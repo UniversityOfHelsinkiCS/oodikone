@@ -1,15 +1,19 @@
 {
-  "name": "nodetest",
-  "version": "1.0.0",
-  "description": "",
+  "name": "oodikone-backend",
+  "version": "0.0.1",
+  "description": "Backend for Oodikone",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Matti Luukkainen",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.16.2",
+    "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
     "install": "^0.10.1",
     "knex": "^0.13.0",
     "moment": "^2.19.1",
@@ -17,5 +21,8 @@
     "pg": "^7.3.0",
     "pg-hstore": "^2.3.2",
     "sequelize": "^4.13.8"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
   }
 }

@@ -1,10 +1,10 @@
 const Sequelize = require('sequelize')
+const moment = require('moment')
 
 const sequelize = new Sequelize('tkt_oodi', 'tkt_oodi', process.ENV.PW, {
   host: 'localhost',
   dialect:'postgres',
 });
-
 
 const Student = sequelize.define('student', 
   {
@@ -35,6 +35,44 @@ const Student = sequelize.define('student',
   }
 );
 
+Student.hasNoPreviousStudies = (startDate) => (student) => {
+  const by = (a, b) => moment(a).isSameOrBefore(b) ? -1 : 1
+  const dates = student.credits.map(c=>c.courseinstance.coursedate).sort(by)
+  const earliestCreditDate = dates[0]
+
+  return moment(startDate).isSameOrBefore(earliestCreditDate)
+}
+
+Student.hasStarted = (student) => {
+  return student.credits.length > 0
+} 
+
+const TagStudent = sequelize.define('tag_student', 
+  {
+    taggedstudents_studentnumber: { type: Sequelize.STRING },
+    tags_tagname: { type: Sequelize.STRING },
+  },
+  {
+    tableName: 'tag_student',
+    timestamps: false,  
+  }  
+);
+
+TagStudent.removeAttribute('id')
+
+const Tag = sequelize.define('tag', 
+  {
+    tagname: {
+      primaryKey: true,
+      type: Sequelize.STRING
+    },
+  },
+  {
+    tableName: 'tag',
+    timestamps: false,  
+  }  
+);
+
 const Credit = sequelize.define('credit', 
   {
     id: {
@@ -54,6 +92,23 @@ const Credit = sequelize.define('credit',
     timestamps: false,  
   }
 );
+
+Credit.inTimeRange = (date, months) => (credit) =>  {
+  const creditDate = credit.courseinstance.coursedate
+  const monthsFromDate = moment(date).add(months, 'months')
+
+  return moment(creditDate).isBetween(date, monthsFromDate, null, '[]')
+}
+
+Credit.notUnnecessary = (credit) => {
+  return credit.credits > 0 && credit.credits <= 12
+}
+
+Credit.failed = (credit) =>
+  ['Luop', 'Hyl.', 'Eisa', '0'].includes(credit.grade)
+
+Credit.passed = (credit) =>
+  !['Luop', 'Hyl.', 'Eisa', '0'].includes(credit.grade)
 
 const Studyright = sequelize.define('studyright', 
   {
@@ -80,10 +135,94 @@ const Studyright = sequelize.define('studyright',
   }
 );
 
+const CourseInstance = sequelize.define('courseinstance', 
+  {
+    id: { 
+      primaryKey: true,
+      type: Sequelize.BIGINT 
+    },
+    coursedate: { type: Sequelize.DATE },
+    course_code: { type: Sequelize.STRING },
+  },
+  {
+    tableName: 'courseinstance',
+    timestamps: false,  
+  }  
+);
+
+const Course = sequelize.define('course', 
+  {
+    code: { 
+      primaryKey: true,
+      type: Sequelize.STRING 
+    },
+    name: { type: Sequelize.STRING },
+  },
+  {
+    tableName: 'course',
+    timestamps: false,  
+  }  
+);
+
+const Teacher = sequelize.define('teacher', 
+  {
+    id: { 
+      primaryKey: true,
+      type: Sequelize.BIGINT 
+    },
+    code: { type: Sequelize.STRING },
+    name: { type: Sequelize.STRING },
+  },
+  {
+    tableName: 'teacher',
+    timestamps: false,  
+  }  
+);
+
+const CourseTeacher = sequelize.define('courseteacher', 
+  {
+    id: { 
+      primaryKey: true,
+      type: Sequelize.BIGINT 
+    },
+    teacherrole: { type: Sequelize.STRING },
+    courseinstance_id: { type: Sequelize.BIGINT },
+    teacher_id: { type: Sequelize.BIGINT },
+  },
+  {
+    tableName: 'courseteacher',
+    timestamps: false,  
+  }  
+);
+
+CourseInstance.belongsTo(Course, {foreignKey: 'course_code', targetKey: 'code'});
+Course.hasMany(CourseInstance, {foreignKey: 'course_code', targetKey: 'code'});
+
+CourseInstance.hasMany(Credit, {foreignKey: 'courseinstance_id', targetKey: 'id'});
+Credit.belongsTo(CourseInstance, {foreignKey: 'courseinstance_id', targetKey: 'id'});
+
+CourseInstance.hasMany(CourseTeacher, {foreignKey: 'courseinstance_id', targetKey: 'id'});
+
 Credit.belongsTo(Student, {foreignKey: 'student_studentnumber', targetKey: 'studentnumber'});
 Student.hasMany(Credit, {foreignKey: 'student_studentnumber', sourceKey: 'studentnumber'});
+
+Student.hasMany(TagStudent, {foreignKey: 'taggedstudents_studentnumber', sourceKey: 'studentnumber'});
+Tag.hasMany(TagStudent, {foreignKey: 'tags_tagname', sourceKey: 'tagname'});
+
+// TagStudent belongsTo
 
 Studyright.belongsTo(Student, {foreignKey: 'student_studentnumber', targetKey: 'studentnumber'});
 Student.hasMany(Studyright, {foreignKey: 'student_studentnumber', sourceKey: 'studentnumber'});
 
-module.exports = {Student, Credit, Studyright, sequelize}
+module.exports = {
+  Student, 
+  Credit, 
+  Studyright, 
+  CourseInstance, 
+  Course, 
+  TagStudent, 
+  Tag, 
+  Teacher, 
+  CourseTeacher, 
+  sequelize
+}
