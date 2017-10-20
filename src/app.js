@@ -2,12 +2,17 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const bodyParser = require('body-parser')
+const { sequelize } = require('./models')
 
 const basicAuth = require('express-basic-auth')
 const bcrypt = require('bcrypt')
 
 app.use(cors({credentials: true, origin: 'http://localhost:8000'}))
 app.use(bodyParser.json())
+
+app.get('/ping', async function (req, res) {
+  res.json({data: 'pong'})
+})
 
 const User = require('./services/users')
 
@@ -20,15 +25,11 @@ async function authorizer (username, password, cb) {
   return cb(null, bcrypt.compareSync(password, hash))
 }
 
-function authorizer2 (username, password) {
-  return false//bcrypt.compareSync(password, hash)
-}
-
 app.use(basicAuth( { 
     authorizer,
     challenge: true,
-    authorizeAsync: true
-    //unauthorizedResponse: { error: 'Unauthorized', message: 'Full authentication is required to access this resource'}
+    authorizeAsync: true,
+    unauthorizedResponse: (req) => { error: 'unauthorized' }
   })
 )
 
@@ -152,6 +153,16 @@ app.get('*', async function (req, res) {
   res.status(404).json(results)
 })
 
-app.listen(8080, function () {
-  console.log('Example app listening on port 8080!')
-})
+if ( process.env.NODE_ENV!=='test' ) {
+  app.listen(8080, function () {
+    console.log('Example app listening on port 8080!')
+  })
+}
+
+if ( process.env.NODE_ENV==='test' ) {
+  app.getDb = () => {
+    return sequelize
+  }
+}
+
+module.exports = app
