@@ -3,14 +3,41 @@ const cors = require('cors')
 const app = express()
 const bodyParser = require('body-parser')
 
+const basicAuth = require('express-basic-auth')
+const bcrypt = require('bcrypt')
+
+app.use(cors({credentials: true, origin: 'http://localhost:8000'}))
+app.use(bodyParser.json())
+
+const User = require('./services/users')
+
+async function authorizer (username, password, cb) {
+  const hash = await User.withUsername(username)  
+  if ( hash===null ) {
+    return cb(null, false)
+  }
+
+  return cb(null, bcrypt.compareSync(password, hash))
+}
+
+function authorizer2 (username, password) {
+  return false//bcrypt.compareSync(password, hash)
+}
+
+app.use(basicAuth( { 
+    authorizer,
+    challenge: true,
+    authorizeAsync: true
+    //unauthorizedResponse: { error: 'Unauthorized', message: 'Full authentication is required to access this resource'}
+  })
+)
+
 const Department = require('./services/departments')
 const Student = require('./services/students')
 const Course = require('./services/courses')
 const Teacher = require('./services/teachers')
 const Population = require('./services/populations')
-
-app.use(cors({credentials: true, origin: 'http://localhost:8000'}))
-app.use(bodyParser.json())
+const Tag = require('./services/tags')
 
 app.get('/api/departmentsuccess', async function (req, res) {
   const startDate = req.query.date? req.query.date.split('.').join('-'): '2005-08-01'
@@ -79,12 +106,46 @@ app.get('/api/studyrightkeywords', async function(req, res) {
   res.json(results)
 })
 
-
 app.get('/api/enrollmentdates', async function(req, res) {
   const results = await Population.universityEnrolmentDates()
   res.json(results)
 })
 
+app.post('/api/populationstatistics', async function(req, res) {
+  const confFromBody = req.body
+  
+  if (confFromBody.maxBirthDate) {
+    confFromBody.maxBirthDate = confFromBody.maxBirthDate.split('.').join('-')
+  }
+  
+  if (confFromBody.minBirthDate) {
+    confFromBody.minBirthDate =confFromBody. minBirthDate.split('.').join('-')
+  }  
+
+  confFromBody.courses = confFromBody.courses.map(c=>c.code)
+
+  console.log(confFromBody)
+
+  try {
+    const result = await Population.statisticsOf(confFromBody)
+    res.json(result)
+  } catch(e) {
+    res.json({})
+  }
+
+})
+
+app.get('/api/tags', async function(req, res) {
+  results = await Tag.bySeachTerm(req.query.query || '')
+  res.json(results)  
+})
+
+app.post('/api/tags/:tagname', async function(req, res) {
+  const tagname = req.params.tagname
+  const students = req.body
+  results = await Tag.addToStudents(tagname, students)
+  res.json(results)  
+})
 
 app.get('*', async function (req, res) {
   const results = { error: "unknown endpoint" }

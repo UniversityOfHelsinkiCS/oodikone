@@ -21,19 +21,21 @@ const studyRightLike = (searchTerm) => {
 const byCriteria = (conf) => {
   const terms = []
 
-  const enrollmentDateCriterias = 
-    conf.enrollmentDates.map( enrollmentDate => (
-        { // for some reason Op.eq does not work...
-          dateofuniversityenrollment: {
-            [Op.between]: [enrollmentDate, enrollmentDate]
-          } 
-        }
-      )  
-    )
+  if (conf.enrollmentDates && conf.enrollmentDates.length>0) {
+    const enrollmentDateCriterias = 
+      conf.enrollmentDates.map( enrollmentDate => (
+          { // for some reason Op.eq does not work...
+            dateofuniversityenrollment: {
+              [Op.between]: [enrollmentDate, enrollmentDate]
+            } 
+          }
+        )  
+      )
       
-  terms.push({
-    [Op.or]: enrollmentDateCriterias
-  })
+    terms.push({
+      [Op.or]: enrollmentDateCriterias
+    })
+  }
 
   if ( conf.minBirthDate || conf.maxBirthDate  ) {
     const minBirthDate = conf.minBirthDate || '1900-01-01'
@@ -161,6 +163,10 @@ const notAmongExcludes = (conf) => (student) => {
 }
 
 const restrictToMonths = (months) => (student) => {
+  if (months===undefined || months.length===0)  {
+    return student
+  }
+
   const withinTimerange = Credit.inTimeRange(student.dateofuniversityenrollment, months)
   const creditsWithinTimelimit = student.credits.filter(withinTimerange)
 

@@ -195,6 +195,21 @@ const CourseTeacher = sequelize.define('courseteacher',
   }  
 );
 
+const User = sequelize.define('users',  
+  {
+    id: { 
+      primaryKey: true,
+      type: Sequelize.BIGINT 
+    },
+    password: { type: Sequelize.STRING },
+    username: { type: Sequelize.STRING },
+  },
+  {
+    tableName: 'users',
+    timestamps: false,  
+  }  
+);
+
 CourseInstance.belongsTo(Course, {foreignKey: 'course_code', targetKey: 'code'});
 Course.hasMany(CourseInstance, {foreignKey: 'course_code', targetKey: 'code'});
 
@@ -224,5 +239,6 @@ module.exports = {
   Tag, 
   Teacher, 
   CourseTeacher, 
+  User,
   sequelize
 }

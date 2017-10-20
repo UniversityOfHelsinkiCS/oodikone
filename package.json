@@ -11,9 +11,11 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.16.2",
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
     "express": "^4.16.2",
+    "express-basic-auth": "^1.1.2",
     "install": "^0.10.1",
     "knex": "^0.13.0",
     "moment": "^2.19.1",

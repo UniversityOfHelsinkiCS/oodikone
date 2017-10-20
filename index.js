@@ -1,2 +1,2 @@
-require('./src/tester')
-//require('./src/app')
+//require('./src/tester')
+require('./src/app')
