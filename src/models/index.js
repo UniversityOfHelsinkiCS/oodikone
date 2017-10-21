@@ -4,6 +4,7 @@ const moment = require('moment')
 const sequelize = new Sequelize('tkt_oodi', 'tkt_oodi', process.ENV.PW, {
   host: 'localhost',
   dialect:'postgres',
+  logging: process.env.NODE_ENV==='test' ? false : true
 });
 
 const Student = sequelize.define('student', 

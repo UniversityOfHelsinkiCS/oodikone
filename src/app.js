@@ -2,7 +2,6 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const bodyParser = require('body-parser')
-const { sequelize } = require('./models')
 
 const basicAuth = require('express-basic-auth')
 const bcrypt = require('bcrypt')
@@ -125,8 +124,6 @@ app.post('/api/populationstatistics', async function(req, res) {
 
   confFromBody.courses = confFromBody.courses.map(c=>c.code)
 
-  console.log(confFromBody)
-
   try {
     const result = await Population.statisticsOf(confFromBody)
     res.json(result)
@@ -157,12 +154,6 @@ if ( process.env.NODE_ENV!=='test' ) {
   app.listen(8080, function () {
     console.log('Example app listening on port 8080!')
   })
-}
-
-if ( process.env.NODE_ENV==='test' ) {
-  app.getDb = () => {
-    return sequelize
-  }
 }
 
 module.exports = app

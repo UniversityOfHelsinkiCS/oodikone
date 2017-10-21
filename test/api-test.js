@@ -1,68 +1,73 @@
-const assert = require('assert')
-const api = require('supertest')
-const chai = require('chai')
-const expect = chai.expect
-
+const test = require('ava')
+const supertest = require('supertest')
 const app = require('../src/app')
+const { sequelize } = require('../src/models')
 
-describe('Oodikone Backend', function() {
-  let request;
-  const auth = {
-    username: 'tktl',
-    password: 'CsZerc8TUtR1S95CYOtTaC69'
-  }
+const api = supertest(app)
 
-  beforeEach(()=>{
-    request = api(app)  
-  })
+const auth = {
+  username: 'tktl',
+  password: 'CsZerc8TUtR1S95CYOtTaC69'
+}
 
-  it('should pong when pinged', (done) => {
-    request = api(app)
-      .get('/ping')
-      .expect('Content-Type', /application\/json/)
-      .expect(200)
-      .then(response=>{
-        expect(response.body).to.eql({data:"pong"})
-        done()
-      })
-  })
+test('should pong when pinged', async t => {
+  const res = await api
+    .get('/ping')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
 
-  it('request without basic auth credentials fails', (done) => {
-    request = api(app)
-      .get('/api/enrollmentdates')
-      .expect(401)
-      .expect('Content-Type', /application\/json/)
-      .end(done)
-  })
+  t.deepEqual(res.body, {data:"pong"} )
+})
 
-  it('request with basic nonexisting user fails', (done) => {
-    request = api(app)
-      .get('/api/enrollmentdates')
-      .auth('nonexistent', 'wrong')
-      .expect(401)
-      .expect('Content-Type', /application\/json/)
-      .end(done)
-  })
 
-  it('request with wrong password fails', (done) => {
-    request = api(app)
-      .get('/api/enrollmentdates')
-      .auth('tktl', 'wrong')
-      .expect(401)
-      .expect('Content-Type', /application\/json/)
-      .end(done)
-  })  
+test('request without basic auth credentials fails', async t => {
+  await api
+    .get('/api/enrollmentdates')
+    .expect(401)
+    .expect('Content-Type', /application\/json/)
+        
+  t.pass()
+})
 
-  it('request with correct credentials succeed', (done) => {
-    request = api(app)
-      .get('/api/enrollmentdates')
-      .auth(auth.username, auth.password)
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
-      .end(done)
-  })  
+test('request with basic nonexisting user fails', async t => {
+  await api
+    .get('/api/enrollmentdates')
+    .auth('nonexistent', 'wrong')
+    .expect(401)
+    .expect('Content-Type', /application\/json/)
+  
+  t.pass()
+})
 
-  after(()=>{
-    app.getDb().close()
-  })
+test('request with wrong password fails', async t => {
+  await api
+    .get('/api/enrollmentdates')
+    .auth('tktl', 'wrong')
+    .expect(401)
+    .expect('Content-Type', /application\/json/)
+
+  t.pass()    
+})  
+
+test('request with correct credentials succeed', async t => {
+  await api
+    .get('/api/enrollmentdates')
+    .auth(auth.username, auth.password)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  
+  t.pass()
+})  
+
+test('Studemts can be searched by searchterm', async t => {
+  const res = await api
+    .get('/api/students')
+    .query({ searchTerm: 'Luukkainen Matti' })
+    .auth(auth.username, auth.password)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const students = res.body
+  t.is(students.length, 1)
+  t.is(students[0].studentNumber, '011120775')        
 })
