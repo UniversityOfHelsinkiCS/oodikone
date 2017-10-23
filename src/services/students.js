@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { Student, Credit, CourseInstance, Course, TagStudent, Tag, sequelize } = require('../models')
-const Op = Sequelize.Op;
+const Op = Sequelize.Op
 
 const byId = (id) => {
   return Student.findOne({
@@ -19,6 +19,16 @@ const byId = (id) => {
     ],
     where: { 
       studentnumber:{
+        [Op.eq]: id
+      } 
+    }
+  })
+}
+
+const tagsOfStudent = (id) => {
+  return TagStudent.findAll({
+    where: { 
+      taggedstudents_studentnumber:{
         [Op.eq]: id
       } 
     }
@@ -46,12 +56,14 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
+/*
+TODO unused?
 const withCreditsAfter = (ids, date) => {
   return Student.findAll({
     include: [
       {
         model: Credit, 
-        include: [ 
+        include: [
           {
             model: CourseInstance,
             where: {
@@ -70,27 +82,28 @@ const withCreditsAfter = (ids, date) => {
     }
   })
 }
+*/
 
 const formatStudent = ({studentnumber, dateofuniversityenrollment, creditcount, credits, tag_students}) => {
-
-  const toCourse = ({grade, credits, status, statuscode, courseinstance}) => {
+  
+  const toCourse = ({grade, credits, courseinstance}) => {
     return {
       course: {
         code: courseinstance.course_code,
         name: courseinstance.course.name
       },
       date: courseinstance.coursedate,
-      passed: Credit.passed(grade),
+      passed: Credit.passed({grade}),
       grade, 
       credits
     }
   }
   
   const tagnames = (tag_students) => {
-    if ( tag_students === undefined || tag_students[0].tags_tagname === null ) {
+    if ( tag_students===undefined || tag_students.length===0 || tag_students[0].tags_tagname===null ) {
       return []
-    }
-    
+    }    
+
     return tag_students.map(t=>t.tags_tagname)
   }
   
@@ -170,8 +183,14 @@ async function bySeachTerm(term) {
 async function withId(id) {
   try {
     const result = await byId(id)
+    // TODO for some reason including tags in query do not work
+    // perhaps it is due to lacking primary key field 
+    const tags = await tagsOfStudent(id)
+    result.tag_students = tags.map(t=>t.dataValues)
+
     return formatStudent(result)
   } catch (e) {
+    console.log(e)
     return {
       error: e
     }
@@ -181,17 +200,15 @@ async function withId(id) {
 async function addTag(id, tagname) {
   try {
     const student = await byId(id)
-    const tag = await findTag(tagname);
+    const tag = await findTag(tagname)
 
     if (tag === null) {
-      sequelize.close()
       return {
         error: `tag '${tagname}' does not exist`
       }
     }
 
     if (student.tag_students.map(t=>t.tags_tagname).includes(tagname)) {
-      sequelize.close()
       return {
         error: `tag '${tagname}' already assosiated with student '${id}'`
       }
@@ -209,13 +226,12 @@ async function deleteTag(id, tagname) {
   try {
     const tag = await findTagOf(id, tagname) 
     if (tag === null) {
-      sequelize.close()
       return {
         error: `tag '${tagname}' is not assosiated with student '${id}'`
       }
     }
 
-    const result = await deleteTagStudent(id, tagname)
+    await deleteTagStudent(id, tagname)
     return {}
   } catch (e) {
     return {

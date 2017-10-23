@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const { Student, Credit, CourseInstance, Course, TagStudent, Tag, CourseTeacher, sequelize } = require('../models')
+const { Student, Credit, CourseInstance, Course, CourseTeacher } = require('../models')
 const { arrayUnique } = require('../util')
-const Op = Sequelize.Op;
+const Op = Sequelize.Op
 
 const byNameOrCode = (searchTerm) => {
   return Course.findAll({
@@ -64,8 +64,8 @@ const byIds = (ids) => {
   return Student.findAll({
     include: [
       {
-        model: Credit, 
-        include: [ 
+        model: Credit,
+        include: [
           {
             model: CourseInstance,
           } 
@@ -111,10 +111,10 @@ async function statisticsOf(code, date, months) {
 
     const creditsAfter = (student) => {
       return student.credits
-              .filter(Credit.inTimeRange(date, months))
-              .filter(Credit.passed)
-              .filter(Credit.notUnnecessary)
-              .reduce((set, c) => set+c.credits, 0.0)
+        .filter(Credit.inTimeRange(date, months))
+        .filter(Credit.passed)
+        .filter(Credit.notUnnecessary)
+        .reduce((set, c) => set+c.credits, 0.0)
     }
 
     const toStudent = (set, student) => {

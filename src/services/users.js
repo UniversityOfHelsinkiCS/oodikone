@@ -1,8 +1,7 @@
 const Sequelize = require('sequelize')
-const moment = require('moment')
-const { User, sequelize } = require('../models')
+const { User } = require('../models')
 
-const Op = Sequelize.Op;
+const Op = Sequelize.Op
 
 const byUsername = (username) => {
   return User.findOne({

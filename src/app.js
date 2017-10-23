@@ -24,11 +24,12 @@ async function authorizer (username, password, cb) {
   return cb(null, bcrypt.compareSync(password, hash))
 }
 
-app.use(basicAuth( { 
+app.use(
+  basicAuth({ 
     authorizer,
     challenge: true,
     authorizeAsync: true,
-    unauthorizedResponse: (req) => { error: 'unauthorized' }
+    unauthorizedResponse: () => ({ error: 'unauthorized' })
   })
 )
 
@@ -42,9 +43,29 @@ const Tag = require('./services/tags')
 app.get('/api/departmentsuccess', async function (req, res) {
   const startDate = req.query.date? req.query.date.split('.').join('-'): '2005-08-01'
   const months = 13
-  const results = await Department.averagesInMonths(startDate, months)
 
-  res.json(results)
+  const redis = require('redis')
+  require('bluebird').promisifyAll(redis.RedisClient.prototype)
+  const client = redis.createClient()
+  const env = process.env.NODE_ENV ? process.env.NODE_ENV : 'development'
+
+  const key = `department-statistics-${startDate}-${months}-${env}`
+  const timeToLive = env==='test' ? 60*60 : 60*60*24*7 // one hour or one week
+
+  try{
+    let results = await client.getAsync(key)
+    if ( results === null ) {
+      results = await Department.averagesInMonths(startDate, months)
+      await client.setAsync(key, JSON.stringify(results), 'EX', timeToLive)
+    } else {
+      results = JSON.parse(results)
+    }
+
+    res.json(results)
+  } catch(e) {
+    console.log(e)    
+  }
+
 })
 
 app.get('/api/students', async function (req, res) {
@@ -59,6 +80,21 @@ app.get('/api/students', async function (req, res) {
 app.get('/api/students/:id', async function (req, res) {
   const results = await Student.withId(req.params.id)
   res.json(results)
+})
+
+app.post('/api/students/:id/tags', async function (req, res) {
+  const tagname = req.body.text
+  const result = await Student.addTag(req.params.id, tagname)
+  const status = result.error === undefined ? 201 : 400
+
+  res.status(status).json(result)
+})
+
+app.delete('/api/students/:id/tags', async function (req, res) {
+  const tagname = req.body.text
+  const result = await Student.deleteTag(req.params.id, tagname)
+  const status = result.error === undefined ? 200 : 400
+  res.status(status).json(result)
 })
 
 app.get('/api/courses', async function (req, res) {
@@ -77,7 +113,7 @@ app.post('/api/courselist', async function(req, res) {
 })
 
 app.post('/api/coursestatistics', async function(req, res) {
-  const code = req.body.code;
+  const code = req.body.code
   const date = req.body.date.split('.').join('-')
   const months = req.body.subsequentMonthsToInvestigate
 
@@ -92,7 +128,7 @@ app.post('/api/teacherstatistics', async function(req, res) {
   const minCourses = req.body.minCourses || 1
   const minStudents = req.body.minStudents || 1
   const studyRights = req.body.studyRights || 1
-  
+
   const results = await Teacher.statisticsOf(courses, fromDate, toDate, minCourses, minStudents, studyRights)
   res.json(results)
 })
@@ -112,41 +148,44 @@ app.get('/api/enrollmentdates', async function(req, res) {
 })
 
 app.post('/api/populationstatistics', async function(req, res) {
-  const confFromBody = req.body
-  
-  if (confFromBody.maxBirthDate) {
-    confFromBody.maxBirthDate = confFromBody.maxBirthDate.split('.').join('-')
-  }
-  
-  if (confFromBody.minBirthDate) {
-    confFromBody.minBirthDate =confFromBody. minBirthDate.split('.').join('-')
-  }  
-
-  confFromBody.courses = confFromBody.courses.map(c=>c.code)
-
   try {
+    const confFromBody = req.body
+    
+    if (confFromBody.maxBirthDate) {
+      confFromBody.maxBirthDate = confFromBody.maxBirthDate.split('.').join('-')
+    }
+    
+    if (confFromBody.minBirthDate) {
+      confFromBody.minBirthDate =confFromBody. minBirthDate.split('.').join('-')
+    }  
+
+    confFromBody.courses = confFromBody.courses.map(c=>c.code)
+
     const result = await Population.statisticsOf(confFromBody)
     res.json(result)
   } catch(e) {
-    res.json({})
+    console.log(e)
+    res.status(400).json({ error: e })
   }
 
 })
 
 app.get('/api/tags', async function(req, res) {
-  results = await Tag.bySeachTerm(req.query.query || '')
+  const results = await Tag.bySeachTerm(req.query.query || '')
   res.json(results)  
 })
 
 app.post('/api/tags/:tagname', async function(req, res) {
   const tagname = req.params.tagname
   const students = req.body
-  results = await Tag.addToStudents(tagname, students)
-  res.json(results)  
+  const results = await Tag.addToStudents(tagname, students)
+  const status = results.error === undefined ? 201 : 400
+  
+  res.status(status).json(results)
 })
 
 app.get('*', async function (req, res) {
-  const results = { error: "unknown endpoint" }
+  const results = { error: 'unknown endpoint' }
   res.status(404).json(results)
 })
 

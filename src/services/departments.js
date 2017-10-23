@@ -1,7 +1,6 @@
 const Sequelize = require('sequelize')
-const moment = require('moment')
-const { Student, Credit, Studyright, CourseInstance, sequelize } = require('../models')
-const Op = Sequelize.Op;
+const { Student, Credit, Studyright, CourseInstance } = require('../models')
+const Op = Sequelize.Op
 
 const studyrightsStartedAt = (date) => {
   return Studyright.findAll({
@@ -31,10 +30,10 @@ const studentsStartedAtDepartment = (studyrights, department, startDate) => {
   }
 
   return studyrights
-          .filter( departmentMatches )
-          .map( s => s.student )
-          .filter( Student.hasStarted )
-          .filter( Student.hasNoPreviousStudies(startDate) )
+    .filter( departmentMatches )
+    .map( s => s.student )
+    .filter( Student.hasStarted )
+    .filter( Student.hasNoPreviousStudies(startDate) )
 }
 
 const averageGradesInMonths = (students, start, months) => {
@@ -51,11 +50,11 @@ const averageGradesInMonths = (students, start, months) => {
     } 
 
     return sum + student.credits
-                 .filter(Credit.passed)
-                 .filter(Credit.notUnnecessary)
-                 .filter(Credit.inTimeRange(start, months))
-                 .reduce(notRepeatEntry, [])
-                 .reduce((sum, c) => sum+c.credits, 0)
+      .filter(Credit.passed)
+      .filter(Credit.notUnnecessary)
+      .filter(Credit.inTimeRange(start, months))
+      .reduce(notRepeatEntry, [])
+      .reduce((sum, c) => sum+c.credits, 0)
   }
 
   return students.reduce(studentsAverageCreditsInMonths, 0.0) / students.length
@@ -84,7 +83,7 @@ async function averagesInMonths(startDate, months) {
   try {
     const studyrights = await studyrightsStartedAt(startDate)
     
-    result = {}
+    const result = {}
     departments.forEach( p => {
       const students = studentsStartedAtDepartment(studyrights, p.name, startDate)
 

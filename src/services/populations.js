@@ -1,8 +1,7 @@
 const Sequelize = require('sequelize')
-const moment = require('moment')
-const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, Tag, CourseTeacher, Teacher, sequelize } = require('../models')
+const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../models')
 const { formatStudent } = require('../services/students')
-const Op = Sequelize.Op;
+const Op = Sequelize.Op
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -24,12 +23,11 @@ const byCriteria = (conf) => {
   if (conf.enrollmentDates && conf.enrollmentDates.length>0) {
     const enrollmentDateCriterias = 
       conf.enrollmentDates.map( enrollmentDate => (
-          { // for some reason Op.eq does not work...
-            dateofuniversityenrollment: {
-              [Op.between]: [enrollmentDate, enrollmentDate]
-            } 
-          }
-        )  
+        { // for some reason Op.eq does not work...
+          dateofuniversityenrollment: {
+            [Op.between]: [enrollmentDate, enrollmentDate]
+          } 
+        })  
       )
       
     terms.push({
@@ -37,7 +35,7 @@ const byCriteria = (conf) => {
     })
   }
 
-  if ( conf.minBirthDate || conf.maxBirthDate  ) {
+  if ( conf.minBirthDate || conf.maxBirthDate ) {
     const minBirthDate = conf.minBirthDate || '1900-01-01'
     const maxBirthDate = conf.maxBirthDate || `${new Date().getFullYear()}-01-01`
     terms.push({
@@ -170,7 +168,13 @@ const restrictToMonths = (months) => (student) => {
   const withinTimerange = Credit.inTimeRange(student.dateofuniversityenrollment, months)
   const creditsWithinTimelimit = student.credits.filter(withinTimerange)
 
-  return {...student, credits: creditsWithinTimelimit }
+  return {
+    studentnumber: student.studentnumber,
+    tag_students: student.tag_students,
+    dateofuniversityenrollment: student.dateofuniversityenrollment,
+    creditcount: student.creditcount,
+    credits: creditsWithinTimelimit 
+  }
 }
 
 async function studyrightsByKeyword(searchTerm) {
@@ -180,17 +184,17 @@ async function studyrightsByKeyword(searchTerm) {
 }
 
 async function universityEnrolmentDates() {
-  const [result, metadata] = await enrolmentDates()
+  const [result] = await enrolmentDates()
 
   return result.map( r => r.date ).filter( d => d ).sort()
 }
 
 async function statisticsOf(conf) {
   const students = (await byCriteria(conf))
-                 .filter(bySelectedCourses(conf.courses))           
-                 .filter(notAmongExcludes(conf))
-                 .map(restrictToMonths(conf.monthsToStudy))
-                    
+    .filter(bySelectedCourses(conf.courses))
+    .filter(notAmongExcludes(conf))
+    .map(restrictToMonths(conf.monthsToStudy))
+
   return students.map(formatStudent)
 }
 

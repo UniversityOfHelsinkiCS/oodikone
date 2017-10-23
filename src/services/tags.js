@@ -1,7 +1,6 @@
 const Sequelize = require('sequelize')
-const moment = require('moment')
-const { Student, Credit, CourseInstance, Course, TagStudent, Tag, sequelize } = require('../models')
-const Op = Sequelize.Op;
+const { TagStudent, Tag } = require('../models')
+const Op = Sequelize.Op
 
 const tagsByTerm = (searchTerm) => {
   return Tag.findAll({
@@ -72,7 +71,6 @@ async function addToStudents(tagname, students) {
 
     return results.map(t=>({student: t.taggedstudents_studentnumber, tag: t.tags_tagname }))
   } catch (e) {
-    console.log(e)
     return {
       error: e
     }

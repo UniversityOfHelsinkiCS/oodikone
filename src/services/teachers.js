@@ -1,8 +1,7 @@
 const Sequelize = require('sequelize')
-const moment = require('moment')
-const { Student, Studyright, Credit, CourseInstance, Course, TagStudent, Tag, CourseTeacher, Teacher, sequelize } = require('../models')
+const { Student, Studyright, Credit, CourseInstance, CourseTeacher, Teacher } = require('../models')
 const { arrayUnique } = require('../util')
-const Op = Sequelize.Op;
+const Op = Sequelize.Op
 
 const courseInstancesInBetween = (courses, fromDate, toDate) => {
   return CourseInstance.findAll({
@@ -110,11 +109,11 @@ async function statisticsOf(courses, fromDate, toDate, minCourses, minStudents, 
   
 
         const totalCredits = creditsWithAskedStudyrights
-                              .filter(Credit.passed)
-                              .filter(noRepeatedEntry)
+          .filter(Credit.passed)
+          .filter(noRepeatedEntry)
 
         const students = creditsWithAskedStudyrights
-                              .filter(noRepeatedAttendance).length 
+          .filter(noRepeatedAttendance).length 
 
         teachers[teacher_id].students += students 
         teachers[teacher_id].courses += 1 
@@ -151,8 +150,6 @@ async function statisticsOf(courses, fromDate, toDate, minCourses, minStudents, 
   try {
     const courseStats = await courseInstancesInBetween(courses, fromDate, toDate)
     const teacherStats = extractStatsPerTeacherId(courseStats)
-
-    // take into account studyRights
 
     const teachers = await teachersByIds(Object.keys(teacherStats)) 
     return format(teacherStats, teachers)

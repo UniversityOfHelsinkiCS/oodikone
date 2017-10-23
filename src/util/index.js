@@ -1,5 +1,5 @@
 function arrayUnique(value, index, self) { 
-  return self.indexOf(value) === index;
+  return self.indexOf(value) === index
 }
 
 module.exports = {
