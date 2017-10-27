@@ -19,7 +19,8 @@ After this you should be working as:
 
 Then run the following commands: 
 
-```CREATE USER tkt_oodi WITH PASSWORD 'insertPasswordHere';
+```
+CREATE USER tkt_oodi WITH PASSWORD 'insertPasswordHere';
 CREATE DATABASE tkt_oodi;
 GRANT ALL PRIVILEGES ON DATABASE tkt_oodi TO tkt_oodi;
 
