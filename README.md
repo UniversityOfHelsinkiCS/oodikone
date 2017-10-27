@@ -7,7 +7,7 @@
 Install postgresql:
 https://www.postgresql.org/download/
 
-Then create user tkt_oodi and database tk_oodi from dump.sql file.
+Then create user tkt_oodi and database tk_oodi from dump.sql file by following these steps: 
 
 Run:
 
