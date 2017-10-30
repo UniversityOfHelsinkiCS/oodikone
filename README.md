@@ -28,7 +28,7 @@ GRANT ALL PRIVILEGES ON DATABASE tkt_oodi TO tkt_oodi;
 ```
 Now put the dump data to the tkt_oodi db: 
 
-`psql tkt_oodi < dump.sq`
+`psql tkt_oodi < dump.sql`
 
 And the db has been set up.
 
