@@ -39,16 +39,25 @@ To look into the tkt_oodi db in terminal run:
 and enter the password.
 
 Then install and run redis
-https://redis.io/topics/quickstart
+
+```
+wget http://download.redis.io/redis-stable.tar.gz
+tar xvzf redis-stable.tar.gz
+cd redis-stable
+make
+sudo make install
+```
 
 Install nodejs and npm
 https://nodejs.org/en/download/
 
 Clone the repository and install the packages in the root of the project:
 
-`git clone git@github.com:UniversityOfHelsinkiCS/oodikone2-backend.git`
-
-`npm install`
+```
+git clone git@github.com:UniversityOfHelsinkiCS/oodikone2-backend.git`
+cd oodikone2-backend
+npm install
+```
 
 ### Running 
 
