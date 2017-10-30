@@ -46,6 +46,7 @@ tar xvzf redis-stable.tar.gz
 cd redis-stable
 make
 sudo make install
+redis-server
 ```
 
 Install nodejs and npm
