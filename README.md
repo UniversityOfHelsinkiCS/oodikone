@@ -36,9 +36,24 @@ To look into the tkt_oodi db in terminal run:
 
 `psql -h 127.0.0.1 -d tkt_oodi -U tkt_oodi -W`
 
-and enter the pw.
+and enter the password.
 
-Then install and run redis.
-TODO
+Then install and run redis
+https://redis.io/topics/quickstart
+
+Install nodejs and npm
+https://nodejs.org/en/download/
+
+Run in the root of the project:
+
+`npm install`
 
 ### Running 
+
+Run `npm start`
+
+Check in your browser for
+
+http://localhost:8080/ping
+
+And if you see "pong" you can congratulate yourself on succesfully installing OodiKone2 backend.
