@@ -11,19 +11,19 @@ Then create user tkt_oodi and database tk_oodi from dump.sql file by following t
 
 Run:
 
-`psql postgres`
+`sudo su postgres`
 
+`psql`ä
 After this you should be working as:
 
 `postgres=#` 
 
-Then run the following commands: 
+Then contact admin to get the password and run the following commands: 
 
 ```
 CREATE USER tkt_oodi WITH PASSWORD 'insertPasswordHere';
 CREATE DATABASE tkt_oodi;
 GRANT ALL PRIVILEGES ON DATABASE tkt_oodi TO tkt_oodi;
-
 \q
 ```
 Now put the dump data to the tkt_oodi db: 
@@ -44,7 +44,9 @@ https://redis.io/topics/quickstart
 Install nodejs and npm
 https://nodejs.org/en/download/
 
-Run in the root of the project:
+Clone the repository and install the packages in the root of the project:
+
+`git clone git@github.com:UniversityOfHelsinkiCS/oodikone2-backend.git`
 
 `npm install`
 
@@ -54,6 +56,6 @@ Run `npm start`
 
 Check in your browser for
 
-http://localhost:8080/ping
+http://localhost:8080/api/tags
 
-And if you see "pong" you can congratulate yourself on succesfully installing OodiKone2 backend.
+If you see a response you can congratulate yourself on succesfully installing and running OodiKone2 backend.
