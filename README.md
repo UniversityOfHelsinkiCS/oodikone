@@ -69,3 +69,9 @@ Check in your browser for
 http://localhost:8080/api/tags
 
 If you see a response you can congratulate yourself on succesfully installing and running OodiKone2 backend.
+
+## oodiKone-backend1
+
+If you have the original oodikone-backend-1.0-SNAPSHOT.jar file, make sure you have the application.properties file set up at the same folder and the psql database set up as required by the backend2 and you should be able to run the original backend with the command
+
+`java -jar oodikone-backend-1.0-SNAPSHOT.jar`
