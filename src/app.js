@@ -5,8 +5,8 @@ const bodyParser = require('body-parser')
 
 const basicAuth = require('express-basic-auth')
 const bcrypt = require('bcrypt')
-
-app.use(cors({credentials: true, origin: 'http://localhost:8000'}))
+const PORT = 8081
+app.use(cors({credentials: true, origin: 'http://localhost:5000'}))
 app.use(bodyParser.json())
 
 app.get('/ping', async function (req, res) {
@@ -46,7 +46,7 @@ app.get('/api/departmentsuccess', async function (req, res) {
 
   const redis = require('redis')
   require('bluebird').promisifyAll(redis.RedisClient.prototype)
-  const client = redis.createClient()
+  const client = redis.createClient(6379 , 'redis')
   const env = process.env.NODE_ENV ? process.env.NODE_ENV : 'development'
 
   const key = `department-statistics-${startDate}-${months}-${env}`
@@ -190,8 +190,8 @@ app.get('*', async function (req, res) {
 })
 
 if ( process.env.NODE_ENV!=='test' ) {
-  app.listen(8080, function () {
-    console.log('Example app listening on port 8080!')
+  app.listen(PORT, function () {
+    console.log('Example app listening on port ' + PORT +'!')
   })
 }
 

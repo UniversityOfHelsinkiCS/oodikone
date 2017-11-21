@@ -74,7 +74,7 @@ const byCriteria = (conf) => {
   }
 
   if ( conf.tags && conf.tags.length > 0 ) {
-    const tagRules = conf.tags.map(tag => ({ [Op.eq]: tag }) )
+    const tagRules = conf.tags.map(tag => ({ [Op.eq]: tag['text'] }) )
 
     tagWithConstraint.where = {
       tags_tagname: {
@@ -161,7 +161,7 @@ const notAmongExcludes = (conf) => (student) => {
 }
 
 const restrictToMonths = (months) => (student) => {
-  if (months===undefined || months.length===0)  {
+  if (months===undefined || months===null || months.length===0)  {
     return student
   }
 

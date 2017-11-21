@@ -1,12 +1,20 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
+// Dev version
+// const sequelize = new Sequelize('tkt_oodi', 'tkt_oodi', process.ENV.PW, {
+//   host: 'localhost',
+//   dialect:'postgres',
+//   logging: process.env.NODE_ENV==='test' ? false : true,
+//   operatorsAliases: false
+// })
 
-const sequelize = new Sequelize('tkt_oodi', 'tkt_oodi', process.ENV.PW, {
-  host: 'localhost',
+const sequelize = new Sequelize('tkt_oodi', 'tkt_oodi', process.env.OODI_PW, {
+  host: 'db',
   dialect:'postgres',
   logging: process.env.NODE_ENV==='test' ? false : true,
   operatorsAliases: false
 })
+
 
 const Student = sequelize.define('student', 
   {
