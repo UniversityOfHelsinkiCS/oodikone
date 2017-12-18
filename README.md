@@ -62,13 +62,51 @@ npm install
 
 ### Running 
 
-Run `npm start`
+#### Dev
+
+Run `npm run dev`
 
 Check in your browser for
 
 http://localhost:8080/api/tags
 
 If you see a response you can congratulate yourself on succesfully installing and running OodiKone2 backend.
+
+#### Docker
+
+Build a Docker image using comand 
+
+`docker build -t {username}/backend`
+
+Run the whole OodiKone with the command 
+
+`docker-compose up`
+
+### Deployment
+
+Log into svm-59 (aka oodikone) and navigate to the correct folder
+
+`ssh {username}@oodikone.cs.helsinki.fi`
+
+`cd home/oodidata/oodikone2-backend/`
+
+Pull the new version from Git
+
+`git pull`
+
+Stop the running version and remove the old docker image and rebuild the new version
+
+```
+docker-compose down 
+docker rmi oodikone/backend
+docker build -t oodikone/backend .
+```
+
+Backtrack to the folder oodidata and start OodiKone
+
+`docker-compose`
+
+Be amazed
 
 ## oodiKone-backend1
 
