@@ -7,7 +7,7 @@ if(process.env.NODE_ENV == 'docker_local') {
   db_host = 'db'
   redis = 'redis'
   frontend_addr = 'http://localhost:5000'
-} else if(process.env.NODE_ENV == 'dev') {
+} else if(process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'test') {
   db_pw = process.ENV.PW
   db_host = 'localhost'
   redis = 'localhost'
