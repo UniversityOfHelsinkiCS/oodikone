@@ -91,7 +91,7 @@ test('a student credit info is returned with student number', async t => {
   t.is(student.studentNumber, '011120775')    
   t.is(student.credits, 514) 
   t.is(student.courses.length, 86)    
-  t.is(student.tags.length, 2)    
+  t.is(student.tags.length, 0)    
 })
 
 test('a tagless student credit info is returned with student number', async t => {
@@ -110,43 +110,43 @@ test('a tagless student credit info is returned with student number', async t =>
 
 
 test('if student already has a tag, it can not be added', async t => {
-  const tagToAdd = { text: 'test' }
+  const tagToAdd = { text: 'StudentsWithCredits2014' }
 
   const res = await api
-    .post('/api/students/011120775/tags')
+    .post('/api/students/014424850/tags')
     .send(tagToAdd)
     .auth(auth.username, auth.password)
     .expect(400)
     .expect('Content-Type', /application\/json/)
 
-  t.is(res.body.error, 'tag \'test\' already assosiated with student \'011120775\'')       
+  t.is(res.body.error, 'tag \'StudentsWithCredits2014\' already assosiated with student \'014424850\'')       
 })
 
 test('tag can be added to and deleted from a student', async t => {
-  const tagToAdd = { text: 'test2' }
+  const tagToAdd = { text: 'mooc-2012' }
 
   let res = await api
-    .post('/api/students/011120775/tags')
+    .post('/api/students/014424850/tags')
     .send(tagToAdd)
     .auth(auth.username, auth.password)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
   const expectedResult = { 
-    taggedstudents_studentnumber: '011120775',
-    tags_tagname: 'test2' 
+    taggedstudents_studentnumber: '014424850',
+    tags_tagname: 'mooc-2012' 
   }
 
   t.deepEqual(res.body, expectedResult)       
 
   res = await api
-    .get('/api/students/011120775')
+    .get('/api/students/014424850')
     .auth(auth.username, auth.password)
 
   t.truthy(res.body.tags.includes(tagToAdd.text))     
 
   res = await api
-    .delete('/api/students/011120775/tags')
+    .delete('/api/students/014424850/tags')
     .send(tagToAdd)
     .auth(auth.username, auth.password)
     .expect(200)
