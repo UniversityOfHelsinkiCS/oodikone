@@ -94,17 +94,9 @@ Pull the new version from Git
 
 `git pull`
 
-Stop the running version and remove the old docker image and rebuild the new version
+Use the update script to restart the software
 
-```
-docker-compose down 
-docker rmi oodikone/backend
-docker build -t oodikone/backend .
-```
-
-Backtrack to the folder oodidata and start OodiKone
-
-`docker-compose`
+`./update.sh`
 
 Be amazed
 
