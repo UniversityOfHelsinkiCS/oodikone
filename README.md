@@ -62,7 +62,7 @@ npm install
 
 ### Running 
 
-Run `npm start`
+Run `npm run dev`
 
 Check in your browser for
 
