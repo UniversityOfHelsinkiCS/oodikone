@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
+    "docker_local": "NODE_ENV=docker_local nodemon index.js",
+    "dev": "NODE_ENV=dev nodemon index.js",
     "test": "NODE_ENV=test ava",
     "lint": "eslint --parser babel-eslint src",
     "coverage": "NODE_ENV=test nyc ava"

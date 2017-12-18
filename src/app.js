@@ -2,11 +2,11 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const bodyParser = require('body-parser')
-
+const conf = require('./conf-backend')
 const basicAuth = require('express-basic-auth')
 const bcrypt = require('bcrypt')
-const PORT = 8081
-app.use(cors({credentials: true, origin: 'http://localhost:5000'}))
+const PORT = 8080
+app.use(cors({credentials: true, origin: conf.frontend_addr}))
 app.use(bodyParser.json())
 
 app.get('/ping', async function (req, res) {
@@ -46,7 +46,7 @@ app.get('/api/departmentsuccess', async function (req, res) {
 
   const redis = require('redis')
   require('bluebird').promisifyAll(redis.RedisClient.prototype)
-  const client = redis.createClient(6379 , 'redis')
+  const client = redis.createClient(6379 , conf.redis)
   const env = process.env.NODE_ENV ? process.env.NODE_ENV : 'development'
 
   const key = `department-statistics-${startDate}-${months}-${env}`
