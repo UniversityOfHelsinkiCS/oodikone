@@ -84,9 +84,9 @@ Run the whole OodiKone with the command
 
 #### Testing
 
-Collect the test data from svm19  with the command
+Collect the test data from svm59  with the command
 
-`scp {username}@oodikone.cs.helsinki.fi:/home/oodidata/ooditestdata.sql`
+`scp {username}@oodikone.cs.helsinki.fi:/home/oodidata/ooditestdata.sql .`
 
 Set up the test database from the file
 
