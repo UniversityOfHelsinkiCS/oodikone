@@ -117,7 +117,7 @@ Run the tests with command
 
 `npm test`
 
-### Deployment
+## Deployment
 
 Log into svm-59 (aka oodikone) and navigate to the correct folder
 
