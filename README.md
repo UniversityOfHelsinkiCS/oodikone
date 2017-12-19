@@ -13,7 +13,7 @@ Run:
 
 `sudo su postgres`
 
-`psql`ä
+`psql`
 After this you should be working as:
 
 `postgres=#` 
@@ -81,6 +81,41 @@ Build a Docker image using comand
 Run the whole OodiKone with the command 
 
 `docker-compose up`
+
+#### Testing
+
+Collect the test data from svm19  with the command
+
+`scp {username}@oodikone.cs.helsinki.fi:/home/oodidata/ooditestdata.sql`
+
+Set up the test database from the file
+
+Run:
+
+`sudo su postgres`
+
+`psql`
+
+After this you should be working as:
+
+`postgres=#` 
+
+Run: 
+
+```
+CREATE DATABASE tkt_oodi_test;
+GRANT ALL PRIVILEGES ON DATABASE tkt_oodi_test TO tkt_oodi;
+\q
+```
+Now put the dump data to the tkt_oodi db: 
+
+`psql tkt_oodi < ooditestdata.sql`
+
+And you're all set. 
+
+Run the tests with command
+
+`npm test`
 
 ### Deployment
 

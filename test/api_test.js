@@ -96,16 +96,16 @@ test('a student credit info is returned with student number', async t => {
 
 test('a tagless student credit info is returned with student number', async t => {
   const res = await api
-    .get('/api/students/011821126')
+    .get('/api/students/014424850')
     .auth(auth.username, auth.password)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
   const student = res.body
 
-  t.is(student.studentNumber, '011821126')    
-  t.is(student.credits, 330) 
-  t.is(student.tags.length, 0)    
+  t.is(student.studentNumber, '014424850')    
+  t.is(student.credits, 181) 
+  t.is(student.tags.length, 3)    
 })
 
 
@@ -123,7 +123,7 @@ test('if student already has a tag, it can not be added', async t => {
 })
 
 test('tag can be added to and deleted from a student', async t => {
-  const tagToAdd = { text: 'mooc-2012' }
+  const tagToAdd = { text: 'mooc-2013' }
 
   let res = await api
     .post('/api/students/014424850/tags')
@@ -134,7 +134,7 @@ test('tag can be added to and deleted from a student', async t => {
 
   const expectedResult = { 
     taggedstudents_studentnumber: '014424850',
-    tags_tagname: 'mooc-2012' 
+    tags_tagname: 'mooc-2013' 
   }
 
   t.deepEqual(res.body, expectedResult)       

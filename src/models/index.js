@@ -2,7 +2,7 @@ const Sequelize = require('sequelize')
 const moment = require('moment')
 const conf = require('../conf-backend')
 
-const sequelize = new Sequelize('tkt_oodi', 'tkt_oodi', conf.db_pw, {
+const sequelize = new Sequelize(conf.db_name, 'tkt_oodi', conf.db_pw, {
   host: conf.db_host,
   dialect:'postgres',
   logging: process.env.NODE_ENV==='test' ? false : true,
