@@ -107,9 +107,9 @@ CREATE DATABASE tkt_oodi_test;
 GRANT ALL PRIVILEGES ON DATABASE tkt_oodi_test TO tkt_oodi;
 \q
 ```
-Now put the dump data to the tkt_oodi db: 
+Now put the dump data to the tkt_oodi_test db: 
 
-`psql tkt_oodi < ooditestdata.sql`
+`psql tkt_oodi_test < ooditestdata.sql`
 
 And you're all set. 
 
