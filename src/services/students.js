@@ -197,10 +197,14 @@ async function withId(id) {
   } 
 }
 
+// HOT-FIXED. Add Id to tag_student table and fix this.
 async function addTag(id, tagname) {
   try {
-    const student = await byId(id)
+    //const student = await byId(id)
     const tag = await findTag(tagname)
+    //console.log(student.tag_students.map(t=>t.tags_tagname))
+    const tags_of_student = await tagsOfStudent(id)
+    //console.log(tags_of_student.map(t=>t.tags_tagname))
 
     if (tag === null) {
       return {
@@ -208,7 +212,7 @@ async function addTag(id, tagname) {
       }
     }
 
-    if (student.tag_students.map(t=>t.tags_tagname).includes(tagname)) {
+    if (tags_of_student.map(t=>t.tags_tagname).includes(tagname)) {
       return {
         error: `tag '${tagname}' already assosiated with student '${id}'`
       }
