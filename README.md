@@ -84,7 +84,14 @@ Run the whole OodiKone with the command
 
 #### Testing
 
-Collect the test data from svm59  with the command
+First log in to oodikone and add reading rights to your username to the test data dump
+
+```
+ssh {username}@oodikone.cs.helsinki.fi
+setfacl -m u:{username}:r /home/oodidata/ooditestdata.sql
+```
+
+Return to your own computer and fetch the test data with the command
 
 `scp {username}@oodikone.cs.helsinki.fi:/home/oodidata/ooditestdata.sql .`
 
