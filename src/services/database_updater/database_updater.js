@@ -3,20 +3,21 @@
 //const { formatStudent } = require('../services/students')
 //const Op = Sequelize.Op
 const axios = require('axios')
+require('dotenv').config()
 
-const url = 'https://oprek4.it.helsinki.fi:30023/students/013737399'
-axios.get(url, {
-  auth: {
-    username: 'tktl',
-    password: process.env.OODI_PW
-  }
+
+axios.defaults.auth = {
+  username: 'tktl',
+  password: process.env.OODI_PW
 }
-)
+
+const url = process.env.OODI_ADDR + '/students/013737399'
+axios.get(url)
   .then(response => {
     console.log(response)
   })
   .catch(error => {
-    console.log(error)
+    console.log("asd")
   })
 /*
 let minStudentNumber = 1000000
