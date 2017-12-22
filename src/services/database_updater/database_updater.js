@@ -7,18 +7,18 @@ const {getStudent, getStudentStudyRights} = require('./oodi_interface')
 let daa = getStudent('014424850')
 let daa2 = getStudentStudyRights('014424850')
 
-let minStudentNumber = 1000000
-let maxStudentNumber = 1500000
+// let minStudentNumber = 1000000
+// let maxStudentNumber = 1500000
 
 // add possibility to update specific students ?
-console.log('Running updater on ' + minStudentNumber + '-' + maxStudentNumber)
+// console.log('Running updater on ' + minStudentNumber + '-' + maxStudentNumber)
 
-for (let i = minStudentNumber; i < maxStudentNumber; i++) {
-  let studentNumber = '0' + i + getStudentNumberChecksum(i.toString)
-  console.log('Updating student ' + studentNumber)
+// for (let i = minStudentNumber; i < maxStudentNumber; i++) {
+//   let studentNumber = '0' + i + getStudentNumberChecksum(i.toString)
+//   console.log('Updating student ' + studentNumber)
 
-  updateStudentInformation(studentNumber)
-}
+//   updateStudentInformation(studentNumber)
+// }
 
 /**
  * Calculate checksum of student number.
