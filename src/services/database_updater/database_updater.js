@@ -2,10 +2,11 @@
 //const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../models')
 //const { formatStudent } = require('../services/students')
 //const Op = Sequelize.Op
-const {getStudent, getStudentStudyRights} = require('./oodi_interface')
+const {getStudent, getStudentStudyRights, getStudyRight} = require('./oodi_interface')
 
 let daa = getStudent('014424850')
 let daa2 = getStudentStudyRights('014424850')
+let daa3 = getStudyRight('102357732')
 
 // let minStudentNumber = 1000000
 // let maxStudentNumber = 1500000
