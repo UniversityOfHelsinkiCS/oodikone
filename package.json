@@ -32,6 +32,7 @@
     "sequelize": "^4.13.8"
   },
   "devDependencies": {
+    "dotenv": "^4.0.0",
     "ava": "^0.22.0",
     "babel-eslint": "^8.0.1",
     "eslint": "^4.9.0",
