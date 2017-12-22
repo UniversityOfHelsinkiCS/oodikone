@@ -36,7 +36,7 @@ function getStudentStudyRights(studentNumber) {
 function getStudyRight(studyRightId) {
   axios.get(base_url + '/studyrights/' + studyRightId)
     .then(response => {
-      console.log(response)
+      console.log(response.data)
       return response
     })
     .catch(error => {
