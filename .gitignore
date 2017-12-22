@@ -2,5 +2,5 @@ node_modules
 .vscode
 .nyc_output
 src/tester.js
-src/services/database_updater.js
 update.sh
+.env
