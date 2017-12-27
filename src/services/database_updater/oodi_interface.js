@@ -15,7 +15,7 @@ function getStudent(studentNumber) {
       return response
     })
     .catch(error => {
-      console.log('asd')
+      console.log('error getStudent')
     })
 
 }
@@ -28,7 +28,7 @@ function getStudentStudyRights(studentNumber) {
       return response
     })
     .catch(error => {
-      console.log('error')
+      console.log('error getStudentStudyRights')
     })
 
 }
@@ -40,30 +40,63 @@ function getStudyRight(studyRightId) {
       return response
     })
     .catch(error => {
-      console.log('error')
+      console.log('error getStudyRights')
     })
 }
 
-// String getTeacherDetails(String courseCode, String date)
+function getOrganization(organizationId) {
+  axios.get(base_url + '/organizations/' + organizationId + '?language_code=en')
+    .then(response => {
+      console.log(response.data)
+      return response
+    })
+    .catch(error => {
+      console.log('error getOrganization')
+    })
+}
+
+
+
+function getTeacherDetails(courseCode, date) {
+  axios.get(base_url + '/courses/' + courseCode + '/' + date + '/teacherdetails')
+    .then(response => {
+      console.log(response.data)
+      return response
+    })
+    .catch(error => {
+      console.log('error getTeacherDetails')
+    })
+}
 
 // String queryUrl(String url)
 
-// List < String > getStudentNumbers()
+function getStudentNumbers() {
+  axios.get(base_url + '/programs/students/since/01.01.1965')
+    .then(response => {
+      console.log(response.data)
+      return response
+    })
+    .catch(error => {
+      console.log('error with getStudentNumbers')
+    })
+}
 
-// Student getStudent(String studentNumber)
 
-// returns a list og studyright ids
+function getStudentCourseCredits(studentNumber) {
+  axios.get(base_url + '/credits/' + studentNumber)
+    .then(response => {
+      console.log(response.data)
+      return response
+    })
+    .catch(error => {
+      console.log('error with getStudentCourseCredits')
+    })
+}
 
-// 
-// Organization getOrganization(String organizationId)
-// 
-// List < Credit > getStudentCourseCredits(Student student)
-// 
-
-// 
 // List < String > getStudyRightIdStrings(String data)
 
 module.exports = {
-    getStudentStudyRights, getStudent, getStudyRight
+  getStudentStudyRights, getStudent, getStudyRight, getOrganization, 
+  getStudentCourseCredits, getStudentNumbers, getTeacherDetails,
 }
 
