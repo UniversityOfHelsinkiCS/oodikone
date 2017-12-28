@@ -1,7 +1,7 @@
-//const Sequelize = require('sequelize')
-//const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../models')
-//const { formatStudent } = require('../services/students')
-//const Op = Sequelize.Op
+const Sequelize = require('sequelize')
+const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../models')
+const StudentService = require('../services/students')
+const Op = Sequelize.Op
 const {getStudent, getStudentStudyRights, getStudyRight} = require('./oodi_interface')
 
 let daa = getStudent('014424850')
@@ -40,3 +40,62 @@ function getStudentNumberChecksum(studentNumber) {
   return (10 - (checksum % 10)) % 10
 }
 */
+
+function updateStudentInformation(studentNumber) {
+  let student = loadAndUpdateStudent(studentNumber)
+  if (student === null) {
+    return
+  }
+  updateStudentStudyRights(student)
+  updateStudentCredits(student)
+}
+
+function updateStudentStudyRights() {
+
+}
+
+function updateStudentCredits() {
+
+}
+
+function studentAlreadyHasCredit() {
+
+}
+
+function loadAndUpdateStudent(studentNumber) {
+  let student = StudentService.bySearchTerm(studentNumber)
+  if (student === null) {
+    try {
+      student = getStudent(studentNumber)
+    }
+    catch(e) {
+      console.log('couldn\'t fetch student ' + studentNumber + '\'s information.')
+      console.log(e)
+      return null
+    }
+    // save student here
+    return student
+  }
+
+  console.log('Student ' + studentNumber + ' found in database')
+  let studentFromOodi
+  try {
+    studentFromOodi = getStudent(studentNumber)
+  }
+  catch(e) {
+    console.log('couldn\'t fetch student ' + studentNumber + '\'s information.')
+    console.log(e)
+    return null
+  }
+  if (studentFromOodi.getDateOfLastCredit() === null ||
+      studentFromOodi.getDateOfLastCredit() === student.getDateOfLastCredit()) {
+    console.log('No need to update student ' + studentNumber + ' information.')
+    return student
+  }
+
+  // info has changed, let's change details
+  student.updateDetailsFrom(studentFromOodi)
+  // save student here
+  console.log('Student ' + studentNumber + ' details updated')
+  return student
+}
