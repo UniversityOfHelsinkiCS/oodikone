@@ -7,7 +7,7 @@ axios.defaults.auth = {
   password: process.env.OODI_PW
 }
 
-function getStudent(studentNumber) {
+const getStudent = (studentNumber) => {
   axios.get(base_url + '/students/' + studentNumber)
     .then(response => {
 
@@ -20,7 +20,7 @@ function getStudent(studentNumber) {
 
 }
 
-function getStudentStudyRights(studentNumber) {
+const getStudentStudyRights = (studentNumber) => {
   axios.get(base_url + '/students/' + studentNumber + '/studyrights')
     .then(response => {
 
@@ -33,7 +33,7 @@ function getStudentStudyRights(studentNumber) {
 
 }
 
-function getStudyRight(studyRightId) {
+const getStudyRight = (studyRightId) => {
   axios.get(base_url + '/studyrights/' + studyRightId)
     .then(response => {
       console.log(response.data)
@@ -44,7 +44,7 @@ function getStudyRight(studyRightId) {
     })
 }
 
-function getOrganization(organizationId) {
+const getOrganization = (organizationId) => {
   axios.get(base_url + '/organizations/' + organizationId + '?language_code=en')
     .then(response => {
       console.log(response.data)
@@ -57,7 +57,7 @@ function getOrganization(organizationId) {
 
 
 
-function getTeacherDetails(courseCode, date) {
+const getTeacherDetails = (courseCode, date) => {
   axios.get(base_url + '/courses/' + courseCode + '/' + date + '/teacherdetails')
     .then(response => {
       console.log(response.data)
@@ -70,7 +70,7 @@ function getTeacherDetails(courseCode, date) {
 
 // String queryUrl(String url)
 
-function getStudentNumbers() {
+const getStudentNumbers = () => {
   axios.get(base_url + '/programs/students/since/01.01.1965')
     .then(response => {
       console.log(response.data)
@@ -82,7 +82,7 @@ function getStudentNumbers() {
 }
 
 
-function getStudentCourseCredits(studentNumber) {
+const getStudentCourseCredits = (studentNumber) => {
   axios.get(base_url + '/credits/' + studentNumber)
     .then(response => {
       console.log(response.data)
