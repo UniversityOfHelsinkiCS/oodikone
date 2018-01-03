@@ -13,26 +13,25 @@ const getStudentFromData = (data) => {
 
 const getStudyRightFromData = (data) => {
   const info = data['info']['data']
-  const details = data['details']['data']
+  const details = data['elements']['data']
+  if (details.length == 0) return null
 
-  if(details.length == 0) return null
-
-  let studyRight = []
-  studyRight['studyRightId'] = info[1] != null ? info[1] : 0
-  studyRight['organization'] = info[2]
-  studyRight['priorityCode'] = info[3] != null ? info[3] : 0
-  studyRight['extentCode'] = info[4] != null ? info[4] : 0
-  studyRight['givenDate'] = info[5]
-  studyRight['startDate'] = info[6]
-  studyRight['studyStartDate'] = info[7]
-  studyRight['cancelDate'] = info[8]
-  studyRight['endDate'] = info[9]
-  studyRight['cancelOrganization'] = info[10]
-  studyRight['graduated'] = info[11]
-  studyRight['highLevelName'] = details[0][4] != null ? details[0][4] : details[0][2]
-
+  let studyRight = {
+    studyRightId: info[1] != null ? info[1] : 0,
+    organisation: info[2],
+    priorityCode: info[3] != null ? info[3] : 0,
+    extentCode: info[4] != null ? info[4] : 0,
+    givenDate: info[5],
+    startDate: info[6],
+    studyStartDate: info[7],
+    cancelDate: info[8],
+    endDate: info[9],
+    cangelOrganisation: info[10],
+    graduated: info[11],
+    highLevelName: details[0][4] != null ? details[0][4] : details[0][2]
+  }
   if (details.length > 1 && details[details.length - 1][4] != null) {
-    studyRight['highLevelName'] += ', ' + details[details.length - 1][4]
+    studyRight.highLevelName += ', ' + details[details.length - 1][4]
   }
   return studyRight
 }
@@ -46,18 +45,22 @@ const getOrganisationFromData = (data) => {
 
 const getCourseCreditsFromData = (data) => {
   let courseCredits = []
-  let course = []
+  let course
   data['data'].forEach((courseData) => {
-    course['credits'] = courseData[3]
-    course['grade'] = courseData[4]
-    course['status'] = courseData[5]
-    course['statusCode'] = courseData[6]
-    course['ordering'] = courseData[7]
-    course['courseInstance'] = []
-    course['courseInstance']['date'] = courseData[0]
-    course['courseInstance']['course'] = []
-    course['courseInstance']['course']['courseCode'] = courseData[1]
-    course['courseInstance']['course']['courseName'] = courseData[2]
+    course = {
+      credits: courseData[3],
+      grade: courseData[4],
+      status: courseData[5],
+      statusCode: courseData[6],
+      ordering: courseData[7],
+      courseInstance: {
+        date: courseData[0],
+        course: {
+          courseCode: courseData[1],
+          courseName: courseData[2]
+        }
+      }
+    }
     courseCredits.push(course)
     course = []
   })
