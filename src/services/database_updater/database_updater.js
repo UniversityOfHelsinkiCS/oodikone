@@ -1,6 +1,9 @@
+import { inspect } from 'util';
+
 const Sequelize = require('sequelize')
 const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../models')
 const StudentService = require('../services/students')
+const CourseService = require('../services/courses')
 const Op = Sequelize.Op
 const Oi = require('./oodi_interface')
 
@@ -64,32 +67,86 @@ function updateStudentStudyRights(student) {
       let organization = Organization.findByCode(studyRight.organization_code)
       if (organization === null) {
         organization = Oi.getOrganisation(studyRight.organization_code)
-        // save the organization
+        organization.save().then(() => {})// save the organization
       }
+      studyRight.organization_code = organization
+      studyRight.student_studentnumber = student.studentnumber
+      studyRight.save().then(() => { // save study right
+        student.setStudentStudyRights([student.getStudentStudyRights(), studyRight]) // add studyrights to student
+      })
     }
   })
-  /*
-  for (StudyRight studyRight : studentStudyRightsFromOodi) {
-    if (student.getStudyRights().contains(studyRight)) {
-        continue;
-    }
-
-    Organization organization = organizationRepository.findByCode(studyRight.getOrganization().getCode());
-    if (organization == null) {
-        organization = oi.getOrganization(studyRight.getOrganization().getCode());
-        organization = organizationRepository.saveAndFlush(organization);
-    }
-    studyRight.setOrganization(organization);
-
-    studyRight.setStudent(student);
-    studyRight = studyRightRepository.saveAndFlush(studyRight);
-    student.getStudyRights().add(studyRight);
 }
 
-}
+async function updateStudentCredits(student) {
+  let studentCourseCredits = await Oi.getStudentCourseCredits(student.studentnumber)
 
-function updateStudentCredits() {
-*/
+  await student.getCredits().then(studentOldCredits => {
+    if (studentOldCredits.lenght === studentCourseCredits.length) {
+      console.log('Student: '  + student.studentnumber + ' no need to update credits')
+      return
+    }
+  })
+  console.log('Student: '  + student.studentnumber + ' updating credits')
+  studentCourseCredits.forEach(credit => {
+    if (!student.studentAlreadyHasCredit(student, credit)) {
+      let instance = await credit.getCourseInstance()
+      let course = await CourseService.byNameOrCode(instance.course_code)
+      if (course === null) {
+        /* something like this?
+        course = credit.getCourseInstance().then(instance => {
+          instance.getCourse().then(() => {})
+        })
+        course.save()
+        */
+      }
+      await credit.getCourseInstance().then(instance => {
+        instance.setCourse(course)
+      })
+     
+      // Is instanceStatistics the right one to use?
+      let courseInstance = CourseService.instanceStatistic(instance.course_code, instance.coursedate)
+      if (courseInstance === null) {
+        teacherDetailData = oi.getTeacherDetails(instance.course_code, instance.coursedate)
+        /*
+        Map<Teacher, String> teacherRoles = OodiDataMapper.getTeacherRoles(teacherDetailData);
+        List<CourseTeacher> courseTeachers = new ArrayList<>();
+        for (Teacher teacher : teacherRoles.keySet()) {
+            Teacher t = (teacher.getCode() == null ? teacherRepository.findByName(teacher.getName()) : teacherRepository.findByCodeOrName(teacher.getCode(), teacher.getName()));
+            
+            if(t == null) {
+                t = teacherRepository.saveAndFlush(teacher);
+            }
+            
+            CourseTeacher ct = new CourseTeacher();
+            ct.setTeacher(t);
+            ct.setTeacherRole(teacherRoles.get(teacher));
+            
+            courseTeachers.add(ct);
+        }
+        
+        courseInstance = courseInstanceRepository.saveAndFlush(credit.getCourseInstance());
+        
+        for (CourseTeacher courseTeacher : courseTeachers) {
+            courseTeacher.setCourseInstance(courseInstance);
+            courseTeacher = courseTeacherRepository.saveAndFlush(courseTeacher);
+            courseInstance.getTeachers().add(courseTeacher);
+        }
+        
+        courseInstance = courseInstanceRepository.saveAndFlush(credit.getCourseInstance());
+        */
+      }
+      await credit.setCourseInstance(courseInstance)
+      await credit.getCourseInstance().then(()=>setCourse(course))
+      
+      await credit.setStudent(student)
+      await credit.save()
+      
+      await courseInstance.addCredit(credit)
+      await courseInstance.save()
+    }
+  })
+  await student.save()
 }
 
 function studentAlreadyHasCredit(student, credit) {
