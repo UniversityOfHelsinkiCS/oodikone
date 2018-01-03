@@ -58,8 +58,15 @@ function updateStudentCredits() {
 
 }
 
-function studentAlreadyHasCredit() {
-
+function studentAlreadyHasCredit(student, credit) {
+  student.getCredits.forEach(studentCredit => {
+    // do below credit methods exist?
+    if (credit.getGrade() === studentCredit.getGrade() && 
+        credit.hasSameCourseInstance(studentCredit.getCourseInstance())) {
+      return true
+    }
+  })
+  return false
 }
 
 function loadAndUpdateStudent(studentNumber) {
@@ -87,6 +94,7 @@ function loadAndUpdateStudent(studentNumber) {
     console.log(e)
     return null
   }
+  // does the getDateOfLastCredit method exist?
   if (studentFromOodi.getDateOfLastCredit() === null ||
       studentFromOodi.getDateOfLastCredit() === student.getDateOfLastCredit()) {
     console.log('No need to update student ' + studentNumber + ' information.')
