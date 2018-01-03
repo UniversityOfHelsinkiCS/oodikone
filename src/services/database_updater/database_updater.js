@@ -2,11 +2,11 @@ const Sequelize = require('sequelize')
 const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../models')
 const StudentService = require('../services/students')
 const Op = Sequelize.Op
-const {getStudent, getStudentStudyRights, getStudyRight} = require('./oodi_interface')
+const Oi = require('./oodi_interface')
 
-let daa = getStudent('014424850')
-let daa2 = getStudentStudyRights('014424850')
-let daa3 = getStudyRight('102357732')
+let daa = Oi.getStudent('014424850')
+let daa2 = Oi.getStudentStudyRights('014424850')
+let daa3 = Oi.getStudyRight('102357732')
 
 // let minStudentNumber = 1000000
 // let maxStudentNumber = 1500000
@@ -50,12 +50,46 @@ function updateStudentInformation(studentNumber) {
   updateStudentCredits(student)
 }
 
-function updateStudentStudyRights() {
+function updateStudentStudyRights(student) {
+  let studentStudyRights = Oi.getStudentStudyRights(student)
+  if (student.studyrights.length === studentStudyRights.length) {
+    console.log('Student: ' + student.studentnumber + 'No need to update study rights')
+    return
+  }
+  console.log('Student: ' + student.studentnumber + ' updating study rights')
+
+  studentStudyRights.forEach(studyRight => {
+    if (!student.studyrights.includes(studyRight)) {
+      // Organization model does not exist
+      let organization = Organization.findByCode(studyRight.organization_code)
+      if (organization === null) {
+        organization = Oi.getOrganisation(studyRight.organization_code)
+        // save the organization
+      }
+    }
+  })
+  /*
+  for (StudyRight studyRight : studentStudyRightsFromOodi) {
+    if (student.getStudyRights().contains(studyRight)) {
+        continue;
+    }
+
+    Organization organization = organizationRepository.findByCode(studyRight.getOrganization().getCode());
+    if (organization == null) {
+        organization = oi.getOrganization(studyRight.getOrganization().getCode());
+        organization = organizationRepository.saveAndFlush(organization);
+    }
+    studyRight.setOrganization(organization);
+
+    studyRight.setStudent(student);
+    studyRight = studyRightRepository.saveAndFlush(studyRight);
+    student.getStudyRights().add(studyRight);
+}
 
 }
 
 function updateStudentCredits() {
-
+*/
 }
 
 function studentAlreadyHasCredit(student, credit) {
@@ -73,7 +107,7 @@ function loadAndUpdateStudent(studentNumber) {
   let student = StudentService.bySearchTerm(studentNumber)
   if (student === null) {
     try {
-      student = getStudent(studentNumber)
+      student = Oi.getStudent(studentNumber)
     }
     catch(e) {
       console.log('couldn\'t fetch student ' + studentNumber + '\'s information.')
@@ -87,7 +121,7 @@ function loadAndUpdateStudent(studentNumber) {
   console.log('Student ' + studentNumber + ' found in database')
   let studentFromOodi
   try {
-    studentFromOodi = getStudent(studentNumber)
+    studentFromOodi = Oi.getStudent(studentNumber)
   }
   catch(e) {
     console.log('couldn\'t fetch student ' + studentNumber + '\'s information.')
