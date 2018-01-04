@@ -1,9 +1,7 @@
-import { inspect } from 'util';
-
 const Sequelize = require('sequelize')
-const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../models')
-const StudentService = require('../services/students')
-const CourseService = require('../services/courses')
+const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../../models')
+// const StudentService = require('../services/students')
+// const CourseService = require('../services/courses')
 const Op = Sequelize.Op
 const Oi = require('./oodi_interface')
 
@@ -30,7 +28,7 @@ let daa3 = Oi.getStudyRight('102357732')
  * @param studentNumber Student number without the checksum (last digit).
  * @return Checksum digit.
  
-function getStudentNumberChecksum(studentNumber) {
+const getStudentNumberChecksum = studentNumber => {
   let checksumNumbers = [7, 3, 1]
   let checksum = 0
 
@@ -44,7 +42,7 @@ function getStudentNumberChecksum(studentNumber) {
 }
 */
 
-function updateStudentInformation(studentNumber) {
+const updateStudentInformation = studentNumber => {
   let student = loadAndUpdateStudent(studentNumber)
   if (student === null) {
     return
@@ -53,7 +51,7 @@ function updateStudentInformation(studentNumber) {
   updateStudentCredits(student)
 }
 
-function updateStudentStudyRights(student) {
+const updateStudentStudyRights = student  => {
   let studentStudyRights = Oi.getStudentStudyRights(student)
   if (student.studyrights.length === studentStudyRights.length) {
     console.log('Student: ' + student.studentnumber + 'No need to update study rights')
@@ -78,7 +76,7 @@ function updateStudentStudyRights(student) {
   })
 }
 
-async function updateStudentCredits(student) {
+const updateStudentCredits = async student => {
   let studentCourseCredits = await Oi.getStudentCourseCredits(student.studentnumber)
 
   await student.getCredits().then(studentOldCredits => {
@@ -88,7 +86,7 @@ async function updateStudentCredits(student) {
     }
   })
   console.log('Student: '  + student.studentnumber + ' updating credits')
-  studentCourseCredits.forEach(credit => {
+  studentCourseCredits.forEach(async credit => {
     if (!student.studentAlreadyHasCredit(student, credit)) {
       let instance = await credit.getCourseInstance()
       let course = await CourseService.byNameOrCode(instance.course_code)
@@ -149,7 +147,7 @@ async function updateStudentCredits(student) {
   await student.save()
 }
 
-function studentAlreadyHasCredit(student, credit) {
+const studentAlreadyHasCredit = (student, credit) => {
   student.getCredits.forEach(studentCredit => {
     // do below credit methods exist?
     if (credit.getGrade() === studentCredit.getGrade() && 
@@ -160,7 +158,7 @@ function studentAlreadyHasCredit(student, credit) {
   return false
 }
 
-function loadAndUpdateStudent(studentNumber) {
+const loadAndUpdateStudent = studentNumber => {
   let student = StudentService.bySearchTerm(studentNumber)
   if (student === null) {
     try {

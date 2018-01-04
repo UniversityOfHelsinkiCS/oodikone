@@ -1,5 +1,5 @@
-const axios = require('axios')
 require('dotenv').config()
+const axios = require('axios')
 const data_mapper = require('./oodi_data_mapper')
 const base_url = process.env.OODI_ADDR
 
