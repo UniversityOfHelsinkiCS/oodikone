@@ -35,7 +35,7 @@ const createTag = (tagname) => {
   })
 }
 
-async function bySeachTerm(searchTerm) {
+async function bySearchTerm(searchTerm) {
   try {
     const tag = await tagsByTerm(searchTerm) 
     return tag.map(t=>t.tagname)
@@ -78,5 +78,5 @@ async function addToStudents(tagname, students) {
 }
 
 module.exports = {
-  bySeachTerm, addToStudents
+  bySearchTerm, addToStudents
 }

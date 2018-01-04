@@ -80,7 +80,7 @@ const byIds = (ids) => {
   })
 }
 
-async function bySeachTerm(term) {
+async function bySearchTerm(term) {
   const formatCourse = ({name, code}) => ({name, code})
   
   try {
@@ -173,5 +173,5 @@ async function instancesOf(code) {
 }
 
 module.exports = {
-  bySeachTerm, instancesOf, statisticsOf
+  bySearchTerm, instancesOf, statisticsOf
 }

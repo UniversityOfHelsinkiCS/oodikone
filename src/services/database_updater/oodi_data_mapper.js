@@ -1,3 +1,5 @@
+const moment = require('moment')
+
 const getStudyRightIdStrings = (data) => {
   const arr = data['data']
   let strings = []
@@ -75,7 +77,13 @@ const getStudentNumbersFromProgramData = (data) => {
   return studentNumbers
 }
 
+const getDate = (date, format) => {
+  if (!date) return null
+  console.log(date, format)
+  return moment(date, format).format('YYYY-MM-DD')
+}
+
 module.exports = {
   getStudentFromData, getStudyRightIdStrings, getStudyRightFromData,
-  getOrganisationFromData, getCourseCreditsFromData, getStudentNumbersFromProgramData
+  getOrganisationFromData, getCourseCreditsFromData, getStudentNumbersFromProgramData, getDate
 }

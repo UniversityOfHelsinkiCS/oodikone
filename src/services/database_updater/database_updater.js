@@ -1,17 +1,16 @@
 const Sequelize = require('sequelize')
 const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../../models')
-// const StudentService = require('../services/students')
+const StudentService = require('../students')
+const {getDate} = require('./oodi_data_mapper')
+const moment = require('moment')
+
 // const CourseService = require('../services/courses')
 const Op = Sequelize.Op
 const Oi = require('./oodi_interface')
 
-let daa = Oi.getStudent('014424850')
-let daa2 = Oi.getStudentStudyRights('014424850')
-let daa3 = Oi.getStudyRight('102357732')
 
 // let minStudentNumber = 1000000
 // let maxStudentNumber = 1500000
-
 // add possibility to update specific students ?
 // console.log('Running updater on ' + minStudentNumber + '-' + maxStudentNumber)
 
@@ -51,7 +50,7 @@ const updateStudentInformation = studentNumber => {
   updateStudentCredits(student)
 }
 
-const updateStudentStudyRights = student  => {
+const updateStudentStudyRights = student => {
   let studentStudyRights = Oi.getStudentStudyRights(student)
   if (student.studyrights.length === studentStudyRights.length) {
     console.log('Student: ' + student.studentnumber + 'No need to update study rights')
@@ -65,7 +64,7 @@ const updateStudentStudyRights = student  => {
       let organization = Organization.findByCode(studyRight.organization_code)
       if (organization === null) {
         organization = Oi.getOrganisation(studyRight.organization_code)
-        organization.save().then(() => {})// save the organization
+        organization.save().then(() => { })// save the organization
       }
       studyRight.organization_code = organization
       studyRight.student_studentnumber = student.studentnumber
@@ -81,11 +80,11 @@ const updateStudentCredits = async student => {
 
   await student.getCredits().then(studentOldCredits => {
     if (studentOldCredits.lenght === studentCourseCredits.length) {
-      console.log('Student: '  + student.studentnumber + ' no need to update credits')
+      console.log('Student: ' + student.studentnumber + ' no need to update credits')
       return
     }
   })
-  console.log('Student: '  + student.studentnumber + ' updating credits')
+  console.log('Student: ' + student.studentnumber + ' updating credits')
   studentCourseCredits.forEach(async credit => {
     if (!student.studentAlreadyHasCredit(student, credit)) {
       let instance = await credit.getCourseInstance()
@@ -101,7 +100,7 @@ const updateStudentCredits = async student => {
       await credit.getCourseInstance().then(instance => {
         instance.setCourse(course)
       })
-     
+
       // Is instanceStatistics the right one to use?
       let courseInstance = CourseService.instanceStatistic(instance.course_code, instance.coursedate)
       if (courseInstance === null) {
@@ -135,11 +134,11 @@ const updateStudentCredits = async student => {
         */
       }
       await credit.setCourseInstance(courseInstance)
-      await credit.getCourseInstance().then(()=>setCourse(course))
-      
+      await credit.getCourseInstance().then(() => setCourse(course))
+
       await credit.setStudent(student)
       await credit.save()
-      
+
       await courseInstance.addCredit(credit)
       await courseInstance.save()
     }
@@ -150,49 +149,54 @@ const updateStudentCredits = async student => {
 const studentAlreadyHasCredit = (student, credit) => {
   student.getCredits.forEach(studentCredit => {
     // do below credit methods exist?
-    if (credit.getGrade() === studentCredit.getGrade() && 
-        credit.hasSameCourseInstance(studentCredit.getCourseInstance())) {
+    if (credit.getGrade() === studentCredit.getGrade() &&
+      credit.hasSameCourseInstance(studentCredit.getCourseInstance())) {
       return true
     }
   })
   return false
 }
 
-const loadAndUpdateStudent = studentNumber => {
-  let student = StudentService.bySearchTerm(studentNumber)
+const loadAndUpdateStudent = async studentNumber => {
+  let student = await StudentService.byId(studentNumber)
   if (student === null) {
     try {
-      student = Oi.getStudent(studentNumber)
+      student = await Oi.getStudent(studentNumber)
     }
-    catch(e) {
+    catch (e) {
       console.log('couldn\'t fetch student ' + studentNumber + '\'s information.')
       console.log(e)
       return null
     }
-    // save student here
+    StudentService.createStudent(student)
     return student
   }
 
   console.log('Student ' + studentNumber + ' found in database')
   let studentFromOodi
   try {
-    studentFromOodi = Oi.getStudent(studentNumber)
+    studentFromOodi = await Oi.getStudent(studentNumber)
   }
-  catch(e) {
+  catch (e) {
     console.log('couldn\'t fetch student ' + studentNumber + '\'s information.')
     console.log(e)
     return null
   }
-  // does the getDateOfLastCredit method exist?
-  if (studentFromOodi.getDateOfLastCredit() === null ||
-      studentFromOodi.getDateOfLastCredit() === student.getDateOfLastCredit()) {
+  let oodiLastCreditDate
+  console.log(moment(studentFromOodi[21], 'DD.MM.YYYY').format('YYYY-MM-DD'), moment(student.dataValues.dateoflastcredit, 'YYYY-MM-DD').format('YYYY-MM-DD'))
+  if (studentFromOodi[21] != null) {
+    oodiLastCreditDate = getDate(studentFromOodi[21], 'DD.MM.YYYY')
+  }
+  if (oodiLastCreditDate === null ||
+    oodiLastCreditDate === getDate(student.dataValues.dateoflastcredit, 'YYYY-MM-DD')) {
     console.log('No need to update student ' + studentNumber + ' information.')
     return student
   }
 
   // info has changed, let's change details
-  student.updateDetailsFrom(studentFromOodi)
+  await StudentService.updateStudent(studentFromOodi)
   // save student here
   console.log('Student ' + studentNumber + ' details updated')
   return student
 }
+loadAndUpdateStudent('014272112')
