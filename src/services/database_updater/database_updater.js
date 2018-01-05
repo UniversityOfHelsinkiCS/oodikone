@@ -5,8 +5,7 @@ const StudyrightService = require('../studyrights')
 
 const { getDate } = require('./oodi_data_mapper')
 const moment = require('moment')
-
-// const CourseService = require('../services/courses')
+const CourseService = require('../courses')
 const Op = Sequelize.Op
 const Oi = require('./oodi_interface')
 
@@ -87,7 +86,7 @@ const updateStudentStudyRights = async student => {
 
 const updateStudentCredits = async student => {
   let studentCourseCredits = await Oi.getStudentCourseCredits(student.studentnumber)
-
+  
   await student.getCredits().then(studentOldCredits => {
     if (studentOldCredits.lenght === studentCourseCredits.length) {
       console.log('Student: ' + student.studentnumber + ' no need to update credits')
@@ -96,7 +95,7 @@ const updateStudentCredits = async student => {
   })
   console.log('Student: ' + student.studentnumber + ' updating credits')
   studentCourseCredits.forEach(async credit => {
-    if (!student.studentAlreadyHasCredit(student, credit)) {
+    if (!studentAlreadyHasCredit(student, credit)) {
       let instance = await credit.getCourseInstance()
       let course = await CourseService.byNameOrCode(instance.course_code)
       if (course === null) {
@@ -108,7 +107,7 @@ const updateStudentCredits = async student => {
         */
       }
       await credit.getCourseInstance().then(instance => {
-        instance.setCourse(course)
+        //instance.setCourse(course)
       })
 
       // Is instanceStatistics the right one to use?
@@ -153,16 +152,18 @@ const updateStudentCredits = async student => {
       await courseInstance.save()
     }
   })
-  await student.save()
+  //await student.save()
 }
 
 const studentAlreadyHasCredit = (student, credit) => {
-  student.getCredits.forEach(studentCredit => {
+  student.getCredits().then(credits => {
+    credits.forEach(studentCredit => {
     // do below credit methods exist?
-    if (credit.getGrade() === studentCredit.getGrade() &&
-      credit.hasSameCourseInstance(studentCredit.getCourseInstance())) {
-      return true
-    }
+      if (credit.getGrade() === studentCredit.getGrade() &&
+        credit.getCourseInstance(studentCredit.getCourseInstance()) != null ) {
+        return true
+      }
+    })
   })
   return false
 }
