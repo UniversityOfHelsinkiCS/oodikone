@@ -20,3 +20,5 @@ const createCredit = (array, studentNumber, courseInstanceId) => {
     return
   })
 }
+
+module.exports = { createCredit }
