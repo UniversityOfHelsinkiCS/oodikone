@@ -47,9 +47,9 @@ const updateStudentInformation = async studentNumber => {
   if (student === null) {
     return
   }
-  updateStudentStudyRights(student)
-  return
+  //updateStudentStudyRights(student)
   updateStudentCredits(student)
+  return
 }
 
 const updateStudentStudyRights = async student => {
@@ -85,6 +85,7 @@ const updateStudentStudyRights = async student => {
 }
 
 const updateStudentCredits = async student => {
+  // get credits from Oodi
   let studentCourseCredits = await Oi.getStudentCourseCredits(student.studentnumber)
   
   await student.getCredits().then(studentOldCredits => {
@@ -95,9 +96,14 @@ const updateStudentCredits = async student => {
   })
   console.log('Student: ' + student.studentnumber + ' updating credits')
   studentCourseCredits.forEach(async credit => {
+    // check for each credit whether oodikone db already has it
     if (!studentAlreadyHasCredit(student, credit)) {
-      let instance = await credit.getCourseInstance()
-      let course = await CourseService.byNameOrCode(instance.course_code)
+      let creditCourseCode = credit.courseInstance.course.courseCode
+      let date = getDate(credit.courseInstance.date)
+      let instance = await CourseService.courseInstanceByCodeAndDate(creditCourseCode, date)
+      // WORKS UNTIL HERE
+      // if the course doesn't exist and the instance doesn't exist, handle those.
+      let course = await CourseService.bySearchTerm(instance.course_code)
       if (course === null) {
         /* something like this?
         course = credit.getCourseInstance().then(instance => {
@@ -106,9 +112,9 @@ const updateStudentCredits = async student => {
         course.save()
         */
       }
-      await credit.getCourseInstance().then(instance => {
-        //instance.setCourse(course)
-      })
+      //await credit.getCourseInstance().then(instance => {
+      //instance.setCourse(course)
+      //})
 
       // Is instanceStatistics the right one to use?
       let courseInstance = CourseService.instanceStatistic(instance.course_code, instance.coursedate)
@@ -142,6 +148,7 @@ const updateStudentCredits = async student => {
         courseInstance = courseInstanceRepository.saveAndFlush(credit.getCourseInstance());
         */
       }
+      return
       await credit.setCourseInstance(courseInstance)
       await credit.getCourseInstance().then(() => setCourse(course))
 
@@ -156,11 +163,15 @@ const updateStudentCredits = async student => {
 }
 
 const studentAlreadyHasCredit = (student, credit) => {
+  // get the course code of the credit from Oodi
+  let creditCode = credit.courseInstance.course.courseCode
   student.getCredits().then(credits => {
-    credits.forEach(studentCredit => {
-    // do below credit methods exist?
-      if (credit.getGrade() === studentCredit.getGrade() &&
-        credit.getCourseInstance(studentCredit.getCourseInstance()) != null ) {
+    credits.forEach(async studentCredit => {
+      let instance = await CourseInstance.findById(studentCredit.courseinstance_id)
+      // get the course code from credit in oodikone db
+      let instanceCode = instance.course_code
+      // compare codes and grades
+      if (creditCode === instanceCode && credit.grade === studentCredit.grade) {
         return true
       }
     })
@@ -195,10 +206,12 @@ const loadAndUpdateStudent = async studentNumber => {
   console.log('Student ' + studentNumber + ' details updated')
   return student
 }
-// updateStudentInformation('014272112')
+updateStudentInformation('014272112')
+/*
 const yolo = async () => {
   const oo =  await Oi.getOrganisation('H20')
   console.log(oo)
 }
 
 yolo()
+*/

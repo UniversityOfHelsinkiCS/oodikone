@@ -172,6 +172,25 @@ async function instancesOf(code) {
   } 
 }
 
+const courseInstanceByCodeAndDate = (code, date) => {
+  return CourseInstance.findOne({
+    where: {
+      [Op.and]: [
+        { 
+          course_code: { 
+            [Op.eq]: code 
+          } 
+        },
+        { 
+          coursedate: { 
+            [Op.eq]: new Date(date) 
+          } 
+        }
+      ] 
+    }
+  })
+}
+
 const createCourseInstance = (creditDate, course) => {
   return CourseInstance.create({
     coursedate: creditDate,
@@ -186,5 +205,5 @@ const createCourseInstance = (creditDate, course) => {
 }
 
 module.exports = {
-  bySearchTerm, instancesOf, statisticsOf, createCourseInstance
+  bySearchTerm, instancesOf, statisticsOf, createCourseInstance, courseInstanceByCodeAndDate
 }
