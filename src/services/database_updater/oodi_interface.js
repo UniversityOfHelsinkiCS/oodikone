@@ -11,7 +11,7 @@ axios.defaults.auth = {
 const getStudent = (studentNumber) => {
   return axios.get(base_url + '/students/' + studentNumber)
     .then(response => {
-      console.log('Data for student: ' + studentNumber)
+      console.log('Fetching data for student: ' + studentNumber)
       return data_mapper.getStudentFromData(response.data)
     })
     .catch(error => {
@@ -24,14 +24,12 @@ const getStudentStudyRights = (studentNumber) => {
     .then(async response => {
       const studyRightIds = data_mapper.getStudyRightIdStrings(response.data)
       let studyRights = []
-      console.log(studyRightIds)
       await Promise.all(studyRightIds.map(async id => {
         try {
           let right = await getStudyRight(id)
           if (right) {
             right['student'] = studentNumber
             studyRights.push(right)
-            console.log(right.studyRightId)
           }
         } catch (e) {
           console.log(e)

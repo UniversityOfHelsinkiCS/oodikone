@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../../models')
 const StudentService = require('../students')
-const {getDate} = require('./oodi_data_mapper')
+const { getDate } = require('./oodi_data_mapper')
 const moment = require('moment')
 
 // const CourseService = require('../services/courses')
@@ -31,7 +31,7 @@ const getStudentNumberChecksum = studentNumber => {
   let checksumNumbers = [7, 3, 1]
   let checksum = 0
 
-  for (let i = 0; i < studentNumber.length; i++) {
+  for (let i = 0; i < studentNumber.length; i++) {Studyright.byStudent(student.studentnumber)
     // go from end to start
     let currentNumber = studentNumber.charAt(studentNumber.length - (i + 1))
     checksum += currentNumber * (checksumNumbers[i % checksumNumbers.length])
@@ -41,23 +41,27 @@ const getStudentNumberChecksum = studentNumber => {
 }
 */
 
-const updateStudentInformation = studentNumber => {
-  let student = loadAndUpdateStudent(studentNumber)
+const updateStudentInformation = async studentNumber => {
+  let student = await loadAndUpdateStudent(studentNumber)
   if (student === null) {
     return
   }
   updateStudentStudyRights(student)
+  return
   updateStudentCredits(student)
 }
 
-const updateStudentStudyRights = student => {
-  let studentStudyRights = Oi.getStudentStudyRights(student)
-  if (student.studyrights.length === studentStudyRights.length) {
+const updateStudentStudyRights = async student => {
+  console.log(student.studentnumber)
+  let oodiStudentStudyRights = await Oi.getStudentStudyRights(student.studentnumber)
+  let studentStudyRights = studentStudyright.byStudent(student.studentnumber)
+  console.log(studentStudyRights)
+  if (oodiStudentStudyRights.length === studentStudyRights.length) {
     console.log('Student: ' + student.studentnumber + 'No need to update study rights')
     return
   }
   console.log('Student: ' + student.studentnumber + ' updating study rights')
-
+  // return 
   studentStudyRights.forEach(studyRight => {
     if (!student.studyrights.includes(studyRight)) {
       // Organization model does not exist
@@ -159,31 +163,17 @@ const studentAlreadyHasCredit = (student, credit) => {
 
 const loadAndUpdateStudent = async studentNumber => {
   let student = await StudentService.byId(studentNumber)
-  if (student === null) {
-    try {
-      student = await Oi.getStudent(studentNumber)
-    }
-    catch (e) {
-      console.log('couldn\'t fetch student ' + studentNumber + '\'s information.')
-      console.log(e)
-      return null
-    }
-    StudentService.createStudent(student)
-    return student
-  }
-
-  console.log('Student ' + studentNumber + ' found in database')
-  let studentFromOodi
-  try {
-    studentFromOodi = await Oi.getStudent(studentNumber)
-  }
-  catch (e) {
+  let studentFromOodi = await Oi.getStudent(studentNumber)
+  if (studentFromOodi == null) {
     console.log('couldn\'t fetch student ' + studentNumber + '\'s information.')
-    console.log(e)
     return null
   }
+  if (student == null) {
+    StudentService.createStudent(student)
+    return student
+  } else console.log('Student ' + studentNumber + ' found in database')
+
   let oodiLastCreditDate
-  console.log(moment(studentFromOodi[21], 'DD.MM.YYYY').format('YYYY-MM-DD'), moment(student.dataValues.dateoflastcredit, 'YYYY-MM-DD').format('YYYY-MM-DD'))
   if (studentFromOodi[21] != null) {
     oodiLastCreditDate = getDate(studentFromOodi[21], 'DD.MM.YYYY')
   }
@@ -192,11 +182,10 @@ const loadAndUpdateStudent = async studentNumber => {
     console.log('No need to update student ' + studentNumber + ' information.')
     return student
   }
-
-  // info has changed, let's change details
+  
   await StudentService.updateStudent(studentFromOodi)
-  // save student here
+  
   console.log('Student ' + studentNumber + ' details updated')
   return student
 }
-loadAndUpdateStudent('014272112')
+updateStudentInformation('014272112')

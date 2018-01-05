@@ -79,7 +79,6 @@ const getStudentNumbersFromProgramData = (data) => {
 
 const getDate = (date, format) => {
   if (!date) return null
-  console.log(date, format)
   return moment(date, format).format('YYYY-MM-DD')
 }
 
