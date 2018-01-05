@@ -19,7 +19,7 @@ const getStudyRightFromData = (data) => {
   if (details.length == 0) return null
 
   let studyRight = {
-    studyRightId: info[1] != null ? info[1] : 0,
+    studyRightId: info[1] != null ? String(info[1]) : '0',
     organisation: info[2],
     priorityCode: info[3] != null ? info[3] : 0,
     extentCode: info[4] != null ? info[4] : 0,
@@ -77,7 +77,7 @@ const getStudentNumbersFromProgramData = (data) => {
   return studentNumbers
 }
 
-const getDate = (date, format) => {
+const getDate = (date, format='DD.MM.YYYY') => {
   if (!date) return null
   return moment(date, format).format('YYYY-MM-DD')
 }
