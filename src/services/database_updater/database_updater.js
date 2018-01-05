@@ -61,7 +61,7 @@ const updateStudentStudyRights = async student => {
     return
   }
 
-  //not the best solution so far
+  //not the best solution so far 
   const oodiStudentStudyRightIds = oodiStudentStudyRights.map(sr => sr.studyRightId)
   const studentStudyRightIds = studentStudyRights.map(sr => sr.studyrightid)
 
@@ -195,4 +195,10 @@ const loadAndUpdateStudent = async studentNumber => {
   console.log('Student ' + studentNumber + ' details updated')
   return student
 }
-updateStudentInformation('014272112')
+// updateStudentInformation('014272112')
+const yolo = async () => {
+  const oo =  await Oi.getOrganisation('H20')
+  console.log(oo)
+}
+
+yolo()
