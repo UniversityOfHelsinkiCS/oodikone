@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize')
 const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../../models')
 const StudentService = require('../students')
+const StudyrightService = require('../studyrights')
+
 const { getDate } = require('./oodi_data_mapper')
 const moment = require('moment')
 const CourseService = require('../courses')
@@ -51,19 +53,23 @@ const updateStudentInformation = async studentNumber => {
 }
 
 const updateStudentStudyRights = async student => {
-  console.log(student.studentnumber)
-  let oodiStudentStudyRights = await Oi.getStudentStudyRights(student.studentnumber)
-  let studentStudyRights = studentStudyright.byStudent(student.studentnumber)
-  console.log(studentStudyRights)
+  const oodiStudentStudyRights = await Oi.getStudentStudyRights(student.studentnumber)
+  const studentStudyRights = await StudyrightService.byStudent(student.studentnumber).map(studyright => studyright.dataValues)
+  
   if (oodiStudentStudyRights.length === studentStudyRights.length) {
     console.log('Student: ' + student.studentnumber + 'No need to update study rights')
     return
   }
+
+  //not the best solution so far
+  const oodiStudentStudyRightIds = oodiStudentStudyRights.map(sr => sr.studyRightId)
+  const studentStudyRightIds = studentStudyRights.map(sr => sr.studyrightid)
+
   console.log('Student: ' + student.studentnumber + ' updating study rights')
-  // return 
-  studentStudyRights.forEach(studyRight => {
-    if (!student.studyrights.includes(studyRight)) {
-      // Organization model does not exist
+  oodiStudentStudyRightIds.forEach(studyRight => {
+    if (!studentStudyRightIds.includes(studyRight)) {
+      console.log('whoa')
+      return
       let organization = Organization.findByCode(studyRight.organization_code)
       if (organization === null) {
         organization = Oi.getOrganisation(studyRight.organization_code)
