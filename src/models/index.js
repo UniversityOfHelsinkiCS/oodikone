@@ -77,6 +77,20 @@ const Tag = sequelize.define('tag',
   }  
 )
 
+const Organisation = sequelize.define('organization', 
+  {
+    code: {
+      primaryKey: true,
+      type: Sequelize.STRING
+    },
+    name: Sequelize.STRING
+  },
+  {
+    tableName: 'tag',
+    timestamps: false,  
+  }  
+)
+
 const Credit = sequelize.define('credit', 
   {
     id: {
@@ -242,5 +256,6 @@ module.exports = {
   Teacher, 
   CourseTeacher, 
   User,
-  sequelize
+  sequelize,
+  Organisation
 }
