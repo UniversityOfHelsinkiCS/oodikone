@@ -172,6 +172,19 @@ async function instancesOf(code) {
   } 
 }
 
+const createCourseInstance = (creditDate, course) => {
+  return CourseInstance.create({
+    coursedate: creditDate,
+    course_code: course.code
+  }).then(result => {
+    console.log('Created new course instance')
+    return
+  }).catch(e => {
+    console.log('Error creating course instance ' + course.code)
+    return
+  })
+}
+
 module.exports = {
-  bySearchTerm, instancesOf, statisticsOf
+  bySearchTerm, instancesOf, statisticsOf, createCourseInstance
 }
