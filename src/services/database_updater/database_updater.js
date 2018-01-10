@@ -98,29 +98,37 @@ const updateStudentCredits = async student => {
   studentCourseCredits.forEach(async credit => {
     // check for each credit whether oodikone db already has it
     if (!studentAlreadyHasCredit(student, credit)) {
-      let creditCourseCode = credit.courseInstance.course.courseCode
-      let date = getDate(credit.courseInstance.date)
-      let instance = await CourseService.courseInstanceByCodeAndDate(creditCourseCode, date)
+      let oodiCreditCourseCode = credit.courseInstance.course.courseCode
+      let oodiCourseName = credit.courseInstance.course.courseName
+      let oodiDate = getDate(credit.courseInstance.date)
+      let instance = await CourseService.courseInstanceByCodeAndDate(oodiCreditCourseCode, oodiDate)
+      let course = await Course.findById(oodiCreditCourseCode)
       // WORKS UNTIL HERE
       // if the course doesn't exist and the instance doesn't exist, handle those.
-      let course = await CourseService.bySearchTerm(instance.course_code)
+      //console.log('!!!!!!!!!!!!!!!!!!!!!!! THIS IS THE COURSE ' + instance.course_code + ' AND ' + instance.coursedate)
       if (course === null) {
-        /* something like this?
-        course = credit.getCourseInstance().then(instance => {
-          instance.getCourse().then(() => {})
-        })
-        course.save()
-        */
+        console.log('I WILL NOW BEGIN CREATION')
+        //course = await CourseService.createCourse(oodiCreditCourseCode, oodiCourseName)
+        //course.save()
+        console.log('LO AND BEHOLD, IT HAS BEEN DONE')
+        console.log(course)
+        console.log('THAT IS IT')
       }
       //await credit.getCourseInstance().then(instance => {
       //instance.setCourse(course)
       //})
 
+      if (instance === null) {
+        console.log('IT WAS NULLLLLLLLL!!!!!!!!!!!!')
+        let teacherDetails = await Oi.getTeacherDetails(oodiCreditCourseCode, oodiDate)
+        console.log(teacherDetails)
+        
+      }
       // Is instanceStatistics the right one to use?
-      let courseInstance = CourseService.instanceStatistic(instance.course_code, instance.coursedate)
+      /*let courseInstance = CourseService.instanceStatistic(instance.course_code, instance.coursedate)
       if (courseInstance === null) {
         teacherDetailData = oi.getTeacherDetails(instance.course_code, instance.coursedate)
-        /*
+        
         Map<Teacher, String> teacherRoles = OodiDataMapper.getTeacherRoles(teacherDetailData);
         List<CourseTeacher> courseTeachers = new ArrayList<>();
         for (Teacher teacher : teacherRoles.keySet()) {
@@ -146,17 +154,17 @@ const updateStudentCredits = async student => {
         }
         
         courseInstance = courseInstanceRepository.saveAndFlush(credit.getCourseInstance());
-        */
-      }
+        
+      }*/
       return
-      await credit.setCourseInstance(courseInstance)
-      await credit.getCourseInstance().then(() => setCourse(course))
+      //await credit.setCourseInstance(courseInstance)
+      //await credit.getCourseInstance().then(() => setCourse(course))
 
-      await credit.setStudent(student)
-      await credit.save()
+      //await credit.setStudent(student)
+      //await credit.save()
 
-      await courseInstance.addCredit(credit)
-      await courseInstance.save()
+      //await courseInstance.addCredit(credit)
+      //await courseInstance.save()
     }
   })
   //await student.save()
