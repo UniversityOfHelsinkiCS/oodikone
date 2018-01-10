@@ -27,7 +27,6 @@ const updateStudentInformation = async studentNumber => {
 const updateStudentStudyRights = async student => {
   const oodiStudentStudyRights = await Oi.getStudentStudyRights(student.studentnumber)
   const studentStudyRights = await StudyrightService.byStudent(student.studentnumber).map(studyright => studyright.dataValues)
-
   if (oodiStudentStudyRights.length === studentStudyRights.length) {
     return
   }
@@ -156,12 +155,13 @@ const loadAndUpdateStudent = async studentNumber => {
     StudentService.createStudent(student)
     return student
   }
-
+  console.log(getDate(student.dataValues.dateoflastcredit, 'YYYY-MM-DD'))
+  console.log(getDate(studentFromOodi[21], 'DD.MM.YYYY'))
   let oodiLastCreditDate
   if (studentFromOodi[21] != null) {
     oodiLastCreditDate = getDate(studentFromOodi[21], 'DD.MM.YYYY')
   }
-  if (oodiLastCreditDate === null ||
+  if (oodiLastCreditDate == null ||
     oodiLastCreditDate === getDate(student.dataValues.dateoflastcredit, 'YYYY-MM-DD')) {
     return student
   }
