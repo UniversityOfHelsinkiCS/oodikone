@@ -2,84 +2,50 @@ const Sequelize = require('sequelize')
 const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../../models')
 const StudentService = require('../students')
 const StudyrightService = require('../studyrights')
-
+const OrganisationService = require('../organisations')
 const { getDate } = require('./oodi_data_mapper')
-const moment = require('moment')
 const CourseService = require('../courses')
 const Op = Sequelize.Op
 const Oi = require('./oodi_interface')
 
 
-// let minStudentNumber = 1000000
-// let maxStudentNumber = 1500000
-// add possibility to update specific students ?
-// console.log('Running updater on ' + minStudentNumber + '-' + maxStudentNumber)
-
-// for (let i = minStudentNumber; i < maxStudentNumber; i++) {
-//   let studentNumber = '0' + i + getStudentNumberChecksum(i.toString)
-//   console.log('Updating student ' + studentNumber)
-
-//   updateStudentInformation(studentNumber)
-// }
-
-/**
- * Calculate checksum of student number.
- *
- * @param studentNumber Student number without the checksum (last digit).
- * @return Checksum digit.
- 
-const getStudentNumberChecksum = studentNumber => {
-  let checksumNumbers = [7, 3, 1]
-  let checksum = 0
-
-  for (let i = 0; i < studentNumber.length; i++) {Studyright.byStudent(student.studentnumber)
-    // go from end to start
-    let currentNumber = studentNumber.charAt(studentNumber.length - (i + 1))
-    checksum += currentNumber * (checksumNumbers[i % checksumNumbers.length])
-  }
-
-  return (10 - (checksum % 10)) % 10
-}
-*/
+let minStudentNumber = 1420000
+let maxStudentNumber = 1500000
+console.log('Running updater on ' + minStudentNumber + '-' + maxStudentNumber)
 
 const updateStudentInformation = async studentNumber => {
+  if(studentNumber == '014424850') return
   let student = await loadAndUpdateStudent(studentNumber)
   if (student === null) {
     return
   }
-  //updateStudentStudyRights(student)
-  updateStudentCredits(student)
+  updateStudentStudyRights(student)
+  // updateStudentCredits(student)
   return
 }
 
 const updateStudentStudyRights = async student => {
   const oodiStudentStudyRights = await Oi.getStudentStudyRights(student.studentnumber)
   const studentStudyRights = await StudyrightService.byStudent(student.studentnumber).map(studyright => studyright.dataValues)
-  
+
   if (oodiStudentStudyRights.length === studentStudyRights.length) {
-    console.log('Student: ' + student.studentnumber + 'No need to update study rights')
     return
   }
-
   //not the best solution so far 
-  const oodiStudentStudyRightIds = oodiStudentStudyRights.map(sr => sr.studyRightId)
   const studentStudyRightIds = studentStudyRights.map(sr => sr.studyrightid)
 
-  console.log('Student: ' + student.studentnumber + ' updating study rights')
-  oodiStudentStudyRightIds.forEach(studyRight => {
-    if (!studentStudyRightIds.includes(studyRight)) {
-      console.log('whoa')
-      return
-      let organization = Organization.findByCode(studyRight.organization_code)
-      if (organization === null) {
-        organization = Oi.getOrganisation(studyRight.organization_code)
-        organization.save().then(() => { })// save the organization
+  oodiStudentStudyRights.forEach(async studyRight => {
+    if (!studentStudyRightIds.includes(studyRight.studyRightId)) {
+      let organisation = await OrganisationService.byCode(studyRight.organisation)
+      if (organisation === null) {
+        organisation = await Oi.getOrganisation(studyRight.organisation_code)
+        OrganisationService.createOrganisation(organisation)
       }
-      studyRight.organization_code = organization
-      studyRight.student_studentnumber = student.studentnumber
-      studyRight.save().then(() => { // save study right
-        student.setStudentStudyRights([student.getStudentStudyRights(), studyRight]) // add studyrights to student
-      })
+      studyRight.organisation = organisation.code
+      studyRight.student = student.studentnumber
+
+      StudyrightService.createStudyright(studyRight)
+      console.log('Student ' + student.studentnumber + ': new studyright added')
     }
   })
 }
@@ -87,7 +53,7 @@ const updateStudentStudyRights = async student => {
 const updateStudentCredits = async student => {
   // get credits from Oodi
   let studentCourseCredits = await Oi.getStudentCourseCredits(student.studentnumber)
-  
+
   await student.getCredits().then(studentOldCredits => {
     if (studentOldCredits.lenght === studentCourseCredits.length) {
       console.log('Student: ' + student.studentnumber + ' no need to update credits')
@@ -181,15 +147,15 @@ const studentAlreadyHasCredit = (student, credit) => {
 
 const loadAndUpdateStudent = async studentNumber => {
   let student = await StudentService.byId(studentNumber)
+  
   let studentFromOodi = await Oi.getStudent(studentNumber)
   if (studentFromOodi == null) {
-    console.log('couldn\'t fetch student ' + studentNumber + '\'s information.')
     return null
   }
   if (student == null) {
     StudentService.createStudent(student)
     return student
-  } else console.log('Student ' + studentNumber + ' found in database')
+  }
 
   let oodiLastCreditDate
   if (studentFromOodi[21] != null) {
@@ -197,21 +163,41 @@ const loadAndUpdateStudent = async studentNumber => {
   }
   if (oodiLastCreditDate === null ||
     oodiLastCreditDate === getDate(student.dataValues.dateoflastcredit, 'YYYY-MM-DD')) {
-    console.log('No need to update student ' + studentNumber + ' information.')
     return student
   }
-  
+
   await StudentService.updateStudent(studentFromOodi)
-  
-  console.log('Student ' + studentNumber + ' details updated')
+
+  console.log('Student: ' + studentNumber + ' details updated')
   return student
 }
-updateStudentInformation('014272112')
-/*
-const yolo = async () => {
-  const oo =  await Oi.getOrganisation('H20')
-  console.log(oo)
+// updateStudentInformation('0142712')
+
+// updateStudentInformation('014349281')
+
+
+const getStudentNumberChecksum = studentNumber => {
+  let checksumNumbers = [7, 3, 1]
+  let checksum = 0
+
+  for (let i = 0; i < studentNumber.length; i++) {
+    // go from end t start
+    let currentNumber = studentNumber[studentNumber.length - (i + 1)]
+    checksum += currentNumber * (checksumNumbers[i % checksumNumbers.length])
+  }
+
+  return (10 - (checksum % 10)) % 10
 }
 
-yolo()
-*/
+
+const run = async () => {
+
+  for (let i = minStudentNumber; i < maxStudentNumber; i++) {
+    let studentNumber = '0' + i + getStudentNumberChecksum(String(i))
+
+    await updateStudentInformation(studentNumber)
+  }
+
+} 
+
+run()

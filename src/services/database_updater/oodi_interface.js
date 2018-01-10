@@ -11,7 +11,6 @@ axios.defaults.auth = {
 const getStudent = (studentNumber) => {
   return axios.get(base_url + '/students/' + studentNumber)
     .then(response => {
-      console.log('Fetching data for student: ' + studentNumber)
       return data_mapper.getStudentFromData(response.data)
     })
     .catch(error => {
