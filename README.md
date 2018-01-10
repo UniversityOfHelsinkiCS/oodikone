@@ -1,1 +1,5 @@
-# oodikone2-frontend
+# OodiKone2-Frontend
+
+## Run
+
+`npm start`
