@@ -60,9 +60,10 @@ const updateStudent = (array) => {
         }
       }
     }).then(res => {
-      console.log('something gone good')
+      console.log('Student: ' + array[0] + ' updated')
     }).catch(e => {
-      console.log('yo something gone bad')
+      console.log('Student: ' + array[0] + ' update FAILED')
+      console.log(e)
     })
 }
 

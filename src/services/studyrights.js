@@ -11,7 +11,7 @@ const createStudyright = (array) => {
     cancelorganisation: array.cangelOrganisation,
     enddate: getDate(array.endDate),
     extentcode: array.extentCode,
-    givendate: array.givenDate,
+    givendate: getDate(array.givenDate),
     graduated: array.graduated,
     highlevelname: array.highLevelName,
     prioritycode: array.priorityCode,
@@ -23,7 +23,7 @@ const createStudyright = (array) => {
     console.log('Student: ' + array.student + ' New studyright added ' + array.highLevelName)
     return
   }).catch(e => {
-    console.log('Student: ' + array.student + 'Error adding studyright ' + array.highLevelName)
+    console.log('Student: ' + array.student + ' Error adding studyright ' + array.highLevelName)
     return
   })
 }
