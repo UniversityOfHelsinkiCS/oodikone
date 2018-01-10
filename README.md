@@ -73,8 +73,10 @@ http://localhost:8080/api/tags
 If you see a response you can congratulate yourself on succesfully installing and running OodiKone2 backend.
 
 #### Docker
-Install docker CE: https://docs.docker.com/engine/installation/
+Install docker CE: https://docs.docker.com/engine/installation/ 
+
 Install docker-compose: https://docs.docker.com/compose/install/
+
 Docker-compose version must be > 1.10.0
 
 Build a Docker image using comand 
