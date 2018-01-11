@@ -192,30 +192,18 @@ const courseInstanceByCodeAndDate = (code, date) => {
 }
 
 const createCourse = async (code, name) => {
-  return Course.create({
+  return Course.build({
     code: code,
     name: name
-  }).then(result => {
-    console.log('Created new course ' + code)
-    result.rollback()
-    return null
-  }).catch(e => {
-    console.log('Error creating course ' + code)
-    console.log(e)
-    return
   })
 }
 
-const createCourseInstance = (creditDate, course) => {
-  return CourseInstance.create({
+const createCourseInstance = async (creditDate, course) => {
+  const id = await CourseInstance.max('id') + 1
+  return CourseInstance.build({
+    id: id,
     coursedate: creditDate,
     course_code: course.code
-  }).then(result => {
-    console.log('Created new course instance')
-    return
-  }).catch(e => {
-    console.log('Error creating course instance ' + course.code)
-    return
   })
 }
 
