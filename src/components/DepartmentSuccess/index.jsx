@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { getDepartmentSuccessAction } from "../../actions";
+import {addError, getDepartmentSuccessAction} from "../../actions";
 
 class DepartmentSuccess extends Component {
     constructor(props) {
@@ -12,6 +12,7 @@ class DepartmentSuccess extends Component {
     }
 
     componentDidMount() {
+        /* TODO: create selector for date and change the YYYY.MM.D notation to something sensible */
         const defaultDateString = '2005.08.1';
         this.props.dispatchGetDepartmentSuccess(defaultDateString)
             .then(json => this.setState({departmentSuccess: json}),
@@ -19,10 +20,9 @@ class DepartmentSuccess extends Component {
     }
 
     render(){
-        const departmentSuccess = this.state.departmentSuccess;
 
         return (
-            <div>{departmentSuccess}</div>
+            <div>{this.state.departmentSuccess || '---'}</div>
         );
     }
 
