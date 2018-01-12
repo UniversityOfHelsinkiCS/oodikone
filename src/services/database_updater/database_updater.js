@@ -1,11 +1,12 @@
 const Sequelize = require('sequelize')
-const { logError, log } = require('./logger')
-const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../../models')
+const { Studyright, Student, Credit, CourseInstance, Course, CourseTeacher, TagStudent, sequelize } = require('../../models')
 const StudentService = require('../students')
 const StudyrightService = require('../studyrights')
 const OrganisationService = require('../organisations')
-const { getDate } = require('./oodi_data_mapper')
+const { getDate, getTeachersAndRolesFromData } = require('./oodi_data_mapper')
 const CourseService = require('../courses')
+const TeacherService = require('../teachers')
+const CreditService = require('../credits')
 const Op = Sequelize.Op
 const Oi = require('./oodi_interface')
 
@@ -20,8 +21,8 @@ const updateStudentInformation = async studentNumber => {
   if (student === null) {
     return
   }
-  updateStudentStudyRights(student)
-  // updateStudentCredits(student)
+  //updateStudentStudyRights(student)
+  updateStudentCredits(student)
   return
 }
 
@@ -67,6 +68,7 @@ const updateStudentStudyRights = async student => {
   }
 }
 
+// NEED TO INCLUDE UPDATE EXISTING CREDIT
 const updateStudentCredits = async student => {
   // get credits from Oodi
   let studentCourseCredits = await Oi.getStudentCourseCredits(student.studentnumber)
@@ -81,65 +83,36 @@ const updateStudentCredits = async student => {
   studentCourseCredits.forEach(async credit => {
     // check for each credit whether oodikone db already has it
     if (!studentAlreadyHasCredit(student, credit)) {
-      let creditCourseCode = credit.courseInstance.course.courseCode
-      let date = getDate(credit.courseInstance.date)
-      let instance = await CourseService.courseInstanceByCodeAndDate(creditCourseCode, date)
-      // WORKS UNTIL HERE
+      let oodiCreditCourseCode = credit.courseInstance.course.courseCode
+      let oodiCourseName = credit.courseInstance.course.courseName
+      let oodiDate = getDate(credit.courseInstance.date)
+      let instance = await CourseService.courseInstanceByCodeAndDate(oodiCreditCourseCode, oodiDate)
+      let course = await Course.findById(oodiCreditCourseCode)
       // if the course doesn't exist and the instance doesn't exist, handle those.
-      let course = await CourseService.bySearchTerm(instance.course_code)
       if (course === null) {
-        /* something like this?
-        course = credit.getCourseInstance().then(instance => {
-          instance.getCourse().then(() => {})
+        course = await CourseService.createCourse(oodiCreditCourseCode, oodiCourseName)
+      }
+
+      if (instance === null) {
+        // save CourseInstance 
+        instance = await CourseService.createCourseInstance(oodiDate, course)
+        // get all teachers for course instance
+        const teacherDetails = await Oi.getTeacherDetails(oodiCreditCourseCode, credit.courseInstance.date)
+        const teachers = getTeachersAndRolesFromData(teacherDetails.data)
+        teachers.forEach(async t => {
+          // check if teacher exists in database and if not, create
+          let teacher =  await TeacherService.findOrCreateTeacher(t.code, t.name)
+          // make CourseTeachers from teachers
+          let courseTeacher = await TeacherService.createCourseTeacher(t.role, teacher, instance)
+          // set teacher as CourseTeacher for the CourseInstance
+          instance = await instance.addCourseteacher(courseTeacher)
         })
-        course.save()
-        */
+        // await instance.save()
+        
       }
-      //await credit.getCourseInstance().then(instance => {
-      //instance.setCourse(course)
-      //})
-
-      // Is instanceStatistics the right one to use?
-      let courseInstance = CourseService.instanceStatistic(instance.course_code, instance.coursedate)
-      if (courseInstance === null) {
-        teacherDetailData = oi.getTeacherDetails(instance.course_code, instance.coursedate)
-        /*
-        Map<Teacher, String> teacherRoles = OodiDataMapper.getTeacherRoles(teacherDetailData);
-        List<CourseTeacher> courseTeachers = new ArrayList<>();
-        for (Teacher teacher : teacherRoles.keySet()) {
-            Teacher t = (teacher.getCode() == null ? teacherRepository.findByName(teacher.getName()) : teacherRepository.findByCodeOrName(teacher.getCode(), teacher.getName()));
-            
-            if(t == null) {
-                t = teacherRepository.saveAndFlush(teacher);
-            }
-            
-            CourseTeacher ct = new CourseTeacher();
-            ct.setTeacher(t);
-            ct.setTeacherRole(teacherRoles.get(teacher));
-            
-            courseTeachers.add(ct);
-        }
-        
-        courseInstance = courseInstanceRepository.saveAndFlush(credit.getCourseInstance());
-        
-        for (CourseTeacher courseTeacher : courseTeachers) {
-            courseTeacher.setCourseInstance(courseInstance);
-            courseTeacher = courseTeacherRepository.saveAndFlush(courseTeacher);
-            courseInstance.getTeachers().add(courseTeacher);
-        }
-        
-        courseInstance = courseInstanceRepository.saveAndFlush(credit.getCourseInstance());
-        */
-      }
-      return
-      await credit.setCourseInstance(courseInstance)
-      await credit.getCourseInstance().then(() => setCourse(course))
-
-      await credit.setStudent(student)
-      await credit.save()
-
-      await courseInstance.addCredit(credit)
-      await courseInstance.save()
+      // create a new credit
+      const newCredit = await CreditService.createCredit(credit, student.studentnumber, instance.id)
+      console.log(newCredit)
     }
   })
   //await student.save()

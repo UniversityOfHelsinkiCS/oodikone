@@ -82,7 +82,29 @@ const getDate = (date, format='DD.MM.YYYY') => {
   return moment(date, format).format('YYYY-MM-DD')
 }
 
+const getTeachersAndRolesFromData = (teacherDetailData) => {
+  let teachers = []
+  teacherDetailData.forEach(teacher => {
+    let role
+    if(teacher[0] === '1') {
+      role = 'Approver'
+    } else if(teacher[0] === '2') {
+      role = 'Teacher'
+    } else if(teacher[0] === '3') {
+      role = 'Responsible'
+    } else {
+      role = 'Unknown'
+    }
+    const code = teacher[1]
+    const name = teacher[2]
+    const t = {'code': code, 'name': name, 'role': role}
+    teachers.push(t)
+  })
+  return teachers
+}
+
 module.exports = {
   getStudentFromData, getStudyRightIdStrings, getStudyRightFromData,
-  getOrganisationFromData, getCourseCreditsFromData, getStudentNumbersFromProgramData, getDate
+  getOrganisationFromData, getCourseCreditsFromData, getStudentNumbersFromProgramData, getDate,
+  getTeachersAndRolesFromData
 }

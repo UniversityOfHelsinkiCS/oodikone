@@ -191,19 +191,22 @@ const courseInstanceByCodeAndDate = (code, date) => {
   })
 }
 
-const createCourseInstance = (creditDate, course) => {
-  return CourseInstance.create({
+const createCourse = async (code, name) => {
+  return Course.build({
+    code: code,
+    name: name
+  })
+}
+
+const createCourseInstance = async (creditDate, course) => {
+  const id = await CourseInstance.max('id') + 1
+  return CourseInstance.build({
+    id: id,
     coursedate: creditDate,
     course_code: course.code
-  }).then(result => {
-    console.log('Created new course instance')
-    return
-  }).catch(e => {
-    console.log('Error creating course instance ' + course.code)
-    return
   })
 }
 
 module.exports = {
-  bySearchTerm, instancesOf, statisticsOf, createCourseInstance, courseInstanceByCodeAndDate
+  bySearchTerm, instancesOf, statisticsOf, createCourse, createCourseInstance, courseInstanceByCodeAndDate
 }
