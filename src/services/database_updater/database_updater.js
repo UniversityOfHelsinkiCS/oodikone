@@ -11,7 +11,7 @@ const Op = Sequelize.Op
 const Oi = require('./oodi_interface')
 
 
-let minStudentNumber = 1420000
+let minStudentNumber = 1450000
 let maxStudentNumber = 1500000
 console.log('Running updater on ' + minStudentNumber + '-' + maxStudentNumber)
 
@@ -29,7 +29,6 @@ const updateStudentInformation = async studentNumber => {
 const updateStudentStudyRights = async student => {
   const oodiStudentStudyRights = await Oi.getStudentStudyRights(student.studentnumber)
   const studentStudyRights = await StudyrightService.byStudent(student.studentnumber).map(studyright => studyright.dataValues)
-
   if (oodiStudentStudyRights.length === studentStudyRights.length) {
     return
   }
@@ -130,12 +129,11 @@ const loadAndUpdateStudent = async studentNumber => {
     StudentService.createStudent(student)
     return student
   }
-
   let oodiLastCreditDate
   if (studentFromOodi[21] != null) {
     oodiLastCreditDate = getDate(studentFromOodi[21], 'DD.MM.YYYY')
   }
-  if (oodiLastCreditDate === null ||
+  if (oodiLastCreditDate == null ||
     oodiLastCreditDate === getDate(student.dataValues.dateoflastcredit, 'YYYY-MM-DD')) {
     return student
   }
