@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
-import thunk from 'redux-thunk';
+import promiseMiddleware from 'redux-promise-middleware';
 import logger from 'redux-logger';
 
 import './styles/global';
@@ -11,7 +11,7 @@ import './styles/global';
 import reducers from './reducers';
 import Main from './components/Main';
 
-const reduxMiddlewares = [thunk];
+const reduxMiddlewares = [promiseMiddleware()];
 
 if (process.env.NODE_ENV === 'development') {
   reduxMiddlewares.push(logger);

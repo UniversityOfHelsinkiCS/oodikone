@@ -5,3 +5,6 @@ export const routes = {
   courses: '/courses',
   teachers: '/teachers'
 };
+
+/* TODO: set this configurable? */
+export const BASE_PATH = "";

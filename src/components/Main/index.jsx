@@ -3,12 +3,10 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import Header from '../Header';
 import Populations from '../Populations';
-import { routes } from '../../constants';
+import DepartmentSuccess from '../DepartmentSuccess';
+import { routes, BASE_PATH } from '../../constants';
 
 import styles from './main.css';
-
-/* TODO: set this configurable? */
-const BASE_PATH = '/';
 
 const Main = () =>
     <div className={styles.appContainer}>
@@ -16,8 +14,9 @@ const Main = () =>
        <Router basename={BASE_PATH}>
            <main className={styles.routeViewContainer}>
             <Switch>
+                <Route exact path={routes.index} component={DepartmentSuccess} />
                 <Route exact path={routes.populations} component={Populations} />
-             </Switch>
+            </Switch>
            </main>
        </Router>
     </div>;
