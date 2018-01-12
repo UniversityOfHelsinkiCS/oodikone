@@ -23,48 +23,36 @@ const createStudent = (array) => {
     semesterenrollmenttypecode: array[16],
     sex: array[3],
     studentstatuscode: array[17]
-  }).then(result => {
-    console.log('Created new student' + array[0])
-    return
-  }).catch(e => {
-    console.log('Error creating student ' + array[0])
-    return
   })
 }
 
 const updateStudent = (array) => {
-  return Student.update(
-    {
-      studentnumber: array[0],
-      lastname: array[4],
-      firstnames: array[5],
-      abbreviatedname: array[6],
-      birthdate: getDate(array[2]),
-      communicationlanguage: array[22],
-      country: array[15],
-      creditcount: array[18],
-      dateoffirstcredit: getDate(array[20]),
-      dateoflastcredit: getDate(array[21]),
-      dateofuniversityenrollment: getDate(array[19]),
-      gradestudent: array[25],
-      matriculationexamination: array[24],
-      nationalities: array[23],
-      semesterenrollmenttypecode: array[16],
-      sex: array[3],
-      studentstatuscode: array[17]
-    },
-    {
-      where: {
-        studentnumber: {
-          [Op.eq]: array[0]
-        }
+  return Student.update({
+    studentnumber: array[0],
+    lastname: array[4],
+    firstnames: array[5],
+    abbreviatedname: array[6],
+    birthdate: getDate(array[2]),
+    communicationlanguage: array[22],
+    country: array[15],
+    creditcount: array[18],
+    dateoffirstcredit: getDate(array[20]),
+    dateoflastcredit: getDate(array[21]),
+    dateofuniversityenrollment: getDate(array[19]),
+    gradestudent: array[25],
+    matriculationexamination: array[24],
+    nationalities: array[23],
+    semesterenrollmenttypecode: array[16],
+    sex: array[3],
+    studentstatuscode: array[17]
+  },
+  {
+    where: {
+      studentnumber: {
+        [Op.eq]: array[0]
       }
-    }).then(res => {
-      console.log('Student: ' + array[0] + ' updated')
-    }).catch(e => {
-      console.log('Student: ' + array[0] + ' update FAILED')
-      console.log(e)
-    })
+    }
+  })
 }
 
 const byId = (id) => {

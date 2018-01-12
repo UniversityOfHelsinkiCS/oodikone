@@ -19,12 +19,6 @@ const createStudyright = (array) => {
     studystartdate: getDate(array.studyStartDate),
     organization_code: array.organisation,
     student_studentnumber: array.student
-  }).then(result => {
-    console.log('Student: ' + array.student + ' New studyright added ' + array.highLevelName)
-    return
-  }).catch(e => {
-    console.log('Student: ' + array.student + ' Error adding studyright ' + array.highLevelName)
-    return
   })
 }
 

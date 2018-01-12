@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize')
+const { logError, log } = require('./logger')
 const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../../models')
 const StudentService = require('../students')
 const StudyrightService = require('../studyrights')
@@ -9,12 +10,12 @@ const Op = Sequelize.Op
 const Oi = require('./oodi_interface')
 
 
-let minStudentNumber = 1450000
+let minStudentNumber = 1400000
 let maxStudentNumber = 1500000
 console.log('Running updater on ' + minStudentNumber + '-' + maxStudentNumber)
 
 const updateStudentInformation = async studentNumber => {
-  if(studentNumber == '014424850') return
+  if (studentNumber == '014424850') return
   let student = await loadAndUpdateStudent(studentNumber)
   if (student === null) {
     return
@@ -25,28 +26,45 @@ const updateStudentInformation = async studentNumber => {
 }
 
 const updateStudentStudyRights = async student => {
-  const oodiStudentStudyRights = await Oi.getStudentStudyRights(student.studentnumber)
-  const studentStudyRights = await StudyrightService.byStudent(student.studentnumber).map(studyright => studyright.dataValues)
-  if (oodiStudentStudyRights.length === studentStudyRights.length) {
-    return
-  }
-  //not the best solution so far 
-  const studentStudyRightIds = studentStudyRights.map(sr => sr.studyrightid)
-
-  oodiStudentStudyRights.forEach(async studyRight => {
-    if (!studentStudyRightIds.includes(studyRight.studyRightId)) {
-      let organisation = await OrganisationService.byCode(studyRight.organisation)
-      if (organisation === null) {
-        organisation = await Oi.getOrganisation(studyRight.organisation_code)
-        OrganisationService.createOrganisation(organisation)
-      }
-      studyRight.organisation = organisation.code
-      studyRight.student = student.studentnumber
-
-      StudyrightService.createStudyright(studyRight)
-      console.log('Student ' + student.studentnumber + ': new studyright added')
+  try {
+    const oodiStudentStudyRights = await Oi.getStudentStudyRights(student.studentnumber)
+    const studentStudyRights = await StudyrightService.byStudent(student.studentnumber).map(studyright => studyright.dataValues)
+    if (oodiStudentStudyRights.length === studentStudyRights.length) {
+      return
     }
-  })
+    //not the best solution so far 
+    const studentStudyRightIds = studentStudyRights.map(sr => sr.studyrightid)
+
+    oodiStudentStudyRights.forEach(async studyRight => {
+      if (!studentStudyRightIds.includes(studyRight.studyRightId)) {
+        let organisation = await OrganisationService.byCode(studyRight.organisation)
+        if (organisation === null) {
+          organisation = await Oi.getOrganisation(studyRight.organisation_code)
+          try {
+            OrganisationService.createOrganisation(organisation)
+            log('Organisation ' + organisation.code + ' ' +
+              organisation.name + ' created')
+          } catch (e) {
+            logError('Saving organisation to database failed, line: ' + e.lineNumber + ', errormessage:')
+            logError(e)
+          }
+        }
+        studyRight.organisation = organisation.code
+        studyRight.student = student.studentnumber
+        try {
+          StudyrightService.createStudyright(studyRight)
+          log('Student ' + student.studentnumber + ': new studyright created: '
+            + studyRight.highLevelName)
+        } catch (e) {
+          logError('Saving studyright to database failed, line: ' + e.lineNumber + ', errormessage:' )
+          logError(e)
+        }
+      }
+    })
+  } catch (e) {
+    logError('Updating studyrights failed')
+    logError(e)
+  }
 }
 
 const updateStudentCredits = async student => {
@@ -145,29 +163,45 @@ const studentAlreadyHasCredit = (student, credit) => {
 }
 
 const loadAndUpdateStudent = async studentNumber => {
-  let student = await StudentService.byId(studentNumber)
-  
-  let studentFromOodi = await Oi.getStudent(studentNumber)
-  if (studentFromOodi == null) {
-    return null
-  }
-  if (student == null) {
-    StudentService.createStudent(student)
-    return student
-  }
-  let oodiLastCreditDate
-  if (studentFromOodi[21] != null) {
-    oodiLastCreditDate = getDate(studentFromOodi[21], 'DD.MM.YYYY')
-  }
-  if (oodiLastCreditDate == null ||
-    oodiLastCreditDate === getDate(student.dataValues.dateoflastcredit, 'YYYY-MM-DD')) {
-    return student
-  }
+  try {
+    let student = await StudentService.byId(studentNumber)
 
-  await StudentService.updateStudent(studentFromOodi)
+    let studentFromOodi = await Oi.getStudent(studentNumber)
+    if (studentFromOodi == null) {
+      return null
+    }
+    if (student == null) {
+      try {
+        StudentService.createStudent(student)
+        log('Student ' + studentNumber + ' created to database')
+        return student
+      } catch (e) {
+        logError('Student ' + studentNumber + ': creation failed, line: ' + e.lineNumber + ', error message:')
+        logError(e)
+        return null
+      }
+    }
+    let oodiLastCreditDate
+    if (studentFromOodi[21] != null) {
+      oodiLastCreditDate = getDate(studentFromOodi[21], 'DD.MM.YYYY')
+    }
+    if (oodiLastCreditDate == null ||
+      oodiLastCreditDate === getDate(student.dataValues.dateoflastcredit, 'YYYY-MM-DD')) {
+      return student
+    }
 
-  console.log('Student: ' + studentNumber + ' details updated')
-  return student
+    try {
+      await StudentService.updateStudent(studentFromOodi)
+      log('Student ' + studentNumber + ': details updated')
+    } catch (e) {
+      logError('Student ' + studentNumber + ': update failed, line: ' + e.lineNumber + ', error message:')
+      logError(e)
+    }
+    return student
+  } catch (e) {
+    logError('Student: ' + studentNumber + ' loadAndUpdate failed, line: ' + e.lineNumber + ', error message:')
+    logError(e)
+  }
 }
 // updateStudentInformation('0142712')
 
@@ -196,6 +230,6 @@ const run = async () => {
     await updateStudentInformation(studentNumber)
   }
 
-} 
+}
 
 run()
