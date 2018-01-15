@@ -17,4 +17,8 @@ const createCredit = async (credit, studentNumber, courseInstanceId) => {
   })
 }
 
-module.exports = { createCredit }
+const updateCreditGrade = async (credit, newGrade) => {
+  return Credit.update({grade: newGrade},{where: {id: credit.id}})
+}
+
+module.exports = { createCredit, updateCreditGrade }
