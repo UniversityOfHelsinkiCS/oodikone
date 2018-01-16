@@ -1,6 +1,7 @@
 # OodiKone2-Frontend
 
 ### Development
+fetch dependencies: `npm install`
 
 local development: `npm run dev` 
 
