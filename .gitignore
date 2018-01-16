@@ -8,6 +8,12 @@
 
 # production
 /build
+dist
+
+# IDE metadata
+.vscode
+.idea
+*.iml
 
 # misc
 .DS_Store

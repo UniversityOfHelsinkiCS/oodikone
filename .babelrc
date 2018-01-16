@@ -1,0 +1,23 @@
+{
+  "presets": [
+    ["latest", {
+      "es2015": {
+        "modules": false
+      }
+    }],
+    "react"
+  ],
+  "env": {
+    "development": {
+      "plugins": [
+        "react-hot-loader/babel"
+      ]
+    },
+    "test": {
+      "plugins": [
+        "transform-async-to-generator",
+        "inline-json-import"
+      ]
+    }
+  }
+}
