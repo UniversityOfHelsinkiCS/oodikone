@@ -12,13 +12,13 @@ import styles from './main.css';
 const Main = () =>
   (
     <div className={styles.appContainer}>
-      <Header />
       <Router basename={BASE_PATH}>
         <main className={styles.routeViewContainer}>
+          <Header />
           <Switch>
-            <Route exact path={routes.index} component={DepartmentSuccess} />
-            <Route exact path={routes.populations} component={Populations} />
-            <Route exact path={routes.students} component={StudentStatistics} />
+            <Route exact path={routes.index.route} component={DepartmentSuccess} />
+            <Route exact path={routes.populations.route} component={Populations} />
+            <Route exact path={routes.students.route} component={StudentStatistics} />
           </Switch>
         </main>
       </Router>
