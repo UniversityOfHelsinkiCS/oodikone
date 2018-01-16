@@ -1,9 +1,13 @@
 import React from 'react';
 
+import styles from './populations.css';
+
 const Populations = () =>
-    <div>
+  (
+    <div className={styles.example}>
         populations component
-    </div>;
+    </div>
+  );
 
 
 export default Populations;

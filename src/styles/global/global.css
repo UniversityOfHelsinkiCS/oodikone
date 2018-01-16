@@ -1,27 +1,27 @@
 @custom-media --mobile (max-width: 768px);
 
 :root {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 html {
-    height: 100%;
-    box-sizing: border-box;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 #root {
-    height: 100%;
+  height: 100%;
 }
 
 *,
 *::before,
 *::after {
-    box-sizing: inherit;
+  box-sizing: inherit;
 }
 
 body {
-    margin: 0;
-    height: 100%;
+  margin: 0;
+  height: 100%;
 }
 
 h1,
@@ -30,150 +30,117 @@ h3,
 h4,
 h5,
 h6 {
-    letter-spacing: unset;
-    line-height: unset;
+  letter-spacing: unset;
+  line-height: unset;
 }
 
 h2 {
-    font-size: 2rem;
+  font-size: 2rem;
 }
 
 h3 {
-    font-size: 1.1rem;
+  font-size: 1.1rem;
+  text-transform: uppercase;
 }
 
 h4 {
-    font-size: 0.9rem;
+  font-size: 0.9rem;
 }
 
 p {
-    line-height: unset;
+  line-height: unset;
 }
 
 figure {
-    font-size: 0.8rem;
-    margin: 0;
+  font-size: 0.8rem;
+  margin: 0;
 }
 
 h1 {
-    margin-bottom: 0.7em;
-}
-
-h3 {
-    text-transform: uppercase;
+  margin-bottom: 0.7em;
 }
 
 button {
-    border-radius: 0;
+  border-radius: 0;
 }
 
 .button.disabled {
-    cursor: default;
-    background-color: var(--darkSilver);
+  cursor: default;
+  background-color: var(--darkSilver);
 }
 
 .page-container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2em 2em 5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2em 2em 5rem;
 }
 
 .mobileOnly {
-    display: none;
+  display: none;
 }
 
 .helpIcon {
-    color: var(--blue);
+  color: var(--blue);
 }
 
 .removeIcon {
-    color: var(--blue);
-    cursor: pointer;
+  color: var(--blue);
+  cursor: pointer;
 
-&:hover {
-     color: var(--darkBlue);
- }
+  &:hover {
+    color: var(--darkBlue);
+  }
 }
 
 .icon::before {
-    display: inline-block;
-    font-style: normal;
-    font-weight: normal;
-    vertical-align: bottom;
+  display: inline-block;
+  font-style: normal;
+  font-weight: normal;
+  vertical-align: bottom;
 }
 
 .iconText::before {
-    content: "";
+  content: "";
 }
 
 .iconRemove::before {
-    content: "";
+  content: "";
 }
 
 @media (--mobile) {
-    .page-container {
-        max-width: 100%;
-        margin: 0;
-        padding: 1.2em 1.2em 5rem;
-    }
+  .page-container {
+    max-width: 100%;
+    margin: 0;
+    padding: 1.2em 1.2em 5rem;
+  }
 
-    .mobileOnly {
-        display: initial;
-    }
+  .mobileOnly {
+    display: initial;
+  }
 }
 
 .page-content h1 {
-    margin-bottom: 1.5em;
+  margin-bottom: 1.5em;
 }
 
 .is-required {
-    color: var(--blue);
-    font-weight: 600;
+  color: var(--blue);
+  font-weight: 600;
 }
 
 .formError {
-    border-left: 4px solid var(--red) !important;
-    padding-left: 1em !important;
+  border-left: 4px solid var(--red) !important;
+  padding-left: 1em !important;
 }
 
 .hy-icon-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.rich-text {
-& ul,
-& ol {
-      margin-bottom: 1em;
-      list-style-position: inside;
-
-& ul,
-& ol {
-      margin-left: 15px;
-      margin-bottom: 0;
-  }
-}
-
-& ul {
-      list-style-type: disc;
-
-& ul {
-      list-style-type: circle;
-
-& ul {
-      list-style-type: square;
-  }
-}
-}
-
-& ol {
-      list-style-type: decimal;
-  }
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 :focus {
-    outline-style: solid;
-    outline-width: 1px;
-    outline-offset: 5px;
+  outline-style: solid;
+  outline-width: 1px;
+  outline-offset: 5px;
 }

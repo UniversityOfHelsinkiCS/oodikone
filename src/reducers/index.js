@@ -8,7 +8,7 @@ import {
 
 /* collect reducers here from subfolders */
 const reducers = combineReducers({
-    departmentSuccess: departmentSuccess
+  departmentSuccess
 
 });
 
