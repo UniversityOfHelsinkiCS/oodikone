@@ -83,7 +83,7 @@ module.exports = {
 
   plugins: [
     new webpack.DefinePlugin({
-     /* CONFIG: JSON.stringify(clientConfig), */
+      /* CONFIG: JSON.stringify(clientConfig), */
 
       'process.env': {
         NODE_ENV: JSON.stringify('production')
@@ -111,7 +111,7 @@ module.exports = {
         collapseWhitespace: true,
         processConditionalComments: true
       },
-  /*    baseHref: `${clientConfig.BASE_PATH}/`, */
+      /*    baseHref: `${clientConfig.BASE_PATH}/`, */
       meta: [
         {
           name: 'viewport',

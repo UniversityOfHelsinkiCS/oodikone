@@ -1,9 +1,9 @@
 import React from 'react';
 
 const Populations = () =>
-    <div>
+  (<div>
         populations component
-    </div>;
+  </div>);
 
 
 export default Populations;
