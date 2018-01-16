@@ -176,8 +176,9 @@ const findOrCreateTeacher = async (code, name) => {
 }
 
 const createTeacher = async (code, name) => {
-  const id = await Teacher.max('id') + 1
-  return Teacher.build({
+  const maxId = await Teacher.max('id')
+  const id = parseInt(maxId) + 1
+  return Teacher.create({
     id: id,
     code: code,
     name: name 
@@ -185,8 +186,9 @@ const createTeacher = async (code, name) => {
 }
 
 const createCourseTeacher = async (role, teacher, instance) => {
-  const id = await CourseTeacher.max('id') + 1
-  return CourseTeacher.build({
+  const maxId = await CourseTeacher.max('id')
+  const id = parseInt(maxId) + 1
+  return CourseTeacher.create({
     id: id,
     teacherrole: role,
     courseinstance_id: instance.id,

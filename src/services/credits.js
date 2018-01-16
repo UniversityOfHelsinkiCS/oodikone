@@ -1,11 +1,9 @@
-const Sequelize = require('sequelize')
 const { Credit } = require('../models')
-const Op = Sequelize.Op
-
 
 const createCredit = async (credit, studentNumber, courseInstanceId) => {
-  const id = await Credit.max('id') + 1
-  return Credit.build({
+  const maxId = await Credit.max('id')
+  const id = parseInt(maxId) + 1
+  return Credit.create({
     id: id,
     grade: credit.grade,
     student_studentnumber: studentNumber,

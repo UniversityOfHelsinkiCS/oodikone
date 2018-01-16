@@ -6,10 +6,6 @@ const createOrganisation = (array) => {
   return Organisation.create({
     code: array.code,
     name: array.name
-  }).then(res => {
-    console.log('Organisation: ' + array.name + ' created')
-  }).catch(e => {
-    console.log('Organisation: ' + array.name + ' creation failed')
   })
 }
 

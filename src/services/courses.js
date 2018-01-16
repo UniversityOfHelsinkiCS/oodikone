@@ -192,15 +192,16 @@ const courseInstanceByCodeAndDate = (code, date) => {
 }
 
 const createCourse = async (code, name) => {
-  return Course.build({
+  return Course.create({
     code: code,
     name: name
   })
 }
 
 const createCourseInstance = async (creditDate, course) => {
-  const id = await CourseInstance.max('id') + 1
-  return CourseInstance.build({
+  const maxId = await CourseInstance.max('id')
+  const id = parseInt(maxId) + 1
+  return CourseInstance.create({
     id: id,
     coursedate: creditDate,
     course_code: course.code
