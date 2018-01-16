@@ -1,0 +1,23 @@
+{
+    "root": true,
+    "parser": "babel-eslint",
+    "extends": "airbnb",
+    "env": {
+      "browser": true
+    },
+    "rules": {
+      "comma-dangle": [2, "never"],
+      "no-param-reassign": [2, {
+        "props": false
+      }],
+      "import/no-unresolved":2,
+      "react/jsx-no-bind": 2,
+      "react/no-did-mount-set-state": 0,
+      "react/prefer-stateless-function": 2
+
+    },
+    "plugins" : [
+      "react",
+      "import"
+    ]
+}
