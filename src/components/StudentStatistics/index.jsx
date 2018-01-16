@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 
 import { addError, findStudentsAction } from '../../actions';
 
+import styles from './studentStatistics.css';
+
 class StudentStatistics extends Component {
   constructor(props) {
     super(props);
@@ -25,7 +27,7 @@ class StudentStatistics extends Component {
 
   render() {
     return (
-      <div>
+      <div className={styles.example}>
         {JSON.stringify(this.state.students)}
       </div>
     );
