@@ -18,7 +18,7 @@ module.exports = {
     hot: true,
     proxy: [
       {
-        context: ['/api/**', '/auth/**'],
+        context: ['/api/**'],
         target: `http://localhost:${apiServerPort}`
       }
     ],
@@ -110,7 +110,7 @@ module.exports = {
       inject: false,
       template: htmlTemplate,
       appMountId: 'root',
-      title: 'Oodikone2',
+      title: 'Oodikone',
       baseHref: '/',
       meta: [
         {

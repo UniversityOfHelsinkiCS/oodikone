@@ -7,9 +7,8 @@
     "url": "git+https://github.com/UniversityOfHelsinkiCS/oodikone2-frontend.git"
   },
   "licence": "",
-  "main": "src/app.js",
+  "main": "src/app.jsx",
   "devDependencies": {
-    "autoprefixer": "7.1.6",
     "babel-core": "6.26.0",
     "babel-eslint": "7.2.3",
     "babel-jest": "20.0.3",
@@ -20,24 +19,28 @@
     "babel-preset-react": "^6.24.1",
     "babel-runtime": "6.26.0",
     "case-sensitive-paths-webpack-plugin": "2.1.1",
+    "concurrently": "^3.5.1",
     "css-loader": "0.28.7",
     "eslint": "4.10.0",
+    "eslint-config-airbnb": "^16.1.0",
     "eslint-config-react-app": "^2.0.1",
     "eslint-loader": "1.9.0",
     "eslint-plugin-flowtype": "2.39.1",
-    "eslint-plugin-import": "2.8.0",
-    "eslint-plugin-jsx-a11y": "5.1.1",
-    "eslint-plugin-react": "7.4.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.5.1",
     "extract-text-webpack-plugin": "3.0.2",
     "file-loader": "1.1.5",
     "glob": "^7.1.2",
     "html-webpack-plugin": "2.29.0",
     "html-webpack-template": "^6.0.1",
+    "husky": "^0.14.3",
     "jest": "20.0.4",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
     "postcss-cssnext": "^3.0.2",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "2.0.8",
+    "purify-css": "^1.2.5",
     "purifycss-webpack": "^0.7.0",
     "react-dev-utils": "^4.2.1",
     "style-loader": "^0.19.1",
@@ -65,12 +68,18 @@
     "redux-logger": "^3.0.6",
     "redux-promise-middleware": "^5.0.0",
     "redux-thunk": "^2.2.0",
+    "rimraf": "^2.6.2",
     "whatwg-fetch": "2.0.3"
   },
   "scripts": {
     "dev": "webpack-dev-server --config webpack.config.local.js",
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
+    "dist": "rimraf dist && webpack --config webpack.config.production.js",
+    "lint": "concurrently 'npm run lint:js' 'npm run lint:css'",
+    "lint:css": "stylelint 'src/**/*.css'",
+    "lint:js": "eslint server ./ --ext .jsx,.js",
+    "lintfix": "eslint server ./ --ext .jsx,.js --fix",
+    "prepush": "npm run lint",
+    "pretest": "npm run lint",
     "test": "node scripts/test.js --env=jsdom"
   },
   "jest": {
@@ -94,9 +103,6 @@
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs)$"
     ],
-    "moduleNameMapper": {
-      "^react-native$": "react-native-web"
-    },
     "moduleFileExtensions": [
       "web.js",
       "mjs",
