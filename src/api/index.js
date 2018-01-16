@@ -1,4 +1,4 @@
-import { get, getJson } from '../common';
+import { getJson } from '../common';
 
 const throwErrors = (res) => {
   if (res.ok === false || res.error) {

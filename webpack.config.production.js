@@ -8,7 +8,6 @@ const htmlTemplate = require('html-webpack-template');
 const path = require('path');
 const glob = require('glob');
 
-/* const clientConfig = require(path.join(__dirname, './config/config.json')); // eslint-disable-line import/no-dynamic-require */
 const commonSettings = require('./webpack.config.common');
 
 const CSS_MODULES_CLASS_PREFIX = 'no-purify';
