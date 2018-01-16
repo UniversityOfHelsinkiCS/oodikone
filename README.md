@@ -1,5 +1,19 @@
 # OodiKone2-Frontend
 
-## Run
+### Development
 
-`npm start`
+local development: `npm run dev` 
+
+### Linting
+Install eslint: `npm install -g eslint`
+
+lint js & css: `npm run lint`
+lint only js: `npm run lint:js`
+lint only css: `npm run lint:css`
+lint fix for js: `npm run lintfix`
+
+
+### Building
+`npm run dist`
+
+Builds optimized production package to /dist
