@@ -29,8 +29,10 @@ class DepartmentSuccess extends Component {
 }
 
 const { func } = PropTypes;
+
 DepartmentSuccess.propTypes = {
-  dispatchGetDepartmentSuccess: func.isRequired
+  dispatchGetDepartmentSuccess: func.isRequired,
+  dispatchAddError: func.isRequired
 };
 
 const mapStateToProps = () => ({});

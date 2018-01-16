@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+
 import { addError, findStudentsAction } from '../../actions';
 
 class StudentStatistics extends Component {
@@ -29,6 +31,12 @@ class StudentStatistics extends Component {
     );
   }
 }
+
+const { func } = PropTypes;
+
+StudentStatistics.propTypes = {
+  dispatchFindStudents: func.isRequired
+};
 
 
 const mapStateToProps = () => ({});
