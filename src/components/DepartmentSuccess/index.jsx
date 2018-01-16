@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import styles from './departmentSuccess.css';
 import { addError, getDepartmentSuccessAction } from '../../actions';
 
 class DepartmentSuccess extends Component {
@@ -23,7 +24,7 @@ class DepartmentSuccess extends Component {
 
   render() {
     return (
-      <div>{this.state.departmentSuccess || '---'}</div>
+      <div className={styles.example}>{this.state.departmentSuccess || '---'}</div>
     );
   }
 }
