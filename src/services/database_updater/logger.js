@@ -5,7 +5,7 @@ const moment = require('moment')
 const time = () => '[' + moment().format('DD.MM.YYYY hh:mm:ss') + ']'
 const timeStamp = moment().format('MMYYYY')
 
-const logError = process.env.NODE_ENV == 'dev' ?
+const logError = process.env.NODE_ENV === 'dev' ?
   (msg) => console.log(time() + ' ERROR: ' + msg + '\n') :
   (msg) => {
     try {
@@ -16,7 +16,7 @@ const logError = process.env.NODE_ENV == 'dev' ?
     }
   }
 
-const log = process.env.NODE_ENV == 'dev' ?
+const log = process.env.NODE_ENV === 'dev' ?
   (msg) => console.log(time() + ' LOG: ' + msg + '\n') :
   (msg) => {
     try {
