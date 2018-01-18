@@ -34,14 +34,13 @@ const updateStudentStudyRights = async student => {
       return
     }
     const studentStudyRightIds = studentStudyRights.map(sr => sr.studyrightid)
-
     oodiStudentStudyRights.forEach(async studyRight => {
       if (!studentStudyRightIds.includes(studyRight.studyRightId)) {
         let organisation = await OrganisationService.byCode(studyRight.organisation)
         if (organisation === null) {
           organisation = await Oi.getOrganisation(studyRight.organisation)
           try {
-            OrganisationService.createOrganisation(organisation)
+            await OrganisationService.createOrganisation(organisation)
             log('Organisation ' + organisation.code + ' ' +
               organisation.name + ' created')
           } catch (e) {
@@ -53,7 +52,7 @@ const updateStudentStudyRights = async student => {
         studyRight.organisation = organisation.code
         studyRight.student = student.studentnumber
         try {
-          StudyrightService.createStudyright(studyRight)
+          await StudyrightService.createStudyright(studyRight)
           log('Student ' + student.studentnumber + ': new studyright created: '
             + studyRight.highLevelName)
         } catch (e) {
@@ -180,7 +179,7 @@ const loadAndUpdateStudent = async studentNumber => {
     }
     if (student == null) {
       try {
-        StudentService.createStudent(student)
+        await StudentService.createStudent(student)
         log('Student ' + studentNumber + ' created to database')
         return student
       } catch (e) {

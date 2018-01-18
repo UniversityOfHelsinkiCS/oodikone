@@ -14,7 +14,7 @@ const getStudent = (studentNumber) => {
       return data_mapper.getStudentFromData(response.data)
     })
     .catch(error => {
-      console.log('error getStudent' + studentNumber + '\n' + error)
+      return null
     })
 }
 

@@ -7,7 +7,7 @@ const Op = Sequelize.Op
 const createStudyright = (array) => {
   return Studyright.create({
     studyrightid: array.studyRightId,
-    canceldate: array.cancelDate,
+    canceldate: getDate(array.cancelDate),
     cancelorganisation: array.cangelOrganisation,
     enddate: getDate(array.endDate),
     extentcode: array.extentCode,
