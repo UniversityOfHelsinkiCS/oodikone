@@ -17,15 +17,14 @@ const logError = process.env.NODE_ENV === 'dev' ?
   }
 
 const log = process.env.NODE_ENV === 'dev' ?
-  (msg) => console.log(time() + ' LOG: ' + msg + '\n') :
-  (msg) => {
-    try {
-      fs.appendFileSync('logs/update_full_log' + timeStamp +'.txt', time() + ' LOG: ' + msg + '\n')
-    } catch (e) {
-      console.log('Writing to log file failed')
-      console.log(e)
-    }
-  }
+  (msg) => console.log(time() + ' LOG: ' + msg + '\n') : () => ''
+  //   try {
+  //     fs.appendFileSync('logs/update_full_log' + timeStamp +'.txt', time() + ' LOG: ' + msg + '\n')
+  //   } catch (e) {
+  //     console.log('Writing to log file failed')
+  //     console.log(e)
+  //   }
+  // }
 
 module.exports = {
   logError, log

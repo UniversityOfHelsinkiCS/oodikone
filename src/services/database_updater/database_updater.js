@@ -12,17 +12,16 @@ const Oi = require('./oodi_interface')
 const { log, logError } = require('./logger')
 
 
-let minStudentNumber = 1400000
+let minStudentNumber = 1000000
 let maxStudentNumber = 1500000
 console.log('Running updater on ' + minStudentNumber + '-' + maxStudentNumber)
 
 const updateStudentInformation = async studentNumber => {
-  if (studentNumber == '014424850') return
   let student = await loadAndUpdateStudent(studentNumber)
   if (student === null) {
     return
   }
-  updateStudentStudyRights(student)
+  await updateStudentStudyRights(student)
   await updateStudentCredits(student)
   return
 }
@@ -40,7 +39,7 @@ const updateStudentStudyRights = async student => {
       if (!studentStudyRightIds.includes(studyRight.studyRightId)) {
         let organisation = await OrganisationService.byCode(studyRight.organisation)
         if (organisation === null) {
-          organisation = await Oi.getOrganisation(studyRight.organisation_code)
+          organisation = await Oi.getOrganisation(studyRight.organisation)
           try {
             OrganisationService.createOrganisation(organisation)
             log('Organisation ' + organisation.code + ' ' +
@@ -48,6 +47,7 @@ const updateStudentStudyRights = async student => {
           } catch (e) {
             logError('Saving organisation to database failed, line: ' + e.lineNumber + ', errormessage:')
             logError(e)
+            return
           }
         }
         studyRight.organisation = organisation.code
@@ -75,11 +75,11 @@ const updateStudentCredits = async student => {
   let studentOldCredits = await student.getCredits()
 
   if (studentOldCredits.length === studentCourseCredits.length) {
-    log('Student: ' + student.studentnumber + ' no need to update credits')
     return
   }
   log('Student: ' + student.studentnumber + ' updating credits')
-  log('Student: ' +  + student.studentnumber + ' old credits: ' + studentOldCredits.length + ' new credits: ' + studentCourseCredits.length)
+  log('Student: ' + student.studentnumber + ' old course count: ' + studentOldCredits.length + ' new course count: ' + studentCourseCredits.length)
+
   for (let i = 0; i < studentCourseCredits.length; i++) {
     let oodiCredit = studentCourseCredits[i]
     // check for each credit whether oodikone db already has it
@@ -129,7 +129,7 @@ const updateStudentCredits = async student => {
       }
       // create a new credit
       try {
-        const newCredit = await CreditService.createCredit(oodiCredit, student.studentnumber, instance.id)
+        await CreditService.createCredit(oodiCredit, student.studentnumber, instance.id)
         log('Student: ' + student.studentnumber + ' new credit for course ' + course.code + ' instance ' + instance.id + ' created')
       } catch (e) {
         logError('ERROR: Student: ' + student.studentnumber + ' could not create credit for course ' + course.code)
@@ -143,21 +143,24 @@ const updateStudentCredits = async student => {
 const studentAlreadyHasCredit = async (student, oodiCredit) => {
   // get the course code of the credit from Oodi
   let creditCode = oodiCredit.courseInstance.course.courseCode
+  let creditDate = getDate(oodiCredit.courseInstance.date)
   const credits = await student.getCredits()
+
   for (let i = 0; i < credits.length; i++) {
     let studentCredit = credits[i]
     let instance = await CourseInstance.findById(studentCredit.courseinstance_id)
     // get the course code from credit in oodikone db
     let instanceCode = instance.course_code
+    let instanceDate = instance.coursedate
     // compare codes and grades
-    if (creditCode === instanceCode) {
+    if (creditCode === instanceCode && creditDate === instanceDate) {
       // if the oodi grade is better, update it
-      if (oodiCredit.grade > studentCredit.grade) {
+      if (parseInt(oodiCredit.grade) && parseInt(oodiCredit.grade) > studentCredit.grade) {
         try {
           await CreditService.updateCreditGrade(studentCredit, oodiCredit.grade)
-          log('Student: ' + student.studentnumber + ' instance ' + instanceCode + ' credit grade updated: ' + studentCredit.grade + ' => ' + oodiCredit.grade)
+          log('Student: ' + student.studentnumber + ' course instance with code ' + instanceCode + ' credit grade updated: ' + studentCredit.grade + ' => ' + oodiCredit.grade)
         } catch (e) {
-          logError('Student: ' + student.studentnumber + ' instance ' + instanceCode + ' credit grade update ' + studentCredit.grade + ' => ' + oodiCredit.grade + ' FAILED')
+          logError('Student: ' + student.studentnumber + ' course instance with code ' + instanceCode + ' credit grade update ' + studentCredit.grade + ' => ' + oodiCredit.grade + ' FAILED')
           logError(e)
         }
       }
@@ -181,7 +184,7 @@ const loadAndUpdateStudent = async studentNumber => {
         log('Student ' + studentNumber + ' created to database')
         return student
       } catch (e) {
-        logError('Student ' + studentNumber + ': creation failed, line: ' + e.lineNumber + ', error message:')
+        logError('Student ' + studentNumber + ': creation failed, error message:')
         logError(e)
         return null
       }
@@ -231,7 +234,8 @@ const run = async () => {
 
     await updateStudentInformation(studentNumber)
   }
-
 }
-
 run()
+
+
+
