@@ -80,7 +80,7 @@ const byIds = (ids) => {
   })
 }
 
-async function bySeachTerm(term) {
+async function bySearchTerm(term) {
   const formatCourse = ({name, code}) => ({name, code})
   
   try {
@@ -172,6 +172,42 @@ async function instancesOf(code) {
   } 
 }
 
+const courseInstanceByCodeAndDate = (code, date) => {
+  return CourseInstance.findOne({
+    where: {
+      [Op.and]: [
+        { 
+          course_code: { 
+            [Op.eq]: code 
+          } 
+        },
+        { 
+          coursedate: { 
+            [Op.eq]: new Date(date) 
+          } 
+        }
+      ] 
+    }
+  })
+}
+
+const createCourse = async (code, name) => {
+  return Course.create({
+    code: code,
+    name: name
+  })
+}
+
+const createCourseInstance = async (creditDate, course) => {
+  const maxId = await CourseInstance.max('id')
+  const id = parseInt(maxId) + 1
+  return CourseInstance.create({
+    id: id,
+    coursedate: creditDate,
+    course_code: course.code
+  })
+}
+
 module.exports = {
-  bySeachTerm, instancesOf, statisticsOf
+  bySearchTerm, instancesOf, statisticsOf, createCourse, createCourseInstance, courseInstanceByCodeAndDate
 }

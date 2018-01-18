@@ -5,7 +5,8 @@ const conf = require('../conf-backend')
 const sequelize = new Sequelize(conf.db_name, 'tkt_oodi', conf.db_pw, {
   host: conf.db_host,
   dialect:'postgres',
-  logging: process.env.NODE_ENV==='test' ? false : true,
+  // logging: process.env.NODE_ENV==='test' ? false : true,
+  logging: false,
   operatorsAliases: false
 })
 
@@ -73,6 +74,20 @@ const Tag = sequelize.define('tag',
   },
   {
     tableName: 'tag',
+    timestamps: false,  
+  }  
+)
+
+const Organisation = sequelize.define('organization', 
+  {
+    code: {
+      primaryKey: true,
+      type: Sequelize.STRING
+    },
+    name: Sequelize.STRING
+  },
+  {
+    tableName: 'organization',
     timestamps: false,  
   }  
 )
@@ -242,5 +257,6 @@ module.exports = {
   Teacher, 
   CourseTeacher, 
   User,
-  sequelize
+  sequelize,
+  Organisation
 }

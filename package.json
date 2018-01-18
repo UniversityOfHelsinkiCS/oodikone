@@ -8,7 +8,8 @@
     "docker_local": "NODE_ENV=docker_local nodemon index.js",
     "dev": "NODE_ENV=dev nodemon index.js",
     "test": "NODE_ENV=test ava",
-    "update_database": "node src/services/database_updater.js",
+    "update_database_dev": "NODE_ENV=dev node src/services/database_updater/database_updater.js",
+    "update_database": "node src/services/database_updater/database_updater.js",
     "lint": "eslint --parser babel-eslint src",
     "coverage": "NODE_ENV=test nyc ava"
   },

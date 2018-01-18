@@ -71,7 +71,7 @@ app.get('/api/departmentsuccess', async function (req, res) {
 app.get('/api/students', async function (req, res) {
   let results = []
   if (req.query.searchTerm) {
-    results = await Student.bySeachTerm(req.query.searchTerm)
+    results = await Student.bySearchTerm(req.query.searchTerm)
   }
 
   res.json(results)
@@ -100,7 +100,7 @@ app.delete('/api/students/:id/tags', async function (req, res) {
 app.get('/api/courses', async function (req, res) {
   let results = []
   if (req.query.name) {
-    results = await Course.bySeachTerm(req.query.name)
+    results = await Course.bySearchTerm(req.query.name)
   }
 
   res.json(results)
@@ -171,7 +171,7 @@ app.post('/api/populationstatistics', async function(req, res) {
 })
 
 app.get('/api/tags', async function(req, res) {
-  const results = await Tag.bySeachTerm(req.query.query || '')
+  const results = await Tag.bySearchTerm(req.query.query || '')
   res.json(results)  
 })
 
