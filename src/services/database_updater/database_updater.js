@@ -17,13 +17,18 @@ let maxStudentNumber = 1500000
 console.log('Running updater on ' + minStudentNumber + '-' + maxStudentNumber)
 
 const updateStudentInformation = async studentNumber => {
-  let student = await loadAndUpdateStudent(studentNumber)
-  if (student === null) {
+  try {
+    let student = await loadAndUpdateStudent(studentNumber)
+    if (student === null) {
+      return
+    }
+    await updateStudentStudyRights(student)
+    await updateStudentCredits(student)
     return
+  } catch (e) {
+    logError('Student: '+ studentNumber + ' UpdateStudenInformation failed.')
+    logError(e)
   }
-  await updateStudentStudyRights(student)
-  await updateStudentCredits(student)
-  return
 }
 
 const updateStudentStudyRights = async student => {
@@ -68,105 +73,114 @@ const updateStudentStudyRights = async student => {
 }
 
 const updateStudentCredits = async student => {
-  // get credits from Oodi
-  let studentCourseCredits = await Oi.getStudentCourseCredits(student.studentnumber)
+  try {
+    let studentCourseCredits = await Oi.getStudentCourseCredits(student.studentnumber)
 
-  let studentOldCredits = await student.getCredits()
-  
-  if (studentOldCredits.length === studentCourseCredits.length) {
-    return
-  }
-  log('Student: ' + student.studentnumber + ' updating credits')
-  log('Student: ' + student.studentnumber + ' old course count: ' + studentOldCredits.length + ' new course count: ' + studentCourseCredits.length)
+    let studentOldCredits = await student.getCredits()
 
-  for (let i = 0; i < studentCourseCredits.length; i++) {
-    let oodiCredit = studentCourseCredits[i]
-    // check for each credit whether oodikone db already has it
-    const hasCredit = await studentAlreadyHasCredit(student, oodiCredit)
-    if (!hasCredit) {
-      let oodiCreditCourseCode = oodiCredit.courseInstance.course.courseCode
-      let oodiCourseName = oodiCredit.courseInstance.course.courseName
-      let oodiDate = getDate(oodiCredit.courseInstance.date)
-      let instance = await CourseService.courseInstanceByCodeAndDate(oodiCreditCourseCode, oodiDate)
-      let course = await Course.findById(oodiCreditCourseCode)
-      // if the course doesn't exist and the instance doesn't exist, handle those.
-      if (course === null) {
-        try {
-          course = await CourseService.createCourse(oodiCreditCourseCode, oodiCourseName)
-          log('Created new course ' + course.code + ', ' + course.name)
-        } catch (e) {
-          logError('Error creating new course: ' + course.code + '. Error message:')
-          logError(e)
-          return
-        }
-      }
-
-      if (instance === null) {
-        // create a course instance
-        try {
-          instance = await CourseService.createCourseInstance(oodiDate, course)
-          log('Created new instance ' + instance.id + ' of course ' + course.code)
-        } catch (e) {
-          logError('Error creating new course instance: ' + course.code + '. Error message:')
-          logError(e)
-          return
-        }
-        // get all teachers for course instance
-        const teacherDetails = await Oi.getTeacherDetails(oodiCreditCourseCode, oodiCredit.courseInstance.date)
-        const teachers = getTeachersAndRolesFromData(teacherDetails.data)
-        for (let i = 0; i < teachers.length; i++) {
-          let t = teachers[i]
-          // check if teacher exists in database and if not, create
-          let teacher = await TeacherService.findOrCreateTeacher(t.code, t.name)
-          // make CourseTeachers from teachers
-          let courseTeacher = await TeacherService.createCourseTeacher(t.role, teacher, instance)
-          // set teacher as CourseTeacher for the CourseInstance
-          instance = await instance.addCourseteacher(courseTeacher)
-          log('Added ' + t.name + ' as teacher for course ' + course.code + ' instance ' + instance.id)
-        }
-
-      }
-      // create a new credit
-      try {
-        await CreditService.createCredit(oodiCredit, student.studentnumber, instance.id)
-        log('Student: ' + student.studentnumber + ' new credit for course ' + course.code + ' instance ' + instance.id + ' created')
-      } catch (e) {
-        logError('ERROR: Student: ' + student.studentnumber + ' could not create credit for course ' + course.code)
-        logError(e)
-      }
-
+    if (!studentCourseCredits || studentOldCredits.length === studentCourseCredits.length) {
+      return
     }
+    log('Student: ' + student.studentnumber + ' updating credits')
+    log('Student: ' + student.studentnumber + ' old course count: ' + studentOldCredits.length + ' new course count: ' + studentCourseCredits.length)
+
+    for (let i = 0; i < studentCourseCredits.length; i++) {
+      let oodiCredit = studentCourseCredits[i]
+      // check for each credit whether oodikone db already has it
+      const hasCredit = await studentAlreadyHasCredit(student, oodiCredit)
+      if (!hasCredit) {
+        let oodiCreditCourseCode = oodiCredit.courseInstance.course.courseCode
+        let oodiCourseName = oodiCredit.courseInstance.course.courseName
+        let oodiDate = getDate(oodiCredit.courseInstance.date)
+        let instance = await CourseService.courseInstanceByCodeAndDate(oodiCreditCourseCode, oodiDate)
+        let course = await Course.findById(oodiCreditCourseCode)
+        // if the course doesn't exist and the instance doesn't exist, handle those.
+        if (course === null) {
+          try {
+            course = await CourseService.createCourse(oodiCreditCourseCode, oodiCourseName)
+            log('Created new course ' + course.code + ', ' + course.name)
+          } catch (e) {
+            logError('Error creating new course: ' + course.code + '. Error message:')
+            logError(e)
+            return
+          }
+        }
+
+        if (instance === null) {
+          // create a course instance
+          try {
+            instance = await CourseService.createCourseInstance(oodiDate, course)
+            log('Created new instance ' + instance.id + ' of course ' + course.code)
+          } catch (e) {
+            logError('Error creating new course instance: ' + course.code + '. Error message:')
+            logError(e)
+            return
+          }
+          // get all teachers for course instance
+          const teacherDetails = await Oi.getTeacherDetails(oodiCreditCourseCode, oodiCredit.courseInstance.date)
+          const teachers = getTeachersAndRolesFromData(teacherDetails.data)
+          for (let i = 0; i < teachers.length; i++) {
+            let t = teachers[i]
+            // check if teacher exists in database and if not, create
+            let teacher = await TeacherService.findOrCreateTeacher(t.code, t.name)
+            // make CourseTeachers from teachers
+            let courseTeacher = await TeacherService.createCourseTeacher(t.role, teacher, instance)
+            // set teacher as CourseTeacher for the CourseInstance
+            instance = await instance.addCourseteacher(courseTeacher)
+            log('Added ' + t.name + ' as teacher for course ' + course.code + ' instance ' + instance.id)
+          }
+
+        }
+        // create a new credit
+        try {
+          await CreditService.createCredit(oodiCredit, student.studentnumber, instance.id)
+          log('Student: ' + student.studentnumber + ' new credit for course ' + course.code + ' instance ' + instance.id + ' created')
+        } catch (e) {
+          logError('ERROR: Student: ' + student.studentnumber + ' updateStudentCredits failed. ')
+          logError(e)
+        }
+
+      }
+    }
+  } catch (e) {
+    logError('ERROR: Student: ' + student.studentnumber + ' could not create credit for course ' + course.code)
+    logError(e)
   }
 }
 
 const studentAlreadyHasCredit = async (student, oodiCredit) => {
-  // get the course code of the credit from Oodi
-  let creditCode = oodiCredit.courseInstance.course.courseCode
-  let creditDate = getDate(oodiCredit.courseInstance.date)
-  const credits = await student.getCredits()
+  try {
+    // get the course code of the credit from Oodi
+    let creditCode = oodiCredit.courseInstance.course.courseCode
+    let creditDate = getDate(oodiCredit.courseInstance.date)
+    const credits = await student.getCredits()
 
-  for (let i = 0; i < credits.length; i++) {
-    let studentCredit = credits[i]
-    let instance = await CourseInstance.findById(studentCredit.courseinstance_id)
-    // get the course code from credit in oodikone db
-    let instanceCode = instance.course_code
-    let instanceDate = instance.coursedate
-    // compare codes and grades
-    if (creditCode === instanceCode && creditDate === instanceDate) {
-      // if the oodi grade is better, update it
-      if (parseInt(oodiCredit.grade) && parseInt(oodiCredit.grade) > studentCredit.grade) {
-        try {
-          await CreditService.updateCreditGrade(studentCredit, oodiCredit.grade)
-          log('Student: ' + student.studentnumber + ' course instance with code ' + instanceCode + ' credit grade updated: ' + studentCredit.grade + ' => ' + oodiCredit.grade)
-        } catch (e) {
-          logError('Student: ' + student.studentnumber + ' course instance with code ' + instanceCode + ' credit grade update ' + studentCredit.grade + ' => ' + oodiCredit.grade + ' FAILED')
-          logError(e)
+    for (let i = 0; i < credits.length; i++) {
+      let studentCredit = credits[i]
+      let instance = await CourseInstance.findById(studentCredit.courseinstance_id)
+      // get the course code from credit in oodikone db
+      let instanceCode = instance.course_code
+      let instanceDate = instance.coursedate
+      // compare codes and grades
+      if (creditCode === instanceCode && creditDate === instanceDate) {
+        // if the oodi grade is better, update it
+        if (parseInt(oodiCredit.grade) && parseInt(oodiCredit.grade) > studentCredit.grade) {
+          try {
+            await CreditService.updateCreditGrade(studentCredit, oodiCredit.grade)
+            log('Student: ' + student.studentnumber + ' course instance with code ' + instanceCode + ' credit grade updated: ' + studentCredit.grade + ' => ' + oodiCredit.grade)
+          } catch (e) {
+            logError('Student: ' + student.studentnumber + ' course instance with code ' + instanceCode + ' credit grade update ' + studentCredit.grade + ' => ' + oodiCredit.grade + ' FAILED')
+            logError(e)
+          }
         }
+        return true
       }
-      return true
     }
+    return false
+  } catch (e) {
+    logError('Student: ' + student.studentnumber + ' alreadyHasCredit check FAILED')
+    logError(e)
   }
-  return false
 }
 
 const loadAndUpdateStudent = async studentNumber => {
