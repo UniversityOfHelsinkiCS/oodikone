@@ -72,7 +72,7 @@ const updateStudentCredits = async student => {
   let studentCourseCredits = await Oi.getStudentCourseCredits(student.studentnumber)
 
   let studentOldCredits = await student.getCredits()
-
+  
   if (studentOldCredits.length === studentCourseCredits.length) {
     return
   }
@@ -179,7 +179,7 @@ const loadAndUpdateStudent = async studentNumber => {
     }
     if (student == null) {
       try {
-        await StudentService.createStudent(student)
+        student = await StudentService.createStudent(studentFromOodi)
         log('Student ' + studentNumber + ' created to database')
         return student
       } catch (e) {
@@ -233,8 +233,6 @@ const run = async () => {
 
     await updateStudentInformation(studentNumber)
   }
+  process.exit(0)
 }
 run()
-
-
-
