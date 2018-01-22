@@ -1,5 +1,4 @@
-const Sequelize = require('sequelize')
-const { Studyright, Student, Credit, CourseInstance, Course, CourseTeacher, TagStudent, sequelize } = require('../../models')
+const { CourseInstance, Course } = require('../../models')
 const StudentService = require('../students')
 const StudyrightService = require('../studyrights')
 const OrganisationService = require('../organisations')
@@ -7,12 +6,11 @@ const { getDate, getTeachersAndRolesFromData } = require('./oodi_data_mapper')
 const CourseService = require('../courses')
 const TeacherService = require('../teachers')
 const CreditService = require('../credits')
-const Op = Sequelize.Op
 const Oi = require('./oodi_interface')
 const { log, logError } = require('./logger')
 
 
-let minStudentNumber = 1000000
+let minStudentNumber = 1441096
 let maxStudentNumber = 1500000
 console.log('Running updater on ' + minStudentNumber + '-' + maxStudentNumber)
 
@@ -22,24 +20,25 @@ const updateStudentInformation = async studentNumber => {
     if (student === null) {
       return
     }
-    await updateStudentStudyRights(student)
-    await updateStudentCredits(student)
+    await Promise.all([updateStudentStudyRights(student), updateStudentCredits(student)])
     return
   } catch (e) {
-    logError('Student: '+ studentNumber + ' UpdateStudenInformation failed.')
+    logError('Student: ' + studentNumber + ' UpdateStudenInformation failed.')
     logError(e)
   }
 }
 
 const updateStudentStudyRights = async student => {
   try {
-    const oodiStudentStudyRights = await Oi.getStudentStudyRights(student.studentnumber)
-    const studentStudyRights = await StudyrightService.byStudent(student.studentnumber).map(studyright => studyright.dataValues)
-    if (oodiStudentStudyRights.length === studentStudyRights.length) {
+    let [oodiStudentStudyRights, studentStudyRights] =
+      await Promise.all([Oi.getStudentStudyRights(student.studentnumber),
+        StudyrightService.byStudent(student.studentnumber)])
+    studentStudyRights = studentStudyRights.map(studyright => studyright.dataValues)
+    if (studentStudyRights && oodiStudentStudyRights.length === studentStudyRights.length) {
       return
     }
     const studentStudyRightIds = studentStudyRights.map(sr => sr.studyrightid)
-    oodiStudentStudyRights.forEach(async studyRight => {
+    await Promise.all(oodiStudentStudyRights.map(async studyRight => {
       if (!studentStudyRightIds.includes(studyRight.studyRightId)) {
         let organisation = await OrganisationService.byCode(studyRight.organisation)
         if (organisation === null) {
@@ -65,7 +64,7 @@ const updateStudentStudyRights = async student => {
           logError(e)
         }
       }
-    })
+    }))
   } catch (e) {
     logError('Updating studyrights failed')
     logError(e)
@@ -74,9 +73,8 @@ const updateStudentStudyRights = async student => {
 
 const updateStudentCredits = async student => {
   try {
-    let studentCourseCredits = await Oi.getStudentCourseCredits(student.studentnumber)
-
-    let studentOldCredits = await student.getCredits()
+    const [studentCourseCredits, studentOldCredits] =
+      await Promise.all([Oi.getStudentCourseCredits(student.studentnumber), student.getCredits()])
 
     if (!studentCourseCredits || studentOldCredits.length === studentCourseCredits.length) {
       return
@@ -92,8 +90,9 @@ const updateStudentCredits = async student => {
         let oodiCreditCourseCode = oodiCredit.courseInstance.course.courseCode
         let oodiCourseName = oodiCredit.courseInstance.course.courseName
         let oodiDate = getDate(oodiCredit.courseInstance.date)
-        let instance = await CourseService.courseInstanceByCodeAndDate(oodiCreditCourseCode, oodiDate)
-        let course = await Course.findById(oodiCreditCourseCode)
+        let [instance, course] =
+          await Promise.all([CourseService.courseInstanceByCodeAndDate(oodiCreditCourseCode, oodiDate),
+            Course.findById(oodiCreditCourseCode)])
         // if the course doesn't exist and the instance doesn't exist, handle those.
         if (course === null) {
           try {
@@ -129,7 +128,6 @@ const updateStudentCredits = async student => {
             instance = await instance.addCourseteacher(courseTeacher)
             log('Added ' + t.name + ' as teacher for course ' + course.code + ' instance ' + instance.id)
           }
-
         }
         // create a new credit
         try {
@@ -143,7 +141,7 @@ const updateStudentCredits = async student => {
       }
     }
   } catch (e) {
-    logError('ERROR: Student: ' + student.studentnumber + ' could not create credit for course ' + course.code)
+    logError('ERROR: Student: ' + student.studentnumber + ' could not create credit for course ')
     logError(e)
   }
 }
@@ -155,8 +153,7 @@ const studentAlreadyHasCredit = async (student, oodiCredit) => {
     let creditDate = getDate(oodiCredit.courseInstance.date)
     const credits = await student.getCredits()
 
-    for (let i = 0; i < credits.length; i++) {
-      let studentCredit = credits[i]
+    await Promise.all(credits.map(async studentCredit => {
       let instance = await CourseInstance.findById(studentCredit.courseinstance_id)
       // get the course code from credit in oodikone db
       let instanceCode = instance.course_code
@@ -175,7 +172,7 @@ const studentAlreadyHasCredit = async (student, oodiCredit) => {
         }
         return true
       }
-    }
+    }))
     return false
   } catch (e) {
     logError('Student: ' + student.studentnumber + ' alreadyHasCredit check FAILED')
@@ -185,9 +182,8 @@ const studentAlreadyHasCredit = async (student, oodiCredit) => {
 
 const loadAndUpdateStudent = async studentNumber => {
   try {
-    let student = await StudentService.byId(studentNumber)
-
-    let studentFromOodi = await Oi.getStudent(studentNumber)
+    let [student, studentFromOodi] =
+      await Promise.all([StudentService.byId(studentNumber), Oi.getStudent(studentNumber)])
     if (studentFromOodi == null) {
       return null
     }
@@ -222,6 +218,7 @@ const loadAndUpdateStudent = async studentNumber => {
   } catch (e) {
     logError('Student: ' + studentNumber + ' loadAndUpdate failed, line: ' + e.lineNumber + ', error message:')
     logError(e)
+
   }
 }
 
@@ -239,12 +236,12 @@ const getStudentNumberChecksum = studentNumber => {
   return (10 - (checksum % 10)) % 10
 }
 
-
 const run = async () => {
 
   for (let i = minStudentNumber; i < maxStudentNumber; i++) {
+    1441096
+    if(i%50000 === 0) log('Running: 0' + i + getStudentNumberChecksum(String(i)))
     let studentNumber = '0' + i + getStudentNumberChecksum(String(i))
-
     await updateStudentInformation(studentNumber)
   }
   process.exit(0)
