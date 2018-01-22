@@ -15,7 +15,6 @@ class NavigationBar extends Component {
     const { activeItem } = this.state;
     const menuWidth = Object.keys(routes).length + 1;
 
-
     return (
       <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
         <Menu.Item onClick={() => this.setState({ activeItem: routes.index.route })}>
