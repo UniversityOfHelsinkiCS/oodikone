@@ -69,6 +69,8 @@
     "redux-promise-middleware": "^5.0.0",
     "redux-thunk": "^2.2.0",
     "rimraf": "^2.6.2",
+    "semantic-ui-css": "^2.2.12",
+    "semantic-ui-react": "^0.77.2",
     "whatwg-fetch": "2.0.3"
   },
   "scripts": {

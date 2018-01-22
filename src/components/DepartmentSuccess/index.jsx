@@ -24,7 +24,7 @@ class DepartmentSuccess extends Component {
 
   render() {
     return (
-      <div className={styles.example}>{this.state.departmentSuccess || '---'}</div>
+      <div className={styles.example}>{this.state.departmentSuccess !== undefined || '---'}</div>
     );
   }
 }
