@@ -18,8 +18,7 @@ class NavigationBar extends Component {
 
     return (
       <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
-        <Menu.Item className={styles.logoContainer}
-                   onClick={() => this.setState({ activeItem: routes.index.route })}>
+        <Menu.Item onClick={() => this.setState({ activeItem: routes.index.route })}>
           <a className={styles.logo} href="/">
             <h1 className={styles.logoText}>oodikone</h1>
           </a>
