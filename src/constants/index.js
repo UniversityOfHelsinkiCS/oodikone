@@ -1,9 +1,9 @@
 export const routes = {
-  index: '/',
-  populations: '/populations',
-  students: '/students',
-  courses: '/courses',
-  teachers: '/teachers'
+  index: { route: '/', text: 'Department success' },
+  populations: { route: '/populations', text: 'Populations' },
+  students: { route: '/students', text: 'Students' },
+  courses: { route: '/courses', text: 'Courses' },
+  teachers: { route: '/teachers,', text: 'Teachers' }
 };
 
 /* TODO: set this configurable? */

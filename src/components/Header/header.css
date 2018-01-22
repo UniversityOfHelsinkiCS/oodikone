@@ -2,12 +2,10 @@
 .header {
   position: relative;
   z-index: 20;
+  background-color: var(--black);
+  margin-bottom: 15px;
 }
 
-.logo {
-  text-decoration: none;
-}
-
-.logoText {
-  color: var(--black);
+.headerBanner {
+  min-height: 100px;
 }
