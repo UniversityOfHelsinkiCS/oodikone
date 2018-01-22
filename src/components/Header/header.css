@@ -3,11 +3,3 @@
   position: relative;
   z-index: 20;
 }
-
-.logo {
-  text-decoration: none;
-}
-
-.logoText {
-  color: var(--black);
-}
