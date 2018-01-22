@@ -2,12 +2,13 @@ import React from 'react';
 
 import styles from './header.css';
 
+import NavigationBar from '../NavigationBar';
+
 const Header = () =>
   (
     <header className={styles.header} role="banner">
-      <a className={styles.logo} href="/">
-        <h1 className={styles.logoText}>oodikone pt2 header</h1>
-      </a>
+      <div className={styles.headerBanner} />
+      <NavigationBar />
     </header>
   );
 
