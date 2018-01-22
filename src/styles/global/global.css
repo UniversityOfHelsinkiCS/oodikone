@@ -140,7 +140,5 @@ button {
 }
 
 :focus {
-  outline-style: solid;
-  outline-width: 1px;
-  outline-offset: 5px;
+  outline: 0;
 }
