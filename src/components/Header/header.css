@@ -2,4 +2,11 @@
 .header {
   position: relative;
   z-index: 20;
+  background-color: var(--black);
+  margin-bottom: 15px;
+}
+
+.headerBanner {
+  min-height: 100px;
+
 }
