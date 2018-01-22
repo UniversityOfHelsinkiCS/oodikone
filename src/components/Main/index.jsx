@@ -5,6 +5,8 @@ import Header from '../Header';
 import Populations from '../Populations';
 import DepartmentSuccess from '../DepartmentSuccess';
 import StudentStatistics from '../StudentStatistics';
+import Courses from '../Courses';
+import Teachers from '../Teachers';
 import { routes, BASE_PATH } from '../../constants';
 
 import styles from './main.css';
@@ -19,6 +21,8 @@ const Main = () =>
             <Route exact path={routes.index.route} component={DepartmentSuccess} />
             <Route exact path={routes.populations.route} component={Populations} />
             <Route exact path={routes.students.route} component={StudentStatistics} />
+            <Route exact path={routes.courses.route} component={Courses} />
+            <Route exact path={routes.teachers.route} component={Teachers} />
           </Switch>
         </main>
       </Router>

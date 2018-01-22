@@ -13,10 +13,13 @@ class NavigationBar extends Component {
   }
   render() {
     const { activeItem } = this.state;
+    const menuWidth = Object.keys(routes).length + 1;
+
 
     return (
-      <Menu stackable>
-        <Menu.Item onClick={() => this.setState({ activeItem: routes.index.route })}>
+      <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
+        <Menu.Item className={styles.logoContainer}
+                   onClick={() => this.setState({ activeItem: routes.index.route })}>
           <a className={styles.logo} href="/">
             <h1 className={styles.logoText}>oodikone</h1>
           </a>
