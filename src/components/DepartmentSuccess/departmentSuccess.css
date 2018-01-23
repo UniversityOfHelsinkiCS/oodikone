@@ -19,9 +19,11 @@
   text-align: center;
   font-size: larger;
 }
+
 .chartContainer {
   padding-right: 52px;
 }
+
 .dateSelector {
   display: flex;
   align-items: center;
