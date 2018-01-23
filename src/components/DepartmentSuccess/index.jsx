@@ -102,6 +102,7 @@ class DepartmentSuccess extends Component {
       departmentSuccess, selectedDate, selectorDates, loading
     } = this.state;
 
+    const selectedIndex = selectorDates.findIndex(value => value.text === selectedDate.text);
     const isFirstIndex = selectedDate.text === selectorDates[0].text;
     const isLastIndex = selectedDate === selectorDates[selectorDates.length - 1];
     const chartData = createChartData(departmentSuccess.value);
@@ -152,6 +153,11 @@ class DepartmentSuccess extends Component {
             >
               <Icon name="chevron right" className={styles.controlIcon} disabled={isLastIndex} />
             </div>
+          </div>
+          <div className={styles.dateBrowser}>
+            <span className={styles.nextDate}>{!isFirstIndex ? `...${selectorDates[selectedIndex - 1].text}` : ' '}</span>
+            <span className={styles.selectedDate}>{selectedDate.text}</span>
+            <span className={styles.nextDate}>{!isLastIndex ? `${selectorDates[selectedIndex + 1 ].text}...` : ' '}</span>
           </div>
         </Dimmer.Dimmable>
       </div>
