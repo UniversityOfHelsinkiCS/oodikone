@@ -1,3 +1,50 @@
-.example {
-  font-style: italic;
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.chartSegment {
+  border: none !important;
+  box-shadow: none !important;
+  width: 99%;
+  max-width: 1200px;
+  min-width: 600px;
+}
+
+.chartTitle {
+  padding: 5px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: larger;
+}
+.chartContainer {
+  padding-right: 52px;
+}
+.dateSelector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.controlIconContiner {
+  min-width: 25px;
+  min-height: 25px;
+  text-align: center;
+}
+
+.controlIcon {
+  cursor: pointer;
+
+  &:hover {
+    font-size: large;
+    color: var(--deepBlack);
+  }
+}
+
+.controlDropdown {
+  min-height: 25px;
+  padding-left: 2px;
+  padding-right: 5px;
 }
