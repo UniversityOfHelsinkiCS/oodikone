@@ -10,7 +10,7 @@ const Oi = require('./oodi_interface')
 const { log, logError } = require('./logger')
 
 
-let minStudentNumber = 1441096
+let minStudentNumber = 1000000
 let maxStudentNumber = 1500000
 console.log('Running updater on ' + minStudentNumber + '-' + maxStudentNumber)
 
