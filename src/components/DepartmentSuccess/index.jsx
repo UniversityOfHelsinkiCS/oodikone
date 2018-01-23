@@ -115,24 +115,25 @@ class DepartmentSuccess extends Component {
           </Dimmer>
           <div className={styles.chartTitle}>{chartTitle}</div>
           <div className={styles.chartContainer}>
-          <ResponsiveContainer height={400} >
-            <BarChart data={chartData} >
-              <XAxis dataKey="name" />
-              <YAxis />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip />
-              <Bar dataKey="value" fill={violet}>
-                {
+            <ResponsiveContainer height={400} >
+              <BarChart data={chartData} >
+                <XAxis dataKey="name" />
+                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" />
+                <Tooltip />
+                <Bar dataKey="value" fill={violet}>
+                  {
               chartData.map((entry, index) => <Cell key={`color-cell-${entry.name}`} fill={BAR_COLOR_OPTIONS[index]} />)
             }
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
           <div className={styles.dateSelector}>
             <div
               className={styles.controlIconContiner}
               onClick={!isFirstIndex ? this.onControlLeft : undefined}
+              onKeyPress={!isFirstIndex ? this.onControlLeft : undefined}
             >
               <Icon name="chevron left" className={styles.controlIcon} disabled={isFirstIndex} />
             </div>
@@ -147,6 +148,7 @@ class DepartmentSuccess extends Component {
             <div
               className={styles.controlIconContiner}
               onClick={!isLastIndex ? this.onControlRight : undefined}
+              onKeyPress={!isLastIndex ? this.onControlRight : undefined}
             >
               <Icon name="chevron right" className={styles.controlIcon} disabled={isLastIndex} />
             </div>
