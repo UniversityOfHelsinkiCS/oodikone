@@ -10,7 +10,6 @@ const BAR_COLOR_OPTIONS = [orange, lime, mellowBlue, turquoise];
 
 const MulticolorBarChart = (props) => {
   const { chartTitle, chartData } = props;
-
   return (
     <div>
       <div className={styles.chartTitle}>{chartTitle}</div>

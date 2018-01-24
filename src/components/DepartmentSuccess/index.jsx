@@ -26,7 +26,8 @@ const getSelectorDates = (startDate) => {
   let date = moment(startDate);
   while (date.isBefore(moment.now())) {
     const displayDate = reformatDate(date, DISPLAY_DATE_FORMAT);
-    dates.push({ text: displayDate, value: date });
+    const apiDate = reformatDate(date, API_DATE_FORMAT);
+    dates.push({ text: displayDate, value: apiDate });
     date = moment(date).add(1, 'year');
   }
   return dates;
@@ -34,7 +35,7 @@ const getSelectorDates = (startDate) => {
 
 const isInArrayLimits = (amount, index, arrayLenght) =>
   !((index === 0 && amount === MOVE_LEFT_AMOUNT)
-    || (index === arrayLenght && amount === MOVE_RIGHT_AMOUNT));
+    || (index === arrayLenght - 1 && amount === MOVE_RIGHT_AMOUNT));
 
 class DepartmentSuccess extends Component {
   constructor(props) {
@@ -47,19 +48,19 @@ class DepartmentSuccess extends Component {
     this.fetchChartData = this.fetchChartData.bind(this);
 
     this.state = {
-      departmentSuccess: {
-        value: {}
-      },
-      selectorDates: getSelectorDates(FIRST_DATE),
+      departmentSuccess: {},
+      selectorDates: [],
       selectedDate: {
-        text: reformatDate(FIRST_DATE, DISPLAY_DATE_FORMAT),
-        value: moment(FIRST_DATE)
+        text: FIRST_DATE,
+        value: reformatDate(FIRST_DATE, API_DATE_FORMAT)
       },
       loading: true
     };
   }
 
   componentDidMount() {
+    const selectorDates = getSelectorDates(FIRST_DATE);
+    this.setState({ selectorDates, selectedDate: selectorDates[0] });
     this.fetchChartData();
   }
 
@@ -83,7 +84,7 @@ class DepartmentSuccess extends Component {
 
   onControlButtonSwitch(amount) {
     const { selectorDates, selectedDate } = this.state;
-    const index = selectorDates.findIndex(value => value === selectedDate);
+    const index = selectorDates.findIndex(date => date.value === selectedDate.value);
     if (isInArrayLimits(amount, index, selectorDates.length)) {
       this.setState({ selectedDate: selectorDates[index + amount] });
       this.fetchChartData();
@@ -93,9 +94,9 @@ class DepartmentSuccess extends Component {
   fetchChartData() {
     const { selectedDate } = this.state;
     this.setState({ loading: true });
-    this.props.dispatchGetDepartmentSuccess(reformatDate(selectedDate.value, API_DATE_FORMAT))
+    this.props.dispatchGetDepartmentSuccess(selectedDate.value)
       .then(
-        json => this.setState({ departmentSuccess: json, loading: false }),
+        json => this.setState({ departmentSuccess: json.value, loading: false }),
         err => this.props.dispatchAddError(err)
       );
   }
@@ -105,16 +106,19 @@ class DepartmentSuccess extends Component {
       departmentSuccess, selectedDate, selectorDates, loading
     } = this.state;
 
-    const chartData = createChartData(departmentSuccess.value);
-    const chartTitle = `Average credit gains after 13 months for BSc students starting ${selectedDate.text}`;
+    const renderMulticolorBarChart = () => {
+      const chartData = createChartData(departmentSuccess);
+      const chartTitle = `Average credit gains after 13 months for BSc students starting ${selectedDate.text}`;
 
-    return (
-      <div className={styles.container} >
-        <Dimmer.Dimmable as={Segment} dimmed={loading} className={styles.chartSegment}>
-          <Dimmer active={loading} inverted>
-            <Loader>Loading</Loader>
-          </Dimmer>
-          <MulticolorBarChart chartTitle={chartTitle} chartData={chartData} />
+      if (chartData.length > 0) {
+        return (<MulticolorBarChart chartTitle={chartTitle} chartData={chartData} />);
+      }
+      return null;
+    };
+
+    const renderScrollableDateSelector = () => {
+      if (selectorDates.length > 0) {
+        return (
           <ScrollableDateSelector
             selectedDate={selectedDate}
             selectorDates={selectorDates}
@@ -122,6 +126,19 @@ class DepartmentSuccess extends Component {
             onControlLeft={this.onControlLeft}
             onControlRight={this.onControlRight}
           />
+        );
+      }
+      return null;
+    };
+
+    return (
+      <div className={styles.container} >
+        <Dimmer.Dimmable as={Segment} dimmed={loading} className={styles.chartSegment}>
+          <Dimmer active={loading} inverted>
+            <Loader>Loading</Loader>
+          </Dimmer>
+          { renderMulticolorBarChart() }
+          { renderScrollableDateSelector() }
         </Dimmer.Dimmable>
       </div>
     );
