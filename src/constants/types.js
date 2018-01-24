@@ -1,11 +1,9 @@
 import PropTypes from 'prop-types';
-import moment from 'moment';
 
 const {
   number,
   shape,
-  string,
-  instanceOf
+  string
 } = PropTypes;
 
 export const multicolorGraphType = shape({
@@ -15,5 +13,5 @@ export const multicolorGraphType = shape({
 
 export const displayableDateType = shape({
   text: string.isRequired,
-  value: instanceOf(moment).isRequired
+  value: string.isRequired
 });

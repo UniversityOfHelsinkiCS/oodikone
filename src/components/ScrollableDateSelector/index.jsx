@@ -7,6 +7,26 @@ import styles from './scrollableDateSelector.css';
 
 const getOnClickFn = (bool, fn) => (bool ? undefined : fn);
 
+const getDateBrowserContent = (index, selectorDates) => {
+  const browserElements = [];
+  const dots = '...';
+
+  const previousText = index > 0 ? `${selectorDates[index - 1].text}` : ' ';
+  const previousTemp = index > 1 ? `${dots}${previousText}` : previousText;
+  browserElements.push(<span key="prev" className={styles.nextDate}>{previousTemp}</span>);
+
+  browserElements.push(<span key="selection" className={styles.selectedDate}>{selectorDates[index].text}</span>);
+
+  const nextText = index < (selectorDates.length - 1) ? `${selectorDates[index + 1].text}` : ' ';
+  const nextTemp = index < (selectorDates.length - 2) ? `${nextText}${dots}` : nextText;
+  browserElements.push(<span key="next" className={styles.nextDate}>{nextTemp}</span>);
+
+  return (
+    <div className={styles.dateBrowser}>
+      {browserElements}
+    </div>
+  );
+};
 
 const ScrollableDateSelector = (props) => {
   const {
@@ -14,8 +34,8 @@ const ScrollableDateSelector = (props) => {
   } = props;
 
   const selectedIndex = selectorDates.findIndex(value => value.text === selectedDate.text);
-  const isFirstIndex = selectedDate.text === selectorDates[0].text;
-  const isLastIndex = selectedDate === selectorDates[selectorDates.length - 1];
+  const isFirstIndex = selectedIndex === 0;
+  const isLastIndex = selectedIndex === selectorDates.length - 1;
   const controlFnLeft = getOnClickFn(isFirstIndex, onControlLeft);
   const controlFnRight = getOnClickFn(isLastIndex, onControlRight);
 
@@ -51,11 +71,7 @@ const ScrollableDateSelector = (props) => {
           />
         </div>
       </div>
-      <div className={styles.dateBrowser}>
-        <span className={styles.nextDate}>{!isFirstIndex ? `...${selectorDates[selectedIndex - 1].text}` : ' '}</span>
-        <span className={styles.selectedDate}>{selectedDate.text}</span>
-        <span className={styles.nextDate}>{!isLastIndex ? `${selectorDates[selectedIndex + 1].text}...` : ' '}</span>
-      </div>
+      { getDateBrowserContent(selectedIndex, selectorDates) }
     </div>
   );
 };
