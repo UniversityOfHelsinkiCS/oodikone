@@ -2,17 +2,19 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
-import { Icon, Dropdown, Dimmer, Segment, Loader } from 'semantic-ui-react';
+
+import { Dimmer, Segment, Loader } from 'semantic-ui-react';
 
 import { addError, getDepartmentSuccessAction } from '../../actions';
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants';
 
-import { violet, orange, lime, mellowBlue, turquoise } from '../../styles/variables/colors';
 import styles from './departmentSuccess.css';
+import MulticolorBarChart from '../MulticolorBarChart';
+import ScrollableDateSelector from '../ScrollableDateSelector';
 
-const BAR_COLOR_OPTIONS = [orange, lime, mellowBlue, turquoise];
 const FIRST_DATE = '2005-08-01';
+const MOVE_LEFT_AMOUNT = -1;
+const MOVE_RIGHT_AMOUNT = 1;
 
 const createChartData = data => (data !== undefined ?
   (Object.keys(data).map(key => ({ name: key, value: data[key] }))) : []);
@@ -23,22 +25,25 @@ const getSelectorDates = (startDate) => {
   const dates = [];
   let date = moment(startDate);
   while (date.isBefore(moment.now())) {
-    const formattedDate = reformatDate(date, DISPLAY_DATE_FORMAT);
-    dates.push({ text: formattedDate, value: date });
+    const displayDate = reformatDate(date, DISPLAY_DATE_FORMAT);
+    dates.push({ text: displayDate, value: date });
     date = moment(date).add(1, 'year');
   }
   return dates;
 };
 
+const isInArrayLimits = (amount, index, arrayLenght) =>
+  !((index === 0 && amount === MOVE_LEFT_AMOUNT) || (index === arrayLenght && amount === MOVE_RIGHT_AMOUNT));
+
 class DepartmentSuccess extends Component {
   constructor(props) {
     super(props);
 
-    this.onDateChange = this.onDateChange.bind(this);
     this.onDateInputChange = this.onDateInputChange.bind(this);
     this.onControlLeft = this.onControlLeft.bind(this);
     this.onControlRight = this.onControlRight.bind(this);
     this.onControlButtonSwitch = this.onControlButtonSwitch.bind(this);
+    this.fetchChartData = this.fetchChartData.bind(this);
 
     this.state = {
       departmentSuccess: {
@@ -47,28 +52,14 @@ class DepartmentSuccess extends Component {
       selectorDates: getSelectorDates(FIRST_DATE),
       selectedDate: {
         text: reformatDate(FIRST_DATE, DISPLAY_DATE_FORMAT),
-        value: FIRST_DATE
+        value: moment(FIRST_DATE)
       },
       loading: true
     };
   }
 
   componentDidMount() {
-    this.props.dispatchGetDepartmentSuccess(this.state.selectedDate.value)
-      .then(
-        json => this.setState({ departmentSuccess: json, loading: false }),
-        err => this.props.dispatchAddError(err)
-      );
-  }
-
-  onDateChange() {
-    const { selectedDate } = this.state;
-    this.setState({ loading: true });
-    this.props.dispatchGetDepartmentSuccess(reformatDate(selectedDate.value, API_DATE_FORMAT))
-      .then(
-        json => this.setState({ departmentSuccess: json, loading: false }),
-        err => this.props.dispatchAddError(err)
-      );
+    this.fetchChartData();
   }
 
   onDateInputChange(e, data) {
@@ -78,23 +69,34 @@ class DepartmentSuccess extends Component {
         value: data.value
       }
     });
-    this.onDateChange();
+    this.fetchChartData();
   }
 
   onControlLeft() {
-    this.onControlButtonSwitch(-1);
+    this.onControlButtonSwitch(MOVE_LEFT_AMOUNT);
   }
 
   onControlRight() {
-    this.onControlButtonSwitch(1);
+    this.onControlButtonSwitch(MOVE_RIGHT_AMOUNT);
   }
 
   onControlButtonSwitch(amount) {
     const { selectorDates, selectedDate } = this.state;
-
     const index = selectorDates.findIndex(value => value === selectedDate);
-    this.setState({ selectedDate: selectorDates[index + amount] });
-    this.onDateChange();
+    if (isInArrayLimits(amount, index, selectorDates.length)) {
+      this.setState({ selectedDate: selectorDates[index + amount] });
+      this.fetchChartData();
+    }
+  }
+
+  fetchChartData() {
+    const { selectedDate } = this.state;
+    this.setState({ loading: true });
+    this.props.dispatchGetDepartmentSuccess(reformatDate(selectedDate.value, API_DATE_FORMAT))
+      .then(
+        json => this.setState({ departmentSuccess: json, loading: false }),
+        err => this.props.dispatchAddError(err)
+      );
   }
 
   render() {
@@ -102,9 +104,6 @@ class DepartmentSuccess extends Component {
       departmentSuccess, selectedDate, selectorDates, loading
     } = this.state;
 
-    const selectedIndex = selectorDates.findIndex(value => value.text === selectedDate.text);
-    const isFirstIndex = selectedDate.text === selectorDates[0].text;
-    const isLastIndex = selectedDate === selectorDates[selectorDates.length - 1];
     const chartData = createChartData(departmentSuccess.value);
     const chartTitle = `Average credit gains after 13 months for BSc students starting ${selectedDate.text}`;
 
@@ -114,51 +113,14 @@ class DepartmentSuccess extends Component {
           <Dimmer active={loading} inverted>
             <Loader>Loading</Loader>
           </Dimmer>
-          <div className={styles.chartTitle}>{chartTitle}</div>
-          <div className={styles.chartContainer}>
-            <ResponsiveContainer height={400} >
-              <BarChart data={chartData} >
-                <XAxis dataKey="name" />
-                <YAxis />
-                <CartesianGrid strokeDasharray="3 3" />
-                <Tooltip />
-                <Bar dataKey="value" fill={violet}>
-                  {
-              chartData.map((entry, index) => <Cell key={`color-cell-${entry.name}`} fill={BAR_COLOR_OPTIONS[index]} />)
-            }
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className={styles.dateSelector}>
-            <div
-              className={styles.controlIconContiner}
-              onClick={!isFirstIndex ? this.onControlLeft : undefined}
-              onKeyPress={!isFirstIndex ? this.onControlLeft : undefined}
-            >
-              <Icon name="chevron left" className={styles.controlIcon} disabled={isFirstIndex} />
-            </div>
-            <Dropdown
-              text={selectedDate.text}
-              className={styles.controlDropdown}
-              value={selectedDate.value}
-              options={selectorDates}
-              onChange={this.onDateInputChange}
-              scrolling
-            />
-            <div
-              className={styles.controlIconContiner}
-              onClick={!isLastIndex ? this.onControlRight : undefined}
-              onKeyPress={!isLastIndex ? this.onControlRight : undefined}
-            >
-              <Icon name="chevron right" className={styles.controlIcon} disabled={isLastIndex} />
-            </div>
-          </div>
-          <div className={styles.dateBrowser}>
-            <span className={styles.nextDate}>{!isFirstIndex ? `...${selectorDates[selectedIndex - 1].text}` : ' '}</span>
-            <span className={styles.selectedDate}>{selectedDate.text}</span>
-            <span className={styles.nextDate}>{!isLastIndex ? `${selectorDates[selectedIndex + 1 ].text}...` : ' '}</span>
-          </div>
+          <MulticolorBarChart chartTitle={chartTitle} chartData={chartData} />
+          <ScrollableDateSelector
+            selectedDate={selectedDate}
+            selectorDates={selectorDates}
+            onDateInputChange={this.onDateInputChange}
+            onControlLeft={this.onControlLeft}
+            onControlRight={this.onControlRight}
+          />
         </Dimmer.Dimmable>
       </div>
     );
