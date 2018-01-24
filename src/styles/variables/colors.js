@@ -2,6 +2,9 @@ module.exports = {
   white: '#fff',
   black: '#222',
   deepBlack: '#000',
+  violet: '#8884d8',
+  turquoise: '#79ccb3',
+  mellowBlue: '#92cad1',
   blue: '#0098d0',
   blueActive: '#0882b3',
   darkBlue: '#005479',
@@ -13,6 +16,7 @@ module.exports = {
   lightGray: '#555',
   darkGray: '#424242',
   red: '#e5053a',
-  orange: '#fca311',
+  orange: '#e9724d',
+  lime: '#d6d727',
   gray: '#555'
 };
