@@ -8,3 +8,8 @@ export const routes = {
 
 /* TODO: set this configurable? */
 export const BASE_PATH = '';
+
+export const DEFAULT_LOCALE = 'en-gb';
+
+export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY';
+export const API_DATE_FORMAT = 'YYYY.MM.DD';
