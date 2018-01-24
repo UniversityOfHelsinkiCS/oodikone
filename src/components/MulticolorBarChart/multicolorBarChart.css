@@ -1,0 +1,10 @@
+.chartTitle {
+  padding: 5px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: larger;
+}
+
+.chartContainer {
+  padding-right: 52px;
+}
