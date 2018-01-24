@@ -10,26 +10,29 @@ const BAR_COLOR_OPTIONS = [orange, lime, mellowBlue, turquoise];
 
 const MulticolorBarChart = (props) => {
   const { chartTitle, chartData } = props;
-  return (
-    <div>
-      <div className={styles.chartTitle}>{chartTitle}</div>
-      <div className={styles.chartContainer}>
-        <ResponsiveContainer height={400} >
-          <BarChart data={chartData} >
-            <XAxis dataKey="name" />
-            <YAxis />
-            <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip />
-            <Bar dataKey="value" fill={violet}>
-              {
-      chartData.map((entry, index) => <Cell key={`color-cell-${entry.name}`} fill={BAR_COLOR_OPTIONS[index]} />)
-}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+  if (chartData.length > 0) {
+    return (
+      <div>
+        <div className={styles.chartTitle}>{chartTitle}</div>
+        <div className={styles.chartContainer}>
+          <ResponsiveContainer height={400}>
+            <BarChart data={chartData}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <CartesianGrid strokeDasharray="3 3" />
+              <Tooltip />
+              <Bar dataKey="value" fill={violet}>
+                {
+                  chartData.map((entry, index) => <Cell key={`color-cell-${entry.name}`} fill={BAR_COLOR_OPTIONS[index]} />)
+                }
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+  return null;
 };
 
 const { string, arrayOf } = PropTypes;

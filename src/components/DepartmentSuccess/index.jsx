@@ -17,7 +17,7 @@ const MOVE_LEFT_AMOUNT = -1;
 const MOVE_RIGHT_AMOUNT = 1;
 
 const createChartData = data => (data !== undefined ?
-  (Object.keys(data).map(key => ({ name: key, value: data[key] }))) : []);
+  (Object.keys(data).map(key => ({ text: key, value: data[key] }))) : []);
 
 const reformatDate = (date, dateFormat) => moment(date).format(dateFormat);
 
@@ -106,30 +106,8 @@ class DepartmentSuccess extends Component {
       departmentSuccess, selectedDate, selectorDates, loading
     } = this.state;
 
-    const renderMulticolorBarChart = () => {
-      const chartData = createChartData(departmentSuccess);
-      const chartTitle = `Average credit gains after 13 months for BSc students starting ${selectedDate.text}`;
-
-      if (chartData.length > 0) {
-        return (<MulticolorBarChart chartTitle={chartTitle} chartData={chartData} />);
-      }
-      return null;
-    };
-
-    const renderScrollableDateSelector = () => {
-      if (selectorDates.length > 0) {
-        return (
-          <ScrollableDateSelector
-            selectedDate={selectedDate}
-            selectorDates={selectorDates}
-            onDateInputChange={this.onDateInputChange}
-            onControlLeft={this.onControlLeft}
-            onControlRight={this.onControlRight}
-          />
-        );
-      }
-      return null;
-    };
+    const chartData = createChartData(departmentSuccess);
+    const chartTitle = `Average credit gains after 13 months for BSc students starting ${selectedDate.text}`;
 
     return (
       <div className={styles.container} >
@@ -137,8 +115,14 @@ class DepartmentSuccess extends Component {
           <Dimmer active={loading} inverted>
             <Loader>Loading</Loader>
           </Dimmer>
-          { renderMulticolorBarChart() }
-          { renderScrollableDateSelector() }
+          <MulticolorBarChart chartTitle={chartTitle} chartData={chartData} />
+          <ScrollableDateSelector
+            selectedDate={selectedDate}
+            selectorDates={selectorDates}
+            onDateInputChange={this.onDateInputChange}
+            onControlLeft={this.onControlLeft}
+            onControlRight={this.onControlRight}
+          />
         </Dimmer.Dimmable>
       </div>
     );
