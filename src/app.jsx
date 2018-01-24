@@ -11,7 +11,7 @@ import 'semantic-ui-css/semantic.min.css';
 import 'react-datetime/css/react-datetime.css';
 import './styles/global';
 
-import {AVAILABLE_LANGUAGES} from './constants';
+import { AVAILABLE_LANGUAGES } from './constants';
 import reducers from './reducers';
 import Main from './components/Main';
 
