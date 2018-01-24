@@ -33,6 +33,10 @@ const ScrollableDateSelector = (props) => {
     selectedDate, selectorDates, onDateInputChange, onControlLeft, onControlRight
   } = props;
 
+  if(selectorDates.length === 0) {
+    return null;
+  }
+
   const selectedIndex = selectorDates.findIndex(value => value.text === selectedDate.text);
   const isFirstIndex = selectedIndex === 0;
   const isLastIndex = selectedIndex === selectorDates.length - 1;
