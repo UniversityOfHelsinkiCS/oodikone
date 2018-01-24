@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Icon, Dropdown, Button } from 'semantic-ui-react';
+import { Icon, Dropdown } from 'semantic-ui-react';
 
 import { displayableDateType } from '../../constants/types';
 import styles from './scrollableDateSelector.css';
 
-const getOnClickFn = (bool, fn) => (bool ? fn : undefined);
+const getOnClickFn = (bool, fn) => (bool ? undefined : fn);
 
 
 const ScrollableDateSelector = (props) => {
@@ -17,7 +17,7 @@ const ScrollableDateSelector = (props) => {
   const isFirstIndex = selectedDate.text === selectorDates[0].text;
   const isLastIndex = selectedDate === selectorDates[selectorDates.length - 1];
   const controlFnLeft = getOnClickFn(isFirstIndex, onControlLeft);
-  const controlFnRigh = getOnClickFn(isLastIndex, onControlRight);
+  const controlFnRight = getOnClickFn(isLastIndex, onControlRight);
 
   return (
     <div>
@@ -25,10 +25,12 @@ const ScrollableDateSelector = (props) => {
         <div
           className={styles.controlIconContainer}
           onClick={controlFnLeft}
-          onKeyPress={controlFnLeft}
-          role="button"
         >
-          <Icon name="chevron left" className={styles.controlIcon} disabled={isFirstIndex} />
+          <Icon
+            name="chevron left"
+            className={styles.controlIcon}
+            disabled={isFirstIndex}
+          />
         </div>
         <Dropdown
           text={selectedDate.text}
@@ -40,11 +42,13 @@ const ScrollableDateSelector = (props) => {
         />
         <div
           className={styles.controlIconContainer}
-          onClick={controlFnRigh}
-          onKeyPress={controlFnRigh}
-          role="button"
+          onClick={controlFnRight}
         >
-          <Icon name="chevron right" className={styles.controlIcon} disabled={isLastIndex} />
+          <Icon
+            name="chevron right"
+            className={styles.controlIcon}
+            disabled={isLastIndex}
+          />
         </div>
       </div>
       <div className={styles.dateBrowser}>
