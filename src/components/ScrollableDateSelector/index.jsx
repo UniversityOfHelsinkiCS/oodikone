@@ -33,7 +33,7 @@ const ScrollableDateSelector = (props) => {
     selectedDate, selectorDates, onDateInputChange, onControlLeft, onControlRight
   } = props;
 
-  if(selectorDates.length === 0) {
+  if (selectorDates.length === 0) {
     return null;
   }
 
