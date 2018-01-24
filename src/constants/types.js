@@ -5,14 +5,8 @@ const {
   number,
   shape,
   string,
-  instanceOf,
-  arrayOf,
-  objectOf,
-  oneOfType,
-  object,
-  bool,
-  date,
-  oneOf  } = PropTypes;
+  instanceOf
+} = PropTypes;
 
 export const multicolorGraphType = shape({
   text: string.isRequired,
@@ -21,5 +15,5 @@ export const multicolorGraphType = shape({
 
 export const displayableDateType = shape({
   text: string.isRequired,
-  value: instanceOf(moment).isRequire
+  value: instanceOf(moment).isRequired
 });

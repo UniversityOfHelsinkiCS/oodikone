@@ -33,7 +33,8 @@ const getSelectorDates = (startDate) => {
 };
 
 const isInArrayLimits = (amount, index, arrayLenght) =>
-  !((index === 0 && amount === MOVE_LEFT_AMOUNT) || (index === arrayLenght && amount === MOVE_RIGHT_AMOUNT));
+  !((index === 0 && amount === MOVE_LEFT_AMOUNT)
+    || (index === arrayLenght && amount === MOVE_RIGHT_AMOUNT));
 
 class DepartmentSuccess extends Component {
   constructor(props) {

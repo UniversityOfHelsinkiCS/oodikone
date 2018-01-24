@@ -2,10 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
 
-import {multicolorGraphType} from '../../constants/types';
+import { multicolorGraphType } from '../../constants/types';
 import { violet, orange, lime, mellowBlue, turquoise } from '../../styles/variables/colors';
 import styles from './multicolorBarChart.css';
-
 
 const BAR_COLOR_OPTIONS = [orange, lime, mellowBlue, turquoise];
 
@@ -42,4 +41,3 @@ MulticolorBarChart.propTypes = {
 };
 
 export default MulticolorBarChart;
-

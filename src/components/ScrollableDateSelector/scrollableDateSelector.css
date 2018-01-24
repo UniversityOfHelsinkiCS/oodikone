@@ -56,5 +56,5 @@
 .nextDate {
   @apply --date-browse;
 
-  color: var(--lightGray)
+  color: var(--lightGray);
 }
