@@ -1,15 +1,28 @@
 import React from 'react';
-
-import styles from './header.css';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { getActiveLanguage, getTranslate } from 'react-localize-redux';
 
 import NavigationBar from '../NavigationBar';
 
-const Header = () =>
-  (
-    <header className={styles.header} role="banner">
-      <div className={styles.headerBanner} />
-      <NavigationBar />
-    </header>
-  );
+import styles from './header.css';
 
-export default Header;
+const Header = props => (
+  <header className={styles.header} role="banner">
+    <div className={styles.headerBanner} />
+    <NavigationBar translate={props.translate} />
+  </header>
+);
+
+const { func } = PropTypes;
+
+Header.propTypes = {
+  translate: func.isRequired
+};
+
+const mapStateToProps = ({ locale }) => ({
+  translate: getTranslate(locale),
+  currentLanguage: getActiveLanguage(locale).value
+});
+
+export default connect(mapStateToProps)(Header);

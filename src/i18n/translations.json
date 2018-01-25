@@ -1,0 +1,16 @@
+{
+  "common": {
+    "example" : ["react-localize-redux example text"],
+    "loading": ["Loading"]
+  },
+  "navigationBar" : {
+    "departmentSuccess" : ["Department success"],
+    "populations" : ["Populations"],
+    "students" : ["Students"],
+    "courses" : ["Courses"],
+    "teachers" : ["Teachers"]
+  },
+  "departmentSuccess": {
+    "chartTitle": ["Average credit gains after 13 months for BSc students starting"]
+  }
+}
