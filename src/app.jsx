@@ -5,13 +5,13 @@ import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import promiseMiddleware from 'redux-promise-middleware';
 import logger from 'redux-logger';
-import { initialize, addTranslation, setActiveLanguage } from 'react-localize-redux';
+import { initialize, addTranslation } from 'react-localize-redux';
 
 import 'semantic-ui-css/semantic.min.css';
 import 'react-datetime/css/react-datetime.css';
 import './styles/global';
 
-import { AVAILABLE_LANGUAGES } from './constants';
+import { AVAILABLE_LANGUAGES, DEFAULT_LANG } from './constants';
 import reducers from './reducers';
 import Main from './components/Main';
 
@@ -25,9 +25,9 @@ const translations = require('./i18n/translations.json');
 
 const store = createStore(reducers, applyMiddleware(...reduxMiddlewares));
 
-store.dispatch(initialize(AVAILABLE_LANGUAGES));
+store.dispatch(initialize(AVAILABLE_LANGUAGES, { defaultLanguage: DEFAULT_LANG }));
 store.dispatch(addTranslation(translations));
-store.dispatch(setActiveLanguage(AVAILABLE_LANGUAGES[0]));
+
 
 const render = (Component) => {
   ReactDOM.render(

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { getTranslate, getActiveLanguage } from 'react-localize-redux';
 
 import { addError, findStudentsAction } from '../../actions';
 
@@ -26,8 +27,10 @@ class StudentStatistics extends Component {
   }
 
   render() {
+    const t = this.props.translate;
     return (
       <div className={styles.example}>
+        <div>{`Students: ${t('common.example')}`}</div>
         {JSON.stringify(this.state.students)}
       </div>
     );
@@ -37,11 +40,15 @@ class StudentStatistics extends Component {
 const { func } = PropTypes;
 
 StudentStatistics.propTypes = {
-  dispatchFindStudents: func.isRequired
+  dispatchFindStudents: func.isRequired,
+  translate: func.isRequired
 };
 
 
-const mapStateToProps = () => ({});
+const mapStateToProps = ({ locale }) => ({
+  translate: getTranslate(locale),
+  currentLanguage: getActiveLanguage(locale).value
+});
 
 const mapDispatchToProps = dispatch => ({
   dispatchFindStudents: searchStr =>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { localize } from 'react-localize-redux';
 
 import Header from '../Header';
 import Populations from '../Populations';
@@ -29,5 +30,5 @@ const Main = () =>
     </div>
   );
 
-export default Main;
+export default localize(Main, 'locale');
 
