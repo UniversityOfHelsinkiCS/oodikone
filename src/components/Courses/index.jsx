@@ -27,6 +27,9 @@ class Courses extends Component {
     this.fetchCoursesList = this.fetchCoursesList.bind(this);
 
     this.state = {};
+  }
+
+  componentDidMount() {
     this.resetComponent();
   }
 
@@ -38,7 +41,7 @@ class Courses extends Component {
     });
   }
 
-  handleResultSelect() {
+  handleResultSelect(e, { result }) {
     this.resetComponent();
   }
 
@@ -62,15 +65,16 @@ class Courses extends Component {
     const { isLoading, courseList, searchStr } = this.state;
     const t = this.props.translate;
     return (
-      <div className={styles.example}>
+      <div className={styles.container}>
         <Search
+          className={styles.courseSearch}
+          input={{ fluid: true }}
           loading={isLoading}
           onResultSelect={this.handleResultSelect}
           onSearchChange={this.handleSearchChange}
           results={courseList}
           resultRenderer={CourseListRenderer}
           value={searchStr}
-          fluid
         />
         <div>{`Courses: ${t('common.example')}`}</div>
         {isLoading}
