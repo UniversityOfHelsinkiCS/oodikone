@@ -1,7 +1,7 @@
 {
   "common": {
     "example" : ["react-localize-redux example text"],
-    "loading": ["Loading"]
+    "isLoading": ["Loading"]
   },
   "navigationBar" : {
     "departmentSuccess" : ["Department success"],
