@@ -1,3 +1,11 @@
-.example {
-  font-style: italic;
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.courseSearch {
+  width: 99%;
+  max-width: 500px;
 }
