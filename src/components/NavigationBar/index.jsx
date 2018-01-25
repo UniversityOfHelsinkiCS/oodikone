@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Menu } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import { routes } from '../../constants';
@@ -10,7 +10,8 @@ import styles from './navigationBar.css';
 class NavigationBar extends Component {
   constructor(props) {
     super(props);
-    this.state = { activeItem: routes.index.route };
+    const location = props.location.pathname;
+    this.state = { activeItem: location };
   }
   render() {
     const { activeItem } = this.state;
@@ -42,11 +43,12 @@ class NavigationBar extends Component {
   }
 }
 
-const { func } = PropTypes;
+const { func, instanceOf } = PropTypes;
 
 NavigationBar.propTypes = {
-  translate: func.isRequired
+  translate: func.isRequired,
+  location: instanceOf(Object).isRequired
 };
 
-export default NavigationBar;
+export default withRouter(NavigationBar);
 
