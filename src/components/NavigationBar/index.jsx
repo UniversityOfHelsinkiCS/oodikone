@@ -1,18 +1,21 @@
 import React, { Component } from 'react';
 import { Menu } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 import { routes } from '../../constants';
 
 import styles from './navigationBar.css';
 
 class NavigationBar extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = { activeItem: routes.index.route };
   }
   render() {
     const { activeItem } = this.state;
+    const t = this.props.translate;
+
     const menuWidth = Object.keys(routes).length + 1;
 
     return (
@@ -31,13 +34,19 @@ class NavigationBar extends Component {
                   active={activeItem === value.route}
                   onClick={() => this.setState({ activeItem: value.route })}
                 >
-                  {value.text}
+                  {t(`navigationBar.${value.translateId}`)}
                 </Menu.Item>
               ))
             }
       </Menu>);
   }
 }
+
+const { func } = PropTypes;
+
+NavigationBar.propTypes = {
+  translate: func.isRequired
+};
 
 export default NavigationBar;
 

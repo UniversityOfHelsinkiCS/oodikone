@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-
+import { getTranslate, getActiveLanguage } from 'react-localize-redux';
 import { Dimmer, Segment, Loader } from 'semantic-ui-react';
 
 import { addError, getDepartmentSuccessAction } from '../../actions';
@@ -40,7 +40,6 @@ const isInArrayLimits = (amount, index, arrayLenght) =>
 class DepartmentSuccess extends Component {
   constructor(props) {
     super(props);
-
     this.onDateInputChange = this.onDateInputChange.bind(this);
     this.onControlLeft = this.onControlLeft.bind(this);
     this.onControlRight = this.onControlRight.bind(this);
@@ -105,15 +104,15 @@ class DepartmentSuccess extends Component {
     const {
       departmentSuccess, selectedDate, selectorDates, loading
     } = this.state;
-
+    const t = this.props.translate;
     const chartData = createChartData(departmentSuccess);
-    const chartTitle = `Average credit gains after 13 months for BSc students starting ${selectedDate.text}`;
+    const chartTitle = `${t('departmentSuccess.chartTitle')} ${selectedDate.text}`;
 
     return (
       <div className={styles.container} >
         <Dimmer.Dimmable as={Segment} dimmed={loading} className={styles.chartSegment}>
           <Dimmer active={loading} inverted>
-            <Loader>Loading</Loader>
+            <Loader>{t('common.loading')}</Loader>
           </Dimmer>
           <MulticolorBarChart chartTitle={chartTitle} chartData={chartData} />
           <ScrollableDateSelector
@@ -133,10 +132,14 @@ const { func } = PropTypes;
 
 DepartmentSuccess.propTypes = {
   dispatchGetDepartmentSuccess: func.isRequired,
-  dispatchAddError: func.isRequired
+  dispatchAddError: func.isRequired,
+  translate: func.isRequired
 };
 
-const mapStateToProps = () => ({});
+const mapStateToProps = ({ locale }) => ({
+  translate: getTranslate(locale),
+  currentLanguage: getActiveLanguage(locale).value
+});
 
 const mapDispatchToProps = dispatch => ({
   dispatchGetDepartmentSuccess: date =>
