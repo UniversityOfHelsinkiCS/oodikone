@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { localeReducer as locale } from 'react-localize-redux';
 
 import departmentSuccess from './departmentSuccess';
 
@@ -8,8 +9,8 @@ import {
 
 /* collect reducers here from subfolders */
 const reducers = combineReducers({
-  departmentSuccess
-
+  departmentSuccess,
+  locale
 });
 
 export default reducers;
