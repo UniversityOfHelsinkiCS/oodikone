@@ -44,7 +44,7 @@ class DepartmentSuccess extends Component {
     this.onControlLeft = this.onControlLeft.bind(this);
     this.onControlRight = this.onControlRight.bind(this);
     this.onControlButtonSwitch = this.onControlButtonSwitch.bind(this);
-    this.fetchChartData = this.fetchChartData.bind(this);
+    this.getChartData = this.getChartData.bind(this);
 
     this.state = {
       departmentSuccess: {},
@@ -53,24 +53,24 @@ class DepartmentSuccess extends Component {
         text: FIRST_DATE,
         value: reformatDate(FIRST_DATE, API_DATE_FORMAT)
       },
-      loading: true
+      isLoading: true
     };
   }
 
   componentDidMount() {
     const selectorDates = getSelectorDates(FIRST_DATE);
     this.setState({ selectorDates, selectedDate: selectorDates[0] });
-    this.fetchChartData();
+    this.getChartData();
   }
 
-  onDateInputChange(e, data) {
+  onDateInputChange(e, { value }) {
     this.setState({
       selectedDate: {
-        text: reformatDate(data.value, DISPLAY_DATE_FORMAT),
-        value: data.value
+        text: reformatDate(value, DISPLAY_DATE_FORMAT),
+        value
       }
     });
-    this.fetchChartData();
+    this.getChartData();
   }
 
   onControlLeft() {
@@ -86,23 +86,23 @@ class DepartmentSuccess extends Component {
     const index = selectorDates.findIndex(date => date.value === selectedDate.value);
     if (isInArrayLimits(amount, index, selectorDates.length)) {
       this.setState({ selectedDate: selectorDates[index + amount] });
-      this.fetchChartData();
+      this.getChartData();
     }
   }
 
-  fetchChartData() {
+  getChartData() {
     const { selectedDate } = this.state;
-    this.setState({ loading: true });
+    this.setState({ isLoading: true });
     this.props.dispatchGetDepartmentSuccess(selectedDate.value)
       .then(
-        json => this.setState({ departmentSuccess: json.value, loading: false }),
+        json => this.setState({ departmentSuccess: json.value, isLoading: false }),
         err => this.props.dispatchAddError(err)
       );
   }
 
   render() {
     const {
-      departmentSuccess, selectedDate, selectorDates, loading
+      departmentSuccess, selectedDate, selectorDates, isLoading
     } = this.state;
     const t = this.props.translate;
     const chartData = createChartData(departmentSuccess);
@@ -110,8 +110,8 @@ class DepartmentSuccess extends Component {
 
     return (
       <div className={styles.container} >
-        <Dimmer.Dimmable as={Segment} dimmed={loading} className={styles.chartSegment}>
-          <Dimmer active={loading} inverted>
+        <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={styles.chartSegment}>
+          <Dimmer active={isLoading} inverted>
             <Loader>{t('common.loading')}</Loader>
           </Dimmer>
           <MulticolorBarChart chartTitle={chartTitle} chartData={chartData} />
