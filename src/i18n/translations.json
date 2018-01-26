@@ -1,7 +1,8 @@
 {
   "common": {
     "example" : ["react-localize-redux example text"],
-    "isLoading": ["Loading"]
+    "loading": ["Loading"],
+    "noResults": ["No search results"]
   },
   "navigationBar" : {
     "departmentSuccess" : ["Department success"],
