@@ -39,8 +39,9 @@ const getTableBody = (rows, rowClickFn) => (
   </Table.Body>
 );
 
-
-const SearchResultTable = ({ headers, rows, rowClickFn }) => {
+const SearchResultTable = ({
+  headers, rows, rowClickFn, noResultText
+}) => {
   if (rows.length > 0) {
     return (
       <Table
@@ -52,14 +53,14 @@ const SearchResultTable = ({ headers, rows, rowClickFn }) => {
         {getTableBody(rows, rowClickFn)}
       </Table>);
   }
-  return null;
+  return <div>{noResultText}</div>;
 };
-
 
 SearchResultTable.propTypes = {
   headers: arrayOf(string).isRequired,
   rows: arrayOf(object).isRequired,
-  rowClickFn: func.isRequired
+  rowClickFn: func.isRequired,
+  noResultText: string.isRequired
 };
 
 export default SearchResultTable;

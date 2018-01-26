@@ -68,7 +68,8 @@ class DepartmentSuccess extends Component {
       selectedDate: {
         text: reformatDate(value, DISPLAY_DATE_FORMAT),
         value
-      }
+      },
+      isLoading: true
     });
     this.getChartData();
   }
@@ -85,14 +86,13 @@ class DepartmentSuccess extends Component {
     const { selectorDates, selectedDate } = this.state;
     const index = selectorDates.findIndex(date => date.value === selectedDate.value);
     if (isInArrayLimits(amount, index, selectorDates.length)) {
-      this.setState({ selectedDate: selectorDates[index + amount] });
+      this.setState({ selectedDate: selectorDates[index + amount], isLoading: true });
       this.getChartData();
     }
   }
 
   getChartData() {
     const { selectedDate } = this.state;
-    this.setState({ isLoading: true });
     this.props.dispatchGetDepartmentSuccess(selectedDate.value)
       .then(
         json => this.setState({ departmentSuccess: json.value, isLoading: false }),
