@@ -1,4 +1,4 @@
-import { getJson } from '../common';
+import { getJson, postToGetJson } from '../common';
 
 const throwErrors = (res) => {
   if (res.ok === false || res.error) {
@@ -13,3 +13,5 @@ export const getDepartmentSuccess = date => getJson(`/departmentsuccess/?date=${
 export const findStudents = searchStr => getJson(`/students?searchTerm=${searchStr}`).then(throwErrors);
 
 export const findCoursesByName = searchStr => getJson(`/courses?name=${searchStr}`).then(throwErrors);
+
+export const findCourseInstances = courseCode => postToGetJson('/courselist', { code: courseCode }).then(throwErrors);
