@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getActiveLanguage, getTranslate } from 'react-localize-redux';
 import PropTypes from 'prop-types';
-import { Search } from 'semantic-ui-react';
+import { Search, Dropdown } from 'semantic-ui-react';
+import CourseStatistics from './statistics';
 
-import { addError, findCoursesAction } from '../../actions';
+import { addError, findCoursesAction, findInstancesAction } from '../../actions';
 
 import styles from './courses.css';
 
@@ -25,6 +26,7 @@ class Courses extends Component {
     this.handleResultSelect = this.handleResultSelect.bind(this);
     this.handleSearchChange = this.handleSearchChange.bind(this);
     this.fetchCoursesList = this.fetchCoursesList.bind(this);
+    this.fetchCourseInstances = this.fetchCourseInstances.bind(this);
 
     this.state = {};
   }
@@ -42,7 +44,9 @@ class Courses extends Component {
   }
 
   handleResultSelect(e, { result }) {
-    this.resetComponent();
+    this.setState({ selectedCourse: result }, () => {
+      this.fetchCourseInstances();
+    });
   }
 
 
@@ -61,8 +65,21 @@ class Courses extends Component {
       );
   }
 
+  fetchCourseInstances() {
+    const courseCode = this.state.selectedCourse.code;
+    this.props.dispatchFindCourseInstances(courseCode)
+      .then(
+        json => this.setState({ courseInstances: json.value }),
+        err => this.props.dispatchAddError(err)
+      );
+  }
+
   render() {
-    const { isLoading, courseList, searchStr } = this.state;
+    const { isLoading, courseList, searchStr, courseInstances, selectedCourse } = this.state;
+    const instanceList = [];
+    if (courseInstances !== undefined) {
+      courseInstances.forEach(i => instanceList.push({ text: `${i.date} (${i.students} students)`, value: i.id }));
+    }
     const t = this.props.translate;
     return (
       <div className={styles.container}>
@@ -78,7 +95,11 @@ class Courses extends Component {
         />
         <div>{`Courses: ${t('common.example')}`}</div>
         {isLoading}
-        {JSON.stringify(courseList)}
+        <pre>{JSON.stringify(courseList)}</pre>
+        <Dropdown placeholder="Select course instance" fluid selection options={instanceList} />
+        <CourseStatistics
+          selectedCourse={selectedCourse}
+        />
       </div>
     );
   }
@@ -86,6 +107,7 @@ class Courses extends Component {
 
 Courses.propTypes = {
   dispatchFindCoursesList: func.isRequired,
+  dispatchFindCourseInstances: func.isRequired,
   dispatchAddError: func.isRequired,
   translate: func.isRequired
 };
@@ -98,6 +120,8 @@ const mapStateToProps = ({ locale }) => ({
 const mapDispatchToProps = dispatch => ({
   dispatchFindCoursesList: queryStr =>
     dispatch(findCoursesAction(queryStr)),
+  dispatchFindCourseInstances: queryStr =>
+    dispatch(findInstancesAction(queryStr)),
   dispatchAddError: err => dispatch(addError(err))
 });
 
