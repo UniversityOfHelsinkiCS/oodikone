@@ -1,5 +1,7 @@
 {
   "common": {
+    "ok": ["Ok"],
+    "cancel": ["Cancel"],
     "example" : ["react-localize-redux example text"],
     "loading": ["Loading"],
     "noResults": ["No search results"]
@@ -18,5 +20,10 @@
     "studentNumber": ["Student number"],
     "started": ["Started"],
     "credits": ["Credits"]
+  },
+  "tags": {
+    "addTag": ["Add tag"],
+    "searchAndAdd": ["Search and select a new tag"],
+    "confirmDelete" : ["Are you sure you want to remove tag"]
   }
 }
