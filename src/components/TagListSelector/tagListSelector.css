@@ -1,0 +1,41 @@
+.tagsContainer {
+  width: 100%;
+}
+
+.editableContainer {
+  display: inline-block;
+  cursor: pointer;
+  height: 20px;
+}
+
+.selectableIcon {
+  width: 20px !important;
+
+  &:hover {
+    font-size: large;
+    color: var(--deepBlack);
+  }
+}
+
+.tag {
+  margin-bottom: 5px !important;
+  margin-right: 5px !important;
+}
+
+.tagSearchContainer {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 99%;
+}
+
+.tagSearchTitle {
+  margin-bottom: 3px;
+}
+
+.tagSearch {
+  width: 99%;
+  max-width: 800px;
+}

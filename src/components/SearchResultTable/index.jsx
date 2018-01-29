@@ -2,6 +2,8 @@ import React from 'react';
 import { Table } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
+import styles from './searchResultsTable.css';
+
 const {
   arrayOf, string, object, func
 } = PropTypes;
@@ -25,6 +27,7 @@ const getTableBody = (rows, rowClickFn) => (
     {
         rows.map(row => (
           <Table.Row
+            className={styles.tableRow}
             key={`row-${Object.values(row)[0]}`}
             onClick={e => rowClickFn(e, row)}
           >

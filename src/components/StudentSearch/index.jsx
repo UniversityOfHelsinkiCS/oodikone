@@ -60,7 +60,6 @@ class StudentSearch extends Component {
     ];
     const rows = students.map(({ studentNumber, started, credits }) =>
       ({ studentNumber, started, credits }));
-
     return (
       <div className={styles.searchContainer}>
         <Search
