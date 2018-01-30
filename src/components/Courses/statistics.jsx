@@ -8,7 +8,10 @@ class CourseStatistics extends Component {
 
     render() {
         return(
+            <div>
             <pre>{JSON.stringify(this.props.selectedCourse)}</pre>
+            <pre>{JSON.stringify(this.props.stats, null, 2)}</pre>
+            </div>
         );
     }
 
