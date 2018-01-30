@@ -9,6 +9,8 @@
 }
 
 .selectableIcon {
+  margin-left: 3px !important;
+  margin-right: 1px !important;
   width: 20px !important;
 
   &:hover {

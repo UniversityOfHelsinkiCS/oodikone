@@ -21,4 +21,3 @@ export const studentDetailsType = shape({
   started: string.isRequired,
   credits: number
 });
-

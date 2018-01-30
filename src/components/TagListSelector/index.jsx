@@ -5,7 +5,9 @@ import { connect } from 'react-redux';
 
 import { addError, findTagsAction } from '../../actions';
 
+
 import styles from './tagListSelector.css';
+
 
 class TagListSelector extends Component {
   constructor(props) {
@@ -102,13 +104,12 @@ class TagListSelector extends Component {
         .filter(tag => !tags.includes(tag))
         .map(tag => ({ title: tag }));
 
-
       return (
         <div className={styles.tagSearchContainer}>
           <div className={styles.tagSearchTitle}>{translate('tags.searchAndAdd')}</div>
           <Search
             className={styles.tagSearch}
-            input={{ fluid: true }}
+            input={{ fluid: true, icon: 'caret down' }}
             loading={isLoading}
             onSearchChange={this.handleSearchChange}
             onResultSelect={this.handleAddTag}
@@ -117,6 +118,7 @@ class TagListSelector extends Component {
             results={results}
             noResultsMessage={translate('common.noResults')}
             value={searchStr}
+            fluid
           />
         </div>);
     }

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Segment, Loader, Dimmer } from 'semantic-ui-react';
 
 import StudentInfoCard from '../StudentInfoCard';
-import { addError, getStudentAction } from '../../actions';
+import { addError, getStudentAction, removeTagFromStudentAction } from '../../actions';
 
 import styles from './studentDetails.css';
 
@@ -67,6 +67,8 @@ const mapStateToProps = () => ({});
 const mapDispatchToProps = dispatch => ({
   dispatchGetStudent: studentNumber =>
     dispatch(getStudentAction(studentNumber)),
+  dispatchRemoveTagFromStudent: (studentNumber, tag) =>
+    dispatch(removeTagFromStudentAction(studentNumber, tag)),
   dispatchAddError: err => dispatch(addError(err))
 });
 
