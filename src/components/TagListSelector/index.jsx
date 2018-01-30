@@ -99,21 +99,21 @@ class TagListSelector extends Component {
         .map(tag => ({ title: tag }));
 
       return (
-          <Search
-            className={styles.tagSearch}
-            input={{ fluid: true }}
-            loading={isLoading}
-            icon={'caret down'}
-            placeholder={translate('tags.searchAndAdd')}
-            onSearchChange={this.handleSearchChange}
-            onResultSelect={this.handleAddTag}
-            onFocus={this.handleSearchChange}
-            minCharacters={0}
-            results={results}
-            noResultsMessage={translate('common.noResults')}
-            value={searchStr}
-            fluid
-          />);
+        <Search
+          className={styles.tagSearch}
+          input={{ fluid: true }}
+          loading={isLoading}
+          icon="caret down"
+          placeholder={translate('tags.searchAndAdd')}
+          onSearchChange={this.handleSearchChange}
+          onResultSelect={this.handleAddTag}
+          onFocus={this.handleSearchChange}
+          minCharacters={0}
+          results={results}
+          noResultsMessage={translate('common.noResults')}
+          value={searchStr}
+          fluid
+        />);
     }
     return (
       <div className={styles.editableContainer} onClick={this.setEditable}>
