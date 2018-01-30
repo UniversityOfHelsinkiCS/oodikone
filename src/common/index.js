@@ -35,7 +35,7 @@ export const getJson = (path, catchRejected = true) => fetch(`${API_BASE_PATH}${
   .then(checkForErrors)
   .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
 
-export const postToGetJson = (path, terms, catchRejected = true) =>
+export const postJsonGetJson = (path, json, catchRejected = true) =>
   fetch(`${API_BASE_PATH}${path}`, {
     method: 'POST',
     credentials: 'same-origin',
@@ -43,7 +43,7 @@ export const postToGetJson = (path, terms, catchRejected = true) =>
     headers: new Headers({
       'Content-Type': 'application/json'
     }),
-    body: JSON.stringify(terms)
+    body: JSON.stringify(json)
   })
     .then(checkForErrors)
     .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
