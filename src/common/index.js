@@ -37,4 +37,28 @@ export const getJson = (path, catchRejected = true) => fetch(`${API_BASE_PATH}${
   .then(checkForErrors)
   .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
 
+export const deleteItem = (path, data, catchRejected = true) => fetch(`${API_BASE_PATH}${path}`, {
+  method: 'DELETE',
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  },
+  credentials: 'same-origin',
+  body: JSON.stringify(data)
+})
+  .then(checkForErrors)
+  .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
+
+export const postJson = (path, data, catchRejected = true) => fetch(`${API_BASE_PATH}${path}`, {
+  method: 'POST',
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  },
+  credentials: 'same-origin',
+  body: JSON.stringify(data)
+})
+  .then(checkForErrors)
+  .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
+
 export const reformatDate = (date, dateFormat) => moment(date).format(dateFormat);
