@@ -1,5 +1,8 @@
 .tagsContainer {
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .editableContainer {
@@ -9,6 +12,7 @@
 }
 
 .selectableIcon {
+  margin-top: 8px;
   margin-left: 3px !important;
   margin-right: 1px !important;
   width: 20px !important;
@@ -20,24 +24,12 @@
 }
 
 .tag {
+  height: 30px !important;
   margin-bottom: 5px !important;
   margin-right: 5px !important;
 }
 
-.tagSearchContainer {
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  width: 99%;
-}
-
-.tagSearchTitle {
-  margin-bottom: 3px;
-}
-
 .tagSearch {
-  width: 99%;
+  min-width: 400px;
   max-width: 800px;
 }
