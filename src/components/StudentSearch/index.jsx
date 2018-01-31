@@ -54,9 +54,9 @@ class StudentSearch extends Component {
 
     const t = this.props.translate;
     const headers = [
-      t('studentStatistics.studentNumber'),
-      t('studentStatistics.started'),
-      t('studentStatistics.credits')
+      t('common.studentNumber'),
+      t('common.started'),
+      t('common.credits')
     ];
     const rows = students.map(({ studentNumber, started, credits }) =>
       ({ studentNumber, started, credits }));
