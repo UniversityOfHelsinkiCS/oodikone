@@ -8,6 +8,7 @@ import StudentDetails from '../StudentDetails';
 
 import styles from './studentStatistics.css';
 
+
 class StudentStatistics extends Component {
   constructor(props) {
     super(props);
@@ -27,7 +28,9 @@ class StudentStatistics extends Component {
     const { student } = this.state;
     const t = this.props.translate;
     if (student) {
-      return (<StudentDetails studentNumber={student.studentNumber} translate={t} />);
+      return (
+        <StudentDetails studentNumber={student.studentNumber} translate={t} />
+      );
     }
 
     return (
