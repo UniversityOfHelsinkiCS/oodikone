@@ -15,3 +15,10 @@ export const displayableDateType = shape({
   text: string.isRequired,
   value: string.isRequired
 });
+
+export const studentDetailsType = shape({
+  studentNumber: string.isRequired,
+  started: string.isRequired,
+  credits: number
+});
+
