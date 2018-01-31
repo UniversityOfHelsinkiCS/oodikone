@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 import { Segment, Loader, Dimmer } from 'semantic-ui-react';
 
 import StudentInfoCard from '../StudentInfoCard';
-import { addError, getStudentAction } from '../../actions';
+import { addError, getStudentAction, removeTagFromStudentAction } from '../../actions';
+import CreditAccumulationGraph from '../CreditAccumulationGraph';
 
 import styles from './studentDetails.css';
 
@@ -12,7 +13,8 @@ class StudentDetails extends Component {
   constructor(props) {
     super(props);
 
-    this.partialRender = this.partialRender.bind(this);
+    this.renderInfoCard = this.renderInfoCard.bind(this);
+    this.renderCreditsGraph = this.renderCreditsGraph.bind(this);
 
     this.state = {
       isLoading: true,
@@ -29,7 +31,7 @@ class StudentDetails extends Component {
       );
   }
 
-  partialRender() {
+  renderInfoCard() {
     const { student } = this.state;
     const t = this.props.translate;
     if (student) {
@@ -37,17 +39,26 @@ class StudentDetails extends Component {
     }
     return null;
   }
+  renderCreditsGraph() {
+    const { student } = this.state;
+    if (student) {
+      return <CreditAccumulationGraph students={[student]} />;
+    }
+    return null;
+  }
 
 
   render() {
     const { isLoading } = this.state;
-    const t = this.props.translate;
+    const { translate } = this.props;
+
     return (
       <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={styles.studentSegment}>
         <Dimmer active={isLoading} inverted>
-          <Loader>{t('common.loading')}</Loader>
+          <Loader>{translate('common.loading')}</Loader>
         </Dimmer>
-        { this.partialRender() }
+        { this.renderInfoCard() }
+        { this.renderCreditsGraph() }
       </Dimmer.Dimmable>
     );
   }
@@ -67,6 +78,8 @@ const mapStateToProps = () => ({});
 const mapDispatchToProps = dispatch => ({
   dispatchGetStudent: studentNumber =>
     dispatch(getStudentAction(studentNumber)),
+  dispatchRemoveTagFromStudent: (studentNumber, tag) =>
+    dispatch(removeTagFromStudentAction(studentNumber, tag)),
   dispatchAddError: err => dispatch(addError(err))
 });
 

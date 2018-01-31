@@ -1,4 +1,4 @@
-import { getJson } from '../common';
+import { getJson, deleteItem, postJson } from '../common';
 
 const throwErrors = (res) => {
   if (res.ok === false || res.error) {
@@ -22,3 +22,8 @@ export const findTags = (searchStr) => {
     : '/tags/';
   return getJson(query).then(throwErrors);
 };
+
+export const removeTagFromStudent = (studentNumber, tag) => deleteItem(`/students/${studentNumber}/tags`, tag)
+  .then(throwErrors);
+
+export const addTagToStudent = (studentNumber, tag) => postJson(`/students/${studentNumber}/tags`, tag).then(throwErrors);

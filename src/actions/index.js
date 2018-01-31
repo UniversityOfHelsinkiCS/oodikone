@@ -3,15 +3,24 @@ import {
   findStudents,
   findCoursesByName,
   getStudent,
-  findTags
+  findTags,
+  removeTagFromStudent, addTagToStudent
 } from '../api';
 
 export const ADD_ERROR = 'ADD_ERROR';
 export const GET_DEPARTMENT_SUCCESS = 'GET_DEPARTMENT_SUCCESS';
 export const FIND_STUDENTS = 'FIND_STUDENTS';
 export const GET_STUDENT = 'GET_STUDENT';
+export const GET_STUDENT_FULFILLED = 'GET_STUDENT_FULFILLED';
 export const FIND_COURSES = 'FIND_COURSES';
 export const FIND_TAGS = 'FIND_TAGS';
+export const REMOVE_TAG_FROM_STUDENT = 'REMOVE_TAG_FROM_STUDENT';
+export const REMOVE_TAG_FROM_STUDENT_FULFILLED = 'REMOVE_TAG_FROM_STUDENT_FULFILLED';
+export const REMOVE_TAG_FROM_STUDENT_REJECTED = 'REMOVE_TAG_FROM_STUDENT_REJECTED';
+export const REMOVE_TAG_FROM_STUDENT_HACK_SUCCESS = 'REMOVE_TAG_FROM_STUDENT_HACK_SUCCESS';
+export const ADD_TAG_TO_STUDENT = 'ADD_TAG_TO_STUDENT';
+export const ADD_TAG_TO_STUDENT_FULFILLED = 'ADD_TAG_TO_STUDENT_FULFILLED';
+export const ADD_TAG_TO_STUDENT_REJECTED = 'ADD_TAG_TO_STUDENT_REJECTED';
 
 export const addError = errorJson => ({
   type: ADD_ERROR,
@@ -43,3 +52,18 @@ export const findTagsAction = searchStr => ({
   payload: findTags(searchStr)
 });
 
+export const removeTagFromStudentAction = (studentNumber, tag) => ({
+  type: REMOVE_TAG_FROM_STUDENT,
+  payload: removeTagFromStudent(studentNumber, tag)
+});
+
+export const removeTagFromStudentHackSuccessAction = (studentNumber, tag) => ({
+  type: REMOVE_TAG_FROM_STUDENT_HACK_SUCCESS,
+  payload: { studentNumber, tag }
+});
+
+export const addTagToStudentAction = (studentNumber, tag) => ({
+  type: ADD_TAG_TO_STUDENT,
+  payload: addTagToStudent(studentNumber, tag)
+
+});
