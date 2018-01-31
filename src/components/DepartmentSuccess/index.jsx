@@ -11,6 +11,7 @@ import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants';
 import styles from './departmentSuccess.css';
 import MulticolorBarChart from '../MulticolorBarChart';
 import ScrollableDateSelector from '../ScrollableDateSelector';
+import { reformatDate } from '../../common';
 
 const FIRST_DATE = '2005-08-01';
 const MOVE_LEFT_AMOUNT = -1;
@@ -18,8 +19,6 @@ const MOVE_RIGHT_AMOUNT = 1;
 
 const createChartData = data => (data !== undefined ?
   (Object.keys(data).map(key => ({ text: key, value: data[key] }))) : []);
-
-const reformatDate = (date, dateFormat) => moment(date).format(dateFormat);
 
 const getSelectorDates = (startDate) => {
   const dates = [];
@@ -68,7 +67,8 @@ class DepartmentSuccess extends Component {
       selectedDate: {
         text: reformatDate(value, DISPLAY_DATE_FORMAT),
         value
-      }
+      },
+      isLoading: true
     });
     this.getChartData();
   }
@@ -85,14 +85,13 @@ class DepartmentSuccess extends Component {
     const { selectorDates, selectedDate } = this.state;
     const index = selectorDates.findIndex(date => date.value === selectedDate.value);
     if (isInArrayLimits(amount, index, selectorDates.length)) {
-      this.setState({ selectedDate: selectorDates[index + amount] });
+      this.setState({ selectedDate: selectorDates[index + amount], isLoading: true });
       this.getChartData();
     }
   }
 
   getChartData() {
     const { selectedDate } = this.state;
-    this.setState({ isLoading: true });
     this.props.dispatchGetDepartmentSuccess(selectedDate.value)
       .then(
         json => this.setState({ departmentSuccess: json.value, isLoading: false }),

@@ -1,0 +1,8 @@
+.studentSegment {
+  border: none !important;
+  box-shadow: none !important;
+  width: 99%;
+  max-width: 1200px;
+  min-height: 200px;
+  padding: 0 !important;
+}

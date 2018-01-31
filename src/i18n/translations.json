@@ -1,7 +1,10 @@
 {
   "common": {
+    "ok": ["Ok"],
+    "cancel": ["Cancel"],
     "example" : ["react-localize-redux example text"],
-    "isLoading": ["Loading"]
+    "loading": ["Loading"],
+    "noResults": ["No search results"]
   },
   "navigationBar" : {
     "departmentSuccess" : ["Department success"],
@@ -12,5 +15,15 @@
   },
   "departmentSuccess": {
     "chartTitle": ["Average credit gains after 13 months for BSc students starting"]
+  },
+  "studentStatistics": {
+    "studentNumber": ["Student number"],
+    "started": ["Started"],
+    "credits": ["Credits"]
+  },
+  "tags": {
+    "addTag": ["Add tag"],
+    "searchAndAdd": ["Search and select a new tag"],
+    "confirmDelete" : ["Are you sure you want to remove tag"]
   }
 }

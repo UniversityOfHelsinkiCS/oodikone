@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const API_BASE_PATH = '/api';
 
 const toJSON = res =>
@@ -34,3 +36,5 @@ export const getJson = (path, catchRejected = true) => fetch(`${API_BASE_PATH}${
 })
   .then(checkForErrors)
   .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
+
+export const reformatDate = (date, dateFormat) => moment(date).format(dateFormat);
