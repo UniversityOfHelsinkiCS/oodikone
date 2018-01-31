@@ -7,5 +7,5 @@ import {
 
 
 export default combineReducers({
-  findStudents: asyncReducer(FIND_TAGS)
+  findTags: asyncReducer(FIND_TAGS)
 });

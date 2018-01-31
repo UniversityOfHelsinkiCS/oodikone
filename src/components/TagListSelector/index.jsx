@@ -5,7 +5,9 @@ import { connect } from 'react-redux';
 
 import { addError, findTagsAction } from '../../actions';
 
+
 import styles from './tagListSelector.css';
+
 
 class TagListSelector extends Component {
   constructor(props) {
@@ -68,26 +70,20 @@ class TagListSelector extends Component {
     const { isConfirm } = this.state;
 
     if (tags && tags.length > 0) {
-      return (
-        <span>
-          {
-           tags.map(tag => (
-             <Label key={tag} className={styles.tag}>
-               {tag}
-               <Icon name="delete" onClick={this.setConfirm} />
-               <Confirm
-                 open={isConfirm}
-                 onCancel={this.setConfirm}
-                 onConfirm={() => this.handleRemoveTag(tag)}
-                 content={`${translate('tags.confirmDelete')}: ${tag}`}
-                 cancelButton={translate('common.cancel')}
-                 confirmButton={translate('common.ok')}
-               />
-             </Label>
-             ))
-          }
-        </span>
-      );
+      return tags.map(tag => (
+        <Label key={tag} className={styles.tag}>
+          {tag}
+          <Icon name="delete" onClick={this.setConfirm} />
+          <Confirm
+            open={isConfirm}
+            onCancel={this.setConfirm}
+            onConfirm={() => this.handleRemoveTag(tag)}
+            content={`${translate('tags.confirmDelete')}: ${tag}`}
+            cancelButton={translate('common.cancel')}
+            confirmButton={translate('common.ok')}
+          />
+        </Label>
+      ));
     }
     return null;
   }
@@ -102,23 +98,22 @@ class TagListSelector extends Component {
         .filter(tag => !tags.includes(tag))
         .map(tag => ({ title: tag }));
 
-
       return (
-        <div className={styles.tagSearchContainer}>
-          <div className={styles.tagSearchTitle}>{translate('tags.searchAndAdd')}</div>
-          <Search
-            className={styles.tagSearch}
-            input={{ fluid: true }}
-            loading={isLoading}
-            onSearchChange={this.handleSearchChange}
-            onResultSelect={this.handleAddTag}
-            onFocus={this.handleSearchChange}
-            minCharacters={0}
-            results={results}
-            noResultsMessage={translate('common.noResults')}
-            value={searchStr}
-          />
-        </div>);
+        <Search
+          className={styles.tagSearch}
+          input={{ fluid: true }}
+          loading={isLoading}
+          icon="caret down"
+          placeholder={translate('tags.searchAndAdd')}
+          onSearchChange={this.handleSearchChange}
+          onResultSelect={this.handleAddTag}
+          onFocus={this.handleSearchChange}
+          minCharacters={0}
+          results={results}
+          noResultsMessage={translate('common.noResults')}
+          value={searchStr}
+          fluid
+        />);
     }
     return (
       <div className={styles.editableContainer} onClick={this.setEditable}>

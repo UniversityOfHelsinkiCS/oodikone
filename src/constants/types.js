@@ -6,7 +6,7 @@ const {
   string
 } = PropTypes;
 
-export const multicolorGraphType = shape({
+export const graphDataType = shape({
   text: string.isRequired,
   value: number.isRequired
 });
@@ -21,4 +21,3 @@ export const studentDetailsType = shape({
   started: string.isRequired,
   credits: number
 });
-
