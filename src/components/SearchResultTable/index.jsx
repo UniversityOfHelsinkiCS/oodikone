@@ -25,10 +25,10 @@ const getHeaderRow = headers => (
 const getTableBody = (rows, rowClickFn) => (
   <Table.Body>
     {
-        rows.map(row => (
+        rows.map((row, i) => (
           <Table.Row
             className={styles.tableRow}
-            key={`row-${Object.values(row)[0]}`}
+            key={`row-${i}`} // eslint-disable-line react/no-array-index-key
             onClick={e => rowClickFn(e, row)}
           >
             {

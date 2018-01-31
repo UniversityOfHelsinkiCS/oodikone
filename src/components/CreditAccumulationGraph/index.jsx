@@ -8,47 +8,75 @@ import styles from './creditAccumulationGraph.css';
 import { DISPLAY_DATE_FORMAT } from '../../constants';
 import { reformatDate } from '../../common';
 
-
-const getReferenceDates = (startDate, lastDate) => {
-  const dates = [];
-  let date = startDate;
-  let credits = 0;
-  while (date.isBefore(lastDate)) {
-    dates.push({ credits, date: reformatDate(date, DISPLAY_DATE_FORMAT) });
-    date = moment(date).add(6, 'month');
-    credits += 36;
-  }
-  return dates;
-};
-
-const CreditAccumulationGraph = (props) => {
-  const { students } = props;
+const getStudentData = (courses) => {
   let totalCredits = 0;
-  const chartData = students[0].courses.map((c) => {
+  return courses.map((c) => {
     const { course, date, credits } = c;
     totalCredits += credits;
     return {
       title: `${course.name} (${course.code})`,
       totalCredits,
+      credits,
       date: reformatDate(date, DISPLAY_DATE_FORMAT)
     };
   });
+};
 
-  const firstDate = moment(_.minBy(students[0].courses, course => moment(course.date)).date);
-  const lastDate = moment(_.maxBy(students[0].courses, course => moment(course.date)).date);
-  const reference = getReferenceDates(firstDate, lastDate);
+const getCombinedChartData = (courses, startDate) => {
+  const lastDate = moment(_.maxBy(courses, course => moment(course.date)).date);
 
+
+  const studentData = getStudentData(courses);
+
+  const dates = {};
+  let day = moment(startDate);
+  let lastReferenceDay = moment(startDate);
+  let referenceCredits = 0;
+  while (!day.isAfter(lastDate)) {
+    const displayDate = reformatDate(day, DISPLAY_DATE_FORMAT);
+
+    if (day.isSame(moment(lastReferenceDay).add(6, 'month'))) {
+      referenceCredits += 6;
+      lastReferenceDay = day;
+    }
+
+    if (Object.keys(dates).length === 0 || day.isSame(lastDate)) {
+      dates[displayDate] = { referenceCredits };
+    } else {
+      dates[displayDate] = { };
+    }
+
+
+    const index = studentData.findIndex(course => course.date === displayDate);
+
+    if (index !== -1) {
+      const course = studentData[index];
+      Object.assign(dates[course.date], dates[course.date], course);
+    }
+
+    day = moment(day).add(1, 'day');
+  }
+
+  return [...Object.values(dates)];
+};
+
+const CreditAccumulationGraph = (props) => {
+  const { students } = props;
+
+  const firstDate = moment(students[0].started);
+
+  const chartData = getCombinedChartData(students[0].courses, firstDate);
 
   return (
     <div className={styles.graphContainer}>
       <ResponsiveContainer height={400}>
-        <LineChart>
-          <XAxis dataKey="date" allowDuplicateCategory={false} />
-          <YAxis dataKey="credits" />
+        <LineChart data={chartData}>
+          <XAxis dataKey="displayDate" />
+          <YAxis dataKey="referenceCredits" />
           <Tooltip />
           <Legend />
-          <Line type="monotone" data={chartData} dataKey="totalCredits" stroke="#8884d8" />
-          <Line type="monotone" dot={false} data={reference} dataKey="credits" stroke="#435345" />
+          <Line type="monotone" dataKey="totalCredits" stroke="#435345" connectNulls />
+          <Line type="monotone" dot={false} dataKey="referenceCredits" stroke="#435345" connectNulls />
         </LineChart>
       </ResponsiveContainer>
     </div>
