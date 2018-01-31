@@ -21,24 +21,28 @@ class NavigationBar extends Component {
 
     return (
       <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
-        <Menu.Item onClick={() => this.setState({ activeItem: routes.index.route })}>
-          <a className={styles.logo} href="/">
+        <Menu.Item
+          as={Link}
+          to={routes.index.route}
+          onClick={() => this.setState({ activeItem: routes.index.route })}
+        >
+          <span className={styles.logo}>
             <h2 className={styles.logoText}>oodikone</h2>
-          </a>
+          </span>
         </Menu.Item>
         {
-              Object.values(routes).map(value => (
-                <Menu.Item
-                  as={Link}
-                  key={`menu-item-${value.route}`}
-                  to={value.route}
-                  active={activeItem === value.route}
-                  onClick={() => this.setState({ activeItem: value.route })}
-                >
-                  {t(`navigationBar.${value.translateId}`)}
-                </Menu.Item>
-              ))
-            }
+          Object.values(routes).map(value => (
+            <Menu.Item
+              as={Link}
+              key={`menu-item-${value.route}`}
+              to={value.route}
+              active={activeItem === value.route}
+              onClick={() => this.setState({ activeItem: value.route })}
+            >
+              {t(`navigationBar.${value.translateId}`)}
+            </Menu.Item>
+          ))
+        }
       </Menu>);
   }
 }
