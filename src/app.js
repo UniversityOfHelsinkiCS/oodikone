@@ -112,7 +112,7 @@ app.post('/api/courselist', async function(req, res) {
   res.json(results)
 })
 
-app.get('/api/courselist', async function(req, res) {
+app.get('/api/v2/courselist', async function(req, res) {
   let results = []
   if (req.query.code) {
     results = await Course.instancesOf(req.query.code)
@@ -130,7 +130,7 @@ app.post('/api/coursestatistics', async function(req, res) {
   res.json(results)
 })
 
-app.get('/api/coursestatistics', async function(req, res) {
+app.get('/api/v2/coursestatistics', async function(req, res) {
   let results = []
   if (req.query.date && req.query.code && req.query.months) {
     const code = req.query.code
