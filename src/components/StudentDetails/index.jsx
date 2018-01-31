@@ -6,8 +6,10 @@ import { Segment, Loader, Dimmer } from 'semantic-ui-react';
 import StudentInfoCard from '../StudentInfoCard';
 import { addError, getStudentAction, removeTagFromStudentAction } from '../../actions';
 import CreditAccumulationGraph from '../CreditAccumulationGraph';
+import SearchResultTable from '../SearchResultTable';
 
 import styles from './studentDetails.css';
+
 
 class StudentDetails extends Component {
   constructor(props) {
@@ -15,6 +17,7 @@ class StudentDetails extends Component {
 
     this.renderInfoCard = this.renderInfoCard.bind(this);
     this.renderCreditsGraph = this.renderCreditsGraph.bind(this);
+    this.renderCourseParticipation = this.renderCourseParticipation.bind(this);
 
     this.state = {
       isLoading: true,
@@ -42,7 +45,40 @@ class StudentDetails extends Component {
   renderCreditsGraph() {
     const { student } = this.state;
     if (student) {
-      return <CreditAccumulationGraph students={[student]} />;
+      return (
+        <Segment>
+          <CreditAccumulationGraph students={[student]} />
+        </Segment>
+      );
+    }
+    return null;
+  }
+
+  renderCourseParticipation() {
+    const { student } = this.state;
+    const { translate } = this.props;
+    if (student) {
+      const courseHeaders = [
+        translate('common.date'),
+        translate('common.course'),
+        translate('common.grade'),
+        translate('common.credits')
+      ];
+      const courseRows = student.courses.map((c) => {
+        const {
+          date, grade, credits, course
+        } = c;
+        return {
+          date, course: `${course.name} (${course.code})`, grade, credits
+        };
+      });
+      return (
+        <SearchResultTable
+          headers={courseHeaders}
+          rows={courseRows}
+          noResultText={translate('common.noResults')}
+        />
+      );
     }
     return null;
   }
@@ -59,6 +95,7 @@ class StudentDetails extends Component {
         </Dimmer>
         { this.renderInfoCard() }
         { this.renderCreditsGraph() }
+        { this.renderCourseParticipation() }
       </Dimmer.Dimmable>
     );
   }

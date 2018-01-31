@@ -55,11 +55,11 @@ class StudentInfoCard extends Component {
           </Card.Header>
           <Card.Meta>
             <div className={styles.startDate}>
-              {`${translate('studentStatistics.started')}: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}
+              {`${translate('common.started')}: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}
             </div>
           </Card.Meta>
           <Card.Description>
-            {`${translate('studentStatistics.credits')}: ${student.credits || 0}`}
+            {`${translate('common.credits')}: ${student.credits || 0}`}
           </Card.Description>
         </Card.Content>
         <Card.Content extra>

@@ -59,10 +59,14 @@ const SearchResultTable = ({
   return <div>{noResultText}</div>;
 };
 
+SearchResultTable.defaultProps = {
+  rowClickFn: () => null
+};
+
 SearchResultTable.propTypes = {
   headers: arrayOf(string).isRequired,
   rows: arrayOf(object).isRequired,
-  rowClickFn: func.isRequired,
+  rowClickFn: func,
   noResultText: string.isRequired
 };
 
