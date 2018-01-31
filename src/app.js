@@ -108,7 +108,16 @@ app.get('/api/courses', async function (req, res) {
 
 app.post('/api/courselist', async function(req, res) {
   const results = await Course.instancesOf(req.body.code)
+  
+  res.json(results)
+})
 
+app.get('/api/courselist', async function(req, res) {
+  let results = []
+  if (req.query.code) {
+    results = await Course.instancesOf(req.query.code)
+  }
+  
   res.json(results)
 })
 
@@ -118,6 +127,18 @@ app.post('/api/coursestatistics', async function(req, res) {
   const months = req.body.subsequentMonthsToInvestigate
 
   const results = await Course.statisticsOf(code, date, months)
+  res.json(results)
+})
+
+app.get('/api/coursestatistics', async function(req, res) {
+  let results = []
+  if (req.query.date && req.query.code && req.query.months) {
+    const code = req.query.code
+    const date = req.query.date.split('.').join('-')
+    const months = req.query.months
+
+    results = await Course.statisticsOf(code, date, months)
+  }
   res.json(results)
 })
 
