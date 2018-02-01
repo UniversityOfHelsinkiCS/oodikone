@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import styles from './searchResultsTable.css';
 
 const {
-  arrayOf, string, object, func
+  arrayOf, string, object, func, boolean
 } = PropTypes;
 
 
@@ -44,14 +44,14 @@ const getTableBody = (rows, rowClickFn) => (
 );
 
 const SearchResultTable = ({
-  headers, rows, rowClickFn, noResultText
+  headers, rows, rowClickFn, noResultText, selectable
 }) => {
   if (rows.length > 0) {
     return (
       <Table
         singleLine
         unstackable
-        selectable
+        selectable={selectable}
       >
         {getHeaderRow(headers)}
         {getTableBody(rows, rowClickFn)}
@@ -61,14 +61,16 @@ const SearchResultTable = ({
 };
 
 SearchResultTable.defaultProps = {
-  rowClickFn: () => null
+  rowClickFn: () => null,
+  selectable: false
 };
 
 SearchResultTable.propTypes = {
   headers: arrayOf(string).isRequired,
   rows: arrayOf(object).isRequired,
   rowClickFn: func,
-  noResultText: string.isRequired
+  noResultText: string.isRequired,
+  selectable: boolean
 };
 
 export default SearchResultTable;
