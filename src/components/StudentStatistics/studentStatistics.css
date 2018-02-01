@@ -3,4 +3,15 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  width: 100%;
+
+}
+
+.title {
+  margin-left: 5px;
+  margin-top: 5px;
+}
+
+.contentSegment {
+  width: 99%;
 }
