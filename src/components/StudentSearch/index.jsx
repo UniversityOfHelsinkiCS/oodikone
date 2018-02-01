@@ -69,13 +69,13 @@ class StudentSearch extends Component {
           onSearchChange={this.handleSearchChange}
           showNoResults={false}
           value={searchStr}
+          placeholder={t('studentStatistics.searchPlaceholder')}
         />
         <SearchResultTable
           headers={headers}
           rows={rows}
           rowClickFn={this.props.handleResultFn}
           noResultText={t('common.noResults')}
-
         />
       </div>
     );

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Segment, Loader, Dimmer } from 'semantic-ui-react';
+import { Segment, Loader, Dimmer, Header } from 'semantic-ui-react';
 
 import StudentInfoCard from '../StudentInfoCard';
 import { addError, getStudentAction, removeTagFromStudentAction } from '../../actions';
@@ -44,11 +44,13 @@ class StudentDetails extends Component {
   }
   renderCreditsGraph() {
     const { student } = this.state;
+    const { translate } = this.props;
     if (student) {
       return (
-        <Segment>
-          <CreditAccumulationGraph students={[student]} />
-        </Segment>
+        <CreditAccumulationGraph
+          students={[student]}
+          title={translate('studentStatistics.chartTitle')}
+        />
       );
     }
     return null;

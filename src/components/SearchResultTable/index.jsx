@@ -8,15 +8,16 @@ const {
   arrayOf, string, object, func
 } = PropTypes;
 
+
 const getHeaderRow = headers => (
   <Table.Header>
     <Table.Row>
       {
-        headers.map(header => (
-          <Table.HeaderCell key={`header-${header}`}>
-            {header}
-          </Table.HeaderCell>
-            ))
+          headers.map(header => (
+            <Table.HeaderCell key={`header-${header}`}>
+              {header}
+            </Table.HeaderCell>
+          ))
         }
     </Table.Row>
   </Table.Header>

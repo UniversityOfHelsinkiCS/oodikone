@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { getTranslate, getActiveLanguage } from 'react-localize-redux';
+import { Segment, Header } from 'semantic-ui-react';
 
 import StudentSearch from '../StudentSearch';
 import StudentDetails from '../StudentDetails';
@@ -32,7 +33,6 @@ class StudentStatistics extends Component {
         <StudentDetails studentNumber={student.studentNumber} translate={t} />
       );
     }
-
     return (
       <StudentSearch
         handleResultFn={this.handleSearchSelect}
@@ -41,9 +41,13 @@ class StudentStatistics extends Component {
   }
 
   render() {
+    const { translate } = this.props;
     return (
       <div className={styles.container}>
-        {this.partialRender()}
+        <Header className={styles.title} size="large">{translate('studentStatistics.header')}</Header>
+        <Segment className={styles.contentSegment}>
+          {this.partialRender()}
+        </Segment>
       </div>
     );
   }
