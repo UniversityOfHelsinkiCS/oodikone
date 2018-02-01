@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Segment, Loader, Dimmer, Header } from 'semantic-ui-react';
+import { Segment, Loader, Dimmer } from 'semantic-ui-react';
 
 import StudentInfoCard from '../StudentInfoCard';
 import { addError, getStudentAction, removeTagFromStudentAction } from '../../actions';
