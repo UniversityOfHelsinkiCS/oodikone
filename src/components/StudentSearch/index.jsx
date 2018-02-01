@@ -76,6 +76,7 @@ class StudentSearch extends Component {
           rows={rows}
           rowClickFn={this.props.handleResultFn}
           noResultText={t('common.noResults')}
+          selectable
         />
       </div>
     );
