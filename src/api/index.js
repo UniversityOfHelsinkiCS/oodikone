@@ -14,6 +14,6 @@ export const findStudents = searchStr => getJson(`/students?searchTerm=${searchS
 
 export const findCoursesByName = searchStr => getJson(`/courses?name=${searchStr}`).then(throwErrors);
 
-export const findCourseInstances = code => getJson(`/courselist?code=${code}`).then(throwErrors);
+export const findCourseInstances = code => getJson(`/v2/courselist?code=${code}`).then(throwErrors);
 
-export const getInstanceStatistics = (date, code, months) => getJson(`/coursestatistics?date=${date}&code=${code}&months=${months}`).then(throwErrors);
+export const getInstanceStatistics = (date, code, months) => getJson(`/v2/coursestatistics?date=${date}&code=${code}&months=${months}`).then(throwErrors);
