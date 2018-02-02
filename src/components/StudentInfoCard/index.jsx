@@ -40,8 +40,8 @@ class StudentInfoCard extends Component {
   }
 
   render() {
-    const { student, translate, studentTags } = this.props;
-    const tags = studentTags[student.studentNumber].tags || [];
+    const { student, translate } = this.props;
+    const tags = student.tags;
     return (
       <Card fluid>
         <Card.Content>
@@ -75,12 +75,10 @@ class StudentInfoCard extends Component {
   }
 }
 
-
-const { func, shape, object } = PropTypes;
+const { func } = PropTypes;
 
 StudentInfoCard.propTypes = {
   student: studentDetailsType.isRequired,
-  studentTags: shape(object).isRequired,
   translate: func.isRequired,
   dispatchRemoveTagFromStudent: func.isRequired,
   dispatchRemoveTagFromStudentHackSuccess: func.isRequired,
@@ -88,9 +86,7 @@ StudentInfoCard.propTypes = {
   dispatchAddError: func.isRequired
 };
 
-const mapStateToProps = ({ studentStatistics }) => ({
-  studentTags: studentStatistics.studentTags
-});
+const mapStateToProps = () => ({});
 
 const mapDispatchToProps = dispatch => ({
   dispatchRemoveTagFromStudent: (studentNumber, tag) =>

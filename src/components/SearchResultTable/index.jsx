@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import styles from './searchResultsTable.css';
 
 const {
-  arrayOf, string, object, func, boolean
+  arrayOf, string, object, func, bool
 } = PropTypes;
 
 
@@ -23,12 +23,12 @@ const getHeaderRow = headers => (
   </Table.Header>
 );
 
-const getTableBody = (rows, rowClickFn) => (
+const getTableBody = (rows, rowClickFn, selectable) => (
   <Table.Body>
     {
         rows.map((row, i) => (
           <Table.Row
-            className={styles.tableRow}
+            className={(selectable ? styles.selectableRow : '')}
             key={`row-${i}`} // eslint-disable-line react/no-array-index-key
             onClick={e => rowClickFn(e, row)}
           >
@@ -54,7 +54,7 @@ const SearchResultTable = ({
         selectable={selectable}
       >
         {getHeaderRow(headers)}
-        {getTableBody(rows, rowClickFn)}
+        {getTableBody(rows, rowClickFn, selectable)}
       </Table>);
   }
   return <div>{noResultText}</div>;
@@ -70,7 +70,7 @@ SearchResultTable.propTypes = {
   rows: arrayOf(object).isRequired,
   rowClickFn: func,
   noResultText: string.isRequired,
-  selectable: boolean
+  selectable: bool
 };
 
 export default SearchResultTable;

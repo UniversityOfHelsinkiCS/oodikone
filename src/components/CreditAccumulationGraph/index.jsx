@@ -56,7 +56,7 @@ const getCombinedChartData = (courses, startDate) => {
 
     day = moment(day).add(1, 'day');
   }
-  const finalDate = reformatDate(day, DISPLAY_DATE_FORMAT);
+  const finalDate = day;
   dates[finalDate] = { finalDate, referenceCredits };
 
   return [...Object.values(dates)];

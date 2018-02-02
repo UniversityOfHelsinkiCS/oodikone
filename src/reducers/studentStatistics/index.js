@@ -12,18 +12,12 @@ import {
   ADD_TAG_TO_STUDENT_REJECTED
 } from '../../actions';
 
-const initialState = { };
 
-
-const studentTags = (state = initialState, action) => {
+const students = (state = {}, action) => {
   switch (action.type) {
     case GET_STUDENT_FULFILLED: {
-      const { studentNumber, tags } = action.payload;
-      return Object.assign({}, state, {
-        [studentNumber]: Object.assign({}, state[studentNumber], {
-          tags
-        })
-      });
+      const student = action.payload;
+      return { ...state, [student.studentNumber]: student };
     }
     case ADD_TAG_TO_STUDENT_FULFILLED: {
       const studentNumber = action.payload.taggedstudents_studentnumber;
@@ -50,12 +44,14 @@ const studentTags = (state = initialState, action) => {
     case REMOVE_TAG_FROM_STUDENT_REJECTED:
       return state;
     default:
-      return state;
+      return {
+        ...state
+      };
   }
 };
 
 export default combineReducers({
-  studentTags,
+  students,
   findStudents: asyncReducer(FIND_STUDENTS),
   getStudent: asyncReducer(GET_STUDENT)
 });
