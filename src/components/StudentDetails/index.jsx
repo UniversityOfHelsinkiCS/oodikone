@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Segment, Loader, Dimmer } from 'semantic-ui-react';
 
 import StudentInfoCard from '../StudentInfoCard';
-import { addError, getStudentAction, removeTagFromStudentAction } from '../../actions';
+import { removeTagFromStudentAction } from '../../actions';
 import CreditAccumulationGraph from '../CreditAccumulationGraph';
 import SearchResultTable from '../SearchResultTable';
 
@@ -19,32 +19,20 @@ class StudentDetails extends Component {
     this.renderCreditsGraph = this.renderCreditsGraph.bind(this);
     this.renderCourseParticipation = this.renderCourseParticipation.bind(this);
 
-    this.state = {
-      isLoading: true,
-      student: null
-    };
-  }
-
-  componentDidMount() {
-    const { studentNumber } = this.props;
-    this.props.dispatchGetStudent(studentNumber)
-      .then(
-        json => this.setState({ student: json.value, isLoading: false }),
-        err => this.props.dispatchAddError(err)
-      );
+    this.state = {};
   }
 
   renderInfoCard() {
-    const { student } = this.state;
-    const t = this.props.translate;
+    const { translate, students, studentNumber } = this.props;
+    const student = students[studentNumber];
     if (student) {
-      return <StudentInfoCard student={student} translate={t} />;
+      return <StudentInfoCard student={student} translate={translate} />;
     }
     return null;
   }
   renderCreditsGraph() {
-    const { student } = this.state;
-    const { translate } = this.props;
+    const { translate, students, studentNumber } = this.props;
+    const student = students[studentNumber];
     if (student) {
       return (
         <CreditAccumulationGraph
@@ -57,8 +45,8 @@ class StudentDetails extends Component {
   }
 
   renderCourseParticipation() {
-    const { student } = this.state;
-    const { translate } = this.props;
+    const { translate, students, studentNumber } = this.props;
+    const student = students[studentNumber];
     if (student) {
       const courseHeaders = [
         translate('common.date'),
@@ -103,23 +91,23 @@ class StudentDetails extends Component {
   }
 }
 
-const { string, func } = PropTypes;
+const {
+  string, func, shape, object
+} = PropTypes;
 
 StudentDetails.propTypes = {
   studentNumber: string.isRequired,
   translate: func.isRequired,
-  dispatchAddError: func.isRequired,
-  dispatchGetStudent: func.isRequired
+  students: shape(object).isRequired
 };
 
-const mapStateToProps = () => ({});
+const mapStateToProps = state => ({
+  students: state.studentStatistics.students
+});
 
 const mapDispatchToProps = dispatch => ({
-  dispatchGetStudent: studentNumber =>
-    dispatch(getStudentAction(studentNumber)),
   dispatchRemoveTagFromStudent: (studentNumber, tag) =>
-    dispatch(removeTagFromStudentAction(studentNumber, tag)),
-  dispatchAddError: err => dispatch(addError(err))
+    dispatch(removeTagFromStudentAction(studentNumber, tag))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudentDetails);
