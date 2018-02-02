@@ -4,12 +4,18 @@
     "cancel": ["Cancel"],
     "example" : ["react-localize-redux example text"],
     "loading": ["Loading"],
-    "noResults": ["No search results"]
+    "noResults": ["No search results"],
+    "studentNumber": ["Student number"],
+    "started": ["Started"],
+    "credits": ["Credits"],
+    "date": ["Date"],
+    "course": ["Course"],
+    "grade": ["Grade"]
   },
   "navigationBar" : {
     "departmentSuccess" : ["Department success"],
     "populations" : ["Populations"],
-    "students" : ["Students"],
+    "students" : ["Student statistics"],
     "courses" : ["Courses"],
     "teachers" : ["Teachers"]
   },
@@ -17,9 +23,9 @@
     "chartTitle": ["Average credit gains after 13 months for BSc students starting"]
   },
   "studentStatistics": {
-    "studentNumber": ["Student number"],
-    "started": ["Started"],
-    "credits": ["Credits"]
+    "header" : ["Student statistics"],
+    "searchPlaceholder": ["Search with a student number or name"],
+    "chartTitle" : ["Credit Accumulation"]
   },
   "tags": {
     "addTag": ["Add tag"],

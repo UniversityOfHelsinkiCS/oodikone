@@ -40,8 +40,8 @@ class StudentInfoCard extends Component {
   }
 
   render() {
-    const { student, translate, studentTags } = this.props;
-    const tags = studentTags[student.studentNumber].tags || [];
+    const { student, translate } = this.props;
+    const { tags, studentNumber, started } = student;
     return (
       <Card fluid>
         <Card.Content>
@@ -50,16 +50,16 @@ class StudentInfoCard extends Component {
               <Icon name="student" />
               <Icon corner name="hashtag" />
             </Icon.Group>
-            <span className={styles.cardHeader}>{`${student.studentNumber}`}</span>
+            <span className={styles.cardHeader}>{`${studentNumber}`}</span>
 
           </Card.Header>
           <Card.Meta>
             <div className={styles.startDate}>
-              {`${translate('studentStatistics.started')}: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}
+              {`${translate('common.started')}: ${reformatDate(started, DISPLAY_DATE_FORMAT)}`}
             </div>
           </Card.Meta>
           <Card.Description>
-            {`${translate('studentStatistics.credits')}: ${student.credits || 0}`}
+            {`${translate('common.credits')}: ${student.credits || 0}`}
           </Card.Description>
         </Card.Content>
         <Card.Content extra>
@@ -75,12 +75,10 @@ class StudentInfoCard extends Component {
   }
 }
 
-
-const { func, shape, object } = PropTypes;
+const { func } = PropTypes;
 
 StudentInfoCard.propTypes = {
   student: studentDetailsType.isRequired,
-  studentTags: shape(object).isRequired,
   translate: func.isRequired,
   dispatchRemoveTagFromStudent: func.isRequired,
   dispatchRemoveTagFromStudentHackSuccess: func.isRequired,
@@ -88,9 +86,7 @@ StudentInfoCard.propTypes = {
   dispatchAddError: func.isRequired
 };
 
-const mapStateToProps = ({ studentStatistics }) => ({
-  studentTags: studentStatistics.studentTags
-});
+const mapStateToProps = () => ({});
 
 const mapDispatchToProps = dispatch => ({
   dispatchRemoveTagFromStudent: (studentNumber, tag) =>

@@ -4,10 +4,12 @@ import { connect } from 'react-redux';
 import { Segment, Loader, Dimmer } from 'semantic-ui-react';
 
 import StudentInfoCard from '../StudentInfoCard';
-import { addError, getStudentAction, removeTagFromStudentAction } from '../../actions';
+import { removeTagFromStudentAction } from '../../actions';
 import CreditAccumulationGraph from '../CreditAccumulationGraph';
+import SearchResultTable from '../SearchResultTable';
 
 import styles from './studentDetails.css';
+
 
 class StudentDetails extends Component {
   constructor(props) {
@@ -15,34 +17,58 @@ class StudentDetails extends Component {
 
     this.renderInfoCard = this.renderInfoCard.bind(this);
     this.renderCreditsGraph = this.renderCreditsGraph.bind(this);
+    this.renderCourseParticipation = this.renderCourseParticipation.bind(this);
 
-    this.state = {
-      isLoading: true,
-      student: null
-    };
-  }
-
-  componentDidMount() {
-    const { studentNumber } = this.props;
-    this.props.dispatchGetStudent(studentNumber)
-      .then(
-        json => this.setState({ student: json.value, isLoading: false }),
-        err => this.props.dispatchAddError(err)
-      );
+    this.state = {};
   }
 
   renderInfoCard() {
-    const { student } = this.state;
-    const t = this.props.translate;
+    const { translate, students, studentNumber } = this.props;
+    const student = students[studentNumber];
     if (student) {
-      return <StudentInfoCard student={student} translate={t} />;
+      return <StudentInfoCard student={student} translate={translate} />;
     }
     return null;
   }
   renderCreditsGraph() {
-    const { student } = this.state;
+    const { translate, students, studentNumber } = this.props;
+    const student = students[studentNumber];
     if (student) {
-      return <CreditAccumulationGraph students={[student]} />;
+      return (
+        <CreditAccumulationGraph
+          students={[student]}
+          title={translate('studentStatistics.chartTitle')}
+        />
+      );
+    }
+    return null;
+  }
+
+  renderCourseParticipation() {
+    const { translate, students, studentNumber } = this.props;
+    const student = students[studentNumber];
+    if (student) {
+      const courseHeaders = [
+        translate('common.date'),
+        translate('common.course'),
+        translate('common.grade'),
+        translate('common.credits')
+      ];
+      const courseRows = student.courses.map((c) => {
+        const {
+          date, grade, credits, course
+        } = c;
+        return {
+          date, course: `${course.name} (${course.code})`, grade, credits
+        };
+      });
+      return (
+        <SearchResultTable
+          headers={courseHeaders}
+          rows={courseRows}
+          noResultText={translate('common.noResults')}
+        />
+      );
     }
     return null;
   }
@@ -59,28 +85,29 @@ class StudentDetails extends Component {
         </Dimmer>
         { this.renderInfoCard() }
         { this.renderCreditsGraph() }
+        { this.renderCourseParticipation() }
       </Dimmer.Dimmable>
     );
   }
 }
 
-const { string, func } = PropTypes;
+const {
+  string, func, shape, object
+} = PropTypes;
 
 StudentDetails.propTypes = {
   studentNumber: string.isRequired,
   translate: func.isRequired,
-  dispatchAddError: func.isRequired,
-  dispatchGetStudent: func.isRequired
+  students: shape(object).isRequired
 };
 
-const mapStateToProps = () => ({});
+const mapStateToProps = ({ students }) => ({
+  students: students.students
+});
 
 const mapDispatchToProps = dispatch => ({
-  dispatchGetStudent: studentNumber =>
-    dispatch(getStudentAction(studentNumber)),
   dispatchRemoveTagFromStudent: (studentNumber, tag) =>
-    dispatch(removeTagFromStudentAction(studentNumber, tag)),
-  dispatchAddError: err => dispatch(addError(err))
+    dispatch(removeTagFromStudentAction(studentNumber, tag))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudentDetails);
