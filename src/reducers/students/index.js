@@ -22,31 +22,42 @@ const students = (state = {}, action) => {
     case ADD_TAG_TO_STUDENT_FULFILLED: {
       const studentNumber = action.payload.taggedstudents_studentnumber;
       const addedTag = action.payload.tags_tagname;
-      return Object.assign({}, state, {
-        [studentNumber]: Object.assign({}, state[studentNumber], {
-          tags: state[studentNumber].tags.concat(addedTag)
-        })
+      return ({
+        ...state,
+        ...{
+          [studentNumber]: ({
+            ...state[studentNumber],
+            ...{
+              tags: state[studentNumber].tags.concat(addedTag)
+            }
+          })
+        }
       });
     }
     case ADD_TAG_TO_STUDENT_REJECTED:
       return state;
     case REMOVE_TAG_FROM_STUDENT_HACK_SUCCESS: {
       const { studentNumber, tag } = action.payload;
-      return Object.assign({}, state, {
-        [studentNumber]: Object.assign({}, state[studentNumber], {
-          tags: state[studentNumber].tags.filter(t => t !== tag)
-        })
+      return ({
+        ...state,
+        ...{
+          [studentNumber]: ({
+            ...state[studentNumber],
+            ...{
+              tags: state[studentNumber].tags.filter(t => t !== tag)
+            }
+          })
+        }
       });
     }
     case REMOVE_TAG_FROM_STUDENT_FULFILLED: {
-      return state;
+      return { ...state };
     }
-    case REMOVE_TAG_FROM_STUDENT_REJECTED:
-      return state;
+    case REMOVE_TAG_FROM_STUDENT_REJECTED: {
+      return { ...state };
+    }
     default:
-      return {
-        ...state
-      };
+      return state;
   }
 };
 
