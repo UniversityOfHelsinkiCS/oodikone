@@ -5,30 +5,31 @@ import PropTypes from 'prop-types';
 import styles from './searchResultsTable.css';
 
 const {
-  arrayOf, string, object, func
+  arrayOf, string, object, func, bool
 } = PropTypes;
+
 
 const getHeaderRow = headers => (
   <Table.Header>
     <Table.Row>
       {
-        headers.map(header => (
-          <Table.HeaderCell key={`header-${header}`}>
-            {header}
-          </Table.HeaderCell>
-            ))
+          headers.map(header => (
+            <Table.HeaderCell key={`header-${header}`}>
+              {header}
+            </Table.HeaderCell>
+          ))
         }
     </Table.Row>
   </Table.Header>
 );
 
-const getTableBody = (rows, rowClickFn) => (
+const getTableBody = (rows, rowClickFn, selectable) => (
   <Table.Body>
     {
-        rows.map(row => (
+        rows.map((row, i) => (
           <Table.Row
-            className={styles.tableRow}
-            key={`row-${Object.values(row)[0]}`}
+            className={(selectable ? styles.selectableRow : '')}
+            key={`row-${i}`} // eslint-disable-line react/no-array-index-key
             onClick={e => rowClickFn(e, row)}
           >
             {
@@ -43,27 +44,33 @@ const getTableBody = (rows, rowClickFn) => (
 );
 
 const SearchResultTable = ({
-  headers, rows, rowClickFn, noResultText
+  headers, rows, rowClickFn, noResultText, selectable
 }) => {
   if (rows.length > 0) {
     return (
       <Table
         singleLine
         unstackable
-        selectable
+        selectable={selectable}
       >
         {getHeaderRow(headers)}
-        {getTableBody(rows, rowClickFn)}
+        {getTableBody(rows, rowClickFn, selectable)}
       </Table>);
   }
   return <div>{noResultText}</div>;
 };
 
+SearchResultTable.defaultProps = {
+  rowClickFn: () => null,
+  selectable: false
+};
+
 SearchResultTable.propTypes = {
   headers: arrayOf(string).isRequired,
   rows: arrayOf(object).isRequired,
-  rowClickFn: func.isRequired,
-  noResultText: string.isRequired
+  rowClickFn: func,
+  noResultText: string.isRequired,
+  selectable: bool
 };
 
 export default SearchResultTable;
