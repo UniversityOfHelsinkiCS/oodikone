@@ -7,7 +7,7 @@ import { Header, Segment } from 'semantic-ui-react';
 
 import styles from './creditAccumulationGraph.css';
 import { DISPLAY_DATE_FORMAT } from '../../constants';
-import { reformatDate } from '../../common';
+import { reformatDate, sortDatesWithFormat } from '../../common';
 import { red, turquoise } from '../../styles/variables/colors';
 
 const getStudentData = (courses) => {
@@ -26,7 +26,6 @@ const getStudentData = (courses) => {
 
 const getCombinedChartData = (courses, startDate) => {
   const lastDate = moment(_.maxBy(courses, course => moment(course.date)).date);
-
 
   const studentData = getStudentData(courses);
   const dates = {};
@@ -56,8 +55,11 @@ const getCombinedChartData = (courses, startDate) => {
 
     day = moment(day).add(1, 'day');
   }
-  const finalDate = day;
-  dates[finalDate] = { finalDate, referenceCredits };
+  const finalDate = reformatDate(day, DISPLAY_DATE_FORMAT);
+  const testDay = reformatDate(moment(day).subtract(10, 'day'), DISPLAY_DATE_FORMAT);
+
+  dates[finalDate] = { displayDate: finalDate, referenceCredits };
+  dates[testDay] = { displayDate: testDay, test: '!!!' };
 
   return [...Object.values(dates)];
 };
@@ -68,7 +70,8 @@ const CreditAccumulationGraph = (props) => {
   const firstDate = moment(students[0].started);
 
   const chartData = getCombinedChartData(students[0].courses, firstDate);
-  _.sortBy(chartData, course => moment(course.displayDate));
+  chartData.sort((c1, c2) =>
+    sortDatesWithFormat(c1.displayDate, c2.displayDate, DISPLAY_DATE_FORMAT));
 
   return (
     <div className={styles.graphContainer}>

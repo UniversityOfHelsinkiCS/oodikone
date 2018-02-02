@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { DISPLAY_DATE_FORMAT } from '../constants';
 
 const API_BASE_PATH = '/api';
 
@@ -62,3 +63,6 @@ export const postJson = (path, data, catchRejected = true) => fetch(`${API_BASE_
   .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
 
 export const reformatDate = (date, dateFormat) => moment(date).format(dateFormat);
+
+export const sortDatesWithFormat = (d1, d2, dateFormat)
+  => moment(d1, dateFormat) - moment(d2, dateFormat);

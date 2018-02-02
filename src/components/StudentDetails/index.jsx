@@ -101,8 +101,8 @@ StudentDetails.propTypes = {
   students: shape(object).isRequired
 };
 
-const mapStateToProps = state => ({
-  students: state.studentStatistics.students
+const mapStateToProps = ({ students }) => ({
+  students: students.students
 });
 
 const mapDispatchToProps = dispatch => ({

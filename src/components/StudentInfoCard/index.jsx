@@ -41,7 +41,7 @@ class StudentInfoCard extends Component {
 
   render() {
     const { student, translate } = this.props;
-    const tags = student.tags;
+    const { tags, studentNumber, started } = student;
     return (
       <Card fluid>
         <Card.Content>
@@ -50,12 +50,12 @@ class StudentInfoCard extends Component {
               <Icon name="student" />
               <Icon corner name="hashtag" />
             </Icon.Group>
-            <span className={styles.cardHeader}>{`${student.studentNumber}`}</span>
+            <span className={styles.cardHeader}>{`${studentNumber}`}</span>
 
           </Card.Header>
           <Card.Meta>
             <div className={styles.startDate}>
-              {`${translate('common.started')}: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}
+              {`${translate('common.started')}: ${reformatDate(started, DISPLAY_DATE_FORMAT)}`}
             </div>
           </Card.Meta>
           <Card.Description>
