@@ -16,10 +16,12 @@
       "react/prefer-stateless-function": 2,
       "react/no-typos": 0,
       "jsx-a11y/no-static-element-interactions": 0,
-      "jsx-a11y/click-events-have-key-events": 0
+      "jsx-a11y/click-events-have-key-events": 0,
+      "prefer-object-spread/prefer-object-spread": 2
     },
     "plugins" : [
       "react",
-      "import"
+      "import",
+      "prefer-object-spread"
     ]
 }
