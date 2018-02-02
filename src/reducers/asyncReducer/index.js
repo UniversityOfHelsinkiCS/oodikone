@@ -8,7 +8,7 @@ const asyncReducer = actionTypename =>
   (state = initialState, action) => {
     switch (action.type) {
       case `${actionTypename}_PENDING`:
-        return Object.assign({}, state, { pending: true, error: false, data: null });
+        return ({ ...state, ...{ pending: true, error: false, data: null } });
       case `${actionTypename}_FULFILLED`: {
         let error = false;
 
@@ -16,10 +16,10 @@ const asyncReducer = actionTypename =>
           error = true;
         }
 
-        return Object.assign({}, state, { pending: false, error, data: action.payload });
+        return ({ ...state, ...{ pending: false, error, data: action.payload } });
       }
       case `${actionTypename}_REJECTED`:
-        return Object.assign({}, state, { pending: false, error: true, data: action.payload });
+        return ({ ...state, ...{ pending: false, error: true, data: action.payload } });
       default:
         return state;
     }
