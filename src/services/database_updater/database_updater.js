@@ -153,7 +153,8 @@ const studentAlreadyHasCredit = async (student, oodiCredit) => {
     let creditDate = getDate(oodiCredit.courseInstance.date)
     const credits = await student.getCredits()
 
-    await Promise.all(credits.map(async studentCredit => {
+    for (let i = 0; i < credits.length; i++) {
+      let studentCredit = credits[i]
       let instance = await CourseInstance.findById(studentCredit.courseinstance_id)
       // get the course code from credit in oodikone db
       let instanceCode = instance.course_code
@@ -172,7 +173,7 @@ const studentAlreadyHasCredit = async (student, oodiCredit) => {
         }
         return true
       }
-    }))
+    }
     return false
   } catch (e) {
     logError('Student: ' + student.studentnumber + ' alreadyHasCredit check FAILED')
@@ -239,7 +240,7 @@ const getStudentNumberChecksum = studentNumber => {
 const run = async () => {
 
   for (let i = minStudentNumber; i < maxStudentNumber; i++) {
-    1441096
+
     if(i%50000 === 0) log('Running: 0' + i + getStudentNumberChecksum(String(i)))
     let studentNumber = '0' + i + getStudentNumberChecksum(String(i))
     await updateStudentInformation(studentNumber)
