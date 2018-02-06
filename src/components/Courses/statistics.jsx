@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { Grid, Table } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
 
 import MulticolorBarChart from '../MulticolorBarChart';
 
+const { shape, object, string } = PropTypes;
 
 const createChartData = data => (data !== undefined ?
   (Object.keys(data).map(key => ({ text: key, value: data[key] }))) : []);
@@ -12,18 +14,18 @@ const sortByValue = (a, b) => (a.value - b.value);
 const tableRow = (title, values) => (
   <Table.Row>
     <Table.Cell>{title}</Table.Cell>
-    {values.map((val, i) => <Table.Cell key={i}>{val}</Table.Cell>)}
+    {values.map(val => <Table.Cell>{val}</Table.Cell>)}
   </Table.Row>);
 
 const calculateAve = (data) => {
   let sum = 0;
-  data.forEach((element) => { sum += element.value; });
+  data.forEach((item) => { sum += item.value; });
   return sum / data.length;
 };
 
 const calculateStd = (ave, data) => {
   let variation = 0;
-  data.forEach((element) => { variation += (ave - element.value) ** 2; });
+  data.forEach((item) => { variation += (ave - item.value) ** 2; });
   variation /= data.length;
   return Math.sqrt(variation);
 };
@@ -37,6 +39,8 @@ class CourseStatistics extends Component {
   render() {
     const { stats, selectedCourse } = this.props;
     if (stats !== undefined) {
+      console.log(stats);
+      
       const dataAll = createChartData(stats.all).sort(sortByValue);
       const dataPassed = createChartData(stats.pass).sort(sortByValue);
       const dataFailed = createChartData(stats.fail).sort(sortByValue);
@@ -106,5 +110,18 @@ class CourseStatistics extends Component {
     );
   }
 }
+
+CourseStatistics.propTypes = {
+  stats: shape({
+    all: object.isRequired,
+    pass: object.isRequired,
+    fail: object.isRequired,
+    startYear: object.isRequired
+  }).isRequired,
+  selectedCourse: shape({
+    name: string.isRequired,
+    code: string.isRequired
+  }).isRequired
+};
 
 export default CourseStatistics;
