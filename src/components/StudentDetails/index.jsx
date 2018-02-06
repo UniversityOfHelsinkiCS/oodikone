@@ -7,9 +7,9 @@ import StudentInfoCard from '../StudentInfoCard';
 import { removeTagFromStudentAction } from '../../actions';
 import CreditAccumulationGraph from '../CreditAccumulationGraph';
 import SearchResultTable from '../SearchResultTable';
+import { removeInvalidCreditsFromStudent } from '../../common';
 
 import styles from './studentDetails.css';
-
 
 class StudentDetails extends Component {
   constructor(props) {
@@ -38,6 +38,7 @@ class StudentDetails extends Component {
         <CreditAccumulationGraph
           students={[student]}
           title={translate('studentStatistics.chartTitle')}
+          translate={translate}
         />
       );
     }
@@ -46,7 +47,7 @@ class StudentDetails extends Component {
 
   renderCourseParticipation() {
     const { translate, students, studentNumber } = this.props;
-    const student = students[studentNumber];
+    const student = removeInvalidCreditsFromStudent(students[studentNumber]);
     if (student) {
       const courseHeaders = [
         translate('common.date'),
@@ -72,7 +73,6 @@ class StudentDetails extends Component {
     }
     return null;
   }
-
 
   render() {
     const { isLoading } = this.state;

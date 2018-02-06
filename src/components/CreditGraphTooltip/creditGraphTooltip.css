@@ -1,0 +1,42 @@
+:root {
+  --flex-default {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+}
+
+.tooltipHeader {
+  font-size: 17px !important;
+}
+
+.tooltipMeta {
+  @apply --flex-default;
+}
+
+.tooltipBody {
+  @apply --flex-default;
+}
+
+.tooltipBodyItem {
+  @apply --flex-default;
+
+  flex-direction: column;
+  position: relative;
+  margin-top: 0;
+  padding-bottom: 7px;
+}
+
+.tooltipBodyTitle {
+  font-weight: bold;
+  text-transform: capitalize;
+  font-size: 12px;
+}
+
+.tooltipBodyValue {
+  font-weight: bold;
+  text-transform: capitalize;
+  font-size: 18px;
+  position: absolute;
+  top: 14px;
+}

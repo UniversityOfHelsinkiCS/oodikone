@@ -3,7 +3,9 @@ import { localeReducer as locale } from 'react-localize-redux';
 
 import departmentSuccess from './departmentSuccess';
 import students from './students';
+import populations from './populations';
 import tags from './tags';
+
 
 import {
 
@@ -14,6 +16,7 @@ const reducers = combineReducers({
   departmentSuccess,
   locale,
   students,
+  populations,
   tags
 });
 
