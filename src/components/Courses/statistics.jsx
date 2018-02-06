@@ -39,8 +39,6 @@ class CourseStatistics extends Component {
   render() {
     const { stats, selectedCourse } = this.props;
     if (stats !== undefined) {
-      console.log(stats);
-      
       const dataAll = createChartData(stats.all).sort(sortByValue);
       const dataPassed = createChartData(stats.pass).sort(sortByValue);
       const dataFailed = createChartData(stats.fail).sort(sortByValue);
