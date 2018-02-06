@@ -33,7 +33,7 @@ const getValues = (students) => {
 const getCreditStats = (students, studentsInQuarters) =>
   [getValues(students), ...studentsInQuarters.map(s => getValues(s))];
 
-const CourseStatistics = (props) => {
+const CourseQuarters = (props) => {
   const { translate, sample } = props;
   const quarters = getStudentSampleInSplitQuarters(sample);
   const stats = getCreditStats(sample, quarters);
@@ -55,7 +55,6 @@ const CourseStatistics = (props) => {
     ['median', ...stats.map(stat => stat.median)],
     ['standardDeviation', ...stats.map(stat => stat.standardDeviation)]
   ];
-console.log(rows);
 
   return (<SearchResultTable
     headers={headers}
@@ -65,11 +64,11 @@ console.log(rows);
   />);
 };
 
-const { func, arrayOf, object } = PropTypes;
+const { func, arrayOf, object } = PropTypes;
 
-CourseStatistics.propTypes = {
+CourseQuarters.propTypes = {
   translate: func.isRequired,
   sample: arrayOf(object).isRequired
 };
 
-export default CourseStatistics;
+export default CourseQuarters;

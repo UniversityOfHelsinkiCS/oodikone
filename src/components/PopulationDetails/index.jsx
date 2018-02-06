@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Segment, Header } from 'semantic-ui-react';
 
 import CreditAccumulationGraph from '../CreditAccumulationGraph';
-import CourseStatistics from '../CourseStatistics';
+import CourseStatistics from '../CourseQuarters';
 import { removeInvalidCreditsFromSamples } from '../../common';
 
 class PopulationDetails extends Component {
