@@ -121,7 +121,6 @@ class Courses extends Component {
         />
         <div>{`Courses: ${t('common.example')}`}</div>
         {isLoading}
-        <pre>{JSON.stringify(courseList, null, 2)}</pre>
         <Dropdown onChange={this.fetchInstanceStatistics} placeholder="Select course instance" fluid selection options={instanceList} />
 
         <CourseStatistics
