@@ -9,7 +9,9 @@ import {
   REMOVE_TAG_FROM_STUDENT_FULFILLED,
   REMOVE_TAG_FROM_STUDENT_REJECTED,
   ADD_TAG_TO_STUDENT_FULFILLED,
-  ADD_TAG_TO_STUDENT_REJECTED
+  ADD_TAG_TO_STUDENT_REJECTED,
+  GET_POPULATION_STATISTICS_FULFILLED,
+  GET_POPULATION_STATISTICS_REJECTED
 } from '../../actions';
 
 
@@ -54,7 +56,15 @@ const students = (state = {}, action) => {
       return { ...state };
     }
     case REMOVE_TAG_FROM_STUDENT_REJECTED: {
-      return { ...state };
+      return state;
+    }
+    case GET_POPULATION_STATISTICS_FULFILLED: {
+      const result = action.payload;
+      return result.reduce((resultState, student) =>
+        ({ ...resultState, [student.studentNumber]: student }), { ...state });
+    }
+    case GET_POPULATION_STATISTICS_REJECTED: {
+      return state;
     }
     default:
       return state;

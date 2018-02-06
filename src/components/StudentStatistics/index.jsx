@@ -25,11 +25,12 @@ class StudentStatistics extends Component {
 
   handleSearchSelect(e, student) {
     const { studentNumber } = student;
+    const { dispatchGetStudent, dispatchAddError } = this.props;
     this.setState({ isLoading: true });
-    this.props.dispatchGetStudent(studentNumber)
+    dispatchGetStudent(studentNumber)
       .then(
         () => this.setState({ studentNumber, isLoading: false }),
-        err => this.props.dispatchAddError(err)
+        err => dispatchAddError(err)
       );
   }
 

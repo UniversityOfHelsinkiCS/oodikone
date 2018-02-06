@@ -44,7 +44,7 @@ const getTableBody = (rows, rowClickFn, selectable) => (
 );
 
 const SearchResultTable = ({
-  headers, rows, rowClickFn, noResultText, selectable
+  headers, rows, rowClickFn, noResultText, selectable, definition
 }) => {
   if (rows.length > 0) {
     return (
@@ -52,6 +52,7 @@ const SearchResultTable = ({
         singleLine
         unstackable
         selectable={selectable}
+        definition={definition}
       >
         {getHeaderRow(headers)}
         {getTableBody(rows, rowClickFn, selectable)}
@@ -62,7 +63,8 @@ const SearchResultTable = ({
 
 SearchResultTable.defaultProps = {
   rowClickFn: () => null,
-  selectable: false
+  selectable: false,
+  definition: false
 };
 
 SearchResultTable.propTypes = {
@@ -70,7 +72,8 @@ SearchResultTable.propTypes = {
   rows: arrayOf(object).isRequired,
   rowClickFn: func,
   noResultText: string.isRequired,
-  selectable: bool
+  selectable: bool,
+  definition: bool
 };
 
 export default SearchResultTable;

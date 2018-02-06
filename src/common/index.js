@@ -61,7 +61,27 @@ export const postJson = (path, data, catchRejected = true) => fetch(`${API_BASE_
   .then(checkForErrors)
   .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
 
-export const reformatDate = (date, dateFormat) => moment(date).format(dateFormat);
+export const reformatDate = (date, outputFormat) => moment(date).format(outputFormat);
 
 export const sortDatesWithFormat = (d1, d2, dateFormat) =>
   moment(d1, dateFormat) - moment(d2, dateFormat);
+
+/* This should be done in backend */
+export const removeInvalidCreditsFromStudent = student => ({
+  ...student,
+  courses: student.courses.map((course) => {
+    if (course.credits > 25) {
+      course.credits = 0;
+    }
+    return course;
+  })
+});
+
+export const removeInvalidCreditsFromStudents = students =>
+  students.map(student => removeInvalidCreditsFromStudent(student));
+
+export const removeInvalidCreditsFromSamples = samples =>
+  samples.map(students => removeInvalidCreditsFromStudents(students));
+
+export const getStudentTotalCredits = student => student.courses.reduce((a, b) => a + b.credits, 0);
+/* ******************** */

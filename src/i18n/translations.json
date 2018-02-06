@@ -10,14 +10,23 @@
     "credits": ["Credits"],
     "date": ["Date"],
     "course": ["Course"],
-    "grade": ["Grade"]
+    "grade": ["Grade"],
+    "passed": ["Passed"]
+  },
+  "graphs": {
+    "referenceCredits": ["Reference credits"]
   },
   "navigationBar" : {
     "departmentSuccess" : ["Department success"],
-    "populations" : ["Populations"],
+    "populations" : ["Population statistics"],
     "students" : ["Student statistics"],
     "courses" : ["Courses"],
     "teachers" : ["Teachers"]
+  },
+  "populationStatistics" : {
+    "header": ["Population statistics"],
+    "graphSegmentHeader" : ["Credit accumulation"],
+    "creditStatisticsHeader" : ["Credit statistics"]
   },
   "departmentSuccess": {
     "chartTitle": ["Average credit gains after 13 months for BSc students starting"]
