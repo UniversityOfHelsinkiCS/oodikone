@@ -14,25 +14,19 @@ import sharedStyles from '../../styles/shared';
 
 
 class StudentDetails extends Component {
-  constructor(props) {
-    super(props);
+  state = {
+    isLoading: false
+  };
 
-    this.renderInfoCard = this.renderInfoCard.bind(this);
-    this.renderCreditsGraph = this.renderCreditsGraph.bind(this);
-    this.renderCourseParticipation = this.renderCourseParticipation.bind(this);
-
-    this.state = {};
-  }
-
-  renderInfoCard() {
+  renderInfoCard = () => {
     const { translate, students, studentNumber } = this.props;
     const student = students[studentNumber];
     if (student) {
       return <StudentInfoCard student={student} translate={translate} />;
     }
     return null;
-  }
-  renderCreditsGraph() {
+  };
+  renderCreditsGraph = () => {
     const { translate, students, studentNumber } = this.props;
     const student = students[studentNumber];
     if (student) {
@@ -45,9 +39,9 @@ class StudentDetails extends Component {
       );
     }
     return null;
-  }
+  };
 
-  renderCourseParticipation() {
+  renderCourseParticipation = () => {
     const { translate, students, studentNumber } = this.props;
     const student = removeInvalidCreditsFromStudent(students[studentNumber]);
     if (student) {
@@ -74,7 +68,7 @@ class StudentDetails extends Component {
       );
     }
     return null;
-  }
+  };
 
   render() {
     const { isLoading } = this.state;

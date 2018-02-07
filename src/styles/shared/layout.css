@@ -14,7 +14,9 @@
 .contentSegment {
   border: none !important;
   box-shadow: none !important;
+  margin-top: 0 !important;
   width: 100%;
   max-width: 1400px;
   min-width: 600px;
+
 }

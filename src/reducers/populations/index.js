@@ -3,7 +3,8 @@ import { combineReducers } from 'redux';
 import {
   GET_POPULATION_STATISTICS_FULFILLED,
   GET_POPULATION_STATISTICS_REJECTED,
-  ADD_NEW_POPULATION_QUERY
+  ADD_NEW_POPULATION_QUERY,
+  CLEAR_POPULATIONS
 }
   from '../../actions';
 
@@ -16,6 +17,8 @@ const samples = (state = [], action) => {
     case GET_POPULATION_STATISTICS_REJECTED: {
       return state;
     }
+    case CLEAR_POPULATIONS:
+      return [];
     default:
       return state;
   }
@@ -27,6 +30,8 @@ const queries = (state = [], action) => {
       const queryObj = action.payload;
       return [...state, queryObj];
     }
+    case CLEAR_POPULATIONS:
+      return [];
     default:
       return state;
   }

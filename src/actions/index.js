@@ -27,6 +27,7 @@ export const GET_POPULATION_STATISTICS = 'GET_POPULATION_STATISTICS';
 export const GET_POPULATION_STATISTICS_FULFILLED = 'GET_POPULATION_STATISTICS_FULFILLED';
 export const GET_POPULATION_STATISTICS_REJECTED = 'GET_POPULATION_STATISTICS_REJECTED';
 export const ADD_NEW_POPULATION_QUERY = 'ADD_NEW_POPULATION_QUERY';
+export const CLEAR_POPULATIONS = 'CLEAR_POPULATIONS';
 
 export const addError = errorJson => ({
   type: ADD_ERROR,
@@ -81,4 +82,8 @@ export const getPopulationStatisticsAction = request => ({
 export const addNewPopulationSampleQueryAction = request => ({
   type: ADD_NEW_POPULATION_QUERY,
   payload: request
+});
+
+export const clearPopulationsAction = () => ({
+  type: CLEAR_POPULATIONS
 });

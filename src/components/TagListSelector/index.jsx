@@ -10,62 +10,51 @@ import styles from './tagListSelector.css';
 
 
 class TagListSelector extends Component {
-  constructor(props) {
-    super(props);
+  state = {
+    isEdit: false,
+    isLoading: false,
+    searchStr: '',
+    existingTags: [],
+    isConfirm: false
+  };
 
-    this.renderTags = this.renderTags.bind(this);
-    this.renderEditComponent = this.renderEditComponent.bind(this);
-    this.setEditable = this.setEditable.bind(this);
-    this.handleSearchChange = this.handleSearchChange.bind(this);
-    this.handleAddTag = this.handleAddTag.bind(this);
-    this.handleRemoveTag = this.handleRemoveTag.bind(this);
-    this.setConfirm = this.setConfirm.bind(this);
 
-    this.state = {
-      isEdit: false,
-      isLoading: false,
-      searchStr: '',
-      existingTags: [],
-      isConfirm: false
-    };
-  }
-
-  setEditable() {
+  setEditable =() => {
     const { isEdit } = this.state;
     this.setState({ isEdit: !isEdit, searchStr: '' });
-  }
+  };
 
-  setConfirm() {
+  setConfirm = () => {
     const { isConfirm } = this.state;
     this.setState({ isConfirm: !isConfirm });
-  }
+  };
 
-  handleSearchChange(e, { value }) {
+  handleSearchChange = (e, { value }) => {
     this.fetchTags(value);
-  }
+  };
 
-  handleAddTag(e, { result }) {
+  handleAddTag = (e, { result }) => {
     const { handleAddTagFn } = this.props;
     handleAddTagFn(result.title);
     this.setEditable();
-  }
+  };
 
-  handleRemoveTag(tag) {
+  handleRemoveTag = (tag) => {
     const { handleRemoveTagFn } = this.props;
     this.setState({ isConfirm: false });
     handleRemoveTagFn(tag);
-  }
+  };
 
-  fetchTags(searchStr) {
+  fetchTags = (searchStr) => {
     this.setState({ isLoading: true, searchStr });
     this.props.dispatchFindTagsAction(searchStr)
       .then(
         json => this.setState({ existingTags: json.value, isLoading: false }),
         err => this.props.dispatchAddError(err)
       );
-  }
+  };
 
-  renderTags() {
+  renderTags =() => {
     const { tags, translate } = this.props;
     const { isConfirm } = this.state;
 
@@ -86,9 +75,9 @@ class TagListSelector extends Component {
       ));
     }
     return null;
-  }
+  };
 
-  renderEditComponent() {
+  renderEditComponent = () => {
     const { tags, translate } = this.props;
     const {
       isEdit, isLoading, searchStr, existingTags
@@ -125,7 +114,7 @@ class TagListSelector extends Component {
         </Icon.Group>
         {translate('tags.addTag')}
       </div>);
-  }
+  };
 
   render() {
     return (

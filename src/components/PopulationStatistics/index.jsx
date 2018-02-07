@@ -13,59 +13,24 @@ import sharedStyles from '../../styles/shared';
 
 
 class PopulationStatistics extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoading: false
-    };
+ state = {
+   isLoading: false
+ };
 
-    this.renderPopulationSearch = this.renderPopulationSearch.bind(this);
-    this.renderPopulationDetails = this.renderPopulationDetails.bind(this);
-  }
 
-  componentDidMount() {
-    const {
-      dispatchGetPopulationStatistics,
-      dispatchAddNewPopulationSampleQuery,
-      dispatchAddError
-    } = this.props;
+  setSearchLoader = (isLoading) => {
+    this.setState(isLoading);
+  };
 
-    const selectedPopulations = {
-      enrollmentDates: ['2010-01-01'],
-      studyRights: ['Master of Science (science), Computer Science'],
-      courses: [],
-      tags: [],
-      studentNumbers: [],
-      excludedTags: [],
-      excludedStudentNumbers: [],
-      excludeStudentsThatHaveNotStartedStudies: false,
-      excludeStudentsWithPreviousStudies: false,
-      excludeStudentsWithZeroCredits: false,
-      monthsToStudy: '',
-      sex: '',
-      matriculationExamination: ''
-    };
-
-    this.setState({ isLoading: true });
-    dispatchGetPopulationStatistics(selectedPopulations)
-      .then(
-        () => {
-          dispatchAddNewPopulationSampleQuery(selectedPopulations);
-          this.setState({ isLoading: false });
-        },
-        err => dispatchAddError(err)
-      );
-  }
-
-  renderPopulationSearch() {
+  renderPopulationSearch = () => {
     const { translate } = this.props;
-    return (<PopulationSearch translate={translate} />);
-  }
+    return (<PopulationSearch translate={translate} isLoadingFn={this.setSearchLoader} />);
+  };
 
-  renderPopulationDetails() {
+  renderPopulationDetails=() => {
     const { translate } = this.props;
     return (<PopulationDetails translate={translate} />);
-  }
+  };
 
   render() {
     const { translate } = this.props;
