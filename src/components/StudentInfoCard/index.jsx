@@ -12,21 +12,15 @@ import styles from './studentInfoCard.css';
 import { addError, addTagToStudentAction, removeTagFromStudentAction, removeTagFromStudentHackSuccessAction } from '../../actions';
 
 class StudentInfoCard extends Component {
-  constructor(props) {
-    super(props);
+ setState = {};
 
-    this.handleAddTagFn = this.handleAddTagFn.bind(this);
-    this.handleRemoveTagFn = this.handleRemoveTagFn.bind(this);
 
-    this.setState = {};
-  }
-
-  handleAddTagFn(tag) {
+  handleAddTagFn = (tag) => {
     const { student, dispatchAddTagToStudent } = this.props;
     dispatchAddTagToStudent(student.studentNumber, { text: tag });
-  }
+  };
 
-  handleRemoveTagFn(tag) {
+  handleRemoveTagFn = (tag) => {
     const {
       student, dispatchRemoveTagFromStudent,
       dispatchRemoveTagFromStudentHackSuccess,
@@ -37,7 +31,7 @@ class StudentInfoCard extends Component {
         () => dispatchRemoveTagFromStudentHackSuccess(student.studentNumber, tag),
         err => dispatchAddError(err)
       );
-  }
+  };
 
   render() {
     const { student, translate } = this.props;

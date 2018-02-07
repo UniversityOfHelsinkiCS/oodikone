@@ -34,12 +34,12 @@ const getCreditStatsForTable = (students, studentsInQuarters) =>
   [getValues(students), ...studentsInQuarters.map(s => getValues(s))];
 
 const CourseQuarters = (props) => {
-  const { translate, sample } = props;
+  const { translate, sample, title } = props;
   const quarters = getStudentSampleInSplitQuarters(sample);
   const stats = getCreditStatsForTable(sample, quarters);
 
   const headers = [
-    '',
+    `${title}`,
     `all (n=${stats[0].n})`,
     `q1, bottom (n=${stats[1].n})`,
     `q2 (n=${stats[2].n})`,
@@ -64,11 +64,14 @@ const CourseQuarters = (props) => {
   />);
 };
 
-const { func, arrayOf, object } = PropTypes;
+const {
+  func, arrayOf, object, string
+} = PropTypes;
 
 CourseQuarters.propTypes = {
   translate: func.isRequired,
-  sample: arrayOf(object).isRequired
+  sample: arrayOf(object).isRequired,
+  title: string.isRequired
 };
 
 export default CourseQuarters;

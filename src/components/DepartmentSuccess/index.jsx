@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { getTranslate, getActiveLanguage } from 'react-localize-redux';
-import { Dimmer, Segment,  Header } from 'semantic-ui-react';
+import { Dimmer, Segment, Header } from 'semantic-ui-react';
 
 import { addError, getDepartmentSuccessAction } from '../../actions';
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants';
@@ -38,24 +38,15 @@ const isInArrayLimits = (amount, index, arrayLenght) =>
     || (index === arrayLenght - 1 && amount === MOVE_RIGHT_AMOUNT));
 
 class DepartmentSuccess extends Component {
-  constructor(props) {
-    super(props);
-    this.onDateInputChange = this.onDateInputChange.bind(this);
-    this.onControlLeft = this.onControlLeft.bind(this);
-    this.onControlRight = this.onControlRight.bind(this);
-    this.onControlButtonSwitch = this.onControlButtonSwitch.bind(this);
-    this.getChartData = this.getChartData.bind(this);
-
-    this.state = {
-      departmentSuccess: {},
-      selectorDates: [],
-      selectedDate: {
-        text: FIRST_DATE,
-        value: reformatDate(FIRST_DATE, API_DATE_FORMAT)
-      },
-      isLoading: true
-    };
-  }
+  state = {
+    departmentSuccess: {},
+    selectorDates: [],
+    selectedDate: {
+      text: FIRST_DATE,
+      value: reformatDate(FIRST_DATE, API_DATE_FORMAT)
+    },
+    isLoading: true
+  };
 
   componentDidMount() {
     const selectorDates = getSelectorDates(FIRST_DATE);
@@ -63,7 +54,7 @@ class DepartmentSuccess extends Component {
     this.getChartData();
   }
 
-  onDateInputChange(e, { value }) {
+  onDateInputChange = (e, { value }) => {
     this.setState({
       selectedDate: {
         text: reformatDate(value, DISPLAY_DATE_FORMAT),
@@ -72,33 +63,33 @@ class DepartmentSuccess extends Component {
       isLoading: true
     });
     this.getChartData();
-  }
+  };
 
-  onControlLeft() {
+  onControlLeft = () => {
     this.onControlButtonSwitch(MOVE_LEFT_AMOUNT);
-  }
+  };
 
-  onControlRight() {
+  onControlRight = () => {
     this.onControlButtonSwitch(MOVE_RIGHT_AMOUNT);
-  }
+  };
 
-  onControlButtonSwitch(amount) {
+  onControlButtonSwitch = (amount) => {
     const { selectorDates, selectedDate } = this.state;
     const index = selectorDates.findIndex(date => date.value === selectedDate.value);
     if (isInArrayLimits(amount, index, selectorDates.length)) {
       this.setState({ selectedDate: selectorDates[index + amount], isLoading: true });
       this.getChartData();
     }
-  }
+  };
 
-  getChartData() {
+  getChartData = () => {
     const { selectedDate } = this.state;
     this.props.dispatchGetDepartmentSuccess(selectedDate.value)
       .then(
         json => this.setState({ departmentSuccess: json.value, isLoading: false }),
         err => this.props.dispatchAddError(err)
       );
-  }
+  };
 
   render() {
     const {

@@ -26,7 +26,8 @@
   "populationStatistics" : {
     "header": ["Population statistics"],
     "graphSegmentHeader" : ["Credit accumulation"],
-    "creditStatisticsHeader" : ["Credit statistics"]
+    "creditStatisticsHeader" : ["Credit statistics"],
+    "sampleId": ["Sample id"]
   },
   "departmentSuccess": {
     "header": ["Department Success"],

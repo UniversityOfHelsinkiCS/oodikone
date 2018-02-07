@@ -18,36 +18,28 @@ const DEFAULT_STATE = {
 };
 
 class StudentSearch extends Component {
-  constructor(props) {
-    super(props);
+ state = DEFAULT_STATE;
 
-    this.resetComponent = this.resetComponent.bind(this);
-    this.handleSearchChange = this.handleSearchChange.bind(this);
-    this.fetchStudentList = this.fetchStudentList.bind(this);
-
-    this.state = DEFAULT_STATE;
-  }
-
-  resetComponent() {
+  resetComponent = () => {
     this.setState(DEFAULT_STATE);
-  }
+  };
 
-  handleSearchChange(e, { value }) {
+  handleSearchChange = (e, { value }) => {
     if (value.length > 0) {
       this.fetchStudentList(value);
     } else {
       this.resetComponent();
     }
-  }
+  };
 
-  fetchStudentList(searchStr) {
+  fetchStudentList = (searchStr) => {
     this.setState({ searchStr, isLoading: true });
     this.props.dispatchFindStudents(searchStr)
       .then(
         json => this.setState({ students: json.value, isLoading: false }),
         err => this.props.dispatchAddError(err)
       );
-  }
+  };
 
   render() {
     const { isLoading, students, searchStr } = this.state;

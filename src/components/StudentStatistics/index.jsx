@@ -12,18 +12,12 @@ import sharedStyles from '../../styles/shared';
 
 
 class StudentStatistics extends Component {
-  constructor(props) {
-    super(props);
+  state = {
+    studentNumber: null,
+    isLoading: false
+  };
 
-    this.handleSearchSelect = this.handleSearchSelect.bind(this);
-    this.partialRender = this.partialRender.bind(this);
-    this.state = {
-      studentNumber: null,
-      isLoading: false
-    };
-  }
-
-  handleSearchSelect(e, student) {
+  handleSearchSelect = (e, student) => {
     const { studentNumber } = student;
     const { dispatchGetStudent, dispatchAddError } = this.props;
     this.setState({ isLoading: true });
@@ -32,9 +26,9 @@ class StudentStatistics extends Component {
         () => this.setState({ studentNumber, isLoading: false }),
         err => dispatchAddError(err)
       );
-  }
+  };
 
-  partialRender() {
+  partialRender = () => {
     const { studentNumber } = this.state;
     const t = this.props.translate;
     if (studentNumber) {
@@ -47,7 +41,8 @@ class StudentStatistics extends Component {
         handleResultFn={this.handleSearchSelect}
         translate={t}
       />);
-  }
+  };
+
   render() {
     const { translate } = this.props;
     const { isLoading } = this.state;

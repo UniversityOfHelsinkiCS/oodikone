@@ -11,13 +11,14 @@
     "development": {
       "plugins": [
         "react-hot-loader/babel",
-        "transform-object-rest-spread"
+        "transform-object-rest-spread",
+        "transform-class-properties"
       ]
     },
     "test": {
       "plugins": [
         "transform-async-to-generator",
-        "inline-json-import"
+        "inline-json-import",
       ]
     }
   }
