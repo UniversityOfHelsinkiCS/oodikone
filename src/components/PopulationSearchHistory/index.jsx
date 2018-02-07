@@ -1,20 +1,31 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Segment } from 'semantic-ui-react';
 
 
+import PopulationQueryCard from '../PopulationQueryCard';
 import { addError } from '../../actions';
 
 class PopulationSearchHistory extends Component {
-
-  renderQueryItem = (item, sample) => (<div>{sample.length}</div>);
+  removePopulation = (query, population) => {
+    console.log(query);
+    console.log(population);
+  };
 
   render() {
-    const { queries, samples } = this.props;
+    const { queries, samples, translate } = this.props;
     return (
       <div>
-        { queries.map((item, i) => this.renderQueryItem(item, samples[i]))}
+        { queries.map((item, i) =>
+          (<PopulationQueryCard
+            key={`population-${i}`}
+            translate={translate}
+            population={samples[i]}
+            query={item}
+            queryId={i}
+            removeSampleFn={this.removePopulation}
+          />))
+        }
       </div>
     );
   }
