@@ -30,13 +30,13 @@ const getValues = (students) => {
   };
 };
 
-const getCreditStats = (students, studentsInQuarters) =>
+const getCreditStatsForTable = (students, studentsInQuarters) =>
   [getValues(students), ...studentsInQuarters.map(s => getValues(s))];
 
 const CourseQuarters = (props) => {
   const { translate, sample } = props;
   const quarters = getStudentSampleInSplitQuarters(sample);
-  const stats = getCreditStats(sample, quarters);
+  const stats = getCreditStatsForTable(sample, quarters);
 
   const headers = [
     '',

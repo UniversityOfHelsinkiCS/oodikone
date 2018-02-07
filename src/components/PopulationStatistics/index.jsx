@@ -4,11 +4,11 @@ import { getActiveLanguage, getTranslate } from 'react-localize-redux';
 import PropTypes from 'prop-types';
 import { Header, Segment, Dimmer, Loader } from 'semantic-ui-react';
 
-import styles from './populationStatistics.css';
 import PopulationSearch from '../PopulationSearch';
 import PopulationDetails from '../PopulationDetails';
 import { addError, addNewPopulationSampleQueryAction, getPopulationStatisticsAction } from '../../actions';
 
+import sharedStyles from '../../styles/shared';
 
 class PopulationStatistics extends Component {
   constructor(props) {
@@ -69,9 +69,9 @@ class PopulationStatistics extends Component {
     const { translate } = this.props;
     const { isLoading } = this.state;
     return (
-      <div className={styles.container}>
-        <Header className={styles.title} size="large">{translate('populationStatistics.header')}</Header>
-        <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={styles.contentSegment}>
+      <div className={sharedStyles.segmentContainer}>
+        <Header className={sharedStyles.segmentTitle} size="large">{translate('populationStatistics.header')}</Header>
+        <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={sharedStyles.contentSegment}>
           <Dimmer active={isLoading} inverted>
             <Loader>{translate('common.loading')}</Loader>
           </Dimmer>

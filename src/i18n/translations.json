@@ -29,6 +29,7 @@
     "creditStatisticsHeader" : ["Credit statistics"]
   },
   "departmentSuccess": {
+    "header": ["Department Success"],
     "chartTitle": ["Average credit gains after 13 months for BSc students starting"]
   },
   "studentStatistics": {

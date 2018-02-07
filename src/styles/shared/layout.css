@@ -1,4 +1,4 @@
-.container {
+.segmentContainer {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6,11 +6,15 @@
   width: 100%;
 }
 
-.title {
+.segmentTitle {
   margin-left: 5px;
   margin-top: 5px;
 }
 
 .contentSegment {
+  border: none !important;
+  box-shadow: none !important;
   width: 99%;
+  max-width: 1400px;
+  min-width: 600px;
 }
