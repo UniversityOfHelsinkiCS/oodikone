@@ -2,13 +2,15 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getActiveLanguage, getTranslate } from 'react-localize-redux';
 import PropTypes from 'prop-types';
-import { Header, Segment, Dimmer, Loader } from 'semantic-ui-react';
+import { Header, Segment, Dimmer } from 'semantic-ui-react';
 
 import PopulationSearch from '../PopulationSearch';
 import PopulationDetails from '../PopulationDetails';
 import { addError, addNewPopulationSampleQueryAction, getPopulationStatisticsAction } from '../../actions';
+import SegmentDimmer from '../SegmentDimmer';
 
 import sharedStyles from '../../styles/shared';
+
 
 class PopulationStatistics extends Component {
   constructor(props) {
@@ -72,9 +74,7 @@ class PopulationStatistics extends Component {
       <div className={sharedStyles.segmentContainer}>
         <Header className={sharedStyles.segmentTitle} size="large">{translate('populationStatistics.header')}</Header>
         <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={sharedStyles.contentSegment}>
-          <Dimmer active={isLoading} inverted>
-            <Loader>{translate('common.loading')}</Loader>
-          </Dimmer>
+          <SegmentDimmer translate={translate} isLoading={isLoading} />
           { this.renderPopulationSearch() }
           { this.renderPopulationDetails() }
         </Dimmer.Dimmable>

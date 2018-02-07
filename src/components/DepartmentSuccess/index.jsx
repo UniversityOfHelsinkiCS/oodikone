@@ -3,13 +3,14 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { getTranslate, getActiveLanguage } from 'react-localize-redux';
-import { Dimmer, Segment, Loader, Header } from 'semantic-ui-react';
+import { Dimmer, Segment,  Header } from 'semantic-ui-react';
 
 import { addError, getDepartmentSuccessAction } from '../../actions';
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants';
 import MulticolorBarChart from '../MulticolorBarChart';
 import ScrollableDateSelector from '../ScrollableDateSelector';
 import { reformatDate } from '../../common';
+import SegmentDimmer from '../SegmentDimmer';
 
 import sharedStyles from '../../styles/shared';
 
@@ -111,9 +112,7 @@ class DepartmentSuccess extends Component {
       <div className={sharedStyles.segmentContainer} >
         <Header className={sharedStyles.segmentTitle} size="large">{translate('departmentSuccess.header')}</Header>
         <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={sharedStyles.contentSegment}>
-          <Dimmer active={isLoading} inverted>
-            <Loader>{translate('common.loading')}</Loader>
-          </Dimmer>
+          <SegmentDimmer translate={translate} isLoading={isLoading} />
           <MulticolorBarChart chartTitle={chartTitle} chartData={chartData} />
           <ScrollableDateSelector
             selectedDate={selectedDate}

@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Segment, Loader, Dimmer } from 'semantic-ui-react';
+import { Segment, Dimmer } from 'semantic-ui-react';
 
 import StudentInfoCard from '../StudentInfoCard';
 import { removeTagFromStudentAction } from '../../actions';
 import CreditAccumulationGraph from '../CreditAccumulationGraph';
 import SearchResultTable from '../SearchResultTable';
 import { removeInvalidCreditsFromStudent } from '../../common';
+import SegmentDimmer from '../SegmentDimmer';
 
-import styles from './studentDetails.css';
+import sharedStyles from '../../styles/shared';
+
 
 class StudentDetails extends Component {
   constructor(props) {
@@ -79,10 +81,8 @@ class StudentDetails extends Component {
     const { translate } = this.props;
 
     return (
-      <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={styles.studentSegment}>
-        <Dimmer active={isLoading} inverted>
-          <Loader>{translate('common.loading')}</Loader>
-        </Dimmer>
+      <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={sharedStyles.contentSegment}>
+        <SegmentDimmer active={isLoading} translate={translate} />
         { this.renderInfoCard() }
         { this.renderCreditsGraph() }
         { this.renderCourseParticipation() }
