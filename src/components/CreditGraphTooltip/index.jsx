@@ -4,6 +4,52 @@ import PropTypes from 'prop-types';
 
 import styles from './creditGraphTooltip.css';
 
+const getCardHeader = title => (
+  <Card.Header className={styles.tooltipHeader}>
+    {title}
+  </Card.Header>
+);
+
+const getCardMeta = (name, date) => (
+  <Card.Meta className={styles.tooltipMeta}>
+    <div>
+      <Icon.Group size="small">
+        <Icon name="student" />
+        <Icon corner name="hashtag" />
+      </Icon.Group>
+      <span>{name}</span>
+    </div>
+    <div>
+      <Icon name="calendar" size="small" />
+      <span>{date}</span>
+    </div>
+  </Card.Meta>
+);
+
+const getCardDescription = (translate, credits, grade, passed) => (
+  <Card.Description className={styles.tooltipBody}>
+    <div className={styles.tooltipBodyItem}>
+      <div className={styles.tooltipBodyTitle}>{translate('common.credits')}</div>
+      <div className={styles.tooltipBodyValue}>{credits}</div>
+
+    </div>
+    <div className={styles.tooltipBodyItem}>
+      <div className={styles.tooltipBodyTitle}>{translate('common.grade')}</div>
+      <div className={styles.tooltipBodyValue}>{grade}</div>
+    </div>
+    <div className={styles.tooltipBodyItem}>
+      <div className={styles.tooltipBodyTitle}>{translate('common.passed')}</div>
+      <div className={styles.tooltipBodyValue}>
+        {
+          passed
+            ? (<Icon name="check circle outline" color="green" />)
+            : (<Icon name="remove circle outline" color="red" />)
+        }
+      </div>
+    </div>
+  </Card.Description>
+);
+
 const CreditGraphTooltip = (props) => {
   const { active, translate } = props;
   if (active) {
@@ -16,43 +62,9 @@ const CreditGraphTooltip = (props) => {
     return (
       <Card>
         <Card.Content >
-          <Card.Header className={styles.tooltipHeader}>
-            {title}
-          </Card.Header>
-          <Card.Meta className={styles.tooltipMeta}>
-            <div>
-              <Icon.Group size="small">
-                <Icon name="student" />
-                <Icon corner name="hashtag" />
-              </Icon.Group>
-              <span>{name}</span>
-            </div>
-            <div>
-              <Icon name="calendar" size="small" />
-              <span>{date}</span>
-            </div>
-          </Card.Meta>
-          <Card.Description className={styles.tooltipBody}>
-            <div className={styles.tooltipBodyItem}>
-              <div className={styles.tooltipBodyTitle}>{translate('common.credits')}</div>
-              <div className={styles.tooltipBodyValue}>{credits}</div>
-
-            </div>
-            <div className={styles.tooltipBodyItem}>
-              <div className={styles.tooltipBodyTitle}>{translate('common.grade')}</div>
-              <div className={styles.tooltipBodyValue}>{grade}</div>
-            </div>
-            <div className={styles.tooltipBodyItem}>
-              <div className={styles.tooltipBodyTitle}>{translate('common.passed')}</div>
-              <div className={styles.tooltipBodyValue}>
-                {
-                  passed
-                    ? (<Icon name="check circle outline" color="green" />)
-                    : (<Icon name="remove circle outline" color="red" />)
-                }
-              </div>
-            </div>
-          </Card.Description>
+          {getCardHeader(title)}
+          {getCardMeta(name, date)}
+          {getCardDescription(translate, credits, grade, passed)}
         </Card.Content>
       </Card>
     );
@@ -64,10 +76,15 @@ const {
   func, bool, arrayOf, object
 } = PropTypes;
 
+CreditGraphTooltip.defaultProps = {
+  active: false,
+  payload: []
+};
+
 CreditGraphTooltip.propTypes = {
   translate: func.isRequired,
-  active: bool.isRequired,
-  payload: arrayOf(object).isRequired
+  active: bool,
+  payload: arrayOf(object)
 };
 
 export default CreditGraphTooltip;
