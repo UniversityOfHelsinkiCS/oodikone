@@ -6,9 +6,9 @@ import { Segment, Header, Dimmer, Loader } from 'semantic-ui-react';
 
 import StudentSearch from '../StudentSearch';
 import StudentDetails from '../StudentDetails';
-
-import styles from './studentStatistics.css';
 import { addError, getStudentAction } from '../../actions';
+
+import sharedStyles from '../../styles/shared';
 
 
 class StudentStatistics extends Component {
@@ -52,9 +52,9 @@ class StudentStatistics extends Component {
     const { translate } = this.props;
     const { isLoading } = this.state;
     return (
-      <div className={styles.container}>
-        <Header className={styles.title} size="large">{translate('studentStatistics.header')}</Header>
-        <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={styles.contentSegment}>
+      <div className={sharedStyles.segmentContainer}>
+        <Header className={sharedStyles.segmentTitle} size="large">{translate('studentStatistics.header')}</Header>
+        <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={sharedStyles.contentSegment}>
           <Dimmer active={isLoading} inverted>
             <Loader>{translate('common.loading')}</Loader>
           </Dimmer>

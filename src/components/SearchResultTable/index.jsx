@@ -49,7 +49,6 @@ const SearchResultTable = ({
   if (rows.length > 0) {
     return (
       <Table
-        singleLine
         unstackable
         selectable={selectable}
         definition={definition}
