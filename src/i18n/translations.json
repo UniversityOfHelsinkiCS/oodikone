@@ -35,7 +35,7 @@
     "clearPopulations": ["Clear populations"],
     "searchTitle": ["Search for populations"],
     "studyRights": ["Study rights"],
-    "ennrollmentDates": ["Ennrollment dates"]
+    "enrollmentDates": ["Enrollment dates"]
   },
   "departmentSuccess": {
     "header": ["Department Success"],

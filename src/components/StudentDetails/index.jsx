@@ -76,7 +76,7 @@ class StudentDetails extends Component {
 
     return (
       <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={sharedStyles.contentSegment}>
-        <SegmentDimmer active={isLoading} translate={translate} />
+        <SegmentDimmer isLoading={isLoading} translate={translate} />
         { this.renderInfoCard() }
         { this.renderCreditsGraph() }
         { this.renderCourseParticipation() }
