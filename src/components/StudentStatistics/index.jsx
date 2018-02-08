@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { getTranslate, getActiveLanguage } from 'react-localize-redux';
-import { Segment, Header, Dimmer, Loader } from 'semantic-ui-react';
+import { Segment, Header, Dimmer } from 'semantic-ui-react';
 
 import StudentSearch from '../StudentSearch';
 import StudentDetails from '../StudentDetails';
 import { addError, getStudentAction } from '../../actions';
+import SegmentDimmer from '../SegmentDimmer';
 
 import sharedStyles from '../../styles/shared';
 
@@ -50,9 +51,7 @@ class StudentStatistics extends Component {
       <div className={sharedStyles.segmentContainer}>
         <Header className={sharedStyles.segmentTitle} size="large">{translate('studentStatistics.header')}</Header>
         <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={sharedStyles.contentSegment}>
-          <Dimmer active={isLoading} inverted>
-            <Loader>{translate('common.loading')}</Loader>
-          </Dimmer>
+          <SegmentDimmer translate={translate} isLoading={isLoading} />
           {this.partialRender()}
         </Dimmer.Dimmable>
       </div>

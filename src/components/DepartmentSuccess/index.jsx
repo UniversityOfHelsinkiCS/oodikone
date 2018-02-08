@@ -50,8 +50,10 @@ class DepartmentSuccess extends Component {
 
   componentDidMount() {
     const selectorDates = getSelectorDates(FIRST_DATE);
-    this.setState({ selectorDates, selectedDate: selectorDates[0] });
-    this.getChartData();
+    this.setState(
+      { selectorDates, selectedDate: selectorDates[0] },
+      () => this.getChartData()
+    );
   }
 
   onDateInputChange = (e, { value }) => {
@@ -61,8 +63,7 @@ class DepartmentSuccess extends Component {
         value
       },
       isLoading: true
-    });
-    this.getChartData();
+    }, () => this.getChartData());
   };
 
   onControlLeft = () => {
@@ -77,8 +78,10 @@ class DepartmentSuccess extends Component {
     const { selectorDates, selectedDate } = this.state;
     const index = selectorDates.findIndex(date => date.value === selectedDate.value);
     if (isInArrayLimits(amount, index, selectorDates.length)) {
-      this.setState({ selectedDate: selectorDates[index + amount], isLoading: true });
-      this.getChartData();
+      this.setState(
+        { selectedDate: selectorDates[index + amount], isLoading: true },
+        () => this.getChartData()
+      );
     }
   };
 

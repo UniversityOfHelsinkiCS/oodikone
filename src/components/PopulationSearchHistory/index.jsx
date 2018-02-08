@@ -17,7 +17,7 @@ class PopulationSearchHistory extends Component {
   renderQueryCards = () => {
     const { populations, translate } = this.props;
     const { samples, queries } = populations;
-
+    console.log(queries);
     return queries.map((query, i) => (
       <PopulationQueryCard
         key={`population-${query.uuid}`}
