@@ -85,3 +85,16 @@ export const flattenAndCleanSamples = samples =>
 
 export const getStudentTotalCredits = student => student.courses.reduce((a, b) => a + b.credits, 0);
 /* ******************** */
+
+export const postJsonGetJson = (path, json, catchRejected = true) =>
+  fetch(`${API_BASE_PATH}${path}`, {
+    method: 'POST',
+    credentials: 'same-origin',
+    'Cache-Control': 'no-cache',
+    headers: new Headers({
+      'Content-Type': 'application/json'
+    }),
+    body: JSON.stringify(json)
+  })
+    .then(checkForErrors)
+    .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
