@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Checkbox, Form, Input, Button, Message } from 'semantic-ui-react';
+import _ from 'lodash';
+import { getTranslate } from 'react-localize-redux';
+import uuidv4 from 'uuid/v4';
 
 import { DISPLAY_DATE_FORMAT } from '../../constants';
 import { reformatDate } from '../../common';
+import { addError, getPopulationStatisticsAction, clearPopulationsAction } from '../../actions';
+
 
 const HARDCODE_STUDY_RIGHTS = [
   'Bachelor of Science, Mathematics',
@@ -13,47 +19,133 @@ const HARDCODE_STUDY_RIGHTS = [
 
 const HARDCODE_DATE = '2010-01-01';
 
+const INITIAL_QUERY = {
+  enrollmentDates: [HARDCODE_DATE],
+  studyRights: [],
+  courses: [],
+  tags: [],
+  studentNumbers: [],
+  excludedTags: [],
+  excludedStudentNumbers: [],
+  excludeStudentsThatHaveNotStartedStudies: false,
+  excludeStudentsWithPreviousStudies: false,
+  excludeStudentsWithZeroCredits: false,
+  monthsToStudy: '',
+  sex: '',
+  matriculationExamination: ''
+};
 
-const PopulationSearchForm = ({
-  translate, handleFormChangeFn, addPopulationFn, isQueryInvalid, clearPopulationsFn
-}) => (
-  <Form error={isQueryInvalid}>
-    <Form.Field>
-      <label htmlFor="enrollmentInput">Enrollment date(s)
-        <Input id="enrollmentInput">{reformatDate(HARDCODE_DATE, DISPLAY_DATE_FORMAT)}</Input>
-      </label>
-    </Form.Field>
-    <Form.Group id="rightGroup" grouped required>
-      <label htmlFor="rightGroup">Study rights</label>
-      {
-      HARDCODE_STUDY_RIGHTS.map(right =>
-        (<Form.Field
-          key={`box-${right.trim()}`}
-          label={right}
-          control={Checkbox}
-          value={right}
-          name="studyRight"
-          onChange={handleFormChangeFn}
-        />))
+
+class PopulationSearchForm extends Component {
+  state = {
+    query: INITIAL_QUERY,
+    isLoading: false
+  };
+
+  validateQuery = () => {
+    const { queries } = this.props;
+    const { query } = this.state;
+    return queries.some(q => _.isEqual(q, query));
+  };
+
+  handleFormChange = (e, data) => {
+    const { checked, value } = data;
+    const { query } = this.state;
+    let { studyRights } = query;
+
+    if (checked) {
+      studyRights = studyRights.concat(value);
+    } else if (!checked) {
+      studyRights = studyRights.filter(right => right !== value);
     }
-    </Form.Group>
-    <Message
-      error
-      header="Population already in analysis"
-      content="You have already fetched a population with the same query."
-    />
-    <Button onClick={addPopulationFn} disabled={isQueryInvalid}>Add population</Button>
-    <Button onClick={clearPopulationsFn}>Clear populations</Button>
-  </Form>);
+    studyRights.sort();
+    this.setState({
+      query: {
+        ...query,
+        studyRights
+      }
+    });
+  };
 
-const { func, bool } = PropTypes;
+  clearPopulations = () => {
+    const { dispatchClearPopulations } = this.props;
+    dispatchClearPopulations();
+  };
+
+  fetchPopulation = () => {
+    const { query } = this.state;
+    const {
+      dispatchGetPopulationStatistics,
+      dispatchAddError
+    } = this.props;
+
+    query.uuid = uuidv4();
+
+    this.setState({ isLoading: true });
+    dispatchGetPopulationStatistics(query)
+      .then(
+        () => this.setState({ isLoading: false }),
+        err => dispatchAddError(err)
+      );
+  };
+
+  render() {
+    const { translate } = this.props;
+    const { isLoading } = this.state;
+    const isQueryInvalid = this.validateQuery();
+    return (
+      <Form error={isQueryInvalid} loading={isLoading}>
+        <Form.Field>
+          <label htmlFor="enrollmentInput">{translate('populationStatistics.enrollmentDates')}
+            <Input id="enrollmentInput">{reformatDate(HARDCODE_DATE, DISPLAY_DATE_FORMAT)}</Input>
+          </label>
+        </Form.Field>
+        <Form.Group id="rightGroup" grouped required>
+          <label htmlFor="rightGroup">{translate('populationStatistics.studyRights')}</label>
+          {
+            HARDCODE_STUDY_RIGHTS.map(right =>
+              (<Form.Field
+                key={`box-${right}`}
+                label={right}
+                control={Checkbox}
+                value={right}
+                name="studyRight"
+                onChange={this.handleFormChange}
+              />))
+          }
+        </Form.Group>
+        <Message
+          error
+          header={translate('populationStatistics.alreadyFetched')}
+        />
+        <Button onClick={this.fetchPopulation} disabled={isQueryInvalid}>{translate('populationStatistics.addPopulation')}</Button>
+        <Button onClick={this.clearPopulations}>{translate('populationStatistics.clearPopulations')}</Button>
+      </Form>
+    );
+  }
+}
+
+const { func, arrayOf, object } = PropTypes;
 
 PopulationSearchForm.propTypes = {
   translate: func.isRequired,
-  handleFormChangeFn: func.isRequired,
-  addPopulationFn: func.isRequired,
-  clearPopulationsFn: func.isRequired,
-  isQueryInvalid: bool.isRequired
+  dispatchGetPopulationStatistics: func.isRequired,
+  dispatchClearPopulations: func.isRequired,
+  dispatchAddError: func.isRequired,
+  queries: arrayOf(object).isRequired
 };
 
-export default PopulationSearchForm;
+const mapStateToProps = ({ populations, locale }) => ({
+  queries: populations.queries,
+  translate: getTranslate(locale)
+});
+
+const mapDispatchToProps = dispatch => ({
+  dispatchGetPopulationStatistics: request =>
+    dispatch(getPopulationStatisticsAction(request)),
+  dispatchClearPopulations: () =>
+    dispatch(clearPopulationsAction()),
+  dispatchAddError: err => dispatch(addError(err))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchForm);

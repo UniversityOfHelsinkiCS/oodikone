@@ -80,8 +80,8 @@ export const removeInvalidCreditsFromStudent = student => ({
 export const removeInvalidCreditsFromStudents = students =>
   students.map(student => removeInvalidCreditsFromStudent(student));
 
-export const removeInvalidCreditsFromSamples = samples =>
-  samples.map(students => removeInvalidCreditsFromStudents(students));
+export const flattenAndCleanSamples = samples =>
+  Object.keys(samples).map(sample => removeInvalidCreditsFromStudents(samples[sample]));
 
 export const getStudentTotalCredits = student => student.courses.reduce((a, b) => a + b.credits, 0);
 /* ******************** */
