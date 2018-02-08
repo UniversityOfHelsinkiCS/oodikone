@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Segment, Header } from 'semantic-ui-react';
+import { getTranslate } from 'react-localize-redux';
 
 import CreditAccumulationGraph from '../CreditAccumulationGraph';
 import CourseQuarters from '../CourseQuarters';
-import { removeInvalidCreditsFromSamples, removeDuplicates } from '../../common';
-
-import sharedStyles from '../../styles/shared';
+import { flattenAndCleanSamples } from '../../common';
 
 class PopulationDetails extends Component {
   state = {};
@@ -73,10 +72,12 @@ const { func, object, arrayOf } = PropTypes;
 PopulationDetails.propTypes = {
   translate: func.isRequired,
   samples: arrayOf(arrayOf(object)).isRequired
+
 };
 
-const mapStateToProps = ({ populations }) => ({
-  samples: removeInvalidCreditsFromSamples(populations.samples)
+const mapStateToProps = ({ populations, locale }) => ({
+  samples: flattenAndCleanSamples(populations.samples),
+  translate: getTranslate(locale)
 });
 
 const mapDispatchToProps = () => ({});

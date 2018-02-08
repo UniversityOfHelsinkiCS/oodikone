@@ -1,5 +1,20 @@
 .cardContainer {
   min-width: 350px !important;
-  width: 100%;
+  padding: 5px 0 5px 5px !important;
+  margin: 0 5px 5px 5px !important;
+  background-color: var(--lightSilver) !important;
 }
 
+.cardHeader {
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
+.controlIcon {
+  cursor: pointer;
+
+  &:hover {
+    font-size: large;
+    color: var(--deepBlack);
+  }
+}

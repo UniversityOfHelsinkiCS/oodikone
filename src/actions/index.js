@@ -28,6 +28,7 @@ export const GET_POPULATION_STATISTICS_FULFILLED = 'GET_POPULATION_STATISTICS_FU
 export const GET_POPULATION_STATISTICS_REJECTED = 'GET_POPULATION_STATISTICS_REJECTED';
 export const ADD_NEW_POPULATION_QUERY = 'ADD_NEW_POPULATION_QUERY';
 export const CLEAR_POPULATIONS = 'CLEAR_POPULATIONS';
+export const REMOVE_POPULATION = 'REMOVE_POPULATION';
 
 export const addError = errorJson => ({
   type: ADD_ERROR,
@@ -74,16 +75,17 @@ export const addTagToStudentAction = (studentNumber, tag) => ({
   payload: addTagToStudent(studentNumber, tag)
 });
 
-export const getPopulationStatisticsAction = request => ({
+export const getPopulationStatisticsAction = query => ({
   type: GET_POPULATION_STATISTICS,
-  payload: postForGetPopulationStatistics(request)
-});
-
-export const addNewPopulationSampleQueryAction = request => ({
-  type: ADD_NEW_POPULATION_QUERY,
-  payload: request
+  meta: { ...query },
+  payload: postForGetPopulationStatistics(query)
 });
 
 export const clearPopulationsAction = () => ({
   type: CLEAR_POPULATIONS
+});
+
+export const removePopulationAction = uuid => ({
+  type: REMOVE_POPULATION,
+  payload: { uuid }
 });
