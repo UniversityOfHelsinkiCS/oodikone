@@ -7,6 +7,9 @@ import {
   removeTagFromStudent,
   addTagToStudent,
   postForGetPopulationStatistics
+  findCoursesByName,
+  findCourseInstances,
+  getInstanceStatistics
 } from '../api';
 
 export const ADD_ERROR = 'ADD_ERROR';
@@ -29,6 +32,8 @@ export const GET_POPULATION_STATISTICS_REJECTED = 'GET_POPULATION_STATISTICS_REJ
 export const ADD_NEW_POPULATION_QUERY = 'ADD_NEW_POPULATION_QUERY';
 export const CLEAR_POPULATIONS = 'CLEAR_POPULATIONS';
 export const REMOVE_POPULATION = 'REMOVE_POPULATION';
+export const FIND_INSTANCES = 'FIND_INSTANCES';
+export const GET_INSTANCE_STATS = 'GET_INSTANCE_STATISTICS';
 
 export const addError = errorJson => ({
   type: ADD_ERROR,
@@ -88,4 +93,13 @@ export const clearPopulationsAction = () => ({
 export const removePopulationAction = uuid => ({
   type: REMOVE_POPULATION,
   payload: { uuid }
+});
+export const findInstancesAction = code => ({
+  type: FIND_INSTANCES,
+  payload: findCourseInstances(code)
+});
+
+export const getInstanceStatisticsAction = (date, code, months) => ({
+  type: GET_INSTANCE_STATS,
+  payload: getInstanceStatistics(date, code, months)
 });
