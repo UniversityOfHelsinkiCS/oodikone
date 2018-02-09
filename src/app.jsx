@@ -24,7 +24,6 @@ if (process.env.NODE_ENV === 'development') {
 const translations = require('./i18n/translations.json');
 
 const store = createStore(reducers, applyMiddleware(...reduxMiddlewares));
-
 store.dispatch(initialize(AVAILABLE_LANGUAGES, { defaultLanguage: DEFAULT_LANG }));
 store.dispatch(addTranslation(translations));
 

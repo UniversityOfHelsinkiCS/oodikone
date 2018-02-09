@@ -1,6 +1,7 @@
 import React from 'react';
 import { jStat } from 'jStat';
 import _ from 'lodash';
+import { Message } from 'semantic-ui-react';
 import { func, arrayOf, object, string } from 'prop-types';
 
 import SearchResultTable from '../SearchResultTable';
@@ -35,6 +36,14 @@ const getCreditStatsForTable = (students, studentsInQuarters) =>
 
 const CourseQuarters = (props) => {
   const { translate, sample, title } = props;
+  if (sample.length === 0) {
+    return (
+      <Message warning>
+        <Message.Header>{title}</Message.Header>
+        <p>{translate('common.noResults')}</p>
+      </Message>
+    );
+  }
   const quarters = getStudentSampleInSplitQuarters(sample);
   const stats = getCreditStatsForTable(sample, quarters);
 

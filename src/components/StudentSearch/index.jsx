@@ -23,7 +23,7 @@ class StudentSearch extends Component {
     dispatchGetStudent: func.isRequired,
     dispatchAddError: func.isRequired,
     translate: func.isRequired
-  }
+  };
 
  state = DEFAULT_STATE;
 

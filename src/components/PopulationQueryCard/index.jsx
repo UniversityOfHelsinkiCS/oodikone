@@ -2,12 +2,14 @@ import React from 'react';
 import { func, arrayOf, object, number, shape } from 'prop-types';
 import { Card, Icon } from 'semantic-ui-react';
 
+import { dateFromApiToDisplay } from '../../common';
+
 import styles from './populationQueryCard.css';
 
 const PopulationQueryCard = ({
   translate, population, query, queryId, removeSampleFn
 }) => {
-  const { uuid, studyRights } = query;
+  const { uuid, studyRights, enrollmentDates } = query;
 
   return (
     <Card className={styles.cardContainer}>
@@ -33,6 +35,11 @@ const PopulationQueryCard = ({
               {` ${translate('populationStatistics.allPopulations')}`}
             </div>
           )
+        }
+        {enrollmentDates.length > 0 ?
+          enrollmentDates.map(date =>
+            (<div className={styles.dateItem} key={date}><Icon name="calendar" size="small" /> {dateFromApiToDisplay(date)}</div>))
+          : (null)
         }
       </Card.Meta>
     </Card>

@@ -64,7 +64,7 @@ class StudentDetails extends Component {
     }
     return (
       <Segment className={sharedStyles.contentSegment} >
-        <StudentInfoCard student={student} translate={translate} />;
+        <StudentInfoCard student={student} translate={translate} />
         { this.renderCreditsGraph() }
         { this.renderCourseParticipation() }
       </Segment>
@@ -72,8 +72,8 @@ class StudentDetails extends Component {
   }
 }
 
-const mapStateToProps = ({ students }) => ({
-  student: students.selectedStudent
+const mapStateToProps = ({ studentReducer }) => ({
+  student: studentReducer.selectedStudent
 });
 
 const mapDispatchToProps = dispatch => ({

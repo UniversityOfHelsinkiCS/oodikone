@@ -5,19 +5,15 @@ import departmentSuccess from './departmentSuccess';
 import students from './students';
 import populations from './populations';
 import tags from './tags';
+import errorReducer from './errorReducer';
 
-
-import {
-
-} from '../actions';
 
 /* collect reducers here from subfolders */
-const reducers = combineReducers({
+export default combineReducers({
   departmentSuccess,
   locale,
-  students,
-  populations,
-  tags
+  studentReducer: students,
+  populationReducer: populations,
+  tags,
+  errors: errorReducer
 });
-
-export default reducers;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table } from 'semantic-ui-react';
-import { arrayOf, string, object, func, bool } from 'prop-types';
+import { arrayOf, string, object, func, bool, oneOfType, array } from 'prop-types';
 
 import styles from './searchResultsTable.css';
 
@@ -63,7 +63,7 @@ SearchResultTable.defaultProps = {
 
 SearchResultTable.propTypes = {
   headers: arrayOf(string).isRequired,
-  rows: arrayOf(object).isRequired,
+  rows: oneOfType([array, arrayOf(object)]).isRequired,
   rowClickFn: func,
   noResultText: string.isRequired,
   selectable: bool,
