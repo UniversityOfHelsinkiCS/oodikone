@@ -1,12 +1,11 @@
 import {
   getDepartmentSuccess,
   findStudents,
-  findCoursesByName,
   getStudent,
   findTags,
   removeTagFromStudent,
   addTagToStudent,
-  postForGetPopulationStatistics
+  postForGetPopulationStatistics,
   findCoursesByName,
   findCourseInstances,
   getInstanceStatistics
@@ -22,14 +21,12 @@ export const FIND_TAGS = 'FIND_TAGS';
 export const REMOVE_TAG_FROM_STUDENT = 'REMOVE_TAG_FROM_STUDENT';
 export const REMOVE_TAG_FROM_STUDENT_FULFILLED = 'REMOVE_TAG_FROM_STUDENT_FULFILLED';
 export const REMOVE_TAG_FROM_STUDENT_REJECTED = 'REMOVE_TAG_FROM_STUDENT_REJECTED';
-export const REMOVE_TAG_FROM_STUDENT_HACK_SUCCESS = 'REMOVE_TAG_FROM_STUDENT_HACK_SUCCESS';
 export const ADD_TAG_TO_STUDENT = 'ADD_TAG_TO_STUDENT';
 export const ADD_TAG_TO_STUDENT_FULFILLED = 'ADD_TAG_TO_STUDENT_FULFILLED';
 export const ADD_TAG_TO_STUDENT_REJECTED = 'ADD_TAG_TO_STUDENT_REJECTED';
 export const GET_POPULATION_STATISTICS = 'GET_POPULATION_STATISTICS';
 export const GET_POPULATION_STATISTICS_FULFILLED = 'GET_POPULATION_STATISTICS_FULFILLED';
 export const GET_POPULATION_STATISTICS_REJECTED = 'GET_POPULATION_STATISTICS_REJECTED';
-export const ADD_NEW_POPULATION_QUERY = 'ADD_NEW_POPULATION_QUERY';
 export const CLEAR_POPULATIONS = 'CLEAR_POPULATIONS';
 export const REMOVE_POPULATION = 'REMOVE_POPULATION';
 export const FIND_INSTANCES = 'FIND_INSTANCES';
@@ -67,16 +64,13 @@ export const findTagsAction = searchStr => ({
 
 export const removeTagFromStudentAction = (studentNumber, tag) => ({
   type: REMOVE_TAG_FROM_STUDENT,
+  meta: { studentNumber, tag: tag.text },
   payload: removeTagFromStudent(studentNumber, tag)
-});
-
-export const removeTagFromStudentHackSuccessAction = (studentNumber, tag) => ({
-  type: REMOVE_TAG_FROM_STUDENT_HACK_SUCCESS,
-  payload: { studentNumber, tag }
 });
 
 export const addTagToStudentAction = (studentNumber, tag) => ({
   type: ADD_TAG_TO_STUDENT,
+  meta: { studentNumber, tag: tag.text },
   payload: addTagToStudent(studentNumber, tag)
 });
 
@@ -94,6 +88,7 @@ export const removePopulationAction = uuid => ({
   type: REMOVE_POPULATION,
   payload: { uuid }
 });
+
 export const findInstancesAction = code => ({
   type: FIND_INSTANCES,
   payload: findCourseInstances(code)

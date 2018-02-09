@@ -2,58 +2,26 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { getTranslate, getActiveLanguage } from 'react-localize-redux';
-import { Segment, Header, Dimmer } from 'semantic-ui-react';
+import { Segment, Header } from 'semantic-ui-react';
 
 import StudentSearch from '../StudentSearch';
 import StudentDetails from '../StudentDetails';
-import { addError, getStudentAction } from '../../actions';
-import SegmentDimmer from '../SegmentDimmer';
 
 import sharedStyles from '../../styles/shared';
 
 
 class StudentStatistics extends Component {
-  state = {
-    studentNumber: null,
-    isLoading: false
-  };
-
-  handleSearchSelect = (e, student) => {
-    const { studentNumber } = student;
-    const { dispatchGetStudent, dispatchAddError } = this.props;
-    this.setState({ isLoading: true });
-    dispatchGetStudent(studentNumber)
-      .then(
-        () => this.setState({ studentNumber, isLoading: false }),
-        err => dispatchAddError(err)
-      );
-  };
-
-  partialRender = () => {
-    const { studentNumber } = this.state;
-    const t = this.props.translate;
-    if (studentNumber) {
-      return (
-        <StudentDetails studentNumber={studentNumber} translate={t} />
-      );
-    }
-    return (
-      <StudentSearch
-        handleResultFn={this.handleSearchSelect}
-        translate={t}
-      />);
-  };
+  state = { };
 
   render() {
     const { translate } = this.props;
-    const { isLoading } = this.state;
     return (
       <div className={sharedStyles.segmentContainer}>
         <Header className={sharedStyles.segmentTitle} size="large">{translate('studentStatistics.header')}</Header>
-        <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={sharedStyles.contentSegment}>
-          <SegmentDimmer translate={translate} isLoading={isLoading} />
-          {this.partialRender()}
-        </Dimmer.Dimmable>
+        <Segment className={sharedStyles.contentSegment}>
+          <StudentSearch translate={translate} />
+          <StudentDetails translate={translate} />
+        </Segment>
       </div>
     );
   }
@@ -62,9 +30,7 @@ class StudentStatistics extends Component {
 const { func } = PropTypes;
 
 StudentStatistics.propTypes = {
-  translate: func.isRequired,
-  dispatchAddError: func.isRequired,
-  dispatchGetStudent: func.isRequired
+  translate: func.isRequired
 };
 
 const mapStateToProps = ({ locale }) => ({
@@ -72,11 +38,7 @@ const mapStateToProps = ({ locale }) => ({
   currentLanguage: getActiveLanguage(locale).value
 });
 
-const mapDispatchToProps = dispatch => ({
-  dispatchGetStudent: studentNumber =>
-    dispatch(getStudentAction(studentNumber)),
-  dispatchAddError: err => dispatch(addError(err))
-});
+const mapDispatchToProps = () => ({});
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudentStatistics);
 
