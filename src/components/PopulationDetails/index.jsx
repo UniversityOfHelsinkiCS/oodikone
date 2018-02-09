@@ -14,11 +14,13 @@ class PopulationDetails extends Component {
     samples: arrayOf(arrayOf(object)).isRequired
   };
 
+  isSamplesRenderable = () => {
+    const { samples } = this.props;
+    return samples && samples.length > 0;
+  };
+
   renderCourseStatistics = () => {
     const { samples, translate } = this.props;
-    if (!samples && samples.length === 0) {
-      return null;
-    }
     let statistics = [];
     if (samples) {
       statistics = samples.map((sample, i) =>
@@ -39,9 +41,6 @@ class PopulationDetails extends Component {
 
   renderCreditGainGraphs = () => {
     const { samples, translate } = this.props;
-    if (!samples || samples.length === 0) {
-      return null;
-    }
     const graphs = samples.map((sample, i) =>
       (<CreditAccumulationGraph
         key={`credit-graph-${i}`} // eslint-disable-line react/no-array-index-key
@@ -58,6 +57,9 @@ class PopulationDetails extends Component {
   };
 
   render() {
+    if (!this.isSamplesRenderable()) {
+      return null;
+    }
     return (
       <div>
         { this.renderCourseStatistics() }
