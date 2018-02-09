@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { func, shape, object } from 'prop-types';
 import { connect } from 'react-redux';
 import { Segment } from 'semantic-ui-react';
 import { isEmpty } from 'lodash';
@@ -13,7 +13,10 @@ import { removeInvalidCreditsFromStudent } from '../../common';
 import sharedStyles from '../../styles/shared';
 
 class StudentDetails extends Component {
-  state = {};
+  static propTypes = {
+    translate: func.isRequired,
+    student: shape(object).isRequired
+  };
 
   renderCreditsGraph = () => {
     const { translate, student } = this.props;
@@ -68,13 +71,6 @@ class StudentDetails extends Component {
     );
   }
 }
-
-const { func, shape, object } = PropTypes;
-
-StudentDetails.propTypes = {
-  translate: func.isRequired,
-  student: shape(object).isRequired
-};
 
 const mapStateToProps = ({ students }) => ({
   student: students.selectedStudent

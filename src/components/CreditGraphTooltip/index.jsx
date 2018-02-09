@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Icon } from 'semantic-ui-react';
-import PropTypes from 'prop-types';
+import { func, bool, arrayOf, object } from 'prop-types';
 
 import styles from './creditGraphTooltip.css';
 
@@ -71,10 +71,6 @@ const CreditGraphTooltip = (props) => {
   }
   return null;
 };
-
-const {
-  func, bool, arrayOf, object
-} = PropTypes;
 
 CreditGraphTooltip.defaultProps = {
   active: false,

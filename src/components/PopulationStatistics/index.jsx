@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getActiveLanguage, getTranslate } from 'react-localize-redux';
-import PropTypes from 'prop-types';
+import { func } from 'prop-types';
 import { Header, Segment, Divider } from 'semantic-ui-react';
 
 import PopulationSearchForm from '../PopulationSearchForm';
@@ -12,6 +12,10 @@ import sharedStyles from '../../styles/shared';
 
 
 class PopulationStatistics extends Component {
+  static propTypes = {
+    translate: func.isRequired
+  };
+
   renderPopulationSearch = () => {
     const { translate } = this.props;
     return (
@@ -37,12 +41,6 @@ class PopulationStatistics extends Component {
     );
   }
 }
-
-const { func } = PropTypes;
-
-PopulationStatistics.propTypes = {
-  translate: func.isRequired
-};
 
 const mapStateToProps = ({ locale }) => ({
   translate: getTranslate(locale),

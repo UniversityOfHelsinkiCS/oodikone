@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { arrayOf, object, string, func } from 'prop-types';
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line, Tooltip, CartesianGrid } from 'recharts';
 import _ from 'lodash';
 import moment from 'moment';
@@ -155,11 +155,6 @@ const CreditAccumulationGraph = (props) => {
     </div>
   );
 };
-
-
-const {
-  arrayOf, object, string, func
-} = PropTypes;
 
 CreditAccumulationGraph.propTypes = {
   translate: func.isRequired,

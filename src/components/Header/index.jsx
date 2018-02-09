@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import { func } from 'prop-types';
 import { getActiveLanguage, getTranslate } from 'react-localize-redux';
 
 import NavigationBar from '../NavigationBar';
@@ -13,8 +13,6 @@ const Header = props => (
     <NavigationBar translate={props.translate} />
   </header>
 );
-
-const { func } = PropTypes;
 
 Header.propTypes = {
   translate: func.isRequired

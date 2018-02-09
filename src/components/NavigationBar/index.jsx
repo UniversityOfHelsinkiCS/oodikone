@@ -1,18 +1,24 @@
 import React, { Component } from 'react';
 import { Menu } from 'semantic-ui-react';
 import { Link, withRouter } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import { func, instanceOf, object } from 'prop-types';
 
 import { routes } from '../../constants';
 
 import styles from './navigationBar.css';
 
 class NavigationBar extends Component {
-  constructor(props) {
-    super(props);
-    const location = props.location.pathname;
-    this.state = { activeItem: location };
+  static propTypes = {
+    translate: func.isRequired,
+    location: instanceOf(object).isRequired
+  };
+  state = { activeItem: '/' };
+
+  componentDidMount() {
+    const { pathname } = this.props.location;
+    this.setState({ activeItem: pathname });
   }
+
   render() {
     const { activeItem } = this.state;
     const t = this.props.translate;
@@ -46,13 +52,6 @@ class NavigationBar extends Component {
       </Menu>);
   }
 }
-
-const { func, instanceOf } = PropTypes;
-
-NavigationBar.propTypes = {
-  translate: func.isRequired,
-  location: instanceOf(Object).isRequired
-};
 
 export default withRouter(NavigationBar);
 

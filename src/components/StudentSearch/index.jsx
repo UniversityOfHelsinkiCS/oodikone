@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { func } from 'prop-types';
 import { connect } from 'react-redux';
 import { Search, Segment } from 'semantic-ui-react';
 
@@ -10,9 +10,6 @@ import SegmentDimmer from '../SegmentDimmer';
 import sharedStyles from '../../styles/shared';
 import styles from './studentSearch.css';
 
-
-const { func } = PropTypes;
-
 const DEFAULT_STATE = {
   students: [],
   isLoading: false,
@@ -21,6 +18,13 @@ const DEFAULT_STATE = {
 };
 
 class StudentSearch extends Component {
+  static propTypes = {
+    dispatchFindStudents: func.isRequired,
+    dispatchGetStudent: func.isRequired,
+    dispatchAddError: func.isRequired,
+    translate: func.isRequired
+  }
+
  state = DEFAULT_STATE;
 
   resetComponent = () => {
@@ -88,7 +92,6 @@ class StudentSearch extends Component {
     const { isLoading, searchStr } = this.state;
     const { translate } = this.props;
 
-
     return (
       <div className={styles.searchContainer}>
         <Search
@@ -108,13 +111,6 @@ class StudentSearch extends Component {
     );
   }
 }
-
-StudentSearch.propTypes = {
-  dispatchFindStudents: func.isRequired,
-  dispatchGetStudent: func.isRequired,
-  dispatchAddError: func.isRequired,
-  translate: func.isRequired
-};
 
 const mapStateToProps = () => ({});
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { jStat } from 'jStat';
 import _ from 'lodash';
-import PropTypes from 'prop-types';
+import { func, arrayOf, object, string } from 'prop-types';
 
 import SearchResultTable from '../SearchResultTable';
 import { getStudentTotalCredits } from '../../common';
@@ -63,10 +63,6 @@ const CourseQuarters = (props) => {
     definition
   />);
 };
-
-const {
-  func, arrayOf, object, string
-} = PropTypes;
 
 CourseQuarters.propTypes = {
   translate: func.isRequired,

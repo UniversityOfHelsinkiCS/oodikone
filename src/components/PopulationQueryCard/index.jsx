@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { func, arrayOf, object, number, shape } from 'prop-types';
 import { Card, Icon } from 'semantic-ui-react';
 
 import styles from './populationQueryCard.css';
@@ -35,14 +35,9 @@ const PopulationQueryCard = ({
           )
         }
       </Card.Meta>
-
     </Card>
   );
 };
-
-const {
-  func, arrayOf, object, number, shape
-} = PropTypes;
 
 PopulationQueryCard.propTypes = {
   translate: func.isRequired,

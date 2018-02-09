@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { arrayOf, func } from 'prop-types';
 import { Icon, Dropdown } from 'semantic-ui-react';
 
 import { displayableDateType } from '../../constants/types';
@@ -79,8 +79,6 @@ const ScrollableDateSelector = (props) => {
     </div>
   );
 };
-
-const { arrayOf, func } = PropTypes;
 
 ScrollableDateSelector.propTypes = {
   selectedDate: displayableDateType.isRequired,

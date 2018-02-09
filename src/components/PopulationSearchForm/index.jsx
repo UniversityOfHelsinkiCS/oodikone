@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import { func, arrayOf, object } from 'prop-types';
 import { Checkbox, Form, Input, Button, Message } from 'semantic-ui-react';
 import _ from 'lodash';
 import { getTranslate } from 'react-localize-redux';
@@ -37,6 +37,14 @@ const INITIAL_QUERY = {
 
 
 class PopulationSearchForm extends Component {
+  static propTypes = {
+    translate: func.isRequired,
+    dispatchGetPopulationStatistics: func.isRequired,
+    dispatchClearPopulations: func.isRequired,
+    dispatchAddError: func.isRequired,
+    queries: arrayOf(object).isRequired
+  };
+
   state = {
     query: INITIAL_QUERY,
     isLoading: false
@@ -124,16 +132,6 @@ class PopulationSearchForm extends Component {
     );
   }
 }
-
-const { func, arrayOf, object } = PropTypes;
-
-PopulationSearchForm.propTypes = {
-  translate: func.isRequired,
-  dispatchGetPopulationStatistics: func.isRequired,
-  dispatchClearPopulations: func.isRequired,
-  dispatchAddError: func.isRequired,
-  queries: arrayOf(object).isRequired
-};
 
 const mapStateToProps = ({ populations, locale }) => ({
   queries: populations.queries,
