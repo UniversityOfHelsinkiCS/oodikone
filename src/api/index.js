@@ -27,3 +27,9 @@ export const removeTagFromStudent = (studentNumber, tag) => deleteItem(`/student
   .then(throwErrors);
 
 export const addTagToStudent = (studentNumber, tag) => postJson(`/students/${studentNumber}/tags`, tag).then(throwErrors);
+
+export const postForGetPopulationStatistics = request => postJson('/populationstatistics', request).then(throwErrors);
+
+export const findCourseInstances = code => getJson(`/v2/courselist?code=${code}`).then(throwErrors);
+
+export const getInstanceStatistics = (date, code, months) => getJson(`/v2/coursestatistics?date=${date}&code=${code}&months=${months}`).then(throwErrors);

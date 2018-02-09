@@ -10,16 +10,36 @@
     "credits": ["Credits"],
     "date": ["Date"],
     "course": ["Course"],
-    "grade": ["Grade"]
+    "grade": ["Grade"],
+    "passed": ["Passed"]
+  },
+  "graphs": {
+    "referenceCredits": ["Reference credits"]
   },
   "navigationBar" : {
     "departmentSuccess" : ["Department success"],
-    "populations" : ["Populations"],
+    "populations" : ["Population statistics"],
     "students" : ["Student statistics"],
     "courses" : ["Courses"],
     "teachers" : ["Teachers"]
   },
+  "populationStatistics" : {
+    "header": ["Population statistics"],
+    "graphSegmentHeader" : ["Credit accumulation"],
+    "creditStatisticsHeader" : ["Credit statistics"],
+    "sampleId": ["Id"],
+    "sampleSize" : ["Sample size: ${ amount } students"],
+    "allPopulations" : ["All populations"],
+    "alreadyFetched": ["Population already in analysis"],
+    "selectDate": ["Select at least one enrollment date"],
+    "addPopulation": ["Add population"],
+    "clearPopulations": ["Clear populations"],
+    "searchTitle": ["Search for populations"],
+    "studyRights": ["Study rights"],
+    "enrollmentDates": ["Enrollment dates"]
+  },
   "departmentSuccess": {
+    "header": ["Department Success"],
     "chartTitle": ["Average credit gains after 13 months for BSc students starting"]
   },
   "studentStatistics": {

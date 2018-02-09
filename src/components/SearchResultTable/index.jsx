@@ -1,13 +1,8 @@
 import React from 'react';
 import { Table } from 'semantic-ui-react';
-import PropTypes from 'prop-types';
+import { arrayOf, string, object, func, bool, oneOfType, array } from 'prop-types';
 
 import styles from './searchResultsTable.css';
-
-const {
-  arrayOf, string, object, func, bool
-} = PropTypes;
-
 
 const getHeaderRow = headers => (
   <Table.Header>
@@ -44,14 +39,14 @@ const getTableBody = (rows, rowClickFn, selectable) => (
 );
 
 const SearchResultTable = ({
-  headers, rows, rowClickFn, noResultText, selectable
+  headers, rows, rowClickFn, noResultText, selectable, definition
 }) => {
   if (rows.length > 0) {
     return (
       <Table
-        singleLine
         unstackable
         selectable={selectable}
+        definition={definition}
       >
         {getHeaderRow(headers)}
         {getTableBody(rows, rowClickFn, selectable)}
@@ -62,15 +57,17 @@ const SearchResultTable = ({
 
 SearchResultTable.defaultProps = {
   rowClickFn: () => null,
-  selectable: false
+  selectable: false,
+  definition: false
 };
 
 SearchResultTable.propTypes = {
   headers: arrayOf(string).isRequired,
-  rows: arrayOf(object).isRequired,
+  rows: oneOfType([array, arrayOf(object)]).isRequired,
   rowClickFn: func,
   noResultText: string.isRequired,
-  selectable: bool
+  selectable: bool,
+  definition: bool
 };
 
 export default SearchResultTable;

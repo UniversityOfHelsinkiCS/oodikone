@@ -1,20 +1,34 @@
 import React, { Component } from 'react';
 import { Menu } from 'semantic-ui-react';
 import { Link, withRouter } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import { func, string, shape } from 'prop-types';
 
 import { routes } from '../../constants';
 
 import styles from './navigationBar.css';
 
 class NavigationBar extends Component {
-  constructor(props) {
-    super(props);
-    const location = props.location.pathname;
-    this.state = { activeItem: location };
+  static propTypes = {
+    translate: func.isRequired,
+    location: shape({
+      pathname: string.isRequired
+    })
+  };
+  static defaultProps = {
+    location: {
+      pathname: '/'
+    }
+  };
+
+  state = { };
+
+  componentDidMount() {
+    const { pathname } = this.props.location;
+    this.setState({ pathname });
   }
+
   render() {
-    const { activeItem } = this.state;
+    const { pathname } = this.state;
     const t = this.props.translate;
 
     const menuWidth = Object.keys(routes).length + 1;
@@ -24,7 +38,7 @@ class NavigationBar extends Component {
         <Menu.Item
           as={Link}
           to={routes.index.route}
-          onClick={() => this.setState({ activeItem: routes.index.route })}
+          onClick={() => this.setState({ pathname: routes.index.route })}
         >
           <span className={styles.logo}>
             <h2 className={styles.logoText}>oodikone</h2>
@@ -36,8 +50,8 @@ class NavigationBar extends Component {
               as={Link}
               key={`menu-item-${value.route}`}
               to={value.route}
-              active={activeItem === value.route}
-              onClick={() => this.setState({ activeItem: value.route })}
+              active={pathname === value.route}
+              onClick={() => this.setState({ pathname: value.route })}
             >
               {t(`navigationBar.${value.translateId}`)}
             </Menu.Item>
@@ -46,13 +60,6 @@ class NavigationBar extends Component {
       </Menu>);
   }
 }
-
-const { func, instanceOf } = PropTypes;
-
-NavigationBar.propTypes = {
-  translate: func.isRequired,
-  location: instanceOf(Object).isRequired
-};
 
 export default withRouter(NavigationBar);
 

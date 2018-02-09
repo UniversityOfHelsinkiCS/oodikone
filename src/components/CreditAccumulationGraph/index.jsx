@@ -1,90 +1,162 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line, Tooltip } from 'recharts';
+import { arrayOf, object, string, func } from 'prop-types';
+import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line, Tooltip, CartesianGrid } from 'recharts';
 import _ from 'lodash';
 import moment from 'moment';
-import { Header, Segment } from 'semantic-ui-react';
+import { Header, Segment, Message } from 'semantic-ui-react';
+
+import { DISPLAY_DATE_FORMAT, CHART_COLORS, API_DATE_FORMAT } from '../../constants';
+import { reformatDate, sortDatesWithFormat } from '../../common';
+import { turquoise } from '../../styles/variables/colors';
 
 import styles from './creditAccumulationGraph.css';
-import { DISPLAY_DATE_FORMAT } from '../../constants';
-import { reformatDate, sortDatesWithFormat } from '../../common';
-import { red, turquoise } from '../../styles/variables/colors';
+import CreditGraphTooltip from '../CreditGraphTooltip';
 
-const getStudentData = (courses) => {
+const getXAxisMonth = (date, startDate) =>
+  Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0);
+
+const getReferenceLineForStudent = (student) => {
+  const { courses, started } = student;
+  const lastDate = moment(_.maxBy(courses, course => moment(course.date)).date);
+  const lastMonth = Math.ceil(getXAxisMonth(lastDate, started));
+  const lastCredits = lastMonth * (55 / 12);
+
+  return [{
+    month: 0,
+    referenceCredits: 0,
+    date: reformatDate(started, DISPLAY_DATE_FORMAT)
+  },
+  {
+    month: lastMonth,
+    referenceCredits: lastCredits,
+    date: reformatDate(lastDate, DISPLAY_DATE_FORMAT)
+  }];
+};
+
+const isReferenceLine = students => students.length === 1;
+
+const getReferenceLineIfApplicable = (students, title) => {
+  if (!isReferenceLine(students)) {
+    return null;
+  }
+  return (<Line
+    type="monotone"
+    activeDot={false}
+    dot={false}
+    isAnimationActive={false}
+    name={title}
+    dataKey="referenceCredits"
+    stroke={turquoise}
+    connectNulls
+  />);
+};
+
+
+const getStudentCourseData = (student) => {
+  const { studentNumber, started, courses } = student;
+
+  const filteredCourses = courses.filter(c => moment(c.date).isSameOrAfter(moment(started)));
+
   let totalCredits = 0;
-  return courses.map((c) => {
-    const { course, date, credits } = c;
+  return filteredCourses.map((c) => {
+    const {
+      course, date, credits, grade, passed
+    } = c;
     totalCredits += credits;
     return {
       title: `${course.name} (${course.code})`,
-      totalCredits,
+      [studentNumber]: totalCredits,
       credits,
-      date: reformatDate(date, DISPLAY_DATE_FORMAT)
+      date: reformatDate(date, DISPLAY_DATE_FORMAT),
+      month: getXAxisMonth(date, started),
+      grade,
+      passed
     };
   });
 };
 
-const getCombinedChartData = (courses, startDate) => {
-  const lastDate = moment(_.maxBy(courses, course => moment(course.date)).date);
-
-  const studentData = getStudentData(courses);
-  const dates = {};
-  let day = moment(startDate);
-  let lastReferenceDay = moment(startDate);
-  let referenceCredits = 0;
-  while (!day.isAfter(lastDate)) {
-    const displayDate = reformatDate(day, DISPLAY_DATE_FORMAT);
-
-    if (day.isSame(moment(lastReferenceDay).add(6, 'month'))) {
-      referenceCredits += 6;
-      lastReferenceDay = day;
-      dates[displayDate] = { displayDate };
+const getStudentChartData = (student) => {
+  const { studentNumber, started } = student;
+  return [
+    ...getStudentCourseData(student),
+    {
+      title: '',
+      [studentNumber]: 0,
+      credits: 0,
+      date: reformatDate(started, DISPLAY_DATE_FORMAT),
+      month: 0
     }
-
-    if (Object.keys(dates).length === 0) {
-      dates[displayDate] = { displayDate, referenceCredits };
-    }
-
-    const index = studentData.findIndex(course => course.date === displayDate);
-
-    if (index !== -1) {
-      const course = studentData[index];
-      dates[displayDate] = { displayDate };
-      Object.assign(dates[course.date], dates[course.date], course);
-    }
-
-    day = moment(day).add(1, 'day');
-  }
-  const finalDate = reformatDate(day, DISPLAY_DATE_FORMAT);
-  const testDay = reformatDate(moment(day).subtract(10, 'day'), DISPLAY_DATE_FORMAT);
-
-  dates[finalDate] = { displayDate: finalDate, referenceCredits };
-  dates[testDay] = { displayDate: testDay, test: '!!!' };
-
-  return [...Object.values(dates)];
+  ];
 };
 
+const getStudentCreditsLine = (student, i) => {
+  const { studentNumber } = student;
+  return (<Line
+    key={`graph-${studentNumber}`}
+    type="monotone"
+    activeDot={{ r: 8 }}
+    dot={{ r: 4 }}
+    dataKey={studentNumber}
+    stroke={CHART_COLORS[i]}
+    isAnimationActive={false}
+    connectNulls
+  />);
+};
+
+
 const CreditAccumulationGraph = (props) => {
-  const { students, title } = props;
+  const { students, title, translate } = props;
 
-  const firstDate = moment(students[0].started);
+  if (students.length === 0) {
+    return (
+      <Message warning>
+        <Message.Header>{title}</Message.Header>
+        <p>{translate('common.noResults')}</p>
+      </Message>);
+  }
 
-  const chartData = getCombinedChartData(students[0].courses, firstDate);
-  chartData.sort((c1, c2) =>
-    sortDatesWithFormat(c1.displayDate, c2.displayDate, DISPLAY_DATE_FORMAT));
+  let combinedStudentData = [].concat(...students.map(getStudentChartData));
 
+  if (isReferenceLine(students)) {
+    const referenceData = getReferenceLineForStudent(students[0]);
+    combinedStudentData = combinedStudentData.concat(referenceData);
+  }
+
+  combinedStudentData.sort((c1, c2) =>
+    sortDatesWithFormat(c1.date, c2.date, DISPLAY_DATE_FORMAT));
+
+  const minTick = combinedStudentData[0].month;
+  const maxTick = Math.ceil(combinedStudentData[combinedStudentData.length - 1].month);
   return (
     <div className={styles.graphContainer}>
       <Header attached="top" size="large">{title}</Header>
       <Segment attached="bottom">
         <ResponsiveContainer height={400}>
-          <LineChart data={chartData}>
-            <XAxis dataKey="displayDate" />
+          <LineChart data={combinedStudentData}>
+            <XAxis
+              dataKey="month"
+              type="number"
+              allowDecimals={false}
+              domain={[minTick, maxTick]}
+              tick={{ fontSize: '15' }}
+              tickCount={20}
+            />
             <YAxis />
-            <Tooltip />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip
+              content={<CreditGraphTooltip
+                {...props}
+                translate={translate}
+              />}
+              cursor={false}
+            />
             <Legend />
-            <Line type="monotone" dataKey="totalCredits" stroke={red} connectNulls />
-            <Line type="monotone" dot={false} dataKey="referenceCredits" stroke={turquoise} connectNulls />
+            {
+              students.map((student, i) => getStudentCreditsLine(student, i))
+            }
+            {
+              getReferenceLineIfApplicable(students, translate('graphs.referenceCredits'))
+            }
           </LineChart>
         </ResponsiveContainer>
       </Segment>
@@ -92,9 +164,8 @@ const CreditAccumulationGraph = (props) => {
   );
 };
 
-const { arrayOf, object, string } = PropTypes;
-
 CreditAccumulationGraph.propTypes = {
+  translate: func.isRequired,
   students: arrayOf(object).isRequired,
   title: string.isRequired
 };

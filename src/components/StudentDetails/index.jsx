@@ -1,108 +1,79 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { func, shape, object } from 'prop-types';
 import { connect } from 'react-redux';
-import { Segment, Loader, Dimmer } from 'semantic-ui-react';
+import { Segment } from 'semantic-ui-react';
+import { isEmpty } from 'lodash';
 
 import StudentInfoCard from '../StudentInfoCard';
 import { removeTagFromStudentAction } from '../../actions';
 import CreditAccumulationGraph from '../CreditAccumulationGraph';
 import SearchResultTable from '../SearchResultTable';
+import { removeInvalidCreditsFromStudent } from '../../common';
 
-import styles from './studentDetails.css';
-
+import sharedStyles from '../../styles/shared';
 
 class StudentDetails extends Component {
-  constructor(props) {
-    super(props);
+  static propTypes = {
+    translate: func.isRequired,
+    student: shape(object).isRequired
+  };
 
-    this.renderInfoCard = this.renderInfoCard.bind(this);
-    this.renderCreditsGraph = this.renderCreditsGraph.bind(this);
-    this.renderCourseParticipation = this.renderCourseParticipation.bind(this);
+  renderCreditsGraph = () => {
+    const { translate, student } = this.props;
 
-    this.state = {};
-  }
+    const filteredStudent = removeInvalidCreditsFromStudent(student);
+    return (
+      <CreditAccumulationGraph
+        students={[filteredStudent]}
+        title={translate('studentStatistics.chartTitle')}
+        translate={translate}
+      />
+    );
+  };
 
-  renderInfoCard() {
-    const { translate, students, studentNumber } = this.props;
-    const student = students[studentNumber];
-    if (student) {
-      return <StudentInfoCard student={student} translate={translate} />;
-    }
-    return null;
-  }
-  renderCreditsGraph() {
-    const { translate, students, studentNumber } = this.props;
-    const student = students[studentNumber];
-    if (student) {
-      return (
-        <CreditAccumulationGraph
-          students={[student]}
-          title={translate('studentStatistics.chartTitle')}
-        />
-      );
-    }
-    return null;
-  }
+  renderCourseParticipation = () => {
+    const { translate, student } = this.props;
 
-  renderCourseParticipation() {
-    const { translate, students, studentNumber } = this.props;
-    const student = students[studentNumber];
-    if (student) {
-      const courseHeaders = [
-        translate('common.date'),
-        translate('common.course'),
-        translate('common.grade'),
-        translate('common.credits')
-      ];
-      const courseRows = student.courses.map((c) => {
-        const {
-          date, grade, credits, course
-        } = c;
-        return {
-          date, course: `${course.name} (${course.code})`, grade, credits
-        };
-      });
-      return (
-        <SearchResultTable
-          headers={courseHeaders}
-          rows={courseRows}
-          noResultText={translate('common.noResults')}
-        />
-      );
-    }
-    return null;
-  }
-
+    const courseHeaders = [
+      translate('common.date'),
+      translate('common.course'),
+      translate('common.grade'),
+      translate('common.credits')
+    ];
+    const courseRows = student.courses.map((c) => {
+      const {
+        date, grade, credits, course
+      } = c;
+      return {
+        date, course: `${course.name} (${course.code})`, grade, credits
+      };
+    });
+    return (
+      <SearchResultTable
+        headers={courseHeaders}
+        rows={courseRows}
+        noResultText={translate('common.noResults')}
+      />
+    );
+  };
 
   render() {
-    const { isLoading } = this.state;
-    const { translate } = this.props;
-
+    const { translate, student } = this.props;
+    if (isEmpty(student)) {
+      return null;
+    }
     return (
-      <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={styles.studentSegment}>
-        <Dimmer active={isLoading} inverted>
-          <Loader>{translate('common.loading')}</Loader>
-        </Dimmer>
-        { this.renderInfoCard() }
+      <Segment className={sharedStyles.contentSegment} >
+        <StudentInfoCard student={student} translate={translate} />
         { this.renderCreditsGraph() }
         { this.renderCourseParticipation() }
-      </Dimmer.Dimmable>
+      </Segment>
     );
   }
 }
 
-const {
-  string, func, shape, object
-} = PropTypes;
-
-StudentDetails.propTypes = {
-  studentNumber: string.isRequired,
-  translate: func.isRequired,
-  students: shape(object).isRequired
-};
-
-const mapStateToProps = ({ students }) => ({
-  students: students.students
+const mapStateToProps = ({ studentReducer }) => ({
+  student: studentReducer.selectedStudent
 });
 
 const mapDispatchToProps = dispatch => ({
