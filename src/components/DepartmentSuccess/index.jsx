@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import { func } from 'prop-types';
 import moment from 'moment';
 import { getTranslate, getActiveLanguage } from 'react-localize-redux';
 import { Dimmer, Segment, Header } from 'semantic-ui-react';
@@ -38,6 +38,12 @@ const isInArrayLimits = (amount, index, arrayLenght) =>
     || (index === arrayLenght - 1 && amount === MOVE_RIGHT_AMOUNT));
 
 class DepartmentSuccess extends Component {
+  static propTypes = {
+    dispatchGetDepartmentSuccess: func.isRequired,
+    dispatchAddError: func.isRequired,
+    translate: func.isRequired
+  };
+
   state = {
     departmentSuccess: {},
     selectorDates: [],
@@ -120,14 +126,6 @@ class DepartmentSuccess extends Component {
     );
   }
 }
-
-const { func } = PropTypes;
-
-DepartmentSuccess.propTypes = {
-  dispatchGetDepartmentSuccess: func.isRequired,
-  dispatchAddError: func.isRequired,
-  translate: func.isRequired
-};
 
 const mapStateToProps = ({ locale }) => ({
   translate: getTranslate(locale),

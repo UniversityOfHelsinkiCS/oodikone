@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import { func, shape, arrayOf, object } from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 
 import PopulationQueryCard from '../PopulationQueryCard';
@@ -9,6 +9,15 @@ import { removePopulationAction } from '../../actions';
 import styles from './populationSearchHistory.css';
 
 class PopulationSearchHistory extends Component {
+  static propTypes = {
+    translate: func.isRequired,
+    dispatchRemovePopulation: func.isRequired,
+    populations: shape({
+      queries: arrayOf(object),
+      samples: object
+    }).isRequired
+  };
+
   removePopulation = (uuid) => {
     const { dispatchRemovePopulation } = this.props;
     dispatchRemovePopulation(uuid);
@@ -37,19 +46,6 @@ class PopulationSearchHistory extends Component {
     );
   }
 }
-
-const {
-  func, shape, arrayOf, object
-} = PropTypes;
-
-PopulationSearchHistory.propTypes = {
-  translate: func.isRequired,
-  dispatchRemovePopulation: func.isRequired,
-  populations: shape({
-    queries: arrayOf(object),
-    samples: object
-  }).isRequired
-};
 
 const mapStateToProps = ({ populations, locale }) => ({
   populations,

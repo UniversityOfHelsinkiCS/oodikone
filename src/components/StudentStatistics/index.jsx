@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import { func } from 'prop-types';
 import { getTranslate, getActiveLanguage } from 'react-localize-redux';
 import { Segment, Header } from 'semantic-ui-react';
 
@@ -9,9 +9,10 @@ import StudentDetails from '../StudentDetails';
 
 import sharedStyles from '../../styles/shared';
 
-
 class StudentStatistics extends Component {
-  state = { };
+  static propTypes = {
+    translate: func.isRequired
+  };
 
   render() {
     const { translate } = this.props;
@@ -26,12 +27,6 @@ class StudentStatistics extends Component {
     );
   }
 }
-
-const { func } = PropTypes;
-
-StudentStatistics.propTypes = {
-  translate: func.isRequired
-};
 
 const mapStateToProps = ({ locale }) => ({
   translate: getTranslate(locale),

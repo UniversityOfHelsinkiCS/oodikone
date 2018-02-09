@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import { func, object, arrayOf } from 'prop-types';
 import { Segment, Header } from 'semantic-ui-react';
 import { getTranslate } from 'react-localize-redux';
 
@@ -9,6 +9,11 @@ import CourseQuarters from '../CourseQuarters';
 import { flattenAndCleanSamples } from '../../common';
 
 class PopulationDetails extends Component {
+  static propTypes = {
+    translate: func.isRequired,
+    samples: arrayOf(arrayOf(object)).isRequired
+  };
+
   state = {};
 
   renderCourseStatistics = () => {
@@ -66,14 +71,6 @@ class PopulationDetails extends Component {
     );
   }
 }
-
-const { func, object, arrayOf } = PropTypes;
-
-PopulationDetails.propTypes = {
-  translate: func.isRequired,
-  samples: arrayOf(arrayOf(object)).isRequired
-
-};
 
 const mapStateToProps = ({ populations, locale }) => ({
   samples: flattenAndCleanSamples(populations.samples),

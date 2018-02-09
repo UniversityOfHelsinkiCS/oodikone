@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { func } from 'prop-types';
 import { Card, Icon } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 
@@ -12,8 +12,13 @@ import styles from './studentInfoCard.css';
 import { addError, addTagToStudentAction, removeTagFromStudentAction } from '../../actions';
 
 class StudentInfoCard extends Component {
- setState = {};
-
+  static propTypes = {
+    student: studentDetailsType.isRequired,
+    translate: func.isRequired,
+    dispatchRemoveTagFromStudent: func.isRequired,
+    dispatchAddTagToStudent: func.isRequired,
+    dispatchAddError: func.isRequired
+  };
 
   handleAddTagFn = (tag) => {
     const { student, dispatchAddTagToStudent } = this.props;
@@ -67,16 +72,6 @@ class StudentInfoCard extends Component {
     );
   }
 }
-
-const { func } = PropTypes;
-
-StudentInfoCard.propTypes = {
-  student: studentDetailsType.isRequired,
-  translate: func.isRequired,
-  dispatchRemoveTagFromStudent: func.isRequired,
-  dispatchAddTagToStudent: func.isRequired,
-  dispatchAddError: func.isRequired
-};
 
 const mapStateToProps = () => ({});
 

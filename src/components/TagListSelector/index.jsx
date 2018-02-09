@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { func, arrayOf, string } from 'prop-types';
 import { Icon, Search, Label, Confirm } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 
@@ -10,6 +10,19 @@ import styles from './tagListSelector.css';
 
 
 class TagListSelector extends Component {
+  static propTypes = {
+    tags: arrayOf(string),
+    translate: func.isRequired,
+    handleAddTagFn: func.isRequired,
+    handleRemoveTagFn: func.isRequired,
+    dispatchFindTagsAction: func.isRequired,
+    dispatchAddError: func.isRequired
+  };
+
+  static defaultProps = {
+    tags: []
+  };
+
   state = {
     isEdit: false,
     isLoading: false,
@@ -125,22 +138,6 @@ class TagListSelector extends Component {
     );
   }
 }
-
-
-const { func, arrayOf, string } = PropTypes;
-
-TagListSelector.defaultProps = {
-  tags: []
-};
-
-TagListSelector.propTypes = {
-  tags: arrayOf(string),
-  translate: func.isRequired,
-  handleAddTagFn: func.isRequired,
-  handleRemoveTagFn: func.isRequired,
-  dispatchFindTagsAction: func.isRequired,
-  dispatchAddError: func.isRequired
-};
 
 const mapStateToProps = () => ({});
 

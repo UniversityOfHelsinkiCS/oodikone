@@ -1,13 +1,8 @@
 import React from 'react';
 import { Table } from 'semantic-ui-react';
-import PropTypes from 'prop-types';
+import { arrayOf, string, object, func, bool } from 'prop-types';
 
 import styles from './searchResultsTable.css';
-
-const {
-  arrayOf, string, object, func, bool
-} = PropTypes;
-
 
 const getHeaderRow = headers => (
   <Table.Header>
