@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { string, arrayOf } from 'prop-types';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
 
 import { graphDataType } from '../../constants/types';
@@ -34,8 +34,6 @@ const MulticolorBarChart = (props) => {
   }
   return null;
 };
-
-const { string, arrayOf } = PropTypes;
 
 MulticolorBarChart.propTypes = {
   chartTitle: string.isRequired,

@@ -15,8 +15,12 @@ const asyncReducer = actionTypename =>
         if (action.payload && action.payload.error) {
           error = true;
         }
-
-        return ({ ...state, ...{ pending: false, error, data: action.payload } });
+        return ({
+          ...state,
+          ...{
+            pending: false, error, data: action.payload, meta: action.meta
+          }
+        });
       }
       case `${actionTypename}_REJECTED`:
         return ({ ...state, ...{ pending: false, error: true, data: action.payload } });

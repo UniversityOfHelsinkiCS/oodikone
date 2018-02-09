@@ -3,18 +3,17 @@ import { localeReducer as locale } from 'react-localize-redux';
 
 import departmentSuccess from './departmentSuccess';
 import students from './students';
+import populations from './populations';
 import tags from './tags';
+import errorReducer from './errorReducer';
 
-import {
-
-} from '../actions';
 
 /* collect reducers here from subfolders */
-const reducers = combineReducers({
+export default combineReducers({
   departmentSuccess,
   locale,
-  students,
-  tags
+  studentReducer: students,
+  populationReducer: populations,
+  tags,
+  errors: errorReducer
 });
-
-export default reducers;

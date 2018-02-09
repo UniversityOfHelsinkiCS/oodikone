@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import { func } from 'prop-types';
 import moment from 'moment';
 import { getTranslate, getActiveLanguage } from 'react-localize-redux';
-import { Dimmer, Segment, Loader } from 'semantic-ui-react';
+import { Dimmer, Segment, Header } from 'semantic-ui-react';
 
 import { addError, getDepartmentSuccessAction } from '../../actions';
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants';
-
-import styles from './departmentSuccess.css';
 import MulticolorBarChart from '../MulticolorBarChart';
 import ScrollableDateSelector from '../ScrollableDateSelector';
 import { reformatDate } from '../../common';
+import SegmentDimmer from '../SegmentDimmer';
+
+import sharedStyles from '../../styles/shared';
 
 const FIRST_DATE = '2005-08-01';
 const MOVE_LEFT_AMOUNT = -1;
@@ -37,82 +38,84 @@ const isInArrayLimits = (amount, index, arrayLenght) =>
     || (index === arrayLenght - 1 && amount === MOVE_RIGHT_AMOUNT));
 
 class DepartmentSuccess extends Component {
-  constructor(props) {
-    super(props);
-    this.onDateInputChange = this.onDateInputChange.bind(this);
-    this.onControlLeft = this.onControlLeft.bind(this);
-    this.onControlRight = this.onControlRight.bind(this);
-    this.onControlButtonSwitch = this.onControlButtonSwitch.bind(this);
-    this.getChartData = this.getChartData.bind(this);
+  static propTypes = {
+    dispatchGetDepartmentSuccess: func.isRequired,
+    dispatchAddError: func.isRequired,
+    translate: func.isRequired
+  };
 
-    this.state = {
-      departmentSuccess: {},
-      selectorDates: [],
-      selectedDate: {
-        text: FIRST_DATE,
-        value: reformatDate(FIRST_DATE, API_DATE_FORMAT)
-      },
-      isLoading: true
-    };
-  }
+  state = {
+    chartData: [],
+    selectorDates: [],
+    selectedDate: {
+      text: FIRST_DATE,
+      value: reformatDate(FIRST_DATE, API_DATE_FORMAT)
+    },
+    isLoading: true
+  };
 
   componentDidMount() {
     const selectorDates = getSelectorDates(FIRST_DATE);
-    this.setState({ selectorDates, selectedDate: selectorDates[0] });
-    this.getChartData();
+    this.setState(
+      { selectorDates, selectedDate: selectorDates[0] },
+      () => this.getChartData()
+    );
   }
 
-  onDateInputChange(e, { value }) {
+  onDateInputChange = (e, { value }) => {
     this.setState({
       selectedDate: {
         text: reformatDate(value, DISPLAY_DATE_FORMAT),
         value
       },
       isLoading: true
-    });
-    this.getChartData();
-  }
+    }, () => this.getChartData());
+  };
 
-  onControlLeft() {
+  onControlLeft = () => {
     this.onControlButtonSwitch(MOVE_LEFT_AMOUNT);
-  }
+  };
 
-  onControlRight() {
+  onControlRight = () => {
     this.onControlButtonSwitch(MOVE_RIGHT_AMOUNT);
-  }
+  };
 
-  onControlButtonSwitch(amount) {
+  onControlButtonSwitch = (amount) => {
     const { selectorDates, selectedDate } = this.state;
     const index = selectorDates.findIndex(date => date.value === selectedDate.value);
     if (isInArrayLimits(amount, index, selectorDates.length)) {
-      this.setState({ selectedDate: selectorDates[index + amount], isLoading: true });
-      this.getChartData();
+      this.setState(
+        { selectedDate: selectorDates[index + amount], isLoading: true },
+        () => this.getChartData()
+      );
     }
-  }
+  };
 
-  getChartData() {
+  getChartData = () => {
     const { selectedDate } = this.state;
     this.props.dispatchGetDepartmentSuccess(selectedDate.value)
       .then(
-        json => this.setState({ departmentSuccess: json.value, isLoading: false }),
+        (json) => {
+          const chartData = createChartData(json.value);
+          this.setState({ chartData, isLoading: false });
+        },
         err => this.props.dispatchAddError(err)
       );
-  }
+  };
 
   render() {
     const {
-      departmentSuccess, selectedDate, selectorDates, isLoading
+      chartData, selectedDate, selectorDates, isLoading
     } = this.state;
-    const t = this.props.translate;
-    const chartData = createChartData(departmentSuccess);
-    const chartTitle = `${t('departmentSuccess.chartTitle')} ${selectedDate.text}`;
+    const { translate } = this.props;
+
+    const chartTitle = `${translate('departmentSuccess.chartTitle')} ${selectedDate.text}`;
 
     return (
-      <div className={styles.container} >
-        <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={styles.chartSegment}>
-          <Dimmer active={isLoading} inverted>
-            <Loader>{t('common.loading')}</Loader>
-          </Dimmer>
+      <div className={sharedStyles.segmentContainer} >
+        <Header className={sharedStyles.segmentTitle} size="large">{translate('departmentSuccess.header')}</Header>
+        <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={sharedStyles.contentSegment}>
+          <SegmentDimmer translate={translate} isLoading={isLoading} />
           <MulticolorBarChart chartTitle={chartTitle} chartData={chartData} />
           <ScrollableDateSelector
             selectedDate={selectedDate}
@@ -126,14 +129,6 @@ class DepartmentSuccess extends Component {
     );
   }
 }
-
-const { func } = PropTypes;
-
-DepartmentSuccess.propTypes = {
-  dispatchGetDepartmentSuccess: func.isRequired,
-  dispatchAddError: func.isRequired,
-  translate: func.isRequired
-};
 
 const mapStateToProps = ({ locale }) => ({
   translate: getTranslate(locale),

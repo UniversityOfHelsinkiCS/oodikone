@@ -1,14 +1,21 @@
-.container {
+.segmentContainer {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  width: 100%;
 }
 
-.chartSegment {
+.segmentTitle {
+  margin-left: 5px;
+  margin-top: 5px;
+}
+
+.contentSegment {
   border: none !important;
   box-shadow: none !important;
-  width: 99%;
-  max-width: 1200px;
+  margin-top: 0 !important;
+  width: 100%;
+  max-width: 1400px;
   min-width: 600px;
 }

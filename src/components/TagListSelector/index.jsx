@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { func, arrayOf, string } from 'prop-types';
 import { Icon, Search, Label, Confirm } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 
@@ -10,62 +10,64 @@ import styles from './tagListSelector.css';
 
 
 class TagListSelector extends Component {
-  constructor(props) {
-    super(props);
+  static propTypes = {
+    tags: arrayOf(string),
+    translate: func.isRequired,
+    handleAddTagFn: func.isRequired,
+    handleRemoveTagFn: func.isRequired,
+    dispatchFindTagsAction: func.isRequired,
+    dispatchAddError: func.isRequired
+  };
 
-    this.renderTags = this.renderTags.bind(this);
-    this.renderEditComponent = this.renderEditComponent.bind(this);
-    this.setEditable = this.setEditable.bind(this);
-    this.handleSearchChange = this.handleSearchChange.bind(this);
-    this.handleAddTag = this.handleAddTag.bind(this);
-    this.handleRemoveTag = this.handleRemoveTag.bind(this);
-    this.setConfirm = this.setConfirm.bind(this);
+  static defaultProps = {
+    tags: []
+  };
 
-    this.state = {
-      isEdit: false,
-      isLoading: false,
-      searchStr: '',
-      existingTags: [],
-      isConfirm: false
-    };
-  }
+  state = {
+    isEdit: false,
+    isLoading: false,
+    searchStr: '',
+    existingTags: [],
+    isConfirm: false
+  };
 
-  setEditable() {
+
+  setEditable =() => {
     const { isEdit } = this.state;
     this.setState({ isEdit: !isEdit, searchStr: '' });
-  }
+  };
 
-  setConfirm() {
+  setConfirm = () => {
     const { isConfirm } = this.state;
     this.setState({ isConfirm: !isConfirm });
-  }
+  };
 
-  handleSearchChange(e, { value }) {
+  handleSearchChange = (e, { value }) => {
     this.fetchTags(value);
-  }
+  };
 
-  handleAddTag(e, { result }) {
+  handleAddTag = (e, { result }) => {
     const { handleAddTagFn } = this.props;
     handleAddTagFn(result.title);
     this.setEditable();
-  }
+  };
 
-  handleRemoveTag(tag) {
+  handleRemoveTag = (tag) => {
     const { handleRemoveTagFn } = this.props;
     this.setState({ isConfirm: false });
     handleRemoveTagFn(tag);
-  }
+  };
 
-  fetchTags(searchStr) {
+  fetchTags = (searchStr) => {
     this.setState({ isLoading: true, searchStr });
     this.props.dispatchFindTagsAction(searchStr)
       .then(
         json => this.setState({ existingTags: json.value, isLoading: false }),
         err => this.props.dispatchAddError(err)
       );
-  }
+  };
 
-  renderTags() {
+  renderTags =() => {
     const { tags, translate } = this.props;
     const { isConfirm } = this.state;
 
@@ -86,9 +88,9 @@ class TagListSelector extends Component {
       ));
     }
     return null;
-  }
+  };
 
-  renderEditComponent() {
+  renderEditComponent = () => {
     const { tags, translate } = this.props;
     const {
       isEdit, isLoading, searchStr, existingTags
@@ -125,7 +127,7 @@ class TagListSelector extends Component {
         </Icon.Group>
         {translate('tags.addTag')}
       </div>);
-  }
+  };
 
   render() {
     return (
@@ -136,22 +138,6 @@ class TagListSelector extends Component {
     );
   }
 }
-
-
-const { func, arrayOf, string } = PropTypes;
-
-TagListSelector.defaultProps = {
-  tags: []
-};
-
-TagListSelector.propTypes = {
-  tags: arrayOf(string),
-  translate: func.isRequired,
-  handleAddTagFn: func.isRequired,
-  handleRemoveTagFn: func.isRequired,
-  dispatchFindTagsAction: func.isRequired,
-  dispatchAddError: func.isRequired
-};
 
 const mapStateToProps = () => ({});
 

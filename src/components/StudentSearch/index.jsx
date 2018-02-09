@@ -1,65 +1,97 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { func } from 'prop-types';
 import { connect } from 'react-redux';
-import { Search } from 'semantic-ui-react';
+import { Search, Segment } from 'semantic-ui-react';
 
-import { addError, findStudentsAction } from '../../actions';
+import { addError, findStudentsAction, getStudentAction } from '../../actions';
 import SearchResultTable from '../SearchResultTable';
+import SegmentDimmer from '../SegmentDimmer';
 
+import sharedStyles from '../../styles/shared';
 import styles from './studentSearch.css';
-
-const { func } = PropTypes;
 
 const DEFAULT_STATE = {
   students: [],
   isLoading: false,
-  searchStr: '',
-  selectedStudent: {}
+  showResults: false,
+  searchStr: ''
 };
 
 class StudentSearch extends Component {
-  constructor(props) {
-    super(props);
+  static propTypes = {
+    dispatchFindStudents: func.isRequired,
+    dispatchGetStudent: func.isRequired,
+    dispatchAddError: func.isRequired,
+    translate: func.isRequired
+  };
 
-    this.resetComponent = this.resetComponent.bind(this);
-    this.handleSearchChange = this.handleSearchChange.bind(this);
-    this.fetchStudentList = this.fetchStudentList.bind(this);
+ state = DEFAULT_STATE;
 
-    this.state = DEFAULT_STATE;
-  }
-
-  resetComponent() {
+  resetComponent = () => {
     this.setState(DEFAULT_STATE);
-  }
+  };
 
-  handleSearchChange(e, { value }) {
+  handleSearchChange = (e, { value }) => {
     if (value.length > 0) {
       this.fetchStudentList(value);
     } else {
       this.resetComponent();
     }
-  }
+  };
 
-  fetchStudentList(searchStr) {
+  handleSearchSelect = (e, student) => {
+    const { studentNumber } = student;
+    const { dispatchGetStudent, dispatchAddError } = this.props;
+    this.setState({ isLoading: true });
+    dispatchGetStudent(studentNumber)
+      .then(
+        () => this.resetComponent(),
+        err => dispatchAddError(err)
+      );
+  };
+
+  fetchStudentList = (searchStr) => {
     this.setState({ searchStr, isLoading: true });
     this.props.dispatchFindStudents(searchStr)
       .then(
-        json => this.setState({ students: json.value, isLoading: false }),
+        json => this.setState({
+          students: json.value,
+          isLoading: false,
+          showResults: true
+        }),
         err => this.props.dispatchAddError(err)
       );
-  }
+  };
 
-  render() {
-    const { isLoading, students, searchStr } = this.state;
+  renderSearchResults = () => {
+    const { translate } = this.props;
+    const { showResults, students } = this.state;
 
-    const t = this.props.translate;
+    if (!showResults) {
+      return null;
+    }
+
     const headers = [
-      t('common.studentNumber'),
-      t('common.started'),
-      t('common.credits')
+      translate('common.studentNumber'),
+      translate('common.started'),
+      translate('common.credits')
     ];
     const rows = students.map(({ studentNumber, started, credits }) =>
       ({ studentNumber, started, credits }));
+
+    return (<SearchResultTable
+      headers={headers}
+      rows={rows}
+      rowClickFn={this.handleSearchSelect}
+      noResultText={translate('common.noResults')}
+      selectable
+    />);
+  };
+
+  render() {
+    const { isLoading, searchStr } = this.state;
+    const { translate } = this.props;
+
     return (
       <div className={styles.searchContainer}>
         <Search
@@ -69,32 +101,24 @@ class StudentSearch extends Component {
           onSearchChange={this.handleSearchChange}
           showNoResults={false}
           value={searchStr}
-          placeholder={t('studentStatistics.searchPlaceholder')}
+          placeholder={translate('studentStatistics.searchPlaceholder')}
         />
-        <SearchResultTable
-          headers={headers}
-          rows={rows}
-          rowClickFn={this.props.handleResultFn}
-          noResultText={t('common.noResults')}
-          selectable
-        />
+        <Segment className={sharedStyles.contentSegment}>
+          <SegmentDimmer translate={translate} isLoading={isLoading} />
+          { this.renderSearchResults() }
+        </Segment>
       </div>
     );
   }
 }
-
-StudentSearch.propTypes = {
-  dispatchFindStudents: func.isRequired,
-  dispatchAddError: func.isRequired,
-  handleResultFn: func.isRequired,
-  translate: func.isRequired
-};
 
 const mapStateToProps = () => ({});
 
 const mapDispatchToProps = dispatch => ({
   dispatchFindStudents: searchStr =>
     dispatch(findStudentsAction(searchStr)),
+  dispatchGetStudent: studentNumber =>
+    dispatch(getStudentAction(studentNumber)),
   dispatchAddError: err => dispatch(addError(err))
 });
 

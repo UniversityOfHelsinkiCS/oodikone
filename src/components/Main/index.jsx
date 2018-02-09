@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { localize } from 'react-localize-redux';
 
 import Header from '../Header';
-import Populations from '../Populations';
+import Populations from '../PopulationStatistics';
 import DepartmentSuccess from '../DepartmentSuccess';
 import StudentStatistics from '../StudentStatistics';
 import Courses from '../Courses';
