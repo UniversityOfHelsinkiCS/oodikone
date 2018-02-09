@@ -1,102 +1,83 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Segment, Dimmer } from 'semantic-ui-react';
+import { Segment } from 'semantic-ui-react';
+import { isEmpty } from 'lodash';
 
 import StudentInfoCard from '../StudentInfoCard';
 import { removeTagFromStudentAction } from '../../actions';
 import CreditAccumulationGraph from '../CreditAccumulationGraph';
 import SearchResultTable from '../SearchResultTable';
 import { removeInvalidCreditsFromStudent } from '../../common';
-import SegmentDimmer from '../SegmentDimmer';
 
 import sharedStyles from '../../styles/shared';
 
-
 class StudentDetails extends Component {
-  state = {
-    isLoading: false
-  };
+  state = {};
 
-  renderInfoCard = () => {
-    const { translate, students, studentNumber } = this.props;
-    const student = students[studentNumber];
-    if (student) {
-      return <StudentInfoCard student={student} translate={translate} />;
-    }
-    return null;
-  };
   renderCreditsGraph = () => {
-    const { translate, students, studentNumber } = this.props;
-    const student = students[studentNumber];
-    if (student) {
-      return (
-        <CreditAccumulationGraph
-          students={[student]}
-          title={translate('studentStatistics.chartTitle')}
-          translate={translate}
-        />
-      );
-    }
-    return null;
+    const { translate, student } = this.props;
+
+    const filteredStudent = removeInvalidCreditsFromStudent(student);
+    return (
+      <CreditAccumulationGraph
+        students={[filteredStudent]}
+        title={translate('studentStatistics.chartTitle')}
+        translate={translate}
+      />
+    );
   };
 
   renderCourseParticipation = () => {
-    const { translate, students, studentNumber } = this.props;
-    const student = removeInvalidCreditsFromStudent(students[studentNumber]);
-    if (student) {
-      const courseHeaders = [
-        translate('common.date'),
-        translate('common.course'),
-        translate('common.grade'),
-        translate('common.credits')
-      ];
-      const courseRows = student.courses.map((c) => {
-        const {
-          date, grade, credits, course
-        } = c;
-        return {
-          date, course: `${course.name} (${course.code})`, grade, credits
-        };
-      });
-      return (
-        <SearchResultTable
-          headers={courseHeaders}
-          rows={courseRows}
-          noResultText={translate('common.noResults')}
-        />
-      );
-    }
-    return null;
+    const { translate, student } = this.props;
+
+    const courseHeaders = [
+      translate('common.date'),
+      translate('common.course'),
+      translate('common.grade'),
+      translate('common.credits')
+    ];
+    const courseRows = student.courses.map((c) => {
+      const {
+        date, grade, credits, course
+      } = c;
+      return {
+        date, course: `${course.name} (${course.code})`, grade, credits
+      };
+    });
+    return (
+      <SearchResultTable
+        headers={courseHeaders}
+        rows={courseRows}
+        noResultText={translate('common.noResults')}
+      />
+    );
   };
 
   render() {
-    const { isLoading } = this.state;
-    const { translate } = this.props;
-
+    const { translate, student } = this.props;
+    if (isEmpty(student)) {
+      return null;
+    }
     return (
-      <Dimmer.Dimmable as={Segment} dimmed={isLoading} className={sharedStyles.contentSegment}>
-        <SegmentDimmer isLoading={isLoading} translate={translate} />
-        { this.renderInfoCard() }
+      <Segment className={sharedStyles.contentSegment} >
+        <StudentInfoCard student={student} translate={translate} />;
         { this.renderCreditsGraph() }
         { this.renderCourseParticipation() }
-      </Dimmer.Dimmable>
+      </Segment>
     );
   }
 }
 
-const {
-  string, func, shape, object
-} = PropTypes;
+const { func, shape, object } = PropTypes;
 
 StudentDetails.propTypes = {
-  studentNumber: string.isRequired,
   translate: func.isRequired,
-  students: shape(object).isRequired
+  student: shape(object).isRequired
 };
 
 const mapStateToProps = ({ students }) => ({
-  students: students.students
+  student: students.selectedStudent
 });
 
 const mapDispatchToProps = dispatch => ({
