@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { func } from 'prop-types';
 import { getTranslate, getActiveLanguage } from 'react-localize-redux';
@@ -9,7 +9,7 @@ import StudentDetails from '../StudentDetails';
 
 import sharedStyles from '../../styles/shared';
 
-class StudentStatistics extends Component {
+class StudentStatistics extends PureComponent {
   static propTypes = {
     translate: func.isRequired
   };

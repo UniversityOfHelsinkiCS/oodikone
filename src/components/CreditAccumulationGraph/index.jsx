@@ -3,7 +3,7 @@ import { arrayOf, object, string, func } from 'prop-types';
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line, Tooltip, CartesianGrid } from 'recharts';
 import _ from 'lodash';
 import moment from 'moment';
-import { Header, Segment } from 'semantic-ui-react';
+import { Header, Segment, Message } from 'semantic-ui-react';
 
 import { DISPLAY_DATE_FORMAT, CHART_COLORS, API_DATE_FORMAT } from '../../constants';
 import { reformatDate, sortDatesWithFormat } from '../../common';
@@ -106,6 +106,14 @@ const getStudentCreditsLine = (student, i) => {
 
 const CreditAccumulationGraph = (props) => {
   const { students, title, translate } = props;
+
+  if (students.length === 0) {
+    return (
+      <Message warning>
+        <Message.Header>{title}</Message.Header>
+        <p>{translate('common.noResults')}</p>
+      </Message>);
+  }
 
   let combinedStudentData = [].concat(...students.map(getStudentChartData));
 

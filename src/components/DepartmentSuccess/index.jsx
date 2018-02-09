@@ -45,7 +45,7 @@ class DepartmentSuccess extends Component {
   };
 
   state = {
-    departmentSuccess: {},
+    chartData: [],
     selectorDates: [],
     selectedDate: {
       text: FIRST_DATE,
@@ -95,17 +95,20 @@ class DepartmentSuccess extends Component {
     const { selectedDate } = this.state;
     this.props.dispatchGetDepartmentSuccess(selectedDate.value)
       .then(
-        json => this.setState({ departmentSuccess: json.value, isLoading: false }),
+        (json) => {
+          const chartData = createChartData(json.value);
+          this.setState({ chartData, isLoading: false });
+        },
         err => this.props.dispatchAddError(err)
       );
   };
 
   render() {
     const {
-      departmentSuccess, selectedDate, selectorDates, isLoading
+      chartData, selectedDate, selectorDates, isLoading
     } = this.state;
     const { translate } = this.props;
-    const chartData = createChartData(departmentSuccess);
+
     const chartTitle = `${translate('departmentSuccess.chartTitle')} ${selectedDate.text}`;
 
     return (

@@ -18,3 +18,8 @@
     color: var(--deepBlack);
   }
 }
+
+.dateItem {
+  display: inline-block;
+}
+

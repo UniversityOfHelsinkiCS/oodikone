@@ -14,11 +14,9 @@ class PopulationDetails extends Component {
     samples: arrayOf(arrayOf(object)).isRequired
   };
 
-  state = {};
-
   renderCourseStatistics = () => {
     const { samples, translate } = this.props;
-    if (samples.length === 0) {
+    if (!samples && samples.length === 0) {
       return null;
     }
     let statistics = [];
@@ -41,19 +39,16 @@ class PopulationDetails extends Component {
 
   renderCreditGainGraphs = () => {
     const { samples, translate } = this.props;
-    if (samples.length === 0) {
+    if (!samples || samples.length === 0) {
       return null;
     }
-    let graphs = [];
-    if (samples) {
-      graphs = samples.map((sample, i) =>
-        (<CreditAccumulationGraph
-          key={`credit-graph-${i}`} // eslint-disable-line react/no-array-index-key
-          students={sample}
-          title={`${translate('populationStatistics.sampleId')}: ${i}`}
-          translate={translate}
-        />));
-    }
+    const graphs = samples.map((sample, i) =>
+      (<CreditAccumulationGraph
+        key={`credit-graph-${i}`} // eslint-disable-line react/no-array-index-key
+        students={sample}
+        title={`${translate('populationStatistics.sampleId')}: ${i}`}
+        translate={translate}
+      />));
     return (
       <Segment>
         <Header size="medium" dividing>{translate('populationStatistics.graphSegmentHeader')}</Header>
@@ -72,8 +67,8 @@ class PopulationDetails extends Component {
   }
 }
 
-const mapStateToProps = ({ populations, locale }) => ({
-  samples: flattenAndCleanSamples(populations.samples),
+const mapStateToProps = ({ populationReducer, locale }) => ({
+  samples: flattenAndCleanSamples(populationReducer.samples),
   translate: getTranslate(locale)
 });
 
