@@ -5,3 +5,4 @@ src/tester.js
 update.sh
 .env
 logs/*
+run_update_script.sh
