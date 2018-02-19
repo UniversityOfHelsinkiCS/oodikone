@@ -5,7 +5,7 @@ import moment from 'moment';
 import { getTranslate, getActiveLanguage } from 'react-localize-redux';
 import { Dimmer, Segment, Header } from 'semantic-ui-react';
 
-import { addError, getDepartmentSuccessAction } from '../../actions';
+import { getDepartmentSuccessAction } from '../../actions';
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants';
 import MulticolorBarChart from '../MulticolorBarChart';
 import ScrollableDateSelector from '../ScrollableDateSelector';
@@ -40,7 +40,6 @@ const isInArrayLimits = (amount, index, arrayLenght) =>
 class DepartmentSuccess extends Component {
   static propTypes = {
     dispatchGetDepartmentSuccess: func.isRequired,
-    dispatchAddError: func.isRequired,
     translate: func.isRequired
   };
 
@@ -99,7 +98,7 @@ class DepartmentSuccess extends Component {
           const chartData = createChartData(json.value);
           this.setState({ chartData, isLoading: false });
         },
-        err => this.props.dispatchAddError(err)
+        () => this.setState({ isLoading: false })
       );
   };
 
@@ -137,8 +136,7 @@ const mapStateToProps = ({ locale }) => ({
 
 const mapDispatchToProps = dispatch => ({
   dispatchGetDepartmentSuccess: date =>
-    dispatch(getDepartmentSuccessAction(date)),
-  dispatchAddError: err => dispatch(addError(err))
+    dispatch(getDepartmentSuccessAction(date))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DepartmentSuccess);

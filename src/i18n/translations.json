@@ -13,6 +13,10 @@
     "grade": ["Grade"],
     "passed": ["Passed"]
   },
+  "error": {
+    "connectionError" : ["Connection error"],
+    "errorInResponseTo" : ["Error for API call"]
+  },
   "graphs": {
     "referenceCredits": ["Reference credits"]
   },
