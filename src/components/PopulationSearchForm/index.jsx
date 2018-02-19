@@ -9,7 +9,7 @@ import { isEqual } from 'lodash';
 
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../../constants';
 import { dateFromApiToDisplay, reformatDate } from '../../common';
-import { addError, getPopulationStatisticsAction, clearPopulationsAction } from '../../actions';
+import { getPopulationStatisticsAction, clearPopulationsAction } from '../../actions';
 
 import styles from './populationSearchForm.css';
 
@@ -43,7 +43,6 @@ class PopulationSearchForm extends Component {
     translate: func.isRequired,
     dispatchGetPopulationStatistics: func.isRequired,
     dispatchClearPopulations: func.isRequired,
-    dispatchAddError: func.isRequired,
     queries: arrayOf(object).isRequired
   };
 
@@ -90,10 +89,7 @@ class PopulationSearchForm extends Component {
 
   fetchPopulation = () => {
     const { query } = this.state;
-    const {
-      dispatchGetPopulationStatistics,
-      dispatchAddError
-    } = this.props;
+    const { dispatchGetPopulationStatistics } = this.props;
 
     query.uuid = uuidv4();
 
@@ -101,7 +97,7 @@ class PopulationSearchForm extends Component {
     dispatchGetPopulationStatistics(query)
       .then(
         () => this.setState({ isLoading: false }),
-        err => dispatchAddError(err)
+        () => this.setState({ isLoading: false })
       );
   };
 
@@ -218,8 +214,7 @@ const mapDispatchToProps = dispatch => ({
   dispatchGetPopulationStatistics: request =>
     dispatch(getPopulationStatisticsAction(request)),
   dispatchClearPopulations: () =>
-    dispatch(clearPopulationsAction()),
-  dispatchAddError: err => dispatch(addError(err))
+    dispatch(clearPopulationsAction())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchForm);

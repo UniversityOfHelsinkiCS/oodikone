@@ -9,11 +9,24 @@ const toJSON = res =>
 const catchErrorsIntoJSON = (err, catchRejected) => {
   if (err.status === 401) throw err;
 
-  return err.json().then((data) => {
-    data.error.url = err.url;
-    data.catchRejected = catchRejected;
-    return data;
-  }).catch(() => err);
+  try {
+    return err.json().then((data) => {
+      data.code = err.status;
+      data.url = err.url;
+      data.catchRejected = catchRejected;
+      return data;
+    }).catch(() => err);
+    // fallback for fetch errors
+  } catch (e) {
+    if (err instanceof TypeError) {
+      return {
+        code: 503,
+        error: `${err.message} ${err.stack}`,
+        catchRejected
+      };
+    }
+  }
+  return err;
 };
 
 const checkForErrors = (res) => {

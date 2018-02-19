@@ -1,9 +1,11 @@
-import { ADD_ERROR } from '../../actions/index';
+import uuidv4 from 'uuid/v4';
+
+import { ADD_ERROR, REMOVE_ERROR } from '../../actions';
 
 function addErrorToState(err, state) {
-  const newState = state.slice();
-  newState.push(err);
-  return newState;
+  /* unpure */
+  err.uuid = uuidv4();
+  return [...state, err];
 }
 
 export default (state = [], action) => {
@@ -11,17 +13,21 @@ export default (state = [], action) => {
     type, error, payload, errorJson
   } = action;
 
-  // Error is handled else where
-  if (payload && !payload.catchRejected) {
+  // Manually added errors
+  if (type === ADD_ERROR) {
+    return addErrorToState(errorJson, state);
+
+  // maunually remove error
+  } else if (type === REMOVE_ERROR) {
+    return state.filter(e => e.uuid !== payload.uuid);
+
+  // Error is handled elsewhere
+  } else if (payload && !payload.catchRejected) {
     return state;
 
-  // Manually added errors
-  } else if (type === ADD_ERROR) {
-    return addErrorToState(errorJson.error, state);
-
-  // Received JSON errors
-  } else if (payload && payload.error) {
-    return addErrorToState(payload.error, state);
+    // Received JSON errors
+  } else if (payload && error) {
+    return addErrorToState(payload, state);
 
   // Responses not in JSON (e.g. Gateway timeouts)
   } else if (error) {

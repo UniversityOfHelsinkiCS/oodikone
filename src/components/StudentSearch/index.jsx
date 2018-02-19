@@ -3,7 +3,7 @@ import { func } from 'prop-types';
 import { connect } from 'react-redux';
 import { Search, Segment } from 'semantic-ui-react';
 
-import { addError, findStudentsAction, getStudentAction } from '../../actions';
+import { findStudentsAction, getStudentAction } from '../../actions';
 import SearchResultTable from '../SearchResultTable';
 import SegmentDimmer from '../SegmentDimmer';
 
@@ -21,7 +21,6 @@ class StudentSearch extends Component {
   static propTypes = {
     dispatchFindStudents: func.isRequired,
     dispatchGetStudent: func.isRequired,
-    dispatchAddError: func.isRequired,
     translate: func.isRequired
   };
 
@@ -41,12 +40,12 @@ class StudentSearch extends Component {
 
   handleSearchSelect = (e, student) => {
     const { studentNumber } = student;
-    const { dispatchGetStudent, dispatchAddError } = this.props;
+    const { dispatchGetStudent } = this.props;
     this.setState({ isLoading: true });
     dispatchGetStudent(studentNumber)
       .then(
-        () => this.resetComponent(),
-        err => dispatchAddError(err)
+        () => this.resetComponent,
+        () => this.resetComponent
       );
   };
 
@@ -59,7 +58,7 @@ class StudentSearch extends Component {
           isLoading: false,
           showResults: true
         }),
-        err => this.props.dispatchAddError(err)
+        () => this.setState({ isLoading: false })
       );
   };
 
@@ -118,8 +117,7 @@ const mapDispatchToProps = dispatch => ({
   dispatchFindStudents: searchStr =>
     dispatch(findStudentsAction(searchStr)),
   dispatchGetStudent: studentNumber =>
-    dispatch(getStudentAction(studentNumber)),
-  dispatchAddError: err => dispatch(addError(err))
+    dispatch(getStudentAction(studentNumber))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudentSearch);

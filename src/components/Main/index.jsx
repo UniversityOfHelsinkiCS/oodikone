@@ -8,6 +8,7 @@ import DepartmentSuccess from '../DepartmentSuccess';
 import StudentStatistics from '../StudentStatistics';
 import Courses from '../Courses';
 import Teachers from '../Teachers';
+import ErrorContainer from '../ErrorContainer';
 import { routes, BASE_PATH } from '../../constants';
 
 import styles from './main.css';
@@ -17,6 +18,7 @@ const Main = () => (
     <Router basename={BASE_PATH}>
       <main className={styles.routeViewContainer}>
         <Header />
+        <ErrorContainer />
         <Switch>
           <Route exact path={routes.index.route} component={DepartmentSuccess} />
           <Route exact path={routes.populations.route} component={Populations} />
