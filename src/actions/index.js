@@ -12,6 +12,7 @@ import {
 } from '../api';
 
 export const ADD_ERROR = 'ADD_ERROR';
+export const REMOVE_ERROR = 'REMOVE_ERROR';
 export const GET_DEPARTMENT_SUCCESS = 'GET_DEPARTMENT_SUCCESS';
 export const FIND_STUDENTS = 'FIND_STUDENTS';
 export const GET_STUDENT = 'GET_STUDENT';
@@ -35,6 +36,11 @@ export const GET_INSTANCE_STATS = 'GET_INSTANCE_STATISTICS';
 export const addError = errorJson => ({
   type: ADD_ERROR,
   errorJson
+});
+
+export const removeError = uuid => ({
+  type: REMOVE_ERROR,
+  payload: { uuid }
 });
 
 export const getDepartmentSuccessAction = date => ({
