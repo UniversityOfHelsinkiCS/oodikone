@@ -12,7 +12,6 @@ export default (state = [], action) => {
   const {
     type, error, payload, errorJson
   } = action;
-
   // Manually added errors
   if (type === ADD_ERROR) {
     return addErrorToState(errorJson, state);
@@ -22,11 +21,11 @@ export default (state = [], action) => {
     return state.filter(e => e.uuid !== payload.uuid);
 
   // Error is handled elsewhere
-  } else if (payload && !payload.catchRejected) {
+  } else if (payload && !payload.catchRejected === false) {
     return state;
 
     // Received JSON errors
-  } else if (payload && error) {
+  } else if (payload && payload.error) {
     return addErrorToState(payload, state);
 
   // Responses not in JSON (e.g. Gateway timeouts)
@@ -36,7 +35,7 @@ export default (state = [], action) => {
       message = `${message} : ${payload.stack}`;
     }
     const err = {
-      message,
+      error: message,
       code: payload.status || 500,
       url: payload.url
     };
