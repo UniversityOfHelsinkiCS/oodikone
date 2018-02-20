@@ -3,7 +3,7 @@ import { func, arrayOf, string } from 'prop-types';
 import { Icon, Search, Label, Confirm } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 
-import { addError, findTagsAction } from '../../actions';
+import { findTagsAction } from '../../actions';
 
 
 import styles from './tagListSelector.css';
@@ -15,8 +15,7 @@ class TagListSelector extends Component {
     translate: func.isRequired,
     handleAddTagFn: func.isRequired,
     handleRemoveTagFn: func.isRequired,
-    dispatchFindTagsAction: func.isRequired,
-    dispatchAddError: func.isRequired
+    dispatchFindTagsAction: func.isRequired
   };
 
   static defaultProps = {
@@ -63,7 +62,7 @@ class TagListSelector extends Component {
     this.props.dispatchFindTagsAction(searchStr)
       .then(
         json => this.setState({ existingTags: json.value, isLoading: false }),
-        err => this.props.dispatchAddError(err)
+        () => this.setState({ isLoading: false })
       );
   };
 
@@ -143,8 +142,7 @@ const mapStateToProps = () => ({});
 
 const mapDispatchToProps = dispatch => ({
   dispatchFindTagsAction: searchStr =>
-    dispatch(findTagsAction(searchStr)),
-  dispatchAddError: err => dispatch(addError(err))
+    dispatch(findTagsAction(searchStr))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TagListSelector);
