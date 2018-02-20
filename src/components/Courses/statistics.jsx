@@ -88,13 +88,13 @@ class CourseStatistics extends Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column key="1">
-              <MulticolorBarChart chartTitle={selectedCourse.name} chartData={dataAll} />
+              <MulticolorBarChart chartTitle="All" chartData={dataAll} />
             </Grid.Column>
             <Grid.Column key="2">
-              <MulticolorBarChart chartTitle={selectedCourse.name} chartData={dataPassed} />
+              <MulticolorBarChart chartTitle="Passed" chartData={dataPassed} />
             </Grid.Column>
             <Grid.Column key="3">
-              <MulticolorBarChart chartTitle={selectedCourse.name} chartData={dataFailed} />
+              <MulticolorBarChart chartTitle="Failed" chartData={dataFailed} />
             </Grid.Column>
           </Grid.Row>
         </Grid>

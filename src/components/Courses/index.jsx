@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getActiveLanguage, getTranslate } from 'react-localize-redux';
 import PropTypes from 'prop-types';
-import { Search, Dropdown } from 'semantic-ui-react';
+import { Search,
+  Dropdown,
+  Header,
+  List,
+  Button } from 'semantic-ui-react';
 import CourseStatistics from './statistics';
 
 import { addError,
@@ -31,8 +35,9 @@ class Courses extends Component {
     this.fetchCoursesList = this.fetchCoursesList.bind(this);
     this.fetchCourseInstances = this.fetchCourseInstances.bind(this);
     this.fetchInstanceStatistics = this.fetchInstanceStatistics.bind(this);
+    this.removeInstance = this.removeInstance.bind(this);
 
-    this.state = {};
+    this.state = { selectedCourse: { name: 'No course', code: 'No code' }, selectedInstances: [] };
   }
 
   componentDidMount() {
@@ -43,7 +48,9 @@ class Courses extends Component {
     this.setState({
       courseList: [],
       isLoading: false,
-      searchStr: ''
+      searchStr: '',
+      selectedInstances: [],
+      selectedCourse: { name: 'No course', code: 'No code' }
     });
   }
 
@@ -80,11 +87,18 @@ class Courses extends Component {
 
   // get selected instance id when selected from dropdown
   fetchInstanceStatistics(e, { value }) {
+    this.state.selectedInstances.push(value);
+    value.course = this.state.selectedCourse;
     this.props.dispatchGetInstanceStatistics(value.date, value.code, 12)
       .then(
         json => this.setState({ instanceStats: json.value }),
         err => this.props.dispatchAddError(err)
       );
+  }
+
+  removeInstance(e, { value }) {
+    this.setState({ selectedInstances: this.state.selectedInstances.filter(i => i !== value) });
+    console.log(value);
   }
 
   render() {
@@ -94,7 +108,8 @@ class Courses extends Component {
       searchStr,
       courseInstances,
       selectedCourse,
-      instanceStats
+      instanceStats,
+      selectedInstances
     } = this.state;
     const instanceList = [];
     if (courseInstances !== undefined) {
@@ -106,9 +121,19 @@ class Courses extends Component {
         }
       }));
     }
+    const myList = selectedInstances.map(i => (
+      <List.Item>
+        <List.Header>
+          {i.course.name}
+          <List.Content floated="right">
+            <Button size="tiny" value={i} onClick={this.removeInstance}>remove</Button>
+          </List.Content>
+        </List.Header>
+        some stuff
+      </List.Item>));
     const t = this.props.translate;
     return (
-      <div className={styles.container}>
+      <div>
         <Search
           className={styles.courseSearch}
           input={{ fluid: true }}
@@ -119,14 +144,25 @@ class Courses extends Component {
           resultRenderer={CourseListRenderer}
           value={searchStr}
         />
-        <div>{`Courses: ${t('common.example')}`}</div>
-        {isLoading}
-        <Dropdown onChange={this.fetchInstanceStatistics} placeholder="Select course instance" fluid selection options={instanceList} />
 
-        <CourseStatistics
-          selectedCourse={selectedCourse}
-          stats={instanceStats}
+        <Header as="h2">
+          {selectedCourse.name}
+        </Header>
+
+        <Dropdown
+          className={styles.courseSearch}
+          onChange={this.fetchInstanceStatistics}
+          placeholder="Select course instance"
+          fluid selection options={instanceList}
         />
+        <List divided relaxed>
+          {myList}
+        </List>
+        {selectedInstances.map(i => (<CourseStatistics
+          selectedCourse={i.course}
+          stats={instanceStats}
+        />))}
+
       </div>
     );
   }
