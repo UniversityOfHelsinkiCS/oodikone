@@ -4,7 +4,7 @@
   "description": "Backend for Oodikone",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "node index.js",
     "docker_local": "NODE_ENV=docker_local nodemon index.js",
     "dev": "NODE_ENV=dev nodemon index.js",
     "test": "NODE_ENV=test ava",

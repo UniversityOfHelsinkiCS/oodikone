@@ -11,16 +11,15 @@ const auth = require('./middleware/auth')
 const PORT = 8080
 
 const app = express()
-
-
 app.use(cors({credentials: true, origin: conf.frontend_addr}))
 app.use(bodyParser.json())
 app.use(expressSession({
   secret: 'Alan Turing oli ihmissusi',
-  store: new Store({ db: sequelize }),
+  store: new Store({db:sequelize}),
   resave: false,
   saveUninitialized: true
 }))
+
 app.use(auth.checkAuth)
 
 app.get('/ping', async function (req, res) {
@@ -29,23 +28,23 @@ app.get('/ping', async function (req, res) {
 
 const User = require('./services/users')
 
-// async function authorizer (username, password, cb) {
-//   const hash = await User.withUsername(username)  
-//   if ( hash===null ) {
-//     return cb(null, false)
-//   }
+async function authorizer (username, password, cb) {
+  const hash = await User.withUsername(username)  
+  if ( hash===null ) {
+    return cb(null, false)
+  }
 
-//   return cb(null, bcrypt.compareSync(password, hash))
-// }
-// 
-// app.use(
-//   basicAuth({ 
-//     authorizer,
-//     challenge: true,
-//     authorizeAsync: true,
-//     unauthorizedResponse: () => ({ error: 'unauthorized' })
-//   })
-// )
+  return cb(null, bcrypt.compareSync(password, hash))
+}
+
+app.use(
+  basicAuth({ 
+    authorizer,
+    challenge: true,
+    authorizeAsync: true,
+    unauthorizedResponse: () => ({ error: 'unauthorized' })
+  })
+)
 
 const Department = require('./services/departments')
 const Student = require('./services/students')
