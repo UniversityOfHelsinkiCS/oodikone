@@ -2,17 +2,21 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getActiveLanguage, getTranslate } from 'react-localize-redux';
 import PropTypes from 'prop-types';
-import { Search,
+import {
+  Search,
   Dropdown,
   Header,
   List,
-  Button } from 'semantic-ui-react';
+  Button
+} from 'semantic-ui-react';
 import CourseStatistics from './statistics';
 
-import { addError,
+import {
+  addError,
   findCoursesAction,
   findInstancesAction,
-  getInstanceStatisticsAction } from '../../actions';
+  getInstanceStatisticsAction
+} from '../../actions';
 
 import styles from './courses.css';
 
@@ -70,35 +74,30 @@ class Courses extends Component {
     const { searchStr } = this.state;
     this.setState({ isLoading: true });
     this.props.dispatchFindCoursesList(searchStr)
-      .then(
-        json => this.setState({ courseList: json.value, isLoading: false }),
-        err => this.props.dispatchAddError(err)
-      );
+      .then(json => this.setState({ courseList: json.value, isLoading: false }));
   }
 
   fetchCourseInstances() {
     const courseCode = this.state.selectedCourse.code;
     this.props.dispatchFindCourseInstances(courseCode)
-      .then(
-        json => this.setState({ courseInstances: json.value }),
-        err => this.props.dispatchAddError(err)
-      );
+      .then(json => this.setState({ courseInstances: json.value }));
   }
 
-  // get selected instance id when selected from dropdown
-  fetchInstanceStatistics(e, { value }) {
-    this.state.selectedInstances.push(value);
-    value.course = this.state.selectedCourse;
-    this.props.dispatchGetInstanceStatistics(value.date, value.code, 12)
-      .then(
-        json => this.setState({ instanceStats: json.value }),
-        err => this.props.dispatchAddError(err)
-      );
+  fetchInstanceStatistics(courseInstance) {
+    const { selectedInstances, selectedCourse } = this.state;
+    courseInstance.course = selectedCourse;
+    this.props.dispatchGetInstanceStatistics(courseInstance.date, courseInstance.code, 12)
+      .then((json) => {
+        courseInstance.stats = json.value;
+        this.setState({
+          selectedInstances: [...selectedInstances, courseInstance]
+        });
+      });
   }
 
-  removeInstance(e, { value }) {
-    this.setState({ selectedInstances: this.state.selectedInstances.filter(i => i !== value) });
-    console.log(value);
+  removeInstance(courseInstance) {
+    const { selectedInstances } = this.state;
+    this.setState({ selectedInstances: selectedInstances.filter(i => i !== courseInstance) });
   }
 
   render() {
@@ -108,7 +107,6 @@ class Courses extends Component {
       searchStr,
       courseInstances,
       selectedCourse,
-      instanceStats,
       selectedInstances
     } = this.state;
     const instanceList = [];
@@ -121,17 +119,20 @@ class Courses extends Component {
         }
       }));
     }
-    const myList = selectedInstances.map(i => (
+
+    const listInstance = selectedInstances.map(instance => (
       <List.Item>
         <List.Header>
-          {i.course.name}
+          {instance.course.name} ({instance.code})
           <List.Content floated="right">
-            <Button size="tiny" value={i} onClick={this.removeInstance}>remove</Button>
+            <Button size="mini" value={instance} onClick={() => this.removeInstance(instance)}>remove</Button>
           </List.Content>
         </List.Header>
-        some stuff
+        {instance.date}
       </List.Item>));
-    const t = this.props.translate;
+
+    // const t = this.props.translate;
+
     return (
       <div>
         <Search
@@ -151,16 +152,21 @@ class Courses extends Component {
 
         <Dropdown
           className={styles.courseSearch}
-          onChange={this.fetchInstanceStatistics}
+          onChange={(e, data) => this.fetchInstanceStatistics(data.value)}
           placeholder="Select course instance"
-          fluid selection options={instanceList}
+          fluid
+          selection
+          options={instanceList}
         />
+
         <List divided relaxed>
-          {myList}
+          {listInstance}
         </List>
+
         {selectedInstances.map(i => (<CourseStatistics
-          selectedCourse={i.course}
-          stats={instanceStats}
+          courseName={i.course.name}
+          instanceDate={i.date}
+          stats={i.stats}
         />))}
 
       </div>
@@ -171,9 +177,8 @@ class Courses extends Component {
 Courses.propTypes = {
   dispatchFindCoursesList: func.isRequired,
   dispatchFindCourseInstances: func.isRequired,
-  dispatchGetInstanceStatistics: func.isRequired,
-  dispatchAddError: func.isRequired,
-  translate: func.isRequired
+  dispatchGetInstanceStatistics: func.isRequired
+  // translate: func.isRequired
 };
 
 const mapStateToProps = ({ locale }) => ({
