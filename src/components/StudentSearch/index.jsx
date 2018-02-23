@@ -44,8 +44,8 @@ class StudentSearch extends Component {
     this.setState({ isLoading: true });
     dispatchGetStudent(studentNumber)
       .then(
-        () => this.resetComponent,
-        () => this.resetComponent
+        () => this.resetComponent(),
+        () => this.resetComponent()
       );
   };
 
