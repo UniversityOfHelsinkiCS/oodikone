@@ -1,26 +1,16 @@
 const express = require('express')
-const expressSession = require('express-session')
-const Store = require('connect-session-sequelize')(expressSession.Store)
 const basicAuth = require('express-basic-auth')
 const bcrypt = require('bcrypt')
 const cors = require('cors')
-const { sequelize } = require('./models/index')
 const bodyParser = require('body-parser')
 const conf = require('./conf-backend')
-const auth = require('./middleware/auth')
+// const auth = require('./middleware/auth')
 const PORT = 8080
 
 const app = express()
 app.use(cors({credentials: true, origin: conf.frontend_addr}))
 app.use(bodyParser.json())
-app.use(expressSession({
-  secret: 'Alan Turing oli ihmissusi',
-  store: new Store({db:sequelize}),
-  resave: false,
-  saveUninitialized: true
-}))
-
-app.use(auth.checkAuth)
+// app.use(auth.checkAuth)
 
 app.get('/ping', async function (req, res) {
   res.json({data: 'pong'})
