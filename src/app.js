@@ -24,7 +24,7 @@ app.get('/ping', async function (req, res) {
   res.json({ data: 'pong' })
 })
 
-const BASE_URL = process.env.NODE_ENV === 'production' ? '/' : '/api'
+const BASE_URL = process.env.NODE_ENV === 'dev' ? '/api' : '/'
 
 routes(app, BASE_URL)
 
