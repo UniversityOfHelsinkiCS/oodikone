@@ -75,6 +75,8 @@ export const postJson = (path, data, catchRejected = true) => fetch(`${API_BASE_
   .then(checkForErrors)
   .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
 
+export const containsOnlyNumbers = str => str.match('^\\d+$');
+
 export const reformatDate = (date, outputFormat) => moment(date).format(outputFormat);
 
 export const dateFromApiToDisplay = date =>
