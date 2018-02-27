@@ -3,6 +3,7 @@ const department = require('./routes/department')
 const students = require('./routes/students')
 const tags = require('./routes/tags')
 const population = require('./routes/population')
+const teacher = require('./routes/teacher')
 
 
 module.exports = (app, url) => {
@@ -11,4 +12,5 @@ module.exports = (app, url) => {
   app.use(url, students)
   app.use(url, tags)
   app.use(url, population)
+  app.use(url, teacher)
 }

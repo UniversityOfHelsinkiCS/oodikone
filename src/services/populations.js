@@ -13,8 +13,7 @@ const studyRightLike = (searchTerm) => {
     SELECT DISTINCT highLevelName 
       FROM StudyRight  
       WHERE LOWER(highLevelName) 
-      LIKE LOWER('%${searchTerm}%')
-      LIMIT 10`
+      LIKE LOWER('%${searchTerm}%')`
   return sequelize.query(query, { model: Studyright })
 }
 
