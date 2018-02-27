@@ -4,52 +4,59 @@
 
 ### Getting started
 
-Install postgresql:
-https://www.postgresql.org/download/
+Install docker & docker-compose to run postgres and redis:
 
-Then create user tkt_oodi and database tk_oodi from dump.sql file by following these steps: 
+Install docker CE: https://docs.docker.com/engine/installation/ 
 
-Run:
+Install docker-compose: https://docs.docker.com/compose/install/
 
-`sudo su postgres`
-
-`psql`
-After this you should be working as:
-
-`postgres=#` 
-
-Then contact admin to get the password and run the following commands: 
-
+Create docker-compose.yml file containing following:
 ```
-CREATE USER tkt_oodi WITH PASSWORD 'insertPasswordHere';
-CREATE DATABASE tkt_oodi;
-GRANT ALL PRIVILEGES ON DATABASE tkt_oodi TO tkt_oodi;
-\q
-```
-Now put the dump data to the tkt_oodi db: 
+version: '3'
 
-`psql tkt_oodi < dump.sql`
-
-And the db has been set up.
-
-To look into the tkt_oodi db in terminal run:
-
-`psql -h 127.0.0.1 -d tkt_oodi -U tkt_oodi -W`
-
-and enter the password.
-
-Then install and run redis
-
-```
-wget http://download.redis.io/redis-stable.tar.gz
-tar xvzf redis-stable.tar.gz
-cd redis-stable
-make
-sudo make install
-redis-server
+services:
+  db:
+    image: postgres:9.6.3
+    ports:
+      - "5421:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    container_name: oodi_db
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    container_name: redis
 ```
 
-Install nodejs and npm
+To start a redis and a database, run:
+
+```docker compose up -d```
+
+(For production database we created user tkt_oodi, but for development we can use postgres.)
+
+Create database tkt_oodi:
+
+`docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi"`
+
+Fill database with data from dump.bak file: 
+
+`cat dump.bak | docker exec -i oodi_db psql -U postgres -d tkt_oodi`
+
+Check that you have all the data you ever wanted:
+
+`docker exec -it -u postgres oodi_db psql -d tkt_oodi`
+`\dt`
+
+Create test database:
+
+`docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_test"`
+
+Fill database with data from test.bak dump file: 
+
+`cat test.bak | docker exec -i oodi_db psql -U postgres -d tkt_oodi_test`
+
+Install node
 https://nodejs.org/en/download/
 
 Clone the repository and install the packages in the root of the project:
@@ -58,6 +65,14 @@ Clone the repository and install the packages in the root of the project:
 git clone git@github.com:UniversityOfHelsinkiCS/oodikone2-backend.git`
 cd oodikone2-backend
 npm install
+```
+
+Create .env file containing
+```
+DB_URL=postgres://postgres@localhost:5421/tkt_oodi
+TEST_DB=postgres://postgres@localhost:5421/tkt_oodi_test
+FRONT_URL=http://localhost:8000
+REDIS=localhost
 ```
 
 ### Running 
@@ -72,62 +87,9 @@ http://localhost:8080/api/tags
 
 If you see a response you can congratulate yourself on succesfully installing and running OodiKone2 backend.
 
-#### Docker
-Install docker CE: https://docs.docker.com/engine/installation/ 
-
-Install docker-compose: https://docs.docker.com/compose/install/
-
-Docker-compose version must be > 1.10.0
-
-Build a Docker image using comand 
-
-`docker build -t {username}/backend`
-
-Run the whole OodiKone with the command 
-
-`docker-compose up`
-
 #### Testing
 
-First log in to oodikone and add reading rights to your username to the test data dump
-
-```
-ssh {username}@oodikone.cs.helsinki.fi
-setfacl -m u:{username}:r /home/oodidata/ooditestdata.sql
-```
-
-Return to your own computer and fetch the test data with the command
-
-`scp {username}@oodikone.cs.helsinki.fi:/home/oodidata/ooditestdata.sql .`
-
-Set up the test database from the file
-
-Run:
-
-`sudo su postgres`
-
-`psql`
-
-After this you should be working as:
-
-`postgres=#` 
-
-Run: 
-
-```
-CREATE DATABASE tkt_oodi_test;
-GRANT ALL PRIVILEGES ON DATABASE tkt_oodi_test TO tkt_oodi;
-\q
-```
-Now put the dump data to the tkt_oodi_test db: 
-
-`psql tkt_oodi_test < ooditestdata.sql`
-
-And you're all set. 
-
-Run the tests with command
-
-`npm test`
+Run `npm test`
 
 ## Deployment
 
@@ -135,20 +97,13 @@ Log into svm-59 (aka oodikone) and navigate to the correct folder
 
 `ssh {username}@oodikone.cs.helsinki.fi`
 
-`cd home/oodidata/oodikone2-backend/`
+Log in as tkt_oodi
+`sudo su - tkt_oodi`
 
-Pull the new version from Git
-
-`git pull`
+Navigate to correct folder
+`cd oodikone.cs.helsinki.fi`
 
 Use the update script to restart the software
-
 `./update.sh`
 
 Be amazed
-
-## oodiKone-backend1
-
-If you have the original oodikone-backend-1.0-SNAPSHOT.jar file, make sure you have the application.properties file set up at the same folder and the psql database set up as required by the backend2 and you should be able to run the original backend with the command
-
-`java -jar oodikone-backend-1.0-SNAPSHOT.jar`
