@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { func } from 'prop-types';
+import { func, string } from 'prop-types';
 import { connect } from 'react-redux';
 import { Search, Segment } from 'semantic-ui-react';
 
@@ -9,6 +9,7 @@ import SegmentDimmer from '../SegmentDimmer';
 
 import sharedStyles from '../../styles/shared';
 import styles from './studentSearch.css';
+import { containsOnlyNumbers } from '../../common';
 
 const DEFAULT_STATE = {
   students: [],
@@ -21,10 +22,26 @@ class StudentSearch extends Component {
   static propTypes = {
     dispatchFindStudents: func.isRequired,
     dispatchGetStudent: func.isRequired,
-    translate: func.isRequired
+    translate: func.isRequired,
+    studentNumber: string
+  };
+  static defaultProps = {
+    studentNumber: undefined
   };
 
  state = DEFAULT_STATE;
+
+ componentDidMount() {
+   const { studentNumber, dispatchGetStudent } = this.props;
+   if (studentNumber && containsOnlyNumbers(studentNumber)) {
+     this.setState({ isLoading: true });
+     dispatchGetStudent(studentNumber)
+       .then(
+         () => this.resetComponent(),
+         () => this.resetComponent()
+       );
+   }
+ }
 
   resetComponent = () => {
     this.setState(DEFAULT_STATE);

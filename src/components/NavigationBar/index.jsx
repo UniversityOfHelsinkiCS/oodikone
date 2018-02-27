@@ -27,8 +27,16 @@ class NavigationBar extends Component {
     this.setState({ pathname });
   }
 
-  render() {
+  checkActiveRoute = (route) => {
     const { pathname } = this.state;
+    return pathname && (pathname === '/' || (route.length > 1 && pathname.includes(route)));
+  };
+
+  checkForOptionalParams = route => (
+    route.endsWith('?') ? route.slice(0, route.indexOf('/:')) : route
+  );
+
+  render() {
     const t = this.props.translate;
 
     const menuWidth = Object.keys(routes).length + 1;
@@ -45,18 +53,21 @@ class NavigationBar extends Component {
           </span>
         </Menu.Item>
         {
-          Object.values(routes).map(value => (
-            <Menu.Item
-              as={Link}
-              key={`menu-item-${value.route}`}
-              to={value.route}
-              active={pathname === value.route}
-              onClick={() => this.setState({ pathname: value.route })}
-            >
-              {t(`navigationBar.${value.translateId}`)}
-            </Menu.Item>
-          ))
-        }
+          Object.values(routes).map((value) => {
+            const viewableRoute = this.checkForOptionalParams(value.route);
+            return (
+              <Menu.Item
+                as={Link}
+                key={`menu-item-${viewableRoute}`}
+                to={this.checkForOptionalParams(viewableRoute)}
+                active={this.checkActiveRoute(viewableRoute)}
+                onClick={() => this.setState({ pathname: viewableRoute })}
+              >
+                {t(`navigationBar.${value.translateId}`)}
+              </Menu.Item>
+            );
+          })
+          }
       </Menu>);
   }
 }

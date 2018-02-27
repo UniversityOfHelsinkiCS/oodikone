@@ -41,8 +41,8 @@ export const routes = {
   index: { route: '/', translateId: 'departmentSuccess' },
   populations: { route: '/populations', translateId: 'populations' },
   courses: { route: '/courses', translateId: 'courses' },
-  students: { route: '/students', translateId: 'students' },
-  teachers: { route: '/teachers,', translateId: 'teachers' }
+  students: { route: '/students/:studentNumber?', translateId: 'students' },
+  teachers: { route: '/teachers', translateId: 'teachers' }
 };
 
 const assumeBasename = () => {
