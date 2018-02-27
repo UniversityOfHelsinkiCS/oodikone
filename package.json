@@ -6,6 +6,17 @@
     "type": "git",
     "url": "git+https://github.com/UniversityOfHelsinkiCS/oodikone2-frontend.git"
   },
+  "scripts": {
+    "dev": "webpack-dev-server --config webpack.config.local.js",
+    "dist": "rimraf dist && webpack --config webpack.config.production.js",
+    "lint": "concurrently 'npm run lint:js' 'npm run lint:css'",
+    "lint:css": "stylelint 'src/**/*.css'",
+    "lint:js": "eslint server ./ --ext .jsx,.js",
+    "lintfix": "eslint server ./ --ext .jsx,.js --fix",
+    "prepush": "npm run lint",
+    "pretest": "npm run lint",
+    "test": "node scripts/test.js --env=jsdom"
+  },
   "licence": "",
   "main": "src/app.jsx",
   "devDependencies": {
@@ -81,17 +92,6 @@
     "semantic-ui-react": "^0.77.2",
     "uuid": "^3.2.1",
     "whatwg-fetch": "2.0.3"
-  },
-  "scripts": {
-    "dev": "webpack-dev-server --config webpack.config.local.js",
-    "dist": "rimraf dist && webpack --config webpack.config.production.js",
-    "lint": "concurrently 'npm run lint:js' 'npm run lint:css'",
-    "lint:css": "stylelint 'src/**/*.css'",
-    "lint:js": "eslint server ./ --ext .jsx,.js",
-    "lintfix": "eslint server ./ --ext .jsx,.js --fix",
-    "prepush": "npm run lint",
-    "pretest": "npm run lint",
-    "test": "node scripts/test.js --env=jsdom"
   },
   "jest": {
     "collectCoverageFrom": [
