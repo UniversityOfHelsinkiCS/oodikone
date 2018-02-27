@@ -39,15 +39,15 @@ router.post('/populationstatistics', async function (req, res) {
 router.get('/studyprogrammes', async function (req, res) {
   const programs = [
     {
-      id: 'MA1',
+      id: '500-K004',
       name: 'Bachelor of Science, Mathematics'
     },
     {
-      id: 'TKT1',
+      id: '500-K005',
       name: 'Bachelor of Science, Computer Science'
     },
     {
-      id: 'TKT2',
+      id: '500-M009',
       name: 'Master of Science (science), Computer Science'
     },
     {
@@ -55,7 +55,7 @@ router.get('/studyprogrammes', async function (req, res) {
       name: 'Bachelor of Science (Biological and Environmental Sciences)'
     },
     {
-      id: 'KH57_003',
+      id: 'KH57',
       name: 'Bachelor\'s Programme in Environmental Sciences'
     }
   ]
