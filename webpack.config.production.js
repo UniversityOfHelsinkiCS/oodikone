@@ -79,6 +79,9 @@ module.exports = {
 
   plugins: [
     new webpack.DefinePlugin({
+      CONFIG: {
+        BASE_PATH: JSON.stringify('')
+      },
       'process.env': {
         NODE_ENV: JSON.stringify('production')
       }
