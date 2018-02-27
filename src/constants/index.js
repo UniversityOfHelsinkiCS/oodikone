@@ -41,8 +41,8 @@ export const routes = {
   index: { route: '/', translateId: 'departmentSuccess' },
   populations: { route: '/populations', translateId: 'populations' },
   courses: { route: '/courses', translateId: 'courses' },
-  students: { route: '/students', translateId: 'students' },
-  teachers: { route: '/teachers,', translateId: 'teachers' }
+  students: { route: '/students/:studentNumber?', translateId: 'students' },
+  teachers: { route: '/teachers', translateId: 'teachers' }
 };
 
 const assumeBasename = () => {
@@ -54,7 +54,7 @@ const assumeBasename = () => {
 
 export const BASE_PATH = assumeBasename();
 
-export const API_BASE_PATH = `${assumeBasename()}/api`;
+export const API_BASE_PATH = '/api';
 
 export const AVAILABLE_LANGUAGES = ['en'];
 export const DEFAULT_LANG = 'en';
