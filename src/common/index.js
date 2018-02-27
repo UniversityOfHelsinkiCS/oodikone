@@ -35,24 +35,19 @@ const checkForErrors = (res) => {
   return res;
 };
 
-export const get = (path) => {
-  console.log('Pyyntö:', API_BASE_PATH, path);
-  return fetch(`${API_BASE_PATH}${path}`, {
+export const get = path =>
+  fetch(`${API_BASE_PATH}${path}`, {
     credentials: 'same-origin',
     'Cache-Control': 'no-cache'
   })
     .then(checkForErrors);
-};
 
-export const getJson = (path, catchRejected = true) => {
-  console.log('Pyyntö:', API_BASE_PATH, path);
-  return fetch(`${API_BASE_PATH}${path}`, {
-    credentials: 'same-origin',
-    'Cache-Control': 'no-cache'
-  })
-    .then(checkForErrors)
-    .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
-};
+export const getJson = (path, catchRejected = true) => fetch(`${API_BASE_PATH}${path}`, {
+  credentials: 'same-origin',
+  'Cache-Control': 'no-cache'
+})
+  .then(checkForErrors)
+  .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
 
 export const deleteItem = (path, data, catchRejected = true) => fetch(`${API_BASE_PATH}${path}`, {
   method: 'DELETE',
