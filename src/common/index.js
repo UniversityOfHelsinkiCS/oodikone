@@ -1,7 +1,5 @@
 import moment from 'moment';
-import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants';
-
-const API_BASE_PATH = '/api';
+import { API_BASE_PATH, API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants';
 
 const toJSON = res =>
   (res.status !== 204 ? res.json() : res);
