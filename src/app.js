@@ -5,22 +5,28 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const conf = require('./conf-backend')
 // const auth = require('./middleware/auth')
+const routes = require('./routes')
 const PORT = 8080
 
 const app = express()
-app.use(cors({credentials: true, origin: conf.frontend_addr}))
+app.use(cors({ credentials: true, origin: conf.frontend_addr }))
 app.use(bodyParser.json())
 // app.use(auth.checkAuth)
 
+
 app.get('/ping', async function (req, res) {
-  res.json({data: 'pong'})
+  res.json({ data: 'pong' })
 })
+
+const BASE_URL = process.env.NODE_ENV === 'dev' ? '/api' : '/'
+
+routes(app, BASE_URL)
 
 const User = require('./services/users')
 
-async function authorizer (username, password, cb) {
-  const hash = await User.withUsername(username)  
-  if ( hash===null ) {
+async function authorizer(username, password, cb) {
+  const hash = await User.withUsername(username)
+  if (hash === null) {
     return cb(null, false)
   }
 
@@ -28,7 +34,7 @@ async function authorizer (username, password, cb) {
 }
 
 app.use(
-  basicAuth({ 
+  basicAuth({
     authorizer,
     challenge: true,
     authorizeAsync: true,
@@ -36,186 +42,14 @@ app.use(
   })
 )
 
-const Department = require('./services/departments')
-const Student = require('./services/students')
-const Course = require('./services/courses')
-const Teacher = require('./services/teachers')
-const Population = require('./services/populations')
-const Tag = require('./services/tags')
-
-app.get('/api/departmentsuccess', async function (req, res) {
-  const startDate = req.query.date? req.query.date.split('.').join('-'): '2005-08-01'
-  const months = 13
-
-  const redis = require('redis')
-  require('bluebird').promisifyAll(redis.RedisClient.prototype)
-  const client = redis.createClient(6379 , conf.redis)
-  const env = process.env.NODE_ENV ? process.env.NODE_ENV : 'development'
-
-  const key = `department-statistics-${startDate}-${months}-${env}`
-  const timeToLive = env==='test' ? 60*60 : 60*60*24*7 // one hour or one week
-
-  try{
-    let results = await client.getAsync(key)
-    if ( results === null ) {
-      results = await Department.averagesInMonths(startDate, months)
-      await client.setAsync(key, JSON.stringify(results), 'EX', timeToLive)
-    } else {
-      results = JSON.parse(results)
-    }
-
-    res.json(results)
-  } catch(e) {
-    console.log(e)    
-  }
-
-})
-
-app.get('/api/students', async function (req, res) {
-  let results = []
-  if (req.query.searchTerm) {
-    results = await Student.bySearchTerm(req.query.searchTerm)
-  }
-
-  res.json(results)
-})
-
-app.get('/api/students/:id', async function (req, res) {
-  const results = await Student.withId(req.params.id)
-  res.json(results)
-})
-
-app.post('/api/students/:id/tags', async function (req, res) {
-  const tagname = req.body.text
-  const result = await Student.addTag(req.params.id, tagname)
-  const status = result.error === undefined ? 201 : 400
-
-  res.status(status).json(result)
-})
-
-app.delete('/api/students/:id/tags', async function (req, res) {
-  const tagname = req.body.text
-  const result = await Student.deleteTag(req.params.id, tagname)
-  const status = result.error === undefined ? 200 : 400
-  res.status(status).json(result)
-})
-
-app.get('/api/courses', async function (req, res) {
-  let results = []
-  if (req.query.name) {
-    results = await Course.bySearchTerm(req.query.name)
-  }
-
-  res.json(results)
-})
-
-app.post('/api/courselist', async function(req, res) {
-  const results = await Course.instancesOf(req.body.code)
-  
-  res.json(results)
-})
-
-app.get('/api/v2/courselist', async function(req, res) {
-  let results = []
-  if (req.query.code) {
-    results = await Course.instancesOf(req.query.code)
-  }
-  
-  res.json(results)
-})
-
-app.post('/api/coursestatistics', async function(req, res) {
-  const code = req.body.code
-  const date = req.body.date.split('.').join('-')
-  const months = req.body.subsequentMonthsToInvestigate
-
-  const results = await Course.statisticsOf(code, date, months)
-  res.json(results)
-})
-
-app.get('/api/v2/coursestatistics', async function(req, res) {
-  let results = []
-  if (req.query.date && req.query.code && req.query.months) {
-    const code = req.query.code
-    const date = req.query.date.split('.').join('-')
-    const months = req.query.months
-
-    results = await Course.statisticsOf(code, date, months)
-  }
-  res.json(results)
-})
-
-app.post('/api/teacherstatistics', async function(req, res) {
-  const courses = req.body.courses.map(c => c.code)
-  const fromDate = req.body.fromDate.split('.').join('-')
-  const toDate = req.body.toDate.split('.').join('-')
-  const minCourses = req.body.minCourses || 1
-  const minStudents = req.body.minStudents || 1
-  const studyRights = req.body.studyRights || 1
-
-  const results = await Teacher.statisticsOf(courses, fromDate, toDate, minCourses, minStudents, studyRights)
-  res.json(results)
-})
-
-app.get('/api/studyrightkeywords', async function(req, res) {
-  let results = []
-  if (req.query.search) {
-    results = await Population.studyrightsByKeyword(req.query.search)
-  }
-
-  res.json(results)
-})
-
-app.get('/api/enrollmentdates', async function(req, res) {
-  const results = await Population.universityEnrolmentDates()
-  res.json(results)
-})
-
-app.post('/api/populationstatistics', async function(req, res) {
-  try {
-    const confFromBody = req.body
-    
-    if (confFromBody.maxBirthDate) {
-      confFromBody.maxBirthDate = confFromBody.maxBirthDate.split('.').join('-')
-    }
-    
-    if (confFromBody.minBirthDate) {
-      confFromBody.minBirthDate =confFromBody. minBirthDate.split('.').join('-')
-    }  
-
-    confFromBody.courses = confFromBody.courses.map(c=>c.code)
-
-    const result = await Population.statisticsOf(confFromBody)
-    res.json(result)
-  } catch(e) {
-    console.log(e)
-    res.status(400).json({ error: e })
-  }
-
-})
-
-app.get('/api/tags', async function(req, res) {
-  const results = await Tag.bySearchTerm(req.query.query || '')
-  res.json(results)  
-})
-
-app.post('/api/tags/:tagname', async function(req, res) {
-  const tagname = req.params.tagname
-  const students = req.body
-  const results = await Tag.addToStudents(tagname, students)
-  const status = results.error === undefined ? 201 : 400
-  
-  res.status(status).json(results)
-})
-
 app.get('*', async function (req, res) {
   const results = { error: 'unknown endpoint' }
   res.status(404).json(results)
 })
 
-if ( process.env.NODE_ENV!=='test' ) {
+if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, function () {
-    console.log('Example app listening on port ' + PORT +'!')
+    console.log('Example app listening on port ' + PORT + '!')
   })
 }
 
