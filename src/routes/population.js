@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const Population = require('./services/populations')
+const Population = require('../services/populations')
 
 router.get('/studyrightkeywords', async function (req, res) {
   let results = []
