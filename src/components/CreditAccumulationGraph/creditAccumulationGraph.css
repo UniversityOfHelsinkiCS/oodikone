@@ -2,3 +2,11 @@
   min-width: 400px;
   margin-bottom: 15px !important;
 }
+
+.dot {
+  &:hover {
+    stroke-width: 0.2em;
+  }
+
+  cursor: pointer;
+}
