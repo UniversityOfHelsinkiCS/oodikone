@@ -7,7 +7,7 @@
     "start": "node index.js",
     "docker_local": "NODE_ENV=docker_local nodemon index.js",
     "dev": "NODE_ENV=dev nodemon index.js",
-    "test": "NODE_ENV=test ava --tap",
+    "test": "NODE_ENV=test ava",
     "update_database_dev": "NODE_ENV=dev node src/services/database_updater/database_updater.js",
     "update_database": "node src/services/database_updater/database_updater.js",
     "lint": "eslint --parser babel-eslint src",
@@ -42,5 +42,23 @@
     "nodemon": "^1.12.1",
     "nyc": "^11.2.1",
     "supertest": "^3.0.0"
+  },
+  "ava": {
+    "files": [
+      "test/*_test.js"
+    ],
+    "source": [
+      "**/*.{js,jsx}",
+      "!test/**/*"
+    ],
+    "concurrency": 5,
+    "failFast": true,
+    "failWithoutAssertions": true,
+    "tap": true,
+    "powerAssert": false,
+    "require": [
+      "babel-register"
+    ],
+    "babel": "inherit"
   }
 }
