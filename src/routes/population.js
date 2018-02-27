@@ -39,16 +39,24 @@ router.post('/populationstatistics', async function (req, res) {
 router.get('/studyprogrammes', async function (req, res) {
   const programs = [
     {
-      id: 1,
+      id: 'MA1',
       name: 'Bachelor of Science, Mathematics'
     },
     {
-      id: 2,
+      id: 'TKT1',
       name: 'Bachelor of Science, Computer Science'
     },
     {
-      id: 3,
+      id: 'TKT2',
       name: 'Master of Science (science), Computer Science'
+    },
+    {
+      id: 'ENV1',
+      name: 'Bachelor of Science (Biological and Environmental Sciences)'
+    },
+    {
+      id: 'KH57_003',
+      name: 'Bachelor\'s Programme in Environmental Sciences'
     }
   ]
   res.json(programs)
