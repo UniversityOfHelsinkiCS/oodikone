@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Table } from 'semantic-ui-react';
+import { Grid, Table, Header } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 import MulticolorBarChart from '../MulticolorBarChart';
@@ -37,11 +37,14 @@ class CourseStatistics extends Component {
   }
 
   render() {
-    const { stats, selectedCourse } = this.props;
+    const { stats, courseName, instanceDate } = this.props;
     if (stats !== undefined) {
       const dataAll = createChartData(stats.all).sort(sortByValue);
       const dataPassed = createChartData(stats.pass).sort(sortByValue);
       const dataFailed = createChartData(stats.fail).sort(sortByValue);
+      const allN = dataAll.length;
+      const passN = dataPassed.length;
+      const failN = dataFailed.length;
       const mins = [dataAll[0].value,
         dataPassed[0].value,
         dataFailed[0].value];
@@ -60,19 +63,22 @@ class CourseStatistics extends Component {
       return (
         <Grid columns="equal">
           <Grid.Row>
+            <Header textAlign="center">{courseName} ({instanceDate})</Header>
+          </Grid.Row>
+          <Grid.Row>
             <Grid.Column>
               <Table>
                 <Table.Header>
                   <Table.Row>
                     <Table.HeaderCell />
                     <Table.HeaderCell>
-                      All
+                      All (n={allN})
                     </Table.HeaderCell>
                     <Table.HeaderCell>
-                      Passed
+                      Passed (n={passN}, {((passN / allN) * 100).toFixed(1)}%)
                     </Table.HeaderCell>
                     <Table.HeaderCell>
-                      Failed
+                      Failed (n={failN}, {((failN / allN) * 100).toFixed(1)}%)
                     </Table.HeaderCell>
                   </Table.Row>
                 </Table.Header>
@@ -88,13 +94,13 @@ class CourseStatistics extends Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column key="1">
-              <MulticolorBarChart chartTitle={selectedCourse.name} chartData={dataAll} />
+              <MulticolorBarChart chartTitle="All" chartData={dataAll} />
             </Grid.Column>
             <Grid.Column key="2">
-              <MulticolorBarChart chartTitle={selectedCourse.name} chartData={dataPassed} />
+              <MulticolorBarChart chartTitle="Passed" chartData={dataPassed} />
             </Grid.Column>
             <Grid.Column key="3">
-              <MulticolorBarChart chartTitle={selectedCourse.name} chartData={dataFailed} />
+              <MulticolorBarChart chartTitle="Failed" chartData={dataFailed} />
             </Grid.Column>
           </Grid.Row>
         </Grid>
@@ -102,7 +108,7 @@ class CourseStatistics extends Component {
     }
     return (
       <div>
-        <pre>{JSON.stringify(selectedCourse)}</pre>
+        <pre>{JSON.stringify(courseName)}</pre>
         <pre>{JSON.stringify(stats, null, 2)}</pre>
       </div>
     );
@@ -116,10 +122,8 @@ CourseStatistics.propTypes = {
     fail: object.isRequired,
     startYear: object.isRequired
   }).isRequired,
-  selectedCourse: shape({
-    name: string.isRequired,
-    code: string.isRequired
-  }).isRequired
+  courseName: string.isRequired,
+  instanceDate: string.isRequired
 };
 
 export default CourseStatistics;
