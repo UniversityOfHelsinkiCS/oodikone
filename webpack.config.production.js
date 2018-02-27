@@ -5,7 +5,6 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const htmlTemplate = require('html-webpack-template');
 const path = require('path');
-const glob = require('glob');
 
 const commonSettings = require('./webpack.config.common');
 
