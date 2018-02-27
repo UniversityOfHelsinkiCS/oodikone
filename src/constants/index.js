@@ -45,8 +45,14 @@ export const routes = {
   teachers: { route: '/teachers,', translateId: 'teachers' }
 };
 
-/* TODO: set this configurable? */
-export const BASE_PATH = '';
+const assumeBasename = () => {
+  const POSSIBLE_BASENAMES = ['staging'];
+  const haystack = window.location.pathname.split('/');
+  const needle = haystack.find(path => POSSIBLE_BASENAMES.includes(path));
+  return needle || '/';
+};
+
+export const BASE_PATH = assumeBasename();
 
 export const AVAILABLE_LANGUAGES = ['en'];
 export const DEFAULT_LANG = 'en';
