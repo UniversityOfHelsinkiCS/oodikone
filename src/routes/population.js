@@ -36,4 +36,22 @@ router.post('/populationstatistics', async function (req, res) {
   }
 })
 
+router.get('/studyprogrammes', async function (req, res) {
+  const programs = [
+    {
+      id: 1,
+      name: 'Bachelor of Science, Mathematics'
+    },
+    {
+      id: 2,
+      name: 'Bachelor of Science, Computer Science'
+    },
+    {
+      id: 3,
+      name: 'Master of Science (science), Computer Science'
+    }
+  ]
+  res.json(programs)
+})
+
 module.exports = router
