@@ -49,7 +49,7 @@ const assumeBasename = () => {
   const POSSIBLE_BASENAMES = ['staging'];
   const haystack = window.location.pathname.split('/');
   const needle = haystack.find(path => POSSIBLE_BASENAMES.includes(path));
-  return needle || '/';
+  return `/${needle}` || '/';
 };
 
 export const BASE_PATH = assumeBasename();
