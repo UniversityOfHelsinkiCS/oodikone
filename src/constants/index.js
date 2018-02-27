@@ -49,12 +49,12 @@ const assumeBasename = () => {
   const POSSIBLE_BASENAMES = ['staging'];
   const haystack = window.location.pathname.split('/');
   const needle = haystack.find(path => POSSIBLE_BASENAMES.includes(path));
-  return needle ? `/${needle}` : '/';
+  return needle ? `/${needle}/` : '/';
 };
 
 export const BASE_PATH = assumeBasename();
 
-export const API_BASE_PATH = `${assumeBasename()}/api`;
+export const API_BASE_PATH = `${assumeBasename()}api`;
 
 export const AVAILABLE_LANGUAGES = ['en'];
 export const DEFAULT_LANG = 'en';
