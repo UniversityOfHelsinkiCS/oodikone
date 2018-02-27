@@ -18,9 +18,8 @@ app.get('/ping', async function (req, res) {
   res.json({ data: 'pong' })
 })
 
-const BASE_URL = process.env.NODE_ENV === 'dev' ? '/api' : '/'
-
-routes(app, BASE_URL)
+const BASE_URL = process.env.NODE_ENV === 'dev' ||
+process.env.NODE_ENV === 'test' ? '/api' : '/'
 
 const User = require('./services/users')
 
@@ -41,6 +40,8 @@ app.use(
     unauthorizedResponse: () => ({ error: 'unauthorized' })
   })
 )
+
+routes(app, BASE_URL)
 
 app.get('*', async function (req, res) {
   const results = { error: 'unknown endpoint' }
