@@ -46,6 +46,7 @@ Fill database with data from dump.bak file:
 Check that you have all the data you ever wanted:
 
 `docker exec -it -u postgres oodi_db psql -d tkt_oodi`
+
 `\dt`
 
 Create test database:
