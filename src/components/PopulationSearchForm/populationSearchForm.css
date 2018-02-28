@@ -1,9 +1,6 @@
-.semesterSelection {
-  height: 80px !important;
-}
 .semesterRadio {
   margin-right: 10px !important;
-  margin-top: 12px !important;
+  padding-top: 22px !important;
 }
 
 .enrollmentSelectorGroup {
