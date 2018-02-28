@@ -33,3 +33,5 @@ export const postForGetPopulationStatistics = request => postJson('/populationst
 export const findCourseInstances = code => getJson(`/v2/courselist?code=${code}`).then(throwErrors);
 
 export const getInstanceStatistics = (date, code, months) => getJson(`/v2/coursestatistics?date=${date}&code=${code}&months=${months}`).then(throwErrors);
+
+export const getStudyProgrammes = () => getJson('/studyprogrammes').then(throwErrors);

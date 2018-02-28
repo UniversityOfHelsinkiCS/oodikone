@@ -8,7 +8,7 @@ import {
   postForGetPopulationStatistics,
   findCoursesByName,
   findCourseInstances,
-  getInstanceStatistics
+  getInstanceStatistics, getStudyProgrammes
 } from '../api';
 
 export const ADD_ERROR = 'ADD_ERROR';
@@ -30,6 +30,8 @@ export const GET_POPULATION_STATISTICS_FULFILLED = 'GET_POPULATION_STATISTICS_FU
 export const GET_POPULATION_STATISTICS_REJECTED = 'GET_POPULATION_STATISTICS_REJECTED';
 export const CLEAR_POPULATIONS = 'CLEAR_POPULATIONS';
 export const REMOVE_POPULATION = 'REMOVE_POPULATION';
+export const GET_STUDY_PROGRAMMES = 'GET_STUDY_PROGRAMMES';
+export const GET_STUDY_PROGRAMMES_FULFILLED = 'GET_STUDY_PROGRAMMES_FULFILLED';
 export const FIND_INSTANCES = 'FIND_INSTANCES';
 export const GET_INSTANCE_STATS = 'GET_INSTANCE_STATISTICS';
 
@@ -93,6 +95,11 @@ export const clearPopulationsAction = () => ({
 export const removePopulationAction = uuid => ({
   type: REMOVE_POPULATION,
   payload: { uuid }
+});
+
+export const getStudyProgrammesAction = () => ({
+  type: GET_STUDY_PROGRAMMES,
+  payload: getStudyProgrammes()
 });
 
 export const findInstancesAction = code => ({

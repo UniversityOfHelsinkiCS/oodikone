@@ -35,12 +35,17 @@
     "sampleSize" : ["Sample size: ${ amount } students"],
     "allPopulations" : ["All populations"],
     "alreadyFetched": ["Population already in analysis"],
-    "selectDate": ["Select at least one enrollment date"],
+    "selectValidYear": ["Select valid year."],
     "addPopulation": ["Add population"],
     "clearPopulations": ["Clear populations"],
     "searchTitle": ["Search for populations"],
     "studyRights": ["Study rights"],
-    "enrollmentDates": ["Enrollment dates"]
+    "enrollmentYear": ["Enrollment year"],
+    "semester" : ["Semester"],
+    "SPRING" : ["Spring"],
+    "FALL" : ["Fall"],
+    "selectStudyRights": ["Select study rights"],
+    "noSelectableStudyRights": ["No selectable study rights"]
   },
   "departmentSuccess": {
     "header": ["Department Success"],
