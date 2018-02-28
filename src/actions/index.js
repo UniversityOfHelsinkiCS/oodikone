@@ -5,10 +5,11 @@ import {
   findTags,
   removeTagFromStudent,
   addTagToStudent,
-  postForGetPopulationStatistics,
   findCoursesByName,
   findCourseInstances,
-  getInstanceStatistics, getStudyProgrammes
+  getInstanceStatistics,
+  getStudyProgrammes,
+  getPopulationStatistics
 } from '../api';
 
 export const ADD_ERROR = 'ADD_ERROR';
@@ -85,7 +86,7 @@ export const addTagToStudentAction = (studentNumber, tag) => ({
 export const getPopulationStatisticsAction = query => ({
   type: GET_POPULATION_STATISTICS,
   meta: { ...query },
-  payload: postForGetPopulationStatistics(query)
+  payload: getPopulationStatistics(query)
 });
 
 export const clearPopulationsAction = () => ({
