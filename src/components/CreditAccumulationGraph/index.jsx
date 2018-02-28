@@ -88,8 +88,8 @@ const getStudentChartData = (student) => {
 
 const getDot = (studentNumber, isSingleStudent, onClickFn) => (isSingleStudent ? <Dot r={4} /> : (
   <Dot
+    className={styles.dot}
     r={3}
-    style={{ cursor: 'pointer' }}
     onClick={() => onClickFn(studentNumber)}
   />
 ));

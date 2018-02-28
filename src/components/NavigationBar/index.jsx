@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Menu } from 'semantic-ui-react';
-import { Link, withRouter } from 'react-router-dom';
-import { func, string, shape } from 'prop-types';
+import { NavLink, Link } from 'react-router-dom';
+import { func } from 'prop-types';
 
 import { routes } from '../../constants';
 
@@ -9,27 +9,7 @@ import styles from './navigationBar.css';
 
 class NavigationBar extends Component {
   static propTypes = {
-    translate: func.isRequired,
-    location: shape({
-      pathname: string.isRequired
-    })
-  };
-  static defaultProps = {
-    location: {
-      pathname: '/'
-    }
-  };
-
-  state = { };
-
-  componentDidMount() {
-    const { pathname } = this.props.location;
-    this.setState({ pathname });
-  }
-
-  checkActiveRoute = (route) => {
-    const { pathname } = this.state;
-    return pathname && (pathname === '/' || (route.length > 1 && pathname.includes(route)));
+    translate: func.isRequired
   };
 
   checkForOptionalParams = route => (
@@ -46,7 +26,6 @@ class NavigationBar extends Component {
         <Menu.Item
           as={Link}
           to={routes.index.route}
-          onClick={() => this.setState({ pathname: routes.index.route })}
         >
           <span className={styles.logo}>
             <h2 className={styles.logoText}>oodikone</h2>
@@ -57,11 +36,11 @@ class NavigationBar extends Component {
             const viewableRoute = this.checkForOptionalParams(value.route);
             return (
               <Menu.Item
-                as={Link}
+                exact={viewableRoute === value.route}
+                strict={viewableRoute !== value.route}
+                as={NavLink}
                 key={`menu-item-${viewableRoute}`}
                 to={this.checkForOptionalParams(viewableRoute)}
-                active={this.checkActiveRoute(viewableRoute)}
-                onClick={() => this.setState({ pathname: viewableRoute })}
               >
                 {t(`navigationBar.${value.translateId}`)}
               </Menu.Item>
@@ -72,5 +51,5 @@ class NavigationBar extends Component {
   }
 }
 
-export default withRouter(NavigationBar);
+export default NavigationBar;
 
