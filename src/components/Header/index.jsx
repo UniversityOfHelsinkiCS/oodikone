@@ -1,21 +1,26 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { func } from 'prop-types';
+import { func, shape, string } from 'prop-types';
 import { getActiveLanguage, getTranslate } from 'react-localize-redux';
+import { withRouter } from 'react-router-dom';
 
 import NavigationBar from '../NavigationBar';
 
 import styles from './header.css';
 
+
 const Header = props => (
   <header className={styles.header} role="banner">
     <div className={styles.headerBanner} />
-    <NavigationBar translate={props.translate} />
+    <NavigationBar translate={props.translate} location={props.location} />
   </header>
 );
 
 Header.propTypes = {
-  translate: func.isRequired
+  translate: func.isRequired,
+  location: shape({
+    pathname: string.isRequired
+  }).isRequired
 };
 
 const mapStateToProps = ({ locale }) => ({
@@ -23,4 +28,4 @@ const mapStateToProps = ({ locale }) => ({
   currentLanguage: getActiveLanguage(locale).value
 });
 
-export default connect(mapStateToProps)(Header);
+export default withRouter(connect(mapStateToProps)(Header));
