@@ -14,7 +14,7 @@ const byUsername = (username) => {
 }
 
 async function withUsername(username) {
-  const user = (await byUsername(username))
+  const user = await byUsername(username)
 
   if ( user ) {
     return user.password
@@ -24,5 +24,6 @@ async function withUsername(username) {
 }
 
 module.exports = {
+  byUsername,
   withUsername
 }

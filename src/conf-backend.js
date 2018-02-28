@@ -3,7 +3,8 @@ require('dotenv').config()
 const DB_URL = process.env.NODE_ENV === 'test' ? process.env.TEST_DB : process.env.DB_URL
 const frontend_addr = process.env.FRONT_URL
 const redis = process.env.REDIS
+const TOKEN_SECRET = process.env.TOKEN_SECRET
 
 module.exports = {
-  frontend_addr, DB_URL, redis
+  frontend_addr, DB_URL, redis, TOKEN_SECRET
 }

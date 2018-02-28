@@ -26,6 +26,7 @@
     "express-basic-auth": "^1.1.2",
     "express-session": "^1.15.6",
     "install": "^0.10.1",
+    "jsonwebtoken": "^8.1.1",
     "knex": "^0.13.0",
     "moment": "^2.19.1",
     "npm": "^5.4.2",
