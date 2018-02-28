@@ -7,7 +7,7 @@ const generateToken = async (uid, res) => {
   const user = await User.byUsername(uid)
   if (user) {
     const payload = { userId: uid }
-    var token = jwt.sign(payload, conf.TOKEN_SECRET, {
+    const token = jwt.sign(payload, conf.TOKEN_SECRET, {
       expiresIn: '24h'
     })
 
