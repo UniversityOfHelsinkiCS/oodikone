@@ -38,7 +38,7 @@ class PopulationSearchForm extends Component {
   };
 
   componentDidMount() {
-    const { studyProgrammes, dispatchGetStudyProgrammes } = this.props;
+    const { studyProgrammes, dispatchGetStudyProgrammes } = this.props;
     if (studyProgrammes.length === 0) {
       dispatchGetStudyProgrammes();
     }
@@ -69,12 +69,20 @@ class PopulationSearchForm extends Component {
       );
   };
 
-  isValidYear = year => year.isSameOrBefore(Datetime.moment(), 'year');
+  isValidYear = year => (year.isSameOrBefore(Datetime.moment(), 'year')
+  && year.isAfter(Datetime.moment('1900', YEAR_DATE_FORMAT), 'year'));
 
   handleYearSelection = (year) => {
     const { query } = this.state;
-    const isValidYear = isInDateFormat(year, YEAR_DATE_FORMAT);
-    this.setState({ isValidYear, query: { ...query, year: reformatDate(year, YEAR_DATE_FORMAT) } });
+    const isValidYear = isInDateFormat(year, YEAR_DATE_FORMAT) && this.isValidYear(year);
+    if (isValidYear) {
+      this.setState({
+        isValidYear,
+        query: { ...query, year: reformatDate(year, YEAR_DATE_FORMAT) }
+      });
+    } else {
+      this.setState({ isValidYear });
+    }
   };
 
   addYear = () => {
@@ -142,7 +150,7 @@ class PopulationSearchForm extends Component {
             />
           </Button.Group>
         </Form.Field>
-        <Form.Field className={style.semesterSelection}>
+        <Form.Field>
           <label>{translate('populationStatistics.semester')}</label>
           {semesters.map(s => (
             <Radio
