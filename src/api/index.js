@@ -32,7 +32,7 @@ export const addTagToStudent = (studentNumber, tag) => postJson(`/students/${stu
 
 export const getPopulationStatistics = (query) => {
   const { year, semester, studyRights } = query;
-  const q = `/populationstatistics?year=${year}&semester=${semester}${getArrayParams('studyRights', studyRights)}`;
+  const q = `/populationstatistics/?year=${year}&semester=${semester}${getArrayParams('studyRights', studyRights)}`;
   return getJson(q).then(throwErrors);
 };
 
