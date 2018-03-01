@@ -23,7 +23,21 @@ async function withUsername(username) {
   } 
 }
 
+const createUser = (username, fullname) => {
+  return User.create({
+    username,
+    fullname,
+    createdDate: new Date(),
+  })
+}
+
+const updateUser = (userObject, values) => {
+  return userObject.update(values)
+}
+
 module.exports = {
   byUsername,
-  withUsername
+  withUsername,
+  createUser,
+  updateUser
 }

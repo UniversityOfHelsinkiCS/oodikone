@@ -4,9 +4,10 @@ const jwt = require('jsonwebtoken')
 const conf = require('../conf-backend')
 
 const generateToken = async (uid, res) => {
-  const user = await User.byUsername(uid)
-  if (user) {
-    const payload = { userId: uid }
+  const model = await User.byUsername(uid)
+  const user = model.dataValues
+  if (user.is_enabled) {
+    const payload = { userId: uid, name: user.fullname }
     const token = jwt.sign(payload, conf.TOKEN_SECRET, {
       expiresIn: '24h'
     })
@@ -23,6 +24,13 @@ const generateToken = async (uid, res) => {
 router.get('/login', async (req, res) => {
   if (req.headers['shib-session-id']) {
     const uid = req.headers.uid
+    const user = await User.byUsername(uid)
+    const fullname = req.headers.givenname || 'Shib Valmis'
+    if (!user) {
+      await User.createUser(uid, fullname)
+    } else {
+      await User.updateUser(user, { fullname })
+    }
     generateToken(uid, res)
   } else {
     res.status(401).end()
@@ -34,7 +42,6 @@ router.get('/login', async (req, res) => {
  */
 if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'dev') {
   router.get('/login/:name', async (req, res) => {
-    console.log('what')
     const uid = req.params.name
     generateToken(uid, res)
   })

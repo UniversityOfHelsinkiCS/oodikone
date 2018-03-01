@@ -31,7 +31,7 @@ services:
 
 To start a redis and a database, run:
 
-```docker compose up -d```
+```docker-compose up -d```
 
 (For production database we created user tkt_oodi, but for development we can use postgres.)
 
