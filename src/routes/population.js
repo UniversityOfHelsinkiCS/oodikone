@@ -36,6 +36,15 @@ router.post('/populationstatistics', async function (req, res) {
   }
 })
 
+router.get('/populationstatistics', async function (req, res) {
+  if (req.query.year) {
+    console.log(req.query)
+    const result = await Population.semesterStatisticsFor(req.query)
+    console.log(result)
+    res.json(result)
+  }
+})
+
 router.get('/studyprogrammes', async function (req, res) {
   const programs = [
     {
