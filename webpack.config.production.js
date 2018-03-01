@@ -2,16 +2,13 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const PurifyCSSPlugin = require('purifycss-webpack');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const htmlTemplate = require('html-webpack-template');
 const path = require('path');
-const glob = require('glob');
 
 const commonSettings = require('./webpack.config.common');
 
 const CSS_MODULES_CLASS_PREFIX = 'no-purify';
-const PURIFY_CSS_WHITELIST = ['*rdt*']; // Classes to be whitelisted from purification.
 
 module.exports = {
   context: path.join(__dirname, 'src'),
@@ -82,8 +79,9 @@ module.exports = {
 
   plugins: [
     new webpack.DefinePlugin({
-      /* CONFIG: JSON.stringify(clientConfig), */
-
+      CONFIG: {
+        BASE_PATH: JSON.stringify('')
+      },
       'process.env': {
         NODE_ENV: JSON.stringify('production')
       }
@@ -110,7 +108,6 @@ module.exports = {
         collapseWhitespace: true,
         processConditionalComments: true
       },
-      /*    baseHref: `${clientConfig.BASE_PATH}/`, */
       meta: [
         {
           name: 'viewport',
@@ -120,13 +117,6 @@ module.exports = {
     }),
 
     new ExtractTextPlugin('[name]-[contenthash].css'),
-
-    new PurifyCSSPlugin({
-      paths: glob.sync(path.join(__dirname, 'src/**/*.jsx')),
-      purifyOptions: {
-        whitelist: [`*${CSS_MODULES_CLASS_PREFIX}*`, ...PURIFY_CSS_WHITELIST]
-      }
-    }),
 
     new OptimizeCssAssetsPlugin(),
     new UglifyJSPlugin()

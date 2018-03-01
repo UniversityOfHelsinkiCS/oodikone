@@ -1,9 +1,10 @@
 import React from 'react';
-import { arrayOf, object, string, func } from 'prop-types';
-import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line, Tooltip, CartesianGrid } from 'recharts';
+import { arrayOf, object, string, func, shape } from 'prop-types';
+import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line, Tooltip, CartesianGrid, Dot } from 'recharts';
 import _ from 'lodash';
 import moment from 'moment';
 import { Header, Segment, Message } from 'semantic-ui-react';
+import { withRouter } from 'react-router-dom';
 
 import { DISPLAY_DATE_FORMAT, CHART_COLORS, API_DATE_FORMAT } from '../../constants';
 import { reformatDate, sortDatesWithFormat } from '../../common';
@@ -11,6 +12,7 @@ import { turquoise } from '../../styles/variables/colors';
 
 import styles from './creditAccumulationGraph.css';
 import CreditGraphTooltip from '../CreditGraphTooltip';
+
 
 const getXAxisMonth = (date, startDate) =>
   Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0);
@@ -33,23 +35,18 @@ const getReferenceLineForStudent = (student) => {
   }];
 };
 
-const isReferenceLine = students => students.length === 1;
+const isSingleStudentGraph = students => students.length === 1;
 
-const getReferenceLineIfApplicable = (students, title) => {
-  if (!isReferenceLine(students)) {
-    return null;
-  }
-  return (<Line
-    type="monotone"
-    activeDot={false}
-    dot={false}
-    isAnimationActive={false}
-    name={title}
-    dataKey="referenceCredits"
-    stroke={turquoise}
-    connectNulls
-  />);
-};
+const getReferenceLine = title => (<Line
+  type="monotone"
+  activeDot={false}
+  dot={false}
+  isAnimationActive={false}
+  name={title}
+  dataKey="referenceCredits"
+  stroke={turquoise}
+  connectNulls
+/>);
 
 
 const getStudentCourseData = (student) => {
@@ -89,13 +86,21 @@ const getStudentChartData = (student) => {
   ];
 };
 
-const getStudentCreditsLine = (student, i) => {
+const getDot = (studentNumber, isSingleStudent, onClickFn) => (isSingleStudent ? <Dot r={4} /> : (
+  <Dot
+    r={3}
+    style={{ cursor: 'pointer' }}
+    onClick={() => onClickFn(studentNumber)}
+  />
+));
+
+const getStudentCreditsLine = (student, i, dot) => {
   const { studentNumber } = student;
   return (<Line
     key={`graph-${studentNumber}`}
     type="monotone"
     activeDot={{ r: 8 }}
-    dot={{ r: 4 }}
+    dot={dot}
     dataKey={studentNumber}
     stroke={CHART_COLORS[i]}
     isAnimationActive={false}
@@ -103,9 +108,18 @@ const getStudentCreditsLine = (student, i) => {
   />);
 };
 
+const getTooltip = props => (
+  <Tooltip
+    content={<CreditGraphTooltip {...props} />}
+    cursor={false}
+  />
+);
+
 
 const CreditAccumulationGraph = (props) => {
-  const { students, title, translate } = props;
+  const {
+    students, title, translate, history
+  } = props;
 
   if (students.length === 0) {
     return (
@@ -117,7 +131,9 @@ const CreditAccumulationGraph = (props) => {
 
   let combinedStudentData = [].concat(...students.map(getStudentChartData));
 
-  if (isReferenceLine(students)) {
+  const isSingleStudent = isSingleStudentGraph(students);
+
+  if (isSingleStudent) {
     const referenceData = getReferenceLineForStudent(students[0]);
     combinedStudentData = combinedStudentData.concat(referenceData);
   }
@@ -127,6 +143,9 @@ const CreditAccumulationGraph = (props) => {
 
   const minTick = combinedStudentData[0].month;
   const maxTick = Math.ceil(combinedStudentData[combinedStudentData.length - 1].month);
+
+  const pushToHistoryFn = studentNumber => history.push(`/students/${studentNumber}`);
+
   return (
     <div className={styles.graphContainer}>
       <Header attached="top" size="large">{title}</Header>
@@ -143,19 +162,18 @@ const CreditAccumulationGraph = (props) => {
             />
             <YAxis />
             <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip
-              content={<CreditGraphTooltip
-                {...props}
-                translate={translate}
-              />}
-              cursor={false}
-            />
+            {
+              isSingleStudent && getTooltip(props)
+            }
             <Legend />
             {
-              students.map((student, i) => getStudentCreditsLine(student, i))
+              students.map((student, i) => {
+                const dot = getDot(student.studentNumber, isSingleStudent, pushToHistoryFn);
+                return getStudentCreditsLine(student, i, dot);
+              })
             }
             {
-              getReferenceLineIfApplicable(students, translate('graphs.referenceCredits'))
+              isSingleStudent && getReferenceLine(translate('graphs.referenceCredits'))
             }
           </LineChart>
         </ResponsiveContainer>
@@ -167,7 +185,8 @@ const CreditAccumulationGraph = (props) => {
 CreditAccumulationGraph.propTypes = {
   translate: func.isRequired,
   students: arrayOf(object).isRequired,
-  title: string.isRequired
+  title: string.isRequired,
+  history: shape(object).isRequired
 };
 
-export default CreditAccumulationGraph;
+export default withRouter(CreditAccumulationGraph);

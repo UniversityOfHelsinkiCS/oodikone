@@ -9,15 +9,14 @@ import { DISPLAY_DATE_FORMAT } from '../../constants';
 import TagListSelector from '../TagListSelector';
 
 import styles from './studentInfoCard.css';
-import { addError, addTagToStudentAction, removeTagFromStudentAction } from '../../actions';
+import { addTagToStudentAction, removeTagFromStudentAction } from '../../actions';
 
 class StudentInfoCard extends Component {
   static propTypes = {
     student: studentDetailsType.isRequired,
     translate: func.isRequired,
     dispatchRemoveTagFromStudent: func.isRequired,
-    dispatchAddTagToStudent: func.isRequired,
-    dispatchAddError: func.isRequired
+    dispatchAddTagToStudent: func.isRequired
   };
 
   handleAddTagFn = (tag) => {
@@ -26,15 +25,8 @@ class StudentInfoCard extends Component {
   };
 
   handleRemoveTagFn = (tag) => {
-    const {
-      student, dispatchRemoveTagFromStudent,
-      dispatchAddError
-    } = this.props;
-    dispatchRemoveTagFromStudent(student.studentNumber, { text: tag })
-      .then(
-        () => {},
-        err => dispatchAddError(err)
-      );
+    const { student, dispatchRemoveTagFromStudent } = this.props;
+    dispatchRemoveTagFromStudent(student.studentNumber, { text: tag });
   };
 
   render() {
@@ -79,8 +71,7 @@ const mapDispatchToProps = dispatch => ({
   dispatchRemoveTagFromStudent: (studentNumber, tag) =>
     dispatch(removeTagFromStudentAction(studentNumber, tag)),
   dispatchAddTagToStudent: (studentNumber, tag) =>
-    dispatch(addTagToStudentAction(studentNumber, tag)),
-  dispatchAddError: err => dispatch(addError(err))
+    dispatch(addTagToStudentAction(studentNumber, tag))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudentInfoCard);
