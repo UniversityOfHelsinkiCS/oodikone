@@ -18,3 +18,7 @@ lint fix for js: `npm run lintfix`
 `npm run dist`
 
 Builds optimized production package to /dist
+
+### Deployment
+
+Read part deployment from [backend README](https://github.com/UniversityOfHelsinkiCS/oodikone2-backend/)

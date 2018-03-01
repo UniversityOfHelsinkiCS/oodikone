@@ -1,7 +1,5 @@
 import moment from 'moment';
-import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants';
-
-const API_BASE_PATH = '/api';
+import { API_BASE_PATH, API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants';
 
 const toJSON = res =>
   (res.status !== 204 ? res.json() : res);
@@ -9,11 +7,24 @@ const toJSON = res =>
 const catchErrorsIntoJSON = (err, catchRejected) => {
   if (err.status === 401) throw err;
 
-  return err.json().then((data) => {
-    data.error.url = err.url;
-    data.catchRejected = catchRejected;
-    return data;
-  }).catch(() => err);
+  try {
+    return err.json().then((data) => {
+      data.code = err.status;
+      data.url = err.url;
+      data.catchRejected = catchRejected;
+      return data;
+    }).catch(() => err);
+    // fallback for fetch errors
+  } catch (e) {
+    if (err instanceof TypeError) {
+      return {
+        code: 503,
+        error: `${err.message} ${err.stack}`,
+        catchRejected
+      };
+    }
+  }
+  return err;
 };
 
 const checkForErrors = (res) => {
@@ -24,19 +35,24 @@ const checkForErrors = (res) => {
   return res;
 };
 
-export const get = path =>
-  fetch(`${API_BASE_PATH}${path}`, {
+export const get = (path) => {
+  console.log('Pyyntö:', API_BASE_PATH, path);
+  return fetch(`${API_BASE_PATH}${path}`, {
     credentials: 'same-origin',
     'Cache-Control': 'no-cache'
   })
     .then(checkForErrors);
+};
 
-export const getJson = (path, catchRejected = true) => fetch(`${API_BASE_PATH}${path}`, {
-  credentials: 'same-origin',
-  'Cache-Control': 'no-cache'
-})
-  .then(checkForErrors)
-  .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
+export const getJson = (path, catchRejected = true) => {
+  console.log('Pyyntö:', API_BASE_PATH, path);
+  return fetch(`${API_BASE_PATH}${path}`, {
+    credentials: 'same-origin',
+    'Cache-Control': 'no-cache'
+  })
+    .then(checkForErrors)
+    .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
+};
 
 export const deleteItem = (path, data, catchRejected = true) => fetch(`${API_BASE_PATH}${path}`, {
   method: 'DELETE',
@@ -61,6 +77,8 @@ export const postJson = (path, data, catchRejected = true) => fetch(`${API_BASE_
 })
   .then(checkForErrors)
   .then(toJSON).catch(err => catchErrorsIntoJSON(err, catchRejected));
+
+export const containsOnlyNumbers = str => str.match('^\\d+$');
 
 export const reformatDate = (date, outputFormat) => moment(date).format(outputFormat);
 
