@@ -52,11 +52,7 @@ router.get('/studyprogrammes', async function (req, res) {
     },
     {
       id: 'ENV1',
-      name: 'Bachelor of Science (Biological and Environmental Sciences)'
-    },
-    {
-      id: 'KH57',
-      name: 'Bachelor\'s Programme in Environmental Sciences'
+      name: 'Bachelor of Science (Biological and Environmental Sciences), Environmental Sciences'
     }
   ]
   res.json(programs)
