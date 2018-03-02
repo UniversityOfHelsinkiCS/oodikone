@@ -22,8 +22,10 @@ const generateToken = async (uid, res) => {
 }
 
 router.get('/login', async (req, res) => {
-  if (req.headers['shib-session-id'] && req.headers['eduPersonPrincipalName']) {
-    const uid = req.headers['eduPersonPrincipalName'].split('@')[0]
+  const uidHeaderName = 'eduPersonPrincipalName'
+  const uidHeader = req.headers[uidHeaderName] || req.headers[uidHeaderName.toLowerCase()]
+  if (req.headers['shib-session-id'] && uidHeader) {
+    const uid = uidHeader.split('@')[0]
     const user = await User.byUsername(uid)
     const fullname = req.headers.givenname || 'Shib Valmis'
     if (!user) {
@@ -37,14 +39,5 @@ router.get('/login', async (req, res) => {
   }
 })
 
-/**
- * In development mode we can use any user we want
- */
-if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'dev') {
-  router.get('/login/:name', async (req, res) => {
-    const uid = req.params.name
-    generateToken(uid, res)
-  })
-}
 
 module.exports = router
