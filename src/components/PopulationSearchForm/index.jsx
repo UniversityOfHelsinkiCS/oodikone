@@ -182,7 +182,7 @@ class PopulationSearchForm extends Component {
             multiple
             search
             selection
-            noResultMessage={translate('populationStatistics.noSelectableStudyRights')}
+            noResultsMessage={translate('populationStatistics.noSelectableStudyRights')}
             value={studyRights}
             options={studyProgrammes}
             onChange={this.handleStudyRightChange}

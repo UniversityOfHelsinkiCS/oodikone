@@ -25,7 +25,7 @@ const PopulationQueryCard = ({
           onClick={() => removeSampleFn(uuid)}
         />
       </Card.Header>
-      <Card.Meta>
+      <Card.Meta>run dev
         {studyRights.length > 0 ?
           studyRights.map(right =>
             (<div key={right}><Icon name="group" size="small" /> {right}</div>))
@@ -37,7 +37,7 @@ const PopulationQueryCard = ({
           )
         }
         <div className={styles.dateItem}>
-          <Icon name="calendar" size="small" /> {`${translate(`populationStatistics.'${semester}`)}/${year}`}
+          <Icon name="calendar" size="small" /> {`${translate(`populationStatistics.${semester}`)}/${year}`}
         </div>
 
       </Card.Meta>
