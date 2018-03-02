@@ -1,4 +1,4 @@
-import { getJson, deleteItem, postJson } from '../common';
+import { getJson, deleteItem, postJson } from './common';
 
 const getArrayParams = (paramName, entries) => entries.map(entry => `&${paramName}=${entry}`).join('');
 
