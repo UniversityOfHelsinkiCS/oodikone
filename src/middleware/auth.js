@@ -1,17 +1,21 @@
-module.exports.checkAuth = async (req, res, next) => {
-  if (!req.session.user_id) { // if a user is not already logged in
-    if (!req.headers['shib-session-id']) { //if a user has not just arrived with a valid shibsessionid 
-      if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'dev') { //if env isn't test or dev
-        res.status(401).end()
-      }
-    }
-    req.session.user_id = req.headers['shib-session-id']
+const jwt = require('jsonwebtoken')
+const conf = require('../conf-backend')
 
-    // do some logging in, fetch person information and admin information
-    // from db and do whatever you feel like doing 
-    next()
-  } else {
-    console.log('user already logged')
-    next()
+const uidHeaderName = 'eduPersonPrincipalName'
+const isShibboUser = (userId, uidHeader) => userId === uidHeader.split('@')[0]
+
+module.exports.checkAuth = async (req, res, next) => {
+  const token = req.headers['x-access-token']
+  const uidHeader = req.headers[uidHeaderName] || req.headers[uidHeaderName.toLowerCase()]
+  if (token) {
+    jwt.verify(token, conf.TOKEN_SECRET, (err, decoded) => {
+      if (!err && isShibboUser(decoded.userId, uidHeader)) {
+        req.decodedToken = decoded // everything is good, save to request for use in other routes
+        return next()
+      }
+      return res.status(403).end()
+    }).then(() => {})
   }
+  return res.status(403).end()
 }
+

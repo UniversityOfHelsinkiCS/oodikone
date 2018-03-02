@@ -8,6 +8,11 @@ const enrolmentDates = () => {
   return sequelize.query(query)
 }
 
+const enrollmentDatesBetween = (startDate, endDate) => {
+  const query = `SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s WHERE s.dateOfUniversityEnrollment BETWEEN '${startDate}' AND '${endDate}'`
+  return sequelize.query(query)
+}
+
 const studyRightLike = (searchTerm) => {
   const query = `
     SELECT DISTINCT highLevelName 
@@ -185,7 +190,7 @@ async function studyrightsByKeyword(searchTerm) {
 
 async function universityEnrolmentDates() {
   const [result] = await enrolmentDates()
-
+  
   return result.map( r => r.date ).filter( d => d ).sort()
 }
 
@@ -198,6 +203,36 @@ async function statisticsOf(conf) {
   return students.map(formatStudent)
 }
 
+const semesterStart = {
+  SPRING: '1-1',
+  FALL: '7-1'
+}
+
+const semesterEnd = {
+  SPRING: '6-30',
+  FALL: '12-31'
+}
+
+const mapProgramToStudyRight = {
+  '500-K004': 'Bachelor of Science, Mathematics',
+  '500-K005': 'Bachelor of Science, Computer Science',
+  '500-M009': 'Master of Science (science), Computer Science',
+  'ENV1': 'Bachelor of Science (Biological and Environmental Sciences), Environmental Sciences' 
+}
+
+async function semesterStatisticsFor(query) {
+  const startDate = `${query.year}-${semesterStart[query.semester]}`
+  const endDate = `${query.year}-${semesterEnd[query.semester]}`
+  console.log(`semester: ${startDate} - ${endDate}`)
+  const [dates] = await enrollmentDatesBetween(startDate, endDate)
+  const studyRights = query.studyRights.map(r => mapProgramToStudyRight[r])
+  console.log(studyRights)
+  const conf = { enrollmentDates: dates.map(r => r.date).filter(d => d).sort(),
+    studyRights: studyRights }
+  const students = await byCriteria(conf).map(restrictToMonths(12))
+  return students.map(formatStudent)
+}
+
 module.exports = {
-  studyrightsByKeyword, universityEnrolmentDates, statisticsOf
+  studyrightsByKeyword, universityEnrolmentDates, statisticsOf, semesterStatisticsFor
 }

@@ -4,9 +4,15 @@ const students = require('./routes/students')
 const tags = require('./routes/tags')
 const population = require('./routes/population')
 const teacher = require('./routes/teacher')
+const login = require('./routes/login')
+const users = require('./routes/users')
 
+const auth = require('./middleware/auth')
 
 module.exports = (app, url) => {
+  app.use(url, login)
+  app.use(auth.checkAuth)
+  app.use(url, users)
   app.use(url, courses)
   app.use(url, department)
   app.use(url, students)

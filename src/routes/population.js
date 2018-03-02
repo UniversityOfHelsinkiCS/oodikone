@@ -36,4 +36,37 @@ router.post('/populationstatistics', async function (req, res) {
   }
 })
 
+router.get('/populationstatistics', async function (req, res) {
+  if (req.query.year) {
+    console.log(req.query)
+    if (!Array.isArray(req.query.studyRights)) {
+      req.query.studyRights = [req.query.studyRights]
+    }
+    const result = await Population.semesterStatisticsFor(req.query)
+    res.json(result)
+  }
+})
+
+router.get('/studyprogrammes', async function (req, res) {
+  const programs = [
+    {
+      id: '500-K004',
+      name: 'Bachelor of Science, Mathematics'
+    },
+    {
+      id: '500-K005',
+      name: 'Bachelor of Science, Computer Science'
+    },
+    {
+      id: '500-M009',
+      name: 'Master of Science (science), Computer Science'
+    },
+    {
+      id: 'ENV1',
+      name: 'Bachelor of Science (Biological and Environmental Sciences), Environmental Sciences'
+    }
+  ]
+  res.json(programs)
+})
+
 module.exports = router

@@ -13,8 +13,18 @@ const byUsername = (username) => {
   })
 }
 
+const byId = (id) => {
+  return User.findOne({
+    where: { 
+      id:{
+        [Op.eq]: id
+      } 
+    }
+  })
+}
+
 async function withUsername(username) {
-  const user = (await byUsername(username))
+  const user = await byUsername(username)
 
   if ( user ) {
     return user.password
@@ -23,6 +33,27 @@ async function withUsername(username) {
   } 
 }
 
+const createUser = (username, fullname) => {
+  return User.create({
+    username,
+    fullname,
+    createdDate: new Date(),
+  })
+}
+
+const updateUser = (userObject, values) => {
+  return userObject.update(values)
+}
+
+const findAll = () => {
+  return User.findAll()
+}
+
 module.exports = {
-  withUsername
+  byUsername,
+  withUsername,
+  createUser,
+  updateUser,
+  findAll,
+  byId
 }
