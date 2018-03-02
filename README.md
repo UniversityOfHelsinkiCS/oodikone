@@ -31,7 +31,7 @@ services:
 
 To start a redis and a database, run:
 
-```docker compose up -d```
+```docker-compose up -d```
 
 (For production database we created user tkt_oodi, but for development we can use postgres.)
 
@@ -74,6 +74,7 @@ DB_URL=postgres://postgres@localhost:5421/tkt_oodi
 TEST_DB=postgres://postgres@localhost:5421/tkt_oodi_test
 FRONT_URL=http://localhost:8000
 REDIS=localhost
+TOKEN_SECRET=IWannaBeTheVeryBest
 ```
 
 ### Running 
