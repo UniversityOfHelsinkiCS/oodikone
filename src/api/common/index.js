@@ -40,48 +40,48 @@ export const checkForErrors = (res) => {
   return res;
 };
 
-export const get = path => checkAuth().then(token =>
+const getHeaders = (auth, isContentType = false) => {
+  const headers = {
+    'x-access-token': auth.token
+  };
+  if (auth.devUser) {
+    headers.eduPersonPrincipalName = `${auth.devUser}@secondParams`;
+  }
+  if (isContentType) {
+    headers.Accept = 'application/json';
+    headers['Content-Type'] = 'application/json';
+  }
+  return headers;
+};
+
+export const get = path => checkAuth().then(auth =>
   fetch(`${API_BASE_PATH}${path}`, {
-    headers: {
-      'x-access-token': token
-    },
-    credentials: 'same-origin',
+    headers: getHeaders(auth),
     'Cache-Control': 'no-cache'
   }))
   .then(checkForErrors);
 
-export const getJson = (path, catchRejected = true) => checkAuth().then(token => fetch(`${API_BASE_PATH}${path}`, {
-  headers: {
-    'x-access-token': token
-  },
-  credentials: 'same-origin',
-  'Cache-Control': 'no-cache'
-})).then(checkForErrors)
+export const getJson = (path, catchRejected = true) => checkAuth().then(auth =>
+  fetch(`${API_BASE_PATH}${path}`, {
+    headers: getHeaders(auth),
+    'Cache-Control': 'no-cache'
+  }))
+  .then(checkForErrors)
   .then(toJSON)
   .catch(err => catchErrorsIntoJSON(err, catchRejected));
 
-export const deleteItem = (path, data, catchRejected = true) => checkAuth().then(token => fetch(`${API_BASE_PATH}${path}`, {
+export const deleteItem = (path, data, catchRejected = true) => checkAuth().then(auth => fetch(`${API_BASE_PATH}${path}`, {
   method: 'DELETE',
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    'x-access-token': token
-  },
-  credentials: 'same-origin',
+  headers: getHeaders(auth),
   body: JSON.stringify(data)
 }))
   .then(checkForErrors)
   .then(toJSON)
   .catch(err => catchErrorsIntoJSON(err, catchRejected));
 
-export const postJson = (path, data, catchRejected = true) => checkAuth().then(token => fetch(`${API_BASE_PATH}${path}`, {
+export const postJson = (path, data, catchRejected = true) => checkAuth().then(auth => fetch(`${API_BASE_PATH}${path}`, {
   method: 'POST',
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    'x-access-token': token
-  },
-  credentials: 'same-origin',
+  headers: getHeaders(auth),
   body: JSON.stringify(data)
 }))
   .then(checkForErrors)
@@ -90,15 +90,11 @@ export const postJson = (path, data, catchRejected = true) => checkAuth().then(t
 
 /* ******************** */
 
-export const postJsonGetJson = (path, json, catchRejected = true) => checkAuth().then(token =>
+export const postJsonGetJson = (path, json, catchRejected = true) => checkAuth().then(auth =>
   fetch(`${API_BASE_PATH}${path}`, {
     method: 'POST',
-    credentials: 'same-origin',
     'Cache-Control': 'no-cache',
-    headers: new Headers({
-      'Content-Type': 'application/json',
-      'x-access-token': token
-    }),
+    headers: getHeaders(auth),
     body: JSON.stringify(json)
   }))
   .then(checkForErrors)

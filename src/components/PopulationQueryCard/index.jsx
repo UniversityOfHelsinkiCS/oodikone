@@ -25,7 +25,7 @@ const PopulationQueryCard = ({
           onClick={() => removeSampleFn(uuid)}
         />
       </Card.Header>
-      <Card.Meta>run dev
+      <Card.Meta>
         {studyRights.length > 0 ?
           studyRights.map(right =>
             (<div key={right}><Icon name="group" size="small" /> {right}</div>))

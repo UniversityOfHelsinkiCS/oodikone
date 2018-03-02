@@ -1,18 +1,17 @@
 .searchContainer {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 99%;
-    max-width: 1000px;
-  }
-  
-  .studentSearch {
-    width: 99%;
-    max-width: 750px;
-  }
-  
-  .searchResultTitle {
-    border-bottom: 1px solid var(--darkSilver);
-  }
-  
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 99%;
+  max-width: 1000px;
+}
+
+.studentSearch {
+  width: 99%;
+  max-width: 750px;
+}
+
+.searchResultTitle {
+  border-bottom: 1px solid var(--darkSilver);
+}
