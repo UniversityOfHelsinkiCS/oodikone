@@ -14,7 +14,7 @@ const byUsername = (username) => {
 }
 
 async function withUsername(username) {
-  const user = (await byUsername(username))
+  const user = await byUsername(username)
 
   if ( user ) {
     return user.password
@@ -23,6 +23,21 @@ async function withUsername(username) {
   } 
 }
 
+const createUser = (username, fullname) => {
+  return User.create({
+    username,
+    fullname,
+    createdDate: new Date(),
+  })
+}
+
+const updateUser = (userObject, values) => {
+  return userObject.update(values)
+}
+
 module.exports = {
-  withUsername
+  byUsername,
+  withUsername,
+  createUser,
+  updateUser
 }
