@@ -25,7 +25,8 @@
     "populations" : ["Population statistics"],
     "students" : ["Student statistics"],
     "courses" : ["Courses"],
-    "teachers" : ["Teachers"]
+    "teachers" : ["Teachers"],
+    "logout": ["Logout"]
   },
   "populationStatistics" : {
     "header": ["Population statistics"],

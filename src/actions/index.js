@@ -11,9 +11,14 @@ import {
   getStudyProgrammes,
   getPopulationStatistics
 } from '../api';
+import { login, logout } from '../api/auth';
 
 export const ADD_ERROR = 'ADD_ERROR';
 export const REMOVE_ERROR = 'REMOVE_ERROR';
+
+export const LOG_OUT = 'LOG_OUT';
+export const LOG_IN_DEV = 'LOG_IN_DEV';
+
 export const GET_DEPARTMENT_SUCCESS = 'GET_DEPARTMENT_SUCCESS';
 export const FIND_STUDENTS = 'FIND_STUDENTS';
 export const GET_STUDENT = 'GET_STUDENT';
@@ -44,6 +49,16 @@ export const addError = errorJson => ({
 export const removeError = uuid => ({
   type: REMOVE_ERROR,
   payload: { uuid }
+});
+
+export const logDevUserInAction = user => ({
+  type: LOG_IN_DEV,
+  payload: login(user)
+});
+
+export const logUserOutAction = () => ({
+  type: LOG_OUT,
+  payload: logout()
 });
 
 export const getDepartmentSuccessAction = date => ({
