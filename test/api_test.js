@@ -408,7 +408,7 @@ test('new api populations can be fetched', async t => {
 
 })
 
-test.only('multiple population studyrights can be fetched', async t => {
+test('multiple population studyrights can be fetched', async t => {
   const res = await api
     .get('/api/populationstatistics')
     .query({ year: '2010',
