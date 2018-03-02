@@ -13,6 +13,16 @@ const byUsername = (username) => {
   })
 }
 
+const byId = (id) => {
+  return User.findOne({
+    where: { 
+      id:{
+        [Op.eq]: id
+      } 
+    }
+  })
+}
+
 async function withUsername(username) {
   const user = await byUsername(username)
 
@@ -35,9 +45,15 @@ const updateUser = (userObject, values) => {
   return userObject.update(values)
 }
 
+const findAll = () => {
+  return User.findAll()
+}
+
 module.exports = {
   byUsername,
   withUsername,
   createUser,
-  updateUser
+  updateUser,
+  findAll,
+  byId
 }
