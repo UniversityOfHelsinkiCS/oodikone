@@ -9,7 +9,9 @@ import styles from './populationQueryCard.css';
 const PopulationQueryCard = ({
   translate, population, query, queryId, removeSampleFn
 }) => {
-  const { uuid, studyRights, enrollmentDates } = query;
+  const {
+    uuid, studyRights, year, semester
+  } = query;
 
   return (
     <Card className={styles.cardContainer}>
@@ -36,11 +38,10 @@ const PopulationQueryCard = ({
             </div>
           )
         }
-        {enrollmentDates.length > 0 ?
-          enrollmentDates.map(date =>
-            (<div className={styles.dateItem} key={date}><Icon name="calendar" size="small" /> {dateFromApiToDisplay(date)}</div>))
-          : (null)
-        }
+        <div className={styles.dateItem}>
+          <Icon name="calendar" size="small" /> {`${translate(`populationStatistics.'${semester})`}/${year}`}
+        </div>
+
       </Card.Meta>
     </Card>
   );
