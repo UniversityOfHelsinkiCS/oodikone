@@ -2,23 +2,34 @@ import { API_BASE_PATH } from '../../constants';
 import { catchErrorsIntoJSON, checkForErrors } from '../common';
 
 const OODI_TOKEN = 'oodi_token';
+const OODI_DEV_USER = 'oodi_dev_user';
+
+const isDevEnv = process.env.NODE_ENV === 'development';
 
 const saveLogin = res => res.json().then((response) => {
   localStorage.setItem(OODI_TOKEN, response.token);
-  return response.token;
+  if (isDevEnv) {
+    response.devUser = localStorage.getItem(OODI_DEV_USER);
+  }
+  return response;
 });
+
+// eduPersonPrincipalName => user@
 
 
 export const login = (user) => {
-  let query = `${API_BASE_PATH}/login/`;
-  if (process.env.NODE_ENV === 'development') {
-    const devUser = user || 'tktl';
-    query = `${query}${devUser}`;
-  }
-  return fetch(query, {
-    credentials: 'same-origin',
+  const request = {
     'Cache-Control': 'no-cache'
-  })
+  };
+  if (isDevEnv) {
+    const devUser = user || 'tktl';
+    localStorage.setItem(OODI_DEV_USER, devUser);
+    request.headers = {
+      eduPersonPrincipalName: `${devUser}@`,
+      'shib-session-id': 'mock-session'
+    };
+  }
+  return fetch(`${API_BASE_PATH}/login`, request)
     .then(checkForErrors)
     .then(saveLogin)
     .catch(err => catchErrorsIntoJSON(err, true));
@@ -36,6 +47,10 @@ export const logout = () => {
 };
 
 export const checkAuth = () => {
-  const token = localStorage.getItem(OODI_TOKEN) || null;
-  return token ? Promise.resolve(token) : login();
+  const auth = {};
+  auth.token = localStorage.getItem(OODI_TOKEN) || null;
+  if (isDevEnv) {
+    auth.devUser = localStorage.getItem(OODI_DEV_USER);
+  }
+  return auth.token ? Promise.resolve(auth) : login();
 };
