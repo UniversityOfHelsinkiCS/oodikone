@@ -61,5 +61,13 @@
     "addTag": ["Add tag"],
     "searchAndAdd": ["Search and select a new tag"],
     "confirmDelete" : ["Are you sure you want to remove tag"]
+  },
+  "studyrights": {
+    "studyright": ["Studyright"],
+    "searchPlaceholder": ["Search with a studyright name"]
+  },
+  "teacherStatistics": {
+    "header" : ["Teacher statistics"],
+    "searchTitle" : ["Search for teachers"]
   }
 }

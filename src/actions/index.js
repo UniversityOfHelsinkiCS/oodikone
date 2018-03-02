@@ -7,6 +7,7 @@ import {
   addTagToStudent,
   findCoursesByName,
   findCourseInstances,
+  findStudyrights,
   getInstanceStatistics,
   getStudyProgrammes,
   getPopulationStatistics
@@ -25,6 +26,7 @@ export const GET_STUDENT = 'GET_STUDENT';
 export const GET_STUDENT_FULFILLED = 'GET_STUDENT_FULFILLED';
 export const FIND_COURSES = 'FIND_COURSES';
 export const FIND_TAGS = 'FIND_TAGS';
+export const FIND_STUDYRIGHTS = 'FIND_STUDYRIGHTS';
 export const REMOVE_TAG_FROM_STUDENT = 'REMOVE_TAG_FROM_STUDENT';
 export const REMOVE_TAG_FROM_STUDENT_FULFILLED = 'REMOVE_TAG_FROM_STUDENT_FULFILLED';
 export const REMOVE_TAG_FROM_STUDENT_REJECTED = 'REMOVE_TAG_FROM_STUDENT_REJECTED';
@@ -79,6 +81,11 @@ export const getStudentAction = studentNumber => ({
 export const findCoursesAction = searchStr => ({
   type: FIND_COURSES,
   payload: findCoursesByName(searchStr)
+});
+
+export const findStudyrightsAction = searchStr => ({
+  type: FIND_STUDYRIGHTS,
+  payload: findStudyrights(searchStr)
 });
 
 export const findTagsAction = searchStr => ({
