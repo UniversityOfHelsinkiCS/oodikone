@@ -5,15 +5,15 @@ import departmentSuccess from './departmentSuccess';
 import students from './students';
 import populations from './populations';
 import tags from './tags';
+import studyProgrammes from './studyProgrammes';
 import errorReducer from './errorReducer';
 
-
-/* collect reducers here from subfolders */
 export default combineReducers({
   departmentSuccess,
   locale,
   studentReducer: students,
   populationReducer: populations,
+  studyProgrammesReducer: studyProgrammes,
   tags,
   errors: errorReducer
 });

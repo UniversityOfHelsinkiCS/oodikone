@@ -1,4 +1,6 @@
-import { getJson, deleteItem, postJson } from '../common';
+import { getJson, deleteItem, postJson } from './common';
+
+const getArrayParams = (paramName, entries) => entries.map(entry => `&${paramName}=${entry}`).join('');
 
 const throwErrors = (res) => {
   if (res.ok === false || res.error) {
@@ -28,10 +30,16 @@ export const removeTagFromStudent = (studentNumber, tag) => deleteItem(`/student
 
 export const addTagToStudent = (studentNumber, tag) => postJson(`/students/${studentNumber}/tags`, tag).then(throwErrors);
 
-export const postForGetPopulationStatistics = request => postJson('/populationstatistics', request).then(throwErrors);
+export const getPopulationStatistics = (query) => {
+  const { year, semester, studyRights } = query;
+  const q = `/populationstatistics/?year=${year}&semester=${semester}${getArrayParams('studyRights', studyRights)}`;
+  return getJson(q).then(throwErrors);
+};
 
 export const findCourseInstances = code => getJson(`/v2/courselist?code=${code}`).then(throwErrors);
 
 export const findStudyrights = searchStr => getJson(`/studyrightkeywords?search=${searchStr}`).then(throwErrors);
 
 export const getInstanceStatistics = (date, code, months) => getJson(`/v2/coursestatistics?date=${date}&code=${code}&months=${months}`).then(throwErrors);
+
+export const getStudyProgrammes = () => getJson('/studyprogrammes').then(throwErrors);

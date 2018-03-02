@@ -5,15 +5,21 @@ import {
   findTags,
   removeTagFromStudent,
   addTagToStudent,
-  postForGetPopulationStatistics,
   findCoursesByName,
   findCourseInstances,
   findStudyrights,
-  getInstanceStatistics
+  getInstanceStatistics,
+  getStudyProgrammes,
+  getPopulationStatistics
 } from '../api';
+import { login, logout } from '../api/auth';
 
 export const ADD_ERROR = 'ADD_ERROR';
 export const REMOVE_ERROR = 'REMOVE_ERROR';
+
+export const LOG_OUT = 'LOG_OUT';
+export const LOG_IN_DEV = 'LOG_IN_DEV';
+
 export const GET_DEPARTMENT_SUCCESS = 'GET_DEPARTMENT_SUCCESS';
 export const FIND_STUDENTS = 'FIND_STUDENTS';
 export const GET_STUDENT = 'GET_STUDENT';
@@ -32,6 +38,8 @@ export const GET_POPULATION_STATISTICS_FULFILLED = 'GET_POPULATION_STATISTICS_FU
 export const GET_POPULATION_STATISTICS_REJECTED = 'GET_POPULATION_STATISTICS_REJECTED';
 export const CLEAR_POPULATIONS = 'CLEAR_POPULATIONS';
 export const REMOVE_POPULATION = 'REMOVE_POPULATION';
+export const GET_STUDY_PROGRAMMES = 'GET_STUDY_PROGRAMMES';
+export const GET_STUDY_PROGRAMMES_FULFILLED = 'GET_STUDY_PROGRAMMES_FULFILLED';
 export const FIND_INSTANCES = 'FIND_INSTANCES';
 export const GET_INSTANCE_STATS = 'GET_INSTANCE_STATISTICS';
 
@@ -43,6 +51,16 @@ export const addError = errorJson => ({
 export const removeError = uuid => ({
   type: REMOVE_ERROR,
   payload: { uuid }
+});
+
+export const logDevUserInAction = user => ({
+  type: LOG_IN_DEV,
+  payload: login(user)
+});
+
+export const logUserOutAction = () => ({
+  type: LOG_OUT,
+  payload: logout()
 });
 
 export const getDepartmentSuccessAction = date => ({
@@ -90,7 +108,7 @@ export const addTagToStudentAction = (studentNumber, tag) => ({
 export const getPopulationStatisticsAction = query => ({
   type: GET_POPULATION_STATISTICS,
   meta: { ...query },
-  payload: postForGetPopulationStatistics(query)
+  payload: getPopulationStatistics(query)
 });
 
 export const clearPopulationsAction = () => ({
@@ -100,6 +118,11 @@ export const clearPopulationsAction = () => ({
 export const removePopulationAction = uuid => ({
   type: REMOVE_POPULATION,
   payload: { uuid }
+});
+
+export const getStudyProgrammesAction = () => ({
+  type: GET_STUDY_PROGRAMMES,
+  payload: getStudyProgrammes()
 });
 
 export const findInstancesAction = code => ({

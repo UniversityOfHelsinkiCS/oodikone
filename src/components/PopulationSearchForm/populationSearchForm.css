@@ -1,3 +1,32 @@
-.listedDate {
-  margin: 5px 0 0 5px !important;
+.semesterRadio {
+  margin-right: 10px !important;
+  padding-top: 22px !important;
 }
+
+.enrollmentSelectorGroup {
+  align-items: center !important;
+}
+
+.yearSelect {
+  padding-right: 0 !important;
+}
+
+.yearSelectInput input {
+  border-bottom-right-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
+.yearControl {
+  padding-top: 22px !important;
+  padding-left: 0 !important;
+}
+
+.yearControlButtonGroup {
+  border-bottom-left-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+}
+
+.yearControlButton {
+  font-size: 8px !important;
+}
+
