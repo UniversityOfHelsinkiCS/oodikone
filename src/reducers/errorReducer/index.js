@@ -24,7 +24,7 @@ export default (state = [], action) => {
     return state.filter(e => e.uuid !== payload.uuid);
 
   // Error is handled elsewhere
-  } else if (payload && !payload.catchRejected) {
+  } else if (payload && payload.catchRejected === false) {
     return state;
     // Received JSON errors
   } else if (payload && payload.error) {
