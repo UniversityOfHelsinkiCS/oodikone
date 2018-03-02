@@ -2,8 +2,6 @@ import React from 'react';
 import { func, arrayOf, object, number, shape } from 'prop-types';
 import { Card, Icon } from 'semantic-ui-react';
 
-import { dateFromApiToDisplay } from '../../common';
-
 import styles from './populationQueryCard.css';
 
 const PopulationQueryCard = ({
