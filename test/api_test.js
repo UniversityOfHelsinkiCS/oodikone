@@ -392,3 +392,33 @@ test('populations can be searched by a searchterm', async t => {
   t.deepEqual(Object.keys(res.body).sort(), ['Chemistry', 'Computer Science', 'Mathematics', 'Physics'].sort())
   t.truthy(res.body['Computer Science']>20)
 })
+
+test('new api populations can be fetched', async t => {
+  const res = await api
+    .get('/api/populationstatistics')
+    .query({ year: '2010',
+      semester: 'SPRING',
+      studyRights: '500-K005'})
+    .auth(auth.username, auth.password)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const stats = res.body
+  t.is(stats.length, 6)
+
+})
+
+test.only('multiple population studyrights can be fetched', async t => {
+  const res = await api
+    .get('/api/populationstatistics')
+    .query({ year: '2010',
+      semester: 'SPRING',
+      studyRights: ['500-K005', '500-M009']})
+    .auth(auth.username, auth.password)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const stats = res.body
+  t.is(stats.length, 7)
+
+})

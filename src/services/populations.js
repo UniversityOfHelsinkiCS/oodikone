@@ -8,7 +8,7 @@ const enrolmentDates = () => {
   return sequelize.query(query)
 }
 
-const enrolmentDatesBetween = (startDate, endDate) => {
+const enrollmentDatesBetween = (startDate, endDate) => {
   const query = `SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s WHERE s.dateOfUniversityEnrollment BETWEEN '${startDate}' AND '${endDate}'`
   return sequelize.query(query)
 }
@@ -203,24 +203,32 @@ async function statisticsOf(conf) {
   return students.map(formatStudent)
 }
 
-const startThis = (semester) => {
-  return semester === 'SPRING' ? '-1-1' : '-7-1'
+const semesterStart = {
+  SPRING: '1-1',
+  FALL: '7-1'
 }
 
-const endThis = (semester) => {
-  return semester === 'SPRING' ? '-6-30' : '-12-31'
+const semesterEnd = {
+  SPRING: '6-30',
+  FALL: '12-31'
+}
+
+const mapProgramToStudyRight = {
+  '500-K004': 'Bachelor of Science, Mathematics',
+  '500-K005': 'Bachelor of Science, Computer Science',
+  '500-M009': 'Master of Science (science), Computer Science',
+  'ENV1': 'Bachelor of Science (Biological and Environmental Sciences), Environmental Sciences' 
 }
 
 async function semesterStatisticsFor(query) {
-  let semesterStart = startThis(query.semester)
-  let semesterEnd = endThis(query.semester)
-  semesterStart = query.year + semesterStart
-  semesterEnd = query.year + semesterEnd
-  console.log(`semester: ${semesterStart} - ${semesterEnd}`)
-  const [dates] = await enrolmentDatesBetween(semesterStart, semesterEnd)
-  console.log(dates)
+  const startDate = `${query.year}-${semesterStart[query.semester]}`
+  const endDate = `${query.year}-${semesterEnd[query.semester]}`
+  console.log(`semester: ${startDate} - ${endDate}`)
+  const [dates] = await enrollmentDatesBetween(startDate, endDate)
+  const studyRights = query.studyRights.map(r => mapProgramToStudyRight[r])
+  console.log(studyRights)
   const conf = { enrollmentDates: dates.map(r => r.date).filter(d => d).sort(),
-    studyRights: ['Bachelor of Science, Computer Science'] }
+    studyRights: studyRights }
   const students = await byCriteria(conf).map(restrictToMonths(12))
   return students.map(formatStudent)
 }
