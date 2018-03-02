@@ -39,7 +39,7 @@ const PopulationQueryCard = ({
           )
         }
         <div className={styles.dateItem}>
-          <Icon name="calendar" size="small" /> {`${translate(`populationStatistics.'${semester})`}/${year}`}
+          <Icon name="calendar" size="small" /> {`${translate(`populationStatistics.'${semester}`)}/${year}`}
         </div>
 
       </Card.Meta>
