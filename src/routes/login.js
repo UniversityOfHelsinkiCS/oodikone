@@ -33,6 +33,7 @@ router.get('/login', async (req, res) => {
       const fullname = req.headers.givenname || 'Shib Valmis'
       if (!user) {
         console.log('User being created')
+        console.log(uid, fullname)
         await User.createUser(uid, fullname)
       } else {
         console.log('User exists')
