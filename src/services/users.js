@@ -36,8 +36,7 @@ async function withUsername(username) {
 const createUser = (username, fullname) => {
   return User.create({
     username,
-    fullname,
-    createdDate: new Date(),
+    fullname
   })
 }
 
