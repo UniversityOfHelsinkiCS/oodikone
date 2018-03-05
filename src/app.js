@@ -6,10 +6,6 @@ const routes = require('./routes')
 const PORT = 8080
 
 const app = express()
-app.use((req, res, next) => {
-  console.log('middleware', req)
-  next()
-})
 
 app.use(cors({ credentials: true, origin: conf.frontend_addr }))
 app.use(bodyParser.json())
