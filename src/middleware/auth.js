@@ -5,6 +5,8 @@ const uidHeaderName = 'eduPersonPrincipalName'
 const isShibboUser = (userId, uidHeader) => userId === uidHeader.split('@')[0]
 
 module.exports.checkAuth = async (req, res, next) => {
+  console.log('checkAuth beginning')
+
   const token = req.headers['x-access-token']
   const uidHeader = req.headers[uidHeaderName] || req.headers[uidHeaderName.toLowerCase()]
   console.log('checkAuth')
