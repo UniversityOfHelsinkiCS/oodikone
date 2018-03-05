@@ -57,14 +57,16 @@ const getHeaders = (auth, isContentType = false) => {
 export const get = path => checkAuth().then(auth =>
   fetch(`${API_BASE_PATH}${path}`, {
     headers: getHeaders(auth),
-    'Cache-Control': 'no-cache'
+    'Cache-Control': 'no-cache',
+    credentials: 'same-origin'
   }))
   .then(checkForErrors);
 
 export const getJson = (path, catchRejected = true) => checkAuth().then(auth =>
   fetch(`${API_BASE_PATH}${path}`, {
     headers: getHeaders(auth),
-    'Cache-Control': 'no-cache'
+    'Cache-Control': 'no-cache',
+    credentials: 'same-origin'
   }))
   .then(checkForErrors)
   .then(toJSON)
@@ -73,6 +75,7 @@ export const getJson = (path, catchRejected = true) => checkAuth().then(auth =>
 export const deleteItem = (path, data, catchRejected = true) => checkAuth().then(auth => fetch(`${API_BASE_PATH}${path}`, {
   method: 'DELETE',
   headers: getHeaders(auth),
+  credentials: 'same-origin',
   body: JSON.stringify(data)
 }))
   .then(checkForErrors)
@@ -82,6 +85,7 @@ export const deleteItem = (path, data, catchRejected = true) => checkAuth().then
 export const postJson = (path, data, catchRejected = true) => checkAuth().then(auth => fetch(`${API_BASE_PATH}${path}`, {
   method: 'POST',
   headers: getHeaders(auth),
+  credentials: 'same-origin',
   body: JSON.stringify(data)
 }))
   .then(checkForErrors)
@@ -94,6 +98,7 @@ export const postJsonGetJson = (path, json, catchRejected = true) => checkAuth()
   fetch(`${API_BASE_PATH}${path}`, {
     method: 'POST',
     'Cache-Control': 'no-cache',
+    credentials: 'same-origin',
     headers: getHeaders(auth),
     body: JSON.stringify(json)
   }))
