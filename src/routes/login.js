@@ -46,6 +46,7 @@ router.get('/login', async (req, res) => {
     }
   } catch (err) {
     console.log('login catch')
+    console.log(err)
     res.status(401).json({ message: 'problem with login' })
   }
 })
