@@ -11,11 +11,13 @@ module.exports.checkAuth = async (req, res, next) => {
     jwt.verify(token, conf.TOKEN_SECRET, (err, decoded) => {
       if (!err && isShibboUser(decoded.userId, uidHeader)) {
         req.decodedToken = decoded // everything is good, save to request for use in other routes
-        return next()
+        next()
+      } else {
+        res.status(403).end()
       }
-      return res.status(403).end()
-    }).then(() => {})
+    })
+  } else {
+    res.status(403).end()
   }
-  return res.status(403).end()
 }
 
