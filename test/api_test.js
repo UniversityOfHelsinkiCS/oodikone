@@ -3,13 +3,27 @@ const supertest = require('supertest')
 const app = require('../src/app')
 const api = supertest(app)
 const { sequelize } = require('../src/models')
+const conf = require('../src/conf-backend')
+const jwt = require('jsonwebtoken')
 
+/*
 const auth = {
   username: 'tktl',
   password: 'CsZerc8TUtR1S95CYOtTaC69'
 }
+*/
+
+let token
+const uid = 'tktl', fullname = ''
+const payload = { userId: uid, name: fullname }
+
+
 
 test.before( async () => {
+  token = jwt.sign(payload, conf.TOKEN_SECRET, {
+    expiresIn: '24h'
+  })
+  console.log(token)
   sequelize.query(
     `DELETE 
       FROM tag_student 
@@ -26,11 +40,11 @@ test('should pong when pinged', async t => {
   t.deepEqual(res.body, {data:'pong'} )
 })
 
-
+/*
 test('request without basic auth credentials fails', async t => {
   await api
     .get('/api/enrollmentdates')
-    .expect(401)
+    .expect(403)
     .expect('Content-Type', /application\/json/)
         
   t.pass()
@@ -40,7 +54,7 @@ test('request with basic nonexisting user fails', async t => {
   await api
     .get('/api/enrollmentdates')
     .auth('nonexistent', 'wrong')
-    .expect(401)
+    .expect(403)
     .expect('Content-Type', /application\/json/)
   
   t.pass()
@@ -50,16 +64,18 @@ test('request with wrong password fails', async t => {
   await api
     .get('/api/enrollmentdates')
     .auth('tktl', 'wrong')
-    .expect(401)
+    .expect(403)
     .expect('Content-Type', /application\/json/)
 
   t.pass()    
-})  
+})  */
 
 test('request with correct credentials succeed', async t => {
   await api
     .get('/api/enrollmentdates')
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+    //.auth(auth.username, auth.password)
     .expect(200)
     .expect('Content-Type', /application\/json/)
   
@@ -70,7 +86,8 @@ test('students can be searched by searchterm', async t => {
   const res = await api
     .get('/api/students')
     .query({ searchTerm: 'Luukkainen Matti' })
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -82,7 +99,8 @@ test('students can be searched by searchterm', async t => {
 test('a student credit info is returned with student number', async t => {
   const res = await api
     .get('/api/students/011120775')
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -97,7 +115,8 @@ test('a student credit info is returned with student number', async t => {
 test('a tagless student credit info is returned with student number', async t => {
   const res = await api
     .get('/api/students/014424850')
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -115,7 +134,8 @@ test('if student already has a tag, it can not be added', async t => {
   const res = await api
     .post('/api/students/014424850/tags')
     .send(tagToAdd)
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(400)
     .expect('Content-Type', /application\/json/)
 
@@ -128,7 +148,8 @@ test('tag can be added to and deleted from a student', async t => {
   let res = await api
     .post('/api/students/014424850/tags')
     .send(tagToAdd)
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
@@ -141,21 +162,24 @@ test('tag can be added to and deleted from a student', async t => {
 
   res = await api
     .get('/api/students/014424850')
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
 
   t.truthy(res.body.tags.includes(tagToAdd.text))     
 
   res = await api
     .delete('/api/students/014424850/tags')
     .send(tagToAdd)
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)  
 
 
   res = await api
     .get('/api/students/011120775')
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
 
   t.falsy(res.body.tags.includes(tagToAdd.text))      
 })
@@ -164,7 +188,8 @@ test('courses can be searched by a searchterm', async t => {
   const res = await api
     .get('/api/courses')
     .query({ name: 'Ohjelmoinnin' })    
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -184,7 +209,8 @@ test('instances of a course can be fetched', async t => {
   const res = await api
     .post('/api/courselist')
     .send(course)
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -204,7 +230,8 @@ test('statistics of an instance can be fetched', async t => {
   const res = await api
     .post('/api/coursestatistics')
     .send(course)
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -225,7 +252,8 @@ test('teacher statistics can be fetched', async t => {
   const res = await api
     .post('/api/teacherstatistics')
     .send(query)
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -239,7 +267,8 @@ test('populations can be searched by a searchterm', async t => {
   const res = await api
     .get('/api/studyrightkeywords')
     .query({ search: 'computer Science' })    
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -250,7 +279,8 @@ test('populations can be searched by a searchterm', async t => {
 test('enrollment dates can be fetched', async t => {
   const res = await api
     .get('/api/enrollmentdates') 
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -262,7 +292,8 @@ test('tags can be searched by a searchterm', async t => {
   const res = await api
     .get('/api/tags')
     .query({ query: 'mooc' })    
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -277,7 +308,8 @@ test('tags can be added to a set of studets', async t => {
   students.forEach(async (s) => {
     let res = await api
       .get(`/api/students/${s}`)
-      .auth(auth.username, auth.password)
+      .set('x-access-token', token)
+      .set('eduPersonPrincipalName', uid)
 
     t.falsy(res.body.tags.includes(tagToAdd))    
   })
@@ -285,14 +317,16 @@ test('tags can be added to a set of studets', async t => {
   await api
     .post('/api/tags/test3')
     .send(students)
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(201)
     .expect('Content-Type', /application\/json/)  
 
   students.forEach(async (s) => {
     let res = await api
       .get(`/api/students/${s}`)
-      .auth(auth.username, auth.password)
+      .set('x-access-token', token)
+      .set('eduPersonPrincipalName', uid)
       .expect(200)
       .expect('Content-Type', /application\/json/)  
 
@@ -303,7 +337,8 @@ test('tags can be added to a set of studets', async t => {
     await api
       .delete(`/api/students/${s}/tags`)
       .send({text: tagToAdd})
-      .auth(auth.username, auth.password)
+      .set('x-access-token', token)
+      .set('eduPersonPrincipalName', uid)
       .expect(200)
       .expect('Content-Type', /application\/json/)  
   })
@@ -311,7 +346,8 @@ test('tags can be added to a set of studets', async t => {
   students.forEach(async (s) => {
     let res = await api
       .get(`/api/students/${s}`)
-      .auth(auth.username, auth.password)
+      .set('x-access-token', token)
+      .set('eduPersonPrincipalName', uid)
 
     t.falsy(res.body.tags.includes(tagToAdd))    
   })
@@ -341,7 +377,8 @@ test('population statistics can be fetched', async t => {
   const res = await api
     .post('/api/populationstatistics')
     .send(query)
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -371,7 +408,8 @@ test('population statistics can be fetched with another configuration', async t 
   const res = await api
     .post('/api/populationstatistics')
     .send(query)
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -385,7 +423,8 @@ test('populations can be searched by a searchterm', async t => {
   const res = await api
     .get('/api/departmentsuccess')
     .query({ date: '2005.08.01' })    
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -399,7 +438,8 @@ test('new api populations can be fetched', async t => {
     .query({ year: '2010',
       semester: 'SPRING',
       studyRights: '500-K005'})
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -414,7 +454,8 @@ test('multiple population studyrights can be fetched', async t => {
     .query({ year: '2010',
       semester: 'SPRING',
       studyRights: ['500-K005', '500-M009']})
-    .auth(auth.username, auth.password)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
