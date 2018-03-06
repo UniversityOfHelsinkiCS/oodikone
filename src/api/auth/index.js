@@ -19,7 +19,8 @@ const saveLogin = res => res.json().then((response) => {
 
 export const login = (user) => {
   const request = {
-    'Cache-Control': 'no-cache'
+    'Cache-Control': 'no-cache',
+    credentials: 'same-origin'
   };
   if (isDevEnv) {
     const devUser = user || 'tktl';
