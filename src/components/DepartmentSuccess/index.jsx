@@ -6,6 +6,7 @@ import { getTranslate, getActiveLanguage } from 'react-localize-redux';
 import { Dimmer, Segment, Header } from 'semantic-ui-react';
 
 import { getDepartmentSuccessAction } from '../../actions';
+import { getDepartmentSuccess } from '../../redux/department';
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants';
 import MulticolorBarChart from '../MulticolorBarChart';
 import ScrollableDateSelector from '../ScrollableDateSelector';
@@ -55,6 +56,7 @@ class DepartmentSuccess extends Component {
 
   componentDidMount() {
     const selectorDates = getSelectorDates(FIRST_DATE);
+    this.props.getDepartment(this.state.selectedDate.value);
     this.setState(
       { selectorDates, selectedDate: selectorDates[0] },
       () => this.getChartData()
@@ -136,7 +138,10 @@ const mapStateToProps = ({ locale }) => ({
 
 const mapDispatchToProps = dispatch => ({
   dispatchGetDepartmentSuccess: date =>
-    dispatch(getDepartmentSuccessAction(date))
+    dispatch(getDepartmentSuccessAction(date)),
+  getDepartment(date) {
+    dispatch(getDepartmentSuccess(date));
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DepartmentSuccess);
