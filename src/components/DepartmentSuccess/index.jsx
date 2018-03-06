@@ -41,7 +41,8 @@ const isInArrayLimits = (amount, index, arrayLenght) =>
 class DepartmentSuccess extends Component {
   static propTypes = {
     dispatchGetDepartmentSuccess: func.isRequired,
-    translate: func.isRequired
+    translate: func.isRequired,
+    getDepartment: func.isRequired
   };
 
   state = {
