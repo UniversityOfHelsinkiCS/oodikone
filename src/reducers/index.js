@@ -7,6 +7,7 @@ import populations from './populations';
 import tags from './tags';
 import studyProgrammes from './studyProgrammes';
 import errorReducer from './errorReducer';
+import newReducers from '../redux';
 
 export default combineReducers({
   departmentSuccess,
@@ -15,5 +16,6 @@ export default combineReducers({
   populationReducer: populations,
   studyProgrammesReducer: studyProgrammes,
   tags,
-  errors: errorReducer
+  errors: errorReducer,
+  newReducers
 });

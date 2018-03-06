@@ -164,7 +164,7 @@ const CreditAccumulationGraph = (props) => {
             <CartesianGrid strokeDasharray="3 3" />
            I {
               isSingleStudent && getTooltip(props)
-            } 
+            }
             {
               students.map((student, i) => {
                 const dot = getDot(student.studentNumber, isSingleStudent, pushToHistoryFn);
