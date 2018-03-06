@@ -221,15 +221,21 @@ const mapProgramToStudyRight = {
 }
 
 async function semesterStatisticsFor(query) {
+  if (semesterStart[query.semester] === undefined) {
+    return { error: 'Semester should be either SPRING OR FALL' }
+  }
   const startDate = `${query.year}-${semesterStart[query.semester]}`
   const endDate = `${query.year}-${semesterEnd[query.semester]}`
-  console.log(`semester: ${startDate} - ${endDate}`)
   const [dates] = await enrollmentDatesBetween(startDate, endDate)
+
   const studyRights = query.studyRights.map(r => mapProgramToStudyRight[r])
-  console.log(studyRights)
+  if (studyRights.includes(undefined)) {
+    return { error: `No such study rights: ${query.studyRights}` }
+  }
+  
   const conf = { enrollmentDates: dates.map(r => r.date).filter(d => d).sort(),
     studyRights: studyRights }
-  const students = await byCriteria(conf).map(restrictToMonths(12))
+  const students = await byCriteria(conf).map(restrictToMonths(query.months))  // Months are hard-coded
   return students.map(formatStudent)
 }
 

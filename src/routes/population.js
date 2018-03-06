@@ -37,13 +37,23 @@ router.post('/populationstatistics', async function (req, res) {
 })
 
 router.get('/populationstatistics', async function (req, res) {
-  if (req.query.year) {
-    console.log(req.query)
-    if (!Array.isArray(req.query.studyRights)) {
+  try {
+    if (!req.query.year || !req.query.semester || ! req.query.studyRights) {
+      res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
+      return
+    }
+    if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
       req.query.studyRights = [req.query.studyRights]
     }
+    req.query.months = 12
     const result = await Population.semesterStatisticsFor(req.query)
+    if (result.error) {
+      res.status(400).json(result)
+      return
+    }
     res.json(result)
+  } catch(e) {
+    res.status(400).json({ error: e })
   }
 })
 

@@ -23,7 +23,7 @@ test.before( async () => {
   token = jwt.sign(payload, conf.TOKEN_SECRET, {
     expiresIn: '24h'
   })
-  console.log(token)
+  //console.log(token)
   sequelize.query(
     `DELETE 
       FROM tag_student 
@@ -461,5 +461,51 @@ test('multiple population studyrights can be fetched', async t => {
 
   const stats = res.body
   t.is(stats.length, 7)
+
+})
+
+test('population statics with wrong semester results in bad request', async t => {
+  const res = await api
+    .get('/api/populationstatistics')
+    .query({ year: '2010',
+      semester: 'NO SEASON',
+      studyRights: '500-K005'})
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+  const stats = res.body
+  t.is(stats.error, 'Semester should be either SPRING OR FALL')
+
+})
+
+test.only('population statics with wrong semester results in bad request', async t => {
+  const res = await api
+    .get('/api/populationstatistics')
+    .query({ year: '2010',
+      semester: 'SPRING',
+      studyRights: '[Huolissaanolon maisteriohjelma, 500-K005]'})
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+  const stats = res.body
+  t.is(stats.error, 'No such study rights: [Huolissaanolon maisteriohjelma, 500-K005]')
+
+})
+
+test('population statics without a proper queryresults in bad request', async t => {
+  const res = await api
+    .get('/api/populationstatistics')
+    .query({ myName: 'Jeff'})
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+  const stats = res.body
+  t.is(stats.error, 'The query should have a year, semester and study rights defined')
 
 })
