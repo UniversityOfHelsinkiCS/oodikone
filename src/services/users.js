@@ -35,8 +35,9 @@ async function withUsername(username) {
 
 const createUser = (username, fullname) => {
   return User.create({
-    username,
-    fullname
+    username: username,
+    full_name: fullname,
+    is_enabled: false
   })
 }
 

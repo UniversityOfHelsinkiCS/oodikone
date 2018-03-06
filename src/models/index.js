@@ -243,7 +243,8 @@ const User = sequelize.define('users',
   {
     id: {
       primaryKey: true,
-      type: Sequelize.BIGINT
+      type: Sequelize.BIGINT,
+      autoIncrement: true
     },
     full_name: { type: Sequelize.STRING },
     is_enabled: { type: Sequelize.BOOLEAN },
