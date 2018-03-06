@@ -480,7 +480,7 @@ test('population statics with wrong semester results in bad request', async t =>
 
 })
 
-test.only('population statics with wrong semester results in bad request', async t => {
+test('population statics with wrong semester results in bad request', async t => {
   const res = await api
     .get('/api/populationstatistics')
     .query({ year: '2010',
