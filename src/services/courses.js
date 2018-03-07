@@ -7,55 +7,55 @@ const Op = Sequelize.Op
 const byNameOrCode = (searchTerm) => {
   return Course.findAll({
     limit: 10,
-    where: { 
+    where: {
       [Op.or]: [
         {
           name: {
             [Op.iLike]: searchTerm
-          } 
-        }, 
+          }
+        },
         {
           code: {
             [Op.like]: searchTerm
           }
         }
-      ] 
+      ]
     }
   })
 }
 
 const instanceStatistics = (code, date) => {
   return CourseInstance.findOne({
-    include: [ 
-      { 
+    include: [
+      {
         model: Credit,
-        include: [ Student ] 
-      } 
+        include: [Student]
+      }
     ],
     where: {
       [Op.and]: [
-        { 
-          course_code: { 
-            [Op.eq]: code 
-          } 
+        {
+          course_code: {
+            [Op.eq]: code
+          }
         },
-        { 
-          coursedate: { 
-            [Op.eq]: new Date(date) 
-          } 
+        {
+          coursedate: {
+            [Op.eq]: new Date(date)
+          }
         }
-      ] 
+      ]
     }
   })
 }
 
 const instancesByCode = (code) => {
   return CourseInstance.findAll({
-    include: [ Credit, CourseTeacher ],
+    include: [Credit, CourseTeacher],
     where: {
       course_code: {
         [Op.eq]: code
-      } 
+      }
     }
   })
 }
@@ -68,21 +68,21 @@ const byIds = (ids) => {
         include: [
           {
             model: CourseInstance,
-          } 
+          }
         ]
       }
     ],
-    where: { 
+    where: {
       studentnumber: {
         [Op.in]: ids
-      } 
+      }
     }
   })
 }
 
 async function bySearchTerm(term) {
-  const formatCourse = ({name, code}) => ({name, code})
-  
+  const formatCourse = ({ name, code }) => ({ name, code })
+
   try {
     const result = await byNameOrCode(`%${term}%`)
     return result.map(formatCourse)
@@ -90,37 +90,42 @@ async function bySearchTerm(term) {
     return {
       error: e
     }
-  } 
+  }
 }
 
 async function statisticsOf(code, date, months) {
 
-  const getStudents = ({credits}) => {
-    const all = credits.map(c=>c.student_studentnumber)
-    const pass = credits.filter(Credit.passed).map(c=>c.student_studentnumber)
-    const fail = credits.filter(Credit.failed).map(c=>c.student_studentnumber)
-    return {all, pass, fail}  
+  const getStudents = ({ credits }) => {
+    const all = credits.map(c => c.student_studentnumber)
+    const pass = credits.filter(Credit.passed).map(c => c.student_studentnumber)
+    const fail = credits.filter(Credit.failed).map(c => c.student_studentnumber)
+    return { all, pass, fail }
   }
 
   const starYearsOf = (students) => {
-    const years = students.map(s=> moment(s.dateofuniversityenrollment).year()).sort()
-    return years.reduce((map, y) => { map[y] = map[y] ? map[y]+1 : 1; return map}, {})
+    const years = students.map(s => moment(s.dateofuniversityenrollment).year()).sort()
+    return years.reduce((map, y) => { map[y] = map[y] ? map[y] + 1 : 1; return map }, {})
   }
 
-  const studentStatsAfter = (studentsStats, date) => {      
+  const currentCourse = (credit) => {
+    return (credit.courseinstance.course_code !== code &&
+      credit.courseinstance.coursedate !== date)
+  }
 
+  const studentStatsAfter = (studentsStats, date) => {
     const creditsAfter = (student) => {
       return student.credits
         .filter(Credit.inTimeRange(date, months))
         .filter(Credit.passed)
+        .filter(currentCourse)
         .filter(Credit.notUnnecessary)
-        .reduce((set, c) => set+c.credits, 0.0)
+        .reduce((set, c) => set + c.credits, 0.0)
     }
-
+    
     const toStudent = (set, student) => {
       set[student.studentnumber] = creditsAfter(student, date)
       return set
-    }    
+    }
 
     return studentsStats.reduce(toStudent, {})
   }
@@ -128,27 +133,27 @@ async function statisticsOf(code, date, months) {
   try {
     const instanceStats = await instanceStatistics(code, date)
     const students = getStudents(instanceStats)
-    const studentStats = await byIds(students.all) 
+    const studentStats = await byIds(students.all)
 
-    const all = studentStatsAfter(studentStats.filter(s=>students.all.includes(s.studentnumber)), date)
-    const pass = studentStatsAfter(studentStats.filter(s=>students.pass.includes(s.studentnumber)), date)
-    const fail = studentStatsAfter(studentStats.filter(s=>students.fail.includes(s.studentnumber)), date)    
+    const all = studentStatsAfter(studentStats.filter(s => students.all.includes(s.studentnumber)), date)
+    const pass = studentStatsAfter(studentStats.filter(s => students.pass.includes(s.studentnumber)), date)
+    const fail = studentStatsAfter(studentStats.filter(s => students.fail.includes(s.studentnumber)), date)
     return {
       all, pass, fail,
-      startYear: starYearsOf(instanceStats.credits.map(c=>c.student))
+      startYear: starYearsOf(instanceStats.credits.map(c => c.student))
     }
   } catch (e) {
     console.log(e)
     return {
       error: e
     }
-  } 
+  }
 }
 
 async function instancesOf(code) {
   const byDate = (a, b) => {
     return moment(a.coursedate).isSameOrBefore(b.coursedate) ? -1 : 1
-  } 
+  }
 
   const formatInstance = (instance) => {
     return {
@@ -157,10 +162,10 @@ async function instancesOf(code) {
       fail: instance.credits.filter(Credit.failed).length,
       pass: instance.credits.filter(Credit.passed).length,
       students: instance.credits.length,
-      teachers: instance.courseteachers.map(t=>t.teacher_id).filter(arrayUnique).length
+      teachers: instance.courseteachers.map(t => t.teacher_id).filter(arrayUnique).length
     }
   }
-  
+
   try {
     const result = await instancesByCode(code)
     return result.sort(byDate).map(formatInstance)
@@ -169,24 +174,24 @@ async function instancesOf(code) {
     return {
       error: e
     }
-  } 
+  }
 }
 
 const courseInstanceByCodeAndDate = (code, date) => {
   return CourseInstance.findOne({
     where: {
       [Op.and]: [
-        { 
-          course_code: { 
-            [Op.eq]: code 
-          } 
+        {
+          course_code: {
+            [Op.eq]: code
+          }
         },
-        { 
-          coursedate: { 
-            [Op.eq]: new Date(date) 
-          } 
+        {
+          coursedate: {
+            [Op.eq]: new Date(date)
+          }
         }
-      ] 
+      ]
     }
   })
 }
