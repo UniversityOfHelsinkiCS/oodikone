@@ -59,7 +59,9 @@ const getStudentCourseData = (student) => {
     const {
       course, date, credits, grade, passed
     } = c;
-    totalCredits += credits;
+    if (passed) {
+      totalCredits += credits;
+    }
     return {
       title: `${course.name} (${course.code})`,
       [studentNumber]: totalCredits,
@@ -162,7 +164,7 @@ const CreditAccumulationGraph = (props) => {
             />
             <YAxis />
             <CartesianGrid strokeDasharray="3 3" />
-           I {
+            I {
               isSingleStudent && getTooltip(props)
             }
             {
