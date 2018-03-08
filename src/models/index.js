@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const sequelize = require('../database/connection')
+const { sequelize, migrationPromise } = require('../database/connection')
 
 const Student = sequelize.define('student',
   {
@@ -251,5 +251,6 @@ module.exports = {
   CourseTeacher,
   User,
   sequelize,
+  migrationPromise,
   Organisation
 }

@@ -38,6 +38,6 @@ const runMigrations = async () => {
   }
 }
 
-runMigrations()
+const migrationPromise = runMigrations()
 
-module.exports = sequelize
+module.exports = { sequelize, migrationPromise }

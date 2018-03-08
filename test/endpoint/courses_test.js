@@ -1,10 +1,12 @@
-process.env.DB_SCHEMA = 'courses_schema'
+const schema = 'courses_schema'
+process.env.DB_SCHEMA = schema
 
 const test = require('ava')
 const supertest = require('supertest')
 const jwt = require('jsonwebtoken')
 
-// const generateCourses = require('../utils')
+const { Course, CourseInstance, sequelize, migrationPromise } = require('../../src/models')
+const { generateCourses, generateCourseInstances } = require('../utils')
 const app = require('../../src/app')
 const conf = require('../../src/conf-backend')
 const api = supertest(app)
@@ -17,7 +19,12 @@ const token = jwt.sign(payload, conf.TOKEN_SECRET, {
 })
 
 test.before(async () => {
-  
+  await migrationPromise
+  await sequelize.sync()
+})
+
+test.after.always(async () => {
+  await sequelize.dropSchema(schema)
 })
 
 test('should pong when pinged', async t => {
@@ -27,20 +34,22 @@ test('should pong when pinged', async t => {
   t.is(res.status, 200)
   t.deepEqual(res.body, { data: 'pong' })
 })
-/*
+
 test('courses can be searched by a searchterm', async t => {
+  const courses = await generateCourses()
+  const courseInstances = await generateCourseInstances(courses)
+  await Course.bulkCreate(courses)
+  await CourseInstance.bulkCreate(courseInstances)
+  const selectedCourse = courses[0]
   const res = await api
     .get('/api/courses')
-    .query({ name: 'Ohjelmoinnin' })
+    .query({ name: selectedCourse.name })
     .set('x-access-token', token)
     .set('eduPersonPrincipalName', uid)
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
+  t.is(res.status, 200)
+  t.truthy(res.body.length > 0, 'res body was empty')
+  const foundCourse = res.body.find(course => course.id === selectedCourse.id)
+  t.is(selectedCourse.code, Number(foundCourse.code))
+  t.is(selectedCourse.name, foundCourse.name)
 
-  const courses = res.body
-
-  t.is(courses.length, 10)
-  const courseNames = courses.map(c => c.name.toUpperCase())
-
-  t.truthy(courseNames.every(n => n.includes('Ohjelmoinnin'.toUpperCase())))
-}) */
+}) 
