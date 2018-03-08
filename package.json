@@ -47,8 +47,7 @@
   },
   "ava": {
     "files": [
-      "test/*_test.js",
-      "!test/supertest/*.js"
+      "test/**/*_test.js"
     ],
     "source": [
       "**/*.{js,jsx}",
