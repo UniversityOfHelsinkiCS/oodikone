@@ -7,7 +7,7 @@ const generateToken = async (uid, res) => {
   const model = await User.byUsername(uid)
   const user = model.dataValues
   if (user.is_enabled) {
-    const payload = { userId: uid, name: user.fullname }
+    const payload = { userId: uid, name: user.full_name }
     const token = jwt.sign(payload, conf.TOKEN_SECRET, {
       expiresIn: '24h'
     })
@@ -37,7 +37,7 @@ router.get('/login', async (req, res) => {
         await User.createUser(uid, fullname)
       } else {
         console.log('User exists')
-        await User.updateUser(user, { fullname })
+        await User.updateUser(user, { full_name: fullname })
       }
       generateToken(uid, res)
     } else {
