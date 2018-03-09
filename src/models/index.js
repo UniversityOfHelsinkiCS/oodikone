@@ -257,6 +257,9 @@ Student.hasMany(Studyright, { foreignKey: 'student_studentnumber', sourceKey: 's
 User.belongsToMany(Unit, { through: 'user_unit', foreignKey: 'user_id', timestamps: false })
 Unit.belongsToMany(User, { through: 'user_unit', foreignKey: 'unit_id', timestamps: false })
 
+Tag.belongsToMany(Unit, { through: 'unit_tag', foreignKey: 'tags_tagname', timestamps: false })
+Unit.belongsToMany(Tag, { through: 'unit_tag', foreignKey: 'unit_id', timestamps: false })
+
 module.exports = {
   Student,
   Credit,
