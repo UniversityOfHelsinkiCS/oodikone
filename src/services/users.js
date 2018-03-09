@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { User } = require('../models')
+const { User, Unit } = require('../models')
 
 const Op = Sequelize.Op
 
@@ -45,6 +45,17 @@ const updateUser = (userObject, values) => {
   return userObject.update(values)
 }
 
+const getUnits = async (id) => {
+  return await Unit.findAll({
+    include: [{
+      model: User,
+      through:{
+        where: {user_id: id}
+      }
+    }]
+  })
+} 
+
 const findAll = () => {
   return User.findAll()
 }
@@ -55,5 +66,6 @@ module.exports = {
   createUser,
   updateUser,
   findAll,
+  getUnits,
   byId
 }

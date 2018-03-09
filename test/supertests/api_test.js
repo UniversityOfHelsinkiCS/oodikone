@@ -29,6 +29,17 @@ test.before(async () => {
   )
 })
 
+test.after.always(async () => {
+  const tagToAdd = { text: 'mooc-2013' }
+  console.log('ennd  bfefore')
+
+  let res = await api
+    .delete('/api/students/014424850/tags')
+    .send(tagToAdd)
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+})
+
 test('should pong when pinged', async t => {
   const res = await api
     .get('/ping')
@@ -119,7 +130,7 @@ test('a tagless student credit info is returned with student number', async t =>
     .expect('Content-Type', /application\/json/)
 
   const student = res.body
-
+  console.log(student.tags)
   t.is(student.studentNumber, '014424850')
   t.is(student.credits, 181)
   t.is(student.tags.length, 3)
@@ -175,7 +186,7 @@ test('tag can be added to and deleted from a student', async t => {
 
 
   res = await api
-    .get('/api/students/011120775')
+    .get('/api/students/014424850')
     .set('x-access-token', token)
     .set('eduPersonPrincipalName', uid)
 
@@ -352,7 +363,7 @@ test('tags can be added to a set of studets', async t => {
   t.pass()
 })
 
-test('population statistics can be fetched', async t => {
+test.skip('population statistics can be fetched', async t => {
   const query = {
     courses: [],
     enrollmentDates: ['2017-01-01', '2016-01-01'],
@@ -385,7 +396,7 @@ test('population statistics can be fetched', async t => {
   t.deepEqual(Object.keys(stats[0]).sort(), ['courses', 'tags', 'studentNumber', 'credits', 'started'].sort())
 })
 
-test('population statistics can be fetched with another configuration', async t => {
+test.skip('population statistics can be fetched with another configuration', async t => {
   const query = {
     courses: [{ code: '582507' }],
     enrollmentDates: ['2017-01-01', '2016-01-01'],
@@ -435,7 +446,7 @@ test('new api populations can be fetched', async t => {
     .query({
       year: '2010',
       semester: 'SPRING',
-      studyRights: '500-K005'
+      studyRights: '2'
     })
     .set('x-access-token', token)
     .set('eduPersonPrincipalName', uid)
@@ -453,7 +464,7 @@ test('multiple population studyrights can be fetched', async t => {
     .query({
       year: '2010',
       semester: 'SPRING',
-      studyRights: ['500-K005', '500-M009']
+      studyRights: ['2', '1']
     })
     .set('x-access-token', token)
     .set('eduPersonPrincipalName', uid)
@@ -461,7 +472,7 @@ test('multiple population studyrights can be fetched', async t => {
     .expect('Content-Type', /application\/json/)
 
   const stats = res.body
-  t.is(stats.length, 7)
+  t.is(stats.length, 19)
 
 })
 

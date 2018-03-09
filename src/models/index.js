@@ -256,6 +256,21 @@ const User = sequelize.define('users',
   }
 )
 
+const Unit = sequelize.define('unit',
+  {
+    id: {
+      primaryKey: true,
+      type: Sequelize.BIGINT,
+      autoIncrement: true
+    },
+    name: { type: Sequelize.STRING },
+  },
+  {
+    tableName: 'unit',
+    timestamps: false,
+  }
+)
+
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
 Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
 
@@ -273,6 +288,9 @@ Tag.hasMany(TagStudent, { foreignKey: 'tags_tagname', sourceKey: 'tagname' })
 Studyright.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyright, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
 
+User.belongsToMany(Unit, { through: 'user_unit', foreignKey: 'user_id', timestamps: false })
+Unit.belongsToMany(User, { through: 'user_unit', foreignKey: 'unit_id', timestamps: false })
+
 module.exports = {
   Student,
   Credit,
@@ -284,6 +302,7 @@ module.exports = {
   Teacher,
   CourseTeacher,
   User,
+  Unit,
   sequelize,
   Organisation
 }
