@@ -41,14 +41,14 @@
     "babel-eslint": "^8.0.1",
     "dotenv": "^4.0.0",
     "eslint": "^4.9.0",
+    "faker": "^4.1.0",
     "nodemon": "^1.17.1",
     "nyc": "^11.2.1",
     "supertest": "^3.0.0"
   },
   "ava": {
     "files": [
-      "test/*_test.js",
-      "!test/supertest/*.js"
+      "test/**/*_test.js"
     ],
     "source": [
       "**/*.{js,jsx}",

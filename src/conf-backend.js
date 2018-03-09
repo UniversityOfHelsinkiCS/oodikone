@@ -4,7 +4,8 @@ const DB_URL = process.env.NODE_ENV === 'test' ? process.env.TEST_DB : process.e
 const frontend_addr = process.env.FRONT_URL
 const redis = process.env.REDIS
 const TOKEN_SECRET = process.env.TOKEN_SECRET
+const DB_SCHEMA = process.env.DB_SCHEMA || 'public'
 
 module.exports = {
-  frontend_addr, DB_URL, redis, TOKEN_SECRET
+  frontend_addr, DB_URL, redis, TOKEN_SECRET, DB_SCHEMA
 }
