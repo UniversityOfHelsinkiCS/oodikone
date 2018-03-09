@@ -1,6 +1,6 @@
 import React from 'react';
 import { arrayOf, object, string, func, shape } from 'prop-types';
-import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line, Tooltip, CartesianGrid, Dot } from 'recharts';
+import { ResponsiveContainer, LineChart, XAxis, YAxis, Line, Tooltip, CartesianGrid, Dot } from 'recharts';
 import _ from 'lodash';
 import moment from 'moment';
 import { Header, Segment, Message } from 'semantic-ui-react';
@@ -59,7 +59,9 @@ const getStudentCourseData = (student) => {
     const {
       course, date, credits, grade, passed
     } = c;
-    totalCredits += credits;
+    if (passed) {
+      totalCredits += credits;
+    }
     return {
       title: `${course.name} (${course.code})`,
       [studentNumber]: totalCredits,
@@ -162,10 +164,9 @@ const CreditAccumulationGraph = (props) => {
             />
             <YAxis />
             <CartesianGrid strokeDasharray="3 3" />
-            {
+            I {
               isSingleStudent && getTooltip(props)
             }
-            <Legend />
             {
               students.map((student, i) => {
                 const dot = getDot(student.studentNumber, isSingleStudent, pushToHistoryFn);
