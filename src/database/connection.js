@@ -10,11 +10,6 @@ const sequelize = new Sequelize(conf.DB_URL, {
 
 const runMigrations = async () => {
   try {
-    try {
-      await sequelize.getQueryInterface().createSchema(conf.DB_SCHEMA)
-    } catch (e) {
-      // not an error, schema already existed
-    }
     const migrator = new Umzug({
       storage: 'sequelize',
       storageOptions: {
@@ -38,6 +33,6 @@ const runMigrations = async () => {
   }
 }
 
-const migrationPromise = runMigrations()
+const migrationPromise = conf.DB_SCHEMA === 'public' ? runMigrations() : Promise.resolve()
 
 module.exports = { sequelize, migrationPromise }

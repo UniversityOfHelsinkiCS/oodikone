@@ -42,7 +42,7 @@ module.exports = {
         references: { model: 'unit', key: 'id' }
       },
       tag_id: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.STRING,
         references: { model: 'tag', key: 'tagname' }
       }
     })

@@ -5,7 +5,7 @@ const test = require('ava')
 const supertest = require('supertest')
 const jwt = require('jsonwebtoken')
 
-const { Course, CourseInstance, sequelize, migrationPromise } = require('../../src/models')
+const { Course, CourseInstance, sequelize } = require('../../src/models')
 const { generateCourses, generateCourseInstances } = require('../utils')
 const app = require('../../src/app')
 const conf = require('../../src/conf-backend')
@@ -19,7 +19,7 @@ const token = jwt.sign(payload, conf.TOKEN_SECRET, {
 })
 
 test.before(async () => {
-  await migrationPromise
+  await sequelize.createSchema(schema)
   await sequelize.sync()
 })
 
