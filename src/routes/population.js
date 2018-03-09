@@ -43,7 +43,6 @@ router.get('/populationstatistics', async function (req, res) {
       res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
       return
     }
-    console.log(req.query.studyRights)
     if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
       req.query.studyRights = [req.query.studyRights]
     }
