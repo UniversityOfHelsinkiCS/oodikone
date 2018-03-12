@@ -7,12 +7,12 @@ const CourseService = require('../courses')
 const TeacherService = require('../teachers')
 const CreditService = require('../credits')
 const Oi = require('./oodi_interface')
+const { ids } = require('./ytnrs')
 const { log, logError } = require('./logger')
 
 
 let minStudentNumber = 1000000
 let maxStudentNumber = 1500000
-console.log('Running updater on ' + minStudentNumber + '-' + maxStudentNumber)
 
 const updateStudentInformation = async studentNumber => {
   try {
@@ -239,10 +239,15 @@ const getStudentNumberChecksum = studentNumber => {
 
 const run = async () => {
 
-  for (let i = minStudentNumber; i < maxStudentNumber; i++) {
+  // for (let i = minStudentNumber; i < maxStudentNumber; i++) {
+  //   if (i % 50000 === 0) log('Running: 0' + i + getStudentNumberChecksum(String(i)))
+  //   let studentNumber = '0' + i + getStudentNumberChecksum(String(i))
+  //   await updateStudentInformation(studentNumber)
+  // }
 
-    if(i%50000 === 0) log('Running: 0' + i + getStudentNumberChecksum(String(i)))
-    let studentNumber = '0' + i + getStudentNumberChecksum(String(i))
+  for (let i = 0; i < ids.length; i++) {
+    if (ids[i] % 50000 === 0) log('Running: ' + ids[i] + getStudentNumberChecksum(String(ids[i])))
+    let studentNumber = ids[i] + getStudentNumberChecksum(String(ids[i]))
     await updateStudentInformation(studentNumber)
   }
   process.exit(0)

@@ -1,9 +1,11 @@
-process.env.DB_SCHEMA = 'population_schema'
+const schema = 'population_schema'
+process.env.DB_SCHEMA = schema
 
 const test = require('ava')
 const supertest = require('supertest')
 const jwt = require('jsonwebtoken')
 
+const { sequelize } = require('../../src/models')
 const app = require('../../src/app')
 const conf = require('../../src/conf-backend')
 const api = supertest(app)
@@ -15,8 +17,13 @@ const token = jwt.sign(payload, conf.TOKEN_SECRET, {
   expiresIn: '24h'
 })
 
-test.after(async () => {
-  //Remove schema?
+test.before(async () => {
+  await sequelize.createSchema(schema)
+  await sequelize.sync()
+})
+
+test.after.always(async () => {
+  await sequelize.dropSchema(schema)
 })
 
 test('should pong when pinged', async t => {

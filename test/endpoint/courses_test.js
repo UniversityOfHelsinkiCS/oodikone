@@ -51,5 +51,4 @@ test('courses can be searched by a searchterm', async t => {
   const foundCourse = res.body.find(course => course.id === selectedCourse.id)
   t.is(selectedCourse.code, Number(foundCourse.code))
   t.is(selectedCourse.name, foundCourse.name)
-
 }) 
