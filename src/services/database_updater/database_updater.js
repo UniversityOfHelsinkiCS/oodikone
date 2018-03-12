@@ -247,9 +247,8 @@ const run = async () => {
   // }
 
   for (let i = 0; i < ids.length; i++) {
-    if (ids[i] % 50000 === 0) log('Running: ' + ids[i] + getStudentNumberChecksum(String(ids[i])))
-    let studentNumber = ids[i] + getStudentNumberChecksum(String(ids[i]))
-    await updateStudentInformation(studentNumber)
+    log('Running: ' + ids[i])
+    await updateStudentInformation(ids[i])
   }
   process.exit(0)
 }
