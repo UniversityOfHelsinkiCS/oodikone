@@ -18,6 +18,7 @@ const updateStudentInformation = async studentNumber => {
   try {
     let student = await loadAndUpdateStudent(studentNumber)
     if (student === null) {
+      logError('Cant get student ' + studentNumber + ' :(')
       return
     }
     await Promise.all([updateStudentStudyRights(student), updateStudentCredits(student)])
