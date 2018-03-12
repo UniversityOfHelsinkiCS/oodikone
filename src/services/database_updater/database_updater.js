@@ -39,8 +39,10 @@ const updateStudentStudyRights = async student => {
       return
     }
     const studentStudyRightIds = studentStudyRights.map(sr => sr.studyrightid)
+    log('sr id list in database: ' + studentStudyRightIds)
     await Promise.all(oodiStudentStudyRights.map(async studyRight => {
       if (!studentStudyRightIds.includes(studyRight.studyRightId)) {
+        log('id not included: ' + studyRight.studyRightId)
         let organisation = await OrganisationService.byCode(studyRight.organisation)
         if (organisation === null) {
           organisation = await Oi.getOrganisation(studyRight.organisation)
