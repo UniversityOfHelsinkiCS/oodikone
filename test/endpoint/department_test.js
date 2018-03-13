@@ -5,7 +5,9 @@ const test = require('ava')
 const supertest = require('supertest')
 const jwt = require('jsonwebtoken')
 
-const { sequelize } = require('../../src/models')
+const { Course, CourseInstance, CourseTeacher, Credit, Teacher, Student, sequelize } = require('../../src/models')
+const { generateCourses, generateCourseInstances, generateCredits, generateTeachers, generateStudents, generateCourseTeachers } = require('../utils')
+
 const app = require('../../src/app')
 const conf = require('../../src/conf-backend')
 const api = supertest(app)
@@ -17,9 +19,27 @@ const token = jwt.sign(payload, conf.TOKEN_SECRET, {
   expiresIn: '24h'
 })
 
+const INSTANCE_COUNT = 4
+
+let courses
+let courseInstances
+
+
 test.before(async () => {
   await sequelize.createSchema(schema)
   await sequelize.sync()
+  courses = await generateCourses(1)
+  courseInstances = await generateCourseInstances(courses, INSTANCE_COUNT)
+  const students = await generateStudents()
+  const credits = await generateCredits(courseInstances, students)
+  const teachers = await generateTeachers()
+  const courseTeachers = generateCourseTeachers(courseInstances, teachers)
+  await Course.bulkCreate(courses)
+  await CourseInstance.bulkCreate(courseInstances)
+  await Student.bulkCreate(students)
+  await Credit.bulkCreate(credits)
+  await Teacher.bulkCreate(teachers)
+  await CourseTeacher.bulkCreate(courseTeachers)
 })
 
 test.after.always(async () => {
@@ -31,4 +51,18 @@ test('should pong when pinged', async t => {
     .get('/ping')
   t.is(res.status, 200)
   t.deepEqual(res.body, { data: 'pong' })
+})
+
+
+test.skip('populations can be searched by a searchterm', async t => {
+  const res = await api
+    .get('/api/departmentsuccess')
+    .query({ date: '2005.08.01' })
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  console.log(res.body)
+  t.deepEqual(Object.keys(res.body).sort(), ['Chemistry', 'Computer Science', 'Mathematics', 'Physics'].sort())
+  t.truthy(res.body['Computer Science'] > 20)
 })

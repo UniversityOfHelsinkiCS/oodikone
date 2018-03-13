@@ -76,8 +76,7 @@ test('instances of a course can be fetched', async t => {
     .send(selectedCourse)
     .set('x-access-token', token)
     .set('eduPersonPrincipalName', uid)
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
+  t.is(res.status, 200)
 
   const instances = res.body
 
@@ -97,8 +96,7 @@ test('statistics of an instance can be fetched', async t => {
     .send(request)
     .set('x-access-token', token)
     .set('eduPersonPrincipalName', uid)
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
+  t.is(res.status, 200)
 
   const stats = res.body
 

@@ -435,7 +435,6 @@ test('populations can be searched by a searchterm', async t => {
     .set('eduPersonPrincipalName', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
-  console.log(res.body)
   t.deepEqual(Object.keys(res.body).sort(), ['Chemistry', 'Computer Science', 'Mathematics', 'Physics'].sort())
   t.truthy(res.body['Computer Science'] > 20)
 })

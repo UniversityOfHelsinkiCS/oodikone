@@ -137,11 +137,48 @@ const generateCourseTeachers = async (courseInstances, teachers, maximumAmount) 
   return courseTeachers
 }
 
+const generateOrganizations = async (amount) => {
+  const organizations = []
+
+  const number = amount || numberFromTo(5, 40)
+  for (let i = 0; i < number; i++) {
+    organizations.push({
+      code: faker.lorem.word(),
+      name: faker.company.companyName()
+    })
+  }
+  return organizations
+}
+
+const generateStudyrights = async (students, organization, date) => {
+  const studyrights = []
+  students.forEach((student) => {
+    studyrights.push({
+      studyrightid: student.studentnumber,
+      canceldate: null,
+      cancelorganisation: null,
+      enddate: new Date().toString(),
+      extentcode: numberFromTo(2, 99), 
+      givendate: daysAgo(365 * numberFromTo(1, 100)),
+      graduated: null,
+      highlevelname: faker.company.catchPhrase(),
+      prioritycode: numberFromTo(0, 30),
+      startdate: date,
+      studystartdate: null,
+      organization_code: organization.code,
+      student_studentnumber: student.studentnumber,
+    })
+  })
+  return studyrights
+}
+
 module.exports = {
   generateCourses,
   generateCourseInstances,
   generateStudents,
+  generateStudyrights,
   generateCredits,
   generateTeachers,
   generateCourseTeachers,
+  generateOrganizations,
 }
