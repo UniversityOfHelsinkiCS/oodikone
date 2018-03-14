@@ -109,3 +109,48 @@ Use the update script to restart the software
 `./update.sh`
 
 Be amazed
+
+
+## Updater
+
+Oodikone2-backend includes the update-script that fetches student data from WebOodi. The updater starts running automatically every saturday at 4am. 
+
+### Dev
+
+TODO: add here instructions for correct dev config
+
+First you need to run the node proxy, this will be clarified in the near future
+
+To run the with every student number:
+`npm run update_database_dev`
+
+If you wish to run the updater for a specific group of students, creata a text file with the name 'student_numbers' with the wanted student numbers in the root of the project. *Never ever push any student numbers to github*
+
+Run the with a student number list:
+`npm run update_student_group_dev`
+
+### Production
+
+If you want to run the script manually (not wait until saturday):
+
+NOTE: Staging and production *use the same database*. Update scripts works both with staging and production versions, the only difference is if you have done changes to the script itself.
+
+Connect to Oodikone:
+`ssh {username}@oodikone.cs.helsinki.fi`
+
+Log in as tkt_oodi
+`sudo su - tkt_oodi`
+
+To run the with every student number:
+
+`docker exec -it backend npm run update_database` (or `docker exec -it staging_backend npm run update_database`)
+
+To run the updater for a specific group of students:
+
+Navigate to correct folder
+`cd oodikone.cs.helsinki.fi` (or `cd oodikone.cs.helsinki.fi/staging`)
+
+Create a text file with the name 'student_numbers' with the wanted student numbers seperated by line break.
+
+Run:
+`./student_numbers_update.sh`

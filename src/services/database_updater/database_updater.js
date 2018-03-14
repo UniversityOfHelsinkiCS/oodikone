@@ -7,9 +7,12 @@ const CourseService = require('../courses')
 const TeacherService = require('../teachers')
 const CreditService = require('../credits')
 const Oi = require('./oodi_interface')
-const { ids } = require('./ytnrs')
+const fs = require('fs')
 const { log, logError } = require('./logger')
-
+const ids = process.env.GROUP === '1' ?
+  fs.readFileSync('student_numbers').toString('utf-8').split('\n')
+  :
+  []
 
 let minStudentNumber = 1000000
 let maxStudentNumber = 1500000
@@ -241,17 +244,23 @@ const getStudentNumberChecksum = studentNumber => {
 }
 
 const run = async () => {
-
-  // for (let i = minStudentNumber; i < maxStudentNumber; i++) {
-  //   if (i % 50000 === 0) log('Running: 0' + i + getStudentNumberChecksum(String(i)))
-  //   let studentNumber = '0' + i + getStudentNumberChecksum(String(i))
-  //   await updateStudentInformation(studentNumber)
-  // }
-
-  for (let i = 0; i < ids.length; i++) {
-    log('Running: ' + ids[i])
-    await updateStudentInformation(ids[i])
+  if (process.env.GROUP === '1') {
+    log('Running updater for specified studentnumberlist: ')
+    for (let i = 0; i < ids.length; i++) {
+      log('Running: ' + ids[i])
+      await updateStudentInformation(ids[i])
+    }
+  }
+  else {
+    log('Running updater for all studentnumbers: ')
+    for (let i = minStudentNumber; i < maxStudentNumber; i++) {
+      if (i % 50000 === 0) log('Running: 0' + i + getStudentNumberChecksum(String(i)))
+      let studentNumber = '0' + i + getStudentNumberChecksum(String(i))
+      await updateStudentInformation(studentNumber)
+    }
   }
   process.exit(0)
 }
+
+
 run()
