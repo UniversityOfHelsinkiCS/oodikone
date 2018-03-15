@@ -24,7 +24,7 @@ const byNameOrCode = (searchTerm) => {
   })
 }
 
-const instanceStatistics = (code, date) => {
+const instanceStatistics = async (code, date) => {
   return CourseInstance.findOne({
     include: [
       {
