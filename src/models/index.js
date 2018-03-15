@@ -230,6 +230,7 @@ const Unit = sequelize.define('unit',
       autoIncrement: true
     },
     name: { type: Sequelize.STRING },
+    enabled: { type: Sequelize.BOOLEAN }
   },
   {
     tableName: 'unit',
