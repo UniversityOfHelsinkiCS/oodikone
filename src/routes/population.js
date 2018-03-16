@@ -59,26 +59,7 @@ router.get('/populationstatistics', async function (req, res) {
 })
 
 router.get('/studyprogrammes', async function (req, res) {
-  // const programs = [
-  //   {
-  //     id: '500-K004',
-  //     name: 'Bachelor of Science, Mathematics'
-  //   },
-  //   {
-  //     id: '500-K005',
-  //     name: 'Bachelor of Science, Computer Science'
-  //   },
-  //   {
-  //     id: '500-M009',
-  //     name: 'Master of Science (science), Computer Science'
-  //   },
-  //   {
-  //     id: 'ENV1',
-  //     name: 'Bachelor of Science (Biological and Environmental Sciences), Environmental Sciences'
-  //   }
-  // ]
-
-  const programs = await Unit.all()
+  const programs = await Unit.findAllEnabled()
   const arr = programs.map(p => { return { id: p.id, name: p.name }})
   res.json(arr)
 })
