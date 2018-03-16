@@ -172,6 +172,19 @@ const generateStudyrights = async (students, organization, date) => {
   return studyrights
 }
 
+const generateUsers = (amount) => {
+  const number = amount || numberFromTo(10, 100)
+  const users = []
+  for (let i = 0; i < number; i++) {
+    users.push({
+      full_name: `${faker.name.lastName()}, ${faker.name.firstName(2)}`,
+      username: faker.lorem.word(),
+      is_enabled: numberFromTo(0, 1) === 1
+    })
+  }
+  return users
+}
+
 module.exports = {
   generateCourses,
   generateCourseInstances,
@@ -181,4 +194,5 @@ module.exports = {
   generateTeachers,
   generateCourseTeachers,
   generateOrganizations,
+  generateUsers,
 }
