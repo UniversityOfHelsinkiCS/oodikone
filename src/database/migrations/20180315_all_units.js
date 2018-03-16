@@ -1,6 +1,8 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    await queryInterface.bulkDelete('user_unit')
     await queryInterface.bulkDelete('unit')
+
     // eslint-disable-next-line
     const rawFromDB = await queryInterface.sequelize.query(`select distinct highlevelname from studyright where highlevelname like 'Bachelor of%' or highlevelname like 'Master of%';`,
       { type: queryInterface.sequelize.QueryTypes.SELECT })
