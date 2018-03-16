@@ -35,7 +35,7 @@ const generateCourseInstances = async (courses, amount) => {
     for (i; i < number; i++) {
       instances.push({
         id: i,
-        coursedate: daysAgo(numberFromTo(10, 365)).toString(),
+        coursedate: daysAgo(numberFromTo(10, 365)).toUTCString(),
         course_code: course.code
       })
     }
