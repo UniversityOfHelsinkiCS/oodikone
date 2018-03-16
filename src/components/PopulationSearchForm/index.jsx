@@ -15,7 +15,7 @@ import { dropdownType } from '../../constants/types';
 const YEAR_DATE_FORMAT = 'YYYY';
 
 const INITIAL_QUERY = {
-  year: '2010',
+  year: '2017',
   semester: 'FALL',
   studyRights: []
 };
