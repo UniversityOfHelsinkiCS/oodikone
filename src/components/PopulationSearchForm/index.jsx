@@ -15,8 +15,8 @@ import { dropdownType } from '../../constants/types';
 const YEAR_DATE_FORMAT = 'YYYY';
 
 const INITIAL_QUERY = {
-  year: '2010',
-  semester: 'SPRING',
+  year: '2017',
+  semester: 'FALL',
   studyRights: []
 };
 
@@ -119,7 +119,7 @@ class PopulationSearchForm extends Component {
     const { query, isValidYear } = this.state;
     const { semester, year } = query;
 
-    const semesters = ['SPRING', 'FALL'];
+    const semesters = ['FALL', 'SPRING'];
 
     return (
       <Form.Group key="year" className={style.enrollmentSelectorGroup}>
