@@ -55,38 +55,40 @@ test('enrollment dates can be fetched', async t => {
     .get('/api/enrollmentdates')
     .set('x-access-token', token)
     .set('eduPersonPrincipalName', uid)
-  
+
   t.is(res.status, 200)
   t.is(res.body.length, 722)
   t.truthy(res.body.includes('2014-09-02'))
 })
 
-test.skip('new api populations can be fetched', async t => {
+test('new api populations can be fetched', async t => {
   const students = await generateStudents()
   const organizations = await generateOrganizations()
-  const date = moment('01/01/2010', 'DD/MM/YYYY').toDate().toUTCString()
-  const studyrights = await generateStudyrights(students, organizations, date)
-  let units = generateUnits(null, studyrights)
+  const date = moment('05/05/2010', 'DD/MM/YYYY').toDate().toUTCString()
+  const studyrights = await generateStudyrights(students, organizations, 1, date, 1)
+  const units = generateUnits(null, studyrights)
 
   await Student.bulkCreate(students)
   await Organisation.bulkCreate(organizations)
   await Studyright.bulkCreate(studyrights)
   await Unit.bulkCreate(units)
-  units = await Unit.findAll()
+  
+  const unitsWithIds = await Unit.findAll()
+  const unit = unitsWithIds.find(unit => units.find(u => u.name === unit.name))
 
   const res = await api
     .get('/api/populationstatistics')
     .query({
       year: '2010',
       semester: 'SPRING',
-      studyRights: units[0].id
+      studyRights: unit.id
     })
     .set('x-access-token', token)
     .set('eduPersonPrincipalName', uid)
-  console.log(res.error)
+
   t.is(res.status, 200)
   const stats = res.body
-  t.is(stats.length, 6)
+  t.is(stats.length, students.length, `Stats length did not match students ${JSON.stringify(stats)}`)
 
 })
 
