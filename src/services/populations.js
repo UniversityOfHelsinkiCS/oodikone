@@ -118,9 +118,14 @@ const byCriteria = (conf) => {
         include: [
           {
             model: CourseInstance,
-            include: [Course]
+            include: [Course],
+            where: { // Only course instances that are from between the dates selected
+              coursedate: {
+                [Op.between]: [conf.enrollmentDates[0], conf.enrollmentDates[1]]
+              }
+            }
           }
-        ]
+        ],
       },
       tagWithConstraint,
       studyrightWithConstraint
@@ -235,7 +240,7 @@ async function semesterStatisticsFor(query) {
       enrollmentDates: [startDate, endDate],
       studyRights: studyRights
     }
-    
+
     const students = await byCriteria(conf).map(restrictToMonths(query.months))  // Months are hard-coded
     return students.map(formatStudent)
   } catch (e) {
