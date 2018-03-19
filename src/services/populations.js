@@ -9,10 +9,15 @@ const enrolmentDates = () => {
   return sequelize.query(query)
 }
 
-const enrollmentDatesBetween = (startDate, endDate) => {
-  const query = `SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s WHERE s.dateOfUniversityEnrollment BETWEEN '${startDate}' AND '${endDate}'`
-  return sequelize.query(query)
-}
+// const enrollmentDatesBetween = (startDate, endDate) => {
+//   const query = `SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s WHERE s.dateOfUniversityEnrollment BETWEEN '${startDate}' AND '${endDate}'`
+//   return sequelize.query(query)
+// }
+
+// const studyrightStartDatesBetween = (startDate, endDate) => {
+//   const query = `SELECT DISTINCT s.studystartdate as date FROM Studyright s WHERE s.studystartdate BETWEEN '${startDate}' AND '${endDate}'`
+//   return sequelize.query(query)
+// }
 
 const studyRightLike = (searchTerm) => {
   const query = `
@@ -25,21 +30,20 @@ const studyRightLike = (searchTerm) => {
 
 const byCriteria = (conf) => {
   const terms = []
+  // if (conf.enrollmentDates && conf.enrollmentDates.length > 0) {
+  // const enrollmentDateCriterias =
+  //   conf.enrollmentDates.map(enrollmentDate => (
+  //     { // for some reason Op.eq does not work...
+  //       studystartdate: {
+  //         [Op.between]: [enrollmentDate, enrollmentDate]
+  //       }
+  //     })
+  //   )
 
-  if (conf.enrollmentDates && conf.enrollmentDates.length > 0) {
-    const enrollmentDateCriterias =
-      conf.enrollmentDates.map(enrollmentDate => (
-        { // for some reason Op.eq does not work...
-          dateofuniversityenrollment: {
-            [Op.between]: [enrollmentDate, enrollmentDate]
-          }
-        })
-      )
-
-    terms.push({
-      [Op.or]: enrollmentDateCriterias
-    })
-  }
+  // terms.push({
+  //   [Op.or]: enrollmentDateCriterias
+  // })
+  // }
 
   if (conf.minBirthDate || conf.maxBirthDate) {
     const minBirthDate = conf.minBirthDate || '1900-01-01'
@@ -97,6 +101,12 @@ const byCriteria = (conf) => {
     studyrightWithConstraint.where = {
       highlevelname: {
         [Op.or]: studyrightRules
+      },
+      prioritycode: {
+        [Op.or]: [1, 30]
+      },
+      studystartdate: {
+        [Op.between]: [conf.enrollmentDates[0], conf.enrollmentDates[1]]
       }
     }
   }
@@ -203,12 +213,12 @@ async function statisticsOf(conf) {
 }
 
 const semesterStart = {
-  SPRING: '1-1',
-  FALL: '7-1'
+  SPRING: '01-01',
+  FALL: '07-01'
 }
 
 const semesterEnd = {
-  SPRING: '6-30',
+  SPRING: '06-30',
   FALL: '12-31'
 }
 
@@ -219,13 +229,13 @@ async function semesterStatisticsFor(query) {
 
   const startDate = `${query.year}-${semesterStart[query.semester]}`
   const endDate = `${query.year}-${semesterEnd[query.semester]}`
-  const [dates] = await enrollmentDatesBetween(startDate, endDate)
   try {
     const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
     const conf = {
-      enrollmentDates: dates.map(r => r.date).filter(d => d).sort(),
+      enrollmentDates: [startDate, endDate],
       studyRights: studyRights
     }
+    
     const students = await byCriteria(conf).map(restrictToMonths(query.months))  // Months are hard-coded
     return students.map(formatStudent)
   } catch (e) {
