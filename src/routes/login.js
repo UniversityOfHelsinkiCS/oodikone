@@ -23,31 +23,23 @@ const generateToken = async (uid, res) => {
 
 router.get('/login', async (req, res) => {
   try {
-    console.log('login started')
     const uidHeaderName = 'eduPersonPrincipalName'
     const uidHeader = req.headers[uidHeaderName] || req.headers[uidHeaderName.toLowerCase()]
     if (req.headers['shib-session-id'] && uidHeader) {
-      console.log('login headers ok')
       const uid = uidHeader.split('@')[0]
       const user = await User.byUsername(uid)
       const fullname = req.headers.givenname || 'Shib Valmis'
       if (!user) {
-        console.log('User being created')
-        console.log(uid, fullname)
         await User.createUser(uid, fullname)
       } else {
-        console.log('User exists')
         await User.updateUser(user, { full_name: fullname })
       }
       generateToken(uid, res)
     } else {
-      console.log('Not enough headers login')
-      res.status(401).end()
+      res.status(401).json({ message: 'Not enough headers login' }).end()
     }
   } catch (err) {
-    console.log('login catch')
-    console.log(err)
-    res.status(401).json({ message: 'problem with login' })
+    res.status(401).json({ message: 'problem with login', err })
   }
 })
 
