@@ -121,7 +121,7 @@ const byCriteria = (conf) => {
             include: [Course],
             where: { // Only course instances that are from between the dates selected
               coursedate: {
-                [Op.between]: [conf.enrollmentDates[0], conf.enrollmentDates[1]]
+                [Op.gte]: conf.enrollmentDates[0]
               }
             }
           }
