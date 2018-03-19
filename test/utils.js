@@ -143,7 +143,7 @@ const generateOrganizations = async (amount) => {
   const number = amount || numberFromTo(5, 40)
   for (let i = 0; i < number; i++) {
     organizations.push({
-      code: faker.lorem.word(),
+      code: faker.lorem.words(3),
       name: faker.company.companyName()
     })
   }
@@ -157,8 +157,8 @@ const generateStudyrights = async (students, organization, date) => {
       studyrightid: student.studentnumber,
       canceldate: null,
       cancelorganisation: null,
-      enddate: new Date().toString(),
-      extentcode: numberFromTo(2, 99), 
+      enddate: new Date().toUTCString(),
+      extentcode: numberFromTo(2, 99),
       givendate: daysAgo(365 * numberFromTo(1, 100)),
       graduated: null,
       highlevelname: faker.company.catchPhrase(),
@@ -172,6 +172,35 @@ const generateStudyrights = async (students, organization, date) => {
   return studyrights
 }
 
+const generateUsers = (amount) => {
+  const number = amount || numberFromTo(10, 100)
+  const users = []
+  for (let i = 0; i < number; i++) {
+    users.push({
+      full_name: `${faker.name.lastName()}, ${faker.name.firstName(2)}`,
+      username: faker.lorem.word(),
+      is_enabled: numberFromTo(0, 1) === 1
+    })
+  }
+  return users
+}
+
+const generateUnits = (amount, studyrights) => {
+  const units = []
+  if (!studyrights) {
+    const number = amount || numberFromTo(10, 100)
+    for (let i = 0; i < number; i++) {
+      units.push({
+        name: faker.company.catchPhrase(),
+        enabled: false
+      })
+    }
+  } else {
+    studyrights.forEach(studyright => units.push({ name: studyright.highlevelname, enabled: false }))
+  }
+  return units
+}
+
 module.exports = {
   generateCourses,
   generateCourseInstances,
@@ -181,4 +210,6 @@ module.exports = {
   generateTeachers,
   generateCourseTeachers,
   generateOrganizations,
+  generateUsers,
+  generateUnits
 }

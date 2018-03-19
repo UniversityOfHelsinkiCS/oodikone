@@ -3,19 +3,13 @@ process.env.DB_SCHEMA = schema
 
 const test = require('ava')
 const supertest = require('supertest')
+
 const jwt = require('jsonwebtoken')
 
-const { sequelize } = require('../../src/models')
+const { User, sequelize } = require('../../src/models')
+const { generateUsers } = require('../utils')
 const app = require('../../src/app')
-const conf = require('../../src/conf-backend')
 const api = supertest(app)
-
-const uid = 'tktl', fullname = ''
-const payload = { userId: uid, name: fullname }
-
-const token = jwt.sign(payload, conf.TOKEN_SECRET, {
-  expiresIn: '24h'
-})
 
 test.before(async () => {
   await sequelize.createSchema(schema)
@@ -33,4 +27,67 @@ test('should pong when pinged', async t => {
 
   t.is(res.status, 200)
   t.deepEqual(res.body, { data: 'pong' })
+})
+
+test('login does not allow without required headers', async t => {
+  const res = api
+    .get('/api/login')
+    .set('eduPersonPrincipalName', 'uid')
+
+  const res2 = api
+    .get('/api/login')
+    .set('shib-session-id', 'sessioniddiibadaaba')
+  const responses = await Promise.all([res, res2])
+
+  responses.forEach(response => t.is(response.status, 401))
+})
+
+test('login creates an user', async t => {
+  const user = generateUsers(1)[0]
+
+  const res = await api
+    .get('/api/login')
+    .set('eduPersonPrincipalName', `${user.username}@hulsinki.hic`)
+    .set('shib-session-id', 'sessioniddiibadaaba')
+    .set('givenname', user.full_name)
+
+  t.is(res.status, 401)
+  const foundUser = await User.find({ where: { username: user.username } })
+
+  t.is(foundUser.username, user.username, 'Username did not match uid')
+  t.is(foundUser.full_name, user.full_name, 'Full name did not match fullname')
+})
+
+test('login fetches an user but validates enabled field', async t => {
+  const user = generateUsers(1)[0]
+  user.is_enabled = false
+  await User.insertOrUpdate(user)
+
+  const res = await api
+    .get('/api/login')
+    .set('eduPersonPrincipalName', `${user.username}@hulsinki.hic`)
+    .set('shib-session-id', 'sessioniddiibadaaba')
+    .set('givenname', user.full_name)
+
+  t.is(res.status, 401)
+})
+
+test('login fetches an user and returns token to enabled', async t => {
+  const user = generateUsers(1)[0]
+  user.is_enabled = true
+  await User.insertOrUpdate(user)
+
+  const res = await api
+    .get('/api/login')
+    .set('eduPersonPrincipalName', `${user.username}@hulsinki.hic`)
+    .set('shib-session-id', 'sessioniddiibadaaba')
+    .set('givenname', user.full_name)
+
+  t.is(res.status, 200)
+  t.truthy(res.body.token, `Token did not exist in body: ${res.body}`)
+
+  const decodedToken = jwt.decode(res.body.token)
+
+  t.is(decodedToken.userId, user.username, 'user id did not match username')
+  t.is(decodedToken.name, user.full_name, 'name did not match full name')
 })

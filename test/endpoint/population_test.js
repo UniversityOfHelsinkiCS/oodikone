@@ -4,8 +4,11 @@ process.env.DB_SCHEMA = schema
 const test = require('ava')
 const supertest = require('supertest')
 const jwt = require('jsonwebtoken')
+const moment = require('moment')
 
-const { sequelize } = require('../../src/models')
+const { Unit, Organisation, Student, Studyright, sequelize } = require('../../src/models')
+const { generateUnits, generateOrganizations, generateStudents, generateStudyrights } = require('../utils')
+
 const app = require('../../src/app')
 const conf = require('../../src/conf-backend')
 const api = supertest(app)
@@ -32,4 +35,125 @@ test('should pong when pinged', async t => {
 
   t.is(res.status, 200)
   t.deepEqual(res.body, { data: 'pong' })
+})
+
+
+test('populations can be searched by a searchterm', async t => {
+  const res = await api
+    .get('/api/studyrightkeywords')
+    .query({ search: 'computer Science' })
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+
+  t.is(res.status, 200)
+  t.is(res.body.length, 40)
+  t.truthy(res.body.every(r => r.toUpperCase().includes('COMPUTER SCIENCE')))
+})
+
+test('enrollment dates can be fetched', async t => {
+  const res = await api
+    .get('/api/enrollmentdates')
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+  
+  t.is(res.status, 200)
+  t.is(res.body.length, 722)
+  t.truthy(res.body.includes('2014-09-02'))
+})
+
+test.skip('new api populations can be fetched', async t => {
+  const students = await generateStudents()
+  const organizations = await generateOrganizations()
+  const date = moment('01/01/2010', 'DD/MM/YYYY').toDate().toUTCString()
+  const studyrights = await generateStudyrights(students, organizations, date)
+  let units = generateUnits(null, studyrights)
+
+  await Student.bulkCreate(students)
+  await Organisation.bulkCreate(organizations)
+  await Studyright.bulkCreate(studyrights)
+  await Unit.bulkCreate(units)
+  units = await Unit.findAll()
+
+  const res = await api
+    .get('/api/populationstatistics')
+    .query({
+      year: '2010',
+      semester: 'SPRING',
+      studyRights: units[0].id
+    })
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+  console.log(res.error)
+  t.is(res.status, 200)
+  const stats = res.body
+  t.is(stats.length, 6)
+
+})
+
+test.skip('multiple population studyrights can be fetched', async t => {
+  const res = await api
+    .get('/api/populationstatistics')
+    .query({
+      year: '2010',
+      semester: 'SPRING',
+      studyRights: ['2', '1']
+    })
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const stats = res.body
+  t.is(stats.length, 19)
+
+})
+
+test.skip('population statics with wrong semester results in bad request', async t => {
+  const res = await api
+    .get('/api/populationstatistics')
+    .query({
+      year: '2010',
+      semester: 'NO SEASON',
+      studyRights: '500-K005'
+    })
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+  const stats = res.body
+  t.is(stats.error, 'Semester should be either SPRING OR FALL')
+
+})
+
+test.skip('population statics with wrong semester results in bad request', async t => {
+  const res = await api
+    .get('/api/populationstatistics')
+    .query({
+      year: '2010',
+      semester: 'SPRING',
+      studyRights: '[Huolissaanolon maisteriohjelma, 500-K005]'
+    })
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+  const stats = res.body
+  t.is(stats.error, 'No such study rights: [Huolissaanolon maisteriohjelma, 500-K005]')
+
+})
+
+test.skip('population statics without a proper queryresults in bad request', async t => {
+  const res = await api
+    .get('/api/populationstatistics')
+    .query({ myName: 'Jeff' })
+    .set('x-access-token', token)
+    .set('eduPersonPrincipalName', uid)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+  const stats = res.body
+  t.is(stats.error, 'The query should have a year, semester and study rights defined')
+
 })
