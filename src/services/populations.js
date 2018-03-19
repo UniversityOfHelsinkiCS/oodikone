@@ -129,20 +129,20 @@ const notAmongExcludes = (conf) => (student) => {
   }
 
   if (conf.excludeStudentsWithZeroCredits &&
-    student.creditcount === 0)  // if (conf.enrollmentDates && conf.enrollmentDates.length > 0) {
-      // const enrollmentDateCriterias =
-      //   conf.enrollmentDates.map(enrollmentDate => (
-      //     { // for some reason Op.eq does not work...
-      //       studystartdate: {
-      //         [Op.between]: [enrollmentDate, enrollmentDate]
-      //       }
-      //     })
-      //   )
-    
-      // terms.push({
-      //   [Op.or]: enrollmentDateCriterias
-      // })
-      // } {
+    student.creditcount === 0) {  // if (conf.enrollmentDates && conf.enrollmentDates.length > 0) {
+    // const enrollmentDateCriterias =
+    //   conf.enrollmentDates.map(enrollmentDate => (
+    //     { // for some reason Op.eq does not work...
+    //       studystartdate: {
+    //         [Op.between]: [enrollmentDate, enrollmentDate]
+    //       }
+    //     })
+    //   )
+
+    // terms.push({
+    //   [Op.or]: enrollmentDateCriterias
+    // })
+    // } {
     return false
   }
 
@@ -229,7 +229,7 @@ async function semesterStatisticsFor(query) {
       enrollmentDates: [startDate, endDate],
       studyRights: studyRights
     }
-    
+
     const students = await byCriteria(conf).map(restrictToMonths(query.months))  // Months are hard-coded
     return students.map(formatStudent)
   } catch (e) {
