@@ -30,12 +30,13 @@ const callApi = (url, method = 'get', data) => {
   }
 };
 
-export const callController = (route, prefix, data, method = 'get') => {
+export const callController = (route, prefix, data, method = 'get', query) => {
   const requestSettings = {
     route,
     method,
     data,
-    prefix
+    prefix,
+    query
   };
   return { type: `${prefix}ATTEMPT`, requestSettings };
 };
@@ -45,13 +46,13 @@ export const handleRequest = store => next => async (action) => {
   const { requestSettings } = action;
   if (requestSettings) {
     const {
-      route, method, data, prefix
+      route, method, data, prefix, query
     } = requestSettings;
     try {
       const res = await callApi(route, method, data);
-      store.dispatch({ type: `${prefix}SUCCESS`, response: res.data });
+      store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query });
     } catch (err) {
-      store.dispatch({ type: `${prefix}FAILURE`, response: err });
+      store.dispatch({ type: `${prefix}FAILURE`, response: err, query });
     }
   }
 };
