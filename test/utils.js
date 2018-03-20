@@ -57,7 +57,7 @@ const generateStudents = async (amount) => {
     const lastname = faker.name.lastName()
     const firstnames = faker.name.firstName(2)
     students.push({
-      studentnumber: numberFromTo(100000000, 999999999),
+      studentnumber: `0${numberFromTo(10000000, 15000000)}`,
       lastname,
       firstnames,
       abbreviatedname: `${lastname} ${firstnames}`,
