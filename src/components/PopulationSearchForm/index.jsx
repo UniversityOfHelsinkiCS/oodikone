@@ -6,6 +6,7 @@ import { getTranslate } from 'react-localize-redux';
 import uuidv4 from 'uuid/v4';
 import Datetime from 'react-datetime';
 import { isEqual } from 'lodash';
+import { getPopulationStatistics } from '../../redux/population';
 import { getPopulationStatisticsAction, clearPopulationsAction, getStudyProgrammesAction } from '../../actions';
 import { isInDateFormat, momentFromFormat, reformatDate } from '../../common';
 
@@ -25,6 +26,7 @@ class PopulationSearchForm extends Component {
   static propTypes = {
     translate: func.isRequired,
     dispatchGetPopulationStatistics: func.isRequired,
+    getPopulationStatistics: func.isRequired,
     dispatchClearPopulations: func.isRequired,
     dispatchGetStudyProgrammes: func.isRequired,
     queries: arrayOf(object).isRequired,
@@ -67,10 +69,11 @@ class PopulationSearchForm extends Component {
         () => this.setState({ isLoading: false }),
         () => this.setState({ isLoading: false })
       );
+    this.props.getPopulationStatistics(query);
   };
 
   isValidYear = year => (year.isSameOrBefore(Datetime.moment(), 'year')
-  && year.isAfter(Datetime.moment('1900', YEAR_DATE_FORMAT), 'year'));
+    && year.isAfter(Datetime.moment('1900', YEAR_DATE_FORMAT), 'year'));
 
   handleYearSelection = (year) => {
     const { query } = this.state;
@@ -236,6 +239,8 @@ const mapStateToProps = ({ populationReducer, studyProgrammesReducer, locale }) 
 });
 
 const mapDispatchToProps = dispatch => ({
+  getPopulationStatistics: request =>
+    dispatch(getPopulationStatistics(request)),
   dispatchGetPopulationStatistics: request =>
     dispatch(getPopulationStatisticsAction(request)),
   dispatchClearPopulations: () =>
