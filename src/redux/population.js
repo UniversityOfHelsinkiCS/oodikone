@@ -12,25 +12,23 @@ export const getPopulationStatistics = ({ year, semester, studyRights }) => {
 const reducer = (state = [], action) => {
   switch (action.type) {
     case 'GET_POPULATION_STATISTICS_ATTEMPT':
-      return {
-        pending: true,
-        error: state.error,
-        data: state.data
-      };
+      return [...state, {
+        pending: true
+      }];
     case 'GET_POPULATION_STATISTICS_FAILURE':
-      return {
+      return [...state.filter(apiCall => !apiCall.pending), {
         pending: false,
         error: true,
-        data: action.response
-      };
+        data: action.response,
+        query: action.query
+      }];
     case 'GET_POPULATION_STATISTICS_SUCCESS':
-      console.log('HELLOOOO');
-      return {
+      return [...state.filter(apiCall => !apiCall.pending), {
         pending: false,
         error: false,
         data: action.response,
         query: action.query
-      };
+      }];
     default:
       return state;
   }
