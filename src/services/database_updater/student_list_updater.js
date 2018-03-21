@@ -1,25 +1,7 @@
 const oodi = require('./oodi_interface')
-const util = require('./util')
+const util = require('../../util')
 const { StudentList } = require('../../models')
-
-const winston = require('winston')
-require('winston-papertrail').Papertrail
-
-const winstonPapertrail = new winston.transports.Papertrail({
-  host: process.env.PAPERTRAIL_HOST,
-  port: process.env.PAPERTRAIL_PORT
-})
-
-winstonPapertrail.on('error', function (err) {
-  console.log(err)
-})
-
-const logger = new winston.Logger({
-  transports: [
-    winstonPapertrail,
-    new winston.transports.Console()
-  ]
-})
+const logger = require('../../util/logger')
 
 /*
   run in staging with: 
@@ -76,16 +58,16 @@ async function run () {
   } else if (!arraysEqual(cached.student_numbers, validStudents)) {
     logger.info('ERROR in student lists. There were ' + cached.student_numbers.length + ' students, was '+ cached.description)
     logger.info('found: valid ' + validStudents.length + ' out of ' + (maxStudentNumber - minStudentNumber))
+    logger.info('student list cached')
     cached.student_numbers = validStudents
     cached.description = `${minStudentNumber} to ${maxStudentNumber}`
     await cached.save()
     process.exit(0)
   }
 
-  await cached.save()
-  logger.info('student list cached')
+  await cached.save() 
   logger.info('found: valid '+ validStudents.length + ' out of '+ (maxStudentNumber - minStudentNumber))
-
+  logger.info('student list cached')
   process.exit(0)
 }
 
