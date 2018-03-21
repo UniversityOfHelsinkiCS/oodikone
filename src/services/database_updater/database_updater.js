@@ -9,6 +9,8 @@ const CreditService = require('../credits')
 const Oi = require('./oodi_interface')
 const fs = require('fs')
 const { log, logError } = require('./logger')
+const util = require('./util')
+
 const ids = process.env.GROUP === '1' ?
   fs.readFileSync('student_numbers').toString('utf-8').split('\n')
   :
@@ -229,20 +231,6 @@ const loadAndUpdateStudent = async studentNumber => {
   }
 }
 
-
-const getStudentNumberChecksum = studentNumber => {
-  let checksumNumbers = [7, 3, 1]
-  let checksum = 0
-
-  for (let i = 0; i < studentNumber.length; i++) {
-    // go from end t start
-    let currentNumber = studentNumber[studentNumber.length - (i + 1)]
-    checksum += currentNumber * (checksumNumbers[i % checksumNumbers.length])
-  }
-
-  return (10 - (checksum % 10)) % 10
-}
-
 const run = async () => {
   if (process.env.GROUP === '1') {
     log('Running updater for specified studentnumberlist: ')
@@ -254,8 +242,8 @@ const run = async () => {
   else {
     log('Running updater for all studentnumbers: ')
     for (let i = minStudentNumber; i < maxStudentNumber; i++) {
-      if (i % 50000 === 0) log('Running: 0' + i + getStudentNumberChecksum(String(i)))
-      let studentNumber = '0' + i + getStudentNumberChecksum(String(i))
+      if (i % 50000 === 0) log('Running: 0' + i + util.getStudentNumberChecksum(String(i)))
+      let studentNumber = '0' + i + util.getStudentNumberChecksum(String(i))
       await updateStudentInformation(studentNumber)
     }
   }

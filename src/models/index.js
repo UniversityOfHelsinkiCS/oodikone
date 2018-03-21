@@ -238,6 +238,29 @@ const Unit = sequelize.define('unit',
   }
 )
 
+const StudentList = sequelize.define('student_list',
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
+    key: {
+      type: Sequelize.STRING
+    },
+    description: {
+      type: Sequelize.STRING
+    },
+    student_numbers: {
+      type: Sequelize.JSONB
+    }
+  },
+  {
+    tableName: 'student_list',
+    timestamps: false,
+  }
+)
+
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
 Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
 
@@ -275,5 +298,6 @@ module.exports = {
   Unit,
   sequelize,
   migrationPromise,
-  Organisation
+  Organisation, 
+  StudentList
 }
