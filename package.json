@@ -37,7 +37,9 @@
     "pg-hstore": "^2.3.2",
     "redis": "^2.8.0",
     "sequelize": "^4.35.1",
-    "umzug": "^2.1.0"
+    "umzug": "^2.1.0",
+    "winston": "^2.4.1",
+    "winston-papertrail": "^1.0.5"
   },
   "devDependencies": {
     "ava": "^0.22.0",
