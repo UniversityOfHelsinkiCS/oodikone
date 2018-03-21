@@ -2,6 +2,17 @@ const oodi = require('./oodi_interface')
 const util = require('./util')
 const { StudentList } = require('../../models')
 
+/*
+  run in staging with: 
+
+  docker exec -it staging_backend sh
+
+  STUDENTS_FROM=1112000 STUDENTS_TO=1112100   npm run update_studentnumbers_dev
+
+  docker exec -it -e STUDENTS_FROM=1112000 -e STUDENTS_TO=1112010 staging_backend npm run update_studentnumbers_dev
+*/
+
+
 const arraysEqual = (a1, a2) => {
   return JSON.stringify(a1.sort()) === JSON.stringify(a2.sort())
 }
@@ -18,9 +29,9 @@ async function run () {
   const validStudents = []
   const minStudentNumber = process.env.STUDENTS_FROM || 1000000
   const maxStudentNumber = process.env.STUDENTS_TO || 1500000
+  const step = process.env.STEP ||200 
 
   const range = maxStudentNumber - minStudentNumber
-  const step = 200
 
   console.log('student numbers form', minStudentNumber, 'to', maxStudentNumber, 'total of', range, 'students')
   console.log('log message every', step, 'student')
