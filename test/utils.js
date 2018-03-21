@@ -57,7 +57,7 @@ const generateStudents = async (amount) => {
     const lastname = faker.name.lastName()
     const firstnames = faker.name.firstName(2)
     students.push({
-      studentnumber: numberFromTo(100000000, 999999999),
+      studentnumber: `0${numberFromTo(10000000, 15000000)}`,
       lastname,
       firstnames,
       abbreviatedname: `${lastname} ${firstnames}`,
@@ -150,8 +150,14 @@ const generateOrganizations = async (amount) => {
   return organizations
 }
 
-const generateStudyrights = async (students, organization, date) => {
+const generateStudyrights = async (students, organization, amount, date, prioritycode) => {
   const studyrights = []
+  const possibleStudyrightNames = []
+  if (amount) {
+    for (let i = 0; i < amount; i++) {
+      possibleStudyrightNames.push(faker.company.catchPhrase())
+    }
+  }
   students.forEach((student) => {
     studyrights.push({
       studyrightid: student.studentnumber,
@@ -161,10 +167,10 @@ const generateStudyrights = async (students, organization, date) => {
       extentcode: numberFromTo(2, 99),
       givendate: daysAgo(365 * numberFromTo(1, 100)),
       graduated: null,
-      highlevelname: faker.company.catchPhrase(),
-      prioritycode: numberFromTo(0, 30),
+      highlevelname: possibleStudyrightNames[numberFromTo(0, amount - 1)] || faker.company.catchPhrase(),
+      prioritycode: prioritycode || numberFromTo(1, 30),
       startdate: date,
-      studystartdate: null,
+      studystartdate: date,
       organization_code: organization.code,
       student_studentnumber: student.studentnumber,
     })
@@ -196,7 +202,11 @@ const generateUnits = (amount, studyrights) => {
       })
     }
   } else {
-    studyrights.forEach(studyright => units.push({ name: studyright.highlevelname, enabled: false }))
+    studyrights.forEach(studyright => {
+      if (!units.find(unit => unit.name === studyright.highlevelname)) {
+        units.push({ name: studyright.highlevelname, enabled: false })
+      }
+    })
   }
   return units
 }

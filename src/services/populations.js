@@ -9,16 +9,6 @@ const enrolmentDates = () => {
   return sequelize.query(query)
 }
 
-// const enrollmentDatesBetween = (startDate, endDate) => {
-//   const query = `SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s WHERE s.dateOfUniversityEnrollment BETWEEN '${startDate}' AND '${endDate}'`
-//   return sequelize.query(query)
-// }
-
-// const studyrightStartDatesBetween = (startDate, endDate) => {
-//   const query = `SELECT DISTINCT s.studystartdate as date FROM Studyright s WHERE s.studystartdate BETWEEN '${startDate}' AND '${endDate}'`
-//   return sequelize.query(query)
-// }
-
 const studyRightLike = (searchTerm) => {
   const query = `
     SELECT DISTINCT highLevelName 
@@ -30,20 +20,6 @@ const studyRightLike = (searchTerm) => {
 
 const byCriteria = (conf) => {
   const terms = []
-  // if (conf.enrollmentDates && conf.enrollmentDates.length > 0) {
-  // const enrollmentDateCriterias =
-  //   conf.enrollmentDates.map(enrollmentDate => (
-  //     { // for some reason Op.eq does not work...
-  //       studystartdate: {
-  //         [Op.between]: [enrollmentDate, enrollmentDate]
-  //       }
-  //     })
-  //   )
-
-  // terms.push({
-  //   [Op.or]: enrollmentDateCriterias
-  // })
-  // }
 
   if (conf.minBirthDate || conf.maxBirthDate) {
     const minBirthDate = conf.minBirthDate || '1900-01-01'
@@ -153,7 +129,20 @@ const notAmongExcludes = (conf) => (student) => {
   }
 
   if (conf.excludeStudentsWithZeroCredits &&
-    student.creditcount === 0) {
+    student.creditcount === 0) {  // if (conf.enrollmentDates && conf.enrollmentDates.length > 0) {
+    // const enrollmentDateCriterias =
+    //   conf.enrollmentDates.map(enrollmentDate => (
+    //     { // for some reason Op.eq does not work...
+    //       studystartdate: {
+    //         [Op.between]: [enrollmentDate, enrollmentDate]
+    //       }
+    //     })
+    //   )
+
+    // terms.push({
+    //   [Op.or]: enrollmentDateCriterias
+    // })
+    // } {
     return false
   }
 

@@ -8,17 +8,17 @@ router.get('/departmentsuccess', async function (req, res) {
 
   const redis = require('redis')
   require('bluebird').promisifyAll(redis.RedisClient.prototype)
-  const client = redis.createClient(6379, conf.redis)
+  const redisClient = redis.createClient(6379, conf.redis)
   const env = process.env.NODE_ENV ? process.env.NODE_ENV : 'development'
 
   const key = `department-statistics-${startDate}-${months}-${env}`
   const timeToLive = env === 'test' ? 60 * 60 : 60 * 60 * 24 * 7 // one hour or one week
 
   try {
-    let results = await client.getAsync(key)
+    let results = await redisClient.getAsync(key)
     if (results === null) {
       results = await Department.averagesInMonths(startDate, months)
-      await client.setAsync(key, JSON.stringify(results), 'EX', timeToLive)
+      await redisClient.setAsync(key, JSON.stringify(results), 'EX', timeToLive)
     } else {
       results = JSON.parse(results)
     }

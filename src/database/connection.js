@@ -27,6 +27,7 @@ const runMigrations = async () => {
       }
     })
     const migrations = await migrator.up()
+
     console.log('MIGRATION COMPLEETED', migrations)
   } catch (e) {
     console.log('WE DIDN\'T DO IT BOSS', e)
