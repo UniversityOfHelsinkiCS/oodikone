@@ -7,7 +7,7 @@
     "start": "node index.js",
     "docker_local": "NODE_ENV=docker_local nodemon index.js",
     "dev": "NODE_ENV=dev nodemon index.js",
-    "test": "NODE_ENV=test ava",
+    "test": "NODE_ENV=test nyc ava",
     "supertest": "NODE_ENV=test ava test/supertests/*.js",
     "update_database_dev": "NODE_ENV=dev node src/services/database_updater/database_updater.js",
     "update_database": "node src/services/database_updater/database_updater.js",
@@ -46,7 +46,7 @@
     "eslint": "^4.9.0",
     "faker": "^4.1.0",
     "nodemon": "^1.17.1",
-    "nyc": "^11.2.1",
+    "nyc": "^11.6.0",
     "supertest": "^3.0.0"
   },
   "ava": {
