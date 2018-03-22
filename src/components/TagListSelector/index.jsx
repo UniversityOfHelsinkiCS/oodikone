@@ -61,7 +61,7 @@ class TagListSelector extends Component {
 
   fetchTags = (searchStr) => {
     this.setState({ isLoading: true, searchStr });
-    this.props.findTags(searchStr)
+    this.props.findTags(searchStr);
     this.props.dispatchFindTagsAction(searchStr)
       .then(
         json => this.setState({ existingTags: json.value, isLoading: false }),
