@@ -4,6 +4,7 @@ import { Icon, Search, Label, Confirm } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 
 import { findTagsAction } from '../../actions';
+import { findTags } from '../../redux/tags';
 
 
 import styles from './tagListSelector.css';
@@ -15,6 +16,7 @@ class TagListSelector extends Component {
     translate: func.isRequired,
     handleAddTagFn: func.isRequired,
     handleRemoveTagFn: func.isRequired,
+    findTags: func.isRequired,
     dispatchFindTagsAction: func.isRequired
   };
 
@@ -59,6 +61,7 @@ class TagListSelector extends Component {
 
   fetchTags = (searchStr) => {
     this.setState({ isLoading: true, searchStr });
+    this.props.findTags(searchStr)
     this.props.dispatchFindTagsAction(searchStr)
       .then(
         json => this.setState({ existingTags: json.value, isLoading: false }),
@@ -142,7 +145,9 @@ const mapStateToProps = () => ({});
 
 const mapDispatchToProps = dispatch => ({
   dispatchFindTagsAction: searchStr =>
-    dispatch(findTagsAction(searchStr))
+    dispatch(findTagsAction(searchStr)),
+  findTags: searchStr =>
+    dispatch(findTags(searchStr))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TagListSelector);
