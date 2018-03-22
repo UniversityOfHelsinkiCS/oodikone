@@ -20,7 +20,7 @@ export const addTagToStudent = (studentNumber, tag) => {
   return callController(route, prefix, tag, 'post');
 };
 
-const reducer = (state = [], action) => {
+const reducer = (state = { data: [] }, action) => {
   switch (action.type) {
     case 'FIND_TAGS_ATTEMPT':
       return {

@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Search, Segment } from 'semantic-ui-react';
 
 import { findStudentsAction, getStudentAction } from '../../actions';
+import { findStudents, getStudent } from '../../redux/students';
 import SearchResultTable from '../SearchResultTable';
 import SegmentDimmer from '../SegmentDimmer';
 
@@ -23,6 +24,8 @@ class StudentSearch extends Component {
     dispatchFindStudents: func.isRequired,
     dispatchGetStudent: func.isRequired,
     translate: func.isRequired,
+    findStudents: func.isRequired,
+    getStudent: func.isRequired,
     studentNumber: string
   };
   static defaultProps = {
@@ -35,6 +38,7 @@ class StudentSearch extends Component {
    const { studentNumber, dispatchGetStudent } = this.props;
    if (studentNumber && containsOnlyNumbers(studentNumber)) {
      this.setState({ isLoading: true });
+     this.props.getStudent(studentNumber);
      dispatchGetStudent(studentNumber)
        .then(
          () => this.resetComponent(),
@@ -59,6 +63,7 @@ class StudentSearch extends Component {
     const { studentNumber } = student;
     const { dispatchGetStudent } = this.props;
     this.setState({ isLoading: true });
+    this.props.getStudent(studentNumber);
     dispatchGetStudent(studentNumber)
       .then(
         () => this.resetComponent(),
@@ -68,6 +73,7 @@ class StudentSearch extends Component {
 
   fetchStudentList = (searchStr) => {
     this.setState({ searchStr, isLoading: true });
+    this.props.findStudents(searchStr);
     this.props.dispatchFindStudents(searchStr)
       .then(
         json => this.setState({
@@ -131,6 +137,10 @@ class StudentSearch extends Component {
 const mapStateToProps = () => ({});
 
 const mapDispatchToProps = dispatch => ({
+  findStudents: searchStr =>
+    dispatch(findStudents(searchStr)),
+  getStudent: studentNumber =>
+    dispatch(getStudent(studentNumber)),
   dispatchFindStudents: searchStr =>
     dispatch(findStudentsAction(searchStr)),
   dispatchGetStudent: studentNumber =>
