@@ -7,7 +7,6 @@ router.get('/users', async function (req, res) {
 })
 
 router.post('/users/enable', async function (req, res) {
-  console.log(req.body)
   const id = req.body.id
   const user = await User.byId(id)
   if (!user) res.status(400).end()

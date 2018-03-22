@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, Unit, sequelize } = require('../models')
+const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../models')
 const { formatStudent } = require('../services/students')
 const { byId } = require('../services/units')
 const Op = Sequelize.Op
