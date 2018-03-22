@@ -7,6 +7,7 @@ import uuidv4 from 'uuid/v4';
 import Datetime from 'react-datetime';
 import { isEqual } from 'lodash';
 import { getPopulationStatistics } from '../../redux/population';
+import { getUnits } from '../../redux/units';
 import { getPopulationStatisticsAction, clearPopulationsAction, getStudyProgrammesAction } from '../../actions';
 import { isInDateFormat, momentFromFormat, reformatDate } from '../../common';
 
@@ -26,6 +27,7 @@ class PopulationSearchForm extends Component {
   static propTypes = {
     translate: func.isRequired,
     dispatchGetPopulationStatistics: func.isRequired,
+    getUnits: func.isRequired,
     getPopulationStatistics: func.isRequired,
     dispatchClearPopulations: func.isRequired,
     dispatchGetStudyProgrammes: func.isRequired,
@@ -42,6 +44,7 @@ class PopulationSearchForm extends Component {
   componentDidMount() {
     const { studyProgrammes, dispatchGetStudyProgrammes } = this.props;
     if (studyProgrammes.length === 0) {
+      this.props.getUnits();
       dispatchGetStudyProgrammes();
     }
   }
@@ -241,6 +244,8 @@ const mapStateToProps = ({ populationReducer, studyProgrammesReducer, locale }) 
 const mapDispatchToProps = dispatch => ({
   getPopulationStatistics: request =>
     dispatch(getPopulationStatistics(request)),
+  getUnits: () =>
+    dispatch(getUnits()),
   dispatchGetPopulationStatistics: request =>
     dispatch(getPopulationStatisticsAction(request)),
   dispatchClearPopulations: () =>
