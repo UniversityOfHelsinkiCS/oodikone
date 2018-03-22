@@ -4,7 +4,7 @@ export const findStudents = (searchStr) => {
   const route = `/students/?searchTerm=${searchStr}`;
   const prefix = 'FIND_STUDENTS_';
   return callController(route, prefix);
-}
+};
 
 export const getStudent = (studentNumber) => {
   const route = `/students/${studentNumber}`;
