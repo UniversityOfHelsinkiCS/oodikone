@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { func, string } from 'prop-types';
+import { func, string, arrayOf, object } from 'prop-types';
 import { connect } from 'react-redux';
 import { Search, Segment } from 'semantic-ui-react';
 
-import { findStudentsAction, getStudentAction } from '../../actions';
-import { findStudents, getStudent } from '../../redux/students';
+import { findStudents, getStudent, selectStudent } from '../../redux/students';
 import SearchResultTable from '../SearchResultTable';
 import SegmentDimmer from '../SegmentDimmer';
 
@@ -21,31 +20,26 @@ const DEFAULT_STATE = {
 
 class StudentSearch extends Component {
   static propTypes = {
-    dispatchFindStudents: func.isRequired,
-    dispatchGetStudent: func.isRequired,
     translate: func.isRequired,
     findStudents: func.isRequired,
     getStudent: func.isRequired,
-    studentNumber: string
+    selectStudent: func.isRequired,
+    studentNumber: string,
+    students: arrayOf(object).isRequired
   };
   static defaultProps = {
     studentNumber: undefined
   };
 
- state = DEFAULT_STATE;
+  state = DEFAULT_STATE;
 
- componentDidMount() {
-   const { studentNumber, dispatchGetStudent } = this.props;
-   if (studentNumber && containsOnlyNumbers(studentNumber)) {
-     this.setState({ isLoading: true });
-     this.props.getStudent(studentNumber);
-     dispatchGetStudent(studentNumber)
-       .then(
-         () => this.resetComponent(),
-         () => this.resetComponent()
-       );
-   }
- }
+  componentDidMount() {
+    const { studentNumber } = this.props;
+    if (studentNumber && containsOnlyNumbers(studentNumber)) {
+      this.setState({ isLoading: true });
+      this.props.getStudent(studentNumber).then(() => this.resetComponent());
+    }
+  }
 
   resetComponent = () => {
     this.setState(DEFAULT_STATE);
@@ -61,38 +55,32 @@ class StudentSearch extends Component {
 
   handleSearchSelect = (e, student) => {
     const { studentNumber } = student;
-    const { dispatchGetStudent } = this.props;
-    this.setState({ isLoading: true });
-    this.props.getStudent(studentNumber);
-    dispatchGetStudent(studentNumber)
-      .then(
-        () => this.resetComponent(),
-        () => this.resetComponent()
-      );
+    const studentObject = this.props.students.find(person =>
+      person.studentNumber === studentNumber);
+    const fetched = studentObject ? studentObject.fetched : false;
+    if (!fetched) {
+      this.setState({ isLoading: true });
+      this.props.getStudent(studentNumber).then(() => this.resetComponent());
+    } else {
+      this.props.selectStudent(studentNumber);
+      this.resetComponent();
+    }
   };
 
   fetchStudentList = (searchStr) => {
     this.setState({ searchStr, isLoading: true });
-    this.props.findStudents(searchStr);
-    this.props.dispatchFindStudents(searchStr)
-      .then(
-        json => this.setState({
-          students: json.value,
-          isLoading: false,
-          showResults: true
-        }),
-        () => this.setState({ isLoading: false })
-      );
+    this.props.findStudents(searchStr).then(() => {
+      this.setState({ isLoading: false, showResults: true });
+    });
   };
 
   renderSearchResults = () => {
-    const { translate } = this.props;
-    const { showResults, students } = this.state;
+    const { translate, students } = this.props;
+    const { showResults } = this.state;
 
     if (!showResults) {
       return null;
     }
-
     const headers = [
       translate('common.studentNumber'),
       translate('common.started'),
@@ -127,24 +115,24 @@ class StudentSearch extends Component {
         />
         <Segment className={sharedStyles.contentSegment}>
           <SegmentDimmer translate={translate} isLoading={isLoading} />
-          { this.renderSearchResults() }
+          {this.renderSearchResults()}
         </Segment>
       </div>
     );
   }
 }
 
-const mapStateToProps = () => ({});
+const mapStateToProps = ({ newReducers }) => ({
+  students: newReducers.students.data
+});
 
 const mapDispatchToProps = dispatch => ({
   findStudents: searchStr =>
     dispatch(findStudents(searchStr)),
   getStudent: studentNumber =>
     dispatch(getStudent(studentNumber)),
-  dispatchFindStudents: searchStr =>
-    dispatch(findStudentsAction(searchStr)),
-  dispatchGetStudent: studentNumber =>
-    dispatch(getStudentAction(studentNumber))
+  selectStudent: studentNumber =>
+    dispatch(selectStudent(studentNumber))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudentSearch);
