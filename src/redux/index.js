@@ -5,11 +5,13 @@ import users from './users';
 import population from './population';
 import tags from './tags';
 import units from './units';
+import students from './students';
 
 export default combineReducers({
   department,
   users,
   population,
   tags,
-  units
+  units,
+  students
 });
