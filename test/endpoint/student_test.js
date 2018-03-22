@@ -117,6 +117,45 @@ test('students tag can be removed', async t => {
   t.is(res.body.tags.length, 4)
 })
 
+test('duplicate tags can\'t be added', async t => {
+  let res = await api
+    .get(`/api/students/${students[3].studentnumber}`)
+    .set('x-access-token', token)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  t.is(res.body.tags.length, 5)
+
+  res = await api
+    .post(`/api/students/${students[3].studentnumber}/tags`)
+    .send({ studentnumber: students[3].studentnumber, tagname: tags[5].tagname })
+    .set('x-access-token', token)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+  t.is(res.body.taggedstudents_studentnumber, students[3].studentnumber)
+  t.is(res.body.tags_tagname, tags[5].tagname)
+  
+  res = await api
+    .get(`/api/students/${students[3].studentnumber}`)
+    .set('x-access-token', token)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  t.is(res.body.tags.length, 6)
+
+  res = await api
+    .post(`/api/students/${students[3].studentnumber}/tags`)
+    .send({ studentnumber: students[3].studentnumber, tagname: tags[5].tagname })
+    .set('x-access-token', token)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+  res = await api
+    .get(`/api/students/${students[3].studentnumber}`)
+    .set('x-access-token', token)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  t.is(res.body.tags.length, 6)
+})
+
 test('should pong when pinged', async t => {
   const res = await api
     .get('/ping')
