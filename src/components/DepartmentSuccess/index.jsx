@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { func } from 'prop-types';
+import { func, arrayOf, object } from 'prop-types';
 import moment from 'moment';
 import { getTranslate, getActiveLanguage } from 'react-localize-redux';
 import { Dimmer, Segment, Header } from 'semantic-ui-react';
 
-import { getDepartmentSuccessAction } from '../../actions';
 import { getDepartmentSuccess } from '../../redux/department';
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants';
 import MulticolorBarChart from '../MulticolorBarChart';
@@ -40,13 +39,12 @@ const isInArrayLimits = (amount, index, arrayLenght) =>
 
 class DepartmentSuccess extends Component {
   static propTypes = {
-    dispatchGetDepartmentSuccess: func.isRequired,
+    chartData: arrayOf(object).isRequired,
     translate: func.isRequired,
     getDepartment: func.isRequired
   };
 
   state = {
-    chartData: [],
     selectorDates: [],
     selectedDate: {
       text: FIRST_DATE,
@@ -57,7 +55,6 @@ class DepartmentSuccess extends Component {
 
   componentDidMount() {
     const selectorDates = getSelectorDates(FIRST_DATE);
-    this.props.getDepartment(this.state.selectedDate.value);
     this.setState(
       { selectorDates, selectedDate: selectorDates[0] },
       () => this.getChartData()
@@ -95,21 +92,15 @@ class DepartmentSuccess extends Component {
 
   getChartData = () => {
     const { selectedDate } = this.state;
-    this.props.dispatchGetDepartmentSuccess(selectedDate.value)
-      .then(
-        (json) => {
-          const chartData = createChartData(json.value);
-          this.setState({ chartData, isLoading: false });
-        },
-        () => this.setState({ isLoading: false })
-      );
+    this.props.getDepartment(selectedDate.value).then(() =>
+      this.setState({ isLoading: false }));
   };
 
   render() {
     const {
-      chartData, selectedDate, selectorDates, isLoading
+      selectedDate, selectorDates, isLoading
     } = this.state;
-    const { translate } = this.props;
+    const { translate, chartData } = this.props;
 
     const chartTitle = `${translate('departmentSuccess.chartTitle')} ${selectedDate.text}`;
 
@@ -132,17 +123,15 @@ class DepartmentSuccess extends Component {
   }
 }
 
-const mapStateToProps = ({ locale }) => ({
+const mapStateToProps = ({ locale, newReducers }) => ({
+  chartData: createChartData(newReducers.department.data),
   translate: getTranslate(locale),
   currentLanguage: getActiveLanguage(locale).value
 });
 
 const mapDispatchToProps = dispatch => ({
-  dispatchGetDepartmentSuccess: date =>
-    dispatch(getDepartmentSuccessAction(date)),
-  getDepartment(date) {
-    dispatch(getDepartmentSuccess(date));
-  }
+  getDepartment: date =>
+    dispatch(getDepartmentSuccess(date))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DepartmentSuccess);
