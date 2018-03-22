@@ -8,6 +8,7 @@ import DepartmentSuccess from '../DepartmentSuccess';
 import StudentStatistics from '../StudentStatistics';
 import Courses from '../Courses';
 import Teachers from '../Teachers';
+import EnableUsers from '../EnableUsers';
 import ErrorContainer from '../ErrorContainer';
 import { routes, BASE_PATH } from '../../constants';
 
@@ -25,6 +26,7 @@ const Main = () => (
           <Route exact path={routes.students.route} component={StudentStatistics} />
           <Route exact path={routes.courses.route} component={Courses} />
           <Route exact path={routes.teachers.route} component={Teachers} />
+          <Route exact path="/users" component={EnableUsers} />
         </Switch>
       </main>
     </Router>
