@@ -65,15 +65,16 @@ class StudentDetails extends Component {
     return (
       <Segment className={sharedStyles.contentSegment} >
         <StudentInfoCard student={student} translate={translate} />
-        { this.renderCreditsGraph() }
-        { this.renderCourseParticipation() }
+        {this.renderCreditsGraph()}
+        {this.renderCourseParticipation()}
       </Segment>
     );
   }
 }
 
-const mapStateToProps = ({ studentReducer }) => ({
-  student: studentReducer.selectedStudent
+const mapStateToProps = ({ newReducers }) => ({
+  student: newReducers.students.data.find(student =>
+    student.studentNumber === newReducers.students.selected)
 });
 
 const mapDispatchToProps = dispatch => ({
