@@ -18,6 +18,7 @@
       "jsx-a11y/no-static-element-interactions": 0,
       "jsx-a11y/click-events-have-key-events": 0,
       "jsx-a11y/label-has-for": 0,
+      "object-curly-newline": "off",
       "prefer-object-spread/prefer-object-spread": 2,
       "prefer-arrow-callback": 2,
       "babel/no-invalid-this": 2,
