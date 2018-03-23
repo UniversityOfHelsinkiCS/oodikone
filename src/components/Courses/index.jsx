@@ -193,7 +193,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(findInstancesAction(queryStr)),
 
   dispatchGetInstanceStatistics: (date, code, months) =>
-    dispatch(getInstanceStatisticsAction(date, code, months)),
+    dispatch(getInstanceStatisticsAction(date, code, months))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Courses);
