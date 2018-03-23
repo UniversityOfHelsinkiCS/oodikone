@@ -8,6 +8,8 @@ import tags from './tags';
 import units from './units';
 import students from './students';
 import errors from './errors';
+import courses from './courses';
+import courseInstances from './courseInstances';
 
 export default combineReducers({
   locale,
@@ -17,5 +19,7 @@ export default combineReducers({
   tags,
   units,
   students,
-  errors
+  errors,
+  courses,
+  courseInstances
 });

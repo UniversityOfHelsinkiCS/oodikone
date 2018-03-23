@@ -2,24 +2,15 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getActiveLanguage, getTranslate } from 'react-localize-redux';
 import PropTypes from 'prop-types';
-import {
-  Search,
-  Dropdown,
-  Header,
-  List,
-  Button
-} from 'semantic-ui-react';
+import { Search, Dropdown, Header, List, Button } from 'semantic-ui-react';
 import CourseStatistics from '../CourseStatistics';
 
-import {
-  findCoursesAction,
-  findInstancesAction,
-  getInstanceStatisticsAction
-} from '../../actions';
+import { findCourses } from '../../redux/courses';
+import { findCourseInstances, getCourseInstanceStatistics } from '../../redux/courseInstances';
 
 import styles from './courses.css';
 
-const { func, string } = PropTypes;
+const { func, string, arrayOf, object } = PropTypes;
 
 const CourseListRenderer = ({ name, code }) => <span>{`${name} ( ${code} )`}</span>;
 
@@ -29,19 +20,19 @@ CourseListRenderer.propTypes = {
 };
 
 class Courses extends Component {
-  state = { selectedCourse: { name: 'No course', code: 'No code' }, selectedInstances: [] };
-
-  componentDidMount() {
-    this.resetComponent();
-  }
+  state = {
+    isLoading: false,
+    searchStr: '',
+    selectedCourse: { name: 'No course', code: 'No code' },
+    selectedInstances: []
+  };
 
   resetComponent = () => {
     this.setState({
-      courseList: [],
       isLoading: false,
       searchStr: '',
-      selectedInstances: [],
-      selectedCourse: { name: 'No course', code: 'No code' }
+      selectedCourse: { name: 'No course', code: 'No code' },
+      selectedInstances: []
     });
   };
 
@@ -60,26 +51,18 @@ class Courses extends Component {
   fetchCoursesList = () => {
     const { searchStr } = this.state;
     this.setState({ isLoading: true });
-    this.props.dispatchFindCoursesList(searchStr)
-      .then(json => this.setState({ courseList: json.value, isLoading: false }));
+    this.props.findCourses(searchStr)
+      .then(() => this.setState({ isLoading: false }));
   };
 
   fetchCourseInstances = () => {
     const courseCode = this.state.selectedCourse.code;
-    this.props.dispatchFindCourseInstances(courseCode)
-      .then(json => this.setState({ courseInstances: json.value }));
+    this.props.findCourseInstances(courseCode);
   };
 
   fetchInstanceStatistics = (courseInstance) => {
-    const { selectedInstances, selectedCourse } = this.state;
-    courseInstance.course = selectedCourse;
-    this.props.dispatchGetInstanceStatistics(courseInstance.date, courseInstance.code, 12)
-      .then((json) => {
-        courseInstance.stats = json.value;
-        this.setState({
-          selectedInstances: [...selectedInstances, courseInstance]
-        });
-      });
+    const query = { ...courseInstance, months: 12, course: this.state.selectedCourse };
+    this.props.getCourseInstanceStatistics(query);
   };
 
   removeInstance = (courseInstance) => {
@@ -88,14 +71,8 @@ class Courses extends Component {
   };
 
   render() {
-    const {
-      isLoading,
-      courseList,
-      searchStr,
-      courseInstances,
-      selectedCourse,
-      selectedInstances
-    } = this.state;
+    const { isLoading, searchStr, selectedCourse } = this.state;
+    const { courseList, courseInstances, selectedInstances } = this.props;
     const instanceList = [];
     if (courseInstances !== undefined) {
       courseInstances.forEach(i => instanceList.push({
@@ -153,7 +130,7 @@ class Courses extends Component {
         {selectedInstances.map(i => (<CourseStatistics
           courseName={i.course.name}
           instanceDate={i.date}
-          stats={i.stats}
+          stats={i.statistics}
         />))}
 
       </div>
@@ -162,26 +139,33 @@ class Courses extends Component {
 }
 
 Courses.propTypes = {
-  dispatchFindCoursesList: func.isRequired,
-  dispatchFindCourseInstances: func.isRequired,
-  dispatchGetInstanceStatistics: func.isRequired
+  findCourses: func.isRequired,
+  findCourseInstances: func.isRequired,
+  getCourseInstanceStatistics: func.isRequired,
+  courseList: arrayOf(object).isRequired,
+  selectedInstances: arrayOf(object).isRequired,
+  courseInstances: arrayOf(object).isRequired
   // translate: func.isRequired
 };
 
-const mapStateToProps = ({ locale }) => ({
+const mapStateToProps = ({ locale, courses, courseInstances }) => ({
+  courseList: courses.data,
+  courseInstances: courseInstances.data,
+  selectedInstances: courseInstances.data.filter(instance =>
+    courseInstances.selected.includes(instance.id)),
   translate: getTranslate(locale),
   currentLanguage: getActiveLanguage(locale).value
 });
 
 const mapDispatchToProps = dispatch => ({
-  dispatchFindCoursesList: queryStr =>
-    dispatch(findCoursesAction(queryStr)),
+  findCourses: query =>
+    dispatch(findCourses(query)),
 
-  dispatchFindCourseInstances: queryStr =>
-    dispatch(findInstancesAction(queryStr)),
+  findCourseInstances: code =>
+    dispatch(findCourseInstances(code)),
 
-  dispatchGetInstanceStatistics: (date, code, months) =>
-    dispatch(getInstanceStatisticsAction(date, code, months))
+  getCourseInstanceStatistics: query =>
+    dispatch(getCourseInstanceStatistics(query))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Courses);
