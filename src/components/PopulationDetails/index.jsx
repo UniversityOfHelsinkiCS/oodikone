@@ -16,7 +16,6 @@ class PopulationDetails extends Component {
 
   isSamplesRenderable = () => {
     const { samples } = this.props;
-    console.log(samples);
     return samples && samples.length > 0;
   };
 
