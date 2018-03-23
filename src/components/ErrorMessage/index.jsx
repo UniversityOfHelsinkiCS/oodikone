@@ -3,26 +3,26 @@ import { connect } from 'react-redux';
 import { func, number, string } from 'prop-types';
 import { Message } from 'semantic-ui-react';
 
-import { removeError } from '../../actions';
+import { removeError } from '../../redux/errors';
 
 class ErrorMessage extends Component {
- static propTypes = {
-   code: number.isRequired,
-   message: string,
-   url: string,
-   uuid: string.isRequired,
-   translate: func.isRequired,
-   dispatchRemoveError: func.isRequired
- };
+  static propTypes = {
+    code: number.isRequired,
+    message: string,
+    url: string,
+    uuid: string.isRequired,
+    translate: func.isRequired,
+    removeError: func.isRequired
+  };
 
- static defaultProps = {
-   url: '',
-   message: ''
- };
+  static defaultProps = {
+    url: '',
+    message: ''
+  };
 
   handleDismiss = () => {
-    const { uuid, dispatchRemoveError } = this.props;
-    dispatchRemoveError(uuid);
+    const { uuid } = this.props;
+    this.props.removeError(uuid);
   };
 
   render() {
@@ -41,7 +41,7 @@ class ErrorMessage extends Component {
 const mapStateToProps = () => ({});
 
 const mapDispatchToProps = dispatch => ({
-  dispatchRemoveError: uuid =>
+  removeError: uuid =>
     dispatch(removeError(uuid))
 });
 

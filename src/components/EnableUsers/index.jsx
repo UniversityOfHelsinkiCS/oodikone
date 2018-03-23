@@ -38,12 +38,12 @@ class EnableUsers extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  translate: getTranslate(state.locale),
-  currentLanguage: getActiveLanguage(state.locale).value,
-  users: state.newReducers.users.data,
-  pending: state.newReducers.users.pending,
-  error: state.newReducers.users.error
+const mapStateToProps = ({ locale, users }) => ({
+  translate: getTranslate(locale),
+  currentLanguage: getActiveLanguage(locale).value,
+  users: users.data,
+  pending: users.pending,
+  error: users.error
 });
 
 const mapDispatchToProps = dispatch => ({

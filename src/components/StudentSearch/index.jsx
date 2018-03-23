@@ -122,8 +122,8 @@ class StudentSearch extends Component {
   }
 }
 
-const mapStateToProps = ({ newReducers }) => ({
-  students: newReducers.students.data
+const mapStateToProps = ({ students }) => ({
+  students: students.data
 });
 
 const mapDispatchToProps = dispatch => ({

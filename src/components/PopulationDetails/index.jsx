@@ -69,8 +69,8 @@ class PopulationDetails extends Component {
   }
 }
 
-const mapStateToProps = ({ newReducers, locale }) => ({
-  samples: flattenAndCleanPopulations(newReducers.populations),
+const mapStateToProps = ({ populations, locale }) => ({
+  samples: flattenAndCleanPopulations(populations),
   translate: getTranslate(locale)
 });
 
