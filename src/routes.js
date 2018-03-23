@@ -12,7 +12,7 @@ const auth = require('./middleware/auth')
 module.exports = (app, url) => {
   app.use(url, login)
   app.use(auth.checkAuth)
-  app.use(url, users)
+  app.use(url, auth.checkAdminAuth, users)
   app.use(url, courses)
   app.use(url, department)
   app.use(url, students)
