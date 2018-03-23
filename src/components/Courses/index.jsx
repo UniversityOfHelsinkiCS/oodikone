@@ -9,7 +9,7 @@ import {
   List,
   Button
 } from 'semantic-ui-react';
-import CourseStatistics from './statistics';
+import CourseStatistics from '../CourseStatistics';
 
 import {
   findCoursesAction,
@@ -29,25 +29,13 @@ CourseListRenderer.propTypes = {
 };
 
 class Courses extends Component {
-  constructor(props) {
-    super(props);
-
-    this.resetComponent = this.resetComponent.bind(this);
-    this.handleResultSelect = this.handleResultSelect.bind(this);
-    this.handleSearchChange = this.handleSearchChange.bind(this);
-    this.fetchCoursesList = this.fetchCoursesList.bind(this);
-    this.fetchCourseInstances = this.fetchCourseInstances.bind(this);
-    this.fetchInstanceStatistics = this.fetchInstanceStatistics.bind(this);
-    this.removeInstance = this.removeInstance.bind(this);
-
-    this.state = { selectedCourse: { name: 'No course', code: 'No code' }, selectedInstances: [] };
-  }
+  state = { selectedCourse: { name: 'No course', code: 'No code' }, selectedInstances: [] };
 
   componentDidMount() {
     this.resetComponent();
   }
 
-  resetComponent() {
+  resetComponent = () => {
     this.setState({
       courseList: [],
       isLoading: false,
@@ -55,34 +43,34 @@ class Courses extends Component {
       selectedInstances: [],
       selectedCourse: { name: 'No course', code: 'No code' }
     });
-  }
+  };
 
-  handleResultSelect(e, { result }) {
+  handleResultSelect = (e, { result }) => {
     this.setState({ selectedCourse: result }, () => {
       this.fetchCourseInstances();
     });
-  }
+  };
 
 
-  handleSearchChange(e, { value }) {
+  handleSearchChange = (e, { value }) => {
     this.setState({ searchStr: value });
     this.fetchCoursesList();
-  }
+  };
 
-  fetchCoursesList() {
+  fetchCoursesList = () => {
     const { searchStr } = this.state;
     this.setState({ isLoading: true });
     this.props.dispatchFindCoursesList(searchStr)
       .then(json => this.setState({ courseList: json.value, isLoading: false }));
-  }
+  };
 
-  fetchCourseInstances() {
+  fetchCourseInstances = () => {
     const courseCode = this.state.selectedCourse.code;
     this.props.dispatchFindCourseInstances(courseCode)
       .then(json => this.setState({ courseInstances: json.value }));
-  }
+  };
 
-  fetchInstanceStatistics(courseInstance) {
+  fetchInstanceStatistics = (courseInstance) => {
     const { selectedInstances, selectedCourse } = this.state;
     courseInstance.course = selectedCourse;
     this.props.dispatchGetInstanceStatistics(courseInstance.date, courseInstance.code, 12)
@@ -92,12 +80,12 @@ class Courses extends Component {
           selectedInstances: [...selectedInstances, courseInstance]
         });
       });
-  }
+  };
 
-  removeInstance(courseInstance) {
+  removeInstance = (courseInstance) => {
     const { selectedInstances } = this.state;
     this.setState({ selectedInstances: selectedInstances.filter(i => i !== courseInstance) });
-  }
+  };
 
   render() {
     const {
@@ -133,7 +121,7 @@ class Courses extends Component {
     // const t = this.props.translate;
 
     return (
-      <div>
+      <div className={styles.container}>
         <Search
           className={styles.courseSearch}
           input={{ fluid: true }}
