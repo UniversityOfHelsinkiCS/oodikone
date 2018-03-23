@@ -50,25 +50,24 @@ class DepartmentSuccess extends Component {
       text: FIRST_DATE,
       value: reformatDate(FIRST_DATE, API_DATE_FORMAT)
     },
-    isLoading: true
+    isLoading: false
   };
 
   componentDidMount() {
     const selectorDates = getSelectorDates(FIRST_DATE);
-    this.setState(
-      { selectorDates, selectedDate: selectorDates[0] },
-      () => this.getChartData()
-    );
+    const selectedDate = selectorDates[0];
+    this.timeout = undefined;
+    this.setLoading({ selectorDates, selectedDate });
+    this.getChartData(selectedDate);
   }
 
   onDateInputChange = (e, { value }) => {
-    this.setState({
-      selectedDate: {
-        text: reformatDate(value, DISPLAY_DATE_FORMAT),
-        value
-      },
-      isLoading: true
-    }, () => this.getChartData());
+    const selectedDate = {
+      text: reformatDate(value, DISPLAY_DATE_FORMAT),
+      value
+    };
+    this.setLoading({ selectedDate });
+    this.getChartData(selectedDate);
   };
 
   onControlLeft = () => {
@@ -80,20 +79,27 @@ class DepartmentSuccess extends Component {
   };
 
   onControlButtonSwitch = (amount) => {
-    const { selectorDates, selectedDate } = this.state;
-    const index = selectorDates.findIndex(date => date.value === selectedDate.value);
+    const { selectorDates, selectedDate: oldDate } = this.state;
+    const index = selectorDates.findIndex(date => date.value === oldDate.value);
     if (isInArrayLimits(amount, index, selectorDates.length)) {
-      this.setState(
-        { selectedDate: selectorDates[index + amount], isLoading: true },
-        () => this.getChartData()
-      );
+      const selectedDate = selectorDates[index + amount];
+      this.setLoading({ selectedDate });
+      this.getChartData(selectedDate);
     }
   };
 
-  getChartData = () => {
-    const { selectedDate } = this.state;
-    this.props.getDepartment(selectedDate.value).then(() =>
-      this.setState({ isLoading: false }));
+  setLoading = (state) => {
+    this.setState(state);
+    this.timeout = setTimeout(() => {
+      this.setState({ isLoading: true });
+    }, 250);
+  };
+
+  getChartData = (selectedDate) => {
+    this.props.getDepartment(selectedDate.value).then(() => {
+      clearTimeout(this.timeout);
+      this.setState({ isLoading: false });
+    });
   };
 
   render() {
