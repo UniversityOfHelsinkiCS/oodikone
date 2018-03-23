@@ -30,7 +30,9 @@ export const removeInvalidCreditsFromStudent = student => ({
 export const removeInvalidCreditsFromStudents = students =>
   students.map(student => removeInvalidCreditsFromStudent(student));
 
-export const flattenAndCleanSamples = samples =>
-  Object.keys(samples).map(sample => removeInvalidCreditsFromStudents(samples[sample]));
+export const flattenAndCleanPopulations = populations =>
+  populations.filter(population => !population.pending)
+    .map(population => population.data)
+    .map(student => removeInvalidCreditsFromStudents(student));
 
 export const getStudentTotalCredits = student => student.courses.reduce((a, b) => a + b.credits, 0);

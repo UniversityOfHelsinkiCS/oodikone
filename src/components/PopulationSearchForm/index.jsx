@@ -6,9 +6,8 @@ import { getTranslate } from 'react-localize-redux';
 import uuidv4 from 'uuid/v4';
 import Datetime from 'react-datetime';
 import { isEqual } from 'lodash';
-import { getPopulationStatistics } from '../../redux/population';
+import { getPopulationStatistics, clearPopulations } from '../../redux/populations';
 import { getUnits } from '../../redux/units';
-import { getPopulationStatisticsAction, clearPopulationsAction, getStudyProgrammesAction } from '../../actions';
 import { isInDateFormat, momentFromFormat, reformatDate } from '../../common';
 
 import style from './populationSearchForm.css';
@@ -26,11 +25,9 @@ const INITIAL_QUERY = {
 class PopulationSearchForm extends Component {
   static propTypes = {
     translate: func.isRequired,
-    dispatchGetPopulationStatistics: func.isRequired,
     getUnits: func.isRequired,
     getPopulationStatistics: func.isRequired,
-    dispatchClearPopulations: func.isRequired,
-    dispatchGetStudyProgrammes: func.isRequired,
+    clearPopulations: func.isRequired,
     queries: arrayOf(object).isRequired,
     studyProgrammes: arrayOf(dropdownType).isRequired
   };
@@ -42,10 +39,9 @@ class PopulationSearchForm extends Component {
   };
 
   componentDidMount() {
-    const { studyProgrammes, dispatchGetStudyProgrammes } = this.props;
+    const { studyProgrammes } = this.props;
     if (studyProgrammes.length === 0) {
       this.props.getUnits();
-      dispatchGetStudyProgrammes();
     }
   }
 
@@ -55,24 +51,15 @@ class PopulationSearchForm extends Component {
     return queries.some(q => isEqual(q, query));
   };
 
-  clearPopulations = () => {
-    const { dispatchClearPopulations } = this.props;
-    dispatchClearPopulations();
-  };
+  clearPopulations = () => this.props.clearPopulations();
 
   fetchPopulation = () => {
     const { query } = this.state;
-    const { dispatchGetPopulationStatistics } = this.props;
-
-    query.uuid = uuidv4();
-
+    const uuid = uuidv4();
+    const request = { ...query, uuid };
     this.setState({ isLoading: true });
-    dispatchGetPopulationStatistics(query)
-      .then(
-        () => this.setState({ isLoading: false }),
-        () => this.setState({ isLoading: false })
-      );
-    this.props.getPopulationStatistics(query);
+    this.props.getPopulationStatistics(request).then(() =>
+      this.setState({ isLoading: false }));
   };
 
   isValidYear = year => (year.isSameOrBefore(Datetime.moment(), 'year')
@@ -229,16 +216,13 @@ class PopulationSearchForm extends Component {
 }
 
 /* TODO: move to reselect */
-const mapRightsToDropdown = rights => (
-  rights.map(r => ({
-    key: r.id, value: r.id, text: r.name
-  }))
-);
+const mapRightsToDropdown = rights =>
+  rights.map(r => ({ key: r.id, value: r.id, text: r.name }));
 
-const mapStateToProps = ({ populationReducer, studyProgrammesReducer, locale }) => ({
+const mapStateToProps = ({ populationReducer, newReducers, locale }) => ({
   queries: populationReducer.queries,
   translate: getTranslate(locale),
-  studyProgrammes: mapRightsToDropdown(studyProgrammesReducer.studyProgrammes)
+  studyProgrammes: mapRightsToDropdown(newReducers.units.data)
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -246,13 +230,8 @@ const mapDispatchToProps = dispatch => ({
     dispatch(getPopulationStatistics(request)),
   getUnits: () =>
     dispatch(getUnits()),
-  dispatchGetPopulationStatistics: request =>
-    dispatch(getPopulationStatisticsAction(request)),
-  dispatchClearPopulations: () =>
-    dispatch(clearPopulationsAction()),
-  dispatchGetStudyProgrammes: () => {
-    dispatch(getStudyProgrammesAction());
-  }
+  clearPopulations: () =>
+    dispatch(clearPopulations())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchForm);

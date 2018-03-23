@@ -6,7 +6,7 @@ import { getTranslate } from 'react-localize-redux';
 
 import CreditAccumulationGraph from '../CreditAccumulationGraph';
 import CourseQuarters from '../CourseQuarters';
-import { flattenAndCleanSamples } from '../../common';
+import { flattenAndCleanPopulations } from '../../common';
 
 class PopulationDetails extends Component {
   static propTypes = {
@@ -16,6 +16,7 @@ class PopulationDetails extends Component {
 
   isSamplesRenderable = () => {
     const { samples } = this.props;
+    console.log(samples);
     return samples && samples.length > 0;
   };
 
@@ -69,8 +70,8 @@ class PopulationDetails extends Component {
   }
 }
 
-const mapStateToProps = ({ populationReducer, locale }) => ({
-  samples: flattenAndCleanSamples(populationReducer.samples),
+const mapStateToProps = ({ newReducers, locale }) => ({
+  samples: flattenAndCleanPopulations(newReducers.populations),
   translate: getTranslate(locale)
 });
 
