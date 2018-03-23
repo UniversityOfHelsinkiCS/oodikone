@@ -1,14 +1,14 @@
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-const htmlTemplate = require('html-webpack-template');
-const path = require('path');
+const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const htmlTemplate = require('html-webpack-template')
+const path = require('path')
 
-const commonSettings = require('./webpack.config.common');
+const commonSettings = require('./webpack.config.common')
 
-const CSS_MODULES_CLASS_PREFIX = 'no-purify';
+const CSS_MODULES_CLASS_PREFIX = 'no-purify'
 
 module.exports = {
   context: path.join(__dirname, 'src'),
@@ -90,12 +90,12 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       minChunks(module, count) {
-        const { resource, context } = module;
+        const { resource, context } = module
 
         return (context && resource) &&
           context.indexOf('node_modules') >= 0 &&
           count >= 1 &&
-          resource.match(/\.js$/);
+          resource.match(/\.js$/)
       }
     }),
 
@@ -127,4 +127,4 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     publicPath: ''
   }
-};
+}

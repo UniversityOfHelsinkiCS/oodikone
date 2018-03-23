@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import { Button } from 'semantic-ui-react';
-import { connect } from 'react-redux';
-import { func, object, bool, arrayOf } from 'prop-types';
-import { getTranslate, getActiveLanguage } from 'react-localize-redux';
+import React, { Component } from 'react'
+import { Button } from 'semantic-ui-react'
+import { connect } from 'react-redux'
+import { func, object, bool, arrayOf } from 'prop-types'
+import { getTranslate, getActiveLanguage } from 'react-localize-redux'
 
-import { getUsers, enableUser } from '../../redux/users';
+import { getUsers, enableUser } from '../../redux/users'
 
 class EnableUsers extends Component {
   static propTypes = {
@@ -12,15 +12,15 @@ class EnableUsers extends Component {
     enableUser: func.isRequired,
     users: arrayOf(object).isRequired,
     error: bool.isRequired
-  };
+  }
 
   componentDidMount() {
-    this.props.getUsers();
+    this.props.getUsers()
   }
 
   enableUser = (id) => {
-    this.props.enableUser(id);
-  };
+    this.props.enableUser(id)
+  }
 
   render() {
     return this.props.error ? <h1>Error: {this.props.error} </h1> : (
@@ -34,7 +34,7 @@ class EnableUsers extends Component {
         )) : <h2>No users could be fetched</h2>
         }
       </div>
-    );
+    )
   }
 }
 
@@ -44,15 +44,15 @@ const mapStateToProps = ({ locale, users }) => ({
   users: users.data,
   pending: users.pending,
   error: users.error
-});
+})
 
 const mapDispatchToProps = dispatch => ({
   getUsers() {
-    dispatch(getUsers());
+    dispatch(getUsers())
   },
   enableUser(id) {
-    dispatch(enableUser(id));
+    dispatch(enableUser(id))
   }
-});
+})
 
-export default connect(mapStateToProps, mapDispatchToProps)(EnableUsers);
+export default connect(mapStateToProps, mapDispatchToProps)(EnableUsers)

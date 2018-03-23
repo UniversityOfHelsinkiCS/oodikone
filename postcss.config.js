@@ -1,6 +1,6 @@
-const cssNextPlugin = require('postcss-cssnext'); // eslint-disable-line import/no-extraneous-dependencies
+const cssNextPlugin = require('postcss-cssnext') // eslint-disable-line import/no-extraneous-dependencies
 
-const variables = require('./src/styles/variables');
+const variables = require('./src/styles/variables')
 
 module.exports = {
   plugins: [
@@ -11,4 +11,4 @@ module.exports = {
       }
     })
   ]
-};
+}

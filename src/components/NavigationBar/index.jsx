@@ -1,29 +1,29 @@
-import React, { Component } from 'react';
-import { Menu, Dropdown } from 'semantic-ui-react';
-import { NavLink, Link } from 'react-router-dom';
-import { func } from 'prop-types';
-import { connect } from 'react-redux';
+import React, { Component } from 'react'
+import { Menu, Dropdown } from 'semantic-ui-react'
+import { NavLink, Link } from 'react-router-dom'
+import { func } from 'prop-types'
+import { connect } from 'react-redux'
 
-import { routes } from '../../constants';
+import { routes } from '../../constants'
 
-import styles from './navigationBar.css';
-import { logDevUserInAction, logUserOutAction } from '../../actions';
+import styles from './navigationBar.css'
+import { logDevUserInAction, logUserOutAction } from '../../actions'
 
 class NavigationBar extends Component {
   static propTypes = {
     translate: func.isRequired,
     dispatchLogout: func.isRequired,
     dispatchDevLogin: func.isRequired
-  };
+  }
 
   checkForOptionalParams = route => (
     route.endsWith('?') ? route.slice(0, route.indexOf('/:')) : route
-  );
+  )
 
   renderUserMenu = () => {
-    const { translate, dispatchLogout, dispatchDevLogin } = this.props;
+    const { translate, dispatchLogout, dispatchDevLogin } = this.props
     if (process.env.NODE_ENV === 'development') {
-      const testUsers = ['tktl', 'oprek'];
+      const testUsers = ['tktl', 'oprek']
       return (
         <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls">
           <Dropdown.Menu>
@@ -42,20 +42,20 @@ class NavigationBar extends Component {
             />
           </Dropdown.Menu>
         </Menu.Item>
-      );
+      )
     }
 
     return (
       <Menu.Item link onClick={() => dispatchLogout()} icon="log out">
         {translate('navigationBar.logout')}
       </Menu.Item>
-    );
-  };
+    )
+  }
 
   render() {
-    const t = this.props.translate;
+    const t = this.props.translate
 
-    const menuWidth = Object.keys(routes).length + 2;
+    const menuWidth = Object.keys(routes).length + 2
 
     return (
       <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
@@ -69,7 +69,7 @@ class NavigationBar extends Component {
         </Menu.Item>
         {
           Object.values(routes).map((value) => {
-            const viewableRoute = this.checkForOptionalParams(value.route);
+            const viewableRoute = this.checkForOptionalParams(value.route)
             return (
               <Menu.Item
                 exact={viewableRoute === value.route}
@@ -80,24 +80,24 @@ class NavigationBar extends Component {
               >
                 {t(`navigationBar.${value.translateId}`)}
               </Menu.Item>
-            );
+            )
           })
           }
         { this.renderUserMenu() }
-      </Menu>);
+      </Menu>)
   }
 }
 
-const mapStateToProps = () => ({});
+const mapStateToProps = () => ({})
 
 const mapDispatchToProps = dispatch => ({
   dispatchLogout: () => {
-    dispatch(logUserOutAction());
+    dispatch(logUserOutAction())
   },
   dispatchDevLogin: (user) => {
-    dispatch(logDevUserInAction(user));
+    dispatch(logDevUserInAction(user))
   }
-});
+})
 
-export default connect(mapStateToProps, mapDispatchToProps)(NavigationBar);
+export default connect(mapStateToProps, mapDispatchToProps)(NavigationBar)
 

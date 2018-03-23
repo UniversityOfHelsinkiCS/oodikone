@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { func, shape, arrayOf, object } from 'prop-types';
-import { getTranslate } from 'react-localize-redux';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { func, shape, arrayOf, object } from 'prop-types'
+import { getTranslate } from 'react-localize-redux'
 
-import PopulationQueryCard from '../PopulationQueryCard';
-import { removePopulation } from '../../redux/populations';
+import PopulationQueryCard from '../PopulationQueryCard'
+import { removePopulation } from '../../redux/populations'
 
-import styles from './populationSearchHistory.css';
+import styles from './populationSearchHistory.css'
 
 class PopulationSearchHistory extends Component {
   static propTypes = {
@@ -16,12 +16,12 @@ class PopulationSearchHistory extends Component {
       queries: arrayOf(object),
       samples: object
     }).isRequired
-  };
+  }
 
-  removePopulation = uuid => this.props.removePopulation(uuid);
+  removePopulation = uuid => this.props.removePopulation(uuid)
 
   renderQueryCards = () => {
-    const { populations, translate } = this.props;
+    const { populations, translate } = this.props
     return populations.map((population, i) => (
       <PopulationQueryCard
         key={`population-${population.query.uuid}`}
@@ -30,27 +30,27 @@ class PopulationSearchHistory extends Component {
         query={population.query}
         queryId={i}
         removeSampleFn={this.removePopulation}
-      />));
-  };
+      />))
+  }
 
   render() {
     return (
       <div className={styles.historyContainer} >
         {this.renderQueryCards()}
       </div>
-    );
+    )
   }
 }
 
 const mapStateToProps = ({ populations, locale }) => ({
   populations,
   translate: getTranslate(locale)
-});
+})
 
 const mapDispatchToProps = dispatch => ({
   removePopulation: uuid =>
     dispatch(removePopulation(uuid))
-});
+})
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory);
+export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory)

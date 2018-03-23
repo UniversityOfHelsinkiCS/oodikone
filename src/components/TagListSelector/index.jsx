@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
-import { func, arrayOf, string } from 'prop-types';
-import { Icon, Search, Label, Confirm } from 'semantic-ui-react';
-import { connect } from 'react-redux';
+import React, { Component } from 'react'
+import { func, arrayOf, string } from 'prop-types'
+import { Icon, Search, Label, Confirm } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 
-import { findTags } from '../../redux/tags';
+import { findTags } from '../../redux/tags'
 
-import styles from './tagListSelector.css';
+import styles from './tagListSelector.css'
 
 
 class TagListSelector extends Component {
@@ -15,11 +15,11 @@ class TagListSelector extends Component {
     handleAddTagFn: func.isRequired,
     handleRemoveTagFn: func.isRequired,
     findTags: func.isRequired
-  };
+  }
 
   static defaultProps = {
     tags: []
-  };
+  }
 
   state = {
     isEdit: false,
@@ -27,44 +27,44 @@ class TagListSelector extends Component {
     searchStr: '',
     existingTags: [],
     isConfirm: false
-  };
+  }
 
 
   setEditable = () => {
-    const { isEdit } = this.state;
-    this.setState({ isEdit: !isEdit, searchStr: '' });
-  };
+    const { isEdit } = this.state
+    this.setState({ isEdit: !isEdit, searchStr: '' })
+  }
 
   setConfirm = () => {
-    const { isConfirm } = this.state;
-    this.setState({ isConfirm: !isConfirm });
-  };
+    const { isConfirm } = this.state
+    this.setState({ isConfirm: !isConfirm })
+  }
 
   handleSearchChange = (e, { value }) => {
-    this.fetchTags(value);
-  };
+    this.fetchTags(value)
+  }
 
   handleAddTag = (e, { result }) => {
-    const { handleAddTagFn } = this.props;
-    handleAddTagFn(result.title);
-    this.setEditable();
-  };
+    const { handleAddTagFn } = this.props
+    handleAddTagFn(result.title)
+    this.setEditable()
+  }
 
   handleRemoveTag = (tag) => {
-    const { handleRemoveTagFn } = this.props;
-    this.setState({ isConfirm: false });
-    handleRemoveTagFn(tag);
-  };
+    const { handleRemoveTagFn } = this.props
+    this.setState({ isConfirm: false })
+    handleRemoveTagFn(tag)
+  }
 
   fetchTags = (searchStr) => {
-    this.setState({ isLoading: true, searchStr });
+    this.setState({ isLoading: true, searchStr })
     this.props.findTags(searchStr).then(() =>
-      this.setState({ isLoading: false }));
-  };
+      this.setState({ isLoading: false }))
+  }
 
   renderTags = () => {
-    const { tags, translate } = this.props;
-    const { isConfirm } = this.state;
+    const { tags, translate } = this.props
+    const { isConfirm } = this.state
 
     if (tags && tags.length > 0) {
       return tags.map(tag => (
@@ -80,20 +80,20 @@ class TagListSelector extends Component {
             confirmButton={translate('common.ok')}
           />
         </Label>
-      ));
+      ))
     }
-    return null;
-  };
+    return null
+  }
 
   renderEditComponent = () => {
-    const { tags, translate } = this.props;
+    const { tags, translate } = this.props
     const {
       isEdit, isLoading, searchStr, existingTags
-    } = this.state;
+    } = this.state
     if (isEdit) {
       const results = existingTags
         .filter(tag => !tags.includes(tag))
-        .map(tag => ({ title: tag }));
+        .map(tag => ({ title: tag }))
 
       return (
         <Search
@@ -110,7 +110,7 @@ class TagListSelector extends Component {
           noResultsMessage={translate('common.noResults')}
           value={searchStr}
           fluid
-        />);
+        />)
     }
     return (
       <div className={styles.editableContainer} onClick={this.setEditable}>
@@ -121,8 +121,8 @@ class TagListSelector extends Component {
           <Icon corner name="add" />
         </Icon.Group>
         {translate('tags.addTag')}
-      </div>);
-  };
+      </div>)
+  }
 
   render() {
     return (
@@ -130,15 +130,15 @@ class TagListSelector extends Component {
         {this.renderTags()}
         {this.renderEditComponent()}
       </div>
-    );
+    )
   }
 }
 
-const mapStateToProps = () => ({});
+const mapStateToProps = () => ({})
 
 const mapDispatchToProps = dispatch => ({
   findTags: searchStr =>
     dispatch(findTags(searchStr))
-});
+})
 
-export default connect(mapStateToProps, mapDispatchToProps)(TagListSelector);
+export default connect(mapStateToProps, mapDispatchToProps)(TagListSelector)

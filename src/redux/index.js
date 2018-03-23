@@ -1,15 +1,15 @@
-import { combineReducers } from 'redux';
-import { localeReducer as locale } from 'react-localize-redux';
+import { combineReducers } from 'redux'
+import { localeReducer as locale } from 'react-localize-redux'
 
-import department from './department';
-import users from './users';
-import populations from './populations';
-import tags from './tags';
-import units from './units';
-import students from './students';
-import errors from './errors';
-import courses from './courses';
-import courseInstances from './courseInstances';
+import department from './department'
+import users from './users'
+import populations from './populations'
+import tags from './tags'
+import units from './units'
+import students from './students'
+import errors from './errors'
+import courses from './courses'
+import courseInstances from './courseInstances'
 
 export default combineReducers({
   locale,
@@ -22,4 +22,4 @@ export default combineReducers({
   errors,
   courses,
   courseInstances
-});
+})
