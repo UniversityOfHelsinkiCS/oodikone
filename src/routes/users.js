@@ -12,7 +12,7 @@ router.post('/users/enable', async function (req, res) {
   if (!user) res.status(400).end()
   else {
     const result = await User.updateUser(user, { is_enabled: !user.is_enabled })
-    const status = result.error === undefined ? 201 : 400
+    const status = result.error === undefined ? 200 : 400
     res.status(status).json(result)
   }
 })
