@@ -1,25 +1,25 @@
-import React from 'react';
-import { jStat } from 'jStat';
-import _ from 'lodash';
-import { Message } from 'semantic-ui-react';
-import { func, arrayOf, object, string } from 'prop-types';
+import React from 'react'
+import { jStat } from 'jStat'
+import _ from 'lodash'
+import { Message } from 'semantic-ui-react'
+import { func, arrayOf, object, string } from 'prop-types'
 
-import SearchResultTable from '../SearchResultTable';
-import { getStudentTotalCredits } from '../../common';
+import SearchResultTable from '../SearchResultTable'
+import { getStudentTotalCredits } from '../../common'
 
 const getStudentSampleInSplitQuarters = (students) => {
-  const sortedStudents = _.sortBy(students, student => getStudentTotalCredits(student));
-  const quarterSize = Math.floor(sortedStudents.length / 4);
+  const sortedStudents = _.sortBy(students, student => getStudentTotalCredits(student))
+  const quarterSize = Math.floor(sortedStudents.length / 4)
   return [
     sortedStudents.slice(0, quarterSize),
     sortedStudents.slice(quarterSize, quarterSize * 2),
     sortedStudents.slice(quarterSize * 2, quarterSize * 3),
     sortedStudents.slice(quarterSize * 3, sortedStudents.length)
-  ];
-};
+  ]
+}
 
 const getValues = (students) => {
-  const creditsList = students.map(student => getStudentTotalCredits(student));
+  const creditsList = students.map(student => getStudentTotalCredits(student))
 
   return {
     n: creditsList.length,
@@ -28,24 +28,24 @@ const getValues = (students) => {
     average: jStat.mean(creditsList).toFixed(2),
     median: jStat.median(creditsList),
     standardDeviation: jStat.stdev(creditsList).toFixed(2)
-  };
-};
+  }
+}
 
 const getCreditStatsForTable = (students, studentsInQuarters) =>
-  [getValues(students), ...studentsInQuarters.map(s => getValues(s))];
+  [getValues(students), ...studentsInQuarters.map(s => getValues(s))]
 
 const CourseQuarters = (props) => {
-  const { translate, sample, title } = props;
+  const { translate, sample, title } = props
   if (sample.length === 0) {
     return (
       <Message warning>
         <Message.Header>{title}</Message.Header>
         <p>{translate('common.noResults')}</p>
       </Message>
-    );
+    )
   }
-  const quarters = getStudentSampleInSplitQuarters(sample);
-  const stats = getCreditStatsForTable(sample, quarters);
+  const quarters = getStudentSampleInSplitQuarters(sample)
+  const stats = getCreditStatsForTable(sample, quarters)
 
   const headers = [
     `${title}`,
@@ -54,7 +54,7 @@ const CourseQuarters = (props) => {
     `q2 (n=${stats[2].n})`,
     `q3 (n=${stats[3].n})`,
     `q4, top (n=${stats[3].n})`
-  ];
+  ]
 
   const rows = [
     ['n', ...stats.map(stat => stat.n)],
@@ -63,20 +63,20 @@ const CourseQuarters = (props) => {
     ['average', ...stats.map(stat => stat.average)],
     ['median', ...stats.map(stat => stat.median)],
     ['standardDeviation', ...stats.map(stat => stat.standardDeviation)]
-  ];
+  ]
 
   return (<SearchResultTable
     headers={headers}
     rows={rows}
     noResultText={translate('common.noResults')}
     definition
-  />);
-};
+  />)
+}
 
 CourseQuarters.propTypes = {
   translate: func.isRequired,
   sample: arrayOf(object).isRequired,
   title: string.isRequired
-};
+}
 
-export default CourseQuarters;
+export default CourseQuarters

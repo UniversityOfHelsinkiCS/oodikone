@@ -53,4 +53,4 @@ module.exports = {
   chart33: '#000035',
   chart34: '#7B4F4B',
   chart35: '#A1C299'
-};
+}

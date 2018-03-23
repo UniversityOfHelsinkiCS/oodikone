@@ -1,27 +1,27 @@
-import React from 'react';
-import { arrayOf, object, string, func, shape } from 'prop-types';
-import { ResponsiveContainer, LineChart, XAxis, YAxis, Line, Tooltip, CartesianGrid, Dot } from 'recharts';
-import _ from 'lodash';
-import moment from 'moment';
-import { Header, Segment, Message } from 'semantic-ui-react';
-import { withRouter } from 'react-router-dom';
+import React from 'react'
+import { arrayOf, object, string, func, shape } from 'prop-types'
+import { ResponsiveContainer, LineChart, XAxis, YAxis, Line, Tooltip, CartesianGrid, Dot } from 'recharts'
+import _ from 'lodash'
+import moment from 'moment'
+import { Header, Segment, Message } from 'semantic-ui-react'
+import { withRouter } from 'react-router-dom'
 
-import { DISPLAY_DATE_FORMAT, CHART_COLORS, API_DATE_FORMAT } from '../../constants';
-import { reformatDate, sortDatesWithFormat } from '../../common';
-import { turquoise } from '../../styles/variables/colors';
+import { DISPLAY_DATE_FORMAT, CHART_COLORS, API_DATE_FORMAT } from '../../constants'
+import { reformatDate, sortDatesWithFormat } from '../../common'
+import { turquoise } from '../../styles/variables/colors'
 
-import styles from './creditAccumulationGraph.css';
-import CreditGraphTooltip from '../CreditGraphTooltip';
+import styles from './creditAccumulationGraph.css'
+import CreditGraphTooltip from '../CreditGraphTooltip'
 
 
 const getXAxisMonth = (date, startDate) =>
-  Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0);
+  Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0)
 
 const getReferenceLineForStudent = (student) => {
-  const { courses, started } = student;
-  const lastDate = moment(_.maxBy(courses, course => moment(course.date)).date);
-  const lastMonth = Math.ceil(getXAxisMonth(lastDate, started));
-  const lastCredits = lastMonth * (55 / 12);
+  const { courses, started } = student
+  const lastDate = moment(_.maxBy(courses, course => moment(course.date)).date)
+  const lastMonth = Math.ceil(getXAxisMonth(lastDate, started))
+  const lastCredits = lastMonth * (55 / 12)
 
   return [{
     month: 0,
@@ -32,10 +32,10 @@ const getReferenceLineForStudent = (student) => {
     month: lastMonth,
     referenceCredits: lastCredits,
     date: reformatDate(lastDate, DISPLAY_DATE_FORMAT)
-  }];
-};
+  }]
+}
 
-const isSingleStudentGraph = students => students.length === 1;
+const isSingleStudentGraph = students => students.length === 1
 
 const getReferenceLine = title => (<Line
   type="monotone"
@@ -46,21 +46,21 @@ const getReferenceLine = title => (<Line
   dataKey="referenceCredits"
   stroke={turquoise}
   connectNulls
-/>);
+/>)
 
 
 const getStudentCourseData = (student) => {
-  const { studentNumber, started, courses } = student;
+  const { studentNumber, started, courses } = student
 
-  const filteredCourses = courses.filter(c => moment(c.date).isSameOrAfter(moment(started)));
+  const filteredCourses = courses.filter(c => moment(c.date).isSameOrAfter(moment(started)))
 
-  let totalCredits = 0;
+  let totalCredits = 0
   return filteredCourses.map((c) => {
     const {
       course, date, credits, grade, passed
-    } = c;
+    } = c
     if (passed) {
-      totalCredits += credits;
+      totalCredits += credits
     }
     return {
       title: `${course.name} (${course.code})`,
@@ -70,12 +70,12 @@ const getStudentCourseData = (student) => {
       month: getXAxisMonth(date, started),
       grade,
       passed
-    };
-  });
-};
+    }
+  })
+}
 
 const getStudentChartData = (student) => {
-  const { studentNumber, started } = student;
+  const { studentNumber, started } = student
   return [
     ...getStudentCourseData(student),
     {
@@ -85,8 +85,8 @@ const getStudentChartData = (student) => {
       date: reformatDate(started, DISPLAY_DATE_FORMAT),
       month: 0
     }
-  ];
-};
+  ]
+}
 
 const getDot = (studentNumber, isSingleStudent, onClickFn) => (isSingleStudent ? <Dot r={4} /> : (
   <Dot
@@ -94,10 +94,10 @@ const getDot = (studentNumber, isSingleStudent, onClickFn) => (isSingleStudent ?
     r={3}
     onClick={() => onClickFn(studentNumber)}
   />
-));
+))
 
 const getStudentCreditsLine = (student, i, dot) => {
-  const { studentNumber } = student;
+  const { studentNumber } = student
   return (<Line
     key={`graph-${studentNumber}`}
     type="monotone"
@@ -107,46 +107,46 @@ const getStudentCreditsLine = (student, i, dot) => {
     stroke={CHART_COLORS[i]}
     isAnimationActive={false}
     connectNulls
-  />);
-};
+  />)
+}
 
 const getTooltip = props => (
   <Tooltip
     content={<CreditGraphTooltip {...props} />}
     cursor={false}
   />
-);
+)
 
 
 const CreditAccumulationGraph = (props) => {
   const {
     students, title, translate, history
-  } = props;
+  } = props
 
   if (students.length === 0) {
     return (
       <Message warning>
         <Message.Header>{title}</Message.Header>
         <p>{translate('common.noResults')}</p>
-      </Message>);
+      </Message>)
   }
 
-  let combinedStudentData = [].concat(...students.map(getStudentChartData));
+  let combinedStudentData = [].concat(...students.map(getStudentChartData))
 
-  const isSingleStudent = isSingleStudentGraph(students);
+  const isSingleStudent = isSingleStudentGraph(students)
 
   if (isSingleStudent) {
-    const referenceData = getReferenceLineForStudent(students[0]);
-    combinedStudentData = combinedStudentData.concat(referenceData);
+    const referenceData = getReferenceLineForStudent(students[0])
+    combinedStudentData = combinedStudentData.concat(referenceData)
   }
 
   combinedStudentData.sort((c1, c2) =>
-    sortDatesWithFormat(c1.date, c2.date, DISPLAY_DATE_FORMAT));
+    sortDatesWithFormat(c1.date, c2.date, DISPLAY_DATE_FORMAT))
 
-  const minTick = combinedStudentData[0].month;
-  const maxTick = Math.ceil(combinedStudentData[combinedStudentData.length - 1].month);
+  const minTick = combinedStudentData[0].month
+  const maxTick = Math.ceil(combinedStudentData[combinedStudentData.length - 1].month)
 
-  const pushToHistoryFn = studentNumber => history.push(`/students/${studentNumber}`);
+  const pushToHistoryFn = studentNumber => history.push(`/students/${studentNumber}`)
 
   return (
     <div className={styles.graphContainer}>
@@ -169,8 +169,8 @@ const CreditAccumulationGraph = (props) => {
             }
             {
               students.map((student, i) => {
-                const dot = getDot(student.studentNumber, isSingleStudent, pushToHistoryFn);
-                return getStudentCreditsLine(student, i, dot);
+                const dot = getDot(student.studentNumber, isSingleStudent, pushToHistoryFn)
+                return getStudentCreditsLine(student, i, dot)
               })
             }
             {
@@ -180,14 +180,14 @@ const CreditAccumulationGraph = (props) => {
         </ResponsiveContainer>
       </Segment>
     </div>
-  );
-};
+  )
+}
 
 CreditAccumulationGraph.propTypes = {
   translate: func.isRequired,
   students: arrayOf(object).isRequired,
   title: string.isRequired,
   history: shape(object).isRequired
-};
+}
 
-export default withRouter(CreditAccumulationGraph);
+export default withRouter(CreditAccumulationGraph)

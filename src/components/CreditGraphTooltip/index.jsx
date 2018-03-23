@@ -1,14 +1,14 @@
-import React from 'react';
-import { Card, Icon } from 'semantic-ui-react';
-import { func, bool, arrayOf, object } from 'prop-types';
+import React from 'react'
+import { Card, Icon } from 'semantic-ui-react'
+import { func, bool, arrayOf, object } from 'prop-types'
 
-import styles from './creditGraphTooltip.css';
+import styles from './creditGraphTooltip.css'
 
 const getCardHeader = title => (
   <Card.Header className={styles.tooltipHeader}>
     {title}
   </Card.Header>
-);
+)
 
 const getCardMeta = (name, date) => (
   <Card.Meta className={styles.tooltipMeta}>
@@ -24,7 +24,7 @@ const getCardMeta = (name, date) => (
       <span>{date}</span>
     </div>
   </Card.Meta>
-);
+)
 
 const getCardDescription = (translate, credits, grade, passed) => (
   <Card.Description className={styles.tooltipBody}>
@@ -48,16 +48,16 @@ const getCardDescription = (translate, credits, grade, passed) => (
       </div>
     </div>
   </Card.Description>
-);
+)
 
 const CreditGraphTooltip = (props) => {
-  const { active, translate } = props;
+  const { active, translate } = props
   if (active) {
-    const { payload } = props;
-    const { name } = payload[0];
+    const { payload } = props
+    const { name } = payload[0]
     const {
       title, credits, date, grade, passed
-    } = payload[0].payload;
+    } = payload[0].payload
 
     return (
       <Card>
@@ -67,20 +67,20 @@ const CreditGraphTooltip = (props) => {
           {getCardDescription(translate, credits, grade, passed)}
         </Card.Content>
       </Card>
-    );
+    )
   }
-  return null;
-};
+  return null
+}
 
 CreditGraphTooltip.defaultProps = {
   active: false,
   payload: []
-};
+}
 
 CreditGraphTooltip.propTypes = {
   translate: func.isRequired,
   active: bool,
   payload: arrayOf(object)
-};
+}
 
-export default CreditGraphTooltip;
+export default CreditGraphTooltip
