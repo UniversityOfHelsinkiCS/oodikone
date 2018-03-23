@@ -6,11 +6,12 @@ export const getUnits = () => {
   return callController(route, prefix);
 };
 
-const reducer = (state = [], action) => {
+const reducer = (state = { data: [] }, action) => {
   switch (action.type) {
     case 'GET_UNITS_ATTEMPT':
       return {
-        pending: true
+        pending: true,
+        data: state.data
       };
     case 'GET_UNITS_FAILURE':
       return {

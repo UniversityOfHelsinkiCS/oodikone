@@ -9,13 +9,16 @@ const throwErrors = (res) => {
 
   return res;
 };
-
+/*
 export const getDepartmentSuccess = date => getJson(`/departmentsuccess/?date=${date}`).then(throwErrors);
 
 export const findStudents = searchStr => getJson(`/students/?searchTerm=${searchStr}`).then(throwErrors);
 
 export const getStudent = studentNumber => getJson(`/students/${studentNumber}`).then(throwErrors);
 
+export const getStudyProgrammes = () => getJson('/studyprogrammes').then(throwErrors);
+
+*/
 export const findCoursesByName = searchStr => getJson(`/courses/?name=${searchStr}`).then(throwErrors);
 
 export const findTags = (searchStr) => {
@@ -41,5 +44,3 @@ export const findCourseInstances = code => getJson(`/v2/courselist?code=${code}`
 export const findStudyrights = searchStr => getJson(`/studyrightkeywords?search=${searchStr}`).then(throwErrors);
 
 export const getInstanceStatistics = (date, code, months) => getJson(`/v2/coursestatistics?date=${date}&code=${code}&months=${months}`).then(throwErrors);
-
-export const getStudyProgrammes = () => getJson('/studyprogrammes').then(throwErrors);
