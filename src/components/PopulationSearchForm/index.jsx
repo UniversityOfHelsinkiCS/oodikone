@@ -219,10 +219,10 @@ class PopulationSearchForm extends Component {
 const mapRightsToDropdown = rights =>
   rights.map(r => ({ key: r.id, value: r.id, text: r.name }));
 
-const mapStateToProps = ({ populationReducer, newReducers, locale }) => ({
-  queries: populationReducer.queries,
+const mapStateToProps = ({ populations, units, locale }) => ({
+  queries: populations.map(population => population.query),
   translate: getTranslate(locale),
-  studyProgrammes: mapRightsToDropdown(newReducers.units.data)
+  studyProgrammes: mapRightsToDropdown(units.data)
 });
 
 const mapDispatchToProps = dispatch => ({

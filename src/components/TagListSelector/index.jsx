@@ -3,9 +3,7 @@ import { func, arrayOf, string } from 'prop-types';
 import { Icon, Search, Label, Confirm } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 
-import { findTagsAction } from '../../actions';
 import { findTags } from '../../redux/tags';
-
 
 import styles from './tagListSelector.css';
 
@@ -16,8 +14,7 @@ class TagListSelector extends Component {
     translate: func.isRequired,
     handleAddTagFn: func.isRequired,
     handleRemoveTagFn: func.isRequired,
-    findTags: func.isRequired,
-    dispatchFindTagsAction: func.isRequired
+    findTags: func.isRequired
   };
 
   static defaultProps = {
@@ -33,7 +30,7 @@ class TagListSelector extends Component {
   };
 
 
-  setEditable =() => {
+  setEditable = () => {
     const { isEdit } = this.state;
     this.setState({ isEdit: !isEdit, searchStr: '' });
   };
@@ -61,15 +58,11 @@ class TagListSelector extends Component {
 
   fetchTags = (searchStr) => {
     this.setState({ isLoading: true, searchStr });
-    this.props.findTags(searchStr);
-    this.props.dispatchFindTagsAction(searchStr)
-      .then(
-        json => this.setState({ existingTags: json.value, isLoading: false }),
-        () => this.setState({ isLoading: false })
-      );
+    this.props.findTags(searchStr).then(() =>
+      this.setState({ isLoading: false }));
   };
 
-  renderTags =() => {
+  renderTags = () => {
     const { tags, translate } = this.props;
     const { isConfirm } = this.state;
 
@@ -134,8 +127,8 @@ class TagListSelector extends Component {
   render() {
     return (
       <div className={styles.tagsContainer}>
-        { this.renderTags()}
-        { this.renderEditComponent() }
+        {this.renderTags()}
+        {this.renderEditComponent()}
       </div>
     );
   }
@@ -144,8 +137,6 @@ class TagListSelector extends Component {
 const mapStateToProps = () => ({});
 
 const mapDispatchToProps = dispatch => ({
-  dispatchFindTagsAction: searchStr =>
-    dispatch(findTagsAction(searchStr)),
   findTags: searchStr =>
     dispatch(findTags(searchStr))
 });

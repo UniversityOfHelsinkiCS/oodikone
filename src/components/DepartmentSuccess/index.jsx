@@ -129,8 +129,8 @@ class DepartmentSuccess extends Component {
   }
 }
 
-const mapStateToProps = ({ locale, newReducers }) => ({
-  chartData: createChartData(newReducers.department.data),
+const mapStateToProps = ({ locale, department }) => ({
+  chartData: createChartData(department.data),
   translate: getTranslate(locale),
   currentLanguage: getActiveLanguage(locale).value
 });

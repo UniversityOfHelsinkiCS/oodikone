@@ -13,7 +13,7 @@ import 'react-datetime/css/react-datetime.css';
 import './styles/global';
 
 import { AVAILABLE_LANGUAGES, DEFAULT_LANG } from './constants';
-import reducers from './reducers';
+import reducers from './redux';
 import { handleRequest } from './apiConnection';
 import Main from './components/Main';
 

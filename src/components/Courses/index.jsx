@@ -12,7 +12,6 @@ import {
 import CourseStatistics from './statistics';
 
 import {
-  addError,
   findCoursesAction,
   findInstancesAction,
   getInstanceStatisticsAction
@@ -195,8 +194,6 @@ const mapDispatchToProps = dispatch => ({
 
   dispatchGetInstanceStatistics: (date, code, months) =>
     dispatch(getInstanceStatisticsAction(date, code, months)),
-
-  dispatchAddError: err => dispatch(addError(err))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Courses);

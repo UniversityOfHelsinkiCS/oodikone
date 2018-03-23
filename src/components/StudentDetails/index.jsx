@@ -5,7 +5,6 @@ import { Segment } from 'semantic-ui-react';
 import { isEmpty } from 'lodash';
 
 import StudentInfoCard from '../StudentInfoCard';
-import { removeTagFromStudentAction } from '../../actions';
 import CreditAccumulationGraph from '../CreditAccumulationGraph';
 import SearchResultTable from '../SearchResultTable';
 import { removeInvalidCreditsFromStudent } from '../../common';
@@ -72,14 +71,12 @@ class StudentDetails extends Component {
   }
 }
 
-const mapStateToProps = ({ newReducers }) => ({
-  student: newReducers.students.data.find(student =>
-    student.studentNumber === newReducers.students.selected)
+const mapStateToProps = ({ students }) => ({
+  student: students.data.find(student =>
+    student.studentNumber === students.selected)
 });
 
-const mapDispatchToProps = dispatch => ({
-  dispatchRemoveTagFromStudent: (studentNumber, tag) =>
-    dispatch(removeTagFromStudentAction(studentNumber, tag))
+const mapDispatchToProps = () => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudentDetails);
