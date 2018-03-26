@@ -1,8 +1,8 @@
-import React from 'react';
-import { Table } from 'semantic-ui-react';
-import { arrayOf, string, object, func, bool, oneOfType, array } from 'prop-types';
+import React from 'react'
+import { Table } from 'semantic-ui-react'
+import { arrayOf, string, object, func, bool, oneOfType, array } from 'prop-types'
 
-import styles from './searchResultsTable.css';
+import styles from './searchResultsTable.css'
 
 const getHeaderRow = headers => (
   <Table.Header>
@@ -16,7 +16,7 @@ const getHeaderRow = headers => (
         }
     </Table.Row>
   </Table.Header>
-);
+)
 
 const getTableBody = (rows, rowClickFn, selectable) => (
   <Table.Body>
@@ -36,7 +36,7 @@ const getTableBody = (rows, rowClickFn, selectable) => (
         ))
       }
   </Table.Body>
-);
+)
 
 const SearchResultTable = ({
   headers, rows, rowClickFn, noResultText, selectable, definition
@@ -50,16 +50,16 @@ const SearchResultTable = ({
       >
         {getHeaderRow(headers)}
         {getTableBody(rows, rowClickFn, selectable)}
-      </Table>);
+      </Table>)
   }
-  return <div>{noResultText}</div>;
-};
+  return <div>{noResultText}</div>
+}
 
 SearchResultTable.defaultProps = {
   rowClickFn: () => null,
   selectable: false,
   definition: false
-};
+}
 
 SearchResultTable.propTypes = {
   headers: arrayOf(string).isRequired,
@@ -68,6 +68,6 @@ SearchResultTable.propTypes = {
   noResultText: string.isRequired,
   selectable: bool,
   definition: bool
-};
+}
 
-export default SearchResultTable;
+export default SearchResultTable

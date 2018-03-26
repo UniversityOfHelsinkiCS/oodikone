@@ -35,7 +35,7 @@ import {
   chart34,
   chart35
 
-} from '../styles/variables';
+} from '../styles/variables'
 
 export const routes = {
   index: { route: '/', translateId: 'departmentSuccess' },
@@ -43,24 +43,24 @@ export const routes = {
   courses: { route: '/courses', translateId: 'courses' },
   students: { route: '/students/:studentNumber?', translateId: 'students' },
   teachers: { route: '/teachers', translateId: 'teachers' }
-};
+}
 
 const assumeBasename = () => {
-  const POSSIBLE_BASENAMES = ['staging'];
-  const haystack = window.location.pathname.split('/');
-  const needle = haystack.find(path => POSSIBLE_BASENAMES.includes(path));
-  return needle ? `/${needle}/` : '/';
-};
+  const POSSIBLE_BASENAMES = ['staging']
+  const haystack = window.location.pathname.split('/')
+  const needle = haystack.find(path => POSSIBLE_BASENAMES.includes(path))
+  return needle ? `/${needle}/` : '/'
+}
 
-export const BASE_PATH = assumeBasename();
+export const BASE_PATH = assumeBasename()
 
-export const API_BASE_PATH = `${assumeBasename()}api`;
+export const API_BASE_PATH = `${assumeBasename()}api`
 
-export const AVAILABLE_LANGUAGES = ['en'];
-export const DEFAULT_LANG = 'en';
+export const AVAILABLE_LANGUAGES = ['en']
+export const DEFAULT_LANG = 'en'
 
-export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY';
-export const API_DATE_FORMAT = 'YYYY.MM.DD';
+export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
+export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
 export const CHART_COLORS = [
   chart1,
@@ -98,4 +98,4 @@ export const CHART_COLORS = [
   chart33,
   chart34,
   chart35
-];
+]

@@ -1,12 +1,12 @@
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const htmlTemplate = require('html-webpack-template');
-const path = require('path');
+const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const htmlTemplate = require('html-webpack-template')
+const path = require('path')
 
-const commonSettings = require('./webpack.config.common');
+const commonSettings = require('./webpack.config.common')
 
-const devServerPort = 8081;
-const apiServerPort = 8080;
+const devServerPort = 8081
+const apiServerPort = 8080
 
 module.exports = {
   context: path.join(__dirname, 'src'),
@@ -129,4 +129,4 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     publicPath: ''
   }
-};
+}

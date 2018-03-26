@@ -1,15 +1,15 @@
-import React from 'react';
-import { string, arrayOf } from 'prop-types';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
+import React from 'react'
+import { string, arrayOf } from 'prop-types'
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts'
 
-import { graphDataType } from '../../constants/types';
-import { violet, orange, lime, mellowBlue, turquoise } from '../../styles/variables/colors';
-import styles from './multicolorBarChart.css';
+import { graphDataType } from '../../constants/types'
+import { violet, orange, lime, mellowBlue, turquoise } from '../../styles/variables/colors'
+import styles from './multicolorBarChart.css'
 
-const BAR_COLOR_OPTIONS = [orange, lime, mellowBlue, turquoise];
+const BAR_COLOR_OPTIONS = [orange, lime, mellowBlue, turquoise]
 
 const MulticolorBarChart = (props) => {
-  const { chartTitle, chartData } = props;
+  const { chartTitle, chartData } = props
   if (chartData.length > 0) {
     return (
       <div>
@@ -30,14 +30,14 @@ const MulticolorBarChart = (props) => {
           </ResponsiveContainer>
         </div>
       </div>
-    );
+    )
   }
-  return null;
-};
+  return null
+}
 
 MulticolorBarChart.propTypes = {
   chartTitle: string.isRequired,
   chartData: arrayOf(graphDataType).isRequired
-};
+}
 
-export default MulticolorBarChart;
+export default MulticolorBarChart

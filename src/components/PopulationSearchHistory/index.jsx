@@ -1,61 +1,56 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { func, shape, arrayOf, object } from 'prop-types';
-import { getTranslate } from 'react-localize-redux';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { func, shape, arrayOf, object } from 'prop-types'
+import { getTranslate } from 'react-localize-redux'
 
-import PopulationQueryCard from '../PopulationQueryCard';
-import { removePopulationAction } from '../../actions';
+import PopulationQueryCard from '../PopulationQueryCard'
+import { removePopulation } from '../../redux/populations'
 
-import styles from './populationSearchHistory.css';
+import styles from './populationSearchHistory.css'
 
 class PopulationSearchHistory extends Component {
   static propTypes = {
     translate: func.isRequired,
-    dispatchRemovePopulation: func.isRequired,
+    removePopulation: func.isRequired,
     populations: shape({
       queries: arrayOf(object),
       samples: object
     }).isRequired
-  };
+  }
 
-  removePopulation = (uuid) => {
-    const { dispatchRemovePopulation } = this.props;
-    dispatchRemovePopulation(uuid);
-  };
+  removePopulation = uuid => this.props.removePopulation(uuid)
 
   renderQueryCards = () => {
-    const { populations, translate } = this.props;
-    const { samples, queries } = populations;
-
-    return queries.map((query, i) => (
+    const { populations, translate } = this.props
+    return populations.map((population, i) => (
       <PopulationQueryCard
-        key={`population-${query.uuid}`}
+        key={`population-${population.query.uuid}`}
         translate={translate}
-        population={samples[query.uuid]}
-        query={query}
+        population={population.data}
+        query={population.query}
         queryId={i}
         removeSampleFn={this.removePopulation}
-      />));
-  };
+      />))
+  }
 
   render() {
     return (
       <div className={styles.historyContainer} >
-        { this.renderQueryCards() }
+        {this.renderQueryCards()}
       </div>
-    );
+    )
   }
 }
 
-const mapStateToProps = ({ populationReducer, locale }) => ({
-  populations: populationReducer,
+const mapStateToProps = ({ populations, locale }) => ({
+  populations,
   translate: getTranslate(locale)
-});
+})
 
 const mapDispatchToProps = dispatch => ({
-  dispatchRemovePopulation: uuid =>
-    dispatch(removePopulationAction(uuid))
-});
+  removePopulation: uuid =>
+    dispatch(removePopulation(uuid))
+})
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory);
+export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory)
