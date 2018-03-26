@@ -1,5 +1,5 @@
-import layout from './layout.css';
+import layout from './layout.css'
 
-const sharedStyles = ({ ...layout });
+const sharedStyles = ({ ...layout })
 
-export default sharedStyles;
+export default sharedStyles

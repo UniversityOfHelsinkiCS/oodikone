@@ -1,115 +1,79 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { getActiveLanguage, getTranslate } from 'react-localize-redux';
-import PropTypes from 'prop-types';
-import {
-  Search,
-  Dropdown,
-  Header,
-  List,
-  Button
-} from 'semantic-ui-react';
-import CourseStatistics from './statistics';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { getActiveLanguage, getTranslate } from 'react-localize-redux'
+import PropTypes from 'prop-types'
+import { Search, Dropdown, Header, List, Button } from 'semantic-ui-react'
+import CourseStatistics from '../CourseStatistics'
 
-import {
-  addError,
-  findCoursesAction,
-  findInstancesAction,
-  getInstanceStatisticsAction
-} from '../../actions';
+import { findCourses } from '../../redux/courses'
+import { findCourseInstances, getCourseInstanceStatistics } from '../../redux/courseInstances'
 
-import styles from './courses.css';
+import styles from './courses.css'
 
-const { func, string } = PropTypes;
+const { func, string, arrayOf, object } = PropTypes
 
-const CourseListRenderer = ({ name, code }) => <span>{`${name} ( ${code} )`}</span>;
+const CourseListRenderer = ({ name, code }) => <span>{`${name} ( ${code} )`}</span>
 
 CourseListRenderer.propTypes = {
   name: string.isRequired,
   code: string.isRequired
-};
+}
 
 class Courses extends Component {
-  constructor(props) {
-    super(props);
-
-    this.resetComponent = this.resetComponent.bind(this);
-    this.handleResultSelect = this.handleResultSelect.bind(this);
-    this.handleSearchChange = this.handleSearchChange.bind(this);
-    this.fetchCoursesList = this.fetchCoursesList.bind(this);
-    this.fetchCourseInstances = this.fetchCourseInstances.bind(this);
-    this.fetchInstanceStatistics = this.fetchInstanceStatistics.bind(this);
-    this.removeInstance = this.removeInstance.bind(this);
-
-    this.state = { selectedCourse: { name: 'No course', code: 'No code' }, selectedInstances: [] };
+  state = {
+    isLoading: false,
+    searchStr: '',
+    selectedCourse: { name: 'No course', code: 'No code' },
+    selectedInstances: []
   }
 
-  componentDidMount() {
-    this.resetComponent();
-  }
-
-  resetComponent() {
+  resetComponent = () => {
     this.setState({
-      courseList: [],
       isLoading: false,
       searchStr: '',
-      selectedInstances: [],
-      selectedCourse: { name: 'No course', code: 'No code' }
-    });
+      selectedCourse: { name: 'No course', code: 'No code' },
+      selectedInstances: []
+    })
   }
 
-  handleResultSelect(e, { result }) {
+  handleResultSelect = (e, { result }) => {
     this.setState({ selectedCourse: result }, () => {
-      this.fetchCourseInstances();
-    });
+      this.fetchCourseInstances()
+    })
   }
 
 
-  handleSearchChange(e, { value }) {
-    this.setState({ searchStr: value });
-    this.fetchCoursesList();
+  handleSearchChange = (e, { value }) => {
+    this.setState({ searchStr: value })
+    this.fetchCoursesList()
   }
 
-  fetchCoursesList() {
-    const { searchStr } = this.state;
-    this.setState({ isLoading: true });
-    this.props.dispatchFindCoursesList(searchStr)
-      .then(json => this.setState({ courseList: json.value, isLoading: false }));
+  fetchCoursesList = () => {
+    const { searchStr } = this.state
+    this.setState({ isLoading: true })
+    this.props.findCourses(searchStr)
+      .then(() => this.setState({ isLoading: false }))
   }
 
-  fetchCourseInstances() {
-    const courseCode = this.state.selectedCourse.code;
-    this.props.dispatchFindCourseInstances(courseCode)
-      .then(json => this.setState({ courseInstances: json.value }));
+  fetchCourseInstances = () => {
+    const courseCode = this.state.selectedCourse.code
+    this.props.findCourseInstances(courseCode)
   }
 
-  fetchInstanceStatistics(courseInstance) {
-    const { selectedInstances, selectedCourse } = this.state;
-    courseInstance.course = selectedCourse;
-    this.props.dispatchGetInstanceStatistics(courseInstance.date, courseInstance.code, 12)
-      .then((json) => {
-        courseInstance.stats = json.value;
-        this.setState({
-          selectedInstances: [...selectedInstances, courseInstance]
-        });
-      });
+  fetchInstanceStatistics = (courseInstance) => {
+    const query = { ...courseInstance, months: 12, course: this.state.selectedCourse }
+    this.props.getCourseInstanceStatistics(query)
   }
 
-  removeInstance(courseInstance) {
-    const { selectedInstances } = this.state;
-    this.setState({ selectedInstances: selectedInstances.filter(i => i !== courseInstance) });
+  removeInstance = (courseInstance) => {
+    const { selectedInstances } = this.state
+    this.setState({ selectedInstances: selectedInstances.filter(i => i !== courseInstance) })
   }
 
   render() {
-    const {
-      isLoading,
-      courseList,
-      searchStr,
-      courseInstances,
-      selectedCourse,
-      selectedInstances
-    } = this.state;
-    const instanceList = [];
+    const { isLoading, searchStr, selectedCourse } = this.state
+    const { courseList, courseInstances, selectedInstances } = this.props
+    const instanceList = []
     if (courseInstances !== undefined) {
       courseInstances.forEach(i => instanceList.push({
         key: i.id,
@@ -117,7 +81,7 @@ class Courses extends Component {
         value: {
           id: i.id, date: i.date, code: selectedCourse.code
         }
-      }));
+      }))
     }
 
     const listInstance = selectedInstances.map(instance => (
@@ -129,12 +93,12 @@ class Courses extends Component {
           </List.Content>
         </List.Header>
         {instance.date}
-      </List.Item>));
+      </List.Item>))
 
     // const t = this.props.translate;
 
     return (
-      <div>
+      <div className={styles.container}>
         <Search
           className={styles.courseSearch}
           input={{ fluid: true }}
@@ -166,37 +130,42 @@ class Courses extends Component {
         {selectedInstances.map(i => (<CourseStatistics
           courseName={i.course.name}
           instanceDate={i.date}
-          stats={i.stats}
+          stats={i.statistics}
         />))}
 
       </div>
-    );
+    )
   }
 }
 
 Courses.propTypes = {
-  dispatchFindCoursesList: func.isRequired,
-  dispatchFindCourseInstances: func.isRequired,
-  dispatchGetInstanceStatistics: func.isRequired
+  findCourses: func.isRequired,
+  findCourseInstances: func.isRequired,
+  getCourseInstanceStatistics: func.isRequired,
+  courseList: arrayOf(object).isRequired,
+  selectedInstances: arrayOf(object).isRequired,
+  courseInstances: arrayOf(object).isRequired
   // translate: func.isRequired
-};
+}
 
-const mapStateToProps = ({ locale }) => ({
+const mapStateToProps = ({ locale, courses, courseInstances }) => ({
+  courseList: courses.data,
+  courseInstances: courseInstances.data,
+  selectedInstances: courseInstances.data.filter(instance =>
+    courseInstances.selected.includes(instance.id)),
   translate: getTranslate(locale),
   currentLanguage: getActiveLanguage(locale).value
-});
+})
 
 const mapDispatchToProps = dispatch => ({
-  dispatchFindCoursesList: queryStr =>
-    dispatch(findCoursesAction(queryStr)),
+  findCourses: query =>
+    dispatch(findCourses(query)),
 
-  dispatchFindCourseInstances: queryStr =>
-    dispatch(findInstancesAction(queryStr)),
+  findCourseInstances: code =>
+    dispatch(findCourseInstances(code)),
 
-  dispatchGetInstanceStatistics: (date, code, months) =>
-    dispatch(getInstanceStatisticsAction(date, code, months)),
+  getCourseInstanceStatistics: query =>
+    dispatch(getCourseInstanceStatistics(query))
+})
 
-  dispatchAddError: err => dispatch(addError(err))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Courses);
+export default connect(mapStateToProps, mapDispatchToProps)(Courses)

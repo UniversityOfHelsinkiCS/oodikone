@@ -1,4 +1,4 @@
-import { AVAILABLE_LANGUAGES } from '../constants';
+import { AVAILABLE_LANGUAGES } from '../constants'
 
 const getTranslation = (strMap, requestedLang) => {
   if (strMap) {
@@ -7,10 +7,10 @@ const getTranslation = (strMap, requestedLang) => {
       AVAILABLE_LANGUAGES
         .filter(l => strMap[l])
         .map(l => strMap[l])
-        .shift();
+        .shift()
   }
 
-  return null;
-};
+  return null
+}
 
-export default getTranslation;
+export default getTranslation

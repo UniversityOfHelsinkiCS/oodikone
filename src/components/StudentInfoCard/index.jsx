@@ -1,37 +1,29 @@
-import React, { Component } from 'react';
-import { func } from 'prop-types';
-import { Card, Icon } from 'semantic-ui-react';
-import { connect } from 'react-redux';
+import React, { Component } from 'react'
+import { func } from 'prop-types'
+import { Card, Icon } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 
-import { reformatDate } from '../../common';
-import { studentDetailsType } from '../../constants/types';
-import { DISPLAY_DATE_FORMAT } from '../../constants';
-import TagListSelector from '../TagListSelector';
+import { reformatDate } from '../../common'
+import { studentDetailsType } from '../../constants/types'
+import { DISPLAY_DATE_FORMAT } from '../../constants'
+import TagListSelector from '../TagListSelector'
 
-import styles from './studentInfoCard.css';
-import { addTagToStudentAction, removeTagFromStudentAction } from '../../actions';
+import styles from './studentInfoCard.css'
 
 class StudentInfoCard extends Component {
   static propTypes = {
     student: studentDetailsType.isRequired,
-    translate: func.isRequired,
-    dispatchRemoveTagFromStudent: func.isRequired,
-    dispatchAddTagToStudent: func.isRequired
-  };
+    translate: func.isRequired
+  }
+  // eslint-disable-next-line
+  handleAddTagFn = tag => console.log('not yet implemented');
 
-  handleAddTagFn = (tag) => {
-    const { student, dispatchAddTagToStudent } = this.props;
-    dispatchAddTagToStudent(student.studentNumber, { text: tag });
-  };
-
-  handleRemoveTagFn = (tag) => {
-    const { student, dispatchRemoveTagFromStudent } = this.props;
-    dispatchRemoveTagFromStudent(student.studentNumber, { text: tag });
-  };
+  // eslint-disable-next-line
+  handleRemoveTagFn = tag => console.log('not yet implemented');
 
   render() {
-    const { student, translate } = this.props;
-    const { tags, studentNumber, started } = student;
+    const { student, translate } = this.props
+    const { tags, studentNumber, started } = student
     return (
       <Card fluid>
         <Card.Content>
@@ -61,18 +53,14 @@ class StudentInfoCard extends Component {
           />
         </Card.Content>
       </Card>
-    );
+    )
   }
 }
 
-const mapStateToProps = () => ({});
+const mapStateToProps = () => ({})
 
-const mapDispatchToProps = dispatch => ({
-  dispatchRemoveTagFromStudent: (studentNumber, tag) =>
-    dispatch(removeTagFromStudentAction(studentNumber, tag)),
-  dispatchAddTagToStudent: (studentNumber, tag) =>
-    dispatch(addTagToStudentAction(studentNumber, tag))
-});
+const mapDispatchToProps = () => ({
+})
 
-export default connect(mapStateToProps, mapDispatchToProps)(StudentInfoCard);
+export default connect(mapStateToProps, mapDispatchToProps)(StudentInfoCard)
 
