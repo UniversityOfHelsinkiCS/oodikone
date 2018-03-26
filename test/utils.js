@@ -29,15 +29,16 @@ const generateCourses = async (amount) => {
 
 const generateCourseInstances = async (courses, amount) => {
   const instances = []
-  let i = 0
+  let id = 0
   courses.forEach(course => {
     const number = amount || numberFromTo(5, 40)
-    for (i; i < number; i++) {
+    for (let i = 0; i < number; i++) {
       instances.push({
-        id: i,
+        id,
         coursedate: daysAgo(numberFromTo(10, 365)).toUTCString(),
         course_code: course.code
       })
+      id++
     }
   })
   return instances
@@ -191,6 +192,31 @@ const generateUsers = (amount) => {
   return users
 }
 
+const generateTags = (amount) => {
+  const number = amount || numberFromTo(10, 100)
+  const tags = []
+  for (let i = 0; i < number; i++) {
+    tags.push({
+      tagname: `${faker.company.catchPhraseAdjective()} ${i}` //tagname should be unique, add i just in case
+    })
+  }
+  return tags
+}
+
+// adds all tags to all students
+const generateTagStudents = (students, tags) => {
+  let tag_students = []
+  students.forEach(student => {
+    tags.forEach(tag => {
+      tag_students.push({
+        taggedstudents_studentnumber: student.studentnumber,
+        tags_tagname: tag.tagname
+      })
+    })
+  })
+  return tag_students
+}
+
 const generateUnits = (amount, studyrights) => {
   const units = []
   if (!studyrights) {
@@ -221,5 +247,7 @@ module.exports = {
   generateCourseTeachers,
   generateOrganizations,
   generateUsers,
-  generateUnits
+  generateUnits,
+  generateTags,
+  generateTagStudents
 }

@@ -4,7 +4,9 @@ const conf = require('../conf-backend')
 const uidHeaderName = 'eduPersonPrincipalName'
 const isShibboUser = (userId, uidHeader) => userId === uidHeader.split('@')[0]
 
-module.exports.checkAuth = async (req, res, next) => {
+const admin = ['totutotu', 'tktl', 'mluukkai', 'mitiai', 'ttuotila', 'jakousa']
+
+const checkAuth = async (req, res, next) => {
   console.log('checkAuth beginning')
 
   const token = req.headers['x-access-token']
@@ -27,3 +29,17 @@ module.exports.checkAuth = async (req, res, next) => {
   }
 }
 
+const checkAdminAuth = async (req, res, next) => {
+  const userId = req.decodedToken.userId
+  const user = admin.find(user => userId === user)
+  if (user) {
+    next()
+  } else {
+    console.log('User not an admin')
+    res.status(403).end()
+  }
+}
+
+module.exports = {
+  checkAuth, checkAdminAuth
+}

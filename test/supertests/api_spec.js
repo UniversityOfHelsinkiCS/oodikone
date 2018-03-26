@@ -439,13 +439,13 @@ test('populations can be searched by a searchterm', async t => {
   t.truthy(res.body['Computer Science'] > 20)
 })
 
-test('new api populations can be fetched', async t => {
+test.only('new api populations can be fetched', async t => {
   const res = await api
     .get('/api/populationstatistics')
     .query({
       year: '2010',
       semester: 'SPRING',
-      studyRights: '2'
+      studyRights: '16'
     })
     .set('x-access-token', token)
     .set('eduPersonPrincipalName', uid)
@@ -453,6 +453,7 @@ test('new api populations can be fetched', async t => {
     .expect('Content-Type', /application\/json/)
 
   const stats = res.body
+  console.log(stats)
   t.is(stats.length, 6)
 
 })
@@ -463,7 +464,7 @@ test('multiple population studyrights can be fetched', async t => {
     .query({
       year: '2010',
       semester: 'SPRING',
-      studyRights: ['2', '1']
+      studyRights: ['6', '7']
     })
     .set('x-access-token', token)
     .set('eduPersonPrincipalName', uid)
