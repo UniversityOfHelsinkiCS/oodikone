@@ -14,7 +14,7 @@ const callApi = async (url, method = 'get', data) => {
   }
   if (isDevEnv) {
     const devUser = 'tktl'
-    options.headers.eduPersonPrincipalName = `${devUser}@ad.helsinki.fi`
+    options.headers.uid = devUser
     options.headers['shib-session-id'] = 'mock-session'
   }
   await checkAuth()
