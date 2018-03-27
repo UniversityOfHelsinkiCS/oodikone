@@ -15,6 +15,7 @@ const checkAuth = async (req, res, next) => {
     jwt.verify(token, conf.TOKEN_SECRET, (err, decoded) => {
       console.log('Jwt verification done')
       console.log('err: ', err)
+      console.log(decoded)
       console.log(uid, ' should equal ', decoded.userId)
       if (!err && isShibboUser(decoded.userId, uid)) {
         console.log('Jwt verification approved')
