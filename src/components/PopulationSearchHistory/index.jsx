@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, shape, arrayOf, object } from 'prop-types'
+import { func, shape, arrayOf, object, bool } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 
 import PopulationQueryCard from '../PopulationQueryCard'
@@ -12,10 +12,12 @@ class PopulationSearchHistory extends Component {
   static propTypes = {
     translate: func.isRequired,
     removePopulation: func.isRequired,
-    populations: shape({
-      queries: arrayOf(object),
-      samples: object
-    }).isRequired
+    populations: arrayOf(shape({
+      pending: bool,
+      error: bool,
+      data: arrayOf(object),
+      query: object
+    })).isRequired
   }
 
   removePopulation = uuid => this.props.removePopulation(uuid)

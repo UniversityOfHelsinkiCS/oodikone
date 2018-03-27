@@ -12,11 +12,6 @@ import { removeInvalidCreditsFromStudent } from '../../common'
 import sharedStyles from '../../styles/shared'
 
 class StudentDetails extends Component {
-  static propTypes = {
-    translate: func.isRequired,
-    student: shape(object).isRequired
-  }
-
   renderCreditsGraph = () => {
     const { translate, student } = this.props
 
@@ -71,12 +66,18 @@ class StudentDetails extends Component {
   }
 }
 
+StudentDetails.propTypes = {
+  translate: func.isRequired,
+  student: shape(object)
+}
+
+StudentDetails.defaultProps = {
+  student: {}
+}
+
 const mapStateToProps = ({ students }) => ({
   student: students.data.find(student =>
     student.studentNumber === students.selected)
 })
 
-const mapDispatchToProps = () => ({
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(StudentDetails)
+export default connect(mapStateToProps)(StudentDetails)

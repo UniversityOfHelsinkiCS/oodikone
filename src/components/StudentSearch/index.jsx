@@ -6,6 +6,7 @@ import { Search, Segment } from 'semantic-ui-react'
 import { findStudents, getStudent, selectStudent } from '../../redux/students'
 import SearchResultTable from '../SearchResultTable'
 import SegmentDimmer from '../SegmentDimmer'
+import Timeout from '../Timeout'
 
 import sharedStyles from '../../styles/shared'
 import styles from './studentSearch.css'
@@ -19,18 +20,6 @@ const DEFAULT_STATE = {
 }
 
 class StudentSearch extends Component {
-  static propTypes = {
-    translate: func.isRequired,
-    findStudents: func.isRequired,
-    getStudent: func.isRequired,
-    selectStudent: func.isRequired,
-    studentNumber: string,
-    students: arrayOf(object).isRequired
-  }
-  static defaultProps = {
-    studentNumber: undefined
-  }
-
   state = DEFAULT_STATE
 
   componentDidMount() {
@@ -46,8 +35,12 @@ class StudentSearch extends Component {
   }
 
   handleSearchChange = (e, { value }) => {
+    this.props.clearTimeout('search')
     if (value.length > 0) {
-      this.fetchStudentList(value)
+      this.setState({ searchStr: value })
+      this.props.setTimeout('search', () => {
+        this.fetchStudentList(value)
+      }, 250)
     } else {
       this.resetComponent()
     }
@@ -68,7 +61,7 @@ class StudentSearch extends Component {
   }
 
   fetchStudentList = (searchStr) => {
-    this.setState({ searchStr, isLoading: true })
+    this.setState({ isLoading: true })
     this.props.findStudents(searchStr).then(() => {
       this.setState({ isLoading: false, showResults: true })
     })
@@ -89,13 +82,15 @@ class StudentSearch extends Component {
     const rows = students.map(({ studentNumber, started, credits }) =>
       ({ studentNumber, started, credits }))
 
-    return (<SearchResultTable
-      headers={headers}
-      rows={rows}
-      rowClickFn={this.handleSearchSelect}
-      noResultText={translate('common.noResults')}
-      selectable
-    />)
+    return (
+      <SearchResultTable
+        headers={headers}
+        rows={rows}
+        rowClickFn={this.handleSearchSelect}
+        noResultText={translate('common.noResults')}
+        selectablestatic
+      />
+    )
   }
 
   render() {
@@ -121,6 +116,19 @@ class StudentSearch extends Component {
     )
   }
 }
+StudentSearch.propTypes = {
+  translate: func.isRequired,
+  findStudents: func.isRequired,
+  getStudent: func.isRequired,
+  selectStudent: func.isRequired,
+  studentNumber: string,
+  students: arrayOf(object).isRequired,
+  setTimeout: func.isRequired,
+  clearTimeout: func.isRequired
+}
+StudentSearch.defaultProps = {
+  studentNumber: undefined
+}
 
 const mapStateToProps = ({ students }) => ({
   students: students.data
@@ -135,4 +143,4 @@ const mapDispatchToProps = dispatch => ({
     dispatch(selectStudent(studentNumber))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(StudentSearch)
+export default connect(mapStateToProps, mapDispatchToProps)(Timeout(StudentSearch))
