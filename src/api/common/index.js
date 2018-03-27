@@ -45,7 +45,7 @@ const getHeaders = (auth, isContentType = false) => {
     'x-access-token': auth.token
   }
   if (auth.devUser) {
-    headers.eduPersonPrincipalName = `${auth.devUser}@secondParams`
+    headers.uid = auth.devUser
   }
   if (isContentType) {
     headers.Accept = 'application/json'
