@@ -14,9 +14,6 @@ const saveLogin = res => res.json().then((response) => {
   return response
 })
 
-// eduPersonPrincipalName => user@
-
-
 export const login = (user) => {
   const request = {
     'Cache-Control': 'no-cache',
@@ -26,7 +23,7 @@ export const login = (user) => {
     const devUser = user || 'tktl'
     localStorage.setItem(OODI_DEV_USER, devUser)
     request.headers = {
-      eduPersonPrincipalName: `${devUser}@`,
+      uid: devUser,
       'shib-session-id': 'mock-session'
     }
   }
