@@ -7,13 +7,12 @@ import { connect } from 'react-redux'
 import { routes } from '../../constants'
 
 import styles from './navigationBar.css'
-import { logDevUserInAction, logUserOutAction } from '../../actions'
+import { logout } from '../../apiConnection'
 
 class NavigationBar extends Component {
   static propTypes = {
     translate: func.isRequired,
-    dispatchLogout: func.isRequired,
-    dispatchDevLogin: func.isRequired
+    logout: func.isRequired
   }
 
   checkForOptionalParams = route => (
@@ -21,9 +20,9 @@ class NavigationBar extends Component {
   )
 
   renderUserMenu = () => {
-    const { translate, dispatchLogout, dispatchDevLogin } = this.props
+    const { translate } = this.props
     if (process.env.NODE_ENV === 'development') {
-      const testUsers = ['tktl', 'oprek']
+      const testUsers = ['tktl']
       return (
         <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls">
           <Dropdown.Menu>
@@ -32,13 +31,13 @@ class NavigationBar extends Component {
                 key={user}
                 icon="user"
                 text={`Use as: ${user}`}
-                onClick={() => dispatchDevLogin(user)}
+                onClick={() => {}}
               />
           ))}
             <Dropdown.Item
               icon="log out"
               text={translate('navigationBar.logout')}
-              onClick={() => dispatchLogout()}
+              onClick={this.props.logout}
             />
           </Dropdown.Menu>
         </Menu.Item>
@@ -46,7 +45,7 @@ class NavigationBar extends Component {
     }
 
     return (
-      <Menu.Item link onClick={() => dispatchLogout()} icon="log out">
+      <Menu.Item link onClick={this.props.logout} icon="log out">
         {translate('navigationBar.logout')}
       </Menu.Item>
     )
@@ -91,11 +90,8 @@ class NavigationBar extends Component {
 const mapStateToProps = () => ({})
 
 const mapDispatchToProps = dispatch => ({
-  dispatchLogout: () => {
-    dispatch(logUserOutAction())
-  },
-  dispatchDevLogin: (user) => {
-    dispatch(logDevUserInAction(user))
+  logout: () => {
+    dispatch(logout())
   }
 })
 
