@@ -37,6 +37,7 @@ test('all users can be fetched', async t => {
   const res = await api
     .get('/api/users')
     .set('x-access-token', token)
+    .set('uid', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
   t.is(res.body.length, 5)
@@ -49,6 +50,7 @@ test('user can be enabled/disabled', async t => {
     .post('/api/users/enable')
     .send({ id: 1 })
     .set('x-access-token', token)
+    .set('uid', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
   t.is(res.body.is_enabled, !enabled)

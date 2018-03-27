@@ -23,12 +23,10 @@ const generateToken = async (uid, res) => {
 
 router.get('/login', async (req, res) => {
   try {
-    const uidHeaderName = 'eduPersonPrincipalName'
-    const uidHeader = req.headers[uidHeaderName] || req.headers[uidHeaderName.toLowerCase()]
-    if (req.headers['shib-session-id'] && uidHeader) {
-      const uid = uidHeader.split('@')[0]
+    const uid = req.headers['uid']
+    if (req.headers['shib-session-id'] && uid) {
       const user = await User.byUsername(uid)
-      const fullname = req.headers.givenname || 'Shib Valmis'
+      const fullname = req.headers.displayname || 'Shib Valmis'
       if (!user) {
         await User.createUser(uid, fullname)
       } else {

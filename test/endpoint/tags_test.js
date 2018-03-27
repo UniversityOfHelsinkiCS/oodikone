@@ -41,6 +41,7 @@ test('all tags can be fetched', async t => {
   const res = await api
     .get('/api/tags')
     .set('x-access-token', token)
+    .set('uid', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
   t.is(res.body.length, 6)
@@ -50,6 +51,7 @@ test('tag can be added to a group of students', async t => {
   let res = await api
     .get(`/api/students/${students[0].studentnumber}`)
     .set('x-access-token', token)
+    .set('uid', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
   t.is(res.body.tags.length, 5)
@@ -58,12 +60,14 @@ test('tag can be added to a group of students', async t => {
     .post(`/api/tags/${tags[5].tagname}`)
     .send(students.map(st => st.studentnumber))
     .set('x-access-token', token)
+    .set('uid', uid)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
   res = await api
     .get(`/api/students/${students[0].studentnumber}`)
     .set('x-access-token', token)
+    .set('uid', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
   t.is(res.body.tags.length, 6)
