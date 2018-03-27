@@ -26,7 +26,7 @@ router.get('/login', async (req, res) => {
     const uid = req.headers['uid']
     if (req.headers['shib-session-id'] && uid) {
       const user = await User.byUsername(uid)
-      const fullname = req.headers.displayname || 'Shib Valmis'
+      const fullname = req.headers.displayName || 'Shib Valmis'
       if (!user) {
         await User.createUser(uid, fullname)
       } else {
@@ -34,6 +34,7 @@ router.get('/login', async (req, res) => {
       }
       generateToken(uid, res)
     } else {
+      console.log('HEADERS', req.headers.uid, req.headers['shib-session-id'])
       res.status(401).json({ message: 'Not enough headers login' }).end()
     }
   } catch (err) {
