@@ -69,7 +69,6 @@ test('tag can be added to a group of students', async t => {
   t.is(res.body.tags.length, 6)
 })
 
-
 test('should pong when pinged', async t => {
   const res = await api
     .get('/ping')
