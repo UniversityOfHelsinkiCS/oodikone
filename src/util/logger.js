@@ -2,8 +2,8 @@ const winston = require('winston')
 require('winston-papertrail').Papertrail
 
 const winstonPapertrail = new winston.transports.Papertrail({
-  host: 'logs4.papertrailapp.com',
-  port: 24439
+  host: process.env.PAPERTRAIL_HOST,
+  port: process.env.PAPERTRAIL_PORT
 })
 
 winstonPapertrail.on('error', function (err) {

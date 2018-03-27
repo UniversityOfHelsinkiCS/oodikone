@@ -34,8 +34,7 @@ router.get('/login', async (req, res) => {
       }
       generateToken(uid, res)
     } else {
-      console.log('HEADERS', req.headers.uid, req.headers['shib-session-id'])
-      res.status(401).json({ message: 'Not enough headers login' }).end()
+      res.status(401).json({ message: `Not enough headers login, uid: ${req.headers.uid} session-id ${req.headers['shib-session-id']}` }).end()
     }
   } catch (err) {
     res.status(401).json({ message: 'problem with login', err })
