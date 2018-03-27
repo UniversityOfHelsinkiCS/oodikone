@@ -1,11 +1,12 @@
 import axios from 'axios'
 import { API_BASE_PATH } from '../constants'
+import { checkAuth } from '../api/auth'
 
 const isDevEnv = process.env.NODE_ENV === 'development'
 
 const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
 
-const callApi = (url, method = 'get', data) => {
+const callApi = async (url, method = 'get', data) => {
   const options = {
     headers: {
       'x-access-token': localStorage.getItem('oodi_token')
@@ -16,6 +17,7 @@ const callApi = (url, method = 'get', data) => {
     options.headers.eduPersonPrincipalName = `${devUser}@ad.helsinki.fi`
     options.headers['shib-session-id'] = 'mock-session'
   }
+  await checkAuth()
   switch (method) {
     case 'get':
       return getAxios().get(url, options)

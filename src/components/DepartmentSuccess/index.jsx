@@ -11,6 +11,7 @@ import MulticolorBarChart from '../MulticolorBarChart'
 import ScrollableDateSelector from '../ScrollableDateSelector'
 import { reformatDate } from '../../common'
 import SegmentDimmer from '../SegmentDimmer'
+import Timeout from '../Timeout'
 
 import sharedStyles from '../../styles/shared'
 
@@ -38,12 +39,6 @@ const isInArrayLimits = (amount, index, arrayLenght) =>
     || (index === arrayLenght - 1 && amount === MOVE_RIGHT_AMOUNT))
 
 class DepartmentSuccess extends Component {
-  static propTypes = {
-    chartData: arrayOf(object).isRequired,
-    translate: func.isRequired,
-    getDepartment: func.isRequired
-  }
-
   state = {
     selectorDates: [],
     selectedDate: {
@@ -56,8 +51,7 @@ class DepartmentSuccess extends Component {
   componentDidMount() {
     const selectorDates = getSelectorDates(FIRST_DATE)
     const selectedDate = selectorDates[0]
-    this.timeout = undefined
-    this.setLoading({ selectorDates, selectedDate })
+    this.setState({ isLoading: true, selectorDates, selectedDate })
     this.getChartData(selectedDate)
   }
 
@@ -90,14 +84,14 @@ class DepartmentSuccess extends Component {
 
   setLoading = (state) => {
     this.setState(state)
-    this.timeout = setTimeout(() => {
+    this.props.setTimeout('loadingIcon', () => {
       this.setState({ isLoading: true })
     }, 250)
   }
 
   getChartData = (selectedDate) => {
     this.props.getDepartment(selectedDate.value).then(() => {
-      clearTimeout(this.timeout)
+      this.props.clearTimeout('loadingIcon')
       this.setState({ isLoading: false })
     })
   }
@@ -129,6 +123,14 @@ class DepartmentSuccess extends Component {
   }
 }
 
+DepartmentSuccess.propTypes = {
+  chartData: arrayOf(object).isRequired,
+  translate: func.isRequired,
+  getDepartment: func.isRequired,
+  setTimeout: func.isRequired,
+  clearTimeout: func.isRequired
+}
+
 const mapStateToProps = ({ locale, department }) => ({
   chartData: createChartData(department.data),
   translate: getTranslate(locale),
@@ -140,4 +142,4 @@ const mapDispatchToProps = dispatch => ({
     dispatch(getDepartmentSuccess(date))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(DepartmentSuccess)
+export default connect(mapStateToProps, mapDispatchToProps)(Timeout(DepartmentSuccess))
