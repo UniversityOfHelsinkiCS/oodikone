@@ -59,7 +59,7 @@ test.skip('populations can be searched by a searchterm', async t => {
     .get('/api/departmentsuccess')
     .query({ date: '2005.08.01' })
     .set('x-access-token', token)
-    .set('eduPersonPrincipalName', uid)
+    .set('uid', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
   console.log(res.body)

@@ -59,7 +59,7 @@ test('courses can be searched by a searchterm', async t => {
     .get('/api/courses')
     .query({ name: selectedCourse.name })
     .set('x-access-token', token)
-    .set('eduPersonPrincipalName', uid)
+    .set('uid', uid)
   t.is(res.status, 200)
   t.truthy(res.body.length > 0, 'res body was empty')
   const foundCourse = res.body.find(course => course.id === selectedCourse.id)
@@ -75,7 +75,7 @@ test('instances of a course can be fetched', async t => {
     .post('/api/courselist')
     .send(selectedCourse)
     .set('x-access-token', token)
-    .set('eduPersonPrincipalName', uid)
+    .set('uid', uid)
   t.is(res.status, 200)
 
   const instances = res.body
@@ -95,7 +95,7 @@ test('statistics of an instance can be fetched', async t => {
     .post('/api/coursestatistics')
     .send(request)
     .set('x-access-token', token)
-    .set('eduPersonPrincipalName', uid)
+    .set('uid', uid)
   t.is(res.status, 200)
 
   const stats = res.body
