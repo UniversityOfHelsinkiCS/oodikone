@@ -11,6 +11,8 @@ const checkAuth = async (req, res, next) => {
 
   const token = req.headers['x-access-token']
   const uidHeader = req.headers[uidHeaderName] || req.headers[uidHeaderName.toLowerCase()]
+  console.log('uidHeader: ', uidHeader)
+  console.log('headers: ', req.headers)
   console.log('checkAuth')
   if (token) {
     jwt.verify(token, conf.TOKEN_SECRET, (err, decoded) => {
