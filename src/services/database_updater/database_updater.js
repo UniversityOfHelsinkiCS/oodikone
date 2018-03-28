@@ -298,7 +298,7 @@ const loadAndUpdateStudent = async studentNumber => {
 
 const run = async () => {
   const STUDENT_SET_KEY = process.env.STUDENT_SET || 'cached_students'
-  const STEP = process.env.STEP || 500 
+  const STEP = process.env.STEP || 1000 
   const FROM = process.env.UPDATE_STUDENTS_FROM 
   const TO = process.env.UPDATE_STUDENTS_TO    
 
@@ -337,6 +337,7 @@ const run = async () => {
   } 
 
   logger.info(stats)
+  logger.info('update completed')
 
   process.exit(0)
  
