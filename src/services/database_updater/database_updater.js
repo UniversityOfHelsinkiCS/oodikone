@@ -300,7 +300,7 @@ const run = async () => {
   const STUDENT_SET_KEY = process.env.STUDENT_SET || 'cached_students'
   const STEP = process.env.STEP || 500 
   const FROM = process.env.UPDATE_STUDENTS_FROM 
-  const TO = process.env.UPDATE_STUDENTS_TO     
+  const TO = process.env.UPDATE_STUDENTS_TO    
 
   const stats = {
     studyRights: 0,
@@ -318,17 +318,18 @@ const run = async () => {
   logger.info(cached.student_numbers.length, 'students numbers in range', cached.description, limit)
 
   for (let i = 0; i < cached.student_numbers.length; i++) {
-    if (i % STEP === 1) {
-      logger.info('Running student number ', i)
-    }
-
     const student_number = cached.student_numbers[i]
 
+    if (i % STEP === 1) {
+      logger.info('Running student', i, 'number', cached.student_numbers[i])
+    }
+
+    console.log(FROM && TO && (FROM > Number(student_number) || TO < Number(student_number)))
     if ( FROM && TO && (FROM > Number(student_number) || TO < Number(student_number))) {
       continue
     }
 
-    const [studyRights, credits] = await updateStudentInformation(student_number)
+    const [ studyRights, credits ] = await updateStudentInformation(student_number)
     
     stats.studyRights += studyRights
     stats.credits += credits
