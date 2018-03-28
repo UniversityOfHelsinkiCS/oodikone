@@ -23,12 +23,10 @@ const generateToken = async (uid, res) => {
 
 router.get('/login', async (req, res) => {
   try {
-    const uidHeaderName = 'eduPersonPrincipalName'
-    const uidHeader = req.headers[uidHeaderName] || req.headers[uidHeaderName.toLowerCase()]
-    if (req.headers['shib-session-id'] && uidHeader) {
-      const uid = uidHeader.split('@')[0]
+    const uid = req.headers['uid']
+    if (req.headers['shib-session-id'] && uid) {
       const user = await User.byUsername(uid)
-      const fullname = req.headers.givenname || 'Shib Valmis'
+      const fullname = req.headers.displayName || 'Shib Valmis'
       if (!user) {
         await User.createUser(uid, fullname)
       } else {
@@ -36,7 +34,7 @@ router.get('/login', async (req, res) => {
       }
       generateToken(uid, res)
     } else {
-      res.status(401).json({ message: 'Not enough headers login' }).end()
+      res.status(401).json({ message: `Not enough headers login, uid: ${req.headers.uid} session-id ${req.headers['shib-session-id']}` }).end()
     }
   } catch (err) {
     res.status(401).json({ message: 'problem with login', err })

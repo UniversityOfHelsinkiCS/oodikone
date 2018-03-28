@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { getDate } = require('./database_updater/oodi_data_mapper')
-const { Student, Credit, CourseInstance, Course, TagStudent, Tag, sequelize } = require('../models')
+const { Student, Credit, CourseInstance, Course, TagStudent, Tag } = require('../models')
 const Op = Sequelize.Op
 
 const createStudent = (array) => {
@@ -213,12 +213,12 @@ const findTagOf = (id, tag) => {
 }
 
 const deleteTagStudent = (id, tagname) => {
-  return sequelize.query(
-    `DELETE 
-      FROM tag_student 
-      WHERE taggedstudents_studentnumber = '${id}' 
-      AND tags_tagname = '${tagname}'`
-  )
+  return TagStudent.destroy({
+    where: {
+      taggedstudents_studentnumber: id,
+      tags_tagname: tagname
+    }
+  })
 }
 
 async function bySearchTerm(term) {
@@ -280,13 +280,14 @@ async function addTag(id, tagname) {
 
 async function deleteTag(id, tagname) {
   try {
+    console.log(id, tagname)
     const tag = await findTagOf(id, tagname)
+
     if (tag === null) {
       return {
         error: `tag '${tagname}' is not assosiated with student '${id}'`
       }
     }
-
     await deleteTagStudent(id, tagname)
     return {}
   } catch (e) {

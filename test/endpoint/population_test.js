@@ -43,7 +43,7 @@ test('populations can be searched by a searchterm', async t => {
     .get('/api/studyrightkeywords')
     .query({ search: 'computer Science' })
     .set('x-access-token', token)
-    .set('eduPersonPrincipalName', uid)
+    .set('uid', uid)
 
   t.is(res.status, 200)
   t.is(res.body.length, 40)
@@ -54,7 +54,7 @@ test('enrollment dates can be fetched', async t => {
   const res = await api
     .get('/api/enrollmentdates')
     .set('x-access-token', token)
-    .set('eduPersonPrincipalName', uid)
+    .set('uid', uid)
 
   t.is(res.status, 200)
   t.is(res.body.length, 722)
@@ -84,7 +84,7 @@ test('new api populations can be fetched', async t => {
       studyRights: unit.id
     })
     .set('x-access-token', token)
-    .set('eduPersonPrincipalName', uid)
+    .set('uid', uid)
 
   t.is(res.status, 200)
   const stats = res.body
@@ -101,7 +101,7 @@ test.skip('multiple population studyrights can be fetched', async t => {
       studyRights: ['2', '1']
     })
     .set('x-access-token', token)
-    .set('eduPersonPrincipalName', uid)
+    .set('uid', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -119,7 +119,7 @@ test.skip('population statics with wrong semester results in bad request', async
       studyRights: '500-K005'
     })
     .set('x-access-token', token)
-    .set('eduPersonPrincipalName', uid)
+    .set('uid', uid)
     .expect(400)
     .expect('Content-Type', /application\/json/)
 
@@ -137,7 +137,7 @@ test.skip('population statics with wrong semester results in bad request', async
       studyRights: '[Huolissaanolon maisteriohjelma, 500-K005]'
     })
     .set('x-access-token', token)
-    .set('eduPersonPrincipalName', uid)
+    .set('uid', uid)
     .expect(400)
     .expect('Content-Type', /application\/json/)
 
@@ -151,7 +151,7 @@ test.skip('population statics without a proper queryresults in bad request', asy
     .get('/api/populationstatistics')
     .query({ myName: 'Jeff' })
     .set('x-access-token', token)
-    .set('eduPersonPrincipalName', uid)
+    .set('uid', uid)
     .expect(400)
     .expect('Content-Type', /application\/json/)
 

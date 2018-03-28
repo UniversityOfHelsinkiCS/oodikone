@@ -32,7 +32,7 @@ test('should pong when pinged', async t => {
 test('login does not allow without required headers', async t => {
   const res = api
     .get('/api/login')
-    .set('eduPersonPrincipalName', 'uid')
+    .set('uid', 'uid')
 
   const res2 = api
     .get('/api/login')
@@ -47,9 +47,9 @@ test('login creates an user', async t => {
 
   const res = await api
     .get('/api/login')
-    .set('eduPersonPrincipalName', `${user.username}@hulsinki.hic`)
+    .set('uid', user.username)
     .set('shib-session-id', 'sessioniddiibadaaba')
-    .set('givenname', user.full_name)
+    .set('displayname', user.full_name)
 
   t.is(res.status, 401)
   const foundUser = await User.find({ where: { username: user.username } })
@@ -65,9 +65,9 @@ test('login fetches an user but validates enabled field', async t => {
 
   const res = await api
     .get('/api/login')
-    .set('eduPersonPrincipalName', `${user.username}@hulsinki.hic`)
+    .set('uid', user.username)
     .set('shib-session-id', 'sessioniddiibadaaba')
-    .set('givenname', user.full_name)
+    .set('displayname', user.full_name)
 
   t.is(res.status, 401)
 })
@@ -79,9 +79,9 @@ test('login fetches an user and returns token to enabled', async t => {
 
   const res = await api
     .get('/api/login')
-    .set('eduPersonPrincipalName', `${user.username}@hulsinki.hic`)
+    .set('uid', user.username)
     .set('shib-session-id', 'sessioniddiibadaaba')
-    .set('givenname', user.full_name)
+    .set('displayname', user.full_name)
 
   t.is(res.status, 200)
   t.truthy(res.body.token, `Token did not exist in body: ${res.body}`)
