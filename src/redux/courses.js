@@ -12,7 +12,7 @@ const reducer = (state = { data: [] }, action) => {
       return {
         pending: true,
         selected: state.selected,
-        data: []
+        data: state.data
       }
     case 'FIND_COURSES_FAILURE':
       return {
