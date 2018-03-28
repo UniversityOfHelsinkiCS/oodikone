@@ -320,12 +320,12 @@ const run = async () => {
   for (let i = 0; i < cached.student_numbers.length; i++) {
     const student_number = cached.student_numbers[i]
 
-    if (i % STEP === 1) {
-      logger.info('Running student', i, 'number', cached.student_numbers[i])
-    }
-
     if ( FROM && TO && (FROM > Number(student_number) || TO < Number(student_number))) {
       continue
+    }
+
+    if (i % STEP === 1) {
+      logger.info('Running student', i, 'number', cached.student_numbers[i])
     }
 
     const [ studyRights, credits ] = await updateStudentInformation(student_number)
