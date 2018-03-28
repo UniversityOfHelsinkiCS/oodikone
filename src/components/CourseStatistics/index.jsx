@@ -35,39 +35,37 @@ const calculateStd = (ave, data) => {
   return Math.sqrt(variation)
 }
 
+const parseInformationFromData = (data) => {
+  const information = {
+    n: data.length,
+    min: 0,
+    max: 0,
+    median: 0,
+    ave: 0,
+    std: 0,
+    data: []
+  }
+  if (information.n > 0) {
+    const sortedData = data.sort(sortByValue)
+    information.min = sortedData[0].value
+    information.max = sortedData[sortedData.length - 1].value
+    information.median = sortedData[Math.floor(sortedData.length / 2)].value
+    information.ave = calculateAve(sortedData)
+    information.std = calculateStd(information.ave, sortedData)
+    information.data = sortedData
+  }
+  return information
+}
 const CourseStatistics = ({ stats, courseName, instanceDate }) => {
   if (stats !== undefined) {
-    const dataAll = createChartData(stats.all).sort(sortByValue)
-    const dataPassed = createChartData(stats.pass).sort(sortByValue)
-    const dataFailed = createChartData(stats.fail).sort(sortByValue)
-    const allN = dataAll.length
-    const passN = dataPassed.length
-    const failN = dataFailed.length
-    const mins = [
-      dataAll[0].value,
-      dataPassed[0].value,
-      dataFailed[0].value
-    ]
-    const maxs = [
-      dataAll[dataAll.length - 1].value,
-      dataPassed[dataPassed.length - 1].value,
-      dataFailed[dataFailed.length - 1].value
-    ]
-    const medians = [
-      dataAll[Math.floor(dataAll.length / 2)].value,
-      dataPassed[Math.floor(dataPassed.length / 2)].value,
-      dataFailed[Math.floor(dataFailed.length / 2)].value
-    ]
-    const aves = [
-      calculateAve(dataAll),
-      calculateAve(dataPassed),
-      calculateAve(dataFailed)
-    ]
-    const stds = [
-      calculateStd(aves[0], dataAll),
-      calculateStd(aves[1], dataPassed),
-      calculateStd(aves[2], dataFailed)
-    ]
+    const dataAll = parseInformationFromData(createChartData(stats.all))
+    const dataPass = parseInformationFromData(createChartData(stats.pass))
+    const dataFail = parseInformationFromData(createChartData(stats.fail))
+    const mins = [dataAll.min, dataPass.min, dataFail.min]
+    const maxs = [dataAll.max, dataPass.max, dataFail.max]
+    const aves = [dataAll.ave, dataPass.ave, dataFail.ave]
+    const medians = [dataAll.median, dataPass.median, dataFail.median]
+    const stds = [dataAll.std, dataPass.std, dataFail.std]
     return (
       <Grid columns="equal">
         <Grid.Row>
@@ -80,13 +78,13 @@ const CourseStatistics = ({ stats, courseName, instanceDate }) => {
                 <Table.Row>
                   <Table.HeaderCell />
                   <Table.HeaderCell>
-                    All (n={allN})
+                    All (n={dataAll.n})
                   </Table.HeaderCell>
                   <Table.HeaderCell>
-                    Passed (n={passN}, {((passN / allN) * 100).toFixed(1)}%)
+                    Passed (n={dataPass.n}, {((dataPass.n / dataAll.n) * 100).toFixed(1)}%)
                   </Table.HeaderCell>
                   <Table.HeaderCell>
-                    Failed (n={failN}, {((failN / allN) * 100).toFixed(1)}%)
+                    Failed (n={dataFail.n}, {((dataFail.n / dataAll.n) * 100).toFixed(1)}%)
                   </Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
@@ -102,13 +100,13 @@ const CourseStatistics = ({ stats, courseName, instanceDate }) => {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column key="1">
-            <MulticolorBarChart chartTitle="All" chartData={dataAll} />
+            <MulticolorBarChart chartTitle="All" chartData={dataAll.data} />
           </Grid.Column>
           <Grid.Column key="2">
-            <MulticolorBarChart chartTitle="Passed" chartData={dataPassed} />
+            <MulticolorBarChart chartTitle="Passed" chartData={dataPass.data} />
           </Grid.Column>
           <Grid.Column key="3">
-            <MulticolorBarChart chartTitle="Failed" chartData={dataFailed} />
+            <MulticolorBarChart chartTitle="Failed" chartData={dataFail.data} />
           </Grid.Column>
         </Grid.Row>
       </Grid>
