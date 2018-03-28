@@ -187,7 +187,7 @@ CreditAccumulationGraph.propTypes = {
   translate: func.isRequired,
   students: arrayOf(object).isRequired,
   title: string.isRequired,
-  history: shape(object).isRequired
+  history: shape({}).isRequired
 }
 
 export default withRouter(CreditAccumulationGraph)
