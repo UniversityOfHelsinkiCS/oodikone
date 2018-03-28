@@ -63,12 +63,21 @@ class Courses extends Component {
     this.props.findCourseInstances(courseCode)
   }
 
-  fetchInstanceStatistics = (courseInstance) => {
-    const query = { ...courseInstance, months: 12, course: this.state.selectedCourse }
+  fetchInstanceStatistics = (e, { value: courseInstanceId }) => {
+    const { selectedCourse } = this.state
+    const courseInstance = this.props.courseInstances
+      .find(instance => instance.id === courseInstanceId)
+    const query = {
+      id: courseInstance.id,
+      date: courseInstance.date,
+      code: selectedCourse.code,
+      months: 12,
+      course: selectedCourse
+    }
     this.props.getCourseInstanceStatistics(query)
   }
 
-  removeInstance = (courseInstance) => {
+  removeInstance = () => (courseInstance) => {
     const { selectedInstances } = this.state
     this.setState({ selectedInstances: selectedInstances.filter(i => i !== courseInstance) })
   }
@@ -78,30 +87,24 @@ class Courses extends Component {
     const { courseInstances, selectedInstances } = this.props
     const courseList = this.props.courseList.map(course => ({ ...course, key: `${course.name}-${course.code}` }))
 
-    const instanceList = []
-    if (courseInstances !== undefined) {
-      courseInstances.forEach(i => instanceList.push({
-        key: i.id,
-        text: `${i.date} (${i.students} students)`,
-        value: {
-          id: i.id, date: i.date, code: selectedCourse.code
-        }
-      }))
-    }
+    const instanceList = courseInstances ? courseInstances.map(instance => ({
+      key: instance.id,
+      text: `${instance.date} (${instance.students} students)`,
+      value: instance.id
+    })) : []
 
     const listInstance = selectedInstances.map(instance => (
       <List.Item>
         <List.Header>
           {instance.course.name} ({instance.code})
           <List.Content floated="right">
-            <Button size="mini" value={instance} onClick={() => this.removeInstance(instance)}>remove</Button>
+            <Button size="mini" value={instance} onClick={this.removeInstance(instance)}>remove</Button>
           </List.Content>
         </List.Header>
         {instance.date}
       </List.Item>))
 
     // const t = this.props.translate;
-
     return (
       <div className={styles.container}>
         <Search
@@ -121,7 +124,7 @@ class Courses extends Component {
 
         <Dropdown
           className={styles.courseSearch}
-          onChange={(e, data) => this.fetchInstanceStatistics(data.value)}
+          onChange={this.fetchInstanceStatistics}
           placeholder="Select course instance"
           fluid
           selection
