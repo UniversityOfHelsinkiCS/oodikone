@@ -4,6 +4,7 @@ import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import PropTypes from 'prop-types'
 import { Search, Dropdown, Header, List, Button } from 'semantic-ui-react'
 import CourseStatistics from '../CourseStatistics'
+import Timeout from '../Timeout'
 
 import { findCourses } from '../../redux/courses'
 import { findCourseInstances, getCourseInstanceStatistics } from '../../redux/courseInstances'
@@ -43,13 +44,15 @@ class Courses extends Component {
   }
 
 
-  handleSearchChange = (e, { value }) => {
-    this.setState({ searchStr: value })
-    this.fetchCoursesList()
+  handleSearchChange = (e, { value: searchStr }) => {
+    this.props.clearTimeout('search')
+    this.setState({ searchStr })
+    this.props.setTimeout('search', () => {
+      this.fetchCoursesList(searchStr)
+    }, 250)
   }
 
-  fetchCoursesList = () => {
-    const { searchStr } = this.state
+  fetchCoursesList = (searchStr) => {
     this.setState({ isLoading: true })
     this.props.findCourses(searchStr)
       .then(() => this.setState({ isLoading: false }))
@@ -146,7 +149,9 @@ Courses.propTypes = {
   getCourseInstanceStatistics: func.isRequired,
   courseList: arrayOf(object).isRequired,
   selectedInstances: arrayOf(object).isRequired,
-  courseInstances: arrayOf(object).isRequired
+  courseInstances: arrayOf(object).isRequired,
+  setTimeout: func.isRequired,
+  clearTimeout: func.isRequired
   // translate: func.isRequired
 }
 
@@ -170,4 +175,4 @@ const mapDispatchToProps = dispatch => ({
     dispatch(getCourseInstanceStatistics(query))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Courses)
+export default connect(mapStateToProps, mapDispatchToProps)(Timeout(Courses))
