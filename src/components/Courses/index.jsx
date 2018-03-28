@@ -7,7 +7,7 @@ import CourseStatistics from '../CourseStatistics'
 import Timeout from '../Timeout'
 
 import { findCourses } from '../../redux/courses'
-import { findCourseInstances, getCourseInstanceStatistics } from '../../redux/courseInstances'
+import { findCourseInstances, getCourseInstanceStatistics, removeInstance } from '../../redux/courseInstances'
 
 import styles from './courses.css'
 
@@ -24,16 +24,14 @@ class Courses extends Component {
   state = {
     isLoading: false,
     searchStr: '',
-    selectedCourse: { name: 'No course', code: 'No code' },
-    selectedInstances: []
+    selectedCourse: { name: 'No course', code: 'No code' }
   }
 
   resetComponent = () => {
     this.setState({
       isLoading: false,
       searchStr: '',
-      selectedCourse: { name: 'No course', code: 'No code' },
-      selectedInstances: []
+      selectedCourse: { name: 'No course', code: 'No code' }
     })
   }
 
@@ -42,7 +40,6 @@ class Courses extends Component {
       this.fetchCourseInstances()
     })
   }
-
 
   handleSearchChange = (e, { value: searchStr }) => {
     this.props.clearTimeout('search')
@@ -77,9 +74,8 @@ class Courses extends Component {
     this.props.getCourseInstanceStatistics(query)
   }
 
-  removeInstance = () => (courseInstance) => {
-    const { selectedInstances } = this.state
-    this.setState({ selectedInstances: selectedInstances.filter(i => i !== courseInstance) })
+  removeInstance = instance => () => {
+    this.props.removeInstance(instance.id)
   }
 
   render() {
@@ -96,7 +92,7 @@ class Courses extends Component {
     const listInstance = selectedInstances.map(instance => (
       <List.Item key={instance.id}>
         <List.Header>
-          {instance.course.name} ({instance.code})
+          {instance.course.name} ({instance.course.code})
           <List.Content floated="right">
             <Button size="mini" value={instance} onClick={this.removeInstance(instance)}>remove</Button>
           </List.Content>
@@ -153,6 +149,7 @@ Courses.propTypes = {
   findCourses: func.isRequired,
   findCourseInstances: func.isRequired,
   getCourseInstanceStatistics: func.isRequired,
+  removeInstance: func.isRequired,
   courseList: arrayOf(object).isRequired,
   selectedInstances: arrayOf(object).isRequired,
   courseInstances: arrayOf(object).isRequired,
@@ -178,7 +175,10 @@ const mapDispatchToProps = dispatch => ({
     dispatch(findCourseInstances(code)),
 
   getCourseInstanceStatistics: query =>
-    dispatch(getCourseInstanceStatistics(query))
+    dispatch(getCourseInstanceStatistics(query)),
+
+  removeInstance: instance =>
+    dispatch(removeInstance(instance))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Timeout(Courses))
