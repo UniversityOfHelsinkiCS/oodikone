@@ -72,7 +72,9 @@ class Courses extends Component {
 
   render() {
     const { isLoading, searchStr, selectedCourse } = this.state
-    const { courseList, courseInstances, selectedInstances } = this.props
+    const { courseInstances, selectedInstances } = this.props
+    const courseList = this.props.courseList.map(course => ({ ...course, key: `${course.name}-${course.code}` }))
+
     const instanceList = []
     if (courseInstances !== undefined) {
       courseInstances.forEach(i => instanceList.push({
