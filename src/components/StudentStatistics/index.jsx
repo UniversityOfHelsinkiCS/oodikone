@@ -10,18 +10,6 @@ import StudentDetails from '../StudentDetails'
 import sharedStyles from '../../styles/shared'
 
 class StudentStatistics extends PureComponent {
-  static propTypes = {
-    translate: func.isRequired,
-    match: shape({
-      params: { studentNumber: string }
-    })
-  }
-  static defaultProps = {
-    match: shape({
-      params: { studentNumber: undefined }
-    })
-  }
-
   render() {
     const { translate, match } = this.props
     const { studentNumber } = match.params
@@ -35,6 +23,21 @@ class StudentStatistics extends PureComponent {
         </Segment>
       </div>
     )
+  }
+}
+
+StudentStatistics.propTypes = {
+  translate: func.isRequired,
+  match: shape({
+    params: shape({
+      studentNumber: string
+    })
+  })
+}
+
+StudentStatistics.defaultProps = {
+  match: {
+    params: { studentNumber: undefined }
   }
 }
 
