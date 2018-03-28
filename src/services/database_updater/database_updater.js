@@ -324,7 +324,7 @@ const run = async () => {
       logger.info('Running student', i, 'number', cached.student_numbers[i])
     }
 
-    console.log(FROM && TO && (FROM > Number(student_number) || TO < Number(student_number)))
+    console.log(FROM, TO, Number(student_number), FROM && TO && (FROM > Number(student_number) || TO < Number(student_number)))
     if ( FROM && TO && (FROM > Number(student_number) || TO < Number(student_number))) {
       continue
     }
