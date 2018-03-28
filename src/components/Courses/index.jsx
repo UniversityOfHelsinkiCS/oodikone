@@ -94,7 +94,7 @@ class Courses extends Component {
     })) : []
 
     const listInstance = selectedInstances.map(instance => (
-      <List.Item>
+      <List.Item key={instance.id}>
         <List.Header>
           {instance.course.name} ({instance.code})
           <List.Content floated="right">
@@ -135,11 +135,14 @@ class Courses extends Component {
           {listInstance}
         </List>
 
-        {selectedInstances.map(i => (<CourseStatistics
-          courseName={i.course.name}
-          instanceDate={i.date}
-          stats={i.statistics}
-        />))}
+        {selectedInstances.map(i => (
+          <CourseStatistics
+            key={i.id}
+            courseName={i.course.name}
+            instanceDate={i.date}
+            stats={i.statistics}
+          />
+        ))}
 
       </div>
     )
