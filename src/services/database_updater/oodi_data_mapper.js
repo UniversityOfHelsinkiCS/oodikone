@@ -45,11 +45,9 @@ const getOrganisationFromData = (data) => {
   return organisation
 }
 
-const getCourseCreditsFromData = (data) => {
-  let courseCredits = []
-  let course
-  data['data'].forEach((courseData) => {
-    course = {
+const getCourseCreditsFromData = (data) => 
+  data['data'].map((courseData) => {
+    return {
       credits: courseData[3],
       grade: courseData[4],
       status: courseData[5],
@@ -63,11 +61,7 @@ const getCourseCreditsFromData = (data) => {
         }
       }
     }
-    courseCredits.push(course)
-    course = []
   })
-  return courseCredits
-}
 
 const getStudentNumbersFromProgramData = (data) => {
   let studentNumbers = []
@@ -104,7 +98,12 @@ const getTeachersAndRolesFromData = (teacherDetailData) => {
 }
 
 module.exports = {
-  getStudentFromData, getStudyRightIdStrings, getStudyRightFromData,
-  getOrganisationFromData, getCourseCreditsFromData, getStudentNumbersFromProgramData, getDate,
+  getStudentFromData, 
+  getStudyRightIdStrings, 
+  getStudyRightFromData,
+  getOrganisationFromData, 
+  getCourseCreditsFromData, 
+  getStudentNumbersFromProgramData, 
+  getDate,
   getTeachersAndRolesFromData
 }
