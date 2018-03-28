@@ -19,7 +19,7 @@ const reducer = (state = { data: [], selected: [] }, action) => {
       return {
         pending: true,
         selected: state.selected,
-        data: state.data.filter(instance => !instance.statistics)
+        data: [] // state.data.filter(instance => instance.statistics)
       }
     case 'FIND_COURSE_INSTANCES_FAILURE':
       return {
