@@ -51,7 +51,8 @@ const parseInformationFromData = (data) => {
     information.max = sortedData[sortedData.length - 1].value
     information.median = sortedData[Math.floor(sortedData.length / 2)].value
     information.ave = calculateAve(sortedData)
-    information.std = calculateStd(information.ave, sortedData)
+    information.std = Math.round(calculateStd(information.ave, sortedData) * 100) / 100
+    information.ave = Math.round(information.ave * 100) / 100
     information.data = sortedData
   }
   return information
