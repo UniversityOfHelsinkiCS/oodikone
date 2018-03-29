@@ -3,11 +3,17 @@ const User = require('../services/users')
 const jwt = require('jsonwebtoken')
 const conf = require('../conf-backend')
 
+const admin = ['totutotu', 'tktl', 'mluukkai', 'mitiai', 'ttuotila', 'jakousa']
+
 const generateToken = async (uid, res) => {
   const model = await User.byUsername(uid)
   const user = model.dataValues
   if (user.is_enabled) {
-    const payload = { userId: uid, name: user.full_name }
+    const payload = { 
+      userId: uid, 
+      name: user.full_name,
+      admin: admin.includes(uid)
+    }
     const token = jwt.sign(payload, conf.TOKEN_SECRET, {
       expiresIn: '24h'
     })
