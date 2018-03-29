@@ -6,7 +6,7 @@ import { API_BASE_PATH } from '../constants'
 const TOKEN_NAME = 'token'
 const isDevEnv = process.env.NODE_ENV === 'development'
 const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
-const tokenExpired = token => jwtDecode(token).exp > new Date().getTime()
+const tokenExpired = token => jwtDecode(token).exp < (new Date().getTime() / 1000)
 
 const checkAuth = async (options) => {
   const auth = {}
