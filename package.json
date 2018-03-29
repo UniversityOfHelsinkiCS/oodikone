@@ -70,6 +70,7 @@
     "babel-polyfill": "^6.26.0",
     "dotenv": "4.0.0",
     "jStat": "^1.7.1",
+    "jwt-decode": "^2.2.0",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
     "prop-types": "^15.6.0",

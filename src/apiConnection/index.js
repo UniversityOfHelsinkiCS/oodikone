@@ -1,25 +1,36 @@
 import axios from 'axios'
-import { API_BASE_PATH } from '../constants'
-import { checkAuth } from '../api/auth'
+
+import { decodeToken } from '../common'
+import { API_BASE_PATH, TOKEN_NAME } from '../constants'
 
 const isDevEnv = process.env.NODE_ENV === 'development'
+const devOptions = {
+  headers: {
+    uid: 'tktl',
+    displayName: 'Development Käyttäjä',
+    'shib-session-id': 'mock-session'
+  }
+}
 
 const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
+const tokenExpired = token => decodeToken(token).exp < (new Date().getTime() / 1000)
+
+export const checkAuth = async () => {
+  const options = isDevEnv ? devOptions : null
+  const token = localStorage.getItem(TOKEN_NAME)
+  if (!token || tokenExpired(token)) {
+    const response = await getAxios().get('/login', options)
+    localStorage.setItem(TOKEN_NAME, response.data.token)
+    return response.data.token
+  }
+  return token
+}
 
 const callApi = async (url, method = 'get', data) => {
-  const options = {
-    headers: {
-      'x-access-token': localStorage.getItem('oodi_token')
-    }
-  }
-  if (isDevEnv) {
-    const uid = 'tktl'
-    const displayName = 'Development Käyttäjä'
-    options.headers.uid = uid
-    options.headers.displayName = displayName
-    options.headers['shib-session-id'] = 'mock-session'
-  }
-  await checkAuth()
+  const options = isDevEnv ? devOptions : { headers: {} }
+  const token = await checkAuth()
+  options.headers['x-access-token'] = token
+
   switch (method) {
     case 'get':
       return getAxios().get(url, options)
@@ -59,4 +70,11 @@ export const handleRequest = store => next => async (action) => {
       store.dispatch({ type: `${prefix}FAILURE`, response: err, query })
     }
   }
+}
+
+export const logout = async () => {
+  // TODO: send logout request and handle it
+  // const response = await getAxios('/logout')
+  localStorage.removeItem(TOKEN_NAME)
+  window.location = '/'
 }

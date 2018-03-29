@@ -26,7 +26,7 @@ const Main = () => (
           <Route exact path={routes.students.route} component={StudentStatistics} />
           <Route exact path={routes.courses.route} component={Courses} />
           <Route exact path={routes.teachers.route} component={Teachers} />
-          <Route exact path="/users" component={EnableUsers} />
+          <Route exact path={routes.users.route} component={EnableUsers} />
         </Switch>
       </main>
     </Router>

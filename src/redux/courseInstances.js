@@ -13,13 +13,18 @@ export const getCourseInstanceStatistics = (query) => {
   return callController(route, prefix, null, 'get', query)
 }
 
+export const removeInstance = instanceId => ({
+  type: 'REMOVE_INSTANCE',
+  instanceId
+})
+
 const reducer = (state = { data: [], selected: [] }, action) => {
   switch (action.type) {
     case 'FIND_COURSE_INSTANCES_ATTEMPT':
       return {
         pending: true,
         selected: state.selected,
-        data: state.data.filter(instance => !instance.statistics)
+        data: [] // state.data.filter(instance => instance.statistics)
       }
     case 'FIND_COURSE_INSTANCES_FAILURE':
       return {
@@ -50,6 +55,8 @@ const reducer = (state = { data: [], selected: [] }, action) => {
         }
         ]
       }
+    case 'REMOVE_INSTANCE':
+      return { ...state, selected: state.selected.filter(id => id !== action.instanceId) }
     default:
       return state
   }

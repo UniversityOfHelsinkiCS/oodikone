@@ -1,15 +1,11 @@
 import React from 'react'
-import { func, arrayOf, object, number, shape } from 'prop-types'
+import { func, arrayOf, object, number, shape, string } from 'prop-types'
 import { Card, Icon } from 'semantic-ui-react'
 
 import styles from './populationQueryCard.css'
 
-const PopulationQueryCard = ({
-  translate, population, query, queryId, removeSampleFn
-}) => {
-  const {
-    uuid, studyRights, year, semester
-  } = query
+const PopulationQueryCard = ({ translate, population, query, queryId, removeSampleFn }) => {
+  const { uuid, studyRights, year, semester } = query
 
   return (
     <Card className={styles.cardContainer}>
@@ -48,7 +44,12 @@ const PopulationQueryCard = ({
 PopulationQueryCard.propTypes = {
   translate: func.isRequired,
   population: arrayOf(object).isRequired,
-  query: shape(object).isRequired,
+  query: shape({
+    year: string,
+    semester: string,
+    studyRights: arrayOf(string),
+    uuid: string
+  }).isRequired,
   queryId: number.isRequired,
   removeSampleFn: func.isRequired
 }

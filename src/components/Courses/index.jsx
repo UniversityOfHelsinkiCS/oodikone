@@ -4,9 +4,10 @@ import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import PropTypes from 'prop-types'
 import { Search, Dropdown, Header, List, Button } from 'semantic-ui-react'
 import CourseStatistics from '../CourseStatistics'
+import Timeout from '../Timeout'
 
 import { findCourses } from '../../redux/courses'
-import { findCourseInstances, getCourseInstanceStatistics } from '../../redux/courseInstances'
+import { findCourseInstances, getCourseInstanceStatistics, removeInstance } from '../../redux/courseInstances'
 
 import styles from './courses.css'
 
@@ -23,16 +24,14 @@ class Courses extends Component {
   state = {
     isLoading: false,
     searchStr: '',
-    selectedCourse: { name: 'No course', code: 'No code' },
-    selectedInstances: []
+    selectedCourse: { name: 'No course', code: 'No code' }
   }
 
   resetComponent = () => {
     this.setState({
       isLoading: false,
       searchStr: '',
-      selectedCourse: { name: 'No course', code: 'No code' },
-      selectedInstances: []
+      selectedCourse: { name: 'No course', code: 'No code' }
     })
   }
 
@@ -42,14 +41,15 @@ class Courses extends Component {
     })
   }
 
-
-  handleSearchChange = (e, { value }) => {
-    this.setState({ searchStr: value })
-    this.fetchCoursesList()
+  handleSearchChange = (e, { value: searchStr }) => {
+    this.props.clearTimeout('search')
+    this.setState({ searchStr })
+    this.props.setTimeout('search', () => {
+      this.fetchCoursesList(searchStr)
+    }, 250)
   }
 
-  fetchCoursesList = () => {
-    const { searchStr } = this.state
+  fetchCoursesList = (searchStr) => {
     this.setState({ isLoading: true })
     this.props.findCourses(searchStr)
       .then(() => this.setState({ isLoading: false }))
@@ -60,43 +60,47 @@ class Courses extends Component {
     this.props.findCourseInstances(courseCode)
   }
 
-  fetchInstanceStatistics = (courseInstance) => {
-    const query = { ...courseInstance, months: 12, course: this.state.selectedCourse }
+  fetchInstanceStatistics = (e, { value: courseInstanceId }) => {
+    const { selectedCourse } = this.state
+    const courseInstance = this.props.courseInstances
+      .find(instance => instance.id === courseInstanceId)
+    const query = {
+      id: courseInstance.id,
+      date: courseInstance.date,
+      code: selectedCourse.code,
+      months: 12,
+      course: selectedCourse
+    }
     this.props.getCourseInstanceStatistics(query)
   }
 
-  removeInstance = (courseInstance) => {
-    const { selectedInstances } = this.state
-    this.setState({ selectedInstances: selectedInstances.filter(i => i !== courseInstance) })
+  removeInstance = instance => () => {
+    this.props.removeInstance(instance.id)
   }
 
   render() {
     const { isLoading, searchStr, selectedCourse } = this.state
-    const { courseList, courseInstances, selectedInstances } = this.props
-    const instanceList = []
-    if (courseInstances !== undefined) {
-      courseInstances.forEach(i => instanceList.push({
-        key: i.id,
-        text: `${i.date} (${i.students} students)`,
-        value: {
-          id: i.id, date: i.date, code: selectedCourse.code
-        }
-      }))
-    }
+    const { courseInstances, selectedInstances } = this.props
+    const courseList = this.props.courseList.map(course => ({ ...course, key: `${course.name}-${course.code}` }))
+
+    const instanceList = courseInstances ? courseInstances.map(instance => ({
+      key: instance.id,
+      text: `${instance.date} (${instance.students} students)`,
+      value: instance.id
+    })) : []
 
     const listInstance = selectedInstances.map(instance => (
-      <List.Item>
+      <List.Item key={instance.id}>
         <List.Header>
-          {instance.course.name} ({instance.code})
+          {instance.course.name} ({instance.course.code})
           <List.Content floated="right">
-            <Button size="mini" value={instance} onClick={() => this.removeInstance(instance)}>remove</Button>
+            <Button size="mini" value={instance} onClick={this.removeInstance(instance)}>remove</Button>
           </List.Content>
         </List.Header>
         {instance.date}
       </List.Item>))
 
     // const t = this.props.translate;
-
     return (
       <div className={styles.container}>
         <Search
@@ -116,7 +120,7 @@ class Courses extends Component {
 
         <Dropdown
           className={styles.courseSearch}
-          onChange={(e, data) => this.fetchInstanceStatistics(data.value)}
+          onChange={this.fetchInstanceStatistics}
           placeholder="Select course instance"
           fluid
           selection
@@ -127,11 +131,14 @@ class Courses extends Component {
           {listInstance}
         </List>
 
-        {selectedInstances.map(i => (<CourseStatistics
-          courseName={i.course.name}
-          instanceDate={i.date}
-          stats={i.statistics}
-        />))}
+        {selectedInstances.map(i => (
+          <CourseStatistics
+            key={i.id}
+            courseName={i.course.name}
+            instanceDate={i.date}
+            stats={i.statistics}
+          />
+        ))}
 
       </div>
     )
@@ -142,9 +149,12 @@ Courses.propTypes = {
   findCourses: func.isRequired,
   findCourseInstances: func.isRequired,
   getCourseInstanceStatistics: func.isRequired,
+  removeInstance: func.isRequired,
   courseList: arrayOf(object).isRequired,
   selectedInstances: arrayOf(object).isRequired,
-  courseInstances: arrayOf(object).isRequired
+  courseInstances: arrayOf(object).isRequired,
+  setTimeout: func.isRequired,
+  clearTimeout: func.isRequired
   // translate: func.isRequired
 }
 
@@ -165,7 +175,10 @@ const mapDispatchToProps = dispatch => ({
     dispatch(findCourseInstances(code)),
 
   getCourseInstanceStatistics: query =>
-    dispatch(getCourseInstanceStatistics(query))
+    dispatch(getCourseInstanceStatistics(query)),
+
+  removeInstance: instance =>
+    dispatch(removeInstance(instance))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Courses)
+export default connect(mapStateToProps, mapDispatchToProps)(Timeout(Courses))

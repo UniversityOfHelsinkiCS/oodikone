@@ -42,7 +42,8 @@ export const routes = {
   populations: { route: '/populations', translateId: 'populations' },
   courses: { route: '/courses', translateId: 'courses' },
   students: { route: '/students/:studentNumber?', translateId: 'students' },
-  teachers: { route: '/teachers', translateId: 'teachers' }
+  teachers: { route: '/teachers', translateId: 'teachers' },
+  users: { route: '/users', translateId: 'users', admin: true }
 }
 
 const assumeBasename = () => {
@@ -61,6 +62,8 @@ export const DEFAULT_LANG = 'en'
 
 export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
 export const API_DATE_FORMAT = 'YYYY.MM.DD'
+
+export const TOKEN_NAME = 'token'
 
 export const CHART_COLORS = [
   chart1,
