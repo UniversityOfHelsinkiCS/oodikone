@@ -1,6 +1,14 @@
 import moment from 'moment'
-
+import jwtDecode from 'jwt-decode'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
+import { checkAuth } from '../apiConnection'
+
+export const decodeToken = jwtDecode
+
+export const userIsAdmin = async () => {
+  const token = await checkAuth()
+  return token ? decodeToken(token).admin : false
+}
 
 export const containsOnlyNumbers = str => str.match('^\\d+$')
 
