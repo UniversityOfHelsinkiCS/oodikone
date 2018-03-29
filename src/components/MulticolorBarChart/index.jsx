@@ -3,10 +3,19 @@ import { string, arrayOf } from 'prop-types'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts'
 
 import { graphDataType } from '../../constants/types'
-import { violet, orange, lime, mellowBlue, turquoise } from '../../styles/variables/colors'
+import { red, green, blue, purple, turquoise } from '../../styles/variables/colors'
 import styles from './multicolorBarChart.css'
 
-const BAR_COLOR_OPTIONS = [orange, lime, mellowBlue, turquoise]
+const BAR_COLOR_OPTIONS = [red, purple, green, blue, turquoise]
+
+const getColor = (number, max) => {
+  if (max < 6) {
+    return BAR_COLOR_OPTIONS[number]
+  }
+  const gap = 16777217 / max
+  const color = Math.floor(gap * number).toString(16)
+  return '#000000'.slice(0, -color.length) + color
+}
 
 const MulticolorBarChart = (props) => {
   const { chartTitle, chartData } = props
@@ -21,9 +30,14 @@ const MulticolorBarChart = (props) => {
               <YAxis />
               <CartesianGrid strokeDasharray="3 3" />
               <Tooltip />
-              <Bar dataKey="value" fill={violet}>
+              <Bar dataKey="value" fill={purple}>
                 {
-                  chartData.map((entry, index) => <Cell key={`color-cell-${entry.name}`} fill={BAR_COLOR_OPTIONS[index]} />)
+                  chartData.map((entry, index) => (
+                    <Cell
+                      key={`color-cell-${entry.name}`}
+                      fill={getColor(index, chartData.length)}
+                    />
+                  ))
                 }
               </Bar>
             </BarChart>

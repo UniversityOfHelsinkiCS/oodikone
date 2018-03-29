@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { func, shape, object } from 'prop-types'
+import { func, shape, string, boolean, arrayOf, integer } from 'prop-types'
 import { connect } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
 import { isEmpty } from 'lodash'
@@ -68,7 +68,23 @@ class StudentDetails extends Component {
 
 StudentDetails.propTypes = {
   translate: func.isRequired,
-  student: shape(object)
+  student: shape({
+    courses: arrayOf(shape({
+      course: shape({
+        code: string,
+        name: string
+      }),
+      credits: integer,
+      date: string,
+      grade: string,
+      passed: boolean
+    })),
+    credits: integer,
+    fetched: boolean,
+    started: string,
+    studentNumber: string,
+    tags: arrayOf(string)
+  })
 }
 
 StudentDetails.defaultProps = {

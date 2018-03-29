@@ -61,8 +61,11 @@ class StudentSearch extends Component {
   }
 
   fetchStudentList = (searchStr) => {
-    this.setState({ isLoading: true })
+    this.props.setTimeout('fetch', () => {
+      this.setState({ isLoading: true })
+    }, 250)
     this.props.findStudents(searchStr).then(() => {
+      this.props.clearTimeout('fetch')
       this.setState({ isLoading: false, showResults: true })
     })
   }

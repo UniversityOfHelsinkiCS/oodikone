@@ -25,14 +25,16 @@ class PopulationSearchHistory extends Component {
   renderQueryCards = () => {
     const { populations, translate } = this.props
     return populations.map((population, i) => (
-      <PopulationQueryCard
-        key={`population-${population.query.uuid}`}
-        translate={translate}
-        population={population.data}
-        query={population.query}
-        queryId={i}
-        removeSampleFn={this.removePopulation}
-      />))
+      population.query ?
+        <PopulationQueryCard
+          key={`population-${population.query.uuid}`}
+          translate={translate}
+          population={population.data}
+          query={population.query}
+          queryId={i}
+          removeSampleFn={this.removePopulation}
+        /> : null
+    ))
   }
 
   render() {

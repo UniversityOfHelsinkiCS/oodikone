@@ -23,7 +23,7 @@ const reducer = (state = { data: [] }, action) => {
       return {
         pending: true,
         selected: state.selected,
-        data: [...state.data.filter(student => student.fetched)]
+        data: state.data
       }
     case 'FIND_STUDENTS_FAILURE':
       return {
@@ -37,7 +37,7 @@ const reducer = (state = { data: [] }, action) => {
         pending: false,
         error: false,
         selected: state.selected,
-        data: [...state.data, ...action.response]
+        data: [...state.data.filter(student => student.fetched), ...action.response]
       }
     case 'GET_STUDENT_SUCCESS':
       return {

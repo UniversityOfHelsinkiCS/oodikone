@@ -14,7 +14,23 @@ export const enableUser = (id) => {
   return callController(route, prefix, data, method)
 }
 
-const reducer = (state = [], action) => {
+export const addUserUnit = (uid, unit) => {
+  const route = '/users/unit'
+  const prefix = 'EDIT_USER_UNIT_'
+  const data = { id: uid, unit }
+  const method = 'post'
+  return callController(route, prefix, data, method)
+}
+
+export const removeUserUnit = (uid, unit) => {
+  const route = '/users/unit'
+  const prefix = 'EDIT_USER_UNIT_'
+  const data = { id: uid, unit }
+  const method = 'delete'
+  return callController(route, prefix, data, method)
+}
+
+const reducer = (state = { data: [] }, action) => {
   switch (action.type) {
     case 'GET_USERS_ATTEMPT':
       return {
@@ -50,6 +66,12 @@ const reducer = (state = [], action) => {
       return {
         ...state,
         data: state.data.filter(a => a.id !== action.response.id)
+          .concat(action.response)
+      }
+    case 'EDIT_USER_UNIT_SUCCESS':
+      return {
+        ...state,
+        data: state.data.filter(user => user.id !== action.response.id)
           .concat(action.response)
       }
     default:
