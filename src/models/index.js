@@ -99,7 +99,9 @@ const Credit = sequelize.define('credit',
   },
   {
     tableName: 'credit',
-    timestamps: false,
+    timestamps: true,
+    createdAt: 'createddate',
+    updatedAt: 'lastmodifieddate',
   }
 )
 
