@@ -4,7 +4,7 @@ require('winston-papertrail').Papertrail
 const winstonPapertrail = new winston.transports.Papertrail({
   host: process.env.PAPERTRAIL_HOST,
   port: process.env.PAPERTRAIL_PORT,
-  hostname: 'database_updater'
+  hostname: process.env.PAPERTRAIL_HOSTNAME
 })
 
 winstonPapertrail.on('error', function (err) {
