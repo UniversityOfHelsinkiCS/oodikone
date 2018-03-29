@@ -3,8 +3,6 @@ const conf = require('../conf-backend')
 
 const isShibboUser = (userId, uidHeader) => userId === uidHeader
 
-const admin = ['totutotu', 'tktl', 'mluukkai', 'mitiai', 'ttuotila', 'jakousa']
-
 const checkAuth = async (req, res, next) => {
   console.log('checkAuth beginning')
 
@@ -32,12 +30,9 @@ const checkAuth = async (req, res, next) => {
 }
 
 const checkAdminAuth = async (req, res, next) => {
-  const userId = req.decodedToken.userId
-  const user = admin.find(user => userId === user)
-  if (user) {
+  if (req.decodedToken.admin) {
     next()
   } else {
-    console.log('User not an admin')
     res.status(403).end()
   }
 }

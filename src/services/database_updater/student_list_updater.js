@@ -20,11 +20,11 @@ const timestamp = () => {
 }
 
 async function run () {
-  const STUDENT_SET_KEY = 'cached_students'
+  const STUDENT_SET_KEY = process.env.STUDENT_SET || 'cached_students'
   const validStudents = []
   const minStudentNumber = process.env.STUDENTS_FROM || 1000000
   const maxStudentNumber = process.env.STUDENTS_TO || 1500000
-  const step = process.env.STEP ||200 
+  const step = process.env.STEP || 500 
 
   const range = maxStudentNumber - minStudentNumber
 
