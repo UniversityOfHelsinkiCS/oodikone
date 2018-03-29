@@ -11,8 +11,6 @@
     "supertest": "NODE_ENV=test ava test/supertests/*.js",
     "update_database_dev": "NODE_ENV=dev node src/services/database_updater/database_updater.js",
     "update_database": "node src/services/database_updater/database_updater.js",
-    "update_student_group": "GROUP=1 node src/services/database_updater/database_updater.js",
-    "update_student_group_dev": "NODE_ENV=dev GROUP=1 node src/services/database_updater/database_updater.js",
     "update_studentnumbers_dev": "NODE_ENV=dev node src/services/database_updater/student_list_updater.js",
     "lint": "eslint --parser babel-eslint src",
     "coverage": "NODE_ENV=test nyc ava"
@@ -31,6 +29,7 @@
     "install": "^0.10.1",
     "jsonwebtoken": "^8.1.1",
     "knex": "^0.13.0",
+    "lodash": "^4.17.5",
     "moment": "^2.19.1",
     "npm": "^5.4.2",
     "pg": "^7.3.0",
