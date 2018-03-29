@@ -16,5 +16,17 @@ router.post('/users/enable', async function (req, res) {
     res.status(status).json(result)
   }
 })
+// router.post('/users/unit', async function (req, res) {
+//   const id = req.body.id
+//   // const unit = req.body.unit
+//   const user = await User.byId(id)
+//   if(!user) res.status(400).end()
+//   else {
+//     const units = await User.getUnits(id)
+//     console.log(units)
+
+
+//   }
+// })
 
 module.exports = router

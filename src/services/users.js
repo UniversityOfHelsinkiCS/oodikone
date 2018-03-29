@@ -57,7 +57,7 @@ const getUnits = async (id) => {
 } 
 
 const findAll = () => {
-  return User.findAll()
+  return User.findAll({ include: [Unit] })
 }
 
 module.exports = {
