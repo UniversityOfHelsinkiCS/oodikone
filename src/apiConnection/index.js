@@ -1,35 +1,35 @@
 import axios from 'axios'
-import jwtDecode from 'jwt-decode'
 
-import { API_BASE_PATH } from '../constants'
+import { decodeToken } from '../common'
+import { API_BASE_PATH, TOKEN_NAME } from '../constants'
 
-const TOKEN_NAME = 'token'
 const isDevEnv = process.env.NODE_ENV === 'development'
-const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
-const tokenExpired = token => jwtDecode(token).exp < (new Date().getTime() / 1000)
-
-const checkAuth = async (options) => {
-  const auth = {}
-  auth.token = localStorage.getItem(TOKEN_NAME)
-  if (!auth.token || tokenExpired(auth.token)) {
-    const response = await getAxios().get('/login', options)
-    auth.token = response.data.token
-    localStorage.setItem(TOKEN_NAME, auth.token)
+const devOptions = {
+  headers: {
+    uid: 'tktl',
+    displayName: 'Development Käyttäjä',
+    'shib-session-id': 'mock-session'
   }
-  return auth
+}
+
+const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
+const tokenExpired = token => decodeToken(token).exp < (new Date().getTime() / 1000)
+
+export const checkAuth = async () => {
+  const options = isDevEnv ? devOptions : null
+  const token = localStorage.getItem(TOKEN_NAME)
+  if (!token || tokenExpired(token)) {
+    const response = await getAxios().get('/login', options)
+    localStorage.setItem(TOKEN_NAME, response.data.token)
+    return response.data.token
+  }
+  return token
 }
 
 const callApi = async (url, method = 'get', data) => {
-  const options = { headers: {} }
-  if (isDevEnv) {
-    const uid = 'tktl' // TODO: Other development users
-    const displayName = 'Development Käyttäjä'
-    options.headers.uid = uid
-    options.headers.displayName = displayName
-    options.headers['shib-session-id'] = 'mock-session'
-  }
-  const auth = await checkAuth(options)
-  options.headers['x-access-token'] = auth.token
+  const options = isDevEnv ? devOptions : { headers: {} }
+  const token = await checkAuth()
+  options.headers['x-access-token'] = token
 
   switch (method) {
     case 'get':
