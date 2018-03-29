@@ -72,6 +72,7 @@ const getTeacherDetails = (courseCode, date) => {
     })
 }
 
+// TODO function not in use?xw
 const getStudentNumbers = () => {
   return axios.get(base_url + '/programs/students/since/01.01.1965')
     .then(response => {
@@ -94,6 +95,11 @@ const getStudentCourseCredits = (studentNumber) => {
 }
 
 module.exports = {
-  getStudentStudyRights, getStudent, getStudyRight, getOrganisation,
-  getStudentCourseCredits, getStudentNumbers, getTeacherDetails,
+  getStudentStudyRights, 
+  getStudent, 
+  getStudyRight, 
+  getOrganisation,
+  getStudentCourseCredits, 
+  getStudentNumbers, 
+  getTeacherDetails,
 } 
