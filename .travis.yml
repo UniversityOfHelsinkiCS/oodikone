@@ -6,8 +6,8 @@ cache:
   directories:
     - node_modules
 
-services:
-  - postgresql
+addons:
+  postgresql: "10"
 
 before_script:
   - psql -c 'create database ooditest;' -U postgres
