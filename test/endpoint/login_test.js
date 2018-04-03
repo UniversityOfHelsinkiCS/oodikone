@@ -51,7 +51,7 @@ test('login creates an user', async t => {
     .set('shib-session-id', 'sessioniddiibadaaba')
     .set('displayName', user.full_name)
 
-  t.is(res.status, 401)
+  t.is(res.status, 200)
   const foundUser = await User.find({ where: { username: user.username } })
 
   t.is(foundUser.username, user.username, 'Username did not match uid')

@@ -29,7 +29,7 @@ router.get('/login', async (req, res) => {
     const uid = req.headers['uid']
     if (req.headers['shib-session-id'] && uid) {
       const user = await User.byUsername(uid)
-      const fullname = req.headers.displayName || 'Shib Valmis'
+      const fullname = req.headers.displayname || 'Shib Valmis'
       if (!user) {
         await User.createUser(uid, fullname)
       } else {
