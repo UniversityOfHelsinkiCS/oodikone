@@ -3,11 +3,37 @@ import jwtDecode from 'jwt-decode'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
 import { checkAuth } from '../apiConnection'
 
-export const decodeToken = jwtDecode
+let decodedToken
+
+export const decodeToken = (token) => {
+  if (!decodedToken) {
+    decodedToken = jwtDecode(token)
+  }
+  return decodedToken
+}
+
+export const tokenInvalid = (token) => {
+  // Expired
+  if (!decodedToken || decodedToken.exp < (new Date().getTime() / 1000)) {
+    const newToken = decodeToken(token)
+    if (newToken.exp < (new Date().getTime() / 1000)) {
+      return true
+    }
+    decodedToken = newToken
+  }
+  // Misses fields
+  const fields = ['enabled', 'userId', 'name']
+  return fields.map(key => Object.keys(decodedToken).includes(key)).includes(false)
+}
 
 export const userIsAdmin = async () => {
   const token = await checkAuth()
   return token ? decodeToken(token).admin : false
+}
+
+export const userIsEnabled = async () => {
+  const token = await checkAuth()
+  return token ? decodeToken(token).enabled : false
 }
 
 export const containsOnlyNumbers = str => str.match('^\\d+$')
