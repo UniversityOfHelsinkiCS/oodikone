@@ -19,7 +19,7 @@ import { userIsEnabled } from '../../common'
 
 class Main extends Component {
   state = {
-    enabled: true
+    enabled: false
   }
 
   async componentDidMount() {
