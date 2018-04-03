@@ -28,7 +28,7 @@ router.post('/users/:uid/units/:id', async (req, res) => {
   try {
     await User.addUnit(uid, id)
     const user = await User.byId(uid)
-    res.status(200).json(user)
+    res.status(201).json(user)
   } catch (e) {
     console.log(e)
     res.status(402).json(e)
