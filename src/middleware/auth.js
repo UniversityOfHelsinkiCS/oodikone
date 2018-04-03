@@ -4,28 +4,25 @@ const conf = require('../conf-backend')
 const isShibboUser = (userId, uidHeader) => userId === uidHeader
 
 const checkAuth = async (req, res, next) => {
-  console.log('checkAuth beginning')
-
   const token = req.headers['x-access-token']
   const uid = req.headers['uid']
-  console.log('checkAuth')
   if (token) {
     jwt.verify(token, conf.TOKEN_SECRET, (err, decoded) => {
-      console.log('Jwt verification done')
-      console.log('err: ', err)
-      console.log(decoded)
-      console.log(uid, ' should equal ', decoded.userId)
-      if (!err && isShibboUser(decoded.userId, uid)) {
-        console.log('Jwt verification approved')
-        req.decodedToken = decoded // everything is good, save to request for use in other routes
-        next()
+      if (err) {
+        res.json(err).status(403).end()
+      } else if (isShibboUser(decoded.userId, uid)) {
+        if (decoded.enabled) {
+          req.decodedToken = decoded
+          next()
+        } else {
+          res.json({ error: 'User is not enabled' }).status(403).end()
+        }
       } else {
-        console.log('Jwt verification ERROR')
-        res.status(403).end()
+        res.json({ error: 'User shibboleth id and token id did not match' }).status(403).end()
       }
     })
   } else {
-    res.status(403).end()
+    res.json({ error: 'No token in headers' }).status(403).end()
   }
 }
 
