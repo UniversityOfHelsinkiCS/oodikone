@@ -1,4 +1,5 @@
 # oodikone2-backend
+[![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend.svg?branch=master)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend)
 
 ## Dev
 
