@@ -11,7 +11,6 @@ const checkAuth = async (req, res, next) => {
       if (err) {
         res.json(err).status(403).end()
       } else if (isShibboUser(decoded.userId, uid)) {
-        console.log(decoded)
         if (decoded.enabled) {
           req.decodedToken = decoded
           next()
