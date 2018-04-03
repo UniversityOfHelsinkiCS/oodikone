@@ -8,20 +8,20 @@ const admin = ['totutotu', 'tktl', 'mluukkai', 'mitiai', 'ttuotila', 'jakousa']
 const generateToken = async (uid, res) => {
   const model = await User.byUsername(uid)
   const user = model.dataValues
-    const payload = { 
-      userId: uid, 
-      name: user.full_name,
-      enabled: user.is_enabled,
-      admin: admin.includes(uid)
-    }
-    const token = jwt.sign(payload, conf.TOKEN_SECRET, {
-      expiresIn: '24h'
-    })
+  const payload = {
+    userId: uid,
+    name: user.full_name,
+    enabled: user.is_enabled,
+    admin: admin.includes(uid)
+  }
+  const token = jwt.sign(payload, conf.TOKEN_SECRET, {
+    expiresIn: '24h'
+  })
 
-    // return the information including token as JSON
-    res.status(200).json({
-      token: token
-    })
+  // return the information including token as JSON
+  res.status(200).json({
+    token: token
+  })
 }
 
 router.get('/login', async (req, res) => {
