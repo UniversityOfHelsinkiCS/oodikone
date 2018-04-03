@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { func, shape, string, number, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
 
+import styles from './enableUsers.css'
 import { getUsers, enableUser, addUserUnit, removeUserUnit } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 
@@ -13,17 +14,15 @@ class EnableUsers extends Component {
     this.props.getUnits()
   }
 
-  enableUser = id => () => {
-    this.props.enableUser(id)
+  enableUser = id => () => this.props.enableUser(id)
+
+  handleChange = user => (e, { value }) => {
+    if (!user.units.find(unit => unit.id === value)) {
+      this.props.addUserUnit(user.username, value)
+    }
   }
 
-  handleClick = uid => (e, { value }) => {
-    this.props.addUserUnit(uid, value)
-  }
-
-  removeAccess = (unit, uid) => () => {
-    this.props.removeUserUnit(uid, unit)
-  }
+  removeAccess = (unit, uid) => () => this.props.removeUserUnit(uid, unit)
 
   renderUnitList = (units, user) => {
     if (!units) return null
@@ -48,7 +47,7 @@ class EnableUsers extends Component {
     const { users, error, units } = this.props
     const unitOptions = units.map(unit => ({ key: unit.id, value: unit.id, text: unit.name }))
     return error ? null : (
-      <div>
+      <div styles={styles.container}>
         <h1>Enable or disable access to OodiKone</h1>
         {users.map(u => (
           <Grid key={u.id} divided="vertically">
@@ -58,7 +57,7 @@ class EnableUsers extends Component {
                 <Dropdown
                   placeholder="Select unit"
                   options={unitOptions}
-                  onChange={this.handleClick(u.username)}
+                  onChange={this.handleChange(u)}
                   fluid
                   search
                   selection
@@ -83,7 +82,7 @@ EnableUsers.propTypes = {
   removeUserUnit: func.isRequired,
   getUnits: func.isRequired,
   units: arrayOf(shape({
-    id: number,
+    id: string,
     name: string
   })).isRequired,
   users: arrayOf(shape({
@@ -92,7 +91,7 @@ EnableUsers.propTypes = {
     is_enabled: bool,
     username: string,
     units: arrayOf(shape({
-      id: number,
+      id: string,
       name: string
     }))
   })).isRequired,
