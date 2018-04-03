@@ -18,11 +18,11 @@ class EnableUsers extends Component {
 
   handleChange = user => (e, { value }) => {
     if (!user.units.find(unit => unit.id === value)) {
-      this.props.addUserUnit(user.username, value)
+      this.props.addUserUnit(user.id, value)
     }
   }
 
-  removeAccess = (unit, uid) => () => this.props.removeUserUnit(uid, unit)
+  removeAccess = (uid, unit) => () => this.props.removeUserUnit(uid, unit)
 
   renderUnitList = (units, user) => {
     if (!units) return null
@@ -31,7 +31,7 @@ class EnableUsers extends Component {
         {units.map(unit => (
           <List.Item key={unit.id}>
             <List.Content floated="right">
-              <Button onClick={this.removeAccess(unit, user)}>Remove</Button>
+              <Button onClick={this.removeAccess(user, unit.id)}>Remove</Button>
             </List.Content>
             <List.Content>
               {unit.name}
@@ -39,7 +39,7 @@ class EnableUsers extends Component {
           </List.Item>
         ))}
 
-      </List >
+      </List>
     )
   }
 
@@ -65,7 +65,7 @@ class EnableUsers extends Component {
               </Grid.Column>
               <Grid.Column>
                 <Button onClick={this.enableUser(u.id)}>Enable/Disable</Button>
-                {this.renderUnitList(u.units, u.username)}
+                {this.renderUnitList(u.units, u.id)}
               </Grid.Column>
             </Grid.Row>
           </Grid>
@@ -82,7 +82,7 @@ EnableUsers.propTypes = {
   removeUserUnit: func.isRequired,
   getUnits: func.isRequired,
   units: arrayOf(shape({
-    id: string,
+    id: number,
     name: string
   })).isRequired,
   users: arrayOf(shape({
@@ -91,7 +91,7 @@ EnableUsers.propTypes = {
     is_enabled: bool,
     username: string,
     units: arrayOf(shape({
-      id: string,
+      id: number,
       name: string
     }))
   })).isRequired,
