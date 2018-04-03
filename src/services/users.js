@@ -5,20 +5,20 @@ const Op = Sequelize.Op
 
 const byUsername = (username) => {
   return User.findOne({
-    where: { 
-      username:{
+    where: {
+      username: {
         [Op.eq]: username
-      } 
+      }
     }
   })
 }
 
 const byId = (id) => {
   return User.findOne({
-    where: { 
-      id:{
+    where: {
+      id: {
         [Op.eq]: id
-      } 
+      }
     }
   })
 }
@@ -26,11 +26,11 @@ const byId = (id) => {
 async function withUsername(username) {
   const user = await byUsername(username)
 
-  if ( user ) {
+  if (user) {
     return user.password
-  } else {  
+  } else {
     return null
-  } 
+  }
 }
 
 const createUser = (username, fullname) => {
@@ -49,12 +49,12 @@ const getUnits = async (id) => {
   return await Unit.findAll({
     include: [{
       model: User,
-      through:{
-        where: {user_id: id}
+      through: {
+        where: { user_id: id }
       }
     }]
   })
-} 
+}
 
 const findAll = () => {
   return User.findAll({ include: [Unit] })
