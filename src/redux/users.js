@@ -7,25 +7,24 @@ export const getUsers = () => {
 }
 
 export const enableUser = (id) => {
-  const route = '/users/enable'
+  const route = `/users/${id}/enable`
   const prefix = 'ENABLE_USER_'
-  const data = { id }
-  const method = 'post'
-  return callController(route, prefix, data, method)
+  const method = 'put'
+  return callController(route, prefix, null, method)
 }
 
 export const addUserUnit = (uid, unit) => {
-  const route = '/users/unit'
+  const route = `/users/${uid}/units/${unit}`
   const prefix = 'EDIT_USER_UNIT_'
-  const data = { id: uid, unit }
+  const data = { uid, unit }
   const method = 'post'
   return callController(route, prefix, data, method)
 }
 
 export const removeUserUnit = (uid, unit) => {
-  const route = '/users/unit'
+  const route = `/users/${uid}/units/${unit}`
   const prefix = 'EDIT_USER_UNIT_'
-  const data = { id: uid, unit }
+  const data = {}
   const method = 'delete'
   return callController(route, prefix, data, method)
 }
