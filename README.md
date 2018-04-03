@@ -1,4 +1,6 @@
 # OodiKone2-Frontend
+[![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-backend.svg?branch=master)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-backend)
+
 
 ### Development
 fetch dependencies: `npm install`
