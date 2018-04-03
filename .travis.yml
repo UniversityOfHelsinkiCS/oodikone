@@ -7,7 +7,11 @@ cache:
     - node_modules
 
 addons:
-  postgresql: "9.4"
+  postgresql: "10"
+  apt:
+    packages:
+    - postgresql-10
+    - postgresql-client-10
 
 before_script:
   - psql -c 'create database ooditest;' -U postgres
