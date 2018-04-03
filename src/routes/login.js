@@ -12,6 +12,7 @@ const generateToken = async (uid, res) => {
     const payload = { 
       userId: uid, 
       name: user.full_name,
+      enabled: user.is_enabled,
       admin: admin.includes(uid)
     }
     const token = jwt.sign(payload, conf.TOKEN_SECRET, {
