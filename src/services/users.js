@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { User, Unit } = require('../models')
+const { User, Unit, UserUnit } = require('../models')
 
 const Op = Sequelize.Op
 
@@ -19,7 +19,8 @@ const byId = (id) => {
       id: {
         [Op.eq]: id
       }
-    }
+    },
+    include: [Unit]
   })
 }
 
@@ -60,12 +61,34 @@ const findAll = () => {
   return User.findAll({ include: [Unit] })
 }
 
+const deleteUnit = async (userId, unitId) => {
+  await UserUnit.destroy(
+    {
+      where: {
+        user_id: userId,
+        unit_id: unitId
+      }
+    }
+  )
+}
+
+const addUnit = async (userId, unitId) => {
+  await UserUnit.create(
+    {
+      user_id: userId,
+      unit_id: unitId
+    }
+  )
+}
+
 module.exports = {
   byUsername,
   withUsername,
   createUser,
   updateUser,
   findAll,
+  deleteUnit,
+  addUnit,
   getUnits,
   byId
 }
