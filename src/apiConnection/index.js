@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { tokenInvalid } from '../common'
+import { tokenInvalid, decodeToken } from '../common'
 import { API_BASE_PATH, TOKEN_NAME } from '../constants'
 
 const isDevEnv = process.env.NODE_ENV === 'development'
@@ -17,7 +17,7 @@ const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
 export const checkAuth = async () => {
   const options = isDevEnv ? devOptions : null
   const token = localStorage.getItem(TOKEN_NAME)
-  if (!token || tokenInvalid(token)) {
+  if (!token || tokenInvalid(token) || !decodeToken(token).enabled) {
     const response = await getAxios().get('/login', options)
     localStorage.setItem(TOKEN_NAME, response.data.token)
     return response.data.token
