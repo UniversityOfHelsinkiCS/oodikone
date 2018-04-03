@@ -51,25 +51,11 @@ test('login creates an user', async t => {
     .set('shib-session-id', 'sessioniddiibadaaba')
     .set('displayName', user.full_name)
 
-  t.is(res.status, 401)
+  t.is(res.status, 200)
   const foundUser = await User.find({ where: { username: user.username } })
 
   t.is(foundUser.username, user.username, 'Username did not match uid')
   t.is(foundUser.full_name, user.full_name, 'Full name did not match fullname')
-})
-
-test('login fetches an user but validates enabled field', async t => {
-  const user = generateUsers(1)[0]
-  user.is_enabled = false
-  await User.insertOrUpdate(user)
-
-  const res = await api
-    .get('/api/login')
-    .set('uid', user.username)
-    .set('shib-session-id', 'sessioniddiibadaaba')
-    .set('displayName', user.full_name)
-
-  t.is(res.status, 401)
 })
 
 test('login fetches an user and returns token to enabled', async t => {
