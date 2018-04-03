@@ -49,7 +49,7 @@ test('login creates an user', async t => {
     .get('/api/login')
     .set('uid', user.username)
     .set('shib-session-id', 'sessioniddiibadaaba')
-    .set('displayname', user.full_name)
+    .set('displayName', user.full_name)
 
   t.is(res.status, 401)
   const foundUser = await User.find({ where: { username: user.username } })
@@ -67,7 +67,7 @@ test('login fetches an user but validates enabled field', async t => {
     .get('/api/login')
     .set('uid', user.username)
     .set('shib-session-id', 'sessioniddiibadaaba')
-    .set('displayname', user.full_name)
+    .set('displayName', user.full_name)
 
   t.is(res.status, 401)
 })
@@ -81,7 +81,7 @@ test('login fetches an user and returns token to enabled', async t => {
     .get('/api/login')
     .set('uid', user.username)
     .set('shib-session-id', 'sessioniddiibadaaba')
-    .set('displayname', user.full_name)
+    .set('displayName', user.full_name)
 
   t.is(res.status, 200)
   t.truthy(res.body.token, `Token did not exist in body: ${res.body}`)

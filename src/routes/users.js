@@ -7,8 +7,8 @@ router.get('/users', async (req, res) => {
   res.json(results)
 })
 
-router.post('/users/enable', async (req, res) => {
-  const id = req.body.id
+router.put('/users/:id/enable', async (req, res) => {
+  const id = req.params.id
   const user = await User.byId(id)
   if (!user) res.status(400).end()
   else {
@@ -18,29 +18,38 @@ router.post('/users/enable', async (req, res) => {
   }
 })
 
-router.post('/users/unit', async (req, res) => {
-  const user = await User.byUsername(req.body.id)
-  const unit = await Unit.byId(req.body.unit)
-  if(!user) res.status(400).end()
-  else {
-    console.log(unit)
-    console.log(user)
-    // Add into liitostaulu where unit & user
-    // Sequelize probably has easy way to insert into joining table
-    res.status(404).end()
+router.post('/users/:uid/units/:id', async (req, res) => {
+  const { uid, id } = req.params
+  const user = await User.byId(uid)
+  const unit = await Unit.byId(id)
+  if (!user || !unit) return res.status(400).end()
+  const exists = user.units.find(unit =>  parseInt(id) === unit.dataValues.id)
+  if (exists) return res.status(400).end()
+  try {
+    await User.addUnit(uid, id)
+    const user = await User.byId(uid)
+    res.status(200).json(user)
+  } catch (e) {
+    console.log(e)
+    res.status(402).json(e)
   }
+
 })
 
-router.delete('/users/unit', async (req, res) => {
-  const user = await User.byUsername(req.body.id)
-  const unit = await Unit.byId(req.body.unit)
-  if(!user) res.status(400).end()
+router.delete('/users/:uid/units/:id', async (req, res) => {
+  const { uid, id } = req.params
+  const user = await User.byId(uid)
+  const unit = await Unit.byId(id)
+  if (!user || !unit) res.status(400).end()
   else {
-    console.log(unit)
-    console.log(user)
-    // Remove from liitostaulu where unit & user
-    // Sequelize probably has easy way to delete from joining table
-    res.status(404).end()
+    try {
+      await User.deleteUnit(uid, id)
+      const users = await User.byId(uid)
+      res.status(200).json(users)
+    } catch (e) {
+      console.log('error deleting userunit')
+      res.status(402).json(e)
+    }
   }
 })
 

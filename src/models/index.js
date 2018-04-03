@@ -240,6 +240,22 @@ const Unit = sequelize.define('unit',
   }
 )
 
+const UserUnit = sequelize.define('user_unit',
+  {
+    id: {
+      primaryKey: true,
+      type: Sequelize.BIGINT,
+      autoIncrement: true
+    },
+    user_id: { type: Sequelize.STRING },
+    unit_id: { type: Sequelize.BOOLEAN }
+  },
+  {
+    tableName: 'user_unit',
+    timestamps: false,
+  }
+)
+
 const StudentList = sequelize.define('student_list',
   {
     id: {
@@ -298,6 +314,7 @@ module.exports = {
   CourseTeacher,
   User,
   Unit,
+  UserUnit,
   sequelize,
   migrationPromise,
   Organisation, 

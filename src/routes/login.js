@@ -8,7 +8,6 @@ const admin = ['totutotu', 'tktl', 'mluukkai', 'mitiai', 'ttuotila', 'jakousa']
 const generateToken = async (uid, res) => {
   const model = await User.byUsername(uid)
   const user = model.dataValues
-  if (user.is_enabled) {
     const payload = { 
       userId: uid, 
       name: user.full_name,
@@ -22,9 +21,6 @@ const generateToken = async (uid, res) => {
     res.status(200).json({
       token: token
     })
-  } else {
-    res.status(401).end()
-  }
 }
 
 router.get('/login', async (req, res) => {
