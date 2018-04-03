@@ -38,7 +38,7 @@ test('should pong when pinged', async t => {
 })
 
 
-test('populations can be searched by a searchterm', async t => {
+test.skip('populations can be searched by a searchterm', async t => {
   const res = await api
     .get('/api/studyrightkeywords')
     .query({ search: 'computer Science' })
