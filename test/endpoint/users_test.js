@@ -13,7 +13,7 @@ const conf = require('../../src/conf-backend')
 const api = supertest(app)
 
 const uid = 'tktl', fullname = ''
-const payload = { userId: uid, name: fullname }
+const payload = { userId: uid, name: fullname, admin: true }
 
 const token = jwt.sign(payload, conf.TOKEN_SECRET, {
   expiresIn: '24h'
@@ -47,7 +47,7 @@ test('user can be enabled/disabled', async t => {
   let user = await User.findOne({ id: 1 })
   const enabled = user.dataValues.is_enabled
   const res = await api
-    .post('/api/users/enable')
+    .put('/api/users/1/enable')
     .send({ id: 1 })
     .set('x-access-token', token)
     .set('uid', uid)
