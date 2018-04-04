@@ -13,6 +13,7 @@
     "lint:css": "stylelint 'src/**/*.css'",
     "lint:js": "eslint server ./ --ext .jsx,.js",
     "lintfix": "eslint server ./ --ext .jsx,.js --fix",
+    "stats": "webpack --json --config webpack.config.production.js > stats.json",
     "prepush": "npm run lint",
     "pretest": "npm run lint",
     "test": "echo 'no tests'"
