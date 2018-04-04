@@ -36,23 +36,29 @@ const updateStudentInformation = async studentNumber => {
 
 const updateStudentStudyRights = async student => {
   try {
-    let [ oodiStudentStudyRights, studentStudyRights ] = await Promise.all([
+    let [ WebOodiStudentStudyRights, OodiKoneStudentStudyRights ] = await Promise.all([
       Oodi.getStudentStudyRights(student.studentnumber),
       StudyrightService.byStudent(student.studentnumber)
     ])
 
-    studentStudyRights = studentStudyRights.map(studyright => studyright.dataValues)
-    if (studentStudyRights && oodiStudentStudyRights.length === studentStudyRights.length) {
+    OodiKoneStudentStudyRights = OodiKoneStudentStudyRights.map(studyright => studyright.dataValues)
+    if (OodiKoneStudentStudyRights && WebOodiStudentStudyRights.length === OodiKoneStudentStudyRights.length) {
       return 0
     }
 
-    const studentStudyRightIds = studentStudyRights.map(sr => sr.studyrightid)
+    const OodiKonestudentStudyRightIds = OodiKoneStudentStudyRights.map(sr => sr.studyrightid).sort()
+    const WebOodiStudentStudyRightIds = WebOodiStudentStudyRights.map(sr => sr.studyRightId).sort()
 
-    logger.verbose('studyright ids in database: ' + studentStudyRightIds)
+    logger.verbose('studyright ids in database:' + OodiKonestudentStudyRightIds)
+    logger.verbose('                in weboodi:' + WebOodiStudentStudyRightIds)
 
-    await Promise.all(oodiStudentStudyRights.map(async studyRight => {
-      if (!studentStudyRightIds.includes(studyRight.studyRightId)) {
+    // TODO refactor...
+    await Promise.all(WebOodiStudentStudyRights.map(async studyRight => {
+      if (OodiKonestudentStudyRightIds.includes(studyRight.studyRightId)) {
+        console.log('included!')
+      } else {
         logger.verbose('id not included: ' + studyRight.studyRightId)
+
         let organisation = await OrganisationService.byCode(studyRight.organisation)
         if (organisation === null) {
           organisation = await Oodi.getOrganisation(studyRight.organisation)

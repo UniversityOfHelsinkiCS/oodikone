@@ -1,13 +1,7 @@
 const moment = require('moment')
 
-const getStudyRightIdStrings = (data) => {
-  const arr = data['data']
-  let strings = []
-  for (let i = 0; i < arr.length; i++) {
-    strings.push(arr[i][0])
-  }
-  return strings
-}
+const getStudyRightIdStrings = (data) => 
+  data['data'].map(elements=>elements[0] )
 
 const getStudentFromData = (data) => {
   return data['data']
