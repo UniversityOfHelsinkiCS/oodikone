@@ -163,8 +163,12 @@ async function statisticsOf(courses, fromDate, toDate, minCourses, minStudents, 
 
 const findOrCreateTeacher = async (code, name) => {
   return Teacher.findOne({where: {
-    code: code,
-    name: name 
+    code: {
+      [Op.eq]: code
+    },
+    name: {
+      [Op.eq]: name
+    } 
   }
   }).then(t => {
     if (t === null) {

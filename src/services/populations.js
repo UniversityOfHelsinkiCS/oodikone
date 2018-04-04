@@ -6,16 +6,23 @@ const Op = Sequelize.Op
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
-  return sequelize.query(query)
+  return sequelize.query(query, { type: sequelize.QueryTypes.SELECT }
+  )
 }
+
 
 const studyRightLike = (searchTerm) => {
   const query = `
     SELECT DISTINCT highLevelName 
       FROM StudyRight  
       WHERE LOWER(highLevelName) 
-      LIKE LOWER('%${searchTerm}%')`
-  return sequelize.query(query, { model: Studyright })
+      LIKE LOWER ?`
+  return sequelize.query(query,
+    {
+      replacements: ['%' + searchTerm + '%'],
+      type: sequelize.QueryTypes.SELECT,
+      model: Studyright
+    })
 }
 
 const byCriteria = (conf) => {
