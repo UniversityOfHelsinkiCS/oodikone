@@ -16,7 +16,9 @@ const tagsByTerm = (searchTerm) => {
 const tagByName = (tagname) => {
   return Tag.findOne({
     where: { 
-      tagname: tagname
+      tagname: {
+        [Op.eq]: tagname
+      }
     },
     include: [TagStudent]
   })
