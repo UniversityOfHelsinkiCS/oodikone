@@ -51,7 +51,12 @@ const getUnits = async (id) => {
     include: [{
       model: User,
       through: {
-        where: { user_id: id }
+        where: {
+          user_id:
+            {
+              [Op.eq]: id
+            }
+        }
       }
     }]
   })
@@ -65,8 +70,14 @@ const deleteUnit = async (userId, unitId) => {
   await UserUnit.destroy(
     {
       where: {
-        user_id: userId,
-        unit_id: unitId
+        user_id:
+          {
+            [Op.eq]: userId
+          },
+        unit_id:
+          {
+            [Op.eq]: unitId
+          }
       }
     }
   )
