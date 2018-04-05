@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const Population = require('../services/populations')
+const User = require('../services/users')
 const Unit = require('../services/units')
 
 router.get('/studyrightkeywords', async function (req, res) {
@@ -38,9 +39,20 @@ router.get('/populationstatistics', async function (req, res) {
 })
 
 router.get('/studyprogrammes', async function (req, res) {
-  const programs = await Unit.findAllEnabled()
-  const arr = programs.map(p => { return { id: p.id, name: p.name }})
-  res.json(arr)
+  try {
+    if (!req.decodedToken.admin) {
+      const user = await User.byUsername(req.decodedToken.userId)
+      const units = await User.getUnits(user.id)
+      const arr = units.map(p => { return { id: p.id, name: p.name } })
+      res.json(arr).status(200).end()
+    } else {
+      const units = await Unit.findAllEnabled()
+      const arr = units.map(p => { return { id: p.id, name: p.name } })
+      res.json(arr).status(200).end()
+    }
+  } catch (err) {
+    res.status(500).json(err).end()
+  }
 })
 
 module.exports = router
