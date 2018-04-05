@@ -47,7 +47,7 @@ const updateUser = (userObject, values) => {
 }
 
 const getUnits = async (id) => {
-  return await Unit.findAll({
+  return Unit.findAll({
     include: [{
       model: User,
       through: {
@@ -57,6 +57,12 @@ const getUnits = async (id) => {
               [Op.eq]: id
             }
         }
+      },
+      where: {
+        id:
+          {
+            [Op.eq]: id
+          }
       }
     }]
   })
