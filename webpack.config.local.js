@@ -9,6 +9,7 @@ const devServerPort = 8081
 const apiServerPort = 8080
 
 module.exports = {
+  mode: 'development',
   context: path.join(__dirname, 'src'),
 
   devServer: {
@@ -34,7 +35,6 @@ module.exports = {
     'react-hot-loader/patch',
     `webpack-dev-server/client?http://localhost:${devServerPort}`,
     'webpack/hot/only-dev-server',
-    'whatwg-fetch',
     './app'
   ],
 
