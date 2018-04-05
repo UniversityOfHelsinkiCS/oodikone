@@ -1,7 +1,7 @@
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const htmlTemplate = require('html-webpack-template')
 const path = require('path')
@@ -11,11 +11,11 @@ const commonSettings = require('./webpack.config.common')
 const CSS_MODULES_CLASS_PREFIX = 'no-purify'
 
 module.exports = {
+  mode: 'production',
   context: path.join(__dirname, 'src'),
 
   entry: [
     'babel-polyfill',
-    'whatwg-fetch',
     './app'
   ],
 
@@ -38,42 +38,53 @@ module.exports = {
 
       {
         test: /\.global\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: 'css-loader!postcss-loader'
-        })
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader!postcss-loader'
+        ]
       },
 
       {
         test: /.*\/node_modules\/.+\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: 'css-loader'
-        })
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader'
+        ]
       },
 
       {
         test: /^((?!\.global).)*\.css$/,
         exclude: /node_modules/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                modules: true,
-                sourceMap: true,
-                importLoaders: 1,
-                localIdentName: `${CSS_MODULES_CLASS_PREFIX}_[name]__[local]___[hash:base64:5]`
-              }
-            },
-
-            {
-              loader: 'postcss-loader'
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true,
+              sourceMap: true,
+              importLoaders: 1,
+              localIdentName: `${CSS_MODULES_CLASS_PREFIX}_[name]__[local]___[hash:base64:5]`
             }
-          ]
-        })
+          },
+          'postcss-loader'
+        ]
       }
+    ]
+  },
+
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          chunks: 'all'
+        }
+      }
+    },
+    minimizer: [
+      new UglifyJSPlugin({ parallel: true }),
+      new OptimizeCssAssetsPlugin()
     ]
   },
 
@@ -84,18 +95,6 @@ module.exports = {
       },
       'process.env': {
         NODE_ENV: JSON.stringify('production')
-      }
-    }),
-
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      minChunks(module, count) {
-        const { resource, context } = module
-
-        return (context && resource) &&
-          context.indexOf('node_modules') >= 0 &&
-          count >= 1 &&
-          resource.match(/\.js$/)
       }
     }),
 
@@ -116,10 +115,10 @@ module.exports = {
       ]
     }),
 
-    new ExtractTextPlugin('[name]-[contenthash].css'),
-
-    new OptimizeCssAssetsPlugin(),
-    new UglifyJSPlugin()
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+      chunkFilename: '[name]-[id].css'
+    })
   ],
 
   output: {
