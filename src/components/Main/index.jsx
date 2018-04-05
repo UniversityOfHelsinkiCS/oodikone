@@ -7,7 +7,6 @@ import Populations from '../PopulationStatistics'
 import DepartmentSuccess from '../DepartmentSuccess'
 import StudentStatistics from '../StudentStatistics'
 import Courses from '../Courses'
-import Teachers from '../Teachers'
 import EnableUsers from '../EnableUsers'
 import ErrorContainer from '../ErrorContainer'
 import { routes, BASE_PATH } from '../../constants'
@@ -42,7 +41,6 @@ class Main extends Component {
               <Route exact path={routes.populations.route} component={Populations} />
               <Route exact path={routes.students.route} component={StudentStatistics} />
               <Route exact path={routes.courses.route} component={Courses} />
-              <Route exact path={routes.teachers.route} component={Teachers} />
               <Route exact path={routes.users.route} component={EnableUsers} />
             </Switch>
           </main>
