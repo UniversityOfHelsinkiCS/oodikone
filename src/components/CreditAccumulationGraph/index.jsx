@@ -31,13 +31,15 @@ class CreditAccumulationGraph extends Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.state.intervalObject.interval)
+    if (this.state.intervalObject) {
+      clearInterval(this.state.intervalObject.interval)
+    }
   }
 
   getMoreCreditLines = () => {
     const { students } = this.props
     const { intervalObject } = this.state
-    const MAX_SPLICES = Math.min(Math.ceil(students.length / 30), 2) // Made up
+    const MAX_SPLICES = Math.min(Math.ceil(students.length / 30), 1) // Made up
     if (!intervalObject) {
       const interval = setInterval(() => this.getMoreCreditLines(), 1000)
       this.setState({ intervalObject: { interval, tick: 0 } })
