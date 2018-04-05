@@ -3,7 +3,7 @@ import { arrayOf, object, string, func, shape } from 'prop-types'
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Line, Tooltip, CartesianGrid, Dot } from 'recharts'
 import _ from 'lodash'
 import moment from 'moment'
-import { Header, Segment, Message } from 'semantic-ui-react'
+import { Header, Segment, Message, Loader } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 
 import { DISPLAY_DATE_FORMAT, CHART_COLORS, API_DATE_FORMAT } from '../../constants'
@@ -13,36 +13,42 @@ import { turquoise } from '../../styles/variables/colors'
 import styles from './creditAccumulationGraph.css'
 import CreditGraphTooltip from '../CreditGraphTooltip'
 
-const MAX_SPLICES = 10
 
 class CreditAccumulationGraph extends Component {
   state = {
     combinedStudentData: undefined,
-    studentCreditLines: undefined,
-    intervalObject: undefined
+    studentCreditLines: [],
+    intervalObject: undefined,
+    loading: true
   }
 
   componentDidMount() {
     const { students } = this.props
 
     const combinedStudentData = this.createCombinedStudentData(students)
-    const studentCreditLines = []
-    const interval = setInterval(() => this.getMoreCreditLines(students), 1000)
-    const intervalObject = { interval, tick: 1 }
-    this.setState({ combinedStudentData, studentCreditLines, intervalObject })
+    this.getMoreCreditLines()
+    this.setState({ combinedStudentData, loading: true })
   }
 
   componentWillUnmount() {
     clearInterval(this.state.intervalObject.interval)
   }
 
-  getMoreCreditLines = (students) => {
+  getMoreCreditLines = () => {
+    const { students } = this.props
     const { intervalObject } = this.state
-    if (!intervalObject) return
-    if (this.state.intervalObject.tick >= MAX_SPLICES) {
-      clearInterval(intervalObject.interval)
+    const MAX_SPLICES = Math.min(Math.ceil(students.length / 30), 2) // Made up
+    if (!intervalObject) {
+      const interval = setInterval(() => this.getMoreCreditLines(), 1000)
+      this.setState({ intervalObject: { interval, tick: 0 } })
+      return
     }
     const newInterval = { ...intervalObject, tick: 1 + intervalObject.tick }
+    let loading = true
+    if (newInterval.tick === MAX_SPLICES) {
+      clearInterval(intervalObject.interval)
+      loading = false
+    }
     const studentCreditLines = this.state.studentCreditLines.concat(this.createStudentCreditLines(
       students.slice(
         this.state.studentCreditLines.length,
@@ -50,7 +56,8 @@ class CreditAccumulationGraph extends Component {
       ),
       this.isSingleStudentGraph(students)
     ))
-    this.setState({ intervalObject: newInterval, studentCreditLines })
+
+    this.setState({ intervalObject: newInterval, studentCreditLines, loading })
   }
 
   getXAxisMonth = (date, startDate) =>
@@ -197,6 +204,7 @@ class CreditAccumulationGraph extends Component {
       <div className={styles.graphContainer}>
         <Header attached="top" size="large">{title}</Header>
         <Segment attached="bottom">
+          <Loader active={this.state.loading} />
           <ResponsiveContainer height={400}>
             <LineChart data={combinedStudentData}>
               <XAxis
