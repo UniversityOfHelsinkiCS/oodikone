@@ -11,27 +11,12 @@ router.get('/courses', async function (req, res) {
   res.json(results)
 })
 
-router.post('/courselist', async function (req, res) {
-  const results = await Course.instancesOf(req.body.code)
-
-  res.json(results)
-})
-
 router.get('/v2/courselist', async function (req, res) {
   let results = []
   if (req.query.code) {
     results = await Course.instancesOf(req.query.code)
   }
 
-  res.json(results)
-})
-
-router.post('/coursestatistics', async function (req, res) {
-  const code = req.body.code
-  const date = req.body.date.split('.').join('-')
-  const months = req.body.subsequentMonthsToInvestigate
-
-  const results = await Course.statisticsOf(code, date, months)
   res.json(results)
 })
 
