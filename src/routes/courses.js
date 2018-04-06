@@ -2,7 +2,7 @@ const router = require('express').Router()
 const Course = require('../services/courses')
 
 
-router.get('/courses', async function (req, res) {
+router.get('/courses', async (req, res) => {
   let results = []
   if (req.query.name) {
     results = await Course.bySearchTerm(req.query.name)
@@ -11,7 +11,7 @@ router.get('/courses', async function (req, res) {
   res.json(results)
 })
 
-router.get('/v2/courselist', async function (req, res) {
+router.get('/v2/courselist', async (req, res) => {
   let results = []
   if (req.query.code) {
     results = await Course.instancesOf(req.query.code)
@@ -20,7 +20,7 @@ router.get('/v2/courselist', async function (req, res) {
   res.json(results)
 })
 
-router.get('/v2/coursestatistics', async function (req, res) {
+router.get('/v2/coursestatistics', async (req, res) => {
   let results = []
   if (req.query.date && req.query.code && req.query.months) {
     const code = req.query.code

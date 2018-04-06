@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const Student = require('../services/students')
 
-router.get('/students', async function (req, res) {
+router.get('/students', async (req, res) => {
   let results = []
   if (req.query.searchTerm) {
     results = await Student.bySearchTerm(req.query.searchTerm)
@@ -10,7 +10,7 @@ router.get('/students', async function (req, res) {
   res.json(results)
 })
 
-router.get('/students/:id', async function (req, res) {
+router.get('/students/:id', async (req, res) => {
   const results = await Student.withId(req.params.id)
   res.json(results)
 })

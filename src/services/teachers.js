@@ -41,7 +41,7 @@ const teachersByIds = (ids) => {
   })
 }
 
-async function statisticsOf(courses, fromDate, toDate, minCourses, minStudents, studyRights) {
+const statisticsOf = async (courses, fromDate, toDate, minCourses, minStudents, studyRights) => {
   const extractStatsPerTeacherId = (courses) => {
     const hasAskedStudyright = (credit) => {
       if ( studyRights.length==0 ) {
