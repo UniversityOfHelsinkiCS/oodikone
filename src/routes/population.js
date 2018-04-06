@@ -43,11 +43,11 @@ router.get('/studyprogrammes', async (req, res) => {
     if (!req.decodedToken.admin) {
       const user = await User.byUsername(req.decodedToken.userId)
       const units = await User.getUnits(user.id)
-      const arr = units.map(p => { return { id: p.id, name: p.name } })
+      const arr = units.map(p => ({ id: p.id, name: p.name }))
       res.json(arr).status(200).end()
     } else {
       const units = await Unit.findAllEnabled()
-      const arr = units.map(p => { return { id: p.id, name: p.name } })
+      const arr = units.map(p => ({ id: p.id, name: p.name }))
       res.json(arr).status(200).end()
     }
   } catch (err) {
