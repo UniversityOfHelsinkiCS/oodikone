@@ -130,7 +130,7 @@ const formatStudent = ({ studentnumber, dateofuniversityenrollment, creditcount,
   }
 }
 
-async function bySearchTerm(term) {
+const bySearchTerm = async (term) => {
   try {
     const result = await byAbreviatedNameOrStudentNumber(`%${term}%`)
     return result.map(formatStudent)
@@ -141,7 +141,7 @@ async function bySearchTerm(term) {
   }
 }
 
-async function withId(id) {
+const withId = async (id) => {
   try {
     const result = await byId(id)
 
