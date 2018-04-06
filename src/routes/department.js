@@ -2,7 +2,7 @@ const router = require('express').Router()
 const Department = require('../services/departments')
 const conf = require('../conf-backend')
 
-router.get('/departmentsuccess', async function (req, res) {
+router.get('/departmentsuccess', async (req, res) => {
   const startDate = req.query.date ? req.query.date.split('.').join('-') : '2005-08-01'
   const months = 13
 

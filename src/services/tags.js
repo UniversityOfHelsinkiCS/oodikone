@@ -16,7 +16,9 @@ const tagsByTerm = (searchTerm) => {
 const tagByName = (tagname) => {
   return Tag.findOne({
     where: { 
-      tagname: tagname
+      tagname: {
+        [Op.eq]: tagname
+      }
     },
     include: [TagStudent]
   })
@@ -35,7 +37,7 @@ const createTag = (tagname) => {
   })
 }
 
-async function bySearchTerm(searchTerm) {
+const bySearchTerm = async (searchTerm) => {
   try {
     const tag = await tagsByTerm(searchTerm) 
     return tag.map(t=>t.tagname)
@@ -47,7 +49,7 @@ async function bySearchTerm(searchTerm) {
 
 }
 
-async function addToStudents(tagname, students) {
+const addToStudents = async (tagname, students) => {
   const notTaggedWith = (tag) => (student) => {
     if (tag.tag_students === undefined ) {
       return true 
