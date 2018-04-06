@@ -3,10 +3,10 @@ import { connect } from 'react-redux'
 import { func, object, arrayOf } from 'prop-types'
 import { Segment, Header } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
+import { makePopulationsToData } from '../../selectors/populationDetails'
 
 import CreditAccumulationGraph from '../CreditAccumulationGraph'
 import CourseQuarters from '../CourseQuarters'
-import { flattenAndCleanPopulations } from '../../common'
 
 class PopulationDetails extends Component {
   static propTypes = {
@@ -34,24 +34,25 @@ class PopulationDetails extends Component {
     return (
       <Segment>
         <Header size="medium" dividing>{translate('populationStatistics.creditStatisticsHeader')}</Header>
-        { statistics }
+        {statistics}
       </Segment>
     )
   }
 
   renderCreditGainGraphs = () => {
     const { samples, translate } = this.props
-    const graphs = samples.map((sample, i) =>
-      (<CreditAccumulationGraph
+    const graphs = samples.map((sample, i) => (
+      <CreditAccumulationGraph
         key={`credit-graph-${i}`} // eslint-disable-line react/no-array-index-key
         students={sample}
         title={`${translate('populationStatistics.sampleId')}: ${i}`}
         translate={translate}
-      />))
+      />
+    ))
     return (
       <Segment>
         <Header size="medium" dividing>{translate('populationStatistics.graphSegmentHeader')}</Header>
-        { graphs }
+        {graphs}
       </Segment>
     )
   }
@@ -62,16 +63,18 @@ class PopulationDetails extends Component {
     }
     return (
       <div>
-        { this.renderCourseStatistics() }
-        { this.renderCreditGainGraphs() }
+        {this.renderCourseStatistics()}
+        {this.renderCreditGainGraphs()}
       </div>
     )
   }
 }
 
-const mapStateToProps = ({ populations, locale }) => ({
-  samples: flattenAndCleanPopulations(populations),
-  translate: getTranslate(locale)
+const populationsToData = makePopulationsToData()
+
+const mapStateToProps = state => ({
+  samples: populationsToData(state),
+  translate: getTranslate(state.locale)
 })
 
 const mapDispatchToProps = () => ({})

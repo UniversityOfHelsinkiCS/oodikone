@@ -64,9 +64,4 @@ export const removeInvalidCreditsFromStudent = student => ({
 export const removeInvalidCreditsFromStudents = students =>
   students.map(student => removeInvalidCreditsFromStudent(student))
 
-export const flattenAndCleanPopulations = populations =>
-  populations.filter(population => !population.pending)
-    .map(population => population.data)
-    .map(student => removeInvalidCreditsFromStudents(student))
-
 export const getStudentTotalCredits = student => student.courses.reduce((a, b) => a + b.credits, 0)
