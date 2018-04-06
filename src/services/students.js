@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { getDate } = require('./database_updater/oodi_data_mapper')
-const { Student, Credit, CourseInstance, Course, TagStudent, Tag } = require('../models')
+const { Student, Credit, CourseInstance, Course, TagStudent } = require('../models')
 const Op = Sequelize.Op
 
 const createStudent = (array) => {
@@ -77,16 +77,6 @@ const byId = (id) => {
   })
 }
 
-const tagsOfStudent = (id) => {
-  return TagStudent.findAll({
-    where: {
-      taggedstudents_studentnumber: {
-        [Op.eq]: id
-      }
-    }
-  })
-}
-
 const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   return Student.findAll({
     limit: 10,
@@ -108,35 +98,7 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
-/*
-TODO unused?
-const withCreditsAfter = (ids, date) => {
-  return Student.findAll({
-    include: [
-      {
-        model: Credit, 
-        include: [
-          {
-            model: CourseInstance,
-            where: {
-              course_code: {
-                [Op.gte] :date
-              }
-            }
-          } 
-        ]
-      }
-    ],
-    where: { 
-      studentnumber: {
-        [Op.in]: ids
-      } 
-    }
-  })
-}
-*/
-
-const formatStudent = ({ studentnumber, dateofuniversityenrollment, creditcount, credits, tag_students }) => {
+const formatStudent = ({ studentnumber, dateofuniversityenrollment, creditcount, credits }) => {
 
   const toCourse = ({ grade, credits, courseinstance }) => {
     return {
@@ -149,14 +111,6 @@ const formatStudent = ({ studentnumber, dateofuniversityenrollment, creditcount,
       grade,
       credits
     }
-  }
-
-  const tagnames = (tag_students) => {
-    if (tag_students === undefined || tag_students.length === 0 || tag_students[0].tags_tagname === null) {
-      return []
-    }
-
-    return tag_students.map(t => t.tags_tagname)
   }
 
   const byDate = (a, b) => {
@@ -172,56 +126,11 @@ const formatStudent = ({ studentnumber, dateofuniversityenrollment, creditcount,
     started: dateofuniversityenrollment,
     credits: creditcount,
     courses: credits.sort(byDate).map(toCourse),
-    tags: tagnames(tag_students)
+    tags: []
   }
 }
 
-const addTagToStudent = (id, tag) => {
-  return TagStudent.create({
-    taggedstudents_studentnumber: id,
-    tags_tagname: tag
-  })
-}
-
-const findTag = (tag) => {
-  return Tag.findOne({
-    where: {
-      tagname: {
-        [Op.eq]: tag
-      }
-    }
-  })
-}
-
-const findTagOf = (id, tag) => {
-  return TagStudent.findOne({
-    where: {
-      [Op.and]: [
-        {
-          tags_tagname: {
-            [Op.eq]: tag
-          }
-        },
-        {
-          taggedstudents_studentnumber: {
-            [Op.eq]: id
-          }
-        }
-      ]
-    }
-  })
-}
-
-const deleteTagStudent = (id, tagname) => {
-  return TagStudent.destroy({
-    where: {
-      taggedstudents_studentnumber: id,
-      tags_tagname: tagname
-    }
-  })
-}
-
-async function bySearchTerm(term) {
+const bySearchTerm = async (term) => {
   try {
     const result = await byAbreviatedNameOrStudentNumber(`%${term}%`)
     return result.map(formatStudent)
@@ -232,13 +141,9 @@ async function bySearchTerm(term) {
   }
 }
 
-async function withId(id) {
+const withId = async (id) => {
   try {
     const result = await byId(id)
-    // TODO for some reason including tags in query do not work
-    // perhaps it is due to lacking primary key field 
-    const tags = await tagsOfStudent(id)
-    result.tag_students = tags.map(t => t.dataValues)
 
     return formatStudent(result)
   } catch (e) {
@@ -249,55 +154,6 @@ async function withId(id) {
   }
 }
 
-// HOT-FIXED. Add Id to tag_student table and fix this.
-async function addTag(id, tagname) {
-  try {
-    //const student = await byId(id)
-    const tag = await findTag(tagname)
-    //console.log(student.tag_students.map(t=>t.tags_tagname))
-    const tags_of_student = await tagsOfStudent(id)
-    //console.log(tags_of_student.map(t=>t.tags_tagname))
-
-    if (tag === null) {
-      return {
-        error: `tag '${tagname}' does not exist`
-      }
-    }
-
-    if (tags_of_student.map(t => t.tags_tagname).includes(tagname)) {
-      return {
-        error: `tag '${tagname}' already assosiated with student '${id}'`
-      }
-    }
-
-    return await addTagToStudent(id, tagname)
-  } catch (e) {
-    return {
-      error: e
-    }
-  }
-}
-
-async function deleteTag(id, tagname) {
-  try {
-    console.log(id, tagname)
-    const tag = await findTagOf(id, tagname)
-
-    if (tag === null) {
-      return {
-        error: `tag '${tagname}' is not assosiated with student '${id}'`
-      }
-    }
-    await deleteTagStudent(id, tagname)
-    return {}
-  } catch (e) {
-    return {
-      error: e
-    }
-  }
-
-}
-
 module.exports = {
-  withId, bySearchTerm, addTag, deleteTag, formatStudent, createStudent, byId, updateStudent
+  withId, bySearchTerm, formatStudent, createStudent, byId, updateStudent
 }

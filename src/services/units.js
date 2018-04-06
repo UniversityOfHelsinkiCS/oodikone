@@ -1,12 +1,17 @@
+const Sequelize = require('sequelize')
 const { Unit } = require('../models')
-
+const Op = Sequelize.Op
 const all = () => {
   return Unit.findAll()
 }
 
 const findAllEnabled = () => {
   return Unit.findAll({
-    where: { enabled: true }
+    where: {
+      enabled: {
+        [Op.eq]: true
+      }
+    }
   })
 }
 

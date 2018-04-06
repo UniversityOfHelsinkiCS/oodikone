@@ -1,4 +1,4 @@
-function arrayUnique(value, index, self) { 
+const arrayUnique = (value, index, self) => { 
   return self.indexOf(value) === index
 }
 

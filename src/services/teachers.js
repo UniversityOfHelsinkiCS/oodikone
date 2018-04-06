@@ -41,7 +41,7 @@ const teachersByIds = (ids) => {
   })
 }
 
-async function statisticsOf(courses, fromDate, toDate, minCourses, minStudents, studyRights) {
+const statisticsOf = async (courses, fromDate, toDate, minCourses, minStudents, studyRights) => {
   const extractStatsPerTeacherId = (courses) => {
     const hasAskedStudyright = (credit) => {
       if ( studyRights.length==0 ) {
@@ -163,8 +163,12 @@ async function statisticsOf(courses, fromDate, toDate, minCourses, minStudents, 
 
 const findOrCreateTeacher = async (code, name) => {
   return Teacher.findOne({where: {
-    code: code,
-    name: name 
+    code: {
+      [Op.eq]: code
+    },
+    name: {
+      [Op.eq]: name
+    } 
   }
   }).then(t => {
     if (t === null) {

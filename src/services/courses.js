@@ -80,7 +80,7 @@ const byIds = (ids) => {
   })
 }
 
-async function bySearchTerm(term) {
+const bySearchTerm = async (term) => {
   const formatCourse = ({ name, code }) => ({ name, code })
 
   try {
@@ -93,7 +93,7 @@ async function bySearchTerm(term) {
   }
 }
 
-async function statisticsOf(code, date, months) {
+const statisticsOf = async (code, date, months) => {
 
   const getStudents = ({ credits }) => {
     const all = credits.map(c => c.student_studentnumber)
@@ -150,7 +150,7 @@ async function statisticsOf(code, date, months) {
   }
 }
 
-async function instancesOf(code) {
+const instancesOf = async (code) => {
   const byDate = (a, b) => {
     return moment(a.coursedate).isSameOrBefore(b.coursedate) ? -1 : 1
   }
