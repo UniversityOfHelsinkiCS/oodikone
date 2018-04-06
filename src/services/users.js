@@ -52,21 +52,21 @@ const getUnits = async (id) => {
       model: User,
       through: {
         where: {
-          user_id:
-            {
-              [Op.eq]: id
-            }
+          user_id: {
+            [Op.eq]: id
+          }
         }
       },
       where: {
-        id:
-          {
-            [Op.eq]: id
-          }
+        id: {
+          [Op.eq]: id
+        }
       }
     }],
     where: {
-      enabled: true
+      enabled: {
+        [Op.eq]: true
+      }
     }
   })
 }
