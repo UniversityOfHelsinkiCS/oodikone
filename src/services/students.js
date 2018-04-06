@@ -1,7 +1,8 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { getDate } = require('./database_updater/oodi_data_mapper')
-const { Student, Credit, CourseInstance, Course, TagStudent } = require('../models')
+const { Student, Credit, CourseInstance, Course, TagStudent, Studyright, Unit } = require('../models')
+const User = require('./users')
 const Op = Sequelize.Op
 
 const createStudent = (array) => {
@@ -46,16 +47,20 @@ const updateStudent = (array) => {
     sex: array[3],
     studentstatuscode: array[17]
   },
-  {
-    where: {
-      studentnumber: {
-        [Op.eq]: array[0]
+    {
+      where: {
+        studentnumber: {
+          [Op.eq]: array[0]
+        }
       }
-    }
-  })
+    })
 }
 
-const byId = (id) => {
+const byId = async (uid, id) => {
+  const user = await User.byUsername(uid)
+  const userId = user.dataValues.id
+  const units = await User.getUnits(userId)
+  const unitIds = units.map(unit => unit.dataValues.id)
   return Student.findOne({
     include: [
       {
@@ -67,6 +72,20 @@ const byId = (id) => {
           }
         ]
       },
+      {
+        separate: true,
+        model: Studyright,
+        include: [
+          {
+            model: Unit,
+            where: {
+              id: { [Op.or]: unitIds }
+            }
+          }],
+        where: {
+          prioritycode: { [Op.eq]: 1 }
+        }
+      },
       TagStudent
     ],
     where: {
@@ -77,7 +96,7 @@ const byId = (id) => {
   })
 }
 
-const byAbreviatedNameOrStudentNumber = (searchTerm) => {
+const byAbreviatedNameOrStudentNumber = (uid, searchTerm) => {
   return Student.findAll({
     limit: 10,
     where: {
@@ -130,9 +149,9 @@ const formatStudent = ({ studentnumber, dateofuniversityenrollment, creditcount,
   }
 }
 
-const bySearchTerm = async (term) => {
+const bySearchTerm = async (uid, term) => {
   try {
-    const result = await byAbreviatedNameOrStudentNumber(`%${term}%`)
+    const result = await byAbreviatedNameOrStudentNumber(uid, `%${term}%`)
     return result.map(formatStudent)
   } catch (e) {
     return {
@@ -141,9 +160,9 @@ const bySearchTerm = async (term) => {
   }
 }
 
-const withId = async (id) => {
+const withId = async (uid, id) => {
   try {
-    const result = await byId(id)
+    const result = await byId(uid, id)
 
     return formatStudent(result)
   } catch (e) {
