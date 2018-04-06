@@ -3,7 +3,7 @@ const Population = require('../services/populations')
 const User = require('../services/users')
 const Unit = require('../services/units')
 
-router.get('/studyrightkeywords', async function (req, res) {
+router.get('/studyrightkeywords', async (req, res) => {
   let results = []
   if (req.query.search) {
     results = await Population.studyrightsByKeyword(req.query.search)
@@ -12,12 +12,12 @@ router.get('/studyrightkeywords', async function (req, res) {
   res.json(results)
 })
 
-router.get('/enrollmentdates', async function (req, res) {
+router.get('/enrollmentdates', async (req, res) => {
   const results = await Population.universityEnrolmentDates()
   res.json(results)
 })
 
-router.get('/populationstatistics', async function (req, res) {
+router.get('/populationstatistics', async (req, res) => {
   try {
     if (!req.query.year || !req.query.semester || !req.query.studyRights) {
       res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
@@ -38,7 +38,7 @@ router.get('/populationstatistics', async function (req, res) {
   }
 })
 
-router.get('/studyprogrammes', async function (req, res) {
+router.get('/studyprogrammes', async (req, res) => {
   try {
     if (!req.decodedToken.admin) {
       const user = await User.byUsername(req.decodedToken.userId)
