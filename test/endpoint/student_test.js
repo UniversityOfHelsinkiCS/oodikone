@@ -55,7 +55,7 @@ test('a students information can be fetched', async t => {
     .set('uid', uid)
     .expect(200)
     .expect('Content-Type', /application\/json/)
-  t.is(res.body.tags.length, 5)
+  t.is(res.body.tags.length, 0)
   t.is(res.body.courses.length, 3)
 })
 
@@ -68,32 +68,6 @@ test('students are returned when searching', async t => {
     .expect(200)
     .expect('Content-Type', /application\/json/)
   t.is(res.body.length, 4)
-})
-
-test('students tag can be removed', async t => {
-  let res = await api
-    .get(`/api/students/${students[2].studentnumber}`)
-    .set('x-access-token', token)
-    .set('uid', uid)
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-  t.is(res.body.tags.length, 5)
-
-  res = await api
-    .delete(`/api/students/${students[2].studentnumber}/tags`)
-    .send({ studentnumber: students[2].studentnumber, tagname: tags[1].tagname })
-    .set('x-access-token', token)
-    .set('uid', uid)
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-
-  res = await api
-    .get(`/api/students/${students[2].studentnumber}`)
-    .set('x-access-token', token)
-    .set('uid', uid)
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-  t.is(res.body.tags.length, 4)
 })
 
 test('should pong when pinged', async t => {

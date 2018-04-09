@@ -4,81 +4,73 @@ const { Student, Credit, CourseInstance, Course, CourseTeacher } = require('../m
 const { arrayUnique } = require('../util')
 const Op = Sequelize.Op
 
-const byNameOrCode = (searchTerm) => {
-  return Course.findAll({
-    limit: 10,
-    where: {
-      [Op.or]: [
+const byNameOrCode = (searchTerm) => Course.findAll({
+  limit: 10,
+  where: {
+    [Op.or]: [
+      {
+        name: {
+          [Op.iLike]: searchTerm
+        }
+      },
+      {
+        code: {
+          [Op.like]: searchTerm
+        }
+      }
+    ]
+  }
+})
+
+const instanceStatistics = async (code, date) => CourseInstance.findOne({
+  include: [
+    {
+      model: Credit,
+      include: [Student]
+    }
+  ],
+  where: {
+    [Op.and]: [
+      {
+        course_code: {
+          [Op.eq]: code
+        }
+      },
+      {
+        coursedate: {
+          [Op.eq]: new Date(date)
+        }
+      }
+    ]
+  }
+})
+
+const instancesByCode = (code) => CourseInstance.findAll({
+  include: [Credit, CourseTeacher],
+  where: {
+    course_code: {
+      [Op.eq]: code
+    }
+  }
+})
+
+const byIds = (ids) => Student.findAll({
+  include: [
+    {
+      model: Credit,
+      include: [
         {
-          name: {
-            [Op.iLike]: searchTerm
-          }
-        },
-        {
-          code: {
-            [Op.like]: searchTerm
-          }
+          model: CourseInstance,
         }
       ]
     }
-  })
-}
-
-const instanceStatistics = async (code, date) => {
-  return CourseInstance.findOne({
-    include: [
-      {
-        model: Credit,
-        include: [Student]
-      }
-    ],
-    where: {
-      [Op.and]: [
-        {
-          course_code: {
-            [Op.eq]: code
-          }
-        },
-        {
-          coursedate: {
-            [Op.eq]: new Date(date)
-          }
-        }
-      ]
+  ],
+  where: {
+    studentnumber: {
+      [Op.in]: ids
     }
-  })
-}
-
-const instancesByCode = (code) => {
-  return CourseInstance.findAll({
-    include: [Credit, CourseTeacher],
-    where: {
-      course_code: {
-        [Op.eq]: code
-      }
-    }
-  })
-}
-
-const byIds = (ids) => {
-  return Student.findAll({
-    include: [
-      {
-        model: Credit,
-        include: [
-          {
-            model: CourseInstance,
-          }
-        ]
-      }
-    ],
-    where: {
-      studentnumber: {
-        [Op.in]: ids
-      }
-    }
-  })
-}
+  }
+})
 
 const bySearchTerm = async (term) => {
   const formatCourse = ({ name, code }) => ({ name, code })
@@ -121,7 +113,7 @@ const statisticsOf = async (code, date, months) => {
         .filter(Credit.notUnnecessary)
         .reduce((set, c) => set + c.credits, 0.0)
     }
-    
+
     const toStudent = (set, student) => {
       set[student.studentnumber] = creditsAfter(student, date)
       return set
@@ -196,12 +188,10 @@ const courseInstanceByCodeAndDate = (code, date) => {
   })
 }
 
-const createCourse = async (code, name) => {
-  return Course.create({
-    code: code,
-    name: name
-  })
-}
+const createCourse = async (code, name) => Course.create({
+  code: code,
+  name: name
+})
 
 const createCourseInstance = async (creditDate, course) => {
   const maxId = await CourseInstance.max('id')

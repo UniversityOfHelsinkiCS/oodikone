@@ -49,36 +49,6 @@ test('should pong when pinged', async t => {
   t.deepEqual(res.body, { data: 'pong' })
 })
 
-/*
-test('request without basic auth credentials fails', async t => {
-  await api
-    .get('/api/enrollmentdates')
-    .expect(403)
-    .expect('Content-Type', /application\/json/)
-        
-  t.pass()
-})
-
-test('request with basic nonexisting user fails', async t => {
-  await api
-    .get('/api/enrollmentdates')
-    .auth('nonexistent', 'wrong')
-    .expect(403)
-    .expect('Content-Type', /application\/json/)
-  
-  t.pass()
-})
-
-test('request with wrong password fails', async t => {
-  await api
-    .get('/api/enrollmentdates')
-    .auth('tktl', 'wrong')
-    .expect(403)
-    .expect('Content-Type', /application\/json/)
-
-  t.pass()    
-})  */
-
 test('request with correct credentials succeed', async t => {
   await api
     .get('/api/enrollmentdates')
