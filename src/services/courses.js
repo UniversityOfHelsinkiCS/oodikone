@@ -2,6 +2,7 @@ const Sequelize = require('sequelize')
 const moment = require('moment')
 const { Student, Credit, CourseInstance, Course, CourseTeacher } = require('../models')
 const { arrayUnique } = require('../util')
+const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
 
 const byNameOrCode = (searchTerm) => Course.findAll({
@@ -115,7 +116,7 @@ const statisticsOf = async (code, date, months) => {
     }
 
     const toStudent = (set, student) => {
-      set[student.studentnumber] = creditsAfter(student, date)
+      set[uuidv4()] = creditsAfter(student, date)
       return set
     }
 
@@ -130,6 +131,7 @@ const statisticsOf = async (code, date, months) => {
     const all = studentStatsAfter(studentStats.filter(s => students.all.includes(s.studentnumber)), date)
     const pass = studentStatsAfter(studentStats.filter(s => students.pass.includes(s.studentnumber)), date)
     const fail = studentStatsAfter(studentStats.filter(s => students.fail.includes(s.studentnumber)), date)
+    console.log(all)
     return {
       all, pass, fail,
       startYear: starYearsOf(instanceStats.credits.map(c => c.student))
