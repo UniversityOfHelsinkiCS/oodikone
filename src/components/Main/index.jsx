@@ -18,7 +18,8 @@ import { userIsEnabled } from '../../common'
 
 class Main extends Component {
   state = {
-    enabled: false
+    enabled: false,
+    hasError: false
   }
 
   async componentDidMount() {
@@ -26,9 +27,13 @@ class Main extends Component {
     this.setState({ enabled })
   }
 
+  componentDidCatch() {
+    this.setState({ hasError: true })
+  }
+
   render() {
-    if (!this.state.enabled) {
-      return <AccessDenied />
+    if (!this.state.enabled || this.state.hasError) {
+      return <AccessDenied itWasError={this.state.hasError} />
     }
     return (
       <div className={styles.appContainer}>
