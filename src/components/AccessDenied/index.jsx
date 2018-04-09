@@ -1,5 +1,6 @@
 import React from 'react'
 import { Dimmer, Header, Icon, Container } from 'semantic-ui-react'
+import { bool } from 'prop-types'
 
 import MulticolorBarChart from '../MulticolorBarChart'
 
@@ -10,28 +11,35 @@ const dummyData = [
   { text: 'ttuotila', value: 59.7 }
 ]
 
-const AccessDenied = () => (
-  <div >
-    <Container style={{ margin: '5%' }}>
-      <MulticolorBarChart chartTitle="Past" chartData={dummyData} />
-      <MulticolorBarChart chartTitle="Your students future" chartData={dummyData.concat(dummyData)} />
-    </Container>
-    <Dimmer
-      active
-      page
-    >
-      <Header as="h2" icon inverted>
-        <Icon name="heart" />
-        Sorry
-        <Header.Subheader>You do not have access to Oodikone</Header.Subheader>
-        <br />
-        <Header.Subheader>
-          If you should have access try refreshing your browser window
-          or contact grp-toska@helsinki.fi
-        </Header.Subheader>
-      </Header>
-    </Dimmer>
-  </div>
-)
+const AccessDenied = ({ itWasError }) => {
+  const header = itWasError ? 'Something broke' : 'You do not have access to Oodikone'
+  const guide = 'try refreshing your browser window or contact grp-toska@helsinki.fi'
+  const subheader = itWasError ? `If this was not intended ${guide}` : `If you should have access ${guide}`
+
+  return (
+    <div >
+      <Container style={{ margin: '5%' }}>
+        <MulticolorBarChart chartTitle="Past" chartData={dummyData} />
+        <MulticolorBarChart chartTitle="Your students future" chartData={dummyData.concat(dummyData)} />
+      </Container>
+      <Dimmer
+        active
+        page
+      >
+        <Header as="h2" icon inverted>
+          <Icon name="heart" />
+          Sorry
+          <Header.Subheader>{header}</Header.Subheader>
+          <br />
+          <Header.Subheader>{subheader}</Header.Subheader>
+        </Header>
+      </Dimmer>
+    </div>
+  )
+}
+
+AccessDenied.propTypes = {
+  itWasError: bool.isRequired
+}
 
 export default AccessDenied
