@@ -1,81 +1,74 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { getDate } = require('./database_updater/oodi_data_mapper')
-const { Student, Credit, CourseInstance, Course, TagStudent } = require('../models')
+const { Student, Credit, CourseInstance, Course, TagStudent, Studyright } = require('../models')
 const Op = Sequelize.Op
 
-const createStudent = (array) => {
-  return Student.create({
-    studentnumber: array[0],
-    lastname: array[4],
-    firstnames: array[5],
-    abbreviatedname: array[6],
-    birthdate: getDate(array[2]),
-    communicationlanguage: array[22],
-    country: array[15],
-    creditcount: array[18],
-    dateoffirstcredit: getDate(array[20]),
-    dateoflastcredit: getDate(array[21]),
-    dateofuniversityenrollment: getDate(array[19]),
-    gradestudent: array[25],
-    matriculationexamination: array[24],
-    nationalities: array[23],
-    semesterenrollmenttypecode: array[16],
-    sex: array[3],
-    studentstatuscode: array[17]
-  })
-}
+const createStudent = (array) => Student.create({
+  studentnumber: array[0],
+  lastname: array[4],
+  firstnames: array[5],
+  abbreviatedname: array[6],
+  birthdate: getDate(array[2]),
+  communicationlanguage: array[22],
+  country: array[15],
+  creditcount: array[18],
+  dateoffirstcredit: getDate(array[20]),
+  dateoflastcredit: getDate(array[21]),
+  dateofuniversityenrollment: getDate(array[19]),
+  gradestudent: array[25],
+  matriculationexamination: array[24],
+  nationalities: array[23],
+  semesterenrollmenttypecode: array[16],
+  sex: array[3],
+  studentstatuscode: array[17]
+})
 
-const updateStudent = (array) => {
-  return Student.update({
-    studentnumber: array[0],
-    lastname: array[4],
-    firstnames: array[5],
-    abbreviatedname: array[6],
-    birthdate: getDate(array[2]),
-    communicationlanguage: array[22],
-    country: array[15],
-    creditcount: array[18],
-    dateoffirstcredit: getDate(array[20]),
-    dateoflastcredit: getDate(array[21]),
-    dateofuniversityenrollment: getDate(array[19]),
-    gradestudent: array[25],
-    matriculationexamination: array[24],
-    nationalities: array[23],
-    semesterenrollmenttypecode: array[16],
-    sex: array[3],
-    studentstatuscode: array[17]
-  },
-  {
-    where: {
-      studentnumber: {
-        [Op.eq]: array[0]
-      }
+const updateStudent = (array) => Student.update({
+  studentnumber: array[0],
+  lastname: array[4],
+  firstnames: array[5],
+  abbreviatedname: array[6],
+  birthdate: getDate(array[2]),
+  communicationlanguage: array[22],
+  country: array[15],
+  creditcount: array[18],
+  dateoffirstcredit: getDate(array[20]),
+  dateoflastcredit: getDate(array[21]),
+  dateofuniversityenrollment: getDate(array[19]),
+  gradestudent: array[25],
+  matriculationexamination: array[24],
+  nationalities: array[23],
+  semesterenrollmenttypecode: array[16],
+  sex: array[3],
+  studentstatuscode: array[17]
+},
+{
+  where: {
+    studentnumber: {
+      [Op.eq]: array[0]
     }
-  })
-}
+  }
+})
 
-const byId = (id) => {
-  return Student.findOne({
-    include: [
-      {
-        model: Credit,
-        include: [
-          {
-            model: CourseInstance,
-            include: [Course]
-          }
-        ]
-      },
-      TagStudent
-    ],
-    where: {
-      studentnumber: {
-        [Op.eq]: id
-      }
+const byId = async (id) => Student.findOne({
+  include: [
+    {
+      model: Credit,
+      include: [
+        {
+          model: CourseInstance,
+          include: [Course]
+        }
+      ]
     }
-  })
-}
+  ],
+  where: {
+    studentnumber: {
+      [Op.eq]: id
+    }
+  }
+})
 
 const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   return Student.findAll({
@@ -144,7 +137,6 @@ const bySearchTerm = async (term) => {
 const withId = async (id) => {
   try {
     const result = await byId(id)
-
     return formatStudent(result)
   } catch (e) {
     console.log(e)
