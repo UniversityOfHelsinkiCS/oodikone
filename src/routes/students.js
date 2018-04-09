@@ -35,21 +35,19 @@ router.get('/students', async (req, res) => {
 })
 
 router.get('/students/:id', async (req, res) => {
+  const studentId = req.params.id
   if (req.decodedToken.admin) {
-    const uid = req.decodedToken.userId
-    const results = await Student.withId(uid, req.params.id)
+    const results = await Student.withId(studentId)
     res.json(results)
   } else {
     const uid = req.decodedToken.userId
-    const studentId = req.params.id
-    const student = await Student.withId(uid, studentId)
+    const student = await Student.withId(studentId)
     const user = await User.byUsername(uid)
     const units = await User.getUnits(user.id)
     const rights = await Promise.all(units.map(async unit => {
       const jtn = await Unit.hasStudent(unit.id, student.studentNumber)
       return jtn
     }))
-    console.log(rights)
     if (rights.some(right => right !== null)) {
       res.json(student).end()
     } else {

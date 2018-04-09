@@ -51,7 +51,7 @@ const updateStudent = (array) => Student.update({
   }
 })
 
-const byId = async (uid, id) => Student.findOne({
+const byId = async (id) => Student.findOne({
   include: [
     {
       model: Credit,
@@ -61,14 +61,7 @@ const byId = async (uid, id) => Student.findOne({
           include: [Course]
         }
       ]
-    },
-    {
-      model: Studyright,
-      where: {
-        prioritycode: { [Op.eq]: 1 }
-      }
-    },
-    TagStudent
+    }
   ],
   where: {
     studentnumber: {
@@ -141,10 +134,9 @@ const bySearchTerm = async (term) => {
   }
 }
 
-const withId = async (uid, id) => {
+const withId = async (id) => {
   try {
-    const result = await byId(uid, id)
-
+    const result = await byId(id)
     return formatStudent(result)
   } catch (e) {
     console.log(e)
