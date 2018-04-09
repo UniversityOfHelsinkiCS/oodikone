@@ -231,7 +231,7 @@ const Unit = sequelize.define('unit',
       type: Sequelize.BIGINT,
       autoIncrement: true
     },
-    name: { type: Sequelize.STRING },
+    name: { type: Sequelize.STRING, unique: true },
     enabled: { type: Sequelize.BOOLEAN }
   },
   {
