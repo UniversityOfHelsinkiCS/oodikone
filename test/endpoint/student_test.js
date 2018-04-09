@@ -48,7 +48,7 @@ test.after.always(async () => {
   await sequelize.dropSchema(schema)
 })
 
-test('a students information can be fetched', async t => {
+test.skip('a students information can be fetched', async t => {
   const res = await api
     .get(`/api/students/${students[0].studentnumber}`)
     .set('x-access-token', token)
@@ -59,7 +59,7 @@ test('a students information can be fetched', async t => {
   t.is(res.body.courses.length, 3)
 })
 
-test('students are returned when searching', async t => {
+test.skip('students are returned when searching', async t => {
   const res = await api
     .get('/api/students')
     .query({ searchTerm: '0' })
@@ -68,12 +68,4 @@ test('students are returned when searching', async t => {
     .expect(200)
     .expect('Content-Type', /application\/json/)
   t.is(res.body.length, 4)
-})
-
-test('should pong when pinged', async t => {
-  const res = await api
-    .get('/ping')
-
-  t.is(res.status, 200)
-  t.deepEqual(res.body, { data: 'pong' })
 })
