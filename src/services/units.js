@@ -1,24 +1,32 @@
 const Sequelize = require('sequelize')
-const { Unit } = require('../models')
+const { Unit, Studyright } = require('../models')
 const Op = Sequelize.Op
-const all = () => {
-  return Unit.findAll()
-}
 
-const findAllEnabled = () => {
-  return Unit.findAll({
-    where: {
-      enabled: {
-        [Op.eq]: true
-      }
+const all = () => Unit.findAll()
+
+const findAllEnabled = () => Unit.findAll({
+  where: {
+    enabled: {
+      [Op.eq]: true
     }
-  })
-}
+  }
+})
 
-const byId = (id) => {
-  return Unit.findById(id)
-}
+const byId = (id) => Unit.findById(id)
+
+const hasStudent = async (unitId, studentNumber) => Studyright.findOne({
+  where: {
+    prioritycode: 1,
+    student_studentnumber: studentNumber
+  },
+  include: {
+    model: Unit,
+    where: {
+      id: unitId
+    }
+  }
+})
 
 module.exports = {
-  all, byId, findAllEnabled
+  all, byId, findAllEnabled, hasStudent
 }
