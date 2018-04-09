@@ -24,16 +24,6 @@ const byId = async (id) => {
   })
 }
 
-const withUsername = async (username) => {
-  const user = await byUsername(username)
-
-  if (user) {
-    return user.password
-  } else {
-    return null
-  }
-}
-
 const createUser = async (username, fullname) => {
   return User.create({
     username: username,
@@ -103,7 +93,6 @@ const addUnit = async (userId, unitId) => {
 
 module.exports = {
   byUsername,
-  withUsername,
   createUser,
   updateUser,
   findAll,
