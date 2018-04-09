@@ -3,20 +3,6 @@ const Population = require('../services/populations')
 const User = require('../services/users')
 const Unit = require('../services/units')
 
-router.get('/studyrightkeywords', async (req, res) => {
-  let results = []
-  if (req.query.search) {
-    results = await Population.studyrightsByKeyword(req.query.search)
-  }
-
-  res.json(results)
-})
-
-router.get('/enrollmentdates', async (req, res) => {
-  const results = await Population.universityEnrolmentDates()
-  res.json(results)
-})
-
 router.get('/populationstatistics', async (req, res) => {
   try {
     if (!req.query.year || !req.query.semester || !req.query.studyRights) {
@@ -25,6 +11,17 @@ router.get('/populationstatistics', async (req, res) => {
     }
     if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
       req.query.studyRights = [req.query.studyRights]
+    }
+    if (!req.decodedToken.admin) {
+      const accesses = await Promise.all(req.query.studyRights.map(async right => {
+        const user = await User.byUsername(req.decodedToken.userId)
+        const units = await User.getUnits(user.id)
+        return units.some(unit => unit.id === right)
+      }))
+      if (accesses.some(access => !access)) {
+        res.status(403).json([]).end()
+        return
+      }
     }
     req.query.months = 12
     const result = await Population.semesterStatisticsFor(req.query)
