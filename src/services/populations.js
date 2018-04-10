@@ -94,10 +94,10 @@ const byCriteria = (conf) => {
   }
 
   console.log(33)
-  console.log(conf) 
-  console.log(tagWithConstraint) 
-  console.log(studyrightWithConstraint)
-  console.log(terms)
+  console.log(JSON.stringify(conf)) 
+  console.log(JSON.stringify(tagWithConstraint)) 
+  console.log(JSON.stringify(studyrightWithConstraint))
+  console.log(JSON.stringify(terms))
 
   return Student.findAll({
     include: [
@@ -120,8 +120,8 @@ const byCriteria = (conf) => {
     ],
     where: {
       [Op.and]: terms
-    }
-  })
+    }, logging: console.log
+  }, )
 
 }
 
@@ -181,7 +181,6 @@ const notAmongExcludes = (conf) => (student) => {
 }
 
 const restrictToMonths = (months) => (student) => {
-  console.log(41)
   if (months === undefined || months === null || months.length === 0) {
     return student
   }
@@ -236,14 +235,10 @@ const semesterStatisticsFor = async (query) => {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
 
-  console.log(11)
-
   const startDate = `${query.year}-${semesterStart[query.semester]}`
   const endDate = `${query.year}-${semesterEnd[query.semester]}`
-  console.log(12, JSON.stringify(query.studyRights))
   try {
     const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
-    console.log(13)
     const conf = {
       enrollmentDates: [startDate, endDate],
       studyRights: studyRights
