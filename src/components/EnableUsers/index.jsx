@@ -7,6 +7,7 @@ import { getTranslate, getActiveLanguage } from 'react-localize-redux'
 import styles from './enableUsers.css'
 import { getUsers, enableUser, addUserUnit, removeUserUnit } from '../../redux/users'
 import { getUnits } from '../../redux/units'
+import { makeSortUsers } from '../../selectors/users'
 
 class EnableUsers extends Component {
   componentDidMount() {
@@ -98,11 +99,13 @@ EnableUsers.propTypes = {
   error: bool.isRequired
 }
 
+const sortUsers = makeSortUsers()
+
 const mapStateToProps = ({ locale, users, units }) => ({
   translate: getTranslate(locale),
   currentLanguage: getActiveLanguage(locale).value,
   units: units.data,
-  users: users.data,
+  users: sortUsers(users),
   pending: users.pending,
   error: users.error || false
 })
