@@ -27,6 +27,7 @@ const generateToken = async (uid, res) => {
 router.get('/login', async (req, res) => {
   try {
     const uid = req.headers['uid']
+    console.log(req.headers)
     if (req.headers['shib-session-id'] && uid) {
       const user = await User.byUsername(uid)
       const fullname = req.headers.displayname || 'Shib Valmis'
