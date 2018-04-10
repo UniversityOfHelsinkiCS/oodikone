@@ -231,7 +231,7 @@ const Unit = sequelize.define('unit',
       type: Sequelize.BIGINT,
       autoIncrement: true
     },
-    name: { type: Sequelize.STRING },
+    name: { type: Sequelize.STRING, unique: true },
     enabled: { type: Sequelize.BOOLEAN }
   },
   {
@@ -302,6 +302,8 @@ Unit.belongsToMany(User, { through: 'user_unit', foreignKey: 'unit_id', timestam
 Tag.belongsToMany(Unit, { through: 'unit_tag', foreignKey: 'tags_tagname', timestamps: false })
 Unit.belongsToMany(Tag, { through: 'unit_tag', foreignKey: 'unit_id', timestamps: false })
 
+Studyright.belongsTo(Unit, { foreignKey: 'highlevelname', targetKey: 'name' })
+
 module.exports = {
   Student,
   Credit,
@@ -317,6 +319,6 @@ module.exports = {
   UserUnit,
   sequelize,
   migrationPromise,
-  Organisation, 
+  Organisation,
   StudentList
 }

@@ -192,19 +192,19 @@ const restrictToMonths = (months) => (student) => {
   }
 }
 
-async function studyrightsByKeyword(searchTerm) {
+const studyrightsByKeyword = async (searchTerm) => {
   const result = await studyRightLike(searchTerm)
 
   return result.map(s => s.highlevelname)
 }
 
-async function universityEnrolmentDates() {
+const universityEnrolmentDates = async () => {
   const [result] = await enrolmentDates()
 
   return result.map(r => r.date).filter(d => d).sort()
 }
 
-async function statisticsOf(conf) {
+const statisticsOf = async (conf) => {
   const students = (await byCriteria(conf))
     .filter(bySelectedCourses(conf.courses))
     .filter(notAmongExcludes(conf))
@@ -223,7 +223,7 @@ const semesterEnd = {
   FALL: '12-31'
 }
 
-async function semesterStatisticsFor(query) {
+const semesterStatisticsFor = async (query) => {
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }

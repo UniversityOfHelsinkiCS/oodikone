@@ -1,91 +1,74 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { getDate } = require('./database_updater/oodi_data_mapper')
-const { Student, Credit, CourseInstance, Course, TagStudent, Tag } = require('../models')
+const { Student, Credit, CourseInstance, Course, TagStudent, Studyright } = require('../models')
 const Op = Sequelize.Op
 
-const createStudent = (array) => {
-  return Student.create({
-    studentnumber: array[0],
-    lastname: array[4],
-    firstnames: array[5],
-    abbreviatedname: array[6],
-    birthdate: getDate(array[2]),
-    communicationlanguage: array[22],
-    country: array[15],
-    creditcount: array[18],
-    dateoffirstcredit: getDate(array[20]),
-    dateoflastcredit: getDate(array[21]),
-    dateofuniversityenrollment: getDate(array[19]),
-    gradestudent: array[25],
-    matriculationexamination: array[24],
-    nationalities: array[23],
-    semesterenrollmenttypecode: array[16],
-    sex: array[3],
-    studentstatuscode: array[17]
-  })
-}
+const createStudent = (array) => Student.create({
+  studentnumber: array[0],
+  lastname: array[4],
+  firstnames: array[5],
+  abbreviatedname: array[6],
+  birthdate: getDate(array[2]),
+  communicationlanguage: array[22],
+  country: array[15],
+  creditcount: array[18],
+  dateoffirstcredit: getDate(array[20]),
+  dateoflastcredit: getDate(array[21]),
+  dateofuniversityenrollment: getDate(array[19]),
+  gradestudent: array[25],
+  matriculationexamination: array[24],
+  nationalities: array[23],
+  semesterenrollmenttypecode: array[16],
+  sex: array[3],
+  studentstatuscode: array[17]
+})
 
-const updateStudent = (array) => {
-  return Student.update({
-    studentnumber: array[0],
-    lastname: array[4],
-    firstnames: array[5],
-    abbreviatedname: array[6],
-    birthdate: getDate(array[2]),
-    communicationlanguage: array[22],
-    country: array[15],
-    creditcount: array[18],
-    dateoffirstcredit: getDate(array[20]),
-    dateoflastcredit: getDate(array[21]),
-    dateofuniversityenrollment: getDate(array[19]),
-    gradestudent: array[25],
-    matriculationexamination: array[24],
-    nationalities: array[23],
-    semesterenrollmenttypecode: array[16],
-    sex: array[3],
-    studentstatuscode: array[17]
-  },
-  {
-    where: {
-      studentnumber: {
-        [Op.eq]: array[0]
-      }
+const updateStudent = (array) => Student.update({
+  studentnumber: array[0],
+  lastname: array[4],
+  firstnames: array[5],
+  abbreviatedname: array[6],
+  birthdate: getDate(array[2]),
+  communicationlanguage: array[22],
+  country: array[15],
+  creditcount: array[18],
+  dateoffirstcredit: getDate(array[20]),
+  dateoflastcredit: getDate(array[21]),
+  dateofuniversityenrollment: getDate(array[19]),
+  gradestudent: array[25],
+  matriculationexamination: array[24],
+  nationalities: array[23],
+  semesterenrollmenttypecode: array[16],
+  sex: array[3],
+  studentstatuscode: array[17]
+},
+{
+  where: {
+    studentnumber: {
+      [Op.eq]: array[0]
     }
-  })
-}
+  }
+})
 
-const byId = (id) => {
-  return Student.findOne({
-    include: [
-      {
-        model: Credit,
-        include: [
-          {
-            model: CourseInstance,
-            include: [Course]
-          }
-        ]
-      },
-      TagStudent
-    ],
-    where: {
-      studentnumber: {
-        [Op.eq]: id
-      }
+const byId = async (id) => Student.findOne({
+  include: [
+    {
+      model: Credit,
+      include: [
+        {
+          model: CourseInstance,
+          include: [Course]
+        }
+      ]
     }
-  })
-}
-
-const tagsOfStudent = (id) => {
-  return TagStudent.findAll({
-    where: {
-      taggedstudents_studentnumber: {
-        [Op.eq]: id
-      }
+  ],
+  where: {
+    studentnumber: {
+      [Op.eq]: id
     }
-  })
-}
+  }
+})
 
 const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   return Student.findAll({
@@ -108,35 +91,7 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
-/*
-TODO unused?
-const withCreditsAfter = (ids, date) => {
-  return Student.findAll({
-    include: [
-      {
-        model: Credit, 
-        include: [
-          {
-            model: CourseInstance,
-            where: {
-              course_code: {
-                [Op.gte] :date
-              }
-            }
-          } 
-        ]
-      }
-    ],
-    where: { 
-      studentnumber: {
-        [Op.in]: ids
-      } 
-    }
-  })
-}
-*/
-
-const formatStudent = ({ studentnumber, dateofuniversityenrollment, creditcount, credits, tag_students }) => {
+const formatStudent = ({ studentnumber, dateofuniversityenrollment, creditcount, credits }) => {
 
   const toCourse = ({ grade, credits, courseinstance }) => {
     return {
@@ -149,14 +104,6 @@ const formatStudent = ({ studentnumber, dateofuniversityenrollment, creditcount,
       grade,
       credits
     }
-  }
-
-  const tagnames = (tag_students) => {
-    if (tag_students === undefined || tag_students.length === 0 || tag_students[0].tags_tagname === null) {
-      return []
-    }
-
-    return tag_students.map(t => t.tags_tagname)
   }
 
   const byDate = (a, b) => {
@@ -172,56 +119,11 @@ const formatStudent = ({ studentnumber, dateofuniversityenrollment, creditcount,
     started: dateofuniversityenrollment,
     credits: creditcount,
     courses: credits.sort(byDate).map(toCourse),
-    tags: tagnames(tag_students)
+    tags: []
   }
 }
 
-const addTagToStudent = (id, tag) => {
-  return TagStudent.create({
-    taggedstudents_studentnumber: id,
-    tags_tagname: tag
-  })
-}
-
-const findTag = (tag) => {
-  return Tag.findOne({
-    where: {
-      tagname: {
-        [Op.eq]: tag
-      }
-    }
-  })
-}
-
-const findTagOf = (id, tag) => {
-  return TagStudent.findOne({
-    where: {
-      [Op.and]: [
-        {
-          tags_tagname: {
-            [Op.eq]: tag
-          }
-        },
-        {
-          taggedstudents_studentnumber: {
-            [Op.eq]: id
-          }
-        }
-      ]
-    }
-  })
-}
-
-const deleteTagStudent = (id, tagname) => {
-  return TagStudent.destroy({
-    where: {
-      taggedstudents_studentnumber: id,
-      tags_tagname: tagname
-    }
-  })
-}
-
-async function bySearchTerm(term) {
+const bySearchTerm = async (term) => {
   try {
     const result = await byAbreviatedNameOrStudentNumber(`%${term}%`)
     return result.map(formatStudent)
@@ -232,14 +134,9 @@ async function bySearchTerm(term) {
   }
 }
 
-async function withId(id) {
+const withId = async (id) => {
   try {
     const result = await byId(id)
-    // TODO for some reason including tags in query do not work
-    // perhaps it is due to lacking primary key field 
-    const tags = await tagsOfStudent(id)
-    result.tag_students = tags.map(t => t.dataValues)
-
     return formatStudent(result)
   } catch (e) {
     console.log(e)
@@ -249,55 +146,6 @@ async function withId(id) {
   }
 }
 
-// HOT-FIXED. Add Id to tag_student table and fix this.
-async function addTag(id, tagname) {
-  try {
-    //const student = await byId(id)
-    const tag = await findTag(tagname)
-    //console.log(student.tag_students.map(t=>t.tags_tagname))
-    const tags_of_student = await tagsOfStudent(id)
-    //console.log(tags_of_student.map(t=>t.tags_tagname))
-
-    if (tag === null) {
-      return {
-        error: `tag '${tagname}' does not exist`
-      }
-    }
-
-    if (tags_of_student.map(t => t.tags_tagname).includes(tagname)) {
-      return {
-        error: `tag '${tagname}' already assosiated with student '${id}'`
-      }
-    }
-
-    return await addTagToStudent(id, tagname)
-  } catch (e) {
-    return {
-      error: e
-    }
-  }
-}
-
-async function deleteTag(id, tagname) {
-  try {
-    console.log(id, tagname)
-    const tag = await findTagOf(id, tagname)
-
-    if (tag === null) {
-      return {
-        error: `tag '${tagname}' is not assosiated with student '${id}'`
-      }
-    }
-    await deleteTagStudent(id, tagname)
-    return {}
-  } catch (e) {
-    return {
-      error: e
-    }
-  }
-
-}
-
 module.exports = {
-  withId, bySearchTerm, addTag, deleteTag, formatStudent, createStudent, byId, updateStudent
+  withId, bySearchTerm, formatStudent, createStudent, byId, updateStudent
 }

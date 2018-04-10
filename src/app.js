@@ -11,7 +11,7 @@ app.use(cors({ credentials: true, origin: conf.frontend_addr }))
 app.use(bodyParser.json())
 
 
-app.get('/ping', async function (req, res) {
+app.get('/ping', async (req, res) => {
   res.json({ data: 'pong' })
 })
 
@@ -20,13 +20,13 @@ process.env.NODE_ENV === 'test' ? '/api' : '/'
 
 routes(app, BASE_URL)
 
-app.get('*', async function (req, res) {
+app.get('*', async (req, res) => {
   const results = { error: 'unknown endpoint' }
   res.status(404).json(results)
 })
 
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, function () {
+  app.listen(PORT, () => {
     console.log('Example app listening on port ' + PORT + '!')
   })
 }

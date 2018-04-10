@@ -3,7 +3,7 @@ const { User, Unit, UserUnit } = require('../models')
 
 const Op = Sequelize.Op
 
-const byUsername = (username) => {
+const byUsername = async (username) => {
   return User.findOne({
     where: {
       username: {
@@ -13,7 +13,7 @@ const byUsername = (username) => {
   })
 }
 
-const byId = (id) => {
+const byId = async (id) => {
   return User.findOne({
     where: {
       id: {
@@ -24,17 +24,7 @@ const byId = (id) => {
   })
 }
 
-async function withUsername(username) {
-  const user = await byUsername(username)
-
-  if (user) {
-    return user.password
-  } else {
-    return null
-  }
-}
-
-const createUser = (username, fullname) => {
+const createUser = async (username, fullname) => {
   return User.create({
     username: username,
     full_name: fullname,
@@ -42,27 +32,36 @@ const createUser = (username, fullname) => {
   })
 }
 
-const updateUser = (userObject, values) => {
+const updateUser = async (userObject, values) => {
   return userObject.update(values)
 }
 
 const getUnits = async (id) => {
-  return await Unit.findAll({
+  return Unit.findAll({
     include: [{
       model: User,
       through: {
         where: {
-          user_id:
-            {
-              [Op.eq]: id
-            }
+          user_id: {
+            [Op.eq]: id
+          }
+        }
+      },
+      where: {
+        id: {
+          [Op.eq]: id
         }
       }
-    }]
+    }],
+    where: {
+      enabled: {
+        [Op.eq]: true
+      }
+    }
   })
 }
 
-const findAll = () => {
+const findAll = async () => {
   return User.findAll({ include: [Unit] })
 }
 
@@ -94,7 +93,6 @@ const addUnit = async (userId, unitId) => {
 
 module.exports = {
   byUsername,
-  withUsername,
   createUser,
   updateUser,
   findAll,

@@ -1,43 +1,9 @@
 const router = require('express').Router()
 const Population = require('../services/populations')
+const User = require('../services/users')
 const Unit = require('../services/units')
 
-router.get('/studyrightkeywords', async function (req, res) {
-  let results = []
-  if (req.query.search) {
-    results = await Population.studyrightsByKeyword(req.query.search)
-  }
-
-  res.json(results)
-})
-
-router.get('/enrollmentdates', async function (req, res) {
-  const results = await Population.universityEnrolmentDates()
-  res.json(results)
-})
-
-router.post('/populationstatistics', async function (req, res) {
-  try {
-    const confFromBody = req.body
-    if (confFromBody.maxBirthDate) {
-      confFromBody.maxBirthDate = confFromBody.maxBirthDate.split('.').join('-')
-    }
-
-    if (confFromBody.minBirthDate) {
-      confFromBody.minBirthDate = confFromBody.minBirthDate.split('.').join('-')
-    }
-
-    confFromBody.courses = confFromBody.courses.map(c => c.code)
-
-    const result = await Population.statisticsOf(confFromBody)
-    res.json(result)
-  } catch (e) {
-    console.log(e)
-    res.status(400).json({ error: e })
-  }
-})
-
-router.get('/populationstatistics', async function (req, res) {
+router.get('/populationstatistics', async (req, res) => {
   try {
     if (!req.query.year || !req.query.semester || !req.query.studyRights) {
       res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
@@ -45,6 +11,17 @@ router.get('/populationstatistics', async function (req, res) {
     }
     if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
       req.query.studyRights = [req.query.studyRights]
+    }
+    if (!req.decodedToken.admin) {
+      const accesses = await Promise.all(req.query.studyRights.map(async right => {
+        const user = await User.byUsername(req.decodedToken.userId)
+        const units = await User.getUnits(user.id)
+        return units.some(unit => unit.id === right)
+      }))
+      if (accesses.some(access => !access)) {
+        res.status(403).json([]).end()
+        return
+      }
     }
     req.query.months = 12
     const result = await Population.semesterStatisticsFor(req.query)
@@ -58,10 +35,21 @@ router.get('/populationstatistics', async function (req, res) {
   }
 })
 
-router.get('/studyprogrammes', async function (req, res) {
-  const programs = await Unit.findAllEnabled()
-  const arr = programs.map(p => { return { id: p.id, name: p.name }})
-  res.json(arr)
+router.get('/studyprogrammes', async (req, res) => {
+  try {
+    if (!req.decodedToken.admin) {
+      const user = await User.byUsername(req.decodedToken.userId)
+      const units = await User.getUnits(user.id)
+      const arr = units.map(p => ({ id: p.id, name: p.name }))
+      res.json(arr).status(200).end()
+    } else {
+      const units = await Unit.findAllEnabled()
+      const arr = units.map(p => ({ id: p.id, name: p.name }))
+      res.json(arr).status(200).end()
+    }
+  } catch (err) {
+    res.status(500).json(err).end()
+  }
 })
 
 module.exports = router
