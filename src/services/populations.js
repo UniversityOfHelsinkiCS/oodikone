@@ -10,7 +10,6 @@ const enrolmentDates = () => {
   )
 }
 
-
 const studyRightLike = (searchTerm) => {
   const query = `
     SELECT DISTINCT highLevelName 
