@@ -28,12 +28,12 @@ router.get('/populationstatistics', async (req, res) => {
     }
     req.query.months = 12
     const result = await Population.semesterStatisticsFor(req.query)
-    console.log(7)
     if (result.error) {
       res.status(400).json(result)
       return
     }
 
+    console.log(`request completed ${new Date()}`)
     res.json(result)
   } catch (e) {
     res.status(400).json({ error: e })
