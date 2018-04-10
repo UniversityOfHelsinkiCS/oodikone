@@ -93,6 +93,12 @@ const byCriteria = (conf) => {
     }
   }
 
+  console.log(33)
+  console.log(conf) 
+  console.log(tagWithConstraint) 
+  console.log(studyrightWithConstraint)
+  console.log(terms)
+
   return Student.findAll({
     include: [
       {
@@ -175,12 +181,15 @@ const notAmongExcludes = (conf) => (student) => {
 }
 
 const restrictToMonths = (months) => (student) => {
+  console.log(41)
   if (months === undefined || months === null || months.length === 0) {
     return student
   }
 
   const withinTimerange = Credit.inTimeRange(student.dateofuniversityenrollment, months)
   const creditsWithinTimelimit = student.credits.filter(withinTimerange)
+
+  console.log(42)
 
   return {
     studentnumber: student.studentnumber,
@@ -227,16 +236,21 @@ const semesterStatisticsFor = async (query) => {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
 
+  console.log(11)
+
   const startDate = `${query.year}-${semesterStart[query.semester]}`
   const endDate = `${query.year}-${semesterEnd[query.semester]}`
+  console.log(12, JSON.stringify(query.studyRights))
   try {
     const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
+    console.log(13)
     const conf = {
       enrollmentDates: [startDate, endDate],
       studyRights: studyRights
     }
-
+    
     const students = await byCriteria(conf).map(restrictToMonths(query.months))  // Months are hard-coded
+    console.log(14)
     return students.map(formatStudent)
   } catch (e) {
     return { error: `No such study rights: ${query.studyRights}` }
