@@ -9,7 +9,7 @@ router.get('/students', async (req, res) => {
     if (req.query.searchTerm) {
       results = await Student.bySearchTerm(req.query.searchTerm)
     }
-    res.json(results)
+    return res.json(results)
   } else {
 
     let results = []

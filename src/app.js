@@ -4,12 +4,17 @@ const bodyParser = require('body-parser')
 const conf = require('./conf-backend')
 const routes = require('./routes')
 const PORT = 8080
+const logger = require('./util/logger')
 
 const app = express()
 
 app.use(cors({ credentials: true, origin: conf.frontend_addr }))
 app.use(bodyParser.json())
 
+app.use((req, res, next) => {
+  logger.info(`${req.path} ${JSON.stringify(req.query)}`)
+  next()
+})
 
 app.get('/ping', async (req, res) => {
   res.json({ data: 'pong' })
