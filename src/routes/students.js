@@ -38,22 +38,27 @@ router.get('/students/:id', async (req, res) => {
   const studentId = req.params.id
   if (req.decodedToken.admin) {
     const results = await Student.withId(studentId)
-    res.json(results)
+    return res.json(results)
+  } 
+
+  const uid = req.decodedToken.userId
+  const student = await Student.withId(studentId)
+  const user = await User.byUsername(uid)
+  const units = await User.getUnits(user.id)
+
+  const rights = await Promise.all(units.map(async unit => {
+    const jtn = await Unit.hasStudent(unit.id, student.studentNumber)
+    return jtn
+  }))
+
+  console.log('rights', JSON.stringify(rights, null, 2))
+
+  if (rights.some(right => right !== null)) {
+    res.json(student).end()
   } else {
-    const uid = req.decodedToken.userId
-    const student = await Student.withId(studentId)
-    const user = await User.byUsername(uid)
-    const units = await User.getUnits(user.id)
-    const rights = await Promise.all(units.map(async unit => {
-      const jtn = await Unit.hasStudent(unit.id, student.studentNumber)
-      return jtn
-    }))
-    if (rights.some(right => right !== null)) {
-      res.json(student).end()
-    } else {
-      res.json([]).end()
-    }
+    res.json([]).end()
   }
+
 })
 
 module.exports = router
