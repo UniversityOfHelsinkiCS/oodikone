@@ -1,15 +1,8 @@
 # OodiKone2-Frontend
-<<<<<<< HEAD
-Master: [![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend.svg?branch=master)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend)
-
-Trunk: [![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend.svg?branch=trunk)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend)
-=======
 Master:
 [![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend.svg?branch=master)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend)
 
-Trunk:
 [![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend.svg?branch=trunk)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend)
->>>>>>> ad7de5c63dc7050a5e3257f0d67bc9fa4f359016
 
 
 ### Development
