@@ -2,6 +2,7 @@
 Master:
 [![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend.svg?branch=master)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend)
 
+Trunk:
 [![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend.svg?branch=trunk)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-frontend)
 
 
