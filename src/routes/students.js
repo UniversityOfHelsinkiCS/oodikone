@@ -38,7 +38,7 @@ router.get('/students/:id', async (req, res) => {
   const studentId = req.params.id
   if (req.decodedToken.admin) {
     const results = await Student.withId(studentId)
-    res.json(results)
+    return res.json(results)
   } 
 
   const uid = req.decodedToken.userId
