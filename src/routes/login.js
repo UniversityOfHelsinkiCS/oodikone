@@ -27,7 +27,6 @@ const generateToken = async (uid, res) => {
 router.get('/login', async (req, res) => {
   try {
     const uid = req.headers['uid']
-    console.log(req.headers)
     if (req.headers['shib-session-id'] && uid) {
       const user = await User.byUsername(uid)
       const fullname = req.headers.displayname || 'Shib Valmis'
@@ -42,6 +41,19 @@ router.get('/login', async (req, res) => {
     }
   } catch (err) {
     res.status(401).json({ message: 'problem with login', err })
+  }
+})
+
+router.get('/logout', async (req, res) => {
+  try {
+    const logoutUrl = req.headers.shib_logout_url
+    const { returnUrl } = req.query
+    if (logoutUrl) {
+      return res.status(200).send({ logoutUrl: `${logoutUrl}?return=${returnUrl}` }).end()
+    }
+    res.status(200).send({ logoutUrl: returnUrl }).end()
+  } catch (err) {
+    res.status(500).json({ message: 'Error with logout', err })
   }
 })
 
