@@ -33,7 +33,8 @@ if ( process.env.NODE_ENV === 'test' ) {
 } else {
   loggerPapertrail = new winston.Logger({
     transports: [
-      transports.papertrail, transports.console
+      transports.papertrail, transports.console,
+      new (winston.transports.File)({ filename: 'debug.log' })
     ]
   })
 }
