@@ -93,12 +93,6 @@ const byCriteria = (conf) => {
     }
   }
 
-  console.log(33)
-  console.log(JSON.stringify(conf)) 
-  console.log(JSON.stringify(tagWithConstraint)) 
-  console.log(JSON.stringify(studyrightWithConstraint))
-  console.log(JSON.stringify(terms))
-
   return Student.findAll({
     include: [
       {
@@ -120,7 +114,8 @@ const byCriteria = (conf) => {
     ],
     where: {
       [Op.and]: terms
-    }, logging: console.log
+    }, 
+    //logging: console.log
   }, )
 
 }
@@ -188,8 +183,6 @@ const restrictToMonths = (months) => (student) => {
   const withinTimerange = Credit.inTimeRange(student.dateofuniversityenrollment, months)
   const creditsWithinTimelimit = student.credits.filter(withinTimerange)
 
-  console.log(42)
-
   return {
     studentnumber: student.studentnumber,
     tag_students: student.tag_students,
@@ -245,7 +238,6 @@ const semesterStatisticsFor = async (query) => {
     }
     
     const students = await byCriteria(conf).map(restrictToMonths(query.months))  // Months are hard-coded
-    console.log(14)
     return students.map(formatStudent)
   } catch (e) {
     return { error: `No such study rights: ${query.studyRights}` }
