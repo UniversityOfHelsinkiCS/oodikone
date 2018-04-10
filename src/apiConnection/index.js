@@ -72,8 +72,8 @@ export const handleRequest = store => next => async (action) => {
 }
 
 export const logout = async () => {
-  // TODO: send logout request and handle it
-  // const response = await getAxios('/logout')
+  const returnUrl = window.location.origin
+  const response = await getAxios().get(`/logout?returnUrl=${returnUrl}`)
   localStorage.removeItem(TOKEN_NAME)
-  window.location = '/'
+  window.location = response.data.logoutUrl
 }
