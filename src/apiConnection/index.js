@@ -72,7 +72,9 @@ export const handleRequest = store => next => async (action) => {
 }
 
 export const logout = async () => {
-  const returnUrl = window.location.origin
+  const stagingPath = '/staging'
+  const returnUrl = window.location.pathname.includes(stagingPath) ?
+    `${window.location.origin}${stagingPath}` : window.location.origin
   const response = await getAxios().get(`/logout?returnUrl=${returnUrl}`)
   localStorage.removeItem(TOKEN_NAME)
   window.location = response.data.logoutUrl
