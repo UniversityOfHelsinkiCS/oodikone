@@ -51,7 +51,12 @@ router.get('/students/:id', async (req, res) => {
     return jtn
   }))
 
-  console.log('rights', JSON.stringify(rights, null, 2))
+  if (process.env.NODE_ENV !== 'test') {
+    const logger = require('../util/logger')
+    logger.info('rights', JSON.stringify(rights, null, 2))
+    console.log('rights', JSON.stringify(rights, null, 2))
+  }
+  
 
   if (rights.some(right => right !== null)) {
     res.json(student).end()
