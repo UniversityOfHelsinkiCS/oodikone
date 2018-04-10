@@ -1,34 +1,59 @@
 const router = require('express').Router()
 const Student = require('../services/students')
+const User = require('../services/users')
+const Unit = require('../services/units')
 
-router.get('/students', async function (req, res) {
-  let results = []
-  if (req.query.searchTerm) {
-    results = await Student.bySearchTerm(req.query.searchTerm)
+router.get('/students', async (req, res) => {
+  if (req.decodedToken.admin) {
+    let results = []
+    if (req.query.searchTerm) {
+      results = await Student.bySearchTerm(req.query.searchTerm)
+    }
+    res.json(results)
+  } else {
+
+    let results = []
+    const uid = req.decodedToken.userId
+    const user = await User.byUsername(uid)
+
+    if (req.query.searchTerm) {
+      results = await Student.bySearchTerm(req.query.searchTerm)
+    }
+    const filteredResults = [] // Filter students away
+    await Promise.all(results.map(async student => {
+      const units = await User.getUnits(user.id)
+      const rights = await Promise.all(units.map(async unit => {
+        const jtn = await Unit.hasStudent(unit.id, student.studentNumber)
+        return jtn
+      }))
+      if (rights.some(right => right !== null)) {
+        filteredResults.push(student)
+      }
+    }))
+    res.json(filteredResults)
   }
-
-  res.json(results)
 })
 
-router.get('/students/:id', async function (req, res) {
-  const results = await Student.withId(req.params.id)
-  res.json(results)
-})
-
-router.post('/students/:id/tags', async function (req, res) {
-  const tagname = req.body.tagname
-  const result = await Student.addTag(req.body.studentnumber, tagname)
-  const status = result.error === undefined ? 201 : 400
-  console.log(result.error)
-
-  res.status(status).json(result)
-})
-
-router.delete('/students/:id/tags', async function (req, res) {
-  const tagname = req.body.tagname
-  const result = await Student.deleteTag(req.body.studentnumber, tagname)
-  const status = result.error === undefined ? 200 : 400
-  res.status(status).json(result)
+router.get('/students/:id', async (req, res) => {
+  const studentId = req.params.id
+  if (req.decodedToken.admin) {
+    const results = await Student.withId(studentId)
+    res.json(results)
+  } else {
+    const uid = req.decodedToken.userId
+    const student = await Student.withId(studentId)
+    const user = await User.byUsername(uid)
+    const units = await User.getUnits(user.id)
+    const rights = await Promise.all(units.map(async unit => {
+      const jtn = await Unit.hasStudent(unit.id, student.studentNumber)
+      return jtn
+    }))
+    if (rights.some(right => right !== null)) {
+      res.json(student).end()
+    } else {
+      res.json([]).end()
+    }
+  }
 })
 
 module.exports = router
