@@ -81,9 +81,11 @@ class Courses extends Component {
   render() {
     const { isLoading, searchStr, selectedCourse } = this.state
     const { courseInstances, selectedInstances } = this.props
+    const byDateDesc = (a, b) => new Date(b.date) - new Date(a.date)
+
     const courseList = this.props.courseList.map(course => ({ ...course, key: `${course.name}-${course.code}` }))
 
-    const instanceList = courseInstances ? courseInstances.map(instance => ({
+    const instanceList = courseInstances ? courseInstances.sort(byDateDesc).map(instance => ({
       key: instance.id,
       text: `${instance.date} (${instance.students} students)`,
       value: instance.id
@@ -100,7 +102,6 @@ class Courses extends Component {
         {instance.date}
       </List.Item>))
 
-    // const t = this.props.translate;
     return (
       <div className={styles.container}>
         <Search
