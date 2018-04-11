@@ -72,7 +72,7 @@ const byId = async (id) => Student.findOne({
 
 const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   return Student.findAll({
-    limit: 10,
+    limit: 500,
     where: {
       [Op.or]: [
         {
