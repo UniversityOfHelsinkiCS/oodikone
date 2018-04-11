@@ -4,7 +4,7 @@
     "cancel": ["Cancel"],
     "example" : ["react-localize-redux example text"],
     "loading": ["Loading"],
-    "noResults": ["No search results"],
+    "noResults": ["No search results or search term is not accurate enough"],
     "studentNumber": ["Student number"],
     "started": ["Started"],
     "credits": ["Credits"],
