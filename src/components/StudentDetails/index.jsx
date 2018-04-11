@@ -48,8 +48,7 @@ class StudentDetails extends Component {
         rows={courseRows.sort(byDateDesc).map(c => ({
           ...c,
           date: reformatDate(c.date, 'DD.MM.YYYY')
-        })
-        )}
+        }))}
         noResultText={translate('common.noResults')}
       />
     )
