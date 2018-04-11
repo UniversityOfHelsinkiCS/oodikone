@@ -48,7 +48,7 @@ class NavigationBar extends Component {
             <Dropdown.Item
               icon="log out"
               text={translate('navigationBar.logout')}
-              onClick={this.props.logout}
+              onClick={logout}
             />
           </Dropdown.Menu>
         </Menu.Item>
@@ -56,7 +56,7 @@ class NavigationBar extends Component {
     }
 
     return (
-      <Menu.Item link onClick={this.props.logout} icon="log out">
+      <Menu.Item link onClick={logout} icon="log out">
         {translate('navigationBar.logout')}
       </Menu.Item>
     )
@@ -99,17 +99,8 @@ class NavigationBar extends Component {
 }
 
 NavigationBar.propTypes = {
-  translate: func.isRequired,
-  logout: func.isRequired
+  translate: func.isRequired
 }
 
-const mapStateToProps = () => ({})
-
-const mapDispatchToProps = dispatch => ({
-  logout: () => {
-    dispatch(logout())
-  }
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(NavigationBar)
+export default connect()(NavigationBar)
 
