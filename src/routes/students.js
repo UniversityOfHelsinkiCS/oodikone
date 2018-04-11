@@ -33,6 +33,8 @@ router.get('/students', async (req, res) => {
         filteredResults.push(student)
       }
     }))
+
+    
     res.json(filteredResults)
   }
 })
