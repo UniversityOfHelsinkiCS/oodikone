@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash'
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraph from '../CreditAccumulationGraph'
 import SearchResultTable from '../SearchResultTable'
-import { removeInvalidCreditsFromStudent } from '../../common'
+import { removeInvalidCreditsFromStudent, byDateDesc, reformatDate } from '../../common'
 
 import sharedStyles from '../../styles/shared'
 
@@ -45,7 +45,10 @@ class StudentDetails extends Component {
     return (
       <SearchResultTable
         headers={courseHeaders}
-        rows={courseRows}
+        rows={courseRows.sort(byDateDesc).map(c => ({
+          ...c,
+          date: reformatDate(c.date, 'DD.MM.YYYY')
+        }))}
         noResultText={translate('common.noResults')}
       />
     )

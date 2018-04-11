@@ -50,6 +50,10 @@ export const dateFromApiToDisplay = date =>
 export const sortDatesWithFormat = (d1, d2, dateFormat) =>
   moment(d1, dateFormat) - moment(d2, dateFormat)
 
+export const byDateDesc = (a, b) => new Date(b.date) - new Date(a.date)
+
+export const byName = (a, b) => a.name.localeCompare(b.name)
+
 /* This should be done in backend */
 export const removeInvalidCreditsFromStudent = student => ({
   ...student,
