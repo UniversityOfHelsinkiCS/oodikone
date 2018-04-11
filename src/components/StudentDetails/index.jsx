@@ -34,18 +34,22 @@ class StudentDetails extends Component {
       translate('common.grade'),
       translate('common.credits')
     ]
-    const courseRows = student.courses.sort(byDateDesc).map((c) => {
+    const courseRows = student.courses.map((c) => {
       const {
         date, grade, credits, course
       } = c
       return {
-        date: reformatDate(date, 'DD.MM.YYYY'), course: `${course.name} (${course.code})`, grade, credits
+        date, course: `${course.name} (${course.code})`, grade, credits
       }
     })
     return (
       <SearchResultTable
         headers={courseHeaders}
-        rows={courseRows}
+        rows={courseRows.sort(byDateDesc).map(c => ({
+          ...c,
+          date: reformatDate(c.date, 'DD.MM.YYYY')
+        })
+        )}
         noResultText={translate('common.noResults')}
       />
     )
