@@ -6,6 +6,7 @@ import { Search, Dropdown, Header, List, Button } from 'semantic-ui-react'
 import CourseStatistics from '../CourseStatistics'
 import Timeout from '../Timeout'
 
+import { byDateDesc, reformatDate } from '../../common'
 import { findCourses } from '../../redux/courses'
 import { findCourseInstances, getCourseInstanceStatistics, removeInstance } from '../../redux/courseInstances'
 
@@ -81,13 +82,12 @@ class Courses extends Component {
   render() {
     const { isLoading, searchStr, selectedCourse } = this.state
     const { courseInstances, selectedInstances } = this.props
-    const byDateDesc = (a, b) => new Date(b.date) - new Date(a.date)
 
     const courseList = this.props.courseList.map(course => ({ ...course, key: `${course.name}-${course.code}` }))
 
     const instanceList = courseInstances ? courseInstances.sort(byDateDesc).map(instance => ({
       key: instance.id,
-      text: `${instance.date} (${instance.students} students)`,
+      text: `${reformatDate(instance.date, 'DD.MM.YYYY')} (${instance.students} students)`,
       value: instance.id
     })) : []
 

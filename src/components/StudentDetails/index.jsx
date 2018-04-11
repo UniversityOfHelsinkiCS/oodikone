@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash'
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraph from '../CreditAccumulationGraph'
 import SearchResultTable from '../SearchResultTable'
-import { removeInvalidCreditsFromStudent } from '../../common'
+import { removeInvalidCreditsFromStudent, byDateDesc, reformatDate } from '../../common'
 
 import sharedStyles from '../../styles/shared'
 
@@ -34,12 +34,12 @@ class StudentDetails extends Component {
       translate('common.grade'),
       translate('common.credits')
     ]
-    const courseRows = student.courses.map((c) => {
+    const courseRows = student.courses.sort(byDateDesc).map((c) => {
       const {
         date, grade, credits, course
       } = c
       return {
-        date, course: `${course.name} (${course.code})`, grade, credits
+        date: reformatDate(date, 'DD.MM.YYYY'), course: `${course.name} (${course.code})`, grade, credits
       }
     })
     return (
