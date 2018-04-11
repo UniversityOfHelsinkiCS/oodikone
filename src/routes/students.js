@@ -8,9 +8,6 @@ router.get('/students', async (req, res) => {
     let results = []
     if (req.query.searchTerm) {
       results = await Student.bySearchTerm(req.query.searchTerm)
-      if (results.length>100) {
-        results = results.slice(0,100)
-      }
     }
     return res.json(results)
   } else {
@@ -34,7 +31,7 @@ router.get('/students', async (req, res) => {
       }
     }))
 
-    
+
     res.json(filteredResults)
   }
 })
