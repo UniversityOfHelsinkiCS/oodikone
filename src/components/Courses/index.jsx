@@ -6,7 +6,7 @@ import { Search, Dropdown, Header, List, Button } from 'semantic-ui-react'
 import CourseStatistics from '../CourseStatistics'
 import Timeout from '../Timeout'
 
-import { byDateDesc, reformatDate } from '../../common'
+import { byDateDesc, reformatDate, byName } from '../../common'
 import { findCourses } from '../../redux/courses'
 import { findCourseInstances, getCourseInstanceStatistics, removeInstance } from '../../redux/courseInstances'
 
@@ -25,14 +25,14 @@ class Courses extends Component {
   state = {
     isLoading: false,
     searchStr: '',
-    selectedCourse: { name: 'No course', code: 'No code' }
+    selectedCourse: { name: 'No course selected', code: '' }
   }
 
   resetComponent = () => {
     this.setState({
       isLoading: false,
       searchStr: '',
-      selectedCourse: { name: 'No course', code: 'No code' }
+      selectedCourse: { name: 'No course selected', code: '' }
     })
   }
 
@@ -83,7 +83,7 @@ class Courses extends Component {
     const { isLoading, searchStr, selectedCourse } = this.state
     const { courseInstances, selectedInstances } = this.props
 
-    const courseList = this.props.courseList.map(course => ({ ...course, key: `${course.name}-${course.code}` }))
+    const courseList = this.props.courseList.sort(byName).map(course => ({ ...course, key: `${course.name}-${course.code}` }))
 
     const instanceList = courseInstances ? courseInstances.sort(byDateDesc).map(instance => ({
       key: instance.id,
@@ -116,7 +116,7 @@ class Courses extends Component {
         />
 
         <Header as="h2">
-          {selectedCourse.name}
+          {selectedCourse.name} {selectedCourse.code ? `(${selectedCourse.code})` : ''}
         </Header>
 
         <Dropdown
@@ -136,7 +136,7 @@ class Courses extends Component {
           <CourseStatistics
             key={i.id}
             courseName={i.course.name}
-            instanceDate={i.date}
+            instanceDate={reformatDate(i.date, 'DD.MM.YYYY')}
             stats={i.statistics}
           />
         ))}
