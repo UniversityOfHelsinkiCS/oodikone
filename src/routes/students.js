@@ -8,6 +8,9 @@ router.get('/students', async (req, res) => {
     let results = []
     if (req.query.searchTerm) {
       results = await Student.bySearchTerm(req.query.searchTerm)
+      if (results.length>100) {
+        results = results.slice(0,100)
+      }
     }
     return res.json(results)
   } else {
@@ -30,6 +33,8 @@ router.get('/students', async (req, res) => {
         filteredResults.push(student)
       }
     }))
+
+    
     res.json(filteredResults)
   }
 })
@@ -50,13 +55,6 @@ router.get('/students/:id', async (req, res) => {
     const jtn = await Unit.hasStudent(unit.id, student.studentNumber)
     return jtn
   }))
-
-  if (process.env.NODE_ENV !== 'test') {
-    const logger = require('../util/logger')
-    logger.info('rights', JSON.stringify(rights, null, 2))
-    console.log('rights', JSON.stringify(rights, null, 2))
-  }
-  
 
   if (rights.some(right => right !== null)) {
     res.json(student).end()
