@@ -18,7 +18,7 @@ class CreditAccumulationGraph extends Component {
   state = {
     combinedStudentData: undefined,
     studentCreditLines: [],
-    intervalObject: undefined,
+    timeout: undefined,
     loading: true
   }
 
@@ -26,61 +26,63 @@ class CreditAccumulationGraph extends Component {
     const { students } = this.props
 
     const combinedStudentData = this.createCombinedStudentData(students)
-    this.getMoreCreditLines()
-    this.setState({ combinedStudentData, loading: true })
+    const timeout = setTimeout(() => this.getMoreCreditLines(students), 1000)
+    this.setState({ combinedStudentData, timeout, loading: true })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.students) {
+      const nextStudents = nextProps.students.map(student => student.studentNumber)
+      const oldStudents = this.props.students.map(student => student.studentNumber)
+      const changed = nextStudents.some(student => !oldStudents.includes(student)) ||
+        oldStudents.some(student => !nextStudents.includes(student))
+      if (changed) {
+        const { students } = nextProps
+
+        const timeout = setTimeout(() => this.getMoreCreditLines(students), 1000)
+        const combinedStudentData = this.createCombinedStudentData(students)
+        this.setState({ combinedStudentData, timeout, loading: true })
+      }
+    }
   }
 
   componentWillUnmount() {
-    if (this.state.intervalObject) {
-      clearInterval(this.state.intervalObject.interval)
+    if (this.state.timeout) {
+      clearInterval(this.state.timeout)
     }
   }
 
-  getMoreCreditLines = () => {
-    const { students } = this.props
-    const { intervalObject } = this.state
-    const MAX_SPLICES = Math.min(Math.ceil(students.length / 30), 1) // Made up
-    if (!intervalObject) {
-      const interval = setInterval(() => this.getMoreCreditLines(), 1000)
-      this.setState({ intervalObject: { interval, tick: 0 } })
-      return
-    }
-    const newInterval = { ...intervalObject, tick: 1 + intervalObject.tick }
-    let loading = true
-    if (newInterval.tick === MAX_SPLICES) {
-      clearInterval(intervalObject.interval)
-      loading = false
-    }
+  getMoreCreditLines = (students) => {
     const studentCreditLines = this.state.studentCreditLines.concat(this.createStudentCreditLines(
-      students.slice(
-        this.state.studentCreditLines.length,
-        Math.ceil(students.length / (MAX_SPLICES - intervalObject.tick))
-      ),
+      students,
       this.isSingleStudentGraph(students)
     ))
-
-    this.setState({ intervalObject: newInterval, studentCreditLines, loading })
+    this.setState({ studentCreditLines, loading: false })
   }
 
   getXAxisMonth = (date, startDate) =>
     Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0)
 
   getReferenceLineForStudent = (student) => {
-    const { courses, started } = student
-    const lastDate = moment(_.maxBy(courses, course => moment(course.date)).date)
-    const lastMonth = Math.ceil(this.getXAxisMonth(lastDate, started))
-    const lastCredits = lastMonth * (55 / 12)
+    try {
+      const { courses, started } = student
+      const lastDate = moment(_.maxBy(courses, course => moment(course.date)).date)
+      const lastMonth = Math.ceil(this.getXAxisMonth(lastDate, started))
+      const lastCredits = lastMonth * (55 / 12)
 
-    return [{
-      month: 0,
-      referenceCredits: 0,
-      date: reformatDate(started, DISPLAY_DATE_FORMAT)
-    },
-    {
-      month: lastMonth,
-      referenceCredits: lastCredits,
-      date: reformatDate(lastDate, DISPLAY_DATE_FORMAT)
-    }]
+      return [{
+        month: 0,
+        referenceCredits: 0,
+        date: reformatDate(started, DISPLAY_DATE_FORMAT)
+      },
+      {
+        month: lastMonth,
+        referenceCredits: lastCredits,
+        date: reformatDate(lastDate, DISPLAY_DATE_FORMAT)
+      }]
+    } catch (e) {
+      return null
+    }
   }
 
 
@@ -183,8 +185,12 @@ class CreditAccumulationGraph extends Component {
       const referenceData = this.getReferenceLineForStudent(students[0])
       combinedStudentData = combinedStudentData.concat(referenceData)
     }
-    return combinedStudentData.sort((c1, c2) =>
-      sortDatesWithFormat(c1.date, c2.date, DISPLAY_DATE_FORMAT))
+    try {
+      return combinedStudentData.sort((c1, c2) =>
+        sortDatesWithFormat(c1.date, c2.date, DISPLAY_DATE_FORMAT))
+    } catch (e) {
+      return null
+    }
   }
 
   render() {
