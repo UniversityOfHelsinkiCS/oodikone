@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { getDate } = require('./database_updater/oodi_data_mapper')
-const { Student, Credit, CourseInstance, Course, TagStudent, Studyright } = require('../models')
+const { Student, Credit, CourseInstance, Course } = require('../models')
 const Op = Sequelize.Op
 
 const createStudent = (array) => Student.create({
