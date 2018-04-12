@@ -22,7 +22,7 @@ router.get('/populationstatistics', async (req, res) => {
       }))
 
       if (accesses.some(access => !access)) {
-        res.status(403).json([]).end()
+        res.status(403).json([])
         return
       }
     }
@@ -46,14 +46,14 @@ router.get('/studyprogrammes', async (req, res) => {
       const user = await User.byUsername(req.decodedToken.userId)
       const units = await User.getUnits(user.id)
       const arr = units.map(p => ({ id: p.id, name: p.name }))
-      res.json(arr).status(200).end()
+      res.json(arr)
     } else {
       const units = await Unit.findAllEnabled()
       const arr = units.map(p => ({ id: p.id, name: p.name }))
-      res.json(arr).status(200).end()
+      res.json(arr)
     }
   } catch (err) {
-    res.status(500).json(err).end()
+    res.status(500).json(err)
   }
 })
 
