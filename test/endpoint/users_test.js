@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken')
 
 const { User, Unit, sequelize } = require('../../src/models')
 const { generateUsers, generateUnits } = require('../utils.js')
+const UserService = require('../../src/services/users')
 
 const app = require('../../src/app')
 const conf = require('../../src/conf-backend')
@@ -16,6 +17,13 @@ const uid = 'tktl', fullname = ''
 const payload = { userId: uid, name: fullname, admin: true, enabled: true }
 
 const token = jwt.sign(payload, conf.TOKEN_SECRET, {
+  expiresIn: '24h'
+})
+
+const uid2 = 'notAdmin', fullname2 = ''
+const payload2 = { userId: uid2, name: fullname2, admin: false, enabled: true }
+
+const token2 = jwt.sign(payload2, conf.TOKEN_SECRET, {
   expiresIn: '24h'
 })
 
@@ -58,7 +66,33 @@ test('user can be enabled/disabled', async t => {
   t.is(res.body.is_enabled, !enabled)
 })
 
-test.only('units can be added to user', async t => {
+
+test('user cannot be enabled/disabled if enabler is not admin', async t => {
+  const user = await User.findOne({ id: 2 })
+  const enabled = user.dataValues.is_enabled
+  await api
+    .put('/api/users/2/enable')
+    .send({ id: 2 })
+    .set('x-access-token', token2)
+    .set('uid', uid2)
+    .expect(403)
+  const userAfter = await User.findOne({ id: 2 })
+  t.is(userAfter.dataValues.is_enabled, enabled)
+})
+
+test('units cannot be added if adder is not admin', async t => {
+  const usersUnits = await UserService.getUnits(2)
+  await api
+    .put('/api/users/2/units/1')
+    .send({ uid: 2, id: 1 })
+    .set('x-access-token', token2)
+    .set('uid', uid2)
+    .expect(403)
+  const usersUnitsAfter = await UserService.getUnits(2)
+  t.is(usersUnitsAfter.length, usersUnits.length)
+})
+
+test('units can be added to user', async t => {
   let res = await api
     .post('/api/users/1/units/1')
     .send({ id: 1, uid: 1 })
@@ -80,7 +114,7 @@ test.only('units can be added to user', async t => {
   t.is(res.body.units.length, 2)
 })
 
-test.only('units can be removed from user', async t => {
+test('units can be removed from user', async t => {
   let res = await api
     .post('/api/users/2/units/1')
     .send({ id: 1, uid: 1 })
