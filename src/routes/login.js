@@ -47,8 +47,8 @@ router.post('/login', async (req, res) => {
 
 router.delete('/logout', async (req, res) => {
   try {
-    const logoutUrl = req.body.shib_logout_url
-    const { returnUrl } = req.query
+    const logoutUrl = req.headers.shib_logout_url
+    const { returnUrl } = req.body
     if (logoutUrl) {
       return res.status(200).send({ logoutUrl: `${logoutUrl}?return=${returnUrl}` }).end()
     }
