@@ -6,9 +6,10 @@ import { Search, Dropdown, Header, List, Button } from 'semantic-ui-react'
 import CourseStatistics from '../CourseStatistics'
 import Timeout from '../Timeout'
 
-import { byDateDesc, reformatDate, byName } from '../../common'
+import { reformatDate } from '../../common'
 import { findCourses } from '../../redux/courses'
 import { findCourseInstances, getCourseInstanceStatistics, removeInstance } from '../../redux/courseInstances'
+import { makeSortCourseInstances, makeSortCourses } from '../../selectors/courses'
 
 import styles from './courses.css'
 
@@ -81,15 +82,7 @@ class Courses extends Component {
 
   render() {
     const { isLoading, searchStr, selectedCourse } = this.state
-    const { courseInstances, selectedInstances } = this.props
-
-    const courseList = this.props.courseList.sort(byName).map(course => ({ ...course, key: `${course.name}-${course.code}` }))
-
-    const instanceList = courseInstances ? courseInstances.sort(byDateDesc).map(instance => ({
-      key: instance.id,
-      text: `${reformatDate(instance.date, 'DD.MM.YYYY')} (${instance.students} students)`,
-      value: instance.id
-    })) : []
+    const { courseInstances, selectedInstances, courseList } = this.props
 
     const listInstance = selectedInstances.map(instance => (
       <List.Item key={instance.id}>
@@ -125,7 +118,7 @@ class Courses extends Component {
           placeholder="Select course instance"
           fluid
           selection
-          options={instanceList}
+          options={courseInstances}
         />
 
         <List divided relaxed>
@@ -159,9 +152,12 @@ Courses.propTypes = {
   // translate: func.isRequired
 }
 
+const sortInstances = makeSortCourseInstances()
+const sortCourses = makeSortCourses()
+
 const mapStateToProps = ({ locale, courses, courseInstances }) => ({
-  courseList: courses.data,
-  courseInstances: courseInstances.data,
+  courseList: sortCourses(courses),
+  courseInstances: sortInstances(courseInstances),
   selectedInstances: courseInstances.data.filter(instance =>
     courseInstances.selected.includes(instance.id)),
   translate: getTranslate(locale),
