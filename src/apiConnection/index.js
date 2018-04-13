@@ -18,7 +18,7 @@ export const checkAuth = async () => {
   const options = isDevEnv ? devOptions : null
   const token = localStorage.getItem(TOKEN_NAME)
   if (!token || tokenInvalid(token) || !decodeToken(token).enabled) {
-    const response = await getAxios().get('/login', options)
+    const response = await getAxios().post('/login', options.headers)
     localStorage.setItem(TOKEN_NAME, response.data.token)
     return response.data.token
   }
@@ -75,7 +75,7 @@ export const logout = async () => {
   const stagingPath = '/staging'
   const returnUrl = window.location.pathname.includes(stagingPath) ?
     `${window.location.origin}${stagingPath}` : window.location.origin
-  const response = await getAxios().get(`/logout?returnUrl=${returnUrl}`)
+  const response = await getAxios().delete('/logout', { returnUrl })
   localStorage.removeItem(TOKEN_NAME)
   window.location = response.data.logoutUrl
 }
