@@ -62,7 +62,7 @@ export const DEFAULT_LANG = 'en'
 export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
 export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
-export const TOKEN_NAME = 'token'
+export const TOKEN_NAME = window.location.pathname.includes('/staging') ? 'staging_token' : 'token'
 
 export const CHART_COLORS = [
   chart1,
