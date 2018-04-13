@@ -75,7 +75,7 @@ export const logout = async () => {
   const stagingPath = '/staging'
   const returnUrl = window.location.pathname.includes(stagingPath) ?
     `${window.location.origin}${stagingPath}` : window.location.origin
-  const response = await getAxios().delete('/logout', { returnUrl })
+  const response = await getAxios().delete('/logout', { data: { returnUrl } })
   localStorage.removeItem(TOKEN_NAME)
   window.location = response.data.logoutUrl
 }

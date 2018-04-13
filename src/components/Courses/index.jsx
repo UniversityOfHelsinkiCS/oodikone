@@ -99,7 +99,7 @@ class Courses extends Component {
             <Button size="mini" value={instance} onClick={this.removeInstance(instance)}>remove</Button>
           </List.Content>
         </List.Header>
-        {instance.date}
+        {reformatDate(instance.date, 'DD.MM.YYYY')}
       </List.Item>))
 
     return (
