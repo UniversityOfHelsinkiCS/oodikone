@@ -31,12 +31,12 @@ test('should pong when pinged', async t => {
 
 test('login does not allow without required headers', async t => {
   const res = api
-    .get('/api/login')
-    .set('uid', 'uid')
+    .post('/api/login')
+    .send({ 'uid': 'uid' })
 
   const res2 = api
-    .get('/api/login')
-    .set('shib-session-id', 'sessioniddiibadaaba')
+    .post('/api/login')
+    .send({ 'shib-session-id': 'sessioniddiibadaaba' })
   const responses = await Promise.all([res, res2])
 
   responses.forEach(response => t.is(response.status, 401))
@@ -46,10 +46,12 @@ test('login creates an user', async t => {
   const user = generateUsers(1)[0]
 
   const res = await api
-    .get('/api/login')
-    .set('uid', user.username)
-    .set('shib-session-id', 'sessioniddiibadaaba')
-    .set('displayName', user.full_name)
+    .post('/api/login')
+    .send({
+      uid: user.username,
+      'shib-session-id': 'sessioniddiibadaaba',
+      'displayname': user.full_name
+    })
 
   t.is(res.status, 200)
   const foundUser = await User.find({ where: { username: user.username } })
@@ -64,16 +66,43 @@ test('login fetches an user and returns token to enabled', async t => {
   await User.insertOrUpdate(user)
 
   const res = await api
-    .get('/api/login')
-    .set('uid', user.username)
-    .set('shib-session-id', 'sessioniddiibadaaba')
-    .set('displayName', user.full_name)
+    .post('/api/login')
+    .send({
+      uid: user.username,
+      'shib-session-id': 'sessioniddiibadaaba',
+      'displayname': user.full_name
+    })
 
   t.is(res.status, 200)
   t.truthy(res.body.token, `Token did not exist in body: ${res.body}`)
 
   const decodedToken = jwt.decode(res.body.token)
-
   t.is(decodedToken.userId, user.username, 'user id did not match username')
   t.is(decodedToken.name, user.full_name, 'name did not match full name')
+})
+
+
+test('logout removes token', async t => {
+  const user = generateUsers(1)[0]
+  await api
+    .post('/api/login')
+    .send({
+      uid: user.username,
+      'shib-session-id': 'sessioniddiibadaaba',
+      'displayname': user.full_name
+    })
+    .expect(200)
+
+  const res = await api
+    .delete('/api/logout')
+    .expect(200)
+
+  t.falsy(res.body.token)
+
+  const res2 = await api
+    .get('/api/departmentsuccess')
+    .expect(403)
+
+  t.is(res2.body.error, 'No token in headers')
+
 })
