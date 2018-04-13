@@ -24,12 +24,13 @@ const generateToken = async (uid, res) => {
   })
 }
 
-router.get('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
-    const uid = req.headers['uid']
-    if (req.headers['shib-session-id'] && uid) {
+    console.log(req.body)
+    const uid = req.body['uid']
+    if (req.body['shib-session-id'] && uid) {
       const user = await User.byUsername(uid)
-      const fullname = req.headers.displayname || 'Shib Valmis'
+      const fullname = req.body.displayname || 'Shib Valmis'
       if (!user) {
         await User.createUser(uid, fullname)
       } else {
@@ -44,9 +45,9 @@ router.get('/login', async (req, res) => {
   }
 })
 
-router.get('/logout', async (req, res) => {
+router.delete('/logout', async (req, res) => {
   try {
-    const logoutUrl = req.headers.shib_logout_url
+    const logoutUrl = req.body.shib_logout_url
     const { returnUrl } = req.query
     if (logoutUrl) {
       return res.status(200).send({ logoutUrl: `${logoutUrl}?return=${returnUrl}` }).end()
