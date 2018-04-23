@@ -12,7 +12,8 @@ const util = require('./util')
 
 const _ = require('lodash')
 
-const logger = require('../../util/logger')
+const winston = require('../../util/logger')
+const logger = (msg) => winston(msg, { service: 'database_updater' })
 
 const updateStudentInformation = async studentNumber => {
   try {

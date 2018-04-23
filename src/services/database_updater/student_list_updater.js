@@ -1,7 +1,8 @@
 const oodi = require('./oodi_interface')
 const util = require('../../util')
 const { StudentList } = require('../../models')
-const logger = require('../../util/logger')
+const winston = require('../../util/logger')
+const logger = (msg) => winston(msg, { service: 'student_list_updater' })
 
 /*
   run in staging with: 
