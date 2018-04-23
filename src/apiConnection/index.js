@@ -79,3 +79,5 @@ export const logout = async () => {
   localStorage.removeItem(TOKEN_NAME)
   window.location = response.data.logoutUrl
 }
+
+export const sendLog = async data => callApi('/log', 'post', data)
