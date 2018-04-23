@@ -14,7 +14,7 @@ import AccessDenied from '../AccessDenied'
 
 import styles from './main.css'
 
-import { userIsEnabled } from '../../common'
+import { userIsEnabled, log } from '../../common'
 
 class Main extends Component {
   state = {
@@ -24,6 +24,9 @@ class Main extends Component {
 
   async componentDidMount() {
     const enabled = await userIsEnabled()
+    if (!enabled) {
+      log('Not enabled')
+    }
     this.setState({ enabled })
   }
 
