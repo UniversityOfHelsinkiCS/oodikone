@@ -1,6 +1,7 @@
 const morgan = require('morgan')
 const logger = require('./util/logger')
 
+const log = require('./routes/log')
 const courses = require('./routes/courses')
 const department = require('./routes/department')
 const students = require('./routes/students')
@@ -26,6 +27,7 @@ const accessLogger = morgan((tokens, req, res) => {
 })
 
 module.exports = (app, url) => {
+  app.use(url, log)
   app.use(url, login)
   app.use(auth.checkAuth, accessLogger)
   app.use(url, courses)
