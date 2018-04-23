@@ -1,7 +1,7 @@
 import moment from 'moment'
 import jwtDecode from 'jwt-decode'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
-import { checkAuth } from '../apiConnection'
+import { checkAuth, sendLog } from '../apiConnection'
 
 let decodedToken
 
@@ -69,3 +69,10 @@ export const removeInvalidCreditsFromStudents = students =>
   students.map(student => removeInvalidCreditsFromStudent(student))
 
 export const getStudentTotalCredits = student => student.courses.reduce((a, b) => a + b.credits, 0)
+
+export const log = async (msg, meta) => {
+  const token = await checkAuth()
+  const decoded = decodeToken(token)
+  const combinedMeta = { ...decoded, ...meta }
+  sendLog({ message: msg, full_message: combinedMeta })
+}
