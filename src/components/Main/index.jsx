@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { localize } from 'react-localize-redux'
+import { Loader } from 'semantic-ui-react'
 
 import Header from '../Header'
 import Populations from '../PopulationStatistics'
@@ -19,7 +20,8 @@ import { userIsEnabled, log } from '../../common'
 class Main extends Component {
   state = {
     enabled: false,
-    hasError: false
+    hasError: false,
+    loaded: false
   }
 
   async componentDidMount() {
@@ -27,14 +29,17 @@ class Main extends Component {
     if (!enabled) {
       log('Not enabled')
     }
-    this.setState({ enabled })
+    this.setState({ enabled, loaded: true })
   }
 
   componentDidCatch() {
-    this.setState({ hasError: true })
+    this.setState({ hasError: true, loaded: true })
   }
 
   render() {
+    if (!this.state.loaded) {
+      return <Loader active inline="centered" />
+    }
     if (!this.state.enabled || this.state.hasError) {
       return <AccessDenied itWasError={this.state.hasError} />
     }
