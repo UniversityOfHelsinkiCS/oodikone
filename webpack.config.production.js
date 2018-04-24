@@ -112,7 +112,8 @@ module.exports = {
           name: 'viewport',
           content: 'width=device-width, initial-scale=1'
         }
-      ]
+      ],
+      headHtmlSnippet: '<script src="https://cdn.ravenjs.com/3.24.2/raven.min.js" crossOrigin="anonymous"></script>'
     }),
 
     new MiniCssExtractPlugin({

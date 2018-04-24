@@ -48,7 +48,11 @@ class PopulationSearchForm extends Component {
   validateQuery = () => {
     const { queries } = this.props
     const { query } = this.state
-    return queries.some(q => isEqual(q, query))
+    return queries.some((q) => {
+      const compare = { ...q }
+      delete compare.uuid
+      return isEqual(compare, query)
+    })
   }
 
   clearPopulations = () => this.props.clearPopulations()
@@ -188,7 +192,7 @@ class PopulationSearchForm extends Component {
 
   render() {
     const { translate } = this.props
-    const { isLoading, isValidYear } = this.state
+    const { isLoading, isValidYear, query } = this.state
 
     let errorText = translate('populationStatistics.alreadyFetched')
     let isQueryInvalid = this.validateQuery()
@@ -198,6 +202,11 @@ class PopulationSearchForm extends Component {
       errorText = translate('populationStatistics.selectValidYear')
     }
 
+    if (query.studyRights.length === 0) {
+      isQueryInvalid = true
+      errorText = translate('populationStatistics.selectStudyRights')
+    }
+
     return (
       <Form error={isQueryInvalid} loading={isLoading}>
         {this.renderEnrollmentDateSelector()}
@@ -205,6 +214,7 @@ class PopulationSearchForm extends Component {
 
         <Message
           error
+          color="blue"
           header={errorText}
         />
         <Button onClick={this.fetchPopulation} disabled={isQueryInvalid}>{translate('populationStatistics.addPopulation')}</Button>
