@@ -47,7 +47,7 @@ PopulationQueryCard.propTypes = {
   query: shape({
     year: string,
     semester: string,
-    studyRights: arrayOf(string),
+    studyRights: arrayOf(number),
     uuid: string
   }).isRequired,
   queryId: number.isRequired,

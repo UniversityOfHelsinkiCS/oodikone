@@ -36,7 +36,7 @@
     "sampleId": ["Id"],
     "sampleSize" : ["Sample size: ${ amount } students"],
     "allPopulations" : ["All populations"],
-    "alreadyFetched": ["Population already in analysis"],
+    "alreadyFetched": ["Selected population already in analysis"],
     "selectValidYear": ["Select valid year."],
     "addPopulation": ["Add population"],
     "clearPopulations": ["Clear populations"],
