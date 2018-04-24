@@ -1,11 +1,13 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const Raven = require('raven')
 const conf = require('./conf-backend')
 const routes = require('./routes')
 const PORT = 8080
-
 const app = express()
+
+Raven.config(process.env.SENTRY_ADDR).install()
 
 app.use(cors({ credentials: true, origin: conf.frontend_addr }))
 app.use(bodyParser.json())
