@@ -12,10 +12,12 @@ import { findCourseInstances, getCourseInstanceStatistics, removeInstance } from
 import { makeSortCourseInstances, makeSortCourses } from '../../selectors/courses'
 
 import styles from './courses.css'
+import sharedStyles from '../../styles/shared'
+
 
 const { func, string, arrayOf, object } = PropTypes
 
-const CourseListRenderer = ({ name, code }) => <span>{`${name} ( ${code} )`}</span>
+const CourseListRenderer = ({ name, code }) => <Search.Result title={`${name} ( ${code} )`} />
 
 CourseListRenderer.propTypes = {
   name: string.isRequired,
@@ -52,9 +54,13 @@ class Courses extends Component {
   }
 
   fetchCoursesList = (searchStr) => {
-    this.setState({ isLoading: true })
-    this.props.findCourses(searchStr)
-      .then(() => this.setState({ isLoading: false }))
+    if (searchStr.length >= 3) {
+      this.setState({ isLoading: true })
+      this.props.findCourses(searchStr)
+        .then(() => this.setState({ isLoading: false }))
+    } else {
+      this.props.findCourses('')
+    }
   }
 
   fetchCourseInstances = () => {
@@ -83,7 +89,7 @@ class Courses extends Component {
   render() {
     const { isLoading, searchStr, selectedCourse } = this.state
     const { courseInstances, selectedInstances, courseList } = this.props
-
+    const coursesToRender = courseList.slice(0, 20)
     const listInstance = selectedInstances.map(instance => (
       <List.Item key={instance.id}>
         <List.Header>
@@ -97,18 +103,22 @@ class Courses extends Component {
 
     return (
       <div className={styles.container}>
+        <Header className={sharedStyles.segmentTitle} size="large">
+          Course Statistics
+        </Header>
         <Search
           className={styles.courseSearch}
           input={{ fluid: true }}
           loading={isLoading}
+          placeholder="Search by entering a course code or name"
           onResultSelect={this.handleResultSelect}
           onSearchChange={this.handleSearchChange}
-          results={courseList}
+          results={coursesToRender}
           resultRenderer={CourseListRenderer}
           value={searchStr}
         />
 
-        <Header as="h2">
+        <Header as="h3">
           {selectedCourse.name} {selectedCourse.code ? `(${selectedCourse.code})` : ''}
         </Header>
 
