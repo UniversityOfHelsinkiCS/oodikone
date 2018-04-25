@@ -1,6 +1,7 @@
 import React from 'react'
 import { Dimmer, Header, Icon, Container, Button } from 'semantic-ui-react'
 import { bool } from 'prop-types'
+import { logout } from '../../apiConnection'
 
 import MulticolorBarChart from '../MulticolorBarChart'
 
@@ -33,7 +34,7 @@ const AccessDenied = ({ itWasError }) => {
           <br />
           <Header.Subheader>{subheader}</Header.Subheader>
           <br />
-          <Button color="pink"> Log out </Button>
+          <Button onClick={logout} color="pink"> Log out </Button>
         </Header>
       </Dimmer>
     </div>
