@@ -1,38 +1,50 @@
 import moment from 'moment'
 import jwtDecode from 'jwt-decode'
-import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
-import { checkAuth, sendLog } from '../apiConnection'
+import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, TOKEN_NAME } from '../constants'
 
-let decodedToken
+import { sendLog, login } from '../apiConnection'
+
+export const setToken = token => localStorage.setItem(TOKEN_NAME, token)
 
 export const decodeToken = (token) => {
-  if (!decodedToken) {
-    decodedToken = jwtDecode(token)
+  try {
+    return jwtDecode(token)
+  } catch (e) {
+    return {}
   }
-  return decodedToken
 }
 
-export const tokenInvalid = (token) => {
+export const tokenAccessInvalid = (token) => {
+  const decodedToken = decodeToken(token)
   // Expired
   if (!decodedToken || decodedToken.exp < (new Date().getTime() / 1000)) {
-    const newToken = decodeToken(token)
-    if (newToken.exp < (new Date().getTime() / 1000)) {
-      return true
-    }
-    decodedToken = newToken
+    return true
   }
   // Misses fields
   const fields = ['enabled', 'userId', 'name']
-  return fields.map(key => Object.keys(decodedToken).includes(key)).includes(false)
+  if (fields.some(key => !Object.keys(decodedToken).includes(key))) {
+    return true
+  }
+  // User is not enabled
+  return !decodedToken.enabled
+}
+
+export const getToken = async () => {
+  let token = localStorage.getItem(TOKEN_NAME)
+  if (!token || tokenAccessInvalid(token)) {
+    token = await login()
+    setToken(token)
+  }
+  return token
 }
 
 export const userIsAdmin = async () => {
-  const token = await checkAuth()
+  const token = await getToken()
   return token ? decodeToken(token).admin : false
 }
 
 export const userIsEnabled = async () => {
-  const token = await checkAuth()
+  const token = await getToken()
   return token ? decodeToken(token).enabled : false
 }
 
@@ -73,7 +85,7 @@ export const removeInvalidCreditsFromStudents = students =>
 export const getStudentTotalCredits = student => student.courses.reduce((a, b) => a + b.credits, 0)
 
 export const log = async (msg, meta) => {
-  const token = await checkAuth()
+  const token = await getToken()
   const decoded = decodeToken(token)
   const combinedMeta = { ...decoded, ...meta }
   sendLog({ message: msg, full_message: combinedMeta })

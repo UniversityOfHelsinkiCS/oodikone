@@ -1,8 +1,9 @@
 import axios from 'axios'
 
-import { tokenInvalid, decodeToken } from '../common'
+import { getToken, setToken } from '../common'
 import { API_BASE_PATH, TOKEN_NAME } from '../constants'
 
+const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
 const isDevEnv = process.env.NODE_ENV === 'development'
 const devOptions = {
   headers: {
@@ -12,22 +13,21 @@ const devOptions = {
   }
 }
 
-const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
-
-export const checkAuth = async () => {
+export const login = async () => {
   const options = isDevEnv ? devOptions : null
-  const token = localStorage.getItem(TOKEN_NAME)
-  if (!token || tokenInvalid(token) || !decodeToken(token).enabled) {
-    const response = await getAxios().post('/login', options.headers)
-    localStorage.setItem(TOKEN_NAME, response.data.token)
-    return response.data.token
-  }
-  return token
+  const response = await getAxios().post('/login', options.headers)
+  return response.data.token
+}
+
+export const swapDevUser = async (newHeaders) => {
+  devOptions.headers = { ...devOptions.headers, ...newHeaders }
+  const token = await login()
+  setToken(token)
 }
 
 const callApi = async (url, method = 'get', data) => {
   const options = isDevEnv ? devOptions : { headers: {} }
-  const token = await checkAuth()
+  const token = await getToken()
   options.headers['x-access-token'] = token
 
   switch (method) {
