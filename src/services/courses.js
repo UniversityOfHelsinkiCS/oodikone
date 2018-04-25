@@ -6,7 +6,6 @@ const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
 
 const byNameOrCode = (searchTerm) => Course.findAll({
-  limit: 10,
   where: {
     [Op.or]: [
       {
