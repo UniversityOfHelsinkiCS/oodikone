@@ -54,6 +54,8 @@ export const byDateDesc = (a, b) => new Date(b.date) - new Date(a.date)
 
 export const byName = (a, b) => a.name.localeCompare(b.name)
 
+export const byCodeDesc = (a, b) => b.code.localeCompare(a.code)
+
 /* This should be done in backend */
 export const removeInvalidCreditsFromStudent = student => ({
   ...student,
