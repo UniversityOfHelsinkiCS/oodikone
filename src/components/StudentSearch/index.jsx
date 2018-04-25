@@ -7,6 +7,7 @@ import { findStudents, getStudent, selectStudent } from '../../redux/students'
 import SearchResultTable from '../SearchResultTable'
 import SegmentDimmer from '../SegmentDimmer'
 import Timeout from '../Timeout'
+import { makeFormatStudentRows } from '../../selectors/students'
 
 import sharedStyles from '../../styles/shared'
 import styles from './studentSearch.css'
@@ -82,8 +83,7 @@ class StudentSearch extends Component {
       translate('common.started'),
       translate('common.credits')
     ]
-    const rows = students.map(({ studentNumber, started, credits }) =>
-      ({ studentNumber, started, credits }))
+    const rows = students
 
     return (
       <SearchResultTable
@@ -133,8 +133,10 @@ StudentSearch.defaultProps = {
   studentNumber: undefined
 }
 
+const formatStudentRows = makeFormatStudentRows()
+
 const mapStateToProps = ({ students }) => ({
-  students: students.data
+  students: formatStudentRows(students)
 })
 
 const mapDispatchToProps = dispatch => ({
