@@ -29,9 +29,9 @@ export const tokenAccessInvalid = (token) => {
   return !decodedToken.enabled
 }
 
-export const getToken = async () => {
+export const getToken = async (forceNew = false) => {
   let token = localStorage.getItem(TOKEN_NAME)
-  if (!token || tokenAccessInvalid(token)) {
+  if (!token || tokenAccessInvalid(token) || forceNew) {
     token = await login()
     setToken(token)
   }
