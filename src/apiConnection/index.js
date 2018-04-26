@@ -65,8 +65,15 @@ export const handleRequest = store => next => async (action) => {
     try {
       const res = await callApi(route, method, data)
       store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
-    } catch (err) {
-      store.dispatch({ type: `${prefix}FAILURE`, response: err, query })
+    } catch (e) {
+      // Something failed. Assume it's the token and try again.
+      try {
+        await getToken(true)
+        const res = await callApi(route, method, data)
+        store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
+      } catch (err) {
+        store.dispatch({ type: `${prefix}FAILURE`, response: err, query })
+      }
     }
   }
 }
