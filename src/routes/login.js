@@ -19,18 +19,15 @@ const generateToken = async (uid, res) => {
   })
 
   // return the information including token as JSON
-  res.status(200).json({
-    token: token
-  })
+  res.status(200).json({ token })
 }
 
 router.post('/login', async (req, res) => {
   try {
-    console.log(req.body)
-    const uid = req.body['uid']
-    if (req.body['shib-session-id'] && uid) {
+    const uid = req.headers['uid']
+    if (req.headers['shib-session-id'] && uid) {
       const user = await User.byUsername(uid)
-      const fullname = req.body.displayname || 'Shib Valmis'
+      const fullname = req.headers.displayname || 'Shib Valmis'
       if (!user) {
         await User.createUser(uid, fullname)
       } else {
