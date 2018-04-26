@@ -15,7 +15,7 @@ const devOptions = {
 
 export const login = async () => {
   const options = isDevEnv ? devOptions : null
-  const response = await getAxios().post('/login', options.headers)
+  const response = await getAxios().post('/login', null, options)
   return response.data.token
 }
 
