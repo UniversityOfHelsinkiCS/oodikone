@@ -9,6 +9,7 @@ import { isEqual } from 'lodash'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getUnits } from '../../redux/units'
 import { isInDateFormat, momentFromFormat, reformatDate } from '../../common'
+import { makeMapRightsToDropDown } from '../../selectors/populationSearchForm'
 
 import style from './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
@@ -225,14 +226,12 @@ class PopulationSearchForm extends Component {
   }
 }
 
-/* TODO: move to reselect */
-const mapRightsToDropdown = rights =>
-  rights.map(r => ({ key: r.id, value: r.id, text: r.name }))
+const mapRightsToDropdown = makeMapRightsToDropDown()
 
 const mapStateToProps = ({ populations, units, locale }) => ({
   queries: populations.map(population => population.query),
   translate: getTranslate(locale),
-  studyProgrammes: mapRightsToDropdown(units.data)
+  studyProgrammes: mapRightsToDropdown(units)
 })
 
 const mapDispatchToProps = dispatch => ({
