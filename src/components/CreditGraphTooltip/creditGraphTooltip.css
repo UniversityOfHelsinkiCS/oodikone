@@ -1,5 +1,5 @@
 :root {
-  --flex-default {
+  --flex-default: {
     display: flex;
     align-items: center;
     justify-content: space-around;
