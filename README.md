@@ -113,8 +113,7 @@ Navigate to correct folder
 Use the update script to restart the software
 `./update.sh`
 
-Be amazed
-
+Be amazed!
 
 ## Updater
 
