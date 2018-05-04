@@ -5,7 +5,7 @@ const getArrayParams = (paramName, entries) => entries.map(entry => `&${paramNam
 export const getPopulationStatistics = ({
   year, semester, studyRights, uuid
 }) => {
-  const route = `/populationstatistics/?year=${year}&semester=${semester}${getArrayParams('studyRights', studyRights)}`
+  const route = `/v2/populationstatistics/?year=${year}&semester=${semester}${getArrayParams('studyRights', studyRights)}`
   const prefix = 'GET_POPULATION_STATISTICS_'
   const query = {
     year, semester, studyRights, uuid
