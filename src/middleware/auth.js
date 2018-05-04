@@ -9,20 +9,20 @@ const checkAuth = async (req, res, next) => {
   if (token) {
     jwt.verify(token, conf.TOKEN_SECRET, (err, decoded) => {
       if (err) {
-        res.json(err).status(403).end()
+        res.status(403).json(err)
       } else if (isShibboUser(decoded.userId, uid)) {
         if (decoded.enabled) {
           req.decodedToken = decoded
           next()
         } else {
-          res.json({ error: 'User is not enabled' }).status(403).end()
+          res.status(403).json({ error: 'User is not enabled' })
         }
       } else {
-        res.json({ error: 'User shibboleth id and token id did not match' }).status(403).end()
+        res.status(403).json({ error: 'User shibboleth id and token id did not match' })
       }
     })
-  } else {
-    res.json({ error: 'No token in headers' }).status(403).end()
+  } else {  
+    res.status(403).json({ error: 'No token in headers' })
   }
 }
 

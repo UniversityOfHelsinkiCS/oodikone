@@ -1,44 +1,33 @@
 const winston = require('winston')
+require('winston-papertrail')
+require('winston-log2gelf')
 
-require('winston-papertrail').Papertrail
+const transports = []
 
-const winstonPapertrail = new winston.transports.Papertrail({
-  host: process.env.PAPERTRAIL_HOST ||'localhost',
-  port: process.env.PAPERTRAIL_PORT || 12345,
-  hostname: process.env.PAPERTRAIL_HOSTNAME || 'travis'
-})
-
-winstonPapertrail.on('error', function (err) {
-  console.log(err)
-})
-
-const transports = {
-  papertrail: winstonPapertrail,
-  console: new winston.transports.Console({ level: 'debug' })
+if (process.env.LOG_PORT && process.env.LOG_HOST) {
+  transports.push(new winston.transports.Log2gelf({
+    hostname: process.env.LOG_HOSTNAME || 'oodikone-backend',
+    host: process.env.LOG_HOST,
+    port: process.env.LOG_PORT,
+    protocol: 'http'
+  }))
 }
 
-let loggerPapertrail = new winston.Logger({
-  transports: [
-    transports.papertrail, transports.console
-  ]
-})
-
-if ( process.env.NODE_ENV === 'test' ) {
-  console.log('logger for tests')
-  loggerPapertrail = new winston.Logger({
-    transports: [
-      transports.console
-    ]
-  })
-} else {
-  loggerPapertrail = new winston.Logger({
-    transports: [
-      transports.papertrail, transports.console,
-      new (winston.transports.File)({ filename: 'debug.log' })
-    ]
-  })
+if (process.env.PAPERTRAIL_HOST && process.env.PAPERTRAIL_PORT && process.env.PAPERTRAIL_HOSTNAME) {
+  transports.push(new winston.transports.Papertrail({
+    level: 'info',
+    host: process.env.PAPERTRAIL_HOST,
+    port: process.env.PAPERTRAIL_PORT,
+    hostname: process.env.PAPERTRAIL_HOSTNAME
+  }))
 }
 
-transports.papertrail.level = 'info'
+if (process.env.NODE_ENV !== 'test') {
+  transports.push(new winston.transports.File({ filename: 'debug.log' }))
+}
 
-module.exports = loggerPapertrail
+transports.push(new winston.transports.Console({ level: 'debug' }))
+
+const logger = new winston.Logger({ transports })
+
+module.exports = logger

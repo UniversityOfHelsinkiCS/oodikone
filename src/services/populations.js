@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize')
 const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../models')
 const { formatStudent } = require('../services/students')
+const StudyRights = require('../services/studyrights')
 const { byId } = require('../services/units')
 const Op = Sequelize.Op
 
@@ -22,6 +23,33 @@ const studyRightLike = (searchTerm) => {
       type: sequelize.QueryTypes.SELECT,
       model: Studyright
     })
+}
+
+const withStudents = (student_numbers, conf) => {
+  return Student.findAll({
+    include: [
+      {
+        model: Credit,
+        include: [
+          {
+            model: CourseInstance,
+            include: [Course],
+            where: { // Only course instances that are from between the dates selected
+              coursedate: {
+                [Op.gte]: conf.enrollmentDates.startDate
+              }
+            }
+          }
+        ],
+      },
+    ],
+    where: {
+      studentnumber: {
+        [Op.in]: student_numbers
+      }
+    },
+    //logging: console.log
+  })
 }
 
 const byCriteria = (conf) => {
@@ -244,6 +272,36 @@ const semesterStatisticsFor = async (query) => {
   }
 }
 
+const optimizedStatisticsOf = async (query) => {
+  if (semesterStart[query.semester] === undefined) {
+    return { error: 'Semester should be either SPRING OR FALL' }
+  }
+
+  const startDate = `${query.year}-${semesterStart[query.semester]}`
+  const endDate = `${query.year}-${semesterEnd[query.semester]}`
+  try {
+    const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
+    const conf = {
+      enrollmentDates: {
+        startDate, 
+        endDate
+      },
+      studyRights
+    }
+
+    const student_numbers = await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
+    
+    const students = await withStudents(student_numbers, conf).map(restrictToMonths(query.months)) 
+
+    return students.map(formatStudent)
+    
+  } catch (e) {
+    console.log(e)
+    return { error: `No such study rights: ${query.studyRights}` }
+  }
+}
+
 module.exports = {
-  studyrightsByKeyword, universityEnrolmentDates, statisticsOf, semesterStatisticsFor
+  studyrightsByKeyword, universityEnrolmentDates, statisticsOf, semesterStatisticsFor,
+  optimizedStatisticsOf
 }

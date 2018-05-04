@@ -19,12 +19,10 @@ const generateToken = async (uid, res) => {
   })
 
   // return the information including token as JSON
-  res.status(200).json({
-    token: token
-  })
+  res.status(200).json({ token })
 }
 
-router.get('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const uid = req.headers['uid']
     if (req.headers['shib-session-id'] && uid) {
@@ -44,10 +42,10 @@ router.get('/login', async (req, res) => {
   }
 })
 
-router.get('/logout', async (req, res) => {
+router.delete('/logout', async (req, res) => {
   try {
     const logoutUrl = req.headers.shib_logout_url
-    const { returnUrl } = req.query
+    const { returnUrl } = req.body
     if (logoutUrl) {
       return res.status(200).send({ logoutUrl: `${logoutUrl}?return=${returnUrl}` }).end()
     }
