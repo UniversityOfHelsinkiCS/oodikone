@@ -118,7 +118,7 @@ Be amazed
 
 ## Updater
 
-Oodikone2-backend includes the update-script that fetches student data from WebOodi. The updater starts running automatically every saturday at 4am. 
+Oodikone2-backend includes the update-script that fetches student data from WebOodi. 
 
 ### Dev
 
