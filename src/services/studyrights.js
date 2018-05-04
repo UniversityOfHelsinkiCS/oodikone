@@ -32,6 +32,25 @@ const byStudent = (studentNumber) => {
   })
 }
 
+const ofPopulations = (conf) => {
+
+  const studyrightRules = conf.studyRights.map(sr => ({ [Op.eq]: sr.name }))
+
+  return Studyright.findAll({
+    where: {
+      highlevelname: {
+        [Op.or]: studyrightRules
+      },
+      prioritycode: {
+        [Op.or]: [1, 30]
+      },
+      studystartdate: {
+        [Op.between]: [conf.enrollmentDates.startDate, conf.enrollmentDates.endDate]
+      }
+    }
+  })
+}
+
 module.exports = {
-  byStudent, createStudyright
+  byStudent, createStudyright, ofPopulations
 }

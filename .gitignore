@@ -7,3 +7,4 @@ update.sh
 logs/*
 run_update_script.sh
 student_numbers
+debug.log

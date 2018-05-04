@@ -6,7 +6,6 @@ const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
 
 const byNameOrCode = (searchTerm) => Course.findAll({
-  limit: 10,
   where: {
     [Op.or]: [
       {
@@ -171,6 +170,18 @@ const instancesOf = async (code) => {
   }
 }
 
+const yearlyStatsOf = async (code, year) => {
+  const allInstances = await instancesOf(code)
+  const yearInst = allInstances.filter(inst => moment(inst.date).isBetween(year + '-08-01' , Number(year) + 1  + '-06-01'))
+
+  console.log(yearInst)
+
+  const passed = yearInst.reduce((a, b) => a + b.pass, 0)
+  const failed = yearInst.reduce((a, b) => a + b.fail, 0)
+  console.log('passed: ', passed, 'Failed: ', failed)
+  return
+}
+
 const courseInstanceByCodeAndDate = (code, date) => {
   return CourseInstance.findOne({
     where: {
@@ -206,5 +217,5 @@ const createCourseInstance = async (creditDate, course) => {
 }
 
 module.exports = {
-  bySearchTerm, instancesOf, statisticsOf, createCourse, createCourseInstance, courseInstanceByCodeAndDate
+  bySearchTerm, instancesOf, statisticsOf, createCourse, createCourseInstance, courseInstanceByCodeAndDate, yearlyStatsOf
 }
