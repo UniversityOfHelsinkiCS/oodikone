@@ -32,11 +32,11 @@ test('should pong when pinged', async t => {
 test('login does not allow without required headers', async t => {
   const res = api
     .post('/api/login')
-    .send({ 'uid': 'uid' })
+    .set({ 'uid': 'uid' })
 
   const res2 = api
     .post('/api/login')
-    .send({ 'shib-session-id': 'sessioniddiibadaaba' })
+    .set({ 'shib-session-id': 'sessioniddiibadaaba' })
   const responses = await Promise.all([res, res2])
 
   responses.forEach(response => t.is(response.status, 401))
@@ -47,7 +47,7 @@ test('login creates an user', async t => {
 
   const res = await api
     .post('/api/login')
-    .send({
+    .set({
       uid: user.username,
       'shib-session-id': 'sessioniddiibadaaba',
       'displayname': user.full_name
@@ -67,7 +67,7 @@ test('login fetches an user and returns token to enabled', async t => {
 
   const res = await api
     .post('/api/login')
-    .send({
+    .set({
       uid: user.username,
       'shib-session-id': 'sessioniddiibadaaba',
       'displayname': user.full_name
@@ -86,23 +86,23 @@ test('logout removes token', async t => {
   const user = generateUsers(1)[0]
   await api
     .post('/api/login')
-    .send({
+    .set({
       uid: user.username,
       'shib-session-id': 'sessioniddiibadaaba',
       'displayname': user.full_name
     })
     .expect(200)
-
-  const res = await api
+  
+  const res2 = await api
     .delete('/api/logout')
     .expect(200)
 
-  t.falsy(res.body.token)
+  t.falsy(res2.body.token)
 
-  const res2 = await api
+  const res3 = await api
     .get('/api/departmentsuccess')
     .expect(403)
 
-  t.is(res2.body.error, 'No token in headers')
+  t.is(res3.body.error, 'No token in headers')
 
 })
