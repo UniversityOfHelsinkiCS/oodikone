@@ -1,8 +1,9 @@
 import axios from 'axios'
 
-import { tokenInvalid, decodeToken } from '../common'
+import { getToken, setToken } from '../common'
 import { API_BASE_PATH, TOKEN_NAME } from '../constants'
 
+const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
 const isDevEnv = process.env.NODE_ENV === 'development'
 const devOptions = {
   headers: {
@@ -12,22 +13,21 @@ const devOptions = {
   }
 }
 
-const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
-
-export const checkAuth = async () => {
+export const login = async () => {
   const options = isDevEnv ? devOptions : null
-  const token = localStorage.getItem(TOKEN_NAME)
-  if (!token || tokenInvalid(token) || !decodeToken(token).enabled) {
-    const response = await getAxios().get('/login', options)
-    localStorage.setItem(TOKEN_NAME, response.data.token)
-    return response.data.token
-  }
-  return token
+  const response = await getAxios().post('/login', null, options)
+  return response.data.token
+}
+
+export const swapDevUser = async (newHeaders) => {
+  devOptions.headers = { ...devOptions.headers, ...newHeaders }
+  const token = await login()
+  setToken(token)
 }
 
 const callApi = async (url, method = 'get', data) => {
   const options = isDevEnv ? devOptions : { headers: {} }
-  const token = await checkAuth()
+  const token = await getToken()
   options.headers['x-access-token'] = token
 
   switch (method) {
@@ -65,8 +65,15 @@ export const handleRequest = store => next => async (action) => {
     try {
       const res = await callApi(route, method, data)
       store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
-    } catch (err) {
-      store.dispatch({ type: `${prefix}FAILURE`, response: err, query })
+    } catch (e) {
+      // Something failed. Assume it's the token and try again.
+      try {
+        await getToken(true)
+        const res = await callApi(route, method, data)
+        store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
+      } catch (err) {
+        store.dispatch({ type: `${prefix}FAILURE`, response: err, query })
+      }
     }
   }
 }
@@ -75,7 +82,9 @@ export const logout = async () => {
   const stagingPath = '/staging'
   const returnUrl = window.location.pathname.includes(stagingPath) ?
     `${window.location.origin}${stagingPath}` : window.location.origin
-  const response = await getAxios().get(`/logout?returnUrl=${returnUrl}`)
+  const response = await getAxios().delete('/logout', { data: { returnUrl } })
   localStorage.removeItem(TOKEN_NAME)
   window.location = response.data.logoutUrl
 }
+
+export const sendLog = async data => callApi('/log', 'post', data)

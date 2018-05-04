@@ -8,7 +8,7 @@ import { routes } from '../../constants'
 import { userIsAdmin } from '../../common'
 
 import styles from './navigationBar.css'
-import { logout } from '../../apiConnection'
+import { logout, swapDevUser } from '../../apiConnection'
 
 class NavigationBar extends Component {
   state = {
@@ -24,6 +24,10 @@ class NavigationBar extends Component {
       }
     })
     this.setState({ navigationRoutes })
+  }
+
+  swapUser = uid => () => {
+    swapDevUser({ uid })
   }
 
   checkForOptionalParams = route => (
@@ -42,7 +46,7 @@ class NavigationBar extends Component {
                 key={user}
                 icon="user"
                 text={`Use as: ${user}`}
-                onClick={() => { }}
+                onClick={this.swapUser(user)}
               />
             ))}
             <Dropdown.Item

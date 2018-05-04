@@ -1,6 +1,7 @@
 import React from 'react'
-import { Dimmer, Header, Icon, Container } from 'semantic-ui-react'
+import { Dimmer, Header, Icon, Container, Button } from 'semantic-ui-react'
 import { bool } from 'prop-types'
+import { logout } from '../../apiConnection'
 
 import MulticolorBarChart from '../MulticolorBarChart'
 
@@ -13,7 +14,7 @@ const dummyData = [
 
 const AccessDenied = ({ itWasError }) => {
   const header = itWasError ? 'Something broke' : 'You do not have access to Oodikone'
-  const guide = 'try refreshing your browser window or contact grp-toska@helsinki.fi'
+  const guide = 'try refreshing your browser window, pressing log out or contacting grp-toska@helsinki.fi'
   const subheader = itWasError ? `If this was not intended ${guide}` : `If you should have access ${guide}`
 
   return (
@@ -32,6 +33,8 @@ const AccessDenied = ({ itWasError }) => {
           <Header.Subheader>{header}</Header.Subheader>
           <br />
           <Header.Subheader>{subheader}</Header.Subheader>
+          <br />
+          <Button onClick={logout} color="pink"> Log out </Button>
         </Header>
       </Dimmer>
     </div>
