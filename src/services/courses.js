@@ -170,16 +170,15 @@ const instancesOf = async (code) => {
   }
 }
 
-const yearlyStatsOf = async (code, year) => {
+const yearlyStatsOf = async (code, dates) => {
   const allInstances = await instancesOf(code)
-  const yearInst = allInstances.filter(inst => moment(inst.date).isBetween(year + '-08-01' , Number(year) + 1  + '-06-01'))
-
-  console.log(yearInst)
-
-  const passed = yearInst.reduce((a, b) => a + b.pass, 0)
-  const failed = yearInst.reduce((a, b) => a + b.fail, 0)
-  console.log('passed: ', passed, 'Failed: ', failed)
-  return
+  const yearInst = allInstances.filter(inst => moment(inst.date).isBetween(dates.start, dates.end))
+  if (yearInst) {
+    const passed = yearInst.reduce((a, b) => a + b.pass, 0)
+    const failed = yearInst.reduce((a, b) => a + b.fail, 0)
+    return { code, passed, failed }
+  }
+  return 
 }
 
 const courseInstanceByCodeAndDate = (code, date) => {
