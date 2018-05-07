@@ -32,4 +32,15 @@ router.get('/v2/coursestatistics', async (req, res) => {
   res.json(results)
 })
 
+router.get('/courseyearlystats', async (req, res) => {
+  let results = []
+  if (req.query.start && req.query.code && req.query.end) {
+    const code = req.query.code
+    const dates = { start: req.query.start, end: req.query.end }
+
+    results = await Course.yearlyStatsOf(code, dates)
+  }
+  res.json(results)
+})
+
 module.exports = router
