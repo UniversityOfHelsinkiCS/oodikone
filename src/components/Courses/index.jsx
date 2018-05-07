@@ -3,14 +3,13 @@ import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import PropTypes from 'prop-types'
 import { Dropdown, Header, List, Button } from 'semantic-ui-react'
-import CourseStatistics from '../CourseStatistics'
+import CourseInstanceStatistics from '../CourseInstanceStatistics'
 import CourseSearch from '../CourseSearch'
 import Timeout from '../Timeout'
 
 import { reformatDate } from '../../common'
-import { findCourses } from '../../redux/courses'
 import { findCourseInstances, getCourseInstanceStatistics, removeInstance } from '../../redux/courseInstances'
-import { makeSortCourseInstances, makeSortCourses } from '../../selectors/courses'
+import { makeSortCourseInstances } from '../../selectors/courses'
 
 import styles from './courses.css'
 import sharedStyles from '../../styles/shared'
@@ -97,7 +96,7 @@ class Courses extends Component {
         </List>
 
         {selectedInstances.map(i => (
-          <CourseStatistics
+          <CourseInstanceStatistics
             key={i.id}
             courseName={i.course.name}
             instanceDate={reformatDate(i.date, 'DD.MM.YYYY')}
@@ -119,10 +118,8 @@ Courses.propTypes = {
 }
 
 const sortInstances = makeSortCourseInstances()
-const sortCourses = makeSortCourses()
 
-const mapStateToProps = ({ locale, courses, courseInstances }) => ({
-  courseList: sortCourses(courses),
+const mapStateToProps = ({ locale, courseInstances }) => ({
   courseInstances: sortInstances(courseInstances),
   selectedInstances: courseInstances.data.filter(instance =>
     courseInstances.selected.includes(instance.id)),
@@ -131,8 +128,6 @@ const mapStateToProps = ({ locale, courses, courseInstances }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  findCourses: query =>
-    dispatch(findCourses(query)),
 
   findCourseInstances: code =>
     dispatch(findCourseInstances(code)),

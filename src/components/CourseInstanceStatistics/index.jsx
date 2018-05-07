@@ -57,7 +57,7 @@ const parseInformationFromData = (data) => {
   }
   return information
 }
-const CourseStatistics = ({ stats, courseName, instanceDate }) => {
+const CourseInstanceStatistics = ({ stats, courseName, instanceDate }) => {
   if (stats !== undefined) {
     const dataAll = parseInformationFromData(createChartData(stats.all))
     const dataPass = parseInformationFromData(createChartData(stats.pass))
@@ -121,7 +121,7 @@ const CourseStatistics = ({ stats, courseName, instanceDate }) => {
   )
 }
 
-CourseStatistics.propTypes = {
+CourseInstanceStatistics.propTypes = {
   stats: shape({
     all: object.isRequired,
     pass: object.isRequired,
@@ -132,4 +132,4 @@ CourseStatistics.propTypes = {
   instanceDate: string.isRequired
 }
 
-export default CourseStatistics
+export default CourseInstanceStatistics
