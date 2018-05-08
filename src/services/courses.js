@@ -183,7 +183,7 @@ const oneYearStats = (instances, year, separate) => {
     const failedS = springInstances.reduce((a, b) => a + b.fail, 0)
 
     if (passedF + failedF > 0) stats.push({ passed: passedF, failed: failedF, time: String(year) + ' Fall' })
-    if (passedS + failedS > 0) stats.push({ passed: passedS, failed: failedS, time: String(year) + ' Spring' })
+    if (passedS + failedS > 0) stats.push({ passed: passedS, failed: failedS, time: String(year + 1) + ' Spring' })
   } else {
     const yearInst = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-06-01'))
     const passed = yearInst.reduce((a, b) => a + b.pass, 0)
