@@ -170,15 +170,44 @@ const instancesOf = async (code) => {
   }
 }
 
-const yearlyStatsOf = async (code, dates) => {
-  const allInstances = await instancesOf(code)
-  const yearInst = allInstances.filter(inst => moment(inst.date).isBetween(dates.start, dates.end))
-  if (yearInst) {
+const oneYearStats = (instances, year, separate) => {
+  const stats = []
+  if (separate) {
+    const fallInstances = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-01-15'))
+    const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-06-01'))
+
+    const passedF = fallInstances.reduce((a, b) => a + b.pass, 0)
+    const failedF = fallInstances.reduce((a, b) => a + b.fail, 0)
+
+    const passedS = springInstances.reduce((a, b) => a + b.pass, 0)
+    const failedS = springInstances.reduce((a, b) => a + b.fail, 0)
+
+    if (passedF + failedF > 0) stats.push({ passed: passedF, failed: failedF, time: String(year) + ' Fall' })
+    if (passedS + failedS > 0) stats.push({ passed: passedS, failed: failedS, time: String(year) + ' Spring' })
+  } else {
+    const yearInst = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-06-01'))
     const passed = yearInst.reduce((a, b) => a + b.pass, 0)
     const failed = yearInst.reduce((a, b) => a + b.fail, 0)
-    return { code, passed, failed }
+    if (passed + failed > 0) stats.push({ passed, failed, time: String(year) + '-' + String(year + 1) })
   }
-  return 
+  return stats
+}
+
+const yearlyStatsOf = async (code, year, separate) => {
+  const allInstances = await instancesOf(code)
+  const yearInst = allInstances.filter(inst => moment(inst.date).isBetween(year.start + '-08-01', year.end + '-06-01'))
+  const start = Number(year.start)
+  const end = Number(year.end)
+  const results = []
+  let stats
+  if (yearInst) {
+    for (let year = start; year < end; year++) {
+      stats = oneYearStats(yearInst, year, separate)
+      if (stats.length > 0) results.push(...stats)
+    }
+    return { code, stats: results }
+  }
+  return
 }
 
 const courseInstanceByCodeAndDate = (code, date) => {
