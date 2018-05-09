@@ -26,6 +26,7 @@
     "students" : ["Student statistics"],
     "courses" : ["Courses"],
     "teachers" : ["Teachers"],
+    "courseStatistics" : ["Course statistics"],
     "users" : ["Users"],
     "logout": ["Logout"]
   },
@@ -54,6 +55,11 @@
     "chartTitle": ["Average credit gains after 13 months for BSc students starting"]
   },
   "studentStatistics": {
+    "header" : ["Student statistics"],
+    "searchPlaceholder": ["Search with a student number or name (surname firstname)"],
+    "chartTitle" : ["Credit Accumulation"]
+  },
+  "courseStatistics": {
     "header" : ["Student statistics"],
     "searchPlaceholder": ["Search with a student number or name (surname firstname)"],
     "chartTitle" : ["Credit Accumulation"]

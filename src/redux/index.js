@@ -9,6 +9,7 @@ import students from './students'
 import errors from './errors'
 import courses from './courses'
 import courseInstances from './courseInstances'
+import courseStatistics from './courseStatistics'
 
 export default combineReducers({
   locale,
@@ -19,5 +20,6 @@ export default combineReducers({
   students,
   errors,
   courses,
-  courseInstances
+  courseInstances,
+  courseStatistics
 })
