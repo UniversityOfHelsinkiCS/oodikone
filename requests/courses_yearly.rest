@@ -1,0 +1,7 @@
+GET /api/courseyearlystats/?start=2013&end=2018&code=TKT10002 HTTP/1.1
+host: localhost:8080
+uid: tktl
+shib-session-id: mock-session
+x-access-token: 
+
+## Insert valid access token generated from login.rest to use

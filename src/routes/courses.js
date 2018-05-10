@@ -35,10 +35,10 @@ router.get('/v2/coursestatistics', async (req, res) => {
 router.get('/courseyearlystats', async (req, res) => {
   let results = []
   if (req.query.start && req.query.code && req.query.end) {
-    const code = req.query.code
-    const dates = { start: req.query.start, end: req.query.end }
-
-    results = await Course.yearlyStatsOf(code, dates)
+    const { code } = req.query
+    const years = { start: req.query.start, end: req.query.end }
+    
+    results = await Course.yearlyStatsOf(code, years, req.query.separate)
   }
   res.json(results)
 })
