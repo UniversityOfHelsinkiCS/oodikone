@@ -2,41 +2,25 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import PropTypes from 'prop-types'
-import { Search, Dropdown, Header, List, Button } from 'semantic-ui-react'
-import CourseStatistics from '../CourseStatistics'
+import { Dropdown, Header, List, Button } from 'semantic-ui-react'
+import CourseInstanceStatistics from '../CourseInstanceStatistics'
+import CourseSearch from '../CourseSearch'
 import Timeout from '../Timeout'
 
 import { reformatDate } from '../../common'
-import { findCourses } from '../../redux/courses'
 import { findCourseInstances, getCourseInstanceStatistics, removeInstance } from '../../redux/courseInstances'
-import { makeSortCourseInstances, makeSortCourses } from '../../selectors/courses'
+import { makeSortCourseInstances } from '../../selectors/courses'
 
 import styles from './courses.css'
 import sharedStyles from '../../styles/shared'
 
 
-const { func, string, arrayOf, object } = PropTypes
-
-const CourseListRenderer = ({ name, code }) => <Search.Result title={`${name} ( ${code} )`} />
-
-CourseListRenderer.propTypes = {
-  name: string.isRequired,
-  code: string.isRequired
-}
+const { func, arrayOf, object } = PropTypes
 
 class Courses extends Component {
   state = {
     isLoading: false,
-    searchStr: '',
     selectedCourse: { name: 'No course selected', code: '' }
-  }
-
-  resetComponent = () => {
-    this.setState({
-      isLoading: false,
-      searchStr: '',
-      selectedCourse: { name: 'No course selected', code: '' }
-    })
   }
 
   handleResultSelect = (e, { result }) => {
@@ -45,27 +29,13 @@ class Courses extends Component {
     })
   }
 
-  handleSearchChange = (e, { value: searchStr }) => {
-    this.props.clearTimeout('search')
-    this.setState({ searchStr })
-    this.props.setTimeout('search', () => {
-      this.fetchCoursesList(searchStr)
-    }, 250)
-  }
-
-  fetchCoursesList = (searchStr) => {
-    if (searchStr.length >= 3) {
-      this.setState({ isLoading: true })
-      this.props.findCourses(searchStr)
-        .then(() => this.setState({ isLoading: false }))
-    } else {
-      this.props.findCourses('')
-    }
-  }
-
   fetchCourseInstances = () => {
     const courseCode = this.state.selectedCourse.code
+    this.setState({ isLoading: true })
     this.props.findCourseInstances(courseCode)
+      .then(() => {
+        this.setState({ isLoading: false })
+      })
   }
 
   fetchInstanceStatistics = (e, { value: courseInstanceId }) => {
@@ -87,9 +57,8 @@ class Courses extends Component {
   }
 
   render() {
-    const { isLoading, searchStr, selectedCourse } = this.state
-    const { courseInstances, selectedInstances, courseList } = this.props
-    const coursesToRender = courseList.slice(0, 20)
+    const { selectedCourse, isLoading } = this.state
+    const { courseInstances, selectedInstances } = this.props
     const listInstance = selectedInstances.map(instance => (
       <List.Item key={instance.id}>
         <List.Header>
@@ -106,23 +75,14 @@ class Courses extends Component {
         <Header className={sharedStyles.segmentTitle} size="large">
           Course Statistics
         </Header>
-        <Search
-          className={styles.courseSearch}
-          input={{ fluid: true }}
-          loading={isLoading}
-          placeholder="Search by entering a course code or name"
-          onResultSelect={this.handleResultSelect}
-          onSearchChange={this.handleSearchChange}
-          results={coursesToRender}
-          resultRenderer={CourseListRenderer}
-          value={searchStr}
-        />
+        <CourseSearch handleResultSelect={this.handleResultSelect} />
 
         <Header as="h3">
           {selectedCourse.name} {selectedCourse.code ? `(${selectedCourse.code})` : ''}
         </Header>
 
         <Dropdown
+          loading={isLoading}
           className={styles.courseSearch}
           onChange={this.fetchInstanceStatistics}
           placeholder="Select course instance"
@@ -136,7 +96,7 @@ class Courses extends Component {
         </List>
 
         {selectedInstances.map(i => (
-          <CourseStatistics
+          <CourseInstanceStatistics
             key={i.id}
             courseName={i.course.name}
             instanceDate={reformatDate(i.date, 'DD.MM.YYYY')}
@@ -150,23 +110,16 @@ class Courses extends Component {
 }
 
 Courses.propTypes = {
-  findCourses: func.isRequired,
   findCourseInstances: func.isRequired,
   getCourseInstanceStatistics: func.isRequired,
   removeInstance: func.isRequired,
-  courseList: arrayOf(object).isRequired,
   selectedInstances: arrayOf(object).isRequired,
-  courseInstances: arrayOf(object).isRequired,
-  setTimeout: func.isRequired,
-  clearTimeout: func.isRequired
-  // translate: func.isRequired
+  courseInstances: arrayOf(object).isRequired
 }
 
 const sortInstances = makeSortCourseInstances()
-const sortCourses = makeSortCourses()
 
-const mapStateToProps = ({ locale, courses, courseInstances }) => ({
-  courseList: sortCourses(courses),
+const mapStateToProps = ({ locale, courseInstances }) => ({
   courseInstances: sortInstances(courseInstances),
   selectedInstances: courseInstances.data.filter(instance =>
     courseInstances.selected.includes(instance.id)),
@@ -175,8 +128,6 @@ const mapStateToProps = ({ locale, courses, courseInstances }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  findCourses: query =>
-    dispatch(findCourses(query)),
 
   findCourseInstances: code =>
     dispatch(findCourseInstances(code)),
