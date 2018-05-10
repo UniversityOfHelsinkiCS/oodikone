@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize')
+const _ = require('lodash')
 const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../models')
-const { formatStudent } = require('../services/students')
+const { formatStudent, formatStudentUnifyCodes } = require('../services/students')
 const StudyRights = require('../services/studyrights')
 const { byId } = require('../services/units')
 const Op = Sequelize.Op
@@ -52,6 +53,7 @@ const withStudents = (student_numbers, conf) => {
   })
 }
 
+// TODO: remove
 const byCriteria = (conf) => {
   const terms = []
 
@@ -165,19 +167,6 @@ const notAmongExcludes = (conf) => (student) => {
 
   if (conf.excludeStudentsWithZeroCredits &&
     student.creditcount === 0) {  // if (conf.enrollmentDates && conf.enrollmentDates.length > 0) {
-    // const enrollmentDateCriterias =
-    //   conf.enrollmentDates.map(enrollmentDate => (
-    //     { // for some reason Op.eq does not work...
-    //       studystartdate: {
-    //         [Op.between]: [enrollmentDate, enrollmentDate]
-    //       }
-    //     })
-    //   )
-
-    // terms.push({
-    //   [Op.or]: enrollmentDateCriterias
-    // })
-    // } {
     return false
   }
 
@@ -243,14 +232,15 @@ const statisticsOf = async (conf) => {
 
 const semesterStart = {
   SPRING: '01-01',
-  FALL: '07-01'
+  FALL: '08-01'
 }
 
 const semesterEnd = {
-  SPRING: '06-30',
+  SPRING: '07-31',
   FALL: '12-31'
 }
 
+// TODO: remove
 const semesterStatisticsFor = async (query) => {
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
@@ -301,7 +291,152 @@ const optimizedStatisticsOf = async (query) => {
   }
 }
 
+// TODO: remove
+const bottlenecksOfOld = async (query) => {
+  if (semesterStart[query.semester] === undefined) {
+    return { error: 'Semester should be either SPRING OR FALL' }
+  }
+
+  const startDate = `${query.year}-${semesterStart[query.semester]}`
+  const endDate = `${query.year}-${semesterEnd[query.semester]}`
+  try {
+    const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
+    const conf = {
+      enrollmentDates: {
+        startDate,
+        endDate
+      },
+      studyRights
+    }
+
+    const student_numbers = await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
+
+    const students = await withStudents(student_numbers, conf).map(restrictToMonths(query.months))
+
+    const formattedStudents = students.map(formatStudent)
+    const courses = _.flatten(formattedStudents.map(s => s.courses))
+
+    const toNameMap = (object, {course}) => {
+      if (object[course.code]===undefined) {
+        object[course.code] = course.name
+      }
+      return object
+    }
+
+    const courseNames = courses.reduce(toNameMap, {})
+
+    const groupedCourses = _.groupBy(courses, c => c.course.code)
+
+    const statsOf = (instances) => {
+      return {
+        total: instances.length,
+        passed: instances.reduce((s, i) => s + (i.passed?1:0), 0)
+      }
+    }
+
+    const stats = Object.keys(groupedCourses).map((courseCode)=>{
+      return {
+        course: {
+          name: courseNames[courseCode],
+          code: courseCode
+        },
+        stats: statsOf(groupedCourses[courseCode])
+      }
+    })
+
+    return stats.sort((c1, c2) => c2.stats.total-c1.stats.total )
+
+  } catch (e) {
+    console.log(e)
+    return { error: `No such study rights: ${query.studyRights}` }
+  }
+}
+
+
+const bottlenecksOf = async (query) => {
+  if (semesterStart[query.semester] === undefined) {
+    return { error: 'Semester should be either SPRING OR FALL' }
+  }
+
+  const startDate = `${query.year}-${semesterStart[query.semester]}`
+  const endDate = `${query.year}-${semesterEnd[query.semester]}`
+  try {
+    const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
+    const conf = {
+      enrollmentDates: {
+        startDate,
+        endDate
+      },
+      studyRights
+    }
+
+    const student_numbers = await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
+
+    const students = await withStudents(student_numbers, conf).map(restrictToMonths(query.months))
+
+    const populationSize = students.length
+
+    const toCourses = (student) => {
+      const courses = _.groupBy(formatStudentUnifyCodes(student).courses, c => c.course.code)
+      return Object.keys(courses).map(code=>{
+        const instances = courses[code]
+        return {
+          course: courses[code][0].course,
+          attempts: instances.length,
+          passed: instances.some(c=>c.passed) 
+        }
+      })
+    }
+
+    const courses = _.flatten(students.map(toCourses))
+
+    const toNameMap = (object, { course }) => {
+      if (object[course.code] === undefined) {
+        object[course.code] = course.name
+      }
+      return object
+    }
+
+    const courseNames = courses.reduce(toNameMap, {})
+    const groupedCourses = _.groupBy(courses, c => c.course.code)
+
+    const statsOf = (instances) => {
+      const passed = instances.reduce((sum, i) => sum + (i.passed ? 1 : 0), 0)
+      const failed = instances.reduce((sum, i) => sum + (i.passed ? 0 : 1), 0)
+      const students = instances.length
+      return {
+        students,
+        passed,
+        failed,
+        percentage: Number((100*passed/students).toFixed(2)),
+        failedMany: instances.reduce((sum, i) => sum + (i.passed ? 0 : (i.attempts>1)? i.attempts: 0 ), 0),
+        retryPassed: instances.reduce((sum, i) => sum + (i.passed && i.attempts>1? 1 : 0), 0),
+        attempts: instances.reduce((sum, i) => sum + i.attempts, 0),
+        passedOfPopulation: Number((100 * passed / populationSize).toFixed(2)),
+        triedOfPopulation: Number((100 * (passed + failed) / populationSize).toFixed(2)),
+      }
+    }
+
+    const stats = Object.keys(groupedCourses).map((courseCode) => {
+      return {
+        course: {
+          name: courseNames[courseCode],
+          code: courseCode
+        },
+        stats: statsOf(groupedCourses[courseCode])
+      }
+    })
+
+    return stats.sort((c1, c2) => c2.stats.attempts - c1.stats.attempts)
+
+  } catch (e) {
+    console.log(e)
+    return { error: `No such study rights: ${query.studyRights}` }
+  }
+}
+
+
 module.exports = {
   studyrightsByKeyword, universityEnrolmentDates, statisticsOf, semesterStatisticsFor,
-  optimizedStatisticsOf
+  optimizedStatisticsOf, bottlenecksOf, bottlenecksOfOld
 }
