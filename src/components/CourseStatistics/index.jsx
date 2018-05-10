@@ -1,135 +1,72 @@
-import React from 'react'
-import { Grid, Table, Header } from 'semantic-ui-react'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { Header } from 'semantic-ui-react'
+import Timeout from '../Timeout'
+import CourseSearch from '../CourseSearch'
+import CoursePassRateChart from '../CoursePassRateChart'
+import { getCourseStatistics } from '../../redux/courseStatistics'
 
-import MulticolorBarChart from '../MulticolorBarChart'
+import styles from './courseStatistics.css'
+import sharedStyles from '../../styles/shared'
 
-const { shape, object, string } = PropTypes
+const { shape, func, array } = PropTypes
 
-const createChartData = data => (data !== undefined ?
-  (Object.keys(data).map(key => ({ text: key, value: data[key] }))) : [])
-
-const sortByValue = (a, b) => (a.value - b.value)
-const idFromTwoIds = (a, b) => ((1 / 2) * (a + b) * (a + b + 1)) + b
-
-const tableRow = (title, values) => (
-  <Table.Row>
-    <Table.Cell>{title}</Table.Cell>
-    {values.map((val, index) => (
-      <Table.Cell key={`${title}-${idFromTwoIds(val, index)}`}>
-        {val}
-      </Table.Cell>
-    ))}
-  </Table.Row>)
-
-const calculateAve = (data) => {
-  let sum = 0
-  data.forEach((item) => { sum += item.value })
-  return sum / data.length
+const INITIAL_YEARS = {
+  start: '2017',
+  end: '2018'
 }
 
-const calculateStd = (ave, data) => {
-  let variation = 0
-  data.forEach((item) => { variation += (ave - item.value) ** 2 })
-  variation /= data.length
-  return Math.sqrt(variation)
-}
-
-const parseInformationFromData = (data) => {
-  const information = {
-    n: data.length,
-    min: 0,
-    max: 0,
-    median: 0,
-    ave: 0,
-    std: 0,
-    data: []
+class CourseStatistics extends Component {
+  state = {
+    selectedCourse: { name: 'No course selected', code: '' },
+    ...INITIAL_YEARS
   }
-  if (information.n > 0) {
-    const sortedData = data.sort(sortByValue)
-    information.min = sortedData[0].value
-    information.max = sortedData[sortedData.length - 1].value
-    information.median = sortedData[Math.floor(sortedData.length / 2)].value
-    information.ave = calculateAve(sortedData)
-    information.std = Math.round(calculateStd(information.ave, sortedData) * 100) / 100
-    information.ave = Math.round(information.ave * 100) / 100
-    information.data = sortedData
+
+  handleResultSelect = (e, { result }) => {
+    this.setState({ selectedCourse: result }, () => {
+      this.fetchCourseStatistics()
+    })
   }
-  return information
-}
-const CourseStatistics = ({ stats, courseName, instanceDate }) => {
-  if (stats !== undefined) {
-    const dataAll = parseInformationFromData(createChartData(stats.all))
-    const dataPass = parseInformationFromData(createChartData(stats.pass))
-    const dataFail = parseInformationFromData(createChartData(stats.fail))
-    const mins = [dataAll.min, dataPass.min, dataFail.min]
-    const maxs = [dataAll.max, dataPass.max, dataFail.max]
-    const aves = [dataAll.ave, dataPass.ave, dataFail.ave]
-    const medians = [dataAll.median, dataPass.median, dataFail.median]
-    const stds = [dataAll.std, dataPass.std, dataFail.std]
+
+  fetchCourseStatistics = () => {
+    const { code } = this.state.selectedCourse
+    const { start, end } = this.state
+    this.props.getCourseStatistics({ code, start, end, separate: true })
+  }
+
+  render() {
+    const { data } = this.props.courseStatistics
     return (
-      <Grid columns="equal">
-        <Grid.Row>
-          <Header textAlign="center">{courseName} ({instanceDate})</Header>
-        </Grid.Row>
-        <Grid.Row>
-          <Grid.Column>
-            <Table>
-              <Table.Header>
-                <Table.Row>
-                  <Table.HeaderCell />
-                  <Table.HeaderCell>
-                    All (n={dataAll.n})
-                  </Table.HeaderCell>
-                  <Table.HeaderCell>
-                    Passed (n={dataPass.n}, {((dataPass.n / dataAll.n) * 100).toFixed(1)}%)
-                  </Table.HeaderCell>
-                  <Table.HeaderCell>
-                    Failed (n={dataFail.n}, {((dataFail.n / dataAll.n) * 100).toFixed(1)}%)
-                  </Table.HeaderCell>
-                </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {tableRow('minimum', mins)}
-                {tableRow('maximum', maxs)}
-                {tableRow('average', aves)}
-                {tableRow('median', medians)}
-                {tableRow('standard deviations', stds)}
-              </Table.Body>
-            </Table>
-          </Grid.Column>
-        </Grid.Row>
-        <Grid.Row>
-          <Grid.Column key="1">
-            <MulticolorBarChart chartTitle="All" chartData={dataAll.data} />
-          </Grid.Column>
-          <Grid.Column key="2">
-            <MulticolorBarChart chartTitle="Passed" chartData={dataPass.data} />
-          </Grid.Column>
-          <Grid.Column key="3">
-            <MulticolorBarChart chartTitle="Failed" chartData={dataFail.data} />
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
+      <div className={styles.container}>
+        <Header className={sharedStyles.segmentTitle} size="large">
+          Course Statistics
+        </Header>
+        <CourseSearch handleResultSelect={this.handleResultSelect} />
+
+        {data.map(course => <CoursePassRateChart key={course.name} stats={course} />)}
+      </div>
     )
   }
-  return (
-    <div>
-      <pre>{JSON.stringify(courseName)}</pre>
-      <pre>{JSON.stringify(stats, null, 2)}</pre>
-    </div>
-  )
 }
 
 CourseStatistics.propTypes = {
-  stats: shape({
-    all: object.isRequired,
-    pass: object.isRequired,
-    fail: object.isRequired,
-    startYear: object.isRequired
-  }).isRequired,
-  courseName: string.isRequired,
-  instanceDate: string.isRequired
+  getCourseStatistics: func.isRequired,
+  courseStatistics: shape({
+    data: array.isRequired,
+    selected: array.isRequired
+  }).isRequired
 }
 
-export default CourseStatistics
+const mapStateToProps = ({ courses, courseStatistics }) => ({
+  courses,
+  courseStatistics
+})
+
+const mapDispatchToProps = dispatch => ({
+  getCourseStatistics: query =>
+    dispatch(getCourseStatistics(query))
+})
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Timeout(CourseStatistics))
