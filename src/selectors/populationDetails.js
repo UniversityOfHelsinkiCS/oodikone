@@ -12,4 +12,3 @@ export const makePopulationsToData = () => createSelector(
   getPopulations,
   flattenAndCleanPopulations
 )
-

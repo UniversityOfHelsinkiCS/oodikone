@@ -4,6 +4,7 @@ import { localeReducer as locale } from 'react-localize-redux'
 import department from './department'
 import users from './users'
 import populations from './populations'
+import populationCourses from './populationCourses'
 import units from './units'
 import students from './students'
 import errors from './errors'
@@ -16,6 +17,7 @@ export default combineReducers({
   department,
   users,
   populations,
+  populationCourses,
   units,
   students,
   errors,

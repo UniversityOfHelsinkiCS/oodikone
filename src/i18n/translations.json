@@ -30,8 +30,27 @@
     "users" : ["Users"],
     "logout": ["Logout"]
   },
+  "populationCourses": {
+    "header": ["Courses of Population"],
+    "course": ["Course"],
+    "students": ["Students"],
+    "passed": ["Passed"],
+    "failed": ["Failed"],   
+    "passedAfterRetry": ["after retry"],
+    "failedManyTimes": ["many times"],
+    "attempts": ["Attempts"],
+    "percentageOfPopulation": ["percentage of population"],
+    "name": ["name"],
+    "code": ["code"],
+    "number": ["n"],
+    "limit": ["Limit to courses where student number at least"],
+    "percentage": ["percentage"],
+    "perStudent": ["per student"],
+    "attempted": ["attempted"]
+  },
   "populationStatistics" : {
     "header": ["Population statistics"],
+    "months": ["Months from beginning"],
     "graphSegmentHeader" : ["Credit accumulation"],
     "creditStatisticsHeader" : ["Credit statistics"],
     "sampleId": ["Id"],
