@@ -3,9 +3,63 @@ const Population = require('../services/populations')
 const User = require('../services/users')
 const Unit = require('../services/units')
 
+router.get('/v2/populationstatistics/courses2', async (req, res) => {
+  try {
+    if (!req.query.year || !req.query.semester || !req.query.studyRights) {
+      res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
+      return
+    }
+
+    if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
+      req.query.studyRights = [req.query.studyRights]
+    }
+
+    if (req.query.months == null) {
+      req.query.months = 12
+    }
+
+    const result = await Population.bottlenecksOfOld(req.query)
+    if (result.error) {
+      res.status(400).json(result)
+      return
+    }
+
+    res.json(result)
+  } catch (e) {
+    res.status(400).json({ error: e })
+  }
+})
+
+router.get('/v2/populationstatistics/courses', async (req, res) => {
+  try {
+    if (!req.query.year || !req.query.semester || !req.query.studyRights) {
+      res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
+      return
+    }
+
+    if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
+      req.query.studyRights = [req.query.studyRights]
+    }
+
+    if (req.query.months == null) {
+      req.query.months = 12
+    }
+
+    const result = await Population.bottlenecksOf(req.query)
+    if (result.error) {
+      res.status(400).json(result)
+      return
+    }
+
+    res.json(result)
+  } catch (e) {
+    res.status(400).json({ error: e })
+  }
+})
+
+
 router.get('/v2/populationstatistics', async (req, res) => {
   try {
-    console.log(req.query)
     if (!req.query.year || !req.query.semester || !req.query.studyRights) {
       res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
       return
@@ -45,6 +99,7 @@ router.get('/v2/populationstatistics', async (req, res) => {
   }
 })
 
+// TODO: remove
 router.get('/populationstatistics', async (req, res) => {
   try {
     console.log(req.query)
