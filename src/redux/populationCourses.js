@@ -2,11 +2,11 @@ import { callController } from '../apiConnection'
 
 const getArrayParams = (paramName, entries) => entries.map(entry => `&${paramName}=${entry}`).join('')
 
-export const getPopulationStatistics = ({
+export const getPopulationCourses = ({
   year, semester, studyRights, months, uuid
 }) => {
-  const route = `/v2/populationstatistics/?year=${year}&semester=${semester}${getArrayParams('studyRights', studyRights)}&months=${months}`
-  const prefix = 'GET_POPULATION_STATISTICS_'
+  const route = `/v2/populationstatistics/courses?year=${year}&semester=${semester}${getArrayParams('studyRights', studyRights)}&months=${months}`
+  const prefix = 'GET_POPULATION_COURSES_'
   const query = {
     year, semester, studyRights, uuid
   }
@@ -14,40 +14,40 @@ export const getPopulationStatistics = ({
 }
 
 export const clearPopulations = () => ({
-  type: 'CLEAR_POPULATIONS'
+  type: 'CLEAR_POPULATIONS_COURSES'
 })
 
 export const removePopulation = uuid => ({
-  type: 'REMOVE_POPULATION',
+  type: 'REMOVE_POPULATION_COURSES',
   uuid
 })
 
 const reducer = (state = [], action) => {
   switch (action.type) {
-    case 'GET_POPULATION_STATISTICS_ATTEMPT':
+    case 'GET_POPULATION_COURSES_ATTEMPT':
       return [...state, {
         pending: true,
         error: false,
         data: [],
         query: action.requestSettings.query
       }]
-    case 'GET_POPULATION_STATISTICS_FAILURE':
+    case 'GET_POPULATION_COURSES_FAILURE':
       return [...state.filter(apiCall => !apiCall.pending), {
         pending: false,
         error: true,
         data: action.response,
         query: action.query
       }]
-    case 'GET_POPULATION_STATISTICS_SUCCESS':
+    case 'GET_POPULATION_COURSES_SUCCESS':
       return [...state.filter(apiCall => !apiCall.pending), {
         pending: false,
         error: false,
         data: action.response,
         query: action.query
       }]
-    case 'REMOVE_POPULATION':
+    case 'REMOVE_POPULATION_COURSES':
       return [...state.filter(apiCall => apiCall.query.uuid !== action.uuid)]
-    case 'CLEAR_POPULATIONS':
+    case 'CLEAR_POPULATIONS_COURSES':
       return []
     default:
       return state
