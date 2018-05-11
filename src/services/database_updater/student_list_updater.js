@@ -1,8 +1,8 @@
 const oodi = require('./oodi_interface')
 const util = require('../../util')
 const { StudentList } = require('../../models')
-const winston = require('../../util/logger')
-const logger = (msg) => winston(msg, { service: 'student_list_updater' })
+const logger = require('../../util/logger')
+//const logger = (msg) => winston(msg, { service: 'student_list_updater' })
 
 /*
   run in staging with: 
@@ -21,6 +21,7 @@ const timestamp = () => {
 }
 
 async function run () {
+  logger.info('test')
   const STUDENT_SET_KEY = process.env.STUDENT_SET || 'cached_students'
   const validStudents = []
   const minStudentNumber = process.env.STUDENTS_FROM || 1000000
