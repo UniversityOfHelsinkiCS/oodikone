@@ -7,6 +7,7 @@ import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
 import { isEqual } from 'lodash'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
+import { getPopulationCourses } from '../../redux/populationCourses'
 import { getUnits } from '../../redux/units'
 import { isInDateFormat, momentFromFormat, reformatDate, isValidYear } from '../../common'
 import { makeMapRightsToDropDown } from '../../selectors/populationSearchForm'
@@ -19,7 +20,8 @@ const YEAR_DATE_FORMAT = 'YYYY'
 const INITIAL_QUERY = {
   year: '2017',
   semester: 'FALL',
-  studyRights: []
+  studyRights: [],
+  months: 12
 }
 
 
@@ -28,6 +30,7 @@ class PopulationSearchForm extends Component {
     translate: func.isRequired,
     getUnits: func.isRequired,
     getPopulationStatistics: func.isRequired,
+    getPopulationCourses: func.isRequired,
     clearPopulations: func.isRequired,
     queries: arrayOf(object).isRequired,
     studyProgrammes: arrayOf(dropdownType).isRequired
@@ -63,8 +66,10 @@ class PopulationSearchForm extends Component {
     const uuid = uuidv4()
     const request = { ...query, uuid }
     this.setState({ isLoading: true })
-    this.props.getPopulationStatistics(request).then(() =>
-      this.setState({ isLoading: false }))
+    Promise.all([
+      this.props.getPopulationStatistics(request),
+      this.props.getPopulationCourses(request)
+    ]).then(() => this.setState({ isLoading: false }))
   }
 
   handleYearSelection = (year) => {
@@ -108,11 +113,25 @@ class PopulationSearchForm extends Component {
     })
   }
 
+  handleMonthsChange = (e, { value }) => {
+    const { query } = this.state
+    this.setState({
+      query: {
+        ...query,
+        months: value
+      }
+    })
+  }
 
   renderEnrollmentDateSelector = () => {
     const { translate } = this.props
+<<<<<<< HEAD
     const { query, validYear } = this.state
     const { semester, year } = query
+=======
+    const { query, isValidYear } = this.state
+    const { semester, year, months } = query
+>>>>>>> c19017b2bdd38422125c74f65285f56fa9378379
 
     const semesters = ['FALL', 'SPRING']
 
@@ -159,6 +178,14 @@ class PopulationSearchForm extends Component {
             />
           ))}
 
+        </Form.Field>
+        <Form.Field>
+          <label>{translate('populationStatistics.months')}</label>
+          <Form.Input
+            type="number"
+            onChange={this.handleMonthsChange}
+            value={months}
+          />
         </Form.Field>
       </Form.Group>
     )
@@ -234,6 +261,8 @@ const mapStateToProps = ({ populations, units, locale }) => ({
 const mapDispatchToProps = dispatch => ({
   getPopulationStatistics: request =>
     dispatch(getPopulationStatistics(request)),
+  getPopulationCourses: request =>
+    dispatch(getPopulationCourses(request)),
   getUnits: () =>
     dispatch(getUnits()),
   clearPopulations: () =>

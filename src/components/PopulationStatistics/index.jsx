@@ -7,9 +7,9 @@ import { Header, Segment, Divider } from 'semantic-ui-react'
 import PopulationSearchForm from '../PopulationSearchForm'
 import PopulationSearchHistory from '../PopulationSearchHistory'
 import PopulationDetails from '../PopulationDetails'
+import PopulationCourses from '../PopulationCourses'
 
 import sharedStyles from '../../styles/shared'
-
 
 class PopulationStatistics extends PureComponent {
   static propTypes = {
@@ -36,6 +36,7 @@ class PopulationStatistics extends PureComponent {
         <Segment className={sharedStyles.contentSegment}>
           { this.renderPopulationSearch() }
           <PopulationDetails />
+          <PopulationCourses />
         </Segment>
       </div>
     )
