@@ -125,13 +125,8 @@ class PopulationSearchForm extends Component {
 
   renderEnrollmentDateSelector = () => {
     const { translate } = this.props
-<<<<<<< HEAD
     const { query, validYear } = this.state
-    const { semester, year } = query
-=======
-    const { query, isValidYear } = this.state
     const { semester, year, months } = query
->>>>>>> c19017b2bdd38422125c74f65285f56fa9378379
 
     const semesters = ['FALL', 'SPRING']
 
