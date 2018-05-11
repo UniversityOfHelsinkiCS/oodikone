@@ -35,8 +35,8 @@ class PopulationStatistics extends PureComponent {
         <Header className={sharedStyles.segmentTitle} size="large">{translate('populationStatistics.header')}</Header>
         <Segment className={sharedStyles.contentSegment}>
           { this.renderPopulationSearch() }
-          <PopulationCourses />
           <PopulationDetails />
+          <PopulationCourses />
         </Segment>
       </div>
     )
