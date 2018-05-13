@@ -85,7 +85,7 @@ const updateStudentStudyRights = async student => {
       }
     }))
   } catch (e) {
-    logger.error('Updating studyrights failed')
+    logger.error('Updating studyrights failed' + student.studentnumber)
   }
 
   return 1
