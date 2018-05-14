@@ -172,7 +172,7 @@ const instancesOf = async (code) => {
 
 const oneYearStats = (instances, year, separate) => {
   const stats = []
-  if (separate) {
+  if (separate === 'true') {
     const fallInstances = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-01-15'))
     const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-06-01'))
 
