@@ -7,7 +7,7 @@ import Timeout from '../Timeout'
 import CourseSearch from '../CourseSearch'
 import CoursePassRateChart from '../CoursePassRateChart'
 import { getCourseStatistics } from '../../redux/courseStatistics'
-import { isValidYear, isInDateFormat, reformatDate } from '../../common'
+import { isValidYear, isInDateFormat, reformatDate, momentFromFormat } from '../../common'
 
 
 import style from './courseStatistics.css'
@@ -24,6 +24,7 @@ class CourseStatistics extends Component {
   state = {
     selectedCourse: { name: 'No course selected', code: '' },
     ...INITIAL_YEARS,
+    separate: false,
     validYear: true
   }
 
@@ -33,22 +34,54 @@ class CourseStatistics extends Component {
     })
   }
 
-  fetchCourseStatistics = () => {
-    const { code } = this.state.selectedCourse
-    const { start, end } = this.state
-    this.props.getCourseStatistics({ code, start, end, separate: true })
+  addYear = change => () => {
+    const year = this.state[change]
+    const nextYear = momentFromFormat(year, 'YYYY').add(1, 'year')
+    this.handleYearSelection(nextYear, change)
   }
 
-  handleYearSelection = (year) => {
-    const validYear = isInDateFormat(year, 'YYYY') && isValidYear(year)
+  subtractYear = change => () => {
+    const year = this.state[change]
+    const previousYear = momentFromFormat(year, 'YYYY').subtract(1, 'year')
+    this.handleYearSelection(previousYear, change)
+  }
+
+  fetchCourseStatistics = () => {
+    const { code } = this.state.selectedCourse
+    const { start, end, separate } = this.state
+    this.props.getCourseStatistics({ code, start, end, separate })
+  }
+
+  startBeforeEnd = (year, change) => {
+    if (change === 'start') {
+      return this.state.end > reformatDate(year, 'YYYY')
+    }
+    return this.state.start < reformatDate(year, 'YYYY')
+  }
+
+  handleYearSelection = (year, change) => {
+    const validYear = isInDateFormat(year, 'YYYY') && isValidYear(year) && this.startBeforeEnd(year, change)
     if (validYear) {
       this.setState({
         validYear,
-        start: reformatDate(year, 'YYYY')
+        [change]: reformatDate(year, 'YYYY')
       })
     } else {
       this.setState({ validYear })
     }
+  }
+
+  handleStartYearSelection = (year) => {
+    this.handleYearSelection(year, 'start')
+  }
+
+  handleEndYearSelection = (year) => {
+    this.handleYearSelection(year, 'end')
+  }
+
+  handleSemesterSeparate = () => {
+    const bool = this.state.separate
+    this.setState({ separate: !bool })
   }
 
   renderEnrollmentDateSelector = () => {
@@ -67,7 +100,7 @@ class CourseStatistics extends Component {
               closeOnSelect
               value={start}
               isValidDate={isValidYear}
-              onChange={this.handleYearSelection}
+              onChange={this.handleStartYearSelection}
             />
           </Form.Field>
           <Form.Field className={style.yearControl}>
@@ -75,12 +108,12 @@ class CourseStatistics extends Component {
               <Button
                 icon="plus"
                 className={style.yearControlButton}
-                onClick={this.addYear}
+                onClick={this.addYear('start')}
               />
               <Button
                 icon="minus"
                 className={style.yearControlButton}
-                onClick={this.subtractYear}
+                onClick={this.subtractYear('start')}
               />
             </Button.Group>
           </Form.Field>
@@ -94,7 +127,7 @@ class CourseStatistics extends Component {
               closeOnSelect
               value={end}
               isValidDate={isValidYear}
-              onChange={this.handleYearSelection}
+              onChange={this.handleEndYearSelection}
             />
           </Form.Field>
           <Form.Field className={style.yearControl}>
@@ -102,18 +135,20 @@ class CourseStatistics extends Component {
               <Button
                 icon="plus"
                 className={style.yearControlButton}
-                onClick={this.addYear}
+                onClick={this.addYear('end')}
               />
               <Button
                 icon="minus"
                 className={style.yearControlButton}
-                onClick={this.subtractYear}
+                onClick={this.subtractYear('end')}
               />
             </Button.Group>
           </Form.Field>
           <Form.Field>
-            <Checkbox label="Separate Spring/Fall" />
-            <label>Select semester thing</label>
+            <Checkbox
+              label="Separate Spring/Fall"
+              onChange={this.handleSemesterSeparate}
+            />
           </Form.Field>
         </Form.Group>
       </Form>
