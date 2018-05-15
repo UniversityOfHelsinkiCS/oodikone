@@ -205,7 +205,7 @@ const yearlyStatsOf = async (code, year, separate) => {
       stats = oneYearStats(yearInst, year, separate)
       if (stats.length > 0) results.push(...stats)
     }
-    return { code, stats: results }
+    return { code, start, end, separate, stats: results }
   }
   return
 }
