@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
 import { Header } from 'semantic-ui-react'
 
+import sharedStyles from '../../styles/shared'
+
 const { array, shape, string } = PropTypes
 
 
@@ -10,8 +12,8 @@ const StackedBarChart = ({ stats }) => {
   const data = stats.stats.map(year => (
     { name: year.time, passed: year.passed, failed: year.failed }))
   return (
-    <div>
-      <Header as="h3">{stats.code}</Header>
+    <div className={sharedStyles.container}>
+      <Header className={sharedStyles.segmentTitle} size="large">{stats.code}</Header>
       <BarChart
         width={600}
         height={300}
