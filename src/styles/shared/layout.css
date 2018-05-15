@@ -18,3 +18,10 @@
   max-width: 1400px;
   min-width: 600px;
 }
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}

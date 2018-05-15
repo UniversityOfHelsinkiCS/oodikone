@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Form, Button, Header, Checkbox } from 'semantic-ui-react'
+import { Form, Button, Header, Checkbox, Message } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
 import Timeout from '../Timeout'
 import CourseSearch from '../CourseSearch'
 import CoursePassRateChart from '../CoursePassRateChart'
-import { getCourseStatistics } from '../../redux/courseStatistics'
+import { getCourseStatistics, removeCourseStatistics } from '../../redux/courseStatistics'
 import { isValidYear, isInDateFormat, reformatDate, momentFromFormat } from '../../common'
 
 
@@ -25,7 +25,8 @@ class CourseStatistics extends Component {
     selectedCourse: { name: 'No course selected', code: '' },
     ...INITIAL_YEARS,
     separate: false,
-    validYear: true
+    validYear: true,
+    error: ''
   }
 
   handleResultSelect = (e, { result }) => {
@@ -49,8 +50,21 @@ class CourseStatistics extends Component {
   fetchCourseStatistics = () => {
     const { code } = this.state.selectedCourse
     const { start, end, separate } = this.state
-    this.props.getCourseStatistics({ code, start, end, separate })
+    const { selected } = this.props.courseStatistics
+    const query = { code, start: Number(start), end: Number(end), separate: String(separate) }
+    const aa = selected.find(olquery =>
+      olquery.separate === query.separate &&
+      olquery.end === query.end &&
+      olquery.start === query.start &&
+      olquery.code === query.code)
+    if (!aa) {
+      this.props.getCourseStatistics(query)
+      this.setState({ error: '' })
+    } else this.setState({ error: 'Course with selected parameters already in analysis' })
   }
+
+  removeCourseStatistics = query => this.props.removeCourseStatistics(query)
+
 
   startBeforeEnd = (year, change) => {
     if (change === 'start') {
@@ -60,6 +74,7 @@ class CourseStatistics extends Component {
   }
 
   handleYearSelection = (year, change) => {
+    this.setState({ error: '' })
     const validYear = isInDateFormat(year, 'YYYY') && isValidYear(year) && this.startBeforeEnd(year, change)
     if (validYear) {
       this.setState({
@@ -80,8 +95,20 @@ class CourseStatistics extends Component {
   }
 
   handleSemesterSeparate = () => {
+    this.setState({ error: '' })
     const bool = this.state.separate
     this.setState({ separate: !bool })
+  }
+  renderErrorMessage = () => {
+    const { error } = this.state
+    if (error) {
+      return (<Message
+        error
+        color="red"
+        header={error}
+      />)
+    }
+    return error
   }
 
   renderEnrollmentDateSelector = () => {
@@ -157,15 +184,23 @@ class CourseStatistics extends Component {
 
   render() {
     const { data } = this.props.courseStatistics
+
     return (
       <div className={style.container}>
         <Header className={sharedStyles.segmentTitle} size="large">
           Course Statistics
         </Header>
         {this.renderEnrollmentDateSelector()}
+        {this.renderErrorMessage()}
         <CourseSearch handleResultSelect={this.handleResultSelect} />
 
-        {data.map(course => <CoursePassRateChart key={course.name} stats={course} />)}
+        {data.map(course => (<CoursePassRateChart
+          removeCourseStatistics={removeCourseStatistics}
+          key={course.code}
+          stats={course}
+        />
+        ))
+        }
       </div>
     )
   }
@@ -173,6 +208,7 @@ class CourseStatistics extends Component {
 
 CourseStatistics.propTypes = {
   getCourseStatistics: func.isRequired,
+  removeCourseStatistics: func.isRequired,
   courseStatistics: shape({
     data: array.isRequired,
     selected: array.isRequired
@@ -186,7 +222,9 @@ const mapStateToProps = ({ courses, courseStatistics }) => ({
 
 const mapDispatchToProps = dispatch => ({
   getCourseStatistics: query =>
-    dispatch(getCourseStatistics(query))
+    dispatch(getCourseStatistics(query)),
+  removeCourseStatistics: query =>
+    dispatch(removeCourseStatistics(query))
 })
 
 
