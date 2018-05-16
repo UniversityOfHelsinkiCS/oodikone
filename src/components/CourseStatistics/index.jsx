@@ -68,8 +68,7 @@ class CourseStatistics extends Component {
     } else this.setState({ error: 'Course with selected parameters already in analysis' })
   }
 
-  removeCourseStatistics = query => this.props.removeCourseStatistics(query)
-
+  removeCourseStatistics = query => () => this.props.removeCourseStatistics(query)
 
   startBeforeEnd = (year, change) => {
     if (change === 'start') {
@@ -202,7 +201,7 @@ class CourseStatistics extends Component {
         {data.map((course) => {
           if (course.stats.length > 0) {
             return (<CoursePassRateChart
-              removeCourseStatistics={removeCourseStatistics}
+              removeCourseStatistics={this.removeCourseStatistics}
               key={course.code}
               stats={course}
             />)

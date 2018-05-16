@@ -1,19 +1,22 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
-import { Header } from 'semantic-ui-react'
+import { Header, Button } from 'semantic-ui-react'
 
 import sharedStyles from '../../styles/shared'
 
-const { array, shape, string } = PropTypes
+const { array, shape, string, func } = PropTypes
 
 
-const StackedBarChart = ({ stats }) => {
+const StackedBarChart = ({ stats, removeCourseStatistics }) => {
   const data = stats.stats.map(year => (
     { name: year.time, passed: year.passed, failed: year.failed }))
+  const { name, code, start, end, separate } = stats
+  const query = { code, start, end, separate }
   return (
     <div className={sharedStyles.container}>
-      <Header className={sharedStyles.segmentTitle} size="large">{stats.name}, {stats.code}</Header>
+      <Header className={sharedStyles.segmentTitle} size="large">{name}, {code}</Header>
+      <Button onClick={removeCourseStatistics(query)}>Deleteee</Button>
       <BarChart
         width={600}
         height={300}
@@ -33,6 +36,7 @@ const StackedBarChart = ({ stats }) => {
 }
 
 StackedBarChart.propTypes = {
+  removeCourseStatistics: func.isRequired,
   stats: shape({
     code: string.isRequired,
     stats: array.isRequired
