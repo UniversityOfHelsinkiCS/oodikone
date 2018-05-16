@@ -41,7 +41,8 @@ const reducer = (state = { data: [], selected: [] }, action) => {
           code: action.response.code,
           start: action.response.start,
           end: action.response.end,
-          separate: action.response.separate
+          separate: action.response.separate,
+          name: action.response.name
         }],
         data: [...state.data, action.response]
       }
