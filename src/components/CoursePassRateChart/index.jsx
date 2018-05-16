@@ -13,7 +13,7 @@ const StackedBarChart = ({ stats }) => {
     { name: year.time, passed: year.passed, failed: year.failed }))
   return (
     <div className={sharedStyles.container}>
-      <Header className={sharedStyles.segmentTitle} size="large">{stats.code}</Header>
+      <Header className={sharedStyles.segmentTitle} size="large">{stats.name}, {stats.code}</Header>
       <BarChart
         width={600}
         height={300}

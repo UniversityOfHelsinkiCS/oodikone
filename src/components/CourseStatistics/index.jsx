@@ -26,7 +26,8 @@ class CourseStatistics extends Component {
     ...INITIAL_YEARS,
     separate: false,
     validYear: true,
-    error: ''
+    error: '',
+    isLoading: false
   }
 
   handleResultSelect = (e, { result }) => {
@@ -58,7 +59,11 @@ class CourseStatistics extends Component {
       olquery.start === query.start &&
       olquery.code === query.code)
     if (!aa) {
+      this.setState({ isLoading: true })
       this.props.getCourseStatistics(query)
+        .then(() => {
+          this.setState({ error: '', isLoading: false })
+        })
       this.setState({ error: '' })
     } else this.setState({ error: 'Course with selected parameters already in analysis' })
   }
@@ -99,6 +104,7 @@ class CourseStatistics extends Component {
     const bool = this.state.separate
     this.setState({ separate: !bool })
   }
+
   renderErrorMessage = () => {
     const { error } = this.state
     if (error) {
@@ -111,12 +117,12 @@ class CourseStatistics extends Component {
     return error
   }
 
-  renderEnrollmentDateSelector = () => {
-    const { validYear, start, end } = this.state
+  renderYearSelector = () => {
+    const { validYear, start, end, isLoading } = this.state
 
     return (
-      <Form>
-        <Form.Group key="year" className={style.enrollmentSelectorGroup}>
+      <Form loading={isLoading}>
+        <Form.Group key="year" className={style.yearSelectorGroup}>
           <Form.Field error={!validYear} className={style.yearSelect}>
             <label>Start year</label>
             <Datetime
@@ -190,16 +196,23 @@ class CourseStatistics extends Component {
         <Header className={sharedStyles.segmentTitle} size="large">
           Course Statistics
         </Header>
-        {this.renderEnrollmentDateSelector()}
+        {this.renderYearSelector()}
         {this.renderErrorMessage()}
         <CourseSearch handleResultSelect={this.handleResultSelect} />
-
-        {data.map(course => (<CoursePassRateChart
-          removeCourseStatistics={removeCourseStatistics}
-          key={course.code}
-          stats={course}
-        />
-        ))
+        {data.map((course) => {
+          if (course.stats.length > 0) {
+            return (<CoursePassRateChart
+              removeCourseStatistics={removeCourseStatistics}
+              key={course.code}
+              stats={course}
+            />)
+          }
+          return (
+            <Header className={sharedStyles.segmentTitle} size="large">
+              No students for course {course.code} during time {course.start}-{course.end}
+            </Header>
+          )
+        })
         }
       </div>
     )
