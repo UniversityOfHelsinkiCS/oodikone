@@ -196,6 +196,7 @@ const oneYearStats = (instances, year, separate) => {
 const yearlyStatsOf = async (code, year, separate) => {
   const allInstances = await instancesOf(code)
   const yearInst = allInstances.filter(inst => moment(inst.date).isBetween(year.start + '-08-01', year.end + '-06-01'))
+  const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name
   const start = Number(year.start)
   const end = Number(year.end)
   const results = []
@@ -205,7 +206,7 @@ const yearlyStatsOf = async (code, year, separate) => {
       stats = oneYearStats(yearInst, year, separate)
       if (stats.length > 0) results.push(...stats)
     }
-    return { code, start, end, separate, stats: results }
+    return { code, start, end, separate, stats: results, name}
   }
   return
 }
