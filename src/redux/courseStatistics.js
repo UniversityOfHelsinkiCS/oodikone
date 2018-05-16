@@ -50,13 +50,13 @@ const reducer = (state = { data: [], selected: [] }, action) => {
       return {
         pending: false,
         error: false,
-        selected: [...state.selected.filter(query => query.code !== action.response.code &&
-          query.start !== action.start &&
-          query.end !== action.end &&
+        selected: [...state.selected.filter(query => query.code !== action.code ||
+          query.start !== action.start ||
+          query.end !== action.end ||
           query.separate !== action.separate)],
-        data: [...state.data.filter(query => query.code !== action.response.code &&
-          query.start !== action.start &&
-          query.end !== action.end &&
+        data: [...state.data.filter(query => query.code !== action.code ||
+          query.start !== action.start ||
+          query.end !== action.end ||
           query.separate !== action.separate)]
       }
     case 'CLEAR_COURSE_STATISTICS':
