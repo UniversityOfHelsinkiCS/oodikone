@@ -21,13 +21,15 @@ const getStudentSampleInSplitQuarters = (students) => {
 const getValues = (students) => {
   const creditsList = students.map(student => getStudentTotalCredits(student))
 
+  const n2z = value => (isNaN(value) ? 0 : value) // eslint-disable-line
+
   return {
     n: creditsList.length,
-    min: jStat.min(creditsList),
-    max: jStat.max(creditsList),
-    average: jStat.mean(creditsList).toFixed(2),
-    median: jStat.median(creditsList),
-    standardDeviation: jStat.stdev(creditsList).toFixed(2)
+    min: n2z(jStat.min(creditsList)),
+    max: n2z(jStat.max(creditsList)),
+    average: n2z(jStat.mean(creditsList)).toFixed(2),
+    median: n2z(jStat.median(creditsList)),
+    standardDeviation: n2z(jStat.stdev(creditsList)).toFixed(2)
   }
 }
 

@@ -23,6 +23,7 @@ class PopulationCourses extends Component {
           <PopulationCourseStats
             key={sample.query.uuid}
             courses={sample.data}
+            query={sample.query}
           />))}
       </Segment>
     )
