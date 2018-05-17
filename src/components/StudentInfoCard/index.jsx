@@ -16,7 +16,7 @@ const StudentInfoCard = ({ student, translate }) => (
           <Icon name="student" />
           <Icon corner name="hashtag" />
         </Icon.Group>
-        <span className={styles.cardHeader}>{`${student.studentNumber}`}</span>
+        <span className={styles.cardHeader}>{student.name}, {student.studentNumber}</span>
 
       </Card.Header>
       <Card.Meta>
