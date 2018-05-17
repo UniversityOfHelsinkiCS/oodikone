@@ -20,10 +20,9 @@ const YEAR_DATE_FORMAT = 'YYYY'
 const INITIAL_QUERY = {
   year: '2017',
   semester: 'FALL',
-  studyRights: [],
+  studyRights: ['26'], // '26' matikan ope, '207' csm, '46' metsä
   months: 12
 }
-
 
 class PopulationSearchForm extends Component {
   static propTypes = {

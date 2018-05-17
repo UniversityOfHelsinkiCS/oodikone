@@ -28,7 +28,6 @@ const store = createStore(reducers, composeEnhancers(applyMiddleware(thunk, hand
 store.dispatch(initialize(AVAILABLE_LANGUAGES, { defaultLanguage: DEFAULT_LANG }))
 store.dispatch(addTranslation(translations))
 
-
 const render = (Component) => {
   ReactDOM.render(
     <Provider store={store}>
