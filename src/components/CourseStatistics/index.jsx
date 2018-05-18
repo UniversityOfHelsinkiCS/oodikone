@@ -198,20 +198,11 @@ class CourseStatistics extends Component {
         {this.renderYearSelector()}
         {this.renderErrorMessage()}
         <CourseSearch handleResultSelect={this.handleResultSelect} />
-        {data.map((course) => {
-          if (course.stats.length > 0) {
-            return (<CoursePassRateChart
-              removeCourseStatistics={this.removeCourseStatistics}
-              key={course.code}
-              stats={course}
-            />)
-          }
-          return (
-            <Header className={sharedStyles.segmentTitle} size="large">
-              No students for course {course.code} during time {course.start}-{course.end}
-            </Header>
-          )
-        })
+        {data.map(course => (<CoursePassRateChart
+          removeCourseStatistics={this.removeCourseStatistics}
+          key={course.code}
+          stats={course}
+        />))
         }
       </div>
     )
