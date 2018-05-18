@@ -40,7 +40,7 @@ import {
 export const routes = {
   index: { route: '/', translateId: 'departmentSuccess' },
   populations: { route: '/populations', translateId: 'populations' },
-  courses: { route: '/courses', translateId: 'courses' },
+  courseInstances: { route: '/courseinstances', translateId: 'courseinstances' },
   students: { route: '/students/:studentNumber?', translateId: 'students' },
   courseStatistics: { route: '/coursestatistics', translateId: 'courseStatistics' },
   users: { route: '/users', translateId: 'users', admin: true }

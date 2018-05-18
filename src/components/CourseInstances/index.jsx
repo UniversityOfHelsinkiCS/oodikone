@@ -17,7 +17,7 @@ import sharedStyles from '../../styles/shared'
 
 const { func, arrayOf, object } = PropTypes
 
-class Courses extends Component {
+class CourseInstances extends Component {
   state = {
     isLoading: false,
     selectedCourse: { name: 'No course selected', code: '' }
@@ -109,7 +109,7 @@ class Courses extends Component {
   }
 }
 
-Courses.propTypes = {
+CourseInstances.propTypes = {
   findCourseInstances: func.isRequired,
   getCourseInstanceStatistics: func.isRequired,
   removeInstance: func.isRequired,
@@ -139,4 +139,4 @@ const mapDispatchToProps = dispatch => ({
     dispatch(removeInstance(instance))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Timeout(Courses))
+export default connect(mapStateToProps, mapDispatchToProps)(Timeout(CourseInstances))
