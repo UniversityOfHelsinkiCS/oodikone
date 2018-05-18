@@ -42,7 +42,7 @@ export const routes = {
   populations: { route: '/populations', translateId: 'populations' },
   courses: { route: '/courses', translateId: 'courses' },
   students: { route: '/students/:studentNumber?', translateId: 'students' },
-  courseStatistics: { route: '/coursestatistics', translateId: 'courseStatistics', admin: true },
+  courseStatistics: { route: '/coursestatistics', translateId: 'courseStatistics' },
   users: { route: '/users', translateId: 'users', admin: true }
 }
 

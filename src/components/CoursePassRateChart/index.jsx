@@ -13,24 +13,34 @@ const StackedBarChart = ({ stats, removeCourseStatistics }) => {
     { name: year.time, passed: year.passed, failed: year.failed }))
   const { name, code, start, end, separate } = stats
   const query = { code, start, end, separate }
+  if (data.length > 0) {
+    return (
+      <div className={sharedStyles.container}>
+        <Header className={sharedStyles.segmentTitle} size="large">{name}, {code}</Header>
+        <BarChart
+          width={800}
+          height={500}
+          data={data}
+          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="passed" stackId="a" fill="#8884d8" />
+          <Bar dataKey="failed" stackId="a" fill="#82ca9d" />
+        </BarChart >
+        <Button onClick={removeCourseStatistics(query)}>Remove</Button>
+      </div>
+    )
+  }
   return (
     <div className={sharedStyles.container}>
+      <Header className={sharedStyles.segmentTitle} size="large">
+        No statistics for course {name}, {code} during time {start}-{end}
+      </Header>
       <Button onClick={removeCourseStatistics(query)}>Remove</Button>
-      <Header className={sharedStyles.segmentTitle} size="large">{name}, {code}</Header>
-      <BarChart
-        width={800}
-        height={500}
-        data={data}
-        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="passed" stackId="a" fill="#8884d8" />
-        <Bar dataKey="failed" stackId="a" fill="#82ca9d" />
-      </BarChart >
     </div>
   )
 }
