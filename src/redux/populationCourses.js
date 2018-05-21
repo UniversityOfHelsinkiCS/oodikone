@@ -13,13 +13,8 @@ export const getPopulationCourses = ({
   return callController(route, prefix, null, 'get', query)
 }
 
-export const clearPopulations = () => ({
+export const clearPopulationCourses = () => ({
   type: 'CLEAR_POPULATIONS_COURSES'
-})
-
-export const removePopulation = uuid => ({
-  type: 'REMOVE_POPULATION_COURSES',
-  uuid
 })
 
 const reducer = (state = [], action) => {

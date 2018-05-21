@@ -1,5 +1,6 @@
 import moment from 'moment'
 import jwtDecode from 'jwt-decode'
+import Datetime from 'react-datetime'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, TOKEN_NAME } from '../constants'
 
 import { sendLog, login } from '../apiConnection'
@@ -55,7 +56,8 @@ export const momentFromFormat = (date, format) => moment(date, format)
 export const reformatDate = (date, outputFormat) => moment(date).format(outputFormat)
 
 export const isInDateFormat = (date, format) => moment(date, format, true).isValid()
-
+export const isValidYear = year => (year.isSameOrBefore(Datetime.moment(), 'year')
+  && year.isAfter(Datetime.moment('1900', 'YYYY'), 'year'))
 export const dateFromApiToDisplay = date =>
   moment(date, API_DATE_FORMAT).format(DISPLAY_DATE_FORMAT)
 

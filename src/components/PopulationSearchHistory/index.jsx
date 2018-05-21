@@ -5,6 +5,8 @@ import { getTranslate } from 'react-localize-redux'
 
 import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation } from '../../redux/populations'
+import { clearPopulationCourses } from '../../redux/populationCourses'
+import { clearPopulationLimit } from '../../redux/populationLimit'
 
 import styles from './populationSearchHistory.css'
 
@@ -17,13 +19,14 @@ class PopulationSearchHistory extends Component {
       error: bool,
       data: arrayOf(object),
       query: object
-    })).isRequired
+    })).isRequired,
+    units: object // eslint-disable-line
   }
 
   removePopulation = uuid => this.props.removePopulation(uuid)
 
   renderQueryCards = () => {
-    const { populations, translate } = this.props
+    const { populations, translate, units } = this.props
     return populations.map((population, i) => (
       population.query ?
         <PopulationQueryCard
@@ -32,6 +35,7 @@ class PopulationSearchHistory extends Component {
           population={population.data}
           query={population.query}
           queryId={i}
+          unit={units.data.find(u => u.id === population.query.studyRights[0])}
           removeSampleFn={this.removePopulation}
         /> : null
     ))
@@ -46,15 +50,18 @@ class PopulationSearchHistory extends Component {
   }
 }
 
-const mapStateToProps = ({ populations, locale }) => ({
+const mapStateToProps = ({ populations, units, locale }) => ({
   populations,
+  units,
   translate: getTranslate(locale)
 })
 
 const mapDispatchToProps = dispatch => ({
-  removePopulation: uuid =>
+  removePopulation: (uuid) => {
     dispatch(removePopulation(uuid))
+    dispatch(clearPopulationCourses())
+    dispatch(clearPopulationLimit())
+  }
 })
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory)

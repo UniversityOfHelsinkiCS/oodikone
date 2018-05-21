@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import { arrayOf, object, string, func, shape } from 'prop-types'
+import { arrayOf, object, string, func, shape, number } from 'prop-types'
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Line, Tooltip, CartesianGrid, Dot } from 'recharts'
 import _ from 'lodash'
 import moment from 'moment'
-import { Header, Segment, Message, Loader } from 'semantic-ui-react'
+import { Segment, Loader } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 
 import { DISPLAY_DATE_FORMAT, CHART_COLORS, API_DATE_FORMAT } from '../../constants'
@@ -12,7 +12,7 @@ import { turquoise } from '../../styles/variables/colors'
 
 import styles from './creditAccumulationGraph.css'
 import CreditGraphTooltip from '../CreditGraphTooltip'
-
+import OodikoneLine from './OodikoneLine'
 
 class CreditAccumulationGraph extends Component {
   state = {
@@ -41,7 +41,7 @@ class CreditAccumulationGraph extends Component {
 
         const timeout = setTimeout(() => this.getMoreCreditLines(students), 1000)
         const combinedStudentData = this.createCombinedStudentData(students)
-        this.setState({ combinedStudentData, timeout, loading: true })
+        this.setState({ combinedStudentData, timeout })
       }
     }
   }
@@ -57,6 +57,7 @@ class CreditAccumulationGraph extends Component {
       students,
       this.isSingleStudentGraph(students)
     ))
+
     this.setState({ studentCreditLines, loading: false })
   }
 
@@ -85,7 +86,6 @@ class CreditAccumulationGraph extends Component {
     }
   }
 
-
   getReferenceLine = title => (
     <Line
       type="monotone"
@@ -98,7 +98,6 @@ class CreditAccumulationGraph extends Component {
       connectNulls
     />
   )
-
 
   getStudentCourseData = (student) => {
     const { studentNumber, started, courses } = student
@@ -147,9 +146,9 @@ class CreditAccumulationGraph extends Component {
     />
   ))
 
-  getStudentCreditsLine = (student, i, dot) => {
+  getStudentCreditsLine = (student, i, dot, hide) => {
     const { studentNumber } = student
-    return (<Line
+    return (<OodikoneLine
       key={`graph-${studentNumber}`}
       type="monotone"
       activeDot={{ r: 8 }}
@@ -157,6 +156,7 @@ class CreditAccumulationGraph extends Component {
       dataKey={studentNumber}
       stroke={CHART_COLORS[i]}
       isAnimationActive={false}
+      hide={hide}
       connectNulls
     />)
   }
@@ -168,16 +168,39 @@ class CreditAccumulationGraph extends Component {
     />
   )
 
-  isSingleStudentGraph = students => students.length === 1
+  getStudent(id) {
+    const i = this.props.students.indexOf(s => s.studentNumber === id)
+    const student = this.props.students.find(s => s.studentNumber === id)
+    return {
+      i,
+      student
+    }
+  }
 
-  createStudentCreditLines = (students, isSingleStudent) => {
-    const pushToHistoryFn = studentNumber => this.props.history.push(`/students/${studentNumber}`)
+  getStudentCreditLines() {
+    return this.state.studentCreditLines.map((studentCreditLine) => {
+      const studentNumber = studentCreditLine.props.dataKey
 
-    return students.map((student, i) => {
-      const dot = this.getDot(student.studentNumber, isSingleStudent, pushToHistoryFn)
-      return this.getStudentCreditsLine(student, i, dot)
+      if (this.props.selectedStudents && !this.props.selectedStudents.includes(studentNumber)) {
+        const isSingleStudent = this.props.selectedStudents.length === 1
+        const dot = this.getDot(studentNumber, isSingleStudent, this.pushToHistoryFn)
+        const { student, i } = this.getStudent(studentNumber)
+
+        return this.getStudentCreditsLine(student, i, dot, true)
+      }
+      return studentCreditLine
     })
   }
+
+  isSingleStudentGraph = students => students.length === 1
+
+  pushToHistoryFn = studentNumber => this.props.history.push(`/students/${studentNumber}`)
+
+  createStudentCreditLines = (students, isSingleStudent) =>
+    students.map((student, i) => {
+      const dot = this.getDot(student.studentNumber, isSingleStudent, this.pushToHistoryFn)
+      return this.getStudentCreditsLine(student, i, dot, false)
+    })
 
   createCombinedStudentData = (students) => {
     let combinedStudentData = [].concat(...students.map(this.getStudentChartData))
@@ -194,23 +217,19 @@ class CreditAccumulationGraph extends Component {
   }
 
   render() {
-    const { students, title, translate } = this.props
-    const { combinedStudentData, studentCreditLines } = this.state
-    if (students.length === 0 || !combinedStudentData) {
-      return (
-        <Message warning>
-          <Message.Header>{title}</Message.Header>
-          <p>{translate('common.noResults')}</p>
-        </Message>)
-    }
+    const { students, translate, maxCredits } = this.props
+    const { combinedStudentData } = this.state
+
     const isSingleStudent = this.isSingleStudentGraph(students)
-    const minTick = combinedStudentData[0].month
-    const maxTick = Math.ceil(combinedStudentData[combinedStudentData.length - 1].month)
+    const minTick = combinedStudentData && combinedStudentData.length > 0 ?
+      combinedStudentData[0].month : 0
+    const maxTick = combinedStudentData && combinedStudentData.length > 0 ?
+      Math.ceil(combinedStudentData[combinedStudentData.length - 1].month) : 8
     const referenceLine = isSingleStudent && this.getReferenceLine(translate('graphs.referenceCredits'))
     const toolTip = isSingleStudent && this.getTooltip(this.props)
+
     return (
       <div className={styles.graphContainer}>
-        <Header attached="top" size="large">{title}</Header>
         <Segment attached="bottom">
           <Loader active={this.state.loading} />
           <ResponsiveContainer height={400}>
@@ -223,10 +242,13 @@ class CreditAccumulationGraph extends Component {
                 tick={{ fontSize: '15' }}
                 tickCount={20}
               />
-              <YAxis />
+              <YAxis
+                type="number"
+                domain={[0, maxCredits]}
+              />
               <CartesianGrid strokeDasharray="3 3" />
               I {toolTip}
-              {studentCreditLines}
+              {this.getStudentCreditLines()}
               {referenceLine}
             </LineChart>
           </ResponsiveContainer>
@@ -240,7 +262,9 @@ CreditAccumulationGraph.propTypes = {
   translate: func.isRequired,
   students: arrayOf(object).isRequired,
   title: string.isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  maxCredits: number.isRequired,
+  selectedStudents: arrayOf(string) // eslint-disable-line
 }
 
 export default withRouter(CreditAccumulationGraph)

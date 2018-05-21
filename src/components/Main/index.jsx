@@ -7,7 +7,7 @@ import Header from '../Header'
 import Populations from '../PopulationStatistics'
 import DepartmentSuccess from '../DepartmentSuccess'
 import StudentStatistics from '../StudentStatistics'
-import Courses from '../Courses'
+import CourseInstances from '../CourseInstances'
 import CourseStatistics from '../CourseStatistics'
 import EnableUsers from '../EnableUsers'
 import ErrorContainer from '../ErrorContainer'
@@ -54,7 +54,7 @@ class Main extends Component {
               <Route exact path={routes.index.route} component={DepartmentSuccess} />
               <Route exact path={routes.populations.route} component={Populations} />
               <Route exact path={routes.students.route} component={StudentStatistics} />
-              <Route exact path={routes.courses.route} component={Courses} />
+              <Route exact path={routes.courseInstances.route} component={CourseInstances} />
               <Route exact path={routes.courseStatistics.route} component={CourseStatistics} />
               <Route exact path={routes.users.route} component={EnableUsers} />
             </Switch>

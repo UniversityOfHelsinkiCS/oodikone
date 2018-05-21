@@ -1,17 +1,20 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, object, arrayOf } from 'prop-types'
+import { func, object, string, arrayOf } from 'prop-types'
 import { Segment, Header } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { makePopulationsToData } from '../../selectors/populationDetails'
+import { setPopulationLimitField, clearPopulationLimit } from '../../redux/populationLimit'
 
 import CreditAccumulationGraph from '../CreditAccumulationGraph'
 import CourseQuarters from '../CourseQuarters'
+import PopulationLimiter from '../PopulationLimiter'
 
 class PopulationDetails extends Component {
   static propTypes = {
     translate: func.isRequired,
-    samples: arrayOf(arrayOf(object)).isRequired
+    samples: arrayOf(arrayOf(object)).isRequired,
+    selectedStudents: arrayOf(string).isRequired
   }
 
   isSamplesRenderable = () => {
@@ -47,11 +50,16 @@ class PopulationDetails extends Component {
         students={sample}
         title={`${translate('populationStatistics.sampleId')}: ${i}`}
         translate={translate}
+        label={sample.label}
+        maxCredits={sample.maxCredits}
+        selectedStudents={this.props.selectedStudents}
       />
     ))
+
     return (
       <Segment>
         <Header size="medium" dividing>{translate('populationStatistics.graphSegmentHeader')}</Header>
+        <PopulationLimiter />
         {graphs}
       </Segment>
     )
@@ -61,6 +69,7 @@ class PopulationDetails extends Component {
     if (!this.isSamplesRenderable()) {
       return null
     }
+
     return (
       <div>
         {this.renderCourseStatistics()}
@@ -72,12 +81,28 @@ class PopulationDetails extends Component {
 
 const populationsToData = makePopulationsToData()
 
-const mapStateToProps = state => ({
-  samples: populationsToData(state),
-  translate: getTranslate(state.locale)
-})
+const mapStateToProps = (state) => {
+  const allSamples = populationsToData(state)
 
-const mapDispatchToProps = () => ({})
+  const all = allSamples.length > 0 ? allSamples[0].map(s => s.studentNumber) : []
 
-export default connect(mapStateToProps, mapDispatchToProps)(PopulationDetails)
+  return {
+    samples: allSamples.map((sample) => {
+      const credits = sample
+        .map(s => s.courses.filter(c => c.passed).reduce((sum, c) => c.credits + sum, 0))
+
+      sample.maxCredits = Math.round(Math.max(...credits) / 10) * 10
+      return sample
+    }),
+    selected: state.populationLimit,
+    selectedStudents: state.populationLimit ?
+      state.populationLimit.course.students[state.populationLimit.field] :
+      all,
+    translate: getTranslate(state.locale)
+  }
+}
+
+export default connect(mapStateToProps, {
+  setPopulationLimitField, clearPopulationLimit
+})(PopulationDetails)
 

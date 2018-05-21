@@ -3,13 +3,24 @@ import { connect } from 'react-redux'
 import { Table, Form, Input } from 'semantic-ui-react'
 import { func, arrayOf, object } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
+import { setPopulationLimit, clearPopulationLimit } from '../../redux/populationLimit'
 
 class PopulationCourseStats extends Component {
+  static propTypes = {
+    courses: arrayOf(object).isRequired,
+    translate: func.isRequired,
+    setPopulationLimit: func.isRequired,
+    selected: object // eslint-disable-line
+  }
+
   state = {
     sortBy: 'students',
     reversed: false,
     limit: ''
   }
+
+  limitPopulationToCourse = course => () =>
+    this.props.setPopulationLimit(course, 'all')
 
   sortBy(criteria) {
     return () => {
@@ -22,10 +33,15 @@ class PopulationCourseStats extends Component {
   }
 
   criteria = () => (c1, c2) => {
+    const orderByCode = (code1, code2) =>
+      (code1.course.code < code2.course.code ? -1 : 1)
+
     if (this.state.reversed) {
-      return c1.stats[this.state.sortBy] - c2.stats[this.state.sortBy]
+      const val = c1.stats[this.state.sortBy] - c2.stats[this.state.sortBy]
+      return (val !== 0 ? val : orderByCode(c1, c2))
     }
-    return c2.stats[this.state.sortBy] - c1.stats[this.state.sortBy]
+    const val = c2.stats[this.state.sortBy] - c1.stats[this.state.sortBy]
+    return (val !== 0 ? val : orderByCode(c1, c2))
   }
 
   limit = () => (course) => {
@@ -36,11 +52,14 @@ class PopulationCourseStats extends Component {
   }
 
   render() {
-    const { courses, translate } = this.props
+    const { courses, translate, selected } = this.props
     const { sortBy, reversed } = this.state
     const direction = reversed ? 'descending' : 'ascending'
 
     if (courses.length === 0) return null
+
+    const active = course =>
+      selected && (course.name === selected.course.name && course.code === selected.course.code)
 
     return (
       <div>
@@ -122,15 +141,27 @@ class PopulationCourseStats extends Component {
           </Table.Header>
           <Table.Body>
             {courses.sort(this.criteria()).filter(this.limit()).map(course => (
-              <Table.Row key={course.course.code}>
-                <Table.Cell>{course.course.name} </Table.Cell>
+              <Table.Row key={course.course.code} active={active(course.course)}>
+                <Table.Cell onClick={this.limitPopulationToCourse(course)}>
+                  {course.course.name}
+                </Table.Cell>
                 <Table.Cell>{course.course.code}</Table.Cell>
-                <Table.Cell>{course.stats.passed + course.stats.failed}</Table.Cell>
-                <Table.Cell>{course.stats.passed}</Table.Cell>
-                <Table.Cell>{course.stats.retryPassed}</Table.Cell>
+                <Table.Cell>
+                  {course.stats.passed + course.stats.failed}
+                </Table.Cell>
+                <Table.Cell>
+                  {course.stats.passed}
+                </Table.Cell>
+                <Table.Cell>
+                  {course.stats.retryPassed}
+                </Table.Cell>
                 <Table.Cell>{course.stats.percentage} %</Table.Cell>
-                <Table.Cell>{course.stats.failed}</Table.Cell>
-                <Table.Cell>{course.stats.failedMany}</Table.Cell>
+                <Table.Cell>
+                  {course.stats.failed}
+                </Table.Cell>
+                <Table.Cell>
+                  {course.stats.failedMany}
+                </Table.Cell>
                 <Table.Cell>{course.stats.attempts}</Table.Cell>
                 <Table.Cell>
                   {(course.stats.attempts / (course.stats.passed + course.stats.failed)).toFixed(2)}
@@ -138,7 +169,6 @@ class PopulationCourseStats extends Component {
                 <Table.Cell>{course.stats.passedOfPopulation} %</Table.Cell>
                 <Table.Cell>{course.stats.triedOfPopulation} %</Table.Cell>
               </Table.Row>))}
-
           </Table.Body>
         </Table>
       </div>
@@ -146,15 +176,12 @@ class PopulationCourseStats extends Component {
   }
 }
 
-PopulationCourseStats.propTypes = {
-  courses: arrayOf(object).isRequired,
-  translate: func.isRequired
-}
-
 const mapStateToProps = state => ({
-  translate: getTranslate(state.locale)
+  translate: getTranslate(state.locale),
+  selected: state.populationLimit ? state.populationLimit.course : null
 })
 
-const mapDispatchToProps = () => ({})
-
-export default connect(mapStateToProps, mapDispatchToProps)(PopulationCourseStats)
+export default connect(
+  mapStateToProps,
+  { setPopulationLimit, clearPopulationLimit }
+)(PopulationCourseStats)
