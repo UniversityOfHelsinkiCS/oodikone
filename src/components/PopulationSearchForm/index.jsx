@@ -11,6 +11,7 @@ import { getPopulationCourses } from '../../redux/populationCourses'
 import { getUnits } from '../../redux/units'
 import { isInDateFormat, momentFromFormat, reformatDate, isValidYear } from '../../common'
 import { makeMapRightsToDropDown } from '../../selectors/populationSearchForm'
+import { setLoading } from '../../redux/graphSpinner'
 
 import style from './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
@@ -65,6 +66,7 @@ class PopulationSearchForm extends Component {
     const uuid = uuidv4()
     const request = { ...query, uuid }
     this.setState({ isLoading: true })
+    this.props.setLoading()
     Promise.all([
       this.props.getPopulationStatistics(request),
       this.props.getPopulationCourses(request)
@@ -266,7 +268,8 @@ const mapDispatchToProps = dispatch => ({
   getUnits: () =>
     dispatch(getUnits()),
   clearPopulations: () =>
-    dispatch(clearPopulations())
+    dispatch(clearPopulations()),
+  setLoading: () => dispatch(setLoading())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchForm)

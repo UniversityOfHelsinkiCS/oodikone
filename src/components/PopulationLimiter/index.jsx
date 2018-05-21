@@ -3,17 +3,22 @@ import { connect } from 'react-redux'
 import { func, object } from 'prop-types'
 import { Segment, Icon } from 'semantic-ui-react'
 import { setPopulationLimitField, clearPopulationLimit } from '../../redux/populationLimit'
+import { setLoading } from '../../redux/graphSpinner'
 
 class PopulationLimiter extends Component {
   static propTypes = {
     clearPopulationLimit: func.isRequired,
     setPopulationLimitField: func.isRequired,
+    setLoading: func.isRequired,
     selected: object // eslint-disable-line
   }
 
   selectField = field => () => {
     if (field !== this.props.selected.field) {
-      this.props.setPopulationLimitField(field)
+      this.props.setLoading()
+      setTimeout(() => {
+        this.props.setPopulationLimitField(field)
+      }, 0)
     }
   }
 
@@ -81,5 +86,5 @@ const mapStateToProps = state => ({
 })
 
 export default connect(mapStateToProps, {
-  setPopulationLimitField, clearPopulationLimit
+  setPopulationLimitField, clearPopulationLimit, setLoading
 })(PopulationLimiter)
