@@ -196,7 +196,7 @@ class CreditAccumulationGraph extends Component {
 
   pushToHistoryFn = studentNumber => this.props.history.push(`/students/${studentNumber}`)
 
-  createStudentCreditLines = (students, isSingleStudent) => 
+  createStudentCreditLines = (students, isSingleStudent) =>
     students.map((student, i) => {
       const dot = this.getDot(student.studentNumber, isSingleStudent, this.pushToHistoryFn)
       return this.getStudentCreditsLine(student, i, dot, false)
