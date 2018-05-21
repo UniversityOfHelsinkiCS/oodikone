@@ -19,7 +19,7 @@ class PopulationCourseStats extends Component {
     limit: ''
   }
 
-  limitPopulationToCourse = course => () => 
+  limitPopulationToCourse = course => () =>
     this.props.setPopulationLimit(course, 'all')
 
   sortBy(criteria) {
