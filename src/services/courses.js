@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { Student, Credit, CourseInstance, Course, CourseTeacher } = require('../models')
-const { arrayUnique } = require('../util')
+const { arrayUnique, newToOld, oldToNew } = require('../util')
 const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
 
@@ -172,7 +172,7 @@ const instancesOf = async (code) => {
 
 const oneYearStats = (instances, year, separate) => {
   const stats = []
-  if (separate) {
+  if (separate === 'true') {
     const fallInstances = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-01-15'))
     const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-06-01'))
 
@@ -195,7 +195,21 @@ const oneYearStats = (instances, year, separate) => {
 
 const yearlyStatsOf = async (code, year, separate) => {
   const allInstances = await instancesOf(code)
+  const oldCode = newToOld(code)
+  const newCode = oldToNew(code)
+  console.log(oldCode, newCode)
+  console.log(allInstances)
+
+  if(oldCode && oldCode !== code) {
+    console.log('pushin')
+    allInstances.push(...await instancesOf(oldCode))
+    console.log(allInstances)
+  }
+  if(newCode && newCode != code) {
+    allInstances.push(await instancesOf(newCode))
+  }
   const yearInst = allInstances.filter(inst => moment(inst.date).isBetween(year.start + '-08-01', year.end + '-06-01'))
+  const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name
   const start = Number(year.start)
   const end = Number(year.end)
   const results = []
@@ -205,7 +219,7 @@ const yearlyStatsOf = async (code, year, separate) => {
       stats = oneYearStats(yearInst, year, separate)
       if (stats.length > 0) results.push(...stats)
     }
-    return { code, stats: results }
+    return { code, start, end, separate, stats: results, name}
   }
   return
 }
