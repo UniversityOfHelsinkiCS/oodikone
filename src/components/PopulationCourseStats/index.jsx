@@ -33,10 +33,15 @@ class PopulationCourseStats extends Component {
   }
 
   criteria = () => (c1, c2) => {
+    const orderByCode = (code1, code2) =>
+      (code1.course.code < code2.course.code ? -1 : 1)
+
     if (this.state.reversed) {
-      return c1.stats[this.state.sortBy] - c2.stats[this.state.sortBy]
+      const val = c1.stats[this.state.sortBy] - c2.stats[this.state.sortBy]
+      return (val !== 0 ? val : orderByCode(c1, c2))
     }
-    return c2.stats[this.state.sortBy] - c1.stats[this.state.sortBy]
+    const val = c2.stats[this.state.sortBy] - c1.stats[this.state.sortBy]
+    return (val !== 0 ? val : orderByCode(c1, c2))
   }
 
   limit = () => (course) => {
