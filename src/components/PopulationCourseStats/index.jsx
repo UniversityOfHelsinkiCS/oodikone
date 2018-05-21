@@ -4,12 +4,14 @@ import { Table, Form, Input } from 'semantic-ui-react'
 import { func, arrayOf, object } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 import { setPopulationLimit, clearPopulationLimit } from '../../redux/populationLimit'
+import { setLoading } from '../../redux/graphSpinner'
 
 class PopulationCourseStats extends Component {
   static propTypes = {
     courses: arrayOf(object).isRequired,
     translate: func.isRequired,
     setPopulationLimit: func.isRequired,
+    setLoading: func.isRequired,
     selected: object // eslint-disable-line
   }
 
@@ -19,8 +21,10 @@ class PopulationCourseStats extends Component {
     limit: ''
   }
 
-  limitPopulationToCourse = course => () =>
+  limitPopulationToCourse = course => () => {
+    this.props.setLoading()
     this.props.setPopulationLimit(course, 'all')
+  }
 
   sortBy(criteria) {
     return () => {
@@ -183,5 +187,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { setPopulationLimit, clearPopulationLimit }
+  { setPopulationLimit, clearPopulationLimit, setLoading }
 )(PopulationCourseStats)

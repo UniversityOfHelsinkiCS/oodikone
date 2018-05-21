@@ -19,8 +19,10 @@ class StudentDetails extends Component {
     return (
       <CreditAccumulationGraph
         students={[filteredStudent]}
+        selectedStudents={[filteredStudent.studentNumber]}
         title={translate('studentStatistics.chartTitle')}
         translate={translate}
+        maxCredits={0}
       />
     )
   }

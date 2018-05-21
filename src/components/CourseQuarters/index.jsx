@@ -1,8 +1,7 @@
 import React from 'react'
 import { jStat } from 'jStat'
 import _ from 'lodash'
-import { Message } from 'semantic-ui-react'
-import { func, arrayOf, object, string } from 'prop-types'
+import { func, arrayOf, object } from 'prop-types'
 
 import SearchResultTable from '../SearchResultTable'
 import { getStudentTotalCredits } from '../../common'
@@ -37,20 +36,13 @@ const getCreditStatsForTable = (students, studentsInQuarters) =>
   [getValues(students), ...studentsInQuarters.map(s => getValues(s))]
 
 const CourseQuarters = (props) => {
-  const { translate, sample, title } = props
-  if (sample.length === 0) {
-    return (
-      <Message warning>
-        <Message.Header>{title}</Message.Header>
-        <p>{translate('common.noResults')}</p>
-      </Message>
-    )
-  }
+  const { translate, sample } = props
+
   const quarters = getStudentSampleInSplitQuarters(sample)
   const stats = getCreditStatsForTable(sample, quarters)
 
   const headers = [
-    `${title}`,
+    '',
     `all (n=${stats[0].n})`,
     `q1, bottom (n=${stats[1].n})`,
     `q2 (n=${stats[2].n})`,
@@ -67,18 +59,19 @@ const CourseQuarters = (props) => {
     ['standardDeviation', ...stats.map(stat => stat.standardDeviation)]
   ]
 
-  return (<SearchResultTable
-    headers={headers}
-    rows={rows}
-    noResultText={translate('common.noResults')}
-    definition
-  />)
+  return (
+    <SearchResultTable
+      headers={headers}
+      rows={rows}
+      noResultText={translate('common.noResults')}
+      definition
+    />
+  )
 }
 
 CourseQuarters.propTypes = {
   translate: func.isRequired,
-  sample: arrayOf(object).isRequired,
-  title: string.isRequired
+  sample: arrayOf(object).isRequired
 }
 
 export default CourseQuarters
