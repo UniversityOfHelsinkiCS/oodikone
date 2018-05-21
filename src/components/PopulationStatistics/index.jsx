@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
-import { func } from 'prop-types'
+import { func, bool } from 'prop-types'
 import { Header, Segment, Divider } from 'semantic-ui-react'
 
 import PopulationSearchForm from '../PopulationSearchForm'
@@ -13,14 +13,20 @@ import sharedStyles from '../../styles/shared'
 
 class PopulationStatistics extends PureComponent {
   static propTypes = {
-    translate: func.isRequired
+    translate: func.isRequired,
+    populationFound: bool.isRequired
   }
 
   renderPopulationSearch = () => {
-    const { translate } = this.props
+    const { translate, populationFound } = this.props
+
+    const title = populationFound ?
+      translate('populationStatistics.foundTitle') :
+      translate('populationStatistics.searchTitle')
+
     return (
       <Segment>
-        <Header size="medium">{translate('populationStatistics.searchTitle')}</Header>
+        <Header size="medium">{title}</Header>
         <PopulationSearchForm />
         <Divider />
         <PopulationSearchHistory />
@@ -43,9 +49,10 @@ class PopulationStatistics extends PureComponent {
   }
 }
 
-const mapStateToProps = ({ locale }) => ({
+const mapStateToProps = ({ locale, populations }) => ({
   translate: getTranslate(locale),
-  currentLanguage: getActiveLanguage(locale).value
+  currentLanguage: getActiveLanguage(locale).value,
+  populationFound: populations.length > 0
 })
 
 const mapDispatchToProps = () => ({})

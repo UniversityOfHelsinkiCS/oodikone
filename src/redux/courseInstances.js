@@ -8,7 +8,7 @@ export const findCourseInstances = (code) => {
 
 export const getCourseInstanceStatistics = (query) => {
   const { date, code, months } = query
-  const route = `/v2/coursestatistics?date=${date}&code=${code}&months=${months}`
+  const route = `/v2/courseinstancestatistics?date=${date}&code=${code}&months=${months}`
   const prefix = 'GET_COURSE_INSTANCE_STATISTICS_'
   return callController(route, prefix, null, 'get', query)
 }
