@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
-import { arrayOf, object, string, func, shape, number } from 'prop-types'
+import { arrayOf, object, string, func, shape, number, bool } from 'prop-types'
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Line, Tooltip, CartesianGrid, Dot } from 'recharts'
 import _ from 'lodash'
 import moment from 'moment'
 import { Segment, Loader } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { clearLoading } from '../../redux/graphSpinner'
 
 import { DISPLAY_DATE_FORMAT, CHART_COLORS, API_DATE_FORMAT } from '../../constants'
 import { reformatDate, sortDatesWithFormat } from '../../common'
@@ -19,7 +21,8 @@ class CreditAccumulationGraph extends Component {
     combinedStudentData: undefined,
     studentCreditLines: [],
     timeout: undefined,
-    loading: true
+    loading: true,
+    initialLoad: true
   }
 
   componentDidMount() {
@@ -38,11 +41,26 @@ class CreditAccumulationGraph extends Component {
         oldStudents.some(student => !nextStudents.includes(student))
       if (changed) {
         const { students } = nextProps
-
         const timeout = setTimeout(() => this.getMoreCreditLines(students), 1000)
         const combinedStudentData = this.createCombinedStudentData(students)
         this.setState({ combinedStudentData, timeout })
       }
+    }
+
+    const loading = nextProps.spinner
+
+    this.setState({ loading })
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.state.initialLoad) {
+      if (this.props.selectedStudents &&
+        (this.state.studentCreditLines.length === this.props.selectedStudents.length)) {
+        this.setState({ initialLoad: false }) // eslint-disable-line
+        this.props.clearLoading()
+      }
+    } else if (this.props.spinner && prevProps.selectedStudents !== this.props.selectedStudents) {
+      this.props.clearLoading()
     }
   }
 
@@ -186,7 +204,7 @@ class CreditAccumulationGraph extends Component {
         const dot = this.getDot(studentNumber, isSingleStudent, this.pushToHistoryFn)
         const { student, i } = this.getStudent(studentNumber)
 
-        return this.getStudentCreditsLine(student, i, dot, true)
+        return student ? this.getStudentCreditsLine(student, i, dot, true) : null
       }
       return studentCreditLine
     })
@@ -264,7 +282,16 @@ CreditAccumulationGraph.propTypes = {
   title: string.isRequired,
   history: shape({}).isRequired,
   maxCredits: number.isRequired,
-  selectedStudents: arrayOf(string) // eslint-disable-line
+  selectedStudents: arrayOf(string).isRequired,
+  spinner: bool.isRequired,
+  clearLoading: func.isRequired
 }
 
-export default withRouter(CreditAccumulationGraph)
+const mapStateToProps = state => ({
+  spinner: state.graphSpinner
+})
+
+export default connect(
+  mapStateToProps,
+  { clearLoading }
+)(withRouter(CreditAccumulationGraph))
