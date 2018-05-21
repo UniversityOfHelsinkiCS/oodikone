@@ -20,7 +20,7 @@ const YEAR_DATE_FORMAT = 'YYYY'
 const INITIAL_QUERY = {
   year: '2017',
   semester: 'FALL',
-  studyRights: ['26'], // '26' matikan ope, '207' csm, '46' metsä
+  studyRights: [],
   months: 12
 }
 
@@ -106,11 +106,11 @@ class PopulationSearchForm extends Component {
 
   handleStudyRightChange = (e, { value }) => {
     const { query } = this.state
-    value.sort()
+    const studyRights = value.length > 0 ? [value[0]] : []
     this.setState({
       query: {
         ...query,
-        studyRights: value
+        studyRights
       }
     })
   }
@@ -213,6 +213,10 @@ class PopulationSearchForm extends Component {
   }
 
   render() {
+    if (this.props.queries.length > 0) {
+      return null
+    }
+
     const { translate } = this.props
     const { isLoading, isValidYear, query } = this.state
 
@@ -239,8 +243,10 @@ class PopulationSearchForm extends Component {
           color="blue"
           header={errorText}
         />
-        <Button onClick={this.fetchPopulation} disabled={isQueryInvalid}>{translate('populationStatistics.addPopulation')}</Button>
-        <Button onClick={this.clearPopulations}>{translate('populationStatistics.clearPopulations')}</Button>
+
+        <Button onClick={this.fetchPopulation} disabled={isQueryInvalid}>
+          {translate('populationStatistics.addPopulation')}
+        </Button>
 
       </Form>
     )
