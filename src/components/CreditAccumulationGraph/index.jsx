@@ -165,7 +165,6 @@ class CreditAccumulationGraph extends Component {
   ))
 
   getStudentCreditsLine = (student, i, dot, hide) => {
-    
     const { studentNumber } = student
     return (<OodikoneLine
       key={`graph-${studentNumber}`}
@@ -215,12 +214,11 @@ class CreditAccumulationGraph extends Component {
 
   pushToHistoryFn = studentNumber => this.props.history.push(`/students/${studentNumber}`)
 
-  createStudentCreditLines = (students, isSingleStudent) => {
-    return students.map((student, i) => {
+  createStudentCreditLines = (students, isSingleStudent) =>
+    students.map((student, i) => {
       const dot = this.getDot(student.studentNumber, isSingleStudent, this.pushToHistoryFn)
       return this.getStudentCreditsLine(student, i, dot, false)
     })
-  }
 
   createCombinedStudentData = (students) => {
     let combinedStudentData = [].concat(...students.map(this.getStudentChartData))
