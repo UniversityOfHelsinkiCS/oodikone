@@ -29,14 +29,14 @@ class PopulationDetails extends Component {
       statistics = samples.map((sample, i) =>
         (<CourseQuarters
           key={`course-quarters-${i}`} // eslint-disable-line react/no-array-index-key
-          sample={sample}
-          title={`${translate('populationStatistics.sampleId')}: ${i}`}
+          sample={sample.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
           translate={translate}
         />))
     }
     return (
       <Segment>
         <Header size="medium" dividing>{translate('populationStatistics.creditStatisticsHeader')}</Header>
+        <PopulationLimiter />
         {statistics}
       </Segment>
     )

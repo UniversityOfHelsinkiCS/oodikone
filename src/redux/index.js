@@ -12,6 +12,7 @@ import errors from './errors'
 import courses from './courses'
 import courseInstances from './courseInstances'
 import courseStatistics from './courseStatistics'
+import graphSpinner from './graphSpinner'
 
 export default combineReducers({
   locale,
@@ -25,5 +26,6 @@ export default combineReducers({
   errors,
   courses,
   courseInstances,
-  courseStatistics
+  courseStatistics,
+  graphSpinner
 })
