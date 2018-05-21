@@ -9,7 +9,7 @@ import { isEqual } from 'lodash'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getUnits } from '../../redux/units'
-import { isInDateFormat, momentFromFormat, reformatDate } from '../../common'
+import { isInDateFormat, momentFromFormat, reformatDate, isValidYear } from '../../common'
 import { makeMapRightsToDropDown } from '../../selectors/populationSearchForm'
 
 import style from './populationSearchForm.css'
@@ -38,7 +38,7 @@ class PopulationSearchForm extends Component {
   state = {
     query: INITIAL_QUERY,
     isLoading: false,
-    isValidYear: true
+    validYear: true
   }
 
   componentDidMount() {
@@ -71,19 +71,16 @@ class PopulationSearchForm extends Component {
     ]).then(() => this.setState({ isLoading: false }))
   }
 
-  isValidYear = year => (year.isSameOrBefore(Datetime.moment(), 'year')
-    && year.isAfter(Datetime.moment('1900', YEAR_DATE_FORMAT), 'year'))
-
   handleYearSelection = (year) => {
     const { query } = this.state
-    const isValidYear = isInDateFormat(year, YEAR_DATE_FORMAT) && this.isValidYear(year)
-    if (isValidYear) {
+    const validYear = isInDateFormat(year, YEAR_DATE_FORMAT) && isValidYear(year)
+    if (validYear) {
       this.setState({
-        isValidYear,
+        validYear,
         query: { ...query, year: reformatDate(year, YEAR_DATE_FORMAT) }
       })
     } else {
-      this.setState({ isValidYear })
+      this.setState({ validYear })
     }
   }
 
@@ -127,14 +124,14 @@ class PopulationSearchForm extends Component {
 
   renderEnrollmentDateSelector = () => {
     const { translate } = this.props
-    const { query, isValidYear } = this.state
+    const { query, validYear } = this.state
     const { semester, year, months } = query
 
     const semesters = ['FALL', 'SPRING']
 
     return (
       <Form.Group key="year" className={style.enrollmentSelectorGroup}>
-        <Form.Field error={!isValidYear} className={style.yearSelect}>
+        <Form.Field error={!validYear} className={style.yearSelect}>
           <label>{translate('populationStatistics.enrollmentYear')}</label>
           <Datetime
             className={style.yearSelectInput}
@@ -143,7 +140,7 @@ class PopulationSearchForm extends Component {
             timeFormat={false}
             closeOnSelect
             value={year}
-            isValidDate={this.isValidYear}
+            isValidDate={isValidYear}
             onChange={this.handleYearSelection}
           />
         </Form.Field>
@@ -218,12 +215,12 @@ class PopulationSearchForm extends Component {
     }
 
     const { translate } = this.props
-    const { isLoading, isValidYear, query } = this.state
+    const { isLoading, validYear, query } = this.state
 
     let errorText = translate('populationStatistics.alreadyFetched')
     let isQueryInvalid = this.validateQuery()
 
-    if (!isValidYear) {
+    if (!validYear) {
       isQueryInvalid = true
       errorText = translate('populationStatistics.selectValidYear')
     }
