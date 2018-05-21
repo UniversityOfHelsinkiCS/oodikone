@@ -33,7 +33,8 @@ class PopulationSearchForm extends Component {
     getPopulationCourses: func.isRequired,
     clearPopulations: func.isRequired,
     queries: arrayOf(object).isRequired,
-    studyProgrammes: arrayOf(dropdownType).isRequired
+    studyProgrammes: arrayOf(dropdownType).isRequired,
+    setLoading: func.isRequired
   }
 
   state = {

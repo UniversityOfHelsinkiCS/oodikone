@@ -1,8 +1,7 @@
 import React from 'react'
 import { jStat } from 'jStat'
 import _ from 'lodash'
-import { Message } from 'semantic-ui-react'
-import { func, arrayOf, object, string } from 'prop-types'
+import { func, arrayOf, object } from 'prop-types'
 
 import SearchResultTable from '../SearchResultTable'
 import { getStudentTotalCredits } from '../../common'

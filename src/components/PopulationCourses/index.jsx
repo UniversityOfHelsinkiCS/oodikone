@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, arrayOf, object } from 'prop-types'
-import { Segment, Header, Popup, Label } from 'semantic-ui-react'
+import { Segment, Header, Popup } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import PopulationCourseStats from '../PopulationCourseStats'
 
