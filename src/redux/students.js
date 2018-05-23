@@ -6,6 +6,12 @@ export const findStudents = (searchStr) => {
   return callController(route, prefix)
 }
 
+export const getStudents = (numbers) => {
+  const route = `/students/?numbers=${numbers}`
+  const prefix = 'GET_STUDENTS_'
+  return callController(route, prefix)
+}
+
 export const getStudent = (studentNumber) => {
   const route = `/students/${studentNumber}`
   const prefix = 'GET_STUDENT_'
@@ -40,6 +46,16 @@ const reducer = (state = { data: [] }, action) => {
         data: [...state.data.filter(student => student.fetched), ...action.response]
       }
     case 'GET_STUDENT_SUCCESS':
+      return {
+        pending: false,
+        error: false,
+        selected: action.response.studentNumber,
+        data: [...state.data.filter(student =>
+          student.studentNumber !== action.response.studentNumber),
+        { ...action.response, ...{ fetched: true } }
+        ]
+      }
+    case 'GET_STUDENTS_SUCCESS':
       return {
         pending: false,
         error: false,
