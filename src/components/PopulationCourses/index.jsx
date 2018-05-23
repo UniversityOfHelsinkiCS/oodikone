@@ -45,6 +45,4 @@ const mapStateToProps = state => ({
   translate: getTranslate(state.locale)
 })
 
-const mapDispatchToProps = () => ({})
-
-export default connect(mapStateToProps, mapDispatchToProps)(PopulationCourses)
+export default connect(mapStateToProps)(PopulationCourses)
