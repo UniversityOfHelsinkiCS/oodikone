@@ -201,6 +201,8 @@ const restrictToMonths = (months) => (student) => {
   const creditsWithinTimelimit = student.credits.filter(withinTimerange)
 
   return {
+    firstnames: student.firstnames,
+    lastname: student.lastname,
     studentnumber: student.studentnumber,
     tag_students: student.tag_students,
     dateofuniversityenrollment: student.dateofuniversityenrollment,
@@ -318,7 +320,7 @@ const bottlenecksOf = async (query) => {
     const courseNames = courses.reduce(toNameMap, {})
     const groupedCourses = _.groupBy(courses, c => c.course.code)
 
-    // TODO: refactor to reduse
+    // TODO: refactor to reduce
     const studentsOf = (instances) => {
       const studentNumber = i => i.student
       const passedStudents = i => i.passed
