@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { string, arrayOf, object } from 'prop-types'
-import { Header, Segment, Table, Button } from 'semantic-ui-react'
+import { string, arrayOf, object, func, bool } from 'prop-types'
+import { Header, Segment, Table, Button, Radio } from 'semantic-ui-react'
 import { makePopulationsToData } from '../../selectors/populationDetails'
+import { toggleStudentNameVisibility } from '../../redux/settings'
 
 class PopulationStudents extends Component {
   state = {
@@ -22,24 +23,36 @@ class PopulationStudents extends Component {
     const byName = (s1, s2) =>
       (students[s1].lastname < students[s2].lastname ? -1 : 1)
 
+    const radioLabel = this.props.showNames ? 'Student names visible' : 'Student names hidden'
+
     return (
-      <Table>
-        <Table.Body>
-          {this.props.selectedStudents.sort(byName).map(studentNumber => (
-            <Table.Row key={studentNumber}>
-              <Table.Cell>
-                {studentNumber}
-              </Table.Cell>
-              <Table.Cell>
-                {students[studentNumber].lastname}
-              </Table.Cell>
-              <Table.Cell>
-                {students[studentNumber].firstnames}
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table>
+      <div>
+        <div style={{ marginTop: 15, marginBottom: 10 }}>
+          <Radio
+            toggle
+            label={radioLabel}
+            onClick={() => this.props.toggleStudentNameVisibility()}
+          />
+        </div>
+        <Table>
+          <Table.Body>
+            {this.props.selectedStudents.sort(byName).map(studentNumber => (
+              <Table.Row key={studentNumber}>
+                <Table.Cell>
+                  <a href={`/students/${studentNumber}`} target="_blank">{studentNumber}</a>
+                </Table.Cell>
+                <Table.Cell>
+                  {this.props.showNames ? students[studentNumber].lastname : ''}
+                </Table.Cell>
+                <Table.Cell>
+                  {this.props.showNames ? students[studentNumber].firstnames : ''}
+                </Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table>
+      </div>
+
     )
   }
 
@@ -64,7 +77,9 @@ class PopulationStudents extends Component {
 
 PopulationStudents.propTypes = {
   samples: arrayOf(arrayOf(object)).isRequired,
-  selectedStudents: arrayOf(string).isRequired
+  selectedStudents: arrayOf(string).isRequired,
+  toggleStudentNameVisibility: func.isRequired,
+  showNames: bool.isRequired
 }
 
 const populationsToData = makePopulationsToData()
@@ -78,8 +93,9 @@ const mapStateToProps = (state) => {
     samples: allSamples,
     selectedStudents: state.populationLimit ?
       state.populationLimit.course.students[state.populationLimit.field] :
-      all
+      all,
+    showNames: state.settings.namesVisible
   }
 }
 
-export default connect(mapStateToProps)(PopulationStudents)
+export default connect(mapStateToProps, { toggleStudentNameVisibility })(PopulationStudents)
