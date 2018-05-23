@@ -77,7 +77,7 @@ class PopulationStudents extends Component {
 
 PopulationStudents.propTypes = {
   samples: arrayOf(arrayOf(object)).isRequired,
-  selectedStudents: arrayOf(string).isRequired, 
+  selectedStudents: arrayOf(string).isRequired,
   toggleStudentNameVisibility: func.isRequired,
   showNames: bool.isRequired
 }
