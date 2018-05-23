@@ -8,6 +8,7 @@ import PopulationSearchForm from '../PopulationSearchForm'
 import PopulationSearchHistory from '../PopulationSearchHistory'
 import PopulationDetails from '../PopulationDetails'
 import PopulationCourses from '../PopulationCourses'
+import PopulationStudents from '../PopulationStudents'
 
 import sharedStyles from '../../styles/shared'
 
@@ -43,6 +44,7 @@ class PopulationStatistics extends PureComponent {
           { this.renderPopulationSearch() }
           <PopulationDetails />
           <PopulationCourses />
+          <PopulationStudents />
         </Segment>
       </div>
     )
