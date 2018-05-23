@@ -4,34 +4,40 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'rec
 import { Header, Button } from 'semantic-ui-react'
 
 import sharedStyles from '../../styles/shared'
+import styles from './coursePassRateChart.css'
+
+import { red, green, turquoise } from '../../styles/variables/colors'
 
 const { array, shape, string, func } = PropTypes
 
 
 const StackedBarChart = ({ stats, removeCourseStatistics }) => {
   const data = stats.stats.map(year => (
-    { name: year.time, passed: year.passed, failed: year.failed }))
+    { name: year.time, passed: year.passed, failed: year.failed, all: year.failed + year.passed }))
   const { name, code, start, end, separate } = stats
   const query = { code, start, end, separate }
   if (data.length > 0) {
     return (
-      <div className={sharedStyles.container}>
+      <div>
         <Header className={sharedStyles.segmentTitle} size="large">{name}, {code}</Header>
-        <BarChart
-          width={800}
-          height={500}
-          data={data}
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="passed" stackId="a" fill="#8884d8" />
-          <Bar dataKey="failed" stackId="a" fill="#82ca9d" />
-        </BarChart >
-        <Button onClick={removeCourseStatistics(query)}>Remove</Button>
+        <div className={styles.chartContainer}>
+          <BarChart
+            height={700}
+            width={1200}
+            data={data}
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="all" stackId="a" fill={turquoise} />
+            <Bar dataKey="passed" stackId="b" fill={green} />
+            <Bar dataKey="failed" stackId="c" fill={red} />
+          </BarChart>
+          <Button className={styles.remove} onClick={removeCourseStatistics(query)}>Remove</Button>
+        </div>
       </div>
     )
   }
