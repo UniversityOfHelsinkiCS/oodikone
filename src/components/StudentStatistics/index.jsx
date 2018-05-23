@@ -60,4 +60,3 @@ const mapStateToProps = ({ locale, settings }) => ({
 })
 
 export default connect(mapStateToProps, { toggleStudentNameVisibility })(StudentStatistics)
-
