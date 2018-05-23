@@ -148,4 +148,5 @@ const mapDispatchToProps = dispatch => ({
     dispatch(selectStudent(studentNumber))
 })
 
+
 export default connect(mapStateToProps, mapDispatchToProps)(Timeout(StudentSearch))
