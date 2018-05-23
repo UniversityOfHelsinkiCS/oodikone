@@ -63,7 +63,10 @@ class StudentDetails extends Component {
     }
     return (
       <Segment className={sharedStyles.contentSegment} >
-        <StudentInfoCard student={student} translate={translate} />
+        <StudentInfoCard
+          student={student}
+          translate={translate}
+        />
         {this.renderCreditsGraph()}
         {this.renderCourseParticipation()}
       </Segment>
