@@ -15,7 +15,7 @@ class StudentStatistics extends PureComponent {
     const { translate, match } = this.props
     const { studentNumber } = match.params
 
-    const radioLabel = this.props.showNames ? 'Student names visible' : 'Studen names hidden'
+    const radioLabel = this.props.showNames ? 'Student names visible' : 'Student names hidden'
 
     return (
       <div className={sharedStyles.segmentContainer}>
