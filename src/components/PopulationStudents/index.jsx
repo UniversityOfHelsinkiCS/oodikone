@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { string, arrayOf, object } from 'prop-types'
+import { string, arrayOf, object, func, bool } from 'prop-types'
 import { Header, Segment, Table, Button, Radio } from 'semantic-ui-react'
 import { makePopulationsToData } from '../../selectors/populationDetails'
 import { toggleStudentNameVisibility } from '../../redux/settings'
@@ -77,7 +77,9 @@ class PopulationStudents extends Component {
 
 PopulationStudents.propTypes = {
   samples: arrayOf(arrayOf(object)).isRequired,
-  selectedStudents: arrayOf(string).isRequired
+  selectedStudents: arrayOf(string).isRequired, 
+  toggleStudentNameVisibility: func.isRequired,
+  showNames: bool.isRequired
 }
 
 const populationsToData = makePopulationsToData()
