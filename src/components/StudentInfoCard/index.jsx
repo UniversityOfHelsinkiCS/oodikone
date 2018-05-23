@@ -1,6 +1,6 @@
 import React from 'react'
 import { func, bool } from 'prop-types'
-import { Card, Icon, Radio } from 'semantic-ui-react'
+import { Card, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 
 import { reformatDate } from '../../common'
