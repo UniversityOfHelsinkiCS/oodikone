@@ -39,7 +39,7 @@ class PopulationStudents extends Component {
             {this.props.selectedStudents.sort(byName).map(studentNumber => (
               <Table.Row key={studentNumber}>
                 <Table.Cell>
-                  <a href={`/students/${studentNumber}`} target="_blank">{studentNumber}</a>
+                  {studentNumber}
                 </Table.Cell>
                 <Table.Cell>
                   {this.props.showNames ? students[studentNumber].lastname : ''}
