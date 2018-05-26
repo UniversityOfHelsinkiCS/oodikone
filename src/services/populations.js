@@ -201,6 +201,8 @@ const restrictToMonths = (months) => (student) => {
   const creditsWithinTimelimit = student.credits.filter(withinTimerange)
 
   return {
+    firstnames: student.firstnames,
+    lastname: student.lastname,
     studentnumber: student.studentnumber,
     tag_students: student.tag_students,
     dateofuniversityenrollment: student.dateofuniversityenrollment,
@@ -221,6 +223,7 @@ const universityEnrolmentDates = async () => {
   return result.map(r => r.date).filter(d => d).sort()
 }
 
+// TODO: not used anymore?
 const statisticsOf = async (conf) => {
   const students = (await byCriteria(conf))
     .filter(bySelectedCourses(conf.courses))
@@ -238,28 +241,6 @@ const semesterStart = {
 const semesterEnd = {
   SPRING: '07-31',
   FALL: '12-31'
-}
-
-// TODO: remove
-const semesterStatisticsFor = async (query) => {
-  if (semesterStart[query.semester] === undefined) {
-    return { error: 'Semester should be either SPRING OR FALL' }
-  }
-
-  const startDate = `${query.year}-${semesterStart[query.semester]}`
-  const endDate = `${query.year}-${semesterEnd[query.semester]}`
-  try {
-    const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
-    const conf = {
-      enrollmentDates: [startDate, endDate],
-      studyRights: studyRights
-    }
-    
-    const students = await byCriteria(conf).map(restrictToMonths(query.months))  // Months are hard-coded
-    return students.map(formatStudent)
-  } catch (e) {
-    return { error: `No such study rights: ${query.studyRights}` }
-  }
 }
 
 const optimizedStatisticsOf = async (query) => {
@@ -291,68 +272,6 @@ const optimizedStatisticsOf = async (query) => {
   }
 }
 
-// TODO: remove
-const bottlenecksOfOld = async (query) => {
-  if (semesterStart[query.semester] === undefined) {
-    return { error: 'Semester should be either SPRING OR FALL' }
-  }
-
-  const startDate = `${query.year}-${semesterStart[query.semester]}`
-  const endDate = `${query.year}-${semesterEnd[query.semester]}`
-  try {
-    const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
-    const conf = {
-      enrollmentDates: {
-        startDate,
-        endDate
-      },
-      studyRights
-    }
-
-    const student_numbers = await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
-
-    const students = await withStudents(student_numbers, conf).map(restrictToMonths(query.months))
-
-    const formattedStudents = students.map(formatStudent)
-    const courses = _.flatten(formattedStudents.map(s => s.courses))
-
-    const toNameMap = (object, {course}) => {
-      if (object[course.code]===undefined) {
-        object[course.code] = course.name
-      }
-      return object
-    }
-
-    const courseNames = courses.reduce(toNameMap, {})
-
-    const groupedCourses = _.groupBy(courses, c => c.course.code)
-
-    const statsOf = (instances) => {
-      return {
-        total: instances.length,
-        passed: instances.reduce((s, i) => s + (i.passed?1:0), 0)
-      }
-    }
-
-    const stats = Object.keys(groupedCourses).map((courseCode)=>{
-      return {
-        course: {
-          name: courseNames[courseCode],
-          code: courseCode
-        },
-        stats: statsOf(groupedCourses[courseCode])
-      }
-    })
-
-    return stats.sort((c1, c2) => c2.stats.total-c1.stats.total )
-
-  } catch (e) {
-    console.log(e)
-    return { error: `No such study rights: ${query.studyRights}` }
-  }
-}
-
-
 const bottlenecksOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
@@ -383,7 +302,8 @@ const bottlenecksOf = async (query) => {
         return {
           course: courses[code][0].course,
           attempts: instances.length,
-          passed: instances.some(c=>c.passed) 
+          passed: instances.some(c=>c.passed), 
+          student: student.studentnumber
         }
       })
     }
@@ -400,6 +320,23 @@ const bottlenecksOf = async (query) => {
     const courseNames = courses.reduce(toNameMap, {})
     const groupedCourses = _.groupBy(courses, c => c.course.code)
 
+    // TODO: refactor to reduce
+    const studentsOf = (instances) => {
+      const studentNumber = i => i.student
+      const passedStudents = i => i.passed
+      const failedStudents = i => !i.passed
+      const passed = instances.filter(passedStudents).map(studentNumber)
+      const failed = instances.filter(failedStudents).map(studentNumber)
+      const nTimes = instances.filter(i => i.attempts > 1)
+      return {
+        all: passed.concat(failed),
+        passed,
+        failed,
+        retryPassed: nTimes.filter(passedStudents).map(studentNumber),
+        failedMany: nTimes.filter(failedStudents).map(studentNumber)
+      }
+    }
+
     const statsOf = (instances) => {
       const passed = instances.reduce((sum, i) => sum + (i.passed ? 1 : 0), 0)
       const failed = instances.reduce((sum, i) => sum + (i.passed ? 0 : 1), 0)
@@ -409,7 +346,7 @@ const bottlenecksOf = async (query) => {
         passed,
         failed,
         percentage: Number((100*passed/students).toFixed(2)),
-        failedMany: instances.reduce((sum, i) => sum + (i.passed ? 0 : (i.attempts>1)? i.attempts: 0 ), 0),
+        failedMany: instances.reduce((sum, i) => sum + (i.passed ? 0 : (i.attempts>1)? 1 : 0 ), 0),
         retryPassed: instances.reduce((sum, i) => sum + (i.passed && i.attempts>1? 1 : 0), 0),
         attempts: instances.reduce((sum, i) => sum + i.attempts, 0),
         passedOfPopulation: Number((100 * passed / populationSize).toFixed(2)),
@@ -417,13 +354,14 @@ const bottlenecksOf = async (query) => {
       }
     }
 
-    const stats = Object.keys(groupedCourses).map((courseCode) => {
+    const stats = Object.keys(groupedCourses).map(courseCode => {
       return {
         course: {
           name: courseNames[courseCode],
           code: courseCode
         },
-        stats: statsOf(groupedCourses[courseCode])
+        stats: statsOf(groupedCourses[courseCode]),
+        students: studentsOf(groupedCourses[courseCode])
       }
     })
 
@@ -437,6 +375,6 @@ const bottlenecksOf = async (query) => {
 
 
 module.exports = {
-  studyrightsByKeyword, universityEnrolmentDates, statisticsOf, semesterStatisticsFor,
-  optimizedStatisticsOf, bottlenecksOf, bottlenecksOfOld
+  studyrightsByKeyword, universityEnrolmentDates, statisticsOf,
+  optimizedStatisticsOf, bottlenecksOf
 }

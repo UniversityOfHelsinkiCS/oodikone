@@ -14,7 +14,6 @@ async function main(studentNumber) {
   }
   
   const studyrightsWeboodi = await Oodi.getStudentStudyRights(studentNumber)
-  
 
   const studyRightsOodiKone = await StudyrightService.byStudent(student.studentnumber)
   

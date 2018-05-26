@@ -20,7 +20,7 @@ router.get('/v2/courselist', async (req, res) => {
   res.json(results)
 })
 
-router.get('/v2/coursestatistics', async (req, res) => {
+router.get('/v2/courseinstancestatistics', async (req, res) => {
   let results = []
   if (req.query.date && req.query.code && req.query.months) {
     const code = req.query.code
