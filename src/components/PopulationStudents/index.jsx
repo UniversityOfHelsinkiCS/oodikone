@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool } from 'prop-types'
 import { Header, Segment, Table, Button, Radio } from 'semantic-ui-react'
-import { makePopulationsToData } from '../../selectors/populationDetails'
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
 class PopulationStudents extends Component {
@@ -82,20 +81,8 @@ PopulationStudents.propTypes = {
   showNames: bool.isRequired
 }
 
-const populationsToData = makePopulationsToData()
-
-const mapStateToProps = (state) => {
-  const allSamples = populationsToData(state)
-
-  const all = allSamples.length > 0 ? allSamples[0].map(s => s.studentNumber) : []
-
-  return {
-    samples: allSamples,
-    selectedStudents: state.populationLimit ?
-      state.populationLimit.course.students[state.populationLimit.field] :
-      all,
-    showNames: state.settings.namesVisible
-  }
-}
+const mapStateToProps = state => ({
+  showNames: state.settings.namesVisible
+})
 
 export default connect(mapStateToProps, { toggleStudentNameVisibility })(PopulationStudents)

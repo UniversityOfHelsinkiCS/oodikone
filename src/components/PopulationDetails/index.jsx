@@ -3,12 +3,16 @@ import { connect } from 'react-redux'
 import { func, object, string, arrayOf } from 'prop-types'
 import { Segment, Header } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
+
 import { makePopulationsToData } from '../../selectors/populationDetails'
 import { setPopulationLimitField, clearPopulationLimit } from '../../redux/populationLimit'
 
+import PopulationFilters from '../PopulationFilters'
 import CreditAccumulationGraph from '../CreditAccumulationGraph'
 import CourseQuarters from '../CourseQuarters'
 import PopulationLimiter from '../PopulationLimiter'
+import PopulationStudents from '../PopulationStudents'
+import PopulationCourses from '../PopulationCourses'
 
 class PopulationDetails extends Component {
   static propTypes = {
@@ -72,8 +76,14 @@ class PopulationDetails extends Component {
 
     return (
       <div>
+        <PopulationFilters />
         {this.renderCourseStatistics()}
         {this.renderCreditGainGraphs()}
+        <PopulationStudents
+          samples={this.props.samples}
+          selectedStudents={this.props.selectedStudents}
+        />
+        <PopulationCourses />
       </div>
     )
   }
@@ -86,6 +96,15 @@ const mapStateToProps = (state) => {
 
   const all = allSamples.length > 0 ? allSamples[0].map(s => s.studentNumber) : []
 
+  let selectedStudents = state.populationLimit ?
+    state.populationLimit.course.students[state.populationLimit.field] :
+    all
+
+  if (state.populationFilters.length > 0) {
+    const { filter } = state.populationFilters[0]
+    selectedStudents = allSamples[0].filter(filter).map(s => s.studentNumber)
+  }
+
   return {
     samples: allSamples.map((sample) => {
       const credits = sample
@@ -95,9 +114,7 @@ const mapStateToProps = (state) => {
       return sample
     }),
     selected: state.populationLimit,
-    selectedStudents: state.populationLimit ?
-      state.populationLimit.course.students[state.populationLimit.field] :
-      all,
+    selectedStudents,
     translate: getTranslate(state.locale)
   }
 }
