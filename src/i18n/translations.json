@@ -58,7 +58,7 @@
     "allPopulations" : ["All populations"],
     "alreadyFetched": ["Selected population already in analysis"],
     "selectValidYear": ["Select valid year."],
-    "addPopulation": ["Add population"],
+    "addPopulation": ["See population"],
     "clearPopulations": ["Remove population"],
     "searchTitle": ["Search for population"],
     "foundTitle": ["Population"],
