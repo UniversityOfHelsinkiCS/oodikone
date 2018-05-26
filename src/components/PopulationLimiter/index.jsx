@@ -38,7 +38,6 @@ class PopulationLimiter extends Component {
             <span style={{ float: 'right' }}>
               <Icon name="remove" onClick={() => this.props.clearPopulationLimit()} />
             </span>
-
           </Segment>
           <Segment
             inverted={active('all')}
