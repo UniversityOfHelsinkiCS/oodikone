@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Table, Form, Input } from 'semantic-ui-react'
-import { func, arrayOf, object } from 'prop-types'
+import { func, arrayOf, object, number } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 import { setPopulationLimit, clearPopulationLimit } from '../../redux/populationLimit'
 import { setLoading } from '../../redux/graphSpinner'
@@ -12,13 +12,14 @@ class PopulationCourseStats extends Component {
     translate: func.isRequired,
     setPopulationLimit: func.isRequired,
     setLoading: func.isRequired,
+    populationSize: number.isRequired,
     selected: object // eslint-disable-line
   }
 
   state = {
     sortBy: 'students',
     reversed: false,
-    limit: ''
+    limit: parseInt(this.props.populationSize * 0.2, 10)
   }
 
   limitPopulationToCourse = course => () => {
@@ -182,7 +183,8 @@ class PopulationCourseStats extends Component {
 
 const mapStateToProps = state => ({
   translate: getTranslate(state.locale),
-  selected: state.populationLimit ? state.populationLimit.course : null
+  selected: state.populationLimit ? state.populationLimit.course : null,
+  populationSize: state.populations.length > 0 ? state.populations[0].data.length : 0
 })
 
 export default connect(
