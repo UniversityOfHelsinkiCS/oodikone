@@ -19,7 +19,7 @@ class PopulationFilters extends Component {
   }
 
   render() {
-    if (!this.state.visible) {
+    if (this.props.populationFilters.length === 0 && !this.state.visible) {
       return (
         <Segment>
           <SegmentDimmer translate={this.props.translate} isLoading={this.props.loading} />
