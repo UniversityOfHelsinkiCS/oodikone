@@ -76,12 +76,12 @@
   },
   "studentStatistics": {
     "header" : ["Student statistics"],
-    "searchPlaceholder": ["Search with a student number or name (surname firstname)"],
+    "searchPlaceholder": ["Search with a student number or name (surename firstname)"],
     "chartTitle" : ["Credit Accumulation"]
   },
   "courseStatistics": {
     "header" : ["Student statistics"],
-    "searchPlaceholder": ["Search with a student number or name (surname firstname)"],
+    "searchPlaceholder": ["Search with a student number or name (surename firstname)"],
     "chartTitle" : ["Credit Accumulation"]
   },
   "tags": {
