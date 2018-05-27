@@ -113,7 +113,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
   if (credits === undefined) {
     credits = []
   }
-
+  
   return {
     firstnames,
     lastname,
