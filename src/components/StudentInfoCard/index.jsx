@@ -9,17 +9,27 @@ import { DISPLAY_DATE_FORMAT } from '../../constants'
 
 import styles from './studentInfoCard.css'
 
-const StudentInfoCard = ({ student, translate, showName }) => {
+import { removeStudentSelection, resetStudent } from '../../redux/students'
+
+const StudentInfoCard = (props) => {
+  const { student, translate, showName } = props
   const name = showName ? `${student.name}, ` : ''
+
+  const onRemove = () => {
+    props.resetStudent()
+    props.removeStudentSelection()
+  }
+
   return (
     <Card fluid>
       <Card.Content>
-        <Card.Header>
-          <Icon.Group size="large">
-            <Icon name="student" />
-            <Icon corner name="hashtag" />
-          </Icon.Group>
-          <span className={styles.cardHeader}>{name}{student.studentNumber}</span>
+        <Card.Header className={styles.cardHeader}>
+          <div>{name}{student.studentNumber}</div>
+          <Icon
+            name="remove"
+            className={styles.controlIcon}
+            onClick={onRemove}
+          />
         </Card.Header>
         <Card.Meta>
           <div className={styles.startDate}>
@@ -37,12 +47,14 @@ const StudentInfoCard = ({ student, translate, showName }) => {
 StudentInfoCard.propTypes = {
   student: studentDetailsType.isRequired,
   translate: func.isRequired,
-  showName: bool.isRequired
+  showName: bool.isRequired,
+  removeStudentSelection: func.isRequired,
+  resetStudent: func.isRequired
 }
 
 const mapStateToProps = state => ({
   showName: state.settings.namesVisible
 })
 
-export default connect(mapStateToProps)(StudentInfoCard)
+export default connect(mapStateToProps, { removeStudentSelection, resetStudent })(StudentInfoCard)
 

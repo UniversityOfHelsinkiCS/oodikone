@@ -38,7 +38,8 @@ class PopulationStudents extends Component {
           <Radio
             toggle
             label={radioLabel}
-            onClick={() => this.props.toggleStudentNameVisibility()}
+            checked={this.props.showNames}
+            onChange={() => this.props.toggleStudentNameVisibility()}
           />
         </div>
         <Table>
@@ -67,8 +68,8 @@ class PopulationStudents extends Component {
           </Table.Header>
           <Table.Body>
             {this.props.selectedStudents.sort(byName).map(studentNumber => (
-              <Table.Row key={studentNumber}>
-                <Table.Cell onClick={() => pushToHistoryFn(studentNumber)}>
+              <Table.Row key={studentNumber} onClick={() => pushToHistoryFn(studentNumber)}>
+                <Table.Cell>
                   {studentNumber}
                 </Table.Cell>
                 { this.props.showNames ? (

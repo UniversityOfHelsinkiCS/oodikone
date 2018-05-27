@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { func, string, arrayOf, object } from 'prop-types'
+import { func, string, arrayOf, object, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { Search, Segment } from 'semantic-ui-react'
 
@@ -72,8 +72,20 @@ class StudentSearch extends Component {
   }
 
   renderSearchResults = () => {
-    const { translate, students } = this.props
+    const { translate, students, showNames } = this.props
     const { showResults } = this.state
+
+    const removeNamesIfNotShown = (student) => {
+      if (showNames) {
+        return student
+      }
+
+      return {
+        studentNumber: student.studentNumber,
+        started: student.started,
+        credits: student.credits
+      }
+    }
 
     if (!showResults) {
       return null
@@ -83,12 +95,16 @@ class StudentSearch extends Component {
       translate('common.started'),
       translate('common.credits')
     ]
-    const rows = students
+
+    if (showNames) {
+      headers.push('last names')
+      headers.push('first names')
+    }
 
     return (
       <SearchResultTable
         headers={headers}
-        rows={rows}
+        rows={students.map(removeNamesIfNotShown)}
         rowClickFn={this.handleSearchSelect}
         noResultText={translate('common.noResults')}
         selectablestatic
@@ -97,8 +113,15 @@ class StudentSearch extends Component {
   }
 
   render() {
+    const { translate, selected } = this.props
+
+    console.log(selected)
+
+    if (selected !== null) {
+      return null
+    }
+
     const { isLoading, searchStr } = this.state
-    const { translate } = this.props
 
     return (
       <div className={styles.searchContainer}>
@@ -127,16 +150,21 @@ StudentSearch.propTypes = {
   studentNumber: string,
   students: arrayOf(object).isRequired,
   setTimeout: func.isRequired,
-  clearTimeout: func.isRequired
+  clearTimeout: func.isRequired,
+  showNames: bool.isRequired,
+  selected: string
 }
 StudentSearch.defaultProps = {
-  studentNumber: undefined
+  studentNumber: undefined,
+  selected: null
 }
 
 const formatStudentRows = makeFormatStudentRows()
 
-const mapStateToProps = ({ students }) => ({
-  students: formatStudentRows(students)
+const mapStateToProps = ({ students, settings }) => ({
+  students: formatStudentRows(students),
+  showNames: settings.namesVisible,
+  selected: students.selected
 })
 
 const mapDispatchToProps = dispatch => ({

@@ -17,6 +17,14 @@ export const selectStudent = studentNumber => ({
   response: studentNumber
 })
 
+export const removeStudentSelection = () => ({
+  type: 'REMOVE_SELECTED_SUCCESS'
+})
+
+export const resetStudent = () => ({
+  type: 'RESET_STUDENT_SUCCESS'
+})
+
 const reducer = (state = { data: [] }, action) => {
   switch (action.type) {
     case 'FIND_STUDENTS_ATTEMPT':
@@ -49,8 +57,12 @@ const reducer = (state = { data: [] }, action) => {
         { ...action.response, ...{ fetched: true } }
         ]
       }
-    case 'SELECT_STUDENT_SUCCESS':
+    case 'SELECT_STUDENTS_SUCCESS':
       return { ...state, selected: action.response }
+    case 'RESET_STUDENT_SUCCESS':
+      return { ...state, data: [] }
+    case 'REMOVE_SELECTED_SUCCESS':
+      return { ...state, selected: null }
     default:
       return state
   }
