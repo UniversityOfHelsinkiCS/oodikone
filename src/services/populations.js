@@ -26,7 +26,7 @@ const studyRightLike = (searchTerm) => {
     })
 }
 
-const withStudents = (student_numbers, conf) => {
+const studentsWithCourses = (student_numbers, conf) => {
   return Student.findAll({
     include: [
       {
@@ -192,12 +192,12 @@ const notAmongExcludes = (conf) => (student) => {
   return true
 }
 
-const restrictToMonths = (months) => (student) => {
+const restrictToMonths = (startDate, months) => (student) => {
   if (months === undefined || months === null || months.length === 0) {
     return student
   }
 
-  const withinTimerange = Credit.inTimeRange(student.dateofuniversityenrollment, months)
+  const withinTimerange = Credit.inTimeRange(startDate, months)
   const creditsWithinTimelimit = student.credits.filter(withinTimerange)
 
   return {
@@ -223,15 +223,6 @@ const universityEnrolmentDates = async () => {
   return result.map(r => r.date).filter(d => d).sort()
 }
 
-// TODO: not used anymore?
-const statisticsOf = async (conf) => {
-  const students = (await byCriteria(conf))
-    .filter(bySelectedCourses(conf.courses))
-    .filter(notAmongExcludes(conf))
-    .map(restrictToMonths(conf.monthsToStudy))
-
-  return students.map(formatStudent)
-}
 
 const semesterStart = {
   SPRING: '01-01',
@@ -250,6 +241,13 @@ const optimizedStatisticsOf = async (query) => {
 
   const startDate = `${query.year}-${semesterStart[query.semester]}`
   const endDate = `${query.year}-${semesterEnd[query.semester]}`
+
+  const withStudyrighStart = (student) => {
+    student.studyrightStart = startDate
+
+    return student
+  }
+
   try {
     const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
     const conf = {
@@ -262,9 +260,12 @@ const optimizedStatisticsOf = async (query) => {
 
     const student_numbers = await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
     
-    const students = await withStudents(student_numbers, conf).map(restrictToMonths(query.months)) 
+    const students = await studentsWithCourses(student_numbers, conf)
+      .map(restrictToMonths(conf.enrollmentDates.startDate, query.months)) 
 
-    return students.map(formatStudent)
+    return students
+      .map(formatStudent)
+      .map(withStudyrighStart)
     
   } catch (e) {
     console.log(e)
@@ -291,7 +292,8 @@ const bottlenecksOf = async (query) => {
 
     const student_numbers = await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
 
-    const students = await withStudents(student_numbers, conf).map(restrictToMonths(query.months))
+    const students = await studentsWithCourses(student_numbers, conf)
+      .map(restrictToMonths(conf.enrollmentDates.startDate, query.months))
 
     const populationSize = students.length
 
@@ -373,8 +375,7 @@ const bottlenecksOf = async (query) => {
   }
 }
 
-
 module.exports = {
-  studyrightsByKeyword, universityEnrolmentDates, statisticsOf,
+  studyrightsByKeyword, universityEnrolmentDates,
   optimizedStatisticsOf, bottlenecksOf
 }
