@@ -4,15 +4,11 @@ import { string, arrayOf, object, func, bool, shape } from 'prop-types'
 import { Header, Segment, Table, Button, Radio } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 
-import { toggleStudentNameVisibility } from '../../redux/settings'
+import { toggleStudentNameVisibility, toggleStudentListVisibility } from '../../redux/settings'
 
 class PopulationStudents extends Component {
-  state = {
-    visible: false
-  }
-
   renderStudentTable() {
-    if (!this.state.visible) {
+    if (!this.props.showList) {
       return null
     }
 
@@ -102,12 +98,12 @@ class PopulationStudents extends Component {
       return null
     }
 
-    const toggleLabel = this.state.visible ? 'hide' : 'show'
+    const toggleLabel = this.props.showNames ? 'hide' : 'show'
 
     return (
       <Segment>
         <Header>Students</Header>
-        <Button onClick={() => this.setState({ visible: !this.state.visible })}>
+        <Button onClick={() => this.props.toggleStudentListVisibility()}>
           {toggleLabel}
         </Button>
         {this.renderStudentTable()}
@@ -120,15 +116,18 @@ PopulationStudents.propTypes = {
   samples: arrayOf(arrayOf(object)).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   toggleStudentNameVisibility: func.isRequired,
+  toggleStudentListVisibility: func.isRequired,
   showNames: bool.isRequired,
+  showList: bool.isRequired,
   history: shape({}).isRequired
 }
 
 const mapStateToProps = state => ({
-  showNames: state.settings.namesVisible
+  showNames: state.settings.namesVisible,
+  showList: state.settings.studentlistVisible
 })
 
 export default connect(
   mapStateToProps,
-  { toggleStudentNameVisibility }
+  { toggleStudentNameVisibility, toggleStudentListVisibility }
 )(withRouter(PopulationStudents))
