@@ -33,6 +33,12 @@ class PopulationFilters extends Component {
       return (
         <Segment>
           <Header>Filters</Header>
+          <div>
+            <em>
+              Note that filters does not work yet when population is limited by students
+              that have participated a specific course
+            </em>
+          </div>
           <CreditsLessThan filter={{ notSet: true }} />
           <Button onClick={() => this.setState({ visible: false })}>cancel</Button>
         </Segment>
