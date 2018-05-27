@@ -9,6 +9,7 @@ import { clearPopulationFilters, setPopulationFilter } from '../../redux/populat
 
 class CreditsLessThan extends Component {
   static propTypes = {
+    setLoading: func.isRequired,
     filter: shape({}).isRequired,
     clearPopulationFilters: func.isRequired,
     setPopulationFilter: func.isRequired
