@@ -8,21 +8,10 @@ import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraph from '../CreditAccumulationGraph'
 import SearchResultTable from '../SearchResultTable'
 import { removeInvalidCreditsFromStudent, byDateDesc, reformatDate } from '../../common'
-import { resetStudentSelection } from '../../redux/students'
 
 import sharedStyles from '../../styles/shared'
 
 class StudentDetails extends Component {
-  /*
-  componentDidMount() {
-    this.props.resetStudentSelection()
-  }
-
-  componentDidUpdate() {
-    this.props.resetStudentSelection()
-  }
-  */
-
   renderCreditsGraph = () => {
     const { translate, student } = this.props
 
@@ -87,7 +76,6 @@ class StudentDetails extends Component {
 
 StudentDetails.propTypes = {
   translate: func.isRequired,
-  resetStudentSelection: func.isRequired,
   student: shape({
     courses: arrayOf(shape({
       course: shape({
@@ -116,4 +104,4 @@ const mapStateToProps = ({ students }) => ({
     student.studentNumber === students.selected)
 })
 
-export default connect(mapStateToProps, { resetStudentSelection })(StudentDetails)
+export default connect(mapStateToProps)(StudentDetails)
