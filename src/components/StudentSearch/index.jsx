@@ -115,7 +115,6 @@ class StudentSearch extends Component {
   render() {
     const { translate, selected } = this.props
 
-    console.log(selected)
 
     if (selected !== null) {
       return null
