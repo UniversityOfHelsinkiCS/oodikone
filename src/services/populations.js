@@ -26,7 +26,7 @@ const studyRightLike = (searchTerm) => {
     })
 }
 
-const withStudents = (student_numbers, conf) => {
+const studentsWithCourses = (student_numbers, conf) => {
   return Student.findAll({
     include: [
       {
@@ -241,6 +241,13 @@ const optimizedStatisticsOf = async (query) => {
 
   const startDate = `${query.year}-${semesterStart[query.semester]}`
   const endDate = `${query.year}-${semesterEnd[query.semester]}`
+
+  const withStudyrighStart = (student) => {
+    student.studyrightStart = startDate
+
+    return student
+  }
+
   try {
     const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
     const conf = {
@@ -253,10 +260,12 @@ const optimizedStatisticsOf = async (query) => {
 
     const student_numbers = await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
     
-    const students = await withStudents(student_numbers, conf)
+    const students = await studentsWithCourses(student_numbers, conf)
       .map(restrictToMonths(conf.enrollmentDates.startDate, query.months)) 
 
-    return students.map(formatStudent)
+    return students
+      .map(formatStudent)
+      .map(withStudyrighStart)
     
   } catch (e) {
     console.log(e)
@@ -283,7 +292,7 @@ const bottlenecksOf = async (query) => {
 
     const student_numbers = await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
 
-    const students = await withStudents(student_numbers, conf)
+    const students = await studentsWithCourses(student_numbers, conf)
       .map(restrictToMonths(conf.enrollmentDates.startDate, query.months))
 
     const populationSize = students.length
