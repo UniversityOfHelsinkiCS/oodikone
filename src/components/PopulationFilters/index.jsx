@@ -19,7 +19,7 @@ class PopulationFilters extends Component {
   }
 
   render() {
-    if (!this.state.visible) {
+    if (this.props.populationFilters.length === 0 && !this.state.visible) {
       return (
         <Segment>
           <SegmentDimmer translate={this.props.translate} isLoading={this.props.loading} />
@@ -33,6 +33,12 @@ class PopulationFilters extends Component {
       return (
         <Segment>
           <Header>Filters</Header>
+          <div>
+            <em>
+              Note that filters does not work yet when population is limited by students
+              that have participated a specific course
+            </em>
+          </div>
           <CreditsLessThan filter={{ notSet: true }} />
           <Button onClick={() => this.setState({ visible: false })}>cancel</Button>
         </Segment>
