@@ -2,14 +2,12 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Input, Button, Form } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
-import { setLoading } from '../../redux/graphSpinner'
 
 import { creditsLessThan } from '../../populationFilters'
 import { clearPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
 
 class CreditsLessThan extends Component {
   static propTypes = {
-    setLoading: func.isRequired,
     filter: shape({}).isRequired,
     clearPopulationFilters: func.isRequired,
     setPopulationFilter: func.isRequired
@@ -24,18 +22,12 @@ class CreditsLessThan extends Component {
   }
 
   handleLimit = () => {
-    this.props.setLoading()
-    setTimeout(() => {
-      this.props.setPopulationFilter(creditsLessThan(this.state.limit))
-      this.setState({ limit: '' })
-    }, 0)
+    this.props.setPopulationFilter(creditsLessThan(this.state.limit))
+    this.setState({ limit: '' })
   }
 
   clearFilter = () => {
-    this.props.setLoading()
-    setTimeout(() => {
-      this.props.clearPopulationFilters()
-    }, 0)
+    this.props.clearPopulationFilters()
   }
 
   render() {
@@ -83,5 +75,5 @@ class CreditsLessThan extends Component {
 
 export default connect(
   null,
-  { setPopulationFilter, clearPopulationFilters, setLoading }
+  { setPopulationFilter, clearPopulationFilters }
 )(CreditsLessThan)
