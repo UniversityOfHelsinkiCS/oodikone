@@ -7,17 +7,19 @@ import { Header, Segment, Divider } from 'semantic-ui-react'
 import PopulationSearchForm from '../PopulationSearchForm'
 import PopulationSearchHistory from '../PopulationSearchHistory'
 import PopulationDetails from '../PopulationDetails'
+import SegmentDimmer from '../SegmentDimmer'
 
 import sharedStyles from '../../styles/shared'
 
 class PopulationStatistics extends PureComponent {
   static propTypes = {
     translate: func.isRequired,
-    populationFound: bool.isRequired
+    populationFound: bool.isRequired,
+    loading: bool.isRequired
   }
 
   renderPopulationSearch = () => {
-    const { translate, populationFound } = this.props
+    const { translate, populationFound, loading } = this.props
 
     const title = populationFound ?
       translate('populationStatistics.foundTitle') :
@@ -29,6 +31,7 @@ class PopulationStatistics extends PureComponent {
         <PopulationSearchForm />
         <Divider />
         <PopulationSearchHistory />
+        <SegmentDimmer translate={translate} isLoading={loading} />
       </Segment>
     )
   }
@@ -50,9 +53,8 @@ class PopulationStatistics extends PureComponent {
 const mapStateToProps = ({ locale, populations }) => ({
   translate: getTranslate(locale),
   currentLanguage: getActiveLanguage(locale).value,
-  populationFound: populations.length > 0
+  populationFound: populations.length > 0,
+  loading: populations.length > 0 && populations[0].pending
 })
 
-const mapDispatchToProps = () => ({})
-
-export default connect(mapStateToProps, mapDispatchToProps)(PopulationStatistics)
+export default connect(mapStateToProps)(PopulationStatistics)
