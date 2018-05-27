@@ -19,7 +19,7 @@ class PopulationCourseStats extends Component {
   state = {
     sortBy: 'students',
     reversed: false,
-    limit: parseInt(this.props.populationSize * 0.2, 10)
+    limit: parseInt(this.props.populationSize * 0.15, 10)
   }
 
   limitPopulationToCourse = course => () => {
