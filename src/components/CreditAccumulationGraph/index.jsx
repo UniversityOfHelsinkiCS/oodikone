@@ -118,9 +118,12 @@ class CreditAccumulationGraph extends Component {
   )
 
   getStudentCourseData = (student) => {
-    const { studentNumber, started, courses } = student
+    const { studentNumber, courses, studyrightStart, started } = student
 
-    const filteredCourses = courses.filter(c => moment(c.date).isSameOrAfter(moment(started)))
+    const startDate = this.props.selectedStudents.length === 1 ? started : studyrightStart
+
+    const filteredCourses = courses
+      .filter(c => moment(c.date).isSameOrAfter(moment(startDate)))
 
     let totalCredits = 0
     return filteredCourses.map((c) => {
@@ -135,7 +138,7 @@ class CreditAccumulationGraph extends Component {
         [studentNumber]: totalCredits,
         credits,
         date: reformatDate(date, DISPLAY_DATE_FORMAT),
-        month: this.getXAxisMonth(date, started),
+        month: this.getXAxisMonth(date, startDate),
         grade,
         passed
       }

@@ -7,6 +7,7 @@ import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation } from '../../redux/populations'
 import { clearPopulationCourses } from '../../redux/populationCourses'
 import { clearPopulationLimit } from '../../redux/populationLimit'
+import { clearPopulationFilters } from '../../redux/populationFilters'
 
 import styles from './populationSearchHistory.css'
 
@@ -61,6 +62,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(removePopulation(uuid))
     dispatch(clearPopulationCourses())
     dispatch(clearPopulationLimit())
+    dispatch(clearPopulationFilters())
   }
 })
 
