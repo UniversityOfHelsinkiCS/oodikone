@@ -24,8 +24,9 @@ class StudentStatistics extends PureComponent {
         </Header>
         <Radio
           toggle
+          checked={this.props.showNames}
           label={radioLabel}
-          onClick={() => this.props.toggleStudentNameVisibility()}
+          onChange={() => this.props.toggleStudentNameVisibility()}
         />
         <Segment className={sharedStyles.contentSegment}>
           <StudentSearch translate={translate} studentNumber={studentNumber} />

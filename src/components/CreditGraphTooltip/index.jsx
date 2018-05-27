@@ -52,7 +52,7 @@ const getCardDescription = (translate, credits, grade, passed) => (
 
 const CreditGraphTooltip = (props) => {
   const { active, translate } = props
-  if (active && props.payload.length > 0) {
+  if (active && props.payload && props.payload.length > 0) {
     const { payload } = props
     const { name } = payload[0]
     const {
