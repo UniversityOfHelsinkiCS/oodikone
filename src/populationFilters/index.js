@@ -14,5 +14,11 @@ export const creditsLessThan = credit =>
   })
 
 
-export const placeHhlder = () => () =>
-  console.log('lol')
+export const placeHolder = () => () =>
+  ({
+    id: uuidv4(),
+    type: 'placeHolder',
+    params: [],
+    filter: () =>
+      null
+  })

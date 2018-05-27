@@ -94,15 +94,17 @@ const populationsToData = makePopulationsToData()
 const mapStateToProps = (state) => {
   const allSamples = populationsToData(state)
 
-  const all = allSamples.length > 0 ? allSamples[0].map(s => s.studentNumber) : []
+  const allStudents = allSamples.length > 0 ? allSamples[0].map(s => s.studentNumber) : []
 
   let selectedStudents = state.populationLimit ?
     state.populationLimit.course.students[state.populationLimit.field] :
-    all
+    allStudents
 
   if (state.populationFilters.length > 0) {
     const { filter } = state.populationFilters[0]
-    selectedStudents = allSamples[0].filter(filter).map(s => s.studentNumber)
+    selectedStudents = allSamples.length > 0 ?
+      allSamples[0].filter(filter).map(s => s.studentNumber) :
+      []
   }
 
   return {
