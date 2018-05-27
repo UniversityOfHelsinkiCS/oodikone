@@ -13,7 +13,7 @@ const getHeaderRow = headers => (
               {header}
             </Table.HeaderCell>
           ))
-        }
+    }
     </Table.Row>
   </Table.Header>
 )
@@ -49,7 +49,7 @@ const SearchResultTable = ({
         definition={definition}
       >
         {getHeaderRow(headers)}
-        {getTableBody(rows, rowClickFn, selectable)}
+        {getTableBody(rows, rowClickFn, selectable, headers.length === 5)}
       </Table>)
   }
   return <div>{noResultText}</div>

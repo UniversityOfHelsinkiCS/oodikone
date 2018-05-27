@@ -1,8 +1,18 @@
+
 .cardHeader {
-  vertical-align: bottom;
-  padding-left: 15px;
+  display: flex !important;
+  justify-content: space-between !important;
 }
 
 .startDate {
   margin-top: 3px !important;
+}
+
+.controlIcon {
+  cursor: pointer;
+
+  &:hover {
+    font-size: large;
+    color: var(--deepBlack);
+  }
 }
