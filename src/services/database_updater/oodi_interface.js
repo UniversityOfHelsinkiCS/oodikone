@@ -101,5 +101,5 @@ module.exports = {
   getOrganisation,
   getStudentCourseCredits, 
   getStudentNumbers, 
-  getTeacherDetails,
+  getTeacherDetails
 } 
