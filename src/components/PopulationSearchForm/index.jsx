@@ -21,7 +21,7 @@ const YEAR_DATE_FORMAT = 'YYYY'
 const INITIAL_QUERY = {
   year: '2017',
   semester: 'FALL',
-  studyRights: [],
+  studyRights: ['49'],
   months: 12
 }
 
@@ -149,16 +149,8 @@ class PopulationSearchForm extends Component {
         </Form.Field>
         <Form.Field className={style.yearControl}>
           <Button.Group basic vertical className={style.yearControlButtonGroup}>
-            <Button
-              icon="plus"
-              className={style.yearControlButton}
-              onClick={this.addYear}
-            />
-            <Button
-              icon="minus"
-              className={style.yearControlButton}
-              onClick={this.subtractYear}
-            />
+            <Button icon="plus" className={style.yearControlButton} onClick={this.addYear} />
+            <Button icon="minus" className={style.yearControlButton} onClick={this.subtractYear} />
           </Button.Group>
         </Form.Field>
         <Form.Field>
@@ -174,15 +166,10 @@ class PopulationSearchForm extends Component {
               onChange={this.handleSemesterSelection}
             />
           ))}
-
         </Form.Field>
         <Form.Field>
           <label>{translate('populationStatistics.months')}</label>
-          <Form.Input
-            type="number"
-            onChange={this.handleMonthsChange}
-            value={months}
-          />
+          <Form.Input type="number" onChange={this.handleMonthsChange} value={months} />
         </Form.Field>
       </Form.Group>
     )
@@ -238,16 +225,11 @@ class PopulationSearchForm extends Component {
         {this.renderEnrollmentDateSelector()}
         {this.renderStudyGroupSelector()}
 
-        <Message
-          error
-          color="blue"
-          header={errorText}
-        />
+        <Message error color="blue" header={errorText} />
 
         <Button onClick={this.fetchPopulation} disabled={isQueryInvalid}>
           {translate('populationStatistics.addPopulation')}
         </Button>
-
       </Form>
     )
   }
@@ -262,14 +244,10 @@ const mapStateToProps = ({ populations, units, locale }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getPopulationStatistics: request =>
-    dispatch(getPopulationStatistics(request)),
-  getPopulationCourses: request =>
-    dispatch(getPopulationCourses(request)),
-  getUnits: () =>
-    dispatch(getUnits()),
-  clearPopulations: () =>
-    dispatch(clearPopulations()),
+  getPopulationStatistics: request => dispatch(getPopulationStatistics(request)),
+  getPopulationCourses: request => dispatch(getPopulationCourses(request)),
+  getUnits: () => dispatch(getUnits()),
+  clearPopulations: () => dispatch(clearPopulations()),
   setLoading: () => dispatch(setLoading())
 })
 
