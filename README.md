@@ -9,7 +9,7 @@ Trunk:
 
 ### Getting started
 
-Install docker & docker-compose to run postgres and redis:
+To install docker & docker-compose to run postgres and redis follow these steps:
 
 Install docker CE: https://docs.docker.com/engine/installation/ 
 
