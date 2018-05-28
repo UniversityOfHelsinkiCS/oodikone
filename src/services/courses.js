@@ -270,10 +270,8 @@ const findDuplicates = async (oldPrefixes, newPrefixes) => {
     
     newPrefixQuery += `inr.code like '${prefix}%' OR\n`
   })
-  console.log(newPrefixQuery)
 
   newPrefixQuery = newPrefixQuery.slice(0, -4)
-  console.log(newPrefixQuery)
 
   return sequelize.query(`select ou.code as code1,  inr.code as code2, ou.name from course ou
   inner join course inr on
