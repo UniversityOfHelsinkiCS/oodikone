@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const { Student, Credit, CourseInstance, Course, CourseTeacher } = require('../models')
+const { sequelize, Student, Credit, CourseInstance, Course, CourseTeacher } = require('../models')
 const { arrayUnique, newToOld, oldToNew } = require('../util')
 const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
@@ -200,12 +200,12 @@ const yearlyStatsOf = async (code, year, separate) => {
   console.log(oldCode, newCode)
   console.log(allInstances)
 
-  if(oldCode && oldCode !== code) {
+  if (oldCode && oldCode !== code) {
     console.log('pushin')
     allInstances.push(...await instancesOf(oldCode))
     console.log(allInstances)
   }
-  if(newCode && newCode != code) {
+  if (newCode && newCode != code) {
     allInstances.push(await instancesOf(newCode))
   }
   const yearInst = allInstances.filter(inst => moment(inst.date).isBetween(year.start + '-08-01', year.end + '-06-01'))
@@ -219,7 +219,7 @@ const yearlyStatsOf = async (code, year, separate) => {
       stats = oneYearStats(yearInst, year, separate)
       if (stats.length > 0) results.push(...stats)
     }
-    return { code, start, end, separate, stats: results, name}
+    return { code, start, end, separate, stats: results, name }
   }
   return
 }
@@ -258,6 +258,50 @@ const createCourseInstance = async (creditDate, course) => {
   })
 }
 
+const findDuplicates = async (oldPrefixes, newPrefixes) => {
+  let oldPrefixQuery = ''
+  let newPrefixQuery = ''
+  oldPrefixes.forEach(prefix => {
+    oldPrefixQuery += `ou.code like '${prefix}%' OR\n`
+  })
+  oldPrefixQuery = oldPrefixQuery.slice(0, -4)
+  
+  newPrefixes.forEach(prefix => {
+    
+    newPrefixQuery += `inr.code like '${prefix}%' OR\n`
+  })
+  console.log(newPrefixQuery)
+
+  newPrefixQuery = newPrefixQuery.slice(0, -4)
+  console.log(newPrefixQuery)
+
+  return sequelize.query(`select ou.code as code1,  inr.code as code2, ou.name from course ou
+  inner join course inr on
+  (
+    select count(*) from course inr
+  where inr.name = ou.name) > 1 
+   AND inr.name = ou.name
+   where(
+    (${oldPrefixQuery})
+    AND (${newPrefixQuery})
+    AND ou.name not like 'Kandidaatin%'
+    AND ou.name not like 'Muualla suoritetut%'
+    AND ou.name not like 'Tutkimusharjoittelu%'
+    AND ou.name not like 'Väitöskirja%'
+    AND ou.name not like '%erusopinnot%'
+    AND ou.name not like '%ineopinnot%'
+    AND ou.name not like '%Pro gradu -tutkielma%'
+  )
+  order by name`)
+}
+
 module.exports = {
-  bySearchTerm, instancesOf, statisticsOf, createCourse, createCourseInstance, courseInstanceByCodeAndDate, yearlyStatsOf
+  bySearchTerm,
+  instancesOf,
+  statisticsOf,
+  createCourse,
+  createCourseInstance,
+  courseInstanceByCodeAndDate,
+  yearlyStatsOf,
+  findDuplicates
 }
