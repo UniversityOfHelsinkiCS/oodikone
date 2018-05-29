@@ -27,11 +27,14 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     container_name: oodi_db
-  redis:
-    image: redis
+  image: redis
+    command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "6379:6379"
+    volumes:
+      - ./redis-data:/data
     container_name: redis
+
 ```
 
 To start a redis and a database, run:
