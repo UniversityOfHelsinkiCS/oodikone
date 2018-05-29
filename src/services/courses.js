@@ -1,9 +1,14 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
+const redis = require('redis')
+const conf = require('../conf-backend')
 const { sequelize, Student, Credit, CourseInstance, Course, CourseTeacher } = require('../models')
 const { arrayUnique, newToOld, oldToNew } = require('../util')
 const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
+
+const redisClient = redis.createClient(6379, conf.redis)
+require('bluebird').promisifyAll(redis.RedisClient.prototype)
 
 const byNameOrCode = (searchTerm) => Course.findAll({
   where: {
@@ -197,13 +202,9 @@ const yearlyStatsOf = async (code, year, separate) => {
   const allInstances = await instancesOf(code)
   const oldCode = newToOld(code)
   const newCode = oldToNew(code)
-  console.log(oldCode, newCode)
-  console.log(allInstances)
 
   if (oldCode && oldCode !== code) {
-    console.log('pushin')
     allInstances.push(...await instancesOf(oldCode))
-    console.log(allInstances)
   }
   if (newCode && newCode != code) {
     allInstances.push(await instancesOf(newCode))
@@ -265,9 +266,8 @@ const findDuplicates = async (oldPrefixes, newPrefixes) => {
     oldPrefixQuery += `ou.code like '${prefix}%' OR\n`
   })
   oldPrefixQuery = oldPrefixQuery.slice(0, -4)
-  
+
   newPrefixes.forEach(prefix => {
-    
     newPrefixQuery += `inr.code like '${prefix}%' OR\n`
   })
 
@@ -293,6 +293,35 @@ const findDuplicates = async (oldPrefixes, newPrefixes) => {
   order by name`)
 }
 
+const getDuplicateCodes = async (code) => {
+  const results = await redisClient.getAsync(code)
+  if(results) return JSON.parse(results)
+  return []
+}
+
+const setDuplicateCode = async (code, duplicate) => {
+  const results = await getDuplicateCodes(code)
+  if (!results.includes(duplicate)) {
+    results.push(duplicate)
+    await redisClient.setAsync(code, JSON.stringify(results))
+  }
+  return results
+}
+
+const removeDuplicateCode = async (code, duplicate) => {
+  let results = await getDuplicateCodes(code)
+  if (results.includes(duplicate)) {
+    results = results.filter(c => c !== duplicate)
+    if (results) { 
+      await redisClient.setAsync(code, JSON.stringify(results))
+    } else {
+      await redisClient.removeAsync(code)
+    }
+  }
+  return results
+}
+
+
 module.exports = {
   bySearchTerm,
   instancesOf,
@@ -301,5 +330,8 @@ module.exports = {
   createCourseInstance,
   courseInstanceByCodeAndDate,
   yearlyStatsOf,
-  findDuplicates
+  findDuplicates,
+  getDuplicateCodes,
+  setDuplicateCode,
+  removeDuplicateCode
 }

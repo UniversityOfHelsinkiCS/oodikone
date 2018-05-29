@@ -1,0 +1,7 @@
+POST /api/courses/duplicatecodes/TKT10005/205044 HTTP/1.1
+Host: localhost:8080
+uid: tktl
+shib-session-id: mock-session
+x-access-token:
+
+## Insert valid access token (without quotes) generated from login.rest to use

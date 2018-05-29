@@ -3,7 +3,7 @@ const User = require('../services/users')
 const jwt = require('jsonwebtoken')
 const conf = require('../conf-backend')
 
-const admin = ['totutotu', 'tktl', 'mluukkai', 'mitiai', 'ttuotila', 'jakousa']
+const admin = ['totutotu', 'tktl', 'mluukkai', 'mitiai', 'ttuotila', 'jakousa', 'sasumaki']
 
 const generateToken = async (uid, res) => {
   const model = await User.byUsername(uid)
