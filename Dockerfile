@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 RUN npm i
 
 RUN npm run dist
-RUN npm install -g serve
+RUN npm install -g serve@6.5.5 
 
 EXPOSE 5000
 
