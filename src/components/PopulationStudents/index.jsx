@@ -1,10 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Table, Button, Radio } from 'semantic-ui-react'
+import { Header, Segment, Table, Button } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 
-import { toggleStudentNameVisibility, toggleStudentListVisibility } from '../../redux/settings'
+import { toggleStudentListVisibility } from '../../redux/settings'
+
+import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
+
 
 class PopulationStudents extends Component {
   renderStudentTable() {
@@ -20,8 +23,6 @@ class PopulationStudents extends Component {
     const byName = (s1, s2) =>
       (students[s1].lastname < students[s2].lastname ? -1 : 1)
 
-    const radioLabel = this.props.showNames ? 'Student names visible' : 'Student names hidden'
-
     const creditsSinceStart = studentNumber => students[studentNumber].courses
       .filter(c => c.passed)
       .reduce((s, c) => s + c.credits, 0)
@@ -30,14 +31,7 @@ class PopulationStudents extends Component {
 
     return (
       <div>
-        <div style={{ marginTop: 15, marginBottom: 10 }}>
-          <Radio
-            toggle
-            label={radioLabel}
-            checked={this.props.showNames}
-            onChange={() => this.props.toggleStudentNameVisibility()}
-          />
-        </div>
+        <StudentNameVisibilityToggle />
         <Table>
           <Table.Header>
             <Table.Row>
@@ -98,7 +92,7 @@ class PopulationStudents extends Component {
       return null
     }
 
-    const toggleLabel = this.props.showNames ? 'hide' : 'show'
+    const toggleLabel = this.props.showList ? 'hide' : 'show'
 
     return (
       <Segment>
@@ -115,7 +109,6 @@ class PopulationStudents extends Component {
 PopulationStudents.propTypes = {
   samples: arrayOf(arrayOf(object)).isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  toggleStudentNameVisibility: func.isRequired,
   toggleStudentListVisibility: func.isRequired,
   showNames: bool.isRequired,
   showList: bool.isRequired,
@@ -129,5 +122,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { toggleStudentNameVisibility, toggleStudentListVisibility }
+  { toggleStudentListVisibility }
 )(withRouter(PopulationStudents))
