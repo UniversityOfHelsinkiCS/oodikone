@@ -28,6 +28,7 @@
     "teachers" : ["Teachers"],
     "courseStatistics" : ["Course statistics"],
     "users" : ["Users"],
+    "settings": ["Settings"],
     "logout": ["Logout"]
   },
   "populationCourses": {
