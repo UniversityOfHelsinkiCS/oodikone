@@ -38,7 +38,7 @@ class PopulationSearchForm extends Component {
     const INITIAL_QUERY = {
       year: '2017',
       semester: 'FALL',
-      studyRights: ['26'],
+      studyRights: [],
       months: this.months('2017', 'FALL')
     }
 
@@ -56,7 +56,7 @@ class PopulationSearchForm extends Component {
     }
   }
 
-  months(year, term) { // eslint-disable-line
+  months(year, term) {    // eslint-disable-line
     const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
     return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
   }
@@ -116,11 +116,13 @@ class PopulationSearchForm extends Component {
 
   handleSemesterSelection = (e, { value }) => {
     const { query } = this.state
-    this.setState({ query: {
-      ...query,
-      semester: value,
-      months: this.months(this.state.query.year, value)
-    } })
+    this.setState({
+      query: {
+        ...query,
+        semester: value,
+        months: this.months(this.state.query.year, value)
+      }
+    })
   }
 
   handleStudyRightChange = (e, { value }) => {
@@ -168,16 +170,8 @@ class PopulationSearchForm extends Component {
         </Form.Field>
         <Form.Field className={style.yearControl}>
           <Button.Group basic vertical className={style.yearControlButtonGroup}>
-            <Button
-              icon="plus"
-              className={style.yearControlButton}
-              onClick={this.addYear}
-            />
-            <Button
-              icon="minus"
-              className={style.yearControlButton}
-              onClick={this.subtractYear}
-            />
+            <Button icon="plus" className={style.yearControlButton} onClick={this.addYear} />
+            <Button icon="minus" className={style.yearControlButton} onClick={this.subtractYear} />
           </Button.Group>
         </Form.Field>
         <Form.Field>
@@ -193,15 +187,10 @@ class PopulationSearchForm extends Component {
               onChange={this.handleSemesterSelection}
             />
           ))}
-
         </Form.Field>
         <Form.Field>
           <label>{translate('populationStatistics.months')}</label>
-          <Form.Input
-            type="number"
-            onChange={this.handleMonthsChange}
-            value={months}
-          />
+          <Form.Input type="number" onChange={this.handleMonthsChange} value={months} />
         </Form.Field>
       </Form.Group>
     )
@@ -257,16 +246,11 @@ class PopulationSearchForm extends Component {
         {this.renderEnrollmentDateSelector()}
         {this.renderStudyGroupSelector()}
 
-        <Message
-          error
-          color="blue"
-          header={errorText}
-        />
+        <Message error color="blue" header={errorText} />
 
         <Button onClick={this.fetchPopulation} disabled={isQueryInvalid}>
           {translate('populationStatistics.addPopulation')}
         </Button>
-
       </Form>
     )
   }
@@ -281,14 +265,10 @@ const mapStateToProps = ({ populations, units, locale }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getPopulationStatistics: request =>
-    dispatch(getPopulationStatistics(request)),
-  getPopulationCourses: request =>
-    dispatch(getPopulationCourses(request)),
-  getUnits: () =>
-    dispatch(getUnits()),
-  clearPopulations: () =>
-    dispatch(clearPopulations()),
+  getPopulationStatistics: request => dispatch(getPopulationStatistics(request)),
+  getPopulationCourses: request => dispatch(getPopulationCourses(request)),
+  getUnits: () => dispatch(getUnits()),
+  clearPopulations: () => dispatch(clearPopulations()),
   setLoading: () => dispatch(setLoading())
 })
 
