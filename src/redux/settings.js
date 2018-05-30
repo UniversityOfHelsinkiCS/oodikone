@@ -1,6 +1,7 @@
 const initial = {
   namesVisible: false,
-  studentlistVisible: false
+  studentlistVisible: false,
+  chartHeight: 600
 }
 
 const reducer = (state = initial, action) => {
@@ -25,6 +26,11 @@ const reducer = (state = initial, action) => {
         ...state,
         studentlistVisible: !state.studentlistVisible
       }
+    case 'SET_CHART_HEIGHT':
+      return {
+        ...state,
+        chartHeight: action.size
+      }
     default:
       return state
   }
@@ -36,6 +42,11 @@ export const hideStudentNames = () => ({
 
 export const showStudentNames = () => ({
   type: 'SHOW_STUDENT_NAMES'
+})
+
+export const setChartHeight = size => ({
+  type: 'SET_CHART_HEIGHT',
+  size
 })
 
 export const toggleStudentNameVisibility = () => ({
