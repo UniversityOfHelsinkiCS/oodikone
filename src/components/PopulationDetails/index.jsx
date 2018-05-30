@@ -8,7 +8,7 @@ import { makePopulationsToData } from '../../selectors/populationDetails'
 import { setPopulationLimitField, clearPopulationLimit } from '../../redux/populationLimit'
 
 import PopulationFilters from '../PopulationFilters'
-import CreditAccumulationGraph from '../CreditAccumulationGraph'
+import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import CourseQuarters from '../CourseQuarters'
 import PopulationLimiter from '../PopulationLimiter'
 import PopulationStudents from '../PopulationStudents'
@@ -30,16 +30,19 @@ class PopulationDetails extends Component {
     const { samples, translate } = this.props
     let statistics = []
     if (samples) {
-      statistics = samples.map((sample, i) =>
-        (<CourseQuarters
+      statistics = samples.map((sample, i) => (
+        <CourseQuarters
           key={`course-quarters-${i}`} // eslint-disable-line react/no-array-index-key
           sample={sample.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
           translate={translate}
-        />))
+        />
+      ))
     }
     return (
       <Segment>
-        <Header size="medium" dividing>{translate('populationStatistics.creditStatisticsHeader')}</Header>
+        <Header size="medium" dividing>
+          {translate('populationStatistics.creditStatisticsHeader')}
+        </Header>
         <PopulationLimiter />
         {statistics}
       </Segment>
@@ -49,7 +52,7 @@ class PopulationDetails extends Component {
   renderCreditGainGraphs = () => {
     const { samples, translate } = this.props
     const graphs = samples.map((sample, i) => (
-      <CreditAccumulationGraph
+      <CreditAccumulationGraphHighCharts
         key={`credit-graph-${i}`} // eslint-disable-line react/no-array-index-key
         students={sample}
         title={`${translate('populationStatistics.sampleId')}: ${i}`}
@@ -62,7 +65,9 @@ class PopulationDetails extends Component {
 
     return (
       <Segment>
-        <Header size="medium" dividing>{translate('populationStatistics.graphSegmentHeader')}</Header>
+        <Header size="medium" dividing>
+          {translate('populationStatistics.graphSegmentHeader')}
+        </Header>
         <PopulationLimiter />
         {graphs}
       </Segment>
@@ -96,21 +101,20 @@ const mapStateToProps = (state) => {
 
   const allStudents = allSamples.length > 0 ? allSamples[0].map(s => s.studentNumber) : []
 
-  let selectedStudents = state.populationLimit ?
-    state.populationLimit.course.students[state.populationLimit.field] :
-    allStudents
+  let selectedStudents = state.populationLimit
+    ? state.populationLimit.course.students[state.populationLimit.field]
+    : allStudents
 
   if (state.populationFilters.length > 0) {
     const { filter } = state.populationFilters[0]
-    selectedStudents = allSamples.length > 0 ?
-      allSamples[0].filter(filter).map(s => s.studentNumber) :
-      []
+    selectedStudents =
+      allSamples.length > 0 ? allSamples[0].filter(filter).map(s => s.studentNumber) : []
   }
 
   return {
     samples: allSamples.map((sample) => {
-      const credits = sample
-        .map(s => s.courses.filter(c => c.passed).reduce((sum, c) => c.credits + sum, 0))
+      const credits = sample.map(s =>
+        s.courses.filter(c => c.passed).reduce((sum, c) => c.credits + sum, 0))
 
       sample.maxCredits = Math.round(Math.max(...credits) / 10) * 10
       return sample
@@ -122,6 +126,6 @@ const mapStateToProps = (state) => {
 }
 
 export default connect(mapStateToProps, {
-  setPopulationLimitField, clearPopulationLimit
+  setPopulationLimitField,
+  clearPopulationLimit
 })(PopulationDetails)
-
