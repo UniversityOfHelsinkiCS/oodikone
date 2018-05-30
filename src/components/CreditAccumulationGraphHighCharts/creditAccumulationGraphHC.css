@@ -10,3 +10,7 @@
 
   cursor: pointer;
 }
+
+.graphOptions {
+  float:right;
+}
