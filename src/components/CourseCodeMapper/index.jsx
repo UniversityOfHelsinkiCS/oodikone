@@ -6,7 +6,7 @@ import { getDuplicates, addDuplicate } from '../../redux/coursecodeduplicates'
 
 import sharedStyles from '../../styles/shared'
 
-const { func, obj } = PropTypes
+const { func, shape } = PropTypes
 
 
 class CourseCodeMapper extends Component {
@@ -66,7 +66,7 @@ class CourseCodeMapper extends Component {
 CourseCodeMapper.propTypes = {
   getDuplicates: func.isRequired,
   addDuplicate: func.isRequired,
-  courseCodeDuplicates: obj.isRequired
+  courseCodeDuplicates: shape({}).isRequired
 }
 
 const mapStateToProps = ({ courseCodeDuplicates }) => ({
