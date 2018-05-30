@@ -56,8 +56,7 @@ class PopulationSearchForm extends Component {
     }
   }
 
-  months(year, term) {
-    // eslint-disable-line
+  months(year, term) {    // eslint-disable-line
     const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
     return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
   }
