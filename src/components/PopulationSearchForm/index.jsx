@@ -153,8 +153,6 @@ class PopulationSearchForm extends Component {
 
     const semesters = ['FALL', 'SPRING']
 
-    console.log('HelloWorld') // eslint-disable-line
-
     return (
       <Form.Group key="year" className={style.enrollmentSelectorGroup}>
         <Form.Field error={!validYear} className={style.yearSelect}>
