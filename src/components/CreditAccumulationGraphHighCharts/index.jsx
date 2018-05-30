@@ -69,7 +69,6 @@ class CreditAccumulationGraphHighCharts extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.students) {
-      console.log(nextProps)
       const nextStudents = nextProps.students.map(student => student.studentNumber)
       const oldStudents = this.props.students.map(student => student.studentNumber)
       const changed =
