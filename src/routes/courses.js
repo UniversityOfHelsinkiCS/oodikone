@@ -48,8 +48,13 @@ router.get('/courses/duplicatecodes', async (req, res) => {
   if (req.query.code) {
     const { code } = req.query
     results = await Course.getDuplicateCodes(code)
-    console.log('results:', results)
   }
+  res.json(results)
+})
+
+router.get('/courses/duplicatecodes/all', async (req, res) => {
+  let results = []
+  results = await Course.getAllDuplicates()
   res.json(results)
 })
 

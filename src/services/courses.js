@@ -293,34 +293,35 @@ const findDuplicates = async (oldPrefixes, newPrefixes) => {
   order by name`)
 }
 
+const getAllDuplicates = async () => {
+  const results = await redisClient.getAsync('duplicates')
+  return JSON.parse(results)
+}
+
 const getDuplicateCodes = async (code) => {
-  const results = await redisClient.getAsync(code)
-  if(results) return JSON.parse(results)
+  const allCodes = await getAllDuplicates()
+  const results = allCodes[code]
+  if (results) return results
   return []
 }
 
 const setDuplicateCode = async (code, duplicate) => {
-  const results = await getDuplicateCodes(code)
-  if (!results.includes(duplicate)) {
-    results.push(duplicate)
-    await redisClient.setAsync(code, JSON.stringify(results))
+  const all = await getAllDuplicates()
+  if (!all[code].includes(duplicate)) {
+    all[code].push(duplicate)
+    await redisClient.setAsync('duplicates', JSON.stringify(all))
   }
-  return results
+  return all
 }
 
 const removeDuplicateCode = async (code, duplicate) => {
-  let results = await getDuplicateCodes(code)
-  if (results.includes(duplicate)) {
-    results = results.filter(c => c !== duplicate)
-    if (results) { 
-      await redisClient.setAsync(code, JSON.stringify(results))
-    } else {
-      await redisClient.removeAsync(code)
-    }
+  let all = await getAllDuplicates(code)
+  if (all[code].includes(duplicate)) {
+    all[code] = all[code].filter(c => c !== duplicate)
+    await redisClient.setAsync(all, JSON.stringify(all))
   }
-  return results
+  return all
 }
-
 
 module.exports = {
   bySearchTerm,
@@ -333,5 +334,6 @@ module.exports = {
   findDuplicates,
   getDuplicateCodes,
   setDuplicateCode,
-  removeDuplicateCode
+  removeDuplicateCode,
+  getAllDuplicates
 }
