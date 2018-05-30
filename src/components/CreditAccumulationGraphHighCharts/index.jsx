@@ -20,7 +20,8 @@ class CreditAccumulationGraphHighCharts extends Component {
     studentCreditLines: [],
     timeout: undefined,
     options: [],
-    initialLoad: true
+    initialLoad: true,
+    renderedOnce: false
   }
 
   componentDidMount() {
@@ -108,8 +109,10 @@ class CreditAccumulationGraphHighCharts extends Component {
         this.setState({ initialLoad: false }) // eslint-disable-line
       }
     }
+    if (!this.state.renderedOnce) {
+      this.setState({ rendered: true }) // eslint-disable-line
+    }
   }
-
 
   componentWillUnmount() {
     if (this.state.timeout) {
@@ -196,9 +199,21 @@ class CreditAccumulationGraphHighCharts extends Component {
       <div>
         <div className={styles.graphContainer}>
           <div className={styles.graphOptions}>
-            <Button onClick={() => this.resizeChart(400)} content="Small" />
-            <Button onClick={() => this.resizeChart(600)} content="Medium" />
-            <Button onClick={() => this.resizeChart(1000)} content="Large" />
+            <Button
+              active={this.props.currentGraphSize === 400}
+              onClick={() => this.resizeChart(400)}
+              content="Small"
+            />
+            <Button
+              active={this.props.currentGraphSize === 600}
+              onClick={() => this.resizeChart(600)}
+              content="Medium"
+            />
+            <Button
+              active={this.props.currentGraphSize === 1000}
+              onClick={() => this.resizeChart(1000)}
+              content="Large"
+            />
           </div>
           <ReactHighstock
             highcharts={Highcharts}
