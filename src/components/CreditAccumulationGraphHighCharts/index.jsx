@@ -69,6 +69,7 @@ class CreditAccumulationGraphHighCharts extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.students) {
+      console.log(nextProps)
       const nextStudents = nextProps.students.map(student => student.studentNumber)
       const oldStudents = this.props.students.map(student => student.studentNumber)
       const changed =
@@ -76,7 +77,7 @@ class CreditAccumulationGraphHighCharts extends Component {
         oldStudents.some(student => !nextStudents.includes(student))
       const dataOfSelected = this.state.studentCreditLines.filter(line =>
         nextProps.selectedStudents.includes(line.name))
-      const options = { ...this.state.options, series: dataOfSelected }
+      const options = { ...this.state.options, yAxis: { max: nextProps.students.maxCredits, title: { text: 'Credits' } }, series: dataOfSelected }
 
       this.setState({ options })
 
