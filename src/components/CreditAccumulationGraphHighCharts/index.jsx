@@ -1,13 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import { arrayOf, object, string } from 'prop-types'
+import { arrayOf, object, string, func, number } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import Highcharts from 'highcharts/highstock'
+import { Button } from 'semantic-ui-react'
 import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import styles from './creditAccumulationGraphHC.css'
 import { clearLoading } from '../../redux/graphSpinner'
+import { setChartHeight } from '../../redux/settings'
 import { reformatDate, sortDatesWithFormat } from '../../common'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
 
@@ -18,7 +20,8 @@ class CreditAccumulationGraphHighCharts extends Component {
     studentCreditLines: [],
     timeout: undefined,
     options: [],
-    initialLoad: true
+    initialLoad: true,
+    renderedOnce: false
   }
 
   componentDidMount() {
@@ -29,7 +32,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       this.props.selectedStudents.includes(line.name))
     const options = {
       chart: {
-        height: 1000
+        height: this.props.currentGraphSize
       },
       plotOptions: {
         series: {
@@ -76,8 +79,17 @@ class CreditAccumulationGraphHighCharts extends Component {
         oldStudents.some(student => !nextStudents.includes(student))
       const dataOfSelected = this.state.studentCreditLines.filter(line =>
         nextProps.selectedStudents.includes(line.name))
-      const options = { ...this.state.options, yAxis: { max: nextProps.students.maxCredits, title: { text: 'Credits' } }, series: dataOfSelected }
-
+      const options = {
+        ...this.state.options,
+        yAxis: {
+          max: nextProps.students.maxCredits,
+          title: { text: 'Credits' }
+        },
+        series: dataOfSelected,
+        chart: {
+          height: nextProps.currentGraphSize
+        }
+      }
       this.setState({ options })
 
       if (changed) {
@@ -97,8 +109,10 @@ class CreditAccumulationGraphHighCharts extends Component {
         this.setState({ initialLoad: false }) // eslint-disable-line
       }
     }
+    if (!this.state.renderedOnce) {
+      this.setState({ rendered: true }) // eslint-disable-line
+    }
   }
-
 
   componentWillUnmount() {
     if (this.state.timeout) {
@@ -174,30 +188,58 @@ class CreditAccumulationGraphHighCharts extends Component {
       return { name: student.studentNumber, data: points, boostThreshold: 500 }
     })
 
+  resizeChart = (size) => {
+    if (this.chart) {
+      this.props.setChartHeight(size)
+    }
+  }
+
   render() {
     return (
-      <div className={styles.graphContainer}>
-        <ReactHighstock
-          highcharts={Highcharts}
-          ref={(HighchartsReact) => {
-            this.chart = HighchartsReact
-          }}
-          constructorType="stockChart"
-          config={this.state.options}
-        />
+      <div>
+        <div className={styles.graphContainer}>
+          <div className={styles.graphOptions}>
+            <Button
+              active={this.props.currentGraphSize === 400}
+              onClick={() => this.resizeChart(400)}
+              content="Small"
+            />
+            <Button
+              active={this.props.currentGraphSize === 600}
+              onClick={() => this.resizeChart(600)}
+              content="Medium"
+            />
+            <Button
+              active={this.props.currentGraphSize === 1000}
+              onClick={() => this.resizeChart(1000)}
+              content="Large"
+            />
+          </div>
+          <ReactHighstock
+            highcharts={Highcharts}
+            ref={(HighchartsReact) => {
+              this.chart = HighchartsReact
+            }}
+            constructorType="stockChart"
+            config={this.state.options}
+          />
+        </div>
       </div>
     )
   }
 }
 CreditAccumulationGraphHighCharts.propTypes = {
   students: arrayOf(object).isRequired,
-  selectedStudents: arrayOf(string).isRequired
+  selectedStudents: arrayOf(string).isRequired,
+  setChartHeight: func.isRequired,
+  currentGraphSize: number.isRequired
 }
 const mapStateToProps = state => ({
-  spinner: state.graphSpinner
+  spinner: state.graphSpinner,
+  currentGraphSize: state.settings.chartHeight
 })
 
 export default connect(
   mapStateToProps,
-  { clearLoading }
+  { clearLoading, setChartHeight }
 )(withRouter(CreditAccumulationGraphHighCharts))
