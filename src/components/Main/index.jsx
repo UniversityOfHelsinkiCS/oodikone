@@ -45,6 +45,7 @@ class Main extends Component {
     if (!this.state.enabled || this.state.hasError) {
       return <AccessDenied itWasError={this.state.hasError} />
     }
+
     return (
       <div className={styles.appContainer}>
         <Router basename={BASE_PATH}>
