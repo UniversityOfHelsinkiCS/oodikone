@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
-import { func, shape, string, bool } from 'prop-types'
+import { func, shape, string } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
-import { Segment, Header, Radio } from 'semantic-ui-react'
+import { Segment, Header } from 'semantic-ui-react'
 
 import StudentSearch from '../StudentSearch'
 import StudentDetails from '../StudentDetails'
+import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
 import sharedStyles from '../../styles/shared'
@@ -15,19 +16,12 @@ class StudentStatistics extends PureComponent {
     const { translate, match } = this.props
     const { studentNumber } = match.params
 
-    const radioLabel = this.props.showNames ? 'Student names visible' : 'Student names hidden'
-
     return (
       <div className={sharedStyles.segmentContainer}>
         <Header className={sharedStyles.segmentTitle} size="large">
           {translate('studentStatistics.header')}
         </Header>
-        <Radio
-          toggle
-          checked={this.props.showNames}
-          label={radioLabel}
-          onChange={() => this.props.toggleStudentNameVisibility()}
-        />
+        <StudentNameVisibilityToggle />
         <Segment className={sharedStyles.contentSegment}>
           <StudentSearch translate={translate} studentNumber={studentNumber} />
           <StudentDetails translate={translate} />
@@ -43,9 +37,7 @@ StudentStatistics.propTypes = {
     params: shape({
       studentNumber: string
     })
-  }),
-  toggleStudentNameVisibility: func.isRequired,
-  showNames: bool.isRequired
+  })
 }
 
 StudentStatistics.defaultProps = {
@@ -54,10 +46,9 @@ StudentStatistics.defaultProps = {
   }
 }
 
-const mapStateToProps = ({ locale, settings }) => ({
+const mapStateToProps = ({ locale }) => ({
   translate: getTranslate(locale),
-  currentLanguage: getActiveLanguage(locale).value,
-  showNames: settings.namesVisible
+  currentLanguage: getActiveLanguage(locale).value
 })
 
 export default connect(mapStateToProps, { toggleStudentNameVisibility })(StudentStatistics)
