@@ -6,6 +6,8 @@ import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
 import { isEqual } from 'lodash'
+import moment from 'moment'
+
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getUnits } from '../../redux/units'
@@ -17,13 +19,6 @@ import style from './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
 
 const YEAR_DATE_FORMAT = 'YYYY'
-
-const INITIAL_QUERY = {
-  year: '2017',
-  semester: 'FALL',
-  studyRights: ['49'],
-  months: 12
-}
 
 class PopulationSearchForm extends Component {
   static propTypes = {
@@ -37,10 +32,21 @@ class PopulationSearchForm extends Component {
     setLoading: func.isRequired
   }
 
-  state = {
-    query: INITIAL_QUERY,
-    isLoading: false,
-    validYear: true
+  constructor() {
+    super()
+
+    const INITIAL_QUERY = {
+      year: '2017',
+      semester: 'FALL',
+      studyRights: [],
+      months: this.months('2017', 'FALL')
+    }
+
+    this.state = {
+      query: INITIAL_QUERY,
+      isLoading: false,
+      validYear: true
+    }
   }
 
   componentDidMount() {
@@ -48,6 +54,12 @@ class PopulationSearchForm extends Component {
     if (studyProgrammes.length === 0) {
       this.props.getUnits()
     }
+  }
+
+  months(year, term) {
+    // eslint-disable-line
+    const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
+    return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
   }
 
   validateQuery = () => {
@@ -80,7 +92,11 @@ class PopulationSearchForm extends Component {
     if (validYear) {
       this.setState({
         validYear,
-        query: { ...query, year: reformatDate(year, YEAR_DATE_FORMAT) }
+        query: {
+          ...query,
+          year: reformatDate(year, YEAR_DATE_FORMAT),
+          months: this.months(reformatDate(year, YEAR_DATE_FORMAT), this.state.query.semester)
+        }
       })
     } else {
       this.setState({ validYear })
@@ -101,7 +117,13 @@ class PopulationSearchForm extends Component {
 
   handleSemesterSelection = (e, { value }) => {
     const { query } = this.state
-    this.setState({ query: { ...query, semester: value } })
+    this.setState({
+      query: {
+        ...query,
+        semester: value,
+        months: this.months(this.state.query.year, value)
+      }
+    })
   }
 
   handleStudyRightChange = (e, { value }) => {

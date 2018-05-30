@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
 import Highcharts from 'highcharts/highstock'
-import HighchartsReact from 'highcharts-react-official'
+import boost from 'highcharts/modules/boost'
+import ReactHighstock from 'react-highcharts/ReactHighstock'
 import styles from './creditAccumulationGraphHC.css'
-
 import { arrayOf, object, string, func, shape, number, bool } from 'prop-types'
-
 import _ from 'lodash'
 import moment from 'moment'
 import { withRouter } from 'react-router-dom'
@@ -13,8 +12,9 @@ import { connect } from 'react-redux'
 import { clearLoading } from '../../redux/graphSpinner'
 import { reformatDate, sortDatesWithFormat } from '../../common'
 import { DISPLAY_DATE_FORMAT, CHART_COLORS, API_DATE_FORMAT } from '../../constants'
-
 import CreditGraphTooltip from '../CreditGraphTooltip'
+
+boost(Highcharts)
 
 class CreditAccumulationGraphHighCharts extends Component {
   state = {
@@ -22,14 +22,55 @@ class CreditAccumulationGraphHighCharts extends Component {
     studentCreditLines: [],
     timeout: undefined,
     loading: true,
+    options: [],
     initialLoad: true
   }
+
   componentDidMount() {
     const { students } = this.props
-
     const combinedStudentData = this.createCombinedStudentData(students)
     const timeout = setTimeout(() => this.getMoreCreditLines(students), 1000)
-    this.setState({ combinedStudentData, timeout, loading: true })
+    const self = this
+    const dataOfSelected = this.createStudentCreditLines(students).filter(line =>
+      this.props.selectedStudents.includes(line.name))
+    const options = {
+      chart: {
+        height: 1000
+      },
+      plotOptions: {
+        series: {
+          point: {
+            events: {
+              click() {
+                self.props.history.push(`/students/${this.series.name}`)
+              },
+              mouseOver() {
+                if (this.series.halo) {
+                  this.series.halo
+                    .attr({
+                      class: 'highcharts-tracker'
+                    })
+                    .toFront()
+                }
+              },
+              hover: {
+                halo: {
+                  size: 9,
+                  attributes: {
+                    fill: Highcharts.getOptions().colors[2],
+                    'stroke-width': 2,
+                    stroke: Highcharts.getOptions().colors[1]
+                  }
+                }
+              }
+            },
+            cursor: 'pointer'
+          }
+        }
+      },
+      series: dataOfSelected
+    }
+    this.setState({ combinedStudentData, timeout, options, dataOfSelected, loading: true })
   }
 
   componentWillReceiveProps(nextProps) {
@@ -39,6 +80,12 @@ class CreditAccumulationGraphHighCharts extends Component {
       const changed =
         nextStudents.some(student => !oldStudents.includes(student)) ||
         oldStudents.some(student => !nextStudents.includes(student))
+      const dataOfSelected = this.state.studentCreditLines.filter(line =>
+        nextProps.selectedStudents.includes(line.name))
+      const options = { ...this.state.options, series: dataOfSelected }
+
+      this.setState({ options })
+
       if (changed) {
         const { students } = nextProps
         const timeout = setTimeout(() => this.getMoreCreditLines(students), 1000)
@@ -51,6 +98,7 @@ class CreditAccumulationGraphHighCharts extends Component {
 
     this.setState({ loading })
   }
+
   componentDidUpdate(prevProps) {
     if (this.state.initialLoad) {
       if (
@@ -74,11 +122,7 @@ class CreditAccumulationGraphHighCharts extends Component {
     Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0)
 
   createCombinedStudentData = (students) => {
-    let combinedStudentData = [].concat(...students.map(this.getStudentChartData))
-    if (this.isSingleStudentGraph(students)) {
-      const referenceData = this.getReferenceLineForStudent(students[0])
-      combinedStudentData = combinedStudentData.concat(referenceData)
-    }
+    const combinedStudentData = [].concat(...students.map(this.getStudentChartData))
     try {
       return combinedStudentData.sort((c1, c2) =>
         sortDatesWithFormat(c1.date, c2.date, DISPLAY_DATE_FORMAT))
@@ -124,15 +168,14 @@ class CreditAccumulationGraphHighCharts extends Component {
       }
     })
   }
-  isSingleStudentGraph = students => students.length === 1
 
   getMoreCreditLines = (students) => {
-    const studentCreditLines = this.state.studentCreditLines.concat(this.createStudentCreditLines(students, this.isSingleStudentGraph(students)))
+    const studentCreditLines = this.state.studentCreditLines.concat(this.createStudentCreditLines(students))
 
     this.setState({ studentCreditLines, loading: false })
   }
 
-  createStudentCreditLines = (students, isSingleStudent) =>
+  createStudentCreditLines = students =>
     students.map((student, i) => {
       const startDate = student.studyrightStart
       const points = []
@@ -144,59 +187,28 @@ class CreditAccumulationGraphHighCharts extends Component {
         }
         points.push([new Date(course.date).getTime(), credits])
       })
-      return { name: student.studentNumber, data: points }
+      return { name: student.studentNumber, data: points, boostThreshold: 500 }
     })
-
-  getTooltip = props => <Tooltip content={<CreditGraphTooltip {...props} />} cursor={false} />
-
-  getStudent(id) {
-    const i = this.props.students.indexOf(s => s.studentNumber === id)
-    const student = this.props.students.find(s => s.studentNumber === id)
-    return {
-      i,
-      student
-    }
-  }
-
-  getStudentCreditLines() {
-    return this.state.studentCreditLines.map((studentCreditLine) => {
-      const studentNumber = studentCreditLine.props.dataKey
-
-      if (this.props.selectedStudents && !this.props.selectedStudents.includes(studentNumber)) {
-        const isSingleStudent = this.props.selectedStudents.length === 1
-        const dot = this.getDot(studentNumber, isSingleStudent, this.pushToHistoryFn)
-        const { student, i } = this.getStudent(studentNumber)
-
-        return student ? this.getStudentCreditsLine(student, i, dot, true) : null
-      }
-      return studentCreditLine
-    })
-  }
 
   render() {
     const { students, translate, maxCredits } = this.props
     const { combinedStudentData, studentCreditLines } = this.state
-    console.log(combinedStudentData)
     const minTick =
       combinedStudentData && combinedStudentData.length > 0 ? combinedStudentData[0].month : 0
     const maxTick =
       combinedStudentData && combinedStudentData.length > 0
         ? Math.ceil(combinedStudentData[combinedStudentData.length - 1].month)
         : 8
-
-    const options = {
-      chart: {
-        height: 600
-      },
-      title: {
-        text: 'KÄYRIÄ'
-      },
-      series: studentCreditLines
-    }
-    if (studentCreditLines.length === 0) return null
     return (
       <div className={styles.graphContainer}>
-        <HighchartsReact highcharts={Highcharts} constructorType="stockChart" options={options} />
+        <ReactHighstock
+          highcharts={Highcharts}
+          ref={(HighchartsReact) => {
+            this.chart = HighchartsReact
+          }}
+          constructorType="stockChart"
+          config={this.state.options}
+        />
       </div>
     )
   }
