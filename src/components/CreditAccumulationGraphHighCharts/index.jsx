@@ -110,7 +110,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       }
     }
     if (!this.state.renderedOnce) {
-      this.setState({ rendered: true }) // eslint-disable-line
+      this.setState({ renderedOnce: true }) // eslint-disable-line
     }
   }
 
