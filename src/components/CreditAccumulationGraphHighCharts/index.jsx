@@ -4,6 +4,7 @@ import moment from 'moment'
 import { arrayOf, object, string } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import Highcharts from 'highcharts/highstock'
+import { Button } from 'semantic-ui-react'
 import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import styles from './creditAccumulationGraphHC.css'
@@ -29,7 +30,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       this.props.selectedStudents.includes(line.name))
     const options = {
       chart: {
-        height: 1000
+        height: 600
       },
       plotOptions: {
         series: {
@@ -176,15 +177,22 @@ class CreditAccumulationGraphHighCharts extends Component {
 
   render() {
     return (
-      <div className={styles.graphContainer}>
-        <ReactHighstock
-          highcharts={Highcharts}
-          ref={(HighchartsReact) => {
-            this.chart = HighchartsReact
-          }}
-          constructorType="stockChart"
-          config={this.state.options}
-        />
+      <div>
+        <div className={styles.graphContainer}>
+          <div className={styles.graphOptions}>
+            <Button onClick={() => this.chart.chart.setSize(null, 400)} content="Small" />
+            <Button onClick={() => this.chart.chart.setSize(null, 600)} content="Medium" />
+            <Button onClick={() => this.chart.chart.setSize(null, 1000)} content="Large" />
+          </div>
+          <ReactHighstock
+            highcharts={Highcharts}
+            ref={(HighchartsReact) => {
+              this.chart = HighchartsReact
+            }}
+            constructorType="stockChart"
+            config={this.state.options}
+          />
+        </div>
       </div>
     )
   }
