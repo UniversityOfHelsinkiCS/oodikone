@@ -39,6 +39,8 @@ class Main extends Component {
   }
 
   render() {
+    console.log('Wed May 30 19:55:39 EEST 2018') // eslint-disable-line
+
     if (!this.state.loaded) {
       return <Loader active inline="centered" />
     }
