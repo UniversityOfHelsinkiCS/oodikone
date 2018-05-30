@@ -4,3 +4,19 @@ node_js:
 cache:
   directories:
     - node_modules
+
+
+env:
+  global:
+    - secure: "jSLWQcF6OP4tWAGTrA7m7A03PQQf/siKuXGlqgr/7bf2LyxGyK21GG9AAUBf8xutLbLFM75J0CjENYHU5ZSphcIA4+pAjiGEFpfgVFy3huY/5kY8x7cgw2d1goYIQCQOgorHmbWYuhS2cJEjBYcFPwoPCCvCRJKfna4V9DgJAuEIt8GUH6fUxZQ+lDJbugqhYrA45Cu82pHFlaPUbaH8r+O9uZH8Z491iKUUuDzvg2jKweLPMfoWk7lMnONoa8yHmdcOkCgUfE2NXVqVZGIT5A1VHmeh3lE6kivZOcjiFB069Rip8XXrv3XLBSQssVwd1wyRLMcP2G6GQbsLTG/9Jymj2dOpyo75nlWC/+urTKxg4Uzj9ekkYj/V9LQ2svyKT2mc7CtM9+vGS2UpEgd50AreFdNm9Z5sBAlTey2oFV1LXPErD6EF641I31Am5yrIXPTnAyvVi55hQmsjOY33iS5HqvD4cBop7vEbxGBX2BQqKd/gDxVu6sD0ir1HyOeD28oulfiozWAujhFXYFgEF1Vx8oS7XxiUp+cV7MA2avjzfWnw7rbnw/LzWePIayeUu6fwaUKvAq1Y1ZQw+Krf8wUTI2+kbDi7blpp7XfXj+xBqe8id+rTOTWZ4zHMpL+vGzjQtst0eXAHLIywO97MhbXZ9bUgDviidUgbWJrT/u8="
+    - secure: "cMeqIGJ8pWxBN03TYeHi+94T6TypdP5FGc2Iz03ddmLLbtOyOkVM1alevoYlrroDdACTfkYh5PF/BMM8pmgWsZG6yZle/Z4dstQsfgyHIEi/8h3xP/o+jIMVHDDRfVJuqxTGPJcvGxQGhS+ip6YhaU0mEsWPyHz6MOzKUvupD1AAoABxPRnYCU07cFgTaTmlEtovVuU3ZdN6e/oN2cj4QM4adfAH5snolMfi8sQak7/aCQ67NWS4Ky7+ai/WmGi/UzAHVnKZwL0Q8ZQYBM0hZdnZula8hyKEmzJiTq1sYw/2BMDTVZkV8OENQH893CDtP9lGh4tf1jt9f/fXdgmouGiJhk0WVg4ZJIPSJCqtEHJ60Vq0PCS8tIyEnZXZLt/lTcWNjHojNtFP3Tss14iHlKndqGnMhJd8n7plzT8O8D0/+dTpLwT3hqD/8IFvRnICm6cxx0gWe1Fv1+VZQjzRj55MgnCOdaVBr+bsBW6PLGtb/y4M1qOBkDkTV1lBsoSeTbsnj7AbuCRWqlsIy5bBxKkf3PH3GnbmmZ3fkSrHdqrChEigxd0hV2fT01zvSP/sfg0MMp4NmxpFGtzTqG7tnixC+g6dRzepbz/aYkfNolUDgBenD3WSwMbJaEiCjtV3DA23tQMWqc0EhNNvafdMAP/j1jsfutR4RmtNuEViAbQ="
+
+sudo: required
+
+services:
+  - docker
+
+after_success:
+  - docker build -t toska/oodikone2-frontend:staging .
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
+  - docker push toska/oodikone2-frontend:staging    
