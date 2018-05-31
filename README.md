@@ -16,6 +16,7 @@ Install docker CE: https://docs.docker.com/engine/installation/
 Install docker-compose: https://docs.docker.com/compose/install/
 
 Create docker-compose.yml file containing following:
+
 ```
 version: '3'
 
@@ -27,7 +28,8 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     container_name: oodi_db
-  image: redis
+  redis:
+    image: redis
     command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "6379:6379"
