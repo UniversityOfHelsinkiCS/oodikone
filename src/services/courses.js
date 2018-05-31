@@ -3,7 +3,7 @@ const moment = require('moment')
 const redis = require('redis')
 const conf = require('../conf-backend')
 const { sequelize, Student, Credit, CourseInstance, Course, CourseTeacher } = require('../models')
-const { arrayUnique, newToOld, oldToNew } = require('../util')
+const { arrayUnique } = require('../util')
 const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
 
@@ -135,7 +135,6 @@ const statisticsOf = async (code, date, months) => {
     const all = studentStatsAfter(studentStats.filter(s => students.all.includes(s.studentnumber)), date)
     const pass = studentStatsAfter(studentStats.filter(s => students.pass.includes(s.studentnumber)), date)
     const fail = studentStatsAfter(studentStats.filter(s => students.fail.includes(s.studentnumber)), date)
-    console.log(all)
     return {
       all, pass, fail,
       startYear: starYearsOf(instanceStats.credits.map(c => c.student))
@@ -200,16 +199,14 @@ const oneYearStats = (instances, year, separate) => {
 
 const yearlyStatsOf = async (code, year, separate) => {
   const allInstances = await instancesOf(code)
-  const oldCode = newToOld(code)
-  const newCode = oldToNew(code)
+  const alternativeCodes = await getDuplicateCodes(code)
+  console.log(alternativeCodes)
+  if (alternativeCodes) {
+    const alternativeInstances = await Promise.all(alternativeCodes.map(code => instancesOf(code)))
+    alternativeInstances.forEach(inst => allInstances.push(...inst))
+  }
 
-  if (oldCode && oldCode !== code) {
-    allInstances.push(...await instancesOf(oldCode))
-  }
-  if (newCode && newCode != code) {
-    allInstances.push(await instancesOf(newCode))
-  }
-  const yearInst = allInstances.filter(inst => moment(inst.date).isBetween(year.start + '-08-01', year.end + '-06-01'))
+  const yearInst = allInstances.filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-08-01', year.end + '-06-01'))
   const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name
   const start = Number(year.start)
   const end = Number(year.end)
@@ -294,7 +291,13 @@ const findDuplicates = async (oldPrefixes, newPrefixes) => {
 }
 
 const getAllDuplicates = async () => {
-  const results = await redisClient.getAsync('duplicates')
+
+  let results = await redisClient.getAsync('duplicates')
+  if (!results) {
+    await redisClient.setAsync('duplicates', '{}')
+    results = await redisClient.getAsync('duplicates')
+  }
+  console.log(results)
   return JSON.parse(results)
 }
 
@@ -307,6 +310,9 @@ const getDuplicateCodes = async (code) => {
 
 const setDuplicateCode = async (code, duplicate) => {
   const all = await getAllDuplicates()
+  if (!all[code]) {
+    all[code] = []
+  }
   if (!all[code].includes(duplicate)) {
     all[code].push(duplicate)
     await redisClient.setAsync('duplicates', JSON.stringify(all))
@@ -316,7 +322,7 @@ const setDuplicateCode = async (code, duplicate) => {
 
 const removeDuplicateCode = async (code, duplicate) => {
   let all = await getAllDuplicates(code)
-  if (all[code].includes(duplicate)) {
+  if (all[code] && all[code].includes(duplicate)) {
     all[code] = all[code].filter(c => c !== duplicate)
     await redisClient.setAsync(all, JSON.stringify(all))
   }
