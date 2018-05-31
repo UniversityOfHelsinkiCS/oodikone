@@ -1,3 +1,5 @@
+const oldToNewMap = require('./oldToNew.json')
+
 const arrayUnique = (value, index, self) => {
   return self.indexOf(value) === index
 }
@@ -15,7 +17,13 @@ const getStudentNumberChecksum = studentNumber => {
   return (10 - (checksum % 10)) % 10
 }
 
+const oldToNew = (code) => {
+  const mappedCode = oldToNewMap[code]
+  return mappedCode ? mappedCode : code
+}
+
 module.exports = {
   arrayUnique,
   getStudentNumberChecksum,
+  oldToNew
 }
