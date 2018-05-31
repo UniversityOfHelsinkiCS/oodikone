@@ -1,9 +1,14 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
+const redis = require('redis')
+const conf = require('../conf-backend')
 const { sequelize, Student, Credit, CourseInstance, Course, CourseTeacher } = require('../models')
-const { arrayUnique, newToOld, oldToNew } = require('../util')
+const { arrayUnique } = require('../util')
 const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
+
+const redisClient = redis.createClient(6379, conf.redis)
+require('bluebird').promisifyAll(redis.RedisClient.prototype)
 
 const byNameOrCode = (searchTerm) => Course.findAll({
   where: {
@@ -130,7 +135,6 @@ const statisticsOf = async (code, date, months) => {
     const all = studentStatsAfter(studentStats.filter(s => students.all.includes(s.studentnumber)), date)
     const pass = studentStatsAfter(studentStats.filter(s => students.pass.includes(s.studentnumber)), date)
     const fail = studentStatsAfter(studentStats.filter(s => students.fail.includes(s.studentnumber)), date)
-    console.log(all)
     return {
       all, pass, fail,
       startYear: starYearsOf(instanceStats.credits.map(c => c.student))
@@ -195,20 +199,13 @@ const oneYearStats = (instances, year, separate) => {
 
 const yearlyStatsOf = async (code, year, separate) => {
   const allInstances = await instancesOf(code)
-  const oldCode = newToOld(code)
-  const newCode = oldToNew(code)
-  console.log(oldCode, newCode)
-  console.log(allInstances)
+  const alternativeCodes = await getDuplicateCodes(code)
+  if (alternativeCodes) {
+    const alternativeInstances = await Promise.all(alternativeCodes.map(code => instancesOf(code)))
+    alternativeInstances.forEach(inst => allInstances.push(...inst))
+  }
 
-  if (oldCode && oldCode !== code) {
-    console.log('pushin')
-    allInstances.push(...await instancesOf(oldCode))
-    console.log(allInstances)
-  }
-  if (newCode && newCode != code) {
-    allInstances.push(await instancesOf(newCode))
-  }
-  const yearInst = allInstances.filter(inst => moment(inst.date).isBetween(year.start + '-08-01', year.end + '-06-01'))
+  const yearInst = allInstances.filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-08-01', year.end + '-06-01'))
   const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name
   const start = Number(year.start)
   const end = Number(year.end)
@@ -265,9 +262,8 @@ const findDuplicates = async (oldPrefixes, newPrefixes) => {
     oldPrefixQuery += `ou.code like '${prefix}%' OR\n`
   })
   oldPrefixQuery = oldPrefixQuery.slice(0, -4)
-  
+
   newPrefixes.forEach(prefix => {
-    
     newPrefixQuery += `inr.code like '${prefix}%' OR\n`
   })
 
@@ -293,6 +289,44 @@ const findDuplicates = async (oldPrefixes, newPrefixes) => {
   order by name`)
 }
 
+const getAllDuplicates = async () => {
+
+  let results = await redisClient.getAsync('duplicates')
+  if (!results) {
+    await redisClient.setAsync('duplicates', '{}')
+    results = await redisClient.getAsync('duplicates')
+  }
+  return JSON.parse(results)
+}
+
+const getDuplicateCodes = async (code) => {
+  const allCodes = await getAllDuplicates()
+  const results = allCodes[code]
+  if (results) return results
+  return []
+}
+
+const setDuplicateCode = async (code, duplicate) => {
+  const all = await getAllDuplicates()
+  if (!all[code]) {
+    all[code] = []
+  }
+  if (!all[code].includes(duplicate)) {
+    all[code].push(duplicate)
+    await redisClient.setAsync('duplicates', JSON.stringify(all))
+  }
+  return all
+}
+
+const removeDuplicateCode = async (code, duplicate) => {
+  let all = await getAllDuplicates(code)
+  if (all[code] && all[code].includes(duplicate)) {
+    all[code] = all[code].filter(c => c !== duplicate)
+    await redisClient.setAsync(all, JSON.stringify(all))
+  }
+  return all
+}
+
 module.exports = {
   bySearchTerm,
   instancesOf,
@@ -301,5 +335,9 @@ module.exports = {
   createCourseInstance,
   courseInstanceByCodeAndDate,
   yearlyStatsOf,
-  findDuplicates
+  findDuplicates,
+  getDuplicateCodes,
+  setDuplicateCode,
+  removeDuplicateCode,
+  getAllDuplicates
 }

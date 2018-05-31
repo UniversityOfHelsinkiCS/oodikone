@@ -43,4 +43,39 @@ router.get('/courseyearlystats', async (req, res) => {
   res.json(results)
 })
 
+router.get('/courses/duplicatecodes', async (req, res) => {
+  let results = []
+  if (req.query.code) {
+    const { code } = req.query
+    results = await Course.getDuplicateCodes(code)
+  }
+  res.json(results)
+})
+
+router.get('/courses/duplicatecodes/all', async (req, res) => {
+  let results = []
+  results = await Course.getAllDuplicates()
+  res.json(results)
+})
+
+router.post('/courses/duplicatecodes/:code/:code2', async (req, res) => {
+  let results = []
+  if (req.params.code && req.params.code2) {
+    const { code, code2 } = req.params
+    results = await Course.setDuplicateCode(code, code2)
+    res.status(200).json(results)
+  }
+  res.status(400).end()
+})
+
+router.delete('/courses/duplicatecodes/:code/:code2', async (req, res) => {
+  let results = []
+  if (req.params.code && req.params.code2) {
+    const { code, code2 } = req.params
+    results = await Course.removeDuplicateCode(code, code2)
+    res.status(200).json(results)
+  }
+  res.status(400).end()
+})
+
 module.exports = router
