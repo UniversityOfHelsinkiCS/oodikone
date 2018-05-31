@@ -200,7 +200,6 @@ const oneYearStats = (instances, year, separate) => {
 const yearlyStatsOf = async (code, year, separate) => {
   const allInstances = await instancesOf(code)
   const alternativeCodes = await getDuplicateCodes(code)
-  console.log(alternativeCodes)
   if (alternativeCodes) {
     const alternativeInstances = await Promise.all(alternativeCodes.map(code => instancesOf(code)))
     alternativeInstances.forEach(inst => allInstances.push(...inst))
@@ -297,7 +296,6 @@ const getAllDuplicates = async () => {
     await redisClient.setAsync('duplicates', '{}')
     results = await redisClient.getAsync('duplicates')
   }
-  console.log(results)
   return JSON.parse(results)
 }
 
