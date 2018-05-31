@@ -136,23 +136,34 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  handleMonthsChange = (e, { value }) => {
+  handleMonthsChange = (value) => {
     const { query } = this.state
+    const months = this.getMonths(query.year, value, this.state.query.semester)
     this.setState({
       query: {
         ...query,
-        months: value
+        months
       }
     })
   }
+  // (Potential?) issue with using Math.ceil with months.
+  getMonths = (year, end, term) => {
+    const lastDayOfMonth = moment(end).endOf('month')
+    const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
+    return Math.ceil(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
+  }
+
+  getMinSelection = (year, semester) => { // eslint-disable-line
+    return semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`
+  }
+
 
   renderEnrollmentDateSelector = () => {
     const { translate } = this.props
     const { query, validYear } = this.state
-    const { semester, year, months } = query
+    const { semester, year } = query
 
     const semesters = ['FALL', 'SPRING']
-
     return (
       <Form.Group key="year" className={style.enrollmentSelectorGroup}>
         <Form.Field error={!validYear} className={style.yearSelect}>
@@ -190,7 +201,13 @@ class PopulationSearchForm extends Component {
         </Form.Field>
         <Form.Field>
           <label>{translate('populationStatistics.months')}</label>
-          <Form.Input type="number" onChange={this.handleMonthsChange} value={months} />
+          <Datetime
+            dateFormat="YYYY-MM"
+            defaultValue={moment()}
+            onChange={value => this.handleMonthsChange(value)}
+            isValidDate={current => current.isBefore(moment()) &&
+              current.isAfter(this.getMinSelection(year, semester))}
+          />
         </Form.Field>
       </Form.Group>
     )
@@ -227,7 +244,6 @@ class PopulationSearchForm extends Component {
 
     const { translate } = this.props
     const { isLoading, validYear, query } = this.state
-
     let errorText = translate('populationStatistics.alreadyFetched')
     let isQueryInvalid = this.validateQuery()
 

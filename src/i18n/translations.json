@@ -1,101 +1,251 @@
 {
   "common": {
-    "ok": ["Ok"],
-    "cancel": ["Cancel"],
-    "example" : ["react-localize-redux example text"],
-    "loading": ["Loading"],
-    "noResults": ["No search results or search term is not accurate enough"],
-    "studentNumber": ["Student number"],
-    "started": ["Started"],
-    "credits": ["Credits"],
-    "date": ["Date"],
-    "course": ["Course"],
-    "grade": ["Grade"],
-    "passed": ["Passed"]
+    "ok": [
+      "Ok"
+    ],
+    "cancel": [
+      "Cancel"
+    ],
+    "example": [
+      "react-localize-redux example text"
+    ],
+    "loading": [
+      "Loading"
+    ],
+    "noResults": [
+      "No search results or search term is not accurate enough"
+    ],
+    "studentNumber": [
+      "Student number"
+    ],
+    "started": [
+      "Started"
+    ],
+    "credits": [
+      "Credits"
+    ],
+    "date": [
+      "Date"
+    ],
+    "course": [
+      "Course"
+    ],
+    "grade": [
+      "Grade"
+    ],
+    "passed": [
+      "Passed"
+    ]
   },
   "error": {
-    "connectionError" : ["Connection error"],
-    "errorInResponseTo" : ["Error for API call"]
+    "connectionError": [
+      "Connection error"
+    ],
+    "errorInResponseTo": [
+      "Error for API call"
+    ]
   },
   "graphs": {
-    "referenceCredits": ["Reference credits"]
+    "referenceCredits": [
+      "Reference credits"
+    ]
   },
-  "navigationBar" : {
-    "departmentSuccess" : ["Department success"],
-    "populations" : ["Population statistics"],
-    "students" : ["Student statistics"],
-    "courseinstances" : ["Course Instances"],
-    "teachers" : ["Teachers"],
-    "courseStatistics" : ["Course statistics"],
-    "users" : ["Users"],
-    "settings": ["Settings"],
-    "logout": ["Logout"]
+  "navigationBar": {
+    "departmentSuccess": [
+      "Department success"
+    ],
+    "populations": [
+      "Population statistics"
+    ],
+    "students": [
+      "Student statistics"
+    ],
+    "courseinstances": [
+      "Course Instances"
+    ],
+    "teachers": [
+      "Teachers"
+    ],
+    "courseStatistics": [
+      "Course statistics"
+    ],
+    "users": [
+      "Users"
+    ],
+    "settings": [
+      "Settings"
+    ],
+    "logout": [
+      "Logout"
+    ]
   },
   "populationCourses": {
-    "header": ["Courses of Population"],
-    "course": ["Course"],
-    "students": ["Students"],
-    "passed": ["Passed"],
-    "failed": ["Failed"],   
-    "passedAfterRetry": ["after retry"],
-    "failedManyTimes": ["many times"],
-    "attempts": ["Attempts"],
-    "percentageOfPopulation": ["percentage of population"],
-    "name": ["name"],
-    "code": ["code"],
-    "number": ["n"],
-    "limit": ["Limit to courses where student number at least"],
-    "percentage": ["percentage"],
-    "perStudent": ["per student"],
-    "attempted": ["attempted"]
+    "header": [
+      "Courses of Population"
+    ],
+    "course": [
+      "Course"
+    ],
+    "students": [
+      "Students"
+    ],
+    "passed": [
+      "Passed"
+    ],
+    "failed": [
+      "Failed"
+    ],
+    "passedAfterRetry": [
+      "after retry"
+    ],
+    "failedManyTimes": [
+      "many times"
+    ],
+    "attempts": [
+      "Attempts"
+    ],
+    "percentageOfPopulation": [
+      "percentage of population"
+    ],
+    "name": [
+      "name"
+    ],
+    "code": [
+      "code"
+    ],
+    "number": [
+      "n"
+    ],
+    "limit": [
+      "Limit to courses where student number at least"
+    ],
+    "percentage": [
+      "percentage"
+    ],
+    "perStudent": [
+      "per student"
+    ],
+    "attempted": [
+      "attempted"
+    ]
   },
-  "populationStatistics" : {
-    "header": ["Population statistics"],
-    "months": ["Months from beginning"],
-    "graphSegmentHeader" : ["Credit accumulation"],
-    "creditStatisticsHeader" : ["Credit statistics"],
-    "sampleId": ["Id"],
-    "sampleSize" : ["Sample size: ${ amount } students"],
-    "allPopulations" : ["All populations"],
-    "alreadyFetched": ["Selected population already in analysis"],
-    "selectValidYear": ["Select valid year."],
-    "addPopulation": ["See population"],
-    "clearPopulations": ["Remove population"],
-    "searchTitle": ["Search for population"],
-    "foundTitle": ["Population"],
-    "studyRights": ["Study rights"],
-    "enrollmentYear": ["Enrollment year"],
-    "semester" : ["Semester"],
-    "SPRING" : ["Spring"],
-    "FALL" : ["Fall"],
-    "selectStudyRights": ["Select study rights"],
-    "noSelectableStudyRights": ["No selectable study rights"]
+  "populationStatistics": {
+    "header": [
+      "Population statistics"
+    ],
+    "months": [
+      "End of search"
+    ],
+    "graphSegmentHeader": [
+      "Credit accumulation"
+    ],
+    "creditStatisticsHeader": [
+      "Credit statistics"
+    ],
+    "sampleId": [
+      "Id"
+    ],
+    "sampleSize": [
+      "Sample size: ${ amount } students"
+    ],
+    "allPopulations": [
+      "All populations"
+    ],
+    "alreadyFetched": [
+      "Selected population already in analysis"
+    ],
+    "selectValidYear": [
+      "Select valid year."
+    ],
+    "addPopulation": [
+      "See population"
+    ],
+    "clearPopulations": [
+      "Remove population"
+    ],
+    "searchTitle": [
+      "Search for population"
+    ],
+    "foundTitle": [
+      "Population"
+    ],
+    "studyRights": [
+      "Study rights"
+    ],
+    "enrollmentYear": [
+      "Enrollment year"
+    ],
+    "semester": [
+      "Semester"
+    ],
+    "SPRING": [
+      "Spring"
+    ],
+    "FALL": [
+      "Fall"
+    ],
+    "selectStudyRights": [
+      "Select study rights"
+    ],
+    "noSelectableStudyRights": [
+      "No selectable study rights"
+    ]
   },
   "departmentSuccess": {
-    "header": ["Department Success"],
-    "chartTitle": ["Average credit gains after 13 months for BSc students starting"]
+    "header": [
+      "Department Success"
+    ],
+    "chartTitle": [
+      "Average credit gains after 13 months for BSc students starting"
+    ]
   },
   "studentStatistics": {
-    "header" : ["Student statistics"],
-    "searchPlaceholder": ["Search with a student number or name (surename firstname)"],
-    "chartTitle" : ["Credit Accumulation"]
+    "header": [
+      "Student statistics"
+    ],
+    "searchPlaceholder": [
+      "Search with a student number or name (surename firstname)"
+    ],
+    "chartTitle": [
+      "Credit Accumulation"
+    ]
   },
   "courseStatistics": {
-    "header" : ["Student statistics"],
-    "searchPlaceholder": ["Search with a student number or name (surename firstname)"],
-    "chartTitle" : ["Credit Accumulation"]
+    "header": [
+      "Student statistics"
+    ],
+    "searchPlaceholder": [
+      "Search with a student number or name (surename firstname)"
+    ],
+    "chartTitle": [
+      "Credit Accumulation"
+    ]
   },
   "tags": {
-    "addTag": ["Add tag"],
-    "searchAndAdd": ["Search and select a new tag"],
-    "confirmDelete" : ["Are you sure you want to remove tag"]
+    "addTag": [
+      "Add tag"
+    ],
+    "searchAndAdd": [
+      "Search and select a new tag"
+    ],
+    "confirmDelete": [
+      "Are you sure you want to remove tag"
+    ]
   },
   "studyrights": {
-    "studyright": ["Studyright"],
-    "searchPlaceholder": ["Search with a studyright name"]
+    "studyright": [
+      "Studyright"
+    ],
+    "searchPlaceholder": [
+      "Search with a studyright name"
+    ]
   },
   "teacherStatistics": {
-    "header" : ["Teacher statistics"],
-    "searchTitle" : ["Search for teachers"]
+    "header": [
+      "Teacher statistics"
+    ],
+    "searchTitle": [
+      "Search for teachers"
+    ]
   }
 }
