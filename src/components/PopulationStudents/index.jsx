@@ -15,7 +15,7 @@ class PopulationStudents extends Component {
       return null
     }
 
-    const students = this.props.samples[0].reduce((obj, s) => {
+    const students = this.props.samples.reduce((obj, s) => {
       obj[s.studentNumber] = s
       return obj
     }, {})
