@@ -18,8 +18,8 @@ const StudentInfoCard = (props) => {
     props.resetStudent()
     props.removeStudentSelection()
   }
-  const getLatestDegreeStudyRight = student2 => student2.studyrights.filter(studyright => !studyright.highlevelname.toLowerCase().includes('non-degree') || studyright.prioritycode !== 2)
-  const studyright = getLatestDegreeStudyRight(student)
+  const filterDegreeStudyRight = student2 => student2.studyrights.filter(studyright => !studyright.highlevelname.toLowerCase().includes('non-degree') || studyright.prioritycode !== 2)
+  const studyright = filterDegreeStudyRight(student)
   return (
     <Card fluid>
       <Card.Content>
