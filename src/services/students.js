@@ -123,6 +123,9 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
   if (credits === undefined) {
     credits = []
   }
+  if(studyrights) {
+    studyrights = studyrights.map(toStudyright).sort(studyRightByDate)
+  }
   return {
     firstnames,
     lastname,
@@ -131,7 +134,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     credits: creditcount,
     courses: credits.sort(courseByDate).map(toCourse),
     name: abbreviatedname,
-    studyrights: studyrights.map(toStudyright).sort(studyRightByDate),
+    studyrights,
     tags: []
   }
 }
