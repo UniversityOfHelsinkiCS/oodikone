@@ -35,6 +35,10 @@ const StudentInfoCard = (props) => {
           <div className={styles.startDate}>
             {`${translate('common.started')}: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}
           </div>
+          <div className={styles.startDate}>
+            {student.studyrights.slice(-1)[0].highlevelname}
+            {` (${reformatDate(student.studyrights.slice(-1)[0].startdate, DISPLAY_DATE_FORMAT)})`}
+          </div>
         </Card.Meta>
         <Card.Description>
           {`${translate('common.credits')}: ${student.credits || 0}`}
