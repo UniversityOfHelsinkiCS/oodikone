@@ -2,6 +2,13 @@ import { callController } from '../apiConnection'
 
 const getArrayParams = (paramName, entries) => entries.map(entry => `&${paramName}=${entry}`).join('')
 
+const initialState = {
+  pending: false,
+  error: false,
+  data: [],
+  query: undefined
+}
+
 export const getPopulationStatistics = ({
   year, semester, studyRights, months, uuid
 }) => {
@@ -22,33 +29,33 @@ export const removePopulation = uuid => ({
   uuid
 })
 
-const reducer = (state = [], action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'GET_POPULATION_STATISTICS_ATTEMPT':
-      return [...state, {
+      return {
         pending: true,
         error: false,
         data: [],
         query: action.requestSettings.query
-      }]
+      }
     case 'GET_POPULATION_STATISTICS_FAILURE':
-      return [...state.filter(apiCall => !apiCall.pending), {
+      return {
         pending: false,
         error: true,
         data: action.response,
         query: action.query
-      }]
+      }
     case 'GET_POPULATION_STATISTICS_SUCCESS':
-      return [...state.filter(apiCall => !apiCall.pending), {
+      return {
         pending: false,
         error: false,
         data: action.response,
         query: action.query
-      }]
+      }
     case 'REMOVE_POPULATION':
-      return [...state.filter(apiCall => apiCall.query.uuid !== action.uuid)]
+      return initialState
     case 'CLEAR_POPULATIONS':
-      return []
+      return initialState
     default:
       return state
   }
