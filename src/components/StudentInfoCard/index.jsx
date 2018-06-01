@@ -14,12 +14,12 @@ import { removeStudentSelection, resetStudent } from '../../redux/students'
 const StudentInfoCard = (props) => {
   const { student, translate, showName } = props
   const name = showName ? `${student.name}, ` : ''
-
   const onRemove = () => {
     props.resetStudent()
     props.removeStudentSelection()
   }
-
+  const filterDegreeStudyRight = student2 => student2.studyrights.filter(studyright => !studyright.highlevelname.toLowerCase().includes('non-degree') || studyright.prioritycode !== 2)
+  const studyright = filterDegreeStudyRight(student)
   return (
     <Card fluid>
       <Card.Content>
@@ -36,8 +36,8 @@ const StudentInfoCard = (props) => {
             {`${translate('common.started')}: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}
           </div>
           <div className={styles.startDate}>
-            {student.studyrights.slice(-1)[0].highlevelname}
-            {` (${reformatDate(student.studyrights.slice(-1)[0].startdate, DISPLAY_DATE_FORMAT)})`}
+            {studyright.slice(-1)[0].highlevelname}
+            {` (${reformatDate(studyright.slice(-1)[0].startdate, DISPLAY_DATE_FORMAT)})`}
           </div>
         </Card.Meta>
         <Card.Description>
