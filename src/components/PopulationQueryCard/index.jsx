@@ -5,8 +5,7 @@ import { Card, Icon } from 'semantic-ui-react'
 import styles from './populationQueryCard.css'
 
 const PopulationQueryCard = ({ translate, population, query, removeSampleFn, unit }) => {
-  const { uuid, year, semester } = query
-
+  const { uuid, year, semester, months } = query
   return (
     <Card className={styles.cardContainer}>
       <Card.Header className={styles.cardHeader}>
@@ -21,7 +20,7 @@ const PopulationQueryCard = ({ translate, population, query, removeSampleFn, uni
       </Card.Header>
       <Card.Meta>
         <div className={styles.dateItem}>
-          <Icon name="calendar" size="small" /> {`${translate(`populationStatistics.${semester}`)}/${year}`}
+          <Icon name="calendar" size="small" /> {`${translate(`populationStatistics.${semester}`)}/${year}, showing ${months} months.`}
         </div>
         <div>
           {`${translate('populationStatistics.sampleSize', { amount: population.length })} `}
