@@ -105,7 +105,7 @@ const mapStateToProps = (state) => {
   if (state.populationFilters.length > 0) {
     const { filter } = state.populationFilters[0]
     selectedStudents =
-      allSamples.length > 0 ? allSamples[0].filter(filter).map(s => s.studentNumber) : []
+      allSamples.length > 0 ? allSamples.filter(filter).map(s => s.studentNumber) : []
   }
   const credits = allSamples.map(s =>
     s.courses.filter(c => c.passed).reduce((sum, c) => c.credits + sum, 0))
