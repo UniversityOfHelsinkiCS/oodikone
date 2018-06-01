@@ -202,7 +202,7 @@ class PopulationSearchForm extends Component {
         <Form.Field>
           <label>{translate('populationStatistics.months')}</label>
           <Datetime
-            dateFormat="YYYY-MM"
+            dateFormat="YYYY-MMM"
             defaultValue={moment()}
             onChange={value => this.handleMonthsChange(value)}
             isValidDate={current => current.isBefore(moment()) &&

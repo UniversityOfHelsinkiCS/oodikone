@@ -8,7 +8,7 @@ export const getPopulationStatistics = ({
   const route = `/v2/populationstatistics/?year=${year}&semester=${semester}${getArrayParams('studyRights', studyRights)}&months=${months}`
   const prefix = 'GET_POPULATION_STATISTICS_'
   const query = {
-    year, semester, studyRights, uuid
+    year, semester, studyRights, uuid, months
   }
   return callController(route, prefix, null, 'get', query)
 }
