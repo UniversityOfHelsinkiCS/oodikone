@@ -109,8 +109,8 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
       credits
     }
   }
-  const toStudyright = ( { studyrightid, highlevelname, enddate, canceldate, givendate, graduated, startdate, studystartdate, organization_code }) => {
-    return {studyrightid, highlevelname, enddate, canceldate, givendate, graduated, startdate, studystartdate, organization_code}
+  const toStudyright = ( { studyrightid, highlevelname, enddate, canceldate, givendate, graduated, startdate, studystartdate, organization_code, prioritycode }) => {
+    return {studyrightid, highlevelname, enddate, canceldate, givendate, graduated, startdate, studystartdate, organization_code, prioritycode}
   }
 
   const courseByDate = (a, b) => {
