@@ -275,7 +275,7 @@ class PopulationSearchForm extends Component {
 const mapRightsToDropdown = makeMapRightsToDropDown()
 
 const mapStateToProps = ({ populations, units, locale }) => ({
-  queries: populations.map(population => population.query),
+  queries: populations.query ? [populations.query] : [],
   translate: getTranslate(locale),
   studyProgrammes: mapRightsToDropdown(units)
 })
