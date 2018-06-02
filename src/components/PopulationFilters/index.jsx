@@ -2,9 +2,16 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Header, Button } from 'semantic-ui-react'
 import { arrayOf, object } from 'prop-types'
+import _ from 'lodash'
 
 import { getTranslate } from 'react-localize-redux'
 import CreditsLessThan from './CreditsLessThan'
+import CreditsAtLeast from './CreditsAtLeast'
+
+const componentFor = {
+  CreditsAtLeast,
+  CreditsLessThan
+}
 
 class PopulationFilters extends Component {
   static propTypes = {
@@ -15,39 +22,64 @@ class PopulationFilters extends Component {
     visible: false
   }
 
-  render() {
-    if (this.props.populationFilters.length === 0 && !this.state.visible) {
+  renderAddFilters() {
+    const allFilters = Object.keys(componentFor).map(f => String(f))
+    const setFilters = this.props.populationFilters.map(f => f.type)
+    const unsetFilters = _.difference(allFilters, setFilters)
+
+    if (unsetFilters.length === 0) {
+      return null
+    }
+
+    if (!this.state.visible) {
       return (
         <Segment>
-          <Header>Filters</Header>
+          <Header>Add filters</Header>
           <Button onClick={() => this.setState({ visible: true })}>add</Button>
         </Segment>
       )
     }
 
-    if (this.props.populationFilters.length === 0) {
-      return (
-        <Segment>
-          <Header>Filters</Header>
-          <div>
-            <em>
-              Note that filters does not work yet when population is limited by students
-              that have participated a specific course
-            </em>
-          </div>
-          <CreditsLessThan filter={{ notSet: true }} />
-          <Button onClick={() => this.setState({ visible: false })}>cancel</Button>
-        </Segment>
-      )
+    return (
+      <Segment>
+        <Header>Add filters</Header>
+        <div>
+          <em>
+            Note that filters does not work yet when population is limited by students
+            that have participated a specific course
+          </em>
+        </div>
+        {unsetFilters.map((filterName, key) =>
+          React.createElement(componentFor[filterName], { filter: { notSet: true }, key })
+        )}
+        <Button onClick={() => this.setState({ visible: false })}>cancel</Button>
+      </Segment>
+    )
+  }
+
+  renderSetFilters() {
+    const setFilters = this.props.populationFilters.map(f => f.type)
+
+    if (setFilters.length === 0) {
+      return null
     }
-
-    const filter = this.props.populationFilters[0]
-
+    
     return (
       <Segment>
         <Header>Filters</Header>
-        <CreditsLessThan filter={filter} />
+        {this.props.populationFilters.map(filter =>
+          React.createElement(componentFor[filter.type], { filter, key: filter.id })
+        )}
       </Segment>
+    )
+  }
+
+  render() {
+    return (
+      <div>
+        {this.renderAddFilters()}
+        {this.renderSetFilters()}
+      </div>
     )
   }
 }
