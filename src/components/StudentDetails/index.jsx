@@ -57,8 +57,6 @@ class StudentDetails extends Component {
   }
 
   renderStudyRights = () => {
-    if (true) return null // eslint-disable-line
-
     const { translate, student } = this.props
     const studyRightHeaders = ['Starting date', 'Degree', 'Graduated']
     const studyRightRows = student.studyrights.filter(studyright => !studyright.highlevelname.toLowerCase().includes('non-degree')).map((studyright) => {
