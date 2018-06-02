@@ -7,12 +7,14 @@ import _ from 'lodash'
 import { getTranslate } from 'react-localize-redux'
 import CreditsLessThan from './CreditsLessThan'
 import CreditsAtLeast from './CreditsAtLeast'
+import StartingThisSemester from './StartingThisSemester'
 import { clearPopulationFilters } from '../../redux/populationFilters'
 
 
 const componentFor = {
   CreditsAtLeast,
-  CreditsLessThan
+  CreditsLessThan,
+  StartingThisSemester
 }
 
 class PopulationFilters extends Component {
