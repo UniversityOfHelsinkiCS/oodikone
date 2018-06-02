@@ -117,7 +117,14 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     return moment(a.courseinstance.coursedate).isSameOrBefore(b.courseinstance.coursedate) ? -1 : 1
   }
   const studyRightByDate = (a, b) => {
-    return moment(a.startdate).isSameOrBefore(b.startdate) ? -1 : 1
+    let rank = moment(a.enddate).isSameOrBefore(b.enddate) ? -1 : 1
+    if (a.canceldate || b.canceldate) {
+      rank = moment(a.canceldate).isBefore(b.enddate) ? -1 : 1
+    }
+    if (!a.canceldate && !b.canceldate && moment(a.enddate).isSame(b.enddate)) {
+      rank = a.prioritycode !== 1 ? -1 : 1
+    }
+    return rank
   }
 
   if (credits === undefined) {
