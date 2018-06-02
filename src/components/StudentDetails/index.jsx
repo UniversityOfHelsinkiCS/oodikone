@@ -55,6 +55,29 @@ class StudentDetails extends Component {
       />
     )
   }
+  renderStudyRights = () => {
+    const { translate, student } = this.props
+    const studyRightHeaders = ['Starting date', 'Degree', 'Graduated']
+    const studyRightRows = student.studyrights.filter(studyright => !studyright.highlevelname.toLowerCase().includes('non-degree')).map((studyright) => {
+      const {
+        startdate, highlevelname, graduated, enddate, canceldate
+      } = studyright
+      return {
+        startdate, highlevelname, graduated, enddate, canceldate
+      }
+    })
+    return (
+      <SearchResultTable
+        headers={studyRightHeaders}
+        rows={studyRightRows.map(c => ({
+          date: reformatDate(c.startdate, 'DD.MM.YYYY'),
+          highlevelname: c.highlevelname,
+          graduated: `${c.graduated ? 'Yes' : 'No'} (${c.canceldate ? reformatDate(c.canceldate, 'DD.MM.YYYY') : reformatDate(c.enddate, 'DD.MM.YYYY')})`
+        }))}
+        noResultText={translate('common.noResults')}
+      />
+    )
+  }
 
   render() {
     const { translate, student } = this.props
@@ -68,6 +91,7 @@ class StudentDetails extends Component {
           translate={translate}
         />
         {this.renderCreditsGraph()}
+        {this.renderStudyRights()}
         {this.renderCourseParticipation()}
       </Segment>
     )

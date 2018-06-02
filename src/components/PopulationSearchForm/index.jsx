@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, arrayOf, object } from 'prop-types'
+import { func, arrayOf, shape } from 'prop-types'
 import { Form, Button, Message, Radio, Dropdown } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
@@ -27,7 +27,7 @@ class PopulationSearchForm extends Component {
     getPopulationStatistics: func.isRequired,
     getPopulationCourses: func.isRequired,
     clearPopulations: func.isRequired,
-    queries: arrayOf(object).isRequired,
+    queries: shape({}).isRequired,
     studyProgrammes: arrayOf(dropdownType).isRequired,
     setLoading: func.isRequired
   }
@@ -64,11 +64,9 @@ class PopulationSearchForm extends Component {
   validateQuery = () => {
     const { queries } = this.props
     const { query } = this.state
-    return queries.some((q) => {
-      const compare = { ...q }
-      delete compare.uuid
-      return isEqual(compare, query)
-    })
+    const compare = { ...queries }
+    delete compare.uuid
+    return isEqual(compare, query)
   }
 
   clearPopulations = () => this.props.clearPopulations()
@@ -136,23 +134,34 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  handleMonthsChange = (e, { value }) => {
+  handleMonthsChange = (value) => {
     const { query } = this.state
+    const months = this.getMonths(query.year, value, this.state.query.semester)
     this.setState({
       query: {
         ...query,
-        months: value
+        months
       }
     })
   }
+  // (Potential?) issue with using Math.ceil with months.
+  getMonths = (year, end, term) => {
+    const lastDayOfMonth = moment(end).endOf('month')
+    const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
+    return Math.ceil(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
+  }
+
+  getMinSelection = (year, semester) => { // eslint-disable-line
+    return semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`
+  }
+
 
   renderEnrollmentDateSelector = () => {
     const { translate } = this.props
     const { query, validYear } = this.state
-    const { semester, year, months } = query
+    const { semester, year } = query
 
     const semesters = ['FALL', 'SPRING']
-
     return (
       <Form.Group key="year" className={style.enrollmentSelectorGroup}>
         <Form.Field error={!validYear} className={style.yearSelect}>
@@ -190,7 +199,13 @@ class PopulationSearchForm extends Component {
         </Form.Field>
         <Form.Field>
           <label>{translate('populationStatistics.months')}</label>
-          <Form.Input type="number" onChange={this.handleMonthsChange} value={months} />
+          <Datetime
+            dateFormat="YYYY-MMM"
+            defaultValue={moment()}
+            onChange={value => this.handleMonthsChange(value)}
+            isValidDate={current => current.isBefore(moment()) &&
+              current.isAfter(this.getMinSelection(year, semester))}
+          />
         </Form.Field>
       </Form.Group>
     )
@@ -221,13 +236,12 @@ class PopulationSearchForm extends Component {
   }
 
   render() {
-    if (this.props.queries.length > 0) {
+    if (Object.getOwnPropertyNames(this.props.queries).length > 0) {
       return null
     }
 
     const { translate } = this.props
     const { isLoading, validYear, query } = this.state
-
     let errorText = translate('populationStatistics.alreadyFetched')
     let isQueryInvalid = this.validateQuery()
 
@@ -259,7 +273,7 @@ class PopulationSearchForm extends Component {
 const mapRightsToDropdown = makeMapRightsToDropDown()
 
 const mapStateToProps = ({ populations, units, locale }) => ({
-  queries: populations.map(population => population.query),
+  queries: populations.query || {},
   translate: getTranslate(locale),
   studyProgrammes: mapRightsToDropdown(units)
 })

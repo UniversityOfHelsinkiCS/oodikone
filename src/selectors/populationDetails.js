@@ -3,10 +3,10 @@ import { removeInvalidCreditsFromStudents } from '../common'
 
 const getPopulations = state => state.populations
 
-export const flattenAndCleanPopulations = populations =>
-  populations.filter(population => !population.pending)
-    .map(population => population.data)
-    .map(student => removeInvalidCreditsFromStudents(student))
+export const flattenAndCleanPopulations = (populations) => {
+  const { pending, data } = populations
+  return pending ? [] : removeInvalidCreditsFromStudents(data)
+}
 
 export const makePopulationsToData = () => createSelector(
   getPopulations,

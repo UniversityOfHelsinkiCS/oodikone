@@ -180,7 +180,7 @@ class CreditAccumulationGraphHighCharts extends Component {
     students.map((student) => {
       let credits = 0
       const points = student.courses.map((course) => {
-        if (course.grade !== 'Hyl.') {
+        if (!['Luop', 'Hyl.', 'Eisa', '0'].includes(course.grade)) {
           credits += course.credits
         }
         return [new Date(course.date).getTime(), credits]

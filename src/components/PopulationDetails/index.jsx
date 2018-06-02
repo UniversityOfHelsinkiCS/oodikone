@@ -17,7 +17,7 @@ import PopulationCourses from '../PopulationCourses'
 class PopulationDetails extends Component {
   static propTypes = {
     translate: func.isRequired,
-    samples: arrayOf(arrayOf(object)).isRequired,
+    samples: arrayOf(object).isRequired,
     selectedStudents: arrayOf(string).isRequired
   }
 
@@ -28,15 +28,14 @@ class PopulationDetails extends Component {
 
   renderCourseStatistics = () => {
     const { samples, translate } = this.props
-    let statistics = []
+    let statistics = null
     if (samples) {
-      statistics = samples.map((sample, i) => (
+      statistics = (
         <CourseQuarters
-          key={`course-quarters-${i}`} // eslint-disable-line react/no-array-index-key
-          sample={sample.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
+          sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
           translate={translate}
         />
-      ))
+      )
     }
     return (
       <Segment>
@@ -51,17 +50,16 @@ class PopulationDetails extends Component {
 
   renderCreditGainGraphs = () => {
     const { samples, translate } = this.props
-    const graphs = samples.map((sample, i) => (
+    const graphs = (
       <CreditAccumulationGraphHighCharts
-        key={`credit-graph-${i}`} // eslint-disable-line react/no-array-index-key
-        students={sample}
-        title={`${translate('populationStatistics.sampleId')}: ${i}`}
+        students={samples}
+        title={`${translate('populationStatistics.sampleId')}`}
         translate={translate}
-        label={sample.label}
-        maxCredits={sample.maxCredits}
+        label={samples.label}
+        maxCredits={samples.maxCredits}
         selectedStudents={this.props.selectedStudents}
       />
-    ))
+    )
 
     return (
       <Segment>
@@ -98,8 +96,7 @@ const populationsToData = makePopulationsToData()
 
 const mapStateToProps = (state) => {
   const allSamples = populationsToData(state)
-
-  const allStudents = allSamples.length > 0 ? allSamples[0].map(s => s.studentNumber) : []
+  const allStudents = allSamples.length > 0 ? allSamples.map(s => s.studentNumber) : []
 
   let selectedStudents = state.populationLimit
     ? state.populationLimit.course.students[state.populationLimit.field]
@@ -108,17 +105,14 @@ const mapStateToProps = (state) => {
   if (state.populationFilters.length > 0) {
     const { filter } = state.populationFilters[0]
     selectedStudents =
-      allSamples.length > 0 ? allSamples[0].filter(filter).map(s => s.studentNumber) : []
+      allSamples.length > 0 ? allSamples.filter(filter).map(s => s.studentNumber) : []
   }
+  const credits = allSamples.map(s =>
+    s.courses.filter(c => c.passed).reduce((sum, c) => c.credits + sum, 0))
+  allSamples.maxCredits = Math.round(Math.max(...credits) / 10) * 10
 
   return {
-    samples: allSamples.map((sample) => {
-      const credits = sample.map(s =>
-        s.courses.filter(c => c.passed).reduce((sum, c) => c.credits + sum, 0))
-
-      sample.maxCredits = Math.round(Math.max(...credits) / 10) * 10
-      return sample
-    }),
+    samples: allSamples,
     selected: state.populationLimit,
     selectedStudents,
     translate: getTranslate(state.locale)
