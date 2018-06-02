@@ -3,7 +3,7 @@ import uuidv4 from 'uuid/v4'
 export const creditsLessThan = credit =>
   ({
     id: uuidv4(),
-    type: 'creditsLessThan',
+    type: 'CreditsLessThan',
     params: [credit],
     filter: (student) => {
       const creditsOfStudent = student.courses
@@ -14,11 +14,15 @@ export const creditsLessThan = credit =>
   })
 
 
-export const placeHolder = () => () =>
+export const creditsAtLeast = credit =>
   ({
     id: uuidv4(),
-    type: 'placeHolder',
-    params: [],
-    filter: () =>
-      null
+    type: 'CreditsAtLeast',
+    params: [credit],
+    filter: (student) => {
+      const creditsOfStudent = student.courses
+        .filter(c => c.passed)
+        .reduce((s, c) => s + c.credits, 0)
+      return credit <= creditsOfStudent
+    }
   })

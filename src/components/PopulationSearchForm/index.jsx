@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, arrayOf, object } from 'prop-types'
+import { func, arrayOf, shape } from 'prop-types'
 import { Form, Button, Message, Radio, Dropdown } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
@@ -27,7 +27,7 @@ class PopulationSearchForm extends Component {
     getPopulationStatistics: func.isRequired,
     getPopulationCourses: func.isRequired,
     clearPopulations: func.isRequired,
-    queries: arrayOf(object).isRequired,
+    queries: shape({}).isRequired,
     studyProgrammes: arrayOf(dropdownType).isRequired,
     setLoading: func.isRequired
   }
@@ -56,7 +56,7 @@ class PopulationSearchForm extends Component {
     }
   }
 
-  months(year, term) {    // eslint-disable-line
+  months(year, term) { // eslint-disable-line
     const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
     return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
   }
@@ -64,11 +64,9 @@ class PopulationSearchForm extends Component {
   validateQuery = () => {
     const { queries } = this.props
     const { query } = this.state
-    return queries.some((q) => {
-      const compare = { ...q }
-      delete compare.uuid
-      return isEqual(compare, query)
-    })
+    const compare = { ...queries }
+    delete compare.uuid
+    return isEqual(compare, query)
   }
 
   clearPopulations = () => this.props.clearPopulations()
@@ -238,7 +236,7 @@ class PopulationSearchForm extends Component {
   }
 
   render() {
-    if (this.props.queries.length > 0) {
+    if (Object.getOwnPropertyNames(this.props.queries).length > 0) {
       return null
     }
 
@@ -275,7 +273,7 @@ class PopulationSearchForm extends Component {
 const mapRightsToDropdown = makeMapRightsToDropDown()
 
 const mapStateToProps = ({ populations, units, locale }) => ({
-  queries: populations.map(population => population.query),
+  queries: populations.query || {},
   translate: getTranslate(locale),
   studyProgrammes: mapRightsToDropdown(units)
 })

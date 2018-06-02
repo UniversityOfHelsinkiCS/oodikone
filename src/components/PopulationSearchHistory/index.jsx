@@ -15,12 +15,12 @@ class PopulationSearchHistory extends Component {
   static propTypes = {
     translate: func.isRequired,
     removePopulation: func.isRequired,
-    populations: arrayOf(shape({
+    populations: shape({
       pending: bool,
       error: bool,
       data: arrayOf(object),
       query: object
-    })).isRequired,
+    }).isRequired,
     units: object // eslint-disable-line
   }
 
@@ -28,18 +28,15 @@ class PopulationSearchHistory extends Component {
 
   renderQueryCards = () => {
     const { populations, translate, units } = this.props
-    return populations.map((population, i) => (
-      population.query ?
-        <PopulationQueryCard
-          key={`population-${population.query.uuid}`}
-          translate={translate}
-          population={population.data}
-          query={population.query}
-          queryId={i}
-          unit={units.data.find(u => u.id === population.query.studyRights[0])}
-          removeSampleFn={this.removePopulation}
-        /> : null
-    ))
+    return populations.query ? (<PopulationQueryCard
+      key={`population-${populations.query.uuid}`}
+      translate={translate}
+      population={populations.data}
+      query={populations.query}
+      queryId={0}
+      unit={units.data.find(u => u.id === populations.query.studyRights[0])}
+      removeSampleFn={this.removePopulation}
+    />) : null
   }
 
   render() {
