@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Header, Button } from 'semantic-ui-react'
-import { arrayOf, object } from 'prop-types'
+import { arrayOf, object, func } from 'prop-types'
 import _ from 'lodash'
 
 import { getTranslate } from 'react-localize-redux'
 import CreditsLessThan from './CreditsLessThan'
 import CreditsAtLeast from './CreditsAtLeast'
+import { clearPopulationFilters } from '../../redux/populationFilters'
+
 
 const componentFor = {
   CreditsAtLeast,
@@ -15,7 +17,8 @@ const componentFor = {
 
 class PopulationFilters extends Component {
   static propTypes = {
-    populationFilters: arrayOf(object).isRequired
+    populationFilters: arrayOf(object).isRequired,
+    clearPopulationFilters: func.isRequired
   }
 
   state = {
@@ -49,9 +52,10 @@ class PopulationFilters extends Component {
             that have participated a specific course
           </em>
         </div>
-        {unsetFilters.map((filterName, key) =>
-          React.createElement(componentFor[filterName], { filter: { notSet: true }, key })
-        )}
+        {unsetFilters.map(filterName =>
+          React.createElement(componentFor[filterName], {
+            filter: { notSet: true }, key: filterName
+          }))}
         <Button onClick={() => this.setState({ visible: false })}>cancel</Button>
       </Segment>
     )
@@ -63,13 +67,13 @@ class PopulationFilters extends Component {
     if (setFilters.length === 0) {
       return null
     }
-    
+
     return (
       <Segment>
         <Header>Filters</Header>
         {this.props.populationFilters.map(filter =>
-          React.createElement(componentFor[filter.type], { filter, key: filter.id })
-        )}
+          React.createElement(componentFor[filter.type], { filter, key: filter.id }))}
+        <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
       </Segment>
     )
   }
@@ -90,4 +94,4 @@ const mapStateToProps = ({ populationFilters, locale, graphSpinner }) => ({
   loading: graphSpinner
 })
 
-export default connect(mapStateToProps)(PopulationFilters)
+export default connect(mapStateToProps, { clearPopulationFilters })(PopulationFilters)

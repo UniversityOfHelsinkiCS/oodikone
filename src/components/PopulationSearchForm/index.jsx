@@ -38,7 +38,7 @@ class PopulationSearchForm extends Component {
     const INITIAL_QUERY = {
       year: '2017',
       semester: 'FALL',
-      studyRights: ['26'],
+      studyRights: [],
       months: this.months('2017', 'FALL')
     }
 
@@ -56,7 +56,7 @@ class PopulationSearchForm extends Component {
     }
   }
 
-  months(year, term) {    // eslint-disable-line
+  months(year, term) { // eslint-disable-line
     const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
     return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
   }
