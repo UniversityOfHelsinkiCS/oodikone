@@ -18,8 +18,21 @@ const StudentInfoCard = (props) => {
     props.resetStudent()
     props.removeStudentSelection()
   }
-  const filterDegreeStudyRight = student2 => student2.studyrights.filter(studyright => !studyright.highlevelname.toLowerCase().includes('non-degree'))
-  const studyright = filterDegreeStudyRight(student)
+
+  const renderStudyright = () => {
+    if (true) return null // eslint-disable-line
+
+    const filterDegreeStudyRight = student2 => student2.studyrights.filter(studyright => !studyright.highlevelname.toLowerCase().includes('non-degree'))
+
+    const studyright = filterDegreeStudyRight(student)
+    return (
+      <div className={styles.startDate}>
+        {studyright.slice(-1)[0].highlevelname}
+        {` (${reformatDate(studyright.slice(-1)[0].startdate, DISPLAY_DATE_FORMAT)})`}
+      </div>
+    )
+  }
+
   return (
     <Card fluid>
       <Card.Content>
@@ -35,10 +48,7 @@ const StudentInfoCard = (props) => {
           <div className={styles.startDate}>
             {`${translate('common.started')}: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}
           </div>
-          <div className={styles.startDate}>
-            {studyright.slice(-1)[0].highlevelname}
-            {` (${reformatDate(studyright.slice(-1)[0].startdate, DISPLAY_DATE_FORMAT)})`}
-          </div>
+          {renderStudyright()}
         </Card.Meta>
         <Card.Description>
           {`${translate('common.credits')}: ${student.credits || 0}`}
