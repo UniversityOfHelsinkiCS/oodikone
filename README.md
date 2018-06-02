@@ -9,13 +9,14 @@ Trunk:
 
 ### Getting started
 
-Install docker & docker-compose to run postgres and redis:
+To install docker & docker-compose to run postgres and redis follow these steps:
 
 Install docker CE: https://docs.docker.com/engine/installation/ 
 
 Install docker-compose: https://docs.docker.com/compose/install/
 
 Create docker-compose.yml file containing following:
+
 ```
 version: '3'
 
@@ -29,9 +30,13 @@ services:
     container_name: oodi_db
   redis:
     image: redis
+    command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "6379:6379"
+    volumes:
+      - ./redis-data:/data
     container_name: redis
+
 ```
 
 To start a redis and a database, run:

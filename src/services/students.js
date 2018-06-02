@@ -1,9 +1,10 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { getDate } = require('./database_updater/oodi_data_mapper')
-const { Student, Credit, CourseInstance, Course } = require('../models')
+const { Student, Credit, CourseInstance, Course, Studyright } = require('../models')
 const Op = Sequelize.Op
 const { oldToNew } = require('../util/index')
+
 
 const createStudent = (array) => Student.create({
   studentnumber: array[0],
@@ -62,6 +63,9 @@ const byId = async (id) => Student.findOne({
           include: [Course]
         }
       ]
+    },
+    {
+      model:Studyright
     }
   ],
   where: {
@@ -92,7 +96,7 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
-const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, credits, abbreviatedname }) => {
+const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, credits, abbreviatedname, studyrights }) => {
   const toCourse = ({ grade, credits, courseinstance }) => {
     return {
       course: {
@@ -105,23 +109,32 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
       credits
     }
   }
+  const toStudyright = ( { studyrightid, highlevelname, enddate, canceldate, givendate, graduated, startdate, studystartdate, organization_code, prioritycode }) => {
+    return {studyrightid, highlevelname, enddate, canceldate, givendate, graduated, startdate, studystartdate, organization_code, prioritycode}
+  }
 
-  const byDate = (a, b) => {
+  const courseByDate = (a, b) => {
     return moment(a.courseinstance.coursedate).isSameOrBefore(b.courseinstance.coursedate) ? -1 : 1
+  }
+  const studyRightByDate = (a, b) => {
+    return moment(a.startdate).isSameOrBefore(b.startdate) ? -1 : 1
   }
 
   if (credits === undefined) {
     credits = []
   }
-  
+  if(studyrights) {
+    studyrights = studyrights.map(toStudyright).sort(studyRightByDate)
+  }
   return {
     firstnames,
     lastname,
     studentNumber: studentnumber,
     started: dateofuniversityenrollment,
     credits: creditcount,
-    courses: credits.sort(byDate).map(toCourse),
+    courses: credits.sort(courseByDate).map(toCourse),
     name: abbreviatedname,
+    studyrights,
     tags: []
   }
 }

@@ -26,7 +26,29 @@ const studyRightLike = (searchTerm) => {
     })
 }
 
-const studentsWithCourses = (student_numbers, conf) => {
+// TODO refactor below two to one 
+const studentsWithAllCourses = (student_numbers) => {
+  return Student.findAll({
+    include: [
+      {
+        model: Credit,
+        include: [
+          {
+            model: CourseInstance,
+            include: [Course]
+          }
+        ],
+      },
+    ],
+    where: {
+      studentnumber: {
+        [Op.in]: student_numbers
+      }
+    },
+  })
+}
+
+const studentsWithCoursesAfterStudyrightStart = (student_numbers, conf) => {
   return Student.findAll({
     include: [
       {
@@ -49,155 +71,10 @@ const studentsWithCourses = (student_numbers, conf) => {
         [Op.in]: student_numbers
       }
     },
-    //logging: console.log
   })
 }
 
-// TODO: remove
-const byCriteria = (conf) => {
-  const terms = []
-
-  if (conf.minBirthDate || conf.maxBirthDate) {
-    const minBirthDate = conf.minBirthDate || '1900-01-01'
-    const maxBirthDate = conf.maxBirthDate || `${new Date().getFullYear()}-01-01`
-    terms.push({
-      birthdate: {
-        [Op.between]: [minBirthDate, maxBirthDate]
-      }
-    })
-  }
-
-  if (conf.sex && ['male', 'female'].includes(conf.sex)) {
-    terms.push({
-      sex: {
-        [Op.eq]: conf.sex
-      }
-    })
-  }
-
-  if (conf.matriculationExamination && ['true', 'false'].includes(conf.matriculationExamination)) {
-    terms.push({
-      matriculationexamination: {
-        [Op.eq]: conf.matriculationExamination === 'true' ? '1' : '0'
-      }
-    })
-  }
-
-  if (conf.studentNumbers && conf.studentNumbers.length > 0) {
-    terms.push({
-      studentnumber: {
-        [Op.in]: conf.studentNumbers
-      }
-    })
-  }
-
-  let tagWithConstraint = {
-    model: TagStudent
-  }
-
-  if (conf.tags && conf.tags.length > 0) {
-    const tagRules = conf.tags.map(tag => ({ [Op.eq]: tag['text'] }))
-
-    tagWithConstraint.where = {
-      tags_tagname: {
-        [Op.or]: tagRules
-      }
-    }
-  }
-
-  let studyrightWithConstraint = {
-    model: Studyright
-  }
-  if (conf.studyRights && conf.studyRights.length > 0) {
-    const studyrightRules = conf.studyRights.map(sr => ({ [Op.eq]: sr.name }))
-    studyrightWithConstraint.where = {
-      highlevelname: {
-        [Op.or]: studyrightRules
-      },
-      prioritycode: {
-        [Op.or]: [1, 30]
-      },
-      studystartdate: {
-        [Op.between]: [conf.enrollmentDates[0], conf.enrollmentDates[1]]
-      }
-    }
-  }
-
-  return Student.findAll({
-    include: [
-      {
-        model: Credit,
-        include: [
-          {
-            model: CourseInstance,
-            include: [Course],
-            where: { // Only course instances that are from between the dates selected
-              coursedate: {
-                [Op.gte]: conf.enrollmentDates[0]
-              }
-            }
-          }
-        ],
-      },
-      tagWithConstraint,
-      studyrightWithConstraint
-    ],
-    where: {
-      [Op.and]: terms
-    }, 
-    //logging: console.log
-  }, )
-
-}
-
-const bySelectedCourses = (courses) => (student) => {
-  if (courses.length === 0) {
-    return true
-  } else {
-    const passedCourses = student.credits.filter(Credit.passed).map(c => c.courseinstance.course_code)
-    return courses.every(c => passedCourses.includes(c))
-  }
-}
-
-const notAmongExcludes = (conf) => (student) => {
-  if (conf.excludeStudentsThatHaveNotStartedStudies &&
-    student.credits.length === 0) {
-    return false
-  }
-
-  if (conf.excludeStudentsWithZeroCredits &&
-    student.creditcount === 0) {  // if (conf.enrollmentDates && conf.enrollmentDates.length > 0) {
-    return false
-  }
-
-  if (conf.excludeStudentsWithPreviousStudies &&
-    Student.hasNoPreviousStudies(student.dateofuniversityenrollment)(student)) {
-    return false
-  }
-
-  if (conf.excludedTags && conf.excludedTags.length > 0) {
-    const noExcludedTags = student.tag_students.every(tag =>
-      conf.excludedTags.includes(tag.tags_tagname) === false
-    )
-    if (!noExcludedTags) {
-      return false
-    }
-  }
-
-  if (conf.excludedStudentNumbers &&
-    conf.excludedStudentNumbers.includes(student.studentnumber)) {
-    return false
-  }
-
-  return true
-}
-
-const restrictToMonths = (startDate, months) => (student) => {
-  if (months === undefined || months === null || months.length === 0) {
-    return student
-  }
-
-  const withinTimerange = Credit.inTimeRange(startDate, months)
+const restrictWith = (withinTimerange) => (student) => {
   const creditsWithinTimelimit = student.credits.filter(withinTimerange)
 
   return {
@@ -244,12 +121,12 @@ const optimizedStatisticsOf = async (query) => {
 
   const withStudyrighStart = (student) => {
     student.studyrightStart = startDate
-
     return student
   }
 
   try {
     const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
+
     const conf = {
       enrollmentDates: {
         startDate, 
@@ -260,8 +137,8 @@ const optimizedStatisticsOf = async (query) => {
 
     const student_numbers = await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
     
-    const students = await studentsWithCourses(student_numbers, conf)
-      .map(restrictToMonths(conf.enrollmentDates.startDate, query.months)) 
+    const students = await studentsWithCoursesAfterStudyrightStart(student_numbers, conf)
+      .map(restrictWith(Credit.inTimeRange(conf.enrollmentDates.startDate, query.months)))
 
     return students
       .map(formatStudent)
@@ -280,6 +157,7 @@ const bottlenecksOf = async (query) => {
 
   const startDate = `${query.year}-${semesterStart[query.semester]}`
   const endDate = `${query.year}-${semesterEnd[query.semester]}`
+
   try {
     const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
     const conf = {
@@ -289,11 +167,11 @@ const bottlenecksOf = async (query) => {
       },
       studyRights
     }
+    const student_numbers = await StudyRights
+      .ofPopulations(conf).map(s => s.student_studentnumber)
 
-    const student_numbers = await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
-
-    const students = await studentsWithCourses(student_numbers, conf)
-      .map(restrictToMonths(conf.enrollmentDates.startDate, query.months))
+    const students = await studentsWithAllCourses(student_numbers)
+      .map(restrictWith(Credit.notLaterThan(conf.enrollmentDates.startDate, query.months)))
 
     const populationSize = students.length
 
@@ -313,9 +191,10 @@ const bottlenecksOf = async (query) => {
     const courses = _.flatten(students.map(toCourses))
 
     const toNameMap = (object, { course }) => {
-      if (object[course.code] === undefined) {
+      if (!object[course.code] || (object[course.code].startsWith('Avoin yo') && !course.name.startsWith('Avoin yo')) ) {
         object[course.code] = course.name
-      }
+      } 
+
       return object
     }
 

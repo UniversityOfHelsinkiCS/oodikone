@@ -23,3 +23,6 @@ before_script:
 
 env:
   - TEST_DB=postgres://postgres@localhost/ooditest TOKEN_SECRET=salainen_token
+
+services:
+  - redis-server
