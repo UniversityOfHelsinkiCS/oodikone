@@ -3,10 +3,10 @@ import { connect } from 'react-redux'
 import { Segment, Icon, Input, Button, Form } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
 
-import { creditsLessThan } from '../../populationFilters'
+import { creditsAtLeast } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
-class CreditsLessThan extends Component {
+class CreditsAtLeast extends Component {
   static propTypes = {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
@@ -22,7 +22,7 @@ class CreditsLessThan extends Component {
   }
 
   handleLimit = () => {
-    this.props.setPopulationFilter(creditsLessThan(this.state.limit))
+    this.props.setPopulationFilter(creditsAtLeast(this.state.limit))
     this.setState({ limit: '' })
   }
 
@@ -39,7 +39,7 @@ class CreditsLessThan extends Component {
           <Form>
             <Form.Group inline>
               <Form.Field>
-                <label>Show only students with credits less than</label>
+                <label>Show only students with credits at least</label>
               </Form.Field>
               <Form.Field>
                 <Input
@@ -64,7 +64,7 @@ class CreditsLessThan extends Component {
 
     return (
       <Segment>
-        Credits less than {filter.params[0]}
+        Credits at least {filter.params[0]}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
@@ -76,4 +76,4 @@ class CreditsLessThan extends Component {
 export default connect(
   null,
   { setPopulationFilter, removePopulationFilter }
-)(CreditsLessThan)
+)(CreditsAtLeast)

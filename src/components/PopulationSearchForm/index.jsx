@@ -38,7 +38,7 @@ class PopulationSearchForm extends Component {
     const INITIAL_QUERY = {
       year: '2017',
       semester: 'FALL',
-      studyRights: [],
+      studyRights: ['26'],
       months: this.months('2017', 'FALL')
     }
 
