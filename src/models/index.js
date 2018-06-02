@@ -112,6 +112,13 @@ Credit.inTimeRange = (date, months) => (credit) => {
   return moment(creditDate).isBetween(date, monthsFromDate, null, '[]')
 }
 
+Credit.notLaterThan = (date, months) => (credit) => {
+  const creditDate = credit.courseinstance.coursedate
+  const monthsFromDate = moment(date).add(months, 'months')
+
+  return moment(creditDate).isSameOrBefore(monthsFromDate, null, '[]')
+}
+
 Credit.notUnnecessary = (credit) => {
   return credit.credits > 0 && credit.credits <= 12
 }
