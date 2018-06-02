@@ -20,8 +20,6 @@ const StudentInfoCard = (props) => {
   }
 
   const renderStudyright = () => {
-    if (true) return null // eslint-disable-line
-
     const filterDegreeStudyRight = student2 => student2.studyrights.filter(studyright => !studyright.highlevelname.toLowerCase().includes('non-degree'))
 
     const studyright = filterDegreeStudyRight(student)
