@@ -26,3 +26,13 @@ export const creditsAtLeast = credit =>
       return credit <= creditsOfStudent
     }
   })
+
+export const startingThisSemester = starting =>
+  ({
+    id: uuidv4(),
+    type: 'StartingThisSemester',
+    params: [starting],
+    filter: student =>
+      student.starting === starting
+  })
+
