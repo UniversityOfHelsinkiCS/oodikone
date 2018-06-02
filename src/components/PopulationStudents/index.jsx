@@ -15,7 +15,7 @@ class PopulationStudents extends Component {
       return null
     }
 
-    const students = this.props.samples[0].reduce((obj, s) => {
+    const students = this.props.samples.reduce((obj, s) => {
       obj[s.studentNumber] = s
       return obj
     }, {})
@@ -107,7 +107,7 @@ class PopulationStudents extends Component {
 }
 
 PopulationStudents.propTypes = {
-  samples: arrayOf(arrayOf(object)).isRequired,
+  samples: arrayOf(object).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   toggleStudentListVisibility: func.isRequired,
   showNames: bool.isRequired,

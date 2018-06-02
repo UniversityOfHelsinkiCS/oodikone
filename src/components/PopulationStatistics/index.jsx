@@ -54,7 +54,7 @@ const mapStateToProps = ({ locale, populations }) => ({
   translate: getTranslate(locale),
   currentLanguage: getActiveLanguage(locale).value,
   populationFound: populations.length > 0,
-  loading: populations.length > 0 && populations[0].pending
+  loading: populations.pending
 })
 
 export default connect(mapStateToProps)(PopulationStatistics)

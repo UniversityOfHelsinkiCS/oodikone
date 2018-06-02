@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { func, object, string, arrayOf } from 'prop-types'
 import { Segment, Header } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
+import _ from 'lodash'
 
 import { makePopulationsToData } from '../../selectors/populationDetails'
 import { setPopulationLimitField, clearPopulationLimit } from '../../redux/populationLimit'
@@ -17,7 +18,7 @@ import PopulationCourses from '../PopulationCourses'
 class PopulationDetails extends Component {
   static propTypes = {
     translate: func.isRequired,
-    samples: arrayOf(arrayOf(object)).isRequired,
+    samples: arrayOf(object).isRequired,
     selectedStudents: arrayOf(string).isRequired
   }
 
@@ -28,15 +29,14 @@ class PopulationDetails extends Component {
 
   renderCourseStatistics = () => {
     const { samples, translate } = this.props
-    let statistics = []
+    let statistics = null
     if (samples) {
-      statistics = samples.map((sample, i) => (
+      statistics = (
         <CourseQuarters
-          key={`course-quarters-${i}`} // eslint-disable-line react/no-array-index-key
-          sample={sample.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
+          sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
           translate={translate}
         />
-      ))
+      )
     }
     return (
       <Segment>
@@ -51,17 +51,16 @@ class PopulationDetails extends Component {
 
   renderCreditGainGraphs = () => {
     const { samples, translate } = this.props
-    const graphs = samples.map((sample, i) => (
+    const graphs = (
       <CreditAccumulationGraphHighCharts
-        key={`credit-graph-${i}`} // eslint-disable-line react/no-array-index-key
-        students={sample}
-        title={`${translate('populationStatistics.sampleId')}: ${i}`}
+        students={samples}
+        title={`${translate('populationStatistics.sampleId')}`}
         translate={translate}
-        label={sample.label}
-        maxCredits={sample.maxCredits}
+        label={samples.label}
+        maxCredits={samples.maxCredits}
         selectedStudents={this.props.selectedStudents}
       />
-    ))
+    )
 
     return (
       <Segment>
@@ -97,28 +96,28 @@ class PopulationDetails extends Component {
 const populationsToData = makePopulationsToData()
 
 const mapStateToProps = (state) => {
-  const allSamples = populationsToData(state)
-
-  const allStudents = allSamples.length > 0 ? allSamples[0].map(s => s.studentNumber) : []
+  const samples = populationsToData(state)
+  const allStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
 
   let selectedStudents = state.populationLimit
     ? state.populationLimit.course.students[state.populationLimit.field]
     : allStudents
 
-  if (state.populationFilters.length > 0) {
-    const { filter } = state.populationFilters[0]
-    selectedStudents =
-      allSamples.length > 0 ? allSamples[0].filter(filter).map(s => s.studentNumber) : []
+  // TODO refactor to more functional approach where the whole sample is not tested for each filter
+  if (samples.length > 0 && state.populationFilters.length > 0) {
+    const matchingStudents = state.populationFilters
+      .map(f => samples.filter(f.filter).map(s => s.studentNumber))
+
+    selectedStudents = _.intersection(...matchingStudents)
   }
 
-  return {
-    samples: allSamples.map((sample) => {
-      const credits = sample.map(s =>
-        s.courses.filter(c => c.passed).reduce((sum, c) => c.credits + sum, 0))
+  const credits = samples.map(s =>
+    s.courses.filter(c => c.passed).reduce((sum, c) => c.credits + sum, 0))
 
-      sample.maxCredits = Math.round(Math.max(...credits) / 10) * 10
-      return sample
-    }),
+  samples.maxCredits = Math.round(Math.max(...credits) / 10) * 10
+
+  return {
+    samples,
     selected: state.populationLimit,
     selectedStudents,
     translate: getTranslate(state.locale)
