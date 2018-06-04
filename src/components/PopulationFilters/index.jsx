@@ -8,13 +8,17 @@ import { getTranslate } from 'react-localize-redux'
 import CreditsLessThan from './CreditsLessThan'
 import CreditsAtLeast from './CreditsAtLeast'
 import StartingThisSemester from './StartingThisSemester'
+import SexFilter from './SexFilter'
+import HasMatriculation from './HasMatriculation'
 import { clearPopulationFilters } from '../../redux/populationFilters'
 
 
 const componentFor = {
   CreditsAtLeast,
   CreditsLessThan,
-  StartingThisSemester
+  StartingThisSemester,
+  SexFilter,
+  HasMatriculation
 }
 
 class PopulationFilters extends Component {
