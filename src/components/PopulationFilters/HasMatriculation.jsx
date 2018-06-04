@@ -40,16 +40,15 @@ class MatriculationFilter extends Component {
                 <label>Filter by matriculation examination</label>
               </Form.Field>
               <Form.Field>
-                <Radio name="sex" onChange={this.handleChange} value label="Yes" checked={this.state.matr === true} />
-                <Radio name="sex" onChange={this.handleChange} value={false} label="No" checked={this.state.matr === false} />
+                <Radio name="matr" onChange={this.handleChange} value label="Yes" checked={this.state.matr === true} />
+                <Radio name="matr" onChange={this.handleChange} value={false} label="No" checked={this.state.matr === false} />
               </Form.Field>
               <Form.Field>
                 <Button
-                  color="red"
                   onClick={this.handleMatr}
-                  disabled
+                  disabled={this.state.matr === undefined}
                 >
-                    Disabled!
+                    set filter
                 </Button>
               </Form.Field>
             </Form.Group>
