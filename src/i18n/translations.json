@@ -189,6 +189,9 @@
     ],
     "noSelectableStudyRights": [
       "No selectable study rights"
+    ],
+    "emptyQueryResult": [
+      "No statistics found for the given query. "
     ]
   },
   "departmentSuccess": {
