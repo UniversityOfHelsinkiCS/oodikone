@@ -89,7 +89,7 @@ const restrictWith = (withinTimerange) => (student) => {
     creditcount: student.creditcount,
     credits: creditsWithinTimelimit,
     sex: student.sex,
-    matriculationexamination: student.matriculationexamination
+    matriculationexamination: !!Number(student.matriculationexamination)
   }
 }
 
