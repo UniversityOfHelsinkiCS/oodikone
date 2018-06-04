@@ -87,7 +87,9 @@ const restrictWith = (withinTimerange) => (student) => {
     tag_students: student.tag_students,
     dateofuniversityenrollment: student.dateofuniversityenrollment,
     creditcount: student.creditcount,
-    credits: creditsWithinTimelimit
+    credits: creditsWithinTimelimit,
+    sex: student.sex,
+    matriculationexamination: student.matriculationexamination
   }
 }
 
