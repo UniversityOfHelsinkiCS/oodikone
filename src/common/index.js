@@ -84,7 +84,8 @@ export const removeInvalidCreditsFromStudent = student => ({
 export const removeInvalidCreditsFromStudents = students =>
   students.map(student => removeInvalidCreditsFromStudent(student))
 
-export const getStudentTotalCredits = student => student.courses.reduce((a, b) => a + b.credits, 0)
+export const getStudentTotalCredits = student => student.courses.filter(c => c.passed)
+  .reduce((a, b) => a + b.credits, 0)
 
 export const log = async (msg, meta) => {
   const token = await getToken()
