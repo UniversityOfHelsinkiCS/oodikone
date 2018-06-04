@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, object, string, arrayOf } from 'prop-types'
-import { Segment, Header } from 'semantic-ui-react'
+import { func, object, string, arrayOf, bool } from 'prop-types'
+import { Segment, Header, Message } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
 
@@ -19,12 +19,9 @@ class PopulationDetails extends Component {
   static propTypes = {
     translate: func.isRequired,
     samples: arrayOf(object).isRequired,
-    selectedStudents: arrayOf(string).isRequired
-  }
-
-  isSamplesRenderable = () => {
-    const { samples } = this.props
-    return samples && samples.length > 0
+    selectedStudents: arrayOf(string).isRequired,
+    queryIsSet: bool.isRequired,
+    isLoading: bool.isRequired
   }
 
   renderCourseStatistics = () => {
@@ -74,10 +71,15 @@ class PopulationDetails extends Component {
   }
 
   render() {
-    if (!this.isSamplesRenderable()) {
+    const { samples, translate, queryIsSet, isLoading } = this.props
+    if (isLoading || !queryIsSet) {
       return null
     }
-
+    if (samples.length === 0) {
+      return (
+        <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
+      )
+    }
     return (
       <div>
         <PopulationFilters />
@@ -111,16 +113,19 @@ const mapStateToProps = (state) => {
     selectedStudents = _.intersection(...matchingStudents)
   }
 
-  const credits = samples.map(s =>
-    s.courses.filter(c => c.passed).reduce((sum, c) => c.credits + sum, 0))
-
-  samples.maxCredits = Math.round(Math.max(...credits) / 10) * 10
+  if (samples.length > 0) {
+    const credits = samples.map(s =>
+      s.courses.filter(c => c.passed).reduce((sum, c) => c.credits + sum, 0))
+    samples.maxCredits = Math.round(Math.max(...credits) / 10) * 10
+  }
 
   return {
     samples,
     selected: state.populationLimit,
     selectedStudents,
-    translate: getTranslate(state.locale)
+    translate: getTranslate(state.locale),
+    queryIsSet: !!state.populations.query,
+    isLoading: state.populations.pending === true
   }
 }
 

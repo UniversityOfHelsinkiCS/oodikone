@@ -13,6 +13,22 @@ export const creditsLessThan = credit =>
     }
   })
 
+export const sexFilter = sex =>
+  ({
+    id: uuidv4(),
+    type: 'SexFilter',
+    params: [sex],
+    filter: student => student.sex === sex
+  })
+
+export const matriculationFilter = matriculationexamination =>
+  ({
+    id: uuidv4(),
+    type: 'HasMatriculation',
+    params: [matriculationexamination],
+    filter: student => student.matriculationexamination === matriculationexamination
+  })
+
 
 export const creditsAtLeast = credit =>
   ({

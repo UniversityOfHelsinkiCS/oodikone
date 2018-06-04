@@ -200,7 +200,7 @@ class PopulationSearchForm extends Component {
         <Form.Field>
           <label>{translate('populationStatistics.months')}</label>
           <Datetime
-            dateFormat="YYYY-MMM"
+            dateFormat="MMMM YYYY"
             defaultValue={moment()}
             onChange={value => this.handleMonthsChange(value)}
             isValidDate={current => current.isBefore(moment()) &&
@@ -235,8 +235,13 @@ class PopulationSearchForm extends Component {
     )
   }
 
+  shouldRenderSearchForm = () => {
+    const queryIsEmpty = Object.getOwnPropertyNames(this.props.queries).length > 0
+    return !queryIsEmpty
+  }
+
   render() {
-    if (Object.getOwnPropertyNames(this.props.queries).length > 0) {
+    if (!this.shouldRenderSearchForm()) {
       return null
     }
 
