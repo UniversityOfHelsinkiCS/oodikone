@@ -62,6 +62,9 @@ class StudentSearch extends Component {
   }
 
   fetchStudentList = (searchStr) => {
+    if (this.state.searchStr.length < 3) {
+      return
+    }
     this.props.setTimeout('fetch', () => {
       this.setState({ isLoading: true })
     }, 250)
