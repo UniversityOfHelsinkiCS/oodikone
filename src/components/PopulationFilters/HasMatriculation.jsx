@@ -14,7 +14,7 @@ class MatriculationFilter extends Component {
   }
 
   state = {
-    matr: ''
+    matr: undefined
   }
 
   handleChange = (e, { value }) => {
@@ -23,11 +23,12 @@ class MatriculationFilter extends Component {
 
   handleMatr = () => {
     this.props.setPopulationFilter(matriculationFilter(this.state.matr))
-    this.setState({ matr: '' })
   }
 
   clearFilter = () => {
     this.props.clearPopulationFilters()
+    this.setState({ matr: '' })
+
   }
 
   render() {
@@ -41,13 +42,13 @@ class MatriculationFilter extends Component {
                 <label>Filter by matriculation examination</label>
               </Form.Field>
               <Form.Field>
-                <Radio name="sex" onChange={this.handleChange} value="1" label="Yes" checked={this.state.matr === '1'} />
-                <Radio name="sex" onChange={this.handleChange} value="0" label="No" checked={this.state.matr === '0'} />
+                <Radio name="sex" onChange={this.handleChange} value label="Yes" checked={this.state.matr === true} />
+                <Radio name="sex" onChange={this.handleChange} value={false} label="No" checked={this.state.matr === false} />
               </Form.Field>
               <Form.Field>
                 <Button
                   onClick={this.handleMatr}
-                  disabled={this.state.matr === ''}
+                  disabled={this.state.matr === undefined}
                 >
                     set filter
                 </Button>
