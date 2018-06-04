@@ -45,10 +45,11 @@ class MatriculationFilter extends Component {
               </Form.Field>
               <Form.Field>
                 <Button
+                  color="red"
                   onClick={this.handleMatr}
-                  disabled={this.state.matr === undefined}
+                  disabled
                 >
-                    set filter
+                    Disabled!
                 </Button>
               </Form.Field>
             </Form.Group>
