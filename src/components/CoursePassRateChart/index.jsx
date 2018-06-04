@@ -8,18 +8,20 @@ import styles from './coursePassRateChart.css'
 
 import { red, green, turquoise } from '../../styles/variables/colors'
 
-const { array, shape, string, func } = PropTypes
+const { array, shape, string, func, arrayOf } = PropTypes
 
 
-const StackedBarChart = ({ stats, removeCourseStatistics }) => {
+const StackedBarChart = ({ stats, altCodes, removeCourseStatistics }) => {
   const data = stats.stats.map(year => (
     { name: year.time, passed: year.passed, failed: year.failed, all: year.failed + year.passed }))
   const { name, code, start, end, separate } = stats
   const query = { code, start, end, separate }
+  const alternativeCodeText = altCodes.length > 0 ? `combined code(s): [${altCodes}]` : ''
   if (data.length > 0) {
     return (
       <div>
         <Header className={sharedStyles.segmentTitle} size="large">{name}, {code}</Header>
+        <Header color="grey" sub>{alternativeCodeText}</Header>
         <div className={styles.chartContainer}>
           <BarChart
             height={700}
@@ -53,6 +55,7 @@ const StackedBarChart = ({ stats, removeCourseStatistics }) => {
 
 StackedBarChart.propTypes = {
   removeCourseStatistics: func.isRequired,
+  altCodes: arrayOf(string).isRequired,
   stats: shape({
     code: string.isRequired,
     stats: array.isRequired

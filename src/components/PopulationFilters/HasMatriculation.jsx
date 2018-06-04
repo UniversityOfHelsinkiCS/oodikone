@@ -4,17 +4,17 @@ import { Radio, Icon, Form, Segment, Button } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
 
 import { matriculationFilter } from '../../populationFilters'
-import { clearPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
+import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
 class MatriculationFilter extends Component {
   static propTypes = {
     filter: shape({}).isRequired,
-    clearPopulationFilters: func.isRequired,
+    removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired
   }
 
   state = {
-    matr: ''
+    matr: undefined
   }
 
   handleChange = (e, { value }) => {
@@ -23,11 +23,10 @@ class MatriculationFilter extends Component {
 
   handleMatr = () => {
     this.props.setPopulationFilter(matriculationFilter(this.state.matr))
-    this.setState({ matr: '' })
   }
 
   clearFilter = () => {
-    this.props.clearPopulationFilters()
+    this.props.removePopulationFilter(this.props.filter.id)
   }
 
   render() {
@@ -41,13 +40,13 @@ class MatriculationFilter extends Component {
                 <label>Filter by matriculation examination</label>
               </Form.Field>
               <Form.Field>
-                <Radio name="sex" onChange={this.handleChange} value="1" label="Yes" checked={this.state.matr === '1'} />
-                <Radio name="sex" onChange={this.handleChange} value="0" label="No" checked={this.state.matr === '0'} />
+                <Radio name="matr" onChange={this.handleChange} value label="Yes" checked={this.state.matr === true} />
+                <Radio name="matr" onChange={this.handleChange} value={false} label="No" checked={this.state.matr === false} />
               </Form.Field>
               <Form.Field>
                 <Button
                   onClick={this.handleMatr}
-                  disabled={this.state.matr === ''}
+                  disabled={this.state.matr === undefined}
                 >
                     set filter
                 </Button>
@@ -71,5 +70,5 @@ class MatriculationFilter extends Component {
 
 export default connect(
   null,
-  { setPopulationFilter, clearPopulationFilters }
+  { setPopulationFilter, removePopulationFilter }
 )(MatriculationFilter)
