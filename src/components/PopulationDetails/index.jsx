@@ -116,7 +116,7 @@ const mapStateToProps = (state) => {
   if (samples.length > 0) {
     const credits = samples.map(s =>
       s.courses.filter(c => c.passed).reduce((sum, c) => c.credits + sum, 0))
-    samples.maxCredits = Math.round(Math.max(...credits) / 10) * 10  
+    samples.maxCredits = Math.round(Math.max(...credits) / 10) * 10
   }
 
   return {
