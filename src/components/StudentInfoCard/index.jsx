@@ -3,7 +3,7 @@ import { func, bool } from 'prop-types'
 import { Card, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 
-import { reformatDate } from '../../common'
+import { reformatDate, studyRightRegex } from '../../common'
 import { studentDetailsType } from '../../constants/types'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
 
@@ -20,7 +20,9 @@ const StudentInfoCard = (props) => {
   }
 
   const renderStudyright = () => {
-    const filterDegreeStudyRight = student2 => student2.studyrights.filter(studyright => !studyright.highlevelname.toLowerCase().includes('non-degree'))
+    const filterDegreeStudyRight = student2 =>
+      student2.studyrights.filter(studyright =>
+        studyright.highlevelname.toLowerCase().match(studyRightRegex))
 
     const studyright = filterDegreeStudyRight(student)
     return (

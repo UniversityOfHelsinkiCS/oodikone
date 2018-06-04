@@ -70,6 +70,8 @@ export const byName = (a, b) => a.name.localeCompare(b.name)
 
 export const byCodeDesc = (a, b) => b.code.localeCompare(a.code)
 
+export const studyRightRegex = new RegExp(/.*master|bachelor|doctor|licentiate|specialist.*/)
+
 /* This should be done in backend */
 export const removeInvalidCreditsFromStudent = student => ({
   ...student,
