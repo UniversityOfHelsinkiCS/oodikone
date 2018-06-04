@@ -189,7 +189,6 @@ class CourseStatistics extends Component {
 
   render() {
     const { data } = this.props.courseStatistics
-
     return (
       <div className={style.container}>
         <Header className={sharedStyles.segmentTitle} size="large">
@@ -200,8 +199,9 @@ class CourseStatistics extends Component {
         <CourseSearch handleResultSelect={this.handleResultSelect} />
         {data.map(course => (<CoursePassRateChart
           removeCourseStatistics={this.removeCourseStatistics}
-          key={course.code}
+          key={course.code + course.start + course.end + course.separate}
           stats={course}
+          altCodes={course.alternativeCodes}
         />))
         }
       </div>
