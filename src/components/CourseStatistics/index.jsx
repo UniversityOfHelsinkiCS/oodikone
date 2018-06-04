@@ -189,7 +189,6 @@ class CourseStatistics extends Component {
 
   render() {
     const { data } = this.props.courseStatistics
-
     return (
       <div className={style.container}>
         <Header className={sharedStyles.segmentTitle} size="large">
@@ -202,6 +201,7 @@ class CourseStatistics extends Component {
           removeCourseStatistics={this.removeCourseStatistics}
           key={course.code}
           stats={course}
+          altCodes={course.alternativeCodes}
         />))
         }
       </div>
