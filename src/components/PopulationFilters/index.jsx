@@ -9,7 +9,6 @@ import CreditsLessThan from './CreditsLessThan'
 import CreditsAtLeast from './CreditsAtLeast'
 import StartingThisSemester from './StartingThisSemester'
 import SexFilter from './SexFilter'
-import HasMatriculation from './HasMatriculation'
 import { clearPopulationFilters } from '../../redux/populationFilters'
 
 
@@ -17,8 +16,7 @@ const componentFor = {
   CreditsAtLeast,
   CreditsLessThan,
   StartingThisSemester,
-  SexFilter,
-  HasMatriculation
+  SexFilter
 }
 
 class PopulationFilters extends Component {
