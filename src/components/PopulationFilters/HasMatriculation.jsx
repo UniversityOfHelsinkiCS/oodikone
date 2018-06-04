@@ -28,7 +28,6 @@ class MatriculationFilter extends Component {
   clearFilter = () => {
     this.props.clearPopulationFilters()
     this.setState({ matr: '' })
-
   }
 
   render() {
