@@ -235,8 +235,13 @@ class PopulationSearchForm extends Component {
     )
   }
 
+  shouldRenderSearchForm = () => {
+    const queryIsEmpty = Object.getOwnPropertyNames(this.props.queries).length > 0
+    return !queryIsEmpty
+  }
+
   render() {
-    if (Object.getOwnPropertyNames(this.props.queries).length > 0) {
+    if (!this.shouldRenderSearchForm()) {
       return null
     }
 
