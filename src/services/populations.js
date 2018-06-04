@@ -1,10 +1,13 @@
 const Sequelize = require('sequelize')
+const Op = Sequelize.Op
 const _ = require('lodash')
-const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../models')
+const moment = require('moment')
+
+const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = require('../models')
 const { formatStudent, formatStudentUnifyCodes } = require('../services/students')
 const StudyRights = require('../services/studyrights')
 const { byId } = require('../services/units')
-const Op = Sequelize.Op
+
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -121,6 +124,7 @@ const optimizedStatisticsOf = async (query) => {
 
   const withStudyrighStart = (student) => {
     student.studyrightStart = startDate
+    student.starting = moment(student.started).isBetween(startDate, endDate, null, '[]')
     return student
   }
 
