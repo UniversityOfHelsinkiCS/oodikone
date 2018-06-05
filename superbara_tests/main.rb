@@ -6,7 +6,7 @@ failed_tests = Array.new
 for test in tests
   begin
     test_filepath = File.join(".", "tests", test)
-    load test_filepath
+    run test_filepath
   rescue
     failed_tests.push(test)
     next
