@@ -70,6 +70,8 @@ export const byName = (a, b) => a.name.localeCompare(b.name)
 
 export const byCodeDesc = (a, b) => b.code.localeCompare(a.code)
 
+export const studyRightRegex = new RegExp(/.*master|bachelor|doctor|licentiate|specialist.*/)
+
 /* This should be done in backend */
 export const removeInvalidCreditsFromStudent = student => ({
   ...student,
@@ -84,7 +86,8 @@ export const removeInvalidCreditsFromStudent = student => ({
 export const removeInvalidCreditsFromStudents = students =>
   students.map(student => removeInvalidCreditsFromStudent(student))
 
-export const getStudentTotalCredits = student => student.courses.reduce((a, b) => a + b.credits, 0)
+export const getStudentTotalCredits = student => student.courses.filter(c => c.passed)
+  .reduce((a, b) => a + b.credits, 0)
 
 export const log = async (msg, meta) => {
   const token = await getToken()

@@ -4,12 +4,12 @@ import { Radio, Icon, Form, Segment, Button } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
 
 import { matriculationFilter } from '../../populationFilters'
-import { clearPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
+import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
 class MatriculationFilter extends Component {
   static propTypes = {
     filter: shape({}).isRequired,
-    clearPopulationFilters: func.isRequired,
+    removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired
   }
 
@@ -26,8 +26,7 @@ class MatriculationFilter extends Component {
   }
 
   clearFilter = () => {
-    this.props.clearPopulationFilters()
-    this.setState({ matr: '' })
+    this.props.removePopulationFilter(this.props.filter.id)
   }
 
   render() {
@@ -41,8 +40,8 @@ class MatriculationFilter extends Component {
                 <label>Filter by matriculation examination</label>
               </Form.Field>
               <Form.Field>
-                <Radio name="sex" onChange={this.handleChange} value label="Yes" checked={this.state.matr === true} />
-                <Radio name="sex" onChange={this.handleChange} value={false} label="No" checked={this.state.matr === false} />
+                <Radio name="matr" onChange={this.handleChange} value label="Yes" checked={this.state.matr === true} />
+                <Radio name="matr" onChange={this.handleChange} value={false} label="No" checked={this.state.matr === false} />
               </Form.Field>
               <Form.Field>
                 <Button
@@ -71,5 +70,5 @@ class MatriculationFilter extends Component {
 
 export default connect(
   null,
-  { setPopulationFilter, clearPopulationFilters }
+  { setPopulationFilter, removePopulationFilter }
 )(MatriculationFilter)
