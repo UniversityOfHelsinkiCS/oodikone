@@ -4,12 +4,12 @@ import { Radio, Icon, Form, Segment, Button } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
 
 import { sexFilter } from '../../populationFilters'
-import { clearPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
+import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
 class SexFilter extends Component {
   static propTypes = {
     filter: shape({}).isRequired,
-    clearPopulationFilters: func.isRequired,
+    removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired
   }
 
@@ -27,7 +27,7 @@ class SexFilter extends Component {
   }
 
   clearFilter = () => {
-    this.props.clearPopulationFilters()
+    this.props.removePopulationFilter(this.props.filter.id)
   }
 
   render() {
@@ -71,5 +71,5 @@ class SexFilter extends Component {
 
 export default connect(
   null,
-  { setPopulationFilter, clearPopulationFilters }
+  { setPopulationFilter, removePopulationFilter }
 )(SexFilter)

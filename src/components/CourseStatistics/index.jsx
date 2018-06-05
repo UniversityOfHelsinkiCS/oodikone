@@ -189,7 +189,6 @@ class CourseStatistics extends Component {
 
   render() {
     const { data } = this.props.courseStatistics
-    console.log(data)
     return (
       <div className={style.container}>
         <Header className={sharedStyles.segmentTitle} size="large">

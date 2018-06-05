@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash'
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraph from '../CreditAccumulationGraph'
 import SearchResultTable from '../SearchResultTable'
-import { removeInvalidCreditsFromStudent, byDateDesc, reformatDate } from '../../common'
+import { removeInvalidCreditsFromStudent, byDateDesc, reformatDate, studyRightRegex } from '../../common'
 
 import sharedStyles from '../../styles/shared'
 
@@ -59,7 +59,9 @@ class StudentDetails extends Component {
   renderStudyRights = () => {
     const { translate, student } = this.props
     const studyRightHeaders = ['Starting date', 'Degree', 'Graduated']
-    const studyRightRows = student.studyrights.filter(studyright => !studyright.highlevelname.toLowerCase().includes('non-degree')).map((studyright) => {
+    const studyRightRows = student.studyrights.filter(studyright =>
+      studyright.highlevelname.toLowerCase()
+        .match(studyRightRegex)).map((studyright) => {
       const {
         startdate, highlevelname, graduated, enddate, canceldate
       } = studyright
