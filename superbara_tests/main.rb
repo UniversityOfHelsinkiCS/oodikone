@@ -1,20 +1,8 @@
 run 'common'
 
 tests = Dir.entries("./tests").select { |file| file.end_with?(".rb") }
-failed_tests = Array.new
 
 for test in tests
-  begin
-    test_filepath = File.join(".", "tests", test)
-    run test_filepath
-  rescue
-    failed_tests.push(test)
-    next
-  end
+  test_filepath = File.join(".", "tests", test)
+  run test_filepath
 end
-
-if !failed_tests.empty?
-  raise 'Some tests failed.'
-end
-
-puts failed_tests
