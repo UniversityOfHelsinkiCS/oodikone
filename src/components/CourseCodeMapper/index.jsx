@@ -17,13 +17,16 @@ class CourseCodeMapper extends Component {
   getTableRows = () => {
     const { courseCodeDuplicates } = this.props
     const keys = Object.keys(courseCodeDuplicates.data)
-    const rows = keys.map(key => (
-      <Table.Row>
-        <Table.Cell>{key}</Table.Cell>
-        <Table.Cell>Oh no</Table.Cell>
-        <Table.Cell>{courseCodeDuplicates.data[key].toString()}</Table.Cell>
-        <Table.Cell>No</Table.Cell>
-      </Table.Row>))
+    const rows = keys.map((key) => {
+      const course = courseCodeDuplicates.data[key]
+      return (
+        <Table.Row>
+          <Table.Cell>{key}</Table.Cell>
+          <Table.Cell>{course.name}</Table.Cell>
+          <Table.Cell>{course.altCodes.map(code => code.code).toString()}</Table.Cell>
+          <Table.Cell>{course.altCodes.map(code => code.name).toString()}</Table.Cell>
+        </Table.Row>)
+    })
     return rows
   }
 
