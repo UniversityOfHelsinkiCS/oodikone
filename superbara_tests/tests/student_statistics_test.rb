@@ -1,4 +1,4 @@
-visit "localhost:8081"
+visit $basepath
 
 wait do
     has_text? "Student statistics"
