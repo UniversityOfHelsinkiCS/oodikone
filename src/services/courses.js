@@ -27,6 +27,14 @@ const byNameOrCode = (searchTerm) => Course.findAll({
   }
 })
 
+const byCode = (code) => Course.findOne({
+  where: {
+    code: {
+      [Op.eq]: code
+    }
+  }
+})
+
 const instanceStatistics = async (code, date) => CourseInstance.findOne({
   include: [
     {
@@ -327,6 +335,37 @@ const removeDuplicateCode = async (code, duplicate) => {
   return all
 }
 
+const getAllDuplicatesAndNames = async () => {
+  const codes = await getAllDuplicates()
+  const keys = Object.keys(codes)
+  const raw = await Promise.all(keys.map(async key => {
+    const course = await byCode(key)
+    const mainName = course.dataValues.name
+    const altCodes = codes[key]
+    const altCodesWithNames = await Promise.all(altCodes.map(async code => {
+      const course = await byCode(key)
+      const name = course.dataValues.name
+      return {
+        code,
+        name
+      }
+    }))
+    return {
+      [key]: {
+        name: mainName,
+        altCodes: altCodesWithNames
+      }
+    }
+  }))
+
+  const res = raw.reduce((map, obj) => {
+    map[Object.keys(obj)[0]] = obj[Object.keys(obj)[0]]
+    return map
+  }, {})
+  console.log(res)
+  return res
+}
+
 module.exports = {
   bySearchTerm,
   instancesOf,
@@ -339,5 +378,6 @@ module.exports = {
   getDuplicateCodes,
   setDuplicateCode,
   removeDuplicateCode,
-  getAllDuplicates
+  getAllDuplicates,
+  getAllDuplicatesAndNames
 }
