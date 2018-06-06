@@ -5,25 +5,41 @@ const { Student, Credit, CourseInstance, Course, Studyright } = require('../mode
 const { getMainCode } = require('./courses')
 const Op = Sequelize.Op
 
-
-const createStudent = (array) => Student.create({
-  studentnumber: array[0],
-  lastname: array[4],
-  firstnames: array[5],
-  abbreviatedname: array[6],
-  birthdate: getDate(array[2]),
-  communicationlanguage: array[22],
-  country: array[15],
-  creditcount: array[18],
-  dateoffirstcredit: getDate(array[20]),
-  dateoflastcredit: getDate(array[21]),
-  dateofuniversityenrollment: getDate(array[19]),
-  gradestudent: array[25],
-  matriculationexamination: array[24],
-  nationalities: array[23],
-  semesterenrollmenttypecode: array[16],
-  sex: array[3],
-  studentstatuscode: array[17]
+const createStudent = (student) => Student.create({
+  studentnumber: student.student_number,
+  email: student.email,
+  phone: student.phone,
+  city_fi: student.city[0].text,
+  city_sv: student.city[1].text,
+  national_student_number: student.national_student_number,
+  zipcode: student.zipcode,
+  address: student.address1,
+  creditcount: student.studyattainments,
+  address2: student.address2,
+  birthdate: getDate(student.birth_date),
+  language_fi: student.language[0].text,
+  language_sv: student.language[1].text,
+  language_en: student.language[2].text,
+  age: student.age_years,
+  lastname: student.last_name,
+  mobile: student.mobile_phone,
+  home_county_id: student.home_county_id,
+  country_fi: student.country[0].text,
+  country_sv: student.country[1].text,
+  country_en: student.country[2].text,
+  firstnames: student.first_names,
+  //DEPRECATED IN NEW API
+  abbreviatedname: null,
+  communicationlanguage: student.language[2].text,
+  dateoffirstcredit: null,
+  dateoflastcredit: null,
+  dateofuniversityenrollment: null,
+  gradestudent: null,
+  matriculationexamination: null,
+  nationalities: null,
+  semesterenrollmenttypecode: null,
+  sex: null,
+  studentstatuscode: null
 })
 
 const updateStudent = (array) => Student.update({
