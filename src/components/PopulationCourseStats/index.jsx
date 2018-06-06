@@ -13,7 +13,8 @@ class PopulationCourseStats extends Component {
     translate: func.isRequired,
     setPopulationFilter: func.isRequired,
     populationSize: number.isRequired,
-    selectedCourses: arrayOf(object).isRequired
+    selectedCourses: arrayOf(object).isRequired,
+    removePopulationFilterOfCourse: func.isRequired
   }
 
   state = {

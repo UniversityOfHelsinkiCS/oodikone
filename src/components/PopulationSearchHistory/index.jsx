@@ -57,7 +57,6 @@ const mapDispatchToProps = dispatch => ({
   removePopulation: (uuid) => {
     dispatch(removePopulation(uuid))
     dispatch(clearPopulationCourses())
-    dispatch(clearPopulationLimit())
     dispatch(clearPopulationFilters())
   }
 })
