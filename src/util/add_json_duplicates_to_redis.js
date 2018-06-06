@@ -10,6 +10,7 @@ const mapJson = async () => {
   for (const i in oldToNew) {
     await setDuplicateCode(i, oldToNew[i])
   }
+  process.exit()
 }
 
 mapJson()
