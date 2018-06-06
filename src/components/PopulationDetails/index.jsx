@@ -101,8 +101,14 @@ const mapStateToProps = (state) => {
 
   // TODO refactor to more functional approach where the whole sample is not tested for each filter
   if (samples.length > 0 && state.populationFilters.length > 0) {
-    const matchingStudents = state.populationFilters
-      .map(f => samples.filter(f.filter).map(s => s.studentNumber))
+    const studentsForFilter = (f) => {
+      if (f.type === 'CourseParticipation') {
+        return Object.keys(f.studentsOfSelectedField)
+      }
+      return samples.filter(f.filter).map(s => s.studentNumber)
+    }
+
+    const matchingStudents = state.populationFilters.map(studentsForFilter)
 
     selectedStudents = _.intersection(...matchingStudents)
   }
