@@ -50,6 +50,11 @@ class CourseSearch extends Component {
     }
   }
 
+  selectCourse = (a, b) => {
+    this.setState({ searchStr: `${b.result.name} ( ${b.result.code} )` })
+    this.props.handleResultSelect(a, b)
+  }
+
   render() {
     const { isLoading, searchStr } = this.state
     const { courseList } = this.props
@@ -62,7 +67,7 @@ class CourseSearch extends Component {
         input={{ fluid: true }}
         loading={isLoading}
         placeholder="Search by entering a course code or name"
-        onResultSelect={this.props.handleResultSelect}
+        onResultSelect={this.selectCourse}
         onSearchChange={this.handleSearchChange}
         results={coursesToRender}
         resultRenderer={CourseListRenderer}
