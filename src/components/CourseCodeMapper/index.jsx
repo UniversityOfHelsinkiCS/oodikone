@@ -1,66 +1,125 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Header, Button, Message, Table, Input } from 'semantic-ui-react'
-import { getDuplicates, addDuplicate } from '../../redux/coursecodeduplicates'
+import { Header, Button, Message, Table, Input, Segment, Icon } from 'semantic-ui-react'
+import { getDuplicates, addDuplicate, removeDuplicate } from '../../redux/coursecodeduplicates'
 
+import CourseSearch from '../CourseSearch'
 import sharedStyles from '../../styles/shared'
+import styles from './courseCodeMapper.css'
 
 const { func, shape } = PropTypes
 
 
 class CourseCodeMapper extends Component {
+  state = {
+    filter: '',
+    code1: '',
+    code2: ''
+  }
+
   componentWillMount = () => {
     this.props.getDuplicates()
   }
 
   getTableRows = () => {
     const { courseCodeDuplicates } = this.props
-    const keys = Object.keys(courseCodeDuplicates.data)
-    const rows = keys.map((key) => {
+    const filteredKeys = this.filterKeys(courseCodeDuplicates)
+    const rows = filteredKeys.map((key) => {
       const course = courseCodeDuplicates.data[key]
       return (
-        <Table.Row>
+        <Table.Row key={key + course.altCodes.map(code => code.code).toString()}>
           <Table.Cell>{key}</Table.Cell>
           <Table.Cell>{course.name}</Table.Cell>
-          <Table.Cell>{course.altCodes.map(code => code.code).toString()}</Table.Cell>
+          <Table.Cell>{course.altCodes.map(code => (
+            <React.Fragment key={code.code + key}>
+              {code.code}
+              <Icon color="red" name="remove circle" onClick={this.removeDuplicate(key, code.code)} />
+            </React.Fragment>))}
+          </Table.Cell>
           <Table.Cell>{course.altCodes.map(code => code.name).toString()}</Table.Cell>
         </Table.Row>)
     })
     return rows
   }
 
-  addDuplicate = (code1, code2) => {
+  filterKeys = (duplicates) => {
+    const filter = this.state.filter.toLocaleLowerCase()
+    const keys = Object.keys(duplicates.data)
+    return keys.filter((key) => {
+      const course = duplicates.data[key]
+      return (
+        key.toLocaleLowerCase().includes(filter) ||
+        course.name.toLocaleLowerCase().includes(filter) ||
+        course.altCodes.find(code =>
+          code.code.toLocaleLowerCase().includes(filter) ||
+          code.name.toLocaleLowerCase().includes(filter))
+      )
+    })
+  }
+
+  handleFilterChange = (e) => {
+    this.setState({ filter: e.target.value })
+  }
+
+  handleResultSelect1 = (e, { result }) => {
+    this.setState({ code1: result.code })
+  }
+
+  handleResultSelect2 = (e, { result }) => {
+    this.setState({ code2: result.code })
+  }
+
+  addDuplicate = (code1, code2) => () => {
     this.props.addDuplicate(code1, code2)
+    // console.log(code1, code2)
+  }
+
+  removeDuplicate = (code1, code2) => () => {
+    this.props.removeDuplicate(code1, code2)
   }
 
   render() {
+    const disabled = !((this.state.code1 && this.state.code2) &&
+      (this.state.code1 !== this.state.code2))
     return (
       <div className={sharedStyles.segmentContainer}>
-        <Header className={sharedStyles.segmentTitle} size="large">Course Code Mapping</Header>
-        <Message
-          header="Map corresponding course codes to each other"
-          content="By default courses with different codes are considered as separate courses.
-            If this is not the case use this to combine old and new course codes to each other."
-        />
-        <Button content="Show all mapped course codes" />
-        <Input
-          placeholder="Filter"
-          onChange={this.handlefilterchange}
-        />
-        <Table striped>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Code</Table.HeaderCell>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Alternative code(s)</Table.HeaderCell>
-              <Table.HeaderCell>Alternative name(s)</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {this.getTableRows()}
-          </Table.Body>
-        </Table>
+        <Segment className={sharedStyles.contentSegment}>
+          <Header className={sharedStyles.segmentTitle} size="large">Course Code Mapping</Header>
+          <Message
+            header="Map corresponding course codes to each other"
+            content="By default courses with different codes are considered as separate courses.
+              If this is not the case use this to combine old and new course codes to each other."
+          />
+          <Segment.Group horizontal>
+            <Segment>
+              <Header content="Filter course codes" />
+              <Input
+                placeholder="Filter"
+                onChange={this.handleFilterChange}
+              />
+            </Segment>
+            <Segment>
+              <Header>Add new corresponding code</Header>
+              <CourseSearch handleResultSelect={this.handleResultSelect1} />
+              <CourseSearch handleResultSelect={this.handleResultSelect2} />
+              <Button disabled={disabled} className={styles.button} content="Add" onClick={this.addDuplicate(this.state.code1, this.state.code2)} />
+            </Segment>
+          </Segment.Group>
+          <Table striped>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Code</Table.HeaderCell>
+                <Table.HeaderCell>Name</Table.HeaderCell>
+                <Table.HeaderCell>Alternative code(s)</Table.HeaderCell>
+                <Table.HeaderCell>Alternative name(s)</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {this.getTableRows()}
+            </Table.Body>
+          </Table>
+        </Segment>
       </div>
     )
   }
@@ -69,6 +128,7 @@ class CourseCodeMapper extends Component {
 CourseCodeMapper.propTypes = {
   getDuplicates: func.isRequired,
   addDuplicate: func.isRequired,
+  removeDuplicate: func.isRequired,
   courseCodeDuplicates: shape({}).isRequired
 }
 
@@ -80,7 +140,9 @@ const mapDispatchToProps = dispatch => ({
   getDuplicates: () =>
     dispatch(getDuplicates()),
   addDuplicate: (code1, code2) =>
-    dispatch(addDuplicate(code1, code2))
+    dispatch(addDuplicate(code1, code2)),
+  removeDuplicate: (code1, code2) =>
+    dispatch(removeDuplicate(code1, code2))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(CourseCodeMapper)
