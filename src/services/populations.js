@@ -215,12 +215,19 @@ const bottlenecksOf = async (query) => {
       const passed = instances.filter(passedStudents).map(studentNumber)
       const failed = instances.filter(failedStudents).map(studentNumber)
       const nTimes = instances.filter(i => i.attempts > 1)
+      const retryPassed = nTimes.filter(passedStudents).map(studentNumber)
+      const failedMany = nTimes.filter(failedStudents).map(studentNumber)
+      const all = passed.concat(failed)
+
+      const toObject = (passed) => 
+        passed.length > 0 ? passed.reduce((o, s) => { o[s] = true; return o }, {}) : {} 
+       
       return {
-        all: passed.concat(failed),
-        passed,
-        failed,
-        retryPassed: nTimes.filter(passedStudents).map(studentNumber),
-        failedMany: nTimes.filter(failedStudents).map(studentNumber)
+        all: toObject(all),
+        passed: toObject(passed),
+        failed: toObject(failed),
+        retryPassed: toObject(retryPassed),
+        failedMany: toObject(failedMany)
       }
     }
 
@@ -228,6 +235,7 @@ const bottlenecksOf = async (query) => {
       const passed = instances.reduce((sum, i) => sum + (i.passed ? 1 : 0), 0)
       const failed = instances.reduce((sum, i) => sum + (i.passed ? 0 : 1), 0)
       const students = instances.length
+
       return {
         students,
         passed,
