@@ -16,12 +16,13 @@ const StackedBarChart = ({ stats, altCodes, removeCourseStatistics }) => {
     { name: year.time, passed: year.passed, failed: year.failed, all: year.failed + year.passed }))
   const { name, code, start, end, separate } = stats
   const query = { code, start, end, separate }
-  const alternativeCodeText = altCodes.length > 0 ? `combined code(s): [${altCodes}]` : ''
+  const alternativeCodeText = altCodes.length > 0 ? `Combined code(s): [${altCodes}]` : ''
   if (data.length > 0) {
     return (
       <div>
-        <Header className={sharedStyles.segmentTitle} size="large">{name}, {code}</Header>
-        <Header color="grey" sub>{alternativeCodeText}</Header>
+        <Header className={sharedStyles.segmentTitle} size="large">{name}, {code}
+          <Header.Subheader>{alternativeCodeText}</Header.Subheader>
+        </Header>
         <div className={styles.chartContainer}>
           <BarChart
             height={700}
