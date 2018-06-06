@@ -6,14 +6,13 @@ import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
 
 import { makePopulationsToData } from '../../selectors/populationDetails'
-import { setPopulationLimitField, clearPopulationLimit } from '../../redux/populationLimit'
 
 import PopulationFilters from '../PopulationFilters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import CourseQuarters from '../CourseQuarters'
-import PopulationLimiter from '../PopulationLimiter'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourses from '../PopulationCourses'
+import CourseParticipationFilters from '../PopulationFilters/CourseParticipationFilters'
 
 class PopulationDetails extends Component {
   static propTypes = {
@@ -40,7 +39,6 @@ class PopulationDetails extends Component {
         <Header size="medium" dividing>
           {translate('populationStatistics.creditStatisticsHeader')}
         </Header>
-        <PopulationLimiter />
         {statistics}
       </Segment>
     )
@@ -64,7 +62,7 @@ class PopulationDetails extends Component {
         <Header size="medium" dividing>
           {translate('populationStatistics.graphSegmentHeader')}
         </Header>
-        <PopulationLimiter />
+        <CourseParticipationFilters />
         {graphs}
       </Segment>
     )
@@ -99,11 +97,7 @@ const populationsToData = makePopulationsToData()
 
 const mapStateToProps = (state) => {
   const samples = populationsToData(state)
-  const allStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
-
-  let selectedStudents = state.populationLimit
-    ? state.populationLimit.course.students[state.populationLimit.field]
-    : allStudents
+  let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
 
   // TODO refactor to more functional approach where the whole sample is not tested for each filter
   if (samples.length > 0 && state.populationFilters.length > 0) {
@@ -121,7 +115,6 @@ const mapStateToProps = (state) => {
 
   return {
     samples,
-    selected: state.populationLimit,
     selectedStudents,
     translate: getTranslate(state.locale),
     queryIsSet: !!state.populations.query,
@@ -129,7 +122,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, {
-  setPopulationLimitField,
-  clearPopulationLimit
-})(PopulationDetails)
+export default connect(mapStateToProps)(PopulationDetails)

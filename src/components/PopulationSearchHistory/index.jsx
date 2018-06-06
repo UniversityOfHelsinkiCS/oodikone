@@ -6,7 +6,6 @@ import { getTranslate } from 'react-localize-redux'
 import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation } from '../../redux/populations'
 import { clearPopulationCourses } from '../../redux/populationCourses'
-import { clearPopulationLimit } from '../../redux/populationLimit'
 import { clearPopulationFilters } from '../../redux/populationFilters'
 
 import styles from './populationSearchHistory.css'
