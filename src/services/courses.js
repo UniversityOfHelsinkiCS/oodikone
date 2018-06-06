@@ -315,24 +315,31 @@ const getDuplicateCodes = async (code) => {
 }
 
 const setDuplicateCode = async (code, duplicate) => {
-  const all = await getAllDuplicates()
-  if (!all[code]) {
-    all[code] = []
+  if (code !== duplicate) {
+    const all = await getAllDuplicates()
+    if (!all[code]) {
+      all[code] = []
+    }
+    if (!all[code].includes(duplicate)) {
+      all[code].push(duplicate)
+      await redisClient.setAsync('duplicates', JSON.stringify(all))
+    }
   }
-  if (!all[code].includes(duplicate)) {
-    all[code].push(duplicate)
-    await redisClient.setAsync('duplicates', JSON.stringify(all))
-  }
-  return all
+
+  const res = await getAllDuplicatesAndNames()
+  return res
 }
 
 const removeDuplicateCode = async (code, duplicate) => {
   let all = await getAllDuplicates(code)
   if (all[code] && all[code].includes(duplicate)) {
     all[code] = all[code].filter(c => c !== duplicate)
-    await redisClient.setAsync(all, JSON.stringify(all))
+    if (all[code].length === 0) delete all[code]
+    await redisClient.setAsync('duplicates', JSON.stringify(all))
   }
-  return all
+
+  const res = await getAllDuplicatesAndNames()
+  return res
 }
 
 const getAllDuplicatesAndNames = async () => {
@@ -358,12 +365,10 @@ const getAllDuplicatesAndNames = async () => {
     }
   }))
 
-  const res = raw.reduce((map, obj) => {
+  return raw.reduce((map, obj) => {
     map[Object.keys(obj)[0]] = obj[Object.keys(obj)[0]]
     return map
   }, {})
-  console.log(res)
-  return res
 }
 
 module.exports = {
