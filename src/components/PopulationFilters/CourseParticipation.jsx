@@ -1,42 +1,48 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, object } from 'prop-types'
 import { Segment, Icon } from 'semantic-ui-react'
-import { setPopulationLimitField, clearPopulationLimit } from '../../redux/populationLimit'
-import { setLoading } from '../../redux/graphSpinner'
+import { shape, func } from 'prop-types'
 
-class PopulationLimiter extends Component {
+import { removePopulationFilter, alterPopulationCourseFilter } from '../../redux/populationFilters'
+
+class CourseParticipation extends Component {
   static propTypes = {
-    clearPopulationLimit: func.isRequired,
-    setPopulationLimitField: func.isRequired,
-    setLoading: func.isRequired,
-    selected: object // eslint-disable-line
+    filter: shape({}).isRequired,
+    removePopulationFilter: func.isRequired,
+    alterPopulationCourseFilter: func.isRequired
+  }
+
+  clearFilter = () => {
+    this.props.removePopulationFilter(this.props.filter.id)
   }
 
   selectField = field => () => {
-    if (field !== this.props.selected.field) {
-      this.props.setLoading()
-      setTimeout(() => {
-        this.props.setPopulationLimitField(field)
-      }, 0)
+    const selectedField = this.props.filter.params[1]
+    if (field !== selectedField) {
+      this.props.alterPopulationCourseFilter(this.props.filter.id, field)
     }
   }
 
   render() {
-    const { selected } = this.props
+    const { filter } = this.props
+
+    if (filter.notSet) {
+      return null
+    }
+
+    const course = filter.params[0]
+    const selectedField = filter.params[1]
 
     const active = field =>
-      (selected && selected.field === field)
-
-    if (!selected) return null
+      (selectedField === field)
 
     return (
       <div>
         <Segment.Group horizontal>
           <Segment>
-            <em>{selected.course.course.name}</em>
+            <em>{course.course.name}</em>
             <span style={{ float: 'right' }}>
-              <Icon name="remove" onClick={() => this.props.clearPopulationLimit()} />
+              <Icon name="remove" onClick={this.clearFilter} />
             </span>
           </Segment>
           <Segment
@@ -80,10 +86,6 @@ class PopulationLimiter extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  selected: state.populationLimit
-})
-
-export default connect(mapStateToProps, {
-  setPopulationLimitField, clearPopulationLimit, setLoading
-})(PopulationLimiter)
+export default connect(null, {
+  removePopulationFilter, alterPopulationCourseFilter
+})(CourseParticipation)

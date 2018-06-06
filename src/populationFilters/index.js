@@ -29,7 +29,6 @@ export const matriculationFilter = matriculationexamination =>
     filter: student => student.matriculationexamination === matriculationexamination
   })
 
-
 export const creditsAtLeast = credit =>
   ({
     id: uuidv4(),
@@ -50,5 +49,14 @@ export const startingThisSemester = starting =>
     params: [starting],
     filter: student =>
       student.starting === starting
+  })
+
+export const courseParticipation = (course, field) =>
+  ({
+    id: uuidv4(),
+    type: 'CourseParticipation',
+    params: [course, field],
+    filter: student =>
+      course.students[field].includes(student.studentNumber)
   })
 

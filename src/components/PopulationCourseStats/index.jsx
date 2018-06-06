@@ -3,17 +3,17 @@ import { connect } from 'react-redux'
 import { Table, Form, Input } from 'semantic-ui-react'
 import { func, arrayOf, object, number } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
-import { setPopulationLimit, clearPopulationLimit } from '../../redux/populationLimit'
-import { setLoading } from '../../redux/graphSpinner'
+
+import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
+import { courseParticipation } from '../../populationFilters'
 
 class PopulationCourseStats extends Component {
   static propTypes = {
     courses: arrayOf(object).isRequired,
     translate: func.isRequired,
-    setPopulationLimit: func.isRequired,
-    setLoading: func.isRequired,
+    setPopulationFilter: func.isRequired,
     populationSize: number.isRequired,
-    selected: object // eslint-disable-line
+    selectedCourses: arrayOf(object).isRequired
   }
 
   state = {
@@ -22,9 +22,16 @@ class PopulationCourseStats extends Component {
     limit: parseInt(this.props.populationSize * 0.15, 10)
   }
 
+  active = course =>
+    this.props.selectedCourses
+      .find(c => course.name === c.name && course.code === c.code) !== undefined
+
   limitPopulationToCourse = course => () => {
-    this.props.setLoading()
-    this.props.setPopulationLimit(course, 'all')
+    if (!this.active(course.course)) {
+      this.props.setPopulationFilter(courseParticipation(course, 'all'))
+    } else {
+      this.props.removePopulationFilterOfCourse(course.course)
+    }
   }
 
   sortBy(criteria) {
@@ -57,14 +64,11 @@ class PopulationCourseStats extends Component {
   }
 
   render() {
-    const { courses, translate, selected } = this.props
+    const { courses, translate } = this.props
     const { sortBy, reversed } = this.state
     const direction = reversed ? 'descending' : 'ascending'
 
     if (courses.length === 0) return null
-
-    const active = course =>
-      selected && (course.name === selected.course.name && course.code === selected.course.code)
 
     return (
       <div>
@@ -146,7 +150,7 @@ class PopulationCourseStats extends Component {
           </Table.Header>
           <Table.Body>
             {courses.sort(this.criteria()).filter(this.limit()).map(course => (
-              <Table.Row key={course.course.code} active={active(course.course)}>
+              <Table.Row key={course.course.code} active={this.active(course.course)}>
                 <Table.Cell onClick={this.limitPopulationToCourse(course)}>
                   {course.course.name}
                 </Table.Cell>
@@ -181,13 +185,18 @@ class PopulationCourseStats extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  translate: getTranslate(state.locale),
-  selected: state.populationLimit ? state.populationLimit.course : null,
-  populationSize: state.populations.length > 0 ? state.populations[0].data.length : 0
-})
+const mapStateToProps = (state) => {
+  const courseFilters = state.populationFilters.filter(f => f.type === 'CourseParticipation')
+  const selectedCourses = courseFilters.map(f => f.params[0].course)
+
+  return {
+    translate: getTranslate(state.locale),
+    selectedCourses,
+    populationSize: state.populations.length > 0 ? state.populations[0].data.length : 0
+  }
+}
 
 export default connect(
   mapStateToProps,
-  { setPopulationLimit, clearPopulationLimit, setLoading }
+  { setPopulationFilter, removePopulationFilterOfCourse }
 )(PopulationCourseStats)
