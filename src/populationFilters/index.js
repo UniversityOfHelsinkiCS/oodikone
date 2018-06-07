@@ -51,12 +51,11 @@ export const startingThisSemester = starting =>
       student.starting === starting
   })
 
-export const courseParticipation = (course, field) =>
-  ({
-    id: uuidv4(),
-    type: 'CourseParticipation',
-    params: [course, field],
-    filter: student =>
-      course.students[field].includes(student.studentNumber)
-  })
-
+export const courseParticipation = (course, field) => ({
+  id: uuidv4(),
+  type: 'CourseParticipation',
+  params: [course, field],
+  studentsOfSelectedField: course.students[field],
+  filter: student =>
+    course.students[field][student.studentNumber] === true
+})
