@@ -91,7 +91,6 @@ const getStudentCourseCredits = (studentNumber) => {
 module.exports = {
   getStudentStudyRights, 
   getStudent, 
-  getStudyRight, 
   getOrganisation,
   getStudentCourseCredits, 
   getStudentNumbers, 
