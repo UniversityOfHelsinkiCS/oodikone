@@ -66,7 +66,6 @@ const loadAndUpdateStudent = async studentNumber => {
     return studentFromDb
   } catch (e) {
     logger.error('Student: ' + studentNumber + ' loadAndUpdate failed')    
-    throw(e)
   }
 }
 
