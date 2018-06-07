@@ -24,7 +24,6 @@ class PopulationCourseStats extends Component {
       reversed: false,
       limit: parseInt(this.props.populationSize * 0.15, 10)
     }
-    console.log(this.props.populationSize, this.state.limit)
   }
 
   active = course =>
