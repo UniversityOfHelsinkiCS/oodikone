@@ -86,6 +86,10 @@ class CreditAccumulationGraphHighCharts extends Component {
           max: nextProps.students.maxCredits,
           title: { text: 'Credits' }
         },
+        xAxis: {
+          max: nextProps.students.maxDate,
+          min: nextProps.students.minDate
+        },
         series: dataOfSelected,
         chart: {
           height: nextProps.currentGraphSize
