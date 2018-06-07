@@ -65,7 +65,8 @@ class CreditAccumulationGraphHighCharts extends Component {
           }
         }
       },
-      series: dataOfSelected
+      series: dataOfSelected,
+      xAxis: { ordinal: false }
     }
     this.setState({ timeout, options })
   }
