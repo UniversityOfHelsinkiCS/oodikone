@@ -56,8 +56,17 @@ const loadAndUpdateStudent = async studentNumber => {
       return studentFromDb
     }
 
+    try {
+      await StudentService.updateStudent(studentFromApi)
+      logger.verbose(`Student ${studentNumber} details updated. `)
+    } catch (e) {
+      logger.error(`Student ${studentNumber} update failed. `)
+    }
+
+    return studentFromDb
   } catch (e) {
-    logger.error('Student: ' + studentNumber + ' loadAndUpdate failed')
+    logger.error('Student: ' + studentNumber + ' loadAndUpdate failed')    
+    throw(e)
   }
 }
 

@@ -5,7 +5,7 @@ const { Student, Credit, CourseInstance, Course, Studyright } = require('../mode
 const { getMainCode } = require('./courses')
 const Op = Sequelize.Op
 
-const createStudent = (student) => Student.create({
+const apiDataToModel = (student) => ({
   studentnumber: student.student_number,
   email: student.email,
   phone: student.phone,
@@ -42,32 +42,18 @@ const createStudent = (student) => Student.create({
   studentstatuscode: null
 })
 
-const updateStudent = (array) => Student.update({
-  studentnumber: array[0],
-  lastname: array[4],
-  firstnames: array[5],
-  abbreviatedname: array[6],
-  birthdate: getDate(array[2]),
-  communicationlanguage: array[22],
-  country: array[15],
-  creditcount: array[18],
-  dateoffirstcredit: getDate(array[20]),
-  dateoflastcredit: getDate(array[21]),
-  dateofuniversityenrollment: getDate(array[19]),
-  gradestudent: array[25],
-  matriculationexamination: array[24],
-  nationalities: array[23],
-  semesterenrollmenttypecode: array[16],
-  sex: array[3],
-  studentstatuscode: array[17]
-},
-{
-  where: {
-    studentnumber: {
-      [Op.eq]: array[0]
+const createStudent = (apiData) => Student.create(apiDataToModel(apiData))
+
+const updateStudent = (apiData) => {
+  const data = apiDataToModel(apiData)
+  return Student.update(data, {
+    where: {
+      studentnumber: {
+        [Op.eq]: data.studentnumber
+      }
     }
-  }
-})
+  })
+}
 
 const byId = async (id) => Student.findOne({
   include: [
