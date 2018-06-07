@@ -16,11 +16,14 @@ class PopulationCourseStats extends Component {
     selectedCourses: arrayOf(object).isRequired,
     removePopulationFilterOfCourse: func.isRequired
   }
+  constructor(props) {
+    super(props)
 
-  state = {
-    sortBy: 'students',
-    reversed: false,
-    limit: parseInt(this.props.populationSize * 0.15, 10)
+    this.state = {
+      sortBy: 'students',
+      reversed: false,
+      limit: parseInt(this.props.populationSize * 0.15, 10)
+    }
   }
 
   active = course =>
@@ -189,11 +192,10 @@ class PopulationCourseStats extends Component {
 const mapStateToProps = (state) => {
   const courseFilters = state.populationFilters.filter(f => f.type === 'CourseParticipation')
   const selectedCourses = courseFilters.map(f => f.params[0].course)
-
   return {
     translate: getTranslate(state.locale),
     selectedCourses,
-    populationSize: state.populations.length > 0 ? state.populations[0].data.length : 0
+    populationSize: state.populations.data.length > 0 ? state.populations.data.length : 0
   }
 }
 
