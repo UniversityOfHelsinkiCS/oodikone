@@ -65,7 +65,8 @@ class CreditAccumulationGraphHighCharts extends Component {
           }
         }
       },
-      series: dataOfSelected
+      series: dataOfSelected,
+      xAxis: { ordinal: false }
     }
     this.setState({ timeout, options })
   }
@@ -84,6 +85,10 @@ class CreditAccumulationGraphHighCharts extends Component {
         yAxis: {
           max: nextProps.students.maxCredits,
           title: { text: 'Credits' }
+        },
+        xAxis: {
+          max: nextProps.students.maxDate,
+          min: nextProps.students.minDate
         },
         series: dataOfSelected,
         chart: {

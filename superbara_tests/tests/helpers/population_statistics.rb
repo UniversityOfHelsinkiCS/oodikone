@@ -1,6 +1,7 @@
 enrollment_year_select = "#root > div > main > div:nth-child(3) > div.ui.segment.layout__contentSegment___M-cZG > div > form > div.fields.populationSearchForm__enrollmentSelectorGroup___2l8ON > div.field.populationSearchForm__yearSelect___OLVSL > div > input"
 study_rights_select = "#rightGroup > div > div"
 
+
 wait 15 do
     (find enrollment_year_select).click
 end
