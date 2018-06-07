@@ -15,11 +15,17 @@ axios.defaults.auth = {
   password: process.env.OODI_PW
 } 
 
+const addTokenToUrl = (url) => {
+  return `${url}?token=${process.env.TOKEN}`
+}
+
+const httpsAgent = new https.Agent({  
+  rejectUnauthorized: false
+})
+
 const getStudent = (studentNumber) => {
-  const agent = new https.Agent({  
-    rejectUnauthorized: false
-  })
-  return axios.get(base_url + '/students/' + studentNumber + '/info?token=' + process.env.TOKEN, { httpsAgent: agent })
+  const url = addTokenToUrl(`${base_url}/students/${studentNumber}/info`)
+  return axios.get(url, { httpsAgent })
     .then(response => {
       return data_mapper.getStudentFromData(response.data)
     })
@@ -29,36 +35,14 @@ const getStudent = (studentNumber) => {
 }
 
 const getStudentStudyRights = (studentNumber) => {
-  return axios.get(base_url + '/students/' + studentNumber + '/studyrights')
-    .then(async response => {
-      const studyRightIds = data_mapper.getStudyRightIdStrings(response.data)
-      let studyRights = []
-      await Promise.all(studyRightIds.map(async id => {
-        try {
-          let right = await getStudyRight(id)
-          if (right) {
-            right['student'] = studentNumber
-            studyRights.push(right)
-          }
-        } catch (e) {
-          console.log(e)
-          throw e
-        }
-      }))
-      return studyRights
+  const url = addTokenToUrl(`${base_url}/students/${studentNumber}/studyrights`)
+  console.log(url)  
+  return axios.get(url, { httpsAgent })
+    .then( response => {
+      return response.data.data
     })
     .catch(error => {
       console.log('error getStudentStudyRights\n' + error)
-    })
-}
-
-const getStudyRight = (studyRightId) => {
-  return axios.get(base_url + '/studyrights/' + studyRightId)
-    .then(response => {
-      return data_mapper.getStudyRightFromData(response.data)
-    })
-    .catch(error => {
-      console.log('error getStudyRights\n' + error)
     })
 }
 
