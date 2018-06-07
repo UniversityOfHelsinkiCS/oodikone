@@ -113,10 +113,20 @@ const mapStateToProps = (state) => {
     selectedStudents = _.intersection(...matchingStudents)
   }
 
+  // REFACTOR ??
   if (samples.length > 0) {
-    const credits = samples.map(s =>
-      s.courses.filter(c => c.passed).reduce((sum, c) => c.credits + sum, 0))
-    samples.maxCredits = Math.round(Math.max(...credits) / 10) * 10
+    const creditsAndDates = samples.map((s) => {
+      const passedCourses = s.courses.filter(c => c.passed)
+      const passedCredits = passedCourses.reduce((sum, c) => c.credits + sum, 0)
+      const dates = passedCourses.map(c => c.date)
+      return { passedCredits, dates }
+    })
+    const credits = creditsAndDates.map(cd => cd.passedCredits)
+    let dates = creditsAndDates.map(cd => cd.dates)
+    dates = _.flattenDeep(dates).map(date => new Date(date).getTime())
+    samples.maxCredits = Math.max(...credits)
+    samples.maxDate = Math.max(...dates)
+    samples.minDate = Math.min(...dates)
   }
 
   return {
