@@ -62,8 +62,9 @@ const loadAndUpdateStudent = async studentNumber => {
 }
 
 const run = async () => {
-  // const studentList = ['014441008', '014420676', '014580736']
-  await updateStudentInformation(['014028638'])
+  const { STUDENT_NUMBERS } = process.env
+  const studentNumbers = STUDENT_NUMBERS ? STUDENT_NUMBERS.split(' ') : []
+  await updateStudentInformation(studentNumbers)
   process.exit(0)
 }
 
