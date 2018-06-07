@@ -1,5 +1,6 @@
 const Oodi = require('./oodi_interface')
 const StudentService = require('../students')
+const StudyrightService = require('../studyrights')
 const logger = require('../../util/logger')
 
 process.on('unhandledRejection', (reason) => {
@@ -18,6 +19,40 @@ const updateAllDataRelatedToStudent = async studentNumber => {
     return
   }
 
+  await updateStudentStudyRights(student)
+
+}
+
+const getStudyRights = async (studentnumber) => await Promise.all([
+  Oodi.getStudentStudyRights(studentnumber),
+  StudyrightService.byStudent(studentnumber)
+])
+
+const saveStudyRight = async studyRight => {
+  logger.verbose(`Saving studyright ${studyRight.studyright_id}`)
+}
+
+const studyrightArrayToObjectById = (array) => array.reduce((obj, studyright) => {
+  obj[studyright.studyright_id] = studyright
+  return obj
+}, {})
+
+const updateStudentStudyRights = async student => {
+  try {
+    const [ apiStudyRightArray, dbStudyRightArray ] = await getStudyRights(student.studentnumber)
+    const dbStudyRightSet = studyrightArrayToObjectById(dbStudyRightArray)
+    await Promise.all(apiStudyRightArray.map(async studyRight => {
+      const id = studyRight.studyright_id
+      if (dbStudyRightSet[id] !== undefined) {
+        logger.verbose(`Studyright ${id} already in database. `)
+        return
+      }
+      logger.verbose(`Studyright ${id} not included in database. `)
+      await saveStudyRight(studyRight)
+    }))
+  } catch (e) {
+    logger.error(`Updating student studyrights failed for student ${student.studentnumber}`)
+  }
 }
 
 const createNewStudent = async (studentFromApi, studentNumber) => {
