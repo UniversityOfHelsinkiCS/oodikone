@@ -6,29 +6,43 @@ process.on('unhandledRejection', (reason) => {
   console.log(reason)
 })
 
-const updateStudentInformation = async studentList => {
-  await Promise.all(studentList.map(student => loadAndUpdateStudent(student)))
-} 
+const updateStudentInformation = async studentNumberList => {
+  await Promise.all(studentNumberList.map(updateAllDataRelatedToStudent))
+}
+
+const updateAllDataRelatedToStudent = async studentNumber => {
+  const student = await loadAndUpdateStudent(studentNumber)
+
+  if (student === null) {
+    logger.error(`Can't get student ' + ${studentNumber}`)
+    return
+  }
+
+}
+
+const createNewStudent = async (studentFromApi, studentNumber) => {
+  try {
+    const studentFromDb = await StudentService.createStudent(studentFromApi)
+    logger.verbose('Student ' + studentNumber + ' created to database')
+    return studentFromDb
+  } catch (e) {
+    logger.error('Student ' + studentNumber + ': creation failed, error message:')
+    return null
+  }
+}
 
 const loadAndUpdateStudent = async studentNumber => {
   try {
-    let [ studentFromDb, studentFromApi ] = await Promise.all([StudentService.byId(studentNumber), Oodi.getStudent(studentNumber)
-    ])
+    let [ studentFromDb, studentFromApi ] = await Promise.all([StudentService.byId(studentNumber), Oodi.getStudent(studentNumber)])
     
     if (studentFromApi === null) {
+      logger.verbose(`API returned null for student ${studentNumber}`)
       return null
     }
-
     if (studentFromDb === null) {
-      try {
-        studentFromDb = await StudentService.createStudent(studentFromApi)
-        logger.verbose('Student ' + studentNumber + ' created to database')
-        return [studentFromDb, studentFromApi]
-      } catch (e) {
-        logger.error('Student ' + studentNumber + ': creation failed, error message:')
-        return null
-      }
+      return await createNewStudent(studentFromApi, studentNumber)
     }
+
   } catch (e) {
     logger.error('Student: ' + studentNumber + ' loadAndUpdate failed')
   }
