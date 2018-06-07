@@ -23,10 +23,10 @@ const updateAllDataRelatedToStudent = async studentNumber => {
 const createNewStudent = async (studentFromApi, studentNumber) => {
   try {
     const studentFromDb = await StudentService.createStudent(studentFromApi)
-    logger.verbose('Student ' + studentNumber + ' created to database')
+    logger.verbose(`Student ${studentNumber} created to database`)
     return studentFromDb
   } catch (e) {
-    logger.error('Student ' + studentNumber + ': creation failed, error message:')
+    logger.error(`Student ${studentNumber} : creation failed, error message:`)
     return null
   }
 
@@ -65,7 +65,7 @@ const loadAndUpdateStudent = async studentNumber => {
 
     return studentFromDb
   } catch (e) {
-    logger.error('Student: ' + studentNumber + ' loadAndUpdate failed')    
+    logger.error(`Student: ${studentNumber} loadAndUpdate failed`)
   }
 }
 
