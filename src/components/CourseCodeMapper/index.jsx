@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Header, Button, Message, Table, Input, Segment, Icon } from 'semantic-ui-react'
+import { Header, Button, Message, Table, Input, Segment, Icon, Loader } from 'semantic-ui-react'
 import { getDuplicates, addDuplicate, removeDuplicate } from '../../redux/coursecodeduplicates'
 
 import CourseSearch from '../CourseSearch'
@@ -12,19 +12,21 @@ const { func, shape } = PropTypes
 
 
 class CourseCodeMapper extends Component {
+  constructor(props) {
+    super(props)
+    props.getDuplicates()
+  }
+
   state = {
     filter: '',
     code1: '',
     code2: ''
   }
 
-  componentWillMount = () => {
-    this.props.getDuplicates()
-  }
-
   getTableRows = () => {
     const { courseCodeDuplicates } = this.props
-    const filteredKeys = this.filterKeys(courseCodeDuplicates)
+    const { data } = courseCodeDuplicates
+    const filteredKeys = this.filterKeys(data)
     const rows = filteredKeys.map((key) => {
       const course = courseCodeDuplicates.data[key]
       return (
@@ -45,9 +47,9 @@ class CourseCodeMapper extends Component {
 
   filterKeys = (duplicates) => {
     const filter = this.state.filter.toLocaleLowerCase()
-    const keys = Object.keys(duplicates.data)
+    const keys = Object.keys(duplicates)
     return keys.filter((key) => {
-      const course = duplicates.data[key]
+      const course = duplicates[key]
       return (
         key.toLocaleLowerCase().includes(filter) ||
         course.name.toLocaleLowerCase().includes(filter) ||
@@ -72,7 +74,6 @@ class CourseCodeMapper extends Component {
 
   addDuplicate = (code1, code2) => () => {
     this.props.addDuplicate(code1, code2)
-    // console.log(code1, code2)
   }
 
   removeDuplicate = (code1, code2) => () => {
@@ -80,6 +81,7 @@ class CourseCodeMapper extends Component {
   }
 
   render() {
+    const { pending } = this.props.courseCodeDuplicates
     const disabled = !((this.state.code1 && this.state.code2) &&
       (this.state.code1 !== this.state.code2))
     return (
@@ -91,6 +93,7 @@ class CourseCodeMapper extends Component {
             content="By default courses with different codes are considered as separate courses.
               If this is not the case use this to combine old and new course codes to each other."
           />
+          <Loader active={pending} />
           <Segment.Group horizontal>
             <Segment>
               <Header content="Filter course codes" />
