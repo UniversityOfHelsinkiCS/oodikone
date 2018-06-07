@@ -29,6 +29,13 @@ const createNewStudent = async (studentFromApi, studentNumber) => {
     logger.error('Student ' + studentNumber + ': creation failed, error message:')
     return null
   }
+
+}
+
+const apiHasNewCreditsForStudent = (studentFromDb, studentFromApi) => {
+  const { studyattainments } = studentFromApi
+  const { creditcount } = studentFromDb
+  return studyattainments && (studyattainments > creditcount)
 }
 
 const loadAndUpdateStudent = async studentNumber => {
@@ -43,14 +50,20 @@ const loadAndUpdateStudent = async studentNumber => {
       return await createNewStudent(studentFromApi, studentNumber)
     }
 
+    const studentRequiresUpdate = apiHasNewCreditsForStudent(studentFromDb, studentFromApi)
+    if (!studentRequiresUpdate) {
+      logger.verbose(`Student ${studentNumber} already up to date.`)
+      return studentFromDb
+    }
+
   } catch (e) {
     logger.error('Student: ' + studentNumber + ' loadAndUpdate failed')
   }
 }
 
 const run = async () => {
-  const studentList = ['014441008', '014420676', '014580736']
-  await updateStudentInformation(studentList)
+  // const studentList = ['014441008', '014420676', '014580736']
+  await updateStudentInformation(['014028638'])
   process.exit(0)
 }
 
