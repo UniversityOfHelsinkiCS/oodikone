@@ -20,7 +20,7 @@ CourseParticipationFilters.propTypes = {
 }
 
 const mapStateToProps = state => ({
-  filters: state.populationFilters.filter(f => f.type === 'CourseParticipation')
+  filters: state.populationFilters.filters.filter(f => f.type === 'CourseParticipation')
 })
 
 export default connect(mapStateToProps)(CourseParticipationFilters)
