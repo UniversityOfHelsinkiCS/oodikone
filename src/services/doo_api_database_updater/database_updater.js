@@ -49,7 +49,7 @@ const getStudyRights = async (studentnumber) => await Promise.all([
 const saveStudyRight = async (studyRight, studentNumber) => {
   try {
     await StudyrightService.createStudyright(studyRight, studentNumber)
-    logger.verbose('Student ' + studentNumber + ': new studyright created')
+    logger.verbose(`Student ${studentNumber}: new studyright created`)
   } catch (e) {
     logger.error(`Student ${studentNumber}: creating studyright failed: ${e.message} `)
     throw(e)
