@@ -27,6 +27,14 @@ const byNameOrCode = (searchTerm) => Course.findAll({
   }
 })
 
+const byCode = (code) => Course.findOne({
+  where: {
+    code: {
+      [Op.eq]: code
+    }
+  }
+})
+
 const instanceStatistics = async (code, date) => CourseInstance.findOne({
   include: [
     {
@@ -216,7 +224,7 @@ const yearlyStatsOf = async (code, year, separate) => {
       stats = oneYearStats(yearInst, year, separate)
       if (stats.length > 0) results.push(...stats)
     }
-    return { code, start, end, separate, stats: results, name }
+    return { code, alternativeCodes, start, end, separate, stats: results, name }
   }
   return
 }
@@ -307,24 +315,60 @@ const getDuplicateCodes = async (code) => {
 }
 
 const setDuplicateCode = async (code, duplicate) => {
-  const all = await getAllDuplicates()
-  if (!all[code]) {
-    all[code] = []
+  if (code !== duplicate) {
+    const all = await getAllDuplicates()
+    if (!all[code]) {
+      all[code] = []
+    }
+    if (!all[code].includes(duplicate)) {
+      all[code].push(duplicate)
+      await redisClient.setAsync('duplicates', JSON.stringify(all))
+    }
   }
-  if (!all[code].includes(duplicate)) {
-    all[code].push(duplicate)
-    await redisClient.setAsync('duplicates', JSON.stringify(all))
-  }
-  return all
+
+  const res = await getAllDuplicatesAndNames()
+  return res
 }
 
 const removeDuplicateCode = async (code, duplicate) => {
   let all = await getAllDuplicates(code)
   if (all[code] && all[code].includes(duplicate)) {
     all[code] = all[code].filter(c => c !== duplicate)
-    await redisClient.setAsync(all, JSON.stringify(all))
+    if (all[code].length === 0) delete all[code]
+    await redisClient.setAsync('duplicates', JSON.stringify(all))
   }
-  return all
+
+  const res = await getAllDuplicatesAndNames()
+  return res
+}
+
+const getAllDuplicatesAndNames = async () => {
+  const codes = await getAllDuplicates()
+  const keys = Object.keys(codes)
+  const raw = await Promise.all(keys.map(async key => {
+    const course = await byCode(key)
+    const mainName = course.dataValues.name
+    const altCodes = codes[key]
+    const altCodesWithNames = await Promise.all(altCodes.map(async code => {
+      const course = await byCode(key)
+      const name = course.dataValues.name
+      return {
+        code,
+        name
+      }
+    }))
+    return {
+      [key]: {
+        name: mainName,
+        altCodes: altCodesWithNames
+      }
+    }
+  }))
+
+  return raw.reduce((map, obj) => {
+    map[Object.keys(obj)[0]] = obj[Object.keys(obj)[0]]
+    return map
+  }, {})
 }
 
 module.exports = {
@@ -339,5 +383,6 @@ module.exports = {
   getDuplicateCodes,
   setDuplicateCode,
   removeDuplicateCode,
-  getAllDuplicates
+  getAllDuplicates,
+  getAllDuplicatesAndNames
 }

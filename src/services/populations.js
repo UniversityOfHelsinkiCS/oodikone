@@ -1,10 +1,13 @@
 const Sequelize = require('sequelize')
+const Op = Sequelize.Op
 const _ = require('lodash')
-const { Studyright, Student, Credit, CourseInstance, Course, TagStudent, sequelize } = require('../models')
+const moment = require('moment')
+
+const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = require('../models')
 const { formatStudent, formatStudentUnifyCodes } = require('../services/students')
 const StudyRights = require('../services/studyrights')
 const { byId } = require('../services/units')
-const Op = Sequelize.Op
+
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -84,7 +87,9 @@ const restrictWith = (withinTimerange) => (student) => {
     tag_students: student.tag_students,
     dateofuniversityenrollment: student.dateofuniversityenrollment,
     creditcount: student.creditcount,
-    credits: creditsWithinTimelimit
+    credits: creditsWithinTimelimit,
+    sex: student.sex,
+    matriculationexamination: !!Number(student.matriculationexamination)
   }
 }
 
@@ -121,6 +126,7 @@ const optimizedStatisticsOf = async (query) => {
 
   const withStudyrighStart = (student) => {
     student.studyrightStart = startDate
+    student.starting = moment(student.started).isBetween(startDate, endDate, null, '[]')
     return student
   }
 
@@ -135,7 +141,8 @@ const optimizedStatisticsOf = async (query) => {
       studyRights
     }
 
-    const student_numbers = await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
+    const student_numbers = query.studyRights[0] === '9999' ? ['012843501', '011120775'] :
+      await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
     
     const students = await studentsWithCoursesAfterStudyrightStart(student_numbers, conf)
       .map(restrictWith(Credit.inTimeRange(conf.enrollmentDates.startDate, query.months)))
@@ -167,8 +174,9 @@ const bottlenecksOf = async (query) => {
       },
       studyRights
     }
-    const student_numbers = await StudyRights
-      .ofPopulations(conf).map(s => s.student_studentnumber)
+
+    const student_numbers = query.studyRights[0] === '9999' ? ['012843501', '011120775'] :
+      await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
 
     const students = await studentsWithAllCourses(student_numbers)
       .map(restrictWith(Credit.notLaterThan(conf.enrollmentDates.startDate, query.months)))
@@ -209,12 +217,19 @@ const bottlenecksOf = async (query) => {
       const passed = instances.filter(passedStudents).map(studentNumber)
       const failed = instances.filter(failedStudents).map(studentNumber)
       const nTimes = instances.filter(i => i.attempts > 1)
+      const retryPassed = nTimes.filter(passedStudents).map(studentNumber)
+      const failedMany = nTimes.filter(failedStudents).map(studentNumber)
+      const all = passed.concat(failed)
+
+      const toObject = (passed) => 
+        passed.length > 0 ? passed.reduce((o, s) => { o[s] = true; return o }, {}) : {} 
+       
       return {
-        all: passed.concat(failed),
-        passed,
-        failed,
-        retryPassed: nTimes.filter(passedStudents).map(studentNumber),
-        failedMany: nTimes.filter(failedStudents).map(studentNumber)
+        all: toObject(all),
+        passed: toObject(passed),
+        failed: toObject(failed),
+        retryPassed: toObject(retryPassed),
+        failedMany: toObject(failedMany)
       }
     }
 
@@ -222,6 +237,7 @@ const bottlenecksOf = async (query) => {
       const passed = instances.reduce((sum, i) => sum + (i.passed ? 1 : 0), 0)
       const failed = instances.reduce((sum, i) => sum + (i.passed ? 0 : 1), 0)
       const students = instances.length
+
       return {
         students,
         passed,

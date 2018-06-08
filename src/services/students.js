@@ -77,7 +77,6 @@ const byId = async (id) => Student.findOne({
 
 const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   return Student.findAll({
-    limit: 10,
     where: {
       [Op.or]: [
         {
@@ -96,7 +95,7 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
-const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, credits, abbreviatedname, studyrights }) => {
+const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount,matriculationexamination,sex, credits, abbreviatedname, studyrights }) => {
   const toCourse = ({ grade, credits, courseinstance }) => {
     return {
       course: {
@@ -117,7 +116,14 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     return moment(a.courseinstance.coursedate).isSameOrBefore(b.courseinstance.coursedate) ? -1 : 1
   }
   const studyRightByDate = (a, b) => {
-    return moment(a.startdate).isSameOrBefore(b.startdate) ? -1 : 1
+    let rank = moment(a.enddate).isSameOrBefore(b.enddate) ? -1 : 1
+    if (a.canceldate || b.canceldate) {
+      rank = moment(a.canceldate).isBefore(b.enddate) ? -1 : 1
+    }
+    if (!a.canceldate && !b.canceldate && moment(a.enddate).isSame(b.enddate)) {
+      rank = a.prioritycode !== 1 ? -1 : 1
+    }
+    return rank
   }
 
   if (credits === undefined) {
@@ -135,6 +141,8 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     courses: credits.sort(courseByDate).map(toCourse),
     name: abbreviatedname,
     studyrights,
+    matriculationexamination,
+    sex,
     tags: []
   }
 }
