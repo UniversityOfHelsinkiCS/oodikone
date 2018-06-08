@@ -8,15 +8,20 @@ process.on('unhandledRejection', (reason) => {
   console.log(reason)
 })
 
+const ELEMENT_ID = {
+  DEGREE_TITLE: 10,
+  DEGREE_MAJOR: 40
+} 
+
 const highlevelnameFromElements = elements => {
   let degree, subject
   elements.forEach(element => {
     const name = element.name[2].text
     switch(element.element_id) {
-    case 10:
+    case ELEMENT_ID.DEGREE_TITLE:
       degree = name
       break
-    case 40:
+    case ELEMENT_ID.DEGREE_MAJOR:
       subject = name
       break
     default:
