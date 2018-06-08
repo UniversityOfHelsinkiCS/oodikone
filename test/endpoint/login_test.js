@@ -29,7 +29,7 @@ test('should pong when pinged', async t => {
   t.deepEqual(res.body, { data: 'pong' })
 })
 
-test('login does not allow without required headers', async t => {
+test.skip('login does not allow without required headers', async t => {
   const res = api
     .post('/api/login')
     .set({ 'uid': 'uid' })
@@ -42,7 +42,7 @@ test('login does not allow without required headers', async t => {
   responses.forEach(response => t.is(response.status, 401))
 })
 
-test('login creates an user', async t => {
+test.skip('login creates an user', async t => {
   const user = generateUsers(1)[0]
 
   const res = await api
@@ -60,7 +60,7 @@ test('login creates an user', async t => {
   t.is(foundUser.full_name, user.full_name, 'Full name did not match fullname')
 })
 
-test('login fetches an user and returns token to enabled', async t => {
+test.skip('login fetches an user and returns token to enabled', async t => {
   const user = generateUsers(1)[0]
   user.is_enabled = true
   await User.insertOrUpdate(user)
@@ -82,7 +82,7 @@ test('login fetches an user and returns token to enabled', async t => {
 })
 
 
-test('logout removes token', async t => {
+test.skip('logout removes token', async t => {
   const user = generateUsers(1)[0]
   await api
     .post('/api/login')

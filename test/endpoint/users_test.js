@@ -43,7 +43,7 @@ test.after.always(async () => {
   await sequelize.dropSchema(schema)
 })
 
-test('all users can be fetched', async t => {
+test.skip('all users can be fetched', async t => {
   const res = await api
     .get('/api/users')
     .set('x-access-token', token)
@@ -53,7 +53,7 @@ test('all users can be fetched', async t => {
   t.is(res.body.length, 5)
 })
 
-test('user can be enabled/disabled', async t => {
+test.skip('user can be enabled/disabled', async t => {
   const user = await User.findOne({ id: 1 })
   const enabled = user.dataValues.is_enabled
   const res = await api
@@ -67,7 +67,7 @@ test('user can be enabled/disabled', async t => {
 })
 
 
-test('user cannot be enabled/disabled if enabler is not admin', async t => {
+test.skip('user cannot be enabled/disabled if enabler is not admin', async t => {
   const user = await User.findOne({ id: 2 })
   const enabled = user.dataValues.is_enabled
   await api
@@ -80,7 +80,7 @@ test('user cannot be enabled/disabled if enabler is not admin', async t => {
   t.is(userAfter.dataValues.is_enabled, enabled)
 })
 
-test('units cannot be added if adder is not admin', async t => {
+test.skip('units cannot be added if adder is not admin', async t => {
   const usersUnits = await UserService.getUnits(2)
   await api
     .put('/api/users/2/units/1')
@@ -92,7 +92,7 @@ test('units cannot be added if adder is not admin', async t => {
   t.is(usersUnitsAfter.length, usersUnits.length)
 })
 
-test('units can be added to user', async t => {
+test.skip('units can be added to user', async t => {
   let res = await api
     .post('/api/users/1/units/1')
     .send({ id: 1, uid: 1 })
@@ -114,7 +114,7 @@ test('units can be added to user', async t => {
   t.is(res.body.units.length, 2)
 })
 
-test('units can be removed from user', async t => {
+test.skip('units can be removed from user', async t => {
   let res = await api
     .post('/api/users/2/units/1')
     .send({ id: 1, uid: 1 })

@@ -20,6 +20,8 @@ const mapCourseCodes = async (newPrefixes, oldPrefixes) => {
   const mappedCodes = res ? res[0] : []
   const formattedCodes = mappedCodes.map(r => { return { [r.code1]: r.code2 } })
   await updateRedis(formattedCodes)
+
+  process.exit()
 }
 
 const redisGetAndSet = async (code1, code2) => {
