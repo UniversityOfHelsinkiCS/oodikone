@@ -36,7 +36,6 @@ const getStudent = (studentNumber) => {
 
 const getStudentStudyRights = (studentNumber) => {
   const url = addTokenToUrl(`${base_url}/students/${studentNumber}/studyrights`)
-  console.log(url)  
   return axios.get(url, { httpsAgent })
     .then( response => {
       return response.data.data
