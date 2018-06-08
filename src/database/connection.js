@@ -34,7 +34,7 @@ const runMigrations = async () => {
   }
 }
 
-const migrationPromise = conf.DB_SCHEMA === 'public' ? sequelize.sync({force: true})
+const migrationPromise = conf.DB_SCHEMA === 'public' ? sequelize.sync({ force: false })
   : Promise.resolve()
 
 module.exports = { sequelize, migrationPromise }
