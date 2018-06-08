@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Header, Button } from 'semantic-ui-react'
-import { arrayOf, object, func } from 'prop-types'
+import { Segment, Header, Button, Form, Radio } from 'semantic-ui-react'
+import { object, func, arrayOf, bool } from 'prop-types'
 import _ from 'lodash'
 
 import { getTranslate } from 'react-localize-redux'
@@ -10,7 +10,7 @@ import CreditsAtLeast from './CreditsAtLeast'
 import StartingThisSemester from './StartingThisSemester'
 import SexFilter from './SexFilter'
 import CourseParticipation from './CourseParticipation'
-import { clearPopulationFilters } from '../../redux/populationFilters'
+import { clearPopulationFilters, setComplementFilter } from '../../redux/populationFilters'
 
 
 const componentFor = {
@@ -23,8 +23,10 @@ const componentFor = {
 
 class PopulationFilters extends Component {
   static propTypes = {
-    populationFilters: arrayOf(object).isRequired,
-    clearPopulationFilters: func.isRequired
+    filters: arrayOf(object).isRequired,
+    complemented: bool.isRequired,
+    clearPopulationFilters: func.isRequired,
+    setComplementFilter: func.isRequired
   }
 
   state = {
@@ -33,7 +35,7 @@ class PopulationFilters extends Component {
 
   renderAddFilters() {
     const allFilters = Object.keys(componentFor).map(f => String(f))
-    const setFilters = this.props.populationFilters.map(f => f.type)
+    const setFilters = this.props.filters.map(f => f.type)
     const unsetFilters = _.difference(allFilters, setFilters)
 
     if (unsetFilters.length === 0) {
@@ -68,8 +70,7 @@ class PopulationFilters extends Component {
   }
 
   renderSetFilters() {
-    const setFilters = this.props.populationFilters.map(f => f.type)
-
+    const setFilters = this.props.filters.map(f => f.type)
     if (setFilters.length === 0) {
       return null
     }
@@ -77,7 +78,24 @@ class PopulationFilters extends Component {
     return (
       <Segment>
         <Header>Filters</Header>
-        {this.props.populationFilters.map(filter =>
+        <Form>
+          <Form.Group inline>
+            <Form.Field>
+              <label>Showing students that</label>
+            </Form.Field>
+            <Form.Field>
+              <Radio
+                toggle
+                checked={this.props.complemented}
+                onClick={this.props.setComplementFilter}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>{!this.props.complemented ? ' are included in these filters.' : ' are in complement of these filters.'}</label>
+            </Form.Field>
+          </Form.Group>
+        </Form>
+        {this.props.filters.map(filter =>
           React.createElement(componentFor[filter.type], { filter, key: filter.id }))}
         <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
       </Segment>
@@ -95,9 +113,11 @@ class PopulationFilters extends Component {
 }
 
 const mapStateToProps = ({ populationFilters, locale, graphSpinner }) => ({
-  populationFilters,
+  filters: populationFilters.filters,
+  complemented: populationFilters.complemented,
   translate: getTranslate(locale),
   loading: graphSpinner
 })
 
-export default connect(mapStateToProps, { clearPopulationFilters })(PopulationFilters)
+export default connect(mapStateToProps, {
+  clearPopulationFilters, setComplementFilter })(PopulationFilters)

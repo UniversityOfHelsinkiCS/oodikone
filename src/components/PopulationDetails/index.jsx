@@ -12,7 +12,6 @@ import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCha
 import CourseQuarters from '../CourseQuarters'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourses from '../PopulationCourses'
-import CourseParticipationFilters from '../PopulationFilters/CourseParticipationFilters'
 
 class PopulationDetails extends Component {
   static propTypes = {
@@ -56,13 +55,11 @@ class PopulationDetails extends Component {
         selectedStudents={this.props.selectedStudents}
       />
     )
-
     return (
       <Segment>
         <Header size="medium" dividing>
           {translate('populationStatistics.graphSegmentHeader')}
         </Header>
-        <CourseParticipationFilters />
         {graphs}
       </Segment>
     )
@@ -81,13 +78,13 @@ class PopulationDetails extends Component {
     return (
       <div>
         <PopulationFilters />
-        {this.renderCourseStatistics()}
         {this.renderCreditGainGraphs()}
+        {this.renderCourseStatistics()}
+        <PopulationCourses />
         <PopulationStudents
           samples={this.props.samples}
           selectedStudents={this.props.selectedStudents}
         />
-        <PopulationCourses />
       </div>
     )
   }
@@ -97,10 +94,11 @@ const populationsToData = makePopulationsToData()
 
 const mapStateToProps = (state) => {
   const samples = populationsToData(state)
+  const { complemented } = state.populationFilters
   let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
 
   // TODO refactor to more functional approach where the whole sample is not tested for each filter
-  if (samples.length > 0 && state.populationFilters.length > 0) {
+  if (samples.length > 0 && state.populationFilters.filters.length > 0) {
     const studentsForFilter = (f) => {
       if (f.type === 'CourseParticipation') {
         return Object.keys(f.studentsOfSelectedField)
@@ -108,9 +106,12 @@ const mapStateToProps = (state) => {
       return samples.filter(f.filter).map(s => s.studentNumber)
     }
 
-    const matchingStudents = state.populationFilters.map(studentsForFilter)
-
+    const matchingStudents = state.populationFilters.filters.map(studentsForFilter)
     selectedStudents = _.intersection(...matchingStudents)
+
+    if (complemented) {
+      selectedStudents = _.difference(samples.map(s => s.studentNumber), selectedStudents)
+    }
   }
 
   // REFACTOR ??
@@ -132,6 +133,7 @@ const mapStateToProps = (state) => {
   return {
     samples,
     selectedStudents,
+    complemented,
     translate: getTranslate(state.locale),
     queryIsSet: !!state.populations.query,
     isLoading: state.populations.pending === true
