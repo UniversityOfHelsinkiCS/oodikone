@@ -51,8 +51,8 @@ const reducer = (state = initial, action) => {
         const { course } = filter.params[0]
         return course.name !== action.course.name || course.code !== action.course.code
       }
-
-      return state.filters.filter(notRemoved)
+      state.filters = state.filters.filter(notRemoved)
+      return state
     }
 
     case 'CLEAR_POPULATION_FILTERS':
