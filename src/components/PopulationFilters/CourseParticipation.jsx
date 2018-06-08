@@ -39,8 +39,8 @@ class CourseParticipation extends Component {
     return (
       <div>
         <Segment.Group horizontal>
-          <Segment>
-            <em>{course.course.name}</em>
+          <Segment style={{ width: '30%', height: 40 }} >
+            <em style={{ float: 'left', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', width: '80%' }}>{course.course.name}</em>
             <span style={{ float: 'right' }}>
               <Icon name="remove" onClick={this.clearFilter} />
             </span>
@@ -49,6 +49,7 @@ class CourseParticipation extends Component {
             inverted={active('all')}
             secondary={active('all')}
             onClick={this.selectField('all')}
+            style={{ width: 30 }}
           >
             all
           </Segment>
