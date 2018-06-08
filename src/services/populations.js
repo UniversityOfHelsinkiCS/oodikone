@@ -7,7 +7,7 @@ const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = requi
 const { formatStudent, formatStudentUnifyCodes } = require('../services/students')
 const StudyRights = require('../services/studyrights')
 const { byId } = require('../services/units')
-
+const { StudentList } = require('../models')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -105,7 +105,6 @@ const universityEnrolmentDates = async () => {
   return result.map(r => r.date).filter(d => d).sort()
 }
 
-
 const semesterStart = {
   SPRING: '01-01',
   FALL: '08-01'
@@ -114,6 +113,18 @@ const semesterStart = {
 const semesterEnd = {
   SPRING: '07-31',
   FALL: '12-31'
+}
+
+const getStudentsWithStudyright = async (studyRight, conf) => {
+  if (['9999'].includes(studyRight)) {
+    let cached = await StudentList.findOne({
+      where: { key: studyRight }
+    })
+
+    return cached.student_numbers 
+  }
+  
+  return await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
 }
 
 const optimizedStatisticsOf = async (query) => {
@@ -141,9 +152,8 @@ const optimizedStatisticsOf = async (query) => {
       studyRights
     }
 
-    const student_numbers = query.studyRights[0] === '9999' ? ['012843501', '011120775'] :
-      await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
-    
+    const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf)
+
     const students = await studentsWithCoursesAfterStudyrightStart(student_numbers, conf)
       .map(restrictWith(Credit.inTimeRange(conf.enrollmentDates.startDate, query.months)))
 
@@ -175,8 +185,7 @@ const bottlenecksOf = async (query) => {
       studyRights
     }
 
-    const student_numbers = query.studyRights[0] === '9999' ? ['012843501', '011120775'] :
-      await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
+    const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf)
 
     const students = await studentsWithAllCourses(student_numbers)
       .map(restrictWith(Credit.notLaterThan(conf.enrollmentDates.startDate, query.months)))
