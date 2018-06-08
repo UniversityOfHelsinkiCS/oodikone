@@ -1,11 +1,30 @@
 const Oodi = require('./oodi_interface')
 const StudentService = require('../students')
 const StudyrightService = require('../studyrights')
+const UnitService = require('../units')
 const logger = require('../../util/logger')
 
 process.on('unhandledRejection', (reason) => {
   console.log(reason)
 })
+
+const highlevelnameFromElements = elements => {
+  let degree, subject
+  elements.forEach(element => {
+    const name = element.name[2].text
+    switch(element.element_id) {
+    case 10:
+      degree = name
+      break
+    case 40:
+      subject = name
+      break
+    default:
+      break
+    }
+  })
+  return `${degree}, ${subject}`
+}
 
 const updateStudentInformation = async studentNumberList => {
   await Promise.all(studentNumberList.map(updateAllDataRelatedToStudent))
@@ -14,13 +33,12 @@ const updateStudentInformation = async studentNumberList => {
 const updateAllDataRelatedToStudent = async studentNumber => {
   const student = await loadAndUpdateStudent(studentNumber)
 
-  if (student === null) {
-    logger.error(`Can't get student ' + ${studentNumber}`)
+  if (!student) {
+    logger.error(`Can't get student ${studentNumber}`)
     return
   }
 
   await updateStudentStudyRights(student)
-
 }
 
 const getStudyRights = async (studentnumber) => await Promise.all([
@@ -28,31 +46,50 @@ const getStudyRights = async (studentnumber) => await Promise.all([
   StudyrightService.byStudent(studentnumber)
 ])
 
-const saveStudyRight = async studyRight => {
-  logger.verbose(`Saving studyright ${studyRight.studyright_id}`)
+const saveStudyRight = async (studyRight, studentNumber) => {
+  try {
+    await StudyrightService.createStudyright(studyRight, studentNumber)
+    logger.verbose('Student ' + studentNumber + ': new studyright created')
+  } catch (e) {
+    logger.error(`Student ${studentNumber}: creating studyright failed: ${e.message} `)
+    throw(e)
+  }
 }
 
 const studyrightArrayToObjectById = (array) => array.reduce((obj, studyright) => {
-  obj[studyright.studyright_id] = studyright
+  const data = studyright.dataValues
+  obj[data.studyrightid] = data
   return obj
 }, {})
 
-const updateStudentStudyRights = async student => {
-  try {
-    const [ apiStudyRightArray, dbStudyRightArray ] = await getStudyRights(student.studentnumber)
-    const dbStudyRightSet = studyrightArrayToObjectById(dbStudyRightArray)
-    await Promise.all(apiStudyRightArray.map(async studyRight => {
-      const id = studyRight.studyright_id
-      if (dbStudyRightSet[id] !== undefined) {
-        logger.verbose(`Studyright ${id} already in database. `)
-        return
-      }
-      logger.verbose(`Studyright ${id} not included in database. `)
-      await saveStudyRight(studyRight)
-    }))
-  } catch (e) {
-    logger.error(`Updating student studyrights failed for student ${student.studentnumber}`)
+const createUnit = async (name) => {
+  const unit = await UnitService.findByName(name)
+  if (unit !== null) {
+    logger.verbose(`Unit ${name} already exists. `)
+    return
   }
+  logger.verbose(`Creating new unit ${name}`)
+  await UnitService.createUnit({
+    name,
+    enabled: true
+  })
+}
+
+const updateStudentStudyRights = async student => {
+  const { studentnumber } = student
+  const [ apiStudyRightArray, dbStudyRightArray ] = await getStudyRights(studentnumber)
+  const dbStudyRightSet = studyrightArrayToObjectById(dbStudyRightArray)
+  await Promise.all(apiStudyRightArray.map(async studyRight => {
+    const id = studyRight.studyright_id
+    if (dbStudyRightSet[id] !== undefined) {
+      logger.verbose(`Studyright ${id} already in database. `)
+      return
+    }
+    logger.verbose(`Studyright ${id} not included in database. `)
+    const highlevelname = highlevelnameFromElements(studyRight.elements)
+    await createUnit(highlevelname)
+    await saveStudyRight(studyRight, studentnumber, highlevelname)
+  }))
 }
 
 const createNewStudent = async (studentFromApi, studentNumber) => {
@@ -76,7 +113,7 @@ const apiHasNewCreditsForStudent = (studentFromDb, studentFromApi) => {
 const loadAndUpdateStudent = async studentNumber => {
   try {
     let [ studentFromDb, studentFromApi ] = await Promise.all([StudentService.byId(studentNumber), Oodi.getStudent(studentNumber)])
-    
+
     if (studentFromApi === null) {
       logger.verbose(`API returned null for student ${studentNumber}`)
       return null
@@ -101,6 +138,7 @@ const loadAndUpdateStudent = async studentNumber => {
     return studentFromDb
   } catch (e) {
     logger.error(`Student: ${studentNumber} loadAndUpdate failed`)
+    throw(e)
   }
 }
 
