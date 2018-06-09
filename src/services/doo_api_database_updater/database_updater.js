@@ -88,13 +88,6 @@ const saveStudyRight = async (studyRight, studentNumber) => {
   }
 }
 
-const reduceArrayToObjectByKey = (array, keyAttribute) => array.reduce((obj, studyright) => {
-  const data = studyright.dataValues
-  const key = data[keyAttribute]
-  obj[key] = data
-  return obj
-}, {})
-
 const createUnit = async (name) => {
   const unit = await UnitService.findByName(name)
   if (unit !== null) {
@@ -108,15 +101,8 @@ const createUnit = async (name) => {
   })
 }
 
-const updateStudyrightIfNotInDb = async (studyRight, dbDataSet, studentnumber) => {
-  const { studyright_id, elements } = studyRight
-  const studyRightAlreadyInDb = dbDataSet[studyright_id] !== undefined
-  if (studyRightAlreadyInDb) {
-    logger.verbose(`Studyright ${studyright_id} already in database. `)
-    return
-  }
-  logger.verbose(`Studyright ${studyright_id} not included in database. `)
-  const highlevelname = highlevelnameFromElements(elements)
+const updateStudyright = async (studyRight, studentnumber) => {
+  const highlevelname = highlevelnameFromElements(studyRight.elements)
   await createUnit(highlevelname)
   await saveStudyRight(studyRight, studentnumber, highlevelname)
 }
@@ -124,8 +110,16 @@ const updateStudyrightIfNotInDb = async (studyRight, dbDataSet, studentnumber) =
 const updateStudentStudyRights = async student => {
   const { studentnumber } = student
   const [ apiStudyRightArray, dbStudyRightArray ] = await getStudyRights(studentnumber)
-  const dbStudyRightSet = reduceArrayToObjectByKey(dbStudyRightArray, 'studyrightid')
-  await Promise.all(apiStudyRightArray.map(studyRight => updateStudyrightIfNotInDb(studyRight, dbStudyRightSet, studentnumber)))
+  const dbStudyRightIds = new Set(dbStudyRightArray.map(studyright => studyright.studyrightid))
+  await Promise.all(apiStudyRightArray.map(async studyRight => {
+    const id = `${studyRight.studyright_id}`
+    if (dbStudyRightIds.has(id)) {
+      logger.verbose(`Studyright ${id} already in database. `)
+      return
+    }
+    logger.verbose(`Studyright ${id} not included in database. `)
+    await updateStudyright(studyRight, studentnumber)
+  }))
 }
 
 const createNewStudent = async (studentFromApi, studentNumber) => {
