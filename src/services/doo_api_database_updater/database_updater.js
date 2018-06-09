@@ -2,6 +2,7 @@ const Oodi = require('./oodi_interface')
 const StudentService = require('../students')
 const StudyrightService = require('../studyrights')
 const UnitService = require('../units')
+const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 
 process.on('unhandledRejection', (reason) => {
@@ -33,6 +34,32 @@ const highlevelnameFromElements = elements => {
 
 const updateStudentInformation = async studentNumberList => {
   await Promise.all(studentNumberList.map(updateAllDataRelatedToStudent))
+}
+
+const getFaculties = () => {
+  return Promise.all([OrganisationService.all(), Oodi.getFaculties()])
+}
+
+const saveFacultyToDb = async faculty => {
+  try {
+    await OrganisationService.createOrganisation(faculty)
+    logger.verbose(`Faculty ${faculty.code} created. `)    
+  } catch (error) {
+    logger.verbose(`Error creating faculty ${faculty.code}, error: ${error.message}`)
+  }
+}
+
+const updateFaculties = async () => {
+  const [ dbFacultiesArray, apiFacultiesArray ] = await getFaculties()
+  const dbFacultyCodes = new Set(dbFacultiesArray.map(faculty => faculty.code))
+  await Promise.all(apiFacultiesArray.map(async faculty => {
+    if (dbFacultyCodes.has(faculty.code)) {
+      logger.verbose(`Faculty ${faculty.code} already in in db.`)
+      return
+    }
+    logger.verbose(`Faculty ${faculty.code} missing from db`)
+    await saveFacultyToDb(faculty)
+  }))
 }
 
 const updateAllDataRelatedToStudent = async studentNumber => {
@@ -154,6 +181,7 @@ const loadAndUpdateStudent = async studentNumber => {
 const run = async () => {
   const { STUDENT_NUMBERS } = process.env
   const studentNumbers = STUDENT_NUMBERS ? STUDENT_NUMBERS.split(' ') : []
+  await updateFaculties()  
   await updateStudentInformation(studentNumbers)
   process.exit(0)
 }
