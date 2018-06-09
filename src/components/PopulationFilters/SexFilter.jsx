@@ -38,7 +38,7 @@ class SexFilter extends Component {
           <Form>
             <Form.Group inline>
               <Form.Field>
-                <label>Filter by sex</label>
+                <label>Filter by gender</label>
               </Form.Field>
               <Form.Field>
                 <Radio name="sex" onChange={this.handleChange} value="male" label="Male" checked={this.state.sex === 'male'} />
