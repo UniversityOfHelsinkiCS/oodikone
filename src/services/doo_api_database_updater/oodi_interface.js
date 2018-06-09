@@ -3,6 +3,7 @@ const axios = require('axios')
 const data_mapper = require('./oodi_data_mapper')
 const base_url = process.env.OODI_ADDR
 const https = require('https')
+const logger = require('../../util/logger')
 
 const instance = axios.create({
   httpsAgent: new https.Agent({  
@@ -87,11 +88,23 @@ const getStudentCourseCredits = (studentNumber) => {
     })
 }
 
-module.exports = {
-  getStudentStudyRights, 
-  getStudent, 
-  getOrganisation,
-  getStudentCourseCredits, 
-  getStudentNumbers, 
-  getTeacherDetails
+const getOrganizationCodes = () => {
+  const url = addTokenToUrl(`${base_url}/codes/faculties`)
+  return axios.get(url, { httpsAgent })
+    .then(response => {
+      return response.data.data
+    })
+    .catch(error => {
+      logger.error(`Error getting organization codes: ${error.message}`)
+    })
 } 
+
+module.exports = {
+  getStudentStudyRights,
+  getStudent,
+  getOrganisation,
+  getStudentCourseCredits,
+  getStudentNumbers,
+  getTeacherDetails,
+  getOrganizationCodes
+}
