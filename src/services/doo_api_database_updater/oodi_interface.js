@@ -88,7 +88,7 @@ const getStudentCourseCredits = (studentNumber) => {
     })
 }
 
-const getOrganizationCodes = () => {
+const getFaculties = () => {
   const url = addTokenToUrl(`${base_url}/codes/faculties`)
   return axios.get(url, { httpsAgent })
     .then(response => {
@@ -106,5 +106,5 @@ module.exports = {
   getStudentCourseCredits,
   getStudentNumbers,
   getTeacherDetails,
-  getOrganizationCodes
+  getFaculties
 }
