@@ -61,9 +61,10 @@ const saveStudyRight = async (studyRight, studentNumber) => {
   }
 }
 
-const studyrightArrayToObjectById = (array) => array.reduce((obj, studyright) => {
+const reduceArrayToObjectByKey = (array, keyAttribute) => array.reduce((obj, studyright) => {
   const data = studyright.dataValues
-  obj[data.studyrightid] = data
+  const key = data[keyAttribute]
+  obj[key] = data
   return obj
 }, {})
 
@@ -80,21 +81,24 @@ const createUnit = async (name) => {
   })
 }
 
+const updateStudyrightIfNotInDb = async (studyRight, dbDataSet, studentnumber) => {
+  const { studyright_id, elements } = studyRight
+  const studyRightAlreadyInDb = dbDataSet[studyright_id] !== undefined
+  if (studyRightAlreadyInDb) {
+    logger.verbose(`Studyright ${studyright_id} already in database. `)
+    return
+  }
+  logger.verbose(`Studyright ${studyright_id} not included in database. `)
+  const highlevelname = highlevelnameFromElements(elements)
+  await createUnit(highlevelname)
+  await saveStudyRight(studyRight, studentnumber, highlevelname)
+}
+
 const updateStudentStudyRights = async student => {
   const { studentnumber } = student
   const [ apiStudyRightArray, dbStudyRightArray ] = await getStudyRights(studentnumber)
-  const dbStudyRightSet = studyrightArrayToObjectById(dbStudyRightArray)
-  await Promise.all(apiStudyRightArray.map(async studyRight => {
-    const id = studyRight.studyright_id
-    if (dbStudyRightSet[id] !== undefined) {
-      logger.verbose(`Studyright ${id} already in database. `)
-      return
-    }
-    logger.verbose(`Studyright ${id} not included in database. `)
-    const highlevelname = highlevelnameFromElements(studyRight.elements)
-    await createUnit(highlevelname)
-    await saveStudyRight(studyRight, studentnumber, highlevelname)
-  }))
+  const dbStudyRightSet = reduceArrayToObjectByKey(dbStudyRightArray, 'studyrightid')
+  await Promise.all(apiStudyRightArray.map(studyRight => updateStudyrightIfNotInDb(studyRight, dbStudyRightSet, studentnumber)))
 }
 
 const createNewStudent = async (studentFromApi, studentNumber) => {
