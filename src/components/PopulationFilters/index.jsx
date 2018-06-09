@@ -91,7 +91,7 @@ class PopulationFilters extends Component {
               />
             </Form.Field>
             <Form.Field>
-              <label>{!this.props.complemented ? ' are included in these filters.' : ' are in complement of these filters.'}</label>
+              <label>{!this.props.complemented ? ' are included in the filters.' : ' are in excluded by the filters.'}</label>
             </Form.Field>
           </Form.Group>
         </Form>
