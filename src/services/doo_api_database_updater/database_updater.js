@@ -22,7 +22,12 @@ const ELEMENT_ID = {
 const highlevelnameFromElements = elements => {
   let degree, subject
   elements.forEach(element => {
-    const name = element.name[2].text
+    let name
+    if (element.name[2]) {
+      name = element.name[2].text
+    }else {
+      name = element.name[0].text
+    }
     switch(element.element_id) {
     case ELEMENT_ID.DEGREE_TITLE:
       degree = name
@@ -99,14 +104,14 @@ const updateCourse = async course => {
 }
 
 const updateCourseInstance = async courseInstance => {
-  const { coursedate, course_code } = courseInstance
+  const { coursedate, course_code, teacherid } = courseInstance
   const dbCourseInstance = await CourseService.courseInstanceByCodeAndDate(course_code, coursedate)
   if (dbCourseInstance !== null) {
     logger.verbose(`Course instance for ${course_code} for date ${coursedate} already in database`)
     return dbCourseInstance
   }
   logger.verbose(`Course instance ${course_code} for date ${coursedate} not in database`)
-  return await CourseService.createCourseInstance(coursedate, course_code)
+  return await CourseService.createCourseInstance(coursedate, course_code, teacherid)
 }
 
 const updateTeachers = async teachers => {

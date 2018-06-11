@@ -315,13 +315,14 @@ const createCourse = async (code, name) => Course.create({
   name: name
 })
 
-const createCourseInstance = async (creditDate, courseCode) => {
+const createCourseInstance = async (creditDate, courseCode, teacherid) => {
   const maxId = await CourseInstance.max('id') || 0
   const id = parseInt(maxId) + 1
   return CourseInstance.create({
     id: id,
     coursedate: creditDate,
-    course_code: courseCode
+    course_code: courseCode,
+    teacherid: teacherid
   })
 }
 
