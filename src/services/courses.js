@@ -36,6 +36,8 @@ const byCode = (code) => Course.findOne({
   }
 })
 
+const byCode = code => Course.findByPrimary(code)
+
 const instanceStatistics = async (code, date) => CourseInstance.findOne({
   include: [
     {
@@ -313,13 +315,13 @@ const createCourse = async (code, name) => Course.create({
   name: name
 })
 
-const createCourseInstance = async (creditDate, course) => {
-  const maxId = await CourseInstance.max('id')
+const createCourseInstance = async (creditDate, courseCode) => {
+  const maxId = await CourseInstance.max('id') || 0
   const id = parseInt(maxId) + 1
   return CourseInstance.create({
     id: id,
     coursedate: creditDate,
-    course_code: course.code
+    course_code: courseCode
   })
 }
 
@@ -440,6 +442,7 @@ const removeDuplicateCode = async (code, duplicate) => {
 }
 
 module.exports = {
+  byCode,
   bySearchTerm,
   instancesOf,
   statisticsOf,
