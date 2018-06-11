@@ -144,9 +144,14 @@ const attainmentDataToCourse = attainment => {
 }
 
 const attainmentDataToCourseInstance = attainment => {
+  let teacher_id = undefined
+  if (attainment.teachers.length > 0) {
+    teacher_id = attainment.teachers[0].teacher_id 
+  }
   return {
     coursedate: getDate(attainment.attainment_date, null),
-    course_code: attainment.learningopportunity_id
+    course_code: attainment.learningopportunity_id,
+    teacherid: teacher_id
   }
 }
 
