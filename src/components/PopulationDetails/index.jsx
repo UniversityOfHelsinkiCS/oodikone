@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool } from 'prop-types'
-import { Segment, Header, Message, Button } from 'semantic-ui-react'
+import { Segment, Header, Message, Button, Icon } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
@@ -29,6 +29,9 @@ class PopulationDetails extends Component {
     this.courses = React.createRef()
     this.students = React.createRef()
     this.filters = React.createRef()
+    this.state = {
+      navigationVisible: false
+    }
   }
 
 
@@ -75,6 +78,38 @@ class PopulationDetails extends Component {
       </Segment>
     )
   }
+  renderNavigationPanel = () => (
+    <div>
+      <Segment style={{ position: 'fixed', right: '2%', bottom: '2%' }}>
+        <Header size="medium" textAlign="center" >
+          Navigation
+          <Button icon basic floated="right" onClick={() => this.setState({ navigationVisible: false })} >
+            <Icon name="chevron right" />
+          </Button>
+        </Header>
+        <Button.Group vertical >
+          <Button onClick={() => scrollToComponent(this.filters.current, { align: 'top', offset: -40 })}>Go To Filters</Button>
+          <Button onClick={() => scrollToComponent(this.chart.current, { align: 'middle' })}>Go To Chart</Button>
+          <Button onClick={() => scrollToComponent(this.courses.current, { align: 'top', offset: -40 })}>Go To Course List</Button>
+          <Button onClick={() => scrollToComponent(this.students.current, { align: 'top', offset: -40 })}>Go To Student List</Button>
+        </Button.Group>
+      </Segment>
+    </div>
+  )
+
+  renderPopulationDetailsContent = () => (
+    <div>
+      <PopulationFilters ref={this.filters} />
+      {this.renderCreditGainGraphs()}
+      {this.renderCourseStatistics()}
+      <PopulationCourses ref={this.courses} />
+      <PopulationStudents
+        samples={this.props.samples}
+        selectedStudents={this.props.selectedStudents}
+        ref={this.students}
+      />
+    </div>
+  )
 
   render() {
     const { samples, translate, queryIsSet, isLoading } = this.props
@@ -86,29 +121,21 @@ class PopulationDetails extends Component {
         <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
       )
     }
+    if (this.state.navigationVisible) {
+      return (
+        <div>
+          {this.renderPopulationDetailsContent()}
+          {this.renderNavigationPanel()}
+        </div>
+      )
+    }
     return (
       <div>
+        {this.renderPopulationDetailsContent()}
         <div>
-          <PopulationFilters ref={this.filters} />
-          {this.renderCreditGainGraphs()}
-          {this.renderCourseStatistics()}
-          <PopulationCourses ref={this.courses} />
-          <PopulationStudents
-            samples={this.props.samples}
-            selectedStudents={this.props.selectedStudents}
-            ref={this.students}
-          />
-        </div>
-        <div>
-          <Segment style={{ position: 'fixed', right: '2%', bottom: '2%' }}>
-            <Header size="medium" textAlign="center" >Navigation</Header>
-            <Button.Group vertical >
-              <Button onClick={() => scrollToComponent(this.filters.current, { align: 'top', offset: -40 })}>Go To Filters</Button>
-              <Button onClick={() => scrollToComponent(this.chart.current, { align: 'middle' })}>Go To Chart</Button>
-              <Button onClick={() => scrollToComponent(this.courses.current, { align: 'top', offset: -40 })}>Go To Course List</Button>
-              <Button onClick={() => scrollToComponent(this.students.current, { align: 'top', offset: -40 })}>Go To Student List</Button>
-            </Button.Group>
-          </Segment>
+          <Button icon basic onClick={() => this.setState({ navigationVisible: true })} style={{ position: 'fixed', right: '0%', bottom: '15%' }} >
+            <Icon name="bars" />
+          </Button>
         </div>
       </div>
     )
