@@ -201,6 +201,8 @@ const createCourseTeacher = async (role, teacher, instance) => {
   })
 }
 
+const createTeacherFromObject = teacher => Teacher.create(teacher)
+
 module.exports = {
-  statisticsOf, findOrCreateTeacher, createCourseTeacher
+  statisticsOf, findOrCreateTeacher, createCourseTeacher, teachersByIds, createTeacherFromObject
 }
