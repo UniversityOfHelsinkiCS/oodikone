@@ -204,7 +204,7 @@ const Teacher = sequelize.define('teacher',
   {
     id: {
       primaryKey: true,
-      type: Sequelize.BIGINT
+      type: Sequelize.STRING
     },
     code: { type: Sequelize.STRING },
     name: { type: Sequelize.STRING },
@@ -223,7 +223,7 @@ const CourseTeacher = sequelize.define('courseteacher',
     },
     teacherrole: { type: Sequelize.STRING },
     courseinstance_id: { type: Sequelize.BIGINT },
-    teacher_id: { type: Sequelize.BIGINT },
+    teacher_id: { type: Sequelize.STRING },
   },
   {
     tableName: 'courseteacher',
