@@ -133,7 +133,7 @@ class PopulationDetails extends Component {
       <div>
         {this.renderPopulationDetailsContent()}
         <div>
-          <Button icon basic onClick={() => this.setState({ navigationVisible: true })} style={{ position: 'fixed', right: '0%', bottom: '15%' }} >
+          <Button icon basic onClick={() => this.setState({ navigationVisible: true })} style={{ position: 'fixed', right: '0.5%', bottom: '0.5%' }} >
             <Icon name="bars" />
           </Button>
         </div>
