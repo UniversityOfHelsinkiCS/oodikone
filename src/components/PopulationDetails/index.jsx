@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool } from 'prop-types'
-import { Segment, Header, Message } from 'semantic-ui-react'
+import { Segment, Header, Message, Button } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
+import scrollToComponent from 'react-scroll-to-component'
+
 
 import { makePopulationsToData } from '../../selectors/populationDetails'
 
@@ -21,6 +23,14 @@ class PopulationDetails extends Component {
     queryIsSet: bool.isRequired,
     isLoading: bool.isRequired
   }
+  constructor() {
+    super()
+    this.chart = React.createRef()
+    this.courses = React.createRef()
+    this.students = React.createRef()
+    this.filters = React.createRef()
+  }
+
 
   renderCourseStatistics = () => {
     const { samples, translate } = this.props
@@ -53,6 +63,7 @@ class PopulationDetails extends Component {
         label={samples.label}
         maxCredits={samples.maxCredits}
         selectedStudents={this.props.selectedStudents}
+        ref={this.chart}
       />
     )
     return (
@@ -77,14 +88,28 @@ class PopulationDetails extends Component {
     }
     return (
       <div>
-        <PopulationFilters />
-        {this.renderCreditGainGraphs()}
-        {this.renderCourseStatistics()}
-        <PopulationCourses />
-        <PopulationStudents
-          samples={this.props.samples}
-          selectedStudents={this.props.selectedStudents}
-        />
+        <div>
+          <PopulationFilters ref={this.filters} />
+          {this.renderCreditGainGraphs()}
+          {this.renderCourseStatistics()}
+          <PopulationCourses ref={this.courses} />
+          <PopulationStudents
+            samples={this.props.samples}
+            selectedStudents={this.props.selectedStudents}
+            ref={this.students}
+          />
+        </div>
+        <div>
+          <Segment style={{ position: 'fixed', right: '2%', bottom: '2%' }}>
+            <Header size="medium" textAlign="center" >Navigation</Header>
+            <Button.Group vertical >
+              <Button onClick={() => scrollToComponent(this.filters.current, { align: 'top', offset: -40 })}>Go To Filters</Button>
+              <Button onClick={() => scrollToComponent(this.chart.current, { align: 'middle' })}>Go To Chart</Button>
+              <Button onClick={() => scrollToComponent(this.courses.current, { align: 'top', offset: -40 })}>Go To Course List</Button>
+              <Button onClick={() => scrollToComponent(this.students.current, { align: 'top', offset: -40 })}>Go To Student List</Button>
+            </Button.Group>
+          </Segment>
+        </div>
       </div>
     )
   }
