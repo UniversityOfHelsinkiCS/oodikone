@@ -129,6 +129,12 @@ const studyAttainmentDataToModels = (data) => {
   return [ credit, course, courseinstance ]
 }
 
+const getTeacherFromData = teacher => ({
+  id: teacher.teacher_id,
+  code: teacher.userid,
+  name: teacher.full_name
+})
+
 module.exports = {
   getStudentFromData, 
   getStudyRightIdStrings, 
@@ -138,5 +144,6 @@ module.exports = {
   getStudentNumbersFromProgramData, 
   getDate,
   getTeachersAndRolesFromData,
-  studyAttainmentDataToModels
+  studyAttainmentDataToModels,
+  getTeacherFromData
 }

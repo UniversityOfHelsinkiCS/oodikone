@@ -5,8 +5,10 @@ const UnitService = require('../units')
 const OrganisationService = require('../organisations')
 const CreditService = require('../credits')
 const CourseService = require('../courses')
+const TeacherService = require('../teachers')
 const logger = require('../../util/logger')
 const datamapper = require('./oodi_data_mapper')
+const _ = require('lodash')
 
 process.on('unhandledRejection', (reason) => {
   console.log(reason)
@@ -36,7 +38,9 @@ const highlevelnameFromElements = elements => {
 }
 
 const updateStudentInformation = async studentNumberList => {
-  await Promise.all(studentNumberList.map(updateAllDataRelatedToStudent))
+  for (let studentNumber of studentNumberList) {
+    await updateAllDataRelatedToStudent(studentNumber)
+  }
 }
 
 const getFaculties = () => {
@@ -105,10 +109,28 @@ const updateCourseInstance = async courseInstance => {
   return await CourseService.createCourseInstance(coursedate, course_code)
 }
 
+const updateTeachers = async teachers => {
+  const apiIds = teachers.map(teacher => teacher.teacher_id)
+  const dbTeachers = await TeacherService.teachersByIds(apiIds)
+  const dbIds = dbTeachers.map(teacher => teacher.id)
+  const newTeacherIds = _.difference(apiIds, dbIds)
+  await Promise.all(newTeacherIds.map(async id => {
+    try {
+      const teacher = await Oodi.getTeacherInfo(id)
+      await TeacherService.createTeacherFromObject(teacher)
+      logger.verbose(`Teacher ${id} created`)
+    } catch (error) {
+      logger.error(`Error creating teacher ${id}: ${error.message}`)
+      throw(error)
+    }
+  }))
+}
+
 const updateStudyAttainment = async (apiAttainment, studentnumber) => {
   const [ credit, course, courseInstance ] = datamapper.studyAttainmentDataToModels(apiAttainment)
   await updateCourse(course)
   const { id } = await updateCourseInstance(courseInstance)
+  await updateTeachers(apiAttainment.teachers)
   await saveStudyAttainment(credit, studentnumber, id)
 }
 

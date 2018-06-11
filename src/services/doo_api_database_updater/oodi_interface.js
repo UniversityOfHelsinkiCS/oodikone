@@ -109,6 +109,16 @@ const getStudyAttainments = (studentNumber) => {
     })
 }
 
+const getTeacherInfo = id => {
+  const url = addTokenToUrl(`${base_url}/teachers/${id}/info`)
+  return axios.get(url, { httpsAgent })
+    .then(response => {
+      return data_mapper.getTeacherFromData(response.data.data)
+    }).catch(error => {
+      logger.error(`Error getting teacher info for teacher ${id}: ${error.message}`)
+    })
+}
+
 module.exports = {
   getStudentStudyRights,
   getStudent,
@@ -117,5 +127,6 @@ module.exports = {
   getStudentNumbers,
   getTeacherDetails,
   getFaculties,
-  getStudyAttainments
+  getStudyAttainments,
+  getTeacherInfo
 }
