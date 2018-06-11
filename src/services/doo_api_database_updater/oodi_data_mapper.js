@@ -1,7 +1,7 @@
 const moment = require('moment')
 
-const getStudyRightIdStrings = (data) => 
-  data['data'].map(elements=>elements[0] )
+const getStudyRightIdStrings = (data) =>
+  data['data'].map(elements => elements[0])
 
 const getStudentFromData = (data) => {
   return data['data']
@@ -39,7 +39,8 @@ const getOrganisationFromData = (data) => {
   return organisation
 }
 
-const getCourseCreditsFromData = (data) => 
+
+const getCourseCreditsFromData = (data) =>
   data['data'].map((courseData) => {
     return {
       credits: courseData[3],
@@ -65,7 +66,7 @@ const getStudentNumbersFromProgramData = (data) => {
   return studentNumbers
 }
 
-const getDate = (date, format='DD.MM.YYYY') => {
+const getDate = (date, format = 'DD.MM.YYYY') => {
   if (!date) return null
   return moment(date, format).format('YYYY-MM-DD')
 }
@@ -74,18 +75,18 @@ const getTeachersAndRolesFromData = (teacherDetailData) => {
   let teachers = []
   teacherDetailData.forEach(teacher => {
     let role
-    if(teacher[0] === '1') {
+    if (teacher[0] === '1') {
       role = 'Approver'
-    } else if(teacher[0] === '2') {
+    } else if (teacher[0] === '2') {
       role = 'Teacher'
-    } else if(teacher[0] === '3') {
+    } else if (teacher[0] === '3') {
       role = 'Responsible'
     } else {
       role = 'Unknown'
     }
     const code = teacher[1]
     const name = teacher[2]
-    const t = {'code': code, 'name': name, 'role': role}
+    const t = { 'code': code, 'name': name, 'role': role }
     teachers.push(t)
   })
   return teachers
@@ -93,7 +94,34 @@ const getTeachersAndRolesFromData = (teacherDetailData) => {
 
 const englishTextFromGrade = grade => grade[2].text
 
-const statusFromAttainmentData = () => null
+const statusFromAttainmentData = (code) => {
+  switch (code) {
+  case 1:
+    return 'Based on a prior decision'
+  case 2:
+    return 'Planned'
+  case 3:
+    return 'Confirmed'
+  case 4:
+    return 'Completed'
+  case 5:
+    return 'Erroneous entry'
+  case 6:
+    return 'Outdated'
+  case 7:
+    return 'Improved (grade)'
+  case 8:
+    return 'In progress'
+  case 9:
+    return 'Transferred'
+  case 10:
+    return 'Failed'
+  case 25:
+    return 'Cancelled planned'
+  default:
+    return 'Undefined'
+  }
+}
 
 const attainmentDataToCredit = attainment => {
   return {
@@ -101,7 +129,7 @@ const attainmentDataToCredit = attainment => {
     grade: englishTextFromGrade(attainment.grade),
     credits: attainment.credits,
     ordering: getDate(attainment.attainment_date, null),
-    status: statusFromAttainmentData(attainment),
+    status: statusFromAttainmentData(attainment.attainment_status_code),
     statuscode: attainment.attainment_status_code,
     courseinstance_id: attainment.learningopportunity_id,
   }
@@ -126,7 +154,7 @@ const studyAttainmentDataToModels = (data) => {
   const credit = attainmentDataToCredit(data)
   const course = attainmentDataToCourse(data)
   const courseinstance = attainmentDataToCourseInstance(data)
-  return [ credit, course, courseinstance ]
+  return [credit, course, courseinstance]
 }
 
 const getTeacherFromData = teacher => ({
@@ -136,12 +164,12 @@ const getTeacherFromData = teacher => ({
 })
 
 module.exports = {
-  getStudentFromData, 
-  getStudyRightIdStrings, 
+  getStudentFromData,
+  getStudyRightIdStrings,
   getStudyRightFromData,
-  getOrganisationFromData, 
-  getCourseCreditsFromData, 
-  getStudentNumbersFromProgramData, 
+  getOrganisationFromData,
+  getCourseCreditsFromData,
+  getStudentNumbersFromProgramData,
   getDate,
   getTeachersAndRolesFromData,
   studyAttainmentDataToModels,
