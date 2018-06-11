@@ -266,6 +266,7 @@ class CreditAccumulationGraph extends Component {
               <YAxis
                 type="number"
                 domain={[0, maxCredits]}
+                tickFormatter={tick => Math.round(tick)}
               />
               <CartesianGrid strokeDasharray="3 3" />
               I {toolTip}
