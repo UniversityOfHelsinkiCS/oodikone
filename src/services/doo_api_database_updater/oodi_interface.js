@@ -97,7 +97,17 @@ const getFaculties = () => {
     .catch(error => {
       logger.error(`Error getting organization codes: ${error.message}`)
     })
-} 
+}
+
+const getStudyAttainments = (studentNumber) => {
+  const url = addTokenToUrl(`${base_url}/students/${studentNumber}/studyattainments`)
+  return axios.get(url, { httpsAgent })
+    .then(response => {
+      return response.data.data
+    }).catch(error => {
+      logger.error(`Error getting study attainments for student ${studentNumber}: ${error.message}`)
+    })
+}
 
 module.exports = {
   getStudentStudyRights,
@@ -106,5 +116,6 @@ module.exports = {
   getStudentCourseCredits,
   getStudentNumbers,
   getTeacherDetails,
-  getFaculties
+  getFaculties,
+  getStudyAttainments
 }

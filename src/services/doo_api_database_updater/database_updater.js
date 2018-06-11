@@ -3,7 +3,10 @@ const StudentService = require('../students')
 const StudyrightService = require('../studyrights')
 const UnitService = require('../units')
 const OrganisationService = require('../organisations')
+const CreditService = require('../credits')
+const CourseService = require('../courses')
 const logger = require('../../util/logger')
+const datamapper = require('./oodi_data_mapper')
 
 process.on('unhandledRejection', (reason) => {
   console.log(reason)
@@ -62,6 +65,69 @@ const updateFaculties = async () => {
   }))
 }
 
+const getStudyAttainments = async student => {
+  const { studentnumber } = student
+  const dbAttainments = student.credits ? student.credits : []
+  const apiAttainments  = await Oodi.getStudyAttainments(studentnumber)
+  return [ dbAttainments, apiAttainments ]
+}
+
+const saveStudyAttainment = async (attainment, studentNumber, courseInstanceId) => {
+  const { id } = attainment
+  try {
+    await CreditService.createCreditFromAttainment(attainment, studentNumber, courseInstanceId)
+    logger.verbose(`Study attainment ${id} created. `)
+  } catch (error) {
+    logger.error(`Creating study attainment ${id} failed: ${error.message}`)
+    throw(error)
+  }
+}
+
+const updateCourse = async course => {
+  const { code, name } = course
+  const dbCourse = await CourseService.byCode(code)
+  if (dbCourse !== null) {
+    logger.verbose(`Course ${code} already already in in database`)
+    return
+  }
+  logger.verbose(`Creating course ${code} ${name}`)
+  await CourseService.createCourse(code, name)
+}
+
+const updateCourseInstance = async courseInstance => {
+  const { coursedate, course_code } = courseInstance
+  const dbCourseInstance = await CourseService.courseInstanceByCodeAndDate(course_code, coursedate)
+  if (dbCourseInstance !== null) {
+    logger.verbose(`Course instance for ${course_code} for date ${coursedate} already in database`)
+    return dbCourseInstance
+  }
+  logger.verbose(`Course instance ${course_code} for date ${coursedate} not in database`)
+  return await CourseService.createCourseInstance(coursedate, course_code)
+}
+
+const updateStudyAttainment = async (apiAttainment, studentnumber) => {
+  const [ credit, course, courseInstance ] = datamapper.studyAttainmentDataToModels(apiAttainment)
+  await updateCourse(course)
+  const { id } = await updateCourseInstance(courseInstance)
+  await saveStudyAttainment(credit, studentnumber, id)
+}
+
+const updateStudentStudyAttainments = async student => {
+  const { studentnumber } = student
+  logger.verbose(`Updating student credits for student ${studentnumber}`)
+  const [ dbAttainments, apiAttainments ] = await getStudyAttainments(student)
+  const dbAttainmentIds = new Set(dbAttainments.map(attainment => Number(attainment.id)))
+  for (let apiAttainment of apiAttainments) {
+    const { studyattainment_id } = apiAttainment
+    if (dbAttainmentIds.has(studyattainment_id)) {
+      logger.verbose(`Study attainment ${studyattainment_id} already in database`)
+      continue
+    }
+    logger.verbose(`Study attainment ${studyattainment_id} not in database`)
+    await updateStudyAttainment(apiAttainment, studentnumber)
+  }
+}
+
 const updateAllDataRelatedToStudent = async studentNumber => {
   const student = await loadAndUpdateStudent(studentNumber)
 
@@ -70,7 +136,10 @@ const updateAllDataRelatedToStudent = async studentNumber => {
     return
   }
 
-  await updateStudentStudyRights(student)
+  await Promise.all([
+    updateStudentStudyRights(student),
+    updateStudentStudyAttainments(student)
+  ])
 }
 
 const getStudyRights = async (studentnumber) => await Promise.all([

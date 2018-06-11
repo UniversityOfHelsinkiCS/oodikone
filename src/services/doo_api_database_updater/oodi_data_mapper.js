@@ -91,6 +91,44 @@ const getTeachersAndRolesFromData = (teacherDetailData) => {
   return teachers
 }
 
+const englishTextFromGrade = grade => grade[2].text
+
+const statusFromAttainmentData = () => null
+
+const attainmentDataToCredit = attainment => {
+  return {
+    id: attainment.studyattainment_id,
+    grade: englishTextFromGrade(attainment.grade),
+    credits: attainment.credits,
+    ordering: getDate(attainment.attainment_date, null),
+    status: statusFromAttainmentData(attainment),
+    statuscode: attainment.attainment_status_code,
+    courseinstance_id: attainment.learningopportunity_id,
+  }
+}
+
+const attainmentDataToCourse = attainment => {
+  const { learningopportunity_name } = attainment
+  return {
+    code: attainment.learningopportunity_id,
+    name: learningopportunity_name[learningopportunity_name.length - 1].text
+  }
+}
+
+const attainmentDataToCourseInstance = attainment => {
+  return {
+    coursedate: getDate(attainment.attainment_date, null),
+    course_code: attainment.learningopportunity_id
+  }
+}
+
+const studyAttainmentDataToModels = (data) => {
+  const credit = attainmentDataToCredit(data)
+  const course = attainmentDataToCourse(data)
+  const courseinstance = attainmentDataToCourseInstance(data)
+  return [ credit, course, courseinstance ]
+}
+
 module.exports = {
   getStudentFromData, 
   getStudyRightIdStrings, 
@@ -99,5 +137,6 @@ module.exports = {
   getCourseCreditsFromData, 
   getStudentNumbersFromProgramData, 
   getDate,
-  getTeachersAndRolesFromData
+  getTeachersAndRolesFromData,
+  studyAttainmentDataToModels
 }
