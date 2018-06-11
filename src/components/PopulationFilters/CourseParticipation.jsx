@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Icon } from 'semantic-ui-react'
+import { Segment, Icon, Popup } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
 
 import { removePopulationFilter, alterPopulationCourseFilter } from '../../redux/populationFilters'
@@ -39,12 +39,18 @@ class CourseParticipation extends Component {
     return (
       <div>
         <Segment.Group horizontal>
-          <Segment style={{ width: '30%', height: 40 }} >
-            <em style={{ float: 'left', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', width: '80%' }}>{course.course.name}</em>
-            <span style={{ float: 'right' }}>
-              <Icon name="remove" onClick={this.clearFilter} />
-            </span>
-          </Segment>
+          <Popup
+            trigger={
+              <Segment
+                style={{ width: '30%', height: 40 }}
+              >
+                <em style={{ float: 'left', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', width: '80%' }}>{course.course.name}</em>
+                <span style={{ float: 'right' }}>
+                  <Icon name="remove" onClick={this.clearFilter} />
+                </span>
+              </Segment>}
+            content={course.course.name}
+          />
           <Segment
             inverted={active('all')}
             secondary={active('all')}
