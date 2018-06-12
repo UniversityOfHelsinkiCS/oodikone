@@ -1,9 +1,11 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, string } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
 import { Segment, Header } from 'semantic-ui-react'
+import { withRouter } from 'react-router-dom'
 
+import { findStudents, getStudent, selectStudent } from '../../redux/students'
 import StudentSearch from '../StudentSearch'
 import StudentDetails from '../StudentDetails'
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
@@ -11,7 +13,7 @@ import { toggleStudentNameVisibility } from '../../redux/settings'
 
 import sharedStyles from '../../styles/shared'
 
-class StudentStatistics extends PureComponent {
+class StudentStatistics extends Component { //eslint-disable-line
   render() {
     const { translate, match } = this.props
     const { studentNumber } = match.params
@@ -24,7 +26,7 @@ class StudentStatistics extends PureComponent {
         <StudentNameVisibilityToggle />
         <Segment className={sharedStyles.contentSegment}>
           <StudentSearch translate={translate} studentNumber={studentNumber} />
-          <StudentDetails translate={translate} />
+          <StudentDetails translate={translate} studentNumber={studentNumber} />
         </Segment>
       </div>
     )
@@ -46,9 +48,21 @@ StudentStatistics.defaultProps = {
   }
 }
 
-const mapStateToProps = ({ locale }) => ({
+const mapStateToProps = ({ locale, students }) => ({
   translate: getTranslate(locale),
-  currentLanguage: getActiveLanguage(locale).value
+  currentLanguage: getActiveLanguage(locale).value,
+  student: students.data.find(student =>
+    student.studentNumber === students.selected)
+})
+const mapDispatchToProps = dispatch => ({
+  toggleStudentNameVisibility,
+  findStudents: searchStr =>
+    dispatch(findStudents(searchStr)),
+  getStudent: studentNumber =>
+    dispatch(getStudent(studentNumber)),
+  selectStudent: studentNumber =>
+    dispatch(selectStudent(studentNumber))
 })
 
-export default connect(mapStateToProps, { toggleStudentNameVisibility })(StudentStatistics)
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentStatistics))

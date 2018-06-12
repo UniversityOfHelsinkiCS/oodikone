@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { func, string, arrayOf, object, bool } from 'prop-types'
+import { withRouter } from 'react-router-dom'
+import { func, string, arrayOf, object, bool, shape } from 'prop-types'
 import { connect } from 'react-redux'
 import { Search, Segment } from 'semantic-ui-react'
 
@@ -25,6 +26,7 @@ class StudentSearch extends Component {
 
   componentDidMount() {
     const { studentNumber } = this.props
+
     if (studentNumber && containsOnlyNumbers(studentNumber)) {
       this.setState({ isLoading: true })
       this.props.getStudent(studentNumber).then(() => this.resetComponent())
@@ -49,6 +51,7 @@ class StudentSearch extends Component {
 
   handleSearchSelect = (e, student) => {
     const { studentNumber } = student
+    this.props.history.push(`/students/${studentNumber}`, { selected: studentNumber })
     const studentObject = this.props.students.find(person =>
       person.studentNumber === studentNumber)
     const fetched = studentObject ? studentObject.fetched : false
@@ -115,11 +118,12 @@ class StudentSearch extends Component {
     )
   }
 
+
   render() {
-    const { translate, selected } = this.props
+    const { translate, studentNumber } = this.props
 
 
-    if (selected !== null) {
+    if (studentNumber) {
       return null
     }
 
@@ -154,11 +158,10 @@ StudentSearch.propTypes = {
   setTimeout: func.isRequired,
   clearTimeout: func.isRequired,
   showNames: bool.isRequired,
-  selected: string
+  history: shape({}).isRequired
 }
 StudentSearch.defaultProps = {
-  studentNumber: undefined,
-  selected: null
+  studentNumber: undefined
 }
 
 const formatStudentRows = makeFormatStudentRows()
@@ -179,4 +182,4 @@ const mapDispatchToProps = dispatch => ({
 })
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(Timeout(StudentSearch))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Timeout(StudentSearch)))
