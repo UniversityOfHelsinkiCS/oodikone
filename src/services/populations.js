@@ -229,18 +229,22 @@ const bottlenecksOf = async (query) => {
       const retryPassed = nTimes.filter(passedStudents).map(studentNumber)
       const failedMany = nTimes.filter(failedStudents).map(studentNumber)
       const all = passed.concat(failed)
-
+      const notParticipated = _.difference(student_numbers, all)
+      const notParticipatedOrFailed = _.union(notParticipated, failed)
       const toObject = (passed) => 
         passed.length > 0 ? passed.reduce((o, s) => { o[s] = true; return o }, {}) : {} 
-       
+
       return {
         all: toObject(all),
         passed: toObject(passed),
         failed: toObject(failed),
         retryPassed: toObject(retryPassed),
-        failedMany: toObject(failedMany)
+        failedMany: toObject(failedMany),
+        notParticipated: toObject(notParticipated),
+        notParticipatedOrFailed: toObject(notParticipatedOrFailed)
       }
     }
+
 
     const statsOf = (instances) => {
       const passed = instances.reduce((sum, i) => sum + (i.passed ? 1 : 0), 0)
