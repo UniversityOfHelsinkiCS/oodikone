@@ -1,7 +1,8 @@
 import React from 'react'
-import { func, bool } from 'prop-types'
+import { func, bool, shape } from 'prop-types'
 import { Card, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 import { reformatDate, studyRightRegex } from '../../common'
 import { studentDetailsType } from '../../constants/types'
@@ -15,9 +16,11 @@ const StudentInfoCard = (props) => {
   const { student, translate, showName } = props
   const name = showName ? `${student.name}, ` : ''
   const onRemove = () => {
+    props.history.push('/students')
     props.resetStudent()
     props.removeStudentSelection()
   }
+
 
   const renderStudyright = () => {
     const filterDegreeStudyRight = student2 =>
@@ -63,12 +66,14 @@ StudentInfoCard.propTypes = {
   translate: func.isRequired,
   showName: bool.isRequired,
   removeStudentSelection: func.isRequired,
-  resetStudent: func.isRequired
+  resetStudent: func.isRequired,
+  history: shape({}).isRequired
 }
 
 const mapStateToProps = state => ({
   showName: state.settings.namesVisible
 })
 
-export default connect(mapStateToProps, { removeStudentSelection, resetStudent })(StudentInfoCard)
+export default withRouter(connect(mapStateToProps, {
+  removeStudentSelection, resetStudent })(StudentInfoCard))
 
