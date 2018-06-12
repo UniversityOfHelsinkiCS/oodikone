@@ -3,7 +3,9 @@ import { func, shape, string, boolean, arrayOf, integer } from 'prop-types'
 import { connect } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
 import { isEmpty } from 'lodash'
+import { withRouter } from 'react-router-dom'
 
+import { getStudent, removeStudentSelection, resetStudent } from '../../redux/students'
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraph from '../CreditAccumulationGraph'
 import SearchResultTable from '../SearchResultTable'
@@ -12,6 +14,20 @@ import { removeInvalidCreditsFromStudent, byDateDesc, reformatDate, studyRightRe
 import sharedStyles from '../../styles/shared'
 
 class StudentDetails extends Component {
+  componentDidMount() {
+    this.props.history.listen((location, action) => {
+      if (location.pathname === '/students' && action === 'POP') {
+        this.props.resetStudent()
+        this.props.removeStudentSelection()
+      }
+    })
+  }
+  componentDidUpdate() {
+    if (isEmpty(this.props.student) && this.props.studentNumber) {
+      this.props.getStudent(this.props.studentNumber)
+    }
+  }
+
   renderCreditsGraph = () => {
     const { translate, student } = this.props
 
@@ -84,7 +100,10 @@ class StudentDetails extends Component {
   }
 
   render() {
-    const { translate, student } = this.props
+    const { translate, student, studentNumber } = this.props
+    if (!studentNumber) {
+      return null
+    }
     if (isEmpty(student)) {
       return null
     }
@@ -103,6 +122,11 @@ class StudentDetails extends Component {
 }
 
 StudentDetails.propTypes = {
+  getStudent: func.isRequired,
+  history: shape({}).isRequired,
+  resetStudent: func.isRequired,
+  removeStudentSelection: func.isRequired,
+  studentNumber: string,
   translate: func.isRequired,
   student: shape({
     courses: arrayOf(shape({
@@ -124,12 +148,19 @@ StudentDetails.propTypes = {
 }
 
 StudentDetails.defaultProps = {
-  student: {}
+  student: {},
+  studentNumber: ''
 }
 
 const mapStateToProps = ({ students }) => ({
   student: students.data.find(student =>
     student.studentNumber === students.selected)
 })
+const mapDispatchToProps = dispatch => ({
+  removeStudentSelection: () => dispatch(removeStudentSelection()),
+  resetStudent: () => dispatch(resetStudent()),
+  getStudent: studentNumber =>
+    dispatch(getStudent(studentNumber))
+})
 
-export default connect(mapStateToProps)(StudentDetails)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentDetails))
