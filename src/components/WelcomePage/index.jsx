@@ -3,16 +3,13 @@ import { connect } from 'react-redux'
 import { Container, Header, Image } from 'semantic-ui-react'
 import { images } from '../../common'
 
-class WelcomePage extends Component {
-  componentDidMount() {
-   console.log(images.toskaLogo)
-  }
+class WelcomePage extends Component { //eslint-disable-line
 
   render() {
     return (
       <div>
         <Container text style={{ paddingTop: 50 }}>
-          <Header as='h1' textAlign="center">oodikone</Header>
+          <Header as="h1" textAlign="center">oodikone</Header>
           <h3>
             A tool for explorative research on student data.
           </h3>
