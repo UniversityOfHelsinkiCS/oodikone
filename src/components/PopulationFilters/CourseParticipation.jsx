@@ -17,7 +17,7 @@ class CourseParticipation extends Component {
   }
 
   selectField = field => () => {
-    const selectedField = this.props.filter.params[1]
+    const selectedField = this.props.filter.params.field
     if (field !== selectedField) {
       this.props.alterPopulationCourseFilter(this.props.filter.id, field)
     }
@@ -41,11 +41,11 @@ class CourseParticipation extends Component {
       return null
     }
 
-    const course = filter.params[0]
-    const selectedField = filter.params[1]
+    const { course, field } = filter.params
+    const selectedField = field
 
-    const active = field =>
-      (selectedField === field)
+    const active = field2 =>
+      (selectedField === field2)
 
     return (
       <div>

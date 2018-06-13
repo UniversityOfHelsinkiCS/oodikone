@@ -191,7 +191,7 @@ class PopulationCourseStats extends Component {
 
 const mapStateToProps = (state) => {
   const courseFilters = state.populationFilters.filters.filter(f => f.type === 'CourseParticipation')
-  const selectedCourses = courseFilters.map(f => f.params[0].course)
+  const selectedCourses = courseFilters.map(f => f.params.course.course)
   return {
     translate: getTranslate(state.locale),
     selectedCourses,
