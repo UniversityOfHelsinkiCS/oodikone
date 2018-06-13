@@ -12,6 +12,7 @@
     "update_database_dev": "NODE_ENV=dev node src/services/database_updater/database_updater.js",
     "update_database": "node src/services/database_updater/database_updater.js",
     "update_studentnumbers_dev": "NODE_ENV=dev node src/services/database_updater/student_list_updater.js",
+    "seed_redis": "node src/util/add_json_duplicates_to_redis.js && node src/util/map_course_codes.js",
     "lint": "eslint --parser babel-eslint src",
     "coverage": "NODE_ENV=test nyc ava"
   },
