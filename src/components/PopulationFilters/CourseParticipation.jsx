@@ -22,6 +22,18 @@ class CourseParticipation extends Component {
       this.props.alterPopulationCourseFilter(this.props.filter.id, field)
     }
   }
+  renderFilterSegment = (type, text, active) =>
+    (
+      <Segment
+        inverted={active(type)}
+        secondary={active(type)}
+        onClick={this.selectField(type)}
+        style={{ width: 30, height: 60, fontSize: 13, textAlign: 'center', verticalAlign: 'middle', lineHeight: 1, paddingTop: 15 }}
+      >
+        {text}
+      </Segment>
+    )
+
 
   render() {
     const { filter } = this.props
@@ -37,7 +49,7 @@ class CourseParticipation extends Component {
 
     return (
       <div>
-        <Segment.Group horizontal>
+        <Segment.Group horizontal size="small">
           <Popup
             trigger={
               <Segment
@@ -50,56 +62,13 @@ class CourseParticipation extends Component {
               </Segment>}
             content={course.course.name}
           />
-          <Segment
-            inverted={active('all')}
-            secondary={active('all')}
-            onClick={this.selectField('all')}
-            style={{ width: 30 }}
-          >
-            all
-          </Segment>
-          <Segment
-            inverted={active('passed')}
-            secondary={active('passed')}
-            onClick={this.selectField('passed')}
-          >
-            passed
-          </Segment>
-          <Segment
-            inverted={active('retryPassed')}
-            secondary={active('retryPassed')}
-            onClick={this.selectField('retryPassed')}
-          >
-            passed after fail
-          </Segment>
-          <Segment
-            inverted={active('failed')}
-            secondary={active('failed')}
-            onClick={this.selectField('failed')}
-          >
-            failed
-          </Segment>
-          <Segment
-            inverted={active('failedMany')}
-            secondary={active('failedMany')}
-            onClick={this.selectField('failedMany')}
-          >
-            failed many
-          </Segment>
-          <Segment
-            inverted={active('notParticipated')}
-            secondary={active('notParticipated')}
-            onClick={this.selectField('notParticipated')}
-          >
-            not participated
-          </Segment>
-          <Segment
-            inverted={active('notParticipatedOrFailed')}
-            secondary={active('notParticipatedOrFailed')}
-            onClick={this.selectField('notParticipatedOrFailed')}
-          >
-            not participated or failed
-          </Segment>
+          {this.renderFilterSegment('all', 'all', active)}
+          {this.renderFilterSegment('passed', 'passed', active)}
+          {this.renderFilterSegment('retryPassed', 'passed after fail', active)}
+          {this.renderFilterSegment('failed', 'failed', active)}
+          {this.renderFilterSegment('failedMany', 'failed many', active)}
+          {this.renderFilterSegment('notParticipated', 'not participated', active)}
+          {this.renderFilterSegment('notParticipatedOrFailed', 'not participated or failed', active)}
         </Segment.Group>
       </div>
     )
