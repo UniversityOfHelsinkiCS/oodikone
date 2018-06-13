@@ -14,6 +14,8 @@ process.on('unhandledRejection', (reason) => {
   console.log(reason)
 })
 
+const DEFAULT_TEACHER_ROLE = 'Teacher'
+
 const ELEMENT_ID = {
   DEGREE_TITLE: 10,
   DEGREE_MAJOR: 40
@@ -104,14 +106,14 @@ const updateCourse = async course => {
 }
 
 const updateCourseInstance = async courseInstance => {
-  const { coursedate, course_code, teacherid } = courseInstance
+  const { coursedate, course_code } = courseInstance
   const dbCourseInstance = await CourseService.courseInstanceByCodeAndDate(course_code, coursedate)
   if (dbCourseInstance !== null) {
     logger.verbose(`Course instance for ${course_code} for date ${coursedate} already in database`)
     return dbCourseInstance
   }
   logger.verbose(`Course instance ${course_code} for date ${coursedate} not in database`)
-  return await CourseService.createCourseInstance(coursedate, course_code, teacherid)
+  return await CourseService.createCourseInstance(coursedate, course_code)
 }
 
 const updateTeachers = async teachers => {
@@ -121,22 +123,31 @@ const updateTeachers = async teachers => {
   const newTeacherIds = _.difference(apiIds, dbIds)
   await Promise.all(newTeacherIds.map(async id => {
     try {
-      const teacher = await Oodi.getTeacherInfo(id)
-      await TeacherService.createTeacherFromObject(teacher)
+      const apiTeacher = await Oodi.getTeacherInfo(id)
+      const dbTeacher = await TeacherService.createTeacherFromObject(apiTeacher)
+      dbTeachers.push(dbTeacher)
       logger.verbose(`Teacher ${id} created`)
     } catch (error) {
       logger.error(`Error creating teacher ${id}: ${error.message}`)
       throw(error)
     }
   }))
+  return dbTeachers
+}
+
+const updateCourseTeacher = async (teachers, courseinstance) => {
+  for (let teacher of teachers) {
+    await TeacherService.createCourseTeacher(DEFAULT_TEACHER_ROLE, teacher, courseinstance)    
+  }
 }
 
 const updateStudyAttainment = async (apiAttainment, studentnumber) => {
   const [ credit, course, courseInstance ] = datamapper.studyAttainmentDataToModels(apiAttainment)
   await updateCourse(course)
-  const { id } = await updateCourseInstance(courseInstance)
-  await updateTeachers(apiAttainment.teachers)
-  await saveStudyAttainment(credit, studentnumber, id)
+  const courseinstance = await updateCourseInstance(courseInstance)
+  const teachers = await updateTeachers(apiAttainment.teachers)
+  await updateCourseTeacher(teachers, courseinstance)
+  await saveStudyAttainment(credit, studentnumber, courseinstance.id)
 }
 
 const updateStudentStudyAttainments = async student => {
@@ -227,7 +238,6 @@ const createNewStudent = async (studentFromApi, studentNumber) => {
     logger.error(`Student ${studentNumber} : creation failed, error message:`)
     return null
   }
-
 }
 
 const apiHasNewCreditsForStudent = (studentFromDb, studentFromApi) => {
@@ -271,7 +281,7 @@ const loadAndUpdateStudent = async studentNumber => {
 const run = async () => {
   const { STUDENT_NUMBERS } = process.env
   const studentNumbers = STUDENT_NUMBERS ? STUDENT_NUMBERS.split(' ') : []
-  await updateFaculties()  
+  await updateFaculties()
   await updateStudentInformation(studentNumbers)
   process.exit(0)
 }
