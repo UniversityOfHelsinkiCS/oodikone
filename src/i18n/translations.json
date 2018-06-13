@@ -54,6 +54,9 @@
     "departmentSuccess": [
       "Department success"
     ],
+    "welcome": [
+      "Starting page"
+    ],
     "populations": [
       "Population statistics"
     ],
@@ -127,6 +130,11 @@
     ],
     "attempted": [
       "attempted"
+    ]
+  },
+  "welcome": {
+    "header": [
+      "Welcome Page"
     ]
   },
   "populationStatistics": {
