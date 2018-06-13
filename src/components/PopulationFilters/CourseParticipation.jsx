@@ -25,7 +25,6 @@ class CourseParticipation extends Component {
 
   render() {
     const { filter } = this.props
-
     if (filter.notSet) {
       return null
     }
@@ -86,6 +85,20 @@ class CourseParticipation extends Component {
             onClick={this.selectField('failedMany')}
           >
             failed many
+          </Segment>
+          <Segment
+            inverted={active('notParticipated')}
+            secondary={active('notParticipated')}
+            onClick={this.selectField('notParticipated')}
+          >
+            not participated
+          </Segment>
+          <Segment
+            inverted={active('notParticipatedOrFailed')}
+            secondary={active('notParticipatedOrFailed')}
+            onClick={this.selectField('notParticipatedOrFailed')}
+          >
+            not participated or failed
           </Segment>
         </Segment.Group>
       </div>
