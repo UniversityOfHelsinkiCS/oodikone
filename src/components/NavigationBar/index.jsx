@@ -70,7 +70,6 @@ class NavigationBar extends Component {
     const t = this.props.translate
     const { navigationRoutes } = this.state
     const menuWidth = Object.keys(navigationRoutes).length + 2
-
     return (
       <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
         <Menu.Item
@@ -85,6 +84,9 @@ class NavigationBar extends Component {
         {
           Object.values(navigationRoutes).map((value) => {
             const viewableRoute = this.checkForOptionalParams(value.route)
+            if (value.route === '/') {
+              return null
+            }
             return (
               <Menu.Item
                 exact={viewableRoute === value.route}
