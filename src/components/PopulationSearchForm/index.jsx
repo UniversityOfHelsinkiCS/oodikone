@@ -179,8 +179,8 @@ class PopulationSearchForm extends Component {
         </Form.Field>
         <Form.Field className={style.yearControl}>
           <Button.Group basic vertical className={style.yearControlButtonGroup}>
-            <Button icon="plus" className={style.yearControlButton} onClick={this.addYear} />
-            <Button icon="minus" className={style.yearControlButton} onClick={this.subtractYear} />
+            <Button icon="plus" className={style.yearControlButton} onClick={this.addYear} tabIndex="-1" />
+            <Button icon="minus" className={style.yearControlButton} onClick={this.subtractYear} tabIndex="-1" />
           </Button.Group>
         </Form.Field>
         <Form.Field>
