@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Header, Image, Divider, Icon } from 'semantic-ui-react'
+import { Container, Header, Image, Divider } from 'semantic-ui-react'
 import { images } from '../../common'
 
 class WelcomePage extends Component { //eslint-disable-line
