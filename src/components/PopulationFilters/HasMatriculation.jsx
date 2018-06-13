@@ -59,7 +59,7 @@ class MatriculationFilter extends Component {
 
     return (
       <Segment>
-        {filter.params[0] ? 'Showing students that have done matriculation examination' : 'Showing students that have not done matriculation examination'}
+        {filter.params.matriculationexamination ? 'Showing students that have done matriculation examination' : 'Showing students that have not done matriculation examination'}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

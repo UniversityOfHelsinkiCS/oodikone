@@ -236,19 +236,25 @@ class CreditAccumulationGraph extends Component {
       return null
     }
   }
+  xAxisFormatter = (startDate, month) => (moment(startDate).add(month, 'months').format('MMM YY'))
 
   render() {
     const { students, translate, maxCredits } = this.props
     const { combinedStudentData } = this.state
-
     const isSingleStudent = this.isSingleStudentGraph(students)
+    if (!isSingleStudent) {
+      return null
+    }
     const minTick = combinedStudentData && combinedStudentData.length > 0 ?
       combinedStudentData[0].month : 0
     const maxTick = combinedStudentData && combinedStudentData.length > 0 ?
       Math.ceil(combinedStudentData[combinedStudentData.length - 1].month) : 8
     const referenceLine = isSingleStudent && this.getReferenceLine(translate('graphs.referenceCredits'))
     const toolTip = isSingleStudent && this.getTooltip(this.props)
-
+    let firstDate = moment()
+    if (isSingleStudent) {
+      firstDate = moment(students[0].started)
+    }
     return (
       <div className={styles.graphContainer}>
         <Segment attached="bottom">
@@ -262,6 +268,7 @@ class CreditAccumulationGraph extends Component {
                 domain={[minTick, maxTick]}
                 tick={{ fontSize: '15' }}
                 tickCount={20}
+                tickFormatter={tick => this.xAxisFormatter(firstDate, tick)}
               />
               <YAxis
                 type="number"

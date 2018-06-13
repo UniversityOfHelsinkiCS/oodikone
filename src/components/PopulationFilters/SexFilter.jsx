@@ -60,7 +60,7 @@ class SexFilter extends Component {
 
     return (
       <Segment>
-        {`Showing only ${filter.params} students.`}
+        {`Showing only ${filter.params.sex} students.`}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
