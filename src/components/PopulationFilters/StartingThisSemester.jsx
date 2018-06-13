@@ -63,7 +63,7 @@ class StartingThisSemester extends Component {
 
     return (
       <Segment>
-        {filter.params[0] ? 'Started this semester' : 'Had started before this semester'}
+        {filter.params.starting ? 'Started this semester' : 'Had started before this semester'}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

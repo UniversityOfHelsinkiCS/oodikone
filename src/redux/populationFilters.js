@@ -48,7 +48,7 @@ const reducer = (state = initial, action) => {
         if (filter.type !== 'CourseParticipation') {
           return true
         }
-        const { course } = filter.params[0]
+        const { course } = filter.params.course
         return course.name !== action.course.name || course.code !== action.course.code
       }
       state.filters = state.filters.filter(notRemoved)
@@ -60,7 +60,7 @@ const reducer = (state = initial, action) => {
       return state
     case 'ALTER_POPULATION_COURSE_FILTER': {
       const toAlter = state.filters.find(f => f.id === action.id)
-      const course = toAlter.params[0]
+      const { course } = toAlter.params
       const alteredFilter = courseParticipation(course, action.field)
       alteredFilter.id = toAlter.id
       state.filters = state.filters.map(f => (f.id !== action.id ? f : alteredFilter))
