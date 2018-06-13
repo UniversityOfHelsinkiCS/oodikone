@@ -120,6 +120,20 @@ Use the update script to restart the software
 
 Be amazed!
 
+## In case you mess up your DB
+
+Drop your current db
+
+`docker exec -u postgres oodi_db dropdb tkt_oodi`
+
+Copy a backup dump from oodikone
+
+`scp oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/dump5.6.2018 <local folder>`
+
+Create a new database and fill it with the backup dump following the instructions above
+
+
+
 ## Accessig production DB
 
 `docker exec -it -u postgres db psql -d tkt_oodi`
