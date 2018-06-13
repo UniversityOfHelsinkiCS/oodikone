@@ -38,7 +38,7 @@ import {
 } from '../styles/variables'
 
 export const routes = {
-  index: { route: '/', translateId: 'departmentSuccess' },
+  index: { route: '/', translateId: 'welcome' },
   populations: { route: '/populations', translateId: 'populations' },
   courseInstances: { route: '/courseinstances', translateId: 'courseinstances' },
   students: { route: '/students/:studentNumber?', translateId: 'students' },

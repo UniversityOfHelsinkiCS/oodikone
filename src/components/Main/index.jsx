@@ -5,7 +5,7 @@ import { Loader } from 'semantic-ui-react'
 
 import Header from '../Header'
 import Populations from '../PopulationStatistics'
-import DepartmentSuccess from '../DepartmentSuccess'
+import WelcomePage from '../WelcomePage'
 import StudentStatistics from '../StudentStatistics'
 import CourseInstances from '../CourseInstances'
 import CourseStatistics from '../CourseStatistics'
@@ -55,7 +55,7 @@ class Main extends Component {
             <Header />
             <ErrorContainer />
             <Switch>
-              <Route exact path={routes.index.route} component={DepartmentSuccess} />
+              <Route exact path={routes.index.route} component={WelcomePage} />
               <Route exact path={routes.populations.route} component={Populations} />
               <Route exact path={routes.students.route} component={StudentStatistics} />
               <Route exact path={routes.courseInstances.route} component={CourseInstances} />
