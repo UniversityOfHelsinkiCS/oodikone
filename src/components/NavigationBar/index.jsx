@@ -39,7 +39,7 @@ class NavigationBar extends Component {
     if (process.env.NODE_ENV === 'development') {
       const testUsers = ['tktl']
       return (
-        <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls">
+        <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls" tabIndex="-1">
           <Dropdown.Menu>
             {testUsers.map(user => (
               <Dropdown.Item
@@ -60,7 +60,7 @@ class NavigationBar extends Component {
     }
 
     return (
-      <Menu.Item link onClick={logout} icon="log out">
+      <Menu.Item link onClick={logout} icon="log out" tabIndex="-1">
         {translate('navigationBar.logout')}
       </Menu.Item>
     )
@@ -76,6 +76,7 @@ class NavigationBar extends Component {
         <Menu.Item
           as={Link}
           to={navigationRoutes.index.route}
+          tabIndex="-1"
         >
           <span className={styles.logo}>
             <h2 className={styles.logoText}>oodikone</h2>
@@ -91,6 +92,7 @@ class NavigationBar extends Component {
                 as={NavLink}
                 key={`menu-item-${viewableRoute}`}
                 to={this.checkForOptionalParams(viewableRoute)}
+                tabIndex="-1"
               >
                 {t(`navigationBar.${value.translateId}`)}
               </Menu.Item>
