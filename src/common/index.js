@@ -2,6 +2,7 @@ import moment from 'moment'
 import jwtDecode from 'jwt-decode'
 import Datetime from 'react-datetime'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, TOKEN_NAME } from '../constants'
+import toskaLogo from '../assets/toska.png'
 
 import { sendLog, login } from '../apiConnection'
 
@@ -14,7 +15,9 @@ export const decodeToken = (token) => {
     return {}
   }
 }
-
+export const images = {
+  toskaLogo
+}
 export const tokenAccessInvalid = (token) => {
   const decodedToken = decodeToken(token)
   // Expired
