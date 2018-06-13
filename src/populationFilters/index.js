@@ -4,7 +4,9 @@ export const creditsLessThan = credit =>
   ({
     id: uuidv4(),
     type: 'CreditsLessThan',
-    params: [credit],
+    params: {
+      credit
+    },
     filter: (student) => {
       const creditsOfStudent = student.courses
         .filter(c => c.passed)
@@ -17,7 +19,9 @@ export const sexFilter = sex =>
   ({
     id: uuidv4(),
     type: 'SexFilter',
-    params: [sex],
+    params: {
+      sex
+    },
     filter: student => student.sex === sex
   })
 
@@ -25,7 +29,9 @@ export const matriculationFilter = matriculationexamination =>
   ({
     id: uuidv4(),
     type: 'HasMatriculation',
-    params: [matriculationexamination],
+    params: {
+      matriculationexamination
+    },
     filter: student => student.matriculationexamination === matriculationexamination
   })
 
@@ -33,7 +39,9 @@ export const creditsAtLeast = credit =>
   ({
     id: uuidv4(),
     type: 'CreditsAtLeast',
-    params: [credit],
+    params: {
+      credit
+    },
     filter: (student) => {
       const creditsOfStudent = student.courses
         .filter(c => c.passed)
@@ -46,7 +54,9 @@ export const startingThisSemester = starting =>
   ({
     id: uuidv4(),
     type: 'StartingThisSemester',
-    params: [starting],
+    params: {
+      starting
+    },
     filter: student =>
       student.starting === starting
   })
@@ -54,7 +64,10 @@ export const startingThisSemester = starting =>
 export const courseParticipation = (course, field) => ({
   id: uuidv4(),
   type: 'CourseParticipation',
-  params: [course, field],
+  params: {
+    course,
+    field
+  },
   studentsOfSelectedField: course.students[field],
   filter: student =>
     course.students[field][student.studentNumber] === true

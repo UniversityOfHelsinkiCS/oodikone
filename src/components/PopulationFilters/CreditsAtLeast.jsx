@@ -64,7 +64,7 @@ class CreditsAtLeast extends Component {
 
     return (
       <Segment>
-        Credits at least {filter.params[0]}
+        Credits at least {filter.params.credit}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

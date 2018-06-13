@@ -64,7 +64,7 @@ class CreditsLessThan extends Component {
 
     return (
       <Segment>
-        Credits less than {filter.params[0]}
+        Credits less than {filter.params.credit}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
