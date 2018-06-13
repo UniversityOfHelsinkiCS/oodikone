@@ -178,8 +178,7 @@ const CourseInstance = sequelize.define('courseinstance',
       type: Sequelize.BIGINT
     },
     coursedate: { type: Sequelize.DATE },
-    course_code: { type: Sequelize.STRING },
-    teacherid: { type: Sequelize.STRING }
+    course_code: { type: Sequelize.STRING }
   },
   {
     tableName: 'courseinstance',
