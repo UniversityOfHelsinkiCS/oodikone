@@ -47,14 +47,14 @@ class WelcomePage extends Component { //eslint-disable-line
           </p>
           <Divider section />
 
-          <h4>
+          {/* <h4>
             Settings
           </h4>
           <p>
             Here you can modify settings of oodikone.
              For example you can create custom course code correspondences.
           </p>
-          <Divider section />
+          <Divider section /> */}
 
         </Container>
         <Image src={images.toskaLogo} size="medium" centered style={{ bottom: 0 }} />
