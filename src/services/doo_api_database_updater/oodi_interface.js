@@ -39,7 +39,7 @@ const getStudentStudyRights = (studentNumber) => {
   const url = addTokenToUrl(`${base_url}/students/${studentNumber}/studyrights`)
   return axios.get(url, { httpsAgent })
     .then( response => {
-      return response.data.data
+      return response.data.data.map(data => data_mapper.getStudyRightFromData(data, studentNumber))
     })
     .catch(error => {
       console.log('error getStudentStudyRights\n' + error)

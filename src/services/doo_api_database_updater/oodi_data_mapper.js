@@ -7,38 +7,12 @@ const getStudentFromData = (data) => {
   return data['data']
 }
 
-const getStudyRightFromData = (data) => {
-  const info = data['info']['data']
-  const details = data['elements']['data']
-  if (details.length == 0) return null
-
-  let studyRight = {
-    studyRightId: info[1] != null ? String(info[1]) : '0',
-    organisation: info[2],
-    priorityCode: info[3] != null ? info[3] : 0,
-    extentCode: info[4] != null ? info[4] : 0,
-    givenDate: info[5],
-    startDate: info[6],
-    studyStartDate: info[7],
-    cancelDate: info[8],
-    endDate: info[9],
-    cangelOrganisation: info[10],
-    graduated: info[11],
-    highLevelName: details[0][4] != null ? details[0][4] : details[0][2]
-  }
-  if (details.length > 1 && details[details.length - 1][4] != null) {
-    studyRight.highLevelName += ', ' + details[details.length - 1][4]
-  }
-  return studyRight
-}
-
 const getOrganisationFromData = (data) => {
   let organisation = []
   organisation['code'] = data['data'][1]
   organisation['name'] = data['data'][4] != null ? data['data'][4] : data['data'][2]
   return organisation
 }
-
 
 const getCourseCreditsFromData = (data) =>
   data['data'].map((courseData) => {
@@ -167,6 +141,54 @@ const getTeacherFromData = teacher => ({
   code: teacher.userid,
   name: teacher.full_name
 })
+
+const ELEMENT_ID = {
+  DEGREE_TITLE: 10,
+  DEGREE_MAJOR: 40
+} 
+
+const highlevelnameFromElements = elements => {
+  let degree, subject
+  elements.forEach(element => {
+    let name
+    if (element.name[2]) {
+      name = element.name[2].text
+    }else {
+      name = element.name[0].text
+    }
+    switch(element.element_id) {
+    case ELEMENT_ID.DEGREE_TITLE:
+      degree = name
+      break
+    case ELEMENT_ID.DEGREE_MAJOR:
+      subject = name
+      break
+    default:
+      break
+    }
+  })
+  return `${degree}, ${subject}`
+}
+
+const parseDate = date => moment.utc(date, null).toDate()
+
+const getStudyRightFromData = (data, studentNumber) => {
+  return {
+    studyrightid: `${data.studyright_id}`,
+    canceldate: data.cancel_date,
+    cancelorganisation: data.organisation_code,
+    enddate: parseDate(data.end_date),
+    extentcode: data.extent_code,
+    givendate: parseDate(data.admission_date),
+    graduated: Number(data.degree_date !== null),
+    highlevelname: highlevelnameFromElements(data.elements),
+    prioritycode: data.priority,
+    startdate: parseDate(data.start_date),
+    studystartdate: parseDate(data.study_start_date),
+    organization_code: data.organisation_code,
+    student_studentnumber: studentNumber
+  }
+}
 
 module.exports = {
   getStudentFromData,
