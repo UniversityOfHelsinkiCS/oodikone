@@ -101,6 +101,12 @@ Run `npm test`
 
 Always deploy first to staging! 
 
+When merging from trunk to master Travis builds a docker image for staging and pushes it automatically.
+
+When a release (or tag) is created in master branch Travis builds a docker image for production and pushes it automatically.
+
+### To update: 
+
 Log into svm-59 (aka oodikone)
 
 `ssh {username}@oodikone.cs.helsinki.fi`
