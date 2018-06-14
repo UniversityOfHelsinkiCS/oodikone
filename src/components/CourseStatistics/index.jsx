@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Form, Button, Header, Checkbox, Message } from 'semantic-ui-react'
+import { Form, Button, Header, Checkbox, Message, Transition, List } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
 import Timeout from '../Timeout'
 import CourseSearch from '../CourseSearch'
@@ -197,13 +197,17 @@ class CourseStatistics extends Component {
         {this.renderYearSelector()}
         {this.renderErrorMessage()}
         <CourseSearch handleResultSelect={this.handleResultSelect} />
-        {data.map(course => (<CoursePassRateChart
-          removeCourseStatistics={this.removeCourseStatistics}
-          key={course.code + course.start + course.end + course.separate}
-          stats={course}
-          altCodes={course.alternativeCodes}
-        />))
-        }
+        <Transition.Group as={List} duration={700}>
+          {data.map(course => (
+            <List.Item key={course.code + course.start + course.end + course.separate}>
+              <CoursePassRateChart
+                removeCourseStatistics={this.removeCourseStatistics}
+                stats={course}
+                altCodes={course.alternativeCodes}
+              />
+            </List.Item>))
+          }
+        </Transition.Group>
       </div>
     )
   }
