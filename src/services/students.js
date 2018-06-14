@@ -1,55 +1,16 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const { getDate } = require('./database_updater/oodi_data_mapper')
 const { Student, Credit, CourseInstance, Course, Studyright } = require('../models')
 const { getMainCode } = require('./courses')
 const Op = Sequelize.Op
 
-const apiDataToModel = (student) => ({
-  studentnumber: student.student_number,
-  email: student.email,
-  phone: student.phone,
-  city_fi: student.city[0].text,
-  city_sv: student.city[1].text,
-  national_student_number: student.national_student_number,
-  zipcode: student.zipcode,
-  address: student.address1,
-  creditcount: student.studyattainments,
-  address2: student.address2,
-  birthdate: getDate(student.birth_date),
-  language_fi: student.language[0].text,
-  language_sv: student.language[1].text,
-  language_en: student.language[2].text,
-  age: student.age_years,
-  lastname: student.last_name,
-  mobile: student.mobile_phone,
-  home_county_id: student.home_county_id,
-  country_fi: student.country[0].text,
-  country_sv: student.country[1].text,
-  country_en: student.country[2].text,
-  firstnames: student.first_names,
-  //DEPRECATED IN NEW API
-  abbreviatedname: null,
-  communicationlanguage: student.language[2].text,
-  dateoffirstcredit: null,
-  dateoflastcredit: null,
-  dateofuniversityenrollment: null,
-  gradestudent: null,
-  matriculationexamination: null,
-  nationalities: null,
-  semesterenrollmenttypecode: null,
-  sex: null,
-  studentstatuscode: null
-})
+const createStudent = student => Student.create(student)
 
-const createStudent = (apiData) => Student.create(apiDataToModel(apiData))
-
-const updateStudent = (apiData) => {
-  const data = apiDataToModel(apiData)
-  return Student.update(data, {
+const updateStudent = student => {
+  return Student.update(student, {
     where: {
       studentnumber: {
-        [Op.eq]: data.studentnumber
+        [Op.eq]: student.studentnumber
       }
     }
   })

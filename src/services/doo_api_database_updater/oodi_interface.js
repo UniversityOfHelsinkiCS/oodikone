@@ -22,7 +22,7 @@ axios.defaults.params = {
 const getStudent = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/info`
   const response = await instance.get(url)
-  return data_mapper.getStudentFromData(response.data)
+  return data_mapper.getStudentFromData(response.data.data)
 }
 
 const getStudentStudyRights = async studentNumber => {
