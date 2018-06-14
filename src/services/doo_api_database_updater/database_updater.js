@@ -208,45 +208,29 @@ const createNewStudent = async (studentFromApi, studentNumber) => {
     logger.verbose(`Student ${studentNumber} created to database`)
     return studentFromDb
   } catch (e) {
-    logger.error(`Student ${studentNumber} : creation failed, error message:`)
+    logger.error(`Student ${studentNumber} : creation failed, error message: ${e.message}`)
     return null
   }
 }
 
-const apiHasNewCreditsForStudent = (studentFromDb, studentFromApi) => {
-  const { studyattainments } = studentFromApi
-  const { creditcount } = studentFromDb
-  return studyattainments && (studyattainments > creditcount)
-}
+const getStudent = studentNumber => Promise.all([StudentService.byId(studentNumber), Oodi.getStudent(studentNumber)])
 
 const loadAndUpdateStudent = async studentNumber => {
   try {
-    let [ studentFromDb, studentFromApi ] = await Promise.all([StudentService.byId(studentNumber), Oodi.getStudent(studentNumber)])
-
+    let [ studentFromDb, studentFromApi ] = await getStudent(studentNumber)
     if (studentFromApi === null) {
-      logger.verbose(`API returned null for student ${studentNumber}`)
-      return null
-    }
-    if (studentFromDb === null) {
+      logger.verbose(`Student ${studentNumber} returned null from the api`)
+      return studentFromDb
+    } else if (studentFromDb === null) {
+      logger.verbose(`Student ${studentNumber} found in api but not in db`)
       return await createNewStudent(studentFromApi, studentNumber)
-    }
-
-    const studentRequiresUpdate = apiHasNewCreditsForStudent(studentFromDb, studentFromApi)
-    if (!studentRequiresUpdate) {
-      logger.verbose(`Student ${studentNumber} already up to date.`)
+    } else {
+      logger.verbose(`Student ${studentNumber} found in api and db, updating values.`)
+      await StudentService.updateStudent(studentFromApi)
       return studentFromDb
     }
-
-    try {
-      await StudentService.updateStudent(studentFromApi)
-      logger.verbose(`Student ${studentNumber} details updated. `)
-    } catch (e) {
-      logger.error(`Student ${studentNumber} update failed. `)
-    }
-
-    return studentFromDb
   } catch (e) {
-    logger.error(`Student: ${studentNumber} loadAndUpdate failed`)
+    logger.error(`Student: ${studentNumber} loadAndUpdate failed.`)
     throw(e)
   }
 }
