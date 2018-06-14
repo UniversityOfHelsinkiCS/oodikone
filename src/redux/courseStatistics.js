@@ -44,7 +44,7 @@ const reducer = (state = { data: [], selected: [] }, action) => {
           separate: action.response.separate,
           name: action.response.name
         }],
-        data: [...state.data, action.response]
+        data: [action.response, ...state.data]
       }
     case 'REMOVE_COURSE_STATISTICS':
       return {
