@@ -8,6 +8,7 @@ const CourseService = require('../courses')
 const TeacherService = require('../teachers')
 const logger = require('../../util/logger')
 const datamapper = require('./oodi_data_mapper')
+const fs = require('fs')
 const _ = require('lodash')
 
 process.on('unhandledRejection', (reason) => {
@@ -16,9 +17,12 @@ process.on('unhandledRejection', (reason) => {
 
 const DEFAULT_TEACHER_ROLE = 'Teacher'
 
-const updateStudentInformation = async studentNumberList => {
+const updateStudentInformation = async (studentNumberList, startindex) => {
+  let index = startindex
   for (let studentNumber of studentNumberList) {
+    logger.verbose(`Students updated: ${index}/${studentNumberList.length}. `)
     await updateAllDataRelatedToStudent(studentNumber)
+    index = index + 1
   }
 }
 
@@ -135,6 +139,7 @@ const updateStudentStudyAttainments = async student => {
     }
     logger.verbose(`Study attainment ${studyattainment_id} not in database`)
     await updateStudyAttainment(apiAttainment, studentnumber)
+    dbAttainmentIds.add(studyattainment_id)
   }
 }
 
@@ -189,7 +194,7 @@ const updateStudentStudyRights = async student => {
   const { studentnumber } = student
   const [ apiStudyRightArray, dbStudyRightArray ] = await getStudyRights(studentnumber)
   const dbStudyRights = new Map(dbStudyRightArray.map(sr => [sr.studyrightid, sr]))
-  await Promise.all(apiStudyRightArray.map(async apiStudyRight => {
+  for (let apiStudyRight of apiStudyRightArray) {
     const { studyrightid } = apiStudyRight
     if (dbStudyRights.has(studyrightid)) {
       logger.verbose(`Studyright ${studyrightid} found in database, checking for updated values. `)
@@ -199,7 +204,7 @@ const updateStudentStudyRights = async student => {
       logger.verbose(`Studyright ${studyrightid} not included in database. `)
       await createNewStudyright(apiStudyRight)
     }
-  }))
+  }
 }
 
 const createNewStudent = async (studentFromApi, studentNumber) => {
@@ -235,11 +240,14 @@ const loadAndUpdateStudent = async studentNumber => {
   }
 }
 
-const run = async () => {
-  const { STUDENT_NUMBERS } = process.env
-  const studentNumbers = STUDENT_NUMBERS ? STUDENT_NUMBERS.split(' ') : []
+const updateDatabaseForStudents = async (studentnumbers, startindex=0) => {
   await updateFaculties()
-  await updateStudentInformation(studentNumbers)
+  await updateStudentInformation(studentnumbers.splice(startindex), startindex)
+}
+
+const run = async () => {
+  const studentnumbers = fs.readFileSync('studentnumbers.txt', 'utf-8').split('\n').map(s => s.replace(' ',''))
+  await updateDatabaseForStudents(studentnumbers)
   process.exit(0)
 }
 
