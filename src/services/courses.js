@@ -6,6 +6,7 @@ const { sequelize, Student, Credit, CourseInstance, Course, CourseTeacher } = re
 const { arrayUnique } = require('../util')
 const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
+const _ = require('lodash')
 
 const redisClient = redis.createClient(6379, conf.redis)
 require('bluebird').promisifyAll(redis.RedisClient.prototype)
@@ -139,7 +140,6 @@ const statisticsOf = async (code, date, months) => {
     const instanceStats = await instanceStatistics(code, date)
     const students = getStudents(instanceStats)
     const studentStats = await byIds(students.all)
-
     const all = studentStatsAfter(studentStats.filter(s => students.all.includes(s.studentnumber)), date)
     const pass = studentStatsAfter(studentStats.filter(s => students.pass.includes(s.studentnumber)), date)
     const fail = studentStatsAfter(studentStats.filter(s => students.fail.includes(s.studentnumber)), date)
@@ -160,10 +160,13 @@ const instancesOf = async (code) => {
     return moment(a.coursedate).isSameOrBefore(b.coursedate) ? -1 : 1
   }
 
+  
+  
   const formatInstance = (instance) => {
     return {
       id: instance.id,
       date: instance.coursedate,
+      credits: instance.credits,
       fail: instance.credits.filter(Credit.failed).length,
       pass: instance.credits.filter(Credit.passed).length,
       students: instance.credits.length,
@@ -183,6 +186,12 @@ const instancesOf = async (code) => {
 }
 
 const oneYearStats = (instances, year, separate) => {
+
+  const uniqueFailuresOf = (instances) => (
+    // counts amount of unique student numbers who have failures in this period of course instances
+    _.uniq(_.flattenDeep(instances.map(inst => inst.credits.filter(Credit.failed).map(c => c.student_studentnumber)))).length
+  )
+
   const stats = []
   if (separate === 'true') {
     const fallInstances = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-01-15'))
@@ -190,17 +199,22 @@ const oneYearStats = (instances, year, separate) => {
 
     const passedF = fallInstances.reduce((a, b) => a + b.pass, 0)
     const failedF = fallInstances.reduce((a, b) => a + b.fail, 0)
+    const uniqueFailuresF = uniqueFailuresOf(fallInstances)
 
     const passedS = springInstances.reduce((a, b) => a + b.pass, 0)
     const failedS = springInstances.reduce((a, b) => a + b.fail, 0)
+    const uniqueFailuresS = uniqueFailuresOf(springInstances)
 
-    if (passedF + failedF > 0) stats.push({ passed: passedF, failed: failedF, time: String(year) + ' Fall' })
-    if (passedS + failedS > 0) stats.push({ passed: passedS, failed: failedS, time: String(year + 1) + ' Spring' })
+
+    if (passedF + failedF + uniqueFailuresF > 0) stats.push({ passed: passedF, failed: failedF, uniqueFailures: uniqueFailuresF, time: String(year) + ' Fall' })
+    if (passedS + failedS + uniqueFailuresS > 0) stats.push({ passed: passedS, failed: failedS, uniquefailures: uniqueFailuresS, time: String(year + 1) + ' Spring' })
   } else {
     const yearInst = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-06-01'))
     const passed = yearInst.reduce((a, b) => a + b.pass, 0)
     const failed = yearInst.reduce((a, b) => a + b.fail, 0)
-    if (passed + failed > 0) stats.push({ passed, failed, time: String(year) + '-' + String(year + 1) })
+    const uniqueFailures = uniqueFailuresOf(yearInst)
+
+    if (passed + failed + uniqueFailures > 0) stats.push({ passed, failed, uniqueFailures, time: String(year) + '-' + String(year + 1) })
   }
   return stats
 }
