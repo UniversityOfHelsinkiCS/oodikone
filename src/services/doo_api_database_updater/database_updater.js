@@ -16,34 +16,6 @@ process.on('unhandledRejection', (reason) => {
 
 const DEFAULT_TEACHER_ROLE = 'Teacher'
 
-const ELEMENT_ID = {
-  DEGREE_TITLE: 10,
-  DEGREE_MAJOR: 40
-} 
-
-const highlevelnameFromElements = elements => {
-  let degree, subject
-  elements.forEach(element => {
-    let name
-    if (element.name[2]) {
-      name = element.name[2].text
-    }else {
-      name = element.name[0].text
-    }
-    switch(element.element_id) {
-    case ELEMENT_ID.DEGREE_TITLE:
-      degree = name
-      break
-    case ELEMENT_ID.DEGREE_MAJOR:
-      subject = name
-      break
-    default:
-      break
-    }
-  })
-  return `${degree}, ${subject}`
-}
-
 const updateStudentInformation = async studentNumberList => {
   for (let studentNumber of studentNumberList) {
     await updateAllDataRelatedToStudent(studentNumber)
@@ -185,16 +157,6 @@ const getStudyRights = async (studentnumber) => await Promise.all([
   StudyrightService.byStudent(studentnumber)
 ])
 
-const saveStudyRight = async (studyRight, studentNumber, highlevelname) => {
-  try {
-    await StudyrightService.createStudyright(studyRight, studentNumber, highlevelname)
-    logger.verbose(`Student ${studentNumber}: new studyright created`)
-  } catch (e) {
-    logger.error(`Student ${studentNumber}: creating studyright failed: ${e.message} `)
-    throw(e)
-  }
-}
-
 const createUnit = async (name) => {
   const unit = await UnitService.findByName(name)
   if (unit !== null) {
@@ -208,24 +170,35 @@ const createUnit = async (name) => {
   })
 }
 
-const updateStudyright = async (studyRight, studentnumber) => {
-  const highlevelname = highlevelnameFromElements(studyRight.elements)
-  await createUnit(highlevelname)
-  await saveStudyRight(studyRight, studentnumber, highlevelname)
+const createNewStudyright = async (studyRight) => {
+  await createUnit(studyRight.highlevelname)
+  await StudyrightService.createStudyright(studyRight)
+}
+
+const updateExistingStudyright = async (apiStudyright, dbStudyright) => {
+  const studyrightHasNotChanged = _.isEqual(apiStudyright, dbStudyright.dataValues)
+  if (studyrightHasNotChanged) {
+    logger.verbose(`Studyright ${apiStudyright.studyrightid} already up to date in database`)
+  } else {
+    logger.verbose(`Studyright ${apiStudyright.studyrightid} requires update`)
+    await dbStudyright.update(apiStudyright)
+  }
 }
 
 const updateStudentStudyRights = async student => {
   const { studentnumber } = student
   const [ apiStudyRightArray, dbStudyRightArray ] = await getStudyRights(studentnumber)
-  const dbStudyRightIds = new Set(dbStudyRightArray.map(studyright => studyright.studyrightid))
-  await Promise.all(apiStudyRightArray.map(async studyRight => {
-    const id = `${studyRight.studyright_id}`
-    if (dbStudyRightIds.has(id)) {
-      logger.verbose(`Studyright ${id} already in database. `)
-      return
+  const dbStudyRights = new Map(dbStudyRightArray.map(sr => [sr.studyrightid, sr]))
+  await Promise.all(apiStudyRightArray.map(async apiStudyRight => {
+    const { studyrightid } = apiStudyRight
+    if (dbStudyRights.has(studyrightid)) {
+      logger.verbose(`Studyright ${studyrightid} found in database, checking for updated values. `)
+      const dbStudyRight = dbStudyRights.get(studyrightid)
+      await updateExistingStudyright(apiStudyRight, dbStudyRight)
+    } else {
+      logger.verbose(`Studyright ${studyrightid} not included in database. `)
+      await createNewStudyright(apiStudyRight)
     }
-    logger.verbose(`Studyright ${id} not included in database. `)
-    await updateStudyright(studyRight, studentnumber)
   }))
 }
 
