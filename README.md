@@ -93,27 +93,24 @@ TOKEN_SECRET=IWannaBeTheVeryBest
 
 Run `npm run dev`
 
-Check in your browser for
-
-http://localhost:8080/api/tags
-
-If you see a response you can congratulate yourself on succesfully installing and running OodiKone2 backend.
-
 #### Testing
 
 Run `npm test`
 
 ## Deployment
 
-Log into svm-59 (aka oodikone) and navigate to the correct folder
+Always deploy first to staging! 
+
+Log into svm-59 (aka oodikone)
 
 `ssh {username}@oodikone.cs.helsinki.fi`
 
-Log in as tkt_oodi
+Switch user to tkt_oodi
+
 `sudo su - tkt_oodi`
 
 Navigate to correct folder
-`cd oodikone.cs.helsinki.fi`
+`cd oodikone.cs.helsinki.fi` or `cd oodikone.cs.helsinki.fi/staging`
 
 Use the update script to restart the software
 `./update.sh`
