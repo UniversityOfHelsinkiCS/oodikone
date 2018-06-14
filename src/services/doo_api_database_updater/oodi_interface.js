@@ -15,36 +15,36 @@ axios.defaults.auth = {
   password: process.env.OODI_PW
 } 
 
-const addTokenToUrl = (url) => {
-  return `${url}?token=${process.env.TOKEN}`
+axios.defaults.params = {
+  token: process.env.TOKEN
 }
 
 const getStudent = async studentNumber => {
-  const url = addTokenToUrl(`${base_url}/students/${studentNumber}/info`)
+  const url = `${base_url}/students/${studentNumber}/info`
   const response = await instance.get(url)
   return data_mapper.getStudentFromData(response.data)
 }
 
 const getStudentStudyRights = async studentNumber => {
-  const url = addTokenToUrl(`${base_url}/students/${studentNumber}/studyrights`)
+  const url = `${base_url}/students/${studentNumber}/studyrights`
   const response = await instance.get(url)
   return response.data.data.map(data => data_mapper.getStudyRightFromData(data, studentNumber))
 }
 
 const getFaculties = async () => {
-  const url = addTokenToUrl(`${base_url}/codes/faculties`)
+  const url = `${base_url}/codes/faculties`
   const response = await instance.get(url)
   return response.data.data
 }
 
 const getStudyAttainments = async studentNumber => {
-  const url = addTokenToUrl(`${base_url}/students/${studentNumber}/studyattainments`)
+  const url = `${base_url}/students/${studentNumber}/studyattainments`
   const response = await instance.get(url)
   return response.data.data
 }
 
 const getTeacherInfo = async id => {
-  const url = addTokenToUrl(`${base_url}/teachers/${id}/info`)
+  const url = `${base_url}/teachers/${id}/info`
   const response = await instance.get(url)
   return data_mapper.getTeacherFromData(response.data.data)
 }
