@@ -3,42 +3,53 @@ const moment = require('moment')
 const getStudyRightIdStrings = (data) =>
   data['data'].map(elements => elements[0])
 
-const getStudentFromData = (student) => ({
-  studentnumber: student.student_number,
-  email: student.email,
-  phone: student.phone,
-  city_fi: student.city[0].text,
-  city_sv: student.city[1].text,
-  national_student_number: student.national_student_number,
-  zipcode: student.zipcode,
-  address: student.address1,
-  creditcount: student.studyattainments,
-  address2: student.address2,
-  birthdate: getDate(student.birth_date),
-  language_fi: student.language[0].text,
-  language_sv: student.language[1].text,
-  language_en: student.language[2].text,
-  age: student.age_years,
-  lastname: student.last_name,
-  mobile: student.mobile_phone,
-  home_county_id: student.home_county_id,
-  country_fi: student.country[0].text,
-  country_sv: student.country[1].text,
-  country_en: student.country[2].text,
-  firstnames: student.first_names,
-  //DEPRECATED IN NEW API
-  abbreviatedname: null,
-  communicationlanguage: student.language[2].text,
-  dateoffirstcredit: null,
-  dateoflastcredit: null,
-  dateofuniversityenrollment: null,
-  gradestudent: null,
-  matriculationexamination: null,
-  nationalities: null,
-  semesterenrollmenttypecode: null,
-  sex: null,
-  studentstatuscode: null
-})
+const getTextsByLanguage = cities => {
+  const names = {}
+  cities.forEach(city => names[city.langcode] = city.text)
+  return { fi: null, sv: null, en: null, ...names}
+}
+
+const getStudentFromData = (student) => {
+  const city = getTextsByLanguage(student.city)
+  const language = getTextsByLanguage(student.language)
+  const country = getTextsByLanguage(student.country)
+  return {
+    studentnumber: student.student_number,
+    email: student.email,
+    phone: student.phone,
+    city_fi: city.fi,
+    city_sv: city.sv,
+    national_student_number: student.national_student_number,
+    zipcode: student.zipcode,
+    address: student.address1,
+    creditcount: student.studyattainments,
+    address2: student.address2,
+    birthdate: getDate(student.birth_date),
+    language_fi: language.fi,
+    language_sv: language.sv,
+    language_en: language.en,
+    age: student.age_years,
+    lastname: student.last_name,
+    mobile: student.mobile_phone,
+    home_county_id: student.home_county_id,
+    country_fi: country.fi,
+    country_sv: country.sv,
+    country_en: country.en,
+    firstnames: student.first_names,
+    //DEPRECATED IN NEW API
+    abbreviatedname: null,
+    communicationlanguage: language.en || language.fi || language.sv,
+    dateoffirstcredit: null,
+    dateoflastcredit: null,
+    dateofuniversityenrollment: null,
+    gradestudent: null,
+    matriculationexamination: null,
+    nationalities: null,
+    semesterenrollmenttypecode: null,
+    sex: null,
+    studentstatuscode: null
+  }
+}
 
 const getOrganisationFromData = (data) => {
   let organisation = []
@@ -203,7 +214,7 @@ const highlevelnameFromElements = elements => {
   return `${degree}, ${subject}`
 }
 
-const parseDate = date => moment.utc(date, null).toDate()
+const parseDate = date => date && moment.utc(date, null).toDate()
 
 const getStudyRightFromData = (data, studentNumber) => {
   return {
