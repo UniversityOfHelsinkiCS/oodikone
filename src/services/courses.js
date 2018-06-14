@@ -207,7 +207,7 @@ const oneYearStats = (instances, year, separate) => {
 
 
     if (passedF + failedF + uniqueFailuresF > 0) stats.push({ passed: passedF, failed: failedF, uniqueFailures: uniqueFailuresF, time: String(year) + ' Fall' })
-    if (passedS + failedS + uniqueFailuresS > 0) stats.push({ passed: passedS, failed: failedS, uniquefailures: uniqueFailuresS, time: String(year + 1) + ' Spring' })
+    if (passedS + failedS + uniqueFailuresS > 0) stats.push({ passed: passedS, failed: failedS, uniqueFailures: uniqueFailuresS, time: String(year + 1) + ' Spring' })
   } else {
     const yearInst = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-06-01'))
     const passed = yearInst.reduce((a, b) => a + b.pass, 0)
