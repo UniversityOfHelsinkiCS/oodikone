@@ -94,7 +94,8 @@ class StudentSearch extends Component {
     }
 
     if (!showResults) {
-      return null
+      // so that the loading spinner doesn't go on top of the search box
+      return <div style={{ margin: 100 }} />
     }
     const headers = [
       translate('common.studentNumber'),
