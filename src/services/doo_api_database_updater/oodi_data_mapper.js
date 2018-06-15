@@ -3,9 +3,9 @@ const moment = require('moment')
 const getStudyRightIdStrings = (data) =>
   data['data'].map(elements => elements[0])
 
-const getTextsByLanguage = cities => {
+const getTextsByLanguage = texts => {
   const names = {}
-  cities.forEach(city => names[city.langcode] = city.text)
+  texts.forEach(text => names[text.langcode] = text.text)
   return { fi: null, sv: null, en: null, ...names}
 }
 
@@ -194,18 +194,13 @@ const ELEMENT_ID = {
 const highlevelnameFromElements = elements => {
   let degree, subject
   elements.forEach(element => {
-    let name
-    if (element.name[2]) {
-      name = element.name[2].text
-    }else {
-      name = element.name[0].text
-    }
+    const names = getTextsByLanguage(element.name)
     switch(element.element_id) {
     case ELEMENT_ID.DEGREE_TITLE:
-      degree = name
+      degree = names.en || names.fi || names.sv
       break
     case ELEMENT_ID.DEGREE_MAJOR:
-      subject = name
+      subject = names.en || names.fi || names.sv
       break
     default:
       break
