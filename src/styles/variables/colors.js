@@ -52,7 +52,14 @@ module.exports = {
   lime: '#d6d727',
   gray: '#555',
   red: '#e5053a',
+  darkred: '#8B0000',
   blue: '#0098d0',
   purple: '#800080',
-  green: '#008000'
+  green: '#008000',
+  lightgreen: '#90EE90',
+  chartblue: '#178aa5',
+  chartdarkg: '#367a1c',
+  chartlgreen: '#80e061',
+  chartdarkred: '#a03530',
+  chartlred: '#e2726d'
 }
