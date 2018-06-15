@@ -7,14 +7,23 @@ import CourseStatisticsTable from '../CourseStatisticsTable'
 import sharedStyles from '../../styles/shared'
 import styles from './coursePassRateChart.css'
 
-import { red, green, turquoise } from '../../styles/variables/colors'
+import { chartblue, chartdarkg, chartlgreen, chartdarkred, chartlred } from '../../styles/variables/colors'
 
 const { array, shape, string, func, arrayOf } = PropTypes
 
 
 const StackedBarChart = ({ stats, altCodes, removeCourseStatistics }) => {
   const data = stats.stats.map(year => (
-    { name: year.time, passed: year.passed, failed: year.failed, all: year.failed + year.passed }))
+    {
+      name: year.time,
+      studentsThatPassedThisYear: year.studentsThatPassedThisYear,
+      studentsThatFailedThisYear: year.studentsThatFailedThisYear,
+      passedStudentsThatFailedBefore: year.passedStudentsThatFailedBefore,
+      passedStudentsOnFirstTry: year.passedStudentsOnFirstTry,
+      failedStudentsThatFailedBefore: year.failedStudentsThatFailedBefore,
+      failedStudentsOnFirstTry: year.failedStudentsOnFirstTry,
+      all: year.studentsThatPassedThisYear + year.studentsThatFailedThisYear
+    }))
   const { name, code, start, end, separate } = stats
   const query = { code, start, end, separate }
   const alternativeCodeText = altCodes.length > 0 ? `Combined code(s): [${altCodes}]` : ''
@@ -24,9 +33,6 @@ const StackedBarChart = ({ stats, altCodes, removeCourseStatistics }) => {
         <Header className={sharedStyles.segmentTitle} size="large">{name}, {code}
           <Header.Subheader>{alternativeCodeText}</Header.Subheader>
         </Header>
-
-        <CourseStatisticsTable stats={stats.stats} />
-
         <div className={styles.chartContainer}>
           <BarChart
             height={700}
@@ -39,10 +45,15 @@ const StackedBarChart = ({ stats, altCodes, removeCourseStatistics }) => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="all" stackId="a" fill={turquoise} />
-            <Bar dataKey="passed" stackId="b" fill={green} />
-            <Bar dataKey="failed" stackId="c" fill={red} />
+            <Bar dataKey="all" stackId="a" fill={chartblue} name="all" />
+            <Bar dataKey="passedStudentsOnFirstTry" stackId="b" fill={chartdarkg} name="students that passed on their first try" />
+            <Bar dataKey="passedStudentsThatFailedBefore" stackId="b" fill={chartlgreen} name="students that passed re-examination" />
+            <Bar dataKey="failedStudentsOnFirstTry" stackId="c" fill={chartdarkred} name="students that failed on their first try" />
+            <Bar dataKey="failedStudentsThatFailedBefore" stackId="c" fill={chartlred} name="students that failed their re-examination" />
+
+
           </BarChart>
+          <CourseStatisticsTable stats={stats.stats} />
           <Button className={styles.remove} onClick={removeCourseStatistics(query)}>Remove</Button>
         </div>
       </div>
