@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
 import { Header, Button } from 'semantic-ui-react'
 
+import CourseStatisticsTable from '../CourseStatisticsTable'
 import sharedStyles from '../../styles/shared'
 import styles from './coursePassRateChart.css'
 
@@ -23,6 +24,9 @@ const StackedBarChart = ({ stats, altCodes, removeCourseStatistics }) => {
         <Header className={sharedStyles.segmentTitle} size="large">{name}, {code}
           <Header.Subheader>{alternativeCodeText}</Header.Subheader>
         </Header>
+
+        <CourseStatisticsTable stats={stats.stats} />
+
         <div className={styles.chartContainer}>
           <BarChart
             height={700}
