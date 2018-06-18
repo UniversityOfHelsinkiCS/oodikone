@@ -37,7 +37,6 @@ const getStudentFromData = (student) => {
     country_en: country.en,
     firstnames: student.first_names,
     //DEPRECATED IN NEW API
-    abbreviatedname: null,
     communicationlanguage: language.en || language.fi || language.sv,
     dateoffirstcredit: null,
     dateoflastcredit: null,
@@ -47,7 +46,8 @@ const getStudentFromData = (student) => {
     nationalities: null,
     semesterenrollmenttypecode: null,
     sex: null,
-    studentstatuscode: null
+    studentstatuscode: null,
+    abbreviatedname: [student.last_name, student.first_names].join(', ')
   }
 }
 
