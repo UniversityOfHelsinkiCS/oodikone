@@ -9,7 +9,6 @@ const TeacherService = require('../teachers')
 const logger = require('../../util/logger')
 const datamapper = require('./oodi_data_mapper')
 const { Course, CourseInstance, Unit } = require('../../models/index') 
-const fs = require('fs')
 const _ = require('lodash')
 
 process.on('unhandledRejection', (reason) => {
