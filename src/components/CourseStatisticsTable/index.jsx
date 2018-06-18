@@ -5,24 +5,23 @@ import { Table } from 'semantic-ui-react'
 const { shape, arrayOf } = PropTypes
 
 
-const CourseStatisticsTable = ({ stats }) => {
-  console.log(stats)
-  return (
+const CourseStatisticsTable = ({ stats }) =>
+  (
     <Table>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>
             Time
-        </Table.HeaderCell>
+          </Table.HeaderCell>
           <Table.HeaderCell>
             Passed Students
-        </Table.HeaderCell>
+          </Table.HeaderCell>
           <Table.HeaderCell>
             Failed Students
-        </Table.HeaderCell>
+          </Table.HeaderCell>
           <Table.HeaderCell>
             Failure %
-        </Table.HeaderCell>
+          </Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -47,7 +46,7 @@ const CourseStatisticsTable = ({ stats }) => {
       </Table.Body>
     </Table>
   )
-}
+
 
 CourseStatisticsTable.propTypes = {
   stats: arrayOf(shape({})).isRequired
