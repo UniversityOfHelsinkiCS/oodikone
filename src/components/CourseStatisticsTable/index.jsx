@@ -30,13 +30,14 @@ const CourseStatisticsTable = ({ stats }) => (
             {year.time}
           </Table.Cell>
           <Table.Cell>
-            {year.passed}
+            {year.studentsThatPassedThisYear}
           </Table.Cell>
           <Table.Cell>
-            {year.failed}
+            {year.studentsThatFailedThisYear}
           </Table.Cell>
           <Table.Cell>
-            {Math.round((year.failed / (year.passed + year.failed)) * 100) / 100}
+            {Math.round((year.studentsThatFailedThisYear /
+              (year.studentsThatPassedThisYear + year.studentsThatFailedThisYear)) * 100) / 100}
           </Table.Cell>
         </Table.Row>
       ))}
