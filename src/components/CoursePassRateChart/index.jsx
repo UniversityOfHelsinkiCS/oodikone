@@ -35,6 +35,18 @@ const StackedBarChart = ({
     }))
   const { name, code, start, end, separate } = stats
   const query = { code, start, end, separate }
+  let statisticsTableStats = data.map(year => ({
+    passed: year.studentsThatPassedThisYear,
+    failed: year.studentsThatFailedThisYear,
+    time: year.name
+  }))
+  if (courseLevel) {
+    statisticsTableStats = data.map(year => ({
+      passed: year.courseLevelPassed,
+      failed: year.courseLevelFailed,
+      time: year.name
+    }))
+  }
   const alternativeCodeText = altCodes.length > 0 ? `Combined code(s): [${altCodes}]` : ''
   if (data.length > 0) {
     return (
@@ -75,7 +87,7 @@ const StackedBarChart = ({
                 height={700}
                 width={1200}
                 data={data}
-                margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
@@ -89,7 +101,7 @@ const StackedBarChart = ({
               </BarChart>
             </Container>
           }
-          <CourseStatisticsTable stats={stats.stats} />
+          <CourseStatisticsTable stats={statisticsTableStats} />
           <Button className={styles.remove} onClick={removeCourseStatistics(query)}>Remove</Button>
         </div>
       </div>
