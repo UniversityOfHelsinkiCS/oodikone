@@ -189,6 +189,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 
   const calculateStats = (thisSemester, allInstancesUntilSemester) => {
     const studentsThatPassedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c => c.student_studentnumber))))
+    const gradeDistribution = _.groupBy(_.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits))), 'grade')
     const studentsThatFailedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student_studentnumber))))
     const allStudentsThatFailedEver = _.flattenDeep(allInstancesUntilSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student_studentnumber)))
     const passedStudentsThatFailedBefore = _.uniq(studentsThatPassedThisYear.filter(student => allStudentsThatFailedEver.includes(student)))
@@ -196,7 +197,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
     const failedStudentsThatFailedBefore = _.uniq(_.flattenDeep(Object.values(_.groupBy(allStudentsThatFailedEver)).filter(group => group.length > 1)).filter(student => studentsThatFailedThisYear.includes(student)))
     const failedStudentsOnFirstTry = _.difference(studentsThatFailedThisYear, failedStudentsThatFailedBefore)
 
-    return { studentsThatPassedThisYear, studentsThatFailedThisYear, allStudentsThatFailedEver, passedStudentsThatFailedBefore, passedStudentsOnFirstTry, failedStudentsThatFailedBefore, failedStudentsOnFirstTry }
+    return { studentsThatPassedThisYear, studentsThatFailedThisYear, allStudentsThatFailedEver, passedStudentsThatFailedBefore, passedStudentsOnFirstTry, failedStudentsThatFailedBefore, failedStudentsOnFirstTry, gradeDistribution }
   }
 
   const stats = []
@@ -223,6 +224,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
         failedStudentsOnFirstTry: fallStatistics.failedStudentsOnFirstTry.length || 0,
         courseLevelPassed: passedF,
         courseLevelFailed: failedF,
+        gradeDistribution: fallStatistics.gradeDistribution,
         time: String(year) + ' Fall'
       })
     if (springStatistics.studentsThatPassedThisYear.length + springStatistics.studentsThatFailedThisYear.length > 0)
@@ -235,6 +237,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
         failedStudentsOnFirstTry: springStatistics.failedStudentsOnFirstTry.length || 0,
         courseLevelPassed: passedS,
         courseLevelFailed: failedS,
+        gradeDistribution: springStatistics.gradeDistribution,
         time: String(year + 1) + ' Spring'
       })
 
@@ -253,6 +256,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
       failedStudentsOnFirstTry: statistics.failedStudentsOnFirstTry.length || 0,
       courseLevelPassed: passed,
       courseLevelFailed: failed,
+      gradeDistribution: statistics.gradeDistribution,
       time: String(year) + '-' + String(year + 1)
     })
   }
