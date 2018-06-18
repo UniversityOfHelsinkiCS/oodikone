@@ -275,16 +275,8 @@ const updateDatabaseForStudents = async (studentnumbers, startindex=0) => {
   await updateStudentInformation(studentnumbers.splice(startindex), startindex)
 }
 
-const readStudentNumbersFromFile = async filename => {
-  logger.verbose(`Reading student numbers from file ${filename}.`)
-  const studentnumbers = fs.readFileSync(filename, 'utf-8').split('\n').map(s => s.replace(' ',''))
-  return studentnumbers.filter(studentnumber => !!studentnumber)  
+const updateDatabase = async (studentnumbers, startindex=0) => {
+  await updateDatabaseForStudents(studentnumbers, startindex)
 }
 
-const run = async (studentnumbersfile='studentnumbers.txt') => {
-  const studentnumbers = await readStudentNumbersFromFile(studentnumbersfile)
-  await updateDatabaseForStudents(studentnumbers)
-  process.exit(0)
-}
-
-run()
+module.exports = { updateDatabase }
