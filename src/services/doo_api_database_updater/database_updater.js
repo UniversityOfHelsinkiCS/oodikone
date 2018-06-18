@@ -90,7 +90,7 @@ const saveStudyAttainment = async (attainment, studentNumber, courseInstanceId) 
   const { id } = attainment
   try {
     await CreditService.createCreditFromAttainment(attainment, studentNumber, courseInstanceId)
-    logger.verbose(`Study attainment ${id} created. `)
+    logger.verbose(`Study attainment ${id} created for student ${studentNumber} and course instance ${courseInstanceId}. `)
   } catch (error) {
     logger.error(`Creating study attainment ${id} failed: ${error.message}`)
     throw(error)
@@ -119,7 +119,7 @@ const updateCourseInstance = async (courseInstance, courseInstanceMap) => {
   logger.verbose(`Course instance ${course_code} for date ${coursedate} not in database.`)
   const newCourseInstance = await CourseService.createCourseInstance(coursedate, course_code)
   courseInstanceMap.set(identifier, newCourseInstance)
-  return courseInstance
+  return newCourseInstance
 }
 
 const updateTeachers = async teachers => {
