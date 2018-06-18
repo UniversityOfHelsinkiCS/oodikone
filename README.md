@@ -93,27 +93,30 @@ TOKEN_SECRET=IWannaBeTheVeryBest
 
 Run `npm run dev`
 
-Check in your browser for
-
-http://localhost:8080/api/tags
-
-If you see a response you can congratulate yourself on succesfully installing and running OodiKone2 backend.
-
 #### Testing
 
 Run `npm test`
 
 ## Deployment
 
-Log into svm-59 (aka oodikone) and navigate to the correct folder
+Always deploy first to staging! 
+
+When merging from trunk to master Travis builds a docker image for staging and pushes it automatically.
+
+When a release (or tag) is created in master branch Travis builds a docker image for production and pushes it automatically.
+
+### To update: 
+
+Log into svm-59 (aka oodikone)
 
 `ssh {username}@oodikone.cs.helsinki.fi`
 
-Log in as tkt_oodi
+Switch user to tkt_oodi
+
 `sudo su - tkt_oodi`
 
 Navigate to correct folder
-`cd oodikone.cs.helsinki.fi`
+`cd oodikone.cs.helsinki.fi` or `cd oodikone.cs.helsinki.fi/staging`
 
 Use the update script to restart the software
 `./update.sh`
@@ -134,9 +137,15 @@ Create a new database and fill it with the backup dump following the instruction
 
 
 
-## Accessig production DB
+## Accessing production DB
+
+To access the database in oodikone.cs.helsinki.fi run: 
 
 `docker exec -it -u postgres db psql -d tkt_oodi`
+
+To create a dump of the production db, run: 
+
+``docker exec -u postgres db pg_dump tkt_oodi > `date +%Y-%m-%d`.bak``
 
 ## Updater
 
