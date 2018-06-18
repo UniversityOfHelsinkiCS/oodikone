@@ -207,7 +207,11 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 
     let fallStatistics = calculateStats(fallInstances, allInstancesUntilFall)
     let springStatistics = calculateStats(springInstances, allInstancesUntilYear)
+    const passedF = fallInstances.reduce((a, b) => a + b.pass, 0)	
+    const failedF = fallInstances.reduce((a, b) => a + b.fail, 0)
 
+    const passedS = springInstances.reduce((a, b) => a + b.pass, 0)
+    const failedS = springInstances.reduce((a, b) => a + b.fail, 0)
 
     if (fallStatistics.studentsThatPassedThisYear.length + fallStatistics.studentsThatFailedThisYear.length > 0)
       stats.push({
@@ -217,6 +221,8 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
         passedStudentsOnFirstTry: fallStatistics.passedStudentsOnFirstTry.length || 0,
         failedStudentsThatFailedBefore: fallStatistics.failedStudentsThatFailedBefore.length || 0,
         failedStudentsOnFirstTry: fallStatistics.failedStudentsOnFirstTry.length || 0,
+        courseLevelPassed: passedF,
+        courseLevelFailed: failedF,
         time: String(year) + ' Fall'
       })
     if (springStatistics.studentsThatPassedThisYear.length + springStatistics.studentsThatFailedThisYear.length > 0)
@@ -227,11 +233,16 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
         passedStudentsOnFirstTry: springStatistics.passedStudentsOnFirstTry.length || 0,
         failedStudentsThatFailedBefore: springStatistics.failedStudentsThatFailedBefore.length || 0,
         failedStudentsOnFirstTry: springStatistics.failedStudentsOnFirstTry.length || 0,
+        courseLevelPassed: passedS,
+        courseLevelFailed: failedS,
         time: String(year + 1) + ' Spring'
       })
 
   } else {
-    let statistics = calculateStats(instances, allInstancesUntilYear)
+    const yearInst = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-06-01'))
+    let statistics = calculateStats(yearInst, allInstancesUntilYear)
+    const passed = yearInst.reduce((a, b) => a + b.pass, 0)
+    const failed = yearInst.reduce((a, b) => a + b.fail, 0)
 
     stats.push({
       studentsThatPassedThisYear: statistics.studentsThatPassedThisYear.length || 0,
@@ -240,6 +251,8 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
       passedStudentsOnFirstTry: statistics.passedStudentsOnFirstTry.length || 0,
       failedStudentsThatFailedBefore: statistics.failedStudentsThatFailedBefore.length || 0,
       failedStudentsOnFirstTry: statistics.failedStudentsOnFirstTry.length || 0,
+      courseLevelPassed: passed,
+      courseLevelFailed: failed,
       time: String(year) + '-' + String(year + 1)
     })
   }
