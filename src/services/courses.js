@@ -28,14 +28,6 @@ const byNameOrCode = (searchTerm) => Course.findAll({
   }
 })
 
-const byCode = (code) => Course.findOne({
-  where: {
-    code: {
-      [Op.eq]: code
-    }
-  }
-})
-
 const byCode = code => Course.findByPrimary(code)
 
 const instanceStatistics = async (code, date) => CourseInstance.findOne({
