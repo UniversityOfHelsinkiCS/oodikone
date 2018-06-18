@@ -27,7 +27,8 @@ class CourseStatistics extends Component {
     separate: false,
     validYear: true,
     error: '',
-    isLoading: false
+    isLoading: false,
+    courseLevel: true
   }
 
   handleResultSelect = (e, { result }) => {
@@ -88,6 +89,10 @@ class CourseStatistics extends Component {
     } else {
       this.setState({ validYear })
     }
+  }
+
+  handleCourseLevelSwitch = () => () => {
+    this.setState({ courseLevel: !this.state.courseLevel })
   }
 
   handleStartYearSelection = (year) => {
@@ -204,6 +209,8 @@ class CourseStatistics extends Component {
                 removeCourseStatistics={this.removeCourseStatistics}
                 stats={course}
                 altCodes={course.alternativeCodes}
+                courseLevel={this.state.courseLevel}
+                courseLevelSwitch={this.handleCourseLevelSwitch}
               />
             </List.Item>))
           }
