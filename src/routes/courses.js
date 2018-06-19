@@ -54,7 +54,7 @@ router.get('/courses/duplicatecodes', async (req, res) => {
 
 router.get('/courses/duplicatecodes/all', async (req, res) => {
   let results = []
-  results = await Course.getAllDuplicatesAndNames()
+  results = await Course.getAllDuplicates()
   res.json(results)
 })
 

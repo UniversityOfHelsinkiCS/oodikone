@@ -8,3 +8,5 @@ logs/*
 run_update_script.sh
 student_numbers
 debug.log
+src/anonymized_API
+studentnumbers.txt

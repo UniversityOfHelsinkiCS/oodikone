@@ -12,7 +12,9 @@
     "update_database_dev": "NODE_ENV=dev node src/services/database_updater/database_updater.js",
     "update_database": "node src/services/database_updater/database_updater.js",
     "update_studentnumbers_dev": "NODE_ENV=dev node src/services/database_updater/student_list_updater.js",
+    "init_redis": "node src/util/init_redis.js",
     "seed_redis": "node src/util/add_json_duplicates_to_redis.js && node src/util/map_course_codes.js",
+    "studentnumbers_to_file": "NODE_ENV=dev node src/services/doo_api_database_updater/db_studentnumbers_to_file.js",
     "lint": "eslint --parser babel-eslint src",
     "coverage": "NODE_ENV=test nyc ava"
   },
@@ -26,6 +28,7 @@
     "express": "^4.16.3",
     "jsonwebtoken": "^8.2.1",
     "lodash": "^4.17.5",
+    "mkdirp": "^0.5.1",
     "moment": "^2.22.1",
     "morgan": "^1.9.0",
     "pg": "^7.4.1",
