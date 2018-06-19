@@ -1,5 +1,6 @@
 const redis = require('redis')
 const Course = require('../services/courses')
+const { setDuplicateCode } = require('../services/courses')
 const conf = require('../conf-backend')
 
 const redisClient = redis.createClient(6379, conf.redis)
@@ -15,26 +16,12 @@ const mapCourseCodes = async (newPrefixes, oldPrefixes) => {
   if (!all) {
     await redisClient.setAsync('duplicates', '{}')
   }
-
   const res = await Course.findDuplicates(newPrefixes, oldPrefixes)
   const mappedCodes = res ? res[0] : []
   const formattedCodes = mappedCodes.map(r => { return { [r.code1]: r.code2 } })
   await updateRedis(formattedCodes)
-
+  console.log('Mapped course codes with similar names with codes starting with ', newPrefixes, ' to  ', oldPrefixes)
   process.exit()
-}
-
-const redisGetAndSet = async (code1, code2) => {
-  const res = await redisClient.getAsync('duplicates')
-  const all = JSON.parse(res)
-  if (all[code1]) {
-    if (!all[code1].includes(code2)) {
-      all[code1].push(code2)
-    }
-  } else {
-    all[code1] = [code2]
-  }
-  await redisClient.setAsync('duplicates', JSON.stringify(all))
 }
 
 const updateRedis = async (codes) => {
@@ -43,8 +30,9 @@ const updateRedis = async (codes) => {
     let code = codes[i]
     const newCode = Object.keys(code)[0]
     const oldCode = code[newCode]
-    await redisGetAndSet(newCode, oldCode)
-    await redisGetAndSet(oldCode, newCode)
+
+    await setDuplicateCode(newCode, oldCode)
+    await setDuplicateCode(oldCode, newCode)
   }
 }
 
