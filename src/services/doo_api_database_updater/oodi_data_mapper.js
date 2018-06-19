@@ -202,17 +202,19 @@ const highlevelnameFromElements = elements => {
     case ELEMENT_ID.DEGREE_TITLE:
       degree = names.en || names.fi || names.sv
       break
-    case ELEMENT_ID.DEGREE_MAJOR:
-      subject = names.en || names.fi || names.sv
-      break
     case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
       subject = names.en || names.fi || names.sv
-      break  
+      break    
+    case ELEMENT_ID.DEGREE_MAJOR:
+      if ( subject===undefined ) {
+        subject = names.en || names.fi || names.sv
+      }  
+      break
     default:
       break
     }
   })
-  return `${degree}, ${subject}`
+  return `${subject}`
 }
 
 const parseDate = date => date && moment.utc(date, null).toDate()
