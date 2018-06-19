@@ -37,8 +37,8 @@ const CourseStatisticsTable = ({ stats }) =>
               {year.failed}
             </Table.Cell>
             <Table.Cell>
-              {Math.round((year.failed /
-                (year.passed + year.failed)) * 100) / 100}
+              {`${Math.round((year.failed /
+                (year.passed + year.failed)) * 100)} %`}
             </Table.Cell>
           </Table.Row>
         ))}
