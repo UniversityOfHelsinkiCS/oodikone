@@ -229,8 +229,10 @@ const updateStudentStudyRights = async (student, unitNameSet) => {
   const { studentnumber } = student
   const [ apiStudyRightArray, dbStudyRightArray ] = await getStudyRights(studentnumber)
   const dbStudyRights = new Map(dbStudyRightArray.map(sr => [sr.studyrightid, sr]))
+
   for (let apiStudyRight of apiStudyRightArray) {
     const { studyrightid } = apiStudyRight
+  
     if (dbStudyRights.has(studyrightid)) {
       logger.verbose(`Studyright ${studyrightid} found in database, checking for updated values.`)
       const dbStudyRight = dbStudyRights.get(studyrightid)

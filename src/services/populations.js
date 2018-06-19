@@ -107,7 +107,7 @@ const universityEnrolmentDates = async () => {
 
 const semesterStart = {
   SPRING: '01-01',
-  FALL: '08-01'
+  FALL: '07-31'
 }
 
 const semesterEnd = {
