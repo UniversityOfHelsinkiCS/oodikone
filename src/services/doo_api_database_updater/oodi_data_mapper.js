@@ -158,7 +158,7 @@ const attainmentDataToCourse = attainment => {
   const names = getTextsByLanguage(learningopportunity_name)
   return {
     code: attainment.learningopportunity_id,
-    name: names.en || names.fi || names.sv,
+    name: names.fi || names.en || names.sv,
     latest_instance_date: parseDate(attainment_date)
   }
 }
@@ -200,14 +200,14 @@ const highlevelnameFromElements = elements => {
     const names = getTextsByLanguage(element.name)
     switch(element.element_id) {
     case ELEMENT_ID.DEGREE_TITLE:
-      degree = names.en || names.fi || names.sv
+      degree = names.fi || names.en || names.sv
       break
     case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
-      subject = names.en || names.fi || names.sv
+      subject = names.fi ||names.en ||  names.sv
       break    
     case ELEMENT_ID.DEGREE_MAJOR:
       if ( subject===undefined ) {
-        subject = names.en || names.fi || names.sv
+        subject = names.fi || names.en ||  names.sv
       }  
       break
     default:
