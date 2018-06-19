@@ -17,11 +17,11 @@ process.on('unhandledRejection', (reason) => {
 
 const DEFAULT_TEACHER_ROLE = 'Teacher'
 
-const createExistingCourseIdSet = async () => {
+const createExistingCourseMap = async () => {
   logger.verbose('Creating a set of existing course ids in the database.')
   const courses = await Course.all()
-  const ids = courses.map(course => course.code)
-  return new Set(ids)
+  const ids = courses.map(course => [course.code, course])
+  return new Map(ids)
 }
 
 const uniqueIdForCourseInstance = ({ course_code, coursedate }) => `${course_code}_${coursedate}`
@@ -42,11 +42,11 @@ const createExistingUnitSet = async () => {
 
 const updateStudentInformation = async (studentNumberList, startindex) => {
   let index = startindex
-  let courseIdSet = await createExistingCourseIdSet()
+  let courseMap = await createExistingCourseMap()
   let courseInstanceMap = await createExistingCourseInstanceMap()
   let unitNameSet = await createExistingUnitSet()
   for (let studentNumber of studentNumberList) {
-    await updateAllDataRelatedToStudent(studentNumber, courseIdSet, courseInstanceMap, unitNameSet)
+    await updateAllDataRelatedToStudent(studentNumber, courseMap, courseInstanceMap, unitNameSet)
     index = index + 1
     logger.verbose(`Students updated: ${index}/${studentNumberList.length + startindex}.`)    
   }
@@ -96,15 +96,21 @@ const saveStudyAttainment = async (attainment, studentNumber, courseInstanceId) 
   }
 }
 
-const updateCourse = async (course, courseIdSet) => {
-  const { code, name } = course
-  if (courseIdSet.has(code)) {
-    logger.verbose(`Course ${code} already already in in database.`)
+const updateCourse = async (course, courseMap) => {
+  const { code, name, latest_instance_date } = course
+  const dbCourse = courseMap.get(code)
+  if (dbCourse !== undefined) {
+    logger.verbose(`Course ${code} already in in database.`)
+    if (latest_instance_date > dbCourse.latest_instance_date) {
+      logger.verbose(`Course ${code} has a newer instance date ${latest_instance_date}, updating course.`)
+      dbCourse.latest_instance_date = latest_instance_date
+      await dbCourse.save()
+    }
     return
   }
   logger.verbose(`Creating course ${code} ${name}`)
-  await CourseService.createCourse(code, name)
-  courseIdSet.add(code)
+  const newCourse = await CourseService.createCourse(code, name, latest_instance_date)
+  courseMap.set(code, newCourse)
 }
 
 const updateCourseInstance = async (courseInstance, courseInstanceMap) => {
@@ -146,16 +152,16 @@ const updateCourseTeacher = async (teachers, courseinstance) => {
   }
 }
 
-const updateStudyAttainment = async (apiAttainment, studentnumber, courseIdSet, courseInstanceMap) => {
+const updateStudyAttainment = async (apiAttainment, studentnumber, courseMap, courseInstanceMap) => {
   const [ credit, course, courseInstance ] = datamapper.studyAttainmentDataToModels(apiAttainment)
-  await updateCourse(course, courseIdSet)
+  await updateCourse(course, courseMap)
   const courseinstance = await updateCourseInstance(courseInstance, courseInstanceMap)
   const teachers = await updateTeachers(apiAttainment.teachers)
   await updateCourseTeacher(teachers, courseinstance)
   await saveStudyAttainment(credit, studentnumber, courseinstance.id)
 }
 
-const updateStudentStudyAttainments = async (student, courseIdSet, courseInstanceMap) => {
+const updateStudentStudyAttainments = async (student, courseMap, courseInstanceMap) => {
   const { studentnumber } = student
   logger.verbose(`Updating student credits for student ${studentnumber}`)
   const [ dbAttainments, apiAttainments ] = await getStudyAttainments(student)
@@ -167,12 +173,12 @@ const updateStudentStudyAttainments = async (student, courseIdSet, courseInstanc
       continue
     }
     logger.verbose(`Study attainment ${studyattainment_id} not in database.`)
-    await updateStudyAttainment(apiAttainment, studentnumber, courseIdSet, courseInstanceMap)
+    await updateStudyAttainment(apiAttainment, studentnumber, courseMap, courseInstanceMap)
     dbAttainmentIds.add(studyattainment_id)
   }
 }
 
-const updateAllDataRelatedToStudent = async (studentNumber, courseIdSet, courseInstanceMap, unitNameSet) => {
+const updateAllDataRelatedToStudent = async (studentNumber, courseMap, courseInstanceMap, unitNameSet) => {
   const student = await loadAndUpdateStudent(studentNumber)
 
   if (!student) {
@@ -182,7 +188,7 @@ const updateAllDataRelatedToStudent = async (studentNumber, courseIdSet, courseI
 
   await Promise.all([
     updateStudentStudyRights(student, unitNameSet),
-    updateStudentStudyAttainments(student, courseIdSet, courseInstanceMap)
+    updateStudentStudyAttainments(student, courseMap, courseInstanceMap)
   ])
 }
 
