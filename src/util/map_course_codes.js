@@ -20,8 +20,7 @@ const mapCourseCodes = async (newPrefixes, oldPrefixes) => {
   const mappedCodes = res ? res[0] : []
   const formattedCodes = mappedCodes.map(r => { return { [r.code1]: r.code2 } })
   await updateRedis(formattedCodes)
-  const allD = await redisClient.getAsync('duplicates')
-  console.log(allD)
+  console.log('Mapped course codes with similar names with codes starting with ', newPrefixes, ' to  ', oldPrefixes)
   process.exit()
 }
 
