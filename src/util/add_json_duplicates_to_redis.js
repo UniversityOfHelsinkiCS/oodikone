@@ -13,6 +13,7 @@ const mapJson = async () => {
     await setDuplicateCode(i, oldToNew[i])
     await setDuplicateCode(oldToNew[i], i)
   }
+  console.log('Mapped codes from newToOld.json and oldToNew.json')
   process.exit()
 }
 
