@@ -193,6 +193,7 @@ const Course = sequelize.define('course',
       type: Sequelize.STRING
     },
     name: { type: Sequelize.STRING },
+    latest_instance_date: { type: Sequelize.DATE }
   },
   {
     tableName: 'course',

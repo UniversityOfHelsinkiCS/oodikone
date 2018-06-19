@@ -302,9 +302,10 @@ const courseInstanceByCodeAndDate = (code, date) => {
   })
 }
 
-const createCourse = async (code, name) => Course.create({
-  code: code,
-  name: name
+const createCourse = async (code, name, latest_instance_date) => Course.create({
+  code,
+  name,
+  latest_instance_date
 })
 
 const createCourseInstance = async (creditDate, courseCode) => {

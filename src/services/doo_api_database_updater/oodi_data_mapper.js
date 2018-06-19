@@ -154,10 +154,11 @@ const attainmentDataToCredit = attainment => {
 }
 
 const attainmentDataToCourse = attainment => {
-  const { learningopportunity_name } = attainment
+  const { learningopportunity_name, attainment_date} = attainment
   return {
     code: attainment.learningopportunity_id,
-    name: learningopportunity_name[learningopportunity_name.length - 1].text
+    name: learningopportunity_name[learningopportunity_name.length - 1].text,
+    latest_instance_date: parseDate(attainment_date)
   }
 }
 
