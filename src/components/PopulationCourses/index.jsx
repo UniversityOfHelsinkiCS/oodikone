@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { func, arrayOf, object } from 'prop-types'
 import { Segment, Header, Popup } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
+import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 
 class PopulationCourses extends Component {
@@ -16,6 +17,7 @@ class PopulationCourses extends Component {
       return null
     }
     const { samples, translate } = this.props
+    const { pending } = this.props.samples[0]
     return (
       <Segment>
         <Popup
@@ -24,6 +26,7 @@ class PopulationCourses extends Component {
           wide
           position="top left"
         />
+        <SegmentDimmer translate={translate} isLoading={pending} />
         {samples.map(sample => (
           <PopulationCourseStats
             key={sample.query.uuid}
