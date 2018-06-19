@@ -189,6 +189,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 
   const calculateStats = (thisSemester, allInstancesUntilSemester) => {
     const studentsThatPassedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c => c.student_studentnumber))))
+    const gradeDistribution = _.groupBy(_.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits))), 'grade')
     const studentsThatFailedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student_studentnumber))))
     const allStudentsThatFailedEver = _.flattenDeep(allInstancesUntilSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student_studentnumber)))
     const passedStudentsThatFailedBefore = _.uniq(studentsThatPassedThisYear.filter(student => allStudentsThatFailedEver.includes(student)))
@@ -196,7 +197,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
     const failedStudentsThatFailedBefore = _.uniq(_.flattenDeep(Object.values(_.groupBy(allStudentsThatFailedEver)).filter(group => group.length > 1)).filter(student => studentsThatFailedThisYear.includes(student)))
     const failedStudentsOnFirstTry = _.difference(studentsThatFailedThisYear, failedStudentsThatFailedBefore)
 
-    return { studentsThatPassedThisYear, studentsThatFailedThisYear, allStudentsThatFailedEver, passedStudentsThatFailedBefore, passedStudentsOnFirstTry, failedStudentsThatFailedBefore, failedStudentsOnFirstTry }
+    return { studentsThatPassedThisYear, studentsThatFailedThisYear, allStudentsThatFailedEver, passedStudentsThatFailedBefore, passedStudentsOnFirstTry, failedStudentsThatFailedBefore, failedStudentsOnFirstTry, gradeDistribution }
   }
 
   const stats = []
@@ -223,6 +224,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
         failedStudentsOnFirstTry: fallStatistics.failedStudentsOnFirstTry.length || 0,
         courseLevelPassed: passedF,
         courseLevelFailed: failedF,
+        gradeDistribution: fallStatistics.gradeDistribution,
         time: String(year) + ' Fall'
       })
     if (springStatistics.studentsThatPassedThisYear.length + springStatistics.studentsThatFailedThisYear.length > 0)
@@ -235,6 +237,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
         failedStudentsOnFirstTry: springStatistics.failedStudentsOnFirstTry.length || 0,
         courseLevelPassed: passedS,
         courseLevelFailed: failedS,
+        gradeDistribution: springStatistics.gradeDistribution,
         time: String(year + 1) + ' Spring'
       })
 
@@ -253,6 +256,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
       failedStudentsOnFirstTry: statistics.failedStudentsOnFirstTry.length || 0,
       courseLevelPassed: passed,
       courseLevelFailed: failed,
+      gradeDistribution: statistics.gradeDistribution,
       time: String(year) + '-' + String(year + 1)
     })
   }
@@ -261,7 +265,8 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 
 const yearlyStatsOf = async (code, year, separate) => {
   const allInstances = await instancesOf(code)
-  const alternativeCodes = await getDuplicateCodes(code)
+  const alternatives = await getDuplicateCodes(code)
+  const alternativeCodes = Object.keys(alternatives.alt)
   if (alternativeCodes) {
     const alternativeInstances = await Promise.all(alternativeCodes.map(code => instancesOf(code)))
     alternativeInstances.forEach(inst => allInstances.push(...inst))
@@ -366,64 +371,72 @@ const getDuplicateCodes = async (code) => {
   const allCodes = await getAllDuplicates()
   const results = allCodes[code]
   if (results) return results
-  return []
+  return null
 }
 
+const getMainCode = async (code) => {
+  const codes = await getDuplicateCodes(code)
+  if (!codes) return code
+  return codes.main
+}
+
+
 const setDuplicateCode = async (code, duplicate) => {
+  // TODO: decide main code by choosing a course that has been held most recently  
+  const isMainCode = (code) => code.slice(0, 2).split('').filter(c => Number(c)).length === 0
+
+  // If an old code is mapped to another, select first alphabetically
+  const selectMain = (code, dupl) => {
+    const codes = [code, ...Object.keys(dupl.alt)]
+    return codes.sort()[0]
+  }
+
   if (code !== duplicate) {
     const all = await getAllDuplicates()
+    const course = await byCode(code)
+    let main = ''
     if (!all[code]) {
-      all[code] = []
+      if (isMainCode(code)) {
+        if (isMainCode(duplicate)) {
+          main = code.localeCompare(duplicate) ? code : duplicate
+        } else {
+          main = course.code
+        }
+      }
+      all[code] = {
+        main: main,
+        name: course.name,
+        alt: {}
+      }
     }
-    if (!all[code].includes(duplicate)) {
-      all[code].push(duplicate)
+
+    if (!Object.keys(all[code].alt).includes(duplicate)) {
+      const duplCourse = await byCode(duplicate)
+      if (isMainCode(duplicate)) {
+        all[code].main = duplCourse.code
+      }
+      all[code].alt[duplicate] = duplCourse.name
+      if (!all[code].main) {
+        all[code].main = selectMain(code, all[code])
+        all[code].name = course.name
+      }
       await redisClient.setAsync('duplicates', JSON.stringify(all))
     }
   }
 
-  const res = await getAllDuplicatesAndNames()
+  const res = await getAllDuplicates()
   return res
 }
 
 const removeDuplicateCode = async (code, duplicate) => {
   let all = await getAllDuplicates(code)
-  if (all[code] && all[code].includes(duplicate)) {
-    all[code] = all[code].filter(c => c !== duplicate)
-    if (all[code].length === 0) delete all[code]
+  if (all[code] && Object.keys(all[code].alt).includes(duplicate)) {
+    delete all[code].alt[duplicate]
+    if (all[code].alt.length === 0) delete all[code]
     await redisClient.setAsync('duplicates', JSON.stringify(all))
   }
-
-  const res = await getAllDuplicatesAndNames()
+  const res = await getAllDuplicates()
   return res
-}
-
-const getAllDuplicatesAndNames = async () => {
-  const codes = await getAllDuplicates()
-  const keys = Object.keys(codes)
-  const raw = await Promise.all(keys.map(async key => {
-    const course = await byCode(key)
-    const mainName = course.dataValues.name
-    const altCodes = codes[key]
-    const altCodesWithNames = await Promise.all(altCodes.map(async code => {
-      const course = await byCode(key)
-      const name = course.dataValues.name
-      return {
-        code,
-        name
-      }
-    }))
-    return {
-      [key]: {
-        name: mainName,
-        altCodes: altCodesWithNames
-      }
-    }
-  }))
-
-  return raw.reduce((map, obj) => {
-    map[Object.keys(obj)[0]] = obj[Object.keys(obj)[0]]
-    return map
-  }, {})
 }
 
 module.exports = {
@@ -439,5 +452,5 @@ module.exports = {
   setDuplicateCode,
   removeDuplicateCode,
   getAllDuplicates,
-  getAllDuplicatesAndNames
+  getMainCode
 }

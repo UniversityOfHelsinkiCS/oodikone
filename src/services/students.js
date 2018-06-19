@@ -2,8 +2,8 @@ const Sequelize = require('sequelize')
 const moment = require('moment')
 const { getDate } = require('./database_updater/oodi_data_mapper')
 const { Student, Credit, CourseInstance, Course, Studyright } = require('../models')
+const { getMainCode } = require('./courses')
 const Op = Sequelize.Op
-const { oldToNew } = require('../util/index')
 
 
 const createStudent = (array) => Student.create({
@@ -147,7 +147,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
   }
 }
 
-const formatStudentUnifyCodes = ({ studentnumber, dateofuniversityenrollment, creditcount, credits }) => {
+const formatStudentUnifyCodes = async ({ studentnumber, dateofuniversityenrollment, creditcount, credits }) => {
   const unifyOpenUniversity = (code) => {
     if (code[0] === 'A') {
       return code.substring(code[1] === 'Y' ? 2 :1 )
@@ -155,8 +155,8 @@ const formatStudentUnifyCodes = ({ studentnumber, dateofuniversityenrollment, cr
     return code
   }
 
-  const toCourse = ({ grade, credits, courseinstance }) => {
-    const code = oldToNew(unifyOpenUniversity(`${courseinstance.course_code}`))
+  const toCourse = async ({ grade, credits, courseinstance }) => {
+    const code = await getMainCode(unifyOpenUniversity(`${courseinstance.course_code}`))
     return {
       course: {
         code,
@@ -177,13 +177,14 @@ const formatStudentUnifyCodes = ({ studentnumber, dateofuniversityenrollment, cr
     credits = []
   }
 
-  return {
+  const student = {
     studentNumber: studentnumber,
     started: dateofuniversityenrollment,
     credits: creditcount,
-    courses: credits.sort(byDate).map(toCourse),
+    courses: await Promise.all(credits.sort(byDate).map(toCourse)),
     tags: []
   }
+  return student
 }
 
 const bySearchTerm = async (term) => {

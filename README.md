@@ -87,6 +87,14 @@ REDIS=localhost
 TOKEN_SECRET=IWannaBeTheVeryBest
 ```
 
+To initiate and seed the redis db, run: 
+
+`npm run init_redis`
+
+and
+
+`npm run seed_redis`
+
 ### Running 
 
 #### Dev

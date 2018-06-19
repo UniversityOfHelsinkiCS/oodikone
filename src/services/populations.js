@@ -192,8 +192,9 @@ const bottlenecksOf = async (query) => {
 
     const populationSize = students.length
 
-    const toCourses = (student) => {
-      const courses = _.groupBy(formatStudentUnifyCodes(student).courses, c => c.course.code)
+    const toCourses = async (student) => {
+      const formattedStudent = await formatStudentUnifyCodes(student)
+      const courses = _.groupBy(formattedStudent.courses, c => c.course.code)
       return Object.keys(courses).map(code=>{
         const instances = courses[code]
         return {
@@ -205,7 +206,7 @@ const bottlenecksOf = async (query) => {
       })
     }
 
-    const courses = _.flatten(students.map(toCourses))
+    const courses = _.flatten(await Promise.all(students.map(toCourses)))
 
     const toNameMap = (object, { course }) => {
       if (!object[course.code] || (object[course.code].startsWith('Avoin yo') && !course.name.startsWith('Avoin yo')) ) {
