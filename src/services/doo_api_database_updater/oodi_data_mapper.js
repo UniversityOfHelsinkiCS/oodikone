@@ -190,7 +190,8 @@ const getTeacherFromData = teacher => ({
 
 const ELEMENT_ID = {
   DEGREE_TITLE: 10,
-  DEGREE_MAJOR: 40
+  DEGREE_STUDY_PROGRAM: 20,
+  DEGREE_MAJOR: 40,
 } 
 
 const highlevelnameFromElements = elements => {
@@ -204,6 +205,9 @@ const highlevelnameFromElements = elements => {
     case ELEMENT_ID.DEGREE_MAJOR:
       subject = names.en || names.fi || names.sv
       break
+    case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
+      subject = names.en || names.fi || names.sv
+      break  
     default:
       break
     }
