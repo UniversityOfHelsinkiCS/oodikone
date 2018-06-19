@@ -145,11 +145,15 @@ Create a new database and fill it with the backup dump following the instruction
 
 
 
-## Accessing production DB
+## Accessing production/staging DB
 
 To access the database in oodikone.cs.helsinki.fi run: 
 
 `docker exec -it -u postgres db psql -d tkt_oodi`
+
+or
+
+`docker exec -it -u postgres db_staging psql -d tkt_oodi_staging`
 
 To create a dump of the production db, run: 
 
