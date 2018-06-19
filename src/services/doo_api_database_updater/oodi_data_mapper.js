@@ -155,9 +155,10 @@ const attainmentDataToCredit = attainment => {
 
 const attainmentDataToCourse = attainment => {
   const { learningopportunity_name, attainment_date} = attainment
+  const names = getTextsByLanguage(learningopportunity_name)
   return {
     code: attainment.learningopportunity_id,
-    name: learningopportunity_name[learningopportunity_name.length - 1].text,
+    name: names.en || names.fi || names.sv,
     latest_instance_date: parseDate(attainment_date)
   }
 }
