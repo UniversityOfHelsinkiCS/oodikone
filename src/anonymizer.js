@@ -6,7 +6,6 @@ const mkdirp = require('mkdirp')
 const getDirName = require('path').dirname
 const logger = require('./util/logger')
 var fs = require('fs')
-const _ = require('lodash')
 require('dotenv').config()
 
 
@@ -157,9 +156,17 @@ const anonymizeStudentAttainments = async (id, studentInfo) => {
   }
   return anonAttainments
 }
-const anonymizeStudentStudyRights = async (id) => {
+const anonymizeStudentStudyRights = async (id, studentInfo) => {
   let studyRights = await getStudyRights(id)
-  return studyRights
+  let anonStudyRights = []
+  for (let studyright of studyRights) {
+    let anonStudyright = {
+      ...studyright,
+      person_id: studentInfo.person_id
+    } 
+    anonStudyRights = anonStudyRights.concat(anonStudyright)
+  }
+  return anonStudyRights
 }
 const APIWriter = (path, data) => {
   mkdirp(getDirName(path), async () => {
