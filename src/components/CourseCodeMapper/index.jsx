@@ -30,16 +30,19 @@ class CourseCodeMapper extends Component {
     const rows = filteredKeys.map((key) => {
       const course = courseCodeDuplicates.data[key]
       return (
-        <Table.Row key={key + course.altCodes.map(code => code.code).toString()}>
+        <Table.Row key={key + Object.keys(course.alt).map(altkey => altkey + course.alt[key])}>
           <Table.Cell>{key}</Table.Cell>
           <Table.Cell>{course.name}</Table.Cell>
-          <Table.Cell>{course.altCodes.map(code => (
-            <React.Fragment key={code.code + key}>
-              {code.code}
-              <Icon color="red" name="remove circle" onClick={this.removeDuplicate(key, code.code)} />
+          <Table.Cell>{course.main}</Table.Cell>
+          <Table.Cell>{Object.keys(course.alt).map(altkey => (
+            <React.Fragment key={course.alt[altkey] + altkey}>
+              {altkey}
+              <Icon color="red" name="remove circle" onClick={this.removeDuplicate(key, altkey)} />
             </React.Fragment>))}
           </Table.Cell>
-          <Table.Cell>{course.altCodes.map(code => code.name).toString()}</Table.Cell>
+          <Table.Cell>
+            {Object.keys(course.alt).map(altKey => course.alt[altKey]).toString()}
+          </Table.Cell>
         </Table.Row>)
     })
     return rows
@@ -53,9 +56,9 @@ class CourseCodeMapper extends Component {
       return (
         key.toLocaleLowerCase().includes(filter) ||
         course.name.toLocaleLowerCase().includes(filter) ||
-        course.altCodes.find(code =>
-          code.code.toLocaleLowerCase().includes(filter) ||
-          code.name.toLocaleLowerCase().includes(filter))
+        Object.keys(course.alt).find(code =>
+          code.toLocaleLowerCase().includes(filter) ||
+          course.alt[code].toLocaleLowerCase().includes(filter))
       )
     })
   }
@@ -114,6 +117,7 @@ class CourseCodeMapper extends Component {
               <Table.Row>
                 <Table.HeaderCell>Code</Table.HeaderCell>
                 <Table.HeaderCell>Name</Table.HeaderCell>
+                <Table.HeaderCell>Main code</Table.HeaderCell>
                 <Table.HeaderCell>Alternative code(s)</Table.HeaderCell>
                 <Table.HeaderCell>Alternative name(s)</Table.HeaderCell>
               </Table.Row>
