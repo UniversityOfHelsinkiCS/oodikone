@@ -414,7 +414,7 @@ const setDuplicateCode = async (code, duplicate) => {
 const removeDuplicateCode = async (code, duplicate) => {
   let all = await getAllDuplicates(code)
   if (all[code] && Object.keys(all[code].alt).includes(duplicate)) {
-    all[code] = all[code].alt.filter(c => Object.keys(c)[0] !== duplicate)
+    delete all[code].alt[duplicate]
     if (all[code].alt.length === 0) delete all[code]
     await redisClient.setAsync('duplicates', JSON.stringify(all))
   }
