@@ -191,7 +191,7 @@ const createTeacher = async (code, name) => {
 }
 
 const createCourseTeacher = async (role, teacher, instance) => {
-  const maxId = await CourseTeacher.max('id')
+  const maxId = await CourseTeacher.max('id') || 0
   const id = parseInt(maxId) + 1
   return CourseTeacher.create({
     id: id,
@@ -201,6 +201,8 @@ const createCourseTeacher = async (role, teacher, instance) => {
   })
 }
 
+const createTeacherFromObject = teacher => Teacher.create(teacher)
+
 module.exports = {
-  statisticsOf, findOrCreateTeacher, createCourseTeacher
+  statisticsOf, findOrCreateTeacher, createCourseTeacher, teachersByIds, createTeacherFromObject
 }

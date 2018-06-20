@@ -28,13 +28,7 @@ const byNameOrCode = (searchTerm) => Course.findAll({
   }
 })
 
-const byCode = (code) => Course.findOne({
-  where: {
-    code: {
-      [Op.eq]: code
-    }
-  }
-})
+const byCode = code => Course.findByPrimary(code)
 
 const instanceStatistics = async (code, date) => CourseInstance.findOne({
   include: [
@@ -308,18 +302,19 @@ const courseInstanceByCodeAndDate = (code, date) => {
   })
 }
 
-const createCourse = async (code, name) => Course.create({
-  code: code,
-  name: name
+const createCourse = async (code, name, latest_instance_date) => Course.create({
+  code,
+  name,
+  latest_instance_date
 })
 
-const createCourseInstance = async (creditDate, course) => {
-  const maxId = await CourseInstance.max('id')
+const createCourseInstance = async (creditDate, courseCode) => {
+  const maxId = await CourseInstance.max('id') || 0
   const id = parseInt(maxId) + 1
   return CourseInstance.create({
     id: id,
     coursedate: creditDate,
-    course_code: course.code
+    course_code: courseCode
   })
 }
 
@@ -385,6 +380,12 @@ const setDuplicateCode = async (code, duplicate) => {
   // TODO: decide main code by choosing a course that has been held most recently  
   const isMainCode = (code) => code.slice(0, 2).split('').filter(c => Number(c)).length === 0
 
+  const course = await byCode(code)
+  const duplCourse = await byCode(duplicate)
+  if(!course || !duplCourse) {
+    return
+  }
+
   // If an old code is mapped to another, select first alphabetically
   const selectMain = (code, dupl) => {
     const codes = [code, ...Object.keys(dupl.alt)]
@@ -393,7 +394,6 @@ const setDuplicateCode = async (code, duplicate) => {
 
   if (code !== duplicate) {
     const all = await getAllDuplicates()
-    const course = await byCode(code)
     let main = ''
     if (!all[code]) {
       if (isMainCode(code)) {
@@ -411,7 +411,6 @@ const setDuplicateCode = async (code, duplicate) => {
     }
 
     if (!Object.keys(all[code].alt).includes(duplicate)) {
-      const duplCourse = await byCode(duplicate)
       if (isMainCode(duplicate)) {
         all[code].main = duplCourse.code
       }
@@ -432,7 +431,8 @@ const removeDuplicateCode = async (code, duplicate) => {
   let all = await getAllDuplicates(code)
   if (all[code] && Object.keys(all[code].alt).includes(duplicate)) {
     delete all[code].alt[duplicate]
-    if (all[code].alt.length === 0) delete all[code]
+    
+    if (Object.keys(all[code].alt).length === 0) delete all[code]
     await redisClient.setAsync('duplicates', JSON.stringify(all))
   }
   const res = await getAllDuplicates()
@@ -440,6 +440,7 @@ const removeDuplicateCode = async (code, duplicate) => {
 }
 
 module.exports = {
+  byCode,
   bySearchTerm,
   instancesOf,
   statisticsOf,
