@@ -2,11 +2,14 @@ const Sequelize = require('sequelize')
 const { Organisation } = require('../models')
 const Op = Sequelize.Op
 
-const createOrganisation = (array) => {
-  return Organisation.create({
-    code: array.code,
-    name: array.name
-  })
+const apiDataToModel = data => ({
+  code: data.code,
+  name: data.name[0].text
+})
+
+const createOrganisation = data => {
+  const organisation = apiDataToModel(data)
+  return Organisation.create(organisation)
 }
 
 const byCode = (code) => {
@@ -19,6 +22,10 @@ const byCode = (code) => {
   })
 }
 
+const all = () => {
+  return Organisation.findAll()
+}
+
 module.exports = {
-  createOrganisation, byCode
+  createOrganisation, byCode, all
 }

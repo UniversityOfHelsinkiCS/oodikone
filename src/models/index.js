@@ -24,6 +24,23 @@ const Student = sequelize.define('student',
     semesterenrollmenttypecode: { type: Sequelize.STRING },
     sex: { type: Sequelize.STRING },
     studentstatuscode: { type: Sequelize.INTEGER },
+    email: { type: Sequelize.STRING },
+    phone: { type: Sequelize.STRING },
+    city_fi: { type: Sequelize.STRING },
+    city_sv: { type: Sequelize.STRING },
+    national_student_number: { type: Sequelize.STRING },
+    zipcode: { type: Sequelize.STRING },
+    address: { type: Sequelize.STRING },
+    address2: { type: Sequelize.STRING },
+    language_fi: { type: Sequelize.STRING },
+    language_sv: { type: Sequelize.STRING },
+    language_en: { type: Sequelize.STRING },
+    age: { type: Sequelize.INTEGER },
+    mobile: { type: Sequelize.STRING },
+    home_county_id: { type: Sequelize.INTEGER },
+    country_fi: { type: Sequelize.STRING },
+    country_sv: { type: Sequelize.STRING },
+    country_en: { type: Sequelize.STRING },
   },
   {
     tableName: 'student',
@@ -123,11 +140,13 @@ Credit.notUnnecessary = (credit) => {
   return credit.credits > 0 && credit.credits <= 12
 }
 
+const failedNames = ['Luop', 'Hyl.', 'Eisa', '0', 'Fail']
+
 Credit.failed = (credit) =>
-  ['Luop', 'Hyl.', 'Eisa', '0'].includes(credit.grade)
+  failedNames.includes(credit.grade)
 
 Credit.passed = (credit) =>
-  !['Luop', 'Hyl.', 'Eisa', '0'].includes(credit.grade)
+  !failedNames.includes(credit.grade)
 
 const Studyright = sequelize.define('studyright',
   {
@@ -161,7 +180,7 @@ const CourseInstance = sequelize.define('courseinstance',
       type: Sequelize.BIGINT
     },
     coursedate: { type: Sequelize.DATE },
-    course_code: { type: Sequelize.STRING },
+    course_code: { type: Sequelize.STRING }
   },
   {
     tableName: 'courseinstance',
@@ -176,6 +195,7 @@ const Course = sequelize.define('course',
       type: Sequelize.STRING
     },
     name: { type: Sequelize.STRING },
+    latest_instance_date: { type: Sequelize.DATE }
   },
   {
     tableName: 'course',
@@ -187,7 +207,7 @@ const Teacher = sequelize.define('teacher',
   {
     id: {
       primaryKey: true,
-      type: Sequelize.BIGINT
+      type: Sequelize.STRING
     },
     code: { type: Sequelize.STRING },
     name: { type: Sequelize.STRING },
@@ -206,7 +226,7 @@ const CourseTeacher = sequelize.define('courseteacher',
     },
     teacherrole: { type: Sequelize.STRING },
     courseinstance_id: { type: Sequelize.BIGINT },
-    teacher_id: { type: Sequelize.BIGINT },
+    teacher_id: { type: Sequelize.STRING },
   },
   {
     tableName: 'courseteacher',

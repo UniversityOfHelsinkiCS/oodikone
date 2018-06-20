@@ -27,6 +27,14 @@ const hasStudent = async (unitId, studentNumber) => Studyright.findOne({
   }
 })
 
+const findByName = name => Unit.findOne({
+  where: { name }
+})
+
+const createUnit = data => {
+  return Unit.create(data)
+}
+
 module.exports = {
-  all, byId, findAllEnabled, hasStudent
+  all, byId, findAllEnabled, hasStudent, createUnit, findByName
 }

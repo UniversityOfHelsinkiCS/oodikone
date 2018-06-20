@@ -1,57 +1,20 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const { getDate } = require('./database_updater/oodi_data_mapper')
 const { Student, Credit, CourseInstance, Course, Studyright } = require('../models')
 const { getMainCode } = require('./courses')
 const Op = Sequelize.Op
 
+const createStudent = student => Student.create(student)
 
-const createStudent = (array) => Student.create({
-  studentnumber: array[0],
-  lastname: array[4],
-  firstnames: array[5],
-  abbreviatedname: array[6],
-  birthdate: getDate(array[2]),
-  communicationlanguage: array[22],
-  country: array[15],
-  creditcount: array[18],
-  dateoffirstcredit: getDate(array[20]),
-  dateoflastcredit: getDate(array[21]),
-  dateofuniversityenrollment: getDate(array[19]),
-  gradestudent: array[25],
-  matriculationexamination: array[24],
-  nationalities: array[23],
-  semesterenrollmenttypecode: array[16],
-  sex: array[3],
-  studentstatuscode: array[17]
-})
-
-const updateStudent = (array) => Student.update({
-  studentnumber: array[0],
-  lastname: array[4],
-  firstnames: array[5],
-  abbreviatedname: array[6],
-  birthdate: getDate(array[2]),
-  communicationlanguage: array[22],
-  country: array[15],
-  creditcount: array[18],
-  dateoffirstcredit: getDate(array[20]),
-  dateoflastcredit: getDate(array[21]),
-  dateofuniversityenrollment: getDate(array[19]),
-  gradestudent: array[25],
-  matriculationexamination: array[24],
-  nationalities: array[23],
-  semesterenrollmenttypecode: array[16],
-  sex: array[3],
-  studentstatuscode: array[17]
-},
-{
-  where: {
-    studentnumber: {
-      [Op.eq]: array[0]
+const updateStudent = student => {
+  return Student.update(student, {
+    where: {
+      studentnumber: {
+        [Op.eq]: student.studentnumber
+      }
     }
-  }
-})
+  })
+}
 
 const byId = async (id) => Student.findOne({
   include: [
