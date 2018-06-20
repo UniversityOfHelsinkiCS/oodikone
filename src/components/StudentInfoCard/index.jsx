@@ -4,7 +4,7 @@ import { Card, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import { reformatDate, studyRightRegex } from '../../common'
+import { reformatDate } from '../../common'
 import { studentDetailsType } from '../../constants/types'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
 
