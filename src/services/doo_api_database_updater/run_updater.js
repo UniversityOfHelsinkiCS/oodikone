@@ -4,7 +4,7 @@ const logger = require('../../util/logger')
 
 const readStudentNumbersFromFile = async filename => {
   logger.verbose(`Reading student numbers from file ${filename}.`)
-  const studentnumbers = fs.readFileSync(filename, 'utf-8').split('\n').map(s => s.replace(' ',''))
+  const studentnumbers = fs.readFileSync(filename, 'utf-8').split('\n').map(s => s.replace(/\D/g, ''))
   return studentnumbers.filter(studentnumber => !!studentnumber).map(s=>s.startsWith('0') ? s : '0'+s ) 
 }
 
