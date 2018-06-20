@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { clearLoading } from '../../redux/graphSpinner'
 
-import { DISPLAY_DATE_FORMAT, CHART_COLORS, API_DATE_FORMAT } from '../../constants'
+import { DISPLAY_DATE_FORMAT, CHART_COLORS } from '../../constants'
 import { reformatDate, sortDatesWithFormat } from '../../common'
 import { turquoise } from '../../styles/variables/colors'
 
