@@ -1,3 +1,4 @@
+const moment = require('moment')
 const Oodi = require('./oodi_interface')
 const StudentService = require('../students')
 const StudyrightService = require('../studyrights')
@@ -8,7 +9,7 @@ const CourseService = require('../courses')
 const TeacherService = require('../teachers')
 const logger = require('../../util/logger')
 const datamapper = require('./oodi_data_mapper')
-const { Course, CourseInstance, Unit } = require('../../models/index') 
+const { Course, CourseInstance, Unit } = require('../../models/index')
 const _ = require('lodash')
 
 process.on('unhandledRejection', (reason) => {
@@ -38,7 +39,7 @@ const createExistingUnitSet = async () => {
   const units = await Unit.all()
   const names = units.map(unit => unit.name)
   return new Set(names)
-} 
+}
 
 const updateStudentInformation = async (studentNumberList, startindex) => {
   let index = startindex
@@ -48,7 +49,7 @@ const updateStudentInformation = async (studentNumberList, startindex) => {
   for (let studentNumber of studentNumberList) {
     await updateAllDataRelatedToStudent(studentNumber, courseMap, courseInstanceMap, unitNameSet)
     index = index + 1
-    logger.verbose(`Students updated: ${index}/${studentNumberList.length + startindex}.`)    
+    logger.verbose(`Students updated: ${index}/${studentNumberList.length + startindex}.`)
   }
 }
 
@@ -59,14 +60,14 @@ const getFaculties = () => {
 const saveFacultyToDb = async faculty => {
   try {
     await OrganisationService.createOrganisation(faculty)
-    logger.verbose(`Faculty ${faculty.code} created.`)    
+    logger.verbose(`Faculty ${faculty.code} created.`)
   } catch (error) {
     logger.verbose(`Error creating faculty ${faculty.code}, error: ${error.message}`)
   }
 }
 
 const updateFaculties = async () => {
-  const [ dbFacultiesArray, apiFacultiesArray ] = await getFaculties()
+  const [dbFacultiesArray, apiFacultiesArray] = await getFaculties()
   const dbFacultyCodes = new Set(dbFacultiesArray.map(faculty => faculty.code))
   await Promise.all(apiFacultiesArray.map(async faculty => {
     if (dbFacultyCodes.has(faculty.code)) {
@@ -81,8 +82,8 @@ const updateFaculties = async () => {
 const getStudyAttainments = async student => {
   const { studentnumber } = student
   const dbAttainments = student.credits ? student.credits : []
-  const apiAttainments  = await Oodi.getStudyAttainments(studentnumber)
-  return [ dbAttainments, apiAttainments ]
+  const apiAttainments = await Oodi.getStudyAttainments(studentnumber)
+  return [dbAttainments, apiAttainments]
 }
 
 const saveStudyAttainment = async (attainment, studentNumber, courseInstanceId) => {
@@ -92,7 +93,7 @@ const saveStudyAttainment = async (attainment, studentNumber, courseInstanceId) 
     logger.verbose(`Study attainment ${id} created for student ${studentNumber} and course instance ${courseInstanceId}. `)
   } catch (error) {
     logger.error(`Creating study attainment ${id} failed: ${error.message}`)
-    throw(error)
+    throw (error)
   }
 }
 
@@ -115,7 +116,7 @@ const updateCourse = async (course, courseMap) => {
 
 const updateCourseInstance = async (courseInstance, courseInstanceMap) => {
   const { coursedate, course_code } = courseInstance
-  const identifier = uniqueIdForCourseInstance(courseInstance) 
+  const identifier = uniqueIdForCourseInstance(courseInstance)
   const dbCourseInstance = courseInstanceMap.get(identifier)
   if (dbCourseInstance !== undefined) {
     logger.verbose(`Course instance for ${course_code} for date ${coursedate} already in database.`)
@@ -140,7 +141,7 @@ const updateTeachers = async teachers => {
       logger.verbose(`Teacher ${id} created.`)
     } catch (error) {
       logger.error(`Error creating teacher ${id}: ${error.message}`)
-      throw(error)
+      throw (error)
     }
   }))
   return dbTeachers
@@ -148,12 +149,12 @@ const updateTeachers = async teachers => {
 
 const updateCourseTeacher = async (teachers, courseinstance) => {
   for (let teacher of teachers) {
-    await TeacherService.createCourseTeacher(DEFAULT_TEACHER_ROLE, teacher, courseinstance)    
+    await TeacherService.createCourseTeacher(DEFAULT_TEACHER_ROLE, teacher, courseinstance)
   }
 }
 
 const updateStudyAttainment = async (apiAttainment, studentnumber, courseMap, courseInstanceMap) => {
-  const [ credit, course, courseInstance ] = datamapper.studyAttainmentDataToModels(apiAttainment)
+  const [credit, course, courseInstance] = datamapper.studyAttainmentDataToModels(apiAttainment)
   await updateCourse(course, courseMap)
   const courseinstance = await updateCourseInstance(courseInstance, courseInstanceMap)
   const teachers = await updateTeachers(apiAttainment.teachers)
@@ -164,7 +165,7 @@ const updateStudyAttainment = async (apiAttainment, studentnumber, courseMap, co
 const updateStudentStudyAttainments = async (student, courseMap, courseInstanceMap) => {
   const { studentnumber } = student
   logger.verbose(`Updating student credits for student ${studentnumber}`)
-  const [ dbAttainments, apiAttainments ] = await getStudyAttainments(student)
+  const [dbAttainments, apiAttainments] = await getStudyAttainments(student)
   const dbAttainmentIds = new Set(dbAttainments.map(attainment => Number(attainment.id)))
   for (let apiAttainment of apiAttainments) {
     const { studyattainment_id } = apiAttainment
@@ -227,12 +228,17 @@ const updateExistingStudyright = async (apiStudyright, dbStudyright) => {
 
 const updateStudentStudyRights = async (student, unitNameSet) => {
   const { studentnumber } = student
-  const [ apiStudyRightArray, dbStudyRightArray ] = await getStudyRights(studentnumber)
+  const [apiStudyRightArray, dbStudyRightArray] = await getStudyRights(studentnumber)
   const dbStudyRights = new Map(dbStudyRightArray.map(sr => [sr.studyrightid, sr]))
-
+  if (!student.dateofuniversityenrollment) {
+    const studyRightStart = _.sortBy(apiStudyRightArray.map(s => s.startdate), n =>
+      moment(n).valueOf())[0]
+    student.dateofuniversityenrollment = studyRightStart
+    await student.save()
+  }
   for (let apiStudyRight of apiStudyRightArray) {
     const { studyrightid } = apiStudyRight
-  
+
     if (dbStudyRights.has(studyrightid)) {
       logger.verbose(`Studyright ${studyrightid} found in database, checking for updated values.`)
       const dbStudyRight = dbStudyRights.get(studyrightid)
@@ -259,7 +265,7 @@ const getStudent = studentNumber => Promise.all([StudentService.byId(studentNumb
 
 const loadAndUpdateStudent = async studentNumber => {
   try {
-    let [ studentFromDb, studentFromApi ] = await getStudent(studentNumber)
+    let [studentFromDb, studentFromApi] = await getStudent(studentNumber)
     if (studentFromApi === null) {
       logger.verbose(`Student ${studentNumber} returned null from the api.`)
       return studentFromDb
@@ -273,16 +279,19 @@ const loadAndUpdateStudent = async studentNumber => {
     }
   } catch (e) {
     logger.error(`Student: ${studentNumber} loadAndUpdate failed.`)
-    throw(e)
+    throw (e)
   }
 }
 
-const updateDatabaseForStudents = async (studentnumbers, startindex=0) => {
+const updateDatabaseForStudents = async (studentnumbers, startindex = 0) => {
   await updateFaculties()
   await updateStudentInformation(studentnumbers.splice(startindex), startindex)
 }
 
-const updateDatabase = async (studentnumbers, startindex=0) => {
+const updateDatabase = async (studentnumbers, startindex = 0) => {
+  // to initiate your db uncomment
+  // const { sequelize } = require('../../models/index')
+  // await sequelize.sync({ force: true })
   await updateDatabaseForStudents(studentnumbers, startindex)
 }
 
