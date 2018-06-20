@@ -53,7 +53,6 @@ class CourseCodeMapper extends Component {
     const filter = this.state.nameFilter.toLocaleLowerCase()
     return keys.filter((key) => {
       const course = duplicates[key]
-      console.log(course)
       return (
         course.name.toLocaleLowerCase().includes(filter) ||
         Object.values(course.alt).find(name =>
