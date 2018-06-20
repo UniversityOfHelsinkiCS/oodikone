@@ -31,13 +31,9 @@ const StudentInfoCard = (props) => {
   const renderStudyright = () => {
     const lastStudyright = student.studyrights.slice(-1)[0]
     return (
-      <div>
-        <div className={styles.startDate}>
-          {`Started in current programme: ${reformatDate(lastStudyright.startdate, DISPLAY_DATE_FORMAT)}`}
-        </div>
-        <div className={styles.startDate}>
-          {lastStudyright.highlevelname}
-        </div>
+      <div className={styles.startDate}>
+        {lastStudyright.highlevelname}
+        {` (${reformatDate(lastStudyright.startdate, DISPLAY_DATE_FORMAT)})`}
       </div>
     )
   }
@@ -54,6 +50,9 @@ const StudentInfoCard = (props) => {
           />
         </Card.Header>
         <Card.Meta>
+          <div className={styles.startDate}>
+            {`${translate('common.started')}: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}
+          </div>
           {renderStudyright()}
         </Card.Meta>
         <Card.Description>
