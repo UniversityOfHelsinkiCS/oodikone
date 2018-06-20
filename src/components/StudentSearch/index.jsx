@@ -88,7 +88,6 @@ class StudentSearch extends Component {
 
       return {
         studentNumber: student.studentNumber,
-        started: student.started,
         credits: student.credits
       }
     }
@@ -99,7 +98,6 @@ class StudentSearch extends Component {
     }
     const headers = [
       translate('common.studentNumber'),
-      translate('common.started'),
       translate('common.credits')
     ]
 
