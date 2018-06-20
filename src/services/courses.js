@@ -380,6 +380,12 @@ const setDuplicateCode = async (code, duplicate) => {
   // TODO: decide main code by choosing a course that has been held most recently  
   const isMainCode = (code) => code.slice(0, 2).split('').filter(c => Number(c)).length === 0
 
+  const course = await byCode(code)
+  const duplCourse = await byCode(duplicate)
+  if(!course || !duplCourse) {
+    return
+  }
+
   // If an old code is mapped to another, select first alphabetically
   const selectMain = (code, dupl) => {
     const codes = [code, ...Object.keys(dupl.alt)]
@@ -388,7 +394,6 @@ const setDuplicateCode = async (code, duplicate) => {
 
   if (code !== duplicate) {
     const all = await getAllDuplicates()
-    const course = await byCode(code)
     let main = ''
     if (!all[code]) {
       if (isMainCode(code)) {
@@ -406,7 +411,6 @@ const setDuplicateCode = async (code, duplicate) => {
     }
 
     if (!Object.keys(all[code].alt).includes(duplicate)) {
-      const duplCourse = await byCode(duplicate)
       if (isMainCode(duplicate)) {
         all[code].main = duplCourse.code
       }
