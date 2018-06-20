@@ -41,7 +41,6 @@ const getTableBody = (rows, rowClickFn, selectable) => (
 const SearchResultTable = ({
   headers, rows, rowClickFn, noResultText, selectable, definition
 }) => {
-  console.log(rows)
   if (rows.length > 0) {
     return (
       <Table
