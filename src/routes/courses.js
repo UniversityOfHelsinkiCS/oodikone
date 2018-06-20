@@ -1,6 +1,8 @@
 const router = require('express').Router()
 const Course = require('../services/courses')
+const moment = require('moment')
 
+const parseUtcDate = date => moment.utc(date).format('YYYY-MM-DD')
 
 router.get('/courses', async (req, res) => {
   let results = []
@@ -24,7 +26,7 @@ router.get('/v2/courseinstancestatistics', async (req, res) => {
   let results = []
   if (req.query.date && req.query.code && req.query.months) {
     const code = req.query.code
-    const date = req.query.date.split('.').join('-')
+    const date = parseUtcDate(req.query.date)
     const months = req.query.months
 
     results = await Course.statisticsOf(code, date, months)
