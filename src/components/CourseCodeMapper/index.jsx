@@ -18,7 +18,8 @@ class CourseCodeMapper extends Component {
   }
 
   state = {
-    filter: '',
+    codeFilter: '',
+    nameFilter: '',
     code1: '',
     code2: ''
   }
@@ -26,7 +27,7 @@ class CourseCodeMapper extends Component {
   getTableRows = () => {
     const { courseCodeDuplicates } = this.props
     const { data } = courseCodeDuplicates
-    const filteredKeys = this.filterKeys(data)
+    const filteredKeys = this.filterNames(data, this.filterCodes(data))
     const rows = filteredKeys.map((key) => {
       const course = courseCodeDuplicates.data[key]
       return (
@@ -48,23 +49,38 @@ class CourseCodeMapper extends Component {
     return rows
   }
 
-  filterKeys = (duplicates) => {
-    const filter = this.state.filter.toLocaleLowerCase()
+  filterNames = (duplicates, keys) => {
+    const filter = this.state.nameFilter.toLocaleLowerCase()
+    return keys.filter((key) => {
+      const course = duplicates[key]
+      console.log(course)
+      return (
+        course.name.toLocaleLowerCase().includes(filter) ||
+        Object.values(course.alt).find(name =>
+          name.toLocaleLowerCase().includes(filter))
+      )
+    })
+  }
+
+  filterCodes = (duplicates) => {
+    const filter = this.state.codeFilter.toLocaleLowerCase()
     const keys = Object.keys(duplicates)
     return keys.filter((key) => {
       const course = duplicates[key]
       return (
         key.toLocaleLowerCase().includes(filter) ||
-        course.name.toLocaleLowerCase().includes(filter) ||
         Object.keys(course.alt).find(code =>
-          code.toLocaleLowerCase().includes(filter) ||
-          course.alt[code].toLocaleLowerCase().includes(filter))
+          code.toLocaleLowerCase().includes(filter))
       )
     })
   }
 
-  handleFilterChange = (e) => {
-    this.setState({ filter: e.target.value })
+  handleCodeFilterChange = (e) => {
+    this.setState({ codeFilter: e.target.value })
+  }
+  handleNameFilterChange = (e) => {
+    console.log(e)
+    this.setState({ nameFilter: e.target.value })
   }
 
   handleResultSelect1 = (e, { result }) => {
@@ -101,8 +117,14 @@ class CourseCodeMapper extends Component {
             <Segment>
               <Header content="Filter course codes" />
               <Input
-                placeholder="Filter"
-                onChange={this.handleFilterChange}
+                fluid
+                placeholder="By Code"
+                onChange={this.handleCodeFilterChange}
+              />
+              <Input
+                fluid
+                placeholder="By Name"
+                onChange={this.handleNameFilterChange}
               />
             </Segment>
             <Segment>
