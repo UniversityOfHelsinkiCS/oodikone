@@ -58,6 +58,7 @@ const CreditGraphTooltip = (props) => {
     const {
       title, credits, date, grade, passed
     } = payload[0].payload
+    console.log(payload[0].payload)
 
     return (
       <Card>
