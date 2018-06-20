@@ -141,6 +141,7 @@ StudentDetails.propTypes = {
     })),
     credits: integer,
     fetched: boolean,
+    started: string,
     studentNumber: string,
     tags: arrayOf(string)
   })
