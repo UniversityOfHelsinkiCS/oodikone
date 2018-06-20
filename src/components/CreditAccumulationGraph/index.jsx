@@ -80,7 +80,7 @@ class CreditAccumulationGraph extends Component {
   }
 
   getXAxisMonth = (date, startDate) =>
-    Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0)
+    Math.max(moment.utc(date).diff(moment.utc(startDate), 'days') / 30, 0)
 
   getReferenceLineForStudent = (student) => {
     try {
