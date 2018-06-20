@@ -140,11 +140,13 @@ Credit.notUnnecessary = (credit) => {
   return credit.credits > 0 && credit.credits <= 12
 }
 
+const failedNames = ['Luop', 'Hyl.', 'Eisa', '0', 'Fail']
+
 Credit.failed = (credit) =>
-  ['Luop', 'Hyl.', 'Eisa', '0'].includes(credit.grade)
+  failedNames.includes(credit.grade)
 
 Credit.passed = (credit) =>
-  !['Luop', 'Hyl.', 'Eisa', '0'].includes(credit.grade)
+  !failedNames.includes(credit.grade)
 
 const Studyright = sequelize.define('studyright',
   {
