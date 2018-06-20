@@ -21,17 +21,19 @@ const StudentInfoCard = (props) => {
     props.removeStudentSelection()
   }
 
+  // Deprecated(?)
+  // const filterDegreeStudyRight = student2 =>
+  // student2.studyrights.filter((studyright) => {
+  //   console.log('sright', studyright)
+  //   return studyright.highlevelname.toLowerCase().match(studyRightRegex)
+  // })
 
   const renderStudyright = () => {
-    const filterDegreeStudyRight = student2 =>
-      student2.studyrights.filter(studyright =>
-        studyright.highlevelname.toLowerCase().match(studyRightRegex))
-
-    const studyright = filterDegreeStudyRight(student)
+    const lastStudyright = student.studyrights.slice(-1)[0]
     return (
       <div className={styles.startDate}>
-        {studyright.slice(-1)[0].highlevelname}
-        {` (${reformatDate(studyright.slice(-1)[0].startdate, DISPLAY_DATE_FORMAT)})`}
+        {lastStudyright.highlevelname}
+        {` (${reformatDate(lastStudyright.startdate, DISPLAY_DATE_FORMAT)})`}
       </div>
     )
   }
