@@ -4,7 +4,7 @@ import { Card, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import { reformatDate, studyRightRegex } from '../../common'
+import { reformatDate } from '../../common'
 import { studentDetailsType } from '../../constants/types'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
 
@@ -21,17 +21,19 @@ const StudentInfoCard = (props) => {
     props.removeStudentSelection()
   }
 
+  // Deprecated(?)
+  // const filterDegreeStudyRight = student2 =>
+  // student2.studyrights.filter((studyright) => {
+  //   console.log('sright', studyright)
+  //   return studyright.highlevelname.toLowerCase().match(studyRightRegex)
+  // })
 
   const renderStudyright = () => {
-    const filterDegreeStudyRight = student2 =>
-      student2.studyrights.filter(studyright =>
-        studyright.highlevelname.toLowerCase().match(studyRightRegex))
-
-    const studyright = filterDegreeStudyRight(student)
+    const lastStudyright = student.studyrights.slice(-1)[0]
     return (
       <div className={styles.startDate}>
-        {studyright.slice(-1)[0].highlevelname}
-        {` (${reformatDate(studyright.slice(-1)[0].startdate, DISPLAY_DATE_FORMAT)})`}
+        {lastStudyright.highlevelname}
+        {` (${reformatDate(lastStudyright.startdate, DISPLAY_DATE_FORMAT)})`}
       </div>
     )
   }
@@ -75,5 +77,6 @@ const mapStateToProps = state => ({
 })
 
 export default withRouter(connect(mapStateToProps, {
-  removeStudentSelection, resetStudent })(StudentInfoCard))
+  removeStudentSelection, resetStudent
+})(StudentInfoCard))
 
