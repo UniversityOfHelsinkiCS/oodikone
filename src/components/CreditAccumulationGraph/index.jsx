@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { clearLoading } from '../../redux/graphSpinner'
 
-import { DISPLAY_DATE_FORMAT, CHART_COLORS, API_DATE_FORMAT } from '../../constants'
+import { DISPLAY_DATE_FORMAT, CHART_COLORS } from '../../constants'
 import { reformatDate, sortDatesWithFormat } from '../../common'
 import { turquoise } from '../../styles/variables/colors'
 
@@ -80,7 +80,7 @@ class CreditAccumulationGraph extends Component {
   }
 
   getXAxisMonth = (date, startDate) =>
-    Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0)
+    Math.max(moment.utc(date).diff(moment.utc(startDate), 'days') / 30, 0)
 
   getReferenceLineForStudent = (student) => {
     try {
