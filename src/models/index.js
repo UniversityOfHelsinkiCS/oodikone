@@ -293,6 +293,9 @@ const StudentList = sequelize.define('student_list',
     key: {
       type: Sequelize.STRING
     },
+    max: {
+      type: Sequelize.BIGINT
+    },
     description: {
       type: Sequelize.STRING
     },
