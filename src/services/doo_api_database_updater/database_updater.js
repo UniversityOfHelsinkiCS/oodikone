@@ -226,16 +226,18 @@ const updateExistingStudyright = async (apiStudyright, dbStudyright) => {
   }
 }
 
+const universityEnrollmentDateFromStudyRights = studyRightArray => {
+  return _.sortBy(studyRightArray.map(s => s.startdate), n =>
+    moment(n).valueOf())[0]
+} 
+
 const updateStudentStudyRights = async (student, unitNameSet) => {
   const { studentnumber } = student
   const [apiStudyRightArray, dbStudyRightArray] = await getStudyRights(studentnumber)
   const dbStudyRights = new Map(dbStudyRightArray.map(sr => [sr.studyrightid, sr]))
-  if (!student.dateofuniversityenrollment) {
-    const studyRightStart = _.sortBy(apiStudyRightArray.map(s => s.startdate), n =>
-      moment(n).valueOf())[0]
-    student.dateofuniversityenrollment = studyRightStart
-    await student.save()
-  }
+  await student.update({ 
+    dateofuniversityenrollment: universityEnrollmentDateFromStudyRights(apiStudyRightArray)
+  })
   for (let apiStudyRight of apiStudyRightArray) {
     const { studyrightid } = apiStudyRight
 
@@ -274,7 +276,7 @@ const loadAndUpdateStudent = async studentNumber => {
       return await createNewStudent(studentFromApi, studentNumber)
     } else {
       logger.verbose(`Student ${studentNumber} found in api and db, updating values.`)
-      await StudentService.updateStudent(studentFromApi)
+      await studentFromDb.update(studentFromApi)
       return studentFromDb
     }
   } catch (e) {
@@ -289,9 +291,6 @@ const updateDatabaseForStudents = async (studentnumbers, startindex = 0) => {
 }
 
 const updateDatabase = async (studentnumbers, startindex = 0) => {
-  // to initiate your db uncomment
-  // const { sequelize } = require('../../models/index')
-  // await sequelize.sync({ force: true })
   await updateDatabaseForStudents(studentnumbers, startindex)
 }
 
