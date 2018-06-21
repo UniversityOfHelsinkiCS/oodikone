@@ -14,6 +14,7 @@ import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCha
 import CourseQuarters from '../CourseQuarters'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourses from '../PopulationCourses'
+import PopulationCreditGainTable from '../PopulationCreditGainTable'
 
 class PopulationDetails extends Component {
   static propTypes = {
@@ -40,10 +41,16 @@ class PopulationDetails extends Component {
     let statistics = null
     if (samples) {
       statistics = (
-        <CourseQuarters
-          sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
-          translate={translate}
-        />
+        <div>
+          <PopulationCreditGainTable
+            sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
+            translate={translate}
+          />
+          <CourseQuarters
+            sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
+            translate={translate}
+          />
+        </div>
       )
     }
     return (
