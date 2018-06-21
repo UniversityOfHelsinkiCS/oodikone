@@ -26,7 +26,7 @@ async function run(incremental = true) {
   })
   
   const minStudentNumber = (incremental && cached && cached.max) ? Number(cached.max) : 1010000
-  const maxStudentNumber = minStudentNumber + 10000 || process.env.STUDENTS_TO || 1500000
+  const maxStudentNumber = process.env.STUDENTS_TO || minStudentNumber + 10000 || 1500000
   const step = process.env.STEP || 500
 
   const range = maxStudentNumber - minStudentNumber
@@ -61,9 +61,13 @@ async function run(incremental = true) {
   } else if (!arraysEqual(cached.student_numbers, validStudents)) {
     logger.info('DIFFERENCE in student lists. There were ' + cached.student_numbers.length + ' students, was ' + cached.description)
     logger.info('found: valid ' + validStudents.length + ' out of ' + (maxStudentNumber - minStudentNumber))
-    logger.info('student list cached')
+
     cached.student_numbers = _.uniq(_.concat(validStudents, cached.student_numbers))
     cached.max = maxStudentNumber
+    
+    logger.info('total number of valid students in db ' + cached.student_numbers )
+
+    logger.info('student list cached')
     await cached.save()
     process.exit(0)
   }
