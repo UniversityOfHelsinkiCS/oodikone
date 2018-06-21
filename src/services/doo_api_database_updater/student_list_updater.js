@@ -1,4 +1,7 @@
 const _ = require('lodash')
+const axios = require('axios')
+const https = require('https')
+const fs = require('fs')
 
 const oodi = require('./oodi_interface')
 const util = require('../../util')
@@ -14,6 +17,27 @@ const timestamp = () => {
 
 const arraysEqual = (a1, a2) => {
   return JSON.stringify(a1.sort()) === JSON.stringify(a2.sort())
+}
+
+const agent = new https.Agent({
+  cert: fs.readFileSync(process.env.CERT_PATH, 'utf8'),
+  key: fs.readFileSync(process.env.KEY_PATH, 'utf8'),
+})
+
+const instance = axios.create()
+instance.defaults.httpsAgent = agent
+
+const options = {
+  key: fs.readFileSync('./localhost.key', 'utf8'),
+  cert: fs.readFileSync('./localhost.cert', 'utf8'),
+  requestCert: false,
+  rejectUnauthorized: false
+}
+
+const requestStudent = async (studentNumber) => {
+  const url = `${process.env.OODI_ADDR}/students/${studentNumber}/info`
+  const response = await instance.get(url)
+  return response
 }
 
 async function run(incremental = true) {
@@ -43,7 +67,7 @@ async function run(incremental = true) {
       logger.info(iteration + '/' + (range / step + 1).toFixed(0)  + ' ' + timestamp())
     }
     
-    const response = await oodi.requestStudent(studentNumber)
+    const response = await requestStudent(studentNumber)
     if (response.data.data != null) {
       validStudents.push(studentNumber)
     }
@@ -60,7 +84,7 @@ async function run(incremental = true) {
       max: maxStudentNumber
     })
   } else if (!arraysEqual(cached.student_numbers, validStudents)) {
-    logger.info('DIFFERENCE in student lists. There were ' + cached.student_numbers.length + ' students, was ' + cached.description)
+    logger.info('DIFFERENCE in student lists. There were ' + cached.student_numbers.length + ' students')
     logger.info('found: valid ' + validStudents.length + ' out of ' + (maxStudentNumber - minStudentNumber))
 
     cached.student_numbers = _.uniq(_.concat(validStudents, cached.student_numbers))
