@@ -27,13 +27,6 @@ const agent = new https.Agent({
 const instance = axios.create()
 instance.defaults.httpsAgent = agent
 
-const options = {
-  key: fs.readFileSync('./localhost.key', 'utf8'),
-  cert: fs.readFileSync('./localhost.cert', 'utf8'),
-  requestCert: false,
-  rejectUnauthorized: false
-}
-
 const requestStudent = async (studentNumber) => {
   const url = `${process.env.OODI_ADDR}/students/${studentNumber}/info`
   const response = await instance.get(url)
