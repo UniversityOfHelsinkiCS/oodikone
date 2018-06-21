@@ -92,7 +92,7 @@ export const removeInvalidCreditsFromStudents = students =>
 export const getStudentTotalCredits = student => student.courses.filter(c => c.passed)
   .reduce((a, b) => a + b.credits, 0)
 
-export const getStudentFirstyearCredits = student => student.courses.filter(c => c.passed && moment(c.date).isBetween(moment(student.started), moment(student.started).add(1, 'year')))
+export const getStudentFirstyearCredits = student => student.courses.filter(c => c.passed && moment(c.date).isBetween(moment(student.studyrightStart), moment(student.studyrightStart).add(1, 'year')))
   .reduce((a, b) => a + b.credits, 0)
 
 export const log = async (msg, meta) => {
