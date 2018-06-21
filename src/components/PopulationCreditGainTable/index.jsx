@@ -1,30 +1,53 @@
 import React from 'react'
-import { func, arrayOf, object } from 'prop-types'
-
+import { connect } from 'react-redux'
+import { func, arrayOf, object, number } from 'prop-types'
+import { Progress } from 'semantic-ui-react'
 import SearchResultTable from '../SearchResultTable'
-import { getStudentFirstyearCredits } from '../../common'
+import { getStudentTotalCredits } from '../../common'
 
-const getValues = students => students.map(student => getStudentFirstyearCredits(student))
+const getTotal = students => students.map(student => getStudentTotalCredits(student))
+
+const expectedAmountOfCredits = months => ([
+  [months * 5],
+  [months * 4, (months * 5) - 1],
+  [months * 3, (months * 4) - 1],
+  [months * 2, (months * 3) - 1],
+  [months * 1, (months * 2) - 1],
+  [1, (months * 1) - 1],
+  [0, 0]
+])
+
+const filterStudents = (students, minCredits, maxCredits = Infinity) => {
+  if (minCredits === 0) {
+    return {
+      minCredits: '',
+      maxCredits,
+      amount: students.filter(s => s === minCredits).length
+    }
+  } else if (maxCredits === Infinity) {
+    return {
+      minCredits,
+      maxCredits: '',
+      amount: students.filter(s => s >= minCredits).length
+    }
+  }
+  return {
+    minCredits,
+    maxCredits,
+    amount: students.filter(s => s >= minCredits && s < maxCredits).length
+  }
+}
 
 const PopulationCreditGainTable = (props) => {
-  const { translate, sample } = props
-
-  const stats = getValues(sample)
-
+  const { translate, sample, months } = props
+  const stats = getTotal(sample)
+  const limits = expectedAmountOfCredits(months)
+  const arr = limits.map(l => filterStudents(stats, ...l))
+  const rows = arr.map(a => [`${a.minCredits}-${a.maxCredits}`, a.amount, <Progress percent={Math.round((a.amount / stats.length) * 100)} progress />])
   const headers = [
-    'Credits dained during first year',
+    `Credits gained during first ${months} months`,
     `Students (all=${stats.length})`,
     'Percentage of population'
-  ]
-
-  const rows = [
-    ['55-', stats.filter(s => s >= 55).length, `${Math.round((stats.filter(s => s >= 55).length / stats.length) * 100)}%`],
-    ['40-54', stats.filter(s => s >= 40 && s < 55).length, `${Math.round((stats.filter(s => s >= 40 && s < 55).length / stats.length) * 100)}%`],
-    ['25-39', stats.filter(s => s >= 25 && s < 40).length, `${Math.round((stats.filter(s => s >= 25 && s < 40).length / stats.length) * 100)}%`],
-    ['10-24', stats.filter(s => s >= 10 && s < 25).length, `${Math.round((stats.filter(s => s >= 10 && s < 25).length / stats.length) * 100)}%`],
-    ['1-9', stats.filter(s => s >= 1 && s < 10).length, `${Math.round((stats.filter(s => s >= 1 && s < 10).length / stats.length) * 100)}%`],
-    ['0', stats.filter(s => s === 0).length, `${Math.round((stats.filter(s => s === 0).length / stats.length) * 100)}%`]
-
   ]
 
   return (
@@ -36,9 +59,14 @@ const PopulationCreditGainTable = (props) => {
   )
 }
 
+const mapStateToProps = state => ({
+  months: state.populations.query.months
+})
+
 PopulationCreditGainTable.propTypes = {
   translate: func.isRequired,
-  sample: arrayOf(object).isRequired
+  sample: arrayOf(object).isRequired,
+  months: number.isRequired
 }
 
-export default PopulationCreditGainTable
+export default connect(mapStateToProps)(PopulationCreditGainTable)
