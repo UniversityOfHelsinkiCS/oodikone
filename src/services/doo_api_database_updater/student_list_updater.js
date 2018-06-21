@@ -26,7 +26,7 @@ async function run(incremental = true) {
   })
   
   const minStudentNumber = (incremental && cached && cached.max) ? Number(cached.max) : 1010000
-  const incremet = process.env.INCREMENT || 10000
+  const incremet = Number(process.env.INCREMENT) || 10000
   const maxStudentNumber = process.env.STUDENTS_TO || minStudentNumber + incremet || 1500000
   const step = process.env.STEP || 500
 
