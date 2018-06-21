@@ -1,8 +1,4 @@
-visit $basepath
-
-male_radio_label = "#root > div > main > div:nth-child(3) > div.ui.segment.layout__contentSegment___M-cZG > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(6) > form > div > div:nth-child(2) > div:nth-child(1) > label"
-sex_filter_add_button = "#root > div > main > div:nth-child(3) > div.ui.segment.layout__contentSegment___M-cZG > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(6) > form > div > div:nth-child(3) > button"
-population_td = "#root > div > main > div:nth-child(3) > div.ui.segment.layout__contentSegment___M-cZG > div:nth-child(2) > div:nth-child(3) > table > tbody > tr:nth-child(1) > td:nth-child(2)"
+visit "localhost:8081"
 
 wait do
     find "a", text: "Population statistics"	     
@@ -11,14 +7,18 @@ end.click
 run "./helpers/population_statistics"
 
 click_text "add"
-value_start = (find population_td).text.to_i
-(find male_radio_label).click
-(find sex_filter_add_button).click
+tablebody = find("th", text: /Credits gained during first [0-9]+ months/).find(:xpath, '..').find(:xpath, '..').find(:xpath, '..')
+value_start = tablebody.all("td")[1].text.to_i
 
-value_end = (find population_td).text.to_i
+filter = find("label", text:"Show only students with credits at least").find(:xpath, '..').find(:xpath, '..')
+filter.find("input").click
+type "200"
+filter.click_button("set filter")
 
-assert "Filter is on and is filtering population" do
-    has_text? "Showing only male students."
+value_end = tablebody.all("td")[1].text.to_i
+
+wait 60 do
+    has_text? "Credits at least 200"
     value_start > value_end
-    highcharts = find("#root > div > main > div:nth-child(3) > div.ui.segment.layout__contentSegment___M-cZG > div:nth-child(2) > div:nth-child(2)")
+    find("th", text: "Course")
 end
