@@ -26,10 +26,11 @@ class CreditAccumulationGraphHighCharts extends Component {
 
   componentDidMount() {
     const { students } = this.props
-    const timeout = setTimeout(() => this.getMoreCreditLines(students), 1000)
+    const timeout = setTimeout(() => this.getMoreCreditLines(students), 0)
     const self = this
     const dataOfSelected = this.createStudentCreditLines(students).filter(line =>
       this.props.selectedStudents.includes(line.name))
+
     const options = {
       chart: {
         height: this.props.currentGraphSize
@@ -66,7 +67,11 @@ class CreditAccumulationGraphHighCharts extends Component {
         }
       },
       series: dataOfSelected,
-      xAxis: { ordinal: false }
+      xAxis: {
+        ordinal: false,
+        max: students.maxDate,
+        min: students.minDate
+      }
     }
     this.setState({ timeout, options })
   }
@@ -80,6 +85,7 @@ class CreditAccumulationGraphHighCharts extends Component {
         oldStudents.some(student => !nextStudents.includes(student))
       const dataOfSelected = this.state.studentCreditLines.filter(line =>
         nextProps.selectedStudents.includes(line.name))
+
       const options = {
         ...this.state.options,
         yAxis: {
@@ -185,7 +191,7 @@ class CreditAccumulationGraphHighCharts extends Component {
     students.map((student) => {
       let credits = 0
       const points = student.courses.map((course) => {
-        if (!['Luop', 'Hyl.', 'Eisa', '0'].includes(course.grade)) {
+        if (!['Luop', 'Hyl.', 'Eisa', '0', 'Fail'].includes(course.grade)) {
           credits += course.credits
         }
         return [new Date(course.date).getTime(), credits]
