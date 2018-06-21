@@ -32,7 +32,7 @@ async function run(incremental = true) {
   const range = maxStudentNumber - minStudentNumber
 
   logger.info('student numbers form ' + minStudentNumber + ' to ' + maxStudentNumber + ' total of ' + range + ' student numbers')
-  //logger.info('log message every ' + step + ' student')
+  logger.info('log message every ' + step + ' student')
 
   for (let i = minStudentNumber; i < maxStudentNumber; i++) {
     let studentNumber = '0' + i + util.getStudentNumberChecksum(String(i))
@@ -65,7 +65,7 @@ async function run(incremental = true) {
     cached.student_numbers = _.uniq(_.concat(validStudents, cached.student_numbers))
     cached.max = maxStudentNumber
     
-    logger.info('total number of valid students in db ' + cached.student_numbers )
+    logger.info('total number of valid students in db ' + cached.student_numbers.length )
 
     logger.info('student list cached')
     await cached.save()
