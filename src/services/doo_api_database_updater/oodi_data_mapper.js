@@ -9,6 +9,11 @@ const getTextsByLanguage = texts => {
   return { fi: null, sv: null, en: null, ...names}
 }
 
+const defaultNameFromTexts = texts => {
+  const names = getTextsByLanguage(texts)
+  return names.fi || names.en || names.sv
+}
+
 const getStudentFromData = (student) => {
   const city = getTextsByLanguage(student.city)
   const language = getTextsByLanguage(student.language)
@@ -110,8 +115,6 @@ const getTeachersAndRolesFromData = (teacherDetailData) => {
   return teachers
 }
 
-const englishTextFromGrade = grade => grade[2].text
-
 const statusFromAttainmentData = (code) => {
   switch (code) {
   case 1:
@@ -144,7 +147,7 @@ const statusFromAttainmentData = (code) => {
 const attainmentDataToCredit = attainment => {
   return {
     id: attainment.studyattainment_id,
-    grade: englishTextFromGrade(attainment.grade),
+    grade: defaultNameFromTexts(attainment.grade),
     credits: attainment.credits,
     ordering: getDate(attainment.attainment_date, null),
     status: statusFromAttainmentData(attainment.attainment_status_code),
@@ -155,10 +158,9 @@ const attainmentDataToCredit = attainment => {
 
 const attainmentDataToCourse = attainment => {
   const { learningopportunity_name, attainment_date} = attainment
-  const names = getTextsByLanguage(learningopportunity_name)
   return {
     code: attainment.learningopportunity_id,
-    name: names.fi || names.en || names.sv,
+    name: defaultNameFromTexts(learningopportunity_name),
     latest_instance_date: parseDate(attainment_date)
   }
 }
@@ -195,19 +197,16 @@ const ELEMENT_ID = {
 } 
 
 const highlevelnameFromElements = elements => {
-  let degree, subject
+  let subject
   elements.forEach(element => {
-    const names = getTextsByLanguage(element.name)
+    const name = defaultNameFromTexts(element.name)
     switch(element.element_id) {
-    case ELEMENT_ID.DEGREE_TITLE:
-      degree = names.fi || names.en || names.sv
-      break
     case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
-      subject = names.fi ||names.en ||  names.sv
+      subject = name
       break    
     case ELEMENT_ID.DEGREE_MAJOR:
       if ( subject===undefined ) {
-        subject = names.fi || names.en ||  names.sv
+        subject = name
       }  
       break
     default:
