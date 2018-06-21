@@ -260,8 +260,9 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 const yearlyStatsOf = async (code, year, separate) => {
   const allInstances = await instancesOf(code)
   const alternatives = await getDuplicateCodes(code)
-  const alternativeCodes = Object.keys(alternatives.alt)
-  if (alternativeCodes) {
+  let alternativeCodes = []
+  if (alternatives) {
+    alternativeCodes = Object.keys(alternatives.alt)
     const alternativeInstances = await Promise.all(alternativeCodes.map(code => instancesOf(code)))
     alternativeInstances.forEach(inst => allInstances.push(...inst))
   }
