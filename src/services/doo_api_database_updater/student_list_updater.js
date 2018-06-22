@@ -8,6 +8,8 @@ const util = require('../../util')
 const { StudentList } = require('../../models')
 const logger = require('../../util/logger')
 
+const STUDENT_SET_KEY = process.env.STUDENT_SET || 'cached_students'
+
 const timestamp = () => {
   const d = new Date()
   const z = (t) => t < 10 ? '0' + t : t
@@ -19,22 +21,39 @@ const arraysEqual = (a1, a2) => {
   return JSON.stringify(a1.sort()) === JSON.stringify(a2.sort())
 }
 
-const agent = new https.Agent({
-  cert: fs.readFileSync(process.env.CERT_PATH, 'utf8'),
-  key: fs.readFileSync(process.env.KEY_PATH, 'utf8'),
-})
+async function save(file) {
+  const cached = await StudentList.findOne({
+    where: { key: STUDENT_SET_KEY }
+  })
 
-const instance = axios.create()
-instance.defaults.httpsAgent = agent
+  const numbers = cached.student_numbers.sort().reverse()
 
-const requestStudent = async (studentNumber) => {
-  const url = `${process.env.OODI_ADDR}/students/${studentNumber}/info`
-  const response = await instance.get(url)
-  return response
+  fs.writeFile(file, numbers.join('\n',), (err) => {
+    if (err) {
+      console.log(err)
+    } else {
+      console.log(`saved ${numbers.length} students to ${file} `)
+    }
+
+    process.exit(0)
+  })
+    
 }
 
 async function run(incremental = true) {
-  const STUDENT_SET_KEY = process.env.STUDENT_SET || 'cached_students'
+  const agent = new https.Agent({
+    cert: fs.readFileSync(process.env.CERT_PATH, 'utf8'),
+    key: fs.readFileSync(process.env.KEY_PATH, 'utf8'),
+  })
+
+  const instance = axios.create()
+  instance.defaults.httpsAgent = agent
+
+  const requestStudent = async (studentNumber) => {
+    const url = `${process.env.OODI_ADDR}/students/${studentNumber}/info`
+    const response = await instance.get(url)
+    return response
+  }
 
   const validStudents = []
     
@@ -67,7 +86,6 @@ async function run(incremental = true) {
   
   }
 
-  console.log(validStudents.length) 
   logger.info('found and saved ' + validStudents.length + ' students')
 
   if (cached === null) {
@@ -97,4 +115,8 @@ async function run(incremental = true) {
   process.exit(0)
 }
 
-run()
+if ( process.argv.length===2) {
+  run()
+} else {
+  save(process.argv[2])
+}
