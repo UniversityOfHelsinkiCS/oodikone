@@ -63,11 +63,7 @@ async function run() {
   
   const oldMax = () => 
     Number((cached.student_numbers.sort().reverse()[0]/10).toFixed(0))
-
-  console.log(oldMax())
-
-  process.exit(0)
-
+                                        
   const minStudentNumber = (cached) ? oldMax() : 1010000
   const incremet = Number(process.env.INCREMENT) || 10000
   const maxStudentNumber = process.env.STUDENTS_TO || minStudentNumber + incremet || 1500000
