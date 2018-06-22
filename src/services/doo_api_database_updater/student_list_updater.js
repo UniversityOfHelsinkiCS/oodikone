@@ -40,7 +40,7 @@ async function save(file) {
     
 }
 
-async function run(incremental = true) {
+async function run() {
   const agent = new https.Agent({
     cert: fs.readFileSync(process.env.CERT_PATH, 'utf8'),
     key: fs.readFileSync(process.env.KEY_PATH, 'utf8'),
@@ -61,7 +61,14 @@ async function run(incremental = true) {
     where: { key: STUDENT_SET_KEY }
   })
   
-  const minStudentNumber = (incremental && cached && cached.max) ? Number(cached.max) : 1010000
+  const oldMax = () => 
+    Number((cached.student_numbers.sort().reverse()[0]/10).toFixed(0))
+
+  console.log(oldMax())
+
+  process.exit(0)
+
+  const minStudentNumber = (cached) ? oldMax() : 1010000
   const incremet = Number(process.env.INCREMENT) || 10000
   const maxStudentNumber = process.env.STUDENTS_TO || minStudentNumber + incremet || 1500000
   const step = process.env.STEP || 500
