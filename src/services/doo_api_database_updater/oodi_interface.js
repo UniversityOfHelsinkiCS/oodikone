@@ -37,6 +37,14 @@ const attemptGetFor = async (url, attempts=5) => {
   }
 }
 
+const requestStudent = async studentNumber => {
+  const url = `${base_url}/students/${studentNumber}/info`
+  const response = await attemptGetFor(url)
+  return response
+  //const data = response.data.data
+  //return data && data_mapper.getStudentFromData(data)
+}
+
 const getStudent = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/info`
   const response = await attemptGetFor(url)
@@ -73,5 +81,6 @@ module.exports = {
   getStudent,
   getFaculties,
   getStudyAttainments,
-  getTeacherInfo
+  getTeacherInfo,
+  requestStudent
 }
