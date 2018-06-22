@@ -143,8 +143,6 @@ Copy a backup dump from oodikone
 
 Create a new database and fill it with the backup dump following the instructions above
 
-
-
 ## Accessing production/staging DB
 
 To access the database in oodikone.cs.helsinki.fi run: 
@@ -161,6 +159,24 @@ To create a dump of the production db, run:
 
 ## Updater
 
-Oodikone2-backend includes the update-script that fetches student data from WebOodi. 
+Oodikone2-backend includes the update-script that fetches student data from WebOodi. Script is split on two parts.
+
+### Student list updater
+
+Finds out the valid student nubers. 
+
+Is located in _/home/tkt_oodi/oodikone.cs.helsinki.fi/student_number_updater_ and run with _ update_student_list.sh_
+
+Script is run at background, see _debug.log_ to find out when it is finished.
+
+Environment variable _INCREMENT_ controls how many new student numbers are searched (from the currently konown greatest student number).
+
+At the moment script uses the local postgres (see .env) to save student numbers.
+
+Use _node src/services/doo_api_database_updater/student_list_updater.js filename.txt_ to save student numbers in textfile. 
+
+_/home/tkt_oodi/oodikone.cs.helsinki.fi/student_number_updater_ is acually the backend code as a cloned git repo. If you modify the updater source, remember to pull the repo.
+
+### Student info updater
 
 TBD
