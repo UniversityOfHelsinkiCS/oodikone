@@ -40,5 +40,20 @@ wait 60 do
     value_start > value_end
     find("th", text: "Course")
 end
-navigation.close
 
+click_button("clear all filters")
+
+navigation.navigate(/Student/)
+click_button("show")
+navigation.navigate(/Student/)
+
+table = find("th", text: "student number").find(:xpath, "../../..")
+student = table.all("td", text: /01/).random
+student_number = student.text
+student.click
+wait 30 do
+    has_text? /Started/
+    has_text? "Student names hidden"
+    has_text? student_number
+    has_text? "Degree"
+end
