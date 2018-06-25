@@ -52,7 +52,7 @@ const getStudentFromData = (student) => {
     semesterenrollmenttypecode: null,
     sex: null,
     studentstatuscode: null,
-    abbreviatedname: [student.last_name, student.first_names].join(', ')
+    abbreviatedname: [student.last_name, student.first_names].join(' ')
   }
 }
 
