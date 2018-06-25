@@ -6,14 +6,16 @@ const { updateFaculties } = require('../../src/services/doo_api_database_updater
 const { faculties } = require('./test_data')
 const { Organisation, sequelize } = require('../../src/models/index')
 
-axios.defaults.adapter = httpAdapter
+axios.defaults.adapter = httpAdapter  
 
-nock(OODI_ADDR)
-  .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
-  .get('/codes/faculties')
-  .reply(200, {
-    data: faculties
-  })
+const mockApiGet = (path, data) => {
+  nock(OODI_ADDR)
+    .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
+    .get(path)
+    .reply(200, {
+      data
+    })
+}
 
 const forceSyncDatabase = async () => {
   await sequelize.sync({ force: true })
@@ -27,8 +29,16 @@ afterAll(async () => {
   await sequelize.close()
 })
 
-test('Database updater saves correct amount of faculties', async () => {
-  await updateFaculties()
-  const facultiesInDb = await Organisation.findAll()
-  expect(facultiesInDb.length).toBe(faculties.length)
+describe('Database updater for saving faculties', () => {
+
+  beforeAll(() => {
+    mockApiGet('/codes/faculties', faculties)
+  })
+
+  test('Database updater saves correct amount of faculties', async () => {
+    await updateFaculties()
+    const facultiesInDb = await Organisation.findAll()
+    expect(facultiesInDb.length).toBe(faculties.length)
+  })
+
 })
