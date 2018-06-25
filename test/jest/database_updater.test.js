@@ -35,14 +35,25 @@ afterAll(async () => {
 
 describe('Database updater for saving faculties', () => {
 
-  beforeAll(() => {
+  let organisation
+
+  beforeAll(async () => {
     mockApiGet('/codes/faculties', faculties)
+    await updateFaculties()
+    organisation = await Organisation.findByPrimary('FAC1')
   })
 
   test('Database updater saves correct amount of faculties', async () => {
-    await updateFaculties()
     const facultiesInDb = await Organisation.findAll()
     expect(facultiesInDb.length).toBe(faculties.length)
+  })
+
+  test('Saved faculty can be found from the database with the faculty code', () => {
+    expect(organisation).not.toBeNull()
+  })
+
+  test('Saved faculty name in DB is the Finnish name returned by the API', () => {
+    expect(organisation.name).toBe('FAC 1 FIN')
   })
 
 })
