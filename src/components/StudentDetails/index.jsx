@@ -16,7 +16,7 @@ import sharedStyles from '../../styles/shared'
 class StudentDetails extends Component {
   componentDidMount() {
     this.props.history.listen((location, action) => {
-      if (location.pathname === '/students' && action === 'POP') {
+      if (action === 'POP' || location.pathname !== '/students') {
         this.props.resetStudent()
         this.props.removeStudentSelection()
       }
