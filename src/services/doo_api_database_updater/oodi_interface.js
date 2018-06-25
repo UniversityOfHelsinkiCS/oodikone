@@ -13,13 +13,16 @@ const instance = axios.create({
   })
 })
 
-axios.defaults.auth = {
-  username: 'tktl',
-  password: process.env.OODI_PW
-} 
+if ( process.env.NODE_ENV !== 'test' ) {
 
-axios.defaults.params = {
-  token: process.env.TOKEN
+  axios.defaults.auth = {
+    username: 'tktl',
+    password: process.env.OODI_PW
+  }
+
+  axios.defaults.params = {
+    token: process.env.TOKEN
+  }
 }
 
 const attemptGetFor = async (url, attempts=5) => {
@@ -31,7 +34,7 @@ const attemptGetFor = async (url, attempts=5) => {
       response = await instance.get(url)
       return response  
     } catch (error) {
-      logger.error(`##################%€€€€€€€€€€€€€€€€%%%%%%%%%%%%%%%%% GET ${url} failed: ${error.message})`)
+      logger.error(`GET ${url} failed: ${error.message})`)
       if (attempt === attempts) {
         throw error
       }
