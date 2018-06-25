@@ -294,4 +294,4 @@ const updateDatabase = async (studentnumbers, startindex = 0) => {
   await updateDatabaseForStudents(studentnumbers, startindex)
 }
 
-module.exports = { updateDatabase }
+module.exports = { updateDatabase, updateFaculties }
