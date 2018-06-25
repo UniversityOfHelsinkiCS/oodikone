@@ -18,7 +18,8 @@
     "studentnumbers_to_file": "NODE_ENV=dev node src/services/doo_api_database_updater/db_studentnumbers_to_file.js",
     "lint": "eslint --parser babel-eslint src",
     "coverage": "NODE_ENV=test nyc ava",
-    "force_sync_database": "node src/services/doo_api_database_updater/force_sync_database.js"
+    "force_sync_database": "node src/services/doo_api_database_updater/force_sync_database.js",
+    "jest": "jest"
   },
   "author": "Matti Luukkainen",
   "license": "MIT",
@@ -49,6 +50,8 @@
     "dotenv": "^4.0.0",
     "eslint": "^4.19.1",
     "faker": "^4.1.0",
+    "jest": "^23.1.0",
+    "nock": "^9.3.3",
     "nodemon": "^1.17.3",
     "nyc": "^11.7.1",
     "supertest": "^3.0.0"
