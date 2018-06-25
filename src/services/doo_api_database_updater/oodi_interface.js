@@ -1,9 +1,11 @@
 require('dotenv').config()
 const axios = require('axios')
 const data_mapper = require('./oodi_data_mapper')
-const base_url = process.env.OODI_ADDR
+const { OODI_ADDR } = require('../../conf-backend')
 const https = require('https')
 const logger = require('../../util/logger')
+
+const base_url = OODI_ADDR
 
 const instance = axios.create({
   httpsAgent: new https.Agent({  
