@@ -23,6 +23,10 @@ beforeAll(async () => {
   await forceSyncDatabase()
 })
 
+afterAll(async () => {
+  await sequelize.close()
+})
+
 test('Database updater saves correct amount of faculties', async () => {
   await updateFaculties()
   const facultiesInDb = await Organisation.findAll()
