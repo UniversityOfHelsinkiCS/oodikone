@@ -8,8 +8,12 @@ const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
 const _ = require('lodash')
 
-const redisClient = redis.createClient(6379, conf.redis)
-require('bluebird').promisifyAll(redis.RedisClient.prototype)
+let redisClient
+
+if (process.env.NODE_ENV !== 'test') {
+  redisClient = redis.createClient(6379, conf.redis)
+  require('bluebird').promisifyAll(redis.RedisClient.prototype)
+}
 
 const byNameOrCode = (searchTerm) => Course.findAll({
   where: {
