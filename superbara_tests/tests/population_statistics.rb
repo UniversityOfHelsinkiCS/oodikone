@@ -6,7 +6,7 @@ require_relative "./components/navigate_population_statistics"
 
 navigation = NavigationPanel.new
 population_query = PopulationQuery.new
-population_query.query("2017", "Tietojenkäsittelytieteen kandiohjelma")
+population_query.query("2016", "Tietojenkäsittelytieteen kandiohjelma")
 
 
 tablebody = find("th", text: /Credits gained during first [0-9]+ months/).find(:xpath, '../../..')
@@ -41,16 +41,19 @@ wait 60 do
     find("th", text: "Course")
 end
 
-click_button("clear all filters")
+wait do
+    find("button", text:"clear all filters").click
+end
+student_number = ""
 
-navigation.navigate(/Student/)
-click_button("show")
-navigation.navigate(/Student/)
+wait do
+    find("button", text:"show").click
+    table = find("th", text: "student number").find(:xpath, "../../..")
+    student = table.all("td", text: /01/).random
+    student_number = student.text
+    student.click
+end
 
-table = find("th", text: "student number").find(:xpath, "../../..")
-student = table.all("td", text: /01/).random
-student_number = student.text
-student.click
 wait 30 do
     has_text? /Started/
     has_text? "Student names hidden"

@@ -7,14 +7,21 @@ class PopulationQuery < Superbara::PCOM
   end
 
   def query(enrollment_year="2017", studyright_query="Tietojenkäsittelytieteen kandiohjelma")
+    value = "2017"
+    enrollment_input = nil
     wait 15 do
-        find("label", text:"Enrollment year").find(:xpath, "..").find("input").click
+        enrollment_input = find("label", text:"Enrollment year").find(:xpath, "..").find("input")
+        value = enrollment_input.value
     end
-    4.times do
-      type :backspace
+
+    if value != enrollment_year
+      enrollment_input.click
+      4.times do
+        type :backspace
+      end
+      type enrollment_year
     end
-    
-    type enrollment_year
+
     
     find("label", text:"Study rights").find(:xpath, "..").click
     
