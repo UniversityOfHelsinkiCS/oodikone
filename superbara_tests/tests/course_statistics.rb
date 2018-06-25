@@ -7,9 +7,11 @@ end_year = rand(start_year + 1 ... Time.now.year+1)
 
 course_statistics.query(start_year.to_s, end_year.to_s, "Tietorakenteet ja algoritmit")
 
-barchart = find("div", class:"recharts-wrapper")
-bar = barchart.all("path", class:"recharts-rectangle").random
-bar.hover
+wait do
+  barchart = find("div", class:"recharts-wrapper")
+  bar = barchart.all("path", class:"recharts-rectangle").random
+  bar.hover
+end
 
 wait do
   has_text? "all"
@@ -19,9 +21,11 @@ end
 
 click_text "switch to student level view"
 
-barchart = find("div", class:"recharts-wrapper")
-bar = barchart.all("path", class:"recharts-rectangle").random
-bar.hover
+wait do 
+  barchart = find("div", class:"recharts-wrapper")
+  bar = barchart.all("path", class:"recharts-rectangle").random
+  bar.hover
+end
 
 wait do
   has_text? "all"
