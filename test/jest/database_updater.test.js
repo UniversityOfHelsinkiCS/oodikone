@@ -6,7 +6,10 @@ const { updateFaculties } = require('../../src/services/doo_api_database_updater
 const { faculties } = require('./test_data')
 const { Organisation, sequelize } = require('../../src/models/index')
 
-axios.defaults.adapter = httpAdapter  
+
+const configureAxios = () => {
+  axios.defaults.adapter = httpAdapter
+}
 
 const mockApiGet = (path, data) => {
   nock(OODI_ADDR)
@@ -22,6 +25,7 @@ const forceSyncDatabase = async () => {
 }
 
 beforeAll(async () => {
+  configureAxios()
   await forceSyncDatabase()
 })
 
