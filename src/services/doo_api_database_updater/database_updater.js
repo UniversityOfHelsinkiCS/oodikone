@@ -286,12 +286,12 @@ const loadAndUpdateStudent = async studentNumber => {
 }
 
 const updateDatabaseForStudents = async (studentnumbers, startindex = 0) => {
-  await updateFaculties()
   await updateStudentInformation(studentnumbers.splice(startindex), startindex)
 }
 
 const updateDatabase = async (studentnumbers, startindex = 0) => {
+  await updateFaculties()  
   await updateDatabaseForStudents(studentnumbers, startindex)
 }
 
-module.exports = { updateDatabase, updateFaculties }
+module.exports = { updateDatabase, updateFaculties, updateDatabaseForStudents }
