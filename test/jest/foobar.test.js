@@ -1,20 +1,22 @@
 const nock = require('nock')
 const axios = require('axios')
 const httpAdapter = require('axios/lib/adapters/http')
-
-const baseUrl = 'http://localhost'
+const { OODI_ADDR } = require('../../src/conf-backend')
+const { updateFaculties } = require('../../src/services/doo_api_database_updater/database_updater')
+const { faculties } = require('./test_data')
+const { Organisation } = require('../../src/models/index')
 
 axios.defaults.adapter = httpAdapter
 
-nock(baseUrl)
-  .get('/ping')
-  .reply(200, 'pong')
+nock(OODI_ADDR)
+  .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
+  .get('/codes/faculties')
+  .reply(200, {
+    data: faculties
+  })
 
-test('foo equals foo', () => {
-  expect('foo').toBe('foo')
-})
-
-test('ping returns pong', async () => {
-  const response = await axios.get(`${baseUrl}/ping`)
-  expect(response.data).toBe('pong')
+test('Database updater saves correct amount of faculties', async () => {
+  await updateFaculties()
+  const facultiesInDb = await Organisation.findAll()
+  expect(facultiesInDb.length).toBe(faculties.length)
 })
