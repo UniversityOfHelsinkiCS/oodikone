@@ -1,35 +1,34 @@
-visit $basepath + "/coursestatistics"
+visit "localhost:8081"
+require_relative "./components/query_course_statistics"
+
+course_statistics = CourseQuery.new
+start_year = rand(2011...Time.now.year)
+end_year = rand(start_year + 1 ... Time.now.year+1)
+
+course_statistics.query(start_year.to_s, end_year.to_s, "Tietorakenteet ja algoritmit")
+
+barchart = find("div", class:"recharts-wrapper")
+bar = barchart.all("path", class:"recharts-rectangle").random
+bar.hover
 
 wait do
-  add_years = find("#root > div > main > div.courseStatistics__container___3xGv2 > form > div > div:nth-child(2) > div > button:nth-child(2)")
-  add_years.click
-  add_years.click
+  has_text? "all"
+  has_text? "passed"
+  has_text? "failed"
 end
+
+click_text "switch to student level view"
+
+barchart = find("div", class:"recharts-wrapper")
+bar = barchart.all("path", class:"recharts-rectangle").random
+bar.hover
 
 wait do
-  input_field = find("#root > div > main > div.courseStatistics__container___3xGv2 > div.ui.search.courseSearch__courseSearch___3itB0 > div.ui.fluid.icon.input > input")
-  input_field.click
+  has_text? "all"
+  has_text? "students that passed on their first try"
+  has_text? "students that passed re-examination"
+  has_text? "students that failed on their first try"
+  has_text? "students that failed their re-examination"
 end
 
-
-type "tietorakenteet"
-
-
-wait do
-  tira_course = find("#root > div > main > div.courseStatistics__container___3xGv2 > div.ui.search.courseSearch__courseSearch___3itB0 > div.results.transition > div:nth-child(2)")
-  tira_course.click
-end
-
-wait do
-  barchart = find("#root > div > main > div.courseStatistics__container___3xGv2 > div:nth-child(4) > div.coursePassRateChart__chartContainer___2eFPn")
-  barchart.hover
-  has_text? "2016-2017"
-end
-
-wait 10 do
-  remove_button = find("#root > div > main > div.courseStatistics__container___3xGv2 > div:nth-child(4) > div.coursePassRateChart__chartContainer___2eFPn > button")
-  remove_button.click
-end
-assert do
-  not has_css? "#root > div > main > div.courseStatistics__container___3xGv2 > div:nth-child(4) > div.coursePassRateChart__chartContainer___2eFPn"
-end
+click_button "Remove"
