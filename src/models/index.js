@@ -203,8 +203,9 @@ const ElementDetails = sequelize.define('element_details',
     },
     name_en: { type: Sequelize.STRING }, 
     name_fi: { type: Sequelize.STRING }, 
-    name_sv: { type: Sequelize.STRING }
-  }, 
+    name_sv: { type: Sequelize.STRING },
+    type: { type: Sequelize.INTEGER }
+  },
   {
     tablename: 'element_details'
   }
@@ -214,7 +215,8 @@ const CourseInstance = sequelize.define('courseinstance',
   {
     id: {
       primaryKey: true,
-      type: Sequelize.BIGINT
+      type: Sequelize.BIGINT,
+      autoIncrement: true      
     },
     coursedate: { type: Sequelize.DATE },
     course_code: { type: Sequelize.STRING }
@@ -368,8 +370,6 @@ Unit.belongsToMany(User, { through: 'user_unit', foreignKey: 'unit_id', timestam
 
 Tag.belongsToMany(Unit, { through: 'unit_tag', foreignKey: 'tags_tagname', timestamps: false })
 Unit.belongsToMany(Tag, { through: 'unit_tag', foreignKey: 'unit_id', timestamps: false })
-
-Studyright.belongsTo(Unit, { foreignKey: 'highlevelname', targetKey: 'name' })
 
 StudyrightElement.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
 Studyright.hasMany(StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid'})
