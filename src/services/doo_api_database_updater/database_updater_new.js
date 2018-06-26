@@ -28,8 +28,7 @@ const getAllStudentInformationFromApi = async studentnumber => {
 
 const updateStudyrights = async api => {
   for (let data of api.studyrights) {
-    const [ studyright, updated ] = await Studyright.upsert(mapper.getStudyRightFromData(data), { returning: true })
-    logger.verbose(`Studyright ${studyright.studyrightid} updated or created: ${updated}`)
+    const [ studyright ] = await Studyright.upsert(mapper.getStudyRightFromData(data), { returning: true })
     for (let element of data.elements) {
       await ElementDetails.upsert(mapper.elementDetailFromData(element))
       await StudyrightElement.upsert(mapper.studyrightElementFromData(element, studyright.studyrightid))
@@ -120,7 +119,6 @@ const updateStudents = async (studentnumbers, startindex = 0) => {
 const updateDatabase = async (studentnumbers) => {
   await updateFaculties()
   await updateStudents(studentnumbers, 560)
-  // await updateStudents(['014028638', '014028638', '014441008', '014687309', '014808340'])
 }
 
 module.exports = { updateDatabase, updateFaculties, updateStudents }
