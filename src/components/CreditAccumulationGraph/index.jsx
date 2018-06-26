@@ -128,9 +128,9 @@ class CreditAccumulationGraph extends Component {
     let totalCredits = 0
     return filteredCourses.map((c) => {
       const {
-        course, date, credits, grade, passed
+        course, date, credits, grade, passed, isStudyModuleCredit
       } = c
-      if (passed) {
+      if (passed && !isStudyModuleCredit) {
         totalCredits += credits
       }
       return {
@@ -140,7 +140,8 @@ class CreditAccumulationGraph extends Component {
         date: reformatDate(date, DISPLAY_DATE_FORMAT),
         month: this.getXAxisMonth(date, startDate),
         grade,
-        passed
+        passed,
+        isStudyModuleCredit
       }
     })
   }
