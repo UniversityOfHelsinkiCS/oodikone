@@ -58,7 +58,7 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
-const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount,matriculationexamination,sex, credits, abbreviatedname, studyrights }) => {
+const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount,matriculationexamination, gender, credits, abbreviatedname, email, studyrights }) => {
   const toCourse = ({ grade, credits, courseinstance, isStudyModuleCredit }) => {
     return {
       course: {
@@ -69,7 +69,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
       passed: Credit.passed({ grade }),
       grade,
       credits,
-      isStudyModuleCredit
+      isStudyModuleCredit,
     }
   }
   const toStudyright = ( { studyrightid, highlevelname, enddate, canceldate, givendate, graduated, startdate, studystartdate, organization_code, prioritycode }) => {
@@ -106,7 +106,8 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     name: abbreviatedname,
     studyrights,
     matriculationexamination,
-    sex,
+    gender,
+    email,
     tags: []
   }
 }
