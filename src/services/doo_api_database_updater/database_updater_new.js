@@ -118,7 +118,7 @@ const updateStudents = async (studentnumbers, startindex = 0) => {
 
 const updateDatabase = async (studentnumbers) => {
   await updateFaculties()
-  await updateStudents(studentnumbers, 560)
+  await updateStudents(studentnumbers)
 }
 
 module.exports = { updateDatabase, updateFaculties, updateStudents }
