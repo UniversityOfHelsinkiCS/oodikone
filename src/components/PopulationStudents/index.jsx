@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
 import { Header, Segment, Table, Button } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
+import { getStudentTotalCredits } from '../../common'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
 
@@ -23,9 +24,7 @@ class PopulationStudents extends Component {
     const byName = (s1, s2) =>
       (students[s1].lastname < students[s2].lastname ? -1 : 1)
 
-    const creditsSinceStart = studentNumber => students[studentNumber].courses
-      .filter(c => c.passed)
-      .reduce((s, c) => s + c.credits, 0)
+    const creditsSinceStart = studentNumber => getStudentTotalCredits(students[studentNumber])
 
     const pushToHistoryFn = studentNumber => this.props.history.push(`/students/${studentNumber}`)
 
