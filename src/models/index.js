@@ -109,6 +109,18 @@ const Credit = sequelize.define('credit',
     grade: { type: Sequelize.STRING },
     student_studentnumber: { type: Sequelize.STRING },
     credits: { type: Sequelize.DOUBLE },
+    isStudyModuleCredit: {
+      type: Sequelize.BOOLEAN,
+      get(){
+        let val = this.getDataValue('credits')
+        if (val >= 25) {
+          return true
+        }
+        else {
+          return false
+        }
+      }
+    },
     ordering: { type: Sequelize.STRING },
     status: { type: Sequelize.STRING },
     statuscode: { type: Sequelize.STRING },
