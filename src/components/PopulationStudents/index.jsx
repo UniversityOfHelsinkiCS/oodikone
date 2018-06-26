@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Table, Button } from 'semantic-ui-react'
+import { Header, Segment, Table, Button, Icon, Popup } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import { getStudentTotalCredits } from '../../common'
 
@@ -9,8 +9,25 @@ import { toggleStudentListVisibility } from '../../redux/settings'
 
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 
+const popupTimeoutLength = 1000
+
 
 class PopulationStudents extends Component {
+  state = {}
+
+  handlePopupOpen = (id) => {
+    this.setState({ [id]: true })
+
+    this.timeout = setTimeout(() => {
+      this.setState({ [id]: false })
+    }, popupTimeoutLength)
+  }
+
+  handlePopupClose = (id) => {
+    this.setState({ [id]: false })
+    clearTimeout(this.timeout)
+  }
+
   renderStudentTable() {
     if (!this.props.showList) {
       return null
@@ -27,6 +44,19 @@ class PopulationStudents extends Component {
     const creditsSinceStart = studentNumber => getStudentTotalCredits(students[studentNumber])
 
     const pushToHistoryFn = studentNumber => this.props.history.push(`/students/${studentNumber}`)
+    const copyToClipboard = (text) => {
+      const textField = document.createElement('textarea')
+      textField.innerText = text
+      document.body.appendChild(textField)
+      textField.select()
+      document.execCommand('copy')
+      textField.remove()
+    }
+    const copyToClipboardAll = () => {
+      const emails = this.props.samples.filter(s => s.email).map(s => s.email)
+      const clipboardString = emails.join('; ')
+      copyToClipboard(clipboardString)
+    }
 
     return (
       <div>
@@ -53,30 +83,72 @@ class PopulationStudents extends Component {
               <Table.HeaderCell>
                 all credits
               </Table.HeaderCell>
+              {this.props.showNames ? (
+                <Table.HeaderCell>
+                  email
+                  <Popup
+                    trigger={
+                      <Icon
+                        link
+                        name="copy"
+                        onClick={copyToClipboardAll}
+                        style={{ float: 'right' }}
+                      />}
+                    content="Copied email list!"
+                    on="click"
+                    open={this.state['0']}
+                    onClose={() => this.handlePopupClose('0')}
+                    onOpen={() => this.handlePopupOpen('0')}
+                    position="top right"
+                  />
+                </Table.HeaderCell>
+              ) : null}
             </Table.Row>
           </Table.Header>
           <Table.Body>
             {this.props.selectedStudents.sort(byName).map(studentNumber => (
-              <Table.Row key={studentNumber} onClick={() => pushToHistoryFn(studentNumber)}>
-                <Table.Cell>
+              <Table.Row key={studentNumber} >
+                <Table.Cell onClick={() => pushToHistoryFn(studentNumber)}>
                   {studentNumber}
                 </Table.Cell>
-                { this.props.showNames ? (
-                  <Table.Cell>
+                {this.props.showNames ? (
+                  <Table.Cell onClick={() => pushToHistoryFn(studentNumber)}>
                     {students[studentNumber].lastname}
                   </Table.Cell>
-                ) : null }
+                ) : null}
                 {this.props.showNames ? (
-                  <Table.Cell>
+                  <Table.Cell onClick={() => pushToHistoryFn(studentNumber)}>
                     {students[studentNumber].firstnames}
                   </Table.Cell>
                 ) : null}
-                <Table.Cell>
+                <Table.Cell onClick={() => pushToHistoryFn(studentNumber)}>
                   {creditsSinceStart(studentNumber)}
                 </Table.Cell>
                 <Table.Cell>
                   {students[studentNumber].credits}
                 </Table.Cell>
+                {this.props.showNames ? (
+                  <Table.Cell>
+                    {students[studentNumber].email}
+                    {students[studentNumber].email
+                      ? <Popup
+                        trigger={
+                          <Icon
+                            link
+                            name="copy outline"
+                            onClick={() => copyToClipboard(students[studentNumber].email)}
+                            style={{ float: 'right' }}
+                          />}
+                        content="Email copied!"
+                        on="click"
+                        open={this.state[studentNumber]}
+                        onClose={() => this.handlePopupClose(studentNumber)}
+                        onOpen={() => this.handlePopupOpen(studentNumber)}
+                        position="top right"
+                      />
+                      : null}
+                  </Table.Cell>
+                ) : null}
               </Table.Row>
             ))}
           </Table.Body>
