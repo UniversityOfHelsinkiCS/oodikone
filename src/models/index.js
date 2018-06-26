@@ -173,6 +173,31 @@ const Studyright = sequelize.define('studyright',
   }
 )
 
+const StudyrightElement = sequelize.define('studyright_elements',
+  {
+    startdate: { type: Sequelize.DATE },
+    enddate: { type: Sequelize.DATE }
+  },
+  {
+    tablename: 'studyright_elements'
+  }
+)
+
+const ElementDetails = sequelize.define('element_details', 
+  {
+    code: {
+      primaryKey: true,
+      type: Sequelize.STRING
+    },
+    name_en: { type: Sequelize.STRING }, 
+    name_fi: { type: Sequelize.STRING }, 
+    name_sv: { type: Sequelize.STRING }
+  }, 
+  {
+    tablename: 'element_details'
+  }
+)
+
 const CourseInstance = sequelize.define('courseinstance',
   {
     id: {
@@ -334,6 +359,12 @@ Unit.belongsToMany(Tag, { through: 'unit_tag', foreignKey: 'unit_id', timestamps
 
 Studyright.belongsTo(Unit, { foreignKey: 'highlevelname', targetKey: 'name' })
 
+StudyrightElement.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
+Studyright.hasMany(StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid'})
+
+StudyrightElement.belongsTo(ElementDetails, { foreignKey: 'code', targetKey: 'code' })
+ElementDetails.hasMany(StudyrightElement, { foreignKey: 'code', sourceKey: 'code' })
+
 module.exports = {
   Student,
   Credit,
@@ -350,5 +381,7 @@ module.exports = {
   sequelize,
   migrationPromise,
   Organisation,
-  StudentList
+  StudentList,
+  StudyrightElement,
+  ElementDetails
 }
