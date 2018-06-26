@@ -54,10 +54,10 @@ class StudentDetails extends Component {
     ]
     const courseRows = student.courses.map((c) => {
       const {
-        date, grade, credits, course
+        date, grade, credits, course, isStudyModuleCredit
       } = c
       return {
-        date, course: `${course.name} (${course.code})`, grade, credits
+        date, course: `${isStudyModuleCredit ? `${course.name} [Study Module]` : course.name} (${course.code})`, grade, credits
       }
     })
     return (
@@ -100,6 +100,7 @@ class StudentDetails extends Component {
 
   render() {
     const { translate, student, studentNumber } = this.props
+    console.log(student)
     if (!studentNumber) {
       return null
     }

@@ -9,6 +9,7 @@ import scrollToComponent from 'react-scroll-to-component'
 
 import { makePopulationsToData } from '../../selectors/populationDetails'
 
+import { getTotalCreditsFromCourses } from '../../common'
 import PopulationFilters from '../PopulationFilters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import CourseQuarters from '../CourseQuarters'
@@ -177,7 +178,7 @@ const mapStateToProps = (state) => {
   if (samples.length > 0) {
     const creditsAndDates = samples.map((s) => {
       const passedCourses = s.courses.filter(c => c.passed)
-      const passedCredits = passedCourses.reduce((sum, c) => c.credits + sum, 0)
+      const passedCredits = getTotalCreditsFromCourses(passedCourses)
       const dates = passedCourses.map(c => c.date)
       return { passedCredits, dates }
     })
