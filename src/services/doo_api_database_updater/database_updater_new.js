@@ -7,6 +7,8 @@ const TeacherService = require('../teachers')
 
 const DEFAULT_TEACHER_ROLE = 'Teacher'
 
+let studyattainmentIdSet
+
 process.on('unhandledRejection', (reason) => {
   console.log(reason)
 })
@@ -45,20 +47,30 @@ const createTeachers = async (attainment, courseinstance) => {
   }
 }
 
-const updateStudyattainments = async api => {
+const attainmentAlreadyInDb = attainment => studyattainmentIdSet.has(String(attainment.studyattainment_id))
+
+const updateStudyattainments = async (api) => {
   for (let attainment of api.studyattainments) {
-    await Course.upsert(mapper.attainmentDataToCourse(attainment))
-    const [ courseinstance ] = await CourseInstance.upsert(
-      mapper.attainmentDataToCourseInstance(attainment),
-      { returning: true }
-    )
-    await Credit.upsert(mapper.attainmentDataToCredit(attainment, courseinstance.id))
-    await createTeachers(attainment, courseinstance)
+    if (!attainmentAlreadyInDb(attainment)) {
+      await Course.upsert(mapper.attainmentDataToCourse(attainment))
+      const [ courseinstance ] = await CourseInstance.upsert(
+        mapper.attainmentDataToCourseInstance(attainment),
+        { returning: true }
+      )
+      await Credit.upsert(mapper.attainmentDataToCredit(attainment, courseinstance.id))
+      await createTeachers(attainment, courseinstance)
+    }
   }
 } 
 
+const existingStudyAttainmentIds = async () => {
+  const attainments = await Credit.findAll()
+  return new Set(attainments.map(attainment => attainment.id))
+}
+
 const updateStudentInformation = async (studentNumberList, startindex) => {
   let index = startindex
+  studyattainmentIdSet = await existingStudyAttainmentIds()
   for (let studentnumber of studentNumberList) {
     const api = await getAllStudentInformationFromApi(studentnumber)
     if (api.student === null || api.student === undefined) {
@@ -107,7 +119,7 @@ const updateStudents = async (studentnumbers, startindex = 0) => {
 
 const updateDatabase = async (studentnumbers) => {
   await updateFaculties()
-  await updateStudents(studentnumbers, startindex=560)
+  await updateStudents(studentnumbers, 560)
   // await updateStudents(['014028638', '014028638', '014441008', '014687309', '014808340'])
 }
 
