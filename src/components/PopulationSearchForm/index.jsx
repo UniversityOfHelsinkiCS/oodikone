@@ -5,7 +5,7 @@ import { Form, Button, Message, Radio, Dropdown } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
-import { isEqual } from 'lodash'
+import _ from 'lodash'
 import moment from 'moment'
 
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
@@ -66,7 +66,7 @@ class PopulationSearchForm extends Component {
     const { query } = this.state
     const compare = { ...queries }
     delete compare.uuid
-    return isEqual(compare, query)
+    return _.isEqual(compare, query)
   }
 
   clearPopulations = () => this.props.clearPopulations()
@@ -214,6 +214,8 @@ class PopulationSearchForm extends Component {
   renderStudyGroupSelector = () => {
     const { studyProgrammes, translate } = this.props
     const { studyRights } = this.state.query
+    const sortedStudyProgrammes = _.sortBy(studyProgrammes, s => s.text)
+    const sortedStudyRights = _.sortBy(studyRights, s => s.text)
 
     return (
       <Form.Group id="rightGroup">
@@ -225,8 +227,8 @@ class PopulationSearchForm extends Component {
             search
             selection
             noResultsMessage={translate('populationStatistics.noSelectableStudyRights')}
-            value={studyRights}
-            options={studyProgrammes}
+            value={sortedStudyRights}
+            options={sortedStudyProgrammes}
             onChange={this.handleStudyRightChange}
             closeOnChange
           />
