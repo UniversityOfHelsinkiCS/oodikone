@@ -4,10 +4,15 @@ import { func, bool, arrayOf, object } from 'prop-types'
 
 import styles from './creditGraphTooltip.css'
 
-const getCardHeader = title => (
-  <Card.Header className={styles.tooltipHeader}>
-    {title}
-  </Card.Header>
+const getCardHeader = (title, isStudyModuleCredit) => (
+  isStudyModuleCredit ?
+    <Card.Header className={styles.tooltipHeader}>
+      {`${title} [Study Module]`}
+    </Card.Header>
+    :
+    <Card.Header className={styles.tooltipHeader}>
+      {title}
+    </Card.Header>
 )
 
 const getCardMeta = (name, date) => (
@@ -26,7 +31,7 @@ const getCardMeta = (name, date) => (
   </Card.Meta>
 )
 
-const getCardDescription = (translate, credits, grade, passed) => (
+const getCardDescription = (translate, credits, grade, passed, isStudyModuleCredit) => (
   <Card.Description className={styles.tooltipBody}>
     <div className={styles.tooltipBodyItem}>
       <div className={styles.tooltipBodyTitle}>{translate('common.credits')}</div>
@@ -38,12 +43,14 @@ const getCardDescription = (translate, credits, grade, passed) => (
       <div className={styles.tooltipBodyValue}>{grade}</div>
     </div>
     <div className={styles.tooltipBodyItem}>
-      <div className={styles.tooltipBodyTitle}>{translate('common.passed')}</div>
+      <div className={styles.tooltipBodyTitle}>{isStudyModuleCredit ? 'module' : translate('common.passed')}</div>
       <div className={styles.tooltipBodyValue}>
         {
-          passed
-            ? (<Icon name="check circle outline" color="green" />)
-            : (<Icon name="remove circle outline" color="red" />)
+          isStudyModuleCredit // eslint-disable-line
+            ? (<Icon name="certificate" color="purple" />)
+            : passed
+              ? (<Icon name="check circle outline" color="green" />)
+              : (<Icon name="remove circle outline" color="red" />)
         }
       </div>
     </div>
@@ -56,15 +63,15 @@ const CreditGraphTooltip = (props) => {
     const { payload } = props
     const { name } = payload[0]
     const {
-      title, credits, date, grade, passed
+      title, credits, date, grade, passed, isStudyModuleCredit
     } = payload[0].payload
 
     return (
       <Card>
         <Card.Content >
-          {getCardHeader(title)}
+          {getCardHeader(title, isStudyModuleCredit)}
           {getCardMeta(name, date)}
-          {getCardDescription(translate, credits, grade, passed)}
+          {getCardDescription(translate, credits, grade, passed, isStudyModuleCredit)}
         </Card.Content>
       </Card>
     )
