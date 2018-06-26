@@ -100,7 +100,6 @@ class StudentDetails extends Component {
 
   render() {
     const { translate, student, studentNumber } = this.props
-    console.log(student)
     if (!studentNumber) {
       return null
     }
