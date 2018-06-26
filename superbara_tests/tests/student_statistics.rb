@@ -1,12 +1,12 @@
-visit $basepath
+visit "localhost:8081"
 
 wait do
     has_text? "Student statistics"
 end
 
-click_text "Student statistics"
+find("a", text:"Student statistics").click
 student_search_input = find "input"
-student_search_input.type "Paksula Matti"
+student_search_input.type "Paksula"
 click_text "Student names hidden"
 click_text "012843501"
 

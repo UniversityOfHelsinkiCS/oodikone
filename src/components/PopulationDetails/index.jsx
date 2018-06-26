@@ -87,10 +87,10 @@ class PopulationDetails extends Component {
   }
   renderNavigationPanel = () => (
     <div>
-      <Segment style={{ position: 'fixed', right: '2%', bottom: '2%' }}>
+      <Segment className="navigationpanel" style={{ position: 'fixed', right: '2%', bottom: '2%' }}>
         <Header size="medium" textAlign="center" >
           Navigation
-          <Button icon basic floated="right" onClick={() => this.setState({ navigationVisible: false })} >
+          <Button className="navigationbuttonclose" icon basic floated="right" onClick={() => this.setState({ navigationVisible: false })} >
             <Icon name="chevron right" />
           </Button>
         </Header>
@@ -140,7 +140,7 @@ class PopulationDetails extends Component {
       <div>
         {this.renderPopulationDetailsContent()}
         <div>
-          <Button icon basic onClick={() => this.setState({ navigationVisible: true })} style={{ position: 'fixed', right: '0.5%', bottom: '0.5%' }} >
+          <Button className="navigationbuttonopen" icon basic onClick={() => this.setState({ navigationVisible: true })} style={{ position: 'fixed', right: '0.5%', bottom: '0.5%' }} >
             <Icon name="bars" />
           </Button>
         </div>
