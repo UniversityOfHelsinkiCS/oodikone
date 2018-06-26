@@ -53,7 +53,8 @@ class PopulationStudents extends Component {
       textField.remove()
     }
     const copyToClipboardAll = () => {
-      const emails = this.props.samples.filter(s => s.email).map(s => s.email)
+      const studentsInfo = this.props.selectedStudents.map(number => students[number])
+      const emails = studentsInfo.filter(s => s.email).map(s => s.email)
       const clipboardString = emails.join('; ')
       copyToClipboard(clipboardString)
     }
