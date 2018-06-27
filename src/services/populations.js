@@ -154,8 +154,8 @@ const optimizedStatisticsOf = async (query) => {
     }
 
     // const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf)
-    const { id } = units[0]
-    const student_numbers = await getStudentsWithStudyrightElement(id, startDate, endDate)
+    const codes = units.map(unit => unit.id)
+    const student_numbers = await getStudentsWithCodes(codes, startDate, endDate)
 
     const students = await studentsWithCoursesAfterStudyrightStart(student_numbers, conf)
       .map(restrictWith(Credit.inTimeRange(conf.enrollmentDates.startDate, query.months)))
@@ -170,8 +170,14 @@ const optimizedStatisticsOf = async (query) => {
   }
 }
 
+const getStudentsWithCodes = async (codes, startDate, endDate) => {
+  const studentnumberlists = await Promise.all(codes.map(code => getStudentsWithStudyrightElement(code, startDate, endDate)))
+  return _.intersection(...studentnumberlists)
+}
+
 const getStudentsWithStudyrightElement  = async (code, startedAfter, startedBefore) => {
   const studyrightelements = await StudyrightElement.findAll({
+    distinct: 'studentnumber',
     where: {
       code: {
         [Op.eq]: code
