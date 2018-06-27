@@ -7,7 +7,9 @@ const TeacherService = require('../teachers')
 
 const DEFAULT_TEACHER_ROLE = 'Teacher'
 
-let studyattainmentIdSet
+let attainmentIds = new Set()
+let courseIds = new Set()
+let elementDetailsIds = new Set()
 
 process.on('unhandledRejection', (reason) => {
   console.log(reason)
@@ -21,7 +23,7 @@ const getAllStudentInformationFromApi = async studentnumber => {
   ])
   return {
     student,
-    studyrights, 
+    studyrights,
     studyattainments
   }
 }
@@ -30,8 +32,13 @@ const updateStudyrights = async api => {
   for (let data of api.studyrights) {
     const [ studyright ] = await Studyright.upsert(mapper.getStudyRightFromData(data), { returning: true })
     for (let element of data.elements) {
-      await ElementDetails.upsert(mapper.elementDetailFromData(element))
-      await StudyrightElement.upsert(mapper.studyrightElementFromData(element, studyright.studyrightid))
+      const elementDetail = mapper.elementDetailFromData(element)
+      const studyrightElement = mapper.studyrightElementFromData(element, studyright.studyrightid)
+      if (!elementDetailsIds.has(elementDetail.code)) {
+        await ElementDetails.upsert(elementDetail)
+        elementDetailsIds.add(elementDetail.code)
+      }
+      await StudyrightElement.upsert(studyrightElement)
     }
   }
 }
@@ -46,30 +53,32 @@ const createTeachers = async (attainment, courseinstance) => {
   }
 }
 
-const attainmentAlreadyInDb = attainment => studyattainmentIdSet.has(String(attainment.studyattainment_id))
+const attainmentAlreadyInDb = attainment => attainmentIds.has(String(attainment.studyattainment_id))
+
+const createCourse = async course => {
+  if (!courseIds.has(course.code)) {
+    await Course.upsert(course)
+    courseIds.add(course.code)
+  }
+}
 
 const updateStudyattainments = async (api) => {
-  for (let attainment of api.studyattainments) {
+  for (let data of api.studyattainments) {
+    const attainment = mapper.attainmentDataToCredit(data)
     if (!attainmentAlreadyInDb(attainment)) {
-      await Course.upsert(mapper.attainmentDataToCourse(attainment))
+      await createCourse(mapper.attainmentDataToCourse(data))
       const [ courseinstance ] = await CourseInstance.upsert(
-        mapper.attainmentDataToCourseInstance(attainment),
+        mapper.attainmentDataToCourseInstance(data),
         { returning: true }
       )
-      await Credit.upsert(mapper.attainmentDataToCredit(attainment, courseinstance.id))
-      await createTeachers(attainment, courseinstance)
+      await Credit.upsert(mapper.attainmentDataToCredit(data, courseinstance.id))
+      await createTeachers(data, courseinstance)
     }
   }
-} 
-
-const existingStudyAttainmentIds = async () => {
-  const attainments = await Credit.findAll()
-  return new Set(attainments.map(attainment => attainment.id))
 }
 
 const updateStudentInformation = async (studentNumberList, startindex) => {
   let index = startindex
-  studyattainmentIdSet = await existingStudyAttainmentIds()
   for (let studentnumber of studentNumberList) {
     const api = await getAllStudentInformationFromApi(studentnumber)
     if (api.student === null || api.student === undefined) {
@@ -116,7 +125,25 @@ const updateStudents = async (studentnumbers, startindex = 0) => {
   await updateStudentInformation(studentnumbers.splice(startindex), startindex)
 }
 
+const existingStudyAttainmentIds = async () => {
+  const attainments = await Credit.findAll()
+  return new Set(attainments.map(attainment => attainment.id))
+}
+
+const existingCourseIds = async () => {
+  const courses = await Course.findAll()
+  return new Set(courses.map(course => course.code))
+}
+
+const existingElementIds = async () => {
+  const elements = await ElementDetails.findAll()
+  return new Set(elements.map(element => element.code))
+}
+
 const updateDatabase = async (studentnumbers) => {
+  attainmentIds = await existingStudyAttainmentIds()
+  courseIds = await existingCourseIds()
+  elementDetailsIds = await existingElementIds()
   await updateFaculties()
   await updateStudents(studentnumbers)
 }
