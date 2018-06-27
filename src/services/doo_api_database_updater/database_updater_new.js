@@ -2,7 +2,7 @@ const Oodi = require('./oodi_interface_new')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation } = require('../../../src/models/index')
 const TeacherService = require('../teachers') 
 
 const DEFAULT_TEACHER_ROLE = 'Teacher'
@@ -90,15 +90,6 @@ const getFaculties = () => {
   return Promise.all([OrganisationService.all(), Oodi.getFaculties()])
 }
 
-const saveFacultyToDb = async faculty => {
-  try {
-    await OrganisationService.createOrganisation(faculty)
-    logger.verbose(`Faculty ${faculty.code} created.`)
-  } catch (error) {
-    logger.verbose(`Error creating faculty ${faculty.code}, error: ${error.message}`)
-  }
-}
-
 const updateFaculties = async () => {
   const [dbFacultiesArray, apiFacultiesArray] = await getFaculties()
   const dbFacultyCodes = new Set(dbFacultiesArray.map(faculty => faculty.code))
@@ -108,7 +99,8 @@ const updateFaculties = async () => {
       return
     }
     logger.verbose(`Faculty ${faculty.code} missing from db.`)
-    await saveFacultyToDb(faculty)
+    await Organisation.upsert(mapper.getOrganisationFromData(faculty))
+
   }))
 }
 

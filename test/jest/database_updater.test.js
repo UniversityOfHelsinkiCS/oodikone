@@ -2,7 +2,7 @@ const nock = require('nock')
 const axios = require('axios')
 const httpAdapter = require('axios/lib/adapters/http')
 const { OODI_ADDR } = require('../../src/conf-backend')
-const { updateFaculties } = require('../../src/services/doo_api_database_updater/database_updater')
+const { updateFaculties } = require('../../src/services/doo_api_database_updater/database_updater_new')
 const { faculties } = require('./test_data')
 const { Organisation, sequelize } = require('../../src/models/index')
 
@@ -45,6 +45,7 @@ describe('Database updater for saving faculties', () => {
 
   test('Database updater saves correct amount of faculties', async () => {
     const facultiesInDb = await Organisation.findAll()
+    console.log(faculties)
     expect(facultiesInDb.length).toBe(faculties.length)
   })
 
@@ -53,7 +54,7 @@ describe('Database updater for saving faculties', () => {
   })
 
   test('Saved faculty name in DB is the Finnish name returned by the API', () => {
-    expect(organisation.name).toBe('FAC 1 FIN')
+    expect(organisation.name.fi).toBe('FAC 1 FIN')
   })
 
 })

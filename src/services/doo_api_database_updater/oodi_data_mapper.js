@@ -102,6 +102,13 @@ const statusFromAttainmentData = (code) => {
   }
 }
 
+const getOrganisationFromData = ({ name, code }) => {
+  return {
+    code, 
+    name: jsonNamesFromTexts(name)
+  }
+}
+
 const attainmentDataToCredit = (attainment, courseinstance_id) => {
   return {
     id: String(attainment.studyattainment_id),
@@ -219,5 +226,6 @@ module.exports = {
   studyrightElementFromData,
   attainmentDataToCourse,
   attainmentDataToCourseInstance,
-  attainmentDataToCredit
+  attainmentDataToCredit,
+  getOrganisationFromData
 }
