@@ -3,6 +3,8 @@ import { connect } from 'react-redux'
 import { Segment, Header, Button, Form, Radio } from 'semantic-ui-react'
 import { object, func, arrayOf, bool } from 'prop-types'
 import _ from 'lodash'
+import uuidv4 from 'uuid/v4'
+
 
 import { getTranslate } from 'react-localize-redux'
 import CreditsLessThan from './CreditsLessThan'
@@ -10,7 +12,9 @@ import CreditsAtLeast from './CreditsAtLeast'
 import StartingThisSemester from './StartingThisSemester'
 import SexFilter from './SexFilter'
 import CourseParticipation from './CourseParticipation'
-import { clearPopulationFilters, setComplementFilter } from '../../redux/populationFilters'
+import Preset from './Preset'
+import { clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
+import { presetFilter } from '../../populationFilters'
 
 
 const componentFor = {
@@ -18,7 +22,8 @@ const componentFor = {
   CreditsLessThan,
   StartingThisSemester,
   SexFilter,
-  CourseParticipation
+  CourseParticipation,
+  Preset
 }
 
 class PopulationFilters extends Component {
@@ -26,7 +31,9 @@ class PopulationFilters extends Component {
     filters: arrayOf(object).isRequired,
     complemented: bool.isRequired,
     clearPopulationFilters: func.isRequired,
-    setComplementFilter: func.isRequired
+    setComplementFilter: func.isRequired,
+    savePopulationFilters: func.isRequired,
+    setPopulationFilter: func.isRequired
   }
 
   state = {
@@ -37,6 +44,8 @@ class PopulationFilters extends Component {
     const allFilters = Object.keys(componentFor).map(f => String(f))
     const setFilters = this.props.filters.map(f => f.type)
     const unsetFilters = _.difference(allFilters, setFilters)
+
+    console.log(this.props.filters)
 
     if (unsetFilters.length === 0) {
       return null
@@ -75,6 +84,18 @@ class PopulationFilters extends Component {
       return null
     }
 
+    const handleSavePopulationFilters = () => {
+      const preset = {
+        id: uuidv4(),
+        name: 'beer',
+        population: 'asd',
+        filters: this.props.filters
+      }
+      this.props.savePopulationFilters(preset) // does nothing atm
+      this.props.clearPopulationFilters()
+      this.props.setPopulationFilter(presetFilter(preset))
+    }
+
     return (
       <Segment>
         <Header>Filters</Header>
@@ -98,6 +119,11 @@ class PopulationFilters extends Component {
         {this.props.filters.map(filter =>
           React.createElement(componentFor[filter.type], { filter, key: filter.id }))}
         <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
+        <div className="ui action input">
+          <input type="text" placeholder="Name..." />
+          <button className="ui button" onClick={handleSavePopulationFilters}>save filters as preset</button>
+        </div>
+
       </Segment>
     )
   }
@@ -120,4 +146,5 @@ const mapStateToProps = ({ populationFilters, locale, graphSpinner }) => ({
 })
 
 export default connect(mapStateToProps, {
-  clearPopulationFilters, setComplementFilter })(PopulationFilters)
+  clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter
+})(PopulationFilters)
