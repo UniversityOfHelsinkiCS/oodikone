@@ -220,6 +220,12 @@ const CourseInstance = sequelize.define('courseinstance',
     course_code: { type: Sequelize.STRING }
   },
   {
+    indexes: [
+      {
+        unique: true,
+        fields: ['coursedate', 'course_code']
+      }
+    ],
     tableName: 'courseinstance',
     timestamps: false,
   }
