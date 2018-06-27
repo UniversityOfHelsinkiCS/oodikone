@@ -111,7 +111,7 @@ const Credit = sequelize.define('credit',
     credits: { type: Sequelize.DOUBLE },
     isStudyModuleCredit: {
       type: Sequelize.BOOLEAN,
-      get(){
+      get() {
         let val = this.getDataValue('credits')
         if (val >= 25) {
           return true
@@ -195,15 +195,13 @@ const StudyrightElement = sequelize.define('studyright_elements',
   }
 )
 
-const ElementDetails = sequelize.define('element_details', 
+const ElementDetails = sequelize.define('element_details',
   {
     code: {
       primaryKey: true,
       type: Sequelize.STRING
     },
-    name_en: { type: Sequelize.STRING }, 
-    name_fi: { type: Sequelize.STRING }, 
-    name_sv: { type: Sequelize.STRING },
+    name: { type: Sequelize.JSONB },
     type: { type: Sequelize.INTEGER }
   },
   {
@@ -216,7 +214,7 @@ const CourseInstance = sequelize.define('courseinstance',
     id: {
       primaryKey: true,
       type: Sequelize.BIGINT,
-      autoIncrement: true      
+      autoIncrement: true
     },
     coursedate: { type: Sequelize.DATE },
     course_code: { type: Sequelize.STRING }
@@ -233,7 +231,7 @@ const Course = sequelize.define('course',
       primaryKey: true,
       type: Sequelize.STRING
     },
-    name: { type: Sequelize.STRING },
+    name: { type: Sequelize.JSONB },
     latest_instance_date: { type: Sequelize.DATE }
   },
   {
@@ -372,7 +370,7 @@ Tag.belongsToMany(Unit, { through: 'unit_tag', foreignKey: 'tags_tagname', times
 Unit.belongsToMany(Tag, { through: 'unit_tag', foreignKey: 'unit_id', timestamps: false })
 
 StudyrightElement.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
-Studyright.hasMany(StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid'})
+Studyright.hasMany(StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
 
 StudyrightElement.belongsTo(ElementDetails, { foreignKey: 'code', targetKey: 'code' })
 ElementDetails.hasMany(StudyrightElement, { foreignKey: 'code', sourceKey: 'code' })
