@@ -63,7 +63,7 @@ const createCourse = async course => {
   }
 }
 
-const updateStudyattainments = async (api) => {
+const updateStudyattainments = async (api, studentnumber) => {
   for (let data of api.studyattainments) {
     const attainment = mapper.attainmentDataToCredit(data)
     if (!attainmentAlreadyInDb(attainment)) {
@@ -72,7 +72,7 @@ const updateStudyattainments = async (api) => {
         mapper.attainmentDataToCourseInstance(data),
         { returning: true }
       )
-      await Credit.upsert(mapper.attainmentDataToCredit(data, courseinstance.id))
+      await Credit.upsert(mapper.attainmentDataToCredit(data, courseinstance.id, studentnumber))
       await createTeachers(data, courseinstance)
     }
   }
@@ -87,7 +87,7 @@ const updateStudentInformation = async (studentnumbers, onUpdateStudent) => {
       await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
       await Promise.all([
         updateStudyrights(api, studentnumber),
-        updateStudyattainments(api)
+        updateStudyattainments(api, studentnumber)
       ])
     }
     if (_.isFunction(onUpdateStudent)) {

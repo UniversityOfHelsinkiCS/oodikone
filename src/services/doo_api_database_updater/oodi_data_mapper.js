@@ -109,7 +109,7 @@ const getOrganisationFromData = ({ name, code }) => {
   }
 }
 
-const attainmentDataToCredit = (attainment, courseinstance_id) => {
+const attainmentDataToCredit = (attainment, courseinstance_id, studentnumber) => {
   return {
     id: String(attainment.studyattainment_id),
     grade: defaultNameFromTexts(attainment.grade),
@@ -117,11 +117,12 @@ const attainmentDataToCredit = (attainment, courseinstance_id) => {
     ordering: getDate(attainment.attainment_date, null),
     status: statusFromAttainmentData(attainment.attainment_status_code),
     statuscode: attainment.attainment_status_code,
-    courseinstance_id
+    courseinstance_id,
+    student_studentnumber: studentnumber
   }
 }
 
-const attainmentDataToCourse = attainment => {
+const attainmentDataToCourse = (attainment) => {
   const { learningopportunity_name, attainment_date} = attainment
   return {
     code: attainment.learningopportunity_id,
