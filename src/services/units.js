@@ -38,13 +38,14 @@ const createUnit = data => {
 const parseUnitFromElement = element => ({
   id: element.code,
   name: element.name.fi,
-  enabled: true
+  enabled: true,
+  type: element.type
 })
 
 const getUnitsFromElementDetails = async () => {
   const elementdetails = await ElementDetails.findAll({ where: { 
     type: {
-      [Op.eq]: '10'
+      [Op.or]: ['10', '20']
     }
   }})
   return elementdetails.map(parseUnitFromElement)

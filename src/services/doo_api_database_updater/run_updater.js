@@ -11,7 +11,7 @@ const readStudentNumbersFromFile = async filename => {
 const createStudentCounter = studentnumbers => status.addItem('students', { max: studentnumbers.length })
 
 const startStatusBar = () => {
-  status.start({ pattern: 'Running: {uptime} | {students.bar} | students updated: {students}'})
+  status.start({ pattern: 'Running: {uptime.time} {spinner.earth.green} | {students.bar} | students updated: {students}'})
 }
 
 const stopStatusBar = () => {
