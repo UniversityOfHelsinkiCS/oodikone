@@ -69,3 +69,15 @@ export const courseParticipation = (course, field) => ({
   filter: student =>
     course.students[field][student.studentNumber] === true
 })
+
+// write a function to search for a filter with its type.
+export const presetFilter = (preset) => {
+  console.log(preset.filters)
+  return ({
+    id: uuidv4(),
+    type: 'Preset',
+    name: preset.name,
+    filter: student => preset.filters.map(f => f.filter(student))
+  })
+}
+

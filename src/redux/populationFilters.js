@@ -28,7 +28,10 @@ export const setComplementFilter = () => ({
   type: 'SET_COMPLEMENT_FILTER'
 })
 
+export const savePopulationFilters = (preset) => {
 
+  console.log(preset)
+}
 const initial = {
   filters: [],
   complemented: true
