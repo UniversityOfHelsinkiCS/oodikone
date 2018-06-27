@@ -191,6 +191,12 @@ const StudyrightElement = sequelize.define('studyright_elements',
     enddate: { type: Sequelize.DATE }
   },
   {
+    indexes: [
+      {
+        unique: true,
+        fields: ['startdate', 'enddate', 'studyrightid', 'code']
+      }
+    ],
     tablename: 'studyright_elements'
   }
 )
