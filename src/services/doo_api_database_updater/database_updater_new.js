@@ -3,7 +3,8 @@ const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
 const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation } = require('../../../src/models/index')
-const TeacherService = require('../teachers') 
+const TeacherService = require('../teachers')
+const _ = require('lodash')
 
 const DEFAULT_TEACHER_ROLE = 'Teacher'
 
@@ -77,9 +78,8 @@ const updateStudyattainments = async (api) => {
   }
 }
 
-const updateStudentInformation = async (studentNumberList, startindex) => {
-  let index = startindex
-  for (let studentnumber of studentNumberList) {
+const updateStudentInformation = async (studentnumbers, onUpdateStudent) => {
+  for (let studentnumber of studentnumbers) {
     const api = await getAllStudentInformationFromApi(studentnumber)
     if (api.student === null || api.student === undefined) {
       logger.verbose(`API returned ${api.student} for studentnumber ${studentnumber}`)
@@ -89,8 +89,9 @@ const updateStudentInformation = async (studentNumberList, startindex) => {
         updateStudyrights(api),
         updateStudyattainments(api)
       ])
-      index = index + 1
-      logger.verbose(`Students updated: ${index}/${studentNumberList.length + startindex}.`)
+    }
+    if (_.isFunction(onUpdateStudent)) {
+      onUpdateStudent()
     }
   }
 }
@@ -104,17 +105,10 @@ const updateFaculties = async () => {
   const dbFacultyCodes = new Set(dbFacultiesArray.map(faculty => faculty.code))
   await Promise.all(apiFacultiesArray.map(async faculty => {
     if (dbFacultyCodes.has(faculty.code)) {
-      logger.verbose(`Faculty ${faculty.code} already in in db.`)
       return
     }
-    logger.verbose(`Faculty ${faculty.code} missing from db.`)
     await Organisation.upsert(mapper.getOrganisationFromData(faculty))
-
   }))
-}
-
-const updateStudents = async (studentnumbers, startindex = 0) => {
-  await updateStudentInformation(studentnumbers.splice(startindex), startindex)
 }
 
 const existingStudyAttainmentIds = async () => {
@@ -132,12 +126,12 @@ const existingElementIds = async () => {
   return new Set(elements.map(element => element.code))
 }
 
-const updateDatabase = async (studentnumbers) => {
+const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   attainmentIds = await existingStudyAttainmentIds()
   courseIds = await existingCourseIds()
   elementDetailsIds = await existingElementIds()
   await updateFaculties()
-  await updateStudents(studentnumbers)
+  await updateStudentInformation(studentnumbers, onUpdateStudent)
 }
 
-module.exports = { updateDatabase, updateFaculties, updateStudents }
+module.exports = { updateDatabase, updateFaculties }
