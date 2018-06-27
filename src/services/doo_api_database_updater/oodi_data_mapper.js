@@ -15,6 +15,11 @@ const defaultNameFromTexts = texts => {
   return names.fi || names.en || names.sv
 }
 
+const jsonNamesFromTexts = texts => {
+  const names = getTextsByLanguage(texts)
+  return names
+}
+
 const universityEnrollmentDateFromStudyRights = studyRightArray => {
   return _.sortBy(studyRightArray.map(s => s.start_date), n =>
     moment(n).valueOf())[0]
@@ -113,7 +118,7 @@ const attainmentDataToCourse = attainment => {
   const { learningopportunity_name, attainment_date} = attainment
   return {
     code: attainment.learningopportunity_id,
-    name: defaultNameFromTexts(learningopportunity_name),
+    name: jsonNamesFromTexts(learningopportunity_name),
     latest_instance_date: parseDate(attainment_date)
   }
 }
@@ -188,9 +193,7 @@ const elementDetailFromData = element => {
   const names = getTextsByLanguage(name)
   return {
     code,
-    name_en: names.en,
-    name_fi: names.fi,
-    name_sv: names.sv,
+    name: names,
     type: element_id
   }
 }
