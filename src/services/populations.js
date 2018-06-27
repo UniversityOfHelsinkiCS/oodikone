@@ -3,7 +3,7 @@ const Op = Sequelize.Op
 const _ = require('lodash')
 const moment = require('moment')
 
-const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = require('../models')
+const { Studyright, Student, Credit, CourseInstance, Course, sequelize, StudyrightElement } = require('../models')
 const { formatStudent, formatStudentUnifyCodes } = require('../services/students')
 const StudyRights = require('../services/studyrights')
 const { getUnitFromElementDetail } = require('../services/units')
@@ -153,7 +153,9 @@ const optimizedStatisticsOf = async (query) => {
       units
     }
 
-    const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf)
+    // const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf)
+    const { id } = units[0]
+    const student_numbers = await getStudentsWithStudyrightElement(id, startDate, endDate)
 
     const students = await studentsWithCoursesAfterStudyrightStart(student_numbers, conf)
       .map(restrictWith(Credit.inTimeRange(conf.enrollmentDates.startDate, query.months)))
@@ -167,6 +169,21 @@ const optimizedStatisticsOf = async (query) => {
     return { error: `No such study rights: ${query.studyRights}` }
   }
 }
+
+const getStudentsWithStudyrightElement  = async (code, startedAfter, startedBefore) => {
+  const studyrightelements = await StudyrightElement.findAll({
+    where: {
+      code: {
+        [Op.eq]: code
+      },
+      startdate: {
+        [Op.between]: [startedAfter, startedBefore]
+      }
+    }
+  })
+  return studyrightelements.map(element => element.studentnumber)
+}
+
 
 const bottlenecksOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
