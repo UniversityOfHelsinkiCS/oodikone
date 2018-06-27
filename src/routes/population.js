@@ -1,7 +1,10 @@
 const router = require('express').Router()
 const Population = require('../services/populations')
 const User = require('../services/users')
-const Unit = require('../services/units')
+const { ElementDetails } = require('../models/index')
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op
+// const Unit = require('../services/units')
 
 router.get('/v2/populationstatistics/courses', async (req, res) => {
   try {
@@ -72,18 +75,33 @@ router.get('/v2/populationstatistics', async (req, res) => {
   }
 })
 
+const getElementDetailsAsUnits = async () => {
+  const elementdetails = await ElementDetails.findAll({ where: { 
+    type: {
+      [Op.eq]: '10'
+    }
+  }})
+  return elementdetails.map(sr => ({
+    id: sr.code,
+    name: sr.name.fi,
+    enabled: true
+  }))
+}
+
 router.get('/studyprogrammes', async (req, res) => {
   try {
-    if (!req.decodedToken.admin) {
-      const user = await User.byUsername(req.decodedToken.userId)
-      const units = await User.getUnits(user.id)
-      const arr = units.map(p => ({ id: p.id, name: p.name }))
-      res.json(arr)
-    } else {
-      const units = await Unit.findAllEnabled()
-      const arr = units.map(p => ({ id: p.id, name: p.name }))
-      res.json(arr)
-    }
+    // if (!req.decodedToken.admin) {
+    //   const user = await User.byUsername(req.decodedToken.userId)
+    //   const units = await User.getUnits(user.id)
+    //   const arr = units.map(p => ({ id: p.id, name: p.name }))
+    //   res.json(arr)
+    // } else {
+    //   const units = await Unit.findAllEnabled()
+    //   const arr = units.map(p => ({ id: p.id, name: p.name }))
+    //   res.json(arr)
+    // }
+    const units = await getElementDetailsAsUnits()
+    res.json(units)
   } catch (err) {
     res.status(500).json(err)
   }
