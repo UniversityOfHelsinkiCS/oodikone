@@ -35,19 +35,26 @@ const createUnit = data => {
   return Unit.create(data)
 }
 
+const parseUnitFromElement = element => ({
+  id: element.code,
+  name: element.name.fi,
+  enabled: true
+})
+
 const getUnitsFromElementDetails = async () => {
   const elementdetails = await ElementDetails.findAll({ where: { 
     type: {
       [Op.eq]: '10'
     }
   }})
-  return elementdetails.map(sr => ({
-    id: sr.code,
-    name: sr.name.fi,
-    enabled: true
-  }))
+  return elementdetails.map(parseUnitFromElement)
+}
+
+const getUnitFromElementDetail = async id => {
+  const element = await ElementDetails.findByPrimary(id)
+  return parseUnitFromElement(element)
 }
 
 module.exports = {
-  all, byId, findAllEnabled, hasStudent, createUnit, findByName, getUnitsFromElementDetails
+  all, byId, findAllEnabled, hasStudent, createUnit, findByName, getUnitsFromElementDetails, getUnitFromElementDetail
 }

@@ -6,7 +6,7 @@ const moment = require('moment')
 const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = require('../models')
 const { formatStudent, formatStudentUnifyCodes } = require('../services/students')
 const StudyRights = require('../services/studyrights')
-const { byId } = require('../services/units')
+const { getUnitFromElementDetail } = require('../services/units')
 const { StudentList } = require('../models')
 
 const enrolmentDates = () => {
@@ -143,14 +143,14 @@ const optimizedStatisticsOf = async (query) => {
   }
 
   try {
-    const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
+    const units = await Promise.all(query.studyRights.map(getUnitFromElementDetail))
 
     const conf = {
       enrollmentDates: {
         startDate, 
         endDate
       },
-      studyRights
+      units
     }
 
     const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf)
@@ -177,13 +177,13 @@ const bottlenecksOf = async (query) => {
   const endDate = `${query.year}-${semesterEnd[query.semester]}`
 
   try {
-    const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
+    const units = await Promise.all(query.studyRights.map(getUnitFromElementDetail))
     const conf = {
       enrollmentDates: {
         startDate,
         endDate
       },
-      studyRights
+      units
     }
 
     const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf)
