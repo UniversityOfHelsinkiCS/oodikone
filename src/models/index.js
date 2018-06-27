@@ -92,7 +92,7 @@ const Organisation = sequelize.define('organization',
       primaryKey: true,
       type: Sequelize.STRING
     },
-    name: Sequelize.STRING
+    name: Sequelize.JSONB
   },
   {
     tableName: 'organization',
@@ -220,12 +220,6 @@ const CourseInstance = sequelize.define('courseinstance',
     course_code: { type: Sequelize.STRING }
   },
   {
-    indexes: [
-      {
-        unique: true,
-        fields: ['coursedate', 'course_code']
-      }
-    ],
     tableName: 'courseinstance',
     timestamps: false,
   }
