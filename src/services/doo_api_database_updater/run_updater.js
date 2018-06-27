@@ -1,16 +1,33 @@
-const { updateDatabase } = require('./database_updater')
+const { updateDatabase } = require('./database_updater_new')
 const fs = require('fs')
 const logger = require('../../util/logger')
+const status = require('node-status')
 
 const readStudentNumbersFromFile = async filename => {
-  logger.verbose(`Reading student numbers from file ${filename}.`)
   const studentnumbers = fs.readFileSync(filename, 'utf-8').split('\n').map(s => s.replace(/\D/g, ''))
   return studentnumbers.filter(studentnumber => !!studentnumber).map(s=>s.startsWith('0') ? s : '0'+s ) 
 }
 
+const createStudentCounter = studentnumbers => status.addItem('students', { max: studentnumbers.length })
+
+const startStatusBar = () => {
+  status.start({ pattern: 'Running: {uptime} | {students.bar} | students updated: {students}'})
+}
+
+const stopStatusBar = () => {
+  status.stamp()
+  status.stop()
+}
+
 const run = async (studentnumbersfile='studentnumbers.txt') => {
   const studentnumbers = await readStudentNumbersFromFile(studentnumbersfile)
-  await updateDatabase(studentnumbers)
+  const counter = createStudentCounter(studentnumbers)
+  const started = new Date()
+  startStatusBar()
+  await updateDatabase(studentnumbers, () => counter.inc())
+  stopStatusBar()
+  const ended = new Date()
+  logger.verbose(`Running script started/ended: \n${started} \n${ended}`)
   process.exit(0)
 }
 
