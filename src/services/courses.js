@@ -20,7 +20,9 @@ const byNameOrCode = (searchTerm) => Course.findAll({
     [Op.or]: [
       {
         name: {
-          [Op.iLike]: searchTerm
+          fi: {
+            [Op.iLike]: searchTerm
+          }
         }
       },
       {
@@ -85,7 +87,7 @@ const byIds = (ids) => Student.findAll({
 })
 
 const bySearchTerm = async (term) => {
-  const formatCourse = ({ name, code }) => ({ name, code })
+  const formatCourse = (course) => ({ name: course.name.fi, code: course.code })
 
   try {
     const result = await byNameOrCode(`%${term}%`)
@@ -206,7 +208,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 
     let fallStatistics = calculateStats(fallInstances, allInstancesUntilFall)
     let springStatistics = calculateStats(springInstances, allInstancesUntilYear)
-    const passedF = fallInstances.reduce((a, b) => a + b.pass, 0)	
+    const passedF = fallInstances.reduce((a, b) => a + b.pass, 0)
     const failedF = fallInstances.reduce((a, b) => a + b.fail, 0)
 
     const passedS = springInstances.reduce((a, b) => a + b.pass, 0)
@@ -262,6 +264,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 }
 
 const yearlyStatsOf = async (code, year, separate) => {
+  console.log("HERE WE GO", code, year, separate)
   const allInstances = await instancesOf(code)
   const alternatives = await getDuplicateCodes(code)
   let alternativeCodes = []
@@ -273,7 +276,7 @@ const yearlyStatsOf = async (code, year, separate) => {
 
   const yearInst = allInstances.filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-08-01', year.end + '-06-01'))
   const allInstancesUntilYear = allInstances.filter(inst => moment(new Date(inst.date)).isBefore(year.end + '-06-01'))
-  const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name
+  const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name.fi //Defaults finnish name
   const start = Number(year.start)
   const end = Number(year.end)
   const results = []
@@ -387,7 +390,7 @@ const setDuplicateCode = async (code, duplicate) => {
 
   const course = await byCode(code)
   const duplCourse = await byCode(duplicate)
-  if(!course || !duplCourse) {
+  if (!course || !duplCourse) {
     return
   }
 
@@ -436,7 +439,7 @@ const removeDuplicateCode = async (code, duplicate) => {
   let all = await getAllDuplicates(code)
   if (all[code] && Object.keys(all[code].alt).includes(duplicate)) {
     delete all[code].alt[duplicate]
-    
+
     if (Object.keys(all[code].alt).length === 0) delete all[code]
     await redisClient.setAsync('duplicates', JSON.stringify(all))
   }
