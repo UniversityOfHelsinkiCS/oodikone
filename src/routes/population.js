@@ -9,7 +9,6 @@ router.get('/v2/populationstatistics/courses', async (req, res) => {
       res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
       return
     }
-
     if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
       req.query.studyRights = [req.query.studyRights]
     }
@@ -19,6 +18,7 @@ router.get('/v2/populationstatistics/courses', async (req, res) => {
     }
 
     const result = await Population.bottlenecksOf(req.query)
+    console.log("result: ", result)
     if (result.error) {
       res.status(400).json(result)
       return

@@ -192,6 +192,7 @@ const getStudentsWithStudyrightElement  = async (code, startedAfter, startedBefo
 
 
 const bottlenecksOf = async (query) => {
+  console.log("preklee", query)
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
@@ -208,9 +209,11 @@ const bottlenecksOf = async (query) => {
       },
       units
     }
-
-    const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf)
-
+    // ---!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!---
+    console.log("conf: ", conf)
+    const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf) // <------ THIS IS BROKEN
+    console.log("students: ", student_numbers)
+    // ---!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!---
     const students = await studentsWithAllCourses(student_numbers)
       .map(restrictWith(Credit.notLaterThan(conf.enrollmentDates.startDate, query.months)))
 
