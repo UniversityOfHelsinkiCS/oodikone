@@ -29,9 +29,9 @@ const getAllStudentInformationFromApi = async studentnumber => {
   }
 }
 
-const updateStudyrights = async api => {
+const updateStudyrights = async (api, studentnumber) => {
   for (let data of api.studyrights) {
-    const [ studyright ] = await Studyright.upsert(mapper.getStudyRightFromData(data), { returning: true })
+    const [ studyright ] = await Studyright.upsert(mapper.getStudyRightFromData(data, studentnumber), { returning: true })
     for (let element of data.elements) {
       const elementDetail = mapper.elementDetailFromData(element)
       const studyrightElement = mapper.studyrightElementFromData(element, studyright.studyrightid)
@@ -86,7 +86,7 @@ const updateStudentInformation = async (studentnumbers, onUpdateStudent) => {
     } else {
       await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
       await Promise.all([
-        updateStudyrights(api),
+        updateStudyrights(api, studentnumber),
         updateStudyattainments(api)
       ])
     }
