@@ -264,7 +264,6 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 }
 
 const yearlyStatsOf = async (code, year, separate) => {
-  console.log("HERE WE GO", code, year, separate)
   const allInstances = await instancesOf(code)
   const alternatives = await getDuplicateCodes(code)
   let alternativeCodes = []
@@ -413,7 +412,7 @@ const setDuplicateCode = async (code, duplicate) => {
       }
       all[code] = {
         main: main,
-        name: course.name,
+        name: course.name.fi,
         alt: {}
       }
     }
@@ -422,10 +421,10 @@ const setDuplicateCode = async (code, duplicate) => {
       if (isMainCode(duplicate)) {
         all[code].main = duplCourse.code
       }
-      all[code].alt[duplicate] = duplCourse.name
+      all[code].alt[duplicate] = duplCourse.name.fi
       if (!all[code].main) {
         all[code].main = selectMain(code, all[code])
-        all[code].name = course.name
+        all[code].name = course.name.fi
       }
       await redisClient.setAsync('duplicates', JSON.stringify(all))
     }
