@@ -34,7 +34,7 @@ const updateStudyrights = async (api, studentnumber) => {
     const [ studyright ] = await Studyright.upsert(mapper.getStudyRightFromData(data, studentnumber), { returning: true })
     for (let element of data.elements) {
       const elementDetail = mapper.elementDetailFromData(element)
-      const studyrightElement = mapper.studyrightElementFromData(element, studyright.studyrightid)
+      const studyrightElement = mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber)
       if (!elementDetailsIds.has(elementDetail.code)) {
         await ElementDetails.upsert(elementDetail)
         elementDetailsIds.add(elementDetail.code)
