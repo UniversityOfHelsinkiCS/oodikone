@@ -206,11 +206,12 @@ const elementDetailFromData = element => {
   }
 }
 
-const studyrightElementFromData = (element, studyrightid) => {
+const studyrightElementFromData = (element, studyrightid, studentnumber) => {
   const { start_date, end_date, code } = element
   return {
     code,
     studyrightid,
+    studentnumber,
     startdate: start_date,
     enddate: end_date
   }
