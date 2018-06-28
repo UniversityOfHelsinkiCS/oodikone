@@ -73,18 +73,15 @@ router.get('/v2/populationstatistics', async (req, res) => {
 
 router.get('/studyprogrammes', async (req, res) => {
   try {
-    // if (!req.decodedToken.admin) {
-    //   const user = await User.byUsername(req.decodedToken.userId)
-    //   const units = await User.getUnits(user.id)
-    //   const arr = units.map(p => ({ id: p.id, name: p.name }))
-    //   res.json(arr)
-    // } else {
-    //   const units = await Unit.findAllEnabled()
-    //   const arr = units.map(p => ({ id: p.id, name: p.name }))
-    //   res.json(arr)
-    // }
-    const units = await Unit.getUnitsFromElementDetails()
-    res.json(units)
+    if (!req.decodedToken.admin) {
+      // const user = await User.byUsername(req.decodedToken.userId)
+      // const units = await User.getUnits(user.id)
+      // const arr = units.map(p => ({ id: p.id, name: p.name }))
+      res.json([])
+    } else {
+      const units = await Unit.getUnitsFromElementDetails()
+      res.json(units)
+    }
   } catch (err) {
     res.status(500).json(err)
   }

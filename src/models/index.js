@@ -384,6 +384,9 @@ ElementDetails.hasMany(StudyrightElement, { foreignKey: 'code', sourceKey: 'code
 StudyrightElement.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
+User.belongsToMany(ElementDetails, { through: 'user_elementdetails', as: 'elementdetails'})
+ElementDetails.belongsToMany(User, { through: 'user_elementdetails' })
+
 module.exports = {
   Student,
   Credit,
