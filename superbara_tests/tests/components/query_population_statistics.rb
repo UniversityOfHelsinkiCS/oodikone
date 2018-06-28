@@ -6,7 +6,7 @@ class PopulationQuery < Superbara::PCOM
     end.click
   end
 
-  def query(enrollment_year="2017", studyright_query="Tietojenkäsittelytieteen kandiohjelma")
+  def query(enrollment_year="2017", degree="Tietojenkäsittelytieteen kandiohjelma", programme="Tietojenkäsittelytieteen kandiohjelma")
     value = "2017"
     enrollment_input = nil
     wait 15 do
@@ -23,12 +23,18 @@ class PopulationQuery < Superbara::PCOM
     end
 
     
-    find("label", text:"Study rights").find(:xpath, "..").click
+    find("label", text:"Degree").find(:xpath, "..").click
     
-    type studyright_query
-    click_text studyright_query
+    type degree
+    find("span", text:/#{Regexp.escape(degree)}$/).click
+
+    find("label", text:"Study programme").find(:xpath, "..").click
+    
+    type programme
+    find("span", text:programme).click
+    
     click_button "See population"
-    
+
     wait 60 do
       has_text? "Credit accumulation"
     end

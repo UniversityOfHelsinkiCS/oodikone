@@ -15,6 +15,7 @@ import { removeStudentSelection, resetStudent } from '../../redux/students'
 const StudentInfoCard = (props) => {
   const { student, translate, showName } = props
   const name = showName ? `${student.name}, ` : ''
+  const email = showName ? `${student.email}` : ''
   const onRemove = () => {
     props.history.push('/students')
     props.resetStudent()
@@ -54,6 +55,9 @@ const StudentInfoCard = (props) => {
             {`${translate('common.started')}: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}
           </div>
           {renderStudyright()}
+          <div className={styles.startDate}>
+            {email}
+          </div>
         </Card.Meta>
         <Card.Description>
           {`${translate('common.credits')}: ${student.credits || 0}`}

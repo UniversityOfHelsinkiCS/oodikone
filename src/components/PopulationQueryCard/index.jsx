@@ -4,14 +4,12 @@ import { Card, Icon } from 'semantic-ui-react'
 
 import styles from './populationQueryCard.css'
 
-const PopulationQueryCard = ({ translate, population, query, removeSampleFn, unit }) => {
+const PopulationQueryCard = ({ translate, population, query, removeSampleFn, units }) => {
   const { uuid, year, semester, months } = query
   return (
     <Card className={styles.cardContainer}>
       <Card.Header className={styles.cardHeader}>
-        <div>
-          {unit.name}
-        </div>
+        <div>{units.map(u => u.name).join(', ')}</div>
         <Icon
           name="remove"
           className={styles.controlIcon}
@@ -40,6 +38,7 @@ PopulationQueryCard.propTypes = {
     uuid: string
   }).isRequired,
   removeSampleFn: func.isRequired,
+  units: arrayOf(object).isRequired,
   unit: object // eslint-disable-line
 }
 

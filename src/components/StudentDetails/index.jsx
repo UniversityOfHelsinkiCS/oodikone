@@ -54,10 +54,10 @@ class StudentDetails extends Component {
     ]
     const courseRows = student.courses.map((c) => {
       const {
-        date, grade, credits, course
+        date, grade, credits, course, isStudyModuleCredit
       } = c
       return {
-        date, course: `${course.name} (${course.code})`, grade, credits
+        date, course: `${isStudyModuleCredit ? `${course.name.fi} [Study Module]` : course.name.fi} (${course.code})`, grade, credits
       }
     })
     return (

@@ -75,12 +75,13 @@ export const byCodeDesc = (a, b) => b.code.localeCompare(a.code)
 
 export const studyRightRegex = new RegExp(/.*master|bachelor|doctor|licentiate|specialist.*/)
 
+export const studyrightTypes = { degree: '10', programme: '20', speciality: '30' } // speciality???
 /* This should be done in backend */
 export const removeInvalidCreditsFromStudent = student => ({
   ...student,
   courses: student.courses.map((course) => {
-    if (course.credits >= 25) {
-      course.credits = 0
+    if (course.credits) {
+      course.credits = course.credits // DOES NOTHING NOW, TOO AFRAID TO REMOVE
     }
     return course
   })
@@ -89,8 +90,11 @@ export const removeInvalidCreditsFromStudent = student => ({
 export const removeInvalidCreditsFromStudents = students =>
   students.map(student => removeInvalidCreditsFromStudent(student))
 
-export const getStudentTotalCredits = student => student.courses.filter(c => c.passed)
-  .reduce((a, b) => a + b.credits, 0)
+export const getStudentTotalCredits = student => student.courses
+  .filter(c => c.passed && !c.isStudyModuleCredit).reduce((a, b) => a + b.credits, 0)
+
+export const getTotalCreditsFromCourses = courses =>
+  courses.filter(c => c.passed && !c.isStudyModuleCredit).reduce((a, b) => a + b.credits, 0)
 
 export const log = async (msg, meta) => {
   const token = await getToken()
@@ -98,3 +102,4 @@ export const log = async (msg, meta) => {
   const combinedMeta = { ...decoded, ...meta }
   sendLog({ message: msg, full_message: combinedMeta })
 }
+
