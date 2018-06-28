@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, arrayOf, shape } from 'prop-types'
-import { Form, Button, Message, Radio, Dropdown } from 'semantic-ui-react'
+import { Form, Button, Message, Radio, Dropdown, Icon } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
-import { isEqual } from 'lodash'
+import _ from 'lodash'
 import moment from 'moment'
 
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
@@ -28,7 +28,8 @@ class PopulationSearchForm extends Component {
     getPopulationCourses: func.isRequired,
     clearPopulations: func.isRequired,
     queries: shape({}).isRequired,
-    studyProgrammes: arrayOf(dropdownType).isRequired,
+    studyProgrammes: arrayOf(dropdownType), //eslint-disable-line
+    degrees: arrayOf(dropdownType), //eslint-disable-line
     setLoading: func.isRequired
   }
 
@@ -51,7 +52,7 @@ class PopulationSearchForm extends Component {
 
   componentDidMount() {
     const { studyProgrammes } = this.props
-    if (studyProgrammes.length === 0) {
+    if (!studyProgrammes || studyProgrammes.length === 0) {
       this.props.getUnits()
     }
   }
@@ -66,15 +67,25 @@ class PopulationSearchForm extends Component {
     const { query } = this.state
     const compare = { ...queries }
     delete compare.uuid
-    return isEqual(compare, query)
+    return _.isEqual(compare, query)
   }
 
   clearPopulations = () => this.props.clearPopulations()
 
   fetchPopulation = () => {
     const { query } = this.state
+    let queryCodes = []
+    // ":D"
+    if (query.studyRights.degree && query.studyRights.programme) {
+      queryCodes = [query.studyRights.degree, query.studyRights.programme]
+    } else if (query.studyRights.degree && !query.studyRights.programme) {
+      queryCodes = [query.studyRights.degree]
+    } else if (!query.studyRights.degree && query.studyRights.programme) {
+      queryCodes = [query.studyRights.programme]
+    }
+    const backendQuery = { ...query, studyRights: queryCodes }
     const uuid = uuidv4()
-    const request = { ...query, uuid }
+    const request = { ...backendQuery, uuid }
     this.setState({ isLoading: true })
     this.props.setLoading()
     Promise.all([
@@ -123,13 +134,29 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  handleStudyRightChange = (e, { value }) => {
+  handleDegreeChange = (e, { value }) => {
     const { query } = this.state
-    const studyRights = value.length > 0 ? [value[0]] : []
+    const degree = value
     this.setState({
       query: {
         ...query,
-        studyRights
+        studyRights: {
+          ...query.studyRights,
+          degree
+        }
+      }
+    })
+  }
+  handleProgrammeChange = (e, { value }) => {
+    const { query } = this.state
+    const programme = value
+    this.setState({
+      query: {
+        ...query,
+        studyRights: {
+          ...query.studyRights,
+          programme
+        }
       }
     })
   }
@@ -144,6 +171,21 @@ class PopulationSearchForm extends Component {
       }
     })
   }
+
+  handleClear = (type) => {
+    const { query } = this.state
+    this.setState({
+      query: {
+        ...query,
+        studyRights: {
+          ...query.studyRights,
+          [type]: undefined
+        }
+      }
+    })
+  }
+
+
   // (Potential?) issue with using Math.ceil with months.
   getMonths = (year, end, term) => {
     const lastDayOfMonth = moment(end).endOf('month')
@@ -212,22 +254,77 @@ class PopulationSearchForm extends Component {
   }
 
   renderStudyGroupSelector = () => {
-    const { studyProgrammes, translate } = this.props
+    const { studyProgrammes, degrees, translate } = this.props
     const { studyRights } = this.state.query
+    const sortedStudyProgrammes = _.sortBy(studyProgrammes, s => s.text)
+    const sortedStudyDegrees = _.sortBy(degrees, s => s.text)
 
     return (
-      <Form.Group id="rightGroup">
-        <Form.Field width={8}>
-          <label htmlFor="rightGroup">{translate('populationStatistics.studyRights')}</label>
+      <Form.Group id="rightGroup" horizontal="true" >
+        <Form.Field
+          width={6}
+          style={{
+            position: 'relative',
+            display: 'inline-block'
+          }}
+        >
+          <Icon
+            link
+            name="close"
+            style={{
+              position: 'absolute',
+              top: 22,
+              bottom: 0,
+              margin: 'auto',
+              right: '2.5em',
+              lineHeight: 1,
+              zIndex: 1
+            }}
+            onClick={() => this.handleClear('degree')}
+          />
+          <label htmlFor="rightGroup">Degree</label>
           <Dropdown
-            placeholder={translate('populationStatistics.selectStudyRights')}
-            multiple
+            placeholder="Select degree"
             search
             selection
             noResultsMessage={translate('populationStatistics.noSelectableStudyRights')}
-            value={studyRights}
-            options={studyProgrammes}
-            onChange={this.handleStudyRightChange}
+            value={studyRights.degree}
+            options={sortedStudyDegrees}
+            onChange={this.handleDegreeChange}
+            closeOnChange
+          />
+        </Form.Field>
+        <Form.Field
+          width={6}
+          style={{
+            position: 'relative',
+            display: 'inline-block'
+          }}
+        >
+          <label htmlFor="rightGroup">Study programme</label>
+
+          <Icon
+            link
+            name="close"
+            style={{
+              position: 'absolute',
+              top: 22,
+              bottom: 0,
+              margin: 'auto',
+              right: '2.5em',
+              lineHeight: 1,
+              zIndex: 1
+            }}
+            onClick={() => this.handleClear('programme')}
+          />
+          <Dropdown
+            placeholder="Select study programme"
+            search
+            selection
+            noResultsMessage={translate('populationStatistics.noSelectableStudyRights')}
+            value={studyRights.programme}
+            options={sortedStudyProgrammes}
+            onChange={this.handleProgrammeChange}
             closeOnChange
           />
         </Form.Field>
@@ -259,7 +356,6 @@ class PopulationSearchForm extends Component {
       isQueryInvalid = true
       errorText = translate('populationStatistics.selectStudyRights')
     }
-
     return (
       <Form error={isQueryInvalid} loading={isLoading}>
         {this.renderEnrollmentDateSelector()}
@@ -277,11 +373,15 @@ class PopulationSearchForm extends Component {
 
 const mapRightsToDropdown = makeMapRightsToDropDown()
 
-const mapStateToProps = ({ populations, units, locale }) => ({
-  queries: populations.query || {},
-  translate: getTranslate(locale),
-  studyProgrammes: mapRightsToDropdown(units)
-})
+const mapStateToProps = ({ populations, units, locale }) => {
+  const studyRights = mapRightsToDropdown(units)
+  return ({
+    queries: populations.query || {},
+    translate: getTranslate(locale),
+    degrees: studyRights['10'],
+    studyProgrammes: studyRights['20']
+  })
+}
 
 const mapDispatchToProps = dispatch => ({
   getPopulationStatistics: request => dispatch(getPopulationStatistics(request)),

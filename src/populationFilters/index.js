@@ -1,4 +1,5 @@
 import uuidv4 from 'uuid/v4'
+import { getStudentTotalCredits } from '../common'
 
 export const creditsLessThan = credit =>
   ({
@@ -8,9 +9,7 @@ export const creditsLessThan = credit =>
       credit
     },
     filter: (student) => {
-      const creditsOfStudent = student.courses
-        .filter(c => c.passed)
-        .reduce((s, c) => s + c.credits, 0)
+      const creditsOfStudent = getStudentTotalCredits(student)
       return credit > creditsOfStudent
     }
   })
@@ -43,9 +42,7 @@ export const creditsAtLeast = credit =>
       credit
     },
     filter: (student) => {
-      const creditsOfStudent = student.courses
-        .filter(c => c.passed)
-        .reduce((s, c) => s + c.credits, 0)
+      const creditsOfStudent = getStudentTotalCredits(student)
       return credit <= creditsOfStudent
     }
   })
