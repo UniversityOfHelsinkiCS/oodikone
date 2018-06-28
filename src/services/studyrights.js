@@ -16,8 +16,6 @@ const byStudent = (studentNumber) => {
 
 const ofPopulations = (conf) => {
 
-  console.log('CONF', conf)
-
   const studyrightRules = conf.units.map(sr => ({ [Op.eq]: sr.name }))
 
   return Studyright.findAll({
