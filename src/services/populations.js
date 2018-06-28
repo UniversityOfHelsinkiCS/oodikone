@@ -5,9 +5,11 @@ const moment = require('moment')
 
 const { Studyright, Student, Credit, CourseInstance, Course, sequelize, StudyrightElement } = require('../models')
 const { formatStudent, formatStudentUnifyCodes } = require('../services/students')
-const StudyRights = require('../services/studyrights')
 const { getUnitFromElementDetail } = require('../services/units')
-const { StudentList } = require('../models')
+
+// const { StudentList } = require('../models')
+// const StudyRights = require('../services/studyrights')
+
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -116,17 +118,17 @@ const semesterEnd = {
   FALL: '12-31'
 }
 
-const getStudentsWithStudyright = async (studyRight, conf) => {
-  if (['9999'].includes(studyRight)) {
-    let cached = await StudentList.findOne({
-      where: { key: studyRight }
-    })
+// const getStudentsWithStudyright = async (studyRight, conf) => {
+//   if (['9999'].includes(studyRight)) {
+//     let cached = await StudentList.findOne({
+//       where: { key: studyRight }
+//     })
 
-    return cached.student_numbers 
-  }
+//     return cached.student_numbers 
+//   }
   
-  return await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
-}
+//   return await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
+// }
 
 const optimizedStatisticsOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
@@ -192,7 +194,6 @@ const getStudentsWithStudyrightElement  = async (code, startedAfter, startedBefo
 
 
 const bottlenecksOf = async (query) => {
-  console.log("preklee", query)
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
@@ -209,11 +210,12 @@ const bottlenecksOf = async (query) => {
       },
       units
     }
-    // ---!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!---
-    console.log("conf: ", conf)
-    const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf) // <------ THIS IS BROKEN
-    console.log("students: ", student_numbers)
-    // ---!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!---
+    // const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf) // <------ THIS IS BROKEN
+    // const students = await studentsWithAllCourses(student_numbers)
+    //   .map(restrictWith(Credit.notLaterThan(conf.enrollmentDates.startDate, query.months)))
+
+    const codes = units.map(unit => unit.id)
+    const student_numbers = await getStudentsWithCodes(codes, startDate, endDate)
     const students = await studentsWithAllCourses(student_numbers)
       .map(restrictWith(Credit.notLaterThan(conf.enrollmentDates.startDate, query.months)))
 
