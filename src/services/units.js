@@ -57,5 +57,5 @@ const getUnitFromElementDetail = async id => {
 }
 
 module.exports = {
-  all, byId, findAllEnabled, hasStudent, createUnit, findByName, getUnitsFromElementDetails, getUnitFromElementDetail
+  all, byId, findAllEnabled, hasStudent, createUnit, findByName, getUnitsFromElementDetails, getUnitFromElementDetail, parseUnitFromElement
 }
