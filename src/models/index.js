@@ -92,7 +92,7 @@ const Organisation = sequelize.define('organization',
       primaryKey: true,
       type: Sequelize.STRING
     },
-    name: Sequelize.STRING
+    name: Sequelize.JSONB
   },
   {
     tableName: 'organization',
@@ -109,6 +109,18 @@ const Credit = sequelize.define('credit',
     grade: { type: Sequelize.STRING },
     student_studentnumber: { type: Sequelize.STRING },
     credits: { type: Sequelize.DOUBLE },
+    isStudyModuleCredit: {
+      type: Sequelize.BOOLEAN,
+      get() {
+        let val = this.getDataValue('credits')
+        if (val >= 25) {
+          return true
+        }
+        else {
+          return false
+        }
+      }
+    },
     ordering: { type: Sequelize.STRING },
     status: { type: Sequelize.STRING },
     statuscode: { type: Sequelize.STRING },
@@ -173,11 +185,42 @@ const Studyright = sequelize.define('studyright',
   }
 )
 
+const StudyrightElement = sequelize.define('studyright_elements',
+  {
+    startdate: { type: Sequelize.DATE },
+    enddate: { type: Sequelize.DATE }
+  },
+  {
+    indexes: [
+      {
+        unique: true,
+        fields: ['startdate', 'enddate', 'studyrightid', 'code']
+      }
+    ],
+    tablename: 'studyright_elements'
+  }
+)
+
+const ElementDetails = sequelize.define('element_details',
+  {
+    code: {
+      primaryKey: true,
+      type: Sequelize.STRING
+    },
+    name: { type: Sequelize.JSONB },
+    type: { type: Sequelize.INTEGER }
+  },
+  {
+    tablename: 'element_details'
+  }
+)
+
 const CourseInstance = sequelize.define('courseinstance',
   {
     id: {
       primaryKey: true,
-      type: Sequelize.BIGINT
+      type: Sequelize.BIGINT,
+      autoIncrement: true
     },
     coursedate: { type: Sequelize.DATE },
     course_code: { type: Sequelize.STRING }
@@ -194,7 +237,7 @@ const Course = sequelize.define('course',
       primaryKey: true,
       type: Sequelize.STRING
     },
-    name: { type: Sequelize.STRING },
+    name: { type: Sequelize.JSONB },
     latest_instance_date: { type: Sequelize.DATE }
   },
   {
@@ -332,7 +375,17 @@ Unit.belongsToMany(User, { through: 'user_unit', foreignKey: 'unit_id', timestam
 Tag.belongsToMany(Unit, { through: 'unit_tag', foreignKey: 'tags_tagname', timestamps: false })
 Unit.belongsToMany(Tag, { through: 'unit_tag', foreignKey: 'unit_id', timestamps: false })
 
-Studyright.belongsTo(Unit, { foreignKey: 'highlevelname', targetKey: 'name' })
+StudyrightElement.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
+Studyright.hasMany(StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
+
+StudyrightElement.belongsTo(ElementDetails, { foreignKey: 'code', targetKey: 'code' })
+ElementDetails.hasMany(StudyrightElement, { foreignKey: 'code', sourceKey: 'code' })
+
+StudyrightElement.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+Student.hasMany(StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+
+User.belongsToMany(ElementDetails, { through: 'user_elementdetails', as: 'elementdetails'})
+ElementDetails.belongsToMany(User, { through: 'user_elementdetails' })
 
 module.exports = {
   Student,
@@ -350,5 +403,7 @@ module.exports = {
   sequelize,
   migrationPromise,
   Organisation,
-  StudentList
+  StudentList,
+  StudyrightElement,
+  ElementDetails
 }

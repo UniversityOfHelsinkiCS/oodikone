@@ -16,7 +16,7 @@ const byStudent = (studentNumber) => {
 
 const ofPopulations = (conf) => {
 
-  const studyrightRules = conf.studyRights.map(sr => ({ [Op.eq]: sr.name }))
+  const studyrightRules = conf.units.map(sr => ({ [Op.eq]: sr.name }))
 
   return Studyright.findAll({
     where: {
