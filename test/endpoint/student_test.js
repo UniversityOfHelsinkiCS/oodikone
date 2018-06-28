@@ -25,7 +25,7 @@ let courses
 let courseInstances
 let credits
 
-test.before(async () => {
+test.skip.before(async () => {
   await sequelize.createSchema(schema)
   await sequelize.sync()
   courses = await generateCourses(3)
@@ -38,11 +38,11 @@ test.before(async () => {
   await Credit.bulkCreate(credits)
 })
 
-test.after.always(async () => {
+test.skip.after.always(async () => {
   await sequelize.dropSchema(schema)
 })
 
-test('a students information can be fetched', async t => {
+test.skip('a students information can be fetched', async t => {
   const res = await api
     .get(`/api/students/${students[0].studentnumber}`)
     .set('x-access-token', token)
@@ -53,7 +53,7 @@ test('a students information can be fetched', async t => {
   t.is(res.body.courses.length, 3)
 })
 
-test('students are returned when searching', async t => {
+test.skip('students are returned when searching', async t => {
   const res = await api
     .get('/api/students')
     .query({ searchTerm: '0' })

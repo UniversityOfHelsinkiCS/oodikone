@@ -1,6 +1,5 @@
 require('dotenv').config()
 const axios = require('axios')
-const data_mapper = require('./oodi_data_mapper')
 const { OODI_ADDR } = require('../../conf-backend')
 const https = require('https')
 const logger = require('../../util/logger')
@@ -42,25 +41,17 @@ const attemptGetFor = async (url, attempts=5) => {
   }
 }
 
-const requestStudent = async studentNumber => {
-  const url = `${base_url}/students/${studentNumber}/info`
-  const response = await attemptGetFor(url)
-  return response
-  //const data = response.data.data
-  //return data && data_mapper.getStudentFromData(data)
-}
-
 const getStudent = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/info`
   const response = await attemptGetFor(url)
   const data = response.data.data
-  return data && data_mapper.getStudentFromData(data)
+  return data
 }
 
 const getStudentStudyRights = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/studyrights`
   const response = await attemptGetFor(url)
-  return response.data.data.map(data => data_mapper.getStudyRightFromData(data, studentNumber))
+  return response.data.data
 }
 
 const getFaculties = async () => {
@@ -78,7 +69,7 @@ const getStudyAttainments = async studentNumber => {
 const getTeacherInfo = async id => {
   const url = `${base_url}/teachers/${id}/info`
   const response = await attemptGetFor(url)
-  return data_mapper.getTeacherFromData(response.data.data)
+  return response.data.data
 }
 
 module.exports = {
@@ -86,6 +77,5 @@ module.exports = {
   getStudent,
   getFaculties,
   getStudyAttainments,
-  getTeacherInfo,
-  requestStudent
+  getTeacherInfo
 }

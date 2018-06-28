@@ -8,15 +8,21 @@ const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
 const _ = require('lodash')
 
-const redisClient = redis.createClient(6379, conf.redis)
-require('bluebird').promisifyAll(redis.RedisClient.prototype)
+let redisClient
+
+if (process.env.NODE_ENV !== 'test') {
+  redisClient = redis.createClient(6379, conf.redis)
+  require('bluebird').promisifyAll(redis.RedisClient.prototype)
+}
 
 const byNameOrCode = (searchTerm) => Course.findAll({
   where: {
     [Op.or]: [
       {
         name: {
-          [Op.iLike]: searchTerm
+          fi: {
+            [Op.iLike]: searchTerm
+          }
         }
       },
       {
@@ -81,7 +87,7 @@ const byIds = (ids) => Student.findAll({
 })
 
 const bySearchTerm = async (term) => {
-  const formatCourse = ({ name, code }) => ({ name, code })
+  const formatCourse = (course) => ({ name: course.name.fi, code: course.code })
 
   try {
     const result = await byNameOrCode(`%${term}%`)
@@ -202,7 +208,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 
     let fallStatistics = calculateStats(fallInstances, allInstancesUntilFall)
     let springStatistics = calculateStats(springInstances, allInstancesUntilYear)
-    const passedF = fallInstances.reduce((a, b) => a + b.pass, 0)	
+    const passedF = fallInstances.reduce((a, b) => a + b.pass, 0)
     const failedF = fallInstances.reduce((a, b) => a + b.fail, 0)
 
     const passedS = springInstances.reduce((a, b) => a + b.pass, 0)
@@ -269,7 +275,7 @@ const yearlyStatsOf = async (code, year, separate) => {
 
   const yearInst = allInstances.filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-08-01', year.end + '-06-01'))
   const allInstancesUntilYear = allInstances.filter(inst => moment(new Date(inst.date)).isBefore(year.end + '-06-01'))
-  const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name
+  const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name.fi //Defaults finnish name
   const start = Number(year.start)
   const end = Number(year.end)
   const results = []
@@ -383,7 +389,7 @@ const setDuplicateCode = async (code, duplicate) => {
 
   const course = await byCode(code)
   const duplCourse = await byCode(duplicate)
-  if(!course || !duplCourse) {
+  if (!course || !duplCourse) {
     return
   }
 
@@ -406,7 +412,7 @@ const setDuplicateCode = async (code, duplicate) => {
       }
       all[code] = {
         main: main,
-        name: course.name,
+        name: course.name.fi,
         alt: {}
       }
     }
@@ -415,10 +421,10 @@ const setDuplicateCode = async (code, duplicate) => {
       if (isMainCode(duplicate)) {
         all[code].main = duplCourse.code
       }
-      all[code].alt[duplicate] = duplCourse.name
+      all[code].alt[duplicate] = duplCourse.name.fi
       if (!all[code].main) {
         all[code].main = selectMain(code, all[code])
-        all[code].name = course.name
+        all[code].name = course.name.fi
       }
       await redisClient.setAsync('duplicates', JSON.stringify(all))
     }
@@ -432,7 +438,7 @@ const removeDuplicateCode = async (code, duplicate) => {
   let all = await getAllDuplicates(code)
   if (all[code] && Object.keys(all[code].alt).includes(duplicate)) {
     delete all[code].alt[duplicate]
-    
+
     if (Object.keys(all[code].alt).length === 0) delete all[code]
     await redisClient.setAsync('duplicates', JSON.stringify(all))
   }

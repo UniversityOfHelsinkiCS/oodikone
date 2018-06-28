@@ -3,11 +3,12 @@ const Op = Sequelize.Op
 const _ = require('lodash')
 const moment = require('moment')
 
-const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = require('../models')
+const { Studyright, Student, Credit, CourseInstance, Course, sequelize, StudyrightElement } = require('../models')
 const { formatStudent, formatStudentUnifyCodes } = require('../services/students')
-const StudyRights = require('../services/studyrights')
-const { byId } = require('../services/units')
-const { StudentList } = require('../models')
+const { getUnitFromElementDetail } = require('../services/units')
+
+// const { StudentList } = require('../models')
+// const StudyRights = require('../services/studyrights')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -89,7 +90,8 @@ const restrictWith = (withinTimerange) => (student) => {
     creditcount: student.creditcount,
     credits: creditsWithinTimelimit,
     sex: student.sex,
-    matriculationexamination: !!Number(student.matriculationexamination)
+    matriculationexamination: !!Number(student.matriculationexamination),
+    email: student.email
   }
 }
 
@@ -115,17 +117,17 @@ const semesterEnd = {
   FALL: '12-31'
 }
 
-const getStudentsWithStudyright = async (studyRight, conf) => {
-  if (['9999'].includes(studyRight)) {
-    let cached = await StudentList.findOne({
-      where: { key: studyRight }
-    })
+// const getStudentsWithStudyright = async (studyRight, conf) => {
+//   if (['9999'].includes(studyRight)) {
+//     let cached = await StudentList.findOne({
+//       where: { key: studyRight }
+//     })
 
-    return cached.student_numbers 
-  }
+//     return cached.student_numbers 
+//   }
   
-  return await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
-}
+//   return await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
+// }
 
 const optimizedStatisticsOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
@@ -142,17 +144,19 @@ const optimizedStatisticsOf = async (query) => {
   }
 
   try {
-    const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
+    const units = await Promise.all(query.studyRights.map(getUnitFromElementDetail))
 
     const conf = {
       enrollmentDates: {
         startDate, 
         endDate
       },
-      studyRights
+      units
     }
 
-    const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf)
+    // const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf)
+    const codes = units.map(unit => unit.id)
+    const student_numbers = await getStudentsWithCodes(codes, startDate, endDate)
 
     const students = await studentsWithCoursesAfterStudyrightStart(student_numbers, conf)
       .map(restrictWith(Credit.inTimeRange(conf.enrollmentDates.startDate, query.months)))
@@ -167,6 +171,27 @@ const optimizedStatisticsOf = async (query) => {
   }
 }
 
+const getStudentsWithCodes = async (codes, startDate, endDate) => {
+  const studentnumberlists = await Promise.all(codes.map(code => getStudentsWithStudyrightElement(code, startDate, endDate)))
+  return _.intersection(...studentnumberlists)
+}
+
+const getStudentsWithStudyrightElement  = async (code, startedAfter, startedBefore) => {
+  const studyrightelements = await StudyrightElement.findAll({
+    distinct: 'studentnumber',
+    where: {
+      code: {
+        [Op.eq]: code
+      },
+      startdate: {
+        [Op.between]: [startedAfter, startedBefore]
+      }
+    }
+  })
+  return studyrightelements.map(element => element.studentnumber)
+}
+
+
 const bottlenecksOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
@@ -176,17 +201,20 @@ const bottlenecksOf = async (query) => {
   const endDate = `${query.year}-${semesterEnd[query.semester]}`
 
   try {
-    const studyRights = await Promise.all(query.studyRights.map(async r => byId(r)))
+    const units = await Promise.all(query.studyRights.map(getUnitFromElementDetail))
     const conf = {
       enrollmentDates: {
         startDate,
         endDate
       },
-      studyRights
+      units
     }
+    // const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf) // <------ THIS IS BROKEN
+    // const students = await studentsWithAllCourses(student_numbers)
+    //   .map(restrictWith(Credit.notLaterThan(conf.enrollmentDates.startDate, query.months)))
 
-    const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf)
-
+    const codes = units.map(unit => unit.id)
+    const student_numbers = await getStudentsWithCodes(codes, startDate, endDate)
     const students = await studentsWithAllCourses(student_numbers)
       .map(restrictWith(Credit.notLaterThan(conf.enrollmentDates.startDate, query.months)))
 
@@ -208,12 +236,12 @@ const bottlenecksOf = async (query) => {
 
     const courses = _.flatten(await Promise.all(students.map(toCourses)))
 
-    const toNameMap = (object, { course }) => {
-      if (!object[course.code] || (object[course.code].startsWith('Avoin yo') && !course.name.startsWith('Avoin yo')) ) {
-        object[course.code] = course.name
-      } 
-
-      return object
+    const toNameMap = (names, { course }) => {
+      const { code, name } = course
+      if (!names[code] || (names[code].fi.startsWith('Avoin yo') && !name.fi.startsWith('Avoin yo')) ) {
+        names[code] = name
+      }
+      return names
     }
 
     const courseNames = courses.reduce(toNameMap, {})
