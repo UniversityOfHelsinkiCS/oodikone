@@ -29,7 +29,6 @@ router.get('/v2/populationstatistics/courses', async (req, res) => {
   }
 })
 
-
 router.get('/v2/populationstatistics', async (req, res) => {
   try {
     if (!req.query.year || !req.query.semester || !req.query.studyRights) {
@@ -42,13 +41,10 @@ router.get('/v2/populationstatistics', async (req, res) => {
     }
 
     if (!req.decodedToken.admin) {
-      const accesses = await Promise.all(req.query.studyRights.map(async right => {
-        const user = await User.byUsername(req.decodedToken.userId)
-        const units = await User.getUnits(user.id)
-        return units.some(unit => unit.id === right)
-      }))
-
-      if (accesses.some(access => !access)) {
+      const user = await User.byUsername(req.decodedToken.userId)
+      const elementdetails = await user.getElementdetails()
+      const elements = new Set(elementdetails.map(element => element.code))
+      if (req.query.studyRights.some(code => !elements.has(code))) {
         res.status(403).json([])
         return
       }
@@ -74,10 +70,9 @@ router.get('/v2/populationstatistics', async (req, res) => {
 router.get('/studyprogrammes', async (req, res) => {
   try {
     if (!req.decodedToken.admin) {
-      // const user = await User.byUsername(req.decodedToken.userId)
-      // const units = await User.getUnits(user.id)
-      // const arr = units.map(p => ({ id: p.id, name: p.name }))
-      res.json([])
+      const user = await User.byUsername(req.decodedToken.userId)
+      const elementdetails = await user.getElementdetails()
+      res.json(elementdetails.map(element => Unit.parseUnitFromElement(element)))
     } else {
       const units = await Unit.getUnitsFromElementDetails()
       res.json(units)
