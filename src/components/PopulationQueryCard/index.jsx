@@ -1,6 +1,6 @@
 import React from 'react'
 import { func, arrayOf, object, shape, string } from 'prop-types'
-import { Card, Icon, Item } from 'semantic-ui-react'
+import { Card, Icon } from 'semantic-ui-react'
 
 import styles from './populationQueryCard.css'
 
