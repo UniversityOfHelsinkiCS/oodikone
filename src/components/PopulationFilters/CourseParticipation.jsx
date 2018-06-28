@@ -55,7 +55,7 @@ class CourseParticipation extends Component {
               <Segment
                 style={{ width: '30%', height: 40 }}
               >
-                <em style={{ float: 'left', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', width: '80%' }}>{course.course.name}</em>
+                <em style={{ float: 'left', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', width: '80%' }}>{course.course.name.en}</em>
                 <span style={{ float: 'right' }}>
                   <Icon name="remove" onClick={this.clearFilter} />
                 </span>
