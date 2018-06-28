@@ -10,7 +10,6 @@ const { getUnitFromElementDetail } = require('../services/units')
 // const { StudentList } = require('../models')
 // const StudyRights = require('../services/studyrights')
 
-
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
   return sequelize.query(query, { type: sequelize.QueryTypes.SELECT }
@@ -237,12 +236,12 @@ const bottlenecksOf = async (query) => {
 
     const courses = _.flatten(await Promise.all(students.map(toCourses)))
 
-    const toNameMap = (object, { course }) => {
-      if (!object[course.code] || (object[course.code].startsWith('Avoin yo') && !course.name.startsWith('Avoin yo')) ) {
-        object[course.code] = course.name
-      } 
-
-      return object
+    const toNameMap = (names, { course }) => {
+      const { code, name } = course
+      if (!names[code] || (names[code].fi.startsWith('Avoin yo') && !name.fi.startsWith('Avoin yo')) ) {
+        names[code] = name
+      }
+      return names
     }
 
     const courseNames = courses.reduce(toNameMap, {})
