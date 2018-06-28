@@ -16,7 +16,8 @@ wait do
   has_text? "Enrollment year"
   has_text? "Semester"
   has_text? "End of search"
-  has_text? "Study rights"
+  has_text? "Degree"
+  has_text? "Study programme"
 end
 
 studentstats_button = find("a", text: "Student statistics")

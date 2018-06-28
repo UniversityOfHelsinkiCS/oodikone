@@ -156,7 +156,7 @@ class PopulationCourseStats extends Component {
             {courses.sort(this.criteria()).filter(this.limit()).map(course => (
               <Table.Row key={course.course.code} active={this.active(course.course)}>
                 <Table.Cell onClick={this.limitPopulationToCourse(course)}>
-                  {course.course.name}
+                  {course.course.name.fi}
                 </Table.Cell>
                 <Table.Cell>{course.course.code}</Table.Cell>
                 <Table.Cell>

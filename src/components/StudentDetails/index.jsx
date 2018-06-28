@@ -57,7 +57,7 @@ class StudentDetails extends Component {
         date, grade, credits, course, isStudyModuleCredit
       } = c
       return {
-        date, course: `${isStudyModuleCredit ? `${course.name} [Study Module]` : course.name} (${course.code})`, grade, credits
+        date, course: `${isStudyModuleCredit ? `${course.name.fi} [Study Module]` : course.name.fi} (${course.code})`, grade, credits
       }
     })
     return (

@@ -75,6 +75,7 @@ export const byCodeDesc = (a, b) => b.code.localeCompare(a.code)
 
 export const studyRightRegex = new RegExp(/.*master|bachelor|doctor|licentiate|specialist.*/)
 
+export const studyrightTypes = { degree: '10', programme: '20', speciality: '30' } // speciality???
 /* This should be done in backend */
 export const removeInvalidCreditsFromStudent = student => ({
   ...student,
@@ -101,3 +102,4 @@ export const log = async (msg, meta) => {
   const combinedMeta = { ...decoded, ...meta }
   sendLog({ message: msg, full_message: combinedMeta })
 }
+

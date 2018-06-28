@@ -6,7 +6,7 @@ require_relative "./components/navigate_population_statistics"
 
 navigation = NavigationPanel.new
 population_query = PopulationQuery.new
-population_query.query("2016", "Tietojenkäsittelytieteen kandiohjelma")
+population_query.query("2017", "Luonnontieteiden kandidaatti", "Tietojenkäsittelytieteen kandiohjelma")
 
 
 tablebody = find("th", text: /Credits gained during first [0-9]+ months/).find(:xpath, '../../..')

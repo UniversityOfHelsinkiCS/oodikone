@@ -33,7 +33,8 @@ class PopulationSearchHistory extends Component {
       population={populations.data}
       query={populations.query}
       queryId={0}
-      unit={units.data.find(u => u.id === populations.query.studyRights[0])}
+      unit={units.data.find(u => u.id === populations.query.studyRights[0])} // Possibly deprecated
+      units={units.data.filter(u => populations.query.studyRights.some(sr => sr === u.id))}
       removeSampleFn={this.removePopulation}
     />) : null
   }
