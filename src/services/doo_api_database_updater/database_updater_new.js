@@ -2,11 +2,8 @@ const Oodi = require('./oodi_interface_new')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation } = require('../../../src/models/index')
-const TeacherService = require('../teachers')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher } = require('../../../src/models/index')
 const _ = require('lodash')
-
-const DEFAULT_TEACHER_ROLE = 'Teacher'
 
 let attainmentIds = new Set()
 let courseIds = new Set()
@@ -49,9 +46,7 @@ const getTeachers = teachers => Promise.all(teachers.map(t => Oodi.getTeacherInf
 const createTeachers = async (attainment, courseinstance) => {
   const teachers = await getTeachers(attainment.teachers)
   await Promise.all(teachers.map(teacher => Teacher.upsert(mapper.getTeacherFromData(teacher))))
-  for (let teacher of teachers) {
-    await TeacherService.createCourseTeacher(DEFAULT_TEACHER_ROLE, teacher, courseinstance)
-  }
+  await Promise.all(teachers.map(teacher => CourseTeacher.upsert(mapper.courseTeacherFromData(teacher, courseinstance.id))))
 }
 
 const attainmentAlreadyInDb = attainment => attainmentIds.has(String(attainment.studyattainment_id))
@@ -78,11 +73,11 @@ const updateStudyattainments = async (api, studentnumber) => {
   }
 }
 
-const updateStudents = async (studentnumbers, onUpdateStudent, synchronously = true) => {
+const updateStudents = async (studentnumbers, onUpdateStudent, synchronously = false) => {
   if (synchronously) {
-    updateStudentInformation(studentnumbers, onUpdateStudent)
+    await updateStudentInformation(studentnumbers, onUpdateStudent)
   } else {
-    updateStudentInformationAsync(studentnumbers, onUpdateStudent)
+    await updateStudentInformationAsync(studentnumbers, onUpdateStudent)
   }
 }
 
@@ -93,6 +88,20 @@ const updateStudentInformation = async (studentnumbers, onUpdateStudent) => {
     if (runOnUpdate) {
       onUpdateStudent()
     }
+  }
+}
+
+const updateStudentInformationAsync = async (studentnumbers, onUpdateStudent, chunksize = 100) => {
+  const runOnUpdate = _.isFunction(onUpdateStudent)
+  const remaining = studentnumbers.slice(0)
+  while (remaining.length > 0) {
+    const nextnumbers = remaining.splice(0, chunksize)
+    await Promise.all(nextnumbers.map(async studentnumber => {
+      await updateStudent(studentnumber)
+      if(runOnUpdate) {
+        onUpdateStudent()
+      }
+    }))
   }
 }
 
@@ -109,17 +118,6 @@ const updateStudent = async studentnumber => {
   }
 } 
 
-const updateStudentInformationAsync = async (studentnumbers, onUpdateStudent, chunksize = 1000) => {
-  const runOnUpdate = _.isFunction(onUpdateStudent)
-  const remaining = studentnumbers.slice(0)
-  while (remaining.length > 0) {
-    const nextnumbers = remaining.splice(0, chunksize)
-    await Promise.all(nextnumbers.map(async studentnumber => {
-      await updateStudent(studentnumber)
-      runOnUpdate && onUpdateStudent()
-    }))
-  }
-}
 
 const getFaculties = () => {
   return Promise.all([OrganisationService.all(), Oodi.getFaculties()])
