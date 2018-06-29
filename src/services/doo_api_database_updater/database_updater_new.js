@@ -78,22 +78,43 @@ const updateStudyattainments = async (api, studentnumber) => {
   }
 }
 
+const updateStudents = async (studentnumbers, onUpdateStudent, synchronously = true) => {
+  if (synchronously) {
+    updateStudentInformation(studentnumbers, onUpdateStudent)
+  } else {
+    updateStudentInformationAsync(studentnumbers, onUpdateStudent)
+  }
+}
+
 const updateStudentInformation = async (studentnumbers, onUpdateStudent) => {
+  const runOnUpdate = _.isFunction(onUpdateStudent)
   for (let studentnumber of studentnumbers) {
-    const api = await getAllStudentInformationFromApi(studentnumber)
-    if (api.student === null || api.student === undefined) {
-      logger.verbose(`API returned ${api.student} for studentnumber ${studentnumber}`)
-    } else {
-      await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
-      await Promise.all([
-        updateStudyrights(api, studentnumber),
-        updateStudyattainments(api, studentnumber)
-      ])
-    }
-    if (_.isFunction(onUpdateStudent)) {
+    await updateStudent(studentnumber)
+    if (runOnUpdate) {
       onUpdateStudent()
     }
   }
+}
+
+const updateStudent = async studentnumber => {
+  const api = await getAllStudentInformationFromApi(studentnumber)
+  if (api.student === null || api.student === undefined) {
+    logger.verbose(`API returned ${api.student} for studentnumber ${studentnumber}`)
+  } else {
+    await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
+    await Promise.all([
+      updateStudyrights(api, studentnumber),
+      updateStudyattainments(api, studentnumber)
+    ])
+  }
+} 
+
+const updateStudentInformationAsync = async (studentnumbers, onUpdateStudent) => {
+  const runOnUpdate = _.isFunction(onUpdateStudent)
+  await Promise.all(studentnumbers.map(async studentnumber => {
+    await updateStudent(studentnumber)
+    runOnUpdate && onUpdateStudent()
+  }))
 }
 
 const getFaculties = () => {
@@ -131,7 +152,7 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   courseIds = await existingCourseIds()
   elementDetailsIds = await existingElementIds()
   await updateFaculties()
-  await updateStudentInformation(studentnumbers, onUpdateStudent)
+  await updateStudents(studentnumbers, onUpdateStudent)
 }
 
 module.exports = { updateDatabase, updateFaculties }
