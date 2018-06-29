@@ -73,12 +73,12 @@ const updateStudyattainments = async (api, studentnumber) => {
   }
 }
 
-const updateStudents = async (studentnumbers, onUpdateStudent, chunksize = 1) => {
+const updateStudentsInChunks = async (studentnumbers, onUpdateStudent, chunksize = 1) => {
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
   while (remaining.length > 0) {
-    const nextnumbers = remaining.splice(0, chunksize)
-    await Promise.all(nextnumbers.map(async studentnumber => {
+    const nextchunk = remaining.splice(0, chunksize)
+    await Promise.all(nextchunk.map(async studentnumber => {
       await updateStudent(studentnumber)
       if(runOnUpdate) {
         onUpdateStudent()
@@ -136,7 +136,7 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   courseIds = await existingCourseIds()
   elementDetailsIds = await existingElementIds()
   await updateFaculties()
-  await updateStudents(studentnumbers, onUpdateStudent, 100)
+  await updateStudentsInChunks(studentnumbers, onUpdateStudent, 100)
 }
 
 module.exports = { updateDatabase, updateFaculties }
