@@ -1,6 +1,8 @@
 const moment = require('moment')
 const _ = require('lodash')
 
+const DEFAULT_TEACHER_ROLE = 'Teacher'
+
 const getStudyRightIdStrings = (data) =>
   data['data'].map(elements => elements[0])
 
@@ -217,6 +219,14 @@ const studyrightElementFromData = (element, studyrightid, studentnumber) => {
   }
 }
 
+const courseTeacherFromData = (teacher, courseinstanceid) => {
+  return {
+    teacherrole: DEFAULT_TEACHER_ROLE,
+    courseinstance_id: courseinstanceid,
+    teacher_id: teacher.teacher_id,
+  }
+}
+
 module.exports = {
   getStudentFromData,
   getStudyRightIdStrings,
@@ -229,5 +239,6 @@ module.exports = {
   attainmentDataToCourse,
   attainmentDataToCourseInstance,
   attainmentDataToCredit,
-  getOrganisationFromData
+  getOrganisationFromData,
+  courseTeacherFromData
 }

@@ -2,11 +2,8 @@ const Oodi = require('./oodi_interface_new')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation } = require('../../../src/models/index')
-const TeacherService = require('../teachers')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher } = require('../../../src/models/index')
 const _ = require('lodash')
-
-const DEFAULT_TEACHER_ROLE = 'Teacher'
 
 let attainmentIds = new Set()
 let courseIds = new Set()
@@ -25,7 +22,8 @@ const getAllStudentInformationFromApi = async studentnumber => {
   return {
     student,
     studyrights,
-    studyattainments
+    studyattainments,
+    studentnumber
   }
 }
 
@@ -49,9 +47,7 @@ const getTeachers = teachers => Promise.all(teachers.map(t => Oodi.getTeacherInf
 const createTeachers = async (attainment, courseinstance) => {
   const teachers = await getTeachers(attainment.teachers)
   await Promise.all(teachers.map(teacher => Teacher.upsert(mapper.getTeacherFromData(teacher))))
-  for (let teacher of teachers) {
-    await TeacherService.createCourseTeacher(DEFAULT_TEACHER_ROLE, teacher, courseinstance)
-  }
+  await Promise.all(teachers.map(teacher => CourseTeacher.upsert(mapper.courseTeacherFromData(teacher, courseinstance.id))))
 }
 
 const attainmentAlreadyInDb = attainment => attainmentIds.has(String(attainment.studyattainment_id))
@@ -78,22 +74,35 @@ const updateStudyattainments = async (api, studentnumber) => {
   }
 }
 
-const updateStudentInformation = async (studentnumbers, onUpdateStudent) => {
-  for (let studentnumber of studentnumbers) {
-    const api = await getAllStudentInformationFromApi(studentnumber)
-    if (api.student === null || api.student === undefined) {
-      logger.verbose(`API returned ${api.student} for studentnumber ${studentnumber}`)
-    } else {
-      await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
-      await Promise.all([
-        updateStudyrights(api, studentnumber),
-        updateStudyattainments(api, studentnumber)
-      ])
-    }
-    if (_.isFunction(onUpdateStudent)) {
-      onUpdateStudent()
-    }
+const updateStudent = async api => {
+  const studentnumber = api.studentnumber
+  if (api.student === null || api.student === undefined) {
+    logger.verbose(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
+  } else {
+    await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
+    await Promise.all([
+      updateStudyrights(api, studentnumber),
+      updateStudyattainments(api, studentnumber)
+    ])
   }
+} 
+
+const updateStudentsInChunks = async (studentnumbers, onUpdateStudent, chunksize = 1) => {
+  const runOnUpdate = _.isFunction(onUpdateStudent)
+  const remaining = studentnumbers.slice(0)
+  const promises = []
+  while (remaining.length > 0) {
+    const nextchunk = remaining.splice(0, chunksize)
+    const data = await Promise.all(nextchunk.map(student => getAllStudentInformationFromApi(student)))
+    const promise = Promise.all(data.map(async data => {
+      await updateStudent(data)
+      if(runOnUpdate) {
+        onUpdateStudent()
+      }
+    }))
+    promises.push(promise)
+  }
+  await Promise.all(promises)
 }
 
 const getFaculties = () => {
@@ -131,7 +140,7 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   courseIds = await existingCourseIds()
   elementDetailsIds = await existingElementIds()
   await updateFaculties()
-  await updateStudentInformation(studentnumbers, onUpdateStudent)
+  await updateStudentsInChunks(studentnumbers, onUpdateStudent, 100)
 }
 
 module.exports = { updateDatabase, updateFaculties }
