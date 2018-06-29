@@ -263,15 +263,17 @@ const Teacher = sequelize.define('teacher',
 
 const CourseTeacher = sequelize.define('courseteacher',
   {
-    id: {
-      primaryKey: true,
-      type: Sequelize.BIGINT
-    },
     teacherrole: { type: Sequelize.STRING },
     courseinstance_id: { type: Sequelize.BIGINT },
     teacher_id: { type: Sequelize.STRING },
   },
   {
+    indexes: [
+      {
+        unique: true,
+        fields: ['teacherrole', 'courseinstance_id', 'teacher_id']
+      }
+    ],
     tableName: 'courseteacher',
     timestamps: false,
   }
