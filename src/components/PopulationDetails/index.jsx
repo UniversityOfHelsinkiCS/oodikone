@@ -16,6 +16,7 @@ import CourseQuarters from '../CourseQuarters'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourses from '../PopulationCourses'
 import PopulationCreditGainTable from '../PopulationCreditGainTable'
+import { getFilterFunction } from '../../populationFilters'
 
 class PopulationDetails extends Component {
   static propTypes = {
@@ -152,12 +153,24 @@ class PopulationDetails extends Component {
 
 const populationsToData = makePopulationsToData()
 
+const regenerateFilterFunctions = filters =>
+  filters.map(f => getFilterFunction(f.type, f.params))
+
 const mapStateToProps = (state) => {
   const samples = populationsToData(state)
   const { complemented } = state.populationFilters
   let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
-
-  // TODO refactor to more functional approach where the whole sample is not tested for each filter
+  let allFilters = []
+  if (state.populationFilters.filtersFromBackend) {
+    const newFilters = state.populationFilters.filtersFromBackend.map((f) => { //eslint-disable-line
+      return ({
+        ...f,
+        filters: regenerateFilterFunctions(f.filters)
+      })
+    })
+    allFilters = allFilters.concat(newFilters)
+  }
+  // TODO refactor to more functional approach where the whole sample is not tested for each filtera
   if (samples.length > 0 && state.populationFilters.filters.length > 0) {
     const studentsForFilter = (f) => {
       if (f.type === 'CourseParticipation') {
@@ -166,7 +179,7 @@ const mapStateToProps = (state) => {
       return samples.filter(f.filter).map(s => s.studentNumber)
     }
 
-    const matchingStudents = state.populationFilters.filters.map(studentsForFilter)
+    const matchingStudents = allFilters.map(studentsForFilter)
     selectedStudents = _.intersection(...matchingStudents)
 
     if (complemented) {
