@@ -109,12 +109,16 @@ const updateStudent = async studentnumber => {
   }
 } 
 
-const updateStudentInformationAsync = async (studentnumbers, onUpdateStudent) => {
+const updateStudentInformationAsync = async (studentnumbers, onUpdateStudent, chunksize = 1000) => {
   const runOnUpdate = _.isFunction(onUpdateStudent)
-  await Promise.all(studentnumbers.map(async studentnumber => {
-    await updateStudent(studentnumber)
-    runOnUpdate && onUpdateStudent()
-  }))
+  const remaining = studentnumbers.slice(0)
+  while (remaining.length > 0) {
+    const nextnumbers = remaining.splice(0, chunksize)
+    await Promise.all(nextnumbers.map(async studentnumber => {
+      await updateStudent(studentnumber)
+      runOnUpdate && onUpdateStudent()
+    }))
+  }
 }
 
 const getFaculties = () => {
