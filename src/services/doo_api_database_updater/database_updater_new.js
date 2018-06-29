@@ -74,7 +74,7 @@ const updateStudyattainments = async (api, studentnumber) => {
   }
 }
 
-const updateStudentPerformant = async api => {
+const updateStudent = async api => {
   const studentnumber = api.studentnumber
   if (api.student === null || api.student === undefined) {
     logger.verbose(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
@@ -95,7 +95,7 @@ const updateStudentsInChunks = async (studentnumbers, onUpdateStudent, chunksize
     const nextchunk = remaining.splice(0, chunksize)
     const data = await Promise.all(nextchunk.map(student => getAllStudentInformationFromApi(student)))
     const promise = Promise.all(data.map(async data => {
-      await updateStudentPerformant(data)
+      await updateStudent(data)
       if(runOnUpdate) {
         onUpdateStudent()
       }
