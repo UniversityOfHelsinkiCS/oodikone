@@ -71,13 +71,19 @@ export const courseParticipation = (course, field) => ({
 })
 
 // write a function to search for a filter with its type.
-export const presetFilter = (preset) => {
-  console.log(preset.filters)
-  return ({
-    id: uuidv4(),
-    type: 'Preset',
-    name: preset.name,
-    filter: student => preset.filters.map(f => f.filter(student))
-  })
+export const presetFilter = preset => ({
+  id: uuidv4(),
+  type: 'Preset',
+  name: preset.name,
+  filter: student => preset.filters.map(f => f.filter(student)).every(b => b === true)
+})
+const typeList = {
+  CreditsLessThan: creditsLessThan,
+  CreditsAtLeast: creditsAtLeast,
+  HasMatriculation: matriculationFilter,
+  SexFilter: sexFilter,
+  CourseParticipation: courseParticipation,
+  StartingThisSemester: startingThisSemester
 }
+export const getFilterFunction = (type, params) => typeList[type](Object.values(params))
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Header, Button, Form, Radio } from 'semantic-ui-react'
-import { object, func, arrayOf, bool } from 'prop-types'
+import { object, func, arrayOf, bool, string } from 'prop-types'
 import _ from 'lodash'
 import uuidv4 from 'uuid/v4'
 
@@ -33,11 +33,13 @@ class PopulationFilters extends Component {
     clearPopulationFilters: func.isRequired,
     setComplementFilter: func.isRequired,
     savePopulationFilters: func.isRequired,
-    setPopulationFilter: func.isRequired
+    setPopulationFilter: func.isRequired,
+    studyRights: arrayOf(string).isRequired
   }
 
   state = {
-    visible: false
+    visible: false,
+    presetName: ''
   }
 
   renderAddFilters() {
@@ -45,7 +47,6 @@ class PopulationFilters extends Component {
     const setFilters = this.props.filters.map(f => f.type)
     const unsetFilters = _.difference(allFilters, setFilters)
 
-    console.log(this.props.filters)
 
     if (unsetFilters.length === 0) {
       return null
@@ -87,11 +88,12 @@ class PopulationFilters extends Component {
     const handleSavePopulationFilters = () => {
       const preset = {
         id: uuidv4(),
-        name: 'beer',
-        population: 'asd',
+        name: this.state.presetName,
+        population: this.props.studyRights,
         filters: this.props.filters
       }
-      this.props.savePopulationFilters(preset) // does nothing atm
+      this.setState({ presetName: '' })
+      this.props.savePopulationFilters(preset)
       this.props.clearPopulationFilters()
       this.props.setPopulationFilter(presetFilter(preset))
     }
@@ -120,7 +122,7 @@ class PopulationFilters extends Component {
           React.createElement(componentFor[filter.type], { filter, key: filter.id }))}
         <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
         <div className="ui action input">
-          <input type="text" placeholder="Name..." />
+          <input type="text" placeholder="Name..." onChange={e => this.setState({ presetName: e.target.value })} />
           <button className="ui button" onClick={handleSavePopulationFilters}>save filters as preset</button>
         </div>
 
@@ -138,11 +140,12 @@ class PopulationFilters extends Component {
   }
 }
 
-const mapStateToProps = ({ populationFilters, locale, graphSpinner }) => ({
+const mapStateToProps = ({ populationFilters, locale, graphSpinner, populations }) => ({
   filters: populationFilters.filters,
   complemented: populationFilters.complemented,
   translate: getTranslate(locale),
-  loading: graphSpinner
+  loading: graphSpinner,
+  studyRights: populations.query.studyRights
 })
 
 export default connect(mapStateToProps, {
