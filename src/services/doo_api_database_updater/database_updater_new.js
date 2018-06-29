@@ -22,7 +22,8 @@ const getAllStudentInformationFromApi = async studentnumber => {
   return {
     student,
     studyrights,
-    studyattainments
+    studyattainments,
+    studentnumber
   }
 }
 
@@ -73,24 +74,10 @@ const updateStudyattainments = async (api, studentnumber) => {
   }
 }
 
-const updateStudentsInChunks = async (studentnumbers, onUpdateStudent, chunksize = 1) => {
-  const runOnUpdate = _.isFunction(onUpdateStudent)
-  const remaining = studentnumbers.slice(0)
-  while (remaining.length > 0) {
-    const nextchunk = remaining.splice(0, chunksize)
-    await Promise.all(nextchunk.map(async studentnumber => {
-      await updateStudent(studentnumber)
-      if(runOnUpdate) {
-        onUpdateStudent()
-      }
-    }))
-  }
-}
-
-const updateStudent = async studentnumber => {
-  const api = await getAllStudentInformationFromApi(studentnumber)
+const updateStudentPerformant = async api => {
+  const studentnumber = api.studentnumber
   if (api.student === null || api.student === undefined) {
-    logger.verbose(`API returned ${api.student} for studentnumber ${studentnumber}`)
+    logger.verbose(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
   } else {
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
     await Promise.all([
@@ -100,6 +87,23 @@ const updateStudent = async studentnumber => {
   }
 } 
 
+const updateStudentsInChunks = async (studentnumbers, onUpdateStudent, chunksize = 1) => {
+  const runOnUpdate = _.isFunction(onUpdateStudent)
+  const remaining = studentnumbers.slice(0)
+  const promises = []
+  while (remaining.length > 0) {
+    const nextchunk = remaining.splice(0, chunksize)
+    const data = await Promise.all(nextchunk.map(student => getAllStudentInformationFromApi(student)))
+    const promise = Promise.all(data.map(async data => {
+      await updateStudentPerformant(data)
+      if(runOnUpdate) {
+        onUpdateStudent()
+      }
+    }))
+    promises.push(promise)
+  }
+  await Promise.all(promises)
+}
 
 const getFaculties = () => {
   return Promise.all([OrganisationService.all(), Oodi.getFaculties()])
