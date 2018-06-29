@@ -74,8 +74,8 @@ const updateStudyattainments = async (api, studentnumber) => {
   }
 }
 
-const updateStudent = async api => {
-  const studentnumber = api.studentnumber
+const updateStudent = async studentnumber => {
+  const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {
     logger.verbose(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
   } else {
@@ -87,22 +87,18 @@ const updateStudent = async api => {
   }
 } 
 
-const updateStudentsInChunks = async (studentnumbers, onUpdateStudent, chunksize = 1) => {
+const updateStudents = async (studentnumbers, onUpdateStudent, chunksize = 1) => {
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
-  const promises = []
   while (remaining.length > 0) {
     const nextchunk = remaining.splice(0, chunksize)
-    const data = await Promise.all(nextchunk.map(student => getAllStudentInformationFromApi(student)))
-    const promise = Promise.all(data.map(async data => {
-      await updateStudent(data)
+    await Promise.all(nextchunk.map(async studentnumber => {
+      await updateStudent(studentnumber)
       if(runOnUpdate) {
         onUpdateStudent()
       }
     }))
-    promises.push(promise)
   }
-  await Promise.all(promises)
 }
 
 const getFaculties = () => {
@@ -140,7 +136,7 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   courseIds = await existingCourseIds()
   elementDetailsIds = await existingElementIds()
   await updateFaculties()
-  await updateStudentsInChunks(studentnumbers, onUpdateStudent, 100)
+  await updateStudents(studentnumbers, onUpdateStudent, 100)
 }
 
 module.exports = { updateDatabase, updateFaculties }
