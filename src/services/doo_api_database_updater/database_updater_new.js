@@ -73,25 +73,7 @@ const updateStudyattainments = async (api, studentnumber) => {
   }
 }
 
-const updateStudents = async (studentnumbers, onUpdateStudent, synchronously = false) => {
-  if (synchronously) {
-    await updateStudentInformation(studentnumbers, onUpdateStudent)
-  } else {
-    await updateStudentInformationAsync(studentnumbers, onUpdateStudent)
-  }
-}
-
-const updateStudentInformation = async (studentnumbers, onUpdateStudent) => {
-  const runOnUpdate = _.isFunction(onUpdateStudent)
-  for (let studentnumber of studentnumbers) {
-    await updateStudent(studentnumber)
-    if (runOnUpdate) {
-      onUpdateStudent()
-    }
-  }
-}
-
-const updateStudentInformationAsync = async (studentnumbers, onUpdateStudent, chunksize = 100) => {
+const updateStudents = async (studentnumbers, onUpdateStudent, chunksize = 1) => {
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
   while (remaining.length > 0) {
@@ -154,7 +136,7 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   courseIds = await existingCourseIds()
   elementDetailsIds = await existingElementIds()
   await updateFaculties()
-  await updateStudents(studentnumbers, onUpdateStudent)
+  await updateStudents(studentnumbers, onUpdateStudent, 100)
 }
 
 module.exports = { updateDatabase, updateFaculties }
