@@ -2,7 +2,6 @@ require('dotenv').config()
 const axios = require('axios')
 const { OODI_ADDR } = require('../../conf-backend')
 const https = require('https')
-const logger = require('../../util/logger')
 
 const base_url = OODI_ADDR
 
@@ -31,9 +30,8 @@ const attemptGetFor = async (url, attempts=5) => {
     attempt += 1
     try {
       response = await instance.get(url)
-      return response  
+      return response
     } catch (error) {
-      logger.error(`GET ${url} failed: ${error.message})`)
       if (attempt === attempts) {
         throw error
       }
