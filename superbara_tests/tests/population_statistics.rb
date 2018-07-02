@@ -49,6 +49,9 @@ wait do
     find("button", text:"clear all filters").click
 end
 student_number = ""
+wait do
+    has_text? "show"
+end
 
 wait do
     find("button", text:"show").click
