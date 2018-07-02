@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { Unit, Studyright, ElementDetails } = require('../models')
+const { Unit, ElementDetails, StudyrightElement } = require('../models')
 const Op = Sequelize.Op
 
 const all = () => Unit.findAll()
@@ -14,16 +14,10 @@ const findAllEnabled = () => Unit.findAll({
 
 const byId = (id) => Unit.findById(id)
 
-const hasStudent = async (unitId, studentNumber) => Studyright.findOne({
+const hasStudent = async (code, studentnumber) => StudyrightElement.findOne({
   where: {
-    prioritycode: 1,
-    student_studentnumber: studentNumber
-  },
-  include: {
-    model: Unit,
-    where: {
-      id: unitId
-    }
+    studentnumber,
+    code
   }
 })
 

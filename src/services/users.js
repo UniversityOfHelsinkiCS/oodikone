@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize')
 const { User, Unit, UserUnit, ElementDetails } = require('../models')
+const UnitService = require('./units')
 
 const Op = Sequelize.Op
 
@@ -64,6 +65,12 @@ const getUnits = async (id) => {
   })
 }
 
+const getUnitsFromElementDetails = async username => {
+  const user = await byUsername(username)
+  const elementDetails = await user.getElementdetails()
+  return elementDetails.map(element => UnitService.parseUnitFromElement(element))
+}
+
 const findAll = async () => {
   return User.findAll({ 
     include: [{ 
@@ -107,5 +114,6 @@ module.exports = {
   deleteUnit,
   addUnit,
   getUnits,
-  byId
+  byId,
+  getUnitsFromElementDetails
 }
