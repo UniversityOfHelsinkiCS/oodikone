@@ -15,9 +15,13 @@ value_start = tablebody.all("td")[1].text.to_i
 navigation.open
 navigation.navigate(/Filters/)
 wait 60 do
-    has_text? "Add filters"	     
+    has_text? "Add filters"
+    has_text? "add" 
   end
 click_button "add"
+  wait do
+      has_text? "cancel"
+  end
 
 atLeastCreditsFilter = Filter.new("Show only students with credits at least")
 startedThisSemesterFilter = Filter.new("started this semester")
