@@ -44,8 +44,7 @@ router.get('/students/:id', async (req, res) => {
 
   const uid = req.decodedToken.userId
   const student = await Student.withId(studentId)
-  const user = await User.byUsername(uid)
-  const units = await User.getUnits(user.id)
+  const units = await User.getUnitsFromElementDetails(uid)
 
   const rights = await Promise.all(units.map(async unit => {
     const jtn = await Unit.hasStudent(unit.id, student.studentNumber)
