@@ -14,14 +14,13 @@ router.get('/students', async (req, res) => {
 
     let results = []
     const uid = req.decodedToken.userId
-    const user = await User.byUsername(uid)
+    const units = await User.getUnitsFromElementDetails(uid)
 
     if (req.query.searchTerm) {
       results = await Student.bySearchTerm(req.query.searchTerm)
     }
     const filteredResults = [] // Filter students away
     await Promise.all(results.map(async student => {
-      const units = await User.getUnits(user.id)
       const rights = await Promise.all(units.map(async unit => {
         const jtn = await Unit.hasStudent(unit.id, student.studentNumber)
         return jtn
