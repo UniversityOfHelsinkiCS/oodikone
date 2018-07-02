@@ -6,7 +6,11 @@ cache:
     - node_modules
 
 sudo: required
-
+before_install:
+  - rvm install 1.29.3
+  - rvm install ruby
+  - gem install superbara
+  
 services:
   - docker
 
