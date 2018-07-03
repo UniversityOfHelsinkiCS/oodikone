@@ -58,21 +58,23 @@ export const startingThisSemester = starting =>
       student.starting === starting
   })
 
-export const courseParticipation = (course, field) => ({
-  id: uuidv4(),
-  type: 'CourseParticipation',
-  params: {
-    course,
-    field
-  },
-  studentsOfSelectedField: course.students[field],
-  filter: student =>
-    course.students[field][student.studentNumber] === true
-})
+export const courseParticipation = ({ field, course }) =>
+  ({
+    id: uuidv4(),
+    type: 'CourseParticipation',
+    params: {
+      field,
+      course
+    },
+    studentsOfSelectedField: course.students[field],
+    filter: student =>
+      course.students[field][student.studentNumber] === true
+  })
+
 
 // write a function to search for a filter with its type.
 export const presetFilter = preset => ({
-  id: uuidv4(),
+  id: preset.id,
   type: 'Preset',
   name: preset.name,
   filter: student => preset.filters.map(f => f.filter(student)).every(b => b === true)
@@ -85,5 +87,10 @@ const typeList = {
   CourseParticipation: courseParticipation,
   StartingThisSemester: startingThisSemester
 }
-export const getFilterFunction = (type, params) => typeList[type](Object.values(params))
+export const getFilterFunction = (type, params) => {
+  if (type === 'CourseParticipation') {
+    return courseParticipation(params)
+  }
+  return typeList[type](Object.values(params))
+}
 
