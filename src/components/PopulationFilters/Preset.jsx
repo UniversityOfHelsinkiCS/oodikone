@@ -22,7 +22,6 @@ class Preset extends Component {
   }
   render() {
     const { filter } = this.props
-    console.log(this.props)
     if (filter.notSet) {
       return (
         <Segment>
