@@ -11,27 +11,10 @@ router.get('/students', async (req, res) => {
     }
     return res.json(results)
   } else {
-
-    let results = []
-    const uid = req.decodedToken.userId
-    const units = await User.getUnitsFromElementDetails(uid)
-
-    if (req.query.searchTerm) {
-      results = await Student.bySearchTerm(req.query.searchTerm)
-    }
-    const filteredResults = [] // Filter students away
-    await Promise.all(results.map(async student => {
-      const rights = await Promise.all(units.map(async unit => {
-        const jtn = await Unit.hasStudent(unit.id, student.studentNumber)
-        return jtn
-      }))
-      if (rights.some(right => right !== null)) {
-        filteredResults.push(student)
-      }
-    }))
-
-
-    res.json(filteredResults)
+    const unitsUserCanAccess = await User.getUnitsFromElementDetails(req.decodedToken.userId)
+    const codes = unitsUserCanAccess.map(unit => unit.id)
+    const matchingStudents = await Student.bySearchTermAndElements(req.query.searchTerm, codes)
+    res.json(matchingStudents.map(Student.formatStudent))
   }
 })
 
