@@ -4,8 +4,12 @@ node_js:
 cache:
   directories:
     - node_modules
+addons:
+  chrome: stable
 
 sudo: required
+before_install:
+  - gem install superbara
 
 services:
   - docker

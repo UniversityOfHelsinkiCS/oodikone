@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Dropdown, List, Item, Header, Segment } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { func, shape, string, number, bool, arrayOf } from 'prop-types'
+import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
 import { getUsers, enableUser, addUserUnit, removeUserUnit } from '../../redux/users'
 import { getUnits } from '../../redux/units'
@@ -17,23 +17,23 @@ class EnableUsers extends Component {
   enableUser = id => () => this.props.enableUser(id)
 
   handleChange = user => (e, { value }) => {
-    if (!user.units.find(unit => unit.id === value)) {
+    if (!user.elementdetails.find(element => element.code === value)) {
       this.props.addUserUnit(user.id, value)
     }
   }
 
   removeAccess = (uid, unit) => () => this.props.removeUserUnit(uid, unit)
 
-  renderUnitList = (units, user) => {
-    if (!units) return null
+  renderUnitList = (elementdetails, user) => {
+    if (!elementdetails) return null
     return (
       <List divided>
-        {units.map(unit => (
-          <List.Item key={unit.id}>
+        {elementdetails.map(element => (
+          <List.Item key={element.code}>
             <List.Content floated="right">
-              <Button floated="right" onClick={this.removeAccess(user, unit.id)} content="Remove" size="tiny" />
+              <Button floated="right" onClick={this.removeAccess(user, element.code)} content="Remove" size="tiny" />
             </List.Content>
-            <List.Content>{unit.name}</List.Content>
+            <List.Content>{element.name.fi}</List.Content>
           </List.Item>
         ))}
       </List>
@@ -64,7 +64,7 @@ class EnableUsers extends Component {
                       search
                       selection
                     />
-                    {this.renderUnitList(user.units, user.id)}
+                    {this.renderUnitList(user.elementdetails, user.id)}
                   </Item.Description>
                   <Item.Extra>
                     {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`}
@@ -93,7 +93,7 @@ EnableUsers.propTypes = {
     name: string
   })).isRequired,
   users: arrayOf(shape({
-    id: number,
+    id: string,
     full_name: string,
     is_enabled: bool,
     username: string,
