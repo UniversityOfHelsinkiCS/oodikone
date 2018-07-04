@@ -38,6 +38,8 @@ before_script:
 
 services:
   - docker
+  - redis-server
+
 jobs:
   include:
     - stage: test stuff
