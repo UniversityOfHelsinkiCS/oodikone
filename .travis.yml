@@ -7,24 +7,22 @@ cache:
 addons:
   chrome: stable
 env: 
-    global:
-        - DOCKER_VERSION=18.03.1-ce
-        - DOCKER_COMPOSE_VERSION=1.21.2
+  global:
+    - DOCKER_VERSION=18.03.1-ce
+    - DOCKER_COMPOSE_VERSION=1.21.2
     
 
 sudo: required
 before_install:
-    # list docker-engine versions
-    - apt-cache madison docker-engine
-    
-    # upgrade docker-engine to specific version
-    - sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine=${DOCKER_VERSION}
-
-    # reinstall docker-compose at specific version
-    - sudo rm -f /usr/local/bin/docker-compose
-    - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-    - chmod +x docker-compose
-    - sudo mv docker-compose /usr/local/bin
+  # list docker-engine versions
+  - apt-cache madison docker-engine
+  # upgrade docker-engine to specific version
+  - sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine=${DOCKER_VERSION}
+  # reinstall docker-compose at specific version
+  - sudo rm -f /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
   - gem install superbara
 before_script:
