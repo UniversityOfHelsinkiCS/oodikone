@@ -1,4 +1,7 @@
 import { courseParticipation } from '../populationFilters'
+import { callController } from '../apiConnection'
+
+const getArrayParams = (paramName, entries) => entries.map(entry => `&${paramName}=${entry}`).join('')
 
 export const clearPopulationFilters = () => ({
   type: 'CLEAR_POPULATION_FILTERS'
@@ -28,9 +31,25 @@ export const setComplementFilter = () => ({
   type: 'SET_COMPLEMENT_FILTER'
 })
 
+export const savePopulationFilters = (preset) => {
+  const route = '/v2/populationstatistics/filters'
+  const prefix = 'SAVE_FILTER_'
+  const data = preset
+  const method = 'post'
+  return callController(route, prefix, data, method)
+}
 
+export const getPopulationFilters = ({ studyRights }) => {
+  const route = `/v2/populationstatistics/filters?${getArrayParams('studyRights', studyRights)}`
+  const prefix = 'GET_FILTER_'
+  const query = {
+    studyRights
+  }
+  return callController(route, prefix, null, 'get', query)
+}
 const initial = {
   filters: [],
+  filtersFromBackend: [],
   complemented: true
 }
 initial.complemented = false
@@ -61,7 +80,8 @@ const reducer = (state = initial, action) => {
     case 'ALTER_POPULATION_COURSE_FILTER': {
       const toAlter = state.filters.find(f => f.id === action.id)
       const { course } = toAlter.params
-      const alteredFilter = courseParticipation(course, action.field)
+      const params = { course, field: action.field }
+      const alteredFilter = courseParticipation(params)
       alteredFilter.id = toAlter.id
       state.filters = state.filters.map(f => (f.id !== action.id ? f : alteredFilter))
       return state
@@ -70,6 +90,44 @@ const reducer = (state = initial, action) => {
       state.complemented = !state.complemented
       return state
     }
+    case 'SAVE_FILTER_ATTEMPT':
+      return {
+        pending: true,
+        error: false,
+        ...state
+      }
+    case 'SAVE_FILTER_FAILURE':
+      return {
+        pending: false,
+        error: true,
+        ...state
+      }
+    case 'SAVE_FILTER_SUCCESS':
+      state.filtersFromBackend = state.filtersFromBackend.concat(action.response)
+      return {
+        pending: false,
+        error: false,
+        ...state
+      }
+    case 'GET_FILTER_ATTEMPT':
+      return {
+        pending: true,
+        error: false,
+        ...state
+      }
+    case 'GET_FILTER_FAILURE':
+      return {
+        pending: false,
+        error: true,
+        ...state
+      }
+    case 'GET_FILTER_SUCCESS':
+      state.filtersFromBackend = state.filtersFromBackend.concat(action.response)
+      return {
+        pending: false,
+        error: false,
+        ...state
+      }
 
     default:
       return state
