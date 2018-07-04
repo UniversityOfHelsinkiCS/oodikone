@@ -29,6 +29,9 @@ services:
   - docker
 
 after_success:
+  - "docker build -t toska/oodikone2-backend:testing ."
+  - "docker login -u $DOCKER_USER -p $DOCKER_PASS"
+  - "docker push toska/oodikone2-backend:testing"
   - "[[ $TRAVIS_BRANCH =~ (master) ]] && docker build -t toska/oodikone2-backend:staging ."
   - "[[ $TRAVIS_BRANCH =~ (master) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
   - "[[ $TRAVIS_BRANCH =~ (master) ]] && docker push toska/oodikone2-backend:staging"

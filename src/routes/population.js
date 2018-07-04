@@ -2,7 +2,7 @@ const router = require('express').Router()
 const Population = require('../services/populations')
 const User = require('../services/users')
 const Unit = require('../services/units')
-
+const Filters = require('../services/filters')
 router.get('/v2/populationstatistics/courses', async (req, res) => {
   try {
     if (!req.query.year || !req.query.semester || !req.query.studyRights) {
@@ -50,10 +50,10 @@ router.get('/v2/populationstatistics', async (req, res) => {
       }
     }
 
-    if (req.query.months==null) {
+    if (req.query.months == null) {
       req.query.months = 12
     }
-    
+
     const result = await Population.optimizedStatisticsOf(req.query)
     if (result.error) {
       res.status(400).json(result)
@@ -61,10 +61,43 @@ router.get('/v2/populationstatistics', async (req, res) => {
     }
 
     console.log(`request completed ${new Date()}`)
-    res.json(result)    
+    res.json(result)
   } catch (e) {
     res.status(400).json({ error: e })
   }
+})
+router.get('/v2/populationstatistics/filters', async (req, res) => {
+  
+  let results = []
+  let rights = req.query.studyRights
+  if (!Array.isArray(rights)) { // studyRights should always be an array
+    rights = [rights]
+  }
+  try {
+    results = await Filters.findForPopulation(rights)
+    console.log(results)
+    res.status(200).json(results)
+
+  } catch (err) {
+    console.log(err)
+    res.status(400).end()
+  }
+
+})
+router.post('/v2/populationstatistics/filters', async (req, res) => {
+  let results = []
+  const filter = req.body
+  console.log(filter)
+  console.log(filter.filters[0])
+  try {
+    results = await Filters.createNewFilter(filter)
+    res.status(200).json(results)
+
+  } catch (err) {
+    console.log(err)
+    res.status(400).end()
+  }
+
 })
 
 router.get('/studyprogrammes', async (req, res) => {
