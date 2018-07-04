@@ -1,0 +1,35 @@
+services:
+ db_testing:
+   image: postgres:9.6.3
+   restart: unless-stopped
+   volumes:
+     - ./postgres/database:/var/lib/postgresql/data
+   ports:
+     - "7501:5432"
+   environment:
+     POSTGRES_USER: tkt_oodi
+     POSTGRES_PASSWORD: test
+     POSTGRES_DB: tkt_oodi_testing
+   container_name: db_testing
+ testing_backend:
+   image: toska/oodikone2-backend:testing
+   environment:
+     DB_URL: postgres://tkt_oodi:test@db_testing:5432/tkt_oodi_testing
+     FRONT_URL: localhost:8081
+     REDIS: testing_redis
+     OODI_ADDR: anonymized api here
+   restart: unless-stopped
+   container_name: testing_backend
+   volumes:
+      - ./data:/data
+ testing_frontend:
+   image: toska/oodikone2-frontend:testing
+   restart: unless-stopped
+   container_name: testing_frontend
+ testing_redis:
+   image: redis
+   restart: unless-stopped
+   container_name: testing_redis
+   command: ["redis-server", "--appendonly", "yes"]
+   volumes:
+      - ./redis-data:/data
