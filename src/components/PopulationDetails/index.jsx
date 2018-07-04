@@ -158,7 +158,6 @@ const mapStateToProps = (state) => {
   let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
 
   // TODO refactor to more functional approach where the whole sample is not tested for each filter
-
   if (samples.length > 0 && state.populationFilters.filters.length > 0) {
     const studentsForFilter = (f) => {
       if (f.type === 'CourseParticipation') {
