@@ -18,11 +18,35 @@ before_script:
 
 services:
   - docker
+jobs:
+  include:
+    - stage: build test docker image
+      script:
+      - docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - docker build -t toska/oodikone2-frontend:testing .
+      - docker images
+      - docker push toska/oodikone2-frontend:testing
+    - stage: starting backend
+      script: docker pull toska/oodikone2-backend:testing
+      script: docker-compose up -d
+      script: docker exec -it db_testing sh
+      script: npm run update_database
+      script: npm run dev
+    - stage: testing backend
+      script: npm test
+    - stage: starting frontend
+      script: docker exec -it frontend_testing sh
+      script: npm run dev
+    - stage: running superbara
+      script: npm test
+      
+    
+      
 
 after_success:
-  - "[[ $TRAVIS_BRANCH =~ (master) ]] && docker build -t toska/oodikone2-frontend:staging ."
-  - "[[ $TRAVIS_BRANCH =~ (master) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
-  - "[[ $TRAVIS_BRANCH =~ (master) ]] && docker push toska/oodikone2-frontend:staging"
+  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker build -t toska/oodikone2-frontend:staging ."
+  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
+  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker push toska/oodikone2-frontend:staging"
   - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker build -t toska/oodikone2-frontend:latest ."
   - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
   - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker push toska/oodikone2-frontend:latest"
