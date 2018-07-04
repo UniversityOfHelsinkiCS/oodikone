@@ -131,7 +131,7 @@ StudentDetails.propTypes = {
     courses: arrayOf(shape({
       course: shape({
         code: string,
-        name: string
+        name: Object
       }),
       credits: integer,
       date: string,
