@@ -49,7 +49,7 @@ class PopulationFilters extends Component {
   }
   updateFilterList(filtersToCreate) {
     const regenerateFilterFunctions = filters =>
-      filters.map(f => getFilterFunction(f.type, f.params))
+      filters.map(f => f.type === 'Preset' ? ({ ...f, filters: regenerateFilterFunctions(f.filters) }) : getFilterFunction(f.type, f.params)) //eslint-disable-line
 
     if (filtersToCreate) {
       const newFilters = filtersToCreate.map((f) =>  //eslint-disable-line

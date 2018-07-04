@@ -77,6 +77,7 @@ export const presetFilter = preset => ({
   id: preset.id,
   type: 'Preset',
   name: preset.name,
+  filters: preset.filters,
   filter: student => preset.filters.map(f => f.filter(student)).every(b => b === true)
 })
 const typeList = {
@@ -85,7 +86,8 @@ const typeList = {
   HasMatriculation: matriculationFilter,
   SexFilter: sexFilter,
   CourseParticipation: courseParticipation,
-  StartingThisSemester: startingThisSemester
+  StartingThisSemester: startingThisSemester,
+  Preset: presetFilter
 }
 export const getFilterFunction = (type, params) => {
   if (type === 'CourseParticipation') {
