@@ -16,7 +16,7 @@
     "stats": "webpack --json --config webpack.config.production.js > stats.json",
     "prepush": "npm run lint",
     "pretest": "npm run lint",
-    "test": "./superbara_tests/run_all_tests.sh"
+    "test": ""
   },
   
   "licence": "",
