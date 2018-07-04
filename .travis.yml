@@ -20,25 +20,24 @@ services:
   - docker
 jobs:
   include:
-    - stage: build test docker image
+    - stage: test stuff
       script:
       - docker login -u $DOCKER_USER -p $DOCKER_PASS
       - docker build -t toska/oodikone2-frontend:testing .
       - docker images
       - docker push toska/oodikone2-frontend:testing
-    - stage: starting backend
-      script: docker pull toska/oodikone2-backend:testing
-      script: docker-compose up -d
-      script: docker exec -it db_testing sh
-      script: npm run update_database
-      script: npm run dev
-    - stage: testing backend
-      script: npm test
-    - stage: starting frontend
-      script: docker exec -it frontend_testing sh
-      script: npm run dev
-    - stage: running superbara
-      script: npm test
+      - docker pull toska/oodikone2-backend:testing
+      - docker-compose up -d
+      - docker exec -it db_testing sh
+      - npm run update_database
+      - npm run dev
+      - testing backend
+      - npm test
+      - starting frontend
+      - docker exec -it frontend_testing sh
+      - npm run dev
+      - running superbara
+      - npm test
       
     
       
