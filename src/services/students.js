@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const { Student, Credit, CourseInstance, Course, Studyright } = require('../models')
+const { Student, Credit, CourseInstance, Course, Studyright, StudyrightElement } = require('../models')
 const { getMainCode } = require('./courses')
 const Op = Sequelize.Op
 
@@ -175,6 +175,34 @@ const withId = async (id) => {
   }
 }
 
+const bySearchTermAndElements = (searchterm, elementcodes) => {
+  const likeSearchTerm = `%${searchterm}%`
+  return Student.findAll({
+    where: {
+      [Op.or]: [
+        {
+          studentnumber: {
+            [Op.like]: likeSearchTerm
+          }
+        },
+        {
+          abbreviatedname: {
+            [Op.iLike]: likeSearchTerm
+          }
+        }
+      ]
+    },
+    include: {
+      model: StudyrightElement,
+      where: {
+        code: {
+          [Op.in]: elementcodes
+        }
+      }
+    }
+  })
+}
+
 module.exports = {
-  withId, bySearchTerm, formatStudent, createStudent, byId, updateStudent, formatStudentUnifyCodes
+  withId, bySearchTerm, formatStudent, createStudent, byId, updateStudent, formatStudentUnifyCodes, bySearchTermAndElements
 }
