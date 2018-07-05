@@ -49,17 +49,17 @@ jobs:
       - docker images
       - docker push toska/oodikone2-frontend:testing
       - docker pull toska/oodikone2-backend:testing
-      - docker-compose up -d
-      - docker exec -it testing_backend sh
-      - npm run update_database
-      - npm run dev
-      - testing backend
-      - npm test
-      - starting frontend
-      - docker exec -it frontend_testing sh
-      - npm run dev
-      - running superbara
-      - npm test
+      - docker-compose up
+      # - docker exec -it testing_backend sh
+      # - npm run update_database
+      # - npm run dev
+      # - testing backend
+      # - npm test
+      # - starting frontend
+      # - docker exec -it frontend_testing sh
+      # - npm run dev
+      # - running superbara
+      # - npm test
       
     
       
