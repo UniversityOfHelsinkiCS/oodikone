@@ -140,7 +140,7 @@ const optimizedStatisticsOf = async (query) => {
     having: sequelize.where(
       sequelize.fn('COUNT', 'code'),
       {
-        [Op.eq]: studyRights.length
+        [Op.gte]: studyRights.length
       }
     )
   })
