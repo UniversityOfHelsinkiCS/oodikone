@@ -7,9 +7,6 @@ const { Studyright, Student, Credit, CourseInstance, Course, sequelize, Studyrig
 const { formatStudent, formatStudentUnifyCodes } = require('../services/students')
 const { getUnitFromElementDetail } = require('../services/units')
 
-// const { StudentList } = require('../models')
-// const StudyRights = require('../services/studyrights')
-
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
   return sequelize.query(query, { type: sequelize.QueryTypes.SELECT }
@@ -40,32 +37,6 @@ const studentsWithAllCourses = (student_numbers) => {
           {
             model: CourseInstance,
             include: [Course]
-          }
-        ],
-      },
-    ],
-    where: {
-      studentnumber: {
-        [Op.in]: student_numbers
-      }
-    },
-  })
-}
-
-const studentsWithCoursesAfterStudyrightStart = (student_numbers, conf) => {
-  return Student.findAll({
-    include: [
-      {
-        model: Credit,
-        include: [
-          {
-            model: CourseInstance,
-            include: [Course],
-            where: { // Only course instances that are from between the dates selected
-              coursedate: {
-                [Op.gte]: conf.enrollmentDates.startDate
-              }
-            }
           }
         ],
       },
@@ -117,58 +88,63 @@ const semesterEnd = {
   FALL: '12-31'
 }
 
-// const getStudentsWithStudyright = async (studyRight, conf) => {
-//   if (['9999'].includes(studyRight)) {
-//     let cached = await StudentList.findOne({
-//       where: { key: studyRight }
-//     })
+const formatStudentForOldApi = (student, startDate, endDate) => {
+  student = formatStudent(student)
+  student.studyrightStart = startDate
+  student.starting = moment(student.started).isBetween(startDate, endDate, null, '[]')
+  return student
+}
 
-//     return cached.student_numbers 
-//   }
-  
-//   return await StudyRights.ofPopulations(conf).map(s => s.student_studentnumber)
-// }
+const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
 
 const optimizedStatisticsOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
+  const { studyRights, semester, year, months } = query
+  const startDate = `${year}-${semesterStart[semester]}`
+  const endDate = `${year}-${semesterEnd[semester]}`
 
-  const startDate = `${query.year}-${semesterStart[query.semester]}`
-  const endDate = `${query.year}-${semesterEnd[query.semester]}`
-
-  const withStudyrighStart = (student) => {
-    student.studyrightStart = startDate
-    student.starting = moment(student.started).isBetween(startDate, endDate, null, '[]')
-    return student
-  }
-
-  try {
-    const units = await Promise.all(query.studyRights.map(getUnitFromElementDetail))
-
-    const conf = {
-      enrollmentDates: {
-        startDate, 
-        endDate
+  const students = await Student.findAll({
+    include: [
+      {
+        model: StudyrightElement,
+        attributes: [],
+        where: {
+          code: {
+            [Op.in]: studyRights
+          },
+          startdate: {
+            [Op.between]: [startDate, endDate]
+          }
+        }
       },
-      units
-    }
-
-    // const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf)
-    const codes = units.map(unit => unit.id)
-    const student_numbers = await getStudentsWithCodes(codes, startDate, endDate)
-
-    const students = await studentsWithCoursesAfterStudyrightStart(student_numbers, conf)
-      .map(restrictWith(Credit.inTimeRange(conf.enrollmentDates.startDate, query.months)))
-
-    return students
-      .map(formatStudent)
-      .map(withStudyrighStart)
-    
-  } catch (e) {
-    console.log(e)
-    return { error: `No such study rights: ${query.studyRights}` }
-  }
+      {
+        model: Credit,
+        required: true,
+        include: [
+          {
+            model: CourseInstance,
+            include: [Course],
+            required: true,
+            where: {
+              coursedate: {
+                [Op.between]: [startDate, dateMonthsFromNow(startDate, months)]
+              }
+            }
+          }
+        ],
+      }
+    ],
+    group: ['student.studentnumber', 'credits.id', 'credits->courseinstance.id', 'credits->courseinstance->course.code'],
+    having: sequelize.where(
+      sequelize.fn('COUNT', 'code'),
+      {
+        [Op.eq]: studyRights.length
+      }
+    )
+  })
+  return students.map(formatStudentForOldApi)
 }
 
 const getStudentsWithCodes = async (codes, startDate, endDate) => {
@@ -209,9 +185,6 @@ const bottlenecksOf = async (query) => {
       },
       units
     }
-    // const student_numbers = await getStudentsWithStudyright(query.studyRights[0], conf) // <------ THIS IS BROKEN
-    // const students = await studentsWithAllCourses(student_numbers)
-    //   .map(restrictWith(Credit.notLaterThan(conf.enrollmentDates.startDate, query.months)))
 
     const codes = units.map(unit => unit.id)
     const student_numbers = await getStudentsWithCodes(codes, startDate, endDate)
