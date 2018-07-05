@@ -14,7 +14,6 @@ import CourseParticipation from './CourseParticipation'
 import Preset from './Preset'
 import { clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
-import { getUserName } from '../../common'
 
 
 const componentFor = {
@@ -43,8 +42,6 @@ class PopulationFilters extends Component {
     presetFilters: []
   }
   async componentDidMount() {
-    const user = await getUserName()
-    this.setState({ user })
     this.updateFilterList(this.props.populationFilters.filtersFromBackend)
   }
   updateFilterList(filtersToCreate) {
@@ -157,16 +154,11 @@ class PopulationFilters extends Component {
             React.createElement(Preset, { filter, key: filter.filter.id }))}
 
         <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
-        {
-          this.state.user === 'tktl' || this.state.user === 'sasumaki' ?
-            <div className="ui action input">
-              <input type="text" placeholder="Name..." onChange={e => this.setState({ presetName: e.target.value })} />
+        <div className="ui action input">
+          <input type="text" placeholder="Name..." onChange={e => this.setState({ presetName: e.target.value })} />
 
-              <button className="ui button" onClick={handleSavePopulationFilters}>save filters as preset</button>
-            </div>
-            : null}
-
-
+          <button className="ui button" onClick={handleSavePopulationFilters}>save filters as preset</button>
+        </div>
       </Segment>
     )
   }
