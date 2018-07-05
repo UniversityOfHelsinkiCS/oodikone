@@ -23,6 +23,8 @@ axios.defaults.params = {
   token: process.env.TOKEN
 }
 
+let student_numbers = []
+
 // few objects to save connections between anonymized and real data to keep relations.
 let teacherRelations = {}
 let learningOpportunityRelations = {}
@@ -191,15 +193,15 @@ const anonymize = async () => {
       const infoPath = `./src/anonymized_API/students/${info.student_number}/info`
       const attainmentPath = `./src/anonymized_API/students/${info.student_number}/studyattainments`
       const studyRightPath = `./src/anonymized_API/students/${info.student_number}/studyrights`
-
+      student_numbers = student_numbers.concat(info.student_number)
       APIWriter(infoPath, info)
       APIWriter(studyRightPath, studyrights)
       APIWriter(attainmentPath, attainments)
     } catch(error) {
       logger.verbose(`FAILED ${id}, ${error}`)
     }
-
   }
+  APIWriter('./studentnumbersN.txt', student_numbers)
 
 
 }
