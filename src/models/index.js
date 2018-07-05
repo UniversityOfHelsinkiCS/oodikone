@@ -365,6 +365,24 @@ const StudentList = sequelize.define('student_list',
     timestamps: false,
   }
 )
+const Filters = sequelize.define('filters',
+  {
+    id: {
+      type: Sequelize.STRING,
+      primaryKey: true
+    },
+    name: {
+      type: Sequelize.STRING
+    },
+    filters: {
+      type: Sequelize.JSONB
+    },
+    population: {
+      type: Sequelize.JSONB
+    }
+
+  }
+)
 
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
 Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
@@ -398,7 +416,7 @@ ElementDetails.hasMany(StudyrightElement, { foreignKey: 'code', sourceKey: 'code
 StudyrightElement.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
-User.belongsToMany(ElementDetails, { through: 'user_elementdetails', as: 'elementdetails'})
+User.belongsToMany(ElementDetails, { through: 'user_elementdetails', as: 'elementdetails' })
 ElementDetails.belongsToMany(User, { through: 'user_elementdetails' })
 
 module.exports = {
@@ -419,5 +437,6 @@ module.exports = {
   Organisation,
   StudentList,
   StudyrightElement,
-  ElementDetails
+  ElementDetails,
+  Filters
 }
