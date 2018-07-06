@@ -25,10 +25,10 @@ app.get('*', async (req, res) => {
   const results = { error: 'unknown endpoint' }
   res.status(404).json(results)
 })
-
-app.listen(PORT, () => {
-  console.log('Example app listening on port ' + PORT + '!')
-})
-
+if (process.env.NOCE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log('Example app listening on port ' + PORT + '!')
+  })
+}
 
 module.exports = app
