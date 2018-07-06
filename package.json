@@ -18,7 +18,6 @@
     "pretest": "npm run lint",
     "test": ""
   },
-  
   "licence": "",
   "main": "src/app.jsx",
   "devDependencies": {

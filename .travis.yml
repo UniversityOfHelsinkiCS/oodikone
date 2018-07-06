@@ -22,12 +22,12 @@ env:
 sudo: required
 before_install:
   # reinstall docker-compose at specific version
-  - sudo rm -f /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
-  - docker version
-  - docker-compose -v
+  # - sudo rm -f /usr/local/bin/docker-compose
+  # - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  # - chmod +x docker-compose
+  # - sudo mv docker-compose /usr/local/bin
+  # - docker version
+  # - docker-compose -v
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
   - gem install superbara
 before_script:
@@ -45,11 +45,11 @@ jobs:
     - stage: test stuff
       script:
       - docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - docker build -t toska/oodikone2-frontend:testing .
-      - docker images
-      - docker push toska/oodikone2-frontend:testing
-      - docker pull toska/oodikone2-backend:testing
-      - docker-compose up
+      # - docker build -t toska/oodikone2-frontend:testing .
+      # - docker images
+      # - docker push toska/oodikone2-frontend:testing
+      # - docker pull toska/oodikone2-backend:testing
+      # - docker-compose up
       # - docker exec -it testing_backend sh
       # - npm run update_database
       # - npm run dev
