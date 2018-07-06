@@ -18,14 +18,18 @@ services:
      DB_URL: postgres://tkt_oodi:test@db_testing:5432/tkt_oodi_testing
      FRONT_URL: localhost:8081
      REDIS: testing_redis
-     #OODI_ADDR:
+     #OODI_ADDR
    restart: unless-stopped
+   command: npm run update_database_anon
    container_name: testing_backend
    volumes:
       - ./data:/data
  testing_frontend:
    image: toska/oodikone2-frontend:testing
    restart: unless-stopped
+   sut:
+    build:
+    command: superbara src/superbara_tests/run_all_tests.sh
    container_name: testing_frontend
  testing_redis:
    image: redis
