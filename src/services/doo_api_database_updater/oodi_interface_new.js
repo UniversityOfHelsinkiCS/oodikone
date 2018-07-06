@@ -2,16 +2,18 @@ require('dotenv').config()
 const axios = require('axios')
 const { OODI_ADDR } = require('../../conf-backend')
 const https = require('https')
-
+const fs = require('fs')
 const base_url = OODI_ADDR
 
 const instance = axios.create({
-  httpsAgent: new https.Agent({  
+  httpsAgent: new https.Agent({
     rejectUnauthorized: false
   })
 })
 
-if ( process.env.NODE_ENV !== 'test' ) {
+let attemptGetFor = () => null
+
+if (process.env.NODE_ENV !== 'test') {
 
   axios.defaults.auth = {
     username: 'tktl',
@@ -21,20 +23,32 @@ if ( process.env.NODE_ENV !== 'test' ) {
   axios.defaults.params = {
     token: process.env.TOKEN
   }
-}
 
-const attemptGetFor = async (url, attempts=5) => {
-  let attempt = 0
-  let response = 0
-  while (attempt <= attempts) {
-    attempt += 1
+  attemptGetFor = async (url, attempts = 5) => {
+    let attempt = 0
+    let response = 0
+    while (attempt <= attempts) {
+      attempt += 1
+      try {
+        response = await instance.get(url)
+        return response
+      } catch (error) {
+        if (attempt === attempts) {
+          throw error
+        }
+      }
+    }
+  }
+}
+if (process.env.NODE_ENV === 'test') {
+  attemptGetFor = async (url) => {
+    let response = {data:{data:{}}}
     try {
-      response = await instance.get(url)
+      response.data.data = JSON.parse(await fs.readFileSync(url))
       return response
     } catch (error) {
-      if (attempt === attempts) {
-        throw error
-      }
+      throw error
+
     }
   }
 }
