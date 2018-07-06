@@ -26,10 +26,9 @@ app.get('*', async (req, res) => {
   res.status(404).json(results)
 })
 
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
-    console.log('Example app listening on port ' + PORT + '!')
-  })
-}
+app.listen(PORT, () => {
+  console.log('Example app listening on port ' + PORT + '!')
+})
+
 
 module.exports = app
