@@ -2,6 +2,7 @@ const Sequelize = require('sequelize')
 const Op = Sequelize.Op
 const _ = require('lodash')
 const moment = require('moment')
+const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
 
 const { Studyright, Student, Credit, CourseInstance, Course, sequelize, StudyrightElement } = require('../models')
 const { formatStudent, formatStudentUnifyCodes } = require('../services/students')
@@ -104,21 +105,9 @@ const optimizedStatisticsOf = async (query) => {
   const { studyRights, semester, year, months } = query
   const startDate = `${year}-${semesterStart[semester]}`
   const endDate = `${year}-${semesterEnd[semester]}`
-
+  const studentnumbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
   const students = await Student.findAll({
     include: [
-      {
-        model: StudyrightElement,
-        attributes: [],
-        where: {
-          code: {
-            [Op.in]: studyRights
-          },
-          startdate: {
-            [Op.between]: [startDate, endDate]
-          }
-        }
-      },
       {
         model: Credit,
         required: true,
@@ -136,13 +125,11 @@ const optimizedStatisticsOf = async (query) => {
         ],
       }
     ],
-    group: ['student.studentnumber', 'credits.id', 'credits->courseinstance.id', 'credits->courseinstance->course.code'],
-    having: sequelize.where(
-      sequelize.fn('COUNT', 'code'),
-      {
-        [Op.gte]: studyRights.length
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumbers
       }
-    )
+    }
   })
   return students.map(formatStudentForOldApi)
 }
@@ -166,7 +153,6 @@ const getStudentsWithStudyrightElement  = async (code, startedAfter, startedBefo
   })
   return studyrightelements.map(element => element.studentnumber)
 }
-
 
 const bottlenecksOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
