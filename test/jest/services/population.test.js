@@ -21,7 +21,7 @@ afterAll(async () => {
   await sequelize.close()
 })
 
-describe('Student with BSc studyright, 2011-07-31, passed course credit in Fall 2011. ', () => {
+describe('Student with BSc & Mathematics studyrights (2011-07-31 – 2016-12-20), with a passed course credit in Fall 2011. ', () => {
 
   const course = {
     code: 'COURSE-1',
@@ -37,10 +37,22 @@ describe('Student with BSc studyright, 2011-07-31, passed course credit in Fall 
     studentnumber: '1234',
   }
 
-  const elementdetail = {
-    code: 'ED01',
+  const bachelorOfScience = {
+    code: 'Element_BSC',
     type: 10,
     name: langify('Bachelor of Science')
+  }
+
+  const mathematics = {
+    code: 'Element_MATH',
+    type: 20,
+    name: langify('Mathematics')
+  }
+
+  const computerScience = {
+    code: 'ELEMENT_CS',
+    type: 20,
+    name: langify('Computer Science')
   }
 
   const studyright = {
@@ -53,11 +65,19 @@ describe('Student with BSc studyright, 2011-07-31, passed course credit in Fall 
     student_studentnumber: student.studentnumber,
   }
 
-  const studyrightelement = {
+  const studyrightBSc = {
     startdate: new Date('2011-07-31 21:00:00+00'),
     enddate: Date('2016-12-20 22:00:00+00'),
     studyrightid: studyright.studyrightid,
-    code: elementdetail.code,
+    code: bachelorOfScience.code,
+    studentnumber: student.studentnumber
+  }
+
+  const studyrightMaths = {
+    startdate: new Date('2011-07-31 21:00:00+00'),
+    enddate: Date('2016-12-20 22:00:00+00'),
+    studyrightid: studyright.studyrightid,
+    code: mathematics.code,
     studentnumber: student.studentnumber
   }
 
@@ -67,21 +87,36 @@ describe('Student with BSc studyright, 2011-07-31, passed course credit in Fall 
     await Course.create(course)
     const dbcourseinstance = await CourseInstance.create(courseinstance)
     await Credit.create({...credit, courseinstance_id: dbcourseinstance.id})
-    await ElementDetails.create(elementdetail)
+    await ElementDetails.create(bachelorOfScience)
+    await ElementDetails.create(mathematics)
+    await ElementDetails.create(computerScience)
     await Studyright.create(studyright)
-    await StudyrightElement.create(studyrightelement)
+    await StudyrightElement.create(studyrightBSc)
+    await StudyrightElement.create(studyrightMaths)
   })
 
-  test('Query result for BSc, Fall 2017 for 12 months, should contain the student.', async () => {
-    const query = createQueryObject('2011', SEMESTER.FALL, [studyrightelement.code], 12)
+  test('Query result for BSc, Fall 2011 for 12 months should contain the student.', async () => {
+    const query = createQueryObject('2011', SEMESTER.FALL, [bachelorOfScience.code], 12)
     const queryResult = await optimizedStatisticsOf(query)
     expect(queryResult.some(s => s.studentNumber === student.studentnumber)).toBe(true)
   })
 
-  test('Query result for BSc, Fall 2018 for 12 months should not contain the student.', async () => {
-    const query = createQueryObject('2012', SEMESTER.FALL, [studyrightelement.code], 12)
+  test('Query result for BSc, Fall 2012 for 12 months should not contain the student.', async () => {
+    const query = createQueryObject('2012', SEMESTER.FALL, [bachelorOfScience.code], 12)
     const queryResult = await optimizedStatisticsOf(query)
     expect(queryResult.some(s => s.studentNumber === student.studentnumber)).toBe(false)
+  })
+
+  test('Query result for BSc and Computer Science, Fall 2011 for 12 months should not contain the student. ', async () => {
+    const query = createQueryObject('2011', SEMESTER.FALL, [bachelorOfScience.code, computerScience.code], 12)
+    const queryResult = await optimizedStatisticsOf(query)
+    expect(queryResult.some(s => s.studentNumber === student.student_studentnumber)).toBe(false)
+  })
+
+  test('Query result for BSc and Mathematics, Fall 2011 for 12 months should contain the student.', async () => {
+    const query = createQueryObject('2011', SEMESTER.FALL, [bachelorOfScience.code, mathematics.code], 12)
+    const queryResult = await optimizedStatisticsOf(query)
+    expect(queryResult.some(s => s.studentNumber === student.studentnumber)).toBe(true)
   })
 
 })
