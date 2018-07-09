@@ -10,7 +10,11 @@ import CreditsAtLeast from './CreditsAtLeast'
 import StartingThisSemester from './StartingThisSemester'
 import SexFilter from './SexFilter'
 import CourseParticipation from './CourseParticipation'
-import { clearPopulationFilters, setComplementFilter } from '../../redux/populationFilters'
+
+import Preset from './Preset'
+import { clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
+import { presetFilter, getFilterFunction } from '../../populationFilters'
+
 
 
 const componentFor = {
@@ -32,6 +36,25 @@ class PopulationFilters extends Component {
   state = {
     visible: false
   }
+
+  async componentDidMount() {
+    this.updateFilterList(this.props.populationFilters.filtersFromBackend)
+  }
+  updateFilterList(filtersToCreate) {
+    const regenerateFilterFunctions = filters =>
+      filters.map(f => f.type === 'Preset' ? ({ ...f, filters: regenerateFilterFunctions(f.filters) }) : getFilterFunction(f.type, f.params)) //eslint-disable-line
+
+    if (filtersToCreate) {
+      const newFilters = filtersToCreate.map(f =>
+        ({
+          ...f,
+          filters: regenerateFilterFunctions(f.filters)
+        }))
+
+      this.setState({ presetFilters: this.state.presetFilters.concat(newFilters) })
+    }
+  }
+
 
   renderAddFilters() {
     const allFilters = Object.keys(componentFor).map(f => String(f))
@@ -98,6 +121,13 @@ class PopulationFilters extends Component {
         {this.props.filters.map(filter =>
           React.createElement(componentFor[filter.type], { filter, key: filter.id }))}
         <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
+
+        <div className="ui action input">
+          <input type="text" placeholder="Name..." onChange={e => this.setState({ presetName: e.target.value })} />
+
+          <button className="ui button" onClick={handleSavePopulationFilters}>save filters as preset</button>
+        </div>
+
       </Segment>
     )
   }
