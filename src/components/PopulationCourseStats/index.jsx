@@ -32,8 +32,7 @@ class PopulationCourseStats extends Component {
 
   limitPopulationToCourse = course => () => {
     if (!this.active(course.course)) {
-      const params = { course, field: 'all' }
-      this.props.setPopulationFilter(courseParticipation(params))
+      this.props.setPopulationFilter(courseParticipation(course, 'all'))
     } else {
       this.props.removePopulationFilterOfCourse(course.course)
     }

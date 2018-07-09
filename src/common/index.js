@@ -46,10 +46,6 @@ export const userIsAdmin = async () => {
   const token = await getToken()
   return token ? decodeToken(token).admin : false
 }
-export const getUserName = async () => {
-  const token = await getToken()
-  return token ? decodeToken(token).userId : false
-}
 
 export const userIsEnabled = async () => {
   const token = await getToken()
