@@ -14,9 +14,9 @@
     "lint:js": "eslint server ./ --ext .jsx,.js",
     "lintfix": "eslint server ./ --ext .jsx,.js --fix",
     "stats": "webpack --json --config webpack.config.production.js > stats.json",
-    "prepush": "npm run lint",
+    "prepush": "npm run lint & npm test",
     "pretest": "npm run lint",
-    "test": ""
+    "test": "./superbara_tests/run_all_tests.sh"
   },
   "licence": "",
   "main": "src/app.jsx",
