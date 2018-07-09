@@ -45,9 +45,9 @@ jobs:
     - stage: test stuff
       script:
       - docker login -u $DOCKER_USER -p $DOCKER_PASS
-      # - docker build -t toska/oodikone2-frontend:testing .
-      # - docker images
-      # - docker push toska/oodikone2-frontend:testing
+      - docker build -t toska/oodikone2-frontend:testing .
+      - docker images
+      - docker push toska/oodikone2-frontend:testing
       # - docker pull toska/oodikone2-backend:testing
       # - docker-compose up
       # - docker exec -it testing_backend sh
