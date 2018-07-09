@@ -30,6 +30,7 @@ class Main extends Component {
     const enabled = await userIsEnabled()
     if (!enabled) {
       log('Not enabled')
+      console.log('not enabled')
     }
     this.setState({ enabled, loaded: true })
   }
@@ -40,14 +41,14 @@ class Main extends Component {
 
   render() {
     console.log('Wed May 30 19:55:39 EEST 2018') // eslint-disable-line
-
+    console.log({ BASE_PATH })
     if (!this.state.loaded) {
       return <Loader active inline="centered" />
     }
     if (!this.state.enabled || this.state.hasError) {
       return <AccessDenied itWasError={this.state.hasError} />
     }
-
+    console.log('rendering')
     return (
       <div className={styles.appContainer}>
         <Router basename={BASE_PATH}>
