@@ -18,7 +18,6 @@
     "pretest": "npm run lint",
     "test": "./superbara_tests/run_all_tests.sh"
   },
-  
   "licence": "",
   "main": "src/app.jsx",
   "devDependencies": {

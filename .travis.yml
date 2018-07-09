@@ -5,15 +5,70 @@ cache:
   directories:
     - node_modules
 
+addons:
+  chrome: stable
+  postgresql: "9.6"
+  apt:
+    packages:
+      - docker-ce
+      - postgresql-9.6
+      - postgresql-client-9.6
+
+
+env: 
+  global:
+    - DOCKER_COMPOSE_VERSION=1.21.2
+    
+
 sudo: required
+before_install:
+  # reinstall docker-compose at specific version
+  # - sudo rm -f /usr/local/bin/docker-compose
+  # - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  # - chmod +x docker-compose
+  # - sudo mv docker-compose /usr/local/bin
+  # - docker version
+  # - docker-compose -v
+  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
+  - gem install superbara
+before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+  - psql -c 'create database tkt_oodi_testing;' -U postgres
 
 services:
   - docker
+  - redis-server
+
+jobs:
+  include:
+    - stage: test stuff
+      script:
+      - docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - docker build -t toska/oodikone2-frontend:testing .
+      - docker images
+      - docker push toska/oodikone2-frontend:testing
+      # - docker pull toska/oodikone2-backend:testing
+      # - docker-compose up
+      # - docker exec -it testing_backend sh
+      # - npm run update_database
+      # - npm run dev
+      # - testing backend
+      # - npm test
+      # - starting frontend
+      # - docker exec -it frontend_testing sh
+      # - npm run dev
+      # - running superbara
+      # - npm test
+      
+    
+      
 
 after_success:
-  - "[[ $TRAVIS_BRANCH =~ (master) ]] && docker build -t toska/oodikone2-frontend:staging ."
-  - "[[ $TRAVIS_BRANCH =~ (master) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
-  - "[[ $TRAVIS_BRANCH =~ (master) ]] && docker push toska/oodikone2-frontend:staging"
+  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker build -t toska/oodikone2-frontend:staging ."
+  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
+  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker push toska/oodikone2-frontend:staging"
   - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker build -t toska/oodikone2-frontend:latest ."
   - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
   - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker push toska/oodikone2-frontend:latest"
