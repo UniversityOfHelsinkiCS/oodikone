@@ -1,11 +1,11 @@
 const nock = require('nock')
 const axios = require('axios')
 const httpAdapter = require('axios/lib/adapters/http')
-const { OODI_ADDR } = require('../../src/conf-backend')
-const { updateFaculties } = require('../../src/services/doo_api_database_updater/database_updater_new')
+const { OODI_ADDR } = require('../../../src/conf-backend')
+const { updateFaculties } = require('../../../src/services/doo_api_database_updater/database_updater_new')
 const { faculties } = require('./test_data')
-const { Organisation, sequelize } = require('../../src/models/index')
-
+const { Organisation, sequelize } = require('../../../src/models/index')
+const { forceSyncDatabase } = require('../../../src/database/connection')
 
 const configureAxios = () => {
   axios.defaults.adapter = httpAdapter
@@ -18,10 +18,6 @@ const mockApiGet = (path, data) => {
     .reply(200, {
       data
     })
-}
-
-const forceSyncDatabase = async () => {
-  await sequelize.sync({ force: true })
 }
 
 beforeAll(async () => {
@@ -45,7 +41,6 @@ describe('Database updater for saving faculties', () => {
 
   test('Database updater saves correct amount of faculties', async () => {
     const facultiesInDb = await Organisation.findAll()
-    console.log(faculties)
     expect(facultiesInDb.length).toBe(faculties.length)
   })
 
