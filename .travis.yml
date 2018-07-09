@@ -4,6 +4,7 @@ node_js:
 cache:
   directories:
     - node_modules
+
 addons:
   chrome: stable
   postgresql: "9.6"

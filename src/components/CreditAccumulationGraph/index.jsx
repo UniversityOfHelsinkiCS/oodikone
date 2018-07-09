@@ -134,7 +134,7 @@ class CreditAccumulationGraph extends Component {
         totalCredits += credits
       }
       return {
-        title: `${course.name.fi} (${course.code})`,
+        title: `${course.name} (${course.code})`,
         [studentNumber]: totalCredits,
         credits,
         date: reformatDate(date, DISPLAY_DATE_FORMAT),
