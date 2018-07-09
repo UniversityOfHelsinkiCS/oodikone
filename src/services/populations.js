@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const Op = Sequelize.Op
+const { Op } = Sequelize
 const _ = require('lodash')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
@@ -107,14 +107,20 @@ const optimizedStatisticsOf = async (query) => {
   const endDate = `${year}-${semesterEnd[semester]}`
   const studentnumbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
   const students = await Student.findAll({
+    attributes: ['firstnames', 'lastname', 'studentnumber', 'dateofuniversityenrollment', 'creditcount', 'matriculationexamination', 'abbreviatedname', 'email'],
     include: [
       {
         model: Credit,
+        attributes: ['grade', 'credits', 'isStudyModuleCredit'],
         required: true,
         include: [
           {
             model: CourseInstance,
-            include: [Course],
+            attributes: ['coursedate', 'course_code'],
+            include: {
+              model: Course,
+              attributes: ['name']
+            },
             required: true,
             where: {
               coursedate: {
