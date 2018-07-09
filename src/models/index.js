@@ -131,6 +131,11 @@ const Credit = sequelize.define('credit',
     timestamps: true,
     createdAt: 'createddate',
     updatedAt: 'lastmodifieddate',
+    indexes: [
+      {
+        fields: ['student_studentnumber']
+      }
+    ]
   }
 )
 
@@ -195,6 +200,8 @@ const StudyrightElement = sequelize.define('studyright_elements',
       {
         unique: true,
         fields: ['startdate', 'enddate', 'studyrightid', 'code']
+      }, {
+        fields: ['startdate']
       }
     ],
     tablename: 'studyright_elements'
@@ -228,6 +235,11 @@ const CourseInstance = sequelize.define('courseinstance',
   {
     tableName: 'courseinstance',
     timestamps: false,
+    indexes: [
+      {
+        fields: ['coursedate']
+      }
+    ]
   }
 )
 
