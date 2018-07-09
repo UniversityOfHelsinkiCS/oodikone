@@ -55,8 +55,10 @@ if (process.env.NODE_ENV === 'test') {
 
 const getStudent = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/info`
+  console.log( {url} )
   const response = await attemptGetFor(url)
   const data = response.data.data
+  console.log({ data })
   return data
 }
 

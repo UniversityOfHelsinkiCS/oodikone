@@ -23,6 +23,8 @@ const run = async (studentnumbersfile='studentnumbers.txt') => {
   const studentnumbers = await readStudentNumbersFromFile(studentnumbersfile)
   const counter = createStudentCounter(studentnumbers)
   const started = new Date()
+  console.log(process.env)
+  console.log({ started })
   startStatusBar()
   await updateDatabase(studentnumbers, () => counter.inc())
   stopStatusBar()
