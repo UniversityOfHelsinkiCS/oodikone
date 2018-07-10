@@ -15,7 +15,7 @@ import { removeStudentSelection, resetStudent } from '../../redux/students'
 const StudentInfoCard = (props) => {
   const { student, translate, showName } = props
   const name = showName ? `${student.name}, ` : ''
-  const email = showName ? `${student.email}` : ''
+  const email = showName && student.email ? `${student.email}` : ''
   const onRemove = () => {
     props.history.push('/students')
     props.resetStudent()
