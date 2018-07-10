@@ -2,34 +2,24 @@ require('dotenv').config()
 const axios = require('axios')
 const { OODI_ADDR } = require('../../conf-backend')
 const https = require('https')
-
+const fs = require('fs')
 const base_url = OODI_ADDR
 
 const instance = axios.create({
-  httpsAgent: new https.Agent({  
+  httpsAgent: new https.Agent({
     rejectUnauthorized: false
   })
 })
 
-if ( process.env.NODE_ENV !== 'test' ) {
+const getUrl = process.env.NODE_ENV === 'anon' ? async (url) => JSON.parse(await fs.readFileSync(url)) : instance.get
 
-  axios.defaults.auth = {
-    username: 'tktl',
-    password: process.env.OODI_PW
-  }
-
-  axios.defaults.params = {
-    token: process.env.TOKEN
-  }
-}
-
-const attemptGetFor = async (url, attempts=5) => {
+const attemptGetFor = async (url, attempts = 5) => {
   let attempt = 0
   let response = 0
   while (attempt <= attempts) {
     attempt += 1
     try {
-      response = await instance.get(url)
+      response = await getUrl(url)
       return response
     } catch (error) {
       if (attempt === attempts) {
@@ -39,10 +29,25 @@ const attemptGetFor = async (url, attempts=5) => {
   }
 }
 
+if (process.env.NODE_ENV === 'dev') {
+
+  axios.defaults.auth = {
+    username: 'tktl',
+    password: process.env.OODI_PW
+  }
+  axios.defaults.params = {
+    token: process.env.TOKEN
+  }
+
+}
+
+
 const getStudent = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/info`
+  console.log({ url })
   const response = await attemptGetFor(url)
   const data = response.data.data
+  console.log({ data })
   return data
 }
 

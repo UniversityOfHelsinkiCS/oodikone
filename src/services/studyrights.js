@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
-const { Studyright } = require('../models')
-const Op = Sequelize.Op
+const { Studyright, StudyrightElement } = require('../models')
+const { Op, col, where, fn } = Sequelize
 
 const createStudyright = apiData => Studyright.create(apiData)
 
@@ -33,6 +33,30 @@ const ofPopulations = (conf) => {
   })
 }
 
+const studentNumbersWithAllStudyRightElements = async (codes, startedAfter, startedBefore) => {
+  const studyrights = await StudyrightElement.findAll({
+    attributes: ['studentnumber'],
+    where: {
+      code: {
+        [Op.in]: codes
+      },
+      startdate: {
+        [Op.between]: [startedAfter, startedBefore]
+      }
+    },
+    group:[
+      col('studentnumber')
+    ],
+    having: where(
+      fn('count', fn('distinct', col('code'))),
+      {
+        [Op.eq]: codes.length
+      }
+    ),
+  })
+  return studyrights.map(srelement => srelement.studentnumber)
+}
+
 module.exports = {
-  byStudent, createStudyright, ofPopulations
+  byStudent, createStudyright, ofPopulations, studentNumbersWithAllStudyRightElements
 }
