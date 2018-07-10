@@ -150,10 +150,11 @@ const bottlenecksOf = async (query) => {
   }
 
   const startDate = `${year}-${semesterStart[semester]}`
+  const endDate = `${year}-${semesterEnd[semester]}`
 
   try {
 
-    const student_numbers = await studentNumbersWithAllStudyRightElements(studyRights)
+    const student_numbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
     const students = await studentsWithAllCourses(student_numbers)
       .map(restrictWith(Credit.notLaterThan(startDate, query.months)))
 
