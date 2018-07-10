@@ -49,7 +49,7 @@ export const routes = {
 }
 
 const assumeBasename = () => {
-  const POSSIBLE_BASENAMES = ['staging']
+  const POSSIBLE_BASENAMES = ['staging', 'testing']
   const haystack = window.location.pathname.split('/')
   const needle = haystack.find(path => POSSIBLE_BASENAMES.includes(path))
   return needle ? `/${needle}/` : '/'
