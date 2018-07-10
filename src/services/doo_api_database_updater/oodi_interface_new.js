@@ -11,51 +11,40 @@ const instance = axios.create({
   })
 })
 
-let attemptGetFor = () => null
+const getUrl = process.env.NODE_ENV === 'anon' ? async (url) => JSON.parse(await fs.readFileSync(url)) : instance.get
 
-if (process.env.NODE_ENV !== 'test') {
+const attemptGetFor = async (url, attempts = 5) => {
+  let attempt = 0
+  let response = 0
+  while (attempt <= attempts) {
+    attempt += 1
+    try {
+      response = await getUrl(url)
+      return response
+    } catch (error) {
+      if (attempt === attempts) {
+        throw error
+      }
+    }
+  }
+}
+
+if (process.env.NODE_ENV === 'dev') {
 
   axios.defaults.auth = {
     username: 'tktl',
     password: process.env.OODI_PW
   }
-
   axios.defaults.params = {
     token: process.env.TOKEN
   }
 
-  attemptGetFor = async (url, attempts = 5) => {
-    let attempt = 0
-    let response = 0
-    while (attempt <= attempts) {
-      attempt += 1
-      try {
-        response = await instance.get(url)
-        return response
-      } catch (error) {
-        if (attempt === attempts) {
-          throw error
-        }
-      }
-    }
-  }
 }
-if (process.env.NODE_ENV === 'test') {
-  attemptGetFor = async (url) => {
-    let response = {data:{data:{}}}
-    try {
-      response.data.data = JSON.parse(await fs.readFileSync(url))
-      return response
-    } catch (error) {
-      throw error
 
-    }
-  }
-}
 
 const getStudent = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/info`
-  console.log( {url} )
+  console.log({ url })
   const response = await attemptGetFor(url)
   const data = response.data.data
   console.log({ data })
