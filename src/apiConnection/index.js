@@ -16,6 +16,7 @@ const devOptions = {
 export const login = async () => {
   const options = isDevEnv ? devOptions : null
   const response = await getAxios().post('/login', null, options)
+  console.log({ response })
   return response.data.token
 }
 
@@ -26,6 +27,8 @@ export const swapDevUser = async (newHeaders) => {
 }
 
 const callApi = async (url, method = 'get', data) => {
+  console.log({ url })
+  console.log({ data })
   const options = isDevEnv ? devOptions : { headers: {} }
   const token = await getToken()
   options.headers['x-access-token'] = token
