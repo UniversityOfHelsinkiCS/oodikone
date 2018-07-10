@@ -37,4 +37,9 @@ const runMigrations = async () => {
 const migrationPromise = conf.DB_SCHEMA === 'public' ? sequelize.sync({ force: false })
   : Promise.resolve()
 
-module.exports = { sequelize, migrationPromise }
+
+const forceSyncDatabase = async () => {
+  await sequelize.sync({ force: true })
+}
+
+module.exports = { sequelize, migrationPromise, forceSyncDatabase }
