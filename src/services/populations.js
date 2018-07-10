@@ -3,10 +3,8 @@ const { Op } = Sequelize
 const _ = require('lodash')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-
-const { Studyright, Student, Credit, CourseInstance, Course, sequelize, StudyrightElement } = require('../models')
+const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = require('../models')
 const { formatStudent, formatStudentUnifyCodes } = require('../services/students')
-const { getUnitFromElementDetail } = require('../services/units')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
