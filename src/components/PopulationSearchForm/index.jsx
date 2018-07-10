@@ -10,6 +10,8 @@ import moment from 'moment'
 
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
+import { getPopulationFilters } from '../../redux/populationFilters'
+
 import { getUnits } from '../../redux/units'
 import { isInDateFormat, momentFromFormat, reformatDate, isValidYear } from '../../common'
 import { makeMapRightsToDropDown } from '../../selectors/populationSearchForm'
@@ -26,6 +28,7 @@ class PopulationSearchForm extends Component {
     getUnits: func.isRequired,
     getPopulationStatistics: func.isRequired,
     getPopulationCourses: func.isRequired,
+    getPopulationFilters: func.isRequired,
     clearPopulations: func.isRequired,
     queries: shape({}).isRequired,
     studyProgrammes: arrayOf(dropdownType), //eslint-disable-line
@@ -90,7 +93,8 @@ class PopulationSearchForm extends Component {
     this.props.setLoading()
     Promise.all([
       this.props.getPopulationStatistics(request),
-      this.props.getPopulationCourses(request)
+      this.props.getPopulationCourses(request),
+      this.props.getPopulationFilters(request)
     ]).then(() => this.setState({ isLoading: false }))
   }
 
@@ -386,6 +390,7 @@ const mapStateToProps = ({ populations, units, locale }) => {
 const mapDispatchToProps = dispatch => ({
   getPopulationStatistics: request => dispatch(getPopulationStatistics(request)),
   getPopulationCourses: request => dispatch(getPopulationCourses(request)),
+  getPopulationFilters: request => dispatch(getPopulationFilters(request)),
   getUnits: () => dispatch(getUnits()),
   clearPopulations: () => dispatch(clearPopulations()),
   setLoading: () => dispatch(setLoading())
