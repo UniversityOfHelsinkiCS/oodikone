@@ -25,7 +25,7 @@ describe(`
 Student with:
 - BSc studyright (2011-07-31 – 2016-12-20),
 - Mathematics studyright (2011-07-31 – 2016-12-20),
-- Two credits in 2011-07-31 and 2012-02-31. 
+- Two credits in 2011-09-31 and 2012-02-31.
 `, () => {
 
   const course = {
@@ -36,7 +36,7 @@ Student with:
   const courseinstanceFall = {
     id: 1,
     course_code: course.code,
-    coursedate: new Date('2011-07-31 21:00:00+00')
+    coursedate: new Date('2011-09-31 21:00:00+00')
   }
 
   const courseinstanceSpring = {
@@ -146,8 +146,8 @@ Student with:
     expect(queryResult.some(s => s.studentNumber === student.studentnumber)).toBe(false)
   })
 
-  test('Query result for BSc, Fall 2011 for 3 months should only return the FALL course instance for student. ', async () => {
-    const query = createQueryObject('2011', SEMESTER.FALL, [bachelorOfScience.code], 3)
+  test('Query result for BSc, Fall 2011 for 4 months should only return the FALL course instance for student. ', async () => {
+    const query = createQueryObject('2011', SEMESTER.FALL, [bachelorOfScience.code], 4)
     const queryResult = await optimizedStatisticsOf(query)
     const result = queryResult.find(s => s.studentNumber === student.studentnumber)
     const courseinstances = result.courses
@@ -157,6 +157,12 @@ Student with:
         (instance.date === courseinstanceFall.date) &&
         (instance.course.code === course.code))
     ).not.toBe(undefined)
+  })
+
+  test('Query result for BSc, Fall 2011 for 1 month should not return student since they do not have any credits yet. ', async () => {
+    const query = createQueryObject('2011', SEMESTER.FALL, [bachelorOfScience.code], 1)
+    const result = await optimizedStatisticsOf(query)
+    expect(result.some(s => s.studentNumber === student.studentnumber)).toBe(false)
   })
 
 })
