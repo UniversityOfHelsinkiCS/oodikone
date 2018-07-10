@@ -98,14 +98,7 @@ const formatStudentForOldApi = (student, startDate, endDate) => {
 
 const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
 
-const optimizedStatisticsOf = async (query) => {
-  if (semesterStart[query.semester] === undefined) {
-    return { error: 'Semester should be either SPRING OR FALL' }
-  }
-  const { studyRights, semester, year, months } = query
-  const startDate = `${year}-${semesterStart[semester]}`
-  const endDate = `${year}-${semesterEnd[semester]}`
-  const studentnumbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
+const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate) => {
   const students = await Student.findAll({
     attributes: ['firstnames', 'lastname', 'studentnumber', 'dateofuniversityenrollment', 'creditcount', 'matriculationexamination', 'abbreviatedname', 'email'],
     include: [
@@ -124,7 +117,7 @@ const optimizedStatisticsOf = async (query) => {
             required: true,
             where: {
               coursedate: {
-                [Op.between]: [startDate, dateMonthsFromNow(startDate, months)]
+                [Op.between]: [startDate, endDate]
               }
             }
           }
@@ -137,51 +130,34 @@ const optimizedStatisticsOf = async (query) => {
       }
     }
   })
-  return students.map(formatStudentForOldApi)
+  return students
 }
 
-const getStudentsWithCodes = async (codes, startDate, endDate) => {
-  const studentnumberlists = await Promise.all(codes.map(code => getStudentsWithStudyrightElement(code, startDate, endDate)))
-  return _.intersection(...studentnumberlists)
-}
-
-const getStudentsWithStudyrightElement  = async (code, startedAfter, startedBefore) => {
-  const studyrightelements = await StudyrightElement.findAll({
-    distinct: 'studentnumber',
-    where: {
-      code: {
-        [Op.eq]: code
-      },
-      startdate: {
-        [Op.between]: [startedAfter, startedBefore]
-      }
-    }
-  })
-  return studyrightelements.map(element => element.studentnumber)
-}
-
-const bottlenecksOf = async (query) => {
+const optimizedStatisticsOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
+  const { studyRights, semester, year, months } = query
+  const startDate = `${year}-${semesterStart[semester]}`
+  const endDate = `${year}-${semesterEnd[semester]}`
+  const studentnumbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
+  const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
+  return students.map(formatStudentForOldApi)
+}
 
-  const startDate = `${query.year}-${semesterStart[query.semester]}`
-  const endDate = `${query.year}-${semesterEnd[query.semester]}`
+const bottlenecksOf = async (query) => {
+  const { semester, year, studyRights } = query
+  if (semesterStart[semester] === undefined) {
+    return { error: 'Semester should be either SPRING OR FALL' }
+  }
+
+  const startDate = `${year}-${semesterStart[semester]}`
 
   try {
-    const units = await Promise.all(query.studyRights.map(getUnitFromElementDetail))
-    const conf = {
-      enrollmentDates: {
-        startDate,
-        endDate
-      },
-      units
-    }
 
-    const codes = units.map(unit => unit.id)
-    const student_numbers = await getStudentsWithCodes(codes, startDate, endDate)
+    const student_numbers = await studentNumbersWithAllStudyRightElements(studyRights)
     const students = await studentsWithAllCourses(student_numbers)
-      .map(restrictWith(Credit.notLaterThan(conf.enrollmentDates.startDate, query.months)))
+      .map(restrictWith(Credit.notLaterThan(startDate, query.months)))
 
     const populationSize = students.length
 
