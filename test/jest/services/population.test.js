@@ -64,7 +64,6 @@ describe('optimizedStatisticsOf tests', () => {
     studentnumber: '1234',
   }
 
-
   const studyright = {
     studyrightid: 1,
     student_studentnumber: student.studentnumber
