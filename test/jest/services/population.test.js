@@ -34,11 +34,13 @@ Student with:
   }
 
   const courseinstanceFall = {
+    id: 1,
     course_code: course.code,
     coursedate: new Date('2011-07-31 21:00:00+00')
   }
 
   const courseinstanceSpring = {
+    id: 2,
     course_code: course.code,
     coursedate: new Date('2012-02-31 21:00:00+00')
   }
@@ -73,11 +75,13 @@ Student with:
   const creditFall = {
     id: 'CREDIT-1',
     student_studentnumber: student.studentnumber,
+    courseinstance_id: courseinstanceFall.id
   }
 
   const creditSpring = {
     id: 'CREDIT-2',
-    student_studentnumber: student.studentnumber
+    student_studentnumber: student.studentnumber,
+    courseinstance_id: courseinstanceSpring.id
   }
 
   const studyrightBSc = {
@@ -100,10 +104,10 @@ Student with:
     await forceSyncDatabase()
     await Student.create(student)
     await Course.create(course)
-    const dbcourseinstanceFall = await CourseInstance.create(courseinstanceFall)
-    const dbcourseinstanceSpring = await CourseInstance.create(courseinstanceSpring)
-    await Credit.create({...creditFall, courseinstance_id: dbcourseinstanceFall.id})
-    await Credit.create({...creditSpring, courseinstance_id: dbcourseinstanceSpring.id})
+    await CourseInstance.create(courseinstanceFall)
+    await CourseInstance.create(courseinstanceSpring)
+    await Credit.create(creditFall)
+    await Credit.create(creditSpring)
     await ElementDetails.create(bachelorOfScience)
     await ElementDetails.create(mathematics)
     await ElementDetails.create(computerScience)
@@ -140,6 +144,19 @@ Student with:
     const query = createQueryObject('2012', SEMESTER.SPRING, [bachelorOfScience.code], 12)
     const queryResult = await optimizedStatisticsOf(query)
     expect(queryResult.some(s => s.studentNumber === student.studentnumber)).toBe(false)
+  })
+
+  test('Query result for BSc, Fall 2011 for 3 months should only return the FALL course instance for student. ', async () => {
+    const query = createQueryObject('2011', SEMESTER.FALL, [bachelorOfScience.code], 3)
+    const queryResult = await optimizedStatisticsOf(query)
+    const result = queryResult.find(s => s.studentNumber === student.studentnumber)
+    const courseinstances = result.courses
+    expect(courseinstances.length).toBe(1)
+    expect(
+      courseinstances.some(instance =>
+        (instance.date === courseinstanceFall.date) &&
+        (instance.course.code === course.code))
+    ).not.toBe(undefined)
   })
 
 })
