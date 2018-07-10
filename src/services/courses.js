@@ -10,10 +10,10 @@ const _ = require('lodash')
 
 let redisClient
 
-// if (process.env.NODE_ENV !== 'test') {
-redisClient = redis.createClient(6379, conf.redis)
-require('bluebird').promisifyAll(redis.RedisClient.prototype)
-// }
+if (process.env.NODE_ENV !== 'test') {
+  redisClient = redis.createClient(6379, conf.redis)
+  require('bluebird').promisifyAll(redis.RedisClient.prototype)
+}
 
 const byNameOrCode = (searchTerm) => Course.findAll({
   where: {

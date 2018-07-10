@@ -135,7 +135,7 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   attainmentIds = await existingStudyAttainmentIds()
   courseIds = await existingCourseIds()
   elementDetailsIds = await existingElementIds()
-  if (process.env.NODE_ENV !== 'test') {
+  if (process.env.NODE_ENV !== 'anon') {
     await updateFaculties()
   }
   await updateStudents(studentnumbers, onUpdateStudent, 100)
