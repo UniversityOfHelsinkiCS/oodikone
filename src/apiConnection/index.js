@@ -5,34 +5,16 @@ import { API_BASE_PATH, TOKEN_NAME } from '../constants'
 
 const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
 const isDevEnv = process.env.NODE_ENV === 'development'
-// const isTestEnv = BASE_PATH === '/testing/'
 const devOptions = {
   headers: {
     uid: 'tktl',
     displayName: 'Development Käyttäjä',
     'shib-session-id': 'mock-session'
   }
-
 }
-/*
-const testOptions = {
-  headers: {
-    uid: 'tester',
-    displayName: 'Testing Käyttäjä',
-    'shib-session-id': 'mock-session'
-  }
-}
-*/
 
 export const login = async () => {
-  let options = null
-  if (isDevEnv) {
-    options = devOptions
-  } /* if (isTestEnv) {
-    options = testOptions
-  }
-  console.log({ options })
-  */
+  const options = isDevEnv ? devOptions : null
   const response = await getAxios().post('/login', null, options)
   return response.data.token
 }
