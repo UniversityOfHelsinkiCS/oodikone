@@ -87,8 +87,7 @@ router.get('/v2/populationstatistics/filters', async (req, res) => {
 router.post('/v2/populationstatistics/filters', async (req, res) => {
   let results = []
   const filter = req.body
-  console.log(filter)
-  console.log(filter.filters[0])
+
   try {
     results = await Filters.createNewFilter(filter)
     res.status(200).json(results)
