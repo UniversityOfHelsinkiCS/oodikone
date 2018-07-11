@@ -1,4 +1,4 @@
-visit "localhost:8081"
+visit $basepath
 
 require_relative "./components/query_population_statistics"
 require_relative "./components/filters_population_statistics"
@@ -6,7 +6,7 @@ require_relative "./components/navigate_population_statistics"
 
 navigation = NavigationPanel.new
 population_query = PopulationQuery.new
-population_query.query("2017", "Luonnontieteiden kandidaatti", "Tietojenkäsittelytieteen kandiohjelma")
+population_query.query("2015", "Bachelors Degree on Witchcraft and Wizardry", "Defence Against the Dark Arts")
 
 
 tablebody = find("th", text: /Credits gained during first [0-9]+ months/).find(:xpath, '../../..')
