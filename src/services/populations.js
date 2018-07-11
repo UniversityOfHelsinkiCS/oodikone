@@ -3,10 +3,8 @@ const { Op } = Sequelize
 const _ = require('lodash')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-
-const { Studyright, Student, Credit, CourseInstance, Course, sequelize, StudyrightElement } = require('../models')
-const { formatStudent, formatStudentUnifyCodes } = require('../services/students')
-const { getUnitFromElementDetail } = require('../services/units')
+const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = require('../models')
+const { formatStudent, formatStudentsUnifyCourseCodes } = require('../services/students')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -26,45 +24,6 @@ const studyRightLike = (searchTerm) => {
       type: sequelize.QueryTypes.SELECT,
       model: Studyright
     })
-}
-
-// TODO refactor below two to one 
-const studentsWithAllCourses = (student_numbers) => {
-  return Student.findAll({
-    include: [
-      {
-        model: Credit,
-        include: [
-          {
-            model: CourseInstance,
-            include: [Course]
-          }
-        ],
-      },
-    ],
-    where: {
-      studentnumber: {
-        [Op.in]: student_numbers
-      }
-    },
-  })
-}
-
-const restrictWith = (withinTimerange) => (student) => {
-  const creditsWithinTimelimit = student.credits.filter(withinTimerange)
-
-  return {
-    firstnames: student.firstnames,
-    lastname: student.lastname,
-    studentnumber: student.studentnumber,
-    tag_students: student.tag_students,
-    dateofuniversityenrollment: student.dateofuniversityenrollment,
-    creditcount: student.creditcount,
-    credits: creditsWithinTimelimit,
-    sex: student.sex,
-    matriculationexamination: !!Number(student.matriculationexamination),
-    email: student.email
-  }
 }
 
 const studyrightsByKeyword = async (searchTerm) => {
@@ -98,14 +57,7 @@ const formatStudentForOldApi = (student, startDate, endDate) => {
 
 const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
 
-const optimizedStatisticsOf = async (query) => {
-  if (semesterStart[query.semester] === undefined) {
-    return { error: 'Semester should be either SPRING OR FALL' }
-  }
-  const { studyRights, semester, year, months } = query
-  const startDate = `${year}-${semesterStart[semester]}`
-  const endDate = `${year}-${semesterEnd[semester]}`
-  const studentnumbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
+const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate) => {
   const students = await Student.findAll({
     attributes: ['firstnames', 'lastname', 'studentnumber', 'dateofuniversityenrollment', 'creditcount', 'matriculationexamination', 'abbreviatedname', 'email'],
     include: [
@@ -124,7 +76,7 @@ const optimizedStatisticsOf = async (query) => {
             required: true,
             where: {
               coursedate: {
-                [Op.between]: [startDate, dateMonthsFromNow(startDate, months)]
+                [Op.between]: [startDate, endDate]
               }
             }
           }
@@ -137,69 +89,77 @@ const optimizedStatisticsOf = async (query) => {
       }
     }
   })
-  return students.map(formatStudentForOldApi)
+  return students
 }
 
-const getStudentsWithCodes = async (codes, startDate, endDate) => {
-  const studentnumberlists = await Promise.all(codes.map(code => getStudentsWithStudyrightElement(code, startDate, endDate)))
-  return _.intersection(...studentnumberlists)
-}
-
-const getStudentsWithStudyrightElement  = async (code, startedAfter, startedBefore) => {
-  const studyrightelements = await StudyrightElement.findAll({
-    distinct: 'studentnumber',
-    where: {
-      code: {
-        [Op.eq]: code
-      },
-      startdate: {
-        [Op.between]: [startedAfter, startedBefore]
+const getStudentsIncludeCreditsBefore = (studentnumbers, endDate) => {
+  return Student.findAll({
+    include: [
+      {
+        model: Credit,
+        required: true,
+        include: [
+          {
+            model: CourseInstance,
+            include: [Course],
+            where: {
+              coursedate: {
+                [Op.lt]: endDate
+              }
+            },
+          }
+        ]
       }
-    }
+    ],
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumbers
+      }
+    },
   })
-  return studyrightelements.map(element => element.studentnumber)
 }
 
-const bottlenecksOf = async (query) => {
+const optimizedStatisticsOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
+  const { studyRights, semester, year, months } = query
+  const startDate = `${year}-${semesterStart[semester]}`
+  const endDate = `${year}-${semesterEnd[semester]}`
+  const studentnumbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
+  const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
+  return students.map(formatStudentForOldApi)
+}
 
-  const startDate = `${query.year}-${semesterStart[query.semester]}`
-  const endDate = `${query.year}-${semesterEnd[query.semester]}`
+const getStudentCourseStatistics = student => {
+  const courses = _.groupBy(student.courses, c => c.course.code)
+  const result = Object.keys(courses).map(code=>{
+    const instances = courses[code]
+    return {
+      course: courses[code][0].course,
+      attempts: instances.length,
+      passed: instances.some(c=>c.passed), 
+      student: student.studentNumber
+    }
+  })
+  return result
+}
+
+const bottlenecksOf = async (query) => {
+  const { semester, year, studyRights, months } = query
+  if (semesterStart[semester] === undefined) {
+    return { error: 'Semester should be either SPRING OR FALL' }
+  }
+
+  const startDate = `${year}-${semesterStart[semester]}`
+  const endDate = `${year}-${semesterEnd[semester]}`
 
   try {
-    const units = await Promise.all(query.studyRights.map(getUnitFromElementDetail))
-    const conf = {
-      enrollmentDates: {
-        startDate,
-        endDate
-      },
-      units
-    }
-
-    const codes = units.map(unit => unit.id)
-    const student_numbers = await getStudentsWithCodes(codes, startDate, endDate)
-    const students = await studentsWithAllCourses(student_numbers)
-      .map(restrictWith(Credit.notLaterThan(conf.enrollmentDates.startDate, query.months)))
-
+    const student_numbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
+    const students = await getStudentsIncludeCreditsBefore(student_numbers, dateMonthsFromNow(startDate, months))
     const populationSize = students.length
-
-    const toCourses = async (student) => {
-      const formattedStudent = await formatStudentUnifyCodes(student)
-      const courses = _.groupBy(formattedStudent.courses, c => c.course.code)
-      return Object.keys(courses).map(code=>{
-        const instances = courses[code]
-        return {
-          course: courses[code][0].course,
-          attempts: instances.length,
-          passed: instances.some(c=>c.passed), 
-          student: student.studentnumber
-        }
-      })
-    }
-
-    const courses = _.flatten(await Promise.all(students.map(toCourses)))
+    const formattedstudents = await formatStudentsUnifyCourseCodes(students)
+    const courses = _.flatten(formattedstudents.map(getStudentCourseStatistics))
 
     const toNameMap = (names, { course }) => {
       const { code, name } = course
@@ -238,7 +198,6 @@ const bottlenecksOf = async (query) => {
         notParticipatedOrFailed: toObject(notParticipatedOrFailed)
       }
     }
-
 
     const statsOf = (instances) => {
       const passed = instances.reduce((sum, i) => sum + (i.passed ? 1 : 0), 0)
@@ -279,5 +238,5 @@ const bottlenecksOf = async (query) => {
 
 module.exports = {
   studyrightsByKeyword, universityEnrolmentDates,
-  optimizedStatisticsOf, bottlenecksOf
+  optimizedStatisticsOf, bottlenecksOf,
 }
