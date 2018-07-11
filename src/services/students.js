@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { Student, Credit, CourseInstance, Course, Studyright, StudyrightElement } = require('../models')
-const { getMainCode } = require('./courses')
+const { getAllDuplicates } = require('./courses')
 const Op = Sequelize.Op
 
 const createStudent = student => Student.create(student)
@@ -112,7 +112,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
   }
 }
 
-const formatStudentUnifyCodes = async ({ studentnumber, dateofuniversityenrollment, creditcount, credits }) => {
+const formatStudentUnifyCodes = async ({ studentnumber, dateofuniversityenrollment, creditcount, credits }, duplicates) => {
   const unifyOpenUniversity = (code) => {
     if (code[0] === 'A') {
       return code.substring(code[1] === 'Y' ? 2 :1 )
@@ -120,8 +120,13 @@ const formatStudentUnifyCodes = async ({ studentnumber, dateofuniversityenrollme
     return code
   }
 
+  const getUnifiedCode = async (code) => {
+    const unifiedcodes = duplicates[code]
+    return !unifiedcodes ? code : unifiedcodes.main
+  }
+
   const toCourse = async ({ grade, credits, courseinstance }) => {
-    const code = await getMainCode(unifyOpenUniversity(`${courseinstance.course_code}`))
+    const code = await getUnifiedCode(unifyOpenUniversity(`${courseinstance.course_code}`))
     return {
       course: {
         code,
@@ -203,6 +208,11 @@ const bySearchTermAndElements = (searchterm, elementcodes) => {
   })
 }
 
+const formatStudentsUnifyCourseCodes = async students => {
+  const duplicates = await getAllDuplicates()
+  return await Promise.all(students.map(student => formatStudentUnifyCodes(student, duplicates)))
+}
+
 module.exports = {
-  withId, bySearchTerm, formatStudent, createStudent, byId, updateStudent, formatStudentUnifyCodes, bySearchTermAndElements
+  withId, bySearchTerm, formatStudent, createStudent, byId, updateStudent, formatStudentUnifyCodes, bySearchTermAndElements, formatStudentsUnifyCourseCodes
 }
