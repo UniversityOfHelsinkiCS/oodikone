@@ -1,11 +1,11 @@
-visit "localhost:8081"
+visit $basepath
 require_relative "./components/query_course_statistics"
 
 course_statistics = CourseQuery.new
 start_year = rand(2011...Time.now.year)
 end_year = rand(start_year + 1 ... Time.now.year+1)
 
-course_statistics.query(start_year.to_s, end_year.to_s, "Tietorakenteet ja algoritmit")
+course_statistics.query(start_year.to_s, end_year.to_s, "end-to-end revolutionize solutions")
 
 wait do
   barchart = find("div", class:"recharts-wrapper")
