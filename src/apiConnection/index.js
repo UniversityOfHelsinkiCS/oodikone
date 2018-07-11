@@ -1,20 +1,36 @@
 import axios from 'axios'
 
 import { getToken, setToken } from '../common'
-import { API_BASE_PATH, TOKEN_NAME } from '../constants'
+import { API_BASE_PATH, TOKEN_NAME, BASE_PATH } from '../constants'
 
 const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
+const isTestEnv = BASE_PATH === '/testing/'
 const isDevEnv = process.env.NODE_ENV === 'development'
 const devOptions = {
   headers: {
     uid: 'tktl',
-    displayName: 'Development Käyttäjä',
+    displayName: 'Development Kayttaja',
+    'shib-session-id': 'mock-session'
+  }
+
+}
+
+const testOptions = {
+  headers: {
+    uid: 'tester',
+    displayName: 'Testing Käyttäjä',
     'shib-session-id': 'mock-session'
   }
 }
 
 export const login = async () => {
-  const options = isDevEnv ? devOptions : null
+  let options = null
+  if (isDevEnv) {
+    options = devOptions
+  }
+  if (isTestEnv) {
+    options = testOptions
+  }
   const response = await getAxios().post('/login', null, options)
   return response.data.token
 }
@@ -26,7 +42,13 @@ export const swapDevUser = async (newHeaders) => {
 }
 
 const callApi = async (url, method = 'get', data) => {
-  const options = isDevEnv ? devOptions : { headers: {} }
+  let options = { headers: {} }
+  if (isDevEnv) {
+    options = devOptions
+  }
+  if (isTestEnv) {
+    options = testOptions
+  }
   const token = await getToken()
   options.headers['x-access-token'] = token
 
