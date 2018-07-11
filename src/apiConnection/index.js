@@ -31,9 +31,7 @@ export const login = async () => {
   if (isTestEnv) {
     options = testOptions
   }
-  console.log({ options })
   const response = await getAxios().post('/login', null, options)
-  console.log({ response })
   return response.data.token
 }
 
