@@ -49,7 +49,7 @@ export const routes = {
 }
 
 const assumeBasename = () => {
-  const POSSIBLE_BASENAMES = ['staging']
+  const POSSIBLE_BASENAMES = ['staging', 'testing']
   const haystack = window.location.pathname.split('/')
   const needle = haystack.find(path => POSSIBLE_BASENAMES.includes(path))
   return needle ? `/${needle}/` : '/'
@@ -65,7 +65,7 @@ export const DEFAULT_LANG = 'en'
 export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
 export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
-export const TOKEN_NAME = window.location.pathname.includes('/staging') ? 'staging_token' : 'token'
+export const TOKEN_NAME = window.location.pathname.includes('/staging') ? 'staging_token' : window.location.pathname.includes('/testing') ? 'testing_token' : 'token' //eslint-disable-line
 
 export const CHART_COLORS = [
   chart1,
