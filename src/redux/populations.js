@@ -6,7 +6,8 @@ const initialState = {
   pending: false,
   error: false,
   data: [],
-  query: undefined
+  query: undefined,
+  updating: false
 }
 
 export const getPopulationStatistics = ({
@@ -19,7 +20,12 @@ export const getPopulationStatistics = ({
   }
   return callController(route, prefix, null, 'get', query)
 }
+export const updatePopulationStudents = (students) => {
+  const route = '/updatedatabase'
+  const prefix = 'UPDATE_POPULATION_STUDENTS_'
 
+  return callController(route, prefix, students, 'post')
+}
 export const clearPopulations = () => ({
   type: 'CLEAR_POPULATIONS'
 })
@@ -36,21 +42,39 @@ const reducer = (state = initialState, action) => {
         pending: true,
         error: false,
         data: [],
-        query: action.requestSettings.query
+        query: action.requestSettings.query,
+        updating: false
       }
     case 'GET_POPULATION_STATISTICS_FAILURE':
       return {
         pending: false,
         error: true,
         data: action.response,
-        query: action.query
+        query: action.query,
+        updating: false
       }
     case 'GET_POPULATION_STATISTICS_SUCCESS':
       return {
         pending: false,
         error: false,
         data: action.response,
-        query: action.query
+        query: action.query,
+        updating: false
+      }
+    case 'UPDATE_POPULATION_STUDENTS_ATTEMPT':
+      return {
+        ...state,
+        updating: true
+      }
+    case 'UPDATE_POPULATION_STUDENTS_FAILURE':
+      return {
+        ...state,
+        updating: false
+      }
+    case 'UPDATE_POPULATION_STUDENTS_SUCCESS':
+      return {
+        ...state,
+        updating: false
       }
     case 'REMOVE_POPULATION':
       return initialState
