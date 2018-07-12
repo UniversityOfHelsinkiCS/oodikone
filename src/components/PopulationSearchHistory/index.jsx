@@ -4,7 +4,7 @@ import { func, shape, arrayOf, object, bool } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 
 import PopulationQueryCard from '../PopulationQueryCard'
-import { removePopulation } from '../../redux/populations'
+import { removePopulation, updatePopulationStudents } from '../../redux/populations'
 import { clearPopulationCourses } from '../../redux/populationCourses'
 import { clearPopulationFilters } from '../../redux/populationFilters'
 
@@ -20,13 +20,15 @@ class PopulationSearchHistory extends Component {
       data: arrayOf(object),
       query: object
     }).isRequired,
-    units: object // eslint-disable-line
+    units: object, // eslint-disable-line
+    updatePopulationStudents: func.isRequired
   }
 
   removePopulation = uuid => this.props.removePopulation(uuid)
 
   renderQueryCards = () => {
     const { populations, translate, units } = this.props
+    const studentNumberList = (populations.data.map(s => s.studentNumber))
     return populations.query ? (<PopulationQueryCard
       key={`population-${populations.query.uuid}`}
       translate={translate}
@@ -36,6 +38,8 @@ class PopulationSearchHistory extends Component {
       unit={units.data.find(u => u.id === populations.query.studyRights[0])} // Possibly deprecated
       units={units.data.filter(u => populations.query.studyRights.some(sr => sr === u.id))}
       removeSampleFn={this.removePopulation}
+      updateStudentsFn={() => this.props.updatePopulationStudents(studentNumberList)}
+      updating={populations.updating}
     />) : null
   }
 
@@ -59,7 +63,9 @@ const mapDispatchToProps = dispatch => ({
     dispatch(removePopulation(uuid))
     dispatch(clearPopulationCourses())
     dispatch(clearPopulationFilters())
-  }
+  },
+  updatePopulationStudents: students => dispatch(updatePopulationStudents(students))
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory)
