@@ -1,3 +1,3 @@
 focus
 
-$basepath = "localhost:8081"
+$basepath = "https://oodikone.cs.helsinki.fi/testing/"
