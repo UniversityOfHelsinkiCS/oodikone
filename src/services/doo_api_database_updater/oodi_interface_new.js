@@ -47,7 +47,6 @@ const getStudent = async studentNumber => {
   console.log({ url })
   const response = await attemptGetFor(url)
   const data = response.data.data
-  console.log({ data })
   return data
 }
 
