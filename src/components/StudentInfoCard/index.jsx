@@ -1,6 +1,6 @@
 import React from 'react'
 import { func, bool, shape } from 'prop-types'
-import { Card, Icon } from 'semantic-ui-react'
+import { Card, Icon, Button } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
@@ -11,9 +11,11 @@ import { DISPLAY_DATE_FORMAT } from '../../constants'
 import styles from './studentInfoCard.css'
 
 import { removeStudentSelection, resetStudent } from '../../redux/students'
+import { updatePopulationStudents } from '../../redux/populations'
+
 
 const StudentInfoCard = (props) => {
-  const { student, translate, showName } = props
+  const { student, translate, showName, updating } = props
   const name = showName ? `${student.name}, ` : ''
   const email = showName && student.email ? `${student.email}` : ''
   const onRemove = () => {
@@ -38,7 +40,6 @@ const StudentInfoCard = (props) => {
       </div>
     )
   }
-
   return (
     <Card fluid>
       <Card.Content>
@@ -49,6 +50,7 @@ const StudentInfoCard = (props) => {
             className={styles.controlIcon}
             onClick={onRemove}
           />
+
         </Card.Header>
         <Card.Meta>
           <div className={styles.startDate}>
@@ -62,6 +64,19 @@ const StudentInfoCard = (props) => {
         <Card.Description>
           {`${translate('common.credits')}: ${student.credits || 0}`}
         </Card.Description>
+        <div style={{ paddingTop: '4px' }}>
+          {updating ?
+            <Button disabled compact size="medium" labelPosition="left" onClick={() => props.updatePopulationStudents([student.studentNumber])} >
+              <Icon loading name="refresh" />
+              update student
+            </Button>
+            :
+            <Button compact floated="left" size="medium" labelPosition="left" onClick={() => props.updatePopulationStudents([student.studentNumber])} >
+              <Icon name="refresh" />
+              update student
+            </Button>
+          }
+        </div>
       </Card.Content>
     </Card>
   )
@@ -73,14 +88,17 @@ StudentInfoCard.propTypes = {
   showName: bool.isRequired,
   removeStudentSelection: func.isRequired,
   resetStudent: func.isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  updating: bool.isRequired,
+  updatePopulationStudents: func.isRequired
 }
 
 const mapStateToProps = state => ({
-  showName: state.settings.namesVisible
+  showName: state.settings.namesVisible,
+  updating: state.populations.updating
 })
 
 export default withRouter(connect(mapStateToProps, {
-  removeStudentSelection, resetStudent
+  removeStudentSelection, resetStudent, updatePopulationStudents
 })(StudentInfoCard))
 
