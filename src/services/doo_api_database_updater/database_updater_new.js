@@ -75,6 +75,7 @@ const updateStudyattainments = async (api, studentnumber) => {
 }
 
 const updateStudent = async studentnumber => {
+  console.log(`updating ${studentnumber}`)
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {
     logger.verbose(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
@@ -90,6 +91,7 @@ const updateStudent = async studentnumber => {
 const updateStudents = async (studentnumbers, onUpdateStudent, chunksize = 1) => {
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
+  console.log('updating')
   while (remaining.length > 0) {
     const nextchunk = remaining.splice(0, chunksize)
     await Promise.all(nextchunk.map(async studentnumber => {
@@ -116,29 +118,14 @@ const updateFaculties = async () => {
   }))
 }
 
-const existingStudyAttainmentIds = async () => {
-  const attainments = await Credit.findAll()
-  return new Set(attainments.map(attainment => attainment.id))
-}
-
-const existingCourseIds = async () => {
-  const courses = await Course.findAll()
-  return new Set(courses.map(course => course.code))
-}
-
-const existingElementIds = async () => {
-  const elements = await ElementDetails.findAll()
-  return new Set(elements.map(element => element.code))
-}
 
 const updateDatabase = async (studentnumbers, onUpdateStudent) => {
-  attainmentIds = await existingStudyAttainmentIds()
-  courseIds = await existingCourseIds()
-  elementDetailsIds = await existingElementIds()
+  console.log('starting', studentnumbers.length)
   if (process.env.NODE_ENV !== 'anon') {
     await updateFaculties()
   }
-  await updateStudents(studentnumbers, onUpdateStudent, 100)
+  await updateStudents(studentnumbers, onUpdateStudent, 128)
+  return
 }
 
 module.exports = { updateDatabase, updateFaculties }

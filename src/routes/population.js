@@ -3,6 +3,8 @@ const Population = require('../services/populations')
 const User = require('../services/users')
 const Unit = require('../services/units')
 const Filters = require('../services/filters')
+const { updateDatabase } = require('../services/doo_api_database_updater/database_updater_new')
+
 router.get('/v2/populationstatistics/courses', async (req, res) => {
   try {
     if (!req.query.year || !req.query.semester || !req.query.studyRights) {
@@ -67,7 +69,7 @@ router.get('/v2/populationstatistics', async (req, res) => {
   }
 })
 router.get('/v2/populationstatistics/filters', async (req, res) => {
-  
+
   let results = []
   let rights = req.query.studyRights
   if (!Array.isArray(rights)) { // studyRights should always be an array
@@ -97,6 +99,16 @@ router.post('/v2/populationstatistics/filters', async (req, res) => {
     res.status(400).end()
   }
 
+})
+router.post('/updatedatabase', async (req, res) => {
+  const studentnumbers = req.body
+  console.log(studentnumbers)
+  if (studentnumbers) {
+    await updateDatabase(studentnumbers)
+    res.status(200).json('Updated')
+  } else {
+    res.status(400).end()
+  }
 })
 
 router.get('/studyprogrammes', async (req, res) => {
