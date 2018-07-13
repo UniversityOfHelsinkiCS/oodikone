@@ -86,13 +86,19 @@ const typeList = {
   HasMatriculation: matriculationFilter,
   SexFilter: sexFilter,
   CourseParticipation: courseParticipation,
-  StartingThisSemester: startingThisSemester,
-  Preset: presetFilter
+  StartingThisSemester: startingThisSemester
 }
-export const getFilterFunction = (type, params) => {
-  if (type === 'CourseParticipation') {
-    return courseParticipation(params)
+export const getFilterFunction = (type, params, populationCourses) => {
+  switch (type) {
+    case 'CourseParticipation':
+      return courseParticipation({
+        field: params.field,
+        course: populationCourses.filter(c => c.course.code === params.course.course.code)[0]
+      })
+    case 'Preset':
+      return presetFilter(params)
+    default:
+      return typeList[type](Object.values(params))
   }
-  return typeList[type](Object.values(params))
 }
 
