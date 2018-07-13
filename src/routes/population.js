@@ -104,7 +104,7 @@ router.post('/updatedatabase', async (req, res) => {
   const studentnumbers = req.body
   console.log(studentnumbers)
   if (studentnumbers) {
-    await updateDatabase(studentnumbers)
+    await updateDatabase(studentnumbers, null, true)
     res.status(200).json('Updated')
   } else {
     res.status(400).end()

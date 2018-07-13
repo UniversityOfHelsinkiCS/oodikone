@@ -4,7 +4,8 @@ const _ = require('lodash')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
 const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = require('../models')
-const { formatStudent, formatStudentsUnifyCourseCodes } = require('../services/students')
+const { formatStudent } = require('../services/students')
+const { getAllDuplicates } = require('./courses')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -94,14 +95,20 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
 
 const getStudentsIncludeCreditsBefore = (studentnumbers, endDate) => {
   return Student.findAll({
+    attributes: ['studentnumber'],
     include: [
       {
         model: Credit,
+        attributes: ['grade', 'student_studentnumber'],
         required: true,
         include: [
           {
             model: CourseInstance,
-            include: [Course],
+            attributes: ['course_code'],
+            include: {
+              model: Course,
+              attributes: ['name']
+            },
             where: {
               coursedate: {
                 [Op.lt]: endDate
@@ -131,112 +138,137 @@ const optimizedStatisticsOf = async (query) => {
   return students.map(formatStudentForOldApi)
 }
 
-const getStudentCourseStatistics = student => {
-  const courses = _.groupBy(student.courses, c => c.course.code)
-  const result = Object.keys(courses).map(code=>{
-    const instances = courses[code]
-    return {
-      course: courses[code][0].course,
-      attempts: instances.length,
-      passed: instances.some(c=>c.passed), 
-      student: student.studentNumber
-    }
-  })
-  return result
+const unifyOpenUniversity = (code) => {
+  if (code[0] === 'A') {
+    return code.substring(code[1] === 'Y' ? 2 :1 )
+  } 
+  return code
 }
 
-const bottlenecksOf = async (query) => {
+const getUnifiedCode = (code, codeduplicates) => {
+  const formattedcode = unifyOpenUniversity(code)
+  const unifiedcodes = codeduplicates[formattedcode]
+  return !unifiedcodes ? formattedcode : unifiedcodes.main
+}
+
+const newCourseStatsObject = (code, name, studentnumbers) => ({
+  course: { 
+    code,
+    name,
+  },
+  students: {
+    all: new Set(),
+    passed: new Set(),
+    failed: new Set(),
+    retryPassed: new Set(),
+    failedMany: new Set(),
+    notParticipated: new Set(studentnumbers),
+    notParticipatedOrFailed: new Set(studentnumbers)
+  },
+  stats: { 
+    students: 0,
+    passed: 0,
+    failed: 0,
+    percentage: undefined,
+    failedMany: 0,
+    retryPassed: 0,
+    attempts: 0,
+    passedOfPopulation: undefined,
+    triedOfPopulation: undefined
+  }
+})
+
+const parseCredit = credit => ({
+  coursecode: credit.courseinstance.course_code,
+  coursenames: credit.courseinstance.course.name,
+  studentnumber: credit.student_studentnumber,
+  passed: Credit.passed({ grade: credit.grade })
+})
+
+const updateStudentStatistics = (coursestats, studentnumber, isPassingGrade) => {
+  const { students, stats } = coursestats
+  const isFirstEntry = !students.all.has(studentnumber)
+  const hasFailedBefore = !isFirstEntry && students.failed.has(studentnumber)
+  const hasPassedBefore = !isFirstEntry && students.passed.has(studentnumber)
+
+  stats.attempts += 1
+
+  if (isFirstEntry) {
+    students.all.add(studentnumber)
+    students.notParticipated.delete(studentnumber)
+    stats.students += 1
+  }
+
+  if (isPassingGrade) {
+    if (!hasPassedBefore) {
+      students.passed.add(studentnumber)
+      students.notParticipatedOrFailed.delete(studentnumber)    
+      stats.passed += 1
+    }
+    if (hasFailedBefore) {
+      students.retryPassed.add(studentnumber)
+      stats.retryPassed += 1
+      students.failed.delete(studentnumber)
+      stats.failed -= 1
+    }
+  } else if (hasFailedBefore) {
+    students.failedMany.add(studentnumber)
+    stats.failedMany += 1
+  } else {
+    students.failed.add(studentnumber)
+    stats.failed += 1
+  }
+}
+
+const percentageOf = (num, denom) => Number((100 * num / denom).toFixed(2))
+
+const setToOldApiObject = snumberset => [...snumberset.values()].reduce((numbers, studentnumber) => {
+  numbers[studentnumber] = true
+  return numbers
+}, {})
+
+const formatStudentsForOldApi = students => {
+  Object.keys(students).forEach(key => {
+    const studentnumberset = students[key]
+    students[key] = setToOldApiObject(studentnumberset)
+  })
+  return students
+}
+
+const bottlenecksOf= async (query) => {
   const { semester, year, studyRights, months } = query
   if (semesterStart[semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
-
+  const codeduplicates = await getAllDuplicates()
   const startDate = `${year}-${semesterStart[semester]}`
   const endDate = `${year}-${semesterEnd[semester]}`
-
-  try {
-    const student_numbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
-    const students = await getStudentsIncludeCreditsBefore(student_numbers, dateMonthsFromNow(startDate, months))
-    const populationSize = students.length
-    const formattedstudents = await formatStudentsUnifyCourseCodes(students)
-    const courses = _.flatten(formattedstudents.map(getStudentCourseStatistics))
-
-    const toNameMap = (names, { course }) => {
-      const { code, name } = course
-      if (!names[code] || (names[code].fi.startsWith('Avoin yo') && !name.fi.startsWith('Avoin yo')) ) {
-        names[code] = name
+  let studentnumbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
+  const students = await getStudentsIncludeCreditsBefore(studentnumbers, dateMonthsFromNow(startDate, months))
+  const coursestudentstatistics = students.reduce((coursemap, student) => {
+    student.credits.forEach(credit => {
+      const { coursecode, coursenames, studentnumber, passed } = parseCredit(credit)
+      const unifiedcode = getUnifiedCode(coursecode, codeduplicates)
+      let coursestats = coursemap.get(unifiedcode) || newCourseStatsObject(coursecode, coursenames, studentnumbers)
+      if (!coursemap.has(unifiedcode)) {
+        coursemap.set(unifiedcode, coursestats)
       }
-      return names
-    }
-
-    const courseNames = courses.reduce(toNameMap, {})
-    const groupedCourses = _.groupBy(courses, c => c.course.code)
-
-    // TODO: refactor to reduce
-    const studentsOf = (instances) => {
-      const studentNumber = i => i.student
-      const passedStudents = i => i.passed
-      const failedStudents = i => !i.passed
-      const passed = instances.filter(passedStudents).map(studentNumber)
-      const failed = instances.filter(failedStudents).map(studentNumber)
-      const nTimes = instances.filter(i => i.attempts > 1)
-      const retryPassed = nTimes.filter(passedStudents).map(studentNumber)
-      const failedMany = nTimes.filter(failedStudents).map(studentNumber)
-      const all = passed.concat(failed)
-      const notParticipated = _.difference(student_numbers, all)
-      const notParticipatedOrFailed = _.union(notParticipated, failed)
-      const toObject = (passed) => 
-        passed.length > 0 ? passed.reduce((o, s) => { o[s] = true; return o }, {}) : {} 
-
-      return {
-        all: toObject(all),
-        passed: toObject(passed),
-        failed: toObject(failed),
-        retryPassed: toObject(retryPassed),
-        failedMany: toObject(failedMany),
-        notParticipated: toObject(notParticipated),
-        notParticipatedOrFailed: toObject(notParticipatedOrFailed)
-      }
-    }
-
-    const statsOf = (instances) => {
-      const passed = instances.reduce((sum, i) => sum + (i.passed ? 1 : 0), 0)
-      const failed = instances.reduce((sum, i) => sum + (i.passed ? 0 : 1), 0)
-      const students = instances.length
-
-      return {
-        students,
-        passed,
-        failed,
-        percentage: Number((100*passed/students).toFixed(2)),
-        failedMany: instances.reduce((sum, i) => sum + (i.passed ? 0 : (i.attempts>1)? 1 : 0 ), 0),
-        retryPassed: instances.reduce((sum, i) => sum + (i.passed && i.attempts>1? 1 : 0), 0),
-        attempts: instances.reduce((sum, i) => sum + i.attempts, 0),
-        passedOfPopulation: Number((100 * passed / populationSize).toFixed(2)),
-        triedOfPopulation: Number((100 * (passed + failed) / populationSize).toFixed(2)),
-      }
-    }
-
-    const stats = Object.keys(groupedCourses).map(courseCode => {
-      return {
-        course: {
-          name: courseNames[courseCode],
-          code: courseCode
-        },
-        stats: statsOf(groupedCourses[courseCode]),
-        students: studentsOf(groupedCourses[courseCode])
-      }
+      updateStudentStatistics(coursestats, studentnumber, passed)  
     })
-
-    return stats.sort((c1, c2) => c2.stats.attempts - c1.stats.attempts)
-
-  } catch (e) {
-    console.log(e)
-    return { error: `No such study rights: ${query.studyRights}` }
-  }
+    return coursemap
+  }, new Map())
+  const statsarray = [ ...coursestudentstatistics.values() ].map(courseStats => {
+    const { stats } = courseStats
+    stats.percentage = percentageOf(stats.passed, stats.students) 
+    stats.passedOfPopulation = percentageOf(stats.passed, studentnumbers.length)
+    stats.triedOfPopulation = percentageOf(stats.students, studentnumbers.length)
+    formatStudentsForOldApi(courseStats.students)
+    return courseStats
+  })
+  return statsarray
 }
 
 module.exports = {
   studyrightsByKeyword, universityEnrolmentDates,
-  optimizedStatisticsOf, bottlenecksOf,
+  optimizedStatisticsOf, bottlenecksOf
 }
