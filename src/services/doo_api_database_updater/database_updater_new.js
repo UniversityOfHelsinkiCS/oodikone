@@ -14,7 +14,7 @@ process.on('unhandledRejection', (reason) => {
 })
 
 const getAllStudentInformationFromApi = async studentnumber => {
-  const [ student, studyrights, studyattainments ] = await Promise.all([
+  const [student, studyrights, studyattainments] = await Promise.all([
     Oodi.getStudent(studentnumber),
     Oodi.getStudentStudyRights(studentnumber),
     Oodi.getStudyAttainments(studentnumber),
@@ -29,7 +29,7 @@ const getAllStudentInformationFromApi = async studentnumber => {
 
 const updateStudyrights = async (api, studentnumber) => {
   for (let data of api.studyrights) {
-    const [ studyright ] = await Studyright.upsert(mapper.getStudyRightFromData(data, studentnumber), { returning: true })
+    const [studyright] = await Studyright.upsert(mapper.getStudyRightFromData(data, studentnumber), { returning: true })
     for (let element of data.elements) {
       const elementDetail = mapper.elementDetailFromData(element)
       const studyrightElement = mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber)
@@ -59,22 +59,24 @@ const createCourse = async course => {
   }
 }
 
-const updateStudyattainments = async (api, studentnumber) => {
+const updateStudyattainments = async (api, studentnumber, onDemand) => {
   for (let data of api.studyattainments) {
     const attainment = mapper.attainmentDataToCredit(data)
     if (!attainmentAlreadyInDb(attainment)) {
       await createCourse(mapper.attainmentDataToCourse(data))
-      const [ courseinstance ] = await CourseInstance.upsert(
+      const [courseinstance] = await CourseInstance.upsert(
         mapper.attainmentDataToCourseInstance(data),
         { returning: true }
       )
       await Credit.upsert(mapper.attainmentDataToCredit(data, courseinstance.id, studentnumber))
-      await createTeachers(data, courseinstance)
+      if (!onDemand) {
+        await createTeachers(data, courseinstance)
+      }
     }
   }
 }
 
-const updateStudent = async studentnumber => {
+const updateStudent = async (studentnumber, onDemand) => {
   console.log(`updating ${studentnumber}`)
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {
@@ -83,20 +85,20 @@ const updateStudent = async studentnumber => {
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
     await Promise.all([
       updateStudyrights(api, studentnumber),
-      updateStudyattainments(api, studentnumber)
+      updateStudyattainments(api, studentnumber, onDemand)
     ])
   }
-} 
+}
 
-const updateStudents = async (studentnumbers, onUpdateStudent, chunksize = 1) => {
+const updateStudents = async (studentnumbers, onUpdateStudent, chunksize = 1, onDemand) => {
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
   console.log('updating')
   while (remaining.length > 0) {
     const nextchunk = remaining.splice(0, chunksize)
     await Promise.all(nextchunk.map(async studentnumber => {
-      await updateStudent(studentnumber)
-      if(runOnUpdate) {
+      await updateStudent(studentnumber, onDemand)
+      if (runOnUpdate) {
         onUpdateStudent()
       }
     }))
@@ -119,12 +121,12 @@ const updateFaculties = async () => {
 }
 
 
-const updateDatabase = async (studentnumbers, onUpdateStudent) => {
+const updateDatabase = async (studentnumbers, onUpdateStudent, onDemand = false) => {
   console.log('starting', studentnumbers.length)
   if (process.env.NODE_ENV !== 'anon') {
     await updateFaculties()
   }
-  await updateStudents(studentnumbers, onUpdateStudent, 128)
+  await updateStudents(studentnumbers, onUpdateStudent, 128, onDemand)
   return
 }
 
