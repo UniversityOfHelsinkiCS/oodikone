@@ -33,7 +33,8 @@ class PopulationFilters extends Component {
     savePopulationFilters: func.isRequired,
     setPopulationFilter: func.isRequired,
     studyRights: arrayOf(string).isRequired,
-    populationFilters: object.isRequired //eslint-disable-line
+    populationFilters: object.isRequired, //eslint-disable-line
+    populationCourses: object.isRequired //eslint-disable-line
   }
 
   state = {
@@ -41,20 +42,22 @@ class PopulationFilters extends Component {
     presetName: '',
     presetFilters: []
   }
-  async componentDidMount() {
-    this.updateFilterList(this.props.populationFilters.filtersFromBackend)
+  async componentDidUpdate(prevProps) {
+    if (this.props.populationCourses.pending === false
+      && prevProps.populationCourses.pending === true) {
+      this.updateFilterList(this.props.populationFilters.filtersFromBackend)
+    }
   }
   updateFilterList(filtersToCreate) {
     const regenerateFilterFunctions = filters =>
-      filters.map(f => f.type === 'Preset' ? ({ ...f, filters: regenerateFilterFunctions(f.filters) }) : getFilterFunction(f.type, f.params)) //eslint-disable-line
+      filters.map(f => f.type === 'Preset' ? getFilterFunction(f.type, { ...f, filters: regenerateFilterFunctions(f.filters) }, this.props.populationCourses.data) : getFilterFunction(f.type, f.params, this.props.populationCourses.data)) //eslint-disable-line
 
     if (filtersToCreate) {
-      const newFilters = filtersToCreate.map(f =>
+      const newFilters = filtersToCreate.map(newFilter =>
         ({
-          ...f,
-          filters: regenerateFilterFunctions(f.filters)
+          ...newFilter,
+          filters: regenerateFilterFunctions(newFilter.filters)
         }))
-
       this.setState({ presetFilters: this.state.presetFilters.concat(newFilters) })
     }
   }
@@ -107,7 +110,35 @@ class PopulationFilters extends Component {
     )
   }
 
+
   renderSetFilters() {
+    const formatFilter = (filter) => {
+      let filterToSave = {}
+      if (filter.type === 'Preset') {
+        filterToSave = {
+          ...filter,
+          filters: filter.filters.map(f => formatFilter(f))
+        }
+      } else {
+        filterToSave = {
+          id: filter.id,
+          type: filter.type,
+          params: filter.type === 'CourseParticipation' ?
+            {
+              field: filter.params.field,
+              course: {
+                course: {
+                  name: filter.params.course.course.name,
+                  code: filter.params.course.course.code
+                }
+              }
+            }
+            :
+            filter.params
+        }
+      }
+      return filterToSave
+    }
     const handleSavePopulationFilters = () => {
       const preset = {
         id: uuidv4(),
@@ -116,7 +147,11 @@ class PopulationFilters extends Component {
         filters: this.props.filters
       }
       this.setState({ presetName: '' })
-      this.props.savePopulationFilters(preset)
+      const presetToSave = {
+        ...preset,
+        filters: preset.filters.map(filter => formatFilter(filter))
+      }
+      this.props.savePopulationFilters(presetToSave)
       this.updateFilterList([preset])
       this.props.clearPopulationFilters()
       this.props.setPopulationFilter(presetFilter(preset))
@@ -173,7 +208,15 @@ class PopulationFilters extends Component {
   }
 }
 
-const mapStateToProps = ({ populationFilters, locale, graphSpinner, populations }) => ({
+const mapStateToProps = ({
+  populationFilters,
+  locale,
+  graphSpinner,
+  populations,
+  populationCourses
+}) => ({
+
+  populationCourses: populationCourses[0],
   populationFilters,
   filters: populationFilters.filters,
   complemented: populationFilters.complemented,
