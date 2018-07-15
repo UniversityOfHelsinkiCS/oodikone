@@ -1,9 +1,8 @@
 const Sequelize = require('sequelize')
-const { Op } = Sequelize
-const _ = require('lodash')
+const { Op, col, where, fn } = Sequelize
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = require('../models')
+const { Studyright, Student, Credit, CourseInstance, Course, sequelize, StudyrightElement } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
 
@@ -126,6 +125,68 @@ const getStudentsIncludeCreditsBefore = (studentnumbers, endDate) => {
   })
 }
 
+const studentnumbersWithAllStudyrightElementsAndCreditsBetween = async (studyRights, startDate, endDate, months) => {
+  const creditBeforeDate = dateMonthsFromNow(startDate, months)
+  const result = await Student.findAll({
+    attributes: ['studentnumber'],
+    include: [
+      {
+        model: StudyrightElement,
+        attributes: [],
+        where: {
+          code: {
+            [Op.in]: studyRights
+          },
+          startdate: {
+            [Op.between]: [startDate, endDate]
+          }
+        },
+      },
+      {
+        model: Credit,
+        attributes:[],
+        required: true,
+        include: [
+          {
+            model: CourseInstance,
+            attributes: [],
+            required: true,
+            where: {
+              coursedate: {
+                [Op.between]: [startDate, creditBeforeDate]
+              }
+            }
+          }
+        ],
+      }
+    ],
+    group:[
+      col('student.studentnumber'),
+      col('credits.id'),
+      col('credits->courseinstance.id')
+    ],
+    having: where(
+      fn('count', fn('distinct', col('studyright_elements.code'))),
+      {
+        [Op.eq]: studyRights.length
+      }
+    )
+  })
+  return result.map(student => student.studentnumber)
+}
+
+const parseQueryParams = query => {
+  const { semester, year, studyRights, months } = query
+  const startDate = `${year}-${semesterStart[semester]}`
+  const endDate = `${year}-${semesterEnd[semester]}`
+  return {
+    studyRights,
+    months,
+    startDate, 
+    endDate
+  }
+}
+
 const optimizedStatisticsOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
@@ -137,6 +198,7 @@ const optimizedStatisticsOf = async (query) => {
   const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
   return students.map(formatStudentForOldApi)
 }
+
 
 const unifyOpenUniversity = (code) => {
   if (code[0] === 'A') {
@@ -193,9 +255,11 @@ const updateStudentStatistics = (coursestats, studentnumber, isPassingGrade) => 
 
   stats.attempts += 1
 
+  students.notParticipated.delete(studentnumber)
+  students.all.add(studentnumber)
+
   if (isFirstEntry) {
     students.all.add(studentnumber)
-    students.notParticipated.delete(studentnumber)
     stats.students += 1
   }
 
@@ -235,15 +299,13 @@ const formatStudentsForOldApi = students => {
   return students
 }
 
-const bottlenecksOf= async (query) => {
-  const { semester, year, studyRights, months } = query
-  if (semesterStart[semester] === undefined) {
+const bottlenecksOf = async (query) => {
+  if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
+  const { studyRights, months, startDate, endDate } = parseQueryParams(query)
   const codeduplicates = await getAllDuplicates()
-  const startDate = `${year}-${semesterStart[semester]}`
-  const endDate = `${year}-${semesterEnd[semester]}`
-  let studentnumbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
+  let studentnumbers = await studentnumbersWithAllStudyrightElementsAndCreditsBetween(studyRights, startDate, endDate, months)
   const students = await getStudentsIncludeCreditsBefore(studentnumbers, dateMonthsFromNow(startDate, months))
   const coursestudentstatistics = students.reduce((coursemap, student) => {
     student.credits.forEach(credit => {
@@ -268,7 +330,10 @@ const bottlenecksOf= async (query) => {
   return statsarray
 }
 
+
 module.exports = {
   studyrightsByKeyword, universityEnrolmentDates,
-  optimizedStatisticsOf, bottlenecksOf
+  optimizedStatisticsOf, bottlenecksOf,
+  studentnumbersWithAllStudyrightElementsAndCreditsBetween,
+  parseQueryParams
 }
