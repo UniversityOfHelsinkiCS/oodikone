@@ -77,7 +77,6 @@ router.get('/v2/populationstatistics/filters', async (req, res) => {
   }
   try {
     results = await Filters.findForPopulation(rights)
-    console.log(results)
     res.status(200).json(results)
 
   } catch (err) {
@@ -100,6 +99,20 @@ router.post('/v2/populationstatistics/filters', async (req, res) => {
   }
 
 })
+router.delete('/v2/populationstatistics/filters', async (req, res) => {
+  let results = []
+  const filter = req.body
+  try {
+    results = await Filters.deleteFilter(filter)
+    res.status(200).json(results)
+
+  } catch (err) {
+    console.log(err)
+    res.status(400).end()
+  }
+
+})
+
 router.post('/updatedatabase', async (req, res) => {
   const studentnumbers = req.body
   console.log(studentnumbers)
