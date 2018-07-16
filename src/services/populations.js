@@ -1,7 +1,7 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = require('../models')
+const { Student, Credit, CourseInstance, Course, sequelize } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
 
@@ -11,29 +11,8 @@ const enrolmentDates = () => {
   )
 }
 
-const studyRightLike = (searchTerm) => {
-  const query = `
-    SELECT DISTINCT highLevelName 
-      FROM StudyRight  
-      WHERE LOWER(highLevelName) 
-      LIKE LOWER ?`
-  return sequelize.query(query,
-    {
-      replacements: ['%' + searchTerm + '%'],
-      type: sequelize.QueryTypes.SELECT,
-      model: Studyright
-    })
-}
-
-const studyrightsByKeyword = async (searchTerm) => {
-  const result = await studyRightLike(searchTerm)
-
-  return result.map(s => s.highlevelname)
-}
-
 const universityEnrolmentDates = async () => {
   const [result] = await enrolmentDates()
-
   return result.map(r => r.date).filter(d => d).sort()
 }
 
@@ -321,6 +300,6 @@ const bottlenecksOf = async (query) => {
 
 
 module.exports = {
-  studyrightsByKeyword, universityEnrolmentDates,
+  universityEnrolmentDates,
   optimizedStatisticsOf, bottlenecksOf
 }
