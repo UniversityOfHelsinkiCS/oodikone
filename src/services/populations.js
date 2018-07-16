@@ -1,8 +1,7 @@
-const Sequelize = require('sequelize')
-const { Op, col, where, fn } = Sequelize
+const { Op } = require('sequelize')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-const { Studyright, Student, Credit, CourseInstance, Course, sequelize, StudyrightElement } = require('../models')
+const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
 
@@ -127,52 +126,42 @@ const getStudentsIncludeCreditsBefore = (studentnumbers, endDate) => {
 
 const studentnumbersWithAllStudyrightElementsAndCreditsBetween = async (studyRights, startDate, endDate, months) => {
   const creditBeforeDate = dateMonthsFromNow(startDate, months)
-  const result = await Student.findAll({
-    attributes: ['studentnumber'],
-    include: [
-      {
-        model: StudyrightElement,
-        attributes: [],
-        where: {
-          code: {
-            [Op.in]: studyRights
-          },
-          startdate: {
-            [Op.between]: [startDate, endDate]
-          }
-        },
-      },
-      {
-        model: Credit,
-        attributes:[],
-        required: true,
-        include: [
-          {
-            model: CourseInstance,
-            attributes: [],
-            required: true,
-            where: {
-              coursedate: {
-                [Op.between]: [startDate, creditBeforeDate]
-              }
-            }
-          }
-        ],
-      }
-    ],
-    group:[
-      col('student.studentnumber'),
-      col('credits.id'),
-      col('credits->courseinstance.id')
-    ],
-    having: where(
-      fn('count', fn('distinct', col('studyright_elements.code'))),
-      {
-        [Op.eq]: studyRights.length
-      }
-    )
+  const query = `
+    SELECT
+        DISTINCT credit.student_studentnumber
+    FROM
+        credit
+    INNER JOIN
+            studyright_elements
+        ON
+            credit.student_studentnumber = studyright_elements.studentnumber
+        AND
+        studyright_elements.code IN(:studyRights)
+        AND
+        studyright_elements.startdate BETWEEN :startDate AND :endDate
+    INNER JOIN
+            courseinstance
+        ON
+            credit.courseinstance_id = courseinstance.id
+        AND
+            courseinstance.coursedate BETWEEN :startDate AND :creditBeforeDate
+    GROUP BY
+        credit.student_studentnumber
+    HAVING
+        COUNT(DISTINCT(studyright_elements.code)) = :studyRightsLength;
+    ;
+  `
+  const result = await sequelize.query(query, {
+    replacements: {
+      studyRights,
+      startDate,
+      endDate,
+      creditBeforeDate,
+      studyRightsLength: studyRights.length
+    },
+    type: sequelize.QueryTypes.SELECT
   })
-  return result.map(student => student.studentnumber)
+  return result.map(student => student.student_studentnumber)
 }
 
 const parseQueryParams = query => {
@@ -303,7 +292,7 @@ const bottlenecksOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
-  const { studyRights, months, startDate, endDate } = parseQueryParams(query)
+  const { studyRights, startDate, endDate, months } = parseQueryParams(query)
   const codeduplicates = await getAllDuplicates()
   let studentnumbers = await studentnumbersWithAllStudyrightElementsAndCreditsBetween(studyRights, startDate, endDate, months)
   const students = await getStudentsIncludeCreditsBefore(studentnumbers, dateMonthsFromNow(startDate, months))
@@ -333,7 +322,5 @@ const bottlenecksOf = async (query) => {
 
 module.exports = {
   studyrightsByKeyword, universityEnrolmentDates,
-  optimizedStatisticsOf, bottlenecksOf,
-  studentnumbersWithAllStudyrightElementsAndCreditsBetween,
-  parseQueryParams
+  optimizedStatisticsOf, bottlenecksOf
 }
