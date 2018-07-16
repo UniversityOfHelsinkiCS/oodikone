@@ -1,4 +1,5 @@
-visit $basepath
+focus
+visit "oodikone.cs.helsinki.fi/testing"
 
 require_relative "./components/query_population_statistics"
 require_relative "./components/filters_population_statistics"
@@ -10,50 +11,108 @@ population_query.query("2015", "Bachelors Degree on Witchcraft and Wizardry", "D
 
 
 tablebody = find("th", text: /Credits gained during first [0-9]+ months/).find(:xpath, '../../..')
-value_start = tablebody.all("td")[1].text.to_i
-
+value_start = tablebody.all("td")[10].text.to_i
+amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i
 navigation.open
 navigation.navigate(/Filters/)
 wait 60 do
     has_text? "Add filters"
-    has_text? "add" 
+    has_text? "add"
+    amount_of_students == 46
   end
 click_button "add"
   wait do
       has_text? "cancel"
+      has_text? "Properly started"
   end
 
 atLeastCreditsFilter = Filter.new("Show only students with credits at least")
 startedThisSemesterFilter = Filter.new("started this semester")
-genderFilter = Filter.new("Filter by gender")
 
 atLeastCreditsFilter.fill(true, "30")
 atLeastCreditsFilter.set_filter
-
 startedThisSemesterFilter.set_filter
 
-genderFilter.fill(false, "Male")
-genderFilter.set_filter
-
-value_end = tablebody.all("td")[1].text.to_i
-
-navigation.navigate(/Course/)
-
-wait 60 do
-    has_text? /Credits at least/
-    value_start > value_end
-    find("th", text: "Course")
-end
+amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i
 
 wait do
-    find("button", text:"clear all filters").click
+    tablebody.find(:xpath, '..').find("tr", text:"min").all("td")[1].text.to_i > 30
+    amount_of_students == 30
+end
+
+navigation.navigate(/Course/)
+find("tr",text:("rich mesh relationships")).all("td")[0].click
+find("tr", text: "intuitive disintermediate e-markets").all("td")[0].click
+value_end = tablebody.all("td")[10].text.to_i
+amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i
+
+wait 10 do
+    has_text? /Credits at least/
+    value_start > value_end
+    amount_of_students == 15
+end
+
+save_button = find("button", text: "save filters as preset")
+filter_name = "test " + rand(1...9999999).to_s
+save_button.find(:xpath, "../..").fill_in "Name...", with: filter_name
+save_button.click
+set_filters = save_button.find(:xpath, "../..")
+saved = set_filters.all("div", text: filter_name).length == 1
+amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i
+
+wait do
+    set_filters == true
+    saved == true
+    amount_of_students == 15
+end
+set_filters.find("div", text: filter_name).all("span")[1].click
+
+wait do
+    set_filters != true
+    has_text? filter_name
+end
+preset_filter = Filter.new(filter_name)
+preset_filter.set_filter
+wait do
+    set_filters.all("div", text: filter_name).length == 1
+end
+set_filters.find("div", text: filter_name).all("span")[0].click
+click_button("Just remove from use")
+wait do
+    set_filters != true
+    has_text? filter_name
+end
+preset_filter.set_filter
+set_filters.find("div", text: filter_name).all("span")[0].click
+click_button("Delete for good")
+
+assert do
+    !(has_text? filter_name)
+end
+
+creditsAtLeast2 = Filter.new("Show only students with credits less than")
+creditsAtLeast2.fill(true, "50")
+creditsAtLeast2.set_filter
+Filter.new("started this semester").set_filter
+save_button = find("button", text: "save filters as preset")
+set_filters = save_button.find(:xpath, "../..")
+wait 10 do
+    set_filters.all("div",class: "segment").length == 2
+    tablebody.find(:xpath, '..').find("tr", text:"max").all("td")[1].text.to_i < 51
+end
+find("button", text:"clear all filters").click
+amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i
+
+wait do
+    set_filters != true
+    amount_of_students == 46
 end
 student_number = ""
 wait do
     has_text? "show"
 end
 
-wait do
+wait 15 do
     find("button", text:"show").click
     table = find("th", text: "student number").find(:xpath, "../../..")
     student = table.all("td", text: /01/).random
