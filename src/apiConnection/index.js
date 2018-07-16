@@ -60,7 +60,7 @@ const callApi = async (url, method = 'get', data) => {
     case 'put':
       return getAxios().put(url, data, options)
     case 'delete':
-      return getAxios().delete(url, options)
+      return getAxios().delete(url, { headers: options.headers, data })
     default:
       return Promise.reject(new Error('Invalid http method'))
   }

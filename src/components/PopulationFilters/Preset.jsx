@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Icon, Form, Segment, Button } from 'semantic-ui-react'
+import { Icon, Form, Segment, Button, Confirm } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
-import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import { removePopulationFilter, setPopulationFilter, deletePopulationFilter } from '../../redux/populationFilters'
 import { presetFilter } from '../../populationFilters'
 
 
@@ -10,17 +10,25 @@ class Preset extends Component {
   static propTypes = {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
-    setPopulationFilter: func.isRequired
+    setPopulationFilter: func.isRequired,
+    deletePopulationFilter: func.isRequired,
+    destroy: func.isRequired
   }
+  state = { open: false }
+
   handleSetFilter = (filter) => {
     this.props.filter.notSet = false
     this.props.setPopulationFilter(presetFilter(filter))
   }
-  clearFilter = () => {
+  clearFilter = (destroy = false) => {
     this.props.filter.notSet = true
+    if (destroy) {
+      this.props.destroy(this.props.filter.id)
+    }
     this.props.removePopulationFilter(this.props.filter.id)
   }
   render() {
+    console.log(this.state)
     const { filter } = this.props
     if (filter.notSet) {
       return (
@@ -32,7 +40,7 @@ class Preset extends Component {
               </Form.Field>
               <Form.Field>
                 <Button onClick={() => this.handleSetFilter(filter)}>
-                    set filter
+                  set filter
                 </Button>
               </Form.Field>
             </Form.Group>
@@ -45,6 +53,28 @@ class Preset extends Component {
       <Segment>
         {filter.name}
         <span style={{ float: 'right' }}>
+          <Icon
+            name="trash"
+            onClick={() => this.setState({ open: true })}
+          />
+          <Confirm
+            style={{
+              marginTop: 'auto !important',
+              display: 'inline-block !important',
+              position: 'relative',
+              top: '20%',
+              left: '33%'
+            }}
+            open={this.state.open}
+            cancelButton="Just remove from use"
+            confirmButton="Delete for good"
+            content="Are you sure you want to delete this filter?"
+            onCancel={() => { this.setState({ open: false }); this.clearFilter() }}
+            onConfirm={() => { this.clearFilter(true); this.props.deletePopulationFilter(filter) }}
+            size="small"
+          />
+        </span>
+        <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
       </Segment>
@@ -54,5 +84,5 @@ class Preset extends Component {
 
 export default connect(
   null,
-  { removePopulationFilter, setPopulationFilter }
+  { removePopulationFilter, setPopulationFilter, deletePopulationFilter }
 )(Preset)
