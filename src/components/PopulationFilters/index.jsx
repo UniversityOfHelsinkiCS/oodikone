@@ -43,14 +43,21 @@ class PopulationFilters extends Component {
     presetFilters: []
   }
   async componentDidUpdate(prevProps) {
-    if (this.props.populationCourses.pending === false
-      && prevProps.populationCourses.pending === true) {
+    if ((this.props.populationCourses.pending === false
+      && prevProps.populationCourses.pending === true)
+      || (this.props.populationFilters.filtersFromBackend.length
+        !== prevProps.populationFilters.filtersFromBackend.length)) {
       this.updateFilterList(this.props.populationFilters.filtersFromBackend)
     }
   }
   updateFilterList(filtersToCreate) {
-    const regenerateFilterFunctions = filters =>
-      filters.map(f => f.type === 'Preset' ? getFilterFunction(f.type, { ...f, filters: regenerateFilterFunctions(f.filters) }, this.props.populationCourses.data) : getFilterFunction(f.type, f.params, this.props.populationCourses.data)) //eslint-disable-line
+    // sorry for the uglyness but it kinda works (I think)
+    const regenerateFilterFunctions = filters =>    /* eslint-disable */
+      filters.map(f => f.type === 'Preset' ?
+        getFilterFunction(f.type, { ...f, filters: regenerateFilterFunctions(f.filters) },
+          this.props.populationCourses.data)
+        :
+        getFilterFunction(f.type, f.params, this.props.populationCourses.data))
 
     if (filtersToCreate) {
       const newFilters = filtersToCreate.map(newFilter =>
@@ -61,6 +68,7 @@ class PopulationFilters extends Component {
       this.setState({ presetFilters: this.state.presetFilters.concat(newFilters) })
     }
   }
+  destroyFromAllFilters = id => this.setState({ presetFilters : this.state.presetFilters.filter(filter => filter.id !== id) })
 
 
   renderAddFilters() {
@@ -103,7 +111,8 @@ class PopulationFilters extends Component {
                 ...this.state.presetFilters.find(f => f.id === filterName),
                 notSet: true
               },
-              key: filterName
+              key: filterName,
+              destroy: this.destroyFromAllFilters
             }))}
         <Button onClick={() => this.setState({ visible: false })}>cancel</Button>
       </Segment>
@@ -186,7 +195,9 @@ class PopulationFilters extends Component {
           filter.type !== 'Preset' ?
             React.createElement(componentFor[filter.type], { filter, key: filter.id })
             :
-            React.createElement(Preset, { filter, key: filter.filter.id }))}
+            React.createElement(Preset, {
+              filter, key: filter.filter.id, destroy: this.destroyFromAllFilters
+            }))}
 
         <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
         <div className="ui action input">
