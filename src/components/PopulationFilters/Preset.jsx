@@ -28,7 +28,6 @@ class Preset extends Component {
     this.props.removePopulationFilter(this.props.filter.id)
   }
   render() {
-    console.log(this.state)
     const { filter } = this.props
     if (filter.notSet) {
       return (
