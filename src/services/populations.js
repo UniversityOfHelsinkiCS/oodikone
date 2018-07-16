@@ -1,9 +1,7 @@
-const Sequelize = require('sequelize')
-const { Op } = Sequelize
-const _ = require('lodash')
+const { Op } = require('sequelize')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-const { Studyright, Student, Credit, CourseInstance, Course, sequelize } = require('../models')
+const { Student, Credit, CourseInstance, Course, sequelize } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
 
@@ -13,29 +11,8 @@ const enrolmentDates = () => {
   )
 }
 
-const studyRightLike = (searchTerm) => {
-  const query = `
-    SELECT DISTINCT highLevelName 
-      FROM StudyRight  
-      WHERE LOWER(highLevelName) 
-      LIKE LOWER ?`
-  return sequelize.query(query,
-    {
-      replacements: ['%' + searchTerm + '%'],
-      type: sequelize.QueryTypes.SELECT,
-      model: Studyright
-    })
-}
-
-const studyrightsByKeyword = async (searchTerm) => {
-  const result = await studyRightLike(searchTerm)
-
-  return result.map(s => s.highlevelname)
-}
-
 const universityEnrolmentDates = async () => {
   const [result] = await enrolmentDates()
-
   return result.map(r => r.date).filter(d => d).sort()
 }
 
@@ -126,6 +103,58 @@ const getStudentsIncludeCreditsBefore = (studentnumbers, endDate) => {
   })
 }
 
+const studentnumbersWithAllStudyrightElementsAndCreditsBetween = async (studyRights, startDate, endDate, months) => {
+  const creditBeforeDate = dateMonthsFromNow(startDate, months)
+  const query = `
+    SELECT
+        DISTINCT credit.student_studentnumber
+    FROM
+        credit
+    INNER JOIN
+            studyright_elements
+        ON
+            credit.student_studentnumber = studyright_elements.studentnumber
+        AND
+        studyright_elements.code IN(:studyRights)
+        AND
+        studyright_elements.startdate BETWEEN :startDate AND :endDate
+    INNER JOIN
+            courseinstance
+        ON
+            credit.courseinstance_id = courseinstance.id
+        AND
+            courseinstance.coursedate BETWEEN :startDate AND :creditBeforeDate
+    GROUP BY
+        credit.student_studentnumber
+    HAVING
+        COUNT(DISTINCT(studyright_elements.code)) = :studyRightsLength;
+    ;
+  `
+  const result = await sequelize.query(query, {
+    replacements: {
+      studyRights,
+      startDate,
+      endDate,
+      creditBeforeDate,
+      studyRightsLength: studyRights.length
+    },
+    type: sequelize.QueryTypes.SELECT
+  })
+  return result.map(student => student.student_studentnumber)
+}
+
+const parseQueryParams = query => {
+  const { semester, year, studyRights, months } = query
+  const startDate = `${year}-${semesterStart[semester]}`
+  const endDate = `${year}-${semesterEnd[semester]}`
+  return {
+    studyRights,
+    months,
+    startDate, 
+    endDate
+  }
+}
+
 const optimizedStatisticsOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
@@ -137,6 +166,7 @@ const optimizedStatisticsOf = async (query) => {
   const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
   return students.map(formatStudentForOldApi)
 }
+
 
 const unifyOpenUniversity = (code) => {
   if (code[0] === 'A') {
@@ -193,9 +223,11 @@ const updateStudentStatistics = (coursestats, studentnumber, isPassingGrade) => 
 
   stats.attempts += 1
 
+  students.notParticipated.delete(studentnumber)
+  students.all.add(studentnumber)
+
   if (isFirstEntry) {
     students.all.add(studentnumber)
-    students.notParticipated.delete(studentnumber)
     stats.students += 1
   }
 
@@ -235,15 +267,13 @@ const formatStudentsForOldApi = students => {
   return students
 }
 
-const bottlenecksOf= async (query) => {
-  const { semester, year, studyRights, months } = query
-  if (semesterStart[semester] === undefined) {
+const bottlenecksOf = async (query) => {
+  if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
+  const { studyRights, startDate, endDate, months } = parseQueryParams(query)
   const codeduplicates = await getAllDuplicates()
-  const startDate = `${year}-${semesterStart[semester]}`
-  const endDate = `${year}-${semesterEnd[semester]}`
-  let studentnumbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
+  let studentnumbers = await studentnumbersWithAllStudyrightElementsAndCreditsBetween(studyRights, startDate, endDate, months)
   const students = await getStudentsIncludeCreditsBefore(studentnumbers, dateMonthsFromNow(startDate, months))
   const coursestudentstatistics = students.reduce((coursemap, student) => {
     student.credits.forEach(credit => {
@@ -268,7 +298,8 @@ const bottlenecksOf= async (query) => {
   return statsarray
 }
 
+
 module.exports = {
-  studyrightsByKeyword, universityEnrolmentDates,
+  universityEnrolmentDates,
   optimizedStatisticsOf, bottlenecksOf
 }
