@@ -50,7 +50,9 @@ class Preset extends Component {
 
     return (
       <Segment>
-        {filter.name}
+        <label>
+          {filter.name}
+        </label>
         <span style={{ float: 'right' }}>
           <Icon
             name="trash"
@@ -69,7 +71,11 @@ class Preset extends Component {
             confirmButton="Delete for good"
             content="Are you sure you want to delete this filter?"
             onCancel={() => { this.setState({ open: false }); this.clearFilter() }}
-            onConfirm={() => { this.clearFilter(true); this.props.deletePopulationFilter(filter) }}
+            onConfirm={() => {
+              this.clearFilter(true)
+              this.props.deletePopulationFilter(filter)
+              this.setState({ open: false })
+            }}
             size="small"
           />
         </span>
