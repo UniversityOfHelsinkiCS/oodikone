@@ -38,6 +38,13 @@ export const savePopulationFilters = (preset) => {
   const method = 'post'
   return callController(route, prefix, data, method)
 }
+export const deletePopulationFilter = (preset) => {
+  const route = '/v2/populationstatistics/filters'
+  const prefix = 'DELETE_FILTER_'
+  const data = preset
+  const method = 'delete'
+  return callController(route, prefix, data, method)
+}
 
 export const getPopulationFilters = ({ studyRights }) => {
   const route = `/v2/populationstatistics/filters?${getArrayParams('studyRights', studyRights)}`
@@ -123,6 +130,25 @@ const reducer = (state = initial, action) => {
       }
     case 'GET_FILTER_SUCCESS':
       state.filtersFromBackend = state.filtersFromBackend.concat(action.response)
+      return {
+        pending: false,
+        error: false,
+        ...state
+      }
+    case 'DELETE_FILTER_ATTEMPT':
+      return {
+        pending: true,
+        error: false,
+        ...state
+      }
+    case 'DELETE_FILTER_FAILURE':
+      return {
+        pending: false,
+        error: true,
+        ...state
+      }
+    case 'DELETE_FILTER_SUCCESS':
+      state.filtersFromBackend = state.filtersFromBackend.filter(f => f.id !== action.response.id)
       return {
         pending: false,
         error: false,
