@@ -74,7 +74,7 @@ class Preset extends Component {
           />
         </span>
         <span style={{ float: 'right' }}>
-          <Icon name="remove" onClick={this.clearFilter} />
+          <Icon name="remove" onClick={() => this.clearFilter(false)} />
         </span>
       </Segment>
     )
