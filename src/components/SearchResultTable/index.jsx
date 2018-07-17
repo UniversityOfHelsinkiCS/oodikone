@@ -29,7 +29,7 @@ const getTableBody = (rows, rowClickFn, selectable) => (
         >
           {
             Object.values(row).map((value, index) => {
-              if (index === 2) {
+              if (index === 2 && row.date) {
                 return (
                   <Table.Cell
                     key={`cell-${index}`} // eslint-disable-line react/no-array-index-key
@@ -56,6 +56,7 @@ const getTableBody = (rows, rowClickFn, selectable) => (
 const SearchResultTable = ({
   headers, rows, rowClickFn, noResultText, selectable, definition
 }) => {
+  console.log(rows)
   if (rows.length > 0) {
     return (
       <Table
