@@ -29,9 +29,11 @@ const getTableBody = (rows, rowClickFn, selectable) => (
         >
           {
             Object.values(row).map((value, index) => {
-              if (index == 2) {
+              if (index === 2) {
                 return (
-                  <Table.Cell key={`cell-${index}`}>
+                  <Table.Cell
+                    key={`cell-${index}`} // eslint-disable-line react/no-array-index-key
+                  >
                     {row.passed || value.includes('Yes') ?
                       <Icon name="check circle outline" color="green" />
                       :
