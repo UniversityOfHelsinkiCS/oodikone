@@ -1,6 +1,6 @@
-const Sequelize = require('sequelize')
-const { Studyright, StudyrightElement } = require('../models')
-const { Op, col, where, fn } = Sequelize
+const { Studyright, StudyrightElement, sequelize } = require('../models')
+const { Op, col, where, fn } = sequelize
+const _ = require('lodash')
 
 const createStudyright = apiData => Studyright.create(apiData)
 
@@ -57,6 +57,79 @@ const studentNumbersWithAllStudyRightElements = async (codes, startedAfter, star
   return studyrights.map(srelement => srelement.studentnumber)
 }
 
+const removeDuplicatesFromValues = obj => {
+  Object.keys(obj).forEach(key => {
+    obj[key] = _.uniq(obj[key])
+  })
+  return obj
+}
+
+const associationArraysToMapping = associations => {
+  const mapping = associations.reduce((mappings, result) => {
+    const { associations } = result
+    associations.forEach(code => {
+      const codes = mappings[code] || []
+      mappings[code] = codes.concat(associations)
+    })
+    return mappings
+  }, {})
+  return removeDuplicatesFromValues(mapping)
+}
+
+const uniqueStudyrightCodeArrays = elementcodes => sequelize.query(`
+  SELECT
+    DISTINCT(array_agg(studyright_elements.code)) AS associations
+  FROM
+    studyright_elements
+  INNER JOIN
+    element_details
+  ON
+    studyright_elements.code = element_details.code
+    AND
+    element_details.type IN (10, 20)
+    AND
+    studyright_elements.code IN(:elementcodes)
+  GROUP BY
+    studyright_elements.studyrightid
+  ;
+`,
+{
+  type: sequelize.QueryTypes.SELECT,
+  replacements: { elementcodes }
+})
+
+const allUniqueStudyrightCodeArrays = () => sequelize.query(`
+  SELECT
+    DISTINCT(array_agg(studyright_elements.code)) AS associations
+  FROM
+    studyright_elements
+  INNER JOIN
+    element_details
+  ON
+    studyright_elements.code = element_details.code
+  WHERE
+    element_details.type IN (10, 20)
+  GROUP BY
+    studyright_elements.studyrightid
+  ;
+`,
+{
+  type: sequelize.QueryTypes.SELECT
+})
+
+const uniqueStudyrightAssocations = elementcodes => {
+  if (elementcodes === undefined) {
+    return allUniqueStudyrightCodeArrays()
+  } else {
+    return uniqueStudyrightCodeArrays(elementcodes)
+  }
+}
+
+const getAssociatedStudyrights = async elementcodes => {
+  const codesByStudyrights = await uniqueStudyrightAssocations(elementcodes)
+  return associationArraysToMapping(codesByStudyrights)
+}
+
 module.exports = {
-  byStudent, createStudyright, ofPopulations, studentNumbersWithAllStudyRightElements
+  byStudent, createStudyright, ofPopulations, studentNumbersWithAllStudyRightElements, getAssociatedStudyrights
 }
