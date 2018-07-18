@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table } from 'semantic-ui-react'
+import { Table, Icon } from 'semantic-ui-react'
 import { arrayOf, string, object, func, bool, oneOfType, array } from 'prop-types'
 
 import styles from './searchResultsTable.css'
@@ -8,12 +8,12 @@ const getHeaderRow = headers => (
   <Table.Header>
     <Table.Row>
       {
-          headers.map(header => (
-            <Table.HeaderCell key={`header-${header}`}>
-              {header}
-            </Table.HeaderCell>
-          ))
-    }
+        headers.map(header => (
+          <Table.HeaderCell key={`header-${header}`}>
+            {header}
+          </Table.HeaderCell>
+        ))
+      }
     </Table.Row>
   </Table.Header>
 )
@@ -21,20 +21,35 @@ const getHeaderRow = headers => (
 const getTableBody = (rows, rowClickFn, selectable) => (
   <Table.Body>
     {
-        rows.map((row, i) => (
-          <Table.Row
-            className={(selectable ? styles.selectableRow : '')}
-            key={`row-${i}`} // eslint-disable-line react/no-array-index-key
-            onClick={e => rowClickFn(e, row)}
-          >
-            {
-              Object.values(row).map((value, index) => (
-                <Table.Cell key={`cell-${index}`}>{value}</Table.Cell> // eslint-disable-line react/no-array-index-key
-              ))
+      rows.map((row, i) => (
+        <Table.Row
+          className={(selectable ? styles.selectableRow : '')}
+          key={`row-${i}`} // eslint-disable-line react/no-array-index-key
+          onClick={e => rowClickFn(e, row)}
+        >
+          {
+            Object.values(row).map((value, index) => {
+              if (index === 2 && row.date) {
+                return (
+                  <Table.Cell
+                    key={`cell-${index}`} // eslint-disable-line react/no-array-index-key
+                  >
+                    {row.passed || value.includes('Yes') ?
+                      <Icon name="check circle outline" color="green" />
+                      :
+                      <Icon name="remove circle outline" color="red" />
+                    }
+                    {value}
+                  </Table.Cell>
+                )
               }
-          </Table.Row>
-        ))
-      }
+              return <Table.Cell key={`cell-${index}`}>{value}</Table.Cell> // eslint-disable-line react/no-array-index-key
+            })
+
+          }
+        </Table.Row>
+      ))
+    }
   </Table.Body>
 )
 
