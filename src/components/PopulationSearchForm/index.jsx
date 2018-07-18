@@ -260,9 +260,19 @@ class PopulationSearchForm extends Component {
   renderStudyGroupSelector = () => {
     const { studyProgrammes, degrees, translate } = this.props
     const { studyRights } = this.state.query
-    const sortedStudyProgrammes = _.sortBy(studyProgrammes, s => s.text)
-    const sortedStudyDegrees = _.sortBy(degrees, s => s.text)
-
+    const sortedStudyProgrammes = _.sortBy(studyProgrammes.filter((s) => {
+      if (studyRights.degree) {
+        return s.associations.includes(studyRights.degree)
+      }
+      return true
+    }), s => s.text)
+    const sortedStudyDegrees = _.sortBy(degrees.filter((d) => {
+      if (studyRights.programme) {
+        return d.associations.includes(studyRights.programme)
+      }
+      return true
+    }), s => s.text)
+    
     return (
       <Form.Group id="rightGroup" horizontal="true" >
         <Form.Field

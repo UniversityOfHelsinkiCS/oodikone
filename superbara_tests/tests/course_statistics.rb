@@ -2,8 +2,8 @@ visit $basepath
 require_relative "./components/query_course_statistics"
 
 course_statistics = CourseQuery.new
-start_year = rand(2011...Time.now.year)
-end_year = rand(start_year + 1 ... Time.now.year+1)
+start_year = rand(2011...Time.now.year - 1)
+end_year = rand(start_year + 1 ... Time.now.year)
 
 course_statistics.query(start_year.to_s, end_year.to_s, "end-to-end revolutionize solutions")
 
