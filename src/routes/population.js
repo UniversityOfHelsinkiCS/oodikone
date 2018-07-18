@@ -4,6 +4,7 @@ const User = require('../services/users')
 const Unit = require('../services/units')
 const Filters = require('../services/filters')
 const { updateDatabase } = require('../services/doo_api_database_updater/database_updater')
+const { getAssociatedStudyrights } = require('../services/studyrights')
 
 router.get('/v2/populationstatistics/courses', async (req, res) => {
   try {
@@ -124,15 +125,22 @@ router.post('/updatedatabase', async (req, res) => {
   }
 })
 
+const appendAssociations = (unit, associations) => ({
+  ...unit, 
+  associatons: associations[unit.id]
+})
+
 router.get('/studyprogrammes', async (req, res) => {
   try {
+    const associations = await getAssociatedStudyrights()
     if (!req.decodedToken.admin) {
       const user = await User.byUsername(req.decodedToken.userId)
       const elementdetails = await user.getElementdetails()
-      res.json(elementdetails.map(element => Unit.parseUnitFromElement(element)))
+      const units = elementdetails.map(element => Unit.parseUnitFromElement(element))
+      res.json(units.map(unit => appendAssociations(unit, associations)))
     } else {
       const units = await Unit.getUnitsFromElementDetails()
-      res.json(units)
+      res.json(units.map(unit => appendAssociations(unit, associations)))
     }
   } catch (err) {
     res.status(500).json(err)
