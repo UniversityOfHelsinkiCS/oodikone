@@ -45,7 +45,7 @@ const PopulationQueryCard =
 
 PopulationQueryCard.propTypes = {
   translate: func.isRequired,
-  population: arrayOf(object).isRequired,
+  population: shape({ students: arrayOf(object), extents: arrayOf(object) }).isRequired,
   query: shape({
     year: string,
     semester: string,

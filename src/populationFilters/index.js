@@ -71,6 +71,18 @@ export const courseParticipation = ({ field, course }) =>
       course.students[field][student.studentNumber] === true
   })
 
+export const extentGraduated = ({ extentcode, name }) => ({
+  id: uuidv4(),
+  type: 'ExtentGraduated',
+  name,
+  params: {
+    extentcode,
+    name
+  },
+  filter: student => student.studyrights.filter(s =>
+    s.graduated).map(s => s.extentcode).includes(extentcode)
+})
+
 
 export const presetFilter = preset => ({
   id: preset.id,
@@ -85,7 +97,8 @@ const typeList = {
   HasMatriculation: matriculationFilter,
   SexFilter: sexFilter,
   CourseParticipation: courseParticipation,
-  StartingThisSemester: startingThisSemester
+  StartingThisSemester: startingThisSemester,
+  ExtentGraduated: extentGraduated
 }
 export const getFilterFunction = (type, params, populationCourses) => {
   switch (type) {
@@ -96,6 +109,8 @@ export const getFilterFunction = (type, params, populationCourses) => {
       })
     case 'Preset':
       return presetFilter(params)
+    case 'ExtentGraduated':
+      return extentGraduated({ extentcode: params.extentcode, name: params.name })
     default:
       return typeList[type](Object.values(params))
   }
