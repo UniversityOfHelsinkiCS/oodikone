@@ -73,8 +73,9 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     }
   }
 
-  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, extentcode, graduated }) => ({
+  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, highlevelname, extentcode, graduated }) => ({
     studyrightid,
+    highlevelname,
     extentcode,
     graduated: Boolean(graduated)
   }))
