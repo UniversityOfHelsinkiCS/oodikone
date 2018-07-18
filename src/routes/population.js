@@ -6,6 +6,24 @@ const Filters = require('../services/filters')
 const { updateDatabase } = require('../services/doo_api_database_updater/database_updater')
 const { getAssociatedStudyrights } = require('../services/studyrights')
 
+const extents = [
+  {
+    extentcode: 1,
+    name: {
+      fi: 'Alempi korkeakoulututkinto',
+      sv: 'Lägre högskoleexamen',
+      en: 'Bachelor\'s Degree'
+    }
+  }, {
+    extentcode: 2,
+    name: {
+      fi: 'Ylempi korkeakoulututkinto',
+      sv: 'Högre högskoleexamen',
+      en: 'Master\'s Degree'
+    }
+  }
+]
+
 router.get('/v2/populationstatistics/courses', async (req, res) => {
   try {
     if (!req.query.year || !req.query.semester || !req.query.studyRights) {
@@ -57,14 +75,15 @@ router.get('/v2/populationstatistics', async (req, res) => {
       req.query.months = 12
     }
 
-    const result = await Population.optimizedStatisticsOf(req.query)
-    if (result.error) {
-      res.status(400).json(result)
+    const students = await Population.optimizedStatisticsOf(req.query)
+
+    if (students.error) {
+      res.status(400)
       return
     }
 
     console.log(`request completed ${new Date()}`)
-    res.json(result)
+    res.json({ students, extents })
   } catch (e) {
     res.status(400).json({ error: e })
   }
