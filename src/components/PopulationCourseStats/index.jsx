@@ -4,10 +4,11 @@ import { Table, Form, Input, Popup, Button, Icon } from 'semantic-ui-react'
 import { func, arrayOf, object, number } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
-import { makePopulationsToData } from '../../selectors/populationDetails'
 
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
 import { courseParticipation } from '../../populationFilters'
+
+const formatGradeDistribution = grades => _.replace(JSON.stringify(grades, null, 1), /{\n*|[^\S\r\n[^:\s]]|}|"|,/g, '')
 
 class PopulationCourseStats extends Component {
   static propTypes = {
@@ -18,6 +19,7 @@ class PopulationCourseStats extends Component {
     selectedCourses: arrayOf(object).isRequired,
     removePopulationFilterOfCourse: func.isRequired
   }
+
   constructor(props) {
     super(props)
 
@@ -70,7 +72,7 @@ class PopulationCourseStats extends Component {
     }
     return course.stats.students >= this.state.limit
   }
-  renderGradeDistributionTable = ({ translate, sortBy, courses, samples }) => (
+  renderGradeDistributionTable = ({ translate, sortBy, courses }) => (
     <Table celled sortable>
       <Table.Header>
         <Table.Row>
@@ -113,8 +115,9 @@ class PopulationCourseStats extends Component {
       <Table.Body>
         {courses.sort(this.criteria()).filter(this.limit()).map(course => (
           <Popup
+            key={course.course.code}
             trigger={
-              <Table.Row key={course.course.code} active={this.active(course.course)}>
+              <Table.Row active={this.active(course.course)}>
                 <Table.Cell onClick={this.limitPopulationToCourse(course)}>
                   {course.course.name.fi}
                 </Table.Cell>
@@ -126,23 +129,23 @@ class PopulationCourseStats extends Component {
                   {course.stats.passed}
                 </Table.Cell>
                 <Table.Cell>
-                  {samples[course.course.code] ? samples[course.course.code].dist[1] || 0 : 0}
+                  {course.grades ? course.grades[1] || 0 : 0}
                 </Table.Cell>
                 <Table.Cell>
-                  {samples[course.course.code] ? samples[course.course.code].dist[2] || 0 : 0}
+                  {course.grades ? course.grades[2] || 0 : 0}
                 </Table.Cell>
                 <Table.Cell>
-                  {samples[course.course.code] ? samples[course.course.code].dist[3] || 0 : 0}
+                  {course.grades ? course.grades[3] || 0 : 0}
                 </Table.Cell>
                 <Table.Cell>
-                  {samples[course.course.code] ? samples[course.course.code].dist[4] || 0 : 0}
+                  {course.grades ? course.grades[4] || 0 : 0}
                 </Table.Cell>
                 <Table.Cell>
-                  {samples[course.course.code] ? samples[course.course.code].dist[5] || 0 : 0}
+                  {course.grades ? course.grades[5] || 0 : 0}
                 </Table.Cell>
                 <Table.Cell>
-                  {samples[course.course.code] ?
-                    _.sum(Object.values(_.omit(samples[course.course.code].dist, [1, 2, 3, 4, 5])))
+                  {course.grades ?
+                    _.sum(Object.values(_.omit(course.grades, [1, 2, 3, 4, 5])))
                     || 0 : 0}
                 </Table.Cell>
                 <Table.Cell>
@@ -153,7 +156,8 @@ class PopulationCourseStats extends Component {
             hoverable
             inverted
             position="top right"
-            content={samples[course.course.code] ? <pre>{_.replace(JSON.stringify(samples[course.course.code].dist, null, 1), /{\n*|[^\S\r\n[^:\s]]|}|"|,/g, '')}</pre> : 'Nothing to see here'}
+            hideOnScroll
+            content={course.grades ? <pre>{formatGradeDistribution(course.grades)}</pre> : 'Nothing to see here'}
           />
         ))}
       </Table.Body>
@@ -267,6 +271,7 @@ class PopulationCourseStats extends Component {
     const { courses, translate } = this.props
     const { reversed } = this.state
     const direction = reversed ? 'descending' : 'ascending'
+
     if (courses.length === 0) return null
     return (
       <div>
@@ -292,19 +297,12 @@ class PopulationCourseStats extends Component {
   }
 }
 
-const populationsToData = makePopulationsToData()
-const createGradeDistribution = samples =>
-  _.forIn(_.groupBy(_.flattenDeep(samples
-    .map(student => student.courses)), c => c.course.code), (c) => {
-    c.dist = _.countBy(c, 'grade')
-  })
 const mapStateToProps = (state) => {
   const courseFilters = state.populationFilters.filters.filter(f => f.type === 'CourseParticipation')
   const selectedCourses = courseFilters.map(f => f.params.course.course)
   return {
     translate: getTranslate(state.locale),
     selectedCourses,
-    samples: createGradeDistribution(populationsToData(state)),
     populationSize: state.populations.data.length > 0 ? state.populations.data.length : 0
   }
 }
