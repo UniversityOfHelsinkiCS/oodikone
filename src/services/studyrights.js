@@ -1,6 +1,6 @@
-const Sequelize = require('sequelize')
-const { Studyright, StudyrightElement } = require('../models')
-const { Op, col, where, fn } = Sequelize
+const { Studyright, StudyrightElement, sequelize } = require('../models')
+const { Op, col, where, fn } = sequelize
+const _ = require('lodash')
 
 const createStudyright = apiData => Studyright.create(apiData)
 
@@ -57,6 +57,37 @@ const studentNumbersWithAllStudyRightElements = async (codes, startedAfter, star
   return studyrights.map(srelement => srelement.studentnumber)
 }
 
+const getAssociatedStudyrights = async () => {
+  const raw = `
+    SELECT
+      DISTINCT(array_agg(studyright_elements.code)) AS associations
+    FROM
+      studyright_elements
+    INNER JOIN
+      element_details
+    ON
+      studyright_elements.code = element_details.code
+    WHERE
+      element_details.type IN (10, 20)
+    GROUP BY
+      studyright_elements.studyrightid
+    ;
+  `
+  const [ queryResult ] = await sequelize.query(raw, sequelize.QueryTypes.SELECT)
+  const results = queryResult.reduce((mappings, result) => {
+    const { associations } = result
+    associations.forEach(code => {
+      const codes = mappings[code] || []
+      mappings[code] = codes.concat(associations)
+    })
+    return mappings
+  }, {})
+  Object.keys(results).forEach(code => {
+    results[code] = _.uniq(results[code])
+  })
+  return results
+}
+
 module.exports = {
-  byStudent, createStudyright, ofPopulations, studentNumbersWithAllStudyRightElements
+  byStudent, createStudyright, ofPopulations, studentNumbersWithAllStudyRightElements, getAssociatedStudyrights
 }
