@@ -260,6 +260,11 @@ class PopulationSearchForm extends Component {
   renderStudyGroupSelector = () => {
     const { studyProgrammes, degrees, translate } = this.props
     const { studyRights } = this.state.query
+    if (!studyProgrammes || !degrees) {
+      return (
+        <Icon name="spinner" loading size="big" color="black" style={{ marginLeft: '45%' }} />
+      )
+    }
     const sortedStudyProgrammes = _.sortBy(studyProgrammes.filter((s) => {
       if (studyRights.degree) {
         return s.associations.includes(studyRights.degree)

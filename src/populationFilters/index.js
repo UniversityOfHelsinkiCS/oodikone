@@ -72,7 +72,6 @@ export const courseParticipation = ({ field, course }) =>
   })
 
 
-// write a function to search for a filter with its type.
 export const presetFilter = preset => ({
   id: preset.id,
   type: 'Preset',
