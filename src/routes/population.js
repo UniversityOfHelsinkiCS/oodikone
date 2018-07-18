@@ -3,7 +3,7 @@ const Population = require('../services/populations')
 const User = require('../services/users')
 const Unit = require('../services/units')
 const Filters = require('../services/filters')
-const { updateDatabase } = require('../services/doo_api_database_updater/database_updater_new')
+const { updateDatabase } = require('../services/doo_api_database_updater/database_updater')
 
 router.get('/v2/populationstatistics/courses', async (req, res) => {
   try {
