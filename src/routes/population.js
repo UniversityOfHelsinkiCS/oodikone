@@ -132,13 +132,14 @@ const appendAssociations = (unit, associations) => ({
 
 router.get('/studyprogrammes', async (req, res) => {
   try {
-    const associations = await getAssociatedStudyrights()
     if (!req.decodedToken.admin) {
       const user = await User.byUsername(req.decodedToken.userId)
       const elementdetails = await user.getElementdetails()
+      const associations = await getAssociatedStudyrights(elementdetails.map(element => element.code))
       const units = elementdetails.map(element => Unit.parseUnitFromElement(element))
       res.json(units.map(unit => appendAssociations(unit, associations)))
     } else {
+      const associations = await getAssociatedStudyrights()
       const units = await Unit.getUnitsFromElementDetails()
       res.json(units.map(unit => appendAssociations(unit, associations)))
     }
