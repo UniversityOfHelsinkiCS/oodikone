@@ -127,7 +127,7 @@ router.post('/updatedatabase', async (req, res) => {
 
 const appendAssociations = (unit, associations) => ({
   ...unit, 
-  associatons: associations[unit.id]
+  associations: associations[unit.id]
 })
 
 router.get('/studyprogrammes', async (req, res) => {
