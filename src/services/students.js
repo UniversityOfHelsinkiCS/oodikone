@@ -72,39 +72,29 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
       isStudyModuleCredit,
     }
   }
-  const toStudyright = ( { studyrightid, highlevelname, enddate, canceldate, givendate, graduated, startdate, studystartdate, organization_code, prioritycode }) => {
-    return {studyrightid, highlevelname, enddate, canceldate, givendate, graduated, startdate, studystartdate, organization_code, prioritycode}
-  }
+
+  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, extentcode, graduated }) => ({
+    studyrightid,
+    extentcode,
+    graduated: Boolean(graduated)
+  }))
 
   const courseByDate = (a, b) => {
     return moment(a.courseinstance.coursedate).isSameOrBefore(b.courseinstance.coursedate) ? -1 : 1
-  }
-  const studyRightByDate = (a, b) => {
-    let rank = moment(a.enddate).isSameOrBefore(b.enddate) ? -1 : 1
-    if (a.canceldate || b.canceldate) {
-      rank = moment(a.canceldate).isBefore(b.enddate) ? -1 : 1
-    }
-    if (!a.canceldate && !b.canceldate && moment(a.enddate).isSame(b.enddate)) {
-      rank = a.prioritycode !== 1 ? -1 : 1
-    }
-    return rank
   }
 
   if (credits === undefined) {
     credits = []
   }
-  if(studyrights) {
-    studyrights = studyrights.map(toStudyright).sort(studyRightByDate)
-  }
   return {
     firstnames,
     lastname,
+    studyrights,
     studentNumber: studentnumber,
     started: dateofuniversityenrollment,
     credits: creditcount,
     courses: credits.sort(courseByDate).map(toCourse),
     name: abbreviatedname,
-    studyrights,
     matriculationexamination,
     gender,
     email,

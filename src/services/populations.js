@@ -1,7 +1,7 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-const { Student, Credit, CourseInstance, Course, sequelize } = require('../models')
+const { Student, Credit, CourseInstance, Course, sequelize, StudyrightElement, Studyright } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
 
@@ -59,6 +59,11 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             }
           }
         ],
+      },
+      {
+        model: Studyright,
+        required: true,
+        attributes: ['studyrightid', 'extentcode', 'graduated']
       }
     ],
     where: {
