@@ -57,24 +57,15 @@ const studentNumbersWithAllStudyRightElements = async (codes, startedAfter, star
   return studyrights.map(srelement => srelement.studentnumber)
 }
 
-const getAssociatedStudyrights = async () => {
-  const raw = `
-    SELECT
-      DISTINCT(array_agg(studyright_elements.code)) AS associations
-    FROM
-      studyright_elements
-    INNER JOIN
-      element_details
-    ON
-      studyright_elements.code = element_details.code
-    WHERE
-      element_details.type IN (10, 20)
-    GROUP BY
-      studyright_elements.studyrightid
-    ;
-  `
-  const [ queryResult ] = await sequelize.query(raw, sequelize.QueryTypes.SELECT)
-  const results = queryResult.reduce((mappings, result) => {
+const removeDuplicatesFromValues = obj => {
+  Object.keys(obj).forEach(key => {
+    obj[key] = _.uniq(obj[key])
+  })
+  return obj
+}
+
+const associationArraysToMapping = associations => {
+  const mapping = associations.reduce((mappings, result) => {
     const { associations } = result
     associations.forEach(code => {
       const codes = mappings[code] || []
@@ -82,10 +73,61 @@ const getAssociatedStudyrights = async () => {
     })
     return mappings
   }, {})
-  Object.keys(results).forEach(code => {
-    results[code] = _.uniq(results[code])
-  })
-  return results
+  return removeDuplicatesFromValues(mapping)
+}
+
+const uniqueStudyrightCodeArrays = elementcodes => sequelize.query(`
+  SELECT
+    DISTINCT(array_agg(studyright_elements.code)) AS associations
+  FROM
+    studyright_elements
+  INNER JOIN
+    element_details
+  ON
+    studyright_elements.code = element_details.code
+    AND
+    element_details.type IN (10, 20)
+    AND
+    studyright_elements.code IN(:elementcodes)
+  GROUP BY
+    studyright_elements.studyrightid
+  ;
+`,
+{
+  type: sequelize.QueryTypes.SELECT,
+  replacements: { elementcodes }
+})
+
+const allUniqueStudyrightCodeArrays = () => sequelize.query(`
+  SELECT
+    DISTINCT(array_agg(studyright_elements.code)) AS associations
+  FROM
+    studyright_elements
+  INNER JOIN
+    element_details
+  ON
+    studyright_elements.code = element_details.code
+  WHERE
+    element_details.type IN (10, 20)
+  GROUP BY
+    studyright_elements.studyrightid
+  ;
+`,
+{
+  type: sequelize.QueryTypes.SELECT
+})
+
+const uniqueStudyrightAssocations = elementcodes => {
+  if (elementcodes === undefined) {
+    return allUniqueStudyrightCodeArrays()
+  } else {
+    return uniqueStudyrightCodeArrays(elementcodes)
+  }
+}
+
+const getAssociatedStudyrights = async elementcodes => {
+  const codesByStudyrights = await uniqueStudyrightAssocations(elementcodes)
+  return associationArraysToMapping(codesByStudyrights)
 }
 
 module.exports = {
