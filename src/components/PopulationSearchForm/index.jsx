@@ -272,7 +272,7 @@ class PopulationSearchForm extends Component {
       }
       return true
     }), s => s.text)
-    
+
     return (
       <Form.Group id="rightGroup" horizontal="true" >
         <Form.Field
