@@ -205,6 +205,8 @@ const newCourseStatsObject = (code, name, studentnumbers) => ({
     attempts: 0,
     passedOfPopulation: undefined,
     triedOfPopulation: undefined
+  },
+  grades: {
   }
 })
 
@@ -212,14 +214,20 @@ const parseCredit = credit => ({
   coursecode: credit.courseinstance.course_code,
   coursenames: credit.courseinstance.course.name,
   studentnumber: credit.student_studentnumber,
+  grade: credit.grade,
   passed: Credit.passed({ grade: credit.grade })
 })
 
-const updateStudentStatistics = (coursestats, studentnumber, isPassingGrade) => {
-  const { students, stats } = coursestats
+const updateStudentStatistics = (coursestats, studentnumber, isPassingGrade, grade) => {
+  const { students, stats, grades } = coursestats
+
+  const gradecount = grades[grade] || 0
+  grades[grade] = gradecount + 1
+
   const isFirstEntry = !students.all.has(studentnumber)
   const hasFailedBefore = !isFirstEntry && students.failed.has(studentnumber)
   const hasPassedBefore = !isFirstEntry && students.passed.has(studentnumber)
+
 
   stats.attempts += 1
 
@@ -277,13 +285,13 @@ const bottlenecksOf = async (query) => {
   const students = await getStudentsIncludeCreditsBefore(studentnumbers, dateMonthsFromNow(startDate, months))
   const coursestudentstatistics = students.reduce((coursemap, student) => {
     student.credits.forEach(credit => {
-      const { coursecode, coursenames, studentnumber, passed } = parseCredit(credit)
+      const { coursecode, coursenames, studentnumber, passed, grade } = parseCredit(credit)
       const unifiedcode = getUnifiedCode(coursecode, codeduplicates)
       let coursestats = coursemap.get(unifiedcode) || newCourseStatsObject(coursecode, coursenames, studentnumbers)
       if (!coursemap.has(unifiedcode)) {
         coursemap.set(unifiedcode, coursestats)
       }
-      updateStudentStatistics(coursestats, studentnumber, passed)  
+      updateStudentStatistics(coursestats, studentnumber, passed, grade)
     })
     return coursemap
   }, new Map())
