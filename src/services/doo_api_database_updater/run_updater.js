@@ -1,4 +1,4 @@
-const { updateDatabase } = require('./database_updater_new')
+const { updateDatabase } = require('./database_updater')
 const fs = require('fs')
 const logger = require('../../util/logger')
 const status = require('node-status')
