@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, shape, arrayOf, object, bool } from 'prop-types'
+import { func, shape, object, bool } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 
 import PopulationQueryCard from '../PopulationQueryCard'
@@ -17,7 +17,7 @@ class PopulationSearchHistory extends Component {
     populations: shape({
       pending: bool,
       error: bool,
-      data: arrayOf(object),
+      data: shape({}),
       query: object
     }).isRequired,
     units: object, // eslint-disable-line
@@ -28,7 +28,10 @@ class PopulationSearchHistory extends Component {
 
   renderQueryCards = () => {
     const { populations, translate, units } = this.props
-    const studentNumberList = (populations.data.map(s => s.studentNumber))
+    if (!populations.data.students) {
+      return null
+    }
+    const studentNumberList = (populations.data.students.map(s => s.studentNumber))
     return populations.query ? (<PopulationQueryCard
       key={`population-${populations.query.uuid}`}
       translate={translate}
