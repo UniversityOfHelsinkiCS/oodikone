@@ -27,7 +27,7 @@ class PopulationCourseStats extends Component {
       sortBy: 'students',
       reversed: false,
       limit: parseInt(this.props.populationSize * 0.15, 10),
-      showGradeDistribution: true
+      showGradeDistribution: false
     }
   }
 
