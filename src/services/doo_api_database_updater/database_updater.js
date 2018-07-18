@@ -1,4 +1,4 @@
-const Oodi = require('oodi_interface')
+const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
