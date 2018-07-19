@@ -5,7 +5,7 @@ const getPopulations = state => state.populations
 
 export const flattenAndCleanPopulations = (populations) => {
   const { pending, data } = populations
-  return pending ? [] : removeInvalidCreditsFromStudents(data)
+  return pending || !data.students ? [] : removeInvalidCreditsFromStudents(data.students)
 }
 
 export const makePopulationsToData = () => createSelector(
