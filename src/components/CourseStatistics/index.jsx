@@ -123,7 +123,6 @@ class CourseStatistics extends Component {
 
   renderYearSelector = () => {
     const { validYear, start, end, isLoading } = this.state
-
     return (
       <Form loading={isLoading}>
         <Form.Group key="year" className={style.yearSelectorGroup}>
@@ -212,7 +211,8 @@ class CourseStatistics extends Component {
                 courseLevel={this.state.courseLevel}
                 courseLevelSwitch={this.handleCourseLevelSwitch}
               />
-            </List.Item>))
+            </List.Item>
+            ))
           }
         </Transition.Group>
       </div>

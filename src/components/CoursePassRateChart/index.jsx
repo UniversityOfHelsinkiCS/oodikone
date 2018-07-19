@@ -1,7 +1,9 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+
+import { PropTypes, number } from 'prop-types'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
 import { Header, Button, Container } from 'semantic-ui-react'
+import _ from 'lodash'
 
 import CourseStatisticsTable from '../CourseStatisticsTable'
 import sharedStyles from '../../styles/shared'
@@ -11,6 +13,29 @@ import { chartblue, chartdarkg, chartlgreen, chartdarkred, chartlred, turquoise,
 
 const { array, shape, string, func, arrayOf, bool } = PropTypes
 
+const CustomizedLabel = (props) => {
+  CustomizedLabel.propTypes = {
+    x: number.isRequired,
+    y: number.isRequired,
+    label: string.isRequired,
+    width: number.isRequired
+  }
+  const { x, y, label, width } = props
+
+  return (
+    <text
+      x={x}
+      y={y}
+      dy={-5}
+      dx={width / 2}
+      fontSize={width / 1.3}
+      fontFamily="sans-serif"
+      textAnchor="middle"
+    >
+      {label}
+    </text>
+  )
+}
 
 const StackedBarChart = ({
   stats,
@@ -31,7 +56,8 @@ const StackedBarChart = ({
       all: year.studentsThatPassedThisYear + year.studentsThatFailedThisYear,
       courseLevelPassed: year.courseLevelPassed,
       courseLevelFailed: year.courseLevelFailed,
-      courseLevelAll: year.courseLevelPassed + year.courseLevelFailed
+      courseLevelAll: year.courseLevelPassed + year.courseLevelFailed,
+      gradeDistribution: year.gradeDistribution
     }))
   const { name, code, start, end, separate } = stats
   const query = { code, start, end, separate }
@@ -101,12 +127,38 @@ const StackedBarChart = ({
               </BarChart>
             </Container>
           }
+
+          <Container>
+            <BarChart
+              height={700}
+              width={1200}
+              data={data.map(c =>
+                ({ name: c.name, gradeDistribution: c.gradeDistribution })).map(a =>
+                  ({ name: a.name, ..._.mapValues(a.gradeDistribution, b => b.length) }))}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="1" stackId="a" fill="grey" label={<CustomizedLabel label="1" />} />
+              <Bar dataKey="2" stackId="b" fill="grey" label={<CustomizedLabel label="2" />} />
+              <Bar dataKey="3" stackId="c" fill="grey" label={<CustomizedLabel label="3" />} />
+              <Bar dataKey="4" stackId="d" fill="grey" label={<CustomizedLabel label="4" />} />
+              <Bar dataKey="5" stackId="e" fill="grey" label={<CustomizedLabel label="5" />} />
+              <Bar dataKey="0" stackId="f" fill={red} name="failed" />
+              <Bar dataKey="Eisa" stackId="f" fill={red} name="Eisa" />
+              <Bar dataKey="Hyl." stackId="f" fill={red} name="Hyl." />
+              <Bar dataKey="Luop" stackId="f" fill={red} name="Luop" label={<CustomizedLabel label="failed" />} />
+            </BarChart>
+          </Container>
           <CourseStatisticsTable stats={statisticsTableStats} />
           <Button className={styles.remove} onClick={removeCourseStatistics(query)}>Remove</Button>
         </div>
       </div>
     )
   }
+
   return (
     <div className={sharedStyles.container}>
       <Header className={sharedStyles.segmentTitle} size="large">
@@ -126,6 +178,8 @@ StackedBarChart.propTypes = {
     stats: array.isRequired
   }).isRequired,
   courseLevel: bool.isRequired
+
+
 }
 
 export default StackedBarChart
