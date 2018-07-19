@@ -65,8 +65,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         required: true,
         attributes: ['studyrightid', 'highlevelname', 'extentcode', 'graduated'],
         include: {
-          model: StudyrightExtent,
-          required: true
+          model: StudyrightExtent
         }
       }
     ],
@@ -167,8 +166,8 @@ const parseQueryParams = query => {
 const formatStudentsForApi = students => {
   const result = students.reduce((stats, student) => {
     student.studyrights.forEach(studyright => {
-      const { extentcode, name } = studyright.studyright_extent
-      if (stats.extents[extentcode] === undefined) {
+      if (studyright.studyright_extent) {
+        const { extentcode, name } = studyright.studyright_extent
         stats.extents[extentcode] = { extentcode, name }
       }
     })

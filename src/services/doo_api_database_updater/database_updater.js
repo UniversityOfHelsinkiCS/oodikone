@@ -27,8 +27,6 @@ const getAllStudentInformationFromApi = async studentnumber => {
   }
 }
 
-
-
 const updateStudyrights = async (api, studentnumber) => {
   for (let data of api.studyrights) {
     await StudyrightExtent.upsert(mapper.studyrightDataToExtent(data))
