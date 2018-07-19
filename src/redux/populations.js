@@ -5,7 +5,7 @@ const getArrayParams = (paramName, entries) => entries.map(entry => `&${paramNam
 const initialState = {
   pending: false,
   error: false,
-  data: [],
+  data: {},
   query: undefined,
   updating: false
 }
@@ -41,7 +41,7 @@ const reducer = (state = initialState, action) => {
       return {
         pending: true,
         error: false,
-        data: [],
+        data: {},
         query: action.requestSettings.query,
         updating: false
       }
