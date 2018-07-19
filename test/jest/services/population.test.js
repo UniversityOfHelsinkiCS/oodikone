@@ -1,5 +1,5 @@
 const { forceSyncDatabase } = require('../../../src/database/connection')
-const { sequelize, Student, Course, CourseInstance, ElementDetails, StudyrightElement, Studyright, Credit } = require('../../../src/models/index')
+const { sequelize, Student, Course, CourseInstance, ElementDetails, StudyrightElement, Studyright, Credit, StudyrightExtent } = require('../../../src/models/index')
 const { optimizedStatisticsOf } = require('../../../src/services/populations')
 
 const langify = name => ({
@@ -10,7 +10,7 @@ const langify = name => ({
 
 const SEMESTER = { SPRING: 'SPRING', FALL: 'FALL' }
 
-const studyrightelements = {
+const elementdetails = {
   bsc: {
     code: 'Element_BSC',
     type: 10,
@@ -64,9 +64,17 @@ describe('optimizedStatisticsOf tests', () => {
     studentnumber: '1234',
   }
 
+  const studyrightextents = {
+    bachelors: {
+      extentcode: 1,
+      name: langify('bachelor\'s degree extent')
+    }
+  }
+
   const studyright = {
     studyrightid: 1,
-    student_studentnumber: student.studentnumber
+    student_studentnumber: student.studentnumber,
+    extentcode: studyrightextents.bachelors.extentcode
   }
 
   const creditFall = {
@@ -81,20 +89,20 @@ describe('optimizedStatisticsOf tests', () => {
     courseinstance_id: courseinstanceSpring.id
   }
 
-  const studyrights = {
+  const studyrightelements = {
     bsc: {
       startdate: new Date('2011-07-31 21:00:00+00'),
       enddate: Date('2016-12-20 22:00:00+00'),
       studyrightid: studyright.studyrightid,
-      code: studyrightelements.bsc.code,
-      studentnumber: student.studentnumber
+      code: elementdetails.bsc.code,
+      studentnumber: student.studentnumber,
     },
     maths: {
       startdate: new Date('2011-07-31 21:00:00+00'),
       enddate: Date('2016-12-20 22:00:00+00'),
       studyrightid: studyright.studyrightid,
-      code: studyrightelements.maths.code,
-      studentnumber: student.studentnumber
+      code: elementdetails.maths.code,
+      studentnumber: student.studentnumber,
     }
   }
 
@@ -113,48 +121,49 @@ describe('optimizedStatisticsOf tests', () => {
       await CourseInstance.create(courseinstanceSpring)
       await Credit.create(creditFall)
       await Credit.create(creditSpring)
-      await ElementDetails.create(studyrightelements.bsc)
-      await ElementDetails.create(studyrightelements.maths)
-      await ElementDetails.create(studyrightelements.cs)
+      await ElementDetails.create(elementdetails.bsc)
+      await ElementDetails.create(elementdetails.maths)
+      await ElementDetails.create(elementdetails.cs)
+      await StudyrightExtent.create(studyrightextents.bachelors)
       await Studyright.create(studyright)
-      await StudyrightElement.create(studyrights.bsc)
-      await StudyrightElement.create(studyrights.maths)
+      await StudyrightElement.create(studyrightelements.bsc)
+      await StudyrightElement.create(studyrightelements.maths)
     })
 
     test('Query result for BSc, Fall 2011 for 12 months should contain the student.', async () => {
-      const query = createQueryObject('2011', SEMESTER.FALL, [studyrightelements.bsc.code], 12)
-      const queryResult = await optimizedStatisticsOf(query)
-      expect(queryResult.some(s => s.studentNumber === student.studentnumber)).toBe(true)
+      const query = createQueryObject('2011', SEMESTER.FALL, [elementdetails.bsc.code], 12)
+      const { students }  = await optimizedStatisticsOf(query)
+      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(true)
     })
 
     test('Query result for BSc, Fall 2012 for 12 months should not contain the student.', async () => {
-      const query = createQueryObject('2012', SEMESTER.FALL, [studyrightelements.bsc.code], 12)
-      const queryResult = await optimizedStatisticsOf(query)
-      expect(queryResult.some(s => s.studentNumber === student.studentnumber)).toBe(false)
+      const query = createQueryObject('2012', SEMESTER.FALL, [elementdetails.bsc.code], 12)
+      const { students } = await optimizedStatisticsOf(query)
+      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(false)
     })
 
     test('Query result for BSc and Computer Science, Fall 2011 for 12 months should not contain the student.', async () => {
-      const query = createQueryObject('2011', SEMESTER.FALL, [studyrightelements.bsc.code, studyrightelements.cs.code], 12)
-      const queryResult = await optimizedStatisticsOf(query)
-      expect(queryResult.some(s => s.studentNumber === student.student_studentnumber)).toBe(false)
+      const query = createQueryObject('2011', SEMESTER.FALL, [elementdetails.bsc.code, elementdetails.cs.code], 12)
+      const { students } = await optimizedStatisticsOf(query)
+      expect(students.some(s => s.studentNumber === student.student_studentnumber)).toBe(false)
     })
 
     test('Query result for BSc and Mathematics, Fall 2011 for 12 months should contain the student.', async () => {
-      const query = createQueryObject('2011', SEMESTER.FALL, [studyrightelements.bsc.code, studyrightelements.maths.code], 12)
-      const queryResult = await optimizedStatisticsOf(query)
-      expect(queryResult.some(s => s.studentNumber === student.studentnumber)).toBe(true)
+      const query = createQueryObject('2011', SEMESTER.FALL, [elementdetails.bsc.code, elementdetails.maths.code], 12)
+      const { students } = await optimizedStatisticsOf(query)
+      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(true)
     })
 
     test('Query result for BSc, Spring 2012 for 12 months should not contain the student', async () => {
-      const query = createQueryObject('2012', SEMESTER.SPRING, [studyrightelements.bsc.code], 12)
-      const queryResult = await optimizedStatisticsOf(query)
-      expect(queryResult.some(s => s.studentNumber === student.studentnumber)).toBe(false)
+      const query = createQueryObject('2012', SEMESTER.SPRING, [elementdetails.bsc.code], 12)
+      const { students } = await optimizedStatisticsOf(query)
+      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(false)
     })
 
     test('Query result for BSc, Fall 2011 for 4 months should only return the FALL course instance for student. ', async () => {
-      const query = createQueryObject('2011', SEMESTER.FALL, [studyrightelements.bsc.code], 4)
-      const queryResult = await optimizedStatisticsOf(query)
-      const result = queryResult.find(s => s.studentNumber === student.studentnumber)
+      const query = createQueryObject('2011', SEMESTER.FALL, [elementdetails.bsc.code], 4)
+      const { students } = await optimizedStatisticsOf(query)
+      const result = students.find(s => s.studentNumber === student.studentnumber)
       const courseinstances = result.courses
       expect(courseinstances.length).toBe(1)
       expect(
@@ -165,9 +174,9 @@ describe('optimizedStatisticsOf tests', () => {
     })
 
     test('Query result for BSc, Fall 2011 for 1 month should not return student since they do not have any credits yet. ', async () => {
-      const query = createQueryObject('2011', SEMESTER.FALL, [studyrightelements.bsc.code], 1)
-      const result = await optimizedStatisticsOf(query)
-      expect(result.some(s => s.studentNumber === student.studentnumber)).toBe(false)
+      const query = createQueryObject('2011', SEMESTER.FALL, [elementdetails.bsc.code], 1)
+      const { students } = await optimizedStatisticsOf(query)
+      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(false)
     })
 
   })
