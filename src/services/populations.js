@@ -1,7 +1,7 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-const { Student, Credit, CourseInstance, Course, sequelize } = require('../models')
+const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
 
@@ -59,6 +59,14 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             }
           }
         ],
+      },
+      {
+        model: Studyright,
+        required: true,
+        attributes: ['studyrightid', 'highlevelname', 'extentcode', 'graduated'],
+        include: {
+          model: StudyrightExtent
+        }
       }
     ],
     where: {
@@ -155,6 +163,26 @@ const parseQueryParams = query => {
   }
 }
 
+const formatStudentsForApi = students => {
+  const result = students.reduce((stats, student) => {
+    student.studyrights.forEach(studyright => {
+      if (studyright.studyright_extent) {
+        const { extentcode, name } = studyright.studyright_extent
+        stats.extents[extentcode] = { extentcode, name }
+      }
+    })
+    stats.students.push(formatStudentForOldApi(student))
+    return stats
+  },{
+    students: [],
+    extents: {}
+  })
+  return {
+    students: result.students,
+    extents: Object.values(result.extents)
+  }
+}
+
 const optimizedStatisticsOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
     return { error: 'Semester should be either SPRING OR FALL' }
@@ -164,7 +192,7 @@ const optimizedStatisticsOf = async (query) => {
   const endDate = `${year}-${semesterEnd[semester]}`
   const studentnumbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
   const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
-  return students.map(formatStudentForOldApi)
+  return formatStudentsForApi(students)
 }
 
 

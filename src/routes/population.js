@@ -3,7 +3,7 @@ const Population = require('../services/populations')
 const User = require('../services/users')
 const Unit = require('../services/units')
 const Filters = require('../services/filters')
-const { updateDatabase } = require('../services/doo_api_database_updater/database_updater')
+const { updateStudents } = require('../services/doo_api_database_updater/database_updater')
 const { getAssociatedStudyrights } = require('../services/studyrights')
 
 router.get('/v2/populationstatistics/courses', async (req, res) => {
@@ -58,14 +58,16 @@ router.get('/v2/populationstatistics', async (req, res) => {
     }
 
     const result = await Population.optimizedStatisticsOf(req.query)
+
     if (result.error) {
-      res.status(400).json(result)
+      res.status(400)
       return
     }
 
     console.log(`request completed ${new Date()}`)
     res.json(result)
   } catch (e) {
+    console.log(e)
     res.status(400).json({ error: e })
   }
 })
@@ -108,7 +110,6 @@ router.delete('/v2/populationstatistics/filters', async (req, res) => {
     res.status(200).json(results)
 
   } catch (err) {
-    console.log(err)
     res.status(400).end()
   }
 
@@ -118,7 +119,7 @@ router.post('/updatedatabase', async (req, res) => {
   const studentnumbers = req.body
   console.log(studentnumbers)
   if (studentnumbers) {
-    await updateDatabase(studentnumbers, null, true)
+    await updateStudents(studentnumbers, 128)
     res.status(200).json('Updated')
   } else {
     res.status(400).end()
