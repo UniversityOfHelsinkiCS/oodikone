@@ -231,6 +231,11 @@ const attainmentDataToTeachers = data => data.teachers.map(teacherdata => ({
   id: teacherdata.teacher_id,
 }))
 
+const studyrightDataToExtent = data => ({
+  extentcode: data.extent_code,
+  name: getTextsByLanguage(data.extent)
+})
+
 module.exports = {
   getStudentFromData,
   getStudyRightIdStrings,
@@ -245,5 +250,6 @@ module.exports = {
   attainmentDataToCredit,
   getOrganisationFromData,
   courseTeacherFromData,
-  attainmentDataToTeachers
+  attainmentDataToTeachers,
+  studyrightDataToExtent
 }
