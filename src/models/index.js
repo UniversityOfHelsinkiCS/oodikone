@@ -174,7 +174,6 @@ const Studyright = sequelize.define('studyright',
     canceldate: { type: Sequelize.DATE },
     cancelorganisation: { type: Sequelize.STRING },
     enddate: { type: Sequelize.DATE },
-    extentcode: { type: Sequelize.INTEGER },
     givendate: { type: Sequelize.DATE },
     graduated: { type: Sequelize.INTEGER },
     highlevelname: { type: Sequelize.STRING },
@@ -365,6 +364,7 @@ const StudentList = sequelize.define('student_list',
     timestamps: false,
   }
 )
+
 const Filters = sequelize.define('filters',
   {
     id: {
@@ -380,7 +380,18 @@ const Filters = sequelize.define('filters',
     population: {
       type: Sequelize.JSONB
     }
+  }
+)
 
+const StudyrightExtent = sequelize.define('studyright_extent',
+  {
+    extentcode: {
+      type: Sequelize.INTEGER,
+      primaryKey: true
+    },
+    name: {
+      type: Sequelize.JSONB,
+    }
   }
 )
 
@@ -419,6 +430,9 @@ Student.hasMany(StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'st
 User.belongsToMany(ElementDetails, { through: 'user_elementdetails', as: 'elementdetails' })
 ElementDetails.belongsToMany(User, { through: 'user_elementdetails' })
 
+StudyrightExtent.hasMany(Studyright, { foreignKey: 'extentcode', sourceKey: 'extentcode' })
+Studyright.belongsTo(StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'extentcode' })
+
 module.exports = {
   Student,
   Credit,
@@ -438,5 +452,6 @@ module.exports = {
   StudentList,
   StudyrightElement,
   ElementDetails,
-  Filters
+  Filters,
+  StudyrightExtent
 }
