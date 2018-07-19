@@ -44,7 +44,6 @@ if (process.env.NODE_ENV === 'dev') {
 
 const getStudent = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/info`
-  console.log({ url })
   const response = await attemptGetFor(url)
   const data = response.data.data
   return data

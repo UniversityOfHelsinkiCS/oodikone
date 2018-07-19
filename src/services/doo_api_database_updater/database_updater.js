@@ -42,12 +42,12 @@ const updateStudyrights = async (api, studentnumber) => {
   }
 }
 
-const getTeachers = teachers => Promise.all(teachers.map(t => Oodi.getTeacherInfo(t.teacher_id)))
+const getTeachersFromApi = teacherids => Promise.all(teacherids.map(id => Oodi.getTeacherInfo(id)))
 
 const createTeachers = async (attainment, courseinstance) => {
-  const teachers = await getTeachers(attainment.teachers)
-  await Promise.all(teachers.map(teacher => Teacher.upsert(mapper.getTeacherFromData(teacher))))
-  await Promise.all(teachers.map(teacher => CourseTeacher.upsert(mapper.courseTeacherFromData(teacher, courseinstance.id))))
+  const teachers = await mapper.attainmentDataToTeachers(attainment)
+  await Promise.all(teachers.map(teacher => Teacher.upsert(teacher)))
+  await Promise.all(teachers.map(teacher => CourseTeacher.upsert(mapper.courseTeacherFromData(teacher.id, courseinstance.id))))
 }
 
 const attainmentAlreadyInDb = attainment => attainmentIds.has(String(attainment.studyattainment_id))
@@ -59,25 +59,24 @@ const createCourse = async course => {
   }
 }
 
-const updateStudyattainments = async (api, studentnumber, onDemand) => {
+const createCourseInstance = async (courseinstance, returning=false) => {
+  const record = await CourseInstance.upsert(courseinstance, { returning })
+  return returning === true ? record[0] : undefined
+}
+
+const updateStudyattainments = async (api, studentnumber) => {
   for (let data of api.studyattainments) {
     const attainment = mapper.attainmentDataToCredit(data)
     if (!attainmentAlreadyInDb(attainment)) {
       await createCourse(mapper.attainmentDataToCourse(data))
-      const [courseinstance] = await CourseInstance.upsert(
-        mapper.attainmentDataToCourseInstance(data),
-        { returning: true }
-      )
+      const courseinstance = await createCourseInstance(mapper.attainmentDataToCourseInstance(data), true)
       await Credit.upsert(mapper.attainmentDataToCredit(data, courseinstance.id, studentnumber))
-      if (!onDemand) {
-        await createTeachers(data, courseinstance)
-      }
+      await createTeachers(data, courseinstance)
     }
   }
 }
 
-const updateStudent = async (studentnumber, onDemand) => {
-  console.log(`updating ${studentnumber}`)
+const updateStudent = async (studentnumber) => {
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {
     logger.verbose(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
@@ -85,19 +84,18 @@ const updateStudent = async (studentnumber, onDemand) => {
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
     await Promise.all([
       updateStudyrights(api, studentnumber),
-      updateStudyattainments(api, studentnumber, onDemand)
+      updateStudyattainments(api, studentnumber)
     ])
   }
 }
 
-const updateStudents = async (studentnumbers, onUpdateStudent, chunksize = 1, onDemand) => {
+const updateStudents = async (studentnumbers, onUpdateStudent, chunksize = 1) => {
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
-  console.log('updating')
   while (remaining.length > 0) {
     const nextchunk = remaining.splice(0, chunksize)
     await Promise.all(nextchunk.map(async studentnumber => {
-      await updateStudent(studentnumber, onDemand)
+      await updateStudent(studentnumber)
       if (runOnUpdate) {
         onUpdateStudent()
       }
@@ -120,14 +118,31 @@ const updateFaculties = async () => {
   }))
 }
 
+const createOrUpdateTeacher = async teacher => {
+  if (teacher !== null) {
+    await Teacher.upsert(mapper.getTeacherFromData(teacher))
+  }
+}
 
-const updateDatabase = async (studentnumbers, onUpdateStudent, onDemand = false) => {
-  console.log('starting', studentnumbers.length)
+const updateTeacherInfo = async (teacherids, chunksize=1) => {
+  const teacherchunks = _.chunk(teacherids, chunksize)
+  for (let chunk of teacherchunks) {
+    const apidata = await getTeachersFromApi(chunk)
+    await Promise.all(apidata.map(createOrUpdateTeacher))
+  }
+}
+
+const updateTeachersInDb = async () => {
+  const dbteachers = await Teacher.findAll({ attributes: ['id']})
+  await updateTeacherInfo(dbteachers.map(teacher => teacher.id)) 
+}
+
+const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   if (process.env.NODE_ENV !== 'anon') {
     await updateFaculties()
   }
-  await updateStudents(studentnumbers, onUpdateStudent, 128, onDemand)
-  return
+  await updateStudents(studentnumbers, onUpdateStudent, 100)
+  await updateTeachersInDb()
 }
 
 module.exports = { updateDatabase, updateFaculties }

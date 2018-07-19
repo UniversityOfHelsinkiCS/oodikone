@@ -219,13 +219,17 @@ const studyrightElementFromData = (element, studyrightid, studentnumber) => {
   }
 }
 
-const courseTeacherFromData = (teacher, courseinstanceid) => {
+const courseTeacherFromData = (teacherid, courseinstanceid) => {
   return {
     teacherrole: DEFAULT_TEACHER_ROLE,
     courseinstance_id: courseinstanceid,
-    teacher_id: teacher.teacher_id,
+    teacher_id: teacherid,
   }
 }
+
+const attainmentDataToTeachers = data => data.teachers.map(teacherdata => ({
+  id: teacherdata.teacher_id,
+}))
 
 module.exports = {
   getStudentFromData,
@@ -240,5 +244,6 @@ module.exports = {
   attainmentDataToCourseInstance,
   attainmentDataToCredit,
   getOrganisationFromData,
-  courseTeacherFromData
+  courseTeacherFromData,
+  attainmentDataToTeachers
 }
