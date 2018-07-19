@@ -2,7 +2,7 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent } = require('../../../src/models/index')
 const _ = require('lodash')
 
 let attainmentIds = new Set()
@@ -27,8 +27,11 @@ const getAllStudentInformationFromApi = async studentnumber => {
   }
 }
 
+
+
 const updateStudyrights = async (api, studentnumber) => {
   for (let data of api.studyrights) {
+    await StudyrightExtent.upsert(mapper.studyrightDataToExtent(data))
     const [studyright] = await Studyright.upsert(mapper.getStudyRightFromData(data, studentnumber), { returning: true })
     for (let element of data.elements) {
       const elementDetail = mapper.elementDetailFromData(element)
@@ -89,7 +92,7 @@ const updateStudent = async (studentnumber) => {
   }
 }
 
-const updateStudents = async (studentnumbers, onUpdateStudent, chunksize = 1) => {
+const updateStudents = async (studentnumbers, chunksize=1, onUpdateStudent=undefined) => {
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
   while (remaining.length > 0) {
@@ -141,8 +144,8 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   if (process.env.NODE_ENV !== 'anon') {
     await updateFaculties()
   }
-  await updateStudents(studentnumbers, onUpdateStudent, 100)
+  await updateStudents(studentnumbers, 100, onUpdateStudent)
   await updateTeachersInDb()
 }
 
-module.exports = { updateDatabase, updateFaculties }
+module.exports = { updateDatabase, updateFaculties, updateStudents }
