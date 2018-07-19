@@ -42,14 +42,18 @@ class PopulationFilters extends Component {
   state = {
     visible: false,
     presetName: '',
-    presetFilters: []
+    presetFilters: [],
+    firstRenderKludge: true
   }
-  async componentDidUpdate(prevProps) {
-    if ((this.props.populationCourses.pending === false
+  componentDidUpdate(prevProps) {
+    if (this.state.firstRenderKludge || (this.props.populationCourses.pending === false
       && prevProps.populationCourses.pending === true)
       || (this.props.populationFilters.filtersFromBackend.length
         !== prevProps.populationFilters.filtersFromBackend.length)) {
       this.updateFilterList(this.props.populationFilters.filtersFromBackend)
+      this.setState({ firstRenderKludge: !this.state.firstRenderKludge }) // eslint-disable-line react/no-did-update-set-state,max-len
+      /* You may call setState() immediately in componentDidUpdate()
+         but note that it must be wrapped in a condition */
     }
   }
   updateFilterList(filtersToCreate) {
@@ -216,7 +220,7 @@ class PopulationFilters extends Component {
             return React.createElement(componentFor[filter.type], { filter, key: filter.id })
           }
           return React.createElement(Preset, {
-            filter, key: filter.filter.id, destroy: this.destroyFromAllFilters
+            filter, key: filter.id, destroy: this.destroyFromAllFilters
           })
         })}
 
