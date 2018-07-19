@@ -80,8 +80,9 @@ class PopulationFilters extends Component {
   renderAddFilters() {
     const { extents } = this.props
     _.forOwn(extents, e => e.type = 'ExtentGraduated')
+    const filteredExtents = extents.filter(e => e.extentcode < 9)
     const allFilters = _.union(Object.keys(componentFor).map(f =>
-      String(f)), this.state.presetFilters.map(f => f.id), extents.map(f => f.name.fi))
+      String(f)), this.state.presetFilters.map(f => f.id), filteredExtents.map(f => f.name.fi))
     const setFilters = _.union(
       this.props.filters.map(f => f.type),
       this.props.filters.filter(f => f.type === 'Preset').map(f => f.id),
@@ -115,9 +116,9 @@ class PopulationFilters extends Component {
             return React.createElement(componentFor[filterName], {
               filter: { notSet: true }, key: filterName
             })
-          } else if (extents.find(e => e.name.fi === filterName)) {
+          } else if (filteredExtents.find(e => e.name.fi === filterName)) {
             return React.createElement(ExtentGraduated, {
-              filter: { notSet: true, ...extents.find(e => e.name.fi === filterName) }, key: filterName
+              filter: { notSet: true, ...filteredExtents.find(e => e.name.fi === filterName) }, key: filterName
             })
           } else {
             return React.createElement(Preset, {
