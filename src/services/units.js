@@ -1,18 +1,6 @@
 const Sequelize = require('sequelize')
-const { Unit, ElementDetails, StudyrightElement } = require('../models')
+const { ElementDetails, StudyrightElement } = require('../models')
 const Op = Sequelize.Op
-
-const all = () => Unit.findAll()
-
-const findAllEnabled = () => Unit.findAll({
-  where: {
-    enabled: {
-      [Op.eq]: true
-    }
-  }
-})
-
-const byId = (id) => Unit.findById(id)
 
 const hasStudent = async (code, studentnumber) => StudyrightElement.findOne({
   where: {
@@ -20,14 +8,6 @@ const hasStudent = async (code, studentnumber) => StudyrightElement.findOne({
     code
   }
 })
-
-const findByName = name => Unit.findOne({
-  where: { name }
-})
-
-const createUnit = data => {
-  return Unit.create(data)
-}
 
 const parseUnitFromElement = element => ({
   id: element.code,
@@ -51,5 +31,5 @@ const getUnitFromElementDetail = async id => {
 }
 
 module.exports = {
-  all, byId, findAllEnabled, hasStudent, createUnit, findByName, getUnitsFromElementDetails, getUnitFromElementDetail, parseUnitFromElement
+  hasStudent, getUnitsFromElementDetails, getUnitFromElementDetail, parseUnitFromElement
 }

@@ -80,18 +80,6 @@ test.skip('user cannot be enabled/disabled if enabler is not admin', async t => 
   t.is(userAfter.dataValues.is_enabled, enabled)
 })
 
-test.skip('units cannot be added if adder is not admin', async t => {
-  const usersUnits = await UserService.getUnits(2)
-  await api
-    .put('/api/users/2/units/1')
-    .send({ uid: 2, id: 1 })
-    .set('x-access-token', token2)
-    .set('uid', uid2)
-    .expect(403)
-  const usersUnitsAfter = await UserService.getUnits(2)
-  t.is(usersUnitsAfter.length, usersUnits.length)
-})
-
 test.skip('units can be added to user', async t => {
   let res = await api
     .post('/api/users/1/units/1')
