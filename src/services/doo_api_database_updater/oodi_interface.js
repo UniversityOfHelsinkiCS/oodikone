@@ -73,10 +73,17 @@ const getTeacherInfo = async id => {
   return response.data.data
 }
 
+const getCourseTypeCodes = async () => {
+  const url = `${base_url}/codes/learningopportunities/types`
+  const response = await attemptGetFor(url)
+  return response.data.data
+}
+
 module.exports = {
   getStudentStudyRights,
   getStudent,
   getFaculties,
   getStudyAttainments,
-  getTeacherInfo
+  getTeacherInfo,
+  getCourseTypeCodes
 }

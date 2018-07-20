@@ -228,6 +228,11 @@ const studyrightDataToExtent = data => ({
   name: getTextsByLanguage(data.extent)
 })
 
+const courseTypeFromData = data => ({
+  coursetypecode: data.code,
+  name: getTextsByLanguage(data.name)
+})
+
 module.exports = {
   getStudentFromData,
   getStudyRightIdStrings,
@@ -243,5 +248,6 @@ module.exports = {
   getOrganisationFromData,
   courseTeacherFromData,
   attainmentDataToTeachers,
-  studyrightDataToExtent
+  studyrightDataToExtent,
+  courseTypeFromData
 }
