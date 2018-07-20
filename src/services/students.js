@@ -63,7 +63,8 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     return {
       course: {
         code: courseinstance.course_code,
-        name: courseinstance.course.name
+        name: courseinstance.course.name,
+        coursetypecode: courseinstance.course.coursetypecode
       },
       date: courseinstance.coursedate,
       passed: Credit.passed({ grade }),

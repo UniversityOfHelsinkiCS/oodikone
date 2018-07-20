@@ -49,7 +49,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             attributes: ['coursedate', 'course_code'],
             include: {
               model: Course,
-              attributes: ['name']
+              attributes: ['name', 'coursetypecode']
             },
             required: true,
             where: {
