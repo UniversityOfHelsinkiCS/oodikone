@@ -356,6 +356,16 @@ const StudyrightExtent = sequelize.define('studyright_extent',
   }
 )
 
+const CourseType = sequelize.define('course_type', {
+  coursetypecode: {
+    type: Sequelize.INTEGER,
+    primaryKey: true
+  },
+  name: {
+    type: Sequelize.JSONB
+  }
+})
+
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
 Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
 
@@ -406,5 +416,6 @@ module.exports = {
   StudyrightElement,
   ElementDetails,
   Filters,
-  StudyrightExtent
+  StudyrightExtent,
+  CourseType
 }
