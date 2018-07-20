@@ -37,7 +37,7 @@ amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td"
 
 wait do
     tablebody.find(:xpath, '..').find("tr", text:"min").all("td")[1].text.to_i > 30
-    amount_of_students == 30
+    amount_of_students == 0
 end
 
 navigation.navigate(/Course/)
