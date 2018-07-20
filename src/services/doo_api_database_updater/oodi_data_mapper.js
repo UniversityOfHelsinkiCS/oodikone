@@ -54,17 +54,9 @@ const getStudentFromData = (student, studyrights) => {
     country_sv: country.sv,
     country_en: country.en,
     firstnames: student.first_names,
-    //DEPRECATED IN NEW API
     communicationlanguage: language.en || language.fi || language.sv,
-    dateoffirstcredit: null,
-    dateoflastcredit: null,
     dateofuniversityenrollment: universityEnrollmentDateFromStudyRights(studyrights),
-    gradestudent: null,
     matriculationexamination: null,
-    nationalities: null,
-    semesterenrollmenttypecode: null,
-    sex: null,
-    studentstatuscode: null,
     abbreviatedname: [student.last_name, student.first_names].join(' ')
   }
 }
