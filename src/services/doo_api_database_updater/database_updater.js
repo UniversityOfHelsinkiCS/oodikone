@@ -148,13 +148,37 @@ const updateTeachersInDb = async () => {
   await updateTeacherInfo(dbteachers.map(teacher => teacher.id)) 
 }
 
+const getLearningOpportunityFromApi = (courseids) => {
+  return Promise.all(courseids.map(courseid => Oodi.getLearningOpportunity(courseid)))
+}
+
+const createOrUpdateCourseFromLearningOpportunityData = async data => {
+  if (data !== null) {
+    await Course.upsert(mapper.learningOpportunityDataToCourse(data))  
+  }
+}
+
+const updateCourseInformation = async (courseids, chunksize=1) => {
+  const coursechunks = _.chunk(courseids, chunksize)
+  for (let chunk of coursechunks) {
+    const apidata = await getLearningOpportunityFromApi(chunk)
+    await Promise.all(apidata.map(data => createOrUpdateCourseFromLearningOpportunityData(data)))
+  }
+}
+
+const updateCoursesInDb = async (chunksize=1) => {
+  const dbcourses = await Course.findAll({ attributes: ['code'] })
+  await updateCourseInformation(dbcourses.map(course => course.code), chunksize)
+}
+
 const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   if (process.env.NODE_ENV !== 'anon') {
     await updateFaculties()
   }
   await updateCourseTypeCodes()
   await updateStudents(studentnumbers, 100, onUpdateStudent)
-  await updateTeachersInDb()
+  await updateTeachersInDb(100)
+  await updateCoursesInDb(100)
 }
 
-module.exports = { updateDatabase, updateFaculties, updateStudents }
+module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformation }
