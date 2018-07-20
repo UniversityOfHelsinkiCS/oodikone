@@ -161,48 +161,8 @@ const statisticsOf = async (courses, fromDate, toDate, minCourses, minStudents, 
   }
 }
 
-const findOrCreateTeacher = async (code, name) => {
-  return Teacher.findOne({
-    where: {
-      code: {
-        [Op.eq]: code
-      },
-      name: {
-        [Op.eq]: name
-      }
-    }
-  }).then(t => {
-    if (t === null) {
-      return createTeacher(code, name)
-    } else {
-      return t
-    }
-  })
-}
-
-const createTeacher = async (code, name) => {
-  const maxId = await Teacher.max('id')
-  const id = parseInt(maxId) + 1
-  return Teacher.create({
-    id: id,
-    code: code,
-    name: name
-  })
-}
-
-const createCourseTeacher = async (role, teacher, instance) => {
-  const maxId = await CourseTeacher.max('id') || 0
-  const id = parseInt(maxId) + 1
-  return CourseTeacher.create({
-    id: id,
-    teacherrole: role,
-    courseinstance_id: instance.id,
-    teacher_id: teacher.id
-  })
-}
-
 const createTeacherFromObject = teacher => Teacher.create(teacher)
 
 module.exports = {
-  statisticsOf, findOrCreateTeacher, createCourseTeacher, teachersByIds, createTeacherFromObject
+  statisticsOf, teachersByIds, createTeacherFromObject
 }
