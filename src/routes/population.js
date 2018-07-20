@@ -1,10 +1,8 @@
 const router = require('express').Router()
 const Population = require('../services/populations')
 const User = require('../services/users')
-const Unit = require('../services/units')
 const Filters = require('../services/filters')
 const { updateStudents } = require('../services/doo_api_database_updater/database_updater')
-const { getAssociatedStudyrights } = require('../services/studyrights')
 const StudyrightService = require('../services/studyrights')
 
 router.get('/v2/populationstatistics/courses', async (req, res) => {
