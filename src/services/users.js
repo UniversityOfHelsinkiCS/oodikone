@@ -46,6 +46,11 @@ const getUnitsFromElementDetails = async username => {
   return elementDetails.map(element => UnitService.parseUnitFromElement(element))
 }
 
+const getUserElementDetails = async username => {
+  const user = await byUsername(username)
+  return await user.getElementdetails()
+}
+
 const findAll = async () => {
   return User.findAll({ 
     include: [{ 
@@ -61,5 +66,6 @@ module.exports = {
   updateUser,
   findAll,
   byId,
-  getUnitsFromElementDetails
+  getUnitsFromElementDetails,
+  getUserElementDetails
 }

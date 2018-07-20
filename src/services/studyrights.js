@@ -1,5 +1,6 @@
-const { Studyright, StudyrightElement, sequelize } = require('../models')
+const { Studyright, StudyrightElement, sequelize, ElementDetails } = require('../models')
 const { Op, col, where, fn } = sequelize
+const { getUserElementDetails } = require('./users')
 const _ = require('lodash')
 
 const createStudyright = apiData => Studyright.create(apiData)
@@ -130,6 +131,32 @@ const getAssociatedStudyrights = async elementcodes => {
   return associationArraysToMapping(codesByStudyrights)
 }
 
+const formatStudyrightElements = (elements, associations) => elements.map(element => ({
+  id: element.code,
+  name: element.name.fi,
+  enabled: true,
+  type: element.type,
+  associations: associations[element.code]
+}))
+
+const getAllStudyrightElementsAndAssociations = async () => {
+  const [ associations, studyrightelements ] = await Promise.all([ getAssociatedStudyrights(), ElementDetails.findAll() ])
+  return formatStudyrightElements(studyrightelements, associations)
+}
+
+
+const getStudyrightElementsAndAssociationsForUser = async username => {
+  const studyrightelements = await getUserElementDetails(username)
+  const associations = await getAssociatedStudyrights(studyrightelements.map(element => element.code))
+  return formatStudyrightElements(studyrightelements, associations)
+}
+
 module.exports = {
-  byStudent, createStudyright, ofPopulations, studentNumbersWithAllStudyRightElements, getAssociatedStudyrights
+  byStudent,
+  createStudyright,
+  ofPopulations,
+  studentNumbersWithAllStudyRightElements,
+  getAssociatedStudyrights,
+  getAllStudyrightElementsAndAssociations,
+  getStudyrightElementsAndAssociationsForUser
 }
