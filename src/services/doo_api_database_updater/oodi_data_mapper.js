@@ -121,7 +121,8 @@ const attainmentDataToCourse = (attainment) => {
   return {
     code: attainment.learningopportunity_id,
     name: jsonNamesFromTexts(learningopportunity_name),
-    latest_instance_date: parseDate(attainment_date)
+    latest_instance_date: parseDate(attainment_date),
+
   }
 }
 
@@ -233,6 +234,12 @@ const courseTypeFromData = data => ({
   name: getTextsByLanguage(data.name)
 })
 
+const learningOpportunityDataToCourse = data => ({
+  code: data.learningopportunity_id,
+  coursetypecode: data.learningopportunity_type_code,
+  name: getTextsByLanguage(data.names)
+})
+
 module.exports = {
   getStudentFromData,
   getStudyRightIdStrings,
@@ -249,5 +256,6 @@ module.exports = {
   courseTeacherFromData,
   attainmentDataToTeachers,
   studyrightDataToExtent,
-  courseTypeFromData
+  courseTypeFromData,
+  learningOpportunityDataToCourse
 }
