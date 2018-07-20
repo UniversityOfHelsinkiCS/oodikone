@@ -307,38 +307,6 @@ const User = sequelize.define('users',
   }
 )
 
-const Unit = sequelize.define('unit',
-  {
-    id: {
-      primaryKey: true,
-      type: Sequelize.BIGINT,
-      autoIncrement: true
-    },
-    name: { type: Sequelize.STRING, unique: true },
-    enabled: { type: Sequelize.BOOLEAN }
-  },
-  {
-    tableName: 'unit',
-    timestamps: false,
-  }
-)
-
-const UserUnit = sequelize.define('user_unit',
-  {
-    id: {
-      primaryKey: true,
-      type: Sequelize.BIGINT,
-      autoIncrement: true
-    },
-    user_id: { type: Sequelize.STRING },
-    unit_id: { type: Sequelize.BOOLEAN }
-  },
-  {
-    tableName: 'user_unit',
-    timestamps: false,
-  }
-)
-
 const StudentList = sequelize.define('student_list',
   {
     id: {
@@ -412,12 +380,6 @@ Tag.hasMany(TagStudent, { foreignKey: 'tags_tagname', sourceKey: 'tagname' })
 Studyright.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyright, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
 
-User.belongsToMany(Unit, { through: 'user_unit', foreignKey: 'user_id', timestamps: false })
-Unit.belongsToMany(User, { through: 'user_unit', foreignKey: 'unit_id', timestamps: false })
-
-Tag.belongsToMany(Unit, { through: 'unit_tag', foreignKey: 'tags_tagname', timestamps: false })
-Unit.belongsToMany(Tag, { through: 'unit_tag', foreignKey: 'unit_id', timestamps: false })
-
 StudyrightElement.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
 Studyright.hasMany(StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
 
@@ -444,8 +406,6 @@ module.exports = {
   Teacher,
   CourseTeacher,
   User,
-  Unit,
-  UserUnit,
   sequelize,
   migrationPromise,
   Organisation,
