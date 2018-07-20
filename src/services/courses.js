@@ -2,7 +2,7 @@ const Sequelize = require('sequelize')
 const moment = require('moment')
 const redis = require('redis')
 const conf = require('../conf-backend')
-const { sequelize, Student, Credit, CourseInstance, Course, CourseTeacher } = require('../models')
+const { sequelize, Student, Credit, CourseInstance, Course, CourseTeacher, CourseType } = require('../models')
 const { arrayUnique } = require('../util')
 const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
@@ -446,6 +446,8 @@ const removeDuplicateCode = async (code, duplicate) => {
   return res
 }
 
+const getAllCourseTypes = () => CourseType.findAll()
+
 module.exports = {
   byCode,
   bySearchTerm,
@@ -460,5 +462,6 @@ module.exports = {
   setDuplicateCode,
   removeDuplicateCode,
   getAllDuplicates,
-  getMainCode
+  getMainCode,
+  getAllCourseTypes
 }
