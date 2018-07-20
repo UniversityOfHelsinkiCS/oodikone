@@ -163,7 +163,7 @@ const parseQueryParams = query => {
   }
 }
 
-const formatStudentsForApi = students => {
+const formatStudentsForApi = (students, startDate, endDate) => {
   const result = students.reduce((stats, student) => {
     student.studyrights.forEach(studyright => {
       if (studyright.studyright_extent) {
@@ -171,7 +171,7 @@ const formatStudentsForApi = students => {
         stats.extents[extentcode] = { extentcode, name }
       }
     })
-    stats.students.push(formatStudentForOldApi(student))
+    stats.students.push(formatStudentForOldApi(student, startDate, endDate))
     return stats
   },{
     students: [],
@@ -192,7 +192,7 @@ const optimizedStatisticsOf = async (query) => {
   const endDate = `${year}-${semesterEnd[semester]}`
   const studentnumbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
   const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
-  return formatStudentsForApi(students)
+  return formatStudentsForApi(students, startDate, endDate)
 }
 
 
