@@ -221,6 +221,14 @@
       "Credit Accumulation"
     ]
   },
+  "studyrightStatistis": {
+    "header": [
+      "Studyright statistics"
+    ],
+    "navigationBar": [
+      "Studyright statistics"
+    ]
+  },
   "courseStatistics": {
     "header": [
       "Student statistics"

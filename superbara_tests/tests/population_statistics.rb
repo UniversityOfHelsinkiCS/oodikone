@@ -35,9 +35,10 @@ startedThisSemesterFilter.set_filter
 
 amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i
 
+min_credits = tablebody.find(:xpath, '..').find("tr", text:"min").all("td")[1].text.to_i
 wait do
-    tablebody.find(:xpath, '..').find("tr", text:"min").all("td")[1].text.to_i > 30
-    amount_of_students == 0
+    (amount_of_students == 24 &&
+    min_credits > 29)
 end
 
 navigation.navigate(/Course/)
@@ -47,9 +48,9 @@ value_end = tablebody.all("td")[10].text.to_i
 amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i
 
 wait 10 do
-    has_text? /Credits at least/
-    value_start > value_end
-    amount_of_students == 15
+    (has_text? /Credits at least/ &&
+    value_start > value_end &&
+    amount_of_students == 12)
 end
 
 save_button = find("button", text: "save filters as preset")
@@ -63,7 +64,7 @@ amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td"
 wait do
     set_filters == true
     saved == true
-    amount_of_students == 15
+    amount_of_students == 12
 end
 set_filters.find("div", text: filter_name).all("span")[1].click
 
