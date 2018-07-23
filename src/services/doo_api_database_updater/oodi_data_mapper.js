@@ -240,6 +240,11 @@ const learningOpportunityDataToCourse = data => ({
   name: getTextsByLanguage(data.names)
 })
 
+const studyattainmentStatusCodeToCreditType = data => ({
+  credittypecode: data.code,
+  name: getTextsByLanguage(data.name)
+})
+
 module.exports = {
   getStudentFromData,
   getStudyRightIdStrings,
@@ -257,5 +262,6 @@ module.exports = {
   attainmentDataToTeachers,
   studyrightDataToExtent,
   courseTypeFromData,
-  learningOpportunityDataToCourse
+  learningOpportunityDataToCourse,
+  studyattainmentStatusCodeToCreditType
 }
