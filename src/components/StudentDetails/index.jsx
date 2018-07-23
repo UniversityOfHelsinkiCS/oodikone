@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { func, shape, string, boolean, arrayOf, integer } from 'prop-types'
 import { connect } from 'react-redux'
-import { Segment } from 'semantic-ui-react'
+import { Segment, Table, Icon } from 'semantic-ui-react'
 import { isEmpty } from 'lodash'
 import { withRouter } from 'react-router-dom'
 
@@ -73,28 +73,64 @@ class StudentDetails extends Component {
   }
 
   renderStudyRights = () => {
-    const { translate, student } = this.props
-    const studyRightHeaders = ['Starting date', 'Degree', 'Graduated']
-    const studyRightRows = student.studyrights.filter(studyright =>
-      studyright.highlevelname.toLowerCase() !== 'undefined').map((studyright) => {
-      const {
-        startdate, highlevelname, graduated, enddate, canceldate
-      } = studyright
+    const { student } = this.props
+    const studyRightHeaders = ['Degree', 'Programme', 'Graduated']
+    const studyRightRows = student.studyrights.map((studyright) => {
+      const degrees = studyright.studyrightElements.filter(e => e.element_detail.type === 10)
+        .map(degree => ({
+          startdate: degree.startdate,
+          enddate: degree.enddate,
+          name: degree.element_detail.name.en
+        }))
+      const programmes = studyright.studyrightElements.filter(e => e.element_detail.type === 20)
+        .map(programme => ({
+          startdate: programme.startdate,
+          enddate: programme.enddate,
+          name: programme.element_detail.name.en
+        }))
       return {
-        startdate, highlevelname, graduated, enddate, canceldate
+        studyrightid: studyright.studyrightid,
+        graduated: studyright.graduated,
+        elements: { degrees, programmes }
       }
     })
 
     return (
-      <SearchResultTable
-        headers={studyRightHeaders}
-        rows={studyRightRows.map(c => ({
-          date: reformatDate(c.startdate, 'DD.MM.YYYY'),
-          highlevelname: c.highlevelname,
-          graduated: `${c.graduated ? 'Yes' : 'No'} (${c.canceldate ? reformatDate(c.canceldate, 'DD.MM.YYYY') : reformatDate(c.enddate, 'DD.MM.YYYY')})`
-        }))}
-        noResultText={translate('common.noResults')}
-      />
+      <Table>
+        <Table.Header>
+          <Table.Row>
+            {studyRightHeaders.map((header, index) => (
+              <Table.HeaderCell key={index}/* eslint-disable-line */>
+                {header}
+              </Table.HeaderCell>
+            ))
+            }
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {studyRightRows.map(c => (
+            <Table.Row key={c.studyrightid}>
+              <Table.Cell verticalAlign="middle">
+                {c.elements.degrees.map(degree => (
+                  <p key={degree.name}>{`${degree.name} (${reformatDate(degree.startdate, 'DD.MM.YYYY')} - ${reformatDate(degree.enddate, 'DD.MM.YYYY')})`} <br /> </p>
+                ))}
+              </Table.Cell>
+              <Table.Cell>
+                {c.elements.programmes.map(programme => (
+                  <p key={programme.name}>{`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(programme.enddate, 'DD.MM.YYYY')})`}<br /> </p>
+                ))}
+              </Table.Cell>
+              <Table.Cell>
+                {c.graduated ?
+                  <div><Icon name="check circle outline" color="green" /><p>{c.graduationDate}</p></div>
+                  : <div><Icon name="remove circle outline" color="red" /><p>{c.enddate}</p></div>
+                }
+
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
     )
   }
 
