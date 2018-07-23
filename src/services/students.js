@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const { Student, Credit, CourseInstance, Course, Studyright, StudyrightElement } = require('../models')
+const { Student, Credit, CourseInstance, Course, Studyright, StudyrightElement, ElementDetails } = require('../models')
 const { getAllDuplicates } = require('./courses')
 const Op = Sequelize.Op
 
@@ -28,7 +28,22 @@ const byId = async (id) => Student.findOne({
       ]
     },
     {
-      model:Studyright
+      model: Studyright,
+      include:
+      {
+        model: StudyrightElement,
+        include: [
+          {
+            model: ElementDetails,
+            where: {
+              type: {
+                [Op.in]: [10, 20]
+              }
+            }
+          }
+
+        ]
+      }
     }
   ],
   where: {
@@ -58,7 +73,7 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
-const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount,matriculationexamination, gender, credits, abbreviatedname, email, studyrights }) => {
+const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights }) => {
   const toCourse = ({ grade, credits, courseinstance, isStudyModuleCredit }) => {
     return {
       course: {
@@ -74,10 +89,14 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     }
   }
 
-  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, highlevelname, extentcode, graduated }) => ({
+  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, highlevelname, startdate, enddate, extentcode, graduated, graduation_date, studyright_elements }) => ({
     studyrightid,
     highlevelname,
     extentcode,
+    startdate,
+    graduationDate: graduation_date,
+    studyrightElements: studyright_elements,
+    enddate,
     graduated: Boolean(graduated)
   }))
 
@@ -107,8 +126,8 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
 const formatStudentUnifyCodes = async ({ studentnumber, dateofuniversityenrollment, creditcount, credits }, duplicates) => {
   const unifyOpenUniversity = (code) => {
     if (code[0] === 'A') {
-      return code.substring(code[1] === 'Y' ? 2 :1 )
-    } 
+      return code.substring(code[1] === 'Y' ? 2 : 1)
+    }
     return code
   }
 
@@ -163,6 +182,7 @@ const bySearchTerm = async (term) => {
 const withId = async (id) => {
   try {
     const result = await byId(id)
+    console.log(result)
     return formatStudent(result)
   } catch (e) {
     console.log(e)

@@ -63,10 +63,11 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       {
         model: Studyright,
         required: true,
-        attributes: ['studyrightid', 'highlevelname', 'extentcode', 'graduated'],
-        include: {
-          model: StudyrightExtent
-        }
+        attributes: ['studyrightid', 'startdate', 'highlevelname', 'extentcode', 'graduated'],
+        include: [
+          {
+            model: StudyrightExtent
+          }]
       }
     ],
     where: {
@@ -158,7 +159,7 @@ const parseQueryParams = query => {
   return {
     studyRights,
     months,
-    startDate, 
+    startDate,
     endDate
   }
 }
@@ -173,7 +174,7 @@ const formatStudentsForApi = (students, startDate, endDate) => {
     })
     stats.students.push(formatStudentForOldApi(student, startDate, endDate))
     return stats
-  },{
+  }, {
     students: [],
     extents: {}
   })
@@ -198,8 +199,8 @@ const optimizedStatisticsOf = async (query) => {
 
 const unifyOpenUniversity = (code) => {
   if (code[0] === 'A') {
-    return code.substring(code[1] === 'Y' ? 2 :1 )
-  } 
+    return code.substring(code[1] === 'Y' ? 2 : 1)
+  }
   return code
 }
 
@@ -210,7 +211,7 @@ const getUnifiedCode = (code, codeduplicates) => {
 }
 
 const newCourseStatsObject = (code, name, studentnumbers) => ({
-  course: { 
+  course: {
     code,
     name,
   },
@@ -223,7 +224,7 @@ const newCourseStatsObject = (code, name, studentnumbers) => ({
     notParticipated: new Set(studentnumbers),
     notParticipatedOrFailed: new Set(studentnumbers)
   },
-  stats: { 
+  stats: {
     students: 0,
     passed: 0,
     failed: 0,
@@ -270,7 +271,7 @@ const updateStudentStatistics = (coursestats, studentnumber, isPassingGrade, gra
   if (isPassingGrade) {
     if (!hasPassedBefore) {
       students.passed.add(studentnumber)
-      students.notParticipatedOrFailed.delete(studentnumber)    
+      students.notParticipatedOrFailed.delete(studentnumber)
       stats.passed += 1
     }
     if (hasFailedBefore) {
@@ -323,9 +324,9 @@ const bottlenecksOf = async (query) => {
     })
     return coursemap
   }, new Map())
-  const statsarray = [ ...coursestudentstatistics.values() ].map(courseStats => {
+  const statsarray = [...coursestudentstatistics.values()].map(courseStats => {
     const { stats } = courseStats
-    stats.percentage = percentageOf(stats.passed, stats.students) 
+    stats.percentage = percentageOf(stats.passed, stats.students)
     stats.passedOfPopulation = percentageOf(stats.passed, studentnumbers.length)
     stats.triedOfPopulation = percentageOf(stats.students, studentnumbers.length)
     formatStudentsForOldApi(courseStats.students)
