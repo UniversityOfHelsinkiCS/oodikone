@@ -9,7 +9,7 @@ const getStudyRightIdStrings = (data) =>
 const getTextsByLanguage = texts => {
   const names = {}
   texts.forEach(text => names[text.langcode] = text.text)
-  return { fi: null, sv: null, en: null, ...names}
+  return { fi: null, sv: null, en: null, ...names }
 }
 
 const defaultNameFromTexts = texts => {
@@ -68,7 +68,7 @@ const getDate = (date, format = 'DD.MM.YYYY') => {
 
 const getOrganisationFromData = ({ name, code }) => {
   return {
-    code, 
+    code,
     name: jsonNamesFromTexts(name)
   }
 }
@@ -86,7 +86,7 @@ const attainmentDataToCredit = (attainment, courseinstance_id, studentnumber) =>
 }
 
 const attainmentDataToCourse = (attainment) => {
-  const { learningopportunity_name, attainment_date} = attainment
+  const { learningopportunity_name, attainment_date } = attainment
   return {
     code: attainment.learningopportunity_id,
     name: jsonNamesFromTexts(learningopportunity_name),
@@ -118,20 +118,20 @@ const ELEMENT_ID = {
   DEGREE_TITLE: 10,
   DEGREE_STUDY_PROGRAM: 20,
   DEGREE_MAJOR: 40,
-} 
+}
 
 const highlevelnameFromElements = elements => {
   let subject
   elements.forEach(element => {
     const name = defaultNameFromTexts(element.name)
-    switch(element.element_id) {
+    switch (element.element_id) {
     case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
       subject = name
-      break    
+      break
     case ELEMENT_ID.DEGREE_MAJOR:
-      if ( subject===undefined ) {
+      if (subject === undefined) {
         subject = name
-      }  
+      }
       break
     default:
       break
@@ -204,9 +204,20 @@ const courseTypeFromData = data => ({
   name: getTextsByLanguage(data.name)
 })
 
+const disciplineFromData = data => ({
+  discipline_id: data.discipline_id,
+  name: getTextsByLanguage(data.name)
+})
+
+const learningOpportunityDataToCourseDisciplines = data => data.disciplines.map(discipline => ({
+  discipline_id: discipline.discipline_id,
+  course_id: data.learningopportunity_id
+}))
+
 const learningOpportunityDataToCourse = data => ({
   code: data.learningopportunity_id,
   coursetypecode: data.learningopportunity_type_code,
+  disciplines: data.disciplines,
   name: getTextsByLanguage(data.names)
 })
 
@@ -233,5 +244,7 @@ module.exports = {
   studyrightDataToExtent,
   courseTypeFromData,
   learningOpportunityDataToCourse,
-  studyattainmentStatusCodeToCreditType
+  studyattainmentStatusCodeToCreditType,
+  disciplineFromData,
+  learningOpportunityDataToCourseDisciplines
 }

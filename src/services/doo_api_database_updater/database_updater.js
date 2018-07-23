@@ -2,7 +2,7 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CreditType } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType } = require('../../../src/models/index')
 const _ = require('lodash')
 
 let attainmentIds = new Set()
@@ -154,7 +154,8 @@ const getLearningOpportunityFromApi = (courseids) => {
 
 const createOrUpdateCourseFromLearningOpportunityData = async data => {
   if (data !== null) {
-    await Course.upsert(mapper.learningOpportunityDataToCourse(data))  
+    await Course.upsert(mapper.learningOpportunityDataToCourse(data))
+    await Promise.all((mapper.learningOpportunityDataToCourseDisciplines(data).map(coursediscipline => CourseDisciplines.upsert(coursediscipline))))
   }
 }
 
@@ -177,15 +178,22 @@ const updateCreditTypeCodes = async () => {
   await Promise.all(creditTypes.map(type => CreditType.upsert(type)))
 }
 
+const updateCourseDisciplines = async () => {
+  const apiCourseDisciplines = await Oodi.getCourseDisciplines()
+  const courseDisciplines = apiCourseDisciplines.map(mapper.disciplineFromData)
+  await Promise.all(courseDisciplines.map(discipline => Discipline.upsert(discipline)))
+}
+
 const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   if (process.env.NODE_ENV !== 'anon') {
     await updateFaculties()
   }
   await updateCreditTypeCodes()
   await updateCourseTypeCodes()
+  await updateCourseDisciplines()
   await updateStudents(studentnumbers, 100, onUpdateStudent)
   await updateTeachersInDb(100)
   await updateCoursesInDb(100)
 }
 
-module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformation, updateCreditTypeCodes }
+module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformation, updateCreditTypeCodes, updateCourseDisciplines }
