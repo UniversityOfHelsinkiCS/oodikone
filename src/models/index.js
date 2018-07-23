@@ -115,8 +115,6 @@ const Credit = sequelize.define('credit',
       }
     },
     ordering: { type: Sequelize.STRING },
-    status: { type: Sequelize.STRING },
-    statuscode: { type: Sequelize.STRING },
     courseinstance_id: { type: Sequelize.BIGINT },
   },
   {
@@ -410,6 +408,9 @@ Studyright.belongsTo(StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'e
 
 CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
 Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
+
+CreditType.hasMany(Credit, { foreignKey: 'credittypecode', sourceKey: 'credittypecode' })
+Credit.belongsTo(CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
 
 module.exports = {
   Student,
