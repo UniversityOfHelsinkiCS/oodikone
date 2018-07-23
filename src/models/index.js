@@ -354,6 +354,20 @@ const StudyrightExtent = sequelize.define('studyright_extent',
   }
 )
 
+const Discipline = sequelize.define('discipline',
+  {
+    discipline_id: {
+      type: Sequelize.STRING,
+      primaryKey: true
+    },
+    name: {
+      type: Sequelize.JSONB
+    }
+  }
+)
+
+const CourseDisciplines = sequelize.define('course_disciplines', {})
+
 const CourseType = sequelize.define('course_type', {
   coursetypecode: {
     type: Sequelize.INTEGER,
@@ -409,8 +423,12 @@ Studyright.belongsTo(StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'e
 CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
 Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
 
+Discipline.belongsToMany(Course, { through: CourseDisciplines, foreignKey: 'discipline_id' })
+Course.belongsToMany(Discipline, { through: CourseDisciplines, foreignKey: 'course_id' })
+
 CreditType.hasMany(Credit, { foreignKey: 'credittypecode', sourceKey: 'credittypecode' })
 Credit.belongsTo(CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
+
 
 module.exports = {
   Student,
@@ -432,5 +450,7 @@ module.exports = {
   Filters,
   StudyrightExtent,
   CourseType,
-  CreditType
+  CreditType,
+  Discipline,
+  CourseDisciplines
 }
