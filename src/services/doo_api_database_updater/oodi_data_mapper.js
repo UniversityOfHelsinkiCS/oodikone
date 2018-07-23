@@ -66,36 +66,6 @@ const getDate = (date, format = 'DD.MM.YYYY') => {
   return moment(date, format).format('YYYY-MM-DD')
 }
 
-
-const statusFromAttainmentData = (code) => {
-  switch (code) {
-  case 1:
-    return 'Based on a prior decision'
-  case 2:
-    return 'Planned'
-  case 3:
-    return 'Confirmed'
-  case 4:
-    return 'Completed'
-  case 5:
-    return 'Erroneous entry'
-  case 6:
-    return 'Outdated'
-  case 7:
-    return 'Improved (grade)'
-  case 8:
-    return 'In progress'
-  case 9:
-    return 'Transferred'
-  case 10:
-    return 'Failed'
-  case 25:
-    return 'Cancelled planned'
-  default:
-    return 'Undefined'
-  }
-}
-
 const getOrganisationFromData = ({ name, code }) => {
   return {
     code, 
@@ -109,8 +79,7 @@ const attainmentDataToCredit = (attainment, courseinstance_id, studentnumber) =>
     grade: defaultNameFromTexts(attainment.grade),
     credits: attainment.credits,
     ordering: getDate(attainment.attainment_date, null),
-    status: statusFromAttainmentData(attainment.attainment_status_code),
-    statuscode: attainment.attainment_status_code,
+    credittypecode: attainment.attainment_status_code,
     courseinstance_id,
     student_studentnumber: studentnumber
   }
@@ -241,6 +210,11 @@ const learningOpportunityDataToCourse = data => ({
   name: getTextsByLanguage(data.names)
 })
 
+const studyattainmentStatusCodeToCreditType = data => ({
+  credittypecode: data.code,
+  name: getTextsByLanguage(data.name)
+})
+
 module.exports = {
   getStudentFromData,
   getStudyRightIdStrings,
@@ -258,5 +232,6 @@ module.exports = {
   attainmentDataToTeachers,
   studyrightDataToExtent,
   courseTypeFromData,
-  learningOpportunityDataToCourse
+  learningOpportunityDataToCourse,
+  studyattainmentStatusCodeToCreditType
 }

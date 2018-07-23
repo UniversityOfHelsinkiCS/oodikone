@@ -2,7 +2,7 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CreditType } = require('../../../src/models/index')
 const _ = require('lodash')
 
 let attainmentIds = new Set()
@@ -171,14 +171,21 @@ const updateCoursesInDb = async (chunksize=1) => {
   await updateCourseInformation(dbcourses.map(course => course.code), chunksize)
 }
 
+const updateCreditTypeCodes = async () => {
+  const apiStudyAttainmentStatusCodes = await Oodi.getStudyattainmentStatusCodes()
+  const creditTypes = apiStudyAttainmentStatusCodes.map(mapper.studyattainmentStatusCodeToCreditType)
+  await Promise.all(creditTypes.map(type => CreditType.upsert(type)))
+}
+
 const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   if (process.env.NODE_ENV !== 'anon') {
     await updateFaculties()
   }
+  await updateCreditTypeCodes()
   await updateCourseTypeCodes()
   await updateStudents(studentnumbers, 100, onUpdateStudent)
   await updateTeachersInDb(100)
   await updateCoursesInDb(100)
 }
 
-module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformation }
+module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformation, updateCreditTypeCodes }
