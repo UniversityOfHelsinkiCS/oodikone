@@ -226,6 +226,13 @@ const studyattainmentStatusCodeToCreditType = data => ({
   name: getTextsByLanguage(data.name)
 })
 
+const semesterFromData = data => ({
+  semestercode: data.semester_code,
+  name: getTextsByLanguage(data.name),
+  startdate: parseDate(data.start_date),
+  enddate: parseDate(data.end_date)
+})
+
 module.exports = {
   getStudentFromData,
   getStudyRightIdStrings,
@@ -246,5 +253,6 @@ module.exports = {
   learningOpportunityDataToCourse,
   studyattainmentStatusCodeToCreditType,
   disciplineFromData,
-  learningOpportunityDataToCourseDisciplines
+  learningOpportunityDataToCourseDisciplines,
+  semesterFromData
 }
