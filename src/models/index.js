@@ -390,6 +390,22 @@ const CreditType = sequelize.define('credit_type', {
   }
 })
 
+const Semester = sequelize.define('semester', {
+  semestercode: {
+    type: Sequelize.INTEGER,
+    primaryKey: true
+  },
+  name: {
+    type: Sequelize.JSONB
+  },
+  startdate: {
+    type: Sequelize.DATE
+  },
+  enddate: {
+    type: Sequelize.DATE
+  }
+})
+
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
 Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
 
@@ -454,5 +470,6 @@ module.exports = {
   CourseType,
   CreditType,
   Discipline,
-  CourseDisciplines
+  CourseDisciplines,
+  Semester
 }
