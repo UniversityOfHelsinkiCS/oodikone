@@ -2,7 +2,7 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment } = require('../../../src/models/index')
 const _ = require('lodash')
 
 let attainmentIds = new Set()
@@ -14,16 +14,18 @@ process.on('unhandledRejection', (reason) => {
 })
 
 const getAllStudentInformationFromApi = async studentnumber => {
-  const [student, studyrights, studyattainments] = await Promise.all([
+  const [student, studyrights, studyattainments, semesterEnrollments] = await Promise.all([
     Oodi.getStudent(studentnumber),
     Oodi.getStudentStudyRights(studentnumber),
     Oodi.getStudyAttainments(studentnumber),
+    Oodi.getSemesterEnrollments(studentnumber)
   ])
   return {
     student,
     studyrights,
     studyattainments,
-    studentnumber
+    studentnumber,
+    semesterEnrollments
   }
 }
 
@@ -77,6 +79,13 @@ const updateStudyattainments = async (api, studentnumber) => {
   }
 }
 
+const updateSemesterEnrollments = async (apidata, studentnumber) => {
+  await Promise.all(apidata.semesterEnrollments.map(apiEnrollment => {
+    const semesterEnrollment = mapper.semesterEnrollmentFromData(apiEnrollment, studentnumber)
+    return SemesterEnrollment.upsert(semesterEnrollment)
+  }))
+}
+
 const updateStudent = async (studentnumber) => {
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {
@@ -85,7 +94,8 @@ const updateStudent = async (studentnumber) => {
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
     await Promise.all([
       updateStudyrights(api, studentnumber),
-      updateStudyattainments(api, studentnumber)
+      updateStudyattainments(api, studentnumber),
+      updateSemesterEnrollments(api, studentnumber)
     ])
   }
 }
@@ -197,7 +207,7 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   await updateCreditTypeCodes()
   await updateCourseTypeCodes()
   await updateCourseDisciplines()
-  await updateStudents(studentnumbers, 100, onUpdateStudent)
+  await updateStudents(studentnumbers, 50, onUpdateStudent)
   await updateTeachersInDb(100)
   await updateCoursesInDb(100)
 }

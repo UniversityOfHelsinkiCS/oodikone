@@ -103,6 +103,12 @@ const getSemesters = async () => {
   return response.data.data
 }
 
+const getSemesterEnrollments = async studentnumber => {
+  const url = `${base_url}/students/${studentnumber}/semesterenrollments`
+  const response = await attemptGetFor(url)
+  return response.data.data
+}
+
 module.exports = {
   getStudentStudyRights,
   getStudent,
@@ -113,5 +119,6 @@ module.exports = {
   getLearningOpportunity,
   getStudyattainmentStatusCodes,
   getCourseDisciplines,
-  getSemesters
+  getSemesters,
+  getSemesterEnrollments
 }
