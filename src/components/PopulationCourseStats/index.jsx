@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Table, Form, Input, Popup, Button, Icon } from 'semantic-ui-react'
-import { func, arrayOf, object, number } from 'prop-types'
+import { func, arrayOf, object, number, shape } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
 
@@ -12,7 +12,11 @@ const formatGradeDistribution = grades => _.replace(JSON.stringify(grades, null,
 
 class PopulationCourseStats extends Component {
   static propTypes = {
-    courses: arrayOf(object).isRequired,
+    courses: shape({
+      coursestatistics: arrayOf(object).isRequired,
+      coursetypes: shape({}).isRequired,
+      disciplines: shape({}).isRequired
+    }).isRequired,
     translate: func.isRequired,
     setPopulationFilter: func.isRequired,
     populationSize: number.isRequired,
@@ -113,7 +117,7 @@ class PopulationCourseStats extends Component {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {courses.sort(this.criteria()).filter(this.limit()).map(course => (
+        {courses.coursestatistics.sort(this.criteria()).filter(this.limit()).map(course => (
           <Popup
             key={course.course.code}
             trigger={
@@ -234,7 +238,7 @@ class PopulationCourseStats extends Component {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {courses.sort(this.criteria()).filter(this.limit()).map(course => (
+        {courses.coursestatistics.sort(this.criteria()).filter(this.limit()).map(course => (
           <Table.Row key={course.course.code} active={this.active(course.course)}>
             <Table.Cell onClick={this.limitPopulationToCourse(course)}>
               {course.course.name.fi}
@@ -271,7 +275,6 @@ class PopulationCourseStats extends Component {
     const { courses, translate } = this.props
     const { reversed } = this.state
     const direction = reversed ? 'descending' : 'ascending'
-
     if (courses.length === 0) return null
     return (
       <div>

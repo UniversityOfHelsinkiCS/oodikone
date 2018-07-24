@@ -6,7 +6,7 @@ export const findCourses = (searchStr) => {
   return callController(route, prefix)
 }
 
-const reducer = (state = { data: [] }, action) => {
+const reducer = (state = { data: {} }, action) => {
   switch (action.type) {
     case 'FIND_COURSES_ATTEMPT':
       return {
