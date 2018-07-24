@@ -46,7 +46,9 @@ find("tr",text:("rich mesh relationships")).all("td")[0].click
 find("tr", text: "intuitive disintermediate e-markets").all("td")[0].click
 value_end = tablebody.all("td")[10].text.to_i
 amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i
-
+puts(value_start)
+puts(value_end)
+puts(amount_of_students)
 wait 10 do
     (has_text? /Credits at least/ &&
     value_start > value_end &&

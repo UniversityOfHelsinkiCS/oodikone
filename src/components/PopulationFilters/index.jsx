@@ -13,6 +13,7 @@ import SexFilter from './SexFilter'
 import CourseParticipation from './CourseParticipation'
 import ExtentGraduated from './ExtentGraduated'
 import Preset from './Preset'
+import DisciplineTypes from './DisciplineTypes'
 import { clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
 
@@ -21,6 +22,7 @@ const componentFor = {
   CreditsAtLeast,
   CreditsLessThan,
   StartingThisSemester,
+  DisciplineTypes,
   SexFilter,
   CourseParticipation
 }
