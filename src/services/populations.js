@@ -1,7 +1,7 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent } = require('../models')
+const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, Discipline } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
 const _ = require('lodash')
@@ -183,26 +183,31 @@ const percentageOf = (num, denom) => Number((100 * num / denom).toFixed(2))
 const findCourses = (studentnumbers, beforeDate) => {
   return Course.findAll({
     attributes: ['code', 'name', 'coursetypecode'],
-    include: {
-      model: CourseInstance,
-      attributes: ['course_code'],
-      required: true,
-      include: {
-        model: Credit,
-        attributes: ['grade', 'student_studentnumber', 'credittypecode'],
+    include: [
+      {
+        model: CourseInstance,
+        attributes: ['course_code'],
         required: true,
-        where: {
-          student_studentnumber: {
-            [Op.in]: studentnumbers
+        include: {
+          model: Credit,
+          attributes: ['grade', 'student_studentnumber', 'credittypecode'],
+          required: true,
+          where: {
+            student_studentnumber: {
+              [Op.in]: studentnumbers
+            }
           }
-        }
+        },
+        where: {
+          coursedate: {
+            [Op.lt]: beforeDate
+          }
+        },
       },
-      where: {
-        coursedate: {
-          [Op.lt]: beforeDate
-        }
-      },
-    }
+      {
+        model: Discipline
+      }
+    ]
   })
 }
 
@@ -210,6 +215,8 @@ const createEmptyStatsObject = (code, name, allstudents) => ({
   course: { 
     code,
     name,
+    disciplines: {},
+    coursetypes: {}
   },
   students: {
     all: {},
@@ -237,6 +244,7 @@ const createEmptyStatsObject = (code, name, allstudents) => ({
   }
 })
 
+
 const parseCreditInfo = credit => ({
   studentnumber: credit.student_studentnumber,
   grade: credit.grade,
@@ -252,15 +260,25 @@ const bottlenecksOf = async (query) => {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
   const { studyRights, startDate, endDate, months } = parseQueryParams(query)
+  const bottlenecks = {
+    disciplines: {},
+    coursetypes: {}
+  }
   const codeduplicates = await getAllDuplicates()
   const studentnumbers = await studentnumbersWithAllStudyrightElementsAndCreditsBetween(studyRights, startDate, endDate, months)
   const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
   const allstudents = studentnumbers.reduce((numbers, num) => ({...numbers, [num]: true}), {})
-  const allcoursestatistics = courses.reduce((allstats, course) => {
-    const { code, name } = course
+  const allcoursestatistics = courses.reduce((coursestatistics, course) => {
+    const { code, name, disciplines, coursetypecode } = course
     const unifiedcode = getUnifiedCode(code, codeduplicates)
-    const coursestats = allstats[unifiedcode] || createEmptyStatsObject(code, name, allstudents)
+    const coursestats = coursestatistics[unifiedcode] || createEmptyStatsObject(code, name, allstudents)
     const { students, grades, stats } = coursestats
+    coursestats.course.coursetypes[coursetypecode] = true
+    bottlenecks.coursetypes[coursetypecode] = true
+    disciplines.forEach(({ discipline_id }) => {
+      coursestats.course.disciplines[discipline_id] = true
+      bottlenecks.disciplines[discipline_id] = true
+    })
     course.courseinstances.forEach(courseinstance => {
       courseinstance.credits.forEach(credit => {
         const { studentnumber, passingGrade, improvedGrade, failingGrade, grade } = parseCreditInfo(credit)
@@ -290,10 +308,10 @@ const bottlenecksOf = async (query) => {
         }
       })
     })
-    allstats[unifiedcode] = coursestats
-    return allstats
+    coursestatistics[unifiedcode] = coursestats
+    return coursestatistics
   }, {})
-  const result = Object.values(allcoursestatistics).map(coursestatistics => {
+  bottlenecks.coursestatistics = Object.values(allcoursestatistics).map(coursestatistics => {
     const { stats, students } = coursestatistics
     stats.students = lengthOf(students.all)
     stats.passed = lengthOf(students.passed)
@@ -306,7 +324,7 @@ const bottlenecksOf = async (query) => {
     stats.triedOfPopulation = percentageOf(stats.students, studentnumbers.length)
     return coursestatistics
   })
-  return result
+  return bottlenecks
 }
 
 module.exports = {
