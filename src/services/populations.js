@@ -1,10 +1,9 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, Discipline, CourseType } = require('../models')
+const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, Discipline, CourseType, SemesterEnrollment, Semester } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
-const _ = require('lodash')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -69,6 +68,22 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
           {
             model: StudyrightExtent
           }]
+      },
+      {
+        model: SemesterEnrollment,
+        required: true,
+        include: {
+          model: Semester,
+          required: true,
+          where: {
+            startdate: {
+              [Op.between]: [startDate, endDate]
+            },
+            enddate: {
+              [Op.between]: [startDate, endDate]
+            }
+          }
+        }
       }
     ],
     where: {
@@ -140,15 +155,20 @@ const formatStudentsForApi = (students, startDate, endDate) => {
         stats.extents[extentcode] = { extentcode, name }
       }
     })
+    student.semester_enrollments.forEach(({ semestercode, semester }) => {
+      stats.semesters[semestercode] = semester
+    })
     stats.students.push(formatStudentForOldApi(student, startDate, endDate))
     return stats
   }, {
     students: [],
-    extents: {}
+    extents: {},
+    semesters: {}
   })
   return {
     students: result.students,
-    extents: Object.values(result.extents)
+    extents: Object.values(result.extents),
+    semesters: Object.values(result.semesters)
   }
 }
 
