@@ -1,7 +1,7 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, Discipline } = require('../models')
+const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, Discipline, CourseType } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
 const _ = require('lodash')
@@ -206,6 +206,10 @@ const findCourses = (studentnumbers, beforeDate) => {
       },
       {
         model: Discipline
+      },
+      {
+        model: CourseType,
+        required: true
       }
     ]
   })
@@ -269,15 +273,15 @@ const bottlenecksOf = async (query) => {
   const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
   const allstudents = studentnumbers.reduce((numbers, num) => ({...numbers, [num]: true}), {})
   const allcoursestatistics = courses.reduce((coursestatistics, course) => {
-    const { code, name, disciplines, coursetypecode } = course
+    const { code, name, disciplines, course_type } = course
     const unifiedcode = getUnifiedCode(code, codeduplicates)
     const coursestats = coursestatistics[unifiedcode] || createEmptyStatsObject(code, name, allstudents)
     const { students, grades, stats } = coursestats
-    coursestats.course.coursetypes[coursetypecode] = true
-    bottlenecks.coursetypes[coursetypecode] = true
-    disciplines.forEach(({ discipline_id }) => {
-      coursestats.course.disciplines[discipline_id] = true
-      bottlenecks.disciplines[discipline_id] = true
+    coursestats.course.coursetypes[course_type.coursetypecode] = course_type.name
+    bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
+    disciplines.forEach(({ discipline_id, name }) => {
+      coursestats.course.disciplines[discipline_id] = name
+      bottlenecks.disciplines[discipline_id] = name
     })
     course.courseinstances.forEach(courseinstance => {
       courseinstance.credits.forEach(credit => {
