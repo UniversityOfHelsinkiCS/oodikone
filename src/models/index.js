@@ -406,6 +406,24 @@ const Semester = sequelize.define('semester', {
   }
 })
 
+const SemesterEnrollment = sequelize.define('semester_enrollment', {
+  id: {
+    primaryKey: true,
+    type: Sequelize.BIGINT,
+    autoIncrement: true
+  },
+  enrollmenttype: {
+    type: Sequelize.INTEGER
+  }
+}, {
+  indexes: [
+    {
+      fields: ['semestercode', 'studentnumber'],
+      unique: true
+    }
+  ]
+})
+
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
 Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
 
@@ -447,6 +465,11 @@ Course.belongsToMany(Discipline, { through: CourseDisciplines, foreignKey: 'cour
 CreditType.hasMany(Credit, { foreignKey: 'credittypecode', sourceKey: 'credittypecode' })
 Credit.belongsTo(CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
 
+SemesterEnrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+Student.hasMany(SemesterEnrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+
+SemesterEnrollment.belongsTo(Semester, { foreignKey: 'semestercode', targetKey: 'semestercode' })
+Semester.hasMany(SemesterEnrollment, { foreignKey: 'semestercode', sourceKey: 'semestercode' })
 
 module.exports = {
   Student,
@@ -471,5 +494,6 @@ module.exports = {
   CreditType,
   Discipline,
   CourseDisciplines,
-  Semester
+  Semester,
+  SemesterEnrollment
 }

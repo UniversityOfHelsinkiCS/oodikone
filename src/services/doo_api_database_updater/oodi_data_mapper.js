@@ -233,6 +233,12 @@ const semesterFromData = data => ({
   enddate: parseDate(data.end_date)
 })
 
+const semesterEnrollmentFromData = (data, studentnumber) => ({
+  enrollmenttype: data.semester_enrollment_type_code,
+  semestercode: data.semester_code,
+  studentnumber
+})
+
 module.exports = {
   getStudentFromData,
   getStudyRightIdStrings,
@@ -254,5 +260,6 @@ module.exports = {
   studyattainmentStatusCodeToCreditType,
   disciplineFromData,
   learningOpportunityDataToCourseDisciplines,
-  semesterFromData
+  semesterFromData,
+  semesterEnrollmentFromData
 }
