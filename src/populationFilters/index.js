@@ -105,7 +105,8 @@ export const getFilterFunction = (type, params, populationCourses) => {
     case 'CourseParticipation':
       return courseParticipation({
         field: params.field,
-        course: populationCourses.filter(c => c.course.code === params.course.course.code)[0]
+        course: populationCourses.coursestatistics.filter(c =>
+          c.course.code === params.course.course.code)[0]
       })
     case 'Preset':
       return presetFilter(params)
