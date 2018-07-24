@@ -73,7 +73,7 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
-const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights }) => {
+const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments }) => {
   const toCourse = ({ grade, credits, courseinstance, isStudyModuleCredit, credittypecode }) => {
     return {
       course: {
@@ -100,6 +100,8 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     graduated: Boolean(graduated)
   }))
 
+  const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({ semestercode, enrollmenttype }))
+
   const courseByDate = (a, b) => {
     return moment(a.courseinstance.coursedate).isSameOrBefore(b.courseinstance.coursedate) ? -1 : 1
   }
@@ -119,6 +121,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     matriculationexamination,
     gender,
     email,
+    semesterenrollments,
     tags: []
   }
 }
@@ -182,7 +185,6 @@ const bySearchTerm = async (term) => {
 const withId = async (id) => {
   try {
     const result = await byId(id)
-    console.log(result)
     return formatStudent(result)
   } catch (e) {
     console.log(e)
