@@ -71,10 +71,8 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       },
       {
         model: SemesterEnrollment,
-        required: true,
         include: {
           model: Semester,
-          required: true,
           where: {
             startdate: {
               [Op.between]: [startDate, endDate]
