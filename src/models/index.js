@@ -421,6 +421,25 @@ const SemesterEnrollment = sequelize.define('semester_enrollment', {
   ]
 })
 
+const Provider = sequelize.define('provider', {
+  providercode: {
+    primaryKey: true,
+    type: Sequelize.STRING
+  },
+  name: {
+    type: Sequelize.JSONB
+  }
+})
+
+const CourseProvider = sequelize.define('course_providers', {}, {
+  indexes: [
+    {
+      fields: ['providercode', 'coursecode'],
+      unique: true
+    }
+  ]
+})
+
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
 Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
 
@@ -468,6 +487,9 @@ Student.hasMany(SemesterEnrollment, { foreignKey: 'studentnumber', sourceKey: 's
 SemesterEnrollment.belongsTo(Semester, { foreignKey: 'semestercode', targetKey: 'semestercode' })
 Semester.hasMany(SemesterEnrollment, { foreignKey: 'semestercode', sourceKey: 'semestercode' })
 
+Course.belongsToMany(Provider, { through: CourseProvider, foreignKey: 'coursecode'})
+Provider.belongsToMany(Course, { through: CourseProvider, foreignKey: 'providercode'})
+
 module.exports = {
   Student,
   Credit,
@@ -492,5 +514,7 @@ module.exports = {
   Discipline,
   CourseDisciplines,
   Semester,
-  SemesterEnrollment
+  SemesterEnrollment,
+  Provider,
+  CourseProvider
 }
