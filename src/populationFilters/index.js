@@ -118,7 +118,6 @@ const typeList = {
   EnrollmentStatus: enrollmentStatus
 }
 export const getFilterFunction = (type, params, populationCourses) => {
-  console.log({ params })
   switch (type) {
     case 'CourseParticipation':
       return courseParticipation({
