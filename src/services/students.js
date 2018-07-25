@@ -16,7 +16,7 @@ const updateStudent = student => {
   })
 }
 
-const byId = async (id) => Student.findOne({
+const byId = async (id) => Student.findByPrimary(id, {
   include: [
     {
       model: Credit,
@@ -29,29 +29,23 @@ const byId = async (id) => Student.findOne({
     },
     {
       model: Studyright,
-      include:
-      {
+      include: {
         model: StudyrightElement,
-        include: [
-          {
-            model: ElementDetails,
-            where: {
-              type: {
-                [Op.in]: [10, 20]
-              }
+        required: true,
+        include: {
+          model: ElementDetails,
+          required: true,
+          where: {
+            type: {
+              [Op.in]: [10, 20]
             }
           }
-
-        ]
+        }
       }
     }
-  ],
-  where: {
-    studentnumber: {
-      [Op.eq]: id
-    }
-  }
+  ]
 })
+
 
 const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   return Student.findAll({
@@ -101,6 +95,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     graduated: Boolean(graduated)
   }))
 
+  semester_enrollments = semester_enrollments || []
   const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({ semestercode, enrollmenttype }))
 
   const courseByDate = (a, b) => {
