@@ -107,7 +107,7 @@ class PopulationDetails extends Component {
 
   renderPopulationDetailsContent = () => (
     <div>
-      <PopulationFilters ref={this.filters} />
+      <PopulationFilters ref={this.filters} samples={this.props.samples} />
       {this.renderCreditGainGraphs()}
       {this.renderCourseStatistics()}
       <PopulationCourses ref={this.courses} />
@@ -137,6 +137,7 @@ class PopulationDetails extends Component {
         </div>
       )
     }
+    console.log(this.props)
     return (
       <div>
         {this.renderPopulationDetailsContent()}
