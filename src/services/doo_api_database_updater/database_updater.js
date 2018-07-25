@@ -2,7 +2,7 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider } = require('../../../src/models/index')
 const _ = require('lodash')
 
 let attainmentIds = new Set()
@@ -163,23 +163,32 @@ const getLearningOpportunityFromApi = (courseids) => {
 }
 
 const createOrUpdateCourseFromLearningOpportunityData = async data => {
-  if (data !== null) {
-    await Course.upsert(mapper.learningOpportunityDataToCourse(data))
-    await Promise.all((mapper.learningOpportunityDataToCourseDisciplines(data).map(coursediscipline => CourseDisciplines.upsert(coursediscipline))))
-  }
+  await Course.upsert(mapper.learningOpportunityDataToCourse(data))
+  await Promise.all((mapper.learningOpportunityDataToCourseDisciplines(data).map(coursediscipline => CourseDisciplines.upsert(coursediscipline))))
 }
 
-const updateCourseInformation = async (courseids, chunksize=1) => {
+const createOrUpdateCourseProviders = async data => {
+  const { providers, courseproviders } = mapper.learningOpportunityDataToCourseProviders(data)
+  await Promise.all(providers.map(provider => Provider.upsert(provider)))
+  await Promise.all(courseproviders.map(courseprovider => CourseProvider.upsert(courseprovider)))
+}
+
+const updateCourseInformationAndProviders = async (courseids, chunksize=1) => {
   const coursechunks = _.chunk(courseids, chunksize)
   for (let chunk of coursechunks) {
     const apidata = await getLearningOpportunityFromApi(chunk)
-    await Promise.all(apidata.map(data => createOrUpdateCourseFromLearningOpportunityData(data)))
+    await Promise.all(apidata.map(async data => {
+      if (data !== null) {
+        await createOrUpdateCourseFromLearningOpportunityData(data)
+        await createOrUpdateCourseProviders(data)
+      }
+    }))
   }
 }
 
-const updateCoursesInDb = async (chunksize=1) => {
+const updateCoursesAndProvidersInDb = async (chunksize=1) => {
   const dbcourses = await Course.findAll({ attributes: ['code'] })
-  await updateCourseInformation(dbcourses.map(course => course.code), chunksize)
+  await updateCourseInformationAndProviders(dbcourses.map(course => course.code), chunksize)
 }
 
 const updateCreditTypeCodes = async () => {
@@ -209,7 +218,7 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   await updateCourseDisciplines()
   await updateStudents(studentnumbers, 50, onUpdateStudent)
   await updateTeachersInDb(100)
-  await updateCoursesInDb(100)
+  await updateCoursesAndProvidersInDb(100)
 }
 
-module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformation, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters }
+module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters }

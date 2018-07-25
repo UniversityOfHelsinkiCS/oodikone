@@ -221,6 +221,21 @@ const learningOpportunityDataToCourse = data => ({
   name: getTextsByLanguage(data.names)
 })
 
+const learningOpportunityDataToCourseProviders = data => {
+  const providers = data.organisations.map(organisation => ({
+    providercode: organisation.code,
+    name: getTextsByLanguage(organisation.name)
+  }))
+  const courseproviders = providers.map(provider => ({
+    providercode: provider.providercode,
+    coursecode: data.learningopportunity_id
+  }))
+  return {
+    providers,
+    courseproviders
+  }
+}
+
 const studyattainmentStatusCodeToCreditType = data => ({
   credittypecode: data.code,
   name: getTextsByLanguage(data.name)
@@ -261,5 +276,6 @@ module.exports = {
   disciplineFromData,
   learningOpportunityDataToCourseDisciplines,
   semesterFromData,
-  semesterEnrollmentFromData
+  semesterEnrollmentFromData,
+  learningOpportunityDataToCourseProviders
 }
