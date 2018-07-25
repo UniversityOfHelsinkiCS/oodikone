@@ -41,7 +41,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     include: [
       {
         model: Credit,
-        attributes: ['grade', 'credits', 'isStudyModuleCredit', 'credittypecode'],
+        attributes: ['grade', 'credits', 'credittypecode'],
         required: true,
         include: [
           {
@@ -49,6 +49,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             attributes: ['coursedate', 'course_code'],
             include: {
               model: Course,
+              required: true,
               attributes: ['name', 'coursetypecode']
             },
             required: true,
@@ -181,7 +182,6 @@ const optimizedStatisticsOf = async (query) => {
   const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
   return formatStudentsForApi(students, startDate, endDate)
 }
-
 
 const unifyOpenUniversity = (code) => {
   if (code[0] === 'A') {

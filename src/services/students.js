@@ -74,18 +74,19 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
 }
 
 const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments }) => {
-  const toCourse = ({ grade, credits, courseinstance, isStudyModuleCredit, credittypecode }) => {
+  const toCourse = ({ grade, credits, courseinstance, credittypecode }) => {
+    const course = courseinstance.course.get()
     return {
       course: {
         code: courseinstance.course_code,
-        name: courseinstance.course.name,
+        name: course.name,
         coursetypecode: courseinstance.course.coursetypecode
       },
       date: courseinstance.coursedate,
       passed: Credit.passed({ credittypecode }),
       grade,
       credits,
-      isStudyModuleCredit,
+      isStudyModuleCredit: course.is_study_module
     }
   }
 
