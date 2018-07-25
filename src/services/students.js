@@ -94,7 +94,6 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     enddate,
     graduated: Boolean(graduated)
   }))
-
   semester_enrollments = semester_enrollments || []
   const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({ semestercode, enrollmenttype }))
 
