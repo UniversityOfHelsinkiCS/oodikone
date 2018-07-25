@@ -102,18 +102,6 @@ const Credit = sequelize.define('credit',
     grade: { type: Sequelize.STRING },
     student_studentnumber: { type: Sequelize.STRING },
     credits: { type: Sequelize.DOUBLE },
-    isStudyModuleCredit: {
-      type: Sequelize.BOOLEAN,
-      get() {
-        let val = this.getDataValue('credits')
-        if (val >= 25) {
-          return true
-        }
-        else {
-          return false
-        }
-      }
-    },
     ordering: { type: Sequelize.STRING },
     courseinstance_id: { type: Sequelize.BIGINT },
   },
@@ -235,6 +223,8 @@ const CourseInstance = sequelize.define('courseinstance',
   }
 )
 
+const STUDY_MODULE_COURSE_TYPES = [8, 9, 10, 11, 17, 18, 19, 20, 33, 40, 41, 42, 43, 44]
+
 const Course = sequelize.define('course',
   {
     code: {
@@ -242,7 +232,14 @@ const Course = sequelize.define('course',
       type: Sequelize.STRING
     },
     name: { type: Sequelize.JSONB },
-    latest_instance_date: { type: Sequelize.DATE }
+    latest_instance_date: { type: Sequelize.DATE },
+    is_study_module: {
+      type: Sequelize.BOOLEAN,
+      get() {
+        const coursetypecode = this.getDataValue('coursetypecode')
+        return STUDY_MODULE_COURSE_TYPES.some(typecode => typecode === coursetypecode)
+      }
+    }
   },
   {
     tableName: 'course',
