@@ -102,18 +102,6 @@ const Credit = sequelize.define('credit',
     grade: { type: Sequelize.STRING },
     student_studentnumber: { type: Sequelize.STRING },
     credits: { type: Sequelize.DOUBLE },
-    isStudyModuleCredit: {
-      type: Sequelize.BOOLEAN,
-      get() {
-        let val = this.getDataValue('credits')
-        if (val >= 25) {
-          return true
-        }
-        else {
-          return false
-        }
-      }
-    },
     ordering: { type: Sequelize.STRING },
     courseinstance_id: { type: Sequelize.BIGINT },
   },
@@ -235,6 +223,8 @@ const CourseInstance = sequelize.define('courseinstance',
   }
 )
 
+const STUDY_MODULE_COURSE_TYPES = [8, 9, 10, 11, 17, 18, 19, 20, 33, 40, 41, 42, 43, 44]
+
 const Course = sequelize.define('course',
   {
     code: {
@@ -242,7 +232,14 @@ const Course = sequelize.define('course',
       type: Sequelize.STRING
     },
     name: { type: Sequelize.JSONB },
-    latest_instance_date: { type: Sequelize.DATE }
+    latest_instance_date: { type: Sequelize.DATE },
+    is_study_module: {
+      type: Sequelize.BOOLEAN,
+      get() {
+        const coursetypecode = this.getDataValue('coursetypecode')
+        return STUDY_MODULE_COURSE_TYPES.some(typecode => typecode === coursetypecode)
+      }
+    }
   },
   {
     tableName: 'course',
@@ -424,6 +421,25 @@ const SemesterEnrollment = sequelize.define('semester_enrollment', {
   ]
 })
 
+const Provider = sequelize.define('provider', {
+  providercode: {
+    primaryKey: true,
+    type: Sequelize.STRING
+  },
+  name: {
+    type: Sequelize.JSONB
+  }
+})
+
+const CourseProvider = sequelize.define('course_providers', {}, {
+  indexes: [
+    {
+      fields: ['providercode', 'coursecode'],
+      unique: true
+    }
+  ]
+})
+
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
 Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
 
@@ -471,6 +487,9 @@ Student.hasMany(SemesterEnrollment, { foreignKey: 'studentnumber', sourceKey: 's
 SemesterEnrollment.belongsTo(Semester, { foreignKey: 'semestercode', targetKey: 'semestercode' })
 Semester.hasMany(SemesterEnrollment, { foreignKey: 'semestercode', sourceKey: 'semestercode' })
 
+Course.belongsToMany(Provider, { through: CourseProvider, foreignKey: 'coursecode'})
+Provider.belongsToMany(Course, { through: CourseProvider, foreignKey: 'providercode'})
+
 module.exports = {
   Student,
   Credit,
@@ -495,5 +514,7 @@ module.exports = {
   Discipline,
   CourseDisciplines,
   Semester,
-  SemesterEnrollment
+  SemesterEnrollment,
+  Provider,
+  CourseProvider
 }
