@@ -253,6 +253,24 @@ const semesterEnrollmentFromData = (data, studentnumber) => ({
   semestercode: data.semester_code,
   studentnumber
 })
+const getTransfersFromData = (data, studentnumber) => {
+  const sorted = _.sortBy(data, 'end_date')
+  let transfers = []
+  let i = 0
+  while (i < sorted.length) {
+    if (i === 0) {
+      i++
+      continue
+    }
+    let target = sorted[i].code
+    let source = sorted[i - 1].code
+    let transferdate = sorted[i - 1].end_date
+
+    transfers = transfers.concat({ source, target, transferdate, studentnumber })
+    i++
+  }
+  return(transfers)
+}
 
 module.exports = {
   getStudentFromData,
@@ -277,5 +295,6 @@ module.exports = {
   learningOpportunityDataToCourseDisciplines,
   semesterFromData,
   semesterEnrollmentFromData,
-  learningOpportunityDataToCourseProviders
+  learningOpportunityDataToCourseProviders,
+  getTransfersFromData
 }

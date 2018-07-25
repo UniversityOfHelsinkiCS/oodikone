@@ -67,7 +67,7 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
-const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments }) => {
+const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments, transfers }) => {
   const toCourse = ({ grade, credits, courseinstance, credittypecode }) => {
     const course = courseinstance.course.get()
     return {
@@ -113,6 +113,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     credits: creditcount,
     courses: credits.sort(courseByDate).map(toCourse),
     name: abbreviatedname,
+    transfers: transfers || [],
     matriculationexamination,
     gender,
     email,

@@ -1,7 +1,7 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, Discipline, CourseType, SemesterEnrollment, Semester } = require('../models')
+const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, StudyrightElement, Discipline, CourseType, SemesterEnrollment, Semester, Transfers } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
 
@@ -60,6 +60,12 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             }
           }
         ],
+      },
+      {
+        model: Transfers,
+        include: [
+          { model: StudyrightElement }
+        ]
       },
       {
         model: Studyright,
@@ -234,7 +240,7 @@ const findCourses = (studentnumbers, beforeDate) => {
 }
 
 const createEmptyStatsObject = (code, name, allstudents) => ({
-  course: { 
+  course: {
     code,
     name,
     disciplines: {},
@@ -250,7 +256,7 @@ const createEmptyStatsObject = (code, name, allstudents) => ({
     notParticipated: allstudents,
     notParticipatedOrFailed: allstudents
   },
-  stats: { 
+  stats: {
     students: 0,
     passed: 0,
     failed: 0,
@@ -258,7 +264,7 @@ const createEmptyStatsObject = (code, name, allstudents) => ({
     retryPassed: 0,
     attempts: 0,
     improvedPassedGrade: 0,
-    percentage: undefined,    
+    percentage: undefined,
     passedOfPopulation: undefined,
     triedOfPopulation: undefined
   },
@@ -289,7 +295,7 @@ const bottlenecksOf = async (query) => {
   const codeduplicates = await getAllDuplicates()
   const studentnumbers = await studentnumbersWithAllStudyrightElementsAndCreditsBetween(studyRights, startDate, endDate, months)
   const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
-  const allstudents = studentnumbers.reduce((numbers, num) => ({...numbers, [num]: true}), {})
+  const allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
   const allcoursestatistics = courses.reduce((coursestatistics, course) => {
     const { code, name, disciplines, course_type } = course
     const unifiedcode = getUnifiedCode(code, codeduplicates)
@@ -311,20 +317,20 @@ const bottlenecksOf = async (query) => {
         const failedBefore = students.failed[studentnumber] !== undefined
         const passedBefore = students.passed[studentnumber] !== undefined
         delete students.notParticipated[studentnumber]
-        if ( passingGrade === true ) {
+        if (passingGrade === true) {
           delete students.notParticipatedOrFailed[studentnumber]
           students.passed[studentnumber] = true
-          if ( failedBefore === true ) {
+          if (failedBefore === true) {
             delete students.failed[studentnumber]
             students.retryPassed[studentnumber] = true
           }
         }
-        if ( improvedGrade === true ) {
+        if (improvedGrade === true) {
           students.improvedPassedGrade[studentnumber] = true
         }
-        if ( failingGrade === true && passedBefore === false ) {
+        if (failingGrade === true && passedBefore === false) {
           students.failed[studentnumber] = true
-          if ( failedBefore === true ) {
+          if (failedBefore === true) {
             students.failedMany[studentnumber] = true
           }
         }
