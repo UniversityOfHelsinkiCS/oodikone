@@ -2,7 +2,7 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers } = require('../../../src/models/index')
 const _ = require('lodash')
 
 let attainmentIds = new Set()
@@ -33,6 +33,10 @@ const updateStudyrights = async (api, studentnumber) => {
   for (let data of api.studyrights) {
     await StudyrightExtent.upsert(mapper.studyrightDataToExtent(data))
     const [studyright] = await Studyright.upsert(mapper.getStudyRightFromData(data, studentnumber), { returning: true })
+    const possibleTransfers = data.elements.filter(element => element.element_id === 20)
+    if (possibleTransfers.length > 1) {
+      await mapper.getTransfersFromData(possibleTransfers, studentnumber).map(transfer => Transfers.upsert(transfer))
+    }
     for (let element of data.elements) {
       const elementDetail = mapper.elementDetailFromData(element)
       const studyrightElement = mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber)
@@ -62,7 +66,7 @@ const createCourse = async course => {
   }
 }
 
-const createCourseInstance = async (courseinstance, returning=false) => {
+const createCourseInstance = async (courseinstance, returning = false) => {
   const record = await CourseInstance.upsert(courseinstance, { returning })
   return returning === true ? record[0] : undefined
 }
@@ -100,7 +104,7 @@ const updateStudent = async (studentnumber) => {
   }
 }
 
-const updateStudents = async (studentnumbers, chunksize=1, onUpdateStudent=undefined) => {
+const updateStudents = async (studentnumbers, chunksize = 1, onUpdateStudent = undefined) => {
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
   while (remaining.length > 0) {
@@ -145,7 +149,7 @@ const createOrUpdateTeacher = async teacher => {
   }
 }
 
-const updateTeacherInfo = async (teacherids, chunksize=1) => {
+const updateTeacherInfo = async (teacherids, chunksize = 1) => {
   const teacherchunks = _.chunk(teacherids, chunksize)
   for (let chunk of teacherchunks) {
     const apidata = await getTeachersFromApi(chunk)
@@ -154,8 +158,8 @@ const updateTeacherInfo = async (teacherids, chunksize=1) => {
 }
 
 const updateTeachersInDb = async () => {
-  const dbteachers = await Teacher.findAll({ attributes: ['id']})
-  await updateTeacherInfo(dbteachers.map(teacher => teacher.id)) 
+  const dbteachers = await Teacher.findAll({ attributes: ['id'] })
+  await updateTeacherInfo(dbteachers.map(teacher => teacher.id))
 }
 
 const getLearningOpportunityFromApi = (courseids) => {
@@ -173,7 +177,7 @@ const createOrUpdateCourseProviders = async data => {
   await Promise.all(courseproviders.map(courseprovider => CourseProvider.upsert(courseprovider)))
 }
 
-const updateCourseInformationAndProviders = async (courseids, chunksize=1) => {
+const updateCourseInformationAndProviders = async (courseids, chunksize = 1) => {
   const coursechunks = _.chunk(courseids, chunksize)
   for (let chunk of coursechunks) {
     const apidata = await getLearningOpportunityFromApi(chunk)
@@ -186,7 +190,7 @@ const updateCourseInformationAndProviders = async (courseids, chunksize=1) => {
   }
 }
 
-const updateCoursesAndProvidersInDb = async (chunksize=1) => {
+const updateCoursesAndProvidersInDb = async (chunksize = 1) => {
   const dbcourses = await Course.findAll({ attributes: ['code'] })
   await updateCourseInformationAndProviders(dbcourses.map(course => course.code), chunksize)
 }
