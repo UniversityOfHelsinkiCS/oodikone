@@ -137,7 +137,6 @@ class PopulationDetails extends Component {
         </div>
       )
     }
-    console.log(this.props)
     return (
       <div>
         {this.renderPopulationDetailsContent()}

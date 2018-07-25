@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown } from 'semantic-ui-react'
-import { shape, func } from 'prop-types'
+import { shape, func, object, arrayOf } from 'prop-types'
 import moment from 'moment'
 import _ from 'lodash'
 
@@ -13,7 +13,7 @@ class EnrollmentStatus extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    samples: shape({}).isRequired
+    samples: arrayOf(object).isRequired
   }
 
   state = {
@@ -62,7 +62,6 @@ class EnrollmentStatus extends Component {
 
   render() {
     const { filter } = this.props
-    console.log(this.state)
     if (filter.notSet) {
       return (
         <Segment>
@@ -73,10 +72,8 @@ class EnrollmentStatus extends Component {
               </Form.Field>
               <Form.Field>
                 <Dropdown
-                  selection
                   placeholder="select status"
                   onChange={(e, data) => this.setState({ enrolled: data.value })}
-                  value={this.state.enrolled}
                   options={[{ key: 1, text: 'present', value: 1 }, { key: 2, text: 'absent', value: 2 }]}
                 />
 
@@ -89,7 +86,6 @@ class EnrollmentStatus extends Component {
                   placeholder="select semesters"
                   fluid
                   multiple
-                  selection
                   options={this.state.options}
                   onChange={this.handleTime}
                 />
