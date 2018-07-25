@@ -99,7 +99,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     enddate,
     graduated: Boolean(graduated)
   }))
-
+  semester_enrollments = semester_enrollments || []
   const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({ semestercode, enrollmenttype }))
 
   const courseByDate = (a, b) => {
@@ -185,6 +185,7 @@ const bySearchTerm = async (term) => {
 const withId = async (id) => {
   try {
     const result = await byId(id)
+    console.log(result)
     return formatStudent(result)
   } catch (e) {
     console.log(e)
