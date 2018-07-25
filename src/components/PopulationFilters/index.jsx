@@ -14,6 +14,7 @@ import CourseParticipation from './CourseParticipation'
 import ExtentGraduated from './ExtentGraduated'
 import Preset from './Preset'
 import DisciplineTypes from './DisciplineTypes'
+import EnrollmentStatus from './EnrollmentStatus'
 import { clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
 
@@ -23,6 +24,7 @@ const componentFor = {
   CreditsLessThan,
   StartingThisSemester,
   DisciplineTypes,
+  EnrollmentStatus,
   SexFilter,
   CourseParticipation
 }
@@ -116,7 +118,7 @@ class PopulationFilters extends Component {
         {unsetFilters.map(filterName => {//eslint-disable-line
           if (componentFor[filterName]) { // THIS IS KINDA HACKED SOLUTION PLS FIX
             return React.createElement(componentFor[filterName], {
-              filter: { notSet: true }, key: filterName
+              filter: { notSet: true }, key: filterName, samples: this.props.samples
             })
           } else if (filteredExtents.find(e => e.name.fi === filterName)) {
             return React.createElement(ExtentGraduated, {
@@ -220,7 +222,7 @@ class PopulationFilters extends Component {
             })
           }
           else if (filter.type !== 'Preset') {
-            return React.createElement(componentFor[filter.type], { filter, key: filter.id })
+            return React.createElement(componentFor[filter.type], { filter, key: filter.id, samples: this.props.samples })
           }
           return React.createElement(Preset, {
             filter, key: filter.id, destroy: this.destroyFromAllFilters

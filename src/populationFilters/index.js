@@ -47,6 +47,22 @@ export const creditsAtLeast = credit =>
     }
   })
 
+export const enrollmentStatus = (params) => {
+  const { semesters, enrolled } = params
+  return ({
+    id: uuidv4(),
+    type: 'EnrollmentStatus',
+    params: {
+      semesters,
+      enrolled
+    },
+    filter: student => student.semesterenrollments.filter(({ semestercode }) =>
+      semesters.includes(semestercode)).map(({ enrollmenttype }) =>
+      enrollmenttype === enrolled).every(b => b === true)
+  })
+}
+
+
 export const startingThisSemester = starting =>
   ({
     id: uuidv4(),
@@ -98,9 +114,11 @@ const typeList = {
   SexFilter: sexFilter,
   CourseParticipation: courseParticipation,
   StartingThisSemester: startingThisSemester,
-  ExtentGraduated: extentGraduated
+  ExtentGraduated: extentGraduated,
+  EnrollmentStatus: enrollmentStatus
 }
 export const getFilterFunction = (type, params, populationCourses) => {
+  console.log({ params })
   switch (type) {
     case 'CourseParticipation':
       return courseParticipation({
@@ -112,6 +130,8 @@ export const getFilterFunction = (type, params, populationCourses) => {
       return presetFilter(params)
     case 'ExtentGraduated':
       return extentGraduated({ extentcode: params.extentcode, name: params.name })
+    case 'EnrollmentStatus':
+      return typeList[type](params)
     default:
       return typeList[type](Object.values(params))
   }
