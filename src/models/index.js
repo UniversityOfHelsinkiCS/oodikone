@@ -430,25 +430,11 @@ const Provider = sequelize.define('provider', {
     type: Sequelize.JSONB
   }
 })
-const StudentTransfers = sequelize.define('student_transfers', {})
+
 const Transfers = sequelize.define('transfers', {
-  id: {
-    primaryKey: true,
-    type: Sequelize.BIGINT,
-    autoIncrement: true
-  },
-  source: {
-    type: Sequelize.STRING
-  },
-  target: {
-    type: Sequelize.STRING
-  },
   transferdate: {
     type: Sequelize.DATE
-  },
-  studentnumber: {
-    type: Sequelize.STRING
-  },
+  }
 })
 
 const CourseProvider = sequelize.define('course_providers', {}, {
@@ -473,13 +459,6 @@ Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'stude
 
 Student.hasMany(TagStudent, { foreignKey: 'taggedstudents_studentnumber', sourceKey: 'studentnumber' })
 Tag.hasMany(TagStudent, { foreignKey: 'tags_tagname', sourceKey: 'tagname' })
-
-Student.hasMany(Transfers, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-Transfers.belongsTo(Student, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-
-StudyrightElement.belongsToMany(Transfers, { through: StudentTransfers, foreignKey: 'source' })
-StudyrightElement.belongsToMany(Transfers, { through: StudentTransfers, foreignKey: 'target' })
-Transfers.belongsToMany(StudyrightElement, { through: StudentTransfers, foreignKey: 'code'})
 
 Studyright.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyright, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
@@ -517,6 +496,15 @@ Semester.hasMany(SemesterEnrollment, { foreignKey: 'semestercode', sourceKey: 's
 Course.belongsToMany(Provider, { through: CourseProvider, foreignKey: 'coursecode' })
 Provider.belongsToMany(Course, { through: CourseProvider, foreignKey: 'providercode' })
 
+Transfers.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+Student.hasMany(Transfers, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+
+Transfers.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid'})
+Studyright.hasMany(Transfers, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
+
+Transfers.belongsTo(ElementDetails, { as: 'source', foreignKey: 'sourcecode' })
+Transfers.belongsTo(ElementDetails, { as: 'target', foreignKey: 'targetcode' })
+
 module.exports = {
   Student,
   Credit,
@@ -544,6 +532,5 @@ module.exports = {
   SemesterEnrollment,
   Provider,
   CourseProvider,
-  Transfers,
-  StudentTransfers
+  Transfers
 }
