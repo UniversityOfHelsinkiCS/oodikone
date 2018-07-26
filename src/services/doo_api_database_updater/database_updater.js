@@ -2,7 +2,7 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType } = require('../../../src/models/index')
 const _ = require('lodash')
 
 let attainmentIds = new Set()
@@ -14,17 +14,24 @@ process.on('unhandledRejection', (reason) => {
 })
 
 const getAllStudentInformationFromApi = async studentnumber => {
-  const [student, studyrights, studyattainments] = await Promise.all([
+  const [student, studyrights, studyattainments, semesterEnrollments] = await Promise.all([
     Oodi.getStudent(studentnumber),
     Oodi.getStudentStudyRights(studentnumber),
     Oodi.getStudyAttainments(studentnumber),
+    Oodi.getSemesterEnrollments(studentnumber)
   ])
   return {
     student,
     studyrights,
     studyattainments,
-    studentnumber
+    studentnumber,
+    semesterEnrollments
   }
+}
+
+const createOrUpdateStudyrightTransfers = async (apiStudyright, studentnumber) => {
+  const transfers = mapper.getTransfersFromData(apiStudyright, studentnumber)
+  await Promise.all(transfers.map(transfer => Transfers.upsert(transfer)))
 }
 
 const updateStudyrights = async (api, studentnumber) => {
@@ -40,6 +47,7 @@ const updateStudyrights = async (api, studentnumber) => {
       }
       await StudyrightElement.upsert(studyrightElement)
     }
+    await createOrUpdateStudyrightTransfers(data, studentnumber)
   }
 }
 
@@ -60,7 +68,7 @@ const createCourse = async course => {
   }
 }
 
-const createCourseInstance = async (courseinstance, returning=false) => {
+const createCourseInstance = async (courseinstance, returning = false) => {
   const record = await CourseInstance.upsert(courseinstance, { returning })
   return returning === true ? record[0] : undefined
 }
@@ -77,6 +85,13 @@ const updateStudyattainments = async (api, studentnumber) => {
   }
 }
 
+const updateSemesterEnrollments = async (apidata, studentnumber) => {
+  await Promise.all(apidata.semesterEnrollments.map(apiEnrollment => {
+    const semesterEnrollment = mapper.semesterEnrollmentFromData(apiEnrollment, studentnumber)
+    return SemesterEnrollment.upsert(semesterEnrollment)
+  }))
+}
+
 const updateStudent = async (studentnumber) => {
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {
@@ -85,12 +100,13 @@ const updateStudent = async (studentnumber) => {
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
     await Promise.all([
       updateStudyrights(api, studentnumber),
-      updateStudyattainments(api, studentnumber)
+      updateStudyattainments(api, studentnumber),
+      updateSemesterEnrollments(api, studentnumber)
     ])
   }
 }
 
-const updateStudents = async (studentnumbers, chunksize=1, onUpdateStudent=undefined) => {
+const updateStudents = async (studentnumbers, chunksize = 1, onUpdateStudent = undefined) => {
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
   while (remaining.length > 0) {
@@ -119,13 +135,23 @@ const updateFaculties = async () => {
   }))
 }
 
+const createCourseType = data => {
+  const coursetype = mapper.courseTypeFromData(data)
+  return CourseType.upsert(coursetype)
+}
+
+const updateCourseTypeCodes = async () => {
+  const apiCourseTypes = await Oodi.getCourseTypeCodes()
+  await Promise.all(apiCourseTypes.map(createCourseType))
+}
+
 const createOrUpdateTeacher = async teacher => {
   if (teacher !== null) {
     await Teacher.upsert(mapper.getTeacherFromData(teacher))
   }
 }
 
-const updateTeacherInfo = async (teacherids, chunksize=1) => {
+const updateTeacherInfo = async (teacherids, chunksize = 1) => {
   const teacherchunks = _.chunk(teacherids, chunksize)
   for (let chunk of teacherchunks) {
     const apidata = await getTeachersFromApi(chunk)
@@ -134,16 +160,77 @@ const updateTeacherInfo = async (teacherids, chunksize=1) => {
 }
 
 const updateTeachersInDb = async () => {
-  const dbteachers = await Teacher.findAll({ attributes: ['id']})
-  await updateTeacherInfo(dbteachers.map(teacher => teacher.id)) 
+  const dbteachers = await Teacher.findAll({ attributes: ['id'] })
+  await updateTeacherInfo(dbteachers.map(teacher => teacher.id))
+}
+
+const getLearningOpportunityFromApi = (courseids) => {
+  return Promise.all(courseids.map(courseid => Oodi.getLearningOpportunity(courseid)))
+}
+
+const createOrUpdateCourseFromLearningOpportunityData = async data => {
+  await Course.upsert(mapper.learningOpportunityDataToCourse(data))
+  await Promise.all((mapper.learningOpportunityDataToCourseDisciplines(data).map(coursediscipline => CourseDisciplines.upsert(coursediscipline))))
+}
+
+const createOrUpdateCourseProviders = async data => {
+  const { providers, courseproviders } = mapper.learningOpportunityDataToCourseProviders(data)
+  await Promise.all(providers.map(provider => Provider.upsert(provider)))
+  await Promise.all(courseproviders.map(courseprovider => CourseProvider.upsert(courseprovider)))
+}
+
+const updateCourseInformationAndProviders = async (courseids, chunksize = 1) => {
+  const coursechunks = _.chunk(courseids, chunksize)
+  for (let chunk of coursechunks) {
+    const apidata = await getLearningOpportunityFromApi(chunk)
+    await Promise.all(apidata.map(async data => {
+      if (data !== null) {
+        await createOrUpdateCourseFromLearningOpportunityData(data)
+        await createOrUpdateCourseProviders(data)
+      }
+    }))
+  }
+}
+
+const updateCoursesAndProvidersInDb = async (chunksize = 1) => {
+  const dbcourses = await Course.findAll({ attributes: ['code'] })
+  await updateCourseInformationAndProviders(dbcourses.map(course => course.code), chunksize)
+}
+
+const updateCreditTypeCodes = async () => {
+  const apiStudyAttainmentStatusCodes = await Oodi.getStudyattainmentStatusCodes()
+  const creditTypes = apiStudyAttainmentStatusCodes.map(mapper.studyattainmentStatusCodeToCreditType)
+  await Promise.all(creditTypes.map(type => CreditType.upsert(type)))
+}
+
+const updateCourseDisciplines = async () => {
+  const apiCourseDisciplines = await Oodi.getCourseDisciplines()
+  const courseDisciplines = apiCourseDisciplines.map(mapper.disciplineFromData)
+  await Promise.all(courseDisciplines.map(discipline => Discipline.upsert(discipline)))
+}
+
+const updateSemesters = async () => {
+  const apiSemesters = await Oodi.getSemesters()
+  await Promise.all(apiSemesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
+}
+
+const updateCourseRealisationTypes = async () => {
+  const apiTypes = await Oodi.getCourseRealisationTypes()
+  await Promise.all(apiTypes.map(data => CourseRealisationType.upsert(mapper.courseRealisationTypeFromData(data))))
 }
 
 const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   if (process.env.NODE_ENV !== 'anon') {
     await updateFaculties()
   }
-  await updateStudents(studentnumbers, 100, onUpdateStudent)
-  await updateTeachersInDb()
+  await updateCourseRealisationTypes()
+  await updateSemesters()
+  await updateCreditTypeCodes()
+  await updateCourseTypeCodes()
+  await updateCourseDisciplines()
+  await updateStudents(studentnumbers, 50, onUpdateStudent)
+  await updateTeachersInDb(100)
+  await updateCoursesAndProvidersInDb(100)
 }
 
-module.exports = { updateDatabase, updateFaculties, updateStudents }
+module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes }

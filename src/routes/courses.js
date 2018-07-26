@@ -13,6 +13,11 @@ router.get('/courses', async (req, res) => {
   res.json(results)
 })
 
+router.get('/coursetypes', async (req, res) => {
+  const coursetypes = await Course.getAllCourseTypes()
+  res.json(coursetypes)
+})
+
 router.get('/v2/courselist', async (req, res) => {
   let results = []
   if (req.query.code) {

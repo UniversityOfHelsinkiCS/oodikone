@@ -9,7 +9,7 @@ const getStudyRightIdStrings = (data) =>
 const getTextsByLanguage = texts => {
   const names = {}
   texts.forEach(text => names[text.langcode] = text.text)
-  return { fi: null, sv: null, en: null, ...names}
+  return { fi: null, sv: null, en: null, ...names }
 }
 
 const defaultNameFromTexts = texts => {
@@ -54,17 +54,9 @@ const getStudentFromData = (student, studyrights) => {
     country_sv: country.sv,
     country_en: country.en,
     firstnames: student.first_names,
-    //DEPRECATED IN NEW API
     communicationlanguage: language.en || language.fi || language.sv,
-    dateoffirstcredit: null,
-    dateoflastcredit: null,
     dateofuniversityenrollment: universityEnrollmentDateFromStudyRights(studyrights),
-    gradestudent: null,
     matriculationexamination: null,
-    nationalities: null,
-    semesterenrollmenttypecode: null,
-    sex: null,
-    studentstatuscode: null,
     abbreviatedname: [student.last_name, student.first_names].join(' ')
   }
 }
@@ -74,39 +66,9 @@ const getDate = (date, format = 'DD.MM.YYYY') => {
   return moment(date, format).format('YYYY-MM-DD')
 }
 
-
-const statusFromAttainmentData = (code) => {
-  switch (code) {
-  case 1:
-    return 'Based on a prior decision'
-  case 2:
-    return 'Planned'
-  case 3:
-    return 'Confirmed'
-  case 4:
-    return 'Completed'
-  case 5:
-    return 'Erroneous entry'
-  case 6:
-    return 'Outdated'
-  case 7:
-    return 'Improved (grade)'
-  case 8:
-    return 'In progress'
-  case 9:
-    return 'Transferred'
-  case 10:
-    return 'Failed'
-  case 25:
-    return 'Cancelled planned'
-  default:
-    return 'Undefined'
-  }
-}
-
 const getOrganisationFromData = ({ name, code }) => {
   return {
-    code, 
+    code,
     name: jsonNamesFromTexts(name)
   }
 }
@@ -117,19 +79,19 @@ const attainmentDataToCredit = (attainment, courseinstance_id, studentnumber) =>
     grade: defaultNameFromTexts(attainment.grade),
     credits: attainment.credits,
     ordering: getDate(attainment.attainment_date, null),
-    status: statusFromAttainmentData(attainment.attainment_status_code),
-    statuscode: attainment.attainment_status_code,
+    credittypecode: attainment.attainment_status_code,
     courseinstance_id,
     student_studentnumber: studentnumber
   }
 }
 
 const attainmentDataToCourse = (attainment) => {
-  const { learningopportunity_name, attainment_date} = attainment
+  const { learningopportunity_name, attainment_date } = attainment
   return {
     code: attainment.learningopportunity_id,
     name: jsonNamesFromTexts(learningopportunity_name),
-    latest_instance_date: parseDate(attainment_date)
+    latest_instance_date: parseDate(attainment_date),
+
   }
 }
 
@@ -156,20 +118,20 @@ const ELEMENT_ID = {
   DEGREE_TITLE: 10,
   DEGREE_STUDY_PROGRAM: 20,
   DEGREE_MAJOR: 40,
-} 
+}
 
 const highlevelnameFromElements = elements => {
   let subject
   elements.forEach(element => {
     const name = defaultNameFromTexts(element.name)
-    switch(element.element_id) {
+    switch (element.element_id) {
     case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
       subject = name
-      break    
+      break
     case ELEMENT_ID.DEGREE_MAJOR:
-      if ( subject===undefined ) {
+      if (subject === undefined) {
         subject = name
-      }  
+      }
       break
     default:
       break
@@ -189,6 +151,7 @@ const getStudyRightFromData = (data, studentNumber) => {
     extentcode: data.extent_code,
     givendate: parseDate(data.admission_date),
     graduated: Number(data.degree_date !== null),
+    graduation_date: data.degree_date,
     highlevelname: highlevelnameFromElements(data.elements),
     prioritycode: data.priority,
     startdate: parseDate(data.start_date),
@@ -236,6 +199,91 @@ const studyrightDataToExtent = data => ({
   name: getTextsByLanguage(data.extent)
 })
 
+const courseTypeFromData = data => ({
+  coursetypecode: data.code,
+  name: getTextsByLanguage(data.name)
+})
+
+const disciplineFromData = data => ({
+  discipline_id: data.discipline_id,
+  name: getTextsByLanguage(data.name)
+})
+
+const learningOpportunityDataToCourseDisciplines = data => data.disciplines.map(discipline => ({
+  discipline_id: discipline.discipline_id,
+  course_id: data.learningopportunity_id
+}))
+
+const learningOpportunityDataToCourse = data => ({
+  code: data.learningopportunity_id,
+  coursetypecode: data.learningopportunity_type_code,
+  disciplines: data.disciplines,
+  name: getTextsByLanguage(data.names)
+})
+
+const learningOpportunityDataToCourseProviders = data => {
+  const providers = data.organisations.map(organisation => ({
+    providercode: organisation.code,
+    name: getTextsByLanguage(organisation.name)
+  }))
+  const courseproviders = providers.map(provider => ({
+    providercode: provider.providercode,
+    coursecode: data.learningopportunity_id
+  }))
+  return {
+    providers,
+    courseproviders
+  }
+}
+
+const studyattainmentStatusCodeToCreditType = data => ({
+  credittypecode: data.code,
+  name: getTextsByLanguage(data.name)
+})
+
+const semesterFromData = data => ({
+  semestercode: data.semester_code,
+  name: getTextsByLanguage(data.name),
+  startdate: parseDate(data.start_date),
+  enddate: parseDate(data.end_date)
+})
+
+const semesterEnrollmentFromData = (data, studentnumber) => ({
+  enrollmenttype: data.semester_enrollment_type_code,
+  semestercode: data.semester_code,
+  studentnumber
+})
+
+const getTransfersFromData = (data, studentnumber) => {
+  const studytracks = data.elements.filter(element => element.element_id === 20)
+  const sorted = _.sortBy(studytracks, 'end_date')
+  let transfers = []
+  let i = 0
+  while (i < sorted.length) {
+    if (i === 0) {
+      i++
+      continue
+    }
+    let target = sorted[i].code
+    let source = sorted[i - 1].code
+    let transferdate = sorted[i - 1].end_date
+
+    transfers = transfers.concat({
+      sourcecode: source,
+      targetcode: target,
+      transferdate,
+      studentnumber,
+      studyrightid: `${data.studyright_id}`})
+    i++
+  }
+  return(transfers)
+}
+
+const courseRealisationTypeFromData = data => ({
+  realisationtypecode: data.code,
+  name: getTextsByLanguage(data.name)
+})
+
 module.exports = {
   getStudentFromData,
   getStudyRightIdStrings,
@@ -251,5 +299,15 @@ module.exports = {
   getOrganisationFromData,
   courseTeacherFromData,
   attainmentDataToTeachers,
-  studyrightDataToExtent
+  studyrightDataToExtent,
+  courseTypeFromData,
+  learningOpportunityDataToCourse,
+  studyattainmentStatusCodeToCreditType,
+  disciplineFromData,
+  learningOpportunityDataToCourseDisciplines,
+  semesterFromData,
+  semesterEnrollmentFromData,
+  learningOpportunityDataToCourseProviders,
+  getTransfersFromData,
+  courseRealisationTypeFromData
 }
