@@ -2,7 +2,7 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType } = require('../../../src/models/index')
 const _ = require('lodash')
 
 let attainmentIds = new Set()
@@ -214,10 +214,16 @@ const updateSemesters = async () => {
   await Promise.all(apiSemesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
 }
 
+const updateCourseRealisationTypes = async () => {
+  const apiTypes = await Oodi.getCourseRealisationTypes()
+  await Promise.all(apiTypes.map(data => CourseRealisationType.upsert(mapper.courseRealisationTypeFromData(data))))
+}
+
 const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   if (process.env.NODE_ENV !== 'anon') {
     await updateFaculties()
   }
+  await updateCourseRealisationTypes()
   await updateSemesters()
   await updateCreditTypeCodes()
   await updateCourseTypeCodes()
@@ -227,4 +233,4 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   await updateCoursesAndProvidersInDb(100)
 }
 
-module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters }
+module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes }
