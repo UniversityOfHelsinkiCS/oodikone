@@ -1,7 +1,7 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
 const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
-const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, StudyrightElement, Discipline, CourseType, SemesterEnrollment, Semester, Transfers } = require('../models')
+const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, ElementDetails, Discipline, CourseType, SemesterEnrollment, Semester, Transfers } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
 
@@ -64,7 +64,14 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       {
         model: Transfers,
         include: [
-          { model: StudyrightElement }
+          {
+            model: ElementDetails,
+            as: 'source'
+          },
+          {
+            model: ElementDetails,
+            as: 'target'
+          }
         ]
       },
       {
