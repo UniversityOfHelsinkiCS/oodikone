@@ -28,6 +28,11 @@ const componentFor = {
   EnrollmentStatus,
   SexFilter,
   CourseParticipation,
+  TransferFilter,
+  ExtentGraduated
+}
+const persistantFilters = { // Filters that can be duplicated with different values
+  ExtentGraduated,
   TransferFilter
 }
 
@@ -85,20 +90,17 @@ class PopulationFilters extends Component {
 
   renderAddFilters() {
     const { extents, transfers } = this.props
-    _.forOwn(extents, e => e.type = 'ExtentGraduated')
-    const filteredExtents = extents.filter(e => e.extentcode < 9)
     const allFilters = _.union(Object.keys(componentFor).map(f =>
-      String(f)), this.state.presetFilters.map(f => f.id), filteredExtents.map(f => f.name.fi))
+      String(f)), this.state.presetFilters.map(f => f.id))
     const setFilters = _.union(
       this.props.filters.map(f => f.type),
       this.props.filters.filter(f => f.type === 'Preset').map(f => f.id),
-      this.props.filters.filter(f => f.type === 'ExtentGraduated').map(f => f.name.fi)
+      
     )
-    const unsetFilters = _.difference(allFilters, setFilters)
+    const unsetFilters = _.uniq(_.difference(allFilters, setFilters.filter(setFilter => !Object.keys(persistantFilters).includes(setFilter))))
     if (unsetFilters.length === 0) {
       return null
     }
-
     if (!this.state.visible) {
       return (
         <Segment>
@@ -120,13 +122,10 @@ class PopulationFilters extends Component {
         {unsetFilters.map(filterName => {//eslint-disable-line
           if (componentFor[filterName]) { // THIS IS KINDA HACKED SOLUTION PLS FIX
             return React.createElement(componentFor[filterName], {
-              filter: { notSet: true }, key: filterName, samples: this.props.samples, transfers
+              filter: { notSet: true }, key: filterName, samples: this.props.samples, transfers, extents
             })
-          } else if (filteredExtents.find(e => e.name.fi === filterName)) {
-            return React.createElement(ExtentGraduated, {
-              filter: { notSet: true, ...filteredExtents.find(e => e.name.fi === filterName) }, key: filterName
-            })
-          } else {
+          }
+          else {
             return React.createElement(Preset, {
               filter: {
                 ...this.state.presetFilters.find(f => f.id === filterName),
@@ -218,13 +217,9 @@ class PopulationFilters extends Component {
           </Form.Group>
         </Form>
         {this.props.filters.map(filter => {
-          if (filter.type === 'ExtentGraduated') {
-            return React.createElement(ExtentGraduated, {
-              filter, key: filter.id
-            })
-          }
-          else if (filter.type !== 'Preset') {
-            return React.createElement(componentFor[filter.type], { filter, key: filter.id, samples: this.props.samples, transfers: this.props.transfers })
+  
+          if (filter.type !== 'Preset') {
+            return React.createElement(componentFor[filter.type], { filter, key: filter.id, samples: this.props.samples, transfers: this.props.transfers, extents: this.props.extents })
           }
           return React.createElement(Preset, {
             filter, key: filter.id, destroy: this.destroyFromAllFilters

@@ -35,7 +35,6 @@ class TransferFilter extends Component {
       source: selectedSource,
       target: selectedTarget
     }))
-    this.setState({ selectedSource: '', selectedTarget: '' })
   }
 
   clearFilter = () => {
