@@ -18,7 +18,7 @@ class StartingThisSemester extends Component {
   }
 
   handleRadio = () => {
-    this.props.setPopulationFilter(startingThisSemester(this.state.starting))
+    this.props.setPopulationFilter(startingThisSemester({ starting: this.state.starting }))
     this.setState({ starting: true })
   }
 

@@ -15,7 +15,7 @@ export const sortInstances = (courseInstances) => {
   return []
 }
 
-export const sortCourses = courseList => courseList.sort(byCodeDesc).map(course => ({ ...course, key: `${course.name}-${course.code}` }))
+export const sortCourses = courseList => Object.values(courseList).sort(byCodeDesc).map(course => ({ ...course, key: `${course.name}-${course.code}` }))
 
 export const makeSortCourseInstances = () => createSelector(
   getData,

@@ -13,6 +13,9 @@ import SexFilter from './SexFilter'
 import CourseParticipation from './CourseParticipation'
 import ExtentGraduated from './ExtentGraduated'
 import Preset from './Preset'
+import DisciplineTypes from './DisciplineTypes'
+import EnrollmentStatus from './EnrollmentStatus'
+import TransferFilter from './TransferFilter'
 import { clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
 
@@ -21,8 +24,11 @@ const componentFor = {
   CreditsAtLeast,
   CreditsLessThan,
   StartingThisSemester,
+  DisciplineTypes,
+  EnrollmentStatus,
   SexFilter,
-  CourseParticipation
+  CourseParticipation,
+  TransferFilter
 }
 
 
@@ -78,10 +84,11 @@ class PopulationFilters extends Component {
 
 
   renderAddFilters() {
-    const { extents } = this.props
+    const { extents, transfers } = this.props
     _.forOwn(extents, e => e.type = 'ExtentGraduated')
+    const filteredExtents = extents.filter(e => e.extentcode < 9)
     const allFilters = _.union(Object.keys(componentFor).map(f =>
-      String(f)), this.state.presetFilters.map(f => f.id), extents.map(f => f.name.fi))
+      String(f)), this.state.presetFilters.map(f => f.id), filteredExtents.map(f => f.name.fi))
     const setFilters = _.union(
       this.props.filters.map(f => f.type),
       this.props.filters.filter(f => f.type === 'Preset').map(f => f.id),
@@ -113,11 +120,11 @@ class PopulationFilters extends Component {
         {unsetFilters.map(filterName => {//eslint-disable-line
           if (componentFor[filterName]) { // THIS IS KINDA HACKED SOLUTION PLS FIX
             return React.createElement(componentFor[filterName], {
-              filter: { notSet: true }, key: filterName
+              filter: { notSet: true }, key: filterName, samples: this.props.samples, transfers
             })
-          } else if (extents.find(e => e.name.fi === filterName)) {
+          } else if (filteredExtents.find(e => e.name.fi === filterName)) {
             return React.createElement(ExtentGraduated, {
-              filter: { notSet: true, ...extents.find(e => e.name.fi === filterName) }, key: filterName
+              filter: { notSet: true, ...filteredExtents.find(e => e.name.fi === filterName) }, key: filterName
             })
           } else {
             return React.createElement(Preset, {
@@ -217,7 +224,7 @@ class PopulationFilters extends Component {
             })
           }
           else if (filter.type !== 'Preset') {
-            return React.createElement(componentFor[filter.type], { filter, key: filter.id })
+            return React.createElement(componentFor[filter.type], { filter, key: filter.id, samples: this.props.samples, transfers: this.props.transfers })
           }
           return React.createElement(Preset, {
             filter, key: filter.id, destroy: this.destroyFromAllFilters
@@ -259,7 +266,8 @@ const mapStateToProps = ({
   translate: getTranslate(locale),
   loading: graphSpinner,
   studyRights: populations.query.studyRights,
-  extents: populations.data.extents
+  extents: populations.data.extents,
+  transfers: populations.data.transfers
 })
 
 export default connect(mapStateToProps, {
