@@ -73,10 +73,66 @@ const getTeacherInfo = async id => {
   return response.data.data
 }
 
+const getCourseTypeCodes = async () => {
+  const url = `${base_url}/codes/learningopportunities/types`
+  const response = await attemptGetFor(url)
+  return response.data.data
+}
+
+const getLearningOpportunity = async (id) => {
+  const url = `${base_url}/learningopportunities/${id}`
+  const response = await attemptGetFor(url)
+  return response.data.data
+}
+
+const getStudyattainmentStatusCodes = async () => {
+  const url = `${base_url}/codes/studyattainments/statuses`
+  const response = await attemptGetFor(url)
+  return response.data.data
+}
+
+const getCourseDisciplines = async () => {
+  const url = `${base_url}/codes/learningopportunities/disciplines`
+  const response = await attemptGetFor(url)
+  return response.data.data
+}
+
+const getSemesters = async () => {
+  const url = `${base_url}/codes/semesters`
+  const response = await attemptGetFor(url)
+  return response.data.data
+}
+
+const getSemesterEnrollments = async studentnumber => {
+  const url = `${base_url}/students/${studentnumber}/semesterenrollments`
+  const response = await attemptGetFor(url)
+  return response.data.data
+}
+
+const getCourseEnrollments = async studentnumber => {
+  const url = `${base_url}/students/${studentnumber}/enrollments`
+  const response = await attemptGetFor(url)
+  return response.data.data
+}
+
+const getCourseRealisationTypes = async () => {
+  const url = `${base_url}/codes/courseunitrealisations/types`
+  const response = await attemptGetFor(url)
+  return response.data.data
+}
+
 module.exports = {
   getStudentStudyRights,
   getStudent,
   getFaculties,
   getStudyAttainments,
-  getTeacherInfo
+  getTeacherInfo,
+  getCourseTypeCodes,
+  getLearningOpportunity,
+  getStudyattainmentStatusCodes,
+  getCourseDisciplines,
+  getSemesters,
+  getSemesterEnrollments,
+  getCourseEnrollments,
+  getCourseRealisationTypes
 }

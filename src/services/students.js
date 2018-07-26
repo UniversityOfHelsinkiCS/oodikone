@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const { Student, Credit, CourseInstance, Course, Studyright, StudyrightElement } = require('../models')
+const { Student, Credit, CourseInstance, Course, Studyright, StudyrightElement, ElementDetails } = require('../models')
 const { getAllDuplicates } = require('./courses')
 const Op = Sequelize.Op
 
@@ -16,7 +16,7 @@ const updateStudent = student => {
   })
 }
 
-const byId = async (id) => Student.findOne({
+const byId = async (id) => Student.findByPrimary(id, {
   include: [
     {
       model: Credit,
@@ -28,15 +28,24 @@ const byId = async (id) => Student.findOne({
       ]
     },
     {
-      model:Studyright
+      model: Studyright,
+      include: {
+        model: StudyrightElement,
+        required: true,
+        include: {
+          model: ElementDetails,
+          required: true,
+          where: {
+            type: {
+              [Op.in]: [10, 20]
+            }
+          }
+        }
+      }
     }
-  ],
-  where: {
-    studentnumber: {
-      [Op.eq]: id
-    }
-  }
+  ]
 })
+
 
 const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   return Student.findAll({
@@ -58,27 +67,35 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
-const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount,matriculationexamination, gender, credits, abbreviatedname, email, studyrights }) => {
-  const toCourse = ({ grade, credits, courseinstance, isStudyModuleCredit }) => {
+const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments, transfers }) => {
+  const toCourse = ({ grade, credits, courseinstance, credittypecode }) => {
+    const course = courseinstance.course.get()
     return {
       course: {
         code: courseinstance.course_code,
-        name: courseinstance.course.name
+        name: course.name,
+        coursetypecode: courseinstance.course.coursetypecode
       },
       date: courseinstance.coursedate,
-      passed: Credit.passed({ grade }),
+      passed: Credit.passed({ credittypecode }),
       grade,
       credits,
-      isStudyModuleCredit,
+      isStudyModuleCredit: course.is_study_module
     }
   }
 
-  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, highlevelname, extentcode, graduated }) => ({
+  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, highlevelname, startdate, enddate, extentcode, graduated, graduation_date, studyright_elements }) => ({
     studyrightid,
     highlevelname,
     extentcode,
+    startdate,
+    graduationDate: graduation_date,
+    studyrightElements: studyright_elements,
+    enddate,
     graduated: Boolean(graduated)
   }))
+  semester_enrollments = semester_enrollments || []
+  const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({ semestercode, enrollmenttype }))
 
   const courseByDate = (a, b) => {
     return moment(a.courseinstance.coursedate).isSameOrBefore(b.courseinstance.coursedate) ? -1 : 1
@@ -96,9 +113,11 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     credits: creditcount,
     courses: credits.sort(courseByDate).map(toCourse),
     name: abbreviatedname,
+    transfers: transfers || [],
     matriculationexamination,
     gender,
     email,
+    semesterenrollments,
     tags: []
   }
 }
@@ -106,8 +125,8 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
 const formatStudentUnifyCodes = async ({ studentnumber, dateofuniversityenrollment, creditcount, credits }, duplicates) => {
   const unifyOpenUniversity = (code) => {
     if (code[0] === 'A') {
-      return code.substring(code[1] === 'Y' ? 2 :1 )
-    } 
+      return code.substring(code[1] === 'Y' ? 2 : 1)
+    }
     return code
   }
 

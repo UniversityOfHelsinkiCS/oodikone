@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { User, Unit, UserUnit, ElementDetails } = require('../models')
+const { User, ElementDetails } = require('../models')
 const UnitService = require('./units')
 
 const Op = Sequelize.Op
@@ -40,35 +40,15 @@ const updateUser = async (userObject, values) => {
   return userObject.update(values)
 }
 
-const getUnits = async (id) => {
-  return Unit.findAll({
-    include: [{
-      model: User,
-      through: {
-        where: {
-          user_id: {
-            [Op.eq]: id
-          }
-        }
-      },
-      where: {
-        id: {
-          [Op.eq]: id
-        }
-      }
-    }],
-    where: {
-      enabled: {
-        [Op.eq]: true
-      }
-    }
-  })
-}
-
 const getUnitsFromElementDetails = async username => {
   const user = await byUsername(username)
   const elementDetails = await user.getElementdetails()
   return elementDetails.map(element => UnitService.parseUnitFromElement(element))
+}
+
+const getUserElementDetails = async username => {
+  const user = await byUsername(username)
+  return await user.getElementdetails()
 }
 
 const findAll = async () => {
@@ -80,40 +60,12 @@ const findAll = async () => {
   })
 }
 
-const deleteUnit = async (userId, unitId) => {
-  await UserUnit.destroy(
-    {
-      where: {
-        user_id:
-          {
-            [Op.eq]: userId
-          },
-        unit_id:
-          {
-            [Op.eq]: unitId
-          }
-      }
-    }
-  )
-}
-
-const addUnit = async (userId, unitId) => {
-  await UserUnit.create(
-    {
-      user_id: userId,
-      unit_id: unitId
-    }
-  )
-}
-
 module.exports = {
   byUsername,
   createUser,
   updateUser,
   findAll,
-  deleteUnit,
-  addUnit,
-  getUnits,
   byId,
-  getUnitsFromElementDetails
+  getUnitsFromElementDetails,
+  getUserElementDetails
 }

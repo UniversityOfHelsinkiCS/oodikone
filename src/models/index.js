@@ -15,15 +15,8 @@ const Student = sequelize.define('student',
     communicationlanguage: { type: Sequelize.STRING },
     country: { type: Sequelize.STRING },
     creditcount: { type: Sequelize.INTEGER },
-    dateoffirstcredit: { type: Sequelize.DATE },
-    dateoflastcredit: { type: Sequelize.DATE },
     dateofuniversityenrollment: { type: Sequelize.DATE },
-    gradestudent: { type: Sequelize.STRING },
     matriculationexamination: { type: Sequelize.STRING },
-    nationalities: { type: Sequelize.STRING },
-    semesterenrollmenttypecode: { type: Sequelize.STRING },
-    sex: { type: Sequelize.STRING },
-    studentstatuscode: { type: Sequelize.INTEGER },
     email: { type: Sequelize.STRING },
     phone: { type: Sequelize.STRING },
     city_fi: { type: Sequelize.STRING },
@@ -44,7 +37,7 @@ const Student = sequelize.define('student',
   },
   {
     tableName: 'student',
-    timestamps: false,
+    timestamps: true,
   }
 )
 
@@ -109,21 +102,7 @@ const Credit = sequelize.define('credit',
     grade: { type: Sequelize.STRING },
     student_studentnumber: { type: Sequelize.STRING },
     credits: { type: Sequelize.DOUBLE },
-    isStudyModuleCredit: {
-      type: Sequelize.BOOLEAN,
-      get() {
-        let val = this.getDataValue('credits')
-        if (val >= 25) {
-          return true
-        }
-        else {
-          return false
-        }
-      }
-    },
     ordering: { type: Sequelize.STRING },
-    status: { type: Sequelize.STRING },
-    statuscode: { type: Sequelize.STRING },
     courseinstance_id: { type: Sequelize.BIGINT },
   },
   {
@@ -157,13 +136,15 @@ Credit.notUnnecessary = (credit) => {
   return credit.credits > 0 && credit.credits <= 12
 }
 
-const failedNames = ['Luop', 'Hyl.', 'Eisa', '0', 'Fail']
+const CREDIT_TYPE_CODES = {
+  PASSED: 4,
+  FAILED: 10,
+  IMPROVED: 7
+}
 
-Credit.failed = (credit) =>
-  failedNames.includes(credit.grade)
-
-Credit.passed = (credit) =>
-  !failedNames.includes(credit.grade)
+Credit.passed = ({ credittypecode }) => credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.IMPROVED
+Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
+Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED
 
 const Studyright = sequelize.define('studyright',
   {
@@ -242,6 +223,8 @@ const CourseInstance = sequelize.define('courseinstance',
   }
 )
 
+const STUDY_MODULE_COURSE_TYPES = [8, 9, 10, 11, 17, 18, 19, 20, 33, 40, 41, 42, 43, 44]
+
 const Course = sequelize.define('course',
   {
     code: {
@@ -249,7 +232,14 @@ const Course = sequelize.define('course',
       type: Sequelize.STRING
     },
     name: { type: Sequelize.JSONB },
-    latest_instance_date: { type: Sequelize.DATE }
+    latest_instance_date: { type: Sequelize.DATE },
+    is_study_module: {
+      type: Sequelize.BOOLEAN,
+      get() {
+        const coursetypecode = this.getDataValue('coursetypecode')
+        return STUDY_MODULE_COURSE_TYPES.some(typecode => typecode === coursetypecode)
+      }
+    }
   },
   {
     tableName: 'course',
@@ -303,38 +293,6 @@ const User = sequelize.define('users',
   },
   {
     tableName: 'users',
-    timestamps: false,
-  }
-)
-
-const Unit = sequelize.define('unit',
-  {
-    id: {
-      primaryKey: true,
-      type: Sequelize.BIGINT,
-      autoIncrement: true
-    },
-    name: { type: Sequelize.STRING, unique: true },
-    enabled: { type: Sequelize.BOOLEAN }
-  },
-  {
-    tableName: 'unit',
-    timestamps: false,
-  }
-)
-
-const UserUnit = sequelize.define('user_unit',
-  {
-    id: {
-      primaryKey: true,
-      type: Sequelize.BIGINT,
-      autoIncrement: true
-    },
-    user_id: { type: Sequelize.STRING },
-    unit_id: { type: Sequelize.BOOLEAN }
-  },
-  {
-    tableName: 'user_unit',
     timestamps: false,
   }
 )
@@ -395,6 +353,109 @@ const StudyrightExtent = sequelize.define('studyright_extent',
   }
 )
 
+const Discipline = sequelize.define('discipline',
+  {
+    discipline_id: {
+      type: Sequelize.STRING,
+      primaryKey: true
+    },
+    name: {
+      type: Sequelize.JSONB
+    }
+  }
+)
+
+const CourseDisciplines = sequelize.define('course_disciplines', {})
+
+const CourseType = sequelize.define('course_type', {
+  coursetypecode: {
+    type: Sequelize.INTEGER,
+    primaryKey: true
+  },
+  name: {
+    type: Sequelize.JSONB
+  }
+})
+
+const CreditType = sequelize.define('credit_type', {
+  credittypecode: {
+    type: Sequelize.INTEGER,
+    primaryKey: true
+  },
+  name: {
+    type: Sequelize.JSONB
+  }
+})
+
+const Semester = sequelize.define('semester', {
+  semestercode: {
+    type: Sequelize.INTEGER,
+    primaryKey: true
+  },
+  name: {
+    type: Sequelize.JSONB
+  },
+  startdate: {
+    type: Sequelize.DATE
+  },
+  enddate: {
+    type: Sequelize.DATE
+  }
+})
+
+const SemesterEnrollment = sequelize.define('semester_enrollment', {
+  id: {
+    primaryKey: true,
+    type: Sequelize.BIGINT,
+    autoIncrement: true
+  },
+  enrollmenttype: {
+    type: Sequelize.INTEGER
+  }
+}, {
+  indexes: [
+    {
+      fields: ['semestercode', 'studentnumber'],
+      unique: true
+    }
+  ]
+})
+
+const Provider = sequelize.define('provider', {
+  providercode: {
+    primaryKey: true,
+    type: Sequelize.STRING
+  },
+  name: {
+    type: Sequelize.JSONB
+  }
+})
+
+const Transfers = sequelize.define('transfers', {
+  transferdate: {
+    type: Sequelize.DATE
+  }
+})
+
+const CourseProvider = sequelize.define('course_providers', {}, {
+  indexes: [
+    {
+      fields: ['providercode', 'coursecode'],
+      unique: true
+    }
+  ]
+})
+
+const CourseRealisationType = sequelize.define('courserealisation_type', {
+  realisationtypecode: {
+    primaryKey: true,
+    type: Sequelize.STRING
+  },
+  name: {
+    type: Sequelize.JSONB
+  }
+})
+
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
 Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
 
@@ -412,12 +473,6 @@ Tag.hasMany(TagStudent, { foreignKey: 'tags_tagname', sourceKey: 'tagname' })
 Studyright.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyright, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
 
-User.belongsToMany(Unit, { through: 'user_unit', foreignKey: 'user_id', timestamps: false })
-Unit.belongsToMany(User, { through: 'user_unit', foreignKey: 'unit_id', timestamps: false })
-
-Tag.belongsToMany(Unit, { through: 'unit_tag', foreignKey: 'tags_tagname', timestamps: false })
-Unit.belongsToMany(Tag, { through: 'unit_tag', foreignKey: 'unit_id', timestamps: false })
-
 StudyrightElement.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
 Studyright.hasMany(StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
 
@@ -433,6 +488,33 @@ ElementDetails.belongsToMany(User, { through: 'user_elementdetails' })
 StudyrightExtent.hasMany(Studyright, { foreignKey: 'extentcode', sourceKey: 'extentcode' })
 Studyright.belongsTo(StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'extentcode' })
 
+CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
+Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
+
+Discipline.belongsToMany(Course, { through: CourseDisciplines, foreignKey: 'discipline_id' })
+Course.belongsToMany(Discipline, { through: CourseDisciplines, foreignKey: 'course_id' })
+
+CreditType.hasMany(Credit, { foreignKey: 'credittypecode', sourceKey: 'credittypecode' })
+Credit.belongsTo(CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
+
+SemesterEnrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+Student.hasMany(SemesterEnrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+
+SemesterEnrollment.belongsTo(Semester, { foreignKey: 'semestercode', targetKey: 'semestercode' })
+Semester.hasMany(SemesterEnrollment, { foreignKey: 'semestercode', sourceKey: 'semestercode' })
+
+Course.belongsToMany(Provider, { through: CourseProvider, foreignKey: 'coursecode' })
+Provider.belongsToMany(Course, { through: CourseProvider, foreignKey: 'providercode' })
+
+Transfers.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+Student.hasMany(Transfers, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+
+Transfers.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid'})
+Studyright.hasMany(Transfers, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
+
+Transfers.belongsTo(ElementDetails, { as: 'source', foreignKey: 'sourcecode' })
+Transfers.belongsTo(ElementDetails, { as: 'target', foreignKey: 'targetcode' })
+
 module.exports = {
   Student,
   Credit,
@@ -444,8 +526,6 @@ module.exports = {
   Teacher,
   CourseTeacher,
   User,
-  Unit,
-  UserUnit,
   sequelize,
   migrationPromise,
   Organisation,
@@ -453,5 +533,15 @@ module.exports = {
   StudyrightElement,
   ElementDetails,
   Filters,
-  StudyrightExtent
+  StudyrightExtent,
+  CourseType,
+  CreditType,
+  Discipline,
+  CourseDisciplines,
+  Semester,
+  SemesterEnrollment,
+  Provider,
+  CourseProvider,
+  Transfers,
+  CourseRealisationType
 }
