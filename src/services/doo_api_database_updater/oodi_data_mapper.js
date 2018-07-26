@@ -253,8 +253,10 @@ const semesterEnrollmentFromData = (data, studentnumber) => ({
   semestercode: data.semester_code,
   studentnumber
 })
+
 const getTransfersFromData = (data, studentnumber) => {
-  const sorted = _.sortBy(data, 'end_date')
+  const studytracks = data.elements.filter(element => element.element_id === 20)
+  const sorted = _.sortBy(studytracks, 'end_date')
   let transfers = []
   let i = 0
   while (i < sorted.length) {
@@ -266,7 +268,12 @@ const getTransfersFromData = (data, studentnumber) => {
     let source = sorted[i - 1].code
     let transferdate = sorted[i - 1].end_date
 
-    transfers = transfers.concat({ source, target, transferdate, studentnumber })
+    transfers = transfers.concat({
+      sourcecode: source,
+      targetcode: target,
+      transferdate,
+      studentnumber,
+      studyrightid: `${data.studyright_id}`})
     i++
   }
   return(transfers)

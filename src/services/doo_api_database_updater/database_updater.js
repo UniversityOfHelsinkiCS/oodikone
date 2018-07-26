@@ -29,14 +29,15 @@ const getAllStudentInformationFromApi = async studentnumber => {
   }
 }
 
+const createOrUpdateStudyrightTransfers = async (apiStudyright, studentnumber) => {
+  const transfers = mapper.getTransfersFromData(apiStudyright, studentnumber)
+  await Promise.all(transfers.map(transfer => Transfers.upsert(transfer)))
+}
+
 const updateStudyrights = async (api, studentnumber) => {
   for (let data of api.studyrights) {
     await StudyrightExtent.upsert(mapper.studyrightDataToExtent(data))
     const [studyright] = await Studyright.upsert(mapper.getStudyRightFromData(data, studentnumber), { returning: true })
-    const possibleTransfers = data.elements.filter(element => element.element_id === 20)
-    if (possibleTransfers.length > 1) {
-      await mapper.getTransfersFromData(possibleTransfers, studentnumber).map(transfer => Transfers.upsert(transfer))
-    }
     for (let element of data.elements) {
       const elementDetail = mapper.elementDetailFromData(element)
       const studyrightElement = mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber)
@@ -46,6 +47,7 @@ const updateStudyrights = async (api, studentnumber) => {
       }
       await StudyrightElement.upsert(studyrightElement)
     }
+    await createOrUpdateStudyrightTransfers(data, studentnumber)
   }
 }
 
