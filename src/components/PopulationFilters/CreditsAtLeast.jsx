@@ -22,7 +22,7 @@ class CreditsAtLeast extends Component {
   }
 
   handleLimit = () => {
-    this.props.setPopulationFilter(creditsAtLeast(this.state.limit))
+    this.props.setPopulationFilter(creditsAtLeast({ credit: this.state.limit }))
     this.setState({ limit: '' })
   }
 

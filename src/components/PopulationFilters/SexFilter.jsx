@@ -22,7 +22,7 @@ class SexFilter extends Component {
   }
 
   handleSex = () => {
-    this.props.setPopulationFilter(sexFilter(this.state.sex))
+    this.props.setPopulationFilter(sexFilter({ gender: this.state.sex }))
     this.setState({ sex: '' })
   }
 

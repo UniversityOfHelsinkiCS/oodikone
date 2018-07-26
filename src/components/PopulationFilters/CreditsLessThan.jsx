@@ -22,7 +22,7 @@ class CreditsLessThan extends Component {
   }
 
   handleLimit = () => {
-    this.props.setPopulationFilter(creditsLessThan(this.state.limit))
+    this.props.setPopulationFilter(creditsLessThan({ credit: this.state.limit }))
     this.setState({ limit: '' })
   }
 

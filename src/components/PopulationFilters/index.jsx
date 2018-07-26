@@ -15,6 +15,7 @@ import ExtentGraduated from './ExtentGraduated'
 import Preset from './Preset'
 import DisciplineTypes from './DisciplineTypes'
 import EnrollmentStatus from './EnrollmentStatus'
+import TransferFilter from './TransferFilter'
 import { clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
 
@@ -26,7 +27,8 @@ const componentFor = {
   DisciplineTypes,
   EnrollmentStatus,
   SexFilter,
-  CourseParticipation
+  CourseParticipation,
+  TransferFilter
 }
 
 
@@ -82,7 +84,7 @@ class PopulationFilters extends Component {
 
 
   renderAddFilters() {
-    const { extents } = this.props
+    const { extents, transfers } = this.props
     _.forOwn(extents, e => e.type = 'ExtentGraduated')
     const filteredExtents = extents.filter(e => e.extentcode < 9)
     const allFilters = _.union(Object.keys(componentFor).map(f =>
@@ -118,7 +120,7 @@ class PopulationFilters extends Component {
         {unsetFilters.map(filterName => {//eslint-disable-line
           if (componentFor[filterName]) { // THIS IS KINDA HACKED SOLUTION PLS FIX
             return React.createElement(componentFor[filterName], {
-              filter: { notSet: true }, key: filterName, samples: this.props.samples
+              filter: { notSet: true }, key: filterName, samples: this.props.samples, transfers
             })
           } else if (filteredExtents.find(e => e.name.fi === filterName)) {
             return React.createElement(ExtentGraduated, {
@@ -222,7 +224,7 @@ class PopulationFilters extends Component {
             })
           }
           else if (filter.type !== 'Preset') {
-            return React.createElement(componentFor[filter.type], { filter, key: filter.id, samples: this.props.samples })
+            return React.createElement(componentFor[filter.type], { filter, key: filter.id, samples: this.props.samples, transfers: this.props.transfers })
           }
           return React.createElement(Preset, {
             filter, key: filter.id, destroy: this.destroyFromAllFilters
@@ -264,7 +266,8 @@ const mapStateToProps = ({
   translate: getTranslate(locale),
   loading: graphSpinner,
   studyRights: populations.query.studyRights,
-  extents: populations.data.extents
+  extents: populations.data.extents,
+  transfers: populations.data.transfers
 })
 
 export default connect(mapStateToProps, {
