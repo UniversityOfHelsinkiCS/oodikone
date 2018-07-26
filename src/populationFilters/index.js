@@ -1,8 +1,10 @@
 import uuidv4 from 'uuid/v4'
 import { getStudentTotalCredits } from '../common'
 
-export const creditsLessThan = credit =>
-  ({
+export const creditsLessThan = (params) => {
+  const { credit } = params
+
+  return ({
     id: uuidv4(),
     type: 'CreditsLessThan',
     params: {
@@ -13,19 +15,21 @@ export const creditsLessThan = credit =>
       return credit > creditsOfStudent
     }
   })
-
-export const sexFilter = sex =>
-  ({
+}
+export const sexFilter = (params) => {
+  const { gender } = params
+  return ({
     id: uuidv4(),
     type: 'SexFilter',
     params: {
-      sex
+      gender
     },
-    filter: student => student.sex === sex
+    filter: student => student.gender === gender
   })
-
-export const matriculationFilter = matriculationexamination =>
-  ({
+}
+export const matriculationFilter = (params) => {
+  const { matriculationexamination } = params
+  return ({
     id: uuidv4(),
     type: 'HasMatriculation',
     params: {
@@ -33,9 +37,10 @@ export const matriculationFilter = matriculationexamination =>
     },
     filter: student => student.matriculationexamination === matriculationexamination
   })
-
-export const creditsAtLeast = credit =>
-  ({
+}
+export const creditsAtLeast = (params) => {
+  const { credit } = params
+  return ({
     id: uuidv4(),
     type: 'CreditsAtLeast',
     params: {
@@ -46,7 +51,7 @@ export const creditsAtLeast = credit =>
       return credit <= creditsOfStudent
     }
   })
-
+}
 export const enrollmentStatus = (params) => {
   const { semesters, enrolled } = params
   return ({
@@ -62,9 +67,23 @@ export const enrollmentStatus = (params) => {
   })
 }
 
+export const transferFilter = (params) => {
+  const { source, target } = params
+  return ({
+    id: uuidv4(),
+    type: 'TransferFilter',
+    params: {
+      source,
+      target
+    },
+    filter: student => student.transfers.map(transfer =>
+      (source === 'anywhere' || transfer.sourcecode === source) && (target === 'anywhere' || transfer.targetcode === target)).some(b => b === true)
+  })
+}
 
-export const startingThisSemester = starting =>
-  ({
+export const startingThisSemester = (params) => {
+  const { starting } = params
+  return ({
     id: uuidv4(),
     type: 'StartingThisSemester',
     params: {
@@ -73,7 +92,7 @@ export const startingThisSemester = starting =>
     filter: student =>
       student.starting === starting
   })
-
+}
 export const courseParticipation = ({ field, course }) =>
   ({
     id: uuidv4(),
@@ -87,17 +106,20 @@ export const courseParticipation = ({ field, course }) =>
       course.students[field][student.studentNumber] === true
   })
 
-export const extentGraduated = ({ extentcode, name }) => ({
-  id: uuidv4(),
-  type: 'ExtentGraduated',
-  name,
-  params: {
-    extentcode,
-    name
-  },
-  filter: student => student.studyrights.filter(s =>
-    s.graduated).map(s => s.extentcode).includes(extentcode)
-})
+export const extentGraduated = (params) => {
+  const { extentcode, name } = params
+  return ({
+    id: uuidv4(),
+    type: 'ExtentGraduated',
+    name,
+    params: {
+      extentcode,
+      name
+    },
+    filter: student => student.studyrights.filter(s =>
+      s.graduated).map(s => s.extentcode).includes(extentcode)
+  })
+}
 
 
 export const presetFilter = preset => ({
@@ -115,7 +137,9 @@ const typeList = {
   CourseParticipation: courseParticipation,
   StartingThisSemester: startingThisSemester,
   ExtentGraduated: extentGraduated,
-  EnrollmentStatus: enrollmentStatus
+  EnrollmentStatus: enrollmentStatus,
+  TransferFilter: transferFilter,
+  Preset: presetFilter
 }
 export const getFilterFunction = (type, params, populationCourses) => {
   switch (type) {
@@ -125,14 +149,8 @@ export const getFilterFunction = (type, params, populationCourses) => {
         course: populationCourses.coursestatistics.filter(c =>
           c.course.code === params.course.course.code)[0]
       })
-    case 'Preset':
-      return presetFilter(params)
-    case 'ExtentGraduated':
-      return extentGraduated({ extentcode: params.extentcode, name: params.name })
-    case 'EnrollmentStatus':
-      return typeList[type](params)
     default:
-      return typeList[type](Object.values(params))
+      return typeList[type](params)
   }
 }
 
