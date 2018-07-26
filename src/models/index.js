@@ -446,6 +446,16 @@ const CourseProvider = sequelize.define('course_providers', {}, {
   ]
 })
 
+const CourseRealisationType = sequelize.define('courserealisation_type', {
+  realisationtypecode: {
+    primaryKey: true,
+    type: Sequelize.STRING
+  },
+  name: {
+    type: Sequelize.JSONB
+  }
+})
+
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
 Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
 
@@ -532,5 +542,6 @@ module.exports = {
   SemesterEnrollment,
   Provider,
   CourseProvider,
-  Transfers
+  Transfers,
+  CourseRealisationType
 }

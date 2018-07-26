@@ -279,6 +279,11 @@ const getTransfersFromData = (data, studentnumber) => {
   return(transfers)
 }
 
+const courseRealisationTypeFromData = data => ({
+  realisationtypecode: data.code,
+  name: getTextsByLanguage(data.name)
+})
+
 module.exports = {
   getStudentFromData,
   getStudyRightIdStrings,
@@ -303,5 +308,6 @@ module.exports = {
   semesterFromData,
   semesterEnrollmentFromData,
   learningOpportunityDataToCourseProviders,
-  getTransfersFromData
+  getTransfersFromData,
+  courseRealisationTypeFromData
 }
