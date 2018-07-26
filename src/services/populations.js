@@ -161,6 +161,14 @@ const parseQueryParams = query => {
 
 const formatStudentsForApi = (students, startDate, endDate) => {
   const result = students.reduce((stats, student) => {
+    student.transfers.forEach(transfer => {
+      const target = stats.transfers.targets[transfer.target.code] || { name: transfer.target.name, sources: {}}
+      const source = stats.transfers.sources[transfer.source.code] || { name: transfer.source.name, targets: {}}
+      target.sources[transfer.source.code] = transfer.source.name
+      source.targets[transfer.target.code] = transfer.target.name
+      stats.transfers.targets[transfer.target.code] = target
+      stats.transfers.sources[transfer.source.code] = source
+    })
     student.studyrights.forEach(studyright => {
       if (studyright.studyright_extent) {
         const { extentcode, name } = studyright.studyright_extent
@@ -175,10 +183,15 @@ const formatStudentsForApi = (students, startDate, endDate) => {
   }, {
     students: [],
     extents: {},
-    semesters: {}
+    semesters: {},
+    transfers: {
+      targets: {},
+      sources:{}
+    }
   })
   return {
     students: result.students,
+    transfers: result.transfers,
     extents: Object.values(result.extents),
     semesters: Object.values(result.semesters)
   }
