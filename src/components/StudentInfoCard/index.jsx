@@ -24,13 +24,6 @@ const StudentInfoCard = (props) => {
     props.removeStudentSelection()
   }
 
-  // Deprecated(?)
-  // const filterDegreeStudyRight = student2 =>
-  // student2.studyrights.filter((studyright) => {
-  //   console.log('sright', studyright)
-  //   return studyright.highlevelname.toLowerCase().match(studyRightRegex)
-  // })
-
   const renderStudyright = () => {
     const lastStudyright = student.studyrights.slice(-1)[0]
     return (
@@ -63,6 +56,7 @@ const StudentInfoCard = (props) => {
         </Card.Meta>
         <Card.Description>
           {`${translate('common.credits')}: ${student.credits || 0}`}
+          <p style={{ fontSize: 14 }}>{`Updated at ${reformatDate(student.updatedAt, DISPLAY_DATE_FORMAT)}`}</p>
         </Card.Description>
         <div style={{ paddingTop: '4px' }}>
           {updating ?
