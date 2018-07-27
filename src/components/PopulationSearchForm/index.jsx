@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, arrayOf, shape } from 'prop-types'
+import { func, arrayOf, shape, bool } from 'prop-types'
 import { Form, Button, Message, Radio, Dropdown, Icon } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
@@ -33,7 +33,8 @@ class PopulationSearchForm extends Component {
     queries: shape({}).isRequired,
     studyProgrammes: arrayOf(dropdownType), //eslint-disable-line
     degrees: arrayOf(dropdownType), //eslint-disable-line
-    setLoading: func.isRequired
+    setLoading: func.isRequired,
+    pending: bool //eslint-disable-line
   }
 
   constructor() {
@@ -260,10 +261,13 @@ class PopulationSearchForm extends Component {
   renderStudyGroupSelector = () => {
     const { studyProgrammes, degrees, translate } = this.props
     const { studyRights } = this.state.query
-    if (!studyProgrammes || !degrees) {
+    if (this.props.pending) {
       return (
         <Icon name="spinner" loading size="big" color="black" style={{ marginLeft: '45%' }} />
       )
+    }
+    if (!studyProgrammes && !degrees && !this.props.pending) {
+      return <Message error color="red" header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi" />
     }
     const sortedStudyProgrammes = _.sortBy(studyProgrammes.filter((s) => {
       if (studyRights.degree) {
@@ -393,12 +397,15 @@ class PopulationSearchForm extends Component {
 const mapRightsToDropdown = makeMapRightsToDropDown()
 
 const mapStateToProps = ({ populations, units, locale }) => {
-  const studyRights = mapRightsToDropdown(units)
+  const rawStudyrights = units || []
+  const { pending } = units
+  const studyRights = mapRightsToDropdown(rawStudyrights)
   return ({
     queries: populations.query || {},
     translate: getTranslate(locale),
     degrees: studyRights['10'],
-    studyProgrammes: studyRights['20']
+    studyProgrammes: studyRights['20'],
+    pending
   })
 }
 
