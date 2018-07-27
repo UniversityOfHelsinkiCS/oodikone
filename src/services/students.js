@@ -67,7 +67,7 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
-const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments, transfers }) => {
+const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments, transfers, updatedAt }) => {
   const toCourse = ({ grade, credits, courseinstance, credittypecode }) => {
     const course = courseinstance.course.get()
     return {
@@ -118,6 +118,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     gender,
     email,
     semesterenrollments,
+    updatedAt,
     tags: []
   }
 }
@@ -181,6 +182,7 @@ const bySearchTerm = async (term) => {
 const withId = async (id) => {
   try {
     const result = await byId(id)
+    console.log(result)
     return formatStudent(result)
   } catch (e) {
     console.log(e)
