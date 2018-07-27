@@ -136,6 +136,7 @@ router.get('/studyprogrammes', async (req, res) => {
       res.json(studyrights)
     }
   } catch (err) {
+    console.log(err)
     res.status(500).json(err)
   }
 })

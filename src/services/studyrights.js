@@ -147,6 +147,9 @@ const getAllStudyrightElementsAndAssociations = async () => {
 
 const getStudyrightElementsAndAssociationsForUser = async username => {
   const studyrightelements = await getUserElementDetails(username)
+  if (studyrightelements.length === 0) {
+    return []
+  }
   const associations = await getAssociatedStudyrights(studyrightelements.map(element => element.code))
   return formatStudyrightElements(studyrightelements, associations)
 }
