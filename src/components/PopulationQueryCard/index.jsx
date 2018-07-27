@@ -1,13 +1,16 @@
 import React from 'react'
 import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { Card, Icon, Button } from 'semantic-ui-react'
-
+import _ from 'lodash'
 import styles from './populationQueryCard.css'
+import { DISPLAY_DATE_FORMAT } from '../../constants'
+import { reformatDate } from '../../common'
 
 
 const PopulationQueryCard =
   ({ translate, population, query, removeSampleFn, units, updateStudentsFn, updating }) => {
     const { uuid, year, semester, months } = query
+    const { students } = population
     return (
       <Card className={styles.cardContainer}>
         <Card.Header className={styles.cardHeader}>
@@ -23,7 +26,10 @@ const PopulationQueryCard =
             <Icon name="calendar" size="small" /> {`${translate(`populationStatistics.${semester}`)}/${year}, showing ${months} months.`}
           </div>
           <div>
-            {`${translate('populationStatistics.sampleSize', { amount: population.length })} `}
+            {`${translate('populationStatistics.sampleSize', { amount: students.length })} `}
+          </div>
+          <div>
+            {`Updated at ${reformatDate(_.minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}
           </div>
           {updating ?
             <Button disabled compact floated="left" size="medium" labelPosition="left" onClick={updateStudentsFn} >
