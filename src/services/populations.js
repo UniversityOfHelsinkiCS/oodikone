@@ -37,7 +37,7 @@ const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').f
 
 const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate) => {
   const students = await Student.findAll({
-    attributes: ['firstnames', 'lastname', 'studentnumber', 'dateofuniversityenrollment', 'creditcount', 'matriculationexamination', 'abbreviatedname', 'email'],
+    attributes: ['firstnames', 'lastname', 'studentnumber', 'dateofuniversityenrollment', 'creditcount', 'matriculationexamination', 'abbreviatedname', 'email', 'updatedAt'],
     include: [
       {
         model: Credit,
