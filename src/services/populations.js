@@ -164,8 +164,8 @@ const formatStudentsForApi = (students, startDate, endDate) => {
     student.transfers.forEach(transfer => {
       const target = stats.transfers.targets[transfer.target.code] || { name: transfer.target.name, sources: {}}
       const source = stats.transfers.sources[transfer.source.code] || { name: transfer.source.name, targets: {}}
-      target.sources[transfer.source.code] = { name: transfer.source.name }
-      source.targets[transfer.target.code] = { name: transfer.target.name }
+      target.sources[transfer.source.code] = { name: transfer.source.name}
+      source.targets[transfer.target.code] = { name: transfer.target.name}
       stats.transfers.targets[transfer.target.code] = target
       stats.transfers.sources[transfer.source.code] = source
     })

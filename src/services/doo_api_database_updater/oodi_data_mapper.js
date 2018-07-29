@@ -91,7 +91,6 @@ const attainmentDataToCourse = (attainment) => {
     code: attainment.learningopportunity_id,
     name: jsonNamesFromTexts(learningopportunity_name),
     latest_instance_date: parseDate(attainment_date),
-
   }
 }
 
@@ -280,9 +279,34 @@ const getTransfersFromData = (data, studentnumber) => {
 }
 
 const courseRealisationTypeFromData = data => ({
-  realisationtypecode: data.code,
+  realisationtypecode: `${data.code}`,
   name: getTextsByLanguage(data.name)
 })
+
+const studentEnrollmentToModels = (data, studentnumber) => {
+  const courserealisation = {
+    courserealisation_id: `${data.course_id}`,
+    startdate: parseDate(data.start_date),
+    enddate: parseDate(data.end_date),
+    coursecode: `${data.learningopportunity_id}`,
+    name: getTextsByLanguage(data.name),
+    realisationtypecode: `${data.type_code}`,
+    parent: `${data.parent_id}`,
+    root: `${data.root_id}`
+  }
+  const courseenrollment = {
+    studentnumber,
+    courserealisation_id: courserealisation.courserealisation_id
+  }
+  const course = {
+    code: data.learningopportunity_id
+  }
+  return {
+    courserealisation,
+    courseenrollment,
+    course
+  }
+}
 
 module.exports = {
   getStudentFromData,
@@ -309,5 +333,6 @@ module.exports = {
   semesterEnrollmentFromData,
   learningOpportunityDataToCourseProviders,
   getTransfersFromData,
-  courseRealisationTypeFromData
+  courseRealisationTypeFromData,
+  studentEnrollmentToModels
 }
