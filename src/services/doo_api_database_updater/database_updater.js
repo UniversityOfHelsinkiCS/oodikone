@@ -76,9 +76,7 @@ const createCourseInstance = async (courseinstance, returning = false) => {
 }
 
 const createCourseEnrollment = async (data, studentnumber) => {
-  console.log(data)
   const { courserealisation, courseenrollment, course } = mapper.studentEnrollmentToModels(data, studentnumber)
-  console.log({ courserealisation, courseenrollment, course })
   await Course.upsert(course)
   await CourseRealisation.upsert(courserealisation)
   await CourseEnrollment.upsert(courseenrollment)
