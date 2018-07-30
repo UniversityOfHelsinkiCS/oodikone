@@ -1,14 +1,21 @@
 require('dotenv').config()
 const axios = require('axios')
-const { OODI_ADDR } = require('../../conf-backend')
+const { OODI_ADDR, KEY_PATH, CERT_PATH } = require('../../conf-backend')
 const https = require('https')
 const fs = require('fs')
 const base_url = OODI_ADDR
 
-const instance = axios.create({
-  httpsAgent: new https.Agent({
+const agent = KEY_PATH && CERT_PATH ? 
+  new https.Agent({
+    cert: fs.readFileSync(process.env.CERT_PATH, 'utf8'),
+    key: fs.readFileSync(process.env.KEY_PATH, 'utf8'), 
+  }) :
+  new https.Agent({
     rejectUnauthorized: false
   })
+
+const instance = axios.create({
+  httpsAgent: agent
 })
 
 const getUrl = process.env.NODE_ENV === 'anon' ? async (url) => JSON.parse(await fs.readFileSync(url)) : instance.get
