@@ -225,6 +225,7 @@ const CourseInstance = sequelize.define('courseinstance',
 )
 
 const STUDY_MODULE_COURSE_TYPES = [8, 9, 10, 11, 17, 18, 19, 20, 33, 40, 41, 42, 43, 44]
+const STUDY_MODULE_HEURISTICS = ['syventävät opinnot', 'muut opinnot', 'opintokokonaisuus', 'perusopinnot', 'aineopinnot']
 
 const Course = sequelize.define('course',
   {
@@ -238,7 +239,10 @@ const Course = sequelize.define('course',
       type: Sequelize.BOOLEAN,
       get() {
         const coursetypecode = this.getDataValue('coursetypecode')
-        return STUDY_MODULE_COURSE_TYPES.some(typecode => typecode === coursetypecode)
+        const coursename = this.getDataValue('name')
+        const name = coursename['fi'].toLowerCase()
+        return STUDY_MODULE_COURSE_TYPES.some(typecode => typecode === coursetypecode) || 
+          STUDY_MODULE_HEURISTICS.some(moduleName => name.includes(moduleName))
       }
     }
   },
