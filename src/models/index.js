@@ -456,6 +456,30 @@ const CourseRealisationType = sequelize.define('courserealisation_type', {
   }
 })
 
+const CourseRealisation = sequelize.define('courserealisation', {
+  courserealisation_id: {
+    primaryKey: true,
+    type: Sequelize.STRING
+  },
+  name: {
+    type: Sequelize.JSONB
+  },
+  startdate: {
+    type: Sequelize.DATE
+  },
+  enddate: {
+    type: Sequelize.DATE
+  },
+  parent: {
+    type: Sequelize.STRING
+  },
+  root: {
+    type: Sequelize.STRING
+  }
+})
+
+const CourseEnrollment = sequelize.define('course_enrollment', {})
+
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
 Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
 
@@ -515,6 +539,11 @@ Studyright.hasMany(Transfers, { foreignKey: 'studyrightid', sourceKey: 'studyrig
 Transfers.belongsTo(ElementDetails, { as: 'source', foreignKey: 'sourcecode' })
 Transfers.belongsTo(ElementDetails, { as: 'target', foreignKey: 'targetcode' })
 
+CourseRealisation.belongsTo(CourseRealisationType, { foreignKey: 'realisationtypecode' })
+CourseRealisation.belongsTo(Course, { foreignKey: 'coursecode' })
+CourseRealisation.belongsToMany(Student, { through: CourseEnrollment, foreignKey: 'courserealisation_id' })
+Student.belongsToMany(CourseRealisation, { through: CourseEnrollment, foreignKey: 'studentnumber' })
+
 module.exports = {
   Student,
   Credit,
@@ -543,5 +572,7 @@ module.exports = {
   Provider,
   CourseProvider,
   Transfers,
-  CourseRealisationType
+  CourseRealisationType,
+  CourseRealisation,
+  CourseEnrollment
 }
