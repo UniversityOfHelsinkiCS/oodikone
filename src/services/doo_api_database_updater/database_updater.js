@@ -2,8 +2,9 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment, sequelize } = require('../../../src/models/index')
 const _ = require('lodash')
+const { taskpool }  = require('../../util/taskpool')
 
 let attainmentIds = new Set()
 let courseIds = new Set()
@@ -120,6 +121,23 @@ const updateStudent = async (studentnumber) => {
   }
 }
 
+const updateStudentFromData = async (api) => {
+  if (api.student === null || api.student === undefined) {
+    logger.verbose(`API returned ${api.student} for studentnumber ${api.studentnumber}.    `)
+  } else {
+    const { studentnumber } = api
+    await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
+    await Promise.all([
+      updateStudyrights(api, studentnumber),
+      updateStudyattainments(api, studentnumber),
+      updateSemesterEnrollments(api, studentnumber),
+      updateCourseEnrollments(api, studentnumber)
+    ])
+  }
+}
+
+const getStudentsDataFromApi = numbers => Promise.all(numbers.map(studentnumber => getAllStudentInformationFromApi(studentnumber)))
+
 const updateStudents = async (studentnumbers, chunksize = 1, onUpdateStudent = undefined) => {
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
@@ -132,6 +150,23 @@ const updateStudents = async (studentnumbers, chunksize = 1, onUpdateStudent = u
       }
     }))
   }
+}
+
+const updateStudentsTaskPooled = async (studentnumbers, chunksize = 1, onUpdateStudent = undefined) => {
+  const remaining = studentnumbers.slice(0)
+  const runOnUpdate = _.isFunction(onUpdateStudent)
+  const pool = taskpool(5)
+  while (remaining.length > 0) {
+    const nextchunk = remaining.splice(0, chunksize)
+    const apidata = await getStudentsDataFromApi(nextchunk)
+    await pool.enqueue(() => Promise.all(apidata.map(async data => {
+      await updateStudentFromData(data, onUpdateStudent)
+      if (runOnUpdate) {
+        onUpdateStudent()
+      }
+    })))
+  }
+  await pool.complete()
 }
 
 const getFaculties = () => {
@@ -161,7 +196,7 @@ const updateCourseTypeCodes = async () => {
 
 const createOrUpdateTeacher = async teacher => {
   if (teacher !== null) {
-    await Teacher.upsert(mapper.getTeacherFromData(teacher))
+    return Teacher.upsert(mapper.getTeacherFromData(teacher))
   }
 }
 
@@ -173,9 +208,23 @@ const updateTeacherInfo = async (teacherids, chunksize = 1) => {
   }
 }
 
-const updateTeachersInDb = async () => {
+const updateTeacherInfoTaskPooled = async (teacherids, chunksize = 1) => {
+  const teacherchunks = _.chunk(teacherids, chunksize)
+  const pool = taskpool()
+  for (let chunk of teacherchunks) {
+    const apidata = await getTeachersFromApi(chunk)
+    await pool.enqueue(() => sequelize.transaction(() => Promise.all(apidata.map(createOrUpdateTeacher))))
+  }
+  await pool.complete()
+}
+
+const updateTeachersInDb = async (chunksize=50, usetaskpool=true) => {
   const dbteachers = await Teacher.findAll({ attributes: ['id'] })
-  await updateTeacherInfo(dbteachers.map(teacher => teacher.id))
+  if (usetaskpool === true) {
+    await updateTeacherInfoTaskPooled(dbteachers.map(teacher => teacher.id), chunksize)
+  } else {
+    await updateTeacherInfo(dbteachers.map(teacher => teacher.id), chunksize)  
+  }
 }
 
 const getLearningOpportunityFromApi = (courseids) => {
@@ -223,9 +272,18 @@ const updateCourseDisciplines = async () => {
   await Promise.all(courseDisciplines.map(discipline => Discipline.upsert(discipline)))
 }
 
-const updateSemesters = async () => {
+const saveSemestersAwesome = semesters => sequelize.transaction(() => {
+  return Promise.all(semesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
+})
+
+
+const updateSemesters = async (usenew=true) => {
   const apiSemesters = await Oodi.getSemesters()
-  await Promise.all(apiSemesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
+  if (usenew===true) {
+    return await saveSemestersAwesome(apiSemesters)
+  } else {
+    return await Promise.all(apiSemesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
+  }
 }
 
 const updateCourseRealisationTypes = async () => {
@@ -242,9 +300,9 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   await updateCreditTypeCodes()
   await updateCourseTypeCodes()
   await updateCourseDisciplines()
-  await updateStudents(studentnumbers, 50, onUpdateStudent)
-  await updateTeachersInDb(100)
+  await updateStudentsTaskPooled(studentnumbers, 50, onUpdateStudent)
+  await updateTeachersInDb(100, true)
   await updateCoursesAndProvidersInDb(100)
 }
 
-module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes }
+module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes, updateTeachersInDb, updateStudentsTaskPooled }
