@@ -136,13 +136,14 @@ Credit.notUnnecessary = (credit) => {
   return credit.credits > 0 && credit.credits <= 12
 }
 
-const CREDIT_TYPE_CODES = {
+const CREDIT_TYPE_CODES = { 
   PASSED: 4,
   FAILED: 10,
-  IMPROVED: 7
+  IMPROVED: 7,
+  APPROVED: 9
 }
 
-Credit.passed = ({ credittypecode }) => credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.IMPROVED
+Credit.passed = ({ credittypecode }) => credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.IMPROVED || credittypecode === CREDIT_TYPE_CODES.APPROVED
 Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
 Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED
 
