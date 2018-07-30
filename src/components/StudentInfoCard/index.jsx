@@ -24,15 +24,7 @@ const StudentInfoCard = (props) => {
     props.removeStudentSelection()
   }
 
-  const renderStudyright = () => {
-    const lastStudyright = student.studyrights.slice(-1)[0]
-    return (
-      <div className={styles.startDate}>
-        {lastStudyright.highlevelname}
-        {` (${reformatDate(lastStudyright.startdate, DISPLAY_DATE_FORMAT)})`}
-      </div>
-    )
-  }
+
   return (
     <Card fluid>
       <Card.Content>
@@ -49,7 +41,6 @@ const StudentInfoCard = (props) => {
           <div className={styles.startDate}>
             {`${translate('common.started')}: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}
           </div>
-          {renderStudyright()}
           <div className={styles.startDate}>
             {email}
           </div>
