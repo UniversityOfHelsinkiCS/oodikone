@@ -107,17 +107,16 @@ export const courseParticipation = ({ field, course }) =>
   })
 
 export const extentGraduated = (params) => {
-  const { extentcode, name } = params
+  const { extentcode, graduated } = params
   return ({
     id: uuidv4(),
     type: 'ExtentGraduated',
-    name,
     params: {
       extentcode,
-      name
+      graduated
     },
     filter: student => student.studyrights.filter(s =>
-      s.graduated).map(s => s.extentcode).includes(extentcode)
+      (graduated === 'studying' || s.graduated === (graduated === 'grad'))).map(s => s.extentcode).includes(extentcode)
   })
 }
 
