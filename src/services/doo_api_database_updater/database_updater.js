@@ -2,7 +2,7 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment, sequelize } = require('../../../src/models/index')
 const _ = require('lodash')
 const { taskpool }  = require('../../util/taskpool')
 
@@ -196,7 +196,7 @@ const updateCourseTypeCodes = async () => {
 
 const createOrUpdateTeacher = async teacher => {
   if (teacher !== null) {
-    await Teacher.upsert(mapper.getTeacherFromData(teacher))
+    return Teacher.upsert(mapper.getTeacherFromData(teacher))
   }
 }
 
@@ -213,7 +213,7 @@ const updateTeacherInfoTaskPooled = async (teacherids, chunksize = 1) => {
   const pool = taskpool()
   for (let chunk of teacherchunks) {
     const apidata = await getTeachersFromApi(chunk)
-    await pool.enqueue(() => Promise.all(apidata.map(createOrUpdateTeacher)))
+    await pool.enqueue(() => sequelize.transaction(() => Promise.all(apidata.map(createOrUpdateTeacher))))
   }
   await pool.complete()
 }
@@ -272,9 +272,18 @@ const updateCourseDisciplines = async () => {
   await Promise.all(courseDisciplines.map(discipline => Discipline.upsert(discipline)))
 }
 
-const updateSemesters = async () => {
+const saveSemestersAwesome = semesters => sequelize.transaction(() => {
+  return Promise.all(semesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
+})
+
+
+const updateSemesters = async (usenew=true) => {
   const apiSemesters = await Oodi.getSemesters()
-  await Promise.all(apiSemesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
+  if (usenew===true) {
+    return await saveSemestersAwesome(apiSemesters)
+  } else {
+    return await Promise.all(apiSemesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
+  }
 }
 
 const updateCourseRealisationTypes = async () => {
