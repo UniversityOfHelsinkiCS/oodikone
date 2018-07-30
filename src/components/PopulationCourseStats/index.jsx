@@ -233,8 +233,18 @@ class PopulationCourseStats extends Component {
           <Table.HeaderCell>
             {translate('populationCourses.perStudent')}
           </Table.HeaderCell>
-          <Table.HeaderCell>{translate('populationCourses.passed')}</Table.HeaderCell>
-          <Table.HeaderCell>{translate('populationCourses.attempted')}</Table.HeaderCell>
+          <Table.HeaderCell
+            sorted={sortBy === 'passedOfPopulation' ? direction : null}
+            onClick={this.sortBy('passedOfPopulation')}
+          >
+            {translate('populationCourses.passed')}
+          </Table.HeaderCell>
+          <Table.HeaderCell
+            sorted={sortBy === 'triedOfPopulation' ? direction : null}
+            onClick={this.sortBy('triedOfPopulation')}
+          >
+            {translate('populationCourses.attempted')}
+          </Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Table.Body>
