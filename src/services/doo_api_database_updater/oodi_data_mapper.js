@@ -308,6 +308,34 @@ const studentEnrollmentToModels = (data, studentnumber) => {
   }
 }
 
+const courseUnitRealisationDataToModels = data => {
+  const courserealisation = {
+    courserealisation_id: `${data.course_id}`,
+    startdate: parseDate(data.start_date),
+    enddate: parseDate(data.end_date),
+    coursecode: `${data.learningopportunity_id}`,
+    name: getTextsByLanguage(data.realisation_name),
+    realisationtypecode: `${data.realisation_type_code}`,
+    parent: `${data.parent_id}`,
+  }
+  const course = {
+    code: courserealisation.coursecode,
+  }
+  const students = data.students.map(({ student_number }) => ({
+    studentnumber: student_number
+  }))
+  const courseenrollments = students.map(student => ({
+    studentnumber: student.studentnumber,
+    courserealisation_id: courserealisation.courserealisation_id
+  }))
+  return {
+    courserealisation,
+    course,
+    students,
+    courseenrollments
+  }
+}
+
 module.exports = {
   getStudentFromData,
   getStudyRightIdStrings,
@@ -334,5 +362,6 @@ module.exports = {
   learningOpportunityDataToCourseProviders,
   getTransfersFromData,
   courseRealisationTypeFromData,
-  studentEnrollmentToModels
+  studentEnrollmentToModels,
+  courseUnitRealisationDataToModels
 }
