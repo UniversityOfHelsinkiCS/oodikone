@@ -290,32 +290,40 @@ const updateCourseRealisationTypes = async () => {
   await Promise.all(apiTypes.map(data => CourseRealisationType.upsert(mapper.courseRealisationTypeFromData(data))))
 }
 
-const getExistingCourseRealisationCodes = async since => {
+const getExistingCourseRealisationCodes = async (since, courseids) => {
+  const validIds = new Set(courseids)
+  const isValidCourse = data => (
+    data !== undefined
+    && data.deleted !== 'true'
+    && validIds.has(data.learningopportunity_id)
+  )
   const all = await Oodi.courseUnitRealisationsSince(since)
-  return all.filter(data => data.deleted !== 'true').map(data => `${data.course_id}`)
+  return all.filter(isValidCourse).map(data => `${data.course_id}`)
 }
 
-const saveCoursesAndRealisationsIds = async (since='0000-01-01', chunksize=50) => {
-  const apidata = await getExistingCourseRealisationCodes(since)
+const updateCourseRealisationsAndEnrollments = async (courseids, since='0000-01-01', chunksize=50) => {
+  const apidata = await getExistingCourseRealisationCodes(since, courseids)
   const chunks = _.chunk(apidata, chunksize)
-  let iter = 0
   const pool = taskpool(5)
   for (let chunk of chunks) {
-    console.log(`iter ${iter}`)
     const datas = await Promise.all(chunk.map(courserealisation_id => Oodi.getCourseUnitRealisation(courserealisation_id)))
     await pool.enqueue(() => Promise.all(datas.map(async data => {
+      if (!data) {
+        return
+      }
       const { course, courserealisation, courseenrollments, students } = mapper.courseUnitRealisationDataToModels(data)
       await Course.upsert(course)
       await CourseRealisation.upsert(courserealisation)
       await Promise.all(students.map(student => Student.upsert(student)))
       await Promise.all(courseenrollments.map(enrollment => CourseEnrollment.upsert(enrollment)))
     })))
-    iter += 1
-    if (iter === 5){
-      break
-    }
   }
   await pool.complete()
+}
+
+const updateCourseRealisationsForCoursesInDb = async () => {
+  const courses = await Course.findAll()
+  await updateCourseRealisationsAndEnrollments(courses.map(course => course.code))
 }
 
 const updateDatabase = async (studentnumbers, onUpdateStudent) => {
@@ -329,7 +337,8 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   await updateCourseDisciplines()
   await updateStudentsTaskPooled(studentnumbers, 50, onUpdateStudent)
   await updateTeachersInDb(100, true)
+  await updateCourseRealisationsForCoursesInDb()
   await updateCoursesAndProvidersInDb(100)
 }
 
-module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes, updateTeachersInDb, updateStudentsTaskPooled, saveCoursesAndRealisationsIds }
+module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes, updateTeachersInDb, updateStudentsTaskPooled, updateCourseRealisationsAndEnrollments, getExistingCourseRealisationCodes }
