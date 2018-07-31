@@ -48,7 +48,6 @@ if (process.env.NODE_ENV === 'dev') {
 
 }
 
-
 const getStudent = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/info`
   const response = await attemptGetFor(url)
@@ -128,8 +127,14 @@ const getCourseRealisationTypes = async () => {
   return response.data.data
 }
 
-const courseUnitRealisations = async () => {
-  const url = `${base_url}/courseunitrealisations/changes/ids/0000-12-24`
+const courseUnitRealisationsSince = async sinceDate => {
+  const url = `${base_url}/courseunitrealisations/changes/ids/${sinceDate}`
+  const response = await attemptGetFor(url)
+  return response.data.data
+}
+
+const learningOpportunitiesSince = async (sinceDate='0000-01-01') => {
+  const url = `${base_url}/learningopportunities/changes/ids/${sinceDate}`
   const response = await attemptGetFor(url)
   return response.data.data
 }
@@ -154,6 +159,7 @@ module.exports = {
   getSemesterEnrollments,
   getCourseEnrollments,
   getCourseRealisationTypes,
-  courseUnitRealisations,
-  getCourseUnitRealisation
+  courseUnitRealisationsSince,
+  getCourseUnitRealisation,
+  learningOpportunitiesSince
 }
