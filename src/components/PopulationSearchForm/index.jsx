@@ -269,19 +269,24 @@ class PopulationSearchForm extends Component {
     if (!studyProgrammes && !degrees && !this.props.pending) {
       return <Message error color="red" header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi" />
     }
-    const sortedStudyProgrammes = _.sortBy(studyProgrammes.filter((s) => {
-      if (studyRights.degree) {
-        return s.associations.includes(studyRights.degree)
-      }
-      return true
-    }), s => s.text)
-    const sortedStudyDegrees = _.sortBy(degrees.filter((d) => {
-      if (studyRights.programme) {
-        return d.associations.includes(studyRights.programme)
-      }
-      return true
-    }), s => s.text)
-
+    let sortedStudyProgrammes = studyProgrammes
+    if (studyProgrammes) {
+      sortedStudyProgrammes = _.sortBy(studyProgrammes.filter((s) => {
+        if (studyRights.degree) {
+          return s.associations.includes(studyRights.degree)
+        }
+        return true
+      }), s => s.text)
+    }
+    let sortedStudyDegrees = degrees
+    if (degrees) {
+      sortedStudyDegrees = _.sortBy(degrees.filter((d) => {
+        if (studyRights.programme) {
+          return d.associations.includes(studyRights.programme)
+        }
+        return true
+      }), s => s.text)
+    }
     return (
       <Form.Group id="rightGroup" horizontal="true" >
         <Form.Field
