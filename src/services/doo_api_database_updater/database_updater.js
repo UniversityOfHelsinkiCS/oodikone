@@ -337,7 +337,6 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   await updateCourseDisciplines()
   await updateStudentsTaskPooled(studentnumbers, 50, onUpdateStudent)
   await updateTeachersInDb(100, true)
-  await updateCourseRealisationsForCoursesInDb()
   await updateCoursesAndProvidersInDb(100)
 }
 
