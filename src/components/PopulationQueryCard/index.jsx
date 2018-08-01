@@ -11,6 +11,42 @@ const PopulationQueryCard =
   ({ translate, population, query, removeSampleFn, units, updateStudentsFn, updating }) => {
     const { uuid, year, semester, months } = query
     const { students } = population
+    if (students.length > 0) {
+      return (
+        <Card className={styles.cardContainer}>
+          <Card.Header className={styles.cardHeader}>
+            <div>{units.map(u => u.name).join(', ')}</div>
+            <Icon
+              name="remove"
+              className={styles.controlIcon}
+              onClick={() => removeSampleFn(uuid)}
+            />
+          </Card.Header>
+          <Card.Meta>
+            <div className={styles.dateItem}>
+              <Icon name="calendar" size="small" /> {`${translate(`populationStatistics.${semester}`)}/${year}, showing ${months} months.`}
+            </div>
+            <div>
+              {`${translate('populationStatistics.sampleSize', { amount: students.length })} `}
+            </div>
+            <div>
+              {`Updated at ${reformatDate(_.minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}
+            </div>
+            {updating ?
+              <Button disabled compact floated="left" size="medium" labelPosition="left" onClick={updateStudentsFn} >
+                <Icon loading name="refresh" />
+                update population
+              </Button>
+              :
+              <Button compact floated="left" size="medium" labelPosition="left" onClick={updateStudentsFn} >
+                <Icon name="refresh" />
+                update population
+              </Button>
+            }
+          </Card.Meta>
+        </Card>
+      )
+    }
     return (
       <Card className={styles.cardContainer}>
         <Card.Header className={styles.cardHeader}>
@@ -28,9 +64,6 @@ const PopulationQueryCard =
           <div>
             {`${translate('populationStatistics.sampleSize', { amount: students.length })} `}
           </div>
-          <div>
-            {`Updated at ${reformatDate(_.minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}
-          </div>
           {updating ?
             <Button disabled compact floated="left" size="medium" labelPosition="left" onClick={updateStudentsFn} >
               <Icon loading name="refresh" />
@@ -43,10 +76,7 @@ const PopulationQueryCard =
             </Button>
           }
         </Card.Meta>
-      </Card>
-
-
-    )
+      </Card>)
   }
 
 PopulationQueryCard.propTypes = {
