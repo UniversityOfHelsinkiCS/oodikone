@@ -182,7 +182,6 @@ const bySearchTerm = async (term) => {
 const withId = async (id) => {
   try {
     const result = await byId(id)
-    console.log(result)
     return formatStudent(result)
   } catch (e) {
     console.log(e)
