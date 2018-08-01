@@ -139,10 +139,11 @@ Credit.notUnnecessary = (credit) => {
 const CREDIT_TYPE_CODES = {
   PASSED: 4,
   FAILED: 10,
-  IMPROVED: 7
+  IMPROVED: 7,
+  APPROVED: 9
 }
 
-Credit.passed = ({ credittypecode }) => credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.IMPROVED
+Credit.passed = ({ credittypecode }) => credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.IMPROVED || credittypecode === CREDIT_TYPE_CODES.APPROVED
 Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
 Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED
 
@@ -224,6 +225,7 @@ const CourseInstance = sequelize.define('courseinstance',
 )
 
 const STUDY_MODULE_COURSE_TYPES = [8, 9, 10, 11, 17, 18, 19, 20, 33, 40, 41, 42, 43, 44]
+const STUDY_MODULE_HEURISTICS = ['syventävät opinnot', 'muut opinnot', 'opintokokonaisuus', 'perusopinnot', 'aineopinnot', 'pedagogiset opinnot', 'sisältöopinnot', 'kasvatustieteelliset opinnot', 'sivuaine']
 
 const Course = sequelize.define('course',
   {
@@ -237,6 +239,12 @@ const Course = sequelize.define('course',
       type: Sequelize.BOOLEAN,
       get() {
         const coursetypecode = this.getDataValue('coursetypecode')
+        const coursename = this.getDataValue('name')
+        const name = coursename['fi'] ? coursename['fi'].toLowerCase() : null 
+        if (name) {
+          return STUDY_MODULE_COURSE_TYPES.some(typecode => typecode === coursetypecode) ||
+            STUDY_MODULE_HEURISTICS.some(moduleName => name.includes(moduleName))
+        }
         return STUDY_MODULE_COURSE_TYPES.some(typecode => typecode === coursetypecode)
       }
     }
@@ -533,7 +541,7 @@ Provider.belongsToMany(Course, { through: CourseProvider, foreignKey: 'providerc
 Transfers.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Transfers, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
-Transfers.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid'})
+Transfers.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
 Studyright.hasMany(Transfers, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
 
 Transfers.belongsTo(ElementDetails, { as: 'source', foreignKey: 'sourcecode' })
