@@ -68,7 +68,7 @@ class EnrollmentStatus extends Component {
           <Form>
             <Form.Group inline>
               <Form.Field>
-                <label>Select students that {'we\'re'} </label>
+                <label>Select students that were </label>
               </Form.Field>
               <Form.Field>
                 <Dropdown
