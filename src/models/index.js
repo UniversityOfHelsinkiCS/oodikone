@@ -240,7 +240,7 @@ const Course = sequelize.define('course',
       get() {
         const coursetypecode = this.getDataValue('coursetypecode')
         const coursename = this.getDataValue('name')
-        const name = coursename['fi'].toLowerCase()
+        const name = coursename['fi'] ? coursename['fi'].toLowerCase() : null 
         if (name) {
           return STUDY_MODULE_COURSE_TYPES.some(typecode => typecode === coursetypecode) ||
             STUDY_MODULE_HEURISTICS.some(moduleName => name.includes(moduleName))
