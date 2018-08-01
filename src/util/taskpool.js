@@ -46,6 +46,9 @@ const taskpool = (poolsize=5) => {
       queue.unshift(() => {
         resolve()
       })
+      if (sleep === true) {
+        execute()
+      }
     })
   }
 
