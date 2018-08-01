@@ -136,7 +136,7 @@ Credit.notUnnecessary = (credit) => {
   return credit.credits > 0 && credit.credits <= 12
 }
 
-const CREDIT_TYPE_CODES = { 
+const CREDIT_TYPE_CODES = {
   PASSED: 4,
   FAILED: 10,
   IMPROVED: 7,
@@ -241,8 +241,11 @@ const Course = sequelize.define('course',
         const coursetypecode = this.getDataValue('coursetypecode')
         const coursename = this.getDataValue('name')
         const name = coursename['fi'].toLowerCase()
-        return STUDY_MODULE_COURSE_TYPES.some(typecode => typecode === coursetypecode) || 
-          STUDY_MODULE_HEURISTICS.some(moduleName => name.includes(moduleName))
+        if (name) {
+          return STUDY_MODULE_COURSE_TYPES.some(typecode => typecode === coursetypecode) ||
+            STUDY_MODULE_HEURISTICS.some(moduleName => name.includes(moduleName))
+        }
+        return STUDY_MODULE_COURSE_TYPES.some(typecode => typecode === coursetypecode)
       }
     }
   },
@@ -538,7 +541,7 @@ Provider.belongsToMany(Course, { through: CourseProvider, foreignKey: 'providerc
 Transfers.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Transfers, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
-Transfers.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid'})
+Transfers.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
 Studyright.hasMany(Transfers, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
 
 Transfers.belongsTo(ElementDetails, { as: 'source', foreignKey: 'sourcecode' })
