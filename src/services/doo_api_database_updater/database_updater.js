@@ -198,7 +198,7 @@ const updateCourseInformationAndProviders = async (courseids, chunksize = 1) => 
   for (let chunk of coursechunks) {
     const apidata = await getLearningOpportunityFromApi(chunk)
     await Promise.all(apidata.map(async data => {
-      if (data !== null) {
+      if (data) {
         await createOrUpdateCourseFromLearningOpportunityData(data)
         await createOrUpdateCourseProviders(data)
       }
