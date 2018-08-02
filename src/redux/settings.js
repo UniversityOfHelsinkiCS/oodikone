@@ -1,4 +1,5 @@
 const initial = {
+  language: 'fi',
   namesVisible: false,
   studentlistVisible: false,
   chartHeight: 600
@@ -6,6 +7,11 @@ const initial = {
 
 const reducer = (state = initial, action) => {
   switch (action.type) {
+    case 'SWITCH_LANGUAGE':
+      return {
+        ...state,
+        language: action.response
+      }
     case 'HIDE_STUDENT_NAMES':
       return {
         ...state,
@@ -35,6 +41,11 @@ const reducer = (state = initial, action) => {
       return state
   }
 }
+
+export const switchLanguage = language => ({
+  type: 'SWITCH_LANGUAGE',
+  response: language
+})
 
 export const hideStudentNames = () => ({
   type: 'HIDE_STUDENT_NAMES'

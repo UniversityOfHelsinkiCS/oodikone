@@ -19,12 +19,12 @@ export const displayableDateType = shape({
 
 export const studentDetailsType = shape({
   studentNumber: string.isRequired,
-  started: string.isRequired,
+  started: string,
   credits: number
 })
 
 export const dropdownType = shape({
   key: oneOfType([string, number]).isRequired,
   value: oneOfType([string, number]).isRequired,
-  text: string.isRequired
+  text: shape({}).isRequired
 })
