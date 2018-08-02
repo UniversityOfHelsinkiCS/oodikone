@@ -168,6 +168,11 @@ const Studyright = sequelize.define('studyright',
   {
     tableName: 'studyright',
     timestamps: false,
+    indexes: [
+      {
+        fields: ['student_studentnumber']
+      }
+    ]
   }
 )
 
@@ -425,6 +430,8 @@ const SemesterEnrollment = sequelize.define('semester_enrollment', {
     {
       fields: ['semestercode', 'studentnumber'],
       unique: true
+    },{
+      fields: ['studentnumber']
     }
   ]
 })
@@ -443,6 +450,12 @@ const Transfers = sequelize.define('transfers', {
   transferdate: {
     type: Sequelize.DATE
   }
+}, {
+  indexes: [
+    {
+      fields: ['studentnumber']
+    }
+  ]
 })
 
 const CourseProvider = sequelize.define('course_providers', {}, {
