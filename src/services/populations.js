@@ -1,6 +1,5 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
-const { studentNumbersWithAllStudyRightElements } = require('./studyrights')
 const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, ElementDetails, Discipline, CourseType, SemesterEnrollment, Semester, Transfers } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
@@ -41,8 +40,8 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     include: [
       {
         model: Credit,
-        attributes: ['grade', 'credits', 'credittypecode'],
-        required: true,
+        attributes: ['grade', 'credits', 'credittypecode', 'student_studentnumber'],
+        separate: true,
         include: [
           {
             model: CourseInstance,
@@ -60,6 +59,11 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             }
           }
         ],
+        where: {
+          student_studentnumber: {
+            [Op.in]: studentnumbers
+          }
+        }
       },
       {
         model: Transfers,
@@ -78,10 +82,9 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         model: Studyright,
         required: true,
         attributes: ['studyrightid', 'startdate', 'highlevelname', 'extentcode', 'graduated'],
-        include: [
-          {
-            model: StudyrightExtent
-          }]
+        include: {
+          model: StudyrightExtent
+        }
       },
       {
         model: SemesterEnrollment,
@@ -204,7 +207,7 @@ const optimizedStatisticsOf = async (query) => {
   const { studyRights, semester, year, months } = query
   const startDate = `${year}-${semesterStart[semester]}`
   const endDate = `${year}-${semesterEnd[semester]}`
-  const studentnumbers = await studentNumbersWithAllStudyRightElements(studyRights, startDate, endDate)
+  const studentnumbers = await studentnumbersWithAllStudyrightElementsAndCreditsBetween(studyRights, startDate, endDate, months)
   const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
   return formatStudentsForApi(students, startDate, endDate)
 }
