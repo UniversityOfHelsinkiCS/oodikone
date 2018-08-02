@@ -24,7 +24,7 @@ const PopulationQueryCard =
       return (
         <Card className={styles.cardContainer}>
           <Card.Header className={styles.cardHeader}>
-            <div>{units.map(u => u.name[language]).join(', ')}{console.log(units)}</div>
+            <div>{units.map(u => u.name[language]).join(', ')}</div>
             <Icon
               name="remove"
               className={styles.controlIcon}
