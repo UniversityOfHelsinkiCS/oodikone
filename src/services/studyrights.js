@@ -133,7 +133,7 @@ const getAssociatedStudyrights = async elementcodes => {
 
 const formatStudyrightElements = (elements, associations) => elements.map(element => ({
   id: element.code,
-  name: element.name.fi,
+  name: element.name,
   enabled: true,
   type: element.type,
   associations: associations[element.code]
