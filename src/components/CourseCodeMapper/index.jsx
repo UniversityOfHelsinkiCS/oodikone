@@ -8,7 +8,7 @@ import CourseSearch from '../CourseSearch'
 import sharedStyles from '../../styles/shared'
 import styles from './courseCodeMapper.css'
 
-const { func, shape } = PropTypes
+const { func, shape, string } = PropTypes
 
 
 class CourseCodeMapper extends Component {
@@ -24,8 +24,15 @@ class CourseCodeMapper extends Component {
     code2: ''
   }
 
+  getName = (name) => {
+    const { language } = this.props
+
+    const res = name[language] ? name[language] : name.fi
+    return res
+  }
+
   getTableRows = () => {
-    const { courseCodeDuplicates } = this.props
+    const { courseCodeDuplicates, language } = this.props
     const { data } = courseCodeDuplicates
     const filteredKeys = this.filterNames(data, this.filterCodes(data))
     const rows = filteredKeys.map((key) => {
@@ -33,7 +40,7 @@ class CourseCodeMapper extends Component {
       return (
         <Table.Row key={key + Object.keys(course.alt).map(altkey => altkey + course.alt[key])}>
           <Table.Cell>{key}</Table.Cell>
-          <Table.Cell>{course.name}</Table.Cell>
+          <Table.Cell>{this.getName(course.name)}</Table.Cell>
           <Table.Cell>{course.main}</Table.Cell>
           <Table.Cell>{Object.keys(course.alt).map(altkey => (
             <React.Fragment key={course.alt[altkey] + altkey}>
@@ -42,7 +49,7 @@ class CourseCodeMapper extends Component {
             </React.Fragment>))}
           </Table.Cell>
           <Table.Cell>
-            {Object.keys(course.alt).map(altKey => course.alt[altKey]).toString()}
+            {Object.keys(course.alt).map(altKey => course.alt[altKey][language]).toString()}
           </Table.Cell>
         </Table.Row>)
     })
@@ -54,9 +61,9 @@ class CourseCodeMapper extends Component {
     return keys.filter((key) => {
       const course = duplicates[key]
       return (
-        course.name.toLocaleLowerCase().includes(filter) ||
+        this.getName(course.name).toLocaleLowerCase().includes(filter) ||
         Object.values(course.alt).find(name =>
-          name.toLocaleLowerCase().includes(filter))
+          this.getName(name).toLocaleLowerCase().includes(filter))
       )
     })
   }
@@ -153,14 +160,16 @@ class CourseCodeMapper extends Component {
 }
 
 CourseCodeMapper.propTypes = {
+  language: string.isRequired,
   getDuplicates: func.isRequired,
   addDuplicate: func.isRequired,
   removeDuplicate: func.isRequired,
   courseCodeDuplicates: shape({}).isRequired
 }
 
-const mapStateToProps = ({ courseCodeDuplicates }) => ({
-  courseCodeDuplicates
+const mapStateToProps = ({ courseCodeDuplicates, settings }) => ({
+  courseCodeDuplicates,
+  language: settings.language
 })
 
 const mapDispatchToProps = dispatch => ({
