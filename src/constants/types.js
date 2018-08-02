@@ -19,7 +19,7 @@ export const displayableDateType = shape({
 
 export const studentDetailsType = shape({
   studentNumber: string.isRequired,
-  started: string.isRequired,
+  started: string,
   credits: number
 })
 
