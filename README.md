@@ -43,15 +43,17 @@ To start a redis and a database, run:
 
 ```docker-compose up -d```
 
-(For production database we created user tkt_oodi, but for development we can use postgres.)
+Copy a backup dump from oodikone
+
+`scp oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/2018-08-01.bak <local folder>`
 
 Create database tkt_oodi:
 
 `docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi"`
 
-Fill database with data from dump.bak file: 
+Fill database with data from backup file: 
 
-`cat dump.bak | docker exec -i oodi_db psql -U postgres -d tkt_oodi`
+`cat 2018-08-01.bak | docker exec -i oodi_db psql -U postgres -d tkt_oodi`
 
 Check that you have all the data you ever wanted:
 
@@ -139,7 +141,7 @@ Drop your current db
 
 Copy a backup dump from oodikone
 
-`scp oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/dump5.6.2018 <local folder>`
+`scp oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/2018-08-01.bak <local folder>`
 
 Create a new database and fill it with the backup dump following the instructions above
 
