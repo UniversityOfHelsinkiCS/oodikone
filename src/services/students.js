@@ -110,7 +110,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     studyrights,
     studentNumber: studentnumber,
     started: dateofuniversityenrollment,
-    credits: creditcount,
+    credits: creditcount || 0,
     courses: credits.sort(courseByDate).map(toCourse),
     name: abbreviatedname,
     transfers: transfers || [],
