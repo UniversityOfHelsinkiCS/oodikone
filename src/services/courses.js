@@ -412,7 +412,7 @@ const setDuplicateCode = async (code, duplicate) => {
       }
       all[code] = {
         main: main,
-        name: course.name.fi,
+        name: course.name,
         alt: {}
       }
     }
@@ -421,10 +421,10 @@ const setDuplicateCode = async (code, duplicate) => {
       if (isMainCode(duplicate)) {
         all[code].main = duplCourse.code
       }
-      all[code].alt[duplicate] = duplCourse.name.fi
+      all[code].alt[duplicate] = duplCourse.name
       if (!all[code].main) {
         all[code].main = selectMain(code, all[code])
-        all[code].name = course.name.fi
+        all[code].name = course.name
       }
       await redisClient.setAsync('duplicates', JSON.stringify(all))
     }
