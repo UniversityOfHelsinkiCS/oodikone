@@ -26,5 +26,5 @@ export const studentDetailsType = shape({
 export const dropdownType = shape({
   key: oneOfType([string, number]).isRequired,
   value: oneOfType([string, number]).isRequired,
-  text: string.isRequired
+  text: shape({}).isRequired
 })

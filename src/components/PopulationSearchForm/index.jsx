@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, arrayOf, shape, bool } from 'prop-types'
+import { func, arrayOf, shape, bool, string } from 'prop-types'
 import { Form, Button, Message, Radio, Dropdown, Icon } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
@@ -16,7 +16,7 @@ import { getUnits } from '../../redux/units'
 import { isInDateFormat, momentFromFormat, reformatDate, isValidYear } from '../../common'
 import { makeMapRightsToDropDown } from '../../selectors/populationSearchForm'
 import { setLoading } from '../../redux/graphSpinner'
-
+import LanguageChooser from '../LanguageChooser'
 import style from './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
 
@@ -24,6 +24,7 @@ const YEAR_DATE_FORMAT = 'YYYY'
 
 class PopulationSearchForm extends Component {
   static propTypes = {
+    language: string.isRequired,
     translate: func.isRequired,
     getUnits: func.isRequired,
     getPopulationStatistics: func.isRequired,
@@ -155,6 +156,7 @@ class PopulationSearchForm extends Component {
   handleProgrammeChange = (e, { value }) => {
     const { query } = this.state
     const programme = value
+
     this.setState({
       query: {
         ...query,
@@ -202,6 +204,15 @@ class PopulationSearchForm extends Component {
     return semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`
   }
 
+  renderableList = (list) => {
+    const { language } = this.props
+    return list.map((sp) => {
+      const shh = {}
+      Object.assign(shh, sp)
+      shh.text = sp.text[language]
+      return shh
+    })
+  }
 
   renderEnrollmentDateSelector = () => {
     const { translate } = this.props
@@ -259,7 +270,7 @@ class PopulationSearchForm extends Component {
   }
 
   renderStudyGroupSelector = () => {
-    const { studyProgrammes, degrees, translate } = this.props
+    const { studyProgrammes, degrees, translate, language } = this.props
     const { studyRights } = this.state.query
     if (this.props.pending) {
       return (
@@ -269,21 +280,35 @@ class PopulationSearchForm extends Component {
     if (!studyProgrammes && !degrees && !this.props.pending) {
       return <Message error color="red" header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi" />
     }
+
     const sortedStudyProgrammes = _.sortBy(studyProgrammes.filter((s) => {
       if (studyRights.degree) {
         return s.associations.includes(studyRights.degree)
       }
       return true
-    }), s => s.text)
+    }), s => s.text[language])
     const sortedStudyDegrees = _.sortBy(degrees.filter((d) => {
       if (studyRights.programme) {
         return d.associations.includes(studyRights.programme)
       }
       return true
-    }), s => s.text)
+    }), s => s.text[language])
+
+    const programmesToRender = this.renderableList(sortedStudyProgrammes)
+    const degreesToRender = this.renderableList(sortedStudyDegrees)
 
     return (
       <Form.Group id="rightGroup" horizontal="true" >
+        <Form.Field
+          width={1}
+          style={{
+            position: 'relative',
+            display: 'inline-block'
+          }}
+        >
+          <label htmlFor="rightGroup">Language</label>
+          <LanguageChooser />
+        </Form.Field>
         <Form.Field
           width={6}
           style={{
@@ -312,7 +337,7 @@ class PopulationSearchForm extends Component {
             selection
             noResultsMessage={translate('populationStatistics.noSelectableStudyRights')}
             value={studyRights.degree}
-            options={sortedStudyDegrees}
+            options={degreesToRender}
             onChange={this.handleDegreeChange}
             closeOnChange
           />
@@ -346,7 +371,7 @@ class PopulationSearchForm extends Component {
             selection
             noResultsMessage={translate('populationStatistics.noSelectableStudyRights')}
             value={studyRights.programme}
-            options={sortedStudyProgrammes}
+            options={programmesToRender}
             onChange={this.handleProgrammeChange}
             closeOnChange
           />
@@ -396,11 +421,12 @@ class PopulationSearchForm extends Component {
 
 const mapRightsToDropdown = makeMapRightsToDropDown()
 
-const mapStateToProps = ({ populations, units, locale }) => {
+const mapStateToProps = ({ settings, populations, units, locale }) => {
   const rawStudyrights = units || []
   const { pending } = units
   const studyRights = mapRightsToDropdown(rawStudyrights)
   return ({
+    language: settings.language,
     queries: populations.query || {},
     translate: getTranslate(locale),
     degrees: studyRights['10'],

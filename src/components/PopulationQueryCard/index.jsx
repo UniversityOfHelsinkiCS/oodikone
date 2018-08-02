@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { Card, Icon, Button } from 'semantic-ui-react'
 import _ from 'lodash'
@@ -8,7 +9,15 @@ import { reformatDate } from '../../common'
 
 
 const PopulationQueryCard =
-  ({ translate, population, query, removeSampleFn, units, updateStudentsFn, updating }) => {
+  ({ translate,
+    population,
+    query,
+    removeSampleFn,
+    units,
+    updateStudentsFn,
+    updating,
+    language
+  }) => {
     const { uuid, year, semester, months } = query
     const { students } = population
     if (students.length > 0) {
@@ -50,7 +59,7 @@ const PopulationQueryCard =
     return (
       <Card className={styles.cardContainer}>
         <Card.Header className={styles.cardHeader}>
-          <div>{units.map(u => u.name).join(', ')}</div>
+          <div>{units.map(u => u.name[language]).join(', ')}</div>
           <Icon
             name="remove"
             className={styles.controlIcon}
@@ -80,6 +89,7 @@ const PopulationQueryCard =
   }
 
 PopulationQueryCard.propTypes = {
+  language: string.isRequired,
   translate: func.isRequired,
   population: shape({ students: arrayOf(object), extents: arrayOf(object) }).isRequired,
   query: shape({
@@ -95,4 +105,6 @@ PopulationQueryCard.propTypes = {
   updating: bool.isRequired
 }
 
-export default PopulationQueryCard
+const mapStateToProps = ({ settings }) => ({ language: settings.language })
+
+export default connect(mapStateToProps, null)(PopulationQueryCard)
