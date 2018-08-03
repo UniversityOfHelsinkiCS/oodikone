@@ -6,7 +6,7 @@ import Datetime from 'react-datetime'
 import Timeout from '../Timeout'
 import CourseSearch from '../CourseSearch'
 import CoursePassRateChart from '../CoursePassRateChart'
-// import LanguageChooser from '../LanguageChooser'
+import LanguageChooser from '../LanguageChooser'
 import { getCourseStatistics, removeCourseStatistics } from '../../redux/courseStatistics'
 import { isValidYear, isInDateFormat, reformatDate, momentFromFormat } from '../../common'
 
@@ -187,10 +187,10 @@ class CourseStatistics extends Component {
               onChange={this.handleSemesterSeparate}
             />
           </Form.Field>
-          {/* <Form.Field error={!validYear} className={style.yearSelect}>
-            <label>Language</label> Not yet ready
+          <Form.Field error={!validYear} className={style.yearSelect}>
+            <label>Language</label>
             <LanguageChooser />
-          </Form.Field> */}
+          </Form.Field>
         </Form.Group>
       </Form>
     )
