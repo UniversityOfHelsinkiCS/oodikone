@@ -14,7 +14,7 @@ import { isValidYear, isInDateFormat, reformatDate, momentFromFormat } from '../
 import style from './courseStatistics.css'
 import sharedStyles from '../../styles/shared'
 
-const { shape, func, array } = PropTypes
+const { shape, func, array, string } = PropTypes
 
 const INITIAL_YEARS = {
   start: '2017',
@@ -54,7 +54,14 @@ class CourseStatistics extends Component {
     const { code } = this.state.selectedCourse
     const { start, end, separate } = this.state
     const { selected } = this.props.courseStatistics
-    const query = { code, start: Number(start), end: Number(end), separate: String(separate) }
+    const { language } = this.props
+    const query = {
+      code,
+      start: Number(start),
+      end: Number(end),
+      separate: String(separate),
+      language
+    }
     const aa = selected.find(olquery =>
       olquery.separate === query.separate &&
       olquery.end === query.end &&
@@ -226,6 +233,7 @@ class CourseStatistics extends Component {
 }
 
 CourseStatistics.propTypes = {
+  language: string.isRequired,
   getCourseStatistics: func.isRequired,
   removeCourseStatistics: func.isRequired,
   courseStatistics: shape({
@@ -234,7 +242,8 @@ CourseStatistics.propTypes = {
   }).isRequired
 }
 
-const mapStateToProps = ({ courses, courseStatistics }) => ({
+const mapStateToProps = ({ courses, courseStatistics, settings }) => ({
+  language: settings.language,
   courses,
   courseStatistics
 })
