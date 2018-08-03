@@ -2,7 +2,7 @@ import React from 'react'
 
 import { PropTypes, number } from 'prop-types'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
-import { Header, Button, Container } from 'semantic-ui-react'
+import { Header, Button, Container, Segment } from 'semantic-ui-react'
 import _ from 'lodash'
 
 import CourseStatisticsTable from '../CourseStatisticsTable'
@@ -11,7 +11,7 @@ import styles from './coursePassRateChart.css'
 
 import { chartblue, chartdarkg, chartlgreen, chartdarkred, chartlred, turquoise, red, green } from '../../styles/variables/colors'
 
-const { array, shape, string, func, arrayOf, bool } = PropTypes
+const { array, shape, string, func, arrayOf, bool, object } = PropTypes
 
 const CustomizedLabel = (props) => {
   CustomizedLabel.propTypes = {
@@ -19,6 +19,7 @@ const CustomizedLabel = (props) => {
     y: number.isRequired,
     label: string.isRequired,
     width: number.isRequired
+
   }
   const { x, y, label, width } = props
 
@@ -42,21 +43,24 @@ const StackedBarChart = ({
   altCodes,
   removeCourseStatistics,
   courseLevel,
-  courseLevelSwitch
+  courseLevelSwitch,
+  max,
+  programmeOptions,
+  dropdown
 }) => {
   const data = stats.stats.map(year => (
     {
       name: year.time,
-      studentsThatPassedThisYear: year.studentsThatPassedThisYear,
-      studentsThatFailedThisYear: year.studentsThatFailedThisYear,
-      passedStudentsThatFailedBefore: year.passedStudentsThatFailedBefore,
-      passedStudentsOnFirstTry: year.passedStudentsOnFirstTry,
-      failedStudentsThatFailedBefore: year.failedStudentsThatFailedBefore,
-      failedStudentsOnFirstTry: year.failedStudentsOnFirstTry,
-      all: year.studentsThatPassedThisYear + year.studentsThatFailedThisYear,
-      courseLevelPassed: year.courseLevelPassed,
-      courseLevelFailed: year.courseLevelFailed,
-      courseLevelAll: year.courseLevelPassed + year.courseLevelFailed,
+      studentsThatPassedThisYear: year.studentsThatPassedThisYear.length,
+      studentsThatFailedThisYear: year.studentsThatFailedThisYear.length,
+      passedStudentsThatFailedBefore: year.passedStudentsThatFailedBefore.length,
+      passedStudentsOnFirstTry: year.passedStudentsOnFirstTry.length,
+      failedStudentsThatFailedBefore: year.failedStudentsThatFailedBefore.length,
+      failedStudentsOnFirstTry: year.failedStudentsOnFirstTry.length,
+      all: year.studentsThatPassedThisYear.length + year.studentsThatFailedThisYear.length,
+      courseLevelPassed: year.courseLevelPassed.length,
+      courseLevelFailed: year.courseLevelFailed.length,
+      courseLevelAll: year.courseLevelPassed.length + year.courseLevelFailed.length,
       gradeDistribution: year.gradeDistribution
     }))
   const { name, code, start, end, separate } = stats
@@ -83,9 +87,17 @@ const StackedBarChart = ({
         <div className={styles.chartContainer}>
           {!courseLevel ?
             <Container>
-              <div>
-                <Button onClick={courseLevelSwitch()} label="switch to course level view" labelPosition="left" compact />
-              </div>
+              <Segment.Group
+                horizontal
+              >
+                <Segment>
+                  <Button onClick={courseLevelSwitch()} label="switch to course level view" labelPosition="left" compact />
+                </Segment>
+                <Segment>
+                  <label> Programme: </label>
+                  {dropdown(programmeOptions)}
+                </Segment>
+              </Segment.Group>
               <BarChart
                 height={700}
                 width={1200}
@@ -94,7 +106,7 @@ const StackedBarChart = ({
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                <YAxis />
+                <YAxis type="number" domain={[0, max]} />
                 <Tooltip />
                 <Bar dataKey="all" stackId="a" fill={chartblue} name="all" />
                 <Bar dataKey="passedStudentsOnFirstTry" stackId="b" fill={chartdarkg} name="students that passed on their first try" />
@@ -106,9 +118,17 @@ const StackedBarChart = ({
             </Container>
             :
             <Container>
-              <div>
-                <Button onClick={courseLevelSwitch()} label="switch to student level view" labelPosition="left" compact />
-              </div>
+              <Segment.Group
+                horizontal
+              >
+                <Segment>
+                  <Button onClick={courseLevelSwitch()} label="switch to student level view" labelPosition="left" compact />
+                </Segment>
+                <Segment>
+                  <label> Programme: </label>
+                  {dropdown(programmeOptions)}
+                </Segment>
+              </Segment.Group>
               <BarChart
                 height={700}
                 width={1200}
@@ -117,7 +137,7 @@ const StackedBarChart = ({
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                <YAxis />
+                <YAxis type="number" domain={[0, max]} />
                 <Tooltip />
                 <Bar dataKey="courseLevelAll" stackId="a" fill={turquoise} name="all" />
                 <Bar dataKey="courseLevelPassed" stackId="b" fill={green} name="passed" />
@@ -139,7 +159,7 @@ const StackedBarChart = ({
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
-              <YAxis />
+              <YAxis type="number" domain={[0, max]} />
               <Tooltip />
               <Bar dataKey="1" stackId="a" fill="grey" label={<CustomizedLabel label="1" />} />
               <Bar dataKey="2" stackId="b" fill="grey" label={<CustomizedLabel label="2" />} />
@@ -149,7 +169,7 @@ const StackedBarChart = ({
               <Bar dataKey="0" stackId="f" fill={red} name="failed" />
               <Bar dataKey="Eisa" stackId="f" fill={red} name="Eisa" />
               <Bar dataKey="Hyl." stackId="f" fill={red} name="Hyl." />
-              <Bar dataKey="Luop" stackId="f" fill={red} name="Luop" label={<CustomizedLabel label="failed" />} />
+              <Bar dataKey="Luop" stackId="f" fill={red} name="Luop" label={<CustomizedLabel label="f" />} />
             </BarChart>
           </Container>
           <CourseStatisticsTable stats={statisticsTableStats} />
@@ -173,11 +193,11 @@ StackedBarChart.propTypes = {
   removeCourseStatistics: func.isRequired,
   courseLevelSwitch: func.isRequired,
   altCodes: arrayOf(string).isRequired,
-  stats: shape({
-    code: string.isRequired,
-    stats: array.isRequired
-  }).isRequired,
-  courseLevel: bool.isRequired
+  stats: arrayOf(object).isRequired,
+  courseLevel: bool.isRequired,
+  max: number.isRequired,
+  dropdown: func.isRequired,
+  programmeOptions: arrayOf(object).isRequired
 
 
 }

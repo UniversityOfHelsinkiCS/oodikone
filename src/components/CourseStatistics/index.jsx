@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Form, Button, Header, Checkbox, Message, Transition, List } from 'semantic-ui-react'
+import { Form, Button, Header, Checkbox, Message, Transition, List, Dropdown } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
+import _ from 'lodash'
 import Timeout from '../Timeout'
 import CourseSearch from '../CourseSearch'
 import CoursePassRateChart from '../CoursePassRateChart'
@@ -13,7 +14,7 @@ import { isValidYear, isInDateFormat, reformatDate, momentFromFormat } from '../
 import style from './courseStatistics.css'
 import sharedStyles from '../../styles/shared'
 
-const { shape, func, array } = PropTypes
+const { shape, func, array, string } = PropTypes
 
 const INITIAL_YEARS = {
   start: '2017',
@@ -28,7 +29,8 @@ class CourseStatistics extends Component {
     validYear: true,
     error: '',
     isLoading: false,
-    courseLevel: true
+    courseLevel: true,
+    selectedProgramme: 'all'
   }
 
   handleResultSelect = (e, { result }) => {
@@ -108,6 +110,9 @@ class CourseStatistics extends Component {
     const bool = this.state.separate
     this.setState({ separate: !bool })
   }
+  handleProgrammeChange = (e, { value }) => {
+    this.setState({ selectedProgramme: value })
+  }
 
   renderErrorMessage = () => {
     const { error } = this.state
@@ -120,6 +125,20 @@ class CourseStatistics extends Component {
     }
     return error
   }
+  renderDropdown = programmeOptions => (
+    <Dropdown
+      placeholder="Select study programme"
+      search
+      selection
+      value={this.state.selectedProgramme}
+      options={programmeOptions}
+      onChange={this.handleProgrammeChange}
+      closeOnChange
+      basic
+      header="Select programme"
+    />
+
+  )
 
   renderYearSelector = () => {
     const { validYear, start, end, isLoading } = this.state
@@ -193,6 +212,8 @@ class CourseStatistics extends Component {
 
   render() {
     const { data } = this.props.courseStatistics
+    const { language } = this.props
+    const { selectedProgramme } = this.state
     return (
       <div className={style.container}>
         <Header className={sharedStyles.segmentTitle} size="large">
@@ -202,17 +223,63 @@ class CourseStatistics extends Component {
         {this.renderErrorMessage()}
         <CourseSearch handleResultSelect={this.handleResultSelect} />
         <Transition.Group as={List} duration={700}>
-          {data.map(course => (
-            <List.Item key={course.code + course.start + course.end + course.separate}>
-              <CoursePassRateChart
-                removeCourseStatistics={this.removeCourseStatistics}
-                stats={course}
-                altCodes={course.alternativeCodes}
-                courseLevel={this.state.courseLevel}
-                courseLevelSwitch={this.handleCourseLevelSwitch}
-              />
-            </List.Item>
-            ))
+          {data.map((course) => {
+            let programmeOptions = course.programmes[0].map(p => ({
+              text: p.element_detail.name[language],
+              value: p.code
+            }))
+            const text = { en: 'all', fi: 'kaikki', sv: 'allt' }
+            programmeOptions = programmeOptions.concat({ text: text[language], value: 'all' })
+            programmeOptions = _.sortBy(programmeOptions, 'text')
+            let filteredstats = course.stats
+            if (selectedProgramme !== 'all') {
+              filteredstats = filteredstats.map(field =>
+                Object.entries(field).reduce((obj, [key, value]) => {
+                  switch (key) {
+                    case 'time':
+                      return ({ ...obj, [key]: value })
+
+                    case 'gradeDistribution':
+                      return {
+                        ...obj,
+                        [key]: Object.entries(value).reduce((distribution, [grade, students]) => ({
+                          ...distribution,
+                          [grade]: students.filter(({ student }) =>
+                            student.studyright_elements.some(e => e.code === selectedProgramme))
+                        }), {})
+                      }
+                    default:
+                      return {
+                        ...obj,
+                        [key]: value.filter(e =>
+                          e.studyright_elements.some(element => element.code === selectedProgramme))
+                      }
+                  }
+                }, {}))
+            }
+            const stats = []
+            Object.assign(stats, course)
+            const max = course.stats[0].courseLevelPassed.length +
+              course.stats[0].courseLevelFailed.length +
+              10
+            stats.stats = filteredstats
+            return (
+              <List.Item key={course.code + course.start + course.end + course.separate}>
+
+
+                <CoursePassRateChart
+                  removeCourseStatistics={this.removeCourseStatistics}
+                  stats={stats}
+                  max={max}
+                  altCodes={course.alternativeCodes}
+                  courseLevel={this.state.courseLevel}
+                  courseLevelSwitch={this.handleCourseLevelSwitch}
+                  dropdown={this.renderDropdown}
+                  programmeOptions={programmeOptions}
+                />
+              </List.Item>
+            )
+          })
           }
         </Transition.Group>
       </div>
@@ -226,12 +293,14 @@ CourseStatistics.propTypes = {
   courseStatistics: shape({
     data: array.isRequired,
     selected: array.isRequired
-  }).isRequired
+  }).isRequired,
+  language: string.isRequired
 }
 
-const mapStateToProps = ({ courses, courseStatistics }) => ({
+const mapStateToProps = ({ settings, courses, courseStatistics }) => ({
   courses,
-  courseStatistics
+  courseStatistics,
+  language: settings.language
 })
 
 const mapDispatchToProps = dispatch => ({
