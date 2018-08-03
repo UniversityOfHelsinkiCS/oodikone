@@ -5,6 +5,7 @@ import { Header, Button, Message, Table, Input, Segment, Icon, Loader } from 'se
 import { getDuplicates, addDuplicate, removeDuplicate } from '../../redux/coursecodeduplicates'
 
 import CourseSearch from '../CourseSearch'
+import LanguageChooser from '../LanguageChooser'
 import sharedStyles from '../../styles/shared'
 import styles from './courseCodeMapper.css'
 
@@ -118,25 +119,31 @@ class CourseCodeMapper extends Component {
               If this is not the case use this to combine old and new course codes to each other."
           />
           <Loader active={pending} />
-          <Segment.Group horizontal>
+          <Segment.Group vertical>
+            <Segment.Group horizontal>
+              <Segment>
+                <Header content="Filter course codes" />
+                <Input
+                  fluid
+                  placeholder="By Code"
+                  onChange={this.handleCodeFilterChange}
+                />
+                <Input
+                  fluid
+                  placeholder="By Name"
+                  onChange={this.handleNameFilterChange}
+                />
+              </Segment>
+              <Segment>
+                <Header>Add new corresponding code</Header>
+                <CourseSearch handleResultSelect={this.handleResultSelect1} />
+                <CourseSearch handleResultSelect={this.handleResultSelect2} />
+                <Button disabled={disabled} className={styles.button} content="Add" onClick={this.addDuplicate(this.state.code1, this.state.code2)} />
+              </Segment>
+            </Segment.Group>
             <Segment>
-              <Header content="Filter course codes" />
-              <Input
-                fluid
-                placeholder="By Code"
-                onChange={this.handleCodeFilterChange}
-              />
-              <Input
-                fluid
-                placeholder="By Name"
-                onChange={this.handleNameFilterChange}
-              />
-            </Segment>
-            <Segment>
-              <Header>Add new corresponding code</Header>
-              <CourseSearch handleResultSelect={this.handleResultSelect1} />
-              <CourseSearch handleResultSelect={this.handleResultSelect2} />
-              <Button disabled={disabled} className={styles.button} content="Add" onClick={this.addDuplicate(this.state.code1, this.state.code2)} />
+              <Header>Language</Header>
+              <LanguageChooser />
             </Segment>
           </Segment.Group>
           <Table striped>
