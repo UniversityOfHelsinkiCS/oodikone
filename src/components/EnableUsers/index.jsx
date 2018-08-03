@@ -3,6 +3,7 @@ import { Button, Dropdown, List, Item, Header, Segment } from 'semantic-ui-react
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
+import LanguageChooser from '../LanguageChooser'
 import { getUsers, enableUser, addUserUnit, removeUserUnit } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { makeSortUsers } from '../../selectors/users'
@@ -25,6 +26,7 @@ class EnableUsers extends Component {
   removeAccess = (uid, unit) => () => this.props.removeUserUnit(uid, unit)
 
   renderUnitList = (elementdetails, user) => {
+    const { language } = this.props
     if (!elementdetails) return null
     return (
       <List divided>
@@ -33,7 +35,7 @@ class EnableUsers extends Component {
             <List.Content floated="right">
               <Button floated="right" onClick={this.removeAccess(user, element.code)} content="Remove" size="tiny" />
             </List.Content>
-            <List.Content>{element.name.fi}</List.Content>
+            <List.Content>{element.name[language]}</List.Content>
           </List.Item>
         ))}
       </List>
@@ -41,13 +43,15 @@ class EnableUsers extends Component {
   }
 
   render() {
-    const { users, units, error } = this.props
-    const unitOptions = units.map(unit => ({ key: unit.id, value: unit.id, text: unit.name }))
+    const { users, units, error, language } = this.props
+    const unitOptions = units.map(unit =>
+      ({ key: unit.id, value: unit.id, text: unit.name[language] }))
     return error ? null : (
       <div className={sharedStyles.segmentContainer}>
         <Header className={sharedStyles.segmentTitle} size="large">
           Enable or disable access to Oodikone
         </Header>
+        <LanguageChooser />
         <Segment className={sharedStyles.contentSegment}>
           <Item.Group divided>
             {users.map(user => (
@@ -83,6 +87,7 @@ class EnableUsers extends Component {
 }
 
 EnableUsers.propTypes = {
+  language: string.isRequired,
   getUsers: func.isRequired,
   enableUser: func.isRequired,
   addUserUnit: func.isRequired,
@@ -90,7 +95,7 @@ EnableUsers.propTypes = {
   getUnits: func.isRequired,
   units: arrayOf(shape({
     id: string,
-    name: string
+    name: shape({}).isRequired
   })).isRequired,
   users: arrayOf(shape({
     id: string,
@@ -99,7 +104,7 @@ EnableUsers.propTypes = {
     username: string,
     units: arrayOf(shape({
       id: string,
-      name: string
+      name: shape({}).isRequired
     }))
   })).isRequired,
   error: bool.isRequired
@@ -107,7 +112,8 @@ EnableUsers.propTypes = {
 
 const sortUsers = makeSortUsers()
 
-const mapStateToProps = ({ locale, users, units }) => ({
+const mapStateToProps = ({ locale, users, units, settings }) => ({
+  language: settings.language,
   translate: getTranslate(locale),
   currentLanguage: getActiveLanguage(locale).value,
   units: units.data,
