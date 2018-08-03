@@ -281,22 +281,29 @@ class PopulationSearchForm extends Component {
       return <Message error color="red" header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi" />
     }
 
-    const sortedStudyProgrammes = _.sortBy(studyProgrammes.filter((s) => {
-      if (studyRights.degree) {
-        return s.associations.includes(studyRights.degree)
-      }
-      return true
-    }), s => s.text[language])
-    const sortedStudyDegrees = _.sortBy(degrees.filter((d) => {
-      if (studyRights.programme) {
-        return d.associations.includes(studyRights.programme)
-      }
-      return true
-    }), s => s.text[language])
+    let sortedStudyProgrammes = studyProgrammes
+    let programmesToRender
+    if (studyProgrammes) {
+      sortedStudyProgrammes = _.sortBy(studyProgrammes.filter((s) => {
+        if (studyRights.degree) {
+          return s.associations.includes(studyRights.degree)
+        }
+        return true
+      }), s => s.text[language])
+      programmesToRender = this.renderableList(sortedStudyProgrammes)
+    }
 
-    const programmesToRender = this.renderableList(sortedStudyProgrammes)
-    const degreesToRender = this.renderableList(sortedStudyDegrees)
-
+    let sortedStudyDegrees = degrees
+    let degreesToRender
+    if (sortedStudyDegrees) {
+      sortedStudyDegrees = _.sortBy(degrees.filter((d) => {
+        if (studyRights.programme) {
+          return d.associations.includes(studyRights.programme)
+        }
+        return true
+      }), s => s.text[language])
+      degreesToRender = this.renderableList(sortedStudyDegrees)
+    }
     return (
       <Form.Group id="rightGroup" horizontal="true" >
         <Form.Field
