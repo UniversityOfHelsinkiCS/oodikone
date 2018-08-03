@@ -263,7 +263,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
   return stats
 }
 
-const yearlyStatsOf = async (code, year, separate) => {
+const yearlyStatsOf = async (code, year, separate, language) => {
   const allInstances = await instancesOf(code)
   const alternatives = await getDuplicateCodes(code)
   let alternativeCodes = []
@@ -275,7 +275,7 @@ const yearlyStatsOf = async (code, year, separate) => {
 
   const yearInst = allInstances.filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-08-01', year.end + '-06-01'))
   const allInstancesUntilYear = allInstances.filter(inst => moment(new Date(inst.date)).isBefore(year.end + '-06-01'))
-  const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name.fi //Defaults finnish name
+  const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name[language]
   const start = Number(year.start)
   const end = Number(year.end)
   const results = []

@@ -45,7 +45,7 @@ router.get('/courseyearlystats', async (req, res) => {
     const { code } = req.query
     const years = { start: req.query.start, end: req.query.end }
     
-    results = await Course.yearlyStatsOf(code, years, req.query.separate)
+    results = await Course.yearlyStatsOf(code, years, req.query.separate, req.query.language)
   }
   res.json(results)
 })
