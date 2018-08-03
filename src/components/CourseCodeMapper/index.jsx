@@ -5,10 +5,11 @@ import { Header, Button, Message, Table, Input, Segment, Icon, Loader } from 'se
 import { getDuplicates, addDuplicate, removeDuplicate } from '../../redux/coursecodeduplicates'
 
 import CourseSearch from '../CourseSearch'
+import LanguageChooser from '../LanguageChooser'
 import sharedStyles from '../../styles/shared'
 import styles from './courseCodeMapper.css'
 
-const { func, shape } = PropTypes
+const { func, shape, string } = PropTypes
 
 
 class CourseCodeMapper extends Component {
@@ -24,8 +25,15 @@ class CourseCodeMapper extends Component {
     code2: ''
   }
 
+  getName = (name) => {
+    const { language } = this.props
+
+    const res = name[language] ? name[language] : name.fi
+    return res
+  }
+
   getTableRows = () => {
-    const { courseCodeDuplicates } = this.props
+    const { courseCodeDuplicates, language } = this.props
     const { data } = courseCodeDuplicates
     const filteredKeys = this.filterNames(data, this.filterCodes(data))
     const rows = filteredKeys.map((key) => {
@@ -33,7 +41,7 @@ class CourseCodeMapper extends Component {
       return (
         <Table.Row key={key + Object.keys(course.alt).map(altkey => altkey + course.alt[key])}>
           <Table.Cell>{key}</Table.Cell>
-          <Table.Cell>{course.name}</Table.Cell>
+          <Table.Cell>{this.getName(course.name)}</Table.Cell>
           <Table.Cell>{course.main}</Table.Cell>
           <Table.Cell>{Object.keys(course.alt).map(altkey => (
             <React.Fragment key={course.alt[altkey] + altkey}>
@@ -42,7 +50,7 @@ class CourseCodeMapper extends Component {
             </React.Fragment>))}
           </Table.Cell>
           <Table.Cell>
-            {Object.keys(course.alt).map(altKey => course.alt[altKey]).toString()}
+            {Object.keys(course.alt).map(altKey => course.alt[altKey][language]).toString()}
           </Table.Cell>
         </Table.Row>)
     })
@@ -54,9 +62,9 @@ class CourseCodeMapper extends Component {
     return keys.filter((key) => {
       const course = duplicates[key]
       return (
-        course.name.toLocaleLowerCase().includes(filter) ||
+        this.getName(course.name).toLocaleLowerCase().includes(filter) ||
         Object.values(course.alt).find(name =>
-          name.toLocaleLowerCase().includes(filter))
+          this.getName(name).toLocaleLowerCase().includes(filter))
       )
     })
   }
@@ -111,25 +119,31 @@ class CourseCodeMapper extends Component {
               If this is not the case use this to combine old and new course codes to each other."
           />
           <Loader active={pending} />
-          <Segment.Group horizontal>
+          <Segment.Group vertical>
+            <Segment.Group horizontal>
+              <Segment>
+                <Header content="Filter course codes" />
+                <Input
+                  fluid
+                  placeholder="By Code"
+                  onChange={this.handleCodeFilterChange}
+                />
+                <Input
+                  fluid
+                  placeholder="By Name"
+                  onChange={this.handleNameFilterChange}
+                />
+              </Segment>
+              <Segment>
+                <Header>Add new corresponding code</Header>
+                <CourseSearch handleResultSelect={this.handleResultSelect1} />
+                <CourseSearch handleResultSelect={this.handleResultSelect2} />
+                <Button disabled={disabled} className={styles.button} content="Add" onClick={this.addDuplicate(this.state.code1, this.state.code2)} />
+              </Segment>
+            </Segment.Group>
             <Segment>
-              <Header content="Filter course codes" />
-              <Input
-                fluid
-                placeholder="By Code"
-                onChange={this.handleCodeFilterChange}
-              />
-              <Input
-                fluid
-                placeholder="By Name"
-                onChange={this.handleNameFilterChange}
-              />
-            </Segment>
-            <Segment>
-              <Header>Add new corresponding code</Header>
-              <CourseSearch handleResultSelect={this.handleResultSelect1} />
-              <CourseSearch handleResultSelect={this.handleResultSelect2} />
-              <Button disabled={disabled} className={styles.button} content="Add" onClick={this.addDuplicate(this.state.code1, this.state.code2)} />
+              <Header>Language</Header>
+              <LanguageChooser />
             </Segment>
           </Segment.Group>
           <Table striped>
@@ -153,14 +167,16 @@ class CourseCodeMapper extends Component {
 }
 
 CourseCodeMapper.propTypes = {
+  language: string.isRequired,
   getDuplicates: func.isRequired,
   addDuplicate: func.isRequired,
   removeDuplicate: func.isRequired,
   courseCodeDuplicates: shape({}).isRequired
 }
 
-const mapStateToProps = ({ courseCodeDuplicates }) => ({
-  courseCodeDuplicates
+const mapStateToProps = ({ courseCodeDuplicates, settings }) => ({
+  courseCodeDuplicates,
+  language: settings.language
 })
 
 const mapDispatchToProps = dispatch => ({
