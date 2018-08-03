@@ -7,7 +7,7 @@ const parseUtcDate = date => moment.utc(date).format('YYYY-MM-DD')
 router.get('/courses', async (req, res) => {
   let results = []
   if (req.query.name) {
-    results = await Course.bySearchTerm(req.query.name)
+    results = await Course.bySearchTerm(req.query.name, req.query.language)
   }
 
   res.json(results)

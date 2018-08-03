@@ -15,12 +15,12 @@ if (process.env.NODE_ENV !== 'test') {
   require('bluebird').promisifyAll(redis.RedisClient.prototype)
 }
 
-const byNameOrCode = (searchTerm) => Course.findAll({
+const byNameOrCode = (searchTerm, language) => Course.findAll({
   where: {
     [Op.or]: [
       {
         name: {
-          fi: {
+          [language]: {
             [Op.iLike]: searchTerm
           }
         }
@@ -86,11 +86,11 @@ const byIds = (ids) => Student.findAll({
   }
 })
 
-const bySearchTerm = async (term) => {
-  const formatCourse = (course) => ({ name: course.name.fi, code: course.code })
+const bySearchTerm = async (term, language) => {
+  const formatCourse = (course) => ({ name: course.name[language], code: course.code })
 
   try {
-    const result = await byNameOrCode(`%${term}%`)
+    const result = await byNameOrCode(`%${term}%`, language)
     return result.map(formatCourse)
   } catch (e) {
     return {
@@ -412,7 +412,7 @@ const setDuplicateCode = async (code, duplicate) => {
       }
       all[code] = {
         main: main,
-        name: course.name.fi,
+        name: course.name,
         alt: {}
       }
     }
@@ -421,10 +421,10 @@ const setDuplicateCode = async (code, duplicate) => {
       if (isMainCode(duplicate)) {
         all[code].main = duplCourse.code
       }
-      all[code].alt[duplicate] = duplCourse.name.fi
+      all[code].alt[duplicate] = duplCourse.name
       if (!all[code].main) {
         all[code].main = selectMain(code, all[code])
-        all[code].name = course.name.fi
+        all[code].name = course.name
       }
       await redisClient.setAsync('duplicates', JSON.stringify(all))
     }
