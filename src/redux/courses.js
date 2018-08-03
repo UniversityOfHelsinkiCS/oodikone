@@ -1,7 +1,7 @@
 import { callController } from '../apiConnection'
 
-export const findCourses = (searchStr) => {
-  const route = `/courses/?name=${searchStr}`
+export const findCourses = (searchStr, language) => {
+  const route = `/courses/?name=${searchStr}&language=${language}`
   const prefix = 'FIND_COURSES_'
   return callController(route, prefix)
 }
