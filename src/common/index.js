@@ -51,6 +51,20 @@ export const getUserName = async () => {
   return token ? decodeToken(token).userId : false
 }
 
+export const setUserLanguage = (language) => {
+  localStorage.setItem('language', language)
+}
+
+export const getUserLanguage = async () => {
+  let lang = localStorage.getItem('language')
+  if (!lang) {
+    const token = await getToken()
+    lang = decodeToken(token).language
+    setUserLanguage(lang)
+  }
+  return lang
+}
+
 export const userIsEnabled = async () => {
   const token = await getToken()
   return token ? decodeToken(token).enabled : false

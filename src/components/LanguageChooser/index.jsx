@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Dropdown } from 'semantic-ui-react'
 import PropTypes from 'prop-types'
 
-import { switchLanguage } from '../../redux/settings'
+import { getUserName, setUserLanguage, getUserLanguage } from '../../common'
+import { switchLanguage, initLanguage } from '../../redux/settings'
 
 const { func, shape, string } = PropTypes
 
@@ -13,35 +14,48 @@ const languages = [
   { key: 'sv', text: 'sv', value: 'sv' }
 ]
 
-const LanguageChooser = (props) => {
-  const change = () => (e, { value }) => {
-    props.switchLanguage(value)
+class LanguageChooser extends Component {
+  async componentDidMount() {
+    const initialLanguage = await getUserLanguage()
+    this.props.initLanguage(initialLanguage)
   }
-  return (
-    <Dropdown
-      size="small"
-      className="icon"
-      floating
-      icon="world"
-      onChange={change()}
-      text={props.settings.language}
-      options={languages}
-      button
-    />
-  )
+
+  change = () => async (e, { value }) => {
+    const name = await getUserName()
+    this.props.switchLanguage(name, value)
+    await setUserLanguage(value)
+  }
+  render() {
+    return (
+      <Dropdown
+        size="small"
+        className="icon"
+        floating
+        icon="world"
+        onChange={this.change()}
+        text={this.props.settings.language}
+        options={languages}
+        button
+      />
+    )
+  }
 }
+
 const mapStateToProps = ({ settings }) => ({
   settings
 })
 
 const mapDispatchToProps = dispatch => ({
-  switchLanguage: language =>
-    dispatch(switchLanguage(language))
+  switchLanguage: (username, language) =>
+    dispatch(switchLanguage(username, language)),
+  initLanguage: language =>
+    dispatch(initLanguage(language))
 })
 
 LanguageChooser.propTypes = {
   settings: shape({ language: string.isRequired }).isRequired,
-  switchLanguage: func.isRequired
+  switchLanguage: func.isRequired,
+  initLanguage: func.isRequired
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LanguageChooser)
