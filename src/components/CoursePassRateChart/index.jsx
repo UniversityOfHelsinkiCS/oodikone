@@ -11,7 +11,7 @@ import styles from './coursePassRateChart.css'
 
 import { chartblue, chartdarkg, chartlgreen, chartdarkred, chartlred, turquoise, red, green } from '../../styles/variables/colors'
 
-const { array, shape, string, func, arrayOf, bool, object } = PropTypes
+const { string, func, arrayOf, bool, object } = PropTypes
 
 const CustomizedLabel = (props) => {
   CustomizedLabel.propTypes = {
