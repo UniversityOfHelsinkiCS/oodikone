@@ -7,7 +7,7 @@ const parseUtcDate = date => moment.utc(date).format('YYYY-MM-DD')
 router.get('/courses', async (req, res) => {
   let results = []
   if (req.query.name) {
-    results = await Course.bySearchTerm(req.query.name)
+    results = await Course.bySearchTerm(req.query.name, req.query.language)
   }
 
   res.json(results)
@@ -45,7 +45,7 @@ router.get('/courseyearlystats', async (req, res) => {
     const { code } = req.query
     const years = { start: req.query.start, end: req.query.end }
     
-    results = await Course.yearlyStatsOf(code, years, req.query.separate)
+    results = await Course.yearlyStatsOf(code, years, req.query.separate, req.query.language)
   }
   res.json(results)
 })

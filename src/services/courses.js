@@ -15,12 +15,12 @@ if (process.env.NODE_ENV !== 'test') {
   require('bluebird').promisifyAll(redis.RedisClient.prototype)
 }
 
-const byNameOrCode = (searchTerm) => Course.findAll({
+const byNameOrCode = (searchTerm, language) => Course.findAll({
   where: {
     [Op.or]: [
       {
         name: {
-          fi: {
+          [language]: {
             [Op.iLike]: searchTerm
           }
         }
@@ -113,11 +113,11 @@ const byIds = (ids) => Student.findAll({
   }
 })
 
-const bySearchTerm = async (term) => {
-  const formatCourse = (course) => ({ name: course.name.fi, code: course.code })
+const bySearchTerm = async (term, language) => {
+  const formatCourse = (course) => ({ name: course.name[language], code: course.code })
 
   try {
-    const result = await byNameOrCode(`%${term}%`)
+    const result = await byNameOrCode(`%${term}%`, language)
     return result.map(formatCourse)
   } catch (e) {
     return {
@@ -294,7 +294,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
   return { stats: stats, programmes: programmes }
 }
 
-const yearlyStatsOf = async (code, year, separate) => {
+const yearlyStatsOf = async (code, year, separate, language) => {
   const allInstances = await instancesOf(code)
   const alternatives = await getDuplicateCodes(code)
   let alternativeCodes = []
@@ -306,7 +306,7 @@ const yearlyStatsOf = async (code, year, separate) => {
 
   const yearInst = allInstances.filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-08-01', year.end + '-06-01'))
   const allInstancesUntilYear = allInstances.filter(inst => moment(new Date(inst.date)).isBefore(year.end + '-06-01'))
-  const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name.fi //Defaults finnish name
+  const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name[language]
   const start = Number(year.start)
   const end = Number(year.end)
   const resultStats = []
@@ -447,7 +447,7 @@ const setDuplicateCode = async (code, duplicate) => {
       }
       all[code] = {
         main: main,
-        name: course.name.fi,
+        name: course.name,
         alt: {}
       }
     }
@@ -456,10 +456,10 @@ const setDuplicateCode = async (code, duplicate) => {
       if (isMainCode(duplicate)) {
         all[code].main = duplCourse.code
       }
-      all[code].alt[duplicate] = duplCourse.name.fi
+      all[code].alt[duplicate] = duplCourse.name
       if (!all[code].main) {
         all[code].main = selectMain(code, all[code])
-        all[code].name = course.name.fi
+        all[code].name = course.name
       }
       await redisClient.setAsync('duplicates', JSON.stringify(all))
     }
