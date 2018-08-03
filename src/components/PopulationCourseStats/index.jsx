@@ -76,7 +76,7 @@ class PopulationCourseStats extends Component {
     }
     return course.stats.students >= this.state.limit
   }
-  renderGradeDistributionTable = ({ translate, sortBy, courses }) => (
+  renderGradeDistributionTable = ({ translate, sortBy, courses, language }) => (
     <Table celled sortable>
       <Table.Header>
         <Table.Row>
@@ -123,7 +123,7 @@ class PopulationCourseStats extends Component {
             trigger={
               <Table.Row active={this.active(course.course)}>
                 <Table.Cell onClick={this.limitPopulationToCourse(course)}>
-                  {course.course.name.fi}
+                  {course.course.name[language]}
                 </Table.Cell>
                 <Table.Cell>{course.course.code}</Table.Cell>
                 <Table.Cell>
@@ -167,7 +167,7 @@ class PopulationCourseStats extends Component {
       </Table.Body>
     </Table>
   )
-  renderBasicTable = ({ translate, sortBy, direction, courses }) => (
+  renderBasicTable = ({ translate, sortBy, direction, courses, language }) => (
     <Table celled sortable>
       <Table.Header>
         <Table.Row>
@@ -251,7 +251,7 @@ class PopulationCourseStats extends Component {
         {courses.coursestatistics.sort(this.criteria()).filter(this.limit()).map(course => (
           <Table.Row key={course.course.code} active={this.active(course.course)}>
             <Table.Cell onClick={this.limitPopulationToCourse(course)}>
-              {course.course.name.fi}
+              {course.course.name[language]}
             </Table.Cell>
             <Table.Cell>{course.course.code}</Table.Cell>
             <Table.Cell>
@@ -314,6 +314,7 @@ const mapStateToProps = (state) => {
   const courseFilters = state.populationFilters.filters.filter(f => f.type === 'CourseParticipation')
   const selectedCourses = courseFilters.map(f => f.params.course.course)
   return {
+    language: state.settings.language,
     translate: getTranslate(state.locale),
     selectedCourses,
     populationSize: state.populations.data.length > 0 ? state.populations.data.length : 0

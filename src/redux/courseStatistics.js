@@ -1,7 +1,7 @@
 import { callController } from '../apiConnection'
 
-export const getCourseStatistics = ({ code, start, end, separate }) => {
-  const route = `/courseyearlystats/?start=${start}&code=${code}&end=${end}&separate=${separate}`
+export const getCourseStatistics = ({ code, start, end, separate, language }) => {
+  const route = `/courseyearlystats/?start=${start}&code=${code}&end=${end}&separate=${separate}&language=${language}`
   const prefix = 'FIND_COURSE_STATISTICS_'
   return callController(route, prefix)
 }

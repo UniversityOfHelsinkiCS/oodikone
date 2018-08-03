@@ -55,9 +55,9 @@ class PopulationSearchHistory extends Component {
   }
 }
 
-const mapStateToProps = ({ populations, units, locale }) => ({
+const mapStateToProps = ({ populations, populationDegreesAndProgrammes, locale }) => ({
   populations,
-  units,
+  units: populationDegreesAndProgrammes,
   translate: getTranslate(locale)
 })
 
