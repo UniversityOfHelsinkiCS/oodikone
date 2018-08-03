@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import { Dropdown, Header, List, Button } from 'semantic-ui-react'
 import CourseInstanceStatistics from '../CourseInstanceStatistics'
 import CourseSearch from '../CourseSearch'
+import LanguageChooser from '../LanguageChooser'
 import Timeout from '../Timeout'
 
 import { reformatDate } from '../../common'
@@ -75,6 +76,7 @@ class CourseInstances extends Component {
         <Header className={sharedStyles.segmentTitle} size="large">
           Course Statistics
         </Header>
+        <LanguageChooser />
         <CourseSearch handleResultSelect={this.handleResultSelect} />
 
         <Header as="h3">

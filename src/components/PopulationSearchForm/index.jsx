@@ -12,7 +12,7 @@ import { getPopulationStatistics, clearPopulations } from '../../redux/populatio
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationFilters } from '../../redux/populationFilters'
 
-import { getUnits } from '../../redux/units'
+import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { isInDateFormat, momentFromFormat, reformatDate, isValidYear } from '../../common'
 import { makeMapRightsToDropDown } from '../../selectors/populationSearchForm'
 import { setLoading } from '../../redux/graphSpinner'
@@ -26,7 +26,7 @@ class PopulationSearchForm extends Component {
   static propTypes = {
     language: string.isRequired,
     translate: func.isRequired,
-    getUnits: func.isRequired,
+    getDegreesAndProgrammes: func.isRequired,
     getPopulationStatistics: func.isRequired,
     getPopulationCourses: func.isRequired,
     getPopulationFilters: func.isRequired,
@@ -58,7 +58,7 @@ class PopulationSearchForm extends Component {
   componentDidMount() {
     const { studyProgrammes } = this.props
     if (!studyProgrammes || studyProgrammes.length === 0) {
-      this.props.getUnits()
+      this.props.getDegreesAndProgrammes()
     }
   }
 
@@ -281,22 +281,29 @@ class PopulationSearchForm extends Component {
       return <Message error color="red" header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi" />
     }
 
-    const sortedStudyProgrammes = _.sortBy(studyProgrammes.filter((s) => {
-      if (studyRights.degree) {
-        return s.associations.includes(studyRights.degree)
-      }
-      return true
-    }), s => s.text[language])
-    const sortedStudyDegrees = _.sortBy(degrees.filter((d) => {
-      if (studyRights.programme) {
-        return d.associations.includes(studyRights.programme)
-      }
-      return true
-    }), s => s.text[language])
+    let sortedStudyProgrammes = studyProgrammes
+    let programmesToRender
+    if (studyProgrammes) {
+      sortedStudyProgrammes = _.sortBy(studyProgrammes.filter((s) => {
+        if (studyRights.degree) {
+          return s.associations.includes(studyRights.degree)
+        }
+        return true
+      }), s => s.text[language])
+      programmesToRender = this.renderableList(sortedStudyProgrammes)
+    }
 
-    const programmesToRender = this.renderableList(sortedStudyProgrammes)
-    const degreesToRender = this.renderableList(sortedStudyDegrees)
-
+    let sortedStudyDegrees = degrees
+    let degreesToRender
+    if (sortedStudyDegrees) {
+      sortedStudyDegrees = _.sortBy(degrees.filter((d) => {
+        if (studyRights.programme) {
+          return d.associations.includes(studyRights.programme)
+        }
+        return true
+      }), s => s.text[language])
+      degreesToRender = this.renderableList(sortedStudyDegrees)
+    }
     return (
       <Form.Group id="rightGroup" horizontal="true" >
         <Form.Field
@@ -421,9 +428,9 @@ class PopulationSearchForm extends Component {
 
 const mapRightsToDropdown = makeMapRightsToDropDown()
 
-const mapStateToProps = ({ settings, populations, units, locale }) => {
-  const rawStudyrights = units || []
-  const { pending } = units
+const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes, locale }) => {
+  const rawStudyrights = populationDegreesAndProgrammes || []
+  const { pending } = populationDegreesAndProgrammes
   const studyRights = mapRightsToDropdown(rawStudyrights)
   return ({
     language: settings.language,
@@ -439,7 +446,7 @@ const mapDispatchToProps = dispatch => ({
   getPopulationStatistics: request => dispatch(getPopulationStatistics(request)),
   getPopulationCourses: request => dispatch(getPopulationCourses(request)),
   getPopulationFilters: request => dispatch(getPopulationFilters(request)),
-  getUnits: () => dispatch(getUnits()),
+  getDegreesAndProgrammes: () => dispatch(getDegreesAndProgrammes()),
   clearPopulations: () => dispatch(clearPopulations()),
   setLoading: () => dispatch(setLoading())
 })

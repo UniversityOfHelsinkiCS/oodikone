@@ -7,6 +7,7 @@ import _ from 'lodash'
 import Timeout from '../Timeout'
 import CourseSearch from '../CourseSearch'
 import CoursePassRateChart from '../CoursePassRateChart'
+import LanguageChooser from '../LanguageChooser'
 import { getCourseStatistics, removeCourseStatistics } from '../../redux/courseStatistics'
 import { isValidYear, isInDateFormat, reformatDate, momentFromFormat } from '../../common'
 
@@ -55,7 +56,14 @@ class CourseStatistics extends Component {
     const { code } = this.state.selectedCourse
     const { start, end, separate } = this.state
     const { selected } = this.props.courseStatistics
-    const query = { code, start: Number(start), end: Number(end), separate: String(separate) }
+    const { language } = this.props
+    const query = {
+      code,
+      start: Number(start),
+      end: Number(end),
+      separate: String(separate),
+      language
+    }
     const aa = selected.find(olquery =>
       olquery.separate === query.separate &&
       olquery.end === query.end &&
@@ -205,6 +213,10 @@ class CourseStatistics extends Component {
               onChange={this.handleSemesterSeparate}
             />
           </Form.Field>
+          <Form.Field error={!validYear} className={style.yearSelect}>
+            <label>Language</label>
+            <LanguageChooser />
+          </Form.Field>
         </Form.Group>
       </Form>
     )
@@ -288,13 +300,13 @@ class CourseStatistics extends Component {
 }
 
 CourseStatistics.propTypes = {
+  language: string.isRequired,
   getCourseStatistics: func.isRequired,
   removeCourseStatistics: func.isRequired,
   courseStatistics: shape({
     data: array.isRequired,
     selected: array.isRequired
-  }).isRequired,
-  language: string.isRequired
+  }).isRequired
 }
 
 const mapStateToProps = ({ settings, courses, courseStatistics }) => ({

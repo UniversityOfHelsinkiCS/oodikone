@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown } from 'semantic-ui-react'
-import { shape, func, arrayOf, object } from 'prop-types'
+import { shape, func, arrayOf, object, string } from 'prop-types'
 import _ from 'lodash'
 import { extentGraduated } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
 class ExtentGraduated extends Component {
   static propTypes = {
+    language: string.isRequired,
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
@@ -31,9 +32,10 @@ class ExtentGraduated extends Component {
     this.props.removePopulationFilter(this.props.filter.id)
   }
   renderSetText = (extents, filter) => {
+    const { language } = this.props
     const { extentcode, graduated } = filter.params
 
-    let returnText = `Studying ${extents.find(extent => extent.extentcode === extentcode).name.fi} `
+    let returnText = `Studying ${extents.find(extent => extent.extentcode === extentcode).name[language]} `
     if (graduated === 'grad') {
       returnText = returnText.concat(' and graduated')
     } else {
@@ -43,7 +45,7 @@ class ExtentGraduated extends Component {
   }
 
   render() {
-    const { filter, extents } = this.props
+    const { filter, extents, language } = this.props
     if (filter.notSet) {
       return (
         <Segment>
@@ -73,7 +75,7 @@ class ExtentGraduated extends Component {
                     Object.values(extents).map(({
                       extentcode, name
                     }) =>
-                      ({ value: extentcode, text: name.fi })),
+                      ({ value: extentcode, text: name[language] })),
                     entry => entry.text
                   )}
                 />
@@ -104,7 +106,9 @@ class ExtentGraduated extends Component {
   }
 }
 
+const mapStateToProps = ({ settings }) => ({ language: settings.language })
+
 export default connect(
-  null,
+  mapStateToProps,
   { setPopulationFilter, removePopulationFilter }
 )(ExtentGraduated)
