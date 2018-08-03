@@ -44,7 +44,7 @@ class StudentDetails extends Component {
   }
 
   renderCourseParticipation = () => {
-    const { translate, student } = this.props
+    const { translate, student, language } = this.props
 
     const courseHeaders = [
       translate('common.date'),
@@ -57,7 +57,7 @@ class StudentDetails extends Component {
         date, grade, credits, course, isStudyModuleCredit, passed
       } = c
       return {
-        date, course: `${isStudyModuleCredit ? `${course.name.fi} [Study Module]` : course.name.fi} (${course.code})`, grade, credits, passed
+        date, course: `${isStudyModuleCredit ? `${course.name[language]} [Study Module]` : course.name[language]} (${course.code})`, grade, credits, passed
       }
     })
     return (
@@ -157,6 +157,7 @@ class StudentDetails extends Component {
 }
 
 StudentDetails.propTypes = {
+  language: string.isRequired,
   getStudent: func.isRequired,
   history: shape({}).isRequired,
   resetStudent: func.isRequired,
@@ -187,7 +188,8 @@ StudentDetails.defaultProps = {
   studentNumber: ''
 }
 
-const mapStateToProps = ({ students }) => ({
+const mapStateToProps = ({ students, settings }) => ({
+  language: settings.language,
   student: students.data.find(student =>
     student.studentNumber === students.selected)
 })
