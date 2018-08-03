@@ -125,7 +125,7 @@ router.post('/updatedatabase', async (req, res) => {
   }
 })
 
-router.get('/studyprogrammes', async (req, res) => {
+router.get('/v2/populationstatistics/studyprogrammes', async (req, res) => {
   try {
     const { admin, userId } = req.decodedToken
     if (!admin) {

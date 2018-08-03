@@ -28,15 +28,14 @@ const runMigrations = async () => {
     })
     const migrations = await migrator.up()
 
-    console.log('MIGRATION COMPLEETED', migrations)
+    console.log('Migrations up to date', migrations)
   } catch (e) {
-    console.log('WE DIDN\'T DO IT BOSS', e)
+    console.log('Migration error, message:', e)
   }
 }
 
-const migrationPromise = conf.DB_SCHEMA === 'public' ? sequelize.sync({ force: false })
+const migrationPromise = conf.DB_SCHEMA === 'public' ? runMigrations()
   : Promise.resolve()
-
 
 const forceSyncDatabase = async () => {
   await sequelize.sync({ force: true })
