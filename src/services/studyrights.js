@@ -136,7 +136,7 @@ const formatStudyrightElements = (elements, associations) => elements.map(elemen
   name: element.name,
   enabled: true,
   type: element.type,
-  associations: associations[element.code]
+  associations: associations && associations[element.code]
 }))
 
 const getAllStudyrightElementsAndAssociations = async () => {
@@ -154,6 +154,17 @@ const getStudyrightElementsAndAssociationsForUser = async username => {
   return formatStudyrightElements(studyrightelements, associations)
 }
 
+const getAllDegreesAndProgrammes = async () => {
+  const elementDetails = ElementDetails.findAll({
+    where: {
+      type: {
+        [Op.in]: [10, 20]
+      }
+    }
+  })
+  return formatStudyrightElements(elementDetails)
+}
+
 module.exports = {
   byStudent,
   createStudyright,
@@ -161,5 +172,6 @@ module.exports = {
   studentNumbersWithAllStudyRightElements,
   getAssociatedStudyrights,
   getAllStudyrightElementsAndAssociations,
-  getStudyrightElementsAndAssociationsForUser
+  getStudyrightElementsAndAssociationsForUser,
+  getAllDegreesAndProgrammes
 }

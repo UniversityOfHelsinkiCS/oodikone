@@ -8,7 +8,7 @@ const students = require('./routes/students')
 const population = require('./routes/population')
 const login = require('./routes/login')
 const users = require('./routes/users')
-
+const elementdetails = require('./routes/elementdetails')
 const auth = require('./middleware/auth')
 
 const accessLogger = morgan((tokens, req, res) => {
@@ -36,4 +36,5 @@ module.exports = (app, url) => {
   app.use(url, population)
   app.use(auth.checkAdminAuth)
   app.use(url, users)
+  app.use(url, elementdetails)
 }
