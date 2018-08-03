@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { Header, Button, Message } from 'semantic-ui-react'
 import CourseCodeMapper from '../CourseCodeMapper'
-import LanguageChooser from '../LanguageChooser'
-
 
 import sharedStyles from '../../styles/shared'
 
@@ -31,7 +29,6 @@ class Settings extends Component {
         <Message content="Visible only for admins for now" />
         <Header className={sharedStyles.segmentTitle} size="large">Settings</Header>
         <Button.Group >
-          <LanguageChooser />
           <Button onClick={() => this.select(1)}>Course code Mapping</Button>
         </Button.Group>
         {selectedComponent}
