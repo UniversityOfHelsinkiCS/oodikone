@@ -119,6 +119,7 @@ class CreditAccumulationGraph extends Component {
 
   getStudentCourseData = (student) => {
     const { studentNumber, courses, studyrightStart, started } = student
+    const { language } = this.props
 
     const startDate = this.props.selectedStudents.length === 1 ? started : studyrightStart
 
@@ -134,7 +135,7 @@ class CreditAccumulationGraph extends Component {
         totalCredits += credits
       }
       return {
-        title: `${course.name.fi} (${course.code})`,
+        title: `${course.name[language]} (${course.code})`,
         [studentNumber]: totalCredits,
         credits,
         date: reformatDate(date, DISPLAY_DATE_FORMAT),
@@ -289,6 +290,7 @@ class CreditAccumulationGraph extends Component {
 }
 
 CreditAccumulationGraph.propTypes = {
+  language: string.isRequired,
   translate: func.isRequired,
   students: arrayOf(object).isRequired,
   title: string.isRequired,
@@ -300,6 +302,7 @@ CreditAccumulationGraph.propTypes = {
 }
 
 const mapStateToProps = state => ({
+  language: state.settings.language,
   spinner: state.graphSpinner
 })
 
