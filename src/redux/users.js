@@ -64,6 +64,7 @@ const reducer = (state = { data: [] }, action) => {
     case 'ENABLE_USER_SUCCESS':
       return {
         ...state,
+        pending: false,
         data: state.data.filter(a => a.id !== action.response.id)
           .concat(action.response)
       }
