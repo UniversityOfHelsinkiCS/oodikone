@@ -113,6 +113,9 @@ const Credit = sequelize.define('credit',
     indexes: [
       {
         fields: ['student_studentnumber']
+      },
+      {
+        fields: ['courseinstance_id']
       }
     ]
   }
@@ -224,6 +227,9 @@ const CourseInstance = sequelize.define('courseinstance',
     indexes: [
       {
         fields: ['coursedate']
+      },
+      {
+        fields: ['course_code']
       }
     ]
   }
@@ -245,7 +251,7 @@ const Course = sequelize.define('course',
       get() {
         const coursetypecode = this.getDataValue('coursetypecode')
         const coursename = this.getDataValue('name')
-        const name = coursename['fi'] ? coursename['fi'].toLowerCase() : null 
+        const name = coursename['fi'] ? coursename['fi'].toLowerCase() : null
         if (name) {
           return STUDY_MODULE_COURSE_TYPES.some(typecode => typecode === coursetypecode) ||
             STUDY_MODULE_HEURISTICS.some(moduleName => name.includes(moduleName))
@@ -431,7 +437,7 @@ const SemesterEnrollment = sequelize.define('semester_enrollment', {
     {
       fields: ['semestercode', 'studentnumber'],
       unique: true
-    },{
+    }, {
       fields: ['studentnumber']
     }
   ]
