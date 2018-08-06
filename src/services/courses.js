@@ -2,8 +2,7 @@ const Sequelize = require('sequelize')
 const moment = require('moment')
 const redis = require('redis')
 const conf = require('../conf-backend')
-const { sequelize, Student, Credit, CourseInstance, Course, CourseTeacher, CourseType, ElementDetails, StudyrightElement } = require('../models')
-const { arrayUnique } = require('../util')
+const { sequelize, Student, Credit, CourseInstance, Course, CourseType, ElementDetails, StudyrightElement } = require('../models')
 const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
 const _ = require('lodash')
@@ -187,8 +186,6 @@ const instancesOf = async (code) => {
     return moment(a.coursedate).isSameOrBefore(b.coursedate) ? -1 : 1
   }
 
-
-
   const formatInstance = (instance) => {
     return {
       id: instance.id,
@@ -295,14 +292,10 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 }
 
 const yearlyStatsOf = async (code, year, separate, language) => {
-  const allInstances = await instancesOf(code)
   const alternatives = await getDuplicateCodes(code)
   let alternativeCodes = []
-  if (alternatives) {
-    alternativeCodes = Object.keys(alternatives.alt)
-    const alternativeInstances = await Promise.all(alternativeCodes.map(code => instancesOf(code)))
-    alternativeInstances.forEach(inst => allInstances.push(...inst))
-  }
+  const codes = alternatives ? [code, ...Object.keys(alternatives.alt)] : [code]
+  const allInstances = _.flatten((await Promise.all(codes.map(code => instancesOf(code)))))
 
   const yearInst = allInstances.filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-08-01', year.end + '-06-01'))
   const allInstancesUntilYear = allInstances.filter(inst => moment(new Date(inst.date)).isBefore(year.end + '-06-01'))
