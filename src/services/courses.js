@@ -293,7 +293,6 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 
 const yearlyStatsOf = async (code, year, separate, language) => {
   const alternatives = await getDuplicateCodes(code)
-  let alternativeCodes = []
   const codes = alternatives ? [code, ...Object.keys(alternatives.alt)] : [code]
   const allInstances = _.flatten((await Promise.all(codes.map(code => instancesOf(code)))))
 
@@ -313,7 +312,7 @@ const yearlyStatsOf = async (code, year, separate, language) => {
         resultProgrammes.push(stats.programmes)
       }
     }
-    return { code, alternativeCodes, start, end, separate, stats: resultStats, programmes: resultProgrammes, name }
+    return { code, alternativeCodes: codes.filter(cd => cd !==  code), start, end, separate, stats: resultStats, programmes: resultProgrammes, name }
   }
   return
 }
