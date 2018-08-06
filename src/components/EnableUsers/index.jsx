@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Button, Dropdown, List, Item, Header, Segment } from 'semantic-ui-react'
+import { withRouter, Redirect } from 'react-router-dom'
+import { Button, Icon, List, Card, Header, Segment, Dropdown, Form, Divider } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
@@ -10,20 +11,49 @@ import { makeSortUsers } from '../../selectors/users'
 import sharedStyles from '../../styles/shared'
 
 class EnableUsers extends Component {
+  state = {
+    selected: null
+  }
+
   componentDidMount() {
     this.props.getUsers()
     this.props.getUnits()
+  }
+
+  getDisabledUnits = (units, enabled) => {
+    const enabledIds = new Set(enabled.map(element => element.code))
+    return units.filter(u => !enabledIds.has(u.id))
   }
 
   enableUser = id => () => this.props.enableUser(id)
 
   handleChange = user => (e, { value }) => {
     if (!user.elementdetails.find(element => element.code === value)) {
-      this.props.addUserUnit(user.id, value)
+      this.setState({
+        selected: value
+      })
     }
   }
 
+  enableAccessRightToUser = userid => async () => {
+    const unit = this.state.selected
+    await this.props.addUserUnit(userid, unit)
+    this.setState({
+      selected: null
+    })
+  }
+
   removeAccess = (uid, unit) => () => this.props.removeUserUnit(uid, unit)
+
+  openEditUserPage = userid => () => {
+    const { history } = this.props
+    history.push(`users/${userid}`)
+  }
+
+  openUsersPage = () => {
+    const { history } = this.props
+    history.push('/users')
+  }
 
   renderUnitList = (elementdetails, user) => {
     const { language } = this.props
@@ -33,7 +63,7 @@ class EnableUsers extends Component {
         {elementdetails.map(element => (
           <List.Item key={element.code}>
             <List.Content floated="right">
-              <Button floated="right" onClick={this.removeAccess(user, element.code)} content="Remove" size="tiny" />
+              <Button basic negative floated="right" onClick={this.removeAccess(user.id, element.code)} content="Remove" size="tiny" />
             </List.Content>
             <List.Content>{element.name[language]}</List.Content>
           </List.Item>
@@ -42,24 +72,43 @@ class EnableUsers extends Component {
     )
   }
 
-  render() {
-    const { users, units, error, language } = this.props
-    const unitOptions = units.map(unit =>
+  renderUserPage = (userid) => {
+    const { units, users, language, pending } = this.props
+    if (pending) {
+      return null
+    }
+    const user = users.find(u => u.id === userid)
+    if (!user) {
+      return (
+        <Redirect to="/users" />
+      )
+    }
+    const disabled = this.getDisabledUnits(units, user.elementdetails)
+    const unitOptions = disabled.map(unit =>
       ({ key: unit.id, value: unit.id, text: unit.name[language] }))
-    return error ? null : (
-      <div className={sharedStyles.segmentContainer}>
-        <Header className={sharedStyles.segmentTitle} size="large">
-          Enable or disable access to Oodikone
-        </Header>
+    return (
+      <div>
+        <Button icon="arrow circle left" content="Back" onClick={this.openUsersPage} />
         <LanguageChooser />
-        <Segment className={sharedStyles.contentSegment}>
-          <Item.Group divided>
-            {users.map(user => (
-              <Item key={user.id}>
-                <Item.Content verticalAlign="middle">
-                  <Item.Header content={user.full_name} />
-                  <Item.Meta content={user.username} />
-                  <Item.Description>
+        <Divider />
+        <Card.Group>
+          <Card fluid>
+            <Card.Content>
+              <Card.Header>
+                {user.full_name}
+              </Card.Header>
+              <Card.Meta content={user.username} />
+              <Card.Description>
+                {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`}
+              </Card.Description>
+            </Card.Content>
+          </Card>
+          <Card fluid>
+            <Card.Content>
+              <Card.Header content="Enable access" />
+              <Card.Description>
+                <Form>
+                  <Form.Field>
                     <Dropdown
                       placeholder="Select unit"
                       options={unitOptions}
@@ -67,19 +116,78 @@ class EnableUsers extends Component {
                       fluid
                       search
                       selection
+                      value={this.state.selected}
                     />
-                    {this.renderUnitList(user.elementdetails, user.id)}
-                  </Item.Description>
-                  <Item.Extra>
-                    {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`}
-                  </Item.Extra>
-                  <Item.Extra>
-                    <Button content={user.is_enabled ? 'Disable' : 'Enable'} size="tiny" onClick={this.enableUser(user.id)} />
-                  </Item.Extra>
-                </Item.Content>
-              </Item>
-            ))}
-          </Item.Group>
+                  </Form.Field>
+                  <Button
+                    basic
+                    fluid
+                    positive
+                    content="Enable"
+                    onClick={this.enableAccessRightToUser(user.id)}
+                  />
+                </Form>
+              </Card.Description>
+            </Card.Content>
+          </Card>
+          <Card fluid>
+            <Card.Content>
+              <Card.Header content="Access rights" />
+              <Card.Description>
+                { this.renderUnitList(user.elementdetails, user) }
+              </Card.Description>
+            </Card.Content>
+          </Card>
+        </Card.Group>
+      </div>
+    )
+  }
+
+  renderUserSearchList = () => {
+    const { users, error } = this.props
+    return error ? null : (
+      <Card.Group itemsPerRow={4}>
+        {users.map(user => (
+          <Card raised key={user.id} color={user.is_enabled ? 'green' : 'red'}>
+            <Card.Content>
+              <Card.Header content={user.full_name} />
+              <Card.Meta content={user.username} />
+              <Card.Description>
+                {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`}
+              </Card.Description>
+            </Card.Content>
+            <Card.Content extra>
+              <Button.Group compact widths={8}>
+                <Button animated basic size="mini" disabled={!user.is_enabled} onClick={this.openEditUserPage(user.id)}>
+                  <Button.Content hidden>Edit</Button.Content>
+                  <Button.Content visible>
+                    <Icon name="wrench" />
+                  </Button.Content>
+                </Button>
+                <Button animated basic onClick={this.enableUser(user.id)} size="mini">
+                  <Button.Content hidden>{user.is_enabled ? 'Disable' : 'Enable'}</Button.Content>
+                  <Button.Content visible>
+                    <Icon color={user.is_enabled ? 'green' : 'red'} name={user.is_enabled ? 'check' : 'remove'} />
+                  </Button.Content>
+                </Button>
+              </Button.Group>
+            </Card.Content>
+          </Card>
+      ))}
+      </Card.Group>
+    )
+  }
+
+  render() {
+    const { match } = this.props
+    const { userid } = match.params
+    return (
+      <div className={sharedStyles.segmentContainer}>
+        <Header className={sharedStyles.segmentTitle} size="large">
+          Enable or disable access to Oodikone
+        </Header>
+        <Segment className={sharedStyles.contentSegment}>
+          { !userid ? this.renderUserSearchList() : this.renderUserPage(userid) }
         </Segment>
       </div>
     )
@@ -87,6 +195,11 @@ class EnableUsers extends Component {
 }
 
 EnableUsers.propTypes = {
+  match: shape({
+    params: shape({
+      studentNumber: string
+    })
+  }).isRequired,
   language: string.isRequired,
   getUsers: func.isRequired,
   enableUser: func.isRequired,
@@ -107,7 +220,9 @@ EnableUsers.propTypes = {
       name: shape({}).isRequired
     }))
   })).isRequired,
-  error: bool.isRequired
+  error: bool.isRequired,
+  history: shape({}).isRequired,
+  pending: bool.isRequired
 }
 
 const sortUsers = makeSortUsers()
@@ -118,7 +233,7 @@ const mapStateToProps = ({ locale, users, units, settings }) => ({
   currentLanguage: getActiveLanguage(locale).value,
   units: units.data,
   users: sortUsers(users),
-  pending: users.pending,
+  pending: (typeof (users.pending) === 'boolean') ? users.pending : true,
   error: users.error || false
 })
 
@@ -140,4 +255,4 @@ const mapDispatchToProps = dispatch => ({
   }
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(EnableUsers)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(EnableUsers))
