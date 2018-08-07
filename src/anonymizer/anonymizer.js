@@ -172,7 +172,7 @@ const anonymizeStudentAttainments = async (id, studentInfo, studentnumber_attain
       }
       anonLearningOpportunity = {
         ...learningOpportunity,
-        disciplines: [{ discipline_id: disciplines[Math.floor(Math.random() * 12)] }],
+        disciplines: [disciplines.data.data[Math.floor(Math.random() * 12)]] ,
         learningopportunity_id: generateRandomId(),
         names: [
           {
@@ -295,7 +295,7 @@ const anonymizeSemesterEnrollments = async (id) => {
   }
   return anonymizedData
 }
-const anonymizeStudent = async (id) => {
+const anonymizeStudent = async (id, student_numbers) => {
   const info = await anonymizeStudentInfo(id)
 
   const attainments = await anonymizeStudentAttainments(id, info, studentnumber_attainments)
@@ -317,15 +317,16 @@ const anonymizeStudent = async (id) => {
   APIWriter(courseEnrollmentPath, { data: { data: [] } })
   APIWriter(attainmentPath, { data: { data: attainments } })
   APIWriter(semesterEnrollmentPath, { data: { data: semesterEnrollments } })
-  return info
+  return student_numbers
 }
-const anonymizeCourseUnitRealisations = async () => {
+const anonymizeCourseUnitRealisations = async () => { 
   const courseUnitRealisations = await oodi.courseUnitRealisations()
   const realisationsCounter = status.addItem('realisations', { max: courseUnitRealisations.length })
   startRealisationsStatusBar()
   let anonRealisations = []
   for (const realisation of courseUnitRealisations) {
-    realisationsCounter.inc()
+    continue
+    realisationsCounter.inc()// eslint-disable-line
     if (!learningOpportunityRelations[realisation.learningopportunity_id]) {
       continue
     }
@@ -372,15 +373,17 @@ const anonymizeCourseUnitRealisations = async () => {
       descriptions: [],
       languages: []
     }
-    APIWriter(`src/anonymized_API/courseunitrealisations/${anonCourseUnitRealisation.course_id}`, { data: { data: anonCourseUnitRealisation } })
+    await APIWriter(`src/anonymized_API/courseunitrealisations/${anonCourseUnitRealisation.course_id}`, { data: { data: anonCourseUnitRealisation } })
   }
-  APIWriter('src/anonymized_API/courseunitrealisations/changes/ids/0000-12-24', { data: { data: anonRealisations } })
+  await APIWriter('src/anonymized_API/courseunitrealisations/changes/ids/0000-12-24', { data: { data: anonRealisations } })
   stopStatusBar()
+  return
 }
 
-const APIWriter = (path, data) => {
+const APIWriter = async (path, data) => {
   mkdirp(getDirName(path), async () => {
     fs.writeFile(path, JSON.stringify(data, null, 4), (error) => { if (error) { console.log(error) } })
+    return 'succeeee'
   })
 }
 
@@ -408,28 +411,31 @@ const anonymize = async () => {
   codeCounter.inc()
   const courseTypeCodes = { data: { data: await oodi.getCourseTypeCodes() } }
   codeCounter.inc()
-  const courseDisciplines = { data: { data: disciplines } }
+  const courseDisciplines = disciplines 
   codeCounter.inc()
-  APIWriter('./src/anonymized_API/codes/semesters', semesters)
-  APIWriter('./src/anonymized_API/codes/courseunitrealisations/types', courseUnitRealisationsTypes)
-  APIWriter('./src/anonymized_API/codes/studyattainments/statuses', creditTypeCodes)
-  APIWriter('./src/anonymized_API/codes/learningopportunities/types', courseTypeCodes)
-  APIWriter('./src/anonymized_API/codes/learningopportunities/disciplines', courseDisciplines)
+  await APIWriter('./src/anonymized_API/codes/semesters', semesters)
+  await APIWriter('./src/anonymized_API/codes/courseunitrealisations/types', courseUnitRealisationsTypes)
+  await APIWriter('./src/anonymized_API/codes/studyattainments/statuses', creditTypeCodes)
+  await APIWriter('./src/anonymized_API/codes/learningopportunities/types', courseTypeCodes)
+  await APIWriter('./src/anonymized_API/codes/learningopportunities/disciplines', courseDisciplines)
   const numberList = await readStudentNumbersFromFile(filename)
   const studentCounter = status.addItem('students', { max: numberList.length })
   status.stamp()
   startStudentsStatusBar()
+  let student_numbers = []
   for (let id of numberList) {
     studentCounter.inc()
     try {
-      await anonymizeStudent(id)
+      student_numbers = await anonymizeStudent(id, student_numbers)
     } catch (error) {
       logger.verbose(`FAILED ${id}, ${error}  elapsed time:  ${getElapsedTime()}`)
+      process.exit(1)
     }
   }
   status.stamp()
   await anonymizeCourseUnitRealisations()
-  APIWriter('./studentnumbersN.txt', student_numbers)
+  console.log(student_numbers)
+  await APIWriter('./studentnumbersN.txt', student_numbers)
   logger.verbose(`end time: ${moment()}, total run-time:  ${getElapsedTime()}`)
 }
 
