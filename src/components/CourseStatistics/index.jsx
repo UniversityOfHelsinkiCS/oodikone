@@ -237,12 +237,13 @@ class CourseStatistics extends Component {
         <Transition.Group as={List} duration={700}>
           {data.map((course) => {
             let programmeOptions = Object.keys(course.programmes).map(key => ({
-              text: course.programmes[key].name[language],
-              value: key
+              text: `${course.programmes[key].name[language]} (${course.programmes[key].amount})`,
+              value: key,
+              amount: course.programmes[key].amount
             }))
             const text = { en: 'all', fi: 'kaikki', sv: 'allt' }
             programmeOptions = programmeOptions.concat({ text: text[language], value: 'all' })
-            programmeOptions = _.sortBy(programmeOptions, 'text')
+            programmeOptions = _.orderBy(programmeOptions, 'amount', 'desc')
             let filteredstats = course.stats
             if (selectedProgramme !== 'all') {
               filteredstats = filteredstats.map(field =>
@@ -277,8 +278,6 @@ class CourseStatistics extends Component {
             stats.stats = filteredstats
             return (
               <List.Item key={course.code + course.start + course.end + course.separate}>
-
-
                 <CoursePassRateChart
                   removeCourseStatistics={this.removeCourseStatistics}
                   stats={stats}
