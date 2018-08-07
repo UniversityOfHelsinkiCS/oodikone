@@ -297,7 +297,11 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
     })
   }
 
-  const programmes = _.flattenDeep(stats
+  return stats
+}
+
+const yearlyStatsOf = async (code, year, separate, language) => {
+  const getProgrammesFromStats = (stats) => _.flattenDeep(stats
     .map(year =>
       _.union(year.courseLevelPassed, year.courseLevelFailed)
         .map(s => s.studyright_elements
@@ -307,11 +311,8 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
         { ...b[a.code], amount: b[a.code].amount + 1 } :
         { name: a.element_detail.name, amount: 1 }
       return b
-    }, {})
-  return { stats: stats, programmes: programmes }
-}
+    }, resultProgrammes)
 
-const yearlyStatsOf = async (code, year, separate, language) => {
   const alternatives = await getDuplicateCodes(code)
   const codes = alternatives ? [code, ...Object.keys(alternatives.alt)] : [code]
   const allInstances = _.flatten((await Promise.all(codes.map(code => instancesOf(code)))))
@@ -322,14 +323,14 @@ const yearlyStatsOf = async (code, year, separate, language) => {
   const start = Number(year.start)
   const end = Number(year.end)
   const resultStats = []
-  const resultProgrammes = []
+  let resultProgrammes = {}
   let stats
   if (yearInst) {
     for (let year = start; year < end; year++) {
       stats = oneYearStats(yearInst, year, separate, allInstancesUntilYear)
-      if (stats.stats.length > 0) {
-        resultStats.push(...stats.stats)
-        resultProgrammes.push(stats.programmes)
+      if (stats.length > 0) {
+        resultStats.push(...stats)
+        resultProgrammes = getProgrammesFromStats(stats)
       }
     }
     return { code, alternativeCodes: codes.filter(cd => cd !== code), start, end, separate, stats: resultStats, programmes: resultProgrammes, name }
