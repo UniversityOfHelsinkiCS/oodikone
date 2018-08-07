@@ -2,7 +2,7 @@ const Sequelize = require('sequelize')
 const moment = require('moment')
 const redis = require('redis')
 const conf = require('../conf-backend')
-const { sequelize, Student, Credit, CourseInstance, Course, CourseType, ElementDetails, StudyrightElement } = require('../models')
+const { sequelize, Student, Credit, CourseInstance, Course, CourseType, ElementDetails, StudyrightElement, Studyright } = require('../models')
 const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
 const _ = require('lodash')
@@ -71,16 +71,25 @@ const instancesByCode = (code) => CourseInstance.findAll({
           model: StudyrightElement,
           attributes: ['code'],
           include:
-          {
-            model: ElementDetails,
-            attributes: ['name', 'type'],
-            where: {
-              type: {
-                [Op.eq]: 20
+            [{
+              model: ElementDetails,
+              attributes: ['name', 'type'],
+              where: {
+                type: {
+                  [Op.eq]: 20
+                }
+              }
+            },
+            {
+              model: Studyright,
+              attributes: ['prioritycode'],
+              where: {
+                prioritycode: {
+                  [Op.eq]: 1
+                }
               }
             }
-          }
-
+            ],
         }
 
       },
@@ -232,16 +241,16 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
     const fallInstances = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-01-15'))
     const allInstancesUntilFall = allInstancesUntilYear.filter(inst => moment(inst.date).isBefore(String(year + 1) + '-01-15'))
     const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-06-01'))
-
     let fallStatistics = calculateStats(fallInstances, allInstancesUntilFall)
     let springStatistics = calculateStats(springInstances, allInstancesUntilYear)
+
     const passedF = fallInstances.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
     const failedF = fallInstances.reduce((a, b) => b.fail ? a = a.concat(b.credits[0].student) : a, [])
 
     const passedS = springInstances.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
     const failedS = springInstances.reduce((a, b) => b.fail ? a = a.concat(b.credits[0].student) : a, [])
 
-    if (fallStatistics.studentsThatPassedThisYear.length + fallStatistics.studentsThatFailedThisYear.length > 0)
+    if (fallStatistics.studentsThatPassedThisYear.length + fallStatistics.studentsThatFailedThisYear.length > 0) {
       stats.push({
         studentsThatPassedThisYear: fallStatistics.studentsThatPassedThisYear || 0,
         studentsThatFailedThisYear: fallStatistics.studentsThatFailedThisYear || 0,
@@ -254,7 +263,8 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
         gradeDistribution: fallStatistics.gradeDistribution,
         time: String(year) + ' Fall'
       })
-    if (springStatistics.studentsThatPassedThisYear.length + springStatistics.studentsThatFailedThisYear > 0)
+    }
+    if (springStatistics.studentsThatPassedThisYear.length + springStatistics.studentsThatFailedThisYear.length > 0) {
       stats.push({
         studentsThatPassedThisYear: springStatistics.studentsThatPassedThisYear || 0,
         studentsThatFailedThisYear: springStatistics.studentsThatFailedThisYear || 0,
@@ -267,6 +277,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
         gradeDistribution: springStatistics.gradeDistribution,
         time: String(year + 1) + ' Spring'
       })
+    }
 
   } else {
     const yearInst = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-06-01'))
@@ -287,11 +298,23 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
       time: String(year) + '-' + String(year + 1)
     })
   }
-  const programmes = _.uniqBy(_.flattenDeep(stats.map(year => _.union(year.courseLevelPassed, year.courseLevelFailed).map(s => s.studyright_elements.map(e => e)))), 'code')
-  return { stats: stats, programmes: programmes }
+
+  return stats
 }
 
 const yearlyStatsOf = async (code, year, separate, language) => {
+  const getProgrammesFromStats = (stats) => _.flattenDeep(stats
+    .map(year =>
+      _.union(year.courseLevelPassed, year.courseLevelFailed)
+        .map(s => s.studyright_elements
+          .map(e => e))))
+    .reduce((b, a) => {
+      b[a.code] = b[a.code] ?
+        { ...b[a.code], amount: b[a.code].amount + 1 } :
+        { name: a.element_detail.name, amount: 1 }
+      return b
+    }, resultProgrammes)
+
   const alternatives = await getDuplicateCodes(code)
   const codes = alternatives ? [code, ...Object.keys(alternatives.alt)] : [code]
   const allInstances = _.flatten((await Promise.all(codes.map(code => instancesOf(code)))))
@@ -302,17 +325,17 @@ const yearlyStatsOf = async (code, year, separate, language) => {
   const start = Number(year.start)
   const end = Number(year.end)
   const resultStats = []
-  const resultProgrammes = []
+  let resultProgrammes = {}
   let stats
   if (yearInst) {
     for (let year = start; year < end; year++) {
       stats = oneYearStats(yearInst, year, separate, allInstancesUntilYear)
-      if (stats.stats.length > 0) {
-        resultStats.push(...stats.stats)
-        resultProgrammes.push(stats.programmes)
+      if (stats.length > 0) {
+        resultStats.push(...stats)
+        resultProgrammes = getProgrammesFromStats(stats)
       }
     }
-    return { code, alternativeCodes: codes.filter(cd => cd !==  code), start, end, separate, stats: resultStats, programmes: resultProgrammes, name }
+    return { code, alternativeCodes: codes.filter(cd => cd !== code), start, end, separate, stats: resultStats, programmes: resultProgrammes, name }
   }
   return
 }
