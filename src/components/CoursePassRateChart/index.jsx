@@ -98,6 +98,7 @@ const StackedBarChart = ({
                   {dropdown(programmeOptions)}
                 </Segment>
               </Segment.Group>
+              <Header textAlign="center">Pass rate</Header>
               <BarChart
                 height={700}
                 width={1200}
@@ -129,6 +130,7 @@ const StackedBarChart = ({
                   {dropdown(programmeOptions)}
                 </Segment>
               </Segment.Group>
+              <Header textAlign="center">Pass rate</Header>
               <BarChart
                 height={700}
                 width={1200}
@@ -147,7 +149,7 @@ const StackedBarChart = ({
               </BarChart>
             </Container>
           }
-
+          <Header textAlign="center">Grade distribution</Header>
           <Container>
             <BarChart
               height={700}

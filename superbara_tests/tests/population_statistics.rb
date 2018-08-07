@@ -7,7 +7,7 @@ require_relative "./components/navigate_population_statistics"
 
 navigation = NavigationPanel.new
 population_query = PopulationQuery.new
-population_query.query("2015", "Bachelors Degree on Witchcraft and Wizardry", "Defence Against the Dark Arts")
+population_query.query("2014", "Bachelors Degree on Witchcraft and Wizardry", "Defence Against the Dark Arts")
 
 
 tablebody = find("th", text: /Credits gained during first [0-9]+ months/).find(:xpath, '../../..')
@@ -18,12 +18,11 @@ navigation.navigate(/Filters/)
 wait 60 do
     has_text? "Add filters"
     has_text? "add"
-    amount_of_students == 46
+    amount_of_students == 25
   end
 click_button "add"
   wait do
       has_text? "cancel"
-      has_text? "Properly started"
   end
 
 atLeastCreditsFilter = Filter.new("Show only students with credits at least")
@@ -37,22 +36,22 @@ amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td"
 
 min_credits = tablebody.find(:xpath, '..').find("tr", text:"min").all("td")[1].text.to_i
 wait do
-    (amount_of_students == 24 &&
+    (amount_of_students == 17 and
     min_credits > 29)
 end
 
 navigation.navigate(/Course/)
-find("tr",text:("rich mesh relationships")).all("td")[0].click
-find("tr", text: "intuitive disintermediate e-markets").all("td")[0].click
+find("tr",text:("B2B morph communities")).all("td")[0].click
+find("tr", text: "robust unleash e-services").all("td")[0].click
 value_end = tablebody.all("td")[10].text.to_i
 amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i
 puts(value_start)
 puts(value_end)
 puts(amount_of_students)
 wait 10 do
-    (has_text? /Credits at least/ &&
-    value_start > value_end &&
-    amount_of_students == 12)
+    (has_text? /Credits at least/ and
+    value_start > value_end and
+    amount_of_students == 7)
 end
 
 save_button = find("button", text: "save filters as preset")
@@ -66,7 +65,7 @@ amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td"
 wait do
     set_filters == true
     saved == true
-    amount_of_students == 12
+    amount_of_students == 7
 end
 set_filters.find("div", text: filter_name).all("span")[1].click
 
@@ -108,7 +107,7 @@ amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td"
 
 wait do
     set_filters != true
-    amount_of_students == 46
+    amount_of_students == 25
 end
 student_number = ""
 wait do
