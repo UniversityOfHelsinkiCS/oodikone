@@ -317,7 +317,8 @@ const mapStateToProps = (state) => {
     language: state.settings.language,
     translate: getTranslate(state.locale),
     selectedCourses,
-    populationSize: state.populations.data.length > 0 ? state.populations.data.length : 0
+    populationSize: state.populations.data.students.length > 0 ?
+      state.populations.data.students.length : 0
   }
 }
 
