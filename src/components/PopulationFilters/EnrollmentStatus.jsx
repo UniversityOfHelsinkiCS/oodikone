@@ -36,8 +36,8 @@ class EnrollmentStatus extends Component {
   }
 
   createPossibleOptions = ({ minDate, maxDate }) => {
-    const firstSemester = moment(minDate).diff(moment('1950', 'YYYY'), 'months') / 6
-    const lastSemester = moment(maxDate).diff(moment('1950', 'YYYY'), 'months') / 6
+    const firstSemester = Math.floor(moment(minDate).diff(moment('1950', 'YYYY'), 'months') / 6)
+    const lastSemester = Math.floor(moment(maxDate).diff(moment('1950', 'YYYY'), 'months') / 6)
     const allSemesters = _.range(firstSemester, lastSemester + 1)
     const options = allSemesters.map(semester =>
       ({ key: semester, text: this.formatSemesterCodeToText(semester), value: semester }))
