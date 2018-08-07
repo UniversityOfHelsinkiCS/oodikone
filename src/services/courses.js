@@ -232,16 +232,16 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
     const fallInstances = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-01-15'))
     const allInstancesUntilFall = allInstancesUntilYear.filter(inst => moment(inst.date).isBefore(String(year + 1) + '-01-15'))
     const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-06-01'))
-
     let fallStatistics = calculateStats(fallInstances, allInstancesUntilFall)
     let springStatistics = calculateStats(springInstances, allInstancesUntilYear)
+
     const passedF = fallInstances.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
     const failedF = fallInstances.reduce((a, b) => b.fail ? a = a.concat(b.credits[0].student) : a, [])
 
     const passedS = springInstances.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
     const failedS = springInstances.reduce((a, b) => b.fail ? a = a.concat(b.credits[0].student) : a, [])
 
-    if (fallStatistics.studentsThatPassedThisYear.length + fallStatistics.studentsThatFailedThisYear.length > 0)
+    if (fallStatistics.studentsThatPassedThisYear.length + fallStatistics.studentsThatFailedThisYear.length > 0) {
       stats.push({
         studentsThatPassedThisYear: fallStatistics.studentsThatPassedThisYear || 0,
         studentsThatFailedThisYear: fallStatistics.studentsThatFailedThisYear || 0,
@@ -254,7 +254,8 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
         gradeDistribution: fallStatistics.gradeDistribution,
         time: String(year) + ' Fall'
       })
-    if (springStatistics.studentsThatPassedThisYear.length + springStatistics.studentsThatFailedThisYear > 0)
+    }
+    if (springStatistics.studentsThatPassedThisYear.length + springStatistics.studentsThatFailedThisYear.length > 0) {
       stats.push({
         studentsThatPassedThisYear: springStatistics.studentsThatPassedThisYear || 0,
         studentsThatFailedThisYear: springStatistics.studentsThatFailedThisYear || 0,
@@ -267,6 +268,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
         gradeDistribution: springStatistics.gradeDistribution,
         time: String(year + 1) + ' Spring'
       })
+    }
 
   } else {
     const yearInst = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-06-01'))
@@ -312,7 +314,7 @@ const yearlyStatsOf = async (code, year, separate, language) => {
         resultProgrammes.push(stats.programmes)
       }
     }
-    return { code, alternativeCodes: codes.filter(cd => cd !==  code), start, end, separate, stats: resultStats, programmes: resultProgrammes, name }
+    return { code, alternativeCodes: codes.filter(cd => cd !== code), start, end, separate, stats: resultStats, programmes: resultProgrammes, name }
   }
   return
 }
