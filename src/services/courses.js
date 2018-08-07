@@ -2,7 +2,7 @@ const Sequelize = require('sequelize')
 const moment = require('moment')
 const redis = require('redis')
 const conf = require('../conf-backend')
-const { sequelize, Student, Credit, CourseInstance, Course, CourseType, ElementDetails, StudyrightElement } = require('../models')
+const { sequelize, Student, Credit, CourseInstance, Course, CourseType, ElementDetails, StudyrightElement, Studyright } = require('../models')
 const uuidv4 = require('uuid/v4')
 const Op = Sequelize.Op
 const _ = require('lodash')
@@ -71,16 +71,25 @@ const instancesByCode = (code) => CourseInstance.findAll({
           model: StudyrightElement,
           attributes: ['code'],
           include:
-          {
-            model: ElementDetails,
-            attributes: ['name', 'type'],
-            where: {
-              type: {
-                [Op.eq]: 20
+            [{
+              model: ElementDetails,
+              attributes: ['name', 'type'],
+              where: {
+                type: {
+                  [Op.eq]: 20
+                }
+              }
+            },
+            {
+              model: Studyright,
+              attributes: ['prioritycode'],
+              where: {
+                prioritycode: {
+                  [Op.eq]: 1
+                }
               }
             }
-          }
-
+            ],
         }
 
       },
@@ -287,7 +296,18 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
       time: String(year) + '-' + String(year + 1)
     })
   }
-  const programmes = _.uniqBy(_.flattenDeep(stats.map(year => _.union(year.courseLevelPassed, year.courseLevelFailed).map(s => s.studyright_elements.map(e => e)))), 'code')
+
+  const programmes = _.flattenDeep(stats
+    .map(year =>
+      _.union(year.courseLevelPassed, year.courseLevelFailed)
+        .map(s => s.studyright_elements
+          .map(e => e))))
+    .reduce((b, a) => {
+      b[a.code] = b[a.code] ?
+        { ...b[a.code], amount: b[a.code].amount + 1 } :
+        { name: a.element_detail.name, amount: 1 }
+      return b
+    }, {})
   return { stats: stats, programmes: programmes }
 }
 
@@ -312,7 +332,7 @@ const yearlyStatsOf = async (code, year, separate, language) => {
         resultProgrammes.push(stats.programmes)
       }
     }
-    return { code, alternativeCodes: codes.filter(cd => cd !==  code), start, end, separate, stats: resultStats, programmes: resultProgrammes, name }
+    return { code, alternativeCodes: codes.filter(cd => cd !== code), start, end, separate, stats: resultStats, programmes: resultProgrammes, name }
   }
   return
 }
