@@ -182,3 +182,13 @@ _/home/tkt_oodi/oodikone.cs.helsinki.fi/student_number_updater_ is acually the b
 ### Student info updater
 
 TBD
+
+### Anonymize data
+
+Run `npm run anonymize` for studentnumbers provided in `studentnumbers.txt` file in root directory. 
+
+Anonymizer will create an `anonymized_API` folder structure which can be used as an alternative to Oodi API and a `studentnumbersN.txt` text file containing new anonymized students studentnumbers.
+
+These can be used to update database with anonymized data by `npm run update_database_anon file="studentnumbersN.txt"`
+
+To update database in oodikone/testing you need to first scp your API and anon studentnumber list to melkki `scp -r src/anonymized_API melkki.cs.helsinki.fi:./` and `scp studentnumbersN.txt melkki.cs.helsinki.fi` then ssh to oodikone/testing and `scp -r <username>@melkki.cs.helsinki.fi:./anonymized_API ./data` and `scp <username>@melkki.cs.helsinki.fi:./studentnumbersN.txt ./data`. Then use `docker exec -it testing_backend sh` and `npm run update_database_anon file="/data/studentnumbersN.txt"`. (Theres probably a better way to scp files into oodikone but this works aswell).
