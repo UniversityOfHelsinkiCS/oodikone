@@ -236,9 +236,9 @@ class CourseStatistics extends Component {
         <CourseSearch handleResultSelect={this.handleResultSelect} />
         <Transition.Group as={List} duration={700}>
           {data.map((course) => {
-            let programmeOptions = course.programmes[0].map(p => ({
-              text: p.element_detail.name[language],
-              value: p.code
+            let programmeOptions = Object.keys(course.programmes).map(key => ({
+              text: course.programmes[key].name[language],
+              value: key
             }))
             const text = { en: 'all', fi: 'kaikki', sv: 'allt' }
             programmeOptions = programmeOptions.concat({ text: text[language], value: 'all' })
