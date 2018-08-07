@@ -2,10 +2,10 @@ visit "oodikone.cs.helsinki.fi/testing"
 require_relative "./components/query_course_statistics"
 
 course_statistics = CourseQuery.new
-start_year = rand(2011...Time.now.year - 1)
-end_year = rand(start_year + 1 ... Time.now.year)
+start_year = rand(2012...Time.now.year - 2)
+end_year = rand(start_year + 1 ... Time.now.year - 1)
 
-course_statistics.query(start_year.to_s, end_year.to_s, "end-to-end revolutionize solutions")
+course_statistics.query(start_year.to_s, end_year.to_s, "robust unleash e-services")
 
 wait do
   barchart = all("div", class:"recharts-wrapper")[0]

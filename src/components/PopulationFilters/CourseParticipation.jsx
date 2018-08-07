@@ -74,7 +74,10 @@ class CourseParticipation extends Component {
     )
   }
 }
+const mapStateToProps = ({ settings }) => ({
+  language: settings.language
+})
 
-export default connect(null, {
+export default connect(mapStateToProps, {
   removePopulationFilter, alterPopulationCourseFilter
 })(CourseParticipation)
