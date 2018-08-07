@@ -17,7 +17,8 @@
     "studentnumbers_to_file": "NODE_ENV=dev node src/services/doo_api_database_updater/db_studentnumbers_to_file.js",
     "lint": "eslint --parser babel-eslint src",
     "force_sync_database": "node src/services/doo_api_database_updater/force_sync_database.js",
-    "update_studentnumbers_dev": "NODE_ENV=dev node src/services/doo_api_database_updater/student_list_updater.js"
+    "update_studentnumbers_dev": "NODE_ENV=dev node src/services/doo_api_database_updater/student_list_updater.js",
+    "anonymize": "node src/anonymizer/anonymizer.js"
   },
   "author": "Matti Luukkainen",
   "license": "MIT",
