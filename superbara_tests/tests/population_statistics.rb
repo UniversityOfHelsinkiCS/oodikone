@@ -21,9 +21,10 @@ wait 60 do
     amount_of_students == 25
   end
 click_button "add"
-  wait do
-      has_text? "cancel"
-  end
+wait do
+    has_text? "cancel"
+end
+click_text "Advanced filters"
 
 atLeastCreditsFilter = Filter.new("Show only students with credits at least")
 startedThisSemesterFilter = Filter.new("started this semester")
