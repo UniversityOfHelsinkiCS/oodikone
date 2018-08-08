@@ -179,9 +179,9 @@ Use _node src/services/doo_api_database_updater/student_list_updater.js filename
 
 _/home/tkt_oodi/oodikone.cs.helsinki.fi/student_number_updater_ is acually the backend code as a cloned git repo. If you modify the updater source, remember to pull the repo.
 
-### Student info updater
+### Student info updater (database updater)
 
-TBD
+To update your database run `npm run update_database` with optional args `file="<filename>"` and `index=<number>` with former telling the studentnumber filename to update and latter telling which row to start from.
 
 ### Anonymize data
 
