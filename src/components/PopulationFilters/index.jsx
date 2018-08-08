@@ -9,7 +9,6 @@ import { getTranslate } from 'react-localize-redux'
 import CreditsLessThan from './CreditsLessThan'
 import CreditsAtLeast from './CreditsAtLeast'
 import StartingThisSemester from './StartingThisSemester'
-import SexFilter from './SexFilter'
 import CourseParticipation from './CourseParticipation'
 import ExtentGraduated from './ExtentGraduated'
 import Preset from './Preset'
@@ -26,10 +25,14 @@ const componentFor = {
   StartingThisSemester,
   DisciplineTypes,
   EnrollmentStatus,
-  SexFilter,
   CourseParticipation,
+  ExtentGraduated
+}
+const advancedFilters = { // Filters that are too hard to use for common folk
+  DisciplineTypes,
   TransferFilter,
   ExtentGraduated
+
 }
 const persistantFilters = { // Filters that can be duplicated with different values
   ExtentGraduated,
@@ -54,7 +57,8 @@ class PopulationFilters extends Component {
     visible: false,
     presetName: '',
     presetFilters: [],
-    firstRenderKludge: true
+    firstRenderKludge: true,
+    advancedUser: false
   }
   componentDidUpdate(prevProps) {
     if (this.state.firstRenderKludge || (this.props.populationCourses.pending === false
@@ -90,12 +94,15 @@ class PopulationFilters extends Component {
 
   renderAddFilters() {
     const { extents, transfers } = this.props
-    const allFilters = _.union(Object.keys(componentFor).map(f =>
-      String(f)), this.state.presetFilters.map(f => f.id))
+
+    const allFilters = _.union(Object.keys(componentFor).filter(f =>
+      !(Object.keys(advancedFilters).includes(f) && !this.state.advancedUser)).map(f =>
+        String(f)), this.state.presetFilters.map(f => f.id).filter(f => this.state.advancedUser))
+
     const setFilters = _.union(
       this.props.filters.map(f => f.type),
       this.props.filters.filter(f => f.type === 'Preset').map(f => f.id),
-      
+
     )
     const unsetFilters = _.uniq(_.difference(allFilters, setFilters.filter(setFilter => !Object.keys(persistantFilters).includes(setFilter))))
     if (unsetFilters.length === 0) {
@@ -114,10 +121,12 @@ class PopulationFilters extends Component {
       <Segment>
         <Header>Add filters</Header>
         <div>
-          <em>
-            Note that filters does not work yet when population is limited by students
-            that have participated a specific course
-          </em>
+          <Radio
+            toggle
+            label="Advanced filters"
+            checked={this.state.advancedUser}
+            onChange={() => this.setState({ advancedUser: !this.state.advancedUser })}
+          />
         </div>
         {unsetFilters.map(filterName => {//eslint-disable-line
           if (componentFor[filterName]) { // THIS IS KINDA HACKED SOLUTION PLS FIX
@@ -217,7 +226,7 @@ class PopulationFilters extends Component {
           </Form.Group>
         </Form>
         {this.props.filters.map(filter => {
-  
+
           if (filter.type !== 'Preset') {
             return React.createElement(componentFor[filter.type], { filter, key: filter.id, samples: this.props.samples, transfers: this.props.transfers, extents: this.props.extents })
           }
@@ -227,11 +236,14 @@ class PopulationFilters extends Component {
         })}
 
         <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
-        <div className="ui action input">
-          <input type="text" placeholder="Name..." onChange={e => this.setState({ presetName: e.target.value })} />
+        {this.state.advancedUser ?
+          <div className="ui action input">
+            <input type="text" placeholder="Name..." onChange={e => this.setState({ presetName: e.target.value })} />
 
-          <button className="ui button" onClick={handleSavePopulationFilters}>save filters as preset</button>
-        </div>
+            <button className="ui button" onClick={handleSavePopulationFilters}>save filters as preset</button>
+          </div>
+          : null
+        }
       </Segment>
     )
   }
