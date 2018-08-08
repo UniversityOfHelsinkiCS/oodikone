@@ -122,7 +122,7 @@ const byIds = (ids) => Student.findAll({
 })
 
 const bySearchTerm = async (term, language) => {
-  const formatCourse = (course) => ({ name: course.name[language], code: course.code })
+  const formatCourse = (course) => ({ name: course.name[language], code: course.code, date: course.latest_instance_date })
 
   try {
     const result = await byNameOrCode(`%${term}%`, language)
