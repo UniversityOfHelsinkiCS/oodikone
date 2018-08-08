@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { byDateDesc, reformatDate, byCodeDesc } from '../common'
+import { byDateDesc, reformatDate } from '../common'
 
 const getData = obj => obj.data
 
@@ -15,7 +15,7 @@ export const sortInstances = (courseInstances) => {
   return []
 }
 
-export const sortCourses = courseList => Object.values(courseList).sort(byCodeDesc).map(course => ({ ...course, key: `${course.name}-${course.code}` }))
+export const sortCourses = courseList => Object.values(courseList).sort(byDateDesc).map(course => ({ ...course, key: `${course.name}-${course.code}` }))
 
 export const makeSortCourseInstances = () => createSelector(
   getData,
