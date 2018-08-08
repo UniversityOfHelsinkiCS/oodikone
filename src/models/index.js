@@ -103,7 +103,7 @@ const Credit = sequelize.define('credit',
     student_studentnumber: { type: Sequelize.STRING },
     credits: { type: Sequelize.DOUBLE },
     ordering: { type: Sequelize.STRING },
-    courseinstance_id: { type: Sequelize.BIGINT },
+    attainment_date: { type: Sequelize.DATE }
   },
   {
     tableName: 'credit',
@@ -115,7 +115,12 @@ const Credit = sequelize.define('credit',
         fields: ['student_studentnumber']
       },
       {
-        fields: ['courseinstance_id']
+        fields: ['courseinstance_id'],
+        name: 'credit_courseinstance_id'
+      },
+      {
+        fields: ['course_code'],
+        name: 'credit_course_code'
       }
     ]
   }
@@ -518,6 +523,8 @@ CourseInstance.hasMany(CourseTeacher, { foreignKey: 'courseinstance_id', targetK
 
 Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
+
+Credit.belongsTo(Course, { foreignKey: 'course_code' })
 
 Student.hasMany(TagStudent, { foreignKey: 'taggedstudents_studentnumber', sourceKey: 'studentnumber' })
 Tag.hasMany(TagStudent, { foreignKey: 'tags_tagname', sourceKey: 'tagname' })
