@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Icon, Form, Segment, Button, Confirm } from 'semantic-ui-react'
+import { Icon, Form, Segment, Button, Confirm, Grid } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
 import { removePopulationFilter, setPopulationFilter, deletePopulationFilter } from '../../redux/populationFilters'
 import { presetFilter } from '../../populationFilters'
@@ -36,6 +36,9 @@ class Preset extends Component {
             <Form.Group inline>
               <Form.Field>
                 <label>{filter.name}</label>
+                <em>
+                  {filter.description}
+                </em>
               </Form.Field>
               <Form.Field>
                 <Button onClick={() => this.handleSetFilter(filter)}>
@@ -49,40 +52,57 @@ class Preset extends Component {
     }
 
     return (
-      <Segment>
-        <label>
-          {filter.name}
-        </label>
-        <span style={{ float: 'right' }}>
-          <Icon
-            name="trash"
-            onClick={() => this.setState({ open: true })}
-          />
-          <Confirm
-            style={{
-              marginTop: 'auto !important',
-              display: 'inline-block !important',
-              position: 'relative',
-              top: '20%',
-              left: '33%'
-            }}
-            open={this.state.open}
-            cancelButton="Just remove from use"
-            confirmButton="Delete for good"
-            content="Are you sure you want to delete this filter?"
-            onCancel={() => { this.setState({ open: false }); this.clearFilter() }}
-            onConfirm={() => {
-              this.clearFilter(true)
-              this.props.deletePopulationFilter(filter)
-              this.setState({ open: false })
-            }}
-            size="small"
-          />
-        </span>
-        <span style={{ float: 'right' }}>
-          <Icon name="remove" onClick={() => this.clearFilter(false)} />
-        </span>
-      </Segment>
+      <Segment >
+        <Grid>
+          <Grid.Column floated="left" width={12}>
+            <Form>
+              <Form.Field inline>
+                <label>
+                  {filter.name}
+                </label>
+                <em>
+                  {filter.description}
+                </em>
+              </Form.Field>
+            </Form>
+          </Grid.Column>
+          <Grid.Column floated="right">
+            <Form style={{ float: 'right' }}>
+              <Form.Group inline>
+                <Form.Field>
+                  <Icon
+                    name="trash"
+                    onClick={() => this.setState({ open: true })}
+                  />
+                  <Confirm
+                    style={{
+                      marginTop: 'auto !important',
+                      display: 'inline-block !important',
+                      position: 'relative',
+                      top: '20%',
+                      left: '33%'
+                    }}
+                    open={this.state.open}
+                    cancelButton="Just remove from use"
+                    confirmButton="Delete for good"
+                    content="Are you sure you want to delete this filter?"
+                    onCancel={() => { this.setState({ open: false }); this.clearFilter() }}
+                    onConfirm={() => {
+                      this.clearFilter(true)
+                      this.props.deletePopulationFilter(filter)
+                      this.setState({ open: false })
+                    }}
+                    size="small"
+                  />
+                </Form.Field>
+                <Form.Field >
+                  <Icon name="remove" onClick={() => this.clearFilter(false)} />
+                </Form.Field>
+              </Form.Group>
+            </Form>
+          </Grid.Column>
+        </Grid>
+      </Segment >
     )
   }
 }
