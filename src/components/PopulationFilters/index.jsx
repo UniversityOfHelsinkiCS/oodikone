@@ -231,7 +231,6 @@ class PopulationFilters extends Component {
           if (filter.type !== 'Preset') {
             return React.createElement(componentFor[filter.type], { filter, key: filter.id, samples: this.props.samples, transfers: this.props.transfers, extents: this.props.extents })
           }
-          console.log(filter)
           return React.createElement(Preset, {
             filter, key: filter.id, destroy: this.destroyFromAllFilters
           })
