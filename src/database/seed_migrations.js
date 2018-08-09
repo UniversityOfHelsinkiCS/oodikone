@@ -3,7 +3,7 @@ const { Migration } = require('../models/index')
 
 const DEFAULT_PATH = `${process.cwd()}/src/database/migrations`
 
-const saveMigrationsToDatabase = filenames => Migration.bulkCreate(filenames)
+const saveMigrationsToDatabase = filenames => Migration.bulkCreate(filenames.map(name => ({ name })))
 
 const seedMigrations = async (migrationfilepath=DEFAULT_PATH) => {
   const filenames = fs.readdirSync(migrationfilepath)
