@@ -1,5 +1,5 @@
 focus
-visit "oodikone.cs.helsinki.fi/testing"
+visit "localhost:8081"
 
 require_relative "./components/query_population_statistics"
 require_relative "./components/filters_population_statistics"
@@ -44,7 +44,7 @@ end
 navigation.navigate(/Course/)
 find("tr",text:("B2B morph communities")).all("td")[0].click
 find("tr", text: "robust unleash e-services").all("td")[0].click
-value_end = tablebody.all("td")[10].text.to_i
+value_end = tablebody.all("td")[10].text.to_iq
 amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i
 puts(value_start)
 puts(value_end)
@@ -55,10 +55,11 @@ wait 10 do
     amount_of_students == 7)
 end
 
-save_button = find("button", text: "save filters as preset")
+save_button = find("button", text: "Save filters as preset")
 filter_name = "test " + rand(1...9999999).to_s
-save_button.find(:xpath, "../..").fill_in "Name...", with: filter_name
 save_button.click
+find(:xpath, "../..").fill_in "Name...", with: filter_name
+find("button", text: "Save").click
 set_filters = save_button.find(:xpath, "../..")
 saved = set_filters.all("div", text: filter_name).length == 1
 amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i

@@ -125,6 +125,7 @@ export const presetFilter = preset => ({
   id: preset.id,
   type: 'Preset',
   name: preset.name,
+  description: preset.description,
   filters: preset.filters,
   filter: student => preset.filters.map(f => f.filter(student)).every(b => b === true)
 })
