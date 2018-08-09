@@ -16,9 +16,10 @@
     "seed_redis": "node src/util/add_json_duplicates_to_redis.js && node src/util/map_course_codes.js",
     "studentnumbers_to_file": "NODE_ENV=dev node src/services/doo_api_database_updater/db_studentnumbers_to_file.js",
     "lint": "eslint --parser babel-eslint src",
-    "force_sync_database": "node src/services/doo_api_database_updater/force_sync_database.js",
+    "force_sync_database": "node scripts/force_sync_database.js",
     "update_studentnumbers_dev": "NODE_ENV=dev node src/services/doo_api_database_updater/student_list_updater.js",
-    "anonymize": "node src/anonymizer/anonymizer.js"
+    "anonymize": "node src/anonymizer/anonymizer.js",
+    "seed_migrations": "node scripts/seed_migrations.js"
   },
   "author": "Matti Luukkainen",
   "license": "MIT",

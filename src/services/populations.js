@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
-const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, ElementDetails, Discipline, CourseType, SemesterEnrollment, Semester, Transfers } = require('../models')
+const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, ElementDetails, Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement } = require('../models')
 const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
 
@@ -110,44 +110,50 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
   return students
 }
 
+const count = (column, count, distinct=false) => {
+  const countable = !distinct ? sequelize.col(column) : sequelize.fn('DISTINCT', sequelize.col(column))
+  return sequelize.where(
+    sequelize.fn('COUNT', countable), {
+      [Op.eq]: count
+    }
+  )
+}
+
 const studentnumbersWithAllStudyrightElementsAndCreditsBetween = async (studyRights, startDate, endDate, months) => {
   const creditBeforeDate = dateMonthsFromNow(startDate, months)
-  const query = `
-    SELECT
-        DISTINCT credit.student_studentnumber
-    FROM
-        credit
-    INNER JOIN
-            studyright_elements
-        ON
-            credit.student_studentnumber = studyright_elements.studentnumber
-        AND
-        studyright_elements.code IN(:studyRights)
-        AND
-        studyright_elements.startdate BETWEEN :startDate AND :endDate
-    INNER JOIN
-            courseinstance
-        ON
-            credit.courseinstance_id = courseinstance.id
-        AND
-            courseinstance.coursedate BETWEEN :startDate AND :creditBeforeDate
-    GROUP BY
-        credit.student_studentnumber
-    HAVING
-        COUNT(DISTINCT(studyright_elements.code)) = :studyRightsLength;
-    ;
-  `
-  const result = await sequelize.query(query, {
-    replacements: {
-      studyRights,
-      startDate,
-      endDate,
-      creditBeforeDate,
-      studyRightsLength: studyRights.length
-    },
-    type: sequelize.QueryTypes.SELECT
+  const students = await Student.findAll({
+    attributes: ['studentnumber'],
+    include: [
+      {
+        model: Credit,
+        attributes: [],
+        required: true,
+        where: {
+          attainment_date: {
+            [Op.between]: [startDate, creditBeforeDate]
+          }
+        }
+      },
+      {
+        model: StudyrightElement,
+        attributes: [],
+        required: true,
+        where: {
+          code: {
+            [Op.in]: studyRights
+          },
+          startdate: {
+            [Op.between]: [startDate, endDate]
+          }
+        }
+      },
+    ],
+    group: [
+      sequelize.col('student.studentnumber')
+    ],
+    having: count('studyright_elements.code', studyRights.length, true)
   })
-  return result.map(student => student.student_studentnumber)
+  return students.map(s => s.studentnumber)
 }
 
 const parseQueryParams = query => {
@@ -165,10 +171,10 @@ const parseQueryParams = query => {
 const formatStudentsForApi = (students, startDate, endDate) => {
   const result = students.reduce((stats, student) => {
     student.transfers.forEach(transfer => {
-      const target = stats.transfers.targets[transfer.target.code] || { name: transfer.target.name, sources: {}}
-      const source = stats.transfers.sources[transfer.source.code] || { name: transfer.source.name, targets: {}}
-      target.sources[transfer.source.code] = { name: transfer.source.name}
-      source.targets[transfer.target.code] = { name: transfer.target.name}
+      const target = stats.transfers.targets[transfer.target.code] || { name: transfer.target.name, sources: {} }
+      const source = stats.transfers.sources[transfer.source.code] || { name: transfer.source.name, targets: {} }
+      target.sources[transfer.source.code] = { name: transfer.source.name }
+      source.targets[transfer.target.code] = { name: transfer.target.name }
       stats.transfers.targets[transfer.target.code] = target
       stats.transfers.sources[transfer.source.code] = source
     })
@@ -189,7 +195,7 @@ const formatStudentsForApi = (students, startDate, endDate) => {
     semesters: {},
     transfers: {
       targets: {},
-      sources:{}
+      sources: {}
     }
   })
   return {
@@ -334,8 +340,8 @@ const bottlenecksOf = async (query) => {
       courseinstance.credits.forEach(credit => {
         const { studentnumber, passingGrade, improvedGrade, failingGrade, grade } = parseCreditInfo(credit)
         stats.attempts += 1
-        const gradecount = grades[grade] || 0
-        grades[grade] = gradecount + 1
+        const gradecount = grades[grade] ? grades[grade].count || 0 : 0
+        grades[grade] = { count: gradecount + 1, status: { passingGrade, improvedGrade, failingGrade } }
         students.all[studentnumber] = true
         const failedBefore = students.failed[studentnumber] !== undefined
         const passedBefore = students.passed[studentnumber] !== undefined
