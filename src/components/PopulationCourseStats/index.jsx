@@ -8,7 +8,7 @@ import _ from 'lodash'
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
 import { courseParticipation } from '../../populationFilters'
 
-const formatGradeDistribution = grades => _.replace(JSON.stringify(grades, null, 1), /{\n*|[^\S\r\n[^:\s]]|}|"|,/g, '')
+const formatGradeDistribution = grades => _.replace(JSON.stringify(_.sortBy(Object.entries(grades).map(([key, value]) => ({ [key]: value.count })), o => -Object.keys(o)), null, 1), /\[\n|{\n*|{\s|}|\s*}|]|"|,/g, '')
 
 class PopulationCourseStats extends Component {
   static propTypes = {
@@ -88,10 +88,10 @@ class PopulationCourseStats extends Component {
             sorted={sortBy === 'students' ? 'descending' : null}
             onClick={this.sortBy('students')}
           >
-            {translate('populationCourses.students')}
+            Attempts
           </Table.HeaderCell>
           <Table.HeaderCell>
-            {translate('populationCourses.passed')}
+            0
           </Table.HeaderCell>
           <Table.HeaderCell>
             1
@@ -109,10 +109,7 @@ class PopulationCourseStats extends Component {
             5
           </Table.HeaderCell>
           <Table.HeaderCell>
-            Other
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-            {translate('populationCourses.failed')}
+            Other passed
           </Table.HeaderCell>
         </Table.Row>
       </Table.Header>
@@ -127,33 +124,32 @@ class PopulationCourseStats extends Component {
                 </Table.Cell>
                 <Table.Cell>{course.course.code}</Table.Cell>
                 <Table.Cell>
-                  {course.stats.passed + course.stats.failed}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.stats.passed}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.grades ? course.grades[1] || 0 : 0}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.grades ? course.grades[2] || 0 : 0}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.grades ? course.grades[3] || 0 : 0}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.grades ? course.grades[4] || 0 : 0}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.grades ? course.grades[5] || 0 : 0}
+                  {course.grades ? _.sum(Object.values(course.grades).map(g => g.count)) || 0 : 0}
                 </Table.Cell>
                 <Table.Cell>
                   {course.grades ?
-                    _.sum(Object.values(_.omit(course.grades, [1, 2, 3, 4, 5])))
+                    _.sum(Object.values(course.grades).filter(g =>
+                      g.status.failingGrade).map(g => g.count))
                     || 0 : 0}
                 </Table.Cell>
                 <Table.Cell>
-                  {course.stats.failed}
+                  {course.grades[1] ? course.grades[1].count || 0 : 0}
+                </Table.Cell>
+                <Table.Cell>
+                  {course.grades[2] ? course.grades[2].count || 0 : 0}
+                </Table.Cell>
+                <Table.Cell>
+                  {course.grades[3] ? course.grades[3].count || 0 : 0}
+                </Table.Cell>
+                <Table.Cell>
+                  {course.grades[4] ? course.grades[4].count || 0 : 0}
+                </Table.Cell>
+                <Table.Cell>
+                  {course.grades[5] ? course.grades[5].count || 0 : 0}
+                </Table.Cell>
+                <Table.Cell>
+                  {course.grades ?
+                    _.sum(Object.values(_.omit(course.grades, [1, 2, 3, 4, 5])).filter(g => g.status.passingGrade || g.status.improvedGrade).map(g => g.count)) : 0}
                 </Table.Cell>
               </Table.Row>}
             flowing
