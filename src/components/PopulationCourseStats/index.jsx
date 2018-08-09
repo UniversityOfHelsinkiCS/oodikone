@@ -149,7 +149,8 @@ class PopulationCourseStats extends Component {
                 </Table.Cell>
                 <Table.Cell>
                   {course.grades ?
-                    _.sum(Object.values(_.omit(course.grades, [1, 2, 3, 4, 5])).filter(g => g.status.passingGrade || g.status.improvedGrade).map(g => g.count)) : 0}
+                    _.sum(Object.values(_.omit(course.grades, [1, 2, 3, 4, 5])).filter(g =>
+                      g.status.passingGrade || g.status.improvedGrade).map(g => g.count)) : 0}
                 </Table.Cell>
               </Table.Row>}
             flowing
