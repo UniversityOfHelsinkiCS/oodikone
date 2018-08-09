@@ -1,5 +1,5 @@
-const { sequelize } = require('../../models/index')
-const { seedMigrations } = require('../../database/seed_migrations')
+const { sequelize } = require('../src/models/index')
+const { seedMigrations } = require('../src/database/seed_migrations')
 
 const options = { force: true }
 
