@@ -352,6 +352,9 @@ const Filters = sequelize.define('filters',
     name: {
       type: Sequelize.STRING
     },
+    description: {
+      type: Sequelize.STRING
+    },
     filters: {
       type: Sequelize.JSONB
     },

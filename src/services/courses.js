@@ -220,15 +220,11 @@ const instancesOf = async (code) => {
 const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 
   const calculateStats = (thisSemester, allInstancesUntilSemester) => {
-    const studentsThatPassedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c => {
-      return c.student
-    }))))
+    const studentsThatPassedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c =>  c.student))))
     const gradeDistribution = _.groupBy(_.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits))), 'grade')
     const studentsThatFailedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student))))
     const allStudentsThatFailedEver = _.flattenDeep(allInstancesUntilSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student)))
-    const passedStudentsThatFailedBefore = _.uniq(studentsThatPassedThisYear.filter(student => {
-      return allStudentsThatFailedEver.map(s => s.studentnumber).includes(student.studentnumber)
-    }))
+    const passedStudentsThatFailedBefore = _.uniq(studentsThatPassedThisYear.filter(student => allStudentsThatFailedEver.map(s => s.studentnumber).includes(student.studentnumber)))
     const passedStudentsOnFirstTry = _.difference(studentsThatPassedThisYear, passedStudentsThatFailedBefore)
     const failedStudentsThatFailedBefore = _.uniq(_.flattenDeep(studentsThatFailedThisYear.filter(student =>
       Object.entries(_.countBy(allStudentsThatFailedEver, 'studentnumber')).some(([number, count]) => number === student.studentnumber && count > 1))))
