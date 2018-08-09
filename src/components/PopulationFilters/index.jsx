@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Header, Button, Form, Radio } from 'semantic-ui-react'
+import { Segment, Header, Button, Form, Radio, Modal, Icon, TextArea, Input } from 'semantic-ui-react'
 import { object, func, arrayOf, bool, string } from 'prop-types'
 import _ from 'lodash'
 import uuidv4 from 'uuid/v4'
@@ -56,9 +56,11 @@ class PopulationFilters extends Component {
   state = {
     visible: false,
     presetName: '',
+    presetDescription: '',
     presetFilters: [],
     firstRenderKludge: true,
-    advancedUser: false
+    advancedUser: false,
+    modalOpen: false
   }
   componentDidUpdate(prevProps) {
     if (this.state.firstRenderKludge || (this.props.populationCourses.pending === false
@@ -71,6 +73,52 @@ class PopulationFilters extends Component {
          but note that it must be wrapped in a condition */
     }
   }
+  formatFilter = (filter) => {
+    let filterToSave = {}
+    if (filter.type === 'Preset') {
+      filterToSave = {
+        ...filter,
+        filters: filter.filters.map(f => this.formatFilter(f))
+      }
+    } else {
+      filterToSave = {
+        ...filter,
+        params: filter.type === 'CourseParticipation' ?
+          {
+            field: filter.params.field,
+            course: {
+              course: {
+                name: filter.params.course.course.name,
+                code: filter.params.course.course.code
+              }
+            }
+          }
+          :
+          filter.params
+      }
+    }
+    return filterToSave
+  }
+  handleSavePopulationFilters = () => {
+    const preset = {
+      id: uuidv4(),
+      name: this.state.presetName,
+      description: this.state.presetDescription,
+      population: this.props.studyRights,
+      filters: this.props.filters
+    }
+    this.setState({ presetName: '', presetDescription: '' })
+    const presetToSave = {
+      ...preset,
+      filters: preset.filters.map(filter => this.formatFilter(filter))
+    }
+    this.props.savePopulationFilters(presetToSave)
+    this.updateFilterList([preset])
+    this.props.clearPopulationFilters()
+    this.props.setPopulationFilter(presetFilter(preset))
+  }
+
+
   updateFilterList(filtersToCreate) {
     // sorry for the uglyness but it kinda works (I think)
     const regenerateFilterFunctions = filters =>    /* eslint-disable */
@@ -152,54 +200,7 @@ class PopulationFilters extends Component {
   }
 
 
-  renderSetFilters() {
-    const formatFilter = (filter) => {
-      let filterToSave = {}
-      if (filter.type === 'Preset') {
-        filterToSave = {
-          ...filter,
-          filters: filter.filters.map(f => formatFilter(f))
-        }
-      } else {
-        filterToSave = {
-          id: filter.id,
-          type: filter.type,
-          name: filter.name,
-          params: filter.type === 'CourseParticipation' ?
-            {
-              field: filter.params.field,
-              course: {
-                course: {
-                  name: filter.params.course.course.name,
-                  code: filter.params.course.course.code
-                }
-              }
-            }
-            :
-            filter.params
-        }
-      }
-      return filterToSave
-    }
-    const handleSavePopulationFilters = () => {
-      const preset = {
-        id: uuidv4(),
-        name: this.state.presetName,
-        population: this.props.studyRights,
-        filters: this.props.filters
-      }
-      this.setState({ presetName: '' })
-      const presetToSave = {
-        ...preset,
-        filters: preset.filters.map(filter => formatFilter(filter))
-      }
-
-      this.props.savePopulationFilters(presetToSave)
-      this.updateFilterList([preset])
-      this.props.clearPopulationFilters()
-      this.props.setPopulationFilter(presetFilter(preset))
-    }
-
+  renderSetFilters(handleSave) {
     const setFilters = this.props.filters.map(f => f.type)
     if (setFilters.length === 0) {
       return null
@@ -237,11 +238,51 @@ class PopulationFilters extends Component {
 
         <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
         {this.state.advancedUser ?
-          <div className="ui action input">
-            <input type="text" placeholder="Name..." onChange={e => this.setState({ presetName: e.target.value })} />
-
-            <button className="ui button" onClick={handleSavePopulationFilters}>save filters as preset</button>
-          </div>
+          <Modal
+            style={{
+              marginTop: 'auto !important',
+              display: 'inline-block !important',
+              position: 'relative',
+              top: '20%',
+              left: '33%'
+            }}
+            trigger={<Button onClick={() => this.setState({ modalOpen: true })}>Save filters as preset</Button>}
+            open={this.state.modalOpen}
+            onClose={() => this.setState({ modalOpen: false })}
+            size='small'
+          >
+            <Header />
+            <Modal.Content>
+              <Form>
+                <Form.Field>
+                  <h2> Save current filters as preset </h2>
+                  <em> This filter is saved in this population for future use </em>
+                  <Input placeholder="Name..." maxLength={40} onChange={e => this.setState({ presetName: e.target.value })} />
+                </Form.Field>
+                <Form.Field>
+                  <em> explain what your filter is doing here </em>
+                  <TextArea placeholder="Description..." maxLength={160} onChange={e => this.setState({ presetDescription: e.target.value })} />
+                </Form.Field>
+              </Form>
+            </Modal.Content>
+            <Modal.Actions>
+              <Button
+                negative
+                onClick={() => this.setState({ modalOpen: false })}
+              >Cancel
+                </Button>
+              <Button
+                disabled={this.state.presetName === ''}
+                color='green'
+                onClick={() => {
+                  handleSave()
+                  this.setState({ modalOpen: false })
+                }}
+                inverted>
+                <Icon name='checkmark' /> Save
+            </Button>
+            </Modal.Actions>
+          </Modal>
           : null
         }
       </Segment>
@@ -252,11 +293,12 @@ class PopulationFilters extends Component {
     return (
       <div>
         {this.renderAddFilters()}
-        {this.renderSetFilters()}
+        {this.renderSetFilters(this.handleSavePopulationFilters)}
       </div>
     )
   }
 }
+
 
 const mapStateToProps = ({
   populationFilters,
