@@ -80,13 +80,17 @@ describe('optimizedStatisticsOf tests', () => {
   const creditFall = {
     id: 'CREDIT-1',
     student_studentnumber: student.studentnumber,
-    courseinstance_id: courseinstanceFall.id
+    courseinstance_id: courseinstanceFall.id,
+    course_code: courseinstanceFall.course_code,
+    attainment_date: courseinstanceFall.coursedate
   }
 
   const creditSpring = {
     id: 'CREDIT-2',
     student_studentnumber: student.studentnumber,
-    courseinstance_id: courseinstanceSpring.id
+    courseinstance_id: courseinstanceSpring.id,
+    course_code: courseinstanceSpring.course_code,
+    attainment_date: courseinstanceSpring.coursedate
   }
 
   const studyrightelements = {
