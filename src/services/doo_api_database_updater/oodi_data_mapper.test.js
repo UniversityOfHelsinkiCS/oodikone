@@ -59,7 +59,7 @@ describe('studyattainment data mapping to credit tests', () => {
     const MAY = 4
 
     test('attainment date is truthy', () => {
-      expect(!!attainment_date).toBeTruthy()
+      expect(attainment_date).toBeTruthy()
     })
 
     test('attainment date is instance of Date', () => {
@@ -67,7 +67,6 @@ describe('studyattainment data mapping to credit tests', () => {
     })
 
     test('attainment date has correct month, year and date', () => {
-      console.log(attainment_date)
       expect(attainment_date.getMonth()).toBe(MAY)
       expect(attainment_date.getFullYear()).toBe(2018)
       expect(attainment_date.getDate()).toBe(30)
