@@ -171,10 +171,10 @@ const parseQueryParams = query => {
 const formatStudentsForApi = (students, startDate, endDate) => {
   const result = students.reduce((stats, student) => {
     student.transfers.forEach(transfer => {
-      const target = stats.transfers.targets[transfer.target.code] || { name: transfer.target.name, sources: {}}
-      const source = stats.transfers.sources[transfer.source.code] || { name: transfer.source.name, targets: {}}
-      target.sources[transfer.source.code] = { name: transfer.source.name}
-      source.targets[transfer.target.code] = { name: transfer.target.name}
+      const target = stats.transfers.targets[transfer.target.code] || { name: transfer.target.name, sources: {} }
+      const source = stats.transfers.sources[transfer.source.code] || { name: transfer.source.name, targets: {} }
+      target.sources[transfer.source.code] = { name: transfer.source.name }
+      source.targets[transfer.target.code] = { name: transfer.target.name }
       stats.transfers.targets[transfer.target.code] = target
       stats.transfers.sources[transfer.source.code] = source
     })
@@ -195,7 +195,7 @@ const formatStudentsForApi = (students, startDate, endDate) => {
     semesters: {},
     transfers: {
       targets: {},
-      sources:{}
+      sources: {}
     }
   })
   return {
@@ -340,8 +340,8 @@ const bottlenecksOf = async (query) => {
       courseinstance.credits.forEach(credit => {
         const { studentnumber, passingGrade, improvedGrade, failingGrade, grade } = parseCreditInfo(credit)
         stats.attempts += 1
-        const gradecount = grades[grade] || 0
-        grades[grade] = gradecount + 1
+        const gradecount = grades[grade] ? grades[grade].count || 0 : 0
+        grades[grade] = { count: gradecount + 1, status: { passingGrade, improvedGrade, failingGrade } }
         students.all[studentnumber] = true
         const failedBefore = students.failed[studentnumber] !== undefined
         const passedBefore = students.passed[studentnumber] !== undefined
