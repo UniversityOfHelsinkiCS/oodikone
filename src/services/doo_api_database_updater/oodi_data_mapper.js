@@ -80,8 +80,10 @@ const attainmentDataToCredit = (attainment, courseinstance_id, studentnumber) =>
     credits: attainment.credits,
     ordering: getDate(attainment.attainment_date, null),
     credittypecode: attainment.attainment_status_code,
+    student_studentnumber: studentnumber,
     courseinstance_id,
-    student_studentnumber: studentnumber
+    attainment_date: parseDate(attainment.attainment_date),
+    course_code: `${attainment.learningopportunity_id}`
   }
 }
 
@@ -139,7 +141,7 @@ const highlevelnameFromElements = elements => {
   return `${subject}`
 }
 
-const parseDate = date => date && moment.utc(date, null).toDate()
+const parseDate = (date, format='YYYY-MM-DD') => date && moment.utc(date, format).toDate()
 
 const getStudyRightFromData = (data, studentNumber) => {
   return {
