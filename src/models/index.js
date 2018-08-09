@@ -513,6 +513,12 @@ const CourseRealisation = sequelize.define('courserealisation', {
 
 const CourseEnrollment = sequelize.define('course_enrollment', {})
 
+const Migration = sequelize.define('migrations', {
+  name: { type: Sequelize.STRING }
+},{
+  tablename: 'migrations'
+})
+
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
 Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
 
@@ -609,5 +615,6 @@ module.exports = {
   Transfers,
   CourseRealisationType,
   CourseRealisation,
-  CourseEnrollment
+  CourseEnrollment,
+  Migration
 }
