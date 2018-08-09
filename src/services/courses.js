@@ -238,9 +238,9 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
   }
   const stats = []
   if (separate === 'true') {
-    const fallInstances = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-01-15'))
+    const fallInstances = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-09-01', String(year + 1) + '-01-15'))
     const allInstancesUntilFall = allInstancesUntilYear.filter(inst => moment(inst.date).isBefore(String(year + 1) + '-01-15'))
-    const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-06-01'))
+    const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-09-01'))
     let fallStatistics = calculateStats(fallInstances, allInstancesUntilFall)
     let springStatistics = calculateStats(springInstances, allInstancesUntilYear)
 
@@ -280,7 +280,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
     }
 
   } else {
-    const yearInst = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-06-01'))
+    const yearInst = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-09-01', String(year + 1) + '-09-01'))
     let statistics = calculateStats(yearInst, allInstancesUntilYear)
     const passed = yearInst.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
     const failed = yearInst.reduce((a, b) => b.fail ? a = a.concat(b.credits[0].student) : a, [])
