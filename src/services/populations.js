@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
-const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, ElementDetails, Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement } = require('../models')
+const { Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails, Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement } = require('../models')
 const { getAllDuplicates } = require('./courses')
 
 const enrolmentDates = () => {
@@ -297,24 +297,18 @@ const findCourses = (studentnumbers, beforeDate) => {
     attributes: ['code', 'name', 'coursetypecode'],
     include: [
       {
-        model: CourseInstance,
-        attributes: ['course_code'],
         required: true,
-        include: {
-          model: Credit,
-          attributes: ['grade', 'student_studentnumber', 'credittypecode'],
-          required: true,
-          where: {
-            student_studentnumber: {
-              [Op.in]: studentnumbers
-            }
-          }
-        },
+        model: Credit,
+        attributes: ['grade', 'student_studentnumber', 'credittypecode', 'attainment_date', 'course_code'],
         where: {
-          coursedate: {
+          student_studentnumber: {
+            [Op.in]: studentnumbers
+          },
+          attainment_date: {
             [Op.lt]: beforeDate
           }
         },
+        order: 'attainment_date'
       },
       {
         model: Discipline
@@ -360,7 +354,6 @@ const createEmptyStatsObject = (code, name, allstudents) => ({
   }
 })
 
-
 const parseCreditInfo = credit => ({
   studentnumber: credit.student_studentnumber,
   grade: credit.grade,
@@ -395,34 +388,32 @@ const bottlenecksOf = async (query) => {
       coursestats.course.disciplines[discipline_id] = name
       bottlenecks.disciplines[discipline_id] = name
     })
-    course.courseinstances.forEach(courseinstance => {
-      courseinstance.credits.forEach(credit => {
-        const { studentnumber, passingGrade, improvedGrade, failingGrade, grade } = parseCreditInfo(credit)
-        stats.attempts += 1
-        const gradecount = grades[grade] ? grades[grade].count || 0 : 0
-        grades[grade] = { count: gradecount + 1, status: { passingGrade, improvedGrade, failingGrade } }
-        students.all[studentnumber] = true
-        const failedBefore = students.failed[studentnumber] !== undefined
-        const passedBefore = students.passed[studentnumber] !== undefined
-        delete students.notParticipated[studentnumber]
-        if (passingGrade === true) {
-          delete students.notParticipatedOrFailed[studentnumber]
-          students.passed[studentnumber] = true
-          if (failedBefore === true) {
-            delete students.failed[studentnumber]
-            students.retryPassed[studentnumber] = true
-          }
+    course.credits.forEach(credit => {
+      const { studentnumber, passingGrade, improvedGrade, failingGrade, grade } = parseCreditInfo(credit)
+      stats.attempts += 1
+      const gradecount = grades[grade] ? grades[grade].count || 0 : 0
+      grades[grade] = { count: gradecount + 1, status: { passingGrade, improvedGrade, failingGrade } }
+      students.all[studentnumber] = true
+      const failedBefore = students.failed[studentnumber] !== undefined
+      const passedBefore = students.passed[studentnumber] !== undefined
+      delete students.notParticipated[studentnumber]
+      if (passingGrade === true) {
+        delete students.notParticipatedOrFailed[studentnumber]
+        students.passed[studentnumber] = true
+        if (failedBefore === true) {
+          delete students.failed[studentnumber]
+          students.retryPassed[studentnumber] = true
         }
-        if (improvedGrade === true) {
-          students.improvedPassedGrade[studentnumber] = true
+      }
+      if (improvedGrade === true) {
+        students.improvedPassedGrade[studentnumber] = true
+      }
+      if (failingGrade === true && passedBefore === false) {
+        students.failed[studentnumber] = true
+        if (failedBefore === true) {
+          students.failedMany[studentnumber] = true
         }
-        if (failingGrade === true && passedBefore === false) {
-          students.failed[studentnumber] = true
-          if (failedBefore === true) {
-            students.failedMany[studentnumber] = true
-          }
-        }
-      })
+      }
     })
     coursestatistics[unifiedcode] = coursestats
     return coursestatistics
