@@ -545,6 +545,7 @@ Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'stu
 Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
 
 Credit.belongsTo(Course, { foreignKey: 'course_code' })
+Course.hasMany(Credit, { foreignKey: 'course_code' })
 
 Student.hasMany(TagStudent, { foreignKey: 'taggedstudents_studentnumber', sourceKey: 'studentnumber' })
 Tag.hasMany(TagStudent, { foreignKey: 'tags_tagname', sourceKey: 'tagname' })
