@@ -1,7 +1,6 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { Student, Credit, Course, Studyright, StudyrightElement, ElementDetails } = require('../models')
-const { getAllDuplicates } = require('./courses')
 const Op = Sequelize.Op
 
 const createStudent = student => Student.create(student)
@@ -121,51 +120,6 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
   }
 }
 
-const formatStudentUnifyCodes = async ({ studentnumber, dateofuniversityenrollment, creditcount, credits }, duplicates) => {
-  const unifyOpenUniversity = (code) => {
-    if (code[0] === 'A') {
-      return code.substring(code[1] === 'Y' ? 2 : 1)
-    }
-    return code
-  }
-
-  const getUnifiedCode = async (code) => {
-    const unifiedcodes = duplicates[code]
-    return !unifiedcodes ? code : unifiedcodes.main
-  }
-
-  const toCourse = async ({ grade, credits, courseinstance }) => {
-    const code = await getUnifiedCode(unifyOpenUniversity(`${courseinstance.course_code}`))
-    return {
-      course: {
-        code,
-        name: courseinstance.course.name
-      },
-      date: courseinstance.coursedate,
-      passed: Credit.passed({ grade }),
-      grade,
-      credits
-    }
-  }
-
-  const byDate = (a, b) => {
-    return moment(a.courseinstance.coursedate).isSameOrBefore(b.courseinstance.coursedate) ? -1 : 1
-  }
-
-  if (credits === undefined) {
-    credits = []
-  }
-
-  const student = {
-    studentNumber: studentnumber,
-    started: dateofuniversityenrollment,
-    credits: creditcount,
-    courses: await Promise.all(credits.sort(byDate).map(toCourse)),
-    tags: []
-  }
-  return student
-}
-
 const bySearchTerm = async (term) => {
   try {
     const result = await byAbreviatedNameOrStudentNumber(`%${term}%`)
@@ -217,11 +171,6 @@ const bySearchTermAndElements = (searchterm, elementcodes) => {
   })
 }
 
-const formatStudentsUnifyCourseCodes = async students => {
-  const duplicates = await getAllDuplicates()
-  return await Promise.all(students.map(student => formatStudentUnifyCodes(student, duplicates)))
-}
-
 module.exports = {
-  withId, bySearchTerm, createStudent, updateStudent, formatStudentUnifyCodes, bySearchTermAndElements, formatStudentsUnifyCourseCodes
+  withId, bySearchTerm, createStudent, updateStudent, bySearchTermAndElements
 }
