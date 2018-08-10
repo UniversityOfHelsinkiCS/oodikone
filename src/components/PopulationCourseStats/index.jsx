@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Table, Form, Input, Popup, Button, Icon } from 'semantic-ui-react'
-import { func, arrayOf, object, number, shape } from 'prop-types'
+import { func, arrayOf, object, number, shape, string } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
+import { withRouter } from 'react-router-dom'
+import moment from 'moment'
 
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
+import { getCourseStatistics } from '../../redux/courseStatistics'
 import { courseParticipation } from '../../populationFilters'
 
 const formatGradeDistribution = grades => _.replace(JSON.stringify(_.sortBy(Object.entries(grades).map(([key, value]) => ({ [key]: value.count })), o => -Object.keys(o)), null, 1), /\[\n|{\n*|{\s|}|\s*}|]|"|,/g, '')
@@ -21,7 +24,11 @@ class PopulationCourseStats extends Component {
     setPopulationFilter: func.isRequired,
     populationSize: number.isRequired,
     selectedCourses: arrayOf(object).isRequired,
-    removePopulationFilterOfCourse: func.isRequired
+    removePopulationFilterOfCourse: func.isRequired,
+    history: shape({}).isRequired,
+    getCourseStatistics: func.isRequired,
+    language: string.isRequired,
+    query: shape({}).isRequired
   }
 
   constructor(props) {
@@ -34,7 +41,6 @@ class PopulationCourseStats extends Component {
       showGradeDistribution: false
     }
   }
-
   active = course =>
     this.props.selectedCourses
       .find(c => course.name === c.name && course.code === c.code) !== undefined
@@ -80,7 +86,7 @@ class PopulationCourseStats extends Component {
     <Table celled sortable>
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell>
+          <Table.HeaderCell colSpan="2" >
             {translate('populationCourses.course')}
           </Table.HeaderCell>
           <Table.HeaderCell>{translate('populationCourses.code')}</Table.HeaderCell>
@@ -122,6 +128,20 @@ class PopulationCourseStats extends Component {
                 <Table.Cell onClick={this.limitPopulationToCourse(course)}>
                   {course.course.name[language]}
                 </Table.Cell>
+                <Table.Cell
+                  icon="level up alternate"
+                  onClick={() => {
+                    this.props.history.push('/coursestatistics/')
+                    this.props.getCourseStatistics({
+                      code: course.course.code,
+                      start: Number(this.props.query.year),
+                      end: Number(moment(moment(this.props.query.year, 'YYYY').add(this.props.query.months, 'months')).format('YYYY')),
+                      separate: false,
+                      language: this.props.language
+                    })
+                  }}
+                  style={{ borderLeft: '0px !important' }}
+                />
                 <Table.Cell>{course.course.code}</Table.Cell>
                 <Table.Cell>
                   {course.grades ? _.sum(Object.values(course.grades).map(g => g.count)) || 0 : 0}
@@ -168,7 +188,7 @@ class PopulationCourseStats extends Component {
     <Table celled sortable>
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell colSpan="2">
+          <Table.HeaderCell colSpan="3">
             {translate('populationCourses.course')}
           </Table.HeaderCell>
           <Table.HeaderCell
@@ -192,7 +212,7 @@ class PopulationCourseStats extends Component {
           <Table.HeaderCell colSpan="2">{translate('populationCourses.percentageOfPopulation')}</Table.HeaderCell>
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell>{translate('populationCourses.name')}</Table.HeaderCell>
+          <Table.HeaderCell colSpan="2" >{translate('populationCourses.name')}</Table.HeaderCell>
           <Table.HeaderCell>{translate('populationCourses.code')}</Table.HeaderCell>
           <Table.HeaderCell
             sorted={sortBy === 'passed' ? 'descending' : null}
@@ -250,6 +270,20 @@ class PopulationCourseStats extends Component {
             <Table.Cell onClick={this.limitPopulationToCourse(course)}>
               {course.course.name[language]}
             </Table.Cell>
+            <Table.Cell
+              icon="level up alternate"
+              onClick={() => {
+                this.props.history.push('/coursestatistics/')
+                this.props.getCourseStatistics({
+                  code: course.course.code,
+                  start: Number(this.props.query.year),
+                  end: Number(moment(moment(this.props.query.year, 'YYYY').add(this.props.query.months, 'months')).format('YYYY')),
+                  separate: false,
+                  language: this.props.language
+                })
+              }}
+              style={{ borderLeft: '0px !important' }}
+            />
             <Table.Cell>{course.course.code}</Table.Cell>
             <Table.Cell>
               {course.stats.passed + course.stats.failed}
@@ -313,6 +347,7 @@ const mapStateToProps = (state) => {
   return {
     language: state.settings.language,
     translate: getTranslate(state.locale),
+    query: state.populations.query,
     selectedCourses,
     populationSize: state.populations.data.students.length > 0 ?
       state.populations.data.students.length : 0
@@ -321,5 +356,5 @@ const mapStateToProps = (state) => {
 
 export default connect(
   mapStateToProps,
-  { setPopulationFilter, removePopulationFilterOfCourse }
-)(PopulationCourseStats)
+  { setPopulationFilter, removePopulationFilterOfCourse, getCourseStatistics }
+)(withRouter(PopulationCourseStats))
