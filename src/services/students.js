@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const { Student, Credit, CourseInstance, Course, Studyright, StudyrightElement, ElementDetails } = require('../models')
+const { Student, Credit, Course, Studyright, StudyrightElement, ElementDetails } = require('../models')
 const { getAllDuplicates } = require('./courses')
 const Op = Sequelize.Op
 
@@ -20,12 +20,11 @@ const byId = async (id) => Student.findByPrimary(id, {
   include: [
     {
       model: Credit,
-      include: [
-        {
-          model: CourseInstance,
-          include: [Course]
-        }
-      ]
+      required: true,
+      include: {
+        model: Course,
+        required: true
+      }
     },
     {
       model: Studyright,
@@ -45,7 +44,6 @@ const byId = async (id) => Student.findByPrimary(id, {
     }
   ]
 })
-
 
 const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   return Student.findAll({
@@ -68,15 +66,15 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
 }
 
 const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments, transfers, updatedAt, createdAt }) => {
-  const toCourse = ({ grade, credits, courseinstance, credittypecode }) => {
-    const course = courseinstance.course.get()
+  const toCourse = ({ grade, credits, credittypecode, attainment_date, course }) => {
+    course = course.get()
     return {
       course: {
-        code: courseinstance.course_code,
+        code: course.course_code,
         name: course.name,
-        coursetypecode: courseinstance.course.coursetypecode
+        coursetypecode: course.coursetypecode
       },
-      date: courseinstance.coursedate,
+      date: attainment_date,
       passed: Credit.passed({ credittypecode }),
       grade,
       credits,
@@ -98,7 +96,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
   const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({ semestercode, enrollmenttype }))
 
   const courseByDate = (a, b) => {
-    return moment(a.courseinstance.coursedate).isSameOrBefore(b.courseinstance.coursedate) ? -1 : 1
+    return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
   }
 
   if (credits === undefined) {
@@ -225,5 +223,5 @@ const formatStudentsUnifyCourseCodes = async students => {
 }
 
 module.exports = {
-  withId, bySearchTerm, formatStudent, createStudent, byId, updateStudent, formatStudentUnifyCodes, bySearchTermAndElements, formatStudentsUnifyCourseCodes
+  withId, bySearchTerm, createStudent, updateStudent, formatStudentUnifyCodes, bySearchTermAndElements, formatStudentsUnifyCourseCodes
 }
