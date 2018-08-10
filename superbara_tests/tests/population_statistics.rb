@@ -1,5 +1,5 @@
 focus
-visit "localhost:8081"
+visit "oodikone.cs.helsinki.fi/testing"
 
 require_relative "./components/query_population_statistics"
 require_relative "./components/filters_population_statistics"
@@ -44,7 +44,7 @@ end
 navigation.navigate(/Course/)
 find("tr",text:("B2B morph communities")).all("td")[0].click
 find("tr", text: "robust unleash e-services").all("td")[0].click
-value_end = tablebody.all("td")[10].text.to_iq
+value_end = tablebody.all("td")[10].text.to_i
 amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i
 puts(value_start)
 puts(value_end)
@@ -58,10 +58,11 @@ end
 save_button = find("button", text: "Save filters as preset")
 filter_name = "test " + rand(1...9999999).to_s
 save_button.click
-find(:xpath, "../..").fill_in "Name...", with: filter_name
-find("button", text: "Save").click
-set_filters = save_button.find(:xpath, "../..")
-saved = set_filters.all("div", text: filter_name).length == 1
+fill_in "Name...", with: filter_name
+fill_in "Description...", with: "Description for " + filter_name
+find("button", text: /^Save$/).click
+set_filters = save_button.find(:xpath, "..")
+saved = set_filters.all("label", text: filter_name).length == 1
 amount_of_students = tablebody.find(:xpath, '..').find("tr", text:/^n/).all("td")[1].text.to_i
 
 wait do
@@ -69,8 +70,7 @@ wait do
     saved == true
     amount_of_students == 7
 end
-set_filters.find("div", text: filter_name).all("span")[1].click
-
+set_filters.find("label", text: filter_name).find(:xpath, "../../../..").all("i")[1].click
 wait do
     set_filters != true
     has_text? filter_name
@@ -78,16 +78,16 @@ end
 preset_filter = Filter.new(filter_name)
 preset_filter.set_filter
 wait do
-    set_filters.all("div", text: filter_name).length == 1
+    set_filters.all("label", text: filter_name).length == 1
 end
-set_filters.find("div", text: filter_name).all("span")[0].click
+set_filters.find("label", text: filter_name).find(:xpath, "../../../..").all("i")[0].click
 click_button("Just remove from use")
 wait do
     set_filters != true
     has_text? filter_name
 end
 preset_filter.set_filter
-set_filters.find("div", text: filter_name).all("span")[0].click
+set_filters.find("label", text: filter_name).find(:xpath, "../../../..").all("i")[0].click
 click_button("Delete for good")
 
 assert do
@@ -98,7 +98,7 @@ creditsAtLeast2 = Filter.new("Show only students with credits less than")
 creditsAtLeast2.fill(true, "50")
 creditsAtLeast2.set_filter
 Filter.new("started this semester").set_filter
-save_button = find("button", text: "save filters as preset")
+save_button = find("button", text: "Save filters as preset")
 set_filters = save_button.find(:xpath, "../..")
 wait 10 do
     set_filters.all("div",class: "segment").length == 2

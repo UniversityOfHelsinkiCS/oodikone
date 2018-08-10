@@ -56,7 +56,6 @@ class Main extends Component {
               <Route exact path={routes.index.route} component={WelcomePage} />
               <Route exact path={routes.populations.route} component={Populations} />
               <Route exact path={routes.students.route} component={StudentStatistics} />
-              <Route exact path={routes.courseInstances.route} component={CourseInstances} />
               <Route exact path={routes.courseStatistics.route} component={CourseStatistics} />
               <Route exact path={routes.settings.route} component={Settings} />
               <Route exact path={routes.users.route} component={EnableUsers} />
