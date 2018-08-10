@@ -1,7 +1,6 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
 const { Student, Credit, CourseInstance, Course, sequelize, Studyright, StudyrightExtent, ElementDetails, Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement } = require('../models')
-const { formatStudent } = require('../services/students')
 const { getAllDuplicates } = require('./courses')
 
 const enrolmentDates = () => {
@@ -25,11 +24,67 @@ const semesterEnd = {
   FALL: '12-31'
 }
 
-const formatStudentForOldApi = (student, startDate, endDate) => {
-  student = formatStudent(student)
-  student.studyrightStart = startDate
-  student.starting = moment(student.started).isBetween(startDate, endDate, null, '[]')
-  return student
+const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments, transfers, updatedAt, createdAt }, startDate, endDate) => {
+
+  const toCourse = ({ grade, attainment_date, credits, course, credittypecode }) => {
+    course = course.get()
+    return {
+      course: {
+        code: course.code,
+        name: course.name,
+        coursetypecode: course.coursetypecode
+      },
+      date: attainment_date,
+      passed: Credit.passed({ credittypecode }),
+      grade,
+      credits,
+      isStudyModuleCredit: course.is_study_module
+    }
+  }
+
+  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, highlevelname, startdate, enddate, extentcode, graduated, graduation_date, studyright_elements }) => ({
+    studyrightid,
+    highlevelname,
+    extentcode,
+    startdate,
+    graduationDate: graduation_date,
+    studyrightElements: studyright_elements,
+    enddate,
+    graduated: Boolean(graduated)
+  }))
+
+  semester_enrollments = semester_enrollments || []
+  const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({ semestercode, enrollmenttype }))
+
+  const courseByDate = (a, b) => {
+    return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
+  }
+
+  if (credits === undefined) {
+    credits = []
+  }
+
+  const started = dateofuniversityenrollment
+
+  return {
+    firstnames,
+    lastname,
+    studyrights,
+    started,
+    studentNumber: studentnumber,
+    credits: creditcount || 0,
+    courses: credits.sort(courseByDate).map(toCourse),
+    name: abbreviatedname,
+    transfers: transfers || [],
+    matriculationexamination,
+    gender,
+    email,
+    semesterenrollments,
+    updatedAt: updatedAt || createdAt,
+    tags: [],
+    studyrightStart: startDate,
+    starting: moment(started).isBetween(startDate, endDate, null, '[]')
+  }
 }
 
 const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
@@ -40,40 +95,38 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     include: [
       {
         model: Credit,
-        attributes: ['grade', 'credits', 'credittypecode', 'student_studentnumber'],
+        attributes: ['grade', 'credits', 'credittypecode', 'attainment_date', 'student_studentnumber'],
         separate: true,
         include: [
           {
-            model: CourseInstance,
-            attributes: ['coursedate', 'course_code'],
-            include: {
-              model: Course,
-              required: true,
-              attributes: ['name', 'coursetypecode']
-            },
+            model: Course,
             required: true,
-            where: {
-              coursedate: {
-                [Op.between]: [startDate, endDate]
-              }
-            }
+            attributes: ['code', 'name', 'coursetypecode']
           }
         ],
         where: {
           student_studentnumber: {
             [Op.in]: studentnumbers
+          },
+          attainment_date: {
+            [Op.between]: [startDate, endDate]
           }
         }
       },
       {
         model: Transfers,
+        attributes: ['transferdate'],
         include: [
           {
             model: ElementDetails,
+            required: true,
+            attributes: ['code', 'name', 'type'],
             as: 'source'
           },
           {
             model: ElementDetails,
+            required: true,
+            attributes: ['code', 'name', 'type'],
             as: 'target'
           }
         ]
@@ -83,13 +136,19 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         required: true,
         attributes: ['studyrightid', 'startdate', 'highlevelname', 'extentcode', 'graduated'],
         include: {
-          model: StudyrightExtent
+          model: StudyrightExtent,
+          required: true,
+          attributes: ['extentcode', 'name']
         }
       },
       {
         model: SemesterEnrollment,
+        attributes: ['enrollmenttype', 'studentnumber', 'semestercode'],
+        separate: true,
         include: {
           model: Semester,
+          attributes: ['semestercode', 'name' ,'startdate', 'enddate'],
+          required: true,
           where: {
             startdate: {
               [Op.between]: [startDate, endDate]
@@ -187,7 +246,7 @@ const formatStudentsForApi = (students, startDate, endDate) => {
     student.semester_enrollments.forEach(({ semestercode, semester }) => {
       stats.semesters[semestercode] = semester
     })
-    stats.students.push(formatStudentForOldApi(student, startDate, endDate))
+    stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   }, {
     students: [],
