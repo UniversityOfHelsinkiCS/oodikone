@@ -26,7 +26,8 @@ const componentFor = {
   DisciplineTypes,
   EnrollmentStatus,
   CourseParticipation,
-  ExtentGraduated
+  ExtentGraduated,
+  TransferFilter
 }
 const advancedFilters = { // Filters that are too hard to use for common folk
   DisciplineTypes,
