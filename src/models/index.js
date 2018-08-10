@@ -121,6 +121,10 @@ const Credit = sequelize.define('credit',
       {
         fields: ['course_code'],
         name: 'credit_course_code'
+      },
+      {
+        fields: ['attainment_date'],
+        name: 'credit_attainment_date'
       }
     ]
   }
@@ -178,7 +182,8 @@ const Studyright = sequelize.define('studyright',
     timestamps: false,
     indexes: [
       {
-        fields: ['student_studentnumber']
+        fields: ['student_studentnumber'],
+        name: 'studyright_student_studentnumber'
       }
     ]
   }
@@ -446,7 +451,8 @@ const SemesterEnrollment = sequelize.define('semester_enrollment', {
       fields: ['semestercode', 'studentnumber'],
       unique: true
     }, {
-      fields: ['studentnumber']
+      fields: ['studentnumber'],
+      name: 'semester_enrollment_studentnumber'
     }
   ]
 })
@@ -468,7 +474,8 @@ const Transfers = sequelize.define('transfers', {
 }, {
   indexes: [
     {
-      fields: ['studentnumber']
+      fields: ['studentnumber'],
+      name: 'transfers_studentnumber'
     }
   ]
 })
@@ -517,9 +524,13 @@ const CourseRealisation = sequelize.define('courserealisation', {
 const CourseEnrollment = sequelize.define('course_enrollment', {})
 
 const Migration = sequelize.define('migrations', {
-  name: { type: Sequelize.STRING }
-},{
-  tablename: 'migrations'
+  name: {
+    type: Sequelize.STRING,
+    primaryKey: true
+  }
+}, {
+  tablename: 'migrations',
+  timestamps: false
 })
 
 CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
