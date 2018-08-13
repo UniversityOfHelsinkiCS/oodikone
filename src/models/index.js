@@ -41,14 +41,6 @@ const Student = sequelize.define('student',
   }
 )
 
-Student.hasNoPreviousStudies = (startDate) => (student) => {
-  const by = (a, b) => moment(a).isSameOrBefore(b) ? -1 : 1
-  const dates = student.credits.map(c => c.courseinstance.coursedate).sort(by)
-  const earliestCreditDate = dates[0]
-
-  return moment(startDate).isSameOrBefore(earliestCreditDate)
-}
-
 Student.hasStarted = (student) => {
   return student.credits.length > 0
 }
@@ -125,20 +117,6 @@ const Credit = sequelize.define('credit',
     ]
   }
 )
-
-Credit.inTimeRange = (date, months) => (credit) => {
-  const creditDate = credit.courseinstance.coursedate
-  const monthsFromDate = moment(date).add(months, 'months')
-
-  return moment(creditDate).isBetween(date, monthsFromDate, null, '[]')
-}
-
-Credit.notLaterThan = (date, months) => (credit) => {
-  const creditDate = credit.courseinstance.coursedate
-  const monthsFromDate = moment(date).add(months, 'months')
-
-  return moment(creditDate).isSameOrBefore(monthsFromDate, null, '[]')
-}
 
 Credit.notUnnecessary = (credit) => {
   return credit.credits > 0 && credit.credits <= 12
