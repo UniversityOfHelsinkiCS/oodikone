@@ -429,6 +429,7 @@ const bottlenecksOf = async (query) => {
     stats.percentage = percentageOf(stats.passed, stats.students)
     stats.passedOfPopulation = percentageOf(stats.passed, studentnumbers.length)
     stats.triedOfPopulation = percentageOf(stats.students, studentnumbers.length)
+    stats.perStudent = stats.attempts / (stats.passed + stats.failed)
     return coursestatistics
   })
   return bottlenecks
