@@ -1,5 +1,5 @@
 const { forceSyncDatabase } = require('../../../src/database/connection')
-const { sequelize, Student, Course, CourseInstance, ElementDetails, StudyrightElement, Studyright, Credit, StudyrightExtent } = require('../../../src/models/index')
+const { sequelize, Student, Course, ElementDetails, StudyrightElement, Studyright, Credit, StudyrightExtent } = require('../../../src/models/index')
 const { optimizedStatisticsOf } = require('../../../src/services/populations')
 
 const langify = name => ({
@@ -80,7 +80,6 @@ describe('optimizedStatisticsOf tests', () => {
   const creditFall = {
     id: 'CREDIT-1',
     student_studentnumber: student.studentnumber,
-    courseinstance_id: courseinstanceFall.id,
     course_code: courseinstanceFall.course_code,
     attainment_date: courseinstanceFall.coursedate
   }
@@ -88,7 +87,6 @@ describe('optimizedStatisticsOf tests', () => {
   const creditSpring = {
     id: 'CREDIT-2',
     student_studentnumber: student.studentnumber,
-    courseinstance_id: courseinstanceSpring.id,
     course_code: courseinstanceSpring.course_code,
     attainment_date: courseinstanceSpring.coursedate
   }
@@ -121,8 +119,6 @@ describe('optimizedStatisticsOf tests', () => {
       await forceSyncDatabase()
       await Student.create(student)
       await Course.create(courses.elements_of_ai)
-      await CourseInstance.create(courseinstanceFall)
-      await CourseInstance.create(courseinstanceSpring)
       await Credit.create(creditFall)
       await Credit.create(creditSpring)
       await ElementDetails.create(elementdetails.bsc)
