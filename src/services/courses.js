@@ -2,7 +2,7 @@ const Sequelize = require('sequelize')
 const moment = require('moment')
 const redis = require('redis')
 const conf = require('../conf-backend')
-const { sequelize, Student, Credit, CourseInstance, Course, CourseType, Discipline, ElementDetails, StudyrightElement, Studyright } = require('../models')
+const { sequelize, Student, Credit, Course, CourseType, Discipline, ElementDetails, StudyrightElement, Studyright } = require('../models')
 const Op = Sequelize.Op
 const _ = require('lodash')
 
@@ -34,47 +34,38 @@ const byNameOrCode = (searchTerm, language) => Course.findAll({
 
 const byCode = code => Course.findByPrimary(code)
 
-const instancesByCode = (code) => CourseInstance.findAll({
-  include: [
-    {
-      model: Credit,
-      include:
-      {
-        model: Student,
-        attributes: ['studentnumber'],
-        include:
+const creditsForCourses = (codes) => Credit.findAll({
+  include: {
+    model: Student,
+    attributes: ['studentnumber'],
+    include: {
+      model: StudyrightElement,
+      attributes: ['code'],
+      include: [
         {
-          model: StudyrightElement,
-          attributes: ['code'],
-          include:
-            [{
-              model: ElementDetails,
-              attributes: ['name', 'type'],
-              where: {
-                type: {
-                  [Op.eq]: 20
-                }
-              }
-            },
-            {
-              model: Studyright,
-              attributes: ['prioritycode'],
-              where: {
-                prioritycode: {
-                  [Op.eq]: 1
-                }
-              }
+          model: ElementDetails,
+          attributes: ['name', 'type'],
+          where: {
+            type: {
+              [Op.eq]: 20
             }
-            ],
+          }
+        },
+        {
+          model: Studyright,
+          attributes: ['prioritycode'],
+          where: {
+            prioritycode: {
+              [Op.eq]: 1
+            }
+          }
         }
-
-      },
-
+      ],
     }
-  ],
+  },
   where: {
     course_code: {
-      [Op.eq]: code
+      [Op.in]: codes
     }
   }
 })
@@ -92,25 +83,26 @@ const bySearchTerm = async (term, language) => {
   }
 }
 
-const instancesOf = async (code) => {
+const creditsOf = async (codes) => {
   const byDate = (a, b) => {
-    return moment(a.coursedate).isSameOrBefore(b.coursedate) ? -1 : 1
+    return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
   }
 
-  const formatInstance = (instance) => {
+  const formatCredit = (credit) => {
+    const credits = [credit]
     return {
-      id: instance.id,
-      date: instance.coursedate,
-      credits: instance.credits,
-      fail: instance.credits.filter(Credit.failed).length,
-      pass: instance.credits.filter(Credit.passed).length,
-      students: instance.credits.length,
+      id: credit.id,
+      date: credit.attainment_date,
+      credits,
+      fail: credits.filter(Credit.failed).length,
+      pass: credits.filter(Credit.passed).length,
+      students: credits.length,
     }
   }
 
   try {
-    const result = await instancesByCode(code)
-    return result.sort(byDate).map(formatInstance)
+    const credits = await creditsForCourses(codes)
+    return credits.sort(byDate).map(formatCredit)
   } catch (e) {
     console.log(e)
     return {
@@ -215,7 +207,7 @@ const yearlyStatsOf = async (code, year, separate, language) => {
 
   const alternatives = await getDuplicateCodes(code)
   const codes = alternatives ? [code, ...Object.keys(alternatives.alt)] : [code]
-  const allInstances = _.flatten((await Promise.all(codes.map(code => instancesOf(code)))))
+  const allInstances = await creditsOf(codes)
 
   const yearInst = allInstances.filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-08-01', year.end + '-06-01'))
   const allInstancesUntilYear = allInstances.filter(inst => moment(new Date(inst.date)).isBefore(year.end + '-06-01'))
@@ -371,7 +363,6 @@ const getAllDisciplines = () => Discipline.findAll()
 module.exports = {
   byCode,
   bySearchTerm,
-  instancesOf,
   createCourse,
   yearlyStatsOf,
   findDuplicates,
