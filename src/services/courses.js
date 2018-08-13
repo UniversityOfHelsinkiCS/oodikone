@@ -238,25 +238,6 @@ const yearlyStatsOf = async (code, year, separate, language) => {
   return
 }
 
-const courseInstanceByCodeAndDate = (code, date) => {
-  return CourseInstance.findOne({
-    where: {
-      [Op.and]: [
-        {
-          course_code: {
-            [Op.eq]: code
-          }
-        },
-        {
-          coursedate: {
-            [Op.eq]: new Date(date)
-          }
-        }
-      ]
-    }
-  })
-}
-
 const createCourse = async (code, name, latest_instance_date) => Course.create({
   code,
   name,
@@ -392,7 +373,6 @@ module.exports = {
   bySearchTerm,
   instancesOf,
   createCourse,
-  courseInstanceByCodeAndDate,
   yearlyStatsOf,
   findDuplicates,
   getDuplicateCodes,
