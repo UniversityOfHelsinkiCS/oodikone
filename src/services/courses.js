@@ -2,8 +2,7 @@ const Sequelize = require('sequelize')
 const moment = require('moment')
 const redis = require('redis')
 const conf = require('../conf-backend')
-const { sequelize, Student, Credit, CourseInstance, Course, CourseType, Discipline, ElementDetails, StudyrightElement, Studyright } = require('../models')
-const uuidv4 = require('uuid/v4')
+const { sequelize, Student, Credit, Course, CourseType, Discipline, ElementDetails, StudyrightElement, Studyright } = require('../models')
 const Op = Sequelize.Op
 const _ = require('lodash')
 
@@ -35,88 +34,38 @@ const byNameOrCode = (searchTerm, language) => Course.findAll({
 
 const byCode = code => Course.findByPrimary(code)
 
-const instanceStatistics = async (code, date) => CourseInstance.findOne({
-  include: [
-    {
-      model: Credit,
-      include: [Student]
-    }
-  ],
-  where: {
-    [Op.and]: [
-      {
-        course_code: {
-          [Op.eq]: code
-        }
-      },
-      {
-        coursedate: {
-          [Op.eq]: new Date(date)
-        }
-      }
-    ]
-  }
-})
-
-const instancesByCode = (code) => CourseInstance.findAll({
-  include: [
-    {
-      model: Credit,
-      include:
-      {
-        model: Student,
-        attributes: ['studentnumber'],
-        include:
-        {
-          model: StudyrightElement,
-          attributes: ['code'],
-          include:
-            [{
-              model: ElementDetails,
-              attributes: ['name', 'type'],
-              where: {
-                type: {
-                  [Op.eq]: 20
-                }
-              }
-            },
-            {
-              model: Studyright,
-              attributes: ['prioritycode'],
-              where: {
-                prioritycode: {
-                  [Op.eq]: 1
-                }
-              }
-            }
-            ],
-        }
-
-      },
-
-    }
-  ],
-  where: {
-    course_code: {
-      [Op.eq]: code
-    }
-  }
-})
-
-const byIds = (ids) => Student.findAll({
-  include: [
-    {
-      model: Credit,
+const creditsForCourses = (codes) => Credit.findAll({
+  include: {
+    model: Student,
+    attributes: ['studentnumber'],
+    include: {
+      model: StudyrightElement,
+      attributes: ['code'],
       include: [
         {
-          model: CourseInstance,
+          model: ElementDetails,
+          attributes: ['name', 'type'],
+          where: {
+            type: {
+              [Op.eq]: 20
+            }
+          }
+        },
+        {
+          model: Studyright,
+          attributes: ['prioritycode'],
+          where: {
+            prioritycode: {
+              [Op.eq]: 1
+            }
+          }
         }
-      ]
+      ],
     }
-  ],
+  },
   where: {
-    studentnumber: {
-      [Op.in]: ids
+    course_code: {
+      [Op.in]: codes
     }
   }
 })
@@ -134,81 +83,26 @@ const bySearchTerm = async (term, language) => {
   }
 }
 
-const statisticsOf = async (code, date, months) => {
-
-  const getStudents = ({ credits }) => {
-    const all = credits.map(c => c.student_studentnumber)
-    const pass = credits.filter(Credit.passed).map(c => c.student_studentnumber)
-    const fail = credits.filter(Credit.failed).map(c => c.student_studentnumber)
-    return { all, pass, fail }
-  }
-
-  const starYearsOf = (students) => {
-    const years = students.map(s => moment(s.dateofuniversityenrollment).year()).sort()
-    return years.reduce((map, y) => { map[y] = map[y] ? map[y] + 1 : 1; return map }, {})
-  }
-
-  const currentCourse = (credit) => {
-    return (credit.courseinstance.course_code !== code &&
-      credit.courseinstance.coursedate !== date)
-  }
-
-  const studentStatsAfter = (studentsStats, date) => {
-    const creditsAfter = (student) => {
-      return student.credits
-        .filter(Credit.inTimeRange(date, months))
-        .filter(Credit.passed)
-        .filter(currentCourse)
-        .filter(Credit.notUnnecessary)
-        .reduce((set, c) => set + c.credits, 0.0)
-    }
-
-    const toStudent = (set, student) => {
-      set[uuidv4()] = creditsAfter(student, date)
-      return set
-    }
-
-    return studentsStats.reduce(toStudent, {})
-  }
-
-  try {
-    const instanceStats = await instanceStatistics(code, date)
-    const students = getStudents(instanceStats)
-    const studentStats = await byIds(students.all)
-    const all = studentStatsAfter(studentStats.filter(s => students.all.includes(s.studentnumber)), date)
-    const pass = studentStatsAfter(studentStats.filter(s => students.pass.includes(s.studentnumber)), date)
-    const fail = studentStatsAfter(studentStats.filter(s => students.fail.includes(s.studentnumber)), date)
-    return {
-      all, pass, fail,
-      startYear: starYearsOf(instanceStats.credits.map(c => c.student))
-    }
-  } catch (e) {
-    console.log(e)
-    return {
-      error: e
-    }
-  }
-}
-
-const instancesOf = async (code) => {
+const creditsOf = async (codes) => {
   const byDate = (a, b) => {
-    return moment(a.coursedate).isSameOrBefore(b.coursedate) ? -1 : 1
+    return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
   }
 
-  const formatInstance = (instance) => {
+  const formatCredit = (credit) => {
+    const credits = [credit]
     return {
-      id: instance.id,
-      date: instance.coursedate,
-      credits: instance.credits,
-      fail: instance.credits.filter(Credit.failed).length,
-      pass: instance.credits.filter(Credit.passed).length,
-      students: instance.credits.length,
+      id: credit.id,
+      date: credit.attainment_date,
+      credits,
+      fail: credits.filter(Credit.failed).length,
+      pass: credits.filter(Credit.passed).length,
+      students: credits.length,
     }
   }
 
   try {
-    const result = await instancesByCode(code)
-    return result.sort(byDate).map(formatInstance)
+    const credits = await creditsForCourses(codes)
+    return credits.sort(byDate).map(formatCredit)
   } catch (e) {
     console.log(e)
     return {
@@ -313,7 +207,7 @@ const yearlyStatsOf = async (code, year, separate, language) => {
 
   const alternatives = await getDuplicateCodes(code)
   const codes = alternatives ? [code, ...Object.keys(alternatives.alt)] : [code]
-  const allInstances = _.flatten((await Promise.all(codes.map(code => instancesOf(code)))))
+  const allInstances = await creditsOf(codes)
 
   const yearInst = allInstances.filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-08-01', year.end + '-06-01'))
   const allInstancesUntilYear = allInstances.filter(inst => moment(new Date(inst.date)).isBefore(year.end + '-06-01'))
@@ -336,40 +230,11 @@ const yearlyStatsOf = async (code, year, separate, language) => {
   return
 }
 
-const courseInstanceByCodeAndDate = (code, date) => {
-  return CourseInstance.findOne({
-    where: {
-      [Op.and]: [
-        {
-          course_code: {
-            [Op.eq]: code
-          }
-        },
-        {
-          coursedate: {
-            [Op.eq]: new Date(date)
-          }
-        }
-      ]
-    }
-  })
-}
-
 const createCourse = async (code, name, latest_instance_date) => Course.create({
   code,
   name,
   latest_instance_date
 })
-
-const createCourseInstance = async (creditDate, courseCode) => {
-  const maxId = await CourseInstance.max('id') || 0
-  const id = parseInt(maxId) + 1
-  return CourseInstance.create({
-    id: id,
-    coursedate: creditDate,
-    course_code: courseCode
-  })
-}
 
 const findDuplicates = async (oldPrefixes, newPrefixes) => {
   let oldPrefixQuery = ''
@@ -498,11 +363,7 @@ const getAllDisciplines = () => Discipline.findAll()
 module.exports = {
   byCode,
   bySearchTerm,
-  instancesOf,
-  statisticsOf,
   createCourse,
-  createCourseInstance,
-  courseInstanceByCodeAndDate,
   yearlyStatsOf,
   findDuplicates,
   getDuplicateCodes,
