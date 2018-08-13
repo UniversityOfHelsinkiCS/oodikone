@@ -1,8 +1,6 @@
 const moment = require('moment')
 const _ = require('lodash')
 
-const DEFAULT_TEACHER_ROLE = 'Teacher'
-
 const getStudyRightIdStrings = (data) =>
   data['data'].map(elements => elements[0])
 
@@ -73,7 +71,7 @@ const getOrganisationFromData = ({ name, code }) => {
   }
 }
 
-const attainmentDataToCredit = (attainment, courseinstance_id, studentnumber) => {
+const attainmentDataToCredit = (attainment, studentnumber) => {
   return {
     id: String(attainment.studyattainment_id),
     grade: defaultNameFromTexts(attainment.grade),
@@ -81,7 +79,6 @@ const attainmentDataToCredit = (attainment, courseinstance_id, studentnumber) =>
     ordering: getDate(attainment.attainment_date, null),
     credittypecode: attainment.attainment_status_code,
     student_studentnumber: studentnumber,
-    courseinstance_id,
     attainment_date: parseDate(attainment.attainment_date),
     course_code: `${attainment.learningopportunity_id}`
   }
@@ -94,19 +91,6 @@ const attainmentDataToCourse = (attainment) => {
     name: jsonNamesFromTexts(learningopportunity_name),
     latest_instance_date: parseDate(attainment_date),
   }
-}
-
-const attainmentDataToCourseInstance = attainment => {
-  return {
-    coursedate: getDate(attainment.attainment_date, null),
-    course_code: attainment.learningopportunity_id
-  }
-}
-
-const studyAttainmentDataToModels = (data) => {
-  const course = attainmentDataToCourse(data)
-  const courseinstance = attainmentDataToCourseInstance(data)
-  return [course, courseinstance]
 }
 
 const getTeacherFromData = teacher => ({
@@ -180,14 +164,6 @@ const studyrightElementFromData = (element, studyrightid, studentnumber) => {
     studentnumber,
     startdate: start_date,
     enddate: end_date
-  }
-}
-
-const courseTeacherFromData = (teacherid, courseinstanceid) => {
-  return {
-    teacherrole: DEFAULT_TEACHER_ROLE,
-    courseinstance_id: courseinstanceid,
-    teacher_id: teacherid,
   }
 }
 
@@ -343,15 +319,12 @@ module.exports = {
   getStudyRightIdStrings,
   getStudyRightFromData,
   getDate,
-  studyAttainmentDataToModels,
   getTeacherFromData,
   elementDetailFromData,
   studyrightElementFromData,
   attainmentDataToCourse,
-  attainmentDataToCourseInstance,
   attainmentDataToCredit,
   getOrganisationFromData,
-  courseTeacherFromData,
   attainmentDataToTeachers,
   studyrightDataToExtent,
   courseTypeFromData,

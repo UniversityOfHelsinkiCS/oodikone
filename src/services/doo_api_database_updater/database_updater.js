@@ -2,7 +2,7 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, CourseInstance, Teacher, Organisation, CourseTeacher, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment, sequelize } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, Teacher, Organisation, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment, sequelize } = require('../../../src/models/index')
 const _ = require('lodash')
 const { taskpool }  = require('../../util/taskpool')
 
@@ -56,10 +56,9 @@ const updateStudyrights = async (api, studentnumber) => {
 
 const getTeachersFromApi = teacherids => Promise.all(teacherids.map(id => Oodi.getTeacherInfo(id)))
 
-const createTeachers = async (attainment, courseinstance) => {
+const createTeachers = async (attainment) => {
   const teachers = await mapper.attainmentDataToTeachers(attainment)
   await Promise.all(teachers.map(teacher => Teacher.upsert(teacher)))
-  await Promise.all(teachers.map(teacher => CourseTeacher.upsert(mapper.courseTeacherFromData(teacher.id, courseinstance.id))))
 }
 
 const attainmentAlreadyInDb = attainment => attainmentIds.has(String(attainment.studyattainment_id))
@@ -69,11 +68,6 @@ const createCourse = async course => {
     await Course.upsert(course)
     courseIds.add(course.code)
   }
-}
-
-const createCourseInstance = async (courseinstance, returning = false) => {
-  const record = await CourseInstance.upsert(courseinstance, { returning })
-  return returning === true ? record[0] : undefined
 }
 
 const createCourseEnrollment = async (data, studentnumber) => {
@@ -92,9 +86,8 @@ const updateStudyattainments = async (api, studentnumber) => {
     const attainment = mapper.attainmentDataToCredit(data)
     if (!attainmentAlreadyInDb(attainment)) {
       await createCourse(mapper.attainmentDataToCourse(data))
-      const courseinstance = await createCourseInstance(mapper.attainmentDataToCourseInstance(data), true)
-      await Credit.upsert(mapper.attainmentDataToCredit(data, courseinstance.id, studentnumber))
-      await createTeachers(data, courseinstance)
+      await Credit.upsert(mapper.attainmentDataToCredit(data, studentnumber))
+      await createTeachers(data)
     }
   }
 }
@@ -340,4 +333,4 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   await updateCoursesAndProvidersInDb(100)
 }
 
-module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes, updateTeachersInDb, updateStudentsTaskPooled, updateCourseRealisationsAndEnrollments, getExistingCourseRealisationCodes }
+module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes, updateTeachersInDb, updateStudentsTaskPooled, updateCourseRealisationsAndEnrollments, getExistingCourseRealisationCodes, updateCourseRealisationsForCoursesInDb }
