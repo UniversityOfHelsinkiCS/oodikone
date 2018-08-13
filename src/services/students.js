@@ -69,7 +69,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     course = course.get()
     return {
       course: {
-        code: course.course_code,
+        code: course.code,
         name: course.name,
         coursetypecode: course.coursetypecode
       },
