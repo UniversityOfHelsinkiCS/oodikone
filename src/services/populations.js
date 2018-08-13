@@ -249,14 +249,14 @@ const formatStudentsForApi = (students, startDate, endDate) => {
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   }, {
-      students: [],
-      extents: {},
-      semesters: {},
-      transfers: {
-        targets: {},
-        sources: {}
-      }
-    })
+    students: [],
+    extents: {},
+    semesters: {},
+    transfers: {
+      targets: {},
+      sources: {}
+    }
+  })
   return {
     students: result.students,
     transfers: result.transfers,
@@ -335,8 +335,8 @@ const createEmptyStatsObject = (code, name, allstudents) => ({
     retryPassed: {},
     failedMany: {},
     improvedPassedGrade: {},
-    notParticipated: allstudents,
-    notParticipatedOrFailed: allstudents
+    notParticipated: Object.assign({},allstudents),
+    notParticipatedOrFailed: Object.assign({},allstudents)
   },
   stats: {
     students: 0,
@@ -388,6 +388,7 @@ const bottlenecksOf = async (query) => {
       coursestats.course.disciplines[discipline_id] = name
       bottlenecks.disciplines[discipline_id] = name
     })
+    
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade } = parseCreditInfo(credit)
       stats.attempts += 1

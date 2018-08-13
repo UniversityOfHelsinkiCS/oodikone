@@ -6,7 +6,6 @@ const isShibboUser = (userId, uidHeader) => userId === uidHeader
 const checkAuth = async (req, res, next) => {
   const token = req.headers['x-access-token']
   const uid = req.headers['uid']
-  console.log(token, uid)
   if (token) {
     jwt.verify(token, conf.TOKEN_SECRET, (err, decoded) => {
       if (err) {
