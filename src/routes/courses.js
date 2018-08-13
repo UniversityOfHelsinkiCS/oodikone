@@ -21,11 +21,7 @@ router.get('/coursedisciplines', async (req, res) => {
 })
 
 router.get('/v2/courselist', async (req, res) => {
-  let results = []
-  if (req.query.code) {
-    results = await Course.instancesOf(req.query.code)
-  }
-  res.json(results)
+  res.status(410).send('Deprecated')
 })
 
 router.get('/v2/courseinstancestatistics', async (req, res) => {
