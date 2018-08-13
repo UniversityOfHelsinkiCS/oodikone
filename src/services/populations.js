@@ -147,7 +147,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         separate: true,
         include: {
           model: Semester,
-          attributes: ['semestercode', 'name' ,'startdate', 'enddate'],
+          attributes: ['semestercode', 'name', 'startdate', 'enddate'],
           required: true,
           where: {
             startdate: {
@@ -169,7 +169,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
   return students
 }
 
-const count = (column, count, distinct=false) => {
+const count = (column, count, distinct = false) => {
   const countable = !distinct ? sequelize.col(column) : sequelize.fn('DISTINCT', sequelize.col(column))
   return sequelize.where(
     sequelize.fn('COUNT', countable), {
@@ -249,14 +249,14 @@ const formatStudentsForApi = (students, startDate, endDate) => {
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   }, {
-    students: [],
-    extents: {},
-    semesters: {},
-    transfers: {
-      targets: {},
-      sources: {}
-    }
-  })
+      students: [],
+      extents: {},
+      semesters: {},
+      transfers: {
+        targets: {},
+        sources: {}
+      }
+    })
   return {
     students: result.students,
     transfers: result.transfers,
@@ -413,6 +413,9 @@ const bottlenecksOf = async (query) => {
         if (failedBefore === true) {
           students.failedMany[studentnumber] = true
         }
+      }
+      if (failingGrade && passedBefore) {
+        students.retryPassed[studentnumber] = true
       }
     })
     coursestatistics[unifiedcode] = coursestats
