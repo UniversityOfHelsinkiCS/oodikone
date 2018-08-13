@@ -263,16 +263,6 @@ const createCourse = async (code, name, latest_instance_date) => Course.create({
   latest_instance_date
 })
 
-const createCourseInstance = async (creditDate, courseCode) => {
-  const maxId = await CourseInstance.max('id') || 0
-  const id = parseInt(maxId) + 1
-  return CourseInstance.create({
-    id: id,
-    coursedate: creditDate,
-    course_code: courseCode
-  })
-}
-
 const findDuplicates = async (oldPrefixes, newPrefixes) => {
   let oldPrefixQuery = ''
   let newPrefixQuery = ''
@@ -402,7 +392,6 @@ module.exports = {
   bySearchTerm,
   instancesOf,
   createCourse,
-  createCourseInstance,
   courseInstanceByCodeAndDate,
   yearlyStatsOf,
   findDuplicates,
