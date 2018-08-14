@@ -147,7 +147,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         separate: true,
         include: {
           model: Semester,
-          attributes: ['semestercode', 'name' ,'startdate', 'enddate'],
+          attributes: ['semestercode', 'name', 'startdate', 'enddate'],
           required: true,
           where: {
             startdate: {
@@ -169,7 +169,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
   return students
 }
 
-const count = (column, count, distinct=false) => {
+const count = (column, count, distinct = false) => {
   const countable = !distinct ? sequelize.col(column) : sequelize.fn('DISTINCT', sequelize.col(column))
   return sequelize.where(
     sequelize.fn('COUNT', countable), {
@@ -335,8 +335,8 @@ const createEmptyStatsObject = (code, name, allstudents) => ({
     retryPassed: {},
     failedMany: {},
     improvedPassedGrade: {},
-    notParticipated: allstudents,
-    notParticipatedOrFailed: allstudents
+    notParticipated: Object.assign({},allstudents),
+    notParticipatedOrFailed: Object.assign({},allstudents)
   },
   stats: {
     students: 0,
@@ -388,6 +388,7 @@ const bottlenecksOf = async (query) => {
       coursestats.course.disciplines[discipline_id] = name
       bottlenecks.disciplines[discipline_id] = name
     })
+    
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade } = parseCreditInfo(credit)
       stats.attempts += 1
@@ -413,6 +414,9 @@ const bottlenecksOf = async (query) => {
         if (failedBefore === true) {
           students.failedMany[studentnumber] = true
         }
+      }
+      if (failingGrade && passedBefore) {
+        students.retryPassed[studentnumber] = true
       }
     })
     coursestatistics[unifiedcode] = coursestats
