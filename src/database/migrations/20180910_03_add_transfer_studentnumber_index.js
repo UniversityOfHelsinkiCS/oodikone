@@ -6,7 +6,7 @@ module.exports = {
         name: 'transfers_studentnumber'
       })
     } catch (e) {
-      console.log('yolo')
+      console.log('transfers_studentnumber index in table transfers already existed')
     }
   },
   down: async () => {
