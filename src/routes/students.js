@@ -14,7 +14,7 @@ router.get('/students', async (req, res) => {
     const unitsUserCanAccess = await User.getUnitsFromElementDetails(req.decodedToken.userId)
     const codes = unitsUserCanAccess.map(unit => unit.id)
     const matchingStudents = await Student.bySearchTermAndElements(req.query.searchTerm, codes)
-    res.json(matchingStudents.map(Student.formatStudent))
+    res.json(matchingStudents)
   }
 })
 
