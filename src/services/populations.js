@@ -2,6 +2,7 @@ const { Op } = require('sequelize')
 const moment = require('moment')
 const { Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails, Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement } = require('../models')
 const { getAllDuplicates } = require('./courses')
+const { CourseStatsCounter } = require('./course_stats_counter')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -290,8 +291,6 @@ const getUnifiedCode = (code, codeduplicates) => {
   return !unifiedcodes ? formattedcode : unifiedcodes.main
 }
 
-const percentageOf = (num, denom) => Number((100 * num / denom).toFixed(2))
-
 const findCourses = (studentnumbers, beforeDate) => {
   return Course.findAll({
     attributes: ['code', 'name', 'coursetypecode'],
@@ -321,39 +320,6 @@ const findCourses = (studentnumbers, beforeDate) => {
   })
 }
 
-const createEmptyStatsObject = (code, name, allstudents) => ({
-  course: {
-    code,
-    name,
-    disciplines: {},
-    coursetypes: {}
-  },
-  students: {
-    all: {},
-    passed: {},
-    failed: {},
-    retryPassed: {},
-    failedMany: {},
-    improvedPassedGrade: {},
-    notParticipated: Object.assign({},allstudents),
-    notParticipatedOrFailed: Object.assign({},allstudents)
-  },
-  stats: {
-    students: 0,
-    passed: 0,
-    failed: 0,
-    failedMany: 0,
-    retryPassed: 0,
-    attempts: 0,
-    improvedPassedGrade: 0,
-    percentage: undefined,
-    passedOfPopulation: undefined,
-    triedOfPopulation: undefined
-  },
-  grades: {
-  }
-})
-
 const parseCreditInfo = credit => ({
   studentnumber: credit.student_studentnumber,
   grade: credit.grade,
@@ -361,8 +327,6 @@ const parseCreditInfo = credit => ({
   failingGrade: Credit.failed(credit),
   improvedGrade: Credit.improved(credit)
 })
-
-const lengthOf = obj => Object.keys(obj).length
 
 const bottlenecksOf = async (query) => {
   if (semesterStart[query.semester] === undefined) {
@@ -375,67 +339,26 @@ const bottlenecksOf = async (query) => {
   }
   const codeduplicates = await getAllDuplicates()
   const studentnumbers = await studentnumbersWithAllStudyrightElementsAndCreditsBetween(studyRights, startDate, endDate, months)
-  const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
   const allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
+  const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
   const allcoursestatistics = courses.reduce((coursestatistics, course) => {
     const { code, name, disciplines, course_type } = course
     const unifiedcode = getUnifiedCode(code, codeduplicates)
-    const coursestats = coursestatistics[unifiedcode] || createEmptyStatsObject(code, name, allstudents)
-    const { students, grades, stats } = coursestats
-    coursestats.course.coursetypes[course_type.coursetypecode] = course_type.name
+    const coursestats = coursestatistics[unifiedcode] || new CourseStatsCounter(code, name, allstudents)
+    coursestats.addCourseType(course_type.coursetypecode, course_type.name)
     bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
     disciplines.forEach(({ discipline_id, name }) => {
-      coursestats.course.disciplines[discipline_id] = name
+      coursestats.addCourseDiscipline(discipline_id, name)
       bottlenecks.disciplines[discipline_id] = name
     })
-    
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade } = parseCreditInfo(credit)
-      stats.attempts += 1
-      const gradecount = grades[grade] ? grades[grade].count || 0 : 0
-      grades[grade] = { count: gradecount + 1, status: { passingGrade, improvedGrade, failingGrade } }
-      students.all[studentnumber] = true
-      const failedBefore = students.failed[studentnumber] !== undefined
-      const passedBefore = students.passed[studentnumber] !== undefined
-      delete students.notParticipated[studentnumber]
-      if (passingGrade === true) {
-        delete students.notParticipatedOrFailed[studentnumber]
-        students.passed[studentnumber] = true
-        if (failedBefore === true) {
-          delete students.failed[studentnumber]
-          students.retryPassed[studentnumber] = true
-        }
-      }
-      if (improvedGrade === true) {
-        students.improvedPassedGrade[studentnumber] = true
-      }
-      if (failingGrade === true && passedBefore === false) {
-        students.failed[studentnumber] = true
-        if (failedBefore === true) {
-          students.failedMany[studentnumber] = true
-        }
-      }
-      if (failingGrade && passedBefore) {
-        students.retryPassed[studentnumber] = true
-      }
+      coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade)
     })
     coursestatistics[unifiedcode] = coursestats
     return coursestatistics
   }, {})
-  bottlenecks.coursestatistics = Object.values(allcoursestatistics).map(coursestatistics => {
-    const { stats, students } = coursestatistics
-    stats.students = lengthOf(students.all)
-    stats.passed = lengthOf(students.passed)
-    stats.failed = lengthOf(students.failed)
-    stats.failedMany = lengthOf(students.failedMany)
-    stats.retryPassed = lengthOf(students.retryPassed)
-    stats.improvedPassedGrade = lengthOf(students.improvedPassedGrade)
-    stats.percentage = percentageOf(stats.passed, stats.students)
-    stats.passedOfPopulation = percentageOf(stats.passed, studentnumbers.length)
-    stats.triedOfPopulation = percentageOf(stats.students, studentnumbers.length)
-    stats.perStudent = stats.attempts / (stats.passed + stats.failed)
-    return coursestatistics
-  })
+  bottlenecks.coursestatistics = Object.values(allcoursestatistics).map(coursestatistics => coursestatistics.getFinalStats())
   return bottlenecks
 }
 
