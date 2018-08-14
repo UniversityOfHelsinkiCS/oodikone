@@ -77,7 +77,8 @@ export const transferFilter = (params) => {
       target
     },
     filter: student => student.transfers.map(transfer =>
-      (source === 'anywhere' || transfer.sourcecode === source) && (target === 'anywhere' || transfer.targetcode === target)).some(b => b === true)
+      (source === 'anywhere' || transfer.source.code === source) && (target === 'anywhere' || transfer.target.code === target)).some(b => b === true)
+
   })
 }
 
