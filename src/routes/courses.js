@@ -10,6 +10,14 @@ router.get('/courses', async (req, res) => {
   res.json(results)
 })
 
+router.get('/coursesmulti', async (req, res) => {
+  let results = []
+  if (req.query.name !== 'undefined' ) {
+    results = await Course.bySearchTermTypeAndDiscipline(req.query.name, req.query.type, req.query.discipline, req.query.language)
+  }
+  res.json(results)
+})
+
 router.get('/coursetypes', async (req, res) => {
   const coursetypes = await Course.getAllCourseTypes()
   res.json(coursetypes)
