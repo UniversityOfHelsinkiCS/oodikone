@@ -32,6 +32,50 @@ const byNameOrCode = (searchTerm, language) => Course.findAll({
   }
 })
 
+const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) => {
+  const whereType = type !== 'null' ? {
+    [Op.and]: [
+      {
+        coursetypecode: {
+          [Op.eq]: type
+        }
+      }
+    ]
+  } : null
+
+  const whereDiscipline = discipline !== 'null' ? {
+    include: {
+      model: Discipline,
+      where: {
+        discipline_id: {
+          [Op.eq]: discipline
+        }
+      }
+    }
+  } : null
+
+  return Course.findAll({
+    ...whereDiscipline,
+    where: {
+      [Op.or]: [
+        {
+          name: {
+            [language]: {
+              [Op.iLike]: searchTerm
+            }
+          }
+        },
+        {
+          code: {
+            [Op.like]: searchTerm
+          }
+        }
+      ],
+      ...whereType
+    }
+  })
+}
+
 const byCode = code => Course.findByPrimary(code)
 
 const creditsForCourses = (codes) => Credit.findAll({
@@ -83,6 +127,20 @@ const bySearchTerm = async (term, language) => {
   }
 }
 
+
+const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) => {
+  const formatCourse = (course) => ({ name: course.name[language], code: course.code, date: course.latest_instance_date })
+
+  try {
+    const result = await byNameOrCodeTypeAndDiscipline(`%${term}%`, type, discipline, language)
+    return result.map(formatCourse)
+  } catch (e) {
+    return {
+      error: e
+    }
+  }
+}
+
 const creditsOf = async (codes) => {
   const byDate = (a, b) => {
     return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
@@ -114,7 +172,7 @@ const creditsOf = async (codes) => {
 const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 
   const calculateStats = (thisSemester, allInstancesUntilSemester) => {
-    const studentsThatPassedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c =>  c.student))))
+    const studentsThatPassedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c => c.student))))
     const gradeDistribution = _.groupBy(_.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits))), 'grade')
     const studentsThatFailedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student))))
     const allStudentsThatFailedEver = _.flattenDeep(allInstancesUntilSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student)))
@@ -363,6 +421,7 @@ const getAllDisciplines = () => Discipline.findAll()
 module.exports = {
   byCode,
   bySearchTerm,
+  bySearchTermTypeAndDiscipline,
   createCourse,
   yearlyStatsOf,
   findDuplicates,
