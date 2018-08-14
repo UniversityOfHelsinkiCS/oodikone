@@ -143,9 +143,9 @@ const withId = async (id) => {
   }
 }
 
-const bySearchTermAndElements = (searchterm, elementcodes) => {
+const bySearchTermAndElements = async (searchterm, elementcodes) => {
   const likeSearchTerm = `%${searchterm}%`
-  return Student.findAll({
+  const students = await Student.findAll({
     where: {
       [Op.or]: [
         {
@@ -169,6 +169,7 @@ const bySearchTermAndElements = (searchterm, elementcodes) => {
       }
     }
   })
+  return students.map(formatStudent)
 }
 
 module.exports = {
