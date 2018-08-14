@@ -1,9 +1,13 @@
 module.exports = {
   up: async (queryInterface) => {
-    await queryInterface.addIndex('transfers', {
-      fields: ['studentnumber'],
-      name: 'transfers_studentnumber'
-    })
+    try {
+      await queryInterface.addIndex('transfers', {
+        fields: ['studentnumber'],
+        name: 'transfers_studentnumber'
+      })
+    } catch (e) {
+      console.log('yolo')
+    }
   },
   down: async () => {
   }
