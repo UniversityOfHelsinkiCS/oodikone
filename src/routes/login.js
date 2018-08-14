@@ -2,7 +2,7 @@ const router = require('express').Router()
 const User = require('../services/users')
 const jwt = require('jsonwebtoken')
 const conf = require('../conf-backend')
-
+const mailservice = require('../services/mailservice')
 const admin = ['totutotu', 'tktl', 'mluukkai', 'mitiai', 'ttuotila', 'jakousa', 'sasumaki']
 
 const generateToken = async (uid, res) => {
@@ -22,6 +22,21 @@ const generateToken = async (uid, res) => {
   // return the information including token as JSON
   res.status(200).json({ token })
 }
+const sendEmail = async (uid) => {
+  if (process.env.SMTP !== undefined) {
+    const message = mailservice.message(uid)
+    await mailservice.transporter.sendMail(message, (error) => {
+      if (error) {
+        console.log('Error occurred')
+        console.log(error.message)
+      } else {
+        console.log('Message sent successfully!')
+      }
+      // only needed when using pooled connections
+      mailservice.transporter.close()
+    })
+  }
+}
 
 router.post('/login', async (req, res) => {
   try {
@@ -31,6 +46,7 @@ router.post('/login', async (req, res) => {
       const fullname = req.headers.displayname || 'Shib Valmis'
       if (!user) {
         await User.createUser(uid, fullname)
+        await sendEmail(uid)
       } else {
         await User.updateUser(user, { full_name: fullname })
       }
@@ -39,6 +55,7 @@ router.post('/login', async (req, res) => {
       res.status(401).json({ message: `Not enough headers login, uid: ${req.headers.uid} session-id ${req.headers['shib-session-id']}` }).end()
     }
   } catch (err) {
+    console.log(err)
     res.status(401).json({ message: 'problem with login', err })
   }
 })

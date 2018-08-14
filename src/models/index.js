@@ -1,5 +1,4 @@
 const Sequelize = require('sequelize')
-const moment = require('moment')
 const { sequelize, migrationPromise } = require('../database/connection')
 
 const Student = sequelize.define('student',
@@ -40,14 +39,6 @@ const Student = sequelize.define('student',
     timestamps: true,
   }
 )
-
-Student.hasNoPreviousStudies = (startDate) => (student) => {
-  const by = (a, b) => moment(a).isSameOrBefore(b) ? -1 : 1
-  const dates = student.credits.map(c => c.courseinstance.coursedate).sort(by)
-  const earliestCreditDate = dates[0]
-
-  return moment(startDate).isSameOrBefore(earliestCreditDate)
-}
 
 Student.hasStarted = (student) => {
   return student.credits.length > 0
@@ -115,10 +106,6 @@ const Credit = sequelize.define('credit',
         fields: ['student_studentnumber']
       },
       {
-        fields: ['courseinstance_id'],
-        name: 'credit_courseinstance_id'
-      },
-      {
         fields: ['course_code'],
         name: 'credit_course_code'
       },
@@ -129,20 +116,6 @@ const Credit = sequelize.define('credit',
     ]
   }
 )
-
-Credit.inTimeRange = (date, months) => (credit) => {
-  const creditDate = credit.courseinstance.coursedate
-  const monthsFromDate = moment(date).add(months, 'months')
-
-  return moment(creditDate).isBetween(date, monthsFromDate, null, '[]')
-}
-
-Credit.notLaterThan = (date, months) => (credit) => {
-  const creditDate = credit.courseinstance.coursedate
-  const monthsFromDate = moment(date).add(months, 'months')
-
-  return moment(creditDate).isSameOrBefore(monthsFromDate, null, '[]')
-}
 
 Credit.notUnnecessary = (credit) => {
   return credit.credits > 0 && credit.credits <= 12
@@ -221,30 +194,6 @@ const ElementDetails = sequelize.define('element_details',
   }
 )
 
-const CourseInstance = sequelize.define('courseinstance',
-  {
-    id: {
-      primaryKey: true,
-      type: Sequelize.BIGINT,
-      autoIncrement: true
-    },
-    coursedate: { type: Sequelize.DATE },
-    course_code: { type: Sequelize.STRING }
-  },
-  {
-    tableName: 'courseinstance',
-    timestamps: false,
-    indexes: [
-      {
-        fields: ['coursedate']
-      },
-      {
-        fields: ['course_code']
-      }
-    ]
-  }
-)
-
 const STUDY_MODULE_COURSE_TYPES = [8, 9, 10, 11, 17, 18, 19, 20, 33, 40, 41, 42, 43, 44]
 const STUDY_MODULE_HEURISTICS = ['syventävät opinnot', 'muut opinnot', 'opintokokonaisuus', 'perusopinnot', 'aineopinnot', 'pedagogiset opinnot', 'sisältöopinnot', 'kasvatustieteelliset opinnot', 'sivuaine', 'muita opintoja etk-tutkinnossa']
 
@@ -287,24 +236,6 @@ const Teacher = sequelize.define('teacher',
   },
   {
     tableName: 'teacher',
-    timestamps: false,
-  }
-)
-
-const CourseTeacher = sequelize.define('courseteacher',
-  {
-    teacherrole: { type: Sequelize.STRING },
-    courseinstance_id: { type: Sequelize.BIGINT },
-    teacher_id: { type: Sequelize.STRING },
-  },
-  {
-    indexes: [
-      {
-        unique: true,
-        fields: ['teacherrole', 'courseinstance_id', 'teacher_id']
-      }
-    ],
-    tableName: 'courseteacher',
     timestamps: false,
   }
 )
@@ -533,14 +464,6 @@ const Migration = sequelize.define('migrations', {
   timestamps: false
 })
 
-CourseInstance.belongsTo(Course, { foreignKey: 'course_code', targetKey: 'code' })
-Course.hasMany(CourseInstance, { foreignKey: 'course_code', targetKey: 'code' })
-
-CourseInstance.hasMany(Credit, { foreignKey: 'courseinstance_id', targetKey: 'id' })
-Credit.belongsTo(CourseInstance, { foreignKey: 'courseinstance_id', targetKey: 'id' })
-
-CourseInstance.hasMany(CourseTeacher, { foreignKey: 'courseinstance_id', targetKey: 'id' })
-
 Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
 
@@ -604,12 +527,10 @@ module.exports = {
   Student,
   Credit,
   Studyright,
-  CourseInstance,
   Course,
   TagStudent,
   Tag,
   Teacher,
-  CourseTeacher,
   User,
   sequelize,
   migrationPromise,
