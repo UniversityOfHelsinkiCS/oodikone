@@ -115,7 +115,7 @@ describe('CourseStatsCounter tests', () => {
 
   })
 
-  describe('mark passed credit credit then failed credit for student', () => {
+  describe('mark passed credit then failed credit for student', () => {
     
     const student = studentnumbers[0]
     const counter = createCounter()
