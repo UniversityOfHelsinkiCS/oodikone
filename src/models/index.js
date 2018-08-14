@@ -1,5 +1,4 @@
 const Sequelize = require('sequelize')
-const moment = require('moment')
 const { sequelize, migrationPromise } = require('../database/connection')
 
 const Student = sequelize.define('student',
