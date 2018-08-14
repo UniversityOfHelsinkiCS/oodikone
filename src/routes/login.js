@@ -22,6 +22,21 @@ const generateToken = async (uid, res) => {
   // return the information including token as JSON
   res.status(200).json({ token })
 }
+const sendEmail = async (uid) => {
+  if (process.env.SMTP !== undefined) {
+    const message = mailservice.message(uid)
+    await mailservice.transporter.sendMail(message, (error) => {
+      if (error) {
+        console.log('Error occurred')
+        console.log(error.message)
+      } else {
+        console.log('Message sent successfully!')
+      }
+      // only needed when using pooled connections
+      mailservice.transporter.close()
+    })
+  }
+}
 
 router.post('/login', async (req, res) => {
   try {
@@ -31,21 +46,7 @@ router.post('/login', async (req, res) => {
       const fullname = req.headers.displayname || 'Shib Valmis'
       if (!user) {
         await User.createUser(uid, fullname)
-        console.log('user created')
-        const message = mailservice.message(uid)
-        console.log({message})
-        console.log('asdasdsda')
-        await mailservice.transporter.sendMail(message, (error) => {
-          if (error) {
-            console.log('Error occurred')
-            console.log(error.message)
-          } else {
-            console.log('Message sent successfully!')
-          }
-
-          // only needed when using pooled connections
-          mailservice.transporter.close()
-        })
+        await sendEmail(uid)
       } else {
         await User.updateUser(user, { full_name: fullname })
       }

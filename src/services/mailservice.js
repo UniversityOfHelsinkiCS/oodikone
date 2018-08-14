@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport(
   {
 
     from: 'Oodikone Robot <noreply@helsinki.fi>',
-    host: 'smtp.helsinki.fi',
+    host: `${process.env.SMTP}`,
     port: 587,
     secure: false // false -> TLS, true -> SSL
     ,
