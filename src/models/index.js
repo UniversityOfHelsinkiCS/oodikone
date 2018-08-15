@@ -375,6 +375,9 @@ const SemesterEnrollment = sequelize.define('semester_enrollment', {
   },
   enrollmenttype: {
     type: Sequelize.INTEGER
+  }, 
+  enrollment_date: {
+    type: Sequelize.DATE 
   }
 }, {
   indexes: [
