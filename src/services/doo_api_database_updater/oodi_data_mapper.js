@@ -228,6 +228,7 @@ const semesterFromData = data => ({
 const semesterEnrollmentFromData = (data, studentnumber) => ({
   enrollmenttype: data.semester_enrollment_type_code,
   semestercode: data.semester_code,
+  enrollment_date: parseDate(data.semester_enrollment_date),
   studentnumber
 })
 
