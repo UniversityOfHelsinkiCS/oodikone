@@ -55,7 +55,7 @@ const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnum
   }))
 
   semester_enrollments = semester_enrollments || []
-  const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({ semestercode, enrollmenttype }))
+  const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype, enrollment_date }) => ({ semestercode, enrollmenttype, enrollmentdate: enrollment_date }))
 
   const courseByDate = (a, b) => {
     return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
@@ -144,7 +144,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       },
       {
         model: SemesterEnrollment,
-        attributes: ['enrollmenttype', 'studentnumber', 'semestercode'],
+        attributes: ['enrollmenttype', 'studentnumber', 'semestercode', 'enrollment_date'],
         separate: true,
         include: {
           model: Semester,
