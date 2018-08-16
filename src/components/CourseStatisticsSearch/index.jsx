@@ -10,13 +10,12 @@ import { findMultipleCourses } from '../../redux/courses'
 import { makeSortCourses } from '../../selectors/courses'
 import { reformatDate } from '../../common'
 
-import style from './courseSearchMulti.css'
-// import sharedStyles from '../../styles/shared'
+import style from './CourseStatisticsSearch.css'
 
 const { func, string, arrayOf, object, shape } = PropTypes
 
 
-class CourseSearchMulti extends Component {
+class CourseStatisticsSearch extends Component {
   state = {
     isLoading: false,
     searchStr: '',
@@ -33,7 +32,9 @@ class CourseSearchMulti extends Component {
   resetComponent = () => {
     this.setState({
       isLoading: false,
-      searchStr: ''
+      searchStr: '',
+      type: null,
+      discipline: null
     })
   }
 
@@ -47,22 +48,27 @@ class CourseSearchMulti extends Component {
 
 
   handleSearchChange = (e, { value: searchStr }) => {
+    const { type, discipline } = this.state
     this.props.clearTimeout('search')
     this.setState({ searchStr })
-    this.props.setTimeout('search', () => {
-      this.fetchCoursesList()
-    }, 250)
+    if (!type && !discipline) {
+      this.props.setTimeout('search', () => {
+        this.fetchCoursesList()
+      }, 250)
+    }
   }
 
   fetchCoursesList = () => {
     const { type, discipline, searchStr } = this.state
     const { language } = this.props
-    if (searchStr.length >= 3 || type || discipline) {
+    if (searchStr.length >= 3 && !type && !discipline) {
       this.setState({ isLoading: true })
       this.props.findMultipleCourses({ searchStr, type, discipline }, language)
         .then(() => this.setState({ isLoading: false }))
-    } else {
-      this.props.findMultipleCourses('')
+    } else if (searchStr.length >= 3 || type || discipline) {
+      this.setState({ isLoading: true })
+      this.props.findMultipleCourses({ searchStr: null, type, discipline }, language)
+        .then(() => this.setState({ isLoading: false }))
     }
   }
 
@@ -71,11 +77,17 @@ class CourseSearchMulti extends Component {
     this.props.handleResultSelect(a, b)
   }
 
+  fetchSelectedCoursesStatistics = () => {
+    this.props.fetchCourseStatistics()
+    this.resetComponent()
+  }
+
   renderCourseTypesDropdown = types => (
     <Dropdown
       placeholder="All"
       search
       selection
+      value={null}
       options={types}
       loading={types === null}
       onChange={this.handleTypeSelect}
@@ -85,8 +97,21 @@ class CourseSearchMulti extends Component {
     />
   )
 
-  renderDisciplinesDropdown = disciplines => (
-    <Dropdown
+  renderDisciplinesDropdown = (disciplines, empty) => {
+    console.log('liek dis')
+    return empty ? (<Dropdown
+      placeholder="All"
+      search
+      value={null}
+      selection
+      loading={disciplines === null}
+      options={disciplines}
+      onChange={this.handleDisciplineSelect}
+      closeOnChange
+      basic
+      header="Select discipline"
+    />
+    ) : (<Dropdown
       placeholder="All"
       search
       selection
@@ -97,12 +122,18 @@ class CourseSearchMulti extends Component {
       basic
       header="Select discipline"
     />
-  )
+    )
+  }
 
   renderResultTable = () => {
     const { courseList } = this.props
-    const coursesToRender = courseList.slice(0, 20).map(c =>
-      ([c.name, c.code, reformatDate(c.date, 'DD.MM.YYYY')]))
+    const { searchStr } = this.state
+    const coursesToRender = courseList.filter(c => c.name !== null)
+      .filter(c => c.name.toLocaleLowerCase()
+        .includes(searchStr.toLocaleLowerCase()))
+      .slice(0, 20)
+      .map(c =>
+        ([c.name, c.code, reformatDate(c.date, 'DD.MM.YYYY')]))
     const headers = ['Name', 'Code', 'Latest instance held', '']
 
     return (
@@ -125,36 +156,68 @@ class CourseSearchMulti extends Component {
         </Table.Header>
 
         <Table.Body>
-          {coursesToRender.map(course => <Table.Row key={`${course[0]}-${course[1]}`}>{course.map(c => <Table.Cell key={c}>{c}</Table.Cell>).concat(<Table.Cell key={`${course.code}-checkbox`}><Checkbox value={{ name: course[0], code: course[1] }} toggle onChange={this.props.handleResultSelect} /></Table.Cell>)}</Table.Row>)}
+          {coursesToRender.map(course => (
+            <Table.Row key={`${course[0]}-${course[1]}`}>{course.map(c =>
+              <Table.Cell key={c}>{c}</Table.Cell>)
+              .concat( // eslint-disable-line function-paren-newline
+                <Table.Cell key={`${course.code}-checkbox`}>
+                  <Checkbox
+                    value={{ name: course[0], code: course[1] }}
+                    toggle
+                    onChange={this.props.handleResultSelect}
+                  />
+                </Table.Cell>)}
+            </Table.Row>))}
         </Table.Body>
       </Table>)
   }
 
-  render() {
-    const { isLoading, searchStr } = this.state
-    const { language } = this.props
-    const { courseTypes, courseDisciplines } = this.props.courseStatistics
+  renderResultDropDown = () => {
+    const { courseList } = this.props
+    const search = (options, query) =>
+      options.filter(opt => opt.text.includes(query) || opt.value.includes(query))
+    const coursesToRender = courseList.map(course => ({ key: course.code, value: course.code, text: course.name, description: course.code, associations: 'hello' }))
+    return (
+      <Dropdown
+        style={{
+          width: '100%',
+          maxWidth: '850px'
+        }}
+        placeholder="Select courses"
+        fluid
+        multiple
+        selection
+        options={coursesToRender}
+        search={search}
+        onSearchChange={this.handleSearchChange}
+      />
+    )
+  }
 
+  render() {
+    const { isLoading, searchStr, type } = this.state
+    const { language, courseList } = this.props
+    const { courseTypes, courseDisciplines } = this.props.courseStatistics
     const text = { en: 'All', fi: 'Kaikki', sv: 'Allt' }
     const disciplineOptions = courseDisciplines ?
       [
         { text: text[language], value: null },
-        ..._.orderBy(courseDisciplines.map(discipline => (
+        ..._.orderBy(courseDisciplines.map(disc => (
           {
-            text: discipline.name.fi, // only finnish names available
-            value: discipline.discipline_id,
-            key: discipline.discipline_id
+            text: disc.name.fi, // only finnish names available
+            value: disc.discipline_id,
+            key: disc.discipline_id
           }
         )), 'text', 'asc')] : null
 
     const typeOptions = courseTypes ?
       [
         { text: text[language], value: null },
-        ..._.orderBy(courseTypes.map(type => (
+        ..._.orderBy(courseTypes.map(ty => (
           {
-            text: type.name[language] ? type.name[language] : type.name.fi,
-            value: type.coursetypecode,
-            key: type.coursetypecode
+            text: ty.name[language] ? ty.name[language] : ty.name.fi,
+            value: ty.coursetypecode,
+            key: ty.coursetypecode
           }
         )), 'text', 'asc')] : null
 
@@ -168,7 +231,7 @@ class CourseSearchMulti extends Component {
             </Form.Field>
             <Form.Field>
               <label>Course type (optional)</label>
-              {this.renderCourseTypesDropdown(typeOptions)}
+              {this.renderCourseTypesDropdown(typeOptions, !type)}
             </Form.Field>
           </Form.Group>
         </Form>
@@ -180,14 +243,15 @@ class CourseSearchMulti extends Component {
           value={searchStr}
           showNoResults={false}
         />
-        <Button onClick={this.props.fetchCourseStatistics} content="GO" />
-        {this.renderResultTable()}
+        <Button style={{ marginTop: '14px' }} fluid onClick={this.fetchSelectedCoursesStatistics} content="Fetch statistics" />
+        {courseList.length > 0 ? this.renderResultTable() : null}
+        {/* this.renderResultDropDown() */}
       </div>
     )
   }
 }
 
-CourseSearchMulti.propTypes = {
+CourseStatisticsSearch.propTypes = {
   language: string.isRequired,
   courseList: arrayOf(object).isRequired,
   setTimeout: func.isRequired,
@@ -223,4 +287,4 @@ const mapDispatchToProps = dispatch => ({
     dispatch(getCourseDisciplines())
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Timeout(CourseSearchMulti))
+export default connect(mapStateToProps, mapDispatchToProps)(Timeout(CourseStatisticsSearch))
