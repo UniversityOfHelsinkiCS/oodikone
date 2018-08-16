@@ -375,6 +375,9 @@ const SemesterEnrollment = sequelize.define('semester_enrollment', {
   },
   enrollmenttype: {
     type: Sequelize.INTEGER
+  }, 
+  enrollment_date: {
+    type: Sequelize.DATE 
   }
 }, {
   indexes: [
@@ -464,6 +467,17 @@ const Migration = sequelize.define('migrations', {
   timestamps: false
 })
 
+const CreditTeacher = sequelize.define('credit_teacher', {
+  credit_id: {
+    type: Sequelize.STRING,
+    primaryKey: true
+  },
+  teacher_id: {
+    type: Sequelize.STRING,
+    primaryKey: true
+  }
+})
+
 Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
 
@@ -523,6 +537,9 @@ CourseRealisation.belongsTo(Course, { foreignKey: 'coursecode' })
 CourseRealisation.belongsToMany(Student, { through: CourseEnrollment, foreignKey: 'courserealisation_id' })
 Student.belongsToMany(CourseRealisation, { through: CourseEnrollment, foreignKey: 'studentnumber' })
 
+Credit.belongsToMany(Student, { through: CreditTeacher, foreignKey: 'credit_id' })
+Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id' })
+
 module.exports = {
   Student,
   Credit,
@@ -552,5 +569,6 @@ module.exports = {
   CourseRealisationType,
   CourseRealisation,
   CourseEnrollment,
-  Migration
+  Migration,
+  CreditTeacher
 }
