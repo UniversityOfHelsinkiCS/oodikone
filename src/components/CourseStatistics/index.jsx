@@ -1,14 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Form, Button, Header, Checkbox, Message, Transition, List, Dropdown, Segment } from 'semantic-ui-react'
+import { Form, Button, Header, Checkbox, Message, Transition, List, Dropdown, Segment, Table } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
 import _ from 'lodash'
 import Timeout from '../Timeout'
-import CourseSearchMulti from '../CourseSearchMulti'
+import CourseStatisticsSearch from '../CourseStatisticsSearch'
 import CoursePassRateChart from '../CoursePassRateChart'
 import LanguageChooser from '../LanguageChooser'
 import { getMultipleCourseStatistics, removeCourseStatistics } from '../../redux/courseStatistics'
+import { emptyCourseSearch } from '../../redux/courses'
 import { isValidYear, isInDateFormat, reformatDate, momentFromFormat } from '../../common'
 
 
@@ -77,7 +78,8 @@ class CourseStatistics extends Component {
       this.setState({ isLoading: true })
       this.props.getMultipleCourseStatistics(query)
         .then(() => {
-          this.setState({ error: '', isLoading: false })
+          this.setState({ selected: [], error: '', isLoading: false })
+          this.props.emptyCourseSearch()
         })
       this.setState({ error: '' })
     } else this.setState({ error: 'Course with selected parameters already in analysis' })
@@ -226,6 +228,43 @@ class CourseStatistics extends Component {
     )
   }
 
+  renderQueryTable = () => {
+    const { data } = this.props.courseStatistics
+    const headers = ['Name', 'Code', 'Time', '']
+
+    return (
+      <Table
+        style={{
+          width: '100%',
+          maxWidth: '850px'
+        }}
+        unstackable
+        selectable
+      >
+        <Table.Header>
+          <Table.Row>
+            {headers.map(header => (
+              <Table.HeaderCell key={`header-${header}`}>
+                {header}
+              </Table.HeaderCell>
+            ))}
+          </Table.Row>
+        </Table.Header>
+
+        <Table.Body>
+          {data.map(course => (
+            <Table.Row key={`${course.name}-${course.code}`}>
+              <Table.Cell>{course.name}</Table.Cell>
+              <Table.Cell>{course.code}</Table.Cell>
+              <Table.Cell>{course.start}-{course.end}</Table.Cell>
+              <Table.Cell>
+                <Button onClick={this.removeCourseStatistics(course)}>Remove</Button>
+              </Table.Cell>
+            </Table.Row>))}
+        </Table.Body>
+      </Table>)
+  }
+
   render() {
     const { selectedProgramme, selectedCourses } = this.state
     const { language } = this.props
@@ -236,14 +275,18 @@ class CourseStatistics extends Component {
           Course Statistics
         </Header>
         <Segment>
+          <Header>Select statistics parameters</Header>
           {this.renderErrorMessage()}
           {this.renderForm()}
-          <h3>{selectedCourses.map(c => c.code)}</h3>
-          <CourseSearchMulti
+          <Header>Select courses to include</Header>
+          <CourseStatisticsSearch
             handleResultSelect={this.handleResultSelect}
             fetchCourseStatistics={this.fetchCourseStatistics}
+            selectedCourses={selectedCourses}
+            removeSelectedCourse={this.removeSelectedCourse}
           />
         </Segment>
+        {data.length > 0 ? this.renderQueryTable() : null}
         <Transition.Group as={List} duration={700}>
           {data.map((course) => {
             let programmeOptions = Object.keys(course.programmes).map(key => ({
@@ -312,6 +355,7 @@ CourseStatistics.propTypes = {
   language: string.isRequired,
   getMultipleCourseStatistics: func.isRequired,
   removeCourseStatistics: func.isRequired,
+  emptyCourseSearch: func.isRequired,
   courseStatistics: shape({
     data: array.isRequired,
     selected: array.isRequired
@@ -328,7 +372,9 @@ const mapDispatchToProps = dispatch => ({
   getMultipleCourseStatistics: query =>
     dispatch(getMultipleCourseStatistics(query)),
   removeCourseStatistics: query =>
-    dispatch(removeCourseStatistics(query))
+    dispatch(removeCourseStatistics(query)),
+  emptyCourseSearch: () =>
+    dispatch(emptyCourseSearch())
 })
 
 

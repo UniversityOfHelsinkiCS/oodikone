@@ -12,6 +12,10 @@ export const findMultipleCourses = ({ searchStr, type, discipline }, language) =
   return callController(route, prefix)
 }
 
+export const emptyCourseSearch = () => ({
+  type: 'CLEAR_COURSE_SEARCH'
+})
+
 const reducer = (state = { data: {} }, action) => {
   switch (action.type) {
     case 'FIND_COURSES_ATTEMPT':
@@ -54,7 +58,12 @@ const reducer = (state = { data: {} }, action) => {
         selected: action.response.code,
         data: action.response
       }
-
+    case 'CLEAR_COURSE_SEARCH':
+      return {
+        pending: false,
+        selected: null,
+        data: {}
+      }
     default:
       return state
   }
