@@ -2,7 +2,7 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, Teacher, Organisation, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment, sequelize } = require('../../../src/models/index')
+const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, Teacher, Organisation, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment, sequelize, CreditTeacher } = require('../../../src/models/index')
 const _ = require('lodash')
 const { taskpool }  = require('../../util/taskpool')
 
@@ -56,8 +56,7 @@ const updateStudyrights = async (api, studentnumber) => {
 
 const getTeachersFromApi = teacherids => Promise.all(teacherids.map(id => Oodi.getTeacherInfo(id)))
 
-const createTeachers = async (attainment) => {
-  const teachers = await mapper.attainmentDataToTeachers(attainment)
+const createTeachers = async (teachers) => {
   await Promise.all(teachers.map(teacher => Teacher.upsert(teacher)))
 }
 
@@ -81,13 +80,30 @@ const updateCourseEnrollments = async (apidata, studentnumber) => {
   await Promise.all(apidata.courseEnrollments.map(enrollment => createCourseEnrollment(enrollment, studentnumber)))
 }
 
+const parseAttainmentData = (data, studentnumber) => {
+  return {
+    credit: mapper.attainmentDataToCredit(data, studentnumber),
+    teachers: mapper.attainmentDataToTeachers(data),
+    course: mapper.attainmentDataToCourse(data)
+  }
+}
+
+const createCreditTeachers = async (credit, teachers) => {
+  const creditTeachers = teachers.map(teacher => ({
+    credit_id: credit.id,
+    teacher_id: teacher.id
+  }))
+  await Promise.all(creditTeachers.map(ct => CreditTeacher.upsert(ct)))
+}
+
 const updateStudyattainments = async (api, studentnumber) => {
   for (let data of api.studyattainments) {
-    const attainment = mapper.attainmentDataToCredit(data)
-    if (!attainmentAlreadyInDb(attainment)) {
-      await createCourse(mapper.attainmentDataToCourse(data))
-      await Credit.upsert(mapper.attainmentDataToCredit(data, studentnumber))
-      await createTeachers(data)
+    const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
+    if (!attainmentAlreadyInDb(credit)) {
+      await createCourse(course)
+      await Credit.upsert(credit)
+      await createTeachers(teachers)
+      await createCreditTeachers(credit, teachers)
     }
   }
 }
