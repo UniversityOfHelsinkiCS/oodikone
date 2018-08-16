@@ -88,6 +88,10 @@ describe('studyattainment data mapping tests', () => {
       expect(credit.student_studentnumber).toBe(studentnumber)
     })
 
+    test('semestercode is correct', () => {
+      expect(credit.semestercode).toBe(136)
+    })
+
   })
 
   describe('teacher mapping tests', () => {
