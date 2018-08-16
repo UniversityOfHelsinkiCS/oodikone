@@ -155,3 +155,55 @@ describe('semester enrollment data mapping tests', () => {
   })
 
 })
+
+describe('semester code data mapping tests', () => {
+
+  const data = {
+    'teaching_start_date': '1950-09-14T22:00:00.000Z',
+    'name': [
+      {
+        'langcode': 'fi',
+        'text': 'Syksy 1950'
+      },
+      {
+        'langcode': 'sv',
+        'text': 'Hösten 1950'
+      },
+      {
+        'langcode': 'en',
+        'text': 'Autumn 1950'
+      }
+    ],
+    'year_name': '1950-51',
+    'enroll_end_date': '1950-09-29T22:00:00.000Z',
+    'enroll_start_date': '1950-05-31T22:00:00.000Z',
+    'end_date': '1950-12-30T22:00:00.000Z',
+    'semester_code': 1,
+    'start_date': '1900-07-31T22:20:11.000Z',
+    'teaching_end_date': '1950-12-20T22:00:00.000Z',
+    'year_code': 1
+  }
+
+  const semester = mapper.semesterFromData(data)
+
+  test('semester code should be correct', () => {
+    expect(semester.semestercode).toBe(1)
+  })
+  
+  test('semester name should have all language keys set as properties', () => {
+    expect(semester.name).toHaveProperty('fi')
+    expect(semester.name).toHaveProperty('en')
+    expect(semester.name).toHaveProperty('sv')
+  })
+
+  test('semester start and end date should be instances of Date', () => {
+    expect(semester.startdate instanceof Date).toBe(true)
+    expect(semester.enddate instanceof Date).toBe(true)
+  })
+
+  test('semester yearcode and yearname should be correct', () => {
+    expect(semester.yearcode).toBe(1)
+    expect(semester.yearname).toBe('1950-51')
+  })
+
+})
