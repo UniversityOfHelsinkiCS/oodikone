@@ -3,47 +3,37 @@ const { Op } = require('sequelize')
 
 const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 
-const likefy = terms => `%${terms.join('%')}%`
+const likefy = term => `%${term}%`
 
 const nameLike = terms => ({
   name: {
-    [Op.like]: likefy(terms)
+    [Op.and]: terms.map(term => ({ [Op.like]: likefy(term) }))
   }
 })
 
-const codeLike = term => {
+const codeLike = terms => {
+  if (terms.length !== 1) {
+    return undefined
+  }
   return {
     code: {
-      [Op.eq]: term
+      [Op.eq]: terms[0]
     }
   }
 }
 
-const teacherMatchesSearchTerm = searchTerm => {
+const bySearchTerm = async searchTerm => {
   const terms = splitByEmptySpace(searchTerm)
-  if (terms.length > 1) {
-    return {
+  return Teacher.findAll({
+    where: {
       [Op.or]: [
         nameLike(terms),
-        nameLike([...terms].reverse())
+        codeLike(terms)
       ]
     }
-  }
-  return {
-    [Op.or]: [
-      nameLike(terms),
-      codeLike(terms[0])
-    ]
-  }
-}
-
-const bySearchTerm = async term => {
-  return Teacher.findAll({ 
-    where: teacherMatchesSearchTerm(term)
   })
 }
 
 module.exports = {
-  bySearchTerm,
-  teacherMatchesSearchTerm
+  bySearchTerm
 }
