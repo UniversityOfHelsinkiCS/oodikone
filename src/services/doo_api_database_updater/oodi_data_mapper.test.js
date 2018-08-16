@@ -1,6 +1,6 @@
 const mapper = require('./oodi_data_mapper')
 
-describe('studyattainment data mapping to credit tests', () => {
+describe('studyattainment data mapping tests', () => {
 
   const data = {
     'attainment_status_code': 4,
@@ -52,29 +52,56 @@ describe('studyattainment data mapping to credit tests', () => {
     'learningopportunity_id': 'LID_001'
   }
 
-  const credit = mapper.attainmentDataToCredit(data)
+  describe('credit mapping tests', () => {
 
-  describe('studyattainment date tests', () => {
-    const { attainment_date } = credit
-    const MAY = 4
+    const studentnumber = '0876654321'
+    const credit = mapper.attainmentDataToCredit(data, studentnumber)
 
-    test('attainment date is truthy', () => {
-      expect(attainment_date).toBeTruthy()
+    describe('studyattainment date tests', () => {
+      const { attainment_date } = credit
+      const MAY = 4
+
+      test('attainment date is truthy', () => {
+        expect(attainment_date).toBeTruthy()
+      })
+
+      test('attainment date is instance of Date', () => {
+        expect(attainment_date instanceof Date).toBe(true)
+      })
+
+      test('attainment date has correct month, year and date', () => {
+        expect(attainment_date.getMonth()).toBe(MAY)
+        expect(attainment_date.getFullYear()).toBe(2018)
+        expect(attainment_date.getDate()).toBe(30)
+      })
     })
 
-    test('attainment date is instance of Date', () => {
-      expect(attainment_date instanceof Date).toBe(true)
+    test('course code matches learningopportunity_id', () => {
+      expect(credit.course_code).toBe('LID_001')
     })
 
-    test('attainment date has correct month, year and date', () => {
-      expect(attainment_date.getMonth()).toBe(MAY)
-      expect(attainment_date.getFullYear()).toBe(2018)
-      expect(attainment_date.getDate()).toBe(30)
+    test('credit id should attainment id as string', () => {
+      expect(credit.id).toBe('123456789')
     })
+
+    test('studentnumber is correct', () => {
+      expect(credit.student_studentnumber).toBe(studentnumber)
+    })
+
   })
 
-  test('course code matches learningopportunity_id', () => {
-    expect(credit.course_code).toBe('LID_001')
+  describe('teacher mapping tests', () => {
+
+    const teachers = mapper.attainmentDataToTeachers(data)
+
+    test('amount of mapped teachers is correct (1)', () => {
+      expect(teachers.length).toBe(1)
+    })
+
+    test('teacher should have correct id', () => {
+      expect(teachers[0].id).toBe('TID_01')
+    })
+
   })
 
 })
