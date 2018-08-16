@@ -33,17 +33,7 @@ const byNameOrCode = (searchTerm, language) => Course.findAll({
 })
 
 const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) => {
-  const whereType = type !== 'null' ? {
-    [Op.and]: [
-      {
-        coursetypecode: {
-          [Op.eq]: type
-        }
-      }
-    ]
-  } : null
-
-  const whereDiscipline = discipline !== 'null' ? {
+  const includeDiscipline = discipline ? {
     include: {
       model: Discipline,
       where: {
@@ -54,23 +44,38 @@ const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) =
     }
   } : null
 
-  return Course.findAll({
-    ...whereDiscipline,
-    where: {
-      [Op.or]: [
-        {
-          name: {
-            [language]: {
-              [Op.iLike]: searchTerm
-            }
-          }
-        },
-        {
-          code: {
-            [Op.like]: searchTerm
+  const whereNameOrCode = searchTerm ? {
+    [Op.or]: [
+      {
+        name: {
+          [language]: {
+            [Op.iLike]: `%${searchTerm}%`
           }
         }
-      ],
+      },
+      {
+        code: {
+          [Op.like]: `%${searchTerm}%`
+        }
+      }
+    ],
+
+  } : null
+
+  const whereType = type ? {
+    [Op.and]: [
+      {
+        coursetypecode: {
+          [Op.eq]: type
+        }
+      }
+    ]
+  } : null
+
+  return Course.findAll({
+    ...includeDiscipline,
+    where: {
+      ...whereNameOrCode,
       ...whereType
     }
   })
@@ -132,7 +137,7 @@ const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) =
   const formatCourse = (course) => ({ name: course.name[language], code: course.code, date: course.latest_instance_date })
 
   try {
-    const result = await byNameOrCodeTypeAndDiscipline(`%${term}%`, type, discipline, language)
+    const result = await byNameOrCodeTypeAndDiscipline(term, type, discipline, language)
     return result.map(formatCourse)
   } catch (e) {
     return {
