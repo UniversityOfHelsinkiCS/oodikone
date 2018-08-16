@@ -364,6 +364,12 @@ const Semester = sequelize.define('semester', {
   },
   enddate: {
     type: Sequelize.DATE
+  },
+  yearcode: {
+    type: Sequelize.INTEGER
+  },
+  yearname: {
+    type: Sequelize.STRING
   }
 })
 
