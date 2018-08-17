@@ -41,7 +41,7 @@ class CourseStatistics extends Component {
     } else {
       this.setState({
         selectedCourses:
-          [...this.state.selectedCourses].filter(course => course.code !== value.code)
+          [...this.state.selectedCourses].filter(code => code !== value)
       })
     }
   }
@@ -63,7 +63,7 @@ class CourseStatistics extends Component {
     const { selected } = this.props.courseStatistics
     const { language } = this.props
     const query = {
-      codes: selectedCourses.map(course => course.code),
+      codes: selectedCourses,
       start: Number(start),
       end: Number(end),
       separate: String(separate),
@@ -266,7 +266,7 @@ class CourseStatistics extends Component {
   }
 
   render() {
-    const { selectedProgramme, selectedCourses } = this.state
+    const { selectedProgramme } = this.state
     const { language } = this.props
     const { data } = this.props.courseStatistics
     return (
@@ -282,7 +282,6 @@ class CourseStatistics extends Component {
           <CourseStatisticsSearch
             handleResultSelect={this.handleResultSelect}
             fetchCourseStatistics={this.fetchCourseStatistics}
-            selectedCourses={selectedCourses}
             removeSelectedCourse={this.removeSelectedCourse}
           />
         </Segment>

@@ -19,8 +19,8 @@ class CourseStatisticsSearch extends Component {
   state = {
     isLoading: false,
     searchStr: '',
-    type: null,
-    discipline: null
+    type: { value: 'All', key: null },
+    discipline: { value: 'All', key: null }
   }
 
 
@@ -33,17 +33,20 @@ class CourseStatisticsSearch extends Component {
     this.setState({
       isLoading: false,
       searchStr: '',
-      type: null,
-      discipline: null
+      type: { value: 'All', key: null },
+      discipline: { value: 'All', key: null }
     })
   }
 
-  handleTypeSelect = (e, { value }) => {
-    this.setState({ type: value }, () => this.fetchCoursesList())
+  handleTypeSelect = (e, { value, options }) => {
+    const { key } = options.find(opt => opt.text === value)
+    this.setState({ type: { value, key } }, () => this.fetchCoursesList())
   }
 
-  handleDisciplineSelect = (e, { value }) => {
-    this.setState({ discipline: value }, () => this.fetchCoursesList())
+  handleDisciplineSelect = (e, { value, options }) => {
+    const { key } = options.find(opt => opt.text === value)
+
+    this.setState({ discipline: { value, key } }, () => this.fetchCoursesList())
   }
 
 
@@ -51,7 +54,7 @@ class CourseStatisticsSearch extends Component {
     const { type, discipline } = this.state
     this.props.clearTimeout('search')
     this.setState({ searchStr })
-    if (!type && !discipline) {
+    if (!type.key && !discipline.key) {
       this.props.setTimeout('search', () => {
         this.fetchCoursesList()
       }, 250)
@@ -61,13 +64,21 @@ class CourseStatisticsSearch extends Component {
   fetchCoursesList = () => {
     const { type, discipline, searchStr } = this.state
     const { language } = this.props
-    if (searchStr.length >= 3 && !type && !discipline) {
+    if (searchStr.length >= 3 && !type.key && !discipline.key) {
       this.setState({ isLoading: true })
-      this.props.findMultipleCourses({ searchStr, type, discipline }, language)
+      this.props.findMultipleCourses({
+        searchStr,
+        type: type.key,
+        discipline: discipline.key
+      }, language)
         .then(() => this.setState({ isLoading: false }))
-    } else if (searchStr.length >= 3 || type || discipline) {
+    } else if (searchStr.length >= 3 || type.key || discipline.key) {
       this.setState({ isLoading: true })
-      this.props.findMultipleCourses({ searchStr: null, type, discipline }, language)
+      this.props.findMultipleCourses({
+        searchStr: null,
+        type: type.key,
+        discipline: discipline.key
+      }, language)
         .then(() => this.setState({ isLoading: false }))
     }
   }
@@ -86,8 +97,8 @@ class CourseStatisticsSearch extends Component {
     <Dropdown
       placeholder="All"
       search
+      value={this.state.type.value}
       selection
-      value={null}
       options={types}
       loading={types === null}
       onChange={this.handleTypeSelect}
@@ -97,12 +108,11 @@ class CourseStatisticsSearch extends Component {
     />
   )
 
-  renderDisciplinesDropdown = (disciplines, empty) => {
-    console.log('liek dis')
-    return empty ? (<Dropdown
+  renderDisciplinesDropdown = disciplines => (
+    <Dropdown
       placeholder="All"
       search
-      value={null}
+      value={this.state.discipline.value}
       selection
       loading={disciplines === null}
       options={disciplines}
@@ -111,19 +121,7 @@ class CourseStatisticsSearch extends Component {
       basic
       header="Select discipline"
     />
-    ) : (<Dropdown
-      placeholder="All"
-      search
-      selection
-      loading={disciplines === null}
-      options={disciplines}
-      onChange={this.handleDisciplineSelect}
-      closeOnChange
-      basic
-      header="Select discipline"
-    />
-    )
-  }
+  )
 
   renderResultTable = () => {
     const { courseList } = this.props
@@ -162,7 +160,7 @@ class CourseStatisticsSearch extends Component {
               .concat( // eslint-disable-line function-paren-newline
                 <Table.Cell key={`${course.code}-checkbox`}>
                   <Checkbox
-                    value={{ name: course[0], code: course[1] }}
+                    value={course[1]}
                     toggle
                     onChange={this.props.handleResultSelect}
                   />
@@ -195,28 +193,28 @@ class CourseStatisticsSearch extends Component {
   }
 
   render() {
-    const { isLoading, searchStr, type } = this.state
+    const { isLoading, searchStr } = this.state
     const { language, courseList } = this.props
     const { courseTypes, courseDisciplines } = this.props.courseStatistics
     const text = { en: 'All', fi: 'Kaikki', sv: 'Allt' }
     const disciplineOptions = courseDisciplines ?
       [
-        { text: text[language], value: null },
+        { text: text[language], value: text[language] },
         ..._.orderBy(courseDisciplines.map(disc => (
           {
-            text: disc.name.fi, // only finnish names available
-            value: disc.discipline_id,
+            text: disc.name.fi ? disc.name.fi : `Name missing (${language})`, // only finnish names available
+            value: disc.name.fi ? disc.name.fi : `Name missing (${language})`,
             key: disc.discipline_id
           }
         )), 'text', 'asc')] : null
 
     const typeOptions = courseTypes ?
       [
-        { text: text[language], value: null },
+        { text: text[language], value: text[language] },
         ..._.orderBy(courseTypes.map(ty => (
           {
-            text: ty.name[language] ? ty.name[language] : ty.name.fi,
-            value: ty.coursetypecode,
+            text: ty.name[language] ? ty.name[language] : `Name missing (${language})`,
+            value: ty.name[language] ? ty.name[language] : `Name missing (${language})`,
             key: ty.coursetypecode
           }
         )), 'text', 'asc')] : null
@@ -231,7 +229,7 @@ class CourseStatisticsSearch extends Component {
             </Form.Field>
             <Form.Field>
               <label>Course type (optional)</label>
-              {this.renderCourseTypesDropdown(typeOptions, !type)}
+              {this.renderCourseTypesDropdown(typeOptions)}
             </Form.Field>
           </Form.Group>
         </Form>
