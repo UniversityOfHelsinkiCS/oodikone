@@ -16,16 +16,22 @@ class ExtentGraduated extends Component {
   }
   state = {
     extentcode: undefined,
-    graduated: undefined
+    graduated: undefined,
+    complemented: 'false'
   }
-  graduationOptions = [{ value: 'notgrad', text: 'not graduated' }, { value: 'grad', text: 'graduated' }, { value: 'either', text: 'studying' }] // illegal to pass boolean values as Dropdown options value :(
+  graduationOptions = [
+    { value: 'grad', text: 'graduated' },
+    { value: 'either', text: 'studying' }
+  ] // illegal to pass boolean values as Dropdown options value :(
+
+  complementedOptions = [{ value: 'false', text: 'are' }, { value: 'true', text: 'are not' }]
 
   handleChange = (e, data) => {
     this.setState({ [data.name]: data.value })
   }
   handleLimit = () => {
-    const { extentcode, graduated } = this.state
-    this.props.setPopulationFilter(extentGraduated({ extentcode, graduated }))
+    const { extentcode, graduated, complemented } = this.state
+    this.props.setPopulationFilter(extentGraduated({ extentcode, graduated, complemented }))
   }
 
   clearFilter = () => {
@@ -33,14 +39,17 @@ class ExtentGraduated extends Component {
   }
   renderSetText = (extents, filter) => {
     const { language } = this.props
-    const { extentcode, graduated } = filter.params
-
-    let returnText = `Studying ${extents.find(extent => extent.extentcode === extentcode).name[language]} `
-    if (graduated === 'grad') {
-      returnText = returnText.concat(' and graduated')
-    } else {
-      returnText = returnText.concat(' but not graduated ')
+    const { extentcode, graduated, complemented } = filter.params
+    let returnText = ''
+    if (complemented === 'true') {
+      returnText = returnText.concat('Not')
     }
+    if (graduated === 'grad') {
+      returnText = returnText.concat(' graduated from')
+    } else if (graduated === 'either') {
+      returnText = returnText.concat(' studying')
+    }
+    returnText = returnText.concat(` ${extents.find(extent => extent.extentcode === extentcode).name[language]} `)
     return returnText
   }
 
@@ -52,7 +61,16 @@ class ExtentGraduated extends Component {
           <Form>
             <Form.Group inline>
               <Form.Field>
-                Students that are
+                Students that
+              </Form.Field>
+              <Form.Field>
+                <Dropdown
+                  fluid
+                  placeholder="are/not"
+                  name="complemented"
+                  onChange={this.handleChange}
+                  options={this.complementedOptions}
+                />
               </Form.Field>
               <Form.Field>
                 <Dropdown
