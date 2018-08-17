@@ -12,7 +12,7 @@ router.get('/courses', async (req, res) => {
 
 router.get('/coursesmulti', async (req, res) => {
   let results = []
-  if (req.query.name !== 'undefined' ) {
+  if (req.query.name || req.query.discipline || req.query.type) {
     results = await Course.bySearchTermTypeAndDiscipline(req.query.name, req.query.type, req.query.discipline, req.query.language)
   }
   res.json(results)
@@ -33,16 +33,25 @@ router.get('/v2/courselist', async (req, res) => {
 })
 
 router.get('/v2/courseinstancestatistics', async (req, res) => {
-  res.status(410).send('Deprecated')}
-)
+  res.status(410).send('Deprecated')
+})
 
 router.get('/courseyearlystats', async (req, res) => {
   let results = []
   if (req.query.start && req.query.code && req.query.end) {
     const { code } = req.query
     const years = { start: req.query.start, end: req.query.end }
-    
     results = await Course.yearlyStatsOf(code, years, req.query.separate, req.query.language)
+  }
+  res.json(results)
+})
+
+router.get('/v2/courseyearlystats', async (req, res) => {
+  let results = []
+  if (req.query.start && req.query.codes && req.query.end) {
+    const { codes } = req.query
+    const years = { start: req.query.start, end: req.query.end }
+    results = await Promise.all(JSON.parse(codes).map(code => Course.yearlyStatsOf(code, years, req.query.separate, req.query.language)))
   }
   res.json(results)
 })
