@@ -16,6 +16,7 @@ import courseStatistics from './courseStatistics'
 import graphSpinner from './graphSpinner'
 import settings from './settings'
 import courseCodeDuplicates from './coursecodeduplicates'
+import teachers from './teachers'
 
 export default combineReducers({
   locale,
@@ -33,5 +34,6 @@ export default combineReducers({
   courseStatistics,
   graphSpinner,
   settings,
-  courseCodeDuplicates
+  courseCodeDuplicates,
+  teachers
 })
