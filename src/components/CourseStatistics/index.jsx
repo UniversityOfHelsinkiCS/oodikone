@@ -1,14 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Form, Button, Header, Checkbox, Message, List, Dropdown } from 'semantic-ui-react'
+import { Form, Button, Header, Checkbox, Message, Transition, List, Dropdown, Segment, Table } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
 import _ from 'lodash'
 import Timeout from '../Timeout'
-import CourseSearch from '../CourseSearch'
+import CourseStatisticsSearch from '../CourseStatisticsSearch'
 import CoursePassRateChart from '../CoursePassRateChart'
 import LanguageChooser from '../LanguageChooser'
-import { getCourseStatistics, removeCourseStatistics } from '../../redux/courseStatistics'
+import { getMultipleCourseStatistics, removeCourseStatistics } from '../../redux/courseStatistics'
+import { emptyCourseSearch } from '../../redux/courses'
 import { isValidYear, isInDateFormat, reformatDate, momentFromFormat } from '../../common'
 
 
@@ -24,31 +25,25 @@ const INITIAL_YEARS = {
 
 class CourseStatistics extends Component {
   state = {
-    selectedCourse: { name: 'No course selected', code: '' },
+    selectedCourses: [],
     ...INITIAL_YEARS,
     separate: false,
     validYear: true,
     error: '',
-    isLoading: true,
+    isLoading: false,
     courseLevel: true,
     selectedProgramme: 'all'
   }
-  componentDidMount() {
-    this.setState({ isLoading: this.props.courseStatistics.pending })
-  }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.courseStatistics.pending && !this.props.courseStatistics.pending) {
-      this.setState({ isLoading: false }) // eslint-disable-line react/no-did-update-set-state,max-len
-      /* You may call setState() immediately in componentDidUpdate()
-         but note that it must be wrapped in a condition */
+  handleResultSelect = (e, { value, checked }) => {
+    if (checked) {
+      this.setState({ selectedCourses: [...this.state.selectedCourses, value] })
+    } else {
+      this.setState({
+        selectedCourses:
+          [...this.state.selectedCourses].filter(code => code !== value)
+      })
     }
-  }
-
-  handleResultSelect = (e, { result }) => {
-    this.setState({ selectedCourse: result }, () => {
-      this.fetchCourseStatistics()
-    })
   }
 
   addYear = change => () => {
@@ -64,12 +59,11 @@ class CourseStatistics extends Component {
   }
 
   fetchCourseStatistics = () => {
-    const { code } = this.state.selectedCourse
-    const { start, end, separate } = this.state
+    const { start, end, separate, selectedCourses } = this.state
     const { selected } = this.props.courseStatistics
     const { language } = this.props
     const query = {
-      code,
+      codes: selectedCourses,
       start: Number(start),
       end: Number(end),
       separate: String(separate),
@@ -79,12 +73,13 @@ class CourseStatistics extends Component {
       olquery.separate === query.separate &&
       olquery.end === query.end &&
       olquery.start === query.start &&
-      olquery.code === query.code)
+      olquery.codes === query.codes)
     if (!aa) {
       this.setState({ isLoading: true })
-      this.props.getCourseStatistics(query)
+      this.props.getMultipleCourseStatistics(query)
         .then(() => {
-          this.setState({ error: '', isLoading: false })
+          this.setState({ selected: [], error: '', isLoading: false })
+          this.props.emptyCourseSearch()
         })
       this.setState({ error: '' })
     } else this.setState({ error: 'Course with selected parameters already in analysis' })
@@ -156,11 +151,11 @@ class CourseStatistics extends Component {
       basic
       header="Select programme"
     />
-
   )
 
-  renderYearSelector = () => {
+  renderForm = () => {
     const { validYear, start, end, isLoading } = this.state
+
     return (
       <Form loading={isLoading}>
         <Form.Group key="year" className={style.yearSelectorGroup}>
@@ -233,75 +228,123 @@ class CourseStatistics extends Component {
     )
   }
 
-  render() {
+  renderQueryTable = () => {
     const { data } = this.props.courseStatistics
-    const { language } = this.props
+    const headers = ['Name', 'Code', 'Time', '']
+
+    return (
+      <Table
+        style={{
+          width: '100%',
+          maxWidth: '850px'
+        }}
+        unstackable
+        selectable
+      >
+        <Table.Header>
+          <Table.Row>
+            {headers.map(header => (
+              <Table.HeaderCell key={`header-${header}`}>
+                {header}
+              </Table.HeaderCell>
+            ))}
+          </Table.Row>
+        </Table.Header>
+
+        <Table.Body>
+          {data.map(course => (
+            <Table.Row key={`${course.name}-${course.code}`}>
+              <Table.Cell>{course.name}</Table.Cell>
+              <Table.Cell>{course.code}</Table.Cell>
+              <Table.Cell>{course.start}-{course.end}</Table.Cell>
+              <Table.Cell>
+                <Button onClick={this.removeCourseStatistics(course)}>Remove</Button>
+              </Table.Cell>
+            </Table.Row>))}
+        </Table.Body>
+      </Table>)
+  }
+
+  render() {
     const { selectedProgramme } = this.state
+    const { language } = this.props
+    const { data } = this.props.courseStatistics
     return (
       <div className={style.container}>
         <Header className={sharedStyles.segmentTitle} size="large">
           Course Statistics
         </Header>
-        {this.renderYearSelector()}
-        {this.renderErrorMessage()}
-        <CourseSearch handleResultSelect={this.handleResultSelect} />
-        {data.map((course) => {
-          let programmeOptions = Object.keys(course.programmes).map(key => ({
-            text: `${course.programmes[key].name[language]} (${course.programmes[key].amount})`,
-            value: key,
-            amount: course.programmes[key].amount
-          }))
-          const text = { en: 'all', fi: 'kaikki', sv: 'allt' }
-          programmeOptions = programmeOptions.concat({ text: text[language], value: 'all' })
-          programmeOptions = _.orderBy(programmeOptions, 'amount', 'desc')
-          let filteredstats = course.stats
-          if (selectedProgramme !== 'all') {
-            filteredstats = filteredstats.map(field =>
-              Object.entries(field).reduce((obj, [key, value]) => {
-                switch (key) {
-                  case 'time':
-                    return ({ ...obj, [key]: value })
+        <Segment>
+          <Header>Select statistics parameters</Header>
+          {this.renderErrorMessage()}
+          {this.renderForm()}
+          <Header>Select courses to include</Header>
+          <CourseStatisticsSearch
+            handleResultSelect={this.handleResultSelect}
+            fetchCourseStatistics={this.fetchCourseStatistics}
+            removeSelectedCourse={this.removeSelectedCourse}
+          />
+        </Segment>
+        {data.length > 0 ? this.renderQueryTable() : null}
+        <Transition.Group as={List} duration={700}>
+          {data.map((course) => {
+            let programmeOptions = Object.keys(course.programmes).map(key => ({
+              text: `${course.programmes[key].name[language] ? course.programmes[key].name[language] : course.programmes[key].name.fi} (${course.programmes[key].amount})`,
+              value: key,
+              amount: course.programmes[key].amount
+            }))
+            const text = { en: 'all', fi: 'kaikki', sv: 'allt' }
+            programmeOptions = _.orderBy(programmeOptions, 'amount', 'desc')
+            programmeOptions = programmeOptions.concat({ text: text[language], value: 'all' })
+            let filteredstats = course.stats
+            if (selectedProgramme !== 'all') {
+              filteredstats = filteredstats.map(field =>
+                Object.entries(field).reduce((obj, [key, value]) => {
+                  switch (key) {
+                    case 'time':
+                      return ({ ...obj, [key]: value })
 
-                  case 'gradeDistribution':
-                    return {
-                      ...obj,
-                      [key]: Object.entries(value).reduce((distribution, [grade, students]) => ({
-                        ...distribution,
-                        [grade]: students.filter(({ student }) =>
-                          student.studyright_elements.some(e => e.code === selectedProgramme))
-                      }), {})
-                    }
-                  default:
-                    return {
-                      ...obj,
-                      [key]: value.filter(e =>
-                        e.studyright_elements.some(element => element.code === selectedProgramme))
-                    }
-                }
-              }, {}))
+                    case 'gradeDistribution':
+                      return {
+                        ...obj,
+                        [key]: Object.entries(value).reduce((distribution, [grade, students]) => ({
+                          ...distribution,
+                          [grade]: students.filter(({ student }) =>
+                            student.studyright_elements.some(e => e.code === selectedProgramme))
+                        }), {})
+                      }
+                    default:
+                      return {
+                        ...obj,
+                        [key]: value.filter(e =>
+                          e.studyright_elements.some(element => element.code === selectedProgramme))
+                      }
+                  }
+                }, {}))
+            }
+            const stats = []
+            Object.assign(stats, course)
+            const max = course.stats[0].courseLevelPassed.length +
+              course.stats[0].courseLevelFailed.length +
+              10
+            stats.stats = filteredstats
+            return (
+              <List.Item key={course.code + course.start + course.end + course.separate}>
+                <CoursePassRateChart
+                  removeCourseStatistics={this.removeCourseStatistics}
+                  stats={stats}
+                  max={max}
+                  altCodes={course.alternativeCodes}
+                  courseLevel={this.state.courseLevel}
+                  courseLevelSwitch={this.handleCourseLevelSwitch}
+                  dropdown={this.renderDropdown}
+                  programmeOptions={programmeOptions}
+                />
+              </List.Item>
+            )
+          })
           }
-          const stats = []
-          Object.assign(stats, course)
-          const max = course.stats[0].courseLevelPassed.length +
-            course.stats[0].courseLevelFailed.length +
-            10
-          stats.stats = filteredstats
-          return (
-            <List.Item key={course.code + course.start + course.end + course.separate}>
-              <CoursePassRateChart
-                removeCourseStatistics={this.removeCourseStatistics}
-                stats={stats}
-                max={max}
-                altCodes={course.alternativeCodes}
-                courseLevel={this.state.courseLevel}
-                courseLevelSwitch={this.handleCourseLevelSwitch}
-                dropdown={this.renderDropdown}
-                programmeOptions={programmeOptions}
-              />
-            </List.Item>
-          )
-        })
-        }
+        </Transition.Group>
       </div>
     )
   }
@@ -309,8 +352,9 @@ class CourseStatistics extends Component {
 
 CourseStatistics.propTypes = {
   language: string.isRequired,
-  getCourseStatistics: func.isRequired,
+  getMultipleCourseStatistics: func.isRequired,
   removeCourseStatistics: func.isRequired,
+  emptyCourseSearch: func.isRequired,
   courseStatistics: shape({
     data: array.isRequired,
     selected: array.isRequired
@@ -324,10 +368,12 @@ const mapStateToProps = ({ settings, courses, courseStatistics }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getCourseStatistics: query =>
-    dispatch(getCourseStatistics(query)),
+  getMultipleCourseStatistics: query =>
+    dispatch(getMultipleCourseStatistics(query)),
   removeCourseStatistics: query =>
-    dispatch(removeCourseStatistics(query))
+    dispatch(removeCourseStatistics(query)),
+  emptyCourseSearch: () =>
+    dispatch(emptyCourseSearch())
 })
 
 
