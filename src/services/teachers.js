@@ -1,4 +1,4 @@
-const { Teacher } = require('../models/index')
+const { Teacher, Credit, Course, Semester } = require('../models/index')
 const { Op } = require('sequelize')
 
 const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
@@ -42,6 +42,24 @@ const bySearchTerm = async searchTerm => {
   })
 }
 
+const teacherStats = async teacherid => Teacher.findByPrimary(teacherid, {
+  include: {
+    model: Credit,
+    attributes: ['credits', 'grade', 'id'],
+    include: [
+      {
+        model: Course,
+        attributes: ['name', 'code']
+      },
+      {
+        model: Semester,
+        attributes: ['semestercode', 'name', 'yearname', 'yearcode']
+      }
+    ]
+  }
+})
+
 module.exports = {
-  bySearchTerm
+  bySearchTerm,
+  teacherStats
 }
