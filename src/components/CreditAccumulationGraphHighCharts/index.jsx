@@ -16,17 +16,16 @@ import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
 boost(Highcharts)
 
 class CreditAccumulationGraphHighCharts extends Component {
-  state = {
-    studentCreditLines: [],
-    timeout: undefined,
-    options: [],
-    initialLoad: true,
-    renderedOnce: false
+  constructor(props) {
+    super(props)
+    this.state = {
+      studentCreditLines: [],
+      options: []
+    }
   }
-
-  componentDidMount() {
+  async componentDidMount() {
     const { students } = this.props
-    const timeout = setTimeout(() => this.getMoreCreditLines(students), 0)
+    await this.getMoreCreditLines(students)
     const self = this
     const dataOfSelected = this.createStudentCreditLines(students).filter(line =>
       this.props.selectedStudents.includes(line.name))
@@ -73,13 +72,14 @@ class CreditAccumulationGraphHighCharts extends Component {
         min: students.minDate
       }
     }
-    this.setState({ timeout, options })
+    this.setState({ options })
   }
 
-  componentWillReceiveProps(nextProps) {
+  async componentWillReceiveProps(nextProps) {
     if (nextProps.students) {
       const nextStudents = nextProps.students.map(student => student.studentNumber)
       const oldStudents = this.props.students.map(student => student.studentNumber)
+
       const changed =
         nextStudents.some(student => !oldStudents.includes(student)) ||
         oldStudents.some(student => !nextStudents.includes(student))
@@ -102,34 +102,13 @@ class CreditAccumulationGraphHighCharts extends Component {
         }
       }
       this.setState({ options })
-
       if (changed) {
         const { students } = nextProps
-        const timeout = setTimeout(() => this.getMoreCreditLines(students), 1000)
-        this.setState({ timeout })
+        await this.getMoreCreditLines(students)
       }
     }
   }
 
-  componentDidUpdate() {
-    if (this.state.initialLoad) {
-      if (
-        this.props.selectedStudents &&
-        this.state.studentCreditLines.length === this.props.selectedStudents.length
-      ) {
-        this.setState({ initialLoad: false }) // eslint-disable-line
-      }
-    }
-    if (!this.state.renderedOnce) {
-      this.setState({ renderedOnce: true }) // eslint-disable-line
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.state.timeout) {
-      clearInterval(this.state.timeout)
-    }
-  }
   getXAxisMonth = (date, startDate) =>
     Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0)
 
@@ -171,7 +150,7 @@ class CreditAccumulationGraphHighCharts extends Component {
     })
   }
 
-  getMoreCreditLines = (students) => {
+  getMoreCreditLines = async (students) => {
     const studentCreditLines = this.state.studentCreditLines
       .concat(this.createStudentCreditLines(students))
     this.setState({ studentCreditLines })
@@ -196,7 +175,7 @@ class CreditAccumulationGraphHighCharts extends Component {
         }
         return [new Date(course.date).getTime(), credits]
       })
-      return { name: student.studentNumber, data: points, boostThreshold: 500 }
+      return { name: student.studentNumber, data: points, seriesThreshold: 150 }
     })
 
   resizeChart = (size) => {
