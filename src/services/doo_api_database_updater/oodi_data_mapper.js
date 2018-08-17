@@ -80,7 +80,8 @@ const attainmentDataToCredit = (attainment, studentnumber) => {
     credittypecode: attainment.attainment_status_code,
     student_studentnumber: studentnumber,
     attainment_date: parseDate(attainment.attainment_date),
-    course_code: `${attainment.learningopportunity_id}`
+    course_code: `${attainment.learningopportunity_id}`,
+    semestercode: attainment.semester_code
   }
 }
 
@@ -222,7 +223,9 @@ const semesterFromData = data => ({
   semestercode: data.semester_code,
   name: getTextsByLanguage(data.name),
   startdate: parseDate(data.start_date),
-  enddate: parseDate(data.end_date)
+  enddate: parseDate(data.end_date),
+  yearcode: data.year_code,
+  yearname: data.year_name
 })
 
 const semesterEnrollmentFromData = (data, studentnumber) => ({
