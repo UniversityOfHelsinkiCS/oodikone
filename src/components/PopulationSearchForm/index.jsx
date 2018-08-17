@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, arrayOf, shape, bool, string } from 'prop-types'
+import { func, arrayOf, shape, bool, string, object } from 'prop-types'
 import { Form, Button, Message, Radio, Dropdown, Icon } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
@@ -10,7 +10,8 @@ import moment from 'moment'
 
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
-import { getPopulationFilters } from '../../redux/populationFilters'
+import { getPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
+import { extentGraduated } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { isInDateFormat, momentFromFormat, reformatDate, isValidYear } from '../../common'
@@ -30,11 +31,13 @@ class PopulationSearchForm extends Component {
     getPopulationStatistics: func.isRequired,
     getPopulationCourses: func.isRequired,
     getPopulationFilters: func.isRequired,
+    setPopulationFilter: func.isRequired,
     clearPopulations: func.isRequired,
     queries: shape({}).isRequired,
     studyProgrammes: arrayOf(dropdownType), //eslint-disable-line
     degrees: arrayOf(dropdownType), //eslint-disable-line
     setLoading: func.isRequired,
+    extents: arrayOf(object).isRequired,
     pending: bool //eslint-disable-line
   }
 
@@ -97,7 +100,15 @@ class PopulationSearchForm extends Component {
       this.props.getPopulationStatistics(request),
       this.props.getPopulationCourses(request),
       this.props.getPopulationFilters(request)
-    ]).then(() => this.setState({ isLoading: false }))
+    ]).then(() => {
+      if (this.props.extents.map(e => e.extentcode).includes(7)) {
+        this.props.setPopulationFilter(extentGraduated({ extentcode: 7, graduated: 'either', complemented: 'true' }))
+      }
+      if (this.props.extents.map(e => e.extentcode).includes(34)) {
+        this.props.setPopulationFilter(extentGraduated({ extentcode: 34, graduated: 'either', complemented: 'true' }))
+      }
+      this.setState({ isLoading: false })
+    })
   }
 
   handleYearSelection = (year) => {
@@ -438,7 +449,8 @@ const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes
     translate: getTranslate(locale),
     degrees: studyRights['10'],
     studyProgrammes: studyRights['20'],
-    pending
+    pending,
+    extents: populations.data.extents || []
   })
 }
 
@@ -446,6 +458,7 @@ const mapDispatchToProps = dispatch => ({
   getPopulationStatistics: request => dispatch(getPopulationStatistics(request)),
   getPopulationCourses: request => dispatch(getPopulationCourses(request)),
   getPopulationFilters: request => dispatch(getPopulationFilters(request)),
+  setPopulationFilter: filter => dispatch(setPopulationFilter(filter)),
   getDegreesAndProgrammes: () => dispatch(getDegreesAndProgrammes()),
   clearPopulations: () => dispatch(clearPopulations()),
   setLoading: () => dispatch(setLoading())
