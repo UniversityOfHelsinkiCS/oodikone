@@ -7,7 +7,7 @@ const likefy = term => `%${term}%`
 
 const nameLike = terms => ({
   name: {
-    [Op.and]: terms.map(term => ({ [Op.like]: likefy(term) }))
+    [Op.and]: terms.map(term => ({ [Op.iLike]: likefy(term) }))
   }
 })
 
@@ -17,14 +17,22 @@ const codeLike = terms => {
   }
   return {
     code: {
-      [Op.eq]: terms[0]
+      [Op.iLike]: likefy(terms[0])
     }
   }
 }
 
+const invalidTerm = searchTerm => !searchTerm.trim()
+
 const bySearchTerm = async searchTerm => {
+  if (invalidTerm(searchTerm)) {
+    return []
+  }
   const terms = splitByEmptySpace(searchTerm)
   return Teacher.findAll({
+    attributes: {
+      exclude: ['createdAt', 'updatedAt']
+    },
     where: {
       [Op.or]: [
         nameLike(terms),
