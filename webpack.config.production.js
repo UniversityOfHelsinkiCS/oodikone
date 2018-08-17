@@ -20,11 +20,7 @@ module.exports = {
   ],
 
   resolve: {
-    extensions: ['.js', '.jsx'],
-    alias: {
-      // resolve RHL directly from /lib to bypass webpack's loader resolution magic
-      'react-hot-loader': 'react-hot-loader/lib'
-    }
+    extensions: ['.js', '.jsx']
   },
 
   module: {
