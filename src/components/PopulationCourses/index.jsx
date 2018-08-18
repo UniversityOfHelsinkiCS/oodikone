@@ -30,7 +30,7 @@ class PopulationCourses extends Component {
         {samples.map(sample => (
           <PopulationCourseStats
             key={sample.query.uuid}
-            courses={sample.data}
+            courses={sample.data || {}}
             query={sample.query}
           />))}
       </Segment>
