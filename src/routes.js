@@ -10,6 +10,7 @@ const login = require('./routes/login')
 const users = require('./routes/users')
 const elementdetails = require('./routes/elementdetails')
 const auth = require('./middleware/auth')
+const teachers = require('./routes/teachers')
 
 const accessLogger = morgan((tokens, req, res) => {
   const fields = ['method', 'url', 'status', 'response-time', 'remote-addr', 'remote-user', 'user-agent', 'referrer']
@@ -33,6 +34,7 @@ module.exports = (app, url) => {
   app.use(url, courses)
   app.use(url, department)
   app.use(url, students)
+  app.use(url, teachers)
   app.use(url, population)
   app.use(auth.checkAdminAuth)
   app.use(url, users)
