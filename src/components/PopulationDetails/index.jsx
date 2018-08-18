@@ -82,7 +82,7 @@ class PopulationDetails extends Component {
         <Header size="medium" dividing>
           {translate('populationStatistics.graphSegmentHeader')}
         </Header>
-        {graphs}
+        {samples.length > 0 ? graphs : null}
       </Segment>
     )
   }
