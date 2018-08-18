@@ -9,4 +9,3 @@ export const makeSortUsers = () => createSelector(
   getUsers,
   sortUsers
 )
-
