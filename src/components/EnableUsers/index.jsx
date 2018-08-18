@@ -8,6 +8,7 @@ import LanguageChooser from '../LanguageChooser'
 import { getUsers, enableUser, addUserUnit, removeUserUnit } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { makeSortUsers } from '../../selectors/users'
+import { copyToClipboard } from '../../common'
 import sharedStyles from '../../styles/shared'
 
 class EnableUsers extends Component {
@@ -55,6 +56,13 @@ class EnableUsers extends Component {
     history.push('/users')
   }
 
+  copyEmailsToClippoard = () => {
+    const clipboardString = this.props.users
+      .filter(u => u.is_enabled && u.email)
+      .map(u => u.email).join('; ')
+    copyToClipboard(clipboardString)
+  }
+
   renderUnitList = (elementdetails, user) => {
     const { language } = this.props
     if (!elementdetails) return null
@@ -98,6 +106,7 @@ class EnableUsers extends Component {
                 {user.full_name}
               </Card.Header>
               <Card.Meta content={user.username} />
+              <Card.Meta content={user.email} />
               <Card.Description>
                 {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`}
               </Card.Description>
@@ -152,6 +161,7 @@ class EnableUsers extends Component {
             <Card.Content>
               <Card.Header content={user.full_name} />
               <Card.Meta content={user.username} />
+              <Card.Meta content={user.email} />
               <Card.Description>
                 {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`}
               </Card.Description>
@@ -189,6 +199,12 @@ class EnableUsers extends Component {
         <Segment className={sharedStyles.contentSegment}>
           { !userid ? this.renderUserSearchList() : this.renderUserPage(userid) }
         </Segment>
+        <Icon
+          link
+          name="envelope"
+          onClick={this.copyEmailsToClippoard}
+          style={{ float: 'right' }}
+        />
       </div>
     )
   }
