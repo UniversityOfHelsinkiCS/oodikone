@@ -1,4 +1,4 @@
-const { Teacher } = require('../models/index')
+const { Teacher, Credit, Course, Semester } = require('../models/index')
 const { Op } = require('sequelize')
 
 const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
@@ -7,7 +7,7 @@ const likefy = term => `%${term}%`
 
 const nameLike = terms => ({
   name: {
-    [Op.and]: terms.map(term => ({ [Op.like]: likefy(term) }))
+    [Op.and]: terms.map(term => ({ [Op.iLike]: likefy(term) }))
   }
 })
 
@@ -17,14 +17,22 @@ const codeLike = terms => {
   }
   return {
     code: {
-      [Op.eq]: terms[0]
+      [Op.iLike]: likefy(terms[0])
     }
   }
 }
 
+const invalidTerm = searchTerm => !searchTerm.trim()
+
 const bySearchTerm = async searchTerm => {
+  if (invalidTerm(searchTerm)) {
+    return []
+  }
   const terms = splitByEmptySpace(searchTerm)
   return Teacher.findAll({
+    attributes: {
+      exclude: ['createdAt', 'updatedAt']
+    },
     where: {
       [Op.or]: [
         nameLike(terms),
@@ -34,6 +42,24 @@ const bySearchTerm = async searchTerm => {
   })
 }
 
+const teacherStats = async teacherid => Teacher.findByPrimary(teacherid, {
+  include: {
+    model: Credit,
+    attributes: ['credits', 'grade', 'id'],
+    include: [
+      {
+        model: Course,
+        attributes: ['name', 'code']
+      },
+      {
+        model: Semester,
+        attributes: ['semestercode', 'name', 'yearname', 'yearcode']
+      }
+    ]
+  }
+})
+
 module.exports = {
-  bySearchTerm
+  bySearchTerm,
+  teacherStats
 }
