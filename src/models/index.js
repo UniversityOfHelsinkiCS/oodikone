@@ -544,7 +544,7 @@ CourseRealisation.belongsTo(Course, { foreignKey: 'coursecode' })
 CourseRealisation.belongsToMany(Student, { through: CourseEnrollment, foreignKey: 'courserealisation_id' })
 Student.belongsToMany(CourseRealisation, { through: CourseEnrollment, foreignKey: 'studentnumber' })
 
-Credit.belongsToMany(Student, { through: CreditTeacher, foreignKey: 'credit_id' })
+Credit.belongsToMany(Teacher, { through: CreditTeacher, foreignKey: 'credit_id' })
 Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id' })
 
 Credit.belongsTo(Semester, { foreignKey: 'semestercode' })
