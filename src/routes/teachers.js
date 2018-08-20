@@ -10,6 +10,9 @@ router.get('/teachers', async (req, res) => {
 router.get('/teachers/:id', async (req, res) => {
   const { id } = req.params
   const result = await teachers.teacherStats(id)
+  if (!result) {
+    return res.status(404).send()
+  }
   res.json(result)
 })
 
