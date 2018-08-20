@@ -13,8 +13,12 @@ import Settings from '../Settings'
 import ErrorContainer from '../ErrorContainer'
 import { routes, BASE_PATH } from '../../constants'
 import AccessDenied from '../AccessDenied'
+<<<<<<< HEAD
 import TeacherStatistics from '../TeacherStatistics'
 import UsageStatistics from '../UsageStatistics'
+=======
+import Teachers from '../Teachers'
+>>>>>>> 8ce83243ee0c2eeba9d0ce05fe3931eec4c1e73c
 
 import styles from './main.css'
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Form, Button, Header, Checkbox, Message, Transition, List, Dropdown, Segment, Table } from 'semantic-ui-react'
+import { Form, Button, Header, Checkbox, Message, Transition, List, Dropdown, Segment, Table, Icon } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
 import _ from 'lodash'
 import Timeout from '../Timeout'
@@ -9,7 +9,7 @@ import CourseStatisticsSearch from '../CourseStatisticsSearch'
 import CoursePassRateChart from '../CoursePassRateChart'
 import LanguageChooser from '../LanguageChooser'
 import { getMultipleCourseStatistics, removeCourseStatistics } from '../../redux/courseStatistics'
-import { emptyCourseSearch } from '../../redux/courses'
+import { emptyCourseSearch, toggleCourseSelect } from '../../redux/courses'
 import { isValidYear, isInDateFormat, reformatDate, momentFromFormat } from '../../common'
 
 
@@ -36,6 +36,7 @@ class CourseStatistics extends Component {
   }
 
   handleResultSelect = (e, { value, checked }) => {
+    this.props.toggleCourseSelect(value)
     if (checked) {
       this.setState({ selectedCourses: [...this.state.selectedCourses, value] })
     } else {
@@ -228,6 +229,47 @@ class CourseStatistics extends Component {
     )
   }
 
+  renderSelectedTable = () => {
+    const { selected } = this.props.courses
+    const headers = ['Name', 'Code', 'Remove']
+    if (selected.length > 0) {
+      return (
+        <div>
+          <Header style={{ paddingTop: '20px', paddingLeft: '5px' }}>Selected Courses</Header>
+          <Table
+            style={{
+              width: '100%',
+              maxWidth: '850px'
+            }}
+            unstackable
+            selectable
+          >
+            <Table.Header>
+              <Table.Row>
+                {headers.map(header => (
+                  <Table.HeaderCell key={`header-${header}`}>
+                    {header}
+                  </Table.HeaderCell>
+                ))}
+              </Table.Row>
+            </Table.Header>
+
+            <Table.Body>
+              {selected.map(course => (
+                <Table.Row key={`${course.name}-${course.code}`}>
+                  <Table.Cell>{course.name}</Table.Cell>
+                  <Table.Cell>{course.code}</Table.Cell>
+                  <Table.Cell>
+                    <Button icon circular value={course.code} checked={false} onClick={this.handleResultSelect}><Icon name="remove" /></Button>
+                  </Table.Cell>
+                </Table.Row>))}
+            </Table.Body>
+          </Table>
+        </div>)
+    }
+    return null
+  }
+
   renderQueryTable = () => {
     const { data } = this.props.courseStatistics
     const headers = ['Name', 'Code', 'Time', '']
@@ -284,6 +326,7 @@ class CourseStatistics extends Component {
             fetchCourseStatistics={this.fetchCourseStatistics}
             removeSelectedCourse={this.removeSelectedCourse}
           />
+          {this.renderSelectedTable()}
         </Segment>
         {data.length > 0 ? this.renderQueryTable() : null}
         <Transition.Group as={List} duration={700}>
@@ -355,8 +398,12 @@ CourseStatistics.propTypes = {
   getMultipleCourseStatistics: func.isRequired,
   removeCourseStatistics: func.isRequired,
   emptyCourseSearch: func.isRequired,
+  toggleCourseSelect: func.isRequired,
   courseStatistics: shape({
     data: array.isRequired,
+    selected: array.isRequired
+  }).isRequired,
+  courses: shape({
     selected: array.isRequired
   }).isRequired
 }
@@ -373,7 +420,10 @@ const mapDispatchToProps = dispatch => ({
   removeCourseStatistics: query =>
     dispatch(removeCourseStatistics(query)),
   emptyCourseSearch: () =>
-    dispatch(emptyCourseSearch())
+    dispatch(emptyCourseSearch()),
+  toggleCourseSelect: (code) => {
+    dispatch(toggleCourseSelect(code))
+  }
 })
 
 
