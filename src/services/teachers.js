@@ -71,7 +71,6 @@ const parseCreditInfo = credit => ({
   semester: credit.semester
 })
 
-
 const reduceStats = (stats, code, name, credits, passed, failed) => {
   const course = stats[code] ? {...stats[code]} : {
     code,
