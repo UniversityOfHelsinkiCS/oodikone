@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Search, Segment, Form } from 'semantic-ui-react'
+import { Search, Segment } from 'semantic-ui-react'
 import { func, arrayOf, object, shape } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
