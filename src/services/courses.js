@@ -1,17 +1,9 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const redis = require('redis')
-const conf = require('../conf-backend')
 const { sequelize, Student, Credit, Course, CourseType, Discipline, ElementDetails, StudyrightElement, Studyright } = require('../models')
+const { redisClient }= require('../services/redis')
 const Op = Sequelize.Op
 const _ = require('lodash')
-
-let redisClient
-
-if (process.env.NODE_ENV !== 'test') {
-  redisClient = redis.createClient(6379, conf.redis)
-  require('bluebird').promisifyAll(redis.RedisClient.prototype)
-}
 
 const byNameOrCode = (searchTerm, language) => Course.findAll({
   where: {
