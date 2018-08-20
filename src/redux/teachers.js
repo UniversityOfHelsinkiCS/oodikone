@@ -1,7 +1,8 @@
 import { callController } from '../apiConnection'
 
 const prefix = {
-  find: 'FIND_TEACHERS_'
+  find: 'FIND_TEACHERS_',
+  get: 'GET_TEACHER_'
 }
 
 const types = {
@@ -9,6 +10,11 @@ const types = {
     attempt: `${prefix.find}ATTEMPT`,
     failure: `${prefix.find}FAILURE`,
     success: `${prefix.find}SUCCESS`
+  },
+  get: {
+    attempt: `${prefix.get}ATTEMPT`,
+    failure: `${prefix.get}FAILURE`,
+    success: `${prefix.get}SUCCESS`
   }
 }
 
@@ -17,10 +23,16 @@ export const findTeachers = (searchString) => {
   return callController(route, prefix.find)
 }
 
+export const getTeacher = (teacherid) => {
+  const route = `/teachers/${teacherid}`
+  return callController(route, prefix.get)
+}
+
 const initial = {
   pending: false,
   error: false,
-  data: []
+  list: [],
+  items: {}
 }
 
 const reducer = (state = initial, action) => {
@@ -34,14 +46,31 @@ const reducer = (state = initial, action) => {
       return {
         ...state,
         pending: false,
-        data: action.response
+        list: action.response
       }
     case types.find.failure:
       return {
         ...state,
         pending: false,
-        error: true,
-        data: action.response
+        error: true
+      }
+    case types.get.attempt:
+      return {
+        ...state,
+        pending: true,
+        error: false
+      }
+    case types.get.success:
+      return {
+        ...state,
+        pending: false,
+        error: false,
+        items: { ...state.items, [action.response.id]: action.response }
+      }
+    case types.get.error:
+      return {
+        ...state,
+        error: true
       }
     default:
       return state
