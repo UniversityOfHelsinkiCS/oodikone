@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Search, Segment } from 'semantic-ui-react'
+import { Search, Segment, Form } from 'semantic-ui-react'
 import { func, arrayOf, object, shape } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -53,14 +53,16 @@ class TeacherSearch extends Component {
             onSearchChange={this.handleSearchChange}
             showNoResults={false}
           />
-          <Segment className={sharedStyles.contentSegment}>
-            { this.state.displayResults && <SearchResultTable
-              headers={['Teacher ID', 'Username', 'Name']}
-              rows={this.props.teachers}
-              rowClickFn={(_, teacher) => this.props.history.push(`/teachers/${teacher.id}`)}
-              noResultText="No teachers matched your search"
-            />}
-          </Segment>
+          { this.state.displayResults && (
+            <Segment className={sharedStyles.contentSegment}>
+              <SearchResultTable
+                headers={['Teacher ID', 'Username', 'Name']}
+                rows={this.props.teachers}
+                rowClickFn={(_, teacher) => this.props.history.push(`/teachers/${teacher.id}`)}
+                noResultText="No teachers matched your search"
+              />
+            </Segment>
+          )}
         </div>
       )
     }
