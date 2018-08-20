@@ -16,53 +16,61 @@ export const emptyCourseSearch = () => ({
   type: 'CLEAR_COURSE_SEARCH'
 })
 
-const reducer = (state = { data: {} }, action) => {
+export const toggleCourseSelect = code => ({
+  type: 'TOGGLE_COURSE_SELECT',
+  code
+})
+
+const reducer = (state = { data: [], selected: [] }, action) => {
   switch (action.type) {
     case 'FIND_COURSES_ATTEMPT':
       return {
-        pending: true,
-        selected: state.selected,
-        data: state.data
+        ...state,
+        pending: true
       }
     case 'FIND_COURSES_FAILURE':
       return {
+        ...state,
         pending: false,
-        error: true,
-        selected: state.selected,
-        data: state.data
+        error: true
       }
     case 'FIND_COURSES_SUCCESS':
       return {
+        ...state,
         pending: false,
         error: false,
-        selected: action.response.code,
         data: action.response
       }
     case 'FIND_COURSES_MULTI_ATTEMPT':
       return {
-        pending: true,
-        selected: state.selected,
-        data: state.data
+        ...state,
+        pending: true
       }
     case 'FIND_COURSES_MULTI_FAILURE':
       return {
+        ...state,
         pending: false,
-        error: true,
-        selected: state.selected,
-        data: state.data
+        error: true
       }
     case 'FIND_COURSES_MULTI_SUCCESS':
       return {
+        ...state,
         pending: false,
         error: false,
-        selected: action.response.code,
         data: action.response
       }
     case 'CLEAR_COURSE_SEARCH':
       return {
         pending: false,
-        selected: null,
-        data: {}
+        data: [],
+        selected: []
+      }
+    case 'TOGGLE_COURSE_SELECT':
+      return { // eslint-disable-line no-return-assign
+        ...state,
+        selected: state.selected.find(course => course.code === action.code) ?
+          state.selected.filter(cr => cr.code !== action.code) :
+          [...state.selected, state.data.find(course => course.code === action.code)]
       }
     default:
       return state
