@@ -7,7 +7,6 @@ class UsageStatistics extends Component { //eslint-disable-line
   state = null
 
   componentWillMount() {
-    console.log('wtf')
     callApi('/usage').then(({ data }) => {
       this.setState(data)
     })
@@ -18,36 +17,48 @@ class UsageStatistics extends Component { //eslint-disable-line
       return null
     }
 
+    const byCount = (x, y) => y.count - x.count
+
+    const users = Object.keys(this.state.byUser).map(user => ({
+      name: user,
+      count: this.state.byUser[user].length
+    }))
+
+    const endpoints = Object.keys(this.state.byEndpoint).map(endpoint => ({
+      name: endpoint,
+      count: this.state.byEndpoint[endpoint].length
+    }))
+
     return (
       <div>
-        <h3>by endpoint</h3>
+        <h3>by user</h3>
 
         <Table celled>
           <Table.Body>
-            {Object.keys(this.state.byEndpoint).map(endpoint => (
-              <Table.Row key={endpoint}>
+            {users.sort(byCount).map(user => (
+              <Table.Row key={user.name}>
                 <Table.Cell>
-                  {endpoint}
+                  {user.name}
                 </Table.Cell>
                 <Table.Cell>
-                  {this.state.byEndpoint[endpoint].length}
+                  {user.count}
                 </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
         </Table>
 
-        <h3>by user</h3>
+        <h3>by endpoint</h3>
 
         <Table celled>
           <Table.Body>
-            {Object.keys(this.state.byUser).map(user => (
-              <Table.Row key={user}>
+            {endpoints.sort(byCount).map(endpoint => (
+              <Table.Row key={endpoint}>
                 <Table.Cell>
-                  {user}
+                  {endpoint.name}
                 </Table.Cell>
                 <Table.Cell>
-                  {this.state.byUser[user].length}
+                  {endpoint.count}
                 </Table.Cell>
               </Table.Row>
             ))}
