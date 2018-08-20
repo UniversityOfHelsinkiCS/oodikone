@@ -1,10 +1,6 @@
-const redis = require('redis')
 const Course = require('../services/courses')
 const { setDuplicateCode } = require('../services/courses')
-const conf = require('../conf-backend')
-
-const redisClient = redis.createClient(6379, conf.redis)
-require('bluebird').promisifyAll(redis.RedisClient.prototype)
+const { redisClient }= require('../services/redis')
 
 // two tables of prefixes, for example new prefixes of  Matlu courses:
 // ['CSM', 'DATA', 'FYS', 'MAT', 'TKT', 'KEK'] 
