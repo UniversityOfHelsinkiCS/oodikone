@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Container, Header, Table } from 'semantic-ui-react'
-import axios from 'axios'
+import { callApi } from '../../apiConnection'
 
 class UsageStatistics extends Component { //eslint-disable-line
   state = null
 
   componentWillMount() {
-    axios.get('/api/usage').then(({ data }) => {
+    callApi('/usage').then(({ data }) => {
       this.setState(data)
     })
   }
