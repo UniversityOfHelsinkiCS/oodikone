@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import Timeout from '../Timeout'
 import { getCourseTypes, getCourseDisciplines, getMultipleCourseStatistics } from '../../redux/courseStatistics'
-import { findMultipleCourses } from '../../redux/courses'
+import { findMultipleCourses, emptyCourseSearch } from '../../redux/courses'
 import { makeSortCourses } from '../../selectors/courses'
 import { reformatDate } from '../../common'
 
@@ -83,13 +83,9 @@ class CourseStatisticsSearch extends Component {
     }
   }
 
-  selectCourse = (a, b) => {
-    this.setState({ searchStr: `${b.result.name} ( ${b.result.code} )` })
-    this.props.handleResultSelect(a, b)
-  }
-
   fetchSelectedCoursesStatistics = () => {
     this.props.fetchCourseStatistics()
+    this.props.emptyCourseSearch()
     this.resetComponent()
   }
 
@@ -124,16 +120,15 @@ class CourseStatisticsSearch extends Component {
   )
 
   renderResultTable = () => {
-    const { courseList } = this.props
     const { searchStr } = this.state
-    const coursesToRender = courseList.filter(c => c.name !== null)
+    const { courseList } = this.props
+    const coursesToRender = courseList.filter(c => c.name)
       .filter(c => c.name.toLocaleLowerCase()
         .includes(searchStr.toLocaleLowerCase()))
       .slice(0, 20)
       .map(c =>
-        ([c.name, c.code, reformatDate(c.date, 'DD.MM.YYYY')]))
-    const headers = ['Name', 'Code', 'Latest instance held', '']
-
+        ({ values: [c.name, c.code, reformatDate(c.date, 'DD.MM.YYYY')], selected: c.selected }))
+    const headers = ['Name', 'Code', 'Latest instance held', 'Select']
     return (
       <Table
         style={{
@@ -155,12 +150,14 @@ class CourseStatisticsSearch extends Component {
 
         <Table.Body>
           {coursesToRender.map(course => (
-            <Table.Row key={`${course[0]}-${course[1]}`}>{course.map(c =>
+            <Table.Row key={`${course.values[0]}-${course.values[1]}`}>{course.values.map(c =>
               <Table.Cell key={c}>{c}</Table.Cell>)
               .concat( // eslint-disable-line function-paren-newline
                 <Table.Cell key={`${course.code}-checkbox`}>
                   <Checkbox
-                    value={course[1]}
+                    checked={course.selected}
+                    key={course.code}
+                    value={course.values[1]}
                     toggle
                     onChange={this.props.handleResultSelect}
                   />
@@ -170,7 +167,7 @@ class CourseStatisticsSearch extends Component {
       </Table>)
   }
 
-  renderResultDropDown = () => {
+  renderResultDropDown = () => { // unused, may delete
     const { courseList } = this.props
     const search = (options, query) =>
       options.filter(opt => opt.text.includes(query) || opt.value.includes(query))
@@ -241,7 +238,7 @@ class CourseStatisticsSearch extends Component {
           value={searchStr}
           showNoResults={false}
         />
-        <Button style={{ marginTop: '14px' }} fluid onClick={this.fetchSelectedCoursesStatistics} content="Fetch statistics" />
+        <Button disabled={isLoading} style={{ marginTop: '14px' }} fluid onClick={this.fetchSelectedCoursesStatistics} content="Fetch statistics" />
         {courseList.length > 0 ? this.renderResultTable() : null}
         {/* this.renderResultDropDown() */}
       </div>
@@ -262,7 +259,8 @@ CourseStatisticsSearch.propTypes = {
   }).isRequired,
   getCourseTypes: func.isRequired,
   getCourseDisciplines: func.isRequired,
-  findMultipleCourses: func.isRequired
+  findMultipleCourses: func.isRequired,
+  emptyCourseSearch: func.isRequired
 }
 
 const sortCourses = makeSortCourses()
@@ -274,15 +272,11 @@ const mapStateToProps = ({ locale, courses, settings, courseStatistics }) => ({
   currentLanguage: getActiveLanguage(locale).value,
   courseStatistics
 })
-const mapDispatchToProps = dispatch => ({
-  findMultipleCourses: (query, language) =>
-    dispatch(findMultipleCourses(query, language)),
-  getMultipleCourseStatistics: query =>
-    dispatch(getMultipleCourseStatistics(query)),
-  getCourseTypes: () =>
-    dispatch(getCourseTypes()),
-  getCourseDisciplines: () =>
-    dispatch(getCourseDisciplines())
-})
 
-export default connect(mapStateToProps, mapDispatchToProps)(Timeout(CourseStatisticsSearch))
+export default connect(mapStateToProps, {
+  findMultipleCourses,
+  getMultipleCourseStatistics,
+  getCourseDisciplines,
+  getCourseTypes,
+  emptyCourseSearch
+})(Timeout(CourseStatisticsSearch))

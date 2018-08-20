@@ -1,13 +1,30 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import { shape, string } from 'prop-types'
-import { Header, Segment } from 'semantic-ui-react'
+import { Header, Segment, Tab } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import sharedStyles from '../../styles/shared'
 import TeacherSearch from '../TeacherSearch'
-import TeacherDetails from '../TeacherDetails'
+import TeacherPage from '../TeacherPage'
 
-class StudentStatistics extends Component {
+const pane = (title, Content) => ({
+  menuItem: title,
+  render: () => (
+    <Tab.Pane style={{ borderWidth: '0' }}>
+      <Content />
+    </Tab.Pane>
+  )
+})
+
+const TeachersTabs = () => (
+  <Tab
+    menu={{ attached: false, borderless: true, tabular: true }}
+    panes={[
+      pane('Search', TeacherSearch)
+    ]}
+  />
+)
+
+class Teachers extends Component {
     state = {}
 
     render() {
@@ -19,14 +36,17 @@ class StudentStatistics extends Component {
             Teacher statistics
           </Header>
           <Segment className={sharedStyles.contentSegment}>
-            { teacherid ? <TeacherDetails teacher={teacherid} /> : <TeacherSearch content="Stats" />}
+            { teacherid
+              ? <TeacherPage teacherid={teacherid} />
+              : <TeachersTabs />
+            }
           </Segment>
         </div>
       )
     }
 }
 
-StudentStatistics.propTypes = {
+Teachers.propTypes = {
   match: shape({
     params: shape({
       teacherid: string
@@ -34,13 +54,10 @@ StudentStatistics.propTypes = {
   })
 }
 
-StudentStatistics.defaultProps = {
+Teachers.defaultProps = {
   match: {
     params: { teacherid: undefined }
   }
 }
 
-const mapStateToProps = () => ({})
-const mapDispatchToProps = () => ({})
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentStatistics))
+export default withRouter(Teachers)
