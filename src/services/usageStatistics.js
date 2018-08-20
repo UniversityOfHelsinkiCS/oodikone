@@ -3,20 +3,9 @@ const { UsageStatistic, sequelize } = require('../models')
 const { Op } = sequelize
 
 const formatForGroup = url => {
-  if (url.startsWith('/api/v2/populationstatistics/courses?year=')) {
-    return '/api/v2/populationstatistics/courses'
-  }
-
-  if (url.startsWith('/api/v2/populationstatistics/?year=')) {
-    return '/api/v2/populationstatistics'
-  }
-
-  if (url.startsWith('/api/v2/populationstatistics/filters?&studyRights')) {
-    return '/api/v2/populationstatistics/filters'
-  }
-
-  if (url.startsWith('/api/teachers/?searchTerm')) {
-    return '/api/teachers'
+  const query = url.indexOf('?')
+  if (query!==-1) {
+    return url.substr(0, query)
   }
 
   return url
