@@ -231,42 +231,43 @@ class CourseStatistics extends Component {
 
   renderSelectedTable = () => {
     const { selected } = this.props.courses
-    console.log(selected)
     const headers = ['Name', 'Code', 'Remove']
+    if (selected.length > 0) {
+      return (
+        <div>
+          <Header style={{ paddingTop: '20px', paddingLeft: '5px' }}>Selected Courses</Header>
+          <Table
+            style={{
+              width: '100%',
+              maxWidth: '850px'
+            }}
+            unstackable
+            selectable
+          >
+            <Table.Header>
+              <Table.Row>
+                {headers.map(header => (
+                  <Table.HeaderCell key={`header-${header}`}>
+                    {header}
+                  </Table.HeaderCell>
+                ))}
+              </Table.Row>
+            </Table.Header>
 
-    return (
-      <div>
-        <Header style={{ paddingTop: '20px', paddingLeft: '5px' }}>Selected Courses</Header>
-        <Table
-          style={{
-            width: '100%',
-            maxWidth: '850px'
-          }}
-          unstackable
-          selectable
-        >
-          <Table.Header>
-            <Table.Row>
-              {headers.map(header => (
-                <Table.HeaderCell key={`header-${header}`}>
-                  {header}
-                </Table.HeaderCell>
-              ))}
-            </Table.Row>
-          </Table.Header>
-
-          <Table.Body>
-            {selected.map(course => (
-              <Table.Row key={`${course.name}-${course.code}`}>
-                <Table.Cell>{course.name}</Table.Cell>
-                <Table.Cell>{course.code}</Table.Cell>
-                <Table.Cell>
-                  <Button icon circular value={course.code} checked={false} onClick={this.handleResultSelect}><Icon name="remove" /></Button>
-                </Table.Cell>
-              </Table.Row>))}
-          </Table.Body>
-        </Table>
-      </div>)
+            <Table.Body>
+              {selected.map(course => (
+                <Table.Row key={`${course.name}-${course.code}`}>
+                  <Table.Cell>{course.name}</Table.Cell>
+                  <Table.Cell>{course.code}</Table.Cell>
+                  <Table.Cell>
+                    <Button icon circular value={course.code} checked={false} onClick={this.handleResultSelect}><Icon name="remove" /></Button>
+                  </Table.Cell>
+                </Table.Row>))}
+            </Table.Body>
+          </Table>
+        </div>)
+    }
+    return null
   }
 
   renderQueryTable = () => {

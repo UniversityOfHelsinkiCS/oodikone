@@ -44,7 +44,8 @@ export const routes = {
   courseStatistics: { route: '/coursestatistics', translateId: 'courseStatistics' },
   teachers: { route: '/teachers/:teacherid?', translateId: 'teachers' },
   users: { route: '/users/:userid?', translateId: 'users', admin: true },
-  settings: { route: '/settings', translateId: 'settings', admin: true }
+  settings: { route: '/settings', translateId: 'settings', admin: true },
+  usage: { route: '/usage', translateId: 'usage', admin: true }
 }
 
 const assumeBasename = () => {

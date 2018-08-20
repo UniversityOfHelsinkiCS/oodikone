@@ -53,14 +53,16 @@ class TeacherSearch extends Component {
             onSearchChange={this.handleSearchChange}
             showNoResults={false}
           />
-          <Segment className={sharedStyles.contentSegment}>
-            { this.state.displayResults && <SearchResultTable
-              headers={['Teacher ID', 'Username', 'Name']}
-              rows={this.props.teachers}
-              rowClickFn={(_, teacher) => this.props.history.push(`/teachers/${teacher.id}`)}
-              noResultText="No teachers matched your search"
-            />}
-          </Segment>
+          { this.state.displayResults && (
+            <Segment className={sharedStyles.contentSegment}>
+              <SearchResultTable
+                headers={['Teacher ID', 'Username', 'Name']}
+                rows={this.props.teachers}
+                rowClickFn={(_, teacher) => this.props.history.push(`/teachers/${teacher.id}`)}
+                noResultText="No teachers matched your search"
+              />
+            </Segment>
+          )}
         </div>
       )
     }
