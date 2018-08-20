@@ -5,7 +5,7 @@ import { Header, Segment } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import sharedStyles from '../../styles/shared'
 import TeacherSearch from '../TeacherSearch'
-import TeacherDetails from '../TeacherDetails'
+import TeacherPage from '../TeacherPage'
 
 class StudentStatistics extends Component {
     state = {}
@@ -19,7 +19,7 @@ class StudentStatistics extends Component {
             Teacher statistics
           </Header>
           <Segment className={sharedStyles.contentSegment}>
-            { teacherid ? <TeacherDetails teacher={teacherid} /> : <TeacherSearch content="Stats" />}
+            { teacherid ? <TeacherPage teacherid={teacherid} /> : <TeacherSearch content="Stats" />}
           </Segment>
         </div>
       )
