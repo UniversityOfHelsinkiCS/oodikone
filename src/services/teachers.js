@@ -42,14 +42,16 @@ const bySearchTerm = async searchTerm => {
   })
 }
 
-const teacherStats = async teacherid => Teacher.findByPrimary(teacherid, {
+const findTeacherCredits = teacherid => Teacher.findByPrimary(teacherid, {
+  attributes: ['name', 'code', 'id'],
   include: {
     model: Credit,
-    attributes: ['credits', 'grade', 'id'],
+    attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode'],
     include: [
       {
         model: Course,
-        attributes: ['name', 'code']
+        attributes: ['name', 'code'],
+        required: true
       },
       {
         model: Semester,
@@ -58,6 +60,70 @@ const teacherStats = async teacherid => Teacher.findByPrimary(teacherid, {
     ]
   }
 })
+
+const parseCreditInfo = credit => ({
+  studentnumber: credit.student_studentnumber,
+  credits: credit.credits,
+  grade: credit.grade,
+  passed: Credit.passed(credit) || Credit.improved(credit),
+  failed: Credit.failed(credit),
+  course: credit.course,
+  semester: credit.semester
+})
+
+
+const reduceStats = (stats, code, name, credits, passed, failed) => {
+  const course = stats[code] ? {...stats[code]} : {
+    code,
+    name,
+    passed: {
+      credits: 0,
+      attainments: 0
+    },
+    failed: {
+      credits: 0,
+      attainments: 0
+    }
+  }
+  if (passed) {
+    course.passed.credits += credits
+    course.passed.attainments += 1
+  }
+  if(failed) {
+    course.failed.credits += credits
+    course.failed.attainments += 1
+  }
+  return {
+    ...stats,
+    [code]: course
+  }
+}
+
+const reducer = (stats, credit) => {
+  const { course, credits, passed, failed, semester } = parseCreditInfo(credit)
+  return {
+    ...stats,
+    courses: reduceStats(stats.courses, course.code, course.name, credits, passed, failed),
+    semesters: reduceStats(stats.semesters, semester.semestercode, semester.name, credits, passed, failed),
+    years: reduceStats(stats.years, semester.yearcode, { 'en' : semester.yearname }, credits, passed, failed)
+  }
+}
+
+const teacherStats = async teacherid => {
+  const teacher = await findTeacherCredits(teacherid)
+  const stats = teacher.credits.reduce(reducer, {
+    courses: {},
+    semesters: {},
+    years: {}
+  })
+  const res = {
+    name: teacher.name,
+    code: teacher.code,
+    id: teacher.id,
+    ...stats
+  }
+  return res
+}
 
 module.exports = {
   bySearchTerm,
