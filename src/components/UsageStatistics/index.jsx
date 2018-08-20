@@ -7,6 +7,7 @@ class UsageStatistics extends Component { //eslint-disable-line
   state = null
 
   componentWillMount() {
+    console.log('wtf')
     callApi('/usage').then(({ data }) => {
       this.setState(data)
     })
