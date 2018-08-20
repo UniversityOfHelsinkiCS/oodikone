@@ -13,12 +13,8 @@ import Settings from '../Settings'
 import ErrorContainer from '../ErrorContainer'
 import { routes, BASE_PATH } from '../../constants'
 import AccessDenied from '../AccessDenied'
-<<<<<<< HEAD
-import TeacherStatistics from '../TeacherStatistics'
 import UsageStatistics from '../UsageStatistics'
-=======
 import Teachers from '../Teachers'
->>>>>>> 8ce83243ee0c2eeba9d0ce05fe3931eec4c1e73c
 
 import styles from './main.css'
 
@@ -64,7 +60,7 @@ class Main extends Component {
               <Route exact path={routes.courseStatistics.route} component={CourseStatistics} />
               <Route exact path={routes.settings.route} component={Settings} />
               <Route exact path={routes.users.route} component={EnableUsers} />
-              <Route exact path={routes.teachers.route} component={TeacherStatistics} />
+              <Route exact path={routes.teachers.route} component={Teachers} />
               <Route exact path={routes.usage.route} component={UsageStatistics} />
             </Switch>
           </main>
