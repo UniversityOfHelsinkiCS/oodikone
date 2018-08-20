@@ -250,6 +250,7 @@ const User = sequelize.define('users',
     full_name: { type: Sequelize.STRING },
     is_enabled: { type: Sequelize.BOOLEAN },
     username: { type: Sequelize.STRING },
+    email: { type: Sequelize.STRING },
     language: { type: Sequelize.STRING }
   },
   {
@@ -364,6 +365,12 @@ const Semester = sequelize.define('semester', {
   },
   enddate: {
     type: Sequelize.DATE
+  },
+  yearcode: {
+    type: Sequelize.INTEGER
+  },
+  yearname: {
+    type: Sequelize.STRING
   }
 })
 
@@ -537,8 +544,10 @@ CourseRealisation.belongsTo(Course, { foreignKey: 'coursecode' })
 CourseRealisation.belongsToMany(Student, { through: CourseEnrollment, foreignKey: 'courserealisation_id' })
 Student.belongsToMany(CourseRealisation, { through: CourseEnrollment, foreignKey: 'studentnumber' })
 
-Credit.belongsToMany(Student, { through: CreditTeacher, foreignKey: 'credit_id' })
+Credit.belongsToMany(Teacher, { through: CreditTeacher, foreignKey: 'credit_id' })
 Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id' })
+
+Credit.belongsTo(Semester, { foreignKey: 'semestercode' })
 
 module.exports = {
   Student,
