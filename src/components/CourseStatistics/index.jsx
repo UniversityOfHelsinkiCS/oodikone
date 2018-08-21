@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Form, Button, Header, Checkbox, Message, Transition, List, Dropdown, Segment, Table, Icon } from 'semantic-ui-react'
+import { Form, Button, Header, Checkbox, Message, List, Dropdown, Segment, Table, Icon } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
 import _ from 'lodash'
 import Timeout from '../Timeout'
@@ -198,10 +198,10 @@ class CourseStatistics extends Component {
   }
 
   renderForm = () => {
-    const { validYear, start, end, isLoading } = this.state
+    const { validYear, start, end } = this.state
 
     return (
-      <Form loading={isLoading}>
+      <Form>
         <Form.Group key="year" className={style.yearSelectorGroup}>
           <Form.Field error={!validYear} className={style.yearSelect}>
             <label>Start year</label>
@@ -351,15 +351,16 @@ class CourseStatistics extends Component {
   }
 
   render() {
-    const { selectedProgrammes } = this.state
+    const { selectedProgrammes, isLoading } = this.state
     const { language } = this.props
     const { data } = this.props.courseStatistics
+    console.log(data)
     return (
       <div className={style.container}>
         <Header className={sharedStyles.segmentTitle} size="large">
           Course Statistics
         </Header>
-        <Segment>
+        <Segment loading={isLoading}>
           <Header>Select statistics parameters</Header>
           {this.renderErrorMessage()}
           {this.renderForm()}
@@ -372,72 +373,69 @@ class CourseStatistics extends Component {
           {this.renderSelectedTable()}
         </Segment>
         {data.length > 0 ? this.renderQueryTable() : null}
-        <Transition.Group as={List} duration={700}>
-          {data.map((course) => {
-            let programmeOptions = Object.keys(course.programmes).map(key => ({
-              text: `${course.programmes[key].name[language] ? course.programmes[key].name[language] : course.programmes[key].name.fi} (${course.programmes[key].amount})`,
-              value: key,
-              amount: course.programmes[key].amount
-            }))
-            const text = { en: 'all', fi: 'kaikki', sv: 'allt' }
-            programmeOptions = _.orderBy(programmeOptions, 'amount', 'desc')
-            programmeOptions = programmeOptions.concat({ text: text[language], value: 'all' })
+        {data.map((course) => {
+          let programmeOptions = Object.keys(course.programmes).map(key => ({
+            text: `${course.programmes[key].name[language] ? course.programmes[key].name[language] : course.programmes[key].name.fi} (${course.programmes[key].amount})`,
+            value: key,
+            amount: course.programmes[key].amount
+          }))
+          const text = { en: 'all', fi: 'kaikki', sv: 'allt' }
+          programmeOptions = _.orderBy(programmeOptions, 'amount', 'desc')
+          programmeOptions = programmeOptions.concat({ text: text[language], value: 'all' })
+          const filteredstats = course.stats.map(field =>
+            Object.entries(field).reduce((obj, [key, value]) => {
+              switch (key) {
+                case 'time':
+                  return ({ ...obj, [key]: value })
 
-            const filteredstats = course.stats.map(field =>
-              Object.entries(field).reduce((obj, [key, value]) => {
-                switch (key) {
-                  case 'time':
-                    return ({ ...obj, [key]: value })
+                case 'gradeDistribution':
+                  return {
+                    ...obj,
+                    [key]: Object.entries(value).reduce((distribution, [grade, students]) => ({
+                      ...distribution,
+                      [grade]: students.filter(({ student }) =>
+                        student.studyright_elements.some(e => e.code === selectedProgrammes[0] || selectedProgrammes[0] === 'all'))
+                    }), {}),
 
-                  case 'gradeDistribution':
-                    return {
-                      ...obj,
-                      [key]: Object.entries(value).reduce((distribution, [grade, students]) => ({
-                        ...distribution,
-                        [grade]: students.filter(({ student }) =>
-                          student.studyright_elements.some(e => e.code === selectedProgrammes[0] || selectedProgrammes[0] === 'all'))
-                      }), {}),
+                    [`c_${key}`]: Object.entries(value).reduce((distribution, [grade, students]) => ({
+                      ...distribution,
+                      [grade]: students.filter(({ student }) =>
+                        student.studyright_elements.some(e => e.code === selectedProgrammes[1] || selectedProgrammes[1] === 'all'))
+                    }), {})
+                  }
+                default:
+                  return {
+                    ...obj,
+                    [key]: value.filter(e =>
+                      e.studyright_elements.some(element =>
+                        element.code === selectedProgrammes[0] || selectedProgrammes[0] === 'all')),
 
-                      [`c_${key}`]: Object.entries(value).reduce((distribution, [grade, students]) => ({
-                        ...distribution,
-                        [grade]: students.filter(({ student }) =>
-                          student.studyright_elements.some(e => e.code === selectedProgrammes[1] || selectedProgrammes[1] === 'all'))
-                      }), {})
-                    }
-                  default:
-                    return {
-                      ...obj,
-                      [key]: value.filter(e =>
-                        e.studyright_elements.some(element =>
-                          element.code === selectedProgrammes[0] || selectedProgrammes[0] === 'all')),
+                    [`c_${key}`]: value.filter(e =>
+                      e.studyright_elements.some(element =>
+                        element.code === selectedProgrammes[1] || selectedProgrammes[1] === 'all'))
+                  }
+              }
+            }, {}))
 
-                      [`c_${key}`]: value.filter(e =>
-                        e.studyright_elements.some(element =>
-                          element.code === selectedProgrammes[1] || selectedProgrammes[1] === 'all'))
-                    }
-                }
-              }, {}))
+          const stats = []
+          Object.assign(stats, course)
 
-            const stats = []
-            Object.assign(stats, course)
-
-            stats.stats = filteredstats
-            return (
-              <List.Item key={course.code + course.start + course.end + course.separate}>
-                <CoursePassRateChart
-                  removeCourseStatistics={this.removeCourseStatistics}
-                  stats={stats}
-                  altCodes={course.alternativeCodes}
-                  courseLevel={this.state.courseLevel}
-                  courseLevelSwitch={this.handleCourseLevelSwitch}
-                  dropdown={this.renderDropdown}
-                  programmeOptions={programmeOptions}
-                />
-              </List.Item>
-            )
-          })
-          }
-        </Transition.Group>
+          stats.stats = filteredstats
+          return (
+            <List.Item key={course.code + course.start + course.end + course.separate}>
+              <CoursePassRateChart
+                removeCourseStatistics={this.removeCourseStatistics}
+                stats={stats}
+                altCodes={course.alternativeCodes}
+                courseLevel={this.state.courseLevel}
+                courseLevelSwitch={this.handleCourseLevelSwitch}
+                dropdown={this.renderDropdown}
+                programmeOptions={programmeOptions}
+              />
+            </List.Item>
+          )
+        })
+        }
       </div>
     )
   }
@@ -464,17 +462,10 @@ const mapStateToProps = ({ settings, courses, courseStatistics }) => ({
   language: settings.language
 })
 
-const mapDispatchToProps = dispatch => ({
-  getMultipleCourseStatistics: query =>
-    dispatch(getMultipleCourseStatistics(query)),
-  removeCourseStatistics: query =>
-    dispatch(removeCourseStatistics(query)),
-  emptyCourseSearch: () =>
-    dispatch(emptyCourseSearch()),
-  toggleCourseSelect: (code) => {
-    dispatch(toggleCourseSelect(code))
-  }
-})
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(Timeout(CourseStatistics))
+export default connect(mapStateToProps, {
+  getMultipleCourseStatistics,
+  removeCourseStatistics,
+  emptyCourseSearch,
+  toggleCourseSelect
+})(Timeout(CourseStatistics))
