@@ -6,7 +6,6 @@ const { shape, arrayOf } = PropTypes
 
 
 const CourseStatisticsTable = ({ stats }) => {
-  console.log(stats)
   return ((stats.some(year => year.c_passed > 0) || stats.some(year => year.c_failed > 0)) ?
     (
       <Table celled padded>
