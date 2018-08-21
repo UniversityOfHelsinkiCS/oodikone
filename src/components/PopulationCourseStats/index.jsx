@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom'
 import moment from 'moment'
 
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
-import { getCourseStatistics } from '../../redux/courseStatistics'
+import { getMultipleCourseStatistics } from '../../redux/courseStatistics'
 import { courseParticipation } from '../../populationFilters'
 
 const formatGradeDistribution = grades => _.replace(JSON.stringify(_.sortBy(Object.entries(grades).map(([key, value]) => ({ [key]: value.count })), o => -Object.keys(o)), null, 1), /\[\n|{\n*|{\s|}|\s*}|]|"|,/g, '')
@@ -26,7 +26,7 @@ class PopulationCourseStats extends Component {
     selectedCourses: arrayOf(object).isRequired,
     removePopulationFilterOfCourse: func.isRequired,
     history: shape({}).isRequired,
-    getCourseStatistics: func.isRequired,
+    getMultipleCourseStatistics: func.isRequired,
     language: string.isRequired,
     query: shape({}).isRequired
   }
@@ -148,8 +148,8 @@ class PopulationCourseStats extends Component {
                   icon="level up alternate"
                   onClick={() => {
                     this.props.history.push('/coursestatistics/')
-                    this.props.getCourseStatistics({
-                      code: course.course.code,
+                    this.props.getMultipleCourseStatistics({
+                      codes: [course.course.code],
                       start: Number(this.props.query.year),
                       end: Number(moment(moment(this.props.query.year, 'YYYY').add(this.props.query.months, 'months')).format('YYYY')),
                       separate: false,
@@ -327,8 +327,8 @@ class PopulationCourseStats extends Component {
               icon="level up alternate"
               onClick={() => {
                 this.props.history.push('/coursestatistics/')
-                this.props.getCourseStatistics({
-                  code: course.course.code,
+                this.props.getMultipleCourseStatistics({
+                  codes: [course.course.code],
                   start: Number(this.props.query.year),
                   end: Number(moment(moment(this.props.query.year, 'YYYY').add(this.props.query.months, 'months')).format('YYYY')),
                   separate: false,
@@ -409,5 +409,5 @@ const mapStateToProps = (state) => {
 
 export default connect(
   mapStateToProps,
-  { setPopulationFilter, removePopulationFilterOfCourse, getCourseStatistics }
+  { setPopulationFilter, removePopulationFilterOfCourse, getMultipleCourseStatistics }
 )(withRouter(PopulationCourseStats))

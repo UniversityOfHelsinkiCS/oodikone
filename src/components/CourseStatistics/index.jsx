@@ -30,11 +30,21 @@ class CourseStatistics extends Component {
     separate: false,
     validYear: true,
     error: '',
-    isLoading: false,
+    isLoading: true,
     courseLevel: true,
     selectedProgrammes: ['all', undefined]
   }
+  componentDidMount() {
+    this.setState({ isLoading: this.props.courseStatistics.pending })
+  }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.courseStatistics.pending && !this.props.courseStatistics.pending) {
+      this.setState({ isLoading: false }) // eslint-disable-line react/no-did-update-set-state,max-len
+      /* You may call setState() immediately in componentDidUpdate()
+         but note that it must be wrapped in a condition */
+    }
+  }
   handleResultSelect = (e, { value, checked }) => {
     this.props.toggleCourseSelect(value)
     if (checked) {
