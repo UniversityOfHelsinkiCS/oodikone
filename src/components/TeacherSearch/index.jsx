@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Search, Segment } from 'semantic-ui-react'
-import { func, arrayOf, object } from 'prop-types'
+import { func, arrayOf, object, shape } from 'prop-types'
+import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import styles from './teacherSearch.css'
 import sharedStyles from '../../styles/shared'
@@ -52,13 +53,16 @@ class TeacherSearch extends Component {
             onSearchChange={this.handleSearchChange}
             showNoResults={false}
           />
-          <Segment className={sharedStyles.contentSegment}>
-            { this.state.displayResults && <SearchResultTable
-              headers={['Teacher ID', 'Username', 'Name']}
-              rows={this.props.teachers}
-              noResultText="No teachers matched your search"
-            />}
-          </Segment>
+          { this.state.displayResults && (
+            <Segment className={sharedStyles.contentSegment}>
+              <SearchResultTable
+                headers={['Teacher ID', 'Username', 'Name']}
+                rows={this.props.teachers}
+                rowClickFn={(_, teacher) => this.props.history.push(`/teachers/${teacher.id}`)}
+                noResultText="No teachers matched your search"
+              />
+            </Segment>
+          )}
         </div>
       )
     }
@@ -68,18 +72,15 @@ TeacherSearch.propTypes = {
   setTimeout: func.isRequired,
   clearTimeout: func.isRequired,
   teachers: arrayOf(object).isRequired,
-  findTeachers: func.isRequired
+  findTeachers: func.isRequired,
+  history: shape({}).isRequired
 }
 
 const mapStateToProps = ({ teachers }) => {
-  const { data } = teachers
+  const { list } = teachers
   return {
-    teachers: data
+    teachers: list
   }
 }
 
-const mapDispatchToProps = dispatch => ({
-  findTeachers: searchterm => dispatch(findTeachers(searchterm))
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(Timeout(TeacherSearch))
+export default withRouter(connect(mapStateToProps, { findTeachers })(Timeout(TeacherSearch)))

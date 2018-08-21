@@ -23,13 +23,6 @@ class WelcomePage extends Component { //eslint-disable-line
             which you can interactively filter and explore.
           </p>
           <Divider section />
-          <h4>
-            Course Instances
-          </h4>
-          <p>
-            Shows course instances of a given course.
-          </p>
-          <Divider section />
 
           <h4>
             Student Statistics
