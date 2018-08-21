@@ -1,16 +1,20 @@
 import { callController } from '../apiConnection'
 
-const getArrayParams = (paramName, entries) => entries.map(entry => `&${paramName}=${entry}`).join('')
-
 export const getPopulationCourses = ({
   year, semester, studyRights, months, uuid
 }) => {
-  const route = `/v2/populationstatistics/courses?year=${year}&semester=${semester}${getArrayParams('studyRights', studyRights)}&months=${months}`
+  const route = '/v2/populationstatistics/courses'
   const prefix = 'GET_POPULATION_COURSES_'
   const query = {
     year, semester, studyRights, uuid
   }
-  return callController(route, prefix, null, 'get', query)
+  const params = {
+    year,
+    semester,
+    months,
+    studyRights
+  }
+  return callController(route, prefix, null, 'get', query, params)
 }
 
 export const clearPopulationCourses = () => ({

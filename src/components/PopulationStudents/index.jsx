@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
 import { Header, Segment, Table, Button, Icon, Popup } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
-import { getStudentTotalCredits } from '../../common'
+import { getStudentTotalCredits, copyToClipboard } from '../../common'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
 
@@ -44,14 +44,7 @@ class PopulationStudents extends Component {
     const creditsSinceStart = studentNumber => getStudentTotalCredits(students[studentNumber])
 
     const pushToHistoryFn = studentNumber => this.props.history.push(`/students/${studentNumber}`)
-    const copyToClipboard = (text) => {
-      const textField = document.createElement('textarea')
-      textField.innerText = text
-      document.body.appendChild(textField)
-      textField.select()
-      document.execCommand('copy')
-      textField.remove()
-    }
+
     const copyToClipboardAll = () => {
       const studentsInfo = this.props.selectedStudents.map(number => students[number])
       const emails = studentsInfo.filter(s => s.email).map(s => s.email)

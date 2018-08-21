@@ -80,6 +80,9 @@
     ],
     "logout": [
       "Logout"
+    ],
+    "usage" : [
+      "Usage"
     ]
   },
   "populationCourses": {
