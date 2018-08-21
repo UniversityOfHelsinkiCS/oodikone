@@ -23,6 +23,18 @@ const testOptions = {
   }
 }
 
+const types = {
+  attempt: prefix => `${prefix}ATTEMPT`,
+  failure: prefix => `${prefix}FAILURE`,
+  success: prefix => `${prefix}SUCCESS`
+}
+
+export const actionTypes = prefix => ({
+  attempt: types.attempt(prefix),
+  failure: types.failure(prefix),
+  success: types.success(prefix)
+})
+
 export const login = async () => {
   let options = null
   if (isDevEnv) {
