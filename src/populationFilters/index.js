@@ -135,6 +135,19 @@ export const extentGraduated = (params) => {
   })
 }
 
+export const courseParticipationNTimes = (params) => {
+  const { amount, course } = params
+  return ({
+    id: uuidv4(),
+    type: 'CourseParticipationNTimes',
+    params: {
+      amount,
+      course
+    },
+    filter: student => student.courses.filter(cr => cr.course.code === course).length >= amount
+  })
+}
+
 
 export const presetFilter = preset => ({
   id: preset.id,
@@ -154,6 +167,7 @@ const typeList = {
   ExtentGraduated: extentGraduated,
   EnrollmentStatus: enrollmentStatus,
   TransferFilter: transferFilter,
+  CourseParticipationNTimes: courseParticipationNTimes,
   Preset: presetFilter
 }
 export const getFilterFunction = (type, params, populationCourses) => {

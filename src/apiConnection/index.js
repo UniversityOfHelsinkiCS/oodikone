@@ -23,6 +23,18 @@ const testOptions = {
   }
 }
 
+const types = {
+  attempt: prefix => `${prefix}ATTEMPT`,
+  failure: prefix => `${prefix}FAILURE`,
+  success: prefix => `${prefix}SUCCESS`
+}
+
+export const actionTypes = prefix => ({
+  attempt: types.attempt(prefix),
+  failure: types.failure(prefix),
+  success: types.success(prefix)
+})
+
 export const login = async () => {
   let options = null
   if (isDevEnv) {
@@ -41,7 +53,7 @@ export const swapDevUser = async (newHeaders) => {
   setToken(token)
 }
 
-export const callApi = async (url, method = 'get', data) => {
+export const callApi = async (url, method = 'get', data, params) => {
   let options = { headers: {} }
   if (isDevEnv) {
     options = devOptions
@@ -51,6 +63,10 @@ export const callApi = async (url, method = 'get', data) => {
   }
   const token = await getToken()
   options.headers['x-access-token'] = token
+
+  if (params) {
+    options.params = params
+  }
 
   switch (method) {
     case 'get':
@@ -66,13 +82,14 @@ export const callApi = async (url, method = 'get', data) => {
   }
 }
 
-export const callController = (route, prefix, data, method = 'get', query) => {
+export const callController = (route, prefix, data, method = 'get', query, params) => {
   const requestSettings = {
     route,
     method,
     data,
     prefix,
-    query
+    query,
+    params
   }
   return { type: `${prefix}ATTEMPT`, requestSettings }
 }
@@ -82,16 +99,16 @@ export const handleRequest = store => next => async (action) => {
   const { requestSettings } = action
   if (requestSettings) {
     const {
-      route, method, data, prefix, query
+      route, method, data, prefix, query, params
     } = requestSettings
     try {
-      const res = await callApi(route, method, data)
+      const res = await callApi(route, method, data, params)
       store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
     } catch (e) {
       // Something failed. Assume it's the token and try again.
       try {
         await getToken(true)
-        const res = await callApi(route, method, data)
+        const res = await callApi(route, method, data, params)
         store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
       } catch (err) {
         store.dispatch({ type: `${prefix}FAILURE`, response: err, query })

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Form, Button, Header, Checkbox, Message, Transition, List, Dropdown, Segment, Table, Icon } from 'semantic-ui-react'
+import { Form, Button, Header, Checkbox, Message, List, Dropdown, Segment, Table, Icon } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
 import _ from 'lodash'
 import Timeout from '../Timeout'
@@ -30,11 +30,21 @@ class CourseStatistics extends Component {
     separate: false,
     validYear: true,
     error: '',
-    isLoading: false,
+    isLoading: true,
     courseLevel: true,
-    selectedProgramme: 'all'
+    selectedProgrammes: ['all', undefined]
+  }
+  componentDidMount() {
+    this.setState({ isLoading: this.props.courseStatistics.pending })
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.courseStatistics.pending && !this.props.courseStatistics.pending) {
+      this.setState({ isLoading: false }) // eslint-disable-line react/no-did-update-set-state,max-len
+      /* You may call setState() immediately in componentDidUpdate()
+         but note that it must be wrapped in a condition */
+    }
+  }
   handleResultSelect = (e, { value, checked }) => {
     this.props.toggleCourseSelect(value)
     if (checked) {
@@ -126,7 +136,14 @@ class CourseStatistics extends Component {
     this.setState({ separate: !bool })
   }
   handleProgrammeChange = (e, { value }) => {
-    this.setState({ selectedProgramme: value })
+    this.setState({ selectedProgrammes: [value, this.state.selectedProgrammes[1]] })
+  }
+  handleCompareChange = (e, { value }) => {
+    this.setState({ selectedProgrammes: [this.state.selectedProgrammes[0], value] })
+  }
+
+  handleClear = () => {
+    this.setState({ selectedProgrammes: [this.state.selectedProgrammes[0], undefined] })
   }
 
   renderErrorMessage = () => {
@@ -140,25 +157,51 @@ class CourseStatistics extends Component {
     }
     return error
   }
-  renderDropdown = programmeOptions => (
-    <Dropdown
-      placeholder="Select study programme"
-      search
-      selection
-      value={this.state.selectedProgramme}
-      options={programmeOptions}
-      onChange={this.handleProgrammeChange}
-      closeOnChange
-      basic
-      header="Select programme"
-    />
-  )
+
+  renderDropdown = (programmeOptions, comparing = false) => {
+    if (comparing) {
+      return (
+        <div>
+          <Dropdown
+            placeholder="Select study programme"
+            search
+            selection
+            value={this.state.selectedProgrammes[1]}
+            options={programmeOptions}
+            onChange={this.handleCompareChange}
+            closeOnChange
+            basic
+            header="Select programme"
+          />
+          <Icon
+            link
+            name="close"
+            onClick={() => this.handleClear('programme')}
+          />
+        </div>)
+    }
+    return (
+      <div>
+        <Dropdown
+          placeholder="Select study programme"
+          search
+          selection
+          value={this.state.selectedProgrammes[0]}
+          options={programmeOptions}
+          onChange={this.handleProgrammeChange}
+          closeOnChange
+          basic
+          header="Select programme"
+        />
+      </div>
+    )
+  }
 
   renderForm = () => {
-    const { validYear, start, end, isLoading } = this.state
+    const { validYear, start, end } = this.state
 
     return (
-      <Form loading={isLoading}>
+      <Form>
         <Form.Group key="year" className={style.yearSelectorGroup}>
           <Form.Field error={!validYear} className={style.yearSelect}>
             <label>Start year</label>
@@ -308,7 +351,7 @@ class CourseStatistics extends Component {
   }
 
   render() {
-    const { selectedProgramme } = this.state
+    const { selectedProgrammes, isLoading } = this.state
     const { language } = this.props
     const { data } = this.props.courseStatistics
     return (
@@ -316,7 +359,7 @@ class CourseStatistics extends Component {
         <Header className={sharedStyles.segmentTitle} size="large">
           Course Statistics
         </Header>
-        <Segment>
+        <Segment loading={isLoading}>
           <Header>Select statistics parameters</Header>
           {this.renderErrorMessage()}
           {this.renderForm()}
@@ -329,65 +372,69 @@ class CourseStatistics extends Component {
           {this.renderSelectedTable()}
         </Segment>
         {data.length > 0 ? this.renderQueryTable() : null}
-        <Transition.Group as={List} duration={700}>
-          {data.map((course) => {
-            let programmeOptions = Object.keys(course.programmes).map(key => ({
-              text: `${course.programmes[key].name[language] ? course.programmes[key].name[language] : course.programmes[key].name.fi} (${course.programmes[key].amount})`,
-              value: key,
-              amount: course.programmes[key].amount
-            }))
-            const text = { en: 'all', fi: 'kaikki', sv: 'allt' }
-            programmeOptions = _.orderBy(programmeOptions, 'amount', 'desc')
-            programmeOptions = programmeOptions.concat({ text: text[language], value: 'all' })
-            let filteredstats = course.stats
-            if (selectedProgramme !== 'all') {
-              filteredstats = filteredstats.map(field =>
-                Object.entries(field).reduce((obj, [key, value]) => {
-                  switch (key) {
-                    case 'time':
-                      return ({ ...obj, [key]: value })
+        {data.map((course) => {
+          let programmeOptions = Object.keys(course.programmes).map(key => ({
+            text: `${course.programmes[key].name[language] ? course.programmes[key].name[language] : course.programmes[key].name.fi} (${course.programmes[key].amount})`,
+            value: key,
+            amount: course.programmes[key].amount
+          }))
+          const text = { en: 'all', fi: 'kaikki', sv: 'allt' }
+          programmeOptions = _.orderBy(programmeOptions, 'amount', 'desc')
+          programmeOptions = programmeOptions.concat({ text: text[language], value: 'all' })
+          const filteredstats = course.stats.map(field =>
+            Object.entries(field).reduce((obj, [key, value]) => {
+              switch (key) {
+                case 'time':
+                  return ({ ...obj, [key]: value })
 
-                    case 'gradeDistribution':
-                      return {
-                        ...obj,
-                        [key]: Object.entries(value).reduce((distribution, [grade, students]) => ({
-                          ...distribution,
-                          [grade]: students.filter(({ student }) =>
-                            student.studyright_elements.some(e => e.code === selectedProgramme))
-                        }), {})
-                      }
-                    default:
-                      return {
-                        ...obj,
-                        [key]: value.filter(e =>
-                          e.studyright_elements.some(element => element.code === selectedProgramme))
-                      }
+                case 'gradeDistribution':
+                  return {
+                    ...obj,
+                    [key]: Object.entries(value).reduce((distribution, [grade, students]) => ({
+                      ...distribution,
+                      [grade]: students.filter(({ student }) =>
+                        student.studyright_elements.some(e => e.code === selectedProgrammes[0] || selectedProgrammes[0] === 'all'))
+                    }), {}),
+
+                    [`c_${key}`]: Object.entries(value).reduce((distribution, [grade, students]) => ({
+                      ...distribution,
+                      [grade]: students.filter(({ student }) =>
+                        student.studyright_elements.some(e => e.code === selectedProgrammes[1] || selectedProgrammes[1] === 'all'))
+                    }), {})
                   }
-                }, {}))
-            }
-            const stats = []
-            Object.assign(stats, course)
-            const max = course.stats[0].courseLevelPassed.length +
-              course.stats[0].courseLevelFailed.length +
-              10
-            stats.stats = filteredstats
-            return (
-              <List.Item key={course.code + course.start + course.end + course.separate}>
-                <CoursePassRateChart
-                  removeCourseStatistics={this.removeCourseStatistics}
-                  stats={stats}
-                  max={max}
-                  altCodes={course.alternativeCodes}
-                  courseLevel={this.state.courseLevel}
-                  courseLevelSwitch={this.handleCourseLevelSwitch}
-                  dropdown={this.renderDropdown}
-                  programmeOptions={programmeOptions}
-                />
-              </List.Item>
-            )
-          })
-          }
-        </Transition.Group>
+                default:
+                  return {
+                    ...obj,
+                    [key]: value.filter(e =>
+                      e.studyright_elements.some(element =>
+                        element.code === selectedProgrammes[0] || selectedProgrammes[0] === 'all')),
+
+                    [`c_${key}`]: value.filter(e =>
+                      e.studyright_elements.some(element =>
+                        element.code === selectedProgrammes[1] || selectedProgrammes[1] === 'all'))
+                  }
+              }
+            }, {}))
+
+          const stats = []
+          Object.assign(stats, course)
+
+          stats.stats = filteredstats
+          return (
+            <List.Item key={course.code + course.start + course.end + course.separate}>
+              <CoursePassRateChart
+                removeCourseStatistics={this.removeCourseStatistics}
+                stats={stats}
+                altCodes={course.alternativeCodes}
+                courseLevel={this.state.courseLevel}
+                courseLevelSwitch={this.handleCourseLevelSwitch}
+                dropdown={this.renderDropdown}
+                programmeOptions={programmeOptions}
+              />
+            </List.Item>
+          )
+        })
+        }
       </div>
     )
   }
@@ -414,17 +461,10 @@ const mapStateToProps = ({ settings, courses, courseStatistics }) => ({
   language: settings.language
 })
 
-const mapDispatchToProps = dispatch => ({
-  getMultipleCourseStatistics: query =>
-    dispatch(getMultipleCourseStatistics(query)),
-  removeCourseStatistics: query =>
-    dispatch(removeCourseStatistics(query)),
-  emptyCourseSearch: () =>
-    dispatch(emptyCourseSearch()),
-  toggleCourseSelect: (code) => {
-    dispatch(toggleCourseSelect(code))
-  }
-})
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(Timeout(CourseStatistics))
+export default connect(mapStateToProps, {
+  getMultipleCourseStatistics,
+  removeCourseStatistics,
+  emptyCourseSearch,
+  toggleCourseSelect
+})(Timeout(CourseStatistics))
