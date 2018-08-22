@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { withRouter, Redirect } from 'react-router-dom'
-import { Button, Icon, List, Card, Header, Segment, Dropdown, Form, Divider } from 'semantic-ui-react'
+import { Button, Icon, List, Card, Header, Segment, Dropdown, Form, Divider, Image } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
 import LanguageChooser from '../LanguageChooser'
-import { getUsers, enableUser, addUserUnit, removeUserUnit } from '../../redux/users'
+import { getUsers, enableUser, addUserUnit, removeUserUnit, toggleCzar } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { makeSortUsers } from '../../selectors/users'
 import { copyToClipboard } from '../../common'
@@ -27,6 +27,10 @@ class EnableUsers extends Component {
   }
 
   enableUser = id => () => this.props.enableUser(id)
+
+  handleCoronation = user => async () => {
+    await this.props.toggleCzar(user.id)
+  }
 
   handleChange = user => (e, { value }) => {
     if (!user.elementdetails.find(element => element.code === value)) {
@@ -91,6 +95,7 @@ class EnableUsers extends Component {
         <Redirect to="/users" />
       )
     }
+    console.log(user)
     const disabled = this.getDisabledUnits(units, user.elementdetails)
     const unitOptions = disabled.map(unit =>
       ({ key: unit.id, value: unit.id, text: unit.name[language] }))
@@ -103,15 +108,18 @@ class EnableUsers extends Component {
           <Card fluid>
             <Card.Content>
               <Card.Header>
+                <Image onClick={this.handleCoronation(user)} src={user.czar ? 'https://i.pinimg.com/originals/06/7a/20/067a20e4ae1edcee790601ce9b9927df.jpg' : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6uJPJLxePjb5u1omdG2kOLfE0BwNjvvJ9accK922xSVwKlR8_'} avatar />
                 {user.full_name}
               </Card.Header>
-              <Card.Meta content={user.username} />
+              <Card.Meta content={user.czar ? `tsaari ${user.username}` : `${user.username}`} />
               <Card.Meta content={user.email} />
               <Card.Description>
-                {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`}
+                {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`} <br />
               </Card.Description>
+              <Divider />
             </Card.Content>
           </Card>
+
           <Card fluid>
             <Card.Content>
               <Card.Header content="Enable access" />
@@ -135,6 +143,7 @@ class EnableUsers extends Component {
                     content="Enable"
                     onClick={this.enableAccessRightToUser(user.id)}
                   />
+
                 </Form>
               </Card.Description>
             </Card.Content>
@@ -143,12 +152,20 @@ class EnableUsers extends Component {
             <Card.Content>
               <Card.Header content="Access rights" />
               <Card.Description>
-                { this.renderUnitList(user.elementdetails, user) }
+                {user.czar ?
+                  <p style={{
+                    fontSize: '34px',
+                    fontFamily: 'Comic Sans',
+                    color: 'darkred',
+                    border: '1px'
+                  }}
+                  >everything!
+                  </p> : this.renderUnitList(user.elementdetails, user)}
               </Card.Description>
             </Card.Content>
           </Card>
         </Card.Group>
-      </div>
+      </div >
     )
   }
 
@@ -183,7 +200,7 @@ class EnableUsers extends Component {
               </Button.Group>
             </Card.Content>
           </Card>
-      ))}
+        ))}
       </Card.Group>
     )
   }
@@ -197,7 +214,7 @@ class EnableUsers extends Component {
           Enable or disable access to Oodikone
         </Header>
         <Segment className={sharedStyles.contentSegment}>
-          { !userid ? this.renderUserSearchList() : this.renderUserPage(userid) }
+          {!userid ? this.renderUserSearchList() : this.renderUserPage(userid)}
         </Segment>
         <Icon
           link
@@ -222,6 +239,7 @@ EnableUsers.propTypes = {
   addUserUnit: func.isRequired,
   removeUserUnit: func.isRequired,
   getUnits: func.isRequired,
+  toggleCzar: func.isRequired,
   units: arrayOf(shape({
     id: string,
     name: shape({}).isRequired
@@ -253,22 +271,6 @@ const mapStateToProps = ({ locale, users, units, settings }) => ({
   error: users.error || false
 })
 
-const mapDispatchToProps = dispatch => ({
-  getUsers: () => {
-    dispatch(getUsers())
-  },
-  enableUser: (id) => {
-    dispatch(enableUser(id))
-  },
-  addUserUnit: (uid, unit) => {
-    dispatch(addUserUnit(uid, unit))
-  },
-  removeUserUnit: (uid, unit) => {
-    dispatch(removeUserUnit(uid, unit))
-  },
-  getUnits: () => {
-    dispatch(getUnits())
-  }
-})
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(EnableUsers))
+export default withRouter(connect(mapStateToProps, {
+  getUsers, enableUser, addUserUnit, removeUserUnit, getUnits, toggleCzar
+})(EnableUsers))
