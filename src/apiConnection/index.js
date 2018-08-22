@@ -64,13 +64,9 @@ export const callApi = async (url, method = 'get', data, params) => {
   const token = await getToken()
   options.headers['x-access-token'] = token
 
-  if (params) {
-    options.params = params
-  }
-
   switch (method) {
     case 'get':
-      return getAxios().get(url, options)
+      return getAxios().get(url, { ...options, params })
     case 'post':
       return getAxios().post(url, data, options)
     case 'put':
