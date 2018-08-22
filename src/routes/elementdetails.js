@@ -3,8 +3,8 @@ const StudyrightService = require('../services/studyrights')
 
 router.get('/studyprogrammes', async (req, res) => {
   try {
-    const { admin } = req.decodedToken
-    if (!admin) {
+    const { admin, czar } = req.decodedToken
+    if (!(admin || czar)) {
       res.status(403).json([])
       return
     } else {
