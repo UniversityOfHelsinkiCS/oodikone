@@ -124,10 +124,12 @@ class CourseStatisticsSearch extends Component {
     const { courseList } = this.props
     const coursesToRender = courseList.filter(c => c.name)
       .filter(c => c.name.toLocaleLowerCase()
-        .includes(searchStr.toLocaleLowerCase()))
+        .includes(searchStr.toLocaleLowerCase()) ||
+        c.code.toLocaleLowerCase()
+          .includes(searchStr.toLocaleLowerCase()))
       .slice(0, 20)
       .map(c =>
-        ({ values: [c.name, c.code, reformatDate(c.date, 'DD.MM.YYYY')], selected: c.selected }))
+        ({ values: [c.name, c.code, c.date ? reformatDate(c.date, 'DD.MM.YYYY') : null], selected: c.selected }))
     const headers = ['Name', 'Code', 'Latest instance held', 'Select']
     return (
       <Table
