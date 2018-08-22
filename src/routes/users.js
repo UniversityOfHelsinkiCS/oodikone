@@ -18,6 +18,20 @@ router.put('/users/:id/enable', async (req, res) => {
   }
 })
 
+
+router.put('/users/:id/toggleczar', async (req, res) => {
+  const id = req.params.id
+  const user = await User.byId(id)
+  if (!user) res.status(400).end()
+  else {
+    const result = await User.updateUser(user, { czar: !user.czar })
+    const status = result.error === undefined ? 200 : 400
+    res.status(status).json(result)
+  }
+})
+
+
+
 router.post('/users/:uid/units/:id', async (req, res) => {
   const { uid, id } = req.params
   const user = await User.byId(uid)
