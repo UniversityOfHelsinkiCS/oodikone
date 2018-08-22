@@ -1,4 +1,4 @@
-const { Teacher, Credit, Course, Semester } = require('../models/index')
+const { Teacher, Credit, Course, Semester, Provider } = require('../models/index')
 const { Op } = require('sequelize')
 
 const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
@@ -71,60 +71,183 @@ const parseCreditInfo = credit => ({
   semester: credit.semester
 })
 
-const reduceStats = (stats, code, name, credits, passed, failed) => {
-  const course = stats[code] ? {...stats[code]} : {
-    code,
-    name,
-    passed: {
-      credits: 0,
-      attainments: 0
-    },
-    failed: {
-      credits: 0,
-      attainments: 0
+const markCredit = (stats, passed, failed, credits) => {
+  if (!stats) {
+    stats = {
+      passed: 0,
+      failed: 0,
+      credits: 0
     }
   }
   if (passed) {
-    course.passed.credits += credits
-    course.passed.attainments += 1
-  }
-  if(failed) {
-    course.failed.credits += credits
-    course.failed.attainments += 1
-  }
-  return {
-    ...stats,
-    [code]: course
+    return {
+      ...stats,
+      credits: stats.credits + credits,
+      passed: stats.passed + 1
+    }
+  } else if (failed) {
+    return {
+      ...stats,
+      failed: stats.failed + 1
+    }
+  } else {
+    return stats
   }
 }
 
-const reducer = (stats, credit) => {
-  const { course, credits, passed, failed, semester } = parseCreditInfo(credit)
+const markCreditForSemester = (semesters, credit) => {
+  const { passed, failed, credits, semester } = parseCreditInfo(credit)
+  const { semestercode, name } = semester
+  const { stats, ...rest } = semesters[semestercode] || { id: semestercode, name }
   return {
-    ...stats,
-    courses: reduceStats(stats.courses, course.code, course.name, credits, passed, failed),
-    semesters: reduceStats(stats.semesters, semester.semestercode, semester.name, credits, passed, failed),
-    years: reduceStats(stats.years, semester.yearcode, { 'en' : semester.yearname }, credits, passed, failed)
+    ...semesters,
+    [semestercode]: {
+      ...rest,
+      stats: markCredit(stats, passed, failed, credits)
+    }
+  }
+}
+
+const markCreditForYear = (years, credit) => {
+  const { passed, failed, credits, semester } = parseCreditInfo(credit)
+  const { yearcode, yearname } = semester
+  const { stats, ...rest } = years[yearcode] || { id: yearcode, name: yearname }
+  return {
+    ...years,
+    [yearcode]: {
+      ...rest,
+      stats: markCredit(stats, passed, failed, credits)
+    }
+  }
+}
+
+const markCreditForCourse = (courses, credit) => {
+  const { passed, failed, credits, course } = parseCreditInfo(credit)
+  const { code, name } = course
+  const { stats, ...rest } = courses[code] || { id: code, name }
+  return {
+    ...courses,
+    [code]: {
+      ...rest,
+      stats: markCredit(stats, passed, failed, credits)
+    }
   }
 }
 
 const teacherStats = async teacherid => {
   const teacher = await findTeacherCredits(teacherid)
-  const stats = teacher.credits.reduce(reducer, {
-    courses: {},
+  const statistics = teacher.credits.reduce(({ semesters, years, courses, ...rest }, credit) => {
+    return {
+      ...rest,
+      semesters: markCreditForSemester(semesters, credit),
+      years: markCreditForYear(years, credit),
+      courses: markCreditForCourse(courses, credit)
+    }
+  }, {
     semesters: {},
+    courses: {},
     years: {}
   })
-  const res = {
+  return {
     name: teacher.name,
     code: teacher.code,
     id: teacher.id,
-    ...stats
+    statistics
   }
-  return res
+}
+
+const activeTeachers = async (providers, yearcodeStart, yearcodeEnd) => {
+  const teachers = Teacher.findAll({
+    attributes: ['id'],
+    include: {
+      model: Credit,
+      attributes: [],
+      required: true,
+      include: [
+        {
+          model: Course,
+          attributes: [],
+          required: true,
+          include: {
+            model: Provider,
+            attributes: [],
+            required: true,
+            where: {
+              providercode: {
+                [Op.in]: providers
+              }
+            }
+          }
+        },
+        {
+          model: Semester,
+          required: true,
+          attributes: [],
+          where: {
+            yearcode: {
+              [Op.between]: [yearcodeStart, yearcodeEnd]
+            }
+          }
+        }
+      ]
+    }
+  })
+  return teachers.map(({ id }) => id)
+}
+
+const getCredits = (teacherIds, yearcodeStart, yearcodeEnd) => Teacher.findAll({
+  attributes: ['name', 'code', 'id'],
+  include: {
+    model: Credit,
+    attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode'],
+    include: [
+      {
+        model: Course,
+        required: true
+      },
+      {
+        model: Semester,
+        required: true,
+        attributes: ['semestercode', 'name', 'yearname', 'yearcode'],
+        where: {
+          yearcode: {
+            [Op.between]: [yearcodeStart, yearcodeEnd]
+          }
+        }
+      }
+    ]
+  },
+  where: {
+    id: {
+      [Op.in]: teacherIds
+    }
+  }
+})
+
+const calculateCreditStatistics = credits => credits.reduce((stats, credit) => {
+  const { passed, failed, credits } = parseCreditInfo(credit)
+  return markCredit(stats, passed, failed, credits)
+}, undefined)
+
+const yearlyStatistics = async (providers, yearcodeStart, yearcodeEnd) => {
+  const ids = await activeTeachers(providers, yearcodeStart, yearcodeEnd)
+  const teachers = await getCredits(ids, yearcodeStart, yearcodeEnd)
+  const statistics = teachers.reduce((acc, teacher) => {
+    return {
+      ...acc,
+      [teacher.id]: {
+        name: teacher.name,
+        code: teacher.code,
+        id: teacher.id,
+        stats: calculateCreditStatistics(teacher.credits)
+      }
+    }
+  }, {})
+  return statistics
 }
 
 module.exports = {
   bySearchTerm,
-  teacherStats
+  teacherStats,
+  yearlyStatistics
 }
