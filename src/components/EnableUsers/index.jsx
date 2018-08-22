@@ -95,7 +95,6 @@ class EnableUsers extends Component {
         <Redirect to="/users" />
       )
     }
-    console.log(user)
     const disabled = this.getDisabledUnits(units, user.elementdetails)
     const unitOptions = disabled.map(unit =>
       ({ key: unit.id, value: unit.id, text: unit.name[language] }))
