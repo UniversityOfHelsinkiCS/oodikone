@@ -1,27 +1,40 @@
 import React, { Component } from 'react'
 import { shape } from 'prop-types'
+import _ from 'lodash'
 import { Card, Tab } from 'semantic-ui-react'
-import CreditStatsTable from './CreditStatsTable'
+import TeacherStatisticsTable from '../TeacherStatisticsTable'
 
 const statisticsTableTab = (title, statistics) => ({
   menuItem: title,
   render: () => (
     <Tab.Pane>
-      <CreditStatsTable statistics={statistics} />
+      <TeacherStatisticsTable statistics={statistics} />
     </Tab.Pane>
   )
 })
+
+const formatStatisticsForTable = (statistics) => {
+  if (!statistics) {
+    return []
+  }
+  return Object.values(statistics).map(({ name, stats, ...rest }) => ({
+    ...rest,
+    ...stats,
+    name: _.isString(name) ? name : name.en
+  }))
+}
 
 class TeacherDetails extends Component {
     state={}
 
     render() {
       const { teacher } = this.props
+      const { courses, years, semesters } = teacher.statistics
 
       const panes = [
-        statisticsTableTab('Courses', teacher.courses),
-        statisticsTableTab('Semesters', teacher.semesters),
-        statisticsTableTab('Years', teacher.years)
+        statisticsTableTab('Courses', formatStatisticsForTable(courses)),
+        statisticsTableTab('Semesters', formatStatisticsForTable(semesters)),
+        statisticsTableTab('Years', formatStatisticsForTable(years))
       ]
 
       return (
