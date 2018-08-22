@@ -110,12 +110,16 @@ const StackedBarChart = ({
   let statisticsTableStats = data.map(year => ({
     passed: year.studentsThatPassedThisYear,
     failed: year.studentsThatFailedThisYear,
+    c_passed: -year.c_studentsThatPassedThisYear,
+    c_failed: -year.c_studentsThatFailedThisYear,
     time: year.name
   }))
   if (courseLevel) {
     statisticsTableStats = data.map(year => ({
       passed: year.courseLevelPassed,
       failed: year.courseLevelFailed,
+      c_passed: -year.c_courseLevelPassed,
+      c_failed: -year.c_courseLevelFailed,
       time: year.name
     }))
   }
