@@ -57,7 +57,7 @@ const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) =
       },
       {
         code: {
-          [Op.like]: `%${searchTerm}%`
+          [Op.iLike]: `%${searchTerm}%`
         }
       }
     ],
@@ -137,10 +137,25 @@ const bySearchTerm = async (term, language) => {
 
 const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) => {
   const formatCourse = (course) => ({ name: course.name[language], code: course.code, date: course.latest_instance_date })
-
+  const removeDuplicates = (courses) => {
+    let newList = []
+    courses.map(course => {
+      const nameDuplicates = courses.filter(c => course.name === c.name)
+      if (nameDuplicates.length === 1 || !newList.find(c => c.name === course.name)) {
+        newList.push(course)
+      }
+      newList = newList.map(cor => {
+        if (cor.name === course.name) {
+          return cor.date > course.date ? cor : course
+        }
+        return cor
+      })
+    })
+    return newList
+  }
   try {
     const result = await byNameOrCodeTypeAndDiscipline(term, type, discipline, language)
-    return result.map(formatCourse)
+    return removeDuplicates(result.map(formatCourse))
   } catch (e) {
     return {
       error: e
