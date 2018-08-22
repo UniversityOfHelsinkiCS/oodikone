@@ -41,8 +41,8 @@ router.get('/v2/populationstatistics', async (req, res) => {
     if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
       req.query.studyRights = [req.query.studyRights]
     }
-
-    if (!req.decodedToken.admin) {
+    const { admin, czar } = req.decodedToken
+    if (!(admin || czar)) {
       const user = await User.byUsername(req.decodedToken.userId)
       const elementdetails = await user.getElementdetails()
       const elements = new Set(elementdetails.map(element => element.code))
@@ -127,12 +127,16 @@ router.post('/updatedatabase', async (req, res) => {
 
 router.get('/v2/populationstatistics/studyprogrammes', async (req, res) => {
   try {
-    const { admin, userId } = req.decodedToken
-    if (!admin) {
-      const studyrights = await StudyrightService.getStudyrightElementsAndAssociationsForUser(userId)
+    const { admin, czar, userId } = req.decodedToken
+    console.log({ admin })
+    console.log({ czar })
+    if (admin || czar) {
+      console.log('rights to all')
+      const studyrights = await StudyrightService.getAllStudyrightElementsAndAssociations()
       res.json(studyrights)
     } else {
-      const studyrights = await StudyrightService.getAllStudyrightElementsAndAssociations()
+      console.log('how does this work')
+      const studyrights = await StudyrightService.getStudyrightElementsAndAssociationsForUser(userId)
       res.json(studyrights)
     }
   } catch (err) {
