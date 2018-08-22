@@ -1,7 +1,8 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
+const { orderBy } = require('lodash')
 const { Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails, Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement } = require('../models')
-const { getAllDuplicates } = require('./courses')
+const { getAllDuplicates, byName } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
 
 const enrolmentDates = () => {
@@ -228,7 +229,7 @@ const parseQueryParams = query => {
   }
 }
 
-const formatStudentsForApi = (students, startDate, endDate) => {
+const formatStudentsForApi = async (students, startDate, endDate) => {
   const result = students.reduce((stats, student) => {
     student.transfers.forEach(transfer => {
       const target = stats.transfers.targets[transfer.target.code] || { name: transfer.target.name, sources: {} }
@@ -275,7 +276,25 @@ const optimizedStatisticsOf = async (query) => {
   const endDate = `${year}-${semesterEnd[semester]}`
   const studentnumbers = await studentnumbersWithAllStudyrightElementsAndCreditsBetween(studyRights, startDate, endDate, months)
   const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
-  return formatStudentsForApi(students, startDate, endDate)
+
+  const studentsWithCombinedOpenUniCredits = await Promise.all(students.map(async st => {
+    const credits = await Promise.all(st.credits.map(async cr => {
+      if (cr.course.name.fi.includes('Avoin yo:')) {
+        const courses = await byName(cr.course.name.fi.split(': ')[1], 'fi')
+        const theOne = courses.length > 0 ? orderBy(courses, ['date'], ['desc'])[0] : cr.course
+        cr.course.name = theOne.name
+        cr.course.code = theOne.code
+
+      }
+      return cr
+    }))
+    st.credits = credits
+    return st
+  }
+  ))
+
+  const formattedStudents = await formatStudentsForApi(studentsWithCombinedOpenUniCredits, startDate, endDate)
+  return formattedStudents
 }
 
 const unifyOpenUniversity = (code) => {
@@ -341,10 +360,17 @@ const bottlenecksOf = async (query) => {
   const studentnumbers = await studentnumbersWithAllStudyrightElementsAndCreditsBetween(studyRights, startDate, endDate, months)
   const allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
   const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
-  const allcoursestatistics = courses.reduce((coursestatistics, course) => {
-    const { code, name, disciplines, course_type } = course
+  const allcoursestatistics = await courses.reduce(async (coursestatistics, course) => {
+    const stats = await coursestatistics
+    let { code, name, disciplines, course_type } =  course
+    if (name.fi && name.fi.includes('Avoin yo:')) {
+      const courses = await byName(name.fi.split(': ')[1], 'fi')
+      const theOne = courses.length > 0 ? orderBy(courses, ['date'], ['desc'])[0] : { name, code }
+      code = theOne.code
+      name = theOne.name
+    }
     const unifiedcode = getUnifiedCode(code, codeduplicates)
-    const coursestats = coursestatistics[unifiedcode] || new CourseStatsCounter(code, name, allstudents)
+    const coursestats = stats[unifiedcode] || new CourseStatsCounter(code, name, allstudents)
     coursestats.addCourseType(course_type.coursetypecode, course_type.name)
     bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
     disciplines.forEach(({ discipline_id, name }) => {
@@ -355,9 +381,9 @@ const bottlenecksOf = async (query) => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade } = parseCreditInfo(credit)
       coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade)
     })
-    coursestatistics[unifiedcode] = coursestats
-    return coursestatistics
-  }, {})
+    stats[unifiedcode] = coursestats
+    return stats
+  }, Promise.resolve({}))
   bottlenecks.coursestatistics = Object.values(allcoursestatistics).map(coursestatistics => coursestatistics.getFinalStats())
   return bottlenecks
 }
