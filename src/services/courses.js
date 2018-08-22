@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const { sequelize, Student, Credit, Course, CourseType, Discipline, ElementDetails, StudyrightElement, Studyright } = require('../models')
-const { redisClient }= require('../services/redis')
+const { redisClient } = require('../services/redis')
 const Op = Sequelize.Op
 const _ = require('lodash')
 
@@ -21,6 +21,16 @@ const byNameOrCode = (searchTerm, language) => Course.findAll({
         }
       }
     ]
+  }
+})
+
+const byName = (name, language) => Course.findAll({
+  where: {
+    name: {
+      [language]: {
+        [Op.eq]: name
+      }
+    }
   }
 })
 
@@ -417,6 +427,7 @@ const getAllDisciplines = () => Discipline.findAll()
 
 module.exports = {
   byCode,
+  byName,
   bySearchTerm,
   bySearchTermTypeAndDiscipline,
   createCourse,
