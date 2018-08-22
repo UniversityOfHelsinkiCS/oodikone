@@ -17,6 +17,12 @@ const getStudentNumberChecksum = studentNumber => {
   return (10 - (checksum % 10)) % 10
 }
 
+// helpers to print complex sequelizedata
+const plainPrint = (sequelizeData) => console.log(JSON.parse(JSON.stringify(sequelizeData)))
+
+const plainify = (sequelizeData) => JSON.parse(JSON.stringify(sequelizeData))
+
+
 const oldToNew = (code) => {
   const mappedCode = oldToNewMap[code]
   return mappedCode ? mappedCode : code
@@ -25,5 +31,7 @@ const oldToNew = (code) => {
 module.exports = {
   arrayUnique,
   getStudentNumberChecksum,
+  plainPrint,
+  plainify,
   oldToNew
 }

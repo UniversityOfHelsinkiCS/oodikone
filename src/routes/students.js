@@ -4,14 +4,15 @@ const User = require('../services/users')
 const Unit = require('../services/units')
 
 router.get('/students', async (req, res) => {
-  if (req.decodedToken.admin) {
+  const { admin, czar, userId } = req.decodedToken
+  if (admin || czar) {
     let results = []
     if (req.query.searchTerm) {
       results = await Student.bySearchTerm(req.query.searchTerm)
     }
     return res.json(results)
   } else {
-    const unitsUserCanAccess = await User.getUnitsFromElementDetails(req.decodedToken.userId)
+    const unitsUserCanAccess = await User.getUnitsFromElementDetails(userId)
     const codes = unitsUserCanAccess.map(unit => unit.id)
     const matchingStudents = await Student.bySearchTermAndElements(req.query.searchTerm, codes)
     res.json(matchingStudents)
@@ -20,10 +21,11 @@ router.get('/students', async (req, res) => {
 
 router.get('/students/:id', async (req, res) => {
   const studentId = req.params.id
-  if (req.decodedToken.admin) {
+  const { admin, czar } = req.decodedToken
+  if (admin || czar) {
     const results = await Student.withId(studentId)
     return res.json(results)
-  } 
+  }
 
   const uid = req.decodedToken.userId
   const student = await Student.withId(studentId)

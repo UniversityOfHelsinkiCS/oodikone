@@ -251,7 +251,8 @@ const User = sequelize.define('users',
     is_enabled: { type: Sequelize.BOOLEAN },
     username: { type: Sequelize.STRING },
     email: { type: Sequelize.STRING },
-    language: { type: Sequelize.STRING }
+    language: { type: Sequelize.STRING },
+    czar: { type: Sequelize.BOOLEAN }
   },
   {
     tableName: 'users',
