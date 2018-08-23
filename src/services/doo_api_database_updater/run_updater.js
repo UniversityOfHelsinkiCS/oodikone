@@ -8,16 +8,6 @@ const readStudentNumbersFromFile = async filename => {
   return studentnumbers.filter(studentnumber => !!studentnumber).map(s => s.startsWith('0') ? s : '0' + s)
 }
 
-const createStudentCounter = studentnumbers => status.addItem('students', { max: studentnumbers.length })
-
-const startStatusBar = () => {
-  status.start({ pattern: 'Running: {uptime.time} {spinner.earth.green} | {students.bar} | students updated: {students}' })
-}
-
-const stopStatusBar = () => {
-  status.stamp()
-  status.stop()
-}
 const parseArguments = (args) => {
   return args.slice(2).reduce((args, arg) => {
     const split = arg.split('=')
@@ -31,23 +21,86 @@ const parseArguments = (args) => {
   
 }
 
-const run = async (studentnumbersfile = 'studentnumbers.txt', index = 0) => {
+const fancylogger = (studentnumbers) => {
+
+  const counter = status.addItem('students', { max: studentnumbers.length })
+
+  const start = () => {
+    status.start({ pattern: 'Running: {uptime.time} {spinner.earth.green} | {students.bar} | students updated: {students}' })
+  }
+
+  const stop = () => {
+    status.stamp()
+    status.stop()
+  }
+
+  const onUpdate = () => {
+    counter.inc()
+  }
+
+  return {
+    start,
+    stop,
+    onUpdate
+  }
+}
+
+const basiclogger = (studentnumbers, nstamps = 100) => {
+
+  const total = studentnumbers.length
+  const divisor = Math.floor(total/nstamps)
+
+  const dolog = iter => {
+    if (iter % divisor === 0) {
+      logger.info(`${new Date()} Students updated: ${iter}/${total}`)
+    }
+  }
+
+  let iter = 0
+
+  const start = () => {
+    logger.info('Updater started. ')
+  }
+
+  const onUpdate = () => {
+    iter += 1
+    dolog(iter)
+  }
+
+  const stop = () => {
+    logger.info('Updater finished. ')
+  }
+
+  return {
+    start,
+    stop,
+    onUpdate
+  }
+}
+
+const run = async (studentnumbersfile = 'studentnumbers.txt', index = 0, basiclogging = true) => {
+
   const args = parseArguments(process.argv)
   index = args.index || index
+  basiclogging = args.basiclogging || basiclogging
+
   studentnumbersfile = args.file || studentnumbersfile
   const readStudentnumbers = await readStudentNumbersFromFile(studentnumbersfile)
   const studentnumbers = readStudentnumbers.slice(index)
-  const counter = createStudentCounter(studentnumbers)
+
+  const statuslogger = basiclogging ? basiclogger(studentnumbers) : fancylogger(studentnumbers)
+
   const started = new Date()
   let exitcode = 0
+
   try {
-    startStatusBar()
-    await updateDatabase(studentnumbers, () => counter.inc())
+    statuslogger.start()
+    await updateDatabase(studentnumbers, statuslogger.onUpdate)
+    statuslogger.stop()
   } catch (e) {
     logger.verbose(e)
     exitcode = 1
   }
-  stopStatusBar()
   const ended = new Date()
   logger.verbose(`Running script started/ended: \n${started} \n${ended}`)
   process.exit(exitcode)
