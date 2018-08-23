@@ -10,6 +10,7 @@ import CreditsLessThan from './CreditsLessThan'
 import CreditsAtLeast from './CreditsAtLeast'
 import StartingThisSemester from './StartingThisSemester'
 import CourseParticipation from './CourseParticipation'
+import CourseParticipationNTimes from './CourseParticipationNTimes'
 import ExtentGraduated from './ExtentGraduated'
 import Preset from './Preset'
 import DisciplineTypes from './DisciplineTypes'
@@ -23,6 +24,7 @@ const componentFor = {
   CreditsAtLeast,
   CreditsLessThan,
   StartingThisSemester,
+  CourseParticipationNTimes,
   DisciplineTypes,
   EnrollmentStatus,
   CourseParticipation,

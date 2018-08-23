@@ -1,7 +1,5 @@
 import { callController } from '../apiConnection'
 
-const getArrayParams = (paramName, entries) => entries.map(entry => `&${paramName}=${entry}`).join('')
-
 const initialState = {
   pending: false,
   error: false,
@@ -13,12 +11,18 @@ const initialState = {
 export const getPopulationStatistics = ({
   year, semester, studyRights, months, uuid
 }) => {
-  const route = `/v2/populationstatistics/?year=${year}&semester=${semester}${getArrayParams('studyRights', studyRights)}&months=${months}`
+  const route = '/v2/populationstatistics/'
   const prefix = 'GET_POPULATION_STATISTICS_'
   const query = {
     year, semester, studyRights, uuid, months
   }
-  return callController(route, prefix, null, 'get', query)
+  const params = {
+    year,
+    semester,
+    months,
+    studyRights
+  }
+  return callController(route, prefix, null, 'get', query, params)
 }
 export const updatePopulationStudents = (students) => {
   const route = '/updatedatabase'
