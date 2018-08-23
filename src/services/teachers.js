@@ -156,7 +156,7 @@ const teacherStats = async teacherid => {
   }
 }
 
-const activeTeachers = async (providers, yearcodeStart, yearcodeEnd) => {
+const activeTeachers = async (providers, semestercodeStart, semestercodeEnd) => {
   const teachers = Teacher.findAll({
     attributes: ['id'],
     include: {
@@ -184,8 +184,8 @@ const activeTeachers = async (providers, yearcodeStart, yearcodeEnd) => {
           required: true,
           attributes: [],
           where: {
-            yearcode: {
-              [Op.between]: [yearcodeStart, yearcodeEnd]
+            semestercode: {
+              [Op.between]: [semestercodeStart, semestercodeEnd]
             }
           }
         }
@@ -195,7 +195,7 @@ const activeTeachers = async (providers, yearcodeStart, yearcodeEnd) => {
   return teachers.map(({ id }) => id)
 }
 
-const getCredits = (teacherIds, yearcodeStart, yearcodeEnd) => Teacher.findAll({
+const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) => Teacher.findAll({
   attributes: ['name', 'code', 'id'],
   include: {
     model: Credit,
@@ -210,8 +210,8 @@ const getCredits = (teacherIds, yearcodeStart, yearcodeEnd) => Teacher.findAll({
         required: true,
         attributes: ['semestercode', 'name', 'yearname', 'yearcode'],
         where: {
-          yearcode: {
-            [Op.between]: [yearcodeStart, yearcodeEnd]
+          semestercode: {
+            [Op.between]: [semestercodeStart, semestercodeEnd]
           }
         }
       }
@@ -229,9 +229,9 @@ const calculateCreditStatistics = credits => credits.reduce((stats, credit) => {
   return markCredit(stats, passed, failed, credits)
 }, undefined)
 
-const yearlyStatistics = async (providers, yearcodeStart, yearcodeEnd) => {
-  const ids = await activeTeachers(providers, yearcodeStart, yearcodeEnd)
-  const teachers = await getCredits(ids, yearcodeStart, yearcodeEnd)
+const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) => {
+  const ids = await activeTeachers(providers, semestercodeStart, semestercodeEnd)
+  const teachers = await getCredits(ids, semestercodeStart, semestercodeEnd)
   const statistics = teachers.reduce((acc, teacher) => {
     return {
       ...acc,

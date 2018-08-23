@@ -8,11 +8,11 @@ router.get('/teachers', async (req, res) => {
 })
 
 router.get('/teachers/stats', async (req, res) => {
-  const { providers, startYearCode, endYearCode } = req.query
-  if (!providers || !startYearCode) {
+  const { providers, semesterStart, semesterEnd } = req.query
+  if (!providers || !semesterStart) {
     return res.status(422).send('Missing required query parameters.')
   }
-  const result = await teachers.yearlyStatistics(providers, startYearCode, endYearCode||startYearCode + 1)
+  const result = await teachers.yearlyStatistics(providers, semesterStart, semesterEnd||semesterStart + 1)
   res.json(result)
 })
 
