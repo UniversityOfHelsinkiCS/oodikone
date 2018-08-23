@@ -5,6 +5,7 @@ import { withRouter } from 'react-router-dom'
 import sharedStyles from '../../styles/shared'
 import TeacherSearch from '../TeacherSearch'
 import TeacherPage from '../TeacherPage'
+import TeacherStatistics from '../TeacherStatistics'
 
 const pane = (title, Content) => ({
   menuItem: title,
@@ -19,6 +20,7 @@ const TeachersTabs = () => (
   <Tab
     menu={{ attached: false, borderless: true, tabular: true }}
     panes={[
+      pane('Statistics', TeacherStatistics),
       pane('Search', TeacherSearch)
     ]}
   />
@@ -32,9 +34,7 @@ class Teachers extends Component {
       const { teacherid } = match.params
       return (
         <div className={sharedStyles.segmentContainer}>
-          <Header className={sharedStyles.segmentTitle} size="large">
-            Teacher statistics
-          </Header>
+          <Header className={sharedStyles.segmentTitle} size="large" content="Teacher statistics" />
           <Segment className={sharedStyles.contentSegment}>
             { teacherid
               ? <TeacherPage teacherid={teacherid} />
