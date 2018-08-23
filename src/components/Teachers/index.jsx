@@ -20,8 +20,8 @@ const TeachersTabs = () => (
   <Tab
     menu={{ attached: false, borderless: true, tabular: true }}
     panes={[
-      pane('Search', TeacherSearch),
-      pane('Statistics', TeacherStatistics)
+      pane('Statistics', TeacherStatistics),
+      pane('Search', TeacherSearch)
     ]}
   />
 )
@@ -34,9 +34,7 @@ class Teachers extends Component {
       const { teacherid } = match.params
       return (
         <div className={sharedStyles.segmentContainer}>
-          <Header className={sharedStyles.segmentTitle} size="large">
-            Teacher statistics
-          </Header>
+          <Header className={sharedStyles.segmentTitle} size="large" content="Teacher statistics" />
           <Segment className={sharedStyles.contentSegment}>
             { teacherid
               ? <TeacherPage teacherid={teacherid} />
