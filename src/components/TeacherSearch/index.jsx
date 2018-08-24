@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Search, Segment } from 'semantic-ui-react'
+import { Search, Segment, Message } from 'semantic-ui-react'
 import { func, arrayOf, object, shape } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -44,25 +44,31 @@ class TeacherSearch extends Component {
 
     render() {
       return (
-        <div className={styles.searchContainer}>
-          <Search
-            className={styles.searchInput}
-            input={{ fluid: true }}
-            placeholder="Search by entering a username, id or name"
-            value={this.state.searchterm}
-            onSearchChange={this.handleSearchChange}
-            showNoResults={false}
+        <div >
+          <Message
+            header="Teacher search"
+            content="Search for a teacher and click the search result to view their individual statistics from their entire career. "
           />
-          { this.state.displayResults && (
-            <Segment className={sharedStyles.contentSegment}>
-              <SearchResultTable
-                headers={['Teacher ID', 'Username', 'Name']}
-                rows={this.props.teachers}
-                rowClickFn={(_, teacher) => this.props.history.push(`/teachers/${teacher.id}`)}
-                noResultText="No teachers matched your search"
-              />
-            </Segment>
-          )}
+          <div className={styles.searchContainer}>
+            <Search
+              className={styles.searchInput}
+              input={{ fluid: true }}
+              placeholder="Search by entering a username, id or name"
+              value={this.state.searchterm}
+              onSearchChange={this.handleSearchChange}
+              showNoResults={false}
+            />
+            { this.state.displayResults && (
+              <Segment className={sharedStyles.contentSegment}>
+                <SearchResultTable
+                  headers={['Teacher ID', 'Username', 'Name']}
+                  rows={this.props.teachers}
+                  rowClickFn={(_, teacher) => this.props.history.push(`/teachers/${teacher.id}`)}
+                  noResultText="No teachers matched your search"
+                />
+              </Segment>
+            )}
+          </div>
         </div>
       )
     }
