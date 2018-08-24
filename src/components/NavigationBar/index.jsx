@@ -5,7 +5,7 @@ import { func } from 'prop-types'
 import { connect } from 'react-redux'
 
 import { routes } from '../../constants'
-import { userIsAdmin } from '../../common'
+import { userIsAdmin, userIsCzar } from '../../common'
 
 import styles from './navigationBar.css'
 import { logout, swapDevUser } from '../../apiConnection'
@@ -18,8 +18,11 @@ class NavigationBar extends Component {
   async componentDidMount() {
     const navigationRoutes = { ...routes }
     const adminRights = await userIsAdmin()
+    const czarRights = await userIsCzar()
     Object.keys(navigationRoutes).forEach((key) => {
       if (navigationRoutes[key].admin && !adminRights) {
+        delete navigationRoutes[key]
+      } else if (navigationRoutes[key].czar && (!adminRights && !czarRights)) {
         delete navigationRoutes[key]
       }
     })
