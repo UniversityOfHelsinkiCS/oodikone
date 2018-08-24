@@ -148,6 +148,25 @@ export const courseParticipationNTimes = (params) => {
   })
 }
 
+export const canceledStudyright = (params) => {
+  const { studyrights, cancel } = params
+  return ({
+    id: uuidv4(),
+    type: 'CanceledStudyright',
+    params: {
+      studyrights,
+      cancel
+    },
+    filter: (student) => {
+      if (cancel === 'true') {
+        return student.studyrights.filter(sr =>
+          sr.studyrightElements.some(e => studyrights.includes(e.code))).every(sr => sr.canceldate)
+      }
+      return !student.studyrights.filter(sr =>
+        sr.studyrightElements.some(e => studyrights.includes(e.code))).every(sr => sr.canceldate)
+    }
+  })
+}
 
 export const presetFilter = preset => ({
   id: preset.id,
@@ -168,6 +187,7 @@ const typeList = {
   EnrollmentStatus: enrollmentStatus,
   TransferFilter: transferFilter,
   CourseParticipationNTimes: courseParticipationNTimes,
+  CanceledStudyright: canceledStudyright,
   Preset: presetFilter
 }
 export const getFilterFunction = (type, params, populationCourses) => {
