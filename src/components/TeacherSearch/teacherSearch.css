@@ -8,4 +8,6 @@
 .searchInput {
   width: 100%;
   max-width: 750px;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
