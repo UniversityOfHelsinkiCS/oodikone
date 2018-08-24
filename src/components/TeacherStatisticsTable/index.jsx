@@ -7,8 +7,8 @@ const calculatePassrate = (pass, fail) => (100 * pass) / (pass + fail)
 
 class TeacherStatisticsTable extends Component {
     state={
-      selected: null,
-      direction: null
+      selected: 'credits',
+      direction: 'descending'
     }
 
     handleSort = column => () => {
