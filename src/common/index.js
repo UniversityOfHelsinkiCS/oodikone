@@ -46,6 +46,10 @@ export const userIsAdmin = async () => {
   const token = await getToken()
   return token ? decodeToken(token).admin : false
 }
+export const userIsCzar = async () => {
+  const token = await getToken()
+  return token ? decodeToken(token).czar : false
+}
 export const getUserName = async () => {
   const token = await getToken()
   return token ? decodeToken(token).userId : false
