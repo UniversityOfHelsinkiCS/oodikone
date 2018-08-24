@@ -2,7 +2,9 @@ const Sequelize = require('sequelize')
 const moment = require('moment')
 const { sequelize, Student, Credit, Course, CourseType, Discipline, ElementDetails, StudyrightElement, Studyright } = require('../models')
 const { redisClient } = require('../services/redis')
+const { plainPrint, plainify } = require('../util')
 const Op = Sequelize.Op
+const { CourseYearlyStatsCounter } = require('../services/course_yearly_stats_counter')
 const _ = require('lodash')
 
 const byNameOrCode = (searchTerm, language) => Course.findAll({
@@ -118,7 +120,10 @@ const creditsForCourses = (codes) => Credit.findAll({
     course_code: {
       [Op.in]: codes
     }
-  }
+  },
+  order: [
+    ['attainment_date', 'ASC']
+  ]
 })
 
 const bySearchTerm = async (term, language) => {
@@ -164,9 +169,6 @@ const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) =
 }
 
 const creditsOf = async (codes) => {
-  const byDate = (a, b) => {
-    return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
-  }
 
   const formatCredit = (credit) => {
     const credits = [credit]
@@ -182,7 +184,7 @@ const creditsOf = async (codes) => {
 
   try {
     const credits = await creditsForCourses(codes)
-    return credits.sort(byDate).map(formatCredit)
+    return credits.map(formatCredit)
   } catch (e) {
     console.log(e)
     return {
@@ -192,6 +194,7 @@ const creditsOf = async (codes) => {
 }
 
 const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
+  const counter = new CourseYearlyStatsCounter()
 
   const calculateStats = (thisSemester, allInstancesUntilSemester) => {
     const studentsThatPassedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c => c.student))))
@@ -208,10 +211,11 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
   }
   const stats = []
   if (separate === 'true') {
-    const fallInstances = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-09-01', String(year + 1) + '-01-15'))
+    const fallInstances = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-01-15'))
     const allInstancesUntilFall = allInstancesUntilYear.filter(inst => moment(inst.date).isBefore(String(year + 1) + '-01-15'))
-    const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-09-01'))
+    const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-08-01'))
     let fallStatistics = calculateStats(fallInstances, allInstancesUntilFall)
+    let aa = counter.calculateStats(fallInstances, allInstancesUntilFall) /// TAIKA TAPAHTUU 
     let springStatistics = calculateStats(springInstances, allInstancesUntilYear)
 
     const passedF = fallInstances.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
@@ -250,7 +254,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
     }
 
   } else {
-    const yearInst = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-09-01', String(year + 1) + '-09-01'))
+    const yearInst = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-08-01'))
     let statistics = calculateStats(yearInst, allInstancesUntilYear)
     const passed = yearInst.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
     const failed = yearInst.reduce((a, b) => b.fail ? a = a.concat(b.credits[0].student) : a, [])
@@ -288,9 +292,8 @@ const yearlyStatsOf = async (code, year, separate, language) => {
   const alternatives = await getDuplicateCodes(code)
   const codes = alternatives ? [code, ...Object.keys(alternatives.alt)] : [code]
   const allInstances = await creditsOf(codes)
-
-  const yearInst = allInstances.filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-08-01', year.end + '-06-01'))
-  const allInstancesUntilYear = allInstances.filter(inst => moment(new Date(inst.date)).isBefore(year.end + '-06-01'))
+  const yearInst = allInstances.filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-09-01', year.end + '-08-01'))
+  const allInstancesUntilYear = allInstances.filter(inst => moment(new Date(inst.date)).isBefore(year.end + '-08-01'))
   const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name[language]
   const start = Number(year.start)
   const end = Number(year.end)
