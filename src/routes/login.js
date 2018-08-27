@@ -41,14 +41,12 @@ const sendEmail = async (uid) => {
 router.post('/login', async (req, res) => {
   try {
     const uid = req.headers['uid']
-    console.log('MAIL', req.headers.mail)
-    console.log(req.headers)
+    console.log('HEADERS',req.headers)
     if (req.headers['shib-session-id'] && uid) {
       const user = await User.byUsername(uid)
       const fullname = req.headers.displayname || 'Shib Valmis'
-      const email = req.headesr.mail
       if (!user) {
-        await User.createUser(uid, fullname, email)
+        await User.createUser(uid, fullname)
         await sendEmail(uid)
       } else {
         await User.updateUser(user, { full_name: fullname })
