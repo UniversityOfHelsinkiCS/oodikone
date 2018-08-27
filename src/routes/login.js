@@ -3,7 +3,6 @@ const User = require('../services/users')
 const jwt = require('jsonwebtoken')
 const conf = require('../conf-backend')
 const mailservice = require('../services/mailservice')
-const admin = ['totutotu', 'tktl', 'mluukkai', 'mitiai', 'ttuotila', 'jakousa', 'sasumaki']
 
 const generateToken = async (uid, res) => {
   const model = await User.byUsername(uid)
@@ -13,7 +12,7 @@ const generateToken = async (uid, res) => {
     name: user.full_name,
     enabled: user.is_enabled,
     language: user.language,
-    admin: admin.includes(uid),
+    admin: user.admin,
     czar: user.czar
   }
   const token = jwt.sign(payload, conf.TOKEN_SECRET, {

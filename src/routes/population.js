@@ -128,14 +128,10 @@ router.post('/updatedatabase', async (req, res) => {
 router.get('/v2/populationstatistics/studyprogrammes', async (req, res) => {
   try {
     const { admin, czar, userId } = req.decodedToken
-    console.log({ admin })
-    console.log({ czar })
     if (admin || czar) {
-      console.log('rights to all')
       const studyrights = await StudyrightService.getAllStudyrightElementsAndAssociations()
       res.json(studyrights)
     } else {
-      console.log('how does this work')
       const studyrights = await StudyrightService.getStudyrightElementsAndAssociationsForUser(userId)
       res.json(studyrights)
     }
