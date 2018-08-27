@@ -16,6 +16,7 @@ import Preset from './Preset'
 import DisciplineTypes from './DisciplineTypes'
 import EnrollmentStatus from './EnrollmentStatus'
 import TransferFilter from './TransferFilter'
+import CanceledStudyright from './CanceledStudyright'
 import { clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
 
@@ -29,7 +30,8 @@ const componentFor = {
   EnrollmentStatus,
   CourseParticipation,
   ExtentGraduated,
-  TransferFilter
+  TransferFilter,
+  CanceledStudyright
 }
 const advancedFilters = { // Filters that are too hard to use for common folk
   DisciplineTypes,
