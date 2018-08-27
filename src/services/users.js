@@ -28,12 +28,13 @@ const byId = async (id) => {
   })
 }
 
-const createUser = async (username, fullname) => {
+const createUser = async (username, fullname, email) => {
   return User.create({
     username: username,
     full_name: fullname,
     is_enabled: false,
-    czar: false
+    czar: false,
+    email
   })
 }
 
