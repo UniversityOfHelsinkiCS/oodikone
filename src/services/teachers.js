@@ -95,6 +95,14 @@ const markCredit = (stats, passed, failed, credits) => {
   }
 }
 
+const parseAndMarkCredit = (stats, key, credit) => {
+  const { passed, failed, credits } = parseCreditInfo(credit)
+  return {
+    ...stats,
+    [key]: markCredit(stats[key], passed, failed ,credits)
+  }
+}
+
 const markCreditForSemester = (semesters, credit) => {
   const { passed, failed, credits, semester } = parseCreditInfo(credit)
   const { semestercode, name } = semester
@@ -122,13 +130,15 @@ const markCreditForYear = (years, credit) => {
 }
 
 const markCreditForCourse = (courses, credit) => {
-  const { passed, failed, credits, course } = parseCreditInfo(credit)
+  const { passed, failed, credits, course, semester } = parseCreditInfo(credit)
   const { code, name } = course
-  const { stats, ...rest } = courses[code] || { id: code, name }
+  const { semestercode } = semester
+  const { stats, semesters={}, ...rest } = courses[code] || { id: code, name }
   return {
     ...courses,
     [code]: {
       ...rest,
+      semesters: parseAndMarkCredit(semesters, semestercode, credit),
       stats: markCredit(stats, passed, failed, credits)
     }
   }
@@ -224,10 +234,20 @@ const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) => Teacher.f
   }
 })
 
+const isRegularCourse = credit => !credit.course ? true : !credit.course.get().is_study_module
+
 const calculateCreditStatistics = credits => credits.reduce((stats, credit) => {
-  const { passed, failed, credits } = parseCreditInfo(credit)
-  return markCredit(stats, passed, failed, credits)
-}, undefined)
+  if (isRegularCourse(credit)) {
+    const { passed, failed, credits } = parseCreditInfo(credit)
+    return markCredit(stats, passed, failed, credits)
+  } else {
+    return stats
+  }
+}, {
+  passed: 0,
+  failed: 0,
+  credits: 0
+})
 
 const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) => {
   const ids = await activeTeachers(providers, semestercodeStart, semestercodeEnd)
@@ -246,8 +266,31 @@ const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) =
   return statistics
 }
 
+const topTeachers = async (limit=50) => {
+  const teachers = await Teacher.findAll({
+    include: {
+      model: Credit,
+      required: true,
+      include: {
+        model: Course,
+        required: true
+      }
+    }
+  })
+  return teachers
+    .map(({ id, code, name, credits }) => ({
+      id,
+      code,
+      name,
+      stats: calculateCreditStatistics(credits)
+    }))
+    .sort((t1, t2) => t2.stats.credits - t1.stats.credits)
+    .slice(0, limit)
+}
+
 module.exports = {
   bySearchTerm,
   teacherStats,
-  yearlyStatistics
+  yearlyStatistics,
+  topTeachers
 }
