@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
-import { shape, string, func } from 'prop-types'
+import { shape, string, func, bool } from 'prop-types'
 import { connect } from 'react-redux'
+import { Segment } from 'semantic-ui-react'
 import { getTeacher } from '../../redux/teachers'
 import TeacherDetails from '../TeacherDetails'
 
@@ -19,9 +20,9 @@ class TeacherPage extends Component {
   }
 
   render() {
-    const { teacher } = this.props
-    if (!this.state.initialized) {
-      return null
+    const { teacher, isLoading } = this.props
+    if (!this.state.initialized || isLoading) {
+      return <Segment basic loading={isLoading} />
     } else if (!teacher) {
       return <Redirect to="/teachers" />
     }
@@ -34,7 +35,8 @@ class TeacherPage extends Component {
 TeacherPage.propTypes = {
   teacher: shape({}),
   teacherid: string.isRequired,
-  getTeacher: func.isRequired
+  getTeacher: func.isRequired,
+  isLoading: bool.isRequired
 }
 
 TeacherPage.defaultProps = {
@@ -43,9 +45,10 @@ TeacherPage.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   const { teacherid } = props
-  const { items } = state.teachers
+  const { items, pending } = state.teachers
   return {
-    teacher: items[teacherid]
+    teacher: items[teacherid],
+    isLoading: pending
   }
 }
 
