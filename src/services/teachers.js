@@ -95,6 +95,14 @@ const markCredit = (stats, passed, failed, credits) => {
   }
 }
 
+const parseAndMarkCredit = (stats, key, credit) => {
+  const { passed, failed, credits } = parseCreditInfo(credit)
+  return {
+    ...stats,
+    [key]: markCredit(stats[key], passed, failed ,credits)
+  }
+}
+
 const markCreditForSemester = (semesters, credit) => {
   const { passed, failed, credits, semester } = parseCreditInfo(credit)
   const { semestercode, name } = semester
@@ -122,13 +130,15 @@ const markCreditForYear = (years, credit) => {
 }
 
 const markCreditForCourse = (courses, credit) => {
-  const { passed, failed, credits, course } = parseCreditInfo(credit)
+  const { passed, failed, credits, course, semester } = parseCreditInfo(credit)
   const { code, name } = course
-  const { stats, ...rest } = courses[code] || { id: code, name }
+  const { semestercode } = semester
+  const { stats, semesters={}, ...rest } = courses[code] || { id: code, name }
   return {
     ...courses,
     [code]: {
       ...rest,
+      semesters: parseAndMarkCredit(semesters, semestercode, credit),
       stats: markCredit(stats, passed, failed, credits)
     }
   }
