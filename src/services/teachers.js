@@ -256,8 +256,31 @@ const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) =
   return statistics
 }
 
+const topTeachers = async (limit=50) => {
+  const teachers = await Teacher.findAll({
+    include: {
+      model: Credit,
+      required: true,
+      include: {
+        model: Course,
+        required: true
+      }
+    }
+  })
+  return teachers
+    .map(({ id, code, name, credits }) => ({
+      id,
+      code,
+      name,
+      stats: calculateCreditStatistics(credits)
+    }))
+    .sort((t1, t2) => t2.stats.credits - t1.stats.credits)
+    .slice(0, limit)
+}
+
 module.exports = {
   bySearchTerm,
   teacherStats,
-  yearlyStatistics
+  yearlyStatistics,
+  topTeachers
 }
