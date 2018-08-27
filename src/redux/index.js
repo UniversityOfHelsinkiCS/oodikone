@@ -20,6 +20,7 @@ import teachers from './teachers'
 import providers from './providers'
 import semesters from './semesters'
 import teacherStatistics from './teacherStatistics'
+import teachersTop from './teachersTop'
 
 export default combineReducers({
   locale,
@@ -41,5 +42,6 @@ export default combineReducers({
   teachers,
   providers,
   semesters,
-  teacherStatistics
+  teacherStatistics,
+  teachersTop
 })
