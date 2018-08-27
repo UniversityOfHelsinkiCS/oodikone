@@ -224,10 +224,20 @@ const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) => Teacher.f
   }
 })
 
+const isRegularCourse = credit => !credit.course ? true : !credit.course.get().is_study_module
+
 const calculateCreditStatistics = credits => credits.reduce((stats, credit) => {
-  const { passed, failed, credits } = parseCreditInfo(credit)
-  return markCredit(stats, passed, failed, credits)
-}, undefined)
+  if (isRegularCourse(credit)) {
+    const { passed, failed, credits } = parseCreditInfo(credit)
+    return markCredit(stats, passed, failed, credits)
+  } else {
+    return stats
+  }
+}, {
+  passed: 0,
+  failed: 0,
+  credits: 0
+})
 
 const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) => {
   const ids = await activeTeachers(providers, semestercodeStart, semestercodeEnd)
