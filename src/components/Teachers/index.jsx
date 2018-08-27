@@ -6,9 +6,10 @@ import sharedStyles from '../../styles/shared'
 import TeacherSearch from '../TeacherSearch'
 import TeacherPage from '../TeacherPage'
 import TeacherStatistics from '../TeacherStatistics'
+import TeacherLeaderBoard from '../TeacherLeaderBoard'
 
-const pane = (title, Content) => ({
-  menuItem: title,
+const pane = (title, Content, icon) => ({
+  menuItem: { key: title, content: title, icon },
   render: () => (
     <Tab.Pane style={{ borderWidth: '0' }}>
       <Content />
@@ -20,8 +21,9 @@ const TeachersTabs = () => (
   <Tab
     menu={{ attached: false, borderless: true, tabular: true }}
     panes={[
-      pane('Statistics', TeacherStatistics),
-      pane('Search', TeacherSearch)
+      pane('Statistics', TeacherStatistics, 'table'),
+      pane('Leaderboard', TeacherLeaderBoard, 'trophy'),
+      pane('Search', TeacherSearch, 'user')
     ]}
   />
 )
