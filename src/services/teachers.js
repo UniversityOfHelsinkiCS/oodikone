@@ -149,7 +149,7 @@ const markCreditForCourse = (courses, credit) => {
 
 const teacherStats = async teacherid => {
   const teacher = await findTeacherCredits(teacherid)
-  const statistics = teacher.credits.reduce(({ semesters, years, courses, ...rest }, credit) => {
+  const statistics = teacher.credits.filter(isRegularCourse).reduce(({ semesters, years, courses, ...rest }, credit) => {
     return {
       ...rest,
       semesters: markCreditForSemester(semesters, credit),
