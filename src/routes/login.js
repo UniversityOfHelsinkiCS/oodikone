@@ -44,8 +44,9 @@ router.post('/login', async (req, res) => {
     if (req.headers['shib-session-id'] && uid) {
       const user = await User.byUsername(uid)
       const fullname = req.headers.displayname || 'Shib Valmis'
+      const mail = req.headers.mail || ''
       if (!user) {
-        await User.createUser(uid, fullname)
+        await User.createUser(uid, fullname, mail)
         await sendEmail(uid)
       } else {
         await User.updateUser(user, { full_name: fullname })
