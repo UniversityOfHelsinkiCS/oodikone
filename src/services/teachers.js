@@ -2,7 +2,7 @@ const { Op } = require('sequelize')
 const { Teacher, Credit, Course, Semester, Provider } = require('../models/index')
 const { redisClient } = require('./redis')
 
-const REDIS_TOP_TEACHERS = 'topteachers'
+const REDIS_TOP_TEACHERS = 'REDIS_TOP_TEACHERS'
 
 const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 
@@ -102,7 +102,7 @@ const parseAndMarkCredit = (stats, key, credit) => {
   const { passed, failed, credits } = parseCreditInfo(credit)
   return {
     ...stats,
-    [key]: markCredit(stats[key], passed, failed ,credits)
+    [key]: markCredit(stats[key], passed, failed, credits)
   }
 }
 
@@ -269,81 +269,82 @@ const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) =
   return statistics
 }
 
-const allTeacherIds = async () => {
-  const data = await Teacher.findAll({
-    attributes: ['id'],
-    raw: true
+const findTopTeachers = async (yearcode, limit=50) => {
+  const credits = await Credit.findAll({
+    attributes: ['id', 'credits', 'credittypecode'],
+    include: [
+      {
+        model: Semester,
+        attributes: [],
+        required: true,
+        where: {
+          yearcode: {
+            [Op.eq]: yearcode
+          }
+        }
+      },
+      {
+        model: Teacher,
+        attributes: ['id', 'name', 'code'],
+        required: true
+      },
+      {
+        model: Course,
+        attributes: ['code', 'name', 'coursetypecode'],
+        required: true
+      }
+    ]
   })
-  return data.map(({ id }) => id)
+  const teacherstats = credits
+    .filter(isRegularCourse)
+    .map(credit => {
+      const teachers = credit.teachers.map(({ id, name }) => ({ id, name }))
+      const { passed, credits, failed } = parseCreditInfo(credit)
+      return { passed, failed, credits, teachers }
+    })
+    .reduce((stats, data) => {
+      data.teachers.forEach(({ id, name }) => {
+        const teacher = stats[id] || { id, name }
+        stats[id] = {
+          ...teacher,
+          stats: markCredit(teacher.stats, data.passed, data.failed, data.credits)
+        }
+      })
+      return stats
+    }, {})
+  const top = Object.values(teacherstats)
+    .sort((t1, t2) => t2.stats.credits - t1.stats.credits)
+    .slice(0, limit)
+    .map(({ stats, ...rest }) => ({
+      ...rest,
+      stats: {
+        ...stats,
+        credits: Math.floor(stats.credits)
+      }
+    }))
+  return top
 }
 
-const getTeachersAndCredits = async ids => Teacher.findAll({
-  attributes: ['id', 'code', 'name'],
-  include: {
-    model: Credit,
-    required: true,
-    include: {
-      model: Course,
-      required: true
-    }
-  },
-  where: {
-    id: {
-      [Op.in]: ids
-    }
-  }
-})
-
-const topTeachersFromDb = async (limit=50, chunksize=100) => {
-  const allIds = await allTeacherIds()
-  let topstats = []
-  let mincredits = 0
-  const iterations = Math.ceil(allIds.length / chunksize)
-  for (let iter of Array(iterations).keys()) {
-    const start = chunksize * iter
-    const end = chunksize * (iter + 1)
-    const ids = allIds.slice(start, end)
-    const teachers = await getTeachersAndCredits(ids)
-    topstats = teachers
-      .map(({ id, code, name, credits }) => ({
-        id,
-        code,
-        name,
-        stats: calculateCreditStatistics(credits)
-      }))
-      .filter(t => t.stats.credits > mincredits)
-      .concat(topstats)
-      .sort((t1, t2) => t2.stats.credits - t1.stats.credits)
-      .slice(0, limit)
-    const { stats } = topstats[limit - 1]
-    mincredits = stats.credits
-  }
-  return topstats.map(({ stats, ...rest }) => ({
-    ...rest,
-    stats: {
-      ...stats,
-      credits: Math.floor(stats.credits)
-    }
-  }))
+const saveTopTeachersToRedis = async (semestercode, data) => {
+  await redisClient.hset(REDIS_TOP_TEACHERS, semestercode, JSON.stringify(data))
 }
 
-const updateTopTeachers = async () => {
-  console.log('get db')
-  const teachers = await topTeachersFromDb()
-  console.log('db done, start redis')
-  await redisClient.setAsync(REDIS_TOP_TEACHERS, JSON.stringify(teachers))
-  console.log('redis client done')
+const getTopTeachersFromRedis = async semestercode => {
+  const data = await redisClient.hgetAsync(REDIS_TOP_TEACHERS, semestercode)
+  return !data ? [] : JSON.parse(data)
 }
 
-const topTeachers = async () => {
-  const teachers = await redisClient.getAsync(REDIS_TOP_TEACHERS)
-  return !teachers ? [] : JSON.parse(teachers)
+const topTeachers = async semestercode => {
+  const topteachers = await getTopTeachersFromRedis(semestercode)
+  return topteachers
 }
 
 module.exports = {
   bySearchTerm,
   teacherStats,
   yearlyStatistics,
-  topTeachers,
-  updateTopTeachers
+  findTopTeachers,
+  saveTopTeachersToRedis,
+  getTopTeachersFromRedis,
+  topTeachers
 }

@@ -1,11 +1,33 @@
-const { updateTopTeachers } = require('../src/services/teachers')
+const { findTopTeachers, saveTopTeachersToRedis } = require('../src/services/teachers')
 const logger = require('../src/util/logger')
+
+const findAndSaveTeachers = async (startcode, endcode) => {
+  for (let code = startcode; code <= endcode; code++) {
+    logger.info(`Saving top teachers from year ${code}`)
+    const topteachers = await findTopTeachers(code)
+    await saveTopTeachersToRedis(code, topteachers)
+  }
+}
+
+const parseargs = (args, SEPARATOR='=')=> args
+  .filter(arg => arg.includes(SEPARATOR))
+  .reduce((acc, arg) => {
+    const [ key, val ] = arg.split(SEPARATOR)
+    return { 
+      ...acc, 
+      [key.trim()]: val.trim()
+    }
+  }, {})
 
 const run = async () => {
   try {
-    logger.info('Started updating top teachers.')
-    await updateTopTeachers()
-    logger.info('Finished updating top teachers.')
+    const { from, to } = parseargs(process.argv)
+    const start = from
+    const end = to || from
+    if (end < start) {
+      throw Error('"to" -argument has to be less than "from" -argument. ')
+    }
+    await findAndSaveTeachers(start, end)
     process.exit(0)
   } catch (error) {
     logger.error(`Failed to update top teachers: ${error.message}`)
