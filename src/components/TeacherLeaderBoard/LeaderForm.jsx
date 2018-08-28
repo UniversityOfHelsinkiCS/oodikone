@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Segment, Form, Button } from 'semantic-ui-react'
+import { Segment, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, arrayOf, shape } from 'prop-types'
 import { getTopTeachers } from '../../redux/teachersTop'
@@ -22,11 +22,7 @@ class LeaderForm extends Component {
 
   handleChange = (_, { value }) => {
     this.setState({ selected: value })
-  }
-
-  handleSubmit = () => {
-    const { selected } = this.state
-    this.props.getTopTeachers(selected)
+    this.props.getTopTeachers(value)
   }
 
   render() {
@@ -35,17 +31,13 @@ class LeaderForm extends Component {
       <Segment>
         <Form>
           <Form.Dropdown
+            label="Academic year"
             placeholder="Academic year"
             options={yearoptions}
             selection
             search
             value={this.state.selected}
             onChange={this.handleChange}
-          />
-          <Button
-            fluid
-            content="Search"
-            onClick={this.handleSubmit}
           />
         </Form>
       </Segment>
