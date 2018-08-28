@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { shape } from 'prop-types'
 import _ from 'lodash'
-import { Card, Tab } from 'semantic-ui-react'
+import { Card, Tab, Icon } from 'semantic-ui-react'
+import { withRouter } from 'react-router'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
+import styles from '../PopulationQueryCard/populationQueryCard.css'
 
 const statisticsTableTab = (title, statistics) => ({
   menuItem: title,
@@ -20,7 +22,7 @@ const formatStatisticsForTable = (statistics) => {
   return Object.values(statistics).map(({ name, stats, ...rest }) => ({
     ...rest,
     ...stats,
-    name: _.isString(name) ? name : name.en
+    name: _.isString(name) ? name : name.fi
   }))
 }
 
@@ -39,9 +41,16 @@ class TeacherDetails extends Component {
 
       return (
         <div>
-          <Card fluid>
+          <Card fluid className={styles.cardContainer}>
             <Card.Content>
-              <Card.Header content={teacher.name} />
+              <Card.Header className={styles.cardHeader}>
+                {teacher.name}
+                <Icon
+                  name="remove"
+                  className={styles.controlIcon}
+                  onClick={() => this.props.history.goBack()}
+                />
+              </Card.Header>
               <Card.Meta content={teacher.code} />
               <Card.Meta content={teacher.id} />
             </Card.Content>
@@ -53,7 +62,8 @@ class TeacherDetails extends Component {
 }
 
 TeacherDetails.propTypes = {
-  teacher: shape({}).isRequired
+  teacher: shape({}).isRequired,
+  history: shape({}).isRequired
 }
 
-export default TeacherDetails
+export default withRouter(TeacherDetails)
