@@ -195,7 +195,10 @@ const ElementDetails = sequelize.define('element_details',
 )
 
 const STUDY_MODULE_COURSE_TYPES = [8, 9, 10, 11, 17, 18, 19, 20, 33, 40, 41, 42, 43, 44]
-const STUDY_MODULE_HEURISTICS = ['syventävät opinnot', 'muut opinnot', 'opintokokonaisuus', 'perusopinnot', 'aineopinnot', 'pedagogiset opinnot', 'sisältöopinnot', 'kasvatustieteelliset opinnot', 'sivuaine', 'muita opintoja etk-tutkinnossa']
+const STUDY_MODULE_HEURISTICS = [
+  'syventävät opinnot', 'muut opinnot', 'opintokokonaisuus', 'perusopinnot', 'aineopinnot', 'pedagogiset opinnot', 'sisältöopinnot', 'kasvatustieteelliset opinnot', 'sivuaine', 'muita opintoja etk-tutkinnossa',
+  'Varhaiskasvatuksen sisältöalueiden opinnot', 'Ainedidaktiikan opinnot', 'Peruskoulussa opetettavien aineiden monialaiset opinnot '
+]
 
 const Course = sequelize.define('course',
   {
