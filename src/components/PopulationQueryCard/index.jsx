@@ -7,7 +7,6 @@ import styles from './populationQueryCard.css'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
 import { reformatDate } from '../../common'
 
-
 const PopulationQueryCard =
   ({ translate,
     population,
