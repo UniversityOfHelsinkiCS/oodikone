@@ -7,17 +7,21 @@ router.get('/teachers', async (req, res) => {
   res.json(result)
 })
 
+router.get('/teachers/top', async (req, res) => {
+  const { yearcode } = req.query
+  if (!yearcode) {
+    return res.status(422).send('Missing required yearcode query param')
+  }
+  const result = await teachers.topTeachers(yearcode)
+  res.json(result)
+})
+
 router.get('/teachers/stats', async (req, res) => {
   const { providers, semesterStart, semesterEnd } = req.query
   if (!providers || !semesterStart) {
     return res.status(422).send('Missing required query parameters.')
   }
   const result = await teachers.yearlyStatistics(providers, semesterStart, semesterEnd||semesterStart + 1)
-  res.json(result)
-})
-
-router.get('/teachers/top', async (req, res) => {
-  const result = await teachers.topTeachers()
   res.json(result)
 })
 
