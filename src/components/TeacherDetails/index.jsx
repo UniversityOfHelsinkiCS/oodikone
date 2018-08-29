@@ -4,15 +4,12 @@ import _ from 'lodash'
 import { Card, Tab, Icon } from 'semantic-ui-react'
 import { withRouter } from 'react-router'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
+import CoursesTab from './CoursesTab'
 import styles from '../PopulationQueryCard/populationQueryCard.css'
 
 const statisticsTableTab = (title, statistics) => ({
   menuItem: title,
-  render: () => (
-    <Tab.Pane>
-      <TeacherStatisticsTable statistics={statistics} />
-    </Tab.Pane>
-  )
+  render: () => <TeacherStatisticsTable statistics={statistics} />
 })
 
 const formatStatisticsForTable = (statistics) => {
@@ -34,7 +31,10 @@ class TeacherDetails extends Component {
       const { courses, years, semesters } = teacher.statistics
 
       const panes = [
-        statisticsTableTab('Courses', formatStatisticsForTable(courses)),
+        {
+          menuItem: 'Courses',
+          render: () => <CoursesTab courses={courses} semesters={semesters} />
+        },
         statisticsTableTab('Semesters', formatStatisticsForTable(semesters)),
         statisticsTableTab('Years', formatStatisticsForTable(years))
       ]
@@ -55,7 +55,7 @@ class TeacherDetails extends Component {
               <Card.Meta content={teacher.id} />
             </Card.Content>
           </Card>
-          <Tab panes={panes} />
+          <Tab panes={panes} style={{ paddingTop: '0.5rem' }} />
         </div>
       )
     }
