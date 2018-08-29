@@ -173,10 +173,10 @@ describe('optimizedStatisticsOf tests', () => {
       ).toBe(true)
     })
 
-    test('Query result for BSc, Fall 2011 for 1 month should not return student since they do not have any credits yet. ', async () => {
+    test('Query result for BSc, Fall 2011 for 1 month should return student even though do not have any credits yet. ', async () => {
       const query = createQueryObject('2011', SEMESTER.FALL, [elementdetails.bsc.code], 1)
       const { students } = await optimizedStatisticsOf(query)
-      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(false)
+      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(true)
     })
 
   })
