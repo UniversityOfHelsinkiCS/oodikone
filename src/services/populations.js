@@ -186,21 +186,10 @@ const count = (column, count, distinct = false) => {
   )
 }
 
-const studentnumbersWithAllStudyrightElementsAndCreditsBetween = async (studyRights, startDate, endDate, months) => {
-  const creditBeforeDate = dateMonthsFromNow(startDate, months)
+const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, endDate) => {
   const students = await Student.findAll({
     attributes: ['studentnumber'],
     include: [
-      {
-        model: Credit,
-        attributes: [],
-        required: true,
-        where: {
-          attainment_date: {
-            [Op.between]: [startDate, creditBeforeDate]
-          }
-        }
-      },
       {
         model: StudyrightElement,
         attributes: [],
@@ -257,14 +246,14 @@ const formatStudentsForApi = async (students, startDate, endDate) => {
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   }, {
-      students: [],
-      extents: {},
-      semesters: {},
-      transfers: {
-        targets: {},
-        sources: {}
-      }
-    })
+    students: [],
+    extents: {},
+    semesters: {},
+    transfers: {
+      targets: {},
+      sources: {}
+    }
+  })
   return {
     students: result.students,
     transfers: result.transfers,
@@ -280,7 +269,7 @@ const optimizedStatisticsOf = async (query) => {
   const { studyRights, semester, year, months } = query
   const startDate = `${year}-${semesterStart[semester]}`
   const endDate = `${year}-${semesterEnd[semester]}`
-  const studentnumbers = await studentnumbersWithAllStudyrightElementsAndCreditsBetween(studyRights, startDate, endDate, months)
+  const studentnumbers = await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate)
   const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
 
   const studentsWithCombinedOpenUniCredits = await Promise.all(students.map(async st => {
@@ -363,7 +352,7 @@ const bottlenecksOf = async (query) => {
     coursetypes: {}
   }
   const codeduplicates = await getAllDuplicates()
-  const studentnumbers = await studentnumbersWithAllStudyrightElementsAndCreditsBetween(studyRights, startDate, endDate, months)
+  const studentnumbers = await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate)
   const allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
   const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
   const allcoursestatistics = await courses.reduce(async (coursestatistics, course) => {
