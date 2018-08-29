@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Icon, Input, Button, Form } from 'semantic-ui-react'
+import { Segment, Icon, Input, Button, Form, Popup } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
 
 import { creditsAtLeast } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import infoTooltips from '../../common/infotooltips'
 
 class CreditsAtLeast extends Component {
   static propTypes = {
@@ -55,6 +56,11 @@ class CreditsAtLeast extends Component {
                 >
                   set filter
                 </Button>
+              </Form.Field>
+              <Form.Field style={{ floated: 'right' }}>
+                <Popup content={infoTooltips.CreditsAtLeast.en} trigger={<Icon name="info" />} />
+
+
               </Form.Field>
             </Form.Group>
           </Form>
