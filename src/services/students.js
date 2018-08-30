@@ -19,20 +19,17 @@ const byId = async (id) => Student.findByPrimary(id, {
   include: [
     {
       model: Credit,
-      required: true,
+      separate: true,
       include: {
         model: Course,
-        required: true
       }
     },
     {
       model: Studyright,
       include: {
         model: StudyrightElement,
-        required: true,
         include: {
           model: ElementDetails,
-          required: true,
           where: {
             type: {
               [Op.in]: [10, 20]
