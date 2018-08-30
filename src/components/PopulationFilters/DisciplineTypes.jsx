@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Icon, Dropdown, Button, Form, Input } from 'semantic-ui-react'
-import { shape, func, arrayOf, object } from 'prop-types'
+import { Segment, Icon, Dropdown, Button, Form, Input, Popup } from 'semantic-ui-react'
+import { shape, func, arrayOf, object, string } from 'prop-types'
 import _ from 'lodash'
 
+import infoTooltips from '../../common/infotooltips'
 import { courseParticipation } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -14,7 +15,8 @@ class DisciplineTypes extends Component {
     setPopulationFilter: func.isRequired,
     courseTypes: shape({}).isRequired,
     disciplines: shape({}).isRequired,
-    courses: arrayOf(object).isRequired
+    courses: arrayOf(object).isRequired,
+    language: string.isRequired
 
   }
 
@@ -47,6 +49,7 @@ class DisciplineTypes extends Component {
       return (
         <Segment>
           <Form>
+            <Popup content={infoTooltips.PopulationStatistics.Filters.DisciplineTypes[this.props.language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
             <Form.Group inline>
               <Form.Field>
                 <label>Filter by </label>
@@ -113,6 +116,7 @@ class DisciplineTypes extends Component {
                 >
                   set filter
                 </Button>
+
               </Form.Field>
             </Form.Group>
           </Form>
@@ -131,10 +135,11 @@ class DisciplineTypes extends Component {
   }
 }
 
-const mapStateToProps = ({ populationCourses }) => ({
+const mapStateToProps = ({ populationCourses, settings }) => ({
   courseTypes: populationCourses[0].data.coursetypes,
   disciplines: populationCourses[0].data.disciplines,
-  courses: populationCourses[0].data.coursestatistics
+  courses: populationCourses[0].data.coursestatistics,
+  language: settings.language
 })
 
 export default connect(
