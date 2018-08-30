@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Icon, Button, Form, Dropdown } from 'semantic-ui-react'
-import { shape, func, object, arrayOf } from 'prop-types'
+import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
+import { shape, func, object, arrayOf, string } from 'prop-types'
 import moment from 'moment'
 import _ from 'lodash'
 
+import infoTooltips from '../../common/infotooltips'
 import { enrollmentStatus } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -13,7 +14,8 @@ class EnrollmentStatus extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    samples: arrayOf(object).isRequired
+    samples: arrayOf(object).isRequired,
+    language: string.isRequired
   }
 
   state = {
@@ -66,6 +68,7 @@ class EnrollmentStatus extends Component {
       return (
         <Segment>
           <Form>
+            <Popup content={infoTooltips.PopulationStatistics.Filters.EnrollmentStatus[this.props.language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
             <Form.Group inline>
               <Form.Field>
                 <label>Select students that were </label>
@@ -98,6 +101,7 @@ class EnrollmentStatus extends Component {
                 >
                   set filter
                 </Button>
+
               </Form.Field>
             </Form.Group>
           </Form>
@@ -115,9 +119,11 @@ class EnrollmentStatus extends Component {
     )
   }
 }
-
+const mapStateToProps = ({ settings }) => ({
+  language: settings.language
+})
 
 export default connect(
-  null,
+  mapStateToProps,
   { setPopulationFilter, removePopulationFilter }
 )(EnrollmentStatus)

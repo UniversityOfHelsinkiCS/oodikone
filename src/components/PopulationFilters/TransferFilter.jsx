@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Icon, Dropdown, Button, Form } from 'semantic-ui-react'
-import { shape, func } from 'prop-types'
+import { Segment, Icon, Dropdown, Button, Form, Popup } from 'semantic-ui-react'
+import { shape, func, string } from 'prop-types'
 import _ from 'lodash'
 
+import infoTooltips from '../../common/infotooltips'
 import { transferFilter } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -12,7 +13,8 @@ class TransferFilter extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    transfers: shape({}).isRequired
+    transfers: shape({}).isRequired,
+    language: string.isRequired
   }
 
   state = {
@@ -70,6 +72,7 @@ class TransferFilter extends Component {
       return (
         <Segment>
           <Form>
+            <Popup content={infoTooltips.PopulationStatistics.Filters.TransferFilter[this.props.language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
             <Form.Group inline>
               <Form.Field>
                 <label>Students that transferred from </label>
@@ -120,6 +123,7 @@ class TransferFilter extends Component {
                 >
                   set filter
                 </Button>
+
               </Form.Field>
             </Form.Group>
           </Form>
@@ -138,10 +142,11 @@ class TransferFilter extends Component {
   }
 }
 
-const mapStateToProps = ({ populationCourses }) => ({
+const mapStateToProps = ({ populationCourses, settings }) => ({
   courseTypes: populationCourses[0].data.coursetypes,
   disciplines: populationCourses[0].data.disciplines,
-  courses: populationCourses[0].data.coursestatistics
+  courses: populationCourses[0].data.coursestatistics,
+  language: settings.language
 })
 
 export default connect(
