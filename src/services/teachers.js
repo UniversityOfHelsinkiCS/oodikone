@@ -25,10 +25,11 @@ const codeLike = terms => {
   }
 }
 
-const invalidTerm = searchTerm => !searchTerm.trim()
+const matchesId = searchTerm => ({ id: { [Op.eq]: searchTerm }})
 
-const bySearchTerm = async searchTerm => {
-  if (invalidTerm(searchTerm)) {
+const bySearchTerm = async rawTerm => {
+  const searchTerm = rawTerm.trim()
+  if (!searchTerm) {
     return []
   }
   const terms = splitByEmptySpace(searchTerm)
@@ -39,7 +40,8 @@ const bySearchTerm = async searchTerm => {
     where: {
       [Op.or]: [
         nameLike(terms),
-        codeLike(terms)
+        codeLike(terms),
+        matchesId(searchTerm)
       ]
     }
   })
