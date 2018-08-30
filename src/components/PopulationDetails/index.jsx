@@ -67,7 +67,8 @@ class PopulationDetails extends Component {
                   />
                 </Tab.Pane>
               )
-            }]} />)
+            }]}
+        />)
     }
     return (
       <Segment>
