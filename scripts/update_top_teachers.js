@@ -1,11 +1,10 @@
-const { findTopTeachers, saveTopTeachersToRedis } = require('../src/services/teachers')
+const { findAndSaveTopTeachers } = require('../src/services/topteachers')
 const logger = require('../src/util/logger')
 
 const findAndSaveTeachers = async (startcode, endcode) => {
   for (let code = startcode; code <= endcode; code++) {
     logger.info(`Saving top teachers from year ${code}`)
-    const topteachers = await findTopTeachers(code)
-    await saveTopTeachersToRedis(code, topteachers)
+    await findAndSaveTopTeachers(code)
   }
 }
 
