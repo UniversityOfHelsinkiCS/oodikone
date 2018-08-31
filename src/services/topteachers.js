@@ -125,7 +125,7 @@ const findTopTeachers = async (yearcode) => {
 
 const findAndSaveTopTeachers = async yearcode => {
   const { all, openuni } = await findTopTeachers(yearcode)
-  await setTeacherStats(ID.ALL, yearcode, openuni)
+  await setTeacherStats(ID.OPENUNI, yearcode, openuni)
   await setTeacherStats(ID.ALL, yearcode, all)
 }
 
