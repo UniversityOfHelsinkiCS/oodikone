@@ -52,13 +52,7 @@ const mapStateToProps = ({ teachersTop, semesters }) => {
   const years = semesters.data.years || {}
   return {
     isLoading: pending,
-    statistics: data.map(({ id, name, stats }) => ({
-      id,
-      name,
-      credits: stats.credits,
-      failed: stats.failed,
-      passed: stats.passed
-    })),
+    statistics: data,
     yearoptions: Object.values(years)
       .map(({ yearcode, yearname }) => ({
         key: yearcode,
