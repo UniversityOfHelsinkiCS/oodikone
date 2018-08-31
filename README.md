@@ -198,9 +198,9 @@ To update database in oodikone/testing you need to first scp your API and anon s
 The statistics for the teacher leader board have to be calculated separately with a script.
 
 ```
-# Update top teachers for academic years 20 through 60.
-npm run update_top_teachers from=20 to=60
+# Update top teachers for academic years 50 (1999-20) through 70 (2018-19).
+npm run update_top_teachers from=50 to=70
 
 # Omit the to–argument to update teachers just for a single academic year. 
-npm run update_top_teachers from=20
+npm run update_top_teachers from=50
 ```
