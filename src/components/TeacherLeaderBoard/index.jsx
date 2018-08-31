@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Segment, Message } from 'semantic-ui-react'
+import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { func, arrayOf, bool, shape } from 'prop-types'
 import { getSemesters } from '../../redux/semesters'
@@ -27,7 +28,7 @@ class TeacherLeaderBoard extends Component {
                   />
                   <LeaderForm yearoptions={yearoptions} />
                   <Segment>
-                    <TeacherStatisticsTable statistics={statistics} />
+                    <TeacherStatisticsTable statistics={statistics} onClickFn={e => this.props.history.push(`/teachers/${e.target.innerText}`)} />
                   </Segment>
                 </div>
               )
@@ -41,7 +42,8 @@ TeacherLeaderBoard.propTypes = {
   getSemesters: func.isRequired,
   isLoading: bool.isRequired,
   statistics: arrayOf(shape({})).isRequired,
-  yearoptions: arrayOf(shape({})).isRequired
+  yearoptions: arrayOf(shape({})).isRequired,
+  history: shape({}).isRequired
 }
 
 const mapStateToProps = ({ teachersTop, semesters }) => {
@@ -66,4 +68,4 @@ const mapStateToProps = ({ teachersTop, semesters }) => {
   }
 }
 
-export default connect(mapStateToProps, { getSemesters })(TeacherLeaderBoard)
+export default connect(mapStateToProps, { getSemesters })(withRouter(TeacherLeaderBoard))

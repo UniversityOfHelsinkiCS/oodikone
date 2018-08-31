@@ -9,7 +9,7 @@ import styles from '../PopulationQueryCard/populationQueryCard.css'
 
 const statisticsTableTab = (title, statistics) => ({
   menuItem: title,
-  render: () => <TeacherStatisticsTable statistics={statistics} />
+  render: () => <TeacherStatisticsTable statistics={statistics} onClickFn={null} />
 })
 
 const formatStatisticsForTable = (statistics) => {
