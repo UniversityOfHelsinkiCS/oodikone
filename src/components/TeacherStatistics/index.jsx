@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { shape, func, arrayOf, bool } from 'prop-types'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
@@ -92,7 +93,7 @@ class TeacherStatistics extends Component {
           </Segment>
           { display && !pending && (
             <Segment>
-              <TeacherStatisticsTable statistics={statistics} />
+              <TeacherStatisticsTable statistics={statistics} onClickFn={e => this.props.history.push(`/teachers/${e.target.innerText}`)} />
             </Segment>
           )}
         </div>
@@ -107,7 +108,8 @@ TeacherStatistics.propTypes = {
   getSemesters: func.isRequired,
   getProviders: func.isRequired,
   getTeacherStatistics: func.isRequired,
-  pending: bool.isRequired
+  pending: bool.isRequired,
+  history: shape({}).isRequired
 }
 
 const mapStateToProps = (state) => {
@@ -145,4 +147,4 @@ export default connect(mapStateToProps, {
   getProviders,
   getSemesters,
   getTeacherStatistics
-})(TeacherStatistics)
+})(withRouter(TeacherStatistics))
