@@ -20,7 +20,8 @@
     "update_studentnumbers_dev": "NODE_ENV=dev node src/services/doo_api_database_updater/student_list_updater.js",
     "anonymize": "node src/anonymizer/anonymizer.js",
     "seed_migrations": "node scripts/seed_migrations.js",
-    "update_top_teachers": "node scripts/update_top_teachers.js"
+    "update_top_teachers": "node scripts/update_top_teachers.js",
+    "update_students_not_modified_since": "node scripts/update_students_not_modified_since.js"
   },
   "author": "Matti Luukkainen",
   "license": "MIT",
