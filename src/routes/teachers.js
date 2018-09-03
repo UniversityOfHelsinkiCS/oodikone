@@ -17,6 +17,11 @@ router.get('/teachers/top', async (req, res) => {
   res.json(result)
 })
 
+router.get('/teachers/top/categories', async (req, res) => {
+  const result = await topteachers.getCategoriesAndYears()
+  res.json(result)
+})
+
 router.get('/teachers/stats', async (req, res) => {
   const { providers, semesterStart, semesterEnd } = req.query
   if (!providers || !semesterStart) {
