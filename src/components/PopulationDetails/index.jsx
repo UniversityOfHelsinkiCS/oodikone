@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool } from 'prop-types'
-import { Segment, Header, Message, Button, Icon } from 'semantic-ui-react'
+import { Segment, Header, Message, Button, Icon, Tab } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
@@ -42,17 +42,33 @@ class PopulationDetails extends Component {
     let statistics = null
     if (samples) {
       statistics = (
-        <div>
-          <PopulationCreditGainTable
-            sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
-            translate={translate}
-          />
-          <CourseQuarters
-            sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
-            translate={translate}
-          />
-        </div>
-      )
+        <Tab
+          menu={{ pointing: true }}
+          panes={[
+            {
+              menuItem: 'Credits gained',
+              render: () => (
+                <Tab.Pane attached={false}>
+                  <PopulationCreditGainTable
+                    sample={samples.filter(s =>
+                      this.props.selectedStudents.includes(s.studentNumber))}
+                    translate={translate}
+                  />
+                </Tab.Pane>)
+            },
+            {
+              menuItem: 'Quarters',
+              render: () => (
+                <Tab.Pane attached={false}>
+                  <CourseQuarters
+                    sample={samples.filter(s =>
+                      this.props.selectedStudents.includes(s.studentNumber))}
+                    translate={translate}
+                  />
+                </Tab.Pane>
+              )
+            }]}
+        />)
     }
     return (
       <Segment>

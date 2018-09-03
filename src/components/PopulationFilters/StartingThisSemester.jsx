@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Icon, Radio, Button, Form } from 'semantic-ui-react'
-import { shape, func } from 'prop-types'
+import { Segment, Icon, Radio, Button, Form, Popup } from 'semantic-ui-react'
+import { shape, func, string } from 'prop-types'
 
+import infoTooltips from '../../common/infotooltips'
 import { startingThisSemester } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -10,7 +11,8 @@ class StartingThisSemester extends Component {
   static propTypes = {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
-    setPopulationFilter: func.isRequired
+    setPopulationFilter: func.isRequired,
+    language: string.isRequired
   }
 
   state = {
@@ -36,6 +38,7 @@ class StartingThisSemester extends Component {
       return (
         <Segment>
           <Form>
+            <Popup content={infoTooltips.PopulationStatistics.Filters.StartingThisSemester[this.props.language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
             <Form.Group inline>
               <Form.Field>
                 <label>Show only students that</label>
@@ -54,6 +57,7 @@ class StartingThisSemester extends Component {
                 >
                   set filter
                 </Button>
+
               </Form.Field>
             </Form.Group>
           </Form>
@@ -71,8 +75,10 @@ class StartingThisSemester extends Component {
     )
   }
 }
-
+const mapStateToProps = ({ settings }) => ({
+  language: settings.language
+})
 export default connect(
-  null,
+  mapStateToProps,
   { setPopulationFilter, removePopulationFilter }
 )(StartingThisSemester)
