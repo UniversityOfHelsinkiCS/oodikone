@@ -194,7 +194,6 @@ const creditsOf = async (codes) => {
 }
 
 const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
-  const counter = new CourseYearlyStatsCounter()
 
   const calculateStats = (thisSemester, allInstancesUntilSemester) => {
     const studentsThatPassedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c => c.student))))
@@ -215,7 +214,9 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
     const allInstancesUntilFall = allInstancesUntilYear.filter(inst => moment(inst.date).isBefore(String(year + 1) + '-01-15'))
     const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-08-01'))
     let fallStatistics = calculateStats(fallInstances, allInstancesUntilFall)
-    let aa = counter.calculateStats(fallInstances, allInstancesUntilFall) /// TAIKA TAPAHTUU 
+    const counter = new CourseYearlyStatsCounter(fallInstances, allInstancesUntilFall)
+
+    let aa = counter.calculateStats() /// TAIKA TAPAHTUU 
     let springStatistics = calculateStats(springInstances, allInstancesUntilYear)
 
     const passedF = fallInstances.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])

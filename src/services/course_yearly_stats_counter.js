@@ -54,7 +54,7 @@ Courses: [
  Courses: [
      {
         ...courseinfo,
-        programmes: {),
+        programmes: {},
         yearlystats: {
             yearcode: {
                 attempts: {
@@ -99,16 +99,21 @@ const { plainPrint, plainify } = require('../util')
 
 
 class CourseYearlyStatsCounter {
-  constructor() {
-    // this.semesterCredits = semesterCredits,
-    // this.creditsUntilSemester = creditsUntilSemester,
+  constructor(thisSemester, allInstancesUntilSemester) {
+
+    // helpers
+    this.thisSemester = thisSemester // credits from current 
+    this.allInstancesUntilSemester = allInstancesUntilSemester
+    this.studentsPassedThisYear = {}
+    this.studentsFailedThisYear = {}
+
+    // values to return
+
     this.programmes = {
 
     }
     this.attempts = {
-      grades: {
-        all: {}
-      },
+      grades: {},
       passed: {
         all: []
       },
@@ -141,17 +146,36 @@ class CourseYearlyStatsCounter {
     this.time = ''
   }
 
-  calculateStats(thisSemester, allInstancesUntilSemester) {
-    this.setProgrammesFromStats(thisSemester)
-    // ensin generoitaan programmit
-    // sitten työnnetään dataa niin saatanasti, ensin kaikkiin, sitten opiskelijaan liittyvään
-    // programmiin
-    this.setPassedStudents(thisSemester)
+  calculateStats() {
+
+    this.setPassedAndFailedStudents()
+    this.setProgrammesFromStats()
+    plainPrint(this.programmes)
+    this.setAttemptGrades()
+    this.setPassedAttempts()
+    this.setFailedAttempts()
   }
 
-  setPassedAttempts(thisSemester) {
-    const studentsThatPassedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c => c.student))))
-    studentsThatPassedThisYear.map(student => {
+  setPassedAndFailedStudents() {
+    this.studentsPassedThisYear = _.uniq(_.flattenDeep(this.thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c => c.student))))
+    this.studentsFailedThisYear = _.uniq(_.flattenDeep(this.thisSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student))))
+
+  }
+
+  setAttemptGrades() {
+    const allGrades = _.flattenDeep(this.thisSemester.map(inst => inst.credits))
+    this.attempts.grades = allGrades.reduce((abr, attainment) => {
+      abr.all[attainment.grade] ? abr.all[attainment.grade].push(attainment.student_studentnumber) : abr.all[attainment.grade] = [attainment.student_studentnumber]
+      attainment.student.studyright_elements.forEach(el => {
+        if(!abr[el.code]) abr[el.code] = {}
+        abr[el.code][attainment.grade] ? abr[el.code][attainment.grade].push(attainment.student_studentnumber) : abr[el.code][attainment.grade] = [attainment.student_studentnumber]
+      })
+      return abr
+    }, { all: {} })
+  }
+
+  setPassedAttempts() {
+    this.studentsPassedThisYear.map(student => {
       this.attempts.passed.all.push(student.studentnumber)
       student.studyright_elements.forEach(el => {
         this.attempts.passed[el.code] ?
@@ -159,11 +183,21 @@ class CourseYearlyStatsCounter {
           this.attempts.passed[el.code] = [student.studentnumber]
       })
     })
-    console.log(this.attempts.passed)
   }
 
-  setProgrammesFromStats(thisSemester) {
-    _.flattenDeep(thisSemester
+  setFailedAttempts() {
+    this.studentsFailedThisYear.map(student => {
+      this.attempts.failed.all.push(student.studentnumber)
+      student.studyright_elements.forEach(el => {
+        this.attempts.failed[el.code] ?
+          this.attempts.failed[el.code].push(student.studentnumber) :
+          this.attempts.failed[el.code] = [student.studentnumber]
+      })
+    })
+  }
+
+  setProgrammesFromStats() {
+    _.flattenDeep(this.thisSemester
       .map(inst => inst.credits.map(cr => cr.student.studyright_elements))).map(cr => {
       Object.keys(this.programmes).includes(cr.code) ?
         this.programmes[cr.code].amount = this.programmes[cr.code].amount + 1 :
@@ -172,7 +206,6 @@ class CourseYearlyStatsCounter {
           amount: 1
         }
     })
-    console.log(this.programmes)
   }
 }
 
