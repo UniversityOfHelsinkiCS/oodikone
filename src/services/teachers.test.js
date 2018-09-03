@@ -53,6 +53,11 @@ describe('teacher service tests', () => {
       expect(teacherIsInResults(teacher.id, matches)).toBe(true)
     })
 
+    test('Search by `id` should find the teacher', async () => {
+      const matches = await service.bySearchTerm('TID_001')
+      expect(teacherIsInResults(teacher.id, matches)).toBe(true)
+    })
+
   })
 
 })

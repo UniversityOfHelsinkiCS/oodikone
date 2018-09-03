@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const teachers = require('../services/teachers')
+const topteachers = require('../services/topteachers')
 
 router.get('/teachers', async (req, res) => {
   const { searchTerm } = req.query
@@ -8,11 +9,16 @@ router.get('/teachers', async (req, res) => {
 })
 
 router.get('/teachers/top', async (req, res) => {
-  const { yearcode } = req.query
+  const { yearcode, category = topteachers.ID.ALL } = req.query
   if (!yearcode) {
     return res.status(422).send('Missing required yearcode query param')
   }
-  const result = await teachers.topTeachers(yearcode)
+  const result = await topteachers.getTeacherStats(category, yearcode)
+  res.json(result)
+})
+
+router.get('/teachers/top/categories', async (req, res) => {
+  const result = await topteachers.getCategoriesAndYears()
   res.json(result)
 })
 
