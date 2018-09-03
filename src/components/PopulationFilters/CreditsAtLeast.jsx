@@ -1,16 +1,18 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Icon, Input, Button, Form } from 'semantic-ui-react'
-import { shape, func } from 'prop-types'
+import { Segment, Icon, Input, Button, Form, Popup } from 'semantic-ui-react'
+import { shape, func, string } from 'prop-types'
 
 import { creditsAtLeast } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import infoTooltips from '../../common/infotooltips'
 
 class CreditsAtLeast extends Component {
   static propTypes = {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
-    setPopulationFilter: func.isRequired
+    setPopulationFilter: func.isRequired,
+    language: string.isRequired
   }
 
   state = {
@@ -37,6 +39,7 @@ class CreditsAtLeast extends Component {
       return (
         <Segment>
           <Form>
+            <Popup content={infoTooltips.PopulationStatistics.Filters.CreditsAtLeast[this.props.language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
             <Form.Group inline>
               <Form.Field>
                 <label>Show only students with credits at least</label>
@@ -56,6 +59,8 @@ class CreditsAtLeast extends Component {
                   set filter
                 </Button>
               </Form.Field>
+
+
             </Form.Group>
           </Form>
         </Segment>
@@ -72,8 +77,10 @@ class CreditsAtLeast extends Component {
     )
   }
 }
-
+const mapStateToProps = ({ settings }) => ({
+  language: settings.language
+})
 export default connect(
-  null,
+  mapStateToProps,
   { setPopulationFilter, removePopulationFilter }
 )(CreditsAtLeast)

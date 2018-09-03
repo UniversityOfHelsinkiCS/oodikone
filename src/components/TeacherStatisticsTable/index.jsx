@@ -71,7 +71,7 @@ class TeacherStatisticsTable extends Component {
         <Table.Body>
           { this.sortStatistics(statistics).map(({ id, name, credits, passrate }) => (
             <Table.Row key={id}>
-              <Table.Cell content={id} width={1} />
+              <Table.Cell content={id} width={1} onClick={this.props.onClickFn} /> {/* eslint-disable-line*/}
               <Table.Cell content={name} textAlign="left" />
               <Table.Cell content={credits} width={2} />
               <Table.Cell content={`${parseFloat(passrate).toFixed(2)} %`} width={2} />

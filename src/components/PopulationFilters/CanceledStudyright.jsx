@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Dropdown, Icon, Form, Segment, Button } from 'semantic-ui-react'
+import { Dropdown, Icon, Form, Segment, Button, Popup } from 'semantic-ui-react'
 import { shape, func, arrayOf, string } from 'prop-types'
-
+import infoTooltips from '../../common/infotooltips'
 import { canceledStudyright } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -11,7 +11,8 @@ class CanceledStudyright extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    studyrights: arrayOf(string).isRequired
+    studyrights: arrayOf(string).isRequired,
+    language: string.isRequired
   }
 
   state = {
@@ -36,11 +37,13 @@ class CanceledStudyright extends Component {
   }
 
   render() {
-    const { filter } = this.props
+    const { filter, language } = this.props
     if (filter.notSet) {
       return (
         <Segment>
           <Form>
+            <Popup content={infoTooltips.PopulationStatistics.Filters.CanceledStudyright[language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
+
             <Form.Group inline>
               <Form.Field>
                 <label>Filter students that </label>
@@ -63,6 +66,7 @@ class CanceledStudyright extends Component {
                 >
                   set filter
                 </Button>
+
               </Form.Field>
             </Form.Group>
           </Form>
@@ -80,8 +84,9 @@ class CanceledStudyright extends Component {
     )
   }
 }
-const mapStateToProps = ({ populations }) => ({
-  studyrights: populations.query.studyRights
+const mapStateToProps = ({ populations, settings }) => ({
+  studyrights: populations.query.studyRights,
+  language: settings.language
 })
 
 
