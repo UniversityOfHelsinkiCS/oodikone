@@ -3,7 +3,6 @@ import { Segment, Message } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { func, arrayOf, bool, shape, any, string } from 'prop-types'
-import { getSemesters } from '../../redux/semesters'
 import { getTopTeachersCategories } from '../../redux/teachersTopCategories'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import LeaderForm from './LeaderForm'
@@ -12,7 +11,6 @@ class TeacherLeaderBoard extends Component {
     state={}
 
     componentDidMount() {
-      this.props.getSemesters()
       this.props.getTopTeachersCategories()
     }
 
@@ -44,7 +42,6 @@ class TeacherLeaderBoard extends Component {
 }
 
 TeacherLeaderBoard.propTypes = {
-  getSemesters: func.isRequired,
   isLoading: bool.isRequired,
   statistics: arrayOf(shape({})).isRequired,
   yearoptions: arrayOf(shape({})).isRequired,
@@ -75,6 +72,5 @@ const mapStateToProps = ({ teachersTop, teachersTopCategories }) => {
 }
 
 export default connect(mapStateToProps, {
-  getSemesters,
   getTopTeachersCategories
 })(withRouter(TeacherLeaderBoard))
