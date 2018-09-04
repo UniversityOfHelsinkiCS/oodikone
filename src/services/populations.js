@@ -44,7 +44,7 @@ const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnum
     }
   }
 
-  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, highlevelname, startdate, canceldate, extentcode, graduated, graduation_date, studyright_elements }) => ({
+  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, highlevelname, startdate, canceldate, extentcode, graduated, graduation_date, studyright_elements, prioritycode }) => ({
     studyrightid,
     highlevelname,
     extentcode,
@@ -52,7 +52,8 @@ const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnum
     graduationDate: graduation_date,
     studyrightElements: studyright_elements,
     canceldate,
-    graduated: Boolean(graduated)
+    graduated: Boolean(graduated),
+    prioritycode
   }))
 
   semester_enrollments = semester_enrollments || []
@@ -136,7 +137,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       {
         model: Studyright,
         required: true,
-        attributes: ['studyrightid', 'startdate', 'highlevelname', 'extentcode', 'graduated', 'canceldate'],
+        attributes: ['studyrightid', 'startdate', 'highlevelname', 'extentcode', 'graduated', 'canceldate', 'prioritycode'],
         include: [{
           model: StudyrightExtent,
           required: true,
@@ -145,7 +146,9 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         {
           model: StudyrightElement,
           required: true,
-          attributes: ['code']
+          include: {
+            model: ElementDetails
+          }
         }
         ]
       },
@@ -238,6 +241,18 @@ const formatStudentsForApi = async (students, startDate, endDate) => {
       if (studyright.studyright_extent) {
         const { extentcode, name } = studyright.studyright_extent
         stats.extents[extentcode] = { extentcode, name }
+        studyright.studyright_elements.map(element => {
+          if (element.element_detail && element.element_detail.type === 10) {
+            if (!stats.studyrights.degrees.map(d => d.code).includes(element.code)) {
+              stats.studyrights.degrees = [...stats.studyrights.degrees, { code: element.code, name: element.element_detail.name }]
+            }
+          }
+          if (element.element_detail && element.element_detail.type === 20) {
+            if (!stats.studyrights.programmes.map(d => d.code).includes(element.code)) {
+              stats.studyrights.programmes = [...stats.studyrights.programmes, { code: element.code, name: element.element_detail.name }]
+            }
+          }
+        })
       }
     })
     student.semester_enrollments.forEach(({ semestercode, semester }) => {
@@ -245,20 +260,25 @@ const formatStudentsForApi = async (students, startDate, endDate) => {
     })
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
-  }, {
+  },{
     students: [],
     extents: {},
     semesters: {},
     transfers: {
       targets: {},
       sources: {}
+    },
+    studyrights: {
+      degrees: [],
+      programmes: []
     }
   })
   return {
     students: result.students,
     transfers: result.transfers,
     extents: Object.values(result.extents),
-    semesters: Object.values(result.semesters)
+    semesters: Object.values(result.semesters),
+    studyrights: result.studyrights
   }
 }
 
