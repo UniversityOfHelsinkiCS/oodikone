@@ -11,12 +11,12 @@ import { setPopulationFilter, removePopulationFilter } from '../../redux/populat
 const getTotal = students => students.map(student => getStudentTotalCredits(student))
 
 const expectedAmountOfCredits = months => ([
-  [months * 5],
-  [months * 4, (months * 5) - 1],
-  [months * 3, (months * 4) - 1],
-  [months * 2, (months * 3) - 1],
-  [months * 1, (months * 2) - 1],
-  [1, (months * 1) - 1],
+  [Math.ceil(months * (55 / 12))],
+  [Math.ceil(months * (40 / 12)), (Math.ceil(months * (55 / 12)))],
+  [Math.ceil(months * (30 / 12)), Math.ceil(months * (40 / 12))],
+  [Math.ceil(months * (20 / 12)), Math.ceil(months * (30 / 12))],
+  [Math.ceil(months * (10 / 12)), Math.ceil(months * (20 / 12))],
+  [1, Math.ceil(months * (10 / 12))],
   [0, 0]
 ])
 
