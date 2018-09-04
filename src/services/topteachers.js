@@ -77,7 +77,7 @@ const updatedStats = (statistics, teacher, passed, failed, credits) => {
   } else if (failed) {
     return {
       ...stats,
-      passed: stats.failed + 1
+      failed: stats.failed + 1
     }
   } else {
     return stats
