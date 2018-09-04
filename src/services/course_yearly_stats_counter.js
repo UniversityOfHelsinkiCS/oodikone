@@ -53,10 +53,10 @@ Courses: [
 
  Courses: [
      {
-        ...courseinfo,
+        ...courseinfo = {},
         programmes: {},
         yearlystats: {
-            yearcode: {
+            [yearcode/semestercode]: {
                 attempts: {
                     grades: {},
                     attempts: {
@@ -70,7 +70,7 @@ Courses: [
                         failedRetry: {}, // any credit before + failed now
                         failedFirst: {}, // no credit before + failed now
                         passedFirst: {}, // no credit before + passed now (if the student passes again this semester should be in raised grade.)
-                        raisedGrade: {}  // 
+                        raisedGrade: {}  //
                     }
                 }
             } 
@@ -88,125 +88,94 @@ Courses: [
 "failedStudentsThatFailedBefore", 
 "failedStudentsOnFirstTry", 
 "courseLevelPassed",
-"courseLevelFailed"rl,
+"courseLevelFailed",
 "gradeDistribution"
 
 */
 
-const _ = require('lodash')
-const { Credit } = require('../models')
-const { plainPrint, plainify } = require('../util')
-
 
 class CourseYearlyStatsCounter {
-  constructor(thisSemester, allInstancesUntilSemester) {
+  constructor() {
 
-    // helpers
-    this.thisSemester = thisSemester // credits from current 
-    this.allInstancesUntilSemester = allInstancesUntilSemester
-    this.studentsPassedThisYear = {}
-    this.studentsFailedThisYear = {}
-
-    // values to return
-
-    this.programmes = {
-
+    this.statistics = {}
+    this.programmes = {}
+    this.history = {
+      passed: new Set(),
+      failed: new Set(),
+      attempts: new Set()
     }
+  
     this.attempts = {
       grades: {},
-      passed: {
-        all: []
-      },
-      failed: {
-        all: []
-      }
+      passed: [],
+      failed: []
     }
     this.students = {
-      grades: {
-        all: {}
-      },
+      grades: {},
       attempts: {
-        failedRetry: {
-          all: {}
+        failedRetry: {},
+        failedFirst: {},
+        passedFirst: {},
+        raisedGrade: {}
+      }
+    }
+  }
 
-        },
-        failedOnce: {
-          all: {}
+  initProgramme(code, name) {
+    this.programmes[code] = { name, students: [] }
+  }
 
-        },
-        passedFirst: {
-          all: {}
-        },
-        passedAfterFail: {
-          all: {}
+  initGroup(groupcode) {
+    this.statistics[groupcode] = {
+      attempts: {
+        grades: {},
+        passed: [],
+        failed: []
+      },
+      students: {
+        grades: {},
+        attempts: {
+          failedRetry: {},
+          failedFirst: {},
+          passedFirst: {},
+          raisedGrade: {}
         }
       }
-    },
-    this.name = '',
-    this.time = ''
+    }
   }
 
-  calculateStats() {
-
-    this.setPassedAndFailedStudents()
-    this.setProgrammesFromStats()
-    plainPrint(this.programmes)
-    this.setAttemptGrades()
-    this.setPassedAttempts()
-    this.setFailedAttempts()
+  studentHistory(studentnumber) {
+    const attempted = this.history.attempts.has(studentnumber)
+    const passed = this.history.passed.has(studentnumber)
+    const failed = this.history.failed.has(studentnumber)
+    return { attempted, passed, failed }
   }
 
-  setPassedAndFailedStudents() {
-    this.studentsPassedThisYear = _.uniq(_.flattenDeep(this.thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c => c.student))))
-    this.studentsFailedThisYear = _.uniq(_.flattenDeep(this.thisSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student))))
-
+  markStudyProgramme(code, name, studentnumber) {
+    if (!this.programmes[code]) {
+      this.initProgramme(code, name)
+    }
+    const prog = this.programmes[code]
+    prog.students.push(studentnumber)
   }
 
-  setAttemptGrades() {
-    const allGrades = _.flattenDeep(this.thisSemester.map(inst => inst.credits))
-    this.attempts.grades = allGrades.reduce((abr, attainment) => {
-      abr.all[attainment.grade] ? abr.all[attainment.grade].push(attainment.student_studentnumber) : abr.all[attainment.grade] = [attainment.student_studentnumber]
-      attainment.student.studyright_elements.forEach(el => {
-        if(!abr[el.code]) abr[el.code] = {}
-        abr[el.code][attainment.grade] ? abr[el.code][attainment.grade].push(attainment.student_studentnumber) : abr[el.code][attainment.grade] = [attainment.student_studentnumber]
-      })
-      return abr
-    }, { all: {} })
+  markCreditToHistory(studentnumber, passed, failed) {
+    this.history.attempts.add(studentnumber)
+    if (passed) {
+      this.history.passed.add(studentnumber)
+      this.history.failed.delete(studentnumber)
+    }
+    if (failed) {
+      this.history.failed.add(studentnumber)
+    }
   }
 
-  setPassedAttempts() {
-    this.studentsPassedThisYear.map(student => {
-      this.attempts.passed.all.push(student.studentnumber)
-      student.studyright_elements.forEach(el => {
-        this.attempts.passed[el.code] ?
-          this.attempts.passed[el.code].push(student.studentnumber) :
-          this.attempts.passed[el.code] = [student.studentnumber]
-      })
-    })
+  markCreditToGroup(studentnumber, passed, failed, groupcode) {
+    if (!this.statistics[groupcode]) {
+      this.initGroup(groupcode)
+    }
   }
 
-  setFailedAttempts() {
-    this.studentsFailedThisYear.map(student => {
-      this.attempts.failed.all.push(student.studentnumber)
-      student.studyright_elements.forEach(el => {
-        this.attempts.failed[el.code] ?
-          this.attempts.failed[el.code].push(student.studentnumber) :
-          this.attempts.failed[el.code] = [student.studentnumber]
-      })
-    })
-  }
-
-  setProgrammesFromStats() {
-    _.flattenDeep(this.thisSemester
-      .map(inst => inst.credits.map(cr => cr.student.studyright_elements))).map(cr => {
-      Object.keys(this.programmes).includes(cr.code) ?
-        this.programmes[cr.code].amount = this.programmes[cr.code].amount + 1 :
-        this.programmes[cr.code] = {
-          name: cr.element_detail.name,
-          amount: 1
-        }
-    })
-  }
 }
 
 module.exports = { CourseYearlyStatsCounter }
