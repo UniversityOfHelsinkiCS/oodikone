@@ -168,6 +168,34 @@ export const canceledStudyright = (params) => {
   })
 }
 
+export const priorityStudyright = (params) => {
+  const { prioritycode, degree, programme } = params
+  return ({
+    id: uuidv4(),
+    type: 'PriorityStudyright',
+    params: {
+      prioritycode,
+      degree,
+      programme
+    },
+    filter: student =>
+      student.studyrights.some((sr) => {
+        if (sr.prioritycode === prioritycode) {
+          const elements = sr.studyrightElements.map(e => e.code)
+          let bools = []
+          if (degree) {
+            bools = bools.concat(elements.includes(degree) || degree === 'anyDegree')
+          }
+          if (programme) {
+            bools = bools.concat(elements.includes(programme) || programme === 'anyProgramme')
+          }
+          return bools.length > 0 ? bools.every(b => b === true) : false
+        }
+        return false
+      })
+  })
+}
+
 export const presetFilter = preset => ({
   id: preset.id,
   type: 'Preset',
@@ -188,7 +216,8 @@ const typeList = {
   TransferFilter: transferFilter,
   CourseParticipationNTimes: courseParticipationNTimes,
   CanceledStudyright: canceledStudyright,
-  Preset: presetFilter
+  Preset: presetFilter,
+  PriorityStudyright: priorityStudyright
 }
 export const getFilterFunction = (type, params, populationCourses) => {
   switch (type) {
