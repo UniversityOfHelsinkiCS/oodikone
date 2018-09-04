@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const { sequelize, Student, Credit, Course, CourseType, Discipline, ElementDetails, StudyrightElement, Studyright } = require('../models')
+const { sequelize, Student, Credit, Course, CourseType, Discipline, ElementDetails, StudyrightElement, Studyright, Semester } = require('../models')
 const { redisClient } = require('../services/redis')
 const { plainPrint, plainify } = require('../util')
 const Op = Sequelize.Op
@@ -88,34 +88,38 @@ const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) =
 const byCode = code => Course.findByPrimary(code)
 
 const creditsForCourses = (codes) => Credit.findAll({
-  include: {
-    model: Student,
-    attributes: ['studentnumber'],
-    include: {
-      model: StudyrightElement,
-      attributes: ['code'],
-      include: [
-        {
-          model: ElementDetails,
-          attributes: ['name', 'type'],
-          where: {
-            type: {
-              [Op.eq]: 20
+  include: [
+    {
+      model: Student,
+      attributes: ['studentnumber'],
+      include: {
+        model: StudyrightElement,
+        attributes: ['code'],
+        include: [
+          {
+            model: ElementDetails,
+            attributes: ['name', 'type'],
+            where: {
+              type: {
+                [Op.eq]: 20
+              }
+            }
+          },
+          {
+            model: Studyright,
+            attributes: ['prioritycode'],
+            where: {
+              prioritycode: {
+                [Op.eq]: 1
+              }
             }
           }
-        },
-        {
-          model: Studyright,
-          attributes: ['prioritycode'],
-          where: {
-            prioritycode: {
-              [Op.eq]: 1
-            }
-          }
-        }
-      ],
-    }
-  },
+        ],
+      }
+    }, {
+      model: Semester,
+      attributes: ['semestercode', 'name', 'yearcode', 'yearname']
+    }],
   where: {
     course_code: {
       [Op.in]: codes
@@ -171,6 +175,7 @@ const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) =
 const creditsOf = async (codes) => {
 
   const formatCredit = (credit) => {
+    plainPrint(credit)
     const credits = [credit]
     return {
       id: credit.id,
@@ -214,9 +219,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
     const allInstancesUntilFall = allInstancesUntilYear.filter(inst => moment(inst.date).isBefore(String(year + 1) + '-01-15'))
     const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-08-01'))
     let fallStatistics = calculateStats(fallInstances, allInstancesUntilFall)
-    const counter = new CourseYearlyStatsCounter(fallInstances, allInstancesUntilFall)
-
-    let aa = counter.calculateStats() /// TAIKA TAPAHTUU 
+  
     let springStatistics = calculateStats(springInstances, allInstancesUntilYear)
 
     const passedF = fallInstances.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
@@ -444,6 +447,37 @@ const removeDuplicateCode = async (code, duplicate) => {
 const getAllCourseTypes = () => CourseType.findAll()
 const getAllDisciplines = () => Discipline.findAll()
 
+const alternativeCodes = async code => {
+  const alternatives = await getDuplicateCodes(code)
+  return alternatives ? [code, ...Object.keys(alternatives.alt)] : [code]
+}
+
+const parseStudyRightElement = ({ code, element_detail }) => ({
+  code,
+  name: element_detail.name
+})
+
+const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode) => {
+  const codes = await alternativeCodes(coursecode)
+  const credits = await creditsForCourses(codes)
+  const counter = new CourseYearlyStatsCounter()
+  for (let credit of credits) {
+    const { student, semester } = credit
+    const { yearcode } = semester 
+    const { studentnumber, studyright_elements: elements } = student
+    counter.markCreditToHistory(credit)    
+    if (startyearcode <= yearcode && yearcode <= endyearcode) {
+      for (let element of elements) {
+        const { code, name } = parseStudyRightElement(element)
+        counter.markStudyProgramme(code, name, studentnumber)
+      }
+    }
+  }
+  return {
+    programmes: counter.programmes
+  }
+}
+
 module.exports = {
   byCode,
   byName,
@@ -458,5 +492,6 @@ module.exports = {
   getAllDuplicates,
   getMainCode,
   getAllCourseTypes,
-  getAllDisciplines
+  getAllDisciplines,
+  yearlyStatsOfNew
 }
