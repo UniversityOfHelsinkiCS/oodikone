@@ -487,6 +487,11 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
   return counter.getFinalStatistics()
 }
 
+const courseYearlyStats = async (coursecodes, separate, startyearcode, endyearcode) => {
+  const stats = await Promise.all(coursecodes.map(code => yearlyStatsOfNew(code, separate, startyearcode, endyearcode)))
+  return stats
+}
+
 module.exports = {
   byCode,
   byName,
@@ -502,5 +507,6 @@ module.exports = {
   getMainCode,
   getAllCourseTypes,
   getAllDisciplines,
-  yearlyStatsOfNew
+  yearlyStatsOfNew,
+  courseYearlyStats
 }
