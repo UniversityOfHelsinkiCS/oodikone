@@ -1,5 +1,5 @@
-const { Teacher, Credit, Course, Semester, Provider } = require('../models/index')
 const { Op } = require('sequelize')
+const { Teacher, Credit, Course, Semester, Provider } = require('../models/index')
 
 const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 
@@ -22,10 +22,11 @@ const codeLike = terms => {
   }
 }
 
-const invalidTerm = searchTerm => !searchTerm.trim()
+const matchesId = searchTerm => ({ id: { [Op.eq]: searchTerm }})
 
-const bySearchTerm = async searchTerm => {
-  if (invalidTerm(searchTerm)) {
+const bySearchTerm = async rawTerm => {
+  const searchTerm = rawTerm.trim()
+  if (!searchTerm) {
     return []
   }
   const terms = splitByEmptySpace(searchTerm)
@@ -36,7 +37,8 @@ const bySearchTerm = async searchTerm => {
     where: {
       [Op.or]: [
         nameLike(terms),
-        codeLike(terms)
+        codeLike(terms),
+        matchesId(searchTerm)
       ]
     }
   })
@@ -95,6 +97,14 @@ const markCredit = (stats, passed, failed, credits) => {
   }
 }
 
+const parseAndMarkCredit = (stats, key, credit) => {
+  const { passed, failed, credits } = parseCreditInfo(credit)
+  return {
+    ...stats,
+    [key]: markCredit(stats[key], passed, failed, credits)
+  }
+}
+
 const markCreditForSemester = (semesters, credit) => {
   const { passed, failed, credits, semester } = parseCreditInfo(credit)
   const { semestercode, name } = semester
@@ -122,13 +132,15 @@ const markCreditForYear = (years, credit) => {
 }
 
 const markCreditForCourse = (courses, credit) => {
-  const { passed, failed, credits, course } = parseCreditInfo(credit)
+  const { passed, failed, credits, course, semester } = parseCreditInfo(credit)
   const { code, name } = course
-  const { stats, ...rest } = courses[code] || { id: code, name }
+  const { semestercode } = semester
+  const { stats, semesters={}, ...rest } = courses[code] || { id: code, name }
   return {
     ...courses,
     [code]: {
       ...rest,
+      semesters: parseAndMarkCredit(semesters, semestercode, credit),
       stats: markCredit(stats, passed, failed, credits)
     }
   }
@@ -136,7 +148,7 @@ const markCreditForCourse = (courses, credit) => {
 
 const teacherStats = async teacherid => {
   const teacher = await findTeacherCredits(teacherid)
-  const statistics = teacher.credits.reduce(({ semesters, years, courses, ...rest }, credit) => {
+  const statistics = teacher.credits.filter(isRegularCourse).reduce(({ semesters, years, courses, ...rest }, credit) => {
     return {
       ...rest,
       semesters: markCreditForSemester(semesters, credit),
@@ -156,7 +168,7 @@ const teacherStats = async teacherid => {
   }
 }
 
-const activeTeachers = async (providers, yearcodeStart, yearcodeEnd) => {
+const activeTeachers = async (providers, semestercodeStart, semestercodeEnd) => {
   const teachers = Teacher.findAll({
     attributes: ['id'],
     include: {
@@ -184,8 +196,8 @@ const activeTeachers = async (providers, yearcodeStart, yearcodeEnd) => {
           required: true,
           attributes: [],
           where: {
-            yearcode: {
-              [Op.between]: [yearcodeStart, yearcodeEnd]
+            semestercode: {
+              [Op.between]: [semestercodeStart, semestercodeEnd]
             }
           }
         }
@@ -195,7 +207,7 @@ const activeTeachers = async (providers, yearcodeStart, yearcodeEnd) => {
   return teachers.map(({ id }) => id)
 }
 
-const getCredits = (teacherIds, yearcodeStart, yearcodeEnd) => Teacher.findAll({
+const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) => Teacher.findAll({
   attributes: ['name', 'code', 'id'],
   include: {
     model: Credit,
@@ -210,8 +222,8 @@ const getCredits = (teacherIds, yearcodeStart, yearcodeEnd) => Teacher.findAll({
         required: true,
         attributes: ['semestercode', 'name', 'yearname', 'yearcode'],
         where: {
-          yearcode: {
-            [Op.between]: [yearcodeStart, yearcodeEnd]
+          semestercode: {
+            [Op.between]: [semestercodeStart, semestercodeEnd]
           }
         }
       }
@@ -224,14 +236,24 @@ const getCredits = (teacherIds, yearcodeStart, yearcodeEnd) => Teacher.findAll({
   }
 })
 
-const calculateCreditStatistics = credits => credits.reduce((stats, credit) => {
-  const { passed, failed, credits } = parseCreditInfo(credit)
-  return markCredit(stats, passed, failed, credits)
-}, undefined)
+const isRegularCourse = credit => !credit.course ? true : !credit.course.get().is_study_module
 
-const yearlyStatistics = async (providers, yearcodeStart, yearcodeEnd) => {
-  const ids = await activeTeachers(providers, yearcodeStart, yearcodeEnd)
-  const teachers = await getCredits(ids, yearcodeStart, yearcodeEnd)
+const calculateCreditStatistics = credits => credits.reduce((stats, credit) => {
+  if (isRegularCourse(credit)) {
+    const { passed, failed, credits } = parseCreditInfo(credit)
+    return markCredit(stats, passed, failed, credits)
+  } else {
+    return stats
+  }
+}, {
+  passed: 0,
+  failed: 0,
+  credits: 0
+})
+
+const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) => {
+  const ids = await activeTeachers(providers, semestercodeStart, semestercodeEnd)
+  const teachers = await getCredits(ids, semestercodeStart, semestercodeEnd)
   const statistics = teachers.reduce((acc, teacher) => {
     return {
       ...acc,

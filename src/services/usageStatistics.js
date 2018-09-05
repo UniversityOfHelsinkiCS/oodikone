@@ -17,16 +17,12 @@ const wildcarded = url => {
   return url
 }
 
-
-
 const formatForGroup = url => {
   const query = url.indexOf('?')
 
   if (query!==-1) {
     return url.substr(0, query)
   }
-
-
 
   return wildcarded(url)
 }

@@ -1,6 +1,8 @@
 const { Studyright, StudyrightElement, sequelize, ElementDetails } = require('../models')
 const { Op, col, where, fn } = sequelize
 const { getUserElementDetails } = require('./users')
+const { redisClient } = require('./redis')
+
 const _ = require('lodash')
 
 const createStudyright = apiData => Studyright.create(apiData)
@@ -140,8 +142,13 @@ const formatStudyrightElements = (elements, associations) => elements.map(elemen
 }))
 
 const getAllStudyrightElementsAndAssociations = async () => {
-  const [ associations, studyrightelements ] = await Promise.all([ getAssociatedStudyrights(), ElementDetails.findAll() ])
-  return formatStudyrightElements(studyrightelements, associations)
+  let studyrightElements = await redisClient.getAsync('studyrightElements')
+  if (!studyrightElements) {
+    const [ associations, studyrightelements ] = await Promise.all([ getAssociatedStudyrights(), ElementDetails.findAll() ])
+    await redisClient.setAsync('studyrightElements', JSON.stringify(formatStudyrightElements(studyrightelements, associations)))
+    studyrightElements = await redisClient.getAsync('studyrightElements')
+  }
+  return JSON.parse(studyrightElements)
 }
 
 

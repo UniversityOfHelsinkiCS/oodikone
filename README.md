@@ -192,3 +192,15 @@ Anonymizer will create an `anonymized_API` folder structure which can be used as
 These can be used to update database with anonymized data by `npm run update_database_anon file="studentnumbersN.txt"`
 
 To update database in oodikone/testing you need to first scp your API and anon studentnumber list to melkki `scp -r src/anonymized_API melkki.cs.helsinki.fi:./` and `scp studentnumbersN.txt melkki.cs.helsinki.fi` then ssh to oodikone/testing and `scp -r <username>@melkki.cs.helsinki.fi:./anonymized_API ./data` and `scp <username>@melkki.cs.helsinki.fi:./studentnumbersN.txt ./data`. Then use `docker exec -it testing_backend sh` and `npm run update_database_anon file="/data/studentnumbersN.txt"`. (Theres probably a better way to scp files into oodikone but this works aswell).
+
+## Teacher leader board statistics
+
+The statistics for the teacher leader board have to be calculated separately with a script.
+
+```
+# Update top teachers for academic years 50 (1999-20) through 70 (2018-19).
+npm run update_top_teachers from=50 to=70
+
+# Omit the to–argument to update teachers just for a single academic year. 
+npm run update_top_teachers from=50
+```
