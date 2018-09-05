@@ -1,123 +1,19 @@
-/**
-
-OLD: 
-Courses: [
-    {
-        code: ...,
-        programmes: ...,
-        years: [
-            {
-                info: ...,
-                stats: {
-                    programmes: { amount, ... },
-
-                }
-            }
-        ]
-    }
-]
-
- */
-
-/*
- 
- NEW:
- Courses: [
-    {
-        code,
-        alternative_codes,
-        query: {},
-        programmes: {
-            id: {
-            }
-            name: {}
-        },
-        yearlystatistics: {
-            id: {
-                name,
-                statistics: {
-                    studentsThatPassed: [ ...{  }, ]
-                }
-                gradeDistribution: {
-                    all: {},
-                    5: [ ...studentnumbers ]
-                }
-            }
-        }
-
-    }
- ]
- 
-
- EVEN NEWER
-
- Courses: [
-     {
-        ...courseinfo = {},
-        programmes: {},
-        yearlystats: {
-            [yearcode/semestercode]: {
-                attempts: {
-                    grades: {},
-                    attempts: {
-                        passed,
-                        failed
-                    }
-                },
-                students: {
-                    grades: {},
-                    attempts: { // these categories are mutually exclusive - student can only be in ONE of these groups. 
-                        failedRetry: {}, // any credit before + failed now
-                        failedFirst: {}, // no credit before + failed now
-                        passedFirst: {}, // no credit before + passed now (if the student passes again this semester should be in raised grade.)
-                        raisedGrade: {}  //
-                    }
-                }
-            } 
-        }
-     }
- ]
-
-
-/*
-
-"studentsThatPassedThisYear", 
-"studentsThatFailedThisYear", 
-"passedStudentsThatFailedBefore", 
-"passedStudentsOnFirstTry", 
-"failedStudentsThatFailedBefore", 
-"failedStudentsOnFirstTry", 
-"courseLevelPassed",
-"courseLevelFailed",
-"gradeDistribution"
-
-*/
-
+const CATEGORY = {
+  FAIL_FIRST: 'failedFirst',
+  PASS_FIRST: 'passedFirst',
+  FAIL_RETRY: 'failedRetry',
+  PASS_RETRY: 'passedRetry'
+}
 
 class CourseYearlyStatsCounter {
-  constructor() {
 
-    this.statistics = {}
+  constructor() {
+    this.groups = {}
     this.programmes = {}
     this.history = {
       passed: new Set(),
       failed: new Set(),
       attempts: new Set()
-    }
-  
-    this.attempts = {
-      grades: {},
-      passed: [],
-      failed: []
-    }
-    this.students = {
-      grades: {},
-      attempts: {
-        failedRetry: {},
-        failedFirst: {},
-        passedFirst: {},
-        raisedGrade: {}
-      }
     }
   }
 
@@ -125,30 +21,24 @@ class CourseYearlyStatsCounter {
     this.programmes[code] = { name, students: [] }
   }
 
-  initGroup(groupcode) {
-    this.statistics[groupcode] = {
+  initGroup(groupcode, name) {
+    this.groups[groupcode] = {
+      code: groupcode,
+      name,
       attempts: {
         grades: {},
         passed: [],
         failed: []
       },
-      students: {
-        grades: {},
-        attempts: {
-          failedRetry: {},
-          failedFirst: {},
-          passedFirst: {},
-          raisedGrade: {}
-        }
-      }
+      students: {}
     }
   }
 
   studentHistory(studentnumber) {
-    const attempted = this.history.attempts.has(studentnumber)
+    const firstattempt = !this.history.attempts.has(studentnumber)
     const passed = this.history.passed.has(studentnumber)
     const failed = this.history.failed.has(studentnumber)
-    return { attempted, passed, failed }
+    return { firstattempt, passed, failed }
   }
 
   markStudyProgramme(code, name, studentnumber) {
@@ -170,9 +60,68 @@ class CourseYearlyStatsCounter {
     }
   }
 
-  markCreditToGroup(studentnumber, passed, failed, groupcode) {
-    if (!this.statistics[groupcode]) {
-      this.initGroup(groupcode)
+  getCreditCategory(studentnumber, passed, firstattempt) {
+    if (firstattempt) {
+      return passed ? CATEGORY.PASS_FIRST : CATEGORY.FAIL_FIRST
+    } else {
+      return passed ? CATEGORY.PASS_RETRY : CATEGORY.FAIL_RETRY
+    }
+  }
+
+  markCreditToStudents(studentnumber, passed, grade, groupcode) {
+    const { students } = this.groups[groupcode]
+    const { firstattempt } = this.studentHistory(studentnumber)
+    const category = this.getCreditCategory(studentnumber, passed, firstattempt)
+    const student = students[studentnumber]
+    if (!student || passed || student.failed) {
+      students[studentnumber] = { passed, category, grade }
+    }
+  }
+
+  markCreditToGroup(studentnumber, passed, grade, groupcode, groupname) {
+    if (!this.groups[groupcode]) {
+      this.initGroup(groupcode, groupname)
+    }
+    this.markCreditToStudents(studentnumber, passed, grade, groupcode)
+    this.markCreditToAttempts(studentnumber, passed, grade, groupcode)
+  }
+
+  markCreditToAttempts(studentnumber, passed, grade, groupcode) {
+    const { attempts } = this.groups[groupcode]
+    const { grades } = attempts
+    if (!grades[grade]) {
+      grades[grade] = []
+    }
+    grades[grade].push(studentnumber)
+    if (passed) {
+      attempts.passed.push(studentnumber)
+    } else {
+      attempts.failed.push(studentnumber)
+    }
+  }
+
+  formatStudentStatistics(students) {
+    const grades = {}
+    const attempts = {}
+    Object.entries(students).forEach(([studentnumber, stat]) => {
+      const { grade, category } = stat
+      grades[grade] = grades[grade] ? grades[grade].concat(studentnumber) : [studentnumber]
+      attempts[category] = attempts[category] ? attempts[category].concat(studentnumber) : [studentnumber]
+    })
+    return { grades, attempts }
+  }
+
+  formatGroupStatistics() {
+    return Object.values(this.groups).map(({ students, ...rest }) => ({
+      ...rest,
+      students: this.formatStudentStatistics(students)
+    }))
+  }
+
+  getFinalStatistics() {
+    return {
+      programmes: this.programmes,
+      statistics: this.formatGroupStatistics()
     }
   }
 

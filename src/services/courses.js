@@ -2,7 +2,6 @@ const Sequelize = require('sequelize')
 const moment = require('moment')
 const { sequelize, Student, Credit, Course, CourseType, Discipline, ElementDetails, StudyrightElement, Studyright, Semester } = require('../models')
 const { redisClient } = require('../services/redis')
-const { plainPrint, plainify } = require('../util')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../services/course_yearly_stats_counter')
 const _ = require('lodash')
@@ -175,7 +174,6 @@ const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) =
 const creditsOf = async (codes) => {
 
   const formatCredit = (credit) => {
-    plainPrint(credit)
     const credits = [credit]
     return {
       id: credit.id,
@@ -457,25 +455,36 @@ const parseStudyRightElement = ({ code, element_detail }) => ({
   name: element_detail.name
 })
 
+const parseCredit = credit => {
+  const { student, semester, grade } = credit
+  return {
+    student,
+    semester,
+    grade,
+    passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit)
+  }
+}
+
 const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode) => {
   const codes = await alternativeCodes(coursecode)
   const credits = await creditsForCourses(codes)
   const counter = new CourseYearlyStatsCounter()
   for (let credit of credits) {
-    const { student, semester } = credit
-    const { yearcode } = semester 
+    const { student, semester, passed, grade } = parseCredit(credit)
+    const { yearcode, semestercode, name: semestername, yearname } = semester
     const { studentnumber, studyright_elements: elements } = student
-    counter.markCreditToHistory(credit)    
+    const groupcode = separate ? semestercode : yearcode
+    const groupname = separate ? semestername : yearname
     if (startyearcode <= yearcode && yearcode <= endyearcode) {
       for (let element of elements) {
         const { code, name } = parseStudyRightElement(element)
         counter.markStudyProgramme(code, name, studentnumber)
       }
+      counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname)
     }
+    counter.markCreditToHistory(studentnumber, passed)
   }
-  return {
-    programmes: counter.programmes
-  }
+  return counter.getFinalStatistics()
 }
 
 module.exports = {
