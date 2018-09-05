@@ -484,7 +484,12 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
     }
     counter.markCreditToHistory(studentnumber, passed)
   }
-  return counter.getFinalStatistics()
+  const statistics = counter.getFinalStatistics()
+  return {
+    ...statistics,
+    coursecode,
+    alternatives: codes
+  }
 }
 
 const courseYearlyStats = async (coursecodes, separate, startyearcode, endyearcode) => {
