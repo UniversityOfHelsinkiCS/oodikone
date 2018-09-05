@@ -11,7 +11,7 @@ import moment from 'moment'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
-import { extentGraduated } from '../../populationFilters'
+import { extentGraduated, canceledStudyright } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { isInDateFormat, momentFromFormat, reformatDate, isValidYear } from '../../common'
@@ -107,6 +107,7 @@ class PopulationSearchForm extends Component {
       if (this.props.extents.map(e => e.extentcode).includes(34)) {
         this.props.setPopulationFilter(extentGraduated({ extentcode: 34, graduated: 'either', complemented: 'true' }))
       }
+      this.props.setPopulationFilter(canceledStudyright({ studyrights: queryCodes, canceled: 'false' }))
       this.setState({ isLoading: false })
     })
   }
