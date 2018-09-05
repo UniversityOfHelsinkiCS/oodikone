@@ -56,6 +56,16 @@ router.get('/v2/courseyearlystats', async (req, res) => {
   res.json(results)
 })
 
+router.get('/v3/courseyearlystats', async (req, res) => {
+  const { codes, startyearcode, endyearcode, separate=true } = req.query
+  if (!codes || !startyearcode || !endyearcode) {
+    res.status(422).send('Missing required query parameters')
+  } else {
+    const results = await Course.courseYearlyStats(codes, separate, startyearcode, endyearcode)
+    res.json(results)
+  }
+})
+
 router.get('/courses/duplicatecodes', async (req, res) => {
   let results = []
   if (req.query.code) {
