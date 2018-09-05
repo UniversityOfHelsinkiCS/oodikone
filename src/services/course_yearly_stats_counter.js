@@ -49,13 +49,18 @@ class CourseYearlyStatsCounter {
     prog.students.push(studentnumber)
   }
 
-  markCreditToHistory(studentnumber, passed, failed) {
+  markStudyProgrammes(studentnumber, programmes) {
+    programmes.forEach(({ code, name }) => {
+      this.markStudyProgramme(code, name, studentnumber)
+    })
+  }
+
+  markCreditToHistory(studentnumber, passed) {
     this.history.attempts.add(studentnumber)
     if (passed) {
       this.history.passed.add(studentnumber)
       this.history.failed.delete(studentnumber)
-    }
-    if (failed) {
+    } else {
       this.history.failed.add(studentnumber)
     }
   }
@@ -73,6 +78,7 @@ class CourseYearlyStatsCounter {
     const { firstattempt } = this.studentHistory(studentnumber)
     const category = this.getCreditCategory(studentnumber, passed, firstattempt)
     const student = students[studentnumber]
+
     if (!student || passed || student.failed) {
       students[studentnumber] = { passed, category, grade }
     }
@@ -84,6 +90,7 @@ class CourseYearlyStatsCounter {
     }
     this.markCreditToStudents(studentnumber, passed, grade, groupcode)
     this.markCreditToAttempts(studentnumber, passed, grade, groupcode)
+    this.markCreditToHistory(studentnumber, passed)
   }
 
   markCreditToAttempts(studentnumber, passed, grade, groupcode) {

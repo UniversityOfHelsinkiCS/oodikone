@@ -450,18 +450,25 @@ const alternativeCodes = async code => {
   return alternatives ? [code, ...Object.keys(alternatives.alt)] : [code]
 }
 
-const parseStudyRightElement = ({ code, element_detail }) => ({
+const formatStudyrightElement = ({ code, element_detail }) => ({
   code,
   name: element_detail.name
 })
 
 const parseCredit = credit => {
   const { student, semester, grade } = credit
+  const { studentnumber, studyright_elements: elements } = student
+  const { yearcode, yearname, semestercode, name: semestername } = semester
   return {
     student,
-    semester,
+    yearcode,
+    yearname,
+    semestercode,
+    semestername,
     grade,
-    passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit)
+    passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),
+    studentnumber,
+    programmes: elements.map(formatStudyrightElement)
   }
 }
 
@@ -470,19 +477,15 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
   const credits = await creditsForCourses(codes)
   const counter = new CourseYearlyStatsCounter()
   for (let credit of credits) {
-    const { student, semester, passed, grade } = parseCredit(credit)
-    const { yearcode, semestercode, name: semestername, yearname } = semester
-    const { studentnumber, studyright_elements: elements } = student
-    const groupcode = separate ? semestercode : yearcode
-    const groupname = separate ? semestername : yearname
+    const { studentnumber, grade, passed, semestercode, semestername, yearcode, yearname, programmes } = parseCredit(credit)
     if (startyearcode <= yearcode && yearcode <= endyearcode) {
-      for (let element of elements) {
-        const { code, name } = parseStudyRightElement(element)
-        counter.markStudyProgramme(code, name, studentnumber)
-      }
+      const groupcode = separate ? semestercode : yearcode
+      const groupname = separate ? semestername : yearname
+      counter.markStudyProgrammes(studentnumber, programmes)
       counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname)
+    } else {
+      counter.markCreditToHistory(studentnumber, passed)
     }
-    counter.markCreditToHistory(studentnumber, passed)
   }
   const statistics = counter.getFinalStatistics()
   return {
