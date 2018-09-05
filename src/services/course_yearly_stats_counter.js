@@ -35,10 +35,10 @@ class CourseYearlyStatsCounter {
   }
 
   studentHistory(studentnumber) {
-    const firstattempt = !this.history.attempts.has(studentnumber)
+    const attempted = this.history.attempts.has(studentnumber)
     const passed = this.history.passed.has(studentnumber)
     const failed = this.history.failed.has(studentnumber)
-    return { firstattempt, passed, failed }
+    return { attempted, passed, failed }
   }
 
   markStudyProgramme(code, name, studentnumber) {
@@ -56,17 +56,20 @@ class CourseYearlyStatsCounter {
   }
 
   markCreditToHistory(studentnumber, passed) {
-    this.history.attempts.add(studentnumber)
-    if (passed) {
-      this.history.passed.add(studentnumber)
-      this.history.failed.delete(studentnumber)
-    } else {
-      this.history.failed.add(studentnumber)
+    const passedBefore = this.history.passed.has(studentnumber)
+    if (!passedBefore) {
+      this.history.attempts.add(studentnumber)
+      if (passed) {
+        this.history.passed.add(studentnumber)
+        this.history.failed.delete(studentnumber)
+      } else {
+        this.history.failed.add(studentnumber)
+      }
     }
   }
 
-  getCreditCategory(studentnumber, passed, firstattempt) {
-    if (firstattempt) {
+  getCreditCategory(studentnumber, passed, attempted) {
+    if (!attempted) {
       return passed ? CATEGORY.PASS_FIRST : CATEGORY.FAIL_FIRST
     } else {
       return passed ? CATEGORY.PASS_RETRY : CATEGORY.FAIL_RETRY
@@ -75,8 +78,8 @@ class CourseYearlyStatsCounter {
 
   markCreditToStudents(studentnumber, passed, grade, groupcode) {
     const { students } = this.groups[groupcode]
-    const { firstattempt } = this.studentHistory(studentnumber)
-    const category = this.getCreditCategory(studentnumber, passed, firstattempt)
+    const { attempted } = this.studentHistory(studentnumber)
+    const category = this.getCreditCategory(studentnumber, passed, attempted)
     const student = students[studentnumber]
 
     if (!student || passed || student.failed) {
@@ -134,4 +137,4 @@ class CourseYearlyStatsCounter {
 
 }
 
-module.exports = { CourseYearlyStatsCounter }
+module.exports = { CourseYearlyStatsCounter, CATEGORY }
