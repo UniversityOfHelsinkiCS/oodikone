@@ -57,7 +57,7 @@ const semesters = {
 const createQueryObject = (year, semester, codes, months) => ({
   studyRights: codes,
   year,
-  semester,
+  semesters: [semester],
   months
 })
 
