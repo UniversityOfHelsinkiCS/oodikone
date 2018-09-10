@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, arrayOf, shape, bool, string, object } from 'prop-types'
-import { Form, Button, Message, Radio, Dropdown, Icon } from 'semantic-ui-react'
+import { Form, Button, Message, Dropdown, Icon, Checkbox } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
@@ -46,7 +46,7 @@ class PopulationSearchForm extends Component {
 
     const INITIAL_QUERY = {
       year: '2017',
-      semester: 'FALL',
+      semesters: ['FALL'],
       studyRights: [],
       months: this.months('2017', 'FALL')
     }
@@ -66,7 +66,7 @@ class PopulationSearchForm extends Component {
   }
 
   months(year, term) { // eslint-disable-line
-    const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
+    const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')
     return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
   }
 
@@ -121,7 +121,7 @@ class PopulationSearchForm extends Component {
         query: {
           ...query,
           year: reformatDate(year, YEAR_DATE_FORMAT),
-          months: this.months(reformatDate(year, YEAR_DATE_FORMAT), this.state.query.semester)
+          months: this.months(reformatDate(year, YEAR_DATE_FORMAT), this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING')
         }
       })
     } else {
@@ -143,11 +143,13 @@ class PopulationSearchForm extends Component {
 
   handleSemesterSelection = (e, { value }) => {
     const { query } = this.state
+    const semesters = query.semesters.includes(value) ?
+      query.semesters.filter(s => s !== value) : [...query.semesters, value]
     this.setState({
       query: {
         ...query,
-        semester: value,
-        months: this.months(this.state.query.year, value)
+        semesters,
+        months: this.months(this.state.query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING')
       }
     })
   }
@@ -182,7 +184,7 @@ class PopulationSearchForm extends Component {
 
   handleMonthsChange = (value) => {
     const { query } = this.state
-    const months = this.getMonths(query.year, value, this.state.query.semester)
+    const months = this.getMonths(query.year, value, this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING')
     this.setState({
       query: {
         ...query,
@@ -229,9 +231,7 @@ class PopulationSearchForm extends Component {
   renderEnrollmentDateSelector = () => {
     const { translate } = this.props
     const { query, validYear } = this.state
-    const { semester, year } = query
-
-    const semesters = ['FALL', 'SPRING']
+    const { semesters, year } = query
     return (
       <Form.Group key="year" className={style.enrollmentSelectorGroup}>
         <Form.Field error={!validYear} className={style.yearSelect}>
@@ -255,17 +255,25 @@ class PopulationSearchForm extends Component {
         </Form.Field>
         <Form.Field>
           <label>{translate('populationStatistics.semester')}</label>
-          {semesters.map(s => (
-            <Radio
-              className={style.semesterRadio}
-              key={s}
-              label={translate(`populationStatistics.${s}`)}
-              value={s}
-              name="semesterGroup"
-              checked={semester === s}
-              onChange={this.handleSemesterSelection}
-            />
-          ))}
+          <Checkbox
+            className={style.semesterRadio}
+            key="FALL"
+            label={translate(`populationStatistics.${'FALL'}`)}
+            value="FALL"
+            name="semesterGroup"
+            checked={semesters.includes('FALL')}
+            onChange={this.handleSemesterSelection}
+          />
+          <Checkbox
+            className={style.semesterRadio}
+            key="SPRING"
+            label={translate(`populationStatistics.${'SPRING'}`)}
+            value="SPRING"
+            name="semesterGroup"
+            checked={semesters.includes('SPRING')}
+            onChange={this.handleSemesterSelection}
+          />
+
         </Form.Field>
         <Form.Field>
           <label>{translate('populationStatistics.months')}</label>
@@ -274,7 +282,7 @@ class PopulationSearchForm extends Component {
             defaultValue={moment()}
             onChange={value => this.handleMonthsChange(value)}
             isValidDate={current => current.isBefore(moment()) &&
-              current.isAfter(this.getMinSelection(year, semester))}
+              current.isAfter(this.getMinSelection(year, semesters[1] || semesters[0]))}
           />
         </Form.Field>
       </Form.Group>
