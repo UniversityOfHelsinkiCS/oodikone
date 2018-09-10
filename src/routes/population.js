@@ -7,7 +7,7 @@ const StudyrightService = require('../services/studyrights')
 
 router.get('/v2/populationstatistics/courses', async (req, res) => {
   try {
-    if (!req.query.year || !req.query.semester || !req.query.studyRights) {
+    if (!req.query.year || !req.query.semesters || !req.query.studyRights) {
       res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
       return
     }
@@ -70,6 +70,48 @@ router.get('/v2/populationstatistics', async (req, res) => {
     res.status(400).json({ error: e })
   }
 })
+
+router.get('/v3/populationstatistics', async (req, res) => {
+  console.log(req.query.year, req.query.semesters, req.query.studyRights)
+  try {
+    if (!req.query.year || !req.query.semesters || !req.query.studyRights) {
+      res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
+      return
+    }
+
+    if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
+      req.query.studyRights = [req.query.studyRights]
+    }
+    const { admin, czar } = req.decodedToken
+    if (!(admin || czar)) {
+      const user = await User.byUsername(req.decodedToken.userId)
+      const elementdetails = await user.getElementdetails()
+      const elements = new Set(elementdetails.map(element => element.code))
+      if (req.query.studyRights.some(code => !elements.has(code))) {
+        res.status(403).json([])
+        return
+      }
+    }
+
+    if (req.query.months == null) {
+      req.query.months = 12
+    }
+
+    const result = await Population.optimizedStatisticsOf(req.query)
+
+    if (result.error) {
+      res.status(400)
+      return
+    }
+
+    console.log(`request completed ${new Date()}`)
+    res.json(result)
+  } catch (e) {
+    console.log(e)
+    res.status(400).json({ error: e })
+  }
+})
+
 router.get('/v2/populationstatistics/filters', async (req, res) => {
 
   let results = []
