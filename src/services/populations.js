@@ -216,9 +216,9 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
 }
 
 const parseQueryParams = query => {
-  const { semester, year, studyRights, months } = query
-  const startDate = `${year}-${semesterStart[semester]}`
-  const endDate = `${year}-${semesterEnd[semester]}`
+  const { semesters, year, studyRights, months } = query
+  const startDate = semesters.includes('FALL') ? `${year}-${semesterStart[semesters.find(s => s === 'FALL')]}` : `${moment(year).add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
+  const endDate = semesters.includes('SPRING') ? `${moment(year).add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}` : `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
   return {
     studyRights,
     months,
@@ -283,12 +283,11 @@ const formatStudentsForApi = async (students, startDate, endDate) => {
 }
 
 const optimizedStatisticsOf = async (query) => {
-  if (semesterStart[query.semester] === undefined) {
+  if (!query.semesters.map(semester => semester === 'FALL' || semester === 'SPRING').every(e => e === true)) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
-  const { studyRights, semester, year, months } = query
-  const startDate = `${year}-${semesterStart[semester]}`
-  const endDate = `${year}-${semesterEnd[semester]}`
+  const { studyRights, startDate, endDate, months } = parseQueryParams(query)
+
   const studentnumbers = await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate)
   const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
 
@@ -363,7 +362,7 @@ const parseCreditInfo = credit => ({
 })
 
 const bottlenecksOf = async (query) => {
-  if (semesterStart[query.semester] === undefined) {
+  if (!query.semesters.map(semester => semester === 'FALL' || semester === 'SPRING').every(e => e === true)) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
   const { studyRights, startDate, endDate, months } = parseQueryParams(query)

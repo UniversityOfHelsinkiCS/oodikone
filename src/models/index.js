@@ -586,7 +586,7 @@ Student.belongsToMany(CourseRealisation, { through: CourseEnrollment, foreignKey
 Credit.belongsToMany(Teacher, { through: CreditTeacher, foreignKey: 'credit_id' })
 Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id' })
 
-Credit.belongsTo(Semester, { foreignKey: 'semestercode' })
+Credit.belongsTo(Semester, { foreignKey: { name: 'semestercode', allowNull: false } })
 
 module.exports = {
   Student,

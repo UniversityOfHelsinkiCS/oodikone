@@ -1,5 +1,5 @@
 const { forceSyncDatabase } = require('../../../src/database/connection')
-const { sequelize, Student, Course, ElementDetails, StudyrightElement, Studyright, Credit, StudyrightExtent } = require('../../../src/models/index')
+const { sequelize, Student, Course, ElementDetails, StudyrightElement, Studyright, Credit, StudyrightExtent, Semester } = require('../../../src/models/index')
 const { optimizedStatisticsOf } = require('../../../src/services/populations')
 
 const langify = name => ({
@@ -35,10 +35,29 @@ const courses = {
   }
 }
 
+const semesters = {
+  fall: {
+    semestercode: 123,
+    name: { en: 'Autumn 2011', fi: 'Syksy 2011', sv: 'Hösten 2011' },
+    startdate: new Date('2011-07-31'),
+    enddate: new Date('2012-07-30'),
+    yearcode: 62,
+    yearname: '2011-12'
+  },
+  spring: {
+    semestercode: 124,
+    name: { en: 'Spring 2012', fi: 'Kevät 2012', sv: 'Våren 2012' },
+    startdate: new Date('2011-12-31'),
+    enddate: new Date('2012-07-30'),
+    yearcode: 62,
+    yearname: '2011-12'
+  }
+}
+
 const createQueryObject = (year, semester, codes, months) => ({
   studyRights: codes,
   year,
-  semester,
+  semesters: [semester],
   months
 })
 
@@ -81,14 +100,16 @@ describe('optimizedStatisticsOf tests', () => {
     id: 'CREDIT-1',
     student_studentnumber: student.studentnumber,
     course_code: courseinstanceFall.course_code,
-    attainment_date: courseinstanceFall.coursedate
+    attainment_date: courseinstanceFall.coursedate,
+    semestercode: 123
   }
 
   const creditSpring = {
     id: 'CREDIT-2',
     student_studentnumber: student.studentnumber,
     course_code: courseinstanceSpring.course_code,
-    attainment_date: courseinstanceSpring.coursedate
+    attainment_date: courseinstanceSpring.coursedate,
+    semestercode: 124
   }
 
   const studyrightelements = {
@@ -117,22 +138,19 @@ describe('optimizedStatisticsOf tests', () => {
 
     beforeAll(async () => {
       await forceSyncDatabase()
+      await Semester.bulkCreate([semesters.fall, semesters.spring])
       await Student.create(student)
       await Course.create(courses.elements_of_ai)
-      await Credit.create(creditFall)
-      await Credit.create(creditSpring)
-      await ElementDetails.create(elementdetails.bsc)
-      await ElementDetails.create(elementdetails.maths)
-      await ElementDetails.create(elementdetails.cs)
+      await Credit.bulkCreate([creditFall, creditSpring])
+      await ElementDetails.bulkCreate([elementdetails.bsc, elementdetails.maths, elementdetails.cs])
       await StudyrightExtent.create(studyrightextents.bachelors)
       await Studyright.create(studyright)
-      await StudyrightElement.create(studyrightelements.bsc)
-      await StudyrightElement.create(studyrightelements.maths)
+      await StudyrightElement.bulkCreate([studyrightelements.bsc, studyrightelements.maths])
     })
 
     test('Query result for BSc, Fall 2011 for 12 months should contain the student.', async () => {
       const query = createQueryObject('2011', SEMESTER.FALL, [elementdetails.bsc.code], 12)
-      const { students }  = await optimizedStatisticsOf(query)
+      const { students } = await optimizedStatisticsOf(query)
       expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(true)
     })
 
