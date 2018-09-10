@@ -474,7 +474,7 @@ const parseCredit = credit => {
 
 const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode) => {
   const codes = await alternativeCodes(coursecode)
-  const credits = await creditsForCourses(codes)
+  const [credits, course] = await Promise.all([creditsForCourses(codes), Course.findById(coursecode)])
   const counter = new CourseYearlyStatsCounter()
   for (let credit of credits) {
     const { studentnumber, grade, passed, semestercode, semestername, yearcode, yearname, programmes } = parseCredit(credit)
@@ -491,7 +491,8 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
   return {
     ...statistics,
     coursecode,
-    alternatives: codes
+    alternatives: codes,
+    name: course.name.fi
   }
 }
 
