@@ -1,16 +1,16 @@
 import { callController } from '../apiConnection'
 
 export const getPopulationCourses = ({
-  year, semester, studyRights, months, uuid
+  year, semesters, studyRights, months, uuid
 }) => {
   const route = '/v2/populationstatistics/courses'
   const prefix = 'GET_POPULATION_COURSES_'
   const query = {
-    year, semester, studyRights, uuid
+    year, semesters, studyRights, uuid
   }
   const params = {
     year,
-    semester,
+    semesters,
     months,
     studyRights
   }
