@@ -235,14 +235,15 @@ class PopulationSearchForm extends Component {
     return (
       <Form.Group key="year" className={style.enrollmentSelectorGroup}>
         <Form.Field error={!validYear} className={style.yearSelect}>
-          <label>{translate('populationStatistics.enrollmentYear')}</label>
+          <label>Enrollment</label>
           <Datetime
             className={style.yearSelectInput}
             control={Datetime}
             dateFormat={YEAR_DATE_FORMAT}
             timeFormat={false}
+            renderYear={(props, selectableYear) => <td {...props}>{`${selectableYear}-${selectableYear + 1}`}</td>}
             closeOnSelect
-            value={year}
+            value={`${year}-${moment(year).add(1, 'years').format('YYYY')}`}
             isValidDate={isValidYear}
             onChange={this.handleYearSelection}
           />
@@ -254,7 +255,7 @@ class PopulationSearchForm extends Component {
           </Button.Group>
         </Form.Field>
         <Form.Field>
-          <label>{translate('populationStatistics.semester')}</label>
+          <label>Semesters</label>
           <Checkbox
             className={style.semesterRadio}
             key="FALL"
@@ -276,7 +277,7 @@ class PopulationSearchForm extends Component {
 
         </Form.Field>
         <Form.Field>
-          <label>{translate('populationStatistics.months')}</label>
+          <label>Statistics until</label>
           <Datetime
             dateFormat="MMMM YYYY"
             defaultValue={moment()}
