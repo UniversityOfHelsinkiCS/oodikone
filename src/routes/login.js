@@ -24,7 +24,7 @@ const generateToken = async (uid, res) => {
 }
 const sendEmail = async (uid) => {
   if (process.env.SMTP !== undefined) {
-    const message = mailservice.message(uid)
+    const message = mailservice.message1(uid)
     await mailservice.transporter.sendMail(message, (error) => {
       if (error) {
         console.log('Error occurred')
