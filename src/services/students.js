@@ -78,7 +78,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     }
   }
 
-  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, highlevelname, startdate, enddate, extentcode, graduated, graduation_date, studyright_elements }) => ({
+  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, highlevelname, startdate, enddate, canceldate, extentcode, graduated, graduation_date, studyright_elements }) => ({
     studyrightid,
     highlevelname,
     extentcode,
@@ -86,6 +86,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     graduationDate: graduation_date,
     studyrightElements: studyright_elements,
     enddate,
+    canceldate,
     graduated: Boolean(graduated)
   }))
   semester_enrollments = semester_enrollments || []

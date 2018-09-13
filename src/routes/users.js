@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const User = require('../services/users')
 const ElementDetails = require('../services/elementdetails')
+const mailservice = require('../services/mailservice')
 
 router.get('/users', async (req, res) => {
   const results = await User.findAll()
@@ -29,7 +30,23 @@ router.put('/users/:id/toggleczar', async (req, res) => {
     res.status(status).json(result)
   }
 })
+router.post('/email', async (req, res) => {
+  const email = req.body.email
+  if (process.env.SMTP !== undefined && email) {
+    const message = mailservice.message2(email)
+    await mailservice.transporter.sendMail(message, (error) => {
+      if (error) {
+        console.log('Error occurred')
+        res.status(400).end()
+      } else {
+        console.log('Message sent successfully!')
+        res.status(200).end()
+      }
+      mailservice.transporter.close()
+    })
+  }
 
+})
 
 
 router.post('/users/:uid/units/:id', async (req, res) => {
