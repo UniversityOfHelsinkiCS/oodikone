@@ -2,9 +2,8 @@ import React, { Component } from 'react'
 import { func, shape, string, boolean, arrayOf, integer } from 'prop-types'
 import { connect } from 'react-redux'
 import { Segment, Table, Icon } from 'semantic-ui-react'
-import { isEmpty } from 'lodash'
+import { isEmpty, sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
-
 import { getStudent, removeStudentSelection, resetStudent } from '../../redux/students'
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraph from '../CreditAccumulationGraph'
@@ -73,24 +72,28 @@ class StudentDetails extends Component {
   }
 
   renderStudyRights = () => {
-    const { student } = this.props
+    const { student, language } = this.props
     const studyRightHeaders = ['Degree', 'Programme', 'Graduated']
     const studyRightRows = student.studyrights.map((studyright) => {
-      const degrees = studyright.studyrightElements.filter(e => e.element_detail.type === 10)
+      const degrees = sortBy(studyright.studyrightElements, 'enddate').filter(e => e.element_detail.type === 10)
         .map(degree => ({
           startdate: degree.startdate,
           enddate: degree.enddate,
-          name: degree.element_detail.name.en
+          name: degree.element_detail.name[language],
+          graduateionDate: degree.graduationDate,
+          canceldate: degree.canceldate
         }))
-      const programmes = studyright.studyrightElements.filter(e => e.element_detail.type === 20)
+      const programmes = sortBy(studyright.studyrightElements, 'enddate').filter(e => e.element_detail.type === 20)
         .map(programme => ({
           startdate: programme.startdate,
           enddate: programme.enddate,
-          name: programme.element_detail.name.en
+          name: programme.element_detail.name[language]
         }))
       return {
         studyrightid: studyright.studyrightid,
         graduated: studyright.graduated,
+        canceldate: studyright.canceldate,
+        enddate: studyright.enddate,
         elements: { degrees, programmes }
       }
     })
@@ -121,9 +124,13 @@ class StudentDetails extends Component {
                 ))}
               </Table.Cell>
               <Table.Cell>
-                {c.graduated ?
-                  <div><Icon name="check circle outline" color="green" /><p>{c.graduationDate}</p></div>
-                  : <div><Icon name="remove circle outline" color="red" /><p>{c.enddate}</p></div>
+                {c.canceldate ? // eslint-disable-line
+                  <div><p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p></div>
+                  :
+                  c.graduated ?
+                    <div><Icon name="check circle outline" color="green" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
+                    :
+                    <div><Icon name="remove circle outline" color="red" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
                 }
 
               </Table.Cell>
