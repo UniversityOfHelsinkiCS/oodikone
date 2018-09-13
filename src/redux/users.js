@@ -35,6 +35,13 @@ export const toggleCzar = (id) => {
   const method = 'put'
   return callController(route, prefix, null, method)
 }
+export const sendEmail = (email) => {
+  const route = '/email'
+  const prefix = 'SEND_EMAIL_'
+  const data = { email }
+  const method = 'post'
+  return callController(route, prefix, data, method)
+}
 
 const reducer = (state = { data: [] }, action) => {
   switch (action.type) {
@@ -99,6 +106,24 @@ const reducer = (state = { data: [] }, action) => {
         ...state,
         data: state.data.filter(user => user.id !== action.response.id)
           .concat(action.response)
+      }
+    case 'SEND_EMAIL_ATTEMPT':
+      return {
+        pending: true,
+        error: state.error,
+        data: state.data
+      }
+    case 'SEND_EMAIL_SUCCESS':
+      return {
+        pending: false,
+        error: state.error,
+        data: state.data
+      }
+    case 'SEND_EMAIL_FAILURE':
+      return {
+        pending: false,
+        error: state.error,
+        data: state.data
       }
     default:
       return state
