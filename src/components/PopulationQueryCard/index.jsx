@@ -17,7 +17,7 @@ const PopulationQueryCard =
     updating,
     language
   }) => {
-    const { uuid, year, semester, months } = query
+    const { uuid, year, semesters, months } = query
     const { students } = population
     if (students.length > 0) {
       return (
@@ -32,7 +32,7 @@ const PopulationQueryCard =
           </Card.Header>
           <Card.Meta>
             <div className={styles.dateItem}>
-              <Icon name="calendar" size="small" /> {`${translate(`populationStatistics.${semester}`)}/${year}, showing ${months} months.`}
+              <Icon name="calendar" size="small" /> {`${semesters.map(s => translate(`populationStatistics.${s}`))}/${year}-${Number(year) + 1}, showing ${months} months.`}
             </div>
             <div>
               {`${translate('populationStatistics.sampleSize', { amount: students.length })} `}
@@ -67,7 +67,7 @@ const PopulationQueryCard =
         </Card.Header>
         <Card.Meta>
           <div className={styles.dateItem}>
-            <Icon name="calendar" size="small" /> {`${translate(`populationStatistics.${semester}`)}/${year}, showing ${months} months.`}
+            <Icon name="calendar" size="small" /> {`${semesters.map(s => translate(`populationStatistics.${s}`))}/${year}-${Number(year) + 1}, showing ${months} months.`}
           </div>
           <div>
             {`${translate('populationStatistics.sampleSize', { amount: students.length })} `}
