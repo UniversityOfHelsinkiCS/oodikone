@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { withRouter, Redirect } from 'react-router-dom'
-import { Button, Icon, List, Card, Header, Segment, Dropdown, Form, Divider, Image } from 'semantic-ui-react'
+import { Button, Icon, List, Card, Header, Segment, Dropdown, Form, Divider, Image, Confirm } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
 import LanguageChooser from '../LanguageChooser'
-import { getUsers, enableUser, addUserUnit, removeUserUnit, toggleCzar } from '../../redux/users'
+import { getUsers, enableUser, addUserUnit, removeUserUnit, toggleCzar, sendEmail } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { makeSortUsers } from '../../selectors/users'
 import { copyToClipboard } from '../../common'
@@ -13,7 +13,9 @@ import sharedStyles from '../../styles/shared'
 
 class EnableUsers extends Component {
   state = {
-    selected: null
+    selected: null,
+    confirm: false,
+    email: ''
   }
 
   componentDidMount() {
@@ -26,7 +28,12 @@ class EnableUsers extends Component {
     return units.filter(u => !enabledIds.has(u.id))
   }
 
-  enableUser = id => () => this.props.enableUser(id)
+  enableUser = user => () => {
+    if (!user.is_enabled) {
+      this.setState({ confirm: true, email: user.email })
+    }
+    this.props.enableUser(user.id)
+  }
 
   handleCoronation = user => async () => {
     await this.props.toggleCzar(user.id)
@@ -100,6 +107,7 @@ class EnableUsers extends Component {
       ({ key: unit.id, value: unit.id, text: unit.name[language] }))
     return (
       <div>
+
         <Button icon="arrow circle left" content="Back" onClick={this.openUsersPage} />
         <LanguageChooser />
         <Divider />
@@ -172,6 +180,26 @@ class EnableUsers extends Component {
     const { users, error } = this.props
     return error ? null : (
       <Card.Group itemsPerRow={4}>
+        {this.state.confirm ? <Confirm
+          style={{
+            marginTop: 'auto !important',
+            display: 'inline-block !important',
+            position: 'relative',
+            top: '20%',
+            left: '33%'
+          }}
+          open={this.state.confirm}
+          cancelButton="no"
+          confirmButton="send"
+          content="Do you want to notify this person by email?"
+          onCancel={() => { this.setState({ confirm: false }) }}
+          onConfirm={() => {
+            this.setState({ confirm: false })
+            this.props.sendEmail(this.state.email)
+          }}
+          size="small"
+        /> : null}
+
         {users.map(user => (
           <Card raised key={user.id} color={user.is_enabled ? 'green' : 'red'}>
             <Card.Content>
@@ -190,7 +218,7 @@ class EnableUsers extends Component {
                     <Icon name="wrench" />
                   </Button.Content>
                 </Button>
-                <Button animated basic onClick={this.enableUser(user.id)} size="mini">
+                <Button animated basic onClick={this.enableUser(user)} size="mini">
                   <Button.Content hidden>{user.is_enabled ? 'Disable' : 'Enable'}</Button.Content>
                   <Button.Content visible>
                     <Icon color={user.is_enabled ? 'green' : 'red'} name={user.is_enabled ? 'check' : 'remove'} />
@@ -239,6 +267,7 @@ EnableUsers.propTypes = {
   removeUserUnit: func.isRequired,
   getUnits: func.isRequired,
   toggleCzar: func.isRequired,
+  sendEmail: func.isRequired,
   units: arrayOf(shape({
     id: string,
     name: shape({}).isRequired
@@ -271,5 +300,5 @@ const mapStateToProps = ({ locale, users, units, settings }) => ({
 })
 
 export default withRouter(connect(mapStateToProps, {
-  getUsers, enableUser, addUserUnit, removeUserUnit, getUnits, toggleCzar
+  getUsers, enableUser, addUserUnit, removeUserUnit, getUnits, toggleCzar, sendEmail
 })(EnableUsers))
