@@ -21,7 +21,8 @@
     "anonymize": "node src/anonymizer/anonymizer.js",
     "seed_migrations": "node scripts/seed_migrations.js",
     "update_top_teachers": "node scripts/update_top_teachers.js",
-    "update_students_not_modified_since": "node scripts/update_students_not_modified_since.js"
+    "update_students_not_modified_since": "node scripts/update_students_not_modified_since.js",
+    "prepush": "npm run test"
   },
   "author": "Matti Luukkainen",
   "license": "MIT",
@@ -54,6 +55,7 @@
     "dotenv": "^4.0.0",
     "eslint": "^4.19.1",
     "faker": "^4.1.0",
+    "husky": "^0.14.3",
     "jest": "^23.5.0",
     "nock": "^9.6.1",
     "node-status": "^1.0.0",
