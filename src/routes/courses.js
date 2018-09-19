@@ -57,11 +57,12 @@ router.get('/v2/courseyearlystats', async (req, res) => {
 })
 
 router.get('/v3/courseyearlystats', async (req, res) => {
-  const { codes, startyearcode, endyearcode, separate=true } = req.query
-  if (!codes || !startyearcode || !endyearcode) {
+  const { codes, startyearcode, endyearcode, separate: sep } = req.query
+  const separate = !sep ? false : JSON.parse(sep)
+  if (!codes || !startyearcode ) {
     res.status(422).send('Missing required query parameters')
   } else {
-    const results = await Course.courseYearlyStats(JSON.parse(codes), JSON.parse(separate), startyearcode, endyearcode)
+    const results = await Course.courseYearlyStats(codes, separate, startyearcode, endyearcode)
     res.json(results)
   }
 })
