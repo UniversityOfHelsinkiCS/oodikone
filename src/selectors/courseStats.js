@@ -41,7 +41,39 @@ const getAllStudyProgrammes = createSelector([getCourseStats], (courseStats) => 
   ]
 })
 
+const getProgrammesFromProps = (state, { programme, programmes }) => ({ programme, programmes })
+
+const summaryStatistics = createSelector(
+  getCourseStats,
+  getProgrammesFromProps,
+  (s, { programme: code, programmes }) => {
+    const prog = programmes.find(p => p.key === code)
+    const filterStudent = studentnumber => new Set(prog.students).has(studentnumber)
+    return Object.entries(s).map((entry) => {
+      const [coursecode, data] = entry
+      const { statistics, name } = data
+      const summary = {
+        passed: 0,
+        failed: 0
+      }
+      statistics.forEach((groupstat) => {
+        const { passed, failed } = groupstat.attempts.classes
+        summary.passed += passed.filter(filterStudent).length
+        summary.failed += failed.filter(filterStudent).length
+      })
+      const passrate = (100 * summary.passed) / (summary.passed + summary.failed)
+      summary.passrate = !passrate ? null : passrate.toFixed(2)
+      return {
+        coursecode,
+        name,
+        summary
+      }
+    })
+  }
+)
+
 export default {
   getAllStudyProgrammes,
+  summaryStatistics,
   ALL
 }
