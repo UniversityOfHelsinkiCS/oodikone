@@ -36,9 +36,7 @@ class LeaderForm extends Component {
     }
   }
 
-  handleChange = (_, { value, name }) => {
-    this.updateAndSubmitForm({ [name]: value })
-  }
+  handleChange = (e, { value, name }) => this.updateAndSubmitForm({ [name]: value })
 
   render() {
     const { yearoptions, categoryoptions } = this.props
