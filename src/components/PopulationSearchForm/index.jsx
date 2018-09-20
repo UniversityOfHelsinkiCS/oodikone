@@ -214,9 +214,8 @@ class PopulationSearchForm extends Component {
     return Math.ceil(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
   }
 
-  getMinSelection = (year, semester) => { // eslint-disable-line
-    return semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`
-  }
+  getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
+
 
   renderableList = (list) => {
     const { language } = this.props

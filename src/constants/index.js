@@ -36,6 +36,7 @@ import {
   chart35
 
 } from '../styles/variables'
+import { chartblue, red, green } from '../styles/variables/colors'
 
 export const routes = {
   index: { route: '/' },
@@ -66,6 +67,68 @@ export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
 export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
 export const TOKEN_NAME = window.location.pathname.includes('/staging') ? 'staging_token' : window.location.pathname.includes('/testing') ? 'testing_token' : 'token' //eslint-disable-line
+
+export const passRateGraphOptions = (categories, max) => ({
+  chart: {
+    type: 'column'
+  },
+  colors: [chartblue, green, red],
+
+  title: {
+    text: 'Pass rate chart'
+  },
+
+  xAxis: {
+    categories
+  },
+
+  yAxis: {
+    allowDecimals: false,
+    title: {
+      text: 'Number of Students'
+    },
+    max,
+    floor: -max
+  },
+
+  plotOptions: {
+    column: {
+      stacking: 'normal',
+      borderRadius: 3
+    }
+  }
+})
+
+export const gradeGraphOptions = (categories, max) => ({
+  chart: {
+    type: 'column'
+  },
+  colors: [red, chartblue, chartblue, chartblue, chartblue, chartblue, chartblue],
+
+  title: {
+    text: 'Grades'
+  },
+
+  xAxis: {
+    categories
+  },
+
+  yAxis: {
+    allowDecimals: false,
+    title: {
+      text: 'Number of Students'
+    },
+    max,
+    floor: -max
+  },
+
+  plotOptions: {
+    column: {
+      stacking: 'normal',
+      borderRadius: 2
+    }
+  }
+})
 
 export const CHART_COLORS = [
   chart1,
