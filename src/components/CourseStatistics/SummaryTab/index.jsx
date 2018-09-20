@@ -1,16 +1,17 @@
 import React, { Component } from 'react'
-import { Table, Form } from 'semantic-ui-react'
+import { Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { shape, arrayOf, func } from 'prop-types'
+import { shape, arrayOf, func, oneOfType, number, string } from 'prop-types'
 import selectors from '../../../selectors/courseStats'
 import { fields, setValue } from '../../../redux/coursesSummaryForm'
+import CumulativeTable from '../CumulativeTable'
 
 class SummaryTab extends Component {
     handleChange = (e, { name, value }) => this.props.setValue(name, value)
 
     render() {
-      const { statistics } = this.props
-      const options = this.props.programmes.map(p => ({
+      const { statistics, programmes } = this.props
+      const options = programmes.map(p => ({
         ...p,
         label: {
           content: p.size,
@@ -31,13 +32,15 @@ class SummaryTab extends Component {
               value={this.props.form[fields.programme]}
             />
           </Form>
-          <Table
-            headerRow={['Course', 'Passed', 'Failed', 'Passrate']}
-            tableData={statistics}
-            renderBodyRow={({ coursecode, name, summary }) => ({
-              key: coursecode,
-              cells: [name, summary.passed, summary.failed, !summary.passrate ? '' : `${summary.passrate} %`]
-            })}
+          <CumulativeTable
+            categoryName="Course"
+            data={statistics.map(s => ({
+              id: s.coursecode,
+              category: s.name,
+              passed: s.summary.passed,
+              failed: s.summary.failed,
+              passrate: s.summary.passrate
+            }))}
           />
         </div>
       )
@@ -45,7 +48,15 @@ class SummaryTab extends Component {
 }
 
 SummaryTab.propTypes = {
-  statistics: arrayOf(shape({})).isRequired,
+  statistics: arrayOf(shape({
+    coursecode: oneOfType([number, string]),
+    name: string,
+    summary: shape({
+      failed: number,
+      passed: number,
+      passrate: oneOfType([number, string])
+    })
+  })).isRequired,
   programmes: arrayOf(shape({})).isRequired,
   form: shape({}).isRequired,
   setValue: func.isRequired
