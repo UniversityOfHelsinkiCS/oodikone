@@ -23,7 +23,8 @@ const countFilteredStudents = (stat, filter) => Object.entries(stat).reduce((acc
 class SingleCourseStats extends Component {
   state = {
     primary: ALL.value,
-    comparison: undefined
+    comparison: undefined,
+    cumMode: true
   }
 
   getMax = stats => ({
@@ -126,7 +127,9 @@ class SingleCourseStats extends Component {
     const comparison = !programmes[c] ? undefined : c
     return { primary, comparison }
   }
-
+  changeMode = () => {
+    this.setState({ cumMode: !this.state.cumMode })
+  }
 
   render() {
     const { stats } = this.props
@@ -167,7 +170,13 @@ class SingleCourseStats extends Component {
             </Form.Group>
           </Form>
         </Segment>
-        <ResultTabs max={max} primary={statistics.primary} comparison={statistics.comparison} />
+        <ResultTabs
+          max={max}
+          primary={statistics.primary}
+          comparison={statistics.comparison}
+          changeMode={this.changeMode}
+          cumMode={this.state.cumMode}
+        />
       </div>
     )
   }
