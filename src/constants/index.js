@@ -36,7 +36,15 @@ import {
   chart35
 
 } from '../styles/variables'
-import { chartblue, red, green } from '../styles/variables/colors'
+/*
+lightgreen: '#90EE90',
+  chartblue: '#178aa5',
+  chartdarkg: '#367a1c',
+  chartlgreen: '#80e061',
+  chartdarkred: '#a03530',
+  chartlred: '#e2726d'
+*/
+import { chartblue, red, green, chartdarkg, chartlgreen, chartdarkred, chartlred } from '../styles/variables/colors'
 
 export const routes = {
   index: { route: '/' },
@@ -68,7 +76,7 @@ export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
 export const TOKEN_NAME = window.location.pathname.includes('/staging') ? 'staging_token' : window.location.pathname.includes('/testing') ? 'testing_token' : 'token' //eslint-disable-line
 
-export const passRateGraphOptions = (categories, max) => ({
+export const passRateCumGraphOptions = (categories, max) => ({
   chart: {
     type: 'column'
   },
@@ -95,6 +103,37 @@ export const passRateGraphOptions = (categories, max) => ({
     column: {
       stacking: 'normal',
       borderRadius: 3
+    }
+  }
+})
+
+export const passRateStudGraphOptions = (categories, max) => ({
+  chart: {
+    type: 'column'
+  },
+  colors: [chartblue, chartlgreen, chartdarkg, chartlred, chartdarkred],
+
+  title: {
+    text: 'Pass rate chart'
+  },
+
+  xAxis: {
+    categories
+  },
+
+  yAxis: {
+    allowDecimals: false,
+    title: {
+      text: 'Number of Students'
+    },
+    max,
+    floor: -max
+  },
+
+  plotOptions: {
+    column: {
+      stacking: 'normal',
+      borderRadius: 1
     }
   }
 })

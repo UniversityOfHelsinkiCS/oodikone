@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import { Tab, Table, Grid, Header } from 'semantic-ui-react'
-import { shape, string, number, oneOfType, arrayOf } from 'prop-types'
+import { Tab, Table, Grid, Header, Radio, Form } from 'semantic-ui-react'
+import { shape, string, number, oneOfType, arrayOf, func, bool } from 'prop-types'
 
 import _ from 'lodash'
 import StackedBarChart from '../../StackedBarChart'
-import { passRateGraphOptions, gradeGraphOptions } from '../../../constants'
+import { passRateCumGraphOptions, passRateStudGraphOptions, gradeGraphOptions } from '../../../constants'
 
-const StatsTable = ({ stats, name }) => (
+const StatsCumTable = ({ stats, name }) => (
   <div>
     <Header as="h3" content={name} textAlign="center" />
     <Table
@@ -14,18 +14,47 @@ const StatsTable = ({ stats, name }) => (
       tableData={stats}
       renderBodyRow={stat => ({
         key: stat.code,
-        cells: [stat.name, stat.cumulative.categories.passed, stat.cumulative.categories.failed]
+        cells: [
+          stat.name,
+          stat.cumulative.categories.passed,
+          stat.cumulative.categories.failed
+        ]
       })}
     />
   </div>
 )
 
-StatsTable.propTypes = {
+StatsCumTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired
 }
 
-const getPassRateSeriesFromStats = (stats, multiplier = 1, name = '') => {
+const StatsStudTable = ({ stats, name }) => (
+  <div>
+    <Header as="h3" content={name} textAlign="center" />
+    <Table
+      headerRow={['Time', 'Passed on first try', 'Passed after retry', 'Failed on first try', 'Failed after retry']}
+      tableData={stats}
+      renderBodyRow={stat => ({
+        key: stat.code,
+        cells: [
+          stat.name,
+          stat.students.categories.passedFirst,
+          stat.students.categories.passedRetry,
+          stat.students.categories.failedFirst,
+          stat.students.categories.failedRetry
+        ]
+      })}
+    />
+  </div>
+)
+
+StatsStudTable.propTypes = {
+  stats: arrayOf(shape({})).isRequired,
+  name: oneOfType([number, string]).isRequired
+}
+
+const getPassRateCumSeriesFromStats = (stats, multiplier = 1, name = '') => {
   const all = []
   const passed = []
   const failed = []
@@ -54,7 +83,56 @@ const getPassRateSeriesFromStats = (stats, multiplier = 1, name = '') => {
   ]
   return series
 }
-const getGradeSeriesFromStats = (stats, multiplier = 1, name = '') => {
+const getPassRateStudSeriesFromStats = (stats, multiplier = 1, name = '') => {
+  const all = []
+  const failedFirst = []
+  const failedRetry = []
+  const passedFirst = []
+  const passedRetry = []
+  stats.forEach((year) => {
+    const {
+      failedFirst: ff,
+      failedRetry: fr,
+      passedFirst: pf,
+      passedRetry: pr
+    } = year.students.categories
+
+    all.push((ff * multiplier) + (fr * multiplier) + (pf * multiplier) + (pr * multiplier))
+    failedFirst.push(ff * multiplier)
+    failedRetry.push(fr * multiplier)
+    passedFirst.push(pf * multiplier)
+    passedRetry.push(pr * multiplier)
+  })
+  const series = [
+    {
+      name: `${name} all`,
+      data: all,
+      stack: 'a'
+    },
+    {
+      name: `${name} passed on first try`,
+      data: passedFirst,
+      stack: 'b'
+    },
+    {
+      name: `${name} passed after retry`,
+      data: passedRetry,
+      stack: 'b'
+    },
+    {
+      name: `${name} failed on first try`,
+      data: failedFirst,
+      stack: 'c'
+    },
+    {
+      name: `${name} failed after retry`,
+      data: failedRetry,
+      stack: 'c'
+    }
+  ]
+  return series
+}
+const getGradeCumSeriesFromStats = (stats, multiplier = 1, name = '') => {
   const zeros = []
   const grades = {}
 
@@ -112,73 +190,172 @@ const getGradeSeriesFromStats = (stats, multiplier = 1, name = '') => {
   return series
 }
 
+const getGradeStudSeriesFromStats = (stats, multiplier = 1, name = '') => {
+  const zeros = []
+  const grades = {}
+
+  stats.forEach((year) => {
+    const fails = []
+    Object.entries(year.students.grades).forEach(([key, value]) => {
+      if (['Eisa', 'Hyl.', '0', 'Luop'].includes(key)) {
+        fails.push(value)
+      }
+      if (!grades[key]) {
+        grades[key] = []
+      }
+      grades[key].push(value * multiplier)
+    })
+    zeros.push(_.sum(fails) * multiplier)
+  })
+  const seriesData = { 0: zeros, ...grades }
+  const series = [
+    {
+      name: `${name} 0`,
+      data: seriesData['0'],
+      stack: 'a'
+    },
+    {
+      name: `${name} 1`,
+      data: seriesData['1'],
+      stack: 'b'
+    },
+    {
+      name: `${name} 2`,
+      data: seriesData['2'],
+      stack: 'c'
+    },
+    {
+      name: `${name} 3`,
+      data: seriesData['3'],
+      stack: 'd'
+    },
+    {
+      name: `${name} 4`,
+      data: seriesData['4'],
+      stack: 'e'
+    },
+    {
+      name: `${name} 5`,
+      data: seriesData['5'],
+      stack: 'f'
+    },
+    {
+      name: `${name} Hyv.`,
+      data: seriesData['Hyv.'],
+      stack: 'g'
+    }
+  ]
+  return series
+}
+
 class ResultTabs extends Component {
   state = {}
   render() {
-    const { max, primary, comparison } = this.props
+    const { max, primary, comparison, changeMode, cumMode } = this.props
     const { maxPassRateVal, maxGradeVal } = max
+    const passGraphSerie = cumMode ?
+      getPassRateCumSeriesFromStats(primary.stats, 1, 'primary').concat(getPassRateCumSeriesFromStats(comparison ? comparison.stats : [], -1, 'comparison'))
+      :
+      getPassRateStudSeriesFromStats(primary.stats, 1, 'primary').concat(getPassRateStudSeriesFromStats(comparison ? comparison.stats : [], -1, 'comparison'))
+    const graphOptions = cumMode ?
+      passRateCumGraphOptions(primary.stats.map(year =>
+        year.name), maxPassRateVal)
+      :
+      passRateStudGraphOptions(primary.stats.map(year =>
+        year.name), maxPassRateVal)
+
+    const gradeGraphSerie = cumMode ?
+      getGradeCumSeriesFromStats(primary.stats, 1, 'primary').concat(getGradeCumSeriesFromStats(comparison ? comparison.stats : [], -1, 'comparison'))
+      :
+      getGradeStudSeriesFromStats(primary.stats, 1, 'primary').concat(getGradeCumSeriesFromStats(comparison ? comparison.stats : [], -1, 'comparison'))
+
     return (
-      <Tab
-        panes={[
-          {
-            menuItem: 'Table',
-            render: () => (
-              <Grid padded="vertically" columns="equal">
-                <Grid.Row>
-                  {primary && (
-                    <Grid.Column>
-                      <StatsTable name={primary.name} stats={primary.stats} />
-                    </Grid.Column>
-                  )}
-                  {
-                    comparison && (
+      <div>
+        <Form>
+          <Form.Group inline >
+            <Form.Field>
+              <label>Cumulative</label>
+            </Form.Field>
+            <Form.Field>
+              <Radio
+                toggle
+                onChange={changeMode}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>Student</label>
+            </Form.Field>
+          </Form.Group>
+        </Form>
+        <Tab
+          panes={[
+            {
+              menuItem: { key: 'Table', icon: 'table', content: 'Table' },
+              render: () => (
+                <Grid padded="vertically" columns="equal">
+                  <Grid.Row>
+                    {primary && (
                       <Grid.Column>
-                        <StatsTable name={comparison.name} stats={comparison.stats} />
+                        {cumMode ?
+                          <StatsCumTable name={primary.name} stats={primary.stats} />
+                          :
+                          <StatsStudTable name={primary.name} stats={primary.stats} />
+                        }
                       </Grid.Column>
-                    )
-                  }
-                </Grid.Row>
-              </Grid>
-            )
-          },
-          {
-            menuItem: 'Pass rate chart',
-            render: () => (
-              <Grid padded="vertically" columns="equal">
-                <Grid.Row>
-                  {primary && (
-                    <Grid.Column>
-                      <StackedBarChart
-                        options={passRateGraphOptions(primary.stats.map(year =>
-                          year.name), maxPassRateVal)}
-                        series={getPassRateSeriesFromStats(primary.stats, 1, 'primary').concat(getPassRateSeriesFromStats(comparison ? comparison.stats : [], -1, 'comparison'))}
-                      />
-                    </Grid.Column>
-                  )}
-                </Grid.Row>
-              </Grid>
-            )
-          },
-          {
-            menuItem: 'Grade distribution chart',
-            render: () => (
-              <Grid padded="vertically" columns="equal">
-                <Grid.Row>
-                  {primary && (
-                    <Grid.Column>
-                      <StackedBarChart
-                        options={gradeGraphOptions(primary.stats.map(year =>
-                          year.name), maxGradeVal)}
-                        series={getGradeSeriesFromStats(primary.stats, 1, 'primary').concat(getGradeSeriesFromStats(comparison ? comparison.stats : [], -1, 'comparison'))}
-                      />
-                    </Grid.Column>
-                  )}
-                </Grid.Row>
-              </Grid>
-            )
-          }
-        ]}
-      />)
+                    )}
+                    {
+                      comparison && (
+                        <Grid.Column>
+                          {cumMode ?
+                            <StatsCumTable name={primary.name} stats={primary.stats} />
+                            :
+                            <StatsStudTable name={primary.name} stats={primary.stats} />
+                          }
+                        </Grid.Column>
+                      )
+                    }
+                  </Grid.Row>
+                </Grid>
+              )
+            },
+            {
+              menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
+              render: () => (
+                <Grid padded="vertically" columns="equal">
+                  <Grid.Row>
+                    {primary && (
+                      <Grid.Column>
+                        <StackedBarChart
+                          options={graphOptions}
+                          series={passGraphSerie}
+                        />
+                      </Grid.Column>
+                    )}
+                  </Grid.Row>
+                </Grid>
+              )
+            },
+            {
+              menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
+              render: () => (
+                <Grid padded="vertically" columns="equal">
+                  <Grid.Row>
+                    {primary && (
+                      <Grid.Column>
+                        <StackedBarChart
+                          options={gradeGraphOptions(primary.stats.map(year =>
+                            year.name), maxGradeVal)}
+                          series={gradeGraphSerie}
+                        />
+                      </Grid.Column>
+                    )}
+                  </Grid.Row>
+                </Grid>
+              )
+            }
+          ]}
+        />
+      </div>)
   }
 }
 
@@ -196,7 +373,9 @@ ResultTabs.propTypes = {
   max: shape({
     maxPassRateVal: number,
     maxGradeVal: number
-  }).isRequired
+  }).isRequired,
+  changeMode: func.isRequired,
+  cumMode: bool.isRequired
 }
 
 ResultTabs.defaultProps = {
