@@ -22,6 +22,11 @@ import semesters from './semesters'
 import teacherStatistics from './teacherStatistics'
 import teachersTop from './teachersTop'
 import teachersTopCategories from './teachersTopCategories'
+import courseTypes from './coursetypes'
+import courseDisciplines from './coursedisciplines'
+import courseSearch from './coursesearch'
+import courseStats from './coursestats'
+import courseSummaryForm from './coursesSummaryForm'
 
 export default combineReducers({
   locale,
@@ -45,5 +50,10 @@ export default combineReducers({
   semesters,
   teacherStatistics,
   teachersTop,
-  teachersTopCategories
+  teachersTopCategories,
+  courseTypes,
+  courseDisciplines,
+  courseSearch,
+  courseStats,
+  courseSummaryForm
 })
