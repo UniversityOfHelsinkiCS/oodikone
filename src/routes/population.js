@@ -183,4 +183,19 @@ router.get('/v2/populationstatistics/studyprogrammes', async (req, res) => {
   }
 })
 
+router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
+  try {
+    const { admin, czar, userId } = req.decodedToken
+    if (admin || czar) {
+      const studyrights = await StudyrightService.getAssociations()
+      res.json(studyrights)
+    } else {
+      const studyrights = await StudyrightService.getUserAssociations(userId)
+      res.json(studyrights)
+    }
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
 module.exports = router
