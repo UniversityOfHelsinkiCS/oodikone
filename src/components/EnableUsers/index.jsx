@@ -83,7 +83,6 @@ class EnableUsers extends Component {
           }}
           size="small"
         /> : null}
-
         {users.map(user => (
           <Card raised key={user.id} color={user.is_enabled ? 'green' : 'red'}>
             <Card.Content>
