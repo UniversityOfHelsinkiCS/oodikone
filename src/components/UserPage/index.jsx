@@ -1,13 +1,30 @@
 import React, { Component } from 'react'
-import { Button, Card, Divider, Image, Form, Dropdown, List } from 'semantic-ui-react'
+import { Button, Card, Divider, Image, Form, List } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { string, number, shape, bool, arrayOf, func } from 'prop-types'
 import LanguageChooser from '../LanguageChooser'
-import { toggleCzar, addUserUnit, removeUserUnit } from '../../redux/users'
+import { toggleCzar, addUserUnits, removeUserUnit } from '../../redux/users'
+import { getStudyrightElements } from '../../redux/studyrightElements'
+
+const formatToDropdown = elements => Object.values(elements).map(e => ({
+  key: e.code,
+  value: e.code,
+  description: e.code,
+  text: e.name.fi || e.name.en || e.name.sv
+}))
 
 class UserPage extends Component {
     state={
-      selected: null
+      degree: undefined,
+      programme: undefined,
+      specializations: []
+    }
+
+    componentDidMount() {
+      const { studyrightElements } = this.props
+      if (Object.keys(studyrightElements).length === 0) {
+        this.props.getStudyrightElements()
+      }
     }
 
     getDisabledUnits = (units, enabled) => {
@@ -15,26 +32,62 @@ class UserPage extends Component {
       return units.filter(u => !enabledIds.has(u.id))
     }
 
-    handleChange = user => (e, { value }) => {
-      if (!user.elementdetails.find(element => element.code === value)) {
-        this.setState({
-          selected: value
-        })
-      }
-    }
+    handleChange = (e, { name, value }) => this.setState({ [name]: value })
 
     enableAccessRightToUser = userid => async () => {
-      const unit = this.state.selected
-      await this.props.addUserUnit(userid, unit)
+      const { degree, programme, specializations } = this.state
+      const codes = [degree, programme, ...specializations].filter(e => !!e)
+      await this.props.addUserUnits(userid, codes)
       this.setState({
-        selected: null
+        degree: undefined,
+        programme: undefined,
+        specializations: []
       })
     }
 
     handleCoronation = user => async () => {
       await this.props.toggleCzar(user.id)
     }
+
     removeAccess = (uid, unit) => () => this.props.removeUserUnit(uid, unit)
+
+    degreeOptions = () => {
+      const { 10: deg } = this.props.studyrightElements
+      const degrees = !deg ? [] : formatToDropdown(deg)
+      return degrees
+    }
+
+    programmeOptions = () => {
+      const { 10: deg, 20: prog } = this.props.studyrightElements
+      const { degree } = this.state
+      const all = !prog ? [] : formatToDropdown(prog)
+      if (deg && degree) {
+        const data = deg[degree]
+        const assocs = data.associations[20] || {}
+        const filtered = all.filter(({ key }) => !!assocs[key])
+        return filtered
+      }
+      return all
+    }
+
+    specializationOptions = () => {
+      const { 20: prog, 30: specs } = this.props.studyrightElements
+      const { programme } = this.state
+      const all = !specs ? [] : formatToDropdown(specs)
+      if (prog && programme) {
+        const data = prog[programme]
+        const assocs = data.associations[30] || {}
+        const filtered = all.filter(({ key }) => !!assocs[key])
+        return filtered
+      }
+      return all
+    }
+
+    studyelementOptions = () => ({
+      degrees: this.degreeOptions(),
+      programmes: this.programmeOptions(),
+      specializations: this.specializationOptions()
+    })
 
     renderUnitList = (elementdetails, user) => {
       const { language } = this.props
@@ -46,7 +99,7 @@ class UserPage extends Component {
               <List.Content floated="right">
                 <Button basic negative floated="right" onClick={this.removeAccess(user.id, element.code)} content="Remove" size="tiny" />
               </List.Content>
-              <List.Content>{element.name[language]}</List.Content>
+              <List.Content>{element.name[language] || element.name.fi || element.name.en || element.name.sv }</List.Content>
             </List.Item>
             ))}
         </List>
@@ -54,10 +107,8 @@ class UserPage extends Component {
     }
 
     render() {
-      const { user, language, units } = this.props
-      const disabled = this.getDisabledUnits(units, user.elementdetails)
-      const unitOptions = disabled.map(unit =>
-        ({ key: unit.id, value: unit.id, text: unit.name[language] }))
+      const { user, pending } = this.props
+      const options = this.studyelementOptions()
       return (
         <div>
           <Button icon="arrow circle left" content="Back" onClick={this.props.goBack} />
@@ -82,18 +133,44 @@ class UserPage extends Component {
               <Card.Content>
                 <Card.Header content="Enable access" />
                 <Card.Description>
-                  <Form>
-                    <Form.Field>
-                      <Dropdown
+                  <Form loading={pending}>
+                    <Form.Dropdown
+                      name="degree"
+                      label="Degree (optional)"
+                      placeholder="Select specialization"
+                      options={options.degrees}
+                      value={this.state.degree}
+                      onChange={this.handleChange}
+                      fluid
+                      search
+                      selection
+                    />
+                    <Divider />
+                    <Form.Group widths="equal">
+                      <Form.Dropdown
+                        name="programme"
+                        label="Study programme"
                         placeholder="Select unit"
-                        options={unitOptions}
-                        onChange={this.handleChange(user)}
+                        options={options.programmes}
+                        value={this.state.programmes}
+                        onChange={this.handleChange}
                         fluid
                         search
                         selection
-                        value={this.state.selected}
                       />
-                    </Form.Field>
+                      <Form.Dropdown
+                        label="Specialization"
+                        name="specializations"
+                        placeholder="Select specialization"
+                        options={options.specializations}
+                        value={this.state.specializations}
+                        onChange={this.handleChange}
+                        fluid
+                        search
+                        multiple
+                        selection
+                      />
+                    </Form.Group>
                     <Button
                       basic
                       fluid
@@ -139,20 +216,25 @@ UserPage.propTypes = {
     }))
   }).isRequired,
   toggleCzar: func.isRequired,
-  addUserUnit: func.isRequired,
+  addUserUnits: func.isRequired,
   removeUserUnit: func.isRequired,
   language: string.isRequired,
-  units: arrayOf(shape({})).isRequired,
-  goBack: func.isRequired
+  goBack: func.isRequired,
+  getStudyrightElements: func.isRequired,
+  studyrightElements: shape({}).isRequired,
+  pending: bool.isRequired
 }
 
 const mapStateToProps = state => ({
   language: state.settings.language,
-  units: state.units.data
+  units: state.units.data,
+  studyrightElements: state.studyrightElements.data,
+  pending: state.studyrightElements.pending
 })
 
 export default connect(mapStateToProps, {
   toggleCzar,
-  addUserUnit,
-  removeUserUnit
+  addUserUnits,
+  removeUserUnit,
+  getStudyrightElements
 })(UserPage)
