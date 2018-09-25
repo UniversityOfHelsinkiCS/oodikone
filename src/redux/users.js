@@ -21,6 +21,13 @@ export const addUserUnit = (uid, unit) => {
   return callController(route, prefix, data, method)
 }
 
+export const addUserUnits = (uid, codes) => {
+  const route = `/users/${uid}/elements`
+  const data = { codes }
+  const prefix = 'EDIT_USER_UNIT_'
+  return callController(route, prefix, data, 'post')
+}
+
 export const removeUserUnit = (uid, unit) => {
   const route = `/users/${uid}/units/${unit}`
   const prefix = 'EDIT_USER_UNIT_'
