@@ -1,6 +1,9 @@
-const router = require('express').Router()
 const teachers = require('../services/teachers')
 const topteachers = require('../services/topteachers')
+const r = require('./router').routerWithWrapper()
+const { FEATURES } = require('../conf-backend')
+
+const router = FEATURES.ERROR_HANDLER ? r.wrapper : r.router
 
 router.get('/teachers', async (req, res) => {
   const { searchTerm } = req.query
@@ -40,4 +43,4 @@ router.get('/teachers/:id', async (req, res) => {
   res.json(result)
 })
 
-module.exports = router
+module.exports = r.router
