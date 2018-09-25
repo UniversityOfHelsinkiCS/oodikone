@@ -246,7 +246,7 @@ const getFilteredAssociations = async (codes) => {
   const all = await getAssociations()
   Object.entries(all).forEach(([type, courses]) => {
     const picked = _.pick(courses, codes)
-    filtered[type] = Object.values(picked).map((course) => {
+    const filteredCourses = Object.values(picked).map((course) => {
       const associations = {}
       Object.entries(course.associations).forEach(([atype, acourses]) => {
         associations[atype] = _.pick(acourses, codes)
@@ -256,6 +256,7 @@ const getFilteredAssociations = async (codes) => {
         associations
       }
     })
+    filtered[type] = _.groupBy(filteredCourses, 'code')
   })
   return filtered
 }
