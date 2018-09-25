@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize')
 const { User, ElementDetails } = require('../models')
 const UnitService = require('./units')
+const ElementService = require('./elementdetails')
 
 const Op = Sequelize.Op
 
@@ -62,6 +63,12 @@ const findAll = async () => {
   })
 }
 
+const enableElementDetails = async (uid, codes) => {
+  const user = await byId(uid)
+  const elements = await ElementService.byCodes(codes)
+  await user.addElementdetails(elements)
+}
+
 module.exports = {
   byUsername,
   createUser,
@@ -69,5 +76,6 @@ module.exports = {
   findAll,
   byId,
   getUnitsFromElementDetails,
-  getUserElementDetails
+  getUserElementDetails,
+  enableElementDetails
 }
