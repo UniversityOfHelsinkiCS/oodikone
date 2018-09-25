@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, object, bool } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
+import _ from 'lodash'
 
 import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation, updatePopulationStudents } from '../../redux/populations'
@@ -38,8 +39,9 @@ class PopulationSearchHistory extends Component {
       population={populations.data}
       query={populations.query}
       queryId={0}
-      unit={units.data.find(u => u.id === populations.query.studyRights[0])} // Possibly deprecated
-      units={units.data.filter(u => populations.query.studyRights.some(sr => sr === u.id))}
+      unit={units.data[20][populations.query.studyRights[0]]} // Possibly deprecated
+      units={_.flattenDeep(Object.values(units.data).map(u =>
+        Object.values(u))).filter(u => populations.query.studyRights.includes(u.code))}
       removeSampleFn={this.removePopulation}
       updateStudentsFn={() => this.props.updatePopulationStudents(studentNumberList)}
       updating={populations.updating}

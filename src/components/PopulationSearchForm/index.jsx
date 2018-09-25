@@ -15,7 +15,6 @@ import { extentGraduated, canceledStudyright } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { isInDateFormat, momentFromFormat, reformatDate, isValidYear } from '../../common'
-import { makeMapRightsToDropDown } from '../../selectors/populationSearchForm'
 import { setLoading } from '../../redux/graphSpinner'
 import LanguageChooser from '../LanguageChooser'
 import style from './populationSearchForm.css'
@@ -34,8 +33,9 @@ class PopulationSearchForm extends Component {
     setPopulationFilter: func.isRequired,
     clearPopulations: func.isRequired,
     queries: shape({}).isRequired,
-    studyProgrammes: arrayOf(dropdownType), //eslint-disable-line
+    studyProgrammes: shape({}), //eslint-disable-line
     degrees: arrayOf(dropdownType), //eslint-disable-line
+    studyTracks: arrayOf(dropdownType), //eslint-disable-line
     setLoading: func.isRequired,
     extents: arrayOf(object).isRequired,
     pending: bool //eslint-disable-line
@@ -46,7 +46,7 @@ class PopulationSearchForm extends Component {
 
     const INITIAL_QUERY = {
       year: '2017',
-      semesters: ['FALL'],
+      semesters: ['FALL', 'SPRING'],
       studyRights: [],
       months: this.months('2017', 'FALL')
     }
@@ -83,14 +83,8 @@ class PopulationSearchForm extends Component {
   fetchPopulation = () => {
     const { query } = this.state
     let queryCodes = []
-    // ":D"
-    if (query.studyRights.degree && query.studyRights.programme) {
-      queryCodes = [query.studyRights.degree, query.studyRights.programme]
-    } else if (query.studyRights.degree && !query.studyRights.programme) {
-      queryCodes = [query.studyRights.degree]
-    } else if (!query.studyRights.degree && query.studyRights.programme) {
-      queryCodes = [query.studyRights.programme]
-    }
+    queryCodes = [...Object.values(query.studyRights)]
+
     const backendQuery = { ...query, studyRights: queryCodes }
     const uuid = uuidv4()
     const request = { ...backendQuery, uuid }
@@ -175,8 +169,21 @@ class PopulationSearchForm extends Component {
       query: {
         ...query,
         studyRights: {
-          ...query.studyRights,
           programme
+        }
+      }
+    })
+  }
+  handleStudyTrackChange = (e, { value }) => {
+    const { query } = this.state
+    const studyTrack = value
+
+    this.setState({
+      query: {
+        ...query,
+        studyRights: {
+          ...query.studyRights,
+          studyTrack
         }
       }
     })
@@ -222,7 +229,8 @@ class PopulationSearchForm extends Component {
     return list.map((sp) => {
       const shh = {}
       Object.assign(shh, sp)
-      shh.text = sp.text[language]
+      shh.text = `${sp.name[language]} (${sp.code})`
+      shh.value = sp.code
       return shh
     })
   }
@@ -288,44 +296,165 @@ class PopulationSearchForm extends Component {
       </Form.Group>
     )
   }
+  renderStudyProgrammeDropdown = (studyRights, programmesToRender) => (
+    <Form.Field
+      width={6}
+      style={{
+        position: 'relative'
+      }}
+    >
+      <label>Study programme</label>
+
+      <Icon
+        link
+        name="close"
+        style={{
+          position: 'absolute',
+          top: 35,
+          bottom: 0,
+          right: '2.5em',
+          lineHeight: 1,
+          zIndex: 1
+        }}
+        onClick={() => this.handleClear('programme')}
+      />
+      <Dropdown
+        placeholder="Select study programme"
+        search
+        selection
+        noResultsMessage="No selectable study programmes"
+        value={studyRights.programme}
+        options={programmesToRender}
+        onChange={this.handleProgrammeChange}
+        closeOnChange
+      />
+    </Form.Field>
+  )
+  renderAdditionalDegreeOrStudyTrackDropdown = (studyRights, studyTracksToRender, degreesToRender) => { //eslint-disable-line
+    const renderableDegrees = (
+      <Form.Field
+        style={{
+          position: 'relative',
+          minWidth: '22em',
+          width: 'auto'
+        }}
+      >
+        <Icon
+          link
+          name="close"
+          style={{
+            position: 'absolute',
+            top: 35,
+            bottom: 0,
+            right: '2.5em',
+            lineHeight: 1,
+            zIndex: 1
+          }}
+          onClick={() => this.handleClear('degree')}
+        />
+        <label>Degree (Optional)</label>
+        <Dropdown
+          placeholder="Select degree"
+          search
+          floating
+          selection
+          noResultsMessage="No selectable degrees"
+          value={studyRights.degree}
+          options={degreesToRender}
+          onChange={this.handleDegreeChange}
+          closeOnChange
+        />
+      </Form.Field>)
+    const renderableTracks = (
+      <Form.Field
+        style={{
+          position: 'relative',
+          minWidth: '22em',
+          width: 'auto'
+        }}
+      >
+        <Icon
+          link
+          name="close"
+          style={{
+            position: 'absolute',
+            top: 35,
+            bottom: 0,
+            right: '2.5em',
+            lineHeight: 1,
+            zIndex: 1
+          }}
+          onClick={() => this.handleClear('studyTrack')}
+        />
+        <label>Study Track (Optional)</label>
+        <Dropdown
+          placeholder="Select study track"
+          search
+          floating
+          selection
+          noResultsMessage="No selectable study track"
+          value={studyRights.studyTrack}
+          options={studyTracksToRender}
+          onChange={this.handleStudyTrackChange}
+          closeOnChange
+        />
+      </Form.Field>)
+    if (studyRights.programme && degreesToRender.length > 1 && studyTracksToRender.length > 1) {
+      return (
+        <Form.Group>
+          {renderableDegrees}
+          {renderableTracks}
+        </Form.Group>
+      )
+    } else if (studyRights.programme && degreesToRender.length > 1) {
+      return (
+        <div>
+          {renderableDegrees}
+        </div>
+      )
+    } else if (studyRights.programme && studyTracksToRender.length > 1) {
+      return (
+        <div>
+          {renderableTracks}
+        </div>
+      )
+    }
+    return null
+  }
+
 
   renderStudyGroupSelector = () => {
-    const { studyProgrammes, degrees, translate, language } = this.props
+    const { studyProgrammes, language } = this.props
     const { studyRights } = this.state.query
     if (this.props.pending) {
       return (
         <Icon name="spinner" loading size="big" color="black" style={{ marginLeft: '45%' }} />
       )
     }
-    if (!studyProgrammes && !degrees && !this.props.pending) {
+    if (!studyProgrammes && !this.props.pending) {
       return <Message error color="red" header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi" />
     }
 
     let sortedStudyProgrammes = studyProgrammes
     let programmesToRender
     if (studyProgrammes) {
-      sortedStudyProgrammes = _.sortBy(studyProgrammes.filter((s) => {
-        if (studyRights.degree) {
-          return s.associations.includes(studyRights.degree)
-        }
-        return true
-      }), s => s.text[language])
+      sortedStudyProgrammes = _.sortBy(sortedStudyProgrammes, s => s.name[language])
       programmesToRender = this.renderableList(sortedStudyProgrammes)
     }
-
-    let sortedStudyDegrees = degrees
     let degreesToRender
-    if (sortedStudyDegrees) {
-      sortedStudyDegrees = _.sortBy(degrees.filter((d) => {
-        if (studyRights.programme) {
-          return d.associations.includes(studyRights.programme)
-        }
-        return true
-      }), s => s.text[language])
+    if (studyRights.programme) {
+      const sortedStudyDegrees = _.sortBy(studyProgrammes[studyRights.programme].associations['10'], s => s.name[language])
       degreesToRender = this.renderableList(sortedStudyDegrees)
     }
+
+    let studyTracksToRender
+    if (studyRights.programme) {
+      const sortedStudyTracks = _.sortBy(studyProgrammes[studyRights.programme].associations['30'], s => s.name[language])
+      studyTracksToRender = this.renderableList(sortedStudyTracks)
+    }
     return (
-      <Form.Group id="rightGroup" horizontal="true" >
+      <Form.Group horizontal="true" widths={2} >
+
         <Form.Field
           width={1}
           style={{
@@ -333,76 +462,15 @@ class PopulationSearchForm extends Component {
             display: 'inline-block'
           }}
         >
-          <label htmlFor="rightGroup">Language</label>
+          <label>Language</label>
           <LanguageChooser />
         </Form.Field>
-        <Form.Field
-          width={6}
-          style={{
-            position: 'relative',
-            display: 'inline-block'
-          }}
-        >
-          <Icon
-            link
-            name="close"
-            style={{
-              position: 'absolute',
-              top: 22,
-              bottom: 0,
-              margin: 'auto',
-              right: '2.5em',
-              lineHeight: 1,
-              zIndex: 1
-            }}
-            onClick={() => this.handleClear('degree')}
-          />
-          <label htmlFor="rightGroup">Degree</label>
-          <Dropdown
-            placeholder="Select degree"
-            search
-            selection
-            noResultsMessage={translate('populationStatistics.noSelectableStudyRights')}
-            value={studyRights.degree}
-            options={degreesToRender}
-            onChange={this.handleDegreeChange}
-            closeOnChange
-          />
-        </Form.Field>
-        <Form.Field
-          width={6}
-          style={{
-            position: 'relative',
-            display: 'inline-block'
-          }}
-        >
-          <label htmlFor="rightGroup">Study programme</label>
-
-          <Icon
-            link
-            name="close"
-            style={{
-              position: 'absolute',
-              top: 22,
-              bottom: 0,
-              margin: 'auto',
-              right: '2.5em',
-              lineHeight: 1,
-              zIndex: 1
-            }}
-            onClick={() => this.handleClear('programme')}
-          />
-          <Dropdown
-            placeholder="Select study programme"
-            search
-            selection
-            noResultsMessage={translate('populationStatistics.noSelectableStudyRights')}
-            value={studyRights.programme}
-            options={programmesToRender}
-            onChange={this.handleProgrammeChange}
-            closeOnChange
-          />
-        </Form.Field>
+        {this.renderStudyProgrammeDropdown(studyRights, programmesToRender)}
+        {this.renderAdditionalDegreeOrStudyTrackDropdown(
+          studyRights,
+          studyTracksToRender,
+          degreesToRender
+          )}
       </Form.Group>
     )
   }
@@ -446,17 +514,14 @@ class PopulationSearchForm extends Component {
   }
 }
 
-const mapRightsToDropdown = makeMapRightsToDropDown()
 
 const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes, locale }) => {
-  const rawStudyrights = populationDegreesAndProgrammes || []
+  const studyRights = populationDegreesAndProgrammes.data || {}
   const { pending } = populationDegreesAndProgrammes
-  const studyRights = mapRightsToDropdown(rawStudyrights)
   return ({
     language: settings.language,
     queries: populations.query || {},
     translate: getTranslate(locale),
-    degrees: studyRights['10'],
     studyProgrammes: studyRights['20'],
     pending,
     extents: populations.data.extents || []

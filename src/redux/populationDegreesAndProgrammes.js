@@ -9,7 +9,7 @@ const types = {
 }
 
 export const getDegreesAndProgrammes = () => {
-  const route = '/v2/populationstatistics/studyprogrammes'
+  const route = '/v3/populationstatistics/studyprogrammes'
   return callController(route, prefix)
 }
 
