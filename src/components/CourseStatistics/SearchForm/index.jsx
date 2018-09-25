@@ -121,6 +121,7 @@ class SearchForm extends Component {
       ...course,
       selected: !!selectedcourses[course.code]
     }))
+    const disabled = (!fromYear || !toYear || Object.keys(selectedcourses).length === 0)
     const selected = Object.values(selectedcourses).map(course => ({ ...course, selected: true }))
     return !this.state.expanded
       ? (
@@ -164,8 +165,8 @@ class SearchForm extends Component {
                   courses={selected}
                   onSelectCourse={this.toggleCourse}
                 />
-                <Form.Button type="button" basic fluid content="Click here to add courses to your search" onClick={this.toggleCourseView} />
-                <Form.Button type="button" fluid basic primary content="Fetch statistics" onClick={this.submitForm} />
+                <Form.Button type="button" basic fluid primary content="Click here to add courses to your search" onClick={this.toggleCourseView} />
+                <Form.Button type="button" disabled={disabled} fluid basic positive content="Fetch statistics" onClick={this.submitForm} />
               </Form>
             ) : (
               <div>
