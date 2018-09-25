@@ -116,7 +116,8 @@ describe('Marking credit to group', () => {
 
     describe('group attempts tests', () => {
       const { attempts } = counter.groups[groupcode]
-      const { grades, passed, failed } = attempts
+      const { grades, classes } = attempts
+      const { passed, failed } = classes
 
       test('studentnumber and passed grade should be in grades', () => {
         expect(grades).toHaveProperty(PASSGRADE)
@@ -162,7 +163,7 @@ describe('Marking credit to group', () => {
     describe('group attempts tests', () => {
 
       const { attempts } = counter.groups[groupcode]
-      const { passed, failed } = attempts
+      const { passed, failed } = attempts.classes
 
       test('passed should not contain studentnumber', () => {
         expect(passed).not.toContain(studentnumber)
@@ -209,8 +210,8 @@ describe('Marking credit to group', () => {
     })
 
     test('group attempts should show studentnumber in both passed and failed lists', () => {
-      expect(attempts.passed).toContain(studentnumber)
-      expect(attempts.failed).toContain(studentnumber)
+      expect(attempts.classes.passed).toContain(studentnumber)
+      expect(attempts.classes.failed).toContain(studentnumber)
     })
 
     test('student history should contain correct values for student', () => {

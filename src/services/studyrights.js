@@ -2,10 +2,11 @@ const { Studyright, StudyrightElement, sequelize, ElementDetails } = require('..
 const { Op, col, where, fn } = sequelize
 const { getUserElementDetails } = require('./users')
 const { redisClient } = require('./redis')
-
 const _ = require('lodash')
 
 const createStudyright = apiData => Studyright.create(apiData)
+
+const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS'
 
 const byStudent = (studentNumber) => {
   return Studyright.findAll({
@@ -151,7 +152,6 @@ const getAllStudyrightElementsAndAssociations = async () => {
   return JSON.parse(studyrightElements)
 }
 
-
 const getStudyrightElementsAndAssociationsForUser = async username => {
   const studyrightelements = await getUserElementDetails(username)
   if (studyrightelements.length === 0) {
@@ -172,6 +172,97 @@ const getAllDegreesAndProgrammes = async () => {
   return formatStudyrightElements(elementDetails)
 }
 
+const associatedStudyrightElements = async (offset, limit) => {
+  const studyrights = await Studyright.findAll({
+    attributes: [],
+    include: {
+      model: StudyrightElement,
+      attributes: ['id', 'code'],
+      include: {
+        model: ElementDetails,
+        attributes: ['type', 'name', 'code']
+      },
+    },
+    limit,
+    offset
+  })
+  const groupings = studyrights.map(({ studyright_elements: sres }) => sres.map(sre => sre.element_detail.get()))
+  return groupings
+}
+
+const calculateAssociationsFromDb = async (chunksize=100000, codes=[10, 20, 30]) => {
+  const total = await Studyright.count()
+  let offset = 0
+  const isValid = ({ type }) => new Set(codes).has(type)
+  const types = {}
+  while(offset <= total) {
+    console.log(`${offset}/${total}`)
+    const elementgroups = await associatedStudyrightElements(offset, chunksize)
+    elementgroups
+      .forEach(group => {
+        group.filter(isValid).forEach(({ type, code, name }) => {
+          const elements = types[type] || (types[type] = {})
+          const element = elements[code] || (elements[code] = { code, name, type, associations: {}})
+          group.filter(e => e.code !== code).forEach(e => {
+            const associations = element.associations[e.type] || ( element.associations[e.type] = {})
+            if (!associations[e.code]) {
+              associations[e.code] = { code: e.code, name: e.name, type: e.type }            
+            }
+          })
+        })
+      })
+    offset += chunksize
+  }
+  return types
+}
+
+const saveAssociationsToRedis = async associations => {
+  await redisClient.setAsync(REDIS_KEY, JSON.stringify(associations))
+}
+
+const getAssociationsFromRedis = async () => {
+  const raw = await redisClient.getAsync(REDIS_KEY)
+  return raw && JSON.parse(raw)
+}
+
+const getAssociations = async (doRefresh=false) => {
+  const studyrights = await getAssociationsFromRedis()
+  if (!studyrights || doRefresh) {
+    const associations = await calculateAssociationsFromDb()
+    await saveAssociationsToRedis(associations)
+    return associations
+  } else {
+    return studyrights
+  }
+}
+
+const getFilteredAssociations = async (codes) => {
+  const filtered = {}
+  const all = await getAssociations()
+  Object.entries(all).forEach(([type, courses]) => {
+    const picked = _.pick(courses, codes)
+    filtered[type] = Object.values(picked).map((course) => {
+      const associations = {}
+      Object.entries(course.associations).forEach(([atype, acourses]) => {
+        associations[atype] = _.pick(acourses, codes)
+      })
+      return {
+        ...course,
+        associations
+      }
+    })
+  })
+  return filtered
+}
+
+const getUserAssociations = async (userid) => {
+  const elements = await getUserElementDetails(userid)
+  const codes = elements.map(e => e.code)
+  const associations = await getFilteredAssociations(codes)
+  return associations
+}
+
+
 module.exports = {
   byStudent,
   createStudyright,
@@ -180,5 +271,9 @@ module.exports = {
   getAssociatedStudyrights,
   getAllStudyrightElementsAndAssociations,
   getStudyrightElementsAndAssociationsForUser,
-  getAllDegreesAndProgrammes
+  getAllDegreesAndProgrammes,
+  getAssociations,
+  associatedStudyrightElements,
+  getFilteredAssociations,
+  getUserAssociations
 }

@@ -27,8 +27,10 @@ class CourseYearlyStatsCounter {
       name,
       attempts: {
         grades: {},
-        passed: [],
-        failed: []
+        classes: {
+          passed: [],
+          failed: []
+        }
       },
       students: {}
     }
@@ -81,7 +83,6 @@ class CourseYearlyStatsCounter {
     const { attempted } = this.studentHistory(studentnumber)
     const category = this.getCreditCategory(studentnumber, passed, attempted)
     const student = students[studentnumber]
-
     if (!student || passed || student.failed) {
       students[studentnumber] = { passed, category, grade }
     }
@@ -98,27 +99,27 @@ class CourseYearlyStatsCounter {
 
   markCreditToAttempts(studentnumber, passed, grade, groupcode) {
     const { attempts } = this.groups[groupcode]
-    const { grades } = attempts
+    const { grades, classes } = attempts
     if (!grades[grade]) {
       grades[grade] = []
     }
     grades[grade].push(studentnumber)
     if (passed) {
-      attempts.passed.push(studentnumber)
+      classes.passed.push(studentnumber)
     } else {
-      attempts.failed.push(studentnumber)
+      classes.failed.push(studentnumber)
     }
   }
 
   formatStudentStatistics(students) {
     const grades = {}
-    const attempts = {}
+    const classes = {}
     Object.entries(students).forEach(([studentnumber, stat]) => {
       const { grade, category } = stat
       grades[grade] = grades[grade] ? grades[grade].concat(studentnumber) : [studentnumber]
-      attempts[category] = attempts[category] ? attempts[category].concat(studentnumber) : [studentnumber]
+      classes[category] = classes[category] ? classes[category].concat(studentnumber) : [studentnumber]
     })
-    return { grades, attempts }
+    return { grades, classes }
   }
 
   formatGroupStatistics() {
