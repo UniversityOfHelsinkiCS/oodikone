@@ -1,10 +1,15 @@
 import { createSelector } from 'reselect'
-import { groupBy } from 'lodash'
 
 const getUnits = units => units.data
 
 export const mapRightsToDropdown = rights =>
-  groupBy(rights.map(r => ({ key: r.id, value: r.id, text: r.name, type: r.type, description: r.id, associations: r.associations || r.associatons })), 'type') // || can be removed when typo fixed :d
+  Object.values(rights).map(r => Object.values(r).map(r2 =>
+    ({ key: r2.id,
+      value: r2.id,
+      text: r2.name,
+      type: r2.type,
+      description: r2.id,
+      associations: r2.associations })))
 
 
 export const makeMapRightsToDropDown = () => createSelector(

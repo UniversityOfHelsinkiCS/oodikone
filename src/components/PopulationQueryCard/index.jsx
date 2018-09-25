@@ -23,7 +23,7 @@ const PopulationQueryCard =
       return (
         <Card className={styles.cardContainer}>
           <Card.Header className={styles.cardHeader}>
-            <div>{units.map(u => u.name[language]).join(', ')}</div>
+            <div>{Object.values(units).map(u => u.name[language]).join(', ')}</div>
             <Icon
               name="remove"
               className={styles.controlIcon}
@@ -58,7 +58,7 @@ const PopulationQueryCard =
     return (
       <Card className={styles.cardContainer}>
         <Card.Header className={styles.cardHeader}>
-          <div>{units.map(u => u.name[language]).join(', ')}</div>
+          <div>{Object.values(units).map(u => u.name[language]).join(', ')}</div>
           <Icon
             name="remove"
             className={styles.controlIcon}
