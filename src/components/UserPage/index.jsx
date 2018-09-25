@@ -99,7 +99,13 @@ class UserPage extends Component {
               <List.Content floated="right">
                 <Button basic negative floated="right" onClick={this.removeAccess(user.id, element.code)} content="Remove" size="tiny" />
               </List.Content>
-              <List.Content>{element.name[language] || element.name.fi || element.name.en || element.name.sv }</List.Content>
+              <List.Content>{
+                  element.name[language]
+                  || element.name.fi
+                  || element.name.en
+                  || element.name.sv
+                  }
+              </List.Content>
             </List.Item>
             ))}
         </List>
