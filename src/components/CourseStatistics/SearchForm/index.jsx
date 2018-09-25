@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Segment, Header, Form, Search, Table, Radio, Menu } from 'semantic-ui-react'
+import { Segment, Header, Form, Table, Radio, Menu } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, arrayOf, shape, string, bool } from 'prop-types'
 import { getCourseTypes } from '../../../redux/coursetypes'
@@ -7,6 +7,7 @@ import { getCourseDisciplines } from '../../../redux/coursedisciplines'
 import { getSemesters } from '../../../redux/semesters'
 import { findCourses } from '../../../redux/coursesearch'
 import { getCourseStats } from '../../../redux/coursestats'
+import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 
 const CourseTable = ({ courses, onSelectCourse }) => (courses.length === 0 ? null : (
   <Table>
@@ -177,13 +178,9 @@ class SearchForm extends Component {
                     <Form.Dropdown disabled label="Type:" search options={coursetypes} selection placeholder="Select a course type" />
                   </Form.Group>
                   <Form.Field>
-                    <Search
-                      input={{ fluid: true }}
+                    <AutoSubmitSearchInput
+                      doSearch={this.fetchCourses}
                       placeholder="Search by entering a course code or name"
-                      showNoResults={false}
-                      value={this.state.searchterm}
-                      onSearchChange={this.handleSearchChange}
-                      onKeyPress={this.searchOnEnter}
                     />
                   </Form.Field>
                   <CourseTable
