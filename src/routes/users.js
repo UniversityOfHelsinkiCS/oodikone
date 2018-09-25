@@ -19,7 +19,6 @@ router.put('/users/:id/enable', async (req, res) => {
   }
 })
 
-
 router.put('/users/:id/toggleczar', async (req, res) => {
   const id = req.params.id
   const user = await User.byId(id)
@@ -30,6 +29,7 @@ router.put('/users/:id/toggleczar', async (req, res) => {
     res.status(status).json(result)
   }
 })
+
 router.post('/email', async (req, res) => {
   const email = req.body.email
   if (process.env.SMTP !== undefined && email) {
@@ -47,7 +47,6 @@ router.post('/email', async (req, res) => {
   }
 
 })
-
 
 router.post('/users/:uid/units/:id', async (req, res) => {
   const { uid, id } = req.params
@@ -95,6 +94,14 @@ router.delete('/users/:uid/units/:id', async (req, res) => {
       res.status(402).json(e)
     }
   }
+})
+
+router.post('/users/:uid/elements', async (req, res) => {
+  const { uid } = req.params
+  const { codes } = req.body
+  await User.enableElementDetails(uid, codes)
+  const user = await User.byId(uid)
+  res.json(user)
 })
 
 module.exports = router
