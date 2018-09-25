@@ -27,6 +27,7 @@ import courseDisciplines from './coursedisciplines'
 import courseSearch from './coursesearch'
 import courseStats from './coursestats'
 import courseSummaryForm from './coursesSummaryForm'
+import studyrightElements from './studyrightElements'
 
 export default combineReducers({
   locale,
@@ -55,5 +56,6 @@ export default combineReducers({
   courseDisciplines,
   courseSearch,
   courseStats,
-  courseSummaryForm
+  courseSummaryForm,
+  studyrightElements
 })
