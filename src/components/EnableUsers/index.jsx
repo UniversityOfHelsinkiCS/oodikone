@@ -1,19 +1,18 @@
 import React, { Component } from 'react'
 import { withRouter, Redirect } from 'react-router-dom'
-import { Button, Icon, List, Card, Header, Segment, Dropdown, Form, Divider, Image, Confirm } from 'semantic-ui-react'
+import { Button, Icon, Card, Header, Segment, Confirm } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
-import LanguageChooser from '../LanguageChooser'
-import { getUsers, enableUser, addUserUnit, removeUserUnit, toggleCzar, sendEmail } from '../../redux/users'
+import { getUsers, enableUser, addUserUnit, removeUserUnit, sendEmail } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { makeSortUsers } from '../../selectors/users'
 import { copyToClipboard } from '../../common'
 import sharedStyles from '../../styles/shared'
+import UserPageNew from '../UserPage'
 
 class EnableUsers extends Component {
   state = {
-    selected: null,
     confirm: false,
     email: ''
   }
@@ -23,39 +22,12 @@ class EnableUsers extends Component {
     this.props.getUnits()
   }
 
-  getDisabledUnits = (units, enabled) => {
-    const enabledIds = new Set(enabled.map(element => element.code))
-    return units.filter(u => !enabledIds.has(u.id))
-  }
-
   enableUser = user => () => {
     if (!user.is_enabled) {
       this.setState({ confirm: true, email: user.email })
     }
     this.props.enableUser(user.id)
   }
-
-  handleCoronation = user => async () => {
-    await this.props.toggleCzar(user.id)
-  }
-
-  handleChange = user => (e, { value }) => {
-    if (!user.elementdetails.find(element => element.code === value)) {
-      this.setState({
-        selected: value
-      })
-    }
-  }
-
-  enableAccessRightToUser = userid => async () => {
-    const unit = this.state.selected
-    await this.props.addUserUnit(userid, unit)
-    this.setState({
-      selected: null
-    })
-  }
-
-  removeAccess = (uid, unit) => () => this.props.removeUserUnit(uid, unit)
 
   openEditUserPage = userid => () => {
     const { history } = this.props
@@ -74,106 +46,18 @@ class EnableUsers extends Component {
     copyToClipboard(clipboardString)
   }
 
-  renderUnitList = (elementdetails, user) => {
-    const { language } = this.props
-    if (!elementdetails) return null
-    return (
-      <List divided>
-        {elementdetails.map(element => (
-          <List.Item key={element.code}>
-            <List.Content floated="right">
-              <Button basic negative floated="right" onClick={this.removeAccess(user.id, element.code)} content="Remove" size="tiny" />
-            </List.Content>
-            <List.Content>{element.name[language]}</List.Content>
-          </List.Item>
-        ))}
-      </List>
-    )
-  }
-
   renderUserPage = (userid) => {
-    const { units, users, language, pending } = this.props
-    if (pending) {
-      return null
-    }
+    const { users } = this.props
     const user = users.find(u => u.id === userid)
-    if (!user) {
-      return (
-        <Redirect to="/users" />
+    return !user
+      ? <Redirect to="/users" />
+      : (
+        <UserPageNew
+          userid={userid}
+          user={user}
+          goBack={this.openUsersPage}
+        />
       )
-    }
-    const disabled = this.getDisabledUnits(units, user.elementdetails)
-    const unitOptions = disabled.map(unit =>
-      ({ key: unit.id, value: unit.id, text: unit.name[language] }))
-    return (
-      <div>
-
-        <Button icon="arrow circle left" content="Back" onClick={this.openUsersPage} />
-        <LanguageChooser />
-        <Divider />
-        <Card.Group>
-          <Card fluid>
-            <Card.Content>
-              <Card.Header>
-                <Image onClick={this.handleCoronation(user)} src={user.czar ? 'https://i.pinimg.com/originals/06/7a/20/067a20e4ae1edcee790601ce9b9927df.jpg' : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6uJPJLxePjb5u1omdG2kOLfE0BwNjvvJ9accK922xSVwKlR8_'} avatar />
-                {user.full_name}
-              </Card.Header>
-              <Card.Meta content={user.czar ? `tsaari ${user.username}` : `${user.username}`} />
-              <Card.Meta content={user.email} />
-              <Card.Description>
-                {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`} <br />
-              </Card.Description>
-              <Divider />
-            </Card.Content>
-          </Card>
-
-          <Card fluid>
-            <Card.Content>
-              <Card.Header content="Enable access" />
-              <Card.Description>
-                <Form>
-                  <Form.Field>
-                    <Dropdown
-                      placeholder="Select unit"
-                      options={unitOptions}
-                      onChange={this.handleChange(user)}
-                      fluid
-                      search
-                      selection
-                      value={this.state.selected}
-                    />
-                  </Form.Field>
-                  <Button
-                    basic
-                    fluid
-                    positive
-                    content="Enable"
-                    onClick={this.enableAccessRightToUser(user.id)}
-                  />
-
-                </Form>
-              </Card.Description>
-            </Card.Content>
-          </Card>
-          <Card fluid>
-            <Card.Content>
-              <Card.Header content="Access rights" />
-              <Card.Description>
-                {user.czar ?
-                  <p style={{
-                    fontSize: '34px',
-                    fontFamily: 'Comic Sans',
-                    color: 'darkred',
-                    border: '1px'
-                  }}
-                  >everything!
-                  </p> : this.renderUnitList(user.elementdetails, user)}
-              </Card.Description>
-            </Card.Content>
-          </Card>
-        </Card.Group>
-      </div >
-    )
   }
 
   renderUserSearchList = () => {
@@ -199,7 +83,6 @@ class EnableUsers extends Component {
           }}
           size="small"
         /> : null}
-
         {users.map(user => (
           <Card raised key={user.id} color={user.is_enabled ? 'green' : 'red'}>
             <Card.Content>
@@ -260,18 +143,10 @@ EnableUsers.propTypes = {
       studentNumber: string
     })
   }).isRequired,
-  language: string.isRequired,
   getUsers: func.isRequired,
   enableUser: func.isRequired,
-  addUserUnit: func.isRequired,
-  removeUserUnit: func.isRequired,
   getUnits: func.isRequired,
-  toggleCzar: func.isRequired,
   sendEmail: func.isRequired,
-  units: arrayOf(shape({
-    id: string,
-    name: shape({}).isRequired
-  })).isRequired,
   users: arrayOf(shape({
     id: string,
     full_name: string,
@@ -283,8 +158,7 @@ EnableUsers.propTypes = {
     }))
   })).isRequired,
   error: bool.isRequired,
-  history: shape({}).isRequired,
-  pending: bool.isRequired
+  history: shape({}).isRequired
 }
 
 const sortUsers = makeSortUsers()
@@ -300,5 +174,10 @@ const mapStateToProps = ({ locale, users, units, settings }) => ({
 })
 
 export default withRouter(connect(mapStateToProps, {
-  getUsers, enableUser, addUserUnit, removeUserUnit, getUnits, toggleCzar, sendEmail
+  getUsers,
+  enableUser,
+  addUserUnit,
+  removeUserUnit,
+  getUnits,
+  sendEmail
 })(EnableUsers))
