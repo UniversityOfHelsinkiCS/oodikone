@@ -225,6 +225,11 @@ const getAssociationsFromRedis = async () => {
   return raw && JSON.parse(raw)
 }
 
+const refreshAssociationsInRedis = async () => {
+  const associations = await calculateAssociationsFromDb()
+  await saveAssociationsToRedis(associations)
+}
+
 const getAssociations = async (doRefresh=false) => {
   const studyrights = await getAssociationsFromRedis()
   if (!studyrights || doRefresh) {
@@ -275,5 +280,6 @@ module.exports = {
   getAssociations,
   associatedStudyrightElements,
   getFilteredAssociations,
-  getUserAssociations
+  getUserAssociations,
+  refreshAssociationsInRedis
 }
