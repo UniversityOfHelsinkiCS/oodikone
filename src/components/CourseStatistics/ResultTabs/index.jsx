@@ -5,19 +5,22 @@ import { shape, string, number, oneOfType, arrayOf, func, bool } from 'prop-type
 import _ from 'lodash'
 import StackedBarChart from '../../StackedBarChart'
 import { passRateCumGraphOptions, passRateStudGraphOptions, gradeGraphOptions } from '../../../constants'
+import { userIsAdmin } from '../../../common'
 
 const StatsCumTable = ({ stats, name }) => (
   <div>
     <Header as="h3" content={name} textAlign="center" />
     <Table
-      headerRow={['Time', 'Passed', 'Failed']}
+      headerRow={['Time', 'Passed', 'Failed', 'Pass rate']}
       tableData={stats}
       renderBodyRow={stat => ({
         key: stat.code,
         cells: [
           stat.name,
-          stat.cumulative.categories.passed,
-          stat.cumulative.categories.failed
+          stat.cumulative.categories.passed || 0,
+          stat.cumulative.categories.failed || 0,
+          `${Number((100 * stat.cumulative.categories.passed) /
+            (stat.cumulative.categories.failed + stat.cumulative.categories.passed)).toFixed(2)} %`
         ]
       })}
     />
@@ -39,15 +42,14 @@ const StatsStudTable = ({ stats, name }) => (
         key: stat.code,
         cells: [
           stat.name,
-          stat.students.categories.passedFirst,
-          stat.students.categories.passedRetry,
-          stat.students.categories.failedFirst,
-          stat.students.categories.failedRetry
+          stat.students.categories.passedFirst || 0,
+          stat.students.categories.passedRetry || 0,
+          stat.students.categories.failedFirst || 0,
+          stat.students.categories.failedRetry || 0
         ]
       })}
     />
-  </div>
-)
+  </div>)
 
 StatsStudTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
@@ -83,6 +85,7 @@ const getPassRateCumSeriesFromStats = (stats, multiplier = 1, name = '') => {
   ]
   return series
 }
+
 const getPassRateStudSeriesFromStats = (stats, multiplier = 1, name = '') => {
   const all = []
   const failedFirst = []
@@ -250,6 +253,15 @@ const getGradeStudSeriesFromStats = (stats, multiplier = 1, name = '') => {
 
 class ResultTabs extends Component {
   state = {}
+
+
+  async componentDidMount() {
+    const adminRights = await userIsAdmin()
+
+    this.setState({ adminRights })
+  }
+
+
   render() {
     const { max, primary, comparison, changeMode, cumMode } = this.props
     const { maxPassRateVal, maxGradeVal } = max
@@ -268,6 +280,76 @@ class ResultTabs extends Component {
       getGradeCumSeriesFromStats(primary.stats, 1, 'primary').concat(getGradeCumSeriesFromStats(comparison ? comparison.stats : [], -1, 'comparison'))
       :
       getGradeStudSeriesFromStats(primary.stats, 1, 'primary').concat(getGradeCumSeriesFromStats(comparison ? comparison.stats : [], -1, 'comparison'))
+
+    const panes = [
+      {
+        menuItem: { key: 'Table', icon: 'table', content: 'Table' },
+        render: () => (
+          <Grid padded="vertically" columns="equal">
+            <Grid.Row>
+              {primary && (
+                <Grid.Column>
+                  {cumMode ?
+                    <StatsCumTable name={primary.name} stats={primary.stats} />
+                    :
+                    <StatsStudTable name={primary.name} stats={primary.stats} />
+                  }
+                </Grid.Column>
+              )}
+              {
+                comparison && (
+                  <Grid.Column>
+                    {cumMode ?
+                      <StatsCumTable name={primary.name} stats={primary.stats} />
+                      :
+                      <StatsStudTable name={primary.name} stats={primary.stats} />
+                    }
+                  </Grid.Column>
+                )
+              }
+            </Grid.Row>
+          </Grid>
+        )
+      },
+      {
+        menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
+        render: () => (
+          <Grid padded="vertically" columns="equal">
+            <Grid.Row>
+              {primary && (
+                <Grid.Column>
+                  <StackedBarChart
+                    options={graphOptions}
+                    series={passGraphSerie}
+                  />
+                </Grid.Column>
+              )}
+            </Grid.Row>
+          </Grid>
+        )
+      }
+    ]
+
+    if (this.state.adminRights) {
+      panes.push({
+        menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
+        render: () => (
+          <Grid padded="vertically" columns="equal">
+            <Grid.Row>
+              {primary && (
+                <Grid.Column>
+                  <StackedBarChart
+                    options={gradeGraphOptions(primary.stats.map(year =>
+                      year.name), maxGradeVal)}
+                    series={gradeGraphSerie}
+                  />
+                </Grid.Column>
+              )}
+            </Grid.Row>
+          </Grid>
+        )
+      })
+    }
 
     return (
       <div>
@@ -288,72 +370,7 @@ class ResultTabs extends Component {
           </Form.Group>
         </Form>
         <Tab
-          panes={[
-            {
-              menuItem: { key: 'Table', icon: 'table', content: 'Table' },
-              render: () => (
-                <Grid padded="vertically" columns="equal">
-                  <Grid.Row>
-                    {primary && (
-                      <Grid.Column>
-                        {cumMode ?
-                          <StatsCumTable name={primary.name} stats={primary.stats} />
-                          :
-                          <StatsStudTable name={primary.name} stats={primary.stats} />
-                        }
-                      </Grid.Column>
-                    )}
-                    {
-                      comparison && (
-                        <Grid.Column>
-                          {cumMode ?
-                            <StatsCumTable name={primary.name} stats={primary.stats} />
-                            :
-                            <StatsStudTable name={primary.name} stats={primary.stats} />
-                          }
-                        </Grid.Column>
-                      )
-                    }
-                  </Grid.Row>
-                </Grid>
-              )
-            },
-            {
-              menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
-              render: () => (
-                <Grid padded="vertically" columns="equal">
-                  <Grid.Row>
-                    {primary && (
-                      <Grid.Column>
-                        <StackedBarChart
-                          options={graphOptions}
-                          series={passGraphSerie}
-                        />
-                      </Grid.Column>
-                    )}
-                  </Grid.Row>
-                </Grid>
-              )
-            },
-            {
-              menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
-              render: () => (
-                <Grid padded="vertically" columns="equal">
-                  <Grid.Row>
-                    {primary && (
-                      <Grid.Column>
-                        <StackedBarChart
-                          options={gradeGraphOptions(primary.stats.map(year =>
-                            year.name), maxGradeVal)}
-                          series={gradeGraphSerie}
-                        />
-                      </Grid.Column>
-                    )}
-                  </Grid.Row>
-                </Grid>
-              )
-            }
-          ]}
+          panes={panes}
         />
       </div>)
   }
@@ -383,4 +400,3 @@ ResultTabs.defaultProps = {
 }
 
 export default ResultTabs
-
