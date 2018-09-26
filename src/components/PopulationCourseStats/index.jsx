@@ -204,7 +204,7 @@ class PopulationCourseStats extends Component {
     <Table celled sortable>
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell colSpan="3">
+          <Table.HeaderCell colSpan="2">
             {translate('populationCourses.course')}
           </Table.HeaderCell>
           <Table.HeaderCell
@@ -230,7 +230,7 @@ class PopulationCourseStats extends Component {
           <Table.HeaderCell colSpan="2">{translate('populationCourses.percentageOfPopulation')}</Table.HeaderCell>
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell colSpan="2" >{translate('populationCourses.name')}</Table.HeaderCell>
+          <Table.HeaderCell colSpan="1" >{translate('populationCourses.name')}</Table.HeaderCell>
           <Table.HeaderCell>{translate('populationCourses.code')}</Table.HeaderCell>
           <Table.HeaderCell
             sorted={sortBy === 'passed' ? 'descending' : null}
@@ -335,7 +335,10 @@ class PopulationCourseStats extends Component {
                   language: this.props.language
                 })
               }}
-              style={{ borderLeft: '0px !important' }}
+              style={{
+                borderLeft: '0px !important',
+                display: 'none'
+              }}
             />
             <Table.Cell>{course.course.code}</Table.Cell>
             <Table.Cell>
