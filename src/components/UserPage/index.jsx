@@ -1,12 +1,16 @@
 import React, { Component } from 'react'
-import { Button, Card, Divider, Image, Form, List } from 'semantic-ui-react'
+import { Button, Card, Divider, Image, Form, List, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { string, number, shape, bool, arrayOf, func } from 'prop-types'
+import _ from 'lodash'
 import LanguageChooser from '../LanguageChooser'
 import { toggleCzar, addUserUnits, removeUserUnit } from '../../redux/users'
 import { getStudyrightElements } from '../../redux/studyrightElements'
 
 const formatToDropdown = elements => Object.values(elements).map(e => ({
+  associations: {
+    20: e.associations[20] ? Object.keys(e.associations[20]) : []
+  },
   key: e.code,
   value: e.code,
   description: e.code,
@@ -91,20 +95,30 @@ class UserPage extends Component {
 
     renderUnitList = (elementdetails, user) => {
       const { language } = this.props
+
+      const nameInLanguage = element =>
+        element.name[language]
+          || element.name.fi
+          || element.name.en
+          || element.name.sv
+
+      const byCode = (a, b) => {
+        const codeA = a.type === 30 && a.associations ? `${a.associations[0]}${nameInLanguage(a)}` : a.code
+        const codeB = b.type === 30 && b.associations ? `${b.associations[0]}${nameInLanguage(b)}` : b.code
+        return codeA < codeB ? -1 : 1
+      }
+
       if (!elementdetails) return null
+
       return (
         <List divided>
-          {elementdetails.map(element => (
+          {elementdetails.sort(byCode).map(element => (
             <List.Item key={element.code}>
               <List.Content floated="right">
                 <Button basic negative floated="right" onClick={this.removeAccess(user.id, element.code)} content="Remove" size="tiny" />
               </List.Content>
-              <List.Content>{
-                  element.name[language]
-                  || element.name.fi
-                  || element.name.en
-                  || element.name.sv
-                  }
+              <List.Content>
+                {element.type === 30 ? <Icon name="minus" /> : null} {`${nameInLanguage(element)} (${element.code})`}
               </List.Content>
             </List.Item>
             ))}
@@ -113,7 +127,23 @@ class UserPage extends Component {
     }
 
     render() {
-      const { user, pending } = this.props
+      const { user, pending, studyrightElements } = this.props
+
+      // ugly trick to add associations to study tracks, should be moved to backend
+      if (studyrightElements[30]) {
+        const programmes = user.elementdetails.filter(e => e.type === 20).map(e => e.code)
+        user.elementdetails = user.elementdetails.map((element) => {
+          const e = Object.assign(element)
+          e.associations = studyrightElements && (element.type === 30) ?
+            _.intersection(
+              programmes,
+              Object.keys(studyrightElements[30][element.code].associations[20])
+            ) :
+            []
+          return e
+        })
+      }
+
       const options = this.studyelementOptions()
       return (
         <div>

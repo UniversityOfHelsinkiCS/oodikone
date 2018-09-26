@@ -170,7 +170,7 @@ class SearchForm extends Component {
                     name="toYear"
                     options={years}
                     selection
-                    placeholder="Optional"
+                    placeholder="Select academic year"
                     onChange={this.handleChange}
                     value={toYear}
                   />
