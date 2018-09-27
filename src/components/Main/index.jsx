@@ -46,7 +46,6 @@ class Main extends Component {
     if (!this.state.loaded) {
       return <Loader active inline="centered" />
     }
-    console.log(this.state.easterEgg)
     if (!this.state.enabled || this.state.hasError) {
       return (
         <div>
