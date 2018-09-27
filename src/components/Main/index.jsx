@@ -32,7 +32,10 @@ class Main extends Component {
     const enabled = await userIsEnabled()
     if (!enabled) {
       log('Not enabled')
-      setTimeout(() => this.setState({ easterEgg: true }), Math.floor(Math.random() * 1800000) + 600000)
+      setTimeout(
+        () => this.setState({ easterEgg: true }),
+        Math.floor(Math.random() * 1800000) + 600000
+      )
     }
     this.setState({ enabled, loaded: true })
   }
