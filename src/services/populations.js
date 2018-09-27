@@ -28,7 +28,7 @@ const semesterEnd = {
 
 const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments, transfers, updatedAt, createdAt }, startDate, endDate) => {
 
-  const toCourse = ({ grade, attainment_date, credits, course, credittypecode }) => {
+  const toCourse = ({ grade, attainment_date, credits, course, credittypecode, isStudyModule }) => {
     course = course.get()
     return {
       course: {
@@ -40,7 +40,7 @@ const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnum
       passed: Credit.passed({ credittypecode }),
       grade,
       credits,
-      isStudyModuleCredit: course.is_study_module
+      isStudyModuleCredit: isStudyModule
     }
   }
 

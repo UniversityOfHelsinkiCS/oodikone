@@ -81,7 +81,8 @@ const attainmentDataToCredit = (attainment, studentnumber) => {
     student_studentnumber: studentnumber,
     attainment_date: parseDate(attainment.attainment_date),
     course_code: `${attainment.learningopportunity_id}`,
-    semestercode: attainment.semester_code
+    semestercode: attainment.semester_code,
+    isStudyModule: attainment.is_leaf === 'false'
   }
 }
 
