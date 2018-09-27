@@ -110,7 +110,6 @@ module.exports = {
         }
       ],
       headHtmlSnippet: '<script src="https://cdn.ravenjs.com/3.24.2/raven.min.js" crossOrigin="anonymous"></script> <script>if(navigator.appVersion.indexOf("MSIE")!=-1){alert("You use IE. That\'s no good.");}</script>'
-      
     }),
 
     new MiniCssExtractPlugin({
