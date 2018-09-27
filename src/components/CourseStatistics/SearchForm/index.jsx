@@ -12,7 +12,7 @@ import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 const CourseTable = ({ courses, selected, onSelectCourse }) => (
   <Segment basic style={{ padding: '0' }} >
     <Table>
-      { selected.length > 0 && (
+      {selected.length > 0 && (
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell content="Selected courses" />
@@ -21,7 +21,7 @@ const CourseTable = ({ courses, selected, onSelectCourse }) => (
           </Table.Row>
         </Table.Header>
       )}
-      { selected.length > 0 && (
+      {selected.length > 0 && (
         <Table.Body>
           {selected.map(course => (
             <Table.Row key={course.code}>
@@ -75,11 +75,12 @@ const INITIAL = {
   separate: false,
   expanded: true,
   discipline: undefined,
-  type: undefined
+  type: undefined,
+  focus: false
 }
 
 class SearchForm extends Component {
-  state={ ...INITIAL }
+  state = { ...INITIAL }
 
   componentDidMount() {
     this.props.clearCourses()
@@ -167,7 +168,7 @@ class SearchForm extends Component {
 
   render() {
     const { disciplines, coursetypes, years, loading } = this.props
-    const { selectedcourses, fromYear, toYear, separate } = this.state
+    const { selectedcourses, fromYear, toYear, separate, focus } = this.state
     const courses = this.props.matchingCourses.map(course => ({
       ...course,
       selected: !!selectedcourses[course.code]
@@ -232,18 +233,27 @@ class SearchForm extends Component {
                 placeholder="Select a course type"
               />
             </Form.Group>
-            <Form.Field>
-              <AutoSubmitSearchInput
-                doSearch={this.fetchCourses}
-                placeholder="Search by entering a course code or name"
-              />
-            </Form.Field>
-            <CourseTable
-              loading={this.props.coursesLoading}
-              selected={selected}
-              courses={courses}
-              onSelectCourse={this.toggleCourse}
-            />
+            <div
+              style={{ marginBottom: '15px' }}
+              onFocus={() => this.setState({ focus: true })}
+              onBlur={() => this.setState({ focus: false })}
+            >
+              <Form.Field>
+                <AutoSubmitSearchInput
+                  doSearch={this.fetchCourses}
+                  placeholder="Search by entering a course code or name"
+                />
+              </Form.Field>
+              {focus ?
+                <CourseTable
+                  onFocus={() => this.setState({ focus: true })}
+                  loading={this.props.coursesLoading}
+                  selected={selected}
+                  courses={courses}
+                  onSelectCourse={this.toggleCourse}
+                />
+                : null}
+            </div>
             <Form.Button type="button" disabled={disabled} fluid basic positive content="Fetch statistics" onClick={this.submitForm} />
           </Form>
         </Segment>

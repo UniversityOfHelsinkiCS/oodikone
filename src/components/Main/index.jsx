@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { localize } from 'react-localize-redux'
-import { Loader } from 'semantic-ui-react'
+import { Loader, Image, Transition } from 'semantic-ui-react'
 
 import Header from '../Header'
 import Populations from '../PopulationStatistics'
@@ -18,19 +18,21 @@ import Teachers from '../Teachers'
 
 import styles from './main.css'
 
-import { userIsEnabled, log } from '../../common'
+import { userIsEnabled, log, images } from '../../common'
 
 class Main extends Component {
   state = {
     enabled: false,
     hasError: false,
-    loaded: false
+    loaded: false,
+    easterEgg: false
   }
 
   async componentDidMount() {
     const enabled = await userIsEnabled()
     if (!enabled) {
       log('Not enabled')
+      setTimeout(() => this.setState({ easterEgg: true }), 30000)
     }
     this.setState({ enabled, loaded: true })
   }
@@ -45,7 +47,14 @@ class Main extends Component {
       return <Loader active inline="centered" />
     }
     if (!this.state.enabled || this.state.hasError) {
-      return <AccessDenied itWasError={this.state.hasError} />
+      return (
+        <div>
+          <AccessDenied itWasError={this.state.hasError} />
+          <Transition visible={this.state.easterEgg} animation="fly up" duration={10000}>
+            <Image src={images.irtomikko} size="huge" verticalAlign="top" inline style={{ position: 'absolute', top: '350px', right: '10px' }} />
+          </Transition>
+        </div>
+      )
     }
     return (
       <div className={styles.appContainer}>
