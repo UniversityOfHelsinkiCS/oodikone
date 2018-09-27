@@ -5,7 +5,7 @@ import { func, arrayOf, shape, string, bool } from 'prop-types'
 import { getCourseTypes } from '../../../redux/coursetypes'
 import { getCourseDisciplines } from '../../../redux/coursedisciplines'
 import { getSemesters } from '../../../redux/semesters'
-import { findCourses } from '../../../redux/coursesearch'
+import { findCourses, clearCourses } from '../../../redux/coursesearch'
 import { getCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 
@@ -82,6 +82,7 @@ class SearchForm extends Component {
   state={ ...INITIAL }
 
   componentDidMount() {
+    this.props.clearCourses()
     this.props.getCourseTypes()
     this.props.getCourseDisciplines()
     this.props.getSemesters()
@@ -158,6 +159,11 @@ class SearchForm extends Component {
     this.setState({ ...INITIAL, expanded: false })
   }
 
+  expandForm = () => {
+    this.props.clearCourses()
+    this.toggleExpanded()
+  }
+
   render() {
     const { disciplines, coursetypes, years, loading } = this.props
     const { selectedcourses, fromYear, toYear, separate } = this.state
@@ -170,7 +176,7 @@ class SearchForm extends Component {
     return !this.state.expanded
       ? (
         <Menu>
-          <Menu.Item icon="search" content="New query" onClick={this.toggleExpanded} />
+          <Menu.Item icon="search" content="New query" onClick={this.expandForm} />
         </Menu>
       ) : (
         <Segment loading={loading}>
@@ -250,6 +256,7 @@ SearchForm.propTypes = {
   findCourses: func.isRequired,
   getSemesters: func.isRequired,
   getCourseStats: func.isRequired,
+  clearCourses: func.isRequired,
   disciplines: arrayOf(shape({})).isRequired,
   coursetypes: arrayOf(shape({})).isRequired,
   matchingCourses: arrayOf(shape({})).isRequired,
@@ -290,5 +297,6 @@ export default connect(mapStateToProps, {
   getCourseDisciplines,
   findCourses,
   getSemesters,
-  getCourseStats
+  getCourseStats,
+  clearCourses
 })(SearchForm)
