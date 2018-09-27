@@ -14,7 +14,7 @@ import { getPopulationFilters, setPopulationFilter } from '../../redux/populatio
 import { extentGraduated, canceledStudyright } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
-import { isInDateFormat, momentFromFormat, reformatDate, isValidYear } from '../../common'
+import { isInDateFormat, momentFromFormat, reformatDate, isValidYear, textAndDescriptionSearch } from '../../common'
 import { setLoading } from '../../redux/graphSpinner'
 import LanguageChooser from '../LanguageChooser'
 import style from './populationSearchForm.css'
@@ -229,7 +229,8 @@ class PopulationSearchForm extends Component {
     return list.map((sp) => {
       const shh = {}
       Object.assign(shh, sp)
-      shh.text = `${sp.name[language]} (${sp.code})`
+      shh.text = sp.name[language]
+      shh.description = sp.code
       shh.value = sp.code
       return shh
     })
@@ -320,7 +321,7 @@ class PopulationSearchForm extends Component {
       />
       <Dropdown
         placeholder="Select study programme"
-        search
+        search={textAndDescriptionSearch}
         selection
         noResultsMessage="No selectable study programmes"
         value={studyRights.programme}
@@ -355,7 +356,7 @@ class PopulationSearchForm extends Component {
         <label>Degree (Optional)</label>
         <Dropdown
           placeholder="Select degree"
-          search
+          search={textAndDescriptionSearch}
           floating
           selection
           noResultsMessage="No selectable degrees"
@@ -389,7 +390,7 @@ class PopulationSearchForm extends Component {
         <label>Study Track (Optional)</label>
         <Dropdown
           placeholder="Select study track"
-          search
+          search={textAndDescriptionSearch}
           floating
           selection
           noResultsMessage="No selectable study track"

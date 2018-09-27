@@ -1,13 +1,18 @@
 import moment from 'moment'
 import jwtDecode from 'jwt-decode'
 import Datetime from 'react-datetime'
+import _ from 'lodash'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, TOKEN_NAME } from '../constants'
 import toskaLogo from '../assets/toska.png'
 import irtomikko from '../assets/irtomikko.png'
-
 import { sendLog, login } from '../apiConnection'
 
 export const setToken = token => localStorage.setItem(TOKEN_NAME, token)
+
+export const textAndDescriptionSearch = (dropDownOptions, param) =>
+  _.filter(dropDownOptions, option =>
+    option.text.toLowerCase().concat(option.description.toLowerCase())
+      .includes(param.toLowerCase()))
 
 export const decodeToken = (token) => {
   try {
