@@ -6,7 +6,7 @@ import { getCourseTypes } from '../../../redux/coursetypes'
 import { getCourseDisciplines } from '../../../redux/coursedisciplines'
 import { getSemesters } from '../../../redux/semesters'
 import { findCourses, clearCourses } from '../../../redux/coursesearch'
-import { getCourseStats } from '../../../redux/coursestats'
+import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 
 const CourseTable = ({ courses, selected, onSelectCourse }) => (
@@ -161,6 +161,7 @@ class SearchForm extends Component {
 
   expandForm = () => {
     this.props.clearCourses()
+    this.props.clearCourseStats()
     this.toggleExpanded()
   }
 
@@ -257,6 +258,7 @@ SearchForm.propTypes = {
   getSemesters: func.isRequired,
   getCourseStats: func.isRequired,
   clearCourses: func.isRequired,
+  clearCourseStats: func.isRequired,
   disciplines: arrayOf(shape({})).isRequired,
   coursetypes: arrayOf(shape({})).isRequired,
   matchingCourses: arrayOf(shape({})).isRequired,
@@ -298,5 +300,6 @@ export default connect(mapStateToProps, {
   findCourses,
   getSemesters,
   getCourseStats,
-  clearCourses
+  clearCourses,
+  clearCourseStats
 })(SearchForm)
