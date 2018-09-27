@@ -94,7 +94,8 @@ const Credit = sequelize.define('credit',
     student_studentnumber: { type: Sequelize.STRING },
     credits: { type: Sequelize.DOUBLE },
     ordering: { type: Sequelize.STRING },
-    attainment_date: { type: Sequelize.DATE }
+    attainment_date: { type: Sequelize.DATE },
+    isStudyModule: { type: Sequelize.BOOLEAN }
   },
   {
     tableName: 'credit',
