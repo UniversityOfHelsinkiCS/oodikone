@@ -1,7 +1,14 @@
 import { actionTypes } from '../../apiConnection'
 
+const additionalTypes = prefix => ({
+  clear: `${prefix}_CLEAR`
+})
+
 const itemreducer = (prefix, initial) => {
-  const types = actionTypes(prefix)
+  const types = {
+    ...actionTypes(prefix),
+    ...additionalTypes(prefix)
+  }
   const initialState = {
     pending: false,
     error: false,
@@ -29,9 +36,21 @@ const itemreducer = (prefix, initial) => {
           error: false,
           data: action.response
         }
+      case types.clear:
+        return {
+          ...state,
+          data: initialState.data
+        }
       default:
         return state
     }
+  }
+}
+
+export const actions = (prefix) => {
+  const types = additionalTypes(prefix)
+  return {
+    clear: () => ({ type: types.clear })
   }
 }
 
