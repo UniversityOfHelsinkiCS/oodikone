@@ -1,7 +1,11 @@
-import listreducer from './common/listreducer'
+import listreducer, { actions } from './common/listreducer'
 import { callController } from '../apiConnection/index'
 
 const prefix = 'COURSESTATS_'
+
+const { reset } = actions(prefix)
+
+export const clearCourseStats = reset
 
 export const getCourseStats = ({ fromYear, toYear, courseCodes, separate }) => {
   const route = '/v3/courseyearlystats'
