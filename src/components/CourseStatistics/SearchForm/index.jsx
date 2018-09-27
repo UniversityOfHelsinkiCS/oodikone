@@ -233,23 +233,27 @@ class SearchForm extends Component {
                 placeholder="Select a course type"
               />
             </Form.Group>
-            <Form.Field
+            <div
+              style={{ marginBottom: '15px' }}
               onFocus={() => this.setState({ focus: true })}
               onBlur={() => this.setState({ focus: false })}
             >
-              <AutoSubmitSearchInput
-                doSearch={this.fetchCourses}
-                placeholder="Search by entering a course code or name"
-              />
-            </Form.Field>
-            {focus ?
-              <CourseTable
-                loading={this.props.coursesLoading}
-                selected={selected}
-                courses={courses}
-                onSelectCourse={this.toggleCourse}
-              />
-              : null}
+              <Form.Field>
+                <AutoSubmitSearchInput
+                  doSearch={this.fetchCourses}
+                  placeholder="Search by entering a course code or name"
+                />
+              </Form.Field>
+              {focus ?
+                <CourseTable
+                  onFocus={() => this.setState({ focus: true })}
+                  loading={this.props.coursesLoading}
+                  selected={selected}
+                  courses={courses}
+                  onSelectCourse={this.toggleCourse}
+                />
+                : null}
+            </div>
             <Form.Button type="button" disabled={disabled} fluid basic positive content="Fetch statistics" onClick={this.submitForm} />
           </Form>
         </Segment>
