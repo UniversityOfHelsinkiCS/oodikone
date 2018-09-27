@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Button, Card, Divider, Image, Form, List, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { string, number, shape, bool, arrayOf, func } from 'prop-types'
+import { textAndDescriptionSearch } from '../../common'
 import _ from 'lodash'
 import LanguageChooser from '../LanguageChooser'
 import { toggleCzar, addUserUnits, removeUserUnit } from '../../redux/users'
@@ -178,7 +179,7 @@ class UserPage extends Component {
                       value={this.state.degree}
                       onChange={this.handleChange}
                       fluid
-                      search
+                      search={textAndDescriptionSearch}
                       selection
                     />
                     <Divider />
@@ -191,7 +192,7 @@ class UserPage extends Component {
                         value={this.state.programmes}
                         onChange={this.handleChange}
                         fluid
-                        search
+                        search={textAndDescriptionSearch}
                         selection
                       />
                       <Form.Dropdown
@@ -202,7 +203,7 @@ class UserPage extends Component {
                         value={this.state.specializations}
                         onChange={this.handleChange}
                         fluid
-                        search
+                        search={textAndDescriptionSearch}
                         multiple
                         selection
                       />
