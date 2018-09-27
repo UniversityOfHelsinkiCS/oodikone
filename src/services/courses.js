@@ -497,7 +497,7 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
 }
 
 const courseYearlyStats = async (coursecodes, separate, startyearcode, endyearcode) => {
-  const stats = await Promise.all(coursecodes.map(code => yearlyStatsOfNew(code, separate, startyearcode, endyearcode)))
+  const stats = await Promise.all(coursecodes.map(code => yearlyStatsOfNew(code, separate, startyearcode, endyearcode||startyearcode)))
   return stats
 }
 
