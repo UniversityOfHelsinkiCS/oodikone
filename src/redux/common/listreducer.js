@@ -1,7 +1,14 @@
 import { actionTypes } from '../../apiConnection'
 
+const additionalTypes = prefix => ({
+  reset: `${prefix}_CLEAR`
+})
+
 const listreducer = (prefix, resToObject, rewriteData = true) => {
-  const types = actionTypes(prefix)
+  const types = {
+    ...actionTypes(prefix),
+    ...additionalTypes(prefix)
+  }
   const initialState = {
     pending: false,
     error: false,
@@ -35,9 +42,21 @@ const listreducer = (prefix, resToObject, rewriteData = true) => {
           query: action.query
         }
       }
+      case types.reset: {
+        return {
+          ...initialState
+        }
+      }
       default:
         return state
     }
+  }
+}
+
+export const actions = (prefix) => {
+  const types = additionalTypes(prefix)
+  return {
+    reset: () => ({ type: types.reset })
   }
 }
 
