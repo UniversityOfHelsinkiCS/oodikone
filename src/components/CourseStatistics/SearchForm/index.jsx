@@ -9,18 +9,44 @@ import { findCourses } from '../../../redux/coursesearch'
 import { getCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 
-const CourseTable = ({ courses, onSelectCourse, loading }) => (courses.length === 0 ? null : (
-  <Segment loading={loading} basic style={{ padding: '0' }} >
+const CourseTable = ({ courses, selected, onSelectCourse }) => (
+  <Segment basic style={{ padding: '0' }} >
     <Table>
+      { selected.length > 0 && (
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell content="Selected courses" />
+            <Table.HeaderCell content="Code" />
+            <Table.HeaderCell content="Select" />
+          </Table.Row>
+        </Table.Header>
+      )}
+      { selected.length > 0 && (
+        <Table.Body>
+          {selected.map(course => (
+            <Table.Row key={course.code}>
+              <Table.Cell content={course.name} />
+              <Table.Cell content={course.code} />
+              <Table.Cell>
+                <Radio toggle checked={course.selected} onChange={() => onSelectCourse(course)} />
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      )}
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell content="Name" />
+          <Table.HeaderCell content="Searched courses" />
           <Table.HeaderCell content="Code" />
           <Table.HeaderCell content="Select" />
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {courses.map(course => (
+        {courses.length === 0 ? (
+          <Table.Row>
+            <Table.Cell colSpan="3" content="No courses matched your query" />
+          </Table.Row>
+        ) : courses.map(course => (
           <Table.Row key={course.code}>
             <Table.Cell content={course.name} />
             <Table.Cell content={course.code} />
@@ -28,20 +54,16 @@ const CourseTable = ({ courses, onSelectCourse, loading }) => (courses.length ==
               <Radio toggle checked={course.selected} onChange={() => onSelectCourse(course)} />
             </Table.Cell>
           </Table.Row>
-          ))}
+        ))}
       </Table.Body>
     </Table>
   </Segment>
-))
+)
 
 CourseTable.propTypes = {
   courses: arrayOf(shape({ code: string, name: string, seleted: bool })).isRequired,
-  onSelectCourse: func.isRequired,
-  loading: bool
-}
-
-CourseTable.defaultProps = {
-  loading: false
+  selected: arrayOf(shape({ code: string, name: string, seleted: bool })).isRequired,
+  onSelectCourse: func.isRequired
 }
 
 const INITIAL = {
@@ -105,6 +127,7 @@ class SearchForm extends Component {
       this.props.findCourses({ type, discipline })
     }
   }
+
   toggleCheckbox = (e, target) => {
     const { name } = target
     this.setState({ [name]: !this.state[name] })
@@ -142,7 +165,7 @@ class SearchForm extends Component {
       ...course,
       selected: !!selectedcourses[course.code]
     }))
-    const disabled = (!fromYear || !toYear || Object.keys(selectedcourses).length === 0)
+    const disabled = (!fromYear || Object.keys(selectedcourses).length === 0)
     const selected = Object.values(selectedcourses).map(course => ({ ...course, selected: true }))
     return !this.state.expanded
       ? (
@@ -151,86 +174,71 @@ class SearchForm extends Component {
         </Menu>
       ) : (
         <Segment loading={loading}>
-          {
-            !this.state.displaycourses ? (
-              <Form>
-                <Header content="Search parameters" onClick={this.toggleExpanded} />
-                <Form.Group widths="equal">
-                  <Form.Dropdown
-                    label="From:"
-                    name="fromYear"
-                    options={years}
-                    selection
-                    placeholder="Select academic year"
-                    onChange={this.handleChange}
-                    value={fromYear}
-                  />
-                  <Form.Dropdown
-                    label="To:"
-                    name="toYear"
-                    options={years}
-                    selection
-                    placeholder="Select academic year"
-                    onChange={this.handleChange}
-                    value={toYear}
-                  />
-                </Form.Group>
-                <Form.Checkbox
-                  label="Separate statistics for Spring and Fall semesters"
-                  name="separate"
-                  onChange={this.toggleCheckbox}
-                  checked={separate}
-                />
-                <Header content="Selected courses" />
-                <CourseTable
-                  courses={selected}
-                  onSelectCourse={this.toggleCourse}
-                />
-                <Form.Button type="button" basic fluid primary content="Click here to add courses to your search" onClick={this.toggleCourseView} />
-                <Form.Button type="button" disabled={disabled} fluid basic positive content="Fetch statistics" onClick={this.submitForm} />
-              </Form>
-            ) : (
-              <div>
-                <Form>
-                  <Header content="Select courses for search" />
-                  <Form.Group widths="equal">
-                    <Form.Dropdown
-                      onChange={this.handleCourseFormChange}
-                      value={this.state.discipline}
-                      label="Discipline:"
-                      name="discipline"
-                      search
-                      options={disciplines}
-                      selection
-                      placeholder="Select a course discipline"
-                    />
-                    <Form.Dropdown
-                      onChange={this.handleCourseFormChange}
-                      label="Type:"
-                      name="type"
-                      value={this.state.type}
-                      search
-                      options={coursetypes}
-                      selection
-                      placeholder="Select a course type"
-                    />
-                  </Form.Group>
-                  <Form.Field>
-                    <AutoSubmitSearchInput
-                      doSearch={this.fetchCourses}
-                      placeholder="Search by entering a course code or name"
-                    />
-                  </Form.Field>
-                  <CourseTable
-                    loading={this.props.coursesLoading}
-                    courses={courses}
-                    onSelectCourse={this.toggleCourse}
-                  />
-                  <Form.Button type="button" basic fluid content="Continue" onClick={this.toggleCourseView} />
-                </Form>
-              </div>
-            )
-          }
+          <Form>
+            <Header content="Search parameters" onClick={this.toggleExpanded} />
+            <Form.Group widths="equal">
+              <Form.Dropdown
+                label="From:"
+                name="fromYear"
+                options={years}
+                selection
+                placeholder="Select academic year"
+                onChange={this.handleChange}
+                value={fromYear}
+              />
+              <Form.Dropdown
+                label="To:"
+                name="toYear"
+                options={years}
+                selection
+                placeholder="Select academic year"
+                onChange={this.handleChange}
+                value={toYear}
+              />
+            </Form.Group>
+            <Form.Checkbox
+              label="Separate statistics for Spring and Fall semesters"
+              name="separate"
+              onChange={this.toggleCheckbox}
+              checked={separate}
+            />
+            <Header content="Search for courses" />
+            <Form.Group widths="equal">
+              <Form.Dropdown
+                onChange={this.handleCourseFormChange}
+                value={this.state.discipline}
+                label="Discipline:"
+                name="discipline"
+                search
+                options={disciplines}
+                selection
+                placeholder="Select a course discipline"
+              />
+              <Form.Dropdown
+                onChange={this.handleCourseFormChange}
+                label="Type:"
+                name="type"
+                value={this.state.type}
+                search
+                options={coursetypes}
+                selection
+                placeholder="Select a course type"
+              />
+            </Form.Group>
+            <Form.Field>
+              <AutoSubmitSearchInput
+                doSearch={this.fetchCourses}
+                placeholder="Search by entering a course code or name"
+              />
+            </Form.Field>
+            <CourseTable
+              loading={this.props.coursesLoading}
+              selected={selected}
+              courses={courses}
+              onSelectCourse={this.toggleCourse}
+            />
+            <Form.Button type="button" disabled={disabled} fluid basic positive content="Fetch statistics" onClick={this.submitForm} />
+          </Form>
         </Segment>
       )
   }
