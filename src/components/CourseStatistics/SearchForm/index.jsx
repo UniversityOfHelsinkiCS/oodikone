@@ -211,7 +211,10 @@ class SearchForm extends Component {
               checked={separate}
             />
             <Header content="Search for courses" />
-            <Form.Group widths="equal">
+            <Form.Group
+              widths="equal"
+              style={{ display: 'none' }}
+            >
               <Form.Dropdown
                 onChange={this.handleCourseFormChange}
                 value={this.state.discipline}
