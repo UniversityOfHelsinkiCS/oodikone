@@ -76,7 +76,7 @@ class CanceledStudyright extends Component {
 
     return (
       <Segment>
-        {filter.params.cancel === 'true' ? 'Showing students that have canceled this studyright' : 'Showing students that have not canceled this studyright'}
+        {filter.params.cancel === 'true' ? 'Showing students that have canceled this studyright' : <span><b>Excluded</b> students whose studyright is cancelled</span>}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
