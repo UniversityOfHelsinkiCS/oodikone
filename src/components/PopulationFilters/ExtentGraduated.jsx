@@ -6,7 +6,6 @@ import _ from 'lodash'
 import infoTooltips from '../../common/infotooltips'
 import { extentGraduated } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
-import { relativeTimeRounding } from 'moment';
 
 class ExtentGraduated extends Component {
   static propTypes = {
