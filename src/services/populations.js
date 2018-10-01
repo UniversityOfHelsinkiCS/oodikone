@@ -28,7 +28,7 @@ const semesterEnd = {
 
 const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments, transfers, updatedAt, createdAt }, startDate, endDate) => {
 
-  const toCourse = ({ grade, attainment_date, credits, course, credittypecode, isStudyModule }) => {
+  const toCourse = ({ grade, attainment_date, credits, course, credittypecode }) => {
     course = course.get()
     return {
       course: {
@@ -40,7 +40,7 @@ const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnum
       passed: Credit.passed({ credittypecode }),
       grade,
       credits,
-      isStudyModuleCredit: isStudyModule
+      isStudyModuleCredit: course.is_study_module
     }
   }
 
@@ -68,7 +68,6 @@ const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnum
   }
 
   const started = dateofuniversityenrollment
-
   return {
     firstnames,
     lastname,
@@ -104,7 +103,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
           {
             model: Course,
             required: true,
-            attributes: ['code', 'name', 'coursetypecode']
+            attributes: ['code', 'name', 'coursetypecode', 'is_study_module']
           }
         ],
         where: {
@@ -217,8 +216,8 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
 
 const parseQueryParams = query => {
   const { semesters, year, studyRights, months } = query
-  const startDate = semesters.includes('FALL') ? `${year}-${semesterStart[semesters.find(s => s === 'FALL')]}` : `${moment(year).add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
-  const endDate = semesters.includes('SPRING') ? `${moment(year).add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}` : `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
+  const startDate = semesters.includes('FALL') ? `${year}-${semesterStart[semesters.find(s => s === 'FALL')]}` : `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
+  const endDate = semesters.includes('SPRING') ? `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}` : `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
   return {
     studyRights,
     months,
