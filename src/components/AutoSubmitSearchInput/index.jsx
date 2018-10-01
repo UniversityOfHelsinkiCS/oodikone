@@ -70,7 +70,7 @@ AutoSubmitSearchInput.defaultProps = {
   placeholder: 'Search...',
   icon: 'search',
   latency: 250,
-  minSearchLength: 5
+  minSearchLength: 4
 }
 
 export default Timeout(AutoSubmitSearchInput)

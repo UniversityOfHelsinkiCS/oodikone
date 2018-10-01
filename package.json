@@ -16,7 +16,8 @@
     "stats": "webpack --json --config webpack.config.production.js > stats.json",
     "prepush": "npm run lint",
     "pretest": "npm run lint",
-    "test": ""
+    "test": "",
+    "notest": "echo"
   },
   "licence": "",
   "main": "src/app.jsx",
