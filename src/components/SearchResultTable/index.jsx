@@ -34,10 +34,13 @@ const getTableBody = (rows, rowClickFn, selectable) => (
                   <Table.Cell
                     key={`cell-${index}`} // eslint-disable-line react/no-array-index-key
                   >
-                    {row.passed || value.includes('Yes') ?
-                      <Icon name="check circle outline" color="green" />
+                    {row.isStudyModuleCredit ? // eslint-disable-line
+                      <Icon name="certificate" color="purple" />
                       :
-                      <Icon name="remove circle outline" color="red" />
+                      row.passed || value.includes('Yes') ?
+                        <Icon name="check circle outline" color="green" />
+                        :
+                        <Icon name="remove circle outline" color="red" />
                     }
                     {value}
                   </Table.Cell>
