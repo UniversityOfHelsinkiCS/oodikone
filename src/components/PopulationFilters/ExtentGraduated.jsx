@@ -6,6 +6,7 @@ import _ from 'lodash'
 import infoTooltips from '../../common/infotooltips'
 import { extentGraduated } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import { relativeTimeRounding } from 'moment';
 
 class ExtentGraduated extends Component {
   static propTypes = {
@@ -51,6 +52,11 @@ class ExtentGraduated extends Component {
       returnText = returnText.concat(' studying')
     }
     returnText = returnText.concat(` ${extents.find(extent => extent.extentcode === extentcode).name[language]} `)
+
+    if (returnText === 'Not studying Määräaikaiset ulkomaalaiset opiskelijat ') {
+      return <span><b>Excluded</b> exchange students</span>
+    }
+
     return returnText
   }
 
