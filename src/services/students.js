@@ -62,7 +62,7 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
 }
 
 const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments, transfers, updatedAt, createdAt }) => {
-  const toCourse = ({ grade, credits, credittypecode, attainment_date, course }) => {
+  const toCourse = ({ grade, credits, credittypecode, attainment_date, course}) => {
     course = course.get()
     return {
       course: {
@@ -98,8 +98,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
 
   if (credits === undefined) {
     credits = []
-  }
-  return {
+  }  return {
     firstnames,
     lastname,
     studyrights,
