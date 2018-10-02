@@ -10,9 +10,12 @@ import { sendLog, login } from '../apiConnection'
 export const setToken = token => localStorage.setItem(TOKEN_NAME, token)
 
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
-  _.filter(dropDownOptions, option =>
+  _.filter(dropDownOptions, option => (option.text ?
     option.text.toLowerCase().concat(option.description.toLowerCase())
-      .includes(param.toLowerCase()))
+      .includes(param.toLowerCase())
+    :
+    null
+  ))
 
 export const decodeToken = (token) => {
   try {
