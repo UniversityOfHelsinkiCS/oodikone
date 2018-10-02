@@ -92,6 +92,7 @@ const attainmentDataToCourse = (attainment) => {
     code: attainment.learningopportunity_id,
     name: jsonNamesFromTexts(learningopportunity_name),
     latest_instance_date: parseDate(attainment_date),
+    is_study_module: attainment.is_leaf === 'false'
   }
 }
 
