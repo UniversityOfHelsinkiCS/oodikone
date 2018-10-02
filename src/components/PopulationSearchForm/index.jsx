@@ -229,7 +229,7 @@ class PopulationSearchForm extends Component {
     return list.map((sp) => {
       const shh = {}
       Object.assign(shh, sp)
-      shh.text = sp.name[language]
+      shh.text = (sp.name[language] || `${(sp.name.fi || sp.name.en || sp.name.sv)} (translation not found)`)
       shh.description = sp.code
       shh.value = sp.code
       return shh
