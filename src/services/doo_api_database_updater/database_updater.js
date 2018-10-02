@@ -4,7 +4,7 @@ const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
 const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, Teacher, Organisation, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment, sequelize, CreditTeacher } = require('../../../src/models/index')
 const _ = require('lodash')
-const { taskpool }  = require('../../util/taskpool')
+const { taskpool } = require('../../util/taskpool')
 
 let attainmentIds = new Set()
 let courseIds = new Set()
@@ -227,12 +227,12 @@ const updateTeacherInfoTaskPooled = async (teacherids, chunksize = 1) => {
   await pool.complete()
 }
 
-const updateTeachersInDb = async (chunksize=50, usetaskpool=true) => {
+const updateTeachersInDb = async (chunksize = 50, usetaskpool = true) => {
   const dbteachers = await Teacher.findAll({ attributes: ['id'] })
   if (usetaskpool === true) {
     await updateTeacherInfoTaskPooled(dbteachers.map(teacher => teacher.id), chunksize)
   } else {
-    await updateTeacherInfo(dbteachers.map(teacher => teacher.id), chunksize)  
+    await updateTeacherInfo(dbteachers.map(teacher => teacher.id), chunksize)
   }
 }
 
@@ -285,9 +285,9 @@ const saveSemestersAwesome = semesters => sequelize.transaction(() => {
   return Promise.all(semesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
 })
 
-const updateSemesters = async (usenew=true) => {
+const updateSemesters = async (usenew = true) => {
   const apiSemesters = await Oodi.getSemesters()
-  if (usenew===true) {
+  if (usenew === true) {
     return await saveSemestersAwesome(apiSemesters)
   } else {
     return await Promise.all(apiSemesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
@@ -310,7 +310,7 @@ const getExistingCourseRealisationCodes = async (since, courseids) => {
   return all.filter(isValidCourse).map(data => `${data.course_id}`)
 }
 
-const updateCourseRealisationsAndEnrollments = async (courseids, since='0000-01-01', chunksize=50) => {
+const updateCourseRealisationsAndEnrollments = async (courseids, since = '0000-01-01', chunksize = 50) => {
   const apidata = await getExistingCourseRealisationCodes(since, courseids)
   const chunks = _.chunk(apidata, chunksize)
   const pool = taskpool(5)
