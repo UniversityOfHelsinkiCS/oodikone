@@ -56,7 +56,7 @@ class StudentDetails extends Component {
         date, grade, credits, course, isStudyModuleCredit, passed
       } = c
       return {
-        date, course: `${isStudyModuleCredit ? `${course.name[language]} [Study Module]` : course.name[language]} (${course.code})`, grade, credits, passed
+        date, course: `${isStudyModuleCredit ? `${course.name[language]} [Study Module]` : course.name[language]} (${course.code})`, grade, credits, passed, isStudyModuleCredit
       }
     })
     return (
@@ -111,31 +111,36 @@ class StudentDetails extends Component {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {studyRightRows.map(c => (
-            <Table.Row key={c.studyrightid}>
-              <Table.Cell verticalAlign="middle">
-                {c.elements.degrees.map(degree => (
-                  <p key={degree.name}>{`${degree.name} (${reformatDate(degree.startdate, 'DD.MM.YYYY')} - ${reformatDate(degree.enddate, 'DD.MM.YYYY')})`} <br /> </p>
-                ))}
-              </Table.Cell>
-              <Table.Cell>
-                {c.elements.programmes.map(programme => (
-                  <p key={programme.name}>{`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(programme.enddate, 'DD.MM.YYYY')})`}<br /> </p>
-                ))}
-              </Table.Cell>
-              <Table.Cell>
-                {c.canceldate ? // eslint-disable-line
-                  <div><p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p></div>
-                  :
-                  c.graduated ?
-                    <div><Icon name="check circle outline" color="green" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
-                    :
-                    <div><Icon name="remove circle outline" color="red" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
-                }
+          {studyRightRows.map((c) => {
+            if (c.elements.programmes.length > 0 || c.elements.degrees.length > 0) {
+              return (
+                <Table.Row key={c.studyrightid}>
+                  <Table.Cell verticalAlign="middle">
+                    {c.elements.degrees.map(degree => (
+                      <p key={degree.name}>{`${degree.name} (${reformatDate(degree.startdate, 'DD.MM.YYYY')} - ${reformatDate(degree.enddate, 'DD.MM.YYYY')})`} <br /> </p>
+                    ))}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {c.elements.programmes.map(programme => (
+                      <p key={programme.name}>{`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(programme.enddate, 'DD.MM.YYYY')})`}<br /> </p>
+                    ))}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {c.canceldate ? // eslint-disable-line
+                      <div><p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p></div>
+                      :
+                      c.graduated ?
+                        <div><Icon name="check circle outline" color="green" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
+                        :
+                        <div><Icon name="remove circle outline" color="red" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
+                    }
 
-              </Table.Cell>
-            </Table.Row>
-          ))}
+                  </Table.Cell>
+                </Table.Row>
+              )
+            }
+            return null
+          })}
         </Table.Body>
       </Table>
     )

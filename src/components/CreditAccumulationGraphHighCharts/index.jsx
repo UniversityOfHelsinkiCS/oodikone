@@ -131,11 +131,10 @@ class CreditAccumulationGraphHighCharts extends Component {
     const startDate = this.props.selectedStudents.length === 1 ? started : studyrightStart
 
     const filteredCourses = courses.filter(c => moment(c.date).isSameOrAfter(moment(startDate)))
-
     let totalCredits = 0
     return filteredCourses.map((c) => {
-      const { course, date, credits, grade, passed } = c
-      if (passed) {
+      const { course, date, credits, grade, passed, isStudyModuleCredit } = c
+      if (passed && !isStudyModuleCredit) {
         totalCredits += credits
       }
       return {
@@ -170,7 +169,7 @@ class CreditAccumulationGraphHighCharts extends Component {
     students.map((student) => {
       let credits = 0
       const points = student.courses.map((course) => {
-        if (!['Luop', 'Hyl.', 'Eisa', '0', 'Fail'].includes(course.grade) && !course.isStudyModuleCredit) {
+        if (course.passed && !course.isStudyModuleCredit) {
           credits += course.credits
         }
         return [new Date(course.date).getTime(), credits]
