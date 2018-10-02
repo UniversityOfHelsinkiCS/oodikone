@@ -9,7 +9,7 @@ import { findCourses, clearCourses } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 
-const CourseTable = ({ courses, selected, onSelectCourse }) => (
+const CourseTable = ({ courses, selected, onSelectCourse, focus }) => (
   <Segment basic style={{ padding: '0' }} >
     <Table>
       {selected.length > 0 && (
@@ -34,27 +34,31 @@ const CourseTable = ({ courses, selected, onSelectCourse }) => (
           ))}
         </Table.Body>
       )}
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell content="Searched courses" />
-          <Table.HeaderCell content="Code" />
-          <Table.HeaderCell content="Select" />
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {courses.length === 0 ? (
+      {focus && (
+        <Table.Header>
           <Table.Row>
-            <Table.Cell colSpan="3" content="No courses matched your query" />
+            <Table.HeaderCell content="Searched courses" />
+            <Table.HeaderCell content="Code" />
+            <Table.HeaderCell content="Select" />
           </Table.Row>
-        ) : courses.map(course => (
-          <Table.Row key={course.code}>
-            <Table.Cell content={course.name} />
-            <Table.Cell content={course.code} />
-            <Table.Cell>
-              <Radio toggle checked={course.selected} onChange={() => onSelectCourse(course)} />
-            </Table.Cell>
-          </Table.Row>
-        ))}
+        </Table.Header>)}
+      <Table.Body>
+        {focus && (
+          courses.length === 0 ? (
+            <Table.Row>
+              <Table.Cell colSpan="3" content="No courses matched your query" />
+            </Table.Row>
+
+          ) : courses.map(course => (
+            <Table.Row key={course.code}>
+              <Table.Cell content={course.name} />
+              <Table.Cell content={course.code} />
+              <Table.Cell>
+                <Radio toggle checked={course.selected} onChange={() => onSelectCourse(course)} />
+              </Table.Cell>
+            </Table.Row>
+          ))
+        )}
       </Table.Body>
     </Table>
   </Segment>
@@ -63,7 +67,8 @@ const CourseTable = ({ courses, selected, onSelectCourse }) => (
 CourseTable.propTypes = {
   courses: arrayOf(shape({ code: string, name: string, seleted: bool })).isRequired,
   selected: arrayOf(shape({ code: string, name: string, seleted: bool })).isRequired,
-  onSelectCourse: func.isRequired
+  onSelectCourse: func.isRequired,
+  focus: bool.isRequired
 }
 
 const INITIAL = {
@@ -247,15 +252,14 @@ class SearchForm extends Component {
                   placeholder="Search by entering a course code or name"
                 />
               </Form.Field>
-              {focus ?
-                <CourseTable
-                  onFocus={() => this.setState({ focus: true })}
-                  loading={this.props.coursesLoading}
-                  selected={selected}
-                  courses={courses}
-                  onSelectCourse={this.toggleCourse}
-                />
-                : null}
+              <CourseTable
+                onFocus={() => this.setState({ focus: true })}
+                focus={focus}
+                loading={this.props.coursesLoading}
+                selected={selected}
+                courses={courses}
+                onSelectCourse={this.toggleCourse}
+              />
             </div>
             <Form.Button type="button" disabled={disabled} fluid basic positive content="Fetch statistics" onClick={this.submitForm} />
           </Form>
