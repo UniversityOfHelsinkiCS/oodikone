@@ -24,7 +24,10 @@ const INITIAL = {
 }
 
 class SearchForm extends Component {
-  state = { ...INITIAL }
+  state = {
+    ...INITIAL,
+    expanded: this.props.expanded
+  }
 
   componentDidMount() {
     this.props.clearCourses()
@@ -224,7 +227,8 @@ SearchForm.propTypes = {
   coursetypes: arrayOf(shape({})).isRequired,
   matchingCourses: arrayOf(shape({})).isRequired,
   years: arrayOf(shape({})).isRequired,
-  loading: bool.isRequired
+  loading: bool.isRequired,
+  expanded: bool.isRequired
 }
 
 const mapStateToProps = (state) => {

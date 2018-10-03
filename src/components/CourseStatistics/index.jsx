@@ -34,7 +34,7 @@ class CourseStatistics extends Component {
           Course Statistics
         </Header>
         <Segment className={sharedStyles.contentSegment} >
-          <SearchForm />
+          <SearchForm expanded={statsIsEmpty} />
           {!statsIsEmpty && <SearchResults />}
         </Segment>
       </div>
