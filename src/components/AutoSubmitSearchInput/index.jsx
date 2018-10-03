@@ -34,9 +34,9 @@ const AutoSubmitSearchInput = ({
 
   const handleSearchChange = (e, { value: val }) => {
     clearTimeout(TIMEOUTS.SEARCH)
-    if (val.length > 0) {
+    if (val.length >= 0) {
       onChange(val)
-      if (val.length > minSearchLength) {
+      if (val.length >= minSearchLength) {
         setTimeout(TIMEOUTS.SEARCH, () => {
           executeSearch(val)
         }, latency)
