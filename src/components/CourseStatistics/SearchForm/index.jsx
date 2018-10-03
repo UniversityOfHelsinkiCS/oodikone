@@ -12,7 +12,7 @@ import CourseTable from '../CourseTable'
 
 const INITIAL = {
   displaycourses: false,
-  searchterm: undefined,
+  searchterm: '',
   selectedcourses: {},
   fromYear: undefined,
   toYear: undefined,
@@ -38,12 +38,6 @@ class SearchForm extends Component {
 
   toggleCourseView = () => {
     this.setState({ displaycourses: !this.state.displaycourses })
-  }
-
-  searchOnEnter = (e) => {
-    if (e.key === 'Enter') {
-      this.fetchCourses(this.state.searchterm)
-    }
   }
 
   toggleCourse = (course) => {
@@ -89,10 +83,6 @@ class SearchForm extends Component {
   fetchCourses = (name) => {
     const { type, discipline } = this.state
     return this.props.findCourses({ name, ...{ type, discipline } })
-  }
-
-  handleSearchChange = (e, { value: searchterm }) => {
-    this.setState({ searchterm })
   }
 
   submitForm = async () => {
@@ -194,12 +184,17 @@ class SearchForm extends Component {
               onFocus={() => this.setState({ focus: true })}
               onBlur={() => this.setState({ focus: false })}
             >
-              <Form.Field>
-                <AutoSubmitSearchInput
-                  doSearch={this.fetchCourses}
-                  placeholder="Search by entering a course code or name"
-                />
-              </Form.Field>
+              <Form.Group widths="equal">
+                <Form.Field>
+                  <AutoSubmitSearchInput
+                    doSearch={this.fetchCourses}
+                    placeholder="Search by entering a course name"
+                    value={this.state.searchterm}
+                    onChange={searchterm => this.setState({ searchterm })}
+                    loading={this.props.coursesLoading}
+                  />
+                </Form.Field>
+              </Form.Group>
               <CourseTable
                 onFocus={() => this.setState({ focus: true })}
                 hidden={!focus}
@@ -228,7 +223,8 @@ SearchForm.propTypes = {
   matchingCourses: arrayOf(shape({})).isRequired,
   years: arrayOf(shape({})).isRequired,
   loading: bool.isRequired,
-  expanded: bool.isRequired
+  expanded: bool.isRequired,
+  coursesLoading: bool.isRequired
 }
 
 const mapStateToProps = (state) => {
