@@ -140,7 +140,7 @@ class SingleCourseStats extends Component {
     return (
       <div>
         <Segment>
-          <Header content={stats.name} />
+          <Header content={stats.name.default} />
           <Label.Group>
             {stats.alternatives.map(code => <Label key={code} content={code} />)}
           </Label.Group>

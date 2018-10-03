@@ -44,7 +44,8 @@ CourseTable.propTypes = {
 }
 
 CourseTable.defaultProps = {
-  emptyListText: 'No results.'
+  emptyListText: 'No results.',
+  string: false
 }
 
 export default CourseTable

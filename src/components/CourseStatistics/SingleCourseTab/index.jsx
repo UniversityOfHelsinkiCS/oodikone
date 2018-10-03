@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Table, Radio } from 'semantic-ui-react'
 import { shape } from 'prop-types'
 import SingleCourseStats from '../SingleCourseStats'
+import selectors from '../../../selectors/courseStats'
 
 class SingleCourse extends Component {
   state={
@@ -61,11 +62,8 @@ SingleCourse.propTypes = {
   stats: shape({}).isRequired
 }
 
-const mapStateToProps = (state) => {
-  const { data } = state.courseStats
-  return {
-    stats: data
-  }
-}
+const mapStateToProps = state => ({
+  stats: selectors.getCourseStats(state)
+})
 
 export default connect(mapStateToProps)(SingleCourse)

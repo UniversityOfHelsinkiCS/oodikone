@@ -127,7 +127,7 @@ class SearchForm extends Component {
       ) : (
         <Segment loading={loading}>
           <Form>
-            <Header content="Search parameters" onClick={this.toggleExpanded} />
+            <Header content="Search parameters" as="h3" onClick={this.toggleExpanded} />
             <Form.Group widths="equal">
               <Form.Dropdown
                 label="From:"
@@ -153,6 +153,12 @@ class SearchForm extends Component {
               name="separate"
               onChange={this.toggleCheckbox}
               checked={separate}
+            />
+            <CourseTable
+              title="Selected courses"
+              hidden={selected.length === 0}
+              courses={selected}
+              onSelectCourse={this.toggleCourse}
             />
             <Header content="Search for courses" />
             <Form.Group
@@ -192,16 +198,10 @@ class SearchForm extends Component {
                 />
               </Form.Field>
               <CourseTable
-                title="Selected courses"
-                hidden={selected.length === 0}
-                courses={selected}
-                onSelectCourse={this.toggleCourse}
-              />
-              <CourseTable
-                title="Searched courses"
                 onFocus={() => this.setState({ focus: true })}
                 hidden={!focus}
                 courses={courses}
+                title="Searched courses"
                 onSelectCourse={this.toggleCourse}
               />
             </div>

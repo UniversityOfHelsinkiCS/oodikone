@@ -1,6 +1,28 @@
 import { createSelector } from 'reselect'
 
-const getCourseStats = state => state.courseStats.data
+const nameAsString = (data, language) => {
+  if (typeof data === 'string') {
+    return data
+  }
+  return data[language] || Object.values(data)[0]
+}
+
+const getCourseStats = (state) => {
+  const { language } = state.settings
+  const stats = {}
+  Object.entries(state.courseStats.data).forEach((entry) => {
+    const [coursecode, data] = entry
+    const { statistics } = data
+    stats[coursecode] = {
+      ...data,
+      statistics: statistics.map(stat => ({
+        ...stat,
+        name: nameAsString(stat.name, language)
+      }))
+    }
+  })
+  return stats
+}
 
 const ALL = {
   key: 'all',
@@ -73,6 +95,7 @@ const summaryStatistics = createSelector(
 )
 
 export default {
+  getCourseStats,
   getAllStudyProgrammes,
   summaryStatistics,
   ALL
