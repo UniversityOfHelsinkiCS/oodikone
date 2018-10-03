@@ -142,7 +142,6 @@ const bySearchTerm = async (term, language) => {
   }
 }
 
-
 const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) => {
   const formatCourse = (course) => ({ name: course.name[language], code: course.code, date: course.latest_instance_date })
   const removeDuplicates = (courses) => {
@@ -501,6 +500,44 @@ const courseYearlyStats = async (coursecodes, separate, startyearcode, endyearco
   return stats
 }
 
+const nameLikeTerm = (name) => {
+  if (!name) {
+    return undefined
+  }
+  const term = `%${name.trim()}%`
+  return {
+    name: {
+      [Op.or]: {
+        fi: {
+          [Op.iLike]: term
+        },
+        sv: {
+          [Op.iLike]: term
+        },
+        en: {
+          [Op.iLike]: term
+        }
+      }
+    }
+  }
+}
+
+const codeLikeTerm = (code) => !code ? undefined : {
+  code: {
+    [Op.iLike]: `${code.trim()}%`
+  }
+}
+
+const byNameAndOrCodeLike = (name, code) => {
+  return Course.findAll({
+    attributes: ['name', 'code', ['latest_instance_date', 'date']],
+    where: {
+      ...nameLikeTerm(name),
+      ...codeLikeTerm(code)
+    }
+  })
+}
+
 module.exports = {
   byCode,
   byName,
@@ -517,5 +554,6 @@ module.exports = {
   getAllCourseTypes,
   getAllDisciplines,
   yearlyStatsOfNew,
-  courseYearlyStats
+  courseYearlyStats,
+  byNameAndOrCodeLike
 }
