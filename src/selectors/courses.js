@@ -28,3 +28,11 @@ export const makeSortCourses = () => createSelector(
   getData,
   sortCourses
 )
+
+export const getCourseSearchResults = (state) => {
+  const { language } = state.settings
+  return state.courseSearch.data.map(({ name, ...rest }) => ({
+    ...rest,
+    name: name[language] || Object.values(name)[0]
+  }))
+}

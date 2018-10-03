@@ -13,6 +13,12 @@ export const findCourses = ({ name, type, discipline }, language = 'fi') => {
   return callController(route, prefix, [], 'get', params, params)
 }
 
+export const findCoursesV2 = ({ name, code }) => {
+  const route = '/v2/coursesmulti'
+  const params = { name, code }
+  return callController(route, prefix, [], 'get', params, params)
+}
+
 const reducer = itemreducer(prefix)
 
 export default reducer

@@ -2,17 +2,17 @@ import React, { Component } from 'react'
 import { Segment, Header, Form, Menu } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, arrayOf, shape, bool } from 'prop-types'
-import { getCourseTypes } from '../../../redux/coursetypes'
-import { getCourseDisciplines } from '../../../redux/coursedisciplines'
 import { getSemesters } from '../../../redux/semesters'
-import { findCourses, clearCourses } from '../../../redux/coursesearch'
+import { findCourses, clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
+import { getCourseSearchResults } from '../../../selectors/courses'
 
 const INITIAL = {
   displaycourses: false,
-  searchterm: '',
+  coursename: '',
+  coursecode: '',
   selectedcourses: {},
   fromYear: undefined,
   toYear: undefined,
@@ -31,8 +31,6 @@ class SearchForm extends Component {
 
   componentDidMount() {
     this.props.clearCourses()
-    this.props.getCourseTypes()
-    this.props.getCourseDisciplines()
     this.props.getSemesters()
   }
 
@@ -80,9 +78,15 @@ class SearchForm extends Component {
     this.setState({ expanded: !this.state.expanded })
   }
 
-  fetchCourses = (name) => {
-    const { type, discipline } = this.state
-    return this.props.findCourses({ name, ...{ type, discipline } })
+  fetchCourses = () => {
+    const { coursename: name, coursecode: code } = this.state
+    if ((name && name.length >= 5) || (code && code.length >= 2)) {
+      return this.props.findCoursesV2({ name, code })
+    }
+    if (name.length === 0 && code.length === 0) {
+      this.props.clearCourses()
+    }
+    return Promise.resolve()
   }
 
   submitForm = async () => {
@@ -104,7 +108,7 @@ class SearchForm extends Component {
   }
 
   render() {
-    const { disciplines, coursetypes, years, loading } = this.props
+    const { years, loading } = this.props
     const { selectedcourses, fromYear, toYear, separate, focus } = this.state
     const courses = this.props.matchingCourses.map(course => ({
       ...course,
@@ -154,31 +158,6 @@ class SearchForm extends Component {
               onSelectCourse={this.toggleCourse}
             />
             <Header content="Search for courses" />
-            <Form.Group
-              widths="equal"
-              style={{ display: 'none' }}
-            >
-              <Form.Dropdown
-                onChange={this.handleCourseFormChange}
-                value={this.state.discipline}
-                label="Discipline:"
-                name="discipline"
-                search
-                options={disciplines}
-                selection
-                placeholder="Select a course discipline"
-              />
-              <Form.Dropdown
-                onChange={this.handleCourseFormChange}
-                label="Type:"
-                name="type"
-                value={this.state.type}
-                search
-                options={coursetypes}
-                selection
-                placeholder="Select a course type"
-              />
-            </Form.Group>
             <div
               style={{ marginBottom: '15px' }}
               onFocus={() => this.setState({ focus: true })}
@@ -186,12 +165,25 @@ class SearchForm extends Component {
             >
               <Form.Group widths="equal">
                 <Form.Field>
+                  <label>Code:</label>
+                  <AutoSubmitSearchInput
+                    doSearch={this.fetchCourses}
+                    placeholder="Search by entering a course code"
+                    value={this.state.coursecode}
+                    onChange={coursecode => this.setState({ coursecode })}
+                    loading={this.props.coursesLoading}
+                    minSearchLength={0}
+                  />
+                </Form.Field>
+                <Form.Field>
+                  <label>Name:</label>
                   <AutoSubmitSearchInput
                     doSearch={this.fetchCourses}
                     placeholder="Search by entering a course name"
-                    value={this.state.searchterm}
-                    onChange={searchterm => this.setState({ searchterm })}
+                    value={this.state.coursename}
+                    onChange={coursename => this.setState({ coursename })}
                     loading={this.props.coursesLoading}
+                    minSearchLength={0}
                   />
                 </Form.Field>
               </Form.Group>
@@ -211,15 +203,12 @@ class SearchForm extends Component {
 }
 
 SearchForm.propTypes = {
-  getCourseTypes: func.isRequired,
-  getCourseDisciplines: func.isRequired,
   findCourses: func.isRequired,
+  findCoursesV2: func.isRequired,
   getSemesters: func.isRequired,
   getCourseStats: func.isRequired,
   clearCourses: func.isRequired,
   clearCourseStats: func.isRequired,
-  disciplines: arrayOf(shape({})).isRequired,
-  coursetypes: arrayOf(shape({})).isRequired,
   matchingCourses: arrayOf(shape({})).isRequired,
   years: arrayOf(shape({})).isRequired,
   loading: bool.isRequired,
@@ -228,22 +217,10 @@ SearchForm.propTypes = {
 }
 
 const mapStateToProps = (state) => {
-  const disciplines = state.courseDisciplines.data.map(({ discipline_id: id, name }) => ({
-    key: id,
-    value: id,
-    text: name.fi || name.en
-  }))
-  const coursetypes = state.courseTypes.data.map(({ coursetypecode: code, name }) => ({
-    key: code,
-    value: code,
-    text: name.fi || name.en
-  }))
   const { years = [] } = state.semesters.data
   const { pending } = state.courseStats
   return {
-    disciplines,
-    coursetypes,
-    matchingCourses: state.courseSearch.data,
+    matchingCourses: getCourseSearchResults(state),
     years: Object.values(years).map(({ yearcode, yearname }) => ({
       key: yearcode,
       text: yearname,
@@ -255,11 +232,10 @@ const mapStateToProps = (state) => {
 }
 
 export default connect(mapStateToProps, {
-  getCourseTypes,
-  getCourseDisciplines,
   findCourses,
   getSemesters,
   getCourseStats,
   clearCourses,
-  clearCourseStats
+  clearCourseStats,
+  findCoursesV2
 })(SearchForm)
