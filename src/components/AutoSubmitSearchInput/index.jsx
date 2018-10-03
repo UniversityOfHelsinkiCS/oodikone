@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Input } from 'semantic-ui-react'
-import { func, string, number } from 'prop-types'
+import { func, string, number, bool } from 'prop-types'
 import Timeout from '../Timeout'
 
 const TIMEOUTS = {
@@ -8,52 +8,53 @@ const TIMEOUTS = {
   SEARCH: 'search'
 }
 
-class AutoSubmitSearchInput extends Component {
-    state = {
-      searchterm: '',
-      loading: false
-    }
+const AutoSubmitSearchInput = ({
+  clearTimeout,
+  onChange,
+  setTimeout,
+  icon,
+  value,
+  latency,
+  placeholder,
+  minSearchLength,
+  doSearch,
+  loading
+}) => {
+  const resetComponent = () => {
+    onChange('')
+  }
 
-    resetComponent = () => {
-      this.setState({ searchterm: '' })
-    }
+  const executeSearch = (searchterm) => {
+    setTimeout(TIMEOUTS.FETCH, () => {
+    }, latency)
+    doSearch(searchterm).then(() => {
+      clearTimeout(TIMEOUTS.FETCH)
+    })
+  }
 
-    executeSearch = (searchterm) => {
-      this.setState({ loading: true })
-      this.props.setTimeout(TIMEOUTS.FETCH, () => {
-      }, this.props.latency)
-      this.props.doSearch(searchterm).then(() => {
-        this.props.clearTimeout(TIMEOUTS.FETCH)
-        this.setState({ loading: false })
-      })
-    }
-
-    handleSearchChange = (e, { value }) => {
-      this.props.clearTimeout(TIMEOUTS.SEARCH)
-      if (value.length > 0) {
-        this.setState({ searchterm: value })
-        if (value.length > this.props.minSearchLength) {
-          this.props.setTimeout(TIMEOUTS.SEARCH, () => {
-            this.executeSearch(value)
-          }, this.props.latency)
-        }
-      } else {
-        this.resetComponent()
+  const handleSearchChange = (e, { value: val }) => {
+    clearTimeout(TIMEOUTS.SEARCH)
+    if (val.length >= 0) {
+      onChange(val)
+      if (val.length >= minSearchLength) {
+        setTimeout(TIMEOUTS.SEARCH, () => {
+          executeSearch(val)
+        }, latency)
       }
+    } else {
+      resetComponent()
     }
-
-    render() {
-      return (
-        <Input
-          fluid
-          icon={this.props.icon}
-          value={this.state.searchterm}
-          onChange={this.handleSearchChange}
-          placeholder={this.props.placeholder}
-          loading={this.state.loading}
-        />
-      )
-    }
+  }
+  return (
+    <Input
+      fluid
+      icon={icon}
+      value={value}
+      onChange={handleSearchChange}
+      placeholder={placeholder}
+      loading={loading}
+    />
+  )
 }
 
 AutoSubmitSearchInput.propTypes = {
@@ -63,14 +64,18 @@ AutoSubmitSearchInput.propTypes = {
   placeholder: string,
   icon: string,
   latency: number,
-  minSearchLength: number
+  minSearchLength: number,
+  value: string.isRequired,
+  onChange: func.isRequired,
+  loading: bool
 }
 
 AutoSubmitSearchInput.defaultProps = {
   placeholder: 'Search...',
   icon: 'search',
   latency: 250,
-  minSearchLength: 4
+  minSearchLength: 4,
+  loading: false
 }
 
 export default Timeout(AutoSubmitSearchInput)
