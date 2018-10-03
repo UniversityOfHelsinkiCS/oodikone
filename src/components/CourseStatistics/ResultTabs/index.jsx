@@ -1,60 +1,12 @@
 import React, { Component } from 'react'
-import { Tab, Table, Grid, Header, Radio, Form } from 'semantic-ui-react'
+import { Tab, Grid, Radio, Form } from 'semantic-ui-react'
 import { shape, string, number, oneOfType, arrayOf, func, bool } from 'prop-types'
-
 import _ from 'lodash'
 import StackedBarChart from '../../StackedBarChart'
 import { passRateCumGraphOptions, passRateStudGraphOptions, gradeGraphOptions } from '../../../constants'
 import { userIsAdmin } from '../../../common'
-
-const StatsCumTable = ({ stats, name }) => (
-  <div>
-    <Header as="h3" content={name} textAlign="center" />
-    <Table
-      headerRow={['Time', 'Passed', 'Failed', 'Pass rate']}
-      tableData={stats}
-      renderBodyRow={stat => ({
-        key: stat.code,
-        cells: [
-          stat.name,
-          stat.cumulative.categories.passed || 0,
-          stat.cumulative.categories.failed || 0,
-          `${Number((100 * stat.cumulative.categories.passed) /
-            (stat.cumulative.categories.failed + stat.cumulative.categories.passed)).toFixed(2)} %`
-        ]
-      })}
-    />
-  </div>
-)
-
-StatsCumTable.propTypes = {
-  stats: arrayOf(shape({})).isRequired,
-  name: oneOfType([number, string]).isRequired
-}
-
-const StatsStudTable = ({ stats, name }) => (
-  <div>
-    <Header as="h3" content={name} textAlign="center" />
-    <Table
-      headerRow={['Time', 'Passed on first try', 'Passed after retry', 'Failed on first try', 'Failed after retry']}
-      tableData={stats}
-      renderBodyRow={stat => ({
-        key: stat.code,
-        cells: [
-          stat.name,
-          stat.students.categories.passedFirst || 0,
-          stat.students.categories.passedRetry || 0,
-          stat.students.categories.failedFirst || 0,
-          stat.students.categories.failedRetry || 0
-        ]
-      })}
-    />
-  </div>)
-
-StatsStudTable.propTypes = {
-  stats: arrayOf(shape({})).isRequired,
-  name: oneOfType([number, string]).isRequired
-}
+import CumulativeTable from './CumulativeTable'
+import StudentTable from './StudentTable'
 
 const getPassRateCumSeriesFromStats = (stats, multiplier = 1, name = '') => {
   const all = []
@@ -290,9 +242,9 @@ class ResultTabs extends Component {
               {primary && (
                 <Grid.Column>
                   {cumMode ?
-                    <StatsCumTable name={primary.name} stats={primary.stats} />
+                    <CumulativeTable name={primary.name} stats={primary.stats} />
                     :
-                    <StatsStudTable name={primary.name} stats={primary.stats} />
+                    <StudentTable name={primary.name} stats={primary.stats} />
                   }
                 </Grid.Column>
               )}
@@ -300,9 +252,9 @@ class ResultTabs extends Component {
                 comparison && (
                   <Grid.Column>
                     {cumMode ?
-                      <StatsCumTable name={primary.name} stats={primary.stats} />
+                      <CumulativeTable name={comparison.name} stats={comparison.stats} />
                       :
-                      <StatsStudTable name={primary.name} stats={primary.stats} />
+                      <StudentTable name={comparison.name} stats={comparison.stats} />
                     }
                   </Grid.Column>
                 )
