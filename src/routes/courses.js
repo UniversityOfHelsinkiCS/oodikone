@@ -22,8 +22,7 @@ router.get('/coursesmulti', async (req, res) => {
 router.get('/v2/coursesmulti', async (req, res) => {
   let results = []
   if (req.query.name || req.query.code) {
-    results = await Course.byNameAndOrCodeLike()
-    res.json(results)
+    results = await Course.byNameAndOrCodeLike(req.query.name, req.query.code)
   }
   res.json(results)
 })
