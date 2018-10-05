@@ -3,14 +3,8 @@ import { Segment, Header, Label, Form, Divider } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number } from 'prop-types'
 import _ from 'lodash'
 import ResultTabs from '../ResultTabs'
-
-const ALL = {
-  key: 'all',
-  value: 'all',
-  text: 'All'
-}
-
-const label = count => ({ content: count, icon: 'user', basic: true })
+import ProgrammeDropdown from '../ProgrammeDropdown'
+import { ALL } from '../../../selectors/courseStats'
 
 const countFilteredStudents = (stat, filter) => Object.entries(stat).reduce((acc, entry) => {
   const [category, students] = entry
@@ -23,7 +17,7 @@ const countFilteredStudents = (stat, filter) => Object.entries(stat).reduce((acc
 class SingleCourseStats extends Component {
   state = {
     primary: ALL.value,
-    comparison: undefined,
+    comparison: null,
     cumMode: true
   }
 
@@ -54,13 +48,12 @@ class SingleCourseStats extends Component {
         key: code,
         value: code,
         text: name.fi || name.en || name.sv,
-        students: students.length,
-        label: label(students.length)
+        size: students.length
       }))
-      .sort((op1, op2) => op2.students - op1.students)
-    const total = options.reduce((acc, opt) => acc + opt.students, 0)
+      .sort((op1, op2) => op2.size - op1.size)
+    const total = options.reduce((acc, opt) => acc + opt.size, 0)
     return [
-      { ...ALL, label: label(total) },
+      { ...ALL, size: total },
       ...options
     ]
   }
@@ -148,24 +141,21 @@ class SingleCourseStats extends Component {
           <Form>
             <Header content="Filter statistics by study programme" as="h4" />
             <Form.Group widths="equal" >
-              <Form.Dropdown
+              <ProgrammeDropdown
                 name="primary"
                 options={options}
                 label="Primary group"
                 placeholder="Select a study programme"
                 value={primary}
                 onChange={this.handleChange}
-                search
-                selection
               />
-              <Form.Dropdown
+              <ProgrammeDropdown
                 name="comparison"
                 options={options}
                 label="Comparison group"
                 placeholder="Optional"
                 value={comparison}
                 onChange={this.handleChange}
-                selection
               />
             </Form.Group>
           </Form>
