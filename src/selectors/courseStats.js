@@ -25,8 +25,8 @@ const getCourseStats = (state) => {
 }
 
 const ALL = {
-  key: 'all',
-  value: 'all',
+  key: 'ALL',
+  value: 'ALL',
   text: 'All'
 }
 
