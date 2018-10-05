@@ -1,20 +1,15 @@
 import React from 'react'
 import { Form } from 'semantic-ui-react'
 import { string, arrayOf, shape, func, oneOfType, number } from 'prop-types'
+import DropdownItem from './DropdownItem'
 
 const ProgrammeDropdown = ({ options, label, name, onChange, value, ...props }) => (
   <Form.Dropdown
     options={options.map(({ key, size, value: v, text, ...rest }) => ({
         key,
+        content: <DropdownItem name={text} code={key} size={size} />,
         text,
         value: v,
-        label: {
-            icon: 'user',
-            content: size,
-            detail: key,
-            size: 'tiny',
-            basic: true
-        },
         ...rest
     }))}
     selection
@@ -23,6 +18,7 @@ const ProgrammeDropdown = ({ options, label, name, onChange, value, ...props }) 
     name={name}
     onChange={onChange}
     value={value}
+    renderLabel={text => text}
     {...props}
   />
 )
