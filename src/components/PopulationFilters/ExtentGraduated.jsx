@@ -42,21 +42,17 @@ class ExtentGraduated extends Component {
     const { language } = this.props
     const { extentcode, graduated, complemented } = filter.params
     let returnText = ''
-    if (complemented === 'true') {
-      returnText = returnText.concat('Not')
-    }
     if (graduated === 'grad') {
-      returnText = returnText.concat(' graduated from')
+      returnText = ('students that graduated from')
     } else if (graduated === 'either') {
-      returnText = returnText.concat(' studying')
+      returnText = ('students that are studying ')
     }
-    returnText = returnText.concat(` ${extents.find(extent => extent.extentcode === extentcode).name[language]} `)
+    const extentText = (` ${extents.find(extent => extent.extentcode === extentcode).name[language]} `)
 
-    if (returnText === 'Not studying Määräaikaiset ulkomaalaiset opiskelijat ') {
-      return <span><b>Excluded</b> exchange students</span>
-    }
-
-    return returnText
+    return complemented === 'true' ?
+      <span><b>Excluded</b> {returnText}<b>{extentText}</b></span>
+      :
+      <span><b>Included</b> {returnText}<b>{extentText}</b></span>
   }
 
   render() {

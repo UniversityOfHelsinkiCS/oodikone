@@ -34,6 +34,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       chart: {
         height: this.props.currentGraphSize
       },
+
       plotOptions: {
         series: {
           point: {
@@ -168,12 +169,15 @@ class CreditAccumulationGraphHighCharts extends Component {
   createStudentCreditLines = students =>
     students.map((student) => {
       let credits = 0
-      const points = student.courses.map((course) => {
+      let points = student.courses.map((course) => {
         if (course.passed && !course.isStudyModuleCredit) {
           credits += course.credits
         }
         return [new Date(course.date).getTime(), credits]
       })
+      if (points.length < 2) {
+        points = [[students.minDate, 0], ...points]
+      }
       return { name: student.studentNumber, data: points, seriesThreshold: 150 }
     })
 

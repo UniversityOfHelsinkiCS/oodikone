@@ -5,27 +5,18 @@ import { shape, arrayOf, func, oneOfType, number, string } from 'prop-types'
 import selectors from '../../../selectors/courseStats'
 import { fields, setValue } from '../../../redux/coursesSummaryForm'
 import CumulativeTable from '../CumulativeTable'
+import ProgrammeDropdown from '../ProgrammeDropdown'
 
 class SummaryTab extends Component {
     handleChange = (e, { name, value }) => this.props.setValue(name, value)
 
     render() {
       const { statistics, programmes } = this.props
-      const options = programmes.map(p => ({
-        ...p,
-        label: {
-          content: p.size,
-          icon: 'user',
-          basic: true
-        }
-      }))
       return (
         <div>
           <Form>
-            <Form.Dropdown
-              options={options}
-              selection
-              fluid
+            <ProgrammeDropdown
+              options={programmes}
               label="Study programme"
               name={fields.programme}
               onChange={this.handleChange}
