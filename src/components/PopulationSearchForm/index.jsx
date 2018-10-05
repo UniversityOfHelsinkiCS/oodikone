@@ -64,6 +64,14 @@ class PopulationSearchForm extends Component {
       this.props.getDegreesAndProgrammes()
     }
   }
+  componentDidUpdate() {
+    const { studyProgrammes } = this.props
+    if (studyProgrammes
+      && Object.values(studyProgrammes).length === 1
+      && !this.state.query.studyRights.programme) {
+      this.handleProgrammeChange(null, { value: Object.values(studyProgrammes)[0].code })
+    }
+  }
 
   months(year, term) { // eslint-disable-line
     const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')
@@ -328,6 +336,7 @@ class PopulationSearchForm extends Component {
         options={programmesToRender}
         onChange={this.handleProgrammeChange}
         closeOnChange
+        disabled={programmesToRender.length === 1}
       />
     </Form.Field>
   )
