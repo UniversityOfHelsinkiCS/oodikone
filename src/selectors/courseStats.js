@@ -24,9 +24,9 @@ const getCourseStats = (state) => {
   return stats
 }
 
-const ALL = {
-  key: 'all',
-  value: 'all',
+export const ALL = {
+  key: 'ALL',
+  value: 'ALL',
   text: 'All'
 }
 
