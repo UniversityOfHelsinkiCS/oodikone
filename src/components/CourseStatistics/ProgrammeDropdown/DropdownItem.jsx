@@ -19,11 +19,11 @@ const styles = {
 const DropdownItem = ({ name, code, size }) => (
   <div style={styles.container}>
     <div style={styles.text}>
-      <Label content={code} size="tiny" />
+      <Label content={size} icon="user" size="tiny" />
       <span style={{ paddingLeft: '1rem' }}>{name}</span>
     </div>
     <div style={styles.students}>
-      <Label content={size} icon="user" size="tiny" />
+      <Label content={code} size="tiny" />
     </div>
   </div>
 )
