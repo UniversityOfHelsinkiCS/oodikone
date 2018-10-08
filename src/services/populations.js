@@ -28,7 +28,7 @@ const semesterEnd = {
 
 const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments, transfers, updatedAt, createdAt }, startDate, endDate) => {
 
-  const toCourse = ({ grade, attainment_date, credits, course, credittypecode }) => {
+  const toCourse = ({ grade, attainment_date, credits, course, credittypecode, isStudyModule }) => {
     course = course.get()
     return {
       course: {
@@ -40,7 +40,7 @@ const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnum
       passed: Credit.passed({ credittypecode }),
       grade,
       credits,
-      isStudyModuleCredit: course.is_study_module
+      isStudyModuleCredit: isStudyModule
     }
   }
 
@@ -97,13 +97,13 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     include: [
       {
         model: Credit,
-        attributes: ['grade', 'credits', 'credittypecode', 'attainment_date', 'student_studentnumber'],
+        attributes: ['grade', 'credits', 'credittypecode', 'attainment_date', 'student_studentnumber', 'isStudyModule'],
         separate: true,
         include: [
           {
             model: Course,
             required: true,
-            attributes: ['code', 'name', 'coursetypecode', 'is_study_module']
+            attributes: ['code', 'name', 'coursetypecode']
           }
         ],
         where: {
