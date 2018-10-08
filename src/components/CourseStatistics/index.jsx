@@ -7,25 +7,25 @@ import sharedStyles from '../../styles/shared'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
 import SummaryTab from './SummaryTab'
-
-const SearchResults = () => (
-  <Tab
-    menu={{ attached: false }}
-    panes={[
-      {
-        menuItem: 'Summary',
-        render: () => <SummaryTab />
-      },
-      {
-        menuItem: 'Course',
-        render: () => <SingleCourseTab />
-      }
-    ]}
-  />
-)
+import { clearCourseStats } from '../../redux/coursestats'
 
 class CourseStatistics extends Component {
-  state={}
+  static getDerivedStateFromProps(props, state) {
+    const finishedGet = !props.pending && state.pending && !props.error
+    return {
+      pending: props.pending,
+      activeIndex: finishedGet ? 0 : state.activeIndex
+    }
+  }
+
+  state={
+    activeIndex: 0
+  }
+
+  handleTabChange = (e, { activeIndex }) => {
+    this.setState({ activeIndex })
+  }
+
   render() {
     const { statsIsEmpty } = this.props
     return (
@@ -34,8 +34,32 @@ class CourseStatistics extends Component {
           Course Statistics
         </Header>
         <Segment className={sharedStyles.contentSegment} >
-          <SearchForm expanded={statsIsEmpty} />
-          {!statsIsEmpty && <SearchResults />}
+          { statsIsEmpty ? <SearchForm /> : (
+            <Tab
+              menu={{ attached: false, borderless: false }}
+              panes={[
+                {
+                  menuItem: 'Summary',
+                  render: () => <SummaryTab />
+                },
+                {
+                  menuItem: 'Course',
+                  render: () => <SingleCourseTab />
+                },
+                {
+                  menuItem: {
+                    key: 'query',
+                    content: 'New query',
+                    icon: 'search',
+                    position: 'right'
+                  },
+                  render: () => <SearchForm />
+                }
+              ]}
+              activeIndex={this.state.activeIndex}
+              onTabChange={this.handleTabChange}
+            />
+          )}
         </Segment>
       </div>
     )
@@ -47,7 +71,9 @@ CourseStatistics.propTypes = {
 }
 
 const mapStateToProps = ({ courseStats }) => ({
+  pending: courseStats.pending,
+  error: courseStats.error,
   statsIsEmpty: Object.keys(courseStats.data).length === 0
 })
 
-export default connect(mapStateToProps)(CourseStatistics)
+export default connect(mapStateToProps, { clearCourseStats })(CourseStatistics)
