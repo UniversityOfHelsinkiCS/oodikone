@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Segment, Header, Label, Form, Divider } from 'semantic-ui-react'
+import { Segment, Header, Form } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number } from 'prop-types'
 import _ from 'lodash'
 import ResultTabs from '../ResultTabs'
@@ -133,11 +133,6 @@ class SingleCourseStats extends Component {
     return (
       <div>
         <Segment>
-          <Header content={stats.name} />
-          <Label.Group>
-            {stats.alternatives.map(code => <Label key={code} content={code} />)}
-          </Label.Group>
-          <Divider />
           <Form>
             <Header content="Filter statistics by study programme" as="h4" />
             <Form.Group widths="equal" >

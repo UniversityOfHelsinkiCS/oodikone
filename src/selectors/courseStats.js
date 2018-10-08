@@ -94,8 +94,20 @@ const summaryStatistics = createSelector(
   }
 )
 
+const getCourses = createSelector(
+  getCourseStats,
+  (stats) => {
+    const courses = Object.values(stats).map(({ name, coursecode: code }) => ({
+      code,
+      name
+    }))
+    return courses
+  }
+)
+
 export default {
   getCourseStats,
+  getCourses,
   getAllStudyProgrammes,
   summaryStatistics,
   ALL
