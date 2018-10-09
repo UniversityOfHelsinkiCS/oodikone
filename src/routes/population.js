@@ -59,6 +59,7 @@ router.get('/v2/populationstatistics', async (req, res) => {
     const result = await Population.optimizedStatisticsOf(req.query)
 
     if (result.error) {
+      console.log(result.error)
       res.status(400)
       return
     }
@@ -100,6 +101,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     const result = await Population.optimizedStatisticsOf(req.query)
 
     if (result.error) {
+      console.log(result.error)
       res.status(400)
       return
     }
