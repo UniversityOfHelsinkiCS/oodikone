@@ -144,7 +144,7 @@ export const courseParticipationNTimes = (params) => {
       amount,
       course
     },
-    filter: student => student.courses.filter(cr => cr.course.code === course).length >= amount
+    filter: student => student.courses.filter(cr => cr.course.code === course).length < amount
   })
 }
 
