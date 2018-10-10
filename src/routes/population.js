@@ -78,10 +78,11 @@ router.get('/v3/populationstatistics', async (req, res) => {
       res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
       return
     }
-
     if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
       req.query.studyRights = [req.query.studyRights]
     }
+    req.query.studyRights = req.query.studyRights.filter(sr => sr !== 'undefined')
+    console.log(req.query.studyRights)
     const { admin, czar } = req.decodedToken
     if (!(admin || czar)) {
       const user = await User.byUsername(req.decodedToken.userId)
