@@ -82,7 +82,6 @@ router.get('/v3/populationstatistics', async (req, res) => {
       req.query.studyRights = [req.query.studyRights]
     }
     req.query.studyRights = req.query.studyRights.filter(sr => sr !== 'undefined')
-    console.log(req.query.studyRights)
     const { admin, czar } = req.decodedToken
     if (!(admin || czar)) {
       const user = await User.byUsername(req.decodedToken.userId)
