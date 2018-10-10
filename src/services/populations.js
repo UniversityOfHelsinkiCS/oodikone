@@ -292,7 +292,7 @@ const optimizedStatisticsOf = async (query) => {
 
   const studentsWithCombinedOpenUniCredits = await Promise.all(students.map(async st => {
     const credits = await Promise.all(st.credits.map(async cr => {
-      if (cr.course.name.fi.includes('Avoin yo:')) {
+      if (cr.course.name.fi && cr.course.name.fi.includes('Avoin yo:')) {
         const courses = await byName(cr.course.name.fi.split(': ')[1], 'fi')
         const theOne = courses.length > 0 ? orderBy(courses, ['date'], ['desc'])[0] : cr.course
         cr.course.name = theOne.name
