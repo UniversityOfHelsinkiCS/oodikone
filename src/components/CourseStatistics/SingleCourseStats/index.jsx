@@ -134,6 +134,7 @@ class SingleCourseStats extends Component {
                 placeholder="Optional"
                 value={comparison}
                 onChange={this.handleChange}
+                onClear={() => this.setState({ comparison: undefined })}
               />
             </Form.Group>
           </Form>
