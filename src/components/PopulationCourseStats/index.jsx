@@ -38,6 +38,7 @@ class PopulationCourseStats extends Component {
       sortBy: 'students',
       reversed: false,
       limit: parseInt(this.props.populationSize * 0.15, 10),
+      codeFilter: '',
       showGradeDistribution: false
     }
   }
@@ -62,6 +63,9 @@ class PopulationCourseStats extends Component {
     }
     return course.stats.students >= this.state.limit
   }
+
+  codeFilter = () => ({ course }) =>
+    course.code.toLowerCase().includes(this.state.codeFilter.toLowerCase())
 
   sortBy(criteria) {
     return () => {
@@ -104,7 +108,10 @@ class PopulationCourseStats extends Component {
           <Table.HeaderCell colSpan="2" >
             {translate('populationCourses.course')}
           </Table.HeaderCell>
-          <Table.HeaderCell>{translate('populationCourses.code')}</Table.HeaderCell>
+          <Table.HeaderCell>
+            {translate('populationCourses.code')}
+            <Input style={{ marginLeft: 10, width: '6em', textDecoration: 'underline' }} transparent placeholder="(filter here)" onKeyPress={e => e.key === 'Enter' && this.setState({ codeFilter: e.target.value })} />
+          </Table.HeaderCell>
           <Table.HeaderCell
             sorted={sortBy === 'students' ? 'descending' : null}
             onClick={this.sortBy('students')}
@@ -136,67 +143,68 @@ class PopulationCourseStats extends Component {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {courses.coursestatistics.sort(this.criteria()).filter(this.limit()).map(course => (
-          <Popup
-            key={course.course.code}
-            trigger={
-              <Table.Row active={this.active(course.course)}>
-                <Table.Cell onClick={this.limitPopulationToCourse(course)}>
-                  {course.course.name[language]}
-                </Table.Cell>
-                <Table.Cell
-                  icon="level up alternate"
-                  onClick={() => {
-                    this.props.history.push('/coursestatistics/')
-                    this.props.getMultipleCourseStatistics({
-                      codes: [course.course.code],
-                      start: Number(this.props.query.year),
-                      end: Number(moment(moment(this.props.query.year, 'YYYY').add(this.props.query.months, 'months')).format('YYYY')),
-                      separate: false,
-                      language: this.props.language
-                    })
-                  }}
-                  style={{ borderLeft: '0px !important' }}
-                />
-                <Table.Cell>{course.course.code}</Table.Cell>
-                <Table.Cell>
-                  {course.grades ? _.sum(Object.values(course.grades).map(g => g.count)) || 0 : 0}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.grades ?
-                    _.sum(Object.values(course.grades).filter(g =>
-                      g.status.failingGrade).map(g => g.count))
-                    || 0 : 0}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.grades[1] ? course.grades[1].count || 0 : 0}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.grades[2] ? course.grades[2].count || 0 : 0}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.grades[3] ? course.grades[3].count || 0 : 0}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.grades[4] ? course.grades[4].count || 0 : 0}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.grades[5] ? course.grades[5].count || 0 : 0}
-                </Table.Cell>
-                <Table.Cell>
-                  {course.grades ?
-                    _.sum(Object.values(_.omit(course.grades, [1, 2, 3, 4, 5])).filter(g =>
-                      g.status.passingGrade || g.status.improvedGrade).map(g => g.count)) : 0}
-                </Table.Cell>
-              </Table.Row>}
-            flowing
-            hoverable
-            inverted
-            position="top right"
-            hideOnScroll
-            content={course.grades ? <pre>{formatGradeDistribution(course.grades)}</pre> : 'Nothing to see here'}
-          />
-        ))}
+        {courses.coursestatistics
+          .sort(this.criteria()).filter(this.limit() && this.codeFilter()).map(course => (
+            <Popup
+              key={course.course.code}
+              trigger={
+                <Table.Row active={this.active(course.course)}>
+                  <Table.Cell onClick={this.limitPopulationToCourse(course)}>
+                    {course.course.name[language]}
+                  </Table.Cell>
+                  <Table.Cell
+                    icon="level up alternate"
+                    onClick={() => {
+                      this.props.history.push('/coursestatistics/')
+                      this.props.getMultipleCourseStatistics({
+                        codes: [course.course.code],
+                        start: Number(this.props.query.year),
+                        end: Number(moment(moment(this.props.query.year, 'YYYY').add(this.props.query.months, 'months')).format('YYYY')),
+                        separate: false,
+                        language: this.props.language
+                      })
+                    }}
+                    style={{ borderLeft: '0px !important' }}
+                  />
+                  <Table.Cell>{course.course.code}</Table.Cell>
+                  <Table.Cell>
+                    {course.grades ? _.sum(Object.values(course.grades).map(g => g.count)) || 0 : 0}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {course.grades ?
+                      _.sum(Object.values(course.grades).filter(g =>
+                        g.status.failingGrade).map(g => g.count))
+                      || 0 : 0}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {course.grades[1] ? course.grades[1].count || 0 : 0}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {course.grades[2] ? course.grades[2].count || 0 : 0}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {course.grades[3] ? course.grades[3].count || 0 : 0}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {course.grades[4] ? course.grades[4].count || 0 : 0}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {course.grades[5] ? course.grades[5].count || 0 : 0}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {course.grades ?
+                      _.sum(Object.values(_.omit(course.grades, [1, 2, 3, 4, 5])).filter(g =>
+                        g.status.passingGrade || g.status.improvedGrade).map(g => g.count)) : 0}
+                  </Table.Cell>
+                </Table.Row>}
+              flowing
+              hoverable
+              inverted
+              position="top right"
+              hideOnScroll
+              content={course.grades ? <pre>{formatGradeDistribution(course.grades)}</pre> : 'Nothing to see here'}
+            />
+          ))}
       </Table.Body>
     </Table>
   )
@@ -231,7 +239,10 @@ class PopulationCourseStats extends Component {
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell colSpan="1" >{translate('populationCourses.name')}</Table.HeaderCell>
-          <Table.HeaderCell>{translate('populationCourses.code')}</Table.HeaderCell>
+          <Table.HeaderCell>
+            {translate('populationCourses.code')}
+            <Input style={{ marginLeft: 10, width: '6em' }} transparent placeholder="(filter here)" onKeyPress={e => e.key === 'Enter' && this.setState({ codeFilter: e.target.value })} />
+          </Table.HeaderCell>
           <Table.HeaderCell
             sorted={sortBy === 'passed' ? 'descending' : null}
             onClick={this.sortBy('passed')}
@@ -318,52 +329,53 @@ class PopulationCourseStats extends Component {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {courses.coursestatistics.sort(this.criteria()).filter(this.limit()).map(course => (
-          <Table.Row key={course.course.code} active={this.active(course.course)}>
-            <Table.Cell onClick={this.limitPopulationToCourse(course)}>
-              {course.course.name[language]}
-            </Table.Cell>
-            <Table.Cell
-              icon="level up alternate"
-              onClick={() => {
-                this.props.history.push('/coursestatistics/')
-                this.props.getMultipleCourseStatistics({
-                  codes: [course.course.code],
-                  start: Number(this.props.query.year),
-                  end: Number(moment(moment(this.props.query.year, 'YYYY').add(this.props.query.months, 'months')).format('YYYY')),
-                  separate: false,
-                  language: this.props.language
-                })
-              }}
-              style={{
-                borderLeft: '0px !important',
-                display: 'none'
-              }}
-            />
-            <Table.Cell>{course.course.code}</Table.Cell>
-            <Table.Cell>
-              {course.stats.passed + course.stats.failed}
-            </Table.Cell>
-            <Table.Cell>
-              {course.stats.passed}
-            </Table.Cell>
-            <Table.Cell>
-              {course.stats.retryPassed}
-            </Table.Cell>
-            <Table.Cell>{course.stats.percentage} %</Table.Cell>
-            <Table.Cell>
-              {course.stats.failed}
-            </Table.Cell>
-            <Table.Cell>
-              {course.stats.failedMany}
-            </Table.Cell>
-            <Table.Cell>{course.stats.attempts}</Table.Cell>
-            <Table.Cell>
-              {course.stats.perStudent.toFixed(2)}
-            </Table.Cell>
-            <Table.Cell>{course.stats.passedOfPopulation} %</Table.Cell>
-            <Table.Cell>{course.stats.triedOfPopulation} %</Table.Cell>
-          </Table.Row>))}
+        {courses.coursestatistics
+          .sort(this.criteria()).filter(this.limit() && this.codeFilter()).map(course => (
+            <Table.Row key={course.course.code} active={this.active(course.course)}>
+              <Table.Cell onClick={this.limitPopulationToCourse(course)}>
+                {course.course.name[language]}
+              </Table.Cell>
+              <Table.Cell
+                icon="level up alternate"
+                onClick={() => {
+                  this.props.history.push('/coursestatistics/')
+                  this.props.getMultipleCourseStatistics({
+                    codes: [course.course.code],
+                    start: Number(this.props.query.year),
+                    end: Number(moment(moment(this.props.query.year, 'YYYY').add(this.props.query.months, 'months')).format('YYYY')),
+                    separate: false,
+                    language: this.props.language
+                  })
+                }}
+                style={{
+                  borderLeft: '0px !important',
+                  display: 'none'
+                }}
+              />
+              <Table.Cell>{course.course.code}</Table.Cell>
+              <Table.Cell>
+                {course.stats.passed + course.stats.failed}
+              </Table.Cell>
+              <Table.Cell>
+                {course.stats.passed}
+              </Table.Cell>
+              <Table.Cell>
+                {course.stats.retryPassed}
+              </Table.Cell>
+              <Table.Cell>{course.stats.percentage} %</Table.Cell>
+              <Table.Cell>
+                {course.stats.failed}
+              </Table.Cell>
+              <Table.Cell>
+                {course.stats.failedMany}
+              </Table.Cell>
+              <Table.Cell>{course.stats.attempts}</Table.Cell>
+              <Table.Cell>
+                {course.stats.perStudent.toFixed(2)}
+              </Table.Cell>
+              <Table.Cell>{course.stats.passedOfPopulation} %</Table.Cell>
+              <Table.Cell>{course.stats.triedOfPopulation} %</Table.Cell>
+            </Table.Row>))}
       </Table.Body>
     </Table>
   )
