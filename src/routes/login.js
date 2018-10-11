@@ -15,9 +15,7 @@ const generateToken = async (uid, res) => {
     admin: user.admin,
     czar: user.czar
   }
-  const token = jwt.sign(payload, conf.TOKEN_SECRET, {
-    expiresIn: '24h'
-  })
+  const token = jwt.sign(payload, conf.TOKEN_SECRET)
 
   // return the information including token as JSON
   res.status(200).json({ token })
