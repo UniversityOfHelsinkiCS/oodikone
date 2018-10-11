@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { Segment, Header, Label, Form, Divider } from 'semantic-ui-react'
+import { Segment, Header, Form } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number } from 'prop-types'
 import _ from 'lodash'
+import { connect } from 'react-redux'
 import ResultTabs from '../ResultTabs'
 import ProgrammeDropdown from '../ProgrammeDropdown'
-import { ALL } from '../../../selectors/courseStats'
+import selectors, { ALL } from '../../../selectors/courseStats'
 
 const countFilteredStudents = (stat, filter) => Object.entries(stat).reduce((acc, entry) => {
   const [category, students] = entry
@@ -39,23 +40,6 @@ class SingleCourseStats extends Component {
     }
     const { name } = this.props.stats.programmes[progcode]
     return name.fi || name.en || name.sv
-  }
-
-  programmeOptions = () => {
-    const { programmes } = this.props.stats
-    const options = Object.entries(programmes)
-      .map(([code, { name, students }]) => ({
-        key: code,
-        value: code,
-        text: name.fi || name.en || name.sv,
-        size: students.length
-      }))
-      .sort((op1, op2) => op2.size - op1.size)
-    const total = options.reduce((acc, opt) => acc + opt.size, 0)
-    return [
-      { ...ALL, size: total },
-      ...options
-    ]
   }
 
   belongsToProgramme = (code) => {
@@ -125,25 +109,19 @@ class SingleCourseStats extends Component {
   }
 
   render() {
-    const { stats } = this.props
+    const { stats, programmes } = this.props
     const { primary, comparison } = this.selectedProgrammes()
-    const options = this.programmeOptions()
     const statistics = this.filteredProgrammeStatistics()
     const max = this.getMax(stats.statistics)
     return (
       <div>
         <Segment>
-          <Header content={stats.name} />
-          <Label.Group>
-            {stats.alternatives.map(code => <Label key={code} content={code} />)}
-          </Label.Group>
-          <Divider />
           <Form>
             <Header content="Filter statistics by study programme" as="h4" />
             <Form.Group widths="equal" >
               <ProgrammeDropdown
                 name="primary"
-                options={options}
+                options={programmes}
                 label="Primary group"
                 placeholder="Select a study programme"
                 value={primary}
@@ -151,7 +129,7 @@ class SingleCourseStats extends Component {
               />
               <ProgrammeDropdown
                 name="comparison"
-                options={options}
+                options={programmes}
                 label="Comparison group"
                 placeholder="Optional"
                 value={comparison}
@@ -189,7 +167,12 @@ SingleCourseStats.propTypes = {
     })),
     name: string,
     coursecode: string
-  }).isRequired
+  }).isRequired,
+  programmes: arrayOf(shape({})).isRequired
 }
 
-export default SingleCourseStats
+const mapStateToProps = state => ({
+  programmes: selectors.getAllStudyProgrammes(state)
+})
+
+export default connect(mapStateToProps)(SingleCourseStats)
