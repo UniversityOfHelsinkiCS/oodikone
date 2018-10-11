@@ -7,35 +7,72 @@ import sharedStyles from '../../styles/shared'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
 import SummaryTab from './SummaryTab'
+import { clearCourseStats } from '../../redux/coursestats'
 
-const SearchResults = () => (
-  <Tab
-    menu={{ attached: false }}
-    panes={[
+const MENU = {
+  SUM: 'Summary',
+  COURSE: 'Course',
+  QUERY: 'New query'
+}
+
+class CourseStatistics extends Component {
+  static getDerivedStateFromProps(props, state) {
+    const finishedGet = !props.pending && state.pending && !props.error
+    return {
+      pending: props.pending,
+      activeIndex: finishedGet ? 0 : state.activeIndex
+    }
+  }
+
+  state={
+    activeIndex: 0
+  }
+
+  getPanes = () => {
+    const { singleCourseStats } = this.props
+    const panes = [
       {
-        menuItem: 'Summary',
+        menuItem: MENU.SUM,
         render: () => <SummaryTab />
       },
       {
-        menuItem: 'Course',
+        menuItem: MENU.COURSE,
         render: () => <SingleCourseTab />
+      },
+      {
+        menuItem: {
+          key: 'query',
+          content: MENU.QUERY,
+          icon: 'search',
+          position: 'right'
+        },
+        render: () => <SearchForm />
       }
-    ]}
-  />
-)
+    ]
+    return !singleCourseStats ? panes : panes.filter(p => p.menuItem !== MENU.SUM)
+  }
 
-class CourseStatistics extends Component {
-  state={}
+  handleTabChange = (e, { activeIndex }) => {
+    this.setState({ activeIndex })
+  }
+
   render() {
     const { statsIsEmpty } = this.props
+    const panes = this.getPanes()
     return (
       <div className={style.container}>
         <Header className={sharedStyles.segmentTitle} size="large">
           Course Statistics
         </Header>
         <Segment className={sharedStyles.contentSegment} >
-          <SearchForm expanded={statsIsEmpty} />
-          {!statsIsEmpty && <SearchResults />}
+          { statsIsEmpty ? <SearchForm /> : (
+            <Tab
+              menu={{ attached: false, borderless: false }}
+              panes={panes}
+              activeIndex={this.state.activeIndex}
+              onTabChange={this.handleTabChange}
+            />
+          )}
         </Segment>
       </div>
     )
@@ -43,11 +80,18 @@ class CourseStatistics extends Component {
 }
 
 CourseStatistics.propTypes = {
-  statsIsEmpty: bool.isRequired
+  statsIsEmpty: bool.isRequired,
+  singleCourseStats: bool.isRequired
 }
 
-const mapStateToProps = ({ courseStats }) => ({
-  statsIsEmpty: Object.keys(courseStats.data).length === 0
-})
+const mapStateToProps = ({ courseStats }) => {
+  const courses = Object.keys(courseStats.data)
+  return {
+    pending: courseStats.pending,
+    error: courseStats.error,
+    statsIsEmpty: courses.length === 0,
+    singleCourseStats: courses.length === 1
+  }
+}
 
-export default connect(mapStateToProps)(CourseStatistics)
+export default connect(mapStateToProps, { clearCourseStats })(CourseStatistics)

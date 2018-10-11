@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import { Segment, Header, Form, Menu } from 'semantic-ui-react'
+import { Segment, Header, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, arrayOf, shape, bool } from 'prop-types'
 import { getSemesters } from '../../../redux/semesters'
 import { findCourses, clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
-import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
+import { getCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import { getCourseSearchResults } from '../../../selectors/courses'
@@ -17,7 +17,6 @@ const INITIAL = {
   fromYear: undefined,
   toYear: undefined,
   separate: false,
-  expanded: true,
   discipline: undefined,
   type: undefined,
   focus: false
@@ -25,13 +24,12 @@ const INITIAL = {
 
 class SearchForm extends Component {
   state = {
-    ...INITIAL,
-    expanded: this.props.expanded
+    ...INITIAL
   }
 
   componentDidMount() {
-    this.props.clearCourses()
     this.props.getSemesters()
+    this.props.clearCourses()
   }
 
   toggleCourseView = () => {
@@ -74,10 +72,6 @@ class SearchForm extends Component {
     this.setState({ [name]: !this.state[name] })
   }
 
-  toggleExpanded = () => {
-    this.setState({ expanded: !this.state.expanded })
-  }
-
   fetchCourses = () => {
     const { coursename: name, coursecode: code } = this.state
     if ((name && name.length >= 5) || (code && code.length >= 2)) {
@@ -98,13 +92,6 @@ class SearchForm extends Component {
       separate
     }
     await this.props.getCourseStats(params)
-    this.setState({ ...INITIAL, expanded: false })
-  }
-
-  expandForm = () => {
-    this.props.clearCourses()
-    this.props.clearCourseStats()
-    this.toggleExpanded()
   }
 
   render() {
@@ -116,89 +103,84 @@ class SearchForm extends Component {
     }))
     const disabled = (!fromYear || Object.keys(selectedcourses).length === 0)
     const selected = Object.values(selectedcourses).map(course => ({ ...course, selected: true }))
-    return !this.state.expanded
-      ? (
-        <Menu>
-          <Menu.Item icon="search" content="New query" onClick={this.expandForm} />
-        </Menu>
-      ) : (
-        <Segment loading={loading}>
-          <Form>
-            <Header content="Search parameters" as="h3" onClick={this.toggleExpanded} />
-            <Form.Group widths="equal">
-              <Form.Dropdown
-                label="From:"
-                name="fromYear"
-                options={years}
-                selection
-                placeholder="Select academic year"
-                onChange={this.handleChange}
-                value={fromYear}
-              />
-              <Form.Dropdown
-                label="To:"
-                name="toYear"
-                options={years}
-                selection
-                placeholder="Select academic year"
-                onChange={this.handleChange}
-                value={toYear}
-              />
-            </Form.Group>
-            <Form.Checkbox
-              label="Separate statistics for Spring and Fall semesters"
-              name="separate"
-              onChange={this.toggleCheckbox}
-              checked={separate}
+    return (
+      <Segment loading={loading}>
+        <Form>
+          <Header content="Search parameters" as="h3" />
+          <Form.Group widths="equal">
+            <Form.Dropdown
+              label="From:"
+              name="fromYear"
+              options={years}
+              selection
+              placeholder="Select academic year"
+              onChange={this.handleChange}
+              value={fromYear}
             />
+            <Form.Dropdown
+              label="To:"
+              name="toYear"
+              options={years}
+              selection
+              placeholder="Select academic year"
+              onChange={this.handleChange}
+              value={toYear}
+            />
+          </Form.Group>
+          <Form.Checkbox
+            label="Separate statistics for Spring and Fall semesters"
+            name="separate"
+            onChange={this.toggleCheckbox}
+            checked={separate}
+          />
+          <CourseTable
+            title="Selected courses"
+            hidden={selected.length === 0}
+            courses={selected}
+            onSelectCourse={this.toggleCourse}
+          />
+          <Header content="Search for courses" />
+          <div
+            style={{ marginBottom: '15px' }}
+            onFocus={() => this.setState({ focus: true })}
+            onBlur={() => this.setState({ focus: false })}
+          >
+            <Form.Group widths="equal">
+              <Form.Field>
+                <label>Code:</label>
+                <AutoSubmitSearchInput
+                  doSearch={this.fetchCourses}
+                  placeholder="Search by entering a course code"
+                  value={this.state.coursecode}
+                  onChange={coursecode => this.setState({ coursecode })}
+                  loading={this.props.coursesLoading}
+                  minSearchLength={0}
+                />
+              </Form.Field>
+              <Form.Field>
+                <label>Name:</label>
+                <AutoSubmitSearchInput
+                  doSearch={this.fetchCourses}
+                  placeholder="Search by entering a course name"
+                  value={this.state.coursename}
+                  onChange={coursename => this.setState({ coursename })}
+                  loading={this.props.coursesLoading}
+                  minSearchLength={0}
+                />
+              </Form.Field>
+            </Form.Group>
             <CourseTable
-              title="Selected courses"
-              hidden={selected.length === 0}
-              courses={selected}
+              onFocus={() => this.setState({ focus: true })}
+              hidden={!focus}
+              courses={courses}
+              title="Searched courses"
               onSelectCourse={this.toggleCourse}
             />
-            <Header content="Search for courses" />
-            <div
-              style={{ marginBottom: '15px' }}
-              onFocus={() => this.setState({ focus: true })}
-              onBlur={() => this.setState({ focus: false })}
-            >
-              <Form.Group widths="equal">
-                <Form.Field>
-                  <label>Code:</label>
-                  <AutoSubmitSearchInput
-                    doSearch={this.fetchCourses}
-                    placeholder="Search by entering a course code"
-                    value={this.state.coursecode}
-                    onChange={coursecode => this.setState({ coursecode })}
-                    loading={this.props.coursesLoading}
-                    minSearchLength={0}
-                  />
-                </Form.Field>
-                <Form.Field>
-                  <label>Name:</label>
-                  <AutoSubmitSearchInput
-                    doSearch={this.fetchCourses}
-                    placeholder="Search by entering a course name"
-                    value={this.state.coursename}
-                    onChange={coursename => this.setState({ coursename })}
-                    loading={this.props.coursesLoading}
-                    minSearchLength={0}
-                  />
-                </Form.Field>
-              </Form.Group>
-              <CourseTable
-                onFocus={() => this.setState({ focus: true })}
-                hidden={!focus}
-                courses={courses}
-                title="Searched courses"
-                onSelectCourse={this.toggleCourse}
-              />
-            </div>
-            <Form.Button type="button" disabled={disabled} fluid basic positive content="Fetch statistics" onClick={this.submitForm} />
-          </Form>
-        </Segment>
-      )
+          </div>
+          <Form.Button type="button" disabled={disabled} fluid basic positive content="Fetch statistics" onClick={this.submitForm} />
+        </Form>
+      </Segment>
+    )
   }
 }
 
@@ -208,11 +190,9 @@ SearchForm.propTypes = {
   getSemesters: func.isRequired,
   getCourseStats: func.isRequired,
   clearCourses: func.isRequired,
-  clearCourseStats: func.isRequired,
   matchingCourses: arrayOf(shape({})).isRequired,
   years: arrayOf(shape({})).isRequired,
   loading: bool.isRequired,
-  expanded: bool.isRequired,
   coursesLoading: bool.isRequired
 }
 
@@ -236,6 +216,5 @@ export default connect(mapStateToProps, {
   getSemesters,
   getCourseStats,
   clearCourses,
-  clearCourseStats,
   findCoursesV2
 })(SearchForm)

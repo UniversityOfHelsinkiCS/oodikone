@@ -54,7 +54,7 @@ class CourseParticipationNTimes extends Component {
             <Form.Group inline>
               <Form.Field>
                 <label>
-                  Show only students that have participated in International Progress Test
+                  Show only students that have participated in International Progress Test less than
                 </label>
               </Form.Field>
               <Form.Field>
@@ -85,7 +85,7 @@ class CourseParticipationNTimes extends Component {
       <Segment>
         Participated in
         <i> International Progress Test </i>
-        at least <b>{filter.params.amount}</b> times
+        less than <b>{filter.params.amount}</b> times
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

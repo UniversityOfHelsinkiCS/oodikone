@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Table, Radio } from 'semantic-ui-react'
-import { shape } from 'prop-types'
+import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
+import { shape, arrayOf } from 'prop-types'
 import SingleCourseStats from '../SingleCourseStats'
 import selectors from '../../../selectors/courseStats'
 
@@ -19,39 +19,33 @@ class SingleCourse extends Component {
     }
     return {
       selected,
-      statistics,
       selectedStatistic: stats[selected]
     }
   }
 
   render() {
-    const { selected, statistics, selectedStatistic } = this.getStats()
+    const { selected, selectedStatistic } = this.getStats()
+    const { courses } = this.props
     return (
       <div>
-        <Table>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell content="Name" />
-              <Table.HeaderCell content="Code" />
-              <Table.HeaderCell content="Select" />
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {statistics.map(stat => (
-              <Table.Row key={stat.coursecode}>
-                <Table.Cell content={stat.name} />
-                <Table.Cell content={stat.coursecode} />
-                <Table.Cell>
-                  <Radio
-                    toggle
-                    checked={stat.coursecode === selected}
-                    onClick={() => this.setState({ selected: stat.coursecode })}
-                  />
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
+        <Segment>
+          <Form size="large">
+            { courses.length === 1 ? courses[0].text : (
+              <Form.Dropdown
+                name="selected"
+                size="large"
+                placeholder="Ohjelmoinnin perusteet"
+                options={courses}
+                onChange={(e, { value }) => this.setState({ selected: value })}
+                value={selected || courses[0].value}
+              />
+            )}
+            <Divider />
+            <Label.Group>
+              {selectedStatistic.alternatives.map(code => <Label key={code} content={code} />)}
+            </Label.Group>
+          </Form>
+        </Segment>
         { selected && <SingleCourseStats stats={selectedStatistic} /> }
       </div>
     )
@@ -59,11 +53,18 @@ class SingleCourse extends Component {
 }
 
 SingleCourse.propTypes = {
-  stats: shape({}).isRequired
+  stats: shape({}).isRequired,
+  courses: arrayOf(shape({})).isRequired
 }
 
 const mapStateToProps = state => ({
-  stats: selectors.getCourseStats(state)
+  stats: selectors.getCourseStats(state),
+  courses: selectors.getCourses(state).map(({ code, name }) => ({
+    key: code,
+    value: code,
+    text: <Header content={name} />,
+    content: name
+  }))
 })
 
 export default connect(mapStateToProps)(SingleCourse)
