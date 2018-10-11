@@ -18,7 +18,7 @@ import Main from './components/Main'
 const av = navigator.appVersion
 console.log(av) // eslint-disable-line
 if (av.indexOf('MSIE') !== -1 || av.indexOf('Trident/') !== -1) {
-  alert("You use IE. That's no good.") // eslint-disable-line
+  alert("Internet Explorer is not supported. Please use a web browser from this decade. e.g. Google Chrome or Firefox.") // eslint-disable-line
 }
 try {
   Raven.config('https://02d07bd40f404cc0965f38f06183d9fb@toska.cs.helsinki.fi/3').install() // eslint-disable-line
