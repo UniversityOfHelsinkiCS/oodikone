@@ -54,7 +54,8 @@ class PopulationSearchForm extends Component {
     this.state = {
       query: INITIAL_QUERY,
       isLoading: false,
-      validYear: true
+      validYear: true,
+      floatMonths: this.months('2017', 'FALL')
     }
   }
 
@@ -226,7 +227,15 @@ class PopulationSearchForm extends Component {
   getMonths = (year, end, term) => {
     const lastDayOfMonth = moment(end).endOf('month')
     const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
+    this.setState({
+      floatMonths: moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths()
+    })
     return Math.ceil(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
+  }
+
+  getMonthValue = (year, months) => {
+    const start = `${year}-08-01`
+    return moment(start).add(months - 1, 'months').format('MMMM YY')
   }
 
   getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
@@ -296,7 +305,7 @@ class PopulationSearchForm extends Component {
           <label>Statistics until</label>
           <Datetime
             dateFormat="MMMM YYYY"
-            defaultValue={moment()}
+            value={this.getMonthValue(this.state.query.year, this.state.floatMonths)}
             onChange={value => this.handleMonthsChange(value)}
             isValidDate={current => current.isBefore(moment()) &&
               current.isAfter(this.getMinSelection(year, semesters[1] || semesters[0]))}
@@ -480,7 +489,7 @@ class PopulationSearchForm extends Component {
           studyRights,
           studyTracksToRender,
           degreesToRender
-          )}
+        )}
       </Form.Group>
     )
   }
@@ -494,7 +503,6 @@ class PopulationSearchForm extends Component {
     if (!this.shouldRenderSearchForm()) {
       return null
     }
-
     const { translate } = this.props
     const { isLoading, validYear, query } = this.state
     let errorText = translate('populationStatistics.alreadyFetched')
