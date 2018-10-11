@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Header, Segment, Message, Grid } from 'semantic-ui-react'
+import { Header, Segment, Grid, Message } from 'semantic-ui-react'
 import sharedStyles from '../../styles/shared'
 import style from './index.css'
 
@@ -17,11 +17,6 @@ class SandboxContainer extends Component {
                   compact
                   content={(<i>{'"I don\'t like sand. It\'s coarse and rough and irritating and it gets everywhere."'}</i>)}
                 />
-              </Grid.Row>
-              <Grid.Row>
-                <Segment style={{ width: '100%' }}>
-                  Do stuff here
-                </Segment>
               </Grid.Row>
             </Grid>
           </Segment>
