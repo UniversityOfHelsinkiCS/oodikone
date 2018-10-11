@@ -1,4 +1,5 @@
 import React from 'react'
+import _ from 'lodash'
 import { Segment, Table, Radio } from 'semantic-ui-react'
 import { func, arrayOf, shape, string, bool } from 'prop-types'
 
@@ -19,7 +20,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText }) 
               <Table.Row>
                 <Table.Cell colSpan="3" content={emptyListText} />
               </Table.Row>
-            ) : courses.map(course => (
+            ) : _.sortBy(courses, course => course.name).map(course => (
               <Table.Row key={course.code}>
                 <Table.Cell content={course.name} width={10} />
                 <Table.Cell content={course.code} />
