@@ -15,6 +15,7 @@ import { routes, BASE_PATH } from '../../constants'
 import AccessDenied from '../AccessDenied'
 import UsageStatistics from '../UsageStatistics'
 import Teachers from '../Teachers'
+import Sandbox from '../Sandbox'
 
 import styles from './main.css'
 
@@ -74,6 +75,7 @@ class Main extends Component {
               <Route exact path={routes.users.route} component={EnableUsers} />
               <Route exact path={routes.teachers.route} component={Teachers} />
               <Route exact path={routes.usage.route} component={UsageStatistics} />
+              <Route exact path={routes.sandbox.route} component={Sandbox} />
             </Switch>
           </main>
         </Router>
