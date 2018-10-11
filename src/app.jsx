@@ -15,6 +15,9 @@ import reducers from './redux'
 import { handleRequest } from './apiConnection'
 import Main from './components/Main'
 
+if (navigator.appVersion.indexOf('MSIE') !== -1) {
+  alert("You use IE. That's no good.")
+}
 try {
   Raven.config('https://02d07bd40f404cc0965f38f06183d9fb@toska.cs.helsinki.fi/3').install() // eslint-disable-line
 } catch (e) { } // eslint-disable-line
