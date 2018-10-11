@@ -2,13 +2,14 @@ import React from 'react'
 import { Form } from 'semantic-ui-react'
 import { string, arrayOf, shape, func, oneOfType, number } from 'prop-types'
 import DropdownItem from './DropdownItem'
+import ClearableItem from './ClearableItem'
 
-const ProgrammeDropdown = ({ options, label, name, onChange, value, ...props }) => (
+const ProgrammeDropdown = ({ options, label, name, onChange, onClear, value, ...props }) => (
   <Form.Dropdown
     options={options.map(({ key, size, value: v, text, ...rest }) => ({
         key,
         content: <DropdownItem name={text} code={key} size={size} />,
-        text,
+        text: !onClear ? text : <ClearableItem name={text} onClear={onClear} />,
         value: v,
         ...rest
     }))}
@@ -18,7 +19,6 @@ const ProgrammeDropdown = ({ options, label, name, onChange, value, ...props }) 
     name={name}
     onChange={onChange}
     value={value}
-    renderLabel={text => text}
     {...props}
   />
 )
@@ -27,6 +27,7 @@ ProgrammeDropdown.propTypes = {
   label: string.isRequired,
   name: string.isRequired,
   onChange: func.isRequired,
+  onClear: func,
   value: oneOfType([string, number]),
   options: arrayOf(shape({
     code: oneOfType([string, number]),
@@ -38,7 +39,8 @@ ProgrammeDropdown.propTypes = {
 }
 
 ProgrammeDropdown.defaultProps = {
-  value: undefined
+  value: undefined,
+  onClear: undefined
 }
 
 export default ProgrammeDropdown
