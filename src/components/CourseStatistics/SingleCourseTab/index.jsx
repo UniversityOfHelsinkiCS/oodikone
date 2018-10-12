@@ -29,12 +29,10 @@ class SingleCourse extends Component {
     return (
       <div>
         <Segment>
-          <Form size="large">
+          <Form>
             { courses.length === 1 ? courses[0].text : (
               <Form.Dropdown
                 name="selected"
-                size="large"
-                placeholder="Ohjelmoinnin perusteet"
                 options={courses}
                 onChange={(e, { value }) => this.setState({ selected: value })}
                 value={selected || courses[0].value}
