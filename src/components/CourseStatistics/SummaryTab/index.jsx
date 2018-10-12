@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form } from 'semantic-ui-react'
+import { Form, Label } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { shape, arrayOf, func, oneOfType, number, string } from 'prop-types'
 import selectors from '../../../selectors/courseStats'
@@ -11,7 +11,7 @@ class SummaryTab extends Component {
     handleChange = (e, { name, value }) => this.props.setValue(name, value)
 
     render() {
-      const { statistics, programmes } = this.props
+      const { statistics, programmes, queryInfo } = this.props
       return (
         <div>
           <Form>
@@ -22,6 +22,19 @@ class SummaryTab extends Component {
               onChange={this.handleChange}
               value={this.props.form[fields.programme]}
             />
+
+            <Form.Group inline>
+              <Form.Field inline>
+                <label>From: </label>
+                <Label content={queryInfo.from.name} basic />
+              </Form.Field>
+              { !!queryInfo.to && (
+                <Form.Field inline>
+                  <label>To: </label>
+                  <Label content={queryInfo.to.name} basic />
+                </Form.Field>
+              )}
+            </Form.Group>
           </Form>
           <CumulativeTable
             categoryName="Course"
@@ -50,7 +63,11 @@ SummaryTab.propTypes = {
   })).isRequired,
   programmes: arrayOf(shape({})).isRequired,
   form: shape({}).isRequired,
-  setValue: func.isRequired
+  setValue: func.isRequired,
+  queryInfo: shape({
+    courses: arrayOf(shape({})),
+    timeframe: arrayOf(shape({}))
+  }).isRequired
 }
 
 const mapStateToProps = (state) => {
@@ -59,6 +76,7 @@ const mapStateToProps = (state) => {
   return {
     form: state.courseSummaryForm,
     statistics: selectors.summaryStatistics(state, { programmes, programme }),
+    queryInfo: selectors.getQueryInfo(state),
     programmes
   }
 }
