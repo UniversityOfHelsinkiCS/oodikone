@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, Label } from 'semantic-ui-react'
+import { Form, Label, Segment, Header, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { shape, arrayOf, func, oneOfType, number, string } from 'prop-types'
 import selectors from '../../../selectors/courseStats'
@@ -14,28 +14,26 @@ class SummaryTab extends Component {
       const { statistics, programmes, queryInfo } = this.props
       return (
         <div>
-          <Form>
-            <ProgrammeDropdown
-              options={programmes}
-              label="Study programme"
-              name={fields.programme}
-              onChange={this.handleChange}
-              value={this.props.form[fields.programme]}
-            />
-
-            <Form.Group inline>
-              <Form.Field inline>
-                <label>From: </label>
-                <Label content={queryInfo.from.name} basic />
+          <Segment>
+            <Form>
+              <Header content="Filter statistics by study programme" as="h4" />
+              <ProgrammeDropdown
+                options={programmes}
+                label="Study programme:"
+                name={fields.programme}
+                onChange={this.handleChange}
+                value={this.props.form[fields.programme]}
+              />
+              <Form.Field>
+                <label>Timeframe:</label>
+                <Label.Group>
+                  {queryInfo.timeframe.map(({ code, name }) => (
+                    <Label key={code} content={name} />
+                  ))}
+                </Label.Group>
               </Form.Field>
-              { !!queryInfo.to && (
-                <Form.Field inline>
-                  <label>To: </label>
-                  <Label content={queryInfo.to.name} basic />
-                </Form.Field>
-              )}
-            </Form.Group>
-          </Form>
+            </Form>
+          </Segment>
           <CumulativeTable
             categoryName="Course"
             data={statistics.map(s => ({
