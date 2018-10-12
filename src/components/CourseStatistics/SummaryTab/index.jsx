@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, Label, Segment, Header, Icon } from 'semantic-ui-react'
+import { Form, Label, Segment, Header } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { shape, arrayOf, func, oneOfType, number, string } from 'prop-types'
 import selectors from '../../../selectors/courseStats'
