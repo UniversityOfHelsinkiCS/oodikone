@@ -24,6 +24,31 @@ const getCourseStats = (state) => {
   return stats
 }
 
+
+const getQueryInfo = (state) => {
+  const courseStats = Object.values(getCourseStats(state))
+  const timeframe = []
+  const courses = []
+  courseStats.forEach((c) => {
+    courses.push({
+      code: c.coursecode,
+      name: c.name,
+      alternatives: c.alternatives
+    })
+  })
+  const { statistics } = courseStats[0]
+  statistics.forEach((stat) => {
+    timeframe.push({
+      name: stat.name,
+      code: stat.code
+    })
+  })
+  const from = timeframe[0]
+  const frames = timeframe.length
+  const to = frames === 1 ? undefined : timeframe[frames - 1]
+  return { courses, timeframe, from, to }
+}
+
 export const ALL = {
   key: 'ALL',
   value: 'ALL',
@@ -110,5 +135,6 @@ export default {
   getCourses,
   getAllStudyProgrammes,
   summaryStatistics,
-  ALL
+  ALL,
+  getQueryInfo
 }
