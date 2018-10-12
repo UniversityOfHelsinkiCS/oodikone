@@ -27,7 +27,7 @@ const getCourseStats = (state) => {
 
 const getQueryInfo = (state) => {
   const courseStats = Object.values(getCourseStats(state))
-  const timeframe = []
+  const semesters = {}
   const courses = []
   courseStats.forEach((c) => {
     courses.push({
@@ -35,18 +35,12 @@ const getQueryInfo = (state) => {
       name: c.name,
       alternatives: c.alternatives
     })
-  })
-  const { statistics } = courseStats[0]
-  statistics.forEach((stat) => {
-    timeframe.push({
-      name: stat.name,
-      code: stat.code
+    c.statistics.forEach(({ name, code }) => {
+      semesters[code] = { name, code }
     })
   })
-  const from = timeframe[0]
-  const frames = timeframe.length
-  const to = frames === 1 ? undefined : timeframe[frames - 1]
-  return { courses, timeframe, from, to }
+  const timeframe = Object.values(semesters).sort((t1, t2) => t1.code > t2.code)
+  return { courses, timeframe }
 }
 
 export const ALL = {
