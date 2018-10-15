@@ -7,6 +7,7 @@ const TOKEN_SECRET = process.env.TOKEN_SECRET
 const DB_SCHEMA = process.env.DB_SCHEMA || 'public'
 const CERT_PATH = process.env.CERT_PATH // production/staging only
 const KEY_PATH = process.env.KEY_PATH // production/staging only
+const OODILEARN_URL = process.env.OODILEARN_URL
 
 const FEATURES = {
   ERROR_HANDLER: false
@@ -29,5 +30,5 @@ const OODI = {
 const OODI_ADDR = OODI[process.env.NODE_ENV] || process.env.OODI_ADDR
 
 module.exports = {
-  frontend_addr, DB_URL, redis, TOKEN_SECRET, DB_SCHEMA, OODI_ADDR, CERT_PATH, KEY_PATH, FEATURES
+  frontend_addr, DB_URL, redis, TOKEN_SECRET, DB_SCHEMA, OODI_ADDR, CERT_PATH, KEY_PATH, FEATURES, OODILEARN_URL
 }
