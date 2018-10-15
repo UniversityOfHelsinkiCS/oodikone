@@ -24,6 +24,25 @@ const getCourseStats = (state) => {
   return stats
 }
 
+
+const getQueryInfo = (state) => {
+  const courseStats = Object.values(getCourseStats(state))
+  const semesters = {}
+  const courses = []
+  courseStats.forEach((c) => {
+    courses.push({
+      code: c.coursecode,
+      name: c.name,
+      alternatives: c.alternatives
+    })
+    c.statistics.forEach(({ name, code }) => {
+      semesters[code] = { name, code }
+    })
+  })
+  const timeframe = Object.values(semesters).sort((t1, t2) => t1.code > t2.code)
+  return { courses, timeframe }
+}
+
 export const ALL = {
   key: 'ALL',
   value: 'ALL',
@@ -110,5 +129,6 @@ export default {
   getCourses,
   getAllStudyProgrammes,
   summaryStatistics,
-  ALL
+  ALL,
+  getQueryInfo
 }

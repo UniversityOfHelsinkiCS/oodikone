@@ -15,29 +15,30 @@ const MENU = {
   QUERY: 'New query'
 }
 
+const INITIAL = {
+  activeIndex: 0,
+  selected: undefined,
+  pending: false
+}
+
 class CourseStatistics extends Component {
   static getDerivedStateFromProps(props, state) {
     const finishedGet = !props.pending && state.pending && !props.error
-    return {
-      pending: props.pending,
-      activeIndex: finishedGet ? 0 : state.activeIndex
-    }
+    return finishedGet ? { ...INITIAL } : { pending: props.pending }
   }
 
-  state={
-    activeIndex: 0
-  }
+  state={ ...INITIAL }
 
   getPanes = () => {
     const { singleCourseStats } = this.props
     const panes = [
       {
         menuItem: MENU.SUM,
-        render: () => <SummaryTab />
+        render: () => <SummaryTab onClickCourse={this.switchToCourse} />
       },
       {
         menuItem: MENU.COURSE,
-        render: () => <SingleCourseTab />
+        render: () => <SingleCourseTab selected={this.state.selected} />
       },
       {
         menuItem: {
@@ -54,6 +55,13 @@ class CourseStatistics extends Component {
 
   handleTabChange = (e, { activeIndex }) => {
     this.setState({ activeIndex })
+  }
+
+  switchToCourse = (coursecode) => {
+    this.setState({
+      activeIndex: 1,
+      selected: coursecode
+    })
   }
 
   render() {
