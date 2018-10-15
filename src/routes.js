@@ -14,6 +14,7 @@ const teachers = require('./routes/teachers')
 const usage = require('./routes/usage')
 const providers = require('./routes/providers')
 const semesters = require('./routes/semesters')
+const oodilearn = require('./routes/oodilearn')
 
 const accessLogger = morgan((tokens, req, res) => {
   const fields = ['method', 'url', 'status', 'response-time', 'remote-addr', 'remote-user', 'user-agent', 'referrer']
@@ -44,5 +45,6 @@ module.exports = (app, url) => {
   app.use(auth.checkAdminAuth)
   app.use(url, users)
   app.use(url, elementdetails)
-  app.use(url, usage)
+  app.use(url, usage),
+  app.use(url, oodilearn)
 }
