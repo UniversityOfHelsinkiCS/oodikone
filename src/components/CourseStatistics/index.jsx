@@ -25,7 +25,8 @@ class CourseStatistics extends Component {
   }
 
   state={
-    activeIndex: 0
+    activeIndex: 0,
+    selected: undefined
   }
 
   getPanes = () => {
@@ -33,11 +34,11 @@ class CourseStatistics extends Component {
     const panes = [
       {
         menuItem: MENU.SUM,
-        render: () => <SummaryTab />
+        render: () => <SummaryTab onClickCourse={this.switchToCourse} />
       },
       {
         menuItem: MENU.COURSE,
-        render: () => <SingleCourseTab />
+        render: () => <SingleCourseTab selected={this.state.selected} />
       },
       {
         menuItem: {
@@ -54,6 +55,13 @@ class CourseStatistics extends Component {
 
   handleTabChange = (e, { activeIndex }) => {
     this.setState({ activeIndex })
+  }
+
+  switchToCourse = (coursecode) => {
+    this.setState({
+      activeIndex: 1,
+      selected: coursecode
+    })
   }
 
   render() {
