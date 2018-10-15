@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
-import { shape, arrayOf } from 'prop-types'
+import { shape, arrayOf, oneOfType, number, string } from 'prop-types'
 import SingleCourseStats from '../SingleCourseStats'
 import selectors from '../../../selectors/courseStats'
 
 class SingleCourse extends Component {
   state={
-    selected: undefined
+    selected: this.props.selected
   }
 
   getStats = () => {
@@ -52,7 +52,12 @@ class SingleCourse extends Component {
 
 SingleCourse.propTypes = {
   stats: shape({}).isRequired,
-  courses: arrayOf(shape({})).isRequired
+  courses: arrayOf(shape({})).isRequired,
+  selected: oneOfType([number, string])
+}
+
+SingleCourse.defaultProps = {
+  selected: undefined
 }
 
 const mapStateToProps = state => ({
