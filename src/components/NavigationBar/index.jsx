@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Menu, Dropdown } from 'semantic-ui-react'
+import { Menu, Dropdown, Button } from 'semantic-ui-react'
+import * as Sentry from '@sentry/browser'
 import { NavLink, Link } from 'react-router-dom'
 import { func } from 'prop-types'
 import { connect } from 'react-redux'
@@ -105,6 +106,9 @@ class NavigationBar extends Component {
           })
         }
         {this.renderUserMenu()}
+        <Menu.Item>
+          <Button icon="bullhorn" onClick={() => Sentry.showReportDialog()} />
+        </Menu.Item>
       </Menu>)
   }
 }
