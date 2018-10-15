@@ -1,0 +1,1 @@
+echo "Vittu Sasu" && docker build -t oodilearn . && docker run -it oodilearn
