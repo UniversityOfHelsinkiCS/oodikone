@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { localize } from 'react-localize-redux'
 import { Loader, Image, Transition } from 'semantic-ui-react'
+import * as Sentry from '@sentry/browser'
 
 import Header from '../Header'
 import Populations from '../PopulationStatistics'
@@ -41,7 +42,8 @@ class Main extends Component {
     this.setState({ enabled, loaded: true })
   }
 
-  componentDidCatch() {
+  componentDidCatch(e) {
+    Sentry.captureException(e)
     this.setState({ hasError: true, loaded: true })
   }
 

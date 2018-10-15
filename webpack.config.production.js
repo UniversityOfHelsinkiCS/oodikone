@@ -109,7 +109,7 @@ module.exports = {
           content: 'width=device-width, initial-scale=1'
         }
       ],
-      headHtmlSnippet: '<script src="https://cdn.ravenjs.com/3.24.2/raven.min.js" crossOrigin="anonymous"></script>'
+      headHtmlSnippet: '<script src="https://browser.sentry-cdn.com/4.1.1/bundle.min.js" crossorigin="anonymous"></script>'
     }),
 
     new MiniCssExtractPlugin({
