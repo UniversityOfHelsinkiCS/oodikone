@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form } from 'semantic-ui-react'
+import { Form, Label, Segment, Header } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { shape, arrayOf, func, oneOfType, number, string } from 'prop-types'
 import selectors from '../../../selectors/courseStats'
@@ -11,20 +11,32 @@ class SummaryTab extends Component {
     handleChange = (e, { name, value }) => this.props.setValue(name, value)
 
     render() {
-      const { statistics, programmes } = this.props
+      const { statistics, programmes, queryInfo } = this.props
       return (
         <div>
-          <Form>
-            <ProgrammeDropdown
-              options={programmes}
-              label="Study programme"
-              name={fields.programme}
-              onChange={this.handleChange}
-              value={this.props.form[fields.programme]}
-            />
-          </Form>
+          <Segment>
+            <Form>
+              <Header content="Filter statistics by study programme" as="h4" />
+              <ProgrammeDropdown
+                options={programmes}
+                label="Study programme:"
+                name={fields.programme}
+                onChange={this.handleChange}
+                value={this.props.form[fields.programme]}
+              />
+              <Form.Field>
+                <label>Timeframe:</label>
+                <Label.Group>
+                  {queryInfo.timeframe.map(({ code, name }) => (
+                    <Label key={code} content={name} />
+                  ))}
+                </Label.Group>
+              </Form.Field>
+            </Form>
+          </Segment>
           <CumulativeTable
             categoryName="Course"
+            onClickCourse={this.props.onClickCourse}
             data={statistics.map(s => ({
               id: s.coursecode,
               category: s.name,
@@ -50,7 +62,12 @@ SummaryTab.propTypes = {
   })).isRequired,
   programmes: arrayOf(shape({})).isRequired,
   form: shape({}).isRequired,
-  setValue: func.isRequired
+  setValue: func.isRequired,
+  queryInfo: shape({
+    courses: arrayOf(shape({})),
+    timeframe: arrayOf(shape({}))
+  }).isRequired,
+  onClickCourse: func.isRequired
 }
 
 const mapStateToProps = (state) => {
@@ -59,6 +76,7 @@ const mapStateToProps = (state) => {
   return {
     form: state.courseSummaryForm,
     statistics: selectors.summaryStatistics(state, { programmes, programme }),
+    queryInfo: selectors.getQueryInfo(state),
     programmes
   }
 }
