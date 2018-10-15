@@ -15,19 +15,19 @@ const MENU = {
   QUERY: 'New query'
 }
 
+const INITIAL = {
+  activeIndex: 0,
+  selected: undefined,
+  pending: false
+}
+
 class CourseStatistics extends Component {
   static getDerivedStateFromProps(props, state) {
     const finishedGet = !props.pending && state.pending && !props.error
-    return {
-      pending: props.pending,
-      activeIndex: finishedGet ? 0 : state.activeIndex
-    }
+    return finishedGet ? { ...INITIAL } : { pending: props.pending }
   }
 
-  state={
-    activeIndex: 0,
-    selected: undefined
-  }
+  state={ ...INITIAL }
 
   getPanes = () => {
     const { singleCourseStats } = this.props
