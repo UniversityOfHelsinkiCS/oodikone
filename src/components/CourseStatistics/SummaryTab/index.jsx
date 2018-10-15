@@ -36,6 +36,7 @@ class SummaryTab extends Component {
           </Segment>
           <CumulativeTable
             categoryName="Course"
+            onClickCourse={this.props.onClickCourse}
             data={statistics.map(s => ({
               id: s.coursecode,
               category: s.name,
@@ -65,7 +66,8 @@ SummaryTab.propTypes = {
   queryInfo: shape({
     courses: arrayOf(shape({})),
     timeframe: arrayOf(shape({}))
-  }).isRequired
+  }).isRequired,
+  onClickCourse: func.isRequired
 }
 
 const mapStateToProps = (state) => {

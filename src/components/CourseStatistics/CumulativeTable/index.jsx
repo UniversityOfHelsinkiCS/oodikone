@@ -1,8 +1,8 @@
 import React from 'react'
 import { Table } from 'semantic-ui-react'
-import { string, arrayOf, shape, number, oneOfType } from 'prop-types'
+import { string, arrayOf, shape, number, oneOfType, func } from 'prop-types'
 
-const CumulativeTable = ({ categoryName, data }) => (
+const CumulativeTable = ({ categoryName, data, onClickCourse }) => (
   <Table>
     <Table.Header>
       <Table.Row>
@@ -15,7 +15,7 @@ const CumulativeTable = ({ categoryName, data }) => (
     <Table.Body>
       { data.map(({ id, category, passed, failed, passrate }) => (
         <Table.Row key={id}>
-          <Table.Cell content={category} />
+          <Table.Cell content={category} onClick={() => onClickCourse(id)} />
           <Table.Cell content={passed} />
           <Table.Cell content={failed} />
           <Table.Cell content={`${passrate || 0} %`} />
@@ -33,7 +33,8 @@ CumulativeTable.propTypes = {
     passed: oneOfType([number, string]),
     failed: oneOfType([number, string]),
     passrate: oneOfType([number, string])
-  })).isRequired
+  })).isRequired,
+  onClickCourse: func.isRequired
 }
 
 export default CumulativeTable
