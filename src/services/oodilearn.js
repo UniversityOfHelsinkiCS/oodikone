@@ -3,7 +3,7 @@ const https = require('https')
 const { OODILEARN_URL } = require('../conf-backend')
 
 const instance = axios.create({
-  baseUrl: OODILEARN_URL,
+  baseURL: OODILEARN_URL,
   httpsAgent: new https.Agent({ rejectUnauthorized: false })
 })
 
