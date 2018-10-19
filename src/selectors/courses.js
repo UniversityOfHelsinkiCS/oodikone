@@ -29,10 +29,12 @@ export const makeSortCourses = () => createSelector(
   sortCourses
 )
 
+const getLocalizedName = (name, language) => (name[language] || Object.values(name)[0])
+
 export const getCourseSearchResults = (state) => {
   const { language } = state.settings
   return state.courseSearch.data.map(({ name, ...rest }) => ({
     ...rest,
-    name: name[language] || Object.values(name)[0]
+    name: name && getLocalizedName(name, language)
   }))
 }
