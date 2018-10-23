@@ -24,8 +24,8 @@ if (av.indexOf('MSIE') !== -1 || av.indexOf('Trident/') !== -1) {
 try {
   Sentry.init({ dsn: 'https://02d07bd40f404cc0965f38f06183d9fb@toska.cs.helsinki.fi/3' }) // eslint-disable-line
 } catch (e) {
-  console.log(e)
-} // eslint-disable-line
+  console.log(e) // eslint-disable-line
+}
 
 const translations = require('./i18n/translations.json')
 
