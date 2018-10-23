@@ -35,24 +35,9 @@ class Main extends Component {
 
 
   async componentDidMount() {
-    try {
-      const res = await callApi('/ping', 'get', null, null, 5000)
-      if (res.status !== 200) {
-        this.setNetworkError()
-      }
-    } catch (e) {
-      this.setNetworkError()
-    }
-    setInterval(async () => {
-      try {
-        const res = await callApi('/ping', 'get', null, null, 5000)
-        if (res.status !== 200) {
-          this.setNetworkError()
-        }
-      } catch (e) {
-        this.setNetworkError()
-      }
-    }, 30000)
+    this.ping()
+    setInterval(this.ping, 30000)
+
     const enabled = await userIsEnabled()
     if (!enabled) {
       log('Not enabled')
@@ -64,7 +49,20 @@ class Main extends Component {
     this.setState({ enabled, loaded: true })
   }
 
-  setNetworkError = () => this.setState({ hasError: true, guide: 'Oodikone is unable to connect. Double check that you\'re in eduroam or have pulse security on. Refresh by pressing F5.', networkError: true })
+  setNetworkError = () => this.setState({ guide: 'Oodikone is unable to connect. Double check that you\'re in eduroam or have pulse security on. Refresh by pressing F5.', networkError: true })
+
+  ping = async () => {
+    try {
+      const res = await callApi('/ping', 'get', null, null, 5000)
+      if (res.status === 504) {
+        throw new Error('Vituix män')
+      } else {
+        this.setState({ networkError: false, guide: 'try refreshing your browser window, pressing log out or contacting grp-toska@helsinki.fi' })
+      }
+    } catch (e) {
+      this.setNetworkError()
+    }
+  }
 
   componentDidCatch(e) {
     Sentry.captureException(e)
@@ -75,7 +73,7 @@ class Main extends Component {
     if (!this.state.loaded) {
       return <Loader active inline="centered" />
     }
-    if (!this.state.enabled || this.state.hasError) {
+    if (!this.state.enabled || this.state.hasError || this.state.networkError) {
       return (
         <div>
           <AccessDenied
