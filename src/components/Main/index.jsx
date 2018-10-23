@@ -17,6 +17,7 @@ import AccessDenied from '../AccessDenied'
 import UsageStatistics from '../UsageStatistics'
 import Teachers from '../Teachers'
 import Sandbox from '../Sandbox'
+import { callApi } from '../../apiConnection'
 
 import styles from './main.css'
 
@@ -27,10 +28,31 @@ class Main extends Component {
     enabled: false,
     hasError: false,
     loaded: false,
-    easterEgg: false
+    easterEgg: false,
+    networkError: false,
+    guide: 'try refreshing your browser window, pressing log out or contacting grp-toska@helsinki.fi'
   }
 
+
   async componentDidMount() {
+    try {
+      const res = await callApi('/ping')
+      if (res.status !== 200) {
+        this.setNetworkError()
+      }
+    } catch (e) {
+      this.setNetworkError()
+    }
+    setInterval(async () => {
+      try {
+        const res = await callApi('/ping')
+        if (res.status !== 200) {
+          this.setNetworkError()
+        }
+      } catch (e) {
+        this.setNetworkError()
+      }
+    }, 30000)
     const enabled = await userIsEnabled()
     if (!enabled) {
       log('Not enabled')
@@ -42,20 +64,25 @@ class Main extends Component {
     this.setState({ enabled, loaded: true })
   }
 
+  setNetworkError = () => this.setState({ hasError: true, guide: 'Oodikone is unable to connect. Double check that you\'re in eduroam or have pulse security on. Refresh by pressing F5.', networkError: true })
+
   componentDidCatch(e) {
     Sentry.captureException(e)
     this.setState({ hasError: true, loaded: true })
   }
 
   render() {
-    console.log('Wed May 30 19:55:39 EEST 2018') // eslint-disable-line
     if (!this.state.loaded) {
       return <Loader active inline="centered" />
     }
     if (!this.state.enabled || this.state.hasError) {
       return (
         <div>
-          <AccessDenied itWasError={this.state.hasError} />
+          <AccessDenied
+            itWasError={this.state.hasError}
+            guide={this.state.guide}
+            networkError={this.state.networkError}
+          />
           <Transition visible={this.state.easterEgg} animation="fly up" duration={10000}>
             <Image src={images.irtomikko} size="huge" verticalAlign="top" inline style={{ position: 'absolute', top: '350px', right: '10px' }} />
           </Transition>

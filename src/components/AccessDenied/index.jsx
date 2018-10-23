@@ -1,6 +1,6 @@
 import React from 'react'
 import { Dimmer, Header, Image, Container, Button } from 'semantic-ui-react'
-import { bool } from 'prop-types'
+import { bool, string } from 'prop-types'
 import Highcharts from 'highcharts'
 import ReactHighchart from 'react-highcharts'
 import { logout } from '../../apiConnection'
@@ -16,10 +16,9 @@ const dummyData = [
   { text: 'ttuotila', value: 59.7 }
 ]
 
-const AccessDenied = ({ itWasError }) => {
-  const header = itWasError ? 'Something broke' : 'Welcome to Oodikone!'
-  const guide = 'try refreshing your browser window, pressing log out or contacting grp-toska@helsinki.fi'
-  const subheader = itWasError ? `If this was not intended ${guide}` : 'You\'re currently not allowed to enter but you will get an email when you\'re authorized'
+const AccessDenied = ({ itWasError, guide, networkError }) => {
+  const header = networkError ? 'Network failure' : itWasError ? 'Something broke' : 'Welcome to Oodikone!' // eslint-disable-line
+  const subheader = networkError ? guide : itWasError ? `If this was not intended ${guide}` : 'You\'re currently not allowed to enter but you will get an email when you\'re authorized' // eslint-disable-line
 
   return (
     <div >
@@ -94,7 +93,9 @@ const AccessDenied = ({ itWasError }) => {
 }
 
 AccessDenied.propTypes = {
-  itWasError: bool.isRequired
+  itWasError: bool.isRequired,
+  networkError: bool.isRequired,
+  guide: string.isRequired
 }
 
 export default AccessDenied
