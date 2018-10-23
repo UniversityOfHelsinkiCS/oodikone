@@ -36,7 +36,6 @@ class Main extends Component {
 
   async componentDidMount() {
     this.ping()
-    setInterval(this.ping, 30000)
 
     const enabled = await userIsEnabled()
     if (!enabled) {
@@ -62,6 +61,7 @@ class Main extends Component {
     } catch (e) {
       this.setNetworkError()
     }
+    setTimeout(this.ping, this.state.networkError ? 2000 : 30000)
   }
 
   componentDidCatch(e) {
