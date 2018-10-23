@@ -36,7 +36,7 @@ class Main extends Component {
 
   async componentDidMount() {
     try {
-      const res = await callApi('/ping')
+      const res = await callApi('/ping', 'get', null, null, 5000)
       if (res.status !== 200) {
         this.setNetworkError()
       }
@@ -45,7 +45,7 @@ class Main extends Component {
     }
     setInterval(async () => {
       try {
-        const res = await callApi('/ping')
+        const res = await callApi('/ping', 'get', null, null, 5000)
         if (res.status !== 200) {
           this.setNetworkError()
         }
