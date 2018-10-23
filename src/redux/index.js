@@ -29,6 +29,7 @@ import courseStats from './coursestats'
 import courseSummaryForm from './coursesSummaryForm'
 import studyrightElements from './studyrightElements'
 import sandbox from './sandbox'
+import ping from './ping'
 
 export default combineReducers({
   locale,
@@ -59,5 +60,6 @@ export default combineReducers({
   courseStats,
   courseSummaryForm,
   studyrightElements,
-  sandbox
+  sandbox,
+  ping
 })
