@@ -53,8 +53,8 @@ export const swapDevUser = async (newHeaders) => {
   setToken(token)
 }
 
-export const callApi = async (url, method = 'get', data, params) => {
-  let options = { headers: {} }
+export const callApi = async (url, method = 'get', data, params, timeout = 0) => {
+  let options = { headers: {}, timeout }
   if (isDevEnv) {
     options = devOptions
   }
