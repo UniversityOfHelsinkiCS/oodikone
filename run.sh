@@ -1,1 +1,1 @@
-echo "Vittu Sasu" && docker build -t oodilearn . && docker run -it oodilearn
+echo "Vittu Sasu" && docker build -t oodilearn . && docker run -it -v mdl:/src/models oodilearn 
