@@ -1,7 +1,3 @@
-training/TKT_HUL.csv
-training/opisnrot.csv
-training/attainments.csv
-training/YET_HUL.csv
 .DS_Store
 .env
 .flaskenv
@@ -26,9 +22,9 @@ htmlcov/
 .coverage.*
 *,cover
 
-*/TKT_HUL.csv
-*/YET_HUL.csv
-*/opisnrot.csv
-*/attainments.csv
-*/src/YET_HUL.csv
+TKT_HUL.csv
+YET_HUL.csv
+opisnrot.csv
+attainments.csv
+src/YET_HUL.csv
 .vscode/
