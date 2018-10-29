@@ -42,7 +42,7 @@ def test():
   return str(np.argmax(res))
 
 def load_model(course):
-  model = pickle.load(open('./models/' + course + '.sav', 'rb'))
+  model = pickle.load(open('../models/' + course + '.sav', 'rb'))
   return model
 
 if __name__ == '__main__':
