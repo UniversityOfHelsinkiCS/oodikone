@@ -89,7 +89,7 @@ def train(X, y, name, n=10, verbose=False):
         f"random loss: {np.average(rand_accuracies):.3f} | "
         f"common loss: {np.average(common_accuracies):.3f} | "
         f"advantage: {np.average(advantages):.3f}")
-  pickle.dump(model, open('./models/' + name + '.sav', 'wb'))
+  pickle.dump(model, open('../models/' + name + '.sav', 'wb'))
   if len(accuracies) == 0:
     return(None)
   return(model)
@@ -98,8 +98,8 @@ def train(X, y, name, n=10, verbose=False):
 
 
 if __name__ == "__main__":
-  questionnaires = pd.concat([pd.read_csv("TKT_HUL.csv", header=0), pd.read_csv("YET_HUL.csv", header=0)])
-  attainments = pd.read_csv("attainments.csv", names=["id", "grade", "studentnumber", "credits", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "code", "semester", "studymodule"])
+  questionnaires = pd.concat([pd.read_csv("../models/data/TKT_HUL.csv", header=0), pd.read_csv("../models/data/YET_HUL.csv", header=0)])
+  attainments = pd.read_csv("../models/data/attainments.csv", names=["id", "grade", "studentnumber", "credits", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "code", "semester", "studymodule"])
   merged = pd.merge(questionnaires, attainments, left_on="Opisnro", right_on="studentnumber")
   data = merged[["studentnumber", "SBI", "Organised", "Surface", "Deep", "SE", "IntRel", "Peer", "Align", "ConsFeed", "credits", "code", "studymodule", "grade"]]
   mayhem = [train(* get_course_data(data, course_code)) for course_code in get_courses(data)]
