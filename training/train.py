@@ -7,7 +7,7 @@ import pickle
 import tensorflow as tf 
 from keras.models import Sequential
 
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 
 def get_courses(data):
   return (data["code"].unique())
@@ -42,9 +42,10 @@ def train(X, y, name, n=10, verbose=False):
   #rbf_feature = RBFSampler(gamma=1)
   #X_features = rbf_feature.fit_transform(X)
   model = Sequential()
-  model.add(Dense(units=64, activation='relu', input_shape=(9,)))
-  model.add(Dense(units=128, activation='relu'))
+  model.add(Dense(units=32, activation='relu', input_shape=(9,)))
   model.add(Dense(units=64, activation='relu'))
+  model.add(Dropout(0.25))
+  model.add(Dense(units=32, activation='relu'))
   model.add(Dense(units=6, activation='sigmoid'))
   model.compile(loss='mean_squared_error',
               optimizer='sgd',
@@ -64,11 +65,9 @@ def train(X, y, name, n=10, verbose=False):
   labels = [0,1,2, 3, 4, 5]
   dummies = pd.get_dummies(y_train)
   y_train = dummies.T.reindex(labels).T.fillna(0) # Magic to keep one-hot-encoding fixed to categories
-  print(y_train.head())
-  model.fit(np.array(X_train), np.array(y_train), epochs=50, batch_size=32, verbose=0)
+  model.fit(np.array(X_train), np.array(y_train), epochs=1000, batch_size=8, verbose=0)
   pred = model.predict(X_test)
   pred = [np.argmax(arr) for arr in pred]
-  print(pred)
   if verbose:
     print("pred: ", pred)
     print("real: ", np.array(y_test).reshape(1, -1)[0])
