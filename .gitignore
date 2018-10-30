@@ -1,2 +1,4 @@
 repos
 data
+pgdata
+redis-data

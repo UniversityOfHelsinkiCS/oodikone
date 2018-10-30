@@ -18,7 +18,7 @@ logo () {
 
 logo
 
-options=("Full setup" "Full reset" "Get db dump" "Reset db" "Quit")
+options=("Full setup" "Full reset" "Reset db" "Get db dump" "Reset env" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -29,11 +29,14 @@ do
         "Full reset")
             purge
             ;;
-        "Drop, create, dump ")
+        "Reset db")
             db_drop_create_dump
             ;;
         "Get db dump")
             get_dump
+            ;;
+        "Reset env")
+            copyenv
             ;;
         "Quit")
             break
