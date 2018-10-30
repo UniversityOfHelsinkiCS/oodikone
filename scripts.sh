@@ -34,7 +34,7 @@ get_dump () {
 }
 
 install_oodilearn () {
-    docker build repos/oodilearn/server
+    docker build repos/oodilearn/server -t oodilearn
     docker build repos/oodilearn/training
 }
 

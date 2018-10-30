@@ -3,3 +3,4 @@ TEST_DB=postgres://postgres@localhost:5421/tkt_oodi_test
 FRONT_URL=http://localhost:8000
 REDIS=localhost
 TOKEN_SECRET=IWannaBeTheVeryBest
+OODILEARN_URL=http://localhost:5000
