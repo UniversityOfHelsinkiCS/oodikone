@@ -57,7 +57,7 @@ install_frontend () {
 }
 
 setup_docker () {
-    docker-compose up
+    docker-compose up -d
 }
 
 db_drop_create_dump () {
