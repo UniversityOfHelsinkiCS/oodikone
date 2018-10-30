@@ -1,4 +1,5 @@
 models/
+mongo/
 training/TKT_HUL.csv
 training/opisnrot.csv
 training/attainments.csv

@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
-
+from flask_pymongo import PyMongo
+from bson import json_util
 from dotenv import load_dotenv
 import os
 import pickle
@@ -8,11 +9,19 @@ import tensorflow as tf
 from keras import backend
 
 app = Flask(__name__)
+app.config["MONGO_URI"] = "mongodb://mongo_db:27017/oodilearn"
+mongo = PyMongo(app)
 
 @app.route('/ping')
 def ping():
   print('someone is pinging')
   return 'pong'
+
+@app.route('/student/<int:studentnumber>')
+def get_student(studentnumber):
+  print(studentnumber)
+  online_users = mongo.db.students.find_one({'Opisnro': studentnumber})
+  return json_util.dumps(online_users)
 
 @app.route('/test', methods=["POST"])
 def test():
