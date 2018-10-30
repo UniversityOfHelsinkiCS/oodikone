@@ -3,6 +3,7 @@
 DATA=data
 REPOS=repos
 DB_BACKUP=data/staging.bak
+MONGO_DATA=data/
 
 init_dirs () {
     mkdir -p $DATA $REPOS
@@ -42,6 +43,18 @@ setup_oodilearn () {
     pushd repos/oodilearn
     mkdir -p models
     popd
+}
+
+setup_oodilearn_db () {
+    docker-compose -f oodilearn-compose.yml up -d mongo_db
+}
+
+restore_mongodb () {
+    docker exec -it mongo_db mongorestore -d oodilearn /dump/oodilearn
+}
+
+get_mongo_dump () {
+    scp -r oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/mongo/oodilearn $MONGO_DATA
 }
 
 install_backend () {
