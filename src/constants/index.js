@@ -55,7 +55,8 @@ export const routes = {
   users: { route: '/users/:userid?', translateId: 'users', admin: true },
   settings: { route: '/settings', translateId: 'settings', admin: true },
   usage: { route: '/usage', translateId: 'usage', admin: true },
-  sandbox: { route: '/sandbox', translateId: 'sandbox', admin: true }
+  sandbox: { route: '/sandbox', translateId: 'sandbox', admin: true },
+  oodilearn: { route: '/oodilearn', translateId: 'oodilearn', admin: true }
 }
 
 const assumeBasename = () => {
