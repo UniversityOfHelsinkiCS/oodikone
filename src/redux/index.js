@@ -30,6 +30,7 @@ import courseSummaryForm from './coursesSummaryForm'
 import studyrightElements from './studyrightElements'
 import sandbox from './sandbox'
 import ping from './ping'
+import oodilearnStudent from './oodilearnStudent'
 
 export default combineReducers({
   locale,
@@ -61,5 +62,6 @@ export default combineReducers({
   courseSummaryForm,
   studyrightElements,
   sandbox,
-  ping
+  ping,
+  oodilearnStudent
 })
