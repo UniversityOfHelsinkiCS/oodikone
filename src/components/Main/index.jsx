@@ -17,6 +17,7 @@ import AccessDenied from '../AccessDenied'
 import UsageStatistics from '../UsageStatistics'
 import Teachers from '../Teachers'
 import Sandbox from '../Sandbox'
+import OodiLearn from '../OodiLearn'
 import { callApi } from '../../apiConnection'
 
 import styles from './main.css'
@@ -36,7 +37,6 @@ class Main extends Component {
 
   async componentDidMount() {
     this.ping()
-    setInterval(this.ping, 30000)
 
     const enabled = await userIsEnabled()
     if (!enabled) {
@@ -62,6 +62,7 @@ class Main extends Component {
     } catch (e) {
       this.setNetworkError()
     }
+    setTimeout(this.ping, this.state.networkError ? 2000 : 30000)
   }
 
   componentDidCatch(e) {
@@ -103,6 +104,7 @@ class Main extends Component {
               <Route exact path={routes.teachers.route} component={Teachers} />
               <Route exact path={routes.usage.route} component={UsageStatistics} />
               <Route exact path={routes.sandbox.route} component={Sandbox} />
+              <Route exact path={routes.oodilearn.route} component={OodiLearn} />
             </Switch>
           </main>
         </Router>
