@@ -7,7 +7,8 @@ wrapper.get('/oodilearn/ping', async (req, res) => {
 })
 
 wrapper.get('/oodilearn/student/:id', async (req, res) => {
-  res.status(404).send('Student not found')
+  const result = await oodilearn.getStudentData(req.params.id)
+  res.status(200).json(result.data)
 })
 
 module.exports = router
