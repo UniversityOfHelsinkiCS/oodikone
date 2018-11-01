@@ -9,6 +9,9 @@ const instance = axios.create({
 
 const ping = () => instance.get('/ping')
 
+const getStudentData = studentnumber => instance.get(`/student/${studentnumber}`) 
+
 module.exports = {
-  ping
+  ping,
+  getStudentData
 }
