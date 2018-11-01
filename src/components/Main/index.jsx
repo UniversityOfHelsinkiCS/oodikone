@@ -36,8 +36,6 @@ class Main extends Component {
 
 
   async componentDidMount() {
-    this.ping()
-
     const enabled = await userIsEnabled()
     if (!enabled) {
       log('Not enabled')
@@ -47,6 +45,7 @@ class Main extends Component {
       )
     }
     this.setState({ enabled, loaded: true })
+    this.ping()
   }
 
   setNetworkError = () => this.setState({ guide: 'Oodikone is unable to connect. Double check that you\'re in eduroam or have pulse security on. Refresh by pressing F5.', networkError: true })
