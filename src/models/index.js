@@ -236,7 +236,10 @@ const User = sequelize.define('users',
     },
     full_name: { type: Sequelize.STRING },
     is_enabled: { type: Sequelize.BOOLEAN },
-    username: { type: Sequelize.STRING },
+    username: {
+      type: Sequelize.STRING,
+      unique: true
+    },
     email: { type: Sequelize.STRING },
     language: { type: Sequelize.STRING },
     admin: { type: Sequelize.BOOLEAN },
