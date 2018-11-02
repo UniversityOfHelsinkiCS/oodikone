@@ -16,7 +16,8 @@ class StudentSearch extends Component {
       const { error, loading, hasData } = this.props
       const { searchterm } = this.state
       const failedQuery = (!loading && (searchterm.length >= MIN_SEARCH_LENGTH) && error)
-      const showResult = (searchterm.length >= MIN_SEARCH_LENGTH) && !loading && !failedQuery && hasData
+      const showResult = (searchterm.length >= MIN_SEARCH_LENGTH)
+        && !loading && !failedQuery && hasData
       const searchTooShort = (searchterm.length > 0 && searchterm.length < MIN_SEARCH_LENGTH)
       return (
         <Segment basic>
