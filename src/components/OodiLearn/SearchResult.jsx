@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import { Message } from 'semantic-ui-react'
+import { Message, Table, Button } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { arrayOf, shape, string } from 'prop-types'
-import ProfileSpiderGraph from './ProfileSpiderGraph'
+import { arrayOf, shape, string, func } from 'prop-types'
 
 class SearchResult extends Component {
     state={}
@@ -13,9 +12,25 @@ class SearchResult extends Component {
         return (<Message content="No results matched query" />)
       }
       return (
-        <div>
-          { profiles.map(s => <ProfileSpiderGraph key={s.studentnumber} profile={s.profile} />)}
-        </div>
+        <Table>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell content="Student number" />
+              <Table.HeaderCell content="Name" />
+              <Table.HeaderCell />
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            { profiles.map(s => (
+              <Table.Row key={s.studentnumber}>
+                <Table.Cell content={s.studentnumber} />
+                <Table.Cell content={s.name} />
+                <Table.Cell width={1}>
+                  <Button size="mini" icon="eye" circular onClick={() => this.props.onSelectStudent(s)} />
+                </Table.Cell>
+              </Table.Row>))}
+          </Table.Body>
+        </Table>
       )
     }
 }
@@ -24,7 +39,8 @@ SearchResult.propTypes = {
   profiles: arrayOf(shape({
     studentnumber: string,
     profile: shape({})
-  })).isRequired
+  })).isRequired,
+  onSelectStudent: func.isRequired
 }
 
 const mapStateToProps = ({ oodilearnStudent }) => ({
