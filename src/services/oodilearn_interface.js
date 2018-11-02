@@ -9,14 +9,20 @@ const instance = axios.create({
 
 const ping = () => instance.get('/ping')
 
-const getStudentData = studentnumber => instance.get(`/student/${studentnumber}`) 
+const getStudentData = studentnumber => instance.get(`/student/${studentnumber}`)
+
+const getStudentsData = studentnumbers => instance.get('/students/',{ params: { 'student': studentnumbers } })
 
 const getStudents = async numbers => {
-  const datas = await Promise.all(numbers.map(async (studentnumber) => {
-    const { data } = await getStudentData(studentnumber)
-    return { studentnumber, data }
-  }))
-  const students = {}
+  console.log(numbers)
+  const request = await getStudentsData(numbers)
+  const datas = request.data
+  console.log(datas) // This is all cool
+  // const datas = await Promise.all(numbers.map(async (studentnumber) => {
+  //   const { data } = await getStudentsData(studentnumber)
+  //   return { studentnumber, data }
+  // }))
+  const students = {} // this is not all cool
   datas.forEach(({ studentnumber, data }) => {
     students[studentnumber] = data
   })
