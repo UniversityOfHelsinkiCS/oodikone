@@ -14,8 +14,8 @@ services:
     image: oodilearn
     restart: unless-stopped
     volumes:
-      - ./server:/src
-      - ./models:/models
+      - ./repos/oodilearn/server:/src
+      - ./repos/oodilearn/models:/models
     ports:
       - "5000:5000"
     environment:
