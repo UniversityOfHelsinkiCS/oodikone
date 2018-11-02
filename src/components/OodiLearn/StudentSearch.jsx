@@ -31,7 +31,7 @@ class StudentSearch extends Component {
           />
           { searchTooShort && <Message content="Search term length must be at least 5 characters." /> }
           { failedQuery && <Message error content="No results matched query." /> }
-          { showResult && <SearchResult /> }
+          { showResult && <SearchResult onSelectStudent={this.props.onSelectStudent} /> }
         </Segment>
       )
     }
@@ -41,7 +41,8 @@ StudentSearch.propTypes = {
   getStudentData: func.isRequired,
   loading: bool.isRequired,
   error: bool.isRequired,
-  hasData: bool.isRequired
+  hasData: bool.isRequired,
+  onSelectStudent: func.isRequired
 }
 
 const mapStateToProps = ({ oodilearnStudent }) => ({
