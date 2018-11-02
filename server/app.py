@@ -9,7 +9,8 @@ import tensorflow as tf
 from keras import backend
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://mongo_db:27017/oodilearn"
+load_dotenv()
+app.config["MONGO_URI"] = os.getenv('MONGO_URI')
 mongo = PyMongo(app)
 
 @app.route('/ping')
@@ -20,8 +21,15 @@ def ping():
 @app.route('/student/<int:studentnumber>')
 def get_student(studentnumber):
   print(studentnumber)
-  online_users = mongo.db.students.find_one({'Opisnro': studentnumber})
+  online_users = mongo.db.students.find_one({'Opiskelijanumero': int(studentnumber)})
   return json_util.dumps(online_users)
+
+@app.route('/students/')
+def get_students():
+  studentnumbers = request.args.getlist('student[]')
+  numbers = list(map(int, studentnumbers))
+  students = mongo.db.students.find({'Opiskelijanumero': { "$in": numbers }})
+  return json_util.dumps(students)
 
 @app.route('/test', methods=["POST"])
 def test():
@@ -55,6 +63,5 @@ def load_model(course):
   return model
 
 if __name__ == '__main__':
-  load_dotenv()
   debug = os.getenv('ENV') == 'development'
   app.run("0.0.0.0", port=5000, debug=debug)
