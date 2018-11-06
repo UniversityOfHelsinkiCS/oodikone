@@ -13,18 +13,18 @@ const getStudentData = studentnumber => instance.get(`/student/${studentnumber}`
 
 const getStudentsData = studentnumbers => instance.get('/students/',{ params: { 'student': studentnumbers } })
 
+// const getCourseData = gradeStudents => instance.get('/averages/',{ params: gradeStudents })
+
 const getStudents = async numbers => {
   console.log(numbers)
   const request = await getStudentsData(numbers)
   const datas = request.data
-  console.log(datas) // This is all cool
-  // const datas = await Promise.all(numbers.map(async (studentnumber) => {
-  //   const { data } = await getStudentsData(studentnumber)
-  //   return { studentnumber, data }
-  // }))
-  const students = {} // this is not all cool
-  datas.forEach(({ studentnumber, data }) => {
-    students[studentnumber] = data
+  console.log(datas)
+  const students = {}
+  datas.forEach((student) => {
+    const formattedStudent = { ...student, studentnumber: `0${student.Opiskelijanumero}` }
+    delete formattedStudent.Opiskelijanumero
+    students[formattedStudent.studentnumber] = formattedStudent
   })
   return students
 }
