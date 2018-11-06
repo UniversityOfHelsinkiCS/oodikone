@@ -28,6 +28,7 @@ def get_course_data(data, course_code):
   y = y.replace("TT", 2)
   y = y.replace("HT", 4)
   y = y.replace("ECLA", 4)
+  y = y.replace("MCLA", 3)
   y = y.replace("L", 5)
   y = y.apply(pd.to_numeric)
   return(X, y, course_code)
@@ -57,7 +58,7 @@ def train(X, y, name, n=10, verbose=False):
   common_accuracies = []
   advantages = []
   while True:
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     if np.unique(y_train).size <= 1 or X_train.shape[0] == 0: # fucked up split
       continue
     break
@@ -84,11 +85,12 @@ def train(X, y, name, n=10, verbose=False):
   advantages.append(real_accuracy - baseline_accuracy)
     
   print(f"Course:  {name} | "
+        f"Samples:  {len(X_train)} | "
         f"prediction loss:  {np.average(accuracies):.3f} | "
         f"random loss: {np.average(rand_accuracies):.3f} | "
         f"common loss: {np.average(common_accuracies):.3f} | "
         f"advantage: {np.average(advantages):.3f}")
-  pickle.dump(model, open('../models/' + name + '.sav', 'wb'))
+  pickle.dump(model, open('./models/' + name + '.sav', 'wb'))
   if len(accuracies) == 0:
     return(None)
   return(model)
@@ -97,9 +99,12 @@ def train(X, y, name, n=10, verbose=False):
 
 
 if __name__ == "__main__":
-  questionnaires = pd.concat([pd.read_csv("../models/data/TKT_HUL.csv", header=0), pd.read_csv("../models/data/YET_HUL.csv", header=0)])
-  attainments = pd.read_csv("../models/data/attainments.csv", names=["id", "grade", "studentnumber", "credits", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "code", "semester", "studymodule"])
-  merged = pd.merge(questionnaires, attainments, left_on="Opisnro", right_on="studentnumber")
+ 
+
+  questionnaires = pd.read_csv("./data/combined.csv", header=0, dtype={"Opiskelijanumero": object})
+  print(questionnaires)
+  attainments = pd.read_csv("./data/attainments.csv", names=["id", "grade", "studentnumber", "credits", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "code", "semester", "studymodule"])
+  merged = pd.merge(questionnaires, attainments, left_on="Opiskelijanumero", right_on="studentnumber")
   data = merged[["studentnumber", "SBI", "Organised", "Surface", "Deep", "SE", "IntRel", "Peer", "Align", "ConsFeed", "credits", "code", "studymodule", "grade"]]
   mayhem = [train(* get_course_data(data, course_code)) for course_code in get_courses(data)]
  

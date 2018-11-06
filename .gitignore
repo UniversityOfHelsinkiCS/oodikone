@@ -34,3 +34,5 @@ htmlcov/
 */attainments.csv
 */src/YET_HUL.csv
 .vscode/
+training/data
+asd.txt
