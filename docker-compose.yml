@@ -8,6 +8,8 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     container_name: oodi_db
+    environment:
+      POSTGRES_DB: tkt_oodi
   redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
@@ -16,3 +18,31 @@ services:
     volumes:
       - ./redis-data:/data
     container_name: redis
+  backend:
+    build:
+      context: repos/oodikone2-backend
+      dockerfile: dev.Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS: redis
+      DB_URL: postgres://postgres@db:5432/tkt_oodi
+      TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
+      FRONT_URL: http://localhost:8000
+      TOKEN_SECRET: IWannaBeTheVeryBest
+      OODILEARN_URL: http://localhost:5000
+    volumes:
+      - ./repos/oodikone2-backend/:/usr/src/app
+    container_name: backend
+    depends_on:
+      - db
+      - redis
+  frontend:
+    build:
+      context: repos/oodikone2-frontend
+      dockerfile: dev.Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      BACKEND_ADDR: backend
+    container_name: frontend
