@@ -18,6 +18,15 @@ services:
     volumes:
       - ./redis-data:/data
     container_name: redis
+  mongo_db:
+    image: mongo
+    restart: unless-stopped
+    volumes:
+      - ./data:/dump
+      - ./mongodata:/data/db
+    ports:
+      - "27017:27017"
+    container_name: mongo_db
   backend:
     build:
       context: repos/oodikone2-backend
@@ -30,7 +39,7 @@ services:
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       FRONT_URL: http://localhost:8000
       TOKEN_SECRET: IWannaBeTheVeryBest
-      OODILEARN_URL: http://localhost:5000
+      OODILEARN_URL: http://oodilearn:5000
     volumes:
       - ./repos/oodikone2-backend/:/usr/src/app
     container_name: backend
@@ -46,3 +55,17 @@ services:
     environment:
       BACKEND_ADDR: backend
     container_name: frontend
+  oodilearn:
+    build:
+      context: repos/oodilearn/server
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./repos/oodilearn/server:/src
+      - ./repos/oodilearn/models:/models
+    ports:
+      - "5000:5000"
+    environment:
+      - ENV=development
+      - MONGO_URI=mongodb://mongo_db:27017/oodilearn
+    container_name: oodilearn
