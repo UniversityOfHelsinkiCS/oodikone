@@ -18,25 +18,36 @@ logo () {
 
 logo
 
-options=("Full setup" "Full reset" "Reset db" "Get db dump" "Reset env" "Quit")
+options=(
+    "Full setup"
+    "Full reset"
+    "Get OK dump"
+    "Reset OK db"
+    "Get OL dump"
+    "Reset OL db"
+    "Quit"
+)
 select opt in "${options[@]}"
 do
     case $opt in
         "Full setup")
             mopo
-            run_setup
+            run_full_setup
             ;;
         "Full reset")
             purge
             ;;
-        "Reset db")
-            db_drop_create_dump
+        "Get OK dump")
+            get_oodikone_dump
             ;;
-        "Get db dump")
-            get_dump
+        "Reset OK db")
+            db_oodikone_reset
             ;;
-        "Reset env")
-            copyenv
+        "Get OL dump")
+            get_mongo_dump
+            ;;
+        "Reset OL db")
+            restore_mongodb
             ;;
         "Quit")
             break

@@ -31,6 +31,7 @@ services:
     build:
       context: repos/oodikone2-backend
       dockerfile: dev.Dockerfile
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
@@ -50,6 +51,7 @@ services:
     build:
       context: repos/oodikone2-frontend
       dockerfile: dev.Dockerfile
+    restart: unless-stopped
     ports:
       - "8081:8081"
     environment:

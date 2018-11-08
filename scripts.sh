@@ -18,20 +18,37 @@ purge () {
     docker-compose down
 }
 
+megapurge () {
+    git clean -f -fdX
+    docker stop $(docker ps -q)
+    docker container prune
+    docker rmi $(docker images -q)
+}
+
 pull () {
     pushd $REPOS
-    git clone https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
-    git clone https://github.com/UniversityOfHelsinkiCS/oodikone2-frontend.git
+    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
+    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-frontend.git
     git clone https://github.com/UniversityOfHelsinkiCS/oodilearn.git
     popd
 }
 
-copyenv () {
-    cp ./configs/backend $REPOS/oodikone2-backend/.env
+get_oodikone_dump () {
+    scp oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/staging.bak $DB_BACKUP
 }
 
-get_dump () {
-    scp oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/staging.bak $DB_BACKUP
+db_oodikone_restore () {
+    cat $DB_BACKUP | docker exec -i -u postgres oodi_db psql -d tkt_oodi
+}
+
+db_oodikone_reset () {
+    docker exec -u postgres oodi_db dropdb "tkt_oodi"
+    docker exec -u postgres oodi_db createdb "tkt_oodi"
+    cat $DB_BACKUP | docker exec -i -u postgres oodi_db psql -d tkt_oodi
+}
+
+db_oodilearn_restore () {
+    docker exec -t mongo_db mongorestore -d oodilearn /dump/oodilearn
 }
 
 install_oodilearn () {
@@ -73,32 +90,35 @@ setup_docker () {
     docker-compose up -d
 }
 
-db_drop_create_dump () {
-    docker exec -u postgres oodi_db dropdb "tkt_oodi"
-    docker exec -u postgres oodi_db createdb "tkt_oodi"
-    cat $DB_BACKUP | docker exec -i -u postgres oodi_db psql -d tkt_oodi
+docker_build () {
+    docker-compose up -d
+}
+
+db_setup_oodikone () {
+    get_oodikone_dump && db_oodikone_restore || echo "Oodikone db setup failed."
+}
+
+db_setup_oodilearn () {
+    get_mongo_dump && db_oodilearn_restore || echo "OodiLearn db setup failed."
+}
+
+run_full_setup () {
+    echo "Purging directory"
+    purge
+    echo "Init dirs"
+    init_dirs
+    echo "Pull repos"
+    pull
+    echo "Building images, starting containers"
+    docker_build
+    echo "Setup oodikone db from dump, this will prompt you for your password."
+    db_setup_oodikone
+    echo "Setup oodilearn db from dump, this will prompt you for your password."
+    db_setup_oodilearn
 }
 
 run_setup () {
   echo "Creating directories."
-  init_dirs
-  echo "Pulling repositories."
-  pull
-  echo "Copying environment variables."
-  copyenv
-  echo "Setting up Docker images."
-  setup_docker
-  echo "Installing oodilearn."
-  install_oodilearn
-  echo "Installing backend."
-  install_backend
-  echo "Installing frontend."
-  install_frontend
-  echo "Getting DB dump from server, this will require your password."
-  get_dump
-  echo "Creating DB, this will take a while."
-  db_drop_create_dump
-  echo "Setup finished."
 }
 
 cd $(dirname "$0")
