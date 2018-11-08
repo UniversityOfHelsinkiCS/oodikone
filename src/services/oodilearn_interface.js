@@ -13,7 +13,7 @@ const getStudentData = studentnumber => instance.get(`/student/${studentnumber}`
 
 const getStudentsData = studentnumbers => instance.get('/students/',{ params: { 'student': studentnumbers } })
 
-// const getCourseData = gradeStudents => instance.get('/averages/',{ params: gradeStudents })
+const getCourseData = gradeStudents => instance.get('/averages/',{ params: gradeStudents })
 
 const getStudents = async numbers => {
   console.log(numbers)
@@ -32,5 +32,6 @@ const getStudents = async numbers => {
 module.exports = {
   ping,
   getStudentData,
-  getStudents
+  getStudents,
+  getCourseData
 }
