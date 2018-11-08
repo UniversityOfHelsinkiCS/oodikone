@@ -3,7 +3,7 @@ import { Message, Table, Button } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { arrayOf, shape, string, func } from 'prop-types'
 
-class SearchResult extends Component {
+class StudentResult extends Component {
     state={}
 
     render() {
@@ -24,7 +24,7 @@ class SearchResult extends Component {
             { profiles.map(s => (
               <Table.Row key={s.studentnumber}>
                 <Table.Cell content={s.studentnumber} />
-                <Table.Cell content="Opiskelija" />
+                <Table.Cell content={s.name} />
                 <Table.Cell width={1}>
                   <Button size="mini" icon="eye" circular onClick={() => this.props.onSelectStudent(s)} />
                 </Table.Cell>
@@ -35,7 +35,7 @@ class SearchResult extends Component {
     }
 }
 
-SearchResult.propTypes = {
+StudentResult.propTypes = {
   profiles: arrayOf(shape({
     studentnumber: string,
     profile: shape({})
@@ -47,4 +47,4 @@ const mapStateToProps = ({ oodilearnStudent }) => ({
   profiles: oodilearnStudent.data
 })
 
-export default connect(mapStateToProps)(SearchResult)
+export default connect(mapStateToProps)(StudentResult)
