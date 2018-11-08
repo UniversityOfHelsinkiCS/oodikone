@@ -35,7 +35,7 @@ def get_course_data(data, course_code):
 
 
 def train(X, y, name, n=10, verbose=False):
-  if np.unique(y).size <= 1 or X.shape[0] <= 50 :
+  if np.unique(y).size <= 1 or X.shape[0] <= 80 :
     if verbose:
       print(f"Course: {name} | only one class or not enough samples, nothing to learn.")
     return(None)
@@ -43,10 +43,12 @@ def train(X, y, name, n=10, verbose=False):
   #rbf_feature = RBFSampler(gamma=1)
   #X_features = rbf_feature.fit_transform(X)
   model = Sequential()
-  model.add(Dense(units=32, activation='relu', input_shape=(9,)))
-  model.add(Dense(units=64, activation='relu'))
-  model.add(Dropout(0.25))
-  model.add(Dense(units=32, activation='relu'))
+  model.add(Dense(units=128, activation='relu', input_shape=(9,)))
+  model.add(Dense(units=256, activation='relu'))
+  model.add(Dropout(0.2))
+  model.add(Dense(units=256, activation='relu'))
+  model.add(Dropout(0.2))
+  model.add(Dense(units=128, activation='relu'))
   model.add(Dense(units=6, activation='sigmoid'))
   model.compile(loss='mean_squared_error',
               optimizer='sgd',
@@ -66,7 +68,7 @@ def train(X, y, name, n=10, verbose=False):
   labels = [0,1,2, 3, 4, 5]
   dummies = pd.get_dummies(y_train)
   y_train = dummies.T.reindex(labels).T.fillna(0) # Magic to keep one-hot-encoding fixed to categories
-  model.fit(np.array(X_train), np.array(y_train), epochs=1000, batch_size=8, verbose=0)
+  model.fit(np.array(X_train), np.array(y_train), epochs=1000, batch_size=16, verbose=0)
   pred = model.predict(X_test)
   pred = [np.argmax(arr) for arr in pred]
   if verbose:
@@ -101,9 +103,10 @@ def train(X, y, name, n=10, verbose=False):
 if __name__ == "__main__":
  
 
-  questionnaires = pd.read_csv("./data/combined.csv", header=0, dtype={"Opiskelijanumero": object})
+  questionnaires = pd.read_csv("./data/combined.csv", header=0)
   print(questionnaires)
   attainments = pd.read_csv("./data/attainments.csv", names=["id", "grade", "studentnumber", "credits", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "code", "semester", "studymodule"])
+  print(attainments)
   merged = pd.merge(questionnaires, attainments, left_on="Opiskelijanumero", right_on="studentnumber")
   data = merged[["studentnumber", "SBI", "Organised", "Surface", "Deep", "SE", "IntRel", "Peer", "Align", "ConsFeed", "credits", "code", "studymodule", "grade"]]
   mayhem = [train(* get_course_data(data, course_code)) for course_code in get_courses(data)]
