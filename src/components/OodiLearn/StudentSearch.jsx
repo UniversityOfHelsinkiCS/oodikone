@@ -4,7 +4,7 @@ import { Segment, Message } from 'semantic-ui-react'
 import { func, bool } from 'prop-types'
 import AutoSubmitSearchInput from '../AutoSubmitSearchInput'
 import { getStudentData } from '../../redux/oodilearnStudent'
-import SearchResult from './SearchResult'
+import StudentResult from './StudentResult'
 
 const MIN_SEARCH_LENGTH = 5
 
@@ -31,7 +31,7 @@ class StudentSearch extends Component {
           />
           { searchTooShort && <Message content="Search term length must be at least 5 characters." /> }
           { failedQuery && <Message error content="No results matched query." /> }
-          { showResult && <SearchResult onSelectStudent={this.props.onSelectStudent} /> }
+          { showResult && <StudentResult onSelectStudent={this.props.onSelectStudent} /> }
         </Segment>
       )
     }
