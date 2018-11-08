@@ -1,5 +1,6 @@
 const oodilearnClient = require('./oodilearn_interface')
 const studentService = require('./students')
+const { Credit, Student } = require('../models')
 
 const ping = oodilearnClient.ping
 
@@ -17,12 +18,36 @@ const matchingStudents = async searchTerm => {
       profile: profiles[studentnumber]
     }))
   return matches
-} 
+}
+
+const getCourseStudents = code => Credit.findAll({
+  include: [
+    {
+      model: Student,
+      attributes: ['studentnumber'],
+      unique: true
+    }],
+  where: {
+    course_code: code
+  }
+})
+
+const courseGradeData = async (courseCode) => {
+  const credits = await getCourseStudents(courseCode)
+  // console.log('this many', credits.filter(s => allStudentNumbers.includes(s.student_studentnumber)).length)
+  const courseGrades = {}
+  credits.map(credit => courseGrades[credit.grade] ? courseGrades[credit.grade].push(credit.student_studentnumber) : courseGrades[credit.grade] = [credit.student_studentnumber])
+  // console.log(courseGrades)
+  const { data } = await oodilearnClient.getCourseData(courseGrades)
+  // console.log(data.data)
+  return data
+}
 
 const getStudentData = studentnumber => oodilearnClient.getStudentData(studentnumber)
 
 module.exports = {
   ping,
   getStudentData,
-  matchingStudents
+  matchingStudents,
+  courseGradeData
 }
