@@ -31,6 +31,47 @@ def get_students():
   students = mongo.db.students.find({'Opiskelijanumero': { "$in": numbers }})
   return json_util.dumps(students)
 
+@app.route('/averages/')
+def get_averages():
+  keys = request.args.keys()
+  grade_students = {}
+  for key in keys:
+    studentnumbers = request.args.getlist(key)
+    numbers = list(map(int, studentnumbers))
+    students = mongo.db.students.find({'Opiskelijanumero': { "$in": numbers }})
+    row_n = students.count()
+    sbi = 0
+    organised = 0
+    surface = 0
+    deep = 0
+    se = 0
+    int_rel = 0
+    peer = 0
+    align = 0
+    cons_feed = 0
+    for s in students:
+      sbi += (s['SBI'] / row_n) if (type(s['SBI']) != str) else 0
+      organised += (s['Organised'] / row_n) if (type(s['Organised']) != str) else 0
+      surface += (s['Surface'] / row_n) if (type(s['Surface']) != str) else 0
+      deep += (s['Deep'] / row_n) if (type(s['Deep']) != str) else 0
+      se += (s['SE'] / row_n) if (type(s['SE']) != str) else 0
+      int_rel += (s['IntRel'] / row_n) if (type(s['IntRel']) != str) else 0
+      peer += (s['Peer'] / row_n) if (type(s['Peer']) != str) else 0
+      align += (s['Align'] / row_n) if (type(s['Align']) != str) else 0
+      cons_feed += (s['ConsFeed'] / row_n) if (type(s['ConsFeed']) != str) else 0
+    grade_students[key] = {
+      'SBI': sbi,
+      'Organised': organised,
+      'Surface': surface,
+      'Deep': deep,
+      'SE': se,
+      'IntRel': int_rel,
+      'Peer': peer,
+      'Align': align,
+      'ConstFeed': cons_feed
+    }
+  return json_util.dumps(grade_students)
+
 @app.route('/test', methods=["POST"])
 def test():
   """
