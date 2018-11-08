@@ -16,7 +16,7 @@ def get_courses(data):
 def get_course_data(data, course_code, return_labels=False):
   course_data = data[(data["code"] == course_code) & (data["studymodule"] == "f")]
   
-  course_data = course_data.drop(axis=1, columns=["studentnumber", "studymodule", "code", "credits"])
+  course_data = course_data.drop(axis=1, columns=[ "studymodule", "code", "credits"])
   X = course_data.drop(axis=1, columns=["grade"])
   X = X.replace(" ", 2.5)
   X = X.apply(pd.to_numeric)
@@ -33,9 +33,10 @@ def get_course_data(data, course_code, return_labels=False):
   y = y.replace("MCLA", 3)
   y = y.replace("L", 5)
   y = y.apply(pd.to_numeric)
-
+  studentnumbers = X["studentnumber"]
   if return_labels:
-    return(X, y,  data["studentnumber"], course_code)
+    return(X, y,  studentnumbers, course_code)
+  X = X.drop("studentnumber")
   return(X, y, course_code)
 
 
@@ -146,7 +147,7 @@ def start_clustering():
 
 
 if __name__ == "__main__":
-  # start_grade_estimate()
+  start_grade_estimate()
   start_clustering()
   print("Done.")
   exit( 1 )
@@ -154,3 +155,5 @@ if __name__ == "__main__":
   
   
 
+  for column in X.select_dtypes(include=['O']):
+    X[column] = [ ord(x) - 64 if len(str(x)) is 1 else x for x in X[column]]
