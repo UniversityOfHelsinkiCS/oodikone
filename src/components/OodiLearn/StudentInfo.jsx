@@ -20,7 +20,7 @@ class SearchResult extends Component {
           <Divider />
           <Card
             fluid
-            header={student.name}
+            header="Opiskelijan Nimi" // {student.name}
             meta={student.studentnumber}
           />
           <Segment>
