@@ -24,7 +24,7 @@ class SearchResult extends Component {
             { profiles.map(s => (
               <Table.Row key={s.studentnumber}>
                 <Table.Cell content={s.studentnumber} />
-                <Table.Cell content={s.name} />
+                <Table.Cell content="Opiskelija" />
                 <Table.Cell width={1}>
                   <Button size="mini" icon="eye" circular onClick={() => this.props.onSelectStudent(s)} />
                 </Table.Cell>
