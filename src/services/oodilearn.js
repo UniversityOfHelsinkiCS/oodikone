@@ -4,6 +4,8 @@ const { Credit, Student } = require('../models')
 
 const ping = oodilearnClient.ping
 
+const query = oodilearnClient.query
+
 const matchingStudents = async searchTerm => {
   const students = await studentService.bySearchTerm(searchTerm)
   const snumbers = students.map(s => s.studentNumber)
@@ -47,6 +49,7 @@ const getStudentData = studentnumber => oodilearnClient.getStudentData(studentnu
 
 module.exports = {
   ping,
+  query,
   getStudentData,
   matchingStudents,
   courseGradeData

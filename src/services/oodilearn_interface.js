@@ -9,6 +9,8 @@ const instance = axios.create({
 
 const ping = () => instance.get('/ping')
 
+const query = query => instance.get(query)
+
 const getStudentData = studentnumber => instance.get(`/student/${studentnumber}`)
 
 const getStudentsData = studentnumbers => instance.get('/students/',{ params: { 'student': studentnumbers } })
@@ -31,6 +33,7 @@ const getStudents = async numbers => {
 
 module.exports = {
   ping,
+  query,
   getStudentData,
   getStudents,
   getCourseData

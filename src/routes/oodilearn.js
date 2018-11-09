@@ -23,6 +23,11 @@ wrapper.get('/oodilearn/ping', async (req, res) => {
   res.json(result.data)
 })
 
+wrapper.get('/oodilearn/query', async (req, res) => {
+  const result = await oodilearn.query(req.query.query)
+  res.json(result.data)
+})
+
 wrapper.get('/oodilearn/student/:id', async (req, res) => {
   const result = await oodilearn.getStudentData(req.params.id)
   res.status(200).json(result.data)
