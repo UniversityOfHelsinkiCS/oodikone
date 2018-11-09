@@ -6,15 +6,17 @@ from sklearn.preprocessing import OneHotEncoder
 import pickle
 import tensorflow as tf 
 from keras.models import Sequential
+from sklearn.manifold import TSNE
 
 from keras.layers import Dense, Dropout
 
 def get_courses(data):
   return (data["code"].unique())
 
-def get_course_data(data, course_code):
+def get_course_data(data, course_code, return_labels=False):
   course_data = data[(data["code"] == course_code) & (data["studymodule"] == "f")]
-  course_data = course_data.drop(axis=1, columns=["studentnumber", "studymodule", "code", "credits"])
+  
+  course_data = course_data.drop(axis=1, columns=[ "studymodule", "code", "credits"])
   X = course_data.drop(axis=1, columns=["grade"])
   X = X.replace(" ", 2.5)
   X = X.apply(pd.to_numeric)
@@ -31,10 +33,33 @@ def get_course_data(data, course_code):
   y = y.replace("MCLA", 3)
   y = y.replace("L", 5)
   y = y.apply(pd.to_numeric)
+  studentnumbers = X["studentnumber"]
+  if return_labels:
+    return(X, y,  studentnumbers, course_code)
+  X = X.drop("studentnumber")
   return(X, y, course_code)
 
 
-def train(X, y, name, n=10, verbose=False):
+def cluster(X, y, studentnumbers, name,  verbose=False):
+  if len(y.unique()) < 3 or X.shape[0] <= 80 :
+    if verbose:
+      print(f"Course: {name} | only one class or not enough samples, nothing to learn.")
+    return(None)
+  print(f"Clustering {name}")
+  X_embedded = TSNE(n_components=2, perplexity=15, learning_rate=350, init="pca").fit_transform(X)
+
+  dicti = {
+    'course': {
+      'name': name,
+      'points': np.array(X_embedded).tolist(),
+      'grades': np.array(y).tolist(),
+      'students': np.array(studentnumbers).tolist()
+      }
+    }
+  pickle.dump(dicti, open('./models/' + name + '_cluster.sav', 'wb'))
+  return(dicti)
+
+def grade_estimate(X, y, name, n=10, verbose=False):
   if np.unique(y).size <= 1 or X.shape[0] <= 80 :
     if verbose:
       print(f"Course: {name} | only one class or not enough samples, nothing to learn.")
@@ -97,19 +122,38 @@ def train(X, y, name, n=10, verbose=False):
     return(None)
   return(model)
 
-      
+def start_grade_estimate():
+  print("Starting grade estimation models...")
+  questionnaires = pd.read_csv("./data/combined.csv", header=0)
+  attainments = pd.read_csv("./data/attainments.csv", names=["id", "grade", "studentnumber", "credits", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "code", "semester", "studymodule"])
+  merged = pd.merge(questionnaires, attainments, left_on="Opiskelijanumero", right_on="studentnumber")
+  data = merged[["studentnumber", "SBI", "Organised", "Surface", "Deep", "SE", "IntRel", "Peer", "Align", "ConsFeed", "credits", "code", "studymodule", "grade"]]
+  mayhem = [grade_estimate(* get_course_data(data, course_code)) for course_code in get_courses(data)]
+  return
+
+def start_clustering():
+  print("Starting population clustering...")
+  questionnaires = pd.read_csv("./data/raw_questionanire.csv", header=0)
+  questionnaires = questionnaires.drop(["Kysely", "Arviointimenetelmä", "Tyypillinenopis.määrä", "KAndipalaute53", "Kandipalaute54", "Kandipalaute55"], axis="columns")
+  attainments = pd.read_csv("./data/attainments.csv", names=["id", "grade", "studentnumber", "credits", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "code", "semester", "studymodule"])
+  merged = pd.merge(questionnaires, attainments, left_on="Opiskelijanumero", right_on="studentnumber")
+  data = merged.drop(["Opiskelijanumero", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "semester", "id"], axis="columns")
+  data = data.dropna(thresh=(data.shape[1] - 5))
+  data = data.fillna(3)
+  mayhem = [cluster(* get_course_data(data, course_code, True)) for course_code in get_courses(data)]
+  return
+
+ 
 
 
 if __name__ == "__main__":
- 
+  start_grade_estimate()
+  start_clustering()
+  print("Done.")
+  exit( 1 )
 
-  questionnaires = pd.read_csv("./data/combined.csv", header=0)
-  print(questionnaires)
-  attainments = pd.read_csv("./data/attainments.csv", names=["id", "grade", "studentnumber", "credits", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "code", "semester", "studymodule"])
-  print(attainments)
-  merged = pd.merge(questionnaires, attainments, left_on="Opiskelijanumero", right_on="studentnumber")
-  data = merged[["studentnumber", "SBI", "Organised", "Surface", "Deep", "SE", "IntRel", "Peer", "Align", "ConsFeed", "credits", "code", "studymodule", "grade"]]
-  mayhem = [train(* get_course_data(data, course_code)) for course_code in get_courses(data)]
- 
+  
   
 
+  for column in X.select_dtypes(include=['O']):
+    X[column] = [ ord(x) - 64 if len(str(x)) is 1 else x for x in X[column]]

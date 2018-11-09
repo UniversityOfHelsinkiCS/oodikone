@@ -130,8 +130,8 @@ def get_averages():
     }
   return json_util.dumps(grade_students)
 
-@app.route('/test', methods=["POST"])
-def test():
+@app.route('/grade_estimate', methods=["POST"])
+def grade_estimate():
   """
   example request body:
   {
@@ -156,6 +156,12 @@ def test():
       model = load_model(course)
       res = model.predict(np.array(data))
   return str(np.argmax(res))
+
+@app.route('/<course_code>')
+def get_cluster(course_code):
+  print(course_code)
+  cluster = pickle.load(open('../models/' + course_code + '_cluster.sav', 'rb'))
+  return json_util.dumps(cluster)
 
 def load_model(course):
   model = pickle.load(open('../models/' + course + '.sav', 'rb'))
