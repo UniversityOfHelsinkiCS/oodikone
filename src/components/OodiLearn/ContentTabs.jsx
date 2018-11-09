@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Tab } from 'semantic-ui-react'
 import Student from './Student'
+import Course from './Course'
 
 class ContentTabs extends Component {
     state={}
@@ -11,6 +12,10 @@ class ContentTabs extends Component {
               {
                   menuItem: 'Student',
                   render: () => <Student />
+              },
+              {
+                menuItem: 'Courses',
+                render: () => <Course />
               }
           ]}
         />
