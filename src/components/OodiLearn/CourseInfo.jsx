@@ -4,18 +4,21 @@ import { Segment, Card, Button, Divider } from 'semantic-ui-react'
 import { string, func, shape, bool, arrayOf } from 'prop-types'
 import ClusterGraph from './ClusterGraph'
 import { getOodiLearnCourse } from '../../redux/oodilearnCourse'
+import { getOodiLearnCluster } from '../../redux/oodilearnCluster'
 import CourseGradeSpiders from './CourseGradeSpiders'
 
 class CourseInfo extends Component {
     state={}
 
     componentDidMount() {
-      const { course, getOodiLearnCourse } = this.props
+      console.log(this.props)
+      const { course, getOodiLearnCourse, getOodiLearnCluster } = this.props
       getOodiLearnCourse(course)
+      getOodiLearnCluster(course)
     }
 
     render() {
-      const { course, goBack, loading, data } = this.props
+      const { course, goBack, loading, data, clusterData } = this.props
       return (
         <Segment basic>
           <Button
@@ -32,7 +35,7 @@ class CourseInfo extends Component {
           />
           <Segment loading={loading}>
             { !!data && <CourseGradeSpiders data={data} /> }
-            <ClusterGraph profile={{}} />
+            { !!clusterData && <ClusterGraph data={clusterData} /> }
           </Segment>
         </Segment>
       )
@@ -52,12 +55,15 @@ CourseInfo.defaultProps = {
 
 const mapStateToProps = (state) => {
   const { pending: loading, data } = state.oodilearnCourse
+  const { pending: clusterLoading, data: clusterData} = state.oodilearnCluster
   return {
     loading,
-    data
+    clusterLoading,
+    data,
+    clusterData
   }
 }
 
 export default connect(mapStateToProps, {
-  getOodiLearnCourse
+  getOodiLearnCourse, getOodiLearnCluster
 })(CourseInfo)
