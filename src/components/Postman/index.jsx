@@ -51,7 +51,8 @@ class Postman extends Component {
                                     style={{
                                         overflow: 'auto',
                                         maxHeight: '25em',
-                                        wordBreak: 'break-all'
+                                        wordBreak: 'break-all',
+                                        whiteSpace: 'pre-wrap'
                                     }}
                                 >{JSON.stringify(value, null, 2)}
                                 </pre>
