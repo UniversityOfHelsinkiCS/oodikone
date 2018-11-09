@@ -13,10 +13,66 @@ load_dotenv()
 app.config["MONGO_URI"] = os.getenv('MONGO_URI')
 mongo = PyMongo(app)
 
+dimensions = [
+  "SBI",
+  "Organised",
+  "Surface",
+  "Deep",
+  "SE",
+  "IntRel",
+  "Peer",
+  "Align",
+  "ConsFeed"
+]
+
 @app.route('/ping')
 def ping():
   print('someone is pinging')
   return 'pong'
+
+@app.route('/calc-groups')
+def calc_groups():
+  pipeline = [
+    { "$group": {
+       "_id": "$Kysely",
+       "avgSBI": { "$avg": "$SBI" },
+       "avgOrganised": { "$avg": "$Organised" },
+       "avgSurface": { "$avg": "$Surface" },
+       "avgDeep": { "$avg": "$Deep" },
+       "avgSE": { "$avg": "$SE" },
+       "avgIntRel": { "$avg": "$IntRel" },
+       "avgPeer": { "$avg": "$Peer" },
+       "avgAlign": { "$avg": "$Align" },
+       "avgConsFeed": { "$avg": "$ConsFeed" },
+       "sdSBI": { "$avg": "$SBI" },
+       "sdOrganised": { "$stdDevSamp": "$Organised" },
+       "sdSurface": { "$stdDevSamp": "$Surface" },
+       "sdDeep": { "$stdDevSamp": "$Deep" },
+       "sdSE": { "$stdDevSamp": "$SE" },
+       "sdIntRel": { "$stdDevSamp": "$IntRel" },
+       "sdPeer": { "$stdDevSamp": "$Peer" },
+       "sdAlign": { "$stdDevSamp": "$Align" },
+       "sdConsFeed": { "$stdDevSamp": "$ConsFeed" }
+      }
+    }
+  ]
+  d = mongo.db.students.aggregate(pipeline)
+  for values in d:
+    # print(values)
+    students = mongo.db.students.find({'Kysely': values['_id']})
+    for student in students:
+      for dimension in dimensions:
+        dimension_high = values['avg' + dimension] + values['sd' + dimension]
+        dimension_low = values['avg' + dimension] - values['sd' + dimension]
+        if type(student[dimension]) == str:
+          continue
+        if student[dimension] > dimension_high:
+          mongo.db.students.update_one({'_id': student['_id']}, {'$set': {dimension + 'Group': 'above'}})
+        elif student[dimension] < dimension_low:
+          mongo.db.students.update_one({'_id': student['_id']}, {'$set': {dimension + 'Group': 'below'}})
+        else:
+          mongo.db.students.update_one({'_id': student['_id']}, {'$set': {dimension + 'Group': 'average'}})
+  return 'beans'
 
 @app.route('/student/<int:studentnumber>')
 def get_student(studentnumber):
@@ -49,6 +105,8 @@ def get_averages():
     peer = 0
     align = 0
     cons_feed = 0
+    # YO! This is calculated wrong, LOL!
+    # If the value is empty, i.e. string, the divider needs to be reduced by one for each empty.
     for s in students:
       sbi += (s['SBI'] / row_n) if (type(s['SBI']) != str) else 0
       organised += (s['Organised'] / row_n) if (type(s['Organised']) != str) else 0
