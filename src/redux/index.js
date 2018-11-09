@@ -33,6 +33,7 @@ import ping from './ping'
 import oodilearnStudent from './oodilearnStudent'
 import oodilearnCourses from './oodilearnCourses'
 import postman from './postman'
+import oodilearnCourse from './oodilearnCourse'
 
 export default combineReducers({
   locale,
@@ -67,5 +68,6 @@ export default combineReducers({
   ping,
   oodilearnStudent,
   oodilearnCourses,
-  postman
+  postman,
+  oodilearnCourse
 })

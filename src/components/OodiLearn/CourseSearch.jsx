@@ -25,7 +25,7 @@ class StudentSearch extends Component {
             placeholder="Search for courses by name or code..."
             doSearch={() => {}}
             value={searchterm}
-            onChange={val => this.sestatutState({ searchterm: val })}
+            onChange={val => this.setState({ searchterm: val })}
             loading={false}
             minSearchLength={MIN_SEARCH_LENGTH}
             disabled={true}

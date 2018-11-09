@@ -7,9 +7,15 @@ class Postman extends Component {
     state={
       route: ''
     }
+
     doRequest = () => {
       this.props.doGet(this.state.route)
     }
+
+    dataToConsole = () => {
+        console.log(this.props.postman.data)
+    }
+
     render() {
         const { postman } = this.props
         const tableData = Object.entries(postman).map(([ key, value ]) => ({ key, value }))
@@ -34,12 +40,39 @@ class Postman extends Component {
                   renderBodyRow={({ key, value }, i) => ({
                       key: i,
                       cells: [
-                        key,
-                        JSON.stringify(value)
+                        {
+                            width: 2,
+                            textAlign: 'center',
+                            content: key,
+                            key: i,
+                        }, {
+                            content: (
+                                <pre
+                                    style={{
+                                        overflow: 'auto',
+                                        maxHeight: '25em',
+                                        wordBreak: 'break-all',
+                                        whiteSpace: 'pre-wrap'
+                                    }}
+                                >{JSON.stringify(value, null, 2)}
+                                </pre>
+                            ),
+                            key: i + 1,
+                            width: 14
+                        }
                     ]})
                   }
-                  headerRow={['Key', 'Value']}
+                  headerRow={[{
+                        content: 'Key',
+                        textAlign: 'center',
+                        key: 'key'
+                    }, {
+                        content: 'Value',
+                        textAlign: 'left',
+                        key:'value'
+                    }]}
                 />
+                <Button fluid primary content="Data2Console" onClick={this.dataToConsole} />
             </div>
         )
     }
