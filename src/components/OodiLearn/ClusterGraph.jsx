@@ -10,7 +10,6 @@ addHighchartsMore(Highcharts)
 const data = {}
 
 const ClusterGraph = ({ data }) => {
-  console.log(data)
   return (
     <Segment basic>
       <HighchartsChart polar>

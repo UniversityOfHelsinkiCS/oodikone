@@ -7,7 +7,6 @@ class Course extends Component {
         selected: undefined
     }
 
-
     setSelected = (coursecode) => {
         this.setState({
           selected: coursecode
