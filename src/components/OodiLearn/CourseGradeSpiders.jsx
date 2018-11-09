@@ -1,37 +1,48 @@
-import React from 'react'
-import { Grid, Card, Header, Table } from 'semantic-ui-react'
+import React, { Component } from 'react'
+import { Grid, Card, Header, Table, Form, Dropdown } from 'semantic-ui-react'
 import { shape } from 'prop-types'
 import SpiderGraph from './ProfileSpiderGraph'
+import ProfileTable from './ProfileTable'
 
-const CourseGradeSpiders = ({ data }) => (
-    <Grid centered textAlign="center">
-        { Object.entries(data).map(([ grade, profile ]) => (
-            <Grid.Row key={grade}>
-                <Grid.Column width={6}>
-                    <Table definition size="small">
-                        <Table.Body>
-                            <Table.Row>
-                                <Table.Cell content="Grade" width={4} textAlign="center" />
-                                <Table.Cell content={grade.slice(0, -2)} />
-                            </Table.Row>
-                            { Object.entries(profile).map(([ key, value ]) => (
-                                <Table.Row key={key}>
-                                    <Table.Cell content={key} width={3} textAlign="center" />
-                                    <Table.Cell content={value} />
-                                </Table.Row>
-                            ))}
-                        </Table.Body>
-                    </Table>
-                </Grid.Column>
-                <Grid.Column width={10}>
-                    <SpiderGraph profile={profile} />                    
-                </Grid.Column>
-            </Grid.Row>
-        ))}
-    </Grid>
-)
-
-
+class CourseGradeSpiders extends Component {
+    state={
+      selected: Object.keys(this.props.data)[0]
+    }
+    render() {
+        const { selected } = this.state
+        const profile = this.props.data[selected]
+        const options = Object.keys(this.props.data)
+            .map(grade => ({
+                value: grade,
+                text: grade.slice(0, -2)
+            }))
+        return (
+            <Grid centered textAlign="center">
+                <Grid.Row>
+                    <Grid.Column width={6}>
+                        <Form>
+                            <Form.Group inline>
+                                <Form.Field>
+                                    <label>Grade</label>
+                                    <Dropdown
+                                        selection
+                                        onChange={(e, { value: selected }) => this.setState({ selected })}
+                                        options={options}
+                                        value={selected}
+                                    />
+                                </Form.Field>
+                            </Form.Group>
+                        </Form>
+                        <ProfileTable profile={profile} />
+                    </Grid.Column>
+                    <Grid.Column width={10}>
+                        <SpiderGraph profile={profile} />
+                    </Grid.Column>
+                </Grid.Row>
+            </Grid>
+        )
+    }
+}
 CourseGradeSpiders.propTypes = {
     data: shape({}).isRequired
 }
