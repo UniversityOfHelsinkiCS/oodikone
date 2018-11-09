@@ -44,6 +44,8 @@ const courseGradeData = async (courseCode) => {
   // console.log(data.data)
   return data
 }
+const getCluster = async (courseCode) =>  oodilearnClient.getCluster(courseCode)
+
 
 const getStudentData = studentnumber => oodilearnClient.getStudentData(studentnumber)
 
@@ -52,5 +54,6 @@ module.exports = {
   query,
   getStudentData,
   matchingStudents,
-  courseGradeData
+  courseGradeData,
+  getCluster
 }

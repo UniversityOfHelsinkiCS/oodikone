@@ -30,11 +30,13 @@ const getStudents = async numbers => {
   })
   return students
 }
+const getCluster = (code) => instance.get(`/${code}`)
 
 module.exports = {
   ping,
   query,
   getStudentData,
   getStudents,
-  getCourseData
+  getCourseData,
+  getCluster
 }
