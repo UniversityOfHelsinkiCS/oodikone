@@ -43,4 +43,9 @@ wrapper.get('/oodilearn/courses', async (req, res) => {
   res.json(result)
 })
 
+wrapper.get('/oodilearn/:code', async (req, res) => {
+  const result = await oodilearn.getCluster(req.params.code)
+  res.status(200).json(result.data)
+})
+
 module.exports = router
