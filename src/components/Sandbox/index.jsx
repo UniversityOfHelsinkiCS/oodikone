@@ -5,6 +5,7 @@ import { func, bool, oneOfType, shape, string } from 'prop-types'
 import sharedStyles from '../../styles/shared'
 import style from './index.css'
 import { pingOodiLearn } from '../../redux/sandbox'
+import Postman from '../Postman'
 
 class SandboxContainer extends Component {
     state={
@@ -31,6 +32,9 @@ class SandboxContainer extends Component {
                   <Segment basic loading={this.props.pending}>
                     <Button primary fluid content="Ping OodiLearn" icon="student" onClick={this.props.pingOodiLearn} />
                     <Message error={this.props.error} content={this.props.error ? 'Error.' : this.props.data} />
+                  </Segment>
+                  <Segment basic>
+                    <Postman />
                   </Segment>
                 </Grid.Column>
               </Grid.Row>
