@@ -18,7 +18,8 @@ const AutoSubmitSearchInput = ({
   placeholder,
   minSearchLength,
   doSearch,
-  loading
+  loading,
+  disabled
 }) => {
   const resetComponent = () => {
     onChange('')
@@ -53,6 +54,7 @@ const AutoSubmitSearchInput = ({
       onChange={handleSearchChange}
       placeholder={placeholder}
       loading={loading}
+      disabled={disabled}
     />
   )
 }
@@ -67,7 +69,8 @@ AutoSubmitSearchInput.propTypes = {
   minSearchLength: number,
   value: string.isRequired,
   onChange: func.isRequired,
-  loading: bool
+  loading: bool,
+  disabled: bool
 }
 
 AutoSubmitSearchInput.defaultProps = {
@@ -75,7 +78,8 @@ AutoSubmitSearchInput.defaultProps = {
   icon: 'search',
   latency: 250,
   minSearchLength: 4,
-  loading: false
+  loading: false,
+  disabled: false
 }
 
 export default Timeout(AutoSubmitSearchInput)
