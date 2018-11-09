@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import CourseSearch from './CourseSearch'
-import CourseInfo from './CourseInfo'
+import CoursePage from './CoursePage'
 
 class Course extends Component {
     state={
@@ -16,7 +16,7 @@ class Course extends Component {
 
     render() {
         return this.state.selected
-            ? <CourseInfo course={this.state.selected} goBack={() => this.setSelected(undefined)}/>
+            ? <CoursePage course={this.state.selected} goBack={() => this.setSelected(undefined)}/>
             : <CourseSearch onClickResult={this.setSelected}/>
     }
     
