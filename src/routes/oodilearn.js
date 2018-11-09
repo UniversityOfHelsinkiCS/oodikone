@@ -43,4 +43,9 @@ wrapper.get('/oodilearn/courses', async (req, res) => {
   res.json(result)
 })
 
+wrapper.get('/oodilearn/courses/:id', async (req, res) => {
+  const result = await oodilearn.courseGradeData(req.params.id)
+  res.json(result)
+})
+
 module.exports = router
