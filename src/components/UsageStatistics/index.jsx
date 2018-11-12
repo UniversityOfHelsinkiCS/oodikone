@@ -100,7 +100,7 @@ class UsageStatistics extends Component { //eslint-disable-line
         <Table celled>
           <Table.Body>
             {endpoints.sort(byCount).map(endpoint => (
-              <Table.Row key={endpoint}>
+              <Table.Row key={endpoint.name}>
                 <Table.Cell>
                   {endpoint.name}
                 </Table.Cell>
