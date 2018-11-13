@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Container, Header, Table, Icon } from 'semantic-ui-react'
+import ReactHighcharts from 'react-highcharts'
+import { Tab } from 'semantic-ui-react'
+
 import { callApi } from '../../apiConnection'
 
 import styles from '../StudentInfoCard/studentInfoCard.css'
 
-class UsageStatistics extends Component { //eslint-disable-line
+class UsageStatistics extends Component {
   state = null
 
   componentWillMount() {
@@ -19,17 +22,68 @@ class UsageStatistics extends Component { //eslint-disable-line
       return null
     }
 
+    const { byUser, byEndpoint, byDate } = this.state
     const byCount = (x, y) => y.count - x.count
 
-    const users = Object.keys(this.state.byUser).map(user => ({
+    const users = Object.keys(byUser).map(user => ({
       name: user,
-      count: this.state.byUser[user].length
+      count: byUser[user].length
     }))
 
-    const endpoints = Object.keys(this.state.byEndpoint).map(endpoint => ({
+    const endpoints = Object.keys(byEndpoint).map(endpoint => ({
       name: endpoint,
-      count: this.state.byEndpoint[endpoint].length
+      count: byEndpoint[endpoint].length
     }))
+
+    const chartConfig = {
+      xAxis: { categories: Object.keys(byDate) },
+      series: [{ data: Object.keys(byDate).map(key => byDate[key]) }]
+    }
+
+    const panes = [
+      {
+        menuItem: 'By user',
+        render: () => (
+          <Table celled>
+            <Table.Body>
+              {users.sort(byCount).map(user => (
+                <Table.Row key={user.name}>
+                  <Table.Cell onClick={() => this.setState({ user: user.name })}>
+                    {user.name}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {user.count}
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
+        )
+      },
+      {
+        menuItem: 'By endpoint',
+        render: () => (
+          <Table celled>
+            <Table.Body>
+              {endpoints.sort(byCount).map(endpoint => (
+                <Table.Row key={endpoint.name}>
+                  <Table.Cell>
+                    {endpoint.name}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {endpoint.count}
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
+        )
+      },
+      {
+        menuItem: 'By date',
+        render: () => <ReactHighcharts config={chartConfig} />
+      }
+    ]
 
     if (this.state.user) {
       const entries = this.state.all
@@ -76,43 +130,7 @@ class UsageStatistics extends Component { //eslint-disable-line
       )
     }
 
-    return (
-      <div>
-        <h3>by user</h3>
-
-        <Table celled>
-          <Table.Body>
-            {users.sort(byCount).map(user => (
-              <Table.Row key={user.name}>
-                <Table.Cell onClick={() => this.setState({ user: user.name })}>
-                  {user.name}
-                </Table.Cell>
-                <Table.Cell>
-                  {user.count}
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-
-        <h3>by endpoint</h3>
-
-        <Table celled>
-          <Table.Body>
-            {endpoints.sort(byCount).map(endpoint => (
-              <Table.Row key={endpoint}>
-                <Table.Cell>
-                  {endpoint.name}
-                </Table.Cell>
-                <Table.Cell>
-                  {endpoint.count}
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      </div>
-    )
+    return <Tab panes={panes} />
   }
 
   render() {
@@ -126,4 +144,5 @@ class UsageStatistics extends Component { //eslint-disable-line
     )
   }
 }
+
 export default connect()(UsageStatistics)
