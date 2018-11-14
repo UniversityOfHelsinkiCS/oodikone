@@ -538,6 +538,16 @@ const byNameAndOrCodeLike = (name, code) => {
   })
 }
 
+const byCodes = (codes) => {
+  return Course.findAll({
+    where: {
+      code: {
+        [Op.in]: codes
+      }
+    }
+  })
+}
+
 module.exports = {
   byCode,
   byName,
@@ -555,5 +565,6 @@ module.exports = {
   getAllDisciplines,
   yearlyStatsOfNew,
   courseYearlyStats,
-  byNameAndOrCodeLike
+  byNameAndOrCodeLike,
+  byCodes
 }

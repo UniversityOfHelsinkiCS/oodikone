@@ -9,6 +9,7 @@
     "dev": "NODE_ENV=dev nodemon --max_old_space_size=4096 index.js",
     "anon": "NODE_ENV=test nodemon index.js",
     "test": "NODE_ENV=test jest --runInBand --verbose",
+    "test_docker": "docker exec -t backend /bin/bash -c 'npm test'",
     "update_database_dev": "NODE_ENV=dev node src/services/doo_api_database_updater/run_updater.js",
     "update_database": "node src/services/doo_api_database_updater/run_updater.js",
     "update_database_anon": "NODE_ENV=anon node src/services/doo_api_database_updater/run_updater.js",
@@ -23,7 +24,7 @@
     "update_top_teachers": "node scripts/update_top_teachers.js",
     "update_students_not_modified_since": "node scripts/update_students_not_modified_since.js",
     "refresh_studyright_associations": "node scripts/refresh_studyright_associations.js",
-    "prepush": "npm run test"
+    "prepush": "npm run test || npm run test_docker"
   },
   "author": "Matti Luukkainen",
   "license": "MIT",
@@ -37,7 +38,7 @@
     "lodash": "^4.17.10",
     "mkdirp": "^0.5.1",
     "moment": "^2.22.2",
-    "morgan": "^1.9.0",
+    "morgan": "^1.9.1",
     "nodemailer": "^4.6.8",
     "pg": "^7.4.3",
     "raven": "^2.6.3",
@@ -51,7 +52,7 @@
     "winston-transport": "^4.2.0"
   },
   "devDependencies": {
-    "ava": "^0.22.0",
+    "ava": "^0.25.0",
     "babel-eslint": "^8.2.6",
     "dotenv": "^4.0.0",
     "eslint": "^4.19.1",
