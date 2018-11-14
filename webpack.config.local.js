@@ -7,6 +7,8 @@ const commonSettings = require('./webpack.config.common')
 
 const devServerPort = 8081
 const apiServerPort = 8080
+const apiAddress = process.env.BACKEND_ADDR || 'localhost'
+const backendURL = `http://${apiAddress}:${apiServerPort}`
 
 module.exports = {
   mode: 'development',
@@ -20,7 +22,7 @@ module.exports = {
     proxy: [
       {
         context: ['/api/**'],
-        target: `http://localhost:${apiServerPort}`
+        target: backendURL
       }
     ],
     historyApiFallback: {
