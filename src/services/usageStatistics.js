@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const moment = require('moment')
 const { UsageStatistic, sequelize } = require('../models')
 const { Op } = sequelize
 
@@ -27,8 +28,20 @@ const formatForGroup = url => {
   return wildcarded(url)
 }
 
-const stripExtraFields = ({ id, username, name, time, admin, method, URL }) => 
+const stripExtraFields = ({ id, username, name, time, admin, method, URL }) =>
   ({ id, username, name, time, admin, method, URL })
+
+const withoutRequestsByAdmins = results => results.filter(u => !u.admin)
+
+const byDate = (results) => {
+  const getDateForRequest = req => moment(req.time * 1000).format('YYYY-MM-DD')
+  const requestsByDate = _.groupBy(withoutRequestsByAdmins(results).map(stripExtraFields), getDateForRequest)
+
+  return Object.keys(requestsByDate).reduce((result, key) => {
+    result[key] = requestsByDate[key].length
+    return result
+  }, {})
+}
 
 const between = async (from, to) => {
   const results = await UsageStatistic.findAll({
@@ -39,10 +52,11 @@ const between = async (from, to) => {
     }
   })
 
-  return { 
+  return {
     byEndpoint: _.groupBy(results.map(stripExtraFields), u => formatForGroup(u.URL)),
     byUser: _.groupBy(results.map(stripExtraFields), u => u.username),
-    all: results 
+    byDate: byDate(results),
+    all: results
   }
 }
 
