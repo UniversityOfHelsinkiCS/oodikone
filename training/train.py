@@ -7,7 +7,7 @@ import pickle
 import tensorflow as tf 
 from keras.models import Sequential
 from sklearn.manifold import TSNE
-
+from datetime import datetime
 from keras.layers import Dense, Dropout
 
 def get_courses(data):
@@ -36,7 +36,7 @@ def get_course_data(data, course_code, return_labels=False):
   studentnumbers = X["studentnumber"]
   if return_labels:
     return(X, y,  studentnumbers, course_code)
-  X = X.drop("studentnumber")
+  X = X.drop("studentnumber", axis="columns")
   return(X, y, course_code)
 
 
@@ -46,7 +46,8 @@ def cluster(X, y, studentnumbers, name,  verbose=False):
       print(f"Course: {name} | only one class or not enough samples, nothing to learn.")
     return(None)
   print(f"Clustering {name}")
-  X_embedded = TSNE(n_components=2, perplexity=15, learning_rate=350, init="pca").fit_transform(X)
+  X = X.drop("studentnumber", axis="columns")
+  X_embedded = TSNE(n_components=2, init="pca").fit_transform(X)
 
   dicti = {
     'course': {
@@ -142,13 +143,34 @@ def start_clustering():
   data = data.fillna(3)
   mayhem = [cluster(* get_course_data(data, course_code, True)) for course_code in get_courses(data)]
   return
+def bucket_dates(attainments):
+  dates = attainments[['attainmentdate', 'semester']]
+  #    // semester code is calculated as "code * 6 months since 1950-1-1", Im bucketing all study attainments in 3 month periods by semester code abstracting real study attainment dates
+  #  const attainment_date = new Date(moment(moment('1950', 'YYYY').add((attainment.semester_code * 6) + _.sample([-3, 0, 3]), 'months')))
 
- 
+  bucket_date = []
+  for index,row in dates.iterrows():
+    date = datetime.strptime(row['attainmentdate'], "%Y-%m-%d %H:%M:%S+00")
+    year = date.year
+    month = date.month
+
+    period3 = datetime.strptime(year+'01'+'01', "%Y%m%d")
+    period4 = datetime.strptime()
+
+  return attainments
+
+
+def start_course_graph_calculation():
+  attainments = pd.read_csv('./data/CSattainments2008.csv', names=["id", "grade", "studentnumber", "credits", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "code", "semester", "studymodule"])
+  bucket_dates(attainments)
+
+  return attainments
 
 
 if __name__ == "__main__":
-  start_grade_estimate()
-  start_clustering()
+  # start_grade_estimate()
+  # start_clustering()
+  start_course_graph_calculation()
   print("Done.")
   exit( 1 )
 
