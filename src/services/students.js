@@ -98,7 +98,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
 
   if (credits === undefined) {
     credits = []
-  }  return {
+  } return {
     firstnames,
     lastname,
     studyrights,
@@ -117,7 +117,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
   }
 }
 
-const bySearchTerm = async (term) => {
+const bySearchTermOld = async (term) => {
   try {
     const result = await byAbreviatedNameOrStudentNumber(`%${term}%`)
     return result.map(formatStudent)
@@ -140,7 +140,7 @@ const withId = async (id) => {
   }
 }
 
-const bySearchTermAndElements = async (searchterm, elementcodes) => {
+const bySearchTermAndElementsOld = async (searchterm, elementcodes) => {
   const likeSearchTerm = `%${searchterm}%`
   const students = await Student.findAll({
     where: {
@@ -168,6 +168,80 @@ const bySearchTermAndElements = async (searchterm, elementcodes) => {
   })
   return students.map(formatStudent)
 }
+
+const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
+
+const likefy = term => `%${term}%`
+
+const columnLike = (column, term) => ({
+  [column]: {
+    [Op.iLike]: likefy(term)
+  }
+})
+
+const nameLike = (terms) => {
+  const [first, second] = terms
+  if (!second) {
+    return columnLike('abbreviatedname', first)
+  } else {
+    return {
+      [Op.or]: [
+        columnLike('abbreviatedname', `%${first}%${second}%`),
+        columnLike('abbreviatedname', `%${second}%${first}%`)
+      ]
+    }
+  }
+}
+
+const studentnumberLike = terms => {
+  if (terms.length !== 1) {
+    return undefined
+  }
+  return {
+    studentnumber: {
+      [Op.iLike]: likefy(terms[0])
+    }
+  }
+}
+
+const bySearchTermNew = async (searchterm) => {
+  const terms = splitByEmptySpace(searchterm)
+  const matches = await Student.findAll({
+    where: {
+      [Op.or]: [
+        nameLike(terms),
+        studentnumberLike(terms)
+      ]
+    }
+  })
+  return matches.map(formatStudent)
+}
+
+const bySearchTermAndElementsNew = async (searchterm, codes) => {
+  const terms = splitByEmptySpace(searchterm)
+  const matches = await Student.findAll({
+    include: {
+      model: StudyrightElement,
+      required: true,
+      where: {
+        code: {
+          [Op.in]: codes
+        }
+      }
+    },
+    where: {
+      [Op.or]: [
+        nameLike(terms),
+        studentnumberLike(terms)
+      ]
+    }
+  })
+  return matches.map(formatStudent)
+}
+
+const NEW_SEARCH = true
+const bySearchTerm = NEW_SEARCH ? bySearchTermNew : bySearchTermOld
+const bySearchTermAndElements = NEW_SEARCH ? bySearchTermAndElementsNew : bySearchTermAndElementsOld
 
 module.exports = {
   withId, bySearchTerm, createStudent, updateStudent, bySearchTermAndElements
