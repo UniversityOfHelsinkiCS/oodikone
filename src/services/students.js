@@ -98,7 +98,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
 
   if (credits === undefined) {
     credits = []
-  }  return {
+  } return {
     firstnames,
     lastname,
     studyrights,
@@ -140,7 +140,7 @@ const withId = async (id) => {
   }
 }
 
-const bySearchTermAndElements = async (searchterm, elementcodes) => {
+const bySearchTermAndElementsOld = async (searchterm, elementcodes) => {
   const likeSearchTerm = `%${searchterm}%`
   const students = await Student.findAll({
     where: {
@@ -182,17 +182,12 @@ const columnLike = (column, term) => ({
 const nameLike = (terms) => {
   const [first, second] = terms
   if (!second) {
-    return {
-      [Op.or]: [
-        columnLike('firstnames', first),
-        columnLike('lastname', first)
-      ]
-    }
+    return columnLike('abbreviatedname', first)
   } else {
     return {
       [Op.or]: [
-        [columnLike('firstnames', first), columnLike('lastname', second)],
-        [columnLike('firstnames', second), columnLike('lastname', first)]
+        columnLike('abbreviatedname', `%${first}%${second}%`),
+        columnLike('abbreviatedname', `%${second}%${first}%`)
       ]
     }
   }
@@ -222,9 +217,32 @@ const bySearchTermNew = async (searchterm) => {
   return matches.map(formatStudent)
 }
 
-const NEW_STUDENT_SEARCH = true
-const bySearchTerm = NEW_STUDENT_SEARCH ? bySearchTermNew : bySearchTermOld
+const bySearchTermAndElementsNew = async (searchterm, codes) => {
+  const terms = splitByEmptySpace(searchterm)
+  const matches = await Student.findAll({
+    include: {
+      model: StudyrightElement,
+      required: true,
+      where: {
+        code: {
+          [Op.in]: codes
+        }
+      }
+    },
+    where: {
+      [Op.or]: [
+        nameLike(terms),
+        studentnumberLike(terms)
+      ]
+    }
+  })
+  return matches.map(formatStudent)
+}
+
+const NEW_SEARCH = true
+const bySearchTerm = NEW_SEARCH ? bySearchTermNew : bySearchTermOld
+const bySearchTermAndElements = NEW_SEARCH ? bySearchTermAndElementsNew : bySearchTermAndElementsOld
 
 module.exports = {
-  withId, bySearchTerm, createStudent, updateStudent, bySearchTermAndElements, bySearchTermNew
+  withId, bySearchTerm, createStudent, updateStudent, bySearchTermAndElements
 }
