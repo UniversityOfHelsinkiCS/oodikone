@@ -117,7 +117,7 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
   }
 }
 
-const bySearchTerm = async (term) => {
+const bySearchTermOld = async (term) => {
   try {
     const result = await byAbreviatedNameOrStudentNumber(`%${term}%`)
     return result.map(formatStudent)
@@ -169,6 +169,62 @@ const bySearchTermAndElements = async (searchterm, elementcodes) => {
   return students.map(formatStudent)
 }
 
+const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
+
+const likefy = term => `%${term}%`
+
+const columnLike = (column, term) => ({
+  [column]: {
+    [Op.iLike]: likefy(term)
+  }
+})
+
+const nameLike = (terms) => {
+  const [first, second] = terms
+  if (!second) {
+    return {
+      [Op.or]: [
+        columnLike('firstnames', first),
+        columnLike('lastname', first)
+      ]
+    }
+  } else {
+    return {
+      [Op.or]: [
+        [columnLike('firstnames', first), columnLike('lastname', second)],
+        [columnLike('firstnames', second), columnLike('lastname', first)]
+      ]
+    }
+  }
+}
+
+const studentnumberLike = terms => {
+  if (terms.length !== 1) {
+    return undefined
+  }
+  return {
+    studentnumber: {
+      [Op.iLike]: likefy(terms[0])
+    }
+  }
+}
+
+const bySearchTermNew = async (searchterm) => {
+  const terms = splitByEmptySpace(searchterm)
+  const matches = await Student.findAll({
+    where: {
+      [Op.or]: [
+        nameLike(terms),
+        studentnumberLike(terms)
+      ]
+    }
+  })
+  return matches.map(formatStudent)
+}
+
+const NEW_STUDENT_SEARCH = true
+const bySearchTerm = NEW_STUDENT_SEARCH ? bySearchTermNew : bySearchTermOld
+
 module.exports = {
-  withId, bySearchTerm, createStudent, updateStudent, bySearchTermAndElements
+  withId, bySearchTerm, createStudent, updateStudent, bySearchTermAndElements, bySearchTermNew
 }
