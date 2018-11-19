@@ -7,8 +7,6 @@ bash run.sh
 
 In a nutshell:
 - Pulls related projects from GitHub
-- Copies default .env files to projects
-- Installs the projects
-- Sets up PostgreSQL and Redis
+- Builds and runs the Dockerized development environment
 - Gets a database dump from production servers
 - Creates the database schema and populates it with the dump
