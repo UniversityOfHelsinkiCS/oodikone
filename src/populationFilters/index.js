@@ -108,19 +108,23 @@ export const courseParticipation = ({ field, course }) =>
   })
 
 export const extentGraduated = (params) => {
-  const { extentcode, graduated, complemented } = params
+  const { extentcode, graduated, complemented, studyright } = params
   return ({
     id: uuidv4(),
     type: 'ExtentGraduated',
     params: {
       extentcode,
       graduated,
-      complemented
+      complemented,
+      studyright
     },
     filter: (student) => {
       if (complemented === 'true' && graduated === 'either') {
-        return !student.studyrights.map(sr =>
-          sr.extentcode).includes(extentcode)
+        // jos koodi 7 eli exchange student
+        const thisStudyright = student.studyrights
+          .find(s => s.studyrightElements.map(e => e.code).includes(studyright))
+
+        return thisStudyright.extentcode !== extentcode
       } else if (complemented === 'true' && graduated === 'grad') {
         return !student.studyrights.filter(sr =>
           sr.extentcode === extentcode && sr.graduated).map(sr =>

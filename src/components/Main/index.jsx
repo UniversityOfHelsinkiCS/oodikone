@@ -12,7 +12,7 @@ import CourseStatistics from '../CourseStatistics'
 import EnableUsers from '../EnableUsers'
 import Settings from '../Settings'
 import ErrorContainer from '../ErrorContainer'
-import { routes, BASE_PATH } from '../../constants'
+import { routes, BASE_PATH, hiddenRoutes } from '../../constants'
 import AccessDenied from '../AccessDenied'
 import UsageStatistics from '../UsageStatistics'
 import Teachers from '../Teachers'
@@ -102,8 +102,8 @@ class Main extends Component {
               <Route exact path={routes.users.route} component={EnableUsers} />
               <Route exact path={routes.teachers.route} component={Teachers} />
               <Route exact path={routes.usage.route} component={UsageStatistics} />
-              <Route exact path={routes.sandbox.route} component={Sandbox} />
-              <Route exact path={routes.oodilearn.route} component={OodiLearn} />
+              <Route exact path={hiddenRoutes.sandbox.route} component={Sandbox} />
+              <Route exact path={hiddenRoutes.oodilearn.route} component={OodiLearn} />
             </Switch>
           </main>
         </Router>
