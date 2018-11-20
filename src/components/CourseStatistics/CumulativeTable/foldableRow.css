@@ -1,5 +1,5 @@
 .subRow {
-  background-color: var(--lightSilver)
+  background-color: var(--lightSilver);
 }
 
 .courseNameCell {
@@ -9,6 +9,7 @@
 .courseRealisationCell {
   padding-left: 2em !important;
 }
+
 .foldControlCell {
   cursor: pointer;
   padding-right: 0 !important;
