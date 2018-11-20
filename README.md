@@ -183,6 +183,12 @@ _/home/tkt_oodi/oodikone.cs.helsinki.fi/student_number_updater_ is acually the b
 
 To update your database run `npm run update_database` with optional args `file="<filename>"` and `index=<number>` with former telling the studentnumber filename to update and latter telling which row to start from.
 
+Use the following to run in detached shell
+
+```
+nohup docker exec backend npm run update_database file="/data/all_student_numbers.txt"
+```
+
 ### Anonymize data
 
 Run `npm run anonymize` for studentnumbers provided in `studentnumbers.txt` file in root directory. 
