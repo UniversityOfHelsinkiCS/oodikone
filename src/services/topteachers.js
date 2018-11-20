@@ -40,7 +40,7 @@ const getCategoriesAndYears = async () => {
 }
 
 const creditsWithTeachersForYear = yearcode => Credit.findAll({
-  attributes: ['id', 'credits', 'credittypecode'],
+  attributes: ['id', 'credits', 'credittypecode', 'isStudyModule'],
   include: [
     {
       model: Semester,
@@ -84,7 +84,7 @@ const updatedStats = (statistics, teacher, passed, failed, credits) => {
   }
 }
 
-const isRegularCourse = credit => !credit.course ? true : !credit.course.get().is_study_module
+const isRegularCourse = credit => !credit.isStudyModule
   
 const filterTopTeachers = (stats, limit=50) => Object.values(stats)
   .sort((t1, t2) => t2.credits - t1.credits)
