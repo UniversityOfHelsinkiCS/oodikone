@@ -1,39 +1,34 @@
 import React from 'react'
 import { Table } from 'semantic-ui-react'
-import { string, arrayOf, shape, number, oneOfType, func } from 'prop-types'
+import { string, arrayOf, func } from 'prop-types'
 
-const CumulativeTable = ({ categoryName, data, onClickCourse }) => (
-  <Table>
+import { courseDataWithRealisationsType } from '../../../constants/types'
+import FoldableRow from './foldableRow'
+
+const getHeader = (categoryName) => {
+  const getHeaderCell = content => <Table.HeaderCell content={content} />
+  const headerLabels = ['', categoryName, 'Passed', 'Failed', 'Pass rate']
+  return (
     <Table.Header>
       <Table.Row>
-        <Table.HeaderCell content={categoryName} />
-        <Table.HeaderCell content="Passed" />
-        <Table.HeaderCell content="Failed" />
-        <Table.HeaderCell content="Pass rate" />
+        {headerLabels.map(getHeaderCell)}
       </Table.Row>
     </Table.Header>
+  )
+}
+
+const CumulativeTable = ({ categoryName, data, onClickCourse }) => (
+  <Table structured>
+    {getHeader(categoryName)}
     <Table.Body>
-      { data.map(({ id, category, passed, failed, passrate }) => (
-        <Table.Row key={id}>
-          <Table.Cell content={category} onClick={() => onClickCourse(id)} />
-          <Table.Cell content={passed} />
-          <Table.Cell content={failed} />
-          <Table.Cell content={`${passrate || 0} %`} />
-        </Table.Row>
-        ))}
+      { data.map(course => <FoldableRow courseData={course} onClickFn={onClickCourse} />)}
     </Table.Body>
   </Table>
 )
 
 CumulativeTable.propTypes = {
   categoryName: string.isRequired,
-  data: arrayOf(shape({
-    id: oneOfType([number, string]),
-    category: oneOfType([number, string]),
-    passed: oneOfType([number, string]),
-    failed: oneOfType([number, string]),
-    passrate: oneOfType([number, string])
-  })).isRequired,
+  data: arrayOf(courseDataWithRealisationsType).isRequired,
   onClickCourse: func.isRequired
 }
 
