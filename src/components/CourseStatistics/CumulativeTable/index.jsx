@@ -7,10 +7,11 @@ import FoldableRow from './foldableRow'
 
 const getHeader = (categoryName) => {
   const getHeaderCell = content => <Table.HeaderCell content={content} />
-  const headerLabels = ['', categoryName, 'Passed', 'Failed', 'Pass rate']
+  const headerLabels = [categoryName, 'Passed', 'Failed', 'Pass rate']
   return (
     <Table.Header>
       <Table.Row>
+        <Table.HeaderCell />
         {headerLabels.map(getHeaderCell)}
       </Table.Row>
     </Table.Header>
@@ -18,7 +19,7 @@ const getHeader = (categoryName) => {
 }
 
 const CumulativeTable = ({ categoryName, data, onClickCourse }) => (
-  <Table structured>
+  <Table>
     {getHeader(categoryName)}
     <Table.Body>
       { data.map(course => <FoldableRow courseData={course} onClickFn={onClickCourse} />)}
