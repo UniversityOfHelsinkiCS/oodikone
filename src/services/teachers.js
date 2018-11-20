@@ -211,7 +211,7 @@ const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) => Teacher.f
   attributes: ['name', 'code', 'id'],
   include: {
     model: Credit,
-    attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode'],
+    attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
     include: [
       {
         model: Course,
@@ -236,7 +236,7 @@ const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) => Teacher.f
   }
 })
 
-const isRegularCourse = credit => !credit.course ? true : !credit.course.get().is_study_module
+const isRegularCourse = credit => !credit.isStudyModule
 
 const calculateCreditStatistics = credits => credits.reduce((stats, credit) => {
   if (isRegularCourse(credit)) {
