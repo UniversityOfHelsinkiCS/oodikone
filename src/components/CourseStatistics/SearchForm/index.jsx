@@ -3,7 +3,7 @@ import { Segment, Header, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, arrayOf, shape, bool } from 'prop-types'
 import { getSemesters } from '../../../redux/semesters'
-import { findCourses, clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
+import { clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
 import { getCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
@@ -56,15 +56,6 @@ class SearchForm extends Component {
   handleChange = (e, target) => {
     const { name, value } = target
     this.setState({ [name]: value })
-  }
-
-  handleCourseFormChange = (e, target) => {
-    const { name, value } = target
-    const { type, discipline } = { ...this.state, [name]: value }
-    this.setState({ type, discipline })
-    if (type && discipline) {
-      this.props.findCourses({ type, discipline })
-    }
   }
 
   toggleCheckbox = (e, target) => {
@@ -139,6 +130,15 @@ class SearchForm extends Component {
             courses={selected}
             onSelectCourse={this.toggleCourse}
           />
+          <Form.Button
+            type="button"
+            disabled={disabled}
+            fluid
+            basic
+            positive
+            content="Fetch statistics"
+            onClick={this.submitForm}
+          />
           <Header content="Search for courses" />
           <div
             style={{ marginBottom: '15px' }}
@@ -177,7 +177,6 @@ class SearchForm extends Component {
               onSelectCourse={this.toggleCourse}
             />
           </div>
-          <Form.Button type="button" disabled={disabled} fluid basic positive content="Fetch statistics" onClick={this.submitForm} />
         </Form>
       </Segment>
     )
@@ -185,7 +184,6 @@ class SearchForm extends Component {
 }
 
 SearchForm.propTypes = {
-  findCourses: func.isRequired,
   findCoursesV2: func.isRequired,
   getSemesters: func.isRequired,
   getCourseStats: func.isRequired,
@@ -212,7 +210,6 @@ const mapStateToProps = (state) => {
 }
 
 export default connect(mapStateToProps, {
-  findCourses,
   getSemesters,
   getCourseStats,
   clearCourses,
