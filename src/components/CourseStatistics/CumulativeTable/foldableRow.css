@@ -1,0 +1,17 @@
+.subRow {
+  background-color: var(--lightSilver);
+}
+
+.courseNameCell {
+  font-weight: 600;
+}
+
+.courseRealisationCell {
+  padding-left: 2em !important;
+}
+
+.foldControlCell {
+  cursor: pointer;
+  padding-right: 0 !important;
+  width: 1em !important;
+}

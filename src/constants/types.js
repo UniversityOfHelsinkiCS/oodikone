@@ -4,7 +4,8 @@ const {
   number,
   shape,
   string,
-  oneOfType
+  oneOfType,
+  arrayOf
 } = PropTypes
 
 export const graphDataType = shape({
@@ -27,4 +28,21 @@ export const dropdownType = shape({
   key: oneOfType([string, number]).isRequired,
   value: oneOfType([string, number]).isRequired,
   text: shape({}).isRequired
+})
+
+export const courseDataType = shape({
+  id: oneOfType([number, string]),
+  category: oneOfType([number, string]),
+  passed: oneOfType([number, string]),
+  failed: oneOfType([number, string]),
+  passrate: oneOfType([number, string])
+})
+
+export const courseDataWithRealisationsType = shape({
+  id: oneOfType([number, string]),
+  category: oneOfType([number, string]),
+  passed: oneOfType([number, string]),
+  failed: oneOfType([number, string]),
+  passrate: oneOfType([number, string]),
+  realisations: arrayOf(courseDataType)
 })
