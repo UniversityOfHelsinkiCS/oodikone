@@ -124,7 +124,7 @@ export const extentGraduated = (params) => {
         const thisStudyright = student.studyrights
           .find(s => s.studyrightElements.map(e => e.code).includes(studyright))
 
-        return thisStudyright.extentcode !== extentcode
+        return !thisStudyright || thisStudyright.extentcode !== extentcode
       } else if (complemented === 'true' && graduated === 'grad') {
         return !student.studyrights.filter(sr =>
           sr.extentcode === extentcode && sr.graduated).map(sr =>
@@ -140,15 +140,16 @@ export const extentGraduated = (params) => {
 }
 
 export const courseParticipationNTimes = (params) => {
-  const { amount, course } = params
+  const { amount, courses } = params
   return ({
     id: uuidv4(),
     type: 'CourseParticipationNTimes',
     params: {
       amount,
-      course
+      courses
     },
-    filter: student => student.courses.filter(cr => cr.course.code === course).length < amount
+    filter: student => student.courses
+      .filter(cr => courses.includes(cr.course.code)).length < amount
   })
 }
 

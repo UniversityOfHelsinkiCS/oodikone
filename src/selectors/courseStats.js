@@ -84,30 +84,62 @@ const getAllStudyProgrammes = createSelector([getCourseStats], (courseStats) => 
 
 const getProgrammesFromProps = (state, { programme, programmes }) => ({ programme, programmes })
 
+const calculatePassRate = (passed, failed) => {
+  const passRate = (100 * passed) / (passed + failed)
+  return passRate ? passRate.toFixed(2) : null
+}
+
+const getRealisationStats = (realisation, filterStudentFn) => {
+  const { name, attempts } = realisation
+  const { passed, failed } = attempts.classes
+  const passedAmount = passed.filter(filterStudentFn).length
+  const failedAmount = failed.filter(filterStudentFn).length
+  return {
+    passed: passedAmount,
+    failed: failedAmount,
+    realisation: name,
+    passrate: calculatePassRate(passedAmount, failedAmount)
+  }
+}
+
+const getSummaryStats = (statistics, filterStudentFn) => {
+  const summaryAcc = {
+    passed: 0,
+    failed: 0
+  }
+
+  const summary = statistics.reduce((acc, cur) => {
+    const { passed, failed } = cur.attempts.classes
+    acc.passed += passed.filter(filterStudentFn).length
+    acc.failed += failed.filter(filterStudentFn).length
+    return acc
+  }, summaryAcc)
+
+  summary.passrate = calculatePassRate(summary.passed, summary.failed)
+
+  return summary
+}
+
 const summaryStatistics = createSelector(
   getCourseStats,
   getProgrammesFromProps,
-  (s, { programme: code, programmes }) => {
-    const prog = programmes.find(p => p.key === code)
-    const filterStudent = studentnumber => new Set(prog.students).has(studentnumber)
-    return Object.entries(s).map((entry) => {
+  (courseStats, { programme: code, programmes }) => {
+    const programme = programmes.find(p => p.key === code)
+    const { students } = programme
+    const filterStudentFn = studentNumber => students && students.includes(studentNumber)
+    return Object.entries(courseStats).map((entry) => {
       const [coursecode, data] = entry
       const { statistics, name } = data
-      const summary = {
-        passed: 0,
-        failed: 0
-      }
-      statistics.forEach((groupstat) => {
-        const { passed, failed } = groupstat.attempts.classes
-        summary.passed += passed.filter(filterStudent).length
-        summary.failed += failed.filter(filterStudent).length
-      })
-      const passrate = (100 * summary.passed) / (summary.passed + summary.failed)
-      summary.passrate = !passrate ? null : passrate.toFixed(2)
+
+      const realisations =
+        statistics.map(realisation => getRealisationStats(realisation, filterStudentFn))
+      const summary = getSummaryStats(statistics, filterStudentFn)
+
       return {
         coursecode,
         name,
-        summary
+        summary,
+        realisations
       }
     })
   }
@@ -115,13 +147,10 @@ const summaryStatistics = createSelector(
 
 const getCourses = createSelector(
   getCourseStats,
-  (stats) => {
-    const courses = Object.values(stats).map(({ name, coursecode: code }) => ({
-      code,
-      name
-    }))
-    return courses
-  }
+  stats => Object.values(stats).map(({ name, coursecode: code }) => ({
+    code,
+    name
+  }))
 )
 
 export default {
