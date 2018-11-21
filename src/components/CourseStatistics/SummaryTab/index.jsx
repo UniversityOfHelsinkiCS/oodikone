@@ -12,6 +12,19 @@ class SummaryTab extends Component {
 
     render() {
       const { statistics, programmes, queryInfo } = this.props
+      const data = statistics.map((stat) => {
+        const { coursecode, name, realisations, summary } = stat
+        const { passed, failed, passrate } = summary
+        return {
+          id: coursecode,
+          category: name,
+          passed,
+          failed,
+          passrate,
+          realisations
+        }
+      })
+
       return (
         <div>
           <Segment>
@@ -37,13 +50,7 @@ class SummaryTab extends Component {
           <CumulativeTable
             categoryName="Course"
             onClickCourse={this.props.onClickCourse}
-            data={statistics.map(s => ({
-              id: s.coursecode,
-              category: s.name,
-              passed: s.summary.passed,
-              failed: s.summary.failed,
-              passrate: s.summary.passrate
-            }))}
+            data={data}
           />
         </div>
       )
