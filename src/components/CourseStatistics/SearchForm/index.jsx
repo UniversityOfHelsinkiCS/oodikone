@@ -18,8 +18,7 @@ const INITIAL = {
   toYear: undefined,
   separate: false,
   discipline: undefined,
-  type: undefined,
-  focus: false
+  type: undefined
 }
 
 class SearchForm extends Component {
@@ -30,10 +29,6 @@ class SearchForm extends Component {
   componentDidMount() {
     this.props.getSemesters()
     this.props.clearCourses()
-  }
-
-  toggleCourseView = () => {
-    this.setState({ displaycourses: !this.state.displaycourses })
   }
 
   toggleCourse = (course) => {
@@ -65,7 +60,12 @@ class SearchForm extends Component {
 
   fetchCourses = () => {
     const { coursename: name, coursecode: code } = this.state
-    if ((name && name.length >= 5) || (code && code.length >= 2)) {
+
+    const validateParam = (param, minLength) => param && param.length >= minLength
+    const isValidName = validateParam(name, 5)
+    const isValidCode = validateParam(code, 2)
+
+    if (isValidName || isValidCode) {
       return this.props.findCoursesV2({ name, code })
     }
     if (name.length === 0 && code.length === 0) {
@@ -86,14 +86,15 @@ class SearchForm extends Component {
   }
 
   render() {
-    const { years, loading } = this.props
-    const { selectedcourses, fromYear, toYear, separate, focus } = this.state
-    const courses = this.props.matchingCourses.map(course => ({
-      ...course,
-      selected: !!selectedcourses[course.code]
-    }))
+    const { years, loading, matchingCourses } = this.props
+    const { selectedcourses, fromYear, toYear, separate, coursename, coursecode } = this.state
+    const courses = matchingCourses.filter(c => !selectedcourses[c.code])
+
     const disabled = (!fromYear || Object.keys(selectedcourses).length === 0)
     const selected = Object.values(selectedcourses).map(course => ({ ...course, selected: true }))
+    const noSelectedCourses = selected.length === 0
+    const noQueryStrings = !coursename && !coursecode
+
     return (
       <Segment loading={loading}>
         <Form>
@@ -126,9 +127,10 @@ class SearchForm extends Component {
           />
           <CourseTable
             title="Selected courses"
-            hidden={selected.length === 0}
+            hidden={noSelectedCourses}
             courses={selected}
             onSelectCourse={this.toggleCourse}
+            controlIcon="remove"
           />
           <Form.Button
             type="button"
@@ -151,8 +153,8 @@ class SearchForm extends Component {
                 <AutoSubmitSearchInput
                   doSearch={this.fetchCourses}
                   placeholder="Search by entering a course code"
-                  value={this.state.coursecode}
-                  onChange={coursecode => this.setState({ coursecode })}
+                  value={coursecode}
+                  onChange={cc => this.setState({ coursecode: cc })}
                   loading={this.props.coursesLoading}
                   minSearchLength={0}
                 />
@@ -162,19 +164,19 @@ class SearchForm extends Component {
                 <AutoSubmitSearchInput
                   doSearch={this.fetchCourses}
                   placeholder="Search by entering a course name"
-                  value={this.state.coursename}
-                  onChange={coursename => this.setState({ coursename })}
+                  value={coursename}
+                  onChange={cn => this.setState({ coursename: cn })}
                   loading={this.props.coursesLoading}
                   minSearchLength={0}
                 />
               </Form.Field>
             </Form.Group>
             <CourseTable
-              onFocus={() => this.setState({ focus: true })}
-              hidden={!focus}
+              hidden={noQueryStrings}
               courses={courses}
               title="Searched courses"
               onSelectCourse={this.toggleCourse}
+              controlIcon="plus"
             />
           </div>
         </Form>
