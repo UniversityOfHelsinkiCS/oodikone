@@ -7,6 +7,9 @@ import pickle
 import numpy as np
 import tensorflow as tf
 from keras import backend
+import pandas as pd
+import json
+import networkx as nx
 
 app = Flask(__name__)
 load_dotenv()
@@ -24,6 +27,19 @@ dimensions = [
   "Align",
   "ConsFeed"
 ]
+
+def map_old_to_new(data):
+  jsonData=json.load(open('./data/oldToNew.json', 'rb'))
+  oldToNew = pd.DataFrame(jsonData, index=range(len(jsonData)), columns=["old", "new"])
+  oldToNew["old"] = jsonData.keys()
+  oldToNew["new"] = jsonData.values()
+  possible_codes = data["code"].unique()
+  for code in possible_codes:
+    if code in oldToNew["old"].values:
+      new = oldToNew[oldToNew["old"] == code]["new"].unique()[0]
+      data["code"] = data["code"].replace(code, new)
+    
+  return data
 
 @app.route('/ping')
 def ping():
@@ -129,8 +145,29 @@ def get_averages():
       'ConstFeed': cons_feed
     }
   return json_util.dumps(grade_students)
+@app.route("/suggest_new_course")
+def suggest_new_course():
+  done_courses = request.args.getlist("doneCourses[]")
+  done_courses = map_old_to_new(pd.DataFrame(done_courses, columns=["code"]))["code"].unique()
+  g = pickle.load(open('../models/graph_pruned.sav', 'rb'))
 
-@app.route('/grade_estimate', methods=["POST"])
+  now = 274 # TODO GET REALTIME
+  edges = []
+  suggested = {}
+  for course in done_courses:
+    for edge in g[course]:
+      if edge in done_courses or g[course][edge]["period"] < now - 8:
+        continue
+      weight = (g[course][edge]["weight"] + (g[course][edge]["count"] * 0.0005))
+      if edge in suggested:
+        if suggested[edge] > weight:
+          continue
+      suggested[edge] = weight
+  print(suggested)
+  top_three = sorted(suggested.items(), key=lambda kv: kv[1])[-3:]
+  return json_util.dumps([tuplez[0] for tuplez in top_three])
+
+@app.route('/grade_estimate')
 def grade_estimate():
   """
   example request body:
