@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Form, Input, Button } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
+import _ from 'lodash'
 
 import { courseParticipationNTimes } from '../../populationFilters'
 import { removePopulationFilter, alterPopulationCourseFilter, setPopulationFilter } from '../../redux/populationFilters'
@@ -15,17 +16,21 @@ class CourseParticipationNTimes extends Component {
   }
 
   state = {
-    participationAmount: 0,
-    code: '375063'
+    participationAmount: 0
   }
 
   handleChange = (e) => {
     this.setState({ participationAmount: e.target.value })
   }
 
+  studyRights = () => {
+    const { populationCourses } = this.props
+    return populationCourses[0] ? populationCourses[0].query.studyRights : []
+  }
+
   handleLimit = () => {
     this.props.setPopulationFilter(courseParticipationNTimes({
-      amount: this.state.participationAmount, course: this.state.code
+      amount: this.state.participationAmount, courses: ['375063', '339101']
     }))
   }
 
@@ -33,13 +38,8 @@ class CourseParticipationNTimes extends Component {
     this.props.removePopulationFilter(this.props.filter.id)
   }
 
-  courseInPopulation = () => {
-    const { populationCourses } = this.props
-    if (populationCourses[0]) {
-      return populationCourses[0].query.studyRights.includes('MH30_001')
-    }
-    return false
-  }
+  courseInPopulation = () =>
+    _.intersection(this.studyRights(), ['MH30_001', '320001']).length > 0
 
   render() {
     const { filter } = this.props
@@ -47,6 +47,10 @@ class CourseParticipationNTimes extends Component {
     if (!this.courseInPopulation()) {
       return null
     }
+    const courseName = this.studyRights().includes('MH30_001')
+      ? 'International progress test'
+      : 'Progress test'
+
     if (filter.notSet) {
       return (
         <Segment>
@@ -54,7 +58,7 @@ class CourseParticipationNTimes extends Component {
             <Form.Group inline>
               <Form.Field>
                 <label>
-                  Show only students that have participated in International Progress Test less than
+                  Show only students that have participated in {courseName} less than
                 </label>
               </Form.Field>
               <Form.Field>
@@ -84,7 +88,7 @@ class CourseParticipationNTimes extends Component {
     return (
       <Segment>
         Participated in
-        <i> International Progress Test </i>
+        <i> {courseName} </i>
         less than <b>{filter.params.amount}</b> times
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
