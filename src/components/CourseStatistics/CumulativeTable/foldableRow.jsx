@@ -31,12 +31,9 @@ class FoldableRow extends Component {
       return (
         <Table.Row key={rowId} className={!isMainRow ? styles.subRow : ''}>
           <Table.Cell
-            className={styles.foldControlCell}
-            onClick={() => this.setState({ isUnfolded: !isUnfolded })}
-          >
-            {showFoldIcon &&
-            <Icon name={`angle ${isUnfolded ? 'down' : 'right'}`} />
-            }
+            className={showFoldIcon ? styles.foldControlCell : ''}
+            onClick={() => isMainRow && this.setState({ isUnfolded: !isUnfolded })}
+          >{showFoldIcon ? <Icon name={`angle ${isUnfolded ? 'down' : 'right'}`} /> : null}
           </Table.Cell>
           <Table.Cell
             content={isMainRow ? category : realisation}
@@ -53,11 +50,12 @@ class FoldableRow extends Component {
     return (
       <Fragment>
         {getRow(id, courseData)}
-        {showCourseRealisations && realisations.map((r) => {
+        {showCourseRealisations ? realisations.map((r) => {
           const { realisation } = r
           const realisationId = `${id}-${realisation}`
           return getRow(realisationId, r, false)
-        })}
+        })
+        : null}
       </Fragment>
     )
   }

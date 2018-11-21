@@ -6,7 +6,7 @@ import { courseDataWithRealisationsType } from '../../../constants/types'
 import FoldableRow from './foldableRow'
 
 const getHeader = (categoryName) => {
-  const getHeaderCell = content => <Table.HeaderCell content={content} />
+  const getHeaderCell = content => <Table.HeaderCell key={content} content={content} />
   const headerLabels = [categoryName, 'Passed', 'Failed', 'Pass rate']
   return (
     <Table.Header>
@@ -22,7 +22,9 @@ const CumulativeTable = ({ categoryName, data, onClickCourse }) => (
   <Table>
     {getHeader(categoryName)}
     <Table.Body>
-      { data.map(course => <FoldableRow courseData={course} onClickFn={onClickCourse} />)}
+      { data.map(course =>
+        <FoldableRow key={course.id} courseData={course} onClickFn={onClickCourse} />)
+      }
     </Table.Body>
   </Table>
 )
