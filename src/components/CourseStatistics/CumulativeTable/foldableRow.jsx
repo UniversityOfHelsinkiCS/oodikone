@@ -50,12 +50,13 @@ class FoldableRow extends Component {
     return (
       <Fragment>
         {getRow(id, courseData)}
-        {showCourseRealisations ? realisations.map((r) => {
-          const { realisation } = r
-          const realisationId = `${id}-${realisation}`
-          return getRow(realisationId, r, false)
+        {showCourseRealisations
+          ? realisations.map((r) => {
+            const { realisation } = r
+            const realisationId = `${id}-${realisation}`
+            return getRow(realisationId, r, false)
         })
-        : null}
+          : null}
       </Fragment>
     )
   }
