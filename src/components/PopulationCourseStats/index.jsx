@@ -13,6 +13,25 @@ import { courseParticipation } from '../../populationFilters'
 
 const formatGradeDistribution = grades => _.replace(JSON.stringify(_.sortBy(Object.entries(grades).map(([key, value]) => ({ [key]: value.count })), o => -Object.keys(o)), null, 1), /\[\n|{\n*|{\s|}|\s*}|]|"|,/g, '')
 
+const tableColumnNames = {
+  STUDENTS: 'students',
+  PASSED: 'passed',
+  RETRY_PASSED: 'retryPassed',
+  PERCENTAGE: 'percentage',
+  FAILED: 'failed',
+  FAILED_MANY: 'failedMany',
+  ATTEMPTS: 'attempts',
+  PER_STUDENT: 'perStudent',
+  PASSED_OF_POPULATION: 'passedOfPopulation',
+  TRIED_OF_POPULATION: 'triedOfPopulation'
+
+}
+
+const sortOrderTypes = {
+  ASC: 'ascending',
+  DESC: 'descending'
+}
+
 class PopulationCourseStats extends Component {
   static propTypes = {
     courses: shape({
@@ -35,7 +54,7 @@ class PopulationCourseStats extends Component {
     super(props)
 
     this.state = {
-      sortBy: 'students',
+      sortBy: tableColumnNames.STUDENTS,
       reversed: false,
       limit: parseInt(this.props.populationSize * 0.15, 10),
       codeFilter: '',
@@ -45,7 +64,7 @@ class PopulationCourseStats extends Component {
 
   getSelectionStyle = criteria => (this.state.sortBy === criteria ? ({ background: 'darkgray' }) : ({ background: '#f9fafb' }))
 
-  criteria = () => (c1, c2) => {
+  criteria = (c1, c2) => {
     const orderByCode = (code1, code2) =>
       (code1.course.code < code2.course.code ? -1 : 1)
 
@@ -64,18 +83,19 @@ class PopulationCourseStats extends Component {
     return course.stats.students >= this.state.limit
   }
 
-  codeFilter = () => ({ course }) =>
+  codeFilter = ({ course }) =>
     course.code.toLowerCase().includes(this.state.codeFilter.toLowerCase())
 
-  sortBy(criteria) {
-    return () => {
-      let { reversed } = this.state
-      if (this.state.sortBy === criteria) {
-        reversed = !reversed
-      }
-      this.setState({ sortBy: criteria, reversed })
-    }
+  sortBy = (criteria) => {
+    const { reversed, sortBy } = this.state
+    const isAlreadySelected = sortBy === criteria
+
+    this.setState({
+      sortBy: criteria,
+      reversed: isAlreadySelected ? !reversed : reversed
+    })
   }
+
 
   limitPopulationToCourse = course => () => {
     if (!this.active(course.course)) {
@@ -91,13 +111,12 @@ class PopulationCourseStats extends Component {
       .find(c => course.name === c.name && course.code === c.code) !== undefined
 
   renderSortArrow = (criteria) => {
-    if (this.state.sortBy === criteria) {
-      if (this.state.reversed) {
-        return (<Icon name="angle up" />)
-      }
-      return (<Icon name="angle down" />)
-    }
-    return null
+    const { sortBy, reversed } = this.state
+    const isSortByCriteria = sortBy === criteria
+
+    return isSortByCriteria
+      ? <Icon name={`angle ${reversed ? 'up' : 'down'}`} />
+      : null
   }
 
 
@@ -113,9 +132,9 @@ class PopulationCourseStats extends Component {
             <Input style={{ marginLeft: 10, width: '6em', textDecoration: 'underline' }} transparent placeholder="(filter here)" onKeyPress={e => e.key === 'Enter' && this.setState({ codeFilter: e.target.value })} />
           </Table.HeaderCell>
           <Table.HeaderCell
-            sorted={sortBy === 'students' ? 'descending' : null}
-            onClick={this.sortBy('students')}
-            style={this.getSelectionStyle('students')}
+            sorted={sortBy === tableColumnNames.STUDENTS ? sortOrderTypes.DESC : null}
+            onClick={this.sortBy(tableColumnNames.STUDENTS)}
+            style={this.getSelectionStyle(tableColumnNames.STUDENTS)}
           >
             Attempts
           </Table.HeaderCell>
@@ -217,12 +236,12 @@ class PopulationCourseStats extends Component {
           </Table.HeaderCell>
           <Table.HeaderCell
             rowSpan="2"
-            sorted={sortBy === 'students' ? 'descending' : null}
-            onClick={this.sortBy('students')}
-            style={this.getSelectionStyle('students')}
+            sorted={sortBy === tableColumnNames.STUDENTS ? sortOrderTypes.DESC : null}
+            onClick={this.sortBy(tableColumnNames.STUDENTS)}
+            style={this.getSelectionStyle(tableColumnNames.STUDENTS)}
           >
             {translate('populationCourses.students')}
-            {this.renderSortArrow('students')}
+            {this.renderSortArrow(tableColumnNames.STUDENTS)}
           </Table.HeaderCell>
           <Table.HeaderCell
             colSpan="3"
@@ -244,87 +263,87 @@ class PopulationCourseStats extends Component {
             <Input style={{ marginLeft: 10, width: '6em' }} transparent placeholder="(filter here)" onKeyPress={e => e.key === 'Enter' && this.setState({ codeFilter: e.target.value })} />
           </Table.HeaderCell>
           <Table.HeaderCell
-            sorted={sortBy === 'passed' ? 'descending' : null}
-            onClick={this.sortBy('passed')}
-            style={this.getSelectionStyle('passed')}
+            sorted={sortBy === tableColumnNames.PASSED ? sortOrderTypes.DESC : null}
+            onClick={this.sortBy(tableColumnNames.PASSED)}
+            style={this.getSelectionStyle(tableColumnNames.PASSED)}
 
           >
             {translate('populationCourses.number')}
-            {this.renderSortArrow('passed')}
+            {this.renderSortArrow(tableColumnNames.PASSED)}
           </Table.HeaderCell>
           <Table.HeaderCell
-            sorted={sortBy === 'retryPassed' ? 'descending' : null}
-            onClick={this.sortBy('retryPassed')}
-            style={this.getSelectionStyle('retryPassed')}
+            sorted={sortBy === tableColumnNames.RETRY_PASSED ? sortOrderTypes.DESC : null}
+            onClick={this.sortBy(tableColumnNames.RETRY_PASSED)}
+            style={this.getSelectionStyle(tableColumnNames.RETRY_PASSED)}
 
           >
             {translate('populationCourses.passedAfterRetry')}
-            {this.renderSortArrow('retryPassed')}
+            {this.renderSortArrow(tableColumnNames.RETRY_PASSED)}
           </Table.HeaderCell>
           <Table.HeaderCell
-            sorted={sortBy === 'percentage' ? direction : null}
-            onClick={this.sortBy('percentage')}
-            style={this.getSelectionStyle('percentage')}
+            sorted={sortBy === tableColumnNames.PERCENTAGE ? direction : null}
+            onClick={this.sortBy(tableColumnNames.PERCENTAGE)}
+            style={this.getSelectionStyle(tableColumnNames.PERCENTAGE)}
 
           >
             {translate('populationCourses.percentage')}
-            {this.renderSortArrow('percentage')}
+            {this.renderSortArrow(tableColumnNames.PERCENTAGE)}
           </Table.HeaderCell>
 
           <Table.HeaderCell
-            sorted={sortBy === 'failed' ? 'descending' : null}
-            onClick={this.sortBy('failed')}
-            style={this.getSelectionStyle('failed')}
+            sorted={sortBy === tableColumnNames.FAILED ? sortOrderTypes.DESC : null}
+            onClick={this.sortBy(tableColumnNames.FAILED)}
+            style={this.getSelectionStyle(tableColumnNames.FAILED)}
 
           >
             {translate('populationCourses.number')}
-            {this.renderSortArrow('failed')}
+            {this.renderSortArrow(tableColumnNames.FAILED)}
           </Table.HeaderCell>
           <Table.HeaderCell
             rowSpan="2"
-            sorted={sortBy === 'failedMany' ? 'descending' : null}
-            onClick={this.sortBy('failedMany')}
-            style={this.getSelectionStyle('failedMany')}
+            sorted={sortBy === tableColumnNames.FAILED_MANY ? sortOrderTypes.DESC : null}
+            onClick={this.sortBy(tableColumnNames.FAILED_MANY)}
+            style={this.getSelectionStyle(tableColumnNames.FAILED_MANY)}
 
           >
             {translate('populationCourses.failedManyTimes')}
-            {this.renderSortArrow('failedMany')}
+            {this.renderSortArrow(tableColumnNames.FAILED_MANY)}
           </Table.HeaderCell>
           <Table.HeaderCell
-            sorted={sortBy === 'attempts' ? 'descending' : null}
-            onClick={this.sortBy('attempts')}
-            style={this.getSelectionStyle('attempts')}
+            sorted={sortBy === tableColumnNames.ATTEMPTS ? sortOrderTypes.DESC : null}
+            onClick={this.sortBy(tableColumnNames.ATTEMPTS)}
+            style={this.getSelectionStyle(tableColumnNames.ATTEMPTS)}
           >
             {translate('populationCourses.number')}
-            {this.renderSortArrow('attempts')}
+            {this.renderSortArrow(tableColumnNames.ATTEMPTS)}
 
           </Table.HeaderCell>
           <Table.HeaderCell
-            sorted={sortBy === 'perStudent' ? 'descending' : null}
-            onClick={this.sortBy('perStudent')}
-            style={this.getSelectionStyle('perStudent')}
+            sorted={sortBy === tableColumnNames.PER_STUDENT ? sortOrderTypes.DESC : null}
+            onClick={this.sortBy(tableColumnNames.PER_STUDENT)}
+            style={this.getSelectionStyle(tableColumnNames.PER_STUDENT)}
           >
             {translate('populationCourses.perStudent')}
-            {this.renderSortArrow('perStudent')}
+            {this.renderSortArrow(tableColumnNames.PER_STUDENT)}
 
           </Table.HeaderCell>
           <Table.HeaderCell
-            sorted={sortBy === 'passedOfPopulation' ? direction : null}
-            onClick={this.sortBy('passedOfPopulation')}
-            style={this.getSelectionStyle('passedOfPopulation')}
+            sorted={sortBy === tableColumnNames.PASSED_OF_POPULATION ? direction : null}
+            onClick={this.sortBy(tableColumnNames.PASSED_OF_POPULATION)}
+            style={this.getSelectionStyle(tableColumnNames.PASSED_OF_POPULATION)}
 
           >
             {translate('populationCourses.passed')}
-            {this.renderSortArrow('passedOfPopulation')}
+            {this.renderSortArrow(tableColumnNames.PASSED_OF_POPULATION)}
           </Table.HeaderCell>
           <Table.HeaderCell
-            sorted={sortBy === 'triedOfPopulation' ? direction : null}
-            onClick={this.sortBy('triedOfPopulation')}
-            style={this.getSelectionStyle('triedOfPopulation')}
+            sorted={sortBy === tableColumnNames.TRIED_OF_POPULATION ? direction : null}
+            onClick={this.sortBy(tableColumnNames.TRIED_OF_POPULATION)}
+            style={this.getSelectionStyle(tableColumnNames.TRIED_OF_POPULATION)}
 
           >
             {translate('populationCourses.attempted')}
-            {this.renderSortArrow('triedOfPopulation')}
+            {this.renderSortArrow(tableColumnNames.TRIED_OF_POPULATION)}
           </Table.HeaderCell>
         </Table.Row>
       </Table.Header>
@@ -383,7 +402,7 @@ class PopulationCourseStats extends Component {
   render() {
     const { courses, translate } = this.props
     const { reversed } = this.state
-    const direction = reversed ? 'descending' : 'ascending'
+    const direction = reversed ? sortOrderTypes.DESC : sortOrderTypes.ASC
     if (courses.length === 0) return null
     return (
       <div>
