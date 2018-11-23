@@ -228,6 +228,20 @@ class PopulationCourseStats extends Component {
       const { course, grades } = courseStats
       const { name, code } = course
 
+      let attempts = 0
+      let failedGrades = 0
+      let otherPassed = 0
+
+      if (grades) {
+        const countSumReducer = (acc, cur) => acc + cur.count
+        const gradeValues = grades ? Object.values(grades) : null
+        attempts = gradeValues.reduce(countSumReducer, 0)
+        failedGrades = gradeValues.filter(g => g.status.failed).reduce(countSumReducer, 0)
+        otherPassed = Object.values(_.omit(grades, courseGradesTypes))
+          .filter(g => g.status.passingGrade || g.status.improvedGrade)
+          .reduce(countSumReducer, 0)
+      }
+
       return (
         <Table.Row active={this.isActiveCourse(course)}>
           <Table.Cell
@@ -240,20 +254,12 @@ class PopulationCourseStats extends Component {
             className={styles.iconCell}
           />
           <Table.Cell content={code} />
-          <Table.Cell content={grades ? _.sum(Object.values(grades).map(g => g.count)) || 0 : 0} />
-          <Table.Cell content={grades
-            ? _.sum(Object.values(grades).filter(g => g.status.failingGrade).map(g => g.count)) || 0
-            : 0}
-          />
+          <Table.Cell content={attempts} />
+          <Table.Cell content={failedGrades} />
           {courseGradesTypes.map(g =>
             <Table.Cell content={grades[g] ? grades[g].count || 0 : 0} />)
           }
-          <Table.Cell>
-            {courseStats.grades
-              ? _.sum(Object.values(_.omit(grades, courseGradesTypes))
-                .filter(g => g.status.passingGrade || g.status.improvedGrade).map(g => g.count))
-              : 0}
-          </Table.Cell>
+          <Table.Cell content={otherPassed} />
         </Table.Row>
       )
     }
