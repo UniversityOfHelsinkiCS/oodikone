@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Table } from 'semantic-ui-react'
-import { shape, arrayOf, string, func } from 'prop-types'
+import { shape, arrayOf, string, func, bool } from 'prop-types'
 import _ from 'lodash'
 
 const DIRECTIONS = {
@@ -44,7 +44,19 @@ class SortableTable extends Component {
         <Table sortable {...tableProps}>
           <Table.Header>
             <Table.Row>
-              {columns.map(c => (
+              {columns.filter(c => !c.child).map(c => (
+                <Table.HeaderCell
+                  key={c.key}
+                  content={c.title}
+                  onClick={c.parent ? undefined : this.handleSort(c.key)}
+                  sorted={c.parent ? undefined : sortDirection(c.key)}
+                  {...c.headerProps}
+                />
+                ))
+              }
+            </Table.Row>
+            <Table.Row>
+              {columns.filter(c => c.child).map(c => (
                 <Table.HeaderCell
                   key={c.key}
                   content={c.title}
@@ -52,21 +64,21 @@ class SortableTable extends Component {
                   sorted={sortDirection(c.key)}
                   {...c.headerProps}
                 />
-                    ))}
+                ))}
             </Table.Row>
           </Table.Header>
           <Table.Body>
             { this.sortedRows().map(row => (
               <Table.Row key={getRowKey(row)}>
-                {columns.map(c => (
+                {columns.filter(c => !c.parent).map(c => (
                   <Table.Cell
                     key={c.key}
                     content={c.getRowContent ? c.getRowContent(row) : c.getRowVal(row)}
                     {...c.cellProps}
                   />
-                        ))}
-              </Table.Row>
                 ))}
+              </Table.Row>
+            ))}
           </Table.Body>
         </Table>
       )
@@ -82,7 +94,9 @@ SortableTable.propTypes = {
     headerProps: shape({}),
     getRowVal: func,
     getRowContent: func,
-    cellProps: shape({})
+    cellProps: shape({}),
+    group: bool,
+    children: arrayOf()
   })).isRequired,
   data: arrayOf(shape({})).isRequired
 }
