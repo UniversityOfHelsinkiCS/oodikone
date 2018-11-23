@@ -31,50 +31,60 @@ class CourseStatsCounter {
       improvedPassedGrade: 0,
       percentage: undefined,
       passedOfPopulation: undefined,
-      triedOfPopulation: undefined
+      triedOfPopulation: undefined,
+      dates: {}
     }
     this.grades = {}
   }
-  
+
   markAttempt() {
     this.stats.attempts = this.stats.attempts + 1
   }
-  
+
   markParticipation(studentnumber) {
     delete this.students.notParticipated[studentnumber]
   }
-  
+
   markToAll(studentnumber) {
     this.students.all[studentnumber] = true
   }
-  
-  markCredit(studentnumber, grade, passed, failed, improved) {
+
+  markPassedDate(date) {
+    if (this.stats.dates[date]) {
+      this.stats.dates[date] = this.stats.dates[date] + 1
+    } else {
+      this.stats.dates[date] = 1
+    }
+  }
+
+  markCredit(studentnumber, grade, passed, failed, improved, date) {
     this.markAttempt()
     this.markParticipation(studentnumber)
     this.markGrade(grade, passed, failed, improved)
     this.markToAll(studentnumber)
     if (passed) {
       this.markPassingGrade(studentnumber)
+      this.markPassedDate(date)
     } else if (improved) {
       this.markImprovedGrade(studentnumber)
     } else if (failed) {
       this.markFailedGrade(studentnumber)
     }
   }
-  
+
   failedBefore(studentnumber) {
     return (this.students.failed[studentnumber] !== undefined)
   }
-  
+
   passedBefore(studentnumber) {
     return (this.students.passed[studentnumber] !== undefined)
   }
-  
+
   removeFromFailed (studentnumber) {
     delete this.students.failed[studentnumber]
     delete this.students.failedMany[studentnumber]
   }
-  
+
   markPassingGrade(studentnumber) {
     delete this.students.notParticipatedOrFailed[studentnumber]
     this.students.passed[studentnumber] = true
@@ -83,13 +93,13 @@ class CourseStatsCounter {
       this.removeFromFailed(studentnumber)
     }
   }
-  
+
   markImprovedGrade(studentnumber) {
     this.removeFromFailed(studentnumber)
     this.students.improvedPassedGrade[studentnumber] = true
     this.students.passed[studentnumber] = true
   }
-  
+
   markFailedGrade(studentnumber) {
     if (this.passedBefore(studentnumber)) {
       this.students.retryPassed[studentnumber] = true
@@ -98,23 +108,23 @@ class CourseStatsCounter {
       if (this.failedBefore(studentnumber)) {
         this.students.failedMany[studentnumber] = true
       }
-      this.students.failed[studentnumber] = true      
+      this.students.failed[studentnumber] = true
     }
   }
-  
+
   markGrade(grade, passingGrade, failingGrade, improvedGrade) {
     const gradecount = this.grades[grade] ? this.grades[grade].count || 0 : 0
     this.grades[grade] = { count: gradecount + 1, status: { passingGrade, improvedGrade, failingGrade } }
   }
-  
+
   addCourseType(typecode, name) {
     this.course.coursetypes[typecode] = name
   }
-  
+
   addCourseDiscipline(id, name) {
     this.course.disciplines[id] = name
   }
-  
+
   getFinalStats() {
     const stats = this.stats
     const students = this.students
@@ -132,7 +142,8 @@ class CourseStatsCounter {
       stats,
       students,
       course: this.course,
-      grades: this.grades
+      grades: this.grades,
+      dates: this.dates
     }
   }
 
