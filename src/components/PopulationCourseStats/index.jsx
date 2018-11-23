@@ -10,6 +10,7 @@ import moment from 'moment'
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
 import { getMultipleCourseStatistics } from '../../redux/courseStatistics'
 import { courseParticipation } from '../../populationFilters'
+import GradeStatistics from './GradeStatistics'
 
 const formatGradeDistribution = grades => _.replace(JSON.stringify(_.sortBy(Object.entries(grades).map(([key, value]) => ({ [key]: value.count })), o => -Object.keys(o)), null, 1), /\[\n|{\n*|{\s|}|\s*}|]|"|,/g, '')
 
@@ -39,7 +40,7 @@ class PopulationCourseStats extends Component {
       reversed: false,
       limit: parseInt(this.props.populationSize * 0.15, 10),
       codeFilter: '',
-      showGradeDistribution: false
+      activeView: null
     }
   }
 
@@ -100,6 +101,16 @@ class PopulationCourseStats extends Component {
     return null
   }
 
+  renderActiveView(direction) {
+    switch (this.state.activeView) {
+      case 'showGradeDistribution':
+        return this.renderGradeDistributionTable(this.props, this.state)
+      case 'passingSemester':
+        return <GradeStatistics courses={this.props.courses} />
+      default:
+        return this.renderBasicTable(this.props, this.state, direction)
+    }
+  }
 
   renderGradeDistributionTable = ({ translate, sortBy, courses, language }) => (
     <Table celled sortable>
@@ -394,16 +405,22 @@ class PopulationCourseStats extends Component {
               value={this.state.limit}
               onChange={e => this.setState({ limit: e.target.value })}
             />
-            <Button icon floated="right" onClick={() => this.setState({ showGradeDistribution: !this.state.showGradeDistribution })}>
+            <Button icon floated="right" onClick={() => this.setState({ activeView: 'showGradeDistribution' })}>
               <Icon color="black" size="big" name="chart bar" />
+            </Button>
+            <Button
+              floated="right"
+              onClick={() => this.setState({ activeView: 'passingSemester' })}
+            >
+              When course is passed
+            </Button>
+            <Button floated="right" onClick={() => this.setState({ activeView: null })}>
+              Basic table
             </Button>
           </Form.Field>
         </Form>
-        {this.state.showGradeDistribution ?
-          this.renderGradeDistributionTable(this.props, this.state)
-          :
-          this.renderBasicTable(this.props, this.state, direction)
-        }
+
+        {this.renderActiveView(direction)}
       </div>
     )
   }
