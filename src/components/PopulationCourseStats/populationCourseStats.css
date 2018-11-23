@@ -1,0 +1,9 @@
+.courseCodeInput {
+  margin-left: 0.25em !important;
+  width: 6em;
+  text-decoration: underline;
+}
+
+.activeSortHeader {
+  background-color: darkgray;
+}

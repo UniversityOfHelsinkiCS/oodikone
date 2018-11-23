@@ -14,6 +14,7 @@ const PopulationCourses = ({ samples, translate }) => {
   }
 
   const { pending } = samples[0]
+
   return (
     <Segment>
       <Popup
