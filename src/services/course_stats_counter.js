@@ -32,7 +32,7 @@ class CourseStatsCounter {
       percentage: undefined,
       passedOfPopulation: undefined,
       triedOfPopulation: undefined,
-      dates: {}
+      passingSemesters: {}
     }
     this.grades = {}
   }
@@ -49,22 +49,24 @@ class CourseStatsCounter {
     this.students.all[studentnumber] = true
   }
 
-  markPassedDate(date) {
-    if (this.stats.dates[date]) {
-      this.stats.dates[date] = this.stats.dates[date] + 1
+  markPassedSemester(semester) {
+    const passingSemesters = this.stats.passingSemesters
+
+    if (passingSemesters[semester]) {
+      passingSemesters[semester] = passingSemesters[semester] + 1
     } else {
-      this.stats.dates[date] = 1
+      passingSemesters[semester] = 1
     }
   }
 
-  markCredit(studentnumber, grade, passed, failed, improved, date) {
+  markCredit(studentnumber, grade, passed, failed, improved, semester) {
     this.markAttempt()
     this.markParticipation(studentnumber)
     this.markGrade(grade, passed, failed, improved)
     this.markToAll(studentnumber)
     if (passed) {
       this.markPassingGrade(studentnumber)
-      this.markPassedDate(date)
+      this.markPassedSemester(semester)
     } else if (improved) {
       this.markImprovedGrade(studentnumber)
     } else if (failed) {
@@ -143,7 +145,7 @@ class CourseStatsCounter {
       students,
       course: this.course,
       grades: this.grades,
-      dates: this.dates
+      passingSemesters: this.passingSemesters
     }
   }
 

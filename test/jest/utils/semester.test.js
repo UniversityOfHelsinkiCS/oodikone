@@ -3,14 +3,13 @@ const semesterUtils = require('../../../src/util/semester')
 
 describe('Semester utils tests', () => {
 
-  test('Get correct semester for date', () => {
-    expect(semesterUtils.getSemester(moment('2018-03-03'))).toBe('SPRING')
-    expect(semesterUtils.getSemester(moment('2018-09-03'))).toBe('FALL')
-  })
-
-  test('Get corret semester and year string for date', () => {
-    expect(semesterUtils.getSemesterAndYear(moment('2018-03-03'))).toBe('2018-SPRING')
-    expect(semesterUtils.getSemesterAndYear(moment('2018-09-03'))).toBe('2018-FALL')
+  test('Get passing semester', () => {
+    expect(semesterUtils.getPassingSemester(2018, moment('2017-09-09'))).toBe('BEFORE')
+    expect(semesterUtils.getPassingSemester(2018, moment('2018-09-09'))).toBe('0-FALL')
+    expect(semesterUtils.getPassingSemester(2018, moment('2019-05-01'))).toBe('0-SPRING')
+    expect(semesterUtils.getPassingSemester(2018, moment('2019-09-01'))).toBe('1-FALL')
+    expect(semesterUtils.getPassingSemester(2018, moment('2020-05-01'))).toBe('1-SPRING')
+    expect(semesterUtils.getPassingSemester(2018, moment('2026-05-01'))).toBe('LATER')
   })
 
 })
