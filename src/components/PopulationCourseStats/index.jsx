@@ -155,12 +155,12 @@ class PopulationCourseStats extends Component {
     this.setState({ courseStatistics })
   }
 
-  limitPopulationToCourse = course => () => {
-    if (!this.active(course.course)) {
-      const params = { course, field: 'all' }
+  limitPopulationToCourse = courseStats => () => {
+    if (!this.active(courseStats.course)) {
+      const params = { courseStats, field: 'all' }
       this.props.setPopulationFilter(courseParticipation(params))
     } else {
-      this.props.removePopulationFilterOfCourse(course.course)
+      this.props.removePopulationFilterOfCourse(courseStats.course)
     }
   }
 
@@ -188,89 +188,97 @@ class PopulationCourseStats extends Component {
   renderGradeDistributionTable = (courseStatistics) => {
     const { translate, language } = this.props
     const { sortCriteria, reversed } = this.state
+
+    const courseGradesTypes = [1, 2, 3, 4, 5]
+
+    const getTableHeader = () => (
+      <Table.Header>
+        <Table.Row>
+          <Table.HeaderCell colSpan="2" content={translate('populationCourses.course')} />
+          {this.renderCodeFilterInputHeaderCell()}
+          <SortableHeaderCell
+            content="Attempts"
+            columnName={tableColumnNames.STUDENTS}
+            onClickFn={this.onSortableColumnHeaderClick}
+            activeSortColumn={sortCriteria}
+            reversed={reversed}
+          />
+          <Table.HeaderCell content={0} />
+          {courseGradesTypes.map(g =>  <Table.HeaderCell content={g} />)}
+          <Table.HeaderCell content="Other passed" />
+        </Table.Row>
+      </Table.Header>
+    )
+
+    const getCourseRow = (courseStats) => {
+      const { course, grades } = courseStats
+      const { name, code } = course
+
+      const onIconClick = () => {
+        const { history, query, getMultipleCourseStatistics } = this.props
+        const { year, months } = query
+        history.push('/coursestatistics/')
+        getMultipleCourseStatistics({
+          codes: [code],
+          start: Number(year),
+          end: Number(moment(moment(year, 'YYYY').add(months, 'months')).format('YYYY')),
+          separate: false,
+          language
+        })
+      }
+
+      return (
+        <Table.Row active={this.active(course)}>
+          <Table.Cell
+            onClick={() => this.limitPopulationToCourse(courseStats)}
+            content={name[language]}
+          />
+          <Table.Cell
+            icon="level up alternate"
+            onClick={() => onIconClick()}
+            style={{ borderLeft: '0px !important' }}
+          />
+          <Table.Cell content={code} />
+          <Table.Cell content={grades ? _.sum(Object.values(grades).map(g => g.count)) || 0 : 0} />
+          <Table.Cell content={course.grades
+            ? _.sum(Object.values(grades).filter(g => g.status.failingGrade).map(g => g.count)) || 0
+            : 0}
+          />
+          {courseGradesTypes.map(g =>
+            <Table.Cell content={grades[g] ? grades[g].count || 0 : 0} />)
+          }
+          <Table.Cell>
+            {courseStats.grades
+              ? _.sum(Object.values(_.omit(grades, courseGradesTypes))
+                .filter(g => g.status.passingGrade || g.status.improvedGrade).map(g => g.count))
+              : 0}
+          </Table.Cell>
+        </Table.Row>
+      )
+    }
+
+    const getCoursePopUpRow = (courseStats) => {
+      const { course } = courseStats
+      const { code, grades } = course
+      return (
+        <Popup
+          key={code}
+          flowing
+          hoverable
+          inverted
+          position="top right"
+          hideOnScroll
+          content={grades ? <pre>{formatGradeDistribution(grades)}</pre> : 'Nothing to see here'}
+          trigger={getCourseRow(courseStats)}
+        />
+      )
+    }
+
     return (
       <Table celled sortable>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell colSpan="2" content={translate('populationCourses.course')} />
-            {this.renderCodeFilterInputHeaderCell()}
-            <SortableHeaderCell
-              content="Attempts"
-              columnName={tableColumnNames.STUDENTS}
-              onClickFn={this.onSortableColumnHeaderClick}
-              activeSortColumn={sortCriteria}
-              reversed={reversed}
-            />
-            <Table.HeaderCell content={0} />
-            <Table.HeaderCell content={1} />
-            <Table.HeaderCell content={2} />
-            <Table.HeaderCell content={3} />
-            <Table.HeaderCell content={5} />
-            <Table.HeaderCell content="Other passed" />
-          </Table.Row>
-        </Table.Header>
+        {getTableHeader()}
         <Table.Body>
-          {courseStatistics.map(course => (
-            <Popup
-              key={course.course.code}
-              trigger={
-                <Table.Row active={false}>
-                  <Table.Cell onClick={() => this.limitPopulationToCourse(course)}>
-                    {course.course.name[language]}
-                  </Table.Cell>
-                  <Table.Cell
-                    icon="level up alternate"
-                    onClick={() => {
-                      this.props.history.push('/coursestatistics/')
-                      this.props.getMultipleCourseStatistics({
-                        codes: [course.course.code],
-                        start: Number(this.props.query.year),
-                        end: Number(moment(moment(this.props.query.year, 'YYYY').add(this.props.query.months, 'months')).format('YYYY')),
-                        separate: false,
-                        language: this.props.language
-                      })
-                    }}
-                    style={{ borderLeft: '0px !important' }}
-                  />
-                  <Table.Cell>{course.course.code}</Table.Cell>
-                  <Table.Cell>
-                    {course.grades ? _.sum(Object.values(course.grades).map(g => g.count)) || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades ?
-                      _.sum(Object.values(course.grades).filter(g =>
-                        g.status.failingGrade).map(g => g.count))
-                      || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades[1] ? course.grades[1].count || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades[2] ? course.grades[2].count || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades[3] ? course.grades[3].count || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades[4] ? course.grades[4].count || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades[5] ? course.grades[5].count || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades ?
-                      _.sum(Object.values(_.omit(course.grades, [1, 2, 3, 4, 5])).filter(g =>
-                        g.status.passingGrade || g.status.improvedGrade).map(g => g.count)) : 0}
-                  </Table.Cell>
-                </Table.Row>}
-              flowing
-              hoverable
-              inverted
-              position="top right"
-              hideOnScroll
-              content={course.grades ? <pre>{formatGradeDistribution(course.grades)}</pre> : 'Nothing to see here'}
-            />
-          ))}
+          {courseStatistics.map(getCoursePopUpRow)}
         </Table.Body>
       </Table>
     )
@@ -315,13 +323,13 @@ class PopulationCourseStats extends Component {
         </Table.Row>
       </Table.Header>
     )
-    // this.active(course.course)
+
     return (
       <Table celled sortable>
         {getTableHeader()}
         <Table.Body>
           {courseStatistics.map(course => (
-            <Table.Row key={course.course.code} active={false}>
+            <Table.Row key={course.course.code} active={this.active(course.course)}>
               <Table.Cell onClick={() => this.limitPopulationToCourse(course)}>
                 {course.course.name[language]}
               </Table.Cell>
