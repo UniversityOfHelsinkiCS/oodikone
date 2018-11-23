@@ -7,7 +7,7 @@ const {
 } = require('../models')
 const { getAllDuplicates, byName } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
-const { getSemester } = require('../util/semester')
+const { getPassingSemester } = require('../util/semester')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -369,25 +369,11 @@ const parseCreditInfo = credit => ({
   date: credit.attainment_date
 })
 
-const getPassingSemester = (startYear, date) => {
-  const mDate = moment(date)
-  const year = mDate.year()
-  const yearCount = year - parseInt(startYear, 10)
-
-  if (year < parseInt(startYear, 10)) {
-    return 'BEFORE'
-  } else if (yearCount < 6) {
-    return `${yearCount}-${getSemester(mDate)}`
-  }
-
-  return 'LATER'
-}
-
 const bottlenecksOf = async (query) => {
   if (!query.semesters.map(semester => semester === 'FALL' || semester === 'SPRING').every(e => e === true)) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
-  console.log(query)
+
   const { studyRights, startDate, endDate, months } = parseQueryParams(query)
   const bottlenecks = {
     disciplines: {},
@@ -419,7 +405,7 @@ const bottlenecksOf = async (query) => {
     })
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
-      const semester = getPassingSemester(query.year, date)
+      const semester = getPassingSemester(parseInt(query.year, 10), date)
 
       coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
     })
