@@ -10,7 +10,7 @@ import moment from 'moment'
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
 import { getMultipleCourseStatistics } from '../../redux/courseStatistics'
 import { courseParticipation } from '../../populationFilters'
-import GradeStatistics from './GradeStatistics'
+import PassingSemesters from './PassingSemesters'
 
 const formatGradeDistribution = grades => _.replace(JSON.stringify(_.sortBy(Object.entries(grades).map(([key, value]) => ({ [key]: value.count })), o => -Object.keys(o)), null, 1), /\[\n|{\n*|{\s|}|\s*}|]|"|,/g, '')
 
@@ -106,7 +106,7 @@ class PopulationCourseStats extends Component {
       case 'showGradeDistribution':
         return this.renderGradeDistributionTable(this.props, this.state)
       case 'passingSemester':
-        return <GradeStatistics courses={this.props.courses} />
+        return <PassingSemesters courses={this.props.courses} />
       default:
         return this.renderBasicTable(this.props, this.state, direction)
     }
