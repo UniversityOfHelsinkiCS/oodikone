@@ -46,6 +46,8 @@ class PopulationCourseStats extends Component {
 
   getSelectionStyle = criteria => (this.state.sortBy === criteria ? ({ background: 'darkgray' }) : ({ background: '#f9fafb' }))
 
+  setActiveView = activeView => this.setState({ activeView })
+
   criteria = () => (c1, c2) => {
     const orderByCode = (code1, code2) =>
       (code1.course.code < code2.course.code ? -1 : 1)
@@ -405,16 +407,13 @@ class PopulationCourseStats extends Component {
               value={this.state.limit}
               onChange={e => this.setState({ limit: e.target.value })}
             />
-            <Button icon floated="right" onClick={() => this.setState({ activeView: 'showGradeDistribution' })}>
-              <Icon color="black" size="big" name="chart bar" />
-            </Button>
-            <Button
-              floated="right"
-              onClick={() => this.setState({ activeView: 'passingSemester' })}
-            >
+            <Button floated="right" onClick={() => this.setActiveView('passingSemester')}>
               When course is passed
             </Button>
-            <Button floated="right" onClick={() => this.setState({ activeView: null })}>
+            <Button floated="right" onClick={() => this.setActiveView('showGradeDistribution')}>
+              Grades table
+            </Button>
+            <Button floated="right" onClick={() => this.setActiveView(null)}>
               Basic table
             </Button>
           </Form.Field>
