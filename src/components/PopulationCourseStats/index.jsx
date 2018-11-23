@@ -127,6 +127,18 @@ class PopulationCourseStats extends Component {
       reversed: isReversed
     }, () => this.handleCourseStatisticsCriteriaChange())
   }
+    onGoToCourseStatisticsClick = (code) => {
+      const { history, query, getMultipleCourseStatistics: getStatsFn, language } = this.props
+      const { year, months } = query
+      history.push('/coursestatistics/')
+      getStatsFn({
+        codes: [code],
+        start: Number(year),
+        end: Number(moment(moment(year, 'YYYY').add(months, 'months')).format('YYYY')),
+        separate: false,
+        language
+      })
+    }
 
   handleCourseStatisticsCriteriaChange = () => {
     const { studentAmountLimit, sortCriteria, codeFilter, reversed } = this.state
@@ -164,9 +176,11 @@ class PopulationCourseStats extends Component {
     }
   }
 
-  active = course =>
-    this.props.selectedCourses
+  isActiveCourse = (course) => {
+    const { selectedCourses } = this.props
+    return selectedCourses.length > 0 && selectedCourses
       .find(c => course.name === c.name && course.code === c.code) !== undefined
+  }
 
   renderCodeFilterInputHeaderCell = () => {
     const { translate } = this.props
@@ -204,7 +218,7 @@ class PopulationCourseStats extends Component {
             reversed={reversed}
           />
           <Table.HeaderCell content={0} />
-          {courseGradesTypes.map(g =>  <Table.HeaderCell content={g} />)}
+          {courseGradesTypes.map(g => <Table.HeaderCell content={g} />)}
           <Table.HeaderCell content="Other passed" />
         </Table.Row>
       </Table.Header>
@@ -214,33 +228,20 @@ class PopulationCourseStats extends Component {
       const { course, grades } = courseStats
       const { name, code } = course
 
-      const onIconClick = () => {
-        const { history, query, getMultipleCourseStatistics } = this.props
-        const { year, months } = query
-        history.push('/coursestatistics/')
-        getMultipleCourseStatistics({
-          codes: [code],
-          start: Number(year),
-          end: Number(moment(moment(year, 'YYYY').add(months, 'months')).format('YYYY')),
-          separate: false,
-          language
-        })
-      }
-
       return (
-        <Table.Row active={this.active(course)}>
+        <Table.Row active={this.isActiveCourse(course)}>
           <Table.Cell
             onClick={() => this.limitPopulationToCourse(courseStats)}
             content={name[language]}
           />
           <Table.Cell
             icon="level up alternate"
-            onClick={() => onIconClick()}
-            style={{ borderLeft: '0px !important' }}
+            onClick={() => this.onGoToCourseStatisticsClick(code)}
+            className={styles.iconCell}
           />
           <Table.Cell content={code} />
           <Table.Cell content={grades ? _.sum(Object.values(grades).map(g => g.count)) || 0 : 0} />
-          <Table.Cell content={course.grades
+          <Table.Cell content={grades
             ? _.sum(Object.values(grades).filter(g => g.status.failingGrade).map(g => g.count)) || 0
             : 0}
           />
@@ -258,8 +259,8 @@ class PopulationCourseStats extends Component {
     }
 
     const getCoursePopUpRow = (courseStats) => {
-      const { course } = courseStats
-      const { code, grades } = course
+      const { course, grades } = courseStats
+      const { code } = course
       return (
         <Popup
           key={code}
@@ -283,6 +284,7 @@ class PopulationCourseStats extends Component {
       </Table>
     )
   }
+
   renderBasicTable = (courseStatistics) => {
     const { translate, language } = this.props
     const { sortCriteria, reversed } = this.state
@@ -301,7 +303,7 @@ class PopulationCourseStats extends Component {
     const getTableHeader = () => (
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell colSpan="2" content={translate('populationCourses.course')} />
+          <Table.HeaderCell colSpan="3" content={translate('populationCourses.course')} />
           {getSortableHeaderCell(translate('populationCourses.students'), tableColumnNames.STUDENTS, 2)}
           <Table.HeaderCell colSpan="3" content={translate('populationCourses.passed')} />
           <Table.HeaderCell colSpan="2" content={translate('populationCourses.failed')} />
@@ -309,7 +311,7 @@ class PopulationCourseStats extends Component {
           <Table.HeaderCell colSpan="2" content={translate('populationCourses.percentageOfPopulation')} />
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell content={translate('populationCourses.name')} />
+          <Table.HeaderCell colSpan="2" content={translate('populationCourses.name')} />
           {this.renderCodeFilterInputHeaderCell()}
           {getSortableHeaderCell(translate('populationCourses.number'), tableColumnNames.PASSED)}
           {getSortableHeaderCell(translate('populationCourses.passedAfterRetry'), tableColumnNames.RETRY_PASSED)}
@@ -324,56 +326,51 @@ class PopulationCourseStats extends Component {
       </Table.Header>
     )
 
+    const getCourseRow = (courseStats) => {
+      const { course, stats } = courseStats
+      const { code, name } = course
+      const {
+        failed,
+        passed,
+        retryPassed,
+        failedMany,
+        attempts,
+        percentage,
+        perStudent,
+        passedOfPopulation,
+        triedOfPopulation
+      } = stats
+      return ((
+        <Table.Row key={code} active={this.isActiveCourse(course)}>
+          <Table.Cell
+            onClick={() => this.limitPopulationToCourse(courseStats)}
+            content={name[language]}
+          />
+          <Table.Cell
+            icon="level up alternate"
+            onClick={() => this.onGoToCourseStatisticsClick(code)}
+            className={styles.iconCell}
+          />
+          <Table.Cell content={code} />
+          <Table.Cell content={passed + failed} />
+          <Table.Cell content={passed} />
+          <Table.Cell content={retryPassed} />
+          <Table.Cell content={`${percentage} %`} />
+          <Table.Cell content={failed} />
+          <Table.Cell content={failedMany} />
+          <Table.Cell content={attempts} />
+          <Table.Cell content={perStudent.toFixed(2)} />
+          <Table.Cell content={`${passedOfPopulation}  %`} />
+          <Table.Cell content={`${triedOfPopulation}  %`} />
+        </Table.Row>)
+      )
+    }
+
     return (
       <Table celled sortable>
         {getTableHeader()}
         <Table.Body>
-          {courseStatistics.map(course => (
-            <Table.Row key={course.course.code} active={this.active(course.course)}>
-              <Table.Cell onClick={() => this.limitPopulationToCourse(course)}>
-                {course.course.name[language]}
-              </Table.Cell>
-              <Table.Cell
-                icon="level up alternate"
-                onClick={() => {
-                  this.props.history.push('/coursestatistics/')
-                  this.props.getMultipleCourseStatistics({
-                    codes: [course.course.code],
-                    start: Number(this.props.query.year),
-                    end: Number(moment(moment(this.props.query.year, 'YYYY').add(this.props.query.months, 'months')).format('YYYY')),
-                    separate: false,
-                    language: this.props.language
-                  })
-                }}
-                style={{
-                  borderLeft: '0px !important',
-                  display: 'none'
-                }}
-              />
-              <Table.Cell>{course.course.code}</Table.Cell>
-              <Table.Cell>
-                {course.stats.passed + course.stats.failed}
-              </Table.Cell>
-              <Table.Cell>
-                {course.stats.passed}
-              </Table.Cell>
-              <Table.Cell>
-                {course.stats.retryPassed}
-              </Table.Cell>
-              <Table.Cell>{course.stats.percentage} %</Table.Cell>
-              <Table.Cell>
-                {course.stats.failed}
-              </Table.Cell>
-              <Table.Cell>
-                {course.stats.failedMany}
-              </Table.Cell>
-              <Table.Cell>{course.stats.attempts}</Table.Cell>
-              <Table.Cell>
-                {course.stats.perStudent.toFixed(2)}
-              </Table.Cell>
-              <Table.Cell>{course.stats.passedOfPopulation} %</Table.Cell>
-              <Table.Cell>{course.stats.triedOfPopulation} %</Table.Cell>
-            </Table.Row>))}
+          {courseStatistics.map(getCourseRow)}
         </Table.Body>
       </Table>
     )

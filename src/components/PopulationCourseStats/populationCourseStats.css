@@ -7,3 +7,8 @@
 .activeSortHeader {
   background-color: darkgray;
 }
+
+.iconCell {
+  border-left: 0 !important;
+  cursor: pointer;
+}
