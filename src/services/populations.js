@@ -30,13 +30,20 @@ const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnum
 
   const toCourse = ({ grade, attainment_date, credits, course, credittypecode, isStudyModule }) => {
     course = course.get()
+
+    const momentStarted = moment(startDate)
+
+    const attainment_date_normailized =
+      moment(attainment_date).isBefore(momentStarted) ?
+        momentStarted.add(1, 'day').toISOString() : attainment_date
+
     return {
       course: {
         code: course.code,
         name: course.name,
         coursetypecode: course.coursetypecode
       },
-      date: attainment_date,
+      date: attainment_date_normailized,
       passed: Credit.passed({ credittypecode }),
       grade,
       credits,
@@ -91,7 +98,38 @@ const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnum
 
 const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
 
-const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate) => {
+const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright) => {
+  const creditsOfStudentOther = {
+    student_studentnumber: {
+      [Op.in]: studentnumbers
+    },
+    attainment_date: {
+      [Op.between]: [startDate, endDate]
+    }
+  }
+
+  // takes into accout possible progress tests taken earlier than the start date
+  const creditsOfStudentLaakis = {
+    student_studentnumber: {
+      [Op.in]: studentnumbers
+    },
+    [Op.or]: [
+      {
+        attainment_date: {
+          [Op.between]: [startDate, endDate]
+        }
+      },
+      {
+        course_code: {
+          [Op.in]: ['375063', '339101']
+        }
+      }
+    ]
+  }
+
+  const creditsOfStudent = ['320001', 'MH30_001'].includes(studyright[0]) ?
+    creditsOfStudentLaakis : creditsOfStudentOther
+
   const students = await Student.findAll({
     attributes: ['firstnames', 'lastname', 'studentnumber', 'dateofuniversityenrollment', 'creditcount', 'matriculationexamination', 'abbreviatedname', 'email', 'updatedAt'],
     include: [
@@ -106,14 +144,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             attributes: ['code', 'name', 'coursetypecode']
           }
         ],
-        where: {
-          student_studentnumber: {
-            [Op.in]: studentnumbers
-          },
-          attainment_date: {
-            [Op.between]: [startDate, endDate]
-          }
-        }
+        where: creditsOfStudent
       },
       {
         model: Transfers,
@@ -288,25 +319,9 @@ const optimizedStatisticsOf = async (query) => {
   const { studyRights, startDate, endDate, months } = parseQueryParams(query)
 
   const studentnumbers = await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate)
-  const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
+  const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months), studyRights)
 
-  const studentsWithCombinedOpenUniCredits = await Promise.all(students.map(async st => {
-    const credits = await Promise.all(st.credits.map(async cr => {
-      if (cr.course.name.fi && cr.course.name.fi.includes('Avoin yo:')) {
-        const courses = await byName(cr.course.name.fi.split(': ')[1], 'fi')
-        const theOne = courses.length > 0 ? orderBy(courses, ['date'], ['desc'])[0] : cr.course
-        cr.course.name = theOne.name
-        cr.course.code = theOne.code
-
-      }
-      return cr
-    }))
-    st.credits = credits
-    return st
-  }
-  ))
-
-  const formattedStudents = await formatStudentsForApi(studentsWithCombinedOpenUniCredits, startDate, endDate)
+  const formattedStudents = await formatStudentsForApi(students, startDate, endDate)
   return formattedStudents
 }
 
