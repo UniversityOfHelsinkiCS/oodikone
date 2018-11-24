@@ -98,94 +98,6 @@ const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnum
 
 const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
 
-const getStudentsIncludeCoursesBetween2 = async (studentnumbers, startDate, endDate) => {
-  const students = await Student.findAll({
-    attributes: ['firstnames', 'lastname', 'studentnumber', 'dateofuniversityenrollment', 'creditcount', 'matriculationexamination', 'abbreviatedname', 'email', 'updatedAt'],
-    include: [
-      {
-        model: Credit,
-        attributes: ['grade', 'credits', 'credittypecode', 'attainment_date', 'student_studentnumber', 'isStudyModule'],
-        separate: true,
-        include: [
-          {
-            model: Course,
-            required: true,
-            attributes: ['code', 'name', 'coursetypecode']
-          }
-        ],
-        where: {
-          student_studentnumber: {
-            [Op.in]: studentnumbers
-          },
-          attainment_date: {
-            [Op.between]: [startDate, endDate]
-          }
-        }
-      },
-      {
-        model: Transfers,
-        attributes: ['transferdate'],
-        include: [
-          {
-            model: ElementDetails,
-            required: true,
-            attributes: ['code', 'name', 'type'],
-            as: 'source'
-          },
-          {
-            model: ElementDetails,
-            required: true,
-            attributes: ['code', 'name', 'type'],
-            as: 'target'
-          }
-        ]
-      },
-      {
-        model: Studyright,
-        required: true,
-        attributes: ['studyrightid', 'startdate', 'highlevelname', 'extentcode', 'graduated', 'canceldate', 'prioritycode'],
-        include: [{
-          model: StudyrightExtent,
-          required: true,
-          attributes: ['extentcode', 'name']
-        },
-        {
-          model: StudyrightElement,
-          required: true,
-          include: {
-            model: ElementDetails
-          }
-        }
-        ]
-      },
-      {
-        model: SemesterEnrollment,
-        attributes: ['enrollmenttype', 'studentnumber', 'semestercode', 'enrollment_date'],
-        separate: true,
-        include: {
-          model: Semester,
-          attributes: ['semestercode', 'name', 'startdate', 'enddate'],
-          required: true,
-          where: {
-            startdate: {
-              [Op.between]: [startDate, endDate]
-            },
-            enddate: {
-              [Op.between]: [startDate, endDate]
-            }
-          }
-        }
-      }
-    ],
-    where: {
-      studentnumber: {
-        [Op.in]: studentnumbers
-      }
-    }
-  })
-  return students
-}
-
 const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright) => {
   const creditsOfStudentOther = {
     student_studentnumber: {
@@ -400,19 +312,6 @@ const formatStudentsForApi = async (students, startDate, endDate) => {
   }
 }
 
-const optimizedStatisticsOf2 = async (query) => {
-  if (!query.semesters.map(semester => semester === 'FALL' || semester === 'SPRING').every(e => e === true)) {
-    return { error: 'Semester should be either SPRING OR FALL' }
-  }
-  const { studyRights, startDate, endDate, months } = parseQueryParams(query)
-
-  const studentnumbers = await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate)
-  const students = await getStudentsIncludeCoursesBetween2(studentnumbers, startDate, dateMonthsFromNow(startDate, months))
-
-  const formattedStudents = await formatStudentsForApi(students, startDate, endDate)
-  return formattedStudents
-}
-
 const optimizedStatisticsOf = async (query) => {
   if (!query.semesters.map(semester => semester === 'FALL' || semester === 'SPRING').every(e => e === true)) {
     return { error: 'Semester should be either SPRING OR FALL' }
@@ -520,6 +419,5 @@ const bottlenecksOf = async (query) => {
 module.exports = {
   universityEnrolmentDates,
   optimizedStatisticsOf,
-  optimizedStatisticsOf2,
   bottlenecksOf
 }
