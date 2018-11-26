@@ -32,9 +32,23 @@ class CourseStatsCounter {
       percentage: undefined,
       passedOfPopulation: undefined,
       triedOfPopulation: undefined,
-      passingSemesters: {}
+      passingSemesters: this.initializePassingSemesters()
     }
     this.grades = {}
+  }
+
+  initializePassingSemesters() {
+    const passingSemesters = {
+      BEFORE: 0,
+      LATER: 0
+    }
+
+    for (let i = 0; i < 7; i++) {
+      passingSemesters[`${i}-FALL`] = 0
+      passingSemesters[`${i}-SPRING`] = 0
+    }
+
+    return passingSemesters
   }
 
   markAttempt() {
@@ -50,13 +64,7 @@ class CourseStatsCounter {
   }
 
   markPassedSemester(semester) {
-    const passingSemesters = this.stats.passingSemesters
-
-    if (passingSemesters[semester]) {
-      passingSemesters[semester] = passingSemesters[semester] + 1
-    } else {
-      passingSemesters[semester] = 1
-    }
+    this.stats.passingSemesters[semester] += 1
   }
 
   markCredit(studentnumber, grade, passed, failed, improved, semester) {
@@ -127,9 +135,32 @@ class CourseStatsCounter {
     this.course.disciplines[id] = name
   }
 
+  getPassingSemestersCumulative() {
+    const passingSemesters = this.stats.passingSemesters
+    const cumulativeStats = {
+      'BEFORE': passingSemesters['BEFORE']
+    }
+
+    cumulativeStats['0-FALL'] = passingSemesters['BEFORE'] + passingSemesters['0-FALL']
+    cumulativeStats['0-SPRING'] = cumulativeStats['0-FALL'] + passingSemesters['0-SPRING']
+
+    for (let i = 1; i < 7; i++) {
+      cumulativeStats[`${i}-FALL`] = cumulativeStats[`${i-1}-SPRING`] + passingSemesters[`${i}-FALL`]
+      cumulativeStats[`${i}-SPRING`] = cumulativeStats[`${i}-FALL`] + passingSemesters[`${i}-SPRING`]
+    }
+
+    cumulativeStats['LATER'] = cumulativeStats['6-SPRING'] + passingSemesters['LATER']
+
+    if (this.course.code === '581325')
+      console.log(cumulativeStats)
+
+    return cumulativeStats
+  }
+
   getFinalStats() {
     const stats = this.stats
     const students = this.students
+
     stats.students = lengthOf(students.all)
     stats.passed = lengthOf(students.passed)
     stats.failed = lengthOf(students.failed)
@@ -140,12 +171,13 @@ class CourseStatsCounter {
     stats.passedOfPopulation = percentageOf(stats.passed, this.studentsInTotal)
     stats.triedOfPopulation = percentageOf(stats.students, this.studentsInTotal)
     stats.perStudent = stats.attempts / (stats.passed + stats.failed)
+    stats.passingSemestersCumulative = this.getPassingSemestersCumulative()
+
     return {
       stats,
       students,
       course: this.course,
-      grades: this.grades,
-      passingSemesters: this.passingSemesters
+      grades: this.grades
     }
   }
 
