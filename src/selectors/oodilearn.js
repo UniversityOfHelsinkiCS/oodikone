@@ -1,5 +1,3 @@
-import { createSelector } from 'reselect'
-
 const getSearchedCourses = (state) => {
   const { settings, oodilearnCourses } = state
   const { language } = settings
