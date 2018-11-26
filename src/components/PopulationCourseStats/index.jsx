@@ -121,8 +121,9 @@ class PopulationCourseStats extends Component {
     const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
 
     const courseStatistics = _.orderBy(
-      filteredCourses, (course => [course.stats[sortCriteria], course.code]
-      ), [lodashSortOrder, lodashSortOrderTypes.DESC]
+      filteredCourses,
+      [course => course.stats[sortCriteria], course => course.course.code],
+      [lodashSortOrder, lodashSortOrderTypes.ASC]
     )
 
     return courseStatistics
@@ -130,7 +131,7 @@ class PopulationCourseStats extends Component {
 
   state = {
     sortCriteria: tableColumnNames.STUDENTS,
-    reversed: false,
+    reversed: true,
     studentAmountLimit: parseInt(this.props.populationSize * 0.15, 10),
     codeFilter: '',
     activeView: null
