@@ -20,6 +20,7 @@ router.get('/v2/populationstatistics/courses', async (req, res) => {
     }
 
     const result = await Population.bottlenecksOf(req.query)
+
     if (result.error) {
       res.status(400).json(result)
       return
