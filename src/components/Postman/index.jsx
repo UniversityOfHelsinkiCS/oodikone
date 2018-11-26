@@ -9,10 +9,12 @@ class Postman extends Component {
     }
 
     doRequest = () => {
+      /* eslint-disable-next-line react/prop-types */
       this.props.doGet(this.state.route)
     }
 
     dataToConsole = () => {
+      /* eslint-disable-next-line react/prop-types */
       console.log(this.props.postman.data)
     }
 

@@ -21,6 +21,7 @@ class StudentDetails extends Component {
       }
     })
   }
+
   componentDidUpdate() {
     if (isEmpty(this.props.student) && this.props.studentNumber) {
       this.props.getStudent(this.props.studentNumber)
