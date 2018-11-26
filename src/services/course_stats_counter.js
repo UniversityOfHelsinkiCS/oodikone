@@ -151,9 +151,6 @@ class CourseStatsCounter {
 
     cumulativeStats['LATER'] = cumulativeStats['6-SPRING'] + passingSemesters['LATER']
 
-    if (this.course.code === '581325')
-      console.log(cumulativeStats)
-
     return cumulativeStats
   }
 
