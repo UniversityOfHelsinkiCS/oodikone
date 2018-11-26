@@ -14,11 +14,13 @@ class PriorityStudyright extends Component {
     setPopulationFilter: func.isRequired,
     studyrights: arrayOf({}).isRequired
   }
+
   state = {
     prioritycode: undefined,
     degree: undefined,
     programme: undefined
   }
+
   graduationOptions = [
     { value: 'grad', text: 'graduated' },
     { value: 'either', text: 'studying' }
@@ -29,6 +31,7 @@ class PriorityStudyright extends Component {
   handleChange = (e, data) => {
     this.setState({ [data.name]: data.value })
   }
+
   handleLimit = () => {
     const { prioritycode, degree, programme } = this.state
     this.props.setPopulationFilter(priorityStudyright({
@@ -39,6 +42,7 @@ class PriorityStudyright extends Component {
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
   }
+
   renderSetText = (filter, studyrights) => {
     const { language } = this.props
     const { prioritycode, degree, programme } = filter.params

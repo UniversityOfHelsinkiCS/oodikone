@@ -25,6 +25,7 @@ class LanguageChooser extends Component {
     this.props.switchLanguage(name, value)
     await setUserLanguage(value)
   }
+
   render() {
     return (
       <Dropdown
