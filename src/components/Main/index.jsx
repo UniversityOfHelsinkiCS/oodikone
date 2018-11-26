@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
+// import { connect } from 'react-redux'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { localize } from 'react-localize-redux'
 import { Loader, Image, Transition } from 'semantic-ui-react'
@@ -50,12 +50,12 @@ class Main extends Component {
   }
 
   componentDidCatch = async (e) => {
-    const { reduxState } = this.props
+  //  const { reduxState } = this.props
     const name = await getUserName()
     Sentry.configureScope((scope) => {
-      Object.keys(reduxState).forEach((key) => {
-        scope.setExtra(key, JSON.stringify(reduxState[key]))
-      })
+  //    Object.keys(reduxState).forEach((key) => {
+  //      scope.setExtra(key, JSON.stringify(reduxState[key]))
+  //    })
       scope.setUser({ username: name })
     })
     Sentry.captureException(e)
@@ -121,10 +121,11 @@ class Main extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  reduxState: state
-})
+// const mapStateToProps = state => ({
+//   reduxState: state
+// })
 
 
-export default connect(mapStateToProps)(localize(Main, 'locale'))
+// export default connect(mapStateToProps)(localize(Main, 'locale'))
+export default localize(Main, 'locale')
 
