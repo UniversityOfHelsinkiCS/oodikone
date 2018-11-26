@@ -25,6 +25,7 @@ class PopulationDetails extends Component {
     queryIsSet: bool.isRequired,
     isLoading: bool.isRequired
   }
+
   constructor() {
     super()
     this.chart = React.createRef()
@@ -102,6 +103,7 @@ class PopulationDetails extends Component {
       </Segment>
     )
   }
+
   renderNavigationPanel = () => (
     <div>
       <Segment className="navigationpanel" style={{ position: 'fixed', right: '2%', bottom: '2%' }}>

@@ -238,6 +238,7 @@ class CreditAccumulationGraph extends Component {
       return null
     }
   }
+
   xAxisFormatter = (startDate, month) => (moment(startDate).add(month, 'months').format('MMM YY'))
 
   render() {
