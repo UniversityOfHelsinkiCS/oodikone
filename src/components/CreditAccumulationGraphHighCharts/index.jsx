@@ -23,6 +23,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       options: []
     }
   }
+
   async componentDidMount() {
     const { students } = this.props
     await this.getMoreCreditLines(students)
@@ -126,6 +127,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       }
     ]
   }
+
   getStudentCourseData = (student) => {
     const { studentNumber, courses, studyrightStart, started } = student
 
