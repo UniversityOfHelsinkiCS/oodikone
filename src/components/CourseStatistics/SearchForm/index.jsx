@@ -18,17 +18,48 @@ const INITIAL = {
   toYear: undefined,
   separate: false,
   discipline: undefined,
-  type: undefined
+  type: undefined,
+  prefilled: false
 }
+
 
 class SearchForm extends Component {
   state = {
     ...INITIAL
   }
 
+  static getDerivedStateFromProps(props, state) {
+    const isFirstLoad = !state.prefilled && !props.pending && props.preselectedCourse
+    if (isFirstLoad) {
+      const { code, start, end } = props.preselectedCourse
+
+      const getMatchingYearSelection = (year) => {
+        const matchingYear = year && props.years.find(y => y.text.startsWith(year.toString()))
+        return matchingYear ? matchingYear.value : undefined
+      }
+      const fromYear = getMatchingYearSelection(start)
+      const toYear = getMatchingYearSelection(end)
+
+      return {
+        coursecode: code,
+        fromYear,
+        toYear
+      }
+    }
+    return null
+  }
+
   componentDidMount() {
     this.props.getSemesters()
     this.props.clearCourses()
+  }
+
+  componentDidUpdate() {
+    const { prefilled } = this.state
+    const { preselectedCourse } = this.props
+    if (!prefilled && preselectedCourse) {
+      this.handlePrefilledLoad()
+    }
   }
 
   toggleCourse = (course) => {
@@ -56,6 +87,13 @@ class SearchForm extends Component {
   toggleCheckbox = (e, target) => {
     const { name } = target
     this.setState({ [name]: !this.state[name] })
+  }
+
+  handlePrefilledLoad = () => {
+    this.setState(
+      { prefilled: true },
+      () => this.fetchCourses()
+    )
   }
 
   fetchCourses = () => {
@@ -87,7 +125,15 @@ class SearchForm extends Component {
 
   render() {
     const { years, loading, matchingCourses } = this.props
-    const { selectedcourses, fromYear, toYear, separate, coursename, coursecode } = this.state
+    const {
+      selectedcourses,
+      fromYear,
+      toYear,
+      separate,
+      coursename,
+      coursecode
+    } = this.state
+
     const courses = matchingCourses.filter(c => !selectedcourses[c.code])
 
     const disabled = (!fromYear || Object.keys(selectedcourses).length === 0)
@@ -193,12 +239,18 @@ SearchForm.propTypes = {
   matchingCourses: arrayOf(shape({})).isRequired,
   years: arrayOf(shape({})).isRequired,
   loading: bool.isRequired,
-  coursesLoading: bool.isRequired
+  coursesLoading: bool.isRequired,
+  preselectedCourse: shape({})
+}
+
+SearchForm.defaultProps = {
+  preselectedCourse: null
 }
 
 const mapStateToProps = (state) => {
   const { years = [] } = state.semesters.data
-  const { pending } = state.courseStats
+  const { pending, data } = state.courseStatistics
+  const preselectedCourse = data[0]
   return {
     matchingCourses: getCourseSearchResults(state),
     years: Object.values(years).map(({ yearcode, yearname }) => ({
@@ -207,6 +259,7 @@ const mapStateToProps = (state) => {
       value: yearcode
     })).reverse(),
     loading: pending,
+    preselectedCourse,
     coursesLoading: state.courseSearch.pending
   }
 }
