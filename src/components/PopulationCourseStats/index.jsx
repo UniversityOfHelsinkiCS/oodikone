@@ -127,6 +127,7 @@ class PopulationCourseStats extends Component {
       reversed: isReversed
     }, () => this.handleCourseStatisticsCriteriaChange())
   }
+
     onGoToCourseStatisticsClick = (code) => {
       const { history, query, getMultipleCourseStatistics: getStatsFn, language } = this.props
       const { year, months } = query

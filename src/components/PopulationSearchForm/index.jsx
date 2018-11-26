@@ -65,6 +65,7 @@ class PopulationSearchForm extends Component {
       this.props.getDegreesAndProgrammes()
     }
   }
+
   componentDidUpdate() {
     const { studyProgrammes } = this.props
     if (studyProgrammes
@@ -175,6 +176,7 @@ class PopulationSearchForm extends Component {
       }
     })
   }
+
   handleProgrammeChange = (e, { value }) => {
     const { query } = this.state
     const programme = value
@@ -188,6 +190,7 @@ class PopulationSearchForm extends Component {
       }
     })
   }
+
   handleStudyTrackChange = (e, { value }) => {
     const { query } = this.state
     const studyTrack = value
@@ -319,6 +322,7 @@ class PopulationSearchForm extends Component {
       </Form.Group>
     )
   }
+
   renderStudyProgrammeDropdown = (studyRights, programmesToRender) => (
     <Form.Field
       width={6}
