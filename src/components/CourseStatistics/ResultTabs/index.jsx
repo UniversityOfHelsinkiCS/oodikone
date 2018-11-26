@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { Tab, Grid, Radio, Form } from 'semantic-ui-react'
 import { shape, string, number, oneOfType, arrayOf, func, bool } from 'prop-types'
+
+import { userIsAdmin } from '../../../common'
 import StackedBarChart from '../../StackedBarChart'
 import { passRateCumGraphOptions, passRateStudGraphOptions, gradeGraphOptions } from '../../../constants'
 import CumulativeTable from './CumulativeTable'
 import StudentTable from './StudentTable'
-
 
 const getDataObject = (name, data, stack) => ({ name, data, stack })
 
@@ -101,6 +102,7 @@ const getGradeSeries = (series, multiplier, name) => {
     getDataObject(`${name} Hyv.`, newSeries['Hyv.'], 'g')
   ]
 }
+
 const getGradeCumSeriesFromStats = (stats, multiplier = 1, name = '') => {
   const series = stats.flatMap(s => s.cumulative.grades)
   return getGradeSeries(series, multiplier, name)
@@ -112,7 +114,14 @@ const getGradeStudSeriesFromStats = (stats, multiplier = 1, name = '') => {
 }
 
 class ResultTabs extends Component {
-  state = {}
+  state = {
+  }
+
+  async componentDidMount() {
+    const adminRights = await userIsAdmin()
+
+    this.setState({ adminRights })
+  }
 
   render() {
     const { max, primary, comparison, changeMode, cumMode } = this.props
