@@ -64,7 +64,7 @@ class CourseStatsCounter {
   }
 
   markPassedSemester(semester) {
-    this.stats.passingSemesters[semester] += 1
+    this.stats.passingSemesters[semester]++
   }
 
   markCredit(studentnumber, grade, passed, failed, improved, semester) {
