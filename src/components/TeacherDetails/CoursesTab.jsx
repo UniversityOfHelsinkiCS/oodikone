@@ -53,6 +53,7 @@ class CoursesTab extends Component {
     }
 
     setCourse = selectedCourse => this.setState({ selectedCourse })
+
     setSemester = selectedSemester => this.setState({ selectedSemester })
 
     getCourseStats(courseid) {

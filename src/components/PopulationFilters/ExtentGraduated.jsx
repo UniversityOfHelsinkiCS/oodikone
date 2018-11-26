@@ -15,11 +15,13 @@ class ExtentGraduated extends Component {
     setPopulationFilter: func.isRequired,
     extents: arrayOf(object).isRequired
   }
+
   state = {
     extentcode: undefined,
     graduated: undefined,
     complemented: 'false'
   }
+
   graduationOptions = [
     { value: 'grad', text: 'graduated' },
     { value: 'either', text: 'studying' }
@@ -30,6 +32,7 @@ class ExtentGraduated extends Component {
   handleChange = (e, data) => {
     this.setState({ [data.name]: data.value })
   }
+
   handleLimit = () => {
     const { extentcode, graduated, complemented } = this.state
     this.props.setPopulationFilter(extentGraduated({ extentcode, graduated, complemented }))
@@ -38,6 +41,7 @@ class ExtentGraduated extends Component {
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
   }
+
   renderSetText = (extents, filter) => {
     const { language } = this.props
     const { extentcode, graduated, complemented } = filter.params

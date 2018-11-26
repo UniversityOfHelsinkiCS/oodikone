@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Header, Table, Icon } from 'semantic-ui-react'
+import { Container, Header, Table, Icon, Tab } from 'semantic-ui-react'
 import ReactHighcharts from 'react-highcharts'
-import { Tab } from 'semantic-ui-react'
 
 import { callApi } from '../../apiConnection'
 

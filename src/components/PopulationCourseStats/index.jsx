@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Table, Form, Input, Popup, Button, Icon } from 'semantic-ui-react'
-import { func, arrayOf, object, number, shape, string } from 'prop-types'
+import { Table, Form, Input, Popup, Button } from 'semantic-ui-react'
+import { func, arrayOf, object, number, shape, string, oneOf, bool } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router-dom'
@@ -10,8 +10,69 @@ import moment from 'moment'
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
 import { getMultipleCourseStatistics } from '../../redux/courseStatistics'
 import { courseParticipation } from '../../populationFilters'
+import PassingSemesters from './PassingSemesters'
 
-const formatGradeDistribution = grades => _.replace(JSON.stringify(_.sortBy(Object.entries(grades).map(([key, value]) => ({ [key]: value.count })), o => -Object.keys(o)), null, 1), /\[\n|{\n*|{\s|}|\s*}|]|"|,/g, '')
+import styles from './populationCourseStats.css'
+
+export const tableColumnNames = {
+  STUDENTS: 'students',
+  PASSED: 'passed',
+  RETRY_PASSED: 'retryPassed',
+  PERCENTAGE: 'percentage',
+  FAILED: 'failed',
+  FAILED_MANY: 'failedMany',
+  ATTEMPTS: 'attempts',
+  PER_STUDENT: 'perStudent',
+  PASSED_OF_POPULATION: 'passedOfPopulation',
+  TRIED_OF_POPULATION: 'triedOfPopulation'
+}
+
+export const sortOrderTypes = {
+  ASC: 'ascending',
+  DESC: 'descending'
+}
+
+const lodashSortOrderTypes = {
+  ASC: 'asc',
+  DESC: 'desc'
+}
+
+const SortableHeaderCell =
+  ({ content, columnName, onClickFn, activeSortColumn, reversed, rowSpan }) => {
+    const isTableSortedBy = activeSortColumn === columnName
+    const direction = reversed ? sortOrderTypes.DESC : sortOrderTypes.ASC
+    return (
+      <Table.HeaderCell
+        rowSpan={`${rowSpan}`}
+        sorted={isTableSortedBy ? direction : null}
+        onClick={() => onClickFn(columnName)}
+        className={isTableSortedBy ? styles.activeSortHeader : ''}
+        content={content}
+      />
+    )
+  }
+
+const tableColumnType = oneOf(Object.values(tableColumnNames))
+
+SortableHeaderCell.propTypes = {
+  content: string.isRequired,
+  columnName: tableColumnType.isRequired,
+  activeSortColumn: tableColumnType.isRequired,
+  reversed: bool.isRequired,
+  onClickFn: func.isRequired,
+  rowSpan: number
+}
+
+SortableHeaderCell.defaultProps = {
+  rowSpan: 1
+}
+
+const formatGradeDistribution = grades =>
+  _.replace(JSON.stringify(
+    _.sortBy(Object.entries(grades)
+      .map(([key, value]) => ({ [key]: value.count })), o => -Object.keys(o)),
+    null, 1
+  ), /\[\n|{\n*|{\s|}|\s*}|]|"|,/g, '')
 
 class PopulationCourseStats extends Component {
   static propTypes = {
@@ -31,379 +92,363 @@ class PopulationCourseStats extends Component {
     query: shape({}).isRequired
   }
 
-  constructor(props) {
-    super(props)
+  static getDerivedStateFromProps(props, state) {
+    if (state && !state.initialSortReady && props.courses.coursestatistics) {
+      state.courseStatistics = PopulationCourseStats.updateCourseStatisticsCriteria(props, state)
+      state.initialSortReady = true
+    }
 
-    this.state = {
-      sortBy: 'students',
-      reversed: false,
-      limit: parseInt(this.props.populationSize * 0.15, 10),
-      codeFilter: '',
-      showGradeDistribution: false
+    return state
+  }
+
+  static updateCourseStatisticsCriteria(props, state) {
+    const { studentAmountLimit, sortCriteria, codeFilter, reversed } = state
+    const { courses: { coursestatistics } } = props
+
+    const studentAmountFilter = ({ stats }) => {
+      const { students } = stats
+      return studentAmountLimit === 0 || students >= studentAmountLimit
+    }
+    const courseCodeFilter = ({ course }) => {
+      const { code } = course
+      return code.toLowerCase().includes(codeFilter.toLowerCase())
+    }
+
+    const filteredCourses = coursestatistics
+      .filter(studentAmountFilter)
+      .filter(c => !codeFilter || courseCodeFilter(c))
+
+    const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
+
+    const courseStatistics = _.orderBy(
+      filteredCourses,
+      [course => course.stats[sortCriteria], course => course.course.code],
+      [lodashSortOrder, lodashSortOrderTypes.ASC]
+    )
+
+    return courseStatistics
+  }
+
+  state = {
+    sortCriteria: tableColumnNames.STUDENTS,
+    reversed: true,
+    studentAmountLimit: parseInt(this.props.populationSize * 0.15, 10),
+    codeFilter: '',
+    activeView: null
+  }
+
+  onCodeFilterChange = (e) => {
+    const { target: { value } } = e
+    this.setState({ codeFilter: value })
+  }
+
+  onSetCodeFilterKeyPress = (e) => {
+    const { key } = e
+    const enterKey = 'Enter'
+    const isEnterKeyPress = key === enterKey
+    if (isEnterKeyPress) {
+      this.handleCourseStatisticsCriteriaChange()
     }
   }
 
-  getSelectionStyle = criteria => (this.state.sortBy === criteria ? ({ background: 'darkgray' }) : ({ background: '#f9fafb' }))
-
-  criteria = () => (c1, c2) => {
-    const orderByCode = (code1, code2) =>
-      (code1.course.code < code2.course.code ? -1 : 1)
-
-    if (this.state.reversed) {
-      const val = c1.stats[this.state.sortBy] - c2.stats[this.state.sortBy]
-      return (val !== 0 ? val : orderByCode(c1, c2))
-    }
-    const val = c2.stats[this.state.sortBy] - c1.stats[this.state.sortBy]
-    return (val !== 0 ? val : orderByCode(c1, c2))
+  onStudentAmountLimitChange = (e) => {
+    const { target: { value } } = e
+    this.setState(
+      { studentAmountLimit: value },
+      () => this.handleCourseStatisticsCriteriaChange()
+    )
   }
 
-  limit = () => (course) => {
-    if (this.state.limit === 0) {
-      return true
-    }
-    return course.stats.students >= this.state.limit
+  onSortableColumnHeaderClick = (criteria) => {
+    const { reversed, sortCriteria } = this.state
+    const isActiveSortCriteria = sortCriteria === criteria
+    const isReversed = isActiveSortCriteria ? !reversed : reversed
+
+    this.setState({
+      sortCriteria: criteria,
+      reversed: isReversed
+    }, () => this.handleCourseStatisticsCriteriaChange())
   }
 
-  codeFilter = () => ({ course }) =>
-    course.code.toLowerCase().includes(this.state.codeFilter.toLowerCase())
-
-  sortBy(criteria) {
-    return () => {
-      let { reversed } = this.state
-      if (this.state.sortBy === criteria) {
-        reversed = !reversed
-      }
-      this.setState({ sortBy: criteria, reversed })
-    }
+  onGoToCourseStatisticsClick = (code) => {
+    const { history, query, getMultipleCourseStatistics: getStatsFn, language } = this.props
+    const { year, months } = query
+    history.push('/coursestatistics/')
+    getStatsFn({
+      codes: [code],
+      start: Number(year),
+      end: Number(moment(moment(year, 'YYYY').add(months, 'months')).format('YYYY')),
+      separate: false,
+      language
+    })
   }
 
-  limitPopulationToCourse = course => () => {
-    if (!this.active(course.course)) {
-      const params = { course, field: 'all' }
+  setActiveView = activeView => this.setState({ activeView })
+
+  handleCourseStatisticsCriteriaChange = () => {
+    const courseStatistics = PopulationCourseStats.updateCourseStatisticsCriteria(this.props, this.state)
+    this.setState({ courseStatistics })
+  }
+
+  limitPopulationToCourse = courseStats => () => {
+    if (!this.active(courseStats.course)) {
+      const params = { courseStats, field: 'all' }
       this.props.setPopulationFilter(courseParticipation(params))
     } else {
-      this.props.removePopulationFilterOfCourse(course.course)
+      this.props.removePopulationFilterOfCourse(courseStats.course)
     }
   }
 
-  active = course =>
-    this.props.selectedCourses
+  isActiveCourse = (course) => {
+    const { selectedCourses } = this.props
+    return selectedCourses.length > 0 && selectedCourses
       .find(c => course.name === c.name && course.code === c.code) !== undefined
-
-  renderSortArrow = (criteria) => {
-    if (this.state.sortBy === criteria) {
-      if (this.state.reversed) {
-        return (<Icon name="angle up" />)
-      }
-      return (<Icon name="angle down" />)
-    }
-    return null
   }
 
+  renderCodeFilterInputHeaderCell = () => {
+    const { translate } = this.props
+    const { codeFilter } = this.state
+    return (
+      <Table.HeaderCell>
+        {translate('populationCourses.code')}
+        <Input
+          className={styles.courseCodeInput}
+          transparent
+          value={codeFilter}
+          placeholder="(filter here)"
+          onChange={this.onCodeFilterChange}
+          onKeyPress={this.onSetCodeFilterKeyPress}
+        />
+      </Table.HeaderCell>)
+  }
 
-  renderGradeDistributionTable = ({ translate, sortBy, courses, language }) => (
-    <Table celled sortable>
+  renderActiveView() {
+    const { courses } = this.props
+    const { courseStatistics } = this.state
+    const courseStats = courseStatistics || courses.coursestatistics
+
+    switch (this.state.activeView) {
+      case 'showGradeDistribution':
+        return this.renderGradeDistributionTable(courseStats)
+      case 'passingSemester':
+        return <PassingSemesters courseStatistics={courseStats} />
+      default:
+        return this.renderBasicTable(courseStats)
+    }
+  }
+
+  renderGradeDistributionTable = (courseStatistics) => {
+    const { translate, language } = this.props
+    const { sortCriteria, reversed } = this.state
+
+    const courseGradesTypes = [1, 2, 3, 4, 5]
+
+    const getTableHeader = () => (
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell colSpan="2" >
-            {translate('populationCourses.course')}
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-            {translate('populationCourses.code')}
-            <Input style={{ marginLeft: 10, width: '6em', textDecoration: 'underline' }} transparent placeholder="(filter here)" onKeyPress={e => e.key === 'Enter' && this.setState({ codeFilter: e.target.value })} />
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            sorted={sortBy === 'students' ? 'descending' : null}
-            onClick={this.sortBy('students')}
-            style={this.getSelectionStyle('students')}
-          >
-            Attempts
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-            0
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-            1
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-            2
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-            3
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-            4
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-            5
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-            Other passed
-          </Table.HeaderCell>
+          <Table.HeaderCell colSpan="2" content={translate('populationCourses.course')} />
+          {this.renderCodeFilterInputHeaderCell()}
+          <SortableHeaderCell
+            content="Attempts"
+            columnName={tableColumnNames.STUDENTS}
+            onClickFn={this.onSortableColumnHeaderClick}
+            activeSortColumn={sortCriteria}
+            reversed={reversed}
+          />
+          <Table.HeaderCell content={0} />
+          {courseGradesTypes.map(g => <Table.HeaderCell content={g} />)}
+          <Table.HeaderCell content="Other passed" />
         </Table.Row>
       </Table.Header>
-      <Table.Body>
-        {courses.coursestatistics
-          .sort(this.criteria()).filter(this.limit() && this.codeFilter()).map(course => (
-            <Popup
-              key={course.course.code}
-              trigger={
-                <Table.Row active={this.active(course.course)}>
-                  <Table.Cell onClick={this.limitPopulationToCourse(course)}>
-                    {course.course.name[language]}
-                  </Table.Cell>
-                  <Table.Cell
-                    icon="level up alternate"
-                    onClick={() => {
-                      this.props.history.push('/coursestatistics/')
-                      this.props.getMultipleCourseStatistics({
-                        codes: [course.course.code],
-                        start: Number(this.props.query.year),
-                        end: Number(moment(moment(this.props.query.year, 'YYYY').add(this.props.query.months, 'months')).format('YYYY')),
-                        separate: false,
-                        language: this.props.language
-                      })
-                    }}
-                    style={{ borderLeft: '0px !important' }}
-                  />
-                  <Table.Cell>{course.course.code}</Table.Cell>
-                  <Table.Cell>
-                    {course.grades ? _.sum(Object.values(course.grades).map(g => g.count)) || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades ?
-                      _.sum(Object.values(course.grades).filter(g =>
-                        g.status.failingGrade).map(g => g.count))
-                      || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades[1] ? course.grades[1].count || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades[2] ? course.grades[2].count || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades[3] ? course.grades[3].count || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades[4] ? course.grades[4].count || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades[5] ? course.grades[5].count || 0 : 0}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.grades ?
-                      _.sum(Object.values(_.omit(course.grades, [1, 2, 3, 4, 5])).filter(g =>
-                        g.status.passingGrade || g.status.improvedGrade).map(g => g.count)) : 0}
-                  </Table.Cell>
-                </Table.Row>}
-              flowing
-              hoverable
-              inverted
-              position="top right"
-              hideOnScroll
-              content={course.grades ? <pre>{formatGradeDistribution(course.grades)}</pre> : 'Nothing to see here'}
-            />
-          ))}
-      </Table.Body>
-    </Table>
-  )
-  renderBasicTable = ({ translate, sortBy, direction, courses, language }) => (
-    <Table celled sortable>
+    )
+
+    const getCourseRow = (courseStats) => {
+      const { course, grades } = courseStats
+      const { name, code } = course
+
+      let attempts = 0
+      let failedGrades = 0
+      let otherPassed = 0
+
+      if (grades) {
+        const countSumReducer = (acc, cur) => acc + cur.count
+        const gradeValues = grades ? Object.values(grades) : null
+        attempts = gradeValues.reduce(countSumReducer, 0)
+        failedGrades = gradeValues.filter(g => g.status.failed).reduce(countSumReducer, 0)
+        otherPassed = Object.values(_.omit(grades, courseGradesTypes))
+          .filter(g => g.status.passingGrade || g.status.improvedGrade)
+          .reduce(countSumReducer, 0)
+      }
+
+      return (
+        <Table.Row active={this.isActiveCourse(course)}>
+          <Table.Cell
+            onClick={() => this.limitPopulationToCourse(courseStats)}
+            content={name[language]}
+          />
+          <Table.Cell
+            icon="level up alternate"
+            onClick={() => this.onGoToCourseStatisticsClick(code)}
+            className={styles.iconCell}
+          />
+          <Table.Cell content={code} />
+          <Table.Cell content={attempts} />
+          <Table.Cell content={failedGrades} />
+          {courseGradesTypes.map(g =>
+            <Table.Cell content={grades[g] ? grades[g].count || 0 : 0} />)
+          }
+          <Table.Cell content={otherPassed} />
+        </Table.Row>
+      )
+    }
+
+    const getCoursePopUpRow = (courseStats) => {
+      const { course, grades } = courseStats
+      const { code } = course
+      return (
+        <Popup
+          key={code}
+          flowing
+          hoverable
+          inverted
+          position="top right"
+          hideOnScroll
+          content={grades ? <pre>{formatGradeDistribution(grades)}</pre> : 'Nothing to see here'}
+          trigger={getCourseRow(courseStats)}
+        />
+      )
+    }
+
+    return (
+      <Table celled sortable>
+        {getTableHeader()}
+        <Table.Body>
+          {courseStatistics.map(getCoursePopUpRow)}
+        </Table.Body>
+      </Table>
+    )
+  }
+
+  renderBasicTable = (courseStatistics) => {
+    const { translate, language } = this.props
+    const { sortCriteria, reversed } = this.state
+
+    const getSortableHeaderCell = (label, columnName, rowSpan = 1) =>
+      (<SortableHeaderCell
+        content={label}
+        columnName={columnName}
+        onClickFn={this.onSortableColumnHeaderClick}
+        activeSortColumn={sortCriteria}
+        reversed={reversed}
+        rowSpan={rowSpan}
+      />)
+
+    const getTableHeader = () => (
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell colSpan="2">
-            {translate('populationCourses.course')}
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            rowSpan="2"
-            sorted={sortBy === 'students' ? 'descending' : null}
-            onClick={this.sortBy('students')}
-            style={this.getSelectionStyle('students')}
-          >
-            {translate('populationCourses.students')}
-            {this.renderSortArrow('students')}
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            colSpan="3"
-          >
-            {translate('populationCourses.passed')}
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            colSpan="2"
-          >
-            {translate('populationCourses.failed')}
-          </Table.HeaderCell>
-          <Table.HeaderCell colSpan="2">{translate('populationCourses.attempts')}</Table.HeaderCell>
-          <Table.HeaderCell colSpan="2">{translate('populationCourses.percentageOfPopulation')}</Table.HeaderCell>
+          <Table.HeaderCell colSpan="3" content={translate('populationCourses.course')} />
+          {getSortableHeaderCell(translate('populationCourses.students'), tableColumnNames.STUDENTS, 2)}
+          <Table.HeaderCell colSpan="3" content={translate('populationCourses.passed')} />
+          <Table.HeaderCell colSpan="2" content={translate('populationCourses.failed')} />
+          <Table.HeaderCell colSpan="2" content={translate('populationCourses.attempts')} />
+          <Table.HeaderCell colSpan="2" content={translate('populationCourses.percentageOfPopulation')} />
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell colSpan="1" >{translate('populationCourses.name')}</Table.HeaderCell>
-          <Table.HeaderCell>
-            {translate('populationCourses.code')}
-            <Input style={{ marginLeft: 10, width: '6em' }} transparent placeholder="(filter here)" onKeyPress={e => e.key === 'Enter' && this.setState({ codeFilter: e.target.value })} />
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            sorted={sortBy === 'passed' ? 'descending' : null}
-            onClick={this.sortBy('passed')}
-            style={this.getSelectionStyle('passed')}
-
-          >
-            {translate('populationCourses.number')}
-            {this.renderSortArrow('passed')}
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            sorted={sortBy === 'retryPassed' ? 'descending' : null}
-            onClick={this.sortBy('retryPassed')}
-            style={this.getSelectionStyle('retryPassed')}
-
-          >
-            {translate('populationCourses.passedAfterRetry')}
-            {this.renderSortArrow('retryPassed')}
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            sorted={sortBy === 'percentage' ? direction : null}
-            onClick={this.sortBy('percentage')}
-            style={this.getSelectionStyle('percentage')}
-
-          >
-            {translate('populationCourses.percentage')}
-            {this.renderSortArrow('percentage')}
-          </Table.HeaderCell>
-
-          <Table.HeaderCell
-            sorted={sortBy === 'failed' ? 'descending' : null}
-            onClick={this.sortBy('failed')}
-            style={this.getSelectionStyle('failed')}
-
-          >
-            {translate('populationCourses.number')}
-            {this.renderSortArrow('failed')}
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            rowSpan="2"
-            sorted={sortBy === 'failedMany' ? 'descending' : null}
-            onClick={this.sortBy('failedMany')}
-            style={this.getSelectionStyle('failedMany')}
-
-          >
-            {translate('populationCourses.failedManyTimes')}
-            {this.renderSortArrow('failedMany')}
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            sorted={sortBy === 'attempts' ? 'descending' : null}
-            onClick={this.sortBy('attempts')}
-            style={this.getSelectionStyle('attempts')}
-          >
-            {translate('populationCourses.number')}
-            {this.renderSortArrow('attempts')}
-
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            sorted={sortBy === 'perStudent' ? 'descending' : null}
-            onClick={this.sortBy('perStudent')}
-            style={this.getSelectionStyle('perStudent')}
-          >
-            {translate('populationCourses.perStudent')}
-            {this.renderSortArrow('perStudent')}
-
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            sorted={sortBy === 'passedOfPopulation' ? direction : null}
-            onClick={this.sortBy('passedOfPopulation')}
-            style={this.getSelectionStyle('passedOfPopulation')}
-
-          >
-            {translate('populationCourses.passed')}
-            {this.renderSortArrow('passedOfPopulation')}
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            sorted={sortBy === 'triedOfPopulation' ? direction : null}
-            onClick={this.sortBy('triedOfPopulation')}
-            style={this.getSelectionStyle('triedOfPopulation')}
-
-          >
-            {translate('populationCourses.attempted')}
-            {this.renderSortArrow('triedOfPopulation')}
-          </Table.HeaderCell>
+          <Table.HeaderCell colSpan="2" content={translate('populationCourses.name')} />
+          {this.renderCodeFilterInputHeaderCell()}
+          {getSortableHeaderCell(translate('populationCourses.number'), tableColumnNames.PASSED)}
+          {getSortableHeaderCell(translate('populationCourses.passedAfterRetry'), tableColumnNames.RETRY_PASSED)}
+          {getSortableHeaderCell(translate('populationCourses.percentage'), tableColumnNames.PERCENTAGE)}
+          {getSortableHeaderCell(translate('populationCourses.number'), tableColumnNames.FAILED)}
+          {getSortableHeaderCell(translate('populationCourses.failedManyTimes'), tableColumnNames.FAILED_MANY)}
+          {getSortableHeaderCell(translate('populationCourses.number'), tableColumnNames.ATTEMPTS)}
+          {getSortableHeaderCell(translate('populationCourses.perStudent'), tableColumnNames.PER_STUDENT)}
+          {getSortableHeaderCell(translate('populationCourses.passed'), tableColumnNames.PASSED_OF_POPULATION)}
+          {getSortableHeaderCell(translate('populationCourses.attempted'), tableColumnNames.TRIED_OF_POPULATION)}
         </Table.Row>
       </Table.Header>
-      <Table.Body>
-        {courses.coursestatistics
-          .sort(this.criteria()).filter(this.limit() && this.codeFilter()).map(course => (
-            <Table.Row key={course.course.code} active={this.active(course.course)}>
-              <Table.Cell onClick={this.limitPopulationToCourse(course)}>
-                {course.course.name[language]}
-              </Table.Cell>
-              <Table.Cell
-                icon="level up alternate"
-                onClick={() => {
-                  this.props.history.push('/coursestatistics/')
-                  this.props.getMultipleCourseStatistics({
-                    codes: [course.course.code],
-                    start: Number(this.props.query.year),
-                    end: Number(moment(moment(this.props.query.year, 'YYYY').add(this.props.query.months, 'months')).format('YYYY')),
-                    separate: false,
-                    language: this.props.language
-                  })
-                }}
-                style={{
-                  borderLeft: '0px !important',
-                  display: 'none'
-                }}
-              />
-              <Table.Cell>{course.course.code}</Table.Cell>
-              <Table.Cell>
-                {course.stats.passed + course.stats.failed}
-              </Table.Cell>
-              <Table.Cell>
-                {course.stats.passed}
-              </Table.Cell>
-              <Table.Cell>
-                {course.stats.retryPassed}
-              </Table.Cell>
-              <Table.Cell>{course.stats.percentage} %</Table.Cell>
-              <Table.Cell>
-                {course.stats.failed}
-              </Table.Cell>
-              <Table.Cell>
-                {course.stats.failedMany}
-              </Table.Cell>
-              <Table.Cell>{course.stats.attempts}</Table.Cell>
-              <Table.Cell>
-                {course.stats.perStudent.toFixed(2)}
-              </Table.Cell>
-              <Table.Cell>{course.stats.passedOfPopulation} %</Table.Cell>
-              <Table.Cell>{course.stats.triedOfPopulation} %</Table.Cell>
-            </Table.Row>))}
-      </Table.Body>
-    </Table>
-  )
+    )
+
+    const getCourseRow = (courseStats) => {
+      const { course, stats } = courseStats
+      const { code, name } = course
+      const {
+        failed,
+        passed,
+        retryPassed,
+        failedMany,
+        attempts,
+        percentage,
+        perStudent,
+        passedOfPopulation,
+        triedOfPopulation
+      } = stats
+      return ((
+        <Table.Row key={code} active={this.isActiveCourse(course)}>
+          <Table.Cell
+            onClick={() => this.limitPopulationToCourse(courseStats)}
+            content={name[language]}
+          />
+          <Table.Cell
+            icon="level up alternate"
+            onClick={() => this.onGoToCourseStatisticsClick(code)}
+            className={styles.iconCell}
+          />
+          <Table.Cell content={code} />
+          <Table.Cell content={passed + failed} />
+          <Table.Cell content={passed} />
+          <Table.Cell content={retryPassed} />
+          <Table.Cell content={`${percentage} %`} />
+          <Table.Cell content={failed} />
+          <Table.Cell content={failedMany} />
+          <Table.Cell content={attempts} />
+          <Table.Cell content={perStudent.toFixed(2)} />
+          <Table.Cell content={`${passedOfPopulation}  %`} />
+          <Table.Cell content={`${triedOfPopulation}  %`} />
+        </Table.Row>)
+      )
+    }
+
+    return (
+      <Table celled sortable>
+        {getTableHeader()}
+        <Table.Body>
+          {courseStatistics.map(getCourseRow)}
+        </Table.Body>
+      </Table>
+    )
+  }
 
   render() {
     const { courses, translate } = this.props
-    const { reversed } = this.state
-    const direction = reversed ? 'descending' : 'ascending'
-    if (courses.length === 0) return null
+    const { studentAmountLimit } = this.state
+
+    if (courses.length === 0) {
+      return null
+    }
+
     return (
       <div>
         <Form>
           <Form.Field inline>
             <label>{translate('populationCourses.limit')}</label>
             <Input
-              value={this.state.limit}
-              onChange={e => this.setState({ limit: e.target.value })}
+              value={studentAmountLimit}
+              onChange={this.onStudentAmountLimitChange}
             />
-            <Button icon floated="right" onClick={() => this.setState({ showGradeDistribution: !this.state.showGradeDistribution })}>
-              <Icon color="black" size="big" name="chart bar" />
+            <Button floated="right" onClick={() => this.setActiveView('passingSemester')}>
+              When course is passed
+            </Button>
+            <Button floated="right" onClick={() => this.setActiveView('showGradeDistribution')}>
+              Grades table
+            </Button>
+            <Button floated="right" onClick={() => this.setActiveView(null)}>
+              Basic table
             </Button>
           </Form.Field>
         </Form>
-        {this.state.showGradeDistribution ?
-          this.renderGradeDistributionTable(this.props, this.state)
-          :
-          this.renderBasicTable(this.props, this.state, direction)
-        }
+
+        {this.renderActiveView()}
       </div>
     )
   }

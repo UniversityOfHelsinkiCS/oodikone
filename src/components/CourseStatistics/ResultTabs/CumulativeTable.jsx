@@ -16,7 +16,8 @@ const CumulativeTable = ({ stats, name }) => (
         {
           key: 'PASSRATE',
           title: 'Pass rate',
-          getRowVal: s => s.cumulative.categories.passed / (s.cumulative.categories.failed + s.cumulative.categories.passed),
+          getRowVal: s => s.cumulative.categories.passed /
+            (s.cumulative.categories.failed + s.cumulative.categories.passed),
           getRowContent: stat => `${Number((100 * stat.cumulative.categories.passed) /
             (stat.cumulative.categories.failed + stat.cumulative.categories.passed)).toFixed(2)} %`,
           cellProps: { width: 4 }
