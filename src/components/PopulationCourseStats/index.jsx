@@ -204,14 +204,18 @@ class PopulationCourseStats extends Component {
       </Table.HeaderCell>)
   }
 
-  renderActiveView(direction) {
+  renderActiveView() {
+    const { courses } = this.props
+    const { courseStatistics } = this.state
+    const courseStats = courseStatistics || courses.coursestatistics
+
     switch (this.state.activeView) {
       case 'showGradeDistribution':
-        return this.renderGradeDistributionTable(this.props, this.state)
+        return this.renderGradeDistributionTable(courseStats)
       case 'passingSemester':
-        return <PassingSemesters courses={this.props.courses} />
+        return <PassingSemesters courses={courseStats} />
       default:
-        return this.renderBasicTable(this.props, this.state, direction)
+        return this.renderBasicTable(courseStats)
     }
   }
 
@@ -400,13 +404,11 @@ class PopulationCourseStats extends Component {
 
   render() {
     const { courses, translate } = this.props
-    const { studentAmountLimit, showGradeDistribution, courseStatistics } = this.state
+    const { studentAmountLimit } = this.state
 
     if (courses.length === 0) {
       return null
     }
-
-    const courseStats = courseStatistics || courses.coursestatistics
 
     return (
       <div>
@@ -429,23 +431,11 @@ class PopulationCourseStats extends Component {
           </Form.Field>
         </Form>
 
-        {this.renderActiveView(direction)}
+        {this.renderActiveView()}
       </div>
     )
   }
 }
-
-/*
-      <Button icon floated="right" onClick={() => this.setState({ showGradeDistribution: !showGradeDistribution })}>
-        <Icon color="black" size="big" name="chart bar" />
-      </Button>
-    </Form.Field>
-  </Form>
-  {showGradeDistribution
-    ? this.renderGradeDistributionTable(courseStats)
-    : this.renderBasicTable(courseStats)
-  }
-*/
 
 const mapStateToProps = (state) => {
   const courseFilters = state.populationFilters.filters.filter(f => f.type === 'CourseParticipation')

@@ -16,8 +16,7 @@ export default class PassingSemesters extends Component {
   }
 
   render() {
-    const { courses } = this.props
-    const { coursestatistics } = courses
+    const { coursestatistics} = this.props
 
     return (
       <div>
