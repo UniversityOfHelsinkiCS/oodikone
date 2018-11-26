@@ -48,12 +48,12 @@ class Main extends Component {
     this.ping()
   }
 
-  setNetworkError = () => this.setState({ guide: 'Oodikone is unable to connect. Double check that you\'re in eduroam or have pulse security on. Refresh by pressing F5.', networkError: true })
-
   componentDidCatch(e) {
     Sentry.captureException(e)
     this.setState({ hasError: true, loaded: true })
   }
+
+  setNetworkError = () => this.setState({ guide: 'Oodikone is unable to connect. Double check that you\'re in eduroam or have pulse security on. Refresh by pressing F5.', networkError: true })
 
   ping = async () => {
     try {
