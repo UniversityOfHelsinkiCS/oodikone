@@ -1,9 +1,13 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
 const { orderBy } = require('lodash')
-const { Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails, Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement } = require('../models')
+const {
+  Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails,
+  Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement
+} = require('../models')
 const { getAllDuplicates, byName } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
+const { getPassingSemester } = require('../util/semester')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -26,7 +30,11 @@ const semesterEnd = {
   FALL: '12-31'
 }
 
-const formatStudentForPopulationStatistics = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments, transfers, updatedAt, createdAt }, startDate, endDate) => {
+const formatStudentForPopulationStatistics = ({
+  firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount,
+  matriculationexamination, gender, credits, abbreviatedname, email, studyrights,
+  semester_enrollments, transfers, updatedAt, createdAt
+}, startDate, endDate) => {
 
   const toCourse = ({ grade, attainment_date, credits, course, credittypecode, isStudyModule }) => {
     course = course.get()
@@ -372,13 +380,15 @@ const parseCreditInfo = credit => ({
   grade: credit.grade,
   passingGrade: Credit.passed(credit),
   failingGrade: Credit.failed(credit),
-  improvedGrade: Credit.improved(credit)
+  improvedGrade: Credit.improved(credit),
+  date: credit.attainment_date
 })
 
 const bottlenecksOf = async (query) => {
   if (!query.semesters.map(semester => semester === 'FALL' || semester === 'SPRING').every(e => e === true)) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
+
   const { studyRights, startDate, endDate, months } = parseQueryParams(query)
   const bottlenecks = {
     disciplines: {},
@@ -391,14 +401,17 @@ const bottlenecksOf = async (query) => {
   const allcoursestatistics = await courses.reduce(async (coursestatistics, course) => {
     const stats = await coursestatistics
     let { code, name, disciplines, course_type } = course
+
     if (name.fi && name.fi.includes('Avoin yo:')) {
       const courses = await byName(name.fi.split(': ')[1], 'fi')
       const theOne = courses.length > 0 ? orderBy(courses, ['date'], ['desc'])[0] : { name, code }
       code = theOne.code
       name = theOne.name
     }
+
     const unifiedcode = getUnifiedCode(code, codeduplicates)
     const coursestats = stats[unifiedcode] || new CourseStatsCounter(code, name, allstudents)
+
     coursestats.addCourseType(course_type.coursetypecode, course_type.name)
     bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
     disciplines.forEach(({ discipline_id, name }) => {
@@ -406,13 +419,19 @@ const bottlenecksOf = async (query) => {
       bottlenecks.disciplines[discipline_id] = name
     })
     course.credits.forEach(credit => {
-      const { studentnumber, passingGrade, improvedGrade, failingGrade, grade } = parseCreditInfo(credit)
-      coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade)
+      const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
+      const semester = getPassingSemester(parseInt(query.year, 10), date)
+
+      coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
     })
+
     stats[unifiedcode] = coursestats
+
     return stats
   }, Promise.resolve({}))
+
   bottlenecks.coursestatistics = Object.values(allcoursestatistics).map(coursestatistics => coursestatistics.getFinalStats())
+
   return bottlenecks
 }
 
