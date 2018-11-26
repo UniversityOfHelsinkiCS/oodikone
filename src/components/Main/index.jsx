@@ -11,6 +11,7 @@ import WelcomePage from '../WelcomePage'
 import StudentStatistics from '../StudentStatistics'
 import CourseStatistics from '../CourseStatistics'
 import EnableUsers from '../EnableUsers'
+import CourseGroups from '../CourseGroups'
 import Settings from '../Settings'
 import ErrorContainer from '../ErrorContainer'
 import { routes, BASE_PATH, hiddenRoutes } from '../../constants'
@@ -107,6 +108,7 @@ class Main extends Component {
               <Route exact path={routes.populations.route} component={Populations} />
               <Route exact path={routes.students.route} component={StudentStatistics} />
               <Route exact path={routes.courseStatistics.route} component={CourseStatistics} />
+              <Route exact path={routes.courseGroups.route} component={CourseGroups} />
               <Route exact path={routes.settings.route} component={Settings} />
               <Route exact path={routes.users.route} component={EnableUsers} />
               <Route exact path={routes.teachers.route} component={Teachers} />
