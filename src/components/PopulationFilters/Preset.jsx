@@ -14,12 +14,14 @@ class Preset extends Component {
     deletePopulationFilter: func.isRequired,
     destroy: func.isRequired
   }
+
   state = { open: false }
 
   handleSetFilter = (filter) => {
     this.props.filter.notSet = false
     this.props.setPopulationFilter(presetFilter(filter))
   }
+
   clearFilter = (destroy = false) => {
     this.props.filter.notSet = true
     if (destroy) {
@@ -27,6 +29,7 @@ class Preset extends Component {
     }
     this.props.removePopulationFilter(this.props.filter.id)
   }
+
   render() {
     const { filter } = this.props
     if (filter.notSet) {

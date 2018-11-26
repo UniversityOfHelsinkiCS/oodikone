@@ -7,16 +7,19 @@ class StackedBarChart extends Component {
   state = {
     graphOptions: {}
   }
+
   componentDidMount() {
     const { options, series } = this.props
     this.setState({ graphOptions: { ...options, series } })
   }
+
   componentDidUpdate(prevProps) {
     if (this.props.series !== prevProps.series) {
       const { options, series } = this.props
       this.setState({ graphOptions: { ...options, series } }) //eslint-disable-line
     }
   }
+
   render() {
     return (
       <div>
