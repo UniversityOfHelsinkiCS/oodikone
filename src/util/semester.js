@@ -13,7 +13,7 @@ const getPassingSemester = (startYear, date) => {
   const yearDiff = year - startYear
   const yearCount = semester === 'SPRING' ? yearDiff - 1 : yearDiff
 
-  if (year < startYear) {
+  if (year < startYear || (semester === 'SPRING' && yearDiff <= 0)) {
     return 'BEFORE'
   }
 
