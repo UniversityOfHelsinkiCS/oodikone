@@ -104,6 +104,7 @@ class SingleCourseStats extends Component {
     const comparison = !programmes[c] ? undefined : c
     return { primary, comparison }
   }
+
   changeMode = () => {
     this.setState({ cumMode: !this.state.cumMode })
   }

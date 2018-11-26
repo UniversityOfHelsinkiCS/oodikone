@@ -70,6 +70,7 @@ class PopulationFilters extends Component {
     advancedUser: false,
     modalOpen: false
   }
+
   componentDidUpdate(prevProps) {
     if (this.state.firstRenderKludge || (this.props.populationCourses.pending === false
       && prevProps.populationCourses.pending === true)
@@ -81,6 +82,7 @@ class PopulationFilters extends Component {
          but note that it must be wrapped in a condition */
     }
   }
+
   formatFilter = (filter) => {
     let filterToSave = {}
     if (filter.type === 'Preset') {
@@ -107,6 +109,7 @@ class PopulationFilters extends Component {
     }
     return filterToSave
   }
+
   handleSavePopulationFilters = () => {
     const preset = {
       id: uuidv4(),

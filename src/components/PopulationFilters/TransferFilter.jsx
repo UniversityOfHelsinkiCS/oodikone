@@ -21,6 +21,7 @@ class TransferFilter extends Component {
     selectedSource: '',
     selectedTarget: ''
   }
+
   getName = (code) => {
     const { transfers } = this.props
     const mergedTransfers = { ...Object.values(transfers)[0], ...Object.values(transfers)[1] }
@@ -42,6 +43,7 @@ class TransferFilter extends Component {
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
   }
+
   renderFilterText = (filter) => {
     const sourceName = this.getName(filter.params.source)
     const targetName = this.getName(filter.params.target)
