@@ -7,7 +7,7 @@ export default class PassingSemesters extends Component {
     super(props)
 
     this.state = {
-      cumulativeStats: true
+      cumulativeStats: false
     }
   }
 
@@ -16,7 +16,7 @@ export default class PassingSemesters extends Component {
   }
 
   render() {
-    const { coursestatistics} = this.props
+    const { courseStatistics } = this.props // eslint-disable-line react/prop-types
 
     return (
       <div>
@@ -49,7 +49,7 @@ export default class PassingSemesters extends Component {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {coursestatistics.map(stats => (
+            {courseStatistics.map(stats => (
               <CourseRow
                 key={stats.course.code}
                 statistics={stats}

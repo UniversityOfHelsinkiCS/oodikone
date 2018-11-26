@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Table, Form, Input, Popup, Button, Icon } from 'semantic-ui-react'
+import { Table, Form, Input, Popup, Button } from 'semantic-ui-react'
 import { func, arrayOf, object, number, shape, string, oneOf, bool } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
@@ -68,7 +68,11 @@ SortableHeaderCell.defaultProps = {
 }
 
 const formatGradeDistribution = grades =>
-  _.replace(JSON.stringify(_.sortBy(Object.entries(grades).map(([key, value]) => ({ [key]: value.count })), o => -Object.keys(o)), null, 1), /\[\n|{\n*|{\s|}|\s*}|]|"|,/g, '')
+  _.replace(JSON.stringify(
+    _.sortBy(Object.entries(grades)
+      .map(([key, value]) => ({ [key]: value.count })), o => -Object.keys(o)),
+    null, 1
+  ), /\[\n|{\n*|{\s|}|\s*}|]|"|,/g, '')
 
 class PopulationCourseStats extends Component {
   static propTypes = {
@@ -88,12 +92,47 @@ class PopulationCourseStats extends Component {
     query: shape({}).isRequired
   }
 
+  static getDerivedStateFromProps(props, state) {
+    if (state && !state.initialSortReady && props.courses.coursestatistics) {
+      state.courseStatistics = PopulationCourseStats.updateCourseStatisticsCriteria(props, state)
+      state.initialSortReady = true
+    }
+
+    return state
+  }
+
+  static updateCourseStatisticsCriteria(props, state) {
+    const { studentAmountLimit, sortCriteria, codeFilter, reversed } = state
+    const { courses: { coursestatistics } } = props
+
+    const studentAmountFilter = ({ stats }) => {
+      const { students } = stats
+      return studentAmountLimit === 0 || students >= studentAmountLimit
+    }
+    const courseCodeFilter = ({ course }) => {
+      const { code } = course
+      return code.toLowerCase().includes(codeFilter.toLowerCase())
+    }
+
+    const filteredCourses = coursestatistics
+      .filter(studentAmountFilter)
+      .filter(c => !codeFilter || courseCodeFilter(c))
+
+    const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
+
+    const courseStatistics = _.orderBy(
+      filteredCourses, (course => [course.stats[sortCriteria], course.code]
+      ), [lodashSortOrder, lodashSortOrderTypes.DESC]
+    )
+
+    return courseStatistics
+  }
+
   state = {
     sortCriteria: tableColumnNames.STUDENTS,
     reversed: false,
     studentAmountLimit: parseInt(this.props.populationSize * 0.15, 10),
     codeFilter: '',
-    showGradeDistribution: false,
     activeView: null
   }
 
@@ -146,29 +185,7 @@ class PopulationCourseStats extends Component {
   setActiveView = activeView => this.setState({ activeView })
 
   handleCourseStatisticsCriteriaChange = () => {
-    const { studentAmountLimit, sortCriteria, codeFilter, reversed } = this.state
-    const { courses: { coursestatistics } } = this.props
-
-    const studentAmountFilter = ({ stats }) => {
-      const { students } = stats
-      return studentAmountLimit === 0 || students >= studentAmountLimit
-    }
-    const courseCodeFilter = ({ course }) => {
-      const { code } = course
-      return code.toLowerCase().includes(codeFilter.toLowerCase())
-    }
-
-    const filteredCourses = coursestatistics
-      .filter(studentAmountFilter)
-      .filter(c => !codeFilter || courseCodeFilter(c))
-
-    const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
-
-    const courseStatistics = _.orderBy(
-      filteredCourses, (course => [course.stats[sortCriteria], course.code]
-      ), [lodashSortOrder, lodashSortOrderTypes.DESC]
-    )
-
+    const courseStatistics = PopulationCourseStats.updateCourseStatisticsCriteria(this.props, this.state)
     this.setState({ courseStatistics })
   }
 
@@ -213,7 +230,7 @@ class PopulationCourseStats extends Component {
       case 'showGradeDistribution':
         return this.renderGradeDistributionTable(courseStats)
       case 'passingSemester':
-        return <PassingSemesters courses={courseStats} />
+        return <PassingSemesters courseStatistics={courseStats} />
       default:
         return this.renderBasicTable(courseStats)
     }
@@ -314,7 +331,6 @@ class PopulationCourseStats extends Component {
   renderBasicTable = (courseStatistics) => {
     const { translate, language } = this.props
     const { sortCriteria, reversed } = this.state
-
 
     const getSortableHeaderCell = (label, columnName, rowSpan = 1) =>
       (<SortableHeaderCell
