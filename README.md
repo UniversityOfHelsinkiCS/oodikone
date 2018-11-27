@@ -186,7 +186,7 @@ To update your database run `npm run update_database` with optional args `file="
 Use the following to run in detached shell
 
 ```
-nohup docker exec backend npm run update_database file="/data/all_student_numbers.txt"
+nohup docker exec backend npm run update_database file="/data/all_student_numbers.txt" &
 ```
 
 ### Anonymize data
