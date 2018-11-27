@@ -153,6 +153,10 @@ export const gradeGraphOptions = (categories, max) => ({
     text: 'Grades'
   },
 
+  legend: {
+    enabled: false
+  },
+
   xAxis: {
     categories
   },

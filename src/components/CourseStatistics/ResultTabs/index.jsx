@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Tab, Grid, Radio, Form } from 'semantic-ui-react'
 import { shape, string, number, oneOfType, arrayOf, func, bool } from 'prop-types'
 
-import { userIsAdmin } from '../../../common'
 import StackedBarChart from '../../StackedBarChart'
 import { passRateCumGraphOptions, passRateStudGraphOptions, gradeGraphOptions } from '../../../constants'
 import CumulativeTable from './CumulativeTable'
@@ -113,19 +112,16 @@ const getGradeStudSeriesFromStats = (stats, multiplier = 1, name = '') => {
   return getGradeSeries(series, multiplier, name)
 }
 
+const getMaxValueOfSeries = series => Object.values(series).reduce((acc, cur) => {
+  const curMax = Math.max(...cur.data.map(Math.abs))
+  return curMax >= acc ? curMax : acc
+}, 0)
+
 class ResultTabs extends Component {
-  state = {
-  }
-
-  async componentDidMount() {
-    const adminRights = await userIsAdmin()
-
-    this.setState({ adminRights })
-  }
+  state = {}
 
   render() {
-    const { max, primary, comparison, changeMode, cumMode } = this.props
-    const { maxPassRateVal, maxGradeVal } = max
+    const { primary, comparison, changeMode, cumMode } = this.props
 
     const primaryName = 'primary'
     const comparisonName = 'comparison'
@@ -142,12 +138,15 @@ class ResultTabs extends Component {
       ...passGraphSerieFn(comparisonStats, comparisonMultiplier, comparisonName)
     ]
 
+    const maxPassRateVal = getMaxValueOfSeries(passGraphSerie)
+
     const graphOptions = graphOptionsFn(primaryStats.map(year => year.name), maxPassRateVal)
 
     const gradeGraphSerie = [
       ...gradeGraphSerieFn(primaryStats, primaryMultiplier, primaryName),
       ...gradeGraphSerieFn(comparisonStats, comparisonMultiplier, comparisonName)
     ]
+    const maxGradeValue = getMaxValueOfSeries(gradeGraphSerie)
 
     const panes = [
       {
@@ -157,20 +156,18 @@ class ResultTabs extends Component {
             <Grid.Row>
               {primary && (
                 <Grid.Column>
-                  {cumMode ?
-                    <CumulativeTable name={primary.name} stats={primary.stats} />
-                    :
-                    <StudentTable name={primary.name} stats={primary.stats} />
+                  {cumMode
+                    ? <CumulativeTable name={primary.name} stats={primary.stats} />
+                    : <StudentTable name={primary.name} stats={primary.stats} />
                   }
                 </Grid.Column>
               )}
               {
                 comparison && (
                   <Grid.Column>
-                    {cumMode ?
-                      <CumulativeTable name={comparison.name} stats={comparison.stats} />
-                      :
-                      <StudentTable name={comparison.name} stats={comparison.stats} />
+                    {cumMode
+                      ? <CumulativeTable name={comparison.name} stats={comparison.stats} />
+                      : <StudentTable name={comparison.name} stats={comparison.stats} />
                     }
                   </Grid.Column>
                 )
@@ -195,11 +192,8 @@ class ResultTabs extends Component {
             </Grid.Row>
           </Grid>
         )
-      }
-    ]
-
-    if (this.state.adminRights) {
-      panes.push({
+      },
+      {
         menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
         render: () => (
           <Grid padded="vertically" columns="equal">
@@ -207,7 +201,7 @@ class ResultTabs extends Component {
               {primary && (
                 <Grid.Column>
                   <StackedBarChart
-                    options={gradeGraphOptions(primary.stats.map(year => year.name), maxGradeVal)}
+                    options={gradeGraphOptions(primary.stats.map(year => year.name), maxGradeValue)}
                     series={gradeGraphSerie}
                   />
                 </Grid.Column>
@@ -215,8 +209,8 @@ class ResultTabs extends Component {
             </Grid.Row>
           </Grid>
         )
-      })
-    }
+      }
+    ]
 
     return (
       <div>
@@ -254,10 +248,6 @@ ResultTabs.propTypes = {
     code: oneOfType([string, number]),
     stats: arrayOf(shape({}))
   }),
-  max: shape({
-    maxPassRateVal: number,
-    maxGradeVal: number
-  }).isRequired,
   changeMode: func.isRequired,
   cumMode: bool.isRequired
 }
