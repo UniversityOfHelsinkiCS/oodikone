@@ -10,9 +10,9 @@ const run = async () => {
 
   const result = await bottlenecksOf(o)
   
-  console.log(JSON.stringify(result.coursestatistics[0].stats, null, 2))
+  //console.log(JSON.stringify(result.coursestatistics[0].stats, null, 2))
   
-  console.log(result.coursestatistics.length)
+  //console.log(result.coursestatistics.length)
 
   process.exit()
 }
