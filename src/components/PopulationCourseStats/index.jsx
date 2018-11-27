@@ -10,7 +10,6 @@ import moment from 'moment'
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
 import { getMultipleCourseStatistics } from '../../redux/courseStatistics'
 import { courseParticipation } from '../../populationFilters'
-import { userIsAdmin } from '../../common'
 import PassingSemesters from './PassingSemesters'
 
 import styles from './populationCourseStats.css'
@@ -135,13 +134,7 @@ class PopulationCourseStats extends Component {
     reversed: true,
     studentAmountLimit: parseInt(this.props.populationSize * 0.15, 10),
     codeFilter: '',
-    activeView: null,
-    isAdmin: false
-  }
-
-  async componentDidMount() {
-    const isAdmin = await userIsAdmin()
-    this.setState({ isAdmin })
+    activeView: null
   }
 
   onCodeFilterChange = (e) => {
@@ -449,14 +442,13 @@ class PopulationCourseStats extends Component {
               value={studentAmountLimit}
               onChange={this.onStudentAmountLimitChange}
             />
-            {this.state.isAdmin &&
-              <Button
-                active={this.state.activeView === 'passingSemester'}
-                floated="right"
-                onClick={() => this.setActiveView('passingSemester')}
-              >
-                when passed
-              </Button>}
+            <Button
+              active={this.state.activeView === 'passingSemester'}
+              floated="right"
+              onClick={() => this.setActiveView('passingSemester')}
+            >
+              when passed
+            </Button>
             <Button
               active={this.state.activeView === 'showGradeDistribution'}
               floated="right"
