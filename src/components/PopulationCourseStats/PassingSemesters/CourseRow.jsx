@@ -1,6 +1,8 @@
 import React, { Fragment } from 'react'
 import { Table } from 'semantic-ui-react'
 
+import styles from '../populationCourseStats.css'
+
 const getYearCount = (year, passingSemesters) => passingSemesters[`${year}-FALL`] + passingSemesters[`${year}-SPRING`]
 const getCumulativeYearCount = (year, passingSemesters) => {
   if (passingSemesters[`${year}-FALL`] === passingSemesters[`${year}-SPRING`]) {
@@ -56,23 +58,25 @@ const renderCumulativeStatistics = passingSemesters => (
   </Fragment>
 )
 
-export default ({ statistics, cumulative }) => { // eslint-disable-line react/prop-types
-  const { stats } = statistics
+// eslint-disable-next-line react/prop-types
+export default ({ statistics, cumulative, onCourseNameClickFn, isActiveCourseFn }) => {
+  const { stats, course } = statistics
   const passingSemesters = cumulative ? stats.passingSemestersCumulative : stats.passingSemesters
+  const isActive = isActiveCourseFn(course)
 
   return (
-    <Table.Row key={statistics.course.code}>
-      <Table.Cell>
-        {statistics.course.code}
+    <Table.Row key={course.code} active={isActive}>
+      <Table.Cell onClick={() => onCourseNameClickFn(statistics)} className={styles.clickableCell}>
+        {course.name.fi}
       </Table.Cell>
       <Table.Cell>
-        {statistics.course.name.fi}
+        {course.code}
       </Table.Cell>
       <Table.Cell>
-        {statistics.stats.students}
+        {stats.students}
       </Table.Cell>
       <Table.Cell>
-        {statistics.stats.passed}
+        {stats.passed}
       </Table.Cell>
 
       {cumulative

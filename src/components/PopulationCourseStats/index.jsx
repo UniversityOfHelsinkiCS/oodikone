@@ -190,20 +190,20 @@ class PopulationCourseStats extends Component {
     })
   }
 
+  onCourseNameCellClick = (courseStats) => {
+    if (!this.isActiveCourse(courseStats.course)) {
+      const params = { course: courseStats, field: 'all' }
+      this.props.setPopulationFilter(courseParticipation(params))
+    } else {
+      this.props.removePopulationFilterOfCourse(courseStats.course)
+    }
+  }
+
   setActiveView = activeView => this.setState({ activeView })
 
   handleCourseStatisticsCriteriaChange = () => {
     const courseStatistics = PopulationCourseStats.updateCourseStatisticsCriteria(this.props, this.state)
     this.setState({ courseStatistics })
-  }
-
-  limitPopulationToCourse = courseStats => () => {
-    if (!this.active(courseStats.course)) {
-      const params = { courseStats, field: 'all' }
-      this.props.setPopulationFilter(courseParticipation(params))
-    } else {
-      this.props.removePopulationFilterOfCourse(courseStats.course)
-    }
   }
 
   isActiveCourse = (course) => {
@@ -238,7 +238,11 @@ class PopulationCourseStats extends Component {
       case 'showGradeDistribution':
         return this.renderGradeDistributionTable(courseStats)
       case 'passingSemester':
-        return <PassingSemesters courseStatistics={courseStats} />
+        return (<PassingSemesters
+          courseStatistics={courseStats}
+          onCourseNameClickFn={this.onCourseNameCellClick}
+          isActiveCourseFn={this.isActiveCourse}
+        />)
       default:
         return this.renderBasicTable(courseStats)
     }
@@ -290,8 +294,9 @@ class PopulationCourseStats extends Component {
       return (
         <Table.Row active={this.isActiveCourse(course)}>
           <Table.Cell
-            onClick={() => this.limitPopulationToCourse(courseStats)}
+            onClick={() => this.onCourseNameCellClick(courseStats)}
             content={name[language]}
+            className={styles.clickableCell}
           />
           <Table.Cell
             icon="level up alternate"
@@ -393,8 +398,9 @@ class PopulationCourseStats extends Component {
       return ((
         <Table.Row key={code} active={this.isActiveCourse(course)}>
           <Table.Cell
-            onClick={() => this.limitPopulationToCourse(courseStats)}
+            onClick={() => this.onCourseNameCellClick(courseStats)}
             content={name[language]}
+            className={styles.clickableCell}
           />
           <Table.Cell
             icon="level up alternate"
