@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 
-const notNumeric = str => !Number.isNaN(str)
+const notNumeric = str => !Number(str)
 
 const formatGradeName = name => name.slice(0, -2)
 
