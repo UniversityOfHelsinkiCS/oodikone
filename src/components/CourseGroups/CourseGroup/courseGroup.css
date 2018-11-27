@@ -1,0 +1,9 @@
+.courseGroupHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.returnIconButton {
+  font-size: 1em !important;
+  background: transparent !important;
+}
