@@ -16,8 +16,8 @@ export default class PassingSemesters extends Component {
   }
 
   render() {
-    const { courseStatistics } = this.props // eslint-disable-line react/prop-types
-
+    // eslint-disable-next-line react/prop-types
+    const { courseStatistics, onCourseNameClickFn, isActiveCourseFn } = this.props
     return (
       <div>
         <Checkbox
@@ -29,8 +29,8 @@ export default class PassingSemesters extends Component {
         <Table celled>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Course code</Table.HeaderCell>
               <Table.HeaderCell>Course name</Table.HeaderCell>
+              <Table.HeaderCell>Course code</Table.HeaderCell>
               <Table.HeaderCell>Students</Table.HeaderCell>
               <Table.HeaderCell>Passed</Table.HeaderCell>
 
@@ -53,6 +53,8 @@ export default class PassingSemesters extends Component {
               <CourseRow
                 key={stats.course.code}
                 statistics={stats}
+                isActiveCourseFn={isActiveCourseFn}
+                onCourseNameClickFn={onCourseNameClickFn}
                 cumulative={this.state.cumulativeStats}
               />
             ))}
