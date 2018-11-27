@@ -8,34 +8,44 @@ import Highcharts from 'highcharts'
 const FONTSIZE = 20
 
 class CourseGradeGraph extends Component {
-    state={}
+  state={
+    focused: undefined
+  }
 
-    render() {
-      const { height, categories, series, onClickCategory } = this.props
-      return (
-        <div style={{ minHeight: height }}>
-          <HighchartsChart>
-            <XAxis
-              categories={categories}
-              title={{
+  handleLegendClick = (event) => {
+    const { name } = event.target
+    event.preventDefault()
+    this.setState({
+      focused: (this.state.focused !== name) ? name : undefined
+    })
+  }
+
+  render() {
+    const { height, categories, series, onClickCategory } = this.props
+    return (
+      <div style={{ minHeight: height }}>
+        <HighchartsChart>
+          <XAxis
+            categories={categories}
+            title={{
                 text: 'Grades',
                 style: { fontSize: FONTSIZE }
               }}
-              labels={{
+            labels={{
                 style: {
                   fontSize: 15
                 }
               }}
-            />
-            <YAxis
-              min={0}
-              max={5}
-              title={{
+          />
+          <YAxis
+            min={0}
+            max={5}
+            title={{
                 text: 'Profile dimensions',
                 style: { fontSize: FONTSIZE }
               }}
-            >
-              {series.map(({ name, data }) => {
+          >
+            {series.map(({ name, data }) => {
                 const formatted = data.map((val, i) => ({
                   y: val,
                   selected: (this.props.selected === categories[i]),
@@ -48,16 +58,20 @@ class CourseGradeGraph extends Component {
                     key={name}
                     name={name}
                     data={formatted}
+                    visible={!this.state.focused || (name === this.state.focused)}
+                    events={{
+                      legendItemClick: this.handleLegendClick
+                    }}
                   />
                   )
                 })}
-            </YAxis>
-            <Legend />
-            <Tooltip />
-          </HighchartsChart>
-        </div>
-      )
-    }
+          </YAxis>
+          <Legend />
+          <Tooltip />
+        </HighchartsChart>
+      </div>
+    )
+  }
 }
 
 CourseGradeGraph.propTypes = {
