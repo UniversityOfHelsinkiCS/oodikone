@@ -1,15 +1,75 @@
-import React from 'react'
-import { shape } from 'prop-types'
+import React, { Component } from 'react'
+import { string, shape, arrayOf, number, func } from 'prop-types'
+import {
+  HighchartsChart, withHighcharts, XAxis, YAxis, SplineSeries, Legend, Tooltip
+} from 'react-jsx-highcharts'
+import Highcharts from 'highcharts'
 
-const CourseGradeGraph = ({ data }) => {
-    console.log(data)
-    return (
-        <p>hello</p>
-    )
+const FONTSIZE = 20
+
+class CourseGradeGraph extends Component {
+    state={}
+
+    render() {
+      const { height, categories, series, onClickCategory } = this.props
+      return (
+        <div style={{ minHeight: height }}>
+          <HighchartsChart>
+            <XAxis
+              categories={categories}
+              title={{
+                text: 'Grades',
+                style: { fontSize: FONTSIZE }
+              }}
+              labels={{
+                style: {
+                  fontSize: 15
+                }
+              }}
+            />
+            <YAxis
+              min={0}
+              max={5}
+              title={{
+                text: 'Profile dimensions',
+                style: { fontSize: FONTSIZE }
+              }}
+            >
+              {series.map(({ name, data }) => {
+                const formatted = data.map((val, i) => ({
+                  y: val,
+                  selected: (this.props.selected === categories[i]),
+                  events: {
+                    mouseOver: () => onClickCategory(categories[i])
+                  }
+                }))
+                return (
+                  <SplineSeries
+                    key={name}
+                    name={name}
+                    data={formatted}
+                  />
+                  )
+                })}
+            </YAxis>
+            <Legend />
+            <Tooltip />
+          </HighchartsChart>
+        </div>
+      )
+    }
 }
 
 CourseGradeGraph.propTypes = {
-    data: shape({}).isRequired
+  categories: arrayOf(string).isRequired,
+  series: arrayOf(shape({})).isRequired,
+  selected: string.isRequired,
+  height: number,
+  onClickCategory: func.isRequired
 }
 
-export default CourseGradeGraph
+CourseGradeGraph.defaultProps = {
+  height: 400
+}
+
+export default withHighcharts(CourseGradeGraph, Highcharts)
