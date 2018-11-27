@@ -13,7 +13,7 @@ const ProfileTable = ({ series, categories, selected }) => (
             content={c}
             textAlign="center"
           />
-                ))}
+        ))}
       </Table.Row>
     </Table.Header>
     <Table.Body>
@@ -22,13 +22,14 @@ const ProfileTable = ({ series, categories, selected }) => (
           <Table.Cell content={name} width={3} textAlign="center" />
           { data.map((value, i) => (
             <Table.Cell
+              key={categories[i]}
               content={value}
               textAlign="center"
               active={selected === categories[i]}
             />
-            ))}
+          ))}
         </Table.Row>
-            ))}
+    ))}
     </Table.Body>
   </Table>
 )
