@@ -10,6 +10,7 @@ import moment from 'moment'
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
 import { getMultipleCourseStatistics } from '../../redux/courseStatistics'
 import { courseParticipation } from '../../populationFilters'
+import { userIsAdmin } from '../../common'
 import PassingSemesters from './PassingSemesters'
 
 import styles from './populationCourseStats.css'
@@ -134,7 +135,13 @@ class PopulationCourseStats extends Component {
     reversed: true,
     studentAmountLimit: parseInt(this.props.populationSize * 0.15, 10),
     codeFilter: '',
-    activeView: null
+    activeView: null,
+    isAdmin: false
+  }
+
+  async componentDidMount() {
+    const isAdmin = await userIsAdmin()
+    this.setState({ isAdmin })
   }
 
   onCodeFilterChange = (e) => {
@@ -183,20 +190,20 @@ class PopulationCourseStats extends Component {
     })
   }
 
+  onCourseNameCellClick = (courseStats) => {
+    if (!this.isActiveCourse(courseStats.course)) {
+      const params = { course: courseStats, field: 'all' }
+      this.props.setPopulationFilter(courseParticipation(params))
+    } else {
+      this.props.removePopulationFilterOfCourse(courseStats.course)
+    }
+  }
+
   setActiveView = activeView => this.setState({ activeView })
 
   handleCourseStatisticsCriteriaChange = () => {
     const courseStatistics = PopulationCourseStats.updateCourseStatisticsCriteria(this.props, this.state)
     this.setState({ courseStatistics })
-  }
-
-  limitPopulationToCourse = courseStats => () => {
-    if (!this.active(courseStats.course)) {
-      const params = { courseStats, field: 'all' }
-      this.props.setPopulationFilter(courseParticipation(params))
-    } else {
-      this.props.removePopulationFilterOfCourse(courseStats.course)
-    }
   }
 
   isActiveCourse = (course) => {
@@ -231,7 +238,11 @@ class PopulationCourseStats extends Component {
       case 'showGradeDistribution':
         return this.renderGradeDistributionTable(courseStats)
       case 'passingSemester':
-        return <PassingSemesters courseStatistics={courseStats} />
+        return (<PassingSemesters
+          courseStatistics={courseStats}
+          onCourseNameClickFn={this.onCourseNameCellClick}
+          isActiveCourseFn={this.isActiveCourse}
+        />)
       default:
         return this.renderBasicTable(courseStats)
     }
@@ -283,8 +294,9 @@ class PopulationCourseStats extends Component {
       return (
         <Table.Row active={this.isActiveCourse(course)}>
           <Table.Cell
-            onClick={() => this.limitPopulationToCourse(courseStats)}
+            onClick={() => this.onCourseNameCellClick(courseStats)}
             content={name[language]}
+            className={styles.clickableCell}
           />
           <Table.Cell
             icon="level up alternate"
@@ -386,8 +398,9 @@ class PopulationCourseStats extends Component {
       return ((
         <Table.Row key={code} active={this.isActiveCourse(course)}>
           <Table.Cell
-            onClick={() => this.limitPopulationToCourse(courseStats)}
+            onClick={() => this.onCourseNameCellClick(courseStats)}
             content={name[language]}
+            className={styles.clickableCell}
           />
           <Table.Cell
             icon="level up alternate"
@@ -436,14 +449,27 @@ class PopulationCourseStats extends Component {
               value={studentAmountLimit}
               onChange={this.onStudentAmountLimitChange}
             />
-            <Button floated="right" onClick={() => this.setActiveView('passingSemester')}>
-              When course is passed
+            {this.state.isAdmin &&
+              <Button
+                active={this.state.activeView === 'passingSemester'}
+                floated="right"
+                onClick={() => this.setActiveView('passingSemester')}
+              >
+                when passed
+              </Button>}
+            <Button
+              active={this.state.activeView === 'showGradeDistribution'}
+              floated="right"
+              onClick={() => this.setActiveView('showGradeDistribution')}
+            >
+              grades
             </Button>
-            <Button floated="right" onClick={() => this.setActiveView('showGradeDistribution')}>
-              Grades table
-            </Button>
-            <Button floated="right" onClick={() => this.setActiveView(null)}>
-              Basic table
+            <Button
+              active={this.state.activeView === null}
+              floated="right"
+              onClick={() => this.setActiveView(null)}
+            >
+              pass/fail
             </Button>
           </Form.Field>
         </Form>

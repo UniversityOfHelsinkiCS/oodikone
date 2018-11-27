@@ -62,7 +62,7 @@ class SearchForm extends Component {
     }
   }
 
-  toggleCourse = (course) => {
+  onSelectCourse = (course) => {
     course.selected = !course.selected
     const { selectedcourses } = this.state
     const isSelected = !!selectedcourses[course.code]
@@ -79,21 +79,21 @@ class SearchForm extends Component {
     }
   }
 
-  handleChange = (e, target) => {
-    const { name, value } = target
-    this.setState({ [name]: value })
-  }
-
-  toggleCheckbox = (e, target) => {
+  onToggleCheckbox = (e, target) => {
     const { name } = target
     this.setState({ [name]: !this.state[name] })
   }
 
-  handlePrefilledLoad = () => {
-    this.setState(
-      { prefilled: true },
-      () => this.fetchCourses()
-    )
+  onSubmitFormClick = async () => {
+    const { fromYear, toYear, selectedcourses, separate } = this.state
+    const params = {
+      fromYear,
+      toYear,
+      courseCodes: Object.keys(selectedcourses),
+      separate
+    }
+
+    await this.props.getCourseStats(params)
   }
 
   fetchCourses = () => {
@@ -112,19 +112,20 @@ class SearchForm extends Component {
     return Promise.resolve()
   }
 
-  submitForm = async () => {
-    const { fromYear, toYear, selectedcourses, separate } = this.state
-    const params = {
-      fromYear,
-      toYear,
-      courseCodes: Object.keys(selectedcourses),
-      separate
-    }
-    await this.props.getCourseStats(params)
+  handlePrefilledLoad = () => {
+    this.setState(
+      { prefilled: true },
+      () => this.fetchCourses()
+    )
+  }
+
+  handleChange = (e, target) => {
+    const { name, value } = target
+    this.setState({ [name]: value })
   }
 
   render() {
-    const { years, loading, matchingCourses } = this.props
+    const { years, isLoading, matchingCourses } = this.props
     const {
       selectedcourses,
       fromYear,
@@ -136,13 +137,13 @@ class SearchForm extends Component {
 
     const courses = matchingCourses.filter(c => !selectedcourses[c.code])
 
-    const disabled = (!fromYear || Object.keys(selectedcourses).length === 0)
+    const disabled = (!fromYear || Object.keys(selectedcourses).length === 0) || isLoading
     const selected = Object.values(selectedcourses).map(course => ({ ...course, selected: true }))
     const noSelectedCourses = selected.length === 0
     const noQueryStrings = !coursename && !coursecode
 
     return (
-      <Segment loading={loading}>
+      <Segment loading={isLoading}>
         <Form>
           <Header content="Search parameters" as="h3" />
           <Form.Group widths="equal">
@@ -168,14 +169,14 @@ class SearchForm extends Component {
           <Form.Checkbox
             label="Separate statistics for Spring and Fall semesters"
             name="separate"
-            onChange={this.toggleCheckbox}
+            onChange={this.onToggleCheckbox}
             checked={separate}
           />
           <CourseTable
             title="Selected courses"
             hidden={noSelectedCourses}
             courses={selected}
-            onSelectCourse={this.toggleCourse}
+            onSelectCourse={this.onSelectCourse}
             controlIcon="remove"
           />
           <Form.Button
@@ -185,7 +186,7 @@ class SearchForm extends Component {
             basic
             positive
             content="Fetch statistics"
-            onClick={this.submitForm}
+            onClick={this.onSubmitFormClick}
           />
           <Header content="Search for courses" />
           <div
@@ -218,10 +219,10 @@ class SearchForm extends Component {
               </Form.Field>
             </Form.Group>
             <CourseTable
-              hidden={noQueryStrings}
+              hidden={noQueryStrings || isLoading}
               courses={courses}
               title="Searched courses"
-              onSelectCourse={this.toggleCourse}
+              onSelectCourse={this.onSelectCourse}
               controlIcon="plus"
             />
           </div>
@@ -238,7 +239,7 @@ SearchForm.propTypes = {
   clearCourses: func.isRequired,
   matchingCourses: arrayOf(shape({})).isRequired,
   years: arrayOf(shape({})).isRequired,
-  loading: bool.isRequired,
+  isLoading: bool.isRequired,
   coursesLoading: bool.isRequired,
   preselectedCourse: shape({})
 }
@@ -251,6 +252,7 @@ const mapStateToProps = (state) => {
   const { years = [] } = state.semesters.data
   const { pending, data } = state.courseStatistics
   const preselectedCourse = data[0]
+  const { pending: courseStatsPending } = state.courseStats
   return {
     matchingCourses: getCourseSearchResults(state),
     years: Object.values(years).map(({ yearcode, yearname }) => ({
@@ -258,7 +260,7 @@ const mapStateToProps = (state) => {
       text: yearname,
       value: yearcode
     })).reverse(),
-    loading: pending,
+    isLoading: pending || courseStatsPending,
     preselectedCourse,
     coursesLoading: state.courseSearch.pending
   }
