@@ -1,9 +1,66 @@
 .courseGroupHeader {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 1em !important;
 }
 
-.returnIconButton {
+.iconButton {
   font-size: 1em !important;
   background: transparent !important;
+}
+
+.activeIconButton {
+  font-size: 1em;
+}
+
+.groupStatistics {
+  display: flex;
+  justify-content: space-around !important;
+  margin: 0 !important;
+}
+
+.groupStatistic {
+  flex: 1 !important;
+  margin: 0 !important;
+}
+
+.teacherActiveItem {
+  background: var(--lightSilver);
+}
+
+.teacherItemStatistics {
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+  display: flex;
+  justify-content: space-between;
+}
+
+.teacherName {
+  font-weight: 700;
+  font-size: 1.075em;
+}
+.teacherCode {
+  color: var(--darkSilver);
+  font-weight: 600;
+}
+
+.teacherItemBasicInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 25%
+}
+
+.statisticItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.statisticLabel {
+  color: var(--darkSilver);
+}
+
+.statisticNumber {
+  margin-left: 0.25em;
+  font-weight: 600;
 }
