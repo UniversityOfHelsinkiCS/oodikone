@@ -394,10 +394,12 @@ const bottlenecksOf = async (query) => {
     disciplines: {},
     coursetypes: {}
   }
+
   const codeduplicates = await getAllDuplicates()
   const studentnumbers = await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate)
   const allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
   const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
+
   const allcoursestatistics = await courses.reduce(async (coursestatistics, course) => {
     const stats = await coursestatistics
     let { code, name, disciplines, course_type } = course
@@ -418,10 +420,10 @@ const bottlenecksOf = async (query) => {
       coursestats.addCourseDiscipline(discipline_id, name)
       bottlenecks.disciplines[discipline_id] = name
     })
+
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
       const semester = getPassingSemester(parseInt(query.year, 10), date)
-
       coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
     })
 

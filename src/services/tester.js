@@ -1,10 +1,23 @@
-const { optimizedStatisticsOf, optimizedStatisticsOf2} = require('./populations')
+const { bottlenecksOf } = require('./populations')
 
-const diff = require('deep-diff').diff
-var equal = require('deep-equal')
+const run = async () => {
+  const o = {
+    semesters: ['FALL', 'SPRING'],
+    year: 2017, // 2015
+    studyRights: ['KH50_005'], // ['KH50_005'], // ['320001']
+    months: 16// 41
+  }
 
-const _ = require('lodash')
+  const result = await bottlenecksOf(o)
+  
+  console.log(JSON.stringify(result.coursestatistics[0].stats, null, 2))
+  
+  console.log(result.coursestatistics.length)
 
+  process.exit()
+}
+
+/*
 const run = async () => {
   const o = {
     semesters: ['FALL', 'SPRING'],
@@ -50,5 +63,7 @@ const run = async () => {
 
   process.exit()
 }
+
+*/
 
 run()
