@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Segment, Header, Form } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number } from 'prop-types'
-import _ from 'lodash'
 import { connect } from 'react-redux'
 import ResultTabs from '../ResultTabs'
 import ProgrammeDropdown from '../ProgrammeDropdown'
@@ -21,18 +20,6 @@ class SingleCourseStats extends Component {
     comparison: null,
     cumMode: true
   }
-
-  getMax = stats => ({
-    maxPassRateVal: _.max(stats.map(year =>
-      year.attempts.classes.passed.concat(year.attempts.classes.failed).length)),
-    maxGradeVal: _.max(_.max(stats.map(year =>
-      Object.values(Object.entries(year.attempts.grades).reduce((acc, [key, value]) => {
-        if (['Eisa', 'Hyl.', '0', 'Luop'].includes(key)) {
-          return { ...acc, 0: acc['0'] + value.length }
-        }
-        return { ...acc, [key]: value.length }
-      }, { 0: 0 })))))
-  })
 
   getProgrammeName = (progcode) => {
     if (progcode === ALL.value) {
@@ -110,10 +97,9 @@ class SingleCourseStats extends Component {
   }
 
   render() {
-    const { stats, programmes } = this.props
+    const { programmes } = this.props
     const { primary, comparison } = this.selectedProgrammes()
     const statistics = this.filteredProgrammeStatistics()
-    const max = this.getMax(stats.statistics)
     return (
       <div>
         <Segment>
@@ -141,7 +127,6 @@ class SingleCourseStats extends Component {
           </Form>
         </Segment>
         <ResultTabs
-          max={max}
           primary={statistics.primary}
           comparison={statistics.comparison}
           changeMode={this.changeMode}
