@@ -15,4 +15,10 @@ router.get('/courseGroups/:id/teachers', async (req, res) => {
   return teachers ? res.send(teachers) : res.send(404)
 })
 
+router.get('/courseGroups/:id', async (req, res) => {
+  const groupData = await CourseGroupService.getCourseGroup(parseInt(req.params.id, 10))
+
+  return groupData ? res.send(groupData) : res.send(404)
+})
+
 module.exports = router
