@@ -39,8 +39,8 @@ describe('Course groups endpoint tests', () => {
 
     expect(res.status).toBe(200)
     expect(res.body).toEqual([
-      { id: 1, name: 'Erityispedagogiikka', credits: null },
-      { id: 2, name: 'Kasvatuspsykologia', credits: null }
+      { id: 1, name: 'Erityispedagogiikka', credits: null, students: 0 },
+      { id: 2, name: 'Kasvatuspsykologia', credits: null, students: 0 }
     ])
   })
 
