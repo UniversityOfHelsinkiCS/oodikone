@@ -262,19 +262,8 @@ const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) =
   return statistics
 }
 
-const getTeachersByIds = teacherIds => Teacher.findAll({
-  attributes: ['name', 'code', 'id'],
-  where: {
-    id: {
-      [Op.in]: teacherIds
-    }
-  }
-})
-
-
 module.exports = {
   bySearchTerm,
   teacherStats,
-  yearlyStatistics,
-  getTeachersByIds
+  yearlyStatistics
 }
