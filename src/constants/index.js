@@ -54,7 +54,10 @@ export const routes = {
   teachers: { route: '/teachers/:teacherid?', translateId: 'teachers', czar: true },
   users: { route: '/users/:userid?', translateId: 'users', admin: true },
   settings: { route: '/settings', translateId: 'settings', admin: true },
-  usage: { route: '/usage', translateId: 'usage', admin: true },
+  usage: { route: '/usage', translateId: 'usage', admin: true }
+}
+
+export const hiddenRoutes = {
   sandbox: { route: '/sandbox', translateId: 'sandbox', admin: true },
   oodilearn: { route: '/oodilearn', translateId: 'oodilearn', admin: true }
 }
@@ -148,6 +151,10 @@ export const gradeGraphOptions = (categories, max) => ({
 
   title: {
     text: 'Grades'
+  },
+
+  legend: {
+    enabled: false
   },
 
   xAxis: {

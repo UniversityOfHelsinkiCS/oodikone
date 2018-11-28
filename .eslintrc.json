@@ -17,6 +17,7 @@
       }
     ],
     "import/no-unresolved": 2,
+    "max-len": [1, 120],
     "react/jsx-no-bind": 2,
     "react/no-did-mount-set-state": 0,
     "react/prefer-stateless-function": 2,
@@ -28,6 +29,7 @@
     "prefer-object-spread/prefer-object-spread": 2,
     "prefer-arrow-callback": 2,
     "babel/no-invalid-this": 2,
+    "lines-between-class-members": [2, "always"],
     "babel/semi": [
       2,
       "never"

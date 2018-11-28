@@ -1,32 +1,30 @@
 import React from 'react'
-import { Table, Header } from 'semantic-ui-react'
+import { Header } from 'semantic-ui-react'
 import { shape, string, number, oneOfType, arrayOf } from 'prop-types'
+import SortableTable from '../SortableTable'
 
 const CumulativeTable = ({ stats, name }) => (
   <div>
     <Header as="h3" content={name} textAlign="center" />
-    <Table>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell content="Time" />
-          <Table.HeaderCell content="Passed" />
-          <Table.HeaderCell content="Failed" />
-          <Table.HeaderCell content="Pass rate" />
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {stats.map(stat => (
-          <Table.Row key={stat.code}>
-            <Table.Cell content={stat.name} />
-            <Table.Cell content={stat.cumulative.categories.passed || 0} />
-            <Table.Cell content={stat.cumulative.categories.failed || 0} />
-            <Table.Cell content={`${Number((100 * stat.cumulative.categories.passed) /
-            (stat.cumulative.categories.failed + stat.cumulative.categories.passed)).toFixed(2)} %`}
-            />
-          </Table.Row>
-          ))}
-      </Table.Body>
-    </Table>
+    <SortableTable
+      getRowKey={s => s.code}
+      tableProps={{ celled: true }}
+      columns={[
+        { key: 'TIME', title: 'Time', getRowVal: s => s.code, getRowContent: s => s.name, cellProps: { width: 4 } },
+        { key: 'PASSED', title: 'Passed', getRowVal: s => s.cumulative.categories.passed, cellProps: { width: 4 } },
+        { key: 'FAILED', title: 'Failed', getRowVal: s => s.cumulative.categories.failed, cellProps: { width: 4 } },
+        {
+          key: 'PASSRATE',
+          title: 'Pass rate',
+          getRowVal: s => s.cumulative.categories.passed /
+            (s.cumulative.categories.failed + s.cumulative.categories.passed),
+          getRowContent: stat => `${Number((100 * stat.cumulative.categories.passed) /
+            (stat.cumulative.categories.failed + stat.cumulative.categories.passed)).toFixed(2)} %`,
+          cellProps: { width: 4 }
+        }
+      ]}
+      data={stats}
+    />
   </div>
 )
 

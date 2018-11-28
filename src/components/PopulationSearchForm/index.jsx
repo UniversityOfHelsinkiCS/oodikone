@@ -65,6 +65,7 @@ class PopulationSearchForm extends Component {
       this.props.getDegreesAndProgrammes()
     }
   }
+
   componentDidUpdate() {
     const { studyProgrammes } = this.props
     if (studyProgrammes
@@ -105,7 +106,12 @@ class PopulationSearchForm extends Component {
       this.props.getPopulationFilters(request)
     ]).then(() => {
       if (this.props.extents.map(e => e.extentcode).includes(7)) {
-        this.props.setPopulationFilter(extentGraduated({ extentcode: 7, graduated: 'either', complemented: 'true' }))
+        this.props.setPopulationFilter(extentGraduated({
+          extentcode: 7,
+          graduated: 'either',
+          complemented: 'true',
+          studyright: queryCodes[0]
+        }))
       }
       if (this.props.extents.map(e => e.extentcode).includes(34)) {
         this.props.setPopulationFilter(extentGraduated({ extentcode: 34, graduated: 'either', complemented: 'true' }))
@@ -170,6 +176,7 @@ class PopulationSearchForm extends Component {
       }
     })
   }
+
   handleProgrammeChange = (e, { value }) => {
     const { query } = this.state
     const programme = value
@@ -183,6 +190,7 @@ class PopulationSearchForm extends Component {
       }
     })
   }
+
   handleStudyTrackChange = (e, { value }) => {
     const { query } = this.state
     const studyTrack = value
@@ -314,6 +322,7 @@ class PopulationSearchForm extends Component {
       </Form.Group>
     )
   }
+
   renderStudyProgrammeDropdown = (studyRights, programmesToRender) => (
     <Form.Field
       width={6}

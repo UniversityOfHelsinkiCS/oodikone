@@ -85,6 +85,7 @@ class CourseCodeMapper extends Component {
   handleCodeFilterChange = (e) => {
     this.setState({ codeFilter: e.target.value })
   }
+
   handleNameFilterChange = (e) => {
     this.setState({ nameFilter: e.target.value })
   }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Card, Button, Divider, Menu } from 'semantic-ui-react'
-import { string, func, shape, bool, arrayOf } from 'prop-types'
+import { Segment, Card, Divider, Menu, Placeholder } from 'semantic-ui-react'
+import { func, shape, bool, string, arrayOf } from 'prop-types'
 import ClusterGraph from './ClusterGraph'
 import { getOodiLearnCourse } from '../../redux/oodilearnCourse'
 import { getOodiLearnCluster } from '../../redux/oodilearnCluster'
@@ -12,15 +12,25 @@ const KEYS = {
   CLUSTER: 'cluster'
 }
 
+const OlPlaceholder = () => (
+  <Placeholder>
+    <Placeholder.Header>
+      <Placeholder.Line />
+      <Placeholder.Line />
+      <Placeholder.Line />
+    </Placeholder.Header>
+  </Placeholder>
+)
+
 class CoursePage extends Component {
     state={
       selected: KEYS.PROFILE
     }
 
     componentDidMount() {
-      const { course, getOodiLearnCourse, getOodiLearnCluster } = this.props
-      getOodiLearnCourse(course)
-      getOodiLearnCluster(course)
+      const { course } = this.props
+      this.props.getOodiLearnCourse(course)
+      this.props.getOodiLearnCluster(course)
     }
 
     render() {
@@ -34,7 +44,7 @@ class CoursePage extends Component {
             header={course}
           />
           <Menu
-            onItemClick={(e, { name: selected }) => this.setState({ selected })}
+            onItemClick={(e, { name }) => this.setState({ selected: name })}
             items={[{
               icon: 'arrow circle left',
               key: 'back',
@@ -48,12 +58,14 @@ class CoursePage extends Component {
               key: KEYS.CLUSTER,
               name: KEYS.CLUSTER,
               active: selected === KEYS.CLUSTER,
+              disabled: true,
               content: 'Clusters'
             }]}
           />
           <Divider />
           <Segment loading={loading}>
-            { finishedLoading && selected === KEYS.PROFILE && <CourseGradeSpiders data={data} /> }
+            { !finishedLoading && <OlPlaceholder /> }
+            { finishedLoading && selected === KEYS.PROFILE && <CourseGradeSpiders /> }
             { finishedLoading && selected === KEYS.CLUSTER && <ClusterGraph data={clusterData} /> }
           </Segment>
         </Segment>
@@ -64,22 +76,26 @@ class CoursePage extends Component {
 CoursePage.propTypes = {
   goBack: func.isRequired,
   getOodiLearnCourse: func.isRequired,
+  getOodiLearnCluster: func.isRequired,
+  loading: bool.isRequired,
+  course: string.isRequired,
   data: shape({}),
-  loading: bool.isRequired
+  clusterData: arrayOf(shape({}))
 }
 
 CoursePage.defaultProps = {
-  data: undefined
+  data: undefined,
+  clusterData: undefined
 }
 
 const mapStateToProps = (state) => {
   const { pending: loading, data } = state.oodilearnCourse
-  const { pending: clusterLoading, data: clusterData} = state.oodilearnCluster
+  const { pending: clusterLoading, data: clusterData } = state.oodilearnCluster
   return {
     loading,
     clusterLoading,
-    data,
-    clusterData
+    clusterData,
+    data
   }
 }
 
