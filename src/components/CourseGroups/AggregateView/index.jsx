@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { Header, Segment, Button } from 'semantic-ui-react'
 import { withRouter } from 'react-router'
 import { func, shape } from 'prop-types'
@@ -6,17 +6,32 @@ import { func, shape } from 'prop-types'
 import { getCompiledPath } from '../../../common'
 import { routes } from '../../../constants'
 
+import { callApi } from '../../../apiConnection'
 
-const AggregateView = ({ history }) => {
-  const navigateToCourseGroup = courseGroupId =>
-    history.push(getCompiledPath(routes.courseGroups.route, { courseGroupId }))
+class AggregateView extends Component {
+  state = {
+    courseGroups: []
+  }
 
-  return (
-    <Segment>
-      <Header size="medium">Group statistics</Header>
-      <Button onClick={() => navigateToCourseGroup('groupId')}>navigation test</Button>
-    </Segment>
-  )
+  componentDidMount() {
+    callApi('/courseGroups')
+      .then((res) => {
+        console.log(res.data)
+        this.setState({ courseGroups: res.data })
+      })
+  }
+
+  render() {
+    const navigateToCourseGroup = courseGroupId =>
+      this.props.history.push(getCompiledPath(routes.courseGroups.route, { courseGroupId }))
+
+    return (
+      <Segment>
+        <Header size="medium">Group statistics</Header>
+        <Button onClick={() => navigateToCourseGroup('groupId')}>navigation test</Button>
+      </Segment>
+    )
+  }
 }
 
 AggregateView.propTypes = {
