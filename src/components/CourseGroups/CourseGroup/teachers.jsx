@@ -83,7 +83,7 @@ class Teachers extends Component {
         <Header size="medium" className={styles.headerWithControl}>
           <span>Teachers<span className={styles.teacherCount}>{teacherCount}</span></span>
           <div className={styles.activeToggleContainer}>
-          <label className={styles.activeToggleLabel} htmlFor="toggle">Show only active</label>
+            <label className={styles.activeToggleLabel} htmlFor="toggle">Show only active</label>
             <Radio
               id="toggle"
               toggle
