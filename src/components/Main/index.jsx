@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+// import { connect } from 'react-redux'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { localize } from 'react-localize-redux'
 import { Loader, Image, Transition } from 'semantic-ui-react'
@@ -12,7 +13,7 @@ import CourseStatistics from '../CourseStatistics'
 import EnableUsers from '../EnableUsers'
 import Settings from '../Settings'
 import ErrorContainer from '../ErrorContainer'
-import { routes, BASE_PATH } from '../../constants'
+import { routes, BASE_PATH, hiddenRoutes } from '../../constants'
 import AccessDenied from '../AccessDenied'
 import UsageStatistics from '../UsageStatistics'
 import Teachers from '../Teachers'
@@ -22,7 +23,7 @@ import { callApi } from '../../apiConnection'
 
 import styles from './main.css'
 
-import { userIsEnabled, log, images } from '../../common'
+import { getUserName, userIsEnabled, log, images } from '../../common'
 
 class Main extends Component {
   state = {
@@ -48,6 +49,19 @@ class Main extends Component {
     this.ping()
   }
 
+  componentDidCatch = async (e) => {
+  //  const { reduxState } = this.props
+    const name = await getUserName()
+    Sentry.configureScope((scope) => {
+  //    Object.keys(reduxState).forEach((key) => {
+  //      scope.setExtra(key, JSON.stringify(reduxState[key]))
+  //    })
+      scope.setUser({ username: name })
+    })
+    Sentry.captureException(e)
+    this.setState({ hasError: true, loaded: true })
+  }
+
   setNetworkError = () => this.setState({ guide: 'Oodikone is unable to connect. Double check that you\'re in eduroam or have pulse security on. Refresh by pressing F5.', networkError: true })
 
   ping = async () => {
@@ -62,11 +76,6 @@ class Main extends Component {
       this.setNetworkError()
     }
     setTimeout(this.ping, this.state.networkError ? 2000 : 30000)
-  }
-
-  componentDidCatch(e) {
-    Sentry.captureException(e)
-    this.setState({ hasError: true, loaded: true })
   }
 
   render() {
@@ -102,8 +111,8 @@ class Main extends Component {
               <Route exact path={routes.users.route} component={EnableUsers} />
               <Route exact path={routes.teachers.route} component={Teachers} />
               <Route exact path={routes.usage.route} component={UsageStatistics} />
-              <Route exact path={routes.sandbox.route} component={Sandbox} />
-              <Route exact path={routes.oodilearn.route} component={OodiLearn} />
+              <Route exact path={hiddenRoutes.sandbox.route} component={Sandbox} />
+              <Route exact path={hiddenRoutes.oodilearn.route} component={OodiLearn} />
             </Switch>
           </main>
         </Router>
@@ -112,5 +121,11 @@ class Main extends Component {
   }
 }
 
+// const mapStateToProps = state => ({
+//   reduxState: state
+// })
+
+
+// export default connect(mapStateToProps)(localize(Main, 'locale'))
 export default localize(Main, 'locale')
 

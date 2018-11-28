@@ -23,6 +23,7 @@ class CourseParticipation extends Component {
       this.props.alterPopulationCourseFilter(this.props.filter.id, field)
     }
   }
+
   renderFilterSegment = (type, text, active) =>
     (
       <Segment
