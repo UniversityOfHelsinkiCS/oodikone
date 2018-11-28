@@ -1,7 +1,6 @@
 const supertest = require('supertest')
 const jwt = require('jsonwebtoken')
 
-const app = require('../../src/app')
 const conf = require('../../src/conf-backend')
 const { forceSyncDatabase } = require('../../src/database/connection')
 
@@ -20,18 +19,20 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await sequelize.close()
-  app.close()
 })
 
 describe('Course groups endpoint tests', () => {
   test('Ping test', async () => {
+    const app = require('../../src/app')
     const res = await supertest(app)
       .get('/ping')
 
     expect(res.status).toBe(200)
+    app.close()
   })
 
   test('Get list of available course groups', async () => {
+    const app = require('../../src/app')
     const res = await supertest(app)
       .get('/api/courseGroups')
       .set('x-access-token', token)
@@ -42,9 +43,11 @@ describe('Course groups endpoint tests', () => {
       { id: 1, name: 'Erityispedagogiikka', credits: null, students: 0 },
       { id: 2, name: 'Kasvatuspsykologia', credits: null, students: 0 }
     ])
+    app.close()
   })
 
   test('Get teachers for course group', async () => {
+    const app = require('../../src/app')
     const res = await supertest(app)
       .get('/api/courseGroups/1/teachers')
       .set('x-access-token', token)
@@ -52,5 +55,6 @@ describe('Course groups endpoint tests', () => {
 
     expect(res.status).toBe(200)
     expect(res.body.length).toBe(8)
+    app.close()
   })
 })
