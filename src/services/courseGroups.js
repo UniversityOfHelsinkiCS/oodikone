@@ -1,4 +1,7 @@
-const teachers = require('./teachers')
+const { sequelize } = require('../database/connection')
+const { Op } = require('sequelize')
+const { Teacher } = require('../models/index')
+
 
 const EP_TEACHERS = ['017715', '019051', '053532', '028579', '036199', '083257', '089822', '128474']
 const KP_TEACHERS = ['032147', '012926', '066993']
@@ -13,6 +16,16 @@ const getTeachersForCourseGroup = (courseGroupId) => {
   }
 }
 
+const getTeachersByIds = teacherIds => Teacher.findAll({
+  attributes: ['name', 'code', 'id'],
+  where: {
+    id: {
+      [Op.in]: teacherIds
+    }
+  }
+})
+
+
 const getCourseGroup = async (courseGroupId) => {
   if (courseGroupId === 1) {
     return {
@@ -21,7 +34,7 @@ const getCourseGroup = async (courseGroupId) => {
       totalStudents: 10,
       totalCredits: 100,
       totalCourses: 1000,
-      teachers: await teachers.getTeachersByIds(EP_TEACHERS)
+      teachers: await getTeachersByIds(EP_TEACHERS)
     }
   }
 
@@ -32,12 +45,35 @@ const getCourseGroup = async (courseGroupId) => {
       totalStudents: 10,
       totalCredits: 100,
       totalCourses: 1000,
-      teachers: await teachers.getTeachersByIds(KP_TEACHERS)
+      teachers: await getTeachersByIds(KP_TEACHERS)
     }
   }
 }
 
+const STATISTICS_START_SEMESTER = 135
+const getCoursesByTeachers = async teacherIds => sequelize.query(
+  `select        
+        course_code as coursecode,
+        co.name as coursenames,
+        t.code as teachercode,
+        t.name as teachername,
+        sum(credits) as credits,
+        count(distinct student_studentnumber) as students
+      from credit_teachers ct
+        left join credit c on ct.credit_id = c.id
+        left join teacher t on ct.teacher_id = t.id
+        left join course co on c.course_code = co.code
+      where
+        semestercode >= ${STATISTICS_START_SEMESTER}
+      and
+        ct.teacher_id in (:teacherIds)
+      group by course_code, t.name, t.code, co.name`,
+  { replacements: { teacherIds }, type: sequelize.QueryTypes.SELECT }
+)
+
+
 module.exports = {
   getTeachersForCourseGroup,
-  getCourseGroup
+  getCourseGroup,
+  getCoursesByTeachers
 }
