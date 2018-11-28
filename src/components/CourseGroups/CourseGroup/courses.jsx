@@ -1,10 +1,10 @@
-import React from 'react'
-import { Header, Segment } from 'semantic-ui-react'
+import React, { Fragment } from 'react'
+import { Header } from 'semantic-ui-react'
 
 const Courses = () => (
-  <Segment>
+  <Fragment>
     <Header size="medium" content="Courses" />
-  </Segment>
+  </Fragment>
 )
 
 export default Courses

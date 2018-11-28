@@ -1,4 +1,4 @@
-.courseGroupHeader {
+.headerWithControl {
   display: flex;
   justify-content: space-between;
   margin-bottom: 1em !important;
@@ -39,6 +39,11 @@
   font-weight: 700;
   font-size: 1.075em;
 }
+.teacherCount {
+  padding-left: 0.25em;
+}
+
+.teacherCount,
 .teacherCode {
   color: var(--darkSilver);
   font-weight: 600;
@@ -63,4 +68,15 @@
 .statisticNumber {
   margin-left: 0.25em;
   font-weight: 600;
+}
+
+.activeToggleContainer {
+  display: flex;
+  align-items: center;
+}
+
+.activeToggleContainer > label {
+  color: var(--darkSilver);
+  font-size: 0.75em;
+  padding-right: 0.5em;
 }
