@@ -80,10 +80,18 @@ class CourseGroup extends Component {
       return null
     }
 
+    const getTeacherIds = teacers => teacers.map(t => t.id)
+
+    const activeTeachers = teachers.filter(t => t.isActive)
+    const hasActiveTeachers = activeTeachers.length > 0
+    const teacherIds = hasActiveTeachers
+      ? getTeacherIds(activeTeachers)
+      : getTeacherIds(teachers)
+
     return (
       <Segment>
         <Teachers teachers={teachers} onFilterClickFn={this.onTeacherFilterClick} />
-        <Courses />
+        <Courses teacherIds={teacherIds} />
       </Segment>
     )
   }
