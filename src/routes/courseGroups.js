@@ -4,7 +4,6 @@ const CourseGroupService = require('../services/courseGroups')
 
 router.get('/courseGroups', async (req, res) => {
   const courseGroups = await CourseGroupService.getCourseGroupsWithTotals()
-
   res.json(courseGroups)
 })
 
