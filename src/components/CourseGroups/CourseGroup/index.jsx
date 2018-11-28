@@ -75,16 +75,16 @@ class CourseGroup extends Component {
   }
 
   renderTeachersAndCourses = () => {
-    const {  teachers, isLoading } = this.state
+    const { teachers, isLoading } = this.state
     if (isLoading) {
       return null
     }
 
     return (
-      <Fragment>
+      <Segment>
         <Teachers teachers={teachers} onFilterClickFn={this.onTeacherFilterClick} />
         <Courses />
-      </Fragment>
+      </Segment>
     )
   }
 
@@ -97,7 +97,7 @@ class CourseGroup extends Component {
     return (
       <Fragment>
         <Segment loading={isLoading}>
-          <Header size="medium" className={styles.courseGroupHeader}>
+          <Header size="medium" className={styles.headerWithControl}>
             {`${name}`}
             <Button
               icon="reply"
