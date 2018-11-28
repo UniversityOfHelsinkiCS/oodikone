@@ -4,10 +4,7 @@ import { Header, List, Button, Radio } from 'semantic-ui-react'
 import styles from './courseGroup.css'
 
 const TeacherItem = ({ teacher, onFilterClickFn }) => {
-  const { name, code, id, isActive } = teacher
-
-  const totalCredits = 10
-  const totalCourses = 10
+  const { name, code, id, isActive, courses, credits } = teacher
 
   const getStatisticItem = (label, value) => (
     <div className={styles.statisticItem}>
@@ -23,9 +20,9 @@ const TeacherItem = ({ teacher, onFilterClickFn }) => {
           <div className={styles.teacherName}>{name}</div>
           <div className={styles.teacherCode}>{`(${code})`}</div>
         </div>
-        {getStatisticItem('Total courses', totalCourses)}
-        {getStatisticItem('Total credits', totalCredits)}
-        <div className={styles.statisticItem}>
+        {getStatisticItem('Total courses', courses)}
+        {getStatisticItem('Total credits', credits)}
+        <div className={styles.statisticControlItem}>
           <Button
             icon="filter"
             className={`${isActive ? styles.activeIconButton : styles.iconButton}`}
