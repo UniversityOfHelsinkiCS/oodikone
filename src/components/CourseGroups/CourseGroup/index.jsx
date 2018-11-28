@@ -31,11 +31,12 @@ class CourseGroup extends Component {
     } catch (e) {
       // todo: error handling
     }
-    const { name, totalCredits, totalStudents, teachers } = response.data
+    const { name, totalCredits, totalStudents, totalCourses, teachers } = response.data
     this.setState({
       name,
       totalCredits,
       totalStudents,
+      totalCourses,
       teachers,
       isLoading: false
     })
@@ -50,7 +51,7 @@ class CourseGroup extends Component {
   }
 
   renderStatistics = () => {
-    const { totalCredits, totalStudents, teachers, isLoading } = this.state
+    const { totalCredits, totalStudents, totalCourses, teachers, isLoading } = this.state
     if (isLoading) {
       return null
     }
@@ -68,7 +69,7 @@ class CourseGroup extends Component {
       <Statistic.Group className={styles.groupStatistics}>
         {getStatistic('Total teachers', totalTeachers)}
         {getStatistic('Total students', totalStudents)}
-        {getStatistic('Total courses', totalStudents)}
+        {getStatistic('Total courses', totalCourses)}
         {getStatistic('Total credits', totalCredits)}
       </Statistic.Group>
     )
@@ -106,7 +107,7 @@ class CourseGroup extends Component {
       <Fragment>
         <Segment loading={isLoading}>
           <Header size="medium" className={styles.headerWithControl}>
-            {`${name}`}
+            {name}
             <Button
               icon="reply"
               onClick={() => navigateTo(routes.courseGroups.route)}

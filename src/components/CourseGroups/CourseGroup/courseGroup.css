@@ -68,14 +68,25 @@
   text-align: left;
 }
 
-.statisticItem {
+.statisticControlItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+.statisticItem {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.statisticItem {
+  flex: 0 0 20%
+}
+
 .statisticLabel {
   color: var(--darkSilver);
+  text-align: center;
 }
 
 .statisticNumber {
