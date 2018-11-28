@@ -265,5 +265,6 @@ const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) =
 module.exports = {
   bySearchTerm,
   teacherStats,
-  yearlyStatistics
+  yearlyStatistics,
+  getCredits
 }
