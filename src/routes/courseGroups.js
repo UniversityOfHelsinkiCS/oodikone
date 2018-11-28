@@ -3,10 +3,8 @@ const router = require('express').Router()
 const CourseGroupService = require('../services/courseGroups')
 
 router.get('/courseGroups', async (req, res) => {
-  res.json([
-    { id: 1, name: 'Erityispedagogiikka' },
-    { id: 2, name: 'Kasvatuspsykologia' }
-  ])
+  const courseGroups = await CourseGroupService.getCourseGroupsWithTotals()
+  res.json(courseGroups)
 })
 
 router.get('/courseGroups/:id/teachers', async (req, res) => {
