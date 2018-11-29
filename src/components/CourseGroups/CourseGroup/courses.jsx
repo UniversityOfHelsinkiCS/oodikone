@@ -1,5 +1,6 @@
 import React, { Fragment, Component } from 'react'
 import { Header, List, Loader, Placeholder, Icon } from 'semantic-ui-react'
+import sortBy from 'lodash/sortBy'
 import { callApi } from '../../../apiConnection'
 import styles from './courseGroup.css'
 
@@ -49,13 +50,11 @@ class Courses extends Component {
   onCourseHeaderClick = (columnName) => {
     const { sortColumn, sortReverse } = this.state
     const isSortColumn = columnName === sortColumn
-    this.setState(
-      {
-        sortColumn: columnName,
-        sortReverse: isSortColumn ? !sortReverse : sortReverse
-      },
-      () => this.fetchCourses()
-    )
+
+    this.setState({
+      sortColumn: columnName,
+      sortReverse: isSortColumn ? !sortReverse : sortReverse
+    })
   }
 
   fetchCourses = async () => {
@@ -110,7 +109,12 @@ class Courses extends Component {
   }
 
   render() {
-    const { isLoading, courses } = this.state
+    const { isLoading, courses, sortColumn, sortReverse } = this.state
+    const sortedCourses = sortBy(courses, sortColumn)
+
+    if (sortReverse) {
+      sortedCourses.reverse()
+    }
 
     return (
       <Fragment>
@@ -121,7 +125,7 @@ class Courses extends Component {
          :
          <List celled>
            {this.renderListHeader()}
-           {courses.map(c =>
+           {sortedCourses.map(c =>
              <CourseItem key={`${c.coursecode}-${c.teachercode}`} course={c} />)}
          </List>
         }
