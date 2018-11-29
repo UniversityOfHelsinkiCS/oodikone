@@ -1,4 +1,5 @@
 import React, { Fragment, Component } from 'react'
+import { bool, func, shape, string, number } from 'prop-types'
 import { Header, List, Button, Radio } from 'semantic-ui-react'
 
 import styles from './courseGroup.css'
@@ -35,6 +36,18 @@ const TeacherItem = ({ teacher, onFilterClickFn }) => {
   )
 }
 
+TeacherItem.propTypes = {
+  onFilterClickFn: func.isRequired,
+  teacher: shape({
+    name: string,
+    code: string,
+    id: string,
+    isActive: bool,
+    courses: string,
+    credits: number
+  }).isRequired
+}
+
 class Teachers extends Component {
   state = {
     showOnlyActive: false,
@@ -67,7 +80,7 @@ class Teachers extends Component {
   }
 
   onActiveToggleChange = () => {
-    const { showOnlyActive } = this.state
+    const { showOnlyActive } = this.state
     this.setState({ showOnlyActive: !showOnlyActive })
   }
 
@@ -99,6 +112,11 @@ class Teachers extends Component {
       </Fragment>
     )
   }
+}
+
+
+Teachers.propTypes = {
+  onFilterClickFn: func.isRequired
 }
 
 export default Teachers
