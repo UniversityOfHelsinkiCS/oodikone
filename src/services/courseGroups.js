@@ -72,9 +72,17 @@ const getCourseGroup = async (courseGroupId) => {
   const teacherIds = getTeachersForCourseGroup(courseGroupId)
   const name = COURSE_GROUP_NAMES[courseGroupId]
   const statistics = await getCourseGroupInfoByTeacherIds(teacherIds)
-  const teachers = await getTeachersByIds(teacherIds)
+  const teachersByIds = await getTeachersByIds(teacherIds)
 
   const { credits, students, courses } = statistics[0]
+
+  const teachers = teachersByIds.map(t => ({
+    id: t.id,
+    name: t.name,
+    code: t.code,
+    courses: Number(t.courses),
+    credits: Number(t.credits)
+  }))
 
   return {
     id: courseGroupId,
