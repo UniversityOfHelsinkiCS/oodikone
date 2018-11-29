@@ -1,7 +1,15 @@
 import React, { Fragment, Component } from 'react'
-import { Header, List, Loader } from 'semantic-ui-react'
+import { Header, List, Loader, Placeholder, Icon } from 'semantic-ui-react'
 import { callApi } from '../../../apiConnection'
 import styles from './courseGroup.css'
+
+const courseColumnTypes = {
+  TEACHER: 'teachername',
+  CODE: 'coursecode',
+  NAME: 'coursenames',
+  CREDITS: 'credits',
+  STUDENTS: 'students'
+}
 
 const CourseItem = ({ course }) => {
   const { coursecode, teachername, credits, students, coursenames } = course
@@ -22,7 +30,9 @@ const CourseItem = ({ course }) => {
 class Courses extends Component {
   state = {
     isLoading: true,
-    courses: []
+    courses: [],
+    sortColumn: courseColumnTypes.TEACHER,
+    sortReverse: false
   }
 
   async componentDidMount() {
@@ -36,6 +46,18 @@ class Courses extends Component {
     }
   }
 
+  onCourseHeaderClick = (columnName) => {
+    const { sortColumn, sortReverse } = this.state
+    const isSortColumn = columnName === sortColumn
+    this.setState(
+      {
+        sortColumn: columnName,
+        sortReverse: isSortColumn ? !sortReverse : sortReverse
+      },
+      () => this.fetchCourses()
+    )
+  }
+
   fetchCourses = async () => {
     const { teacherIds } = this.props
 
@@ -47,6 +69,46 @@ class Courses extends Component {
     )
   }
 
+  renderPlaceholder = () => {
+    const placeholderKeys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    return (
+      <Placeholder fluid>
+        {placeholderKeys.map(k => <Placeholder.Line key={k} length="full" />)}
+      </Placeholder>
+    )
+  }
+
+  renderListHeader = () => {
+    const { sortColumn, sortReverse } = this.state
+
+    const getHeader = (className, label, columnName) => {
+      const isActive = columnName === sortColumn
+      return (
+        <div
+          className={className}
+          onClick={() => this.onCourseHeaderClick(columnName)}
+        >
+          {label}
+          {isActive
+            ? <Icon name={`caret ${sortReverse ? 'up' : 'down'}`} />
+            : null}
+        </div>
+      )
+    }
+
+    return (
+      <List.Header>
+        <List.Content className={styles.courseHeaderContent}>
+          {getHeader(styles.courseHeaderTeacher, 'Teacher', courseColumnTypes.TEACHER)}
+          {getHeader(styles.courseHeaderCode, 'Code', courseColumnTypes.CODE)}
+          {getHeader(styles.courseHeaderName, 'Name', courseColumnTypes.NAME)}
+          {getHeader(styles.courseHeaderItem, 'Credits', courseColumnTypes.CREDITS)}
+          {getHeader(styles.courseHeaderItem, 'Students', courseColumnTypes.STUDENTS)}
+        </List.Content>
+      </List.Header>
+    )
+  }
+
   render() {
     const { isLoading, courses } = this.state
 
@@ -54,10 +116,15 @@ class Courses extends Component {
       <Fragment>
         <Header size="medium" content="Courses" />
         <Loader active={isLoading} inline="centered" />
-        <List celled className={styles.teacherList}>
-          {courses.map(c =>
-            <CourseItem key={`${c.coursecode}-${c.teachercode}`} course={c} />)}
-        </List>
+        {isLoading
+         ? this.renderPlaceholder()
+         :
+         <List celled>
+           {this.renderListHeader()}
+           {courses.map(c =>
+             <CourseItem key={`${c.coursecode}-${c.teachercode}`} course={c} />)}
+         </List>
+        }
       </Fragment>
     )
   }

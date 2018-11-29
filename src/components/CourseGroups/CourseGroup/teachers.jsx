@@ -74,15 +74,16 @@ class Teachers extends Component {
   render() {
     const { onFilterClickFn } = this.props
     const { viewableTeachers, activeTeacherCount, teacherCount, showOnlyActive } = this.state
+    const toggleId = 'toggle'
 
     return (
       <Fragment>
         <Header size="medium" className={styles.headerWithControl}>
           <span>Teachers<span className={styles.teacherCount}>{teacherCount}</span></span>
           <div className={styles.activeToggleContainer}>
-            <label className={styles.activeToggleLabel} htmlFor="toggle">Show only active</label>
+            <label htmlFor={toggleId}>Show only active</label>
             <Radio
-              id="toggle"
+              id={toggleId}
               toggle
               checked={showOnlyActive}
               onChange={this.onActiveToggleChange}
@@ -90,7 +91,7 @@ class Teachers extends Component {
             />
           </div>
         </Header>
-        <List celled className={styles.teacherList}>
+        <List celled>
           {viewableTeachers.map(t =>
             <TeacherItem key={t.id} teacher={t} onFilterClickFn={onFilterClickFn} />)
           }
