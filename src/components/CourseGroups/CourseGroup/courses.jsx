@@ -11,15 +11,15 @@ const courseColumnTypes = {
   STUDENTS: 'students'
 }
 
-const CourseItem = ({ course }) => {
+const CourseItem = ({ course }) => { // eslint-disable-line react/prop-types
   const { coursecode, teachername, credits, students, coursenames } = course
   const coursename = coursenames.fi
   return (
     <List.Item>
       <List.Content className={styles.courseInfoContent}>
-        <div className={styles.courseInfoTeacher}>{teachername}</div>
-        <div className={styles.courseInfoCode}>{coursecode}</div>
         <div className={styles.courseInfoName}>{coursename}</div>
+        <div className={styles.courseInfoCode}>{coursecode}</div>
+        <div className={styles.courseInfoTeacher}>{teachername}</div>
         <div className={styles.courseInfoItem}>{credits}</div>
         <div className={styles.courseInfoItem}>{students}</div>
       </List.Content>
@@ -65,7 +65,7 @@ class Courses extends Component {
       { isLoading: true, courses: [] },
       () => callApi(`courseGroups/teachers/?teacherIds=${JSON.stringify(teacherIds)}`)
         .then(({ data: courses }) => this.setState({ isLoading: false, courses }))
-        .catch(e => console.log('handle error'))
+        .catch(e => console.log('handle error', e))
     )
   }
 
@@ -99,9 +99,9 @@ class Courses extends Component {
     return (
       <List.Header>
         <List.Content className={styles.courseHeaderContent}>
-          {getHeader(styles.courseHeaderTeacher, 'Teacher', courseColumnTypes.TEACHER)}
-          {getHeader(styles.courseHeaderCode, 'Code', courseColumnTypes.CODE)}
           {getHeader(styles.courseHeaderName, 'Name', courseColumnTypes.NAME)}
+          {getHeader(styles.courseHeaderCode, 'Code', courseColumnTypes.CODE)}
+          {getHeader(styles.courseHeaderTeacher, 'Teacher', courseColumnTypes.TEACHER)}
           {getHeader(styles.courseHeaderItem, 'Credits', courseColumnTypes.CREDITS)}
           {getHeader(styles.courseHeaderItem, 'Students', courseColumnTypes.STUDENTS)}
         </List.Content>
