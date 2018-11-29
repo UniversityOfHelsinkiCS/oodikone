@@ -31,7 +31,7 @@ describe('Course groups endpoint tests', () => {
     app.close()
   })
 
-  test('Get list of available course groups', async () => {
+  test.skip('Get list of available course groups', async () => {
     const app = require('../../src/app')
     const res = await supertest(app)
       .get('/api/courseGroups')
