@@ -1,17 +1,18 @@
 import React, { Fragment, Component } from 'react'
-import { Header, List, Button, Radio } from 'semantic-ui-react'
+import { Header, List, Button, Radio, Icon } from 'semantic-ui-react'
+import sortBy from 'lodash/sortBy'
 
 import styles from './courseGroup.css'
 
+const teacherColumnTypes = {
+  NAME: 'name',
+  CODE: 'code',
+  COURSES: 'courses',
+  CREDITS: 'credits'
+}
+
 const TeacherItem = ({ teacher, onFilterClickFn }) => {
   const { name, code, id, isActive, courses, credits } = teacher
-
-  const getStatisticItem = (label, value) => (
-    <div className={styles.statisticItem}>
-      <div className={styles.statisticLabel}>{label}</div>
-      <div className={styles.statisticNumber}>{value}</div>
-    </div>
-  )
 
   return (
     <List.Item className={`${isActive ? styles.teacherActiveItem : ''}`}>
@@ -20,8 +21,8 @@ const TeacherItem = ({ teacher, onFilterClickFn }) => {
           <div className={styles.teacherName}>{name}</div>
           <div className={styles.teacherCode}>{`(${code})`}</div>
         </div>
-        {getStatisticItem('Total courses', courses)}
-        {getStatisticItem('Total credits', credits)}
+        <div className={styles.teacherStatisticNumber}>{courses}</div>
+        <div className={styles.teacherStatisticNumber}>{credits}</div>
         <div className={styles.statisticControlItem}>
           <Button
             icon="filter"
@@ -40,7 +41,9 @@ class Teachers extends Component {
     showOnlyActive: false,
     activeTeacherCount: 0,
     teacherCount: 0,
-    viewableTeachers: []
+    viewableTeachers: [],
+    sortColumn: teacherColumnTypes.NAME,
+    sortReverse: false
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -50,6 +53,7 @@ class Teachers extends Component {
     const activeTeacherCount = activeTeachers.length
     const teacherCount = teachers.length
     const resetShowOnlyActive = showOnlyActive && activeTeacherCount === 0
+
     if (!showOnlyActive || resetShowOnlyActive) {
       return {
         showOnlyActive: false,
@@ -67,14 +71,66 @@ class Teachers extends Component {
   }
 
   onActiveToggleChange = () => {
-    const { showOnlyActive } = this.state
+    const { showOnlyActive } = this.state
     this.setState({ showOnlyActive: !showOnlyActive })
+  }
+
+  onTeacherHeaderClick = (columnName) => {
+    const { sortColumn, sortReverse } = this.state
+    const isSortColumn = columnName === sortColumn
+    this.setState({
+      sortColumn: columnName,
+      sortReverse: isSortColumn ? !sortReverse : sortReverse
+    })
+  }
+
+  renderListHeader = () => {
+    const { sortColumn, sortReverse } = this.state
+
+    const getHeader = (className, label, columnName) => {
+      const isActive = columnName === sortColumn
+
+      return (
+        <div
+          className={className}
+          onClick={() => this.onTeacherHeaderClick(columnName)}
+        >
+          {label}
+          {isActive
+            ? <Icon name={`caret ${sortReverse ? 'up' : 'down'}`} />
+            : null}
+        </div>
+      )
+    }
+
+    return (
+      <List.Header>
+        <List.Content className={styles.courseHeaderContent}>
+          {getHeader(styles.teacherHeaderName, 'Name', teacherColumnTypes.NAME)}
+          {getHeader(styles.teacherHeaderItem, 'Courses', teacherColumnTypes.COURSES)}
+          {getHeader(styles.teacherHeaderItem, 'Credits', teacherColumnTypes.CREDITS)}
+          <div className={styles.teacherHeaderFilter}>Filter</div>
+        </List.Content>
+      </List.Header>
+    )
   }
 
   render() {
     const { onFilterClickFn } = this.props
-    const { viewableTeachers, activeTeacherCount, teacherCount, showOnlyActive } = this.state
+    const {
+      viewableTeachers,
+      activeTeacherCount,
+      teacherCount,
+      showOnlyActive,
+      sortColumn,
+      sortReverse
+    } = this.state
     const toggleId = 'toggle'
+    const sortedTeachers = sortBy(viewableTeachers, [sortColumn])
+
+    if (sortReverse) {
+      sortedTeachers.reverse()
+    }
 
     return (
       <Fragment>
@@ -92,7 +148,8 @@ class Teachers extends Component {
           </div>
         </Header>
         <List celled>
-          {viewableTeachers.map(t =>
+          {this.renderListHeader()}
+          {sortedTeachers.map(t =>
             <TeacherItem key={t.id} teacher={t} onFilterClickFn={onFilterClickFn} />)
           }
         </List>
