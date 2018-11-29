@@ -16,6 +16,7 @@
 .groupStatistics {
   display: flex;
   justify-content: space-around !important;
+  align-items: flex-end !important;
   margin: 0 !important;
 }
 
@@ -29,11 +30,22 @@
 }
 
 .courseInfoContent,
-.teacherItemStatistics {
+.teacherItemStatistics,
+.courseHeaderContent {
   padding-top: 0.3em;
   padding-bottom: 0.3em;
   display: flex;
   justify-content: space-between;
+}
+
+.courseHeaderContent {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.courseHeaderContent > div {
+  cursor: pointer;
+  font-weight: 700;
 }
 
 .teacherName {
@@ -57,13 +69,22 @@
 }
 
 .courseInfoItem,
-.courseInfoCode {
+.courseInfoCode,
+.courseHeaderCode,
+.courseHeaderItem {
   flex: 0 0 10%;
   text-align: center;
 }
 
+.courseHeaderCode,
+.courseInfoCode {
+  text-align: left;
+}
+
 .courseInfoName,
-.courseInfoTeacher {
+.courseInfoTeacher,
+.courseHeaderTeacher,
+.courseHeaderName {
   flex: 0 0 33%;
   text-align: left;
 }
