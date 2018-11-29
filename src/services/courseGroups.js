@@ -2,6 +2,7 @@ const Promise = require('bluebird')
 const { sequelize } = require('../database/connection')
 const { redisClient } = require('../services/redis')
 
+// Hard coded teacher ids for demo purposes
 const EP_TEACHERS = ['017715', '019051', '053532', '028579', '036199', '083257', '089822', '128474']
 const KP_TEACHERS = ['032147', '012926', '066993']
 
@@ -10,7 +11,7 @@ const STATISTICS_START_SEMESTER = 135
 
 const COURSE_GROUP_STATISTICS_KEY = 'course_group_statistics'
 const COURSE_GROUP_KEY = groupId => `course_group_${groupId}`
-const TEACHER_COURSES_KEY = teacherId => `course_group_${teacherId}`
+const TEACHER_COURSES_KEY = teacherId => `course_group_courses_${teacherId}`
 const REDIS_CACHE_TTL = 12 * 60 * 60
 
 const getTeachersForCourseGroup = (courseGroupId) => {
@@ -137,6 +138,12 @@ const getCoursesByTeachers = async teacherIds => {
         group by course_code, t.name, t.code, co.name`,
     { replacements: { teacherIds }, type: sequelize.QueryTypes.SELECT }
   )
+
+  // Sequelize returns credis sums as string
+  courses.forEach((course) => {
+    course.credits = Number(course.credits)
+    course.students = Number(course.students)
+  })
 
   await redisClient.setAsync(TEACHER_COURSES_KEY(teacherIds), JSON.stringify(courses), 'EX', REDIS_CACHE_TTL)
 
