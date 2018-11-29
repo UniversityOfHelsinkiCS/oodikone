@@ -58,6 +58,8 @@ const getCourseGroupsWithTotals = async () => {
   })
 
   await redisClient.setAsync(COURSE_GROUP_STATISTICS_KEY, JSON.stringify(courseGroupStatistics), 'EX', REDIS_CACHE_TTL)
+
+  return courseGroupStatistics
 }
 
 const getTeachersByIds = async teacherIds => sequelize.query(
