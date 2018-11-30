@@ -74,14 +74,15 @@ const getGradeSeries = (series, multiplier, name) => {
 
   const newSeries = series.reduce((acc, cur, i) => {
     const currentEntries = Object.entries(cur)
+    let failed = 0
     currentEntries.forEach(([k, v]) => {
       if (failedKeys.includes(k)) {
-        acc[0].push(v)
+        failed += v
       } else {
         acc[k].push(v * multiplier)
       }
     })
-
+    acc[0].push(failed)
     Object.entries(acc).forEach(([k, v]) => {
       if (v.length < i + 1) {
         acc[k].push(0)
