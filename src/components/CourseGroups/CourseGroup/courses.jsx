@@ -89,7 +89,7 @@ class Courses extends Component {
         >
           {label}
           {isActive
-            ? <Icon name={`caret ${sortReverse ? 'up' : 'down'}`} />
+            ? <Icon name={`caret ${sortReverse ? 'down' : 'up'}`} />
             : null}
         </div>
       )
