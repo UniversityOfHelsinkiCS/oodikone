@@ -24,7 +24,6 @@ const getTeachersForCourseGroup = (courseGroupId) => {
   }
 }
 
-
 const getCourseGroupInfoByTeacherIds = teacherIds => sequelize.query(
   `select
         count(distinct c.course_code) as courses,
@@ -49,6 +48,11 @@ const getCourseGroupsWithTotals = async () => {
 
   const courseGroupStatistics = await Promise.map(courseGroupIds, async (courseGroupId) => {
     const teachers = getTeachersForCourseGroup(courseGroupId)
+
+    if (!teachers) {
+      return
+    }
+
     const name = COURSE_GROUP_NAMES[courseGroupId]
 
     const statistics = await getCourseGroupInfoByTeacherIds(teachers)
@@ -93,6 +97,10 @@ const getCourseGroup = async (courseGroupId) => {
   }
 
   const teacherIds = getTeachersForCourseGroup(courseGroupId)
+
+  if (!teacherIds) {
+    return
+  }
   const name = COURSE_GROUP_NAMES[courseGroupId]
   const statistics = await getCourseGroupInfoByTeacherIds(teacherIds)
   const teachers = await getTeachersByIds(teacherIds)
