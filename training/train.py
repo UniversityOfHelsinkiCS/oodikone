@@ -7,7 +7,7 @@ from sklearn.preprocessing import OneHotEncoder
 import pickle
 import tensorflow as tf 
 import itertools
-
+import re
 from keras.models import Sequential
 from sklearn.manifold import TSNE
 from datetime import datetime
@@ -165,9 +165,50 @@ def map_grades(grades):
   grades = grades.replace("NSLA", 1)
   return grades
 
+def convert_to_period(semester, month):
+  if (month < 4):
+      period = (semester * 2 - 1)
+  elif (month >= 4 and month <= 9):
+    period = (semester * 2)
+  elif (month < 11):
+    period = (semester * 2 - 1) 
+  else:
+    period = semester * 2 
+  return period
+
+def bucket_dates_to_relative(attainments):
+  dates = attainments[['attainmentdate', 'semester']]
+  all_student_attainments = pd.DataFrame()
+  i = 0
+  student_len = len(attainments["studentnumber"].unique())
+  for student in attainments["studentnumber"].unique():
+      i = i + 1
+      if i % 100 == 0:
+        print("BUCKETING: ", i, "/", student_len)
+      student_attainments = attainments[attainments["studentnumber"] == student]
+
+      first = student_attainments.sort_values(["attainmentdate"]).iloc[0][["semester", "attainmentdate"]]
+      date = datetime.strptime(first['attainmentdate'], "%Y-%m-%d %H:%M:%S+00")
+      month = date.month
+      first = convert_to_period(first["semester"], month)
+      periods = []
+      dates = student_attainments[['attainmentdate', 'semester']]
+
+      for index,row in dates.iterrows():
+        date = datetime.strptime(row['attainmentdate'], "%Y-%m-%d %H:%M:%S+00")
+        month = date.month
+        period = convert_to_period(row["semester"], month)
+        periods.append(period)
+
+      student_attainments["period"] = np.array(periods) - first + 1
+      all_student_attainments = all_student_attainments.append(student_attainments)
+
+  all_student_attainments.to_csv("./relative_period_attainments.csv")
+  return all_student_attainments
+
 def bucket_dates(attainments):
   dates = attainments[['attainmentdate', 'semester']]
-
+  
   periods = []
   for index,row in dates.iterrows():
     date = datetime.strptime(row['attainmentdate'], "%Y-%m-%d %H:%M:%S+00")
@@ -218,6 +259,113 @@ def map_old_to_new(data):
     
   return data
 
+def structure_hierarchy(attainments):
+  attainments = attainments.sort_values(["period"])
+  all_courses = pd.DataFrame(columns=attainments["code"].unique())
+  g_all_courses = all_courses.add_suffix("_g")
+  c_all_courses = all_courses.add_suffix("_c")
+  hier = {}
+  acual = {}
+  for period in attainments["period"].unique():
+    print(period, "/", len(attainments["period"].unique()))
+
+    acual[period] = attainments[attainments["period"] == period][["code", "grade"]]
+    
+
+    hier[period] = attainments[attainments["period"] == period][["code", "grade", "studentnumber"]]
+  
+    grade = hier[period].groupby(['code']).mean().reset_index()
+    grade = pd.concat([grade, g_all_courses], axis=1)
+    grade = pd.concat([grade, c_all_courses], axis=1)
+    count = hier[period].groupby(['code']).count().reset_index()
+    count = count.rename(index=str, columns={"grade": "count"})
+    grade = grade.drop(["studentnumber"], axis="columns")
+    count = count.drop(["studentnumber"], axis="columns")
+
+    acual[period] = pd.merge(grade, count, on="code")
+    #print(acual[period])
+  
+    previous = attainments[attainments["period"] < period][["code", "grade", "studentnumber", "period"]]
+    print("attainments: ", len(previous["code"]))
+    
+    for course in hier[period]["code"].unique():
+      #print(course)
+      grades = {}
+      counts = {}
+      for student in hier[period][hier[period]["code"] == course]["studentnumber"].unique():
+        
+        student_courses = previous[previous["studentnumber"] == student]
+        
+        for crs in student_courses["code"].unique():
+          crs_g = student_courses[student_courses["code"] == crs]["grade"].values
+          # print(crs_g)
+          if len(crs_g) > 0:
+            if crs + "_g" in grades:
+              grades[crs + "_g"] = (grades[crs + "_g"] + crs_g[0])/2
+            else:
+              grades[crs + "_g"] = crs_g[0]
+            if crs + "_c" in counts:
+              counts[crs + "_c"] = counts[crs + "_c"] + 1
+            else:
+              counts[crs + "_c"] = 1
+
+      idx = acual[period].index[acual[period]["code"] == course].tolist()[0]
+      for column, count in zip(grades.keys(), counts.keys()):
+        acual[period].at[idx , column] = grades[column]
+        acual[period].at[idx , count] = counts[count] 
+    print(acual[period])
+      
+
+  pickle.dump(acual, open("./data/hierarchical_attainments.pkl", "wb"))
+  return acual
+
+def start_acyclic_course_graph_calculation():
+  try:
+    attainments = pd.read_csv('./data/relative_period_attainments.csv')
+  except:
+    attainments = pd.read_csv('./data/CSattainments2008.csv', names=["id", "grade", "studentnumber", "credits", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "code", "semester", "studymodule"])
+    attainments = attainments[attainments["studymodule"] == "f"]
+    attainments = map_old_to_new(attainments)
+    attainments = bucket_dates_to_relative(attainments)
+  g = nx.DiGraph()
+  attainments["grade"] = map_grades(attainments["grade"])
+  attainments["grade"] = pd.to_numeric(attainments["grade"])
+  try:
+    courses = pickle.load(open("./data/hierarchical_attainments.pkl", "rb"))
+  except:
+    courses = structure_hierarchy(attainments)
+  try: 
+    g = pickle.load(open("./models/graph_acyclic.sav", "rb"))
+  except:
+    g.add_node("start")
+    g.add_nodes_from(["0_" + code for code in courses[0]["code"]])
+    i = 0
+    prev = ["start"]
+    for period in courses:
+      print("period: ", period, "/", len(courses),"| nodes: ", len(g.nodes), " edges: ", len(g.edges))
+      g.add_nodes_from([str(period) + "_" + code for code in courses[period]["code"]])
+      regx = r"^" + str(period) + r"_"
+      for course in [x for x in g.nodes if re.search(regx, x)]:
+        code = course.split("_")[1]
+        # print(courses[period])
+        data = courses[period][courses[period]["code"] == code]
+        # print(data)
+        if prev[0] == "start":
+          g.add_edge("start", course , grade = data["grade"].values[0], count = data["count"].values[0]) # SO MUCH CANCER SYNTAX 
+        else:
+          for previous_course in prev:
+            # print(data)
+            if data[previous_course + "_c"].values[0] > 4:
+              g.add_edge(str(period - 1) + "_" + previous_course, course, grade = data[previous_course + "_g"].values[0], count = data[previous_course + "_c"].values[0])
+      prev = courses[period]["code"]
+   
+
+  pickle.dump(g, open('./models/graph_acyclic.sav', 'wb'))
+  g = prune_graph(g)
+  pickle.dump(g, open('./models/graph_acyclic_pruned.sav', 'wb'))
+  return g
+
+
 def start_course_graph_calculation():
   attainments = pd.read_csv('./data/CSattainments2008.csv', names=["id", "grade", "studentnumber", "credits", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "code", "semester", "studymodule"])
   attainments = attainments[attainments["studymodule"] == "f"]
@@ -267,35 +415,98 @@ def start_course_graph_calculation():
   pickle.dump(g, open('./models/graph_pruned.sav', 'wb'))
   return g
 
-def suggest_next_course(done_courses=[]):
+def suggest_route_to_graduation(done_courses=[]):
   done_courses = map_old_to_new(pd.DataFrame(done_courses, columns=["code"]))["code"].unique()
-  print(done_courses)
-  g = pickle.load(open('./models/graph_pruned.sav', 'rb'))
-  attainments = pd.read_csv('./data/CSattainments2008.csv', names=["id", "grade", "studentnumber", "credits", "ordering", "createddate", "lastmodified", "typecode", "attainmentdate", "code", "semester", "studymodule"])
-  attainments = map_old_to_new(attainments)
-  attainments = bucket_dates(attainments)
+  g = pickle.load(open('./models/graph_acyclic.sav', 'rb'))
+  plt.figure()
+  nx.draw(g)
+  plt.show()
+  # def dijkstra(G, sources, target):
+  #   Q = []
+  #   on_route = []
+  #   dist = {}
+  #   prev = {}
+  #   done_courses = sources
+  #   source = sources[-1]
+  #   # Initialize graph 
+  #   for node in G.nodes:
+  #     dist[node] = 99999999999
+  #     prev[node] = None
+  #     Q.append(node)
+    
+  #   dist[source] = 0
 
-  now = np.max(attainments["period"])
-  print(now)
-  edges = []
-  suggested = {}
-  for course in done_courses:
-    for edge in g[course]:
-      if edge in done_courses or g[course][edge]["period"] < now - 8:
-        continue
-      weight = (g[course][edge]["weight"] + (g[course][edge]["count"] * 0.0005))
-      if edge in suggested:
-        if suggested[edge] > weight:
-          continue
-      suggested[edge] = weight
+  #   while Q:
+  #     least = 99999999999999
+  #     u = None
+  #     S = []
+  #     for node in Q:
+  #       tmp = dist[node]
+  #       if tmp < least:
+  #         u = node
+  #         least = tmp
+  #         if re.search(r"^3[0-9]*_TKT20013", u):
+  #           print(u, prev[u])
+  #           return dist, prev, u
       
-  top_three = sorted(suggested.items(), key=lambda kv: kv[1])[-3:]
-  return [tuplez[0] for tuplez in top_three]
+  #     Q.remove(u)
+  #     for v in g[u]:
+  #       alt = dist[u] + (5 - g[u][v]["grade"])
+  #       if alt < dist[v] and v.split("_")[1] not in on_route:
+  #         dist[v] = alt
+  #         prev[v] = u
+  #         on_route.append(v.split("_")[1])
 
+  # S = []
+  # dist, prev, target = dijkstra(g, done_courses, "TKT20013")
+  # u = target
+  # # print(dist)
+  # # print(prev)
+  # if prev[target] or target == "start":
+  #     while u:
+  #       print(u)
+  #       S.insert(0,u)
+  #       u = prev[u]
+        
+  # S.insert(0, done_courses)
+  # print(S)
+
+
+  # def initialize(graph, source):
+  #     d = {} # Stands for destination
+  #     p = {} # Stands for predecessor
+  #     for node in graph.nodes:
+  #         d[node] = float('Inf') # We start admiting that the rest of nodes are very very far
+  #         p[node] = None
+  #     d[source] = 0 # For the source we know how to reach
+  #     return d, p
+
+  # def relax(node, neighbour, graph, d, p):
+  #     # If the distance between the node and the neighbour is lower than the one I have now
+  #     if d[neighbour] > d[node] + (5 - graph[node][neighbour]["grade"]):
+  #         # Record this lower distance
+  #         d[neighbour]  = d[node] + (5 - graph[node][neighbour]["grade"])
+  #         p[neighbour] = node
+
+  # def bellman_ford(graph, sources):
+  #     d, p = initialize(graph, sources[-1])
+  #     for i in range(len(graph)-1): #Run this until is converges
+  #         for u in graph.nodes:
+  #             for v in graph[u]: #For each neighbour of u
+  #                 relax(u, v, graph, d, p) #Lets relax it
+
+
+  #     return d, p
+
+
+  
+  #print(routes)
+  return
 if __name__ == "__main__":
-  start_grade_estimate()
-  start_clustering()
-  g = start_course_graph_calculation()
+  # start_grade_estimate()
+  # start_clustering()
+  g = start_acyclic_course_graph_calculation()
+  suggest_route_to_graduation(["start"])
   print("Done.")
   exit( 1 )
 
