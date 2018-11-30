@@ -64,21 +64,18 @@ class Teachers extends Component {
     const { showOnlyActive } = state
     const activeTeachers = teachers.filter(t => t.isActive)
     const activeTeacherCount = activeTeachers.length
-    const teacherCount = teachers.length
     const resetShowOnlyActive = showOnlyActive && activeTeacherCount === 0
 
     if (!showOnlyActive || resetShowOnlyActive) {
       return {
         showOnlyActive: false,
         activeTeacherCount,
-        teacherCount,
         viewableTeachers: teachers
       }
     }
 
     return {
       activeTeacherCount,
-      teacherCount,
       viewableTeachers: activeTeachers
     }
   }
@@ -110,7 +107,7 @@ class Teachers extends Component {
         >
           {label}
           {isActive
-            ? <Icon name={`caret ${sortReverse ? 'up' : 'down'}`} />
+            ? <Icon name={`caret ${sortReverse ? 'down' : 'up'}`} />
             : null}
         </div>
       )
@@ -133,13 +130,12 @@ class Teachers extends Component {
     const {
       viewableTeachers,
       activeTeacherCount,
-      teacherCount,
       showOnlyActive,
       sortColumn,
       sortReverse
     } = this.state
     const toggleId = 'toggle'
-    const sortedTeachers = sortBy(viewableTeachers, [sortColumn])
+    const sortedTeachers = sortBy(viewableTeachers, sortColumn)
 
     if (sortReverse) {
       sortedTeachers.reverse()
@@ -148,7 +144,7 @@ class Teachers extends Component {
     return (
       <Fragment>
         <Header size="medium" className={styles.headerWithControl}>
-          <span>Teachers<span className={styles.teacherCount}>{teacherCount}</span></span>
+          Teachers
           <div className={styles.activeToggleContainer}>
             <label htmlFor={toggleId}>Show only active</label>
             <Radio
