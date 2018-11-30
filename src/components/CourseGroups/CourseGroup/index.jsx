@@ -25,12 +25,9 @@ class CourseGroup extends Component {
 
   async componentDidMount() {
     const { groupId } = this.props
-    let response
-    try {
-      response = await callApi(`courseGroups/${groupId}`)
-    } catch (e) {
-      // todo: error handling
-    }
+
+    const response = await callApi(`courseGroups/${groupId}`)
+
     const { name, totalCredits, totalStudents, totalCourses, teachers } = response.data
     this.setState({
       name,

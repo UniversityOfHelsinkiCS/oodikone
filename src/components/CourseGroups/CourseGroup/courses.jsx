@@ -64,7 +64,6 @@ class Courses extends Component {
       { isLoading: true, courses: [] },
       () => callApi(`courseGroups/teachers/?teacherIds=${JSON.stringify(teacherIds)}`)
         .then(({ data: courses }) => this.setState({ isLoading: false, courses }))
-        .catch(e => console.log('handle error', e))
     )
   }
 
