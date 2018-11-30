@@ -2,7 +2,6 @@ import React, { Fragment, Component } from 'react'
 import { Header, List, Button, Radio, Icon } from 'semantic-ui-react'
 import sortBy from 'lodash/sortBy'
 import { bool, func, shape, string, number } from 'prop-types'
-import { Header, List, Button, Radio } from 'semantic-ui-react'
 
 import styles from './courseGroup.css'
 
