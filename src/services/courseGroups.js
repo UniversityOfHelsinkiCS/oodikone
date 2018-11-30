@@ -24,6 +24,21 @@ const getTeachersForCourseGroup = (courseGroupId) => {
   }
 }
 
+
+const getCourseGroupInfoByTeacherIds = teacherIds => sequelize.query(
+  `select
+        count(distinct c.course_code) as courses,
+        sum(credits) as credits,
+        count(distinct student_studentnumber) as students
+      from credit_teachers ct
+        left join credit c on ct.credit_id = c.id
+      where
+        ct.teacher_id in (:teacherIds)
+      and
+        c.semestercode >= ${STATISTICS_START_SEMESTER}`,
+  { replacements: { teacherIds }, type: sequelize.QueryTypes.SELECT }
+)
+
 const getCourseGroupsWithTotals = async () => {
   const courseGroupIds = [1, 2]
   const cachedStats = await redisClient.getAsync(COURSE_GROUP_STATISTICS_KEY)
@@ -51,48 +66,6 @@ const getCourseGroupsWithTotals = async () => {
   return courseGroupStatistics
 }
 
-const getCourseGroup = async (courseGroupId) => {
-  const cachedCourseGroup = await redisClient.getAsync(COURSE_GROUP_KEY(courseGroupId))
-
-  if (cachedCourseGroup) {
-    return JSON.parse(cachedCourseGroup)
-  }
-
-  const teacherIds = getTeachersForCourseGroup(courseGroupId)
-  const name = COURSE_GROUP_NAMES[courseGroupId]
-  const statistics = await getCourseGroupInfoByTeacherIds(teacherIds)
-  const teachers = await getTeachersByIds(teacherIds)
-
-  const { credits, students, courses } = statistics[0]
-
-  const courseGroup = {
-    id: courseGroupId,
-    name,
-    teachers,
-    totalCredits: credits,
-    totalStudents: students,
-    totalCourses: courses
-  }
-
-  await redisClient.setAsync(COURSE_GROUP_KEY(courseGroupId), JSON.stringify(courseGroup), 'EX', REDIS_CACHE_TTL)
-
-  return courseGroup
-}
-
-const getCourseGroupInfoByTeacherIds = teacherIds => sequelize.query(
-  `select
-        count(distinct c.course_code) as courses,
-        sum(credits) as credits,
-        count(distinct student_studentnumber) as students
-      from credit_teachers ct
-        left join credit c on ct.credit_id = c.id
-      where
-        ct.teacher_id in (:teacherIds)
-      and
-        c.semestercode >= ${STATISTICS_START_SEMESTER}`,
-  { replacements: { teacherIds }, type: sequelize.QueryTypes.SELECT }
-)
-
 const getTeachersByIds = async teacherIds => sequelize.query(
   `select
         t.id as id,
@@ -112,33 +85,45 @@ const getTeachersByIds = async teacherIds => sequelize.query(
   { replacements: { teacherIds }, type: sequelize.QueryTypes.SELECT }
 )
 
-const getCoursesByTeachers = async teacherIds => {
-  const cachedData = await redisClient.getAsync(TEACHER_COURSES_KEY(teacherIds))
 const getCourseGroup = async (courseGroupId) => {
+  const cachedCourseGroup = await redisClient.getAsync(COURSE_GROUP_KEY(courseGroupId))
+
+  if (cachedCourseGroup) {
+    return JSON.parse(cachedCourseGroup)
+  }
+
   const teacherIds = getTeachersForCourseGroup(courseGroupId)
   const name = COURSE_GROUP_NAMES[courseGroupId]
   const statistics = await getCourseGroupInfoByTeacherIds(teacherIds)
-  const teachersByIds = await getTeachersByIds(teacherIds)
+  const teachers = await getTeachersByIds(teacherIds)
 
   const { credits, students, courses } = statistics[0]
 
-  if (cachedData) {
-    return JSON.parse(cachedData)
-  const teachers = teachersByIds.map(t => ({
-    id: t.id,
-    name: t.name,
-    code: t.code,
-    courses: Number(t.courses),
-    credits: Number(t.credits)
-  }))
+  teachers.forEach((t) => {
+    t.courses = Number(t.courses)
+    t.credits = Number(t.credits)
+    t.students = Number(t.students)
+  })
 
-  return {
+  const courseGroup = {
     id: courseGroupId,
     name,
     teachers,
     totalCredits: credits,
     totalStudents: students,
     totalCourses: courses
+  }
+
+  await redisClient.setAsync(COURSE_GROUP_KEY(courseGroupId), JSON.stringify(courseGroup), 'EX', REDIS_CACHE_TTL)
+
+  return courseGroup
+}
+
+const getCoursesByTeachers = async (teacherIds) => {
+  const cachedData = await redisClient.getAsync(TEACHER_COURSES_KEY(teacherIds))
+
+  if (cachedData) {
+    return JSON.parse(cachedData)
   }
 
   const courses = await sequelize.query(
