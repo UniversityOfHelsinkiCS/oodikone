@@ -1,5 +1,6 @@
 import React, { Fragment, Component } from 'react'
 import { Header, List, Loader, Placeholder, Icon } from 'semantic-ui-react'
+import sortBy from 'lodash/sortBy'
 import { callApi } from '../../../apiConnection'
 import styles from './courseGroup.css'
 
@@ -11,15 +12,15 @@ const courseColumnTypes = {
   STUDENTS: 'students'
 }
 
-const CourseItem = ({ course }) => {
+const CourseItem = ({ course }) => { // eslint-disable-line react/prop-types
   const { coursecode, teachername, credits, students, coursenames } = course
   const coursename = coursenames.fi
   return (
     <List.Item>
       <List.Content className={styles.courseInfoContent}>
-        <div className={styles.courseInfoTeacher}>{teachername}</div>
-        <div className={styles.courseInfoCode}>{coursecode}</div>
         <div className={styles.courseInfoName}>{coursename}</div>
+        <div className={styles.courseInfoCode}>{coursecode}</div>
+        <div className={styles.courseInfoTeacher}>{teachername}</div>
         <div className={styles.courseInfoItem}>{credits}</div>
         <div className={styles.courseInfoItem}>{students}</div>
       </List.Content>
@@ -49,13 +50,11 @@ class Courses extends Component {
   onCourseHeaderClick = (columnName) => {
     const { sortColumn, sortReverse } = this.state
     const isSortColumn = columnName === sortColumn
-    this.setState(
-      {
-        sortColumn: columnName,
-        sortReverse: isSortColumn ? !sortReverse : sortReverse
-      },
-      () => this.fetchCourses()
-    )
+
+    this.setState({
+      sortColumn: columnName,
+      sortReverse: isSortColumn ? !sortReverse : sortReverse
+    })
   }
 
   fetchCourses = async () => {
@@ -65,7 +64,7 @@ class Courses extends Component {
       { isLoading: true, courses: [] },
       () => callApi(`courseGroups/teachers/?teacherIds=${JSON.stringify(teacherIds)}`)
         .then(({ data: courses }) => this.setState({ isLoading: false, courses }))
-        .catch(e => console.log('handle error'))
+        .catch(e => console.log('handle error', e))
     )
   }
 
@@ -99,9 +98,9 @@ class Courses extends Component {
     return (
       <List.Header>
         <List.Content className={styles.courseHeaderContent}>
-          {getHeader(styles.courseHeaderTeacher, 'Teacher', courseColumnTypes.TEACHER)}
-          {getHeader(styles.courseHeaderCode, 'Code', courseColumnTypes.CODE)}
           {getHeader(styles.courseHeaderName, 'Name', courseColumnTypes.NAME)}
+          {getHeader(styles.courseHeaderCode, 'Code', courseColumnTypes.CODE)}
+          {getHeader(styles.courseHeaderTeacher, 'Teacher', courseColumnTypes.TEACHER)}
           {getHeader(styles.courseHeaderItem, 'Credits', courseColumnTypes.CREDITS)}
           {getHeader(styles.courseHeaderItem, 'Students', courseColumnTypes.STUDENTS)}
         </List.Content>
@@ -110,7 +109,12 @@ class Courses extends Component {
   }
 
   render() {
-    const { isLoading, courses } = this.state
+    const { isLoading, courses, sortColumn, sortReverse } = this.state
+    const sortedCourses = sortBy(courses, sortColumn)
+
+    if (sortReverse) {
+      sortedCourses.reverse()
+    }
 
     return (
       <Fragment>
@@ -121,7 +125,7 @@ class Courses extends Component {
          :
          <List celled>
            {this.renderListHeader()}
-           {courses.map(c =>
+           {sortedCourses.map(c =>
              <CourseItem key={`${c.coursecode}-${c.teachercode}`} course={c} />)}
          </List>
         }

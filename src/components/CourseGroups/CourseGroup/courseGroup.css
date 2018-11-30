@@ -112,6 +112,16 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
+  flex: 0 0 20%;
+}
+
+.statisticLabel {
+  color: var(--darkSilver);
+  text-align: center;
+}
+
+.statisticNumber {
+  margin-left: 0.25em;
   font-weight: 600;
   font-size: 1.25em;
 }

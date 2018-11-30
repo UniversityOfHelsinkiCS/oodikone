@@ -54,9 +54,9 @@ class Main extends Component {
   //  const { reduxState } = this.props
     const name = await getUserName()
     Sentry.configureScope((scope) => {
-  //    Object.keys(reduxState).forEach((key) => {
-  //      scope.setExtra(key, JSON.stringify(reduxState[key]))
-  //    })
+    //    Object.keys(reduxState).forEach((key) => {
+    //      scope.setExtra(key, JSON.stringify(reduxState[key]))
+    //    })
       scope.setUser({ username: name })
     })
     Sentry.captureException(e)
@@ -130,4 +130,3 @@ class Main extends Component {
 
 // export default connect(mapStateToProps)(localize(Main, 'locale'))
 export default localize(Main, 'locale')
-
