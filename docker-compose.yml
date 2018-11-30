@@ -7,9 +7,12 @@ services:
       - "5421:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
     container_name: oodi_db
     environment:
-      POSTGRES_DB: tkt_oodi
+      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
   redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
