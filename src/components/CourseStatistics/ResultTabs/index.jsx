@@ -82,7 +82,7 @@ const getGradeSeries = (series, multiplier, name) => {
         acc[k].push(v * multiplier)
       }
     })
-    acc[0].push(failed)
+    acc[0].push(failed * multiplier)
     Object.entries(acc).forEach(([k, v]) => {
       if (v.length < i + 1) {
         acc[k].push(0)
