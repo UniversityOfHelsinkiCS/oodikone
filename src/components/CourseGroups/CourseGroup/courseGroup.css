@@ -1,0 +1,129 @@
+.headerWithControl {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1em !important;
+}
+
+.iconButton {
+  font-size: 1em !important;
+  background: transparent !important;
+}
+
+.activeIconButton {
+  font-size: 1em;
+}
+
+.groupStatistics {
+  display: flex;
+  justify-content: space-around !important;
+  align-items: flex-end !important;
+  margin: 0 !important;
+}
+
+.groupStatistic {
+  flex: 1 !important;
+  margin: 0 !important;
+}
+
+.teacherActiveItem {
+  background: var(--lightSilver);
+}
+
+.courseInfoContent,
+.teacherItemStatistics,
+.courseHeaderContent {
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+  display: flex;
+  justify-content: space-between;
+}
+
+.courseHeaderContent {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  font-size: 1.1em;
+}
+
+.courseHeaderContent > div {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.teacherName {
+  font-weight: 700;
+  font-size: 1.075em;
+}
+
+.teacherCount {
+  padding-left: 0.25em;
+}
+
+.teacherCount,
+.teacherCode {
+  color: var(--darkSilver);
+  font-weight: 600;
+}
+
+.teacherItemBasicInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 33%;
+}
+
+.courseInfoItem,
+.courseInfoCode,
+.courseHeaderCode,
+.courseHeaderItem {
+  flex: 0 0 10%;
+  text-align: center;
+}
+
+.courseHeaderCode,
+.courseInfoCode {
+  text-align: left;
+}
+
+.courseInfoName,
+.courseInfoTeacher,
+.courseHeaderTeacher,
+.courseHeaderName,
+.teacherHeaderName {
+  flex: 0 0 33%;
+  text-align: left;
+}
+
+.teacherHeaderFilter {
+  cursor: default !important;
+}
+
+.statisticControlItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.teacherStatisticNumber,
+.teacherHeaderItem {
+  flex: 0 0 20%;
+  text-align: center;
+}
+
+.teacherStatisticNumber {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex: 0 0 20%;
+  font-size: 1.3em;
+  font-weight: 600;
+}
+
+.activeToggleContainer {
+  display: flex;
+  align-items: center;
+}
+
+.activeToggleContainer > label {
+  color: var(--darkSilver);
+  font-size: 0.75em;
+  padding-right: 0.5em;
+}
