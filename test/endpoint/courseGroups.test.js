@@ -1,0 +1,79 @@
+const supertest = require('supertest')
+const jwt = require('jsonwebtoken')
+const conf = require('../../src/conf-backend')
+const { forceSyncDatabase } = require('../../src/database/connection')
+
+const { sequelize } = require('../../src/models/index')
+
+jest.mock('../../src/services/redis', () => ({
+  __esModule: true,
+  redisClient: {
+    getAsync: jest.fn(() => Promise.resolve()),
+    setAsync: jest.fn(() => Promise.resolve())
+  }
+}))
+
+const uid = 'tktl'
+const payload = { userId: uid, name: '', enabled: true, admin: true }
+
+const token = jwt.sign(payload, conf.TOKEN_SECRET, {
+  expiresIn: '24h'
+})
+
+beforeAll(async () => {
+  await forceSyncDatabase()
+})
+
+afterAll(async () => {
+  await sequelize.close()
+})
+
+describe('Course groups endpoint tests', () => {
+  test('Ping test', async () => {
+    const app = require('../../src/app')
+    const res = await supertest(app)
+      .get('/ping')
+
+    expect(res.status).toBe(200)
+    app.close()
+  })
+
+  test('Get list of available course groups', async () => {
+    const app = require('../../src/app')
+
+    const res = await supertest(app)
+      .get('/api/courseGroups')
+      .set('x-access-token', token)
+      .set('uid', uid)
+
+
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual([
+      expect.objectContaining({
+        credits: null,
+        id: 1,
+        name: 'Erityispedagogiikka',
+        students: 0
+      }),
+      expect.objectContaining({
+        credits: null,
+        id: 2,
+        name: 'Kasvatuspsykologia',
+        students: 0
+      })
+    ])
+    app.close()
+  })
+
+  test('Get teachers for course group', async () => {
+    const app = require('../../src/app')
+    const res = await supertest(app)
+      .get('/api/courseGroups/1/teachers')
+      .set('x-access-token', token)
+      .set('uid', uid)
+
+    expect(res.status).toBe(200)
+    expect(res.body.length).toBe(8)
+    app.close()
+  })
+})
