@@ -30,6 +30,7 @@
     "prefer-arrow-callback": 2,
     "babel/no-invalid-this": 2,
     "lines-between-class-members": [2, "always"],
+    "no-plusplus": 0,
     "babel/semi": [
       2,
       "never"
