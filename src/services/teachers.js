@@ -11,7 +11,7 @@ const nameLike = terms => ({
   }
 })
 
-const codeLike = terms => {
+const codeLike = (terms) => {
   if (terms.length !== 1) {
     return undefined
   }
@@ -22,9 +22,9 @@ const codeLike = terms => {
   }
 }
 
-const matchesId = searchTerm => ({ id: { [Op.eq]: searchTerm }})
+const matchesId = searchTerm => ({ id: { [Op.eq]: searchTerm } })
 
-const bySearchTerm = async rawTerm => {
+const bySearchTerm = async (rawTerm) => {
   const searchTerm = rawTerm.trim()
   if (!searchTerm) {
     return []
@@ -92,9 +92,8 @@ const markCredit = (stats, passed, failed, credits) => {
       ...stats,
       failed: stats.failed + 1
     }
-  } else {
-    return stats
   }
+  return stats
 }
 
 const parseAndMarkCredit = (stats, key, credit) => {
@@ -135,7 +134,7 @@ const markCreditForCourse = (courses, credit) => {
   const { passed, failed, credits, course, semester } = parseCreditInfo(credit)
   const { code, name } = course
   const { semestercode } = semester
-  const { stats, semesters={}, ...rest } = courses[code] || { id: code, name }
+  const { stats, semesters = {}, ...rest } = courses[code] || { id: code, name }
   return {
     ...courses,
     [code]: {
@@ -146,16 +145,14 @@ const markCreditForCourse = (courses, credit) => {
   }
 }
 
-const teacherStats = async teacherid => {
+const teacherStats = async (teacherid) => {
   const teacher = await findTeacherCredits(teacherid)
-  const statistics = teacher.credits.filter(isRegularCourse).reduce(({ semesters, years, courses, ...rest }, credit) => {
-    return {
-      ...rest,
-      semesters: markCreditForSemester(semesters, credit),
-      years: markCreditForYear(years, credit),
-      courses: markCreditForCourse(courses, credit)
-    }
-  }, {
+  const statistics = teacher.credits.filter(isRegularCourse).reduce(({ semesters, years, courses, ...rest }, credit) => ({
+    ...rest,
+    semesters: markCreditForSemester(semesters, credit),
+    years: markCreditForYear(years, credit),
+    courses: markCreditForCourse(courses, credit)
+  }), {
     semesters: {},
     courses: {},
     years: {}
@@ -242,9 +239,8 @@ const calculateCreditStatistics = credits => credits.reduce((stats, credit) => {
   if (isRegularCourse(credit)) {
     const { passed, failed, credits } = parseCreditInfo(credit)
     return markCredit(stats, passed, failed, credits)
-  } else {
-    return stats
   }
+  return stats
 }, {
   passed: 0,
   failed: 0,
@@ -254,22 +250,21 @@ const calculateCreditStatistics = credits => credits.reduce((stats, credit) => {
 const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) => {
   const ids = await activeTeachers(providers, semestercodeStart, semestercodeEnd)
   const teachers = await getCredits(ids, semestercodeStart, semestercodeEnd)
-  const statistics = teachers.reduce((acc, teacher) => {
-    return {
-      ...acc,
-      [teacher.id]: {
-        name: teacher.name,
-        code: teacher.code,
-        id: teacher.id,
-        stats: calculateCreditStatistics(teacher.credits)
-      }
+  const statistics = teachers.reduce((acc, teacher) => ({
+    ...acc,
+    [teacher.id]: {
+      name: teacher.name,
+      code: teacher.code,
+      id: teacher.id,
+      stats: calculateCreditStatistics(teacher.credits)
     }
-  }, {})
+  }), {})
   return statistics
 }
 
 module.exports = {
   bySearchTerm,
   teacherStats,
-  yearlyStatistics
+  yearlyStatistics,
+  getCredits
 }
