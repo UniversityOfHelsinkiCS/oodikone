@@ -346,7 +346,7 @@ def start_acyclic_course_graph_calculation():
       g.add_nodes_from([str(period) + "_" + code for code in courses[period]["code"]])
       regx = r"^" + str(period) + r"_"
       for course in [x for x in g.nodes if re.search(regx, x)]:
-        code = course.split("_")[1]
+        code = course.split("_")[1], "TKT20013"
         # print(courses[period])
         data = courses[period][courses[period]["code"] == code]
         # print(data)
@@ -355,14 +355,12 @@ def start_acyclic_course_graph_calculation():
         else:
           for previous_course in prev:
             # print(data)
-            if data[previous_course + "_c"].values[0] > 4:
+            if data[previous_course + "_c"].values[0] > 0:
               g.add_edge(str(period - 1) + "_" + previous_course, course, grade = data[previous_course + "_g"].values[0], count = data[previous_course + "_c"].values[0])
       prev = courses[period]["code"]
    
 
   pickle.dump(g, open('./models/graph_acyclic.sav', 'wb'))
-  g = prune_graph(g)
-  pickle.dump(g, open('./models/graph_acyclic_pruned.sav', 'wb'))
   return g
 
 
@@ -418,88 +416,60 @@ def start_course_graph_calculation():
 def suggest_route_to_graduation(done_courses=[]):
   done_courses = map_old_to_new(pd.DataFrame(done_courses, columns=["code"]))["code"].unique()
   g = pickle.load(open('./models/graph_acyclic.sav', 'rb'))
-  plt.figure()
-  nx.draw(g)
-  plt.show()
-  # def dijkstra(G, sources, target):
-  #   Q = []
-  #   on_route = []
-  #   dist = {}
-  #   prev = {}
-  #   done_courses = sources
-  #   source = sources[-1]
-  #   # Initialize graph 
-  #   for node in G.nodes:
-  #     dist[node] = 99999999999
-  #     prev[node] = None
-  #     Q.append(node)
-    
-  #   dist[source] = 0
-
-  #   while Q:
-  #     least = 99999999999999
-  #     u = None
-  #     S = []
-  #     for node in Q:
-  #       tmp = dist[node]
-  #       if tmp < least:
-  #         u = node
-  #         least = tmp
-  #         if re.search(r"^3[0-9]*_TKT20013", u):
-  #           print(u, prev[u])
-  #           return dist, prev, u
-      
-  #     Q.remove(u)
-  #     for v in g[u]:
-  #       alt = dist[u] + (5 - g[u][v]["grade"])
-  #       if alt < dist[v] and v.split("_")[1] not in on_route:
-  #         dist[v] = alt
-  #         prev[v] = u
-  #         on_route.append(v.split("_")[1])
-
-  # S = []
-  # dist, prev, target = dijkstra(g, done_courses, "TKT20013")
-  # u = target
-  # # print(dist)
-  # # print(prev)
-  # if prev[target] or target == "start":
-  #     while u:
-  #       print(u)
-  #       S.insert(0,u)
-  #       u = prev[u]
-        
-  # S.insert(0, done_courses)
-  # print(S)
-
-
-  # def initialize(graph, source):
-  #     d = {} # Stands for destination
-  #     p = {} # Stands for predecessor
-  #     for node in graph.nodes:
-  #         d[node] = float('Inf') # We start admiting that the rest of nodes are very very far
-  #         p[node] = None
-  #     d[source] = 0 # For the source we know how to reach
-  #     return d, p
-
-  # def relax(node, neighbour, graph, d, p):
-  #     # If the distance between the node and the neighbour is lower than the one I have now
-  #     if d[neighbour] > d[node] + (5 - graph[node][neighbour]["grade"]):
-  #         # Record this lower distance
-  #         d[neighbour]  = d[node] + (5 - graph[node][neighbour]["grade"])
-  #         p[neighbour] = node
-
-  # def bellman_ford(graph, sources):
-  #     d, p = initialize(graph, sources[-1])
-  #     for i in range(len(graph)-1): #Run this until is converges
-  #         for u in graph.nodes:
-  #             for v in graph[u]: #For each neighbour of u
-  #                 relax(u, v, graph, d, p) #Lets relax it
-
-
-  #     return d, p
-
-
+  compulsory = pd.read_json("./data/degree_structure.json")
+  compulsory = compulsory["CS"].map(lambda x: x["courses"] if 'courses' in x else [x[0]["courses"], x[1]["courses"]])
+  compulsory = compulsory[0] + compulsory[1] + compulsory[2] + compulsory[3][0] + compulsory[3][1]
   
+  def find_path(graph, start, path=[]):
+        path = path + [start]
+  
+        s = start
+        
+        top_three = ["none", "none", "none"]
+        top_three_v = [-100,-100,-100]
+        top_comp = {}
+        for comp in compulsory:
+          top_comp[comp] = -100
+        for v in graph[s]:
+          if v not in path and any(graph[s][v]["grade"] > i for i in top_three_v) and len(graph[v]) > 0:
+            idx = np.argmin(top_three_v)
+            top_three[idx] = v
+            top_three_v[idx] = graph[s][v]["grade"]
+        path = path + top_three
+
+        def naive_bois(path, graph, i):
+          top_three = ["none", "none", "none"]
+          top_three_v = [-100,-100,-100]
+          for v in path[-3:-1]:
+            if v == "none":
+              continue
+            for pot in graph[v]:
+              course_name = pot.split["_"][1]
+              grade = graph[v][pot]["grade"]
+              if re.search(r"^3[0-9]_TKT20013", pot):
+                return path + [pot]
+
+              if course_name in compulsory:
+                  if grade > top_comp[course_name]:
+                    top_comp[course_name] = grade
+
+              if course_name not in [z.split("_")[1] for z in path[1:]] and any(grade > i for i in top_three_v) and len(graph[pot]) > 0 and pot not in top_three:
+                  idx = np.argmin(top_three_v)
+                  top_three[idx] = pot
+                  top_three_v[idx] = grade
+          
+            
+          path = path + [y for y in top_three if y != "none"]
+          if i  == 42:
+            return path
+          return naive_bois(path, graph, i + 1)
+          
+
+        path = naive_bois(path, graph, 0)
+        return path
+   
+  path = find_path(g,"start")
+  print(path)
   #print(routes)
   return
 if __name__ == "__main__":
