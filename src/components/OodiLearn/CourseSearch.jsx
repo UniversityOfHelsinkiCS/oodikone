@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Message } from 'semantic-ui-react'
+import { Segment } from 'semantic-ui-react'
 import { func, arrayOf, shape } from 'prop-types'
 import AutoSubmitSearchInput from '../AutoSubmitSearchInput'
 import { getCourses } from '../../redux/oodilearnCourses'
@@ -13,9 +13,11 @@ class StudentSearch extends Component {
     state={
       searchterm: ''
     }
+
     componentDidMount() {
       this.props.getCourses()
     }
+
     render() {
       const { courses } = this.props
       const { searchterm } = this.state
@@ -28,9 +30,9 @@ class StudentSearch extends Component {
             onChange={val => this.setState({ searchterm: val })}
             loading={false}
             minSearchLength={MIN_SEARCH_LENGTH}
-            disabled={true}
+            disabled
           />
-          <ResultTable 
+          <ResultTable
             results={courses.map(({ code: id, name }) => ({
               id,
               name,
@@ -49,7 +51,7 @@ StudentSearch.propTypes = {
   onClickResult: func.isRequired
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   courses: oodilearnSelector.getSearchedCourses(state)
 })
 

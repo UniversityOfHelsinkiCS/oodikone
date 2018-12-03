@@ -12,6 +12,7 @@ class StudentSearch extends Component {
     state={
       searchterm: ''
     }
+
     render() {
       const { error, loading, hasData } = this.props
       const { searchterm } = this.state
