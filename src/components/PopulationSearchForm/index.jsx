@@ -313,7 +313,7 @@ class PopulationSearchForm extends Component {
           <label>Statistics until</label>
           <Datetime
             dateFormat="MMMM YYYY"
-            value={this.getMonthValue(this.state.query.year, this.state.floatMonths)}
+            defaultValue={this.getMonthValue(this.state.query.year, this.state.floatMonths)}
             onChange={value => this.handleMonthsChange(value)}
             isValidDate={current => current.isBefore(moment()) &&
               current.isAfter(this.getMinSelection(year, semesters[1] || semesters[0]))}
