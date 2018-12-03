@@ -1,13 +1,13 @@
 const moment = require('moment')
 
-const SPRING = { start: 1, end: 7 }
+const SPRING = { start: 0, end: 6 }
 
 const isSpring = date => SPRING.start <= date.month() && date.month() <= SPRING.end
 
 const getSemester = date => isSpring(date) ? 'SPRING' : 'FALL'
 
 const getPassingSemester = (startYear, date) => {
-  const mDate = moment(date)
+  const mDate = moment(date).add(1, 'day')
   const year = mDate.year()
   const semester = getSemester(mDate)
   const yearDiff = year - startYear
