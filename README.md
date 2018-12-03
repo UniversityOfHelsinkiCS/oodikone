@@ -8,6 +8,10 @@ Install Docker CE on your machine:
 - [macOS](https://docs.docker.com/docker-for-mac/install/)
 - [Windows](https://docs.docker.com/docker-for-windows/install/)
 
+Install Docker Compose: 
+
+- https://docs.docker.com/compose/install/
+
 ## Installation
 
 Launch the CLI with the command below and follow the instructions. 
