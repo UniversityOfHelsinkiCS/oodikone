@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { Tab, Grid, Radio, Form } from 'semantic-ui-react'
 import { shape, string, number, oneOfType, arrayOf, func, bool } from 'prop-types'
 
@@ -7,9 +7,16 @@ import { passRateCumGraphOptions, passRateStudGraphOptions, gradeGraphOptions } 
 import CumulativeTable from './CumulativeTable'
 import StudentTable from './StudentTable'
 
+
+const graphSeriesTypes = {
+  PRIMARY: { name: 'primary', multiplier: 1 },
+  COMPARISON: { name: 'comparison', multiplier: -1 }
+}
+
 const getDataObject = (name, data, stack) => ({ name, data, stack })
 
-const getPassRateCumSeriesFromStats = (stats, multiplier = 1, name = '') => {
+const getPassRateCumSeriesFromStats = (stats, seriesType) => {
+  const { name, multiplier } = seriesType
   const all = []
   const passed = []
   const failed = []
@@ -28,7 +35,9 @@ const getPassRateCumSeriesFromStats = (stats, multiplier = 1, name = '') => {
   ]
 }
 
-const getPassRateStudSeriesFromStats = (stats, multiplier = 1, name = '') => {
+const getPassRateStudSeriesFromStats = (stats, seriesType) => {
+  const { name, multiplier } = seriesType
+
   const all = []
   const failedFirst = []
   const failedRetry = []
@@ -59,7 +68,8 @@ const getPassRateStudSeriesFromStats = (stats, multiplier = 1, name = '') => {
   ]
 }
 
-const getGradeSeries = (series, multiplier, name) => {
+const getGradeSeries = (series, seriesType) => {
+  const { name, multiplier } = seriesType
   const failedKeys = ['Eisa', 'Hyl.', '0', 'Luop']
 
   const baseAccumalator = {
@@ -103,14 +113,14 @@ const getGradeSeries = (series, multiplier, name) => {
   ]
 }
 
-const getGradeCumSeriesFromStats = (stats, multiplier = 1, name = '') => {
+const getGradeCumSeriesFromStats = (stats, seriesType) => {
   const series = stats.flatMap(s => s.cumulative.grades)
-  return getGradeSeries(series, multiplier, name)
+  return getGradeSeries(series, seriesType)
 }
 
-const getGradeStudSeriesFromStats = (stats, multiplier = 1, name = '') => {
+const getGradeStudSeriesFromStats = (stats, seriesType) => {
   const series = stats.flatMap(s => s.students.grades)
-  return getGradeSeries(series, multiplier, name)
+  return getGradeSeries(series, seriesType)
 }
 
 const getMaxValueOfSeries = series => Object.values(series).reduce((acc, cur) => {
@@ -121,97 +131,111 @@ const getMaxValueOfSeries = series => Object.values(series).reduce((acc, cur) =>
 class ResultTabs extends Component {
   state = {}
 
-  render() {
-    const { primary, comparison, changeMode, cumMode } = this.props
+  getTablePane = () => {
+    const { primary, comparison, cumMode } = this.props
 
-    const primaryName = 'primary'
-    const comparisonName = 'comparison'
-    const primaryMultiplier = 1
-    const comparisonMultiplier = -1
+    const getTables = ({ name, stats }) => (
+      <Grid.Column>
+        {cumMode
+            ? <CumulativeTable name={name} stats={stats} />
+            : <StudentTable name={name} stats={stats} />
+          }
+      </Grid.Column>
+    )
+
+    return (
+      <Fragment>
+        {primary && getTables(primary)}
+        {comparison && getTables(comparison)}
+      </Fragment>
+    )
+  }
+
+  getPassRatePane = () => {
+    const { primary, comparison, cumMode } = this.props
+
     const primaryStats = primary.stats
+    const statYears = primaryStats.map(year => year.name)
     const comparisonStats = comparison ? comparison.stats : []
     const passGraphSerieFn = cumMode ? getPassRateCumSeriesFromStats : getPassRateStudSeriesFromStats
-    const graphOptionsFn = cumMode ? passRateCumGraphOptions : passRateStudGraphOptions
-    const gradeGraphSerieFn = cumMode ? getGradeCumSeriesFromStats : getGradeStudSeriesFromStats
 
     const passGraphSerie = [
-      ...passGraphSerieFn(primaryStats, primaryMultiplier, primaryName),
-      ...passGraphSerieFn(comparisonStats, comparisonMultiplier, comparisonName)
+      ...passGraphSerieFn(primaryStats, graphSeriesTypes.PRIMARY),
+      ...passGraphSerieFn(comparisonStats, graphSeriesTypes.COMPARISON)
     ]
 
     const maxPassRateVal = getMaxValueOfSeries(passGraphSerie)
+    const graphOptionsFn = cumMode ? passRateCumGraphOptions : passRateStudGraphOptions
+    const graphOptions = graphOptionsFn(statYears, maxPassRateVal)
 
-    const graphOptions = graphOptionsFn(primaryStats.map(year => year.name), maxPassRateVal)
+    return (
+      <Grid.Column>
+        <StackedBarChart
+          options={graphOptions}
+          series={passGraphSerie}
+        />
+      </Grid.Column>
+    )
+  }
+
+  getDistributionPane = () => {
+    const { primary, comparison, cumMode } = this.props
+
+    const primaryStats = primary.stats
+    const statYears = primaryStats.map(year => year.name)
+    const comparisonStats = comparison ? comparison.stats : []
+
+    const gradeGraphSerieFn = cumMode ? getGradeCumSeriesFromStats : getGradeStudSeriesFromStats
+
 
     const gradeGraphSerie = [
-      ...gradeGraphSerieFn(primaryStats, primaryMultiplier, primaryName),
-      ...gradeGraphSerieFn(comparisonStats, comparisonMultiplier, comparisonName)
+      ...gradeGraphSerieFn(primaryStats, graphSeriesTypes.PRIMARY),
+      ...gradeGraphSerieFn(comparisonStats, graphSeriesTypes.COMPARISON)
     ]
+
     const maxGradeValue = getMaxValueOfSeries(gradeGraphSerie)
 
-    const panes = [
-      {
-        menuItem: { key: 'Table', icon: 'table', content: 'Table' },
+    const distributionOptions = gradeGraphOptions(statYears, maxGradeValue)
+
+    return (
+      <Grid.Column>
+        <StackedBarChart
+          options={distributionOptions}
+          series={gradeGraphSerie}
+        />
+      </Grid.Column>
+    )
+  }
+
+  getPanes = () => {
+    const paneMenuItems = [
+      { menuItem: { key: 'Table', icon: 'table', content: 'Table' },
+        renderFn: this.getTablePane },
+      { menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
+        renderFn: this.getPassRatePane },
+      { menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
+        renderFn: this.getDistributionPane }
+    ]
+
+    return paneMenuItems.map((p) => {
+      const { menuItem, renderFn } = p
+      return {
+        menuItem,
         render: () => (
           <Grid padded="vertically" columns="equal">
             <Grid.Row>
-              {primary && (
-                <Grid.Column>
-                  {cumMode
-                    ? <CumulativeTable name={primary.name} stats={primary.stats} />
-                    : <StudentTable name={primary.name} stats={primary.stats} />
-                  }
-                </Grid.Column>
-              )}
-              {
-                comparison && (
-                  <Grid.Column>
-                    {cumMode
-                      ? <CumulativeTable name={comparison.name} stats={comparison.stats} />
-                      : <StudentTable name={comparison.name} stats={comparison.stats} />
-                    }
-                  </Grid.Column>
-                )
-              }
-            </Grid.Row>
-          </Grid>
-        )
-      },
-      {
-        menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
-        render: () => (
-          <Grid padded="vertically" columns="equal">
-            <Grid.Row>
-              {primary && (
-                <Grid.Column>
-                  <StackedBarChart
-                    options={graphOptions}
-                    series={passGraphSerie}
-                  />
-                </Grid.Column>
-              )}
-            </Grid.Row>
-          </Grid>
-        )
-      },
-      {
-        menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
-        render: () => (
-          <Grid padded="vertically" columns="equal">
-            <Grid.Row>
-              {primary && (
-                <Grid.Column>
-                  <StackedBarChart
-                    options={gradeGraphOptions(primary.stats.map(year => year.name), maxGradeValue)}
-                    series={gradeGraphSerie}
-                  />
-                </Grid.Column>
-              )}
+              {renderFn()}
             </Grid.Row>
           </Grid>
         )
       }
-    ]
+    })
+  }
+
+
+  render() {
+    const { changeMode } = this.props
+    const panes = this.getPanes()
 
     return (
       <div>
