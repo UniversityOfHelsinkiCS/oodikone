@@ -74,7 +74,9 @@ class CourseStatsCounter {
     this.markToAll(studentnumber)
     if (passed) {
       this.markPassingGrade(studentnumber)
-      this.markPassedSemester(semester)
+      if (!improved) {
+        this.markPassedSemester(semester)
+      }
     } else if (improved) {
       this.markImprovedGrade(studentnumber)
     } else if (failed) {
