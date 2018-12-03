@@ -23,28 +23,27 @@
     "seed_migrations": "node scripts/seed_migrations.js",
     "update_top_teachers": "node scripts/update_top_teachers.js",
     "update_students_not_modified_since": "node scripts/update_students_not_modified_since.js",
-    "refresh_studyright_associations": "node scripts/refresh_studyright_associations.js",
-    "prepush": "npm run test || npm run test_docker"
+    "refresh_studyright_associations": "node scripts/refresh_studyright_associations.js"
   },
   "author": "Matti Luukkainen",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.16.2",
-    "bluebird": "^3.5.1",
+    "axios": "^0.18.0",
+    "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
-    "cors": "^2.8.4",
-    "express": "^4.16.3",
-    "jsonwebtoken": "^8.3.0",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.4.0",
     "lodash": "^4.17.10",
     "mkdirp": "^0.5.1",
     "moment": "^2.22.2",
     "morgan": "^1.9.1",
-    "nodemailer": "^4.6.8",
-    "pg": "^7.4.3",
+    "nodemailer": "^4.7.0",
+    "pg": "^7.7.1",
     "raven": "^2.6.3",
     "redis": "^2.8.0",
-    "sequelize": "^4.38.0",
-    "umzug": "^2.1.0",
+    "sequelize": "^4.41.2",
+    "umzug": "^2.2.0",
     "uuid": "^3.3.2",
     "winston": "^2.4.4",
     "winston-log2gelf": "^1.9.1",
@@ -54,15 +53,15 @@
   "devDependencies": {
     "ava": "^0.25.0",
     "babel-eslint": "^8.2.6",
-    "dotenv": "^4.0.0",
-    "eslint": "^4.19.1",
+    "dotenv": "^6.1.0",
+    "eslint": "^5.9.0",
     "faker": "^4.1.0",
-    "husky": "^0.14.3",
+    "husky": "^1.2.0",
     "jest": "^23.5.0",
-    "nock": "^9.6.1",
+    "nock": "^10.0.2",
     "node-status": "^1.0.0",
-    "nodemon": "^1.18.3",
-    "nyc": "^11.9.0",
+    "nodemon": "^1.18.7",
+    "nyc": "^13.1.0",
     "supertest": "^3.1.0"
   },
   "ava": {
@@ -82,5 +81,10 @@
       "babel-register"
     ],
     "babel": "inherit"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run test || npm run test_docker"
+    }
   }
 }

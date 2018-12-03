@@ -15,6 +15,7 @@ const usage = require('./routes/usage')
 const providers = require('./routes/providers')
 const semesters = require('./routes/semesters')
 const oodilearn = require('./routes/oodilearn')
+const courseGroups = require('./routes/courseGroups')
 const ping = require('./routes/ping')
 
 
@@ -49,5 +50,6 @@ module.exports = (app, url) => {
   app.use(url, users)
   app.use(url, elementdetails)
   app.use(url, usage),
-  app.use(url, oodilearn)
+  app.use(url, oodilearn),
+  app.use(url, courseGroups)
 }
