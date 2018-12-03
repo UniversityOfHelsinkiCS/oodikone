@@ -5,6 +5,7 @@ import Course from './Course'
 
 class ContentTabs extends Component {
     state={}
+
     render() {
       return (
         <Tab
