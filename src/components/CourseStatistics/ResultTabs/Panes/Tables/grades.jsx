@@ -2,7 +2,7 @@ import React from 'react'
 import { arrayOf, number, oneOfType, shape, string } from 'prop-types'
 import { Header } from 'semantic-ui-react'
 import SortableTable from '../../../SortableTable'
-import { getGradeSpread } from '../util'
+import { getGradeSpread, getThesisGradeSpread, isThesisGrades, THESIS_GRADE_KEYS } from '../util'
 
 const getSortableColumn = (key, title, getRowVal, getRowContent) => (
   {
@@ -12,9 +12,13 @@ const getSortableColumn = (key, title, getRowVal, getRowContent) => (
     getRowContent
   })
 
-const getTableData = stats => stats.map(((stat) => {
+const getTableData = (stats, isGradeSeries) => stats.map(((stat) => {
   const { name, code, cumulative: { grades } } = stat
-  const spread = getGradeSpread([grades])
+
+  const spread = isGradeSeries
+    ? getGradeSpread([grades])
+    : getThesisGradeSpread([grades])
+
   const attempts = Object.values(grades)
     .reduce((cur, acc) => (acc + cur), 0)
   return {
@@ -25,11 +29,8 @@ const getTableData = stats => stats.map(((stat) => {
   }
 }))
 
-
-const GradesTable = ({ stats, name }) => {
-  const columns = [
-    getSortableColumn('TIME', 'Time', s => s.code, s => s.name),
-    getSortableColumn('ATTEMPTS', 'Attempts', s => s.attempts),
+const getGradeColumns = isGradeSeries => (isGradeSeries
+  ? [
     getSortableColumn('0', '0', s => s['0']),
     getSortableColumn('1', '1', s => s['1']),
     getSortableColumn('2', '2', s => s['2']),
@@ -38,8 +39,21 @@ const GradesTable = ({ stats, name }) => {
     getSortableColumn('5', '5', s => s['5']),
     getSortableColumn('OTHER_PASSED', 'Other passed', s => s['Hyv.'])
   ]
+  : THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s[k]))
+)
 
-  const data = getTableData(stats)
+const GradesTable = ({ stats, name }) => {
+  const { cumulative: { grades } } = stats[0]
+  const isGradeSeries = !isThesisGrades(grades)
+
+  const columns = [
+    getSortableColumn('TIME', 'Time', s => s.code, s => s.name),
+    getSortableColumn('ATTEMPTS', 'Attempts', s => s.attempts),
+    ...getGradeColumns(isGradeSeries)
+  ]
+
+
+  const data = getTableData(stats, isGradeSeries)
 
   return (
     <div>
