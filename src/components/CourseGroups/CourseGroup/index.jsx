@@ -35,25 +35,65 @@ class CourseGroup extends Component {
       totalStudents,
       totalCourses,
       teachers,
-      isLoading: false
+      isLoading: false,
+      showOnlyActiveTeachers: false
     })
   }
 
+  onTeacherActiveToggleChange = () => {
+    const { showOnlyActiveTeachers } = this.state
+    this.setState({ showOnlyActiveTeachers: !showOnlyActiveTeachers })
+  }
+
   onTeacherFilterClick = (teacherId) => {
-    const { teachers } = this.state
-    const newTeachers = [...teachers]
-    const index = newTeachers.findIndex(t => t.id === teacherId)
-    newTeachers[index].isActive = !newTeachers[index].isActive
-    this.setState({ teachers: newTeachers })
+    const { teachers, showOnlyActiveTeachers } = this.state
+    this.setState({ isLoading: true }, () => {
+      const newTeachers = [...teachers]
+      const index = newTeachers.findIndex(t => t.id === teacherId)
+      newTeachers[index].isActive = !newTeachers[index].isActive
+      const activeTeachers = newTeachers.filter(t => t.isActive).length
+      const resetActiveTeachers = showOnlyActiveTeachers && activeTeachers === 0
+
+      this.setState({
+        teachers: newTeachers,
+        isLoading: false,
+        showOnlyActiveTeachers: resetActiveTeachers ? false : showOnlyActiveTeachers
+      })
+    })
   }
 
   renderStatistics = () => {
-    const { totalCredits, totalStudents, totalCourses, teachers, isLoading } = this.state
+    const { totalStudents, totalCourses, totalCredits, teachers, isLoading } = this.state
     if (isLoading) {
       return null
     }
+    let teacherAmount = teachers.length
+    let studentAmount = totalStudents
+    let coursesAmount = totalCourses
+    let creditAmount = totalCredits
+    const activeTeachers = teachers.filter(t => t.isActive)
 
-    const totalTeachers = teachers.length
+    if (activeTeachers.length > 0) {
+      const accumulator = {
+        credits: 0,
+        students: 0,
+        courses: 0
+      }
+
+      const filteredStatistics = activeTeachers.reduce((acc, cur) => {
+        acc.credits += cur.credits
+        acc.students += cur.students
+        acc.courses += cur.courses
+        return acc
+      }, accumulator)
+
+      const { credits, students, courses } = filteredStatistics
+
+      teacherAmount = activeTeachers.length
+      studentAmount = students
+      creditAmount = credits
+      coursesAmount = courses
+    }
 
     const getStatistic = (label, value) => (
       <Statistic className={styles.groupStatistic}>
@@ -64,21 +104,21 @@ class CourseGroup extends Component {
 
     return (
       <Statistic.Group className={styles.groupStatistics}>
-        {getStatistic('Total teachers', totalTeachers)}
-        {getStatistic('Total students', totalStudents)}
-        {getStatistic('Total courses', totalCourses)}
-        {getStatistic('Total credits', totalCredits)}
+        {getStatistic('Total teachers', teacherAmount)}
+        {getStatistic('Total students', studentAmount)}
+        {getStatistic('Total courses', coursesAmount)}
+        {getStatistic('Total credits', creditAmount)}
       </Statistic.Group>
     )
   }
 
   renderTeachersAndCourses = () => {
-    const { teachers, isLoading } = this.state
+    const { teachers, isLoading, showOnlyActiveTeachers } = this.state
     if (isLoading) {
       return null
     }
 
-    const getTeacherIds = teacers => teacers.map(t => t.id)
+    const getTeacherIds = teach => teach.map(t => t.id)
 
     const activeTeachers = teachers.filter(t => t.isActive)
     const hasActiveTeachers = activeTeachers.length > 0
@@ -87,10 +127,16 @@ class CourseGroup extends Component {
       : getTeacherIds(teachers)
 
     return (
-      <Segment>
-        <Teachers teachers={teachers} onFilterClickFn={this.onTeacherFilterClick} />
+      <Fragment>
+        <Teachers
+          teachers={teachers}
+          onFilterClickFn={this.onTeacherFilterClick}
+          onActiveToggleChangeFn={this.onTeacherActiveToggleChange}
+          showOnlyActiveTeachers={showOnlyActiveTeachers}
+
+        />
         <Courses teacherIds={teacherIds} />
-      </Segment>
+      </Fragment>
     )
   }
 
@@ -101,20 +147,18 @@ class CourseGroup extends Component {
     const navigateTo = route => history.push(getCompiledPath(route, {}))
 
     return (
-      <Fragment>
-        <Segment loading={isLoading}>
-          <Header size="medium" className={styles.headerWithControl}>
-            {name}
-            <Button
-              icon="reply"
-              onClick={() => navigateTo(routes.courseGroups.route)}
-              className={styles.iconButton}
-            />
-          </Header>
-          {this.renderStatistics()}
-        </Segment>
+      <Segment loading={isLoading}>
+        <Header size="medium" className={styles.headerWithControl}>
+          {name}
+          <Button
+            icon="reply"
+            onClick={() => navigateTo(routes.courseGroups.route)}
+            className={styles.iconButton}
+          />
+        </Header>
+        {this.renderStatistics()}
         {this.renderTeachersAndCourses()}
-      </Fragment>
+      </Segment>
     )
   }
 }
