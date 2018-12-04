@@ -7,7 +7,8 @@ import {
   graphSeriesTypes,
   getDataObject,
   getMaxValueOfSeries,
-  dataSeriesType, viewModeType
+  dataSeriesType,
+  viewModeType
 } from './util'
 
 
