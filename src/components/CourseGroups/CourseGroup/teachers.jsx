@@ -1,7 +1,8 @@
 import React, { Fragment, Component } from 'react'
 import { Header, List, Button, Radio, Icon } from 'semantic-ui-react'
 import sortBy from 'lodash/sortBy'
-import { bool, func, shape, string, number } from 'prop-types'
+import { bool, func } from 'prop-types'
+import { teacherType } from './util'
 
 import styles from './courseGroup.css'
 
@@ -39,14 +40,7 @@ const TeacherItem = ({ teacher, onFilterClickFn }) => {
 
 TeacherItem.propTypes = {
   onFilterClickFn: func.isRequired,
-  teacher: shape({
-    name: string,
-    code: string,
-    id: string,
-    isActive: bool,
-    courses: number,
-    credits: number
-  }).isRequired
+  teacher: teacherType.isRequired
 }
 
 class Teachers extends Component {

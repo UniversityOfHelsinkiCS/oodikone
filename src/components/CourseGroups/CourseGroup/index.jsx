@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { Segment, Header, Button, Statistic } from 'semantic-ui-react'
+import { Segment, Header, Button } from 'semantic-ui-react'
 import { string, func, shape } from 'prop-types'
 import { withRouter } from 'react-router'
 
@@ -10,6 +10,7 @@ import Teachers from './teachers'
 import Courses from './courses'
 
 import styles from './courseGroup.css'
+import Statistics from './statistics'
 
 class CourseGroup extends Component {
   static propTypes = {
@@ -62,56 +63,6 @@ class CourseGroup extends Component {
     })
   }
 
-  renderStatistics = () => {
-    const { totalStudents, totalCourses, totalCredits, teachers, isLoading } = this.state
-    if (isLoading) {
-      return null
-    }
-    let teacherAmount = teachers.length
-    let studentAmount = totalStudents
-    let coursesAmount = totalCourses
-    let creditAmount = totalCredits
-    const activeTeachers = teachers.filter(t => t.isActive)
-
-    if (activeTeachers.length > 0) {
-      const accumulator = {
-        credits: 0,
-        students: 0,
-        courses: 0
-      }
-
-      const filteredStatistics = activeTeachers.reduce((acc, cur) => {
-        acc.credits += cur.credits
-        acc.students += cur.students
-        acc.courses += cur.courses
-        return acc
-      }, accumulator)
-
-      const { credits, students, courses } = filteredStatistics
-
-      teacherAmount = activeTeachers.length
-      studentAmount = students
-      creditAmount = credits
-      coursesAmount = courses
-    }
-
-    const getStatistic = (label, value) => (
-      <Statistic className={styles.groupStatistic}>
-        <Statistic.Label>{label}</Statistic.Label>
-        <Statistic.Value>{value}</Statistic.Value>
-      </Statistic>
-    )
-
-    return (
-      <Statistic.Group className={styles.groupStatistics}>
-        {getStatistic('Total teachers', teacherAmount)}
-        {getStatistic('Total students', studentAmount)}
-        {getStatistic('Total courses', coursesAmount)}
-        {getStatistic('Total credits', creditAmount)}
-      </Statistic.Group>
-    )
-  }
-
   renderTeachersAndCourses = () => {
     const { teachers, isLoading, showOnlyActiveTeachers } = this.state
     if (isLoading) {
@@ -142,7 +93,7 @@ class CourseGroup extends Component {
 
   render() {
     const { history } = this.props
-    const { isLoading, name } = this.state
+    const { totalStudents, totalCourses, totalCredits, teachers, isLoading, name } = this.state
 
     const navigateTo = route => history.push(getCompiledPath(route, {}))
 
@@ -156,7 +107,13 @@ class CourseGroup extends Component {
             className={styles.iconButton}
           />
         </Header>
-        {this.renderStatistics()}
+        <Statistics
+          isLoading={isLoading}
+          totalCourses={totalCourses}
+          teachers={teachers}
+          totalStudents={totalStudents}
+          totalCredits={totalCredits}
+        />
         {this.renderTeachersAndCourses()}
       </Segment>
     )
