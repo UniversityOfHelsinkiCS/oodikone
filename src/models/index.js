@@ -204,7 +204,9 @@ const Course = sequelize.define('course',
     },
     name: { type: Sequelize.JSONB },
     latest_instance_date: { type: Sequelize.DATE },
-    is_study_module: { type: Sequelize.BOOLEAN }
+    is_study_module: { type: Sequelize.BOOLEAN },
+    startdate: { type: Sequelize.DATE },
+    enddate: { type: Sequelize.DATE }
   },
   {
     tableName: 'course',
@@ -374,9 +376,9 @@ const SemesterEnrollment = sequelize.define('semester_enrollment', {
   },
   enrollmenttype: {
     type: Sequelize.INTEGER
-  }, 
+  },
   enrollment_date: {
-    type: Sequelize.DATE 
+    type: Sequelize.DATE
   }
 }, {
   indexes: [
@@ -451,6 +453,9 @@ const CourseRealisation = sequelize.define('courserealisation', {
   },
   root: {
     type: Sequelize.STRING
+  },
+  coursecode: {
+    type: Sequelize.STRING
   }
 })
 
@@ -476,7 +481,7 @@ const CreditTeacher = sequelize.define('credit_teacher', {
     primaryKey: true
   }
 })
- 
+
 const UsageStatistic = sequelize.define('usage_statistics', {
   id: {
     primaryKey: true,
@@ -506,7 +511,7 @@ const UsageStatistic = sequelize.define('usage_statistics', {
   data: {
     type: Sequelize.JSONB
   },
-  
+
 }, {
   timestamps: false
 })
