@@ -5,15 +5,17 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import OneHotEncoder
 import pickle
-import tensorflow as tf 
+# import tensorflow as tf 
 import itertools
 import re
-from keras.models import Sequential
+# from keras.models import Sequential
 from sklearn.manifold import TSNE
 from datetime import datetime
 import json
-from keras.layers import Dense, Dropout
+# from keras.layers import Dense, Dropout
 import networkx as nx
+
+from operator import itemgetter
 
 def get_courses(data):
   return (data["code"].unique())
@@ -346,7 +348,7 @@ def start_acyclic_course_graph_calculation():
       g.add_nodes_from([str(period) + "_" + code for code in courses[period]["code"]])
       regx = r"^" + str(period) + r"_"
       for course in [x for x in g.nodes if re.search(regx, x)]:
-        code = course.split("_")[1], "TKT20013"
+        code = course.split("_")[1]
         # print(courses[period])
         data = courses[period][courses[period]["code"] == code]
         # print(data)
@@ -429,7 +431,7 @@ def suggest_route_to_graduation(done_courses=[]):
         top_three_v = [-100,-100,-100]
         top_comp = {}
         for comp in compulsory:
-          top_comp[comp] = -100
+          top_comp[comp] = []
         for v in graph[s]:
           if v not in path and any(graph[s][v]["grade"] > i for i in top_three_v) and len(graph[v]) > 0:
             idx = np.argmin(top_three_v)
@@ -444,32 +446,56 @@ def suggest_route_to_graduation(done_courses=[]):
             if v == "none":
               continue
             for pot in graph[v]:
-              course_name = pot.split["_"][1]
+              period = pot.split("_")[0]
+              course_name = pot.split("_")[1]
               grade = graph[v][pot]["grade"]
-              if re.search(r"^3[0-9]_TKT20013", pot):
-                return path + [pot]
+              count = graph[v][pot]["count"]
+              grade += count * 0.05
+              # if re.search(r"^3[0-9]_TKT20014", pot):
+              #   return path + [pot]
 
               if course_name in compulsory:
-                  if grade > top_comp[course_name]:
-                    top_comp[course_name] = grade
+                top_comp[course_name] = top_comp[course_name] + [(grade + count * 0.05, period, count)]
 
               if course_name not in [z.split("_")[1] for z in path[1:]] and any(grade > i for i in top_three_v) and len(graph[pot]) > 0 and pot not in top_three:
                   idx = np.argmin(top_three_v)
                   top_three[idx] = pot
                   top_three_v[idx] = grade
-          
             
           path = path + [y for y in top_three if y != "none"]
-          if i  == 42:
+          if i  == 13:
             return path
           return naive_bois(path, graph, i + 1)
           
-
         path = naive_bois(path, graph, 0)
+
+        for key in top_comp.keys():
+          filtered = [x for x in top_comp[key] if x[2] > 4]
+          top_comp_options = [(k, max(g, key=lambda a: a[0])) for k, g in itertools.groupby(filtered, itemgetter(1))]
+          top_comp[key] = top_comp_options
+        sorted_top_comp = sorted(top_comp.keys(), key=lambda a: len(top_comp[a]))
+        for c in path:
+          course = c.split("_")
+          if len(course) > 1 and course[1] in sorted_top_comp:
+            sorted_top_comp.remove(course[1])
+        print(sorted_top_comp)
+        for comp_course in sorted_top_comp:
+          cur_course = top_comp[comp_course]
+          handled = False
+          for period in cur_course:
+            if handled:
+              break
+            for path_i, path_course in enumerate(path):
+              pc = path_course.split("_")
+              if pc[0] == period[0] and pc[1] not in sorted_top_comp:
+                handled = True
+                path[path_i] = period[0] + "_" + comp_course
+                break
+        print(path)
         return path
-   
+
   path = find_path(g,"start")
-  print(path)
+  # print(path)
   #print(routes)
   return
 if __name__ == "__main__":
