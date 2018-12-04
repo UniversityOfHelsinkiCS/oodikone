@@ -4,22 +4,20 @@ import CoursePage from './CoursePage'
 
 class Course extends Component {
     state={
-        selected: undefined
+      selected: undefined
     }
 
     setSelected = (coursecode) => {
-        this.setState({
-          selected: coursecode
-        })
-      }
-  
+      this.setState({
+        selected: coursecode
+      })
+    }
 
     render() {
-        return this.state.selected
-            ? <CoursePage course={this.state.selected} goBack={() => this.setSelected(undefined)}/>
-            : <CourseSearch onClickResult={this.setSelected}/>
+      return this.state.selected
+        ? <CoursePage course={this.state.selected} goBack={() => this.setSelected(undefined)} />
+        : <CourseSearch onClickResult={this.setSelected} />
     }
-    
 }
 
 export default Course

@@ -44,7 +44,7 @@ TeacherItem.propTypes = {
     code: string,
     id: string,
     isActive: bool,
-    courses: string,
+    courses: number,
     credits: number
   }).isRequired
 }
@@ -53,7 +53,6 @@ class Teachers extends Component {
   state = {
     showOnlyActive: false,
     activeTeacherCount: 0,
-    teacherCount: 0,
     viewableTeachers: [],
     sortColumn: teacherColumnTypes.NAME,
     sortReverse: false
