@@ -2,8 +2,12 @@ import React from 'react'
 import _ from 'lodash'
 import { Segment, Table, Button } from 'semantic-ui-react'
 import { func, arrayOf, shape, string, bool } from 'prop-types'
+import moment from 'moment'
 
 import styles from './courseTable.css'
+
+const MIN_YEAR = 1899
+const MAX_YEAR = 2112
 
 const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, controlIcon }) => {
   const noContent = courses.length === 0
@@ -15,9 +19,40 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, co
     </Table.Row>
   )
 
+  const isSpring = date => moment(date).month() < 7
+  const isPre2016Course = course => !Number.isNaN(Number(course.code.charAt(0)))
+  const twoDigitYear = year => year.toString().substring(2, 4)
+  const getSemesterText = (start, end) => `${start}-${twoDigitYear(end)}`
+  const getYearText = (year, spring) => (spring ? getSemesterText(year - 1, year) : getSemesterText(year, year + 1))
+
+  const getActiveYears = (course) => {
+    const startYear = moment(course.startdate).year()
+    const endYear = moment(course.enddate).year()
+
+    const startYearText = getYearText(startYear, isSpring(course.startdate))
+    const endYearText = getYearText(endYear, isSpring(course.enddate))
+
+    if (endYear === MAX_YEAR && isPre2016Course(course)) {
+      return `— ${getYearText(2016, false)}`
+    }
+
+    if (startYear === MIN_YEAR) {
+      return `— ${endYearText}`
+    }
+
+    if (endYear === MAX_YEAR) {
+      return `${startYearText} — `
+    }
+
+    return `${startYearText} — ${endYearText}`
+  }
+
   const getCourseRow = course => (
     <Table.Row key={course.code}>
-      <Table.Cell content={course.name} width={10} />
+      <Table.Cell width={10}>
+        <div>{course.name}</div>
+        <div>{getActiveYears(course)}</div>
+      </Table.Cell>
       <Table.Cell content={course.code} />
       <Table.Cell>
         <Button
