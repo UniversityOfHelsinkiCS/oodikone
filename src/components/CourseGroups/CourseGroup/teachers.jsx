@@ -50,38 +50,28 @@ TeacherItem.propTypes = {
 }
 
 class Teachers extends Component {
+  static propTypes = {
+    onFilterClickFn: func.isRequired,
+    onActiveToggleChangeFn: func.isRequired,
+    showOnlyActiveTeachers: bool.isRequired
+  }
+
   state = {
-    showOnlyActive: false,
-    activeTeacherCount: 0,
     viewableTeachers: [],
     sortColumn: teacherColumnTypes.NAME,
-    sortReverse: false
+    sortReverse: false,
+    activeTeacherCount: 0
   }
 
-  static getDerivedStateFromProps(props, state) {
-    const { teachers } = props
-    const { showOnlyActive } = state
-    const activeTeachers = teachers.filter(t => t.isActive)
-    const activeTeacherCount = activeTeachers.length
-    const resetShowOnlyActive = showOnlyActive && activeTeacherCount === 0
+  static getDerivedStateFromProps(props) {
+    const { teachers, showOnlyActiveTeachers } = props
 
-    if (!showOnlyActive || resetShowOnlyActive) {
-      return {
-        showOnlyActive: false,
-        activeTeacherCount,
-        viewableTeachers: teachers
-      }
-    }
+    const activeTeachers = teachers.filter(t => t.isActive)
 
     return {
-      activeTeacherCount,
-      viewableTeachers: activeTeachers
+      activeTeacherCount: activeTeachers.length,
+      viewableTeachers: showOnlyActiveTeachers ? activeTeachers : teachers
     }
-  }
-
-  onActiveToggleChange = () => {
-    const { showOnlyActive } = this.state
-    this.setState({ showOnlyActive: !showOnlyActive })
   }
 
   onTeacherHeaderClick = (columnName) => {
@@ -125,14 +115,14 @@ class Teachers extends Component {
   }
 
   render() {
-    const { onFilterClickFn } = this.props
+    const { onFilterClickFn, onActiveToggleChangeFn, showOnlyActiveTeachers } = this.props
     const {
       viewableTeachers,
       activeTeacherCount,
-      showOnlyActive,
       sortColumn,
       sortReverse
     } = this.state
+
     const toggleId = 'toggle'
     const sortedTeachers = sortBy(viewableTeachers, sortColumn)
 
@@ -149,8 +139,8 @@ class Teachers extends Component {
             <Radio
               id={toggleId}
               toggle
-              checked={showOnlyActive}
-              onChange={this.onActiveToggleChange}
+              checked={showOnlyActiveTeachers}
+              onChange={onActiveToggleChangeFn}
               disabled={activeTeacherCount === 0}
             />
           </div>
@@ -166,9 +156,5 @@ class Teachers extends Component {
   }
 }
 
-
-Teachers.propTypes = {
-  onFilterClickFn: func.isRequired
-}
 
 export default Teachers
