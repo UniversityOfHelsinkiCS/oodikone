@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
-import { Tab, Grid, Radio, Form, Menu } from 'semantic-ui-react'
+import { Tab, Grid, Radio, Menu } from 'semantic-ui-react'
 import { dataSeriesType, viewModeNames } from './Panes/util'
 import PassRate from './Panes/passRate'
 import Distribution from './Panes/distribution'
 import Tables from './Panes/tables'
+
+import styles from './resultTabs.css'
 
 
 const paneViewIndex = {
@@ -25,11 +27,29 @@ class ResultTabs extends Component {
 
     const paneMenuItems = [
       { menuItem: { key: 'Table', icon: 'table', content: 'Table' },
-        renderFn: () => <Tables comparison={comparison} primary={primary} viewMode={viewMode} /> },
+        renderFn: () =>
+          (<Tables
+            comparison={comparison}
+            primary={primary}
+            viewMode={viewMode}
+          />)
+      },
       { menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
-        renderFn: () => <PassRate comparison={comparison} primary={primary} viewMode={viewMode} /> },
+        renderFn: () =>
+          (<PassRate
+            comparison={comparison}
+            primary={primary}
+            viewMode={viewMode}
+          />)
+      },
       { menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
-        renderFn: () => <Distribution comparison={comparison} primary={primary} viewMode={viewMode} /> }
+        renderFn: () =>
+          (<Distribution
+            comparison={comparison}
+            primary={primary}
+            viewMode={viewMode}
+          />)
+      }
     ]
 
     return paneMenuItems.map((p) => {
@@ -38,6 +58,9 @@ class ResultTabs extends Component {
         menuItem,
         render: () => (
           <Grid padded="vertically" columns="equal">
+            <Grid.Row className={styles.modeSelectorRow}>
+              {this.renderViewModeSelector()}
+            </Grid.Row>
             <Grid.Row>
               {renderFn()}
             </Grid.Row>
@@ -71,6 +94,7 @@ class ResultTabs extends Component {
       <Menu secondary>
         {Object.values(viewModeNames).map(name => (
           <Menu.Item
+            key={name}
             name={name}
             active={viewMode === name}
             onClick={() => this.handleModeChange(name)}
@@ -81,35 +105,31 @@ class ResultTabs extends Component {
     const getToggle = () => {
       const isToggleChecked = viewMode === viewModeNames.STUDENT
       const newMode = isToggleChecked ? viewModeNames.CUMULATIVE : viewModeNames.STUDENT
-
+      const toggleId = 'viewModeToggle'
       return (
-        <Form>
-          <Form.Group inline >
-            <Form.Field>
-              <label>{viewModeNames.CUMULATIVE}</label>
-            </Form.Field>
-            <Form.Field>
-              <Radio
-                checked={isToggleChecked}
-                toggle
-                onChange={() => this.handleModeChange(newMode)}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label>{viewModeNames.STUDENT}</label>
-            </Form.Field>
-          </Form.Group>
-        </Form>
+        <div className={styles.toggleContainer}>
+          <label className={styles.toggleLabel} htmlFor={toggleId}>{viewModeNames.CUMULATIVE}</label>
+          <Radio
+            id={toggleId}
+            checked={isToggleChecked}
+            toggle
+            onChange={() => this.handleModeChange(newMode)}
+          />
+          <label className={styles.toggleLabel} htmlFor={toggleId}>{viewModeNames.STUDENT}</label>
+        </div>
       )
     }
 
-    return isTogglePane ? getToggle() : getButtonMenu()
+    return (
+      <div className={styles.modeSelectorContainer}>
+        {isTogglePane ? getToggle() : getButtonMenu()}
+      </div>
+    )
   }
 
   render() {
     return (
       <div>
-        {this.renderViewModeSelector()}
         <Tab
           panes={this.getPanes()}
           onTabChange={this.handleTabChange}

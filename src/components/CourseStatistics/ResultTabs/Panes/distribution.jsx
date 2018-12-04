@@ -7,44 +7,15 @@ import {
   getDataObject,
   getMaxValueOfSeries,
   dataSeriesType,
-  viewModeType
+  viewModeType,
+  getGradeSpread
 } from './util'
 import StackedBarChart from '../../../StackedBarChart'
 
 
 const getGradeSeries = (series, seriesType) => {
   const { name, multiplier } = seriesType
-  const failedKeys = ['Eisa', 'Hyl.', '0', 'Luop']
-
-  const baseAccumalator = {
-    0: [],
-    1: [],
-    2: [],
-    3: [],
-    4: [],
-    5: [],
-    'Hyv.': []
-  }
-
-  const newSeries = series.reduce((acc, cur, i) => {
-    const currentEntries = Object.entries(cur)
-    let failed = 0
-    currentEntries.forEach(([k, v]) => {
-      if (failedKeys.includes(k)) {
-        failed += v
-      } else {
-        acc[k].push(v * multiplier)
-      }
-    })
-    acc[0].push(failed * multiplier)
-    Object.entries(acc).forEach(([k, v]) => {
-      if (v.length < i + 1) {
-        acc[k].push(0)
-      }
-    })
-
-    return acc
-  }, { ...baseAccumalator })
+  const newSeries = getGradeSpread(series, multiplier)
 
   return [
     getDataObject(`${name} 0`, newSeries[0], 'a'),
