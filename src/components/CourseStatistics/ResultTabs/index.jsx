@@ -1,220 +1,35 @@
-import React, { Component, Fragment } from 'react'
-import { Tab, Grid, Radio, Form } from 'semantic-ui-react'
-import { shape, string, number, oneOfType, arrayOf, func, bool } from 'prop-types'
-
-import StackedBarChart from '../../StackedBarChart'
-import { passRateCumGraphOptions, passRateStudGraphOptions, gradeGraphOptions } from '../../../constants'
-import CumulativeTable from './CumulativeTable'
-import StudentTable from './StudentTable'
+import React, { Component } from 'react'
+import { Tab, Grid, Radio, Form, Menu } from 'semantic-ui-react'
+import { dataSeriesType, viewModeNames } from './Panes/util'
+import PassRate from './Panes/passRate'
+import Distribution from './Panes/distribution'
+import Tables from './Panes/tables'
 
 
-const graphSeriesTypes = {
-  PRIMARY: { name: 'primary', multiplier: 1 },
-  COMPARISON: { name: 'comparison', multiplier: -1 }
+const paneViewIndex = {
+  TABLE: 0,
+  PASS_RAGE: 1,
+  GRADE_DISTRIBUTION: 2
 }
 
-const getDataObject = (name, data, stack) => ({ name, data, stack })
-
-const getPassRateCumSeriesFromStats = (stats, seriesType) => {
-  const { name, multiplier } = seriesType
-  const all = []
-  const passed = []
-  const failed = []
-
-  stats.forEach((year) => {
-    const { passed: p, failed: f } = year.cumulative.categories
-    all.push((p * multiplier) + (f * multiplier))
-    passed.push(p * multiplier)
-    failed.push(f * multiplier)
-  })
-
-  return [
-    getDataObject(`${name} all`, all, 'a'),
-    getDataObject(`${name} passed`, passed, 'b'),
-    getDataObject(`${name} failed`, failed, 'c')
-  ]
-}
-
-const getPassRateStudSeriesFromStats = (stats, seriesType) => {
-  const { name, multiplier } = seriesType
-
-  const all = []
-  const failedFirst = []
-  const failedRetry = []
-  const passedFirst = []
-  const passedRetry = []
-
-  stats.forEach((year) => {
-    const {
-      failedFirst: ff,
-      failedRetry: fr,
-      passedFirst: pf,
-      passedRetry: pr
-    } = year.students.categories
-
-    all.push((ff * multiplier) + (fr * multiplier) + (pf * multiplier) + (pr * multiplier))
-    failedFirst.push(ff * multiplier)
-    failedRetry.push(fr * multiplier)
-    passedFirst.push(pf * multiplier)
-    passedRetry.push(pr * multiplier)
-  })
-
-  return [
-    getDataObject(`${name} all`, all, 'a'),
-    getDataObject(`${name} passed on first try`, passedFirst, 'b'),
-    getDataObject(`${name} passed after retry`, passedRetry, 'b'),
-    getDataObject(`${name} failed on first try`, failedFirst, 'c'),
-    getDataObject(`${name} failed after retry`, failedRetry, 'c')
-  ]
-}
-
-const getGradeSeries = (series, seriesType) => {
-  const { name, multiplier } = seriesType
-  const failedKeys = ['Eisa', 'Hyl.', '0', 'Luop']
-
-  const baseAccumalator = {
-    0: [],
-    1: [],
-    2: [],
-    3: [],
-    4: [],
-    5: [],
-    'Hyv.': []
-  }
-
-  const newSeries = series.reduce((acc, cur, i) => {
-    const currentEntries = Object.entries(cur)
-    let failed = 0
-    currentEntries.forEach(([k, v]) => {
-      if (failedKeys.includes(k)) {
-        failed += v
-      } else {
-        acc[k].push(v * multiplier)
-      }
-    })
-    acc[0].push(failed * multiplier)
-    Object.entries(acc).forEach(([k, v]) => {
-      if (v.length < i + 1) {
-        acc[k].push(0)
-      }
-    })
-
-    return acc
-  }, { ...baseAccumalator })
-
-  return [
-    getDataObject(`${name} 0`, newSeries[0], 'a'),
-    getDataObject(`${name} 1`, newSeries[1], 'b'),
-    getDataObject(`${name} 2`, newSeries[2], 'c'),
-    getDataObject(`${name} 3`, newSeries[3], 'd'),
-    getDataObject(`${name} 4`, newSeries[4], 'e'),
-    getDataObject(`${name} 5`, newSeries[5], 'f'),
-    getDataObject(`${name} Hyv.`, newSeries['Hyv.'], 'g')
-  ]
-}
-
-const getGradeCumSeriesFromStats = (stats, seriesType) => {
-  const series = stats.flatMap(s => s.cumulative.grades)
-  return getGradeSeries(series, seriesType)
-}
-
-const getGradeStudSeriesFromStats = (stats, seriesType) => {
-  const series = stats.flatMap(s => s.students.grades)
-  return getGradeSeries(series, seriesType)
-}
-
-const getMaxValueOfSeries = series => Object.values(series).reduce((acc, cur) => {
-  const curMax = Math.max(...cur.data.map(Math.abs))
-  return curMax >= acc ? curMax : acc
-}, 0)
 
 class ResultTabs extends Component {
-  state = {}
-
-  getTablePane = () => {
-    const { primary, comparison, cumMode } = this.props
-
-    const getTables = ({ name, stats }) => (
-      <Grid.Column>
-        {cumMode
-            ? <CumulativeTable name={name} stats={stats} />
-            : <StudentTable name={name} stats={stats} />
-          }
-      </Grid.Column>
-    )
-
-    return (
-      <Fragment>
-        {primary && getTables(primary)}
-        {comparison && getTables(comparison)}
-      </Fragment>
-    )
-  }
-
-  getPassRatePane = () => {
-    const { primary, comparison, cumMode } = this.props
-
-    const primaryStats = primary.stats
-    const statYears = primaryStats.map(year => year.name)
-    const comparisonStats = comparison ? comparison.stats : []
-    const passGraphSerieFn = cumMode ? getPassRateCumSeriesFromStats : getPassRateStudSeriesFromStats
-
-    const passGraphSerie = [
-      ...passGraphSerieFn(primaryStats, graphSeriesTypes.PRIMARY),
-      ...passGraphSerieFn(comparisonStats, graphSeriesTypes.COMPARISON)
-    ]
-
-    const maxPassRateVal = getMaxValueOfSeries(passGraphSerie)
-    const graphOptionsFn = cumMode ? passRateCumGraphOptions : passRateStudGraphOptions
-    const graphOptions = graphOptionsFn(statYears, maxPassRateVal)
-
-    return (
-      <Grid.Column>
-        <StackedBarChart
-          options={graphOptions}
-          series={passGraphSerie}
-        />
-      </Grid.Column>
-    )
-  }
-
-  getDistributionPane = () => {
-    const { primary, comparison, cumMode } = this.props
-
-    const primaryStats = primary.stats
-    const statYears = primaryStats.map(year => year.name)
-    const comparisonStats = comparison ? comparison.stats : []
-
-    const gradeGraphSerieFn = cumMode ? getGradeCumSeriesFromStats : getGradeStudSeriesFromStats
-
-
-    const gradeGraphSerie = [
-      ...gradeGraphSerieFn(primaryStats, graphSeriesTypes.PRIMARY),
-      ...gradeGraphSerieFn(comparisonStats, graphSeriesTypes.COMPARISON)
-    ]
-
-    const maxGradeValue = getMaxValueOfSeries(gradeGraphSerie)
-
-    const distributionOptions = gradeGraphOptions(statYears, maxGradeValue)
-
-    return (
-      <Grid.Column>
-        <StackedBarChart
-          options={distributionOptions}
-          series={gradeGraphSerie}
-        />
-      </Grid.Column>
-    )
+  state = {
+    activeIndex: paneViewIndex.TABLE,
+    viewMode: viewModeNames.CUMULATIVE
   }
 
   getPanes = () => {
+    const { primary, comparison } = this.props
+    const { viewMode } = this.state
+
     const paneMenuItems = [
       { menuItem: { key: 'Table', icon: 'table', content: 'Table' },
-        renderFn: this.getTablePane },
+        renderFn: () => <Tables comparison={comparison} primary={primary} viewMode={viewMode} /> },
       { menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
-        renderFn: this.getPassRatePane },
+        renderFn: () => <PassRate comparison={comparison} primary={primary} viewMode={viewMode} /> },
       { menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
-        renderFn: this.getDistributionPane }
+        renderFn: () => <Distribution comparison={comparison} primary={primary} viewMode={viewMode} /> }
     ]
 
     return paneMenuItems.map((p) => {
@@ -232,49 +47,80 @@ class ResultTabs extends Component {
     })
   }
 
+  handleTabChange = (e, { activeIndex }) => {
+    const { viewMode, activeIndex: oldIndex } = this.state
+    const resetViewMode = oldIndex === paneViewIndex.TABLE
+      && viewMode === viewModeNames.GRADES
 
-  render() {
-    const { changeMode } = this.props
-    const panes = this.getPanes()
+    this.setState({
+      activeIndex,
+      viewMode: resetViewMode ? viewModeNames.CUMULATIVE : viewMode
+    })
+  }
 
-    return (
-      <div>
+  handleModeChange = (viewMode) => {
+    this.setState({ viewMode })
+  }
+
+  renderViewModeSelector = () => {
+    const { activeIndex, viewMode } = this.state
+
+    const isTogglePane = activeIndex !== 0
+
+    const getButtonMenu = () => (
+      <Menu secondary>
+        {Object.values(viewModeNames).map(name => (
+          <Menu.Item
+            name={name}
+            active={viewMode === name}
+            onClick={() => this.handleModeChange(name)}
+          />))}
+      </Menu>
+    )
+
+    const getToggle = () => {
+      const isToggleChecked = viewMode === viewModeNames.STUDENT
+      const newMode = isToggleChecked ? viewModeNames.CUMULATIVE : viewModeNames.STUDENT
+
+      return (
         <Form>
           <Form.Group inline >
             <Form.Field>
-              <label>Cumulative</label>
+              <label>{viewModeNames.CUMULATIVE}</label>
             </Form.Field>
             <Form.Field>
               <Radio
+                checked={isToggleChecked}
                 toggle
-                onChange={changeMode}
+                onChange={() => this.handleModeChange(newMode)}
               />
             </Form.Field>
             <Form.Field>
-              <label>Student</label>
+              <label>{viewModeNames.STUDENT}</label>
             </Form.Field>
           </Form.Group>
         </Form>
+      )
+    }
+
+    return isTogglePane ? getToggle() : getButtonMenu()
+  }
+
+  render() {
+    return (
+      <div>
+        {this.renderViewModeSelector()}
         <Tab
-          panes={panes}
+          panes={this.getPanes()}
+          onTabChange={this.handleTabChange}
         />
       </div>)
   }
 }
 
 ResultTabs.propTypes = {
-  primary: shape({
-    name: string,
-    code: oneOfType([string, number]),
-    stats: arrayOf(shape({}))
-  }).isRequired,
-  comparison: shape({
-    name: string,
-    code: oneOfType([string, number]),
-    stats: arrayOf(shape({}))
-  }),
-  changeMode: func.isRequired,
-  cumMode: bool.isRequired
+  primary: dataSeriesType.isRequired,
+  comparison: dataSeriesType
 }
 
 ResultTabs.defaultProps = {
