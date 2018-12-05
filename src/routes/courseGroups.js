@@ -5,7 +5,8 @@ const CourseGroupService = require('../services/courseGroups')
 const BASE_PATH = '/course-groups'
 
 router.get(BASE_PATH, async (req, res) => {
-  const courseGroups = await CourseGroupService.getCourseGroupsWithTotals()
+  const semesterCode = req.query.semester
+  const courseGroups = await CourseGroupService.getCourseGroupsWithTotals(semesterCode)
   res.json(courseGroups)
 })
 
@@ -21,19 +22,22 @@ router.get(`${BASE_PATH}/:id/teachers`, async (req, res) => {
 })
 
 router.get(`${BASE_PATH}/teachers`, async (req, res) => {
-  const teacherIds = JSON.parse(req.query.teacherIds)
+  const { teacherIds: ids, semester } = req.query.teacherIds
+  const teacherIds = JSON.parse(ids)
 
   if (!Array.isArray(teacherIds)) {
     res.send(400)
   }
 
-  const courses = await CourseGroupService.getCoursesByTeachers(teacherIds)
+  const courses = await CourseGroupService.getCoursesByTeachers(teacherIds, semester)
 
   return courses ? res.send(courses) : res.send(404)
 })
 
 router.get(`${BASE_PATH}/:id`, async (req, res) => {
-  const groupData = await CourseGroupService.getCourseGroup(Number(req.params.id))
+  const { id } = req.params
+  const { semester } = req.query
+  const groupData = await CourseGroupService.getCourseGroup(Number(id), semester)
 
   return groupData ? res.send(groupData) : res.send(404)
 })
