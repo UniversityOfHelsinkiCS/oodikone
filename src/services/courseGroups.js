@@ -17,6 +17,16 @@ const TEACHER_COURSES_KEY = teacherId => `course_group_courses_${teacherId}`
 const REDIS_CACHE_TTL = 12 * 60 * 60
 
 
+const getAcademicYears = () => sequelize.query(
+  `select 
+      distinct on (yearname) yearname, 
+      semestercode 
+    from semesters 
+    where semestercode >= ${STATISTICS_START_SEMESTER}
+      order by yearname, semestercode`,
+  { type: sequelize.QueryTypes.SELECT }
+)
+
 const getTeachersForCourseGroup = (courseGroupId) => {
   const validCourseGroupIds = [1, 2]
   if (!validCourseGroupIds.includes(courseGroupId)) {
@@ -105,6 +115,8 @@ const getTeacherStatisticsByIds = async teacherIds => sequelize.query(
   { replacements: { teacherIds }, type: sequelize.QueryTypes.SELECT }
 )
 
+
+
 const getCourseGroup = async (courseGroupId) => {
   const cachedCourseGroup = await redisClient.getAsync(COURSE_GROUP_KEY(courseGroupId))
 
@@ -147,8 +159,8 @@ const getCourseGroup = async (courseGroupId) => {
     name,
     teachers,
     totalCredits: credits,
-    totalStudents: students,
-    totalCourses: courses
+    totalStudents: Number(students),
+    totalCourses: Number(courses)
   }
 
   await redisClient.setAsync(COURSE_GROUP_KEY(courseGroupId), JSON.stringify(courseGroup), 'EX', REDIS_CACHE_TTL)
@@ -195,6 +207,7 @@ const getCoursesByTeachers = async (teacherIds) => {
 }
 
 module.exports = {
+  getAcademicYears,
   getTeachersForCourseGroup,
   getCourseGroupsWithTotals,
   getCourseGroup,

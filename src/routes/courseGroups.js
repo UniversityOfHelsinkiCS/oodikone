@@ -9,6 +9,11 @@ router.get(BASE_PATH, async (req, res) => {
   res.json(courseGroups)
 })
 
+router.get(`${BASE_PATH}/academic-years`, async (req, res) => {
+  const academicYears = await CourseGroupService.getAcademicYears()
+  res.json(academicYears)
+})
+
 router.get(`${BASE_PATH}/:id/teachers`, async (req, res) => {
   const teachers = CourseGroupService.getTeachersForCourseGroup(Number(req.params.id))
 
