@@ -27,10 +27,13 @@ class CourseGroup extends Component {
 
   async componentDidMount() {
     const { groupId } = this.props
+    const basePath = 'course-groups'
+    const [courseGroup, academicYears] = await Promise.all([
+      callApi(`${basePath}/${groupId}`),
+      callApi(`${basePath}/academic-years`)
+    ])
 
-    const response = await callApi(`course-groups/${groupId}`)
-
-    const { name, totalCredits, totalStudents, totalCourses, teachers } = response.data
+    const { name, totalCredits, totalStudents, totalCourses, teachers } = courseGroup.data
     this.setState({
       name,
       totalCredits,
