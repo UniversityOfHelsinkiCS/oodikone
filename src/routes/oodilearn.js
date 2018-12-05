@@ -28,6 +28,11 @@ wrapper.get('/oodilearn/query', async (req, res) => {
   res.json(result.data)
 })
 
+wrapper.get('/oodilearn/suggest_course', async (req, res) => {
+  const result = await oodilearn.suggestCourse(req.query.doneCourses, req.query.period)
+  res.json(result.data)
+})
+
 wrapper.get('/oodilearn/student/:id', async (req, res) => {
   const result = await oodilearn.getStudentData(req.params.id)
   res.status(200).json(result.data)
