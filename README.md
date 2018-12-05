@@ -147,7 +147,7 @@ Create a new database and fill it with the backup dump following the instruction
 
 ## Accessing production/staging DB
 
-To access the database in oodikone.cs.helsinki.fi run: 
+To access the database in oodikone.cs.helsinki.fi you can use `postgres_connect.sh` script in production/staging directory. Alternatively you can use commands: 
 
 `docker exec -it -u postgres db psql -d tkt_oodi`
 
