@@ -17,7 +17,7 @@ class AggregateView extends Component {
   }
 
   componentDidMount() {
-    callApi('/courseGroups')
+    callApi('/course-groups')
       .then((res) => {
         this.setState({
           courseGroups: res.data,

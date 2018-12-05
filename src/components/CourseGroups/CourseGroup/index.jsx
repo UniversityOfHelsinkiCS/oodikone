@@ -11,6 +11,7 @@ import Courses from './courses'
 
 import styles from './courseGroup.css'
 import Statistics from './statistics'
+import Filters from './filters'
 
 class CourseGroup extends Component {
   static propTypes = {
@@ -27,7 +28,7 @@ class CourseGroup extends Component {
   async componentDidMount() {
     const { groupId } = this.props
 
-    const response = await callApi(`courseGroups/${groupId}`)
+    const response = await callApi(`course-groups/${groupId}`)
 
     const { name, totalCredits, totalStudents, totalCourses, teachers } = response.data
     this.setState({
@@ -114,6 +115,7 @@ class CourseGroup extends Component {
           totalStudents={totalStudents}
           totalCredits={totalCredits}
         />
+        <Filters />
         {this.renderTeachersAndCourses()}
       </Segment>
     )

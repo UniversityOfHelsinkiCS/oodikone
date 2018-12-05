@@ -62,7 +62,7 @@ class Courses extends Component {
 
     this.setState(
       { isLoading: true, courses: [] },
-      () => callApi(`courseGroups/teachers/?teacherIds=${JSON.stringify(teacherIds)}`)
+      () => callApi(`course-groups/teachers/?teacherIds=${JSON.stringify(teacherIds)}`)
         .then(({ data: courses }) => this.setState({ isLoading: false, courses }))
     )
   }
