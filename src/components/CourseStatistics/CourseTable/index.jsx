@@ -2,6 +2,7 @@ import React from 'react'
 import _ from 'lodash'
 import { Segment, Table, Button } from 'semantic-ui-react'
 import { func, arrayOf, shape, string, bool } from 'prop-types'
+import { getActiveYears } from '../courseStatisticsUtils'
 
 import styles from './courseTable.css'
 
@@ -15,9 +16,12 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, co
     </Table.Row>
   )
 
-  const getCourseRow = course => (
+  const toCourseRow = course => (
     <Table.Row key={course.code}>
-      <Table.Cell content={course.name} width={10} />
+      <Table.Cell width={10}>
+        <div>{course.name}</div>
+        <div>{getActiveYears(course)}</div>
+      </Table.Cell>
       <Table.Cell content={course.code} />
       <Table.Cell>
         <Button
@@ -45,7 +49,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, co
           {
             noContent
               ? getEmptyListRow()
-              : sortedCourses.map(getCourseRow)
+              : sortedCourses.map(toCourseRow)
           }
         </Table.Body>
       </Table>
