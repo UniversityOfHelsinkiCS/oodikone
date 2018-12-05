@@ -23,6 +23,7 @@ const getAcademicYears = () => sequelize.query(
       semestercode 
     from semesters 
     where semestercode >= ${ACADEMIC_YEAR_START_SEMESTER}
+    and startdate <= now()
       order by yearname, semestercode`,
   { type: sequelize.QueryTypes.SELECT }
 )
@@ -192,9 +193,10 @@ const getCourseGroup = async (courseGroupId, semesterCode) => {
     id: courseGroupId,
     name,
     teachers,
-    totalCredits: credits,
+    totalCredits: credits || 0,
     totalStudents: Number(students),
-    totalCourses: Number(courses)
+    totalCourses: Number(courses),
+    semester: startSemester
   }
 
   await redisClient.setAsync(cacheKey, JSON.stringify(courseGroup), 'EX', REDIS_CACHE_TTL)

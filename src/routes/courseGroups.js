@@ -22,7 +22,7 @@ router.get(`${BASE_PATH}/:id/teachers`, async (req, res) => {
 })
 
 router.get(`${BASE_PATH}/teachers`, async (req, res) => {
-  const { teacherIds: ids, semester } = req.query.teacherIds
+  const { teacherIds: ids, semester } = req.query
   const teacherIds = JSON.parse(ids)
 
   if (!Array.isArray(teacherIds)) {
