@@ -11,7 +11,7 @@ import Courses from './courses'
 
 import styles from './courseGroup.css'
 import Statistics from './statistics'
-import Filters from './filters'
+import AcademicYearFilter from './academicYearFilter'
 import { CG_API_BASE_PATH } from './util'
 
 class CourseGroup extends Component {
@@ -146,11 +146,18 @@ class CourseGroup extends Component {
     return (
       <Segment loading={isLoading}>
         <Header size="medium" className={styles.headerWithControl}>
-          {name}
+          <div className={styles.headerFilterContainer}>
+            {name}
+            <AcademicYearFilter
+              semesterCode={semesterCode}
+              academicYears={academicYears}
+              handleSemesterCodeChangeFn={this.handleSemesterCodeChange}
+            />
+          </div>
           <Button
             icon="reply"
             onClick={() => navigateTo(routes.courseGroups.route)}
-            className={styles.iconButton}
+            className={styles.headerIconButton}
           />
         </Header>
         <Statistics
@@ -160,11 +167,6 @@ class CourseGroup extends Component {
           activeTeachers={statisticsTeachers}
           totalStudents={totalStudents}
           totalCredits={totalCredits}
-        />
-        <Filters
-          semesterCode={semesterCode}
-          academicYears={academicYears}
-          handleSemesterCodeChangeFn={this.handleSemesterCodeChange}
         />
         {this.renderTeachersAndCourses()}
       </Segment>
