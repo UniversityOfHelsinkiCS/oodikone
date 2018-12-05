@@ -55,11 +55,18 @@ const Statistics = ({ totalStudents, totalCourses, totalCredits, teachers, isLoa
 }
 
 Statistics.propTypes = {
-  totalStudents: number.isRequired,
-  totalCourses: number.isRequired,
-  totalCredits: number.isRequired,
-  teachers: arrayOf(teacherType).isRequired,
+  totalStudents: number,
+  totalCourses: number,
+  totalCredits: number,
+  teachers: arrayOf(teacherType),
   isLoading: bool.isRequired
+}
+
+Statistics.defaultProps = {
+  totalStudents: undefined,
+  totalCourses: undefined,
+  totalCredits: undefined,
+  teachers: undefined,
 }
 
 export default Statistics
