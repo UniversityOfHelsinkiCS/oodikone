@@ -3,6 +3,7 @@ import { Header, List, Loader, Placeholder, Icon } from 'semantic-ui-react'
 import sortBy from 'lodash/sortBy'
 import { callApi } from '../../../apiConnection'
 import styles from './courseGroup.css'
+import { CG_API_BASE_PATH } from './util'
 
 const courseColumnTypes = {
   TEACHER: 'teachername',
@@ -41,8 +42,10 @@ class Courses extends Component {
   }
 
   async componentDidUpdate(prevProps) {
-    const { teacherIds } = this.props
-    if (prevProps.teacherIds.length !== teacherIds.length) {
+    const { teacherIds, semesterCode } = this.props
+    const isNewTeachers = prevProps.teacherIds.length !== teacherIds.length
+    const isNewSemester = prevProps.semesterCode !== semesterCode
+    if (isNewTeachers || isNewSemester) {
       await this.fetchCourses()
     }
   }
@@ -58,11 +61,16 @@ class Courses extends Component {
   }
 
   fetchCourses = async () => {
-    const { teacherIds } = this.props
+    const { teacherIds, semesterCode } = this.props
+
+    let path = `${CG_API_BASE_PATH}/teachers/?teacherIds=${JSON.stringify(teacherIds)}`
+    if (semesterCode) {
+      path = `${path}&semester=${semesterCode}`
+    }
 
     this.setState(
       { isLoading: true, courses: [] },
-      () => callApi(`course-groups/teachers/?teacherIds=${JSON.stringify(teacherIds)}`)
+      () => callApi(path)
         .then(({ data: courses }) => this.setState({ isLoading: false, courses }))
     )
   }

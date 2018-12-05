@@ -117,6 +117,7 @@
   font-weight: 600;
 }
 
+
 .activeToggleContainer {
   display: flex;
   align-items: center;
@@ -126,4 +127,32 @@
   color: var(--darkSilver);
   font-size: 0.75em;
   padding-right: 0.5em;
+}
+
+.academicYearFilterContainer {
+  display: flex;
+  align-items: flex-end;
+}
+
+.academicYearSelectContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.academicYearSelectContainer > label {
+  color: var(--darkSilver);
+  font-weight: 600
+}
+
+.hiddenButton,
+.filterButton {
+  height: 2em;
+  margin-right: 0 !important;
+  background: none !important;
+  padding: 0 !important;
+  font-size: 1.5em !important;
+}
+
+.hiddenButton {
+  visibility: hidden;
 }
