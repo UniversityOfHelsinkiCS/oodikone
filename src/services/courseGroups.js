@@ -1,6 +1,8 @@
 const Promise = require('bluebird')
+const { Op } = require('sequelize')
 const { sequelize } = require('../database/connection')
 const { redisClient } = require('../services/redis')
+const { Teacher } = require('../models')
 
 // Hard coded teacher ids for demo purposes
 const EP_TEACHERS = ['017715', '019051', '053532', '028579', '036199', '083257', '089822', '128474']
@@ -14,14 +16,31 @@ const COURSE_GROUP_KEY = groupId => `course_group_${groupId}`
 const TEACHER_COURSES_KEY = teacherId => `course_group_courses_${teacherId}`
 const REDIS_CACHE_TTL = 12 * 60 * 60
 
+
 const getTeachersForCourseGroup = (courseGroupId) => {
+  const validCourseGroupIds = [1, 2]
+  if (!validCourseGroupIds.includes(courseGroupId)) {
+    return undefined
+  }
+
+  let teacherIds
   if (courseGroupId === 1) {
-    return EP_TEACHERS
+    teacherIds = EP_TEACHERS
   }
 
   if (courseGroupId === 2) {
-    return KP_TEACHERS
+    teacherIds = KP_TEACHERS
   }
+
+  return Teacher.findAll({
+    raw: true,
+    attributes: ['name', 'code', 'id'],
+    where: {
+      id: {
+        [Op.in]: teacherIds
+      }
+    }
+  })
 }
 
 const getCourseGroupInfoByTeacherIds = teacherIds => sequelize.query(
@@ -47,15 +66,15 @@ const getCourseGroupsWithTotals = async () => {
   }
 
   const courseGroupStatistics = await Promise.map(courseGroupIds, async (courseGroupId) => {
-    const teachers = getTeachersForCourseGroup(courseGroupId)
+    const teacherBasicInfos = await getTeachersForCourseGroup(courseGroupId)
 
-    if (!teachers) {
+    if (!teacherBasicInfos) {
       return
     }
 
     const name = COURSE_GROUP_NAMES[courseGroupId]
-
-    const statistics = await getCourseGroupInfoByTeacherIds(teachers)
+    const teacherIds = teacherBasicInfos.map(t => t.id)
+    const statistics = await getCourseGroupInfoByTeacherIds(teacherIds)
 
     return {
       id: courseGroupId,
@@ -70,22 +89,19 @@ const getCourseGroupsWithTotals = async () => {
   return courseGroupStatistics
 }
 
-const getTeachersByIds = async teacherIds => sequelize.query(
+const getTeacherStatisticsByIds = async teacherIds => sequelize.query(
   `select
-        t.id as id,
-        t.code as code,
-        t.name as name,
+        ct.teacher_id as id,       
         count(distinct c.course_code) as courses,
         sum(credits) as credits,
         count(distinct student_studentnumber) as students
       from credit_teachers ct
-        left join credit c on ct.credit_id = c.id
-        left join teacher t on ct.teacher_id = t.id
+        left join credit c on ct.credit_id = c.id       
       where
         semestercode >= ${STATISTICS_START_SEMESTER}
       and
         ct.teacher_id in (:teacherIds)
-      group by t.id, t.name, t.code`,
+      group by ct.teacher_id`,
   { replacements: { teacherIds }, type: sequelize.QueryTypes.SELECT }
 )
 
@@ -96,22 +112,36 @@ const getCourseGroup = async (courseGroupId) => {
     return JSON.parse(cachedCourseGroup)
   }
 
-  const teacherIds = getTeachersForCourseGroup(courseGroupId)
+  const teacherBasicInfo = await getTeachersForCourseGroup(courseGroupId)
 
-  if (!teacherIds) {
+  if (!teacherBasicInfo) {
     return
   }
+  const teacherIds = teacherBasicInfo.map(t => t.id)
   const name = COURSE_GROUP_NAMES[courseGroupId]
   const statistics = await getCourseGroupInfoByTeacherIds(teacherIds)
-  const teachers = await getTeachersByIds(teacherIds)
+  const teacherStats = await getTeacherStatisticsByIds(teacherIds)
 
   const { credits, students, courses } = statistics[0]
 
-  teachers.forEach((t) => {
-    t.courses = Number(t.courses)
-    t.credits = Number(t.credits)
-    t.students = Number(t.students)
-  })
+  const mergedTeachers = [...teacherBasicInfo, ...teacherStats]
+    .reduce((acc, cur) => {
+      if (acc[cur.id]) {
+        acc[cur.id] = { ...cur, ...acc[cur.id] }
+      } else {
+        acc[cur.id] = cur
+      }
+      return acc
+    }, {})
+
+  const teachers = Object.values(mergedTeachers)
+    .map(t => ({
+      ...t,
+      courses: t.courses ? Number(t.courses) : 0,
+      credits: t.credits ? Number(t.credits) : 0,
+      students: t.students ? Number(t.students) : 0
+
+    }))
 
   const courseGroup = {
     id: courseGroupId,
