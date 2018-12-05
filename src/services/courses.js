@@ -216,7 +216,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
     const allInstancesUntilFall = allInstancesUntilYear.filter(inst => moment(inst.date).isBefore(String(year + 1) + '-01-15'))
     const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-08-01'))
     let fallStatistics = calculateStats(fallInstances, allInstancesUntilFall)
-  
+
     let springStatistics = calculateStats(springInstances, allInstancesUntilYear)
 
     const passedF = fallInstances.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
@@ -338,7 +338,7 @@ const findDuplicates = async (oldPrefixes, newPrefixes) => {
   inner join course inr on
   (
     select count(*) from course inr
-  where inr.name = ou.name) > 1 
+  where inr.name = ou.name) > 1
    AND inr.name = ou.name
    where(
     (${oldPrefixQuery})
@@ -379,7 +379,7 @@ const getMainCode = async (code) => {
 
 
 const setDuplicateCode = async (code, duplicate) => {
-  // TODO: decide main code by choosing a course that has been held most recently  
+  // TODO: decide main code by choosing a course that has been held most recently
   const isMainCode = (code) => code.slice(0, 2).split('').filter(c => Number(c)).length === 0
 
   const course = await byCode(code)
@@ -530,7 +530,7 @@ const codeLikeTerm = (code) => !code ? undefined : {
 
 const byNameAndOrCodeLike = (name, code) => {
   return Course.findAll({
-    attributes: ['name', 'code', ['latest_instance_date', 'date']],
+    attributes: ['name', 'code', ['latest_instance_date', 'date'], 'startdate', 'enddate'],
     where: {
       ...nameLikeTerm(name),
       ...codeLikeTerm(code)

@@ -198,7 +198,9 @@ const learningOpportunityDataToCourse = data => ({
   code: data.learningopportunity_id,
   coursetypecode: data.learningopportunity_type_code,
   disciplines: data.disciplines,
-  name: getTextsByLanguage(data.names)
+  name: getTextsByLanguage(data.names),
+  startdate: parseDate(data.start_date),
+  enddate: parseDate(data.end_date)
 })
 
 const learningOpportunityDataToCourseProviders = data => {
