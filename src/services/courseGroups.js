@@ -140,7 +140,6 @@ const getCourseGroup = async (courseGroupId) => {
       courses: t.courses ? Number(t.courses) : 0,
       credits: t.credits ? Number(t.credits) : 0,
       students: t.students ? Number(t.students) : 0
-
     }))
 
   const courseGroup = {
