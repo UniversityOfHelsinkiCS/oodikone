@@ -195,7 +195,6 @@ const ElementDetails = sequelize.define('element_details',
   }
 )
 
-
 const Course = sequelize.define('course',
   {
     code: {
