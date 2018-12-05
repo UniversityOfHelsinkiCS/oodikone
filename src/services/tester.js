@@ -8,10 +8,10 @@ const run = async () => {
     months: 16// 41
   }
 
-  const result = await bottlenecksOf(o)
-  
+  const result = await bottlenecksOf(o) // eslint-disable-line
+
   //console.log(JSON.stringify(result.coursestatistics[0].stats, null, 2))
-  
+
   //console.log(result.coursestatistics.length)
 
   process.exit()
