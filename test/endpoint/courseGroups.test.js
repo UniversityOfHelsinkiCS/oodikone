@@ -42,7 +42,7 @@ describe('Course groups endpoint tests', () => {
     const app = require('../../src/app')
 
     const res = await supertest(app)
-      .get('/api/courseGroups')
+      .get('/api/course-groups')
       .set('x-access-token', token)
       .set('uid', uid)
 
@@ -68,7 +68,7 @@ describe('Course groups endpoint tests', () => {
   test('Get teachers for course group', async () => {
     const app = require('../../src/app')
     const res = await supertest(app)
-      .get('/api/courseGroups/1/teachers')
+      .get('/api/course-groups/1/teachers')
       .set('x-access-token', token)
       .set('uid', uid)
 
