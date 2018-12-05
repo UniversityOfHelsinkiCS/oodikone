@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react'
-import { Header, Dropdown, Button } from 'semantic-ui-react'
+import { Dropdown, Button } from 'semantic-ui-react'
 import { number, arrayOf, func } from 'prop-types'
 import { academicYearType } from './util'
 
 import styles from './courseGroup.css'
 
-const Filters = ({ academicYears, semesterCode, handleSemesterCodeChangeFn }) => {
+const AcademicYearFilter = ({ academicYears, semesterCode, handleSemesterCodeChangeFn }) => {
   if (!academicYears) {
     return null
   }
@@ -23,9 +23,6 @@ const Filters = ({ academicYears, semesterCode, handleSemesterCodeChangeFn }) =>
 
   return (
     <Fragment>
-      <Header size="medium">
-        Filters
-      </Header>
       <div className={styles.academicYearFilterContainer}>
         <Button
           type="button"
@@ -37,7 +34,6 @@ const Filters = ({ academicYears, semesterCode, handleSemesterCodeChangeFn }) =>
             )}
         />
         <div className={styles.academicYearSelectContainer}>
-          <label htmlFor={academicYearSelectId}>Academic year</label>
           <Dropdown
             id={academicYearSelectId}
             search
@@ -62,15 +58,15 @@ const Filters = ({ academicYears, semesterCode, handleSemesterCodeChangeFn }) =>
   )
 }
 
-export default Filters
+export default AcademicYearFilter
 
-Filters.propTypes = {
+AcademicYearFilter.propTypes = {
   semesterCode: number,
   academicYears: arrayOf(academicYearType),
   handleSemesterCodeChangeFn: func.isRequired
 }
 
-Filters.defaultProps = {
+AcademicYearFilter.defaultProps = {
   semesterCode: undefined,
   academicYears: undefined
 }

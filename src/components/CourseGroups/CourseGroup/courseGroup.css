@@ -1,16 +1,54 @@
 .headerWithControl {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 1em !important;
 }
 
+.headerFilterContainer {
+  font-size: 1.2em;
+  display: flex;
+  flex-direction: column;
+}
+
+.headerIconButton,
 .iconButton {
   font-size: 1em !important;
   background: transparent !important;
 }
 
+.headerIconButton {
+  padding: 0 !important;
+}
+
 .activeIconButton {
   font-size: 1em;
+}
+
+.academicYearFilterContainer {
+  display: flex;
+  align-items: flex-end;
+  font-size: 0.65em;
+  margin-top: 0.4em;
+}
+
+.academicYearSelectContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.academicYearSelectContainer > label {
+  color: var(--darkSilver);
+  font-weight: 600
+}
+
+.hiddenButton,
+.filterButton {
+  height: 1.9em;
+  margin-right: 0 !important;
+  background: none !important;
+  padding: 0 !important;
+  font-size: 1.5em !important;
 }
 
 .groupStatistics {
@@ -125,32 +163,8 @@
 
 .activeToggleContainer > label {
   color: var(--darkSilver);
-  font-size: 0.75em;
+  font-size: 0.65em;
   padding-right: 0.5em;
-}
-
-.academicYearFilterContainer {
-  display: flex;
-  align-items: flex-end;
-}
-
-.academicYearSelectContainer {
-  display: flex;
-  flex-direction: column;
-}
-
-.academicYearSelectContainer > label {
-  color: var(--darkSilver);
-  font-weight: 600
-}
-
-.hiddenButton,
-.filterButton {
-  height: 2em;
-  margin-right: 0 !important;
-  background: none !important;
-  padding: 0 !important;
-  font-size: 1.5em !important;
 }
 
 .hiddenButton {
