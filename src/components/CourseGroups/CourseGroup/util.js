@@ -9,3 +9,10 @@ export const teacherType = shape({
   credits: number,
   students: number
 })
+
+export const academicYearType = shape({
+  semestercode: number.isRequired,
+  yearname: string.isRequired
+})
+
+export const CG_API_BASE_PATH = 'course-groups'
