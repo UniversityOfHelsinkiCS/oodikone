@@ -16,7 +16,7 @@ import Preset from './Preset'
 import DisciplineTypes from './DisciplineTypes'
 import EnrollmentStatus from './EnrollmentStatus'
 import TransferFilter from './TransferFilter'
-import TransferToFilter from './TransferToFilter'
+import TransferToStudyrightFilter from './TransferToStudyrightFilter'
 import CanceledStudyright from './CanceledStudyright'
 import PriorityStudyright from './PriorityStudyright'
 import {
@@ -37,7 +37,7 @@ const componentFor = {
   TransferFilter,
   CanceledStudyright,
   PriorityStudyright,
-  TransferToFilter
+  TransferToStudyrightFilter
 }
 
 const advancedFilters = { // Filters that are too hard to use for common folk
