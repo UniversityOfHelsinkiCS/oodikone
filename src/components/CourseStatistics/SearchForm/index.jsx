@@ -8,6 +8,8 @@ import { getCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import { getCourseSearchResults } from '../../../selectors/courses'
+import { getStartAndEndYearValues } from '../courseStatisticsUtils'
+import YearFilter from './YearFilter'
 
 const INITIAL = {
   displaycourses: false,
@@ -66,6 +68,8 @@ class SearchForm extends Component {
     course.selected = !course.selected
     const { selectedcourses } = this.state
     const isSelected = !!selectedcourses[course.code]
+    const { fromYear, toYear } = getStartAndEndYearValues(course, this.props.years)
+
     if (isSelected) {
       const { [course.code]: omit, ...rest } = selectedcourses
       this.setState({ selectedcourses: rest })
@@ -74,7 +78,9 @@ class SearchForm extends Component {
         selectedcourses: {
           ...selectedcourses,
           [course.code]: { ...course, selected: true }
-        }
+        },
+        fromYear: this.state.fromYear < fromYear ? this.state.fromYear : fromYear,
+        toYear: this.state.toYear > toYear ? this.state.toYear : toYear
       })
     }
   }
@@ -146,31 +152,13 @@ class SearchForm extends Component {
       <Segment loading={isLoading}>
         <Form>
           <Header content="Search parameters" as="h3" />
-          <Form.Group widths="equal">
-            <Form.Dropdown
-              label="From:"
-              name="fromYear"
-              options={years}
-              selection
-              placeholder="Select academic year"
-              onChange={this.handleChange}
-              value={fromYear}
-            />
-            <Form.Dropdown
-              label="To:"
-              name="toYear"
-              options={years}
-              selection
-              placeholder="Select academic year"
-              onChange={this.handleChange}
-              value={toYear}
-            />
-          </Form.Group>
-          <Form.Checkbox
-            label="Separate statistics for Spring and Fall semesters"
-            name="separate"
-            onChange={this.onToggleCheckbox}
-            checked={separate}
+          <YearFilter
+            fromYear={fromYear}
+            toYear={toYear}
+            years={years}
+            separate={separate}
+            handleChange={this.handleChange}
+            onToggleCheckbox={this.onToggleCheckbox}
           />
           <CourseTable
             title="Selected courses"
@@ -189,11 +177,7 @@ class SearchForm extends Component {
             onClick={this.onSubmitFormClick}
           />
           <Header content="Search for courses" />
-          <div
-            style={{ marginBottom: '15px' }}
-            onFocus={() => this.setState({ focus: true })}
-            onBlur={() => this.setState({ focus: false })}
-          >
+          <div style={{ marginBottom: '15px' }}>
             <Form.Group widths="equal">
               <Form.Field>
                 <label>Code:</label>
