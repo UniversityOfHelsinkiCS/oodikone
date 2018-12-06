@@ -5,12 +5,13 @@ import { shape, func, string } from 'prop-types'
 import _ from 'lodash'
 
 import infoTooltips from '../../common/infotooltips'
-import { transferToFilter } from '../../populationFilters'
+import { transferTo } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
 class TransferToFilter extends Component {
   static propTypes = {
     filter: shape({}).isRequired,
+    studyrightName: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
     language: string.isRequired
@@ -21,7 +22,7 @@ class TransferToFilter extends Component {
   }
 
   handleRadio = () => {
-    this.props.setPopulationFilter(transferToFilter({ negated: this.state.negated }))
+    this.props.setPopulationFilter(transferTo({ negated: this.state.negated }))
     this.setState({ starting: true })
   }
 
@@ -30,10 +31,10 @@ class TransferToFilter extends Component {
   }
 
   render() {
-    const { filter } = this.props
-    const toggleLabel = this.state.starting
-      ? 'did not transfer to this studyright'
-      : 'transferred to this studyright'
+    const { filter, studyrightName, language } = this.props
+    const toggleLabel = this.state.negated
+      ? `have transferred to ${studyrightName[language]}`
+      : `have not transfer to ${studyrightName[language]}`
 
     if (filter.notSet) {
       return (
@@ -71,7 +72,7 @@ class TransferToFilter extends Component {
 
     return (
       <Segment>
-        {filter.params.starting ? 'Had not transferred' : 'Had not transferred'}
+        {filter.params.negated ? `Have transferred to ${studyrightName[language]}` : `Have not transferred to ${studyrightName[language]}`}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
@@ -80,9 +81,14 @@ class TransferToFilter extends Component {
   }
 }
 
-const mapStateToProps = ({ settings }) => ({
-  language: settings.language
-})
+const mapStateToProps = (state) => {
+  const code = state.populations.query.studyRights[0]
+  const studyrightName = state.populationDegreesAndProgrammes.data[20][code].name
+  return ({
+    language: state.settings.language,
+    studyrightName
+  })
+}
 
 export default connect(
   mapStateToProps,

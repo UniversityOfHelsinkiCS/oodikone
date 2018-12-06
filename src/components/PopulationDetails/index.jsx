@@ -97,7 +97,7 @@ class PopulationDetails extends Component {
     return (
       <Segment>
         <Header size="medium" dividing>
-          {translate('populationStatistics.graphSegmentHeader')}
+          {translate('populationStatistics.graphSegmentHeader')} (for {this.props.selectedStudents.length} students)
         </Header>
         {samples.length > 0 ? graphs : null}
       </Segment>
