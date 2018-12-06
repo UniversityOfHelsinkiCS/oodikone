@@ -32,11 +32,14 @@ const getStudents = async numbers => {
 }
 const getCluster = (code) => instance.get(`/${code}`)
 
+const getCourseSuggestion = (doneCourses, period) => instance.get('suggest_new_course', { params: { 'doneCourses': doneCourses, 'period': period } })
+
 module.exports = {
   ping,
   query,
   getStudentData,
   getStudents,
   getCourseData,
-  getCluster
+  getCluster,
+  getCourseSuggestion
 }

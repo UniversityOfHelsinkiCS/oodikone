@@ -46,8 +46,9 @@ const courseGradeData = async (courseCode) => {
 }
 const getCluster = async (courseCode) =>  oodilearnClient.getCluster(courseCode)
 
-
 const getStudentData = studentnumber => oodilearnClient.getStudentData(studentnumber)
+
+const suggestCourse = (doneCourses, period) => oodilearnClient.getCourseSuggestion(doneCourses, period)
 
 module.exports = {
   ping,
@@ -55,5 +56,6 @@ module.exports = {
   getStudentData,
   matchingStudents,
   courseGradeData,
-  getCluster
+  getCluster,
+  suggestCourse
 }
