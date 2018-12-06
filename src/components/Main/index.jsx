@@ -80,10 +80,10 @@ class Main extends Component {
   }
 
   render() {
-    console.log('DOESTHISWORK')
     if (!this.state.loaded) {
       return <Loader active inline="centered" />
     }
+
     if (!this.state.enabled || this.state.hasError || this.state.networkError) {
       return (
         <div>
@@ -93,7 +93,11 @@ class Main extends Component {
             networkError={this.state.networkError}
           />
           <Transition visible={this.state.easterEgg} animation="fly up" duration={10000}>
-            <Image src={images.irtomikko} size="huge" verticalAlign="top" inline style={{ position: 'absolute', top: '350px', right: '10px' }} />
+            <Image
+              src={images.irtomikko}
+              size="huge" verticalAlign="top"
+              inline
+              style={{ position: 'absolute', top: '350px', right: '10px' }} />
           </Transition>
         </div>
       )
