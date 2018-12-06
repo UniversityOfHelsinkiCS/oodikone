@@ -72,7 +72,9 @@ class TransferToFilter extends Component {
 
     return (
       <Segment>
-        {filter.params.negated ? `Have transferred to ${studyrightName[language]}` : `Have not transferred to ${studyrightName[language]}`}
+        {filter.params.negated
+          ? `Have transferred to ${studyrightName[language]}`
+          : `Have not transferred to ${studyrightName[language]}`}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
