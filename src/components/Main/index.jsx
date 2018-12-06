@@ -80,6 +80,7 @@ class Main extends Component {
   }
 
   render() {
+    console.log('DOESTHISWORK')
     if (!this.state.loaded) {
       return <Loader active inline="centered" />
     }
