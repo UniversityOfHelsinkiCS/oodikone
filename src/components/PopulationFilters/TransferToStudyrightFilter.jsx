@@ -8,7 +8,7 @@ import infoTooltips from '../../common/infotooltips'
 import { transferTo } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
-class TransferToFilter extends Component {
+class TransferToStudyrightFilter extends Component {
   static propTypes = {
     filter: shape({}).isRequired,
     studyrightName: shape({}).isRequired,
@@ -95,4 +95,4 @@ const mapStateToProps = (state) => {
 export default connect(
   mapStateToProps,
   { setPopulationFilter, removePopulationFilter }
-)(TransferToFilter)
+)(TransferToStudyrightFilter)
