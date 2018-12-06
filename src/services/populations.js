@@ -315,16 +315,26 @@ const formatStudentsForApi = async (students, startDate, endDate, {studyRights} 
     }
   })
 
-  const changedStudyright = (s) => {
+  const transferredStudyright = (s) => {
     const studyright = s.studyrights.find(s => s.studyrightElements.map(d => d.element_detail.code).includes(studyRights[0]))
+    
     if (studyright) {
-      s.changedStudyright = moment(startDate).isAfter(moment(studyright.startdate))
+      s.transferredStudyright = moment(startDate).isAfter(moment(studyright.startdate))
+
+      console.log(s.studentNumber)
+
+      if (s.transferredStudyright) {
+        const previousRights = studyright.studyrightElements.filter(e => e.element_detail.type === 20 && e.element_detail.code !== studyRights[0])
+        console.log(JSON.stringify(previousRights, null, 2))
+        s.previousRights = previousRights
+      }
+
     }
     return s
   }
 
   return {
-    students: result.students.map(changedStudyright),
+    students: result.students.map(transferredStudyright),
     transfers: result.transfers,
     extents: Object.values(result.extents),
     semesters: Object.values(result.semesters),
