@@ -1,8 +1,8 @@
 import React from 'react'
 import { Statistic, Placeholder } from 'semantic-ui-react'
 import { number, bool, arrayOf } from 'prop-types'
-import { teacherType } from './util'
-import styles from './courseGroup.css'
+import { teacherType } from '../util'
+import styles from '../courseGroup.css'
 
 const getStatistic = (label, value) => (
   <Statistic className={styles.groupStatistic}>
@@ -11,7 +11,7 @@ const getStatistic = (label, value) => (
   </Statistic>
 )
 
-const Statistics = ({ totalStudents, totalCourses, totalCredits, totalTeachers, activeTeachers, isLoading }) => {
+const Index = ({ totalStudents, totalCourses, totalCredits, totalTeachers, activeTeachers, isLoading }) => {
   if (isLoading) {
     const lineKeys = [1, 2, 3, 4, 5]
     return (
@@ -57,7 +57,7 @@ const Statistics = ({ totalStudents, totalCourses, totalCredits, totalTeachers, 
   )
 }
 
-Statistics.propTypes = {
+Index.propTypes = {
   totalStudents: number,
   totalCourses: number,
   totalCredits: number,
@@ -66,7 +66,7 @@ Statistics.propTypes = {
   isLoading: bool.isRequired
 }
 
-Statistics.defaultProps = {
+Index.defaultProps = {
   totalTeachers: undefined,
   totalStudents: undefined,
   totalCourses: undefined,
@@ -74,4 +74,4 @@ Statistics.defaultProps = {
   activeTeachers: undefined
 }
 
-export default Statistics
+export default Index
