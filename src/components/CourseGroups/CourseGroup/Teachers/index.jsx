@@ -1,9 +1,10 @@
 import React, { Fragment, Component } from 'react'
 import { Header, List, Button, Radio, Icon } from 'semantic-ui-react'
 import sortBy from 'lodash/sortBy'
-import { bool, func, shape, string, number } from 'prop-types'
+import { bool, func, arrayOf, number } from 'prop-types'
+import { teacherType } from '../util'
 
-import styles from './courseGroup.css'
+import styles from '../courseGroup.css'
 
 const teacherColumnTypes = {
   NAME: 'name',
@@ -12,8 +13,8 @@ const teacherColumnTypes = {
   CREDITS: 'credits'
 }
 
-const TeacherItem = ({ teacher, onFilterClickFn }) => {
-  const { name, code, id, isActive, courses, credits } = teacher
+const TeacherItem = ({ teacher, isActive, handleFilterClick }) => {
+  const { name, code, id, courses, credits } = teacher
 
   return (
     <List.Item className={`${isActive ? styles.teacherActiveItem : ''}`}>
@@ -28,7 +29,7 @@ const TeacherItem = ({ teacher, onFilterClickFn }) => {
           <Button
             icon="filter"
             className={`${isActive ? styles.activeIconButton : styles.iconButton}`}
-            onClick={() => onFilterClickFn(id)}
+            onClick={() => handleFilterClick(id)}
             circular
           />
         </div>
@@ -38,53 +39,38 @@ const TeacherItem = ({ teacher, onFilterClickFn }) => {
 }
 
 TeacherItem.propTypes = {
-  onFilterClickFn: func.isRequired,
-  teacher: shape({
-    name: string,
-    code: string,
-    id: string,
-    isActive: bool,
-    courses: number,
-    credits: number
-  }).isRequired
+  handleFilterClick: func.isRequired,
+  teacher: teacherType.isRequired,
+  isActive: bool.isRequired
 }
 
-class Teachers extends Component {
+class Index extends Component {
+  static propTypes = {
+    activeTeacherIds: arrayOf(number).isRequired,
+    handleFilterClick: func.isRequired,
+    handleActiveToggleChange: func.isRequired,
+    showOnlyActiveTeachers: bool.isRequired
+  }
+
   state = {
-    showOnlyActive: false,
-    activeTeacherCount: 0,
     viewableTeachers: [],
     sortColumn: teacherColumnTypes.NAME,
-    sortReverse: false
+    sortReverse: false,
+    activeTeacherCount: 0
   }
 
-  static getDerivedStateFromProps(props, state) {
-    const { teachers } = props
-    const { showOnlyActive } = state
-    const activeTeachers = teachers.filter(t => t.isActive)
-    const activeTeacherCount = activeTeachers.length
-    const resetShowOnlyActive = showOnlyActive && activeTeacherCount === 0
+  static getDerivedStateFromProps(props) {
+    const { teachers, showOnlyActiveTeachers, activeTeacherIds } = props
 
-    if (!showOnlyActive || resetShowOnlyActive) {
-      return {
-        showOnlyActive: false,
-        activeTeacherCount,
-        viewableTeachers: teachers
-      }
-    }
+    const activeTeachers = teachers.filter(t => activeTeacherIds.includes(t.id))
 
     return {
-      activeTeacherCount,
-      viewableTeachers: activeTeachers
+      activeTeacherCount: activeTeachers.length,
+      viewableTeachers: showOnlyActiveTeachers ? activeTeachers : teachers
     }
   }
 
-  onActiveToggleChange = () => {
-    const { showOnlyActive } = this.state
-    this.setState({ showOnlyActive: !showOnlyActive })
-  }
-
-  onTeacherHeaderClick = (columnName) => {
+  handleTeacherHeaderClick = (columnName) => {
     const { sortColumn, sortReverse } = this.state
     const isSortColumn = columnName === sortColumn
     this.setState({
@@ -102,7 +88,7 @@ class Teachers extends Component {
       return (
         <div
           className={className}
-          onClick={() => this.onTeacherHeaderClick(columnName)}
+          onClick={() => this.handleTeacherHeaderClick(columnName)}
         >
           {label}
           {isActive
@@ -125,14 +111,14 @@ class Teachers extends Component {
   }
 
   render() {
-    const { onFilterClickFn } = this.props
+    const { handleFilterClick, handleActiveToggleChange, showOnlyActiveTeachers, activeTeacherIds } = this.props
     const {
       viewableTeachers,
       activeTeacherCount,
-      showOnlyActive,
       sortColumn,
       sortReverse
     } = this.state
+
     const toggleId = 'toggle'
     const sortedTeachers = sortBy(viewableTeachers, sortColumn)
 
@@ -149,17 +135,20 @@ class Teachers extends Component {
             <Radio
               id={toggleId}
               toggle
-              checked={showOnlyActive}
-              onChange={this.onActiveToggleChange}
+              checked={showOnlyActiveTeachers}
+              onChange={handleActiveToggleChange}
               disabled={activeTeacherCount === 0}
             />
           </div>
         </Header>
         <List celled>
           {this.renderListHeader()}
-          {sortedTeachers.map(t =>
-            <TeacherItem key={t.id} teacher={t} onFilterClickFn={onFilterClickFn} />)
+          {sortedTeachers.map((t) => {
+            const isActive = activeTeacherIds.includes(t.id)
+            return <TeacherItem key={t.id} teacher={t} isActive={isActive} handleFilterClick={handleFilterClick} />
+          })
           }
+
         </List>
       </Fragment>
     )
@@ -167,8 +156,4 @@ class Teachers extends Component {
 }
 
 
-Teachers.propTypes = {
-  onFilterClickFn: func.isRequired
-}
-
-export default Teachers
+export default Index

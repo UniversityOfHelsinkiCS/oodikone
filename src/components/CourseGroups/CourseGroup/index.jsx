@@ -1,15 +1,19 @@
 import React, { Component, Fragment } from 'react'
-import { Segment, Header, Button, Statistic } from 'semantic-ui-react'
+import { Segment, Header, Button, Placeholder } from 'semantic-ui-react'
 import { string, func, shape } from 'prop-types'
 import { withRouter } from 'react-router'
 
 import { getCompiledPath } from '../../../common'
 import { routes } from '../../../constants'
 import { callApi } from '../../../apiConnection'
-import Teachers from './teachers'
-import Courses from './courses'
+import Teachers from './Teachers'
+import Courses from './Courses'
+import Statistics from './Statistics'
 
 import styles from './courseGroup.css'
+
+import AcademicYearFilter from './academicYearFilter'
+import { CG_API_BASE_PATH } from './util'
 
 class CourseGroup extends Component {
   static propTypes = {
@@ -20,101 +24,153 @@ class CourseGroup extends Component {
   }
 
   state = {
-    isLoading: true
+    isLoading: true,
+    teachers: [],
+    activeTeacherIds: []
   }
 
   async componentDidMount() {
     const { groupId } = this.props
+    const [courseGroup, academicYears] = await Promise.all([
+      callApi(`${CG_API_BASE_PATH}/${groupId}`),
+      callApi(`${CG_API_BASE_PATH}/academic-years`)
+    ])
 
-    const response = await callApi(`courseGroups/${groupId}`)
+    const { name, totalCredits, totalStudents, totalCourses, teachers, semester } = courseGroup.data
 
-    const { name, totalCredits, totalStudents, totalCourses, teachers } = response.data
     this.setState({
+      academicYears: academicYears.data,
+      semesterCode: semester,
       name,
       totalCredits,
       totalStudents,
       totalCourses,
       teachers,
-      isLoading: false
+      isLoading: false,
+      showOnlyActiveTeachers: false
     })
   }
 
-  onTeacherFilterClick = (teacherId) => {
-    const { teachers } = this.state
-    const newTeachers = [...teachers]
-    const index = newTeachers.findIndex(t => t.id === teacherId)
-    newTeachers[index].isActive = !newTeachers[index].isActive
-    this.setState({ teachers: newTeachers })
+  handleSemesterCodeChange = (e, { value }) => {
+    const { groupId } = this.props
+
+    this.setState(
+      { semesterCode: value, isLoading: true },
+      () => callApi(`${CG_API_BASE_PATH}/${groupId}/?semester=${value}`)
+        .then(({ data }) => {
+          const { totalCredits, totalStudents, totalCourses, teachers } = data
+
+          this.setState({
+            isLoading: false,
+            totalCredits,
+            totalStudents,
+            totalCourses,
+            teachers
+          })
+        })
+    )
   }
 
-  renderStatistics = () => {
-    const { totalCredits, totalStudents, totalCourses, teachers, isLoading } = this.state
-    if (isLoading) {
-      return null
-    }
+  handleTeacherActiveToggleChange = () => {
+    const { showOnlyActiveTeachers } = this.state
+    this.setState({ showOnlyActiveTeachers: !showOnlyActiveTeachers })
+  }
 
-    const totalTeachers = teachers.length
+  handleTeacherFilterClick = (teacherId) => {
+    const { showOnlyActiveTeachers, activeTeacherIds } = this.state
+    this.setState({ isLoading: true }, () => {
+      const isActiveTeacher = activeTeacherIds.includes(teacherId)
 
-    const getStatistic = (label, value) => (
-      <Statistic className={styles.groupStatistic}>
-        <Statistic.Label>{label}</Statistic.Label>
-        <Statistic.Value>{value}</Statistic.Value>
-      </Statistic>
-    )
+      const newActiveTeachers = isActiveTeacher
+        ? activeTeacherIds.filter(id => id !== teacherId)
+        : [...activeTeacherIds, teacherId]
 
-    return (
-      <Statistic.Group className={styles.groupStatistics}>
-        {getStatistic('Total teachers', totalTeachers)}
-        {getStatistic('Total students', totalStudents)}
-        {getStatistic('Total courses', totalCourses)}
-        {getStatistic('Total credits', totalCredits)}
-      </Statistic.Group>
-    )
+      const resetActiveTeachers = showOnlyActiveTeachers && newActiveTeachers.length === 0
+
+      this.setState({
+        activeTeacherIds: newActiveTeachers,
+        isLoading: false,
+        showOnlyActiveTeachers: resetActiveTeachers ? false : showOnlyActiveTeachers
+      })
+    })
   }
 
   renderTeachersAndCourses = () => {
-    const { teachers, isLoading } = this.state
+    const { teachers, isLoading, showOnlyActiveTeachers, semesterCode, activeTeacherIds } = this.state
     if (isLoading) {
-      return null
+      const lineKeys = [1, 2, 3, 4]
+      return (
+        <Placeholder>
+          {lineKeys.map(k => <Placeholder.Line key={k} length="full" />)}
+        </Placeholder>)
     }
 
-    const getTeacherIds = teacers => teacers.map(t => t.id)
+    const getTeacherIds = teach => teach.map(t => t.id)
 
-    const activeTeachers = teachers.filter(t => t.isActive)
-    const hasActiveTeachers = activeTeachers.length > 0
+    const hasActiveTeachers = activeTeacherIds.length > 0
     const teacherIds = hasActiveTeachers
-      ? getTeacherIds(activeTeachers)
+      ? activeTeacherIds
       : getTeacherIds(teachers)
 
     return (
-      <Segment>
-        <Teachers teachers={teachers} onFilterClickFn={this.onTeacherFilterClick} />
-        <Courses teacherIds={teacherIds} />
-      </Segment>
+      <Fragment>
+        <Teachers
+          activeTeacherIds={activeTeacherIds}
+          teachers={teachers}
+          handleFilterClick={this.handleTeacherFilterClick}
+          handleActiveToggleChange={this.handleTeacherActiveToggleChange}
+          showOnlyActiveTeachers={showOnlyActiveTeachers}
+
+        />
+        <Courses teacherIds={teacherIds} semesterCode={semesterCode} />
+      </Fragment>
     )
   }
 
   render() {
     const { history } = this.props
-    const { isLoading, name } = this.state
+    const {
+      totalStudents,
+      totalCourses,
+      totalCredits,
+      teachers,
+      activeTeacherIds,
+      isLoading,
+      name,
+      semesterCode,
+      academicYears
+    } = this.state
 
     const navigateTo = route => history.push(getCompiledPath(route, {}))
+    const statisticsTeachers = teachers.filter(t => activeTeacherIds.includes(t.id))
 
     return (
-      <Fragment>
-        <Segment loading={isLoading}>
-          <Header size="medium" className={styles.headerWithControl}>
+      <Segment loading={isLoading}>
+        <Header size="medium" className={styles.headerWithControl}>
+          <div className={styles.headerFilterContainer}>
             {name}
-            <Button
-              icon="reply"
-              onClick={() => navigateTo(routes.courseGroups.route)}
-              className={styles.iconButton}
+            <AcademicYearFilter
+              semesterCode={semesterCode}
+              academicYears={academicYears}
+              handleSemesterCodeChangeFn={this.handleSemesterCodeChange}
             />
-          </Header>
-          {this.renderStatistics()}
-        </Segment>
+          </div>
+          <Button
+            icon="reply"
+            onClick={() => navigateTo(routes.courseGroups.route)}
+            className={styles.headerIconButton}
+          />
+        </Header>
+        <Statistics
+          isLoading={isLoading}
+          totalCourses={totalCourses}
+          totalTeachers={teachers.length}
+          activeTeachers={statisticsTeachers}
+          totalStudents={totalStudents}
+          totalCredits={totalCredits}
+        />
         {this.renderTeachersAndCourses()}
-      </Fragment>
+      </Segment>
     )
   }
 }
