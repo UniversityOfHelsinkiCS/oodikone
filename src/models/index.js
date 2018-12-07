@@ -206,7 +206,8 @@ const Course = sequelize.define('course',
     is_study_module: { type: Sequelize.BOOLEAN },
     startdate: { type: Sequelize.DATE },
     enddate: { type: Sequelize.DATE },
-    max_attainment_date: { type: Sequelize.DATE }
+    max_attainment_date: { type: Sequelize.DATE },
+    min_attainment_date: { type: Sequelize.DATE }
   },
   {
     tableName: 'course',
