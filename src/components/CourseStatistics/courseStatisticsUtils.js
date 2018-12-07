@@ -9,18 +9,20 @@ const isSpring = date => moment(date).month() < 7
 const isPre2016Course = course => !Number.isNaN(Number(course.code.charAt(0)))
 const twoDigitYear = year => year.toString().substring(2, 4)
 const getSemesterText = (start, end) => `${start}-${twoDigitYear(end)}`
-const getYearText = (year, spring) => (spring ? getSemesterText(year - 1, year) : getSemesterText(year, year + 1))
+const getYearDataText = (year, spring) => (spring ? getSemesterText(year - 1, year) : getSemesterText(year, year + 1))
+const getYearText = (year, spring) => (spring ? `Spring ${year}` : `Fall ${year}`)
+
 
 const getCourseYears = course => ({
-  startYear: moment(course.startdate).year(),
-  endYear: moment(course.max_attainment_date || course.enddate).year()
+  startYear: moment(course.min_attainment_date).year(),
+  endYear: moment(course.max_attainment_date).year()
 })
 
 const getActiveYears = (course) => {
   const { startYear, endYear } = getCourseYears(course)
+  if (!startYear && !endYear) return 'No attainments yet'
   const startYearText = getYearText(startYear, isSpring(course.startdate))
   const endYearText = getYearText(endYear, isSpring(course.max_attainment_date || course.enddate))
-
   if (endYear === MAX_YEAR && isPre2016Course(course)) {
     return `— ${getYearText(2016, false)}`
   }
@@ -32,31 +34,34 @@ const getActiveYears = (course) => {
   if (endYear === MAX_YEAR) {
     return `${startYearText} — `
   }
-
   return `${startYearText} — ${endYearText}`
 }
 
 const getCourseSemesters = (course) => {
   const { startYear, endYear } = getCourseYears(course)
-
   return {
-    start: getYearText(startYear, isSpring(course.startdate)),
-    end: getYearText(endYear, isSpring(course.max_attainment_date || course.enddate))
+    start: getYearDataText(startYear, isSpring(course.startdate)),
+    end: getYearDataText(endYear, isSpring(course.max_attainment_date))
   }
 }
 
-const getStartAndEndYearValues = (course, years) => {
-  const { start, end } = getCourseSemesters(course)
+const maximumYear = years => (
+  years.reduce((prev, curr) => {
+    if (prev.value > curr.value) return prev
+    return curr
+  })
+)
 
+const getStartAndEndYearValues = (course, years) => {
+  if (!course.min_attainment_date && !course.max_attainment_date) return { fromYear: null, toYear: null }
+  const { start, end } = getCourseSemesters(course)
   const startYear = Number(start.substring(0, 4)) < MIN_DEFAULT_YEAR
     ? years.find(year => year.text === MIN_DEFAULT_SEMESTER)
     : years.find(year => year.text === start)
 
-  const endYear = Number(start.substring(0, 4) === MAX_YEAR) ? undefined : years.find(year => year.text === end)
-
+  const endYear = Number(start.substring(0, 4) === MAX_YEAR) ? maximumYear(years) : years.find(year => year.text === end)
   const fromYear = startYear ? startYear.value : undefined
   const toYear = endYear ? endYear.value : undefined
-
   return { fromYear, toYear }
 }
 
