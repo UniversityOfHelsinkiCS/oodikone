@@ -24,36 +24,37 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, co
       </Table.Cell>
       <Table.Cell content={course.code} />
       <Table.Cell>
-        <Button
-          basic
-          className={styles.controlIcon}
-          icon={controlIcon}
-          onClick={() => onSelectCourse(course)}
-        />
+        {course.min_attainment_date ?
+          <Button
+            basic
+            className={styles.controlIcon}
+            icon={controlIcon}
+            onClick={() => onSelectCourse(course)}
+          /> : null }
       </Table.Cell>
     </Table.Row>
   )
 
   return (
     !hidden && (
-    <Segment basic style={{ padding: '0' }} >
-      <Table>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell content={title} />
-            <Table.HeaderCell content="Code" />
-            <Table.HeaderCell content="Select" />
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {
-            noContent
-              ? getEmptyListRow()
-              : sortedCourses.map(toCourseRow)
-          }
-        </Table.Body>
-      </Table>
-    </Segment>
+      <Segment basic style={{ padding: '0' }} >
+        <Table>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell content={title} />
+              <Table.HeaderCell content="Code" />
+              <Table.HeaderCell content="Select" />
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {
+              noContent
+                ? getEmptyListRow()
+                : sortedCourses.map(toCourseRow)
+            }
+          </Table.Body>
+        </Table>
+      </Segment>
     )
   )
 }
