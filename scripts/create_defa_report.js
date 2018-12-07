@@ -57,22 +57,40 @@ const withinTimeframe = timeframe => time => time > timeframe.start && time < ti
 
 const HEADER_ROW_STUB = '"student number","DEFA credits","required courses done"'
 
-const toCsv = includedCourses => students => [
-  `${HEADER_ROW_STUB},${includedCourses.join(',')}`,
-  ...students.map(
-    student => `"${student.student_number}",${student.credits},${student.hasRequired},${student.courseCompletions.join(',')}`
-  )
-].join('\n')
+const toCsv = includedCourses => students => {
+  const creditTotals = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+  const courseTotals = includedCourses.map(() => 0)
+  students.forEach(student => {
+    let creditTotalIndex
+    if (student.credits >= 60) {
+      creditTotalIndex = 12
+    } else {
+      creditTotalIndex = (student.credits - student.credits % 5) / 5
+    }
+    creditTotals[creditTotalIndex] += 1
+    student.courseCompletions.forEach((complete, index) => {
+      if (complete) {
+        courseTotals[index] += 1
+      }
+    })
+  })
 
-const toStats = students => {
-  const totalNumber = students.length
-  const totalHasAny = students.filter(student => student.credits > 0).length
-  const totalHasRequired = students.filter(student => student.hasRequired).length
-  return [
-    `Total number of DEFA students: ${totalNumber}`,
-    `Total number of DEFA students with at least one credit: ${totalHasAny}`,
-    `Total number of DEFA students with all required courses done: ${totalHasRequired}`
+  const allCredits = students.reduce((acc, student) => acc + student.credits,0)
+  const reportCsv = [
+    `${HEADER_ROW_STUB},${includedCourses.join(',')}`,
+    ...students.map(
+      student => `"${student.student_number}",${student.credits},${student.hasRequired},${student.courseCompletions.join(',')}`
+    ),
+    ['total', allCredits, 'N/A', ...courseTotals].join(',')
   ].join('\n')
+
+  const creditTotalHeaders = ['0-4','5-9','10-14','15-19','20-24','25-29','30-34','35-39','40-44','45-49','50-54','55-59','60+']
+  const creditTotalCsv = [
+    creditTotalHeaders.join(','),
+    creditTotals.join(',')
+  ].join('\n')
+
+  return [reportCsv, creditTotalCsv]
 }
 
 const getStudentNumbers = async courseIds => {
@@ -142,15 +160,16 @@ const createReport = async (paramFileName) => {
   const defaStudents = await getStudents(includedCourses, requiredCourses, timeframe)(studentNumbers)
 
   // Print out into output files
-  if (params.out.csv) {
-    fs.writeFileSync(params.out.csv, toCsv(includedCourses)(defaStudents))
+  const [reportCsv, statsCsv] = toCsv(includedCourses)(defaStudents)
+  if (params.out.report) {
+    fs.writeFileSync(params.out.report, reportCsv)
   } else {
-    console.log('No file defined for csv output. You can set it as out.csv in the parameter file.')
+    console.log('No file defined for report output. You can set it as out.report in the parameter file.')
   }
   if (params.out.stats) {
-    fs.writeFileSync(params.out.stats, toStats(defaStudents))
+    fs.writeFileSync(params.out.stats, statsCsv)
   } else {
-    console.log('No file defined for stats JSON output. You can set it as out.stats in the parameter file.')
+    console.log('No file defined for stats output. You can set it as out.stats in the parameter file.')
   }
   console.log('Successfully created a DEFA report.')
   process.exit(0)
