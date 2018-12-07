@@ -30,8 +30,7 @@ const getAcademicYears = () => sequelize.query(
 
 const getCurrentAcademicYear = () => sequelize.query(
   `select 
-      semestercode, 
-      startdate, 
+      semestercode,
       yearname 
     from semesters 
       where startdate <= now() 
@@ -250,7 +249,6 @@ const getCoursesByTeachers = async (teacherIds, semesterCode) => {
 
 module.exports = {
   getAcademicYears,
-  getTeachersForCourseGroup,
   getCourseGroupsWithTotals,
   getCourseGroup,
   getCoursesByTeachers

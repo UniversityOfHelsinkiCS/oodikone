@@ -40,6 +40,20 @@ describe('Course groups endpoint tests', () => {
 
   test('Get list of available course groups', async () => {
     const app = require('../../src/app')
+    const expectedArray = [{
+      credits: null,
+      id: 1,
+      name: 'Erityispedagogiikka',
+      students: 0
+    },
+    {
+      credits: null,
+      id: 2,
+      name: 'Kasvatuspsykologia',
+      students: 0
+    }
+    ]
+    sequelize.query = jest.fn(() => Promise.resolve(expectedArray))
 
     const res = await supertest(app)
       .get('/api/course-groups')
@@ -48,32 +62,7 @@ describe('Course groups endpoint tests', () => {
 
 
     expect(res.status).toBe(200)
-    expect(res.body).toEqual([
-      expect.objectContaining({
-        credits: null,
-        id: 1,
-        name: 'Erityispedagogiikka',
-        students: 0
-      }),
-      expect.objectContaining({
-        credits: null,
-        id: 2,
-        name: 'Kasvatuspsykologia',
-        students: 0
-      })
-    ])
-    app.close()
-  })
-
-  test('Get teachers for course group', async () => {
-    const app = require('../../src/app')
-    const res = await supertest(app)
-      .get('/api/course-groups/1/teachers')
-      .set('x-access-token', token)
-      .set('uid', uid)
-
-    expect(res.status).toBe(200)
-    expect(res.body.length).toBe(8)
+    expect(res.body).toEqual(expectedArray)
     app.close()
   })
 })

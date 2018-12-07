@@ -15,12 +15,6 @@ router.get(`${BASE_PATH}/academic-years`, async (req, res) => {
   res.json(academicYears)
 })
 
-router.get(`${BASE_PATH}/:id/teachers`, async (req, res) => {
-  const teachers = CourseGroupService.getTeachersForCourseGroup(Number(req.params.id))
-
-  return teachers ? res.send(teachers) : res.send(404)
-})
-
 router.get(`${BASE_PATH}/teachers`, async (req, res) => {
   const { teacherIds: ids, semester } = req.query
   const teacherIds = JSON.parse(ids)
