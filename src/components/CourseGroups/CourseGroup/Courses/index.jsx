@@ -63,7 +63,7 @@ class Index extends Component {
   fetchCourses = async () => {
     const { teacherIds, semesterCode } = this.props
 
-    let path = `${CG_API_BASE_PATH}/teachers/?teacherIds=${JSON.stringify(teacherIds)}`
+    let path = `${CG_API_BASE_PATH}/courses/?teacherIds=${JSON.stringify(teacherIds)}`
     if (semesterCode) {
       path = `${path}&semester=${semesterCode}`
     }
