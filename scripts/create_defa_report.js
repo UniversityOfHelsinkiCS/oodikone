@@ -9,45 +9,58 @@ const parseInfo = response => {
   }
 }
 
-const getStudents = (requiredCourses, timeframe) => async studentNumbers => {
+const getStudents = (includedCourses, requiredCourses, timeframe) => async studentNumbers => {
   const responses = await Promise.all(
     studentNumbers.map(sn => getStudyAttainments(sn))
   )
-  return responses.map((response, index) => parseStudentInfo(requiredCourses, timeframe)(response, studentNumbers[index]))
+  return responses.map((response, index) => parseStudentInfo(includedCourses, requiredCourses, timeframe)(response, studentNumbers[index]))
 }
 
-const parseStudentInfo = (requiredCourses, timeframe) => (response, studentNumber) => {
+const optionalAYprefixRegex = course => new RegExp(`^(AY)?${course}$`)
+
+const parseStudentInfo = (includedCourses, requiredCourses, timeframe) => (response, studentNumber) => {
   const studyAttainments = response.map(studyAttainment => ({
     date: new Date(studyAttainment.attainment_date),
     grade: Number(studyAttainment.grade[0].text),
     credits: studyAttainment.credits,
     course_code: studyAttainment.learningopportunity_id
   }))
-  const passed = studyAttainments.filter(studyAttainment => studyAttainment.grade > 0)
-  const creditsTotal = passed.reduce((acc, studyAttainment) => acc + studyAttainment.credits, 0)
-  const hasRequired = checkRequiredCourses(requiredCourses, timeframe)(passed)
+  const defaCourses = studyAttainments
+    .filter(
+      studyAttainment => Boolean(includedCourses.find(
+        course => Boolean(studyAttainment.course_code.match(optionalAYprefixRegex(course)))
+      ))
+    )
+    .filter(studyAttainment => studyAttainment.grade > 0)
+    .filter(studyAttainment => withinTimeframe(timeframe)(studyAttainment.date))
+  const creditsTotal = defaCourses.reduce((acc, studyAttainment) => acc + studyAttainment.credits, 0)
+  const hasRequired = checkRequiredCourses(requiredCourses)(defaCourses)
+  const courseCompletions = includedCourses.map(course => Boolean(
+    defaCourses.find(courseCompletion => Boolean(courseCompletion.course_code.match(optionalAYprefixRegex(course))))
+  ))
   return {
     student_number: studentNumber,
     credits: creditsTotal,
-    hasRequired
+    hasRequired,
+    courseCompletions
   }
 }
 
-const checkRequiredCourses = (requiredCourses, timeframe) => studyAttainments => requiredCourses.reduce(
+const checkRequiredCourses = requiredCourses => studyAttainments => requiredCourses.reduce(
   (acc, course) => acc && Boolean(studyAttainments.find(
-    studyAttainment => studyAttainment.course_code === course && withinTimeframe(timeframe)(studyAttainment.date)
+    studyAttainment => Boolean(studyAttainment.course_code.match(optionalAYprefixRegex(course)))
   )),
   true
 )
 
 const withinTimeframe = timeframe => time => time > timeframe.start && time < timeframe.end
 
-const HEADER_ROW = '"student number","credits","required courses done"'
+const HEADER_ROW_STUB = '"student number","DEFA credits","required courses done"'
 
-const toCsv = students => [
-  HEADER_ROW,
+const toCsv = includedCourses => students => [
+  `${HEADER_ROW_STUB},${includedCourses.join(',')}`,
   ...students.map(
-    student => `"${student.student_number}","${student.credits}",${student.hasRequired}`
+    student => `"${student.student_number}",${student.credits},${student.hasRequired},${student.courseCompletions.join(',')}`
   )
 ].join('\n')
 
@@ -97,7 +110,16 @@ const createReport = async (paramFileName) => {
     console.error('DEFA course unit realisation codes input file is empty.')
     process.exit(1)
   }
-  if (!params.in.course_ids) {
+  if (!params.in.included_courses) {
+    console.error('No file was defined as input for included course codes. Set it as in.included_courses in the parameter file.')
+    process.exit(1)
+  }
+  const includedCourses = String(fs.readFileSync(params.in.included_courses)).trim().split('\n')
+  if (includedCourses.length === 1 && includedCourses[0].length === 0) {
+    console.error('Included course codes input file is empty.')
+    process.exit(1)
+  }
+  if (!params.in.required_courses) {
     console.error('No file was defined as input for required course codes. Set it as in.required_courses in the parameter file.')
     process.exit(1)
   }
@@ -117,11 +139,11 @@ const createReport = async (paramFileName) => {
 
   // Get information from api
   const studentNumbers = await getStudentNumbers(courseIds)
-  const defaStudents = await getStudents(requiredCourses, timeframe)(studentNumbers)
+  const defaStudents = await getStudents(includedCourses, requiredCourses, timeframe)(studentNumbers)
 
   // Print out into output files
   if (params.out.csv) {
-    fs.writeFileSync(params.out.csv, toCsv(defaStudents))
+    fs.writeFileSync(params.out.csv, toCsv(includedCourses)(defaStudents))
   } else {
     console.log('No file defined for csv output. You can set it as out.csv in the parameter file.')
   }
