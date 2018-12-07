@@ -5,7 +5,7 @@ const MAX_YEAR = 2112
 const MIN_DEFAULT_YEAR = 2000
 const MIN_DEFAULT_SEMESTER = '2000-01'
 
-const isSpring = date => moment(date).month() < 7
+const isSpring = date => moment(date).month() < 9
 const isPre2016Course = course => !Number.isNaN(Number(course.code.charAt(0)))
 const twoDigitYear = year => year.toString().substring(2, 4)
 const getSemesterText = (start, end) => `${start}-${twoDigitYear(end)}`
@@ -21,8 +21,8 @@ const getCourseYears = course => ({
 const getActiveYears = (course) => {
   const { startYear, endYear } = getCourseYears(course)
   if (!startYear && !endYear) return 'No attainments yet'
-  const startYearText = getYearText(startYear, isSpring(course.startdate))
-  const endYearText = getYearText(endYear, isSpring(course.max_attainment_date || course.enddate))
+  const startYearText = getYearText(startYear, isSpring(course.min_attainment_date))
+  const endYearText = getYearText(endYear, isSpring(course.max_attainment_date))
   if (endYear === MAX_YEAR && isPre2016Course(course)) {
     return `— ${getYearText(2016, false)}`
   }
@@ -40,7 +40,7 @@ const getActiveYears = (course) => {
 const getCourseSemesters = (course) => {
   const { startYear, endYear } = getCourseYears(course)
   return {
-    start: getYearDataText(startYear, isSpring(course.startdate)),
+    start: getYearDataText(startYear, isSpring(course.min_attainment_date)),
     end: getYearDataText(endYear, isSpring(course.max_attainment_date))
   }
 }
