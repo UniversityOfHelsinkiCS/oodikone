@@ -31,7 +31,7 @@ router.get(`${BASE_PATH}/courses`, async (req, res) => {
 router.get(`${BASE_PATH}/:id`, async (req, res) => {
   const { id } = req.params
   const { semester } = req.query
-  const groupData = await CourseGroupService.getCourseGroup(Number(id), semester)
+  const groupData = await CourseGroupService.getCourseGroup(Number(id), Number(semester))
 
   return groupData ? res.send(groupData) : res.sendStatus(404)
 })
