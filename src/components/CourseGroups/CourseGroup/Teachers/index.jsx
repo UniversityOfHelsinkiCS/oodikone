@@ -2,9 +2,9 @@ import React, { Fragment, Component } from 'react'
 import { Header, List, Button, Radio, Icon } from 'semantic-ui-react'
 import sortBy from 'lodash/sortBy'
 import { bool, func, arrayOf, number } from 'prop-types'
-import { teacherType } from './util'
+import { teacherType } from '../util'
 
-import styles from './courseGroup.css'
+import styles from '../courseGroup.css'
 
 const teacherColumnTypes = {
   NAME: 'name',
@@ -44,7 +44,7 @@ TeacherItem.propTypes = {
   isActive: bool.isRequired
 }
 
-class Teachers extends Component {
+class Index extends Component {
   static propTypes = {
     activeTeacherIds: arrayOf(number).isRequired,
     handleFilterClick: func.isRequired,
@@ -156,4 +156,4 @@ class Teachers extends Component {
 }
 
 
-export default Teachers
+export default Index

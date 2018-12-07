@@ -1,9 +1,9 @@
 import React, { Fragment, Component } from 'react'
 import { Header, List, Loader, Placeholder, Icon } from 'semantic-ui-react'
 import sortBy from 'lodash/sortBy'
-import { callApi } from '../../../apiConnection'
-import styles from './courseGroup.css'
-import { CG_API_BASE_PATH } from './util'
+import { callApi } from '../../../../apiConnection/index'
+import styles from '../courseGroup.css'
+import { CG_API_BASE_PATH } from '../util'
 
 const courseColumnTypes = {
   TEACHER: 'teachername',
@@ -29,7 +29,7 @@ const CourseItem = ({ course }) => { // eslint-disable-line react/prop-types
   )
 }
 
-class Courses extends Component {
+class Index extends Component {
   state = {
     isLoading: true,
     courses: [],
@@ -141,4 +141,4 @@ class Courses extends Component {
   }
 }
 
-export default Courses
+export default Index

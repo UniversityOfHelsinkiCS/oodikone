@@ -6,11 +6,12 @@ import { withRouter } from 'react-router'
 import { getCompiledPath } from '../../../common'
 import { routes } from '../../../constants'
 import { callApi } from '../../../apiConnection'
-import Teachers from './teachers'
-import Courses from './courses'
+import Teachers from './Teachers'
+import Courses from './Courses'
+import Statistics from './Statistics'
 
 import styles from './courseGroup.css'
-import Statistics from './statistics'
+
 import AcademicYearFilter from './academicYearFilter'
 import { CG_API_BASE_PATH } from './util'
 
