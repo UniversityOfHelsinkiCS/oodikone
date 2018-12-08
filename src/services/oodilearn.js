@@ -48,6 +48,8 @@ const getCluster = async (courseCode) =>  oodilearnClient.getCluster(courseCode)
 
 const getStudentData = studentnumber => oodilearnClient.getStudentData(studentnumber)
 
+const getPopulation = population => oodilearnClient.getPopulationData(population)
+
 const suggestCourse = (doneCourses, period) => oodilearnClient.getCourseSuggestion(doneCourses, period)
 
 module.exports = {
@@ -57,5 +59,6 @@ module.exports = {
   matchingStudents,
   courseGradeData,
   getCluster,
+  getPopulation,
   suggestCourse
 }

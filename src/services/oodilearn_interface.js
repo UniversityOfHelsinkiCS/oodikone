@@ -32,6 +32,8 @@ const getStudents = async numbers => {
 }
 const getCluster = (code) => instance.get(`/${code}`)
 
+const getPopulationData = population => instance.get(`/groups/${population}`)
+
 const getCourseSuggestion = (doneCourses, period) => instance.get('suggest_new_course', { params: { 'doneCourses': doneCourses, 'period': period } })
 
 module.exports = {
@@ -41,5 +43,6 @@ module.exports = {
   getStudents,
   getCourseData,
   getCluster,
+  getPopulationData,
   getCourseSuggestion
 }

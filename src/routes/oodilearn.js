@@ -53,6 +53,11 @@ wrapper.get('/oodilearn/courses', async (req, res) => {
   res.json(result)
 })
 
+wrapper.get('/oodilearn/populations/:population', async (req, res) => {
+  const result = await oodilearn.getPopulation(req.params.population)
+  res.status(200).json(result.data)
+})
+
 wrapper.get('/oodilearn/:code', async (req, res) => {
   const result = await oodilearn.getCluster(req.params.code)
   res.status(200).json(result.data)
