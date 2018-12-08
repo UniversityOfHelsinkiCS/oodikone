@@ -52,6 +52,11 @@ const getPopulation = population => oodilearnClient.getPopulationData(population
 
 const suggestCourse = (doneCourses, period) => oodilearnClient.getCourseSuggestion(doneCourses, period)
 
+const getPopulations = async () => {
+  const { data } = await oodilearnClient.getPopulations()
+  return data
+}
+
 module.exports = {
   ping,
   query,
@@ -60,5 +65,6 @@ module.exports = {
   courseGradeData,
   getCluster,
   getPopulation,
-  suggestCourse
+  suggestCourse,
+  getPopulations
 }
