@@ -35,6 +35,7 @@ import oodilearnCourses from './oodilearnCourses'
 import postman from './postman'
 import oodilearnCourse from './oodilearnCourse'
 import oodilearnCluster from './oodilearnCluster'
+import oodilearnPopulations from './oodilearnPopulations'
 
 export default combineReducers({
   locale,
@@ -71,5 +72,6 @@ export default combineReducers({
   oodilearnCourses,
   postman,
   oodilearnCourse,
-  oodilearnCluster
+  oodilearnCluster,
+  oodilearnPopulations
 })
