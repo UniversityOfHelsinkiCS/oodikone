@@ -530,7 +530,7 @@ const codeLikeTerm = (code) => !code ? undefined : {
 
 const byNameAndOrCodeLike = (name, code) => {
   return Course.findAll({
-    attributes: ['name', 'code', ['latest_instance_date', 'date'], 'startdate', 'enddate'],
+    attributes: ['name', 'code', ['latest_instance_date', 'date'], 'startdate', 'enddate', 'max_attainment_date', 'min_attainment_date'],
     where: {
       ...nameLikeTerm(name),
       ...codeLikeTerm(code)

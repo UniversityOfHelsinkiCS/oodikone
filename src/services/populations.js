@@ -265,7 +265,7 @@ const parseQueryParams = query => {
   }
 }
 
-const formatStudentsForApi = async (students, startDate, endDate) => {
+const formatStudentsForApi = async (students, startDate, endDate, {studyRights} ) => {
   const result = students.reduce((stats, student) => {
     student.transfers.forEach(transfer => {
       const target = stats.transfers.targets[transfer.target.code] || { name: transfer.target.name, sources: {} }
@@ -275,6 +275,7 @@ const formatStudentsForApi = async (students, startDate, endDate) => {
       stats.transfers.targets[transfer.target.code] = target
       stats.transfers.sources[transfer.source.code] = source
     })
+
     student.studyrights.forEach(studyright => {
       if (studyright.studyright_extent) {
         const { extentcode, name } = studyright.studyright_extent
@@ -293,9 +294,11 @@ const formatStudentsForApi = async (students, startDate, endDate) => {
         })
       }
     })
+
     student.semester_enrollments.forEach(({ semestercode, semester }) => {
       stats.semesters[semestercode] = semester
     })
+
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   },{
@@ -311,8 +314,27 @@ const formatStudentsForApi = async (students, startDate, endDate) => {
       programmes: []
     }
   })
+
+  const transferredStudyright = (s) => {
+    const studyright = s.studyrights.find(s => s.studyrightElements.map(d => d.element_detail.code).includes(studyRights[0]))
+    
+    if (studyright) {
+      s.transferredStudyright = moment(startDate).isAfter(moment(studyright.startdate))
+
+      console.log(s.studentNumber)
+
+      if (s.transferredStudyright) {
+        const previousRights = studyright.studyrightElements.filter(e => e.element_detail.type === 20 && e.element_detail.code !== studyRights[0])
+        console.log(JSON.stringify(previousRights, null, 2))
+        s.previousRights = previousRights
+      }
+
+    }
+    return s
+  }
+
   return {
-    students: result.students,
+    students: result.students.map(transferredStudyright),
     transfers: result.transfers,
     extents: Object.values(result.extents),
     semesters: Object.values(result.semesters),
@@ -329,7 +351,7 @@ const optimizedStatisticsOf = async (query) => {
   const studentnumbers = await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate)
   const students = await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months), studyRights)
 
-  const formattedStudents = await formatStudentsForApi(students, startDate, endDate)
+  const formattedStudents = await formatStudentsForApi(students, startDate, endDate, query)
   return formattedStudents
 }
 
