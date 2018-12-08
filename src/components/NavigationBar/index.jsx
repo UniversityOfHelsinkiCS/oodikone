@@ -5,7 +5,7 @@ import { NavLink, Link } from 'react-router-dom'
 import { func } from 'prop-types'
 import { connect } from 'react-redux'
 
-import { routes } from '../../constants'
+import { routes, hiddenRoutes } from '../../constants'
 import { userIsAdmin, userIsCzar } from '../../common'
 
 import styles from './navigationBar.css'
@@ -45,6 +45,11 @@ class NavigationBar extends Component {
       return (
         <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls" tabIndex="-1">
           <Dropdown.Menu>
+            <Dropdown.Item
+              as={NavLink}
+              to={hiddenRoutes.oodilearn.route}
+              text="OodiLearn"
+            />
             {testUsers.map(user => (
               <Dropdown.Item
                 key={user}
