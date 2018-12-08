@@ -33,19 +33,29 @@ class CoursePage extends Component {
       this.props.getOodiLearnCluster(course)
     }
 
+    handleMenuClick = (e, { name }) => this.setState({ selected: name })
+
     render() {
       const { selected } = this.state
       const { course, goBack, loading, data, clusterData } = this.props
       const finishedLoading = (!loading && data)
       return (
         <Segment basic>
-          <Menu
-            onItemClick={(e, { name }) => this.setState({ selected: name })}
-          >
+          <Menu>
             <Menu.Item icon="arrow circle left" onClick={goBack} />
             <Menu.Item header content={course} />
-            <Menu.Item name={KEYS.PROFILE} content="Profiles" active={selected === KEYS.PROFILE} />
-            <Menu.Item name={KEYS.CLUSTER} content="Clusters" active={selected === KEYS.CLUSTER} disabled />
+            <Menu.Item
+              name={KEYS.PROFILE}
+              content="Profiles"
+              active={selected === KEYS.PROFILE}
+              onClick={this.handleMenuClick}
+            />
+            <Menu.Item
+              name={KEYS.CLUSTER}
+              content="Clusters"
+              active={selected === KEYS.CLUSTER}
+              disabled
+            />
           </Menu>
           <Divider />
           <Segment loading={loading}>
