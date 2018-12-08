@@ -132,6 +132,11 @@ def get_student(studentnumber):
   online_users = mongo.db.students.find_one({'Opiskelijanumero': int(studentnumber)})
   return json_util.dumps(online_users)
 
+@app.route('/populations/')
+def get_populations():
+  populations = mongo.db.populations.find()
+  return json_util.dumps(populations)
+
 @app.route('/students/')
 def get_students():
   studentnumbers = request.args.getlist('student[]')
