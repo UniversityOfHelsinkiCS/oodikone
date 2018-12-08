@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Card, Divider, Menu, Placeholder } from 'semantic-ui-react'
+import { Segment, Divider, Menu, Placeholder } from 'semantic-ui-react'
 import { func, shape, bool, string, arrayOf } from 'prop-types'
 import ClusterGraph from './ClusterGraph'
 import { getOodiLearnCourse } from '../../redux/oodilearnCourse'
@@ -39,29 +39,14 @@ class CoursePage extends Component {
       const finishedLoading = (!loading && data)
       return (
         <Segment basic>
-          <Card
-            fluid
-            header={course}
-          />
           <Menu
             onItemClick={(e, { name }) => this.setState({ selected: name })}
-            items={[{
-              icon: 'arrow circle left',
-              key: 'back',
-              onClick: goBack
-            }, {
-              key: KEYS.PROFILE,
-              name: KEYS.PROFILE,
-              active: selected === KEYS.PROFILE,
-              content: 'Profiles'
-            }, {
-              key: KEYS.CLUSTER,
-              name: KEYS.CLUSTER,
-              active: selected === KEYS.CLUSTER,
-              disabled: true,
-              content: 'Clusters'
-            }]}
-          />
+          >
+            <Menu.Item icon="arrow circle left" onClick={goBack} />
+            <Menu.Item header content={course} />
+            <Menu.Item name={KEYS.PROFILE} content="Profiles" active={selected === KEYS.PROFILE} />
+            <Menu.Item name={KEYS.CLUSTER} content="Clusters" active={selected === KEYS.CLUSTER} disabled />
+          </Menu>
           <Divider />
           <Segment loading={loading}>
             { !finishedLoading && <OlPlaceholder /> }
