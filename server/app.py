@@ -96,6 +96,19 @@ def calc_groups():
           mongo.db.students.update_one({'_id': student['_id']}, {'$set': {dimension + 'Group': 'average'}})
   return 'beans'
 
+@app.route('/groups/<string:population>')
+def get_groups(population):
+  students = mongo.db.students.find({'Kysely': population})
+  data = {}
+  data['students'] = []
+  for student in students:
+    student_data = {}
+    student_data['studentnumber'] = student['Opiskelijanumero']
+    for dim in dimensions:
+      student_data[dim] = { 'value': student[dim], 'group': student[dim + 'Group'] }
+    data['students'].append(student_data)
+  return json_util.dumps(data)
+
 @app.route('/student/<int:studentnumber>')
 def get_student(studentnumber):
   print(studentnumber)
