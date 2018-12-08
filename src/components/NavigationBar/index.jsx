@@ -50,6 +50,11 @@ class NavigationBar extends Component {
               to={hiddenRoutes.oodilearn.route}
               text="OodiLearn"
             />
+            <Dropdown.Item
+              as={NavLink}
+              to={hiddenRoutes.sandbox.route}
+              text="Sandbox"
+            />
             {testUsers.map(user => (
               <Dropdown.Item
                 key={user}
