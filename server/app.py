@@ -81,11 +81,26 @@ def calc_groups():
   d = mongo.db.students.aggregate(pipeline)
   for values in d:
     # print(values)
+    population = {}
+    population['population'] = values['_id']
+    population['n'] = mongo.db.students.count({'Kysely': values['_id']})
+    for dimension in dimensions:
+      population[dimension] = {}
+      average = values['avg' + dimension]
+      sd = values['sd' + dimension]
+      dimension_high = average + sd
+      dimension_low = average - sd
+      population[dimension]['average'] = average
+      population[dimension]['below'] = dimension_low
+      population[dimension]['above'] = dimension_high
+
     students = mongo.db.students.find({'Kysely': values['_id']})
     for student in students:
       for dimension in dimensions:
-        dimension_high = values['avg' + dimension] + values['sd' + dimension]
-        dimension_low = values['avg' + dimension] - values['sd' + dimension]
+        average = values['avg' + dimension]
+        sd = values['sd' + dimension]
+        dimension_high = average + sd
+        dimension_low = average - sd
         if type(student[dimension]) == str:
           continue
         if student[dimension] > dimension_high:
@@ -94,6 +109,7 @@ def calc_groups():
           mongo.db.students.update_one({'_id': student['_id']}, {'$set': {dimension + 'Group': 'below'}})
         else:
           mongo.db.students.update_one({'_id': student['_id']}, {'$set': {dimension + 'Group': 'average'}})
+    mongo.db.populations.insert_one(population)
   return 'beans'
 
 @app.route('/groups/<string:population>')
@@ -107,6 +123,7 @@ def get_groups(population):
     for dim in dimensions:
       student_data[dim] = { 'value': student[dim], 'group': student[dim + 'Group'] }
     data['students'].append(student_data)
+  data['dimensions'] = mongo.db.populations.find({'population': population})
   return json_util.dumps(data)
 
 @app.route('/student/<int:studentnumber>')
