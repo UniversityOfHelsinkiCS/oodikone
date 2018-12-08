@@ -5,6 +5,7 @@ const mapper = require('./oodi_data_mapper')
 const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, Teacher, Organisation, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment, sequelize, CreditTeacher } = require('../../../src/models/index')
 const _ = require('lodash')
 const { taskpool } = require('../../util/taskpool')
+const { updateAttainmentDates } = require('./update_attainment_dates')
 
 let attainmentIds = new Set()
 let courseIds = new Set()
@@ -347,6 +348,7 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   await updateStudentsTaskPooled(studentnumbers, 50, onUpdateStudent)
   await updateTeachersInDb(100, true)
   await updateCoursesAndProvidersInDb(100)
+  await updateAttainmentDates()
 }
 
 module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes, updateTeachersInDb, updateStudentsTaskPooled, updateCourseRealisationsAndEnrollments, getExistingCourseRealisationCodes, updateCourseRealisationsForCoursesInDb }
