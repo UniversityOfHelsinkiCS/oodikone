@@ -121,7 +121,10 @@ def get_groups(population):
     student_data = {}
     student_data['studentnumber'] = student['Opiskelijanumero']
     for dim in dimensions:
-      student_data[dim] = { 'value': student[dim], 'group': student[dim + 'Group'] }
+      try:
+        student_data[dim] = { 'value': student[dim], 'group': student[dim + 'Group'] }
+      except:
+        student_data[dim] = { 'value': '', 'group': '' }
     data['students'].append(student_data)
   data['dimensions'] = mongo.db.populations.find({'population': population})
   return json_util.dumps(data)
@@ -190,13 +193,13 @@ def get_averages():
 @app.route("/suggest_new_course")
 def suggest_new_course():
   done_courses = request.args.getlist("doneCourses[]")
-  period = request.args.getlist("period")
+  period = request.args.get("period")
   if not period:
     period = 274
   done_courses = map_old_to_new(pd.DataFrame(done_courses, columns=["code"]))["code"].unique()
   g = pickle.load(open('../models/graph_pruned.sav', 'rb'))
 
-  now = period # 274 # TODO GET REALTIME
+  now = int(period) # 274 # TODO GET REALTIME
   edges = []
   suggested = {}
   for course in done_courses:
