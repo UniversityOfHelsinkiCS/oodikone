@@ -60,7 +60,7 @@ wrapper.get('/oodilearn/populations', async (req, res) => {
 
 wrapper.get('/oodilearn/populations/:population', async (req, res) => {
   const result = await oodilearn.getPopulation(req.params.population)
-  res.status(200).json(result.data)
+  res.json(result)
 })
 
 wrapper.get('/oodilearn/:code', async (req, res) => {
