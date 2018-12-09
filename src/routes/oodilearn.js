@@ -55,7 +55,6 @@ wrapper.get('/oodilearn/courses', async (req, res) => {
 
 wrapper.get('/oodilearn/populations', async (req, res) => {
   const result = await oodilearn.getPopulations()
-  console.log('RESULT', result)
   res.json(result)
 })
 
