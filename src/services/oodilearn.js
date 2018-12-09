@@ -2,6 +2,11 @@ const oodilearnClient = require('./oodilearn_interface')
 const studentService = require('./students')
 const { Credit, Student } = require('../models')
 
+const formatStudentNumber = studentnumber => {
+  const snum = studentnumber.toString()
+  return snum.startsWith('0') ? snum : `0${snum}`
+}
+
 const ping = oodilearnClient.ping
 
 const query = oodilearnClient.query
@@ -36,19 +41,24 @@ const getCourseStudents = code => Credit.findAll({
 
 const courseGradeData = async (courseCode) => {
   const credits = await getCourseStudents(courseCode)
-  // console.log('this many', credits.filter(s => allStudentNumbers.includes(s.student_studentnumber)).length)
   const courseGrades = {}
   credits.map(credit => courseGrades[credit.grade] ? courseGrades[credit.grade].push(credit.student_studentnumber) : courseGrades[credit.grade] = [credit.student_studentnumber])
-  // console.log(courseGrades)
   const { data } = await oodilearnClient.getCourseData(courseGrades)
-  // console.log(data.data)
   return data
 }
 const getCluster = async (courseCode) =>  oodilearnClient.getCluster(courseCode)
 
 const getStudentData = studentnumber => oodilearnClient.getStudentData(studentnumber)
 
-const getPopulation = population => oodilearnClient.getPopulationData(population)
+const getPopulation = async population => {
+  const { data } = await oodilearnClient.getPopulationData(population)
+  const { dimensions } = data
+  const students = data.students.map(({ studentnumber, ...rest }) => ({
+    studentnumber: formatStudentNumber(studentnumber),
+    ...rest
+  }))
+  return { students, categories: dimensions }
+}
 
 const suggestCourse = (doneCourses, period) => oodilearnClient.getCourseSuggestion(doneCourses, period)
 
