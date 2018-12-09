@@ -13,6 +13,10 @@ class SuggestCourseGraph extends Component {
     })
   }
 
+  generateWholeRoute = () => {
+    console.log('hello vith')
+  }
+
   handleClick = (e, { value }) => {
     const courses = this.state.courses.slice(0, value + 1)
     const doneCourses = []
@@ -44,6 +48,11 @@ class SuggestCourseGraph extends Component {
     if (!this.state.courses) return <h1>hello</h1>
     return (
       <Grid padded="vertically">
+        <Grid.Row>
+          <Grid.Column>
+            <Button onClick={this.generateWholeRoute}>generate route</Button>
+          </Grid.Column>
+        </Grid.Row>
         <Grid.Row>
           {this.state.courses.map((period, i) => (
             <Grid.Column width={2} style={{ paddingBottom: '1em' }}>
