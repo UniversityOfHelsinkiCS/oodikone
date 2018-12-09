@@ -4,12 +4,12 @@ import { shape, string, arrayOf, number } from 'prop-types'
 import Highcharts from 'highcharts'
 import addHighchartsMore from 'highcharts/highcharts-more'
 import {
-  HighchartsChart, withHighcharts, XAxis, YAxis, Pane, AreaSeries, Title, Tooltip, Legend
+  HighchartsChart, withHighcharts, XAxis, YAxis, Pane, LineSeries, Title, Tooltip, Legend
 } from 'react-jsx-highcharts'
 
 addHighchartsMore(Highcharts)
 
-const SpiderArea = ({ category }) => <AreaSeries name={category.name} data={category.data} />
+const SpiderArea = ({ category }) => <LineSeries name={category.name} data={category.data} />
 
 SpiderArea.propTypes = {
   category: shape({
