@@ -66,7 +66,7 @@ def calc_groups():
       "avgPeer": { "$avg": "$Peer" },
       "avgAlign": { "$avg": "$Align" },
       "avgConsFeed": { "$avg": "$ConsFeed" },
-      "sdSBI": { "$std": "$SBI" },
+      "sdSBI": { "$stdDevSamp": "$SBI" },
       "sdOrganised": { "$stdDevSamp": "$Organised" },
       "sdSurface": { "$stdDevSamp": "$Surface" },
       "sdDeep": { "$stdDevSamp": "$Deep" },
