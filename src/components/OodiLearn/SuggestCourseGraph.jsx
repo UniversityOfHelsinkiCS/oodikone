@@ -14,7 +14,20 @@ class SuggestCourseGraph extends Component {
   }
 
   generateWholeRoute = () => {
-    console.log('hello vith')
+    callApi('/oodilearn/suggest_route')
+      .then((res) => {
+        const { data } = res
+        const route = []
+        data.map((course) => {
+          const item = course.split('_')
+          if (item.length > 1) {
+            const period = item[0]
+            const code = item[1]
+            route[period] = { ...route[period], [code]: true }
+          }
+        })
+        this.setState({ courses: route })
+      })
   }
 
   handleClick = (e, { value }) => {
