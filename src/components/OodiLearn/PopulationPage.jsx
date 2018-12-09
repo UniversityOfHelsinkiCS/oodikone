@@ -6,11 +6,13 @@ import selector from '../../selectors/oodilearnPopulations'
 import { getOodilearnPopulation } from '../../redux/oodilearnPopulation'
 import PagePlaceholder from './PagePlaceholder'
 import PopulationDashboard from './PopulationDashboard'
+import { clear } from '../../redux/oodilearnPopulationForm'
 
 class PopulationPage extends Component {
     state={}
 
     componentDidMount() {
+      this.props.clearFilters()
       this.props.getOodilearnPopulation(this.props.population)
     }
 
@@ -33,7 +35,8 @@ PopulationPage.propTypes = {
   goBack: func.isRequired,
   population: string.isRequired,
   getOodilearnPopulation: func.isRequired,
-  loading: bool.isRequired
+  loading: bool.isRequired,
+  clearFilters: func.isRequired
 }
 
 const mapStateToProps = state => ({
@@ -41,4 +44,7 @@ const mapStateToProps = state => ({
   loading: selector.populationIsLoading(state)
 })
 
-export default connect(mapStateToProps, { getOodilearnPopulation })(PopulationPage)
+export default connect(mapStateToProps, {
+  getOodilearnPopulation,
+  clearFilters: clear
+})(PopulationPage)

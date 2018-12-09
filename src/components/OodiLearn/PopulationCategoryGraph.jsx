@@ -9,22 +9,20 @@ import {
 
 addHighchartsMore(Highcharts)
 
-const PopulationCategorySpider = ({ data, title }) => {
-  return (
-    <Segment basic>
-      <HighchartsChart>
-        {title && (<Title>{title}</Title>)}
-        <XAxis min={0} tickmarkPlacement="on" categories={data.dimensions} lineWidth={0} />
-        <YAxis min={0} max={5} lineWidth={0}>
-          <AreaSplineRangeSeries data={data.ranges} name="Below and Above" />
-          <SplineSeries data={data.averages} name="Average" />
-        </YAxis>
-        <Tooltip />
-        <Legend />
-      </HighchartsChart>
-    </Segment>
-  )
-}
+const PopulationCategorySpider = ({ data, title }) => (
+  <Segment basic>
+    <HighchartsChart>
+      {title && (<Title>{title}</Title>)}
+      <XAxis min={0} tickmarkPlacement="on" categories={data.dimensions} lineWidth={0} />
+      <YAxis min={0} max={5} lineWidth={0}>
+        <AreaSplineRangeSeries data={data.ranges} name="Below and Above" />
+        <SplineSeries data={data.averages} name="Average" />
+      </YAxis>
+      <Tooltip />
+      <Legend />
+    </HighchartsChart>
+  </Segment>
+)
 
 PopulationCategorySpider.propTypes = {
   data: shape({}).isRequired,
