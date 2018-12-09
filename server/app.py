@@ -126,7 +126,7 @@ def get_groups(population):
       except:
         student_data[dim] = { 'value': '', 'group': '' }
     data['students'].append(student_data)
-  data['dimensions'] = mongo.db.populations.find({'population': population})
+  data['dimensions'] = mongo.db.populations.find_one({'population': population})
   return json_util.dumps(data)
 
 @app.route('/student/<int:studentnumber>')
