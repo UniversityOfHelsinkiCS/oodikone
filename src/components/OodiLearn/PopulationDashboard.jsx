@@ -1,36 +1,59 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { shape } from 'prop-types'
-import { Segment } from 'semantic-ui-react'
+import { Message, Grid } from 'semantic-ui-react'
 import selector from '../../selectors/oodilearnPopulations'
-import PopulationCategorySpider from './PopulationCategorySpider'
 import PopulationCategoryGraph from './PopulationCategoryGraph'
+import PopulationFilters from './PopulationFilters'
+import PopulationStats from './PopulationStats'
+
+const HEADER = 'Population profile dimensions by category'
+const DESCRIPTION = `
+Each dimension is divided into average, below and above average groups 
+based on the composition of the selected population.
+`
 
 class PopulationDashboard extends Component {
     state={}
 
     render() {
       return (
-        <Segment basic>
-          <PopulationCategorySpider data={this.props.populationCategories} />
-          <PopulationCategoryGraph data={this.props.populationGraphSeries} />
-        </Segment>
+        <Grid>
+          <Grid.Row>
+            <Grid.Column>
+              <Message
+                header={HEADER}
+                content={DESCRIPTION}
+              />
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column width="8">
+              <PopulationFilters />
+            </Grid.Column>
+            <Grid.Column width="8">
+              <PopulationStats />
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column>
+              <PopulationCategoryGraph data={this.props.populationGraphSeries} />
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
       )
     }
 }
 
 PopulationDashboard.propTypes = {
-  populationCategories: shape({}),
   populationGraphSeries: shape({})
 }
 
 PopulationDashboard.defaultProps = {
-  populationCategories: undefined,
   populationGraphSeries: undefined
 }
 
 const mapStateToProps = state => ({
-  populationCategories: selector.getPopulationCategorySeries(state),
   populationGraphSeries: selector.getPopulationGraphSeries(state)
 })
 
