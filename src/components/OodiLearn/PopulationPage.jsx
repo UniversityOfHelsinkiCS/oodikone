@@ -1,11 +1,18 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, string, shape } from 'prop-types'
+import { func, string, bool } from 'prop-types'
 import { Segment, Menu } from 'semantic-ui-react'
 import selector from '../../selectors/oodilearnPopulations'
+import { getOodilearnPopulation } from '../../redux/oodilearnPopulation'
+import PagePlaceholder from './PagePlaceholder'
+import PopulationDashboard from './PopulationDashboard'
 
 class PopulationPage extends Component {
     state={}
+
+    componentDidMount() {
+      this.props.getOodilearnPopulation(this.props.population)
+    }
 
     render() {
       return (
@@ -14,10 +21,8 @@ class PopulationPage extends Component {
             <Menu.Item icon="arrow circle left" onClick={this.props.goBack} />
             <Menu.Item header content={this.props.population} />
           </Menu>
-          <Segment>
-            <pre>
-              {JSON.stringify(this.props.data, null, 2)}
-            </pre>
+          <Segment loading={this.props.loading}>
+            { this.props.loading ? <PagePlaceholder /> : <PopulationDashboard /> }
           </Segment>
         </Segment>
       )
@@ -27,11 +32,13 @@ class PopulationPage extends Component {
 PopulationPage.propTypes = {
   goBack: func.isRequired,
   population: string.isRequired,
-  data: shape({}).isRequired
+  getOodilearnPopulation: func.isRequired,
+  loading: bool.isRequired
 }
 
-const mapStateToProps = (state, props) => ({
-  data: selector.getPopulation(state, props.population)
+const mapStateToProps = state => ({
+  data: selector.getPopulation(state),
+  loading: selector.populationIsLoading(state)
 })
 
-export default connect(mapStateToProps)(PopulationPage)
+export default connect(mapStateToProps, { getOodilearnPopulation })(PopulationPage)
