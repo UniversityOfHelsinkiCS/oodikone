@@ -36,6 +36,8 @@ const getPopulationData = population => instance.get(`/groups/${population}`)
 
 const getCourseSuggestion = (doneCourses, period) => instance.get('suggest_new_course', { params: { 'doneCourses': doneCourses, 'period': period } })
 
+const getRouteSuggestion = () => instance.get('suggest_route_to_graduation')
+
 const getPopulations = () => instance.get('/populations/')
 
 module.exports = {
@@ -47,5 +49,6 @@ module.exports = {
   getCluster,
   getPopulationData,
   getCourseSuggestion,
+  getRouteSuggestion,
   getPopulations
 }
