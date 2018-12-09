@@ -2,6 +2,7 @@ import moment from 'moment'
 import jwtDecode from 'jwt-decode'
 import Datetime from 'react-datetime'
 import _ from 'lodash'
+import pathToRegexp from 'path-to-regexp'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, TOKEN_NAME } from '../constants'
 import toskaLogo from '../assets/toska.png'
 import irtomikko from '../assets/irtomikko.png'
@@ -142,4 +143,9 @@ export const copyToClipboard = (text) => {
   textField.select()
   document.execCommand('copy')
   textField.remove()
+}
+
+export const getCompiledPath = (template, parameters) => {
+  const toPath = pathToRegexp.compile(template)
+  return toPath(parameters)
 }

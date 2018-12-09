@@ -75,9 +75,11 @@ class StartingThisSemester extends Component {
     )
   }
 }
+
 const mapStateToProps = ({ settings }) => ({
   language: settings.language
 })
+
 export default connect(
   mapStateToProps,
   { setPopulationFilter, removePopulationFilter }

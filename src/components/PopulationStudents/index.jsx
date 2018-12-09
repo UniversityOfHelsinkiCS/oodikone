@@ -8,6 +8,7 @@ import { getStudentTotalCredits, copyToClipboard } from '../../common'
 import { toggleStudentListVisibility } from '../../redux/settings'
 
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
+import { format } from 'util';
 
 const popupTimeoutLength = 1000
 
@@ -52,6 +53,10 @@ class PopulationStudents extends Component {
       copyToClipboard(clipboardString)
     }
 
+    const transferFrom = (s) => {
+      return s.previousRights[0].element_detail.name[this.props.language]
+    }
+
     return (
       <div>
         <StudentNameVisibilityToggle />
@@ -77,6 +82,9 @@ class PopulationStudents extends Component {
               <Table.HeaderCell>
                 all credits
               </Table.HeaderCell>
+              <Table.HeaderCell>
+                transferred from
+              </Table.HeaderCell>
               {this.props.showNames ? (
                 <Table.HeaderCell>
                   email
@@ -97,6 +105,7 @@ class PopulationStudents extends Component {
                   />
                 </Table.HeaderCell>
               ) : null}
+
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -120,6 +129,9 @@ class PopulationStudents extends Component {
                 </Table.Cell>
                 <Table.Cell>
                   {students[studentNumber].credits}
+                </Table.Cell>
+                <Table.Cell>
+                  {students[studentNumber].transferredStudyright ? transferFrom(students[studentNumber]) : ''}
                 </Table.Cell>
                 {this.props.showNames ? (
                   <Table.Cell>
@@ -161,7 +173,7 @@ class PopulationStudents extends Component {
 
     return (
       <Segment>
-        <Header>Students</Header>
+        <Header>Students ({this.props.selectedStudents.length})</Header>
         <Button onClick={() => this.props.toggleStudentListVisibility()}>
           {toggleLabel}
         </Button>
@@ -177,12 +189,14 @@ PopulationStudents.propTypes = {
   toggleStudentListVisibility: func.isRequired,
   showNames: bool.isRequired,
   showList: bool.isRequired,
+  language: string.isRequired,
   history: shape({}).isRequired
 }
 
-const mapStateToProps = state => ({
-  showNames: state.settings.namesVisible,
-  showList: state.settings.studentlistVisible
+const mapStateToProps = ({ settings }) => ({
+  showNames: settings.namesVisible,
+  showList: settings.studentlistVisible,
+  language: settings.language
 })
 
 export default connect(

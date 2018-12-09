@@ -89,6 +89,9 @@
     ],
     "oodilearn": [
       "OodiLearn"
+    ],
+    "courseGroups": [
+      "Course groups"
     ]
   },
   "populationCourses": {

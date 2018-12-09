@@ -11,7 +11,7 @@ import moment from 'moment'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
-import { extentGraduated, canceledStudyright } from '../../populationFilters'
+import { extentGraduated, canceledStudyright, transferTo} from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { isInDateFormat, momentFromFormat, reformatDate, isValidYear, textAndDescriptionSearch } from '../../common'
@@ -117,6 +117,9 @@ class PopulationSearchForm extends Component {
         this.props.setPopulationFilter(extentGraduated({ extentcode: 34, graduated: 'either', complemented: 'true' }))
       }
       this.props.setPopulationFilter(canceledStudyright({ studyrights: queryCodes, canceled: 'false' }))
+      if (queryCodes[0] === 'KH50_001') {
+        this.props.setPopulationFilter(transferTo(false))
+      }
       this.setState({ isLoading: false })
     })
   }
@@ -313,7 +316,7 @@ class PopulationSearchForm extends Component {
           <label>Statistics until</label>
           <Datetime
             dateFormat="MMMM YYYY"
-            value={this.getMonthValue(this.state.query.year, this.state.floatMonths)}
+            defaultValue={this.getMonthValue(this.state.query.year, this.state.floatMonths)}
             onChange={value => this.handleMonthsChange(value)}
             isValidDate={current => current.isBefore(moment()) &&
               current.isAfter(this.getMinSelection(year, semesters[1] || semesters[0]))}

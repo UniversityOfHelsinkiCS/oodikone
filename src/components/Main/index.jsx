@@ -11,6 +11,7 @@ import WelcomePage from '../WelcomePage'
 import StudentStatistics from '../StudentStatistics'
 import CourseStatistics from '../CourseStatistics'
 import EnableUsers from '../EnableUsers'
+import CourseGroups from '../CourseGroups'
 import Settings from '../Settings'
 import ErrorContainer from '../ErrorContainer'
 import { routes, BASE_PATH, hiddenRoutes } from '../../constants'
@@ -53,9 +54,9 @@ class Main extends Component {
   //  const { reduxState } = this.props
     const name = await getUserName()
     Sentry.configureScope((scope) => {
-  //    Object.keys(reduxState).forEach((key) => {
-  //      scope.setExtra(key, JSON.stringify(reduxState[key]))
-  //    })
+    //    Object.keys(reduxState).forEach((key) => {
+    //      scope.setExtra(key, JSON.stringify(reduxState[key]))
+    //    })
       scope.setUser({ username: name })
     })
     Sentry.captureException(e)
@@ -82,6 +83,7 @@ class Main extends Component {
     if (!this.state.loaded) {
       return <Loader active inline="centered" />
     }
+
     if (!this.state.enabled || this.state.hasError || this.state.networkError) {
       return (
         <div>
@@ -91,7 +93,11 @@ class Main extends Component {
             networkError={this.state.networkError}
           />
           <Transition visible={this.state.easterEgg} animation="fly up" duration={10000}>
-            <Image src={images.irtomikko} size="huge" verticalAlign="top" inline style={{ position: 'absolute', top: '350px', right: '10px' }} />
+            <Image
+              src={images.irtomikko}
+              size="huge" verticalAlign="top"
+              inline
+              style={{ position: 'absolute', top: '350px', right: '10px' }} />
           </Transition>
         </div>
       )
@@ -107,6 +113,7 @@ class Main extends Component {
               <Route exact path={routes.populations.route} component={Populations} />
               <Route exact path={routes.students.route} component={StudentStatistics} />
               <Route exact path={routes.courseStatistics.route} component={CourseStatistics} />
+              <Route exact path={routes.courseGroups.route} component={CourseGroups} />
               <Route exact path={routes.settings.route} component={Settings} />
               <Route exact path={routes.users.route} component={EnableUsers} />
               <Route exact path={routes.teachers.route} component={Teachers} />
@@ -128,4 +135,3 @@ class Main extends Component {
 
 // export default connect(mapStateToProps)(localize(Main, 'locale'))
 export default localize(Main, 'locale')
-

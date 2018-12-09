@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter, Redirect } from 'react-router-dom'
-import { Button, Icon, Card, Header, Segment, Confirm } from 'semantic-ui-react'
+import { Button, Icon, Header, Segment, Confirm } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
@@ -10,6 +10,7 @@ import { makeSortUsers } from '../../selectors/users'
 import { copyToClipboard } from '../../common'
 import sharedStyles from '../../styles/shared'
 import UserPageNew from '../UserPage'
+import SortableTable from '../CourseStatistics/SortableTable'
 
 class EnableUsers extends Component {
   state = {
@@ -63,14 +64,14 @@ class EnableUsers extends Component {
   renderUserSearchList = () => {
     const { users, error } = this.props
     return error ? null : (
-      <Card.Group itemsPerRow={4}>
+      <div>
         {this.state.confirm ? <Confirm
           style={{
             marginTop: 'auto !important',
             display: 'inline-block !important',
-            position: 'relative',
-            top: '20%',
-            left: '33%'
+            position: 'relative'
+            // top: '20%',
+            // left: '33%'
           }}
           open={this.state.confirm}
           cancelButton="no"
@@ -83,35 +84,89 @@ class EnableUsers extends Component {
           }}
           size="small"
         /> : null}
-        {users.map(user => (
-          <Card raised key={user.id} color={user.is_enabled ? 'green' : 'red'}>
-            <Card.Content>
-              <Card.Header content={user.full_name} />
-              <Card.Meta content={user.username} />
-              <Card.Meta content={user.email} />
-              <Card.Description>
-                {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`}
-              </Card.Description>
-            </Card.Content>
-            <Card.Content extra>
-              <Button.Group compact widths={8}>
-                <Button animated basic size="mini" disabled={!user.is_enabled} onClick={this.openEditUserPage(user.id)}>
-                  <Button.Content hidden>Edit</Button.Content>
-                  <Button.Content visible>
-                    <Icon name="wrench" />
-                  </Button.Content>
-                </Button>
-                <Button animated basic onClick={this.enableUser(user)} size="mini">
-                  <Button.Content hidden>{user.is_enabled ? 'Disable' : 'Enable'}</Button.Content>
-                  <Button.Content visible>
-                    <Icon color={user.is_enabled ? 'green' : 'red'} name={user.is_enabled ? 'check' : 'remove'} />
-                  </Button.Content>
-                </Button>
-              </Button.Group>
-            </Card.Content>
-          </Card>
-        ))}
-      </Card.Group>
+        <SortableTable
+          getRowKey={user => user.id}
+          tableProps={{ celled: true, structured: true }}
+          columns={[
+            {
+              key: 'NAME',
+              title: 'Name',
+              getRowVal: (user) => {
+                const nameparts = user.full_name.split(' ')
+                return nameparts[nameparts.length - 1]
+              },
+              getRowContent: user => user.full_name,
+              cellProps: { singleLine: true }
+            }, {
+              key: 'USERNAME',
+              title: 'Username',
+              getRowVal: user => user.username,
+              cellProps: { singleLine: true }
+            }, {
+              key: 'ROLE',
+              title: 'Role',
+              getRowVal: (user) => {
+                // TODO: visual representation
+                if (user.admin && user.czar) return 'admin czar'
+                if (user.admin) return 'admin'
+                if (user.czar) return 'czar'
+                return 'user'
+              },
+              cellProps: { singleLine: true }
+            }, {
+              key: 'STUDYTRACKS',
+              title: 'Studytracks',
+              getRowVal: (user) => {
+                // TODO: language handling
+                // const { currentLanguage } = this.props
+                const language = 0
+                const nameInLanguage = element =>
+                  element.name[language]
+                    || element.name.fi
+                    || element.name.en
+                    || element.name.sv
+
+                if (!user.elementdetails || user.elementdetails.length === 0) return null
+                if (user.elementdetails.length >= 2) {
+                  return `${nameInLanguage(user.elementdetails[0])} +${user.elementdetails.length - 1} others`
+                }
+                return nameInLanguage(user.elementdetails[0])
+              },
+              cellProps: { singleLine: true }
+            }, {
+              key: 'OODIACCESS',
+              title: 'Access to oodikone',
+              getRowVal: user => user.is_enabled,
+              getRowContent: user => (
+                <Button.Group compact widths={2}>
+                  <Button animated basic onClick={this.enableUser(user)} size="mini">
+                    <Button.Content hidden>{user.is_enabled ? 'Disable' : 'Enable'}</Button.Content>
+                    <Button.Content visible>
+                      <Icon color={user.is_enabled ? 'green' : 'red'} name={user.is_enabled ? 'check' : 'remove'} />
+                    </Button.Content>
+                  </Button>
+                </Button.Group>
+              ),
+              cellProps: { singleLine: true }
+            }, {
+              key: 'EDIT',
+              getRowVal: user => (
+                <Button.Group compact widths={2}>
+                  <Button animated basic size="mini" disabled={!user.is_enabled} onClick={this.openEditUserPage(user.id)}>
+                    <Button.Content hidden>Edit</Button.Content>
+                    <Button.Content visible>
+                      <Icon name="wrench" />
+                    </Button.Content>
+                  </Button>
+                </Button.Group>
+              ),
+              cellProps: { singleLine: true },
+              headerProps: { onClick: null, sorted: null }
+            }
+          ]}
+          data={users}
+        />
+      </div>
     )
   }
 

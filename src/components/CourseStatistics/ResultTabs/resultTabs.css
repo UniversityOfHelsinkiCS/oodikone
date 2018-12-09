@@ -1,0 +1,19 @@
+.modeSelectorRow {
+  margin-top: 1em !important;
+  padding-bottom: 0 !important;
+}
+
+.modeSelectorContainer {
+  margin-left: 2em;
+}
+
+.toggleContainer {
+  display: flex;
+  align-items: center;
+}
+
+.toggleLabel {
+  cursor: pointer;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
