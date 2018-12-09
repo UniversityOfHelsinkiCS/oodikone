@@ -79,6 +79,7 @@ def calc_groups():
     }
   ]
   d = mongo.db.students.aggregate(pipeline)
+  mongo.db.populations.drop()
   for values in d:
     # print(values)
     population = {}
