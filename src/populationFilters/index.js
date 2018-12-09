@@ -94,6 +94,17 @@ export const startingThisSemester = (params) => {
       student.starting === starting
   })
 }
+
+export const transferTo = (params) => {
+  const { negated } = params
+  return ({
+    id: uuidv4(),
+    type: 'TransferToStudyrightFilter',
+    params: {},
+    filter: student => (negated ? student.transferredStudyright : !student.transferredStudyright)
+  })
+}
+
 export const courseParticipation = ({ field, course }) =>
   ({
     id: uuidv4(),

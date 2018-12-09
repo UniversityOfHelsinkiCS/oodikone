@@ -3,7 +3,7 @@ import { Table, Button } from 'semantic-ui-react'
 import { arrayOf, shape, func, oneOfType, string, number } from 'prop-types'
 
 const ResultTable = ({ results, idTitle, nameTitle }) => (results.length > 0) && (
-    <Table>
+  <Table>
     <Table.Header>
       <Table.Row>
         <Table.HeaderCell content={idTitle} />
@@ -28,7 +28,7 @@ ResultTable.propTypes = {
   idTitle: string,
   nameTitle: string,
   results: arrayOf(shape({
-    id: oneOfType([ number, string ]),
+    id: oneOfType([number, string]),
     name: string,
     handleClick: func
   })).isRequired

@@ -1,3 +1,4 @@
+/* eslint eqeqeq: 1, react/prop-types: 1, quote-props: 0, prefer-const: 0  */
 import React, { PureComponent } from 'react'
 import { Segment } from 'semantic-ui-react'
 import Highcharts from 'highcharts'
@@ -23,9 +24,9 @@ class ClusterGraph extends PureComponent {
     maxX: 0,
     maxY: 0
   }
-  componentDidMount() {
 
-    const { name, points, students, grades } = this.props.data.course
+  componentDidMount() {
+    const { name, points, students, grades } = this.props.data.course // eslint-disable-line
     const minY = _.min(points.map(p => p[1]))
     const maxY = _.max(points.map(p => p[1]))
     const minX = _.min(points.map(p => p[0]))
@@ -44,10 +45,12 @@ class ClusterGraph extends PureComponent {
   setActive = (series) => {
     console.log(series)
   }
+
   setName = (series) => {
     console.log(series.target)
     this.setState({ name: this.state.series[series.target.name].data.name[series.target.index] })
   }
+
   render() {
     const { series, minX, minY, maxX, maxY } = this.state
 

@@ -16,9 +16,12 @@ import Preset from './Preset'
 import DisciplineTypes from './DisciplineTypes'
 import EnrollmentStatus from './EnrollmentStatus'
 import TransferFilter from './TransferFilter'
+import TransferToStudyrightFilter from './TransferToStudyrightFilter'
 import CanceledStudyright from './CanceledStudyright'
 import PriorityStudyright from './PriorityStudyright'
-import { clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
+import {
+  clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter
+} from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
 
 
@@ -33,20 +36,21 @@ const componentFor = {
   ExtentGraduated,
   TransferFilter,
   CanceledStudyright,
-  PriorityStudyright
+  PriorityStudyright,
+  TransferToStudyrightFilter
 }
+
 const advancedFilters = { // Filters that are too hard to use for common folk
   DisciplineTypes,
   TransferFilter,
   ExtentGraduated,
   PriorityStudyright
-
 }
+
 const persistantFilters = { // Filters that can be duplicated with different values
   ExtentGraduated,
   TransferFilter
 }
-
 
 class PopulationFilters extends Component {
   static propTypes = {
