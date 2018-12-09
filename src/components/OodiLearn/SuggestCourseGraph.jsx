@@ -1,18 +1,6 @@
 import React, { Component } from 'react'
-// import { connect } from 'react-redux'
-import { Button, Dropdown, Grid, Segment, Card, Divider, Menu, Placeholder } from 'semantic-ui-react'
-import { func, shape, bool, string, arrayOf } from 'prop-types'
+import { Button, Grid, Divider } from 'semantic-ui-react'
 import { callApi } from '../../apiConnection'
-
-const OlPlaceholder = () => (
-  <Placeholder>
-    <Placeholder.Header>
-      <Placeholder.Line />
-      <Placeholder.Line />
-      <Placeholder.Line />
-    </Placeholder.Header>
-  </Placeholder>
-)
 
 class SuggestCourseGraph extends Component {
   state = {
@@ -23,13 +11,12 @@ class SuggestCourseGraph extends Component {
     this.setState({
       courses: [{ TKT10001: true, TKT10002: false }]
     })
-    // axios.get('/oodilearn/suggest_course')
   }
 
   handleClick = (e, { value }) => {
     const courses = this.state.courses.slice(0, value + 1)
     const doneCourses = []
-    courses.map((period) => {
+    courses.forEach((period) => {
       const c = Object.keys(period).filter(course => period[course])
       doneCourses.push(...c)
     })
@@ -37,7 +24,7 @@ class SuggestCourseGraph extends Component {
       .then((res) => {
         const { data } = res
         const newCourses = {}
-        data.map((course) => {
+        data.forEach((course) => {
           newCourses[course] = false
         })
         courses.push(newCourses)
@@ -54,18 +41,32 @@ class SuggestCourseGraph extends Component {
   }
 
   render() {
-    // console.log(this.state)
     if (!this.state.courses) return <h1>hello</h1>
     return (
-      <Grid columns={16}>
+      <Grid padded="vertically">
         <Grid.Row>
           {this.state.courses.map((period, i) => (
-            <Grid.Column width={2}>
-              <Segment>
-                <Button color="blue" content="next" value={i} onClick={this.handleClick} />
-                <Divider />
-                {Object.keys(period).map(course => <Button basic={!period[course]} value={`${i}_${course}`} onClick={this.selectCourse}>{course}</Button>)}
-              </Segment>
+            <Grid.Column width={2} style={{ paddingBottom: '1em' }}>
+              <Button
+                fluid
+                size="tiny"
+                color="blue"
+                content="next"
+                value={i}
+                onClick={this.handleClick}
+              />
+              <Divider />
+              {Object.keys(period).map(course => (
+                <Button
+                  fluid
+                  size="tiny"
+                  key={course}
+                  basic={!period[course]}
+                  value={`${i}_${course}`}
+                  onClick={this.selectCourse}
+                  content={course}
+                />
+                ))}
             </Grid.Column>
           ))}
         </Grid.Row>
@@ -73,20 +74,5 @@ class SuggestCourseGraph extends Component {
     )
   }
 }
-
-// SuggestCourseGraph.propTypes = {
-//   goBack: func.isRequired,
-//   getOodiLearnCourse: func.isRequired,
-//   getOodiLearnCluster: func.isRequired,
-//   loading: bool.isRequired,
-//   course: string.isRequired,
-//   data: shape({}),
-//   clusterData: arrayOf(shape({}))
-// }
-
-// SuggestCourseGraph.defaultProps = {
-//   data: undefined,
-//   clusterData: undefined
-// }
 
 export default SuggestCourseGraph
