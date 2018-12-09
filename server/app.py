@@ -205,7 +205,7 @@ def suggest_new_course():
   suggested = {}
   for course in done_courses:
     for edge in g[course]:
-      if edge in done_courses or g[course][edge]["period"] < now - 8:
+      if edge in done_courses or g[course][edge]["period"] < now - 8 or edge.startswith('AY'):
         continue
       weight = (g[course][edge]["weight"] + (g[course][edge]["count"] * 0.01))
       if edge in suggested:
