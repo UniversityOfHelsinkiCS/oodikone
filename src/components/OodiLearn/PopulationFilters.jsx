@@ -5,7 +5,7 @@ import { shape, func } from 'prop-types'
 import { options, setValue, fields } from '../../redux/oodilearnPopulationForm'
 
 const PopulationFilters = ({ form, setFormValue }) => (
-  <Table definition>
+  <Table definition textAlign="center">
     <Table.Header>
       <Table.Row>
         <Table.HeaderCell />
