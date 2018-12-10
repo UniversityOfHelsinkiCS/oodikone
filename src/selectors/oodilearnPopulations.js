@@ -87,7 +87,10 @@ const getFilteredPopulationStats = createSelector(
       const hasCourse = !course ? true : student.credits.some(credit => credit.course.code === course)
       return matchesFilter && hasCourse
     })
-    const credits = filtered.reduce((all, student) => all.concat(student.credits), [])
+    const credits = filtered.reduce((all, student) => {
+      const studentCredits = !course ? student.credits : student.credits.filter(cr => cr.course.code === course)
+      return all.concat(studentCredits)
+    }, [])
     const stats = credits
       .reduce((acc, credit) => {
         const { grade, credits: op } = credit
