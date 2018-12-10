@@ -4,7 +4,7 @@ import { Table } from 'semantic-ui-react'
 import { shape } from 'prop-types'
 import selector from '../../selectors/oodilearnPopulations'
 
-const GRADES = ['Hyl.', 'TT', 'HY', 'Hyv.', '0', '1', '2', '3', '4', '5']
+const GRADES = ['Hyl.', 'TT', 'HT', 'Hyv.', '0', '1', '2', '3', '4', '5']
 
 const PopulationStats = ({ stats }) => (
   <Table structured celled textAlign="center">
