@@ -11,6 +11,8 @@ const populationSelector = state => state.oodilearnPopulation.data
 
 const populationFilterSelector = state => state.oodilearnPopulationForm
 
+const selectedCourseSelector = state => state.oodilearnPopulationCourseSelect.course
+
 const getPopulations = createSelector(
   populationsSelector,
   ({ data = [] }) => data.map((({ population: id }) => ({ id })))
@@ -74,28 +76,33 @@ const getPopulationGraphSeries = createSelector(
 )
 
 const getFilteredPopulationStats = createSelector(
-  [populationSelector, populationFilterSelector],
-  (population, form) => {
+  [populationSelector, populationFilterSelector, selectedCourseSelector],
+  (population, form, course) => {
     const filters = Object.entries(form).filter(entry => !!entry[1])
-    const filtered = population.students.filter(student => filters.every(([category, value]) => {
-      const { group } = student[category]
-      return group === value
-    }))
-    const credits = filtered.reduce((all, student) => all.concat(student.credits), [])
-    const stats = credits.reduce((acc, credit) => {
-      const { grade, credits: op } = credit
-      const gradeCount = acc.grades[grade] || 0
-      return {
-        total: acc.total + op,
-        grades: {
-          ...acc.grades,
-          [grade]: gradeCount + 1
-        }
-      }
-    }, {
-      total: 0,
-      grades: {}
+    const filtered = population.students.filter((student) => {
+      const matchesFilter = filters.every(([category, value]) => {
+        const { group } = student[category]
+        return group === value
+      })
+      const hasCourse = !course ? true : student.credits.some(credit => credit.course.code === course)
+      return matchesFilter && hasCourse
     })
+    const credits = filtered.reduce((all, student) => all.concat(student.credits), [])
+    const stats = credits
+      .reduce((acc, credit) => {
+        const { grade, credits: op } = credit
+        const gradeCount = acc.grades[grade] || 0
+        return {
+          total: acc.total + op,
+          grades: {
+            ...acc.grades,
+            [grade]: gradeCount + 1
+          }
+        }
+      }, {
+        total: 0,
+        grades: {}
+      })
     const size = filtered.length
     return {
       grades: stats.grades,
@@ -133,6 +140,11 @@ const getPopulationStackedSeries = createSelector(
   }
 )
 
+const getPopulationCourses = createSelector(
+  populationSelector,
+  population => population.courses.map(({ text, value }) => ({ text, value, description: value }))
+)
+
 export default {
   getPopulations,
   getPopulation,
@@ -140,5 +152,7 @@ export default {
   populationIsLoading,
   getPopulationGraphSeries,
   getFilteredPopulationStats,
-  getPopulationStackedSeries
+  getPopulationStackedSeries,
+  getPopulationCourses,
+  selectedCourseSelector
 }
