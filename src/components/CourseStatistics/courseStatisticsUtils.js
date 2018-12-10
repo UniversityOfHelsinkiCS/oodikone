@@ -2,8 +2,6 @@ import moment from 'moment'
 
 const MIN_YEAR = 1899
 const MAX_YEAR = 2112
-const MIN_DEFAULT_YEAR = 2000
-const MIN_DEFAULT_SEMESTER = '2000-01'
 
 const isSpring = date => moment(date).month() < 9
 const isPre2016Course = course => !Number.isNaN(Number(course.code.charAt(0)))
@@ -34,6 +32,7 @@ const getActiveYears = (course) => {
   if (endYear === MAX_YEAR) {
     return `${startYearText} — `
   }
+  if (startYearText === endYearText) return startYearText
   return `${startYearText} — ${endYearText}`
 }
 
@@ -55,11 +54,11 @@ const maximumYear = years => (
 const getStartAndEndYearValues = (course, years) => {
   if (!course.min_attainment_date && !course.max_attainment_date) return { fromYear: null, toYear: null }
   const { start, end } = getCourseSemesters(course)
-  const startYear = Number(start.substring(0, 4)) < MIN_DEFAULT_YEAR
-    ? years.find(year => year.text === MIN_DEFAULT_SEMESTER)
-    : years.find(year => year.text === start)
+  const startYear = years.find(year => year.text === start)
 
-  const endYear = Number(start.substring(0, 4) === MAX_YEAR) ? maximumYear(years) : years.find(year => year.text === end)
+  const endYear = Number(start.substring(0, 4) === MAX_YEAR) ?
+    maximumYear(years) :
+    years.find(year => year.text === end)
   const fromYear = startYear ? startYear.value : undefined
   const toYear = endYear ? endYear.value : undefined
   return { fromYear, toYear }
