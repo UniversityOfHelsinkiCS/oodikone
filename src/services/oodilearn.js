@@ -4,6 +4,8 @@ const studentService = require('./students')
 const { Credit, Student, Course } = require('../models')
 const Op = Sequelize.Op
 
+const defaultName = nameObj => nameObj['en'] || nameObj['fi'] || Object.values(nameObj)[0]
+
 const formatStudentNumber = studentnumber => {
   const snum = studentnumber.toString()
   return snum.startsWith('0') ? snum : `0${snum}`
@@ -49,7 +51,7 @@ const getStudentCredits = studentnumbers => Student.findAll({
     required: true,
     include: {
       model: Course,
-      attributes: [],
+      attributes: ['name', 'code'],
       where: {
         is_study_module: false
       }
@@ -77,19 +79,31 @@ const getPopulation = async population => {
   const { data } = await oodilearnClient.getPopulationData(population)
   const { dimensions } = data
   const students = {}
+  const courses = {}
   data.students.forEach(({ studentnumber: snum, ...rest }) => {
     const studentnumber = formatStudentNumber(snum)
     students[studentnumber] = { studentnumber, ...rest }
   })
   const studentcredits = await getStudentCredits(Object.keys(students))
-  const aggregate = studentcredits.map(({ studentnumber, credits }) => ({
-    ...students[studentnumber],
-    studentnumber,
-    credits
-  }))
+  const aggregate = studentcredits.map(({ studentnumber, credits }) => {
+    credits.forEach(({ course }) => {
+      courses[course.code] = course.name
+    })
+    return {
+      ...students[studentnumber],
+      studentnumber,
+      credits
+    }
+  })
   return {
     students: aggregate,
-    categories: dimensions
+    categories: dimensions,
+    courses: Object.entries(courses).map(([code, name]) => ({
+      code,
+      value: code,
+      text: defaultName(name),
+      names: name
+    }))
   }
 }
 
