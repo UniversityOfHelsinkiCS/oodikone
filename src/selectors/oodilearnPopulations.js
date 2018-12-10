@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 
-const DIMENSIONS_MAIN = ['Organised', 'Surface', 'Deep', 'SE', 'SBI']
+const DIMENSIONS_MAIN = ['SBI', 'SE', 'Deep', 'Surface', 'Organised']
 const DIMENSIONS_ALL = [...DIMENSIONS_MAIN, 'IntRel', 'Peer', 'Align', 'ConsFeed']
 
 const formatValue = value => parseFloat(value.toFixed(2))
@@ -108,11 +108,37 @@ const getFilteredPopulationStats = createSelector(
   }
 )
 
+const getPopulationStackedSeries = createSelector(
+  [populationSelector, populationFilterSelector],
+  (population, filters) => {
+    const categories = [...DIMENSIONS_ALL]
+    const series = {
+      below: [],
+      average: [],
+      above: []
+    }
+    categories.forEach((category) => {
+      const { below: b, above: a } = population.categories[category]
+      const below = formatValue(b)
+      const above = formatValue(a)
+      const selected = filters[category]
+      series.below.push(!selected || selected === 'below' ? [0, below] : [])
+      series.average.push(!selected || selected === 'average' ? [below, above] : [])
+      series.above.push(!selected || selected === 'above' ? [above, 5] : [])
+    })
+    return {
+      categories,
+      series
+    }
+  }
+)
+
 export default {
   getPopulations,
   getPopulation,
   getPopulationCategorySeries,
   populationIsLoading,
   getPopulationGraphSeries,
-  getFilteredPopulationStats
+  getFilteredPopulationStats,
+  getPopulationStackedSeries
 }
