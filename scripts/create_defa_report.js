@@ -76,12 +76,13 @@ const toCsv = includedCourses => students => {
   })
 
   const allCredits = students.reduce((acc, student) => acc + student.credits,0)
+  const totalRequired = students.filter(student => student.hasRequired).length
   const reportCsv = [
     `${HEADER_ROW_STUB},${includedCourses.join(',')}`,
     ...students.map(
-      student => `"${student.student_number}",${student.credits},${student.hasRequired},${student.courseCompletions.join(',')}`
+      student => `"${student.student_number}",${student.credits},${Number(student.hasRequired)},${student.courseCompletions.map(bool => Number(bool)).join(',')}`
     ),
-    ['total', allCredits, 'N/A', ...courseTotals].join(',')
+    ['total', allCredits, totalRequired, ...courseTotals].join(',')
   ].join('\n')
 
   const creditTotalHeaders = ['0-4','5-9','10-14','15-19','20-24','25-29','30-34','35-39','40-44','45-49','50-54','55-59','60+']
