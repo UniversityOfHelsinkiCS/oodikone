@@ -6,20 +6,20 @@ import { options, setValue, fields } from '../../redux/oodilearnPopulationForm'
 
 const PopulationFilters = ({ form, setFormValue }) => (
   <Table definition textAlign="center">
-    <Table.Header>
+    {/* <Table.Header>
       <Table.Row>
         <Table.HeaderCell />
         <Table.HeaderCell content="Category" />
       </Table.Row>
-    </Table.Header>
+    </Table.Header> */}
     <Table.Body>
       {Object.values(fields).map(field => (
         <Table.Row key={field}>
-          <Table.Cell content={field} />
+          <Table.Cell content={field} width={3} />
           <Table.Cell>
             <Dropdown
-              selection
               options={options}
+              fluid
               clearable
               style={{ width: '100%' }}
               value={form[field]}
