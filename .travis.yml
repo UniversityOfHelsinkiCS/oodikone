@@ -28,13 +28,12 @@ jobs:
         - npm run notest
     - stage: build & deploy
       script:
-        - "[[ $TRAVIS_BRANCH =~ (trunk) ]] && docker build -t toska/oodikone2-frontend:testing ."
-        - "[[ $TRAVIS_BRANCH =~ (trunk) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
-        - "[[ $TRAVIS_BRANCH =~ (trunk) ]] && docker push toska/oodikone2-frontend:testing"
-        - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker build -t toska/oodikone2-frontend:staging ."
-        - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
-        - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker push toska/oodikone2-frontend:staging"
-        - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker build -t toska/oodikone2-frontend:latest ."
-        - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
-        - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker push toska/oodikone2-frontend:latest"
-        
+        - "[[ $TRAVIS_BRANCH =~ (trunk) ]] && ( docker build -t toska/oodikone2-frontend:testing . ; exit 0 )"
+        - "[[ $TRAVIS_BRANCH =~ (trunk) ]] && ( docker login -u $DOCKER_USER -p $DOCKER_PASS ; exit 0 )"
+        - "[[ $TRAVIS_BRANCH =~ (trunk) ]] && ( docker push toska/oodikone2-frontend:testing ; exit 0 )"
+        - "[[ $TRAVIS_BRANCH =~ (^master) ]] && ( docker build -t toska/oodikone2-frontend:staging . ; exit 0 )"
+        - "[[ $TRAVIS_BRANCH =~ (^master) ]] && ( docker login -u $DOCKER_USER -p $DOCKER_PASS ; exit 0 )"
+        - "[[ $TRAVIS_BRANCH =~ (^master) ]] && ( docker push toska/oodikone2-frontend:staging ; exit 0 )"
+        - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && ( docker build -t toska/oodikone2-frontend:latest . ; exit 0 )"
+        - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && ( docker login -u $DOCKER_USER -p $DOCKER_PASS ; exit 0 )"
+        - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && ( docker push toska/oodikone2-frontend:latest ; exit 0 )"
