@@ -33,11 +33,11 @@ class PopulationDashboard extends Component {
               <PopulationStats />
             </Grid.Column>
           </Grid.Row>
-          <Grid.Row>
-            <Grid.Column width="8">
+          <Grid.Row stretched>
+            <Grid.Column width={6}>
               <PopulationFilters />
             </Grid.Column>
-            <Grid.Column width="8">
+            <Grid.Column width={10} verticalAlign="middle">
               <PopulationStackedBar />
             </Grid.Column>
           </Grid.Row>

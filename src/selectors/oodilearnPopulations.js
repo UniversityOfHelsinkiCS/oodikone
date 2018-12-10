@@ -109,9 +109,9 @@ const getFilteredPopulationStats = createSelector(
 )
 
 const getPopulationStackedSeries = createSelector(
-  populationSelector,
-  (population) => {
-    const categories = [...DIMENSIONS_MAIN]
+  [populationSelector, populationFilterSelector],
+  (population, filters) => {
+    const categories = [...DIMENSIONS_ALL]
     const series = {
       below: [],
       average: [],
@@ -121,9 +121,10 @@ const getPopulationStackedSeries = createSelector(
       const { below: b, above: a } = population.categories[category]
       const below = formatValue(b)
       const above = formatValue(a)
-      series.below.push([0, below])
-      series.average.push([below, above])
-      series.above.push([above, 5])
+      const selected = filters[category]
+      series.below.push(!selected || selected === 'below' ? [0, below] : [])
+      series.average.push(!selected || selected === 'average' ? [below, above] : [])
+      series.above.push(!selected || selected === 'above' ? [above, 5] : [])
     })
     return {
       categories,

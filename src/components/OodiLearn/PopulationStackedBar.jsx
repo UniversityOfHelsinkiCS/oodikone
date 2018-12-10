@@ -16,7 +16,7 @@ const options = {
 
 const PopulationStackedBar = ({ categories, series }) => (
   <Segment basic>
-    <HighchartsChart plotOptions={options}>
+    <HighchartsChart plotOptions={options} stlye={{ height: '100%' }}>
       <Chart type="columnrange" inverted />
       <XAxis categories={categories} />
       <YAxis min={0} max={5}>
