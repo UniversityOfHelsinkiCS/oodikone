@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, arrayOf, shape, bool, string, object } from 'prop-types'
-import { Form, Button, Message, Dropdown, Icon, Checkbox } from 'semantic-ui-react'
+import { Form, Button, Message, Icon, Grid } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
@@ -11,7 +11,7 @@ import moment from 'moment'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
-import { extentGraduated, canceledStudyright, transferTo} from '../../populationFilters'
+import { extentGraduated, canceledStudyright, transferTo } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { isInDateFormat, momentFromFormat, reformatDate, isValidYear, textAndDescriptionSearch } from '../../common'
@@ -47,6 +47,7 @@ class PopulationSearchForm extends Component {
     const INITIAL_QUERY = {
       year: '2017',
       semesters: ['FALL', 'SPRING'],
+      studentStatuses: [],
       studyRights: [],
       months: this.months('2017', 'FALL')
     }
@@ -54,6 +55,7 @@ class PopulationSearchForm extends Component {
     this.state = {
       query: INITIAL_QUERY,
       isLoading: false,
+      showAdvancedSettings: false,
       validYear: true,
       floatMonths: this.months('2017', 'FALL')
     }
@@ -166,9 +168,25 @@ class PopulationSearchForm extends Component {
     })
   }
 
+  handleStudentStatusSelection = (e, { value }) => {
+    const { query } = this.state
+    const studentStatuses = query.studentStatuses.includes(value) ?
+      query.studentStatuses.filter(s => s !== value) : [...query.studentStatuses, value]
+    this.setState({
+      query: {
+        ...query,
+        studentStatuses
+      }
+    })
+  }
+
   handleDegreeChange = (e, { value }) => {
     const { query } = this.state
     const degree = value
+    if (degree === '') {
+      this.handleClear('degree')
+      return
+    }
     this.setState({
       query: {
         ...query,
@@ -183,7 +201,10 @@ class PopulationSearchForm extends Component {
   handleProgrammeChange = (e, { value }) => {
     const { query } = this.state
     const programme = value
-
+    if (programme === '') {
+      this.handleClear('programme')
+      return
+    }
     this.setState({
       query: {
         ...query,
@@ -197,7 +218,10 @@ class PopulationSearchForm extends Component {
   handleStudyTrackChange = (e, { value }) => {
     const { query } = this.state
     const studyTrack = value
-
+    if (studyTrack === '') {
+      this.handleClear('studyTrack')
+      return
+    }
     this.setState({
       query: {
         ...query,
@@ -265,7 +289,6 @@ class PopulationSearchForm extends Component {
   }
 
   renderEnrollmentDateSelector = () => {
-    const { translate } = this.props
     const { query, validYear } = this.state
     const { semesters, year } = query
     return (
@@ -291,28 +314,6 @@ class PopulationSearchForm extends Component {
           </Button.Group>
         </Form.Field>
         <Form.Field>
-          <label>Semesters</label>
-          <Checkbox
-            className={style.semesterRadio}
-            key="FALL"
-            label={translate(`populationStatistics.${'FALL'}`)}
-            value="FALL"
-            name="semesterGroup"
-            checked={semesters.includes('FALL')}
-            onChange={this.handleSemesterSelection}
-          />
-          <Checkbox
-            className={style.semesterRadio}
-            key="SPRING"
-            label={translate(`populationStatistics.${'SPRING'}`)}
-            value="SPRING"
-            name="semesterGroup"
-            checked={semesters.includes('SPRING')}
-            onChange={this.handleSemesterSelection}
-          />
-
-        </Form.Field>
-        <Form.Field>
           <label>Statistics until</label>
           <Datetime
             dateFormat="MMMM YYYY"
@@ -327,28 +328,9 @@ class PopulationSearchForm extends Component {
   }
 
   renderStudyProgrammeDropdown = (studyRights, programmesToRender) => (
-    <Form.Field
-      width={6}
-      style={{
-        position: 'relative'
-      }}
-    >
+    <Form.Field width={15}>
       <label>Study programme</label>
-
-      <Icon
-        link
-        name="close"
-        style={{
-          position: 'absolute',
-          top: 35,
-          bottom: 0,
-          right: '2.5em',
-          lineHeight: 1,
-          zIndex: 1
-        }}
-        onClick={() => this.handleClear('programme')}
-      />
-      <Dropdown
+      <Form.Dropdown
         placeholder="Select study programme"
         search={textAndDescriptionSearch}
         selection
@@ -358,33 +340,15 @@ class PopulationSearchForm extends Component {
         onChange={this.handleProgrammeChange}
         closeOnChange
         disabled={programmesToRender.length === 1}
+        clearable
       />
     </Form.Field>
   )
   renderAdditionalDegreeOrStudyTrackDropdown = (studyRights, studyTracksToRender, degreesToRender) => { //eslint-disable-line
-    const renderableDegrees = (
-      <Form.Field
-        style={{
-          position: 'relative',
-          minWidth: '22em',
-          width: 'auto'
-        }}
-      >
-        <Icon
-          link
-          name="close"
-          style={{
-            position: 'absolute',
-            top: 35,
-            bottom: 0,
-            right: '2.5em',
-            lineHeight: 1,
-            zIndex: 1
-          }}
-          onClick={() => this.handleClear('degree')}
-        />
+    const renderableDegrees = () => (
+      <Form.Field width={8}>
         <label>Degree (Optional)</label>
-        <Dropdown
+        <Form.Dropdown
           placeholder="Select degree"
           search={textAndDescriptionSearch}
           floating
@@ -394,31 +358,13 @@ class PopulationSearchForm extends Component {
           options={degreesToRender}
           onChange={this.handleDegreeChange}
           closeOnChange
+          clearable
         />
       </Form.Field>)
-    const renderableTracks = (
-      <Form.Field
-        style={{
-          position: 'relative',
-          minWidth: '22em',
-          width: 'auto'
-        }}
-      >
-        <Icon
-          link
-          name="close"
-          style={{
-            position: 'absolute',
-            top: 35,
-            bottom: 0,
-            right: '2.5em',
-            lineHeight: 1,
-            zIndex: 1
-          }}
-          onClick={() => this.handleClear('studyTrack')}
-        />
+    const renderableTracks = () => (
+      <Form.Field width={8}>
         <label>Study Track (Optional)</label>
-        <Dropdown
+        <Form.Dropdown
           placeholder="Select study track"
           search={textAndDescriptionSearch}
           floating
@@ -428,26 +374,27 @@ class PopulationSearchForm extends Component {
           options={studyTracksToRender}
           onChange={this.handleStudyTrackChange}
           closeOnChange
+          clearable
         />
       </Form.Field>)
     if (studyRights.programme && degreesToRender.length > 1 && studyTracksToRender.length > 1) {
       return (
         <Form.Group>
-          {renderableDegrees}
-          {renderableTracks}
+          {renderableDegrees()}
+          {renderableTracks()}
         </Form.Group>
       )
     } else if (studyRights.programme && degreesToRender.length > 1) {
       return (
-        <div>
-          {renderableDegrees}
-        </div>
+        <Form.Group>
+          {renderableDegrees()}
+        </Form.Group>
       )
     } else if (studyRights.programme && studyTracksToRender.length > 1) {
       return (
-        <div>
-          {renderableTracks}
-        </div>
+        <Form.Group>
+          {renderableTracks()}
+        </Form.Group>
       )
     }
     return null
@@ -484,26 +431,79 @@ class PopulationSearchForm extends Component {
       studyTracksToRender = this.renderableList(sortedStudyTracks)
     }
     return (
-      <Form.Group horizontal="true" widths={2} >
-
-        <Form.Field
-          width={1}
-          style={{
-            position: 'relative',
-            display: 'inline-block'
-          }}
-        >
-          <label>Language</label>
-          <LanguageChooser />
-        </Form.Field>
-        {this.renderStudyProgrammeDropdown(studyRights, programmesToRender)}
+      <div>
+        <Form.Group>
+          <Form.Field>
+            <label>Language</label>
+            <LanguageChooser />
+          </Form.Field>
+          {this.renderStudyProgrammeDropdown(studyRights, programmesToRender)}
+        </Form.Group>
         {this.renderAdditionalDegreeOrStudyTrackDropdown(
           studyRights,
           studyTracksToRender,
           degreesToRender
         )}
-      </Form.Group>
+      </div>
     )
+  }
+
+  renderAdvancedSettingsSelector = () => {
+    if (!this.state.showAdvancedSettings) {
+      return null
+    }
+    const { translate } = this.props
+    const { query } = this.state
+    const { semesters, studentStatuses } = query
+    return (
+      <div>
+        <Form.Group>
+          <Form.Field>
+            <label>Semesters</label>
+            <Form.Checkbox
+              className={style.populationStatisticsRadio}
+              key="FALL"
+              label={translate(`populationStatistics.${'FALL'}`)}
+              value="FALL"
+              name="semesterGroup"
+              checked={semesters.includes('FALL')}
+              onChange={this.handleSemesterSelection}
+            />
+            <Form.Checkbox
+              className={style.populationStatisticsRadio}
+              key="SPRING"
+              label={translate(`populationStatistics.${'SPRING'}`)}
+              value="SPRING"
+              name="semesterGroup"
+              checked={semesters.includes('SPRING')}
+              onChange={this.handleSemesterSelection}
+            />
+          </Form.Field>
+        </Form.Group>
+        <Form.Group>
+          <Form.Field>
+            <label>Include</label>
+            <Form.Checkbox
+              className={style.populationStatisticsRadio}
+              key="EXCHANGE"
+              label="Exchange students"
+              value="EXCHANGE"
+              name="studentStatusGroup"
+              checked={studentStatuses.includes('EXCHANGE')}
+              onChange={this.handleStudentStatusSelection}
+            />
+            <Form.Checkbox
+              className={style.populationStatisticsRadio}
+              key="CANCELLED"
+              label="Students with cancelled study right"
+              value="CANCELLED"
+              name="studentStatusGroup"
+              checked={studentStatuses.includes('CANCELLED')}
+              onChange={this.handleStudentStatusSelection}
+            />
+          </Form.Field>
+        </Form.Group>
+      </div>)
   }
 
   shouldRenderSearchForm = () => {
@@ -531,14 +531,31 @@ class PopulationSearchForm extends Component {
     }
     return (
       <Form error={isQueryInvalid} loading={isLoading}>
-        {this.renderEnrollmentDateSelector()}
-        {this.renderStudyGroupSelector()}
+        <Grid divided>
+          <Grid.Row>
+            <Grid.Column width={10}>
+              {this.renderEnrollmentDateSelector()}
+              {this.renderStudyGroupSelector()}
+            </Grid.Column>
+            <Grid.Column width={6}>
+              <Form.Field style={{ margin: 'auto' }}>
+                <label>Advanced settings</label>
+                <Form.Radio
+                  toggle
+                  checked={this.state.showAdvancedSettings}
+                  onClick={() => { this.setState({ showAdvancedSettings: !this.state.showAdvancedSettings }) }}
+                />
+              </Form.Field>
+              {this.renderAdvancedSettingsSelector()}
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
 
         <Message error color="blue" header={errorText} />
 
-        <Button onClick={this.fetchPopulation} disabled={isQueryInvalid}>
+        <Form.Button onClick={this.fetchPopulation} disabled={isQueryInvalid}>
           {translate('populationStatistics.addPopulation')}
-        </Button>
+        </Form.Button>
       </Form>
     )
   }

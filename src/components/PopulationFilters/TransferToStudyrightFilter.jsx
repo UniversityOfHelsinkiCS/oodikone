@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Popup, Radio } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
-import _ from 'lodash'
 
 import infoTooltips from '../../common/infotooltips'
 import { transferTo } from '../../populationFilters'
