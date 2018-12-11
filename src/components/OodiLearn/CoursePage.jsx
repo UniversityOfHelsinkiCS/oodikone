@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Divider, Menu, Placeholder } from 'semantic-ui-react'
-import { func, shape, bool, string, arrayOf } from 'prop-types'
+import { func, shape, bool, string } from 'prop-types'
 import ClusterGraph from './ClusterGraph'
 import { getOodiLearnCourse } from '../../redux/oodilearnCourse'
 import { getOodiLearnCluster } from '../../redux/oodilearnCluster'
@@ -75,7 +75,7 @@ CoursePage.propTypes = {
   loading: bool.isRequired,
   course: string.isRequired,
   data: shape({}),
-  clusterData: arrayOf(shape({}))
+  clusterData: shape({})
 }
 
 CoursePage.defaultProps = {
