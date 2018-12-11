@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-// import { connect } from 'react-redux'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { localize } from 'react-localize-redux'
 import { Loader, Image, Transition } from 'semantic-ui-react'
@@ -95,9 +94,11 @@ class Main extends Component {
           <Transition visible={this.state.easterEgg} animation="fly up" duration={10000}>
             <Image
               src={images.irtomikko}
-              size="huge" verticalAlign="top"
+              size="huge"
+              verticalAlign="top"
               inline
-              style={{ position: 'absolute', top: '350px', right: '10px' }} />
+              style={{ position: 'absolute', top: '350px', right: '10px' }}
+            />
           </Transition>
         </div>
       )
