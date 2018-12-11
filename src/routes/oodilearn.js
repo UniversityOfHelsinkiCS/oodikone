@@ -33,6 +33,11 @@ wrapper.get('/oodilearn/suggest_course', async (req, res) => {
   res.json(result.data)
 })
 
+wrapper.get('/oodilearn/suggest_route', async (req, res) => {
+  const result = await oodilearn.suggestRoute()
+  res.json(result.data)
+})
+
 wrapper.get('/oodilearn/student/:id', async (req, res) => {
   const result = await oodilearn.getStudentData(req.params.id)
   res.status(200).json(result.data)
@@ -50,6 +55,16 @@ wrapper.get('/oodilearn/student', async (req, res) => {
 
 wrapper.get('/oodilearn/courses', async (req, res) => {
   const result = await courses.byCodes(AVAILABLE_COURSES)
+  res.json(result)
+})
+
+wrapper.get('/oodilearn/populations', async (req, res) => {
+  const result = await oodilearn.getPopulations()
+  res.json(result)
+})
+
+wrapper.get('/oodilearn/populations/:population', async (req, res) => {
+  const result = await oodilearn.getPopulation(req.params.population)
   res.json(result)
 })
 
