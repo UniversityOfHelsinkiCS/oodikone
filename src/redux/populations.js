@@ -9,16 +9,17 @@ const initialState = {
 }
 
 export const getPopulationStatistics = ({
-  year, semesters, studyRights, months, uuid
+  year, semesters, studentStatuses, studyRights, months, uuid
 }) => {
   const route = '/v3/populationstatistics/'
   const prefix = 'GET_POPULATION_STATISTICS_'
   const query = {
-    year, semesters, studyRights, uuid, months
+    year, semesters, studentStatuses, studyRights, uuid, months
   }
   const params = {
     year,
     semesters,
+    studentStatuses,
     months,
     studyRights
   }
