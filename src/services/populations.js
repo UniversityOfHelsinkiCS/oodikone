@@ -239,9 +239,9 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
     studyrightWhere.canceldate = null
   }
 
-  const students = await Student.findAll({
-    attributes: ['studentnumber'],
-    include: [
+  const students = await Studyright.findAll({
+    attributes: ['student_studentnumber'],
+    include:
       {
         model: StudyrightElement,
         attributes: [],
@@ -254,25 +254,17 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
             [Op.between]: [startDate, endDate]
           }
         },
-        include: [
-          {
-            model: Studyright,
-            required: true,
+    },
+    group: [
+      sequelize.col('studyright.studyrightid'),
+    ],
             where: {
               ...studyrightWhere
-            }
-          }
-        ]
       },
-    ],
-    group: [
-      sequelize.col('student.studentnumber'),
-      sequelize.col('studyright_elements->studyright.studyrightid'),
-      sequelize.col('studyright_elements.id')
-    ],
-    having: count('studyright_elements.code', studyRights.length, true)
+    having: count('studyright_elements.code', studyRights.length, true),
   })
-  return students.map(s => s.studentnumber)
+
+  return [...new Set(students.map(s => s.student_studentnumber))]
 }
 
 const parseQueryParams = query => {
