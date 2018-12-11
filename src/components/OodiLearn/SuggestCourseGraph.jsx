@@ -18,7 +18,7 @@ class SuggestCourseGraph extends Component {
       .then((res) => {
         const { data } = res
         const route = []
-        data.map((course) => {
+        data.forEach((course) => {
           const item = course.split('_')
           if (item.length > 1) {
             const period = item[0]
