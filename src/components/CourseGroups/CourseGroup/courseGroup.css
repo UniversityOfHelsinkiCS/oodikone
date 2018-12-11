@@ -39,7 +39,7 @@
 
 .academicYearSelectContainer > label {
   color: var(--darkSilver);
-  font-weight: 600
+  font-weight: 600;
 }
 
 .hiddenButton,
@@ -154,7 +154,6 @@
   font-size: 1.3em;
   font-weight: 600;
 }
-
 
 .activeToggleContainer {
   display: flex;

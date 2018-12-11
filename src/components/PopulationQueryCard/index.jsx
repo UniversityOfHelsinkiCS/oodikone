@@ -17,7 +17,7 @@ const PopulationQueryCard =
     updating,
     language
   }) => {
-    const { uuid, year, semesters, months } = query
+    const { uuid, year, semesters, months, studentStatuses } = query
     const { students } = population
     if (students.length > 0) {
       return (
@@ -40,6 +40,8 @@ const PopulationQueryCard =
             <div>
               {`Updated at ${reformatDate(_.minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}
             </div>
+            <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes' } exchange students</div>
+            <div>{studentStatuses.includes('CANCELLED') ? 'Includes' : 'Excludes' } students with cancelled study right</div>
             {updating ?
               <Button disabled compact floated="left" size="medium" labelPosition="left" onClick={updateStudentsFn} >
                 <Icon loading name="refresh" />

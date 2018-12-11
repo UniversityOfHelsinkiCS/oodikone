@@ -1,36 +1,18 @@
-language: node_js
-node_js:
-- '8'
-cache:
-  directories:
-    - node_modules
-
-addons:
-  chrome: stable
-
 sudo: required
-before_install:
-  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
-  - gem install superbara
-before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
-
-script:
-  - npm run notest
 
 services:
   - docker
-  - redis-server
 
-after_success:
-  - "[[ $TRAVIS_BRANCH =~ (trunk) ]] && docker build -t toska/oodikone2-frontend:testing ."
-  - "[[ $TRAVIS_BRANCH =~ (trunk) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
-  - "[[ $TRAVIS_BRANCH =~ (trunk) ]] && docker push toska/oodikone2-frontend:testing"
-  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker build -t toska/oodikone2-frontend:staging ."
-  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
-  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker push toska/oodikone2-frontend:staging"
-  - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker build -t toska/oodikone2-frontend:latest ."
-  - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
-  - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker push toska/oodikone2-frontend:latest"
+jobs:
+  include:
+    - stage: build & deploy
+      script:
+        - "if [[ $TRAVIS_BRANCH =~ (trunk) ]]; then docker build -t toska/oodikone2-frontend:testing . ; else :;fi"
+        - "if [[ $TRAVIS_BRANCH =~ (trunk) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS ; else :;fi"
+        - "if [[ $TRAVIS_BRANCH =~ (trunk) ]]; then docker push toska/oodikone2-frontend:testing ; else :;fi"
+        - "if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker build -t toska/oodikone2-frontend:staging . ; else :;fi"
+        - "if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS ; else :;fi"
+        - "if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker push toska/oodikone2-frontend:staging ; else :;fi"
+        - "if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker build -t toska/oodikone2-frontend:latest . ; else :;fi"
+        - "if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS ; else :;fi"
+        - "if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker push toska/oodikone2-frontend:latest ; else :;fi"

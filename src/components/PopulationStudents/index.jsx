@@ -8,7 +8,6 @@ import { getStudentTotalCredits, copyToClipboard } from '../../common'
 import { toggleStudentListVisibility } from '../../redux/settings'
 
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
-import { format } from 'util';
 
 const popupTimeoutLength = 1000
 
@@ -53,9 +52,7 @@ class PopulationStudents extends Component {
       copyToClipboard(clipboardString)
     }
 
-    const transferFrom = (s) => {
-      return s.previousRights[0].element_detail.name[this.props.language]
-    }
+    const transferFrom = s => (s.previousRights[0].element_detail.name[this.props.language])
 
     return (
       <div>
