@@ -328,7 +328,7 @@ class PopulationSearchForm extends Component {
   }
 
   renderStudyProgrammeDropdown = (studyRights, programmesToRender) => (
-    <Form.Field width={15}>
+    <Form.Field width={14}>
       <label>Study programme</label>
       <Form.Dropdown
         placeholder="Select study programme"
@@ -525,10 +525,16 @@ class PopulationSearchForm extends Component {
       errorText = translate('populationStatistics.selectValidYear')
     }
 
-    if (query.studyRights.length === 0) {
+    if (query.semesters.length === 0) {
+      isQueryInvalid = true
+      errorText = 'Select at least one semester'
+    }
+
+    if (!query.studyRights.programme) {
       isQueryInvalid = true
       errorText = translate('populationStatistics.selectStudyRights')
     }
+
     return (
       <Form error={isQueryInvalid} loading={isLoading}>
         <Grid divided>

@@ -8,6 +8,7 @@ import { getStudentTotalCredits, copyToClipboard } from '../../common'
 import { toggleStudentListVisibility } from '../../redux/settings'
 
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
+import styles from '../PopulationCourseStats/populationCourseStats.css'
 
 const popupTimeoutLength = 1000
 
@@ -57,10 +58,10 @@ class PopulationStudents extends Component {
     return (
       <div>
         <StudentNameVisibilityToggle />
-        <Table>
+        <Table celled>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>
+              <Table.HeaderCell colSpan={2}>
                 student number
               </Table.HeaderCell>
               {this.props.showNames ? (
@@ -108,20 +109,26 @@ class PopulationStudents extends Component {
           <Table.Body>
             {this.props.selectedStudents.sort(byName).map(studentNumber => (
               <Table.Row key={studentNumber} >
-                <Table.Cell onClick={() => pushToHistoryFn(studentNumber)}>
+                <Table.Cell>
                   {studentNumber}
                 </Table.Cell>
+                <Table.Cell
+                  icon="level up alternate"
+                  onClick={() => pushToHistoryFn(studentNumber)}
+                  className={styles.iconCell}
+                  collapsing
+                />
                 {this.props.showNames ? (
-                  <Table.Cell onClick={() => pushToHistoryFn(studentNumber)}>
+                  <Table.Cell>
                     {students[studentNumber].lastname}
                   </Table.Cell>
                 ) : null}
                 {this.props.showNames ? (
-                  <Table.Cell onClick={() => pushToHistoryFn(studentNumber)}>
+                  <Table.Cell>
                     {students[studentNumber].firstnames}
                   </Table.Cell>
                 ) : null}
-                <Table.Cell onClick={() => pushToHistoryFn(studentNumber)}>
+                <Table.Cell>
                   {creditsSinceStart(studentNumber)}
                 </Table.Cell>
                 <Table.Cell>
