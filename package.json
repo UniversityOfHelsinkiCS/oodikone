@@ -1,0 +1,20 @@
+{
+  "name": "oodikone2-userservice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"no test specified, all good\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice/issues"
+  },
+  "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice#readme"
+}
