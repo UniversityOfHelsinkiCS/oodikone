@@ -49,5 +49,11 @@ const run1 = async () => {
   process.exit()
 }
 
+const run3 = async () => {
+  const userStatistics = require('./userService')
+  const resp = await userStatistics.ping()
+  console.log(resp)   
+}
 
-run2()
+
+run3()
