@@ -232,7 +232,7 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
   let studyrightWhere = {}
   if (!exchangeStudents) {
     studyrightWhere.extentcode = {
-      [Op.ne]: 7
+      [Op.notIn]: [7, 34]
     }
   }
   if (!cancelledStudents) {
