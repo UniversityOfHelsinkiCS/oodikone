@@ -5,6 +5,6 @@ COPY . /usr/src/app
 WORKDIR /usr/src/app
 
 RUN npm install
-EXPOSE 8080
+EXPOSE 4567
  
 CMD ["npm", "start"]
