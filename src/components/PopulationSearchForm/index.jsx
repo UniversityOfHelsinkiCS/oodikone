@@ -107,17 +107,6 @@ class PopulationSearchForm extends Component {
       this.props.getPopulationCourses(request),
       this.props.getPopulationFilters(request)
     ]).then(() => {
-      if (this.props.extents.map(e => e.extentcode).includes(7)) {
-        this.props.setPopulationFilter(extentGraduated({
-          extentcode: 7,
-          graduated: 'either',
-          complemented: 'true',
-          studyright: queryCodes[0]
-        }))
-      }
-      if (this.props.extents.map(e => e.extentcode).includes(34)) {
-        this.props.setPopulationFilter(extentGraduated({ extentcode: 34, graduated: 'either', complemented: 'true' }))
-      }
       if (queryCodes[0] === 'KH50_001') {
         this.props.setPopulationFilter(transferTo(false))
       }
