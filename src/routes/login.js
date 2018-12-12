@@ -3,6 +3,7 @@ const User = require('../services/users')
 const jwt = require('jsonwebtoken')
 const conf = require('../conf-backend')
 const mailservice = require('../services/mailservice')
+const userService = require('../services/userService')
 
 const generateToken = async (uid, res) => {
   const model = await User.byUsername(uid)
@@ -39,6 +40,10 @@ const sendEmail = async (uid) => {
 router.post('/login', async (req, res) => {
   try {
     const uid = req.headers['uid']
+
+    const response = await userService.ping()
+    console.log(response)
+
     if (req.headers['shib-session-id'] && uid) {
       const user = await User.byUsername(uid)
       const fullname = req.headers.displayname || 'Shib Valmis'
