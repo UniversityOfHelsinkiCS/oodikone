@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice/issues"
   },
-  "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice#readme"
+  "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
 }
