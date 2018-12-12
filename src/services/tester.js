@@ -6,7 +6,7 @@ const run2 = async () => {
   const o = {
     semesters: ['FALL', 'SPRING'],
     year: 2017, // 2015
-    studyRights: ['KH50_001'], // ['KH50_005'], // ['320001']
+    studyRights: ['KH10_001'], // ['KH50_005'], // ['320001']
     months: 16// 41
   }
 
@@ -50,4 +50,4 @@ const run1 = async () => {
 }
 
 
-run1()
+run2()
