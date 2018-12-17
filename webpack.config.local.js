@@ -104,7 +104,8 @@ module.exports = {
         AUTH_PROFILE: JSON.stringify('development')
       },
       'process.env': {
-        NODE_ENV: JSON.stringify('development')
+        NODE_ENV: JSON.stringify('development'),
+        ADMINER_URL: JSON.stringify(process.env.ADMINER_URL)
       }
     }),
 
