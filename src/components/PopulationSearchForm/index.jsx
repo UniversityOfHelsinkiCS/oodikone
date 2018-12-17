@@ -11,7 +11,7 @@ import moment from 'moment'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
-import { extentGraduated, canceledStudyright, transferTo } from '../../populationFilters'
+import { extentGraduated, transferTo } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { isInDateFormat, momentFromFormat, reformatDate, isValidYear, textAndDescriptionSearch } from '../../common'
@@ -107,18 +107,6 @@ class PopulationSearchForm extends Component {
       this.props.getPopulationCourses(request),
       this.props.getPopulationFilters(request)
     ]).then(() => {
-      if (this.props.extents.map(e => e.extentcode).includes(7)) {
-        this.props.setPopulationFilter(extentGraduated({
-          extentcode: 7,
-          graduated: 'either',
-          complemented: 'true',
-          studyright: queryCodes[0]
-        }))
-      }
-      if (this.props.extents.map(e => e.extentcode).includes(34)) {
-        this.props.setPopulationFilter(extentGraduated({ extentcode: 34, graduated: 'either', complemented: 'true' }))
-      }
-      this.props.setPopulationFilter(canceledStudyright({ studyrights: queryCodes, canceled: 'false' }))
       if (queryCodes[0] === 'KH50_001') {
         this.props.setPopulationFilter(transferTo(false))
       }
@@ -328,7 +316,7 @@ class PopulationSearchForm extends Component {
   }
 
   renderStudyProgrammeDropdown = (studyRights, programmesToRender) => (
-    <Form.Field width={15}>
+    <Form.Field width={14}>
       <label>Study programme</label>
       <Form.Dropdown
         placeholder="Select study programme"
@@ -525,10 +513,16 @@ class PopulationSearchForm extends Component {
       errorText = translate('populationStatistics.selectValidYear')
     }
 
-    if (query.studyRights.length === 0) {
+    if (query.semesters.length === 0) {
+      isQueryInvalid = true
+      errorText = 'Select at least one semester'
+    }
+
+    if (!query.studyRights.programme) {
       isQueryInvalid = true
       errorText = translate('populationStatistics.selectStudyRights')
     }
+
     return (
       <Form error={isQueryInvalid} loading={isLoading}>
         <Grid divided>
