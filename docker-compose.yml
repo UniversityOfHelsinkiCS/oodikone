@@ -77,6 +77,15 @@ services:
       - ENV=development
       - MONGO_URI=mongodb://mongo_db:27017/oodilearn
     container_name: oodilearn
+  userservice:
+    image: node:8.11.3
+    command: sh -c "cd /usr/src/app && npm install && npm start"
+    restart: unless-stopped
+    volumes:
+      - ./repos/oodikone2-userservice/:/usr/src/app
+    environment:
+      - DB_URL=postgres://postgres@db:5432/tkt_oodi
+    container_name: userservice
   adminer:
     image: adminer:4.6.2
     environment:
