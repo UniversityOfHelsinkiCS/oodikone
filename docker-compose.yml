@@ -43,6 +43,7 @@ services:
       FRONT_URL: http://localhost:8000
       TOKEN_SECRET: IWannaBeTheVeryBest
       OODILEARN_URL: http://oodilearn:5000
+      USERSERVICE_URL: http://userservice:4567
     volumes:
       - ./repos/oodikone2-backend/:/usr/src/app
     container_name: backend
@@ -81,6 +82,8 @@ services:
     image: node:8.11.3
     command: sh -c "cd /usr/src/app && npm install && npm start"
     restart: unless-stopped
+    ports:
+      - 4567:4567
     volumes:
       - ./repos/oodikone2-userservice/:/usr/src/app
     environment:
