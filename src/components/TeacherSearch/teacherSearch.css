@@ -11,3 +11,11 @@
   padding-top: 1rem;
   padding-bottom: 1rem;
 }
+
+.clickable {
+  cursor: pointer;
+}
+
+.noLeftBorder {
+  border-left: none !important;
+}
