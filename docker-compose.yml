@@ -12,7 +12,6 @@ services:
     environment:
       - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=
   redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
@@ -59,6 +58,7 @@ services:
       - "8081:8081"
     environment:
       BACKEND_ADDR: backend
+      ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
     volumes:
       - ./repos/oodikone2-frontend/:/usr/src/app
     container_name: frontend
@@ -68,6 +68,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     volumes:
+      - ./repos/oodilearn/data:/data
       - ./repos/oodilearn/server:/src
       - ./repos/oodilearn/models:/models
     ports:
@@ -76,3 +77,13 @@ services:
       - ENV=development
       - MONGO_URI=mongodb://mongo_db:27017/oodilearn
     container_name: oodilearn
+  adminer:
+    image: adminer:4.6.2
+    environment:
+      - ADMINER_DESIGN=pepa-linha
+    volumes:
+      - ./adminer-plugins:/var/www/html/plugins-enabled
+    ports:
+      - 5050:8080
+    restart: always
+    container_name: adminer
