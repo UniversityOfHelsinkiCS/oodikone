@@ -52,21 +52,29 @@ class StudentDetails extends Component {
       translate('common.grade'),
       translate('common.credits')
     ]
-    const courseRows = student.courses.map((c) => {
+    const courseRows = student.courses.sort(byDateDesc).map((c) => {
       const {
         date, grade, credits, course, isStudyModuleCredit, passed
       } = c
-      return {
-        date, course: `${isStudyModuleCredit ? `${course.name[language]} [Study Module]` : course.name[language]} (${course.code})`, grade, credits, passed, isStudyModuleCredit
+      let icon = null
+      if (isStudyModuleCredit) {
+        icon = <Icon name="certificate" color="purple" />
+      } else if (passed) {
+        icon = <Icon name="check circle outline" color="green" />
+      } else {
+        icon = <Icon name="circle outline" color="red" />
       }
+      return [
+        reformatDate(date, 'DD.MM.YYYY'),
+        `${isStudyModuleCredit ? `${course.name[language]} [Study Module]` : course.name[language]} (${course.code})`,
+        <div>{icon}{grade}</div>,
+        credits
+      ]
     })
     return (
       <SearchResultTable
         headers={courseHeaders}
-        rows={courseRows.sort(byDateDesc).map(c => ({
-          ...c,
-          date: reformatDate(c.date, 'DD.MM.YYYY')
-        }))}
+        rows={courseRows}
         noResultText={translate('common.noResults')}
       />
     )
@@ -133,7 +141,7 @@ class StudentDetails extends Component {
                       c.graduated ?
                         <div><Icon name="check circle outline" color="green" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
                         :
-                        <div><Icon name="remove circle outline" color="red" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
+                        <div><Icon name="circle outline" color="red" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
                     }
 
                   </Table.Cell>

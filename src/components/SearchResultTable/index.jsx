@@ -1,6 +1,6 @@
 import React from 'react'
-import { Table, Icon } from 'semantic-ui-react'
-import { arrayOf, string, object, func, bool, oneOfType, array } from 'prop-types'
+import { Table } from 'semantic-ui-react'
+import { arrayOf, array, string, func, bool } from 'prop-types'
 
 import styles from './searchResultsTable.css'
 
@@ -28,27 +28,8 @@ const getTableBody = (rows, rowClickFn, selectable) => (
           onClick={e => rowClickFn(e, row)}
         >
           {
-            Object.values(row).map((value, index) => {
-              if (index === 2 && row.date) {
-                return (
-                  <Table.Cell
-                    key={`cell-${index}`} // eslint-disable-line react/no-array-index-key
-                  >
-                    {row.isStudyModuleCredit ? // eslint-disable-line
-                      <Icon name="certificate" color="purple" />
-                      :
-                      row.passed || value.includes('Yes') ?
-                        <Icon name="check circle outline" color="green" />
-                        :
-                        <Icon name="remove circle outline" color="red" />
-                    }
-                    {value}
-                  </Table.Cell>
-                )
-              }
-              return <Table.Cell key={`cell-${index}`}>{value}</Table.Cell> // eslint-disable-line react/no-array-index-key
-            })
-
+            Object.values(row).map((value, index) => (
+              <Table.Cell key={`cell-${index}`}>{value}</Table.Cell>)) // eslint-disable-line react/no-array-index-key
           }
         </Table.Row>
       ))
@@ -67,7 +48,7 @@ const SearchResultTable = ({
         definition={definition}
       >
         {getHeaderRow(headers)}
-        {getTableBody(rows, rowClickFn, selectable, headers.length === 5)}
+        {getTableBody(rows, rowClickFn, selectable)}
       </Table>)
   }
   return <div>{noResultText}</div>
@@ -81,7 +62,7 @@ SearchResultTable.defaultProps = {
 
 SearchResultTable.propTypes = {
   headers: arrayOf(string).isRequired,
-  rows: oneOfType([array, arrayOf(object)]).isRequired,
+  rows: arrayOf(array).isRequired,
   rowClickFn: func,
   noResultText: string.isRequired,
   selectable: bool,
