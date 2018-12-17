@@ -30,6 +30,7 @@ pull () {
     git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
     git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-frontend.git
     git clone https://github.com/UniversityOfHelsinkiCS/oodilearn.git
+    git clone https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git
     popd
 }
 
