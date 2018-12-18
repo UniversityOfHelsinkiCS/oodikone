@@ -50,7 +50,7 @@ const getCardDescription = (translate, credits, grade, passed, isStudyModuleCred
             ? (<Icon name="certificate" color="purple" />)
             : passed
               ? (<Icon name="check circle outline" color="green" />)
-              : (<Icon name="remove circle outline" color="red" />)
+              : (<Icon name="circle outline" color="red" />)
         }
       </div>
     </div>

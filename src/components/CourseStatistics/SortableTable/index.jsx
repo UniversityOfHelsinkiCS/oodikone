@@ -37,7 +37,7 @@ class SortableTable extends Component {
     }
 
     render() {
-      const { tableProps, columns, getRowKey } = this.props
+      const { tableProps, getRowProps, columns, getRowKey } = this.props
       const { selected, direction } = this.state
       const sortDirection = name => (selected === name ? direction : null)
       return (
@@ -69,12 +69,16 @@ class SortableTable extends Component {
           </Table.Header>
           <Table.Body>
             { this.sortedRows().map(row => (
-              <Table.Row key={getRowKey(row)}>
+              <Table.Row
+                key={getRowKey(row)}
+                {...getRowProps && getRowProps(row)}
+              >
                 {columns.filter(c => !c.parent).map(c => (
                   <Table.Cell
                     key={c.key}
                     content={c.getRowContent ? c.getRowContent(row) : c.getRowVal(row)}
                     {...c.cellProps}
+                    {...c.getCellProps && c.getCellProps(row)}
                   />
                 ))}
               </Table.Row>
@@ -88,12 +92,14 @@ class SortableTable extends Component {
 SortableTable.propTypes = {
   tableProps: shape({}),
   getRowKey: func.isRequired,
+  getRowProps: func,
   columns: arrayOf(shape({
     key: string,
     title: string,
     headerProps: shape({}),
     getRowVal: func,
     getRowContent: func,
+    getCellProps: func,
     cellProps: shape({}),
     group: bool,
     children: arrayOf()
@@ -102,7 +108,8 @@ SortableTable.propTypes = {
 }
 
 SortableTable.defaultProps = {
-  tableProps: undefined
+  tableProps: undefined,
+  getRowProps: undefined
 }
 
 export default SortableTable

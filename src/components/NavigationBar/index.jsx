@@ -11,6 +11,8 @@ import { userIsAdmin, userIsCzar } from '../../common'
 import styles from './navigationBar.css'
 import { logout, swapDevUser } from '../../apiConnection'
 
+const { ADMINER_URL } = process.env
+
 class NavigationBar extends Component {
   state = {
     navigationRoutes: routes
@@ -49,12 +51,24 @@ class NavigationBar extends Component {
               as={NavLink}
               to={hiddenRoutes.oodilearn.route}
               text="OodiLearn"
+              icon="graduation cap"
             />
             <Dropdown.Item
               as={NavLink}
               to={hiddenRoutes.sandbox.route}
               text="Sandbox"
+              icon="boxes"
             />
+            { ADMINER_URL && (
+              <Dropdown.Item
+                onClick={() => {
+                const win = window.open(ADMINER_URL, '_blank')
+                win.focus()
+              }}
+                text="Database"
+                icon="database"
+              />
+            )}
             {testUsers.map(user => (
               <Dropdown.Item
                 key={user}
