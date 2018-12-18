@@ -90,8 +90,7 @@ class StudentSearch extends Component {
     }
 
     const columns = [
-      { key: 'studentnumber', title: translate('common.studentNumber'), getRowVal: s => s.studentNumber, cellProps: { width: 3 }, headerProps: { onClick: null, sorted: null } },
-      { key: 'icon', title: '', getRowVal: () => (<Icon name="level up alternate" />), cellProps: { collapsing: true, className: styles.noLeftBorder }, headerProps: { onClick: null, sorted: null, className: styles.noLeftBorder } },
+      { key: 'studentnumber', title: translate('common.studentNumber'), getRowVal: s => s.studentNumber, headerProps: { onClick: null, sorted: null } },
       { key: 'started', title: translate('common.started'), getRowVal: s => s.started, headerProps: { onClick: null, sorted: null } },
       { key: 'credits', title: translate('common.credits'), getRowVal: s => s.credits, headerProps: { onClick: null, sorted: null } }
     ]
@@ -100,6 +99,7 @@ class StudentSearch extends Component {
       columns.push({ key: 'lastnames', title: 'last names', getRowVal: s => s.lastname, headerProps: { onClick: null, sorted: null } })
       columns.push({ key: 'firstnames', title: 'first names', getRowVal: s => s.firstnames, headerProps: { onClick: null, sorted: null } })
     }
+    columns.push({ key: 'icon', title: '', getRowVal: () => (<Icon name="level up alternate" />), cellProps: { collapsing: true }, headerProps: { onClick: null, sorted: null } })
 
     return (
       <SortableTable
@@ -108,7 +108,7 @@ class StudentSearch extends Component {
           className: styles.clickable,
           onClick: () => this.handleSearchSelect(s)
         })}
-        tableProps={{ celled: true, singleLine: true, sortable: false }}
+        tableProps={{ celled: false, singleLine: true, sortable: false }}
         columns={columns}
         data={students}
       />

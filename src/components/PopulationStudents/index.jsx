@@ -53,9 +53,7 @@ class PopulationStudents extends Component {
       copyToClipboard(clipboardString)
     }
 
-    const transferFrom = s => (s.previousRights.length > 0
-      ? s.previousRights[0].element_detail.name[this.props.language]
-      : '')
+    const transferFrom = s => (s.previousRights[0].element_detail.name[this.props.language])
 
     return (
       <div>
