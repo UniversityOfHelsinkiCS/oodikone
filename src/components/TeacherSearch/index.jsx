@@ -45,9 +45,9 @@ class TeacherSearch extends Component {
     render() {
       const columns = [
         { key: 'teacherid', title: 'Teacher ID', getRowVal: s => s.id, headerProps: { onClick: null, sorted: null } },
-        { key: 'icon', title: '', getRowVal: () => (<Icon name="level up alternate" />), cellProps: { collapsing: true, className: styles.noLeftBorder }, headerProps: { onClick: null, sorted: null, className: styles.noLeftBorder } },
-        { key: 'username', title: 'Username', getRowVal: s => s.code, cellProps: { width: 6 }, headerProps: { onClick: null, sorted: null } },
-        { key: 'name', title: 'Name', getRowVal: s => s.name, cellProps: { width: 6 }, headerProps: { onClick: null, sorted: null } }
+        { key: 'username', title: 'Username', getRowVal: s => s.code, headerProps: { onClick: null, sorted: null } },
+        { key: 'name', title: 'Name', getRowVal: s => s.name, headerProps: { onClick: null, sorted: null } },
+        { key: 'icon', title: '', getRowVal: () => (<Icon name="level up alternate" />), cellProps: { collapsing: true }, headerProps: { onClick: null, sorted: null } }
       ]
 
       return (
@@ -74,7 +74,7 @@ class TeacherSearch extends Component {
                     className: styles.clickable,
                     onClick: () => this.props.history.push(`/teachers/${teacher.id}`)
                   })}
-                  tableProps={{ celled: true, singleLine: true, sortable: false }}
+                  tableProps={{ celled: false, singleLine: true, sortable: false }}
                   columns={columns}
                   data={this.props.teachers}
                 />}

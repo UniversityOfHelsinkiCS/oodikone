@@ -15,7 +15,3 @@
 .clickable {
   cursor: pointer;
 }
-
-.noLeftBorder {
-  border-left: none !important;
-}
