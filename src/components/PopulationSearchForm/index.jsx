@@ -334,7 +334,7 @@ class PopulationSearchForm extends Component {
   )
   renderAdditionalDegreeOrStudyTrackDropdown = (studyRights, studyTracksToRender, degreesToRender) => { //eslint-disable-line
     const renderableDegrees = () => (
-      <Form.Field width={8}>
+      <React.Fragment>
         <label>Degree (Optional)</label>
         <Form.Dropdown
           placeholder="Select degree"
@@ -348,9 +348,9 @@ class PopulationSearchForm extends Component {
           closeOnChange
           clearable
         />
-      </Form.Field>)
+      </React.Fragment>)
     const renderableTracks = () => (
-      <Form.Field width={8}>
+      <React.Fragment>
         <label>Study Track (Optional)</label>
         <Form.Dropdown
           placeholder="Select study track"
@@ -364,24 +364,37 @@ class PopulationSearchForm extends Component {
           closeOnChange
           clearable
         />
-      </Form.Field>)
-    if (studyRights.programme && degreesToRender.length > 1 && studyTracksToRender.length > 1) {
+      </React.Fragment>)
+    const isNewProgramme = programme => programme.length > 1 && Number(programme[0])
+    if (studyRights.programme && isNewProgramme(studyRights.programme) && degreesToRender.length > 1 && studyTracksToRender.length > 1) {
       return (
         <Form.Group>
-          {renderableDegrees()}
-          {renderableTracks()}
+          <Form.Field width={8}>
+            {renderableDegrees()}
+          </Form.Field>
+          <Form.Field width={8}>
+            {renderableTracks()}
+          </Form.Field>
         </Form.Group>
       )
-    } else if (studyRights.programme && degreesToRender.length > 1) {
+    } else if (studyRights.programme && isNewProgramme(studyRights.programme) && degreesToRender.length > 1) {
       return (
         <Form.Group>
-          {renderableDegrees()}
+          <Form.Field width={8}>
+            {renderableDegrees()}
+          </Form.Field>
+          <Form.Field width={8}>
+          </Form.Field>
         </Form.Group>
       )
     } else if (studyRights.programme && studyTracksToRender.length > 1) {
       return (
         <Form.Group>
-          {renderableTracks()}
+          <Form.Field width={8}>
+          </Form.Field>
+          <Form.Field width={8}>
+            {renderableTracks()}
+          </Form.Field>
         </Form.Group>
       )
     }
