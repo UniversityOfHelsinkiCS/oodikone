@@ -365,8 +365,8 @@ class PopulationSearchForm extends Component {
           clearable
         />
       </React.Fragment>)
-    const isNewProgramme = programme => programme.length > 1 && Number(programme[0])
-    if (studyRights.programme && isNewProgramme(studyRights.programme) && degreesToRender.length > 1 && studyTracksToRender.length > 1) {
+    const isOldProgramme = programme => programme.length > 1 && Number(programme[0])
+    if (studyRights.programme && isOldProgramme(studyRights.programme) && degreesToRender.length > 1 && studyTracksToRender.length > 1) {
       return (
         <Form.Group>
           <Form.Field width={8}>
@@ -377,7 +377,7 @@ class PopulationSearchForm extends Component {
           </Form.Field>
         </Form.Group>
       )
-    } else if (studyRights.programme && isNewProgramme(studyRights.programme) && degreesToRender.length > 1) {
+    } else if (studyRights.programme && isOldProgramme(studyRights.programme) && degreesToRender.length > 1) {
       return (
         <Form.Group>
           <Form.Field width={8}>
