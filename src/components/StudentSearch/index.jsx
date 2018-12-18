@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { func, string, arrayOf, object, bool, shape } from 'prop-types'
 import { connect } from 'react-redux'
-import { Search, Segment } from 'semantic-ui-react'
+import { Search, Segment, Icon } from 'semantic-ui-react'
 
 import { findStudents, getStudent, selectStudent } from '../../redux/students'
-import SearchResultTable from '../SearchResultTable'
 import SegmentDimmer from '../SegmentDimmer'
+import SortableTable from '../CourseStatistics/SortableTable'
 import Timeout from '../Timeout'
 import { makeFormatStudentRows } from '../../selectors/students'
 
@@ -49,7 +49,7 @@ class StudentSearch extends Component {
     }
   }
 
-  handleSearchSelect = (e, student) => {
+  handleSearchSelect = (student) => {
     const { studentNumber } = student
     this.props.history.push(`/students/${studentNumber}`, { selected: studentNumber })
     const studentObject = this.props.students.find(person =>
@@ -81,40 +81,36 @@ class StudentSearch extends Component {
     const { translate, students, showNames } = this.props
     const { showResults } = this.state
 
-    const removeNamesIfNotShown = (student) => {
-      if (showNames) {
-        return student
-      }
-
-      return {
-        studentNumber: student.studentNumber,
-        started: student.started,
-        credits: student.credits
-      }
-    }
-
     if (!showResults) {
       // so that the loading spinner doesn't go on top of the search box
       return <div style={{ margin: 100 }} />
     }
-    const headers = [
-      translate('common.studentNumber'),
-      translate('common.started'),
-      translate('common.credits')
+    if (students.length <= 0) {
+      return <div>{translate('common.noResults')}</div>
+    }
+
+    const columns = [
+      { key: 'studentnumber', title: translate('common.studentNumber'), getRowVal: s => s.studentNumber, headerProps: { onClick: null, sorted: null } },
+      { key: 'started', title: translate('common.started'), getRowVal: s => s.started, headerProps: { onClick: null, sorted: null } },
+      { key: 'credits', title: translate('common.credits'), getRowVal: s => s.credits, headerProps: { onClick: null, sorted: null } }
     ]
 
     if (showNames) {
-      headers.push('last names')
-      headers.push('first names')
+      columns.push({ key: 'lastnames', title: 'last names', getRowVal: s => s.lastname, headerProps: { onClick: null, sorted: null } })
+      columns.push({ key: 'firstnames', title: 'first names', getRowVal: s => s.firstnames, headerProps: { onClick: null, sorted: null } })
     }
+    columns.push({ key: 'icon', title: '', getRowVal: () => (<Icon name="level up alternate" />), cellProps: { collapsing: true }, headerProps: { onClick: null, sorted: null } })
 
     return (
-      <SearchResultTable
-        headers={headers}
-        rows={students.map(removeNamesIfNotShown)}
-        rowClickFn={this.handleSearchSelect}
-        noResultText={translate('common.noResults')}
-        selectablestatic
+      <SortableTable
+        getRowKey={s => s.studentNumber}
+        getRowProps={s => ({
+          className: styles.clickable,
+          onClick: () => this.handleSearchSelect(s)
+        })}
+        tableProps={{ celled: false, singleLine: true, sortable: false }}
+        columns={columns}
+        data={students}
       />
     )
   }

@@ -11,7 +11,7 @@ import moment from 'moment'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
-import { extentGraduated, transferTo } from '../../populationFilters'
+import { transferTo } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { isInDateFormat, momentFromFormat, reformatDate, isValidYear, textAndDescriptionSearch } from '../../common'

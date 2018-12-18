@@ -13,3 +13,7 @@
 .searchResultTitle {
   border-bottom: 1px solid var(--darkSilver);
 }
+
+.clickable {
+  cursor: pointer;
+}
