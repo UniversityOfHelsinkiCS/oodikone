@@ -1,12 +1,11 @@
 #!/bin/bash
 
-DATA=data
+BACKUP_DIR=backups
 REPOS=repos
-DB_BACKUP=data/staging.bak
-MONGO_DATA=data/
+PSQL_DB_BACKUP="$BACKUP_DIR/latest-pg.bak"
 
 init_dirs () {
-    mkdir -p $DATA $REPOS
+    mkdir -p $REPOS $BACKUP_DIR
 }
 
 echo_path () {
@@ -14,8 +13,8 @@ echo_path () {
 }
 
 purge () {
+    docker-compose down || echo "docker-compose down failed"
     git clean -f -fdX
-    docker-compose down
 }
 
 megapurge () {
@@ -25,7 +24,7 @@ megapurge () {
     docker rmi $(docker images -q)
 }
 
-pull () {
+pull_git_repositories () {
     pushd $REPOS
     git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
     git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-frontend.git
@@ -34,92 +33,58 @@ pull () {
     popd
 }
 
-get_oodikone_dump () {
-    scp oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/staging.bak $DB_BACKUP
+get_oodikone_server_backup() {
+    scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
 }
 
-db_oodikone_restore () {
-    cat $DB_BACKUP | docker exec -i -u postgres oodi_db psql -d tkt_oodi
+unpack_oodikone_server_backup() {
+    bunzip2 -d -v ./$BACKUP_DIR/*.bz2
+}
+
+restore_psql_from_backup () {
+    cat $PSQL_DB_BACKUP | docker exec -i -u postgres oodi_db psql -d tkt_oodi
+}
+
+restore_mongodb_from_backup () {
+    docker exec -t mongo_db mongorestore -d oodilearn "/dump"
 }
 
 db_oodikone_reset () {
-    docker exec -u postgres oodi_db dropdb "tkt_oodi"
-    docker exec -u postgres oodi_db createdb "tkt_oodi"
-    cat $DB_BACKUP | docker exec -i -u postgres oodi_db psql -d tkt_oodi
+    docker exec -u postgres oodi_db dropdb "tkt_oodi" || echo "dbdrop of tkt_oodi failed. "
+    docker exec -u postgres oodi_db createdb "tkt_oodi" || echo "createdb of tkt_oodi failed. "
+    restore_psql_from_backup
 }
 
-db_oodilearn_restore () {
-    docker exec -t mongo_db mongorestore -d oodilearn /dump/oodilearn
-}
-
-install_oodilearn () {
-    docker build repos/oodilearn/server -t oodilearn
-    docker build repos/oodilearn/training
-}
-
-setup_oodilearn () {
-    pushd repos/oodilearn
-    mkdir -p models
-    popd
-}
-
-setup_oodilearn_db () {
-    docker-compose -f oodilearn-compose.yml up -d mongo_db
-}
-
-restore_mongodb () {
-    docker exec -it mongo_db mongorestore -d oodilearn /dump/oodilearn
-}
-
-get_mongo_dump () {
-    scp -r oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/mongo/oodilearn $MONGO_DATA
-}
-
-install_backend () {
-    pushd repos/oodikone2-backend
-    npm install
-    popd
-}
-
-install_frontend () {
-    pushd repos/oodikone2-frontend
-    npm install
-    popd
-}
-
-setup_docker () {
-    docker-compose up -d
+db_setup_full () {
+    echo "Getting backups from the Oodikone server, this will prompt you for your password. "
+    get_oodikone_server_backup
+    echo "Unpacking compressed files"
+    unpack_oodikone_server_backup
+    echo "Restoring PostgreSQL from backup"
+    restore_psql_from_backup
+    echo "Restoring MongoDB from backup"
+    restore_mongodb_from_backup
+    echo "Database setup finished"
 }
 
 docker_build () {
-    docker-compose up -d
+    docker-compose up -d --build
 }
 
-db_setup_oodikone () {
-    get_oodikone_dump && db_oodikone_restore || echo "Oodikone db setup failed."
-}
-
-db_setup_oodilearn () {
-    get_mongo_dump && db_oodilearn_restore || echo "OodiLearn db setup failed."
+show_instructions () {
+    cat ./assets/instructions.txt
 }
 
 run_full_setup () {
-    echo "Purging directory"
-    purge
     echo "Init dirs"
     init_dirs
     echo "Pull repos"
-    pull
+    pull_git_repositories
     echo "Building images, starting containers"
     docker_build
     echo "Setup oodikone db from dump, this will prompt you for your password."
-    db_setup_oodikone
-    echo "Setup oodilearn db from dump, this will prompt you for your password."
-    db_setup_oodilearn
-}
-
-run_setup () {
-  echo "Creating directories."
+    db_setup_full
+    show_instructions
 }
 
 cd $(dirname "$0")

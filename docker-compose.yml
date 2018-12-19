@@ -24,7 +24,7 @@ services:
     image: mongo
     restart: unless-stopped
     volumes:
-      - ./data:/dump
+      - ./backups/mongo/oodilearn:/dump
       - ./mongodata:/data/db
     ports:
       - "27017:27017"
