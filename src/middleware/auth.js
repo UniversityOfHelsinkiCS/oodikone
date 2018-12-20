@@ -13,6 +13,11 @@ const checkAuth = async (req, res, next) => {
       } else if (isShibboUser(decoded.userId, uid)) {
         if (decoded.enabled) {
           req.decodedToken = decoded
+          if (decoded.admin && decoded.asuser) {
+            req.decodedToken.userId = decoded.asuser
+            req.decodedToken.admin = false
+            req.decodedToken.czar = false
+          }
           next()
         } else {
           res.status(403).json({ error: 'User is not enabled' })
@@ -21,7 +26,7 @@ const checkAuth = async (req, res, next) => {
         res.status(403).json({ error: 'User shibboleth id and token id did not match' })
       }
     })
-  } else {  
+  } else {
     res.status(403).json({ error: 'No token in headers' })
   }
 }
@@ -30,7 +35,7 @@ const checkAdminAuth = async (req, res, next) => {
   if (req.decodedToken.admin) {
     next()
   } else {
-    res.status(403).end()
+    res.status(403).json({ error: 'No authorized' })
   }
 }
 
