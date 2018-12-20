@@ -6,22 +6,35 @@ import { func } from 'prop-types'
 import { connect } from 'react-redux'
 
 import { routes, hiddenRoutes } from '../../constants'
-import { userIsAdmin, userIsCzar } from '../../common'
+import { userIsAdmin, userIsCzar, userIsMock } from '../../common'
 
 import styles from './navigationBar.css'
-import { logout, swapDevUser } from '../../apiConnection'
+import { logout, swapUser, login } from '../../apiConnection'
 
 const { ADMINER_URL } = process.env
 
 class NavigationBar extends Component {
   state = {
+    fake: false,
     navigationRoutes: routes
   }
 
   async componentDidMount() {
+    await this.setNavigationRoutes()
+  }
+
+  async componentWillReceiveProps() {
+    this.setState({ fake: true })
+    await this.setNavigationRoutes()
+    this.render()
+  }
+
+  setNavigationRoutes = async () => {
     const navigationRoutes = { ...routes }
-    const adminRights = await userIsAdmin()
-    const czarRights = await userIsCzar()
+    const fake = await userIsMock()
+    this.setState({ fake })
+    const adminRights = fake ? false : await userIsAdmin()
+    const czarRights = fake ? false : await userIsCzar()
     Object.keys(navigationRoutes).forEach((key) => {
       if (navigationRoutes[key].admin && !adminRights) {
         delete navigationRoutes[key]
@@ -32,8 +45,9 @@ class NavigationBar extends Component {
     this.setState({ navigationRoutes })
   }
 
-  swapUser = uid => () => {
-    swapDevUser({ uid })
+  swapUser = uid => async () => {
+    await swapUser(uid)
+    this.setNavigationRoutes()
   }
 
   checkForOptionalParams = route => (
@@ -59,12 +73,12 @@ class NavigationBar extends Component {
               text="Sandbox"
               icon="boxes"
             />
-            { ADMINER_URL && (
+            {ADMINER_URL && (
               <Dropdown.Item
                 onClick={() => {
-                const win = window.open(ADMINER_URL, '_blank')
-                win.focus()
-              }}
+                  const win = window.open(ADMINER_URL, '_blank')
+                  win.focus()
+                }}
                 text="Database"
                 icon="database"
               />
@@ -74,7 +88,7 @@ class NavigationBar extends Component {
                 key={user}
                 icon="user"
                 text={`Use as: ${user}`}
-                onClick={this.swapUser(user)}
+                onClick={() => login()}
               />
             ))}
             <Dropdown.Item
@@ -96,8 +110,8 @@ class NavigationBar extends Component {
 
   render() {
     const t = this.props.translate
-    const { navigationRoutes } = this.state
-    const menuWidth = Object.keys(navigationRoutes).length + 2
+    const { fake, navigationRoutes } = this.state
+    const menuWidth = fake ? Object.keys(navigationRoutes).length + 3 : Object.keys(navigationRoutes).length + 2
     return (
       <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
         <Menu.Item
@@ -133,6 +147,11 @@ class NavigationBar extends Component {
         <Menu.Item>
           <Button icon="bullhorn" onClick={() => Sentry.showReportDialog()} />
         </Menu.Item>
+        {fake ?
+          <Menu.Item>
+            <Button onClick={logout}>Stop (logout)</Button>
+          </Menu.Item>
+          : null}
       </Menu>)
   }
 }
@@ -140,6 +159,7 @@ class NavigationBar extends Component {
 NavigationBar.propTypes = {
   translate: func.isRequired
 }
+
 
 export default connect()(NavigationBar)
 
