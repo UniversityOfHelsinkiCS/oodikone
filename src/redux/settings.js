@@ -52,6 +52,11 @@ const reducer = (state = initial, action) => {
         ...state,
         chartHeight: action.size
       }
+    case 'SET_AS_USER':
+      return {
+        ...state,
+        asUser: action.uid
+      }
     default:
       return state
   }
@@ -64,6 +69,11 @@ export const initLanguage = language => ({
 
 export const hideStudentNames = () => ({
   type: 'HIDE_STUDENT_NAMES'
+})
+
+export const setAsUser = uid => ({
+  type: 'SET_AS_USER',
+  uid
 })
 
 export const showStudentNames = () => ({
