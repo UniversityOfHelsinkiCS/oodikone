@@ -61,6 +61,10 @@ export const userIsCzar = async () => {
   const token = await getToken()
   return token ? decodeToken(token).czar : false
 }
+export const userIsMock = async () => {
+  const token = await getToken()
+  return token ? decodeToken(token).asuser : false
+}
 export const getUserName = async () => {
   const token = await getToken()
   return token ? decodeToken(token).userId : false
