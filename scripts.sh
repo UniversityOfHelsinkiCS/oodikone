@@ -86,5 +86,3 @@ run_full_setup () {
     db_setup_full
     show_instructions
 }
-
-cd $(dirname "$0")
