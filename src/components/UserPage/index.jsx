@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Button, Card, Divider, Image, Form, List, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import _ from 'lodash'
+import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func } from 'prop-types'
 import { textAndDescriptionSearch } from '../../common'
 import LanguageChooser from '../LanguageChooser'
@@ -103,6 +104,7 @@ class UserPage extends Component {
   showAs = async (uid) => {
     await superLogin(uid)
     this.props.setAsUser(uid)
+    this.props.history.push('/')
   }
 
   renderUnitList = (elementdetails, user) => {
@@ -278,7 +280,10 @@ UserPage.propTypes = {
   goBack: func.isRequired,
   getStudyrightElements: func.isRequired,
   studyrightElements: shape({}).isRequired,
-  pending: bool.isRequired
+  pending: bool.isRequired,
+  history: shape({
+    push: func.isRequired
+  }).isRequired
 }
 
 const mapStateToProps = state => ({
@@ -294,4 +299,4 @@ export default connect(mapStateToProps, {
   removeUserUnit,
   getStudyrightElements,
   setAsUser
-})(UserPage)
+})(withRouter(UserPage))
