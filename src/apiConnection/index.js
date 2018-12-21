@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { getToken, setToken } from '../common'
+import { getToken, setToken, userIsMock } from '../common'
 import { API_BASE_PATH, TOKEN_NAME, BASE_PATH } from '../constants'
 
 const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
@@ -47,9 +47,20 @@ export const login = async () => {
   return response.data.token
 }
 
-export const swapDevUser = async (newHeaders) => {
-  devOptions.headers = { ...devOptions.headers, ...newHeaders }
-  const token = await login()
+export const superLogin = async (uid) => {
+  let options = null
+  if (isDevEnv) {
+    options = devOptions
+  }
+  if (isTestEnv) {
+    options = testOptions
+  }
+  const response = await getAxios().post(`/superlogin/${uid}`, null, options)
+  await setToken(response.data.token)
+}
+
+export const swapUser = async (uid) => {
+  const token = await superLogin(uid)
   setToken(token)
 }
 
@@ -103,7 +114,8 @@ export const handleRequest = store => next => async (action) => {
     } catch (e) {
       // Something failed. Assume it's the token and try again.
       try {
-        await getToken(true)
+        const mock = await userIsMock()
+        if (!mock) await getToken(true)
         const res = await callApi(route, method, data, params)
         store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
       } catch (err) {

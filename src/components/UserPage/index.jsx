@@ -6,7 +6,9 @@ import { string, number, shape, bool, arrayOf, func } from 'prop-types'
 import { textAndDescriptionSearch } from '../../common'
 import LanguageChooser from '../LanguageChooser'
 import { toggleCzar, addUserUnits, removeUserUnit } from '../../redux/users'
+import { setAsUser } from '../../redux/settings'
 import { getStudyrightElements } from '../../redux/studyrightElements'
+import { superLogin } from '../../apiConnection'
 
 const formatToDropdown = elements => Object.values(elements).map(e => ({
   associations: {
@@ -97,6 +99,11 @@ class UserPage extends Component {
     programmes: this.programmeOptions(),
     specializations: this.specializationOptions()
   })
+
+  showAs = async (uid) => {
+    await superLogin(uid)
+    this.props.setAsUser(uid)
+  }
 
   renderUnitList = (elementdetails, user) => {
     const { language } = this.props
@@ -219,6 +226,13 @@ class UserPage extends Component {
                     content="Enable"
                     onClick={this.enableAccessRightToUser(user.id)}
                   />
+                  <Button
+                    basic
+                    fluid
+                    positive
+                    content="Show Oodikone as this user"
+                    onClick={() => this.showAs(user.username)}
+                  />
                 </Form>
               </Card.Description>
             </Card.Content>
@@ -257,6 +271,7 @@ UserPage.propTypes = {
     }))
   }).isRequired,
   toggleCzar: func.isRequired,
+  setAsUser: func.isRequired,
   addUserUnits: func.isRequired,
   removeUserUnit: func.isRequired,
   language: string.isRequired,
@@ -277,5 +292,6 @@ export default connect(mapStateToProps, {
   toggleCzar,
   addUserUnits,
   removeUserUnit,
-  getStudyrightElements
+  getStudyrightElements,
+  setAsUser
 })(UserPage)
