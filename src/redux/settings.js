@@ -57,6 +57,11 @@ const reducer = (state = initial, action) => {
         ...state,
         asUser: action.uid
       }
+    case 'REMOVE_AS_USER':
+      return {
+        ...state,
+        asUser: null
+      }
     default:
       return state
   }
@@ -74,6 +79,10 @@ export const hideStudentNames = () => ({
 export const setAsUser = uid => ({
   type: 'SET_AS_USER',
   uid
+})
+
+export const removeAsUser = () => ({
+  type: 'REMOVE_AS_USER'
 })
 
 export const showStudentNames = () => ({

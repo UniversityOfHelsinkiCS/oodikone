@@ -57,13 +57,16 @@ class PopulationSearchForm extends Component {
       isLoading: false,
       showAdvancedSettings: false,
       validYear: true,
-      floatMonths: this.months('2017', 'FALL')
+      floatMonths: this.months('2017', 'FALL'),
+      asUser: undefined
     }
   }
 
   componentDidMount() {
-    const { studyProgrammes } = this.props
-    if (!studyProgrammes || studyProgrammes.length === 0) {
+    const { studyProgrammes, asUser } = this.props
+
+    if (asUser != this.state.asUser || !studyProgrammes || studyProgrammes.length === 0) { // eslint-disable-line
+      this.setState({ asUser })
       this.props.getDegreesAndProgrammes()
     }
   }
@@ -570,10 +573,12 @@ class PopulationSearchForm extends Component {
 
 
 const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes, locale }) => {
+  const { language, asUser } = settings
   const studyRights = populationDegreesAndProgrammes.data || {}
   const { pending } = populationDegreesAndProgrammes
   return ({
-    language: settings.language,
+    language,
+    asUser,
     queries: populations.query || {},
     translate: getTranslate(locale),
     studyProgrammes: studyRights['20'],
