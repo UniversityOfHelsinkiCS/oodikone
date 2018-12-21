@@ -1,5 +1,6 @@
 #!/bin/bash
 
+ABS_DIR_PATH=$(realpath $(dirname "$0"))
 BACKUP_DIR=backups
 REPOS=repos
 PSQL_DB_BACKUP="$BACKUP_DIR/latest-pg.bak"
@@ -71,6 +72,11 @@ docker_build () {
     docker-compose up -d --build
 }
 
+create_symlink_git_hooks () {
+    ln -f "$ABS_DIR_PATH/git-hooks/frontend/pre-push" repos/oodikone2-frontend/.git/hooks/pre-push
+    ln -f "$ABS_DIR_PATH/git-hooks/backend/pre-push" repos/oodikone2-backend/.git/hooks/pre-push
+}
+
 show_instructions () {
     cat ./assets/instructions.txt
 }
@@ -84,5 +90,7 @@ run_full_setup () {
     docker_build
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_setup_full
+    echo "Adding git-hooks to projects"
+    create_symlink_git_hooks
     show_instructions
 }
