@@ -67,6 +67,9 @@ class PopulationSearchForm extends Component {
 
     if (asUser != this.state.asUser || !studyProgrammes || studyProgrammes.length === 0) { // eslint-disable-line
       this.setState({ asUser }) // doesn't work please fix
+    }
+  }
+
   componentDidUpdate() {
     const { studyProgrammes } = this.props
     if (studyProgrammes
