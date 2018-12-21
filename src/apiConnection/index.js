@@ -59,9 +59,14 @@ export const superLogin = async (uid) => {
   await setToken(response.data.token)
 }
 
+export const returnToSelf = async () => {
+  const token = await login()
+  await setToken(token)
+}
+
 export const swapUser = async (uid) => {
   const token = await superLogin(uid)
-  setToken(token)
+  await setToken(token)
 }
 
 export const callApi = async (url, method = 'get', data, params, timeout = 0) => {

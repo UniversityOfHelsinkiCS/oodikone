@@ -21,7 +21,7 @@ const INITIAL = {
   separate: false,
   discipline: undefined,
   type: undefined,
-  prefilled: false
+  prefilled: undefined
 }
 
 
@@ -31,8 +31,8 @@ class SearchForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const isFirstLoad = !state.prefilled && !props.pending && props.preselectedCourse
-    if (isFirstLoad) {
+    const shouldPrefill = !props.pending && props.preselectedCourse && state.prefilled !== props.preselectedCourse
+    if (shouldPrefill) {
       const { code, start, end } = props.preselectedCourse
 
       const getMatchingYearSelection = (year) => {
@@ -59,8 +59,8 @@ class SearchForm extends Component {
   componentDidUpdate() {
     const { prefilled } = this.state
     const { preselectedCourse } = this.props
-    if (!prefilled && preselectedCourse) {
-      this.handlePrefilledLoad()
+    if (prefilled !== preselectedCourse) {
+      this.handlePrefilledLoad(preselectedCourse)
     }
   }
 
@@ -118,9 +118,9 @@ class SearchForm extends Component {
     return Promise.resolve()
   }
 
-  handlePrefilledLoad = () => {
+  handlePrefilledLoad = (preselectedCourse) => {
     this.setState(
-      { prefilled: true },
+      { prefilled: preselectedCourse },
       () => this.fetchCourses()
     )
   }
