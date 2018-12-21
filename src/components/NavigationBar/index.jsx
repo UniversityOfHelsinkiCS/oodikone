@@ -2,14 +2,14 @@ import React, { Component } from 'react'
 import { Menu, Dropdown, Button } from 'semantic-ui-react'
 import * as Sentry from '@sentry/browser'
 import { NavLink, Link } from 'react-router-dom'
-import { func } from 'prop-types'
+import { func, string, oneOfType, shape } from 'prop-types'
 import { connect } from 'react-redux'
-
+import { withRouter } from 'react-router'
 import { routes, hiddenRoutes } from '../../constants'
 import { userIsAdmin, userIsCzar, userIsMock } from '../../common'
-
+import { removeAsUser } from '../../redux/settings'
 import styles from './navigationBar.css'
-import { logout, swapUser, login } from '../../apiConnection'
+import { logout, login, returnToSelf } from '../../apiConnection'
 
 const { ADMINER_URL } = process.env
 
@@ -24,7 +24,6 @@ class NavigationBar extends Component {
   }
 
   async componentWillReceiveProps() {
-    this.setState({ fake: true })
     await this.setNavigationRoutes()
     this.render()
   }
@@ -45,9 +44,12 @@ class NavigationBar extends Component {
     this.setState({ navigationRoutes })
   }
 
-  swapUser = uid => async () => {
-    await swapUser(uid)
-    this.setNavigationRoutes()
+  returnToSelf = () => async () => {
+    this.props.removeAsUser()
+    await returnToSelf()
+    await this.setNavigationRoutes()
+    this.render()
+    this.props.history.push('/')
   }
 
   checkForOptionalParams = route => (
@@ -110,6 +112,7 @@ class NavigationBar extends Component {
 
   render() {
     const t = this.props.translate
+    const { asUser } = this.props
     const { fake, navigationRoutes } = this.state
     const menuWidth = fake ? Object.keys(navigationRoutes).length + 3 : Object.keys(navigationRoutes).length + 2
     return (
@@ -149,7 +152,7 @@ class NavigationBar extends Component {
         </Menu.Item>
         {fake ?
           <Menu.Item>
-            <Button onClick={logout}>Stop (logout)</Button>
+            <Button onClick={this.returnToSelf()}>Stop mocking as {asUser}</Button>
           </Menu.Item>
           : null}
       </Menu>)
@@ -157,9 +160,16 @@ class NavigationBar extends Component {
 }
 
 NavigationBar.propTypes = {
-  translate: func.isRequired
+  translate: func.isRequired,
+  removeAsUser: func.isRequired,
+  asUser: oneOfType([null, string]).isRequired,
+  history: shape({
+    push: func.isRequired
+  }).isRequired
 }
 
+const mapStateToProps = ({ settings }) => ({
+  asUser: settings.asUser
+})
 
-export default connect()(NavigationBar)
-
+export default connect(mapStateToProps, { removeAsUser })(withRouter(NavigationBar))
