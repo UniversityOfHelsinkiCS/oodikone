@@ -60,7 +60,7 @@ class SearchForm extends Component {
     const { prefilled } = this.state
     const { preselectedCourse } = this.props
     if (prefilled !== preselectedCourse) {
-      this.handlePrefilledLoad()
+      this.handlePrefilledLoad(preselectedCourse)
     }
   }
 
@@ -118,8 +118,7 @@ class SearchForm extends Component {
     return Promise.resolve()
   }
 
-  handlePrefilledLoad = () => {
-    const { preselectedCourse } = this.props.preselectedCourse
+  handlePrefilledLoad = (preselectedCourse) => {
     this.setState(
       { prefilled: preselectedCourse },
       () => this.fetchCourses()
