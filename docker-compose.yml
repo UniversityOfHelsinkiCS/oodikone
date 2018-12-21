@@ -33,6 +33,7 @@ services:
     build:
       context: repos/oodikone2-backend
       dockerfile: dev.Dockerfile
+    command: sh -c "npm install && npm run dev"
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -54,6 +55,7 @@ services:
     build:
       context: repos/oodikone2-frontend
       dockerfile: dev.Dockerfile
+    command: sh -c "npm install && npm run docker"
     restart: unless-stopped
     ports:
       - "8081:8081"
