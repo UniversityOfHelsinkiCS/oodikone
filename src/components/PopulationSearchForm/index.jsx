@@ -66,7 +66,8 @@ class PopulationSearchForm extends Component {
     const { studyProgrammes, asUser } = this.props
 
     if (asUser != this.state.asUser || !studyProgrammes || studyProgrammes.length === 0) { // eslint-disable-line
-      this.setState({ asUser }) // doesn't work please fix
+      this.setState({ asUser })
+      this.props.getDegreesAndProgrammes()
     }
   }
 
