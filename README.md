@@ -36,7 +36,7 @@ The development environment is entirely configured in the docker-compose.yml fil
 - The databases used by the services
 - Adminer & other dev tools
 
-The mapping of ports and environment variables are also defined in the docker-compose file. You can start, stop and manage the development environment by running the following commands from a shell in this directory.
+The mapping of ports and environment variables are also defined in the docker-compose file. You can start, stop and manage the development environment by running the following commands from a terminal shell in this directory.
 
 ### Start the development environment
 ```
