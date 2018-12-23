@@ -1,5 +1,5 @@
 # oodikone2-cli
-Simple CLI tool for setting up the development environment for Oodikone. 
+Simple CLI tool for setting up the development environment for Oodikone. The entire development environment runs inside of a Docker network that's defined in the docker-compose.yml file. The specifics of what this means for setting up the environment and accessing logs is discussed in a later section.
 
 ## Prerequisites
 Install Docker CE on your machine:
@@ -24,12 +24,73 @@ bash run.sh
 - Builds and runs the Dockerized development environment
 - Gets a database dump from production servers
 - Creates the database schema and populates it with the dump
+- Adds git-hooks from the "hooks" -subdirectory to the repos
 
-## Individual commands
+## Docker commands
 
-This section contains more information about some of the commands used by the CLI.
+The development environment is entirely configured in the docker-compose.yml file located in this repository. The file defines the containers/environments for:
+- Frontend
+- Backend
+- Userservice
+- Oodilearn
+- The databases used by the services
+- Adminer & other dev tools
+
+The mapping of ports and environment variables are also defined in the docker-compose file. You can start, stop and manage the development environment by running the following commands from a shell in this directory.
+
+### Start the development environment
+```
+docker-compose up -d
+```
+
+### Stop the development environment
+```
+docker-compose down
+```
+
+### Restart container(s)
+
+```
+docker-compose restart          # all
+
+docker-compose restart backend  # just backend
+```
+
+### View the containers in the running environment
+```
+docker-compose ps
+```
+
+### View logs
+
+
+```
+docker-compose logs -f          # all
+
+docker-compose logs -f backend  # just backend
+```
+
+
+
+### Attach a terminal shell to a container
+```
+docker exec -it backend bash
+
+docker exec -it <container> <command>
+```
+
+### Use `psql` or other database CLI tools
+```
+docker exec -it -u postgres oodi_db psql -d tkt_oodi
+
+docker exec -it -u <username> <container> psql -d <db name>
+```
+
+## Other commands
 
 ### How to `scp` backup files from oodikone via melkki-proxy
+
+This is how the setup script fetches the database dump from production servers. It will require you to have access to both melkki.cs.helsinki.fi as well as oodikone.cs.helsinki.fi. The command uses `scp` to transfer all backup files recursively from a known location on the production server by using the melkki server as a proxy, allowing you to get the dump even when you're not connected to the university network.
 
 #### Command 
 ```
