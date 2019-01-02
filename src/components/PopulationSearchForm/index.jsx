@@ -44,16 +44,8 @@ class PopulationSearchForm extends Component {
   constructor() {
     super()
 
-    const INITIAL_QUERY = {
-      year: '2017',
-      semesters: ['FALL', 'SPRING'],
-      studentStatuses: [],
-      studyRights: [],
-      months: this.months('2017', 'FALL')
-    }
-
     this.state = {
-      query: INITIAL_QUERY,
+      query: this.initialQuery(),
       isLoading: false,
       showAdvancedSettings: false,
       validYear: true,
@@ -65,6 +57,7 @@ class PopulationSearchForm extends Component {
   componentDidMount() {
     const { studyProgrammes, asUser } = this.props
     if (asUser !== this.state.asUser || !studyProgrammes || studyProgrammes.length === 0) {
+      this.setState({ asUser: asUser, query: this.initialQuery() }) // eslint-disable-line
       this.props.getDegreesAndProgrammes()
     }
   }
@@ -77,7 +70,7 @@ class PopulationSearchForm extends Component {
       this.handleProgrammeChange(null, { value: Object.values(studyProgrammes)[0].code })
     }
     if (asUser !== this.state.asUser) {
-      this.setState({ asUser: asUser }) // eslint-disable-line
+      this.setState({ asUser: asUser, query: this.initialQuery() }) // eslint-disable-line
       this.props.getDegreesAndProgrammes()
     }
   }
@@ -271,6 +264,15 @@ class PopulationSearchForm extends Component {
 
   getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
 
+  initialQuery = () => ({
+    year: '2017',
+    semesters: ['FALL', 'SPRING'],
+    studentStatuses: [],
+    studyRights: [],
+    months: this.months('2017', 'FALL')
+  })
+
+
   renderableList = (list) => {
     const { language } = this.props
     return list.map((sp) => {
@@ -374,9 +376,9 @@ class PopulationSearchForm extends Component {
       </React.Fragment>)
     const isOldProgramme = programme => programme.length > 1 && Number(programme[0])
     if (studyRights.programme &&
-        isOldProgramme(studyRights.programme) &&
-        degreesToRender.length > 1 &&
-        studyTracksToRender.length > 1) {
+      isOldProgramme(studyRights.programme) &&
+      degreesToRender.length > 1 &&
+      studyTracksToRender.length > 1) {
       return (
         <Form.Group>
           <Form.Field width={8}>
