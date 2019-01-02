@@ -4,7 +4,8 @@ const initial = {
   language: 'fi',
   namesVisible: false,
   studentlistVisible: false,
-  chartHeight: 600
+  chartHeight: 600,
+  asUser: null
 }
 
 export const switchLanguage = (username, language) => {
