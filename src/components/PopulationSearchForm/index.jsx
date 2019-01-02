@@ -58,25 +58,27 @@ class PopulationSearchForm extends Component {
       showAdvancedSettings: false,
       validYear: true,
       floatMonths: this.months('2017', 'FALL'),
-      asUser: undefined
+      asUser: null
     }
   }
 
   componentDidMount() {
     const { studyProgrammes, asUser } = this.props
-
-    if (asUser != this.state.asUser || !studyProgrammes || studyProgrammes.length === 0) { // eslint-disable-line
-      this.setState({ asUser })
+    if (asUser !== this.state.asUser || !studyProgrammes || studyProgrammes.length === 0) {
       this.props.getDegreesAndProgrammes()
     }
   }
 
   componentDidUpdate() {
-    const { studyProgrammes } = this.props
+    const { studyProgrammes, asUser } = this.props
     if (studyProgrammes
       && Object.values(studyProgrammes).length === 1
       && !this.state.query.studyRights.programme) {
       this.handleProgrammeChange(null, { value: Object.values(studyProgrammes)[0].code })
+    }
+    if (asUser !== this.state.asUser) {
+      this.setState({ asUser: asUser }) // eslint-disable-line
+      this.props.getDegreesAndProgrammes()
     }
   }
 
@@ -126,7 +128,10 @@ class PopulationSearchForm extends Component {
         query: {
           ...query,
           year: reformatDate(year, YEAR_DATE_FORMAT),
-          months: this.months(reformatDate(year, YEAR_DATE_FORMAT), this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING')
+          months: this.months(
+            reformatDate(year, YEAR_DATE_FORMAT),
+            this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING'
+          )
         }
       })
     } else {
@@ -266,7 +271,6 @@ class PopulationSearchForm extends Component {
 
   getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
 
-
   renderableList = (list) => {
     const { language } = this.props
     return list.map((sp) => {
@@ -369,7 +373,10 @@ class PopulationSearchForm extends Component {
         />
       </React.Fragment>)
     const isOldProgramme = programme => programme.length > 1 && Number(programme[0])
-    if (studyRights.programme && isOldProgramme(studyRights.programme) && degreesToRender.length > 1 && studyTracksToRender.length > 1) {
+    if (studyRights.programme &&
+        isOldProgramme(studyRights.programme) &&
+        degreesToRender.length > 1 &&
+        studyTracksToRender.length > 1) {
       return (
         <Form.Group>
           <Form.Field width={8}>
@@ -414,7 +421,13 @@ class PopulationSearchForm extends Component {
       )
     }
     if (!studyProgrammes && !this.props.pending) {
-      return <Message error color="red" header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi" />
+      return (
+        <Message
+          error
+          color="red"
+          header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi"
+        />
+      )
     }
 
     let sortedStudyProgrammes = studyProgrammes
@@ -425,13 +438,15 @@ class PopulationSearchForm extends Component {
     }
     let degreesToRender
     if (studyRights.programme) {
-      const sortedStudyDegrees = _.sortBy(studyProgrammes[studyRights.programme].associations['10'], s => s.name[language])
+      const sortedStudyDegrees =
+        _.sortBy(studyProgrammes[studyRights.programme].associations['10'], s => s.name[language])
       degreesToRender = this.renderableList(sortedStudyDegrees)
     }
 
     let studyTracksToRender
     if (studyRights.programme) {
-      const sortedStudyTracks = _.sortBy(studyProgrammes[studyRights.programme].associations['30'], s => s.name[language])
+      const sortedStudyTracks =
+        _.sortBy(studyProgrammes[studyRights.programme].associations['30'], s => s.name[language])
       studyTracksToRender = this.renderableList(sortedStudyTracks)
     }
     return (
