@@ -61,7 +61,12 @@ class NavigationBar extends Component {
     if (process.env.NODE_ENV === 'development') {
       const testUsers = ['tktl']
       return (
-        <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls" tabIndex="-1">
+        <Menu.Item
+          as={Dropdown}
+          style={{ backgroundColor: 'purple', color: 'white' }}
+          text="Dev controls"
+          tabIndex="-1"
+        >
           <Dropdown.Menu>
             <Dropdown.Item
               as={NavLink}
