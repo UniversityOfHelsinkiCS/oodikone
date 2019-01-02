@@ -271,16 +271,6 @@ class PopulationSearchForm extends Component {
 
   getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
 
-  initialQuery() {
-    return {
-      year: '2017',
-      semesters: ['FALL', 'SPRING'],
-      studentStatuses: [],
-      studyRights: [],
-      months: this.months('2017', 'FALL')
-    }
-  }
-
   renderableList = (list) => {
     const { language } = this.props
     return list.map((sp) => {
