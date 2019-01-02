@@ -45,8 +45,8 @@ class NavigationBar extends Component {
   }
 
   returnToSelf = () => async () => {
-    this.props.removeAsUser()
     await returnToSelf()
+    this.props.removeAsUser()
     await this.setNavigationRoutes()
     this.render()
     this.props.history.push('/')
