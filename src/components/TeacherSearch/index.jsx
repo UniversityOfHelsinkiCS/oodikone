@@ -7,7 +7,7 @@ import styles from './teacherSearch.css'
 import sharedStyles from '../../styles/shared'
 import Timeout from '../Timeout'
 import { findTeachers } from '../../redux/teachers'
-import SortableTable from '../CourseStatistics/SortableTable'
+import SortableTable from '../SortableTable'
 
 const DEFAULT_STATE = {
   searchterm: '',

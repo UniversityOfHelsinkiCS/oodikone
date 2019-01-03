@@ -1,7 +1,7 @@
 import React from 'react'
 import { Header } from 'semantic-ui-react'
 import { shape, string, number, oneOfType, arrayOf } from 'prop-types'
-import SortableTable from '../../../SortableTable'
+import SortableTable from '../../../../SortableTable'
 
 const CumulativeTable = ({ stats, name }) => (
   <div>

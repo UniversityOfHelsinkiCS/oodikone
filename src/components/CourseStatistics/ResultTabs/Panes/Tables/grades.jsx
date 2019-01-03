@@ -1,7 +1,7 @@
 import React from 'react'
 import { arrayOf, number, oneOfType, shape, string } from 'prop-types'
 import { Header } from 'semantic-ui-react'
-import SortableTable from '../../../SortableTable'
+import SortableTable from '../../../../SortableTable'
 import { getGradeSpread, getThesisGradeSpread, isThesisGrades, THESIS_GRADE_KEYS } from '../util'
 
 const getSortableColumn = (key, title, getRowVal, getRowContent) => (

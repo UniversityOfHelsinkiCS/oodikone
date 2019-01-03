@@ -6,7 +6,7 @@ import { Search, Segment, Icon } from 'semantic-ui-react'
 
 import { findStudents, getStudent, selectStudent } from '../../redux/students'
 import SegmentDimmer from '../SegmentDimmer'
-import SortableTable from '../CourseStatistics/SortableTable'
+import SortableTable from '../SortableTable'
 import Timeout from '../Timeout'
 import { makeFormatStudentRows } from '../../selectors/students'
 
