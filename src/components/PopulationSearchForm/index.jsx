@@ -11,6 +11,7 @@ import moment from 'moment'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
+import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 import { transferTo } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
@@ -29,6 +30,7 @@ class PopulationSearchForm extends Component {
     getDegreesAndProgrammes: func.isRequired,
     getPopulationStatistics: func.isRequired,
     getPopulationCourses: func.isRequired,
+    getMandatoryCourses: func.isRequired,
     getPopulationFilters: func.isRequired,
     setPopulationFilter: func.isRequired,
     clearPopulations: func.isRequired,
@@ -94,7 +96,6 @@ class PopulationSearchForm extends Component {
     const { query } = this.state
     let queryCodes = []
     queryCodes = [...Object.values(query.studyRights)]
-
     const backendQuery = { ...query, studyRights: queryCodes }
     const uuid = uuidv4()
     const request = { ...backendQuery, uuid }
@@ -103,7 +104,8 @@ class PopulationSearchForm extends Component {
     Promise.all([
       this.props.getPopulationStatistics(request),
       this.props.getPopulationCourses(request),
-      this.props.getPopulationFilters(request)
+      this.props.getPopulationFilters(request),
+      this.props.getMandatoryCourses(query.studyRights.programme)
     ]).then(() => {
       if (queryCodes[0] === 'KH50_001') {
         this.props.setPopulationFilter(transferTo(false))
@@ -608,6 +610,7 @@ const mapDispatchToProps = dispatch => ({
   getPopulationStatistics: request => dispatch(getPopulationStatistics(request)),
   getPopulationCourses: request => dispatch(getPopulationCourses(request)),
   getPopulationFilters: request => dispatch(getPopulationFilters(request)),
+  getMandatoryCourses: id => dispatch(getMandatoryCourses(id)),
   setPopulationFilter: filter => dispatch(setPopulationFilter(filter)),
   getDegreesAndProgrammes: () => dispatch(getDegreesAndProgrammes()),
   clearPopulations: () => dispatch(clearPopulations()),

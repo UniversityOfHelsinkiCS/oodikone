@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Table, Button, Icon, Popup } from 'semantic-ui-react'
+import { Header, Segment, Button, Icon, Popup } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import { getStudentTotalCredits, copyToClipboard } from '../../common'
 
@@ -9,6 +9,7 @@ import { toggleStudentListVisibility } from '../../redux/settings'
 
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 import styles from '../PopulationCourseStats/populationCourseStats.css'
+import SortableTable from '../SortableTable'
 
 const popupTimeoutLength = 1000
 
@@ -39,11 +40,6 @@ class PopulationStudents extends Component {
       return obj
     }, {})
 
-    const byName = (s1, s2) =>
-      (students[s1].lastname < students[s2].lastname ? -1 : 1)
-
-    const creditsSinceStart = studentNumber => getStudentTotalCredits(students[studentNumber])
-
     const pushToHistoryFn = studentNumber => this.props.history.push(`/students/${studentNumber}`)
 
     const copyToClipboardAll = () => {
@@ -55,116 +51,84 @@ class PopulationStudents extends Component {
 
     const transferFrom = s => (s.previousRights[0].element_detail.name[this.props.language])
 
+    const columns = []
+    if (this.props.showNames) {
+      columns.push(
+        { key: 'lastname', title: 'last name', getRowVal: s => s.lastname },
+        { key: 'firstname', title: 'first names', getRowVal: s => s.firstnames }
+      )
+    }
+    columns.push(
+      { key: 'studentnumber', title: 'student number', getRowVal: s => s.studentNumber, headerProps: { colSpan: 2 } },
+      { key: 'icon', getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />), cellProps: { collapsing: true, className: styles.iconCell } },
+      { key: 'credits since start', title: 'credits since start', getRowVal: getStudentTotalCredits },
+      { key: 'all credits', title: 'all credits', getRowVal: s => s.credits },
+      { key: 'transferred from', title: 'transferred from', getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '') }
+    )
+    if (this.props.showNames) {
+      columns.push(
+        {
+          key: 'email',
+          title: (
+            <Fragment>
+              email
+              <Popup
+                trigger={
+                  <Icon
+                    link
+                    name="copy"
+                    onClick={copyToClipboardAll}
+                    style={{ float: 'right' }}
+                  />}
+                content="Copied email list!"
+                on="click"
+                open={this.state['0']}
+                onClose={() => this.handlePopupClose('0')}
+                onOpen={() => this.handlePopupOpen('0')}
+                position="top right"
+              />
+            </Fragment>
+          ),
+          getRowVal: s => s.email,
+          headerProps: { colSpan: 2 }
+        },
+        {
+          key: 'copy email',
+          getRowVal: s => (
+            s.email
+              ? <Popup
+                trigger={
+                  <Icon
+                    link
+                    name="copy outline"
+                    onClick={() => copyToClipboard(s.email)}
+                    style={{ float: 'right' }}
+                  />}
+                content="Email copied!"
+                on="click"
+                open={this.state[s.studentNumber]}
+                onClose={() => this.handlePopupClose(s.studentNumber)}
+                onOpen={() => this.handlePopupOpen(s.studentNumber)}
+                position="top right"
+              />
+              : null
+          ),
+          headerProps: { onClick: null, sorted: null },
+          cellProps: { collapsing: true, className: styles.iconCell }
+        }
+      )
+    }
+
     return (
-      <div>
+      <Fragment>
         <StudentNameVisibilityToggle />
-        <Table celled>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell colSpan={2}>
-                student number
-              </Table.HeaderCell>
-              {this.props.showNames ? (
-                <Table.HeaderCell>
-                  last name
-                </Table.HeaderCell>
-              ) : null}
-              {this.props.showNames ? (
-                <Table.HeaderCell>
-                  first names
-                </Table.HeaderCell>
-              ) : null}
-              <Table.HeaderCell>
-                credits since start
-              </Table.HeaderCell>
-              <Table.HeaderCell>
-                all credits
-              </Table.HeaderCell>
-              <Table.HeaderCell>
-                transferred from
-              </Table.HeaderCell>
-              {this.props.showNames ? (
-                <Table.HeaderCell>
-                  email
-                  <Popup
-                    trigger={
-                      <Icon
-                        link
-                        name="copy"
-                        onClick={copyToClipboardAll}
-                        style={{ float: 'right' }}
-                      />}
-                    content="Copied email list!"
-                    on="click"
-                    open={this.state['0']}
-                    onClose={() => this.handlePopupClose('0')}
-                    onOpen={() => this.handlePopupOpen('0')}
-                    position="top right"
-                  />
-                </Table.HeaderCell>
-              ) : null}
-
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {this.props.selectedStudents.sort(byName).map(studentNumber => (
-              <Table.Row key={studentNumber} >
-                <Table.Cell>
-                  {studentNumber}
-                </Table.Cell>
-                <Table.Cell
-                  icon="level up alternate"
-                  onClick={() => pushToHistoryFn(studentNumber)}
-                  className={styles.iconCell}
-                  collapsing
-                />
-                {this.props.showNames ? (
-                  <Table.Cell>
-                    {students[studentNumber].lastname}
-                  </Table.Cell>
-                ) : null}
-                {this.props.showNames ? (
-                  <Table.Cell>
-                    {students[studentNumber].firstnames}
-                  </Table.Cell>
-                ) : null}
-                <Table.Cell>
-                  {creditsSinceStart(studentNumber)}
-                </Table.Cell>
-                <Table.Cell>
-                  {students[studentNumber].credits}
-                </Table.Cell>
-                <Table.Cell>
-                  {students[studentNumber].transferredStudyright ? transferFrom(students[studentNumber]) : ''}
-                </Table.Cell>
-                {this.props.showNames ? (
-                  <Table.Cell>
-                    {students[studentNumber].email}
-                    {students[studentNumber].email
-                      ? <Popup
-                        trigger={
-                          <Icon
-                            link
-                            name="copy outline"
-                            onClick={() => copyToClipboard(students[studentNumber].email)}
-                            style={{ float: 'right' }}
-                          />}
-                        content="Email copied!"
-                        on="click"
-                        open={this.state[studentNumber]}
-                        onClose={() => this.handlePopupClose(studentNumber)}
-                        onOpen={() => this.handlePopupOpen(studentNumber)}
-                        position="top right"
-                      />
-                      : null}
-                  </Table.Cell>
-                ) : null}
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      </div>
-
+        <SortableTable
+          getRowKey={s => s.studentNumber}
+          tableProps={{ celled: true }}
+          columns={columns}
+          data={this.props.selectedStudents.map(sn => students[sn])}
+        />
+      </Fragment>
     )
   }
 
