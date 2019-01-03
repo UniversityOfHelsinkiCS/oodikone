@@ -22,6 +22,9 @@ class TeacherSearch extends Component {
     }
 
     fetchTeachers = (searchterm) => {
+      if (searchterm.length <= 3 || (Number(searchterm) && searchterm.length < 6)) {
+        return
+      }
       this.props.setTimeout('fetch', () => {
       }, 250)
       this.props.findTeachers(searchterm).then(() => {
