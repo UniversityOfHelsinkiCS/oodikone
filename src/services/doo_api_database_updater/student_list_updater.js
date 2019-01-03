@@ -55,7 +55,7 @@ async function run() {
   const maxStudentNumber = process.env.STUDENTS_TO || minStudentNumber + incremet || 1500000
   const step = process.env.STEP || 500
   const range = maxStudentNumber - minStudentNumber
-  logger.info('student numbers form ' + minStudentNumber + ' to ' + maxStudentNumber + ' total of ' + range + ' student numbers')
+  logger.info('student numbers from ' + minStudentNumber + ' to ' + maxStudentNumber + ' total of ' + range + ' student numbers')
   logger.info('log message every ' + step + ' student')
   for (let i = minStudentNumber; i < maxStudentNumber; i++) {
     let studentNumber = '0' + i + util.getStudentNumberChecksum(String(i))
