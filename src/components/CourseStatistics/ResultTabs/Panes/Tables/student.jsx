@@ -1,7 +1,7 @@
 import React from 'react'
 import { Header } from 'semantic-ui-react'
 import { shape, string, number, oneOfType, arrayOf } from 'prop-types'
-import SortableTable from '../../../SortableTable'
+import SortableTable from '../../../../SortableTable'
 
 const formatPercentage = p => `${p.toFixed(2) * 100} %`
 
