@@ -92,14 +92,14 @@ class StudentSearch extends Component {
     const columns = [
       { key: 'studentnumber', title: translate('common.studentNumber'), getRowVal: s => s.studentNumber, headerProps: { onClick: null, sorted: null } },
       { key: 'started', title: translate('common.started'), getRowVal: s => s.started, headerProps: { onClick: null, sorted: null } },
-      { key: 'credits', title: translate('common.credits'), getRowVal: s => s.credits, headerProps: { onClick: null, sorted: null } }
+      { key: 'credits', title: translate('common.credits'), getRowVal: s => s.credits, headerProps: { onClick: null, sorted: null, colSpan: showNames ? 1 : 2 } }
     ]
 
     if (showNames) {
       columns.push({ key: 'lastnames', title: 'last names', getRowVal: s => s.lastname, headerProps: { onClick: null, sorted: null } })
-      columns.push({ key: 'firstnames', title: 'first names', getRowVal: s => s.firstnames, headerProps: { onClick: null, sorted: null } })
+      columns.push({ key: 'firstnames', title: 'first names', getRowVal: s => s.firstnames, headerProps: { onClick: null, sorted: null, colSpan: showNames ? 2 : 1 } })
     }
-    columns.push({ key: 'icon', title: '', getRowVal: () => (<Icon name="level up alternate" />), cellProps: { collapsing: true }, headerProps: { onClick: null, sorted: null } })
+    columns.push({ key: 'icon', getRowVal: () => (<Icon name="level up alternate" />), cellProps: { collapsing: true }, headerProps: { onClick: null, sorted: null } })
 
     return (
       <SortableTable
