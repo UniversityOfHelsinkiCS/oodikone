@@ -155,43 +155,40 @@ or
 
 `docker exec -it -u postgres db_staging psql -d tkt_oodi_staging`
 
-To create a dump of the production db, run: 
+Production db backups are taken daily 
+
+To create a dump of the production db manually, run: 
 
 ``docker exec -u postgres db pg_dump tkt_oodi > `date +%Y-%m-%d`.bak``
 
 ## Updater
 
-Oodikone2-backend includes the update-script that fetches student data from WebOodi. Script is split on two parts.
+Oodikone2-backend includes the update-script that fetches student data from WebOodi. Script is split on two parts. Both production and staging environments have separate updater set up, in directories /oodikone.cs.helsinki.fi/updater and /oodikone.cs.helsinki.fi/staging/updater respectively. Both of updater directories have README file with summary of commands. Container names are production_updater and staging_updater, replace in examples below CONTAINER_NAME with correct one. Both containers have updater_files-directory that is mounted within container to /updater_files.
+
+Updater uses respective backend-image (production or staging, respectively).
 
 ### Student list updater
 
 Finds out the valid student nubers. 
 
-Is located in _/home/tkt_oodi/oodikone.cs.helsinki.fi/student_number_updater_ and run with _ update_student_list.sh_
+Run in updater directory with _update_student_list.sh_
 
-Script is run at background, see _debug.log_ to find out when it is finished.
+Updater is run in separate detached container, see graylog or _debug.log_ to find out when it is finished.
 
-Environment variable _INCREMENT_ controls how many new student numbers are searched (from the currently konown greatest student number).
+Environment variable _INCREMENT_ (currently not set) controls how many new student numbers are searched (from the currently known greatest student number).
 
 At the moment script uses the local postgres (see .env) to save student numbers.
 
-Use _node src/services/doo_api_database_updater/student_list_updater.js filename.txt_ to save student numbers in textfile. 
-
-_/home/tkt_oodi/oodikone.cs.helsinki.fi/student_number_updater_ is acually the backend code as a cloned git repo. If you modify the updater source, remember to pull the repo.
+Use _docker-compose run -d CONTAINER_NAME node src/services/doo_api_database_updater/student_list_updater.js /updater_files/all_student_numbers.txt_ to save student numbers in textfile. 
 
 ### Student info updater (database updater)
 
-To update your database run `npm run update_database` with optional args `file="<filename>"` and `index=<number>` with former telling the studentnumber filename to update and latter telling which row to start from.
+To update your database run `docker-compose run -d CONTAINER_NAME npm run update_database` with optional args `file="<filename>"` and `index=<number>` with former telling the studentnumber filename to update and latter telling which row to start from.
 
-Use the following to run in detached shell
-
-```
-nohup docker exec backend npm run update_database file="/data/all_student_numbers.txt" &
-```
 
 ### Anonymize data
 
-Run `npm run anonymize` for studentnumbers provided in `studentnumbers.txt` file in root directory. 
+Run `npm run anonymize` for studentnumbers provided in `studentnumbers.txt` file in root directory. This would be broken with current container setup, due hardcoding file location, but testing has not been updated for this.
 
 Anonymizer will create an `anonymized_API` folder structure which can be used as an alternative to Oodi API and a `studentnumbersN.txt` text file containing new anonymized students studentnumbers.
 
@@ -205,8 +202,8 @@ The statistics for the teacher leader board have to be calculated separately wit
 
 ```
 # Update top teachers for academic years 50 (1999-20) through 70 (2018-19).
-npm run update_top_teachers from=50 to=70
+docker-compose run -d CONTAINER_NAME npm run update_top_teachers from=50 to=70
 
 # Omit the to–argument to update teachers just for a single academic year. 
-npm run update_top_teachers from=50
+docker-compose run -d CONTAINER_NAME npm run update_top_teachers from=50
 ```
