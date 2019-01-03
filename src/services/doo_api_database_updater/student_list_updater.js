@@ -51,8 +51,8 @@ async function run() {
     Number((cached.student_numbers.sort().reverse()[0]/10).toFixed(0))
                                         
   const minStudentNumber = (cached) ? oldMax() : 1010000
-  const incremet = Number(process.env.INCREMENT) || 10000
-  const maxStudentNumber = process.env.STUDENTS_TO || minStudentNumber + incremet || 1500000
+  const numberOfStudents = Number(process.env.INCREMENT) || 10000
+  const maxStudentNumber = process.env.STUDENTS_TO || minStudentNumber + numberOfStudents || 1500000
   const step = process.env.STEP || 500
   const range = maxStudentNumber - minStudentNumber
   logger.info('student numbers from ' + minStudentNumber + ' to ' + maxStudentNumber + ' total of ' + range + ' student numbers')
