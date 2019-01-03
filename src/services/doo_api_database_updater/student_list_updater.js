@@ -61,7 +61,7 @@ async function run() {
     let studentNumber = '0' + i + util.getStudentNumberChecksum(String(i))
     if (i % step === 1) {
       const iteration = (1 + (i - minStudentNumber) / step).toFixed()
-      logger.info(iteration + '/' + (range / step + 1).toFixed(0)  + ' ' + timestamp())
+      logger.info('student list updater: ' + iteration + '/' + (range / step + 1).toFixed(0)  + ' ' + timestamp())
     }
     
     const response = await requestStudent(studentNumber)
