@@ -7,6 +7,7 @@ import uuidv4 from 'uuid/v4'
 
 import { getTranslate } from 'react-localize-redux'
 import CreditsLessThan from './CreditsLessThan'
+import CreditsLessThanFromMandatory from './CreditsLessThanFromMandatory'
 import CreditsAtLeast from './CreditsAtLeast'
 import StartingThisSemester from './StartingThisSemester'
 import CourseParticipation from './CourseParticipation'
@@ -28,6 +29,7 @@ import { presetFilter, getFilterFunction } from '../../populationFilters'
 const componentFor = {
   CreditsAtLeast,
   CreditsLessThan,
+  CreditsLessThanFromMandatory,
   StartingThisSemester,
   CourseParticipationNTimes,
   DisciplineTypes,

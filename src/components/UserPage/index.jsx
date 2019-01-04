@@ -129,7 +129,14 @@ class UserPage extends Component {
         {elementdetails.sort(byCode).map(element => (
           <List.Item key={element.code}>
             <List.Content floated="right">
-              <Button basic negative floated="right" onClick={this.removeAccess(user.id, element.code)} content="Remove" size="tiny" />
+              <Button
+                basic
+                negative
+                floated="right"
+                onClick={this.removeAccess(user.id, element.code)}
+                content="Remove"
+                size="tiny"
+              />
             </List.Content>
             <List.Content>
               {element.type === 30 ? <Icon name="minus" /> : null} {`${nameInLanguage(element)} (${element.code})`}
@@ -167,7 +174,14 @@ class UserPage extends Component {
           <Card fluid>
             <Card.Content>
               <Card.Header>
-                <Image onClick={this.handleCoronation(user)} src={user.czar ? 'https://i.pinimg.com/originals/06/7a/20/067a20e4ae1edcee790601ce9b9927df.jpg' : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6uJPJLxePjb5u1omdG2kOLfE0BwNjvvJ9accK922xSVwKlR8_'} avatar />
+                <Image
+                  onClick={this.handleCoronation(user)}
+                  src={user.czar ?
+                    'https://i.pinimg.com/originals/06/7a/20/067a20e4ae1edcee790601ce9b9927df.jpg' :
+                    `https://encrypted-tbn0.gstatic.com/
+                      images?q=tbn:ANd9GcS6uJPJLxePjb5u1omdG2kOLfE0BwNjvvJ9accK922xSVwKlR8_`}
+                  avatar
+                />
                 {user.full_name}
               </Card.Header>
               <Card.Meta content={user.czar ? `tsaari ${user.username}` : `${user.username}`} />
@@ -219,7 +233,13 @@ class UserPage extends Component {
                       multiple
                       selection
                     />
-                    <Button size="small" style={{ marginTop: '18px' }} onClick={() => this.selectAll()}>Select all specializations</Button>
+                    <Button
+                      size="small"
+                      style={{ marginTop: '18px' }}
+                      onClick={() => this.selectAll()}
+                    >
+                      Select all specializations
+                    </Button>
                   </Form.Group>
                   <Button
                     basic
