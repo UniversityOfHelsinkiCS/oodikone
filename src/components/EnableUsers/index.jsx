@@ -10,7 +10,7 @@ import { makeSortUsers } from '../../selectors/users'
 import { copyToClipboard } from '../../common'
 import sharedStyles from '../../styles/shared'
 import UserPageNew from '../UserPage'
-import SortableTable from '../CourseStatistics/SortableTable'
+import SortableTable from '../SortableTable'
 
 class EnableUsers extends Component {
   state = {

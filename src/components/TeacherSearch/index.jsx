@@ -7,7 +7,7 @@ import styles from './teacherSearch.css'
 import sharedStyles from '../../styles/shared'
 import Timeout from '../Timeout'
 import { findTeachers } from '../../redux/teachers'
-import SortableTable from '../CourseStatistics/SortableTable'
+import SortableTable from '../SortableTable'
 
 const DEFAULT_STATE = {
   searchterm: '',
@@ -49,8 +49,8 @@ class TeacherSearch extends Component {
       const columns = [
         { key: 'teacherid', title: 'Teacher ID', getRowVal: s => s.id, headerProps: { onClick: null, sorted: null } },
         { key: 'username', title: 'Username', getRowVal: s => s.code, headerProps: { onClick: null, sorted: null } },
-        { key: 'name', title: 'Name', getRowVal: s => s.name, headerProps: { onClick: null, sorted: null } },
-        { key: 'icon', title: '', getRowVal: () => (<Icon name="level up alternate" />), cellProps: { collapsing: true }, headerProps: { onClick: null, sorted: null } }
+        { key: 'name', title: 'Name', getRowVal: s => s.name, headerProps: { onClick: null, sorted: null, colSpan: 2 } },
+        { key: 'icon', getRowVal: () => (<Icon name="level up alternate" />), cellProps: { collapsing: true }, headerProps: { onClick: null, sorted: null } }
       ]
 
       return (
