@@ -2,7 +2,7 @@ const { bottlenecksOf, optimizedStatisticsOf } = require('./populations')
 
 const moment = require('moment')
 
-const run2 = async () => {
+const run2 = async () => { // eslint-disable-line
   const o = {
     semesters: ['FALL', 'SPRING'],
     year: 2017, // 2015
@@ -20,7 +20,7 @@ const run2 = async () => {
 }
 
 
-const run1 = async () => {
+const run1 = async () => { // eslint-disable-line
   const o = {
     semesters: ['FALL', 'SPRING'],
     year: 2018, // 2015
@@ -33,7 +33,7 @@ const run1 = async () => {
   const start = moment('2018-07-31')
 
   a.students.forEach(s1 => {
-    if (true || s1.studentNumber === '014612688') {
+    if (true || s1.studentNumber === '014612688') { // eslint-disable-line
 
       const studyright = s1.studyrights.find(s => s.studyrightElements.map(d => d.element_detail.code).includes('KH50_001'))
 
