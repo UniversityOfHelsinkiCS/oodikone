@@ -130,6 +130,13 @@ export const removeInvalidCreditsFromStudents = students =>
 export const getStudentTotalCredits = student => student.courses
   .filter(c => c.passed && !c.isStudyModuleCredit).reduce((a, b) => a + b.credits, 0)
 
+export const getStudentTotalCreditsFromMandatory = (student, mandatoryCourses) => student.courses
+  .filter(c =>
+    c.passed &&
+    !c.isStudyModuleCredit &&
+    mandatoryCourses.includes(c.course.code))
+  .reduce((a, b) => a + b.credits, 0)
+
 export const getTotalCreditsFromCourses = courses =>
   courses.filter(c => c.passed && !c.isStudyModuleCredit).reduce((a, b) => a + b.credits, 0)
 
