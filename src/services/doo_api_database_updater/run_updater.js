@@ -85,6 +85,7 @@ const run = async (studentnumbersfile = 'studentnumbers.txt', index = 0, basiclo
   basiclogging = args.basiclogging || basiclogging
 
   studentnumbersfile = args.file || studentnumbersfile
+  logger.info('Student number source is: ' + studentnumbersfile)
   const readStudentnumbers = await readStudentNumbersFromFile(studentnumbersfile)
   const studentnumbers = readStudentnumbers.slice(index)
 
@@ -102,7 +103,7 @@ const run = async (studentnumbersfile = 'studentnumbers.txt', index = 0, basiclo
     exitcode = 1
   }
   const ended = new Date()
-  logger.verbose(`Running script started/ended: \n${started} \n${ended}`)
+  logger.verbose(`Updater started/ended: \n${started} \n${ended}`)
   process.exit(exitcode)
 }
 

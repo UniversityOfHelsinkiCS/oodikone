@@ -40,7 +40,6 @@ const sendEmail = async (uid) => {
 router.post('/login', async (req, res) => {
   try {
     const uid = req.headers['uid']
-    const asUser = req.headers['asuser']
     if (req.headers['shib-session-id'] && uid) {
       let user = await userService.byUsername(uid)
 
@@ -55,7 +54,10 @@ router.post('/login', async (req, res) => {
       }
       generateToken(uid, res)
     } else {
-      res.status(401).json({ message: `Not enough headers login, uid: ${req.headers.uid} session-id ${req.headers['shib-session-id']}` }).end()
+      res.status(401).json({
+        message: `Not enough headers login, uid: ${req.headers.uid} 
+        session-id ${req.headers['shib-session-id']}`
+      }).end()
     }
   } catch (err) {
     console.log(err)
@@ -75,7 +77,10 @@ router.post('/superlogin/:uid', async (req, res) => {
         res.status(401).json({ message: 'Not admin' }).end()
       }
     } else {
-      res.status(401).json({ message: `Not enough headers login, uid: ${req.headers.uid} session-id ${req.headers['shib-session-id']}` }).end()
+      res.status(401).json({
+        message: `Not enough headers login, uid: 
+        ${req.headers.uid} session-id ${req.headers['shib-session-id']}`
+      }).end()
     }
   } catch (err) {
     console.log(err)
