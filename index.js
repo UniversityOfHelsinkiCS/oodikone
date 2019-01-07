@@ -48,6 +48,22 @@ app.post('/user', async (req, res) => {
 
   res.json(user)
 })
+app.post('/login', async (req, res) => {
+  const { uid, full_name, email } = req.body
+
+  const { token, isNew } = await User.login(uid, full_name, email)
+  res.status(200).json({ token, isNew })
+})
+
+app.post('/superlogin', async (req, res) => {
+  const { uid, asUser  } = req.body
+
+  const token = await User.superlogin(uid, asUser)
+  if (token) {
+    res.status(200).json(token)
+  }
+  res.status(403)
+})
 
 app.put('/user/:uid', async (req, res) => {
   const uid = req.params.uid
