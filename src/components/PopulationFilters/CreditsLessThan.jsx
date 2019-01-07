@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Input, Button, Form, Popup } from 'semantic-ui-react'
-import { shape, func, string } from 'prop-types'
+import { shape, func } from 'prop-types'
 
 import infoTooltips from '../../common/infotooltips'
 import { creditsLessThan } from '../../populationFilters'
@@ -11,8 +11,7 @@ class CreditsLessThan extends Component {
   static propTypes = {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
-    setPopulationFilter: func.isRequired,
-    language: string.isRequired
+    setPopulationFilter: func.isRequired
   }
 
   state = {
@@ -39,7 +38,10 @@ class CreditsLessThan extends Component {
       return (
         <Segment>
           <Form>
-            <Popup content={infoTooltips.PopulationStatistics.Filters.CreditsLessThan[this.props.language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
+            <Popup
+              content={infoTooltips.PopulationStatistics.Filters.CreditsLessThan}
+              trigger={<Icon style={{ float: 'right' }} name="info" />}
+            />
             <Form.Group inline>
               <Form.Field>
                 <label>Show only students with credits less than</label>
@@ -76,9 +78,11 @@ class CreditsLessThan extends Component {
     )
   }
 }
+
 const mapStateToProps = ({ settings }) => ({
   language: settings.language
 })
+
 export default connect(
   mapStateToProps,
   { setPopulationFilter, removePopulationFilter }

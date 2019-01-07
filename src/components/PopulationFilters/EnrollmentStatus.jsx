@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
-import { shape, func, object, arrayOf, string } from 'prop-types'
+import { shape, func, object, arrayOf } from 'prop-types'
 import moment from 'moment'
 import _ from 'lodash'
 
@@ -14,8 +14,7 @@ class EnrollmentStatus extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    samples: arrayOf(object).isRequired,
-    language: string.isRequired
+    samples: arrayOf(object).isRequired
   }
 
   state = {
@@ -61,14 +60,16 @@ class EnrollmentStatus extends Component {
     this.props.removePopulationFilter(this.props.filter.id)
   }
 
-
   render() {
     const { filter } = this.props
     if (filter.notSet) {
       return (
         <Segment>
           <Form>
-            <Popup content={infoTooltips.PopulationStatistics.Filters.EnrollmentStatus[this.props.language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
+            <Popup
+              content={infoTooltips.PopulationStatistics.Filters.EnrollmentStatus}
+              trigger={<Icon style={{ float: 'right' }} name="info" />}
+            />
             <Form.Group inline>
               <Form.Field>
                 <label>Select students that were </label>
@@ -111,7 +112,11 @@ class EnrollmentStatus extends Component {
 
     return (
       <Segment>
-        Students that were {filter.params.enrolled === 1 ? 'present' : 'absent'} during {filter.params.semesters.map(semester => this.formatSemesterCodeToText(semester)).join(', ')}
+        Students that were {filter.params.enrolled === 1 ?
+          'present' :
+          'absent'} during {
+            filter.params.semesters.map(semester => this.formatSemesterCodeToText(semester)).join(', ')
+          }
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
@@ -119,11 +124,8 @@ class EnrollmentStatus extends Component {
     )
   }
 }
-const mapStateToProps = ({ settings }) => ({
-  language: settings.language
-})
 
 export default connect(
-  mapStateToProps,
+  null,
   { setPopulationFilter, removePopulationFilter }
 )(EnrollmentStatus)

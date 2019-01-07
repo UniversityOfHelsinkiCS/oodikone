@@ -11,8 +11,7 @@ class CanceledStudyright extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    studyrights: arrayOf(string).isRequired,
-    language: string.isRequired
+    studyrights: arrayOf(string).isRequired
   }
 
   state = {
@@ -37,12 +36,12 @@ class CanceledStudyright extends Component {
   }
 
   render() {
-    const { filter, language } = this.props
+    const { filter } = this.props
     if (filter.notSet) {
       return (
         <Segment>
           <Form>
-            <Popup content={infoTooltips.PopulationStatistics.Filters.CanceledStudyright[language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
+            <Popup content={infoTooltips.PopulationStatistics.Filters.CanceledStudyright} trigger={<Icon style={{ float: 'right' }} name="info" />} />
 
             <Form.Group inline>
               <Form.Field>
@@ -76,7 +75,10 @@ class CanceledStudyright extends Component {
 
     return (
       <Segment>
-        {filter.params.cancel === 'true' ? 'Showing students that have canceled this studyright' : <span><b>Excluded</b> students whose studyright is cancelled</span>}
+        {filter.params.cancel === 'true' ?
+          'Showing students that have canceled this studyright' :
+          <span><b>Excluded</b> students whose studyright is cancelled</span>
+        }
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
@@ -84,11 +86,10 @@ class CanceledStudyright extends Component {
     )
   }
 }
-const mapStateToProps = ({ populations, settings }) => ({
-  studyrights: populations.query.studyRights,
-  language: settings.language
-})
 
+const mapStateToProps = ({ populations }) => ({
+  studyrights: populations.query.studyRights
+})
 
 export default connect(
   mapStateToProps,

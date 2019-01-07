@@ -25,7 +25,6 @@ import {
 } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
 
-
 const componentFor = {
   CreditsAtLeast,
   CreditsLessThan,
@@ -134,7 +133,6 @@ class PopulationFilters extends Component {
     this.props.clearPopulationFilters()
     this.props.setPopulationFilter(presetFilter(preset))
   }
-
 
   updateFilterList(filtersToCreate) {
     // sorry for the uglyness but it kinda works (I think)

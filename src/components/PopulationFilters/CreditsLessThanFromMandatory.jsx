@@ -12,7 +12,6 @@ class CreditsLessThanFromMandatory extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    language: string.isRequired,
     courses: arrayOf(string).isRequired
   }
 
@@ -45,7 +44,7 @@ class CreditsLessThanFromMandatory extends Component {
         <Segment>
           <Form>
             <Popup
-              content={infoTooltips.PopulationStatistics.Filters.CreditsLessThanFromMandatory[this.props.language]}
+              content={infoTooltips.PopulationStatistics.Filters.CreditsLessThanFromMandatory}
               trigger={<Icon style={{ float: 'right' }} name="info" />}
             />
             <Form.Group inline>
@@ -70,8 +69,6 @@ class CreditsLessThanFromMandatory extends Component {
                   set filter
                 </Button>
               </Form.Field>
-
-
             </Form.Group>
           </Form>
         </Segment>
@@ -88,8 +85,7 @@ class CreditsLessThanFromMandatory extends Component {
     )
   }
 }
-const mapStateToProps = ({ settings, populationMandatoryCourses }) => ({
-  language: settings.language,
+const mapStateToProps = ({ populationMandatoryCourses }) => ({
   courses: populationMandatoryCourses.data
 })
 

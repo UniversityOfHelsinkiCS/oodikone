@@ -40,7 +40,7 @@ class TransferToStudyrightFilter extends Component {
         <Segment>
           <Form>
             <Popup
-              content={infoTooltips.PopulationStatistics.Filters.StartingThisSemester[this.props.language]}
+              content={infoTooltips.PopulationStatistics.Filters.StartingThisSemester}
               trigger={<Icon style={{ float: 'right' }} name="info" />}
             />
             <Form.Group inline>
