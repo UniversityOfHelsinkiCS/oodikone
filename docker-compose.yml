@@ -92,6 +92,8 @@ services:
     environment:
       - DB_URL=postgres://postgres@db:5432/tkt_oodi
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      - TOKEN_SECRET=IWannaBeTheVeryBest
+
     container_name: userservice
   adminer:
     image: adminer:4.6.2
