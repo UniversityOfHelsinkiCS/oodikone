@@ -1,8 +1,50 @@
 const Sequelize = require('sequelize')
+const jwt = require('jsonwebtoken')
 const { User, ElementDetails } = require('../models')
 
 const Op = Sequelize.Op
 
+const generateToken = async (uid, asUser) => {
+
+  const user = await byUsername(uid)
+  const payload = {
+    userId: uid,
+    name: user.full_name,
+    enabled: user.is_enabled,
+    language: user.language,
+    admin: user.admin,
+    czar: user.czar,
+    asuser: user.admin ? asUser : null
+  }
+  const token = jwt.sign(payload, process.env.TOKEN_SECRET)
+
+  // return the information including token as JSON
+  return token
+}
+
+const login = async (uid, full_name, mail) => {
+  console.log('login', uid, full_name)
+  let user = await byUsername(uid)
+  let isNew = false
+  if (!user) {
+    user = await createUser(uid, full_name, mail)
+    isNew = true
+  } else {
+    user = await updateUser(user, { full_name })
+  }
+  const token = await generateToken(uid)
+
+  return({ token, isNew })
+
+}
+const superlogin = async (uid, asUser) => {
+  const user = await byUsername(uid)
+  if (user.admin) {
+    const token = await generateToken(uid, asUser)
+    return token
+  }
+  return undefined
+}
 const byUsername = async (username) => {
   return User.findOne({
     where: {
@@ -77,6 +119,8 @@ module.exports = {
   byId,
   getUnitsFromElementDetails,
   getUserElementDetails,
-  enableElementDetails
-  
+  enableElementDetails,
+  login,
+  superlogin
+
 }
