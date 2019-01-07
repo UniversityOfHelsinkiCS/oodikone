@@ -15,6 +15,18 @@ const byUsername = async (uid) => {
   return response.data
 }
 
+const getUserElementdetails = async (username) => {
+  const url = `/user/elementdetails/${username}`
+  const response = await client.get(url)
+  return response.data
+}
+
+const byId = async (id) => {
+  const url = `/user/id/${id}`
+  const response = await client.get(url)
+  return response.data
+}
+
 const updateUser = async (uid, fields) => {
   const url = `/user/${uid}`
   const response = await client.put(url, fields)
@@ -29,5 +41,5 @@ const createUser = async (username, full_name, email) => {
 }
 
 module.exports = {
-  ping, byUsername, createUser, updateUser
+  ping, byUsername, createUser, updateUser, byId, getUserElementdetails
 }
