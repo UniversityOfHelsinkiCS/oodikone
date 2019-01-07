@@ -5,8 +5,10 @@ const User = require('./src/services/users')
 const app = express()
 const port = 4567
 const bodyParser = require('body-parser')
+const checkSecret = require('./src/middlewares/secret')
 
 app.use(bodyParser.json())
+app.use(checkSecret)
 
 app.get('/ping', (req, res) => res.json({ message: 'pong '}))
 
