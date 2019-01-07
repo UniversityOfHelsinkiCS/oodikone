@@ -45,6 +45,7 @@ services:
       TOKEN_SECRET: IWannaBeTheVeryBest
       OODILEARN_URL: http://oodilearn:5000
       USERSERVICE_URL: http://userservice:4567
+      USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
     volumes:
       - ./repos/oodikone2-backend/:/usr/src/app
     container_name: backend
@@ -90,6 +91,7 @@ services:
       - ./repos/oodikone2-userservice/:/usr/src/app
     environment:
       - DB_URL=postgres://postgres@db:5432/tkt_oodi
+      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
     container_name: userservice
   adminer:
     image: adminer:4.6.2
