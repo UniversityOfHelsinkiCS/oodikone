@@ -15,7 +15,7 @@ const byUsername = async (uid) => {
   return response.data
 }
 
-const getUserElementdetails = async (username) => {
+const getUserElementDetails = async (username) => {
   const url = `/user/elementdetails/${username}`
   const response = await client.get(url)
   return response.data
@@ -41,5 +41,5 @@ const createUser = async (username, full_name, email) => {
 }
 
 module.exports = {
-  ping, byUsername, createUser, updateUser, byId, getUserElementdetails
+  ping, byUsername, createUser, updateUser, byId, getUserElementDetails
 }
