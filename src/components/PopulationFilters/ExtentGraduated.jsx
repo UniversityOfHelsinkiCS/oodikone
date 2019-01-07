@@ -65,7 +65,10 @@ class ExtentGraduated extends Component {
       return (
         <Segment>
           <Form>
-            <Popup content={infoTooltips.PopulationStatistics.Filters.ExtentGraduated[language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
+            <Popup
+              content={infoTooltips.PopulationStatistics.Filters.ExtentGraduated}
+              trigger={<Icon style={{ float: 'right' }} name="info" />}
+            />
             <Form.Group inline>
               <Form.Field>
                 Students that

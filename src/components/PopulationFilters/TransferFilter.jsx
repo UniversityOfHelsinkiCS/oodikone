@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Dropdown, Button, Form, Popup } from 'semantic-ui-react'
-import { shape, func, string } from 'prop-types'
+import { shape, func } from 'prop-types'
 import _ from 'lodash'
 
 import infoTooltips from '../../common/infotooltips'
@@ -13,8 +13,7 @@ class TransferFilter extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    transfers: shape({}).isRequired,
-    language: string.isRequired
+    transfers: shape({}).isRequired
   }
 
   state = {
@@ -65,16 +64,25 @@ class TransferFilter extends Component {
     let filteredTargets = targets
     let filteredSources = sources
     if (this.state.selectedSource !== '') {
-      filteredTargets = { ...sources[this.state.selectedSource].targets, anywhere: { name: { en: 'Anywhere', fi: 'Anywhere' } } }
+      filteredTargets = {
+        ...sources[this.state.selectedSource].targets,
+        anywhere: { name: { en: 'Anywhere', fi: 'Anywhere' } }
+      }
     }
     if (this.state.selectedTarget !== '') {
-      filteredSources = { ...targets[this.state.selectedTarget].sources, anywhere: { name: { en: 'Anywhere', fi: 'Anywhere' } } }
+      filteredSources = {
+        ...targets[this.state.selectedTarget].sources,
+        anywhere: { name: { en: 'Anywhere', fi: 'Anywhere' } }
+      }
     }
     if (filter.notSet) {
       return (
         <Segment>
           <Form>
-            <Popup content={infoTooltips.PopulationStatistics.Filters.TransferFilter[this.props.language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
+            <Popup
+              content={infoTooltips.PopulationStatistics.Filters.TransferFilter}
+              trigger={<Icon style={{ float: 'right' }} name="info" />}
+            />
             <Form.Group inline>
               <Form.Field>
                 <label>Students that transferred from </label>
@@ -144,11 +152,10 @@ class TransferFilter extends Component {
   }
 }
 
-const mapStateToProps = ({ populationCourses, settings }) => ({
+const mapStateToProps = ({ populationCourses }) => ({
   courseTypes: populationCourses[0].data.coursetypes,
   disciplines: populationCourses[0].data.disciplines,
-  courses: populationCourses[0].data.coursestatistics,
-  language: settings.language
+  courses: populationCourses[0].data.coursestatistics
 })
 
 export default connect(

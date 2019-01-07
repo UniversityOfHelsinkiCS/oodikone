@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Popup } from 'semantic-ui-react'
-import { shape, func, string } from 'prop-types'
+import { shape, func } from 'prop-types'
 
 import { removePopulationFilter, alterPopulationCourseFilter } from '../../redux/populationFilters'
 
 class CourseParticipation extends Component {
   static propTypes = {
-    language: string.isRequired,
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     alterPopulationCourseFilter: func.isRequired
@@ -30,15 +29,22 @@ class CourseParticipation extends Component {
         inverted={active(type)}
         secondary={active(type)}
         onClick={this.selectField(type)}
-        style={{ width: 30, height: 60, fontSize: 13, textAlign: 'center', verticalAlign: 'middle', lineHeight: 1, paddingTop: 15 }}
+        style={{
+          width: 30,
+          height: 60,
+          fontSize: 13,
+          textAlign: 'center',
+          verticalAlign: 'middle',
+          lineHeight: 1,
+          paddingTop: 15
+        }}
       >
         {text}
       </Segment>
     )
 
-
   render() {
-    const { filter, language } = this.props
+    const { filter } = this.props
     if (filter.notSet) {
       return null
     }
@@ -56,12 +62,20 @@ class CourseParticipation extends Component {
               <Segment
                 style={{ width: '30%', height: 40 }}
               >
-                <em style={{ float: 'left', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', width: '80%' }}>{course.course.name[language]}</em>
+                <em style={{ float: 'left',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  width: '80%'
+                }}
+                >
+                  {course.course.name}
+                </em>
                 <span style={{ float: 'right' }}>
                   <Icon name="remove" onClick={this.clearFilter} />
                 </span>
               </Segment>}
-            content={course.course.name[language]}
+            content={course.course.name}
           />
           {this.renderFilterSegment('all', 'all', active)}
           {this.renderFilterSegment('passed', 'passed', active)}
@@ -75,10 +89,7 @@ class CourseParticipation extends Component {
     )
   }
 }
-const mapStateToProps = ({ settings }) => ({
-  language: settings.language
-})
 
-export default connect(mapStateToProps, {
+export default connect(null, {
   removePopulationFilter, alterPopulationCourseFilter
 })(CourseParticipation)
