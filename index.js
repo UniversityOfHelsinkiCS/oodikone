@@ -19,6 +19,24 @@ app.get('/user/:uid', async (req, res) => {
   res.json(user)
 })
 
+app.get('/user/elementdetails/:username', async (req, res) => {
+  const username = req.params.username
+  const elementdetails = await User.getUserElementDetails(username)
+
+  console.log(JSON.stringify(elementdetails))
+
+  res.json(elementdetails)
+})
+
+app.get('/user/id/:id', async (req, res) => {
+  const id = req.params.id
+  const user = await User.byId(id)
+
+  console.log(JSON.stringify(user))
+
+  res.json(user)
+})
+
 app.post('/user', async (req, res) => {
   console.log('POST') 
   const { username, full_name, email } = req.body
