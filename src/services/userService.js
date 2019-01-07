@@ -8,6 +8,19 @@ const ping = async () => {
   const response = await axios.get(url)
   return response.data
 }
+const login = async(uid, full_name, email) => {
+  const response = await client.post('/login', {
+    uid, full_name, email
+  })
+  return response.data
+}
+
+const superlogin = async(uid, asUser) => {
+  const response = await client.post('/superlogin', {
+    uid, asUser
+  })
+  return response.data
+}
 
 const byUsername = async (uid) => {
   const url = `/user/${uid}`
@@ -41,5 +54,5 @@ const createUser = async (username, full_name, email) => {
 }
 
 module.exports = {
-  ping, byUsername, createUser, updateUser, byId, getUserElementDetails
+  ping, byUsername, createUser, updateUser, byId, getUserElementDetails, login, superlogin
 }
