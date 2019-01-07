@@ -88,7 +88,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     const { admin, czar } = req.decodedToken
     if (!(admin || czar)) {
       const user = await userService.byUsername(req.decodedToken.userId)
-      const elementdetails = await userService.getUserElementdetails(user.username)
+      const elementdetails = await userService.getUserElementDetails(user.username)
       const elements = new Set(elementdetails.map(element => element.code))
       if (req.query.studyRights.some(code => !elements.has(code))) {
         res.status(403).json([])
