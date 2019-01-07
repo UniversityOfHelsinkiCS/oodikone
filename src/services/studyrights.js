@@ -1,6 +1,6 @@
 const { Studyright, StudyrightElement, sequelize, ElementDetails } = require('../models')
 const { Op, col, where, fn } = sequelize
-const { getUserElementDetails } = require('./users')
+const { getUserElementDetails } = require('./userService')
 const { redisClient } = require('./redis')
 const _ = require('lodash')
 
@@ -95,7 +95,7 @@ const uniqueStudyrightCodeArrays = elementcodes => sequelize.query(`
     studyright_elements.code IN(:elementcodes)
   GROUP BY
     studyright_elements.studyrightid
-  ;
+  ;
 `,
 {
   type: sequelize.QueryTypes.SELECT,
@@ -115,7 +115,7 @@ const allUniqueStudyrightCodeArrays = () => sequelize.query(`
     element_details.type IN (10, 20)
   GROUP BY
     studyright_elements.studyrightid
-  ;
+  ;
 `,
 {
   type: sequelize.QueryTypes.SELECT
