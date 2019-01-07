@@ -27,7 +27,7 @@ const updateUser = async (userObject, values) => {
   return userObject.update(values)
 }
 
-/*
+
 const byId = async (id) => {
   return User.findOne({
     where: {
@@ -67,17 +67,16 @@ const enableElementDetails = async (uid, codes) => {
   const elements = await ElementService.byCodes(codes)
   await user.addElementdetails(elements)
 }
-*/
+
 
 module.exports = {
   byUsername,
   createUser,
   updateUser,
-  /*
   findAll,
   byId,
   getUnitsFromElementDetails,
   getUserElementDetails,
   enableElementDetails
-  */
+  
 }
