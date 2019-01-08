@@ -44,7 +44,7 @@ const render = (Component) => {
   ReactDOM.render(
     <Provider store={store}>
       <AppContainer>
-        <Component />
+        <Component store={store} />
       </AppContainer>
     </Provider>,
     document.getElementById('root')
