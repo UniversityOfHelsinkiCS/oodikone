@@ -7,7 +7,8 @@ export const findCourses = (searchStr, language) => {
 }
 
 export const findMultipleCourses = ({ searchStr, type, discipline }, language = 'fi') => {
-  const route = `/coursesmulti/?${searchStr ? `name=${searchStr}` : ''}${type ? `&type=${type}` : ''}${discipline ? `&discipline=${discipline}` : ''}&language=${language}`
+  const route = `/coursesmulti/?${searchStr ? `name=${searchStr}` : ''}
+    ${type ? `&type=${type}` : ''}${discipline ? `&discipline=${discipline}` : ''}&language=${language}`
   const prefix = 'FIND_COURSES_MULTI_'
   return callController(route, prefix)
 }

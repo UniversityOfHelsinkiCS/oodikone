@@ -167,7 +167,7 @@ class NavigationBar extends Component {
 NavigationBar.propTypes = {
   translate: func.isRequired,
   removeAsUser: func.isRequired,
-  asUser: oneOfType([null, string]).isRequired,
+  asUser: oneOfType([null, undefined, string]).isRequired,
   history: shape({
     push: func.isRequired
   }).isRequired

@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Dropdown, Icon, Form, Segment, Button, Popup } from 'semantic-ui-react'
+import { Dropdown, Icon, Form, Segment, Button } from 'semantic-ui-react'
 import { shape, func, arrayOf, string } from 'prop-types'
-import infoTooltips from '../../common/infotooltips'
+import InfoBox from '../InfoBox'
+import infoTooltips from '../../common/InfoToolTips'
 import { canceledStudyright } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -11,8 +12,7 @@ class CanceledStudyright extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    studyrights: arrayOf(string).isRequired,
-    language: string.isRequired
+    studyrights: arrayOf(string).isRequired
   }
 
   state = {
@@ -37,13 +37,12 @@ class CanceledStudyright extends Component {
   }
 
   render() {
-    const { filter, language } = this.props
+    const { filter } = this.props
     if (filter.notSet) {
       return (
         <Segment>
           <Form>
-            <Popup content={infoTooltips.PopulationStatistics.Filters.CanceledStudyright[language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
-
+            <InfoBox content={infoTooltips.PopulationStatistics.Filters.CanceledStudyright} />
             <Form.Group inline>
               <Form.Field>
                 <label>Filter students that </label>
@@ -76,7 +75,10 @@ class CanceledStudyright extends Component {
 
     return (
       <Segment>
-        {filter.params.cancel === 'true' ? 'Showing students that have canceled this studyright' : <span><b>Excluded</b> students whose studyright is cancelled</span>}
+        {filter.params.cancel === 'true' ?
+          'Showing students that have canceled this studyright' :
+          <span><b>Excluded</b> students whose studyright is cancelled</span>
+        }
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
@@ -84,11 +86,10 @@ class CanceledStudyright extends Component {
     )
   }
 }
-const mapStateToProps = ({ populations, settings }) => ({
-  studyrights: populations.query.studyRights,
-  language: settings.language
-})
 
+const mapStateToProps = ({ populations }) => ({
+  studyrights: populations.query.studyRights
+})
 
 export default connect(
   mapStateToProps,
