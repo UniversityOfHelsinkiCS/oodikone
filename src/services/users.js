@@ -7,6 +7,9 @@ const Op = Sequelize.Op
 const generateToken = async (uid, asUser) => {
 
   const user = await byUsername(uid)
+  const elementdetails = user.admin && asUser ? await getUserElementDetails(asUser) : await getUserElementDetails(user.username)
+  const elements = elementdetails.map(element => element.code)
+
   const payload = {
     userId: uid,
     name: user.full_name,
@@ -14,7 +17,8 @@ const generateToken = async (uid, asUser) => {
     language: user.language,
     admin: user.admin,
     czar: user.czar,
-    asuser: user.admin ? asUser : null
+    asuser: user.admin ? asUser : null,
+    rights: elements
   }
   const token = jwt.sign(payload, process.env.TOKEN_SECRET)
 
@@ -34,7 +38,7 @@ const login = async (uid, full_name, mail) => {
   }
   console.log('Generating token')
   const token = await generateToken(uid)
-
+  console.log('Token done')
   return({ token, isNew })
 
 }
