@@ -139,7 +139,12 @@ class CourseCodeMapper extends Component {
                 <Header>Add new corresponding code</Header>
                 <CourseSearch handleResultSelect={this.handleResultSelect1} />
                 <CourseSearch handleResultSelect={this.handleResultSelect2} />
-                <Button disabled={disabled} className={styles.button} content="Add" onClick={this.addDuplicate(this.state.code1, this.state.code2)} />
+                <Button
+                  disabled={disabled}
+                  className={styles.button}
+                  content="Add"
+                  onClick={this.addDuplicate(this.state.code1, this.state.code2)}
+                />
               </Segment>
             </Segment.Group>
             <Segment>

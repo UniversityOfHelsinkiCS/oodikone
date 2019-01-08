@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { shape, func, arrayOf, string } from 'prop-types'
-import infoTooltips from '../../common/infotooltips'
+import infoTooltips from '../../common/InfoToolTips'
 import { priorityStudyright } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -50,7 +50,8 @@ class PriorityStudyright extends Component {
     if (degree && programme) {
       const degreeText = studyrights.degrees.find(sr => sr.code === degree)
       const programmeText = studyrights.programmes.find(sr => sr.code === programme)
-      returnText = returnText.concat(`${degreeText ? degreeText.name[language] : ''} and ${programmeText ? programmeText.name[language] : ''}`)
+      returnText = returnText.concat(`${degreeText ? degreeText.name[language] : ''} and
+        ${programmeText ? programmeText.name[language] : ''}`)
     } else if (degree && !programme) {
       const degreeText = studyrights.degrees.find(sr => sr.code === degree)
       returnText = returnText.concat(`${degreeText ? degreeText.name[language] : ''}`)
@@ -61,7 +62,6 @@ class PriorityStudyright extends Component {
     returnText = returnText.concat(` as ${this.priorityOptions.find(option => option.value === prioritycode).text} `)
     return returnText
   }
-
 
   render() {
     const { filter, language, studyrights } = this.props
@@ -78,7 +78,10 @@ class PriorityStudyright extends Component {
       return (
         <Segment>
           <Form>
-            <Popup content={infoTooltips.PopulationStatistics.Filters.ExtentGraduated[language]} trigger={<Icon style={{ float: 'right' }} name="info" />} />
+            <Popup
+              content={infoTooltips.PopulationStatistics.Filters.ExtentGraduated}
+              trigger={<Icon style={{ float: 'right' }} name="info" />}
+            />
             <Form.Group inline>
               <Form.Field>
                 <label>Students that has</label>

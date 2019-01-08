@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Popup, Radio } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
 
-import infoTooltips from '../../common/infotooltips'
+import infoTooltips from '../../common/InfoToolTips'
 import { transferTo } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -40,7 +40,7 @@ class TransferToStudyrightFilter extends Component {
         <Segment>
           <Form>
             <Popup
-              content={infoTooltips.PopulationStatistics.Filters.StartingThisSemester[this.props.language]}
+              content={infoTooltips.PopulationStatistics.Filters.StartingThisSemester}
               trigger={<Icon style={{ float: 'right' }} name="info" />}
             />
             <Form.Group inline>
