@@ -26,7 +26,7 @@ router.post('/login', async (req, res) => {
       
       const full_name = req.headers.displayname || 'Shib Valmis'
       const mail = req.headers.mail || ''
-
+      console.log(uid, 'trying to login, referring to userservice.')
       let { token, isNew } = await userService.login(uid, full_name, mail)
       isNew && sendEmail(uid)
       res.status(200).json({ token })
