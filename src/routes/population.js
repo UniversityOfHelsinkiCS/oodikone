@@ -4,7 +4,6 @@ const User = require('../services/users')
 const Filters = require('../services/filters')
 const { updateStudents } = require('../services/doo_api_database_updater/database_updater')
 const StudyrightService = require('../services/studyrights')
-const userService = require('../services/userService')
 
 router.get('/v2/populationstatistics/courses', async (req, res) => {
   try {
@@ -87,9 +86,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     req.query.studyRights = req.query.studyRights.filter(sr => sr !== 'undefined')
     const { admin, czar } = req.decodedToken
     if (!(admin || czar)) {
-      const user = await userService.byUsername(req.decodedToken.userId)
-      const elementdetails = await userService.getUserElementDetails(user.username)
-      const elements = new Set(elementdetails.map(element => element.code))
+      const elements = new Set(req.decodedToken.rights)
       if (req.query.studyRights.some(code => !elements.has(code))) {
         res.status(403).json([])
         return
@@ -179,6 +176,7 @@ router.get('/v2/populationstatistics/studyprogrammes', async (req, res) => {
       res.json(studyrights)
     } else {
       const studyrights = await StudyrightService.getStudyrightElementsAndAssociationsForUser(userId)
+      console.log(studyrights)
       res.json(studyrights)
     }
   } catch (err) {
@@ -189,12 +187,12 @@ router.get('/v2/populationstatistics/studyprogrammes', async (req, res) => {
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   try {
-    const { admin, czar, userId } = req.decodedToken
+    const { admin, czar, rights } = req.decodedToken
     if (admin || czar) {
       const studyrights = await StudyrightService.getAssociations()
       res.json(studyrights)
     } else {
-      const studyrights = await StudyrightService.getUserAssociations(userId)
+      const studyrights = await StudyrightService.getFilteredAssociations(rights)
       res.json(studyrights)
     }
   } catch (err) {
