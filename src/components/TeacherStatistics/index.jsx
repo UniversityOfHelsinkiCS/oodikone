@@ -49,7 +49,11 @@ class TeacherStatistics extends Component {
       const invalidQueryParams = this.state.providers.length === 0 || !semesterStart
       return (
         <div>
-          <Message header="Teacher statistics by course providers" content="Statistics for teachers that admitted credits during and between the given semesters for one of the given course providers." />
+          <Message
+            header="Teacher statistics by course providers"
+            content="Statistics for teachers that admitted credits during
+              and between the given semesters for one of the given course providers."
+          />
           <Segment>
             <Form loading={pending}>
               <Form.Group widths="equal">

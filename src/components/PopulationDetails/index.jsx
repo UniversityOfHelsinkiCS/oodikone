@@ -6,7 +6,6 @@ import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
 
-
 import { makePopulationsToData } from '../../selectors/populationDetails'
 
 import { getTotalCreditsFromCourses } from '../../common'
@@ -16,6 +15,8 @@ import CourseQuarters from '../CourseQuarters'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourses from '../PopulationCourses'
 import PopulationCreditGainTable from '../PopulationCreditGainTable'
+import InfoBox from '../InfoBox'
+import infoTooltips from '../../common/InfoToolTips'
 
 class PopulationDetails extends Component {
   static propTypes = {
@@ -36,7 +37,6 @@ class PopulationDetails extends Component {
       navigationVisible: false
     }
   }
-
 
   renderCourseStatistics = () => {
     const { samples, translate } = this.props
@@ -83,6 +83,7 @@ class PopulationDetails extends Component {
 
   renderCreditGainGraphs = () => {
     const { samples, translate } = this.props
+    const { CreditAccumulationGraph } = infoTooltips.PopulationStatistics
     const graphs = (
       <CreditAccumulationGraphHighCharts
         students={samples}
@@ -98,6 +99,7 @@ class PopulationDetails extends Component {
       <Segment>
         <Header size="medium" dividing>
           {translate('populationStatistics.graphSegmentHeader')} (for {this.props.selectedStudents.length} students)
+          <InfoBox content={CreditAccumulationGraph} />
         </Header>
         {samples.length > 0 ? graphs : null}
       </Segment>
@@ -109,15 +111,37 @@ class PopulationDetails extends Component {
       <Segment className="navigationpanel" style={{ position: 'fixed', right: '2%', bottom: '2%' }}>
         <Header size="medium" textAlign="center" >
           Navigation
-          <Button className="navigationbuttonclose" icon basic floated="right" onClick={() => this.setState({ navigationVisible: false })} >
+          <Button
+            className="navigationbuttonclose"
+            icon
+            basic
+            floated="right"
+            onClick={() => this.setState({ navigationVisible: false })}
+          >
             <Icon name="chevron right" />
           </Button>
         </Header>
         <Button.Group vertical >
-          <Button onClick={() => scrollToComponent(this.filters.current, { align: 'top', offset: -40 })}>Go To Filters</Button>
-          <Button onClick={() => scrollToComponent(this.chart.current, { align: 'middle' })}>Go To Chart</Button>
-          <Button onClick={() => scrollToComponent(this.courses.current, { align: 'top', offset: -40 })}>Go To Course List</Button>
-          <Button onClick={() => scrollToComponent(this.students.current, { align: 'top', offset: -40 })}>Go To Student List</Button>
+          <Button
+            onClick={() => scrollToComponent(this.filters.current, { align: 'top', offset: -40 })}
+          >
+            Go To Filters
+          </Button>
+          <Button
+            onClick={() => scrollToComponent(this.chart.current, { align: 'middle' })}
+          >
+            Go To Chart
+          </Button>
+          <Button
+            onClick={() => scrollToComponent(this.courses.current, { align: 'top', offset: -40 })}
+          >
+            Go To Course List
+          </Button>
+          <Button
+            onClick={() => scrollToComponent(this.students.current, { align: 'top', offset: -40 })}
+          >
+            Go To Student List
+          </Button>
         </Button.Group>
       </Segment>
     </div>
@@ -159,7 +183,13 @@ class PopulationDetails extends Component {
       <div>
         {this.renderPopulationDetailsContent()}
         <div>
-          <Button className="navigationbuttonopen" icon basic onClick={() => this.setState({ navigationVisible: true })} style={{ position: 'fixed', right: '0.5%', bottom: '0.5%' }} >
+          <Button
+            className="navigationbuttonopen"
+            icon
+            basic
+            onClick={() => this.setState({ navigationVisible: true })}
+            style={{ position: 'fixed', right: '0.5%', bottom: '0.5%' }}
+          >
             <Icon name="bars" />
           </Button>
         </div>

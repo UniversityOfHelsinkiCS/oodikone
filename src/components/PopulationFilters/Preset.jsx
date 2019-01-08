@@ -5,7 +5,6 @@ import { shape, func } from 'prop-types'
 import { removePopulationFilter, setPopulationFilter, deletePopulationFilter } from '../../redux/populationFilters'
 import { presetFilter } from '../../populationFilters'
 
-
 class Preset extends Component {
   static propTypes = {
     filter: shape({}).isRequired,

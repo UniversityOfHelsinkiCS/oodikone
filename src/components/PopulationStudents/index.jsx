@@ -10,9 +10,10 @@ import { toggleStudentListVisibility } from '../../redux/settings'
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 import styles from '../PopulationCourseStats/populationCourseStats.css'
 import SortableTable from '../SortableTable'
+import InfoBox from '../InfoBox'
+import infotooltips from '../../common/InfoToolTips'
 
 const popupTimeoutLength = 1000
-
 
 class PopulationStudents extends Component {
   state = {}
@@ -59,11 +60,22 @@ class PopulationStudents extends Component {
       )
     }
     columns.push(
-      { key: 'studentnumber', title: 'student number', getRowVal: s => s.studentNumber, headerProps: { colSpan: 2 } },
-      { key: 'icon', getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />), cellProps: { collapsing: true, className: styles.iconCell } },
-      { key: 'credits since start', title: 'credits since start', getRowVal: getStudentTotalCredits },
-      { key: 'all credits', title: 'all credits', getRowVal: s => s.credits },
-      { key: 'transferred from', title: 'transferred from', getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '') }
+      { key: 'studentnumber',
+        title: 'student number',
+        getRowVal: s => s.studentNumber,
+        headerProps: { colSpan: 2 } },
+      { key: 'icon',
+        getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
+        cellProps: { collapsing: true, className: styles.iconCell } },
+      { key: 'credits since start',
+        title: 'credits since start',
+        getRowVal: getStudentTotalCredits },
+      { key: 'all credits',
+        title: 'all credits',
+        getRowVal: s => s.credits },
+      { key: 'transferred from',
+        title: 'transferred from',
+        getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '') }
     )
     if (this.props.showNames) {
       columns.push(
@@ -133,6 +145,7 @@ class PopulationStudents extends Component {
   }
 
   render() {
+    const { Students } = infotooltips.PopulationStatistics
     if (this.props.samples.length === 0) {
       return null
     }
@@ -141,7 +154,9 @@ class PopulationStudents extends Component {
 
     return (
       <Segment>
-        <Header>Students ({this.props.selectedStudents.length})</Header>
+        <Header dividing >
+          Students ({this.props.selectedStudents.length}) <InfoBox content={Students} />
+        </Header>
         <Button onClick={() => this.props.toggleStudentListVisibility()}>
           {toggleLabel}
         </Button>
