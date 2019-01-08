@@ -4,7 +4,7 @@ import { Segment, Icon, Dropdown, Button, Form, Input, Popup } from 'semantic-ui
 import { shape, func, arrayOf, object } from 'prop-types'
 import _ from 'lodash'
 
-import infoTooltips from '../../common/infotooltips'
+import infoTooltips from '../../common/InfoToolTips'
 import { courseParticipation } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 

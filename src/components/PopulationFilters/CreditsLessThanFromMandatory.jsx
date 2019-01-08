@@ -5,7 +5,7 @@ import { shape, func, string, arrayOf } from 'prop-types'
 
 import { creditsLessThanFromMandatory } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
-import infoTooltips from '../../common/infotooltips'
+import infoTooltips from '../../common/InfoToolTips'
 
 class CreditsLessThanFromMandatory extends Component {
   static propTypes = {

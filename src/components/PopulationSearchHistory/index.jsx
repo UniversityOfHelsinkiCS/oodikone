@@ -10,6 +10,8 @@ import { clearPopulationCourses } from '../../redux/populationCourses'
 import { clearPopulationFilters } from '../../redux/populationFilters'
 
 import styles from './populationSearchHistory.css'
+import infotooltips from '../../common/InfoToolTips'
+import InfoBox from '../InfoBox'
 
 class PopulationSearchHistory extends Component {
   static propTypes = {
@@ -29,23 +31,28 @@ class PopulationSearchHistory extends Component {
 
   renderQueryCards = () => {
     const { populations, translate, units } = this.props
+    const { QueryCard } = infotooltips.PopulationStatistics
     if (!populations.data.students) {
       return null
     }
     const studentNumberList = (populations.data.students.map(s => s.studentNumber))
-    return populations.query ? (<PopulationQueryCard
-      key={`population-${populations.query.uuid}`}
-      translate={translate}
-      population={populations.data}
-      query={populations.query}
-      queryId={0}
-      unit={units.data[20][populations.query.studyRights[0]]} // Possibly deprecated
-      units={_.flattenDeep(Object.values(units.data).map(u =>
-        Object.values(u))).filter(u => populations.query.studyRights.includes(u.code))}
-      removeSampleFn={this.removePopulation}
-      updateStudentsFn={() => this.props.updatePopulationStudents(studentNumberList)}
-      updating={populations.updating}
-    />) : null
+    return populations.query ? (
+      <React.Fragment>
+        <PopulationQueryCard
+          key={`population-${populations.query.uuid}`}
+          translate={translate}
+          population={populations.data}
+          query={populations.query}
+          queryId={0}
+          unit={units.data[20][populations.query.studyRights[0]]} // Possibly deprecated
+          units={_.flattenDeep(Object.values(units.data).map(u =>
+            Object.values(u))).filter(u => populations.query.studyRights.includes(u.code))}
+          removeSampleFn={this.removePopulation}
+          updateStudentsFn={() => this.props.updatePopulationStudents(studentNumberList)}
+          updating={populations.updating}
+        />
+        <InfoBox content={QueryCard} />
+      </React.Fragment>) : null
   }
 
   render() {

@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Dropdown, Icon, Form, Segment, Button, Popup } from 'semantic-ui-react'
+import { Dropdown, Icon, Form, Segment, Button } from 'semantic-ui-react'
 import { shape, func, arrayOf, string } from 'prop-types'
-import infoTooltips from '../../common/infotooltips'
+import InfoBox from '../InfoBox'
+import infoTooltips from '../../common/InfoToolTips'
 import { canceledStudyright } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -41,8 +42,7 @@ class CanceledStudyright extends Component {
       return (
         <Segment>
           <Form>
-            <Popup content={infoTooltips.PopulationStatistics.Filters.CanceledStudyright} trigger={<Icon style={{ float: 'right' }} name="info" />} />
-
+            <InfoBox content={infoTooltips.PopulationStatistics.Filters.CanceledStudyright} />
             <Form.Group inline>
               <Form.Field>
                 <label>Filter students that </label>
