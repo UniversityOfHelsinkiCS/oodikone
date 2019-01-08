@@ -5,7 +5,7 @@ import { shape, func, object, arrayOf } from 'prop-types'
 import moment from 'moment'
 import _ from 'lodash'
 
-import infoTooltips from '../../common/infotooltips'
+import infoTooltips from '../../common/InfoToolTips'
 import { enrollmentStatus } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 

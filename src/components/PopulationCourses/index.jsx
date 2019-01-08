@@ -5,10 +5,12 @@ import { Segment, Header, Popup } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
+import InfoBox from '../InfoBox'
+import infotooltips from '../../common/InfoToolTips'
 
 const PopulationCourses = ({ samples, translate }) => {
   const isValidSample = samples && samples.length > 0
-
+  const { CoursesOf } = infotooltips.PopulationStatistics
   if (!isValidSample) {
     return null
   }
@@ -17,12 +19,16 @@ const PopulationCourses = ({ samples, translate }) => {
 
   return (
     <Segment>
-      <Popup
-        trigger={<Header size="medium" dividing>{translate('populationCourses.header')}</Header>}
-        content="Sort by clicking columns. Click course name to limit observed population to students who participated to the course."
-        wide
-        position="top left"
-      />
+      <Header size="medium" dividing >
+        <Popup
+          trigger={<Header.Content>{translate('populationCourses.header')}</Header.Content>}
+          content="Sort by clicking columns. Click course name to limit observed population to students who
+          participated to the course."
+          wide
+          position="top left"
+        />
+        <InfoBox content={CoursesOf} />
+      </Header>
       <SegmentDimmer translate={translate} isLoading={pending} />
       {samples.map(sample => (
         <PopulationCourseStats

@@ -20,6 +20,8 @@ import TransferFilter from './TransferFilter'
 import TransferToStudyrightFilter from './TransferToStudyrightFilter'
 import CanceledStudyright from './CanceledStudyright'
 import PriorityStudyright from './PriorityStudyright'
+import InfoBox from '../InfoBox'
+import infotooltips from '../../common/InfoToolTips'
 import {
   clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter
 } from '../../redux/populationFilters'
@@ -157,7 +159,7 @@ class PopulationFilters extends Component {
 
   renderAddFilters() {
     const { extents, transfers } = this.props
-
+    const { Add } = infotooltips.PopulationStatistics.Filters
     const allFilters = _.union(Object.keys(componentFor).filter(f =>
       !(Object.keys(advancedFilters).includes(f) && !this.state.advancedUser)).map(f =>
         String(f)), this.state.presetFilters.map(f => f.id).filter(f => this.state.advancedUser))
@@ -174,7 +176,7 @@ class PopulationFilters extends Component {
     if (!this.state.visible) {
       return (
         <Segment>
-          <Header>Add filters</Header>
+          <Header>Add filters <InfoBox content={Add} /></Header>
           <Button onClick={() => this.setState({ visible: true })}>add</Button>
         </Segment>
       )
@@ -182,7 +184,7 @@ class PopulationFilters extends Component {
 
     return (
       <Segment>
-        <Header>Add filters</Header>
+        <Header>Add filters <InfoBox content={Add} /></Header>
         <div>
           <Radio
             toggle
@@ -217,13 +219,14 @@ class PopulationFilters extends Component {
 
   renderSetFilters(handleSave) {
     const setFilters = this.props.filters.map(f => f.type)
+    const { Filters } = infotooltips.PopulationStatistics.Filters
     if (setFilters.length === 0) {
       return null
     }
 
     return (
       <Segment>
-        <Header>Filters</Header>
+        <Header>Filters <InfoBox content={Filters} /></Header>
         <Form>
           <Form.Group inline>
             <Form.Field>

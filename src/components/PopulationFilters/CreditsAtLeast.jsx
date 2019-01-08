@@ -5,7 +5,7 @@ import { shape, func } from 'prop-types'
 
 import { creditsAtLeast } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
-import infoTooltips from '../../common/infotooltips'
+import infoTooltips from '../../common/InfoToolTips'
 
 class CreditsAtLeast extends Component {
   static propTypes = {

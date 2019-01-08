@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Popup, Radio } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
 
-import infoTooltips from '../../common/infotooltips'
+import infoTooltips from '../../common/InfoToolTips'
 import { transferTo } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 

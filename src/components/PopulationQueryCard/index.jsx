@@ -32,7 +32,9 @@ const PopulationQueryCard =
           </Card.Header>
           <Card.Meta>
             <div className={styles.dateItem}>
-              <Icon name="calendar" size="small" /> {`${semesters.map(s => translate(`populationStatistics.${s}`))}/${year}-${Number(year) + 1}, showing ${months} months.`}
+              <Icon name="calendar" size="small" />
+              {`${semesters.map(s => translate(`populationStatistics.${s}`))}/
+                ${year}-${Number(year) + 1}, showing ${months} months.`}
             </div>
             <div>
               {`${translate('populationStatistics.sampleSize', { amount: students.length })} `}
@@ -41,7 +43,9 @@ const PopulationQueryCard =
               {`Updated at ${reformatDate(_.minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}
             </div>
             <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes' } exchange students</div>
-            <div>{studentStatuses.includes('CANCELLED') ? 'Includes' : 'Excludes' } students with cancelled study right</div>
+            <div>{studentStatuses.includes('CANCELLED') ? 'Includes ' : 'Excludes ' }
+              students with cancelled study right
+            </div>
             {updating ?
               <Button disabled compact floated="left" size="medium" labelPosition="left" onClick={updateStudentsFn} >
                 <Icon loading name="refresh" />
@@ -69,7 +73,9 @@ const PopulationQueryCard =
         </Card.Header>
         <Card.Meta>
           <div className={styles.dateItem}>
-            <Icon name="calendar" size="small" /> {`${semesters.map(s => translate(`populationStatistics.${s}`))}/${year}-${Number(year) + 1}, showing ${months} months.`}
+            <Icon name="calendar" size="small" />
+            {`${semesters.map(s => translate(`populationStatistics.${s}`))}/${year}-${Number(year) + 1},
+             showing ${months} months.`}
           </div>
           <div>
             {`${translate('populationStatistics.sampleSize', { amount: students.length })} `}
