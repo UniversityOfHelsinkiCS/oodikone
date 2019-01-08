@@ -560,7 +560,7 @@ class PopulationSearchForm extends Component {
 
     return (
       <Form error={isQueryInvalid} loading={isLoading}>
-        <Grid divided>
+        <Grid divided padded="vertically">
           <Grid.Row>
             <Grid.Column width={10}>
               {this.renderEnrollmentDateSelector()}
