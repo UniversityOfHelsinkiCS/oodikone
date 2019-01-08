@@ -155,7 +155,7 @@ or
 
 `docker exec -it -u postgres db_staging psql -d tkt_oodi_staging`
 
-Production db backups are taken daily and can be found in /var/toska/tkt_oodi/backups/postgres/.
+Production db backups are taken daily and can be found in /var/toska/tkt_oodi/backups/postgres/. Symlink to latest backup can always be found as /home/tkt_oodi/backups/latest-pg.bak.bz2.
 
 To create a dump of the production db manually, run: 
 
