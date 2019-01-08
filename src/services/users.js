@@ -23,15 +23,16 @@ const generateToken = async (uid, asUser) => {
 }
 
 const login = async (uid, full_name, mail) => {
-  console.log('login', uid, full_name)
   let user = await byUsername(uid)
   let isNew = false
   if (!user) {
+    console.log('New user')
     user = await createUser(uid, full_name, mail)
     isNew = true
   } else {
     user = await updateUser(user, { full_name })
   }
+  console.log('Generating token')
   const token = await generateToken(uid)
 
   return({ token, isNew })
