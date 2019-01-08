@@ -36,7 +36,7 @@ class FoldableRow extends Component {
           >{showFoldIcon ? <Icon name={`angle ${isUnfolded ? 'down' : 'right'}`} /> : null}
           </Table.Cell>
           <Table.Cell
-            content={isMainRow ? category : realisation}
+            content={isMainRow ? <Fragment>{category} <span>{id}</span></Fragment> : realisation}
             className={isMainRow ? styles.courseNameCell : styles.courseRealisationCell}
             onClick={() => onClickFn(id)}
           />
