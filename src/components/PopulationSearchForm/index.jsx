@@ -20,6 +20,8 @@ import { setLoading } from '../../redux/graphSpinner'
 import LanguageChooser from '../LanguageChooser'
 import style from './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
+import InfoBox from '../InfoBox'
+import infoToolTips from '../../common/InfoToolTips'
 
 const YEAR_DATE_FORMAT = 'YYYY'
 
@@ -248,7 +250,6 @@ class PopulationSearchForm extends Component {
     })
   }
 
-
   // (Potential?) issue with using Math.ceil with months.
   getMonths = (year, end, term) => {
     const lastDayOfMonth = moment(end).endOf('month')
@@ -273,7 +274,6 @@ class PopulationSearchForm extends Component {
     studyRights: [],
     months: this.months('2017', 'FALL')
   })
-
 
   renderableList = (list) => {
     const { language } = this.props
@@ -415,7 +415,6 @@ class PopulationSearchForm extends Component {
     return null
   }
 
-
   renderStudyGroupSelector = () => {
     const { studyProgrammes, language } = this.props
     const { studyRights } = this.state.query
@@ -540,6 +539,7 @@ class PopulationSearchForm extends Component {
     }
     const { translate } = this.props
     const { isLoading, validYear, query } = this.state
+    const { Advanced } = infoToolTips.PopulationStatistics
     let errorText = translate('populationStatistics.alreadyFetched')
     let isQueryInvalid = this.validateQuery()
 
@@ -560,7 +560,7 @@ class PopulationSearchForm extends Component {
 
     return (
       <Form error={isQueryInvalid} loading={isLoading}>
-        <Grid divided>
+        <Grid divided padded="vertically">
           <Grid.Row>
             <Grid.Column width={10}>
               {this.renderEnrollmentDateSelector()}
@@ -568,7 +568,7 @@ class PopulationSearchForm extends Component {
             </Grid.Column>
             <Grid.Column width={6}>
               <Form.Field style={{ margin: 'auto' }}>
-                <label>Advanced settings</label>
+                <label>Advanced settings <InfoBox content={Advanced} /></label>
                 <Form.Radio
                   toggle
                   checked={this.state.showAdvancedSettings}
@@ -589,7 +589,6 @@ class PopulationSearchForm extends Component {
     )
   }
 }
-
 
 const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes, locale }) => {
   const { language, asUser } = settings

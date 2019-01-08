@@ -1,5 +1,5 @@
 import uuidv4 from 'uuid/v4'
-import { getStudentTotalCredits } from '../common'
+import { getStudentTotalCredits, getStudentTotalCreditsFromMandatory } from '../common'
 
 export const creditsLessThan = (params) => {
   const { credit } = params
@@ -77,7 +77,9 @@ export const transferFilter = (params) => {
       target
     },
     filter: student => student.transfers.map(transfer =>
-      (source === 'anywhere' || transfer.source.code === source) && (target === 'anywhere' || transfer.target.code === target)).some(b => b === true)
+      (source === 'anywhere' || transfer.source.code === source) &&
+        (target === 'anywhere' || transfer.target.code === target))
+      .some(b => b === true)
 
   })
 }
@@ -184,6 +186,20 @@ export const canceledStudyright = (params) => {
   })
 }
 
+export const creditsLessThanFromMandatory = (params) => {
+  const { amount, courses } = params
+  return ({
+    id: uuidv4(),
+    type: 'CreditsLessThanFromMandatory',
+    params: {
+      amount,
+      courses
+    },
+    filter: student => amount > getStudentTotalCreditsFromMandatory(student, courses)
+  })
+}
+
+
 export const priorityStudyright = (params) => {
   const { prioritycode, degree, programme } = params
   return ({
@@ -221,6 +237,7 @@ export const presetFilter = preset => ({
   filter: student => preset.filters.map(f => f.filter(student)).every(b => b === true)
 })
 const typeList = {
+  CreditsLessThanFromMandatory: creditsLessThanFromMandatory,
   CreditsLessThan: creditsLessThan,
   CreditsAtLeast: creditsAtLeast,
   HasMatriculation: matriculationFilter,

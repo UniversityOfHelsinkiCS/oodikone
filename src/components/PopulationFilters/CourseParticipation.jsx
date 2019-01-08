@@ -30,12 +30,19 @@ class CourseParticipation extends Component {
         inverted={active(type)}
         secondary={active(type)}
         onClick={this.selectField(type)}
-        style={{ width: 30, height: 60, fontSize: 13, textAlign: 'center', verticalAlign: 'middle', lineHeight: 1, paddingTop: 15 }}
+        style={{
+          width: 30,
+          height: 60,
+          fontSize: 13,
+          textAlign: 'center',
+          verticalAlign: 'middle',
+          lineHeight: 1,
+          paddingTop: 15
+        }}
       >
         {text}
       </Segment>
     )
-
 
   render() {
     const { filter, language } = this.props
@@ -56,7 +63,15 @@ class CourseParticipation extends Component {
               <Segment
                 style={{ width: '30%', height: 40 }}
               >
-                <em style={{ float: 'left', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', width: '80%' }}>{course.course.name[language]}</em>
+                <em style={{ float: 'left',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  width: '80%'
+                }}
+                >
+                  {course.course.name[language]}
+                </em>
                 <span style={{ float: 'right' }}>
                   <Icon name="remove" onClick={this.clearFilter} />
                 </span>
@@ -75,6 +90,7 @@ class CourseParticipation extends Component {
     )
   }
 }
+
 const mapStateToProps = ({ settings }) => ({
   language: settings.language
 })

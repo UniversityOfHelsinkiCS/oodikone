@@ -20,14 +20,14 @@ class FoldableRow extends Component {
     const { isUnfolded } = this.state
     const { id, category, realisations } = courseData
 
-    const hasMultipleRealisations = realisations.length && realisations.length > 1
-    const showCourseRealisations = hasMultipleRealisations && isUnfolded
+    const hasRealisations = realisations.length && realisations.length > 0
+    const showCourseRealisations = hasRealisations && isUnfolded
 
     const getCell = content => (<Table.Cell content={content} />)
 
     const getRow = (rowId, rowData, isMainRow = true) => {
       const { passed, failed, passrate, realisation } = rowData
-      const showFoldIcon = isMainRow && hasMultipleRealisations
+      const showFoldIcon = isMainRow && hasRealisations
       return (
         <Table.Row key={rowId} className={!isMainRow ? styles.subRow : ''}>
           <Table.Cell

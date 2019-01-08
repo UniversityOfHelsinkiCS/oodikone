@@ -8,8 +8,10 @@ import PopulationSearchForm from '../PopulationSearchForm'
 import PopulationSearchHistory from '../PopulationSearchHistory'
 import PopulationDetails from '../PopulationDetails'
 import SegmentDimmer from '../SegmentDimmer'
+import InfoBox from '../InfoBox'
 
 import sharedStyles from '../../styles/shared'
+import infoTooltips from '../../common/InfoToolTips'
 
 class PopulationStatistics extends PureComponent {
   static propTypes = {
@@ -20,14 +22,16 @@ class PopulationStatistics extends PureComponent {
 
   renderPopulationSearch = () => {
     const { translate, populationFound, loading } = this.props
-
+    const { Main } = infoTooltips.PopulationStatistics
     const title = populationFound ?
       translate('populationStatistics.foundTitle') :
       translate('populationStatistics.searchTitle')
 
     return (
       <Segment>
-        <Header size="medium">{title}</Header>
+        <Header size="medium">{title}
+          <InfoBox content={Main} />
+        </Header>
         <PopulationSearchForm />
         <Divider />
         <PopulationSearchHistory />

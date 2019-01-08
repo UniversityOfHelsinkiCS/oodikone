@@ -95,7 +95,9 @@ class UsageStatistics extends Component {
         const zeroed = v => (v < 10 ? `0${v}` : v)
 
         const date = new Date(stamp * 1000)
-        return `${date.getFullYear()}${zeroed(date.getUTCMonth() + 1)}${zeroed(date.getDate())} ${zeroed(date.getHours())}:${zeroed(date.getMinutes())}:${zeroed(date.getSeconds())}`
+        return `${date.getFullYear()}${zeroed(date.getUTCMonth() + 1)}
+          ${zeroed(date.getDate())} ${zeroed(date.getHours())}:
+          ${zeroed(date.getMinutes())}:${zeroed(date.getSeconds())}`
       }
 
       return (
