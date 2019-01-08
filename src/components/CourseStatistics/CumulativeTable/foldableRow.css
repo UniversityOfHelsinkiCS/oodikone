@@ -6,6 +6,12 @@
   font-weight: 600;
 }
 
+.courseNameCell > span {
+  font-weight: initial;
+  font-size: smaller;
+  color: grey;
+}
+
 .courseRealisationCell {
   padding-left: 2em !important;
 }
