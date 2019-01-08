@@ -482,7 +482,15 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
     if (startyearcode <= yearcode && yearcode <= endyearcode) {
       const groupcode = separate ? semestercode : yearcode
       const groupname = separate ? semestername : yearname
-      counter.markStudyProgrammes(studentnumber, programmes)
+      const unknownProgramme = [{
+        code: 'OTHER',
+        name: {
+          en: 'Other',
+          fi: 'Muu',
+          sv: 'Andra'
+        }
+      }]
+      counter.markStudyProgrammes(studentnumber, programmes.length === 0 ? unknownProgramme : programmes)
       counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname)
     } else {
       counter.markCreditToHistory(studentnumber, passed)
