@@ -51,17 +51,17 @@ async function run() {
     Number((cached.student_numbers.sort().reverse()[0]/10).toFixed(0))
                                         
   const minStudentNumber = (cached) ? oldMax() : 1010000
-  const incremet = Number(process.env.INCREMENT) || 10000
-  const maxStudentNumber = process.env.STUDENTS_TO || minStudentNumber + incremet || 1500000
+  const numberOfStudents = Number(process.env.INCREMENT) || 500000
+  const maxStudentNumber = process.env.STUDENTS_TO || minStudentNumber + numberOfStudents || 1510000
   const step = process.env.STEP || 500
   const range = maxStudentNumber - minStudentNumber
-  logger.info('student numbers form ' + minStudentNumber + ' to ' + maxStudentNumber + ' total of ' + range + ' student numbers')
+  logger.info('student numbers from ' + minStudentNumber + ' to ' + maxStudentNumber + ' total of ' + range + ' student numbers')
   logger.info('log message every ' + step + ' student')
   for (let i = minStudentNumber; i < maxStudentNumber; i++) {
     let studentNumber = '0' + i + util.getStudentNumberChecksum(String(i))
     if (i % step === 1) {
       const iteration = (1 + (i - minStudentNumber) / step).toFixed()
-      logger.info(iteration + '/' + (range / step + 1).toFixed(0)  + ' ' + timestamp())
+      logger.info('student list updater: ' + iteration + '/' + (range / step + 1).toFixed(0)  + ' ' + timestamp())
     }
     
     const response = await requestStudent(studentNumber)
