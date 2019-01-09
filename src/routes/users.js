@@ -11,10 +11,10 @@ router.get('/users', async (req, res) => {
 
 router.put('/users/:id/enable', async (req, res) => {
   const id = req.params.id
-  const user = await User.byId(id)
+  const user = await userService.byId(id)
   if (!user) res.status(400).end()
   else {
-    const result = await User.updateUser(user, { is_enabled: !user.is_enabled })
+    const result = await userService.updateUser(user.username, { is_enabled: !user.is_enabled })
     const status = result.error === undefined ? 200 : 400
     res.status(status).json(result)
   }
