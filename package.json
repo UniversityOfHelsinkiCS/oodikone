@@ -7,7 +7,7 @@
     "start": "nodemon index.js",
     "dev": "nodemon index.js",
     "test": "NODE_ENV=test jest --runInBand --verbose --detectOpenHandles",
-    "test_docker": "docker exec -t userservice /bin/bash -c 'cd usr && npm test'"
+    "test_docker": "docker exec -t userservice /bin/bash -c 'cd usr/src/app && npm test'"
   },
   "repository": {
     "type": "git",
