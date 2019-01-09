@@ -76,7 +76,12 @@ const formatGradeDistribution = grades =>
 
 class PopulationCourseStats extends Component {
   static propTypes = {
-    courses: arrayOf(object).isRequired,
+    courses: shape({
+      coursestatistics: arrayOf(object).isRequired,
+      coursetypes: shape({}),
+      disciplines: shape({}).isRequired
+
+    }).isRequired,
     translate: func.isRequired,
     setPopulationFilter: func.isRequired,
     populationSize: number.isRequired,

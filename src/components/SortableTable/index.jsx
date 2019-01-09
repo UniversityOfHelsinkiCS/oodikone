@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Table } from 'semantic-ui-react'
-import { shape, arrayOf, oneOf, string, func, bool } from 'prop-types'
+import { shape, arrayOf, string, func, bool } from 'prop-types'
 import _ from 'lodash'
 
 const DIRECTIONS = {
@@ -98,7 +98,7 @@ SortableTable.propTypes = {
   getRowProps: func,
   columns: arrayOf(shape({
     key: string,
-    title: oneOf(string, undefined),
+    title: string,
     headerProps: shape({}),
     getRowVal: func,
     getRowContent: func,
