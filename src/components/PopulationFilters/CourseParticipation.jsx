@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Popup } from 'semantic-ui-react'
-import { shape, func } from 'prop-types'
+import { shape, func, string } from 'prop-types'
 
 import { removePopulationFilter, alterPopulationCourseFilter } from '../../redux/populationFilters'
 
 class CourseParticipation extends Component {
   static propTypes = {
+    language: string.isRequired,
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     alterPopulationCourseFilter: func.isRequired
@@ -44,7 +45,7 @@ class CourseParticipation extends Component {
     )
 
   render() {
-    const { filter } = this.props
+    const { filter, language } = this.props
     if (filter.notSet) {
       return null
     }
@@ -69,13 +70,13 @@ class CourseParticipation extends Component {
                   width: '80%'
                 }}
                 >
-                  {course.course.name}
+                  {course.course.name[language]}
                 </em>
                 <span style={{ float: 'right' }}>
                   <Icon name="remove" onClick={this.clearFilter} />
                 </span>
               </Segment>}
-            content={course.course.name}
+            content={course.course.name[language]}
           />
           {this.renderFilterSegment('all', 'all', active)}
           {this.renderFilterSegment('passed', 'passed', active)}
@@ -90,6 +91,10 @@ class CourseParticipation extends Component {
   }
 }
 
-export default connect(null, {
+const mapStateToProps = ({ settings }) => ({
+  language: settings.language
+})
+
+export default connect(mapStateToProps, {
   removePopulationFilter, alterPopulationCourseFilter
 })(CourseParticipation)

@@ -150,6 +150,7 @@ class EnableUsers extends Component {
               cellProps: { singleLine: true }
             }, {
               key: 'EDIT',
+              title: '',
               getRowVal: user => (
                 <Button.Group compact widths={2}>
                   <Button animated basic size="mini" disabled={!user.is_enabled} onClick={this.openEditUserPage(user.id)}>

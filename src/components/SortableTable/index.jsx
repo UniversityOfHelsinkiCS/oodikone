@@ -47,7 +47,7 @@ class SortableTable extends Component {
         <Table sortable {...tableProps}>
           <Table.Header>
             <Table.Row>
-              {columns.filter(c => !c.child && c.title).map(c => (
+              {columns.filter(c => !c.child && !(c.title == null)).map(c => (
                 <Table.HeaderCell
                   key={c.key}
                   content={c.title}
@@ -59,7 +59,7 @@ class SortableTable extends Component {
               }
             </Table.Row>
             <Table.Row>
-              {columns.filter(c => c.child && c.title).map(c => (
+              {columns.filter(c => c.child && !(c.title == null)).map(c => (
                 <Table.HeaderCell
                   key={c.key}
                   content={c.title}

@@ -154,12 +154,19 @@ class UserPage extends Component {
       const programmes = user.elementdetails.filter(e => e.type === 20).map(e => e.code)
       user.elementdetails = user.elementdetails.map((element) => {
         const e = Object.assign(element)
-        e.associations = studyrightElements && (element.type === 30) ?
-          _.intersection(
-            programmes,
-            Object.keys(studyrightElements[30][element.code].associations[20])
-          ) :
-          []
+        if (studyrightElements && (element.type === 30)) {
+          const studyright = studyrightElements[30][element.code]
+          if (studyright && studyright.associations && studyright.associations[20]) {
+            e.associations = _.intersection(
+              programmes,
+              Object.keys(studyright.associations[20])
+            )
+          } else {
+            e.associations = programmes
+          }
+        } else {
+          e.associations = []
+        }
         return e
       })
     }
