@@ -167,7 +167,7 @@ class NavigationBar extends Component {
 NavigationBar.propTypes = {
   translate: func.isRequired,
   removeAsUser: func.isRequired,
-  asUser: string,
+  asUser: string, // eslint-disable-line
   history: shape({
     push: func.isRequired
   }).isRequired
