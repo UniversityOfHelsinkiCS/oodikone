@@ -12,6 +12,10 @@ app.use(checkSecret)
 
 app.get('/ping', (req, res) => res.json({ message: 'pong '}))
 
+app.get('/findall', async (req, res) => {
+  const users = await User.findAll()
+  res.json(users)
+})
 app.get('/user/:uid', async (req, res) => {
   const uid = req.params.uid
   const user = await User.byUsername(uid)
@@ -71,6 +75,18 @@ app.put('/user/:uid', async (req, res) => {
   const { full_name } = req.body
   User.updateUser(user, { full_name } )
   res.json(user)
+})
+app.post('/add_rights', async (req, res) => {
+  const { uid, codes } = req.body
+  console.log("adding rights to ", uid)
+  try {
+    await User.enableElementDetails(uid, codes)
+    const user = await User.byId(uid)
+    res.status(200).json({ user })
+
+  } catch (e) {
+    res.status(401).json({ e })
+  }
 })
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

@@ -1,11 +1,10 @@
 const Sequelize = require('sequelize')
 const jwt = require('jsonwebtoken')
 const { User, ElementDetails } = require('../models')
-
+const ElementService = require('./studyelements')
 const Op = Sequelize.Op
 
 const generateToken = async (uid, asUser) => {
-
   const user = await byUsername(uid)
   const elementdetails = user.admin && asUser ? await getUserElementDetails(asUser) : await getUserElementDetails(user.username)
   const elements = elementdetails.map(element => element.code)
