@@ -1,10 +1,11 @@
 const router = require('express').Router()
 const User = require('../services/users')
 const ElementDetails = require('../services/elementdetails')
+const userService = require('../services/userService')
 const mailservice = require('../services/mailservice')
 
 router.get('/users', async (req, res) => {
-  const results = await User.findAll()
+  const results = await userService.findAll()
   res.json(results)
 })
 
@@ -99,8 +100,7 @@ router.delete('/users/:uid/units/:id', async (req, res) => {
 router.post('/users/:uid/elements', async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
-  await User.enableElementDetails(uid, codes)
-  const user = await User.byId(uid)
+  const user = await userService.enableElementDetails(uid, codes)
   res.json(user)
 })
 
