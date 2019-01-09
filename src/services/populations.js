@@ -229,6 +229,15 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
   return students
 }
 
+const count = (column, count, distinct = false) => {
+  const countable = !distinct ? sequelize.col(column) : sequelize.fn('DISTINCT', sequelize.col(column))
+  return sequelize.where(
+    sequelize.fn('COUNT', countable), {
+      [Op.eq]: count
+    }
+  )
+}
+
 const studentnumbersWithAllStudyrightElements = async (studyRights,startDate, endDate, exchangeStudents, cancelledStudents) => { // eslint-disable-line
 
   let studyrightWhere = {}
@@ -241,59 +250,44 @@ const studentnumbersWithAllStudyrightElements = async (studyRights,startDate, en
     studyrightWhere.canceldate = null
   }
 
-  const query = `
-  SELECT
-    "studyright"."studyrightid", "studyright"."student_studentnumber"
-  FROM
-    "studyright"
-  INNER JOIN
-    "studyright_elements"
-    ON
-      "studyright"."studyrightid" = "studyright_elements"."studyrightid"
-  LEFT JOIN
-    "element_details"
-    ON
-      "studyright_elements"."code" = "element_details"."code"
-  WHERE
-    "studyright_elements"."code" IN (:studyRights)
-  AND
-    (
-      "element_details"."type" != 20
-    OR
-      "studyright_elements"."startdate" BETWEEN :startDate AND :endDate
-    )
-  AND
-    (
-      :exchangeStudents
-    OR
-      "studyright"."extentcode" NOT IN (7, 34)
-    )
-  AND
-    (
-      :cancelledStudents
-    OR
-      "studyright"."canceldate" IS NULL
-    )
-  GROUP BY
-    "studyright"."studyrightid"
-  HAVING
-    COUNT(DISTINCT("studyright_elements"."code")) = :studyRightsLength
-  ;
-  `
-
-  const result = await sequelize.query(query, {
-    replacements: {
-      studyRights,
-      startDate,
-      endDate,
-      exchangeStudents: Boolean(exchangeStudents),
-      cancelledStudents: Boolean(cancelledStudents),
-      studyRightsLength: studyRights.length
+  const students = await Studyright.findAll({
+    attributes: ['student_studentnumber'],
+    include: {
+      model: StudyrightElement,
+      attributes: [],
+      required: true,
+      where: {
+        code: {
+          [Op.in]: studyRights
+        }
+      },
+      include: {
+        model: ElementDetails,
+        attributes: [],
+      }
     },
-    type: sequelize.QueryTypes.SELECT
+    group: [
+      sequelize.col('studyright.studyrightid'),
+    ],
+    where: {
+      [Op.or]: [
+        {
+          ['$studyright_elements->element_detail.type$']: {
+            [Op.ne]: 20
+          }
+        },
+        {
+          ['$studyright_elements.startdate$']: {
+            [Op.between]: [startDate, endDate]
+          }
+        }
+      ],
+      ...studyrightWhere
+    },
+    having: count('studyright_elements.code', studyRights.length, true),
   })
 
-  return [...new Set(result.map(s => s.student_studentnumber))]
+  return [...new Set(students.map(s => s.student_studentnumber))]
 }
 
 const parseQueryParams = query => {
