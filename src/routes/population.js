@@ -168,6 +168,7 @@ router.post('/updatedatabase', async (req, res) => {
   }
 })
 
+// This is used by users page and is slightly different from v3. regards Saus Maekine 2019.01.09 
 router.get('/v2/populationstatistics/studyprogrammes', async (req, res) => {
   try {
     const { admin, czar, userId } = req.decodedToken
@@ -176,7 +177,6 @@ router.get('/v2/populationstatistics/studyprogrammes', async (req, res) => {
       res.json(studyrights)
     } else {
       const studyrights = await StudyrightService.getStudyrightElementsAndAssociationsForUser(userId)
-      console.log(studyrights)
       res.json(studyrights)
     }
   } catch (err) {

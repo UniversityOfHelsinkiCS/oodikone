@@ -1,21 +1,25 @@
 const axios = require('axios')
 const { USERSERVICE_URL } = require('../conf-backend')
 
-const client = axios.create({ baseURL: USERSERVICE_URL,  headers: {'secret': process.env.USERSERVICE_SECRET } })
+const client = axios.create({ baseURL: USERSERVICE_URL, headers: { 'secret': process.env.USERSERVICE_SECRET } })
 
 const ping = async () => {
   const url = '/ping'
   const response = await axios.get(url)
   return response.data
 }
-const login = async(uid, full_name, email) => {
+const findAll = async () => {
+  const response = await client.get('/findall')
+  return response.data
+}
+const login = async (uid, full_name, email) => {
   const response = await client.post('/login', {
     uid, full_name, email
   })
   return response.data
 }
 
-const superlogin = async(uid, asUser) => {
+const superlogin = async (uid, asUser) => {
   const response = await client.post('/superlogin', {
     uid, asUser
   })
@@ -53,6 +57,20 @@ const createUser = async (username, full_name, email) => {
   return response.data
 }
 
+const enableElementDetails = async (uid, codes) => {
+  const response = await client.post('/add_rights', { uid, codes })
+  return response.data.user
+}
+
 module.exports = {
-  ping, byUsername, createUser, updateUser, byId, getUserElementDetails, login, superlogin
+  ping,
+  byUsername,
+  createUser,
+  updateUser,
+  byId,
+  getUserElementDetails,
+  login,
+  superlogin,
+  enableElementDetails,
+  findAll
 }
