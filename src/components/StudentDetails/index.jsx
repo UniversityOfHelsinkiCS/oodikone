@@ -107,6 +107,18 @@ class StudentDetails extends Component {
       }
     })
 
+    const filterDuplicates = (elem1, index, array) => {
+      for (let i = 0; i < array.length; i++) {
+        const elem2 = array[i]
+        if (elem1.name === elem2.name &&
+          ((elem1.startdate > elem2.startdate && elem1.enddate <= elem2.enddate) ||
+            (elem1.enddate < elem2.enddate && elem1.startdate >= elem2.startdate))) {
+          return false
+        }
+      }
+      return true
+    }
+
     return (
       <Table>
         <Table.Header>
@@ -125,12 +137,12 @@ class StudentDetails extends Component {
               return (
                 <Table.Row key={c.studyrightid}>
                   <Table.Cell verticalAlign="middle">
-                    {c.elements.degrees.map(degree => (
+                    {c.elements.degrees.filter(filterDuplicates).map(degree => (
                       <p key={degree.name}>{`${degree.name} (${reformatDate(degree.startdate, 'DD.MM.YYYY')} - ${reformatDate(degree.enddate, 'DD.MM.YYYY')})`} <br /> </p>
                     ))}
                   </Table.Cell>
                   <Table.Cell>
-                    {c.elements.programmes.map(programme => (
+                    {c.elements.programmes.filter(filterDuplicates).map(programme => (
                       <p key={programme.name}>{`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(programme.enddate, 'DD.MM.YYYY')})`}<br /> </p>
                     ))}
                   </Table.Cell>
