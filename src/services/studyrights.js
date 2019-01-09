@@ -196,6 +196,7 @@ const calculateAssociationsFromDb = async (chunksize=100000, codes=[10, 20, 30])
   const total = await Studyright.count()
   let offset = 0
   const isValid = ({ type }) => new Set(codes).has(type)
+  const studyTrackByAge = (code) => e => e.type !== 30 || Boolean(Number(e.code[0])) === Boolean(Number(code[0]))
   const types = {}
   while(offset <= total) {
     console.log(`${offset}/${total}`)
@@ -205,7 +206,7 @@ const calculateAssociationsFromDb = async (chunksize=100000, codes=[10, 20, 30])
         group.filter(isValid).forEach(({ type, code, name }) => {
           const elements = types[type] || (types[type] = {})
           const element = elements[code] || (elements[code] = { code, name, type, associations: {}})
-          group.filter(e => e.code !== code).forEach(e => {
+          group.filter(e => e.code !== code).filter(studyTrackByAge(code)).forEach(e => {
             const associations = element.associations[e.type] || ( element.associations[e.type] = {})
             if (!associations[e.code]) {
               associations[e.code] = { code: e.code, name: e.name, type: e.type }            

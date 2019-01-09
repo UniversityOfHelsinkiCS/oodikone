@@ -252,24 +252,36 @@ const studentnumbersWithAllStudyrightElements = async (studyRights,startDate, en
 
   const students = await Studyright.findAll({
     attributes: ['student_studentnumber'],
-    include:
-    {
+    include: {
       model: StudyrightElement,
       attributes: [],
       required: true,
       where: {
         code: {
           [Op.in]: studyRights
-        },
-        startdate: {
-          [Op.between]: [startDate, endDate]
         }
       },
+      include: {
+        model: ElementDetails,
+        attributes: [],
+      }
     },
     group: [
       sequelize.col('studyright.studyrightid'),
     ],
     where: {
+      [Op.or]: [
+        {
+          ['$studyright_elements->element_detail.type$']: {
+            [Op.ne]: 20
+          }
+        },
+        {
+          ['$studyright_elements.startdate$']: {
+            [Op.between]: [startDate, endDate]
+          }
+        }
+      ],
       ...studyrightWhere
     },
     having: count('studyright_elements.code', studyRights.length, true),
