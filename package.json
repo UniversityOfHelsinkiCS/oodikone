@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"no test specified, all good\" && exit 0"
+    "test": "NODE_ENV=test jest --runInBand --verbose --detectOpenHandles",
+    "test_docker": "docker exec -t userservice /bin/bash -c 'npm test'"
   },
   "repository": {
     "type": "git",
@@ -26,5 +27,13 @@
     "pg": "^7.7.1",
     "sequelize": "^4.41.2",
     "umzug": "^2.2.0"
+  },
+  "devDependencies": {
+    "jest": "^23.6.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run test || npm run test_docker"
+    }
   }
 }
