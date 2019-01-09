@@ -72,8 +72,7 @@ app.post('/superlogin', async (req, res) => {
 app.put('/user/:uid', async (req, res) => {
   const uid = req.params.uid
   const user = await User.byUsername(uid)
-  const { full_name } = req.body
-  User.updateUser(user, { full_name } )
+  await User.updateUser(user, req.body)
   res.json(user)
 })
 app.post('/add_rights', async (req, res) => {
