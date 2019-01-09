@@ -10,6 +10,23 @@ services:
   - redis-server
   - docker
 
+addons:
+  postgresql: "9.6"
+  apt:
+    packages:
+    - postgresql-9.6
+    - postgresql-client-9.6
+
+env:
+  global:
+  - PGPORT=5433
+  - NODE_ENV=test
+  - TEST_DB=postgres://postgres@localhost/ooditest TOKEN_SECRET=salainen_token
+
+before_script:
+  - psql -c 'create database ooditest;' -U postgres
+  
+
 after_success:
   - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker build -t toska/oodikone2-userservice:staging ."
   - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
