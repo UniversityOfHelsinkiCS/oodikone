@@ -29,8 +29,10 @@ env:
 before_script:
   - psql --version
   - psql -c 'create database ooditest;' -U postgres
-  
 
+script: 
+  - npm run test_docker
+  
 after_success:
   - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker build -t toska/oodikone2-userservice:staging ."
   - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
