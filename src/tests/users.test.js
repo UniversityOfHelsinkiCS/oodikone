@@ -78,7 +78,7 @@ describe('basic tests', async () => {
   })
 
   test('database is connected', async () => {
-    expect(DB_URL).toBe('postgres://postgres@user_db:5432/user_db_test')
+    expect(DB_URL).toBe(process.env.TEST_DB)
     try {
       await sequelize.authenticate()
     } catch (e) {
