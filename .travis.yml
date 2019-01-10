@@ -16,7 +16,9 @@ services:
   - redis-server
   - docker
   - postgresql
+
 dist: trusty
+
 env:
   global:
     - PGPORT=5433
@@ -25,6 +27,7 @@ env:
     - TOKEN_SECRET=salainen_token
 
 before_script:
+  - psql --version
   - psql -c 'create database ooditest;' -U postgres
   
 
