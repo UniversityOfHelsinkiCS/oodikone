@@ -6,8 +6,6 @@ cache:
   directories:
     - node_modules
 
-
-
 addons:
   postgresql: "9.6"
   apt:
@@ -18,12 +16,12 @@ services:
   - redis-server
   - docker
   - postgresql
-
+dist: trusty
 env:
   global:
     - PGPORT=5433
     - NODE_ENV=test
-    - TEST_DB=postgres://postgres@localhost/ooditest
+    - TEST_DB=postgres://postgres@localhost:5433/ooditest
     - TOKEN_SECRET=salainen_token
 
 before_script:
