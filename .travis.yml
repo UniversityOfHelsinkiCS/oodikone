@@ -28,7 +28,7 @@ env:
 
 before_script:
   - psql --version
-  - psql -c 'create database ooditest;' -U postgres
+  - psql -c 'create database ooditest' -U postgres
   - psql -l
 
 after_success:
