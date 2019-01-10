@@ -12,6 +12,7 @@ addons:
     packages:
     - postgresql-9.6
     - postgresql-client-9.6
+
 services:
   - redis-server
   - docker
@@ -21,7 +22,6 @@ dist: trusty
 
 env:
   global:
-    - PGPORT=5433
     - NODE_ENV=test
     - TEST_DB=postgres://postgres@localhost:5433/ooditest
     - TOKEN_SECRET=salainen_token
