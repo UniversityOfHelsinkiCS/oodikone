@@ -23,11 +23,10 @@ dist: trusty
 env:
   global:
     - NODE_ENV=test
-    - TEST_DB=postgres://postgres@localhost:5432/ooditest
+    - TEST_DB=postgres://postgres@localhost/ooditest
     - TOKEN_SECRET=salainen_token
 
 before_script:
-  - sudo service postgresql restart
   - psql --version
   - psql -c 'create database ooditest;' -U postgres
   
