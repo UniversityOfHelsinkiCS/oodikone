@@ -27,6 +27,7 @@ env:
     - TOKEN_SECRET=salainen_token
 
 before_script:
+  - sudo service postgresql restart
   - psql --version
   - psql -c 'create database ooditest;' -U postgres
   
