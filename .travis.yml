@@ -23,7 +23,7 @@ dist: trusty
 env:
   global:
     - NODE_ENV=test
-    - TEST_DB=postgres://postgres@localhost:5433/ooditest
+    - TEST_DB=postgres://postgres@localhost:5432/ooditest
     - TOKEN_SECRET=salainen_token
 
 before_script:
