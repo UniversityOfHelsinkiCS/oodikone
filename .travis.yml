@@ -6,9 +6,7 @@ cache:
   directories:
     - node_modules
 
-services:
-  - redis-server
-  - docker
+
 
 addons:
   postgresql: "9.6"
@@ -16,12 +14,17 @@ addons:
     packages:
     - postgresql-9.6
     - postgresql-client-9.6
+services:
+  - redis-server
+  - docker
+  - postgresql
 
 env:
   global:
-  - PGPORT=5433
-  - NODE_ENV=test
-  - TEST_DB=postgres://postgres@localhost/ooditest TOKEN_SECRET=salainen_token
+    - PGPORT=5433
+    - NODE_ENV=test
+    - TEST_DB=postgres://postgres@localhost/ooditest
+    - TOKEN_SECRET=salainen_token
 
 before_script:
   - psql -c 'create database ooditest;' -U postgres
