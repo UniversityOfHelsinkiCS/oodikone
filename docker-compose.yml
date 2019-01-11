@@ -1,6 +1,16 @@
 version: '3'
 
 services:
+  user_db:
+    image: postgres:9.6.3
+    ports:
+      - "5422:5432"
+    volumes:
+      - ./user_pgdata:/var/lib/postgresql/data
+    container_name: oodi_user_db
+    environment:
+      - POSTGRES_USER=postgres
+
   db:
     image: postgres:9.6.3
     ports:
@@ -90,7 +100,8 @@ services:
     volumes:
       - ./repos/oodikone2-userservice/:/usr/src/app
     environment:
-      - DB_URL=postgres://postgres@db:5432/tkt_oodi
+      - DB_URL=postgres://postgres@user_db:5432/user_db
+      - TEST_DB=postgres://postgres@user_db:5432/user_db_test
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       - TOKEN_SECRET=IWannaBeTheVeryBest
 
