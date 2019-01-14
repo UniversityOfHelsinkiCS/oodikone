@@ -9,9 +9,8 @@ export default {
   **Study programme:** haluttu koulutusohjelma.`,
   Advanced: `**Semesters:**  Jos haluaa tarkastella vain syyslukukaudella tai kevätlukukaudella ilmoittautuneita, 
   haluttu ajanjakso valitaan tästä.`,
-  QueryCard: `Valitun populaation perustiedot. ”Sample size” luku sisältää kaikki tähän populaatioon liittyvät 
-    opiskelijat: läsnä- ja poissaolevaksi ilmoittautuneet, määräaikaiset ulkomaalaiset opiskelijat 
-    sekä opinto-oikeutensa peruneet opiskelijat.`,
+  QueryCard: `Valitun populaation perustiedot. "Sample size" kertoo populaation opiskelijalukumäärän. 
+    Lukumäärään sisältyvät (läsnäolevat, poissaolevat ja kirjoiltapoistetut) tutkinto-opiskelijat."`,
   Filters: {
     Add: `Harmaata ”add” painiketta klikkaamalla aukeaa filters- eli suodatinvalikko, josta voi 
       lisätä haluamiaan suodattimia, jotka rajaavat valittua populaatiota. Huom.! Filtterit eivät vaikuta 

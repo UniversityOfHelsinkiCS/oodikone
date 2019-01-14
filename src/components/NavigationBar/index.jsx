@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Menu, Dropdown, Button } from 'semantic-ui-react'
 import * as Sentry from '@sentry/browser'
 import { NavLink, Link } from 'react-router-dom'
-import { func, string, oneOfType, shape } from 'prop-types'
+import { func, shape, string } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { routes, hiddenRoutes } from '../../constants'
@@ -167,7 +167,7 @@ class NavigationBar extends Component {
 NavigationBar.propTypes = {
   translate: func.isRequired,
   removeAsUser: func.isRequired,
-  asUser: oneOfType([null, undefined, string]).isRequired,
+  asUser: string, // eslint-disable-line
   history: shape({
     push: func.isRequired
   }).isRequired
