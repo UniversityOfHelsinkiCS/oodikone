@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, arrayOf, shape, bool, string, object } from 'prop-types'
-import { Form, Button, Message, Icon, Grid } from 'semantic-ui-react'
+import { Form, Button, Message, Icon, Grid, Transition } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
@@ -54,7 +54,9 @@ class PopulationSearchForm extends Component {
       showAdvancedSettings: false,
       validYear: true,
       floatMonths: this.months('2017', 'FALL'),
-      asUser: null
+      asUser: null,
+      selectableStartYears: { first: 1900, last: Datetime.moment().format() },
+      animate: true
     }
   }
 
@@ -118,7 +120,7 @@ class PopulationSearchForm extends Component {
 
   handleYearSelection = (year) => {
     const { query } = this.state
-    const validYear = isInDateFormat(year, YEAR_DATE_FORMAT) && isValidYear(year)
+    const validYear = isInDateFormat(year, YEAR_DATE_FORMAT) && this.validYearCheck(year)
     if (validYear) {
       this.setState({
         validYear,
@@ -191,20 +193,29 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  handleProgrammeChange = (e, { value }) => {
-    const { query } = this.state
+  handleProgrammeChange = async (e, { value }) => {
     const programme = value
     if (programme === '') {
       this.handleClear('programme')
       return
     }
-    this.setState({
+    const { query } = this.state
+    let { animate } = this.state
+    const { studyProgrammes } = this.props
+    const selectableStartYears = { first: studyProgrammes[value].first_held, last: studyProgrammes[value].latest_held }
+    if (!this.validYearCheck(Datetime.moment(query.year), selectableStartYears.first, selectableStartYears.last)) {
+      query.year = Datetime.moment(selectableStartYears.last).year()
+      animate = !animate
+    }
+    await this.setState({
       query: {
         ...query,
         studyRights: {
           programme
         }
-      }
+      },
+      selectableStartYears,
+      animate
     })
   }
 
@@ -265,10 +276,15 @@ class PopulationSearchForm extends Component {
     return moment(start).add(months - 1, 'months').format('MMMM YY')
   }
 
+  validYearCheck = (year, first = this.state.selectableStartYears.first, last = this.state.selectableStartYears.last) => ( // eslint-disable-line
+    isValidYear(year) && year.isSameOrBefore(Datetime.moment(last), 'year')
+      && year.isSameOrAfter(Datetime.moment(first), 'year')
+  )
+
   getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
 
   initialQuery = () => ({
-    year: '2017',
+    year: Datetime.moment('2017-01-01').year(),
     semesters: ['FALL', 'SPRING'],
     studentStatuses: [],
     studyRights: [],
@@ -288,23 +304,25 @@ class PopulationSearchForm extends Component {
   }
 
   renderEnrollmentDateSelector = () => {
-    const { query, validYear } = this.state
+    const { query, validYear, animate } = this.state
     const { semesters, year } = query
     return (
       <Form.Group key="year" className={style.enrollmentSelectorGroup}>
         <Form.Field error={!validYear} className={style.yearSelect}>
           <label>Enrollment</label>
-          <Datetime
-            className={style.yearSelectInput}
-            control={Datetime}
-            dateFormat={YEAR_DATE_FORMAT}
-            timeFormat={false}
-            renderYear={(props, selectableYear) => <td {...props}>{`${selectableYear}-${selectableYear + 1}`}</td>}
-            closeOnSelect
-            value={`${year}-${moment(year).add(1, 'years').format('YYYY')}`}
-            isValidDate={isValidYear}
-            onChange={this.handleYearSelection}
-          />
+          <Transition animation="pulse" duration={20} visible={animate}>
+            <Datetime
+              className={style.yearSelectInput}
+              control={Datetime}
+              dateFormat={YEAR_DATE_FORMAT}
+              timeFormat={false}
+              renderYear={(props, selectableYear) => <td {...props}>{`${selectableYear}-${selectableYear + 1}`}</td>}
+              closeOnSelect
+              value={`${year}-${moment().year(year).add(1, 'years').format('YYYY')}`}
+              isValidDate={this.validYearCheck}
+              onChange={this.handleYearSelection}
+            />
+          </Transition>
         </Form.Field>
         <Form.Field className={style.yearControl}>
           <Button.Group basic vertical className={style.yearControlButtonGroup}>

@@ -11,7 +11,6 @@ import styles from './courseCodeMapper.css'
 
 const { func, shape, string } = PropTypes
 
-
 class CourseCodeMapper extends Component {
   constructor(props) {
     super(props)
@@ -120,7 +119,7 @@ class CourseCodeMapper extends Component {
               If this is not the case use this to combine old and new course codes to each other."
           />
           <Loader active={pending} />
-          <Segment.Group vertical>
+          <Segment.Group>
             <Segment.Group horizontal>
               <Segment>
                 <Header content="Filter course codes" />
