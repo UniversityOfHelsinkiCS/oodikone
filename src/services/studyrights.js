@@ -179,16 +179,18 @@ const associatedStudyrightElements = async (offset, limit) => {
     attributes: [],
     include: {
       model: StudyrightElement,
-      attributes: ['id', 'code'],
+      attributes: ['id', 'code', 'startdate'],
       include: {
         model: ElementDetails,
-        attributes: ['type', 'name', 'code']
+        attributes: ['type', 'name', 'code'],
       },
     },
     limit,
     offset
   })
-  const groupings = studyrights.map(({ studyright_elements: sres }) => sres.map(sre => sre.element_detail.get()))
+  const groupings = studyrights.map(({ studyright_elements: sres }) => (
+    sres.map(sre => ({ ...sre.element_detail.get(), startdate: sre.startdate })))
+  )
   return groupings
 }
 
@@ -203,9 +205,20 @@ const calculateAssociationsFromDb = async (chunksize=100000, codes=[10, 20, 30])
     const elementgroups = await associatedStudyrightElements(offset, chunksize)
     elementgroups
       .forEach(group => {
-        group.filter(isValid).forEach(({ type, code, name }) => {
+        group.filter(isValid).forEach(({ type, code, name, startdate }) => {
           const elements = types[type] || (types[type] = {})
-          const element = elements[code] || (elements[code] = { code, name, type, associations: {}})
+          if(!elements[code]) {
+            elements[code] = { code, name, type, first_held: startdate, latest_held: startdate, associations: {}}
+          }
+          else {
+            if (elements[code].first_held > startdate) {
+              elements[code].first_held = startdate
+            }
+            if (elements[code].latest_held < startdate) {
+              elements[code].latest_held = startdate
+            }
+          }
+          const element = elements[code]
           group.filter(e => e.code !== code).filter(studyTrackByAge(code)).forEach(e => {
             const associations = element.associations[e.type] || ( element.associations[e.type] = {})
             if (!associations[e.code]) {
