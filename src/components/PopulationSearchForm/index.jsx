@@ -451,12 +451,12 @@ class PopulationSearchForm extends Component {
       )
     }
 
-    let sortedStudyProgrammes = studyProgrammes
     let programmesToRender
     if (studyProgrammes) {
-      sortedStudyProgrammes = _.sortBy(sortedStudyProgrammes, s => s.name[language])
+      const sortedStudyProgrammes = _.sortBy(studyProgrammes, s => s.name[language])
       programmesToRender = this.renderableList(sortedStudyProgrammes)
     }
+
     let degreesToRender
     if (studyRights.programme) {
       const sortedStudyDegrees =
