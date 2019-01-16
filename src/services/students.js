@@ -32,7 +32,7 @@ const byId = async (id) => Student.findByPrimary(id, {
           model: ElementDetails,
           where: {
             type: {
-              [Op.in]: [10, 20]
+              [Op.in]: [10, 20, 30]
             }
           }
         }
