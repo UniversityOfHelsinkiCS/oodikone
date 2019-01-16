@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, arrayOf, shape, bool, string, object } from 'prop-types'
-import { Form, Button, Message, Icon, Grid, Transition } from 'semantic-ui-react'
+import { Form, Button, Message, Icon, Grid } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
@@ -48,15 +48,15 @@ class PopulationSearchForm extends Component {
   constructor() {
     super()
 
+    const query = this.initialQuery()
     this.state = {
-      query: this.initialQuery(),
+      query,
       isLoading: false,
       showAdvancedSettings: false,
-      validYear: true,
+      momentYear: Datetime.moment('2017-01-01'),
       floatMonths: this.months('2017', 'FALL'),
       asUser: null,
-      selectableStartYears: { first: 1900, last: Datetime.moment().format() },
-      animate: true
+      selectableStartYears: this.defaultSelectableStartYears()
     }
   }
 
@@ -118,24 +118,19 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  handleYearSelection = (year) => {
+  handleYearSelection = (momentYear) => {
     const { query } = this.state
-    const validYear = isInDateFormat(year, YEAR_DATE_FORMAT) && this.validYearCheck(year)
-    if (validYear) {
-      this.setState({
-        validYear,
-        query: {
-          ...query,
-          year: reformatDate(year, YEAR_DATE_FORMAT),
-          months: this.months(
-            reformatDate(year, YEAR_DATE_FORMAT),
-            this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING'
-          )
-        }
-      })
-    } else {
-      this.setState({ validYear })
-    }
+    this.setState({
+      momentYear,
+      query: {
+        ...query,
+        year: reformatDate(momentYear, YEAR_DATE_FORMAT),
+        months: this.months(
+          reformatDate(momentYear, YEAR_DATE_FORMAT),
+          this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING'
+        )
+      }
+    })
   }
 
   addYear = () => {
@@ -193,29 +188,24 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  handleProgrammeChange = async (e, { value }) => {
+  handleProgrammeChange = (e, { value }) => {
     const programme = value
     if (programme === '') {
+      this.setState({ selectableStartYears: this.defaultSelectableStartYears() })
       this.handleClear('programme')
       return
     }
     const { query } = this.state
-    let { animate } = this.state
     const { studyProgrammes } = this.props
     const selectableStartYears = { first: studyProgrammes[value].first_held, last: studyProgrammes[value].latest_held }
-    if (!this.validYearCheck(Datetime.moment(query.year), selectableStartYears.first, selectableStartYears.last)) {
-      query.year = Datetime.moment(selectableStartYears.last).year()
-      animate = !animate
-    }
-    await this.setState({
+    this.setState({
       query: {
         ...query,
         studyRights: {
           programme
         }
       },
-      selectableStartYears,
-      animate
+      selectableStartYears
     })
   }
 
@@ -276,10 +266,13 @@ class PopulationSearchForm extends Component {
     return moment(start).add(months - 1, 'months').format('MMMM YY')
   }
 
-  validYearCheck = (year, first = this.state.selectableStartYears.first, last = this.state.selectableStartYears.last) => ( // eslint-disable-line
-    isValidYear(year) && year.isSameOrBefore(Datetime.moment(last), 'year')
-      && year.isSameOrAfter(Datetime.moment(first), 'year')
-  )
+  validYearCheck = (momentYear, first = this.state.selectableStartYears.first, last = this.state.selectableStartYears.last) => { // eslint-disable-line
+    if (!isInDateFormat(momentYear, YEAR_DATE_FORMAT) || !isValidYear(momentYear)) {
+      return false
+    }
+    const year = momentYear.year()
+    return year >= first && year <= last
+  }
 
   getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
 
@@ -289,6 +282,11 @@ class PopulationSearchForm extends Component {
     studentStatuses: [],
     studyRights: [],
     months: this.months('2017', 'FALL')
+  })
+
+  defaultSelectableStartYears = () => ({
+    first: 1900,
+    last: Datetime.moment().year()
   })
 
   renderableList = (list) => {
@@ -304,25 +302,23 @@ class PopulationSearchForm extends Component {
   }
 
   renderEnrollmentDateSelector = () => {
-    const { query, validYear, animate } = this.state
+    const { query, momentYear } = this.state
     const { semesters, year } = query
     return (
       <Form.Group key="year" className={style.enrollmentSelectorGroup}>
-        <Form.Field error={!validYear} className={style.yearSelect}>
+        <Form.Field error={!this.validYearCheck(momentYear)} className={style.yearSelect}>
           <label>Enrollment</label>
-          <Transition animation="pulse" duration={20} visible={animate}>
-            <Datetime
-              className={style.yearSelectInput}
-              control={Datetime}
-              dateFormat={YEAR_DATE_FORMAT}
-              timeFormat={false}
-              renderYear={(props, selectableYear) => <td {...props}>{`${selectableYear}-${selectableYear + 1}`}</td>}
-              closeOnSelect
-              value={`${year}-${moment().year(year).add(1, 'years').format('YYYY')}`}
-              isValidDate={this.validYearCheck}
-              onChange={this.handleYearSelection}
-            />
-          </Transition>
+          <Datetime
+            className={style.yearSelectInput}
+            control={Datetime}
+            dateFormat={YEAR_DATE_FORMAT}
+            timeFormat={false}
+            renderYear={(props, selectableYear) => <td {...props}>{`${selectableYear}-${selectableYear + 1}`}</td>}
+            closeOnSelect
+            value={`${year}-${moment().year(year).add(1, 'years').format('YYYY')}`}
+            isValidDate={this.validYearCheck}
+            onChange={this.handleYearSelection}
+          />
         </Form.Field>
         <Form.Field className={style.yearControl}>
           <Button.Group basic vertical className={style.yearControlButtonGroup}>
@@ -451,17 +447,18 @@ class PopulationSearchForm extends Component {
       )
     }
 
-    let sortedStudyProgrammes = studyProgrammes
     let programmesToRender
     if (studyProgrammes) {
-      sortedStudyProgrammes = _.sortBy(sortedStudyProgrammes, s => s.name[language])
+      const sortedStudyProgrammes = _.sortBy(studyProgrammes, s => s.name[language])
       programmesToRender = this.renderableList(sortedStudyProgrammes)
     }
+
     let degreesToRender
     if (studyRights.programme) {
       const sortedStudyDegrees =
         _.sortBy(studyProgrammes[studyRights.programme].associations['10'], s => s.name[language])
-      degreesToRender = this.renderableList(sortedStudyDegrees)
+      const year = this.state.momentYear.year()
+      degreesToRender = this.renderableList(sortedStudyDegrees.filter(s => s.year >= year && s.year <= year + 1))
     }
 
     let studyTracksToRender
@@ -556,12 +553,12 @@ class PopulationSearchForm extends Component {
       return null
     }
     const { translate } = this.props
-    const { isLoading, validYear, query } = this.state
+    const { isLoading, momentYear, query } = this.state
     const { Advanced } = infoToolTips.PopulationStatistics
     let errorText = translate('populationStatistics.alreadyFetched')
     let isQueryInvalid = this.validateQuery()
 
-    if (!validYear) {
+    if (!this.validYearCheck(momentYear)) {
       isQueryInvalid = true
       errorText = translate('populationStatistics.selectValidYear')
     }
