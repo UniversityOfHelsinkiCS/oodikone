@@ -82,7 +82,7 @@ class StudentDetails extends Component {
 
   renderStudyRights = () => {
     const { student, language } = this.props
-    const studyRightHeaders = ['Degree', 'Programme', 'Graduated']
+    const studyRightHeaders = ['Degree', 'Programme', 'Study Track', 'Graduated']
     const studyRightRows = student.studyrights.map((studyright) => {
       const degrees = sortBy(studyright.studyrightElements, 'enddate').filter(e => e.element_detail.type === 10)
         .map(degree => ({
@@ -98,12 +98,18 @@ class StudentDetails extends Component {
           enddate: programme.enddate,
           name: programme.element_detail.name[language]
         }))
+      const studytracks = sortBy(studyright.studyrightElements, 'enddate').filter(e => e.element_detail.type === 30)
+        .map(studytrack => ({
+          startdate: studytrack.startdate,
+          enddate: studytrack.enddate,
+          name: studytrack.element_detail.name[language]
+        }))
       return {
         studyrightid: studyright.studyrightid,
         graduated: studyright.graduated,
         canceldate: studyright.canceldate,
         enddate: studyright.enddate,
-        elements: { degrees, programmes }
+        elements: { degrees, programmes, studytracks }
       }
     })
 
@@ -144,6 +150,11 @@ class StudentDetails extends Component {
                   <Table.Cell>
                     {c.elements.programmes.filter(filterDuplicates).map(programme => (
                       <p key={programme.name}>{`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(programme.enddate, 'DD.MM.YYYY')})`}<br /> </p>
+                    ))}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {c.elements.studytracks.filter(filterDuplicates).map(studytrack => (
+                      <p key={studytrack.name}>{`${studytrack.name} (${reformatDate(studytrack.startdate, 'DD.MM.YYYY')} - ${reformatDate(studytrack.enddate, 'DD.MM.YYYY')})`}<br /> </p>
                     ))}
                   </Table.Cell>
                   <Table.Cell>
