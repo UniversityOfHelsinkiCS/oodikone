@@ -266,10 +266,13 @@ class PopulationSearchForm extends Component {
     return moment(start).add(months - 1, 'months').format('MMMM YY')
   }
 
-  validYearCheck = (year, first = this.state.selectableStartYears.first, last = this.state.selectableStartYears.last) => ( // eslint-disable-line
-    isInDateFormat(year, YEAR_DATE_FORMAT) && isValidYear(year) && year.isSameOrBefore(Datetime.moment(last), 'year')
-      && year.isSameOrAfter(Datetime.moment(first), 'year')
-  )
+  validYearCheck = (momentYear, first = this.state.selectableStartYears.first, last = this.state.selectableStartYears.last) => { // eslint-disable-line
+    if (!isInDateFormat(momentYear, YEAR_DATE_FORMAT) || !isValidYear(momentYear)) {
+      return false
+    }
+    const year = momentYear.year()
+    return year >= first && year <= last
+  }
 
   getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
 
@@ -283,7 +286,7 @@ class PopulationSearchForm extends Component {
 
   defaultSelectableStartYears = () => ({
     first: 1900,
-    last: Datetime.moment().format()
+    last: Datetime.moment().year()
   })
 
   renderableList = (list) => {
@@ -454,7 +457,8 @@ class PopulationSearchForm extends Component {
     if (studyRights.programme) {
       const sortedStudyDegrees =
         _.sortBy(studyProgrammes[studyRights.programme].associations['10'], s => s.name[language])
-      degreesToRender = this.renderableList(sortedStudyDegrees)
+      const year = this.state.momentYear.year()
+      degreesToRender = this.renderableList(sortedStudyDegrees.filter(s => s.year >= year && s.year <= year + 1))
     }
 
     let studyTracksToRender
