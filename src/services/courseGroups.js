@@ -1,7 +1,7 @@
 const Promise = require('bluebird')
 const { Op } = require('sequelize')
 const { redisClient } = require('../services/redis')
-const { Teacher } = require('../models')
+const { Teacher, CourseGroup } = require('../models')
 
 const {
   getCurrentAcademicYear,
@@ -56,6 +56,8 @@ const getTeachersForCourseGroup = (courseGroupId) => {
     }
   })
 }
+
+const createCourseGroup = (name) => CourseGroup.create({ name })
 
 const getCourseGroupsWithTotals = async (semesterCode) => {
   const courseGroupIds = [1, 2]
@@ -169,6 +171,7 @@ const getCoursesByTeachers = async (teacherIds, semesterCode) => {
 }
 
 module.exports = {
+  createCourseGroup,
   getAcademicYears,
   getCourseGroupsWithTotals,
   getCourseGroup,
