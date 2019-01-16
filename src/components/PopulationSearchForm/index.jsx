@@ -458,7 +458,7 @@ class PopulationSearchForm extends Component {
       const sortedStudyDegrees =
         _.sortBy(studyProgrammes[studyRights.programme].associations['10'], s => s.name[language])
       const year = this.state.momentYear.year()
-      degreesToRender = this.renderableList(sortedStudyDegrees.filter(s => s.year >= year && s.year <= year + 1))
+      degreesToRender = this.renderableList(sortedStudyDegrees.filter(s => s.first_held <= year && s.latest_held >= year))
     }
 
     let studyTracksToRender
