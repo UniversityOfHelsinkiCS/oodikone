@@ -15,6 +15,29 @@ const ElementDetails = sequelize.define('element_details',
   }
 )
 
+const AccessGroup = sequelize.define('access_group',
+{
+  id: {
+    primaryKey: true,
+    type: Sequelize.BIGINT,
+    autoIncrement: true
+  },
+  group_code: {
+    type: Sequelize.STRING,
+    unique: true
+  },
+  group_info: {
+    type: Sequelize.STRING
+  },
+  createdAt: {
+    type: Sequelize.DATE
+  },
+  updatedAt: {
+    type: Sequelize.DATE
+  }
+})
+
+
 const User = sequelize.define('users',
   {
     id: {
@@ -53,8 +76,12 @@ const Migration = sequelize.define('migrations', {
 User.belongsToMany(ElementDetails, { through: 'user_elementdetails', as: 'elementdetails' })
 ElementDetails.belongsToMany(User, { through: 'user_elementdetails' })
 
+User.belongsToMany(AccessGroup, { through: 'user_accessgroup', as: 'accessgroup' })
+AccessGroup.belongsToMany(User, { through: 'user_accessgroup' })
+
 module.exports = {
   User,
   ElementDetails,
-  Migration
+  Migration,
+  AccessGroup
 }
