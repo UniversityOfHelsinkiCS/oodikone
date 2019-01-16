@@ -97,7 +97,12 @@ class TeacherStatistics extends Component {
           </Segment>
           { display && !pending && (
             <Segment>
-              <TeacherStatisticsTable statistics={statistics} onClickFn={e => this.props.history.push(`/teachers/${e.target.innerText}`)} />
+              <TeacherStatisticsTable
+                statistics={statistics}
+                onClickFn={e =>
+                  this.props.history.push(`/teachers/${e.target.innerText}`)
+                }
+              />
             </Segment>
           )}
         </div>
