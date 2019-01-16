@@ -19,6 +19,7 @@ import UsageStatistics from '../UsageStatistics'
 import Teachers from '../Teachers'
 import Sandbox from '../Sandbox'
 import OodiLearn from '../OodiLearn'
+import StudyProgramme from '../StudyProgramme'
 import { callApi } from '../../apiConnection'
 
 import styles from './main.css'
@@ -34,7 +35,6 @@ class Main extends Component {
     networkError: false,
     guide: 'try refreshing your browser window, pressing log out or contacting grp-toska@helsinki.fi'
   }
-
 
   async componentDidMount() {
     const enabled = await userIsEnabled()
@@ -62,7 +62,11 @@ class Main extends Component {
     this.setState({ hasError: true, loaded: true })
   }
 
-  setNetworkError = () => this.setState({ guide: 'Oodikone is unable to connect. Double check that you\'re in eduroam or have pulse security on. Refresh by pressing F5.', networkError: true })
+  setNetworkError = () => this.setState({
+    guide: `Oodikone is unable to connect. 
+      Double check that you're in eduroam or have 
+      pulse security on. Refresh by pressing F5.`,
+    networkError: true })
 
   ping = async () => {
     try {
@@ -70,7 +74,11 @@ class Main extends Component {
       if (res.status === 504) {
         throw new Error('Vituix män')
       } else {
-        this.setState({ networkError: false, guide: 'try refreshing your browser window, pressing log out or contacting grp-toska@helsinki.fi' })
+        this.setState({
+          networkError: false,
+          guide: `try refreshing your browser window, pressing 
+            log out or contacting grp-toska@helsinki.fi`
+        })
       }
     } catch (e) {
       this.setNetworkError()
@@ -115,6 +123,7 @@ class Main extends Component {
               <Route exact path={routes.students.route} component={StudentStatistics} />
               <Route exact path={routes.courseStatistics.route} component={CourseStatistics} />
               <Route exact path={routes.courseGroups.route} component={CourseGroups} />
+              <Route exact path={routes.studyProgramme.route} component={StudyProgramme} />
               <Route exact path={routes.settings.route} component={Settings} />
               <Route exact path={routes.users.route} component={EnableUsers} />
               <Route exact path={routes.teachers.route} component={Teachers} />
