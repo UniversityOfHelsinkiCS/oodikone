@@ -62,6 +62,11 @@ const enableElementDetails = async (uid, codes) => {
   return response.data.user
 }
 
+const modifyAccess = async (body) => {
+  const response = await client.post('/modifyaccess', body)
+  return response.data
+}
+
 module.exports = {
   ping,
   byUsername,
@@ -72,5 +77,7 @@ module.exports = {
   login,
   superlogin,
   enableElementDetails,
-  findAll
+  findAll,
+  modifyAccess
+
 }
