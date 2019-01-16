@@ -1,7 +1,6 @@
 const { sequelize, forceSyncDatabase } = require('../database/connection')
-const { User, ElementDetails } = require('../models/index')
+const { User, ElementDetails, AccessGroup } = require('../models/index')
 const userService = require('../services/users')
-const elementService = require('../services/studyelements')
 const { DB_URL } = require('../conf')
 
 const langify = name => ({
@@ -61,11 +60,24 @@ const default_elementdetails = [
   }
 
 ]
+const default_accessgroups = [
+  {
+    id: 1,
+    group_code: 'teachers',
+    group_info: 'liirum laarum'
+  },
+  {
+    id: 2,
+    group_code: 'admin',
+    group_info: 'big boss'
+  }
+]
   
 beforeAll(async () => {
   await forceSyncDatabase()
   await User.bulkCreate(default_users)
   await ElementDetails.bulkCreate(default_elementdetails)
+  await AccessGroup.bulkCreate(default_accessgroups)
 })
 afterAll(async () => {
   await sequelize.close()
@@ -145,5 +157,31 @@ describe('user access right tests', async () => {
       await userService.updateUser(user1, { is_enabled: true })
       const user2 = await userService.byUsername('rambo666')
       expect(user2.is_enabled).toBe(true)
+    })
+    test('Access groups can be added and removed', async () => {
+      const id = 666
+      const user1 = await userService.byId(id)
+      expect(user1.accessgroup.length).toBe(0)
+
+      await userService.modifyRights(id, { teachers: true, admin: true })
+      const user2 = await userService.byId(id)
+      expect(user2.accessgroup.length).toBe(2)
+      const ags = user2.accessgroup.map(ag => ag.group_code)
+      expect(ags).toContain('teachers')
+      expect(ags).toContain('admin')
+
+      await userService.modifyRights(user1.id, { admin: false })
+      const user3 = await userService.byId(id)
+      expect(user3.accessgroup.length).toBe(1)
+      const ags2 = user3.accessgroup.map(ag => ag.group_code)
+      expect(ags2).toContain('teachers')
+      expect(ags2).not.toContain('admin')
+    })
+    test('get accessgroups workerinos ', async () => {
+      const id = 666
+      const user = await userService.byId(id)
+      await userService.modifyRights(id, { teachers: true, admin: true })
+      const ags = await userService.getUserAccessGroups(user.username)
+      expect(ags.length).toBe(2)
     })
 })

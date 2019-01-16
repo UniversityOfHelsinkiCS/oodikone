@@ -75,6 +75,20 @@ app.put('/user/:uid', async (req, res) => {
   await User.updateUser(user, req.body)
   res.json(user)
 })
+
+app.post('/modifyaccess', async (req, res) => {
+  console.log('AAAAAAAaa')
+  const { uid, rights } = req.body
+  try {
+    await User.modifyRights(uid, rights)
+    const user = await User.byId(uid)
+    console.log(user)
+    res.status(200).json({ user })
+  } catch (e) {
+    res.status(403).json({ e })
+  }
+
+})
 app.post('/add_rights', async (req, res) => {
   const { uid, codes } = req.body
   console.log("adding rights to ", uid)

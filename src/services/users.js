@@ -1,7 +1,8 @@
 const Sequelize = require('sequelize')
 const jwt = require('jsonwebtoken')
-const { User, ElementDetails } = require('../models')
+const { User, ElementDetails, AccessGroup } = require('../models')
 const ElementService = require('./studyelements')
+const AccessService = require('./accessgroups')
 const Op = Sequelize.Op
 
 const generateToken = async (uid, asUser) => {
@@ -38,7 +39,7 @@ const login = async (uid, full_name, mail) => {
   console.log('Generating token')
   const token = await generateToken(uid)
   console.log('Token done')
-  return({ token, isNew })
+  return ({ token, isNew })
 
 }
 const superlogin = async (uid, asUser) => {
@@ -84,6 +85,10 @@ const byId = async (id) => {
     include: [{
       model: ElementDetails,
       as: 'elementdetails'
+    }, {
+      model: AccessGroup,
+      as: 'accessgroup',
+      attributes: ['id','group_code', 'group_info']
     }]
   })
 }
@@ -97,6 +102,10 @@ const getUnitsFromElementDetails = async username => {
 const getUserElementDetails = async username => {
   const user = await byUsername(username)
   return await user.getElementdetails()
+}
+const getUserAccessGroups = async username => {
+  const user = await byUsername(username)
+  return await user.getAccessgroup()
 }
 
 const findAll = async () => {
@@ -114,6 +123,24 @@ const enableElementDetails = async (uid, codes) => {
   await user.addElementdetails(elements)
 }
 
+const modifyRights = async (uid, rights) => {
+  const rightsToAdd = Object.entries(rights).map(([code, val]) => {
+    if (val === true) {
+      return code
+    }}).filter(code => code)
+  const rightsToRemove = Object.entries(rights).map(([code, val]) => {
+    if (val === false) {
+      return code
+    }}).filter(code => code)
+  
+  const user = await byId(uid)
+  const accessGroupsToAdd = await AccessService.byCodes(rightsToAdd)
+  const accessGroupsToRemove = await AccessService.byCodes(rightsToRemove)
+
+  await user.addAccessgroup(accessGroupsToAdd)
+  await user.removeAccessgroup(accessGroupsToRemove)
+}
+
 
 module.exports = {
   byUsername,
@@ -125,6 +152,8 @@ module.exports = {
   getUserElementDetails,
   enableElementDetails,
   login,
-  superlogin
+  superlogin,
+  modifyRights,
+  getUserAccessGroups
 
 }
