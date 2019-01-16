@@ -220,7 +220,17 @@ const calculateAssociationsFromDb = async (chunksize=100000, codes=[10, 20, 30])
           group.filter(e => e.code !== code).filter(studyTrackByAge(code)).forEach(e => {
             const associations = element.associations[e.type] || ( element.associations[e.type] = {})
             if (!associations[e.code]) {
-              associations[e.code] = { code: e.code, name: e.name, type: e.type, year: e.year }            
+              associations[e.code] = {
+                code: e.code, name: e.name, type: e.type, first_held: e.year, latest_held: e.year
+              }            
+            } else {
+              const association = associations[e.code]
+              if (association.first_held > e.year) {
+                association.first_held = e.year
+              }
+              if (association.latest_held < e.year) {
+                association.latest_held = e.year
+              }
             }
           })
         })
