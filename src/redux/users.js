@@ -6,6 +6,19 @@ export const getUsers = () => {
   return callController(route, prefix)
 }
 
+export const getAccessGroups = () => {
+  const route = '/users/access_groups'
+  const prefix = 'GET_ACCESSGROUPS_'
+  return callController(route, prefix)
+}
+export const modifyAccessGroups = (uid, accessgroups) => {
+  const route = '/users/modifyaccess'
+  const prefix = 'MODIFY_ACCESSGROUPS_'
+  const method = 'post'
+  const data = { uid, accessgroups }
+  return callController(route, prefix, data, method)
+}
+
 export const enableUser = (id) => {
   const route = `/users/${id}/enable`
   const prefix = 'ENABLE_USER_'
@@ -56,13 +69,15 @@ const reducer = (state = { data: [] }, action) => {
       return {
         pending: true,
         error: state.error,
-        data: state.data
+        data: state.data,
+        ...state
       }
     case 'GET_USERS_FAILURE':
       return {
         pending: false,
         error: true,
-        data: action.response
+        data: action.response,
+        ...state
       }
     case 'GET_USERS_SUCCESS':
       return {
@@ -70,45 +85,76 @@ const reducer = (state = { data: [] }, action) => {
         error: false,
         data: action.response
       }
+    case 'GET_ACCESSGROUPS_ATTEMPT':
+      return {
+        accessgroupPending: true,
+        error: state.error,
+        ...state
+      }
+    case 'GET_ACCESSGROUPS_FAILURE':
+      return {
+        accessgroupPending: false,
+        error: true,
+        accessGroupsData: action.response,
+        ...state
+      }
+    case 'GET_ACCESSGROUPS_SUCCESS':
+      return {
+        accessgroupPending: false,
+        error: false,
+        accessGroupsData: action.response,
+        ...state
+      }
     case 'ENABLE_USER_ATTEMPT':
       return {
         pending: true,
         error: state.error,
-        data: state.data
+        data: state.data,
+        ...state
       }
     case 'ENABLE_USER_FAILURE':
       return {
         pending: false,
         error: true,
-        data: action.response
+        data: action.response,
+        ...state
       }
     case 'ENABLE_USER_SUCCESS':
       return {
         ...state,
         pending: false,
-        data: state.data.filter(a => a.id !== action.response.id)
+        data: state.data.filter(user => user.id !== action.response.id)
           .concat(action.response)
       }
     case 'TOGGLE_USER_CZAR_ATTEMPT':
       return {
         pending: true,
         error: state.error,
-        data: state.data
+        data: state.data,
+        ...state
       }
     case 'TOGGLE_USER_CZAR_SUCCESS':
       return {
         pending: false,
         error: state.error,
         data: state.data.filter(a => a.id !== action.response.id)
-          .concat(action.response)
+          .concat(action.response),
+        ...state
       }
     case 'TOGGLE_USER_CZAR_FAILURE':
       return {
         pending: false,
         error: state.error,
-        data: state.data
+        data: state.data,
+        ...state
       }
     case 'EDIT_USER_UNIT_SUCCESS':
+      return {
+        ...state,
+        data: state.data.filter(user => user.id !== action.response.id)
+          .concat(action.response)
+      }
+    case 'MODIFY_ACCESSGROUPS_SUCCESS':
       return {
         ...state,
         data: state.data.filter(user => user.id !== action.response.id)
@@ -118,19 +164,22 @@ const reducer = (state = { data: [] }, action) => {
       return {
         pending: true,
         error: state.error,
-        data: state.data
+        data: state.data,
+        ...state
       }
     case 'SEND_EMAIL_SUCCESS':
       return {
         pending: false,
         error: state.error,
-        data: state.data
+        data: state.data,
+        ...state
       }
     case 'SEND_EMAIL_FAILURE':
       return {
         pending: false,
         error: state.error,
-        data: state.data
+        data: state.data,
+        ...state
       }
     default:
       return state
