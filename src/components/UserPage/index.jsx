@@ -3,10 +3,12 @@ import { Button, Card, Divider, Image, Form, List, Icon } from 'semantic-ui-reac
 import { connect } from 'react-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router'
-import { string, number, shape, bool, arrayOf, func } from 'prop-types'
+import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
 import { textAndDescriptionSearch } from '../../common'
 import LanguageChooser from '../LanguageChooser'
 import { toggleCzar, addUserUnits, removeUserUnit, getAccessGroups, modifyAccessGroups } from '../../redux/users'
+import { setAsUser } from '../../redux/settings'
+
 import { getStudyrightElements } from '../../redux/studyrightElements'
 import { superLogin } from '../../apiConnection'
 
@@ -345,7 +347,7 @@ UserPage.propTypes = {
     push: func.isRequired
   }).isRequired,
   getAccessGroups: func.isRequired,
-  accessGroups: arrayOf({}).isRequired,
+  accessGroups: arrayOf(object).isRequired,
   modifyAccessGroups: func.isRequired
 }
 
@@ -354,7 +356,7 @@ const mapStateToProps = state => ({
   units: state.units.data,
   studyrightElements: state.studyrightElements.data,
   pending: state.studyrightElements.pending,
-  accessGroups: state.users.accessGroupsData
+  accessGroups: state.users.accessGroupsData || []
 })
 
 
@@ -364,5 +366,6 @@ export default connect(mapStateToProps, {
   removeUserUnit,
   getStudyrightElements,
   getAccessGroups,
-  modifyAccessGroups
+  modifyAccessGroups,
+  setAsUser
 })(withRouter(UserPage))
