@@ -56,7 +56,15 @@ const byUsername = async (username) => {
       username: {
         [Op.eq]: username
       }
-    }
+    },
+    include: [{
+      model: ElementDetails,
+      as: 'elementdetails'
+    }, {
+      model: AccessGroup,
+      as: 'accessgroup',
+      attributes: ['id', 'group_code', 'group_info']
+    }]
   })
 }
 
@@ -88,7 +96,7 @@ const byId = async (id) => {
     }, {
       model: AccessGroup,
       as: 'accessgroup',
-      attributes: ['id','group_code', 'group_info']
+      attributes: ['id', 'group_code', 'group_info']
     }]
   })
 }
@@ -113,6 +121,10 @@ const findAll = async () => {
     include: [{
       model: ElementDetails,
       as: 'elementdetails'
+    },
+    {
+      model: AccessGroup,
+      as: 'accessgroup'
     }]
   })
 }
@@ -124,15 +136,18 @@ const enableElementDetails = async (uid, codes) => {
 }
 
 const modifyRights = async (uid, rights) => {
+  console.log(uid, rights)
   const rightsToAdd = Object.entries(rights).map(([code, val]) => {
     if (val === true) {
       return code
-    }}).filter(code => code)
+    }
+  }).filter(code => code)
   const rightsToRemove = Object.entries(rights).map(([code, val]) => {
     if (val === false) {
       return code
-    }}).filter(code => code)
-  
+    }
+  }).filter(code => code)
+
   const user = await byId(uid)
   const accessGroupsToAdd = await AccessService.byCodes(rightsToAdd)
   const accessGroupsToRemove = await AccessService.byCodes(rightsToRemove)

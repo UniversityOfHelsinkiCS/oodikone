@@ -3,6 +3,8 @@ const { Op } = require('sequelize')
 
 const byId = id =>  AccessGroup.findById(id)
 
+const findAll = () => AccessGroup.findAll()
+
 const byCodes = codes => AccessGroup.findAll({
   where: {
     group_code: {
@@ -11,4 +13,4 @@ const byCodes = codes => AccessGroup.findAll({
   }
 })
 
-module.exports = { byId, byCodes }
+module.exports = { byId, byCodes, findAll }
