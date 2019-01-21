@@ -177,7 +177,7 @@ describe('user access right tests', async () => {
       expect(ags2).toContain('teachers')
       expect(ags2).not.toContain('admin')
     })
-    test('get accessgroups workerinos ', async () => {
+    test('get accessgroups for user workerinos ', async () => {
       const id = 666
       const user = await userService.byId(id)
       await userService.modifyRights(id, { teachers: true, admin: true })

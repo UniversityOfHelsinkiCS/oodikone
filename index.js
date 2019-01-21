@@ -1,6 +1,7 @@
 const express = require('express')
 
 const User = require('./src/services/users')
+const AccessGroup = require('./src/services/accessgroups')
 
 const app = express()
 const port = 4567
@@ -66,26 +67,25 @@ app.post('/superlogin', async (req, res) => {
   if (token) {
     res.status(200).json(token)
   }
-  res.status(403)
+  res.status(400)
 })
 
 app.put('/user/:uid', async (req, res) => {
   const uid = req.params.uid
   const user = await User.byUsername(uid)
   await User.updateUser(user, req.body)
-  res.json(user)
+  const returnedUser = await User.byUsername(uid)
+  res.json(returnedUser)
 })
 
 app.post('/modifyaccess', async (req, res) => {
-  console.log('AAAAAAAaa')
-  const { uid, rights } = req.body
+  const { uid, accessgroups } = req.body
   try {
-    await User.modifyRights(uid, rights)
+    await User.modifyRights(uid, accessgroups)
     const user = await User.byId(uid)
-    console.log(user)
-    res.status(200).json({ user })
+    res.status(200).json(user)
   } catch (e) {
-    res.status(403).json({ e })
+    res.status(400).json({ e })
   }
 
 })
@@ -98,7 +98,15 @@ app.post('/add_rights', async (req, res) => {
     res.status(200).json({ user })
 
   } catch (e) {
-    res.status(401).json({ e })
+    res.status(400).json({ e })
+  }
+})
+app.get('/access_groups', async (req, res) => {
+  try {
+    const groups = await AccessGroup.findAll()
+    res.status(200).json(groups)
+  } catch (e) {
+    res.status(400)
   }
 })
 
