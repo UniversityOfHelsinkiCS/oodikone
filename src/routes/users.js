@@ -9,6 +9,11 @@ router.get('/users', async (req, res) => {
   res.json(results)
 })
 
+router.get('/users/access_groups', async (req, res) => {
+  const result = await userService.getAccessGroups()
+  res.json(result)
+})
+
 router.put('/users/:id/enable', async (req, res) => {
   const id = req.params.id
   const user = await userService.byId(id)
