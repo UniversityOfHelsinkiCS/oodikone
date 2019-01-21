@@ -92,6 +92,6 @@ module.exports = {
   enableElementDetails,
   findAll,
   modifyAccess,
-  getAccessGroups
+  getAccessGroups,
   getUnitsFromElementDetails
 }
