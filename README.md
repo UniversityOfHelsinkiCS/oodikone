@@ -207,3 +207,85 @@ docker-compose run -d CONTAINER_NAME npm run update_top_teachers from=50 to=70
 # Omit the to–argument to update teachers just for a single academic year. 
 docker-compose run -d CONTAINER_NAME npm run update_top_teachers from=50
 ```
+
+## DEFA report
+
+The npm script `create_defa_report` can quickly aggregate data about DEFA students and display it in neat csv format. Here's how you can use it on the Oodikone production server. It does not work if run locally.
+
+### Input files
+
+Input files should be placed in the `/home/tkt_oodi/oodikone.cs.helsinki.fi/defa` directory unless a different directory has been included into the backend docker container as `/usr/src/app/defa`.
+
+* `params.json`
+  * Defines the input/output files. File paths are for the container, so the working directory is `/usr/src/app/defa/`.
+  * Defines the timeframe to look at: from `params.in.timeframe.start` to `params.in.timeframe.end`. Studyattainments outside this timeframe will not be considered to be part of DEFA. Changing the timeframe is the main reason you'd want to make changes to this file.
+  * Example:
+```
+{
+  "out": {
+    "report": "/usr/src/app/defa/defa-report.csv",
+    "stats": "/usr/src/app/defa/defa-stats.csv"
+  },
+  "in": {
+    "course_ids": "/usr/src/app/defa/ids.txt",
+    "included_courses": "/usr/src/app/defa/included.txt",
+    "required_courses": "/usr/src/app/defa/required.txt",
+    "timeframe": {
+      "start": "2018-09-01T01:00:00.000Z",
+      "end": "2019-06-30T01:00:00.000Z"
+    }
+  }
+}
+```
+
+* `ids.txt` (or another name specified in `params.in.course_ids`)
+  * Holds the courseunitrealisation ids of DEFA courses to be included in the report.
+  * Example:
+```
+126240934
+126237007
+126238082
+126239325
+12699580
+```
+
+* `included.txt` (or another name specified in `params.in.included_courses`)
+  * Holds the learningopportunity ids of courses to be included in the report. Basically put all DEFA course codes here.
+  * One id per line.
+  * AY courses like `AYTKT0000` can be entered without the `AY` prefix to match both with and without it. e.g. `TKT0000` matches both `TKT0000` and `AYTKT0000`. `AYTKT0000` will only match `AYTKT0000`.
+  * Example:
+```
+TKT10002
+TKT10003
+MAT11001
+TKT10004
+TKT20001
+TKT20004
+TKT20009
+TKT21007
+MAT12001
+MAT12002
+```
+
+* `required.txt` (or another name specified in `params.in.required_courses`)
+  * Holds the learningopportunity ids of courses that are required to complete for a DEFA student to qualify.
+  * Same format as `included.txt`.
+  * All entries in this file should also be in `included.txt`.
+  * Example: same as `included.txt`
+
+### Running
+
+1. Make sure the backend docker container is running.
+2. run `docker exec <backend container> npm run create_defa_report defa/<parameter json file>` or use the ready made script `/home/tkt_oodi/oodikone.cs.helsinki.fi/defa/create_report.sh`.
+3. Check the output files.
+
+### Output files
+
+Output files will be created in the same directory where the input files are. Old output files will be overwritten unless they have been renamed/moved. 
+
+* `defa-report.csv` (or another name defined in `params.out.report`)
+  * Contains individual information about each DEFA student and individual inforamtion about each DEFA course.
+  * Contains aggregate information about all DEFA students.
+
+* `defa-stats.csv` (or another name defined in `params.out.stats`)
+  * Contains the credit amount distribution of DEFA students.

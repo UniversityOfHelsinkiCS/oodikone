@@ -1,5 +1,6 @@
 const axios = require('axios')
 const { USERSERVICE_URL } = require('../conf-backend')
+const UnitService = require('./units')
 
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { 'secret': process.env.USERSERVICE_SECRET } })
 
@@ -62,6 +63,18 @@ const enableElementDetails = async (uid, codes) => {
   return response.data.user
 }
 
+const getUnitsFromElementDetails = async username => {
+  const url = `/user/elementdetails/${username}`
+  const response = await client.get(url)
+  const elementDetails = response.data
+  return elementDetails.map(element => UnitService.parseUnitFromElement(element))
+}
+
+const modifyAccess = async (body) => {
+  const response = await client.post('/modifyaccess', body)
+  return response.data
+}
+
 module.exports = {
   ping,
   byUsername,
@@ -72,5 +85,8 @@ module.exports = {
   login,
   superlogin,
   enableElementDetails,
-  findAll
+  findAll,
+  modifyAccess,
+  getUnitsFromElementDetails
+
 }
