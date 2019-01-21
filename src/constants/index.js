@@ -52,6 +52,7 @@ export const routes = {
   students: { route: '/students/:studentNumber?', translateId: 'students' },
   courseStatistics: { route: '/coursestatistics', translateId: 'courseStatistics' },
   courseGroups: { route: '/course-groups/:courseGroupId?', translateId: 'courseGroups', admin: true },
+  studyProgramme: { route: '/study-programme/:studyProgrammeId?', translateId: 'studyProgramme', admin: true },
   teachers: { route: '/teachers/:teacherid?', translateId: 'teachers', czar: true },
   users: { route: '/users/:userid?', translateId: 'users', admin: true },
   settings: { route: '/settings', translateId: 'settings', admin: true },
