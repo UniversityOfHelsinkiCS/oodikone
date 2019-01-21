@@ -3,11 +3,12 @@ import { Button, Card, Divider, Image, Form, List, Icon } from 'semantic-ui-reac
 import { connect } from 'react-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router'
-import { string, number, shape, bool, arrayOf, func } from 'prop-types'
+import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
 import { textAndDescriptionSearch } from '../../common'
 import LanguageChooser from '../LanguageChooser'
-import { toggleCzar, addUserUnits, removeUserUnit } from '../../redux/users'
+import { toggleCzar, addUserUnits, removeUserUnit, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 import { setAsUser } from '../../redux/settings'
+
 import { getStudyrightElements } from '../../redux/studyrightElements'
 import { superLogin } from '../../apiConnection'
 
@@ -25,13 +26,15 @@ class UserPage extends Component {
   state = {
     degree: undefined,
     programme: undefined,
-    specializations: []
+    specializations: [],
+    groups: this.props.user.accessgroup ? this.props.user.accessgroup.map(ag => ag.id) : []
   }
 
-  componentDidMount() {
-    const { studyrightElements } = this.props
-    if (Object.keys(studyrightElements).length === 0) {
+  async componentDidMount() {
+    const { studyrightElements, accessgroupPending } = this.props
+    if (Object.keys(studyrightElements).length === 0 && !accessgroupPending) {
       this.props.getStudyrightElements()
+      await this.props.getAccessGroups()
     }
   }
 
@@ -45,9 +48,18 @@ class UserPage extends Component {
   selectAll = () => this.setState({ specializations: this.allSpecializationIds() })
 
   enableAccessRightToUser = userid => async () => {
-    const { degree, programme, specializations } = this.state
+    const { degree, programme, specializations, groups } = this.state
     const codes = [degree, programme, ...specializations].filter(e => !!e)
     await this.props.addUserUnits(userid, codes)
+
+    const accessGroups = this.props.accessGroups.reduce((acc, ag) => {
+      if (groups.includes(ag.id)) {
+        return { ...acc, [ag.group_code]: true }
+      }
+      return { ...acc, [ag.group_code]: false }
+    }, {})
+
+    await this.props.modifyAccessGroups(userid, accessGroups)
     this.setState({
       degree: undefined,
       programme: undefined,
@@ -100,6 +112,15 @@ class UserPage extends Component {
     programmes: this.programmeOptions(),
     specializations: this.specializationOptions()
   })
+
+  accessGroupOptions = accessGroups => (accessGroups ?
+    accessGroups.map(ag => ({
+      key: ag.id,
+      text: ag.group_code,
+      value: ag.id,
+      description: ag.group_info
+    })) : [])
+
 
   showAs = async (uid) => {
     await superLogin(uid)
@@ -172,7 +193,9 @@ class UserPage extends Component {
     }
 
     const options = this.studyelementOptions()
-    return (
+    const accessGroupOptions = this.accessGroupOptions(this.props.accessGroups)
+    const enabledAccessGroups = this.state.groups
+    return this.props.accessGroups ?
       <div>
         <Button icon="arrow circle left" content="Back" onClick={this.props.goBack} />
         <LanguageChooser />
@@ -204,6 +227,17 @@ class UserPage extends Component {
               <Card.Header content="Enable access" />
               <Card.Description>
                 <Form loading={pending}>
+                  <Divider />
+                  <Form.Dropdown
+                    name="groups"
+                    label="Access Groups"
+                    placeholder="Select access groups"
+                    fluid
+                    multiple
+                    options={accessGroupOptions}
+                    defaultValue={enabledAccessGroups}
+                    onChange={this.handleChange}
+                  />
                   <Form.Dropdown
                     name="degree"
                     label="Degree (optional)"
@@ -284,7 +318,8 @@ class UserPage extends Component {
           </Card>
         </Card.Group>
       </div >
-    )
+      :
+      null
   }
 }
 
@@ -310,20 +345,27 @@ UserPage.propTypes = {
   pending: bool.isRequired,
   history: shape({
     push: func.isRequired
-  }).isRequired
+  }).isRequired,
+  getAccessGroups: func.isRequired,
+  accessGroups: arrayOf(object).isRequired,
+  modifyAccessGroups: func.isRequired
 }
 
 const mapStateToProps = state => ({
   language: state.settings.language,
   units: state.units.data,
   studyrightElements: state.studyrightElements.data,
-  pending: state.studyrightElements.pending
+  pending: state.studyrightElements.pending,
+  accessGroups: state.users.accessGroupsData || []
 })
+
 
 export default connect(mapStateToProps, {
   toggleCzar,
   addUserUnits,
   removeUserUnit,
   getStudyrightElements,
+  getAccessGroups,
+  modifyAccessGroups,
   setAsUser
 })(withRouter(UserPage))
