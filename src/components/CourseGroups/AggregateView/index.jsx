@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { Header, Segment, Table } from 'semantic-ui-react'
+import { Header, Segment } from 'semantic-ui-react'
 import { withRouter } from 'react-router'
 import { func, shape } from 'prop-types'
 
