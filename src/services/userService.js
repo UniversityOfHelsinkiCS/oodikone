@@ -75,6 +75,11 @@ const modifyAccess = async (body) => {
   return response.data
 }
 
+const getAccessGroups = async () => {
+  const response = await client.get('/access_groups')
+  return response.data
+}
+
 module.exports = {
   ping,
   byUsername,
@@ -87,6 +92,6 @@ module.exports = {
   enableElementDetails,
   findAll,
   modifyAccess,
+  getAccessGroups,
   getUnitsFromElementDetails
-
 }
