@@ -179,7 +179,7 @@ const associatedStudyrightElements = async (offset, limit) => {
     attributes: [],
     include: {
       model: StudyrightElement,
-      attributes: ['id', 'code', 'startdate'],
+      attributes: ['id', 'code', [sequelize.fn('date_part', 'year', sequelize.col('startdate')), 'year']],
       include: {
         model: ElementDetails,
         attributes: ['type', 'name', 'code'],
@@ -189,7 +189,7 @@ const associatedStudyrightElements = async (offset, limit) => {
     offset
   })
   const groupings = studyrights.map(({ studyright_elements: sres }) => (
-    sres.map(sre => ({ ...sre.element_detail.get(), startdate: sre.startdate })))
+    sres.map(sre => ({ ...sre.element_detail.get(), year: sre.get().year })))
   )
   return groupings
 }
@@ -205,24 +205,32 @@ const calculateAssociationsFromDb = async (chunksize=100000, codes=[10, 20, 30])
     const elementgroups = await associatedStudyrightElements(offset, chunksize)
     elementgroups
       .forEach(group => {
-        group.filter(isValid).forEach(({ type, code, name, startdate }) => {
+        group.filter(isValid).forEach(({ type, code, name, year }) => {
           const elements = types[type] || (types[type] = {})
           if(!elements[code]) {
-            elements[code] = { code, name, type, first_held: startdate, latest_held: startdate, associations: {}}
-          }
-          else {
-            if (elements[code].first_held > startdate) {
-              elements[code].first_held = startdate
-            }
-            if (elements[code].latest_held < startdate) {
-              elements[code].latest_held = startdate
-            }
+            elements[code] = { code, name, type, first_held: year, latest_held: year, associations: {}}
           }
           const element = elements[code]
+          if (elements[code].first_held > year) {
+            elements[code].first_held = year
+          }
+          if (elements[code].latest_held < year) {
+            elements[code].latest_held = year
+          }
           group.filter(e => e.code !== code).filter(studyTrackByAge(code)).forEach(e => {
             const associations = element.associations[e.type] || ( element.associations[e.type] = {})
             if (!associations[e.code]) {
-              associations[e.code] = { code: e.code, name: e.name, type: e.type }            
+              associations[e.code] = {
+                code: e.code, name: e.name, type: e.type, first_held: e.year, latest_held: e.year
+              }            
+            } else {
+              const association = associations[e.code]
+              if (association.first_held > e.year) {
+                association.first_held = e.year
+              }
+              if (association.latest_held < e.year) {
+                association.latest_held = e.year
+              }
             }
           })
         })

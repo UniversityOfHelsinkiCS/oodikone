@@ -474,6 +474,18 @@ const Migration = sequelize.define('migrations', {
   timestamps: false
 })
 
+const CourseGroup = sequelize.define('course_groups', {
+  id: {
+    primaryKey: true,
+    type: Sequelize.BIGINT,
+    autoIncrement: true
+  },
+  name: {
+    type: Sequelize.STRING,
+    unique: true
+  }
+})
+
 const CreditTeacher = sequelize.define('credit_teacher', {
   credit_id: {
     type: Sequelize.STRING,
@@ -581,6 +593,9 @@ Student.belongsToMany(CourseRealisation, { through: CourseEnrollment, foreignKey
 Credit.belongsToMany(Teacher, { through: CreditTeacher, foreignKey: 'credit_id' })
 Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id' })
 
+Teacher.belongsToMany(CourseGroup, { through: 'teacher_course_group', foreignKey:' id' })
+CourseGroup.belongsToMany(Teacher, { through: 'teacher_course_group', foreignKey:' id' })
+
 Credit.belongsTo(Semester, { foreignKey: { name: 'semestercode', allowNull: false } })
 
 module.exports = {
@@ -614,5 +629,6 @@ module.exports = {
   CourseEnrollment,
   Migration,
   CreditTeacher,
-  UsageStatistic
+  UsageStatistic,
+  CourseGroup
 }
