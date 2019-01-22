@@ -13,7 +13,6 @@ const {
 const ACADEMIC_YEAR_START_SEMESTER = 111 // academic year 2005-06
 
 const COURSE_GROUP_STATISTICS_KEY = 'course_group_statistics'
-const COURSE_GROUP_KEY = (groupId, semesterCode) => `course_group_${groupId}_${semesterCode}`
 const TEACHER_COURSES_KEY = (teacherId, semesterCode) => `course_group_courses_${teacherId}_${semesterCode}`
 const REDIS_CACHE_TTL = 12 * 60 * 60
 
@@ -85,13 +84,6 @@ const getCourseGroupsWithTotals = async (semesterCode) => {
 
 const getCourseGroup = async (courseGroupId, semesterCode) => {
   const startSemester = semesterCode || await getCurrentAcademicYearSemesterCode()
-  const cacheKey = COURSE_GROUP_KEY(courseGroupId, startSemester)
-  const cachedCourseGroup = await redisClient.getAsync(cacheKey)
-
-  if (cachedCourseGroup) {
-    return JSON.parse(cachedCourseGroup)
-  }
-
   const teacherBasicInfo = await getTeachersForCourseGroup(courseGroupId)
   const courseGroup = await CourseGroup.findByPk(courseGroupId)
 
@@ -144,8 +136,6 @@ const getCourseGroup = async (courseGroupId, semesterCode) => {
     semester: startSemester
   }
 
-  await redisClient.setAsync(cacheKey, JSON.stringify(courseGroupInfo), 'EX', REDIS_CACHE_TTL)
-
   return courseGroupInfo
 }
 
@@ -171,10 +161,26 @@ const getCoursesByTeachers = async (teacherIds, semesterCode) => {
   return courses
 }
 
+const addTeacher = async (courseGroupId, teacherid) => {
+  const group = await CourseGroup.findByPk(courseGroupId)
+  const teacher = await Teacher.findByPk(teacherid)
+  if (!group || !teacher) return
+  return await group.addTeacher(teacher)
+}
+
+const removeTeacher = async (courseGroupId, teacherid) => {
+  const group = await CourseGroup.findByPk(courseGroupId)
+  const teacher = await Teacher.findByPk(teacherid)
+  if (!group || !teacher) return
+  return await group.removeTeacher(teacher)
+}
+
 module.exports = {
   createCourseGroup,
   getAcademicYears,
   getCourseGroupsWithTotals,
   getCourseGroup,
-  getCoursesByTeachers
+  getCoursesByTeachers,
+  addTeacher,
+  removeTeacher
 }
