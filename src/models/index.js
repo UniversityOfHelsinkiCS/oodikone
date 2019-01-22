@@ -593,8 +593,8 @@ Student.belongsToMany(CourseRealisation, { through: CourseEnrollment, foreignKey
 Credit.belongsToMany(Teacher, { through: CreditTeacher, foreignKey: 'credit_id' })
 Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id' })
 
-Teacher.belongsToMany(CourseGroup, { through: 'teacher_course_group', foreignKey:' id' })
-CourseGroup.belongsToMany(Teacher, { through: 'teacher_course_group', foreignKey:' id' })
+Teacher.belongsToMany(CourseGroup, { through: 'teacher_course_group', foreignKey: 'teacher_id' })
+CourseGroup.belongsToMany(Teacher, { through: 'teacher_course_group', foreignKey: 'course_group_id' })
 
 Credit.belongsTo(Semester, { foreignKey: { name: 'semestercode', allowNull: false } })
 
