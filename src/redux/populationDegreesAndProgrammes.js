@@ -13,7 +13,7 @@ export const getDegreesAndProgrammes = () => {
   return callController(route, prefix)
 }
 
-const reducer = (state = { data: [] }, action) => {
+const reducer = (state = { data: {} }, action) => {
   switch (action.type) {
     case types.attempt:
       return {
