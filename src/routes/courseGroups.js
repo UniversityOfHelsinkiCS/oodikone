@@ -23,6 +23,8 @@ router.get(`${BASE_PATH}/courses`, async (req, res) => {
     return res.sendStatus(400)
   }
 
+  if (teacherIds.length === 0) return res.send([])
+
   const courses = await CourseGroupService.getCoursesByTeachers(teacherIds, semester)
 
   return courses ? res.send(courses) : res.sendStatus(404)
