@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const Student = require('../services/students')
-const User = require('../services/users')
+const User = require('../services/userService')
 const Unit = require('../services/units')
 
 router.get('/students', async (req, res) => {

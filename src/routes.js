@@ -46,9 +46,9 @@ module.exports = (app, url) => {
   app.use(url, population)
   app.use(url, providers)
   app.use(url, semesters)
+  app.use(url, elementdetails)
   app.use(auth.checkAdminAuth)
   app.use(url, users)
-  app.use(url, elementdetails)
   app.use(url, usage),
   app.use(url, oodilearn),
   app.use(url, courseGroups)
