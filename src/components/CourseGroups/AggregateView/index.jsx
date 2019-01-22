@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { Header, Segment, Table } from 'semantic-ui-react'
+import React, { Component, Fragment } from 'react'
+import { Header, Segment } from 'semantic-ui-react'
 import { withRouter } from 'react-router'
 import { func, shape } from 'prop-types'
 
@@ -7,6 +7,7 @@ import { getCompiledPath } from '../../../common'
 import { routes } from '../../../constants'
 
 import { callApi } from '../../../apiConnection'
+import SortableTable from '../../SortableTable'
 
 const getCourseGroupPath = courseGroupId => getCompiledPath(routes.courseGroups.route, { courseGroupId })
 
@@ -34,34 +35,34 @@ class AggregateView extends Component {
   render() {
     const { isLoading, courseGroups } = this.state
 
+    const columns = [
+      {
+        key: 'Course group',
+        title: 'Course group',
+        getRowVal: cg => cg.name,
+        getRowContent: courseGroup => (
+          <Fragment>
+            <a
+              href={getCourseGroupPath(courseGroup.id)}
+              onClick={e => this.handleNavigation(e, courseGroup.id)}
+            >
+              {courseGroup.name}
+            </a>
+          </Fragment>)
+      },
+      { key: 'Credits', title: 'Credits', getRowVal: cg => cg.credits },
+      { key: 'Students', title: 'Students', getRowVal: cg => cg.students }
+    ]
+
     return (
       <Segment loading={isLoading}>
         <Header size="medium">Group statistics</Header>
-        <Table>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell content="Course group" />
-              <Table.HeaderCell content="Credits" />
-              <Table.HeaderCell content="Students" />
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {courseGroups.map(courseGroup => (
-              <Table.Row key={courseGroup.id}>
-                <Table.Cell>
-                  <a
-                    href={getCourseGroupPath(courseGroup.id)}
-                    onClick={e => this.handleNavigation(e, courseGroup.id)}
-                  >
-                    {courseGroup.name}
-                  </a>
-                </Table.Cell>
-                <Table.Cell content={courseGroup.credits} />
-                <Table.Cell content={courseGroup.students} />
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
+        <SortableTable
+          getRowKey={gc => gc.id}
+          tableProps={{ celled: false, singleLine: true }}
+          columns={columns}
+          data={courseGroups}
+        />
       </Segment>
     )
   }
