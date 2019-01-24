@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { Search, Segment, Message, Icon } from 'semantic-ui-react'
-import { func, arrayOf, object, shape } from 'prop-types'
+import { Search, Segment, Icon } from 'semantic-ui-react'
+import { func, arrayOf, object, string } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import styles from './teacherSearch.css'
@@ -50,15 +50,11 @@ class TeacherSearch extends Component {
         { key: 'teacherid', title: 'Teacher ID', getRowVal: s => s.id, headerProps: { onClick: null, sorted: null } },
         { key: 'username', title: 'Username', getRowVal: s => s.code, headerProps: { onClick: null, sorted: null } },
         { key: 'name', title: 'Name', getRowVal: s => s.name, headerProps: { onClick: null, sorted: null, colSpan: 2 } },
-        { key: 'icon', getRowVal: () => (<Icon name="level up alternate" />), cellProps: { collapsing: true }, headerProps: { onClick: null, sorted: null } }
+        { key: 'icon', getRowVal: () => (<Icon name={this.props.icon} />), cellProps: { collapsing: true }, headerProps: { onClick: null, sorted: null } }
       ]
 
       return (
         <div >
-          <Message
-            header="Teacher search"
-            content="Search for a teacher and click the search result to view their individual statistics from their entire career. "
-          />
           <div className={styles.searchContainer}>
             <Search
               className={styles.searchInput}
@@ -75,7 +71,7 @@ class TeacherSearch extends Component {
                   getRowKey={s => s.id}
                   getRowProps={teacher => ({
                     className: styles.clickable,
-                    onClick: () => this.props.history.push(`/teachers/${teacher.id}`)
+                    onClick: () => this.props.onClick(teacher)
                   })}
                   tableProps={{ celled: false, singleLine: true, sortable: false }}
                   columns={columns}
@@ -94,7 +90,8 @@ TeacherSearch.propTypes = {
   clearTimeout: func.isRequired,
   teachers: arrayOf(object).isRequired,
   findTeachers: func.isRequired,
-  history: shape({}).isRequired
+  onClick: func.isRequired,
+  icon: string.isRequired
 }
 
 const mapStateToProps = ({ teachers }) => {
