@@ -6,7 +6,17 @@ const { forceSyncDatabase } = require('../../src/database/connection')
 const { sequelize, Teacher } = require('../../src/models/index')
 
 const uid = 'tktl'
-const payload = { userId: uid, name: '', enabled: true, admin: true }
+const payload = {
+  userId: uid,
+  name: '',
+  enabled: true,
+  admin: true,
+  roles: [{
+    id: '9',
+    group_code: 'coursegroups',
+    group_info: 'grants access to course groups'
+  }]
+}
 
 const token = jwt.sign(payload, conf.TOKEN_SECRET, {
   expiresIn: '24h'
@@ -33,24 +43,29 @@ const MOCK_TEACHERS = [{ name: 'testname', code: 'testcode', id: '12345' }]
 const MOCK_COURSES = [{
   coursecode: 'EDUK111',
   coursenames:
-    { en: "Bachelor's Thesis",
-      fi: 'Kandidaatin tutkielma ja seminaari',
-      sv: 'Kandidatavhandling och seminarium'
-    },
+  {
+    en: "Bachelor's Thesis",
+    fi: 'Kandidaatin tutkielma ja seminaari',
+    sv: 'Kandidatavhandling och seminarium'
+  },
   teachercode: 'testcode',
   teachername: 'testname',
   credits: '10',
-  students: 1 },
-{ coursecode: 'EDUK123',
+  students: 1
+},
+{
+  coursecode: 'EDUK123',
   coursenames:
-      { en: 'Course',
-        fi: 'Kurssi',
-        sv: 'kursser'
-      },
+  {
+    en: 'Course',
+    fi: 'Kurssi',
+    sv: 'kursser'
+  },
   teachercode: 'testcode',
   teachername: 'testname',
   credits: 12,
-  students: '1' }]
+  students: '1'
+}]
 
 beforeAll(async () => {
   await forceSyncDatabase()
@@ -204,26 +219,32 @@ describe('Course groups endpoint tests', () => {
 
   describe('/api/course-groups/courses', () => {
     const expectedCourses = [
-      { coursecode: 'EDUK111',
+      {
+        coursecode: 'EDUK111',
         coursenames:
-          { en: "Bachelor's Thesis",
-            fi: 'Kandidaatin tutkielma ja seminaari',
-            sv: 'Kandidatavhandling och seminarium'
-          },
+        {
+          en: "Bachelor's Thesis",
+          fi: 'Kandidaatin tutkielma ja seminaari',
+          sv: 'Kandidatavhandling och seminarium'
+        },
         teachercode: 'testcode',
         teachername: 'testname',
         credits: 10,
-        students: 1 },
-      { coursecode: 'EDUK123',
+        students: 1
+      },
+      {
+        coursecode: 'EDUK123',
         coursenames:
-          { en: 'Course',
-            fi: 'Kurssi',
-            sv: 'kursser'
-          },
+        {
+          en: 'Course',
+          fi: 'Kurssi',
+          sv: 'kursser'
+        },
         teachercode: 'testcode',
         teachername: 'testname',
         credits: 12,
-        students: 1 }]
+        students: 1
+      }]
 
     const teacherIds = ['021314', '021345']
 
