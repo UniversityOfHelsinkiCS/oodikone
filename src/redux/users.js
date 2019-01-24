@@ -56,7 +56,7 @@ export const toggleCzar = (id) => {
   return callController(route, prefix, null, method)
 }
 export const sendEmail = (email) => {
-  const route = '/email'
+  const route = '/users/email'
   const prefix = 'SEND_EMAIL_'
   const data = { email }
   const method = 'post'

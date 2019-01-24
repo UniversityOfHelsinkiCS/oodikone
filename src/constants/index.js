@@ -51,17 +51,17 @@ export const routes = {
   populations: { route: '/populations', translateId: 'populations' },
   students: { route: '/students/:studentNumber?', translateId: 'students' },
   courseStatistics: { route: '/coursestatistics', translateId: 'courseStatistics' },
-  courseGroups: { route: '/course-groups/:courseGroupId?', translateId: 'courseGroups', admin: true },
-  studyProgramme: { route: '/study-programme/:studyProgrammeId?', translateId: 'studyProgramme', admin: true },
-  teachers: { route: '/teachers/:teacherid?', translateId: 'teachers', czar: true },
-  users: { route: '/users/:userid?', translateId: 'users', admin: true },
-  settings: { route: '/settings', translateId: 'settings', admin: true },
-  usage: { route: '/usage', translateId: 'usage', admin: true }
+  courseGroups: { route: '/course-groups/:courseGroupId?', translateId: 'courseGroups', reqRights: ['coursegroups'] },
+  studyProgramme: { route: '/study-programme/:studyProgrammeId?', translateId: 'studyProgramme', admin: true, reqRights: ['admin'] },
+  teachers: { route: '/teachers/:teacherid?', translateId: 'teachers', czar: true, reqRights: ['teachers'] },
+  users: { route: '/users/:userid?', translateId: 'users', admin: true, reqRights: ['users'] },
+  settings: { route: '/settings', translateId: 'settings', admin: true, reqRights: ['admin'] },
+  usage: { route: '/usage', translateId: 'usage', reqRights: ['usage'] },
+  sandbox: { route: '/sandbox', translateId: 'sandbox', admin: true, reqRights: ['admin'] },
+  oodilearn: { route: '/oodilearn', translateId: 'oodilearn', admin: true, reqRights: ['oodilearn'] }
 }
 
 export const hiddenRoutes = {
-  sandbox: { route: '/sandbox', translateId: 'sandbox', admin: true },
-  oodilearn: { route: '/oodilearn', translateId: 'oodilearn', admin: true }
 }
 
 const assumeBasename = () => {
