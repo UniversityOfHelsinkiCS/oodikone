@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Card, Divider, Image, Form, List, Icon } from 'semantic-ui-react'
+import { Button, Card, Divider, Image, Form, List, Icon, Transition } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router'
@@ -27,7 +27,8 @@ class UserPage extends Component {
     degree: undefined,
     programme: undefined,
     specializations: [],
-    groups: this.props.user.accessgroup ? this.props.user.accessgroup.map(ag => ag.id) : []
+    groups: this.props.user.accessgroup ? this.props.user.accessgroup.map(ag => ag.id) : [],
+    visible: false
   }
 
   async componentDidMount() {
@@ -63,8 +64,10 @@ class UserPage extends Component {
     this.setState({
       degree: undefined,
       programme: undefined,
-      specializations: []
+      specializations: [],
+      visible: true
     })
+    setTimeout(() => this.setState({ visible: false }), 5000)
   }
 
   handleCoronation = user => async () => {
@@ -120,7 +123,6 @@ class UserPage extends Component {
       value: ag.id,
       description: ag.group_info
     })) : [])
-
 
   showAs = async (uid) => {
     await superLogin(uid)
@@ -289,6 +291,9 @@ class UserPage extends Component {
                     content="Enable"
                     onClick={this.enableAccessRightToUser(user.id)}
                   />
+                  <Transition.Group animation="drop" duration="1000">
+                    {this.state.visible && <Image centered size="small" src="https://images.alko.fi/images/cs_srgb,f_auto,t_large/cdn/003002/minttu-peppermint-40.jpg" />}
+                  </Transition.Group>
                   <Button
                     basic
                     fluid
@@ -358,7 +363,6 @@ const mapStateToProps = state => ({
   pending: state.studyrightElements.pending,
   accessGroups: state.users.accessGroupsData || []
 })
-
 
 export default connect(mapStateToProps, {
   toggleCzar,

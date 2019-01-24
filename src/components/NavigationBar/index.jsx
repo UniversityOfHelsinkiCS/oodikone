@@ -5,8 +5,8 @@ import { NavLink, Link } from 'react-router-dom'
 import { func, shape, string } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-import { routes, hiddenRoutes } from '../../constants'
-import { userIsAdmin, userIsCzar, userIsMock } from '../../common'
+import { routes } from '../../constants'
+import { userIsMock, userRoles } from '../../common'
 import { removeAsUser } from '../../redux/settings'
 import styles from './navigationBar.css'
 import { logout, login, returnToSelf } from '../../apiConnection'
@@ -32,12 +32,9 @@ class NavigationBar extends Component {
     const navigationRoutes = { ...routes }
     const fake = await userIsMock()
     this.setState({ fake })
-    const adminRights = fake ? false : await userIsAdmin()
-    const czarRights = fake ? false : await userIsCzar()
+    const roles = fake ? false : await userRoles()
     Object.keys(navigationRoutes).forEach((key) => {
-      if (navigationRoutes[key].admin && !adminRights) {
-        delete navigationRoutes[key]
-      } else if (navigationRoutes[key].czar && (!adminRights && !czarRights)) {
+      if (navigationRoutes[key].reqRights && roles.every(r => navigationRoutes[key].reqRights.indexOf(r) === -1)) {
         delete navigationRoutes[key]
       }
     })
@@ -68,18 +65,6 @@ class NavigationBar extends Component {
           tabIndex="-1"
         >
           <Dropdown.Menu>
-            <Dropdown.Item
-              as={NavLink}
-              to={hiddenRoutes.oodilearn.route}
-              text="OodiLearn"
-              icon="graduation cap"
-            />
-            <Dropdown.Item
-              as={NavLink}
-              to={hiddenRoutes.sandbox.route}
-              text="Sandbox"
-              icon="boxes"
-            />
             {ADMINER_URL && (
               <Dropdown.Item
                 onClick={() => {
