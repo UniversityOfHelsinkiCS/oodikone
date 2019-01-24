@@ -18,7 +18,8 @@ const generateToken = async (uid, asUser) => {
     admin: user.admin,
     czar: user.czar,
     asuser: user.admin ? asUser : null,
-    rights: elements
+    rights: elements,
+    roles: user.accessgroup
   }
   const token = jwt.sign(payload, process.env.TOKEN_SECRET)
 
