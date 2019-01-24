@@ -1,5 +1,4 @@
 const Promise = require('bluebird')
-const { Op } = require('sequelize')
 const { redisClient } = require('../services/redis')
 const { Teacher, CourseGroup } = require('../models')
 
@@ -11,15 +10,9 @@ const {
   getAcademicYearCoursesByTeacherIds
 } = require('../models/queries')
 
-// Hard coded teacher ids for demo purposes
-const EP_TEACHERS = ['017715', '019051', '053532', '028579', '036199', '083257', '089822', '128474']
-const KP_TEACHERS = ['032147', '012926', '066993']
-
-const COURSE_GROUP_NAMES = { 1: 'Erityispedagogiikka', 2: 'Kasvatuspsykologia' }
 const ACADEMIC_YEAR_START_SEMESTER = 111 // academic year 2005-06
 
 const COURSE_GROUP_STATISTICS_KEY = 'course_group_statistics'
-const COURSE_GROUP_KEY = (groupId, semesterCode) => `course_group_${groupId}_${semesterCode}`
 const TEACHER_COURSES_KEY = (teacherId, semesterCode) => `course_group_courses_${teacherId}_${semesterCode}`
 const REDIS_CACHE_TTL = 12 * 60 * 60
 
@@ -32,56 +25,53 @@ const getCurrentAcademicYearSemesterCode = async () => {
 }
 
 const getTeachersForCourseGroup = (courseGroupId) => {
-  const validCourseGroupIds = [1, 2]
-  if (!validCourseGroupIds.includes(courseGroupId)) {
-    return undefined
-  }
-
-  let teacherIds
-  if (courseGroupId === 1) {
-    teacherIds = EP_TEACHERS
-  }
-
-  if (courseGroupId === 2) {
-    teacherIds = KP_TEACHERS
-  }
-
   return Teacher.findAll({
-    raw: true,
     attributes: ['name', 'code', 'id'],
-    where: {
-      id: {
-        [Op.in]: teacherIds
-      }
-    }
+    include: {
+      model: CourseGroup,
+      attributes: [],
+      required: true,
+      where: {
+        id: courseGroupId
+      },
+    },
   })
+}
+
+const getCourseGroups = () => {
+  return CourseGroup.findAll({})
 }
 
 const createCourseGroup = (name) => CourseGroup.create({ name })
 
 const getCourseGroupsWithTotals = async (semesterCode) => {
-  const courseGroupIds = [1, 2]
   const cachedStats = await redisClient.getAsync(COURSE_GROUP_STATISTICS_KEY)
 
   if (cachedStats) {
     return JSON.parse(cachedStats)
   }
 
-  const courseGroupStatistics = await Promise.map(courseGroupIds, async (courseGroupId) => {
-    const teacherBasicInfo = await getTeachersForCourseGroup(courseGroupId)
+  const courseGroups = await getCourseGroups()
 
-    if (!teacherBasicInfo) {
-      return
+  const courseGroupStatistics = await Promise.map(courseGroups, async (courseGroup) => {
+    const teachers = await getTeachersForCourseGroup(courseGroup.id)
+    
+    if (teachers.length === 0) {
+      return {
+        id: courseGroup.id,
+        name: courseGroup.name,
+        credits: 0,
+        students: 0
+      }
     }
 
-    const name = COURSE_GROUP_NAMES[courseGroupId]
-    const teacherIds = teacherBasicInfo.map(t => t.id)
+    const teacherIds = teachers.map(t => t.get().id)
     const startSemester = semesterCode || await getCurrentAcademicYearSemesterCode()
     const statistics = await getAcademicYearStatistics(teacherIds, startSemester)
 
     return {
-      id: courseGroupId,
-      name,
+      id: courseGroup.id,
+      name: courseGroup.name,
       credits: statistics[0].credits,
       students: Number(statistics[0].students)
     }
@@ -94,28 +84,31 @@ const getCourseGroupsWithTotals = async (semesterCode) => {
 
 const getCourseGroup = async (courseGroupId, semesterCode) => {
   const startSemester = semesterCode || await getCurrentAcademicYearSemesterCode()
-  const cacheKey = COURSE_GROUP_KEY(courseGroupId, startSemester)
-  const cachedCourseGroup = await redisClient.getAsync(cacheKey)
-
-  if (cachedCourseGroup) {
-    return JSON.parse(cachedCourseGroup)
-  }
-
   const teacherBasicInfo = await getTeachersForCourseGroup(courseGroupId)
+  const courseGroup = await CourseGroup.findByPk(courseGroupId)
 
-  if (!teacherBasicInfo) {
-    return
+  if (!courseGroup) return
+  if (!teacherBasicInfo) return
+
+  if (teacherBasicInfo.length === 0) {
+    return {
+      id: courseGroupId,
+      name: courseGroup.name,
+      teachers: [],
+      totalCredits: 0,
+      totalStudents: 0,
+      totalCourses: 0,
+      semester: startSemester
+    }
   }
 
   const teacherIds = teacherBasicInfo.map(t => t.id)
-  const name = COURSE_GROUP_NAMES[courseGroupId]
-
   const statistics = await getAcademicYearStatistics(teacherIds, startSemester)
   const teacherStats = await getTeacherAcademicYearStatisticsByIds(teacherIds, startSemester)
 
   const { credits, students, courses } = statistics[0]
 
-  const mergedTeachers = [...teacherBasicInfo, ...teacherStats]
+  const mergedTeachers = [...teacherBasicInfo.map(e => e.get()), ...teacherStats]
     .reduce((acc, cur) => {
       if (acc[cur.id]) {
         acc[cur.id] = { ...cur, ...acc[cur.id] }
@@ -133,9 +126,9 @@ const getCourseGroup = async (courseGroupId, semesterCode) => {
       students: t.students ? Number(t.students) : 0
     }))
 
-  const courseGroup = {
+  const courseGroupInfo = {
     id: courseGroupId,
-    name,
+    name: courseGroup.name,
     teachers,
     totalCredits: credits || 0,
     totalStudents: Number(students),
@@ -143,9 +136,7 @@ const getCourseGroup = async (courseGroupId, semesterCode) => {
     semester: startSemester
   }
 
-  await redisClient.setAsync(cacheKey, JSON.stringify(courseGroup), 'EX', REDIS_CACHE_TTL)
-
-  return courseGroup
+  return courseGroupInfo
 }
 
 const getCoursesByTeachers = async (teacherIds, semesterCode) => {
@@ -170,10 +161,26 @@ const getCoursesByTeachers = async (teacherIds, semesterCode) => {
   return courses
 }
 
+const addTeacher = async (courseGroupId, teacherid) => {
+  const group = await CourseGroup.findByPk(courseGroupId)
+  const teacher = await Teacher.findByPk(teacherid)
+  if (!group || !teacher) return
+  return await group.addTeacher(teacher)
+}
+
+const removeTeacher = async (courseGroupId, teacherid) => {
+  const group = await CourseGroup.findByPk(courseGroupId)
+  const teacher = await Teacher.findByPk(teacherid)
+  if (!group || !teacher) return
+  return await group.removeTeacher(teacher)
+}
+
 module.exports = {
   createCourseGroup,
   getAcademicYears,
   getCourseGroupsWithTotals,
   getCourseGroup,
-  getCoursesByTeachers
+  getCoursesByTeachers,
+  addTeacher,
+  removeTeacher
 }
