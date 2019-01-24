@@ -35,10 +35,24 @@ const checkAdminAuth = async (req, res, next) => {
   if (req.decodedToken.admin) {
     next()
   } else {
-    res.status(403).json({ error: 'No authorized' })
+    res.status(403).json({ error: 'Not authorized' })
   }
 }
-
+const roles = requiredRoles => (req, res, next) => {
+  const token = req.headers['x-access-token']
+  if (token) {
+    jwt.verify(token, conf.TOKEN_SECRET, (err, decoded) => {
+      const roles = decoded.roles.map(r => r.group_code)
+      console.log(`Request has roles: ${roles}`)
+      if (requiredRoles.every(r => roles.indexOf(r) >= 0) || decoded.admin) {
+        console.log(`authorized for ${requiredRoles}`)
+        next()
+      } else {
+        console.log(`missing required roles ${requiredRoles}`)
+      }
+    })
+  }
+}
 module.exports = {
-  checkAuth, checkAdminAuth
+  checkAuth, checkAdminAuth, roles
 }

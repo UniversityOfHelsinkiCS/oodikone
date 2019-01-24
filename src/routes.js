@@ -34,22 +34,24 @@ const accessLogger = morgan((tokens, req, res) => {
   logger.info(message, meta)
 })
 
+
+
 module.exports = (app, url) => {
   app.use(url, log)
   app.use(url, login)
   app.use(url, ping)
   app.use(auth.checkAuth, accessLogger)
+  app.use(url, elementdetails)
   app.use(url, courses)
   app.use(url, department)
   app.use(url, students)
-  app.use(url, teachers)
   app.use(url, population)
   app.use(url, providers)
   app.use(url, semesters)
+  app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
+  app.use(`${url}/users`, auth.roles(['users']), users)
+  app.use(`${url}/usage`, auth.roles(['usage']), usage)
+  app.use(`${url}/oodilearn`, auth.roles(['oodilearn']), oodilearn)
+  app.use(`${url}/course-groups`,auth.roles(['coursegroups']), courseGroups)
   app.use(auth.checkAdminAuth)
-  app.use(url, users)
-  app.use(url, elementdetails)
-  app.use(url, usage),
-  app.use(url, oodilearn),
-  app.use(url, courseGroups)
 }
