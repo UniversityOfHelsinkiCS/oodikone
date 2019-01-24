@@ -4,20 +4,29 @@ import { shape, string } from 'prop-types'
 
 import AggregateView from './AggregateView'
 import CourseGroup from './CourseGroup'
+import CourseGroupAddTeacher from './CourseGroupAddTeacher'
 import sharedStyles from '../../styles/shared'
 
 
 const CourseGroups = ({ match }) => {
-  const { params: { courseGroupId } } = match
+  const { params: { courseGroupId, action } } = match
+
+  let view = null
+  if (courseGroupId) {
+    if (action === 'edit') {
+      view = <CourseGroupAddTeacher groupId={courseGroupId} />
+    } else {
+      view = <CourseGroup groupId={courseGroupId} />
+    }
+  } else {
+    view = <AggregateView />
+  }
 
   return (
     <div className={sharedStyles.segmentContainer}>
       <Header className={sharedStyles.segmentTitle} size="large" content="Course groups" />
       <Segment className={sharedStyles.contentSegment}>
-        { courseGroupId
-            ? <CourseGroup groupId={courseGroupId} />
-            : <AggregateView />
-        }
+        {view}
       </Segment>
     </div>
   )
@@ -26,7 +35,8 @@ const CourseGroups = ({ match }) => {
 CourseGroups.propTypes = {
   match: shape({
     params: shape({
-      courseGroupId: string
+      courseGroupId: string,
+      edit: string
     }).isRequired
   }).isRequired
 }
