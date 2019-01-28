@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { Teacher, Credit, Course, Semester, Provider } = require('../models/index')
+const { Teacher, Credit, Course, Semester, Provider, CourseGroup } = require('../models/index')
 
 const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 
@@ -40,6 +40,11 @@ const bySearchTerm = async (rawTerm) => {
         codeLike(terms),
         matchesId(searchTerm)
       ]
+    },
+    include: {
+      model: CourseGroup,
+      attributes: ['id', 'name'],
+      required: false
     }
   })
 }
