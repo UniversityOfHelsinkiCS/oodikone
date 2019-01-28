@@ -4,17 +4,17 @@ const ElementDetails = require('../services/elementdetails')
 const userService = require('../services/userService')
 const mailservice = require('../services/mailservice')
 
-router.get('/users', async (req, res) => {
+router.get('/', async (req, res) => {
   const results = await userService.findAll()
   res.json(results)
 })
 
-router.get('/users/access_groups', async (req, res) => {
+router.get('/access_groups', async (req, res) => {
   const result = await userService.getAccessGroups()
   res.json(result)
 })
 
-router.put('/users/:id/enable', async (req, res) => {
+router.put('/:id/enable', async (req, res) => {
   const id = req.params.id
   const user = await userService.byId(id)
   if (!user) res.status(400).end()
@@ -25,7 +25,7 @@ router.put('/users/:id/enable', async (req, res) => {
   }
 })
 
-router.put('/users/:id/toggleczar', async (req, res) => {
+router.put('/:id/toggleczar', async (req, res) => {
   const id = req.params.id
   const user = await User.byId(id)
   if (!user) res.status(400).end()
@@ -36,7 +36,7 @@ router.put('/users/:id/toggleczar', async (req, res) => {
   }
 })
 
-router.post('/users/modifyaccess', async (req, res) => {
+router.post('/modifyaccess', async (req, res) => {
   try {
     const result = await userService.modifyAccess(req.body)
     res.status(200).json(result)
@@ -63,7 +63,7 @@ router.post('/email', async (req, res) => {
 
 })
 
-router.post('/users/:uid/units/:id', async (req, res) => {
+router.post('/:uid/units/:id', async (req, res) => {
   const { uid, id } = req.params
   const user = await User.byId(uid)
   const elementdetail = await ElementDetails.byId(id)
@@ -80,7 +80,7 @@ router.post('/users/:uid/units/:id', async (req, res) => {
   }
 })
 
-router.post('/users/language', async (req, res) => {
+router.post('/language', async (req, res) => {
   const { username, language } = req.body
   let user = await User.byUsername(username)
   if (!user) return res.status(400).end()
@@ -94,7 +94,7 @@ router.post('/users/language', async (req, res) => {
   }
 })
 
-router.delete('/users/:uid/units/:id', async (req, res) => {
+router.delete('/:uid/units/:id', async (req, res) => {
   const { uid, id } = req.params
   const user = await User.byId(uid)
   const elementdetail = await ElementDetails.byId(id)
@@ -111,11 +111,12 @@ router.delete('/users/:uid/units/:id', async (req, res) => {
   }
 })
 
-router.post('/users/:uid/elements', async (req, res) => {
+router.post('/:uid/elements', async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
   const user = await userService.enableElementDetails(uid, codes)
   res.json(user)
 })
+
 
 module.exports = router

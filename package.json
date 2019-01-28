@@ -27,7 +27,6 @@
     "update_attainment_dates": "node scripts/update_max_attainment_dates.js",
     "create_defa_report": "node scripts/create_defa_report.js",
     "seed_course_groups": "node scripts/create_course_groups_kayttis.js"
-
   },
   "author": "Matti Luukkainen",
   "license": "MIT",

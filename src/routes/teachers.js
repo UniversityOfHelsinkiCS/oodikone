@@ -5,13 +5,13 @@ const { FEATURES } = require('../conf-backend')
 
 const router = FEATURES.ERROR_HANDLER ? r.wrapper : r.router
 
-router.get('/teachers', async (req, res) => {
+router.get('/', async (req, res) => {
   const { searchTerm } = req.query
   const result = await teachers.bySearchTerm(searchTerm)
   res.json(result)
 })
 
-router.get('/teachers/top', async (req, res) => {
+router.get('/top', async (req, res) => {
   const { yearcode, category = topteachers.ID.ALL } = req.query
   if (!yearcode) {
     return res.status(422).send('Missing required yearcode query param')
@@ -20,12 +20,12 @@ router.get('/teachers/top', async (req, res) => {
   res.json(result)
 })
 
-router.get('/teachers/top/categories', async (req, res) => {
+router.get('/top/categories', async (req, res) => {
   const result = await topteachers.getCategoriesAndYears()
   res.json(result)
 })
 
-router.get('/teachers/stats', async (req, res) => {
+router.get('/stats', async (req, res) => {
   const { providers, semesterStart, semesterEnd } = req.query
   if (!providers || !semesterStart) {
     return res.status(422).send('Missing required query parameters.')
@@ -34,7 +34,7 @@ router.get('/teachers/stats', async (req, res) => {
   res.json(result)
 })
 
-router.get('/teachers/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
   const { id } = req.params
   const result = await teachers.teacherStats(id)
   if (!result) {
