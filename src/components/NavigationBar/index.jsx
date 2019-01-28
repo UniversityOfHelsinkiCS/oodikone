@@ -33,11 +33,13 @@ class NavigationBar extends Component {
     const fake = await userIsMock()
     this.setState({ fake })
     const roles = fake ? false : await userRoles()
-    Object.keys(navigationRoutes).forEach((key) => {
-      if (navigationRoutes[key].reqRights && roles.every(r => navigationRoutes[key].reqRights.indexOf(r) === -1)) {
-        delete navigationRoutes[key]
-      }
-    })
+    if (!roles.includes('admin')) {
+      Object.keys(navigationRoutes).forEach((key) => {
+        if (navigationRoutes[key].reqRights && roles.every(r => navigationRoutes[key].reqRights.indexOf(r) === -1)) {
+          delete navigationRoutes[key]
+        }
+      })
+    }
     this.setState({ navigationRoutes })
   }
 
@@ -53,14 +55,14 @@ class NavigationBar extends Component {
     route.endsWith('?') ? route.slice(0, route.indexOf('/:')) : route
   )
 
-  renderUserMenu = () => {
+  renderUserMenu = (itemWidth) => {
     const { translate } = this.props
     if (process.env.NODE_ENV === 'development') {
       const testUsers = ['tktl']
       return (
         <Menu.Item
           as={Dropdown}
-          style={{ backgroundColor: 'purple', color: 'white' }}
+          style={{ backgroundColor: 'purple', color: 'white', width: `${itemWidth}%` }}
           text="Dev controls"
           tabIndex="-1"
         >
@@ -105,9 +107,11 @@ class NavigationBar extends Component {
     const { asUser } = this.props
     const { fake, navigationRoutes } = this.state
     const menuWidth = fake ? Object.keys(navigationRoutes).length + 3 : Object.keys(navigationRoutes).length + 2
+    const itemWidth = 100 / menuWidth
     return (
       <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
         <Menu.Item
+          style={{ width: `${itemWidth}%` }}
           as={Link}
           to={navigationRoutes.index.route}
           tabIndex="-1"
@@ -124,8 +128,8 @@ class NavigationBar extends Component {
             }
             return (
               <Menu.Item
+                style={{ width: `${itemWidth}%` }}
                 exact={viewableRoute === value.route}
-                strict={viewableRoute !== value.route}
                 as={NavLink}
                 key={`menu-item-${viewableRoute}`}
                 to={this.checkForOptionalParams(viewableRoute)}
@@ -136,12 +140,16 @@ class NavigationBar extends Component {
             )
           })
         }
-        {this.renderUserMenu()}
-        <Menu.Item>
+        {this.renderUserMenu(itemWidth)}
+        <Menu.Item
+          style={{ width: `${itemWidth}%` }}
+        >
           <Button icon="bullhorn" onClick={() => Sentry.showReportDialog()} />
         </Menu.Item>
         {fake ?
-          <Menu.Item>
+          <Menu.Item
+            style={{ width: `${itemWidth}%` }}
+          >
             <Button onClick={this.returnToSelf()}>Stop mocking as {asUser}</Button>
           </Menu.Item>
           : null}
