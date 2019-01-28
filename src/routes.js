@@ -48,19 +48,10 @@ module.exports = (app, url) => {
   app.use(url, population)
   app.use(url, providers)
   app.use(url, semesters)
-<<<<<<< HEAD
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
   app.use(`${url}/users`, auth.roles(['users']), users)
   app.use(`${url}/usage`, auth.roles(['usage']), usage)
   app.use(`${url}/oodilearn`, auth.roles(['oodilearn']), oodilearn)
   app.use(`${url}/course-groups`,auth.roles(['coursegroups']), courseGroups)
   app.use(auth.checkAdminAuth)
-=======
-  app.use(url, elementdetails)
-  app.use(auth.checkAdminAuth)
-  app.use(url, users)
-  app.use(url, usage),
-  app.use(url, oodilearn),
-  app.use(url, courseGroups)
->>>>>>> 35691806d05b9cd5379ccdb0ec52fa33ade651e9
 }
