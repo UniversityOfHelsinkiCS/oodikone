@@ -2,7 +2,7 @@ const router = require('express').Router()
 
 const CourseGroupService = require('../services/courseGroups')
 
-const BASE_PATH = '/course-groups'
+const BASE_PATH = '/'
 
 router.get(BASE_PATH, async (req, res) => {
   const semesterCode = req.query.semester
@@ -10,12 +10,12 @@ router.get(BASE_PATH, async (req, res) => {
   return res.json(courseGroups)
 })
 
-router.get(`${BASE_PATH}/academic-years`, async (req, res) => {
+router.get(`${BASE_PATH}academic-years`, async (req, res) => {
   const academicYears = await CourseGroupService.getAcademicYears()
   return res.json(academicYears)
 })
 
-router.get(`${BASE_PATH}/courses`, async (req, res) => {
+router.get(`${BASE_PATH}courses`, async (req, res) => {
   const { teacherIds: ids, semester } = req.query
   const teacherIds = ids && JSON.parse(ids)
 
@@ -30,7 +30,7 @@ router.get(`${BASE_PATH}/courses`, async (req, res) => {
   return courses ? res.send(courses) : res.sendStatus(404)
 })
 
-router.get(`${BASE_PATH}/:id`, async (req, res) => {
+router.get(`${BASE_PATH}:id`, async (req, res) => {
   const { id } = req.params
   const { semester } = req.query
   const groupData = await CourseGroupService.getCourseGroup(Number(id), Number(semester))
