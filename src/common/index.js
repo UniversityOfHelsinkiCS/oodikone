@@ -10,6 +10,8 @@ import { sendLog, login } from '../apiConnection'
 
 export const setToken = token => localStorage.setItem(TOKEN_NAME, token)
 
+const tokenFields = ['enabled', 'userId', 'name', 'language', 'rights', 'roles', 'asuser', 'iat']
+
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   _.filter(dropDownOptions, option => (option.text ?
     option.text.toLowerCase().concat(option.description.toLowerCase())
@@ -36,8 +38,8 @@ export const tokenAccessInvalid = (token) => {
     return true
   }
   // Misses fields
-  const fields = ['enabled', 'userId', 'name']
-  if (fields.some(key => !Object.keys(decodedToken).includes(key))) {
+  if (tokenFields.some(key => !Object.keys(decodedToken).includes(key))) {
+    console.log('Token is of invalid form, re-logging in')
     return true
   }
   // User is not enabled
@@ -76,6 +78,7 @@ export const getUserName = async () => {
   const token = await getToken()
   return token ? decodeToken(token).userId : false
 }
+
 
 export const setUserLanguage = (language) => {
   localStorage.setItem('language', language)
