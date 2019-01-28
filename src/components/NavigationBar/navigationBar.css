@@ -1,11 +1,11 @@
 .navBar {
-  border-radius: 0 !important;
+  border-radius: 0 !important;
 }
 
 .logo {
-  text-decoration: none;
+  text-decoration: none;
 }
 
 .logoText {
-  color: var(--black);
+  color: var(--black);
 }

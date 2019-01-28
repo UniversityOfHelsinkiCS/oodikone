@@ -49,8 +49,13 @@ export const tokenAccessInvalid = (token) => {
 export const getToken = async (forceNew = false) => {
   let token = localStorage.getItem(TOKEN_NAME)
   if (!token || tokenAccessInvalid(token) || forceNew) {
-    token = await login()
-    setToken(token)
+    try {
+      token = await login()
+      setToken(token)
+    } catch (e) {
+      console.log('mayhem, reloading')
+      window.location.reload(true)
+    }
   }
   return token
 }
