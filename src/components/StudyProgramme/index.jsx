@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { shape, string } from 'prop-types'
-import { Header, Message, Segment, Button } from 'semantic-ui-react'
+import { Header, Message, Segment, Tab } from 'semantic-ui-react'
 import sharedStyles from '../../styles/shared'
-import StudyProgrammeMandatoryCourses from '../StudyProgrammeMandatoryCourses'
-import StudyProgrammeCourseCodeMapper from '../StudyProgrammeCourseCodeMapper'
-import StudyProgrammeSelector from '../StudyProgrammeSelector'
+import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
+import StudyProgrammeCourseCodeMapper from './StudyProgrammeCourseCodeMapper'
+import StudyProgrammeSelector from './StudyProgrammeSelector'
 
 class StudyProgramme extends Component {
   static propTypes = {
@@ -27,6 +27,19 @@ class StudyProgramme extends Component {
     selected: 0
   }
 
+  getPanes() {
+    const { match } = this.props
+    const { studyProgrammeId } = match.params
+    return ([
+      {
+        menuItem: 'Mandatory Courses',
+        render: () => <StudyProgrammeMandatoryCourses studyProgramme={studyProgrammeId} />
+      },
+      { menuItem: 'Code Mapper', render: () => <StudyProgrammeCourseCodeMapper /> },
+      { menuItem: 'Course Groups', render: () => <Header>Nothing here yet</Header> }
+    ])
+  }
+
   getComponent = () => {
     const { match } = this.props
     const { studyProgrammeId } = match.params
@@ -44,13 +57,15 @@ class StudyProgramme extends Component {
     this.props.history.push(`/study-programme/${target[1]}`, { selected: target[1] })
   }
 
-  select = (int) => {
-    this.setState({ selected: int })
+  select = (e, { activeIndex }) => {
+    this.setState({ selected: activeIndex })
   }
 
   render() {
+    const { selected } = this.state
     const { match } = this.props
     const { studyProgrammeId } = match.params
+    const panes = this.getPanes()
     return (
       <div className={sharedStyles.segmentContainer}>
         <Header className={sharedStyles.segmentTitle} size="large">
@@ -61,16 +76,8 @@ class StudyProgramme extends Component {
           <StudyProgrammeSelector handleSelect={this.handleSelect} selected={studyProgrammeId !== undefined} />
           {
             studyProgrammeId ? (
-              <React.Fragment>
-                <Button.Group>
-                  <Button onClick={() => this.select(0)}>Mandatory Courses</Button>
-                  <Button onClick={() => this.select(1)}>Course Code Mapping</Button>
-                  <Button onClick={() => this.select(2)}>Course Groups</Button>
-                </Button.Group>
-                <Segment className={sharedStyles.contentSegment}>
-                  {this.getComponent()}
-                </Segment>
-              </React.Fragment>) : null
+              <Tab panes={panes} activeIndex={selected} onTabChange={this.select} />
+            ) : null
           }
         </Segment>
       </div>
