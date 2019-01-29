@@ -10,7 +10,7 @@ import { sendLog, login } from '../apiConnection'
 
 export const setToken = token => localStorage.setItem(TOKEN_NAME, token)
 
-const tokenFields = ['enabled', 'userId', 'name', 'language', 'rights', 'roles', 'asuser', 'iat']
+const tokenFields = ['enabled', 'userId', 'name', 'language', 'rights', 'roles', 'iat']
 
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   _.filter(dropDownOptions, option => (option.text ?
