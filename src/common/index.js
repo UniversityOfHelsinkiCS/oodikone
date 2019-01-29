@@ -141,7 +141,7 @@ export const getStudentTotalCreditsFromMandatory = (student, mandatoryCourses) =
   .filter(c =>
     c.passed &&
     !c.isStudyModuleCredit &&
-    mandatoryCourses.includes(c.course.code))
+    mandatoryCourses.find(cr => cr.code === c.course.code))
   .reduce((a, b) => a + b.credits, 0)
 
 export const getTotalCreditsFromCourses = courses =>

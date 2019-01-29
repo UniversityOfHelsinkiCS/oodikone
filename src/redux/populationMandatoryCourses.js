@@ -7,7 +7,6 @@ export const getMandatoryCourses = (id) => {
   const route = `/v2/studyprogrammes/${id}/mandatory_courses`
   return callController(route, prefix)
 }
-
-const reducer = itemreducer(prefix, { data: {} })
+const reducer = itemreducer(prefix, { data: [] })
 
 export default reducer

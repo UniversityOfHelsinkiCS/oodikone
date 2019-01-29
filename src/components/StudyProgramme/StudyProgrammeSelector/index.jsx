@@ -3,8 +3,8 @@ import { connect } from 'react-redux'
 import { shape, func, string, bool } from 'prop-types'
 import { Loader } from 'semantic-ui-react'
 import { sortBy } from 'lodash'
-import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
-import Table from '../SearchResultTable'
+import { getDegreesAndProgrammes } from '../../../redux/populationDegreesAndProgrammes'
+import Table from '../../SearchResultTable'
 
 const headers = [
   'name',
