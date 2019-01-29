@@ -51,7 +51,7 @@ export const routes = {
   populations: { route: '/populations', translateId: 'populations' },
   students: { route: '/students/:studentNumber?', translateId: 'students' },
   courseStatistics: { route: '/coursestatistics', translateId: 'courseStatistics' },
-  courseGroups: { route: '/course-groups/:courseGroupId?', translateId: 'courseGroups', reqRights: ['coursegroups'] },
+  courseGroups: { route: '/course-groups/:courseGroupId?/:action?', translateId: 'courseGroups', reqRights: ['coursegroups'] },
   studyProgramme: { route: '/study-programme/:studyProgrammeId?', translateId: 'studyProgramme', admin: true, reqRights: ['admin'] },
   teachers: { route: '/teachers/:teacherid?', translateId: 'teachers', czar: true, reqRights: ['teachers'] },
   users: { route: '/users/:userid?', translateId: 'users', admin: true, reqRights: ['users'] },
