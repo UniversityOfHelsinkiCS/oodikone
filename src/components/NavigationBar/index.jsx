@@ -5,8 +5,8 @@ import { NavLink, Link } from 'react-router-dom'
 import { func, shape, string } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-import { routes, hiddenRoutes } from '../../constants'
-import { userIsAdmin, userIsCzar, userIsMock } from '../../common'
+import { routes } from '../../constants'
+import { userIsMock, userRoles } from '../../common'
 import { removeAsUser } from '../../redux/settings'
 import styles from './navigationBar.css'
 import { logout, login, returnToSelf } from '../../apiConnection'
@@ -32,15 +32,14 @@ class NavigationBar extends Component {
     const navigationRoutes = { ...routes }
     const fake = await userIsMock()
     this.setState({ fake })
-    const adminRights = fake ? false : await userIsAdmin()
-    const czarRights = fake ? false : await userIsCzar()
-    Object.keys(navigationRoutes).forEach((key) => {
-      if (navigationRoutes[key].admin && !adminRights) {
-        delete navigationRoutes[key]
-      } else if (navigationRoutes[key].czar && (!adminRights && !czarRights)) {
-        delete navigationRoutes[key]
-      }
-    })
+    const roles = fake ? false : await userRoles()
+    if (!roles.includes('admin')) {
+      Object.keys(navigationRoutes).forEach((key) => {
+        if (navigationRoutes[key].reqRights && roles.every(r => navigationRoutes[key].reqRights.indexOf(r) === -1)) {
+          delete navigationRoutes[key]
+        }
+      })
+    }
     this.setState({ navigationRoutes })
   }
 
@@ -52,34 +51,18 @@ class NavigationBar extends Component {
     this.props.history.push('/')
   }
 
-  checkForOptionalParams = route => (
-    route.endsWith('?') ? route.slice(0, route.indexOf('/:')) : route
-  )
-
-  renderUserMenu = () => {
+  renderUserMenu = (itemWidth) => {
     const { translate } = this.props
     if (process.env.NODE_ENV === 'development') {
       const testUsers = ['tktl']
       return (
         <Menu.Item
           as={Dropdown}
-          style={{ backgroundColor: 'purple', color: 'white' }}
+          style={{ backgroundColor: 'purple', color: 'white', width: `${itemWidth}%` }}
           text="Dev controls"
           tabIndex="-1"
         >
           <Dropdown.Menu>
-            <Dropdown.Item
-              as={NavLink}
-              to={hiddenRoutes.oodilearn.route}
-              text="OodiLearn"
-              icon="graduation cap"
-            />
-            <Dropdown.Item
-              as={NavLink}
-              to={hiddenRoutes.sandbox.route}
-              text="Sandbox"
-              icon="boxes"
-            />
             {ADMINER_URL && (
               <Dropdown.Item
                 onClick={() => {
@@ -120,9 +103,11 @@ class NavigationBar extends Component {
     const { asUser } = this.props
     const { fake, navigationRoutes } = this.state
     const menuWidth = fake ? Object.keys(navigationRoutes).length + 3 : Object.keys(navigationRoutes).length + 2
+    const itemWidth = 100 / menuWidth
     return (
       <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
         <Menu.Item
+          style={{ width: `${itemWidth}%` }}
           as={Link}
           to={navigationRoutes.index.route}
           tabIndex="-1"
@@ -133,17 +118,17 @@ class NavigationBar extends Component {
         </Menu.Item>
         {
           Object.values(navigationRoutes).map((value) => {
-            const viewableRoute = this.checkForOptionalParams(value.route)
-            if (value.route === '/') {
+            const viewableRoute = value.menuRoute
+            if (!viewableRoute) {
               return null
             }
             return (
               <Menu.Item
-                exact={viewableRoute === value.route}
-                strict={viewableRoute !== value.route}
+                style={{ width: `${itemWidth}%` }}
+                exact
                 as={NavLink}
                 key={`menu-item-${viewableRoute}`}
-                to={this.checkForOptionalParams(viewableRoute)}
+                to={viewableRoute}
                 tabIndex="-1"
               >
                 {t(`navigationBar.${value.translateId}`)}
@@ -151,12 +136,16 @@ class NavigationBar extends Component {
             )
           })
         }
-        {this.renderUserMenu()}
-        <Menu.Item>
+        {this.renderUserMenu(itemWidth)}
+        <Menu.Item
+          style={{ width: `${itemWidth}%` }}
+        >
           <Button icon="bullhorn" onClick={() => Sentry.showReportDialog()} />
         </Menu.Item>
         {fake ?
-          <Menu.Item>
+          <Menu.Item
+            style={{ width: `${itemWidth}%` }}
+          >
             <Button onClick={this.returnToSelf()}>Stop mocking as {asUser}</Button>
           </Menu.Item>
           : null}

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Input, Button, Form, Popup } from 'semantic-ui-react'
-import { shape, func, string, arrayOf } from 'prop-types'
+import { shape, func, arrayOf } from 'prop-types'
 
 import { creditsLessThanFromMandatory } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
@@ -12,7 +12,7 @@ class CreditsLessThanFromMandatory extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    courses: arrayOf(string).isRequired
+    courses: arrayOf(shape({})).isRequired
   }
 
   state = {

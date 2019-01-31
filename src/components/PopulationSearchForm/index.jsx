@@ -15,7 +15,7 @@ import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 import { transferTo } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
-import { isInDateFormat, momentFromFormat, reformatDate, isValidYear, textAndDescriptionSearch } from '../../common'
+import { momentFromFormat, reformatDate, textAndDescriptionSearch } from '../../common'
 import { setLoading } from '../../redux/graphSpinner'
 import LanguageChooser from '../LanguageChooser'
 import style from './populationSearchForm.css'
@@ -55,14 +55,13 @@ class PopulationSearchForm extends Component {
       showAdvancedSettings: false,
       momentYear: Datetime.moment('2017-01-01'),
       floatMonths: this.months('2017', 'FALL'),
-      asUser: null,
-      selectableStartYears: this.defaultSelectableStartYears()
+      asUser: null
     }
   }
 
   componentDidMount() {
     const { studyProgrammes, asUser } = this.props
-    if (asUser !== this.state.asUser || !studyProgrammes || studyProgrammes.length === 0) {
+    if (asUser !== this.state.asUser || !studyProgrammes || Object.values(studyProgrammes).length === 0) {
       this.setState({ asUser: asUser, query: this.initialQuery() }) // eslint-disable-line
       this.props.getDegreesAndProgrammes()
     }
@@ -99,7 +98,7 @@ class PopulationSearchForm extends Component {
   fetchPopulation = () => {
     const { query } = this.state
     let queryCodes = []
-    queryCodes = [...Object.values(query.studyRights)]
+    queryCodes = [...Object.values(query.studyRights).filter(e => e != null)]
     const backendQuery = { ...query, studyRights: queryCodes }
     const uuid = uuidv4()
     const request = { ...backendQuery, uuid }
@@ -120,6 +119,48 @@ class PopulationSearchForm extends Component {
 
   handleYearSelection = (momentYear) => {
     const { query } = this.state
+    const { studyProgrammes } = this.props
+
+    if (!this.validYearCheck(momentYear)) {
+      this.setState({
+        momentYear: null,
+        query: {
+          ...query,
+          studyRights: {
+            ...query.studyRights,
+            studyTrack: null,
+            degree: null
+          }
+        }
+      })
+      return
+    }
+
+    // When changing year, remove degree and track selections
+    // if they are no longer possible to select or there is only one selection possible
+    let { degree, studyTrack } = this.state.query.studyRights
+    if (degree || studyTrack) {
+      if (!query.studyRights.programme) {
+        degree = null
+        studyTrack = null
+      } else {
+        const associations = studyProgrammes[query.studyRights.programme].enrollmentStartYears[momentYear.year()]
+        if (!associations) {
+          degree = null
+          studyTrack = null
+        } else {
+          if (!associations.degrees[this.state.query.studyRights.degree]
+            || Object.values(associations.degrees).length <= 1) {
+            degree = null
+          }
+          if (!associations.studyTracks[this.state.query.studyRights.studyTrack]
+            || Object.values(associations.studyTracks).length <= 1) {
+            studyTrack = null
+          }
+        }
+      }
+    }
+
     this.setState({
       momentYear,
       query: {
@@ -128,7 +169,12 @@ class PopulationSearchForm extends Component {
         months: this.months(
           reformatDate(momentYear, YEAR_DATE_FORMAT),
           this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING'
-        )
+        ),
+        studyRights: {
+          ...query.studyRights,
+          studyTrack,
+          degree
+        }
       }
     })
   }
@@ -191,21 +237,17 @@ class PopulationSearchForm extends Component {
   handleProgrammeChange = (e, { value }) => {
     const programme = value
     if (programme === '') {
-      this.setState({ selectableStartYears: this.defaultSelectableStartYears() })
       this.handleClear('programme')
       return
     }
     const { query } = this.state
-    const { studyProgrammes } = this.props
-    const selectableStartYears = { first: studyProgrammes[value].first_held, last: studyProgrammes[value].latest_held }
     this.setState({
       query: {
         ...query,
         studyRights: {
           programme
         }
-      },
-      selectableStartYears
+      }
     })
   }
 
@@ -266,12 +308,14 @@ class PopulationSearchForm extends Component {
     return moment(start).add(months - 1, 'months').format('MMMM YY')
   }
 
-  validYearCheck = (momentYear, first = this.state.selectableStartYears.first, last = this.state.selectableStartYears.last) => { // eslint-disable-line
-    if (!isInDateFormat(momentYear, YEAR_DATE_FORMAT) || !isValidYear(momentYear)) {
+  validYearCheck = (momentYear) => {
+    if (!moment.isMoment(momentYear)) {
       return false
     }
-    const year = momentYear.year()
-    return year >= first && year <= last
+    if (!this.state.query.studyRights.programme) {
+      return momentYear.year() >= 1900 && momentYear.isSameOrBefore(moment().subtract(6, 'months'))
+    }
+    return this.props.studyProgrammes[this.state.query.studyRights.programme].enrollmentStartYears[momentYear.year()] != null
   }
 
   getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
@@ -284,16 +328,11 @@ class PopulationSearchForm extends Component {
     months: this.months('2017', 'FALL')
   })
 
-  defaultSelectableStartYears = () => ({
-    first: 1900,
-    last: Datetime.moment().year()
-  })
-
   renderableList = (list) => {
     const { language } = this.props
     return list.map((sp) => {
-      const shh = {}
-      Object.assign(shh, sp)
+      const { type, name, code } = sp
+      const shh = { type, name, code }
       shh.text = (sp.name[language] || `${(sp.name.fi || sp.name.en || sp.name.sv)} (translation not found)`)
       shh.description = sp.code
       shh.value = sp.code
@@ -390,38 +429,14 @@ class PopulationSearchForm extends Component {
           clearable
         />
       </React.Fragment>)
-    const isOldProgramme = programme => programme.length > 1 && Number(programme[0])
-    if (studyRights.programme &&
-      isOldProgramme(studyRights.programme) &&
-      degreesToRender.length > 1 &&
-      studyTracksToRender.length > 1) {
+    if (studyRights.programme) {
       return (
         <Form.Group>
           <Form.Field width={8}>
-            {renderableDegrees()}
+            { degreesToRender && degreesToRender.length > 1 ? renderableDegrees() : null }
           </Form.Field>
           <Form.Field width={8}>
-            {renderableTracks()}
-          </Form.Field>
-        </Form.Group>
-      )
-    } else if (studyRights.programme && isOldProgramme(studyRights.programme) && degreesToRender.length > 1) {
-      return (
-        <Form.Group>
-          <Form.Field width={8}>
-            {renderableDegrees()}
-          </Form.Field>
-          <Form.Field width={8}>
-          </Form.Field>
-        </Form.Group>
-      )
-    } else if (studyRights.programme && studyTracksToRender.length > 1) {
-      return (
-        <Form.Group>
-          <Form.Field width={8}>
-          </Form.Field>
-          <Form.Field width={8}>
-            {renderableTracks()}
+            { studyTracksToRender && studyTracksToRender.length > 1 ? renderableTracks() : null }
           </Form.Field>
         </Form.Group>
       )
@@ -432,6 +447,7 @@ class PopulationSearchForm extends Component {
   renderStudyGroupSelector = () => {
     const { studyProgrammes, language } = this.props
     const { studyRights } = this.state.query
+    const { momentYear } = this.state
     if (this.props.pending) {
       return (
         <Icon name="spinner" loading size="big" color="black" style={{ marginLeft: '45%' }} />
@@ -454,19 +470,18 @@ class PopulationSearchForm extends Component {
     }
 
     let degreesToRender
-    if (studyRights.programme) {
-      const sortedStudyDegrees =
-        _.sortBy(studyProgrammes[studyRights.programme].associations['10'], s => s.name[language])
-      const year = this.state.momentYear.year()
-      degreesToRender = this.renderableList(sortedStudyDegrees.filter(s => s.first_held <= year && s.latest_held >= year))
+    let studyTracksToRender
+    if (studyRights.programme && this.validYearCheck(momentYear)) {
+      const associations = studyProgrammes[studyRights.programme].enrollmentStartYears[momentYear.year()]
+      if (associations) {
+        const sortedStudyDegrees = _.sortBy(associations.degrees, s => s.name[language])
+        degreesToRender = this.renderableList(sortedStudyDegrees)
+
+        const sortedStudyTracks = _.sortBy(associations.studyTracks, s => s.name[language])
+        studyTracksToRender = this.renderableList(sortedStudyTracks)
+      }
     }
 
-    let studyTracksToRender
-    if (studyRights.programme) {
-      const sortedStudyTracks =
-        _.sortBy(studyProgrammes[studyRights.programme].associations['30'], s => s.name[language])
-      studyTracksToRender = this.renderableList(sortedStudyTracks)
-    }
     return (
       <div>
         <Form.Group>
@@ -607,14 +622,13 @@ class PopulationSearchForm extends Component {
 
 const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes, locale }) => {
   const { language, asUser } = settings
-  const studyRights = populationDegreesAndProgrammes.data || {}
   const { pending } = populationDegreesAndProgrammes
   return ({
     language,
     asUser,
     queries: populations.query || {},
     translate: getTranslate(locale),
-    studyProgrammes: studyRights['20'],
+    studyProgrammes: populationDegreesAndProgrammes.data || {},
     pending,
     extents: populations.data.extents || []
   })

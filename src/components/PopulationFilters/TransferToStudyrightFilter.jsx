@@ -84,7 +84,7 @@ class TransferToStudyrightFilter extends Component {
 
 const mapStateToProps = (state) => {
   const code = state.populations.query.studyRights[0]
-  const studyrightName = state.populationDegreesAndProgrammes.data[20][code].name
+  const studyrightName = state.populationDegreesAndProgrammes.data[code].name
   return ({
     language: state.settings.language,
     studyrightName
