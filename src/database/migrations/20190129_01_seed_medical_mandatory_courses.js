@@ -1,5 +1,4 @@
 const mandatoryMedical = require('../data/medicalcodes')
-console.log(mandatoryMedical)
 module.exports = {
   up: async queryInterface => {
     await queryInterface.bulkInsert(
