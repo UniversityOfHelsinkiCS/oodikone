@@ -48,17 +48,17 @@ import { chartblue, red, green, chartdarkg, chartlgreen, chartdarkred, chartlred
 
 export const routes = {
   index: { route: '/' },
-  populations: { route: '/populations', translateId: 'populations' },
-  students: { route: '/students/:studentNumber?', translateId: 'students' },
-  courseStatistics: { route: '/coursestatistics', translateId: 'courseStatistics' },
-  courseGroups: { route: '/course-groups/:courseGroupId?/:action?', translateId: 'courseGroups', reqRights: ['coursegroups'] },
-  studyProgramme: { route: '/study-programme/:studyProgrammeId?', translateId: 'studyProgramme', admin: true, reqRights: ['admin'] },
-  teachers: { route: '/teachers/:teacherid?', translateId: 'teachers', czar: true, reqRights: ['teachers'] },
-  users: { route: '/users/:userid?', translateId: 'users', admin: true, reqRights: ['users'] },
-  settings: { route: '/settings', translateId: 'settings', admin: true, reqRights: ['admin'] },
-  usage: { route: '/usage', translateId: 'usage', reqRights: ['usage'] },
-  sandbox: { route: '/sandbox', translateId: 'sandbox', admin: true, reqRights: ['admin'] },
-  oodilearn: { route: '/oodilearn', translateId: 'oodilearn', admin: true, reqRights: ['oodilearn'] }
+  populations: { menuRoute: '/populations', route: '/populations', translateId: 'populations' },
+  students: { menuRoute: '/students', route: '/students/:studentNumber?', translateId: 'students' },
+  courseStatistics: { menuRoute: '/coursestatistics', route: '/coursestatistics', translateId: 'courseStatistics' },
+  studyProgramme: { menuRoute: '/study-programme', route: '/study-programme/:studyProgrammeId?', translateId: 'studyProgramme', admin: true, reqRights: ['admin'] },
+  studyProgrammeCourseGroup: { route: '/study-programme/:studyProgrammeId/course-group/:courseGroupId', translateId: 'studyProgramme', admin: true, reqRights: ['admin'] },
+  teachers: { menuRoute: '/teachers', route: '/teachers/:teacherid?', translateId: 'teachers', czar: true, reqRights: ['teachers'] },
+  users: { menuRoute: '/users', route: '/users/:userid?', translateId: 'users', admin: true, reqRights: ['users'] },
+  settings: { menuRoute: '/settings', route: '/settings', translateId: 'settings', admin: true, reqRights: ['admin'] },
+  usage: { menuRoute: '/usage', route: '/usage', translateId: 'usage', reqRights: ['usage'] },
+  sandbox: { menuRoute: '/sandbox', route: '/sandbox', translateId: 'sandbox', admin: true, reqRights: ['admin'] },
+  oodilearn: { menuRoute: '/oodilearn', route: '/oodilearn', translateId: 'oodilearn', admin: true, reqRights: ['oodilearn'] }
 }
 
 export const hiddenRoutes = {

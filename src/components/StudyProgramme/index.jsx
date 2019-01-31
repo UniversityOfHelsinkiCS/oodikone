@@ -6,12 +6,14 @@ import sharedStyles from '../../styles/shared'
 import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
 import StudyProgrammeCourseCodeMapper from './StudyProgrammeCourseCodeMapper'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
+import AggregateView from '../CourseGroups/AggregateView'
 
 class StudyProgramme extends Component {
   static propTypes = {
     match: shape({
       params: shape({
-        studyProgrammeId: string
+        studyProgrammeId: string,
+        courseGroupId: string
       })
     }),
     history: shape({}).isRequired
@@ -24,33 +26,20 @@ class StudyProgramme extends Component {
   }
 
   state = {
-    selected: 0
+    selected: this.props.match.params.courseGroupId ? 2 : 0
   }
 
   getPanes() {
     const { match } = this.props
-    const { studyProgrammeId } = match.params
+    const { studyProgrammeId, courseGroupId } = match.params
     return ([
       {
         menuItem: 'Mandatory Courses',
         render: () => <StudyProgrammeMandatoryCourses studyProgramme={studyProgrammeId} />
       },
       { menuItem: 'Code Mapper', render: () => <StudyProgrammeCourseCodeMapper /> },
-      { menuItem: 'Course Groups', render: () => <Header>Nothing here yet</Header> }
+      { menuItem: 'Course Groups', render: () => <AggregateView programmeId={studyProgrammeId} courseGroupId={courseGroupId} /> }
     ])
-  }
-
-  getComponent = () => {
-    const { match } = this.props
-    const { studyProgrammeId } = match.params
-    if (this.state.selected === 0) {
-      return <StudyProgrammeMandatoryCourses studyProgramme={studyProgrammeId} />
-    } else if (this.state.selected === 1) {
-      return <StudyProgrammeCourseCodeMapper />
-    } else if (this.state.selected === 2) {
-      return <Header>Nothing here yet</Header>
-    }
-    return []
   }
 
   handleSelect = (target) => {

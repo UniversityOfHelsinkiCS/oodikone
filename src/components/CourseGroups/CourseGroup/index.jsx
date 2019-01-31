@@ -20,7 +20,8 @@ class CourseGroup extends Component {
     groupId: string.isRequired,
     history: shape({
       push: func.isRequired
-    }).isRequired
+    }).isRequired,
+    studyProgrammeId: string.isRequired
   }
 
   state = {
@@ -128,7 +129,7 @@ class CourseGroup extends Component {
   }
 
   render() {
-    const { history } = this.props
+    const { history, studyProgrammeId } = this.props
     const {
       totalStudents,
       totalCourses,
@@ -141,7 +142,7 @@ class CourseGroup extends Component {
       academicYears
     } = this.state
 
-    const navigateTo = route => history.push(getCompiledPath(route, {}))
+    const navigateTo = route => history.push(getCompiledPath(route, { studyProgrammeId }))
     const statisticsTeachers = teachers.filter(t => activeTeacherIds.includes(t.id))
 
     return (
@@ -157,7 +158,7 @@ class CourseGroup extends Component {
           </div>
           <Button
             icon="reply"
-            onClick={() => navigateTo(routes.courseGroups.route)}
+            onClick={() => navigateTo(routes.studyProgramme.route)}
             className={styles.headerIconButton}
           />
         </Header>
