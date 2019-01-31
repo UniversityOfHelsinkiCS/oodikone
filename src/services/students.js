@@ -61,8 +61,31 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
-const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount, matriculationexamination, gender, credits, abbreviatedname, email, studyrights, semester_enrollments, transfers, updatedAt, createdAt }) => {
-  const toCourse = ({ grade, credits, credittypecode, attainment_date, course, isStudyModule}) => {
+const formatStudent = ({
+  firstnames,
+  lastname,
+  studentnumber,
+  dateofuniversityenrollment,
+  creditcount,
+  matriculationexamination,
+  gender,
+  credits,
+  abbreviatedname,
+  email,
+  studyrights,
+  semester_enrollments,
+  transfers,
+  updatedAt,
+  createdAt
+}) => {
+  const toCourse = ({
+    grade,
+    credits,
+    credittypecode,
+    attainment_date,
+    course,
+    isStudyModule
+  }) => {
     course = course.get()
     return {
       course: {
@@ -78,19 +101,36 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
     }
   }
 
-  studyrights = studyrights === undefined ? [] : studyrights.map(({ studyrightid, highlevelname, startdate, enddate, canceldate, extentcode, graduated, graduation_date, studyright_elements }) => ({
-    studyrightid,
-    highlevelname,
-    extentcode,
-    startdate,
-    graduationDate: graduation_date,
-    studyrightElements: studyright_elements,
-    enddate,
-    canceldate,
-    graduated: Boolean(graduated)
-  }))
+  studyrights =
+    studyrights === undefined
+      ? []
+      : studyrights.map(
+        ({
+          studyrightid,
+          highlevelname,
+          startdate,
+          enddate,
+          canceldate,
+          extentcode,
+          graduated,
+          graduation_date,
+          studyright_elements
+        }) => ({
+          studyrightid,
+          highlevelname,
+          extentcode,
+          startdate,
+          graduationDate: graduation_date,
+          studyrightElements: studyright_elements,
+          enddate,
+          canceldate,
+          graduated: Boolean(graduated)
+        })
+      )
   semester_enrollments = semester_enrollments || []
-  const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({ semestercode, enrollmenttype }))
+  const semesterenrollments = semester_enrollments.map(
+    ({ semestercode, enrollmenttype }) => ({ semestercode, enrollmenttype })
+  )
 
   const courseByDate = (a, b) => {
     return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
@@ -98,7 +138,8 @@ const formatStudent = ({ firstnames, lastname, studentnumber, dateofuniversityen
 
   if (credits === undefined) {
     credits = []
-  } return {
+  }
+  return {
     firstnames,
     lastname,
     studyrights,

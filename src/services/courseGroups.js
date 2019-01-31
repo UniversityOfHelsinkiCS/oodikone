@@ -12,8 +12,10 @@ const {
 
 const ACADEMIC_YEAR_START_SEMESTER = 111 // academic year 2005-06
 
-const COURSE_GROUP_STATISTICS_KEY = (programmeId, semesterCode) => `course_group_statistics_${programmeId}_${semesterCode}`
-const TEACHER_COURSES_KEY = (teacherId, semesterCode) => `course_group_courses_${teacherId}_${semesterCode}`
+const COURSE_GROUP_STATISTICS_KEY = (programmeId, semesterCode) =>
+  `course_group_statistics_${programmeId}_${semesterCode}`
+const TEACHER_COURSES_KEY = (teacherId, semesterCode) =>
+  `course_group_courses_${teacherId}_${semesterCode}`
 const REDIS_CACHE_TTL = 12 * 60 * 60
 
 const getAcademicYears = async () =>
@@ -81,7 +83,12 @@ const getCourseGroupsWithTotals = async (programmeId, semesterCode) => {
     }
   })
 
-  await redisClient.setAsync(COURSE_GROUP_STATISTICS_KEY(programmeId, semesterCode), JSON.stringify(courseGroupStatistics), 'EX', REDIS_CACHE_TTL)
+  await redisClient.setAsync(
+    COURSE_GROUP_STATISTICS_KEY(programmeId, semesterCode),
+    JSON.stringify(courseGroupStatistics),
+    'EX',
+    REDIS_CACHE_TTL
+  )
 
   return courseGroupStatistics
 }
