@@ -1,10 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { Header, Segment, Icon } from 'semantic-ui-react'
-import { withRouter } from 'react-router'
-import { func, shape, string } from 'prop-types'
-
-import { getCompiledPath } from '../../../common'
-import { routes } from '../../../constants'
+import { string } from 'prop-types'
 
 import { callApi } from '../../../apiConnection'
 import SortableTable from '../../SortableTable'
@@ -28,7 +24,6 @@ class CourseGroupAddTeacher extends Component {
 
   render() {
     const { isLoading, courseGroup } = this.state
-    const { history } = this.props
 
     const columns = [
       { key: 'Teacher ID', title: 'Teacher ID', getRowVal: t => t.id },
@@ -71,11 +66,6 @@ class CourseGroupAddTeacher extends Component {
           <Fragment>
             <Header size="large">
               {courseGroup.name}
-              <Icon
-                name="reply"
-                onClick={() => history.push(getCompiledPath(routes.courseGroups.route, {}))}
-                link
-              />
             </Header>
             <Segment>
               <Header size="medium">Add teacher</Header>
@@ -114,10 +104,7 @@ class CourseGroupAddTeacher extends Component {
 }
 
 CourseGroupAddTeacher.propTypes = {
-  history: shape({
-    push: func.isRequired
-  }).isRequired,
   groupId: string.isRequired
 }
 
-export default withRouter(CourseGroupAddTeacher)
+export default CourseGroupAddTeacher

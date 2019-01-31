@@ -51,10 +51,6 @@ class NavigationBar extends Component {
     this.props.history.push('/')
   }
 
-  checkForOptionalParams = route => (
-    route.endsWith('?') ? route.slice(0, route.indexOf('/:')) : route
-  )
-
   renderUserMenu = (itemWidth) => {
     const { translate } = this.props
     if (process.env.NODE_ENV === 'development') {
@@ -122,17 +118,17 @@ class NavigationBar extends Component {
         </Menu.Item>
         {
           Object.values(navigationRoutes).map((value) => {
-            const viewableRoute = this.checkForOptionalParams(value.route)
-            if (value.route === '/') {
+            const viewableRoute = value.menuRoute
+            if (!viewableRoute) {
               return null
             }
             return (
               <Menu.Item
                 style={{ width: `${itemWidth}%` }}
-                exact={viewableRoute === value.route}
+                exact
                 as={NavLink}
                 key={`menu-item-${viewableRoute}`}
-                to={this.checkForOptionalParams(viewableRoute)}
+                to={viewableRoute}
                 tabIndex="-1"
               >
                 {t(`navigationBar.${value.translateId}`)}
