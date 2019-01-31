@@ -4,9 +4,10 @@ const CourseGroupService = require('../services/courseGroups')
 
 const BASE_PATH = '/'
 
-router.get(BASE_PATH, async (req, res) => {
+router.get(`${BASE_PATH}programme/:programmeId`, async (req, res) => {
+  const { programmeId } = req.params
   const semesterCode = req.query.semester
-  const courseGroups = await CourseGroupService.getCourseGroupsWithTotals(semesterCode)
+  const courseGroups = await CourseGroupService.getCourseGroupsWithTotals(programmeId, semesterCode)
   return res.json(courseGroups)
 })
 
