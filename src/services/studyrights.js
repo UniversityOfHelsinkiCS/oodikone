@@ -201,14 +201,14 @@ const associatedStudyrightElements = async (offset, limit) => {
 }
 
 const calculateAssociationsFromDb = async (chunksize=100000) => {
-  const getSemester = startdate => {
-    const month = moment(startdate).month()+1
+  const getSemester = momentstartdate => {
+    const month = momentstartdate.month()+1
     if (month >= 1 && month < 8) return 'SPRING'
     return 'FALL'
   }
-  const getEnrollmentStartYear = startdate => {
-    if (getSemester(startdate) == 'SPRING') return moment(startdate).year() - 1
-    return moment(startdate).year()
+  const getEnrollmentStartYear = momentstartdate => {
+    if (getSemester(momentstartdate) == 'SPRING') return momentstartdate.year() - 1
+    return momentstartdate.year()
   }
   const total = await Studyright.count()
   let offset = 0
@@ -221,7 +221,7 @@ const calculateAssociationsFromDb = async (chunksize=100000) => {
     elementgroups
       .forEach(fullgroup => {
         const group = fullgroup.filter(isValid)
-        group.filter(isValid).forEach(({ type, code, name, studyrightid, startdate, enddate }) => {
+        group.forEach(({ type, code, name, studyrightid, startdate, enddate }) => {
           if (type != 20) {
             return
           }
@@ -231,7 +231,8 @@ const calculateAssociationsFromDb = async (chunksize=100000) => {
             code: code,
             enrollmentStartYears: {}
           }
-          const enrollment = getEnrollmentStartYear(startdate)
+          const momentstartdate = moment(startdate)
+          const enrollment = getEnrollmentStartYear(momentstartdate)
           const enrollmentStartYears = programmes[code].enrollmentStartYears
           enrollmentStartYears[enrollment] = enrollmentStartYears[enrollment] || {
             degrees: {},
@@ -244,8 +245,14 @@ const calculateAssociationsFromDb = async (chunksize=100000) => {
               enrollmentStartYear.degrees[e.code] = { type: e.type, name: e.name, code: e.code }
             }
             if (e.type == 30) {
-              if (moment(startdate) <= moment(e.startdate) && moment(enddate) >= moment(e.startdate) ||
-                moment(e.startdate) <= moment(startdate) && moment(e.enddate) >= moment(startdate)) {
+              const momentenddate = moment(enddate)
+              const estartdate = moment(e.startdate)
+              const eenddate = moment(e.enddate)
+              // check that programme and studytrack time ranges overlap
+              if ((momentstartdate <= estartdate && momentenddate >= estartdate) ||
+                  (momentstartdate <= eenddate && momentenddate >= eenddate) ||
+                  (estartdate <= momentstartdate && eenddate >= momentstartdate) ||
+                  (estartdate <= momentenddate && eenddate >= momentenddate)) {
                 enrollmentStartYear.studyTracks[e.code] = { type: e.type, name: e.name, code: e.code }
               }
             }
