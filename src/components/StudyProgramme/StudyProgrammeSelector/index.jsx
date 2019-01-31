@@ -21,20 +21,20 @@ class StudyProgrammeSelector extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.studyprogrammes['20']) {
+    if (Object.values(this.props.studyprogrammes).length === 0) {
       this.props.getDegreesAndProgrammes()
     }
   }
 
   render() {
     const { studyprogrammes, selected, language } = this.props
-    if (!studyprogrammes['20']) return <Loader active>Loading</Loader>
+    if (!studyprogrammes) return <Loader active>Loading</Loader>
 
     if (selected) return null
 
-    const rows = sortBy(Object.keys(studyprogrammes['20']).reduce((res, key) => {
+    const rows = sortBy(Object.keys(studyprogrammes).reduce((res, key) => {
       res.push([
-        studyprogrammes['20'][key].name[language],
+        studyprogrammes[key].name[language],
         key
       ])
       return res
