@@ -3,10 +3,20 @@ const jwt = require('jsonwebtoken')
 const conf = require('../../src/conf-backend')
 const { forceSyncDatabase } = require('../../src/database/connection')
 
-const { sequelize, Teacher } = require('../../src/models/index')
+const { sequelize, Teacher, CourseGroup } = require('../../src/models/index')
 
 const uid = 'tktl'
-const payload = { userId: uid, name: '', enabled: true, admin: true }
+const payload = {
+  userId: uid,
+  name: '',
+  enabled: true,
+  admin: true,
+  roles: [{
+    id: '9',
+    group_code: 'coursegroups',
+    group_info: 'grants access to course groups'
+  }]
+}
 
 const token = jwt.sign(payload, conf.TOKEN_SECRET, {
   expiresIn: '24h'
@@ -22,38 +32,69 @@ const MOCK_ACADEMIC_YEARS = [
   { yearname: '2016-17', semestercode: 158 }
 ]
 
+const MOCK_TEACHER_COURSE_GROUPS = [
+  { id: 1, teacher_id: '12345', course_group_id: 1},
+]
+
 const MOCK_COURSE_GROUP_STATS = [{
   courses: '10',
   credits: 100,
   students: '20'
 }]
 
+const MOCK_COURSE_GROUPS = [
+  {
+    id: 1,
+    name: 'Erityispedagogiikka',
+  },
+  {
+    id: 2,
+    name: 'Kasvatuspsykologia',
+  },
+]
+
 const MOCK_TEACHER_STATS = [{ courses: '10', credits: 100, students: '20', id: '12345' }]
 const MOCK_TEACHERS = [{ name: 'testname', code: 'testcode', id: '12345' }]
 const MOCK_COURSES = [{
   coursecode: 'EDUK111',
   coursenames:
-    { en: "Bachelor's Thesis",
+    { en: 'Bachelor\'s Thesis',
       fi: 'Kandidaatin tutkielma ja seminaari',
       sv: 'Kandidatavhandling och seminarium'
     },
   teachercode: 'testcode',
   teachername: 'testname',
   credits: '10',
-  students: 1 },
-{ coursecode: 'EDUK123',
+  students: 1
+},
+{
+  coursecode: 'EDUK123',
   coursenames:
-      { en: 'Course',
-        fi: 'Kurssi',
-        sv: 'kursser'
-      },
+  {
+    en: 'Course',
+    fi: 'Kurssi',
+    sv: 'kursser'
+  },
   teachercode: 'testcode',
   teachername: 'testname',
   credits: 12,
-  students: '1' }]
+  students: '1'
+}]
 
 beforeAll(async () => {
   await forceSyncDatabase()
+  CourseGroup.findByPk = jest.fn((id) => Promise.resolve(MOCK_COURSE_GROUPS.find(e => e.id === id)))
+  CourseGroup.findAll = jest.fn(() => Promise.resolve(MOCK_COURSE_GROUPS))
+  Teacher.findAll = jest.fn(condition =>
+    Promise.resolve(
+      MOCK_TEACHERS.filter(t =>
+        MOCK_TEACHER_COURSE_GROUPS.find(
+          tcg =>
+            tcg.teacher_id === t.id && tcg.course_group_id === condition.include.where.id
+        )
+      ).map(e => Teacher.build(e))
+    )
+  )
 })
 
 afterAll(async () => {
@@ -76,8 +117,6 @@ beforeEach(() => {
     getAcademicYearsFrom: jest.fn(() => Promise.resolve(MOCK_ACADEMIC_YEARS)),
     getTeacherAcademicYearStatisticsByIds: jest.fn(() => Promise.resolve(MOCK_TEACHER_STATS)),
     getAcademicYearCoursesByTeacherIds: jest.fn(() => Promise.resolve(MOCK_COURSES))
-
-
   }))
 })
 
@@ -102,11 +141,11 @@ describe('Course groups endpoint tests', () => {
 
       const expectedCourseGroups = [
         { credits: 100, id: 1, name: 'Erityispedagogiikka', students: 20 },
-        { credits: 100, id: 2, name: 'Kasvatuspsykologia', students: 20 }
+        { credits: 0, id: 2, name: 'Kasvatuspsykologia', students: 0 }
       ]
 
       const res = await supertest(app)
-        .get(API_PATH)
+        .get(`${API_PATH}/programme/EDUK111`)
         .set('x-access-token', token)
         .set('uid', uid)
 
@@ -159,8 +198,6 @@ describe('Course groups endpoint tests', () => {
     test('Returns mocked course group without semester parameter', async () => {
       const app = require('../../src/app')
 
-      Teacher.findAll = jest.fn(() => Promise.resolve(MOCK_TEACHERS))
-
       const res = await supertest(app)
         .get(`${API_PATH}/${MOCK_COURSE_GROUP_ID}`)
         .set('x-access-token', token)
@@ -173,8 +210,6 @@ describe('Course groups endpoint tests', () => {
 
     test('Returns mocked course group with semester parameter', async () => {
       const app = require('../../src/app')
-
-      Teacher.findAll = jest.fn(() => Promise.resolve(MOCK_TEACHERS))
 
       const res = await supertest(app)
         .get(`${API_PATH}/${MOCK_COURSE_GROUP_ID}?semester=160`)
@@ -204,26 +239,31 @@ describe('Course groups endpoint tests', () => {
 
   describe('/api/course-groups/courses', () => {
     const expectedCourses = [
-      { coursecode: 'EDUK111',
+      {
+        coursecode: 'EDUK111',
         coursenames:
-          { en: "Bachelor's Thesis",
+          { en: 'Bachelor\'s Thesis',
             fi: 'Kandidaatin tutkielma ja seminaari',
             sv: 'Kandidatavhandling och seminarium'
           },
         teachercode: 'testcode',
         teachername: 'testname',
         credits: 10,
-        students: 1 },
-      { coursecode: 'EDUK123',
+        students: 1
+      },
+      {
+        coursecode: 'EDUK123',
         coursenames:
-          { en: 'Course',
-            fi: 'Kurssi',
-            sv: 'kursser'
-          },
+        {
+          en: 'Course',
+          fi: 'Kurssi',
+          sv: 'kursser'
+        },
         teachercode: 'testcode',
         teachername: 'testname',
         credits: 12,
-        students: 1 }]
+        students: 1
+      }]
 
     const teacherIds = ['021314', '021345']
 
@@ -274,6 +314,19 @@ describe('Course groups endpoint tests', () => {
 
       expect(res.status).toBe(200)
       expect(res.body).toEqual(expectedCourses)
+      app.close()
+    })
+
+    test('Returns empty list with empty teacherIds parameter and semester parameter', async () => {
+      const app = require('../../src/app')
+
+      const res = await supertest(app)
+        .get(`${API_PATH}/courses/?teacherIds=[]&semester=160`)
+        .set('x-access-token', token)
+        .set('uid', uid)
+
+      expect(res.status).toBe(200)
+      expect(res.body).toEqual([])
       app.close()
     })
   })

@@ -18,32 +18,32 @@ const AVAILABLE_COURSES = [
   'TKT50003'
 ]
 
-wrapper.get('/oodilearn/ping', async (req, res) => {
+wrapper.get('/ping', async (req, res) => {
   const result = await oodilearn.ping()
   res.json(result.data)
 })
 
-wrapper.get('/oodilearn/query', async (req, res) => {
+wrapper.get('/query', async (req, res) => {
   const result = await oodilearn.query(req.query.query)
   res.json(result.data)
 })
 
-wrapper.get('/oodilearn/suggest_course', async (req, res) => {
+wrapper.get('/suggest_course', async (req, res) => {
   const result = await oodilearn.suggestCourse(req.query.doneCourses, req.query.period)
   res.json(result.data)
 })
 
-wrapper.get('/oodilearn/suggest_route', async (req, res) => {
+wrapper.get('/suggest_route', async (req, res) => {
   const result = await oodilearn.suggestRoute()
   res.json(result.data)
 })
 
-wrapper.get('/oodilearn/student/:id', async (req, res) => {
+wrapper.get('/student/:id', async (req, res) => {
   const result = await oodilearn.getStudentData(req.params.id)
   res.status(200).json(result.data)
 })
 
-wrapper.get('/oodilearn/student', async (req, res) => {
+wrapper.get('/student', async (req, res) => {
   const { searchTerm } = req.query
   if (!searchTerm) {
     return res.status(400).send('Missing searchTerm query parameter')
@@ -53,27 +53,27 @@ wrapper.get('/oodilearn/student', async (req, res) => {
   }
 })
 
-wrapper.get('/oodilearn/courses', async (req, res) => {
+wrapper.get('/courses', async (req, res) => {
   const result = await courses.byCodes(AVAILABLE_COURSES)
   res.json(result)
 })
 
-wrapper.get('/oodilearn/populations', async (req, res) => {
+wrapper.get('/populations', async (req, res) => {
   const result = await oodilearn.getPopulations()
   res.json(result)
 })
 
-wrapper.get('/oodilearn/populations/:population', async (req, res) => {
+wrapper.get('/populations/:population', async (req, res) => {
   const result = await oodilearn.getPopulation(req.params.population)
   res.json(result)
 })
 
-wrapper.get('/oodilearn/:code', async (req, res) => {
+wrapper.get('/:code', async (req, res) => {
   const result = await oodilearn.getCluster(req.params.code)
   res.status(200).json(result.data)
 })
 
-wrapper.get('/oodilearn/courses/:id', async (req, res) => {
+wrapper.get('/courses/:id', async (req, res) => {
   const result = await oodilearn.courseGradeData(req.params.id)
   res.json(result)
 })
