@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
-import { shape, func, arrayOf, string } from 'prop-types'
+import { shape, func, string } from 'prop-types'
 import infoTooltips from '../../common/InfoToolTips'
 import { priorityStudyright } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
@@ -12,7 +12,7 @@ class PriorityStudyright extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    studyrights: arrayOf({}).isRequired
+    studyrights: shape({}).isRequired
   }
 
   state = {

@@ -67,5 +67,4 @@ const mapDispatchToProps = dispatch => ({
     dispatch(selectStudent(studentNumber))
 })
 
-
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentStatistics))

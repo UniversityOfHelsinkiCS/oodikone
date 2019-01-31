@@ -3,7 +3,7 @@ import { shape, string } from 'prop-types'
 import { Header, Segment, Tab } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import sharedStyles from '../../styles/shared'
-import TeacherSearch from '../TeacherSearch'
+import TeacherSearchTab from '../TeacherSearchTab'
 import TeacherPage from '../TeacherPage'
 import TeacherStatistics from '../TeacherStatistics'
 import TeacherLeaderBoard from '../TeacherLeaderBoard'
@@ -23,7 +23,7 @@ const TeachersTabs = () => (
     panes={[
       pane('Statistics', TeacherStatistics, 'table'),
       pane('Leaderboard', TeacherLeaderBoard, 'trophy'),
-      pane('Search', TeacherSearch, 'user')
+      pane('Search', TeacherSearchTab, 'user')
     ]}
   />
 )

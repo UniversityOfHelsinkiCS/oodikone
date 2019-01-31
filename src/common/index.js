@@ -10,6 +10,8 @@ import { sendLog, login } from '../apiConnection'
 
 export const setToken = token => localStorage.setItem(TOKEN_NAME, token)
 
+const tokenFields = ['enabled', 'userId', 'name', 'language', 'rights', 'roles', 'iat']
+
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   _.filter(dropDownOptions, option => (option.text ?
     option.text.toLowerCase().concat(option.description.toLowerCase())
@@ -36,8 +38,8 @@ export const tokenAccessInvalid = (token) => {
     return true
   }
   // Misses fields
-  const fields = ['enabled', 'userId', 'name']
-  if (fields.some(key => !Object.keys(decodedToken).includes(key))) {
+  if (tokenFields.some(key => !Object.keys(decodedToken).includes(key))) {
+    console.log('Token is of invalid form, re-logging in')
     return true
   }
   // User is not enabled
@@ -47,8 +49,13 @@ export const tokenAccessInvalid = (token) => {
 export const getToken = async (forceNew = false) => {
   let token = localStorage.getItem(TOKEN_NAME)
   if (!token || tokenAccessInvalid(token) || forceNew) {
-    token = await login()
-    setToken(token)
+    try {
+      token = await login()
+      setToken(token)
+    } catch (e) {
+      console.log('mayhem, reloading')
+      window.location.reload(true)
+    }
   }
   return token
 }
@@ -56,6 +63,13 @@ export const getToken = async (forceNew = false) => {
 export const userIsAdmin = async () => {
   const token = await getToken()
   return token ? decodeToken(token).admin : false
+}
+
+export const userRoles = async () => {
+  const token = await getToken()
+  const decoded = decodeToken(token)
+  const roles = decoded.admin ? ['admin', ...decoded.roles.map(r => r.group_code)] : decoded.roles.map(r => r.group_code)
+  return roles
 }
 export const userIsCzar = async () => {
   const token = await getToken()
@@ -69,6 +83,7 @@ export const getUserName = async () => {
   const token = await getToken()
   return token ? decodeToken(token).userId : false
 }
+
 
 export const setUserLanguage = (language) => {
   localStorage.setItem('language', language)
@@ -134,7 +149,7 @@ export const getStudentTotalCreditsFromMandatory = (student, mandatoryCourses) =
   .filter(c =>
     c.passed &&
     !c.isStudyModuleCredit &&
-    mandatoryCourses.includes(c.course.code))
+    mandatoryCourses.find(cr => cr.code === c.course.code))
   .reduce((a, b) => a + b.credits, 0)
 
 export const getTotalCreditsFromCourses = courses =>

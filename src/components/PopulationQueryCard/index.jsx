@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { func, arrayOf, object, shape, string, bool } from 'prop-types'
+import { func, arrayOf, object, shape, string, bool, oneOfType, number } from 'prop-types'
 import { Card, Icon, Button } from 'semantic-ui-react'
 import _ from 'lodash'
 import styles from './populationQueryCard.css'
@@ -100,7 +100,7 @@ PopulationQueryCard.propTypes = {
   translate: func.isRequired,
   population: shape({ students: arrayOf(object), extents: arrayOf(object) }).isRequired,
   query: shape({
-    year: string,
+    year: oneOfType([string, number]),
     semester: string,
     studyRights: arrayOf(string),
     uuid: string
