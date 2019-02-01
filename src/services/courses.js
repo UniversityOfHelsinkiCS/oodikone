@@ -6,8 +6,6 @@ const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../services/course_yearly_stats_counter')
 const _ = require('lodash')
 
-const codes = require('../util/medicalcodes.js')
-
 const byNameOrCode = (searchTerm, language) => Course.findAll({
   where: {
     [Op.or]: [
@@ -558,13 +556,7 @@ const byCodes = (codes) => {
   })
 }
 
-const getMandatoryCourses = async (id) => {
-  if (id === 'MH30_001') return codes
-  return []
-}
-
 module.exports = {
-  getMandatoryCourses,
   byCode,
   byName,
   bySearchTerm,
