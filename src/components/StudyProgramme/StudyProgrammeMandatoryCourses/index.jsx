@@ -2,12 +2,19 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, string } from 'prop-types'
 import { Message } from 'semantic-ui-react'
-import { getMandatoryCourses } from '../../../redux/populationMandatoryCourses'
+import {
+  getMandatoryCourses,
+  addMandatoryCourse,
+  deleteMandatoryCourse
+} from '../../../redux/populationMandatoryCourses'
 import MandatoryCourseTable from '../MandatoryCourseTable'
+import AddMandatoryCourses from '../AddMandatoryCourses'
 
 class StudyProgrammeMandatoryCourses extends Component {
   static propTypes = {
     getMandatoryCourses: func.isRequired,
+    addMandatoryCourse: func.isRequired,
+    deleteMandatoryCourse: func.isRequired,
     studyProgramme: string.isRequired,
     mandatoryCourses: shape({}).isRequired,
     language: string.isRequired
@@ -27,7 +34,6 @@ class StudyProgrammeMandatoryCourses extends Component {
 
   render() {
     const { studyProgramme, mandatoryCourses, language } = this.props
-    console.log(mandatoryCourses)
     if (!studyProgramme) return null
 
     return (
@@ -37,7 +43,16 @@ class StudyProgrammeMandatoryCourses extends Component {
           content="The set of mandatory courses which can be used in populeation filtering
               in the population statistics page"
         />
-        <MandatoryCourseTable mandatoryCourses={mandatoryCourses.data} language={language} />
+        <AddMandatoryCourses
+          addMandatoryCourse={this.props.addMandatoryCourse}
+          studyProgramme={studyProgramme}
+        />
+        <MandatoryCourseTable
+          mandatoryCourses={mandatoryCourses.data}
+          studyProgramme={studyProgramme}
+          deleteMandatoryCourse={this.props.deleteMandatoryCourse}
+          language={language}
+        />
       </React.Fragment >
     )
   }
@@ -48,5 +63,5 @@ export default connect(
     mandatoryCourses: populationMandatoryCourses,
     language: settings.language
   }),
-  { getMandatoryCourses }
+  { getMandatoryCourses, addMandatoryCourse, deleteMandatoryCourse }
 )(StudyProgrammeMandatoryCourses)

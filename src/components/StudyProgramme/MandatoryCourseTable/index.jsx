@@ -1,17 +1,30 @@
 import React from 'react'
-import { arrayOf, string, shape } from 'prop-types'
+import { arrayOf, string, shape, func } from 'prop-types'
+import { Button } from 'semantic-ui-react'
 import SortableTable from '../../SortableTable'
 
-const MandatoryCourseTable = ({ mandatoryCourses, language }) => {
+const MandatoryCourseTable = ({ studyProgramme, mandatoryCourses, language, deleteMandatoryCourse }) => {
+  const deleteButton = code => (
+    <Button
+      onClick={() => deleteMandatoryCourse(studyProgramme, code)}
+    >
+      dont click delete will happen
+    </Button>
+  )
+
   const columns = [
     { key: 'name', title: 'Name', getRowVal: course => course.name[language] },
-    { key: 'code', title: 'Code', getRowVal: course => course.code }
+    { key: 'code', title: 'Code', getRowVal: course => course.code },
+    { key: 'delete', title: 'Delete', getRowVal: course => deleteButton(course.code) }
   ]
+
   return <SortableTable columns={columns} data={mandatoryCourses} getRowKey={row => row.code} />
 }
 
 MandatoryCourseTable.propTypes = {
   mandatoryCourses: arrayOf(shape({})).isRequired,
+  studyProgramme: string.isRequired,
+  deleteMandatoryCourse: func.isRequired,
   language: string.isRequired
 }
 
