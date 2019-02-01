@@ -44,7 +44,7 @@ const roles = requiredRoles => (req, res, next) => {
     jwt.verify(token, conf.TOKEN_SECRET, (err, decoded) => {
       const roles = decoded.roles.map(r => r.group_code)
       console.log(`Request has roles: ${roles}`)
-      if (requiredRoles.every(r => roles.indexOf(r) >= 0) || decoded.admin) {
+      if (requiredRoles.every(r => roles.indexOf(r) >= 0) || decoded.admin || roles.includes('admin')) {
         console.log(`authorized for ${requiredRoles}`)
         next()
       } else {
