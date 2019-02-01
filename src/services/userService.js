@@ -51,6 +51,14 @@ const updateUser = async (uid, fields) => {
   return response.data
 }
 
+const getRolesFor = async (user) => {
+  console.log('roles for', user)
+  const url = `/get_roles/${user}`
+  const response = await client.get(url)
+  console.log(response.data)
+  return response.data
+}
+
 const createUser = async (username, full_name, email) => {
   const response = await client.post('/user', {
     username, full_name, email
@@ -93,5 +101,6 @@ module.exports = {
   findAll,
   modifyAccess,
   getAccessGroups,
-  getUnitsFromElementDetails
+  getUnitsFromElementDetails,
+  getRolesFor
 }

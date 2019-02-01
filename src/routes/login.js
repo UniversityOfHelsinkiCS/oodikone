@@ -48,7 +48,9 @@ router.post('/superlogin/:uid', async (req, res) => {
     const asUser = req.params.uid
     const uid = req.headers['uid']
     if (req.headers['shib-session-id'] && uid) {
+      console.log('super')
       const token = await userService.superlogin(uid, asUser)
+      console.log(token)
       res.status(200).json({ token })
     } else {
       res.status(401).json({

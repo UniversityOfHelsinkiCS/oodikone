@@ -173,9 +173,9 @@ router.post('/updatedatabase', async (req, res) => {
 // This is used by users page and is slightly different from v3. regards Saus Maekine 2019.01.09 
 router.get('/v2/populationstatistics/studyprogrammes', async (req, res) => {
   try {
-    const { admin, czar, userId } = req.decodedToken
-    if (admin || czar) {
-      const studyrights = await StudyrightService.getAllStudyrightElementsAndAssociations()
+    const { admin, czar, userId, roles} = req.decodedToken
+    if (admin || czar || (roles && roles.map(r => r.group_code).includes('admin'))) {
+      const studyrights = await StudyrightService.getAssociations()
       res.json(studyrights)
     } else {
       const studyrights = await StudyrightService.getStudyrightElementsAndAssociationsForUser(userId)
@@ -189,12 +189,14 @@ router.get('/v2/populationstatistics/studyprogrammes', async (req, res) => {
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   try {
-    const { admin, czar, rights } = req.decodedToken
-    if (admin || czar) {
+    const { admin, czar, rights, roles } = req.decodedToken
+    if (admin || czar || (roles && roles.map(r => r.group_code).includes('admin'))) {
       const studyrights = await StudyrightService.getAssociations()
       res.json(studyrights)
     } else {
+      console.log('Not an admin')
       const studyrights = await StudyrightService.getFilteredAssociations(rights)
+      console.log(studyrights)
       res.json(studyrights)
     }
   } catch (err) {
