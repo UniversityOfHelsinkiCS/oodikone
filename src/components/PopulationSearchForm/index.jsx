@@ -465,6 +465,7 @@ class PopulationSearchForm extends Component {
 
     let programmesToRender
     if (studyProgrammes) {
+      console.log(studyProgrammes)
       const sortedStudyProgrammes = _.sortBy(studyProgrammes, s => s.name[language])
       programmesToRender = this.renderableList(sortedStudyProgrammes)
     }
@@ -623,6 +624,7 @@ class PopulationSearchForm extends Component {
 const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes, locale }) => {
   const { language, asUser } = settings
   const { pending } = populationDegreesAndProgrammes
+  console.log(populationDegreesAndProgrammes)
   return ({
     language,
     asUser,

@@ -56,6 +56,7 @@ export const superLogin = async (uid) => {
     options = testOptions
   }
   const response = await getAxios().post(`/superlogin/${uid}`, null, options)
+  console.log(`Setting new token ${response.data.token}`)
   await setToken(response.data.token)
 }
 
