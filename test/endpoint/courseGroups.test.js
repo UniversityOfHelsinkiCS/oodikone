@@ -145,7 +145,7 @@ describe('Course groups endpoint tests', () => {
       ]
 
       const res = await supertest(app)
-        .get(API_PATH)
+        .get(`${API_PATH}/programme/EDUK111`)
         .set('x-access-token', token)
         .set('uid', uid)
 

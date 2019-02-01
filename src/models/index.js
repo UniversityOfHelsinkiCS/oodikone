@@ -427,6 +427,19 @@ const CourseProvider = sequelize.define('course_providers', {}, {
   ]
 })
 
+const MandatoryCourse = sequelize.define('mandatory_course', {
+  course_code: {
+    type: Sequelize.STRING,
+    references: {
+      model: Course,
+      key: 'code'
+    }
+  },
+  studyprogramme_id: {
+    type: Sequelize.STRING
+  }
+})
+
 const CourseRealisationType = sequelize.define('courserealisation_type', {
   realisationtypecode: {
     primaryKey: true,
@@ -537,6 +550,8 @@ Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'stude
 Credit.belongsTo(Course, { foreignKey: 'course_code' })
 Course.hasMany(Credit, { foreignKey: 'course_code' })
 
+MandatoryCourse.belongsTo(Course, { foreignKey: 'course_code' })
+
 Student.hasMany(TagStudent, { foreignKey: 'taggedstudents_studentnumber', sourceKey: 'studentnumber' })
 Tag.hasMany(TagStudent, { foreignKey: 'tags_tagname', sourceKey: 'tagname' })
 
@@ -598,7 +613,9 @@ CourseGroup.belongsToMany(Teacher, { through: 'teacher_course_group', foreignKey
 
 Credit.belongsTo(Semester, { foreignKey: { name: 'semestercode', allowNull: false } })
 
+
 module.exports = {
+  MandatoryCourse,
   Student,
   Credit,
   Studyright,

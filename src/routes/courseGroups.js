@@ -4,9 +4,10 @@ const CourseGroupService = require('../services/courseGroups')
 
 const BASE_PATH = '/'
 
-router.get(BASE_PATH, async (req, res) => {
+router.get(`${BASE_PATH}programme/:programmeId`, async (req, res) => {
+  const { programmeId } = req.params
   const semesterCode = req.query.semester
-  const courseGroups = await CourseGroupService.getCourseGroupsWithTotals(semesterCode)
+  const courseGroups = await CourseGroupService.getCourseGroupsWithTotals(programmeId, semesterCode)
   return res.json(courseGroups)
 })
 
@@ -38,14 +39,14 @@ router.get(`${BASE_PATH}:id`, async (req, res) => {
   return groupData ? res.send(groupData) : res.sendStatus(404)
 })
 
-router.post(`${BASE_PATH}/:id/add/:teacherid`, async (req, res) => {
+router.post(`${BASE_PATH}:id/add/:teacherid`, async (req, res) => {
   const { id, teacherid } = req.params
   const success = await CourseGroupService.addTeacher(Number(id), teacherid)
 
   return success ? res.status(200).json('added') : res.sendStatus(404)
 })
 
-router.post(`${BASE_PATH}/:id/remove/:teacherid`, async (req, res) => {
+router.post(`${BASE_PATH}:id/remove/:teacherid`, async (req, res) => {
   const { id, teacherid } = req.params
   const success = await CourseGroupService.removeTeacher(Number(id), teacherid)
 

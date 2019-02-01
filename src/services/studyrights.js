@@ -1,6 +1,7 @@
 const { Studyright, StudyrightElement, sequelize, ElementDetails } = require('../models')
 const { Op, col, where, fn } = sequelize
 const { getUserElementDetails } = require('./userService')
+const moment = require('moment')
 const { redisClient } = require('./redis')
 const _ = require('lodash')
 
@@ -179,7 +180,7 @@ const associatedStudyrightElements = async (offset, limit) => {
     attributes: [],
     include: {
       model: StudyrightElement,
-      attributes: ['id', 'code', [sequelize.fn('date_part', 'year', sequelize.col('startdate')), 'year']],
+      attributes: ['studyrightid', 'startdate', 'enddate'],
       include: {
         model: ElementDetails,
         attributes: ['type', 'name', 'code'],
@@ -188,48 +189,71 @@ const associatedStudyrightElements = async (offset, limit) => {
     limit,
     offset
   })
-  const groupings = studyrights.map(({ studyright_elements: sres }) => (
-    sres.map(sre => ({ ...sre.element_detail.get(), year: sre.get().year })))
+  const groupings = studyrights.map(({ studyright_elements: sres }) =>
+    sres.map(sre => ({
+      ...sre.element_detail.get(),
+      studyrightid: sre.get().studyrightid,
+      startdate: sre.get().startdate,
+      enddate: sre.get().enddate
+    }))
   )
   return groupings
 }
 
-const calculateAssociationsFromDb = async (chunksize=100000, codes=[10, 20, 30]) => {
+const calculateAssociationsFromDb = async (chunksize=100000) => {
+  const getSemester = momentstartdate => {
+    const month = momentstartdate.month()+1
+    if (month >= 1 && month < 8) return 'SPRING'
+    return 'FALL'
+  }
+  const getEnrollmentStartYear = momentstartdate => {
+    if (getSemester(momentstartdate) == 'SPRING') return momentstartdate.year() - 1
+    return momentstartdate.year()
+  }
   const total = await Studyright.count()
   let offset = 0
-  const isValid = ({ type }) => new Set(codes).has(type)
-  const studyTrackByAge = (code) => e => e.type !== 30 || Boolean(Number(e.code[0])) === Boolean(Number(code[0]))
-  const types = {}
+  const types = new Set([10, 20, 30]) // degree, programme, studytrack
+  const isValid = ({ type }) => types.has(type)
+  const programmes = {}
   while(offset <= total) {
     console.log(`${offset}/${total}`)
     const elementgroups = await associatedStudyrightElements(offset, chunksize)
     elementgroups
-      .forEach(group => {
-        group.filter(isValid).forEach(({ type, code, name, year }) => {
-          const elements = types[type] || (types[type] = {})
-          if(!elements[code]) {
-            elements[code] = { code, name, type, first_held: year, latest_held: year, associations: {}}
+      .forEach(fullgroup => {
+        const group = fullgroup.filter(isValid)
+        group.forEach(({ type, code, name, studyrightid, startdate, enddate }) => {
+          if (type != 20) {
+            return
           }
-          const element = elements[code]
-          if (elements[code].first_held > year) {
-            elements[code].first_held = year
+          programmes[code] = programmes[code] || {
+            type: type,
+            name: name,
+            code: code,
+            enrollmentStartYears: {}
           }
-          if (elements[code].latest_held < year) {
-            elements[code].latest_held = year
+          const momentstartdate = moment(startdate)
+          const enrollment = getEnrollmentStartYear(momentstartdate)
+          const enrollmentStartYears = programmes[code].enrollmentStartYears
+          enrollmentStartYears[enrollment] = enrollmentStartYears[enrollment] || {
+            degrees: {},
+            studyTracks: {}
           }
-          group.filter(e => e.code !== code).filter(studyTrackByAge(code)).forEach(e => {
-            const associations = element.associations[e.type] || ( element.associations[e.type] = {})
-            if (!associations[e.code]) {
-              associations[e.code] = {
-                code: e.code, name: e.name, type: e.type, first_held: e.year, latest_held: e.year
-              }            
-            } else {
-              const association = associations[e.code]
-              if (association.first_held > e.year) {
-                association.first_held = e.year
-              }
-              if (association.latest_held < e.year) {
-                association.latest_held = e.year
+          const enrollmentStartYear = enrollmentStartYears[enrollment]
+          
+          group.filter(e => e.studyrightid === studyrightid).filter(e => e.code !== code).forEach(e => {
+            if (e.type == 10) {
+              enrollmentStartYear.degrees[e.code] = { type: e.type, name: e.name, code: e.code }
+            }
+            if (e.type == 30) {
+              const momentenddate = moment(enddate)
+              const estartdate = moment(e.startdate)
+              const eenddate = moment(e.enddate)
+              // check that programme and studytrack time ranges overlap
+              if ((momentstartdate <= estartdate && momentenddate >= estartdate) ||
+                  (momentstartdate <= eenddate && momentenddate >= eenddate) ||
+                  (estartdate <= momentstartdate && eenddate >= momentstartdate) ||
+                  (estartdate <= momentenddate && eenddate >= momentenddate)) {
+                enrollmentStartYear.studyTracks[e.code] = { type: e.type, name: e.name, code: e.code }
               }
             }
           })
@@ -237,7 +261,7 @@ const calculateAssociationsFromDb = async (chunksize=100000, codes=[10, 20, 30])
       })
     offset += chunksize
   }
-  return types
+  return programmes
 }
 
 const saveAssociationsToRedis = async associations => {
@@ -300,7 +324,6 @@ module.exports = {
   getStudyrightElementsAndAssociationsForUser,
   getAllDegreesAndProgrammes,
   getAssociations,
-  associatedStudyrightElements,
   getFilteredAssociations,
   getUserAssociations,
   refreshAssociationsInRedis

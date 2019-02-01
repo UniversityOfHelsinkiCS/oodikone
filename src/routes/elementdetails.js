@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { getAllDegreesAndProgrammes, getAssociations } = require('../services/studyrights')
-const { getMandatoryCourses } = require('../services/courses')
+const MandatoryCourses = require('../services/mandatoryCourses')
 
 router.get('/studyprogrammes', async (req, res) => {
   try {
@@ -19,7 +19,7 @@ router.get('/v2/studyprogrammes', async (req, res) => {
 router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {
   console.log(req.params)
   if (req.params.id) {
-    const codes = await getMandatoryCourses(req.params.id)
+    const codes = await MandatoryCourses.byStudyprogramme(req.params.id)
     res.json(codes)
   } else {
     res.status(422)
