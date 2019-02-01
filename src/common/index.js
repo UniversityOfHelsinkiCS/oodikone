@@ -71,6 +71,12 @@ export const userRoles = async () => {
   const roles = decoded.admin ? ['admin', ...decoded.roles.map(r => r.group_code)] : decoded.roles.map(r => r.group_code)
   return roles
 }
+export const userRights = async () => {
+  const token = await getToken()
+  const decoded = decodeToken(token)
+  const { rights } = decoded
+  return rights
+}
 export const userIsCzar = async () => {
   const token = await getToken()
   return token ? decodeToken(token).czar : false
