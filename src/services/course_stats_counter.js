@@ -68,6 +68,7 @@ class CourseStatsCounter {
   }
 
   markCredit(studentnumber, grade, passed, failed, improved, semester) {
+    // studentnumber = `${shajs('sha256').update(process.env.key + studentnumber).digest('hex')}`
     this.markAttempt()
     this.markParticipation(studentnumber)
     this.markGrade(grade, passed, failed, improved)
