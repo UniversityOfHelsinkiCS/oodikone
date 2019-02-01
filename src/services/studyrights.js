@@ -290,19 +290,9 @@ const getAssociations = async (doRefresh=false) => {
 }
 
 const getFilteredAssociations = async (codes) => {
-  const filtered = {}
+  console.log(codes)
   const all = await getAssociations()
-  Object.entries(all).forEach(([t, courses]) => {
-    const picked = _.pick(courses, codes)
-    const type = (filtered[t] = {})
-    Object.entries(picked).map(([coursecode, course]) => {
-      const associations = {}
-      Object.entries(course.associations).forEach(([atype, acourses]) => {
-        associations[atype] = _.pick(acourses, codes)
-      })
-      type[coursecode] = { ...course, associations }
-    })
-  })
+  const filtered = _.pick(all, codes)
   return filtered
 }
 
