@@ -10,7 +10,7 @@ services:
     container_name: oodi_user_db
     environment:
       - POSTGRES_USER=postgres
-
+      - POSTGRES_DB=user_db
   db:
     image: postgres:9.6.3
     ports:
