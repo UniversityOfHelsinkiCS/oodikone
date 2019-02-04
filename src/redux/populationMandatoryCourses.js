@@ -62,7 +62,7 @@ const reducer = (state = { data: [] }, action) => {
       return {
         pending: false,
         error: false,
-        data: state.data.push(action.response)
+        data: [...state.data, action.response]
       }
     case 'DELETE_MANDATORY_COURSES_ATTEMPT':
       return {

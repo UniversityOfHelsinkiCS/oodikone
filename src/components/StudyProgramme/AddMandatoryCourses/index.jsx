@@ -14,7 +14,8 @@ class AddMandatoryCourses extends Component {
     pending: bool.isRequired,
     addMandatoryCourse: func.isRequired,
     studyProgramme: string.isRequired,
-    matchingCourses: arrayOf(shape({})).isRequired
+    matchingCourses: arrayOf(shape({})).isRequired,
+    mandatoryCourseCodes: arrayOf(string).isRequired
   }
 
   state = {
@@ -50,9 +51,9 @@ class AddMandatoryCourses extends Component {
 
   render() {
     const { visible, coursename, coursecode } = this.state
-    const { pending, matchingCourses } = this.props
+    const { pending, matchingCourses, mandatoryCourseCodes } = this.props
     const noQueryStrings = !coursename && !coursecode
-    const courses = matchingCourses
+    const courses = matchingCourses.filter(c => !mandatoryCourseCodes.includes(c.code))
 
     return (
       <Segment>
@@ -104,7 +105,8 @@ class AddMandatoryCourses extends Component {
 const mapStateToProps = state => ({
   matchingCourses: getCourseSearchResults(state),
   pending: state.courseSearch.pending,
-  mandatoryCourses: state.populationMandatoryCourses.data ? state.populationMandatoryCourses.data[20] : []
+  mandatoryCourseCodes: state.populationMandatoryCourses.data ?
+    state.populationMandatoryCourses.data.map(man => man.code) : []
 })
 
 export default connect(mapStateToProps, {
