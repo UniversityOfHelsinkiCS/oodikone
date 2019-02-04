@@ -28,6 +28,24 @@ const create = (studyProgrammeId, code) => {
   })
 }
 
+const find = (studyProgrammeId, code) => {
+  return MandatoryCourse.findOne({
+    attributes: ['course_code'],
+    include: {
+      model: Course,
+      attributes: ['name'],
+    },
+    where: {
+      studyprogramme_id: {
+        [Op.eq]: studyProgrammeId
+      },
+      course_code: {
+        [Op.eq]: code
+      }
+    }
+  })
+}
+
 const remove = (studyProgrammeId, code) => {
   return MandatoryCourse.destroy({
     where: {
@@ -39,6 +57,7 @@ const remove = (studyProgrammeId, code) => {
 
 module.exports = {
   create,
+  find,
   remove,
   byStudyprogramme
 }
