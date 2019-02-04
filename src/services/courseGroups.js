@@ -70,7 +70,7 @@ const getCourseGroupsWithTotals = async (programmeId, semesterCode) => {
         students: 0
       }
     }
-
+    
     const teacherIds = teachers.map(t => t.get().id)
     const startSemester = semesterCode || await getCurrentAcademicYearSemesterCode()
     const statistics = await getAcademicYearStatistics(teacherIds, startSemester)
@@ -81,7 +81,7 @@ const getCourseGroupsWithTotals = async (programmeId, semesterCode) => {
       credits: statistics[0].credits,
       students: Number(statistics[0].students)
     }
-  })
+  }, { concurrency: 10 })
 
   await redisClient.setAsync(
     COURSE_GROUP_STATISTICS_KEY(programmeId, semesterCode),
