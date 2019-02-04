@@ -8,7 +8,7 @@ const MandatoryCourseTable = ({ studyProgramme, mandatoryCourses, language, dele
     <Button
       onClick={() => deleteMandatoryCourse(studyProgramme, code)}
     >
-      dont click delete will happen
+      Delete
     </Button>
   )
 
