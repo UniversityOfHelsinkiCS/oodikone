@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { shape, string } from 'prop-types'
-import { Header, Message, Segment, Tab, Card, Icon } from 'semantic-ui-react'
+import { Header, Segment, Tab, Card, Icon } from 'semantic-ui-react'
 import sharedStyles from '../../styles/shared'
 import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
 // import StudyProgrammeCourseCodeMapper from './StudyProgrammeCourseCodeMapper'
@@ -65,7 +65,6 @@ class StudyProgramme extends Component {
         <Header className={sharedStyles.segmentTitle} size="large">
           Study Programme Settings
         </Header>
-        <Message content="Visible only for admins for now" />
         <Segment className={sharedStyles.contentSegment}>
           <StudyProgrammeSelector handleSelect={this.handleSelect} selected={studyProgrammeId !== undefined} />
           {
