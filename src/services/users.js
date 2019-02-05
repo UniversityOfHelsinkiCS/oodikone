@@ -15,10 +15,9 @@ const generateToken = async (uid, asUser) => {
     name: user.full_name,
     enabled: user.is_enabled,
     language: user.language,
-    admin: user.admin,
-    czar: user.czar,
-    asuser: user.admin ? asUser : null,
-    rights: elements
+    asuser: user.accessgroup.map(ag => ag.group_code).includes('admin') ? asUser : null,
+    rights: elements,
+    roles: user.accessgroup
   }
   const token = jwt.sign(payload, process.env.TOKEN_SECRET)
 
@@ -44,7 +43,8 @@ const login = async (uid, full_name, mail) => {
 }
 const superlogin = async (uid, asUser) => {
   const user = await byUsername(uid)
-  if (user.admin) {
+  console.log(user)
+  if (user.accessgroup.map(r => r.group_code).includes('admin') || user.adming) {
     const token = await generateToken(uid, asUser)
     return token
   }
@@ -155,6 +155,11 @@ const modifyRights = async (uid, rights) => {
   await user.addAccessgroup(accessGroupsToAdd)
   await user.removeAccessgroup(accessGroupsToRemove)
 }
+const getRoles = async (user) => {
+  const foundUser = byUsername(user)
+  return foundUser.accessgroup
+}
+
 
 
 module.exports = {
@@ -169,6 +174,7 @@ module.exports = {
   login,
   superlogin,
   modifyRights,
-  getUserAccessGroups
+  getUserAccessGroups,
+  getRoles
 
 }

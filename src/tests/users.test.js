@@ -1,6 +1,7 @@
 const { sequelize, forceSyncDatabase } = require('../database/connection')
 const { User, ElementDetails, AccessGroup } = require('../models/index')
 const userService = require('../services/users')
+const AccessService = require('../services/accessgroups')
 const { DB_URL } = require('../conf')
 
 const langify = name => ({
@@ -17,8 +18,6 @@ const default_users = [
     username: 'sasumaki',
     email: 'vittuilu.email@gmail.com',
     language: 'finnish',
-    admin: true,
-    czar: true
   },
   {
     id: 42,
@@ -78,6 +77,9 @@ beforeAll(async () => {
   await User.bulkCreate(default_users)
   await ElementDetails.bulkCreate(default_elementdetails)
   await AccessGroup.bulkCreate(default_accessgroups)
+  const admin_user = await User.findOne({ where: { id: 69 }})
+  const admin = await AccessService.byId(2)
+  await admin_user.addAccessgroup(admin)
 })
 afterAll(async () => {
   await sequelize.close()

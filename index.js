@@ -62,7 +62,7 @@ app.post('/login', async (req, res) => {
 
 app.post('/superlogin', async (req, res) => {
   const { uid, asUser  } = req.body
-
+  console.log(`${uid} superlogging`)
   const token = await User.superlogin(uid, asUser)
   if (token) {
     res.status(200).json(token)
@@ -107,6 +107,16 @@ app.get('/access_groups', async (req, res) => {
     res.status(200).json(groups)
   } catch (e) {
     res.status(400)
+  }
+})
+
+app.get('/get_roles/:user', async (req, res) => {
+  const user = req.params.user
+  try {
+    const roles = await User.getRoles(user)
+    res.status(200).json(roles)
+  } catch (e) {
+    res.status(400).json({ e })
   }
 })
 
