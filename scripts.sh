@@ -6,6 +6,13 @@ REPOS=repos
 PSQL_DB_BACKUP="$BACKUP_DIR/latest-pg.bak"
 USER_DB_BACKUP="$BACKUP_DIR/latest-user-pg.bak"
 
+retry () {
+    for i in {1..10}
+    do
+        $@ && break || echo "Retry attempt $i failed, waiting..." && sleep 10;
+    done
+}
+
 init_dirs () {
     mkdir -p $REPOS $BACKUP_DIR
 }
@@ -62,8 +69,8 @@ db_oodikone_reset () {
 }
 
 ping_psql () {
-    echo "Pinging psql in container $1"
-    for i in 1 2 3 4 5; do docker exec -u postgres $1 pg_isready && break || echo "Waiting..." && sleep 10; done
+    echo "Pinging psql in container $1 with db name $2"
+    retry docker exec -u postgres $1 pg_isready -d $2
 }
 
 db_setup_full () {
@@ -73,12 +80,12 @@ db_setup_full () {
     unpack_oodikone_server_backup
     echo "Restoring PostgreSQL from backup"
     ping_psql "oodi_db"
-    restore_psql_from_backup
+    retry restore_psql_from_backup
     echo "Restoring MongoDB from backup"
+    retry restore_mongodb_from_backup
     echo "Restore user db from backup"
-    ping_psql "oodi_user_db"
-    restore_userdb_from_backup
-    restore_mongodb_from_backup
+    ping_psql "oodi_user_db" "user_db"
+    retry restore_userdb_from_backup
     echo "Database setup finished"
 }
 
@@ -95,6 +102,10 @@ show_instructions () {
     cat ./assets/instructions.txt
 }
 
+docker_restart_backend () {
+    docker-compose restart backend userservice
+}
+
 run_full_setup () {
     echo "Init dirs"
     init_dirs
@@ -106,5 +117,7 @@ run_full_setup () {
     db_setup_full
     echo "Adding git-hooks to projects"
     create_symlink_git_hooks
+    echo "Restarting Docker backend containers to run migrations, etc."
+    docker_restart_backend
     show_instructions
 }
