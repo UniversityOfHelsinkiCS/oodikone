@@ -121,7 +121,7 @@ class PopulationSearchForm extends Component {
     const { query } = this.state
     const { studyProgrammes } = this.props
 
-    if (!this.validYearCheck(momentYear)) {
+    if (!moment.isMoment(momentYear)) {
       this.setState({
         momentYear: null,
         query: {
@@ -453,7 +453,7 @@ class PopulationSearchForm extends Component {
         <Icon name="spinner" loading size="big" color="black" style={{ marginLeft: '45%' }} />
       )
     }
-    if (!studyProgrammes && !this.props.pending) {
+    if (Object.values(studyProgrammes).length === 0 && !this.props.pending) {
       return (
         <Message
           error
@@ -464,8 +464,7 @@ class PopulationSearchForm extends Component {
     }
 
     let programmesToRender
-    if (studyProgrammes) {
-      console.log(studyProgrammes)
+    if (Object.values(studyProgrammes).length !== 0) {
       const sortedStudyProgrammes = _.sortBy(studyProgrammes, s => s.name[language])
       programmesToRender = this.renderableList(sortedStudyProgrammes)
     }
@@ -624,13 +623,12 @@ class PopulationSearchForm extends Component {
 const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes, locale }) => {
   const { language, asUser } = settings
   const { pending } = populationDegreesAndProgrammes
-  console.log(populationDegreesAndProgrammes)
   return ({
     language,
     asUser,
     queries: populations.query || {},
     translate: getTranslate(locale),
-    studyProgrammes: populationDegreesAndProgrammes.data || {},
+    studyProgrammes: populationDegreesAndProgrammes.data.programmes || {},
     pending,
     extents: populations.data.extents || []
   })
