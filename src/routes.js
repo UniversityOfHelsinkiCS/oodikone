@@ -16,6 +16,7 @@ const providers = require('./routes/providers')
 const semesters = require('./routes/semesters')
 const oodilearn = require('./routes/oodilearn')
 const courseGroups = require('./routes/courseGroups')
+const mandatoryCourses = require('./routes/mandatorycourses')
 const ping = require('./routes/ping')
 
 
@@ -52,6 +53,6 @@ module.exports = (app, url) => {
   app.use(`${url}/users`, auth.roles(['users']), users)
   app.use(`${url}/usage`, auth.roles(['usage']), usage)
   app.use(`${url}/oodilearn`, auth.roles(['oodilearn']), oodilearn)
-  app.use(`${url}/course-groups`,auth.roles(['coursegroups']), courseGroups)
-  app.use(auth.checkAdminAuth)
+  app.use(`${url}/course-groups`, auth.roles(['coursegroups']), courseGroups)
+  app.use(`${url}/mandatory_courses`, auth.roles(['studyprogramme']), mandatoryCourses)
 }

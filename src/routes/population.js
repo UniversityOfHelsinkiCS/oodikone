@@ -18,7 +18,6 @@ router.get('/v2/populationstatistics/courses', async (req, res) => {
     if (req.query.months == null) {
       req.query.months = 12
     }
-
     const result = await Population.bottlenecksOf(req.query)
 
     if (result.error) {
@@ -84,15 +83,18 @@ router.get('/v3/populationstatistics', async (req, res) => {
       req.query.studyRights = [req.query.studyRights]
     }
     req.query.studyRights = req.query.studyRights.filter(sr => sr !== 'undefined')
-    const { admin, czar } = req.decodedToken
-    if (!(admin || czar)) {
+    const roles = req.decodedToken.roles.map(r => r.group_code)
+    console.log(roles)
+    if (!roles.includes('admin')) {
+      console.log('not admin')
       const elements = new Set(req.decodedToken.rights)
+      console.log(elements)
       if (req.query.studyRights.some(code => !elements.has(code))) {
         res.status(403).json([])
         return
       }
     }
-
+    
     if (req.query.months == null) {
       req.query.months = 12
     }
@@ -168,27 +170,10 @@ router.post('/updatedatabase', async (req, res) => {
   }
 })
 
-// This is used by users page and is slightly different from v3. regards Saus Maekine 2019.01.09 
-router.get('/v2/populationstatistics/studyprogrammes', async (req, res) => {
-  try {
-    const { admin, czar, userId } = req.decodedToken
-    if (admin || czar) {
-      const studyrights = await StudyrightService.getAllStudyrightElementsAndAssociations()
-      res.json(studyrights)
-    } else {
-      const studyrights = await StudyrightService.getStudyrightElementsAndAssociationsForUser(userId)
-      res.json(studyrights)
-    }
-  } catch (err) {
-    console.log(err)
-    res.status(500).json(err)
-  }
-})
-
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   try {
-    const { admin, czar, rights } = req.decodedToken
-    if (admin || czar) {
+    const { admin, czar, rights, roles } = req.decodedToken
+    if (admin || czar || (roles && roles.map(r => r.group_code).includes('admin'))) {
       const studyrights = await StudyrightService.getAssociations()
       res.json(studyrights)
     } else {
