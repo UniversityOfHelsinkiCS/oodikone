@@ -104,7 +104,6 @@ services:
       - TEST_DB=postgres://postgres@user_db:5432/user_db_test
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       - TOKEN_SECRET=IWannaBeTheVeryBest
-
     container_name: userservice
   adminer:
     image: adminer:4.6.2
