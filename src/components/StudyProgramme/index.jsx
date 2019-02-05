@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { shape, string } from 'prop-types'
-import { Header, Message, Segment, Tab } from 'semantic-ui-react'
+import { Header, Segment, Tab, Card, Icon } from 'semantic-ui-react'
 import sharedStyles from '../../styles/shared'
 import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
-import StudyProgrammeCourseCodeMapper from './StudyProgrammeCourseCodeMapper'
+// import StudyProgrammeCourseCodeMapper from './StudyProgrammeCourseCodeMapper'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import AggregateView from '../CourseGroups/AggregateView'
+import styles from '../PopulationQueryCard/populationQueryCard.css'
 
 class StudyProgramme extends Component {
   static propTypes = {
@@ -37,12 +38,16 @@ class StudyProgramme extends Component {
         menuItem: 'Mandatory Courses',
         render: () => <StudyProgrammeMandatoryCourses studyProgramme={studyProgrammeId} />
       },
-      { menuItem: 'Code Mapper', render: () => <StudyProgrammeCourseCodeMapper /> },
-      { menuItem: 'Course Groups', render: () => <AggregateView programmeId={studyProgrammeId} courseGroupId={courseGroupId} /> }
+      // { menuItem: 'Code Mapper', render: () => <StudyProgrammeCourseCodeMapper /> },
+      studyProgrammeId === 'KH60_001' ? {
+        menuItem: 'Course Groups',
+        render: () => <AggregateView programmeId={studyProgrammeId} courseGroupId={courseGroupId} />
+      } : null
     ])
   }
 
   handleSelect = (target) => {
+    this.setState({ studyProgrammeName: target[0] })
     this.props.history.push(`/study-programme/${target[1]}`, { selected: target[1] })
   }
 
@@ -51,7 +56,7 @@ class StudyProgramme extends Component {
   }
 
   render() {
-    const { selected } = this.state
+    const { selected, studyProgrammeName } = this.state
     const { match } = this.props
     const { studyProgrammeId } = match.params
     const panes = this.getPanes()
@@ -60,12 +65,26 @@ class StudyProgramme extends Component {
         <Header className={sharedStyles.segmentTitle} size="large">
           Study Programme Settings
         </Header>
-        <Message content="Visible only for admins for now" />
         <Segment className={sharedStyles.contentSegment}>
           <StudyProgrammeSelector handleSelect={this.handleSelect} selected={studyProgrammeId !== undefined} />
           {
             studyProgrammeId ? (
-              <Tab panes={panes} activeIndex={selected} onTabChange={this.select} />
+              <React.Fragment>
+                <Card fluid className={styles.cardContainer}>
+                  <Card.Content>
+                    <Card.Header className={styles.cardHeader}>
+                      {studyProgrammeName}
+                      <Icon
+                        name="remove"
+                        className={styles.controlIcon}
+                        onClick={() => this.props.history.goBack()}
+                      />
+                    </Card.Header>
+                    <Card.Meta content={studyProgrammeId} />
+                  </Card.Content>
+                </Card>
+                <Tab panes={panes} activeIndex={selected} onTabChange={this.select} />
+              </React.Fragment>
             ) : null
           }
         </Segment>

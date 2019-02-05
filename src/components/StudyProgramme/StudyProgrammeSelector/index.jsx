@@ -21,7 +21,7 @@ class StudyProgrammeSelector extends Component {
   }
 
   componentDidMount() {
-    if (Object.values(this.props.studyprogrammes).length === 0) {
+    if (!this.props.studyprogrammes) {
       this.props.getDegreesAndProgrammes()
     }
   }
@@ -31,14 +31,9 @@ class StudyProgrammeSelector extends Component {
     if (!studyprogrammes) return <Loader active>Loading</Loader>
 
     if (selected) return null
+    const rows = sortBy(Object.values(studyprogrammes)
+      .map(programme => [programme.name[language], programme.code]), '0')
 
-    const rows = sortBy(Object.keys(studyprogrammes).reduce((res, key) => {
-      res.push([
-        studyprogrammes[key].name[language],
-        key
-      ])
-      return res
-    }, []), '0')
     return (
       <Table
         headers={headers}
@@ -52,7 +47,7 @@ class StudyProgrammeSelector extends Component {
 }
 
 const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => ({
-  studyprogrammes: populationDegreesAndProgrammes.data || {},
+  studyprogrammes: populationDegreesAndProgrammes.data.programmes,
   language: settings.language
 })
 

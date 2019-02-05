@@ -9,18 +9,18 @@ import LanguageChooser from '../LanguageChooser'
 import { toggleCzar, addUserUnits, removeUserUnit, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 import { setAsUser } from '../../redux/settings'
 
-import { getStudyrightElements } from '../../redux/studyrightElements'
+import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { superLogin } from '../../apiConnection'
 
-const formatToDropdown = elements => Object.values(elements).map(e => ({
-  associations: {
-    20: e.associations[20] ? Object.keys(e.associations[20]) : []
-  },
-  key: e.code,
-  value: e.code,
-  description: e.code,
-  text: e.name.fi || e.name.en || e.name.sv
-}))
+const formatToDropdown = (elements) => {
+  const options = Object.values(elements).map(e => ({
+    key: e.code,
+    value: e.code,
+    description: e.code,
+    text: e.name.fi || e.name.en || e.name.sv
+  }))
+  return _.sortBy(options, 'text')
+}
 
 class UserPage extends Component {
   state = {
@@ -32,9 +32,9 @@ class UserPage extends Component {
   }
 
   async componentDidMount() {
-    const { studyrightElements, accessgroupPending } = this.props
-    if (Object.keys(studyrightElements).length === 0 && !accessgroupPending) {
-      this.props.getStudyrightElements()
+    const { associations, accessgroupPending } = this.props
+    if (Object.keys(associations).length === 0 && !accessgroupPending) {
+      this.props.getDegreesAndProgrammes()
       await this.props.getAccessGroups()
     }
   }
@@ -77,35 +77,36 @@ class UserPage extends Component {
   removeAccess = (uid, unit) => () => this.props.removeUserUnit(uid, unit)
 
   degreeOptions = () => {
-    const { 10: deg } = this.props.studyrightElements
-    const degrees = !deg ? [] : formatToDropdown(deg)
-    return degrees
+    const { degrees } = this.props.associations
+    const degreeOptions = !degrees ? [] : formatToDropdown(degrees)
+    return degreeOptions
   }
 
   programmeOptions = () => {
-    const { 10: deg, 20: prog } = this.props.studyrightElements
-    const { degree } = this.state
-    const all = !prog ? [] : formatToDropdown(prog)
-    if (deg && degree) {
-      const data = deg[degree]
-      const assocs = data.associations[20] || {}
-      const filtered = all.filter(({ key }) => !!assocs[key])
-      return filtered
+    const { degrees, programmes } = this.props.associations
+    const { degree: degreeCode } = this.state
+    if (!programmes) return []
+    if (degrees && degreeCode) {
+      const degree = degrees[degreeCode]
+      return formatToDropdown(degree.programmes)
     }
-    return all
+    return formatToDropdown(programmes)
   }
 
   specializationOptions = () => {
-    const { 20: prog, 30: specs } = this.props.studyrightElements
-    const { programme } = this.state
-    const all = !specs ? [] : formatToDropdown(specs)
-    if (prog && programme) {
-      const data = prog[programme]
-      const assocs = data.associations[30] || {}
-      const filtered = all.filter(({ key }) => !!assocs[key])
-      return filtered
+    const { studyTracks } = this.props.associations
+    const { programme: programmeCode } = this.state
+    if (!studyTracks) return []
+    if (programmeCode) {
+      const filteredStudyTracks = Object.values(studyTracks)
+        .filter(s => s.programmes[programmeCode])
+        .reduce((acc, e) => {
+          acc[e.code] = e
+          return acc
+        }, {})
+      return formatToDropdown(filteredStudyTracks)
     }
-    return all
+    return formatToDropdown(studyTracks)
   }
 
   allSpecializationIds = () => this.specializationOptions().map(sp => sp.key)
@@ -171,18 +172,18 @@ class UserPage extends Component {
   }
 
   render() {
-    const { user, pending, studyrightElements } = this.props
+    const { user, pending, associations } = this.props
     // ugly trick to add associations to study tracks, should be moved to backend
-    if (studyrightElements[30]) {
+    if (associations.programmes) {
       const programmes = user.elementdetails.filter(e => e.type === 20).map(e => e.code)
       user.elementdetails = user.elementdetails.map((element) => {
         const e = Object.assign(element)
-        if (studyrightElements && (element.type === 30)) {
-          const studyright = studyrightElements[30][element.code]
-          if (studyright && studyright.associations && studyright.associations[20]) {
+        if (associations && (element.type === 30)) {
+          const studyright = associations.studyTracks[element.code]
+          if (studyright && studyright.programmes) {
             e.associations = _.intersection(
               programmes,
-              Object.keys(studyright.associations[20])
+              Object.keys(studyright.programmes)
             )
           } else {
             e.associations = programmes
@@ -345,8 +346,8 @@ UserPage.propTypes = {
   removeUserUnit: func.isRequired,
   language: string.isRequired,
   goBack: func.isRequired,
-  getStudyrightElements: func.isRequired,
-  studyrightElements: shape({}).isRequired,
+  getDegreesAndProgrammes: func.isRequired,
+  associations: shape({}).isRequired,
   pending: bool.isRequired,
   history: shape({
     push: func.isRequired
@@ -359,8 +360,8 @@ UserPage.propTypes = {
 const mapStateToProps = state => ({
   language: state.settings.language,
   units: state.units.data,
-  studyrightElements: state.studyrightElements.data,
-  pending: state.studyrightElements.pending,
+  associations: state.populationDegreesAndProgrammes.data,
+  pending: !!state.populationDegreesAndProgrammes.pending,
   accessGroups: state.users.accessGroupsData || []
 })
 
@@ -368,7 +369,7 @@ export default connect(mapStateToProps, {
   toggleCzar,
   addUserUnits,
   removeUserUnit,
-  getStudyrightElements,
+  getDegreesAndProgrammes,
   getAccessGroups,
   modifyAccessGroups,
   setAsUser

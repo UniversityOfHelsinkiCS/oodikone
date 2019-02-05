@@ -6,7 +6,7 @@ import { getActiveYears } from '../courseStatisticsUtils'
 
 import styles from './courseTable.css'
 
-const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, controlIcon }) => {
+const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, controlIcon, mandatory = false }) => {
   const noContent = courses.length === 0
   const sortedCourses = !noContent && _.sortBy(courses, course => course.name)
 
@@ -24,7 +24,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, co
       </Table.Cell>
       <Table.Cell content={course.code} />
       <Table.Cell>
-        {course.min_attainment_date ?
+        {course.min_attainment_date || mandatory ?
           <Button
             basic
             className={styles.controlIcon}

@@ -7,6 +7,7 @@ import { getProviders } from '../../redux/providers'
 import { getSemesters } from '../../redux/semesters'
 import { getTeacherStatistics } from '../../redux/teacherStatistics'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
+import { userRights } from '../../common'
 
 const initial = {
   semesterStart: null,
@@ -18,7 +19,10 @@ const initial = {
 class TeacherStatistics extends Component {
     state=initial
 
-    componentDidMount() {
+    async componentDidMount() {
+      const rights = await userRights()
+      const providers = this.mapToProviders(rights)
+      console.log(providers)
       this.props.getProviders()
       this.props.getSemesters()
     }
@@ -32,6 +36,19 @@ class TeacherStatistics extends Component {
         })
       }
     }
+
+    mapToProviders = rights => rights.map((r) => {
+      if (r.includes('_')) {
+        const split = r.split('_')
+        console.log(split)
+        const replaced = `${split[0].substring(0, 1)}00${split[0].substring(2, 3)}`
+        console.log(replaced)
+        const provider = `${replaced.split('').reverse().join('')}_${split[1]}`.split('').reverse().join('')
+        console.log(provider)
+        return provider
+      }
+      return r
+    })
 
     handleChange = (_, { name, value }) => {
       this.setState({ [name]: value })
