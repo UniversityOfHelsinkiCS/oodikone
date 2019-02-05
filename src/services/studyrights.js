@@ -214,7 +214,7 @@ const calculateAssociationsFromDb = async (chunksize=100000) => {
   let offset = 0
   const types = new Set([10, 20, 30]) // degree, programme, studytrack
   const isValid = ({ type }) => types.has(type)
-  const programmes = {}
+  const associations = { programmes: {},  degrees: {},  studyTracks: {}}
   while(offset <= total) {
     console.log(`${offset}/${total}`)
     const elementgroups = await associatedStudyrightElements(offset, chunksize)
@@ -222,46 +222,75 @@ const calculateAssociationsFromDb = async (chunksize=100000) => {
       .forEach(fullgroup => {
         const group = fullgroup.filter(isValid)
         group.forEach(({ type, code, name, studyrightid, startdate, enddate }) => {
-          if (type != 20) {
-            return
-          }
-          programmes[code] = programmes[code] || {
-            type: type,
-            name: name,
-            code: code,
-            enrollmentStartYears: {}
-          }
-          const momentstartdate = moment(startdate)
-          const enrollment = getEnrollmentStartYear(momentstartdate)
-          const enrollmentStartYears = programmes[code].enrollmentStartYears
-          enrollmentStartYears[enrollment] = enrollmentStartYears[enrollment] || {
-            degrees: {},
-            studyTracks: {}
-          }
-          const enrollmentStartYear = enrollmentStartYears[enrollment]
-          
-          group.filter(e => e.studyrightid === studyrightid).filter(e => e.code !== code).forEach(e => {
-            if (e.type == 10) {
-              enrollmentStartYear.degrees[e.code] = { type: e.type, name: e.name, code: e.code }
+          if (type === 10) {
+            associations.degrees[code] = associations.degrees[code] || {
+              type, name, code, programmes: {}
             }
-            if (e.type == 30) {
-              const momentenddate = moment(enddate)
-              const estartdate = moment(e.startdate)
-              const eenddate = moment(e.enddate)
-              // check that programme and studytrack time ranges overlap
-              if ((momentstartdate <= estartdate && momentenddate >= estartdate) ||
-                  (momentstartdate <= eenddate && momentenddate >= eenddate) ||
-                  (estartdate <= momentstartdate && eenddate >= momentstartdate) ||
-                  (estartdate <= momentenddate && eenddate >= momentenddate)) {
-                enrollmentStartYear.studyTracks[e.code] = { type: e.type, name: e.name, code: e.code }
+          }
+          if (type === 30) {
+            associations.studyTracks[code] = associations.studyTracks[code] || {
+              type, name, code, programmes: {}
+            }
+          }
+          if (type === 20) {
+            associations.programmes[code] = associations.programmes[code] || {
+              type: type,
+              name: name,
+              code: code,
+              enrollmentStartYears: {}
+            }
+            const momentstartdate = moment(startdate)
+            const enrollment = getEnrollmentStartYear(momentstartdate)
+            const enrollmentStartYears = associations.programmes[code].enrollmentStartYears
+            enrollmentStartYears[enrollment] = enrollmentStartYears[enrollment] || {
+              degrees: {},
+              studyTracks: {}
+            }
+            const enrollmentStartYear = enrollmentStartYears[enrollment]
+            
+            group.filter(e => e.studyrightid === studyrightid && e.code !== code).forEach(e => {
+              if (e.type == 10) {
+                enrollmentStartYear.degrees[e.code] = {
+                  type: e.type, name: e.name, code: e.code
+                }
+                associations.degrees[e.code] = associations.degrees[e.code] || {
+                  type: e.type, name: e.name, code: e.code, programmes: {}
+                }
+                associations.degrees[e.code].programmes[code] = {
+                  type: type,
+                  name: name,
+                  code: code,
+                }
               }
-            }
-          })
+              if (e.type == 30) {
+                const momentenddate = moment(enddate)
+                const estartdate = moment(e.startdate)
+                const eenddate = moment(e.enddate)
+                // check that programme and studytrack time ranges overlap
+                if ((momentstartdate <= estartdate && momentenddate >= estartdate) ||
+                    (momentstartdate <= eenddate && momentenddate >= eenddate) ||
+                    (estartdate <= momentstartdate && eenddate >= momentstartdate) ||
+                    (estartdate <= momentenddate && eenddate >= momentenddate)) {
+                  enrollmentStartYear.studyTracks[e.code] = {
+                    type: e.type, name: e.name, code: e.code
+                  }
+                }
+                associations.studyTracks[e.code] = associations.studyTracks[e.code] || {
+                  type: e.type, name: e.name, code: e.code, programmes: {}
+                }
+                associations.studyTracks[e.code].programmes[code] = {
+                  type: type,
+                  name: name,
+                  code: code,
+                }
+              }
+            })
+          }
         })
       })
     offset += chunksize
   }
-  return programmes
+  return associations
 }
 
 const saveAssociationsToRedis = async associations => {
@@ -291,16 +320,24 @@ const getAssociations = async (doRefresh=false) => {
 
 const getFilteredAssociations = async (codes) => {
   console.log(codes)
-  const programmeAssociations = await getAssociations()
-  let filteredProgrammes = _.pick(programmeAssociations, codes)
-  Object.keys(filteredProgrammes).forEach(k => {
-    Object.keys(filteredProgrammes[k].enrollmentStartYears).forEach(year => {
-      const yearData = filteredProgrammes[k].enrollmentStartYears[year]
+  const associations = await getAssociations()
+  associations.programmes = _.pick(associations.programmes, codes)
+  Object.keys(associations.programmes).forEach(k => {
+    Object.keys(associations.programmes[k].enrollmentStartYears).forEach(year => {
+      const yearData = associations.programmes[k].enrollmentStartYears[year]
       yearData.degrees = _.pick(yearData.degrees, codes)
       yearData.studyTracks = _.pick(yearData.studyTracks, codes)
     })
   })
-  return filteredProgrammes
+  associations.degrees = _.pick(associations.degrees, codes)
+  Object.keys(associations.degrees).forEach(k => {
+    associations.degrees[k].programmes = _.pick(associations.degrees[k].programmes, codes)
+  })
+  associations.studyTracks = _.pick(associations.studyTracks, codes)
+  Object.keys(associations.studyTracks).forEach(k => {
+    associations.studyTracks[k].programmes = _.pick(associations.studyTracks[k].programmes, codes)
+  })
+  return associations
 }
 
 const getUserAssociations = async (userid) => {
