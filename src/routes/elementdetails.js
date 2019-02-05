@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { getAllDegreesAndProgrammes, getAssociations } = require('../services/studyrights')
+const { getAllDegreesAndProgrammes } = require('../services/studyrights')
 const MandatoryCourses = require('../services/mandatoryCourses')
 
 router.get('/studyprogrammes', async (req, res) => {
@@ -9,11 +9,6 @@ router.get('/studyprogrammes', async (req, res) => {
   } catch (err) {
     res.status(500).json(err)
   }
-})
-
-router.get('/v2/studyprogrammes', async (req, res) => {
-  const associations = await getAssociations()
-  res.json(associations)
 })
 
 router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {

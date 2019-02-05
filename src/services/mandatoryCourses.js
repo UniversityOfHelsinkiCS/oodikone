@@ -3,7 +3,7 @@ const { Course, MandatoryCourse } = require('../models')
 const { Op } = Sequelize
 
 const byStudyprogramme = (studyProgrammeId) => {
-  const courses =  MandatoryCourse.findAll({
+  const courses = MandatoryCourse.findAll({
     attributes: ['course_code'],
     include: {
       model: Course,
@@ -23,20 +23,41 @@ const byStudyprogramme = (studyProgrammeId) => {
 
 const create = (studyProgrammeId, code) => {
   return MandatoryCourse.create({
-    study_programme_id: studyProgrammeId,
-    course_code: code    
+    studyprogramme_id: studyProgrammeId,
+    course_code: code
+  })
+}
+
+const find = (studyProgrammeId, code) => {
+  return MandatoryCourse.findOne({
+    attributes: ['course_code'],
+    include: {
+      model: Course,
+      attributes: ['name'],
+    },
+    where: {
+      studyprogramme_id: {
+        [Op.eq]: studyProgrammeId
+      },
+      course_code: {
+        [Op.eq]: code
+      }
+    }
   })
 }
 
 const remove = (studyProgrammeId, code) => {
-  return MandatoryCourse.delete({
-    study_programme_id: studyProgrammeId,
-    course_code: code    
+  return MandatoryCourse.destroy({
+    where: {
+      studyprogramme_id: studyProgrammeId,
+      course_code: code
+    }
   })
 }
 
 module.exports = {
   create,
+  find,
   remove,
   byStudyprogramme
 }
