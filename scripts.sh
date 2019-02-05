@@ -79,7 +79,7 @@ db_setup_full () {
     echo "Unpacking compressed files"
     unpack_oodikone_server_backup
     echo "Restoring PostgreSQL from backup"
-    ping_psql "oodi_db"
+    ping_psql "oodi_db" "tkt_oodi"
     retry restore_psql_from_backup
     echo "Restoring MongoDB from backup"
     retry restore_mongodb_from_backup
