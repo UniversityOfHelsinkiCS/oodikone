@@ -291,9 +291,16 @@ const getAssociations = async (doRefresh=false) => {
 
 const getFilteredAssociations = async (codes) => {
   console.log(codes)
-  const all = await getAssociations()
-  const filtered = _.pick(all, codes)
-  return filtered
+  const programmeAssociations = await getAssociations()
+  let filteredProgrammes = _.pick(programmeAssociations, codes)
+  Object.keys(filteredProgrammes).forEach(k => {
+    Object.keys(filteredProgrammes[k].enrollmentStartYears).forEach(year => {
+      const yearData = filteredProgrammes[k].enrollmentStartYears[year]
+      yearData.degrees = _.pick(yearData.degrees, codes)
+      yearData.studyTracks = _.pick(yearData.studyTracks, codes)
+    })
+  })
+  return filteredProgrammes
 }
 
 const getUserAssociations = async (userid) => {
