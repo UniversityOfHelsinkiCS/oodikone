@@ -34,7 +34,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm run test || npm run test_docker"
+      "pre-push": "npm run test_docker || npm run test"
     }
   }
 }
