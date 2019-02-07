@@ -53,17 +53,15 @@ const reducer = (state = { data: [] }, action) => {
   switch (action.type) {
     case 'GET_USERS_ATTEMPT':
       return {
-        pending: true,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: true
       }
     case 'GET_USERS_FAILURE':
       return {
+        ...state,
         pending: false,
         error: true,
-        data: action.response,
-        ...state
+        data: action.response
       }
     case 'GET_USERS_SUCCESS':
       return {
@@ -73,37 +71,35 @@ const reducer = (state = { data: [] }, action) => {
       }
     case 'GET_ACCESSGROUPS_ATTEMPT':
       return {
+        ...state,
         accessgroupPending: true,
-        error: state.error,
-        ...state
+        error: state.error
       }
     case 'GET_ACCESSGROUPS_FAILURE':
       return {
+        ...state,
         accessgroupPending: false,
         error: true,
-        accessGroupsData: action.response,
-        ...state
+        accessGroupsData: action.response
       }
     case 'GET_ACCESSGROUPS_SUCCESS':
       return {
+        ...state,
         accessgroupPending: false,
         error: false,
-        accessGroupsData: action.response,
-        ...state
+        accessGroupsData: action.response
       }
     case 'ENABLE_USER_ATTEMPT':
       return {
-        pending: true,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: true
       }
     case 'ENABLE_USER_FAILURE':
       return {
+        ...state,
         pending: false,
         error: true,
-        data: action.response,
-        ...state
+        data: action.response
       }
     case 'ENABLE_USER_SUCCESS':
       return {
@@ -126,24 +122,18 @@ const reducer = (state = { data: [] }, action) => {
       }
     case 'SEND_EMAIL_ATTEMPT':
       return {
-        pending: true,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: true
       }
     case 'SEND_EMAIL_SUCCESS':
       return {
-        pending: false,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: false
       }
     case 'SEND_EMAIL_FAILURE':
       return {
-        pending: false,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: false
       }
     default:
       return state

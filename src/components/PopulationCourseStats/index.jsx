@@ -95,11 +95,14 @@ class PopulationCourseStats extends Component {
 
   static getDerivedStateFromProps(props, state) {
     if (state && !state.initialSortReady && props.courses.coursestatistics) {
-      state.courseStatistics = PopulationCourseStats.updateCourseStatisticsCriteria(props, state)
-      state.initialSortReady = true
+      return {
+        ...state,
+        courseStatistics: PopulationCourseStats.updateCourseStatisticsCriteria(props, state),
+        initialSortReady: true
+      }
     }
 
-    return state
+    return null
   }
 
   static updateCourseStatisticsCriteria(props, state) {

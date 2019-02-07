@@ -64,11 +64,15 @@ initial.complemented = false
 const reducer = (state = initial, action) => {
   switch (action.type) {
     case 'ADD_POPULATION_FILTER':
-      state.filters = state.filters.concat(action.filter)
-      return state
+      return {
+        ...state,
+        filters: state.filters.concat(action.filter)
+      }
     case 'REMOVE_POPULATION_FILTER':
-      state.filters = state.filters.filter(f => f.id !== action.id)
-      return state
+      return {
+        ...state,
+        filters: state.filters.filter(f => f.id !== action.id)
+      }
     case 'REMOVE_POPULATION_FILTER_OF_COURSE': {
       const notRemoved = (filter) => {
         if (filter.type !== 'CourseParticipation') {
@@ -77,82 +81,90 @@ const reducer = (state = initial, action) => {
         const { course } = filter.params.course
         return course.name !== action.course.name || course.code !== action.course.code
       }
-      state.filters = state.filters.filter(notRemoved)
-      return state
+      return {
+        ...state,
+        filters: state.filters.filter(notRemoved)
+      }
     }
 
     case 'CLEAR_POPULATION_FILTERS':
-      state.filters = []
-      return state
+      return {
+        ...state,
+        filters: []
+      }
     case 'ALTER_POPULATION_COURSE_FILTER': {
       const toAlter = state.filters.find(f => f.id === action.id)
       const { course } = toAlter.params
       const params = { course, field: action.field }
       const alteredFilter = courseParticipation(params)
       alteredFilter.id = toAlter.id
-      state.filters = state.filters.map(f => (f.id !== action.id ? f : alteredFilter))
-      return state
+      return {
+        ...state,
+        filters: state.filters.map(f => (f.id !== action.id ? f : alteredFilter))
+      }
     }
     case 'SET_COMPLEMENT_FILTER': {
-      state.complemented = !state.complemented
-      return state
+      return {
+        ...state,
+        complemented: !state.complemented
+      }
     }
     case 'SAVE_FILTER_ATTEMPT':
       return {
+        ...state,
         pending: true,
-        error: false,
-        ...state
+        error: false
       }
     case 'SAVE_FILTER_FAILURE':
       return {
+        ...state,
         pending: false,
-        error: true,
-        ...state
+        error: true
       }
     case 'SAVE_FILTER_SUCCESS':
-      state.filtersFromBackend = state.filtersFromBackend.concat(action.response)
       return {
+        ...state,
         pending: false,
         error: false,
-        ...state
+        filtersFromBackend: state.filtersFromBackend.concat(action.response)
       }
     case 'GET_FILTER_ATTEMPT':
       return {
+        ...state,
         pending: true,
-        error: false,
-        ...state
+        error: false
       }
     case 'GET_FILTER_FAILURE':
       return {
+        ...state,
         pending: false,
-        error: true,
-        ...state
+        error: true
       }
     case 'GET_FILTER_SUCCESS':
-      state.filtersFromBackend = state.filtersFromBackend.concat(action.response)
       return {
+        ...state,
         pending: false,
         error: false,
-        ...state
+        filtersFromBackend: state.filtersFromBackend.concat(action.response)
       }
     case 'DELETE_FILTER_ATTEMPT':
       return {
+        ...state,
         pending: true,
-        error: false,
-        ...state
+        error: false
       }
     case 'DELETE_FILTER_FAILURE':
       return {
+        ...state,
         pending: false,
-        error: true,
-        ...state
+        error: true
       }
     case 'DELETE_FILTER_SUCCESS':
-      state.filtersFromBackend = state.filtersFromBackend.filter(f => f.id !== action.response.id)
       return {
+        ...state,
         pending: false,
         error: false,
-        ...state
+        filtersFromBackend: state.filtersFromBackend.filter(f => f.id !== action.response.id)
       }
 
     default:
