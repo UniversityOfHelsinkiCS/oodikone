@@ -26,14 +26,6 @@ export const enableUser = (id) => {
   return callController(route, prefix, null, method)
 }
 
-export const addUserUnit = (uid, unit) => {
-  const route = `/users/${uid}/units/${unit}`
-  const prefix = 'EDIT_USER_UNIT_'
-  const data = { uid, unit }
-  const method = 'post'
-  return callController(route, prefix, data, method)
-}
-
 export const addUserUnits = (uid, codes) => {
   const route = `/users/${uid}/elements`
   const data = { codes }
@@ -49,12 +41,6 @@ export const removeUserUnit = (uid, unit) => {
   return callController(route, prefix, data, method)
 }
 
-export const toggleCzar = (id) => {
-  const route = `/users/${id}/toggleczar`
-  const prefix = 'TOGGLE_USER_CZAR_'
-  const method = 'put'
-  return callController(route, prefix, null, method)
-}
 export const sendEmail = (email) => {
   const route = '/users/email'
   const prefix = 'SEND_EMAIL_'
@@ -125,28 +111,6 @@ const reducer = (state = { data: [] }, action) => {
         pending: false,
         data: state.data.filter(user => user.id !== action.response.id)
           .concat(action.response)
-      }
-    case 'TOGGLE_USER_CZAR_ATTEMPT':
-      return {
-        pending: true,
-        error: state.error,
-        data: state.data,
-        ...state
-      }
-    case 'TOGGLE_USER_CZAR_SUCCESS':
-      return {
-        pending: false,
-        error: state.error,
-        data: state.data.filter(a => a.id !== action.response.id)
-          .concat(action.response),
-        ...state
-      }
-    case 'TOGGLE_USER_CZAR_FAILURE':
-      return {
-        pending: false,
-        error: state.error,
-        data: state.data,
-        ...state
       }
     case 'EDIT_USER_UNIT_SUCCESS':
       return {

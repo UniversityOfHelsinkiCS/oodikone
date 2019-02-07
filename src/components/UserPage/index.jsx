@@ -6,7 +6,7 @@ import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
 import { textAndDescriptionSearch } from '../../common'
 import LanguageChooser from '../LanguageChooser'
-import { toggleCzar, addUserUnits, removeUserUnit, getAccessGroups, modifyAccessGroups } from '../../redux/users'
+import { addUserUnits, removeUserUnit, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 import { setAsUser } from '../../redux/settings'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
@@ -68,10 +68,6 @@ class UserPage extends Component {
       visible: true
     })
     setTimeout(() => this.setState({ visible: false }), 5000)
-  }
-
-  handleCoronation = user => async () => {
-    await this.props.toggleCzar(user.id)
   }
 
   removeAccess = (uid, unit) => () => this.props.removeUserUnit(uid, unit)
@@ -207,14 +203,6 @@ class UserPage extends Component {
           <Card fluid>
             <Card.Content>
               <Card.Header>
-                <Image
-                  onClick={this.handleCoronation(user)}
-                  src={user.czar ?
-                    'https://i.pinimg.com/originals/06/7a/20/067a20e4ae1edcee790601ce9b9927df.jpg' :
-                    `https://encrypted-tbn0.gstatic.com/
-                      images?q=tbn:ANd9GcS6uJPJLxePjb5u1omdG2kOLfE0BwNjvvJ9accK922xSVwKlR8_`}
-                  avatar
-                />
                 {user.full_name}
               </Card.Header>
               <Card.Meta content={user.czar ? `tsaari ${user.username}` : `${user.username}`} />
@@ -340,7 +328,6 @@ UserPage.propTypes = {
       type: number
     }))
   }).isRequired,
-  toggleCzar: func.isRequired,
   setAsUser: func.isRequired,
   addUserUnits: func.isRequired,
   removeUserUnit: func.isRequired,
@@ -366,7 +353,6 @@ const mapStateToProps = state => ({
 })
 
 export default connect(mapStateToProps, {
-  toggleCzar,
   addUserUnits,
   removeUserUnit,
   getDegreesAndProgrammes,

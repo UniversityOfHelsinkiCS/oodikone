@@ -60,11 +60,6 @@ export const getToken = async (forceNew = false) => {
   return token
 }
 
-export const userIsAdmin = async () => {
-  const token = await getToken()
-  return token ? decodeToken(token).admin : false
-}
-
 export const userRoles = async () => {
   const token = await getToken()
   const decoded = decodeToken(token)
@@ -76,10 +71,6 @@ export const userRights = async () => {
   const decoded = decodeToken(token)
   const { rights } = decoded
   return rights
-}
-export const userIsCzar = async () => {
-  const token = await getToken()
-  return token ? decodeToken(token).czar : false
 }
 export const userIsMock = async () => {
   const token = await getToken()
