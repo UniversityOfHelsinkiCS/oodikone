@@ -232,30 +232,6 @@ const Teacher = sequelize.define('teacher',
   }
 )
 
-const User = sequelize.define('users',
-  {
-    id: {
-      primaryKey: true,
-      type: Sequelize.BIGINT,
-      autoIncrement: true
-    },
-    full_name: { type: Sequelize.STRING },
-    is_enabled: { type: Sequelize.BOOLEAN },
-    username: {
-      type: Sequelize.STRING,
-      unique: true
-    },
-    email: { type: Sequelize.STRING },
-    language: { type: Sequelize.STRING },
-    admin: { type: Sequelize.BOOLEAN },
-    czar: { type: Sequelize.BOOLEAN }
-  },
-  {
-    tableName: 'users',
-    timestamps: false,
-  }
-)
-
 const StudentList = sequelize.define('student_list',
   {
     id: {
@@ -567,9 +543,6 @@ ElementDetails.hasMany(StudyrightElement, { foreignKey: 'code', sourceKey: 'code
 StudyrightElement.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
-User.belongsToMany(ElementDetails, { through: 'user_elementdetails', as: 'elementdetails' })
-ElementDetails.belongsToMany(User, { through: 'user_elementdetails' })
-
 StudyrightExtent.hasMany(Studyright, { foreignKey: 'extentcode', sourceKey: 'extentcode' })
 Studyright.belongsTo(StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'extentcode' })
 
@@ -623,7 +596,6 @@ module.exports = {
   TagStudent,
   Tag,
   Teacher,
-  User,
   sequelize,
   migrationPromise,
   Organisation,
