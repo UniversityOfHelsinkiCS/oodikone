@@ -205,7 +205,7 @@ class UserPage extends Component {
               <Card.Header>
                 {user.full_name}
               </Card.Header>
-              <Card.Meta content={user.czar ? `tsaari ${user.username}` : `${user.username}`} />
+              <Card.Meta content={user.username} />
               <Card.Meta content={user.email} />
               <Card.Description>
                 {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`} <br />
@@ -298,7 +298,7 @@ class UserPage extends Component {
             <Card.Content>
               <Card.Header content="Access rights" />
               <Card.Description>
-                {user.czar ?
+                {user.accessgroup.map(ag => ag.group_code).includes('admin') ?
                   <p style={{
                     fontSize: '34px',
                     fontFamily: 'Comic Sans',
