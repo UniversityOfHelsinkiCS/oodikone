@@ -26,17 +26,15 @@ const reducer = (state = { data: [] }, action) => {
   switch (action.type) {
     case 'GET_MANDATORY_COURSES_ATTEMPT':
       return {
-        pending: true,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: true
       }
     case 'GET_MANDATORY_COURSES_FAILURE':
       return {
+        ...state,
         pending: false,
         error: true,
-        data: action.response,
-        ...state
+        data: action.response
       }
     case 'GET_MANDATORY_COURSES_SUCCESS':
       return {
@@ -46,17 +44,15 @@ const reducer = (state = { data: [] }, action) => {
       }
     case 'ADD_MANDATORY_COURSES_ATTEMPT':
       return {
-        pending: true,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: true
       }
     case 'ADD_MANDATORY_COURSE_FAILURE':
       return {
+        ...state,
         pending: false,
         error: true,
-        data: action.response,
-        ...state
+        data: action.response
       }
     case 'ADD_MANDATORY_COURSE_SUCCESS':
       return {
@@ -66,17 +62,15 @@ const reducer = (state = { data: [] }, action) => {
       }
     case 'DELETE_MANDATORY_COURSES_ATTEMPT':
       return {
-        pending: true,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: true
       }
     case 'DELETE_MANDATORY_COURSE_FAILURE':
       return {
+        ...state,
         pending: false,
         error: true,
-        data: action.response,
-        ...state
+        data: action.response
       }
     case 'DELETE_MANDATORY_COURSE_SUCCESS':
       return {
