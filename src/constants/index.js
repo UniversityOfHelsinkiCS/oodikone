@@ -51,14 +51,14 @@ export const routes = {
   populations: { menuRoute: '/populations', route: '/populations', translateId: 'populations' },
   students: { menuRoute: '/students', route: '/students/:studentNumber?', translateId: 'students' },
   courseStatistics: { menuRoute: '/coursestatistics', route: '/coursestatistics', translateId: 'courseStatistics' },
-  studyProgramme: { menuRoute: '/study-programme', route: '/study-programme/:studyProgrammeId?', translateId: 'studyProgramme', admin: true, reqRights: ['studyprogramme'] },
+  studyProgramme: { menuRoute: '/study-programme', route: '/study-programme/:studyProgrammeId?', translateId: 'studyProgramme', reqRights: ['studyprogramme'] },
   studyProgrammeCourseGroup: { route: '/study-programme/:studyProgrammeId/course-group/:courseGroupId', translateId: 'studyProgramme', reqRights: ['studyprogramme'] },
-  teachers: { menuRoute: '/teachers', route: '/teachers/:teacherid?', translateId: 'teachers', czar: true, reqRights: ['teachers'] },
-  users: { menuRoute: '/users', route: '/users/:userid?', translateId: 'users', admin: true, reqRights: ['users'] },
-  settings: { menuRoute: '/settings', route: '/settings', translateId: 'settings', admin: true, reqRights: ['admin'] },
+  teachers: { menuRoute: '/teachers', route: '/teachers/:teacherid?', translateId: 'teachers', reqRights: ['teachers'] },
+  users: { menuRoute: '/users', route: '/users/:userid?', translateId: 'users', reqRights: ['users'] },
+  settings: { menuRoute: '/settings', route: '/settings', translateId: 'settings', reqRights: ['admin'] },
   usage: { menuRoute: '/usage', route: '/usage', translateId: 'usage', reqRights: ['usage'] },
-  sandbox: { menuRoute: '/sandbox', route: '/sandbox', translateId: 'sandbox', admin: true, reqRights: ['admin'] },
-  oodilearn: { menuRoute: '/oodilearn', route: '/oodilearn', translateId: 'oodilearn', admin: true, reqRights: ['oodilearn'] }
+  sandbox: { menuRoute: '/sandbox', route: '/sandbox', translateId: 'sandbox', reqRights: ['admin'] },
+  oodilearn: { menuRoute: '/oodilearn', route: '/oodilearn', translateId: 'oodilearn', reqRights: ['oodilearn'] }
 }
 
 export const hiddenRoutes = {

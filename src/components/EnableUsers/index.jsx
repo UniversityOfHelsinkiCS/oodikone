@@ -105,13 +105,7 @@ class EnableUsers extends Component {
             }, {
               key: 'ROLE',
               title: 'Role',
-              getRowVal: (user) => {
-                // TODO: visual representation
-                if (user.admin && user.czar) return 'admin czar'
-                if (user.admin) return 'admin'
-                if (user.czar) return 'czar'
-                return 'user'
-              },
+              getRowVal: user => (user.accessgroup.map(ag => ag.group_code).sort().join()),
               cellProps: { singleLine: true }
             }, {
               key: 'STUDYTRACKS',
