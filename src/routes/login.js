@@ -1,7 +1,16 @@
 const router = require('express').Router()
 const mailservice = require('../services/mailservice')
 const userService = require('../services/userService')
+const blacklist = require('../services/blacklist')
+const { ACCESS_TOKEN_HEADER_KEY } = require('../conf-backend')
 
+const removeBlacklisting = async req => {
+  const token = req.headers[ACCESS_TOKEN_HEADER_KEY]
+  if (token) {
+    console.log('removing tokennn', token)
+    await blacklist.removeTokenFromBlacklist(token)
+  }
+}
 
 const sendEmail = async (uid) => {
   if (process.env.SMTP !== undefined) {
@@ -23,14 +32,13 @@ router.post('/login', async (req, res) => {
   try {
     const uid = req.headers['uid']
     if (req.headers['shib-session-id'] && uid) {
-      
       const full_name = req.headers.displayname || 'Shib Valmis'
       const mail = req.headers.mail || ''
       console.log(uid, 'trying to login, referring to userservice.')
       let { token, isNew } = await userService.login(uid, full_name, mail)
       isNew && sendEmail(uid)
+      await removeBlacklisting(req)
       res.status(200).json({ token })
-     
     } else {
       res.status(401).json({
         message: `Not enough headers login, uid: ${req.headers.uid} 
@@ -50,7 +58,7 @@ router.post('/superlogin/:uid', async (req, res) => {
     if (req.headers['shib-session-id'] && uid) {
       console.log('super')
       const token = await userService.superlogin(uid, asUser)
-      console.log(token)
+      await removeBlacklisting(req)
       res.status(200).json({ token })
     } else {
       res.status(401).json({
