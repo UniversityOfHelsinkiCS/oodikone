@@ -143,4 +143,13 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   }
 })
 
+router.get('/v3/populationstatistics/studyprogrammes/unfiltered', async (req, res) => {
+  try {
+    const studyrights = await StudyrightService.getAssociations()
+    res.json(studyrights)
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
 module.exports = router
