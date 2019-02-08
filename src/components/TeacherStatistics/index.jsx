@@ -13,7 +13,8 @@ const initial = {
   semesterStart: null,
   semesterEnd: null,
   providers: [],
-  display: false
+  display: false,
+  userProviders: []
 }
 
 class TeacherStatistics extends Component {
@@ -21,8 +22,8 @@ class TeacherStatistics extends Component {
 
     async componentDidMount() {
       const rights = await userRights()
-      const providers = this.mapToProviders(rights)
-      console.log(providers)
+      const userProviders = this.mapToProviders(rights)
+      this.setState({ userProviders })
       this.props.getProviders()
       this.props.getSemesters()
     }
@@ -37,15 +38,29 @@ class TeacherStatistics extends Component {
       }
     }
 
+    /*
+    Maps new studyright codes to providercodes. Just a wild guess on how the codes are structured....
+    --------
+    KH50_005
+    500-K005
+    --------
+    KH57_001
+    500-K001
+    --------
+    KH80_003
+    800-K003
+    --------
+    etcetc...
+    */
     mapToProviders = rights => rights.map((r) => {
       if (r.includes('_')) {
+        let newPrefix = ''
+        let newSuffix = ''
         const split = r.split('_')
-        console.log(split)
-        const replaced = `${split[0].substring(0, 1)}00${split[0].substring(2, 3)}`
-        console.log(replaced)
-        const provider = `${replaced.split('').reverse().join('')}_${split[1]}`.split('').reverse().join('')
-        console.log(provider)
-        return provider
+        newPrefix = `${split[0][2]}00`
+        newSuffix = `${split[0][0]}${split[1]}`
+        const providercode = `${newPrefix}-${newSuffix}`
+        return providercode
       }
       return r
     })
@@ -62,8 +77,9 @@ class TeacherStatistics extends Component {
 
     render() {
       const { semesters, providers, statistics, pending } = this.props
-      const { display, semesterStart, semesterEnd } = this.state
+      const { display, semesterStart, semesterEnd, userProviders } = this.state
       const invalidQueryParams = this.state.providers.length === 0 || !semesterStart
+      const providerOptions = providers.filter(p => userProviders.includes(p.value))
       return (
         <div>
           <Message
@@ -104,7 +120,7 @@ class TeacherStatistics extends Component {
                   multiple
                   selection
                   search
-                  options={providers}
+                  options={providerOptions}
                   value={this.state.providers}
                   onChange={this.handleChange}
                 />
