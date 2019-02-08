@@ -6,7 +6,8 @@ const supertest = require('supertest')
 
 const jwt = require('jsonwebtoken')
 
-const { User, sequelize } = require('../../src/models')
+const userService = require('../../src/services/userService')
+const { sequelize } = require('../../src/models')
 const { generateUsers } = require('../utils')
 const app = require('../../src/app')
 const api = supertest(app)
@@ -54,7 +55,7 @@ test.skip('login creates an user', async t => {
     })
 
   t.is(res.status, 200)
-  const foundUser = await User.find({ where: { username: user.username } })
+  const foundUser = await userService.byUsername(user.username)
 
   t.is(foundUser.username, user.username, 'Username did not match uid')
   t.is(foundUser.full_name, user.full_name, 'Full name did not match fullname')
@@ -63,7 +64,7 @@ test.skip('login creates an user', async t => {
 test.skip('login fetches an user and returns token to enabled', async t => {
   const user = generateUsers(1)[0]
   user.is_enabled = true
-  await User.insertOrUpdate(user)
+  // await User.insertOrUpdate(user) replace with user service equivalent when test is no longer skipped
 
   const res = await api
     .post('/api/login')

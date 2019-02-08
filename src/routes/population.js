@@ -1,6 +1,5 @@
 const router = require('express').Router()
 const Population = require('../services/populations')
-const User = require('../services/users')
 const Filters = require('../services/filters')
 const { updateStudents } = require('../services/doo_api_database_updater/database_updater')
 const StudyrightService = require('../services/studyrights')
@@ -27,47 +26,6 @@ router.get('/v2/populationstatistics/courses', async (req, res) => {
 
     res.json(result)
   } catch (e) {
-    res.status(400).json({ error: e })
-  }
-})
-
-router.get('/v2/populationstatistics', async (req, res) => {
-  try {
-    if (!req.query.year || !req.query.semester || !req.query.studyRights) {
-      res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
-      return
-    }
-
-    if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
-      req.query.studyRights = [req.query.studyRights]
-    }
-    const { admin, czar } = req.decodedToken
-    if (!(admin || czar)) {
-      const user = await User.byUsername(req.decodedToken.userId)
-      const elementdetails = await user.getElementdetails()
-      const elements = new Set(elementdetails.map(element => element.code))
-      if (req.query.studyRights.some(code => !elements.has(code))) {
-        res.status(403).json([])
-        return
-      }
-    }
-
-    if (req.query.months == null) {
-      req.query.months = 12
-    }
-
-    const result = await Population.optimizedStatisticsOf(req.query)
-
-    if (result.error) {
-      console.log(result.error)
-      res.status(400)
-      return
-    }
-
-    console.log(`request completed ${new Date()}`)
-    res.json(result)
-  } catch (e) {
-    console.log(e)
     res.status(400).json({ error: e })
   }
 })
@@ -172,14 +130,23 @@ router.post('/updatedatabase', async (req, res) => {
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   try {
-    const { admin, czar, rights, roles } = req.decodedToken
-    if (admin || czar || (roles && roles.map(r => r.group_code).includes('admin'))) {
+    const { rights, roles } = req.decodedToken
+    if (roles && roles.map(r => r.group_code).includes('admin')) {
       const studyrights = await StudyrightService.getAssociations()
       res.json(studyrights)
     } else {
       const studyrights = await StudyrightService.getFilteredAssociations(rights)
       res.json(studyrights)
     }
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
+router.get('/v3/populationstatistics/studyprogrammes/unfiltered', async (req, res) => {
+  try {
+    const studyrights = await StudyrightService.getAssociations()
+    res.json(studyrights)
   } catch (err) {
     res.status(500).json(err)
   }
