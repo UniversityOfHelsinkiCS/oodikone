@@ -4,7 +4,7 @@ import { Button, Icon, Header, Segment, Confirm } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
-import { getUsers, enableUser, addUserUnit, removeUserUnit, sendEmail } from '../../redux/users'
+import { getUsers, enableUser, removeUserUnit, sendEmail } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { makeSortUsers } from '../../selectors/users'
 import { copyToClipboard } from '../../common'
@@ -105,13 +105,7 @@ class EnableUsers extends Component {
             }, {
               key: 'ROLE',
               title: 'Role',
-              getRowVal: (user) => {
-                // TODO: visual representation
-                if (user.admin && user.czar) return 'admin czar'
-                if (user.admin) return 'admin'
-                if (user.czar) return 'czar'
-                return 'user'
-              },
+              getRowVal: user => (user.accessgroup.map(ag => ag.group_code).sort().join()),
               cellProps: { singleLine: true }
             }, {
               key: 'STUDYTRACKS',
@@ -232,7 +226,6 @@ const mapStateToProps = ({ locale, users, units, settings }) => ({
 export default withRouter(connect(mapStateToProps, {
   getUsers,
   enableUser,
-  addUserUnit,
   removeUserUnit,
   getUnits,
   sendEmail

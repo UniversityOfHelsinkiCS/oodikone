@@ -73,7 +73,7 @@ class TeacherSearch extends Component {
                     className: styles.clickable,
                     onClick: () => this.props.onClick(teacher)
                   })}
-                  tableProps={{ celled: false, singleLine: true, sortable: false }}
+                  tableProps={{ celled: false, sortable: false }}
                   columns={columns}
                   data={this.props.teachers}
                 />}

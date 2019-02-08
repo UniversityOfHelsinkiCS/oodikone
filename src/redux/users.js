@@ -26,14 +26,6 @@ export const enableUser = (id) => {
   return callController(route, prefix, null, method)
 }
 
-export const addUserUnit = (uid, unit) => {
-  const route = `/users/${uid}/units/${unit}`
-  const prefix = 'EDIT_USER_UNIT_'
-  const data = { uid, unit }
-  const method = 'post'
-  return callController(route, prefix, data, method)
-}
-
 export const addUserUnits = (uid, codes) => {
   const route = `/users/${uid}/elements`
   const data = { codes }
@@ -49,12 +41,6 @@ export const removeUserUnit = (uid, unit) => {
   return callController(route, prefix, data, method)
 }
 
-export const toggleCzar = (id) => {
-  const route = `/users/${id}/toggleczar`
-  const prefix = 'TOGGLE_USER_CZAR_'
-  const method = 'put'
-  return callController(route, prefix, null, method)
-}
 export const sendEmail = (email) => {
   const route = '/users/email'
   const prefix = 'SEND_EMAIL_'
@@ -67,17 +53,15 @@ const reducer = (state = { data: [] }, action) => {
   switch (action.type) {
     case 'GET_USERS_ATTEMPT':
       return {
-        pending: true,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: true
       }
     case 'GET_USERS_FAILURE':
       return {
+        ...state,
         pending: false,
         error: true,
-        data: action.response,
-        ...state
+        data: action.response
       }
     case 'GET_USERS_SUCCESS':
       return {
@@ -87,37 +71,35 @@ const reducer = (state = { data: [] }, action) => {
       }
     case 'GET_ACCESSGROUPS_ATTEMPT':
       return {
+        ...state,
         accessgroupPending: true,
-        error: state.error,
-        ...state
+        error: state.error
       }
     case 'GET_ACCESSGROUPS_FAILURE':
       return {
+        ...state,
         accessgroupPending: false,
         error: true,
-        accessGroupsData: action.response,
-        ...state
+        accessGroupsData: action.response
       }
     case 'GET_ACCESSGROUPS_SUCCESS':
       return {
+        ...state,
         accessgroupPending: false,
         error: false,
-        accessGroupsData: action.response,
-        ...state
+        accessGroupsData: action.response
       }
     case 'ENABLE_USER_ATTEMPT':
       return {
-        pending: true,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: true
       }
     case 'ENABLE_USER_FAILURE':
       return {
+        ...state,
         pending: false,
         error: true,
-        data: action.response,
-        ...state
+        data: action.response
       }
     case 'ENABLE_USER_SUCCESS':
       return {
@@ -125,28 +107,6 @@ const reducer = (state = { data: [] }, action) => {
         pending: false,
         data: state.data.filter(user => user.id !== action.response.id)
           .concat(action.response)
-      }
-    case 'TOGGLE_USER_CZAR_ATTEMPT':
-      return {
-        pending: true,
-        error: state.error,
-        data: state.data,
-        ...state
-      }
-    case 'TOGGLE_USER_CZAR_SUCCESS':
-      return {
-        pending: false,
-        error: state.error,
-        data: state.data.filter(a => a.id !== action.response.id)
-          .concat(action.response),
-        ...state
-      }
-    case 'TOGGLE_USER_CZAR_FAILURE':
-      return {
-        pending: false,
-        error: state.error,
-        data: state.data,
-        ...state
       }
     case 'EDIT_USER_UNIT_SUCCESS':
       return {
@@ -162,24 +122,18 @@ const reducer = (state = { data: [] }, action) => {
       }
     case 'SEND_EMAIL_ATTEMPT':
       return {
-        pending: true,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: true
       }
     case 'SEND_EMAIL_SUCCESS':
       return {
-        pending: false,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: false
       }
     case 'SEND_EMAIL_FAILURE':
       return {
-        pending: false,
-        error: state.error,
-        data: state.data,
-        ...state
+        ...state,
+        pending: false
       }
     default:
       return state

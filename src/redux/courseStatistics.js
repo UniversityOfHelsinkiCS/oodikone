@@ -43,17 +43,13 @@ const reducer = (state = { data: [], selected: [] }, action) => {
     case 'FIND_COURSE_STATISTICS_ATTEMPT':
       return {
         ...state,
-        pending: true,
-        selected: state.selected,
-        data: state.data
+        pending: true
       }
     case 'FIND_COURSE_STATISTICS_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true,
-        selected: state.selected,
-        data: state.data
+        error: true
       }
     case 'FIND_COURSE_STATISTICS_SUCCESS':
       return {
@@ -86,17 +82,13 @@ const reducer = (state = { data: [], selected: [] }, action) => {
     case 'FIND_COURSE_TYPES_ATTEMPT':
       return {
         ...state,
-        types_pending: true,
-        selected: state.selected,
-        data: state.data
+        types_pending: true
       }
     case 'FIND_COURSE_TYPES_FAILURE':
       return {
         ...state,
         types_pending: false,
-        error: true,
-        selected: state.selected,
-        data: state.data
+        error: true
       }
     case 'FIND_COURSE_TYPES_SUCCESS':
       return {
@@ -108,17 +100,13 @@ const reducer = (state = { data: [], selected: [] }, action) => {
     case 'FIND_COURSE_DISCIPLINES_ATTEMPT':
       return {
         ...state,
-        disciplines_pending: true,
-        selected: state.selected,
-        data: state.data
+        disciplines_pending: true
       }
     case 'FIND_COURSE_DISCIPLINES_FAILURE':
       return {
         ...state,
         disciplines_pending: false,
-        error: true,
-        selected: state.selected,
-        data: state.data
+        error: true
       }
     case 'FIND_COURSE_DISCIPLINES_SUCCESS':
       return {
