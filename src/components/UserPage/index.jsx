@@ -6,10 +6,10 @@ import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
 import { textAndDescriptionSearch } from '../../common'
 import LanguageChooser from '../LanguageChooser'
-import { toggleCzar, addUserUnits, removeUserUnit, getAccessGroups, modifyAccessGroups } from '../../redux/users'
+import { addUserUnits, removeUserUnit, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 import { setAsUser } from '../../redux/settings'
 
-import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
+import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
 import { superLogin } from '../../apiConnection'
 
 const formatToDropdown = (elements) => {
@@ -34,7 +34,7 @@ class UserPage extends Component {
   async componentDidMount() {
     const { associations, accessgroupPending } = this.props
     if (Object.keys(associations).length === 0 && !accessgroupPending) {
-      this.props.getDegreesAndProgrammes()
+      this.props.getDegreesAndProgrammesUnfiltered()
       await this.props.getAccessGroups()
     }
   }
@@ -68,10 +68,6 @@ class UserPage extends Component {
       visible: true
     })
     setTimeout(() => this.setState({ visible: false }), 5000)
-  }
-
-  handleCoronation = user => async () => {
-    await this.props.toggleCzar(user.id)
   }
 
   removeAccess = (uid, unit) => () => this.props.removeUserUnit(uid, unit)
@@ -207,17 +203,9 @@ class UserPage extends Component {
           <Card fluid>
             <Card.Content>
               <Card.Header>
-                <Image
-                  onClick={this.handleCoronation(user)}
-                  src={user.czar ?
-                    'https://i.pinimg.com/originals/06/7a/20/067a20e4ae1edcee790601ce9b9927df.jpg' :
-                    `https://encrypted-tbn0.gstatic.com/
-                      images?q=tbn:ANd9GcS6uJPJLxePjb5u1omdG2kOLfE0BwNjvvJ9accK922xSVwKlR8_`}
-                  avatar
-                />
                 {user.full_name}
               </Card.Header>
-              <Card.Meta content={user.czar ? `tsaari ${user.username}` : `${user.username}`} />
+              <Card.Meta content={user.username} />
               <Card.Meta content={user.email} />
               <Card.Description>
                 {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`} <br />
@@ -240,6 +228,7 @@ class UserPage extends Component {
                     options={accessGroupOptions}
                     defaultValue={enabledAccessGroups}
                     onChange={this.handleChange}
+                    clearable
                   />
                   <Form.Dropdown
                     name="degree"
@@ -251,6 +240,7 @@ class UserPage extends Component {
                     fluid
                     search={textAndDescriptionSearch}
                     selection
+                    clearable
                   />
                   <Divider />
                   <Form.Group widths="equal">
@@ -259,11 +249,12 @@ class UserPage extends Component {
                       label="Study programme"
                       placeholder="Select unit"
                       options={options.programmes}
-                      value={this.state.programmes}
+                      value={this.state.programme}
                       onChange={this.handleChange}
                       fluid
                       search={textAndDescriptionSearch}
                       selection
+                      clearable
                     />
                     <Form.Dropdown
                       label="Specialization"
@@ -276,6 +267,7 @@ class UserPage extends Component {
                       search={textAndDescriptionSearch}
                       multiple
                       selection
+                      clearable
                     />
                     <Button
                       size="small"
@@ -310,7 +302,7 @@ class UserPage extends Component {
             <Card.Content>
               <Card.Header content="Access rights" />
               <Card.Description>
-                {user.czar ?
+                {user.accessgroup.map(ag => ag.group_code).includes('admin') ?
                   <p style={{
                     fontSize: '34px',
                     fontFamily: 'Comic Sans',
@@ -340,13 +332,12 @@ UserPage.propTypes = {
       type: number
     }))
   }).isRequired,
-  toggleCzar: func.isRequired,
   setAsUser: func.isRequired,
   addUserUnits: func.isRequired,
   removeUserUnit: func.isRequired,
   language: string.isRequired,
   goBack: func.isRequired,
-  getDegreesAndProgrammes: func.isRequired,
+  getDegreesAndProgrammesUnfiltered: func.isRequired,
   associations: shape({}).isRequired,
   pending: bool.isRequired,
   history: shape({
@@ -360,16 +351,15 @@ UserPage.propTypes = {
 const mapStateToProps = state => ({
   language: state.settings.language,
   units: state.units.data,
-  associations: state.populationDegreesAndProgrammes.data,
-  pending: !!state.populationDegreesAndProgrammes.pending,
+  associations: state.populationDegreesAndProgrammesUnfiltered.data,
+  pending: !!state.populationDegreesAndProgrammesUnfiltered.pending,
   accessGroups: state.users.accessGroupsData || []
 })
 
 export default connect(mapStateToProps, {
-  toggleCzar,
   addUserUnits,
   removeUserUnit,
-  getDegreesAndProgrammes,
+  getDegreesAndProgrammesUnfiltered,
   getAccessGroups,
   modifyAccessGroups,
   setAsUser
