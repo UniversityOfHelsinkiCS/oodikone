@@ -14,7 +14,7 @@ const conf = require('../../src/conf-backend')
 const api = supertest(app)
 
 const userId = 'tktl'
-const payload = { userId, name: 'Koko nimi', admin: true, enabled: true }
+const payload = { userId, name: 'Koko nimi', enabled: true }
 
 const token = jwt.sign(payload, conf.TOKEN_SECRET, {
   expiresIn: '24h'

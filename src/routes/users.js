@@ -1,5 +1,4 @@
 const router = require('express').Router()
-const User = require('../services/users')
 const ElementDetails = require('../services/elementdetails')
 const userService = require('../services/userService')
 const mailservice = require('../services/mailservice')
