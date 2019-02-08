@@ -7,6 +7,7 @@ import populations from './populations'
 import populationCourses from './populationCourses'
 import populationFilters from './populationFilters'
 import populationDegreesAndProgrammes from './populationDegreesAndProgrammes'
+import populationDegreesAndProgrammesUnfiltered from './populationDegreesAndProgrammesUnfiltered'
 import populationMandatoryCourses from './populationMandatoryCourses'
 import units from './units'
 import students from './students'
@@ -48,6 +49,7 @@ export default combineReducers({
   populationCourses,
   populationFilters,
   populationDegreesAndProgrammes,
+  populationDegreesAndProgrammesUnfiltered,
   populationMandatoryCourses,
   units,
   students,

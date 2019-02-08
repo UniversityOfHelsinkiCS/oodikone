@@ -9,7 +9,7 @@ import LanguageChooser from '../LanguageChooser'
 import { addUserUnits, removeUserUnit, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 import { setAsUser } from '../../redux/settings'
 
-import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
+import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
 import { superLogin } from '../../apiConnection'
 
 const formatToDropdown = (elements) => {
@@ -34,7 +34,7 @@ class UserPage extends Component {
   async componentDidMount() {
     const { associations, accessgroupPending } = this.props
     if (Object.keys(associations).length === 0 && !accessgroupPending) {
-      this.props.getDegreesAndProgrammes()
+      this.props.getDegreesAndProgrammesUnfiltered()
       await this.props.getAccessGroups()
     }
   }
@@ -228,6 +228,7 @@ class UserPage extends Component {
                     options={accessGroupOptions}
                     defaultValue={enabledAccessGroups}
                     onChange={this.handleChange}
+                    clearable
                   />
                   <Form.Dropdown
                     name="degree"
@@ -239,6 +240,7 @@ class UserPage extends Component {
                     fluid
                     search={textAndDescriptionSearch}
                     selection
+                    clearable
                   />
                   <Divider />
                   <Form.Group widths="equal">
@@ -247,11 +249,12 @@ class UserPage extends Component {
                       label="Study programme"
                       placeholder="Select unit"
                       options={options.programmes}
-                      value={this.state.programmes}
+                      value={this.state.programme}
                       onChange={this.handleChange}
                       fluid
                       search={textAndDescriptionSearch}
                       selection
+                      clearable
                     />
                     <Form.Dropdown
                       label="Specialization"
@@ -264,6 +267,7 @@ class UserPage extends Component {
                       search={textAndDescriptionSearch}
                       multiple
                       selection
+                      clearable
                     />
                     <Button
                       size="small"
@@ -333,7 +337,7 @@ UserPage.propTypes = {
   removeUserUnit: func.isRequired,
   language: string.isRequired,
   goBack: func.isRequired,
-  getDegreesAndProgrammes: func.isRequired,
+  getDegreesAndProgrammesUnfiltered: func.isRequired,
   associations: shape({}).isRequired,
   pending: bool.isRequired,
   history: shape({
@@ -347,15 +351,15 @@ UserPage.propTypes = {
 const mapStateToProps = state => ({
   language: state.settings.language,
   units: state.units.data,
-  associations: state.populationDegreesAndProgrammes.data,
-  pending: !!state.populationDegreesAndProgrammes.pending,
+  associations: state.populationDegreesAndProgrammesUnfiltered.data,
+  pending: !!state.populationDegreesAndProgrammesUnfiltered.pending,
   accessGroups: state.users.accessGroupsData || []
 })
 
 export default connect(mapStateToProps, {
   addUserUnits,
   removeUserUnit,
-  getDegreesAndProgrammes,
+  getDegreesAndProgrammesUnfiltered,
   getAccessGroups,
   modifyAccessGroups,
   setAsUser
