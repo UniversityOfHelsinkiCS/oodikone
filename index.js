@@ -45,9 +45,9 @@ app.get('/user/id/:id', async (req, res) => {
 })
 
 app.post('/user', async (req, res) => {
-  console.log('POST') 
+  console.log('POST')
   const { username, full_name, email } = req.body
-  console.log(username, full_name, email) 
+  console.log(username, full_name, email)
 
   const user = await User.createUser(username, full_name, email)
 
@@ -73,6 +73,9 @@ app.post('/superlogin', async (req, res) => {
 app.put('/user/:uid', async (req, res) => {
   const uid = req.params.uid
   const user = await User.byUsername(uid)
+  if (!user) {
+    return res.status(400).json({ error: "invalid username given" })
+  }
   await User.updateUser(user, req.body)
   const returnedUser = await User.byUsername(uid)
   res.json(returnedUser)
@@ -94,6 +97,18 @@ app.post('/add_rights', async (req, res) => {
   console.log("adding rights to ", uid)
   try {
     await User.enableElementDetails(uid, codes)
+    const user = await User.byId(uid)
+    res.status(200).json({ user })
+
+  } catch (e) {
+    res.status(400).json({ e })
+  }
+})
+app.post('/remove_rights', async (req, res) => {
+  const { uid, codes } = req.body
+  console.log("removing rights from ", uid)
+  try {
+    await User.removeElementDetails(uid, codes)
     const user = await User.byId(uid)
     res.status(200).json({ user })
 
