@@ -38,6 +38,16 @@ const default_users = [
     language: 'americano',
     admin: false,
     czar: true
+  },
+  {
+    id: 665,
+    full_name: 'Morgan Freeman',
+    is_enabled: true,
+    username: 'freeman',
+    email: 'morgan@freeman.com',
+    language: 'americano',
+    admin: false,
+    czar: false
   }
 ]
 
@@ -71,7 +81,7 @@ const default_accessgroups = [
     group_info: 'big boss'
   }
 ]
-  
+
 beforeAll(async () => {
   await forceSyncDatabase()
   await User.bulkCreate(default_users)
@@ -80,6 +90,9 @@ beforeAll(async () => {
   const admin_user = await User.findOne({ where: { id: 69 }})
   const admin = await AccessService.byId(2)
   await admin_user.addAccessgroup(admin)
+  const normal_user = await User.findOne({ where: { id: 665 }})
+  const CS_ED = await ElementDetails.findOne({ where: { code: 'ELEMENT_CS' }})
+  await normal_user.addElementdetail(CS_ED)
 })
 afterAll(async () => {
   await sequelize.close()
@@ -107,23 +120,23 @@ describe('user tests', async () => {
     const users = await userService.findAll()
     expect(users.length).toBe(default_users.length)
   })
-  
+
   test('finds specific user by id', async () => {
     const user = await userService.byId(69)
     expect(user.full_name).toBe('Saus Maekinen')
   })
-  
+
   test('finds user by username', async () => {
     const user = await userService.byUsername('rambo666')
     expect(user.full_name).toBe('Sylvester Stallone')
   })
-  
+
   test('login works if user already exists', async () => {
     const { token, isNew } = await userService.login('poutaukko', 'Pekka Pouta', 'pekka.pouta@ilmatieteenlaitos.fi')
     expect(token).toBeTruthy()
     expect(isNew).toBe(false)
   })
-  
+
   test('login creates user if user does not exist', async () => {
     const { token, isNew } = await userService.login('rtz', 'Artour Babaev', 'rtz@eg.com')
     expect(token).toBeTruthy()
@@ -152,6 +165,15 @@ describe('user access right tests', async () => {
       await userService.enableElementDetails(69, ['Element_MATH'])
       const rights2 = await userService.getUserElementDetails('sasumaki')
       expect(rights2[0].type).toBe(20)
+    })
+    test('removing and getting access rights works', async () => {
+      const rights1 = await userService.getUserElementDetails('freeman')
+      expect(rights1.length).toBe(1)
+
+      await userService.removeElementDetails(665, ['ELEMENT_CS'])
+      const rights2 = await userService.getUserElementDetails('freeman')
+      console.log(rights2)
+      expect(rights2.length).toBe(0)
     })
     test('enabling user works', async () => {
       const user1 = await userService.byUsername('rambo666')
