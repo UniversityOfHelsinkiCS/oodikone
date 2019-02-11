@@ -4,8 +4,8 @@ const { forceSyncDatabase } = require('../../src/database/connection')
 const { seedMigrations } = require('../../src/database/seed_migrations')
 
 beforeAll(async () => {
-  await seedMigrations()
   await forceSyncDatabase()
+  await seedMigrations()
 })
 
 afterAll(async () => {
