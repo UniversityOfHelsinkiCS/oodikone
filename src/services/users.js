@@ -5,17 +5,21 @@ const ElementService = require('./studyelements')
 const AccessService = require('./accessgroups')
 const Op = Sequelize.Op
 
-const generateToken = async (uid, asUser) => {
-  const user = await byUsername(uid)
-  const elementdetails = user.admin && asUser ? await getUserElementDetails(asUser) : await getUserElementDetails(user.username)
-  const elements = elementdetails.map(element => element.code)
+const generateToken = async (uid, asUser = null) => {
+  let user = await byUsername(uid)
+  const impersonate = asUser && user.accessgroup.map(r => r.group_code).includes('admin')
+  if (impersonate) {
+    user = await byUsername(asUser)
+  }
 
+  const elementdetails = await getUserElementDetails(user.username)
+  const elements = elementdetails.map(element => element.code)
   const payload = {
     userId: uid,
     name: user.full_name,
     enabled: user.is_enabled,
     language: user.language,
-    asuser: user.accessgroup.map(ag => ag.group_code).includes('admin') ? asUser : null,
+    asuser: impersonate ? asUser : null,
     rights: elements,
     roles: user.accessgroup
   }
@@ -44,7 +48,7 @@ const login = async (uid, full_name, mail) => {
 const superlogin = async (uid, asUser) => {
   const user = await byUsername(uid)
   console.log(user)
-  if (user.accessgroup.map(r => r.group_code).includes('admin') || user.adming) {
+  if (user.accessgroup.map(r => r.group_code).includes('admin')) {
     const token = await generateToken(uid, asUser)
     return token
   }
