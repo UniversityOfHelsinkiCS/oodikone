@@ -46,9 +46,17 @@ export const tokenAccessInvalid = (token) => {
   return !decodedToken.enabled
 }
 
+export const getTokenWithoutRefresh = () => {
+  const token = localStorage.getItem(TOKEN_NAME)
+  if (token && !tokenAccessInvalid(token)) {
+    return token
+  }
+  return null
+}
+
 export const getToken = async (forceNew = false) => {
-  let token = localStorage.getItem(TOKEN_NAME)
-  if (!token || tokenAccessInvalid(token) || forceNew) {
+  let token = getTokenWithoutRefresh()
+  if (!token || forceNew) {
     try {
       token = await login()
       setToken(token)
@@ -72,15 +80,14 @@ export const userRights = async () => {
   const { rights } = decoded
   return rights
 }
-export const userIsMock = async () => {
-  const token = await getToken()
-  return token ? decodeToken(token).asuser : false
+export const getAsUserWithoutRefreshToken = () => {
+  const token = getTokenWithoutRefresh()
+  return token ? decodeToken(token).asuser : null
 }
 export const getUserName = async () => {
   const token = await getToken()
-  return token ? decodeToken(token).userId : false
+  return token ? decodeToken(token).userId : null
 }
-
 
 export const setUserLanguage = (language) => {
   localStorage.setItem('language', language)

@@ -6,8 +6,7 @@ import { func, shape, string } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { routes } from '../../constants'
-import { userIsMock, userRoles } from '../../common'
-import { removeAsUser } from '../../redux/settings'
+import { userRoles } from '../../common'
 import styles from './navigationBar.css'
 import { logout, login, returnToSelf } from '../../apiConnection'
 
@@ -15,7 +14,6 @@ const { ADMINER_URL } = process.env
 
 class NavigationBar extends Component {
   state = {
-    fake: false,
     navigationRoutes: routes
   }
 
@@ -30,9 +28,7 @@ class NavigationBar extends Component {
 
   setNavigationRoutes = async () => {
     const navigationRoutes = { ...routes }
-    const fake = await userIsMock()
-    this.setState({ fake })
-    const roles = fake ? false : await userRoles()
+    const roles = await userRoles()
     if (!roles.includes('admin')) {
       Object.keys(navigationRoutes).forEach((key) => {
         if (navigationRoutes[key].reqRights && roles.every(r => navigationRoutes[key].reqRights.indexOf(r) === -1)) {
@@ -45,10 +41,8 @@ class NavigationBar extends Component {
 
   returnToSelf = () => async () => {
     await returnToSelf()
-    this.props.removeAsUser()
-    await this.setNavigationRoutes()
-    this.render()
     this.props.history.push('/')
+    window.location.reload()
   }
 
   renderUserMenu = (itemWidth) => {
@@ -99,10 +93,9 @@ class NavigationBar extends Component {
   }
 
   render() {
-    const t = this.props.translate
-    const { asUser } = this.props
-    const { fake, navigationRoutes } = this.state
-    const menuWidth = fake ? Object.keys(navigationRoutes).length + 3 : Object.keys(navigationRoutes).length + 2
+    const { translate: t, asUser } = this.props
+    const { navigationRoutes } = this.state
+    const menuWidth = asUser ? Object.keys(navigationRoutes).length + 3 : Object.keys(navigationRoutes).length + 2
     const itemWidth = 100 / menuWidth
     return (
       <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
@@ -142,7 +135,7 @@ class NavigationBar extends Component {
         >
           <Button icon="bullhorn" onClick={() => Sentry.showReportDialog()} />
         </Menu.Item>
-        {fake ?
+        {asUser ?
           <Menu.Item
             style={{ width: `${itemWidth}%` }}
           >
@@ -155,15 +148,18 @@ class NavigationBar extends Component {
 
 NavigationBar.propTypes = {
   translate: func.isRequired,
-  removeAsUser: func.isRequired,
-  asUser: string, // eslint-disable-line
+  asUser: string,
   history: shape({
     push: func.isRequired
   }).isRequired
+}
+
+NavigationBar.defaultProps = {
+  asUser: null
 }
 
 const mapStateToProps = ({ settings }) => ({
   asUser: settings.asUser
 })
 
-export default connect(mapStateToProps, { removeAsUser })(withRouter(NavigationBar))
+export default connect(mapStateToProps)(withRouter(NavigationBar))

@@ -1,12 +1,13 @@
 import { callController } from '../apiConnection'
+import { getAsUserWithoutRefreshToken } from '../common'
 
-const initial = {
+const initial = () => ({
   language: 'fi',
   namesVisible: false,
   studentlistVisible: false,
   chartHeight: 600,
-  asUser: null
-}
+  asUser: getAsUserWithoutRefreshToken()
+})
 
 export const switchLanguage = (username, language) => {
   const route = '/users/language'
@@ -16,7 +17,7 @@ export const switchLanguage = (username, language) => {
   return callController(route, prefix, data, method)
 }
 
-const reducer = (state = initial, action) => {
+const reducer = (state = initial(), action) => {
   switch (action.type) {
     case 'INIT_LANGUAGE':
       return {
@@ -53,16 +54,6 @@ const reducer = (state = initial, action) => {
         ...state,
         chartHeight: action.size
       }
-    case 'SET_AS_USER':
-      return {
-        ...state,
-        asUser: action.uid
-      }
-    case 'REMOVE_AS_USER':
-      return {
-        ...state,
-        asUser: null
-      }
     default:
       return state
   }
@@ -75,15 +66,6 @@ export const initLanguage = language => ({
 
 export const hideStudentNames = () => ({
   type: 'HIDE_STUDENT_NAMES'
-})
-
-export const setAsUser = uid => ({
-  type: 'SET_AS_USER',
-  uid
-})
-
-export const removeAsUser = () => ({
-  type: 'REMOVE_AS_USER'
 })
 
 export const showStudentNames = () => ({
