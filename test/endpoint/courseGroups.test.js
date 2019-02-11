@@ -1,9 +1,8 @@
 const supertest = require('supertest')
 const jwt = require('jsonwebtoken')
 const conf = require('../../src/conf-backend')
-const { forceSyncDatabase } = require('../../src/database/connection')
 
-const { sequelize, Teacher, CourseGroup } = require('../../src/models/index')
+const { Teacher, CourseGroup } = require('../../src/models/index')
 
 const uid = 'tktl'
 const payload = {
@@ -81,7 +80,6 @@ const MOCK_COURSES = [{
 }]
 
 beforeAll(async () => {
-  await forceSyncDatabase()
   CourseGroup.findByPk = jest.fn((id) => Promise.resolve(MOCK_COURSE_GROUPS.find(e => e.id === id)))
   CourseGroup.findAll = jest.fn(() => Promise.resolve(MOCK_COURSE_GROUPS))
   Teacher.findAll = jest.fn(condition =>
@@ -97,18 +95,9 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  await sequelize.close()
 })
 
 beforeEach(() => {
-  jest.mock('../../src/services/redis', () => ({
-    __esModule: true,
-    redisClient: {
-      getAsync: jest.fn(() => Promise.resolve()),
-      setAsync: jest.fn(() => Promise.resolve())
-    }
-  }))
-
   jest.mock('../../src/models/queries', () => ({
     __esModule: true,
     getCurrentAcademicYear: jest.fn(() => Promise.resolve([MOCK_ACADEMIC_YEARS[0]])),
