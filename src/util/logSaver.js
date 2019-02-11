@@ -9,7 +9,7 @@ module.exports = class LogSaverTransport extends Transport {
         id: uuid.v4(),
         username: payload.userId,
         name: payload.name,
-        admin: payload.admin,
+        admin: payload.roles ? payload.roles.map(r => r.group_code).includes('admin') : false,
         time: payload.iat,
         method: payload.method,
         URL: payload.url,

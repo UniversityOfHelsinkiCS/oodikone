@@ -10,7 +10,6 @@ const payload = {
   userId: uid,
   name: '',
   enabled: true,
-  admin: true,
   roles: [{
     id: '9',
     group_code: 'coursegroups',
