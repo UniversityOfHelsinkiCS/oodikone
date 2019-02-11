@@ -41,12 +41,9 @@ router.get('/v3/populationstatistics', async (req, res) => {
       req.query.studyRights = [req.query.studyRights]
     }
     req.query.studyRights = req.query.studyRights.filter(sr => sr !== 'undefined')
-    const roles = req.decodedToken.roles.map(r => r.group_code)
-    console.log(roles)
-    if (!roles.includes('admin')) {
-      console.log('not admin')
+    const roles = req.decodedToken.roles
+    if (!roles || !roles.map(r => r.group_code).includes('admin')) {
       const elements = new Set(req.decodedToken.rights)
-      console.log(elements)
       if (req.query.studyRights.some(code => !elements.has(code))) {
         res.status(403).json([])
         return
