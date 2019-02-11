@@ -1,6 +1,5 @@
 const { Teacher } = require('../models/index')
 const service = require('./teachers')
-const { forceSyncDatabase, sequelize } = require('../database/connection')
 
 const teacher = {
   id: 'TID_001',
@@ -9,12 +8,7 @@ const teacher = {
 }
 
 beforeAll(async () => {
-  await forceSyncDatabase()
   await Teacher.create(teacher)
-})
-  
-afterAll(async () => {
-  await sequelize.close()
 })
 
 describe('teacher service tests', () => {

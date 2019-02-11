@@ -3,6 +3,11 @@
   "version": "0.0.1",
   "description": "Backend for Oodikone",
   "main": "index.js",
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./test/jest/globals.js"
+    ]
+  },
   "scripts": {
     "start": "node --max_old_space_size=4096 index.js",
     "docker_local": "NODE_ENV=docker_local nodemon index.js",
@@ -60,7 +65,7 @@
     "eslint": "^5.9.0",
     "faker": "^4.1.0",
     "husky": "^1.2.0",
-    "jest": "^23.5.0",
+    "jest": "^24.1.0",
     "nock": "^10.0.2",
     "node-status": "^1.0.0",
     "nodemon": "^1.18.7",

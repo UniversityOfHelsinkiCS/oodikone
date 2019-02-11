@@ -1,11 +1,13 @@
 const jwt = require('jsonwebtoken')
 const conf = require('../conf-backend')
 const UserService = require('../services/userService')
+const blacklist = require('../services/blacklist')
+const { ACCESS_TOKEN_HEADER_KEY } = require('../conf-backend')
 
 const isShibboUser = (userId, uidHeader) => userId === uidHeader
 
 const checkAuth = async (req, res, next) => {
-  const token = req.headers['x-access-token']
+  const token = req.headers[ACCESS_TOKEN_HEADER_KEY]
   const uid = req.headers['uid']
   if (token) {
     jwt.verify(token, conf.TOKEN_SECRET, async (err, decoded) => {
@@ -48,6 +50,17 @@ const roles = requiredRoles => (req, res, next) => {
     })
   }
 }
+
+const checkTokenBlacklisting = async (req, res, next) => {
+  const token = req.headers[ACCESS_TOKEN_HEADER_KEY]
+  const isBlacklisted = await blacklist.isTokenBlacklisted(token)
+  if (isBlacklisted) {
+    res.status(401).json({ error: 'Token needs to be refreshed' })
+  } else {
+    next()
+  }
+}
+
 module.exports = {
-  checkAuth, roles
+  checkAuth, roles, checkTokenBlacklisting
 }
