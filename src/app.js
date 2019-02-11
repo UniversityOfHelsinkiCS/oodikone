@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 const Raven = require('raven')
 const conf = require('./conf-backend')
 const routes = require('./routes')
-const PORT = 8080
+const { PORT } = conf
 const app = express()
 
 Raven.config(process.env.SENTRY_ADDR).install()
