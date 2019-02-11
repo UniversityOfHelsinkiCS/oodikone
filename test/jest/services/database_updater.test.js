@@ -4,8 +4,7 @@ const httpAdapter = require('axios/lib/adapters/http')
 const { OODI_ADDR } = require('../../../src/conf-backend')
 const { updateFaculties } = require('../../../src/services/doo_api_database_updater/database_updater')
 const { faculties } = require('./test_data')
-const { Organisation, sequelize } = require('../../../src/models/index')
-const { forceSyncDatabase } = require('../../../src/database/connection')
+const { Organisation } = require('../../../src/models/index')
 
 const configureAxios = () => {
   axios.defaults.adapter = httpAdapter
@@ -22,11 +21,9 @@ const mockApiGet = (path, data) => {
 
 beforeAll(async () => {
   configureAxios()
-  await forceSyncDatabase()
 })
 
 afterAll(async () => {
-  await sequelize.close()
 })
 
 describe('Database updater for saving faculties', () => {
