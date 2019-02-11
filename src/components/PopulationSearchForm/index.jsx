@@ -42,6 +42,7 @@ class PopulationSearchForm extends Component {
     studyTracks: arrayOf(dropdownType), //eslint-disable-line
     setLoading: func.isRequired,
     extents: arrayOf(object).isRequired,
+    asUser: string,
     pending: bool //eslint-disable-line
   }
 
@@ -632,6 +633,10 @@ const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes
     pending,
     extents: populations.data.extents || []
   })
+}
+
+PopulationSearchForm.defaultProps = {
+  asUser: null
 }
 
 const mapDispatchToProps = dispatch => ({
