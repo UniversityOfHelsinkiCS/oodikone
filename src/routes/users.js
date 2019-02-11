@@ -66,4 +66,25 @@ router.post('/:uid/elements', async (req, res) => {
   res.json(user)
 })
 
+router.delete('/:uid/elements', async (req, res) => {
+  const { uid } = req.params
+  const { codes } = req.body
+  const user = await userService.removeElementDetails(uid, codes)
+  await blacklistRequestToken(req)
+  res.json(user)
+})
+
+router.post('/language', async (req, res) => {
+  const { username, language } = req.body
+  if (!['fi','sv','en'].includes(language)) {
+    return res.status(400).json('invalid language')
+  }
+  try {
+    const result = await userService.updateUser(username, { language })
+    return res.status(200).json(result)
+  } catch (e) {
+    return res.status(e.response.status).json(e.response.data)
+  }
+})
+
 module.exports = router
