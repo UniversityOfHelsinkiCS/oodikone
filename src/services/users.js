@@ -135,6 +135,12 @@ const enableElementDetails = async (uid, codes) => {
   await user.addElementdetails(elements)
 }
 
+const removeElementDetails = async (uid, codes) => {
+  const user = await byId(uid)
+  const elements = await ElementService.byCodes(codes)
+  await user.removeElementdetails(elements)
+}
+
 const modifyRights = async (uid, rights) => {
   console.log(uid, rights)
   const rightsToAdd = Object.entries(rights).map(([code, val]) => {
@@ -171,6 +177,7 @@ module.exports = {
   getUnitsFromElementDetails,
   getUserElementDetails,
   enableElementDetails,
+  removeElementDetails,
   login,
   superlogin,
   modifyRights,
