@@ -6,7 +6,7 @@ import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
 import { textAndDescriptionSearch } from '../../common'
 import LanguageChooser from '../LanguageChooser'
-import { addUserUnits, removeUserUnit, getAccessGroups, modifyAccessGroups } from '../../redux/users'
+import { addUserUnits, removeUserUnits, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 import { setAsUser } from '../../redux/settings'
 
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
@@ -70,7 +70,7 @@ class UserPage extends Component {
     setTimeout(() => this.setState({ visible: false }), 5000)
   }
 
-  removeAccess = (uid, unit) => () => this.props.removeUserUnit(uid, unit)
+  removeAccess = (uid, unit) => () => this.props.removeUserUnits(uid, [unit])
 
   degreeOptions = () => {
     const { degrees } = this.props.associations
@@ -334,7 +334,7 @@ UserPage.propTypes = {
   }).isRequired,
   setAsUser: func.isRequired,
   addUserUnits: func.isRequired,
-  removeUserUnit: func.isRequired,
+  removeUserUnits: func.isRequired,
   language: string.isRequired,
   goBack: func.isRequired,
   getDegreesAndProgrammesUnfiltered: func.isRequired,
@@ -358,7 +358,7 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   addUserUnits,
-  removeUserUnit,
+  removeUserUnits,
   getDegreesAndProgrammesUnfiltered,
   getAccessGroups,
   modifyAccessGroups,
