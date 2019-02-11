@@ -1,5 +1,4 @@
-const { forceSyncDatabase } = require('../../../src/database/connection')
-const { sequelize, Student, Course, ElementDetails, StudyrightElement, Studyright, Credit, StudyrightExtent, Semester } = require('../../../src/models/index')
+const { Student, Course, ElementDetails, StudyrightElement, Studyright, Credit, StudyrightExtent, Semester } = require('../../../src/models/index')
 const { optimizedStatisticsOf } = require('../../../src/services/populations')
 
 const langify = name => ({
@@ -62,7 +61,6 @@ const createQueryObject = (year, semester, codes, months) => ({
 })
 
 afterAll(async () => {
-  await sequelize.close()
 })
 
 describe('optimizedStatisticsOf tests', () => {
@@ -137,7 +135,6 @@ describe('optimizedStatisticsOf tests', () => {
     `, () => {
 
     beforeAll(async () => {
-      await forceSyncDatabase()
       await Semester.bulkCreate([semesters.fall, semesters.spring])
       await Student.create(student)
       await Course.create(courses.elements_of_ai)

@@ -1,12 +1,11 @@
 const redis = require('redis')
+const bluebird = require('bluebird')
 const conf = require('../conf-backend.js')
 
-let redisClient // eslint disable-line
+bluebird.promisifyAll(redis.RedisClient.prototype)
 
-if (process.env.NODE_ENV !== 'test') {
-  redisClient = redis.createClient(6379, conf.redis)
-  require('bluebird').promisifyAll(redis.RedisClient.prototype)
-}
+const redisClient = redis.createClient(6379, conf.redis)
+
 module.exports = {
   redisClient
 }
