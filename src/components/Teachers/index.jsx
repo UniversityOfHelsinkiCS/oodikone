@@ -76,8 +76,7 @@ TeachersTabs.defaultProps = {
 Teachers.defaultProps = {
   match: {
     params: { teacherid: undefined }
-  },
-  admin: undefined
+  }
 }
 
 export default withRouter(Teachers)
