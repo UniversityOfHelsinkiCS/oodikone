@@ -102,7 +102,7 @@ export const transferTo = (params) => {
   return ({
     id: uuidv4(),
     type: 'TransferToStudyrightFilter',
-    params: {},
+    params: { negated },
     filter: student => (negated ? student.transferredStudyright : !student.transferredStudyright)
   })
 }
