@@ -7,7 +7,6 @@ import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
 import { textAndDescriptionSearch } from '../../common'
 import LanguageChooser from '../LanguageChooser'
 import { addUserUnits, removeUserUnits, getAccessGroups, modifyAccessGroups } from '../../redux/users'
-import { setAsUser } from '../../redux/settings'
 
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
 import { superLogin } from '../../apiConnection'
@@ -123,8 +122,8 @@ class UserPage extends Component {
 
   showAs = async (uid) => {
     await superLogin(uid)
-    this.props.setAsUser(uid)
     this.props.history.push('/')
+    window.location.reload()
   }
 
   renderUnitList = (elementdetails, user) => {
@@ -332,7 +331,6 @@ UserPage.propTypes = {
       type: number
     }))
   }).isRequired,
-  setAsUser: func.isRequired,
   addUserUnits: func.isRequired,
   removeUserUnits: func.isRequired,
   language: string.isRequired,
@@ -361,6 +359,5 @@ export default connect(mapStateToProps, {
   removeUserUnits,
   getDegreesAndProgrammesUnfiltered,
   getAccessGroups,
-  modifyAccessGroups,
-  setAsUser
+  modifyAccessGroups
 })(withRouter(UserPage))

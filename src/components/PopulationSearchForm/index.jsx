@@ -42,7 +42,6 @@ class PopulationSearchForm extends Component {
     studyTracks: arrayOf(dropdownType), //eslint-disable-line
     setLoading: func.isRequired,
     extents: arrayOf(object).isRequired,
-    asUser: string,
     pending: bool //eslint-disable-line
   }
 
@@ -55,29 +54,24 @@ class PopulationSearchForm extends Component {
       isLoading: false,
       showAdvancedSettings: false,
       momentYear: Datetime.moment('2017-01-01'),
-      floatMonths: this.months('2017', 'FALL'),
-      asUser: null
+      floatMonths: this.months('2017', 'FALL')
     }
   }
 
   componentDidMount() {
-    const { studyProgrammes, asUser } = this.props
-    if (asUser !== this.state.asUser || !studyProgrammes || Object.values(studyProgrammes).length === 0) {
-      this.setState({ asUser: asUser, query: this.initialQuery() }) // eslint-disable-line
+    const { studyProgrammes } = this.props
+    if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
+      this.setState({ query: this.initialQuery() }) // eslint-disable-line
       this.props.getDegreesAndProgrammes()
     }
   }
 
   componentDidUpdate() {
-    const { studyProgrammes, asUser } = this.props
+    const { studyProgrammes } = this.props
     if (studyProgrammes
       && Object.values(studyProgrammes).length === 1
       && !this.state.query.studyRights.programme) {
       this.handleProgrammeChange(null, { value: Object.values(studyProgrammes)[0].code })
-    }
-    if (asUser !== this.state.asUser) {
-      this.setState({ asUser: asUser, query: this.initialQuery() }) // eslint-disable-line
-      this.props.getDegreesAndProgrammes()
     }
   }
 
@@ -622,21 +616,16 @@ class PopulationSearchForm extends Component {
 }
 
 const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes, locale }) => {
-  const { language, asUser } = settings
+  const { language } = settings
   const { pending } = populationDegreesAndProgrammes
   return ({
     language,
-    asUser,
     queries: populations.query || {},
     translate: getTranslate(locale),
     studyProgrammes: populationDegreesAndProgrammes.data.programmes || {},
     pending,
     extents: populations.data.extents || []
   })
-}
-
-PopulationSearchForm.defaultProps = {
-  asUser: null
 }
 
 const mapDispatchToProps = dispatch => ({

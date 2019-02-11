@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { getToken, setToken, userIsMock } from '../common'
+import { getToken, setToken, getAsUserWithoutRefreshToken } from '../common'
 import { API_BASE_PATH, TOKEN_NAME, BASE_PATH } from '../constants'
 
 const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
@@ -65,11 +65,6 @@ export const returnToSelf = async () => {
   await setToken(token)
 }
 
-export const swapUser = async (uid) => {
-  const token = await superLogin(uid)
-  await setToken(token)
-}
-
 export const callApi = async (url, method = 'get', data, params, timeout = 0) => {
   let options = { headers: {}, timeout }
   if (isDevEnv) {
@@ -120,7 +115,7 @@ export const handleRequest = store => next => async (action) => {
     } catch (e) {
       // Something failed. Assume it's the token and try again.
       try {
-        const mock = await userIsMock()
+        const mock = getAsUserWithoutRefreshToken()
         if (!mock) await getToken(true)
         const res = await callApi(route, method, data, params)
         store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
