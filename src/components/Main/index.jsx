@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { localize } from 'react-localize-redux'
 import { Loader, Image, Transition } from 'semantic-ui-react'
+import { shape } from 'prop-types'
 import * as Sentry from '@sentry/browser'
 
 import Header from '../Header'
@@ -135,6 +136,10 @@ class Main extends Component {
       </div>
     )
   }
+}
+
+Main.propTypes = {
+  store: shape({}).isRequired
 }
 
 export default localize(Main, 'locale')

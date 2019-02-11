@@ -32,8 +32,8 @@ class UserPage extends Component {
   }
 
   async componentDidMount() {
-    const { associations, accessgroupPending } = this.props
-    if (Object.keys(associations).length === 0 && !accessgroupPending) {
+    const { associations, pending } = this.props
+    if (Object.keys(associations).length === 0 && !pending) {
       this.props.getDegreesAndProgrammesUnfiltered()
       await this.props.getAccessGroups()
     }
