@@ -14,7 +14,7 @@ export const graphSeriesTypes = {
 export const getDataObject = (name, data, stack) => ({ name, data, stack })
 
 export const getMaxValueOfSeries = series => Object.values(series).reduce((acc, cur) => {
-  const curMax = Math.max(...cur.data.map(Math.abs))
+  const curMax = Math.max(...cur.data.filter(n => !Number.isNaN(n)).map(Math.abs))
   return curMax >= acc ? curMax : acc
 }, 0)
 
