@@ -53,7 +53,7 @@ const findTeacherCredits = teacherid => Teacher.findByPrimary(teacherid, {
   attributes: ['name', 'code', 'id'],
   include: {
     model: Credit,
-    attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode'],
+    attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
     include: [
       {
         model: Course,
