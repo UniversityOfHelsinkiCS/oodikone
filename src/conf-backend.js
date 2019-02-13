@@ -29,8 +29,7 @@ if (process.env.NODE_ENV === 'dev' && process.env.FEATURES) {
 }
 
 const OODI = {
-  test: 'http://localhost',
-  anon: process.env.OODI_ADDR_ANON
+  test: process.env.OODI_ADDR_ANON
 }
 
 const OODI_ADDR = OODI[process.env.NODE_ENV] || process.env.OODI_ADDR
