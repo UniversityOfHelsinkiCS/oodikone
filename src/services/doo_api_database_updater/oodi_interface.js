@@ -18,7 +18,7 @@ const instance = axios.create({
   httpsAgent: agent
 })
 
-const getUrl = process.env.NODE_ENV === 'anon' ? async (url) => JSON.parse(await fs.readFileSync(url)) : instance.get
+const getUrl = instance.get
 
 const attemptGetFor = async (url, attempts = 5) => {
   let attempt = 0
