@@ -1,6 +1,14 @@
 require('dotenv').config()
 
-const DB_URL = process.env.NODE_ENV === 'test' ? process.env.TEST_DB : process.env.DB_URL
+const { NODE_ENV } = process.env
+let DB_URL = process.env.DB_URL
+if (NODE_ENV === 'test') {
+  DB_URL = process.env.TEST_DB
+}
+else if (NODE_ENV === 'anon') {
+  DB_URL = process.env.ANON_DB
+}
+console.log(process.env)
 const frontend_addr = process.env.FRONT_URL
 const redis = process.env.REDIS
 const TOKEN_SECRET = process.env.TOKEN_SECRET
@@ -22,7 +30,7 @@ const formatURL = url => {
 if (process.env.NODE_ENV === 'dev' && process.env.FEATURES) {
   const toggled = process.env.FEATURES.split(',')
   toggled.map(toggle => toggle.trim()).forEach(feature => {
-    if(FEATURES[feature] !== undefined) {
+    if (FEATURES[feature] !== undefined) {
       FEATURES[feature] = true
     }
   })

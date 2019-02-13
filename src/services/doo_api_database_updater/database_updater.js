@@ -2,7 +2,14 @@ const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
 const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
-const { Student, Studyright, ElementDetails, StudyrightElement, Credit, Course, Teacher, Organisation, StudyrightExtent, CourseType, CourseDisciplines, Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider, Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment, sequelize, CreditTeacher } = require('../../../src/models/index')
+const {
+  Student, Studyright, ElementDetails, StudyrightElement, Credit, Course,
+  Teacher, Organisation, StudyrightExtent, CourseType, CourseDisciplines,
+  Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider,
+  Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment, sequelize,
+  CreditTeacher
+} = require('../../../src/models/index')
+
 const _ = require('lodash')
 const { taskpool } = require('../../util/taskpool')
 const { updateAttainmentDates } = require('./update_attainment_dates')
@@ -146,7 +153,8 @@ const updateStudentFromData = async (api) => {
   }
 }
 
-const getStudentsDataFromApi = numbers => Promise.all(numbers.map(studentnumber => getAllStudentInformationFromApi(studentnumber)))
+const getStudentsDataFromApi = numbers => Promise.all(numbers.map(studentnumber =>
+  getAllStudentInformationFromApi(studentnumber)))
 
 const updateStudents = async (studentnumbers, chunksize = 1, onUpdateStudent = undefined) => {
   const runOnUpdate = _.isFunction(onUpdateStudent)
@@ -243,7 +251,8 @@ const getLearningOpportunityFromApi = (courseids) => {
 
 const createOrUpdateCourseFromLearningOpportunityData = async data => {
   await Course.upsert(mapper.learningOpportunityDataToCourse(data))
-  await Promise.all((mapper.learningOpportunityDataToCourseDisciplines(data).map(coursediscipline => CourseDisciplines.upsert(coursediscipline))))
+  await Promise.all((mapper.learningOpportunityDataToCourseDisciplines(data).map(coursediscipline =>
+    CourseDisciplines.upsert(coursediscipline))))
 }
 
 const createOrUpdateCourseProviders = async data => {
@@ -316,7 +325,8 @@ const updateCourseRealisationsAndEnrollments = async (courseids, since = '0000-0
   const chunks = _.chunk(apidata, chunksize)
   const pool = taskpool(5)
   for (let chunk of chunks) {
-    const datas = await Promise.all(chunk.map(courserealisation_id => Oodi.getCourseUnitRealisation(courserealisation_id)))
+    const datas = await Promise.all(chunk.map(courserealisation_id =>
+      Oodi.getCourseUnitRealisation(courserealisation_id)))
     await pool.enqueue(() => Promise.all(datas.map(async data => {
       if (!data) {
         return
@@ -351,4 +361,9 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   await updateAttainmentDates()
 }
 
-module.exports = { updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders, updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes, updateTeachersInDb, updateStudentsTaskPooled, updateCourseRealisationsAndEnrollments, getExistingCourseRealisationCodes, updateCourseRealisationsForCoursesInDb }
+module.exports = {
+  updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders,
+  updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes,
+  updateTeachersInDb, updateStudentsTaskPooled, updateCourseRealisationsAndEnrollments,
+  getExistingCourseRealisationCodes, updateCourseRealisationsForCoursesInDb
+}

@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken')
 const conf = require('../conf-backend')
-const UserService = require('../services/userService')
 const blacklist = require('../services/blacklist')
 const { ACCESS_TOKEN_HEADER_KEY } = require('../conf-backend')
 
@@ -16,12 +15,6 @@ const checkAuth = async (req, res, next) => {
       } else if (isShibboUser(decoded.userId, uid)) {
         if (decoded.enabled) {
           req.decodedToken = decoded
-          if (decoded.roles.map(r => r.group_code).includes('admin') && decoded.asuser) {
-            req.decodedToken.userId = decoded.asuser
-            req.decodedToken.roles = await UserService.getRolesFor(decoded.asuser)
-            req.decodedToken.rights = Object.values(await UserService.getUserElementDetails(decoded.asuser))
-              .map(a => a.code)
-          }
           next()
         } else {
           res.status(403).json({ error: 'User is not enabled' })
