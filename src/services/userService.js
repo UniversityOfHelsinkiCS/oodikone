@@ -71,6 +71,11 @@ const enableElementDetails = async (uid, codes) => {
   return response.data.user
 }
 
+const removeElementDetails = async (uid, codes) => {
+  const response = await client.post('/remove_rights', { uid, codes })
+  return response.data.user
+}
+
 const getUnitsFromElementDetails = async username => {
   const url = `/user/elementdetails/${username}`
   const response = await client.get(url)
@@ -98,6 +103,7 @@ module.exports = {
   login,
   superlogin,
   enableElementDetails,
+  removeElementDetails,
   findAll,
   modifyAccess,
   getAccessGroups,

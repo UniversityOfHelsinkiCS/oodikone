@@ -1,4 +1,7 @@
-const { Student, Course, ElementDetails, StudyrightElement, Studyright, Credit, StudyrightExtent, Semester } = require('../../../src/models/index')
+const {
+  Student, Course, ElementDetails, StudyrightElement,
+  Studyright, Credit, StudyrightExtent, Semester
+} = require('../../../src/models/index')
 const { optimizedStatisticsOf } = require('../../../src/services/populations')
 
 const langify = name => ({
