@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { withRouter, Redirect } from 'react-router-dom'
-import { Button, Icon, Header, Segment, Confirm } from 'semantic-ui-react'
+import { withRouter } from 'react-router-dom'
+import { Button, Icon, Header, Segment, Confirm, Loader } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
@@ -51,7 +51,7 @@ class EnableUsers extends Component {
     const { users } = this.props
     const user = users.find(u => u.id === userid)
     return !user
-      ? <Redirect to="/users" />
+      ? <Loader active />
       : (
         <UserPageNew
           userid={userid}
