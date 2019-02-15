@@ -52,8 +52,9 @@ class Main extends Component {
   componentDidCatch = async (e) => {
     const { store } = this.props
     const name = await getUserName()
+    const state = store.getState()
     Sentry.configureScope((scope) => {
-      Object.keys(store).forEach((key) => {
+      Object.keys(state).forEach((key) => {
         scope.setExtra(key, JSON.stringify(store[key]))
       })
       scope.setUser({ username: name })
@@ -76,7 +77,7 @@ class Main extends Component {
       } else {
         this.setState({
           networkError: false,
-          guide: `try refreshing your browser window, pressing 
+          guide: `try refreshing your browser window, pressing
             log out or contacting grp-toska@helsinki.fi`
         })
       }
