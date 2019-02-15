@@ -6,8 +6,7 @@ import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
 import { textAndDescriptionSearch } from '../../common'
 import LanguageChooser from '../LanguageChooser'
-import { addUserUnits, removeUserUnit, getAccessGroups, modifyAccessGroups } from '../../redux/users'
-import { setAsUser } from '../../redux/settings'
+import { addUserUnits, removeUserUnits, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
 import { superLogin } from '../../apiConnection'
@@ -32,8 +31,8 @@ class UserPage extends Component {
   }
 
   async componentDidMount() {
-    const { associations, accessgroupPending } = this.props
-    if (Object.keys(associations).length === 0 && !accessgroupPending) {
+    const { associations, pending } = this.props
+    if (Object.keys(associations).length === 0 && !pending) {
       this.props.getDegreesAndProgrammesUnfiltered()
       await this.props.getAccessGroups()
     }
@@ -70,7 +69,7 @@ class UserPage extends Component {
     setTimeout(() => this.setState({ visible: false }), 5000)
   }
 
-  removeAccess = (uid, unit) => () => this.props.removeUserUnit(uid, unit)
+  removeAccess = (uid, unit) => () => this.props.removeUserUnits(uid, [unit])
 
   degreeOptions = () => {
     const { degrees } = this.props.associations
@@ -123,8 +122,8 @@ class UserPage extends Component {
 
   showAs = async (uid) => {
     await superLogin(uid)
-    this.props.setAsUser(uid)
     this.props.history.push('/')
+    window.location.reload()
   }
 
   renderUnitList = (elementdetails, user) => {
@@ -332,9 +331,8 @@ UserPage.propTypes = {
       type: number
     }))
   }).isRequired,
-  setAsUser: func.isRequired,
   addUserUnits: func.isRequired,
-  removeUserUnit: func.isRequired,
+  removeUserUnits: func.isRequired,
   language: string.isRequired,
   goBack: func.isRequired,
   getDegreesAndProgrammesUnfiltered: func.isRequired,
@@ -358,9 +356,8 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   addUserUnits,
-  removeUserUnit,
+  removeUserUnits,
   getDegreesAndProgrammesUnfiltered,
   getAccessGroups,
-  modifyAccessGroups,
-  setAsUser
+  modifyAccessGroups
 })(withRouter(UserPage))
