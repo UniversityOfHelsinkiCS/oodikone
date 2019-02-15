@@ -29,12 +29,13 @@ const checkAuth = async (req, res, next) => {
 }
 
 const roles = requiredRoles => (req, res, next) => {
-  if (req.decodedToken && req.decodedToken.roles) {
+  if (req.decodedToken && req.decodedToken.roles != null) {
     const roles = req.decodedToken.roles.map(r => r.group_code)
     console.log(`Request has roles: ${roles}`)
     if (requiredRoles.every(r => roles.indexOf(r) >= 0) || roles.includes('admin')) {
       console.log(`authorized for ${requiredRoles}`)
       next()
+      return
     }
   }
   console.log(`missing required roles ${requiredRoles}`)
