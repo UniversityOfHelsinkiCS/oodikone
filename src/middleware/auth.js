@@ -29,19 +29,17 @@ const checkAuth = async (req, res, next) => {
 }
 
 const roles = requiredRoles => (req, res, next) => {
-  const token = req.headers['x-access-token']
-  if (token) {
-    jwt.verify(token, conf.TOKEN_SECRET, (err, decoded) => {
-      const roles = decoded.roles.map(r => r.group_code)
-      console.log(`Request has roles: ${roles}`)
-      if (requiredRoles.every(r => roles.indexOf(r) >= 0) || roles.includes('admin')) {
-        console.log(`authorized for ${requiredRoles}`)
-        next()
-      } else {
-        console.log(`missing required roles ${requiredRoles}`)
-      }
-    })
+  if (req.decodedToken && req.decodedToken.roles != null) {
+    const roles = req.decodedToken.roles.map(r => r.group_code)
+    console.log(`Request has roles: ${roles}`)
+    if (requiredRoles.every(r => roles.indexOf(r) >= 0) || roles.includes('admin')) {
+      console.log(`authorized for ${requiredRoles}`)
+      next()
+      return
+    }
   }
+  console.log(`missing required roles ${requiredRoles}`)
+  res.status(403).json({ error: 'missing required roles' })
 }
 
 const checkTokenBlacklisting = async (req, res, next) => {
