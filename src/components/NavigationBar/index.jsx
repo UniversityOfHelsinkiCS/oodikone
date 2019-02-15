@@ -86,7 +86,7 @@ class NavigationBar extends Component {
     }
 
     return (
-      <Menu.Item link onClick={logout} icon="log out" tabIndex="-1">
+      <Menu.Item link onClick={logout} icon="log out" tabIndex="-1" style={{ width: `${itemWidth}%` }}>
         {translate('navigationBar.logout')}
       </Menu.Item>
     )
