@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Input, Button, Table } from 'semantic-ui-react'
+import { shape } from 'prop-types'
 import { connect } from 'react-redux'
 import { doGet } from '../../redux/postman'
 
@@ -78,6 +79,10 @@ class Postman extends Component {
         </div>
       )
     }
+}
+
+Postman.propTypes = {
+  postman: shape({}).isRequired
 }
 
 const mapStateToProps = ({ postman }) => ({ postman })
