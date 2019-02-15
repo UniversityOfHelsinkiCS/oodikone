@@ -87,7 +87,7 @@ ping_psql () {
 
 db_setup_full () {
     echo "Getting backups from the Oodikone server, this will prompt you for your password. "
-    get_anon_oodikone
+    get_oodikone_server_backup
     echo "Unpacking compressed files"
     unpack_oodikone_server_backup
     echo "Restoring PostgreSQL from backup"
@@ -103,7 +103,7 @@ db_setup_full () {
 
 db_anon_setup_full () {
     echo "Getting anon backups from the private repository. "
-    get_oodikone_server_backup
+    get_anon_oodikone
     echo "Unpacking compressed files"
     unpack_oodikone_server_backup
     echo "Restoring PostgreSQL from backup"
