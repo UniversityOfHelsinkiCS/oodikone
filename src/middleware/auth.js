@@ -12,7 +12,7 @@ const checkAuth = async (req, res, next) => {
     jwt.verify(token, conf.TOKEN_SECRET, async (err, decoded) => {
       if (err) {
         res.status(403).json(err)
-      } else if (isShibboUser(decoded.userId, uid)) {
+      } else if (decoded.mockedBy ? isShibboUser(decoded.mockedBy, uid) : isShibboUser(decoded.userId, uid)) {
         if (decoded.enabled) {
           req.decodedToken = decoded
           next()
