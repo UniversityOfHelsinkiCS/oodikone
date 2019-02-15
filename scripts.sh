@@ -46,6 +46,18 @@ get_oodikone_server_backup() {
     scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
 }
 
+get_anon_oodikone() {
+    mkdir keys
+    cat $OODI_KEY > keys/private.key
+    cat $OODI_KEY_PUB > keys/public.key
+    chmod 700 keys
+    chmod 600 keys/private.key
+    chmod 644 keys/public.key    
+
+    GIT_SSH_COMMAND='ssh -i keys/private.key' git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
+    mv anonyymioodi/anon.bak.bz2 ./$BACKUP_DIR/latest-pg.bak.bz2
+}
+
 unpack_oodikone_server_backup() {
     bunzip2 -d -v ./$BACKUP_DIR/*.bz2
 }
@@ -75,6 +87,22 @@ ping_psql () {
 
 db_setup_full () {
     echo "Getting backups from the Oodikone server, this will prompt you for your password. "
+    get_anon_oodikone
+    echo "Unpacking compressed files"
+    unpack_oodikone_server_backup
+    echo "Restoring PostgreSQL from backup"
+    ping_psql "oodi_db" "tkt_oodi"
+    retry restore_psql_from_backup
+    echo "Restoring MongoDB from backup"
+    retry restore_mongodb_from_backup
+    echo "Restore user db from backup"
+    ping_psql "oodi_user_db" "user_db"
+    retry restore_userdb_from_backup
+    echo "Database setup finished"
+}
+
+db_anon_setup_full () {
+    echo "Getting anon backups from the private repository. "
     get_oodikone_server_backup
     echo "Unpacking compressed files"
     unpack_oodikone_server_backup
@@ -115,6 +143,21 @@ run_full_setup () {
     docker_build
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_setup_full
+    echo "Adding git-hooks to projects"
+    create_symlink_git_hooks
+    echo "Restarting Docker backend containers to run migrations, etc."
+    docker_restart_backend
+    show_instructions
+}
+run_anon_full_setup () {
+    echo "Init dirs"
+    init_dirs
+    echo "Pull repos"
+    pull_git_repositories
+    echo "Building images, starting containers"
+    docker_build
+    echo "Setup oodikone db from dump, this will prompt you for your password."
+    db_anon_setup_full
     echo "Adding git-hooks to projects"
     create_symlink_git_hooks
     echo "Restarting Docker backend containers to run migrations, etc."

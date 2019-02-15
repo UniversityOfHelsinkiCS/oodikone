@@ -19,6 +19,7 @@ logo () {
 logo
 
 options=(
+    "Anon setup"
     "Full setup"
     "Full reset"
     "Quit"
@@ -26,6 +27,10 @@ options=(
 select opt in "${options[@]}"
 do
     case $opt in
+        "Anon setup")
+            mopo
+            run_anon_full_setup
+            ;;
         "Full setup")
             mopo
             run_full_setup
