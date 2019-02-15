@@ -82,7 +82,9 @@ export const userRights = async () => {
 }
 export const getAsUserWithoutRefreshToken = () => {
   const token = getTokenWithoutRefresh()
-  return token ? decodeToken(token).asuser : null
+  if (!token) return null
+  const decoded = decodeToken(token)
+  return decoded.mockedBy ? decoded.userId : null
 }
 export const getUserName = async () => {
   const token = await getToken()
