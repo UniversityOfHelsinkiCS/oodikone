@@ -42,9 +42,9 @@ const roles = requiredRoles => (req, res, next) => {
   res.status(403).json({ error: 'missing required roles' })
 }
 
-const checkTokenBlacklisting = async (req, res, next) => {
-  const token = req.headers[ACCESS_TOKEN_HEADER_KEY]
-  const isBlacklisted = await blacklist.isTokenBlacklisted(token)
+const checkUserBlacklisting = async (req, res, next) => {
+  const userId = req.decodedToken.userId
+  const isBlacklisted = await blacklist.isUserBlacklisted(userId)
   if (isBlacklisted) {
     res.status(401).json({ error: 'Token needs to be refreshed' })
   } else {
@@ -53,5 +53,5 @@ const checkTokenBlacklisting = async (req, res, next) => {
 }
 
 module.exports = {
-  checkAuth, roles, checkTokenBlacklisting
+  checkAuth, roles, checkUserBlacklisting
 }
