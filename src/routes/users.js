@@ -2,12 +2,6 @@ const router = require('express').Router()
 const userService = require('../services/userService')
 const mailservice = require('../services/mailservice')
 const blacklist = require('../services/blacklist')
-const { ACCESS_TOKEN_HEADER_KEY } = require('../conf-backend')
-
-const blacklistRequestToken = async (req) => {
-  const token = req.headers[ACCESS_TOKEN_HEADER_KEY]
-  await blacklist.addTokenToBlacklist(token)
-}
 
 router.get('/', async (req, res) => {
   const results = await userService.findAll()
@@ -26,15 +20,17 @@ router.put('/:id/enable', async (req, res) => {
   else {
     const result = await userService.updateUser(user.username, { is_enabled: !user.is_enabled })
     const status = result.error === undefined ? 200 : 400
-    await blacklistRequestToken(req)
+    await blacklist.addUserToBlacklist(user.username)
     res.status(status).json(result)
   }
 })
 
 router.post('/modifyaccess', async (req, res) => {
   try {
+    const { uid } = req.body
     const result = await userService.modifyAccess(req.body)
-    await blacklistRequestToken(req)
+    const user = await userService.byId(uid)
+    if (user) await blacklist.addUserToBlacklist(user.username)
     res.status(200).json(result)
   } catch (e) {
     res.status(400).json(e)
@@ -62,7 +58,7 @@ router.post('/:uid/elements', async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
   const user = await userService.enableElementDetails(uid, codes)
-  await blacklistRequestToken(req)
+  if (user) await blacklist.addUserToBlacklist(user.username)
   res.json(user)
 })
 
@@ -70,7 +66,7 @@ router.delete('/:uid/elements', async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
   const user = await userService.removeElementDetails(uid, codes)
-  await blacklistRequestToken(req)
+  if (user) await blacklist.addUserToBlacklist(user.username)
   res.json(user)
 })
 
