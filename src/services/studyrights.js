@@ -202,12 +202,11 @@ const associatedStudyrightElements = async (offset, limit) => {
 
 const calculateAssociationsFromDb = async (chunksize=100000) => {
   const getSemester = momentstartdate => {
-    const month = momentstartdate.month()+1
-    if (month >= 1 && month < 8) return 'SPRING'
+    if (momentstartdate < moment(`${momentstartdate.utc().year()}-07-31 21:00:00+00`)) return 'SPRING'
     return 'FALL'
   }
   const getEnrollmentStartYear = momentstartdate => {
-    if (getSemester(momentstartdate) == 'SPRING') return momentstartdate.year() - 1
+    if (getSemester(momentstartdate) == 'SPRING') return momentstartdate.utc(2).year() - 1
     return momentstartdate.year()
   }
   const total = await Studyright.count()
@@ -247,7 +246,7 @@ const calculateAssociationsFromDb = async (chunksize=100000) => {
               studyTracks: {}
             }
             const enrollmentStartYear = enrollmentStartYears[enrollment]
-            
+
             group.filter(e => e.studyrightid === studyrightid && e.code !== code).forEach(e => {
               if (e.type == 10) {
                 enrollmentStartYear.degrees[e.code] = {
