@@ -16,11 +16,9 @@ app.get('/ping', async (req, res) => {
   res.json({ data: 'pong' })
 })
 
-let BASE_URL = '/'
+let BASE_URL = ''
 if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test') {
   BASE_URL = '/api'
-} else if (process.env.NODE_ENV === 'prod') {
-  BASE_URL = ''
 }
 
 routes(app, BASE_URL)
