@@ -39,7 +39,6 @@ const StudentTable = ({ stats, name }) => {
             title: 'Time',
             getRowVal: s => s.code,
             getRowContent: s => s.name,
-            cellProps: { singleLine: true },
             headerProps: { rowSpan: 2, width: 3 }
           }, {
             key: 'TOTAL',
