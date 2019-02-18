@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
-import { textAndDescriptionSearch } from '../../common'
+import { textAndDescriptionSearch, getRolesWithoutRefreshToken } from '../../common'
 import LanguageChooser from '../LanguageChooser'
 import { addUserUnits, removeUserUnits, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 
@@ -286,13 +286,13 @@ class UserPage extends Component {
                   <Transition.Group animation="drop" duration="1000">
                     {this.state.visible && <Image centered size="small" src="https://images.alko.fi/images/cs_srgb,f_auto,t_large/cdn/003002/minttu-peppermint-40.jpg" />}
                   </Transition.Group>
-                  <Button
+                  {this.props.isAdmin ? <Button
                     basic
                     fluid
                     positive
                     content="Show Oodikone as this user"
                     onClick={() => this.showAs(user.username)}
-                  />
+                  /> : null}
                 </Form>
               </Card.Description>
             </Card.Content>
@@ -343,7 +343,8 @@ UserPage.propTypes = {
   }).isRequired,
   getAccessGroups: func.isRequired,
   accessGroups: arrayOf(object).isRequired,
-  modifyAccessGroups: func.isRequired
+  modifyAccessGroups: func.isRequired,
+  isAdmin: bool.isRequired
 }
 
 const mapStateToProps = state => ({
@@ -351,7 +352,8 @@ const mapStateToProps = state => ({
   units: state.units.data,
   associations: state.populationDegreesAndProgrammesUnfiltered.data,
   pending: !!state.populationDegreesAndProgrammesUnfiltered.pending,
-  accessGroups: state.users.accessGroupsData || []
+  accessGroups: state.users.accessGroupsData || [],
+  isAdmin: getRolesWithoutRefreshToken().includes('admin')
 })
 
 export default connect(mapStateToProps, {
