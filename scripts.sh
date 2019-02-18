@@ -47,14 +47,10 @@ get_oodikone_server_backup() {
 }
 
 get_anon_oodikone() {
-    mkdir keys
-    cat $OODI_KEY > keys/private.key
-    cat $OODI_KEY_PUB > keys/public.key
-    chmod 700 keys
-    chmod 600 keys/private.key
-    chmod 644 keys/public.key    
+    cat "$OODI_KEY" > private.key
+    chmod 400 private.key
 
-    GIT_SSH_COMMAND='ssh -i keys/private.key' git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
+    GIT_SSH_COMMAND='ssh -i private.key' git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
     mv anonyymioodi/anon.bak.bz2 ./$BACKUP_DIR/latest-pg.bak.bz2
 }
 
