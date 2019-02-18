@@ -108,7 +108,7 @@ class StudentSearch extends Component {
           className: styles.clickable,
           onClick: () => this.handleSearchSelect(s)
         })}
-        tableProps={{ celled: false, singleLine: true, sortable: false }}
+        tableProps={{ celled: false, sortable: false }}
         columns={columns}
         data={students}
       />

@@ -96,7 +96,7 @@ class AggregateView extends Component {
         :
           <SortableTable
             getRowKey={gc => gc.id}
-            tableProps={{ celled: false, singleLine: true }}
+            tableProps={{ celled: false }}
             columns={columns}
             data={courseGroups}
           />
