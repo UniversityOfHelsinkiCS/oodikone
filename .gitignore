@@ -6,3 +6,4 @@ redis-data
 mongodata
 repos/oodilearn/training/data
 backups
+private.key
