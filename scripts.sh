@@ -78,7 +78,8 @@ db_oodikone_reset () {
 
 ping_psql () {
     echo "Pinging psql in container $1 with db name $2"
-    retry docker exec -u postgres $1 pg_isready -d $2
+    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi"
+    retry docker exec -u postgres $1 pg_isready
 }
 
 db_setup_full () {
