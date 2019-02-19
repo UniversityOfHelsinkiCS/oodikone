@@ -24,7 +24,6 @@ export const getCourseDisciplines = () => {
   return callController(route, prefix)
 }
 
-
 export const clearCouresStatistics = () => ({
   type: 'CLEAR_COURSE_STATISTICS'
 })

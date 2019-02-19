@@ -41,7 +41,6 @@ const filterStudents = (students, minCredits, maxCredits = Infinity) => {
   }
 }
 
-
 const PopulationCreditGainTable = (props) => {
   const setCreditFilter = (row) => {
     props.filters.map(filter => props.removePopulationFilter(filter.id))

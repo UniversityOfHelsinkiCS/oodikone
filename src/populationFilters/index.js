@@ -199,7 +199,6 @@ export const creditsLessThanFromMandatory = (params) => {
   })
 }
 
-
 export const priorityStudyright = (params) => {
   const { prioritycode, degree, programme } = params
   return ({

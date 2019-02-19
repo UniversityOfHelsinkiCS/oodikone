@@ -46,7 +46,6 @@ const Index = ({ totalStudents, totalCourses, totalCredits, totalTeachers, activ
     coursesAmount = courses
   }
 
-
   return (
     <Statistic.Group className={styles.groupStatistics}>
       {getStatistic('Total teachers', teacherAmount)}

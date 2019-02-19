@@ -6,7 +6,6 @@ import ReactHighchart from 'react-highcharts'
 import { logout } from '../../apiConnection'
 import { images } from '../../common'
 
-
 import MulticolorBarChart from '../MulticolorBarChart'
 
 const dummyData = [

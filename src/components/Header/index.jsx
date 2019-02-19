@@ -8,7 +8,6 @@ import NavigationBar from '../NavigationBar'
 
 import styles from './header.css'
 
-
 const Header = props => (
   <header className={styles.header} role="banner">
     <div className={styles.headerBanner} />
