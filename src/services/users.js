@@ -6,6 +6,7 @@ const ElementService = require('./studyelements')
 const AccessService = require('./accessgroups')
 const Op = Sequelize.Op
 
+const TOKEN_VERSION = 1 // When token structure changes, increment in userservice and in backend
 const generateToken = async (uid, mockedBy = null) => {
   let user = await byUsername(uid)
   const elementdetails = await getUserElementDetails(user.username)
@@ -20,6 +21,7 @@ const generateToken = async (uid, mockedBy = null) => {
     rights: elements,
     roles: user.accessgroup,
     createdAt: moment().toISOString(),
+    version: TOKEN_VERSION,
   }
   const token = jwt.sign(payload, process.env.TOKEN_SECRET)
 
