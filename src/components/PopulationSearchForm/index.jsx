@@ -386,7 +386,6 @@ class PopulationSearchForm extends Component {
         options={programmesToRender}
         onChange={this.handleProgrammeChange}
         closeOnChange
-        disabled={programmesToRender.length === 1}
         clearable
       />
     </Form.Field>
