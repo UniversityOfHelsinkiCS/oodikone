@@ -6,7 +6,7 @@ const ElementService = require('./studyelements')
 const AccessService = require('./accessgroups')
 const Op = Sequelize.Op
 
-const TOKEN_VERSION = 1 // When token structure changes, increment in userservice and in backend
+const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
 const generateToken = async (uid, mockedBy = null) => {
   let user = await byUsername(uid)
   const elementdetails = await getUserElementDetails(user.username)
