@@ -42,6 +42,14 @@ pull_git_repositories () {
     popd
 }
 
+pull_e2e_git_repositories () {
+    pushd $REPOS
+    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
+    git clone https://github.com/UniversityOfHelsinkiCS/oodilearn.git
+    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git
+    popd
+}
+
 get_oodikone_server_backup() {
     scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
 }
@@ -52,6 +60,8 @@ get_anon_oodikone() {
 
     GIT_SSH_COMMAND='ssh -i private.key' git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
     mv anonyymioodi/anon.bak.bz2 ./$BACKUP_DIR/latest-pg.bak.bz2
+    mv anonyymioodi/user-dump.bak.bz2 ./$BACKUP_DIR/latest-user-pg.bak.bz2
+
 }
 
 unpack_oodikone_server_backup() {
@@ -160,4 +170,22 @@ run_anon_full_setup () {
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
     show_instructions
+}
+
+run_e2e_setup () {
+    echo "Init dirs"
+    init_dirs
+    echo "Pull repos"
+    pull_e2e_git_repositories
+    echo "Building images, starting containers"
+    docker-compose -f docker-compose.e2e.yml up -d --build
+    echo "Installing Cypress"
+    npm i -g cypress@^3.1.5
+    echo "Setup oodikone db from dump, this will prompt you for your password."
+    db_anon_setup_full
+    echo "Adding git-hooks to projects"
+    create_symlink_git_hooks
+    echo "Restarting Docker backend containers to run migrations, etc."
+    docker_restart_backend
+
 }
