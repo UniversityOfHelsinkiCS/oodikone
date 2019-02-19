@@ -46,7 +46,7 @@ const checkUserBlacklisting = async (req, res, next) => {
   const { userId, createdAt } = req.decodedToken
   const isBlacklisted = await blacklist.isUserBlacklisted(userId, createdAt)
   if (isBlacklisted) {
-    res.status(401).json({ error: 'Token needs to be refreshed' })
+    res.status(401).json({ error: 'Token needs to be refreshed', reloadPage: true })
   } else {
     next()
   }
