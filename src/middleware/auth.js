@@ -4,7 +4,7 @@ const blacklist = require('../services/blacklist')
 const { ACCESS_TOKEN_HEADER_KEY } = require('../conf-backend')
 
 const isShibboUser = (userId, uidHeader) => userId === uidHeader
-const TOKEN_VERSION = 1 // When token structure changes, increment in userservice and in backend
+const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
 
 const checkAuth = async (req, res, next) => {
   const token = req.headers[ACCESS_TOKEN_HEADER_KEY]
