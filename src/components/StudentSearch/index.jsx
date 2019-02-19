@@ -108,17 +108,15 @@ class StudentSearch extends Component {
           className: styles.clickable,
           onClick: () => this.handleSearchSelect(s)
         })}
-        tableProps={{ celled: false, singleLine: true, sortable: false }}
+        tableProps={{ celled: false, sortable: false }}
         columns={columns}
         data={students}
       />
     )
   }
 
-
   render() {
     const { translate, studentNumber } = this.props
-
 
     if (studentNumber) {
       return null
@@ -177,6 +175,5 @@ const mapDispatchToProps = dispatch => ({
   selectStudent: studentNumber =>
     dispatch(selectStudent(studentNumber))
 })
-
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Timeout(StudentSearch)))

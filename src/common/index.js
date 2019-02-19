@@ -86,6 +86,13 @@ export const getAsUserWithoutRefreshToken = () => {
   const decoded = decodeToken(token)
   return decoded.mockedBy ? decoded.userId : null
 }
+export const getRolesWithoutRefreshToken = () => {
+  const token = getTokenWithoutRefresh()
+  if (!token) return []
+  const decoded = decodeToken(token)
+  const roles = decoded.roles.map(r => r.group_code)
+  return roles
+}
 export const getUserName = async () => {
   const token = await getToken()
   return token ? decodeToken(token).userId : null

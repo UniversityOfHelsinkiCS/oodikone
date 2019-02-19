@@ -11,7 +11,6 @@ export const mapRightsToDropdown = rights =>
       description: r2.id,
       associations: r2.associations })))
 
-
 export const makeMapRightsToDropDown = () => createSelector(
   getUnits,
   mapRightsToDropdown

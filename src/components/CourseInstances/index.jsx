@@ -15,7 +15,6 @@ import { makeSortCourseInstances } from '../../selectors/courses'
 import styles from './courses.css'
 import sharedStyles from '../../styles/shared'
 
-
 const { func, arrayOf, object } = PropTypes
 
 class CourseInstances extends Component {

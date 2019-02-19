@@ -13,7 +13,6 @@ import styles from './studentInfoCard.css'
 import { removeStudentSelection, resetStudent } from '../../redux/students'
 import { updatePopulationStudents } from '../../redux/populations'
 
-
 const StudentInfoCard = (props) => {
   const { student, translate, showName, updating } = props
   const name = showName ? `${student.name}, ` : ''
@@ -23,7 +22,6 @@ const StudentInfoCard = (props) => {
     props.resetStudent()
     props.removeStudentSelection()
   }
-
 
   return (
     <Card fluid>

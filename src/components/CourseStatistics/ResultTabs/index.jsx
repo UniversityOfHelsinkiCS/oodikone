@@ -7,13 +7,11 @@ import Tables from './Panes/tables'
 
 import styles from './resultTabs.css'
 
-
 const paneViewIndex = {
   TABLE: 0,
   PASS_RAGE: 1,
   GRADE_DISTRIBUTION: 2
 }
-
 
 class ResultTabs extends Component {
   state = {
