@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize')
 const jwt = require('jsonwebtoken')
+const moment = require('moment')
 const { User, ElementDetails, AccessGroup } = require('../models')
 const ElementService = require('./studyelements')
 const AccessService = require('./accessgroups')
@@ -10,13 +11,15 @@ const generateToken = async (uid, mockedBy = null) => {
   const elementdetails = await getUserElementDetails(user.username)
   const elements = elementdetails.map(element => element.code)
   const payload = {
-    userId: uid,
+    id: user.id,
+    userId: uid, // username
     name: user.full_name,
     enabled: user.is_enabled,
     language: user.language,
     mockedBy,
     rights: elements,
-    roles: user.accessgroup
+    roles: user.accessgroup,
+    createdAt: moment().toISOString(),
   }
   const token = jwt.sign(payload, process.env.TOKEN_SECRET)
 
