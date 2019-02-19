@@ -10,8 +10,6 @@ import { sendLog, login } from '../apiConnection'
 
 export const setToken = token => localStorage.setItem(TOKEN_NAME, token)
 
-const tokenFields = ['enabled', 'userId', 'name', 'language', 'rights', 'roles', 'iat']
-
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   _.filter(dropDownOptions, option => (option.text ?
     option.text.toLowerCase().concat(option.description.toLowerCase())
@@ -31,6 +29,9 @@ export const images = {
   toskaLogo,
   irtomikko
 }
+
+export const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
+
 export const tokenAccessInvalid = (token) => {
   const decodedToken = decodeToken(token)
   // Expired
@@ -38,8 +39,8 @@ export const tokenAccessInvalid = (token) => {
     return true
   }
   // Misses fields
-  if (tokenFields.some(key => !Object.keys(decodedToken).includes(key))) {
-    console.log('Token is of invalid form, re-logging in')
+  if (decodedToken.version !== TOKEN_VERSION) {
+    console.log('Token is of invalid version, re-logging in')
     return true
   }
   // User is not enabled
