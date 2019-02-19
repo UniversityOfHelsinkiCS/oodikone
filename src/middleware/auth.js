@@ -43,8 +43,8 @@ const roles = requiredRoles => (req, res, next) => {
 }
 
 const checkUserBlacklisting = async (req, res, next) => {
-  const userId = req.decodedToken.userId
-  const isBlacklisted = await blacklist.isUserBlacklisted(userId)
+  const { userId, createdAt } = req.decodedToken
+  const isBlacklisted = await blacklist.isUserBlacklisted(userId, createdAt)
   if (isBlacklisted) {
     res.status(401).json({ error: 'Token needs to be refreshed' })
   } else {
