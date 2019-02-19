@@ -55,7 +55,7 @@ get_oodikone_server_backup() {
 }
 
 get_anon_oodikone() {
-    echo "$OODI_KEY" > private.key
+    echo "$OODI_KEY" | awk  '{gsub("\\\\n","\n")};1' > private.key
     chmod 400 private.key
 
     GIT_SSH_COMMAND='ssh -i private.key' git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
@@ -180,7 +180,7 @@ run_e2e_setup () {
     echo "Building images, starting containers"
     docker-compose -f docker-compose.e2e.yml up -d --build
     echo "Installing Cypress"
-    npm i -g cypress@^3.1.5
+    npm i -g --silent cypress@^3.1.5
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_anon_setup_full
     echo "Adding git-hooks to projects"
