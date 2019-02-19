@@ -24,7 +24,6 @@ const getCourseStats = (state) => {
   return stats
 }
 
-
 const getQueryInfo = (state) => {
   const courseStats = Object.values(getCourseStats(state))
   const semesters = {}

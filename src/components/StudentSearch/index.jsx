@@ -115,10 +115,8 @@ class StudentSearch extends Component {
     )
   }
 
-
   render() {
     const { translate, studentNumber } = this.props
-
 
     if (studentNumber) {
       return null
@@ -177,6 +175,5 @@ const mapDispatchToProps = dispatch => ({
   selectStudent: studentNumber =>
     dispatch(selectStudent(studentNumber))
 })
-
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Timeout(StudentSearch)))

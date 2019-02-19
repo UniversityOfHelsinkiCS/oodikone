@@ -24,7 +24,6 @@ const INITIAL = {
   prefilled: undefined
 }
 
-
 class SearchForm extends Component {
   state = {
     ...INITIAL
