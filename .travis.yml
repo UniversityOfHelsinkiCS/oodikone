@@ -1,5 +1,17 @@
 sudo: required
+cache:
+  directories:
+    - node_modules
 
+
+before_script:
+  - git clone https://github.com/UniversityOfHelsinkiCS/oodikone2-cli.git
+  - cd oodikone2-cli
+  - echo "1" | ./run.sh
+
+script:
+  - CYPRESS_baseUrl=http://localhost:8081 npm run cypress:run
+  
 services:
   - docker
 
