@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
-import { textAndDescriptionSearch, getRolesWithoutRefreshToken } from '../../common'
+import { textAndDescriptionSearch, getRolesWithoutRefreshToken, getIdWithoutRefreshToken } from '../../common'
 import LanguageChooser from '../LanguageChooser'
 import { addUserUnits, removeUserUnits, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 
@@ -66,7 +66,13 @@ class UserPage extends Component {
       specializations: [],
       visible: true
     })
-    setTimeout(() => this.setState({ visible: false }), 5000)
+    setTimeout(() => {
+      if (userid === getIdWithoutRefreshToken()) {
+        window.location.reload()
+      } else {
+        this.setState({ visible: false })
+      }
+    }, 5000)
   }
 
   removeAccess = (uid, unit) => () => this.props.removeUserUnits(uid, [unit])
@@ -209,7 +215,6 @@ class UserPage extends Component {
               <Card.Description>
                 {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`} <br />
               </Card.Description>
-              <Divider />
             </Card.Content>
           </Card>
           <Card fluid>
@@ -309,7 +314,8 @@ class UserPage extends Component {
                     border: '1px'
                   }}
                   >everything!
-                  </p> : this.renderUnitList(user.elementdetails, user)}
+                  </p> : null}
+                { this.renderUnitList(user.elementdetails, user) }
               </Card.Description>
             </Card.Content>
           </Card>
