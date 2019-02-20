@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
-import { textAndDescriptionSearch, getRolesWithoutRefreshToken, getIdWithoutRefreshToken } from '../../common'
+import { textAndDescriptionSearch, getRolesWithoutRefreshToken, getIdWithoutRefreshToken, setToken } from '../../common'
 import LanguageChooser from '../LanguageChooser'
 import { addUserUnits, removeUserUnits, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 
@@ -68,6 +68,7 @@ class UserPage extends Component {
     })
     setTimeout(() => {
       if (userid === getIdWithoutRefreshToken()) {
+        setToken(null)
         window.location.reload()
       } else {
         this.setState({ visible: false })
