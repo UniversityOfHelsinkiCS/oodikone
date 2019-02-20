@@ -6,6 +6,7 @@ const { Teacher, CourseGroup } = require('../../src/models/index')
 
 const uid = 'tktl'
 const payload = {
+  id: 1,
   userId: uid,
   name: '',
   enabled: true,
@@ -13,7 +14,9 @@ const payload = {
     id: '9',
     group_code: 'coursegroups',
     group_info: 'grants access to course groups'
-  }]
+  }],
+  createdAt: '2019-02-20T08:51:37.207Z',
+  version: 1,
 }
 
 const token = jwt.sign(payload, conf.TOKEN_SECRET, {
