@@ -19,6 +19,7 @@ logo () {
 logo
 
 options=(
+    "e2e setup"
     "Anon setup"
     "Full setup"
     "Full reset"
