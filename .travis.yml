@@ -7,7 +7,7 @@ cache:
 before_script:
   - git clone https://github.com/UniversityOfHelsinkiCS/oodikone2-cli.git
   - cd oodikone2-cli
-  - source oodikone2-cli/scripts.sh && run_e2e_setup
+  - source scripts.sh && run_e2e_setup
   - cd ..
 
 
