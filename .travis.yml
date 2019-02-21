@@ -10,15 +10,15 @@ before_script:
   - source scripts.sh && run_e2e_setup
   - cd ..
 
-
-script:
-  - CYPRESS_baseUrl=http://localhost:8081 npm run cypress:run
-
 services:
   - docker
 
 jobs:
   include:
+    - stage: test
+      script:
+        - CYPRESS_baseUrl=http://localhost:8081 npm run cypress:run
+  
     - stage: build & deploy
       script:
         - "if [[ $TRAVIS_BRANCH =~ (trunk) ]]; then docker build -t toska/oodikone2-frontend:testing . ; else :;fi"
