@@ -179,11 +179,9 @@ run_e2e_setup () {
     echo "Building images, starting containers"
     docker-compose -f docker-compose.e2e.yml up -d --build
     echo "Installing Cypress"
-    npm i -g --silent cypress@^3.1.5
+    npm i -g cypress@^3.1.5 --silent
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_anon_setup_full
-    # echo "Adding git-hooks to projects"
-    # create_symlink_git_hooks
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
 
