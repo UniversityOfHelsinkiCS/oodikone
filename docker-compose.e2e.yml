@@ -40,7 +40,9 @@ services:
       - "27017:27017"
     container_name: mongo_db
   backend:
-    image: toska/oodikone2-backend:staging
+    build:
+      context: repos/oodikone2-backend
+      dockerfile: dev.Dockerfile
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -53,8 +55,6 @@ services:
       OODILEARN_URL: http://oodilearn:5000
       USERSERVICE_URL: http://userservice:4567
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
-    volumes:
-      - ./repos/oodikone2-backend/:/usr/src/app
     container_name: backend
     depends_on:
       - db
@@ -70,27 +70,15 @@ services:
     environment:
       BACKEND_ADDR: backend
       ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
-    volumes:
-      - ./repos/oodikone2-frontend/:/usr/src/app
     container_name: frontend
-  oodilearn:
-    image: toska/oodilearn:staging
-    restart: unless-stopped
-    volumes:
-      - ./repos/oodilearn/data:/data
-      - ./repos/oodilearn/server:/src
-      - ./repos/oodilearn/models:/models
-    ports:
-      - "5000:5000"
-    environment:
-      - ENV=development
-      - MONGO_URI=mongodb://mongo_db:27017/oodilearn
-    container_name: oodilearn
   userservice:
-    image: toska/oodikone2-userservice:staging
+    image: node:8.11.3
+    command: sh -c "cd /usr/src/app && npm install && npm start"
     restart: unless-stopped
     ports:
       - 4567:4567
+    volumes:
+      - ./repos/oodikone2-userservice/:/usr/src/app
     environment:
       - DB_URL=postgres://postgres@user_db:5432/user_db
       - TEST_DB=postgres://postgres@user_db:5432/user_db_test
