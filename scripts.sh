@@ -183,6 +183,7 @@ run_e2e_setup () {
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_anon_setup_full
     echo "Restarting Docker backend containers to run migrations, etc."
-    docker_restart_backend
+    docker-compose -f docker-compose.e2e.yml restart backend userservice
+
 
 }
