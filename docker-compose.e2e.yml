@@ -40,10 +40,7 @@ services:
       - "27017:27017"
     container_name: mongo_db
   backend:
-    build:
-      context: repos/oodikone2-backend
-      dockerfile: dev.Dockerfile
-    command: sh -c "npm install && npm run dev"
+    image: toska/oodikone2-backend:staging
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -77,9 +74,7 @@ services:
       - ./repos/oodikone2-frontend/:/usr/src/app
     container_name: frontend
   oodilearn:
-    build:
-      context: repos/oodilearn/server
-      dockerfile: Dockerfile
+    image: toska/oodilearn:staging
     restart: unless-stopped
     volumes:
       - ./repos/oodilearn/data:/data
@@ -92,13 +87,10 @@ services:
       - MONGO_URI=mongodb://mongo_db:27017/oodilearn
     container_name: oodilearn
   userservice:
-    image: node:8.11.3
-    command: sh -c "cd /usr/src/app && npm install && npm start"
+    image: toska/oodikone2-userservice:staging
     restart: unless-stopped
     ports:
       - 4567:4567
-    volumes:
-      - ./repos/oodikone2-userservice/:/usr/src/app
     environment:
       - DB_URL=postgres://postgres@user_db:5432/user_db
       - TEST_DB=postgres://postgres@user_db:5432/user_db_test
