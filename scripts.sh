@@ -45,7 +45,6 @@ pull_git_repositories () {
 pull_e2e_git_repositories () {
     pushd $REPOS
     git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
-    git clone https://github.com/UniversityOfHelsinkiCS/oodilearn.git
     git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git
     popd
 }
@@ -173,18 +172,18 @@ run_anon_full_setup () {
 }
 
 run_e2e_setup () {
-    # echo "Init dirs"
-    # init_dirs
-    # echo "Pull repos"
-    # pull_e2e_git_repositories
+    echo "Init dirs"
+    init_dirs
+    echo "Pull repos"
+    pull_e2e_git_repositories
     echo "Building images, starting containers"
     docker-compose -f docker-compose.e2e.yml up -d --build
     echo "Installing Cypress"
     npm i -g --silent cypress@^3.1.5
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_anon_setup_full
-    echo "Adding git-hooks to projects"
-    create_symlink_git_hooks
+    # echo "Adding git-hooks to projects"
+    # create_symlink_git_hooks
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
 
