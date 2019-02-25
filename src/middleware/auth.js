@@ -4,6 +4,7 @@ const blacklist = require('../services/blacklist')
 const { ACCESS_TOKEN_HEADER_KEY } = require('../conf-backend')
 
 const isShibboUser = (userId, uidHeader) => userId === uidHeader
+const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
 
 const checkAuth = async (req, res, next) => {
   const token = req.headers[ACCESS_TOKEN_HEADER_KEY]
@@ -12,6 +13,8 @@ const checkAuth = async (req, res, next) => {
     jwt.verify(token, conf.TOKEN_SECRET, async (err, decoded) => {
       if (err) {
         res.status(403).json(err)
+      } else if (decoded.version !== TOKEN_VERSION) {
+        res.status(401).json({ error: 'Token needs to be refreshed - invalid version', reloadPage: true })
       } else if (decoded.mockedBy ? isShibboUser(decoded.mockedBy, uid) : isShibboUser(decoded.userId, uid)) {
         if (decoded.enabled) {
           req.decodedToken = decoded
@@ -43,10 +46,10 @@ const roles = requiredRoles => (req, res, next) => {
 }
 
 const checkUserBlacklisting = async (req, res, next) => {
-  const userId = req.decodedToken.userId
-  const isBlacklisted = await blacklist.isUserBlacklisted(userId)
+  const { userId, createdAt } = req.decodedToken
+  const isBlacklisted = await blacklist.isUserBlacklisted(userId, createdAt)
   if (isBlacklisted) {
-    res.status(401).json({ error: 'Token needs to be refreshed' })
+    res.status(401).json({ error: 'Token needs to be refreshed - blacklisted', reloadPage: true })
   } else {
     next()
   }

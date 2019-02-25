@@ -583,6 +583,7 @@ Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id'
 
 Teacher.belongsToMany(CourseGroup, { through: 'teacher_course_group', foreignKey: 'teacher_id' })
 CourseGroup.belongsToMany(Teacher, { through: 'teacher_course_group', foreignKey: 'course_group_id' })
+CourseGroup.belongsTo(ElementDetails, { foreignKey: 'programmeid' })
 
 Credit.belongsTo(Semester, { foreignKey: { name: 'semestercode', allowNull: false } })
 

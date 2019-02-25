@@ -1,4 +1,3 @@
-const Promise = require('bluebird')
 const { redisClient } = require('../services/redis')
 const { Teacher, CourseGroup } = require('../models')
 
@@ -6,6 +5,7 @@ const {
   getCurrentAcademicYear,
   getAcademicYearsFrom,
   getAcademicYearStatistics,
+  getAcademicYearStatisticsForStudyProgramme,
   getTeacherAcademicYearStatisticsByIds,
   getAcademicYearCoursesByTeacherIds
 } = require('../models/queries')
@@ -40,57 +40,25 @@ const getTeachersForCourseGroup = (courseGroupId) => {
   })
 }
 
-const getCourseGroups = (programmeId) => {
-  return CourseGroup.findAll({
-    where: {
-      // programmeid: programmeId
-    }
-  })
-}
-
 const createCourseGroup = (name) => CourseGroup.create({ name })
 
-const getCourseGroupsWithTotals = async (programmeId, semesterCode) => {
-  const cachedStats = await redisClient.getAsync(COURSE_GROUP_STATISTICS_KEY(programmeId, semesterCode))
-
-  if (cachedStats) {
-    return JSON.parse(cachedStats)
+const getCourseGroupsWithTotals = async (programmeId, semesterCode, forceRefresh = false) => {
+  if (!forceRefresh) {
+    const cachedStats = await redisClient.getAsync(COURSE_GROUP_STATISTICS_KEY(programmeId, semesterCode))
+    if (cachedStats) {
+      return JSON.parse(cachedStats)
+    }
   }
-
-  const courseGroups = await getCourseGroups(programmeId)
-
-  const courseGroupStatistics = await Promise.map(courseGroups, async (courseGroup) => {
-    const teachers = await getTeachersForCourseGroup(courseGroup.id)
-    
-    if (teachers.length === 0) {
-      return {
-        id: courseGroup.id,
-        name: courseGroup.name,
-        credits: 0,
-        students: 0
-      }
-    }
-    
-    const teacherIds = teachers.map(t => t.get().id)
-    const startSemester = semesterCode || await getCurrentAcademicYearSemesterCode()
-    const statistics = await getAcademicYearStatistics(teacherIds, startSemester)
-
-    return {
-      id: courseGroup.id,
-      name: courseGroup.name,
-      credits: statistics[0].credits,
-      students: Number(statistics[0].students)
-    }
-  }, { concurrency: 10 })
+  const startSemester = semesterCode || await getCurrentAcademicYearSemesterCode()
+  const result = await getAcademicYearStatisticsForStudyProgramme(programmeId, startSemester)
 
   await redisClient.setAsync(
     COURSE_GROUP_STATISTICS_KEY(programmeId, semesterCode),
-    JSON.stringify(courseGroupStatistics),
+    JSON.stringify(result),
     'EX',
-    REDIS_CACHE_TTL
+    6*4*7*24*60*60 // 6 months in seconds
   )
-
-  return courseGroupStatistics
+  return result
 }
 
 const getCourseGroup = async (courseGroupId, semesterCode) => {
