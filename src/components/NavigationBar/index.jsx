@@ -10,7 +10,7 @@ import { userRoles } from '../../common'
 import styles from './navigationBar.css'
 import { logout, login, returnToSelf } from '../../apiConnection'
 
-const { ADMINER_URL } = process.env
+const { USER_ADMINER_URL, ADMINER_URL } = process.env
 
 class NavigationBar extends Component {
   state = {
@@ -64,6 +64,16 @@ class NavigationBar extends Component {
                   win.focus()
                 }}
                 text="Database"
+                icon="database"
+              />
+            )}
+            {USER_ADMINER_URL && (
+              <Dropdown.Item
+                onClick={() => {
+                  const win = window.open(USER_ADMINER_URL, '_blank')
+                  win.focus()
+                }}
+                text="User database"
                 icon="database"
               />
             )}

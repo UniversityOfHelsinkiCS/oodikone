@@ -7,7 +7,6 @@ import ErrorMessage from '../ErrorMessage'
 
 import sharedStyles from '../../styles/shared'
 
-
 const ErrorContainer = (props) => {
   if (!props.errors) return (null)
   const errors = props.errors.map((error, index) => (

@@ -39,7 +39,6 @@ ClearableItem.propTypes = {
   icon: string
 }
 
-
 ClearableItem.defaultProps = {
   icon: 'cancel'
 }

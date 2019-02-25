@@ -17,7 +17,9 @@
     "stats": "webpack --json --config webpack.config.production.js > stats.json",
     "pretest": "npm run lint",
     "test": "",
-    "notest": "echo"
+    "notest": "echo",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run -P ./"
   },
   "licence": "",
   "main": "src/app.jsx",

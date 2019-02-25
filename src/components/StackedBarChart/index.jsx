@@ -36,5 +36,4 @@ StackedBarChart.propTypes = {
   series: arrayOf(object).isRequired
 }
 
-
 export default StackedBarChart

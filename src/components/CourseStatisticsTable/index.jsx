@@ -4,7 +4,6 @@ import { Table } from 'semantic-ui-react'
 
 const { shape, arrayOf } = PropTypes
 
-
 const CourseStatisticsTable = ({ stats }) =>
   ((stats.some(year => year.c_passed > 0) || stats.some(year => year.c_failed > 0)) ?
     (
@@ -90,7 +89,6 @@ const CourseStatisticsTable = ({ stats }) =>
         </Table.Body>
       </Table>
     ))
-
 
 CourseStatisticsTable.propTypes = {
   stats: arrayOf(shape({})).isRequired

@@ -30,7 +30,6 @@ const mapStateToProps = state => ({
   toggleLabel: state.settings.namesVisible ? 'Student names visible' : 'Student names hidden'
 })
 
-
 export default connect(
   mapStateToProps,
   { toggleStudentNameVisibility }

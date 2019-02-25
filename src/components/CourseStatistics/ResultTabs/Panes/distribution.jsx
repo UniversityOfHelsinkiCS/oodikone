@@ -14,7 +14,6 @@ import {
 } from './util'
 import StackedBarChart from '../../../StackedBarChart'
 
-
 const getGradeSeries = (series, seriesType) => {
   const { name, multiplier } = seriesType
   const isGradeSeries = !isThesisSeries(series)

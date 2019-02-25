@@ -39,10 +39,10 @@ class StudyProgramme extends Component {
         render: () => <StudyProgrammeMandatoryCourses studyProgramme={studyProgrammeId} />
       },
       // { menuItem: 'Code Mapper', render: () => <StudyProgrammeCourseCodeMapper /> },
-      studyProgrammeId === 'KH60_001' ? {
+      {
         menuItem: 'Course Groups',
         render: () => <AggregateView programmeId={studyProgrammeId} courseGroupId={courseGroupId} />
-      } : null
+      }
     ])
   }
 

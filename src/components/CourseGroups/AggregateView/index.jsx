@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { Header, Segment, Icon } from 'semantic-ui-react'
+import { Header, Segment, Icon, Button } from 'semantic-ui-react'
 import { withRouter } from 'react-router'
 import { func, shape, string } from 'prop-types'
 
@@ -31,6 +31,21 @@ class AggregateView extends Component {
           courseGroups: res.data,
           isLoading: false
         })
+      }).catch(() => {
+        this.setState({ courseGroups: [], isLoading: false })
+      })
+  }
+
+  handleForceRefresh() {
+    this.setState({ isLoading: true })
+    callApi(`/course-groups/programme/${this.props.programmeId}/force`)
+      .then((res) => {
+        this.setState({
+          courseGroups: res.data,
+          isLoading: false
+        })
+      }).catch(() => {
+        this.setState({ courseGroups: [], isLoading: false })
       })
   }
 
@@ -90,13 +105,22 @@ class AggregateView extends Component {
 
     const renderCourseGroups = () => (
       <Fragment>
-        <Header size="medium">Group statistics</Header>
+        <Header size="medium">
+          Group statistics
+          <Button
+            content="Recalculate"
+            floated="right"
+            size="small"
+            style={{ 'margin-bottom': '10px' }}
+            onClick={() => { this.handleForceRefresh() }}
+          />
+        </Header>
         {courseGroups.length === 0 ?
           <Segment>No course groups defined</Segment>
-        :
+          :
           <SortableTable
             getRowKey={gc => gc.id}
-            tableProps={{ celled: false, singleLine: true }}
+            tableProps={{ celled: false }}
             columns={columns}
             data={courseGroups}
           />

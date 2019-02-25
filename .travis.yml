@@ -1,10 +1,23 @@
 sudo: required
+cache:
+  directories:
+    - node_modules
+
 
 services:
   - docker
 
 jobs:
   include:
+    - stage: testing
+      script:
+        - git clone https://github.com/UniversityOfHelsinkiCS/oodikone2-cli.git
+        - cd oodikone2-cli
+        - source scripts.sh && run_e2e_setup
+        - cd ..
+        - docker ps
+        - CYPRESS_baseUrl=http://localhost:8081 npm run cypress:run
+  
     - stage: build & deploy
       script:
         - "if [[ $TRAVIS_BRANCH =~ (trunk) ]]; then docker build -t toska/oodikone2-frontend:testing . ; else :;fi"
