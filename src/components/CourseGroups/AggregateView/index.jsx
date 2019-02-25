@@ -105,14 +105,16 @@ class AggregateView extends Component {
 
     const renderCourseGroups = () => (
       <Fragment>
-        <Header size="medium" floated="left">Group statistics</Header>
-        <Button
-          content="Recalculate"
-          floated="right"
-          size="medium"
-          style={{ 'margin-bottom': '10px' }}
-          onClick={() => { this.handleForceRefresh() }}
-        />
+        <Header size="medium">
+          Group statistics
+          <Button
+            content="Recalculate"
+            floated="right"
+            size="small"
+            style={{ 'margin-bottom': '10px' }}
+            onClick={() => { this.handleForceRefresh() }}
+          />
+        </Header>
         {courseGroups.length === 0 ?
           <Segment>No course groups defined</Segment>
           :
