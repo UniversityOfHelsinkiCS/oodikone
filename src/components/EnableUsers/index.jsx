@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Button, Icon, Header, Segment, Confirm, Loader } from 'semantic-ui-react'
+import { Button, Icon, Header, Segment, Confirm, Loader, Label } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
@@ -103,7 +103,11 @@ class EnableUsers extends Component {
             }, {
               key: 'ROLE',
               title: 'Role',
-              getRowVal: user => (user.accessgroup.map(ag => ag.group_code).sort().join())
+              getRowVal: user => (
+                <Label.Group>
+                  {user.accessgroup.map(ag => ag.group_code).sort().map(code => <Label key={code} content={code} />)}
+                </Label.Group>
+              )
             }, {
               key: 'STUDYTRACKS',
               title: 'Studytracks',
