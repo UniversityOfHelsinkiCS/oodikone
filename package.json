@@ -20,7 +20,6 @@
     "notest": "echo",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run -P ./"
-
   },
   "licence": "",
   "main": "src/app.jsx",

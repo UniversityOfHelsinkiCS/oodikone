@@ -9,15 +9,12 @@ services:
 
 jobs:
   include:
-    - stage: building environment
+    - stage: testing
       script:
         - git clone https://github.com/UniversityOfHelsinkiCS/oodikone2-cli.git
         - cd oodikone2-cli
         - source scripts.sh && run_e2e_setup
         - cd ..
-
-    - stage: testing
-      script:
         - docker ps
         - CYPRESS_baseUrl=http://localhost:8081 npm run cypress:run
   
