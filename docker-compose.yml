@@ -73,6 +73,7 @@ services:
     environment:
       BACKEND_ADDR: backend
       ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
+      USER_ADMINER_URL: http://localhost:5050/?pgsql=user_db&username=postgres
     volumes:
       - ./repos/oodikone2-frontend/:/usr/src/app
     container_name: frontend
