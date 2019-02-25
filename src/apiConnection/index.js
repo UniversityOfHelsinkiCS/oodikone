@@ -116,7 +116,13 @@ export const handleRequest = store => next => async (action) => {
       // Something failed. Assume it's the token and try again.
       try {
         const mock = getAsUserWithoutRefreshToken()
-        if (!mock) await getToken(true)
+        if (!mock) {
+          await getToken(true)
+          if (e.response.data.reloadPage) {
+            setTimeout(() => { window.location.reload() }, 1000)
+            return
+          }
+        }
         const res = await callApi(route, method, data, params)
         store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
       } catch (err) {

@@ -52,7 +52,6 @@ const GradesTable = ({ stats, name }) => {
     ...getGradeColumns(isGradeSeries)
   ]
 
-
   const data = getTableData(stats, isGradeSeries)
 
   return (

@@ -10,7 +10,6 @@ const getSemesterText = (start, end) => `${start}-${twoDigitYear(end)}`
 const getYearDataText = (year, spring) => (spring ? getSemesterText(year - 1, year) : getSemesterText(year, year + 1))
 const getYearText = (year, spring) => (spring ? `Spring ${year}` : `Fall ${year}`)
 
-
 const getCourseYears = course => ({
   startYear: moment(course.min_attainment_date).year(),
   endYear: moment(course.max_attainment_date).year()

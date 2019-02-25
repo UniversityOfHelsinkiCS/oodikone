@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Button, Icon, Header, Segment, Confirm, Loader } from 'semantic-ui-react'
+import { Button, Icon, Header, Segment, Confirm, Loader, Label } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
@@ -95,18 +95,19 @@ class EnableUsers extends Component {
                 const nameparts = user.full_name.split(' ')
                 return nameparts[nameparts.length - 1]
               },
-              getRowContent: user => user.full_name,
-              cellProps: { singleLine: true }
+              getRowContent: user => user.full_name
             }, {
               key: 'USERNAME',
               title: 'Username',
-              getRowVal: user => user.username,
-              cellProps: { singleLine: true }
+              getRowVal: user => user.username
             }, {
               key: 'ROLE',
               title: 'Role',
-              getRowVal: user => (user.accessgroup.map(ag => ag.group_code).sort().join()),
-              cellProps: { singleLine: true }
+              getRowVal: user => (
+                <Label.Group>
+                  {user.accessgroup.map(ag => ag.group_code).sort().map(code => <Label key={code} content={code} />)}
+                </Label.Group>
+              )
             }, {
               key: 'STUDYTRACKS',
               title: 'Studytracks',
@@ -125,8 +126,7 @@ class EnableUsers extends Component {
                   return `${nameInLanguage(user.elementdetails[0])} +${user.elementdetails.length - 1} others`
                 }
                 return nameInLanguage(user.elementdetails[0])
-              },
-              cellProps: { singleLine: true }
+              }
             }, {
               key: 'OODIACCESS',
               title: 'Access to oodikone',
@@ -140,8 +140,7 @@ class EnableUsers extends Component {
                     </Button.Content>
                   </Button>
                 </Button.Group>
-              ),
-              cellProps: { singleLine: true }
+              )
             }, {
               key: 'EDIT',
               title: '',
@@ -155,7 +154,6 @@ class EnableUsers extends Component {
                   </Button>
                 </Button.Group>
               ),
-              cellProps: { singleLine: true },
               headerProps: { onClick: null, sorted: null }
             }
           ]}

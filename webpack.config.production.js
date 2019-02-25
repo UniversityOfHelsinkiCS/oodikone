@@ -99,6 +99,7 @@ module.exports = {
       template: htmlTemplate,
       appMountId: 'root',
       title: 'Oodikone',
+      baseHref: '/',
       minify: {
         collapseWhitespace: true,
         processConditionalComments: true

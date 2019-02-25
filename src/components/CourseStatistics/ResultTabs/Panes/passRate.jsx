@@ -11,7 +11,6 @@ import {
   viewModeType
 } from './util'
 
-
 const getPassRateCumSeriesFromStats = (stats, seriesType) => {
   const { name, multiplier } = seriesType
   const all = []
@@ -64,7 +63,6 @@ const getPassRateStudSeriesFromStats = (stats, seriesType) => {
     getDataObject(`${name} failed after retry`, failedRetry, 'c')
   ]
 }
-
 
 const PassRate = ({ primary, comparison, viewMode }) => {
   const isCumulativeMode = viewMode === viewModeNames.CUMULATIVE

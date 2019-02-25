@@ -6,7 +6,6 @@ import ReactHighchart from 'react-highcharts'
 
 import _ from 'lodash'
 
-
 class ClusterGraph extends PureComponent {
   state = {
     active: 'all',
@@ -31,7 +30,6 @@ class ClusterGraph extends PureComponent {
     const maxY = _.max(points.map(p => p[1]))
     const minX = _.min(points.map(p => p[0]))
     const maxX = _.max(points.map(p => p[0]))
-
 
     let { series } = this.state
 
