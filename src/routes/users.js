@@ -20,7 +20,8 @@ router.put('/:id/enable', async (req, res) => {
   else {
     const result = await userService.updateUser(user.username, { is_enabled: !user.is_enabled })
     const status = result.error === undefined ? 200 : 400
-    await blacklist.addUserToBlacklist(user.username)
+    if (user.username != req.decodedToken.userId)
+      await blacklist.addUserToBlacklist(user.username)
     res.status(status).json(result)
   }
 })
@@ -30,7 +31,7 @@ router.post('/modifyaccess', async (req, res) => {
     const { uid } = req.body
     const result = await userService.modifyAccess(req.body)
     const user = await userService.byId(uid)
-    if (user) await blacklist.addUserToBlacklist(user.username)
+    if (user && user.username != req.decodedToken.userId) await blacklist.addUserToBlacklist(user.username)
     res.status(200).json(result)
   } catch (e) {
     res.status(400).json(e)
@@ -58,7 +59,7 @@ router.post('/:uid/elements', async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
   const user = await userService.enableElementDetails(uid, codes)
-  if (user) await blacklist.addUserToBlacklist(user.username)
+  if (user && user.username != req.decodedToken.userId) await blacklist.addUserToBlacklist(user.username)
   res.json(user)
 })
 
@@ -66,7 +67,7 @@ router.delete('/:uid/elements', async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
   const user = await userService.removeElementDetails(uid, codes)
-  if (user) await blacklist.addUserToBlacklist(user.username)
+  if (user && user.username != req.decodedToken.userId) await blacklist.addUserToBlacklist(user.username)
   res.json(user)
 })
 

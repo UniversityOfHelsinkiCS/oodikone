@@ -1,21 +1,18 @@
 const { redisClient } = require('./redis')
+const moment = require('moment')
 
-const REDIS_HASH_KEY = 'USERNAME_BLACKLIST'
+const MAKE_REDIS_HASH_KEY = id => `BLACKLIST ${id}`
 
 const addUserToBlacklist = async userId => {
   console.log('ADDED BLACKLIST', userId)
-  await redisClient.saddAsync([REDIS_HASH_KEY, userId])
+  await redisClient.setAsync(MAKE_REDIS_HASH_KEY(userId), moment().toISOString(false))
 }
 
-const removeUserFromBlacklist = async userId => {
-  console.log('REMOVED BLACKLIST', userId)
-  await redisClient.sremAsync([REDIS_HASH_KEY, userId])
+const isUserBlacklisted = async (userId, tokenCreatedAt) => {
+  const blacklistTimestamp = await redisClient.getAsync(MAKE_REDIS_HASH_KEY(userId))
+  const isBlacklisted = !!(tokenCreatedAt && blacklistTimestamp && moment(tokenCreatedAt) < moment(blacklistTimestamp))
+  console.log('BLACKLISTED? ', {isBlacklisted, userId, tokenCreatedAt, blacklistTimestamp})
+  return isBlacklisted
 }
 
-const isUserBlacklisted = async userId => {
-  const isMember = await redisClient.sismemberAsync([REDIS_HASH_KEY, userId])
-  console.log('IN BLACKLIST?', !!isMember, userId)
-  return !!isMember
-}
-
-module.exports = { addUserToBlacklist, removeUserFromBlacklist, isUserBlacklisted }
+module.exports = { addUserToBlacklist, isUserBlacklisted }
