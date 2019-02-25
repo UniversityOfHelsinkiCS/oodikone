@@ -1,22 +1,27 @@
 const Sequelize = require('sequelize')
 const jwt = require('jsonwebtoken')
+const moment = require('moment')
 const { User, ElementDetails, AccessGroup } = require('../models')
 const ElementService = require('./studyelements')
 const AccessService = require('./accessgroups')
 const Op = Sequelize.Op
 
+const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
 const generateToken = async (uid, mockedBy = null) => {
   let user = await byUsername(uid)
   const elementdetails = await getUserElementDetails(user.username)
   const elements = elementdetails.map(element => element.code)
   const payload = {
-    userId: uid,
+    id: user.id,
+    userId: uid, // username
     name: user.full_name,
     enabled: user.is_enabled,
     language: user.language,
     mockedBy,
     rights: elements,
-    roles: user.accessgroup
+    roles: user.accessgroup,
+    createdAt: moment().toISOString(),
+    version: TOKEN_VERSION,
   }
   const token = jwt.sign(payload, process.env.TOKEN_SECRET)
 
