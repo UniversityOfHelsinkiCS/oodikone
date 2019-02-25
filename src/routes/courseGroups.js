@@ -4,11 +4,17 @@ const CourseGroupService = require('../services/courseGroups')
 
 const BASE_PATH = '/'
 
-router.get(`${BASE_PATH}programme/:programmeId`, async (req, res) => {
-  const { programmeId } = req.params
+router.get(`${BASE_PATH}programme/:programmeId/:force?`, async (req, res) => {
+  const { programmeId, force } = req.params
+  const { rights, roles } = req.decodedToken
   const semesterCode = req.query.semester
-  const courseGroups = await CourseGroupService.getCourseGroupsWithTotals(programmeId, semesterCode)
-  return res.json(courseGroups)
+  if (rights.includes(programmeId) || (roles && roles.map(r => r.group_code).includes('admin'))) {
+    const courseGroups = await CourseGroupService.getCourseGroupsWithTotals(
+      programmeId, semesterCode, force === 'force'
+    )
+    return res.json(courseGroups)
+  }
+  return res.status(403).json({ error: 'No right to view programme data' })
 })
 
 router.get(`${BASE_PATH}academic-years`, async (req, res) => {
