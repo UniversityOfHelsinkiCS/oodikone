@@ -55,9 +55,9 @@ export const routes = {
   studyProgrammeCourseGroup: { route: '/study-programme/:studyProgrammeId/course-group/:courseGroupId', translateId: 'studyProgramme', reqRights: ['studyprogramme'] },
   teachers: { menuRoute: '/teachers', route: '/teachers/:teacherid?', translateId: 'teachers', reqRights: ['teachers'] },
   users: { menuRoute: '/users', route: '/users/:userid?', translateId: 'users', reqRights: ['users'] },
-  settings: { menuRoute: '/settings', route: '/settings', translateId: 'settings', reqRights: ['admin'] },
+  settings: { menuRoute: '/settings', route: '/settings', translateId: 'settings', reqRights: ['dev'] },
   usage: { menuRoute: '/usage', route: '/usage', translateId: 'usage', reqRights: ['usage'] },
-  sandbox: { menuRoute: '/sandbox', route: '/sandbox', translateId: 'sandbox', reqRights: ['admin'] },
+  sandbox: { menuRoute: '/sandbox', route: '/sandbox', translateId: 'sandbox', reqRights: ['dev'] },
   oodilearn: { menuRoute: '/oodilearn', route: '/oodilearn', translateId: 'oodilearn', reqRights: ['oodilearn'] }
 }
 
