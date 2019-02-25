@@ -42,20 +42,30 @@ pull_git_repositories () {
     popd
 }
 
+pull_e2e_git_repositories () {
+    pushd $REPOS
+    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
+    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git
+    popd
+}
+
 get_oodikone_server_backup() {
     scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
 }
 
 get_anon_oodikone() {
-    mkdir keys
-    cat $OODI_KEY > keys/private.key
-    cat $OODI_KEY_PUB > keys/public.key
-    chmod 700 keys
-    chmod 600 keys/private.key
-    chmod 644 keys/public.key    
-
-    GIT_SSH_COMMAND='ssh -i keys/private.key' git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
+    file=./private.key
+    if [ -e "$file" ]; then
+      echo "Private key exists"
+    else 
+      echo "No private key, echoing from environment variable OODI_KEY"
+      echo "$OODI_KEY" | awk  '{gsub("\\\\n","\n")};1' > private.key
+      chmod 400 private.key
+    fi
+    GIT_SSH_COMMAND='ssh -i private.key' git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
     mv anonyymioodi/anon.bak.bz2 ./$BACKUP_DIR/latest-pg.bak.bz2
+    mv anonyymioodi/user-dump.bak.bz2 ./$BACKUP_DIR/latest-user-pg.bak.bz2
+
 }
 
 unpack_oodikone_server_backup() {
@@ -82,7 +92,8 @@ db_oodikone_reset () {
 
 ping_psql () {
     echo "Pinging psql in container $1 with db name $2"
-    retry docker exec -u postgres $1 pg_isready -d $2
+    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi"
+    retry docker exec -u postgres $1 pg_isready
 }
 
 db_setup_full () {
@@ -163,4 +174,21 @@ run_anon_full_setup () {
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
     show_instructions
+}
+
+run_e2e_setup () {
+    echo "Init dirs"
+    init_dirs
+    echo "Pull repos"
+    pull_e2e_git_repositories
+    echo "Building images, starting containers"
+    docker-compose -f docker-compose.e2e.yml up -d --build
+    echo "Installing Cypress"
+    npm i -g cypress@^3.1.5 --silent
+    echo "Setup oodikone db from dump, this will prompt you for your password."
+    db_anon_setup_full
+    echo "Restarting Docker backend containers to run migrations, etc."
+    docker-compose -f docker-compose.e2e.yml restart backend userservice
+
+
 }
