@@ -26,7 +26,9 @@ const fancylogger = (studentnumbers) => {
   const counter = status.addItem('students', { max: studentnumbers.length })
 
   const start = () => {
-    status.start({ pattern: 'Running: {uptime.time} {spinner.earth.green} | {students.bar} | students updated: {students}' })
+    status.start({
+      pattern: 'Running: {uptime.time} {spinner.earth.green} | {students.bar} | students updated: {students}'
+    })
   }
 
   const stop = () => {
@@ -103,7 +105,7 @@ const run = async (studentnumbersfile = 'studentnumbers.txt', index = 0, basiclo
     exitcode = 1
   }
   const ended = new Date()
-  logger.verbose(`Updater started/ended: \n${started} \n${ended}`)
+  logger.info(`Updater started/ended: \n${started} \n${ended}`)
   process.exit(exitcode)
 }
 
