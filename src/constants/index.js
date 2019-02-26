@@ -64,16 +64,9 @@ export const routes = {
 export const hiddenRoutes = {
 }
 
-const assumeBasename = () => {
-  const POSSIBLE_BASENAMES = ['staging', 'testing']
-  const haystack = window.location.pathname.split('/')
-  const needle = haystack.find(path => POSSIBLE_BASENAMES.includes(path))
-  return needle ? `/${needle}/` : '/'
-}
+export const BASE_PATH = process.env.BASE_PATH != null ? process.env.BASE_PATH : '/'
 
-export const BASE_PATH = assumeBasename()
-
-export const API_BASE_PATH = `${assumeBasename()}api`
+export const API_BASE_PATH = `${BASE_PATH}api`
 
 export const AVAILABLE_LANGUAGES = ['en']
 export const DEFAULT_LANG = 'en'
