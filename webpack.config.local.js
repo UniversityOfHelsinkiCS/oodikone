@@ -9,6 +9,7 @@ const devServerPort = 8081
 const apiServerPort = 8080
 const apiAddress = process.env.BACKEND_ADDR || 'localhost'
 const backendURL = `http://${apiAddress}:${apiServerPort}`
+const BASE_PATH = process.env.BASE_PATH != null ? process.env.BASE_PATH : '/'
 
 module.exports = {
   mode: 'development',
@@ -115,7 +116,7 @@ module.exports = {
       template: htmlTemplate,
       appMountId: 'root',
       title: 'Oodikone',
-      baseHref: '/',
+      baseHref: BASE_PATH,
       meta: [
         {
           name: 'viewport',
@@ -131,6 +132,6 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.join(__dirname, 'dist'),
-    publicPath: ''
+    publicPath: BASE_PATH
   }
 }
