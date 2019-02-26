@@ -3,7 +3,7 @@ const axios = require('axios')
 const https = require('https')
 const fs = require('fs')
 const util = require('../../util')
-const { StudentList } = require('../../models')
+const { Student, StudentList } = require('../../models')
 const logger = require('../../util/logger')
 const STUDENT_SET_KEY = process.env.STUDENT_SET || 'cached_students'
 const timestamp = () => {
@@ -21,9 +21,9 @@ async function save(file) {
   const numbers = cached.student_numbers.sort().reverse()
   fs.writeFile(file, numbers.join('\n',), (err) => {
     if (err) {
-      console.log(err)
+      logger.info(err)
     } else {
-      console.log(`saved ${numbers.length} students to ${file} `)
+      logger.info(`saved ${numbers.length} students to ${file} `)
     }
     process.exit(0)
   })
@@ -67,6 +67,7 @@ async function run() {
     
     const response = await requestStudent(studentNumber)
     if (response.data.data != null) {
+      Student.upsert({studentnumber: studentNumber})
       validStudents.push(studentNumber)
     }
   
