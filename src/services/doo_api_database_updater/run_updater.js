@@ -2,11 +2,18 @@ const { updateDatabase } = require('./database_updater')
 const fs = require('fs')
 const logger = require('../../util/logger')
 const status = require('node-status')
+const { getStudentNumbers } = require('../../models/queries')
 
 const readStudentNumbersFromFile = async filename => {
   const studentnumbers = fs.readFileSync(filename, 'utf-8').split('\n').map(s => s.replace(/\D/g, ''))
   return studentnumbers.filter(studentnumber => !!studentnumber).map(s => s.startsWith('0') ? s : '0' + s)
 }
+
+const readStudentNumbersFromDb = async () => {
+  const studentnumbers = await getStudentNumbers().map(s => s.studentnumber)
+  return studentnumbers.filter(studentnumber => !!studentnumber).map(s => s.startsWith('0') ? s : '0' + s)
+}
+
 
 const parseArguments = (args) => {
   return args.slice(2).reduce((args, arg) => {
@@ -18,7 +25,7 @@ const parseArguments = (args) => {
     }
     return args
   }, {})
-  
+
 }
 
 const fancylogger = (studentnumbers) => {
@@ -50,7 +57,7 @@ const fancylogger = (studentnumbers) => {
 const basiclogger = (studentnumbers, nstamps = 100) => {
 
   const total = studentnumbers.length
-  const divisor = Math.floor(total/nstamps)
+  const divisor = Math.floor(total / nstamps)
 
   const dolog = iter => {
     if (iter % divisor === 0) {
@@ -80,16 +87,26 @@ const basiclogger = (studentnumbers, nstamps = 100) => {
   }
 }
 
-const run = async (studentnumbersfile = 'studentnumbers.txt', index = 0, basiclogging = true) => {
+const run = async (index = 0, basiclogging = true) => {
 
   const args = parseArguments(process.argv)
   index = args.index || index
   basiclogging = args.basiclogging || basiclogging
 
-  studentnumbersfile = args.file || studentnumbersfile
-  logger.info('Student number source is: ' + studentnumbersfile)
-  const readStudentnumbers = await readStudentNumbersFromFile(studentnumbersfile)
+  let studentnumberssource
+  let readStudentnumbers
+
+  if (args.file) {
+    studentnumberssource = args.file
+    readStudentnumbers = await readStudentNumbersFromFile(studentnumberssource)
+  } else {
+    studentnumberssource = 'database'
+    readStudentnumbers = await readStudentNumbersFromDb()
+  }
+
   const studentnumbers = readStudentnumbers.slice(index)
+
+  logger.info('Student number source is: ', studentnumberssource)
 
   const statuslogger = basiclogging ? basiclogger(studentnumbers) : fancylogger(studentnumbers)
 
@@ -101,7 +118,7 @@ const run = async (studentnumbersfile = 'studentnumbers.txt', index = 0, basiclo
     await updateDatabase(studentnumbers, statuslogger.onUpdate)
     statuslogger.stop()
   } catch (e) {
-    logger.verbose(e)
+    logger.verbose(e.message)
     exitcode = 1
   }
   const ended = new Date()

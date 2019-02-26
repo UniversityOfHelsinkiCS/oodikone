@@ -1,5 +1,13 @@
 const { sequelize } = require('../database/connection')
 
+const getStudentNumbers = () => sequelize.query(
+  `select 
+      studentnumber
+      from student 
+      order by studentnumber desc`,
+  { type: sequelize.QueryTypes.SELECT }
+)
+
 const getCurrentAcademicYear = () => sequelize.query(
   `select
       semestercode,
@@ -20,8 +28,10 @@ const getAcademicYearsFrom = startSemesterCode => sequelize.query(
     where semestercode >= :startSemesterCode
     and startdate <= now()
       order by yearname, semestercode`,
-  { replacements: { startSemesterCode },
-    type: sequelize.QueryTypes.SELECT }
+  {
+    replacements: { startSemesterCode },
+    type: sequelize.QueryTypes.SELECT
+  }
 )
 
 const getAcademicYearStatistics = (teacherIds, startSemester) => {
@@ -39,8 +49,10 @@ const getAcademicYearStatistics = (teacherIds, startSemester) => {
         c.semestercode >= :startSemester
       and
         c.semestercode <= :endSemester`,
-    { replacements: { teacherIds, startSemester, endSemester },
-      type: sequelize.QueryTypes.SELECT }
+    {
+      replacements: { teacherIds, startSemester, endSemester },
+      type: sequelize.QueryTypes.SELECT
+    }
   )
 }
 
@@ -61,8 +73,10 @@ const getTeacherAcademicYearStatisticsByIds = (teacherIds, startSemester) => {
       and
         ct.teacher_id in (:teacherIds)
       group by ct.teacher_id`,
-    { replacements: { teacherIds, startSemester, endSemester },
-      type: sequelize.QueryTypes.SELECT }
+    {
+      replacements: { teacherIds, startSemester, endSemester },
+      type: sequelize.QueryTypes.SELECT
+    }
   )
 }
 
@@ -87,8 +101,10 @@ const getAcademicYearCoursesByTeacherIds = (teacherIds, startSemester) => {
         and
           ct.teacher_id in (:teacherIds)
         group by course_code, t.name, t.code, co.name`,
-    { replacements: { teacherIds, startSemester, endSemester },
-      type: sequelize.QueryTypes.SELECT }
+    {
+      replacements: { teacherIds, startSemester, endSemester },
+      type: sequelize.QueryTypes.SELECT
+    }
   )
 }
 
@@ -121,6 +137,7 @@ GROUP BY cg.programmeid,cg.id,cg.name`,
 }
 
 module.exports = {
+  getStudentNumbers,
   getCurrentAcademicYear,
   getAcademicYearsFrom,
   getAcademicYearStatistics,
