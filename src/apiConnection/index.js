@@ -133,7 +133,10 @@ export const handleRequest = store => next => async (action) => {
 }
 
 export const logout = async () => {
-  const response = await getAxios().delete('/logout', { data: { BASE_PATH } })
+  const stagingPath = '/staging'
+  const returnUrl = window.location.pathname.includes(stagingPath) ?
+    `${window.location.origin}${stagingPath}` : window.location.origin
+  const response = await getAxios().delete('/logout', { data: { returnUrl } })
   localStorage.removeItem(TOKEN_NAME)
   window.location = response.data.logoutUrl
 }
