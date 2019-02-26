@@ -9,7 +9,6 @@ const path = require('path')
 const commonSettings = require('./webpack.config.common')
 
 const CSS_MODULES_CLASS_PREFIX = 'no-purify'
-const BASE_PATH = process.env.BASE_PATH != null ? process.env.BASE_PATH : '/'
 
 module.exports = {
   mode: 'production',
@@ -100,7 +99,6 @@ module.exports = {
       template: htmlTemplate,
       appMountId: 'root',
       title: 'Oodikone',
-      baseHref: BASE_PATH,
       minify: {
         collapseWhitespace: true,
         processConditionalComments: true
@@ -123,6 +121,6 @@ module.exports = {
   output: {
     filename: '[name].[chunkhash].bundle.js',
     path: path.join(__dirname, 'dist'),
-    publicPath: BASE_PATH
+    publicPath: ''
   }
 }
