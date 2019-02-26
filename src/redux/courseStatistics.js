@@ -7,7 +7,7 @@ export const getCourseStatistics = ({ code, start, end, separate, language }) =>
 }
 
 export const getMultipleCourseStatistics = ({ codes, start, end, separate, language }) => {
-  const route = `/v2/courseyearlystats/?start=${start}&codes=${codes}&end=${end}&separate=${separate}&language=${language}` // eslint-disable-line
+  const route = `/v2/courseyearlystats/?start=${start}&codes=${JSON.stringify(codes)}&end=${end}&separate=${separate}&language=${language}` // eslint-disable-line
   const prefix = 'FIND_COURSE_STATISTICS_'
   return callController(route, prefix)
 }
