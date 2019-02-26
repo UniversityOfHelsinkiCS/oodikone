@@ -23,7 +23,7 @@ jobs:
         - "if [[ $TRAVIS_BRANCH =~ (trunk) ]]; then docker build -t toska/oodikone2-frontend:testing . ; else :;fi"
         - "if [[ $TRAVIS_BRANCH =~ (trunk) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS ; else :;fi"
         - "if [[ $TRAVIS_BRANCH =~ (trunk) ]]; then docker push toska/oodikone2-frontend:testing ; else :;fi"
-        - "if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker build --build-arg BASE_PATH=/staging/ -t toska/oodikone2-frontend:staging . ; else :;fi"
+        - "if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker build -t toska/oodikone2-frontend:staging . ; else :;fi"
         - "if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS ; else :;fi"
         - "if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker push toska/oodikone2-frontend:staging ; else :;fi"
         - "if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker build -t toska/oodikone2-frontend:latest . ; else :;fi"
