@@ -4,6 +4,8 @@ const moment = require('moment')
 const { User, ElementDetails, AccessGroup } = require('../models')
 const ElementService = require('./studyelements')
 const AccessService = require('./accessgroups')
+const AffiliationService = require('./affiliations')
+const HyGroupService = require('./hygroups')
 const Op = Sequelize.Op
 
 const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
@@ -28,17 +30,64 @@ const generateToken = async (uid, mockedBy = null) => {
   // return the information including token as JSON
   return token
 }
+const createMissingGroups = async (group, service) => {
+  const savedGroups = service.findAll()
+  group.forEach(code => {
+    if (!savedGroups.contains(code)) {
+      await service.create(code)
+    }
+  })
+}
 
-const login = async (uid, full_name, mail) => {
+const updateGroups = async (user, affiliations, hyGroups) => {
+  affiliationsToBeUpdated = user.getAffiliations()
+    affiliations.forEach(async (affilitation) => {
+      if (!affiliationsToBeUpdated.contains(affilitation)) {
+        await user.addAffiliation(affilitation)
+      }
+    })
+    affiliationsToBeUpdated.forEach(async affilitation => {
+      if (!affiliations.contains(affilitation)) {
+        await user.deleteAffilitation(affilitation)
+      }
+    })
+
+    hyGroupsToBeUpdated = user.getAffiliations()
+    hyGroups.forEach(async (hyGroup) => {
+      if (!hyGroupsToBeUpdated.contains(hyGroup)) {
+        await user.addAffiliation(hyGroup)
+      }
+    })
+    hyGroupsToBeUpdated.forEach(async hyGroup => {
+      if (!hyGroups.contains(hyGroup)) {
+        await user.deleteAffilitation(hyGroup)
+      }
+    })
+}
+
+const login = async (uid, full_name, hyGroups, affiliations, mail) => {
   let user = await byUsername(uid)
   let isNew = false
+
+  await createMissingGroups(hyGroups, HyGroupService)
+  await createMissingGroups(affiliations, AffiliationService)
+  
   if (!user) {
     console.log('New user')
     user = await createUser(uid, full_name, mail)
+
+    const userHyGroups = await HyGroupService.byCodes(hyGroups)
+    await user.addHygroups(userHyGroups)
+
+    const userAffiliations = await AffiliationService.byCodes(affiliations)
+    await user.addAffiliations(userAffiliations)
+
     isNew = true
   } else {
-    user = await updateUser(user, { full_name })
+    user = await updateUser(user, { full_name, mail })
+    await updateGroups(user, affiliations, hyGroups)
   }
+
   console.log('Generating token')
   const token = await generateToken(uid)
   console.log('Token done')
