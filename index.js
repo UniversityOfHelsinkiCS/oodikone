@@ -54,9 +54,9 @@ app.post('/user', async (req, res) => {
   res.json(user)
 })
 app.post('/login', async (req, res) => {
-  const { uid, full_name, email } = req.body
+  const { uid, full_name, hyGroups, affiliations, email } = req.body
   console.log(uid, full_name, 'logging in!')
-  const { token, isNew } = await User.login(uid, full_name, email)
+  const { token, isNew } = await User.login(uid, full_name, hyGroups, affiliations, email)
   res.status(200).json({ token, isNew })
 })
 

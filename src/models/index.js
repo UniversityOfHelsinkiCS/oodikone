@@ -61,7 +61,7 @@ const User = sequelize.define('users',
     timestamps: false,
   }
 )
-const HyGroup = sequelize.define('hy_groups',
+const HyGroup = sequelize.define('hy_group',
   {
     id: {
       primaryKey:true,
@@ -118,11 +118,11 @@ ElementDetails.belongsToMany(User, { through: 'user_elementdetails' })
 User.belongsToMany(AccessGroup, { through: 'user_accessgroup', as: 'accessgroup' })
 AccessGroup.belongsToMany(User, { through: 'user_accessgroup' })
 
-User.belongsToMany(HyGroup, { through: 'user_hy_groups', as: 'hy_groups' })
-HyGroup.belongsToMany(User, { through: 'user_hy_groups' })
+User.belongsToMany(HyGroup, { through: 'user_hy_group', as: 'hy_group' })
+HyGroup.belongsToMany(User, { through: 'user_hy_group' })
 
-User.belongsToMany(Affiliation, { through: 'user_affiliations', as: 'affiliations' })
-Affiliation.belongsToMany(User, { through: 'user_affiliations' })
+User.belongsToMany(Affiliation, { through: 'user_affiliation', as: 'affiliation' })
+Affiliation.belongsToMany(User, { through: 'user_affiliation' })
 
 module.exports = {
   User,
