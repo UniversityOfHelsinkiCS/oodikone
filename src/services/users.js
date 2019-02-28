@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
-const { User, ElementDetails, AccessGroup } = require('../models')
+const { User, ElementDetails, AccessGroup, HyGroup, Affiliation } = require('../models')
 const ElementService = require('./studyelements')
 const AccessService = require('./accessgroups')
 const AffiliationService = require('./affiliations')
@@ -40,29 +40,30 @@ const createMissingGroups = async (group, service) => {
 }
 
 const updateGroups = async (user, affiliations, hyGroups) => {
-  affiliationsToBeUpdated = user.getAffiliations()
-    affiliations.forEach(async (affilitation) => {
-      if (!affiliationsToBeUpdated.contains(affilitation)) {
-        await user.addAffiliation(affilitation)
-      }
-    })
-    affiliationsToBeUpdated.forEach(async affilitation => {
-      if (!affiliations.contains(affilitation)) {
-        await user.deleteAffilitation(affilitation)
-      }
-    })
+  affiliationsToBeUpdated = await user.getAffiliations()
+  affiliations.forEach(async (affilitation) => {
+    if (!affiliationsToBeUpdated.contains(affilitation)) {
+      await user.addAffiliation(affilitation)
+    }
+  })
+  console.log(affiliationsToBeUpdated)
+  affiliationsToBeUpdated.forEach(async affilitation => {
+    if (!affiliations.contains(affilitation)) {
+      await user.deleteAffilitation(affilitation)
+    }
+  })
 
-    hyGroupsToBeUpdated = user.getAffiliations()
-    hyGroups.forEach(async (hyGroup) => {
-      if (!hyGroupsToBeUpdated.contains(hyGroup)) {
-        await user.addAffiliation(hyGroup)
-      }
-    })
-    hyGroupsToBeUpdated.forEach(async hyGroup => {
-      if (!hyGroups.contains(hyGroup)) {
-        await user.deleteAffilitation(hyGroup)
-      }
-    })
+  hyGroupsToBeUpdated = await user.getHy_groups()
+  hyGroups.forEach(async (hyGroup) => {
+    if (!hyGroupsToBeUpdated.contains(hyGroup)) {
+      await user.addHy_group(hyGroup)
+    }
+  })
+  hyGroupsToBeUpdated.forEach(async hyGroup => {
+    if (!hyGroups.contains(hyGroup)) {
+      await user.deleteHy_group(hyGroup)
+    }
+  })
 }
 
 const login = async (uid, full_name, hyGroups, affiliations, mail) => {
@@ -77,7 +78,7 @@ const login = async (uid, full_name, hyGroups, affiliations, mail) => {
     user = await createUser(uid, full_name, mail)
 
     const userHyGroups = await HyGroupService.byCodes(hyGroups)
-    await user.addHygroups(userHyGroups)
+    await user.addHy_groups(userHyGroups)
 
     const userAffiliations = await AffiliationService.byCodes(affiliations)
     await user.addAffiliations(userAffiliations)
@@ -96,7 +97,6 @@ const login = async (uid, full_name, hyGroups, affiliations, mail) => {
 }
 const superlogin = async (uid, asUser) => {
   const user = await byUsername(uid)
-  console.log(user)
   if (user.accessgroup.map(r => r.group_code).includes('admin')) {
     const token = await generateToken(asUser, uid)
     return token
@@ -117,6 +117,12 @@ const byUsername = async (username) => {
       model: AccessGroup,
       as: 'accessgroup',
       attributes: ['id', 'group_code', 'group_info']
+    }, {
+      model: HyGroup,
+      as: 'hy_groups'
+    },{
+      model: Affiliation,
+      as: 'affiliations'
     }]
   })
 }
