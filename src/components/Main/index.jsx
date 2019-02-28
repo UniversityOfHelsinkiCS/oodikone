@@ -46,7 +46,7 @@ class Main extends Component {
       )
     }
     this.setState({ enabled, loaded: true })
-    this.ping()
+    // this.ping()
   }
 
   componentDidCatch = async (e) => {
