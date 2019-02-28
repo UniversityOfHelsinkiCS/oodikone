@@ -15,9 +15,9 @@ const byCodes = codes => Affiliation.findAll({
 
 const create = code => Affiliation.create({ code })
 
-const addGroup = async (uid, codes) => {
+const addGroups = async (uid, codes) => {
   const user = await byId(uid)
   const groups = await byCodes(codes)
   await user.addAffiliations(groups)
 }
-module.exports = { byId, byCodes, findAll, create, addAffiliations }
+module.exports = { byId, byCodes, findAll, create, addGroups }
