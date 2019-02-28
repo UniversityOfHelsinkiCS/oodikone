@@ -36,7 +36,7 @@ module.exports = {
       hyGroupId: {
         type: Sequelize.BIGINT,
         references: {
-          model: 'hy_group',
+          model: 'hy_groups',
           key: 'id'
         }
       },

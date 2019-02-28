@@ -31,48 +31,54 @@ const generateToken = async (uid, mockedBy = null) => {
   return token
 }
 const createMissingGroups = async (group, service) => {
-  console.log(group, service)
-  const savedGroups = service.findAll()
-  console.log(savedGroups)
+  const savedGroups = await service.findAll()
   group.forEach(async code => {
-    if (!savedGroups.contains(code)) {
+    if (!savedGroups.map(sg => sg.code).includes(code)) {
+      console.log(`Creating grp ${code}`)
       await service.create(code)
     }
   })
 }
 
 const updateGroups = async (user, affiliations, hyGroups) => {
-  affiliationsToBeUpdated = await user.getAffiliation()
+  let affiliationsToBeUpdated = (await user.getAffiliation()).map(af => af.code)
+  let affiliationsToAdd = []
+  let affiliationsToDelete = []
+
   affiliations.forEach(async (affilitation) => {
-    if (!affiliationsToBeUpdated.contains(affilitation)) {
-      await user.addAffiliation(affilitation)
+    if (!affiliationsToBeUpdated.includes(affilitation)) {
+      affiliationsToAdd = affiliationsToAdd.concat(affilitation)
     }
   })
   affiliationsToBeUpdated.forEach(async affilitation => {
-    if (!affiliations.contains(affilitation)) {
-      await user.deleteAffilitation(affilitation)
+    if (!affiliations.includes(affilitation)) {
+      affiliationsToDelete  = affiliationsToDelete.concat(affilitation)
     }
   })
+  await user.addAffiliation(await AffiliationService.byCodes(affiliationsToAdd))
+  await user.removeAffiliation(await AffiliationService.byCodes(affiliationsToDelete))
+  
+  let hyGroupsToBeUpdated = (await user.getHy_group()).map(hg => hg.code)
+  let hyGroupsToAdd = []
+  let hyGroupsToDelete = []
 
-  hyGroupsToBeUpdated = await user.getHy_group()
   hyGroups.forEach(async (hyGroup) => {
-    if (!hyGroupsToBeUpdated.contains(hyGroup)) {
-      await user.addHy_group(hyGroup)
+    if (!hyGroupsToBeUpdated.includes(hyGroup)) {
+      hyGroupsToAdd = hyGroupsToAdd.concat(hyGroup)
     }
   })
   hyGroupsToBeUpdated.forEach(async hyGroup => {
-    if (!hyGroups.contains(hyGroup)) {
-      await user.deleteHy_group(hyGroup)
+    if (!hyGroups.includes(hyGroup)) {
+      hyGroupsToDelete = hyGroupsToDelete.concat(hyGroup)
     }
   })
+  await user.addHy_group(await HyGroupService.byCodes(hyGroupsToAdd))
+  await user.removeHy_group(await HyGroupService.byCodes(hyGroupsToDelete))
 }
 
 const login = async (uid, full_name, hyGroups, affiliations, mail) => {
   let user = await byUsername(uid)
   let isNew = false
-  console.log(hyGroups)
-  console.log(affiliations)
-  console.log("creating missing groups")
   await createMissingGroups(hyGroups, HyGroupService)
   await createMissingGroups(affiliations, AffiliationService)
   
