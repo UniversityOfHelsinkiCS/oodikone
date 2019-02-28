@@ -8,7 +8,6 @@ if (NODE_ENV === 'test') {
 else if (NODE_ENV === 'anon') {
   DB_URL = process.env.ANON_DB
 }
-console.log(process.env)
 const frontend_addr = process.env.FRONT_URL
 const redis = process.env.REDIS
 const TOKEN_SECRET = process.env.TOKEN_SECRET
