@@ -16,26 +16,26 @@ const ElementDetails = sequelize.define('element_details',
 )
 
 const AccessGroup = sequelize.define('access_group',
-{
-  id: {
-    primaryKey: true,
-    type: Sequelize.BIGINT,
-    autoIncrement: true
-  },
-  group_code: {
-    type: Sequelize.STRING,
-    unique: true
-  },
-  group_info: {
-    type: Sequelize.STRING
-  },
-  createdAt: {
-    type: Sequelize.DATE
-  },
-  updatedAt: {
-    type: Sequelize.DATE
-  }
-})
+  {
+    id: {
+      primaryKey: true,
+      type: Sequelize.BIGINT,
+      autoIncrement: true
+    },
+    group_code: {
+      type: Sequelize.STRING,
+      unique: true
+    },
+    group_info: {
+      type: Sequelize.STRING
+    },
+    createdAt: {
+      type: Sequelize.DATE
+    },
+    updatedAt: {
+      type: Sequelize.DATE
+    }
+  })
 
 
 const User = sequelize.define('users',
@@ -61,6 +61,45 @@ const User = sequelize.define('users',
     timestamps: false,
   }
 )
+const HyGroup = sequelize.define('hy_groups',
+  {
+    id: {
+      primaryKey:true,
+      type: Sequelize.BIGINT,
+      autoIncrement: true
+    },
+
+    code: { type: Sequelize.STRING },
+
+    createdAt: {
+      type: Sequelize.DATE
+    },
+
+    updatedAt: {
+      type: Sequelize.DATE
+    }
+
+  })
+
+  const Affiliation = sequelize.define('affiliations',
+  {
+    id: {
+      primaryKey:true,
+      type: Sequelize.BIGINT,
+      autoIncrement: true
+    },
+
+    code: { type: Sequelize.STRING },
+
+    createdAt: {
+      type: Sequelize.DATE
+    },
+
+    updatedAt: {
+      type: Sequelize.DATE
+    }
+
+  })
 
 const Migration = sequelize.define('migrations', {
   name: {
@@ -79,9 +118,17 @@ ElementDetails.belongsToMany(User, { through: 'user_elementdetails' })
 User.belongsToMany(AccessGroup, { through: 'user_accessgroup', as: 'accessgroup' })
 AccessGroup.belongsToMany(User, { through: 'user_accessgroup' })
 
+User.belongsToMany(HyGroup, { through: 'user_hy_groups', as: 'hy_groups' })
+HyGroup.belongsToMany(User, { through: 'user_hy_groups' })
+
+User.belongsToMany(Affiliation, { through: 'user_affiliations', as: 'affiliations' })
+Affiliation.belongsToMany(User, { through: 'user_affiliations' })
+
 module.exports = {
   User,
   ElementDetails,
   Migration,
-  AccessGroup
+  AccessGroup,
+  HyGroup,
+  Affiliation
 }
