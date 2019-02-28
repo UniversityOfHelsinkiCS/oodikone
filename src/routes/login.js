@@ -29,11 +29,11 @@ router.post('/login', async (req, res) => {
       let parsedHyGroups = []
       let parsedAffiliations = []
 
-      if(!(hyGroups || hyGroups === '')) {
-        parsedHyGroups = hyGroups.split[';']
+      if(!(hyGroups === undefined || hyGroups === '')) {
+        parsedHyGroups = hyGroups.split(';')
       }
-      if(!(affiliations || affiliations === '')) {
-        parsedAffiliations = affiliations.split[';']
+      if(!(affiliations === undefined || affiliations === '')) {
+        parsedAffiliations = affiliations.split(';')
       }
       console.log(uid, 'trying to login, referring to userservice.')
       let { token, isNew } = await userService.login(uid, full_name, parsedHyGroups, parsedAffiliations, mail)
