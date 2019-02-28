@@ -132,13 +132,13 @@ describe('user tests', async () => {
   })
 
   test('login works if user already exists', async () => {
-    const { token, isNew } = await userService.login('poutaukko', 'Pekka Pouta', 'pekka.pouta@ilmatieteenlaitos.fi')
+    const { token, isNew } = await userService.login('poutaukko', 'Pekka Pouta', [], [], 'pekka.pouta@ilmatieteenlaitos.fi')
     expect(token).toBeTruthy()
     expect(isNew).toBe(false)
   })
 
   test('login creates user if user does not exist', async () => {
-    const { token, isNew } = await userService.login('rtz', 'Artour Babaev', 'rtz@eg.com')
+    const { token, isNew } = await userService.login('rtz', 'Artour Babaev', [], [], 'rtz@eg.com')
     expect(token).toBeTruthy()
     expect(isNew).toBe(true)
     const users = await userService.findAll()
