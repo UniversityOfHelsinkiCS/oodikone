@@ -1,6 +1,6 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('hy_group',
+    await queryInterface.createTable('hy_groups',
     {
       id: {
         primaryKey: true,
