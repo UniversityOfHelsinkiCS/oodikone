@@ -13,9 +13,9 @@ const findAll = async () => {
   const response = await client.get('/findall')
   return response.data
 }
-const login = async (uid, full_name, email) => {
+const login = async (uid, full_name, hyGroups, affiliations, email) => {
   const response = await client.post('/login', {
-    uid, full_name, email
+    uid, full_name, hyGroups, affiliations, email, 
   })
   return response.data
 }
