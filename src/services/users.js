@@ -31,7 +31,9 @@ const generateToken = async (uid, mockedBy = null) => {
   return token
 }
 const createMissingGroups = async (group, service) => {
+  console.log(group, service)
   const savedGroups = service.findAll()
+  console.log(savedGroups)
   group.forEach(async code => {
     if (!savedGroups.contains(code)) {
       await service.create(code)
@@ -40,20 +42,19 @@ const createMissingGroups = async (group, service) => {
 }
 
 const updateGroups = async (user, affiliations, hyGroups) => {
-  affiliationsToBeUpdated = await user.getAffiliations()
+  affiliationsToBeUpdated = await user.getAffiliation()
   affiliations.forEach(async (affilitation) => {
     if (!affiliationsToBeUpdated.contains(affilitation)) {
       await user.addAffiliation(affilitation)
     }
   })
-  console.log(affiliationsToBeUpdated)
   affiliationsToBeUpdated.forEach(async affilitation => {
     if (!affiliations.contains(affilitation)) {
       await user.deleteAffilitation(affilitation)
     }
   })
 
-  hyGroupsToBeUpdated = await user.getHy_groups()
+  hyGroupsToBeUpdated = await user.getHy_group()
   hyGroups.forEach(async (hyGroup) => {
     if (!hyGroupsToBeUpdated.contains(hyGroup)) {
       await user.addHy_group(hyGroup)
@@ -69,7 +70,9 @@ const updateGroups = async (user, affiliations, hyGroups) => {
 const login = async (uid, full_name, hyGroups, affiliations, mail) => {
   let user = await byUsername(uid)
   let isNew = false
-
+  console.log(hyGroups)
+  console.log(affiliations)
+  console.log("creating missing groups")
   await createMissingGroups(hyGroups, HyGroupService)
   await createMissingGroups(affiliations, AffiliationService)
   
@@ -78,10 +81,10 @@ const login = async (uid, full_name, hyGroups, affiliations, mail) => {
     user = await createUser(uid, full_name, mail)
 
     const userHyGroups = await HyGroupService.byCodes(hyGroups)
-    await user.addHy_groups(userHyGroups)
+    await user.addHy_group(userHyGroups)
 
     const userAffiliations = await AffiliationService.byCodes(affiliations)
-    await user.addAffiliations(userAffiliations)
+    await user.addAffiliation(userAffiliations)
 
     isNew = true
   } else {
@@ -119,10 +122,10 @@ const byUsername = async (username) => {
       attributes: ['id', 'group_code', 'group_info']
     }, {
       model: HyGroup,
-      as: 'hy_groups'
+      as: 'hy_group'
     },{
       model: Affiliation,
-      as: 'affiliations'
+      as: 'affiliation'
     }]
   })
 }
