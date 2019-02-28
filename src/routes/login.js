@@ -24,8 +24,19 @@ router.post('/login', async (req, res) => {
     if (req.headers['shib-session-id'] && uid) {
       const full_name = req.headers.displayname || 'Shib Valmis'
       const mail = req.headers.mail || ''
+      const hyGroups = req.headers['hygroupcn']
+      const affiliations = req.headers['edupersonaffiliation']
+      let parsedHyGroups = []
+      let parsedAffiliations = []
+
+      if(!(hyGroups || hyGroups === '')) {
+        parsedHyGroups = hyGroups.split[';']
+      }
+      if(!(affiliations || affiliations === '')) {
+        parsedAffiliations = affiliations.split[';']
+      }
       console.log(uid, 'trying to login, referring to userservice.')
-      let { token, isNew } = await userService.login(uid, full_name, mail)
+      let { token, isNew } = await userService.login(uid, full_name, parsedHyGroups, parsedAffiliations, mail)
       isNew && sendEmail(uid)
       res.status(200).json({ token })
     } else {
