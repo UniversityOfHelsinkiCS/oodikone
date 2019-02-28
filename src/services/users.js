@@ -32,7 +32,7 @@ const generateToken = async (uid, mockedBy = null) => {
 }
 const createMissingGroups = async (group, service) => {
   const savedGroups = service.findAll()
-  group.forEach(code => {
+  group.forEach(async code => {
     if (!savedGroups.contains(code)) {
       await service.create(code)
     }
