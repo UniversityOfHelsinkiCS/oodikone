@@ -16,7 +16,6 @@ jobs:
         - cd oodikone2-cli
         - source scripts.sh && run_e2e_setup
         - cd ..
-        - docker ps
         - CYPRESS_baseUrl=http://localhost:8081 npm run cypress:run
 
     - stage: build & deploy
