@@ -40,6 +40,14 @@ class WelcomePage extends Component { //eslint-disable-line
           </p>
           <Divider section />
 
+          <h4>
+            Trouble? Questions? Suggestions? Need access rights?
+          </h4>
+          <p>
+            Contact team Oodikone by email: grp-toska@helsinki.fi
+          </p>
+          <Divider section />
+
           {/* <h4>
             Settings
           </h4>
