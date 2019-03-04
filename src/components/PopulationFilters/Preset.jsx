@@ -77,13 +77,6 @@ class Preset extends Component {
                     onClick={() => this.setState({ open: true })}
                   />
                   <Confirm
-                    style={{
-                      marginTop: 'auto !important',
-                      display: 'inline-block !important',
-                      position: 'relative',
-                      top: '20%',
-                      left: '33%'
-                    }}
                     open={this.state.open}
                     cancelButton="Just remove from use"
                     confirmButton="Delete for good"
