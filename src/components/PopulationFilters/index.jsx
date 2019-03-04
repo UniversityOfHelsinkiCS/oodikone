@@ -257,13 +257,6 @@ class PopulationFilters extends Component {
         <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
         {this.state.advancedUser ?
           <Modal
-            style={{
-              marginTop: 'auto !important',
-              display: 'inline-block !important',
-              position: 'relative',
-              top: '20%',
-              left: '33%'
-            }}
             trigger={<Button onClick={() => this.setState({ modalOpen: true })}>Save filters as preset</Button>}
             open={this.state.modalOpen}
             onClose={() => this.setState({ modalOpen: false })}
