@@ -132,7 +132,7 @@ class PopulationSearchForm extends Component {
     }
 
     // When changing year, remove degree and track selections
-    // if they are no longer possible to select or there is only one selection possible
+    // if they are no longer possible to select
     let { degree, studyTrack } = this.state.query.studyRights
     if (degree || studyTrack) {
       if (!query.studyRights.programme) {
@@ -144,12 +144,10 @@ class PopulationSearchForm extends Component {
           degree = null
           studyTrack = null
         } else {
-          if (!associations.degrees[this.state.query.studyRights.degree]
-            || Object.values(associations.degrees).length <= 1) {
+          if (!associations.degrees[this.state.query.studyRights.degree]) {
             degree = null
           }
-          if (!associations.studyTracks[this.state.query.studyRights.studyTrack]
-            || Object.values(associations.studyTracks).length <= 1) {
+          if (!associations.studyTracks[this.state.query.studyRights.studyTrack]) {
             studyTrack = null
           }
         }
@@ -427,10 +425,10 @@ class PopulationSearchForm extends Component {
       return (
         <Form.Group>
           <Form.Field width={8}>
-            { degreesToRender && degreesToRender.length > 1 ? renderableDegrees() : null }
+            { degreesToRender && degreesToRender.length > 0 ? renderableDegrees() : null }
           </Form.Field>
           <Form.Field width={8}>
-            { studyTracksToRender && studyTracksToRender.length > 1 ? renderableTracks() : null }
+            { studyTracksToRender && studyTracksToRender.length > 0 ? renderableTracks() : null }
           </Form.Field>
         </Form.Group>
       )
