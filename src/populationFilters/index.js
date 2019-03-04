@@ -249,6 +249,7 @@ const typeList = {
   CourseParticipationNTimes: courseParticipationNTimes,
   CanceledStudyright: canceledStudyright,
   Preset: presetFilter,
+  TransferToStudyrightFilter: transferTo,
   PriorityStudyright: priorityStudyright
 }
 export const getFilterFunction = (type, params, populationCourses) => {
