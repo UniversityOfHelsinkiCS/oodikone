@@ -21,6 +21,15 @@ describe('Population Statistics tests', () => {
     })
   }
 
+  const removeFilter = (text) => {
+    cy.contains("Filters").siblings().within(() => {
+      cy.contains(text).parent().within(() => {
+        cy.get(".remove").click()
+      })
+    })
+  }
+
+
   it('Population statistics search form is usable', () => {
     cy.contains("See population").should('be.disabled')
     cy.url().should('include', '/populations')
@@ -75,16 +84,24 @@ describe('Population Statistics tests', () => {
 
     cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
       cy.get("tr").its('length').should('be.gte', 10)
+      cy.get("tr").eq(3).find(".level").click()
+      cy.wait(1000)
+      cy.url().should('include', '/coursestatistics')
     })
+    cy.contains("DIGI-000A")
+    cy.contains("Searched courses").parentsUntil(".segment").contains("digitaidot").should("have.text", "Opiskelijan digitaidot: orientaatio (Keskusta)")
+    
+    cy.go("back")
     cy.get("button").contains("show").click()
     cy.contains("Student names hidden").click()
     cy.contains("Oinonen").siblings().eq(2).click()
     cy.contains("Oinonen").invoke('text').then((text) => expect(text).to.equal('Oinonen Heidi Eeva Elisabet, 014473717'))
   })
 
-  it.only('All filters working', () => {
-    cy.contains("Select study programme").click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
+  it('All filters working', () => {
+    cy.contains("Select study programme", { timeout: 50000 }).click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
     cy.contains("See population").click()
+    cy.wait(5000)
 
     cy.contains("add").click()
     cy.contains("Add filters").siblings().within(() => {
@@ -108,8 +125,106 @@ describe('Population Statistics tests', () => {
 
     checkAmountOfStudents(17)
 
-    // cy.contains("select status").click().contains("present").click()
-    // cy.contains("select semesters").click().contains("Fall 2018").click().contains("Spring 2018").click()
-  })
+    cy.contains("select status").click().siblings().contains("present").click()
+    cy.contains("select semesters").click().siblings().contains("Fall 2018").click()
+    cy.contains("Spring 2018").click()
+    cy.contains("Spring 2018").parentsUntil("form").contains("set filter").click()
+    cy.contains("Students that were present").should('have.text', "Students that were present during Fall 2018, Spring 2018")
 
+    checkAmountOfStudents(17)
+
+    cy.contains("have/haven't").click().siblings().contains('haven\'t').click()
+    cy.contains('canceled this studyright').parentsUntil('form').contains('set filter').click()
+    cy.contains('Excluded students whose').should('have.text', 'Excluded students whose studyright is cancelled')
+
+    checkAmountOfStudents(17)
+
+    cy.contains('have not transfer to').parentsUntil("form").contains("set filter").click()
+
+    checkAmountOfStudents(17)
+
+    cy.contains("Advanced filters").click()
+
+    cy.contains("Save filters as preset").click()
+    cy.contains("This filter is saved").siblings().within(() => { cy.get("input").type(`Basic filters-${new Date().getTime()}`, { delay: 0 }) })
+    cy.contains("Save current filters as preset").parentsUntil(".dimmer").within(() => { cy.get("button").contains("Save").click() })
+
+    cy.contains("Filters").siblings().within(() => {
+      cy.contains(`Basic filters`).parentsUntil("form").get(".remove").click()
+    })
+
+    cy.contains("course type").click().siblings().contains("Aineopinnot").click()
+    cy.contains("discipline").click().siblings().contains("Kasvatustieteet").click()
+    cy.contains("and at least").parentsUntil("form").contains("set filter").click()
+
+    cy.contains("Filters").siblings().within(() => {
+      cy.contains('Kehittävä').should('have.text', 'Kehittävä työntutkimus')
+      cy.contains('Kvalitatiiviset').should('have.text', 'Kvalitatiiviset tutkimusmenetelmät I')
+    })
+
+    checkAmountOfStudents(1)
+
+    removeFilter('Kehittävä')
+
+    cy.contains("select source").click().siblings().contains("Anywhere").click()
+    cy.contains("select target").click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
+    cy.contains("Students that transferred from").parentsUntil("form").contains("set filter").click()
+    cy.contains("Showing students that transferred").should('have.text', 'Showing students that transferred to Kasvatustieteiden kandiohjelma')
+
+    cy.contains('are/not').click().siblings().contains('not').click()
+    cy.contains('select graduation').click().siblings().contains('graduated').click()
+    cy.contains('select extent').click().siblings().contains('Ylempi korkeakoulututkinto').click()
+    cy.contains('Alempi korkeakoulututkinto').parentsUntil("form").contains("set filter").click()
+
+    cy.contains('Excluded students that graduated')
+
+    cy.contains("Students that has").parentsUntil("form").within(() => {
+      cy.contains("degree").click().siblings().contains("any degree").click()
+      cy.contains("programme").click().siblings().contains("Kasvatustieteiden kandiohjelma")
+      cy.contains("priority").click().siblings().contains("primary studies").click()
+      cy.contains("set filter").click()
+    })
+
+    checkAmountOfStudents(1)
+
+    cy.contains("Basic filters").parentsUntil("form").contains("set filter").click()
+
+    cy.contains("Save filters as preset").click()
+    cy.contains("This filter is saved").siblings().within(() => { cy.get("input").type(`Advanced filters-${new Date().getTime()}`, { delay: 0 }) })
+    cy.contains("Save current filters as preset").parentsUntil(".dimmer").within(() => { cy.get("button").contains("Save").click() })
+
+    cy.reload()
+    cy.contains("Select study programme", { timeout: 50000 }).click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
+    cy.contains("See population").click()
+    cy.wait(5000)
+
+    cy.contains("add").click()
+    cy.contains("Advanced filters").click()
+
+    cy.get('label:contains(Basic filters)').each(($f) => {
+      cy.wrap($f).parentsUntil("form").contains("set filter").click()
+    })
+    cy.get("label:contains(Advanced filters-)").each(($f) => {
+      cy.wrap($f).parentsUntil("form").contains("set filter").click()
+    })
+
+    cy.get(".header").contains("Filters").siblings().within(() => {
+      cy.get("label:contains(Basic filters)").each(($f) => {
+        cy.wrap($f).parentsUntil(".segment").within(() => {
+          cy.get(".trash").click()
+        })
+      })
+    })
+    cy.get("button").contains("Delete for good").click({ force: true })
+
+    cy.contains("Filters").siblings().within(() => {
+      cy.get("label:contains(Advanced filters-)").each(($f) => {
+        cy.wrap($f).parentsUntil(".segment").within(() => {
+          cy.get(".trash").click()
+        })
+      })
+    })
+    cy.get("button").contains("Delete for good").click({ force: true })
+
+  })
 })
