@@ -238,13 +238,18 @@ const count = (column, count, distinct = false) => {
   )
 }
 
-const studentnumbersWithAllStudyrightElements = async (studyRights,startDate, endDate, exchangeStudents, cancelledStudents) => { // eslint-disable-line
-
-  let studyrightWhere = {}
-  if (!exchangeStudents) {
-    studyrightWhere.extentcode = {
-      [Op.notIn]: [7, 34]
+const studentnumbersWithAllStudyrightElements = async (studyRights,startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents) => { // eslint-disable-line
+  const filteredExtents = []
+  let studyrightWhere = {
+    extentcode: {
+      [Op.notIn]: filteredExtents
     }
+  }
+  if (!exchangeStudents) {
+    filteredExtents.push(7, 34)
+  }
+  if (!nondegreeStudents) {
+    filteredExtents.push(33, 99, 14, 13)
   }
   if (!cancelledStudents) {
     studyrightWhere.canceldate = null
@@ -300,9 +305,11 @@ const parseQueryParams = query => {
     `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
   const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
   const cancelledStudents = studentStatuses && studentStatuses.includes('CANCELLED')
+  const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
   return {
     exchangeStudents,
     cancelledStudents,
+    nondegreeStudents,
     studyRights,
     months,
     startDate,
@@ -397,14 +404,21 @@ const optimizedStatisticsOf = async (query) => {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
   if (query.studentStatuses &&
-      !query.studentStatuses.map(status => status === 'CANCELLED' || status === 'EXCHANGE').every(e => e === true)) {
-    return { error: 'Student status should be either CANCELLED or EXCHANGE' }
+    !query.studentStatuses.map(
+      status => status === 'CANCELLED' || status === 'EXCHANGE' || status === 'NONDEGREE'
+    ).every(e => e === true)
+  ) {
+    return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE' }
   }
 
-  const { studyRights, startDate, endDate, months, exchangeStudents, cancelledStudents } = parseQueryParams(query)
+  const {
+    studyRights, startDate, endDate, months, exchangeStudents, cancelledStudents, nondegreeStudents
+  } = parseQueryParams(query)
 
   const studentnumbers =
-    await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate, exchangeStudents, cancelledStudents)
+    await studentnumbersWithAllStudyrightElements(
+      studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
+    )
   const students =
     await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months), studyRights)
 
@@ -468,8 +482,10 @@ const bottlenecksOf = async (query) => {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
   if (query.studentStatuses &&
-    !query.studentStatuses.map(status => status === 'CANCELLED' || status === 'EXCHANGE').every(e => e === true)) {
-    return { error: 'Student status should be either CANCELLED or EXCHANGE' }
+    !query.studentStatuses.map(
+      status => status === 'CANCELLED' || status === 'EXCHANGE' || status === 'NONDEGREE'
+    ).every(e => e === true)) {
+    return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE' }
   }
 
   const { studyRights, startDate, endDate, months, exchangeStudents, cancelledStudents } = parseQueryParams(query)
