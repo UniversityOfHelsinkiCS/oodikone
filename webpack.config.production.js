@@ -10,6 +10,8 @@ const commonSettings = require('./webpack.config.common')
 
 const CSS_MODULES_CLASS_PREFIX = 'no-purify'
 
+console.log("print BASE_PATH", process.env.BASE_PATH)
+
 module.exports = {
   mode: 'production',
   context: path.join(__dirname, 'src'),
@@ -87,7 +89,7 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       CONFIG: {
-        BASE_PATH: JSON.stringify('')
+        BASE_PATH: JSON.stringify(process.env.BASE_PATH || '')
       },
       'process.env': {
         NODE_ENV: JSON.stringify('production')
