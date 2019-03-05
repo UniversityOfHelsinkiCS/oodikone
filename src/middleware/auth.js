@@ -17,12 +17,8 @@ const checkAuth = async (req, res, next) => {
       } else if (decoded.version !== TOKEN_VERSION) {
         res.status(401).json({ error: 'Token needs to be refreshed - invalid version', reloadPage: true })
       } else if (decoded.mockedBy ? isShibboUser(decoded.mockedBy, uid) : isShibboUser(decoded.userId, uid)) {
-        if (decoded.enabled) {
-          req.decodedToken = decoded
-          next()
-        } else {
-          res.status(403).json({ error: 'User is not enabled' })
-        }
+        req.decodedToken = decoded
+        next()
       } else {
         res.status(403).json({ error: 'User shibboleth id and token id did not match' })
       }
