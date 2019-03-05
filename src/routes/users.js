@@ -13,19 +13,6 @@ router.get('/access_groups', async (req, res) => {
   res.json(result)
 })
 
-router.put('/:id/enable', async (req, res) => {
-  const id = req.params.id
-  const user = await userService.byId(id)
-  if (!user) res.status(400).end()
-  else {
-    const result = await userService.updateUser(user.username, { is_enabled: !user.is_enabled })
-    const status = result.error === undefined ? 200 : 400
-    if (user.username != req.decodedToken.userId)
-      await blacklist.addUserToBlacklist(user.username)
-    res.status(status).json(result)
-  }
-})
-
 router.post('/modifyaccess', async (req, res) => {
   try {
     const { uid } = req.body
