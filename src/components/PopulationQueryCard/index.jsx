@@ -46,6 +46,9 @@ const PopulationQueryCard =
             <div>{studentStatuses.includes('CANCELLED') ? 'Includes ' : 'Excludes ' }
               students with cancelled study right
             </div>
+            <div>{studentStatuses.includes('NONDEGREE') ? 'Includes ' : 'Excludes ' }
+              students with non-degree study right
+            </div>
             {updating ?
               <Button disabled compact floated="left" size="medium" labelPosition="left" onClick={updateStudentsFn} >
                 <Icon loading name="refresh" />
