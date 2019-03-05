@@ -99,6 +99,7 @@ module.exports = {
       template: htmlTemplate,
       appMountId: 'root',
       title: 'Oodikone',
+      baseHref: process.env.BASE_PATH,
       minify: {
         collapseWhitespace: true,
         processConditionalComments: true
@@ -121,6 +122,6 @@ module.exports = {
   output: {
     filename: '[name].[chunkhash].bundle.js',
     path: path.join(__dirname, 'dist'),
-    publicPath: ''
+    publicPath: process.env.BASE_PATH || ''
   }
 }
