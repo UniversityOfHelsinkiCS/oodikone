@@ -6,6 +6,7 @@ const ElementService = require('./studyelements')
 const AccessService = require('./accessgroups')
 const AffiliationService = require('./affiliations')
 const HyGroupService = require('./hygroups')
+const { requiredGroup } = require('../conf')
 const Op = Sequelize.Op
 
 const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
@@ -13,11 +14,12 @@ const generateToken = async (uid, mockedBy = null) => {
   let user = await byUsername(uid)
   const elementdetails = await getUserElementDetails(user.username)
   const elements = elementdetails.map(element => element.code)
+  const enabled = requiredGroup === null || user.hy_group.some(e => e.code === requiredGroup)
   const payload = {
     id: user.id,
     userId: uid, // username
     name: user.full_name,
-    enabled: user.is_enabled,
+    enabled,
     language: user.language,
     mockedBy,
     rights: elements,
@@ -57,7 +59,7 @@ const updateGroups = async (user, affiliations, hyGroups) => {
   })
   await user.addAffiliation(await AffiliationService.byCodes(affiliationsToAdd))
   await user.removeAffiliation(await AffiliationService.byCodes(affiliationsToDelete))
-  
+
   let hyGroupsToBeUpdated = (await user.getHy_group()).map(hg => hg.code)
   let hyGroupsToAdd = []
   let hyGroupsToDelete = []
@@ -81,7 +83,7 @@ const login = async (uid, full_name, hyGroups, affiliations, mail) => {
   let isNew = false
   await createMissingGroups(hyGroups, HyGroupService)
   await createMissingGroups(affiliations, AffiliationService)
-  
+
   if (!user) {
     console.log('New user')
     user = await createUser(uid, full_name, mail)
@@ -140,7 +142,6 @@ const createUser = async (username, fullname, email) => {
   return User.create({
     username: username,
     full_name: fullname,
-    is_enabled: false,
     czar: false,
     email
   })
@@ -193,6 +194,10 @@ const findAll = async () => {
     {
       model: AccessGroup,
       as: 'accessgroup'
+    },
+    {
+      model: HyGroup,
+      as: 'hy_group'
     }]
   })
 }
