@@ -8,7 +8,7 @@
     "react"
   ],
   "env": {
-    "development": {
+    "dev": {
       "plugins": [
         "transform-object-rest-spread",
         "transform-class-properties",
