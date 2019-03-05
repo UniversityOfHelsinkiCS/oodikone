@@ -545,6 +545,15 @@ class PopulationSearchForm extends Component {
               checked={studentStatuses.includes('CANCELLED')}
               onChange={this.handleStudentStatusSelection}
             />
+            <Form.Checkbox
+              className={style.populationStatisticsRadio}
+              key="NONDEGREE"
+              label="Students with non-degree study right"
+              value="NONDEGREE"
+              name="studentStatusGroup"
+              checked={studentStatuses.includes('NONDEGREE')}
+              onChange={this.handleStudentStatusSelection}
+            />
           </Form.Field>
         </Form.Group>
       </div>)
