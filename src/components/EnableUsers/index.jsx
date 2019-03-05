@@ -4,7 +4,7 @@ import { Button, Icon, Header, Segment, Confirm, Loader, Label } from 'semantic-
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
-import { getUsers, enableUser, sendEmail } from '../../redux/users'
+import { getUsers, sendEmail } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { makeSortUsers } from '../../selectors/users'
 import { copyToClipboard } from '../../common'
@@ -23,11 +23,8 @@ class EnableUsers extends Component {
     this.props.getUnits()
   }
 
-  enableUser = user => () => {
-    if (!user.is_enabled) {
-      this.setState({ confirm: true, email: user.email })
-    }
-    this.props.enableUser(user.id)
+  sendMailPopup = user => () => {
+    this.setState({ confirm: true, email: user.email })
   }
 
   openEditUserPage = userid => () => {
@@ -76,7 +73,7 @@ class EnableUsers extends Component {
           open={this.state.confirm}
           cancelButton="no"
           confirmButton="send"
-          content="Do you want to notify this person by email?"
+          content="Do you want to notify this person by email about receiving access to oodikone?"
           onCancel={() => { this.setState({ confirm: false }) }}
           onConfirm={() => {
             this.setState({ confirm: false })
@@ -129,18 +126,23 @@ class EnableUsers extends Component {
               }
             }, {
               key: 'OODIACCESS',
-              title: 'Access to oodikone',
+              title: 'Has access',
               getRowVal: user => user.is_enabled,
               getRowContent: user => (
-                <Button.Group compact widths={2}>
-                  <Button animated basic onClick={this.enableUser(user)} size="mini">
-                    <Button.Content hidden>{user.is_enabled ? 'Disable' : 'Enable'}</Button.Content>
-                    <Button.Content visible>
-                      <Icon color={user.is_enabled ? 'green' : 'red'} name={user.is_enabled ? 'check' : 'remove'} />
-                    </Button.Content>
-                  </Button>
-                </Button.Group>
+                <Icon
+                  style={{ margin: 'auto' }}
+                  color={user.is_enabled ? 'green' : 'red'}
+                  name={user.is_enabled ? 'check' : 'remove'}
+                />
               )
+            }, {
+              key: 'SENDMAIL',
+              title: '',
+              getRowVal: user => user.is_enabled,
+              getRowContent: user => (
+                <Button onClick={this.sendMailPopup(user)} basic fluid size="mini">Send mail</Button>
+              ),
+              headerProps: { onClick: null, sorted: null }
             }, {
               key: 'EDIT',
               title: '',
@@ -192,7 +194,6 @@ EnableUsers.propTypes = {
     })
   }).isRequired,
   getUsers: func.isRequired,
-  enableUser: func.isRequired,
   getUnits: func.isRequired,
   sendEmail: func.isRequired,
   users: arrayOf(shape({
@@ -223,7 +224,6 @@ const mapStateToProps = ({ locale, users, units, settings }) => ({
 
 export default withRouter(connect(mapStateToProps, {
   getUsers,
-  enableUser,
   getUnits,
   sendEmail
 })(EnableUsers))
