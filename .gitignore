@@ -29,3 +29,4 @@ yarn-error.log*
 
 #Stats
 stats.json
+cypress/screenshots
