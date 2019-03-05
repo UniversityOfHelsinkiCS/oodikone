@@ -20,7 +20,6 @@ import Teachers from '../Teachers'
 import Sandbox from '../Sandbox'
 import OodiLearn from '../OodiLearn'
 import StudyProgramme from '../StudyProgramme'
-import { callApi } from '../../apiConnection'
 
 import styles from './main.css'
 
@@ -46,7 +45,6 @@ class Main extends Component {
       )
     }
     this.setState({ enabled, loaded: true })
-    // this.ping()
   }
 
   componentDidCatch = async (e) => {
@@ -64,28 +62,10 @@ class Main extends Component {
   }
 
   setNetworkError = () => this.setState({
-    guide: `Oodikone is unable to connect. 
-      Double check that you're in eduroam or have 
+    guide: `Oodikone is unable to connect.
+      Double check that you're in eduroam or have
       pulse security on. Refresh by pressing F5.`,
     networkError: true })
-
-  ping = async () => {
-    try {
-      const res = await callApi('/ping', 'get', null, null, 5000)
-      if (res.status === 504) {
-        throw new Error('Vituix män')
-      } else {
-        this.setState({
-          networkError: false,
-          guide: `try refreshing your browser window, pressing
-            log out or contacting grp-toska@helsinki.fi`
-        })
-      }
-    } catch (e) {
-      this.setNetworkError()
-    }
-    setTimeout(this.ping, this.state.networkError ? 2000 : 30000)
-  }
 
   render() {
     if (!this.state.loaded) {

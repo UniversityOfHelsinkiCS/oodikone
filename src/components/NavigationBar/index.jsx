@@ -29,13 +29,11 @@ class NavigationBar extends Component {
   setNavigationRoutes = async () => {
     const navigationRoutes = { ...routes }
     const roles = await userRoles()
-    if (!roles.includes('admin')) {
-      Object.keys(navigationRoutes).forEach((key) => {
-        if (navigationRoutes[key].reqRights && roles.every(r => navigationRoutes[key].reqRights.indexOf(r) === -1)) {
-          delete navigationRoutes[key]
-        }
-      })
-    }
+    Object.keys(navigationRoutes).forEach((key) => {
+      if (navigationRoutes[key].reqRights && roles.every(r => navigationRoutes[key].reqRights.indexOf(r) === -1)) {
+        delete navigationRoutes[key]
+      }
+    })
     this.setState({ navigationRoutes })
   }
 
