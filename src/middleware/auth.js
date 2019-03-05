@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const conf = require('../conf-backend')
 const blacklist = require('../services/blacklist')
 const { ACCESS_TOKEN_HEADER_KEY } = require('../conf-backend')
+const { hasRequiredGroup, parseHyGroups } = require('../util/utils')
 
 const isShibboUser = (userId, uidHeader) => userId === uidHeader
 const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
@@ -45,10 +46,23 @@ const roles = requiredRoles => (req, res, next) => {
   res.status(403).json({ error: 'missing required roles' })
 }
 
+const checkRequiredGroup = async (req, res, next) => {
+  const hyGroups = parseHyGroups(req.headers['hygroupcn'])
+  if (req.decodedToken.enabled !== hasRequiredGroup(hyGroups)) {
+    res.status(401).json({
+      error: 'Token needs to be refreshed - enabled doesnt match hy-group requirement',
+      reloadPage: true
+    })
+  } else {
+    next()
+  }
+}
+
 const checkUserBlacklisting = async (req, res, next) => {
   const { userId, createdAt } = req.decodedToken
   const isBlacklisted = await blacklist.isUserBlacklisted(userId, createdAt)
-  if (isBlacklisted) {
+  const hyGroups = parseHyGroups(req.headers['hygroupcn'])
+  if (isBlacklisted || req.decodedToken.enabled !== hasRequiredGroup(hyGroups)) {
     res.status(401).json({ error: 'Token needs to be refreshed - blacklisted', reloadPage: true })
   } else {
     next()
@@ -56,5 +70,5 @@ const checkUserBlacklisting = async (req, res, next) => {
 }
 
 module.exports = {
-  checkAuth, roles, checkUserBlacklisting
+  checkAuth, roles, checkRequiredGroup, checkUserBlacklisting
 }

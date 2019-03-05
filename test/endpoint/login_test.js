@@ -93,7 +93,7 @@ test.skip('logout removes token', async t => {
       'displayname': user.full_name
     })
     .expect(200)
-  
+
   const res2 = await api
     .delete('/api/logout')
     .expect(200)
