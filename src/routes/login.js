@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const mailservice = require('../services/mailservice')
 const userService = require('../services/userService')
+const { parseHyGroups } = require('../util/utils')
 
 const sendEmail = async (uid) => {
   if (process.env.SMTP !== undefined) {
@@ -24,19 +25,15 @@ router.post('/login', async (req, res) => {
     if (req.headers['shib-session-id'] && uid) {
       const full_name = req.headers.displayname || 'Shib Valmis'
       const mail = req.headers.mail || ''
-      const hyGroups = req.headers['hygroupcn']
+      const hyGroups = parseHyGroups(req.headers['hygroupcn'])
       const affiliations = req.headers['edupersonaffiliation']
-      let parsedHyGroups = []
       let parsedAffiliations = []
 
-      if(!(hyGroups === undefined || hyGroups === '')) {
-        parsedHyGroups = hyGroups.split(';')
-      }
       if(!(affiliations === undefined || affiliations === '')) {
         parsedAffiliations = affiliations.split(';')
       }
       console.log(uid, 'trying to login, referring to userservice.')
-      let { token, isNew } = await userService.login(uid, full_name, parsedHyGroups, parsedAffiliations, mail)
+      let { token, isNew } = await userService.login(uid, full_name, hyGroups, parsedAffiliations, mail)
       isNew && sendEmail(uid)
       res.status(200).json({ token })
     } else {
