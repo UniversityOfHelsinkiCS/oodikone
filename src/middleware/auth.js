@@ -44,11 +44,15 @@ const roles = requiredRoles => (req, res, next) => {
 
 const checkRequiredGroup = async (req, res, next) => {
   const hyGroups = parseHyGroups(req.headers['hygroupcn'])
-  if (req.decodedToken.enabled !== hasRequiredGroup(hyGroups)) {
+  const enabled = hasRequiredGroup(hyGroups)
+  const tokenOutdated = req.decodedToken.enabled !== enabled
+  if (tokenOutdated) {
     res.status(401).json({
       error: 'Token needs to be refreshed - enabled doesnt match hy-group requirement',
       reloadPage: true
     })
+  } else if (!enabled) {
+    res.status(403).json({ error: 'User is not enabled' })
   } else {
     next()
   }
@@ -57,8 +61,7 @@ const checkRequiredGroup = async (req, res, next) => {
 const checkUserBlacklisting = async (req, res, next) => {
   const { userId, createdAt } = req.decodedToken
   const isBlacklisted = await blacklist.isUserBlacklisted(userId, createdAt)
-  const hyGroups = parseHyGroups(req.headers['hygroupcn'])
-  if (isBlacklisted || req.decodedToken.enabled !== hasRequiredGroup(hyGroups)) {
+  if (isBlacklisted) {
     res.status(401).json({ error: 'Token needs to be refreshed - blacklisted', reloadPage: true })
   } else {
     next()
