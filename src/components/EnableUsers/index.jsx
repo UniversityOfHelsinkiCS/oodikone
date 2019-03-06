@@ -148,7 +148,7 @@ class EnableUsers extends Component {
               title: '',
               getRowVal: user => (
                 <Button.Group compact widths={2}>
-                  <Button animated basic size="mini" disabled={!user.is_enabled} onClick={this.openEditUserPage(user.id)}>
+                  <Button animated basic size="mini" onClick={this.openEditUserPage(user.id)}>
                     <Button.Content hidden>Edit</Button.Content>
                     <Button.Content visible>
                       <Icon name="wrench" />
