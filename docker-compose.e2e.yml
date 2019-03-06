@@ -55,6 +55,7 @@ services:
       OODILEARN_URL: http://oodilearn:5000
       USERSERVICE_URL: http://userservice:4567
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      NODE_ENV: dev
     container_name: backend
     depends_on:
       - db
@@ -84,6 +85,7 @@ services:
       - TEST_DB=postgres://postgres@user_db:5432/user_db_test
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       - TOKEN_SECRET=IWannaBeTheVeryBest
+      - NODE_ENV=dev
     container_name: userservice
   adminer:
     image: adminer:4.6.2
