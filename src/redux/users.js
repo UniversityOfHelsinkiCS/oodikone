@@ -19,13 +19,6 @@ export const modifyAccessGroups = (uid, accessgroups) => {
   return callController(route, prefix, data, method)
 }
 
-export const enableUser = (id) => {
-  const route = `/users/${id}/enable`
-  const prefix = 'ENABLE_USER_'
-  const method = 'put'
-  return callController(route, prefix, null, method)
-}
-
 export const addUserUnits = (uid, codes) => {
   const route = `/users/${uid}/elements`
   const data = { codes }
@@ -87,25 +80,6 @@ const reducer = (state = { data: [] }, action) => {
         accessgroupPending: false,
         error: false,
         accessGroupsData: action.response
-      }
-    case 'ENABLE_USER_ATTEMPT':
-      return {
-        ...state,
-        pending: true
-      }
-    case 'ENABLE_USER_FAILURE':
-      return {
-        ...state,
-        pending: false,
-        error: true,
-        data: action.response
-      }
-    case 'ENABLE_USER_SUCCESS':
-      return {
-        ...state,
-        pending: false,
-        data: state.data.filter(user => user.id !== action.response.id)
-          .concat(action.response)
       }
     case 'EDIT_USER_UNIT_SUCCESS':
       return {
