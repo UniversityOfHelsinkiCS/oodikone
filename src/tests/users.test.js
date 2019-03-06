@@ -1,5 +1,5 @@
 const { sequelize, forceSyncDatabase } = require('../database/connection')
-const { User, ElementDetails, AccessGroup } = require('../models/index')
+const { User, ElementDetails, AccessGroup, HyGroup } = require('../models/index')
 const userService = require('../services/users')
 const AccessService = require('../services/accessgroups')
 const { DB_URL } = require('../conf')
@@ -14,7 +14,6 @@ const default_users = [
   {
     id: 69,
     full_name: 'Saus Maekinen',
-    is_enabled: true,
     username: 'sasumaki',
     email: 'vittuilu.email@gmail.com',
     language: 'finnish',
@@ -22,7 +21,6 @@ const default_users = [
   {
     id: 42,
     full_name: 'Pekka Pouta',
-    is_enabled: false,
     username: 'poutaukko',
     email: 'pekka.pouta@ilmatieteenlaitos.fi',
     language: 'finnish',
@@ -32,7 +30,6 @@ const default_users = [
   {
     id: 666,
     full_name: 'Sylvester Stallone',
-    is_enabled: false,
     username: 'rambo666',
     email: 'sylvester@rambo.com',
     language: 'americano',
@@ -42,7 +39,6 @@ const default_users = [
   {
     id: 665,
     full_name: 'Morgan Freeman',
-    is_enabled: true,
     username: 'freeman',
     email: 'morgan@freeman.com',
     language: 'americano',
@@ -81,18 +77,28 @@ const default_accessgroups = [
     group_info: 'big boss'
   }
 ]
+const default_hygroups = [
+  {
+    id: 1,
+    code: 'test-group'
+  }
+]
 
 beforeAll(async () => {
   await forceSyncDatabase()
   await User.bulkCreate(default_users)
   await ElementDetails.bulkCreate(default_elementdetails)
   await AccessGroup.bulkCreate(default_accessgroups)
+  await HyGroup.bulkCreate(default_hygroups)
   const admin_user = await User.findOne({ where: { id: 69 }})
   const admin = await AccessService.byId(2)
   await admin_user.addAccessgroup(admin)
+  const hygroup = await HyGroup.findByPk(1)
+  await admin_user.addHy_group(hygroup)
   const normal_user = await User.findOne({ where: { id: 665 }})
   const CS_ED = await ElementDetails.findOne({ where: { code: 'ELEMENT_CS' }})
   await normal_user.addElementdetail(CS_ED)
+  await normal_user.addHy_group(hygroup)
 })
 afterAll(async () => {
   await sequelize.close()
@@ -174,13 +180,6 @@ describe('user access right tests', async () => {
       const rights2 = await userService.getUserElementDetails('freeman')
       console.log(rights2)
       expect(rights2.length).toBe(0)
-    })
-    test('enabling user works', async () => {
-      const user1 = await userService.byUsername('rambo666')
-      expect(user1.is_enabled).toBe(false)
-      await userService.updateUser(user1, { is_enabled: true })
-      const user2 = await userService.byUsername('rambo666')
-      expect(user2.is_enabled).toBe(true)
     })
     test('Access groups can be added and removed', async () => {
       const id = 666

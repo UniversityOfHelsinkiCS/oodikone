@@ -46,7 +46,6 @@ const User = sequelize.define('users',
       autoIncrement: true
     },
     full_name: { type: Sequelize.STRING },
-    is_enabled: { type: Sequelize.BOOLEAN },
     username: {
       type: Sequelize.STRING,
       unique: true

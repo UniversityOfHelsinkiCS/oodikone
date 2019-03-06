@@ -7,6 +7,7 @@ const app = express()
 const port = 4567
 const bodyParser = require('body-parser')
 const checkSecret = require('./src/middlewares/secret')
+const { requiredGroup } = require('./src/conf')
 
 app.use(bodyParser.json())
 app.use(checkSecret)
@@ -15,7 +16,11 @@ app.get('/ping', (req, res) => res.json({ message: 'pong '}))
 
 app.get('/findall', async (req, res) => {
   const users = await User.findAll()
-  res.json(users)
+  const returnedUsers = users.map(u => {
+    const enabled = requiredGroup === null || u.hy_group.some(e => e.code === requiredGroup)
+    return {...u.get(), is_enabled: enabled, hy_group: null}
+  })
+  res.json(returnedUsers)
 })
 app.get('/user/:uid', async (req, res) => {
   const uid = req.params.uid
