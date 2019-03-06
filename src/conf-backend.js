@@ -47,7 +47,7 @@ let requiredGroup = 'grp-oodikone-users'
 if (process.env.NODE_ENV === 'staging') {
   requiredGroup = 'grp-oodikone-staging-users'
 }
-if (process.env.NODE_ENV === 'dev') {
+if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test') {
   requiredGroup = null
 }
 
