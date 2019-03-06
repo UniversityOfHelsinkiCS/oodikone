@@ -5,7 +5,7 @@ import { API_BASE_PATH, TOKEN_NAME, BASE_PATH } from '../constants'
 
 const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
 const isTestEnv = BASE_PATH === '/testing/'
-const isDevEnv = process.env.NODE_ENV === 'dev'
+const isDevEnv = process.env.NODE_ENV === 'development'
 const devOptions = {
   headers: {
     uid: 'tktl',

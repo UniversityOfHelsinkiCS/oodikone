@@ -45,7 +45,7 @@ class NavigationBar extends Component {
 
   renderUserMenu = (itemWidth) => {
     const { translate } = this.props
-    if (process.env.NODE_ENV === 'dev') {
+    if (process.env.NODE_ENV === 'development') {
       const testUsers = ['tktl']
       return (
         <Menu.Item

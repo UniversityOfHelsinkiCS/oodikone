@@ -11,7 +11,7 @@ const apiAddress = process.env.BACKEND_ADDR || 'localhost'
 const backendURL = `http://${apiAddress}:${apiServerPort}`
 
 module.exports = {
-  mode: 'dev',
+  mode: 'development',
   context: path.join(__dirname, 'src'),
 
   devServer: {
@@ -101,10 +101,10 @@ module.exports = {
     new webpack.DefinePlugin({
       CONFIG: {
         BASE_PATH: JSON.stringify(''),
-        AUTH_PROFILE: JSON.stringify('dev')
+        AUTH_PROFILE: JSON.stringify('development')
       },
       'process.env': {
-        NODE_ENV: JSON.stringify('dev'),
+        NODE_ENV: JSON.stringify('development'),
         USER_ADMINER_URL: JSON.stringify(process.env.USER_ADMINER_URL),
         ADMINER_URL: JSON.stringify(process.env.ADMINER_URL)
       }
