@@ -40,7 +40,7 @@ module.exports = (app, url) => {
   app.use(url, log)
   app.use(url, login)
   app.use(url, ping)
-  app.use(auth.checkAuth, auth.checkUserBlacklisting, accessLogger)
+  app.use(auth.checkAuth, auth.checkRequiredGroup, auth.checkUserBlacklisting, accessLogger)
   app.use(url, elementdetails)
   app.use(url, courses)
   app.use(url, department)
