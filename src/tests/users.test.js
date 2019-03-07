@@ -2,7 +2,7 @@ const { sequelize, forceSyncDatabase } = require('../database/connection')
 const { User, ElementDetails, AccessGroup, HyGroup } = require('../models/index')
 const userService = require('../services/users')
 const AccessService = require('../services/accessgroups')
-const { DB_URL } = require('../conf')
+const { DB_URL, DB_SCHEMA } = require('../conf')
 
 const langify = name => ({
   en: `${name}_en`,
@@ -84,7 +84,16 @@ const default_hygroups = [
   }
 ]
 
+const dropSchemaIfExists = async schema => {
+  const schemas = await sequelize.showAllSchemas()
+  if (schemas.some(name => name === schema)) {
+    await sequelize.dropSchema(schema)
+  }
+}
+
 beforeAll(async () => {
+  await dropSchemaIfExists(DB_SCHEMA)
+  await sequelize.createSchema(DB_SCHEMA)
   await forceSyncDatabase()
   await User.bulkCreate(default_users)
   await ElementDetails.bulkCreate(default_elementdetails)
@@ -111,7 +120,7 @@ describe('basic tests', async () => {
   })
 
   test('database is connected', async () => {
-    expect(DB_URL).toBe(process.env.TEST_DB)
+    expect(DB_SCHEMA).toBe('test')
     try {
       await sequelize.authenticate()
     } catch (e) {
