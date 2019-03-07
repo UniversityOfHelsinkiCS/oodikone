@@ -33,7 +33,6 @@ import sandbox from './sandbox'
 import ping from './ping'
 import oodilearnStudent from './oodilearnStudent'
 import oodilearnCourses from './oodilearnCourses'
-import postman from './postman'
 import oodilearnCourse from './oodilearnCourse'
 import oodilearnCluster from './oodilearnCluster'
 import oodilearnPopulations from './oodilearnPopulations'
@@ -75,7 +74,6 @@ export default combineReducers({
   ping,
   oodilearnStudent,
   oodilearnCourses,
-  postman,
   oodilearnCourse,
   oodilearnCluster,
   oodilearnPopulations,
