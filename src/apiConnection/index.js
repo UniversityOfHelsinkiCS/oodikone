@@ -23,6 +23,28 @@ const testOptions = {
   }
 }
 
+const getDefaultConfig = () => {
+  if (isTestEnv) {
+    return { ...testOptions }
+  } else if (isDevEnv) {
+    return { ...devOptions }
+  }
+  return undefined
+}
+
+const createDefaultAxiosConfig = async () => {
+  const config = getDefaultConfig()
+  const token = await getToken()
+  config.baseURL = API_BASE_PATH
+  config.headers['x-access-token'] = token
+  return config
+}
+
+export const createConfiguredAxios = async () => {
+  const config = await createDefaultAxiosConfig()
+  return axios.create(config)
+}
+
 const types = {
   attempt: prefix => `${prefix}ATTEMPT`,
   failure: prefix => `${prefix}FAILURE`,
