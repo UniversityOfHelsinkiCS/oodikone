@@ -12,7 +12,8 @@ const routerWithWrapper = () => {
   return {
     router,
     wrapper: {
-      get: (url, callback) => router.get(url, wrapWithErrorHandler(callback))
+      get: (url, callback) => router.get(url, wrapWithErrorHandler(callback)),
+      post: (url, callback) => router.post(url, wrapWithErrorHandler(callback))
     }
   }
 }
