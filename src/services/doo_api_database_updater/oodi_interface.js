@@ -20,6 +20,12 @@ const instance = axios.create({
 
 const getUrl = instance.get
 
+const getOodiApi = async relative => {
+  const route = base_url + relative
+  const stuff = await getUrl(route)
+  return stuff
+}
+
 const attemptGetFor = async (url, attempts = 5) => {
   let attempt = 0
   let response = 0
@@ -161,5 +167,6 @@ module.exports = {
   getCourseRealisationTypes,
   courseUnitRealisationsSince,
   getCourseUnitRealisation,
-  learningOpportunitiesSince
+  learningOpportunitiesSince,
+  getOodiApi
 }
