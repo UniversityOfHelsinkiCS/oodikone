@@ -1,16 +1,24 @@
 require('dotenv').config()
-const DB_SCHEMA = process.env.DB_SCHEMA || 'public'
-const DB_URL = process.env.NODE_ENV === 'test' ? process.env.TEST_DB : process.env.DB_URL
+
+const { NODE_ENV } = process.env
+
+const isTest = NODE_ENV === 'test'
+const isDev = NODE_ENV === 'test'
+const isStaging = NODE_ENV === 'staging'
+
+const DB_SCHEMA = isTest ? 'test' : (process.env.DB_SCHEMA || 'public')
+const DB_URL = process.env.DB_URL
 
 let requiredGroup = 'grp-oodikone-users'
-if (process.env.NODE_ENV === 'staging') {
+if (isStaging) {
   requiredGroup = 'grp-oodikone-staging-users'
 }
-if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test') {
+if (isDev || isTest) {
   requiredGroup = null
 }
 
 module.exports = {
   DB_URL, DB_SCHEMA,
-  requiredGroup
+  requiredGroup,
+  isTest
 }
