@@ -6,6 +6,9 @@ WORKDIR /usr/src/app
 
 RUN npm i
 
+ARG BASE_PATH
+ENV BASE_PATH=$BASE_PATH
+
 RUN npm run dist
 RUN npm install -g serve
 

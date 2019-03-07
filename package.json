@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "webpack-dev-server --config webpack.config.local.js",
     "docker": "webpack-dev-server --host 0.0.0.0 --inline --config webpack.config.local.js",
-    "dist": "rimraf dist && webpack --env.BASE_PATH=$BASE_PATH --config webpack.config.production.js",
+    "dist": "rimraf dist && webpack --config webpack.config.production.js",
     "lint": "concurrently 'npm run lint:js' 'npm run lint:css'",
     "lint:css": "stylelint 'src/**/*.css'",
     "lint:js": "eslint server ./ --ext .jsx,.js",
