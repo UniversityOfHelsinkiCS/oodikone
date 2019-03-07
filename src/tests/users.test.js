@@ -84,7 +84,15 @@ const default_hygroups = [
   }
 ]
 
+const dropSchemaIfExists = async schema => {
+  const schemas = await sequelize.showAllSchemas()
+  if (schemas.some(name => name === schema)) {
+    await sequelize.dropSchema(schema)
+  }
+}
+
 beforeAll(async () => {
+  await dropSchemaIfExists(DB_SCHEMA)
   await sequelize.createSchema(DB_SCHEMA)
   await forceSyncDatabase()
   await User.bulkCreate(default_users)
