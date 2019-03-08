@@ -1,7 +1,7 @@
 const { wrapper, router } = require('./router').routerWithWrapper()
 const { getOodiApi } = require('../services/doo_api_database_updater/oodi_interface')
 const { OODI_SECRET, OODI_SECRET_HEADER_KEY } = require('../conf-backend')
-import logger from '../util/logger'
+const logger = require('../util/logger')
 
 const validOodApiRequest = request => {
   const secret = request.headers[OODI_SECRET_HEADER_KEY]
