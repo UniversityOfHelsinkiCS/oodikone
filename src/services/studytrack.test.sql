@@ -1,6 +1,8 @@
 DO $$
 DECLARE
   ts TIMESTAMP = CURRENT_TIMESTAMP;
+  studytrk_01 VARCHAR(50) = 'MH50_010';
+  studytrk_02 VARCHAR(50) = 'KH50_005';
   provider_01 VARCHAR(50) = '500-M010';
   provider_02 VARCHAR(50) = '500-K005';
   course_01 VARCHAR(50) = 'M010_COURSE';
@@ -57,5 +59,28 @@ BEGIN
   (module_01, provider_01, ts, ts),
   (course_02, provider_02, ts, ts),
   (thesis, provider_01, ts, ts)
+  ;
+
+  INSERT INTO element_details
+  ("code", "createdAt", "updatedAt")
+  VALUES
+  (studytrk_01, ts, ts),
+  (studytrk_02, ts, ts)
+  ;
+
+  INSERT INTO studyright
+  ("studyrightid", "graduated", "enddate")
+  VALUES
+  (10, 1, date_2016),
+  (11, 0, date_2016),
+  (12, 1, date_2016)
+  ;
+
+  INSERT INTO studyright_elements
+  ("studyrightid", "code", "createdAt", "updatedAt")
+  VALUES
+  (10, studytrk_01, ts, ts),
+  (11, studytrk_01, ts, ts),
+  (12, studytrk_02, ts, ts)
   ;
 END $$;

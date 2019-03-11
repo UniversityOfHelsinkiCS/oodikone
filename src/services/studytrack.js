@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { Credit, Course, Provider } = require('../models')
+const { Credit, Course, Provider, Studyright, StudyrightElement, ElementDetails } = require('../models')
 
 const isNumber = str => !Number.isNaN(Number(str))
 
@@ -55,18 +55,78 @@ const productivityStatsFromCredits = credits => {
     stat.credits += creds
     thesis && stat.thesis++
   })
-  return Object.values(stats)
+  return stats
 }
 
 const productivityStatsForProvider = async providercode => {
   const credits = await getCreditsForProvider(providercode)
   return productivityStatsFromCredits(credits)
 }
- 
+
+const formatGraduatedStudyright = ({ studyrightid, enddate }) => {
+  const year = enddate && enddate.getFullYear()
+  return { studyrightid, year }
+}
+
+const findGraduated = studytrack => Studyright.findAll({
+  include: {
+    model: StudyrightElement,
+    attributes: [],
+    required: true,
+    include: {
+      model: ElementDetails,
+      attributes: [],
+      required: true,
+      where: {
+        code: studytrack
+      }
+    }
+  },
+  where: {
+    graduated: 1
+  }
+}).map(formatGraduatedStudyright)
+
+const graduatedStatsFromStudyrights = studyrights => {
+  const stats = {}
+  studyrights.forEach(({ year }) => {
+    const graduated = stats[year] || 0
+    stats[year] = graduated + 1
+  })
+  return stats
+}
+
+const graduatedStatsForStudytrack = async studytrack => {
+  const studyrights = await findGraduated(studytrack)
+  return graduatedStatsFromStudyrights(studyrights)
+}
+
+const combineStatistics = (creditStats, studyrightStats) => {
+  const stats = { ...creditStats }
+  Object.keys(stats).forEach(year => {
+    stats[year].graduated = studyrightStats[year] || 0
+  })
+  return Object.values(stats)
+}
+
+const productivityStatsForStudytrack = async studytrack => {
+  const providercode = studytrackToProviderCode(studytrack)
+  const promises = [
+    graduatedStatsForStudytrack(studytrack),
+    productivityStatsForProvider(providercode)
+  ]
+  const [studyrightStats, creditStats] = await Promise.all(promises)
+  return combineStatistics(creditStats, studyrightStats)
+}
+
 module.exports = {
   isThesis,
   studytrackToProviderCode,
   getCreditsForProvider,
   productivityStatsFromCredits,
-  productivityStatsForProvider
+  productivityStatsForProvider,
+  findGraduated,
+  graduatedStatsFromStudyrights,
+  combineStatistics,
+  productivityStatsForStudytrack
 }
