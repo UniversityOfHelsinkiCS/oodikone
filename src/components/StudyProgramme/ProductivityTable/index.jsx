@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table, Header, Loader } from 'semantic-ui-react'
+import { Table, Header } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool } from 'prop-types'
 
 const ProductivityTable = ({ productivity, loading, error }) => {
