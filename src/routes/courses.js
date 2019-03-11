@@ -45,18 +45,12 @@ router.get('/v2/courseinstancestatistics', async (req, res) => {
   res.status(410).send('Deprecated')
 })
 
-router.get('/courseyearlystats', async (req, res) => {
-  let results = []
-  if (req.query.start && req.query.code && req.query.end) {
-    const { code } = req.query
-    const years = { start: req.query.start, end: req.query.end }
-    results = await Course.yearlyStatsOf(code, years, req.query.separate, req.query.language)
-  }
-  res.json(results)
-})
-
 router.get('/v2/courseyearlystats', async (req, res) => {
   let results = []
+  const { rights } = req.decodedToken
+  if (rights.length <= 0) {
+    return res.status(403).json({ error: 'No programmes so no access to course stats' })
+  }
   if (req.query.start && req.query.codes && req.query.end) {
     const { codes } = req.query
     const years = { start: req.query.start, end: req.query.end }
@@ -68,6 +62,10 @@ router.get('/v2/courseyearlystats', async (req, res) => {
 
 router.get('/v3/courseyearlystats', async (req, res) => {
   try {
+    const { rights } = req.decodedToken
+    if (rights.length <= 0) {
+      return res.status(403).json({ error: 'No programmes so no access to course stats' })
+    }
     const { codes, startyearcode, endyearcode, separate: sep } = req.query
     const separate = !sep ? false : JSON.parse(sep)
     if (!codes || !startyearcode) {
