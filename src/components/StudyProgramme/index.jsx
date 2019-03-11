@@ -6,6 +6,7 @@ import sharedStyles from '../../styles/shared'
 import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
 // import StudyProgrammeCourseCodeMapper from './StudyProgrammeCourseCodeMapper'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
+import Overview from './Overview'
 import AggregateView from '../CourseGroups/AggregateView'
 import styles from '../PopulationQueryCard/populationQueryCard.css'
 
@@ -34,6 +35,10 @@ class StudyProgramme extends Component {
     const { match } = this.props
     const { studyProgrammeId, courseGroupId } = match.params
     return ([
+      {
+        menuItem: 'Overview',
+        render: () => <Overview studyprogramme={studyProgrammeId} />
+      },
       {
         menuItem: 'Mandatory Courses',
         render: () => <StudyProgrammeMandatoryCourses studyProgramme={studyProgrammeId} />
