@@ -2,7 +2,7 @@ import { configure } from '@storybook/react'
 
 function loadStories() {
   console.log('asasd')
-  require('../src/components/AccessDenied/index.storybook')
+  require('../src/components/AccessDenied/index.storybook.jsx')
   // You can require as many stories as you need.
 }
 
