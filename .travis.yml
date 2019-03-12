@@ -17,7 +17,7 @@ jobs:
         - source scripts.sh && run_e2e_setup
         - cd ..
         - until $(curl --output /dev/null --silent --fail http://localhost:8081); do printf '.'; sleep 5; done
-        - CYPRESS_baseUrl=http://localhost:8081 npm run cypress:run
+        - CYPRESS_baseUrl=http://localhost:8081 npm run cypress:record
 
     - stage: build & deploy
       script:
