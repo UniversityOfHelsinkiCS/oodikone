@@ -17,7 +17,7 @@ const oodilearn = require('./routes/oodilearn')
 const courseGroups = require('./routes/courseGroups')
 const mandatoryCourses = require('./routes/mandatorycourses')
 const ping = require('./routes/ping')
-
+const oodi = require('./routes/oodi')
 
 const accessLogger = morgan((tokens, req, res) => {
   const fields = ['method', 'url', 'status', 'response-time', 'remote-addr', 'remote-user', 'user-agent', 'referrer']
@@ -53,5 +53,6 @@ module.exports = (app, url) => {
   app.use(`${url}/usage`, auth.roles(['usage']), usage)
   app.use(`${url}/oodilearn`, auth.roles(['oodilearn']), oodilearn)
   app.use(`${url}/course-groups`, auth.roles(['coursegroups']), courseGroups)
-  app.use(`${url}/mandatory_courses`, auth.roles(['studyprogramme']), mandatoryCourses)
+  app.use(`${url}/mandatory_courses`, auth.roles(['studyprogramme']), mandatoryCourses),
+  app.use(`${url}/oodi`, auth.roles(['dev']), oodi)
 }
