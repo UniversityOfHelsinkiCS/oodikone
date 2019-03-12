@@ -6,7 +6,8 @@
   "jest": {
     "setupFilesAfterEnv": [
       "./test/jest/globals.js"
-    ]
+    ],
+    "testEnvironment": "node"
   },
   "scripts": {
     "start": "node --max_old_space_size=4096 index.js",

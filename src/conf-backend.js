@@ -17,6 +17,7 @@ const KEY_PATH = process.env.KEY_PATH // production/staging only
 const OODILEARN_URL = process.env.OODILEARN_URL
 const USERSERVICE_URL = process.env.USERSERVICE_URL
 const PORT = process.env.NODE_ENV === 'test' ? 8079 : 8080
+const OODI_SECRET = process.env.OODI_SECRET
 
 const FEATURES = {
   ERROR_HANDLER: false
@@ -42,6 +43,7 @@ const OODI = {
 
 const OODI_ADDR = OODI[process.env.NODE_ENV] || process.env.OODI_ADDR
 const ACCESS_TOKEN_HEADER_KEY = 'x-access-token'
+const OODI_SECRET_HEADER_KEY = 'x-oodi-secret'
 
 let requiredGroup = 'grp-oodikone-users'
 if (process.env.NODE_ENV === 'staging') {
@@ -54,5 +56,5 @@ if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test') {
 module.exports = {
   frontend_addr, DB_URL, redis, TOKEN_SECRET, DB_SCHEMA, OODI_ADDR, CERT_PATH, KEY_PATH, FEATURES, OODILEARN_URL,
   USERSERVICE_URL: formatURL(USERSERVICE_URL), ACCESS_TOKEN_HEADER_KEY, PORT,
-  requiredGroup
+  requiredGroup, OODI_SECRET, OODI_SECRET_HEADER_KEY
 }
