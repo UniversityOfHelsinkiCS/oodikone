@@ -22,6 +22,8 @@ services:
     environment:
       - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
       - POSTGRES_USER=postgres
+    depends_on:
+      - frontend
   redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
