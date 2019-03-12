@@ -6,7 +6,7 @@ import { func, shape, string } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { routes } from '../../constants'
-import { userRoles } from '../../common'
+import { userRoles, userRights } from '../../common'
 import styles from './navigationBar.css'
 import { logout, login, returnToSelf } from '../../apiConnection'
 
@@ -34,6 +34,12 @@ class NavigationBar extends Component {
         delete navigationRoutes[key]
       }
     })
+    const rights = await userRights()
+    if (!roles.includes('admin')) {
+      if (rights.length === 0) {
+        delete navigationRoutes.courseStatistics
+      }
+    }
     this.setState({ navigationRoutes })
   }
 
