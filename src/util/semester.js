@@ -6,6 +6,15 @@ const isSpring = date => SPRING.start <= date.month() && date.month() <= SPRING.
 
 const getSemester = date => isSpring(date) ? 'SPRING' : 'FALL'
 
+const semesterStart = {
+  SPRING: '01-01',
+  FALL: '07-31'
+}
+
+const semesterEnd = {
+  SPRING: '07-31',
+  FALL: '12-31'
+}
 const getPassingSemester = (startYear, date) => {
   const mDate = moment(date).add(1, 'day')
   const year = mDate.year()
@@ -21,5 +30,7 @@ const getPassingSemester = (startYear, date) => {
 }
 
 module.exports = {
-  getPassingSemester
+  getPassingSemester,
+  semesterEnd,
+  semesterStart
 }
