@@ -47,9 +47,12 @@ router.get('/v2/courseinstancestatistics', async (req, res) => {
 
 router.get('/v2/courseyearlystats', async (req, res) => {
   let results = []
-  const { rights } = req.decodedToken
-  if (rights.length <= 0) {
-    return res.status(403).json({ error: 'No programmes so no access to course stats' })
+  const { rights, roles } = req.decodedToken
+  const admin = roles.map(r => r.group_code).includes('admin')
+  if (!admin) {
+    if (rights.length <= 0) {
+      return res.status(403).json({ error: 'No programmes so no access to course stats' })
+    }
   }
   if (req.query.start && req.query.codes && req.query.end) {
     const { codes } = req.query
@@ -62,9 +65,12 @@ router.get('/v2/courseyearlystats', async (req, res) => {
 
 router.get('/v3/courseyearlystats', async (req, res) => {
   try {
-    const { rights } = req.decodedToken
-    if (rights.length <= 0) {
-      return res.status(403).json({ error: 'No programmes so no access to course stats' })
+    const { rights, roles } = req.decodedToken
+    const admin = roles.map(r => r.group_code).includes('admin')
+    if (!admin) {
+      if (rights.length <= 0) {
+        return res.status(403).json({ error: 'No programmes so no access to course stats' })
+      }
     }
     const { codes, startyearcode, endyearcode, separate: sep } = req.query
     const separate = !sep ? false : JSON.parse(sep)
