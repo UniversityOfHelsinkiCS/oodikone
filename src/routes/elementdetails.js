@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const { getAllDegreesAndProgrammes } = require('../services/studyrights')
 const MandatoryCourses = require('../services/mandatoryCourses')
-const { productivityStatsForStudytrack } = require('../services/studytrack')
+const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('../services/studytrack')
 
 router.get('/studyprogrammes', async (req, res) => {
   try {
@@ -26,6 +26,16 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
   if (req.params.id) {
     const productivityData = await productivityStatsForStudytrack(req.params.id)
     res.json(productivityData)
+  } else {
+    res.status(422)
+  }
+})
+
+router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
+  if (req.params.id) {
+    const since = req.params.since ? req.params.since : new Date().getFullYear() - 5
+    const throughputData = await throughputStatsForStudytrack(req.params.id, since)
+    res.json(throughputData)
   } else {
     res.status(422)
   }

@@ -1,6 +1,8 @@
 const { Op } = require('sequelize')
+const moment = require('moment')
 const { Credit, Course, Provider, Studyright, StudyrightElement, ElementDetails } = require('../models')
-
+const { studentnumbersWithAllStudyrightElements } = require('./populations')
+const { semesterStart, semesterEnd } = require('../util/semester')
 const isNumber = str => !Number.isNaN(Number(str))
 
 const studytrackToProviderCode = code => {
@@ -16,7 +18,7 @@ const isThesis = (name, credits) => {
 }
 
 const formatCredit = credit => {
-  const { id, credits, attainment_date, course : { name } } = credit
+  const { id, credits, attainment_date, course: { name } } = credit
   const year = attainment_date && attainment_date.getFullYear()
   const course = name.en
   const thesis = isThesis(course, credits)
@@ -31,7 +33,7 @@ const getCreditsForProvider = (provider) => Credit.findAll({
     required: true,
     where: {
       is_study_module: false
-    }, 
+    },
     include: {
       model: Provider,
       attributes: [],
@@ -119,6 +121,110 @@ const productivityStatsForStudytrack = async studytrack => {
   return combineStatistics(creditStats, studyrightStats)
 }
 
+const creditsAfter = (studentnumbers, startDate) => {
+  const failed = ['0', 'Hyl.', 'Luop', 'Eisa']
+  return Promise.all(studentnumbers
+    .map(student => Credit.sum('credits', {
+      where: {
+        student_studentnumber: {
+          [Op.eq]: student
+        },
+        attainment_date: {
+          [Op.gte]: startDate
+        },
+        isStudyModule: {
+          [Op.eq]: false
+        },
+        grade: {
+          [Op.notIn]: failed
+        }
+      }
+  })))
+}
+
+const graduationsFromClass = (studentnumbers, startDate, endDate, studytrack) => {
+  return Studyright.count({
+    include: {
+      model: StudyrightElement,
+      attributes: [],
+      required: true,
+      include: {
+        model: ElementDetails,
+        attributes: [],
+        required: true,
+        where: {
+          code: studytrack
+        }
+      }
+    },
+    where: {
+      graduated: 1,
+      student_studentnumber: {
+        [Op.in]: studentnumbers
+      },
+      startdate: {
+        [Op.between]: [startDate, endDate]
+      }
+    }
+  })
+}
+
+// const thesesFromClass = (studentnumbers, startDate) => {
+//   return Credit.count({
+//     include: {
+//       model: Course,
+//       attributes: [],
+//       required: true,
+//       where: {
+//         name: {
+//           fi: {
+//             [Op.like]: "%tutkielma%"
+//           }
+//         }
+//       }
+//     },
+//     where: {
+//       credits: {
+//         [Op.gte]: 10
+//       },
+//       student_studentnumber: {
+//         [Op.in]: studentnumbers
+//       }
+//     }
+//   })
+// }
+
+const productivityStats = (studentnumbers, startDate, endDate, studytrack) => {
+  return Promise.all([creditsAfter(studentnumbers, startDate),
+    graduationsFromClass(studentnumbers, startDate, endDate, studytrack)])
+  // const theses = await thesesFromClass(studentnumbers, startDate)
+}
+
+const getYears = (since) => {
+  const years = []
+  for(let i = since; i <= new Date().getFullYear(); i++) {
+    years.push(i)
+  }
+  console.log(years)
+  return years
+}
+
+const throughputStatsForStudytrack = async (studytrack, since) => {
+  const years = getYears(since)
+  const arr = await Promise.all(years.map(async year => {
+    const startDate = `${year}-${semesterStart['FALL']}`
+    const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
+    const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
+    const [credits, graduated] = await productivityStats(studentnumbers, startDate, endDate, studytrack)
+      return {
+        year: `${year}-${year + 1}`,
+        credits: credits.map(cr => cr === null ? 0 : cr),
+        graduated: graduated
+      }
+  }))
+  return arr
+}
+
 module.exports = {
   isThesis,
   studytrackToProviderCode,
@@ -128,5 +234,6 @@ module.exports = {
   findGraduated,
   graduatedStatsFromStudyrights,
   combineStatistics,
-  productivityStatsForStudytrack
+  productivityStatsForStudytrack,
+  throughputStatsForStudytrack
 }
