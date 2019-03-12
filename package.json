@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --config webpack.config.local.js",
-    "docker": "webpack-dev-server --host 0.0.0.0 --inline --config webpack.config.local.js",
+    "docker": "webpack-dev-server --host 0.0.0.0 --inline --config webpack.config.local.js & start-storybook -h 0.0.0.0 -p 7777 --ci",
     "dist": "rimraf dist && webpack --config webpack.config.production.js",
     "lint": "concurrently 'npm run lint:js' 'npm run lint:css'",
     "lint:css": "stylelint 'src/**/*.css'",
@@ -19,11 +19,13 @@
     "test": "",
     "notest": "echo",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run -P ./"
+    "cypress:run": "cypress run -P ./",
+    "storybook": "start-storybook -h 0.0.0.0 -p 7777 --ci"
   },
   "licence": "",
   "main": "src/app.jsx",
   "devDependencies": {
+    "@storybook/react": "^5.0.1",
     "babel-core": "6.26.0",
     "babel-eslint": "^10.0.1",
     "babel-loader": "7.1.4",
