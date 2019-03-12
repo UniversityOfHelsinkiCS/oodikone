@@ -58,7 +58,7 @@ describe('Population Statistics tests', () => {
     cy.contains("See population").should('be.enabled')
   })
 
-  it.only('Population statistics is usable on general level', () => {
+  it('Population statistics is usable on general level', () => {
     cy.contains("Select study programme").click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
     cy.contains("See population").click()
     cy.get(".card").within(() => {
