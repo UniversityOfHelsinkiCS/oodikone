@@ -71,6 +71,7 @@ services:
     restart: unless-stopped
     ports:
       - "8081:8081"
+      - "7777:7777"
     environment:
       BACKEND_ADDR: backend
       ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
