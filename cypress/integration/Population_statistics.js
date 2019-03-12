@@ -3,7 +3,8 @@ describe('Population Statistics tests', () => {
   Cypress.config('pageLoadTimeout', 100000)
 
   beforeEach(() => {
-    cy.visit("localhost:8081", { timeout: 240000 })
+    cy.visit("localhost:8081")
+
     cy.contains("Population statistics").click()
     cy.contains("Select study programme", { timeout: 100000 })
   })

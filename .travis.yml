@@ -16,6 +16,7 @@ jobs:
         - cd oodikone2-cli
         - source scripts.sh && run_e2e_setup
         - cd ..
+        - until $(curl --output /dev/null --silent --fail http://localhost:8081); do printf '.'; sleep 5; done
         - CYPRESS_baseUrl=http://localhost:8081 npm run cypress:run
 
     - stage: build & deploy
