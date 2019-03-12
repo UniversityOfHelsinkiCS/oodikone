@@ -3,8 +3,7 @@ describe('Population Statistics tests', () => {
   Cypress.config('pageLoadTimeout', 100000)
 
   beforeEach(() => {
-    cy.visit("localhost:8081")
-
+    cy.visit("localhost:8081", { timeout: 240000 })
     cy.contains("Population statistics").click()
     cy.contains("Select study programme", { timeout: 100000 })
   })
@@ -59,7 +58,7 @@ describe('Population Statistics tests', () => {
     cy.contains("See population").should('be.enabled')
   })
 
-  it('Population statistics is usable on general level', () => {
+  it.only('Population statistics is usable on general level', () => {
     cy.contains("Select study programme").click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
     cy.contains("See population").click()
     cy.get(".card").within(() => {
@@ -68,6 +67,8 @@ describe('Population Statistics tests', () => {
       cy.contains("Excludes exchange students")
       cy.contains("Excludes students with cancelled study right")
     })
+    cy.wait(10000)
+
     cy.contains("add").click()
     cy.contains("Add filters").siblings().within(() => {
       cy.get(".form").should('have.length', 6)
@@ -85,11 +86,11 @@ describe('Population Statistics tests', () => {
 
     cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
       cy.get("tr").its('length').should('be.gte', 10)
-      cy.get("tr").eq(3).find(".level").click()
+      cy.contains("Opiskelijan digitaidot: orientaatio").siblings().find(".level").click()
       cy.wait(1000)
       cy.url().should('include', '/coursestatistics')
     })
-    cy.contains("DIGI-000A")
+    cy.contains("DIGI-000A", { timeout: 10000 })
     cy.contains("Searched courses").parentsUntil(".segment").contains("digitaidot").should("have.text", "Opiskelijan digitaidot: orientaatio (Keskusta)")
     
     cy.go("back")
@@ -102,7 +103,7 @@ describe('Population Statistics tests', () => {
   it('All filters working', () => {
     cy.contains("Select study programme", { timeout: 50000 }).click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
     cy.contains("See population").click()
-    cy.wait(5000)
+    cy.wait(10000)
 
     cy.contains("add").click()
     cy.contains("Add filters").siblings().within(() => {

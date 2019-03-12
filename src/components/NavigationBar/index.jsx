@@ -35,8 +35,10 @@ class NavigationBar extends Component {
       }
     })
     const rights = await userRights()
-    if (rights.length === 0) {
-      delete navigationRoutes.courseStatistics
+    if (!roles.includes('admin')) {
+      if (rights.length === 0) {
+        delete navigationRoutes.courseStatistics
+      }
     }
     this.setState({ navigationRoutes })
   }
