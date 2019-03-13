@@ -80,7 +80,6 @@ class PopulationCourseStats extends Component {
       coursestatistics: arrayOf(object).isRequired,
       coursetypes: shape({}),
       disciplines: shape({}).isRequired
-
     }).isRequired,
     translate: func.isRequired,
     setPopulationFilter: func.isRequired,
@@ -90,11 +89,12 @@ class PopulationCourseStats extends Component {
     history: shape({}).isRequired,
     getMultipleCourseStatistics: func.isRequired,
     language: string.isRequired,
-    query: shape({}).isRequired
+    query: shape({}).isRequired,
+    pending: bool.isRequired
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (state && !state.initialSortReady && props.courses.coursestatistics) {
+    if (state && !state.initialSortReady && props.courses) {
       return {
         ...state,
         courseStatistics: PopulationCourseStats.updateCourseStatisticsCriteria(props, state),
@@ -430,10 +430,13 @@ class PopulationCourseStats extends Component {
   }
 
   render() {
-    const { courses, translate } = this.props
+    const { courses, translate, pending } = this.props
     const { studentAmountLimit } = this.state
 
-    if (courses.length === 0) {
+    if (!courses) {
+      return null
+    }
+    if (pending) {
       return null
     }
 
