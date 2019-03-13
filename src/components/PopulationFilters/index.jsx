@@ -95,8 +95,9 @@ class PopulationFilters extends Component {
   componentDidUpdate(prevProps) {
     const { data, pending } = this.props.populationCourses
     const { prevPending } = prevProps.populationCourses
+
     if (data && !this.state.initialUpdate && ((!pending && prevPending) ||
-       (this.props.populationFilters.filtersFromBackend.length !== this.state.presetFilters.length))) {
+      (this.props.populationFilters.filtersFromBackend.length !== this.state.presetFilters.length))) {
       this.updateFilterList(this.props.populationFilters.filtersFromBackend)
       this.setState({ initialUpdate: true }) //eslint-disable-line
     }
@@ -190,7 +191,12 @@ class PopulationFilters extends Component {
       return (
         <Segment>
           <Header>Add filters <InfoBox content={Add} /></Header>
-          <Button onClick={() => this.setState({ visible: true })} disabled={!this.state.initialUpdate} >add</Button>
+          <Button
+            onClick={() => this.setState({ visible: true })}
+            disabled={!this.state.initialUpdate && this.props.populationFilters.filtersFromBackend.length !== 0}
+          >
+            add
+          </Button>
         </Segment>
       )
     }
