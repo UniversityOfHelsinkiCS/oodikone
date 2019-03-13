@@ -67,7 +67,6 @@ describe('Population Statistics tests', () => {
       cy.contains("Excludes exchange students")
       cy.contains("Excludes students with cancelled study right")
     })
-    cy.wait(10000)
 
     cy.contains("add").click()
     cy.contains("Add filters").siblings().within(() => {
@@ -103,7 +102,6 @@ describe('Population Statistics tests', () => {
   it('All filters working', () => {
     cy.contains("Select study programme", { timeout: 50000 }).click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
     cy.contains("See population").click()
-    cy.wait(10000)
 
     cy.contains("add").click()
     cy.contains("Add filters").siblings().within(() => {
@@ -198,7 +196,6 @@ describe('Population Statistics tests', () => {
     cy.reload()
     cy.contains("Select study programme", { timeout: 50000 }).click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
     cy.contains("See population").click()
-    cy.wait(10000)
 
     cy.contains("add").click()
     cy.contains("Advanced filters").click()
