@@ -28,7 +28,7 @@ const reducer = (state = [], action) => {
       return [...state, {
         pending: true,
         error: false,
-        data: [],
+        data: {},
         query: action.requestSettings.query
       }]
     case 'GET_POPULATION_COURSES_FAILURE':

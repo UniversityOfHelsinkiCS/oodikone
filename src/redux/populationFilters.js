@@ -112,57 +112,57 @@ const reducer = (state = initial, action) => {
     case 'SAVE_FILTER_ATTEMPT':
       return {
         ...state,
-        pending: true,
+        filterPending: true,
         error: false
       }
     case 'SAVE_FILTER_FAILURE':
       return {
         ...state,
-        pending: false,
+        filterPending: false,
         error: true
       }
     case 'SAVE_FILTER_SUCCESS':
       return {
         ...state,
-        pending: false,
+        filterPending: false,
         error: false,
         filtersFromBackend: state.filtersFromBackend.concat(action.response)
       }
     case 'GET_FILTER_ATTEMPT':
       return {
         ...state,
-        pending: true,
+        filterPending: true,
         error: false
       }
     case 'GET_FILTER_FAILURE':
       return {
         ...state,
-        pending: false,
+        filterPending: false,
         error: true
       }
     case 'GET_FILTER_SUCCESS':
       return {
         ...state,
-        pending: false,
+        filterPending: false,
         error: false,
         filtersFromBackend: state.filtersFromBackend.concat(action.response)
       }
     case 'DELETE_FILTER_ATTEMPT':
       return {
         ...state,
-        pending: true,
+        filterPending: true,
         error: false
       }
     case 'DELETE_FILTER_FAILURE':
       return {
         ...state,
-        pending: false,
+        filterPending: false,
         error: true
       }
     case 'DELETE_FILTER_SUCCESS':
       return {
         ...state,
-        pending: false,
+        filterPending: false,
         error: false,
         filtersFromBackend: state.filtersFromBackend.filter(f => f.id !== action.response.id)
       }

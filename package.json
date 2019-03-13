@@ -20,6 +20,7 @@
     "notest": "echo",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run -P ./",
+    "cypress:record": "cypress run --record -P ./",
     "storybook": "start-storybook -h 0.0.0.0 -p 7777 --ci"
   },
   "licence": "",
