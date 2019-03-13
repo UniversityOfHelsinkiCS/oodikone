@@ -74,33 +74,27 @@ class PopulationFilters extends Component {
     presetDescription: '',
     presetFilters: [],
     advancedUser: false,
-    modalOpen: false,
-    initialUpdate: false
+    modalOpen: false
   }
 
-  componentDidMount() {
-    const { data, pending } = this.props.populationCourses
-    if (data && !pending) {
-      this.updateFilterList(this.props.populationFilters.filtersFromBackend)
-    }
+  async componentDidMount() {
+    this.initialFilterLoading()
   }
 
-  /*
-  Editors note:
-  This piece of shit is here because of filters can't be loaded before courses are loaded so this can't be called in componentDidMount.
-  Don't know a better way to handle this. Probably with React effectHooks one (joona) would be able to write this in a sane way.
-
-  Joona pls fix.
-  */
-  componentDidUpdate(prevProps) {
-    const { data, pending } = this.props.populationCourses
-    const { prevPending } = prevProps.populationCourses
-
-    if (data && !this.state.initialUpdate && ((!pending && prevPending) ||
-      (this.props.populationFilters.filtersFromBackend.length !== this.state.presetFilters.length))) {
-      this.updateFilterList(this.props.populationFilters.filtersFromBackend)
-      this.setState({ initialUpdate: true }) //eslint-disable-line
+  initialFilterLoading = async () => {
+    const untilCoursesLoaded = () => {
+      const poll = (resolve) => {
+        const { data, pending } = this.props.populationCourses
+        if (data && !pending) {
+          resolve()
+        } else {
+          setTimeout(() => poll(resolve), 400)
+        }
+      }
+      return new Promise(poll)
     }
+    await untilCoursesLoaded()
+    this.updateFilterList(this.props.populationFilters.filtersFromBackend)
   }
 
   formatFilter = (filter) => {
@@ -193,7 +187,7 @@ class PopulationFilters extends Component {
           <Header>Add filters <InfoBox content={Add} /></Header>
           <Button
             onClick={() => this.setState({ visible: true })}
-            disabled={!this.state.initialUpdate && this.props.populationFilters.filtersFromBackend.length !== 0}
+            disabled={this.props.populationCourses.pending}
           >
             add
           </Button>
@@ -320,6 +314,7 @@ class PopulationFilters extends Component {
   }
 
   render() {
+
     return (
       <div>
         {this.renderAddFilters()}
