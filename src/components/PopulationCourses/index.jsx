@@ -16,7 +16,9 @@ const PopulationCourses = ({ samples, translate }) => {
   }
 
   const { pending } = samples[0]
-
+  if (pending) {
+    return null
+  }
   return (
     <Segment>
       <Header size="medium" dividing >
@@ -35,6 +37,7 @@ const PopulationCourses = ({ samples, translate }) => {
           key={sample.query.uuid}
           courses={sample.data || {}}
           query={sample.query}
+          pending={sample.pending}
         />))}
     </Segment>
   )
