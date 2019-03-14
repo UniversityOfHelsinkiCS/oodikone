@@ -45,7 +45,7 @@ pull_git_repositories () {
 pull_e2e_git_repositories () {
     pushd $REPOS
     BRANCH=trunk
-    if [ $TRAVIS_BRANCH =~ (^master) ]; then
+    if [[ $TRAVIS_BRANCH =~ (^master) ]]; then
         BRANCH=master
     fi
     git clone -b $BRANCH https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
