@@ -292,7 +292,7 @@ class PopulationSearchForm extends Component {
     this.setState({
       floatMonths: moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths()
     })
-    return Math.floor(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
+    return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
   }
 
   getMonthValue = (year, months) => {
