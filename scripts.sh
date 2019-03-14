@@ -44,8 +44,12 @@ pull_git_repositories () {
 
 pull_e2e_git_repositories () {
     pushd $REPOS
-    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
-    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git
+    BRANCH=trunk
+    if [ $TRAVIS_BRANCH =~ (^master) ]; then
+        BRANCH=master
+    fi
+    git clone -b $BRANCH https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
+    git clone -b $BRANCH https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git
     popd
 }
 
