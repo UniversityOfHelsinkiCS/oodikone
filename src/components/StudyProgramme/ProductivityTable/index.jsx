@@ -1,13 +1,13 @@
 import React from 'react'
-import { Table, Header } from 'semantic-ui-react'
+import { Table, Header, Loader } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool } from 'prop-types'
 
 const ProductivityTable = ({ productivity, loading, error }) => {
   if (error) return <h1>Oh no so error {error}</h1>
   return (
-    productivity.length === 0 && !loading ? null :
     <React.Fragment>
       <Header>Yearly productivity</Header>
+      <Loader active={loading} inline="centered">Loading...</Loader>
       <Table celled>
         <Table.Header>
           <Table.Row>
@@ -25,7 +25,6 @@ const ProductivityTable = ({ productivity, loading, error }) => {
             </Table.Row>
           ))}
         </Table.Body>
-
       </Table>
     </React.Fragment>
   )
