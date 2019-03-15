@@ -1,6 +1,9 @@
 const { Op } = require('sequelize')
+const { sequelize } = require('../database/connection')
+const moment = require('moment')
 const { Credit, Course, Provider, Studyright, StudyrightElement, ElementDetails } = require('../models')
-
+const { studentnumbersWithAllStudyrightElements } = require('./populations')
+const { semesterStart, semesterEnd } = require('../util/semester')
 const isNumber = str => !Number.isNaN(Number(str))
 
 const studytrackToProviderCode = code => {
@@ -11,12 +14,13 @@ const studytrackToProviderCode = code => {
 }
 
 const isThesis = (name, credits) => {
+  if (!name) return false
   const nameMatch = !!name.toLowerCase().match(/^.*(bachelor|master).*thesis.*$/)
   return nameMatch && (credits >= 20)
 }
 
 const formatCredit = credit => {
-  const { id, credits, attainment_date, course : { name } } = credit
+  const { id, credits, attainment_date, course: { name } } = credit
   const year = attainment_date && attainment_date.getFullYear()
   const course = name.en
   const thesis = isThesis(course, credits)
@@ -31,7 +35,7 @@ const getCreditsForProvider = (provider) => Credit.findAll({
     required: true,
     where: {
       is_study_module: false
-    }, 
+    },
     include: {
       model: Provider,
       attributes: [],
@@ -119,6 +123,117 @@ const productivityStatsForStudytrack = async studytrack => {
   return combineStatistics(creditStats, studyrightStats)
 }
 
+const creditsAfter = (studentnumbers, startDate) => {
+  const failed = ['0', 'Hyl.', 'Luop', 'Eisa']
+  return Promise.all(studentnumbers
+    .map(student => Credit.sum('credits', {
+      where: {
+        student_studentnumber: {
+          [Op.eq]: student
+        },
+        attainment_date: {
+          [Op.gte]: startDate
+        },
+        isStudyModule: {
+          [Op.eq]: false
+        },
+        grade: {
+          [Op.notIn]: failed
+        }
+      }
+    })))
+}
+
+const graduationsFromClass = async (studentnumbers, startDate) => {
+  const query = `SELECT code
+  FROM course
+  WHERE is_study_module=true
+  AND (
+    (name->>'fi' ilike '%kandidaatti%'
+      OR name->>'fi' ilike '%maisteri%' )
+    AND NOT name->>'fi' ilike '%opinnot%'
+  );`
+  const codes = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT })
+
+  return Credit.count({
+    where: {
+      course_code: {
+        [Op.in]: codes.map(c => c.code)
+      },
+      student_studentnumber: {
+        [Op.in]: studentnumbers
+      },
+      attainment_date: {
+        [Op.gte]: startDate
+      }
+    }
+  })
+}
+
+const thesesFromClass = (studentnumbers, startDate) => {
+  return Credit.count({
+    include: {
+      model: Course,
+      attributes: [],
+      required: true,
+      where: {
+        name: {
+          fi: {
+            [Op.and]: {
+              [Op.iLike]: "%tutkielma%",
+              [Op.notILike]: "%seminaari%",
+              [Op.notILike]: "%ilman tutkielmaa%"
+            }
+          }
+        }
+      }
+    },
+    where: {
+      credits: {
+        [Op.gte]: 6
+      },
+      student_studentnumber: {
+        [Op.in]: studentnumbers
+      },
+      attainment_date: {
+        [Op.gte]: startDate
+      }
+    }
+  })
+}
+
+const productivityStats = (studentnumbers, startDate) => {
+  return Promise.all([creditsAfter(studentnumbers, startDate),
+  graduationsFromClass(studentnumbers, startDate),
+  thesesFromClass(studentnumbers, startDate)])
+}
+
+const getYears = (since) => {
+  const years = []
+  for (let i = since; i <= new Date().getFullYear(); i++) {
+    years.push(i)
+  }
+  console.log(years)
+  return years
+}
+
+const throughputStatsForStudytrack = async (studytrack, since) => {
+  const years = getYears(since)
+  const arr = await Promise.all(years.map(async year => {
+    const startDate = `${year}-${semesterStart['FALL']}`
+    const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
+    const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
+    const [credits, graduated, theses] = await productivityStats(studentnumbers, startDate)
+    return {
+      year: `${year}-${year + 1}`,
+      credits: credits.map(cr => cr === null ? 0 : cr),
+      graduated: graduated,
+      theses: theses
+    }
+  }))
+  return arr
+}
+
 module.exports = {
   isThesis,
   studytrackToProviderCode,
@@ -128,5 +243,6 @@ module.exports = {
   findGraduated,
   graduatedStatsFromStudyrights,
   combineStatistics,
-  productivityStatsForStudytrack
+  productivityStatsForStudytrack,
+  throughputStatsForStudytrack
 }

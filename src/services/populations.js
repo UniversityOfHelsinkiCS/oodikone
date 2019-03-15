@@ -7,7 +7,7 @@ const {
 } = require('../models')
 const { getAllDuplicates, byName } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
-const { getPassingSemester } = require('../util/semester')
+const { getPassingSemester, semesterEnd, semesterStart} = require('../util/semester')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -18,16 +18,6 @@ const enrolmentDates = () => {
 const universityEnrolmentDates = async () => {
   const [result] = await enrolmentDates()
   return result.map(r => r.date).filter(d => d).sort()
-}
-
-const semesterStart = {
-  SPRING: '01-01',
-  FALL: '07-31'
-}
-
-const semesterEnd = {
-  SPRING: '07-31',
-  FALL: '12-31'
 }
 
 const formatStudentForPopulationStatistics = ({
@@ -539,6 +529,7 @@ const bottlenecksOf = async (query) => {
 }
 
 module.exports = {
+  studentnumbersWithAllStudyrightElements,
   universityEnrolmentDates,
   optimizedStatisticsOf,
   bottlenecksOf
