@@ -286,14 +286,13 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  // (Potential?) issue with using Math.ceil with months.
   getMonths = (year, end, term) => {
     const lastDayOfMonth = moment(end).endOf('month')
     const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
     this.setState({
       floatMonths: moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths()
     })
-    return Math.ceil(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
+    return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
   }
 
   getMonthValue = (year, months) => {

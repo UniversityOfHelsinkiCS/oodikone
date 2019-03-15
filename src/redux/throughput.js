@@ -1,14 +1,14 @@
 import itemreducer from './common/itemreducer'
 import { callController } from '../apiConnection/index'
 
-const prefix = 'STUDYPROGRAMME_PRODUCTIVITY_'
+const prefix = 'STUDYPROGRAMME_THROUGHPUT_'
 
-export const getProductivity = (studyprogrammeId) => {
-  const route = `v2/studyprogrammes/${studyprogrammeId}/productivity`
+export const getThroughput = (studyprogrammeId) => {
+  const route = `v2//studyprogrammes/${studyprogrammeId}/throughput`
   return callController(route, prefix, [], 'get')
 }
 
-export const clearProductivity = () => ({
+export const clearThroughput = () => ({
   type: `${prefix}_CLEAR`
 })
 
