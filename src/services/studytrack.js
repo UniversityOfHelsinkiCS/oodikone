@@ -14,6 +14,7 @@ const studytrackToProviderCode = code => {
 }
 
 const isThesis = (name, credits) => {
+  if (!name) return false
   const nameMatch = !!name.toLowerCase().match(/^.*(bachelor|master).*thesis.*$/)
   return nameMatch && (credits >= 20)
 }
