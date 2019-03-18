@@ -13,18 +13,29 @@ const studytrackToProviderCode = code => {
   return `${prefix}0-${suffix}`
 }
 
-const isThesis = (name, credits) => {
+const isMastersThesis = (name, credits) => {
   if (!name) return false
-  const nameMatch = !!name.toLowerCase().match(/^.*(bachelor|master).*thesis.*$/)
+  const nameMatch = (name.en ? !!name.en.toLowerCase().match(/^.*master.*thesis.*$/) : false
+  )|| (name.fi ? !!name.fi.toLowerCase().match(/^.*pro gradu.*$/) : false)
   return nameMatch && (credits >= 20)
+}
+
+const isBachelorsThesis = (name, credits) => {
+  if (!name) return false
+  const nameMatch = (name.fi ? (!!name.fi.toLowerCase().match(/^.*kandidaat.*tutkielma.*/) 
+      && !name.fi.toLowerCase().match(/^.*seminaari.*/)) : false)
+    || (name.en ? (!!name.en.toLowerCase().match(/^.*bachelor.*thesis.*/)
+      && !name.en.toLowerCase().match(/^.*seminar.*/)) : false)
+  return nameMatch && (credits >= 5)
 }
 
 const formatCredit = credit => {
   const { id, credits, attainment_date, course: { name } } = credit
   const year = attainment_date && attainment_date.getFullYear()
   const course = name.en
-  const thesis = isThesis(course, credits)
-  return { id, year, credits, course, thesis }
+  const mThesis = isMastersThesis(name, credits)
+  const bThesis = isBachelorsThesis(name, credits)
+  return { id, year, credits, course, mThesis,  bThesis }
 }
 
 const getCreditsForProvider = (provider) => Credit.findAll({
@@ -54,10 +65,11 @@ const getCreditsForProvider = (provider) => Credit.findAll({
 
 const productivityStatsFromCredits = credits => {
   const stats = {}
-  credits.forEach(({ year, credits: creds, thesis }) => {
-    const stat = stats[year] || (stats[year] = { credits: 0, thesis: 0, year })
+  credits.forEach(({ year, credits: creds, mThesis, bThesis }) => {
+    const stat = stats[year] || (stats[year] = { credits: 0, bThesis: 0, mThesis: 0, year })
     stat.credits += creds
-    thesis && stat.thesis++
+    mThesis && stat.mThesis++
+    bThesis && stat.bThesis++
   })
   return stats
 }
@@ -235,7 +247,8 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
 }
 
 module.exports = {
-  isThesis,
+  isBachelorsThesis,
+  isMastersThesis,
   studytrackToProviderCode,
   getCreditsForProvider,
   productivityStatsFromCredits,

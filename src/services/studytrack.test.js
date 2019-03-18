@@ -1,7 +1,8 @@
 const {
   studytrackToProviderCode,
   getCreditsForProvider,
-  isThesis,
+  isBachelorsThesis,
+  isMastersThesis,
   productivityStatsFromCredits,
   productivityStatsForProvider,
   findGraduated,
@@ -34,7 +35,8 @@ test('Credits for provider should return object in correct format', async () => 
     course: 'COURSE_EN',
     year: 2016,
     id: 'CREDIT_01',
-    thesis: false
+    mThesis: false,
+    bThesis: false
   })
 })
 
@@ -69,33 +71,64 @@ test('MH50_010 track code maps to 500-M010 provider code', () => {
 })
 
 test('isThesis returns true and false correctly', () => {
-  expect(isThesis('Bachelors thesis', 30)).toBe(true)
-  expect(isThesis('bachelors thesis', 30)).toBe(true)
-  expect(isThesis('bachelors thesis seminar', 6)).toBe(false)
-  expect(isThesis('Masters Thesis', 30)).toBe(true)
+  const bThesis1 = {
+    fi: 'kandidaatintutkielma',
+    en: 'Bachelors thesis'
+  }
+  const bThesis2 = {
+    fi: 'kandidaatintutkielma',
+    en: 'kandidaatintutkielma'
+  }
+  const bThesisFaulty1 = {
+    fi: 'kandidaatintutkielmaan kuuluva seminaari',
+    en: 'kandidaatintutkielmaan kuuluva seminaari'
+  }
+  const bThesisFaulty2 = {
+    fi: null,
+    en: 'seminar for Bachelors Thesis'
+  }
+  const mThesis1 = {
+    fi: 'pro gradu tutkielma',
+    en: 'pro gradu tutkielma'
+  }
+  const mThesis2 = {
+    fi: 'pro gradu-tutkielma',
+    en: 'Masters thesis'
+  }
+  const mThesisFaulty = {
+    fi: 'Seminar for thesis',
+    en: 'Seminar for thesis'
+  }
+  expect(isBachelorsThesis(bThesis1, 6)).toBe(true)
+  expect(isBachelorsThesis(bThesis2, 6)).toBe(true)
+  expect(isBachelorsThesis(bThesisFaulty1, 6)).toBe(false)
+  expect(isBachelorsThesis(bThesisFaulty2, 10)).toBe(false)
+  expect(isMastersThesis(mThesis1, 30)).toBe(true)
+  expect(isMastersThesis(mThesis2, 30)).toBe(true)
+  expect(isMastersThesis(mThesisFaulty, 30)).toBe(false)
 })
 
 test('productivityStatsFromCredits calculates stats correctly', () => {
   const credits = [
-    { year: 2016, credits: 5, thesis: false },
-    { year: 2016, credits: 5, thesis: false },
-    { year: 2016, credits: 5, thesis: true },
-    { year: 2015, credits: 5, thesis: true },
-    { year: 2015, credits: 5, thesis: true },
-    { year: 2015, credits: 10, thesis: false }
+    { year: 2016, credits: 5, bTthesis: false, mThesis: false },
+    { year: 2016, credits: 5, bThesis: false, mThesis: false },
+    { year: 2016, credits: 5, bThesis: true, mThesis: false },
+    { year: 2015, credits: 5, bThesis: true, mThesis: false },
+    { year: 2015, credits: 5, mThesis: true, bThesis: false },
+    { year: 2015, credits: 10, mThesis: false, bThesis: false }
   ]
   const stats = productivityStatsFromCredits(credits)
   expect(stats).toMatchObject({
-    2016: { year: 2016, credits: 15, thesis: 1 },
-    2015: { year: 2015, credits: 20, thesis: 2 }
+    2016: { year: 2016, credits: 15, mThesis: 0, bThesis: 1 },
+    2015: { year: 2015, credits: 20, mThesis: 1, bThesis: 1 }
   })
 })
 
 test('productivityStats integrates correctly', async () => {
   const stats = await productivityStatsForProvider(provider)
   expect(stats).toMatchObject({
-    2015: { year: 2015, thesis: 1, credits: 40 },
-    2016: { year: 2016, thesis: 0, credits: 5 }
+    2015: { year: 2015, bThesis: 1, mThesis: 0, credits: 40 },
+    2016: { year: 2016, bThesis: 0, mThesis: 0, credits: 5 }
   })
 })
 
@@ -171,13 +204,15 @@ test('productivityStatsForStudytrack integrates', async () => {
   expect(stats).toContainEqual({
     year: 2015,
     graduated: 0,
-    thesis: 1,
+    bThesis: 1,
+    mThesis: 0,
     credits: 40
   })
   expect(stats).toContainEqual({
     year: 2016,
     graduated: 1,
-    thesis: 0,
+    mThesis: 0,
+    bThesis: 0,
     credits: 5
   })
 })
