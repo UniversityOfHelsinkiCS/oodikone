@@ -13,7 +13,8 @@ const ThroughputTable = ({ throughput, loading, error }) => {
     { key: 'credits90', title: 'Credits >= 90', getRowVal: year => year.credits.reduce(morethan(90), 0) },
     { key: 'credits120', title: 'Credits >= 120', getRowVal: year => year.credits.reduce(morethan(120), 0) },
     { key: 'credits150', title: 'Credits >= 150', getRowVal: year => year.credits.reduce(morethan(150), 0) },
-    { key: 'theses', title: 'Thesis', getRowVal: year => year.theses },
+    { key: 'thesisM', title: 'Thesis (Master)', getRowVal: year => year.thesisM },
+    { key: 'thesisB', title: 'Thesis (Bachelor)', getRowVal: year => year.thesisB },
     { key: 'graduatedM', title: 'Graduated (Master)', getRowVal: year => year.graduatedM },
     { key: 'graduatedB', title: 'Graduated (Bachelor)', getRowVal: year => year.graduatedB }
   ]
@@ -31,7 +32,8 @@ ThroughputTable.propTypes = {
   throughput: arrayOf(shape({
     year: string,
     credits: number,
-    theses: number,
+    thesisM: number,
+    thesisB: number,
     graduatedB: number,
     graduatedM: number
   })).isRequired,
