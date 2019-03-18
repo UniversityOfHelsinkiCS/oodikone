@@ -11,28 +11,27 @@ const ThroughputTable = ({ throughput, loading, error }) => {
       <Header>Population progress</Header>
       <Loader active={loading} inline="centered">Loading...</Loader>
       <Table celled structured>
-    <Table.Header>
-      <Table.Row>
-        <Table.HeaderCell rowSpan='2'>Year</Table.HeaderCell>
-        <Table.HeaderCell rowSpan='2'>Students</Table.HeaderCell>
-        <Table.HeaderCell colSpan='5'>Credits</Table.HeaderCell>
-        <Table.HeaderCell colSpan='2'>Thesis</Table.HeaderCell>
-        <Table.HeaderCell colSpan='2'>Graduated</Table.HeaderCell>
-      </Table.Row>
-      <Table.Row>
-        <Table.HeaderCell>>= 30</Table.HeaderCell>
-        <Table.HeaderCell>>= 60</Table.HeaderCell>
-        <Table.HeaderCell>>= 90</Table.HeaderCell>
-        <Table.HeaderCell>>= 120</Table.HeaderCell>
-        <Table.HeaderCell>>= 150</Table.HeaderCell>
-        <Table.HeaderCell>Master</Table.HeaderCell>
-        <Table.HeaderCell>Bachelor</Table.HeaderCell>
-        <Table.HeaderCell>Master</Table.HeaderCell>
-        <Table.HeaderCell>Bachelor</Table.HeaderCell>
-      </Table.Row>
-    </Table.Header>
-
-    <Table.Body> 
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
+            <Table.HeaderCell rowSpan="2">Students</Table.HeaderCell>
+            <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
+            <Table.HeaderCell colSpan="2">Thesis</Table.HeaderCell>
+            <Table.HeaderCell colSpan="2">Graduated</Table.HeaderCell>
+          </Table.Row>
+          <Table.Row>
+            <Table.HeaderCell content=">= 30" />
+            <Table.HeaderCell content=">= 60" />
+            <Table.HeaderCell content=">= 90" />
+            <Table.HeaderCell content=">= 120" />
+            <Table.HeaderCell content=">= 150" />
+            <Table.HeaderCell content="Master" />
+            <Table.HeaderCell content="Bachelor" />
+            <Table.HeaderCell content="Master" />
+            <Table.HeaderCell content="Bachelor" />
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
           {data.map(year => (
             <Table.Row key={year.year}>
               <Table.Cell>{year.year}</Table.Cell>
