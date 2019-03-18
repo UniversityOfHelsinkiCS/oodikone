@@ -156,21 +156,35 @@ const creditsAfter = (studentnumbers, startDate) => {
     })))
 }
 
-const graduationsFromClass = async (studentnumbers, startDate) => {
-  const query = `SELECT code
+const degreeCodes = () => {
+  const queryBachelors = `SELECT code
   FROM course
   WHERE is_study_module=true
   AND (
-    (name->>'fi' ilike '%kandidaatti%'
-      OR name->>'fi' ilike '%maisteri%' )
-    AND NOT name->>'fi' ilike '%opinnot%'
+    name->>'fi' ILIKE '%kandidaatti%'
+    AND NOT name->>'fi' ILIKE '%opinnot%'
+    AND NOT name->>'fi' ILIKE '%opintoja%'
   );`
-  const codes = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT })
 
-  return Credit.count({
+  const queryMasters = `SELECT code
+    FROM course 
+    WHERE is_study_module=true 
+    AND (
+      name->>'fi' ILIKE '%maisteri%' 
+      AND NOT name->>'fi' ILIKE '%opinnot%'
+      AND NOT name->>'fi' ILIKE '%opintoja%'
+    );`
+  return [
+    sequelize.query(queryMasters, { type: sequelize.QueryTypes.SELECT }),
+    sequelize.query(queryBachelors, { type: sequelize.QueryTypes.SELECT }),
+  ]
+}
+
+const graduationsFromClass = (studentnumbers, startDate, mastersCodes, bachelorsCodes) => {
+  return [Credit.count({
     where: {
       course_code: {
-        [Op.in]: codes.map(c => c.code)
+        [Op.in]: mastersCodes.map(c => c.code)
       },
       student_studentnumber: {
         [Op.in]: studentnumbers
@@ -179,7 +193,20 @@ const graduationsFromClass = async (studentnumbers, startDate) => {
         [Op.gte]: startDate
       }
     }
-  })
+  }),
+  Credit.count({
+    where: {
+      course_code: {
+        [Op.in]: bachelorsCodes.map(c => c.code)
+      },
+      student_studentnumber: {
+        [Op.in]: studentnumbers
+      },
+      attainment_date: {
+        [Op.gte]: startDate
+      }
+    }
+  })]
 }
 
 const thesesFromClass = (studentnumbers, startDate) => {
@@ -214,9 +241,10 @@ const thesesFromClass = (studentnumbers, startDate) => {
   })
 }
 
-const productivityStats = (studentnumbers, startDate) => {
+const productivityStats = (studentnumbers, startDate, mastersCodes, bachelorsCodes) => {
+  console.log(mastersCodes, bachelorsCodes)
   return Promise.all([creditsAfter(studentnumbers, startDate),
-  graduationsFromClass(studentnumbers, startDate),
+    ...graduationsFromClass(studentnumbers, startDate, mastersCodes, bachelorsCodes),
   thesesFromClass(studentnumbers, startDate)])
 }
 
@@ -225,21 +253,22 @@ const getYears = (since) => {
   for (let i = since; i <= new Date().getFullYear(); i++) {
     years.push(i)
   }
-  console.log(years)
   return years
 }
 
 const throughputStatsForStudytrack = async (studytrack, since) => {
   const years = getYears(since)
+  const [mastersCodes, bachelorsCodes] = await Promise.all(degreeCodes())
   const arr = await Promise.all(years.map(async year => {
     const startDate = `${year}-${semesterStart['FALL']}`
     const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
-    const [credits, graduated, theses] = await productivityStats(studentnumbers, startDate)
+    const [credits, graduatedM, graduatedB, theses] = await productivityStats(studentnumbers, startDate, mastersCodes, bachelorsCodes)
     return {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
-      graduated: graduated,
+      graduatedB: graduatedB,
+      graduatedM: graduatedM,
       theses: theses
     }
   }))
