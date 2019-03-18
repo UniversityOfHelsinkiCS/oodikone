@@ -1,7 +1,6 @@
 import React from 'react'
 import { Header, Loader, Table } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string } from 'prop-types'
-import SortableTable from '../../SortableTable'
 
 const ThroughputTable = ({ throughput, loading, error }) => {
   const morethan = x => (total, amount) => amount >= x ? total + 1 : total // eslint-disable-line
