@@ -16,15 +16,15 @@ const studytrackToProviderCode = code => {
 const isMastersThesis = (name, credits) => {
   if (!name) return false
   const nameMatch = (name.en ? !!name.en.toLowerCase().match(/^.*master.*thesis.*$/) : false
-  )|| (name.fi ? !!name.fi.toLowerCase().match(/^.*pro gradu.*$/) : false)
+  ) || (name.fi ? !!name.fi.toLowerCase().match(/^.*pro gradu.*$/) : false)
   return nameMatch && (credits >= 20)
 }
 
 const isBachelorsThesis = (name, credits) => {
   if (!name) return false
-  const nameMatch = (name.fi ? (!!name.fi.toLowerCase().match(/^.*kandidaat.*tutkielma.*/) 
-      && !name.fi.toLowerCase().match(/^.*seminaari.*/)) : false)
-    || (name.en ? (!!name.en.toLowerCase().match(/^.*bachelor.*thesis.*/)
+  const nameMatch = (name.fi ? (!!name.fi.toLowerCase().match(/^.*kandidaat.*tutkielma.*/)
+    && !name.fi.toLowerCase().match(/^.*seminaari.*/)) : false)
+    || (name.en ? (!!name.en.toLowerCase().match(/^.*bachelor.*thesis.*/)
       && !name.en.toLowerCase().match(/^.*seminar.*/)) : false)
   return nameMatch && (credits >= 5)
 }
@@ -35,7 +35,7 @@ const formatCredit = credit => {
   const course = name.en
   const mThesis = isMastersThesis(name, credits)
   const bThesis = isBachelorsThesis(name, credits)
-  return { id, year, credits, course, mThesis,  bThesis }
+  return { id, year, credits, course, mThesis, bThesis }
 }
 
 const getCreditsForProvider = (provider) => Credit.findAll({
@@ -210,18 +210,35 @@ const graduationsFromClass = (studentnumbers, startDate, mastersCodes, bachelors
 }
 
 const thesesFromClass = (studentnumbers, startDate) => {
-  return Credit.count({
+  return [Credit.count({
     include: {
       model: Course,
       attributes: [],
       required: true,
       where: {
-        name: {
-          fi: {
-            [Op.and]: {
-              [Op.iLike]: "%tutkielma%",
-              [Op.notILike]: "%seminaari%",
-              [Op.notILike]: "%ilman tutkielmaa%"
+        [Op.and]: {
+          is_study_module: false,
+          [Op.or]: {
+            name: {
+              fi: {
+                [Op.and]: {
+                  [Op.iLike]: "%pro gradu%",
+                  [Op.iLike]: "%tutkielma%",
+                  [Op.notILike]: "%seminaari%",
+                  [Op.notILike]: "%ilman tutkielmaa%"
+                }
+              }
+            },
+            name: {
+              en: {
+                [Op.and]: {
+                  [Op.iLike]: "%master%",
+                  [Op.iLike]: "%thesis%",
+                  [Op.notILike]: "%seminar%",
+                  [Op.notILike]: "%studies%"
+                  
+                }
+              }
             }
           }
         }
@@ -229,7 +246,7 @@ const thesesFromClass = (studentnumbers, startDate) => {
     },
     where: {
       credits: {
-        [Op.gte]: 6
+        [Op.gte]: 20
       },
       student_studentnumber: {
         [Op.in]: studentnumbers
@@ -238,14 +255,56 @@ const thesesFromClass = (studentnumbers, startDate) => {
         [Op.gte]: startDate
       }
     }
-  })
+  }),
+  Credit.count({
+    include: {
+      model: Course,
+      attributes: [],
+      required: true,
+      where: {
+        [Op.and]: {
+          is_study_module: false,
+          name: {
+            [Op.or]: {
+              fi: {
+                [Op.and]: {
+                  [Op.iLike]: "%kandidaatin%",
+                  [Op.iLike]: "%tutkielma%",
+                  [Op.notILike]: "%opinnot%",
+                  [Op.notILike]: "%ilman tutkielmaa%"
+                }
+              }
+            },
+            en: {
+              [Op.and]: {
+                [Op.iLike]: "%bachelor%",
+                [Op.iLike]: "%thesis%",
+                [Op.notILike]: "%seminar%",
+                [Op.notILike]: "%studies%",
+              }
+            }
+          }
+        }
+      }
+    },
+    where: {
+      credits: {
+        [Op.gte]: 5
+      },
+      student_studentnumber: {
+        [Op.in]: studentnumbers
+      },
+      attainment_date: {
+        [Op.gte]: startDate
+      }
+    }
+  })]
 }
 
 const productivityStats = (studentnumbers, startDate, mastersCodes, bachelorsCodes) => {
-  console.log(mastersCodes, bachelorsCodes)
   return Promise.all([creditsAfter(studentnumbers, startDate),
-    ...graduationsFromClass(studentnumbers, startDate, mastersCodes, bachelorsCodes),
-  thesesFromClass(studentnumbers, startDate)])
+  ...graduationsFromClass(studentnumbers, startDate, mastersCodes, bachelorsCodes),
+  ...thesesFromClass(studentnumbers, startDate)])
 }
 
 const getYears = (since) => {
@@ -263,13 +322,14 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     const startDate = `${year}-${semesterStart['FALL']}`
     const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
-    const [credits, graduatedM, graduatedB, theses] = await productivityStats(studentnumbers, startDate, mastersCodes, bachelorsCodes)
+    const [credits, graduatedM, graduatedB, thesisM, thesisB] = await productivityStats(studentnumbers, startDate, mastersCodes, bachelorsCodes)
     return {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
       graduatedB: graduatedB,
       graduatedM: graduatedM,
-      theses: theses
+      thesisM: thesisM,
+      thesisB: thesisB
     }
   }))
   return arr
