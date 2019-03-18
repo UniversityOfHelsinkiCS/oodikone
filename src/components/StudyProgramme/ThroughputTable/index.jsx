@@ -14,7 +14,8 @@ const ThroughputTable = ({ throughput, loading, error }) => {
     { key: 'credits120', title: 'Credits >= 120', getRowVal: year => year.credits.reduce(morethan(120), 0) },
     { key: 'credits150', title: 'Credits >= 150', getRowVal: year => year.credits.reduce(morethan(150), 0) },
     { key: 'theses', title: 'Thesis', getRowVal: year => year.theses },
-    { key: 'graduated', title: 'Graduated', getRowVal: year => year.graduated }
+    { key: 'graduatedM', title: 'Graduated (Master)', getRowVal: year => year.graduatedM },
+    { key: 'graduatedB', title: 'Graduated (Bachelor)', getRowVal: year => year.graduatedB }
   ]
   if (error) return <h1>Oh no so error {error}</h1>
   return (
@@ -31,7 +32,8 @@ ThroughputTable.propTypes = {
     year: string,
     credits: number,
     theses: number,
-    graduated: number
+    graduatedB: number,
+    graduatedM: number
   })).isRequired,
   loading: bool.isRequired,
   error: bool.isRequired
