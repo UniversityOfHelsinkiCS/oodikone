@@ -68,7 +68,7 @@ class StudyProgramme extends Component {
     return (
       <div className={sharedStyles.segmentContainer}>
         <Header className={sharedStyles.segmentTitle} size="large">
-          Study Programme Settings
+          Study Programme
         </Header>
         <Segment className={sharedStyles.contentSegment}>
           <StudyProgrammeSelector handleSelect={this.handleSelect} selected={studyProgrammeId !== undefined} />

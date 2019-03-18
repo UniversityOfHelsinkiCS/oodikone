@@ -11,7 +11,7 @@ const ProductivityTable = ({ productivity, loading, error }) => {
       <Table celled>
         <Table.Header>
           <Table.Row>
-            {['Year', 'Credits', 'Thesis', 'Graduated'].map(header =>
+            {['Year', 'Credits', 'Bachelors Thesis', 'Masters Thesis', 'Graduated'].map(header =>
               <Table.HeaderCell key={header}>{header}</Table.HeaderCell>)}
           </Table.Row>
         </Table.Header>
@@ -20,7 +20,8 @@ const ProductivityTable = ({ productivity, loading, error }) => {
             <Table.Row key={year.year}>
               <Table.Cell>{year.year}</Table.Cell>
               <Table.Cell>{year.credits}</Table.Cell>
-              <Table.Cell>{year.thesis}</Table.Cell>
+              <Table.Cell>{year.bThesis}</Table.Cell>
+              <Table.Cell>{year.mThesis}</Table.Cell>
               <Table.Cell>{year.graduated}</Table.Cell>
             </Table.Row>
           ))}
@@ -34,7 +35,8 @@ ProductivityTable.propTypes = {
   productivity: arrayOf(shape({
     year: number,
     credits: number,
-    thesis: number,
+    mThesis: number,
+    bThesis: number,
     graduated: number
   })).isRequired,
   loading: bool.isRequired,
