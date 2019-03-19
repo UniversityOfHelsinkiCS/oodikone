@@ -289,9 +289,11 @@ class UserPage extends Component {
                     content="Enable"
                     onClick={this.enableAccessRightToUser(user.id)}
                   />
-                  <Transition.Group animation="drop" duration="1000">
-                    {this.state.visible && <Image centered size="small" src="https://images.alko.fi/images/cs_srgb,f_auto,t_large/cdn/003002/minttu-peppermint-40.jpg" />}
-                  </Transition.Group>
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Transition.Group animation="drop" duration="1000">
+                      {this.state.visible && <Icon circular color="green" size="massive" name="check" />}
+                    </Transition.Group>
+                  </div>
                   {this.props.isAdmin ? <Button
                     basic
                     fluid
@@ -316,7 +318,7 @@ class UserPage extends Component {
                   }}
                   >everything!
                   </p> : null}
-                { this.renderUnitList(user.elementdetails, user) }
+                {this.renderUnitList(user.elementdetails, user)}
               </Card.Description>
             </Card.Content>
           </Card>
