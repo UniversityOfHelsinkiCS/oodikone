@@ -29,7 +29,9 @@ const getDefaultConfig = () => {
   } else if (isDevEnv) {
     return { ...devOptions }
   }
-  return {}
+  return {
+    headers: {}
+  }
 }
 
 const createDefaultAxiosConfig = async () => {
