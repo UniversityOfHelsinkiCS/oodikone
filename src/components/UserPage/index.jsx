@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Card, Divider, Image, Form, List, Icon, Transition } from 'semantic-ui-react'
+import { Button, Card, Divider, Form, List, Icon, Transition } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router'
