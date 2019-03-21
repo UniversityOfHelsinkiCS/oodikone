@@ -14,7 +14,9 @@ retry () {
 }
 
 init_dirs () {
-    mkdir -p $REPOS $BACKUP_DIR
+    mkdir -p $REPOS $BACKUP_DIR nginx nginx/cache nginx/letsencrypt
+    touch nginx/error.log
+    touch nginx/log
 }
 
 echo_path () {
