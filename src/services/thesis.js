@@ -6,11 +6,10 @@ const createThesisCourse = (programme, course, type) => ThesisCourse.create({
   thesisType: type
 })
 
-const deleteThesisCourse = (programme, course, type) => ThesisCourse.destroy({
+const deleteThesisCourse = (programme, course) => ThesisCourse.destroy({
   where: {
     programmeCode: programme,
-    courseCode: course,
-    thesisType: type
+    courseCode: course
   }
 })
 

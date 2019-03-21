@@ -63,7 +63,7 @@ test('deleteThesisCourse removes thesis from table', async () => {
   await createThesisCourse(progOne.code, courseTwo.code, ThesisTypeEnums.BACHELOR)
   courses = await ThesisCourse.findAll()
   expect(courses.length).toBe(2)
-  await deleteThesisCourse(progOne.code, courseOne.code, ThesisTypeEnums.MASTER)
+  await deleteThesisCourse(progOne.code, courseOne.code)
   courses = await ThesisCourse.findAll()
   expect(courses.length).toBe(1)
   expect(courses[0]).toMatchObject({ thesisType: 'BACHELOR' })
