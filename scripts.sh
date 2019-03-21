@@ -183,10 +183,8 @@ run_anon_full_setup () {
 run_e2e_setup () {
     echo "Init dirs"
     init_dirs
-    echo "Pull repos"
-    pull_e2e_git_repositories
     echo "Building images, starting containers"
-    docker-compose -f docker-compose.e2e.yml up -d --build
+    docker-compose -f docker-compose.lateste2e.yml up -d --build
     echo "Installing Cypress"
     npm i -g cypress@^3.1.5 --silent
     echo "Setup oodikone db from dump, this will prompt you for your password."
