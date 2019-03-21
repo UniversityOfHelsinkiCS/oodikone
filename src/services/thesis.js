@@ -14,7 +14,14 @@ const deleteThesisCourse = (programme, course, type) => ThesisCourse.destroy({
   }
 })
 
+const findProgrammeTheses = programme => ThesisCourse.findAll({
+  where: {
+    programmeCode: programme
+  }
+})
+
 module.exports = {
   createThesisCourse,
-  deleteThesisCourse    
+  deleteThesisCourse,
+  findProgrammeTheses
 }
