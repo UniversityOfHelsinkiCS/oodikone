@@ -543,8 +543,7 @@ const ThesisCourse = sequelize.define('thesis_courses', {
     }
   },
   thesisType: {
-    type: Sequelize.ENUM([ThesisTypeEnums.BACHELOR, ThesisTypeEnums.MASTER]),
-    primaryKey: true
+    type: Sequelize.ENUM([ThesisTypeEnums.BACHELOR, ThesisTypeEnums.MASTER])
   }
 })
 

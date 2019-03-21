@@ -18,8 +18,7 @@ module.exports = {
         }
       },
       thesisType: {
-        type: Sequelize.ENUM(['BACHELOR', 'MASTER']),
-        primaryKey: true
+        type: Sequelize.ENUM(['BACHELOR', 'MASTER'])
       },
       createdAt: {
         type: Sequelize.DATE
