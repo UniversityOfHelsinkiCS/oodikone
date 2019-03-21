@@ -184,7 +184,7 @@ run_e2e_setup () {
     echo "Init dirs"
     init_dirs
     echo "Building images, starting containers"
-    docker-compose -f docker-compose.lateste2e.yml up -d --build
+    docker-compose -f docker-compose.lateste2e.yml pull && docker-compose -f docker-compose.lateste2e.yml up -d
     echo "Installing Cypress"
     npm i -g cypress@^3.1.5 --silent
     echo "Setup oodikone db from dump, this will prompt you for your password."
