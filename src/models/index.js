@@ -1,6 +1,11 @@
 const Sequelize = require('sequelize')
 const { sequelize, migrationPromise } = require('../database/connection')
 
+const ThesisTypeEnums = {
+  MASTER: 'MASTER',
+  BACHELOR: 'BACHELOR'
+}
+
 const Student = sequelize.define('student',
   {
     studentnumber: {
@@ -520,6 +525,29 @@ const UsageStatistic = sequelize.define('usage_statistics', {
   timestamps: false
 })
 
+const ThesisCourse = sequelize.define('thesis_courses', {
+  programmeCode: {
+    primaryKey: true,
+    type: Sequelize.STRING,
+    references: {
+      model: ElementDetails,
+      key: 'code'
+    }
+  },
+  courseCode: {
+    primaryKey: true,
+    type: Sequelize.STRING,
+    references: {
+      model: Course,
+      key: 'code'
+    }
+  },
+  thesisType: {
+    type: Sequelize.ENUM([ThesisTypeEnums.BACHELOR, ThesisTypeEnums.MASTER]),
+    primaryKey: true
+  }
+})
+
 Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
 
@@ -587,6 +615,11 @@ CourseGroup.belongsTo(ElementDetails, { foreignKey: 'programmeid' })
 
 Credit.belongsTo(Semester, { foreignKey: { name: 'semestercode', allowNull: false } })
 
+Course.hasMany(ThesisCourse, { foreignKey: 'courseCode', sourceKey: 'code' })
+ThesisCourse.belongsTo(Course, { foreignKey: 'courseCode', targetKey: 'code' })
+
+ElementDetails.hasMany(ThesisCourse, { foreignKey: 'programmeCode', sourceKey: 'code' })
+ThesisCourse.belongsTo(ElementDetails, { foreignKey: 'programmeCode', targetKey: 'code' })
 
 module.exports = {
   MandatoryCourse,
@@ -620,5 +653,7 @@ module.exports = {
   Migration,
   CreditTeacher,
   UsageStatistic,
-  CourseGroup
+  CourseGroup,
+  ThesisCourse,
+  ThesisTypeEnums
 }
