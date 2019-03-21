@@ -53,7 +53,7 @@ services:
       REDIS: redis
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
-      FRONT_URL: http://localhost
+      FRONT_URL: http://localhost:1337
       TOKEN_SECRET: IWannaBeTheVeryBest
       OODILEARN_URL: http://oodilearn:5000
       USERSERVICE_URL: http://userservice:4567
@@ -98,5 +98,10 @@ services:
       - ./nginx/cache/:/etc/nginx/cache
       - /etc/letsencrypt/:/etc/letsencrypt/
     ports:
-      -  6969:6969
+      -  1337:80
+    depends_on: 
+      - frontend
+      - backend
+      - userservice
+
     container_name: nginx
