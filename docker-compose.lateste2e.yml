@@ -90,6 +90,7 @@ services:
 
   nginx:
     image: nginx:latest
+    restart: unless-stopped
     volumes: 
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/error.log:/etc/nginx/error_log.log
@@ -97,5 +98,5 @@ services:
       - ./nginx/cache/:/etc/nginx/cache
       - /etc/letsencrypt/:/etc/letsencrypt/
     ports:
-      -  80:80
+      -  6969:6969
     container_name: nginx
