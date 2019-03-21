@@ -3,7 +3,15 @@ describe('Population Statistics tests', () => {
   Cypress.config('pageLoadTimeout', 100000)
 
   beforeEach(() => {
-    cy.visit("localhost:8081", { timeout: 240000 })
+    cy.server({
+      onAnyRequest: function (route, proxy) {
+        proxy.xhr.setRequestHeader('uid', 'tktl')
+        proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
+        proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
+        proxy.xhr.setRequestHeader('edupersonaffiliation', 'asdasd')
+      }
+    })
+    cy.visit("localhost", { timeout: 240000 })
     cy.contains("Population statistics").click()
     cy.contains("Select study programme", { timeout: 100000 })
   })
@@ -34,15 +42,16 @@ describe('Population Statistics tests', () => {
     cy.contains("See population").should('be.disabled')
     cy.url().should('include', '/populations')
     cy.contains("Search for population")
-    cy.get(".populationSearchForm__yearSelect___2w98a").as("enrollmentSelect").contains("Enrollment")
-
-    cy.get("@enrollmentSelect").within(() => {
-      cy.get("input").its(`${[0]}.value`).then((beforeVal) => {
-        cy.get("input").click()
-        cy.get("table").contains("2014-2015").click()
-        cy.get("input").should('not.have.value', beforeVal)
-      })
+    cy.contains("Enrollment").parent().within(() => {
+      cy.get(".form-control").as("enrollmentSelect")
     })
+
+    cy.get("@enrollmentSelect").its(`${[0]}.value`).then((beforeVal) => {
+      cy.get("@enrollmentSelect").click()
+      cy.get("table").contains("2014-2015").click()
+      cy.get("@enrollmentSelect").should('not.have.value', beforeVal)
+    })
+
 
     cy.contains("Statistics until").siblings().within(() => {
       cy.get("input").click()
@@ -91,7 +100,7 @@ describe('Population Statistics tests', () => {
     })
     cy.contains("DIGI-000A", { timeout: 10000 })
     cy.contains("Searched courses").parentsUntil(".segment").contains("digitaidot").should("have.text", "Opiskelijan digitaidot: orientaatio (Keskusta)")
-    
+
     cy.go("back")
     cy.get("button").contains("show").click()
     cy.contains("Student names hidden").click()

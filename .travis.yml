@@ -10,15 +10,6 @@ services:
 
 jobs:
   include:
-    - stage: testing
-      script:
-        - git clone https://github.com/UniversityOfHelsinkiCS/oodikone2-cli.git
-        - cd oodikone2-cli
-        - source scripts.sh && run_e2e_setup
-        - cd ..
-        - until $(curl --output /dev/null --silent --fail http://localhost:8081); do printf '.'; sleep 5; done
-        - CYPRESS_baseUrl=http://localhost:8081 npm run cypress:record
-
     - stage: build & deploy
       script:
         - "if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker build --build-arg BASE_PATH=/staging/ -t toska/oodikone2-frontend:staging . ; else :;fi"
