@@ -5,7 +5,7 @@ import { shape, number, arrayOf, bool, string } from 'prop-types'
 const ThroughputTable = ({ throughput, loading, error }) => {
   const morethan = x => (total, amount) => amount >= x ? total + 1 : total // eslint-disable-line
   if (error) return <h1>Oh no so error {error}</h1>
-  const data = throughput.filter(year => year.credits.length > 0)
+  const data = throughput ? throughput.filter(year => year.credits.length > 0) : []
   return (
     <React.Fragment>
       <Header>Population progress</Header>
@@ -57,9 +57,13 @@ ThroughputTable.propTypes = {
     thesisM: number,
     thesisB: number,
     graduated: number
-  })).isRequired,
+  })), // eslint-disable-line
   loading: bool.isRequired,
   error: bool.isRequired
+}
+
+ThroughputTable.defaultProps = {
+  throughput: null
 }
 
 export default ThroughputTable
