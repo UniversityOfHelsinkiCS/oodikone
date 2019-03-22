@@ -1,31 +1,29 @@
 import React, { Component } from 'react'
-import { string, func, shape, arrayOf, bool } from 'prop-types'
+import { string, func, shape, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import ProductivityTable from '../ProductivityTable'
 import ThroughputTable from '../ThroughputTable'
-import { getProductivity, clearProductivity } from '../../../redux/productivity'
-import { getThroughput, clearThroughput } from '../../../redux/throughput'
+import { getProductivity } from '../../../redux/productivity'
+import { getThroughput } from '../../../redux/throughput'
 
 class Overview extends Component {
   componentDidMount() {
-    const { studyprogramme } = this.props
-    this.props.dispatchClearProductivity()
-    this.props.dispatchClearThroughput()
-    this.props.dispatchGetProductivity(studyprogramme)
-    this.props.dispatchGetThroughput(studyprogramme)
+    const { studyprogramme, productivity, throughput } = this.props
+    if (!productivity.data[studyprogramme]) this.props.dispatchGetProductivity(studyprogramme)
+    if (!throughput.data[studyprogramme]) this.props.dispatchGetThroughput(studyprogramme)
   }
 
   render() {
-    const { productivity, throughput } = this.props
+    const { productivity, throughput, studyprogramme } = this.props
     return (
       <React.Fragment>
         <ProductivityTable
-          productivity={productivity.data}
+          productivity={productivity.data[studyprogramme]}
           loading={productivity.pending}
           error={productivity.error}
         />
         <ThroughputTable
-          throughput={throughput.data}
+          throughput={throughput.data[studyprogramme]}
           loading={throughput.pending}
           error={throughput.error}
         />
@@ -38,17 +36,15 @@ Overview.propTypes = {
   studyprogramme: string.isRequired,
   dispatchGetProductivity: func.isRequired,
   dispatchGetThroughput: func.isRequired,
-  dispatchClearThroughput: func.isRequired,
-  dispatchClearProductivity: func.isRequired,
   productivity: shape({
     error: bool,
     pending: bool,
-    data: arrayOf(shape({}))
+    data: shape({})
   }).isRequired, // eslint-disable-line
   throughput: shape({
     error: bool,
     pending: bool,
-    data: arrayOf(shape({}))
+    data: shape({})
   }).isRequired // eslint-disable-line
 }
 
@@ -56,11 +52,7 @@ const mapDispatchToProps = dispatch => ({
   dispatchGetProductivity: studyprogrammeId =>
     dispatch(getProductivity(studyprogrammeId)),
   dispatchGetThroughput: studyprogrammeId =>
-    dispatch(getThroughput(studyprogrammeId)),
-  dispatchClearProductivity: () =>
-    dispatch(clearProductivity()),
-  dispatchClearThroughput: () =>
-    dispatch(clearThroughput())
+    dispatch(getThroughput(studyprogrammeId))
 })
 
 const mapStateToProps = ({ studyProgrammeProductivity, studyProgrammeThroughput }) => ({

@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { shape, func, string, bool } from 'prop-types'
-import { Loader } from 'semantic-ui-react'
+import { arrayOf, func, string, bool } from 'prop-types'
 import { sortBy } from 'lodash'
+import { Loader } from 'semantic-ui-react'
 import { getDegreesAndProgrammes } from '../../../redux/populationDegreesAndProgrammes'
 import Table from '../../SearchResultTable'
 
@@ -14,9 +14,8 @@ const headers = [
 class StudyProgrammeSelector extends Component {
   static propTypes = {
     getDegreesAndProgrammes: func.isRequired,
-    language: string.isRequired,
     handleSelect: func.isRequired,
-    studyprogrammes: shape({}).isRequired,
+    studyprogrammes: arrayOf(arrayOf(string)), // eslint-disable-line
     selected: bool.isRequired
   }
 
@@ -27,17 +26,13 @@ class StudyProgrammeSelector extends Component {
   }
 
   render() {
-    const { studyprogrammes, selected, language } = this.props
-    if (!studyprogrammes) return <Loader active>Loading</Loader>
-
+    const { studyprogrammes, selected } = this.props
     if (selected) return null
-    const rows = sortBy(Object.values(studyprogrammes)
-      .map(programme => [programme.name[language], programme.code]), '0')
-
+    if (!studyprogrammes) return <Loader active>Loading</Loader>
     return (
       <Table
         headers={headers}
-        rows={rows}
+        rows={studyprogrammes}
         rowClickFn={(e, row) => this.props.handleSelect(row)}
         selectable
         noResultText="No study programmes"
@@ -46,9 +41,15 @@ class StudyProgrammeSelector extends Component {
   }
 }
 
-const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => ({
-  studyprogrammes: populationDegreesAndProgrammes.data.programmes,
-  language: settings.language
-})
+const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
+  const { programmes } = populationDegreesAndProgrammes.data
+  const { language } = settings
+
+  return {
+    studyprogrammes: programmes ? sortBy(Object.values(programmes).filter(programme =>
+      programme.code.includes('_'))
+      .map(programme => [programme.name[language], programme.code]), '0') : null
+  }
+}
 
 export default connect(mapStateToProps, { getDegreesAndProgrammes })(StudyProgrammeSelector)
