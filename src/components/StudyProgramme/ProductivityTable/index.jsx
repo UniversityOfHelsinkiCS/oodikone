@@ -16,7 +16,7 @@ const ProductivityTable = ({ productivity, loading, error }) => {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {productivity.map(year => (
+          {productivity ? productivity.map(year => (
             <Table.Row key={year.year}>
               <Table.Cell>{year.year}</Table.Cell>
               <Table.Cell>{year.credits}</Table.Cell>
@@ -24,7 +24,7 @@ const ProductivityTable = ({ productivity, loading, error }) => {
               <Table.Cell>{year.mThesis}</Table.Cell>
               <Table.Cell>{year.graduated}</Table.Cell>
             </Table.Row>
-          ))}
+          )) : null}
         </Table.Body>
       </Table>
     </React.Fragment>
@@ -38,9 +38,13 @@ ProductivityTable.propTypes = {
     mThesis: number,
     bThesis: number,
     graduated: number
-  })).isRequired,
+  })), // eslint-disable-line
   loading: bool.isRequired,
   error: bool.isRequired
+}
+
+ProductivityTable.defaultProps = {
+  productivity: null
 }
 
 export default ProductivityTable
