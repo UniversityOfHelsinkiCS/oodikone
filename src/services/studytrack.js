@@ -138,7 +138,7 @@ const productivityStatsForStudytrack = async (studytrack, since) => {
     productivityStatsForProvider(providercode, since)
   ]
   const [studyrightStats, creditStats] = await Promise.all(promises)
-  return combineStatistics(creditStats, studyrightStats)
+  return { [studytrack]: combineStatistics(creditStats, studyrightStats) }
 }
 
 const creditsAfter = (studentnumbers, startDate) => {
@@ -308,7 +308,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       thesisB: thesisB
     }
   }))
-  return arr
+  return { [studytrack]: arr }
 }
 
 module.exports = {

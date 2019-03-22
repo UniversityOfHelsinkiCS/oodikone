@@ -201,14 +201,14 @@ test('combineStatistics returns correctly formatted array', () => {
 
 test('productivityStatsForStudytrack integrates', async () => {
   const stats = await productivityStatsForStudytrack(studytrack, '2001-01-01')
-  expect(stats).toContainEqual({
+  expect(stats[studytrack]).toContainEqual({
     year: 2015,
     graduated: 0,
     bThesis: 1,
     mThesis: 0,
     credits: 40
   })
-  expect(stats).toContainEqual({
+  expect(stats[studytrack]).toContainEqual({
     year: 2016,
     graduated: 1,
     mThesis: 0,
