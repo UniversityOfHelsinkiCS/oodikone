@@ -24,7 +24,8 @@ router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {
 
 router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
   if (req.params.id) {
-    const productivityData = await productivityStatsForStudytrack(req.params.id)
+    const since = req.params.since ? req.params.since : '2017-08-01'
+    const productivityData = await productivityStatsForStudytrack(req.params.id, since)
     res.json(productivityData)
   } else {
     res.status(422)
