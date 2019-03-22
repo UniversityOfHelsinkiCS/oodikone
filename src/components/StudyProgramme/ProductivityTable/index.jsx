@@ -8,7 +8,7 @@ const ProductivityTable = ({ productivity, loading, error }) => {
     <React.Fragment>
       <Header>Yearly productivity</Header>
       <Loader active={loading} inline="centered">Loading...</Loader>
-      <Table celled>
+      <Table structured celled>
         <Table.Header>
           <Table.Row>
             {['Year', 'Credits', 'Bachelors Thesis', 'Masters Thesis', 'Graduated'].map(header =>
