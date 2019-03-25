@@ -60,6 +60,7 @@ class ExtentGraduated extends Component {
   }
 
   render() {
+    const { extentcode, graduated, complemented } = this.state
     const { filter, extents, language } = this.props
     if (filter.notSet) {
       return (
@@ -110,6 +111,7 @@ class ExtentGraduated extends Component {
               </Form.Field>
               <Form.Field>
                 <Button
+                  disabled={!extentcode || !graduated || !(complemented === 'true' || complemented === 'false')}
                   onClick={this.handleLimit}
                 >
                   set filter
