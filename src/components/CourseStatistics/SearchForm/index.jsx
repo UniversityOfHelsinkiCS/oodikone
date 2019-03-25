@@ -29,38 +29,9 @@ class SearchForm extends Component {
     ...INITIAL
   }
 
-  static getDerivedStateFromProps(props, state) {
-    const shouldPrefill = !props.pending && props.preselectedCourse && state.prefilled !== props.preselectedCourse
-    if (shouldPrefill) {
-      const { code, start, end } = props.preselectedCourse
-
-      const getMatchingYearSelection = (year) => {
-        const matchingYear = year && props.years.find(y => y.text.startsWith(year.toString()))
-        return matchingYear ? matchingYear.value : undefined
-      }
-      const fromYear = getMatchingYearSelection(start)
-      const toYear = getMatchingYearSelection(end)
-
-      return {
-        coursecode: code,
-        fromYear,
-        toYear
-      }
-    }
-    return null
-  }
-
   componentDidMount() {
     this.props.getSemesters()
     this.props.clearCourses()
-  }
-
-  componentDidUpdate() {
-    const { prefilled } = this.state
-    const { preselectedCourse } = this.props
-    if (prefilled !== preselectedCourse) {
-      this.handlePrefilledLoad(preselectedCourse)
-    }
   }
 
   onSelectCourse = (course) => {
@@ -115,13 +86,6 @@ class SearchForm extends Component {
       this.props.clearCourses()
     }
     return Promise.resolve()
-  }
-
-  handlePrefilledLoad = (preselectedCourse) => {
-    this.setState(
-      { prefilled: preselectedCourse },
-      () => this.fetchCourses()
-    )
   }
 
   handleChange = (e, target) => {
@@ -223,18 +187,11 @@ SearchForm.propTypes = {
   matchingCourses: arrayOf(shape({})).isRequired,
   years: arrayOf(shape({})).isRequired,
   isLoading: bool.isRequired,
-  coursesLoading: bool.isRequired,
-  preselectedCourse: shape({})
-}
-
-SearchForm.defaultProps = {
-  preselectedCourse: null
+  coursesLoading: bool.isRequired
 }
 
 const mapStateToProps = (state) => {
   const { years = [] } = state.semesters.data
-  const { pending, data } = state.courseStatistics
-  const preselectedCourse = data[0]
   const { pending: courseStatsPending } = state.courseStats
   return {
     matchingCourses: getCourseSearchResults(state),
@@ -243,8 +200,7 @@ const mapStateToProps = (state) => {
       text: yearname,
       value: yearcode
     })).reverse(),
-    isLoading: pending || courseStatsPending,
-    preselectedCourse,
+    isLoading: courseStatsPending,
     coursesLoading: state.courseSearch.pending
   }
 }
