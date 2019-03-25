@@ -48,16 +48,15 @@ Overview.propTypes = {
   }).isRequired // eslint-disable-line
 }
 
-const mapDispatchToProps = dispatch => ({
-  dispatchGetProductivity: studyprogrammeId =>
-    dispatch(getProductivity(studyprogrammeId)),
-  dispatchGetThroughput: studyprogrammeId =>
-    dispatch(getThroughput(studyprogrammeId))
-})
-
 const mapStateToProps = ({ studyProgrammeProductivity, studyProgrammeThroughput }) => ({
   productivity: studyProgrammeProductivity,
   throughput: studyProgrammeThroughput
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Overview)
+export default connect(
+  mapStateToProps,
+  {
+    dispatchGetProductivity: getProductivity,
+    dispatchGetThroughput: getThroughput
+  }
+)(Overview)
