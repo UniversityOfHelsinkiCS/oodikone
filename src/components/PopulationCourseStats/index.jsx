@@ -8,7 +8,8 @@ import { withRouter } from 'react-router-dom'
 import moment from 'moment'
 
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
-import { getMultipleCourseStatistics } from '../../redux/courseStatistics'
+import { getCourseStats, clearCourseStats } from '../../redux/coursestats'
+
 import { courseParticipation } from '../../populationFilters'
 import PassingSemesters from './PassingSemesters'
 
@@ -87,10 +88,12 @@ class PopulationCourseStats extends Component {
     selectedCourses: arrayOf(object).isRequired,
     removePopulationFilterOfCourse: func.isRequired,
     history: shape({}).isRequired,
-    getMultipleCourseStatistics: func.isRequired,
+    getCourseStats: func.isRequired,
+    clearCourseStats: func.isRequired,
     language: string.isRequired,
     query: shape({}).isRequired,
-    pending: bool.isRequired
+    pending: bool.isRequired,
+    years: shape({}).isRequired
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -175,15 +178,26 @@ class PopulationCourseStats extends Component {
   }
 
   onGoToCourseStatisticsClick = (code) => {
-    const { history, query, getMultipleCourseStatistics: getStatsFn, language } = this.props
+    const {
+      history,
+      query,
+      getCourseStats: getStatsFn,
+      clearCourseStats: clearCourseStatsfn,
+      years
+    } = this.props
+
+    const yearCode = year => Object.values(years).find(yearObject =>
+      yearObject.yearname.slice(0, 4).includes(year)).yearcode
     const { year, months } = query
+    const fromYear = yearCode(year)
+    const toYear = yearCode(moment(moment(year, 'YYYY').add(months, 'months')).format('YYYY'))
     history.push('/coursestatistics/')
+    clearCourseStatsfn()
     getStatsFn({
-      codes: [code],
-      start: Number(year),
-      end: Number(moment(moment(year, 'YYYY').add(months, 'months')).format('YYYY')),
-      separate: false,
-      language
+      courseCodes: [code],
+      fromYear,
+      toYear,
+      separate: false
     })
   }
 
@@ -480,12 +494,14 @@ class PopulationCourseStats extends Component {
 }
 
 const mapStateToProps = (state) => {
+  const { years } = state.semesters.data
   const courseFilters = state.populationFilters.filters.filter(f => f.type === 'CourseParticipation')
   const selectedCourses = courseFilters.map(f => f.params.course.course)
   return {
     language: state.settings.language,
     translate: getTranslate(state.locale),
     query: state.populations.query,
+    years,
     selectedCourses,
     populationSize: state.populations.data.students.length > 0 ?
       state.populations.data.students.length : 0
@@ -494,5 +510,10 @@ const mapStateToProps = (state) => {
 
 export default connect(
   mapStateToProps,
-  { setPopulationFilter, removePopulationFilterOfCourse, getMultipleCourseStatistics }
+  {
+    setPopulationFilter,
+    removePopulationFilterOfCourse,
+    getCourseStats,
+    clearCourseStats
+  }
 )(withRouter(PopulationCourseStats))
