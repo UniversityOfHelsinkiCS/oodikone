@@ -93,7 +93,7 @@ class PopulationCourseStats extends Component {
     language: string.isRequired,
     query: shape({}).isRequired,
     pending: bool.isRequired,
-    years: shape({}).isRequired
+    years: shape({}) // eslint-disable-line
   }
 
   static getDerivedStateFromProps(props, state) {
