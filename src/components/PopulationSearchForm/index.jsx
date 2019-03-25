@@ -67,7 +67,7 @@ class PopulationSearchForm extends Component {
       this.setState({ query: this.initialQuery() }) // eslint-disable-line
       this.props.getDegreesAndProgrammes()
     }
-    if (semesters.length === 0) {
+    if (!semesters.years) {
       this.props.getSemesters()
     }
   }
