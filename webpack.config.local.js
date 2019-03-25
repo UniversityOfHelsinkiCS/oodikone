@@ -1,6 +1,7 @@
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const htmlTemplate = require('html-webpack-template')
+const DeadCodePlugin = require('webpack-deadcode-plugin');
 const path = require('path')
 
 const commonSettings = require('./webpack.config.common')
@@ -43,7 +44,9 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx']
   },
-
+  optimization: {
+    usedExports: true,
+  },
   module: {
     rules: [
       ...commonSettings.module.rules,
@@ -98,6 +101,11 @@ module.exports = {
   },
 
   plugins: [
+    new DeadCodePlugin({
+      exclude: [
+        '**/*.(storybook|spec).(js|jsx)',
+      ],
+    }),
     new webpack.DefinePlugin({
       CONFIG: {
         BASE_PATH: JSON.stringify(''),

@@ -1,6 +1,6 @@
 import React, { Fragment, Component } from 'react'
 import { Header, List, Loader, Placeholder, Icon } from 'semantic-ui-react'
-import { arrayOf, string } from 'prop-types'
+import { arrayOf, string, number } from 'prop-types'
 import sortBy from 'lodash/sortBy'
 import { callApi } from '../../../../apiConnection/index'
 import styles from '../courseGroup.css'
@@ -144,7 +144,7 @@ class Index extends Component {
 
 Index.propTypes = {
   teacherIds: arrayOf(string).isRequired,
-  semesterCode: string.isRequired
+  semesterCode: number.isRequired
 }
 
 export default Index

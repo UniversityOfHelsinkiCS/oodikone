@@ -67,6 +67,7 @@
     "uglifyjs-webpack-plugin": "^2.1.1",
     "webpack": "^4.29.3",
     "webpack-cli": "^3.2.3",
+    "webpack-deadcode-plugin": "^0.1.11",
     "webpack-dev-server": "^3.1.14",
     "webpack-manifest-plugin": "^2.0.4"
   },
