@@ -8,6 +8,7 @@ import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
 import AggregateView from '../CourseGroups/AggregateView'
+import ThesisCourses from './ThesisCourses'
 import styles from '../PopulationQueryCard/populationQueryCard.css'
 
 class StudyProgramme extends Component {
@@ -47,6 +48,10 @@ class StudyProgramme extends Component {
       {
         menuItem: 'Course Groups',
         render: () => <AggregateView programmeId={studyProgrammeId} courseGroupId={courseGroupId} />
+      },
+      {
+        menuItem: 'Thesis Courses',
+        render: () => <ThesisCourses studyprogramme={studyProgrammeId} />
       }
     ])
   }
