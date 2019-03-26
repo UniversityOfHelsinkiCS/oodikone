@@ -37,14 +37,6 @@ router.get('/coursedisciplines', async (req, res) => {
   res.json(courseDisciplines)
 })
 
-router.get('/v2/courselist', async (req, res) => {
-  res.status(410).send('Deprecated')
-})
-
-router.get('/v2/courseinstancestatistics', async (req, res) => {
-  res.status(410).send('Deprecated')
-})
-
 router.get('/v2/courseyearlystats', async (req, res) => {
   let results = []
   const { rights, roles } = req.decodedToken
