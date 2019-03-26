@@ -1,7 +1,5 @@
 import { combineReducers } from 'redux'
 import { localeReducer as locale } from 'react-localize-redux'
-
-import department from './department'
 import users from './users'
 import populations from './populations'
 import populationCourses from './populationCourses'
@@ -16,7 +14,6 @@ import students from './students'
 import errors from './errors'
 import courses from './courses'
 import courseInstances from './courseInstances'
-import courseStatistics from './courseStatistics'
 import graphSpinner from './graphSpinner'
 import settings from './settings'
 import courseCodeDuplicates from './coursecodeduplicates'
@@ -41,10 +38,10 @@ import oodilearnPopulations from './oodilearnPopulations'
 import oodilearnPopulation from './oodilearnPopulation'
 import oodilearnPopulationForm from './oodilearnPopulationForm'
 import oodilearnPopulationCourseSelect from './oodilearnPopulationCourseSelect'
+import thesisCourses from './thesisCourses'
 
 export default combineReducers({
   locale,
-  department,
   users,
   populations,
   populationCourses,
@@ -59,7 +56,6 @@ export default combineReducers({
   errors,
   courses,
   courseInstances,
-  courseStatistics,
   graphSpinner,
   settings,
   courseCodeDuplicates,
@@ -83,5 +79,6 @@ export default combineReducers({
   oodilearnPopulations,
   oodilearnPopulation,
   oodilearnPopulationForm,
-  oodilearnPopulationCourseSelect
+  oodilearnPopulationCourseSelect,
+  thesisCourses
 })

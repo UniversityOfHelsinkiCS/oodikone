@@ -12,6 +12,7 @@ import { getPopulationStatistics, clearPopulations } from '../../redux/populatio
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
+import { getSemesters } from '../../redux/semesters'
 import { transferTo } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
@@ -42,7 +43,9 @@ class PopulationSearchForm extends Component {
     studyTracks: arrayOf(dropdownType), //eslint-disable-line
     setLoading: func.isRequired,
     extents: arrayOf(object).isRequired,
-    pending: bool //eslint-disable-line
+    pending: bool, //eslint-disable-line
+    getSemesters: func.isRequired,
+    semesters: shape({}).isRequired
   }
 
   constructor() {
@@ -59,10 +62,13 @@ class PopulationSearchForm extends Component {
   }
 
   componentDidMount() {
-    const { studyProgrammes } = this.props
+    const { studyProgrammes, semesters } = this.props
     if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
       this.setState({ query: this.initialQuery() }) // eslint-disable-line
       this.props.getDegreesAndProgrammes()
+    }
+    if (!semesters.years) {
+      this.props.getSemesters()
     }
   }
 
@@ -620,10 +626,11 @@ class PopulationSearchForm extends Component {
   }
 }
 
-const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes, locale }) => {
+const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, locale }) => {
   const { language } = settings
   const { pending } = populationDegreesAndProgrammes
   return ({
+    semesters: semesters.data,
     language,
     queries: populations.query || {},
     translate: getTranslate(locale),
@@ -633,15 +640,14 @@ const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes
   })
 }
 
-const mapDispatchToProps = dispatch => ({
-  getPopulationStatistics: request => dispatch(getPopulationStatistics(request)),
-  getPopulationCourses: request => dispatch(getPopulationCourses(request)),
-  getPopulationFilters: request => dispatch(getPopulationFilters(request)),
-  getMandatoryCourses: id => dispatch(getMandatoryCourses(id)),
-  setPopulationFilter: filter => dispatch(setPopulationFilter(filter)),
-  getDegreesAndProgrammes: () => dispatch(getDegreesAndProgrammes()),
-  clearPopulations: () => dispatch(clearPopulations()),
-  setLoading: () => dispatch(setLoading())
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchForm)
+export default connect(mapStateToProps, {
+  getPopulationStatistics,
+  getPopulationCourses,
+  getPopulationFilters,
+  getMandatoryCourses,
+  setPopulationFilter,
+  getDegreesAndProgrammes,
+  clearPopulations,
+  setLoading,
+  getSemesters
+})(PopulationSearchForm)

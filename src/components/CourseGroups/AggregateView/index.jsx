@@ -111,7 +111,7 @@ class AggregateView extends Component {
             content="Recalculate"
             floated="right"
             size="small"
-            style={{ 'margin-bottom': '10px' }}
+            style={{ marginBottom: '10px' }}
             onClick={() => { this.handleForceRefresh() }}
           />
         </Header>
