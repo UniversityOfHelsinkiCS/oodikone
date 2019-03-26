@@ -10,7 +10,6 @@ import styles from './header.css'
 
 const Header = props => (
   <header className={styles.header} role="banner">
-    <div className={styles.headerBanner} />
     <NavigationBar translate={props.translate} location={props.location} />
   </header>
 )
