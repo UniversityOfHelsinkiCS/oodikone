@@ -60,6 +60,7 @@ class ExtentGraduated extends Component {
   }
 
   render() {
+    const { extentcode, graduated, complemented } = this.state
     const { filter, extents, language } = this.props
     if (filter.notSet) {
       return (
@@ -101,15 +102,16 @@ class ExtentGraduated extends Component {
                   onChange={this.handleChange}
                   options={_.sortBy(
                     Object.values(extents).map(({
-                      extentcode, name
+                      extentcode: code, name
                     }) =>
-                      ({ value: extentcode, text: name[language] })),
+                      ({ value: code, text: name[language] })),
                     entry => entry.text
                   )}
                 />
               </Form.Field>
               <Form.Field>
                 <Button
+                  disabled={!extentcode || !graduated || !(complemented === 'true' || complemented === 'false')}
                   onClick={this.handleLimit}
                 >
                   set filter
