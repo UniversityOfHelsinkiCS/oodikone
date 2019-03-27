@@ -6,18 +6,17 @@ const bodyParser = require('body-parser')
 
 app.use(bodyParser.json())
 
-app.get('/ping', (req, res) => res.json({ message: 'pong '}))
+app.get('/ping', (req, res) => res.json({ message: 'pong'}))
 
-let fetching = false
-let data = null
-app.get('/data', (req, res) => {
-  if (fetching) {
-    return res.json(data)
-  }
-  if (!data) {
-    data = { data: "datahere" } // recalculate?
-  }
-  return res.json(data)
+let data = {} // TODO: implement DB instead once we know the needed DB structure
+
+app.get('/data/:id', (req, res) => {
+  const { id } = req.params
+  res.json(data[id])
+})
+app.post('/data', (req, res) => {
+  data = { ...req.body.data }
+  res.status(200).end()
 })
 
 app.listen(port, () => console.log(`Analytics listening on port ${port}!`))
