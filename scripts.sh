@@ -14,7 +14,9 @@ retry () {
 }
 
 init_dirs () {
-    mkdir -p $REPOS $BACKUP_DIR
+    mkdir -p $REPOS $BACKUP_DIR nginx nginx/cache nginx/letsencrypt
+    touch nginx/error.log
+    touch nginx/log
 }
 
 echo_path () {
@@ -45,8 +47,12 @@ pull_git_repositories () {
 
 pull_e2e_git_repositories () {
     pushd $REPOS
-    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
-    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git
+    BRANCH=trunk
+    if [[ $TRAVIS_BRANCH =~ (^master) ]]; then
+        BRANCH=master
+    fi
+    git clone -b $BRANCH https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
+    git clone -b $BRANCH https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git
     popd
 }
 
@@ -180,16 +186,14 @@ run_anon_full_setup () {
 run_e2e_setup () {
     echo "Init dirs"
     init_dirs
-    echo "Pull repos"
-    pull_e2e_git_repositories
     echo "Building images, starting containers"
-    docker-compose -f docker-compose.e2e.yml up -d --build
+    docker-compose -f docker-compose.lateste2e.yml pull && docker-compose -f docker-compose.lateste2e.yml up -d
     echo "Installing Cypress"
     npm i -g cypress@^3.1.5 --silent
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_anon_setup_full
     echo "Restarting Docker backend containers to run migrations, etc."
-    docker-compose -f docker-compose.e2e.yml restart backend userservice
+    docker-compose -f docker-compose.lateste2e.yml restart backend userservice
 
 
 }

@@ -11,6 +11,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=user_db
+
   db:
     image: postgres:9.6.3
     ports:
@@ -22,8 +23,7 @@ services:
     environment:
       - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
       - POSTGRES_USER=postgres
-    depends_on:
-      - frontend
+
   redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
@@ -32,6 +32,7 @@ services:
     volumes:
       - ./redis-data:/data
     container_name: redis
+
   mongo_db:
     image: mongo
     restart: unless-stopped
@@ -41,61 +42,66 @@ services:
     ports:
       - "27017:27017"
     container_name: mongo_db
+
   backend:
-    build:
-      context: repos/oodikone2-backend
-      dockerfile: dev.Dockerfile
+    image: toska/oodikone2-backend:staging
     restart: unless-stopped
     ports:
       - "8080:8080"
+      - "9229:9229"
     environment:
       REDIS: redis
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
-      FRONT_URL: http://localhost:8000
+      FRONT_URL: http://localhost:1337
       TOKEN_SECRET: IWannaBeTheVeryBest
       OODILEARN_URL: http://oodilearn:5000
       USERSERVICE_URL: http://userservice:4567
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
-      NODE_ENV: dev
     container_name: backend
+    entrypoint: 'node --inspect=0.0.0.0:9229 --max_old_space_size=4096 index.js'
     depends_on:
       - db
       - redis
+
   frontend:
-    build:
-      context: ../
-      dockerfile: dev.Dockerfile
-    command: sh -c "npm install && npm run docker"
+    image: toska/oodikone2-frontend:staging
     restart: unless-stopped
     ports:
-      - "8081:8081"
+      - "5000:5000"
     environment:
       BACKEND_ADDR: backend
       ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
     container_name: frontend
+
   userservice:
-    image: node:8.11.3
-    command: sh -c "cd /usr/src/app && npm install && npm start"
+    image: toska/oodikone2-userservice:staging
     restart: unless-stopped
     ports:
       - 4567:4567
-    volumes:
-      - ./repos/oodikone2-userservice/:/usr/src/app
     environment:
       - DB_URL=postgres://postgres@user_db:5432/user_db
       - TEST_DB=postgres://postgres@user_db:5432/user_db_test
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       - TOKEN_SECRET=IWannaBeTheVeryBest
-      - NODE_ENV=dev
+    depends_on:
+      - user_db
     container_name: userservice
-  adminer:
-    image: adminer:4.6.2
-    environment:
-      - ADMINER_DESIGN=pepa-linha
-    volumes:
-      - ./adminer-plugins:/var/www/html/plugins-enabled
+
+  nginx:
+    image: nginx:latest
+    restart: unless-stopped
+    volumes: 
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/error.log:/etc/nginx/error_log.log
+      - ./nginx/log:/var/log/nginx/localhost.error_log
+      - ./nginx/cache/:/etc/nginx/cache
+      - /etc/letsencrypt/:/etc/letsencrypt/
     ports:
-      - 5050:8080
-    restart: always
-    container_name: adminer
+      -  1337:80
+    depends_on: 
+      - frontend
+      - backend
+      - userservice
+
+    container_name: nginx
