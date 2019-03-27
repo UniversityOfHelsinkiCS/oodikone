@@ -1,0 +1,32 @@
+language: node_js
+node_js:
+  - '8'
+
+cache:
+  directories:
+    - node_modules
+
+addons:
+  postgresql: "9.6"
+  apt:
+    packages:
+    - postgresql-9.6
+    - postgresql-client-9.6
+
+services:
+  - redis-server
+  - docker
+  - postgresql
+
+dist: trusty
+
+env:
+  global:
+    - NODE_ENV=test
+    - DB_URL=postgres://postgres@localhost/ooditest
+    - TOKEN_SECRET=salainen_token
+
+before_script:
+  - psql --version
+  - psql -c 'create database ooditest' -U postgres
+  - psql -l
