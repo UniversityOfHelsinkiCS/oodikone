@@ -24,9 +24,16 @@ env:
   global:
     - NODE_ENV=test
     - DB_URL=postgres://postgres@localhost/ooditest
-    - TOKEN_SECRET=salainen_token
 
 before_script:
   - psql --version
   - psql -c 'create database ooditest' -U postgres
   - psql -l
+
+script:
+  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker build -t toska/oodikone2-analytics:staging ."
+  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
+  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker push toska/oodikone2-analytics:staging"
+  - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker build -t toska/oodikone2-analytics:latest ."
+  - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
+  - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker push toska/oodikone2-analytics:latest"
