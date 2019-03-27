@@ -83,4 +83,9 @@ BEGIN
   (11, studytrk_01, ts, ts),
   (12, studytrk_02, ts, ts)
   ;
+
+  INSERT INTO thesis_courses
+  ("programmeCode", "courseCode", "thesisType", "createdAt", "updatedAt")
+  VALUES
+  (studytrk_01, thesis, 'MASTER', ts, ts);
 END $$;
