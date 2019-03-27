@@ -8,14 +8,25 @@ app.use(bodyParser.json())
 
 app.get('/ping', (req, res) => res.json({ message: 'pong'}))
 
-let data = {} // TODO: implement DB instead once we know the needed DB structure
+let productivity = {} // TODO: implement DB instead once we know the needed DB structure
 
-app.get('/data/:id', (req, res) => {
+app.get('/productivity/:id', (req, res) => {
   const { id } = req.params
-  res.json(data[id])
+  res.json({ [id]: productivity[id] })
 })
-app.post('/data', (req, res) => {
-  data = { ...req.body.data }
+app.post('/productivity', (req, res) => {
+  productivity = { ...productivity, ...req.body.data }
+  res.status(200).end()
+})
+
+let throughput = {} // TODO: implement DB instead once we know the needed DB structure
+
+app.get('/throughput/:id', (req, res) => {
+  const { id } = req.params
+  res.json({ [id]: throughput[id] })
+})
+app.post('/throughput', (req, res) => {
+  throughput = { ...throughput, ...req.body.data }
   res.status(200).end()
 })
 
