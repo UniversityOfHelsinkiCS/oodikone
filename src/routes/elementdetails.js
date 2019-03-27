@@ -1,8 +1,9 @@
 const router = require('express').Router()
-const { getAllDegreesAndProgrammes } = require('../services/studyrights')
+const { getAllDegreesAndProgrammes, getAllProgrammes } = require('../services/studyrights')
 const MandatoryCourses = require('../services/mandatoryCourses')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('../services/studytrack')
 const { findProgrammeTheses, createThesisCourse, deleteThesisCourse } = require('../services/thesis')
+const { getProductivity, setProductivity, ping } = require('../services/analyticsService')
 
 router.get('/studyprogrammes', async (req, res) => {
   try {
@@ -25,11 +26,39 @@ router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {
 
 router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
   if (req.params.id) {
-    const since = req.params.since ? req.params.since : '2017-08-01'
-    const productivityData = await productivityStatsForStudytrack(req.params.id, since)
+    const productivityData = await getProductivity(req.params.id)
     res.json(productivityData)
   } else {
     res.status(422)
+  }
+})
+
+router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
+  const since = req.params.since ? req.params.since : '2017-08-01'
+  const code = req.query.code
+  res.status(200).end()
+
+  console.log('Productivity stats recalculation starting')
+  const codes = code ? [code] : (await getAllProgrammes()).map(p => p.code)
+  let ready = 0
+  for(const code of codes) {
+    try {
+      const data = await productivityStatsForStudytrack(code, since)
+      await setProductivity(data)
+    } catch (e) {
+      console.log(`Failed to update productivity stats for code: ${code}, since: ${since}, reason: ${e.message}`)
+    }
+    ready += 1
+    console.log(`Productivity stats recalculation ${ready}/${codes.length} done`)
+  }
+})
+
+router.get('/v2/studyprogrammes/productivity/ping', async (req, res) => {
+  try {
+    const result = await ping()
+    res.json(result)
+  } catch (e) {
+    res.status(500)
   }
 })
 
