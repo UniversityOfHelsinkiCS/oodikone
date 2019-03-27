@@ -12,10 +12,10 @@ let data = {} // TODO: implement DB instead once we know the needed DB structure
 
 app.get('/data/:id', (req, res) => {
   const { id } = req.params
-  res.json(data[id])
+  res.json({ [id]: data[id] })
 })
 app.post('/data', (req, res) => {
-  data = { ...req.body.data }
+  data = { ...data, ...req.body.data }
   res.status(200).end()
 })
 
