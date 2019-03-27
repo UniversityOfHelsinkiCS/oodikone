@@ -66,6 +66,7 @@ services:
       OODILEARN_URL: http://oodilearn:5000
       USERSERVICE_URL: http://userservice:4567
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      ANALYTICS_URL: http://analytics:4568
     volumes:
       - ./repos/oodikone2-backend/:/usr/src/app
       - ./repos/oodikone2-backend/node_modules:/usr/src/app/node_modules
@@ -86,6 +87,7 @@ services:
       BACKEND_ADDR: backend
       ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
       USER_ADMINER_URL: http://localhost:5050/?pgsql=user_db&username=postgres
+      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
     volumes:
       - ./repos/oodikone2-frontend/:/usr/src/app
     container_name: frontend
@@ -108,10 +110,10 @@ services:
     image: node:8.11.3
     command: sh -c "cd /usr/src/app && npm install && npm run dev"
     restart: unless-stopped
-    ports:
-      - 4567:4567
     volumes:
       - ./repos/oodikone2-userservice/:/usr/src/app
+    ports:
+      - 4567:4567
     environment:
       - DB_URL=postgres://postgres@user_db:5432/user_db
       - TEST_DB=postgres://postgres@user_db:5432/user_db_test
@@ -122,10 +124,10 @@ services:
     image: node:8.11.3
     command: sh -c "cd /usr/src/app && npm install && npm run dev"
     restart: unless-stopped
-    ports:
-      - 4568:4568
     volumes:
       - ./repos/oodikone2-analytics/:/usr/src/app
+    ports:
+      - 4568:4568
     environment:
       - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
       - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
