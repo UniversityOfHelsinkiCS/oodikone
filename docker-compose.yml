@@ -1,6 +1,16 @@
 version: '3'
 
 services:
+  analytics_db:
+    image: postgres:9.6.3
+    ports:
+      - "5423:5432"
+    volumes:
+      - ./analytics_pgdata:/var/lib/postgresql/data
+    container_name: oodi_analytics_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=analytics_db
   user_db:
     image: postgres:9.6.3
     ports:
@@ -110,12 +120,15 @@ services:
     container_name: userservice
   analytics:
     image: node:8.11.3
-    command: sh -c "cd /usr/src/app && npm install && npm start"
+    command: sh -c "cd /usr/src/app && npm install && npm run dev"
     restart: unless-stopped
     ports:
       - 4568:4568
     volumes:
       - ./repos/oodikone2-analytics/:/usr/src/app
+    environment:
+      - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
+      - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
     container_name: analytics
   adminer:
     image: adminer:4.6.2
