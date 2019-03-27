@@ -31,9 +31,10 @@ before_script:
   - psql -l
 
 script:
-  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker build -t toska/oodikone2-analytics:staging ."
-  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
-  - "[[ $TRAVIS_BRANCH =~ (^master) ]] && docker push toska/oodikone2-analytics:staging"
-  - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker build -t toska/oodikone2-analytics:latest ."
-  - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
-  - "[[ $TRAVIS_TAG =~ ([0-1].+) ]] && docker push toska/oodikone2-analytics:latest"
+  - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker build -t toska/oodikone2-analytics:staging .; fi
+  - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS; fi
+  - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker push toska/oodikone2-analytics:staging; fi
+  - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker build -t toska/oodikone2-analytics:latest .; fi
+  - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS; fi
+  - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker push toska/oodikone2-analytics:latest; fi
+
