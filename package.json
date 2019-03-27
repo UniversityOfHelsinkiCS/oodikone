@@ -1,0 +1,31 @@
+{
+  "name": "analytics",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "NODE_ENV=dev nodemon index.js",
+    "test": "echo \"Error: no test specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UniversityOfHelsinkiCS/oodikone2-analytics.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UniversityOfHelsinkiCS/oodikone2-analytics/issues"
+  },
+  "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone2-analytics#readme",
+  "dependencies": {
+    "dotenv": "^7.0.0",
+    "express": "^4.16.4",
+    "pg": "^7.9.0",
+    "sequelize": "^5.2.1",
+    "umzug": "^2.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10"
+  }
+}
