@@ -1,7 +1,8 @@
 const { Op } = require('sequelize')
-const { sequelize } = require('../database/connection')
 const moment = require('moment')
-const { Credit, Course, Provider, Studyright, StudyrightElement, ElementDetails } = require('../models')
+const {Credit, Course, Provider, Studyright, StudyrightElement,
+  ElementDetails, ThesisCourse, ThesisTypeEnums
+} = require('../models')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { semesterStart, semesterEnd } = require('../util/semester')
 const isNumber = str => !Number.isNaN(Number(str))
@@ -13,36 +14,17 @@ const studytrackToProviderCode = code => {
   return `${prefix}0-${suffix}`
 }
 
-const isMastersThesis = (name, credits) => {
-  if (!name) return false
-  const nameMatch = (name.en ? !!name.en.toLowerCase().match(/^.*master.*thesis.*$/) : false
-  ) || (name.fi ? !!name.fi.toLowerCase().match(/^.*pro gradu.*$/) : false)
-  return nameMatch && (credits >= 20)
-}
-
-const isBachelorsThesis = (name, credits) => {
-  if (!name) return false
-  const nameMatch = (name.fi ? (!!name.fi.toLowerCase().match(/^.*kandidaat.*tutkielma.*/)
-    && !name.fi.toLowerCase().match(/^.*seminaari.*/)) : false)
-    || (name.en ? (!!name.en.toLowerCase().match(/^.*bachelor.*thesis.*/)
-      && !name.en.toLowerCase().match(/^.*seminar.*/)) : false)
-  return nameMatch && (credits >= 5)
-}
-
 const formatCredit = credit => {
-  const { id, credits, attainment_date, course: { name } } = credit
+  const { id, credits, attainment_date } = credit
   const year = attainment_date && attainment_date.getFullYear()
-  const course = name.en
-  const mThesis = isMastersThesis(name, credits)
-  const bThesis = isBachelorsThesis(name, credits)
-  return { id, year, credits, course, mThesis, bThesis }
+  return { id, year, credits }
 }
 
 const getCreditsForProvider = (provider, since) => Credit.findAll({
   attributes: ['id', 'course_code', 'credits', 'attainment_date'],
   include: {
     model: Course,
-    attributes: ['code', 'name'],
+    attributes: ['code'],
     required: true,
     where: {
       is_study_module: false
@@ -68,11 +50,9 @@ const getCreditsForProvider = (provider, since) => Credit.findAll({
 
 const productivityStatsFromCredits = credits => {
   const stats = {}
-  credits.forEach(({ year, credits: creds, mThesis, bThesis }) => {
-    const stat = stats[year] || (stats[year] = { credits: 0, bThesis: 0, mThesis: 0, year })
+  credits.forEach(({ year, credits: creds }) => {
+    const stat = stats[year] || (stats[year] = { credits: 0, year })
     stat.credits += creds
-    mThesis && stat.mThesis++
-    bThesis && stat.bThesis++
   })
   return stats
 }
@@ -123,10 +103,58 @@ const graduatedStatsForStudytrack = async (studytrack, since) => {
   return graduatedStatsFromStudyrights(studyrights)
 }
 
-const combineStatistics = (creditStats, studyrightStats) => {
+const findProgrammeThesisCredits = code => Credit.findAll({
+  include: {
+    model: Course,
+    required: true,
+    include: {
+      model: ThesisCourse,
+      required: true,
+      where: {
+        programmeCode: code
+      }
+    }
+  },
+  where: {
+    credittypecode: {
+      [Op.ne]: 10
+    }
+  }
+}).map(credit => {
+  const { id, course, attainment_date } = credit
+  const { code, thesis_courses } = course
+  const { thesisType: type } = thesis_courses[0]
+  const year = attainment_date && attainment_date.getFullYear()
+  return { id, code, type, year }
+})
+
+const thesisProductivityFromCredits = credits => {
+  const stats = {}
+  credits.forEach(({ type, year }) => {
+    const yearstat = stats[year] ||  (stats[year] = { mThesis: 0, bThesis: 0 })
+    if (type === ThesisTypeEnums.MASTER) {
+      yearstat.mThesis++
+    } else if (type === ThesisTypeEnums.BACHELOR) {
+      yearstat.bThesis++
+    } else {
+      return
+    }
+  })
+  return stats
+}
+
+const thesisProductivityForStudytrack = async code => {
+  const credits = await findProgrammeThesisCredits(code)
+  return thesisProductivityFromCredits(credits)
+}
+
+const combineStatistics = (creditStats, studyrightStats, thesisStats) => {
   const stats = { ...creditStats }
   Object.keys(stats).forEach(year => {
+    const thesis = thesisStats[year] || {}
     stats[year].graduated = studyrightStats[year] || 0
+    stats[year].bThesis = thesis.bThesis || 0
+    stats[year].mThesis = thesis.mThesis || 0
   })
   return Object.values(stats)
 }
@@ -135,10 +163,11 @@ const productivityStatsForStudytrack = async (studytrack, since) => {
   const providercode = studytrackToProviderCode(studytrack)
   const promises = [
     graduatedStatsForStudytrack(studytrack, since),
-    productivityStatsForProvider(providercode, since)
+    productivityStatsForProvider(providercode, since),
+    thesisProductivityForStudytrack(studytrack)
   ]
-  const [studyrightStats, creditStats] = await Promise.all(promises)
-  return { [studytrack]: combineStatistics(creditStats, studyrightStats) }
+  const [studyrightStats, creditStats, thesisStats] = await Promise.all(promises)
+  return { [studytrack]: combineStatistics(creditStats, studyrightStats, thesisStats) }
 }
 
 const creditsAfter = (studentnumbers, startDate) => {
@@ -175,20 +204,20 @@ const thesesFromClass = (studentnumbers, startDate) => {
             name: {
               fi: {
                 [Op.and]: {
-                  [Op.iLike]: "%pro gradu%",
-                  [Op.iLike]: "%tutkielma%",
-                  [Op.notILike]: "%seminaari%",
-                  [Op.notILike]: "%ilman tutkielmaa%"
+                  [Op.iLike]: '%pro gradu%',
+                  [Op.iLike]: '%tutkielma%',
+                  [Op.notILike]: '%seminaari%',
+                  [Op.notILike]: '%ilman tutkielmaa%'
                 }
               }
             },
             name: {
               en: {
                 [Op.and]: {
-                  [Op.iLike]: "%master%",
-                  [Op.iLike]: "%thesis%",
-                  [Op.notILike]: "%seminar%",
-                  [Op.notILike]: "%studies%"
+                  [Op.iLike]: '%master%',
+                  [Op.iLike]: '%thesis%',
+                  [Op.notILike]: '%seminar%',
+                  [Op.notILike]: '%studies%'
 
                 }
               }
@@ -221,20 +250,20 @@ const thesesFromClass = (studentnumbers, startDate) => {
             [Op.or]: {
               fi: {
                 [Op.and]: {
-                  [Op.iLike]: "%kandidaatin%",
-                  [Op.iLike]: "%tutkielma%",
-                  [Op.notILike]: "%opinnot%",
-                  [Op.notILike]: "%seminaari%",
-                  [Op.notILike]: "%ilman tutkielmaa%"
+                  [Op.iLike]: '%kandidaatin%',
+                  [Op.iLike]: '%tutkielma%',
+                  [Op.notILike]: '%opinnot%',
+                  [Op.notILike]: '%seminaari%',
+                  [Op.notILike]: '%ilman tutkielmaa%'
                 }
               }
             },
             en: {
               [Op.and]: {
-                [Op.iLike]: "%bachelor%",
-                [Op.iLike]: "%thesis%",
-                [Op.notILike]: "%seminar%",
-                [Op.notILike]: "%studies%",
+                [Op.iLike]: '%bachelor%',
+                [Op.iLike]: '%thesis%',
+                [Op.notILike]: '%seminar%',
+                [Op.notILike]: '%studies%',
               }
             }
           }
@@ -281,8 +310,8 @@ const graduationsFromClass = async (studentnumbers, studytrack) => {
 
 const productivityStats = (studentnumbers, startDate, studytrack) => {
   return Promise.all([creditsAfter(studentnumbers, startDate),
-  graduationsFromClass(studentnumbers, studytrack),
-  ...thesesFromClass(studentnumbers, startDate)])
+    graduationsFromClass(studentnumbers, studytrack),
+    ...thesesFromClass(studentnumbers, startDate)])
 }
 
 const getYears = (since) => {
@@ -312,8 +341,6 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
 }
 
 module.exports = {
-  isBachelorsThesis,
-  isMastersThesis,
   studytrackToProviderCode,
   getCreditsForProvider,
   productivityStatsFromCredits,
@@ -322,5 +349,8 @@ module.exports = {
   graduatedStatsFromStudyrights,
   combineStatistics,
   productivityStatsForStudytrack,
-  throughputStatsForStudytrack
+  throughputStatsForStudytrack,
+  findProgrammeThesisCredits,
+  thesisProductivityFromCredits,
+  thesisProductivityForStudytrack
 }
