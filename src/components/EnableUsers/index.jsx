@@ -100,10 +100,13 @@ class EnableUsers extends Component {
             }, {
               key: 'ROLE',
               title: 'Role',
-              getRowVal: user => (
+              getRowContent: user => (
                 <Label.Group>
                   {user.accessgroup.map(ag => ag.group_code).sort().map(code => <Label key={code} content={code} />)}
                 </Label.Group>
+              ),
+              getRowVal: user => (
+                user.accessgroup.map(ag => ag.group_code).sort()
               )
             }, {
               key: 'STUDYTRACKS',
