@@ -107,6 +107,15 @@ services:
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       - TOKEN_SECRET=IWannaBeTheVeryBest
     container_name: userservice
+  analytics:
+    image: node:8.11.3
+    command: sh -c "cd /usr/src/app && npm install && npm start"
+    restart: unless-stopped
+    ports:
+      - 4568:4568
+    volumes:
+      - ./repos/oodikone2-analytics/:/usr/src/app
+    container_name: analytics
   adminer:
     image: adminer:4.6.2
     environment:
