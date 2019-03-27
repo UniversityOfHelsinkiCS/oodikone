@@ -1,6 +1,17 @@
 version: '3'
 
 services:
+  analytics_db:
+    image: postgres:9.6.3
+    ports:
+      - "5423:5432"
+    volumes:
+      - ./analytics_pgdata:/var/lib/postgresql/data
+    container_name: oodi_analytics_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=analytics_db
+
   user_db:
     image: postgres:9.6.3
     ports:
@@ -58,6 +69,7 @@ services:
       OODILEARN_URL: http://oodilearn:5000
       USERSERVICE_URL: http://userservice:4567
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
     container_name: backend
     entrypoint: 'node --inspect=0.0.0.0:9229 --max_old_space_size=4096 index.js'
     depends_on:
@@ -88,6 +100,18 @@ services:
       - user_db
     container_name: userservice
 
+  analytics:
+    image: toska/oodikone2-analytics:staging
+    restart: unless-stopped
+    ports:
+      - 4568:4568
+    environment:
+      - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
+      - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
+    depends_on:
+      - analytics_db
+    container_name: analytics
+
   nginx:
     image: nginx:latest
     restart: unless-stopped
@@ -103,5 +127,6 @@ services:
       - frontend
       - backend
       - userservice
+      - analytics
 
     container_name: nginx
