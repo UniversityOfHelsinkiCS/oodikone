@@ -113,6 +113,7 @@ module.exports = {
       },
       'process.env': {
         NODE_ENV: JSON.stringify('development'),
+        ANALYTICS_ADMINER_URL: JSON.stringify(process.env.ANALYTICS_ADMINER_URL),
         USER_ADMINER_URL: JSON.stringify(process.env.USER_ADMINER_URL),
         ADMINER_URL: JSON.stringify(process.env.ADMINER_URL)
       }
