@@ -4,6 +4,7 @@ import { string, arrayOf, object, func, bool, shape } from 'prop-types'
 import { Header, Segment, Button, Icon, Popup } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import { getStudentTotalCredits, copyToClipboard } from '../../common'
+import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
 
@@ -36,6 +37,8 @@ class PopulationStudents extends Component {
       return null
     }
 
+    const { queryStudyrights } = this.props
+
     const students = this.props.samples.reduce((obj, s) => {
       obj[s.studentNumber] = s
       return obj
@@ -52,6 +55,20 @@ class PopulationStudents extends Component {
 
     const transferFrom = s => (s.previousRights[0] && s.previousRights[0].element_detail.name[this.props.language])
 
+    const priorityCode = studyrights => (
+      studyrights.filter((sr) => {
+        const { studyrightElements } = sr
+        return studyrightElements.filter(sre => (
+          queryStudyrights.includes(sre.code)
+        )).length >= queryStudyrights.length
+      })[0].prioritycode
+    )
+
+    const priorityText = (studyRights) => {
+      const code = priorityCode(studyRights)
+      return PRIORITYCODE_TEXTS[code] ? PRIORITYCODE_TEXTS[code] : code
+    }
+
     const columns = []
     if (this.props.showNames) {
       columns.push(
@@ -60,22 +77,37 @@ class PopulationStudents extends Component {
       )
     }
     columns.push(
-      { key: 'studentnumber',
+      {
+        key: 'studentnumber',
         title: 'student number',
         getRowVal: s => s.studentNumber,
-        headerProps: { colSpan: 2 } },
-      { key: 'icon',
+        headerProps: { colSpan: 2 }
+      },
+      {
+        key: 'icon',
         getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
-        cellProps: { collapsing: true, className: styles.iconCell } },
-      { key: 'credits since start',
+        cellProps: { collapsing: true, className: styles.iconCell }
+      },
+      {
+        key: 'credits since start',
         title: 'credits since start',
-        getRowVal: getStudentTotalCredits },
-      { key: 'all credits',
+        getRowVal: getStudentTotalCredits
+      },
+      {
+        key: 'all credits',
         title: 'all credits',
-        getRowVal: s => s.credits },
-      { key: 'transferred from',
+        getRowVal: s => s.credits
+      },
+      {
+        key: 'priority',
+        title: 'priority',
+        getRowVal: s => priorityText(s.studyrights)
+      },
+      {
+        key: 'transferred from',
         title: 'transferred from',
-        getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '') }
+        getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '')
+      }
     )
     if (this.props.showNames) {
       columns.push(
@@ -173,13 +205,16 @@ PopulationStudents.propTypes = {
   showNames: bool.isRequired,
   showList: bool.isRequired,
   language: string.isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  queryStudyrights: arrayOf(string).isRequired
+
 }
 
-const mapStateToProps = ({ settings }) => ({
+const mapStateToProps = ({ settings, populations }) => ({
   showNames: settings.namesVisible,
   showList: settings.studentlistVisible,
-  language: settings.language
+  language: settings.language,
+  queryStudyrights: populations.query.studyRights
 })
 
 export default connect(
