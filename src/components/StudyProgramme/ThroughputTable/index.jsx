@@ -30,20 +30,23 @@ const ThroughputTable = ({ throughput, loading, error }) => {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {data.map(year => (
-            <Table.Row key={year.year}>
-              <Table.Cell>{year.year}</Table.Cell>
-              <Table.Cell>{year.credits.length}</Table.Cell>
-              <Table.Cell>{year.graduated}</Table.Cell>
-              <Table.Cell>{year.credits.reduce(morethan(30), 0)}</Table.Cell>
-              <Table.Cell>{year.credits.reduce(morethan(60), 0)}</Table.Cell>
-              <Table.Cell>{year.credits.reduce(morethan(90), 0)}</Table.Cell>
-              <Table.Cell>{year.credits.reduce(morethan(120), 0)}</Table.Cell>
-              <Table.Cell>{year.credits.reduce(morethan(150), 0)}</Table.Cell>
-              <Table.Cell>{year.thesisM}</Table.Cell>
-              <Table.Cell>{year.thesisB}</Table.Cell>
-            </Table.Row>
-          ))}
+          {data
+            .sort((year1, year2) => Number(year2.year.slice(0, 4)) - Number(year1.year.slice(0, 4)))
+            .map(year =>
+              (
+                <Table.Row key={year.year}>
+                  <Table.Cell>{year.year}</Table.Cell>
+                  <Table.Cell>{year.credits.length}</Table.Cell>
+                  <Table.Cell>{year.graduated}</Table.Cell>
+                  <Table.Cell>{year.credits.reduce(morethan(30), 0)}</Table.Cell>
+                  <Table.Cell>{year.credits.reduce(morethan(60), 0)}</Table.Cell>
+                  <Table.Cell>{year.credits.reduce(morethan(90), 0)}</Table.Cell>
+                  <Table.Cell>{year.credits.reduce(morethan(120), 0)}</Table.Cell>
+                  <Table.Cell>{year.credits.reduce(morethan(150), 0)}</Table.Cell>
+                  <Table.Cell>{year.thesisM}</Table.Cell>
+                  <Table.Cell>{year.thesisB}</Table.Cell>
+                </Table.Row>
+              ))}
         </Table.Body>
       </Table>
     </React.Fragment>
