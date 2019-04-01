@@ -44,6 +44,15 @@ services:
       - ./redis-data:/data
     container_name: redis
 
+  analytics_redis:
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6380:6379"
+    volumes:
+      - ./analytics-redis-data:/data
+    container_name: analytics_redis
+
   mongo_db:
     image: mongo
     restart: unless-stopped
@@ -110,6 +119,7 @@ services:
       - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
     depends_on:
       - analytics_db
+      - analytics_redis
     container_name: analytics
 
   nginx:
