@@ -1,0 +1,24 @@
+{
+  "name": "oodikone2-usageservice",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.18.10"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "uuid": "^3.3.2",
+    "winston": "^3.2.1",
+    "winston-log2gelf": "^2.0.4",
+    "winston-papertrail": "^1.0.5",
+    "winston-transport": "^4.3.0"
+  }
+}
