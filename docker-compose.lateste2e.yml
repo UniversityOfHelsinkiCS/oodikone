@@ -115,6 +115,7 @@ services:
     ports:
       - 4568:4568
     environment:
+      - REDIS=analytics_redis
       - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
       - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
     depends_on:
