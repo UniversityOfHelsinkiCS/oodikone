@@ -126,7 +126,7 @@ const updateSemesterEnrollments = async (apidata, studentnumber) => {
 const updateStudent = async (studentnumber) => {
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {
-    logger.verbose(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
+    logger.info(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
   } else {
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
     await Promise.all([
@@ -140,9 +140,10 @@ const updateStudent = async (studentnumber) => {
 
 const updateStudentFromData = async (api) => {
   if (api.student === null || api.student === undefined) {
-    logger.verbose(`API returned ${api.student} for studentnumber ${api.studentnumber}.    `)
+    logger.info(`API returned ${api.student} for studentnumber ${api.studentnumber}.    `)
   } else {
     const { studentnumber } = api
+    logger.info(`TRYING TO UPDATE ${studentnumber}`)
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
     await Promise.all([
       updateStudyrights(api, studentnumber),
