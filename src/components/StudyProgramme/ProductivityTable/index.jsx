@@ -16,15 +16,18 @@ const ProductivityTable = ({ productivity, loading, error }) => {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {productivity ? productivity.map(year => (
-            <Table.Row key={year.year}>
-              <Table.Cell>{year.year}</Table.Cell>
-              <Table.Cell>{year.credits}</Table.Cell>
-              <Table.Cell>{year.bThesis}</Table.Cell>
-              <Table.Cell>{year.mThesis}</Table.Cell>
-              <Table.Cell>{year.graduated}</Table.Cell>
-            </Table.Row>
-          )) : null}
+          {productivity ? productivity
+            .sort((year1, year2) => year2.year - year1.year)
+            .map(year =>
+              (
+                <Table.Row key={year.year}>
+                  <Table.Cell>{year.year}</Table.Cell>
+                  <Table.Cell>{year.credits}</Table.Cell>
+                  <Table.Cell>{year.bThesis}</Table.Cell>
+                  <Table.Cell>{year.mThesis}</Table.Cell>
+                  <Table.Cell>{year.graduated}</Table.Cell>
+                </Table.Row>
+              )) : null}
         </Table.Body>
       </Table>
     </React.Fragment>
