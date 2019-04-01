@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
-const {Credit, Course, Provider, Studyright, StudyrightElement,
+const { Credit, Course, Provider, Studyright, StudyrightElement,
   ElementDetails, ThesisCourse, ThesisTypeEnums
 } = require('../models')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
@@ -125,7 +125,7 @@ const findProgrammeThesisCredits = code => Credit.findAll({
 const thesisProductivityFromCredits = credits => {
   const stats = {}
   credits.forEach(({ type, year }) => {
-    const yearstat = stats[year] ||  (stats[year] = { mThesis: 0, bThesis: 0 })
+    const yearstat = stats[year] || (stats[year] = { mThesis: 0, bThesis: 0 })
     if (type === ThesisTypeEnums.MASTER) {
       yearstat.mThesis++
     } else if (type === ThesisTypeEnums.BACHELOR) {
@@ -185,97 +185,37 @@ const creditsAfter = (studentnumbers, startDate) => {
     })))
 }
 
-const thesesFromClass = (studentnumbers, startDate) => {
-  return [Credit.count({
+const thesesFromClass = async (studentnumbers, startDate, code) => {
+  return Credit.findAll({
     include: {
       model: Course,
-      attributes: [],
       required: true,
-      where: {
-        [Op.and]: {
-          is_study_module: false,
-          [Op.or]: {
-            name: {
-              fi: {
-                [Op.and]: {
-                  [Op.iLike]: '%pro gradu%',
-                  [Op.iLike]: '%tutkielma%',
-                  [Op.notILike]: '%seminaari%',
-                  [Op.notILike]: '%ilman tutkielmaa%'
-                }
-              }
-            },
-            name: {
-              en: {
-                [Op.and]: {
-                  [Op.iLike]: '%master%',
-                  [Op.iLike]: '%thesis%',
-                  [Op.notILike]: '%seminar%',
-                  [Op.notILike]: '%studies%'
-
-                }
-              }
-            }
-          }
+      include: {
+        attributes: ['thesisType'],
+        model: ThesisCourse,
+        required: true,
+        where: {
+          programmeCode: code
         }
       }
     },
     where: {
-      credits: {
-        [Op.gte]: 20
-      },
-      student_studentnumber: {
-        [Op.in]: studentnumbers
+      credittypecode: {
+        [Op.ne]: 10
       },
       attainment_date: {
         [Op.gte]: startDate
-      }
-    }
-  }),
-  Credit.count({
-    include: {
-      model: Course,
-      attributes: [],
-      required: true,
-      where: {
-        [Op.and]: {
-          is_study_module: false,
-          name: {
-            [Op.or]: {
-              fi: {
-                [Op.and]: {
-                  [Op.iLike]: '%kandidaatin%',
-                  [Op.iLike]: '%tutkielma%',
-                  [Op.notILike]: '%opinnot%',
-                  [Op.notILike]: '%seminaari%',
-                  [Op.notILike]: '%ilman tutkielmaa%'
-                }
-              }
-            },
-            en: {
-              [Op.and]: {
-                [Op.iLike]: '%bachelor%',
-                [Op.iLike]: '%thesis%',
-                [Op.notILike]: '%seminar%',
-                [Op.notILike]: '%studies%',
-              }
-            }
-          }
-        }
-      }
-    },
-    where: {
-      credits: {
-        [Op.gte]: 5
       },
       student_studentnumber: {
         [Op.in]: studentnumbers
-      },
-      attainment_date: {
-        [Op.gte]: startDate
       }
     }
-  })]
+  }).reduce((acc, curr) => {
+    curr.course.thesis_courses.map(th => {
+      acc[th.thesisType] = acc[th.thesisType] ? acc[th.thesisType] + 1 : 1
+    })
+    return acc
+  }, {})
 }
 
 const graduationsFromClass = async (studentnumbers, studytrack) => {
@@ -302,10 +242,10 @@ const graduationsFromClass = async (studentnumbers, studytrack) => {
   })
 }
 
-const productivityStats = (studentnumbers, startDate, studytrack) => {
+const productivityStats = async (studentnumbers, startDate, studytrack) => {
   return Promise.all([creditsAfter(studentnumbers, startDate),
     graduationsFromClass(studentnumbers, studytrack),
-    ...thesesFromClass(studentnumbers, startDate)])
+    thesesFromClass(studentnumbers, startDate, studytrack)])
 }
 
 const getYears = (since) => {
@@ -322,13 +262,13 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     const startDate = `${year}-${semesterStart['FALL']}`
     const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
-    const [credits, graduated, thesisM, thesisB] = await productivityStats(studentnumbers, startDate, studytrack)
+    const [credits, graduated, theses] = await productivityStats(studentnumbers, startDate, studytrack)
     return {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
       graduated: graduated.length,
-      thesisM: thesisM,
-      thesisB: thesisB
+      thesisM: theses.MASTER,
+      thesisB: theses.BACHELOR
     }
   }))
   return { [studytrack]: arr }

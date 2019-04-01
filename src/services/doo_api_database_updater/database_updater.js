@@ -143,6 +143,7 @@ const updateStudentFromData = async (api) => {
     logger.info(`API returned ${api.student} for studentnumber ${api.studentnumber}.    `)
   } else {
     const { studentnumber } = api
+    logger.info(`TRYING TO UPDATE ${studentnumber}`)
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
     await Promise.all([
       updateStudyrights(api, studentnumber),
