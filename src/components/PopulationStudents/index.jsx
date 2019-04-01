@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
 import { Header, Segment, Button, Icon, Popup } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
-import { getStudentTotalCredits, copyToClipboard } from '../../common'
+import { getStudentTotalCredits, copyToClipboard, userRoles } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
@@ -18,6 +18,13 @@ const popupTimeoutLength = 1000
 
 class PopulationStudents extends Component {
   state = {}
+
+  async componentDidMount() {
+    const roles = await userRoles()
+    const admin = roles.includes('admin')
+
+    this.setState({ admin })
+  }
 
   handlePopupOpen = (id) => {
     this.setState({ [id]: true })
@@ -37,6 +44,7 @@ class PopulationStudents extends Component {
       return null
     }
 
+    const { admin } = this.state
     const { queryStudyrights } = this.props
 
     const students = this.props.samples.reduce((obj, s) => {
@@ -55,18 +63,23 @@ class PopulationStudents extends Component {
 
     const transferFrom = s => (s.previousRights[0] && s.previousRights[0].element_detail.name[this.props.language])
 
-    const priorityCode = studyrights => (
+    const studyrightCodes = (studyrights, value) => (
       studyrights.filter((sr) => {
         const { studyrightElements } = sr
         return studyrightElements.filter(sre => (
           queryStudyrights.includes(sre.code)
         )).length >= queryStudyrights.length
-      })[0].prioritycode
+      }).map(a => a[value])
     )
 
     const priorityText = (studyRights) => {
-      const code = priorityCode(studyRights)
-      return PRIORITYCODE_TEXTS[code] ? PRIORITYCODE_TEXTS[code] : code
+      const codes = studyrightCodes(studyRights, 'prioritycode')
+      return codes.map(code => PRIORITYCODE_TEXTS[code] ? PRIORITYCODE_TEXTS[code] : code).join(', ') // eslint-disable-line
+    }
+
+    const extentCodes = (studyRights) => {
+      const codes = studyrightCodes(studyRights, 'extentcode')
+      return codes.join(', ') // eslint-disable-line
     }
 
     const columns = []
@@ -99,16 +112,25 @@ class PopulationStudents extends Component {
         getRowVal: s => s.credits
       },
       {
-        key: 'priority',
-        title: 'priority',
-        getRowVal: s => priorityText(s.studyrights)
-      },
-      {
         key: 'transferred from',
         title: 'transferred from',
         getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '')
       }
     )
+    if (admin) {
+      columns.push(
+        {
+          key: 'priority',
+          title: 'priority',
+          getRowVal: s => priorityText(s.studyrights)
+        },
+        {
+          key: 'extent',
+          title: 'extent',
+          getRowVal: s => extentCodes(s.studyrights)
+        }
+      )
+    }
     if (this.props.showNames) {
       columns.push(
         {
