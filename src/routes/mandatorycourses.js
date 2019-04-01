@@ -12,7 +12,7 @@ router.delete('/:id', async (req, res) => {
       res.status(400).json(err)
     }
   } else {
-    res.status(422)
+    res.status(422).end()
   }
 })
 
@@ -28,7 +28,7 @@ router.post('/:id', async (req, res) => {
       res.status(400).json(err)
     }
   } else {
-    res.status(422)
+    res.status(422).end()
   }
 })
 
