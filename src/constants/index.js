@@ -217,3 +217,9 @@ export const CHART_COLORS = [
   chart34,
   chart35
 ]
+
+export const PRIORITYCODE_TEXTS = {
+  1: 'Main',
+  2: 'Secondary',
+  30: 'Graduated'
+}
