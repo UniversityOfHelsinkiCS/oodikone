@@ -1,4 +1,5 @@
 const express = require('express')
+const { redisClient } = require('./src/services/redis')
 
 const app = express()
 const port = 4568
@@ -8,25 +9,25 @@ app.use(bodyParser.json())
 
 app.get('/ping', (req, res) => res.json({ message: 'pong'}))
 
-let productivity = {} // TODO: implement DB instead once we know the needed DB structure
-
 app.get('/productivity/:id', (req, res) => {
   const { id } = req.params
-  res.json({ [id]: productivity[id] })
+  const data = JSON.parse(redisClient.get('productivity')) || {}
+  res.json({ [id]: data[id] })
 })
 app.post('/productivity', (req, res) => {
-  productivity = { ...productivity, ...req.body.data }
+  const data = JSON.parse(redisClient.get('productivity')) || {}
+  redisClient.set('productivity', JSON.stringify({...data, ...req.body.data}))
   res.status(200).end()
 })
 
-let throughput = {} // TODO: implement DB instead once we know the needed DB structure
-
 app.get('/throughput/:id', (req, res) => {
   const { id } = req.params
-  res.json({ [id]: throughput[id] })
+  const data = JSON.parse(redisClient.get('throughput')) || {}
+  res.json({ [id]: data[id] })
 })
 app.post('/throughput', (req, res) => {
-  throughput = { ...throughput, ...req.body.data }
+  const data = JSON.parse(redisClient.get('throughput')) || {}
+  redisClient.set('throughput', JSON.stringify({...data, ...req.body.data}))
   res.status(200).end()
 })
 
