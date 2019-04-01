@@ -175,6 +175,17 @@ const getAllDegreesAndProgrammes = async () => {
   return formatStudyrightElements(elementDetails)
 }
 
+const getAllProgrammes = async () => {
+  const elementDetails = ElementDetails.findAll({
+    where: {
+      type: {
+        [Op.in]: [20]
+      }
+    }
+  })
+  return elementDetails
+}
+
 const associatedStudyrightElements = async (offset, limit) => {
   const studyrights = await Studyright.findAll({
     attributes: [],
@@ -359,5 +370,6 @@ module.exports = {
   getAssociations,
   getFilteredAssociations,
   getUserAssociations,
-  refreshAssociationsInRedis
+  refreshAssociationsInRedis,
+  getAllProgrammes
 }
