@@ -10,6 +10,7 @@ import Overview from './Overview'
 import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import styles from '../PopulationQueryCard/populationQueryCard.css'
+import { getRolesWithoutRefreshToken, getRightsWithoutRefreshToken } from '../../common'
 
 class StudyProgramme extends Component {
   static propTypes = {
@@ -35,7 +36,8 @@ class StudyProgramme extends Component {
   getPanes() {
     const { match } = this.props
     const { studyProgrammeId, courseGroupId } = match.params
-    return ([
+    const panes = []
+    panes.push(
       {
         menuItem: 'Overview',
         render: () => <Overview studyprogramme={studyProgrammeId} />
@@ -43,17 +45,22 @@ class StudyProgramme extends Component {
       {
         menuItem: 'Mandatory Courses',
         render: () => <StudyProgrammeMandatoryCourses studyProgramme={studyProgrammeId} />
-      },
+      }
       // { menuItem: 'Code Mapper', render: () => <StudyProgrammeCourseCodeMapper /> },
-      {
+    )
+    if ((getRolesWithoutRefreshToken().includes('coursegroups') &&
+      getRightsWithoutRefreshToken().includes(studyProgrammeId)) ||
+      getRolesWithoutRefreshToken().includes('admin')) {
+      panes.push({
         menuItem: 'Course Groups',
         render: () => <AggregateView programmeId={studyProgrammeId} courseGroupId={courseGroupId} />
-      },
-      {
-        menuItem: 'Thesis Courses',
-        render: () => <ThesisCourses studyprogramme={studyProgrammeId} />
-      }
-    ])
+      })
+    }
+    panes.push({
+      menuItem: 'Thesis Courses',
+      render: () => <ThesisCourses studyprogramme={studyProgrammeId} />
+    })
+    return panes
   }
 
   handleSelect = (target) => {
