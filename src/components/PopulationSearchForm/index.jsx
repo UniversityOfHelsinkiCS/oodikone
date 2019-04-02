@@ -343,7 +343,7 @@ class PopulationSearchForm extends Component {
     return (
       <Form.Group key="year" className={style.enrollmentSelectorGroup}>
         <Form.Field error={!this.validYearCheck(momentYear)} className={style.yearSelect}>
-          <label>Enrollment</label>
+          <label>Class of</label>
           <Datetime
             className={style.yearSelectInput}
             control={Datetime}

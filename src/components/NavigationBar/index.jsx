@@ -137,6 +137,32 @@ class NavigationBar extends Component {
         {
           Object.values(navigationRoutes).map((value) => {
             const viewableRoute = value.menuRoute
+            if (value.items) {
+              return (
+                <Menu.Item
+                  style={{ width: `${itemWidth}%` }}
+                  exact
+                  as={Dropdown}
+                  key={`menu-item-drop-${value.translateId}`}
+                  tabIndex="-1"
+                  text={t(`navigationBar.${value.translateId}`)}
+                >
+                  <Dropdown.Menu>
+                    {value.items.map(i => (
+                      <Dropdown.Item
+                        exact
+                        as={NavLink}
+                        key={`menu-item-${i.menuRoute}`}
+                        to={i.menuRoute}
+                        tabIndex="-1"
+                      >
+                        {t(`navigationBar.${i.translateId}`)}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Menu.Item>
+              )
+            }
             if (!viewableRoute) {
               return null
             }
