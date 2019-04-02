@@ -36,5 +36,6 @@ const UsageStatistic = sequelize.define('usage_statistics', {
 })
 
 module.exports = {
-  UsageStatistic
+  UsageStatistic,
+  sequelize
 }
