@@ -127,14 +127,12 @@ const deleteStudentStudyrights = async studentnumber => {
   await Studyright.destroy({
     where: {
       student_studentnumber: studentnumber
-    },
-    logging: console.log
+    }
   })
   await StudyrightElement.destroy({
     where: {
       studentnumber
-    },
-    logging: console.log
+    }
   })
 }
 
@@ -144,6 +142,7 @@ const updateStudent = async (studentnumber) => {
     logger.info(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
   } else {
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
+    await deleteStudentStudyrights(studentnumber)
     await Promise.all([
       updateStudyrights(api, studentnumber),
       updateStudyattainments(api, studentnumber),
@@ -160,6 +159,7 @@ const updateStudentFromData = async (api) => {
     const { studentnumber } = api
     logger.info(`TRYING TO UPDATE ${studentnumber}`)
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
+    await deleteStudentStudyrights(studentnumber)
     await Promise.all([
       updateStudyrights(api, studentnumber),
       updateStudyattainments(api, studentnumber),
