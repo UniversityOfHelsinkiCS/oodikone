@@ -123,6 +123,21 @@ const updateSemesterEnrollments = async (apidata, studentnumber) => {
   }))
 }
 
+const deleteStudentStudyrights = async studentnumber => {
+  await Studyright.destroy({
+    where: {
+      student_studentnumber: studentnumber
+    },
+    logging: console.log
+  })
+  await StudyrightElement.destroy({
+    where: {
+      studentnumber
+    },
+    logging: console.log
+  })
+}
+
 const updateStudent = async (studentnumber) => {
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {
@@ -366,5 +381,6 @@ module.exports = {
   updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders,
   updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes,
   updateTeachersInDb, updateStudentsTaskPooled, updateCourseRealisationsAndEnrollments,
-  getExistingCourseRealisationCodes, updateCourseRealisationsForCoursesInDb
+  getExistingCourseRealisationCodes, updateCourseRealisationsForCoursesInDb,
+  deleteStudentStudyrights
 }
