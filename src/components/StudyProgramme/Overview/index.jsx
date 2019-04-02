@@ -17,15 +17,15 @@ class Overview extends Component {
     const { productivity, throughput, studyprogramme } = this.props
     return (
       <React.Fragment>
-        <ProductivityTable
-          productivity={productivity.data[studyprogramme]}
-          loading={productivity.pending}
-          error={productivity.error}
-        />
         <ThroughputTable
           throughput={throughput.data[studyprogramme]}
           loading={throughput.pending}
           error={throughput.error}
+        />
+        <ProductivityTable
+          productivity={productivity.data[studyprogramme]}
+          loading={productivity.pending}
+          error={productivity.error}
         />
       </React.Fragment>
     )
