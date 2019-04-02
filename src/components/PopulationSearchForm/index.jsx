@@ -377,7 +377,7 @@ class PopulationSearchForm extends Component {
   }
 
   renderStudyProgrammeDropdown = (studyRights, programmesToRender) => (
-    <Form.Field fluid>
+    <Form.Field>
       <label>Study programme</label>
       <Form.Dropdown
         placeholder="Select study programme"
@@ -389,6 +389,7 @@ class PopulationSearchForm extends Component {
         onChange={this.handleProgrammeChange}
         closeOnChange
         clearable
+        fluid
       />
     </Form.Field>
   )
