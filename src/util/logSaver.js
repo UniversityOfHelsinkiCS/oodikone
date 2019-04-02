@@ -1,9 +1,9 @@
 const Transport = require('winston-transport')
 const uuid = require('uuid')
-// const { UsageStatistic } = require('../models')
+const { UsageStatistic } = require('../models')
 
 module.exports = class LogSaverTransport extends Transport {
-  log(level, message, payload) {
+  log(payload) {
     if (payload.url && payload.method) {
       const object = {
         id: uuid.v4(),
@@ -16,8 +16,7 @@ module.exports = class LogSaverTransport extends Transport {
         status: payload.status,
         data: payload
       }
-      
-      // UsageStatistic.create(object)
+      UsageStatistic.create(object)
     }
   }
 }

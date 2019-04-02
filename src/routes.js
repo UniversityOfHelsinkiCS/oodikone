@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const bodyParser = require('body-parser')
-const logSaver = require('../util/logSaver')
-const logger = require('../util/logger')
+const logSaver = require('./util/logSaver')
+const logger = require('./util/logger')
 
 router.use(bodyParser.json())
 

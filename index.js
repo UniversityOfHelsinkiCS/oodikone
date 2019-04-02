@@ -1,5 +1,5 @@
 const express = require('express')
-const conf = require('./conf-usageservice')
+const conf = require('./src/conf-usageservice')
 const { PORT } = conf
 const router = require('./src/routes')
 const app = express()
