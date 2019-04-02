@@ -10,10 +10,14 @@ router.get('/ping', async (req, res) => {
 })
 
 router.get('/log', async (req, res) => {
-  const from = req.query.from || 1
-  const to = req.query.to || Number((new Date().getTime() / 1000 + 60).toFixed(0))
-  const results = await between(from, to)
-  res.json(results)
+  try {
+    const from = req.query.from || 1
+    const to = req.query.to || Number((new Date().getTime() / 1000 + 60).toFixed(0))
+    const results = await between(from, to)
+    res.json(results)
+  } catch(e) {
+    console.log('error retrieving logs, msg: ', e.message)
+  }
 })
 
 router.post('/log', async (req, res) => {
