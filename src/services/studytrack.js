@@ -20,7 +20,7 @@ const formatCredit = credit => {
   return { id, year, credits }
 }
 
-const getCreditsForProvider = (provider) => Credit.findAll({
+const getCreditsForProvider = (provider, since) => Credit.findAll({
   attributes: ['id', 'course_code', 'credits', 'attainment_date'],
   include: {
     model: Course,
@@ -41,6 +41,9 @@ const getCreditsForProvider = (provider) => Credit.findAll({
   where: {
     credittypecode: {
       [Op.ne]: 10
+    },
+    attainment_date: {
+      [Op.gte]: since
     }
   }
 }).map(formatCredit)
@@ -54,8 +57,8 @@ const productivityStatsFromCredits = credits => {
   return stats
 }
 
-const productivityStatsForProvider = async (providercode) => {
-  const credits = await getCreditsForProvider(providercode)
+const productivityStatsForProvider = async (providercode, since) => {
+  const credits = await getCreditsForProvider(providercode, since)
   return productivityStatsFromCredits(credits)
 }
 
@@ -64,7 +67,7 @@ const formatGraduatedStudyright = ({ studyrightid, enddate }) => {
   return { studyrightid, year }
 }
 
-const findGraduated = (studytrack) => Studyright.findAll({
+const findGraduated = (studytrack, since) => Studyright.findAll({
   include: {
     model: StudyrightElement,
     attributes: [],
@@ -79,7 +82,10 @@ const findGraduated = (studytrack) => Studyright.findAll({
     }
   },
   where: {
-    graduated: 1
+    graduated: 1,
+    enddate: {
+      [Op.gte]: since
+    }
   }
 }).map(formatGraduatedStudyright)
 
@@ -92,8 +98,8 @@ const graduatedStatsFromStudyrights = studyrights => {
   return stats
 }
 
-const graduatedStatsForStudytrack = async (studytrack) => {
-  const studyrights = await findGraduated(studytrack)
+const graduatedStatsForStudytrack = async (studytrack, since) => {
+  const studyrights = await findGraduated(studytrack, since)
   return graduatedStatsFromStudyrights(studyrights)
 }
 
@@ -153,11 +159,11 @@ const combineStatistics = (creditStats, studyrightStats, thesisStats) => {
   return Object.values(stats)
 }
 
-const productivityStatsForStudytrack = async (studytrack) => {
+const productivityStatsForStudytrack = async (studytrack, since) => {
   const providercode = studytrackToProviderCode(studytrack)
   const promises = [
-    graduatedStatsForStudytrack(studytrack),
-    productivityStatsForProvider(providercode),
+    graduatedStatsForStudytrack(studytrack, since),
+    productivityStatsForProvider(providercode, since),
     thesisProductivityForStudytrack(studytrack)
   ]
   const [studyrightStats, creditStats, thesisStats] = await Promise.all(promises)
@@ -267,8 +273,8 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
       graduated: graduated.length,
-      thesisM: theses.MASTER,
-      thesisB: theses.BACHELOR
+      thesisM: theses.MASTER || 0,
+      thesisB: theses.BACHELOR || 0
     }
   }))
   return { [studytrack]: arr }
