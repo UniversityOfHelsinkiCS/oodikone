@@ -94,6 +94,13 @@ export const getRolesWithoutRefreshToken = () => {
   const roles = decoded.roles.map(r => r.group_code)
   return roles
 }
+export const getRightsWithoutRefreshToken = () => {
+  const token = getTokenWithoutRefresh()
+  if (!token) return []
+  const decoded = decodeToken(token)
+  const { rights } = decoded
+  return rights
+}
 export const getIdWithoutRefreshToken = () => {
   const token = getTokenWithoutRefresh()
   if (!token) return []
