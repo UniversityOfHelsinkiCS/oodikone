@@ -9,7 +9,6 @@ import { findStudents, getStudent, selectStudent } from '../../redux/students'
 import StudentSearch from '../StudentSearch'
 import StudentDetails from '../StudentDetails'
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
-import LanguageChooser from '../LanguageChooser'
 
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
@@ -25,7 +24,6 @@ class StudentStatistics extends Component { //eslint-disable-line
         <Header className={sharedStyles.segmentTitle} size="large">
           {translate('studentStatistics.header')}
         </Header>
-        <LanguageChooser />
         <StudentNameVisibilityToggle />
         <Segment className={sharedStyles.contentSegment}>
           <StudentSearch translate={translate} studentNumber={studentNumber} />

@@ -5,7 +5,6 @@ import { Header, Button, Message, Table, Input, Segment, Icon, Loader } from 'se
 import { getDuplicates, addDuplicate, removeDuplicate } from '../../redux/coursecodeduplicates'
 
 import CourseSearch from '../CourseSearch'
-import LanguageChooser from '../LanguageChooser'
 import sharedStyles from '../../styles/shared'
 import styles from './courseCodeMapper.css'
 
@@ -146,10 +145,6 @@ class CourseCodeMapper extends Component {
                 />
               </Segment>
             </Segment.Group>
-            <Segment>
-              <Header>Language</Header>
-              <LanguageChooser />
-            </Segment>
           </Segment.Group>
           <Table striped>
             <Table.Header>
