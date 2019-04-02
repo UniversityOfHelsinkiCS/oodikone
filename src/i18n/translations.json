@@ -57,9 +57,6 @@
     "welcome": [
       "Starting page"
     ],
-    "populations": [
-      "Population statistics"
-    ],
     "students": [
       "Student statistics"
     ],
@@ -92,6 +89,12 @@
     ],
     "courseGroups": [
       "Course groups"
+    ],
+    "class": [
+      "Search by class"
+    ],
+    "overview": [
+      "Overview"
     ],
     "studyProgramme": [
       "Study programme"

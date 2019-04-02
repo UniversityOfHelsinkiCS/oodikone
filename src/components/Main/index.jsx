@@ -100,11 +100,11 @@ class Main extends Component {
             <ErrorContainer />
             <Switch>
               <Route exact path={routes.index.route} component={WelcomePage} />
-              <Route exact path={routes.populations.route} component={Populations} />
+              <Route exact path="/populations" component={Populations} />
+              <Route exact path="/study-programme/:studyProgrammeId?" component={StudyProgramme} />
+              <Route exact path="/study-programme/:studyProgrammeId/course-group/:courseGroupId" component={StudyProgramme} />
               <Route exact path={routes.students.route} component={StudentStatistics} />
               <Route exact path={routes.courseStatistics.route} component={CourseStatistics} />
-              <Route exact path={routes.studyProgramme.route} component={StudyProgramme} />
-              <Route exact path={routes.studyProgrammeCourseGroup.route} component={StudyProgramme} />
               <Route exact path={routes.settings.route} component={Settings} />
               <Route exact path={routes.users.route} component={EnableUsers} />
               <Route exact path={routes.teachers.route} component={Teachers} />

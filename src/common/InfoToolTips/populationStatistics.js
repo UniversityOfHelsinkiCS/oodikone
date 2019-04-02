@@ -8,7 +8,11 @@ export default {
   **Statistics until:** tarkastelujakson päättymiskuukausi. <br>
   **Study programme:** haluttu koulutusohjelma.`,
   Advanced: `**Semesters:**  Jos haluaa tarkastella vain syyslukukaudella tai kevätlukukaudella ilmoittautuneita,
-  haluttu ajanjakso valitaan tästä.`,
+  haluttu ajanjakso valitaan tästä.
+
+  **Include:** Koulutusohjelmapopulaatiosta on oletusarvoisesti suodatettu pois vaihto-opiskelijat,
+  tutkinnonsuoritusoikeudesta luopuneet ja ei-tutkinto-opiskelijat (esim. erillisopinto-oikeudella opiskelevat).
+  Näitä ryhmiä voi sisällyttää mukaan lisäämällä ruksin haluamaansa kohtaan.`,
   QueryCard: `Valitun populaation perustiedot. "Sample size" kertoo populaation opiskelijalukumäärän.
     Lukumäärään sisältyvät (läsnäolevat, poissaolevat ja kirjoiltapoistetut) tutkinto-opiskelijat."`,
   Filters: {

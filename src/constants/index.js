@@ -48,11 +48,15 @@ import { chartblue, red, green, chartdarkg, chartlgreen, chartdarkred, chartlred
 
 export const routes = {
   index: { route: '/' },
-  populations: { menuRoute: '/populations', route: '/populations', translateId: 'populations' },
+  populations: {
+    translateId: 'studyProgramme',
+    items: [
+      { menuRoute: '/populations', translateId: 'class' },
+      { menuRoute: '/study-programme', translateId: 'overview' }
+    ]
+  },
   students: { menuRoute: '/students', route: '/students/:studentNumber?', translateId: 'students' },
   courseStatistics: { menuRoute: '/coursestatistics', route: '/coursestatistics', translateId: 'courseStatistics' },
-  studyProgramme: { menuRoute: '/study-programme', route: '/study-programme/:studyProgrammeId?', translateId: 'studyProgramme', reqRights: ['studyprogramme'] },
-  studyProgrammeCourseGroup: { route: '/study-programme/:studyProgrammeId/course-group/:courseGroupId', translateId: 'studyProgramme', reqRights: ['studyprogramme'] },
   teachers: { menuRoute: '/teachers', route: '/teachers/:teacherid?', translateId: 'teachers', reqRights: ['teachers'] },
   users: { menuRoute: '/users', route: '/users/:userid?', translateId: 'users', reqRights: ['users'] },
   settings: { menuRoute: '/settings', route: '/settings', translateId: 'settings', reqRights: ['dev'] },
