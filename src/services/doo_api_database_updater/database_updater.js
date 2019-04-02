@@ -307,17 +307,9 @@ const updateCourseDisciplines = async () => {
   await Promise.all(courseDisciplines.map(discipline => Discipline.upsert(discipline)))
 }
 
-const saveSemestersAwesome = semesters => sequelize.transaction(() => {
-  return Promise.all(semesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
-})
-
-const updateSemesters = async (usenew = true) => {
+const updateSemesters = async () => {
   const apiSemesters = await Oodi.getSemesters()
-  if (usenew === true) {
-    return await saveSemestersAwesome(apiSemesters)
-  } else {
-    return await Promise.all(apiSemesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
-  }
+  return await Promise.all(apiSemesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
 }
 
 const updateCourseRealisationTypes = async () => {
