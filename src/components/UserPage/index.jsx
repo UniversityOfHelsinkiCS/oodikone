@@ -5,7 +5,6 @@ import _ from 'lodash'
 import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
 import { textAndDescriptionSearch, getRolesWithoutRefreshToken, getIdWithoutRefreshToken, setToken } from '../../common'
-import LanguageChooser from '../LanguageChooser'
 import { addUserUnits, removeUserUnits, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
@@ -203,7 +202,6 @@ class UserPage extends Component {
     return this.props.accessGroups ?
       <div>
         <Button icon="arrow circle left" content="Back" onClick={this.props.goBack} />
-        <LanguageChooser />
         <Divider />
         <Card.Group>
           <Card fluid>
