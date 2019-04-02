@@ -18,7 +18,6 @@ import { transferTo } from '../../populationFilters'
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { momentFromFormat, reformatDate, textAndDescriptionSearch } from '../../common'
 import { setLoading } from '../../redux/graphSpinner'
-import LanguageChooser from '../LanguageChooser'
 import style from './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
 import InfoBox from '../InfoBox'
@@ -378,7 +377,7 @@ class PopulationSearchForm extends Component {
   }
 
   renderStudyProgrammeDropdown = (studyRights, programmesToRender) => (
-    <Form.Field width={14}>
+    <Form.Field fluid>
       <label>Study programme</label>
       <Form.Dropdown
         placeholder="Select study programme"
@@ -481,13 +480,7 @@ class PopulationSearchForm extends Component {
 
     return (
       <div>
-        <Form.Group>
-          <Form.Field>
-            <label>Language</label>
-            <LanguageChooser />
-          </Form.Field>
-          {this.renderStudyProgrammeDropdown(studyRights, programmesToRender)}
-        </Form.Group>
+        {this.renderStudyProgrammeDropdown(studyRights, programmesToRender)}
         {this.renderAdditionalDegreeOrStudyTrackDropdown(
           studyRights,
           studyTracksToRender,

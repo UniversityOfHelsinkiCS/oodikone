@@ -9,6 +9,7 @@ import { routes } from '../../constants'
 import { userRoles, userRights } from '../../common'
 import styles from './navigationBar.css'
 import { logout, login, returnToSelf } from '../../apiConnection'
+import LanguageChooser from '../LanguageChooser'
 
 const { USER_ADMINER_URL, ADMINER_URL, ANALYTICS_ADMINER_URL } = process.env
 
@@ -119,7 +120,7 @@ class NavigationBar extends Component {
   render() {
     const { translate: t, asUser } = this.props
     const { navigationRoutes } = this.state
-    const menuWidth = asUser ? Object.keys(navigationRoutes).length + 3 : Object.keys(navigationRoutes).length + 2
+    const menuWidth = asUser ? Object.keys(navigationRoutes).length + 4 : Object.keys(navigationRoutes).length + 3
     const itemWidth = 100 / menuWidth
     return (
       <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
@@ -158,6 +159,11 @@ class NavigationBar extends Component {
           style={{ width: `${itemWidth}%` }}
         >
           <Button icon="bullhorn" onClick={() => Sentry.showReportDialog()} />
+        </Menu.Item>
+        <Menu.Item
+          style={{ width: `${itemWidth}%` }}
+        >
+          <LanguageChooser />
         </Menu.Item>
         {asUser ?
           <Menu.Item
