@@ -11,14 +11,7 @@ import infotooltips from '../../common/InfoToolTips'
 const PopulationCourses = ({ samples, translate }) => {
   const isValidSample = samples && samples.length > 0
   const { CoursesOf } = infotooltips.PopulationStatistics
-  if (!isValidSample) {
-    return null
-  }
-
-  const { pending } = samples[0]
-  if (pending) {
-    return null
-  }
+  const pending = !isValidSample || samples[0].pending
   return (
     <Segment>
       <Header size="medium" dividing >
@@ -32,7 +25,7 @@ const PopulationCourses = ({ samples, translate }) => {
         <InfoBox content={CoursesOf} />
       </Header>
       <SegmentDimmer translate={translate} isLoading={pending} />
-      {samples.map(sample => (
+      {!pending && samples.map(sample => (
         <PopulationCourseStats
           key={sample.query.uuid}
           courses={sample.data || {}}
