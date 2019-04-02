@@ -267,8 +267,8 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
       graduated: graduated.length,
-      thesisM: theses.MASTER,
-      thesisB: theses.BACHELOR
+      thesisM: theses.MASTER || 0,
+      thesisB: theses.BACHELOR || 0
     }
   }))
   return { [studytrack]: arr }
