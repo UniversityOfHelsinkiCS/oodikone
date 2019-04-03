@@ -6,5 +6,7 @@ cd ../oodikone2-userservice
 git pull
 cd ../oodilearn
 git pull
+cd ../oodikone2-usageservice
+git pull
 cd ../..
 git pull
