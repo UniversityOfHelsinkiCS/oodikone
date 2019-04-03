@@ -40,6 +40,7 @@ pull_git_repositories () {
     git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
     git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-frontend.git
     git clone https://github.com/UniversityOfHelsinkiCS/oodilearn.git
+    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-usageservice.git
     git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git
     git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-analytics.git
     popd

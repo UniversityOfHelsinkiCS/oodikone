@@ -21,6 +21,17 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=user_db
+  usage_db:
+    image: postgres:9.6.3
+    ports:
+      - "5424:5432"
+    volumes:
+      - ./usage_pgdata:/var/lib/postgresql/data
+    container_name: oodi_usage_db
+    environment:
+      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=usage_db
   db:
     image: postgres:9.6.3
     ports:
@@ -65,7 +76,9 @@ services:
       TOKEN_SECRET: IWannaBeTheVeryBest
       OODILEARN_URL: http://oodilearn:5000
       USERSERVICE_URL: http://userservice:4567
+      USAGESERVICE_URL: http://usageservice:545
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       ANALYTICS_URL: http://analytics:4568
     volumes:
       - ./repos/oodikone2-backend/:/usr/src/app
@@ -120,6 +133,18 @@ services:
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       - TOKEN_SECRET=IWannaBeTheVeryBest
     container_name: userservice
+  usageservice:
+    image: node:10-alpine
+    command: sh -c "cd /usr/src/app && npm install && npm run dev"
+    restart: unless-stopped
+    volumes:
+      - ./repos/oodikone2-usageservice/:/usr/src/app
+    ports:
+      - 545:545
+    environment:
+      - PORT=545
+      - DB_URL=postgres://postgres@usage_db:5432/usage_db
+    container_name: usageservice                     
   analytics:
     image: node:8.11.3
     command: sh -c "cd /usr/src/app && npm install && npm run dev"
