@@ -11,6 +11,7 @@
   },
   "scripts": {
     "start": "node --max_old_space_size=4096 index.js",
+    "start-debug": "node --inspect-brk=0.0.0.0:9229 --max_old_space_size=4096 index.js",
     "docker_local": "NODE_ENV=docker_local nodemon index.js",
     "dev": "NODE_ENV=dev nodemon --max_old_space_size=4096 index.js",
     "anon": "NODE_ENV=test nodemon index.js",

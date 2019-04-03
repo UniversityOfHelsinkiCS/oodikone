@@ -26,14 +26,10 @@ router.post('/login', async (req, res) => {
       const full_name = req.headers.displayname || 'Shib Valmis'
       const mail = req.headers.mail || ''
       const hyGroups = parseHyGroups(req.headers['hygroupcn'])
-      const affiliations = req.headers['edupersonaffiliation']
-      let parsedAffiliations = []
-
-      if(!(affiliations === undefined || affiliations === '')) {
-        parsedAffiliations = affiliations.split(';')
-      }
+      const affiliations = parseHyGroups(req.headers['edupersonaffiliation'])
+   
       console.log(uid, 'trying to login, referring to userservice.')
-      let { token, isNew } = await userService.login(uid, full_name, hyGroups, parsedAffiliations, mail)
+      let { token, isNew } = await userService.login(uid, full_name, hyGroups, affiliations, mail)
       isNew && sendEmail(uid)
       res.status(200).json({ token })
     } else {
