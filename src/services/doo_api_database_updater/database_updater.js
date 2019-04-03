@@ -123,12 +123,26 @@ const updateSemesterEnrollments = async (apidata, studentnumber) => {
   }))
 }
 
+const deleteStudentStudyrights = async studentnumber => {
+  await Studyright.destroy({
+    where: {
+      student_studentnumber: studentnumber
+    }
+  })
+  await StudyrightElement.destroy({
+    where: {
+      studentnumber
+    }
+  })
+}
+
 const updateStudent = async (studentnumber) => {
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {
     logger.info(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
   } else {
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
+    await deleteStudentStudyrights(studentnumber)
     await Promise.all([
       updateStudyrights(api, studentnumber),
       updateStudyattainments(api, studentnumber),
@@ -143,7 +157,9 @@ const updateStudentFromData = async (api) => {
     logger.info(`API returned ${api.student} for studentnumber ${api.studentnumber}.    `)
   } else {
     const { studentnumber } = api
+    logger.info(`TRYING TO UPDATE ${studentnumber}`)
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
+    await deleteStudentStudyrights(studentnumber)
     await Promise.all([
       updateStudyrights(api, studentnumber),
       updateStudyattainments(api, studentnumber),
@@ -291,17 +307,9 @@ const updateCourseDisciplines = async () => {
   await Promise.all(courseDisciplines.map(discipline => Discipline.upsert(discipline)))
 }
 
-const saveSemestersAwesome = semesters => sequelize.transaction(() => {
-  return Promise.all(semesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
-})
-
-const updateSemesters = async (usenew = true) => {
+const updateSemesters = async () => {
   const apiSemesters = await Oodi.getSemesters()
-  if (usenew === true) {
-    return await saveSemestersAwesome(apiSemesters)
-  } else {
-    return await Promise.all(apiSemesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
-  }
+  return await Promise.all(apiSemesters.map(data => Semester.upsert(mapper.semesterFromData(data))))
 }
 
 const updateCourseRealisationTypes = async () => {
@@ -365,5 +373,6 @@ module.exports = {
   updateDatabase, updateFaculties, updateStudents, updateCourseInformationAndProviders,
   updateCreditTypeCodes, updateCourseDisciplines, updateSemesters, updateCourseRealisationTypes,
   updateTeachersInDb, updateStudentsTaskPooled, updateCourseRealisationsAndEnrollments,
-  getExistingCourseRealisationCodes, updateCourseRealisationsForCoursesInDb
+  getExistingCourseRealisationCodes, updateCourseRealisationsForCoursesInDb,
+  deleteStudentStudyrights
 }

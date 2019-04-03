@@ -40,7 +40,8 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
     if (productivityData[code]) {
       return res.json(productivityData)
     }
-    const data = await productivityStatsForStudytrack(code)
+    const since = '2017-08-01'
+    const data = await productivityStatsForStudytrack(code, since)
     await setProductivity(data)
     return res.json(data)
   } else {
@@ -57,7 +58,8 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
   let ready = 0
   for(const code of codes) {
     try {
-      const data = await productivityStatsForStudytrack(code)
+      const since = '2017-08-01'
+      const data = await productivityStatsForStudytrack(code, since)
       await setProductivity(data)
     } catch (e) {
       console.log(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
