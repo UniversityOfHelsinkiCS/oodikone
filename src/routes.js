@@ -1,5 +1,4 @@
-const morgan = require('morgan')
-const logger = require('./util/logger')
+const accessLogger = require('./middleware/accesslogger')
 const log = require('./routes/log')
 const courses = require('./routes/courses')
 const students = require('./routes/students')
@@ -17,23 +16,6 @@ const courseGroups = require('./routes/courseGroups')
 const mandatoryCourses = require('./routes/mandatorycourses')
 const ping = require('./routes/ping')
 const oodi = require('./routes/oodi')
-
-const accessLogger = morgan((tokens, req, res) => {
-  const fields = ['method', 'url', 'status', 'response-time', 'remote-addr', 'remote-user', 'user-agent', 'referrer']
-  const message = [
-    req.decodedToken.name, ':',
-    tokens['method'](req, res),
-    tokens['url'](req, res),
-    tokens['status'](req, res),
-    '-',
-    tokens['response-time'](req, res), 'ms'
-  ].join(' ')
-  const meta = req.decodedToken
-  fields.forEach(field => meta[field] = tokens[field](req, res))
-  logger.info(message, meta)
-})
-
-
 
 module.exports = (app, url) => {
   app.use(url, log)
