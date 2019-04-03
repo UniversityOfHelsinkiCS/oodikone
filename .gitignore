@@ -3,6 +3,7 @@ data
 pgdata
 user_pgdata
 usage_pgdata
+analytics-redis-data
 redis-data
 mongodata
 repos/oodilearn/training/data
