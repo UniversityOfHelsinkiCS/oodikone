@@ -363,7 +363,7 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   await updateCreditTypeCodes()
   await updateCourseTypeCodes()
   await updateCourseDisciplines()
-  await updateStudentsTaskPooled(studentnumbers, 50, onUpdateStudent)
+  await updateStudents(studentnumbers, 1, onUpdateStudent)
   await updateTeachersInDb(100, true)
   await updateCoursesAndProvidersInDb(100)
   await updateAttainmentDates()
