@@ -15,7 +15,7 @@ class TeacherLeaderBoard extends Component {
     }
 
     render() {
-      const { statistics, isLoading, yearoptions, categoryoptions } = this.props
+      const { statistics, updated, isLoading, yearoptions, categoryoptions } = this.props
       return (
         <div>
           { isLoading
@@ -28,6 +28,7 @@ class TeacherLeaderBoard extends Component {
                   />
                   <LeaderForm yearoptions={yearoptions} categoryoptions={categoryoptions} />
                   <Segment>
+                    <Message size="tiny" content={`Last updated: ${updated}`} />
                     <TeacherStatisticsTable
                       statistics={statistics}
                       onClickFn={e => this.props.history.push(`/teachers/${e.target.innerText}`)}
@@ -46,6 +47,7 @@ TeacherLeaderBoard.propTypes = {
   statistics: arrayOf(shape({})).isRequired,
   yearoptions: arrayOf(shape({})).isRequired,
   history: shape({}).isRequired,
+  updated: string.isRequired,
   getTopTeachersCategories: func.isRequired,
   categoryoptions: arrayOf(shape({ key: any, text: string, value: any })).isRequired
 }
@@ -54,9 +56,11 @@ const mapStateToProps = ({ teachersTop, teachersTopCategories }) => {
   const { data } = teachersTop
   const { pending, data: yearsAndCategories } = teachersTopCategories
   const { years = {}, categories = {} } = yearsAndCategories
+  const updated = new Date(data.updated)
   return {
     isLoading: pending,
-    statistics: data,
+    statistics: data.stats || [],
+    updated: updated.toLocaleDateString('en-GB'),
     yearoptions: Object.values(years)
       .map(({ yearcode, yearname }) => ({
         key: yearcode,
