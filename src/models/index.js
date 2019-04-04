@@ -546,6 +546,15 @@ const ThesisCourse = sequelize.define('thesis_courses', {
     type: Sequelize.ENUM([ThesisTypeEnums.BACHELOR, ThesisTypeEnums.MASTER])
   }
 })
+const ErrorData = sequelize.define('error_data', {
+  id: {
+    primaryKey: true,
+    type: Sequelize.STRING
+  },
+  data: {
+    type: Sequelize.JSONB
+  }
+})
 
 Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
@@ -654,5 +663,6 @@ module.exports = {
   UsageStatistic,
   CourseGroup,
   ThesisCourse,
-  ThesisTypeEnums
+  ThesisTypeEnums,
+  ErrorData
 }
