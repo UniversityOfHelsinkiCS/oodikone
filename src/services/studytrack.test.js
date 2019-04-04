@@ -25,13 +25,13 @@ beforeAll(async () => {
 })
 
 test('Credits for provider should contain passed course credit', async () => {
-  const credits = await getCreditsForProvider(provider)
+  const credits = await getCreditsForProvider(provider, '2001-01-01')
   const credit = await credits.find(cr => cr.id === 'CREDIT_01')
   expect(credit).toMatchObject({ id: 'CREDIT_01' })
 })
 
 test('Credits for provider should return object in correct format', async () => {
-  const credits = await getCreditsForProvider(provider)
+  const credits = await getCreditsForProvider(provider, '2001-01-01')
   const credit = await credits.find(cr => cr.id === 'CREDIT_01')
   expect(credit).toMatchObject({
     credits: 5,
@@ -87,7 +87,7 @@ test('productivityStatsFromCredits calculates stats correctly', () => {
 })
 
 test('productivityStats integrates correctly', async () => {
-  const stats = await productivityStatsForProvider(provider)
+  const stats = await productivityStatsForProvider(provider, '2001-01-01')
   expect(stats).toMatchObject({
     2015: { year: 2015, credits: 40 },
     2016: { year: 2016, credits: 5 }
@@ -95,24 +95,24 @@ test('productivityStats integrates correctly', async () => {
 })
 
 test('findGraduated finds graduated studyright', async () => {
-  const studyrights = await findGraduated(studytrack)
+  const studyrights = await findGraduated(studytrack, '2001-01-01')
   const match = studyrights.find(sr => sr.studyrightid === '10')
   expect(match).toBeTruthy()
 })
 
 test('findGraduated formats graduated studyrights correctly', async () => {
-  const studyrights = await findGraduated(studytrack)
+  const studyrights = await findGraduated(studytrack, '2001-01-01')
   expect(studyrights).toContainEqual({ studyrightid: '10', year: 2016 })
 })
 
 test('findGraduated does not return studyrights that are not graduated', async () => {
-  const studyrights = await findGraduated(studytrack)
+  const studyrights = await findGraduated(studytrack, '2001-01-01')
   const match = studyrights.find(sr => sr.id === '11')
   expect(match).toBeFalsy()
 })
 
 test('findGraduated does return graduated studyrights from other studytracks', async () => {
-  const studyrights = await findGraduated(studytrack)
+  const studyrights = await findGraduated(studytrack, '2001-01-01')
   const match = studyrights.find(sr => sr.id === '12')
   expect(match).toBeFalsy()
 })
@@ -150,7 +150,7 @@ test('combineStatistics returns correctly formatted array', () => {
     mThesis: 2,
     bThesis: 1,
     credits: 40,
-    graduated: 2
+    graduated: 2 
   })
   expect(stats).toContainEqual({
     year: 2014,
@@ -169,7 +169,7 @@ test('combineStatistics returns correctly formatted array', () => {
 })
 
 test('productivityStatsForStudytrack integrates', async () => {
-  const stats = await productivityStatsForStudytrack(studytrack)
+  const stats = await productivityStatsForStudytrack(studytrack, '2001-01-01')
   expect(stats[studytrack]).toContainEqual({
     year: 2015,
     graduated: 0,

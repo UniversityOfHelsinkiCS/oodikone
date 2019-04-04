@@ -186,15 +186,18 @@ Use _docker-compose run -d CONTAINER_NAME node src/services/doo_api_database_upd
 To update your database run `docker-compose run -d CONTAINER_NAME npm run update_database` with optional args `file="<filename>"` and `index=<number>` with former telling the studentnumber filename to update and latter telling which row to start from.
 
 
-### Anonymize data
+### Anonymized data & E2E environment
 
-Run `npm run anonymize` for studentnumbers provided in `studentnumbers.txt` file in root directory. This would be broken with current container setup, due hardcoding file location, but testing has not been updated for this.
+Use [oodikone2-cli](https://github.com/UniversityOfHelsinkiCS/oodikone2-cli) to setup you're environments.
 
-Anonymizer will create an `anonymized_API` folder structure which can be used as an alternative to Oodi API and a `studentnumbersN.txt` text file containing new anonymized students studentnumbers.
+Before running cli make yourself a deployment key for Anonyymioodi private repository and put it in your cli folder as `private.key`. This allows you to download the anonymized dumps from the repository.
 
-These can be used to update database with anonymized data by `npm run update_database_anon file="studentnumbersN.txt"`
+For local development use with anonymized data use `2) Anon setup` (you can run e2e tests with this).
 
-To update database in oodikone/testing you need to first scp your API and anon studentnumber list to melkki `scp -r src/anonymized_API melkki.cs.helsinki.fi:./` and `scp studentnumbersN.txt melkki.cs.helsinki.fi` then ssh to oodikone/testing and `scp -r <username>@melkki.cs.helsinki.fi:./anonymized_API ./data` and `scp <username>@melkki.cs.helsinki.fi:./studentnumbersN.txt ./data`. Then use `docker exec -it testing_backend sh` and `npm run update_database_anon file="/data/studentnumbersN.txt"`. (Theres probably a better way to scp files into oodikone but this works aswell).
+`1) e2e setup` is designed for use in travis. But you can still try it locally if you want to.
+
+Run E2E tests with `npm run cypress:run` or `npm run cypress:open` if you want to see what it's doing. 
+
 
 ## Teacher leader board statistics
 
