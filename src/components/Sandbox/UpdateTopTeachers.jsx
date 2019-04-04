@@ -2,9 +2,10 @@ import React, { Component } from 'react'
 import { Button, Progress } from 'semantic-ui-react'
 import { createConfiguredAxios } from '../../apiConnection'
 import KeyValueTable from '../Postman/KeyValueTable'
+import { API_BASE_PATH } from '../../constants'
 
 const TASK_URL = '/tasks/topteachers'
-const STREAM_URL = '/api/status/topteachers'
+const STREAM_URL = `${API_BASE_PATH}/status/topteachers`
 
 class UpdateTopTeachers extends Component {
   state={
