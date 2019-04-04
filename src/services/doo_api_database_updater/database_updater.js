@@ -7,7 +7,7 @@ const {
   Teacher, Organisation, StudyrightExtent, CourseType, CourseDisciplines,
   Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider,
   Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment, sequelize,
-  CreditTeacher
+  CreditTeacher, ErrorData
 } = require('../../../src/models/index')
 
 const _ = require('lodash')
@@ -72,8 +72,16 @@ const attainmentAlreadyInDb = attainment => attainmentIds.has(String(attainment.
 
 const createCourse = async course => {
   if (!courseIds.has(course.code)) {
-    await Course.upsert(course)
     courseIds.add(course.code)
+
+    if (!course.semestercode) {
+      await ErrorData.upsert({ id: course.id, data: course })
+      const tamperedCourse = { ...course,  semestercode: mapper.getSemesterCode(course.attainment_date) }
+      await Course.upsert(tamperedCourse)
+      return
+    }
+
+    await Course.upsert(course)
   }
 }
 
@@ -107,11 +115,6 @@ const createCreditTeachers = async (credit, teachers) => {
 const updateStudyattainments = async (api, studentnumber) => {
   for (let data of api.studyattainments) {
     const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
-    if (!credit.semestercode) {
-      logger.info('SOSSELISKOKKELIS')
-      logger.info(credit, course)
-      logger.info('================================')
-    }
     if (!attainmentAlreadyInDb(credit)) {
       await createCourse(course)
       await Credit.upsert(credit)
