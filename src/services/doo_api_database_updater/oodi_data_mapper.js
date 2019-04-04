@@ -59,6 +59,8 @@ const getStudentFromData = (student, studyrights) => {
   }
 }
 
+const getSemesterCode = attainment_date => ((moment(attainment_date).diff(moment('1950', 'YYYY'), 'months')) / 6)
+
 const getDate = (date, format = 'DD.MM.YYYY') => {
   if (!date) return null
   return moment(date, format).format('YYYY-MM-DD')
@@ -346,5 +348,6 @@ module.exports = {
   getTransfersFromData,
   courseRealisationTypeFromData,
   studentEnrollmentToModels,
-  courseUnitRealisationDataToModels
+  courseUnitRealisationDataToModels,
+  getSemesterCode
 }

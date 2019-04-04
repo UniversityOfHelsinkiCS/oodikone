@@ -75,7 +75,9 @@ const createCourse = async course => {
     courseIds.add(course.code)
 
     if (!course.semestercode) {
-      ErrorData.upsert({id: course.id, data: course})
+      await ErrorData.upsert({ id: course.id, data: course })
+      const tamperedCourse = { ...course,  semestercode: mapper.getSemesterCode(course.attainment_date) }
+      await Course.upsert(tamperedCourse)
       return
     }
 
