@@ -41,7 +41,7 @@ class TeacherStatisticsTable extends Component {
 
       const sortDirection = name => (selected === name ? direction : null)
 
-      return (statistics.length === 0 ? <Segment content="No statistics found for the given query." /> :
+      return (statistics.length === 0 ? <Segment basic content="No statistics found for the given query." /> :
       <Table structured celled textAlign="center" sortable>
         <Table.Header>
           <Table.Row>
