@@ -16,12 +16,10 @@ const courseGroups = require('./routes/courseGroups')
 const mandatoryCourses = require('./routes/mandatorycourses')
 const ping = require('./routes/ping')
 const oodi = require('./routes/oodi')
-const status = require('./routes/status')
 const task = require('./routes/tasks')
 
 module.exports = (app, url) => {
   app.use(url, log)
-  app.use(url, status)
   app.use(url, login)
   app.use(url, ping)
   app.use(auth.checkAuth, auth.checkRequiredGroup, auth.checkUserBlacklisting, accessLogger)
