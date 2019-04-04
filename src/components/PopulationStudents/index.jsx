@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
 import { Header, Segment, Button, Icon, Popup } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
-import { getStudentTotalCredits, copyToClipboard, userRoles } from '../../common'
+import { getStudentTotalCredits, copyToClipboard, userRoles, reformatDate } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
@@ -128,6 +128,11 @@ class PopulationStudents extends Component {
           key: 'extent',
           title: 'extent',
           getRowVal: s => extentCodes(s.studyrights)
+        },
+        {
+          key: 'updatedAt',
+          title: 'last updated at',
+          getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss')
         }
       )
     }
