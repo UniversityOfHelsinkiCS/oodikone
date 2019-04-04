@@ -73,15 +73,6 @@ const attainmentAlreadyInDb = attainment => attainmentIds.has(String(attainment.
 const createCourse = async course => {
   if (!courseIds.has(course.code)) {
     courseIds.add(course.code)
-
-    if (!course.semestercode) {
-      console.log(course)
-      await ErrorData.upsert({ id: course.id, data: course })
-      const tamperedCourse = { ...course,  semestercode: mapper.getSemesterCode(course.attainment_date) }
-      await Course.upsert(tamperedCourse)
-      return
-    }
-
     await Course.upsert(course)
   }
 }
@@ -118,7 +109,15 @@ const updateStudyattainments = async (api, studentnumber) => {
     const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
     if (!attainmentAlreadyInDb(credit)) {
       await createCourse(course)
-      await Credit.upsert(credit)
+      if (!credit.semestercode) {
+        console.log(credit)
+        await ErrorData.upsert({ id: credit.id, data: credit })
+        const tamperedCredit = { ...credit, semestercode: mapper.getSemesterCode(credit.attainment_date) }
+        await Credit.upsert(tamperedCredit)
+        return
+      } else {
+        await Credit.upsert(credit)
+      }
       await createTeachers(teachers)
       await createCreditTeachers(credit, teachers)
     }
