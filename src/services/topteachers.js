@@ -28,7 +28,8 @@ const getTeacherStats = async (categoryid, yearcode) => {
 
 const setTeacherStats = async (categoryid, yearcode, stats) => {
   const { rediskey } = categories[categoryid]
-  await redisClient.hsetAsync(rediskey, yearcode, JSON.stringify(stats))
+  const data = { stats, updated: new Date() }
+  await redisClient.hsetAsync(rediskey, yearcode, JSON.stringify(data))
 }
 
 const getCategoriesAndYears = async () => {
