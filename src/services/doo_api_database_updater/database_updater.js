@@ -107,6 +107,11 @@ const createCreditTeachers = async (credit, teachers) => {
 const updateStudyattainments = async (api, studentnumber) => {
   for (let data of api.studyattainments) {
     const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
+    if (!credit.semestercode) {
+      logger.info('SOSSELISKOKKELIS')
+      logger.info(credit, course)
+      logger.info('================================')
+    }
     if (!attainmentAlreadyInDb(credit)) {
       await createCourse(course)
       await Credit.upsert(credit)
@@ -141,6 +146,7 @@ const updateStudent = async (studentnumber) => {
   if (api.student === null || api.student === undefined) {
     logger.info(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
   } else {
+    logger.info(`TRYING TO UPDATE ${studentnumber}`)
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
     await deleteStudentStudyrights(studentnumber)
     await Promise.all([
