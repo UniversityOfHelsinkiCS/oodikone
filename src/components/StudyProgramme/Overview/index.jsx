@@ -19,11 +19,13 @@ class Overview extends Component {
       <React.Fragment>
         <ThroughputTable
           throughput={throughput.data[studyprogramme]}
+          thesis={throughput.data.thesis}
           loading={throughput.pending}
           error={throughput.error}
         />
         <ProductivityTable
           productivity={productivity.data[studyprogramme]}
+          thesis={throughput.data.thesis}
           loading={productivity.pending}
           error={productivity.error}
         />
