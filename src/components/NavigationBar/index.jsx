@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { Menu, Dropdown, Button } from 'semantic-ui-react'
-import * as Sentry from '@sentry/browser'
 import { NavLink, Link } from 'react-router-dom'
 import { func, shape, string } from 'prop-types'
 import { connect } from 'react-redux'
@@ -120,7 +119,7 @@ class NavigationBar extends Component {
   render() {
     const { translate: t, asUser } = this.props
     const { navigationRoutes } = this.state
-    const menuWidth = asUser ? Object.keys(navigationRoutes).length + 4 : Object.keys(navigationRoutes).length + 3
+    const menuWidth = asUser ? Object.keys(navigationRoutes).length + 3 : Object.keys(navigationRoutes).length + 2
     const itemWidth = 100 / menuWidth
     return (
       <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
@@ -181,11 +180,6 @@ class NavigationBar extends Component {
           })
         }
         {this.renderUserMenu(itemWidth)}
-        <Menu.Item
-          style={{ width: `${itemWidth}%` }}
-        >
-          <Button icon="bullhorn" onClick={() => Sentry.showReportDialog()} />
-        </Menu.Item>
         <Menu.Item
           style={{ width: `${itemWidth}%` }}
         >
