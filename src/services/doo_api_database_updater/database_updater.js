@@ -7,7 +7,7 @@ const {
   Teacher, Organisation, StudyrightExtent, CourseType, CourseDisciplines,
   Discipline, CreditType, Semester, SemesterEnrollment, Provider, CourseProvider,
   Transfers, CourseRealisationType, CourseRealisation, CourseEnrollment, sequelize,
-  CreditTeacher
+  CreditTeacher, ErrorData
 } = require('../../../src/models/index')
 
 const _ = require('lodash')
@@ -72,8 +72,8 @@ const attainmentAlreadyInDb = attainment => attainmentIds.has(String(attainment.
 
 const createCourse = async course => {
   if (!courseIds.has(course.code)) {
-    await Course.upsert(course)
     courseIds.add(course.code)
+    await Course.upsert(course)
   }
 }
 
@@ -109,7 +109,15 @@ const updateStudyattainments = async (api, studentnumber) => {
     const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
     if (!attainmentAlreadyInDb(credit)) {
       await createCourse(course)
-      await Credit.upsert(credit)
+      if (!credit.semestercode) {
+        console.log(credit)
+        await ErrorData.upsert({ id: credit.id, data: credit })
+        const tamperedCredit = { ...credit, semestercode: mapper.getSemesterCode(credit.attainment_date) }
+        await Credit.upsert(tamperedCredit)
+        return
+      } else {
+        await Credit.upsert(credit)
+      }
       await createTeachers(teachers)
       await createCreditTeachers(credit, teachers)
     }
@@ -141,6 +149,7 @@ const updateStudent = async (studentnumber) => {
   if (api.student === null || api.student === undefined) {
     logger.info(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
   } else {
+    logger.info(`TRYING TO UPDATE ${studentnumber}`)
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
     await deleteStudentStudyrights(studentnumber)
     await Promise.all([
@@ -363,7 +372,7 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   await updateCreditTypeCodes()
   await updateCourseTypeCodes()
   await updateCourseDisciplines()
-  await updateStudentsTaskPooled(studentnumbers, 50, onUpdateStudent)
+  await updateStudents(studentnumbers, 1, onUpdateStudent)
   await updateTeachersInDb(100, true)
   await updateCoursesAndProvidersInDb(100)
   await updateAttainmentDates()
