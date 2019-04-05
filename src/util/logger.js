@@ -1,12 +1,12 @@
 const winston = require('winston')
 require('winston-papertrail')
-require('winston-log2gelf')
+const Log2gelf = require('winston-log2gelf')
 const LogSaverTransport = require('./logSaver')
 
 const transports = []
 
 if (process.env.LOG_PORT && process.env.LOG_HOST) {
-  transports.push(new winston.transports.Log2gelf({
+  transports.push(new Log2gelf({
     hostname: process.env.LOG_HOSTNAME || 'oodikone-backend',
     host: process.env.LOG_HOST,
     port: process.env.LOG_PORT,
