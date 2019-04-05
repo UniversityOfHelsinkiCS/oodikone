@@ -78,8 +78,9 @@ router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
     }
     const since = req.params.since ? req.params.since : new Date().getFullYear() - 5
     const data = await throughputStatsForStudytrack(req.params.id, since)
+    const thesis = await findProgrammeTheses(req.params.id)
     await setThroughput(data)
-    return res.json(data)
+    return res.json({...data, thesis })
   } else {
     res.status(422)
   }
