@@ -59,6 +59,7 @@ const updateStudyrights = async (api, studentnumber) => {
       await StudyrightElement.upsert(studyrightElement)
     }
     await createOrUpdateStudyrightTransfers(data, studentnumber)
+    logger.info(`studyrights updated for ${studentnumber}`)
   }
 }
 
@@ -86,6 +87,7 @@ const createCourseEnrollment = async (data, studentnumber) => {
 
 const updateCourseEnrollments = async (apidata, studentnumber) => {
   await Promise.all(apidata.courseEnrollments.map(enrollment => createCourseEnrollment(enrollment, studentnumber)))
+  logger.info(`course enrollments updated for ${studentnumber}`)
 }
 
 const parseAttainmentData = (data, studentnumber) => {
@@ -110,7 +112,6 @@ const updateStudyattainments = async (api, studentnumber) => {
     if (!attainmentAlreadyInDb(credit)) {
       await createCourse(course)
       if (!credit.semestercode) {
-        console.log(credit)
         await ErrorData.upsert({ id: credit.id, data: credit })
         const tamperedCredit = { ...credit, semestercode: mapper.getSemesterCode(credit.attainment_date) }
         await Credit.upsert(tamperedCredit)
@@ -120,6 +121,7 @@ const updateStudyattainments = async (api, studentnumber) => {
       }
       await createTeachers(teachers)
       await createCreditTeachers(credit, teachers)
+      logger.info(`Studyattainments updated for ${studentnumber}`)
     }
   }
 }
@@ -129,6 +131,7 @@ const updateSemesterEnrollments = async (apidata, studentnumber) => {
     const semesterEnrollment = mapper.semesterEnrollmentFromData(apiEnrollment, studentnumber)
     return SemesterEnrollment.upsert(semesterEnrollment)
   }))
+  logger.info(`semester enrollments updated for ${studentnumber}`)
 }
 
 const deleteStudentStudyrights = async studentnumber => {
@@ -158,6 +161,7 @@ const updateStudent = async (studentnumber) => {
       updateSemesterEnrollments(api, studentnumber),
       updateCourseEnrollments(api, studentnumber)
     ])
+    logger.info(`SUCCESSFULLY UPDATED ${studentnumber}`)
   }
 }
 
