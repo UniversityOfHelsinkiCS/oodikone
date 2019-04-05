@@ -111,11 +111,11 @@ const updateStudyattainments = async (api, studentnumber) => {
     const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
     if (!attainmentAlreadyInDb(credit)) {
       await createCourse(course)
+      logger.info(credit)
       if (!credit.semestercode) {
-        await ErrorData.upsert({ id: credit.id, data: credit })
+        await ErrorData.upsert({ id: credit.id || String(Math.random() * 34893723) + String(666), data: credit })
         const tamperedCredit = { ...credit, semestercode: mapper.getSemesterCode(credit.attainment_date) }
         await Credit.upsert(tamperedCredit)
-        return
       } else {
         await Credit.upsert(credit)
       }
