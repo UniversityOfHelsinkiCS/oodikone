@@ -1,5 +1,4 @@
 const winston = require('winston')
-require('winston-papertrail')
 const Log2gelf = require('winston-log2gelf')
 const LogSaverTransport = require('./logSaver')
 
@@ -11,15 +10,6 @@ if (process.env.LOG_PORT && process.env.LOG_HOST) {
     host: process.env.LOG_HOST,
     port: process.env.LOG_PORT,
     protocol: 'http'
-  }))
-}
-
-if (process.env.PAPERTRAIL_HOST && process.env.PAPERTRAIL_PORT && process.env.PAPERTRAIL_HOSTNAME) {
-  transports.push(new winston.transports.Papertrail({
-    level: 'info',
-    host: process.env.PAPERTRAIL_HOST,
-    port: process.env.PAPERTRAIL_PORT,
-    hostname: process.env.PAPERTRAIL_HOSTNAME
   }))
 }
 
