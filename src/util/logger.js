@@ -6,7 +6,7 @@ const transports = []
 
 if (process.env.LOG_PORT && process.env.LOG_HOST) {
   transports.push(new Log2gelf({
-    hostname: process.env.LOG_HOSTNAME || 'oodikone-backend',
+    hostname: process.env.LOG_HOSTNAME || 'oodikone-usageservice',
     host: process.env.LOG_HOST,
     port: process.env.LOG_PORT,
     protocol: 'http'
