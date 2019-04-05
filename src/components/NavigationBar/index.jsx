@@ -10,7 +10,7 @@ import styles from './navigationBar.css'
 import { logout, login, returnToSelf } from '../../apiConnection'
 import LanguageChooser from '../LanguageChooser'
 
-const { USER_ADMINER_URL, ADMINER_URL, ANALYTICS_ADMINER_URL } = process.env
+const { USER_ADMINER_URL, ADMINER_URL, ANALYTICS_ADMINER_URL, USAGE_ADMINER_URL } = process.env
 
 class NavigationBar extends Component {
   state = {
@@ -27,6 +27,8 @@ class NavigationBar extends Component {
   }
 
   setNavigationRoutes = async () => {
+    console.log(process.env)
+
     const navigationRoutes = { ...routes }
     const roles = await userRoles()
     Object.keys(navigationRoutes).forEach((key) => {
@@ -88,6 +90,16 @@ class NavigationBar extends Component {
                   win.focus()
                 }}
                 text="Analytics database"
+                icon="database"
+              />
+            )}
+            {USAGE_ADMINER_URL && (
+              <Dropdown.Item
+                onClick={() => {
+                  const win = window.open(USAGE_ADMINER_URL, '_blank')
+                  win.focus()
+                }}
+                text="Usage database"
                 icon="database"
               />
             )}
