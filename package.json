@@ -57,7 +57,6 @@
     "uuid": "^3.3.2",
     "winston": "^3.0.0",
     "winston-log2gelf": "^2.0.4",
-    "winston-papertrail": "^1.0.5",
     "winston-transport": "^4.2.0"
   },
   "devDependencies": {
