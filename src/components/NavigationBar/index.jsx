@@ -27,8 +27,6 @@ class NavigationBar extends Component {
   }
 
   setNavigationRoutes = async () => {
-    console.log(process.env)
-
     const navigationRoutes = { ...routes }
     const roles = await userRoles()
     Object.keys(navigationRoutes).forEach((key) => {
