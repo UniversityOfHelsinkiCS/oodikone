@@ -3,7 +3,7 @@ const uuid = require('uuid')
 const { UsageStatistic } = require('../models')
 
 module.exports = class LogSaverTransport extends Transport {
-  log(level, message, payload) {
+  log(payload) {
     if (payload.url && payload.method) {
       const object = {
         id: uuid.v4(),
