@@ -31,6 +31,6 @@ transports.push(new winston.transports.Console({ level: 'debug' }))
 
 transports.push(new LogSaverTransport())
 
-const logger = new winston.Logger({ transports })
+const logger = winston.createLogger({ transports })
 
 module.exports = logger
