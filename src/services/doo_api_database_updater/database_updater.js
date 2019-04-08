@@ -108,8 +108,8 @@ const createCreditTeachers = async (credit, teachers) => {
 
 const updateStudyattainments = async (api, studentnumber) => {
   logger.info(`update studyattainments called for ${studentnumber}`)
-  logger.info(api)
   if (api.studyattainments.length === 0) {
+    logger.info("No study attainments, returning")
     return
   }
   for (let data of api.studyattainments) {
@@ -197,6 +197,7 @@ const updateStudents = async (studentnumbers, chunksize = 1, onUpdateStudent = u
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
   while (remaining.length > 0) {
+    logger.info(`remaining: ${remaining}`)
     const nextchunk = remaining.splice(0, chunksize)
     await Promise.all(nextchunk.map(async studentnumber => {
       await updateStudent(studentnumber)
