@@ -109,11 +109,11 @@ const createCreditTeachers = async (credit, teachers) => {
 const updateStudyattainments = async (api, studentnumber) => {
   for (let data of api.studyattainments) {
     const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
+    logger.info(credit)
     if (!attainmentAlreadyInDb(credit)) {
       await createCourse(course)
-      logger.info(credit)
       if (!credit.semestercode) {
-        await ErrorData.upsert({ id: credit.id || String(Math.random() * 34893723) + String(666), data: credit })
+        await ErrorData.upsert({ id: credit.id || Math.round(String(Math.random() * 34893723))+ String(666), data: credit })
         const tamperedCredit = { ...credit, semestercode: mapper.getSemesterCode(credit.attainment_date) }
         await Credit.upsert(tamperedCredit)
       } else {
@@ -121,8 +121,8 @@ const updateStudyattainments = async (api, studentnumber) => {
       }
       await createTeachers(teachers)
       await createCreditTeachers(credit, teachers)
-      logger.info(`Studyattainments updated for ${studentnumber}`)
     }
+    logger.info(`Studyattainments updated for ${studentnumber}`)
   }
 }
 
