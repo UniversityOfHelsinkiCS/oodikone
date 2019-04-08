@@ -46,7 +46,13 @@ const createOrUpdateStudyrightTransfers = async (apiStudyright, studentnumber) =
 }
 
 const updateStudyrights = async (api, studentnumber) => {
+  logger.info(`update studyrights called for ${studentnumber}`)
+  if (api.studyrights.length === 0) {
+    logger.info(`No studyrights for ${studentnumber}`)
+    return
+  }
   for (let data of api.studyrights) {
+    logger.info(data)
     await StudyrightExtent.upsert(mapper.studyrightDataToExtent(data))
     const [studyright] = await Studyright.upsert(mapper.getStudyRightFromData(data, studentnumber), { returning: true })
     for (let element of data.elements) {
@@ -109,7 +115,7 @@ const createCreditTeachers = async (credit, teachers) => {
 const updateStudyattainments = async (api, studentnumber) => {
   logger.info(`update studyattainments called for ${studentnumber}`)
   if (api.studyattainments.length === 0) {
-    logger.info("No study attainments, returning")
+    logger.info(`No study attainments for ${studentnumber}`)
     return
   }
   for (let data of api.studyattainments) {
@@ -197,7 +203,7 @@ const updateStudents = async (studentnumbers, chunksize = 1, onUpdateStudent = u
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
   while (remaining.length > 0) {
-    logger.info(`remaining: ${remaining}`)
+    logger.info(`remaining: ${remaining.length}`)
     const nextchunk = remaining.splice(0, chunksize)
     await Promise.all(nextchunk.map(async studentnumber => {
       await updateStudent(studentnumber)
