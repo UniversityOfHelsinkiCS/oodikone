@@ -52,12 +52,11 @@ const updateStudyrights = async (api, studentnumber) => {
     return
   }
   for (let data of api.studyrights) {
-    console.log(data)
     await StudyrightExtent.upsert(mapper.studyrightDataToExtent(data))
     console.log(`got studyrightextent`)
     const [studyright] = await Studyright.upsert(mapper.getStudyRightFromData(data, studentnumber), { returning: true })
     console.log('got studyright')
-    let i = 1 
+    let i = 0
     for (let element of data.elements) {
       i = i + 1
       const elementDetail = mapper.elementDetailFromData(element)
@@ -396,7 +395,7 @@ const updateDatabase = async (studentnumbers, onUpdateStudent) => {
   await updateCreditTypeCodes()
   await updateCourseTypeCodes()
   await updateCourseDisciplines()
-  await updateStudents(studentnumbers, 1, onUpdateStudent)
+  await updateStudents(studentnumbers, 25, onUpdateStudent)
   await updateTeachersInDb(100, true)
   await updateCoursesAndProvidersInDb(100)
   await updateAttainmentDates()
