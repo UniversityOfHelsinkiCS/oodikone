@@ -29,7 +29,6 @@ services:
       - ./usage_pgdata:/var/lib/postgresql/data
     container_name: oodi_usage_db
     environment:
-      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       - POSTGRES_USER=postgres
       - POSTGRES_DB=usage_db
   db:
@@ -148,6 +147,7 @@ services:
     environment:
       - PORT=545
       - DB_URL=postgres://postgres@usage_db:5432/usage_db
+      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
     volumes:
       - ./repos/oodikone2-usageservice/:/usr/src/app
       - ./repos/oodikone2-usageservice/node_modules:/usr/src/app/node_modules
