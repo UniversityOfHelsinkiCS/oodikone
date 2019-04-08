@@ -46,17 +46,17 @@ const createOrUpdateStudyrightTransfers = async (apiStudyright, studentnumber) =
 }
 
 const updateStudyrights = async (api, studentnumber) => {
-  logger.info(`update studyrights called for ${studentnumber}`)
+  console.log(`update studyrights called for ${studentnumber}`)
   if (api.studyrights.length === 0) {
-    logger.info(`No studyrights for ${studentnumber}`)
+    console.log(`No studyrights for ${studentnumber}`)
     return
   }
   for (let data of api.studyrights) {
-    logger.info(data)
+    console.log(data)
     await StudyrightExtent.upsert(mapper.studyrightDataToExtent(data))
-    logger.info(`got studyrightextent`)
+    console.log(`got studyrightextent`)
     const [studyright] = await Studyright.upsert(mapper.getStudyRightFromData(data, studentnumber), { returning: true })
-    logger.info('got studyright')
+    console.log('got studyright')
     for (let element of data.elements) {
       const elementDetail = mapper.elementDetailFromData(element)
       const studyrightElement = mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber)
@@ -65,10 +65,10 @@ const updateStudyrights = async (api, studentnumber) => {
         elementDetailsIds.add(elementDetail.code)
       }
       await StudyrightElement.upsert(studyrightElement)
-      logger.info('got all elements from studyright')
+      console.log('got all elements from studyright')
     }
     await createOrUpdateStudyrightTransfers(data, studentnumber)
-    logger.info(`studyrights updated for ${studentnumber}`)
+    console.log(`studyrights updated for ${studentnumber}`)
   }
 }
 
@@ -96,7 +96,7 @@ const createCourseEnrollment = async (data, studentnumber) => {
 
 const updateCourseEnrollments = async (apidata, studentnumber) => {
   await Promise.all(apidata.courseEnrollments.map(enrollment => createCourseEnrollment(enrollment, studentnumber)))
-  logger.info(`course enrollments updated for ${studentnumber}`)
+  console.log(`course enrollments updated for ${studentnumber}`)
 }
 
 const parseAttainmentData = (data, studentnumber) => {
@@ -116,14 +116,14 @@ const createCreditTeachers = async (credit, teachers) => {
 }
 
 const updateStudyattainments = async (api, studentnumber) => {
-  logger.info(`update studyattainments called for ${studentnumber}`)
+  console.log(`update studyattainments called for ${studentnumber}`)
   if (api.studyattainments.length === 0) {
-    logger.info(`No study attainments for ${studentnumber}`)
+    console.log(`No study attainments for ${studentnumber}`)
     return
   }
   for (let data of api.studyattainments) {
     const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
-    logger.info(credit)
+    console.log(credit)
     if (!attainmentAlreadyInDb(credit)) {
       await createCourse(course)
       if (!credit.semestercode) {
@@ -139,7 +139,7 @@ const updateStudyattainments = async (api, studentnumber) => {
       await createTeachers(teachers)
       await createCreditTeachers(credit, teachers)
     }
-    logger.info(`Studyattainments updated for ${studentnumber}`)
+    console.log(`Studyattainments updated for ${studentnumber}`)
   }
 }
 
@@ -148,7 +148,7 @@ const updateSemesterEnrollments = async (apidata, studentnumber) => {
     const semesterEnrollment = mapper.semesterEnrollmentFromData(apiEnrollment, studentnumber)
     return SemesterEnrollment.upsert(semesterEnrollment)
   }))
-  logger.info(`semester enrollments updated for ${studentnumber}`)
+  console.log(`semester enrollments updated for ${studentnumber}`)
 }
 
 const deleteStudentStudyrights = async studentnumber => {
@@ -167,9 +167,9 @@ const deleteStudentStudyrights = async studentnumber => {
 const updateStudent = async (studentnumber) => {
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {
-    logger.info(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
+    console.log(`API returned ${api.student} for studentnumber ${studentnumber}.    `)
   } else {
-    logger.info(`TRYING TO UPDATE ${studentnumber}`)
+    console.log(`TRYING TO UPDATE ${studentnumber}`)
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
     await deleteStudentStudyrights(studentnumber)
     await Promise.all([
@@ -178,16 +178,16 @@ const updateStudent = async (studentnumber) => {
       updateSemesterEnrollments(api, studentnumber),
       updateCourseEnrollments(api, studentnumber)
     ])
-    logger.info(`SUCCESSFULLY UPDATED ${studentnumber}`)
+    console.log(`SUCCESSFULLY UPDATED ${studentnumber}`)
   }
 }
 
 const updateStudentFromData = async (api) => {
   if (api.student === null || api.student === undefined) {
-    logger.info(`API returned ${api.student} for studentnumber ${api.studentnumber}.    `)
+    console.log(`API returned ${api.student} for studentnumber ${api.studentnumber}.    `)
   } else {
     const { studentnumber } = api
-    logger.info(`TRYING TO UPDATE ${studentnumber}`)
+    console.log(`TRYING TO UPDATE ${studentnumber}`)
     await Student.upsert(mapper.getStudentFromData(api.student, api.studyrights))
     await deleteStudentStudyrights(studentnumber)
     await Promise.all([
@@ -206,7 +206,7 @@ const updateStudents = async (studentnumbers, chunksize = 1, onUpdateStudent = u
   const runOnUpdate = _.isFunction(onUpdateStudent)
   const remaining = studentnumbers.slice(0)
   while (remaining.length > 0) {
-    logger.info(`remaining: ${remaining.length}`)
+    console.log(`remaining: ${remaining.length}`)
     const nextchunk = remaining.splice(0, chunksize)
     await Promise.all(nextchunk.map(async studentnumber => {
       await updateStudent(studentnumber)
