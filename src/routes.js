@@ -15,14 +15,19 @@ router.get('/log', async (req, res) => {
     const to = req.query.to || Number((new Date().getTime() / 1000 + 60).toFixed(0))
     const results = await between(from, to)
     res.json(results)
-  } catch(e) {
+  } catch (e) {
     console.log('error retrieving logs, msg: ', e.message)
   }
 })
 
 router.post('/log', async (req, res) => {
-  logger.info(req.body.message, req.body.meta)
-  res.status(201)
+  try {
+    logger.info(req.body.message, req.body.meta)
+    res.status(201)
+  } catch (e) {
+    console.log('error Saving logs: ', e.message)
+    res.status(501)
+  }
 })
 
 router.get('*', async (req, res) => {
