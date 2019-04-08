@@ -107,7 +107,9 @@ const createCreditTeachers = async (credit, teachers) => {
 }
 
 const updateStudyattainments = async (api, studentnumber) => {
+  logger.info(`update studyattainments called for ${studentnumber}`)
   for (let data of api.studyattainments) {
+    logger.info(data)
     const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
     logger.info(credit)
     if (!attainmentAlreadyInDb(credit)) {
