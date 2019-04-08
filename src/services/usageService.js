@@ -1,7 +1,7 @@
 const axios = require('axios')
 const { USAGESERVICE_URL } = require('../conf-backend')
 
-const client = axios.create({ baseURL: USAGESERVICE_URL })
+const client = axios.create({ baseURL: USAGESERVICE_URL, headers: { 'secret': process.env.USAGESERVICE_SECRET } })
 
 const ping = async () => {
   const url = '/ping'
