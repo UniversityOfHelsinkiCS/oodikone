@@ -54,7 +54,9 @@ const updateStudyrights = async (api, studentnumber) => {
   for (let data of api.studyrights) {
     logger.info(data)
     await StudyrightExtent.upsert(mapper.studyrightDataToExtent(data))
+    logger.info(`got studyrightextent`)
     const [studyright] = await Studyright.upsert(mapper.getStudyRightFromData(data, studentnumber), { returning: true })
+    logger.info('got studyright')
     for (let element of data.elements) {
       const elementDetail = mapper.elementDetailFromData(element)
       const studyrightElement = mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber)
@@ -63,6 +65,7 @@ const updateStudyrights = async (api, studentnumber) => {
         elementDetailsIds.add(elementDetail.code)
       }
       await StudyrightElement.upsert(studyrightElement)
+      logger.info('got all elements from studyright')
     }
     await createOrUpdateStudyrightTransfers(data, studentnumber)
     logger.info(`studyrights updated for ${studentnumber}`)
