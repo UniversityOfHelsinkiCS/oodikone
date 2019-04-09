@@ -29,6 +29,7 @@ const getStudentFromData = (student, studyrights) => {
   const city = getTextsByLanguage(student.city)
   const language = getTextsByLanguage(student.language)
   const country = getTextsByLanguage(student.country)
+  const gender = getTextsByLanguage(student.gender)
   return {
     studentnumber: student.student_number,
     email: student.email,
@@ -55,7 +56,11 @@ const getStudentFromData = (student, studyrights) => {
     communicationlanguage: language.en || language.fi || language.sv,
     dateofuniversityenrollment: universityEnrollmentDateFromStudyRights(studyrights),
     matriculationexamination: null,
-    abbreviatedname: [student.last_name, student.first_names].join(' ')
+    abbreviatedname: [student.last_name, student.first_names].join(' '),
+    gender_code: student.gender_code,
+    gender_fi: gender.fi,
+    gender_sv: gender.sv,
+    gender_en: gender.en
   }
 }
 

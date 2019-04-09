@@ -38,6 +38,11 @@ const Student = sequelize.define('student',
     country_fi: { type: Sequelize.STRING },
     country_sv: { type: Sequelize.STRING },
     country_en: { type: Sequelize.STRING },
+    gender_code: { type: Sequelize.INTEGER },
+    gender_fi: { type: Sequelize.STRING },
+    gender_sv: { type: Sequelize.STRING },
+    gender_en: { type: Sequelize.STRING },
+
   },
   {
     tableName: 'student',
