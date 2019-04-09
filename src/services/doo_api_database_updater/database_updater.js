@@ -53,7 +53,7 @@ const updateStudyrights = async (api, studentnumber) => {
   }
   for (let data of api.studyrights) {
     await StudyrightExtent.upsert(mapper.studyrightDataToExtent(data))
-    console.log(`got studyrightextent`)
+    console.log('got studyrightextent')
     const [studyright] = await Studyright.upsert(mapper.getStudyRightFromData(data, studentnumber), { returning: true })
     console.log('got studyright')
     let i = 0
