@@ -10,7 +10,7 @@ import styles from './navigationBar.css'
 import { logout, login, returnToSelf } from '../../apiConnection'
 import LanguageChooser from '../LanguageChooser'
 
-const { USER_ADMINER_URL, ADMINER_URL, ANALYTICS_ADMINER_URL } = process.env
+const { USER_ADMINER_URL, ADMINER_URL, ANALYTICS_ADMINER_URL, USAGE_ADMINER_URL } = process.env
 
 class NavigationBar extends Component {
   state = {
@@ -91,6 +91,16 @@ class NavigationBar extends Component {
                 icon="database"
               />
             )}
+            {USAGE_ADMINER_URL && (
+              <Dropdown.Item
+                onClick={() => {
+                  const win = window.open(USAGE_ADMINER_URL, '_blank')
+                  win.focus()
+                }}
+                text="Usage database"
+                icon="database"
+              />
+            )}
             {testUsers.map(user => (
               <Dropdown.Item
                 key={user}
@@ -140,7 +150,6 @@ class NavigationBar extends Component {
               return (
                 <Menu.Item
                   style={{ width: `${itemWidth}%` }}
-                  exact
                   as={Dropdown}
                   key={`menu-item-drop-${value.translateId}`}
                   tabIndex="-1"
@@ -149,7 +158,6 @@ class NavigationBar extends Component {
                   <Dropdown.Menu>
                     {value.items.map(i => (
                       <Dropdown.Item
-                        exact
                         as={NavLink}
                         key={`menu-item-${i.menuRoute}`}
                         to={i.menuRoute}
@@ -168,7 +176,6 @@ class NavigationBar extends Component {
             return (
               <Menu.Item
                 style={{ width: `${itemWidth}%` }}
-                exact
                 as={NavLink}
                 key={`menu-item-${viewableRoute}`}
                 to={viewableRoute}
