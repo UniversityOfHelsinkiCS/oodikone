@@ -13,11 +13,12 @@ class ExtentGraduated extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    extents: arrayOf(object).isRequired
+    extents: arrayOf(object).isRequired,
+    allStudyRights: arrayOf(object).isRequired
   }
 
   state = {
-    extentcode: undefined,
+    code: undefined,
     graduated: undefined,
     complemented: 'false'
   }
@@ -34,34 +35,35 @@ class ExtentGraduated extends Component {
   }
 
   handleLimit = () => {
-    const { extentcode, graduated, complemented } = this.state
-    this.props.setPopulationFilter(extentGraduated({ extentcode, graduated, complemented }))
+    const { code, graduated, complemented } = this.state
+    this.props.setPopulationFilter(extentGraduated({ code, graduated, complemented, isExtent: (typeof code === 'number') }))
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
   }
 
-  renderSetText = (extents, filter) => {
+  renderSetText = (extents, filter, allStudyRights) => {
     const { language } = this.props
-    const { extentcode, graduated, complemented } = filter.params
+    const { code, graduated, complemented, isExtent } = filter.params
     let returnText = ''
     if (graduated === 'grad') {
       returnText = ('students that graduated from')
     } else if (graduated === 'either') {
       returnText = ('students that are studying ')
     }
-    const extentText = (` ${extents.find(extent => extent.extentcode === extentcode).name[language]} `)
+    const postText = isExtent ? (` ${extents.find(extent => extent.extentcode === code).name[language]} `) : (` ${allStudyRights.find(sr => sr.value === code).text}`)
 
     return complemented === 'true' ?
-      <span><b>Excluded</b> {returnText}<b>{extentText}</b></span>
+      <span><b>Excluded</b> {returnText}<b>{postText}</b></span>
       :
-      <span><b>Included</b> {returnText}<b>{extentText}</b></span>
+      <span><b>Included</b> {returnText}<b>{postText}</b></span>
   }
 
   render() {
-    const { extentcode, graduated, complemented } = this.state
-    const { filter, extents, language } = this.props
+    const { code, graduated, complemented } = this.state
+    const { filter, extents, language, allStudyRights } = this.props
+
     if (filter.notSet) {
       return (
         <Segment>
@@ -97,21 +99,19 @@ class ExtentGraduated extends Component {
                 <Dropdown
                   search
                   fluid
-                  name="extentcode"
+                  name="code"
                   placeholder="select extent"
                   onChange={this.handleChange}
-                  options={_.sortBy(
-                    Object.values(extents).map(({
-                      extentcode: code, name
-                    }) =>
-                      ({ value: code, text: name[language] })),
-                    entry => entry.text
-                  )}
+                  options={_.sortBy(Object.values(extents).map(({
+                    extentcode: ecode, name
+                  }) => ({
+                    value: ecode, text: name[language]
+                  })).concat(allStudyRights), entry => entry.text)}
                 />
               </Form.Field>
               <Form.Field>
                 <Button
-                  disabled={!extentcode || !graduated || !(complemented === 'true' || complemented === 'false')}
+                  disabled={!code || !graduated || !(complemented === 'true' || complemented === 'false')}
                   onClick={this.handleLimit}
                 >
                   set filter
@@ -127,7 +127,7 @@ class ExtentGraduated extends Component {
     return (
       <Segment>
         <label>
-          {this.renderSetText(extents, filter)}
+          {this.renderSetText(extents, filter, allStudyRights)}
         </label>
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
