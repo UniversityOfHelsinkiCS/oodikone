@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Icon, Button, Form, Popup, Radio } from 'semantic-ui-react'
+import { Segment, Icon, Button, Form, Popup, Dropdown } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
 
 import infoTooltips from '../../common/InfoToolTips'
@@ -17,12 +17,17 @@ class TransferToStudyrightFilter extends Component {
   }
 
   state = {
-    negated: false
+    negated: 'false'
   }
 
+  options = [{ value: 'false', text: 'have not' }, { value: 'true', text: 'have' }]
+
   handleRadio = () => {
-    this.props.setPopulationFilter(transferTo({ negated: this.state.negated }))
-    this.setState({ starting: true })
+    this.props.setPopulationFilter(transferTo({ negated: this.state.negated === 'true' }))
+  }
+
+  handleChange = (e, { value }) => {
+    this.setState({ negated: value })
   }
 
   clearFilter = () => {
@@ -31,9 +36,7 @@ class TransferToStudyrightFilter extends Component {
 
   render() {
     const { filter, studyrightName, language } = this.props
-    const toggleLabel = this.state.negated
-      ? `have transferred to ${studyrightName[language]}`
-      : `have not transfer to ${studyrightName[language]}`
+    const toggleLabel = `transferred to ${studyrightName[language]}`
 
     if (filter.notSet) {
       return (
@@ -48,12 +51,16 @@ class TransferToStudyrightFilter extends Component {
                 <label>Show only students that</label>
               </Form.Field>
               <Form.Field>
-                <Radio
-                  toggle
-                  label={toggleLabel}
-                  checked={this.state.starting}
-                  onChange={() => this.setState({ negated: !this.state.negated })}
+                <Dropdown
+                  fluid
+                  placeholder="have/have not"
+                  name="complemented"
+                  onChange={this.handleChange}
+                  options={this.options}
                 />
+              </Form.Field>
+              <Form.Field>
+                <label>{toggleLabel}</label>
               </Form.Field>
               <Form.Field>
                 <Button
@@ -61,7 +68,6 @@ class TransferToStudyrightFilter extends Component {
                 >
                   set filter
                 </Button>
-
               </Form.Field>
             </Form.Group>
           </Form>
