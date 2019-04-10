@@ -7,7 +7,7 @@ import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, TOKEN_NAME } from '../constants'
 import toskaLogo from '../assets/toska.png'
 import irtomikko from '../assets/irtomikko.png'
 import { sendLog, login } from '../apiConnection'
-window.moment = moment
+
 export const setToken = token => localStorage.setItem(TOKEN_NAME, token)
 
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
