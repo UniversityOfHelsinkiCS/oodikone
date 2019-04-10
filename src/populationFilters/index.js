@@ -78,7 +78,7 @@ export const transferFilter = (params) => {
     },
     filter: student => student.transfers.map(transfer =>
       (source === 'anywhere' || transfer.source.code === source) &&
-        (target === 'anywhere' || transfer.target.code === target))
+      (target === 'anywhere' || transfer.target.code === target))
       .some(b => b === true)
 
   })
@@ -121,33 +121,39 @@ export const courseParticipation = ({ field, course }) =>
   })
 
 export const extentGraduated = (params) => {
-  const { extentcode, graduated, complemented, studyright } = params
+  const { code, graduated, complemented, isExtent, studyright } = params
   return ({
     id: uuidv4(),
     type: 'ExtentGraduated',
     params: {
-      extentcode,
+      code,
       graduated,
       complemented,
-      studyright
+      studyright,
+      isExtent
     },
     filter: (student) => {
-      if (complemented === 'true' && graduated === 'either') {
-        // jos koodi 7 eli exchange student
-        const thisStudyright = student.studyrights
-          .find(s => s.studyrightElements.map(e => e.code).includes(studyright))
+      if (isExtent) {
+        if (complemented === 'true' && graduated === 'either') {
+          // jos koodi 7 eli exchange student
+          const thisStudyright = student.studyrights
+            .find(s => s.studyrightElements.map(e => e.code).includes(studyright))
 
-        return !thisStudyright || thisStudyright.extentcode !== extentcode
-      } else if (complemented === 'true' && graduated === 'grad') {
-        return !student.studyrights.filter(sr =>
-          sr.extentcode === extentcode && sr.graduated).map(sr =>
-          sr.extentcode).includes(extentcode)
-      } else if (complemented === 'false' && graduated === 'either') {
-        return student.studyrights.map(sr => sr.extentcode).includes(extentcode)
+          return !thisStudyright || thisStudyright.extentcode !== code
+        } else if (complemented === 'true' && graduated === 'grad') {
+          return !student.studyrights.filter(sr =>
+            sr.extentcode === code && sr.graduated).map(sr =>
+            sr.extentcode).includes(code)
+        } else if (complemented === 'false' && graduated === 'either') {
+          return student.studyrights.map(sr => sr.extentcode).includes(code)
+        }
+        return student.studyrights.filter(sr =>
+          sr.extentcode === code && sr.graduated).map(sr =>
+          sr.extentcode).includes(code)
       }
-      return student.studyrights.filter(sr =>
-        sr.extentcode === extentcode && sr.graduated).map(sr =>
-        sr.extentcode).includes(extentcode)
+      const foundStudyRight = student.studyrights.find(s => s.studyrightElements.map(e => e.code).includes(code))
+      const returnable = graduated !== 'grad' ? !!foundStudyRight : foundStudyRight && foundStudyRight.graduated
+      return complemented ? returnable : !returnable
     }
   })
 }
