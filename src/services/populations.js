@@ -22,8 +22,9 @@ const universityEnrolmentDates = async () => {
 
 const formatStudentForPopulationStatistics = ({
   firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount,
-  matriculationexamination, gender, credits, abbreviatedname, email, studyrights,
-  semester_enrollments, transfers, updatedAt, createdAt
+  matriculationexamination, credits, abbreviatedname, email, studyrights,
+  semester_enrollments, transfers, updatedAt, createdAt, gender_code,
+  gender_fi, gender_sv, gender_en
 }, startDate, endDate) => {
 
   const toCourse = ({ grade, attainment_date, credits, course, credittypecode, isStudyModule }) => {
@@ -92,7 +93,8 @@ const formatStudentForPopulationStatistics = ({
     name: abbreviatedname,
     transfers: transfers || [],
     matriculationexamination,
-    gender,
+    gender_code,
+    gender: { gender_en, gender_fi, gender_sv },
     email,
     semesterenrollments,
     updatedAt: updatedAt || createdAt,
