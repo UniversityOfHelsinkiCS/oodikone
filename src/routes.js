@@ -22,11 +22,11 @@ router.get('/log', async (req, res) => {
 
 router.post('/log', async (req, res) => {
   try {
-    logger.info(req.body.message, req.body.meta)
-    res.status(201)
+    await logger.info(req.body.message, req.body.meta)
+    res.status(201).end()
   } catch (e) {
     console.log('error Saving logs: ', e.message)
-    res.status(501)
+    res.status(500).send(e.message)
   }
 })
 

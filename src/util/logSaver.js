@@ -3,7 +3,7 @@ const uuid = require('uuid')
 const { UsageStatistic } = require('../models')
 
 module.exports = class LogSaverTransport extends Transport {
-  log(payload) {
+  async log(payload, callback) {
     if (payload.url && payload.method) {
       const object = {
         id: uuid.v4(),
@@ -16,7 +16,13 @@ module.exports = class LogSaverTransport extends Transport {
         status: payload.status,
         data: payload
       }
-      UsageStatistic.create(object)
+      try {
+        await UsageStatistic.create(object)
+        callback()
+      } catch (e) {
+        console.log('error', e)
+        callback()
+      }
     }
   }
 }
