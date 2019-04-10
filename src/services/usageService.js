@@ -17,8 +17,6 @@ const get = async (from, to) => {
   return response.data
 }
 
-
-
 module.exports = {
   ping,
   log,
