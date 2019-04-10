@@ -1,11 +1,22 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Icon, Radio, Button, Form, Popup } from 'semantic-ui-react'
+import { Segment, Icon, Button, Form, Popup, Dropdown } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
 
 import infoTooltips from '../../common/InfoToolTips'
 import { startingThisSemester } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+
+const dropDownOptions = [
+  {
+    text: 'started ',
+    value: 'started'
+  },
+  {
+    text: 'did not start ',
+    value: 'didnotstart'
+  }
+]
 
 class StartingThisSemester extends Component {
   static propTypes = {
@@ -16,6 +27,10 @@ class StartingThisSemester extends Component {
 
   state = {
     starting: true
+  }
+
+  handleChange = (e, data) => {
+    this.setState({ starting: data.value === 'started' })
   }
 
   handleRadio = () => {
@@ -29,9 +44,6 @@ class StartingThisSemester extends Component {
 
   render() {
     const { filter } = this.props
-    const toggleLabel = this.state.starting
-      ? 'started this semester'
-      : 'had started before this semester'
 
     if (filter.notSet) {
       return (
@@ -46,12 +58,17 @@ class StartingThisSemester extends Component {
                 <label>Show only students that</label>
               </Form.Field>
               <Form.Field>
-                <Radio
-                  toggle
-                  label={toggleLabel}
-                  checked={this.state.starting}
-                  onChange={() => this.setState({ starting: !this.state.starting })}
+                <Dropdown
+                  search
+                  fluid
+                  name="degree"
+                  defaultValue="started"
+                  onChange={this.handleChange}
+                  options={dropDownOptions}
                 />
+              </Form.Field>
+              <Form.Field>
+                <label>this semester</label>
               </Form.Field>
               <Form.Field>
                 <Button
