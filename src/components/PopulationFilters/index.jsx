@@ -166,7 +166,7 @@ class PopulationFilters extends Component {
 
   renderAddFilters(allStudyRights) {
     const { extents, transfers } = this.props
-  
+
     const { Add } = infotooltips.PopulationStatistics.Filters
     const allFilters = _.union(Object.keys(componentFor).filter(f =>
       !(Object.keys(advancedFilters).includes(f) && !this.state.advancedUser)).map(f =>
@@ -240,23 +240,6 @@ class PopulationFilters extends Component {
     return (
       <Segment>
         <Header>Filters <InfoBox content={Filters} /></Header>
-        <Form>
-          <Form.Group inline>
-            <Form.Field>
-              <label>Showing students that</label>
-            </Form.Field>
-            <Form.Field>
-              <Radio
-                toggle
-                checked={this.props.complemented}
-                onClick={this.props.setComplementFilter}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label>{!this.props.complemented ? ' are included in the filters.' : ' are in excluded by the filters.'}</label>
-            </Form.Field>
-          </Form.Group>
-        </Form>
         {this.props.filters.map(filter => {
 
           if (filter.type !== 'Preset') {
@@ -266,6 +249,21 @@ class PopulationFilters extends Component {
             filter, key: filter.id, destroy: this.destroyFromAllFilters
           })
         })}
+        <Form>
+          <Form.Group inline>
+            <Form.Field>
+              <label>Show filtered students only</label>
+            </Form.Field>
+            <Form.Field>
+              <Radio
+                toggle
+                checked={this.props.complemented}
+                onClick={this.props.setComplementFilter}
+              />
+            </Form.Field>
+          </Form.Group>
+        </Form>
+
 
         <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
         {this.state.advancedUser ?
