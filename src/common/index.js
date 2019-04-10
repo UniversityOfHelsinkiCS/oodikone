@@ -135,7 +135,7 @@ export const containsOnlyNumbers = str => str.match('^\\d+$')
 
 export const momentFromFormat = (date, format) => moment(date, format)
 
-export const reformatDate = (date, outputFormat) => (!date ? 'Unavailable' : moment(date).format(outputFormat))
+export const reformatDate = (date, outputFormat) => (!date ? 'Unavailable' : moment(date).local().format(outputFormat))
 
 export const isInDateFormat = (date, format) => moment(date, format, true).isValid()
 export const isValidYear = year => (year.isSameOrBefore(Datetime.moment(), 'year')
