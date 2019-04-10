@@ -164,9 +164,9 @@ class PopulationFilters extends Component {
   destroyFromAllFilters = id => this.setState({ presetFilters: this.state.presetFilters.filter(filter => filter.id !== id) })
 
 
-  renderAddFilters() {
+  renderAddFilters(allStudyRights) {
     const { extents, transfers } = this.props
-
+  
     const { Add } = infotooltips.PopulationStatistics.Filters
     const allFilters = _.union(Object.keys(componentFor).filter(f =>
       !(Object.keys(advancedFilters).includes(f) && !this.state.advancedUser)).map(f =>
@@ -209,7 +209,7 @@ class PopulationFilters extends Component {
         {unsetFilters.map(filterName => {//eslint-disable-line
           if (componentFor[filterName]) { // THIS IS KINDA HACKED SOLUTION PLS FIX
             return React.createElement(componentFor[filterName], {
-              filter: { notSet: true }, key: filterName, samples: this.props.samples, transfers, extents
+              filter: { notSet: true }, key: filterName, samples: this.props.samples, transfers, extents, allStudyRights
             })
           }
           else {
@@ -230,7 +230,7 @@ class PopulationFilters extends Component {
   }
 
 
-  renderSetFilters(handleSave) {
+  renderSetFilters(handleSave, allStudyRights) {
     const setFilters = this.props.filters.map(f => f.type)
     const { Filters } = infotooltips.PopulationStatistics.Filters
     if (setFilters.length === 0) {
@@ -260,7 +260,7 @@ class PopulationFilters extends Component {
         {this.props.filters.map(filter => {
 
           if (filter.type !== 'Preset') {
-            return React.createElement(componentFor[filter.type], { filter, key: filter.id, samples: this.props.samples, transfers: this.props.transfers, extents: this.props.extents })
+            return React.createElement(componentFor[filter.type], { filter, key: filter.id, samples: this.props.samples, transfers: this.props.transfers, extents: this.props.extents, allStudyRights })
           }
           return React.createElement(Preset, {
             filter, key: filter.id, destroy: this.destroyFromAllFilters
@@ -314,11 +314,15 @@ class PopulationFilters extends Component {
   }
 
   render() {
-
+    const { allStudyRights, language } = this.props
+    let allStudyRightOptions = []
+    if (allStudyRights) {
+      allStudyRightOptions = Object.values(allStudyRights).reduce((options, level) => [...options, ...level.map(sr => ({ value: sr.code, text: sr.name[language] }))], [])
+    }
     return (
       <div>
-        {this.renderAddFilters()}
-        {this.renderSetFilters(this.handleSavePopulationFilters)}
+        {this.renderAddFilters(allStudyRightOptions)}
+        {this.renderSetFilters(this.handleSavePopulationFilters, allStudyRightOptions)}
       </div>
     )
   }
@@ -330,7 +334,8 @@ const mapStateToProps = ({
   locale,
   graphSpinner,
   populations,
-  populationCourses
+  populationCourses,
+  settings
 }) => ({
 
   populationCourses: populationCourses[0],
@@ -339,7 +344,9 @@ const mapStateToProps = ({
   complemented: populationFilters.complemented,
   translate: getTranslate(locale),
   loading: graphSpinner,
+  language: settings.language,
   studyRights: populations.query.studyRights,
+  allStudyRights: populations.data.studyrights,
   extents: populations.data.extents,
   transfers: populations.data.transfers
 })
