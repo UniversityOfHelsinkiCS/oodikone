@@ -10,7 +10,7 @@ const initial = () => ({
 })
 
 export const switchLanguage = (username, language) => {
-  const route = '/users/language'
+  const route = '/language'
   const prefix = 'SWITCH_LANGUAGE_'
   const data = { username, language }
   const method = 'post'
