@@ -51,8 +51,7 @@ const reducer = (state = { data: [] }, action) => {
       return {
         ...state,
         pending: false,
-        error: true,
-        data: action.response
+        error: true
       }
     case 'ADD_MANDATORY_COURSE_SUCCESS':
       return {
