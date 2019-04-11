@@ -34,7 +34,7 @@ module.exports = (app, url) => {
   app.use(`${url}/usage`, auth.roles(['usage']), usage)
   app.use(`${url}/oodilearn`, auth.roles(['oodilearn']), oodilearn)
   app.use(`${url}/course-groups`, auth.roles(['coursegroups']), courseGroups)
-  app.use(`${url}/mandatory_courses`, auth.roles(['studyprogramme']), mandatoryCourses),
+  app.use(`${url}/mandatory_courses`, mandatoryCourses),
   app.use(`${url}/oodi`, auth.roles(['dev']), oodi)
   app.use(url, auth.roles(['dev', 'admin']), task)
 }
