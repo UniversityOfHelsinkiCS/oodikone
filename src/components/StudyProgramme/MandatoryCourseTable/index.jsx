@@ -13,7 +13,7 @@ const MandatoryCourseTable = ({ studyProgramme, mandatoryCourses, language, dele
   )
 
   const columns = [
-    { key: 'name', title: 'Name', getRowVal: course => course.name[language] },
+    { key: 'name', title: 'Name', getRowVal: course => course.name ? course.name[language] : null }, //eslint-disable-line
     { key: 'code', title: 'Code', getRowVal: course => course.code },
     { key: 'delete', title: 'Delete', getRowVal: course => deleteButton(course.code) }
   ]
