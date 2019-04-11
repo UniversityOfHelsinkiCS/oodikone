@@ -4,6 +4,7 @@ const courses = require('./routes/courses')
 const students = require('./routes/students')
 const population = require('./routes/population')
 const login = require('./routes/login')
+const language = require('./routes/language')
 const users = require('./routes/users')
 const elementdetails = require('./routes/elementdetails')
 const auth = require('./middleware/auth')
@@ -27,6 +28,7 @@ module.exports = (app, url) => {
   app.use(url, courses)
   app.use(url, students)
   app.use(url, population)
+  app.use(url, language)
   app.use(url, providers)
   app.use(url, semesters)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
@@ -34,7 +36,7 @@ module.exports = (app, url) => {
   app.use(`${url}/usage`, auth.roles(['usage']), usage)
   app.use(`${url}/oodilearn`, auth.roles(['oodilearn']), oodilearn)
   app.use(`${url}/course-groups`, auth.roles(['coursegroups']), courseGroups)
-  app.use(`${url}/mandatory_courses`, auth.roles(['studyprogramme']), mandatoryCourses),
+  app.use(`${url}/mandatory_courses`, mandatoryCourses),
   app.use(`${url}/oodi`, auth.roles(['dev']), oodi)
   app.use(url, auth.roles(['dev', 'admin']), task)
 }
