@@ -15,7 +15,7 @@ const updateStudent = student => {
   })
 }
 
-const byId = async (id) => Student.findByPrimary(id, {
+const byId = async (id) => Student.findByPk(id, {
   include: [
     {
       model: Credit,
