@@ -49,7 +49,7 @@ const bySearchTerm = async (rawTerm) => {
   })
 }
 
-const findTeacherCredits = teacherid => Teacher.findByPrimary(teacherid, {
+const findTeacherCredits = teacherid => Teacher.findByPk(teacherid, {
   attributes: ['name', 'code', 'id'],
   include: {
     model: Credit,

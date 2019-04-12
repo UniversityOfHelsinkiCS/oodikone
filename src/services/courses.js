@@ -89,7 +89,7 @@ const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) =
   })
 }
 
-const byCode = code => Course.findByPrimary(code)
+const byCode = code => Course.findByPk(code)
 
 const creditsForCourses = (codes) => Credit.findAll({
   include: [
