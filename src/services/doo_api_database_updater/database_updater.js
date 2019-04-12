@@ -18,10 +18,6 @@ let attainmentIds = new Set()
 let courseIds = new Set()
 let elementDetailsIds = new Set()
 
-process.on('unhandledRejection', (reason, p) => {
-  logger.error('Unhandled Rejection at: Promise', { promise: p, reason, stack: reason.stack })
-})
-
 const getAllStudentInformationFromApi = async studentnumber => {
   const [student, studyrights, studyattainments, semesterEnrollments, courseEnrollments] = await Promise.all([
     Oodi.getStudent(studentnumber),
