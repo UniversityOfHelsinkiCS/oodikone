@@ -1,6 +1,5 @@
 const Oodi = require('./oodi_interface')
 const OrganisationService = require('../organisations')
-const logger = require('../../util/logger')
 const mapper = require('./oodi_data_mapper')
 const {
   Student, Studyright, ElementDetails, StudyrightElement, Credit, Course,
@@ -17,10 +16,6 @@ const { updateAttainmentDates } = require('./update_attainment_dates')
 let attainmentIds = new Set()
 let courseIds = new Set()
 let elementDetailsIds = new Set()
-
-process.on('unhandledRejection', (reason, p) => {
-  logger.error('Unhandled Rejection at: Promise', { promise: p, reason, stack: reason.stack })
-})
 
 const getAllStudentInformationFromApi = async studentnumber => {
   const [student, studyrights, studyattainments, semesterEnrollments, courseEnrollments] = await Promise.all([

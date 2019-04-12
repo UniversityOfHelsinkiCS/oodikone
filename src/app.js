@@ -7,7 +7,7 @@ const routes = require('./routes')
 const { PORT } = conf
 const app = express()
 
-Raven.config(process.env.SENTRY_ADDR).install()
+Raven.config(process.env.SENTRY_ADDR, { captureUnhandledRejections: true }).install()
 
 app.use(cors({ credentials: true, origin: conf.frontend_addr }))
 app.use(bodyParser.json())
