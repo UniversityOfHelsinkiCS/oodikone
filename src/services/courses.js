@@ -1,6 +1,11 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
-const { sequelize, Student, Credit, Course, CourseType, Discipline, ElementDetails, StudyrightElement, Studyright, Semester } = require('../models')
+const {
+  sequelize, Student, Credit,
+  Course, CourseType, Discipline,
+  ElementDetails, StudyrightElement,
+  Studyright, Semester
+} = require('../models')
 const { redisClient } = require('../services/redis')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../services/course_yearly_stats_counter')
@@ -130,7 +135,11 @@ const creditsForCourses = (codes) => Credit.findAll({
 })
 
 const bySearchTerm = async (term, language) => {
-  const formatCourse = (course) => ({ name: course.name[language], code: course.code, date: course.latest_instance_date })
+  const formatCourse = (course) => ({
+    name: course.name[language],
+    code: course.code,
+    date: course.latest_instance_date
+  })
 
   try {
     const result = await byNameOrCode(`%${term}%`, language)
@@ -143,7 +152,11 @@ const bySearchTerm = async (term, language) => {
 }
 
 const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) => {
-  const formatCourse = (course) => ({ name: course.name[language], code: course.code, date: course.latest_instance_date })
+  const formatCourse = (course) => ({
+    name: course.name[language],
+    code: course.code,
+    date: course.latest_instance_date
+  })
   const removeDuplicates = (courses) => {
     let newList = []
     courses.map(course => {
@@ -198,23 +211,45 @@ const creditsOf = async (codes) => {
 const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 
   const calculateStats = (thisSemester, allInstancesUntilSemester) => {
-    const studentsThatPassedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c => c.student))))
-    const gradeDistribution = _.groupBy(_.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits))), 'grade')
-    const studentsThatFailedThisYear = _.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student))))
-    const allStudentsThatFailedEver = _.flattenDeep(allInstancesUntilSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student)))
-    const passedStudentsThatFailedBefore = _.uniq(studentsThatPassedThisYear.filter(student => allStudentsThatFailedEver.map(s => s.studentnumber).includes(student.studentnumber)))
+    const studentsThatPassedThisYear = _.uniq(_.flattenDeep(thisSemester
+      .map(inst => inst.credits.filter(Credit.passed).map(c => c.student))))
+
+    const gradeDistribution = _.groupBy(_.uniq(_.flattenDeep(thisSemester
+      .map(inst => inst.credits))), 'grade')
+
+    const studentsThatFailedThisYear = _.uniq(_.flattenDeep(thisSemester
+      .map(inst => inst.credits.filter(Credit.failed).map(c => c.student))))
+
+    const allStudentsThatFailedEver = _.flattenDeep(allInstancesUntilSemester
+      .map(inst => inst.credits.filter(Credit.failed).map(c => c.student)))
+
+    const passedStudentsThatFailedBefore = _.uniq(studentsThatPassedThisYear
+      .filter(student => allStudentsThatFailedEver.map(s => s.studentnumber).includes(student.studentnumber)))
+
     const passedStudentsOnFirstTry = _.difference(studentsThatPassedThisYear, passedStudentsThatFailedBefore)
     const failedStudentsThatFailedBefore = _.uniq(_.flattenDeep(studentsThatFailedThisYear.filter(student =>
-      Object.entries(_.countBy(allStudentsThatFailedEver, 'studentnumber')).some(([number, count]) => number === student.studentnumber && count > 1))))
+      Object.entries(_.countBy(allStudentsThatFailedEver, 'studentnumber'))
+        .some(([number, count]) => number === student.studentnumber && count > 1))))
+
     const failedStudentsOnFirstTry = _.difference(studentsThatFailedThisYear, failedStudentsThatFailedBefore)
 
-    return { studentsThatPassedThisYear, studentsThatFailedThisYear, allStudentsThatFailedEver, passedStudentsThatFailedBefore, passedStudentsOnFirstTry, failedStudentsThatFailedBefore, failedStudentsOnFirstTry, gradeDistribution }
+    return {
+      studentsThatPassedThisYear, studentsThatFailedThisYear, allStudentsThatFailedEver,
+      passedStudentsThatFailedBefore, passedStudentsOnFirstTry, failedStudentsThatFailedBefore,
+      failedStudentsOnFirstTry, gradeDistribution
+    }
   }
   const stats = []
   if (separate === 'true') {
-    const fallInstances = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-01-15'))
-    const allInstancesUntilFall = allInstancesUntilYear.filter(inst => moment(inst.date).isBefore(String(year + 1) + '-01-15'))
-    const springInstances = instances.filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-08-01'))
+    const fallInstances = instances.
+      filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-01-15'))
+
+    const allInstancesUntilFall = allInstancesUntilYear
+      .filter(inst => moment(inst.date).isBefore(String(year + 1) + '-01-15'))
+
+    const springInstances = instances
+      .filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-08-01'))
+
     let fallStatistics = calculateStats(fallInstances, allInstancesUntilFall)
 
     let springStatistics = calculateStats(springInstances, allInstancesUntilYear)
@@ -255,7 +290,9 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
     }
 
   } else {
-    const yearInst = instances.filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-08-01'))
+    const yearInst = instances
+      .filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-08-01'))
+
     let statistics = calculateStats(yearInst, allInstancesUntilYear)
     const passed = yearInst.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
     const failed = yearInst.reduce((a, b) => b.fail ? a = a.concat(b.credits[0].student) : a, [])
@@ -293,7 +330,9 @@ const yearlyStatsOf = async (code, year, separate, language) => {
   const alternatives = await getDuplicateCodes(code)
   const codes = alternatives ? [code, ...Object.keys(alternatives.alt)] : [code]
   const allInstances = await creditsOf(codes)
-  const yearInst = allInstances.filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-09-01', year.end + '-08-01'))
+  const yearInst = allInstances
+    .filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-09-01', year.end + '-08-01'))
+
   const allInstancesUntilYear = allInstances.filter(inst => moment(new Date(inst.date)).isBefore(year.end + '-08-01'))
   const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name[language]
   const start = Number(year.start)
@@ -309,7 +348,13 @@ const yearlyStatsOf = async (code, year, separate, language) => {
         resultProgrammes = getProgrammesFromStats(stats)
       }
     }
-    return { code, alternativeCodes: codes.filter(cd => cd !== code), start, end, separate, stats: resultStats, programmes: resultProgrammes, name }
+    return {
+      code,
+      alternativeCodes: codes.filter(cd => cd !== code),
+      start, end, separate,
+      stats: resultStats, programmes: resultProgrammes,
+      name
+    }
   }
   return
 }
@@ -473,10 +518,15 @@ const parseCredit = credit => {
 
 const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode) => {
   const codes = await alternativeCodes(coursecode)
-  const [credits, course] = await Promise.all([creditsForCourses(codes), Course.findById(coursecode)])
+  const [credits, course] = await Promise.all([creditsForCourses(codes), Course.findByPk(coursecode)])
   const counter = new CourseYearlyStatsCounter()
   for (let credit of credits) {
-    const { studentnumber, grade, passed, semestercode, semestername, yearcode, yearname, programmes } = parseCredit(credit)
+    const {
+      studentnumber, grade, passed,
+      semestercode, semestername,
+      yearcode, yearname, programmes
+    } = parseCredit(credit)
+
     if (startyearcode <= yearcode && yearcode <= endyearcode) {
       const groupcode = separate ? semestercode : yearcode
       const groupname = separate ? semestername : yearname
@@ -504,7 +554,9 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
 }
 
 const courseYearlyStats = async (coursecodes, separate, startyearcode, endyearcode) => {
-  const stats = await Promise.all(coursecodes.map(code => yearlyStatsOfNew(code, separate, startyearcode, endyearcode||startyearcode)))
+  const stats = await Promise.all(coursecodes
+    .map(code => yearlyStatsOfNew(code, separate, startyearcode, endyearcode || startyearcode)))
+
   return stats
 }
 
@@ -538,7 +590,12 @@ const codeLikeTerm = (code) => !code ? undefined : {
 
 const byNameAndOrCodeLike = (name, code) => {
   return Course.findAll({
-    attributes: ['name', 'code', ['latest_instance_date', 'date'], 'startdate', 'enddate', 'max_attainment_date', 'min_attainment_date'],
+    attributes: [
+      'name', 'code',
+      ['latest_instance_date', 'date'],
+      'startdate', 'enddate', 'max_attainment_date',
+      'min_attainment_date'
+    ],
     where: {
       ...nameLikeTerm(name),
       ...codeLikeTerm(code)
