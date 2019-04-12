@@ -33,7 +33,7 @@ describe('Database updater for saving faculties', () => {
   beforeAll(async () => {
     mockApiGet('/codes/faculties', faculties)
     await updateFaculties()
-    organisation = await Organisation.findByPrimary('FAC1')
+    organisation = await Organisation.findByPk('FAC1')
   })
 
   test('Database updater saves correct amount of faculties', async () => {

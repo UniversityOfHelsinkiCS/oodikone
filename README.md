@@ -196,7 +196,7 @@ For local development use with anonymized data use `2) Anon setup` (you can run 
 
 `1) e2e setup` is designed for use in travis. But you can still try it locally if you want to.
 
-Run E2E tests with `npm run cypress:run` or `npm run cypress:open` if you want to see what it's doing. 
+Run E2E tests in ToskaWatch with `npm run cypress:run` or `npm run cypress:open` for local tests.
 
 
 ## Teacher leader board statistics
