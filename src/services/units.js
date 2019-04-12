@@ -26,7 +26,7 @@ const getUnitsFromElementDetails = async () => {
 }
 
 const getUnitFromElementDetail = async id => {
-  const element = await ElementDetails.findByPrimary(id)
+  const element = await ElementDetails.findByPk(id)
   return parseUnitFromElement(element)
 }
 
