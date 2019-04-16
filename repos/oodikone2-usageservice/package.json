@@ -1,0 +1,28 @@
+{
+  "name": "oodikone2-usageservice",
+  "version": "0.0.1",
+  "description": "Logging and usage statistic for Oodikone",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.18.10"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "lodash": "^4.17.11",
+    "pg": "^7.9.0",
+    "sequelize": "^5.2.8",
+    "umzug": "^2.2.0",
+    "uuid": "^3.3.2",
+    "winston": "^3.2.1",
+    "winston-log2gelf": "^2.0.4",
+    "winston-transport": "^4.3.0"
+  }
+}
