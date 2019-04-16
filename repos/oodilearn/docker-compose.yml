@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  mongo_db:
+    image: mongo
+    restart: unless-stopped
+    volumes:
+      - ./mongo/:/data/db
+      - ./models/data/:/some-data
+    ports:
+      - "27017:27017"
+    container_name: mongo_db
+  oodilearn:
+    image: oodilearn
+    restart: unless-stopped
+    volumes:
+      - ./server:/src
+      - ./models:/models
+      - ./data:/data
+    ports:
+      - "5000:5000"
+    environment:
+      - ENV=development
+      - MONGO_URI=mongodb://mongo_db:27017/oodilearn
+    container_name: oodilearn

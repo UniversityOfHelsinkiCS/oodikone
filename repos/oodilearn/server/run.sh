@@ -1,0 +1,1 @@
+echo "Vittu Sasu" && docker build -t oodilearn . && docker run -it -v mdl:/src/models -v /home/local/sasumaki/toska/oodilearn/server:/src -p 5000:5000 oodilearn 
