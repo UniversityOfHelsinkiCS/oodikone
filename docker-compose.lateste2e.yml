@@ -1,0 +1,143 @@
+version: '3'
+
+services:
+  analytics_db:
+    image: postgres:9.6.3
+    ports:
+      - "5423:5432"
+    volumes:
+      - ./analytics_pgdata:/var/lib/postgresql/data
+    container_name: oodi_analytics_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=analytics_db
+
+  user_db:
+    image: postgres:9.6.3
+    ports:
+      - "5422:5432"
+    volumes:
+      - ./user_pgdata:/var/lib/postgresql/data
+    container_name: oodi_user_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=user_db
+
+  db:
+    image: postgres:9.6.3
+    ports:
+      - "5421:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    container_name: oodi_db
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
+      - POSTGRES_USER=postgres
+
+  redis:
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-data:/data
+    container_name: redis
+
+  analytics_redis:
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6380:6379"
+    volumes:
+      - ./analytics-redis-data:/data
+    container_name: analytics_redis
+
+  mongo_db:
+    image: mongo
+    restart: unless-stopped
+    volumes:
+      - ./backups/mongo/oodilearn:/dump
+      - ./mongodata:/data/db
+    ports:
+      - "27017:27017"
+    container_name: mongo_db
+
+  backend:
+    image: toska/oodikone2-backend:staging
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "9229:9229"
+    environment:
+      REDIS: redis
+      DB_URL: postgres://postgres@db:5432/tkt_oodi
+      TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
+      FRONT_URL: http://localhost:1337
+      TOKEN_SECRET: IWannaBeTheVeryBest
+      OODILEARN_URL: http://oodilearn:5000
+      USERSERVICE_URL: http://userservice:4567
+      USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
+    container_name: backend
+    entrypoint: 'node --inspect=0.0.0.0:9229 --max_old_space_size=4096 index.js'
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    image: toska/oodikone2-frontend:staging
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      BACKEND_ADDR: backend
+      ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
+    container_name: frontend
+
+  userservice:
+    image: toska/oodikone2-userservice:staging
+    restart: unless-stopped
+    ports:
+      - 4567:4567
+    environment:
+      - DB_URL=postgres://postgres@user_db:5432/user_db
+      - TEST_DB=postgres://postgres@user_db:5432/user_db_test
+      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      - TOKEN_SECRET=IWannaBeTheVeryBest
+    depends_on:
+      - user_db
+    container_name: userservice
+
+  analytics:
+    image: toska/oodikone2-analytics:staging
+    restart: unless-stopped
+    ports:
+      - 4568:4568
+    environment:
+      - REDIS=analytics_redis
+      - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
+      - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
+    depends_on:
+      - analytics_db
+      - analytics_redis
+    container_name: analytics
+
+  nginx:
+    image: nginx:latest
+    restart: unless-stopped
+    volumes: 
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/error.log:/etc/nginx/error_log.log
+      - ./nginx/log:/var/log/nginx/localhost.error_log
+      - ./nginx/cache/:/etc/nginx/cache
+      - /etc/letsencrypt/:/etc/letsencrypt/
+    ports:
+      -  1337:80
+    depends_on: 
+      - frontend
+      - backend
+      - userservice
+      - analytics
+
+    container_name: nginx

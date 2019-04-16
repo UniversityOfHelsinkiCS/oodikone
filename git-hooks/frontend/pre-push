@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "Running tests inside of the oodikone2-cli network."
+docker exec -t frontend sh -c "npm run lint"
+exit
