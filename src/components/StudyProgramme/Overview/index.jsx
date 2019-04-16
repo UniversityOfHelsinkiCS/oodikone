@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useEffect } from 'react'
 import { string, func, shape, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import ProductivityTable from '../ProductivityTable'
@@ -6,32 +6,30 @@ import ThroughputTable from '../ThroughputTable'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
 
-class Overview extends Component {
-  componentDidMount() {
-    const { studyprogramme, productivity, throughput } = this.props
-    if (!productivity.data[studyprogramme]) this.props.dispatchGetProductivity(studyprogramme)
-    if (!throughput.data[studyprogramme]) this.props.dispatchGetThroughput(studyprogramme)
-  }
+const Overview = (props) => {
+  const { productivity, throughput, studyprogramme, dispatchGetProductivity, dispatchGetThroughput } = props
 
-  render() {
-    const { productivity, throughput, studyprogramme } = this.props
-    return (
-      <React.Fragment>
-        <ThroughputTable
-          throughput={throughput.data[studyprogramme]}
-          thesis={throughput.data.thesis}
-          loading={throughput.pending}
-          error={throughput.error}
-        />
-        <ProductivityTable
-          productivity={productivity.data[studyprogramme]}
-          thesis={throughput.data.thesis}
-          loading={productivity.pending}
-          error={productivity.error}
-        />
-      </React.Fragment>
-    )
-  }
+  useEffect(() => {
+    dispatchGetProductivity(studyprogramme)
+    dispatchGetThroughput(studyprogramme)
+  }, [])
+
+  return (
+    <React.Fragment>
+      <ThroughputTable
+        throughput={throughput.data[studyprogramme]}
+        thesis={throughput.data.thesis}
+        loading={throughput.pending}
+        error={throughput.error}
+      />
+      <ProductivityTable
+        productivity={productivity.data[studyprogramme]}
+        thesis={throughput.data.thesis}
+        loading={productivity.pending}
+        error={productivity.error}
+      />
+    </React.Fragment>
+  )
 }
 
 Overview.propTypes = {
