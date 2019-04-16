@@ -1,0 +1,14 @@
+cd repos/oodikone2-backend
+git pull
+cd ../oodikone2-frontend
+git pull
+cd ../oodikone2-userservice
+git pull
+cd ../oodilearn
+git pull
+cd ../oodikone2-usageservice
+git pull
+cd ../oodikone2-analytics
+git pull
+cd ../..
+git pull
