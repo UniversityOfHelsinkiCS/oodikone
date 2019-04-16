@@ -8,5 +8,7 @@ cd ../oodilearn
 git pull
 cd ../oodikone2-usageservice
 git pull
+cd ../oodikone2-analytics
+git pull
 cd ../..
 git pull
