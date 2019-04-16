@@ -9,25 +9,25 @@ app.use(bodyParser.json())
 
 app.get('/ping', (req, res) => res.json({ message: 'pong'}))
 
-app.get('/productivity/:id', (req, res) => {
+app.get('/productivity/:id', async (req, res) => {
   const { id } = req.params
-  const data = JSON.parse(redisClient.get('productivity')) || {}
+  const data = JSON.parse(await redisClient.getAsync('productivity')) || {}
   res.json({ [id]: data[id] })
 })
-app.post('/productivity', (req, res) => {
-  const data = JSON.parse(redisClient.get('productivity')) || {}
-  redisClient.set('productivity', JSON.stringify({...data, ...req.body.data}))
+app.post('/productivity', async (req, res) => {
+  const data = JSON.parse(await redisClient.getAsync('productivity')) || {}
+  await redisClient.setAsync('productivity', JSON.stringify({...data, ...req.body.data}))
   res.status(200).end()
 })
 
-app.get('/throughput/:id', (req, res) => {
+app.get('/throughput/:id', async (req, res) => {
   const { id } = req.params
-  const data = JSON.parse(redisClient.get('throughput')) || {}
+  const data = JSON.parse(await redisClient.getAsync('throughput')) || {}
   res.json({ [id]: data[id] })
 })
-app.post('/throughput', (req, res) => {
-  const data = JSON.parse(redisClient.get('throughput')) || {}
-  redisClient.set('throughput', JSON.stringify({...data, ...req.body.data}))
+app.post('/throughput', async (req, res) => {
+  const data = JSON.parse(await redisClient.getAsync('throughput')) || {}
+  await redisClient.setAsync('throughput', JSON.stringify({...data, ...req.body.data}))
   res.status(200).end()
 })
 
