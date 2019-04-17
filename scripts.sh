@@ -140,9 +140,8 @@ docker_build () {
     docker-compose up -d --build
 }
 
-create_symlink_git_hooks () {
-    ln -f "$DIR_PATH/git-hooks/frontend/pre-push" repos/oodikone2-frontend/.git/hooks/pre-push
-    ln -f "$DIR_PATH/git-hooks/backend/pre-push" repos/oodikone2-backend/.git/hooks/pre-push
+enable_git_hooks () {
+    git config --local core.hooksPath git-hooks
 }
 
 show_instructions () {
@@ -163,7 +162,7 @@ run_full_setup () {
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_setup_full
     echo "Adding git-hooks to projects"
-    create_symlink_git_hooks
+    enable_git_hooks
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
     show_instructions
@@ -178,7 +177,7 @@ run_anon_full_setup () {
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_anon_setup_full
     echo "Adding git-hooks to projects"
-    create_symlink_git_hooks
+    enable_git_hooks
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
     show_instructions
