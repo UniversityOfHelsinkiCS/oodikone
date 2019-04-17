@@ -4,7 +4,7 @@ RUN mkdir -p /usr/src/app
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 
-RUN npm i
+RUN npm ci
 
 ARG BASE_PATH
 ENV BASE_PATH=$BASE_PATH

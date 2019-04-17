@@ -2,7 +2,6 @@
 
 DIR_PATH=$(dirname "$0")
 BACKUP_DIR=backups
-REPOS=repos
 PSQL_DB_BACKUP="$BACKUP_DIR/latest-pg.bak"
 USER_DB_BACKUP="$BACKUP_DIR/latest-user-pg.bak"
 
@@ -14,7 +13,7 @@ retry () {
 }
 
 init_dirs () {
-    mkdir -p $REPOS $BACKUP_DIR nginx nginx/cache nginx/letsencrypt
+    mkdir -p $BACKUP_DIR nginx nginx/cache nginx/letsencrypt
     touch nginx/error.log
     touch nginx/log
 }
@@ -33,28 +32,6 @@ megapurge () {
     docker stop $(docker ps -q)
     docker container prune
     docker rmi $(docker images -q)
-}
-
-pull_git_repositories () {
-    pushd $REPOS
-    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
-    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-frontend.git
-    git clone https://github.com/UniversityOfHelsinkiCS/oodilearn.git
-    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-usageservice.git
-    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git
-    git clone -b trunk https://github.com/UniversityOfHelsinkiCS/oodikone2-analytics.git
-    popd
-}
-
-pull_e2e_git_repositories () {
-    pushd $REPOS
-    BRANCH=trunk
-    if [[ $TRAVIS_BRANCH =~ (^master) ]]; then
-        BRANCH=master
-    fi
-    git clone -b $BRANCH https://github.com/UniversityOfHelsinkiCS/oodikone2-backend.git
-    git clone -b $BRANCH https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git
-    popd
 }
 
 get_oodikone_server_backup() {
@@ -155,8 +132,6 @@ docker_restart_backend () {
 run_full_setup () {
     echo "Init dirs"
     init_dirs
-    echo "Pull repos"
-    pull_git_repositories
     echo "Building images, starting containers"
     docker_build
     echo "Setup oodikone db from dump, this will prompt you for your password."
@@ -170,8 +145,6 @@ run_full_setup () {
 run_anon_full_setup () {
     echo "Init dirs"
     init_dirs
-    echo "Pull repos"
-    pull_git_repositories
     echo "Building images, starting containers"
     docker_build
     echo "Setup oodikone db from dump, this will prompt you for your password."
