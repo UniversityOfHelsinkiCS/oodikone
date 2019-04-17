@@ -1,0 +1,19 @@
+services:
+  - docker
+
+env:
+  - REPO=oodikone2-frontend
+  - REPO=oodikone2-backend
+  - REPO=oodikone2-userservice
+  - REPO=oodikone2-usageservice
+  - REPO=oodikone2-analytics
+
+script:
+  - cd repos/${REPO}
+  - docker build --build-arg BASE_PATH=/staging/ -t toska/${REPO}:staging .
+  # - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker build --build-arg BASE_PATH=/staging/ -t toska/${REPO}:staging .; fi
+  # - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS; fi
+  # - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker push toska/${REPO}:staging; fi
+  # - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker build --build-arg BASE_PATH=/ -t toska/${REPO}:latest .; fi
+  # - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS; fi
+  # - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker push toska/${REPO}:latest; fi
