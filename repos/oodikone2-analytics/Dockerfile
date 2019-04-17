@@ -4,7 +4,7 @@ RUN mkdir -p /usr/src/app
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 
-RUN npm install
+RUN npm ci
 EXPOSE 4568
  
 CMD ["npm", "start"]
