@@ -152,7 +152,7 @@ class PopulationDetails extends Component {
       <PopulationFilters ref={this.filters} samples={this.props.samples} />
       {this.renderCreditGainGraphs()}
       {this.renderCourseStatistics()}
-      <PopulationCourses ref={this.courses} />
+      <PopulationCourses ref={this.courses} selectedStudents={this.props.selectedStudents} />
       <PopulationStudents
         samples={this.props.samples}
         selectedStudents={this.props.selectedStudents}

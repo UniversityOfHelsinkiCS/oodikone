@@ -97,11 +97,12 @@ class PopulationCourseStats extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (state && !state.initialSortReady && props.courses) {
+    if (state && props.courses) {
       return {
         ...state,
         courseStatistics: PopulationCourseStats.updateCourseStatisticsCriteria(props, state),
-        initialSortReady: true
+        initialSortReady: true,
+        studentAmountLimit: props.courses.coursestatistics ? parseInt(Math.max(...props.courses.coursestatistics.map(c => c.stats.students)) * 0.15, 10) : parseInt(...props.populationSize * 0.15, 10)
       }
     }
 
@@ -121,7 +122,7 @@ class PopulationCourseStats extends Component {
       return code.toLowerCase().includes(codeFilter.toLowerCase())
     }
 
-    const filteredCourses = coursestatistics
+    const filteredCourses = coursestatistics && coursestatistics
       .filter(studentAmountFilter)
       .filter(c => !codeFilter || courseCodeFilter(c))
 
@@ -139,7 +140,7 @@ class PopulationCourseStats extends Component {
   state = {
     sortCriteria: tableColumnNames.STUDENTS,
     reversed: true,
-    studentAmountLimit: parseInt(this.props.populationSize * 0.15, 10),
+    studentAmountLimit: parseInt(...this.props.populationSize * 0.15, 10),
     codeFilter: '',
     activeView: null
   }
@@ -243,8 +244,7 @@ class PopulationCourseStats extends Component {
   renderActiveView() {
     const { courses } = this.props
     const { courseStatistics } = this.state
-    const courseStats = courseStatistics || courses.coursestatistics
-
+    const courseStats = !(_.isEmpty(courseStatistics)) ? courseStatistics : courses.coursestatistics
     switch (this.state.activeView) {
       case 'showGradeDistribution':
         return this.renderGradeDistributionTable(courseStats)
