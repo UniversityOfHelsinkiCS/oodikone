@@ -1,4 +1,0 @@
-#!/bin/sh
-echo "Running tests inside of the oodikone2-cli network."
-docker exec -t backend sh -c "npm test"
-exit
