@@ -16,13 +16,10 @@ module.exports = class LogSaverTransport extends Transport {
         status: payload.status,
         data: payload
       }
-      try {
-        await UsageStatistic.create(object)
-        callback()
-      } catch (e) {
-        console.log('error', e)
-        callback()
-      }
+
+      await UsageStatistic.create(object)
+      callback()
+
     }
   }
 }
