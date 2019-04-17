@@ -1,19 +1,26 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { func, arrayOf, object } from 'prop-types'
-import { Segment, Header, Popup } from 'semantic-ui-react'
+import { func, shape, arrayOf, string } from 'prop-types'
+import { Segment, Header, Popup, Button } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
+import uuidv4 from 'uuid/v4'
+
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
+import { getPopulationCourses } from '../../redux/populationCourses'
 
-const PopulationCourses = ({ samples, translate }) => {
-  const isValidSample = samples && samples.length > 0
+const PopulationCourses = ({ populationCourses, selectedStudents, translate, getPopulationCourses: gpc }) => {
   const { CoursesOf } = infotooltips.PopulationStatistics
-  const pending = !isValidSample || samples[0].pending
+  const { pending } = populationCourses
+  const reloadCourses = () => {
+    gpc({ ...populationCourses.query, uuid: uuidv4(), selectedStudents })
+  }
+
   return (
     <Segment>
+      <Button onClick={reloadCourses} floated="right" icon="refresh" compact />
       <Header size="medium" dividing >
         <Popup
           trigger={<Header.Content>{translate('populationCourses.header')}</Header.Content>}
@@ -25,25 +32,29 @@ const PopulationCourses = ({ samples, translate }) => {
         <InfoBox content={CoursesOf} />
       </Header>
       <SegmentDimmer translate={translate} isLoading={pending} />
-      {!pending && samples.map(sample => (
-        <PopulationCourseStats
-          key={sample.query.uuid}
-          courses={sample.data || {}}
-          query={sample.query}
-          pending={sample.pending}
-        />))}
+      <PopulationCourseStats
+        key={populationCourses.query.uuid}
+        courses={populationCourses.data}
+        query={populationCourses.query}
+        pending={populationCourses.pending}
+        selectedStudents={selectedStudents}
+      />
     </Segment>
   )
 }
 
 PopulationCourses.propTypes = {
-  samples: arrayOf(object).isRequired,
-  translate: func.isRequired
+  populationCourses: shape({}).isRequired,
+  translate: func.isRequired,
+  selectedStudents: arrayOf(string).isRequired,
+  getPopulationCourses: func.isRequired
 }
 
 const mapStateToProps = ({ populationCourses, locale }) => ({
-  samples: populationCourses,
+  populationCourses,
   translate: getTranslate(locale)
 })
 
-export default connect(mapStateToProps)(PopulationCourses)
+export default connect(mapStateToProps, {
+  getPopulationCourses
+})(PopulationCourses)
