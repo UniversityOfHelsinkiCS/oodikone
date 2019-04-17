@@ -1,5 +1,4 @@
-FROM node:dubnium
-# dubnium means version 10.15
+FROM node:10
 
 RUN mkdir -p /usr/src/app
 COPY . /usr/src/app
