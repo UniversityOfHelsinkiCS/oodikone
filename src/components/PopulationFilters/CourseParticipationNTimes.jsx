@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Form, Input, Button } from 'semantic-ui-react'
-import { shape, func, arrayOf } from 'prop-types'
+import { shape, func } from 'prop-types'
 import _ from 'lodash'
 
 import { courseParticipationNTimes } from '../../populationFilters'
@@ -12,7 +12,7 @@ class CourseParticipationNTimes extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    populationCourses: arrayOf(shape({})).isRequired
+    populationCourses: shape({}).isRequired
   }
 
   state = {
@@ -25,7 +25,7 @@ class CourseParticipationNTimes extends Component {
 
   studyRights = () => {
     const { populationCourses } = this.props
-    return populationCourses[0] ? populationCourses[0].query.studyRights : []
+    return populationCourses ? populationCourses.query.studyRights : []
   }
 
   handleLimit = () => {
