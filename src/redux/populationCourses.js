@@ -1,19 +1,20 @@
 import { callController } from '../apiConnection'
 
 export const getPopulationCourses = ({
-  year, semesters, studentStatuses, studyRights, months, uuid
+  year, semesters, studentStatuses, studyRights, months, uuid, selectedStudents
 }) => {
   const route = '/v2/populationstatistics/courses'
   const prefix = 'GET_POPULATION_COURSES_'
   const query = {
-    year, semesters, studentStatuses, studyRights, uuid
+    year, semesters, studentStatuses, studyRights, uuid, selectedStudents
   }
   const params = {
     year,
     semesters,
     studentStatuses,
     months,
-    studyRights
+    studyRights,
+    selectedStudents
   }
   return callController(route, prefix, null, 'get', query, params)
 }
@@ -21,34 +22,30 @@ export const getPopulationCourses = ({
 export const clearPopulationCourses = () => ({
   type: 'CLEAR_POPULATIONS_COURSES'
 })
-
-const reducer = (state = [], action) => {
+const defaultState = { pending: false, error: false, data: {}, query: {} }
+const reducer = (state = defaultState, action) => {
   switch (action.type) {
     case 'GET_POPULATION_COURSES_ATTEMPT':
-      return [...state, {
+      return { ...state,
         pending: true,
         error: false,
         data: {},
         query: action.requestSettings.query
-      }]
+      }
     case 'GET_POPULATION_COURSES_FAILURE':
-      return [...state.filter(apiCall => !apiCall.pending), {
+      return { ...state,
         pending: false,
         error: true,
-        data: action.response,
+        data: action.response || {},
         query: action.query
-      }]
+      }
     case 'GET_POPULATION_COURSES_SUCCESS':
-      return [...state.filter(apiCall => !apiCall.pending), {
+      return { ...state,
         pending: false,
         error: false,
-        data: action.response,
+        data: action.response || {},
         query: action.query
-      }]
-    case 'REMOVE_POPULATION_COURSES':
-      return [...state.filter(apiCall => apiCall.query.uuid !== action.uuid)]
-    case 'CLEAR_POPULATIONS_COURSES':
-      return []
+      }
     default:
       return state
   }

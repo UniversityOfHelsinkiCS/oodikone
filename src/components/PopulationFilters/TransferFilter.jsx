@@ -153,9 +153,9 @@ class TransferFilter extends Component {
 }
 
 const mapStateToProps = ({ populationCourses }) => ({
-  courseTypes: populationCourses[0].data.coursetypes,
-  disciplines: populationCourses[0].data.disciplines,
-  courses: populationCourses[0].data.coursestatistics
+  courseTypes: populationCourses.data.coursetypes,
+  disciplines: populationCourses.data.disciplines,
+  courses: populationCourses.data.coursestatistics
 })
 
 export default connect(

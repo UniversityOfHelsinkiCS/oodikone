@@ -165,8 +165,7 @@ class PopulationFilters extends Component {
 
 
   renderAddFilters(allStudyRights) {
-    const { extents, transfers } = this.props
-
+    const { extents, transfers, populationCourses } = this.props
     const { Add } = infotooltips.PopulationStatistics.Filters
     const allFilters = _.union(Object.keys(componentFor).filter(f =>
       !(Object.keys(advancedFilters).includes(f) && !this.state.advancedUser)).map(f =>
@@ -187,7 +186,7 @@ class PopulationFilters extends Component {
           <Header>Add filters <InfoBox content={Add} /></Header>
           <Button
             onClick={() => this.setState({ visible: true })}
-            disabled={this.props.populationCourses.pending}
+            disabled={populationCourses.pending}
           >
             add
           </Button>
@@ -335,8 +334,7 @@ const mapStateToProps = ({
   populationCourses,
   settings
 }) => ({
-
-  populationCourses: populationCourses[0],
+  populationCourses,
   populationFilters,
   filters: populationFilters.filters,
   complemented: populationFilters.complemented,
