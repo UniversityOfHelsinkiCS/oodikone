@@ -8,23 +8,22 @@ Install Docker CE on your machine:
 - [macOS](https://docs.docker.com/docker-for-mac/install/)
 - [Windows](https://docs.docker.com/docker-for-windows/install/)
 
-Install Docker Compose: 
+Install Docker Compose:
 
 - https://docs.docker.com/compose/install/
 
 ## Installation
 
-Launch the CLI with the command below and follow the instructions. 
+Launch the CLI with the command below and follow the instructions.
 ```
 bash run.sh
 ```
 
 ## What the CLI does
-- Pulls related projects from GitHub
 - Builds and runs the Dockerized development environment
 - Gets a database dump from production servers
 - Creates the database schema and populates it with the dump
-- Adds git-hooks from the "hooks" -subdirectory to the repos
+- Adds git-hooks
 
 ## Docker commands
 
@@ -92,7 +91,7 @@ docker exec -it -u <username> <container> psql -d <db name>
 
 This is how the setup script fetches the database dump from production servers. It will require you to have access to both melkki.cs.helsinki.fi as well as oodikone.cs.helsinki.fi. The command uses `scp` to transfer all backup files recursively from a known location on the production server by using the melkki server as a proxy, allowing you to get the dump even when you're not connected to the university network.
 
-#### Command 
+#### Command
 ```
 scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* ./backups/
 
@@ -103,21 +102,21 @@ scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki
 #### [Unix StackExchange answer](https://unix.stackexchange.com/questions/355640/how-to-scp-via-an-intermediate-machine)
 
 > It's possible and relatively easy, even when you need to use certificates > for authentication (typical in AWS environments).
-> 
+>
 > The command below will copy files from a remotePath on server2 directly > into your machine at localPath. Internally the scp request is proxied via > server1.
-> 
+>
 > ```
 > scp -i user2-cert.pem -o ProxyCommand="ssh -i user1-cert.pem -W %h:%p > user1@server1" user2@server2:/<remotePath> <localpath>
 > ```
-> 
+>
 > If you use password authentication instead, try with:
-> 
+>
 >  ```
 > scp -o ProxyCommand="ssh -W %h:%p user1@server1" > user2@server2:/<remotePath> <localpath>
 > ```
-> 
+>
 > If you use the same user credentials in both servers:
-> 
+>
 > ```
 > scp -o ProxyCommand="ssh -W %h:%p commonuser@server1" > commonuser@server2:/<remotePath> <localpath>
 > ```
