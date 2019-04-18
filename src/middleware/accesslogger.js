@@ -13,7 +13,8 @@ const accessLogger = morgan((tokens, req, res) => {
   ].join(' ')
   const meta = req.decodedToken
   fields.forEach(field => meta[field] = tokens[field](req, res))
-  UsageService.log(message, meta)
+  UsageService.log(message, meta).catch(console.log)
+ 
 })
 
 module.exports = accessLogger

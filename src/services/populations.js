@@ -7,7 +7,7 @@ const {
 } = require('../models')
 const { getAllDuplicates, byName } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
-const { getPassingSemester, semesterEnd, semesterStart} = require('../util/semester')
+const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -230,7 +230,7 @@ const count = (column, count, distinct = false) => {
   )
 }
 
-const studentnumbersWithAllStudyrightElements = async (studyRights,startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents) => { // eslint-disable-line
+const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents) => { // eslint-disable-line
   const filteredExtents = []
   let studyrightWhere = {
     extentcode: {
@@ -460,6 +460,10 @@ const findCourses = (studentnumbers, beforeDate) => {
   })
 }
 
+const checkThatSelectedStudentsAreUnderRequestedStudyright = (selectedStudents, allStudents) =>
+  !selectedStudents.every(s => allStudents.includes(s))
+
+
 const parseCreditInfo = credit => ({
   studentnumber: credit.student_studentnumber,
   grade: credit.grade,
@@ -479,15 +483,26 @@ const bottlenecksOf = async (query) => {
     ).every(e => e === true)) {
     return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE' }
   }
-
   const { studyRights, startDate, endDate, months, exchangeStudents, cancelledStudents } = parseQueryParams(query)
+
+  if (query.selectedStudents) {
+    const allStudents =
+      await studentnumbersWithAllStudyrightElements(
+        studyRights, startDate, endDate, exchangeStudents, cancelledStudents
+      )
+    const disallowedRequest =
+      checkThatSelectedStudentsAreUnderRequestedStudyright(query.selectedStudents, allStudents)
+    if (disallowedRequest) return { error: 'Trying to request unauthorized students data' }
+  }
+
   const bottlenecks = {
     disciplines: {},
     coursetypes: {}
   }
 
   const codeduplicates = await getAllDuplicates()
-  const studentnumbers =
+
+  const studentnumbers = query.selectedStudents ||
     await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate, exchangeStudents, cancelledStudents)
   const allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
   const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
