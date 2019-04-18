@@ -1,0 +1,7 @@
+GET /api/v2/studyprogrammes/{insertstudyprogrammecodehere}/mandatory_courses
+host: localhost:8080
+uid: tktl
+shib-session-id: mock-session
+x-access-token: 
+
+## Insert valid access token (without quotes) generated from login.rest and a student id to use
