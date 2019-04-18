@@ -21,7 +21,8 @@ const ThroughputTable = ({ throughput, thesis, loading, error }) => {
             <Table.HeaderCell rowSpan="2">Students</Table.HeaderCell>
             <Table.HeaderCell rowSpan="2">Graduated</Table.HeaderCell>
             <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
-            <Table.HeaderCell colSpan={thesisTypes.length}>Thesis</Table.HeaderCell>
+            {(thesisTypes.includes('BACHELOR') || thesisTypes.includes('MASTER')) &&
+            <Table.HeaderCell colSpan={thesisTypes.length}>Thesis</Table.HeaderCell>}
           </Table.Row>
           <Table.Row>
             <Table.HeaderCell content=">= 30" />

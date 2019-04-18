@@ -30,12 +30,12 @@ class SingleCourse extends Component {
       <div>
         <Segment>
           <Form>
-            { courses.length === 1 ? courses[0].text : (
+            { courses ? courses.text : (
               <Form.Dropdown
                 name="selected"
                 options={courses}
                 onChange={(e, { value }) => this.setState({ selected: value })}
-                value={selected || courses[0].value}
+                value={selected || courses.value}
               />
             )}
             <Divider />

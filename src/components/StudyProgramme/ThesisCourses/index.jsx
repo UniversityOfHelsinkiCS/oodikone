@@ -11,7 +11,7 @@ import { createNewThesisCourse, getThesisCourses } from '../../../redux/thesisCo
 const ThesisCourses = ({ studyprogramme, createThesis, getTheses }) => {
   const handleClick = (course, thesis) => async () => {
     createThesis(studyprogramme, course, thesis)
-    getTheses(studyprogramme)
+      .then(() => { getTheses(studyprogramme) })
   }
   return (
     <React.Fragment>
