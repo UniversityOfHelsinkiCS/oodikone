@@ -1,8 +1,9 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Button, Icon, Popup } from 'semantic-ui-react'
+import { Header, Segment, Button, Icon, Popup, Tab } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
+import _ from 'lodash'
 import { getStudentTotalCredits, copyToClipboard, userRoles, reformatDate } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
@@ -190,16 +191,74 @@ class PopulationStudents extends Component {
       )
     }
 
+    const mandatoryCourseColumns = [
+      {
+        key: 'studentnumber',
+        title: (
+          // https://stackoverflow.com/a/41396815
+          <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>
+            student number
+          </div>
+        ),
+        cellProps: { collapsing: true },
+        getRowVal: s => s.studentNumber
+      },
+      ..._.sortBy(
+        this.props.mandatoryCourses,
+        [(m) => {
+          const res = m.code.match(/\d+/)
+          return res ? Number(res[0]) : Number.MAX_VALUE
+        }]
+      ).map(m => ({
+        key: m.code,
+        title: (
+          // https://stackoverflow.com/a/41396815
+          <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>
+            {m.name[this.props.language]}<br />{m.code}
+          </div>
+        ),
+        cellProps: { collapsing: true, textAlign: 'center' },
+        getRowVal: s => Boolean(s.courses.find(c => c.passed && c.course.code === m.code)),
+        getRowContent: s => (
+          s.courses.find(c => c.passed && c.course.code === m.code) ? (<Icon fitted name="check circle" color="green" />) : (<Icon fitted name="times circle" color="red" />)
+        )
+      }))
+    ]
+
+    const panes = [
+      {
+        menuItem: 'General',
+        render: () => (
+          <Tab.Pane>
+            <StudentNameVisibilityToggle />
+            <SortableTable
+              getRowKey={s => s.studentNumber}
+              tableProps={{ celled: true }}
+              columns={columns}
+              data={this.props.selectedStudents.map(sn => students[sn])}
+            />
+          </Tab.Pane>
+        )
+      },
+      {
+        menuItem: 'Mandatory courses',
+        render: () => (
+          <Tab.Pane>
+            <div style={{ overflowX: 'auto' }}>
+              <SortableTable
+                getRowKey={s => s.studentNumber}
+                tableProps={{ celled: true, compact: 'very', padded: false, collapsing: true, basic: true }}
+                columns={mandatoryCourseColumns}
+                data={this.props.selectedStudents.map(sn => students[sn])}
+              />
+            </div>
+          </Tab.Pane>
+        )
+      }
+    ]
+
     return (
-      <Fragment>
-        <StudentNameVisibilityToggle />
-        <SortableTable
-          getRowKey={s => s.studentNumber}
-          tableProps={{ celled: true }}
-          columns={columns}
-          data={this.props.selectedStudents.map(sn => students[sn])}
-        />
-      </Fragment>
+      <Tab panes={panes} />
     )
   }
 
@@ -214,11 +273,10 @@ class PopulationStudents extends Component {
     return (
       <Segment>
         <Header dividing >
-          Students ({this.props.selectedStudents.length}) <InfoBox content={Students} />
+          {`Students (${this.props.selectedStudents.length}) `}
+          <Button size="small" onClick={() => this.props.toggleStudentListVisibility()}>{toggleLabel}</Button>
+          <InfoBox content={Students} />
         </Header>
-        <Button onClick={() => this.props.toggleStudentListVisibility()}>
-          {toggleLabel}
-        </Button>
         {this.renderStudentTable()}
       </Segment>
     )
@@ -233,15 +291,23 @@ PopulationStudents.propTypes = {
   showList: bool.isRequired,
   language: string.isRequired,
   history: shape({}).isRequired,
-  queryStudyrights: arrayOf(string).isRequired
-
+  queryStudyrights: arrayOf(string).isRequired,
+  mandatoryCourses: arrayOf(shape({
+    name: shape({
+      en: string.isRequired,
+      fi: string.isRequired,
+      sv: string.isRequired
+    }).isRequired,
+    code: string.isRequired
+  })).isRequired
 }
 
-const mapStateToProps = ({ settings, populations }) => ({
+const mapStateToProps = ({ settings, populations, populationMandatoryCourses }) => ({
   showNames: settings.namesVisible,
   showList: settings.studentlistVisible,
   language: settings.language,
-  queryStudyrights: populations.query.studyRights
+  queryStudyrights: populations.query.studyRights,
+  mandatoryCourses: populationMandatoryCourses.data
 })
 
 export default connect(
