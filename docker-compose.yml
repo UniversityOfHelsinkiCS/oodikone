@@ -1,6 +1,30 @@
 version: '3'
 
 services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - KAFKA_BROKER_ID=1
+    container_name: zookeeper
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      - HOSTNAME_COMMAND=route -n | awk '/UG[ \t]/{print $$2}'
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_DELETE_TOPIC_ENABLE=true
+      - KAFKA_CREATE_TOPICS=studentnumbers:1:1,priority_studentnumbers:1:1
+      - KAFKA_LOG_DIRS=/kafka/kafka-logs-1
+    volumes:
+      - ./kafka/docker.sock:/var/run/docker.sock
+      - ./kafka/logs:/kafka/kafka-logs-1
   analytics_db:
     image: postgres:9.6.3
     ports:
@@ -152,6 +176,21 @@ services:
       - ./services/oodikone2-usageservice/:/usr/src/app
       - ./services/oodikone2-usageservice/node_modules:/usr/src/app/node_modules
     container_name: usageservice
+  updater_api:
+    image: node:10-alpine
+    build:
+      context: services/updater_api
+      dockerfile: dev.Dockerfile
+    command: sh -c "cd /usr/src/app && npm install && npm run dev"
+    restart: unless-stopped
+    depends_on:
+      - kafka
+    volumes:
+      - ./services/updater_api/:/usr/src/app
+    volumes:
+      - ./services/updater_api/:/usr/src/app
+      - ./services/updater_api/node_modules:/usr/src/app/node_modules
+    container_name: updater_api
   analytics:
     image: node:8.11.3
     command: sh -c "cd /usr/src/app && npm install && npm run dev"
