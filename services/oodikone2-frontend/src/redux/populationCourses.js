@@ -8,7 +8,7 @@ export const getPopulationCourses = ({
   const query = {
     year, semesters, studentStatuses, studyRights, uuid, selectedStudents
   }
-  const params = {
+  const body = {
     year,
     semesters,
     studentStatuses,
@@ -16,7 +16,7 @@ export const getPopulationCourses = ({
     studyRights,
     selectedStudents
   }
-  return callController(route, prefix, null, 'get', query, params)
+  return callController(route, prefix, body, 'post', query)
 }
 
 export const clearPopulationCourses = () => ({
