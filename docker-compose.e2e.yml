@@ -43,7 +43,7 @@ services:
     container_name: mongo_db
   backend:
     build:
-      context: repos/oodikone2-backend
+      context: SERVICE/oodikone2-backend
       dockerfile: dev.Dockerfile
     restart: unless-stopped
     ports:
@@ -81,7 +81,7 @@ services:
     ports:
       - 4567:4567
     volumes:
-      - ./repos/oodikone2-userservice/:/usr/src/app
+      - ./SERVICE/oodikone2-userservice/:/usr/src/app
     environment:
       - DB_URL=postgres://postgres@user_db:5432/user_db
       - TEST_DB=postgres://postgres@user_db:5432/user_db_test

@@ -2,17 +2,17 @@ services:
   - docker
 
 env:
-  - REPO=oodikone2-frontend
-  - REPO=oodikone2-backend
-  - REPO=oodikone2-userservice
-  - REPO=oodikone2-usageservice
-  - REPO=oodikone2-analytics
+  - SERVICE=oodikone2-frontend
+  - SERVICE=oodikone2-backend
+  - SERVICE=oodikone2-userservice
+  - SERVICE=oodikone2-usageservice
+  - SERVICE=oodikone2-analytics
 
 script:
-  - cd repos/${REPO}
-  - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker build --build-arg BASE_PATH=/staging/ -t toska/${REPO}:staging .; fi
+  - cd services/${SERVICE}
+  - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker build --build-arg BASE_PATH=/staging/ -t toska/${SERVICE}:staging .; fi
   - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS; fi
-  - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker push toska/${REPO}:staging; fi
-  - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker build --build-arg BASE_PATH=/ -t toska/${REPO}:latest .; fi
+  - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker push toska/${SERVICE}:staging; fi
+  - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker build --build-arg BASE_PATH=/ -t toska/${SERVICE}:latest .; fi
   - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS; fi
-  - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker push toska/${REPO}:latest; fi
+  - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker push toska/${SERVICE}:latest; fi

@@ -1,4 +1,4 @@
-Oodikone2 should now be running on your machine. The source code is located in the "repos" -subdirectory.
+Oodikone2 should now be running on your machine.
 
 View Oodikone @ http://localhost:8081
 SQL viewer and editor @ http://localhost:5050/?pgsql=db&username=postgres

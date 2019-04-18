@@ -61,7 +61,7 @@ services:
     container_name: mongo_db
   backend:
     build:
-      context: repos/oodikone2-backend
+      context: services/oodikone2-backend
       dockerfile: dev.Dockerfile
     command: sh -c "npm install && npm run dev"
     restart: unless-stopped
@@ -80,15 +80,15 @@ services:
       USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       ANALYTICS_URL: http://analytics:4568
     volumes:
-      - ./repos/oodikone2-backend/:/usr/src/app
-      - ./repos/oodikone2-backend/node_modules:/usr/src/app/node_modules
+      - ./services/oodikone2-backend/:/usr/src/app
+      - ./services/oodikone2-backend/node_modules:/usr/src/app/node_modules
     container_name: backend
     depends_on:
       - db
       - redis
   frontend:
     build:
-      context: repos/oodikone2-frontend
+      context: services/oodikone2-frontend
       dockerfile: dev.Dockerfile
     command: sh -c "npm install && npm run docker"
     restart: unless-stopped
@@ -102,17 +102,17 @@ services:
       ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
       USAGE_ADMINER_URL: http://localhost:5050/?pgsql=usage_db&username=postgres
     volumes:
-      - ./repos/oodikone2-frontend/:/usr/src/app
+      - ./services/oodikone2-frontend/:/usr/src/app
     container_name: frontend
   oodilearn:
     build:
-      context: repos/oodilearn/server
+      context: services/oodilearn/server
       dockerfile: Dockerfile
     restart: unless-stopped
     volumes:
-      - ./repos/oodilearn/data:/data
-      - ./repos/oodilearn/server:/src
-      - ./repos/oodilearn/models:/models
+      - ./services/oodilearn/data:/data
+      - ./services/oodilearn/server:/src
+      - ./services/oodilearn/models:/models
     ports:
       - "5000:5000"
     environment:
@@ -124,7 +124,7 @@ services:
     command: sh -c "cd /usr/src/app && npm install && npm run dev"
     restart: unless-stopped
     volumes:
-      - ./repos/oodikone2-userservice/:/usr/src/app
+      - ./services/oodikone2-userservice/:/usr/src/app
     ports:
       - 4567:4567
     environment:
@@ -136,12 +136,12 @@ services:
   usageservice:
     image: node:10-alpine
     build:
-      context: repos/oodikone2-usageservice
+      context: services/oodikone2-usageservice
       dockerfile: dev.Dockerfile
     command: sh -c "cd /usr/src/app && npm install && npm run dev"
     restart: unless-stopped
     volumes:
-      - ./repos/oodikone2-usageservice/:/usr/src/app
+      - ./services/oodikone2-usageservice/:/usr/src/app
     ports:
       - 545:545
     environment:
@@ -149,15 +149,15 @@ services:
       - DB_URL=postgres://postgres@usage_db:5432/usage_db
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
     volumes:
-      - ./repos/oodikone2-usageservice/:/usr/src/app
-      - ./repos/oodikone2-usageservice/node_modules:/usr/src/app/node_modules
-    container_name: usageservice                     
+      - ./services/oodikone2-usageservice/:/usr/src/app
+      - ./services/oodikone2-usageservice/node_modules:/usr/src/app/node_modules
+    container_name: usageservice
   analytics:
     image: node:8.11.3
     command: sh -c "cd /usr/src/app && npm install && npm run dev"
     restart: unless-stopped
     volumes:
-      - ./repos/oodikone2-analytics/:/usr/src/app
+      - ./services/oodikone2-analytics/:/usr/src/app
     ports:
       - 4568:4568
     environment:
