@@ -4,20 +4,21 @@ const Filters = require('../services/filters')
 const { updateStudents } = require('../services/doo_api_database_updater/database_updater')
 const StudyrightService = require('../services/studyrights')
 
-router.get('/v2/populationstatistics/courses', async (req, res) => {
+// POST instead of GET because of too long params and "sensitive" data
+router.post('/v2/populationstatistics/courses', async (req, res) => { 
   try {
-    if (!req.query.year || !req.query.semesters || !req.query.studyRights) {
-      res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
+    if (!req.body.year || !req.body.semesters || !req.body.studyRights) {
+      res.status(400).json({ error: 'The body should have a year, semester and study rights defined' })
       return
     }
-    if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
-      req.query.studyRights = [req.query.studyRights]
+    if (!Array.isArray(req.body.studyRights)) { // studyRights should always be an array
+      req.body.studyRights = [req.body.studyRights]
     }
 
-    if (req.query.months == null) {
-      req.query.months = 12
+    if (req.body.months == null) {
+      req.body.months = 12
     }
-    const result = await Population.bottlenecksOf(req.query)
+    const result = await Population.bottlenecksOf(req.body)
 
     if (result.error) {
       res.status(400).json(result)
