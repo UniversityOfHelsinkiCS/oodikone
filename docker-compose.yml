@@ -1,0 +1,188 @@
+version: '3'
+
+services:
+  analytics_db:
+    image: postgres:9.6.3
+    ports:
+      - "5423:5432"
+    volumes:
+      - ./analytics_pgdata:/var/lib/postgresql/data
+    container_name: oodi_analytics_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=analytics_db
+  user_db:
+    image: postgres:9.6.3
+    ports:
+      - "5422:5432"
+    volumes:
+      - ./user_pgdata:/var/lib/postgresql/data
+    container_name: oodi_user_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=user_db
+  usage_db:
+    image: postgres:9.6.3
+    ports:
+      - "5424:5432"
+    volumes:
+      - ./usage_pgdata:/var/lib/postgresql/data
+    container_name: oodi_usage_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=usage_db
+  db:
+    image: postgres:9.6.3
+    ports:
+      - "5421:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    container_name: oodi_db
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
+      - POSTGRES_USER=postgres
+  redis:
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-data:/data
+    container_name: redis
+  mongo_db:
+    image: mongo
+    restart: unless-stopped
+    volumes:
+      - ./backups/mongo/oodilearn:/dump
+      - ./mongodata:/data/db
+    ports:
+      - "27017:27017"
+    container_name: mongo_db
+  backend:
+    build:
+      context: services/oodikone2-backend
+      dockerfile: dev.Dockerfile
+    command: sh -c "npm install && npm run dev"
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS: redis
+      DB_URL: postgres://postgres@db:5432/tkt_oodi
+      TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
+      FRONT_URL: http://localhost:8000
+      TOKEN_SECRET: IWannaBeTheVeryBest
+      OODILEARN_URL: http://oodilearn:5000
+      USERSERVICE_URL: http://userservice:4567
+      USAGESERVICE_URL: http://usageservice:545
+      USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      ANALYTICS_URL: http://analytics:4568
+    volumes:
+      - ./services/oodikone2-backend/:/usr/src/app
+      - ./services/oodikone2-backend/node_modules:/usr/src/app/node_modules
+    container_name: backend
+    depends_on:
+      - db
+      - redis
+  frontend:
+    build:
+      context: services/oodikone2-frontend
+      dockerfile: dev.Dockerfile
+    command: sh -c "npm install && npm run docker"
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+      - "7777:7777"
+    environment:
+      BACKEND_ADDR: backend
+      ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
+      USER_ADMINER_URL: http://localhost:5050/?pgsql=user_db&username=postgres
+      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
+      USAGE_ADMINER_URL: http://localhost:5050/?pgsql=usage_db&username=postgres
+    volumes:
+      - ./services/oodikone2-frontend/:/usr/src/app
+    container_name: frontend
+  oodilearn:
+    build:
+      context: services/oodilearn/server
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./services/oodilearn/data:/data
+      - ./services/oodilearn/server:/src
+      - ./services/oodilearn/models:/models
+    ports:
+      - "5000:5000"
+    environment:
+      - ENV=development
+      - MONGO_URI=mongodb://mongo_db:27017/oodilearn
+    container_name: oodilearn
+  userservice:
+    image: node:8.11.3
+    command: sh -c "cd /usr/src/app && npm install && npm run dev"
+    restart: unless-stopped
+    volumes:
+      - ./services/oodikone2-userservice/:/usr/src/app
+    ports:
+      - 4567:4567
+    environment:
+      - DB_URL=postgres://postgres@user_db:5432/user_db
+      - TEST_DB=postgres://postgres@user_db:5432/user_db_test
+      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      - TOKEN_SECRET=IWannaBeTheVeryBest
+    container_name: userservice
+  usageservice:
+    image: node:10-alpine
+    build:
+      context: services/oodikone2-usageservice
+      dockerfile: dev.Dockerfile
+    command: sh -c "cd /usr/src/app && npm install && npm run dev"
+    restart: unless-stopped
+    volumes:
+      - ./services/oodikone2-usageservice/:/usr/src/app
+    ports:
+      - 545:545
+    environment:
+      - PORT=545
+      - DB_URL=postgres://postgres@usage_db:5432/usage_db
+      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+    volumes:
+      - ./services/oodikone2-usageservice/:/usr/src/app
+      - ./services/oodikone2-usageservice/node_modules:/usr/src/app/node_modules
+    container_name: usageservice
+  analytics:
+    image: node:8.11.3
+    command: sh -c "cd /usr/src/app && npm install && npm run dev"
+    restart: unless-stopped
+    volumes:
+      - ./services/oodikone2-analytics/:/usr/src/app
+    ports:
+      - 4568:4568
+    environment:
+      - REDIS=analytics_redis
+      - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
+      - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
+    depends_on:
+      - analytics_db
+      - analytics_redis
+    container_name: analytics
+  analytics_redis:
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6380:6379"
+    volumes:
+      - ./analytics-redis-data:/data
+    container_name: analytics_redis
+  adminer:
+    image: adminer:4.6.2
+    environment:
+      - ADMINER_DESIGN=pepa-linha
+    volumes:
+      - ./adminer-plugins:/var/www/html/plugins-enabled
+    ports:
+      - 5050:8080
+    restart: always
+    container_name: adminer
