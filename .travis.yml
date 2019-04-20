@@ -24,9 +24,6 @@ env:
 
 script:
   - cd services/${SERVICE}
-  - docker build --build-arg BASE_PATH=/staging/ -t toska/${SERVICE}:staging .
-  - docker login -u $DOCKER_USER -p $DOCKER_PASS
-  - docker push toska/${SERVICE}:staging
   - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker build --build-arg BASE_PATH=/staging/ -t toska/${SERVICE}:staging .; fi
   - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS; fi
   - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker push toska/${SERVICE}:staging; fi
@@ -37,7 +34,7 @@ script:
 jobs:
   include:
     - stage: test & release
-      # if: branch = master
+      if: branch = master
       script:
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
         - source scripts.sh && run_e2e_setup
@@ -45,4 +42,4 @@ jobs:
         - cat nginx/log
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
         - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
-        - "curl -k -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" -d \"{ \\\"request\\\": { \\\"stage\\\":\\\"staging\\\" } }\" https://toska.cs.helsinki.fi/toskawatch/release/"
+        - "curl --fail -k -X POST -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" https://toska.cs.helsinki.fi/toskawatch/release/"
