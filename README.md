@@ -1,4 +1,7 @@
 # oodikone2-cli
+
+[![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone.svg?branch=master)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone)
+
 Simple CLI tool for setting up the development environment for Oodikone. The entire development environment runs inside of a Docker network that's defined in the docker-compose.yml file. The specifics of what this means for setting up the environment and accessing logs is discussed in a later section.
 
 ## Prerequisites
