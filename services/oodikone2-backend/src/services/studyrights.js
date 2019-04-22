@@ -1,9 +1,9 @@
 const { Studyright, StudyrightElement, sequelize, ElementDetails } = require('../models')
-const { Op, col, where, fn } = sequelize
 const { getUserElementDetails } = require('./userService')
 const moment = require('moment')
 const { redisClient } = require('./redis')
 const _ = require('lodash')
+const { Op, col, where, fn } = require('sequelize')
 
 const createStudyright = apiData => Studyright.create(apiData)
 
@@ -165,6 +165,7 @@ const getStudyrightElementsAndAssociationsForUser = async username => {
 }
 
 const getAllDegreesAndProgrammes = async () => {
+
   const elementDetails = ElementDetails.findAll({
     where: {
       type: {
