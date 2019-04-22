@@ -6,7 +6,7 @@ export const getPopulationCourses = ({
   const route = '/v2/populationstatistics/courses'
   const prefix = 'GET_POPULATION_COURSES_'
   const query = {
-    year, semesters, studentStatuses, studyRights, uuid, selectedStudents
+    year, semesters, studentStatuses, studyRights, uuid, selectedStudents, months
   }
   const body = {
     year,
