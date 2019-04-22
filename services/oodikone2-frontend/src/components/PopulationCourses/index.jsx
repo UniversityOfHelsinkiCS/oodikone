@@ -14,6 +14,7 @@ import { getPopulationCourses } from '../../redux/populationCourses'
 const PopulationCourses = ({ populationCourses, selectedStudents, translate, getPopulationCourses: gpc }) => {
   const { CoursesOf } = infotooltips.PopulationStatistics
   const { pending } = populationCourses
+
   const reloadCourses = () => {
     gpc({ ...populationCourses.query, uuid: uuidv4(), selectedStudents })
   }
