@@ -70,12 +70,21 @@ export default {
     täsmää puolivuosi-lukumäärien summan kanssa, johtuen tuplakirjauksista Oodissa. Asiaa selvitetään ja pyritään
     korjaamaan mahdollisimman pian.`,
   Students: `**Students:** harmaata painiketta ”show” klikkaamalla saa listan kaikista populaation opiskelijoista
-    (huom. suodattimet vaikuttavat tähän listaan!). Klikkaamalla opiskelijanumeron vieressä olevaa nappia siirtyy
+    (huom. suodattimet vaikuttavat tähän listaan!).
+    <br> <br>
+    **General:**
+    <br>
+    Klikkaamalla opiskelijanumeron vieressä olevaa nappia siirtyy
     ”student statistics” näkymään valitun opiskelijan osalta.
-    <br> <br>
-    **credits since start:** listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson ajalta.
-    <br> <br>
+    <br>
+    **credits since start** listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson ajalta.
+    <br>
     **all credits:** listaa opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen
-      valittuun tarkastelujaksoon ja populaatioon kuulumista)
+      valittuun tarkastelujaksoon ja populaatioon kuulumista).
+    <br> <br>
+    **Mandatory courses:**
+    <br>
+    Tällä välilehdellä näkyy mitä pakollisiksi määritettyjä kursseja opiskelija on suorittanut.
+    Pitämällä kursoria kentän päällä näet kentän otsikon.
     `
 }
