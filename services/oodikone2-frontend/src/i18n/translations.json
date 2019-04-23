@@ -157,7 +157,7 @@
   },
   "populationStatistics": {
     "header": [
-      "Population statistics"
+      "Class of a study programme"
     ],
     "months": [
       "End of search"
@@ -184,13 +184,13 @@
       "Select valid year."
     ],
     "addPopulation": [
-      "See population"
+      "See a class"
     ],
     "clearPopulations": [
       "Remove population"
     ],
     "searchTitle": [
-      "Search for population"
+      "Search for a class of a study programme"
     ],
     "foundTitle": [
       "Population"
