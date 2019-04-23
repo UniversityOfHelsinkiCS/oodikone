@@ -117,10 +117,6 @@ docker_build () {
     docker-compose up -d --build
 }
 
-enable_git_hooks () {
-    git config --local core.hooksPath git-hooks
-}
-
 show_instructions () {
     cat ./assets/instructions.txt
 }
@@ -136,8 +132,6 @@ run_full_setup () {
     docker_build
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_setup_full
-    echo "Adding git-hooks to projects"
-    enable_git_hooks
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
     show_instructions
@@ -149,8 +143,6 @@ run_anon_full_setup () {
     docker_build
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_anon_setup_full
-    echo "Adding git-hooks to projects"
-    enable_git_hooks
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
     show_instructions
