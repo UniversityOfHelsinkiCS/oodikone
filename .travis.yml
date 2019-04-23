@@ -15,6 +15,9 @@ cache:
 services:
   - docker
 
+matrix:
+  - fast_finish
+
 env:
   - SERVICE=oodikone2-frontend
   - SERVICE=oodikone2-backend
