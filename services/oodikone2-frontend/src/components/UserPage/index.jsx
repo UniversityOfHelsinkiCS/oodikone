@@ -4,18 +4,18 @@ import { connect } from 'react-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
-import { textAndDescriptionSearch, getRolesWithoutRefreshToken, getIdWithoutRefreshToken, setToken } from '../../common'
+import { textAndDescriptionSearch, getRolesWithoutRefreshToken, getIdWithoutRefreshToken, setToken, getTextIn } from '../../common'
 import { addUserUnits, removeUserUnits, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
 import { superLogin } from '../../apiConnection'
 
-const formatToDropdown = (elements) => {
+const formatToDropdown = (elements, language) => {
   const options = Object.values(elements).map(e => ({
     key: e.code,
     value: e.code,
     description: e.code,
-    text: e.name.fi || e.name.en || e.name.sv
+    text: getTextIn(e.name, language)
   }))
   return _.sortBy(options, 'text')
 }
@@ -79,7 +79,7 @@ class UserPage extends Component {
 
   degreeOptions = () => {
     const { degrees } = this.props.associations
-    const degreeOptions = !degrees ? [] : formatToDropdown(degrees)
+    const degreeOptions = !degrees ? [] : formatToDropdown(degrees, this.props.language)
     return degreeOptions
   }
 
@@ -89,9 +89,9 @@ class UserPage extends Component {
     if (!programmes) return []
     if (degrees && degreeCode) {
       const degree = degrees[degreeCode]
-      return formatToDropdown(degree.programmes)
+      return formatToDropdown(degree.programmes, this.props.language)
     }
-    return formatToDropdown(programmes)
+    return formatToDropdown(programmes, this.props.language)
   }
 
   specializationOptions = () => {
@@ -105,9 +105,9 @@ class UserPage extends Component {
           acc[e.code] = e
           return acc
         }, {})
-      return formatToDropdown(filteredStudyTracks)
+      return formatToDropdown(filteredStudyTracks, this.props.language)
     }
-    return formatToDropdown(studyTracks)
+    return formatToDropdown(studyTracks, this.props.language)
   }
 
   allSpecializationIds = () => this.specializationOptions().map(sp => sp.key)
@@ -135,11 +135,7 @@ class UserPage extends Component {
   renderUnitList = (elementdetails, user) => {
     const { language } = this.props
 
-    const nameInLanguage = element =>
-      element.name[language]
-      || element.name.fi
-      || element.name.en
-      || element.name.sv
+    const nameInLanguage = element => getTextIn(element.name, language)
 
     const byCode = (a, b) => {
       const codeA = a.type === 30 && a.associations ? `${a.associations[0]}${nameInLanguage(a)}` : a.code

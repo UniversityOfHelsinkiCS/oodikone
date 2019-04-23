@@ -202,3 +202,10 @@ export const getCompiledPath = (template, parameters) => {
   const toPath = pathToRegexp.compile(template)
   return toPath(parameters)
 }
+
+export const getTextIn = (texts, language) => {
+  if (texts) {
+    return texts[language] || texts.fi || texts.en || texts.sv || Object.values(texts)[0]
+  }
+  return null
+}

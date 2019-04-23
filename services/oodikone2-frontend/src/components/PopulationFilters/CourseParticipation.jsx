@@ -4,6 +4,7 @@ import { Segment, Icon, Popup } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
 
 import { removePopulationFilter, alterPopulationCourseFilter } from '../../redux/populationFilters'
+import { getTextIn } from '../../common'
 
 class CourseParticipation extends Component {
   static propTypes = {
@@ -70,13 +71,13 @@ class CourseParticipation extends Component {
                   width: '80%'
                 }}
                 >
-                  {course.course.name[language]}
+                  {getTextIn(course.course.name, language)}
                 </em>
                 <span style={{ float: 'right' }}>
                   <Icon name="remove" onClick={this.clearFilter} />
                 </span>
               </Segment>}
-            content={course.course.name[language]}
+            content={getTextIn(course.course.name, language)}
           />
           {this.renderFilterSegment('all', 'all', active)}
           {this.renderFilterSegment('passed', 'passed', active)}
