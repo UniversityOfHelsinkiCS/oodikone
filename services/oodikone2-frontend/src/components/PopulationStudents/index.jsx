@@ -192,6 +192,10 @@ class PopulationStudents extends Component {
     }
 
     const mandatoryCourseColumns = [
+      ...(this.props.showNames) ? [
+        { key: 'lastname', title: 'last name', getRowVal: s => s.lastname, cellProps: { title: 'last name' } },
+        { key: 'firstname', title: 'first names', getRowVal: s => s.firstnames, cellProps: { title: 'first names' } }
+      ] : [],
       {
         key: 'studentnumber',
         title: (
@@ -200,7 +204,7 @@ class PopulationStudents extends Component {
             student number
           </div>
         ),
-        cellProps: { collapsing: true },
+        cellProps: { title: 'student number' },
         getRowVal: s => s.studentNumber
       },
       ..._.sortBy(
@@ -217,10 +221,12 @@ class PopulationStudents extends Component {
             {m.name[this.props.language]}<br />{m.code}
           </div>
         ),
-        cellProps: { collapsing: true, textAlign: 'center' },
+        // https://stackoverflow.com/a/246451
+        cellProps: { title: `${m.name[this.props.language]}\n${m.code}` },
         getRowVal: s => Boolean(s.courses.find(c => c.passed && c.course.code === m.code)),
         getRowContent: s => (
-         s.courses.find(c => c.passed && c.course.code === m.code) ? (<Icon fitted name="check circle" color="green" />) : (<Icon fitted name="times circle" color="red" />)
+          s.courses.find(c => c.passed && c.course.code === m.code) ?
+            (<Icon fitted name="check" color="green" />) : (<Icon fitted name="" color="grey" />)
         )
       }))
     ]
@@ -230,7 +236,6 @@ class PopulationStudents extends Component {
         menuItem: 'General',
         render: () => (
           <Tab.Pane>
-            <StudentNameVisibilityToggle />
             <SortableTable
               getRowKey={s => s.studentNumber}
               tableProps={{ celled: true }}
@@ -247,7 +252,16 @@ class PopulationStudents extends Component {
             <div style={{ overflowX: 'auto' }}>
               <SortableTable
                 getRowKey={s => s.studentNumber}
-                tableProps={{ celled: true, compact: 'very', padded: false, collapsing: true, basic: true }}
+                tableProps={{
+                  celled: true,
+                  compact: 'very',
+                  padded: false,
+                  collapsing: true,
+                  basic: true,
+                  striped: true,
+                  singleLine: true,
+                  textAlign: 'center'
+                }}
                 columns={mandatoryCourseColumns}
                 data={this.props.selectedStudents.map(sn => students[sn])}
               />
@@ -258,7 +272,10 @@ class PopulationStudents extends Component {
     ]
 
     return (
-      <Tab panes={panes} />
+      <Fragment>
+        <StudentNameVisibilityToggle />
+        <Tab panes={panes} />
+      </Fragment>
     )
   }
 
