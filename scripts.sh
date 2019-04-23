@@ -113,12 +113,12 @@ db_anon_setup_full () {
     echo "Database setup finished"
 }
 
-docker_build () {
-    docker-compose up -d --build
+install_cli_npm_packages () {
+    npm ci
 }
 
-enable_git_hooks () {
-    git config --local core.hooksPath git-hooks
+docker_build () {
+    docker-compose up -d --build
 }
 
 show_instructions () {
@@ -130,33 +130,35 @@ docker_restart_backend () {
 }
 
 run_full_setup () {
+    echo "Setup npm packages"
+    install_cli_npm_packages
     echo "Init dirs"
     init_dirs
     echo "Building images, starting containers"
     docker_build
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_setup_full
-    echo "Adding git-hooks to projects"
-    enable_git_hooks
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
     show_instructions
 }
 run_anon_full_setup () {
+    echo "Setup npm packages"
+    install_cli_npm_packages
     echo "Init dirs"
     init_dirs
     echo "Building images, starting containers"
     docker_build
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_anon_setup_full
-    echo "Adding git-hooks to projects"
-    enable_git_hooks
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
     show_instructions
 }
 
 run_e2e_setup () {
+    echo "Setup npm packages"
+    install_cli_npm_packages
     echo "Init dirs"
     init_dirs
     echo "Building images, starting containers"
