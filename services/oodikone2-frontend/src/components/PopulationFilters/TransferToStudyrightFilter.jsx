@@ -6,6 +6,7 @@ import { shape, func, string } from 'prop-types'
 import infoTooltips from '../../common/InfoToolTips'
 import { transferTo } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import { getTextIn } from '../../common'
 
 class TransferToStudyrightFilter extends Component {
   static propTypes = {
@@ -36,7 +37,7 @@ class TransferToStudyrightFilter extends Component {
 
   render() {
     const { filter, studyrightName, language } = this.props
-    const toggleLabel = `transferred to ${studyrightName[language]}`
+    const toggleLabel = `transferred to ${getTextIn(studyrightName, language)}`
 
     if (filter.notSet) {
       return (
@@ -78,8 +79,8 @@ class TransferToStudyrightFilter extends Component {
     return (
       <Segment>
         {filter.params.negated
-          ? `Have transferred to ${studyrightName[language]}`
-          : `Have not transferred to ${studyrightName[language]}`}
+          ? `Have transferred to ${getTextIn(studyrightName, language)}`
+          : `Have not transferred to ${getTextIn(studyrightName, language)}`}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

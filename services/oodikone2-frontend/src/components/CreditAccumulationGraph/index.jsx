@@ -9,7 +9,7 @@ import { connect } from 'react-redux'
 import { clearLoading } from '../../redux/graphSpinner'
 
 import { DISPLAY_DATE_FORMAT, CHART_COLORS } from '../../constants'
-import { reformatDate, sortDatesWithFormat } from '../../common'
+import { reformatDate, sortDatesWithFormat, getTextIn } from '../../common'
 import { turquoise } from '../../styles/variables/colors'
 
 import styles from './creditAccumulationGraph.css'
@@ -135,7 +135,7 @@ class CreditAccumulationGraph extends Component {
         totalCredits += credits
       }
       return {
-        title: `${course.name[language]} (${course.code})`,
+        title: `${getTextIn(course.name, language)} (${course.code})`,
         [studentNumber]: totalCredits,
         credits,
         date: reformatDate(date, DISPLAY_DATE_FORMAT),

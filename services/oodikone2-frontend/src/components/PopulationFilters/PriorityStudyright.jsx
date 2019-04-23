@@ -5,6 +5,7 @@ import { shape, func, string } from 'prop-types'
 import infoTooltips from '../../common/InfoToolTips'
 import { priorityStudyright } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import { getTextIn } from '../../common'
 
 class PriorityStudyright extends Component {
   static propTypes = {
@@ -50,14 +51,14 @@ class PriorityStudyright extends Component {
     if (degree && programme) {
       const degreeText = studyrights.degrees.find(sr => sr.code === degree)
       const programmeText = studyrights.programmes.find(sr => sr.code === programme)
-      returnText = returnText.concat(`${degreeText ? degreeText.name[language] : ''} and
-        ${programmeText ? programmeText.name[language] : ''}`)
+      returnText = returnText.concat(`${degreeText ? getTextIn(degreeText.name, language) : ''} and
+        ${programmeText ? getTextIn(programmeText.name, language) : ''}`)
     } else if (degree && !programme) {
       const degreeText = studyrights.degrees.find(sr => sr.code === degree)
-      returnText = returnText.concat(`${degreeText ? degreeText.name[language] : ''}`)
+      returnText = returnText.concat(`${degreeText ? getTextIn(degreeText.name, language) : ''}`)
     } else if (!degree && programme) {
       const programmeText = studyrights.programmes.find(sr => sr.code === programme)
-      returnText = returnText.concat(`${programmeText ? programmeText.name[language] : ''}`)
+      returnText = returnText.concat(`${programmeText ? getTextIn(programmeText.name, language) : ''}`)
     }
     returnText = returnText.concat(` as ${this.priorityOptions.find(option => option.value === prioritycode).text} `)
     return returnText
@@ -67,11 +68,11 @@ class PriorityStudyright extends Component {
     const { filter, language, studyrights } = this.props
 
     let degreeOptions = studyrights.degrees.map(sr =>
-      ({ value: sr.code, text: sr.name[language] }))
+      ({ value: sr.code, text: getTextIn(sr.name, language) }))
     degreeOptions = [{ value: 'anyDegree', text: 'any degree' }, ...degreeOptions]
 
     let programmeOptions = studyrights.programmes.map(sr =>
-      ({ value: sr.code, text: sr.name[language] }))
+      ({ value: sr.code, text: getTextIn(sr.name, language) }))
     programmeOptions = [{ value: 'anyProgramme', text: 'any programme' }, ...programmeOptions]
 
     if (filter.notSet) {
