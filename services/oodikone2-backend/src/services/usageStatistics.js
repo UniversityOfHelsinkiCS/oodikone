@@ -1,7 +1,8 @@
 const _ = require('lodash')
 const moment = require('moment')
-const { UsageStatistic, sequelize } = require('../models')
-const { Op } = sequelize
+const { UsageStatistic } = require('../models')
+const Sequelize = require('sequelize')
+const { Op } = Sequelize
 
 const wildcarded = url => {
   if (url.includes('/units/') && url.includes('/users/')) {

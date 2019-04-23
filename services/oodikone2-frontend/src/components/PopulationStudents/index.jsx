@@ -220,7 +220,7 @@ class PopulationStudents extends Component {
         cellProps: { collapsing: true, textAlign: 'center' },
         getRowVal: s => Boolean(s.courses.find(c => c.passed && c.course.code === m.code)),
         getRowContent: s => (
-          s.courses.find(c => c.passed && c.course.code === m.code) ? (<Icon fitted name="check circle" color="green" />) : (<Icon fitted name="times circle" color="red" />)
+         s.courses.find(c => c.passed && c.course.code === m.code) ? (<Icon fitted name="check circle" color="green" />) : (<Icon fitted name="times circle" color="red" />)
         )
       }))
     ]
