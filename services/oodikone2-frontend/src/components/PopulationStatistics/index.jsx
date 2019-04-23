@@ -30,7 +30,7 @@ class PopulationStatistics extends PureComponent {
     return (
       <Segment>
         <Header size="medium">{title}
-          <InfoBox content={Main} />
+          {!populationFound && <InfoBox content={Main} />}
         </Header>
         <PopulationSearchForm />
         <Divider />
@@ -57,8 +57,8 @@ class PopulationStatistics extends PureComponent {
 const mapStateToProps = ({ locale, populations }) => ({
   translate: getTranslate(locale),
   currentLanguage: getActiveLanguage(locale).value,
-  populationFound: populations.length > 0,
-  loading: populations.pending
+  loading: populations.pending,
+  populationFound: populations.data.students !== undefined
 })
 
 export default connect(mapStateToProps)(PopulationStatistics)
