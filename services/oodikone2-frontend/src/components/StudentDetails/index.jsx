@@ -8,7 +8,7 @@ import { getStudent, removeStudentSelection, resetStudent } from '../../redux/st
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraph from '../CreditAccumulationGraph'
 import SearchResultTable from '../SearchResultTable'
-import { removeInvalidCreditsFromStudent, byDateDesc, reformatDate } from '../../common'
+import { removeInvalidCreditsFromStudent, byDateDesc, reformatDate, getTextIn } from '../../common'
 
 import sharedStyles from '../../styles/shared'
 
@@ -66,7 +66,7 @@ class StudentDetails extends Component {
       }
       return [
         reformatDate(date, 'DD.MM.YYYY'),
-        `${isStudyModuleCredit ? `${course.name[language]} [Study Module]` : course.name[language]} (${course.code})`,
+        `${isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)} (${course.code})`,
         <div>{icon}{grade}</div>,
         credits
       ]
@@ -88,7 +88,7 @@ class StudentDetails extends Component {
         .map(degree => ({
           startdate: degree.startdate,
           enddate: degree.enddate,
-          name: degree.element_detail.name[language],
+          name: getTextIn(degree.element_detail.name, language),
           graduateionDate: degree.graduationDate,
           canceldate: degree.canceldate
         }))
@@ -96,13 +96,13 @@ class StudentDetails extends Component {
         .map(programme => ({
           startdate: programme.startdate,
           enddate: programme.enddate,
-          name: programme.element_detail.name[language]
+          name: getTextIn(programme.element_detail.name, language)
         }))
       const studytracks = sortBy(studyright.studyrightElements, 'enddate').filter(e => e.element_detail.type === 30)
         .map(studytrack => ({
           startdate: studytrack.startdate,
           enddate: studytrack.enddate,
-          name: studytrack.element_detail.name[language]
+          name: getTextIn(studytrack.element_detail.name, language)
         }))
       return {
         studyrightid: studyright.studyrightid,
