@@ -251,7 +251,7 @@ class PopulationFilters extends Component {
         <Form>
           <Form.Group inline>
             <Form.Field>
-              <label>Show filtered students only</label>
+              <label>Show excluded students only</label>
             </Form.Field>
             <Form.Field>
               <Radio

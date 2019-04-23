@@ -5,8 +5,14 @@
   "main": "run.sh",
   "scripts": {
     "cypress:open": "CYPRESS_baseUrl=http://localhost:8081 cypress open",
-    "cypress:run": "CYPRESS_baseUrl=http://localhost:8081 cypress run -P ./",
-    "cypress:record": "cypress run --record -P ./"
+    "cypress:run": "CYPRESS_baseUrl=http://localhost:8081 cypress run --config video=false -P ./",
+    "cypress:record": "cypress run --record -P ./",
+    "test": "./run_all_tests.sh"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm test"
+    }
   },
   "repository": {
     "type": "git",
@@ -19,6 +25,7 @@
   },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
-    "cypress": "^3.2.0"
+    "cypress": "^3.2.0",
+    "husky": "^1.3.1"
   }
 }

@@ -221,7 +221,7 @@ class PopulationCourseStats extends Component {
   isActiveCourse = (course) => {
     const { selectedCourses } = this.props
     return selectedCourses.length > 0 && selectedCourses
-      .find(c => course.name === c.name && course.code === c.code) !== undefined
+      .find(c => course.code === c.code) !== undefined
   }
 
   renderCodeFilterInputHeaderCell = () => {
@@ -446,7 +446,6 @@ class PopulationCourseStats extends Component {
   render() {
     const { courses, translate, pending } = this.props
     const { studentAmountLimit } = this.state
-
     if (!courses) {
       return null
     }
