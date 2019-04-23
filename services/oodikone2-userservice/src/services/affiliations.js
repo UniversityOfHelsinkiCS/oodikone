@@ -1,7 +1,7 @@
 const { Affiliation } = require('../models/index')
 const { Op } = require('sequelize')
 
-const byId = id =>  Affiliation.findById(id)
+const byId = id =>  Affiliation.findByPk(id)
 
 const findAll = () => Affiliation.findAll()
 

@@ -1,7 +1,7 @@
 const { HyGroup } = require('../models/index')
 const { Op } = require('sequelize')
 
-const byId = id =>  HyGroup.findById(id)
+const byId = id =>  HyGroup.findByPk(id)
 
 const findAll = () => HyGroup.findAll()
 
