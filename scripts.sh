@@ -113,6 +113,10 @@ db_anon_setup_full () {
     echo "Database setup finished"
 }
 
+install_cli_npm_packages () {
+    npm ci
+}
+
 docker_build () {
     docker-compose up -d --build
 }
@@ -126,6 +130,8 @@ docker_restart_backend () {
 }
 
 run_full_setup () {
+    echo "Setup npm packages"
+    install_cli_npm_packages
     echo "Init dirs"
     init_dirs
     echo "Building images, starting containers"
@@ -137,6 +143,8 @@ run_full_setup () {
     show_instructions
 }
 run_anon_full_setup () {
+    echo "Setup npm packages"
+    install_cli_npm_packages
     echo "Init dirs"
     init_dirs
     echo "Building images, starting containers"
@@ -149,6 +157,8 @@ run_anon_full_setup () {
 }
 
 run_e2e_setup () {
+    echo "Setup npm packages"
+    install_cli_npm_packages
     echo "Init dirs"
     init_dirs
     echo "Building images, starting containers"
