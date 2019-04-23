@@ -12,3 +12,5 @@ anonyymioodi
 nginx
 kafka
 node_modules
+cypress/support
+cypress/videos
