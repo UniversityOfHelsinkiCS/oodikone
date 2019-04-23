@@ -26,6 +26,7 @@ import {
   clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter
 } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
+import { getTextIn } from '../../common'
 
 const componentFor = {
   CreditsAtLeast,
