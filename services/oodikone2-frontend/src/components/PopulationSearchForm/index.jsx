@@ -430,7 +430,7 @@ class PopulationSearchForm extends Component {
       return (
         <Form.Group>
           <Form.Field width={8}>
-            { degreesToRender && degreesToRender.length > 0 ? renderableDegrees() : null }
+            { degreesToRender && degreesToRender.length > 1 ? renderableDegrees() : null }
           </Form.Field>
           <Form.Field width={8}>
             { studyTracksToRender && studyTracksToRender.length > 0 ? renderableTracks() : null }
