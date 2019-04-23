@@ -280,7 +280,7 @@ class UserPage extends Component {
                     basic
                     fluid
                     positive
-                    content="Enable"
+                    content="Save"
                     onClick={this.enableAccessRightToUser(user.id)}
                   />
                   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
