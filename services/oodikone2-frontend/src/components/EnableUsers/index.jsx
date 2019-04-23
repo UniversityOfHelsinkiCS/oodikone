@@ -3,11 +3,11 @@ import { withRouter } from 'react-router-dom'
 import { Button, Icon, Header, Segment, Confirm, Loader, Label } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
-import { getTranslate, getActiveLanguage } from 'react-localize-redux'
+import { getTranslate } from 'react-localize-redux'
 import { getUsers, sendEmail } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { makeSortUsers } from '../../selectors/users'
-import { copyToClipboard } from '../../common'
+import { copyToClipboard, getTextIn } from '../../common'
 import sharedStyles from '../../styles/shared'
 import UserPageNew from '../UserPage'
 import SortableTable from '../SortableTable'
@@ -112,14 +112,8 @@ class EnableUsers extends Component {
               key: 'STUDYTRACKS',
               title: 'Studytracks',
               getRowVal: (user) => {
-                // TODO: language handling
-                // const { currentLanguage } = this.props
-                const language = 0
                 const nameInLanguage = element =>
-                  element.name[language]
-                    || element.name.fi
-                    || element.name.en
-                    || element.name.sv
+                  getTextIn(element.name, this.props.language)
 
                 if (!user.elementdetails || user.elementdetails.length === 0) return null
                 if (user.elementdetails.length >= 2) {
@@ -196,6 +190,7 @@ EnableUsers.propTypes = {
       studentNumber: string
     })
   }).isRequired,
+  language: string.isRequired,
   getUsers: func.isRequired,
   getUnits: func.isRequired,
   sendEmail: func.isRequired,
@@ -218,7 +213,6 @@ const sortUsers = makeSortUsers()
 const mapStateToProps = ({ locale, users, units, settings }) => ({
   language: settings.language,
   translate: getTranslate(locale),
-  currentLanguage: getActiveLanguage(locale).value,
   units: units.data,
   users: sortUsers(users),
   pending: (typeof (users.pending) === 'boolean') ? users.pending : true,

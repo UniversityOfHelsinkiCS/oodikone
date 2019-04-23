@@ -5,7 +5,7 @@ import { Card, Icon, Button } from 'semantic-ui-react'
 import _ from 'lodash'
 import styles from './populationQueryCard.css'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
-import { reformatDate } from '../../common'
+import { reformatDate, getTextIn } from '../../common'
 
 const PopulationQueryCard =
   ({ translate,
@@ -23,7 +23,7 @@ const PopulationQueryCard =
       return (
         <Card className={styles.cardContainer}>
           <Card.Header className={styles.cardHeader}>
-            <div>{Object.values(units).map(u => u.name[language]).join(', ')}</div>
+            <div>{Object.values(units).map(u => getTextIn(u.name, language)).join(', ')}</div>
             <Icon
               name="remove"
               className={styles.controlIcon}
@@ -67,7 +67,7 @@ const PopulationQueryCard =
     return (
       <Card className={styles.cardContainer}>
         <Card.Header className={styles.cardHeader}>
-          <div>{Object.values(units).map(u => u.name[language]).join(', ')}</div>
+          <div>{Object.values(units).map(u => getTextIn(u.name, language)).join(', ')}</div>
           <Icon
             name="remove"
             className={styles.controlIcon}
