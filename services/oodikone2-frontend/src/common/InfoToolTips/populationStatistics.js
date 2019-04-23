@@ -3,18 +3,26 @@ export default {
   sisäänotto-lukuvuoden mukaisesti, vuosikurssi kerrallaan. Uudet koulutusohjelmat
   ovat pääsääntöisesti alkaneet 1.8.2017 joten oletusvalinnat näyttävät tiedot tästä päivämäärästä lähtien.
   <br>
-  **Enrollment:** lukuvuosi, jolloin opiskelija on ilmoittautunut ensimmäisen kerran (läsnä- tai poissaolevaksi)
-  ohjelmaan. <br>
+  <br>
+  **Class of:** lukuvuosi, jolloin opiskelija on ilmoittautunut ensimmäisen kerran (läsnä- tai poissaolevaksi) ohjelmaan. Ilmoittautumisen opinto-oikeus voi olla ensi- tai toissijainen. <br>
   **Statistics until:** tarkastelujakson päättymiskuukausi. <br>
   **Study programme:** haluttu koulutusohjelma.`,
-  Advanced: `**Semesters:**  Jos haluaa tarkastella vain syyslukukaudella tai kevätlukukaudella ilmoittautuneita,
-  haluttu ajanjakso valitaan tästä.
+  Advanced: `**Semesters:**  Jos haluaa tarkastella vain syyslukukaudella tai kevätlukukaudella ilmoittautuneita, haluttu ajanjakso valitaan tästä.
 
-  **Include:** Koulutusohjelmapopulaatiosta on oletusarvoisesti suodatettu pois vaihto-opiskelijat,
-  tutkinnonsuoritusoikeudesta luopuneet ja ei-tutkinto-opiskelijat (esim. erillisopinto-oikeudella opiskelevat).
-  Näitä ryhmiä voi sisällyttää mukaan lisäämällä ruksin haluamaansa kohtaan.`,
-  QueryCard: `Valitun populaation perustiedot. "Sample size" kertoo populaation opiskelijalukumäärän.
-    Lukumäärään sisältyvät (läsnäolevat, poissaolevat ja kirjoiltapoistetut) tutkinto-opiskelijat."`,
+  **Include:** Koulutusohjelmapopulaatiosta on oletusarvoisesti suodatettu pois vaihto-opiskelijat, tutkinnonsuoritusoikeudesta luopuneet ja erillisopinto-oikeudella opiskelevat. Näitä ryhmiä voi sisällyttää mukaan lisäämällä ruksin haluamaansa kohtaan.`,
+  QueryCard: `Valitun koulutusohjelmavuosikurssin perustiedot.
+  <br>
+  <br>
+  **Sample size** luku sisältää läsnä- ja poissaolevaksi ilmoittautuneet opiskelijat, muttei "excludes"-ryhmiä, jotka voi määritellä koulutusohjelmaa valittaessa.
+  <br>
+  **Fall** = 1.8. - 31.12. ilmoittautuneet ja **Spring** = 1.1. - 31.7. ilmoittautuneet.
+  <br>
+  **showing XX months**: Dataa näytetään ohjelman vuosikurssin alkamispäivästä lähtien haluttuun kuukauteen asti (oletusarvoisesti "tähän päivään").
+  <br>
+  **Updated** kertoo milloin data on päivitetty ja **Update population** kohdasta datan voi päivittää käsin (päivitysoperaatio kestää noin 10 minuuttia, sivu on uudelleenladattava päivitetyt tiedot nähdäkseen).
+  <br>
+  Mustasta rastista voi sulkea valitun koulutusohjelmavuosikurssin.
+  `,
   Filters: {
     Add: `Harmaata ”add” painiketta klikkaamalla aukeaa filters- eli suodatinvalikko, josta voi
       lisätä haluamiaan suodattimia, jotka rajaavat valittua populaatiota. Huom.! Filtterit eivät vaikuta
