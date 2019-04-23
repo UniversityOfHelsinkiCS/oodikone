@@ -6,6 +6,7 @@ import _ from 'lodash'
 import infoTooltips from '../../common/InfoToolTips'
 import { extentGraduated } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import { getTextIn } from '../../common'
 
 class ExtentGraduated extends Component {
   static propTypes = {
@@ -52,7 +53,7 @@ class ExtentGraduated extends Component {
     } else if (graduated === 'either') {
       returnText = ('students that are studying ')
     }
-    const postText = isExtent ? (` ${extents.find(extent => extent.extentcode === code).name[language]} `) : (` ${allStudyRights.find(sr => sr.value === code).text}`)
+    const postText = isExtent ? (` ${getTextIn(extents.find(extent => extent.extentcode === code).name, language)} `) : (` ${allStudyRights.find(sr => sr.value === code).text}`)
 
     return complemented === 'true' ?
       <span><b>Excluded</b> {returnText}<b>{postText}</b></span>
@@ -105,7 +106,7 @@ class ExtentGraduated extends Component {
                   options={_.sortBy(Object.values(extents).map(({
                     extentcode: ecode, name
                   }) => ({
-                    value: ecode, text: name[language]
+                    value: ecode, text: getTextIn(name, language)
                   })).concat(allStudyRights), entry => entry.text)}
                 />
               </Form.Field>

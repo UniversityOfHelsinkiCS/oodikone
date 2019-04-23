@@ -4,7 +4,7 @@ import { string, arrayOf, object, func, bool, shape } from 'prop-types'
 import { Header, Segment, Button, Icon, Popup, Tab } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import _ from 'lodash'
-import { getStudentTotalCredits, copyToClipboard, userRoles, reformatDate } from '../../common'
+import { getStudentTotalCredits, copyToClipboard, userRoles, reformatDate, getTextIn } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
@@ -62,7 +62,7 @@ class PopulationStudents extends Component {
       copyToClipboard(clipboardString)
     }
 
-    const transferFrom = s => (s.previousRights[0] && s.previousRights[0].element_detail.name[this.props.language])
+    const transferFrom = s => (s.previousRights[0] && getTextIn(s.previousRights[0].element_detail.name, this.props.language))
 
     const studyrightCodes = (studyrights, value) => (
       studyrights.filter((sr) => {
@@ -218,11 +218,11 @@ class PopulationStudents extends Component {
         title: (
           // https://stackoverflow.com/a/41396815
           <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>
-            {m.name[this.props.language]}<br />{m.code}
+            {getTextIn(m.name, this.props.language)}<br />{m.code}
           </div>
         ),
         // https://stackoverflow.com/a/246451
-        cellProps: { title: `${m.name[this.props.language]}\n${m.code}` },
+        cellProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
         getRowVal: s => Boolean(this.props.mandatoryPassed[m.code].includes(s.studentNumber)),
         getRowContent: s => (
           this.props.mandatoryPassed[m.code].includes(s.studentNumber) ?

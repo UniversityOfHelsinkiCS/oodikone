@@ -16,7 +16,7 @@ import { getSemesters } from '../../redux/semesters'
 import { transferTo } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
-import { momentFromFormat, reformatDate, textAndDescriptionSearch } from '../../common'
+import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn } from '../../common'
 import { setLoading } from '../../redux/graphSpinner'
 import style from './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
@@ -462,7 +462,7 @@ class PopulationSearchForm extends Component {
 
     let programmesToRender
     if (Object.values(studyProgrammes).length !== 0) {
-      const sortedStudyProgrammes = _.sortBy(studyProgrammes, s => s.name[language])
+      const sortedStudyProgrammes = _.sortBy(studyProgrammes, s => getTextIn(s.name, language))
       programmesToRender = this.renderableList(sortedStudyProgrammes)
     }
 
@@ -471,10 +471,10 @@ class PopulationSearchForm extends Component {
     if (studyRights.programme && this.validYearCheck(momentYear)) {
       const associations = studyProgrammes[studyRights.programme].enrollmentStartYears[momentYear.year()]
       if (associations) {
-        const sortedStudyDegrees = _.sortBy(associations.degrees, s => s.name[language])
+        const sortedStudyDegrees = _.sortBy(associations.degrees, s => getTextIn(s.name, language))
         degreesToRender = this.renderableList(sortedStudyDegrees)
 
-        const sortedStudyTracks = _.sortBy(associations.studyTracks, s => s.name[language])
+        const sortedStudyTracks = _.sortBy(associations.studyTracks, s => getTextIn(s.name, language))
         studyTracksToRender = this.renderableList(sortedStudyTracks)
       }
     }

@@ -26,6 +26,7 @@ import {
   clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter
 } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
+import { getTextIn } from '../../common'
 
 const componentFor = {
   CreditsAtLeast,
@@ -314,7 +315,7 @@ class PopulationFilters extends Component {
     const { allStudyRights, language } = this.props
     let allStudyRightOptions = []
     if (allStudyRights) {
-      allStudyRightOptions = Object.values(allStudyRights).reduce((options, level) => [...options, ...level.map(sr => ({ value: sr.code, text: sr.name[language] }))], [])
+      allStudyRightOptions = Object.values(allStudyRights).reduce((options, level) => [...options, ...level.map(sr => ({ value: sr.code, text: getTextIn(sr.name, language) }))], [])
     }
     return (
       <div>
