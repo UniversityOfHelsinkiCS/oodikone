@@ -179,18 +179,19 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         required: true,
         attributes: ['studyrightid', 'startdate', 'highlevelname',
           'extentcode', 'graduated', 'canceldate', 'prioritycode'],
-        include: [{
-          model: StudyrightExtent,
-          required: true,
-          attributes: ['extentcode', 'name']
-        },
-        {
-          model: StudyrightElement,
-          required: true,
-          include: {
-            model: ElementDetails
+        include: [
+          {
+            model: StudyrightExtent,
+            required: true,
+            attributes: ['extentcode', 'name']
+          },
+          {
+            model: StudyrightElement,
+            required: true,
+            include: {
+              model: ElementDetails
+            }
           }
-        }
         ]
       },
       {

@@ -446,7 +446,6 @@ class PopulationCourseStats extends Component {
   render() {
     const { courses, translate, pending } = this.props
     const { studentAmountLimit } = this.state
-    console.log(this.props.selectedCourses)
     if (!courses) {
       return null
     }
