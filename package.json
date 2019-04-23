@@ -7,8 +7,12 @@
     "cypress:open": "CYPRESS_baseUrl=http://localhost:8081 cypress open",
     "cypress:run": "CYPRESS_baseUrl=http://localhost:8081 cypress run -P ./",
     "cypress:record": "cypress run --record -P ./",
-    "test": "./run_all_tests.sh",
-    "pre-push": "npm test"
+    "test": "./run_all_tests.sh"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm test"
+    }
   },
   "repository": {
     "type": "git",
