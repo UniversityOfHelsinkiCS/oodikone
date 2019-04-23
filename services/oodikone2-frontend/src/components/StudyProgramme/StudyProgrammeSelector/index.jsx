@@ -5,6 +5,7 @@ import { sortBy } from 'lodash'
 import { Loader } from 'semantic-ui-react'
 import { getDegreesAndProgrammes } from '../../../redux/populationDegreesAndProgrammes'
 import Table from '../../SearchResultTable'
+import { getTextIn } from '../../../common'
 
 const headers = [
   'name',
@@ -48,7 +49,7 @@ const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
   return {
     studyprogrammes: programmes ? sortBy(Object.values(programmes).filter(programme =>
       programme.code.includes('_'))
-      .map(programme => [programme.name[language], programme.code]), '0') : null
+      .map(programme => [getTextIn(programme.name, language), programme.code]), '0') : null
   }
 }
 

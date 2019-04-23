@@ -1,10 +1,11 @@
 import { createSelector } from 'reselect'
+import { getTextIn } from '../common'
 
 const nameAsString = (data, language) => {
   if (typeof data === 'string') {
     return data
   }
-  return data[language] || Object.values(data)[0]
+  return getTextIn(data, language)
 }
 
 const getCourseStats = (state) => {

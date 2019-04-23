@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { byDateDesc, reformatDate } from '../common'
+import { byDateDesc, reformatDate, getTextIn } from '../common'
 
 const getData = obj => obj
 
@@ -33,12 +33,10 @@ export const makeSortCourses = () => createSelector(
   sortCourses
 )
 
-const getLocalizedName = (name, language) => (name[language] || Object.values(name)[0])
-
 export const getCourseSearchResults = (state) => {
   const { language } = state.settings
   return state.courseSearch.data.map(({ name, ...rest }) => ({
     ...rest,
-    name: name && getLocalizedName(name, language)
+    name: getTextIn(name, language)
   }))
 }

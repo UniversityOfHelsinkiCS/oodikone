@@ -7,6 +7,7 @@ import { getDuplicates, addDuplicate, removeDuplicate } from '../../redux/course
 import CourseSearch from '../CourseSearch'
 import sharedStyles from '../../styles/shared'
 import styles from './courseCodeMapper.css'
+import { getTextIn } from '../../common'
 
 const { func, shape, string } = PropTypes
 
@@ -25,9 +26,7 @@ class CourseCodeMapper extends Component {
 
   getName = (name) => {
     const { language } = this.props
-
-    const res = name[language] ? name[language] : name.fi
-    return res
+    return getTextIn(name, language)
   }
 
   getTableRows = () => {
@@ -48,7 +47,7 @@ class CourseCodeMapper extends Component {
             </React.Fragment>))}
           </Table.Cell>
           <Table.Cell>
-            {Object.keys(course.alt).map(altKey => course.alt[altKey][language]).toString()}
+            {Object.keys(course.alt).map(altKey => getTextIn(course.alt[altKey], language)).toString()}
           </Table.Cell>
         </Table.Row>)
     })

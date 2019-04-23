@@ -14,6 +14,7 @@ import { courseParticipation } from '../../populationFilters'
 import PassingSemesters from './PassingSemesters'
 
 import styles from './populationCourseStats.css'
+import { getTextIn } from '../../common'
 
 export const tableColumnNames = {
   STUDENTS: 'students',
@@ -306,7 +307,7 @@ class PopulationCourseStats extends Component {
         <Table.Row active={this.isActiveCourse(course)}>
           <Table.Cell
             onClick={() => this.onCourseNameCellClick(courseStats)}
-            content={name[language]}
+            content={getTextIn(name, language)}
             className={styles.clickableCell}
           />
           <Table.Cell
@@ -410,7 +411,7 @@ class PopulationCourseStats extends Component {
         <Table.Row key={code} active={this.isActiveCourse(course)}>
           <Table.Cell
             onClick={() => this.onCourseNameCellClick(courseStats)}
-            content={name[language]}
+            content={getTextIn(name, language)}
             className={styles.clickableCell}
           />
           <Table.Cell

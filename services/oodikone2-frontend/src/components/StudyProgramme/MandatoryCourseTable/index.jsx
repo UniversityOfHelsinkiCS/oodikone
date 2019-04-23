@@ -2,6 +2,7 @@ import React from 'react'
 import { arrayOf, string, shape, func } from 'prop-types'
 import { Button } from 'semantic-ui-react'
 import SortableTable from '../../SortableTable'
+import { getTextIn } from '../../../common'
 
 const MandatoryCourseTable = ({ studyProgramme, mandatoryCourses, language, deleteMandatoryCourse }) => {
   const deleteButton = code => (
@@ -13,7 +14,7 @@ const MandatoryCourseTable = ({ studyProgramme, mandatoryCourses, language, dele
   )
 
   const columns = [
-    { key: 'name', title: 'Name', getRowVal: course => course.name ? course.name[language] : null }, //eslint-disable-line
+    { key: 'name', title: 'Name', getRowVal: course => getTextIn(course.name, language) },
     { key: 'code', title: 'Code', getRowVal: course => course.code },
     { key: 'delete', title: 'Delete', getRowVal: course => deleteButton(course.code) }
   ]
