@@ -207,6 +207,11 @@ class PopulationStudents extends Component {
         cellProps: { title: 'student number' },
         getRowVal: s => s.studentNumber
       },
+      {
+        key: 'icon',
+        getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
+        cellProps: { collapsing: true, className: styles.iconCell }
+      },
       ..._.sortBy(
         this.props.mandatoryCourses,
         [(m) => {
