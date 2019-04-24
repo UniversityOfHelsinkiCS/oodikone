@@ -12,7 +12,60 @@ const wildcarded = url => {
     return `${zeroedUrl.substr(0, end)}/00000`
   }
 
-  if (url.includes('/students/') || url.includes('/teachers/') || url.includes('/users/')) {
+  if (url.includes('/students/')
+    || url.includes('/teachers/')
+    || url.includes('/users/')
+    || url.includes('oodilearn/student')
+    || url.includes('courseGroups/')) {
+    return url.replace(/\d/g, '0')
+  }
+
+
+  // if post to /thesis/xxxx
+  if (url.includes('/studyprogrammes/') &&  url.includes('/thesis/')) {
+    const aa =  url.split('/')
+    aa[aa.length - 1] = '00000'
+    aa[aa.length - 3] = '00000'
+    return aa.join('/')
+  }
+
+  if ((url.includes('/studyprogrammes/') &&  url.includes('/mandatory_courses'))
+  || (url.includes('/studyprogrammes/') &&  url.includes('/productivity')) 
+  || (url.includes('/studyprogrammes/') &&  url.includes('/thesis'))
+  || (url.includes('/studyprogrammes/') &&  url.includes('/throughput'))) {
+    const aa =  url.split('/')
+    aa[aa.length - 2] = '00000'
+    return aa.join('/')
+  }
+
+  if (url.includes('oodilearn/courses/')) {
+    const aa =  url.split('/')
+    aa[aa.length - 1] = '00000'
+    return aa.join('/')
+  }
+
+  if (url.includes('oodilearn/') && !url.includes('ping') && !url.includes('populations')) {
+    const aa =  url.split('/')
+    aa[aa.length - 1] = '00000'
+    return aa.join('/')
+  }
+
+  if(url.includes('mandatory_courses')) {
+    return '/mandatory_courses/00000'
+  }
+
+  if(url.includes('course-groups/')) {
+    if(url.includes('programme')) {
+      if(url.includes('force')) {
+        const aa =  url.split('/')
+        aa[aa.length - 2] = '00000'
+        return aa.join('/')
+      } else {
+        const aa =  url.split('/')
+        aa[aa.length - 1] = '00000'
+        return aa.join('/')
+      }
+    }
     return url.replace(/\d/g, '0')
   }
 
