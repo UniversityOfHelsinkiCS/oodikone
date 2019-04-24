@@ -1,4 +1,4 @@
-# oodikone2-cli
+# oodikone
 
 [![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone.svg?branch=master)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone)
 
