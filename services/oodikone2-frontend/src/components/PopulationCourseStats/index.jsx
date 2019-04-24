@@ -102,8 +102,7 @@ class PopulationCourseStats extends Component {
       return {
         ...state,
         courseStatistics: PopulationCourseStats.updateCourseStatisticsCriteria(props, state),
-        initialSortReady: true,
-        studentAmountLimit: props.courses.coursestatistics ? parseInt(Math.max(...props.courses.coursestatistics.map(c => c.stats.students)) * 0.15, 10) : parseInt(...props.populationSize * 0.15, 10)
+        initialSortReady: true
       }
     }
 
@@ -246,6 +245,7 @@ class PopulationCourseStats extends Component {
     const { courses } = this.props
     const { courseStatistics } = this.state
     const courseStats = !(_.isEmpty(courseStatistics)) ? courseStatistics : courses.coursestatistics
+
     switch (this.state.activeView) {
       case 'showGradeDistribution':
         return this.renderGradeDistributionTable(courseStats)
