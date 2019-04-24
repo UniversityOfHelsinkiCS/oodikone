@@ -190,7 +190,6 @@ class PopulationStudents extends Component {
         }
       )
     }
-
     const mandatoryCourseColumns = [
       ...(this.props.showNames) ? [
         { key: 'lastname', title: 'last name', getRowVal: s => s.lastname, cellProps: { title: 'last name' } },
@@ -206,6 +205,14 @@ class PopulationStudents extends Component {
         ),
         cellProps: { title: 'student number' },
         getRowVal: s => s.studentNumber
+      },
+      {
+        key: 'icon',
+        title: (
+          <div />
+        ),
+        getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
+        cellProps: { collapsing: true, className: styles.iconCell }
       },
       ..._.sortBy(
         this.props.mandatoryCourses,
@@ -225,7 +232,7 @@ class PopulationStudents extends Component {
         cellProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
         getRowVal: s => Boolean(this.props.mandatoryPassed[m.code].includes(s.studentNumber)),
         getRowContent: s => (
-          this.props.mandatoryPassed[m.code] &&this.props.mandatoryPassed[m.code].includes(s.studentNumber) ?
+          this.props.mandatoryPassed[m.code] && this.props.mandatoryPassed[m.code].includes(s.studentNumber) ?
             (<Icon fitted name="check" color="green" />) : (<Icon fitted name="" color="grey" />)
         )
       }))
@@ -249,22 +256,28 @@ class PopulationStudents extends Component {
         menuItem: 'Mandatory courses',
         render: () => (
           <Tab.Pane>
-            <div style={{ overflowX: 'auto' }}>
-              <SortableTable
-                getRowKey={s => s.studentNumber}
-                tableProps={{
-                  celled: true,
-                  compact: 'very',
-                  padded: false,
-                  collapsing: true,
-                  basic: true,
-                  striped: true,
-                  singleLine: true,
-                  textAlign: 'center'
-                }}
-                columns={mandatoryCourseColumns}
-                data={this.props.selectedStudents.map(sn => students[sn])}
-              />
+            <div style={{ display: 'flex' }}>
+              <div style={{ overflowX: 'auto' }}>
+                <SortableTable
+                  getRowKey={s => s.studentNumber}
+                  tableProps={{
+                    celled: true,
+                    compact: 'very',
+                    padded: false,
+                    collapsing: true,
+                    basic: true,
+                    striped: true,
+                    singleLine: true,
+                    textAlign: 'center'
+                  }}
+                  columns={mandatoryCourseColumns}
+                  data={this.props.selectedStudents.map(sn => students[sn])}
+                />
+              </div>
+              <div style={{ paddingLeft: '2em' }}>
+                {this.props.mandatoryCourses.length === 0 &&
+                  <h1>Please define mandatory courses at study program overview panel!</h1>}
+              </div>
             </div>
           </Tab.Pane>
         )
@@ -328,7 +341,8 @@ const mapStateToProps = ({ settings, populations, populationCourses, populationM
   if (populationCourses.data.coursestatistics) {
     const courses = populationCourses.data.coursestatistics
     mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
-      obj[code] = Object.keys(courses.find(c => c.course.code === code).students.passed)
+      const foundCourse = !!courses.find(c => c.course.code === code)
+      obj[code] = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
       return obj
     }, {})
   }
