@@ -230,7 +230,7 @@ class PopulationStudents extends Component {
         cellProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
         getRowVal: s => Boolean(this.props.mandatoryPassed[m.code].includes(s.studentNumber)),
         getRowContent: s => (
-          this.props.mandatoryPassed[m.code] &&this.props.mandatoryPassed[m.code].includes(s.studentNumber) ?
+          this.props.mandatoryPassed[m.code] && this.props.mandatoryPassed[m.code].includes(s.studentNumber) ?
             (<Icon fitted name="check" color="green" />) : (<Icon fitted name="" color="grey" />)
         )
       }))
