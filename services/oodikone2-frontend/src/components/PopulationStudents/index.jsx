@@ -190,6 +190,18 @@ class PopulationStudents extends Component {
         }
       )
     }
+
+    const verticalTitle = title => (
+      // https://stackoverflow.com/a/41396815
+      <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>
+        {title}
+      </div>
+    )
+
+    const hasPassedMandatory = (studentNumber, code) => (
+      this.props.mandatoryPassed[code] && this.props.mandatoryPassed[code].includes(studentNumber)
+    )
+
     const mandatoryCourseColumns = [
       ...(this.props.showNames) ? [
         { key: 'lastname', title: 'last name', getRowVal: s => s.lastname, cellProps: { title: 'last name' } },
@@ -197,22 +209,24 @@ class PopulationStudents extends Component {
       ] : [],
       {
         key: 'studentnumber',
-        title: (
-          // https://stackoverflow.com/a/41396815
-          <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>
-            student number
-          </div>
-        ),
+        title: verticalTitle('student number'),
         cellProps: { title: 'student number' },
         getRowVal: s => s.studentNumber
       },
       {
         key: 'icon',
-        title: (
-          <div />
-        ),
+        title: '',
         getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
         cellProps: { collapsing: true, className: styles.iconCell }
+      },
+      {
+        key: 'totalpassed',
+        title: verticalTitle('total passed'),
+        getRowVal: s => this.props.mandatoryCourses.reduce((acc, m) => (
+          hasPassedMandatory(s.studentNumber, m.code) ?
+            acc + 1 : acc
+        ), 0),
+        cellProps: { title: 'total passed' }
       },
       ..._.sortBy(
         this.props.mandatoryCourses,
@@ -222,18 +236,11 @@ class PopulationStudents extends Component {
         }]
       ).map(m => ({
         key: m.code,
-        title: (
-          // https://stackoverflow.com/a/41396815
-          <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>
-            {getTextIn(m.name, this.props.language)}<br />{m.code}
-          </div>
-        ),
-        // https://stackoverflow.com/a/246451
+        title: verticalTitle(<Fragment>{getTextIn(m.name, this.props.language)}<br />{m.code}</Fragment>),
         cellProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
-        getRowVal: s => Boolean(this.props.mandatoryPassed[m.code].includes(s.studentNumber)),
+        getRowVal: s => hasPassedMandatory(s.studentNumber, m.code),
         getRowContent: s => (
-          this.props.mandatoryPassed[m.code] && this.props.mandatoryPassed[m.code].includes(s.studentNumber) ?
-            (<Icon fitted name="check" color="green" />) : (<Icon fitted name="" color="grey" />)
+          hasPassedMandatory(s.studentNumber, m.code) ? (<Icon fitted name="check" color="green" />) : (null)
         )
       }))
     ]
