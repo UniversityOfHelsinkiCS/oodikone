@@ -15,7 +15,6 @@
     "lint:js": "eslint server ./ --ext .jsx,.js",
     "lintfix": "eslint server ./ --ext .jsx,.js --fix",
     "stats": "webpack --json --config webpack.config.production.js > stats.json",
-    "pretest": "npm run lint",
     "test": "npm run lint",
     "notest": "echo",
     "storybook": "start-storybook -h 0.0.0.0 -p 7777 --ci"
