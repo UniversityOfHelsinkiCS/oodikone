@@ -22,7 +22,7 @@
   "licence": "",
   "main": "src/app.jsx",
   "devDependencies": {
-    "@storybook/react": "^5.0.1",
+    "@storybook/react": "^5.0.10",
     "babel-core": "6.26.0",
     "babel-eslint": "^10.0.1",
     "babel-loader": "7.1.4",
@@ -100,6 +100,7 @@
     "rimraf": "^2.6.3",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.83.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "xlsx": "^0.14.2"
   }
 }
