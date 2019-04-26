@@ -18,7 +18,7 @@ services:
 matrix:
   - fast_finish
 
-if: branch = master or tag =~ ([0-1].+)
+if: branch = master or tag =~ ^[0-9.]+$
 
 env:
   - SERVICE=oodikone2-frontend
