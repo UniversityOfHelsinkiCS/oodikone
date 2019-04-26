@@ -18,6 +18,8 @@ services:
 matrix:
   - fast_finish
 
+if: branch = master or tag =~ ([0-1].+)
+
 env:
   - SERVICE=oodikone2-frontend
   - SERVICE=oodikone2-backend
