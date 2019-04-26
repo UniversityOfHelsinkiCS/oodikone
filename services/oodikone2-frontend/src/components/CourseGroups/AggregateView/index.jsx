@@ -4,7 +4,6 @@ import { withRouter } from 'react-router'
 import { func, shape, string } from 'prop-types'
 
 import { getCompiledPath } from '../../../common'
-import { routes } from '../../../constants'
 
 import { callApi } from '../../../apiConnection'
 import SortableTable from '../../SortableTable'
@@ -12,7 +11,7 @@ import CourseGroupAddTeacher from '../CourseGroupAddTeacher'
 import CourseGroup from '../CourseGroup'
 
 const getCourseGroupPath = (courseGroupId, studyProgrammeId) =>
-  getCompiledPath(routes.studyProgrammeCourseGroup.route, {
+  getCompiledPath('/study-programme/:studyProgrammeId/course-group/:courseGroupId', {
     courseGroupId,
     studyProgrammeId
   })
