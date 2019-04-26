@@ -26,7 +26,7 @@ class EnableUsers extends Component {
 
   toggleEnabledOnly() {
     if (this.props.enabledOnly) this.props.getUsers()
-    const { enabledOnly } = this.state
+    const { enabledOnly } = this.state
     this.setState({ enabledOnly: !enabledOnly })
   }
 
