@@ -99,10 +99,14 @@ class PopulationCourseStats extends Component {
 
   static getDerivedStateFromProps(props, state) {
     if (state && props.courses) {
+      const studentAmountLimit = state.studentAmountLimit > props.selectedStudents.length
+        ? Math.round(props.selectedStudents.length / 2) : state.studentAmountLimit
+
       return {
         ...state,
         courseStatistics: PopulationCourseStats.updateCourseStatisticsCriteria(props, state),
-        initialSortReady: true
+        initialSortReady: true,
+        studentAmountLimit
       }
     }
 
@@ -140,7 +144,7 @@ class PopulationCourseStats extends Component {
   state = {
     sortCriteria: tableColumnNames.STUDENTS,
     reversed: true,
-    studentAmountLimit: parseInt(...this.props.populationSize * 0.15, 10),
+    studentAmountLimit: Math.round(this.props.populationSize * 0.3),
     codeFilter: '',
     activeView: null
   }
