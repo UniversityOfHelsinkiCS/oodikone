@@ -8,6 +8,11 @@ router.get('/', async (req, res) => {
   res.json(results)
 })
 
+router.get('/enabled', async (req, res) => {
+  const results = await userService.findAllEnabled()
+  res.json(results)
+})
+
 router.get('/access_groups', async (req, res) => {
   const result = await userService.getAccessGroups()
   res.json(result)
