@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
 import { shape, string } from 'prop-types'
 import { Header, Segment, Tab, Card, Icon } from 'semantic-ui-react'
 import sharedStyles from '../../styles/shared'
@@ -10,7 +11,7 @@ import Overview from './Overview'
 import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import styles from '../PopulationQueryCard/populationQueryCard.css'
-import { getRolesWithoutRefreshToken, getRightsWithoutRefreshToken } from '../../common'
+import { getRolesWithoutRefreshToken, getRightsWithoutRefreshToken, getTextIn } from '../../common'
 
 class StudyProgramme extends Component {
   static propTypes = {
@@ -20,13 +21,16 @@ class StudyProgramme extends Component {
         courseGroupId: string
       })
     }),
+    programmes: shape({}),
+    language: string.isRequired,
     history: shape({}).isRequired
   }
 
   static defaultProps = {
     match: {
       params: { studyProgrammeId: undefined }
-    }
+    },
+    programmes: {}
   }
 
   state = {
@@ -64,7 +68,6 @@ class StudyProgramme extends Component {
   }
 
   handleSelect = (target) => {
-    this.setState({ studyProgrammeName: target[0] })
     this.props.history.push(`/study-programme/${target[1]}`, { selected: target[1] })
   }
 
@@ -73,9 +76,10 @@ class StudyProgramme extends Component {
   }
 
   render() {
-    const { selected, studyProgrammeName } = this.state
-    const { match } = this.props
+    const { selected } = this.state
+    const { match, programmes, language } = this.props
     const { studyProgrammeId } = match.params
+    const programmeName = programmes[studyProgrammeId] && getTextIn(programmes[studyProgrammeId].name, language)
     const panes = this.getPanes()
     return (
       <div className={sharedStyles.segmentContainer}>
@@ -90,11 +94,11 @@ class StudyProgramme extends Component {
                 <Card fluid className={styles.cardContainer}>
                   <Card.Content>
                     <Card.Header className={styles.cardHeader}>
-                      {studyProgrammeName}
+                      {programmeName}
                       <Icon
                         name="remove"
                         className={styles.controlIcon}
-                        onClick={() => this.props.history.goBack()}
+                        onClick={() => this.props.history.push('/study-programme')}
                       />
                     </Card.Header>
                     <Card.Meta content={studyProgrammeId} />
@@ -110,4 +114,10 @@ class StudyProgramme extends Component {
   }
 }
 
-export default withRouter(StudyProgramme)
+const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
+  const programmes = populationDegreesAndProgrammes.data ?
+    populationDegreesAndProgrammes.data.programmes : {}
+  return { programmes, language: settings.language }
+}
+
+export default connect(mapStateToProps)(withRouter(StudyProgramme))
