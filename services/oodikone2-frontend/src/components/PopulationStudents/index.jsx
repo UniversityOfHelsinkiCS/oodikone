@@ -1,9 +1,10 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Button, Icon, Popup, Tab } from 'semantic-ui-react'
+import { Header, Segment, Button, Icon, Popup, Tab, Grid } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import _ from 'lodash'
+import XLSX from 'xlsx'
 import { getStudentTotalCredits, copyToClipboard, userRoles, reformatDate, getTextIn } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
@@ -191,6 +192,24 @@ class PopulationStudents extends Component {
       )
     }
 
+    const verticalTitle = title => (
+      // https://stackoverflow.com/a/41396815
+      <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>
+        {title}
+      </div>
+    )
+
+    const hasPassedMandatory = (studentNumber, code) => (
+      this.props.mandatoryPassed[code] && this.props.mandatoryPassed[code].includes(studentNumber)
+    )
+
+    const totalMandatoryPassed = studentNumber => (
+      this.props.mandatoryCourses.reduce((acc, m) => (
+        hasPassedMandatory(studentNumber, m.code) ?
+          acc + 1 : acc
+      ), 0)
+    )
+
     const mandatoryCourseColumns = [
       ...(this.props.showNames) ? [
         { key: 'lastname', title: 'last name', getRowVal: s => s.lastname, cellProps: { title: 'last name' } },
@@ -198,14 +217,21 @@ class PopulationStudents extends Component {
       ] : [],
       {
         key: 'studentnumber',
-        title: (
-          // https://stackoverflow.com/a/41396815
-          <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>
-            student number
-          </div>
-        ),
+        title: verticalTitle('student number'),
         cellProps: { title: 'student number' },
         getRowVal: s => s.studentNumber
+      },
+      {
+        key: 'icon',
+        title: '',
+        getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
+        cellProps: { collapsing: true, className: styles.iconCell }
+      },
+      {
+        key: 'totalpassed',
+        title: verticalTitle('total passed'),
+        getRowVal: s => totalMandatoryPassed(s.studentNumber),
+        cellProps: { title: 'total passed' }
       },
       ..._.sortBy(
         this.props.mandatoryCourses,
@@ -215,18 +241,11 @@ class PopulationStudents extends Component {
         }]
       ).map(m => ({
         key: m.code,
-        title: (
-          // https://stackoverflow.com/a/41396815
-          <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>
-            {getTextIn(m.name, this.props.language)}<br />{m.code}
-          </div>
-        ),
-        // https://stackoverflow.com/a/246451
+        title: verticalTitle(<Fragment>{getTextIn(m.name, this.props.language)}<br />{m.code}</Fragment>),
         cellProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
-        getRowVal: s => Boolean(this.props.mandatoryPassed[m.code].includes(s.studentNumber)),
+        getRowVal: s => hasPassedMandatory(s.studentNumber, m.code),
         getRowContent: s => (
-          this.props.mandatoryPassed[m.code] &&this.props.mandatoryPassed[m.code].includes(s.studentNumber) ?
-            (<Icon fitted name="check" color="green" />) : (<Icon fitted name="" color="grey" />)
+          hasPassedMandatory(s.studentNumber, m.code) ? (<Icon fitted name="check" color="green" />) : (null)
         )
       }))
     ]
@@ -249,31 +268,76 @@ class PopulationStudents extends Component {
         menuItem: 'Mandatory courses',
         render: () => (
           <Tab.Pane>
-            <div style={{ overflowX: 'auto' }}>
-              <SortableTable
-                getRowKey={s => s.studentNumber}
-                tableProps={{
-                  celled: true,
-                  compact: 'very',
-                  padded: false,
-                  collapsing: true,
-                  basic: true,
-                  striped: true,
-                  singleLine: true,
-                  textAlign: 'center'
-                }}
-                columns={mandatoryCourseColumns}
-                data={this.props.selectedStudents.map(sn => students[sn])}
-              />
+            <div style={{ display: 'flex' }}>
+              <div style={{ overflowX: 'auto' }}>
+                <SortableTable
+                  getRowKey={s => s.studentNumber}
+                  tableProps={{
+                    celled: true,
+                    compact: 'very',
+                    padded: false,
+                    collapsing: true,
+                    basic: true,
+                    striped: true,
+                    singleLine: true,
+                    textAlign: 'center'
+                  }}
+                  columns={mandatoryCourseColumns}
+                  data={this.props.selectedStudents.map(sn => students[sn])}
+                />
+              </div>
+              <div style={{ paddingLeft: '2em' }}>
+                {this.props.mandatoryCourses.length === 0 &&
+                  <h1>Please define mandatory courses at study program overview panel!</h1>}
+              </div>
             </div>
           </Tab.Pane>
         )
       }
     ]
 
+    const generateWorkbook = () => {
+      const data = this.props.selectedStudents.map(sn => students[sn])
+      const sortedMandatory = _.sortBy(
+        this.props.mandatoryCourses,
+        [(m) => {
+          const res = m.code.match(/\d+/)
+          return res ? Number(res[0]) : Number.MAX_VALUE
+        }]
+      )
+      const worksheet = XLSX.utils.json_to_sheet(data.map(s => ({
+        'last name': s.firstnames,
+        'first names': s.lastname,
+        'student number': s.studentNumber,
+        'credits since start': getStudentTotalCredits(s),
+        'all credits': s.credits,
+        email: s.email,
+        'transferred from': (s.transferredStudyright ? transferFrom(s) : ''),
+        priority: priorityText(s.studyrights),
+        extent: extentCodes(s.studyrights),
+        'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
+        'mandatory total passed': totalMandatoryPassed(s.studentNumber),
+        ...sortedMandatory.reduce((acc, m) => {
+          acc[`${getTextIn(m.name, this.props.language)}\n${m.code}`] = hasPassedMandatory(s.studentNumber, m.code)
+          return acc
+        }, {})
+      })))
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet)
+      return workbook
+    }
+
     return (
       <Fragment>
-        <StudentNameVisibilityToggle />
+        <Grid columns="two">
+          <Grid.Column><StudentNameVisibilityToggle /></Grid.Column>
+          <Grid.Column textAlign="right">
+            <Button icon labelPosition="right" onClick={() => XLSX.writeFile(generateWorkbook(), 'students.xlsx')}>
+              Download
+              <Icon name="file excel" />
+            </Button>
+          </Grid.Column>
+        </Grid>
         <Tab panes={panes} />
       </Fragment>
     )
@@ -328,7 +392,8 @@ const mapStateToProps = ({ settings, populations, populationCourses, populationM
   if (populationCourses.data.coursestatistics) {
     const courses = populationCourses.data.coursestatistics
     mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
-      obj[code] = Object.keys(courses.find(c => c.course.code === code).students.passed)
+      const foundCourse = !!courses.find(c => c.course.code === code)
+      obj[code] = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
       return obj
     }, {})
   }

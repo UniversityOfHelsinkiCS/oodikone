@@ -40,7 +40,7 @@ class StudyProgrammeMandatoryCourses extends Component {
       <React.Fragment>
         <Message
           content="The set of mandatory courses which can be used in population filtering
-              in the population statistics page"
+              in the 'Study programme' > 'Search by class' results page"
         />
         <AddMandatoryCourses
           addMandatoryCourse={this.props.addMandatoryCourse}

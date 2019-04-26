@@ -15,12 +15,16 @@ class WelcomePage extends Component { //eslint-disable-line
           </h3>
           <Divider section />
           <h4>
-            Population Statistics
+            Study programme
           </h4>
           <p>
             Query a student population specified by starting year and studyright.
             Oodikone will give you study statistics and visualizations of the population,
             which you can interactively filter and explore.
+          </p>
+          <p>
+            View overview of a studyprogramme with statistics of population progress
+            and yearly productivity.
           </p>
           <Divider section />
 
