@@ -22,6 +22,18 @@ app.get('/findall', async (req, res) => {
   })
   res.json(returnedUsers)
 })
+
+app.get('/findallenabled', async (req, res) => {
+  const users = await User.findAll()
+  const returnedUsers = users.filter(u => (
+    requiredGroup === null || u.hy_group.some(e => e.code === requiredGroup)
+  )).map(u => {
+    const enabled = requiredGroup === null || u.hy_group.some(e => e.code === requiredGroup)
+    return {...u.get(), is_enabled: enabled, hy_group: null}
+  })
+  res.json(returnedUsers)
+})
+
 app.get('/user/:uid', async (req, res) => {
   const uid = req.params.uid
   const user = await User.byUsername(uid)
