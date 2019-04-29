@@ -9,10 +9,17 @@ const ping = async () => {
   const response = await axios.get(url)
   return response.data
 }
+
 const findAll = async () => {
   const response = await client.get('/findall')
   return response.data
 }
+
+const findAllEnabled = async () => {
+  const response = await client.get('/findallenabled')
+  return response.data
+}
+
 const login = async (uid, full_name, hyGroups, affiliations, email) => {
   const response = await client.post('/login', {
     uid, full_name, hyGroups, affiliations, email, 
@@ -105,6 +112,7 @@ module.exports = {
   enableElementDetails,
   removeElementDetails,
   findAll,
+  findAllEnabled,
   modifyAccess,
   getAccessGroups,
   getUnitsFromElementDetails,

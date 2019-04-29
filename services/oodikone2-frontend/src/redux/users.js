@@ -6,6 +6,12 @@ export const getUsers = () => {
   return callController(route, prefix)
 }
 
+export const getEnabledUsers = () => {
+  const route = '/users/enabled'
+  const prefix = 'GET_ENABLED_USERS_'
+  return callController(route, prefix)
+}
+
 export const getAccessGroups = () => {
   const route = '/users/access_groups'
   const prefix = 'GET_ACCESSGROUPS_'
@@ -41,11 +47,12 @@ export const sendEmail = (email) => {
   return callController(route, prefix, data, method)
 }
 
-const reducer = (state = { data: [] }, action) => {
+const reducer = (state = { data: [], enabledOnly: true }, action) => {
   switch (action.type) {
     case 'GET_USERS_ATTEMPT':
       return {
         ...state,
+        enabledOnly: false,
         pending: true
       }
     case 'GET_USERS_FAILURE':
@@ -57,6 +64,27 @@ const reducer = (state = { data: [] }, action) => {
       }
     case 'GET_USERS_SUCCESS':
       return {
+        ...state,
+        pending: false,
+        error: false,
+        data: action.response
+      }
+    case 'GET_ENABLED_USERS_ATTEMPT':
+      return {
+        ...state,
+        enabledOnly: true,
+        pending: true
+      }
+    case 'GET_ENABLED_USERS_FAILURE':
+      return {
+        ...state,
+        pending: false,
+        error: true,
+        data: action.response
+      }
+    case 'GET_ENABLED_USERS_SUCCESS':
+      return {
+        ...state,
         pending: false,
         error: false,
         data: action.response
