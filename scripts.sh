@@ -2,8 +2,10 @@
 
 DIR_PATH=$(dirname "$0")
 BACKUP_DIR=backups
-PSQL_DB_BACKUP="$BACKUP_DIR/latest-pg.bak"
-USER_DB_BACKUP="$BACKUP_DIR/latest-user-pg.bak"
+PSQL_DB_BACKUP="$BACKUP_DIR/anon.bak"
+USER_DB_BACKUP="$BACKUP_DIR/user-dump.bak"
+PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.bak"
+USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.bak"
 
 retry () {
     for i in {1..10}
@@ -48,8 +50,8 @@ get_anon_oodikone() {
       chmod 400 private.key
     fi
     GIT_SSH_COMMAND='ssh -i private.key' git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
-    mv anonyymioodi/anon.bak.bz2 ./$BACKUP_DIR/latest-pg.bak.bz2
-    mv anonyymioodi/user-dump.bak.bz2 ./$BACKUP_DIR/latest-user-pg.bak.bz2
+    mv anonyymioodi/anon.bak.bz2 ./$BACKUP_DIR/anon.bak.bz2
+    mv anonyymioodi/user-dump.bak.bz2 ./$BACKUP_DIR/user-dump.bak.bz2
 
 }
 
@@ -61,8 +63,18 @@ restore_psql_from_backup () {
     cat $PSQL_DB_BACKUP | docker exec -i -u postgres oodi_db psql -d tkt_oodi
 }
 
+restore_real_psql_from_backup () {
+    cat $PSQL_REAL_DB_BACKUP | docker exec -i -u postgres oodi_db psql -d tkt_oodi_real
+}
+
 restore_userdb_from_backup () {
+    docker exec -u postgres oodi_user_db psql -c "CREATE DATABASE user_db"
     cat $USER_DB_BACKUP | docker exec -i -u postgres oodi_user_db psql -d user_db
+}
+
+restore_real_userdb_from_backup () {
+    docker exec -u postgres oodi_user_db psql -c "CREATE DATABASE user_db_real"
+    cat $USER_REAL_DB_BACKUP | docker exec -i -u postgres oodi_user_db psql -d user_db_real
 }
 
 restore_mongodb_from_backup () {
@@ -79,6 +91,15 @@ ping_psql () {
     echo "Pinging psql in container $1 with db name $2"
     docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi"
     retry docker exec -u postgres $1 pg_isready
+    echo "Pinging psql in container $1 with db name tkt_oodi_test"
+    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_test"
+    retry docker exec -u postgres $1 pg_isready
+}
+
+ping_psql_real () {
+    echo "Pinging psql in container $1 with db name $2"
+    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_real"
+    retry docker exec -u postgres $1 pg_isready
 }
 
 db_setup_full () {
@@ -87,13 +108,13 @@ db_setup_full () {
     echo "Unpacking compressed files"
     unpack_oodikone_server_backup
     echo "Restoring PostgreSQL from backup"
-    ping_psql "oodi_db" "tkt_oodi"
-    retry restore_psql_from_backup
+    ping_psql_real "oodi_db" "tkt_oodi_real"
+    retry restore_real_psql_from_backup
     echo "Restoring MongoDB from backup"
     retry restore_mongodb_from_backup
     echo "Restore user db from backup"
-    ping_psql "oodi_user_db" "user_db"
-    retry restore_userdb_from_backup
+    ping_psql "oodi_user_db" "user_db_real"
+    retry restore_real_userdb_from_backup
     echo "Database setup finished"
 }
 
@@ -138,6 +159,7 @@ run_full_setup () {
     docker_build
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_setup_full
+    db_anon_setup_full
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
     show_instructions
