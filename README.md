@@ -28,6 +28,8 @@ bash run.sh
 
 For local development with anonymized data use `2) Anon setup` (you can run e2e tests with this).
 
+To get also the full real dataset use `3) Full setup`
+
 > `1) e2e setup` is designed for use in travis. But you can still try it locally if you want to.
 
 Run E2E tests in with `npm run cypress:run` or `npm run cypress:open` with visual browser.
@@ -51,9 +53,19 @@ The development environment is entirely configured in the docker-compose.yml fil
 The mapping of ports and environment variables are also defined in the docker-compose file. You can start, stop and manage the development environment by running the following commands from a terminal shell in this directory.
 
 ### Start the development environment
+
+#### With anonymized data:
+
 ```
 docker-compose up -d
 ```
+
+#### With real data:
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.real.yml up -d
+```
+
 
 ### Stop the development environment
 ```

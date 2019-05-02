@@ -214,7 +214,7 @@ class UserPage extends Component {
           </Card>
           <Card fluid>
             <Card.Content>
-              <Card.Header content="Enable access" />
+              <Card.Header content="Add access rights" />
               <Card.Description>
                 <Form loading={pending}>
                   <Divider />
@@ -288,7 +288,7 @@ class UserPage extends Component {
                       {this.state.visible && <Icon circular color="green" size="massive" name="check" />}
                     </Transition.Group>
                   </div>
-                  {this.props.isAdmin ? <Button
+                  {this.props.isAdmin && user.is_enabled ? <Button
                     basic
                     fluid
                     positive
