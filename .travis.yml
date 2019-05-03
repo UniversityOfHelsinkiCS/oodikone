@@ -57,3 +57,19 @@ jobs:
         - docker-compose -f compose-latest.yml build
         - docker-compose -f compose-latest.yml push
         - echo "Done, please MANUAL DEPLOY"
+
+    - stage: TESTCI
+      if: branch = fixci
+      script:
+        - set -e
+        - docker login -u $DOCKER_USER -p $DOCKER_PASS
+        - source scripts.sh && run_e2e_setup
+        - docker ps
+        - cat nginx/log
+        - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
+        - npm run --prefix services/oodikone2-backend test_docker
+        - npm test --prefix services/oodikone2-analytics
+        - npm run --prefix services/oodikone2-userservice test_docker
+        - npm test --prefix services/oodikone2-usageservice
+        - npm test --prefix services/oodikone2-frontend
+        - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
