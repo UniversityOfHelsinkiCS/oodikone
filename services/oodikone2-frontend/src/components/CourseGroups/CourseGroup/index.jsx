@@ -10,7 +10,7 @@ import Teachers from './Teachers'
 import Courses from './Courses'
 import Statistics from './Statistics'
 
-import styles from './courseGroup.css'
+import './courseGroup.css'
 
 import AcademicYearFilter from './academicYearFilter'
 import { CG_API_BASE_PATH } from './util'
@@ -147,8 +147,8 @@ class CourseGroup extends Component {
 
     return (
       <Segment loading={isLoading}>
-        <Header size="medium" className={styles.headerWithControl}>
-          <div className={styles.headerFilterContainer}>
+        <Header size="medium" className="headerWithControl">
+          <div className="headerFilterContainer">
             {name}
             <AcademicYearFilter
               semesterCode={semesterCode}
@@ -159,7 +159,7 @@ class CourseGroup extends Component {
           <Button
             icon="reply"
             onClick={() => navigateTo(routes.studyProgramme.route)}
-            className={styles.headerIconButton}
+            className="headerIconButton"
           />
         </Header>
         <Statistics

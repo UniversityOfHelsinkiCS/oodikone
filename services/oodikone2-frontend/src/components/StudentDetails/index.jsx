@@ -10,8 +10,6 @@ import CreditAccumulationGraph from '../CreditAccumulationGraph'
 import SearchResultTable from '../SearchResultTable'
 import { removeInvalidCreditsFromStudent, byDateDesc, reformatDate, getTextIn } from '../../common'
 
-import sharedStyles from '../../styles/shared'
-
 class StudentDetails extends Component {
   componentDidMount() {
     this.props.history.listen((location, action) => {
@@ -187,7 +185,7 @@ class StudentDetails extends Component {
       return null
     }
     return (
-      <Segment className={sharedStyles.contentSegment} >
+      <Segment className="contentSegment" >
         <StudentInfoCard
           student={student}
           translate={translate}

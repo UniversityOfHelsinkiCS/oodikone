@@ -153,7 +153,7 @@ export const gradeGraphOptions = (categories, max) => ({
   chart: {
     type: 'column'
   },
-  colors: [red, chartblue, chartblue, chartblue, chartblue, chartblue, chartblue, chartblue],
+  colors: [red, chartblue, chartblue, chartblue, chartblue, chartblue, green, green],
 
   title: {
     text: 'Grades'

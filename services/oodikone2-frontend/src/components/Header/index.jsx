@@ -6,10 +6,10 @@ import { withRouter } from 'react-router-dom'
 
 import NavigationBar from '../NavigationBar'
 
-import styles from './header.css'
+import './header.css'
 
 const Header = props => (
-  <header className={styles.header} role="banner">
+  <header className="header" role="banner">
     <NavigationBar translate={props.translate} location={props.location} />
   </header>
 )

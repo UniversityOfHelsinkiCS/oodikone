@@ -5,8 +5,7 @@ import { Header, Button, Message, Table, Input, Segment, Icon, Loader } from 'se
 import { getDuplicates, addDuplicate, removeDuplicate } from '../../redux/coursecodeduplicates'
 
 import CourseSearch from '../CourseSearch'
-import sharedStyles from '../../styles/shared'
-import styles from './courseCodeMapper.css'
+import './courseCodeMapper.css'
 import { getTextIn } from '../../common'
 
 const { func, shape, string } = PropTypes
@@ -108,9 +107,9 @@ class CourseCodeMapper extends Component {
     const disabled = !((this.state.code1 && this.state.code2) &&
       (this.state.code1 !== this.state.code2))
     return (
-      <div className={sharedStyles.segmentContainer}>
-        <Segment className={sharedStyles.contentSegment}>
-          <Header className={sharedStyles.segmentTitle} size="large">Course Code Mapping</Header>
+      <div className="segmentContainer">
+        <Segment className="contentSegment">
+          <Header className="segmentTitle" size="large">Course Code Mapping</Header>
           <Message
             header="Map corresponding course codes to each other"
             content="By default courses with different codes are considered as separate courses.
@@ -138,7 +137,7 @@ class CourseCodeMapper extends Component {
                 <CourseSearch handleResultSelect={this.handleResultSelect2} />
                 <Button
                   disabled={disabled}
-                  className={styles.button}
+                  className="button"
                   content="Add"
                   onClick={this.addDuplicate(this.state.code1, this.state.code2)}
                 />

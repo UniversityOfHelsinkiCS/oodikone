@@ -9,7 +9,7 @@ import thunk from 'redux-thunk'
 import * as Sentry from '@sentry/browser'
 import 'semantic-ui-css/semantic.min.css'
 import 'react-datetime/css/react-datetime.css'
-import './styles/global'
+import './styles/custom.css'
 
 import { AVAILABLE_LANGUAGES, DEFAULT_LANG, BASE_PATH } from './constants'
 import reducers from './redux'
@@ -34,28 +34,26 @@ try {
 const translations = require('./i18n/translations.json')
 
 // eslint-disable-next-line
-const composeEnhancers = (!IS_PRODUCTION && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 const store = createStore(reducers, composeEnhancers(applyMiddleware(thunk, handleRequest)))
 store.dispatch(initialize(AVAILABLE_LANGUAGES, { defaultLanguage: DEFAULT_LANG }))
 store.dispatch(addTranslation(translations))
 
-const render = (Component) => {
+const render = () => {
   ReactDOM.render(
     <Provider store={store}>
       <AppContainer>
-        <Component store={store} />
+        <Main store={store} />
       </AppContainer>
     </Provider>,
     document.getElementById('root')
   )
 }
 
-render(Main)
+render()
 
 if (module.hot) {
-  module.hot.accept('./components/Main', () => {
-    render(Main)
-  })
+  module.hot.accept()
 }
 

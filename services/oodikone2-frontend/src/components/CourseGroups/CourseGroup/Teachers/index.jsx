@@ -4,7 +4,7 @@ import sortBy from 'lodash/sortBy'
 import { bool, func, arrayOf, number } from 'prop-types'
 import { teacherType } from '../util'
 
-import styles from '../courseGroup.css'
+import '../courseGroup.css'
 
 const teacherColumnTypes = {
   NAME: 'name',
@@ -17,18 +17,18 @@ const TeacherItem = ({ teacher, isActive, handleFilterClick }) => {
   const { name, code, id, courses, credits } = teacher
 
   return (
-    <List.Item className={`${isActive ? styles.teacherActiveItem : ''}`}>
-      <List.Content className={styles.teacherItemStatistics}>
-        <div className={styles.teacherItemBasicInfo}>
-          <div className={styles.teacherName}>{name}</div>
-          <div className={styles.teacherCode}>{`(${code})`}</div>
+    <List.Item className={`${isActive ? 'teacherActiveItem' : ''}`}>
+      <List.Content className="teacherItemStatistics">
+        <div className="teacherItemBasicInfo">
+          <div className="teacherName">{name}</div>
+          <div className="teacherCode">{`(${code})`}</div>
         </div>
-        <div className={styles.teacherStatisticNumber}>{courses}</div>
-        <div className={styles.teacherStatisticNumber}>{credits}</div>
-        <div className={styles.statisticControlItem}>
+        <div className="teacherStatisticNumber">{courses}</div>
+        <div className="teacherStatisticNumber">{credits}</div>
+        <div className="statisticControlItem">
           <Button
             icon="filter"
-            className={`${isActive ? styles.activeIconButton : styles.iconButton}`}
+            className={`${isActive ? 'activeIconButton' : 'iconButton'}`}
             onClick={() => handleFilterClick(id)}
             circular
           />
@@ -100,11 +100,11 @@ class Index extends Component {
 
     return (
       <List.Header>
-        <List.Content className={styles.courseHeaderContent}>
-          {getHeader(styles.teacherHeaderName, 'Name', teacherColumnTypes.NAME)}
-          {getHeader(styles.teacherHeaderItem, 'Courses', teacherColumnTypes.COURSES)}
-          {getHeader(styles.teacherHeaderItem, 'Credits', teacherColumnTypes.CREDITS)}
-          <div className={styles.teacherHeaderFilter}>Filter</div>
+        <List.Content className="courseHeaderContent">
+          {getHeader('teacherHeaderName', 'Name', teacherColumnTypes.NAME)}
+          {getHeader('teacherHeaderItem', 'Courses', teacherColumnTypes.COURSES)}
+          {getHeader('teacherHeaderItem', 'Credits', teacherColumnTypes.CREDITS)}
+          <div className="teacherHeaderFilter">Filter</div>
         </List.Content>
       </List.Header>
     )
@@ -128,9 +128,9 @@ class Index extends Component {
 
     return (
       <Fragment>
-        <Header size="medium" className={styles.headerWithControl}>
+        <Header size="medium" className="headerWithControl">
           Teachers
-          <div className={styles.activeToggleContainer}>
+          <div className="activeToggleContainer">
             <label htmlFor={toggleId}>Show only active</label>
             <Radio
               id={toggleId}

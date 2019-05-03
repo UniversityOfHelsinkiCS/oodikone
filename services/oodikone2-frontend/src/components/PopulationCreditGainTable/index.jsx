@@ -12,7 +12,8 @@ const getTotal = students => students.map(student => getStudentTotalCredits(stud
 
 const expectedAmountOfCredits = months => ([
   [Math.ceil(months * (55 / 12))],
-  [Math.ceil(months * (40 / 12)), (Math.ceil(months * (55 / 12)))],
+  [Math.ceil(months * (50 / 12)), Math.ceil(months * (55 / 12))],
+  [Math.ceil(months * (40 / 12)), Math.ceil(months * (50 / 12))],
   [Math.ceil(months * (30 / 12)), Math.ceil(months * (40 / 12))],
   [Math.ceil(months * (20 / 12)), Math.ceil(months * (30 / 12))],
   [Math.ceil(months * (10 / 12)), Math.ceil(months * (20 / 12))],
@@ -59,7 +60,8 @@ const PopulationCreditGainTable = (props) => {
   const stats = getTotal(sample)
   const limits = expectedAmountOfCredits(months)
   const arr = limits.map(l => filterStudents(stats, ...l))
-  const rows = arr.map(a => [`${a.minCredits}-${a.maxCredits}`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />])
+  const rows = arr.map(a => [`${a.minCredits} - ${a.maxCredits}`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />])
+
   const headers = [
     `Credits gained during first ${months} months`,
     `Students (all=${stats.length})`,

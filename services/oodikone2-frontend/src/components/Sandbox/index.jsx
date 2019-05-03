@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import { Header, Segment, Grid, Message, Button } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, bool, oneOfType, shape, string } from 'prop-types'
-import sharedStyles from '../../styles/shared'
-import style from './index.css'
+import './index.css'
 import { pingOodiLearn } from '../../redux/sandbox'
 import Postman from '../Postman'
 import UpdateTopTeachers from './UpdateTopTeachers'
@@ -18,9 +17,9 @@ class SandboxContainer extends Component {
         throw new Error('Oo oo ah ah!')
       }
       return (
-        <div className={style.container}>
-          <Header className={sharedStyles.segmentTitle} content="Sandbox" size="large" />
-          <Segment className={sharedStyles.contentSegment}>
+        <div className="container">
+          <Header className="segmentTitle" content="Sandbox" size="large" />
+          <Segment className="contentSegment">
             <Grid container columns={1} verticalAlign="middle" textAlign="center">
               <Grid.Row>
                 <Grid.Column>
