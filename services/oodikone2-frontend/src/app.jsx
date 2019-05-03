@@ -34,24 +34,24 @@ try {
 const translations = require('./i18n/translations.json')
 
 // eslint-disable-next-line
-const composeEnhancers = (!IS_PRODUCTION && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 const store = createStore(reducers, composeEnhancers(applyMiddleware(thunk, handleRequest)))
 store.dispatch(initialize(AVAILABLE_LANGUAGES, { defaultLanguage: DEFAULT_LANG }))
 store.dispatch(addTranslation(translations))
 
-const render = (Component) => {
+const render = () => {
   ReactDOM.render(
     <Provider store={store}>
       <AppContainer>
-        <Component store={store} />
+        <Main store={store} />
       </AppContainer>
     </Provider>,
     document.getElementById('root')
   )
 }
 
-render(Main)
+render()
 
 if (module.hot) {
   module.hot.accept()
