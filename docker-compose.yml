@@ -1,6 +1,42 @@
 version: '3'
 
 services:
+  # zookeeper:
+  #   image: wurstmeister/zookeeper
+  #   ports:
+  #     - "2181:2181"
+  #   environment:
+  #     - KAFKA_BROKER_ID=1
+  #   container_name: zookeeper
+  
+  # kafka:
+  #   image: wurstmeister/kafka
+  #   container_name: kafka
+  #   depends_on:
+  #     - zookeeper
+  #   ports:
+  #     - "9092:9092"
+  #   environment:
+  #     - HOSTNAME_COMMAND=route -n | awk '/UG[ \t]/{print $$2}'
+  #     - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+  #     - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+  #     - KAFKA_DELETE_TOPIC_ENABLE=true
+  #     - KAFKA_CREATE_TOPICS=studentnumbers:1:1,priority_studentnumbers:1:1
+  #     - KAFKA_LOG_DIRS=/kafka/kafka-logs-1
+  #   volumes:
+  #     - ./kafka/docker.sock:/var/run/docker.sock
+  #     - ./kafka/logs:/kafka/kafka-logs-1
+  
+  nats:
+    image: nats-streaming
+    command: -cid updaterNATS
+    expose:
+      - "4222"
+    ports:
+      - "8222:8222"
+      - "4222:4222"
+    container_name: nats
+
   analytics_db:
     image: postgres:9.6.3
     ports:
@@ -11,6 +47,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=analytics_db
+
   user_db:
     image: postgres:9.6.3
     ports:
@@ -31,6 +68,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=usage_db
+
   db:
     image: postgres:9.6.3
     ports:
@@ -42,6 +80,7 @@ services:
     environment:
       - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test,tkt_oodi_real
       - POSTGRES_USER=postgres
+
   redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
@@ -50,15 +89,17 @@ services:
     volumes:
       - ./redis-data:/data
     container_name: redis
-  mongo_db:
-    image: mongo
-    restart: unless-stopped
-    volumes:
-      - ./backups/mongo/oodilearn:/dump
-      - ./mongodata:/data/db
-    ports:
-      - "27017:27017"
-    container_name: mongo_db
+
+  # mongo_db:
+  #   image: mongo
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./backups/mongo/oodilearn:/dump
+  #     - ./mongodata:/data/db
+  #   ports:
+  #     - "27017:27017"
+  #   container_name: mongo_db
+
   backend:
     build:
       context: services/oodikone2-backend
@@ -86,6 +127,7 @@ services:
     depends_on:
       - db
       - redis
+
   frontend:
     build:
       context: services/oodikone2-frontend
@@ -104,21 +146,23 @@ services:
     volumes:
       - ./services/oodikone2-frontend/:/usr/src/app
     container_name: frontend
-  oodilearn:
-    build:
-      context: services/oodilearn/server
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    volumes:
-      - ./services/oodilearn/data:/data
-      - ./services/oodilearn/server:/src
-      - ./services/oodilearn/models:/models
-    ports:
-      - "5000:5000"
-    environment:
-      - ENV=development
-      - MONGO_URI=mongodb://mongo_db:27017/oodilearn
-    container_name: oodilearn
+
+  # oodilearn:
+  #   build:
+  #     context: services/oodilearn/server
+  #     dockerfile: Dockerfile
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./services/oodilearn/data:/data
+  #     - ./services/oodilearn/server:/src
+  #     - ./services/oodilearn/models:/models
+  #   ports:
+  #     - "5000:5000"
+  #   environment:
+  #     - ENV=development
+  #     - MONGO_URI=mongodb://mongo_db:27017/oodilearn
+  #   container_name: oodilearn
+
   userservice:
     image: node:8.11.3
     command: sh -c "cd /usr/src/app && npm install && npm run dev"
@@ -133,6 +177,7 @@ services:
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       - TOKEN_SECRET=IWannaBeTheVeryBest
     container_name: userservice
+
   usageservice:
     image: node:10-alpine
     build:
@@ -140,8 +185,6 @@ services:
       dockerfile: dev.Dockerfile
     command: sh -c "cd /usr/src/app && npm install && npm run dev"
     restart: unless-stopped
-    volumes:
-      - ./services/oodikone2-usageservice/:/usr/src/app
     ports:
       - 545:545
     environment:
@@ -152,6 +195,24 @@ services:
       - ./services/oodikone2-usageservice/:/usr/src/app
       - ./services/oodikone2-usageservice/node_modules:/usr/src/app/node_modules
     container_name: usageservice
+
+  updater_api:
+    image: node:10-alpine
+    build:
+      context: services/updater_api
+      dockerfile: dev.Dockerfile
+    command: sh -c "cd /usr/src/app && npm install && npm run dev"
+    restart: unless-stopped
+    volumes: 
+      - ./services/updater_api/:/usr/src/app
+    depends_on:
+      - nats
+    environment:
+      - NATS_URI=nats://nats:4222
+      - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
+      - TOKEN=LAITASALASANATÄNNELOL
+    container_name: updater_api
+
   analytics:
     image: node:8.11.3
     command: sh -c "cd /usr/src/app && npm install && npm run dev"
@@ -168,6 +229,7 @@ services:
       - analytics_db
       - analytics_redis
     container_name: analytics
+
   analytics_redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
@@ -176,6 +238,7 @@ services:
     volumes:
       - ./analytics-redis-data:/data
     container_name: analytics_redis
+
   adminer:
     image: adminer:4.6.2
     environment:
