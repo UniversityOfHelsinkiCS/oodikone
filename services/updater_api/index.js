@@ -1,6 +1,5 @@
 var stan = require('node-nats-streaming').connect('updaterNATS', process.env.HOSTNAME, process.env.NATS_URI);
-const fs = require('fs');
-const { updateStudent } = require('./doo_api_database_updater/database_updater')
+const { getStudent } = require('./doo_api_database_updater/updater_formatter')
 
 
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
@@ -11,14 +10,14 @@ opts.setDeliverAllAvailable()
 opts.setDurableName('durable')
 stan.on('connect', function () {
 
-  const sub = stan.subscribe('Update', 'updater.workers', opts)
+  const sub = stan.subscribe('UpdateApi', 'updater.workers', opts)
   const prioSub = stan.subscribe('Priority_Update', 'updater.workers', opts)
 
   sub.on('message', async (msg) => {
     const studentnumber = msg.getData()
     // TODO: check that its a valid studentnumber and just ack it if its not
     try {
-      const student = await updateStudent(studentnumber)
+      const student = await getStudent(studentnumber)
       // TODO: check that student data is properly structured(?)
       stan.publish('UpdateWrite', JSON.stringify(student), (err, guid) => {
         if (err) {

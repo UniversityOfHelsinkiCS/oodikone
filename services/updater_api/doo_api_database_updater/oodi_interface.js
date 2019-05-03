@@ -63,7 +63,6 @@ const getStudent = async studentNumber => {
     const data = response.data.data
     return data
   } catch (e) {
-    console.log(e)
     throw e
   }
 }
