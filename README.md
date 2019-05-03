@@ -68,6 +68,7 @@ docker-compose -f docker-compose.yml -f docker-compose.real.yml up -d
 
 
 ### Stop the development environment
+
 ```
 docker-compose down
 ```
