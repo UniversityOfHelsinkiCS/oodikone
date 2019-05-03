@@ -126,6 +126,7 @@ class PopulationFilters extends Component {
   }
 
   handleSavePopulationFilters = () => {
+    console.log('save init')
     const preset = {
       id: uuidv4(),
       name: this.state.presetName,
