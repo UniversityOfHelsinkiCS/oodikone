@@ -6,45 +6,46 @@ node_js:
 
 cache:
   # cache both npm modules and Cypress binary
+  npm: true
   directories:
-    - ~/.npm
     - ~/.cache
-  override:
-    - npm ci
 
 services:
   - docker
 
-matrix:
-  - fast_finish
-
-if: branch = master or tag =~ ^[0-9.]+$
-
-env:
-  - SERVICE=oodikone2-frontend
-  - SERVICE=oodikone2-backend
-  - SERVICE=oodikone2-userservice
-  - SERVICE=oodikone2-usageservice
-  - SERVICE=oodikone2-analytics
-
-script:
-  - cd services/${SERVICE}
-  - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker build --build-arg BASE_PATH=/staging/ -t toska/${SERVICE}:staging .; fi
-  - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS; fi
-  - if [[ $TRAVIS_BRANCH =~ (^master) ]]; then docker push toska/${SERVICE}:staging; fi
-  - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker build --build-arg BASE_PATH=/ -t toska/${SERVICE}:latest .; fi
-  - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker login -u $DOCKER_USER -p $DOCKER_PASS; fi
-  - if [[ $TRAVIS_TAG =~ ([0-1].+) ]]; then docker push toska/${SERVICE}:latest; fi
-
 jobs:
   include:
-    - stage: test & release
-      if: branch = master
+    - stage: build & test (not staging or production release)
+      if: NOT branch = master AND NOT tag =~ ^[0-9.]+$
       script:
+        - set -e
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
         - source scripts.sh && run_e2e_setup
         - docker ps
         - cat nginx/log
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
+        - npm run test_services
         - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
+
+    - stage: build & test & push & deploy staging
+      if: branch = master
+      script:
+        - set -e
+        - docker login -u $DOCKER_USER -p $DOCKER_PASS
+        - source scripts.sh && run_e2e_setup
+        - docker ps
+        - cat nginx/log
+        - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
+        - npm run test_services
+        - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
+        - docker-compose -f docker-compose.lateste2e.yml push
         - "curl --fail -k -X POST -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" https://toska.cs.helsinki.fi/toskawatch/release/"
+
+    - stage: build & push & MANUAL DEPLOY production
+      if: tag =~ ^[0-9.]+$
+      script:
+        - set -e
+        - docker login -u $DOCKER_USER -p $DOCKER_PASS
+        - docker-compose -f compose-latest.yml build
+        - docker-compose -f compose-latest.yml push
+        - echo "Done, please MANUAL DEPLOY"
