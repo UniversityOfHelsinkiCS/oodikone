@@ -1,7 +1,6 @@
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const htmlTemplate = require('html-webpack-template')
 const TerserPlugin = require('terser-webpack-plugin')
 const DeadCodePlugin = require('webpack-deadcode-plugin')
 
@@ -51,10 +50,7 @@ module.exports = (env, args) => {
         ]
       }),
       new HtmlWebpackPlugin({
-        inject: false,
-        template: htmlTemplate,
-        appMountId: 'root',
-        title: 'Oodikone'
+        template: './index.html'
       }),
       new webpack.DefinePlugin({
         CONFIG: {
