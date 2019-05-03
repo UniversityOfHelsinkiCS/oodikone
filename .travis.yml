@@ -6,7 +6,7 @@ node_js:
 
 cache:
   # cache both npm modules and Cypress binary
-  - npm
+  npm: true
   directories:
     - ~/.cache
 
