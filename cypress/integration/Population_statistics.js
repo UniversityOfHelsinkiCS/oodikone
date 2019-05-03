@@ -15,7 +15,7 @@ describe('Population Statistics tests', () => {
     })
     console.log(Cypress.config().baseUrl)
     cy.visit(Cypress.config().baseUrl, { timeout: 24000 })
-    cy.contains("Study programme").click().siblings().contains("Search by class").click()
+    cy.contains("Study programme", { timeout: 100000 }).click().siblings().contains("Search by class").click()
     cy.contains("Select study programme", { timeout: 100000 })
   })
 
