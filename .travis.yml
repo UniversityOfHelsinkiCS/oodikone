@@ -16,7 +16,7 @@ services:
 jobs:
   include:
     - stage: build & test (not staging or production release)
-      if: NOT branch = master AND NOT tag =~ ^[0-9.]+$
+      if: type = pull_request
       script:
         - set -e
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
