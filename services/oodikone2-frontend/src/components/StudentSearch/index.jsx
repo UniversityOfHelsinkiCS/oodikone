@@ -10,8 +10,7 @@ import SortableTable from '../SortableTable'
 import Timeout from '../Timeout'
 import { makeFormatStudentRows } from '../../selectors/students'
 
-import sharedStyles from '../../styles/shared'
-import styles from './studentSearch.css'
+import './studentSearch.css'
 import { containsOnlyNumbers } from '../../common'
 
 const DEFAULT_STATE = {
@@ -105,7 +104,7 @@ class StudentSearch extends Component {
       <SortableTable
         getRowKey={s => s.studentNumber}
         getRowProps={s => ({
-          className: styles.clickable,
+          className: 'clickable',
           onClick: () => this.handleSearchSelect(s)
         })}
         tableProps={{ celled: false, sortable: false }}
@@ -125,9 +124,9 @@ class StudentSearch extends Component {
     const { isLoading, searchStr } = this.state
 
     return (
-      <div className={styles.searchContainer}>
+      <div className="searchContainer">
         <Search
-          className={styles.studentSearch}
+          className="studentSearch"
           input={{ fluid: true }}
           loading={isLoading}
           onSearchChange={this.handleSearchChange}
@@ -135,7 +134,7 @@ class StudentSearch extends Component {
           value={searchStr}
           placeholder={translate('studentStatistics.searchPlaceholder')}
         />
-        <Segment className={sharedStyles.contentSegment}>
+        <Segment className="contentSegment">
           <SegmentDimmer translate={translate} isLoading={isLoading} />
           {this.renderSearchResults()}
         </Segment>

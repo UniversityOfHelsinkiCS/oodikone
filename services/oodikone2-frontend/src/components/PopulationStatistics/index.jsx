@@ -10,7 +10,6 @@ import PopulationDetails from '../PopulationDetails'
 import SegmentDimmer from '../SegmentDimmer'
 import InfoBox from '../InfoBox'
 
-import sharedStyles from '../../styles/shared'
 import infoTooltips from '../../common/InfoToolTips'
 
 class PopulationStatistics extends PureComponent {
@@ -43,9 +42,9 @@ class PopulationStatistics extends PureComponent {
   render() {
     const { translate } = this.props
     return (
-      <div className={sharedStyles.segmentContainer}>
-        <Header className={sharedStyles.segmentTitle} size="large">{translate('populationStatistics.header')}</Header>
-        <Segment className={sharedStyles.contentSegment}>
+      <div className="segmentContainer">
+        <Header className="segmentTitle" size="large">{translate('populationStatistics.header')}</Header>
+        <Segment className="contentSegment">
           { this.renderPopulationSearch() }
           <PopulationDetails />
         </Segment>

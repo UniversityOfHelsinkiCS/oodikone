@@ -3,7 +3,7 @@ import { Dropdown, Button } from 'semantic-ui-react'
 import { number, arrayOf, func } from 'prop-types'
 import { academicYearType } from './util'
 
-import styles from './courseGroup.css'
+import './courseGroup.css'
 
 const AcademicYearFilter = ({ academicYears, semesterCode, handleSemesterCodeChangeFn }) => {
   if (!academicYears) {
@@ -23,17 +23,17 @@ const AcademicYearFilter = ({ academicYears, semesterCode, handleSemesterCodeCha
 
   return (
     <Fragment>
-      <div className={styles.academicYearFilterContainer}>
+      <div className="academicYearFilterContainer">
         <Button
           type="button"
           icon="angle left"
-          className={isMinSemesterCode ? styles.hiddenButton : styles.filterButton}
+          className={isMinSemesterCode ? 'hiddenButton' : 'filterButton'}
           onClick={e => handleSemesterCodeChangeFn(
             e,
             { value: semesterCode - semesterCodeDifference }
             )}
         />
-        <div className={styles.academicYearSelectContainer}>
+        <div className="academicYearSelectContainer">
           <Dropdown
             id={academicYearSelectId}
             search
@@ -47,7 +47,7 @@ const AcademicYearFilter = ({ academicYears, semesterCode, handleSemesterCodeCha
         <Button
           type="button"
           icon="angle right"
-          className={isMaxSemesterCode ? styles.hiddenButton : styles.filterButton}
+          className={isMaxSemesterCode ? 'hiddenButton' : 'filterButton'}
           onClick={e => handleSemesterCodeChangeFn(
               e,
               { value: semesterCode + semesterCodeDifference }

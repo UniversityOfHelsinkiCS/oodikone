@@ -3,8 +3,7 @@ import { Search, Segment, Icon } from 'semantic-ui-react'
 import { func, arrayOf, object, string } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import styles from './teacherSearch.css'
-import sharedStyles from '../../styles/shared'
+import './teacherSearch.css'
 import Timeout from '../Timeout'
 import { findTeachers } from '../../redux/teachers'
 import SortableTable from '../SortableTable'
@@ -55,9 +54,9 @@ class TeacherSearch extends Component {
 
       return (
         <div >
-          <div className={styles.searchContainer}>
+          <div className="searchContainer">
             <Search
-              className={styles.searchInput}
+              className="searchInput"
               input={{ fluid: true }}
               placeholder="Search by entering a username, id or name"
               value={this.state.searchterm}
@@ -65,12 +64,12 @@ class TeacherSearch extends Component {
               showNoResults={false}
             />
             { this.state.displayResults && (
-              <Segment className={sharedStyles.contentSegment}>
+              <Segment className="contentSegment">
                 {this.props.teachers.length <= 0 ? <div>No teachers matched your search</div> :
                 <SortableTable
                   getRowKey={s => s.id}
                   getRowProps={teacher => ({
-                    className: styles.clickable,
+                    className: 'clickable',
                     onClick: () => this.props.onClick(teacher)
                   })}
                   tableProps={{ celled: false, sortable: false }}

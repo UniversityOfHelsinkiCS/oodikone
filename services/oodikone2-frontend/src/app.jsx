@@ -9,7 +9,7 @@ import thunk from 'redux-thunk'
 import * as Sentry from '@sentry/browser'
 import 'semantic-ui-css/semantic.min.css'
 import 'react-datetime/css/react-datetime.css'
-import './styles/global'
+import './styles/custom.css'
 
 import { AVAILABLE_LANGUAGES, DEFAULT_LANG, BASE_PATH } from './constants'
 import reducers from './redux'
@@ -54,8 +54,6 @@ const render = (Component) => {
 render(Main)
 
 if (module.hot) {
-  module.hot.accept('./components/Main', () => {
-    render(Main)
-  })
+  module.hot.accept()
 }
 

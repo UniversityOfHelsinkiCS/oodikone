@@ -8,7 +8,7 @@ import Timeout from '../Timeout'
 import { findCourses } from '../../redux/courses'
 import { makeSortCourses } from '../../selectors/courses'
 
-import styles from './courseSearch.css'
+import './courseSearch.css'
 
 const { func, string, arrayOf, object } = PropTypes
 
@@ -64,7 +64,7 @@ class CourseSearch extends Component {
 
     return (
       <Search
-        className={styles.courseSearch}
+        className="courseSearch"
         input={{ fluid: true }}
         loading={isLoading}
         placeholder="Search by entering a course code or name"

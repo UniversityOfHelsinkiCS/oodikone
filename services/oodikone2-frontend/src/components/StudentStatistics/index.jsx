@@ -12,7 +12,6 @@ import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
-import sharedStyles from '../../styles/shared'
 
 class StudentStatistics extends Component { //eslint-disable-line
   render() {
@@ -20,12 +19,12 @@ class StudentStatistics extends Component { //eslint-disable-line
     const { studentNumber } = match.params
 
     return (
-      <div className={sharedStyles.segmentContainer}>
-        <Header className={sharedStyles.segmentTitle} size="large">
+      <div className="segmentContainer">
+        <Header className="segmentTitle" size="large">
           {translate('studentStatistics.header')}
         </Header>
         <StudentNameVisibilityToggle />
-        <Segment className={sharedStyles.contentSegment}>
+        <Segment className="contentSegment">
           <StudentSearch translate={translate} studentNumber={studentNumber} />
           <StudentDetails translate={translate} studentNumber={studentNumber} />
         </Segment>

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { func, arrayOf, object, shape, string, bool, oneOfType, number } from 'prop-types'
 import { Card, Icon, Button } from 'semantic-ui-react'
 import _ from 'lodash'
-import styles from './populationQueryCard.css'
+import './populationQueryCard.css'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
 import { reformatDate, getTextIn } from '../../common'
 
@@ -21,17 +21,17 @@ const PopulationQueryCard =
     const { students } = population
     if (students.length > 0) {
       return (
-        <Card className={styles.cardContainer}>
-          <Card.Header className={styles.cardHeader}>
+        <Card className="cardContainer">
+          <Card.Header className="cardHeader">
             <div>{Object.values(units).map(u => getTextIn(u.name, language)).join(', ')}</div>
             <Icon
               name="remove"
-              className={styles.controlIcon}
+              className="controlIcon"
               onClick={() => removeSampleFn(uuid)}
             />
           </Card.Header>
           <Card.Meta>
-            <div className={styles.dateItem}>
+            <div className="dateItem">
               <Icon name="calendar" size="small" />
               {`${semesters.map(s => translate(`populationStatistics.${s}`))}/
                 ${year}-${Number(year) + 1}, showing ${months} months.`}
@@ -65,17 +65,17 @@ const PopulationQueryCard =
       )
     }
     return (
-      <Card className={styles.cardContainer}>
-        <Card.Header className={styles.cardHeader}>
+      <Card className="cardContainer">
+        <Card.Header className="cardHeader">
           <div>{Object.values(units).map(u => getTextIn(u.name, language)).join(', ')}</div>
           <Icon
             name="remove"
-            className={styles.controlIcon}
+            className="controlIcon"
             onClick={() => removeSampleFn(uuid)}
           />
         </Card.Header>
         <Card.Meta>
-          <div className={styles.dateItem}>
+          <div className="dateItem">
             <Icon name="calendar" size="small" />
             {`${semesters.map(s => translate(`populationStatistics.${s}`))}/${year}-${Number(year) + 1},
              showing ${months} months.`}

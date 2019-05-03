@@ -3,7 +3,7 @@ import { Header, List, Loader, Placeholder, Icon } from 'semantic-ui-react'
 import { arrayOf, string, number } from 'prop-types'
 import sortBy from 'lodash/sortBy'
 import { callApi } from '../../../../apiConnection/index'
-import styles from '../courseGroup.css'
+import '../courseGroup.css'
 import { CG_API_BASE_PATH } from '../util'
 
 const courseColumnTypes = {
@@ -19,12 +19,12 @@ const CourseItem = ({ course }) => { // eslint-disable-line react/prop-types
   const coursename = coursenames.fi
   return (
     <List.Item>
-      <List.Content className={styles.courseInfoContent}>
-        <div className={styles.courseInfoName}>{coursename}</div>
-        <div className={styles.courseInfoCode}>{coursecode}</div>
-        <div className={styles.courseInfoTeacher}>{teachername}</div>
-        <div className={styles.courseInfoItem}>{credits}</div>
-        <div className={styles.courseInfoItem}>{students}</div>
+      <List.Content className="courseInfoContent">
+        <div className="courseInfoName">{coursename}</div>
+        <div className="courseInfoCode">{coursecode}</div>
+        <div className="courseInfoTeacher">{teachername}</div>
+        <div className="courseInfoItem">{credits}</div>
+        <div className="courseInfoItem">{students}</div>
       </List.Content>
     </List.Item>
   )
@@ -105,12 +105,12 @@ class Index extends Component {
 
     return (
       <List.Header>
-        <List.Content className={styles.courseHeaderContent}>
-          {getHeader(styles.courseHeaderName, 'Name', courseColumnTypes.NAME)}
-          {getHeader(styles.courseHeaderCode, 'Code', courseColumnTypes.CODE)}
-          {getHeader(styles.courseHeaderTeacher, 'Teacher', courseColumnTypes.TEACHER)}
-          {getHeader(styles.courseHeaderItem, 'Credits', courseColumnTypes.CREDITS)}
-          {getHeader(styles.courseHeaderItem, 'Students', courseColumnTypes.STUDENTS)}
+        <List.Content className="courseHeaderContent">
+          {getHeader('courseHeaderName', 'Name', courseColumnTypes.NAME)}
+          {getHeader('courseHeaderCode', 'Code', courseColumnTypes.CODE)}
+          {getHeader('courseHeaderTeacher', 'Teacher', courseColumnTypes.TEACHER)}
+          {getHeader('courseHeaderItem', 'Credits', courseColumnTypes.CREDITS)}
+          {getHeader('courseHeaderItem', 'Students', courseColumnTypes.STUDENTS)}
         </List.Content>
       </List.Header>
     )
