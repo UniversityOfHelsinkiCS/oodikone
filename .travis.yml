@@ -24,11 +24,7 @@ jobs:
         - docker ps
         - cat nginx/log
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
-        - npm run --prefix services/oodikone2-backend test_docker
-        - npm test --prefix services/oodikone2-analytics
-        - npm run --prefix services/oodikone2-userservice test_docker
-        - npm test --prefix services/oodikone2-usageservice
-        - npm run --prefix services/oodikone2-frontend test_docker
+        - npm run test_services
         - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
 
     - stage: build & test & push & deploy staging
@@ -40,11 +36,7 @@ jobs:
         - docker ps
         - cat nginx/log
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
-        - npm run --prefix services/oodikone2-backend test_docker
-        - npm test --prefix services/oodikone2-analytics
-        - npm run --prefix services/oodikone2-userservice test_docker
-        - npm test --prefix services/oodikone2-usageservice
-        - npm test --prefix services/oodikone2-frontend
+        - npm run test_services
         - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
         - docker-compose -f docker-compose.lateste2e.yml push
         - "curl --fail -k -X POST -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" https://toska.cs.helsinki.fi/toskawatch/release/"
