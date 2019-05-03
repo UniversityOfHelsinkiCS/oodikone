@@ -61,6 +61,7 @@ export const actionTypes = prefix => ({
 
 export const login = async () => {
   let options = null
+  console.log(isDevEnv)
   if (isDevEnv) {
     options = devOptions
   }

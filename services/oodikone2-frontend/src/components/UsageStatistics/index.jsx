@@ -5,7 +5,7 @@ import ReactHighcharts from 'react-highcharts'
 
 import { callApi } from '../../apiConnection'
 
-import styles from '../StudentInfoCard/studentInfoCard.css'
+import '../StudentInfoCard/studentInfoCard.css'
 
 class UsageStatistics extends Component {
   state = null
@@ -107,7 +107,7 @@ class UsageStatistics extends Component {
             <Icon
               onClick={() => this.setState({ user: null })}
               name="remove"
-              className={styles.controlIcon}
+              className="controlIcon"
             />
           </h3>
           <Table celled>

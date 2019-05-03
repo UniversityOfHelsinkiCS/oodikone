@@ -2,21 +2,21 @@ import React from 'react'
 import { Card, Icon } from 'semantic-ui-react'
 import { func, bool, arrayOf, object } from 'prop-types'
 
-import styles from './creditGraphTooltip.css'
+import './creditGraphTooltip.css'
 
 const getCardHeader = (title, isStudyModuleCredit) => (
   isStudyModuleCredit ?
-    <Card.Header className={styles.tooltipHeader}>
+    <Card.Header className="tooltipHeader">
       {`${title} [Study Module]`}
     </Card.Header>
     :
-    <Card.Header className={styles.tooltipHeader}>
+    <Card.Header className="tooltipHeader">
       {title}
     </Card.Header>
 )
 
 const getCardMeta = (name, date) => (
-  <Card.Meta className={styles.tooltipMeta}>
+  <Card.Meta className="tooltipMeta">
     <div>
       <Icon.Group size="small">
         <Icon name="student" />
@@ -32,19 +32,19 @@ const getCardMeta = (name, date) => (
 )
 
 const getCardDescription = (translate, credits, grade, passed, isStudyModuleCredit) => (
-  <Card.Description className={styles.tooltipBody}>
-    <div className={styles.tooltipBodyItem}>
-      <div className={styles.tooltipBodyTitle}>{translate('common.credits')}</div>
-      <div className={styles.tooltipBodyValue}>{credits}</div>
+  <Card.Description className="tooltipBody">
+    <div className="tooltipBodyItem">
+      <div className="tooltipBodyTitle">{translate('common.credits')}</div>
+      <div className="tooltipBodyValue">{credits}</div>
 
     </div>
-    <div className={styles.tooltipBodyItem}>
-      <div className={styles.tooltipBodyTitle}>{translate('common.grade')}</div>
-      <div className={styles.tooltipBodyValue}>{grade}</div>
+    <div className="tooltipBodyItem">
+      <div className="tooltipBodyTitle">{translate('common.grade')}</div>
+      <div className="tooltipBodyValue">{grade}</div>
     </div>
-    <div className={styles.tooltipBodyItem}>
-      <div className={styles.tooltipBodyTitle}>{isStudyModuleCredit ? 'module' : translate('common.passed')}</div>
-      <div className={styles.tooltipBodyValue}>
+    <div className="tooltipBodyItem">
+      <div className="tooltipBodyTitle">{isStudyModuleCredit ? 'module' : translate('common.passed')}</div>
+      <div className="tooltipBodyValue">
         {
           isStudyModuleCredit // eslint-disable-line
             ? (<Icon name="certificate" color="purple" />)

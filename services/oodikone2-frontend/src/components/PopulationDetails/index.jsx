@@ -40,6 +40,7 @@ class PopulationDetails extends Component {
 
   renderCourseStatistics = () => {
     const { samples, translate } = this.props
+    const { CreditStatistics } = infoTooltips.PopulationStatistics
     let statistics = null
     if (samples) {
       statistics = (
@@ -75,6 +76,7 @@ class PopulationDetails extends Component {
       <Segment>
         <Header size="medium" dividing>
           {translate('populationStatistics.creditStatisticsHeader')}
+          <InfoBox content={CreditStatistics} />
         </Header>
         {statistics}
       </Segment>

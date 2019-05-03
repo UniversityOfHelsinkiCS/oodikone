@@ -3,7 +3,7 @@ import { func } from 'prop-types'
 import { Table, Icon } from 'semantic-ui-react'
 
 import { courseDataWithRealisationsType } from '../../../constants/types'
-import styles from './foldableRow.css'
+import './foldableRow.css'
 
 class FoldableRow extends Component {
   static propTypes = {
@@ -29,15 +29,15 @@ class FoldableRow extends Component {
       const { passed, failed, passrate, realisation } = rowData
       const showFoldIcon = isMainRow && hasRealisations
       return (
-        <Table.Row key={rowId} className={!isMainRow ? styles.subRow : ''}>
+        <Table.Row key={rowId} className={!isMainRow ? 'subRow' : ''}>
           <Table.Cell
-            className={showFoldIcon ? styles.foldControlCell : ''}
+            className={showFoldIcon ? 'foldControlCell' : ''}
             onClick={() => isMainRow && this.setState({ isUnfolded: !isUnfolded })}
           >{showFoldIcon ? <Icon name={`angle ${isUnfolded ? 'down' : 'right'}`} /> : null}
           </Table.Cell>
           <Table.Cell
             content={isMainRow ? <Fragment>{category} <span>{id}</span></Fragment> : realisation}
-            className={isMainRow ? styles.courseNameCell : styles.courseRealisationCell}
+            className={isMainRow ? 'courseNameCell' : 'courseRealisationCell'}
             onClick={() => onClickFn(id)}
           />
           {getCell(passed)}

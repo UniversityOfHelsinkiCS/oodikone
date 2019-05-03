@@ -11,7 +11,7 @@ import { PRIORITYCODE_TEXTS } from '../../constants'
 import { toggleStudentListVisibility } from '../../redux/settings'
 
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
-import styles from '../PopulationCourseStats/populationCourseStats.css'
+import '../PopulationCourseStats/populationCourseStats.css'
 import SortableTable from '../SortableTable'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
@@ -101,7 +101,7 @@ class PopulationStudents extends Component {
       {
         key: 'icon',
         getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
-        cellProps: { collapsing: true, className: styles.iconCell }
+        cellProps: { collapsing: true, className: 'iconCell' }
       },
       {
         key: 'credits since start',
@@ -187,7 +187,7 @@ class PopulationStudents extends Component {
               : null
           ),
           headerProps: { onClick: null, sorted: null },
-          cellProps: { collapsing: true, className: styles.iconCell }
+          cellProps: { collapsing: true, className: 'iconCell' }
         }
       )
     }
@@ -225,7 +225,7 @@ class PopulationStudents extends Component {
         key: 'icon',
         title: '',
         getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
-        cellProps: { collapsing: true, className: styles.iconCell }
+        cellProps: { collapsing: true, className: 'iconCell' }
       },
       {
         key: 'totalpassed',

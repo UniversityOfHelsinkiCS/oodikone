@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react'
 import { Table } from 'semantic-ui-react'
 
-import styles from '../populationCourseStats.css'
+import '../populationCourseStats.css'
 
 const getYearCount = (year, passingSemesters) => passingSemesters[`${year}-FALL`] + passingSemesters[`${year}-SPRING`]
 const getCumulativeYearCount = (year, passingSemesters) => {
@@ -66,7 +66,7 @@ export default ({ statistics, cumulative, onCourseNameClickFn, isActiveCourseFn 
 
   return (
     <Table.Row key={course.code} active={isActive}>
-      <Table.Cell onClick={() => onCourseNameClickFn(statistics)} className={styles.clickableCell}>
+      <Table.Cell onClick={() => onCourseNameClickFn(statistics)} className="clickableCell">
         {course.name.fi}
       </Table.Cell>
       <Table.Cell>

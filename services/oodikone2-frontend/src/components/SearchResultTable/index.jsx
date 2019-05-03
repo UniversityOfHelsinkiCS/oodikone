@@ -2,7 +2,7 @@ import React from 'react'
 import { Table } from 'semantic-ui-react'
 import { arrayOf, array, string, func, bool } from 'prop-types'
 
-import styles from './searchResultsTable.css'
+import './searchResultsTable.css'
 
 const getHeaderRow = headers => (
   <Table.Header>
@@ -23,7 +23,7 @@ const getTableBody = (rows, rowClickFn, selectable) => (
     {
       rows.map((row, i) => (
         <Table.Row
-          className={(selectable ? styles.selectableRow : '')}
+          className={(selectable ? 'selectableRow' : '')}
           key={`row-${i}`} // eslint-disable-line react/no-array-index-key
           onClick={e => rowClickFn(e, row)}
         >

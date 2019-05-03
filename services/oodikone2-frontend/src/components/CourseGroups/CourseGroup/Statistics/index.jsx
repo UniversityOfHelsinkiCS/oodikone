@@ -2,10 +2,10 @@ import React from 'react'
 import { Statistic, Placeholder } from 'semantic-ui-react'
 import { number, bool, arrayOf } from 'prop-types'
 import { teacherType } from '../util'
-import styles from '../courseGroup.css'
+import '../courseGroup.css'
 
 const getStatistic = (label, value) => (
-  <Statistic className={styles.groupStatistic}>
+  <Statistic className="groupStatistic">
     <Statistic.Label>{label}</Statistic.Label>
     <Statistic.Value>{value}</Statistic.Value>
   </Statistic>
@@ -47,7 +47,7 @@ const Index = ({ totalStudents, totalCourses, totalCredits, totalTeachers, activ
   }
 
   return (
-    <Statistic.Group className={styles.groupStatistics}>
+    <Statistic.Group className="groupStatistics">
       {getStatistic('Total teachers', teacherAmount)}
       {getStatistic('Total students', studentAmount)}
       {getStatistic('Total courses', coursesAmount)}

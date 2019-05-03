@@ -12,7 +12,7 @@ import { DISPLAY_DATE_FORMAT, CHART_COLORS } from '../../constants'
 import { reformatDate, sortDatesWithFormat, getTextIn } from '../../common'
 import { turquoise } from '../../styles/variables/colors'
 
-import styles from './creditAccumulationGraph.css'
+import './creditAccumulationGraph.css'
 import CreditGraphTooltip from '../CreditGraphTooltip'
 import OodikoneLine from './OodikoneLine'
 
@@ -163,7 +163,7 @@ class CreditAccumulationGraph extends Component {
 
   getDot = (studentNumber, isSingleStudent, onClickFn) => (isSingleStudent ? <Dot r={4} /> : (
     <Dot
-      className={styles.dot}
+      className="dot"
       r={3}
       onClick={() => onClickFn(studentNumber)}
     />
@@ -259,7 +259,7 @@ class CreditAccumulationGraph extends Component {
       firstDate = moment(students[0].started)
     }
     return (
-      <div className={styles.graphContainer}>
+      <div className="graphContainer">
         <Segment attached="bottom">
           <Loader active={this.state.loading} />
           <ResponsiveContainer height={400}>

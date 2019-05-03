@@ -19,7 +19,7 @@ Install Docker Compose:
 
 Launch the CLI with the command below and follow the instructions.
 
-Before running cli make yourself a deployment key for Anonyymioodi private repository and put it in your root folder as private.key. This allows you to download the anonymized dumps from the repository.
+Before running cli [make yourself a deployment key](https://developer.github.com/v3/guides/managing-deploy-keys/#setup-2) for Anonyymioodi private repository and put it in your root folder as private.key. This allows you to download the anonymized dumps from the repository.
 
 ```
 bash run.sh

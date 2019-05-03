@@ -18,7 +18,7 @@ import { transferTo } from '../../populationFilters'
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn } from '../../common'
 import { setLoading } from '../../redux/graphSpinner'
-import style from './populationSearchForm.css'
+import './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
 import InfoBox from '../InfoBox'
 import infoToolTips from '../../common/InfoToolTips'
@@ -341,11 +341,11 @@ class PopulationSearchForm extends Component {
     const { query, momentYear } = this.state
     const { semesters, year } = query
     return (
-      <Form.Group key="year" className={style.enrollmentSelectorGroup}>
-        <Form.Field error={!this.validYearCheck(momentYear)} className={style.yearSelect}>
+      <Form.Group key="year" className="enrollmentSelectorGroup">
+        <Form.Field error={!this.validYearCheck(momentYear)} className="yearSelect">
           <label>Class of</label>
           <Datetime
-            className={style.yearSelectInput}
+            className="yearSelectInput"
             control={Datetime}
             dateFormat={YEAR_DATE_FORMAT}
             timeFormat={false}
@@ -356,10 +356,10 @@ class PopulationSearchForm extends Component {
             onChange={this.handleYearSelection}
           />
         </Form.Field>
-        <Form.Field className={style.yearControl}>
-          <Button.Group basic vertical className={style.yearControlButtonGroup}>
-            <Button icon="plus" className={style.yearControlButton} onClick={this.addYear} tabIndex="-1" />
-            <Button icon="minus" className={style.yearControlButton} onClick={this.subtractYear} tabIndex="-1" />
+        <Form.Field className="yearControl">
+          <Button.Group basic vertical className="yearControlButtonGroup">
+            <Button icon="plus" className="yearControlButton" onClick={this.addYear} tabIndex="-1" />
+            <Button icon="minus" className="yearControlButton" onClick={this.subtractYear} tabIndex="-1" />
           </Button.Group>
         </Form.Field>
         <Form.Field>
@@ -504,7 +504,7 @@ class PopulationSearchForm extends Component {
           <Form.Field>
             <label>Semesters</label>
             <Form.Checkbox
-              className={style.populationStatisticsRadio}
+              className="populationStatisticsRadio"
               key="FALL"
               label={translate(`populationStatistics.${'FALL'}`)}
               value="FALL"
@@ -513,7 +513,7 @@ class PopulationSearchForm extends Component {
               onChange={this.handleSemesterSelection}
             />
             <Form.Checkbox
-              className={style.populationStatisticsRadio}
+              className="populationStatisticsRadio"
               key="SPRING"
               label={translate(`populationStatistics.${'SPRING'}`)}
               value="SPRING"
@@ -527,7 +527,7 @@ class PopulationSearchForm extends Component {
           <Form.Field>
             <label>Include</label>
             <Form.Checkbox
-              className={style.populationStatisticsRadio}
+              className="populationStatisticsRadio"
               key="EXCHANGE"
               label="Exchange students"
               value="EXCHANGE"
@@ -536,7 +536,7 @@ class PopulationSearchForm extends Component {
               onChange={this.handleStudentStatusSelection}
             />
             <Form.Checkbox
-              className={style.populationStatisticsRadio}
+              className="populationStatisticsRadio"
               key="CANCELLED"
               label="Students with cancelled study right"
               value="CANCELLED"
@@ -545,7 +545,7 @@ class PopulationSearchForm extends Component {
               onChange={this.handleStudentStatusSelection}
             />
             <Form.Checkbox
-              className={style.populationStatisticsRadio}
+              className="populationStatisticsRadio"
               key="NONDEGREE"
               label="Students with non-degree study right"
               value="NONDEGREE"

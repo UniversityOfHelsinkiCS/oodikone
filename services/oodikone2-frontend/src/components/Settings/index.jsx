@@ -2,8 +2,6 @@ import React, { Component } from 'react'
 import { Header, Button, Message } from 'semantic-ui-react'
 import CourseCodeMapper from '../CourseCodeMapper'
 
-import sharedStyles from '../../styles/shared'
-
 class Settings extends Component {
   state = {
     selected: 1
@@ -25,9 +23,9 @@ class Settings extends Component {
   render() {
     const selectedComponent = this.getSetting()
     return (
-      <div className={sharedStyles.segmentContainer} >
+      <div className="segmentContainer" >
         <Message content="Visible only for admins for now" />
-        <Header className={sharedStyles.segmentTitle} size="large">Settings</Header>
+        <Header className="segmentTitle" size="large">Settings</Header>
         <Button.Group >
           <Button onClick={() => this.select(1)}>Course code Mapping</Button>
         </Button.Group>

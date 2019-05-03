@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { routes } from '../../constants'
 import { userRoles, userRights } from '../../common'
-import styles from './navigationBar.css'
+import './navigationBar.css'
 import { logout, login, returnToSelf } from '../../apiConnection'
 import LanguageChooser from '../LanguageChooser'
 
@@ -132,15 +132,15 @@ class NavigationBar extends Component {
     const menuWidth = asUser ? Object.keys(navigationRoutes).length + 3 : Object.keys(navigationRoutes).length + 2
     const itemWidth = 100 / menuWidth
     return (
-      <Menu stackable fluid widths={menuWidth} className={styles.navBar}>
+      <Menu stackable fluid widths={menuWidth} className="navBar">
         <Menu.Item
           style={{ width: `${itemWidth}%` }}
           as={Link}
           to={navigationRoutes.index.route}
           tabIndex="-1"
         >
-          <span className={styles.logo}>
-            <h2 className={styles.logoText}>oodikone</h2>
+          <span className="logo">
+            <h2 className="logoText">oodikone</h2>
           </span>
         </Menu.Item>
         {
