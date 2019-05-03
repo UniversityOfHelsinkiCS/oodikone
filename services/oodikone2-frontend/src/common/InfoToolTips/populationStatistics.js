@@ -24,12 +24,19 @@ export default {
   Mustasta rastista voi sulkea valitun koulutusohjelmavuosikurssin.
   `,
   Filters: {
-    Add: `Harmaata ”add” painiketta klikkaamalla aukeaa filters- eli suodatinvalikko, josta voi
-      lisätä haluamiaan suodattimia, jotka rajaavat valittua populaatiota. Huom.! Filtterit eivät vaikuta
-      ”Courses of population” taulukkoon (alempana).`,
+    Add: `Harmaata ”add” painiketta klikkaamalla aukeaa filters- eli suodatinvalikko, 
+    josta voi lisätä haluamiaan suodattimia, jotka rajaavat valittua populaatiota. 
+    Huom.! Filtterit eivät automaattisesti vaikuta ”Courses of population” taulukkoon (alempana). 
+    "Courses of population" taulukon saa päivittymään filttereiden mukaiseksi painamalla harmaata 
+    "refresh" -painiketta.`,
     Filters: `Valitut suodattimet näkyvät tässä. Suodattimia voi poistaa klikkaamalla mustaa rastia.
-     Huom.! valitusta populaatiosta on oletusarvoisesti suodatettu pois määräaikaiset ulkomaalaiset opiskelijat
-     ja opiskelijat, jotka ovat peruuttaneet opinto-oikeutensa.`,
+    <br> <br>
+    **Show excluded students only**: Tällä liukukytkimellä voi valita filtteri-suodatuksien komplementin,
+    eli liukukytkin päällä saa näkyviin poissuodatetut opiskelijat.
+    <br> <br>
+    **Clear all filters**: Poistaa kerralla valitut filtterit.
+    <br> <br>
+    **Save filters as preset**: Voit tallentaa tekemäsi filtteri-yhdistelmän myöhempää käyttöä varten.`,
     CreditsAtLeast: 'Suodattaa pois *opiskelijat*, joilla on alle annetun määrän opintopisteitä',
     CreditsLessThanFromMandatory: `Suodattaa pois opiskelijat, joilla on yli
     annetun määrän opintopisteitä pakollisista kursseista`,
@@ -57,42 +64,61 @@ export default {
     X-akselin skaalaa voi säätää harmaista painikkeista ”1m”, ”3m”, ”6m”, ”YTD”, ”1y” ja ”ALL” tai kuvaajan alla
     olevan sinisen näkymän harmaita ”kahvoja” siirtämällä. Y-akselin skaalaa voi säätää harmaista painikkeista
     ”small” ”medium” ja "large”`,
-  CoursesOf: `Tämä taulukko sisältää kaikkien populaatioon liittyvien opiskelijoiden kaikki kurssisuoritukset. Esim.
-    ”Filters” –valikon suodattimet eivät vaikuta tämän taulukon dataan. Taulukon tietoja voi suodattaa kohdassa
-    ”limit to courses where student number at least” kirjoittamalla haluamansa opiskelijalukumäärän kenttään sekä
-    kohdassa ”code (filter here)” kirjoittamalla haluamansa kurssikoodin alun kenttään ja näkyviin jää esimerkiksi
-    vain ”MAT”-alkuiset. Huom.! Nämä suodattimet ovat ”taulukon sisäisiä” suodattimia, eivätkä siis ilmesty ”Filters”
-    otsikon alle. Suodattimet saa pois tyhjentämällä kentän kirjoittamistaan merkeistä ja painamalla ENTER.
+  CoursesOf: `Courses of population
+    <br> <br>
+    Tämä taulukko sisältää kaikkien populaatioon liittyvien opiskelijoiden kaikki kurssisuoritukset.
+    <br> <br>
+    **Huom.!** Filtterit eivät automaattisesti vaikuta ”Courses of population” taulukkoon. Taulukon saa 
+    päivittymään filttereiden mukaiseksi painamalla harmaata "refresh" -painiketta.
+    <br> <br>
+    Taulukon tietoja voi suodattaa kohdassa ”limit to courses where student number at least” 
+    kirjoittamalla haluamansa opiskelijalukumäärän kenttään sekä kohdassa ”code (filter here)” 
+    kirjoittamalla haluamansa kurssikoodin alun kenttään ja näkyviin jää esimerkiksi vain 
+    ”MAT”-alkuiset kurssit. Huom.! Nämä suodattimet ovat ”taulukon sisäisiä” suodattimia, 
+    eivätkä siis ilmesty ”Filters” otsikon alle. Suodattimet saa pois tyhjentämällä kentän 
+    kirjoittamistaan merkeistä ja painamalla ENTER.
     <br> <br>
     Taulukossa on kolme eri näkymää ”pass/fail”, ”grades” ja ”when passed”.
     <br> <br>
-    **pass/fail** tämä on oletusnäkymä ja sisältää kurssisuoritukset, hylätyt sekä yritykset. Taulukon tietoja voi
-    järjestää eri sarakkeita (n, after retry, percentage, many times, per student, passed ja attempted) painamalla.
+    **pass/fail** oletusnäkymä, joka sisältää kurssisuoritukset, hylätyt sekä yritykset. 
+    Taulukon tietoja voi järjestää eri sarakkeita (n, after retry, percentage, many times, 
+    per student, passed ja attempted) klikkaamalla.
     <br> <br>
-    Kurssin nimen perässä olevasta mustasta nuolesta painamalla siirtyy ”course statistics” näkymään valitun kurssin
-    osalta.
+    Klikkaamalla kurssin nimen vieressä olevaa mustaa nuolta siirtyy ”course statistics” 
+    näkymään valitun kurssin osalta.
     <br> <br>
     **grades** arvosanajakauma
     <br> <br>
-    **when passed** näyttää kurssisuorituksen ajankohdan. Huom.! ”passed” sarakkeen kokonaissumma ei välttämättä
-    täsmää puolivuosi-lukumäärien summan kanssa, johtuen tuplakirjauksista Oodissa. Asiaa selvitetään ja pyritään
-    korjaamaan mahdollisimman pian.`,
-  Students: `**Students:** harmaata painiketta ”show” klikkaamalla saa listan kaikista populaation opiskelijoista
-    (huom. suodattimet vaikuttavat tähän listaan!).
+    **when passed** kurssisuorituksen ajankohdan. Huom.! ”passed” sarakkeen kokonaissumma ei välttämättä 
+    täsmää puolivuosi-lukumäärien summan kanssa, johtuen tuplakirjauksista Oodissa.`,
+  Students: `**Students:** harmaata "show" painiketta klikkaamalla saa listan kaikista populaation opiskelijoista
+    (huom. suodattimet vaikuttavat tähän listaan!). Taulukko näyttää oletusarvoisesti vain 
+    opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
     <br> <br>
     **General:**
-    <br>
-    Klikkaamalla opiskelijanumeron vieressä olevaa nappia siirtyy
-    ”student statistics” näkymään valitun opiskelijan osalta.
-    <br>
-    **credits since start** listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson ajalta.
-    <br>
-    **all credits:** listaa opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen
-      valittuun tarkastelujaksoon ja populaatioon kuulumista).
+    <br> <br>
+    Klikkaamalla opiskelijanumeron vieressä olevaa mustaa nuolta, siirtyy "student statistic" näkymään.    ”student statistics” näkymään valitun opiskelijan osalta.
+    <br> <br>
+    **credits since start**  listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson / populaation ajalta.
+    <br> <br>
+    **all credits:** listaa opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, 
+      eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
     <br> <br>
     **Mandatory courses:**
     <br>
-    Tällä välilehdellä näkyy mitä pakollisiksi määritettyjä kursseja opiskelija on suorittanut.
-    Pitämällä kursoria kentän päällä näet kentän otsikon.
-    `
+    Tällä välilehdellä näkyy, mitä pakollisiksi määriteltyjä kursseja opiskelija on suorittanut. 
+    Kurssit voi määrittää kohdassa "Study program" > "Overview" > haluttu koulutusohjelma. 
+    Scrollatessa kurssitaulukkoa alaspäin, kurssin nimen saa näkyviin viemällä kursorin halutun 
+    solun kohdalle.
+    <br> <br>
+    **Download**:  klikkaamalla tätä harmaata kuvaketta, saa ladattua .xlsx tiedoston, 
+    joka sisältää kaikki "General" ja "Mandatory Courses" välilehtien tiedot.
+    `,
+  CreditStatistics: `Opintopistekertymä-kategoria skaalautuvat valitun tarkastelujakson mukaan. 
+    Jos tarkastelujaksoksi valitsee 12 kuukautta, ylin kategoria on 55 opintopistettä tai yli, 
+    eli opiskelija etenee tavoiteajassa. Taulukosta näkee silmäyksellä tavoiteajassa etenevät (ylin kategoria) 
+    ja myös esim. nollasuorittajat. Huom.! nollasuorittajissa on mukana myös poissaolevaksi ilmoittautuneet, 
+    ellei heitä ole erikseen suodattanut populaatiosta pois. Kategorioita voi myös itsessään käyttää suodattimina, 
+    eli klikkaamalla haluamaansa kategoriaa saa näkyviin vain sen kategorian opiskelijat. 
+    Tämä suodatin löytyy ”Filters” otsikon alta ja sen voi poistaa klikkaamalla mustaa rastia.`
 }
