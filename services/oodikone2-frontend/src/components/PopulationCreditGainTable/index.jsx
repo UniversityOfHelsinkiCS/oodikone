@@ -60,12 +60,8 @@ const PopulationCreditGainTable = (props) => {
   const stats = getTotal(sample)
   const limits = expectedAmountOfCredits(months)
   const arr = limits.map(l => filterStudents(stats, ...l))
-  //disgusting figure something cleaner
-  const rows = arr.map(a => a.maxCredits === 0 ? 
-    [`${a.maxCredits} credits`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />] : 
-    a.maxCredits > 1 ? 
-    [`${a.minCredits} <= credits  < ${a.maxCredits}`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />] :
-    [`${a.minCredits} <= credits `, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />])
+  const rows = arr.map(a => [`${a.minCredits} - ${a.maxCredits}`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />])
+
   const headers = [
     `Credits gained during first ${months} months`,
     `Students (all=${stats.length})`,
