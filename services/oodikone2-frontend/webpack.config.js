@@ -13,6 +13,9 @@ module.exports = (env, args) => {
   const { mode } = args
   const isDev = mode === 'development'
   return {
+    output: {
+      publicPath: '/'
+    },
     entry: [
       'babel-polyfill',
       './src/app'
