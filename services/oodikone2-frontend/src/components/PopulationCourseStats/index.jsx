@@ -13,7 +13,7 @@ import { getCourseStats, clearCourseStats } from '../../redux/coursestats'
 import { courseParticipation } from '../../populationFilters'
 import PassingSemesters from './PassingSemesters'
 
-import styles from './populationCourseStats.css'
+import './populationCourseStats.css'
 import { getTextIn } from '../../common'
 
 export const tableColumnNames = {
@@ -48,7 +48,7 @@ const SortableHeaderCell =
         rowSpan={`${rowSpan}`}
         sorted={isTableSortedBy ? direction : null}
         onClick={() => onClickFn(columnName)}
-        className={isTableSortedBy ? styles.activeSortHeader : ''}
+        className={isTableSortedBy ? 'activeSortHeader' : ''}
         content={content}
       />
     )
@@ -235,7 +235,7 @@ class PopulationCourseStats extends Component {
       <Table.HeaderCell>
         {translate('populationCourses.code')}
         <Input
-          className={styles.courseCodeInput}
+          className="courseCodeInput"
           transparent
           value={codeFilter}
           placeholder="(filter here)"
@@ -312,12 +312,12 @@ class PopulationCourseStats extends Component {
           <Table.Cell
             onClick={() => this.onCourseNameCellClick(courseStats)}
             content={getTextIn(name, language)}
-            className={styles.clickableCell}
+            className="clickableCell"
           />
           <Table.Cell
             icon="level up alternate"
             onClick={() => this.onGoToCourseStatisticsClick(code)}
-            className={styles.iconCell}
+            className="iconCell"
           />
           <Table.Cell content={code} />
           <Table.Cell content={attempts} />
@@ -416,12 +416,12 @@ class PopulationCourseStats extends Component {
           <Table.Cell
             onClick={() => this.onCourseNameCellClick(courseStats)}
             content={getTextIn(name, language)}
-            className={styles.clickableCell}
+            className="clickableCell"
           />
           <Table.Cell
             icon="level up alternate"
             onClick={() => this.onGoToCourseStatisticsClick(code)}
-            className={styles.iconCell}
+            className="iconCell"
           />
           <Table.Cell content={code} />
           <Table.Cell content={passed + failed} />

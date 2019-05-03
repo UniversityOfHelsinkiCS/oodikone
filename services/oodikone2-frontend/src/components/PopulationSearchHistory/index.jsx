@@ -8,7 +8,7 @@ import { removePopulation, updatePopulationStudents } from '../../redux/populati
 import { clearPopulationCourses } from '../../redux/populationCourses'
 import { clearPopulationFilters } from '../../redux/populationFilters'
 
-import styles from './populationSearchHistory.css'
+import './populationSearchHistory.css'
 import infotooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
 
@@ -61,7 +61,7 @@ class PopulationSearchHistory extends Component {
 
   render() {
     return (
-      <div className={styles.historyContainer} >
+      <div className="historyContainer" >
         {this.renderQueryCards()}
       </div>
     )

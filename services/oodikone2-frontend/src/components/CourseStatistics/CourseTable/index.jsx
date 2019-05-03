@@ -4,7 +4,7 @@ import { Segment, Table, Button } from 'semantic-ui-react'
 import { func, arrayOf, shape, string, bool } from 'prop-types'
 import { getActiveYears } from '../courseStatisticsUtils'
 
-import styles from './courseTable.css'
+import './courseTable.css'
 
 const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, controlIcon, mandatory = false }) => {
   const noContent = courses.length === 0
@@ -27,7 +27,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, co
         {course.min_attainment_date || mandatory ?
           <Button
             basic
-            className={styles.controlIcon}
+            className="controlIcon"
             icon={controlIcon}
             onClick={() => onSelectCourse(course)}
           /> : null }

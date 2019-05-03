@@ -7,7 +7,7 @@ import Highcharts from 'highcharts/highstock'
 import { Button } from 'semantic-ui-react'
 import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
-import styles from './creditAccumulationGraphHC.css'
+import './creditAccumulationGraphHC.css'
 import { clearLoading } from '../../redux/graphSpinner'
 import { setChartHeight } from '../../redux/settings'
 import { reformatDate, sortDatesWithFormat } from '../../common'
@@ -192,8 +192,8 @@ class CreditAccumulationGraphHighCharts extends Component {
   render() {
     return (
       <div>
-        <div className={styles.graphContainer}>
-          <div className={styles.graphOptions}>
+        <div className="graphContainer">
+          <div className="graphOptions">
             <Button
               active={this.props.currentGraphSize === 400}
               onClick={() => this.resizeChart(400)}

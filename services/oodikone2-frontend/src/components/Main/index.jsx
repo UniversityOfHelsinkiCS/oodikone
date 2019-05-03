@@ -21,7 +21,7 @@ import Sandbox from '../Sandbox'
 import OodiLearn from '../OodiLearn'
 import StudyProgramme from '../StudyProgramme'
 
-import styles from './main.css'
+import './main.css'
 
 import { getUserName, userIsEnabled, log, images } from '../../common'
 
@@ -93,9 +93,9 @@ class Main extends Component {
       )
     }
     return (
-      <div className={styles.appContainer}>
+      <div className="appContainer">
         <Router basename={BASE_PATH}>
-          <main className={styles.routeViewContainer}>
+          <main className="routeViewContainer">
             <Header />
             <ErrorContainer />
             <Switch>

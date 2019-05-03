@@ -8,7 +8,7 @@ import { reformatDate } from '../../common'
 import { studentDetailsType } from '../../constants/types'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
 
-import styles from './studentInfoCard.css'
+import './studentInfoCard.css'
 
 import { removeStudentSelection, resetStudent } from '../../redux/students'
 import { updatePopulationStudents } from '../../redux/populations'
@@ -26,20 +26,20 @@ const StudentInfoCard = (props) => {
   return (
     <Card fluid>
       <Card.Content>
-        <Card.Header className={styles.cardHeader}>
+        <Card.Header className="cardHeader">
           <div>{name}{student.studentNumber}</div>
           <Icon
             name="remove"
-            className={styles.controlIcon}
+            className="controlIcon"
             onClick={onRemove}
           />
 
         </Card.Header>
         <Card.Meta>
-          <div className={styles.startDate}>
+          <div className="startDate">
             {`${translate('common.started')}: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}
           </div>
-          <div className={styles.startDate}>
+          <div className="startDate">
             {email}
           </div>
         </Card.Meta>

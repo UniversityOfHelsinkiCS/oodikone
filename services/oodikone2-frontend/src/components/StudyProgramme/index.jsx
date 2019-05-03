@@ -3,14 +3,13 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { shape, string } from 'prop-types'
 import { Header, Segment, Tab, Card, Icon } from 'semantic-ui-react'
-import sharedStyles from '../../styles/shared'
 import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
 // import StudyProgrammeCourseCodeMapper from './StudyProgrammeCourseCodeMapper'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
 import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
-import styles from '../PopulationQueryCard/populationQueryCard.css'
+import '../PopulationQueryCard/populationQueryCard.css'
 import { getRolesWithoutRefreshToken, getRightsWithoutRefreshToken, getTextIn } from '../../common'
 
 class StudyProgramme extends Component {
@@ -82,22 +81,22 @@ class StudyProgramme extends Component {
     const programmeName = programmes[studyProgrammeId] && getTextIn(programmes[studyProgrammeId].name, language)
     const panes = this.getPanes()
     return (
-      <div className={sharedStyles.segmentContainer}>
-        <Header className={sharedStyles.segmentTitle} size="large">
+      <div className="segmentContainer">
+        <Header className="segmentTitle" size="large">
           Study Programme
         </Header>
-        <Segment className={sharedStyles.contentSegment}>
+        <Segment className="contentSegment">
           <StudyProgrammeSelector handleSelect={this.handleSelect} selected={studyProgrammeId !== undefined} />
           {
             studyProgrammeId ? (
               <React.Fragment>
-                <Card fluid className={styles.cardContainer}>
+                <Card fluid className="cardContainer">
                   <Card.Content>
-                    <Card.Header className={styles.cardHeader}>
+                    <Card.Header className="cardHeader">
                       {programmeName}
                       <Icon
                         name="remove"
-                        className={styles.controlIcon}
+                        className="controlIcon"
                         onClick={() => this.props.history.push('/study-programme')}
                       />
                     </Card.Header>

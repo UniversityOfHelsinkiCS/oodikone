@@ -3,7 +3,7 @@ import { Header, Search, Segment, Icon } from 'semantic-ui-react'
 import { func, arrayOf, object, string } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import styles from './courseGroupAddTeacher.css'
+import './courseGroupAddTeacher.css'
 
 import Timeout from '../../Timeout'
 import { findTeachers } from '../../../redux/teachers'
@@ -126,7 +126,7 @@ class CourseGroupAddTeacher extends Component {
                   <SortableTable
                     getRowKey={s => s.id}
                     getRowProps={teacher => ({
-                      className: styles.clickable,
+                      className: 'clickable',
                       onClick: () => {
                         this.setState({ isLoading: true })
                         callApi(`/course-groups/${this.props.groupId}/add/${teacher.id}`, 'post')

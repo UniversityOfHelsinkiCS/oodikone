@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Header, Segment, Grid, Message, Button } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, bool, oneOfType, shape, string } from 'prop-types'
-import sharedStyles from '../../styles/shared'
 import style from './index.css'
 import { pingOodiLearn } from '../../redux/sandbox'
 import Postman from '../Postman'
@@ -19,8 +18,8 @@ class SandboxContainer extends Component {
       }
       return (
         <div className={style.container}>
-          <Header className={sharedStyles.segmentTitle} content="Sandbox" size="large" />
-          <Segment className={sharedStyles.contentSegment}>
+          <Header className="segmentTitle" content="Sandbox" size="large" />
+          <Segment className="contentSegment">
             <Grid container columns={1} verticalAlign="middle" textAlign="center">
               <Grid.Row>
                 <Grid.Column>

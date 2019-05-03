@@ -8,7 +8,6 @@ import { getUsers, getEnabledUsers, sendEmail } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { makeSortUsers } from '../../selectors/users'
 import { copyToClipboard, getTextIn } from '../../common'
-import sharedStyles from '../../styles/shared'
 import UserPageNew from '../UserPage'
 import SortableTable from '../SortableTable'
 
@@ -181,13 +180,13 @@ class EnableUsers extends Component {
     const { enabledOnly } = this.state
     const { userid } = match.params
     return (
-      <div className={sharedStyles.segmentContainer}>
-        <Header className={sharedStyles.segmentTitle} size="large">
+      <div className="segmentContainer">
+        <Header className="segmentTitle" size="large">
           Enable or disable access to Oodikone
         </Header>
         <Radio toggle onClick={() => this.toggleEnabledOnly()} />
         <Message>Showing {enabledOnly ? 'only enabled' : 'all'} users</Message>
-        <Segment loading={pending} className={sharedStyles.contentSegment}>
+        <Segment loading={pending} className="contentSegment">
           {!userid ? this.renderUserSearchList() : this.renderUserPage(userid)}
         </Segment>
         <Icon
