@@ -1,26 +1,32 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Button, Icon, Header, Segment, Confirm, Loader, Label } from 'semantic-ui-react'
+import { Button, Radio, Icon, Header, Segment, Confirm, Loader, Label, Message } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
-import { getUsers, sendEmail } from '../../redux/users'
+import { getUsers, getEnabledUsers, sendEmail } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { makeSortUsers } from '../../selectors/users'
 import { copyToClipboard, getTextIn } from '../../common'
-import sharedStyles from '../../styles/shared'
 import UserPageNew from '../UserPage'
 import SortableTable from '../SortableTable'
 
 class EnableUsers extends Component {
   state = {
     confirm: false,
-    email: ''
+    email: '',
+    enabledOnly: true
   }
 
   componentDidMount() {
-    this.props.getUsers()
-    this.props.getUnits()
+    if (this.props.units.length === 0) this.props.getUnits()
+    if (this.props.users.length === 0) this.props.getEnabledUsers()
+  }
+
+  toggleEnabledOnly() {
+    if (this.props.enabledOnly) this.props.getUsers()
+    const { enabledOnly } = this.state
+    this.setState({ enabledOnly: !enabledOnly })
   }
 
   sendMailPopup = user => () => {
@@ -59,7 +65,14 @@ class EnableUsers extends Component {
   }
 
   renderUserSearchList = () => {
+    const { enabledOnly } = this.state
     const { users, error } = this.props
+    let usersToRender
+    if (enabledOnly) {
+      usersToRender = users.filter(u => u.is_enabled)
+    } else {
+      usersToRender = users
+    }
     return error ? null : (
       <div>
         {this.state.confirm ? <Confirm
@@ -156,21 +169,24 @@ class EnableUsers extends Component {
               headerProps: { onClick: null, sorted: null }
             }
           ]}
-          data={users}
+          data={usersToRender}
         />
       </div>
     )
   }
 
   render() {
-    const { match } = this.props
+    const { match, pending } = this.props
+    const { enabledOnly } = this.state
     const { userid } = match.params
     return (
-      <div className={sharedStyles.segmentContainer}>
-        <Header className={sharedStyles.segmentTitle} size="large">
+      <div className="segmentContainer">
+        <Header className="segmentTitle" size="large">
           Enable or disable access to Oodikone
         </Header>
-        <Segment className={sharedStyles.contentSegment}>
+        <Radio toggle onClick={() => this.toggleEnabledOnly()} />
+        <Message>Showing {enabledOnly ? 'only enabled' : 'all'} users</Message>
+        <Segment loading={pending} className="contentSegment">
           {!userid ? this.renderUserSearchList() : this.renderUserPage(userid)}
         </Segment>
         <Icon
@@ -192,8 +208,11 @@ EnableUsers.propTypes = {
   }).isRequired,
   language: string.isRequired,
   getUsers: func.isRequired,
+  getEnabledUsers: func.isRequired,
+  pending: bool.isRequired,
   getUnits: func.isRequired,
   sendEmail: func.isRequired,
+  enabledOnly: bool.isRequired,
   users: arrayOf(shape({
     id: string,
     full_name: string,
@@ -205,6 +224,7 @@ EnableUsers.propTypes = {
     }))
   })).isRequired,
   error: bool.isRequired,
+  units: arrayOf(shape({})).isRequired,
   history: shape({}).isRequired
 }
 
@@ -214,6 +234,7 @@ const mapStateToProps = ({ locale, users, units, settings }) => ({
   language: settings.language,
   translate: getTranslate(locale),
   units: units.data,
+  enabledOnly: users.enabledOnly,
   users: sortUsers(users),
   pending: (typeof (users.pending) === 'boolean') ? users.pending : true,
   error: users.error || false
@@ -221,6 +242,7 @@ const mapStateToProps = ({ locale, users, units, settings }) => ({
 
 export default withRouter(connect(mapStateToProps, {
   getUsers,
+  getEnabledUsers,
   getUnits,
   sendEmail
 })(EnableUsers))

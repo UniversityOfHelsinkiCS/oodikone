@@ -5,7 +5,7 @@ import { Card, Tab, Icon } from 'semantic-ui-react'
 import { withRouter } from 'react-router'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import CoursesTab from './CoursesTab'
-import styles from '../PopulationQueryCard/populationQueryCard.css'
+import '../PopulationQueryCard/populationQueryCard.css'
 
 const statisticsTableTab = (title, statistics) => ({
   menuItem: title,
@@ -41,13 +41,13 @@ class TeacherDetails extends Component {
 
       return (
         <div>
-          <Card fluid className={styles.cardContainer}>
+          <Card fluid className="cardContainer">
             <Card.Content>
-              <Card.Header className={styles.cardHeader}>
+              <Card.Header className="cardHeader">
                 {teacher.name}
                 <Icon
                   name="remove"
-                  className={styles.controlIcon}
+                  className="controlIcon"
                   onClick={() => this.props.history.goBack()}
                 />
               </Card.Header>

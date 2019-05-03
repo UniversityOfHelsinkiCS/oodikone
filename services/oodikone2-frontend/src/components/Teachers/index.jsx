@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { shape, string, bool } from 'prop-types'
 import { Header, Segment, Tab } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
-import sharedStyles from '../../styles/shared'
 import TeacherSearchTab from '../TeacherSearchTab'
 import TeacherPage from '../TeacherPage'
 import TeacherStatistics from '../TeacherStatistics'
@@ -46,9 +45,9 @@ class Teachers extends Component {
     const { match } = this.props
     const { teacherid } = match.params
     return (
-      <div className={sharedStyles.segmentContainer}>
-        <Header className={sharedStyles.segmentTitle} size="large" content="Teacher statistics" />
-        <Segment className={sharedStyles.contentSegment}>
+      <div className="segmentContainer">
+        <Header className="segmentTitle" size="large" content="Teacher statistics" />
+        <Segment className="contentSegment">
           {teacherid
             ? <TeacherPage teacherid={teacherid} />
             : <TeachersTabs admin={this.state.admin} />

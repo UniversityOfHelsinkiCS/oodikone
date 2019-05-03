@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Suspense } from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { localize } from 'react-localize-redux'
 import { Loader, Image, Transition } from 'semantic-ui-react'
@@ -7,23 +7,24 @@ import * as Sentry from '@sentry/browser'
 
 import Header from '../Header'
 import Populations from '../PopulationStatistics'
-import WelcomePage from '../WelcomePage'
-import StudentStatistics from '../StudentStatistics'
-import CourseStatistics from '../CourseStatistics'
-import EnableUsers from '../EnableUsers'
-import Settings from '../Settings'
 import ErrorContainer from '../ErrorContainer'
 import { routes, BASE_PATH } from '../../constants'
 import AccessDenied from '../AccessDenied'
-import UsageStatistics from '../UsageStatistics'
-import Teachers from '../Teachers'
-import Sandbox from '../Sandbox'
-import OodiLearn from '../OodiLearn'
-import StudyProgramme from '../StudyProgramme'
 
-import styles from './main.css'
+import './main.css'
 
 import { getUserName, userIsEnabled, log, images } from '../../common'
+
+const WelcomePage = React.lazy(() => import('../WelcomePage'))
+const StudentStatistics = React.lazy(() => import('../StudentStatistics'))
+const CourseStatistics = React.lazy(() => import('../CourseStatistics'))
+const EnableUsers = React.lazy(() => import('../EnableUsers'))
+const Settings = React.lazy(() => import('../Settings'))
+const StudyProgramme = React.lazy(() => import('../StudyProgramme'))
+const Teachers = React.lazy(() => import('../Teachers'))
+const Sandbox = React.lazy(() => import('../Sandbox'))
+const UsageStatistics = React.lazy(() => import('../UsageStatistics'))
+const OodiLearn = React.lazy(() => import('../OodiLearn'))
 
 class Main extends Component {
   state = {
@@ -65,7 +66,8 @@ class Main extends Component {
     guide: `Oodikone is unable to connect.
       Double check that you're in eduroam or have
       pulse security on. Refresh by pressing F5.`,
-    networkError: true })
+    networkError: true
+  })
 
   render() {
     if (!this.state.loaded) {
@@ -93,25 +95,27 @@ class Main extends Component {
       )
     }
     return (
-      <div className={styles.appContainer}>
+      <div className="appContainer">
         <Router basename={BASE_PATH}>
-          <main className={styles.routeViewContainer}>
+          <main className="routeViewContainer">
             <Header />
             <ErrorContainer />
-            <Switch>
-              <Route exact path={routes.index.route} component={WelcomePage} />
-              <Route exact path="/populations" component={Populations} />
-              <Route exact path="/study-programme/:studyProgrammeId?" component={StudyProgramme} />
-              <Route exact path="/study-programme/:studyProgrammeId/course-group/:courseGroupId" component={StudyProgramme} />
-              <Route exact path={routes.students.route} component={StudentStatistics} />
-              <Route exact path={routes.courseStatistics.route} component={CourseStatistics} />
-              <Route exact path={routes.settings.route} component={Settings} />
-              <Route exact path={routes.users.route} component={EnableUsers} />
-              <Route exact path={routes.teachers.route} component={Teachers} />
-              <Route exact path={routes.usage.route} component={UsageStatistics} />
-              <Route exact path={routes.sandbox.route} component={Sandbox} />
-              <Route exact path={routes.oodilearn.route} component={OodiLearn} />
-            </Switch>
+            <Suspense fallback={<Loader active inline="centered" />}>
+              <Switch>
+                <Route exact path={routes.index.route} component={WelcomePage} />
+                <Route exact path="/populations" component={Populations} />
+                <Route exact path="/study-programme/:studyProgrammeId?" component={StudyProgramme} />
+                <Route exact path="/study-programme/:studyProgrammeId/course-group/:courseGroupId" component={StudyProgramme} />
+                <Route exact path={routes.students.route} component={StudentStatistics} />
+                <Route exact path={routes.courseStatistics.route} component={CourseStatistics} />
+                <Route exact path={routes.settings.route} component={Settings} />
+                <Route exact path={routes.users.route} component={EnableUsers} />
+                <Route exact path={routes.teachers.route} component={Teachers} />
+                <Route exact path={routes.usage.route} component={UsageStatistics} />
+                <Route exact path={routes.sandbox.route} component={Sandbox} />
+                <Route exact path={routes.oodilearn.route} component={OodiLearn} />
+              </Switch>
+            </Suspense>
           </main>
         </Router>
       </div>
