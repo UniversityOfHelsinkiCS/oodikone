@@ -12,6 +12,7 @@ const backendURL = `http://${apiAddress}:${apiServerPort}`
 
 module.exports = (env, args) => {
   const { mode } = args
+  const isDev = mode === 'development'
   return {
     entry: [
       'babel-polyfill',
@@ -64,8 +65,10 @@ module.exports = (env, args) => {
       }),
       new MiniCssExtractPlugin()
     ],
+    devtool: isDev ? 'eval-source-map' : 'source-map',
     devServer: {
       historyApiFallback: true,
+      port: devServerPort,
       proxy: [
         {
           context: ['/api/**'],
