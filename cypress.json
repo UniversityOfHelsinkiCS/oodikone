@@ -1,3 +1,9 @@
 {
-  "projectId": "c8bfes"
+  "projectId": "c8bfes",
+  "defaultCommandTimeout": 20000,
+  "execTimeout": 60000,
+  "taskTimeout": 60000,
+  "pageLoadTimeout": 100000,
+  "requestTimeout": 20000,
+  "responseTimeout": 60000
 }

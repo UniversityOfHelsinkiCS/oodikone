@@ -1,6 +1,4 @@
 describe('Studyprogramme overview', () => {
-  Cypress.config('pageLoadTimeout', 100000)
-
   beforeEach(() => {
     cy.server({
       onAnyRequest: function (route, proxy) {
@@ -12,7 +10,7 @@ describe('Studyprogramme overview', () => {
         }
       }
     })
-    cy.visit(Cypress.config().baseUrl, { timeout: 24000 })
+    cy.visit(Cypress.config().baseUrl)
     cy.contains("Study programme").click().siblings().contains("Overview").click()
     cy.contains("Study Programme", { timeout: 100000 })
   })
