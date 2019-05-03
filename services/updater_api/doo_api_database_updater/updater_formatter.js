@@ -1,8 +1,6 @@
 const Oodi = require('./oodi_interface')
 const mapper = require('./oodi_data_mapper')
 
-const _ = require('lodash')
-
 const getAllStudentInformationFromApi = async studentnumber => {
   const [student, studyrights, studyattainments, semesterEnrollments, courseEnrollments] = await Promise.all([
     Oodi.getStudent(studentnumber),
@@ -20,7 +18,7 @@ const getAllStudentInformationFromApi = async studentnumber => {
     courseEnrollments
   }
 }
-const updateStudyrights = async (api, studentnumber) => {
+const formatStudyrights = async (api, studentnumber) => {
   if (api.studyrights.length === 0) {
     console.log(`No studyrights for ${studentnumber}`)
     return
@@ -39,7 +37,7 @@ const updateStudyrights = async (api, studentnumber) => {
   }
 }
 
-const updateCourseEnrollments = async (apidata, studentnumber) => await Promise.all(apidata.courseEnrollments.map(enrollment => mapper.studentEnrollmentToModels(enrollment, studentnumber)))
+const formatCourseEnrollments = async (apidata, studentnumber) => await Promise.all(apidata.courseEnrollments.map(enrollment => mapper.studentEnrollmentToModels(enrollment, studentnumber)))
 
 
 const parseAttainmentData = (data, studentnumber) => {
@@ -58,7 +56,7 @@ const createCreditTeachers = async (credit, teachers) => {
   return creditTeachers
 }
 
-const updateStudyattainments = async (api, studentnumber) => {
+const formatStudyattainments = async (api, studentnumber) => {
   let studyAttainments = []
   for (let data of api.studyattainments) {
     const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
@@ -74,28 +72,25 @@ const updateStudyattainments = async (api, studentnumber) => {
   return studyAttainments
 }
 
-const updateSemesterEnrollments = async (apidata, studentnumber) => await Promise.all(apidata.semesterEnrollments.map(apiEnrollment => mapper.semesterEnrollmentFromData(apiEnrollment, studentnumber)))
+const formatSemesterEnrollments = async (apidata, studentnumber) => await Promise.all(apidata.semesterEnrollments.map(apiEnrollment => mapper.semesterEnrollmentFromData(apiEnrollment, studentnumber)))
 
 
-const updateStudent = async (studentnumber) => {
+const getStudent = async (studentnumber) => {
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {
     throw new Error(`API returned ${api.student} for studentnumber ${studentnumber}.`)
   }
   const studentInfo = await mapper.getStudentFromData(api.student, api.studyrights)
   const [studyRights, studyAttainments, semesterEnrollments, courseEnrollments] = await Promise.all([
-    updateStudyrights(api, studentnumber),
-    updateStudyattainments(api, studentnumber),
-    updateSemesterEnrollments(api, studentnumber),
-    updateCourseEnrollments(api, studentnumber)
+    formatStudyrights(api, studentnumber),
+    formatStudyattainments(api, studentnumber),
+    formatSemesterEnrollments(api, studentnumber),
+    formatCourseEnrollments(api, studentnumber)
   ])
   return { studentInfo, studyRights, studyAttainments, semesterEnrollments, courseEnrollments }
 }
 
 
-
-
-
 module.exports = {
-  updateStudent
+  getStudent
 }
