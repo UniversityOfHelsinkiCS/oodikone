@@ -16,6 +16,7 @@
     "lintfix": "eslint server ./ --ext .jsx,.js --fix",
     "stats": "webpack --json --config webpack.config.production.js > stats.json",
     "test": "npm run lint",
+    "test_docker": "docker exec -t frontend /bin/bash -c 'npm test'",
     "notest": "echo",
     "storybook": "start-storybook -h 0.0.0.0 -p 7777 --ci"
   },
