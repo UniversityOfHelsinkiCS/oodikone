@@ -162,7 +162,7 @@ run_e2e_setup () {
     echo "Init dirs"
     init_dirs
     echo "Building images, starting containers"
-    docker-compose -f docker-compose.lateste2e.yml pull && docker-compose -f docker-compose.lateste2e.yml up -d
+    docker-compose -f docker-compose.lateste2e.yml build && docker-compose -f docker-compose.lateste2e.yml up -d
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_anon_setup_full
     echo "Restarting Docker backend containers to run migrations, etc."
