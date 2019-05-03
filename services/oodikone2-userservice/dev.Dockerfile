@@ -1,9 +1,10 @@
 FROM node:10
 
+RUN mkdir -p /usr/src/app
 COPY . /usr/src/app
 WORKDIR /usr/src/app
-ENV NODE_ENV dev
+
 RUN npm ci && mv /usr/src/app/node_modules /node_modules
-EXPOSE 8080
+EXPOSE 4567
 
 CMD ["npm", "run", "dev"]

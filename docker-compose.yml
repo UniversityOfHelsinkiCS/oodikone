@@ -87,7 +87,6 @@ services:
     build:
       context: services/oodikone2-backend
       dockerfile: dev.Dockerfile
-    command: sh -c "npm install && npm run dev"
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -114,7 +113,6 @@ services:
     build:
       context: services/oodikone2-frontend
       dockerfile: dev.Dockerfile
-    command: sh -c "npm install && npm run docker"
     restart: unless-stopped
     ports:
       - "8081:8081"
@@ -144,8 +142,9 @@ services:
       - MONGO_URI=mongodb://mongo_db:27017/oodilearn
     container_name: oodilearn
   userservice:
-    image: node:8.11.3
-    command: sh -c "cd /usr/src/app && npm install && npm run dev"
+    build:
+      context: services/oodikone2-userservice
+      dockerfile: dev.Dockerfile
     restart: unless-stopped
     volumes:
       - ./services/oodikone2-userservice/:/usr/src/app
@@ -156,13 +155,13 @@ services:
       - TEST_DB=postgres://postgres@user_db:5432/user_db_test
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       - TOKEN_SECRET=IWannaBeTheVeryBest
+    depends_on:
+      - user_db
     container_name: userservice
   usageservice:
-    image: node:10-alpine
     build:
       context: services/oodikone2-usageservice
       dockerfile: dev.Dockerfile
-    command: sh -c "cd /usr/src/app && npm install && npm run dev"
     restart: unless-stopped
     volumes:
       - ./services/oodikone2-usageservice/:/usr/src/app
@@ -177,11 +176,9 @@ services:
       - ./services/oodikone2-usageservice/node_modules:/usr/src/app/node_modules
     container_name: usageservice
   updater_api:
-    image: node:10-alpine
     build:
       context: services/updater_api
       dockerfile: dev.Dockerfile
-    command: sh -c "cd /usr/src/app && npm install && npm run dev"
     restart: unless-stopped
     depends_on:
       - kafka
@@ -192,8 +189,9 @@ services:
       - ./services/updater_api/node_modules:/usr/src/app/node_modules
     container_name: updater_api
   analytics:
-    image: node:8.11.3
-    command: sh -c "cd /usr/src/app && npm install && npm run dev"
+    build:
+      context: services/oodikone2-analytics
+      dockerfile: dev.Dockerfile
     restart: unless-stopped
     volumes:
       - ./services/oodikone2-analytics/:/usr/src/app
