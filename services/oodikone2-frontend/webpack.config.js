@@ -8,13 +8,14 @@ const devServerPort = 8081
 const apiServerPort = 8080
 const apiAddress = process.env.BACKEND_ADDR || 'localhost'
 const backendURL = `http://${apiAddress}:${apiServerPort}`
+const BASE_PATH = process.env.BASE_PATH || '/'
 
 module.exports = (env, args) => {
   const { mode } = args
   const isDev = mode === 'development'
   return {
     output: {
-      publicPath: '/'
+      publicPath: BASE_PATH
     },
     entry: [
       'babel-polyfill',
@@ -53,11 +54,12 @@ module.exports = (env, args) => {
         ]
       }),
       new HtmlWebpackPlugin({
-        template: './index.html'
+        template: './index.html',
+        baseHref: BASE_PATH
       }),
       new webpack.DefinePlugin({
         CONFIG: {
-          BASE_PATH: JSON.stringify(''),
+          BASE_PATH: JSON.stringify(BASE_PATH),
           AUTH_PROFILE: JSON.stringify(mode)
         },
         'process.env': {
