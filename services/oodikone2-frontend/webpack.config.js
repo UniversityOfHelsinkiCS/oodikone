@@ -85,8 +85,9 @@ module.exports = (env, args) => {
       port: devServerPort,
       proxy: [
         {
-          context: ['/api/**'],
-          target: backendURL
+          context: ['/api', '/staging/api'],
+          target: backendURL,
+          pathRewrite: { '^/staging': '' }
         }
       ]
     }
