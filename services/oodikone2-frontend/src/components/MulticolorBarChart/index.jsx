@@ -4,7 +4,7 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 
 import { graphDataType } from '../../constants/types'
 import { red, green, blue, purple, turquoise } from '../../styles/variables/colors'
-import styles from './multicolorBarChart.css'
+import './multicolorBarChart.css'
 
 const BAR_COLOR_OPTIONS = [red, purple, green, blue, turquoise]
 
@@ -22,8 +22,8 @@ const MulticolorBarChart = (props) => {
   if (chartData.length > 0) {
     return (
       <div>
-        <div className={styles.chartTitle}>{chartTitle}</div>
-        <div className={styles.chartContainer}>
+        <div className="chartTitle">{chartTitle}</div>
+        <div className="chartContainer">
           <ResponsiveContainer height={400}>
             <BarChart data={chartData}>
               <XAxis dataKey="name" />

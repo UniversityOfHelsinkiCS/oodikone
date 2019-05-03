@@ -1,30 +1,42 @@
 version: '3'
 
 services:
-  zookeeper:
-    image: wurstmeister/zookeeper
+  # zookeeper:
+  #   image: wurstmeister/zookeeper
+  #   ports:
+  #     - "2181:2181"
+  #   environment:
+  #     - KAFKA_BROKER_ID=1
+  #   container_name: zookeeper
+  
+  # kafka:
+  #   image: wurstmeister/kafka
+  #   container_name: kafka
+  #   depends_on:
+  #     - zookeeper
+  #   ports:
+  #     - "9092:9092"
+  #   environment:
+  #     - HOSTNAME_COMMAND=route -n | awk '/UG[ \t]/{print $$2}'
+  #     - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+  #     - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+  #     - KAFKA_DELETE_TOPIC_ENABLE=true
+  #     - KAFKA_CREATE_TOPICS=studentnumbers:1:1,priority_studentnumbers:1:1
+  #     - KAFKA_LOG_DIRS=/kafka/kafka-logs-1
+  #   volumes:
+  #     - ./kafka/docker.sock:/var/run/docker.sock
+  #     - ./kafka/logs:/kafka/kafka-logs-1
+  
+  nats:
+    image: nats-streaming
+    command: -cid updaterNATS
+    expose:
+      - "4222"
     ports:
-      - "2181:2181"
-    environment:
-      - KAFKA_BROKER_ID=1
-    container_name: zookeeper
-  kafka:
-    image: wurstmeister/kafka
-    container_name: kafka
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    environment:
-      - HOSTNAME_COMMAND=route -n | awk '/UG[ \t]/{print $$2}'
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
-      - KAFKA_DELETE_TOPIC_ENABLE=true
-      - KAFKA_CREATE_TOPICS=studentnumbers:1:1,priority_studentnumbers:1:1
-      - KAFKA_LOG_DIRS=/kafka/kafka-logs-1
-    volumes:
-      - ./kafka/docker.sock:/var/run/docker.sock
-      - ./kafka/logs:/kafka/kafka-logs-1
+      - "8222:8222"
+      - "4222:4222"
+    container_name: nats
+
   analytics_db:
     image: postgres:9.6.3
     ports:
@@ -35,6 +47,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=analytics_db
+
   user_db:
     image: postgres:9.6.3
     ports:
@@ -44,7 +57,7 @@ services:
     container_name: oodi_user_db
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=user_db
+      - POSTGRES_MULTIPLE_DATABASES=user_db,user_db_real
   usage_db:
     image: postgres:9.6.3
     ports:
@@ -55,6 +68,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=usage_db
+
   db:
     image: postgres:9.6.3
     ports:
@@ -64,8 +78,9 @@ services:
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
     container_name: oodi_db
     environment:
-      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
+      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test,tkt_oodi_real
       - POSTGRES_USER=postgres
+
   redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
@@ -74,15 +89,17 @@ services:
     volumes:
       - ./redis-data:/data
     container_name: redis
-  mongo_db:
-    image: mongo
-    restart: unless-stopped
-    volumes:
-      - ./backups/mongo/oodilearn:/dump
-      - ./mongodata:/data/db
-    ports:
-      - "27017:27017"
-    container_name: mongo_db
+
+  # mongo_db:
+  #   image: mongo
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./backups/mongo/oodilearn:/dump
+  #     - ./mongodata:/data/db
+  #   ports:
+  #     - "27017:27017"
+  #   container_name: mongo_db
+
   backend:
     build:
       context: services/oodikone2-backend
@@ -105,10 +122,12 @@ services:
     volumes:
       - ./services/oodikone2-backend/:/usr/src/app
       - ./services/oodikone2-backend/node_modules:/usr/src/app/node_modules
+      - ./models:/usr/src/app/src/models
     container_name: backend
     depends_on:
       - db
       - redis
+
   frontend:
     build:
       context: services/oodikone2-frontend
@@ -126,21 +145,23 @@ services:
     volumes:
       - ./services/oodikone2-frontend/:/usr/src/app
     container_name: frontend
-  oodilearn:
-    build:
-      context: services/oodilearn/server
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    volumes:
-      - ./services/oodilearn/data:/data
-      - ./services/oodilearn/server:/src
-      - ./services/oodilearn/models:/models
-    ports:
-      - "5000:5000"
-    environment:
-      - ENV=development
-      - MONGO_URI=mongodb://mongo_db:27017/oodilearn
-    container_name: oodilearn
+
+  # oodilearn:
+  #   build:
+  #     context: services/oodilearn/server
+  #     dockerfile: Dockerfile
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./services/oodilearn/data:/data
+  #     - ./services/oodilearn/server:/src
+  #     - ./services/oodilearn/models:/models
+  #   ports:
+  #     - "5000:5000"
+  #   environment:
+  #     - ENV=development
+  #     - MONGO_URI=mongodb://mongo_db:27017/oodilearn
+  #   container_name: oodilearn
+
   userservice:
     build:
       context: services/oodikone2-userservice
@@ -158,13 +179,12 @@ services:
     depends_on:
       - user_db
     container_name: userservice
+
   usageservice:
     build:
       context: services/oodikone2-usageservice
       dockerfile: dev.Dockerfile
     restart: unless-stopped
-    volumes:
-      - ./services/oodikone2-usageservice/:/usr/src/app
     ports:
       - 545:545
     environment:
@@ -175,19 +195,41 @@ services:
       - ./services/oodikone2-usageservice/:/usr/src/app
       - ./services/oodikone2-usageservice/node_modules:/usr/src/app/node_modules
     container_name: usageservice
+
   updater_api:
     build:
       context: services/updater_api
       dockerfile: dev.Dockerfile
     restart: unless-stopped
+    volumes: 
+      - ./services/updater_api/:/usr/src/app
     depends_on:
-      - kafka
-    volumes:
-      - ./services/updater_api/:/usr/src/app
-    volumes:
-      - ./services/updater_api/:/usr/src/app
-      - ./services/updater_api/node_modules:/usr/src/app/node_modules
+      - nats
+    environment:
+      - NATS_URI=nats://nats:4222
+      - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
+      - TOKEN=asdasdsadasd
     container_name: updater_api
+
+  updater_writer:
+    image: node:10-alpine
+    build:
+      context: services/updater_writer
+      dockerfile: dev.Dockerfile
+    command: sh -c "cd /usr/src/app && npm install && npm run dev"
+    restart: unless-stopped
+    volumes: 
+      - ./services/updater_writer/:/usr/src/app
+      - ./models:/usr/src/app/models
+
+    depends_on:
+      - nats
+      - db
+    environment:
+      NATS_URI: nats://nats:4222
+      DB_URL: postgres://postgres@db:5432/tkt_oodi
+
+
   analytics:
     build:
       context: services/oodikone2-analytics
@@ -205,6 +247,7 @@ services:
       - analytics_db
       - analytics_redis
     container_name: analytics
+
   analytics_redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
@@ -213,6 +256,7 @@ services:
     volumes:
       - ./analytics-redis-data:/data
     container_name: analytics_redis
+
   adminer:
     image: adminer:4.6.2
     environment:

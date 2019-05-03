@@ -1,7 +1,5 @@
 
 describe('Population Statistics tests', () => {
-  Cypress.config('pageLoadTimeout', 100000)
-
   beforeEach(() => {
     cy.server({
       onAnyRequest: function (route, proxy) {
@@ -14,9 +12,9 @@ describe('Population Statistics tests', () => {
       }
     })
     console.log(Cypress.config().baseUrl)
-    cy.visit(Cypress.config().baseUrl, { timeout: 24000 })
+    cy.visit(Cypress.config().baseUrl)
     cy.contains("Study programme").click().siblings().contains("Search by class").click()
-    cy.contains("Select study programme", { timeout: 100000 })
+    cy.contains("Select study programme")
   })
 
   const checkAmountOfStudents = (assertion) => {
@@ -101,7 +99,7 @@ describe('Population Statistics tests', () => {
       cy.wait(1000)
       cy.url().should('include', '/coursestatistics')
     })
-    cy.contains("DIGI-000A", { timeout: 10000 })
+    cy.contains("DIGI-000A")
     cy.go("back")
 
    
@@ -221,7 +219,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Select study programme", { timeout: 50000 }).click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
     cy.contains("See population").click()
 
-    cy.contains("add", { timeout: 20000 }).click()
+    cy.contains("add").click()
     cy.contains("Advanced filters").click()
 
     cy.get('label:contains(Basic filters)').each(($f) => {

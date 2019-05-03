@@ -5,7 +5,7 @@ import PassRate from './Panes/passRate'
 import Distribution from './Panes/distribution'
 import Tables from './Panes/tables'
 
-import styles from './resultTabs.css'
+import './resultTabs.css'
 
 const paneViewIndex = {
   TABLE: 0,
@@ -56,7 +56,7 @@ class ResultTabs extends Component {
         menuItem,
         render: () => (
           <Grid padded="vertically" columns="equal">
-            <Grid.Row className={styles.modeSelectorRow}>
+            <Grid.Row className="modeSelectorRow">
               {this.renderViewModeSelector()}
             </Grid.Row>
             <Grid.Row>
@@ -105,21 +105,21 @@ class ResultTabs extends Component {
       const newMode = isToggleChecked ? viewModeNames.CUMULATIVE : viewModeNames.STUDENT
       const toggleId = 'viewModeToggle'
       return (
-        <div className={styles.toggleContainer}>
-          <label className={styles.toggleLabel} htmlFor={toggleId}>{viewModeNames.CUMULATIVE}</label>
+        <div className="toggleContainer">
+          <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.CUMULATIVE}</label>
           <Radio
             id={toggleId}
             checked={isToggleChecked}
             toggle
             onChange={() => this.handleModeChange(newMode)}
           />
-          <label className={styles.toggleLabel} htmlFor={toggleId}>{viewModeNames.STUDENT}</label>
+          <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.STUDENT}</label>
         </div>
       )
     }
 
     return (
-      <div className={styles.modeSelectorContainer}>
+      <div className="modeSelectorContainer">
         {isTogglePane ? getToggle() : getButtonMenu()}
       </div>
     )
