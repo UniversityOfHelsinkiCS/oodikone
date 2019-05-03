@@ -13,13 +13,6 @@ cache:
 services:
   - docker
 
-env:
-  - SERVICE=oodikone2-frontend
-  - SERVICE=oodikone2-backend
-  - SERVICE=oodikone2-userservice
-  - SERVICE=oodikone2-usageservice
-  - SERVICE=oodikone2-analytics
-
 jobs:
   include:
     - stage: build & test trunk
