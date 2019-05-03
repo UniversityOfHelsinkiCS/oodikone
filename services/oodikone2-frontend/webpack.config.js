@@ -2,8 +2,8 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const htmlTemplate = require('html-webpack-template')
+const TerserPlugin = require('terser-webpack-plugin')
 const DeadCodePlugin = require('webpack-deadcode-plugin')
-const path = require('path')
 
 const devServerPort = 8081
 const apiServerPort = 8080
@@ -44,6 +44,12 @@ module.exports = (env, args) => {
       ]
     },
     plugins: [
+      new DeadCodePlugin({
+        exclude: [
+          '**/node_modules/**',
+          '**/*.(storybook|spec).(js|jsx)'
+        ]
+      }),
       new HtmlWebpackPlugin({
         inject: false,
         template: htmlTemplate,
@@ -65,6 +71,13 @@ module.exports = (env, args) => {
       }),
       new MiniCssExtractPlugin()
     ],
+    optimization: {
+      minimizer: [new TerserPlugin({
+        cache: true,
+        parallel: true,
+        sourceMap: true
+      })]
+    },
     devtool: isDev ? 'eval-source-map' : 'source-map',
     devServer: {
       historyApiFallback: true,
