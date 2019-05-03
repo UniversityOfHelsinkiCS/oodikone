@@ -17,7 +17,7 @@ const TeacherItem = ({ teacher, isActive, handleFilterClick }) => {
   const { name, code, id, courses, credits } = teacher
 
   return (
-    <List.Item className={`${isActive ? "teacherActiveItem" : ''}`}>
+    <List.Item className={`${isActive ? 'teacherActiveItem' : ''}`}>
       <List.Content className="teacherItemStatistics">
         <div className="teacherItemBasicInfo">
           <div className="teacherName">{name}</div>
@@ -28,7 +28,7 @@ const TeacherItem = ({ teacher, isActive, handleFilterClick }) => {
         <div className="statisticControlItem">
           <Button
             icon="filter"
-            className={`${isActive ? "activeIconButton" : "iconButton"}`}
+            className={`${isActive ? 'activeIconButton' : 'iconButton'}`}
             onClick={() => handleFilterClick(id)}
             circular
           />
