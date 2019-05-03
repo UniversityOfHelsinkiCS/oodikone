@@ -57,8 +57,7 @@ services:
     container_name: oodi_user_db
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=user_db
-
+      - POSTGRES_MULTIPLE_DATABASES=user_db,user_db_real
   usage_db:
     image: postgres:9.6.3
     ports:
@@ -79,7 +78,7 @@ services:
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
     container_name: oodi_db
     environment:
-      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
+      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test,tkt_oodi_real
       - POSTGRES_USER=postgres
 
   redis:

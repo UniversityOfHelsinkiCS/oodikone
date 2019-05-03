@@ -19,7 +19,7 @@ Install Docker Compose:
 
 Launch the CLI with the command below and follow the instructions.
 
-Before running cli make yourself a deployment key for Anonyymioodi private repository and put it in your root folder as private.key. This allows you to download the anonymized dumps from the repository.
+Before running cli [make yourself a deployment key](https://developer.github.com/v3/guides/managing-deploy-keys/#setup-2) for Anonyymioodi private repository and put it in your root folder as private.key. This allows you to download the anonymized dumps from the repository.
 
 ```
 bash run.sh
@@ -27,6 +27,8 @@ bash run.sh
 
 
 For local development with anonymized data use `2) Anon setup` (you can run e2e tests with this).
+
+To get also the full real dataset use `3) Full setup`
 
 > `1) e2e setup` is designed for use in travis. But you can still try it locally if you want to.
 
@@ -51,9 +53,19 @@ The development environment is entirely configured in the docker-compose.yml fil
 The mapping of ports and environment variables are also defined in the docker-compose file. You can start, stop and manage the development environment by running the following commands from a terminal shell in this directory.
 
 ### Start the development environment
+
+#### With anonymized data:
+
 ```
 docker-compose up -d
 ```
+
+#### With real data:
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.real.yml up -d
+```
+
 
 ### Stop the development environment
 ```
