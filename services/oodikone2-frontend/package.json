@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --mode=development --hot",
-    "docker": "webpack-dev-server --mode=development --host 0.0.0.0 --inline --config webpack.config.local.js",
+    "docker": "webpack-dev-server --mode=development --hot --host 0.0.0.0",
     "dist": "rimraf dist && webpack --mode=production --config webpack.config.production.js",
     "lint": "concurrently 'npm run lint:js' 'npm run lint:css'",
     "lint:css": "stylelint 'src/**/*.css'",
