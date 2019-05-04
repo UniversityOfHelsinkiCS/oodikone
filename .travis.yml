@@ -17,8 +17,9 @@ jobs:
   include:
     - stage: build & test staging and production images
       if: type = pull_request
+      env:
+        - IMAGE=STAGING
       script:
-        - echo "using staging image"
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
         - source scripts.sh && run_e2e_setup docker-compose.lateste2e.yml
         - docker ps
@@ -28,8 +29,9 @@ jobs:
         - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
     - # parallel build
       if: type = pull_request
+      env:
+        - IMAGE=PRODUCTION
       script:
-        - echo "using production image"
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
         - source scripts.sh && run_e2e_setup docker-compose.lateste2e.production.yml
         - docker ps
@@ -40,6 +42,8 @@ jobs:
 
     - stage: build & test & push & deploy staging image
       if: branch = master AND NOT type = pull_request
+      env:
+        - IMAGE=STAGING
       script:
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
         - source scripts.sh && run_e2e_setup docker-compose.lateste2e.yml
@@ -55,6 +59,8 @@ jobs:
 
     - stage: build & push & MANUAL DEPLOY production image
       if: tag =~ ^[0-9.]+$
+      env:
+        - IMAGE=PRODUCTION
       script:
         - set -e
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
