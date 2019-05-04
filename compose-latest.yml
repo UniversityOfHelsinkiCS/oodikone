@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  backend:
+    image: toska/oodikone2-backend:latest
+    build:
+      context: services/oodikone2-backend
+  frontend:
+    image: toska/oodikone2-frontend:latest
+    build:
+      context: services/oodikone2-frontend
+      args:
+        BASE_PATH: /
+  userservice:
+    image: toska/oodikone2-userservice:latest
+    build:
+      context: services/oodikone2-userservice
+  usageservice:
+    image: toska/oodikone2-usageservice:latest
+    build:
+      context: services/oodikone2-usageservice
+  analytics:
+    image: toska/oodikone2-analytics:latest
+    build:
+      context: services/oodikone2-analytics

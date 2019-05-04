@@ -89,16 +89,16 @@ db_oodikone_reset () {
 
 ping_psql () {
     echo "Pinging psql in container $1 with db name $2"
-    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi"
     retry docker exec -u postgres $1 pg_isready
+    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi" || echo "tkt_oodi DB already exists"
     echo "Pinging psql in container $1 with db name tkt_oodi_test"
-    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_test"
+    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_test" || echo "tkt_oodi_test DB already exists"
     retry docker exec -u postgres $1 pg_isready
 }
 
 ping_psql_real () {
     echo "Pinging psql in container $1 with db name $2"
-    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_real"
+    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_real" || echo "tkt_oodi_real DB already exists"
     retry docker exec -u postgres $1 pg_isready
 }
 
@@ -184,7 +184,7 @@ run_e2e_setup () {
     echo "Init dirs"
     init_dirs
     echo "Building images, starting containers"
-    docker-compose -f docker-compose.lateste2e.yml pull && docker-compose -f docker-compose.lateste2e.yml up -d
+    docker-compose -f docker-compose.lateste2e.yml build && docker-compose -f docker-compose.lateste2e.yml up -d
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_anon_setup_full
     echo "Restarting Docker backend containers to run migrations, etc."
