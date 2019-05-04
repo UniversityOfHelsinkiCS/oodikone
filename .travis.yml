@@ -15,13 +15,16 @@ services:
   - docker
 
 env:
-  - DOCKER_COMPOSE_VERSION=1.24.0 # enables use of docker-compose build --parallel
+  global:
+    - DOCKER_COMPOSE_VERSION=1.24.0 # enables use of docker-compose build --parallel
 
 before_install: # install newer docker-compose https://docs.travis-ci.com/user/docker/#installing-a-newer-docker-version
   - sudo rm /usr/local/bin/docker-compose
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
+    curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
 
 before_script:
   - docker --version
