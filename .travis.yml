@@ -18,7 +18,6 @@ jobs:
     - stage: build & test (not staging or production release)
       if: type = pull_request
       script:
-        - set -e
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
         - source scripts.sh && run_e2e_setup
         - docker ps
@@ -26,13 +25,11 @@ jobs:
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
         - npm run test_services
         - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
-      after_failure:
         - docker-compose logs
 
     - stage: build & test & push & deploy staging
       if: branch = master AND NOT type = pull_request
       script:
-        - set -e
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
         - source scripts.sh && run_e2e_setup
         - docker ps
@@ -40,10 +37,11 @@ jobs:
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
         - npm run test_services
         - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
+        - docker-compose logs
+      after_success:
+        - set -e
         - docker-compose -f docker-compose.lateste2e.yml push
         - "curl --fail -k -X POST -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" https://toska.cs.helsinki.fi/toskawatch/release/"
-      after_failure:
-        - docker-compose logs
 
     - stage: build & push & MANUAL DEPLOY production
       if: tag =~ ^[0-9.]+$
