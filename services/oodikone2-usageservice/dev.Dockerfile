@@ -6,4 +6,4 @@ ENV NODE_ENV dev
 RUN npm ci && mv /usr/src/app/node_modules /node_modules
 EXPOSE 545
 
-CMD ["/node_modules/.bin/nodemon", "index.js"]
+CMD ["npm", "run", "dev"]

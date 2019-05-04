@@ -9,10 +9,14 @@ const addUserToBlacklist = async userId => {
 }
 
 const isUserBlacklisted = async (userId, tokenCreatedAt) => {
-  const blacklistTimestamp = await redisClient.getAsync(MAKE_REDIS_HASH_KEY(userId))
-  const isBlacklisted = !!(tokenCreatedAt && blacklistTimestamp && moment(tokenCreatedAt) < moment(blacklistTimestamp))
-  console.log('BLACKLISTED? ', {isBlacklisted, userId, tokenCreatedAt, blacklistTimestamp})
-  return isBlacklisted
+  const isBlacklisted = async () => {
+    const blacklistTimestamp = await redisClient.getAsync(MAKE_REDIS_HASH_KEY(userId))
+    const status = !!(tokenCreatedAt && blacklistTimestamp && moment(tokenCreatedAt) < moment(blacklistTimestamp))
+    console.log('BLACKLISTED? ', {isBlacklisted: status, userId, tokenCreatedAt, blacklistTimestamp})
+    return status
+  }
+  const timer = () => new Promise(resolve => setTimeout(() => resolve(true), 5000))
+  return Promise.race([isBlacklisted(), timer()])
 }
 
 module.exports = { addUserToBlacklist, isUserBlacklisted }

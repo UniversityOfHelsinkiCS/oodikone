@@ -5,4 +5,4 @@ WORKDIR /usr/src/app
 ENV NODE_ENV dev	
 RUN npm ci && mv /usr/src/app/node_modules /node_modules	
 
- CMD ["/node_modules/.bin/nodemon", "index.js"]
+CMD ["npm", "run", "dev"]

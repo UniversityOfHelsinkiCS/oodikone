@@ -65,6 +65,8 @@ services:
 
   backend:
     image: toska/oodikone2-backend:staging
+    build:
+      context: services/oodikone2-backend
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -78,6 +80,7 @@ services:
       OODILEARN_URL: http://oodilearn:5000
       USERSERVICE_URL: http://userservice:4567
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
     container_name: backend
     entrypoint: 'node --inspect=0.0.0.0:9229 --max_old_space_size=4096 index.js'
@@ -87,6 +90,10 @@ services:
 
   frontend:
     image: toska/oodikone2-frontend:staging
+    build:
+      context: services/oodikone2-frontend
+      args:
+        BASE_PATH: /staging/
     restart: unless-stopped
     ports:
       - "5000:5000"
@@ -97,6 +104,8 @@ services:
 
   userservice:
     image: toska/oodikone2-userservice:staging
+    build:
+      context: services/oodikone2-userservice
     restart: unless-stopped
     ports:
       - 4567:4567
@@ -111,6 +120,8 @@ services:
 
   analytics:
     image: toska/oodikone2-analytics:staging
+    build:
+      context: services/oodikone2-analytics
     restart: unless-stopped
     ports:
       - 4568:4568
@@ -126,7 +137,7 @@ services:
   nginx:
     image: nginx:latest
     restart: unless-stopped
-    volumes: 
+    volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/error.log:/etc/nginx/error_log.log
       - ./nginx/log:/var/log/nginx/localhost.error_log
@@ -134,7 +145,7 @@ services:
       - /etc/letsencrypt/:/etc/letsencrypt/
     ports:
       -  1337:80
-    depends_on: 
+    depends_on:
       - frontend
       - backend
       - userservice
