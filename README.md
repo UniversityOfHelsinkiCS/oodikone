@@ -26,7 +26,6 @@ Before running cli [make yourself a deployment key](https://developer.github.com
 bash run.sh
 ```
 
-
 For local development with anonymized data use `2) Anon setup` (you can run e2e tests with this).
 
 To get also the full real dataset use `3) Full setup`
@@ -36,6 +35,7 @@ To get also the full real dataset use `3) Full setup`
 Run E2E tests in with `npm run cypress:run` or `npm run cypress:open` with visual browser.
 
 ## What the CLI does
+
 - Builds and runs the Dockerized development environment
 - Gets a database dump from production servers
 - Creates the database schema and populates it with the dump
@@ -66,7 +66,6 @@ docker-compose up -d
 ```
 docker-compose -f docker-compose.yml -f docker-compose.real.yml up -d
 ```
-
 
 ### Stop the development environment
 
