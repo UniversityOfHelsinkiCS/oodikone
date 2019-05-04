@@ -1,4 +1,5 @@
 language: node_js
+dist: xenial
 
 node_js:
   # Node 10.3+ includes npm@6 which has good "npm ci" command
@@ -15,6 +16,8 @@ services:
 
 addons:
   apt:
+    sources:
+      - docker-xenial
     packages:
       - docker-ce
 
