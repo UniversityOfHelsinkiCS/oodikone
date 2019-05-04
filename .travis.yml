@@ -25,7 +25,6 @@ jobs:
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
         - npm run test_services
         - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
-        - docker-compose logs
 
     - stage: build & test & push & deploy staging
       if: branch = master AND NOT type = pull_request
@@ -37,7 +36,6 @@ jobs:
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
         - npm run test_services
         - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
-        - docker-compose logs
       after_success:
         - set -e
         - docker-compose -f docker-compose.lateste2e.yml push
