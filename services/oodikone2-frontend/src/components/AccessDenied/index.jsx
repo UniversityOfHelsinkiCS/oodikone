@@ -1,10 +1,10 @@
-import React from 'react'
-import { Dimmer, Header, Image, Container, Button } from 'semantic-ui-react'
-import { bool, string } from 'prop-types'
+import React, { useState, useEffect } from 'react'
+import { Transition, Dimmer, Header, Image, Container, Button } from 'semantic-ui-react'
+import { bool } from 'prop-types'
 import Highcharts from 'highcharts'
 import ReactHighchart from 'react-highcharts'
 import { logout } from '../../apiConnection'
-import { images } from '../../common'
+import { log, images } from '../../common'
 
 import MulticolorBarChart from '../MulticolorBarChart'
 
@@ -15,9 +15,24 @@ const dummyData = [
   { text: 'ttuotila', value: 59.7 }
 ]
 
-const AccessDenied = ({ itWasError, guide, networkError }) => {
-  const header = networkError ? 'Network failure' : itWasError ? 'Something broke' : 'Welcome to Oodikone!' // eslint-disable-line
-  const subheader = networkError ? guide : itWasError ? `If this was not intended ${guide}` : 'You\'re currently not allowed to enter but you will get an email when you\'re authorized' // eslint-disable-line
+const AccessDenied = ({ notEnabled }) => {
+  const header = notEnabled ? 'Welcome to Oodikone!' : 'Something broke'
+  const subheader = notEnabled ? `You're currently not allowed to enter 
+  but you will get an email when you're authorized`
+    : `If this was not intended try refreshing your browser window, 
+    pressing log out or contacting grp-toska@helsinki.fi`
+
+  const [easterEgg, setEasterEgg] = useState(false)
+
+  useEffect(() => {
+    if (notEnabled) {
+      log('Not enabled')
+      setTimeout(
+        () => setEasterEgg(true),
+        Math.floor(Math.random() * 1800000) + 600000
+      )
+    }
+  }, [])
 
   return (
     <div >
@@ -87,14 +102,21 @@ const AccessDenied = ({ itWasError, guide, networkError }) => {
           <Button onClick={logout} color="pink"> Log out </Button>
         </Header>
       </Dimmer>
+      <Transition visible={easterEgg} animation="fly up" duration={10000}>
+        <Image
+          src={images.irtomikko}
+          size="huge"
+          verticalAlign="top"
+          inline
+          style={{ position: 'absolute', top: '350px', right: '10px' }}
+        />
+      </Transition>
     </div>
   )
 }
 
 AccessDenied.propTypes = {
-  itWasError: bool.isRequired,
-  networkError: bool.isRequired,
-  guide: string.isRequired
+  notEnabled: bool.isRequired
 }
 
 export default AccessDenied
