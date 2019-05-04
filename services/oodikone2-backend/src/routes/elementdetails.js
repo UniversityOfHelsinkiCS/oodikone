@@ -36,13 +36,16 @@ router.get('/v2/studyprogrammes/ping', async (req, res) => {
 router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
   const code = req.params.id
   if (code) {
-    const productivityData = await getProductivity(code)
-    if (productivityData[code]) {
-      return res.json(productivityData)
-    }
+    const cachedDataPromise = getProductivity(code)
     const since = '2017-08-01'
-    const data = await productivityStatsForStudytrack(code, since)
-    await setProductivity(data)
+    const dataPromise = productivityStatsForStudytrack(code, since)
+
+    let data = Promise.race([cachedDataPromise, dataPromise])
+    // If the faster is cache but cache doesn't have data
+    if (!data[code]) {
+      data = await dataPromise
+      setProductivity(data)
+    }
     return res.json(data)
   } else {
     res.status(422)
@@ -72,15 +75,18 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
 router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
   const code = req.params.id
   if (code) {
-    const throughputData = await getThroughput(code)
-    const thesis = await findProgrammeTheses(req.params.id)
-    if (throughputData[code]) {
-      return res.json({ ...throughputData, thesis })
-    }
+    const thesisPromise = findProgrammeTheses(req.params.id)
+    const cachedDataPromise = getThroughput(code)
     const since = req.params.since ? req.params.since : new Date().getFullYear() - 5
-    const data = await throughputStatsForStudytrack(req.params.id, since)
-    await setThroughput(data)
-    return res.json({...data, thesis })
+    const dataPromise = throughputStatsForStudytrack(req.params.id, since)
+
+    let data = Promise.race([cachedDataPromise, dataPromise])
+    // If the faster is cache but cache doesn't have data
+    if (!data[code]) {
+      data = await dataPromise
+      setThroughput(data)
+    }
+    return res.json({ ...data, thesis: await thesisPromise })
   } else {
     res.status(422)
   }
