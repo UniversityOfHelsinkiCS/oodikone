@@ -1,5 +1,4 @@
 language: node_js
-sudo: required
 
 node_js:
   # Node 10.3+ includes npm@6 which has good "npm ci" command
@@ -41,10 +40,6 @@ jobs:
         - cat nginx/log
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
         - npm run concurrently "npm run test_services" "CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record"
-      after_success:
-        - set -e
-        - docker-compose -f docker-compose.lateste2e.yml push
-        - "curl --fail -k -X POST -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" https://toska.cs.helsinki.fi/toskawatch/release/"
       deploy: # deploy is always skipped for PR
         provider: script
         script: "docker-compose -f docker-compose.lateste2e.yml push && curl --fail -k -X POST -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" https://toska.cs.helsinki.fi/toskawatch/release/"
