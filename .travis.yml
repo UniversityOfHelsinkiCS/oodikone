@@ -13,39 +13,46 @@ cache:
 services:
   - docker
 
+before_script:
+  - docker --version
+  - docker-compose --version
+
 jobs:
   include:
-    - stage: build & test (not staging or production release)
-      if: type = pull_request
+    - stage: build & test & push & deploy
+      if: branch = master OR type = pull_request
+      env:
+        - IMAGE=STAGING
       script:
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - source scripts.sh && run_e2e_setup
+        - source scripts.sh && time run_e2e_setup docker-compose.lateste2e.yml
         - docker ps
         - cat nginx/log
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
-        - npm run test_services
-        - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
-
-    - stage: build & test & push & deploy staging
-      if: branch = master AND NOT type = pull_request
+        - time npm run test_services
+        - time CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
+      deploy: # deploy is always skipped for PR
+        provider: script
+        script: "docker-compose -f docker-compose.lateste2e.yml push && curl --fail -k -X POST -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" https://toska.cs.helsinki.fi/toskawatch/release/"
+        on:
+          branch: master
+    - # in parallel
+      if: tag IS present OR type = pull_request
+      env:
+        - IMAGE=PRODUCTION
       script:
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - source scripts.sh && run_e2e_setup
+        - source scripts.sh && time run_e2e_setup docker-compose.lateste2e.production.yml
         - docker ps
         - cat nginx/log
-        - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
-        - npm run test_services
-        - CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
-      after_success:
-        - set -e
-        - docker-compose -f docker-compose.lateste2e.yml push
-        - "curl --fail -k -X POST -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" https://toska.cs.helsinki.fi/toskawatch/release/"
+        - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
+        - time npm run test_services
+        - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
+      deploy: # deploy is always skipped for PR
+        provider: script
+        script: docker-compose -f docker-compose.lateste2e.production.yml push && echo "Done, please MANUAL DEPLOY"
+        on:
+          tags: true
 
-    - stage: build & push & MANUAL DEPLOY production
-      if: tag =~ ^[0-9.]+$
-      script:
-        - set -e
-        - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - docker-compose -f compose-latest.yml build
-        - docker-compose -f compose-latest.yml push
-        - echo "Done, please MANUAL DEPLOY"
+after_script:
+  - docker-compose logs

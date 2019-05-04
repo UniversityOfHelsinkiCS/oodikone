@@ -3,7 +3,7 @@ describe('Population Statistics tests', () => {
   beforeEach(() => {
     cy.server({
       onAnyRequest: function (route, proxy) {
-        if (Cypress.config().baseUrl === "http://localhost:1337/staging/") {
+        if (Cypress.config().baseUrl.includes("http://localhost:1337/")) {
           proxy.xhr.setRequestHeader('uid', 'tktl')
           proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
           proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
