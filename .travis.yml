@@ -67,3 +67,6 @@ jobs:
         - docker-compose -f compose-latest.yml build
         - docker-compose -f compose-latest.yml push
         - echo "Done, please MANUAL DEPLOY"
+
+after_script:
+  - docker-compose logs
