@@ -49,7 +49,3 @@ jobs:
         - docker-compose -f compose-latest.yml build
         - docker-compose -f compose-latest.yml push
         - echo "Done, please MANUAL DEPLOY"
-    - stage: build (not staging or production release)
-      if: branch = trunk
-      script:
-        - echo 'no tests'     
