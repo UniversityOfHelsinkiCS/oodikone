@@ -184,7 +184,7 @@ run_e2e_setup () {
     echo "Init dirs"
     init_dirs
     echo "Building images, starting containers"
-    docker-compose -f $1 build $2 && docker-compose -f $1 up -d
+    docker-compose -f $1 build && docker-compose -f $1 up -d
     echo "Setup oodikone db from dump, this will prompt you for your password."
     db_anon_setup_full
     echo "Restarting Docker backend containers to run migrations, etc."
