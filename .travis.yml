@@ -25,7 +25,7 @@ jobs:
         - IMAGE=STAGING
       script:
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - time source scripts.sh && run_e2e_setup docker-compose.lateste2e.yml
+        - source scripts.sh && time run_e2e_setup docker-compose.lateste2e.yml
         - docker ps
         - cat nginx/log
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
@@ -42,7 +42,7 @@ jobs:
         - IMAGE=PRODUCTION
       script:
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - time source scripts.sh && run_e2e_setup docker-compose.lateste2e.production.yml
+        - source scripts.sh && time run_e2e_setup docker-compose.lateste2e.production.yml
         - docker ps
         - cat nginx/log
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
