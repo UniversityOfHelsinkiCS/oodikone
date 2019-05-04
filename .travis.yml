@@ -13,6 +13,15 @@ cache:
 services:
   - docker
 
+addons:
+  apt:
+    packages:
+      - docker-ce
+
+env:
+  global:
+    - DOCKER_BUILDKIT=1
+
 before_script:
   - docker --version
   - docker-compose --version
