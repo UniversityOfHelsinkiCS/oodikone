@@ -1,5 +1,5 @@
 const stan = require('node-nats-streaming').connect('updaterNATS', process.env.HOSTNAME, process.env.NATS_URI);
-const fs = require('fs')
+const { updateStudent } = require('./updater/database_updater')
 
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
 const opts = stan.subscriptionOptions();
@@ -14,7 +14,7 @@ stan.on('connect', function () {
 
   sub.on('message', async (msg) => {
     const studentData = msg.getData()
-    fs.writeFileSync('./updater/test_student.json', studentData)
+    await updateStudent(studentData)
     msg.ack()
   });
 

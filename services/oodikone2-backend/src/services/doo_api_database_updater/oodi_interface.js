@@ -3,7 +3,7 @@ const axios = require('axios')
 const { OODI_ADDR, KEY_PATH, CERT_PATH } = require('../../conf-backend')
 const https = require('https')
 const fs = require('fs')
-const base_url = OODI_ADDR
+const base_url = "https://oodikone.cs.helsinki.fi/oodi"
 
 const agent = KEY_PATH && CERT_PATH ? 
   new https.Agent({
@@ -49,7 +49,7 @@ if (process.env.NODE_ENV === 'dev') {
     password: process.env.OODI_PW
   }
   axios.defaults.params = {
-    token: process.env.TOKEN
+    token: "toskab1gs8cret5"
   }
 
 }
