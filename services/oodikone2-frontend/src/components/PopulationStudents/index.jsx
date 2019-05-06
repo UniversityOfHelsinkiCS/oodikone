@@ -213,7 +213,8 @@ class PopulationStudents extends Component {
     const mandatoryCourseColumns = [
       ...(this.props.showNames) ? [
         { key: 'lastname', title: 'last name', getRowVal: s => s.lastname, cellProps: { title: 'last name' } },
-        { key: 'firstname', title: 'first names', getRowVal: s => s.firstnames, cellProps: { title: 'first names' } }
+        { key: 'firstname', title: 'first names', getRowVal: s => s.firstnames, cellProps: { title: 'first names' } },
+        { key: 'email', title: 'emails', getRowVal: s => s.email, cellProps: { title: 'emails' } }
       ] : [],
       {
         key: 'studentnumber',
