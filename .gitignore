@@ -15,3 +15,7 @@ node_modules
 cypress/support
 cypress/videos
 services/updater_writer/updater/test_assets/testi.bak
+services/updater_writer/updater/test_assets/011120775.json
+services/updater_writer/updater/test_assets/014272112.json
+services/updater_writer/updater/test_assets/014441008.json
+services/updater_writer/updater/test_assets/meta.json

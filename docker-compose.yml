@@ -122,7 +122,8 @@ services:
     volumes:
       - ./services/oodikone2-backend/:/usr/src/app
       - ./services/oodikone2-backend/node_modules:/usr/src/app/node_modules
-      - ./models:/usr/src/app/src/models
+      - ./shared/models:/usr/src/app/src/models
+      - ./shared/migrations:/usr/src/app/src/database/migrations
     container_name: backend
     depends_on:
       - db
@@ -208,7 +209,7 @@ services:
     environment:
       - NATS_URI=nats://nats:4222
       - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
-      - TOKEN=asdasdsadasd
+      - TOKEN=toskab1gs8cret5
     container_name: updater_api
 
   updater_writer:
@@ -220,8 +221,8 @@ services:
     restart: unless-stopped
     volumes:
       - ./services/updater_writer/:/usr/src/app
-      - ./models:/usr/src/app/models
-
+      - ./shared/models:/usr/src/app/models
+      - ./shared/migrations:/usr/src/app/database/migrations
     depends_on:
       - nats
       - db
