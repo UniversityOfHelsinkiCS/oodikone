@@ -14,3 +14,4 @@ kafka
 node_modules
 cypress/support
 cypress/videos
+services/updater_writer/updater/test_assets/testi.bak
