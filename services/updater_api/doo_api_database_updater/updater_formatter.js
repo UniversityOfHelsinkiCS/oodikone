@@ -60,18 +60,18 @@ const formatStudyattainments = async (api, studentnumber) => {
   let studyAttainments = []
   for (let data of api.studyattainments) {
     const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
+    const learningOpportunity = await Oodi.getLearningOpportunity(course.code)
 
     studyAttainments = [
       ...studyAttainments, {
         credit: (credit.semestercode ? credit : { ...credit, semestercode: mapper.getSemesterCode(credit.attainment_date) }),
         creditTeachers: await createCreditTeachers(credit, teachers), teachers,
-        course
+        course: {...course, ...mapper.learningOpportunityDataToCourse(learningOpportunity), disciplines: mapper.learningOpportunityDataToCourseDisciplines(learningOpportunity) }
       }
     ]
   }
   return studyAttainments
 }
-
 const formatSemesterEnrollments = async (apidata, studentnumber) => await Promise.all(apidata.semesterEnrollments.map(apiEnrollment => mapper.semesterEnrollmentFromData(apiEnrollment, studentnumber)))
 
 
@@ -90,7 +90,21 @@ const getStudent = async (studentnumber) => {
   return { studentInfo, studyRights, studyAttainments, semesterEnrollments, courseEnrollments }
 }
 
+const getMeta = async () => {
+  const [faculties, courseRealisationsTypes, semesters, creditTypeCodes, courseTypeCodes, disciplines] = await Promise.all([
+    Oodi.getFaculties(),
+    (await Oodi.getCourseRealisationTypes()).map(mapper.courseRealisationTypeFromData),
+    (await Oodi.getSemesters()).map(mapper.semesterFromData),
+    (await Oodi.getStudyattainmentStatusCodes()).map(mapper.studyattainmentStatusCodeToCreditType),
+    (await Oodi.getCourseTypeCodes()).map(mapper.courseTypeFromData),
+    (await Oodi.getCourseDisciplines()).map(mapper.disciplineFromData)
+  ])
+  return { faculties, courseRealisationsTypes, semesters, creditTypeCodes, courseTypeCodes, disciplines }
+}
+
+
+
 
 module.exports = {
-  getStudent
+  getStudent, getMeta
 }
