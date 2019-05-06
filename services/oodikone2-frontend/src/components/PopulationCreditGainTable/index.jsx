@@ -62,13 +62,13 @@ const PopulationCreditGainTable = (props) => {
   const arr = limits.map(l => filterStudents(stats, ...l))
 
   const rows = arr.map(a => {
-    if (a.maxCredits) {
-      if (a.maxCredits === 0) {
-        return [`${a.maxCredits}`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />]
-      }
+    if(a.maxCredits === 0) {
+      return [`${a.maxCredits}`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />]
+    } else if(a.maxCredits) {
       return [`${a.minCredits} <= credits < ${a.maxCredits}`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />]
+    } else {
+      return [`${a.minCredits} <= credits`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />]
     }
-    return [`${a.minCredits} <= credits`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />]
   })
 
   const headers = [
