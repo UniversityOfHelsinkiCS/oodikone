@@ -8,7 +8,7 @@ services:
   #   environment:
   #     - KAFKA_BROKER_ID=1
   #   container_name: zookeeper
-  
+
   # kafka:
   #   image: wurstmeister/kafka
   #   container_name: kafka
@@ -26,7 +26,7 @@ services:
   #   volumes:
   #     - ./kafka/docker.sock:/var/run/docker.sock
   #     - ./kafka/logs:/kafka/kafka-logs-1
-  
+
   nats:
     image: nats-streaming
     command: -cid updaterNATS
@@ -201,7 +201,7 @@ services:
       context: services/updater_api
       dockerfile: dev.Dockerfile
     restart: unless-stopped
-    volumes: 
+    volumes:
       - ./services/updater_api/:/usr/src/app
     depends_on:
       - nats
@@ -218,7 +218,7 @@ services:
       dockerfile: dev.Dockerfile
     command: sh -c "cd /usr/src/app && npm install && npm run dev"
     restart: unless-stopped
-    volumes: 
+    volumes:
       - ./services/updater_writer/:/usr/src/app
       - ./models:/usr/src/app/models
 
