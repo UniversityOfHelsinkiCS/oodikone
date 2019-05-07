@@ -65,8 +65,9 @@ const formatStudyattainments = async (api, studentnumber) => {
     studyAttainments = [
       ...studyAttainments, {
         credit: (credit.semestercode ? credit : { ...credit, semestercode: mapper.getSemesterCode(credit.attainment_date) }),
-        creditTeachers: await createCreditTeachers(credit, teachers), teachers,
-        course: {...course, ...mapper.learningOpportunityDataToCourse(learningOpportunity), disciplines: mapper.learningOpportunityDataToCourseDisciplines(learningOpportunity) }
+        creditTeachers: await createCreditTeachers(credit, teachers),
+        teachers: await Promise.all(teachers.map(async (t) => mapper.getTeacherFromData((await Oodi.getTeacherInfo(t.id))))),
+        course: { ...course, ...mapper.learningOpportunityDataToCourse(learningOpportunity), disciplines: mapper.learningOpportunityDataToCourseDisciplines(learningOpportunity) }
       }
     ]
   }
