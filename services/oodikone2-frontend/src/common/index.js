@@ -172,6 +172,14 @@ export const removeInvalidCreditsFromStudents = students =>
 export const getStudentTotalCredits = student => student.courses
   .filter(c => c.passed && !c.isStudyModuleCredit).reduce((a, b) => a + b.credits, 0)
 
+export const getStudentGradeMean = (student) => {
+  const gradedCourses = student.courses.filter(c => Number(c.grade))
+  const gradeTotal = gradedCourses.reduce((a, b) => a + b.grade, 0)
+  const mean = gradeTotal / gradedCourses.length || 0
+
+  return mean
+}
+
 export const getStudentTotalCreditsFromMandatory = (student, mandatoryCourses) => student.courses
   .filter(c =>
     c.passed &&
