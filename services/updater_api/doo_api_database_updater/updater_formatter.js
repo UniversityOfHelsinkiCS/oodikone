@@ -61,13 +61,19 @@ const formatStudyattainments = async (api, studentnumber) => {
   for (let data of api.studyattainments) {
     const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
     const learningOpportunity = await Oodi.getLearningOpportunity(course.code)
+    const { providers, courseproviders } = mapper.learningOpportunityDataToCourseProviders(learningOpportunity)
 
     studyAttainments = [
       ...studyAttainments, {
         credit: (credit.semestercode ? credit : { ...credit, semestercode: mapper.getSemesterCode(credit.attainment_date) }),
         creditTeachers: await createCreditTeachers(credit, teachers),
         teachers: await Promise.all(teachers.map(async (t) => mapper.getTeacherFromData((await Oodi.getTeacherInfo(t.id))))),
-        course: { ...course, ...mapper.learningOpportunityDataToCourse(learningOpportunity), disciplines: mapper.learningOpportunityDataToCourseDisciplines(learningOpportunity) }
+        course: {
+          ...course, ...mapper.learningOpportunityDataToCourse(learningOpportunity),
+          disciplines: mapper.learningOpportunityDataToCourseDisciplines(learningOpportunity),
+          providers,
+          courseproviders
+        }
       }
     ]
   }
@@ -75,7 +81,11 @@ const formatStudyattainments = async (api, studentnumber) => {
 }
 const formatSemesterEnrollments = async (apidata, studentnumber) => await Promise.all(apidata.semesterEnrollments.map(apiEnrollment => mapper.semesterEnrollmentFromData(apiEnrollment, studentnumber)))
 
-
+const createOrUpdateCourseProviders = async data => {
+  const { providers, courseproviders } = mapper.learningOpportunityDataToCourseProviders(data)
+  await Promise.all(providers.map(provider => Provider.upsert(provider)))
+  await Promise.all(courseproviders.map(courseprovider => CourseProvider.upsert(courseprovider)))
+}
 const getStudent = async (studentnumber) => {
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {

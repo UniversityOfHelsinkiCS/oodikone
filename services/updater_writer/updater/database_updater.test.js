@@ -1,5 +1,5 @@
 const { updateStudent, updateMeta } = require('./database_updater')
-const { Student, Credit, Course, Organisation, CourseRealisationType, Semester, CreditType, CourseType, Discipline, CourseDisciplines, Teacher, CreditTeacher, SemesterEnrollment } = require('../models/index')
+const { Student, Credit, Course, Organisation, CourseRealisationType, Semester, CreditType, CourseType, Discipline, CourseDisciplines, Teacher, CreditTeacher, SemesterEnrollment, Provider, CourseProvider } = require('../models/index')
 const { students } = require('./test_assets/test_students')
 const meta = require('./test_assets/meta')
 const { sequelize, forceSyncDatabase } = require('../database/connection')
@@ -183,6 +183,24 @@ describe('Updater writes students the right way', () => {
         expect(studentnumber).toBe('014272112')
         expect(semestercode).toBe(107)
 
+    })
+    
+    test('Providers are written to database', async () => {
+        const providers = await Provider.findAll({ order: [['providercode', 'DESC']] })
+        const { providercode, name } = providers[0]
+
+        expect(providers.length).toBe(20)
+        expect(providercode).toBe('H906')
+        expect(name).toMatchObject({ en: 'Language Centre', fi: 'Kielikeskus', sv: 'Språkcentrum' })
+        expect(providers.map(_ => _.providercode)).not.toContain(null)
+        
+    })
+    test('Course providers are written to database', async () => {
+        const courseproviders = await CourseProvider.findAll()
+
+        expect(courseproviders.length).toBe(123)
+        expect(courseproviders.map(_ => _.coursecode)).not.toContain(null)
+        expect(courseproviders.map(_ => _.providercode)).not.toContain(null)
     })
     
 
