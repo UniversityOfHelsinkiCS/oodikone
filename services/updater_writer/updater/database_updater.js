@@ -11,12 +11,12 @@ const updateStudent = async (student) => {
     return Promise.all([
       Student.upsert(studentInfo, { transaction: t }),
 
-      Promise.all(studyAttainments.map(({ credit, creditTeachers, teacheres, course }) => {
+      Promise.all(studyAttainments.map(({ credit, creditTeachers, teachers, course }) => {
         Course.upsert(course, { transaction: t })
-        if (course.disciplines.length > 0) {
-          Promise.all(course.disciplines.map(courseDiscipline => { CourseDisciplines.upsert(courseDiscipline, { transaction: t }) }))
-        }
-        Credit.upsert(credit, { transaction: t })
+        Promise.all(course.disciplines.map(courseDiscipline => { CourseDisciplines.upsert(courseDiscipline, { transaction: t }) })),
+        Credit.upsert(credit, { transaction: t }),
+        Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction: t }))),
+        Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction: t })))
       })).catch(console.log),
 
     ]).then(async (result) => {
