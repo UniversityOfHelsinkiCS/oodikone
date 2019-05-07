@@ -80,7 +80,7 @@ describe('Population Statistics tests', () => {
 
     cy.contains("add").click()
     cy.contains("Add filters").siblings().within(() => {
-      cy.get(".form").should('have.length', 6)
+      cy.get(".form").should('have.length', 7)
     })
 
     checkAmountOfStudents(26)

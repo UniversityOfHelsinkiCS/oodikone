@@ -1,5 +1,5 @@
 const { updateStudent, updateMeta } = require('./database_updater')
-const { Student, Credit, Course, Organisation, CourseRealisationType, Semester, CreditType, CourseType, Discipline, CourseDisciplines, Teacher, CreditTeacher } = require('../models/index')
+const { Student, Credit, Course, Organisation, CourseRealisationType, Semester, CreditType, CourseType, Discipline, CourseDisciplines, Teacher, CreditTeacher, SemesterEnrollment } = require('../models/index')
 const { students } = require('./test_assets/test_students')
 const meta = require('./test_assets/meta')
 const { sequelize, forceSyncDatabase } = require('../database/connection')
@@ -170,6 +170,19 @@ describe('Updater writes students the right way', () => {
         expect(creditteachers.length).toBe(119)
         expect(creditteachers.map(_ => _.credit_id)).not.toContain(null)
         expect(creditteachers.map(_ => _.teacher_id)).not.toContain(null)
+    })
+
+    test('Semester enrollments are written to database', async () => {
+        const semesterEnrollments = await SemesterEnrollment.findAll({ order: [['semestercode', 'ASC']] })
+        const { id, enrollmenttype, enrollment_date, studentnumber, semestercode } = semesterEnrollments[0]
+
+        expect(semesterEnrollments.length).toBe(28)
+        expect(id).toEqual(expect.any(String))
+        expect(enrollmenttype).toBe(1)
+        expect(enrollment_date.toISOString()).toBe(new Date('2003-08-17 00:00:00+00').toISOString())
+        expect(studentnumber).toBe('014272112')
+        expect(semestercode).toBe(107)
+
     })
     
 
