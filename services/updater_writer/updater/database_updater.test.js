@@ -114,7 +114,7 @@ describe('Updater writes students the right way', () => {
     test('Courses are written to database', async () => {
         const courses = await Course.findAll({ order: [['code', 'ASC']] })
         const { code, name, latest_instance_date, is_study_module, startdate, enddate, max_attainment_date, min_attainment_date, coursetypecode } = courses[0]
-        
+
         expect(courses.length).toBe(147)
         expect(code).toBe('00031')
         expect(name.en).toBe('Master of Science (Agriculture and Forestry)')
@@ -131,6 +131,26 @@ describe('Updater writes students the right way', () => {
         expect(code1).toBe('402512')
         expect(ism).toBe(false)
         expect(ctc).toBe(2)
+    })
+    test('Credits are written to database', async () => {
+        const allCredits = await Credit.findAll({ order: [['id', 'ASC']]})
+        const { id, grade, student_studentnumber, credits, ordering, attainment_date, isStudyModule,  lastmodifieddate, course_code, credittypecode, semestercode } = allCredits[0]
+
+        expect(allCredits.length).toBe(150)
+        expect(id).toBe('2340421')
+        expect(grade).toBe('4')
+        expect(allCredits.map(_ => _.grade)).not.toContain(null)
+        expect(student_studentnumber).toBe('014441008')
+        expect(credits).toBe(2)
+        expect(allCredits.map(_ => _.credits)).not.toContain(null)
+        expect(ordering).toBe('1997-10-21')
+        expect(attainment_date.toISOString()).toBe(new Date('1997-10-21 00:00:00+00').toISOString())
+        expect(isStudyModule).toBe(false)
+        expect(lastmodifieddate).not.toBe(null)
+        expect(course_code).toBe('65002')
+        expect(allCredits.map(_ => _.course_code)).not.toContain(null)
+        expect(credittypecode).toBe(4)
+        expect(allCredits.map(_ => _.semestercode)).toEqual(expect.arrayContaining([expect.any(Number)]))
     })
     
 
