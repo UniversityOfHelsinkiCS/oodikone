@@ -223,13 +223,9 @@ services:
     restart: unless-stopped
     volumes:
       - ./services/updater_writer/:/usr/src/app
-<<<<<<< HEAD
+      - /usr/src/app/node_modules
       - ./shared/models:/usr/src/app/models
       - ./shared/migrations:/usr/src/app/database/migrations
-=======
-      - ./models:/usr/src/app/models
-      - /usr/src/app/node_modules
->>>>>>> master
     depends_on:
       - nats
       - db
