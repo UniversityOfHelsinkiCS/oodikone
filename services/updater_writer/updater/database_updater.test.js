@@ -1,5 +1,5 @@
 const { updateStudent, updateMeta } = require('./database_updater')
-const { Student, Credit, Course, Organisation, CourseRealisationType, Semester, CreditType, CourseType, Discipline, CourseDisciplines } = require('../models/index')
+const { Student, Credit, Course, Organisation, CourseRealisationType, Semester, CreditType, CourseType, Discipline, CourseDisciplines, Teacher, CreditTeacher } = require('../models/index')
 const { students } = require('./test_assets/test_students')
 const meta = require('./test_assets/meta')
 const { sequelize, forceSyncDatabase } = require('../database/connection')
@@ -132,6 +132,7 @@ describe('Updater writes students the right way', () => {
         expect(ism).toBe(false)
         expect(ctc).toBe(2)
     })
+
     test('Credits are written to database', async () => {
         const allCredits = await Credit.findAll({ order: [['id', 'ASC']]})
         const { id, grade, student_studentnumber, credits, ordering, attainment_date, isStudyModule,  lastmodifieddate, course_code, credittypecode, semestercode } = allCredits[0]
@@ -151,6 +152,24 @@ describe('Updater writes students the right way', () => {
         expect(allCredits.map(_ => _.course_code)).not.toContain(null)
         expect(credittypecode).toBe(4)
         expect(allCredits.map(_ => _.semestercode)).toEqual(expect.arrayContaining([expect.any(Number)]))
+    })
+    
+    test('Teachers are written to database', async () => {
+        const teachers = await Teacher.findAll({ order: [['name', 'ASC']]})
+        const { id, code, name } = teachers[0]
+
+        expect(teachers.length).toBe(51)
+        expect(id).toBe('9016947')
+        expect(code).toBe('hpyrhone')
+        expect(name).toBe('Ahvenniemi Emilia')
+    })
+    
+    test('Credit Teachers are written to database', async () => {
+        const creditteachers = await CreditTeacher.findAll()
+
+        expect(creditteachers.length).toBe(119)
+        expect(creditteachers.map(_ => _.credit_id)).not.toContain(null)
+        expect(creditteachers.map(_ => _.teacher_id)).not.toContain(null)
     })
     
 
