@@ -8,6 +8,7 @@ redis-data
 mongodata
 backups
 private.key
+private.key.pub
 anonyymioodi
 nginx
 kafka
