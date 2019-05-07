@@ -5,5 +5,6 @@ COPY . /usr/src/app
 WORKDIR /usr/src/app
 
 EXPOSE 8081
+RUN npm ci
 
-CMD npm ci && npm run docker
+CMD npm run docker
