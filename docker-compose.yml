@@ -121,7 +121,6 @@ services:
       ANALYTICS_URL: http://analytics:4568
     volumes:
       - ./services/oodikone2-backend/:/usr/src/app
-      - ./services/oodikone2-backend/node_modules:/usr/src/app/node_modules
       - ./models:/usr/src/app/src/models
     container_name: backend
     depends_on:
