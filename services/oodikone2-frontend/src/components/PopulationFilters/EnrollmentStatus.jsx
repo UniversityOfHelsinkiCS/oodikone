@@ -115,8 +115,8 @@ class EnrollmentStatus extends Component {
         Students that were {filter.params.enrolled === 1 ?
           'present' :
           'absent'} during {
-            filter.params.semesters.map(semester => this.formatSemesterCodeToText(semester)).join(', ')
-          }
+          filter.params.semesters.map(semester => this.formatSemesterCodeToText(semester)).join(', ')
+        }
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

@@ -1,16 +1,15 @@
 const { sequelize, } = require('../database/connection')
 
-const { Student, Credit, Course, CreditTeacher, Teacher, Organisation, CourseRealisationType, Semester, CreditType, CourseType, Discipline, CourseDisciplines } = require('../models/index')
+const { Student, Credit, Course, CreditTeacher, Teacher, Organisation, CourseRealisationType, Semester, CreditType, CourseType, Discipline, CourseDisciplines, SemesterEnrollment } = require('../models/index')
 const { updateAttainmentDates } = require('./update_attainment_dates')
 
 
 const updateStudent = async (student) => {
-  const { studentInfo, studyAttainments } = student
+  const { studentInfo, studyAttainments, semesterEnrollments } = student
   return sequelize.transaction(t => {
-
     return Promise.all([
       Student.upsert(studentInfo, { transaction: t }),
-
+      Promise.all(semesterEnrollments.map(SE => SemesterEnrollment.upsert(SE, { transaction: t}))),
       Promise.all(studyAttainments.map(({ credit, creditTeachers, teachers, course }) => {
         Course.upsert(course, { transaction: t })
         Promise.all(course.disciplines.map(courseDiscipline => { CourseDisciplines.upsert(courseDiscipline, { transaction: t }) })),
