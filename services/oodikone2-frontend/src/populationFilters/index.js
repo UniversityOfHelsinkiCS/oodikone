@@ -1,5 +1,5 @@
 import uuidv4 from 'uuid/v4'
-import { getStudentTotalCredits, getStudentTotalCreditsFromMandatory } from '../common'
+import { getStudentTotalCredits, getStudentTotalCreditsFromMandatory, getStudentGradeMean } from '../common'
 
 export const creditsLessThan = (params) => {
   const { credit } = params
@@ -24,7 +24,7 @@ export const sexFilter = (params) => {
     params: {
       gender
     },
-    filter: student => student.gender === gender
+    filter: student => student.gender_code === gender
   })
 }
 export const matriculationFilter = (params) => {
@@ -230,6 +230,26 @@ export const priorityStudyright = (params) => {
         }
         return false
       })
+  })
+}
+
+export const gradeMeanFilter = (params) => {
+  const { gradeMean, comparator } = params
+  return ({
+    id: uuidv4(),
+    type: 'GradeMeanFilter',
+    params: {
+      gradeMean,
+      comparator
+    },
+    filter: (student) => {
+      const gradeMeanOfStudent = getStudentGradeMean(student)
+
+      if (comparator === 'less') {
+        return gradeMean > gradeMeanOfStudent
+      }
+      return gradeMean <= gradeMeanOfStudent
+    }
   })
 }
 

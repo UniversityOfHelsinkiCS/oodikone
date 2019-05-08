@@ -77,9 +77,10 @@ restore_real_userdb_from_backup () {
     cat $USER_REAL_DB_BACKUP | docker exec -i -u postgres oodi_user_db psql -d user_db_real
 }
 
-restore_mongodb_from_backup () {
-    docker exec -t mongo_db mongorestore -d oodilearn "/dump"
-}
+# oodilearn
+# restore_mongodb_from_backup () {
+#     docker exec -t mongo_db mongorestore -d oodilearn "/dump"
+# }
 
 db_oodikone_reset () {
     docker exec -u postgres oodi_db dropdb "tkt_oodi" || echo "dbdrop of tkt_oodi failed. "
@@ -110,8 +111,8 @@ db_setup_full () {
     echo "Restoring PostgreSQL from backup"
     ping_psql_real "oodi_db" "tkt_oodi_real"
     retry restore_real_psql_from_backup
-    echo "Restoring MongoDB from backup"
-    retry restore_mongodb_from_backup
+    # echo "Restoring MongoDB from backup"
+    # retry restore_mongodb_from_backup
     echo "Restore user db from backup"
     ping_psql "oodi_user_db" "user_db_real"
     retry restore_real_userdb_from_backup
@@ -126,8 +127,8 @@ db_anon_setup_full () {
     echo "Restoring PostgreSQL from backup"
     ping_psql "oodi_db" "tkt_oodi"
     retry restore_psql_from_backup
-    echo "Restoring MongoDB from backup"
-    retry restore_mongodb_from_backup
+    # echo "Restoring MongoDB from backup"
+    # retry restore_mongodb_from_backup
     echo "Restore user db from backup"
     ping_psql "oodi_user_db" "user_db"
     retry restore_userdb_from_backup

@@ -103,7 +103,7 @@ const attainmentDataToCourse = (attainment) => {
   }
 }
 
-const getTeacherFromData = teacher => ({
+const getTeacherFromData = (teacher) => ({
   id: teacher.teacher_id,
   code: teacher.userid,
   name: teacher.full_name
@@ -120,22 +120,22 @@ const highlevelnameFromElements = elements => {
   elements.forEach(element => {
     const name = defaultNameFromTexts(element.name)
     switch (element.element_id) {
-    case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
-      subject = name
-      break
-    case ELEMENT_ID.DEGREE_MAJOR:
-      if (subject === undefined) {
+      case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
         subject = name
-      }
-      break
-    default:
-      break
+        break
+      case ELEMENT_ID.DEGREE_MAJOR:
+        if (subject === undefined) {
+          subject = name
+        }
+        break
+      default:
+        break
     }
   })
   return `${subject}`
 }
 
-const parseDate = (date, format='YYYY-MM-DD') => date && moment.utc(date, format).toDate()
+const parseDate = (date, format = 'YYYY-MM-DD') => date && moment.utc(date, format).toDate()
 
 const getStudyRightFromData = (data, studentNumber) => {
   return {
@@ -265,10 +265,11 @@ const getTransfersFromData = (data, studentnumber) => {
       targetcode: target,
       transferdate,
       studentnumber,
-      studyrightid: `${data.studyright_id}`})
+      studyrightid: `${data.studyright_id}`
+    })
     i++
   }
-  return(transfers)
+  return (transfers)
 }
 
 const courseRealisationTypeFromData = data => ({
