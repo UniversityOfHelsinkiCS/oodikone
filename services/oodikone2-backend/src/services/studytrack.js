@@ -166,8 +166,16 @@ const productivityStatsForStudytrack = async (studytrack, since) => {
     productivityStatsForProvider(providercode, since),
     thesisProductivityForStudytrack(studytrack)
   ]
-  const [studyrightStats, creditStats, thesisStats] = await Promise.all(promises)
-  return { [studytrack]: combineStatistics(creditStats, studyrightStats, thesisStats) }
+  const [studyrightStats, creditStats, thesisStats] = await Promise.all(
+    promises
+  )
+  return {
+    [studytrack]: {
+      lastUpdated: moment(),
+      status: null,
+      data: combineStatistics(creditStats, studyrightStats, thesisStats)
+    }
+  }
 }
 
 const creditsAfter = (studentnumbers, startDate) => {
@@ -277,7 +285,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       thesisB: theses.BACHELOR || 0
     }
   }))
-  return { [studytrack]: arr }
+  return { [studytrack]: { lastUpdated: moment(), status: null,  data: arr } }
 }
 
 module.exports = {
