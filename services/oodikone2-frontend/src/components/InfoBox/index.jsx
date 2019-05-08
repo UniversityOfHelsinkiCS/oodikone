@@ -7,7 +7,7 @@ const InfoBox = ({ content }) => (
   <Popup
     trigger={<Icon style={{ float: 'right' }} name="info" />}
     wide="very"
-    position='left center'
+    position="left center"
   >
     <Popup.Content>
       <ReactMarkdown source={content} escapeHtml={false} />
