@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Radio, Icon, Form, Segment, Button } from 'semantic-ui-react'
-import { shape, func } from 'prop-types'
+import { shape, func, string } from 'prop-types'
+import { getTextIn } from '../../common'
 
 import { sexFilter } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
@@ -10,7 +11,8 @@ class SexFilter extends Component {
   static propTypes = {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
-    setPopulationFilter: func.isRequired
+    setPopulationFilter: func.isRequired,
+    language: string.isRequired
   }
 
   state = {
@@ -31,7 +33,10 @@ class SexFilter extends Component {
   }
 
   render() {
-    const { filter } = this.props
+    const { filter, language } = this.props
+    const genderMale = { fi: 'Mies', en: 'Male', sv: 'Man' }
+    const genderFemale = { fi: 'Nainen', en: 'Female', sv: 'Kvinna' }
+
     if (filter.notSet) {
       return (
         <Segment>
@@ -41,15 +46,15 @@ class SexFilter extends Component {
                 <label>Filter by gender</label>
               </Form.Field>
               <Form.Field>
-                <Radio name="sex" onChange={this.handleChange} value="male" label="Male" checked={this.state.sex === 'male'} />
-                <Radio name="sex" onChange={this.handleChange} value="female" label="Female" checked={this.state.sex === 'female'} />
+                <Radio name="sex" onChange={this.handleChange} value={1} label={getTextIn(genderMale, language)} checked={this.state.sex === 1} />
+                <Radio name="sex" onChange={this.handleChange} value={2} label={getTextIn(genderFemale, language)} checked={this.state.sex === 2} />
               </Form.Field>
               <Form.Field>
                 <Button
                   onClick={this.handleSex}
                   disabled={this.state.sex === ''}
                 >
-                    set filter
+                  set filter
                 </Button>
               </Form.Field>
             </Form.Group>
@@ -60,7 +65,7 @@ class SexFilter extends Component {
 
     return (
       <Segment>
-        {`Showing only ${filter.params.sex} students.`}
+        {`Showing only students classified as: "${filter.params.gender === 1 ? getTextIn(genderMale, language) : getTextIn(genderFemale, language)}"`}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
@@ -69,7 +74,11 @@ class SexFilter extends Component {
   }
 }
 
+const mapStateToProps = ({ settings }) => ({
+  language: settings.language
+})
+
 export default connect(
-  null,
+  mapStateToProps,
   { setPopulationFilter, removePopulationFilter }
 )(SexFilter)
