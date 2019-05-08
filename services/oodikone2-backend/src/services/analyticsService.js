@@ -18,6 +18,11 @@ const setProductivity = async (data) => {
   return response.data
 }
 
+const patchProductivity = async (data) => {
+  const response = await client.patch('/productivity', { data })
+  return response.data
+}
+
 const getThroughput = async (id) => {
   const response = await client.get(`/throughput/${id}`)
   return response.data
@@ -28,10 +33,17 @@ const setThroughput = async (data) => {
   return response.data
 }
 
+const patchThroughput = async (data) => {
+  const response = await client.patch('/throughput', { data })
+  return response.data
+}
+
 module.exports = {
   ping,
   getProductivity,
   setProductivity,
+  patchProductivity,
   getThroughput,
-  setThroughput
+  setThroughput,
+  patchThroughput
 }

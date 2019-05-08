@@ -3,7 +3,8 @@ const { getAllDegreesAndProgrammes, getAllProgrammes } = require('../services/st
 const MandatoryCourses = require('../services/mandatoryCourses')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('../services/studytrack')
 const { findProgrammeTheses, createThesisCourse, deleteThesisCourse } = require('../services/thesis')
-const { getProductivity, setProductivity, getThroughput, setThroughput, ping } = require('../services/analyticsService')
+const { getProductivity, setProductivity, getThroughput, setThroughput,
+  patchProductivity, patchThroughput, ping } = require('../services/analyticsService')
 
 router.get('/studyprogrammes', async (req, res) => {
   try {
@@ -36,17 +37,22 @@ router.get('/v2/studyprogrammes/ping', async (req, res) => {
 router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
   const code = req.params.id
   if (code) {
-    const cachedDataPromise = getProductivity(code)
-    const since = '2017-08-01'
-    const dataPromise = productivityStatsForStudytrack(code, since)
-
-    let data = Promise.race([cachedDataPromise, dataPromise])
-    // If the faster is cache but cache doesn't have data
-    if (!data[code]) {
-      data = await dataPromise
-      setProductivity(data)
+    let data = null
+    try {
+      data = await getProductivity(code)
+    } catch (e) {
+      console.error(e)
     }
-    return res.json(data)
+    if (!data) {
+      try {
+        const since = '2017-08-01'
+        data = await productivityStatsForStudytrack(code, since)
+        setProductivity(data)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    return res.json({ ...data })
   } else {
     res.status(422)
   }
@@ -54,10 +60,20 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
 
 router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
   const code = req.query.code
-  res.status(200).end()
 
   console.log('Productivity stats recalculation starting')
   const codes = code ? [code] : (await getAllProgrammes()).map(p => p.code)
+  try {
+    await patchProductivity(codes.reduce((acc, c) => {
+      acc[c] = { status: 'RECALCULATING' }
+      return acc
+    }, {}))
+    res.status(200).end()
+  } catch (e) {
+    console.error(e)
+    return res.status(500).end()
+  }
+
   let ready = 0
   for(const code of codes) {
     try {
@@ -65,6 +81,14 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
       const data = await productivityStatsForStudytrack(code, since)
       await setProductivity(data)
     } catch (e) {
+      try {
+        await patchProductivity({
+          [code]: { status: 'RECALCULATION ERRORED' }
+        })
+      } catch (e) {
+        console.error(e)
+        return
+      }
       console.log(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
     }
     ready += 1
@@ -76,15 +100,21 @@ router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
   const code = req.params.id
   if (code) {
     const thesisPromise = findProgrammeTheses(req.params.id)
-    const cachedDataPromise = getThroughput(code)
-    const since = req.params.since ? req.params.since : new Date().getFullYear() - 5
-    const dataPromise = throughputStatsForStudytrack(req.params.id, since)
 
-    let data = Promise.race([cachedDataPromise, dataPromise])
-    // If the faster is cache but cache doesn't have data
-    if (!data[code]) {
-      data = await dataPromise
-      setThroughput(data)
+    let data = null
+    try {
+      data = await getThroughput(code)
+    } catch (e) {
+      console.error(e)
+    }
+    if (!data) {
+      try {
+        const since = req.params.since ? req.params.since : new Date().getFullYear() - 5
+        data = await throughputStatsForStudytrack(req.params.id, since)
+        setThroughput(data)
+      } catch (e) {
+        console.error(e)
+      }
     }
     return res.json({ ...data, thesis: await thesisPromise })
   } else {
@@ -94,10 +124,20 @@ router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
 
 router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
   const code = req.query.code
-  res.status(200).end()
 
   console.log('Throughput stats recalculation starting')
   const codes = code ? [code] : (await getAllProgrammes()).map(p => p.code)
+  try {
+    await patchThroughput(codes.reduce((acc, c) => {
+      acc[c] = { status: 'RECALCULATING' }
+      return acc
+    }, {}))
+    res.status(200).end()
+  } catch (e) {
+    console.error(e)
+    return res.status(500).end()
+  }
+
   let ready = 0
   for(const code of codes) {
     try {
@@ -105,6 +145,14 @@ router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
       const data = await throughputStatsForStudytrack(code, since)
       await setThroughput(data)
     } catch (e) {
+      try {
+        await patchThroughput({
+          [code]: { status: 'RECALCULATION ERRORED' }
+        })
+      } catch (e) {
+        console.error(e)
+        return
+      }
       console.log(`Failed to update throughput stats for code: ${code}, reason: ${e.message}`)
     }
     ready += 1

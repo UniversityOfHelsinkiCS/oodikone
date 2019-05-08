@@ -23,7 +23,6 @@ const productivityData = [
   }
 ]
 
-
 storiesOf('ProductivityTable', module)
   .add('with text', () => (
     <ProductivityTable productivity={productivityData} />

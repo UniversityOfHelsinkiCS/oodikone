@@ -1,8 +1,12 @@
 import React from 'react'
-import { Table, Header, Loader } from 'semantic-ui-react'
-import { shape, number, arrayOf, bool, string } from 'prop-types'
+import moment from 'moment'
+import { Table, Header, Loader, Button, Grid } from 'semantic-ui-react'
+import { connect } from 'react-redux'
+import { shape, number, arrayOf, bool, string, func } from 'prop-types'
+import { callApi } from '../../../apiConnection'
+import { getProductivity } from '../../../redux/productivity'
 
-const ProductivityTable = ({ productivity, thesis, loading, error }) => {
+const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramme, dispatchGetProductivity }) => {
   if (error) return <h1>Oh no so error {error}</h1>
   let thesisTypes = []
   if (thesis) {
@@ -10,30 +14,64 @@ const ProductivityTable = ({ productivity, thesis, loading, error }) => {
   }
   const headerList = ['Year', 'Credits', thesisTypes.includes('MASTER') && 'Masters Thesis', thesisTypes.includes('BACHELOR') && 'Bachelors Thesis', 'Graduated'].filter(_ => _)
 
+  const refresh = () => {
+    callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, { code: studyprogramme })
+      .then(() => { dispatchGetProductivity(studyprogramme) })
+  }
   return (
     <React.Fragment>
-      <Header>Yearly productivity</Header>
-      <Loader active={loading} inline="centered">Loading...</Loader>
+      <Header>
+        <Grid columns={2}>
+          <Grid.Row>
+            <Grid.Column>
+              Yearly productivity
+              {productivity && (
+                <Header.Subheader>
+                  {`Last updated ${
+                    productivity.lastUpdated
+                      ? moment(productivity.lastUpdated).format('HH:mm:ss MM-DD-YYYY')
+                      : 'unknown'
+                  } ${productivity.status || ''}`}
+                </Header.Subheader>
+              )}
+            </Grid.Column>
+            <Grid.Column>
+              <Button floated="right" onClick={refresh}>
+                Recalculate
+              </Button>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </Header>
+      <Loader active={loading} inline="centered">
+        Loading...
+      </Loader>
       <Table structured celled>
         <Table.Header>
           <Table.Row>
-            {headerList.map(header =>
-              <Table.HeaderCell key={header}>{header}</Table.HeaderCell>)}
+            {headerList.map(header => (
+              <Table.HeaderCell key={header}>{header}</Table.HeaderCell>
+            ))}
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {productivity ? productivity
-            .sort((year1, year2) => year2.year - year1.year)
-            .map(year =>
-              (
-                <Table.Row key={year.year}>
-                  <Table.Cell>{year.year}</Table.Cell>
-                  <Table.Cell>{year.credits}</Table.Cell>
-                  {thesisTypes.includes('BACHELOR') && <Table.Cell>{year.bThesis}</Table.Cell>}
-                  {thesisTypes.includes('MASTER') && <Table.Cell>{year.mThesis}</Table.Cell>}
-                  <Table.Cell>{year.graduated}</Table.Cell>
-                </Table.Row>
-              )) : null}
+          {productivity
+            ? productivity.data
+                .sort((year1, year2) => year2.year - year1.year)
+                .map(year => (
+                  <Table.Row key={year.year}>
+                    <Table.Cell>{year.year}</Table.Cell>
+                    <Table.Cell>{year.credits}</Table.Cell>
+                    {thesisTypes.includes('BACHELOR') && (
+                      <Table.Cell>{year.bThesis}</Table.Cell>
+                    )}
+                    {thesisTypes.includes('MASTER') && (
+                      <Table.Cell>{year.mThesis}</Table.Cell>
+                    )}
+                    <Table.Cell>{year.graduated}</Table.Cell>
+                  </Table.Row>
+                ))
+            : null}
         </Table.Body>
       </Table>
     </React.Fragment>
@@ -41,13 +79,17 @@ const ProductivityTable = ({ productivity, thesis, loading, error }) => {
 }
 
 ProductivityTable.propTypes = {
-  productivity: arrayOf(shape({
-    year: number,
-    credits: number,
-    mThesis: number,
-    bThesis: number,
-    graduated: number
-  })), // eslint-disable-line
+  productivity: shape({
+    lastUpdated: string,
+    status: string,
+    data: arrayOf(shape({
+      year: number,
+      credits: number,
+      mThesis: number,
+      bThesis: number,
+      graduated: number
+    }))
+  }),
   thesis: arrayOf(shape({
     programmeCode: string,
     courseCode: string,
@@ -55,6 +97,8 @@ ProductivityTable.propTypes = {
     createdAt: string,
     updatedAt: string
   })),
+  studyprogramme: string.isRequired,
+  dispatchGetProductivity: func.isRequired,
   loading: bool.isRequired,
   error: bool.isRequired
 }
@@ -64,4 +108,9 @@ ProductivityTable.defaultProps = {
   thesis: undefined
 }
 
-export default ProductivityTable
+export default connect(
+  null,
+  {
+    dispatchGetProductivity: getProductivity
+  }
+)(ProductivityTable)
