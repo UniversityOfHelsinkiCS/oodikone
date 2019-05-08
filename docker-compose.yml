@@ -8,7 +8,7 @@ services:
   #   environment:
   #     - KAFKA_BROKER_ID=1
   #   container_name: zookeeper
-  
+
   # kafka:
   #   image: wurstmeister/kafka
   #   container_name: kafka
@@ -26,7 +26,7 @@ services:
   #   volumes:
   #     - ./kafka/docker.sock:/var/run/docker.sock
   #     - ./kafka/logs:/kafka/kafka-logs-1
-  
+
   nats:
     image: nats-streaming
     command: -cid updaterNATS
@@ -121,8 +121,9 @@ services:
       ANALYTICS_URL: http://analytics:4568
     volumes:
       - ./services/oodikone2-backend/:/usr/src/app
-      - ./services/oodikone2-backend/node_modules:/usr/src/app/node_modules
-      - ./models:/usr/src/app/src/models
+      - /usr/src/app/node_modules
+      - ./shared/models:/usr/src/app/src/models
+      - ./shared/migrations:/usr/src/app/src/database/migrations
     container_name: backend
     depends_on:
       - db
@@ -144,6 +145,7 @@ services:
       USAGE_ADMINER_URL: http://localhost:5050/?pgsql=usage_db&username=postgres
     volumes:
       - ./services/oodikone2-frontend/:/usr/src/app
+      - /usr/src/app/node_modules
     container_name: frontend
 
   # oodilearn:
@@ -169,6 +171,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./services/oodikone2-userservice/:/usr/src/app
+      - /usr/src/app/node_modules
     ports:
       - 4567:4567
     environment:
@@ -193,7 +196,7 @@ services:
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
     volumes:
       - ./services/oodikone2-usageservice/:/usr/src/app
-      - ./services/oodikone2-usageservice/node_modules:/usr/src/app/node_modules
+      - /usr/src/app/node_modules
     container_name: usageservice
 
   updater_api:
@@ -201,14 +204,15 @@ services:
       context: services/updater_api
       dockerfile: dev.Dockerfile
     restart: unless-stopped
-    volumes: 
+    volumes:
       - ./services/updater_api/:/usr/src/app
+      - /usr/src/app/node_modules
     depends_on:
       - nats
     environment:
       - NATS_URI=nats://nats:4222
       - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
-      - TOKEN=asdasdsadasd
+      - TOKEN=toskab1gs8cret5
     container_name: updater_api
 
   updater_writer:
@@ -216,18 +220,19 @@ services:
     build:
       context: services/updater_writer
       dockerfile: dev.Dockerfile
-    command: sh -c "cd /usr/src/app && npm install && npm run dev"
     restart: unless-stopped
-    volumes: 
+    volumes:
       - ./services/updater_writer/:/usr/src/app
-      - ./models:/usr/src/app/models
-
+      - /usr/src/app/node_modules
+      - ./shared/models:/usr/src/app/models
+      - ./shared/migrations:/usr/src/app/database/migrations
     depends_on:
       - nats
       - db
     environment:
       NATS_URI: nats://nats:4222
       DB_URL: postgres://postgres@db:5432/tkt_oodi
+      TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
 
 
   analytics:
@@ -237,6 +242,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./services/oodikone2-analytics/:/usr/src/app
+      - /usr/src/app/node_modules
     ports:
       - 4568:4568
     environment:

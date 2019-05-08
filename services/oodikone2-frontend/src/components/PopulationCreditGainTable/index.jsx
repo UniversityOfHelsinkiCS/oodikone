@@ -45,11 +45,11 @@ const filterStudents = (students, minCredits, maxCredits = Infinity) => {
 const PopulationCreditGainTable = (props) => {
   const setCreditFilter = (row) => {
     props.filters.map(filter => props.removePopulationFilter(filter.id))
-    const credits = row[0].split('-').map(count => Number(count))
-    if (credits[0]) {
-      props.setPopulationFilter(creditsAtLeast({ credit: credits[0] }))
-      if (credits[1]) {
-        props.setPopulationFilter(creditsLessThan({ credit: credits[1] }))
+    const credits = row[0].split(/(\d+)/).map(count => Number(count))
+    if (credits[1]) {
+      props.setPopulationFilter(creditsAtLeast({ credit: credits[1] }))
+      if (credits[3]) {
+        props.setPopulationFilter(creditsLessThan({ credit: credits[3] }))
       }
     } else {
       props.setPopulationFilter(creditsLessThan({ credit: 1 }))
@@ -60,14 +60,21 @@ const PopulationCreditGainTable = (props) => {
   const stats = getTotal(sample)
   const limits = expectedAmountOfCredits(months)
   const arr = limits.map(l => filterStudents(stats, ...l))
-  const rows = arr.map(a => [`${a.minCredits} - ${a.maxCredits}`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />])
+
+  const rows = arr.map((a) => {
+    if (a.maxCredits === 0) {
+      return [`${a.maxCredits}`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />]
+    } else if (a.maxCredits) {
+      return [`${a.minCredits} <= credits < ${a.maxCredits}`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />]
+    }
+    return [`${a.minCredits} <= credits`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />]
+  })
 
   const headers = [
     `Credits gained during first ${months} months`,
     `Students (all=${stats.length})`,
     'Percentage of population'
   ]
-
   return (
     <SearchResultTable
       headers={headers}

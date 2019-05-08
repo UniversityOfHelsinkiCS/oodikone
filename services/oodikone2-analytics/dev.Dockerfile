@@ -3,8 +3,8 @@ FROM node:10
 RUN mkdir -p /usr/src/app
 COPY . /usr/src/app
 WORKDIR /usr/src/app
+RUN npm ci
 
-RUN npm ci && mv /usr/src/app/node_modules /node_modules
 EXPOSE 4568
 
-CMD ["npm", "run", "dev"]
+CMD npm run dev

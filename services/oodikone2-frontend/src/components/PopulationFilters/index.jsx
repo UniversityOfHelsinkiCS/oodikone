@@ -9,11 +9,13 @@ import { getTranslate } from 'react-localize-redux'
 import CreditsLessThan from './CreditsLessThan'
 import CreditsLessThanFromMandatory from './CreditsLessThanFromMandatory'
 import CreditsAtLeast from './CreditsAtLeast'
+import GradeMeanFilter from './GradeMeanFilter'
 import StartingThisSemester from './StartingThisSemester'
 import CourseParticipation from './CourseParticipation'
 import CourseParticipationNTimes from './CourseParticipationNTimes'
 import ExtentGraduated from './ExtentGraduated'
 import Preset from './Preset'
+import SexFilter from './SexFilter'
 import DisciplineTypes from './DisciplineTypes'
 import EnrollmentStatus from './EnrollmentStatus'
 import TransferFilter from './TransferFilter'
@@ -31,12 +33,14 @@ import { getTextIn } from '../../common'
 const componentFor = {
   CreditsAtLeast,
   CreditsLessThan,
+  GradeMeanFilter,
   CreditsLessThanFromMandatory,
   StartingThisSemester,
   CourseParticipationNTimes,
   DisciplineTypes,
   EnrollmentStatus,
   CourseParticipation,
+  SexFilter,
   ExtentGraduated,
   TransferFilter,
   CanceledStudyright,
@@ -242,7 +246,6 @@ class PopulationFilters extends Component {
       <Segment>
         <Header>Filters <InfoBox content={Filters} /></Header>
         {this.props.filters.map(filter => {
-
           if (filter.type !== 'Preset') {
             return React.createElement(componentFor[filter.type], { filter, key: filter.id, samples: this.props.samples, transfers: this.props.transfers, extents: this.props.extents, allStudyRights })
           }

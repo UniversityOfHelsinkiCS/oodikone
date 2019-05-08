@@ -37,10 +37,11 @@ export default {
     **Clear all filters**: Poistaa kerralla valitut filtterit.
     <br> <br>
     **Save filters as preset**: Voit tallentaa tekemäsi filtteri-yhdistelmän myöhempää käyttöä varten.`,
-    CreditsAtLeast: 'Suodattaa pois *opiskelijat*, joilla on alle annetun määrän opintopisteitä',
+    CreditsAtLeast: 'Suodattaa pois opiskelijat, joilla on alle annetun määrän opintopisteitä',
+    CreditsLessThan: 'Suodattaa opiskelijat, joilla on yli annetun määrän opintopisteitä',
+    GradeMeanFilter: 'Suodattaa pois opiskelijat, joilla on yli/alle annetun numeron keskiarvo',
     CreditsLessThanFromMandatory: `Suodattaa pois opiskelijat, joilla on yli
     annetun määrän opintopisteitä pakollisista kursseista`,
-    CreditsLessThan: 'Suodattaa opiskelijat, joilla on yli annetun määrän opintopisteitä',
     StartingThisSemester: `Paina kytkintä vaihtaaksesi suodatinta. Suodatin suodattaa opiskelijat,
     jotka ovat opiskelleet ennen valittua lukuvuotta tai päinvastoin`,
     EnrollmentStatus: 'Näytä opiskelijat, jotka olivat läsnä- tai poissaolevana valittuina lukukausina',
