@@ -33,6 +33,7 @@ jobs:
         - time CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
       deploy: # deploy is always skipped for PR
         provider: script
+        skip_cleanup: true
         script: "docker-compose -f docker-compose.lateste2e.yml push && curl --fail -k -X POST -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" https://toska.cs.helsinki.fi/toskawatch/release/"
         on:
           branch: master
@@ -50,6 +51,7 @@ jobs:
         - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
       deploy: # deploy is always skipped for PR
         provider: script
+        skip_cleanup: true
         script: docker-compose -f docker-compose.lateste2e.production.yml push && echo "Done, please MANUAL DEPLOY"
         on:
           tags: true
