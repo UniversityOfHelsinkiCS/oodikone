@@ -15,6 +15,7 @@ import CourseParticipation from './CourseParticipation'
 import CourseParticipationNTimes from './CourseParticipationNTimes'
 import ExtentGraduated from './ExtentGraduated'
 import Preset from './Preset'
+import SexFilter from './SexFilter'
 import DisciplineTypes from './DisciplineTypes'
 import EnrollmentStatus from './EnrollmentStatus'
 import TransferFilter from './TransferFilter'
@@ -39,6 +40,7 @@ const componentFor = {
   DisciplineTypes,
   EnrollmentStatus,
   CourseParticipation,
+  SexFilter,
   ExtentGraduated,
   TransferFilter,
   CanceledStudyright,
