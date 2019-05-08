@@ -19,13 +19,39 @@ import infotooltips from '../../common/InfoToolTips'
 const popupTimeoutLength = 1000
 
 class PopulationStudents extends Component {
-  state = {}
+  state = { containsStudyTracks: false }
 
   async componentDidMount() {
     const roles = await userRoles()
     const admin = roles.includes('admin')
 
-    this.setState({ admin })
+    this.setState({ admin, containsStudyTracks: this.containsStudyTracks() })
+  }
+
+
+
+  containsStudyTracks = () => {
+    const students = this.props.samples.reduce((obj, s) => {
+      obj[s.studentNumber] = s
+      return obj
+    }, {})
+    const allStudyrights = this.props.selectedStudents.map(sn => students[sn]).map(st => st.studyrights)
+    return allStudyrights.map(studyrights => this.studyrightCodes(studyrights, 'studyrightElements')
+      .reduce((acc, elemArr) => {
+        elemArr.filter(el => el.element_detail.type === 30).forEach(el =>
+          acc.push(el.element_detail.name.fi))
+        return acc
+      }, []).length > 0).some(el => el === true)
+  }
+
+  studyrightCodes = (studyrights, value) => {
+    const { queryStudyrights } = this.props
+    return studyrights.filter((sr) => {
+      const { studyrightElements } = sr
+      return studyrightElements.filter(sre => (
+        queryStudyrights.includes(sre.code)
+      )).length >= queryStudyrights.length
+    }).map(a => a[value])
   }
 
   handlePopupOpen = (id) => {
@@ -46,8 +72,7 @@ class PopulationStudents extends Component {
       return null
     }
 
-    const { admin } = this.state
-    const { queryStudyrights } = this.props
+    const { admin, containsStudyTracks } = this.state
 
     const students = this.props.samples.reduce((obj, s) => {
       obj[s.studentNumber] = s
@@ -65,24 +90,23 @@ class PopulationStudents extends Component {
 
     const transferFrom = s => (s.previousRights[0] && getTextIn(s.previousRights[0].element_detail.name, this.props.language))
 
-    const studyrightCodes = (studyrights, value) => (
-      studyrights.filter((sr) => {
-        const { studyrightElements } = sr
-        return studyrightElements.filter(sre => (
-          queryStudyrights.includes(sre.code)
-        )).length >= queryStudyrights.length
-      }).map(a => a[value])
-    )
-
     const priorityText = (studyRights) => {
-      const codes = studyrightCodes(studyRights, 'prioritycode')
+      const codes = this.studyrightCodes(studyRights, 'prioritycode')
       return codes.map(code => PRIORITYCODE_TEXTS[code] ? PRIORITYCODE_TEXTS[code] : code).join(', ') // eslint-disable-line
     }
 
     const extentCodes = (studyRights) => {
-      const codes = studyrightCodes(studyRights, 'extentcode')
+      const codes = this.studyrightCodes(studyRights, 'extentcode')
       return codes.join(', ') // eslint-disable-line
     }
+
+    const studytrack = studyrights => (
+      this.studyrightCodes(studyrights, 'studyrightElements')
+        .reduce((acc, elemArr) => {
+          elemArr.filter(el => el.element_detail.type === 30).forEach(el =>
+            acc.push(el.element_detail.name.fi))
+          return acc
+        }, []))
 
     const columns = []
     if (this.props.showNames) {
@@ -119,6 +143,15 @@ class PopulationStudents extends Component {
         getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '')
       }
     )
+
+    if (containsStudyTracks) {
+      columns.push({
+        key: 'studytrack',
+        title: 'studytrack',
+        getRowVal: s => studytrack(s.studyrights)
+      })
+    }
+
     if (admin) {
       columns.push(
         {
