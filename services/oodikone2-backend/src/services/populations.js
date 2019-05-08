@@ -26,7 +26,6 @@ const formatStudentForPopulationStatistics = ({
   semester_enrollments, transfers, updatedAt, createdAt, gender_code,
   gender_fi, gender_sv, gender_en
 }, startDate, endDate) => {
-
   const toCourse = ({ grade, attainment_date, credits, course, credittypecode, isStudyModule }) => {
     course = course.get()
 
@@ -141,7 +140,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
   const students = await Student.findAll({
     attributes: ['firstnames', 'lastname', 'studentnumber',
       'dateofuniversityenrollment', 'creditcount', 'matriculationexamination',
-      'abbreviatedname', 'email', 'updatedAt'],
+      'abbreviatedname', 'email', 'updatedAt', 'gender_code', 'gender_fi', 'gender_sv', 'gender_en'],
     include: [
       {
         model: Credit,
@@ -415,7 +414,7 @@ const optimizedStatisticsOf = async (query) => {
   const students =
     await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months), studyRights)
 
-  const formattedStudents = await formatStudentsForApi(students, startDate, endDate, query)
+    const formattedStudents = await formatStudentsForApi(students, startDate, endDate, query)
   return formattedStudents
 }
 

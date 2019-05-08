@@ -24,7 +24,7 @@ export const sexFilter = (params) => {
     params: {
       gender
     },
-    filter: student => student.gender === gender
+    filter: student => student.gender_code === gender
   })
 }
 export const matriculationFilter = (params) => {
