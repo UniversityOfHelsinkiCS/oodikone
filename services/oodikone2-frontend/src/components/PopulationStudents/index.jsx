@@ -28,8 +28,6 @@ class PopulationStudents extends Component {
     this.setState({ admin, containsStudyTracks: this.containsStudyTracks() })
   }
 
-
-
   containsStudyTracks = () => {
     const students = this.props.samples.reduce((obj, s) => {
       obj[s.studentNumber] = s
