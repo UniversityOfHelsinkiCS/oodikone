@@ -20,7 +20,7 @@ export const sortInstances = (courseInstances) => {
 export const sortCourses = courseList => Object.values(courseList.data)
   .sort(byDateDesc)
   .map(course => ({
-    ...course, key: `${course.name}-${course.code}`, selected: courseList.selected.some(c => course.code === c.code)
+    ...course, title: `${course.name} (${course.code})`, key: `${course.name}-${course.code}`, selected: courseList.selected.some(c => course.code === c.code)
   }))
 
 export const makeSortCourseInstances = () => createSelector(

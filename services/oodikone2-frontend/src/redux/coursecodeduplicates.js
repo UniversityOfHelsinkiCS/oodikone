@@ -1,7 +1,7 @@
 import { callController } from '../apiConnection'
 
-export const getDuplicates = () => {
-  const route = '/courses/duplicatecodes/all'
+export const getDuplicates = (programme) => {
+  const route = `/courses/duplicatecodes/${programme}`
   const prefix = 'GET_ALL_DUPLICATES_'
   return callController(route, prefix)
 }
@@ -9,19 +9,18 @@ export const getDuplicates = () => {
 export const addDuplicate = (code1, code2) => {
   const route = `/courses/duplicatecodes/${code1}/${code2}`
   const prefix = 'ADD_DUPLICATE_'
-  const data = { code1, code2 }
   const method = 'post'
-  return callController(route, prefix, data, method)
+  return callController(route, prefix, {}, method)
 }
 
-export const removeDuplicate = (code1, code2) => {
-  const route = `/courses/duplicatecodes/${code1}/${code2}`
+export const removeDuplicate = (code) => {
+  const route = `/courses/duplicatecodes/${code}`
   const prefix = 'REMOVE_DUPLICATE_'
   const method = 'delete'
   return callController(route, prefix, {}, method)
 }
 
-const reducer = (state = { data: [] }, action) => {
+const reducer = (state = { data: {} }, action) => {
   switch (action.type) {
     case 'GET_ALL_DUPLICATES_ATTEMPT':
       return {
