@@ -17,7 +17,7 @@ const getCached = async (key) => {
   } catch (e) {
     console.error(e)
   }
-  return {}
+  return null
 }
 
 const setCached = async (key, data) => {
@@ -31,11 +31,12 @@ const setCached = async (key, data) => {
 app.get('/productivity/:id', async (req, res) => {
   const { id } = req.params
   const data = await getCached('productivity')
-  res.json({ [id]: data[id] })
+  if (data) res.json({ [id]: data[id] })
+  else res.json(null)
 })
 app.post('/productivity', async (req, res) => {
   const data = await getCached('productivity')
-  await setCached('productivity', {...data, ...req.body.data})
+  await setCached('productivity', { ...data, ...req.body.data })
   res.status(200).end()
 })
 app.patch('/productivity', async (req, res) => {
@@ -47,7 +48,8 @@ app.patch('/productivity', async (req, res) => {
 app.get('/throughput/:id', async (req, res) => {
   const { id } = req.params
   const data = await getCached('throughput')
-  res.json({ [id]: data[id] })
+  if (data) res.json({ [id]: data[id] })
+  else res.json(null)
 })
 app.post('/throughput', async (req, res) => {
   const data = await getCached('throughput')
