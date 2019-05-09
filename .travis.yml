@@ -38,7 +38,7 @@ jobs:
         on:
           branch: master
     - # in parallel
-      if: tag IS present OR type = pull_request
+      if: tag IS present OR type = pull_request OR branch = trunk
       env:
         - IMAGE=PRODUCTION
       script:
