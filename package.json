@@ -7,7 +7,6 @@
     "cypress:open": "CYPRESS_baseUrl=http://localhost:8081 cypress open",
     "cypress:run": "CYPRESS_baseUrl=http://localhost:8081 cypress run --config video=false -P ./",
     "cypress:record": "cypress run --record -P ./",
-    "cypress:rune2e": "cypress run --record -P ./",
     "concurrently": "concurrently",
     "test": "./run_all_tests.sh",
     "test_services": "./run_service_tests.sh"

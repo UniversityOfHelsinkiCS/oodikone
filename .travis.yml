@@ -30,7 +30,7 @@ jobs:
         - cat nginx/log
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
         - time npm run test_services
-        - time CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:rune2e
+        - time CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
       deploy: # deploy is always skipped for PR
         provider: script
         skip_cleanup: true
@@ -48,7 +48,7 @@ jobs:
         - cat nginx/log
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
         - time npm run test_services
-        - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:rune2e
+        - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
       deploy: # deploy is always skipped for PR
         provider: script
         skip_cleanup: true
