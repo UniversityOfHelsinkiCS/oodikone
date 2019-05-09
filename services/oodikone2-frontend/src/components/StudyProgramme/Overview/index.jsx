@@ -21,12 +21,14 @@ const Overview = (props) => {
         thesis={throughput.data.thesis}
         loading={throughput.pending}
         error={throughput.error}
+        studyprogramme={studyprogramme}
       />
       <ProductivityTable
         productivity={productivity.data[studyprogramme]}
         thesis={throughput.data.thesis}
         loading={productivity.pending}
         error={productivity.error}
+        studyprogramme={studyprogramme}
       />
     </React.Fragment>
   )
