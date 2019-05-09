@@ -4,11 +4,12 @@ import { connect } from 'react-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
-import { textAndDescriptionSearch, getRolesWithoutRefreshToken, getIdWithoutRefreshToken, setToken, getTextIn } from '../../common'
-import { addUserUnits, removeUserUnits, getAccessGroups, modifyAccessGroups } from '../../redux/users'
+import { getRolesWithoutRefreshToken, getIdWithoutRefreshToken, setToken, getTextIn } from '../../common'
+import { removeUserUnits, getAccessGroups, modifyAccessGroups } from '../../redux/users'
 
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
 import { superLogin } from '../../apiConnection'
+import AccessRights from './AccessRights'
 
 const formatToDropdown = (elements, language) => {
   const options = Object.values(elements).map(e => ({
@@ -24,7 +25,6 @@ class UserPage extends Component {
   state = {
     degree: undefined,
     programme: undefined,
-    specializations: [],
     groups: this.props.user.accessgroup ? this.props.user.accessgroup.map(ag => ag.id) : [],
     visible: false
   }
@@ -44,12 +44,8 @@ class UserPage extends Component {
 
   handleChange = (e, { name, value }) => this.setState({ [name]: value })
 
-  selectAll = () => this.setState({ specializations: this.allSpecializationIds() })
-
   enableAccessRightToUser = userid => async () => {
-    const { degree, programme, specializations, groups } = this.state
-    const codes = [degree, programme, ...specializations].filter(e => !!e)
-    await this.props.addUserUnits(userid, codes)
+    const { groups } = this.state
 
     const accessGroups = this.props.accessGroups.reduce((acc, ag) => {
       if (groups.includes(ag.id)) {
@@ -62,7 +58,6 @@ class UserPage extends Component {
     this.setState({
       degree: undefined,
       programme: undefined,
-      specializations: [],
       visible: true
     })
     setTimeout(() => {
@@ -111,12 +106,6 @@ class UserPage extends Component {
   }
 
   allSpecializationIds = () => this.specializationOptions().map(sp => sp.key)
-
-  studyelementOptions = () => ({
-    degrees: this.degreeOptions(),
-    programmes: this.programmeOptions(),
-    specializations: this.specializationOptions()
-  })
 
   accessGroupOptions = accessGroups => (accessGroups ?
     accessGroups.map(ag => ({
@@ -192,7 +181,6 @@ class UserPage extends Component {
       })
     }
 
-    const options = this.studyelementOptions()
     const accessGroupOptions = this.accessGroupOptions(this.props.accessGroups)
     const enabledAccessGroups = this.state.groups
     return this.props.accessGroups ?
@@ -202,9 +190,8 @@ class UserPage extends Component {
         <Card.Group>
           <Card fluid>
             <Card.Content>
-              <Card.Header>
-                {user.full_name}
-              </Card.Header>
+              <Card.Header content={user.full_name} />
+              <Divider />
               <Card.Meta content={user.username} />
               <Card.Meta content={user.email} />
               <Card.Description>
@@ -214,10 +201,17 @@ class UserPage extends Component {
           </Card>
           <Card fluid>
             <Card.Content>
-              <Card.Header content="Add access rights" />
+              <Card.Header content="Add study programme access rights" />
+              <Divider />
+              <AccessRights uid={user.id} />
+            </Card.Content>
+          </Card>
+          <Card fluid>
+            <Card.Content>
+              <Card.Header content="Add access group rights" />
+              <Divider />
               <Card.Description>
                 <Form loading={pending}>
-                  <Divider />
                   <Form.Dropdown
                     name="groups"
                     label="Access Groups"
@@ -229,53 +223,7 @@ class UserPage extends Component {
                     onChange={this.handleChange}
                     clearable
                   />
-                  <Form.Dropdown
-                    name="degree"
-                    label="Degree (optional)"
-                    placeholder="Select specialization"
-                    options={options.degrees}
-                    value={this.state.degree}
-                    onChange={this.handleChange}
-                    fluid
-                    search={textAndDescriptionSearch}
-                    selection
-                    clearable
-                  />
                   <Divider />
-                  <Form.Group widths="equal">
-                    <Form.Dropdown
-                      name="programme"
-                      label="Study programme"
-                      placeholder="Select unit"
-                      options={options.programmes}
-                      value={this.state.programme}
-                      onChange={this.handleChange}
-                      fluid
-                      search={textAndDescriptionSearch}
-                      selection
-                      clearable
-                    />
-                    <Form.Dropdown
-                      label="Specialization"
-                      name="specializations"
-                      placeholder="Select specialization"
-                      options={options.specializations}
-                      value={this.state.specializations}
-                      onChange={this.handleChange}
-                      fluid
-                      search={textAndDescriptionSearch}
-                      multiple
-                      selection
-                      clearable
-                    />
-                    <Button
-                      size="small"
-                      style={{ marginTop: '18px' }}
-                      onClick={() => this.selectAll()}
-                    >
-                      Select all specializations
-                    </Button>
-                  </Form.Group>
                   <Button
                     basic
                     fluid
@@ -334,7 +282,6 @@ UserPage.propTypes = {
       type: number
     }))
   }).isRequired,
-  addUserUnits: func.isRequired,
   removeUserUnits: func.isRequired,
   language: string.isRequired,
   goBack: func.isRequired,
@@ -360,7 +307,6 @@ const mapStateToProps = state => ({
 })
 
 export default connect(mapStateToProps, {
-  addUserUnits,
   removeUserUnits,
   getDegreesAndProgrammesUnfiltered,
   getAccessGroups,
