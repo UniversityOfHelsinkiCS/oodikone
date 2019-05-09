@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { shape, string } from 'prop-types'
 import { Header, Segment, Tab, Card, Icon } from 'semantic-ui-react'
 import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
-// import StudyProgrammeCourseCodeMapper from './StudyProgrammeCourseCodeMapper'
+import CourseCodeMapper from '../CourseCodeMapper'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
 import AggregateView from '../CourseGroups/AggregateView'
@@ -48,8 +48,8 @@ class StudyProgramme extends Component {
       {
         menuItem: 'Mandatory Courses',
         render: () => <StudyProgrammeMandatoryCourses studyProgramme={studyProgrammeId} />
-      }
-      // { menuItem: 'Code Mapper', render: () => <StudyProgrammeCourseCodeMapper /> },
+      },
+      { menuItem: 'Code Mapper', render: () => <CourseCodeMapper studyprogramme={studyProgrammeId} /> },
     )
     if ((getRolesWithoutRefreshToken().includes('coursegroups') &&
       getRightsWithoutRefreshToken().includes(studyProgrammeId)) ||
