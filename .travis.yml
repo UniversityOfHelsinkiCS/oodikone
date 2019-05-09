@@ -20,7 +20,7 @@ before_script:
 jobs:
   include:
     - stage: build & test & push & deploy
-      if: branch = master OR type = pull_request OR branch = trunk
+      if: NOT tag IS present
       env:
         - IMAGE=STAGING
       script:
@@ -38,7 +38,7 @@ jobs:
         on:
           branch: master
     - # in parallel
-      if: tag IS present OR type = pull_request OR branch = trunk
+      if: type = pull_request OR NOT branch = master
       env:
         - IMAGE=PRODUCTION
       script:
