@@ -20,7 +20,7 @@ before_script:
 jobs:
   include:
     - stage: build & test & push & deploy
-      if: branch = master OR type = pull_request
+      if: branch = master OR type = pull_request OR branch = trunk
       env:
         - IMAGE=STAGING
       script:
