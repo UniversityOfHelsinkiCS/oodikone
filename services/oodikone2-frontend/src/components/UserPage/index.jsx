@@ -203,7 +203,7 @@ class UserPage extends Component {
             <Card.Content>
               <Card.Header content="Add study programme access rights" />
               <Divider />
-              <AccessRights uid={user.id} />
+              <AccessRights uid={user.id} rights={user.elementdetails} />
             </Card.Content>
           </Card>
           <Card fluid>

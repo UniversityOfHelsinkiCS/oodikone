@@ -13,31 +13,31 @@ const formatToOptions = ({ code, name }) => ({
   description: code
 })
 
-const AccessRights = ({ uid, options, ...props }) => {
-  const [programme, setProgramme] = useState(undefined)
-  const [selectedTracks, setTracks] = useState([])
-  const [selectedDegrees, setDegrees] = useState([])
-  const [showOptional, setShowOptional] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const programmeOptions = options.map(formatToOptions)
-    .sort((p1, p2) => p1.text.localeCompare(p2.text))
-  const { tracks, degrees } = options.find(opt => opt.code === programme) || {}
-  const trackOptions = !tracks ? [] : tracks.map(formatToOptions)
-  const degreeOptions = !degrees ? [] : degrees.map(formatToOptions)
+const initialState = {
+  programme: undefined,
+  selectedTracks: [],
+  selectedDegrees: [],
+  showOptional: false,
+  loading: false
+}
+
+const AccessRights = ({ uid, rights, programmes, associations, ...props }) => {
+  const [state, setState] = useState({ ...initialState })
+  const { programme, selectedTracks, selectedDegrees, showOptional, loading } = state
+  const { tracks = [], degrees = [] } = associations[programme] || {}
   const setAllOptions = () => {
-    setTracks(trackOptions.map(t => t.value))
-    setDegrees(degreeOptions.map(d => d.value))
+    setState({
+      ...state,
+      selectedTracks: tracks.map(t => t.value),
+      selectedDegrees: degrees.map(d => d.value)
+    })
   }
-  const toggleExpanded = () => setShowOptional(!showOptional)
+  const toggleExpanded = () => setState({ ...state, showOptional: !showOptional })
   const handleClick = async () => {
-    setLoading(true)
+    setState({ ...state, loading: true })
     const codes = [...selectedTracks, ...selectedDegrees, programme].filter(e => !!e)
     await props.addUserUnits(uid, codes)
-    setProgramme(undefined)
-    setTracks([])
-    setDegrees([])
-    setShowOptional(false)
-    setLoading(false)
+    setState({ ...state, ...initialState })
   }
   return (
     <Form loading={loading}>
@@ -46,14 +46,15 @@ const AccessRights = ({ uid, options, ...props }) => {
         required
         label="Study programme"
         placeholder="Select unit"
-        options={programmeOptions}
+        options={programmes}
         value={programme}
-        onChange={(_, { value }) => {
-          setProgramme(value)
-          setTracks([])
-          setDegrees([])
-          setShowOptional(true)
-        }}
+        onChange={(_, { value }) => setState({
+          ...state,
+          programme: value,
+          tracks: [],
+          degrees: [],
+          showOptional: !!value
+        })}
         fluid
         search={textAndDescriptionSearch}
         selection
@@ -68,9 +69,9 @@ const AccessRights = ({ uid, options, ...props }) => {
             disabled={!programme}
             name="degree"
             placeholder="Select specialization"
-            options={degreeOptions}
+            options={degrees}
             value={selectedDegrees}
-            onChange={(_, { value }) => setDegrees(value)}
+            onChange={(_, { value }) => setState({ ...state, selectedDegrees: value })}
             fluid
             search={textAndDescriptionSearch}
             multiple
@@ -82,9 +83,9 @@ const AccessRights = ({ uid, options, ...props }) => {
             label="Specialization (Optional)"
             name="specializations"
             placeholder="Select specialization"
-            options={trackOptions}
+            options={tracks}
             value={selectedTracks}
-            onChange={(_, { value }) => setTracks(value)}
+            onChange={(_, { value }) => setState({ ...state, selectedTracks: value })}
             fluid
             search={textAndDescriptionSearch}
             multiple
@@ -114,26 +115,28 @@ const AccessRights = ({ uid, options, ...props }) => {
 }
 
 AccessRights.propTypes = {
-  options: PropTypes.arrayOf(PropTypes.shape({
-    code: PropTypes.string,
-    name: PropTypes.string,
-    tracks: PropTypes.arrayOf({
-      code: PropTypes.string,
-      name: PropTypes.string
-    })
-  })).isRequired,
   addUserUnits: PropTypes.func.isRequired,
-  uid: PropTypes.string.isRequired
+  uid: PropTypes.string.isRequired,
+  rights: PropTypes.arrayOf(PropTypes.shape({
+    code: PropTypes.string
+  })).isRequired,
+  associations: PropTypes.shape({}).isRequired,
+  programmes: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 }
 
-const mapStateToProps = (state) => {
-  const { programmes, tracks, degrees } = selectors.dropdownOptionsSelector(state)
-  const options = selectors.dropdownAssociationsSelector(state)
+const mapStateToProps = (state, props) => {
+  const options = selectors.filteredDropdownAssociationsSelector(state, props)
+  const programmes = options.map(formatToOptions).sort((p1, p2) => p1.text.localeCompare(p2.text))
+  const associations = options.reduce((acc, prog) => ({
+    ...acc,
+    [prog.code]: {
+      tracks: prog.tracks.map(formatToOptions),
+      degrees: prog.degrees.map(formatToOptions)
+    }
+  }), {})
   return {
     programmes,
-    tracks,
-    degrees,
-    options
+    associations
   }
 }
 
