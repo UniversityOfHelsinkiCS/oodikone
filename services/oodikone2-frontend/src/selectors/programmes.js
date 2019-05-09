@@ -39,6 +39,8 @@ const groupByProgramme = (elements) => {
   return acc
 }
 
+const userRightsPropSelector = (_, props) => props.rights.map(r => r.code)
+
 const dropdownAssociationsSelector = createSelector(
   languageSelector,
   associationsSelector,
@@ -50,15 +52,32 @@ const dropdownAssociationsSelector = createSelector(
     const programmes = toOptions(assocs.programmes, language).map(({ code, name }) => ({
       code,
       name,
-      degrees: programmeDegrees[code],
-      tracks: programmeTracks[code]
+      degrees: programmeDegrees[code] || [],
+      tracks: programmeTracks[code] || []
     }))
     return programmes
+  }
+)
+
+const filteredDropdownAssociationsSelector = createSelector(
+  dropdownAssociationsSelector,
+  userRightsPropSelector,
+  (associations, rights) => {
+    const rightsSet = new Set(rights)
+    const notSelected = ({ code, tracks, degrees }) => !(rightsSet.has(code) && tracks.length === 0 && degrees.length === 0)
+    const programmes = associations.map(({ degrees, tracks, ...rest }) => ({
+      degrees: degrees.filter(d => !rightsSet.has(d.code)),
+      tracks: tracks.filter(t => !rightsSet.has(t.code)),
+      ...rest
+    }))
+    const filtered = programmes.filter(notSelected)
+    return filtered
   }
 )
 
 export default {
   dropdownOptionsSelector,
   associationsSelector,
-  dropdownAssociationsSelector
+  dropdownAssociationsSelector,
+  filteredDropdownAssociationsSelector
 }
