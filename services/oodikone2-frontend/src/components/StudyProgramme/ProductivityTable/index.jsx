@@ -55,7 +55,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {productivity
+          {productivity && productivity.data
             ? productivity.data
                 .sort((year1, year2) => year2.year - year1.year)
                 .map(year => (
