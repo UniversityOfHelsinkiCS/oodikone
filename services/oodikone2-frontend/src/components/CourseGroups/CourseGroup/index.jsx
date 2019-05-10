@@ -142,7 +142,9 @@ class CourseGroup extends Component {
       academicYears
     } = this.state
 
-    const navigateTo = route => history.push(getCompiledPath(route, { studyProgrammeId }))
+    const navigateTo = (studyProgrammeId) => history.push(getCompiledPath('/study-programme/:studyProgrammeId', {
+      studyProgrammeId
+    }))
     const statisticsTeachers = teachers.filter(t => activeTeacherIds.includes(t.id))
 
     return (
@@ -158,7 +160,7 @@ class CourseGroup extends Component {
           </div>
           <Button
             icon="reply"
-            onClick={() => navigateTo(routes.studyProgramme.route)}
+            onClick={() => navigateTo(studyProgrammeId)}
             className="headerIconButton"
           />
         </Header>
