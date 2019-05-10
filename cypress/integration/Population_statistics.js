@@ -215,7 +215,7 @@ describe('Population Statistics tests', () => {
     cy.contains("This filter is saved").siblings().within(() => { cy.get("input").type(`Advanced filters-${new Date().getTime()}`, { delay: 0 }) })
     cy.contains("Save current filters as preset").parentsUntil(".dimmer").within(() => { cy.get("button").contains("Save").click() })
 
-    cy.reload()
+    cy.visit("/populations")
     cy.contains("Select study programme", { timeout: 50000 }).click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
     cy.contains("See population").click()
 
