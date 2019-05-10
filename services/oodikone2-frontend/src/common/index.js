@@ -211,6 +211,9 @@ export const getCompiledPath = (template, parameters) => {
   return toPath(parameters)
 }
 
+// https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
+export const roundToTwo = num => +(`${Math.round(`${num}e+2`)}e-2`)
+
 export const getTextIn = (texts, language) => {
   if (texts) {
     return texts[language] || texts.fi || texts.en || texts.sv || Object.values(texts)[0]
