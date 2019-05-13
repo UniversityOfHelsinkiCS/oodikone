@@ -75,6 +75,7 @@ class PopulationSearchForm extends Component {
     }
     if (location.search) {
       const query = this.parseQueryFromUrl()
+      this.setState({ query })
       this.fetchPopulation(query)
     }
   }
