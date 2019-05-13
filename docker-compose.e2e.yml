@@ -1,0 +1,102 @@
+version: '3'
+
+services:
+  user_db:
+    image: postgres:9.6.3
+    ports:
+      - "5422:5432"
+    volumes:
+      - ./user_pgdata:/var/lib/postgresql/data
+    container_name: oodi_user_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=user_db
+  db:
+    image: postgres:9.6.3
+    ports:
+      - "5421:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    container_name: oodi_db
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
+      - POSTGRES_USER=postgres
+    depends_on:
+      - frontend
+  redis:
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-data:/data
+    container_name: redis
+  mongo_db:
+    image: mongo
+    restart: unless-stopped
+    volumes:
+      - ./backups/mongo/oodilearn:/dump
+      - ./mongodata:/data/db
+    ports:
+      - "27017:27017"
+    container_name: mongo_db
+  backend:
+    build:
+      context: SERVICE/oodikone2-backend
+      dockerfile: dev.Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS: redis
+      DB_URL: postgres://postgres@db:5432/tkt_oodi
+      TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
+      FRONT_URL: http://localhost:8000
+      TOKEN_SECRET: IWannaBeTheVeryBest
+      OODILEARN_URL: http://oodilearn:5000
+      USERSERVICE_URL: http://userservice:4567
+      USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      NODE_ENV: dev
+    container_name: backend
+    depends_on:
+      - db
+      - redis
+  frontend:
+    build:
+      context: ../
+      dockerfile: dev.Dockerfile
+    command: sh -c "npm install && npm run docker"
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      BACKEND_ADDR: backend
+      ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
+    container_name: frontend
+  userservice:
+    image: node:8.11.3
+    command: sh -c "cd /usr/src/app && npm install && npm start"
+    restart: unless-stopped
+    ports:
+      - 4567:4567
+    volumes:
+      - ./SERVICE/oodikone2-userservice/:/usr/src/app
+    environment:
+      - DB_URL=postgres://postgres@user_db:5432/user_db
+      - TEST_DB=postgres://postgres@user_db:5432/user_db_test
+      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      - TOKEN_SECRET=IWannaBeTheVeryBest
+      - NODE_ENV=dev
+    container_name: userservice
+  adminer:
+    image: adminer:4.6.2
+    environment:
+      - ADMINER_DESIGN=pepa-linha
+    volumes:
+      - ./adminer-plugins:/var/www/html/plugins-enabled
+    ports:
+      - 5050:8080
+    restart: always
+    container_name: adminer
