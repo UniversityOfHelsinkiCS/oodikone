@@ -138,7 +138,7 @@ services:
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run docker']
     restart: unless-stopped
     ports:
-      - "8081:5000"
+      - "8081:8081"
       - "7777:7777"
     environment:
       BACKEND_ADDR: backend
