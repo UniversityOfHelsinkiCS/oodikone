@@ -115,9 +115,23 @@ const reducer = (state = { data: [], enabledOnly: true }, action) => {
         data: state.data.filter(user => user.id !== action.response.id)
           .concat(action.response)
       }
+    case 'MODIFY_ACCESSGROUPS_ATTEMPT':
+      return {
+        ...state,
+        accessgroupPending: true,
+        accessgroupError: false
+      }
+    case 'MODIFY_ACCESSGROUPS_FAILURE':
+      return {
+        ...state,
+        accessgroupPending: false,
+        accessgroupError: true
+      }
     case 'MODIFY_ACCESSGROUPS_SUCCESS':
       return {
         ...state,
+        accessgroupPending: false,
+        accessgroupError: false,
         data: state.data.filter(user => user.id !== action.response.id)
           .concat(action.response)
       }
