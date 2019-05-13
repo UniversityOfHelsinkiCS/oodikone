@@ -5,7 +5,7 @@ const {
   Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails,
   Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement
 } = require('../models')
-const { getAllDuplicates, byName } = require('./courses')
+const { getMainCodesMap, byName } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
 
@@ -414,7 +414,7 @@ const optimizedStatisticsOf = async (query) => {
   const students =
     await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months), studyRights)
 
-    const formattedStudents = await formatStudentsForApi(students, startDate, endDate, query)
+  const formattedStudents = await formatStudentsForApi(students, startDate, endDate, query)
   return formattedStudents
 }
 
@@ -427,8 +427,8 @@ const unifyOpenUniversity = (code) => {
 
 const getUnifiedCode = (code, codeduplicates) => {
   const formattedcode = unifyOpenUniversity(code)
-  const unifiedcodes = codeduplicates[formattedcode]
-  return !unifiedcodes ? formattedcode : unifiedcodes.main
+  const unifiedcode = codeduplicates[formattedcode]
+  return !unifiedcode ? formattedcode : unifiedcode
 }
 
 const findCourses = (studentnumbers, beforeDate) => {
@@ -500,7 +500,7 @@ const bottlenecksOf = async (query) => {
     coursetypes: {}
   }
 
-  const codeduplicates = await getAllDuplicates()
+  const codeduplicates = await getMainCodesMap()
 
   const studentnumbers = query.selectedStudents ||
     await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate, exchangeStudents, cancelledStudents)

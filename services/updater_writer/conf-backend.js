@@ -2,8 +2,10 @@ require('dotenv').config()
 
 const { NODE_ENV } = process.env
 let DB_URL = process.env.DB_URL
+let DB_SCHEMA = process.env.DB_SCHEMA || 'public'
 if (NODE_ENV === 'test') {
   DB_URL = process.env.TEST_DB
+  DB_SCHEMA = process.env.TEST_DB_SCHEMA
 }
 else if (NODE_ENV === 'anon') {
   DB_URL = process.env.ANON_DB
@@ -11,7 +13,6 @@ else if (NODE_ENV === 'anon') {
 const frontend_addr = process.env.FRONT_URL
 const redis = process.env.REDIS
 const TOKEN_SECRET = process.env.TOKEN_SECRET
-const DB_SCHEMA = process.env.DB_SCHEMA || 'public'
 const CERT_PATH = process.env.CERT_PATH // production/staging only
 const KEY_PATH = process.env.KEY_PATH // production/staging only
 const OODILEARN_URL = process.env.OODILEARN_URL
