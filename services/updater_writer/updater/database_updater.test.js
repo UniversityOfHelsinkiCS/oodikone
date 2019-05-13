@@ -130,10 +130,9 @@ describe('Updater writes students the right way', () => {
         expect(startdate.toISOString()).toBe(new Date('1899-12-31 00:00:00+00').toISOString())
         expect(enddate.toISOString()).toBe(new Date('2112-12-20 00:00:00+00').toISOString())
 
-        // these dont work
-
-        // expect(max_attainment_date.toISOString()).toBe(new Date('2010-03-16 00:00:00+00').toISOString())
-        // expect(min_attainment_date.toISOString()).toBe(new Date('2010-03-16 00:00:00+00').toISOString())
+        // these don't pass
+        expect(max_attainment_date.toISOString()).toBe(new Date('2010-03-16 00:00:00+00').toISOString())
+        expect(min_attainment_date.toISOString()).toBe(new Date('2010-03-16 00:00:00+00').toISOString())
 
         expect(coursetypecode).toBe(8)
 
@@ -287,7 +286,6 @@ describe('Updater writes students the right way', () => {
         expect(sourcecode).toBe('820016')
         expect(targetcode).toBe('820042')
 
-        // 1	2009-07-30 21:00:00+00	2019-05-06 09:11:51.495+00	2019-05-06 09:11:51.495+00	014272112	62346253	820016	820042
     })
 
 })
