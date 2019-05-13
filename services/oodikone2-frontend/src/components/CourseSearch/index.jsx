@@ -5,19 +5,11 @@ import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import Timeout from '../Timeout'
 
-import { findCourses } from '../../redux/courses'
 import { makeSortCourses } from '../../selectors/courses'
 
 import './courseSearch.css'
 
 const { func, string, arrayOf, object } = PropTypes
-
-const CourseListRenderer = ({ name, code }) => <Search.Result title={`${name} ( ${code} )`} />
-
-CourseListRenderer.propTypes = {
-  name: string.isRequired,
-  code: string.isRequired
-}
 
 class CourseSearch extends Component {
   state = {
@@ -44,15 +36,15 @@ class CourseSearch extends Component {
     const { language } = this.props
     if (searchStr.length >= 3) {
       this.setState({ isLoading: true })
-      this.props.findCourses(searchStr, language)
+      this.props.findFunction(searchStr, language)
         .then(() => this.setState({ isLoading: false }))
     } else {
-      this.props.findCourses('')
+      this.props.findFunction('')
     }
   }
 
   selectCourse = (a, b) => {
-    this.setState({ searchStr: `${b.result.name} ( ${b.result.code} )` })
+    this.setState({ searchStr: b.result.title })
     this.props.handleResultSelect(a, b)
   }
 
@@ -71,7 +63,6 @@ class CourseSearch extends Component {
         onResultSelect={this.selectCourse}
         onSearchChange={this.handleSearchChange}
         results={coursesToRender}
-        resultRenderer={CourseListRenderer}
         value={searchStr}
       />
     )
@@ -80,7 +71,7 @@ class CourseSearch extends Component {
 
 CourseSearch.propTypes = {
   language: string.isRequired,
-  findCourses: func.isRequired,
+  findFunction: func.isRequired,
   courseList: arrayOf(object).isRequired,
   setTimeout: func.isRequired,
   clearTimeout: func.isRequired,
@@ -95,9 +86,5 @@ const mapStateToProps = ({ locale, courses, settings }) => ({
   translate: getTranslate(locale),
   currentLanguage: getActiveLanguage(locale).value
 })
-const mapDispatchToProps = dispatch => ({
-  findCourses: (query, language) =>
-    dispatch(findCourses(query, language))
-})
 
-export default connect(mapStateToProps, mapDispatchToProps)(Timeout(CourseSearch))
+export default connect(mapStateToProps)(Timeout(CourseSearch))

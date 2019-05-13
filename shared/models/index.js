@@ -551,6 +551,21 @@ const ThesisCourse = sequelize.define('thesis_courses', {
     type: Sequelize.ENUM([ThesisTypeEnums.BACHELOR, ThesisTypeEnums.MASTER])
   }
 })
+
+const CourseDuplicates = sequelize.define('course_duplicates', {
+  groupid: {
+    primaryKey: true,
+    type: Sequelize.INTEGER
+  },
+  coursecode: {
+    type: Sequelize.STRING,
+    references: {
+      model: Course,
+      key: 'code'
+    }
+  }
+})
+
 const ErrorData = sequelize.define('error_data', {
   id: {
     primaryKey: true,
@@ -634,6 +649,8 @@ ThesisCourse.belongsTo(Course, { foreignKey: 'courseCode', targetKey: 'code' })
 ElementDetails.hasMany(ThesisCourse, { foreignKey: 'programmeCode', sourceKey: 'code' })
 ThesisCourse.belongsTo(ElementDetails, { foreignKey: 'programmeCode', targetKey: 'code' })
 
+CourseDuplicates.belongsTo(Course, { foreignKey: 'coursecode' })
+
 module.exports = {
   MandatoryCourse,
   Student,
@@ -668,6 +685,7 @@ module.exports = {
   UsageStatistic,
   CourseGroup,
   ThesisCourse,
+  CourseDuplicates,
   ThesisTypeEnums,
   ErrorData
 }
