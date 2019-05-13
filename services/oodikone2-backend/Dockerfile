@@ -13,7 +13,7 @@ RUN npm ci
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 
-RUN if [ "${NODE_ENV}" = "production" ]; then mv /usr/src/cache/node_modules/. /usr/src/app/node_modules/s; fi
+RUN if [ "${NODE_ENV}" = "production" ]; then mv /usr/src/cache/node_modules /usr/src/app/node_modules; fi
 
 EXPOSE 8080
 CMD ["npm", "start"]
