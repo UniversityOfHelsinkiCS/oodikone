@@ -9,11 +9,11 @@ import { removePopulationFilter, setPopulationFilter } from '../../redux/populat
 
 const dropDownOptions = [
   {
-    text: 'started ',
+    text: 'started during',
     value: 'started'
   },
   {
-    text: 'did not start ',
+    text: 'started before ',
     value: 'didnotstart'
   }
 ]
@@ -68,7 +68,7 @@ class StartingThisSemester extends Component {
                 />
               </Form.Field>
               <Form.Field>
-                <label>this semester</label>
+                <label>chosen semester</label>
               </Form.Field>
               <Form.Field>
                 <Button
@@ -86,7 +86,7 @@ class StartingThisSemester extends Component {
 
     return (
       <Segment>
-        {filter.params.starting ? 'Started this semester' : 'Had started before this semester'}
+        {filter.params.starting ? 'Started during chosen semester' : 'Had started before chosen semester'}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

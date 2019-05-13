@@ -14,7 +14,6 @@ const updateStudent = async (student) => {
   const { studentInfo, studyAttainments, semesterEnrollments, studyRights } = student
   const transaction = await sequelize.transaction()
   try {
-
     await Student.upsert(studentInfo, { transaction })
     await Promise.all(semesterEnrollments.map(SE => SemesterEnrollment.upsert(SE, { transaction })))
     await Promise.all(studyAttainments.map(async ({ credit, creditTeachers, teachers, course }) => Promise.all([
@@ -37,11 +36,11 @@ const updateStudent = async (student) => {
     }
 
     await transaction.commit()
-    await updateAttainmentDates()
   } catch (err) {
     await transaction.rollback()
     console.log(err)
   }
+  await updateAttainmentDates()
 }
 
 const updateMeta = async ({
