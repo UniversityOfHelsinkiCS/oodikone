@@ -5,7 +5,7 @@ import { Header, Segment, Button, Icon, Popup, Tab, Grid } from 'semantic-ui-rea
 import { withRouter } from 'react-router-dom'
 import _ from 'lodash'
 import XLSX from 'xlsx'
-import { getStudentTotalCredits, copyToClipboard, userRoles, reformatDate, getTextIn } from '../../common'
+import { getStudentTotalCredits, copyToClipboard, userRoles, reformatDate, getTextIn, roundToTwo } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
@@ -128,7 +128,10 @@ class PopulationStudents extends Component {
       {
         key: 'credits since start',
         title: 'credits since start',
-        getRowVal: getStudentTotalCredits
+        getRowVal: (s) => {
+          const credits = getStudentTotalCredits(s)
+          return roundToTwo(credits)
+        }
       },
       {
         key: 'all credits',
@@ -287,12 +290,20 @@ class PopulationStudents extends Component {
         menuItem: 'General',
         render: () => (
           <Tab.Pane>
-            <SortableTable
-              getRowKey={s => s.studentNumber}
-              tableProps={{ celled: true }}
-              columns={columns}
-              data={this.props.selectedStudents.map(sn => students[sn])}
-            />
+            <div style={{ overflowX: 'auto' }}>
+              <SortableTable
+                getRowKey={s => s.studentNumber}
+                tableProps={{
+                  collapsing: true,
+                  basic: true,
+                  compact: 'very',
+                  padded: false,
+                  celled: true
+                }}
+                columns={columns}
+                data={this.props.selectedStudents.map(sn => students[sn])}
+              />
+            </div>
           </Tab.Pane>
         )
       },

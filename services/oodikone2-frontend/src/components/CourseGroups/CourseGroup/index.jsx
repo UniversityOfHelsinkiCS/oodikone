@@ -4,7 +4,6 @@ import { string, func, shape } from 'prop-types'
 import { withRouter } from 'react-router'
 
 import { getCompiledPath } from '../../../common'
-import { routes } from '../../../constants'
 import { callApi } from '../../../apiConnection'
 import Teachers from './Teachers'
 import Courses from './Courses'
@@ -142,7 +141,9 @@ class CourseGroup extends Component {
       academicYears
     } = this.state
 
-    const navigateTo = route => history.push(getCompiledPath(route, { studyProgrammeId }))
+    const navigateTo = programme => history.push(getCompiledPath('/study-programme/:programme', {
+      programme
+    }))
     const statisticsTeachers = teachers.filter(t => activeTeacherIds.includes(t.id))
 
     return (
@@ -158,7 +159,7 @@ class CourseGroup extends Component {
           </div>
           <Button
             icon="reply"
-            onClick={() => navigateTo(routes.studyProgramme.route)}
+            onClick={() => navigateTo(studyProgrammeId)}
             className="headerIconButton"
           />
         </Header>
