@@ -18,12 +18,12 @@ const updateStudent = async (student) => {
     await Promise.all(semesterEnrollments.map(SE => SemesterEnrollment.upsert(SE, { transaction })))
     await Promise.all(studyAttainments.map(async ({ credit, creditTeachers, teachers, course }) => Promise.all([
       Course.upsert(course, { transaction }),
-      Promise.all(course.disciplines.map(async courseDiscipline => { CourseDisciplines.upsert(courseDiscipline, { transaction }) })),
-      Promise.all(course.providers.map(provider => Provider.upsert(provider, { transaction }))),
-      Promise.all(course.courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
+      course.disciplines && Promise.all(course.disciplines.map(async courseDiscipline => { CourseDisciplines.upsert(courseDiscipline, { transaction }) })),
+      course.providers && Promise.all(course.providers.map(provider => Provider.upsert(provider, { transaction }))),
+      course.courseproviders && Promise.all(course.courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
       Credit.upsert(credit, { transaction }),
-      Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
-      Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
+      teachers && Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
+      creditTeachers && Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
     ])))
     if (studyRights) {
       await Promise.all(studyRights.map(async ({ studyRightExtent, studyright, elementDetails, studyRightElements,transfers }) => Promise.all([
@@ -34,11 +34,10 @@ const updateStudent = async (student) => {
         Promise.all(transfers.map(transfer => Transfers.upsert(transfer, { transaction })))
       ])))
     }
-
     await transaction.commit()
   } catch (err) {
-    await transaction.rollback()
     console.log(err)
+    await transaction.rollback()
   }
   await updateAttainmentDates()
 }
