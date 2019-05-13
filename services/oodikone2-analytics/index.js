@@ -31,6 +31,7 @@ const setCached = async (key, data) => {
 app.get('/productivity/:id', async (req, res) => {
   const { id } = req.params
   const data = await getCached('productivity')
+  console.log(data)
   if (data) res.json({ [id]: data[id] })
   else res.json(null)
 })
