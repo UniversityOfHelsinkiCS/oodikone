@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
+import qs from 'query-string'
 import { func, arrayOf, shape, bool, string, object } from 'prop-types'
 import { Form, Button, Message, Icon, Grid } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
@@ -44,7 +46,9 @@ class PopulationSearchForm extends Component {
     extents: arrayOf(object).isRequired,
     pending: bool, //eslint-disable-line
     getSemesters: func.isRequired,
-    semesters: shape({}).isRequired
+    semesters: shape({}).isRequired,
+    history: shape({}).isRequired,
+    location: shape({}).isRequired
   }
 
   constructor() {
@@ -61,7 +65,7 @@ class PopulationSearchForm extends Component {
   }
 
   componentDidMount() {
-    const { studyProgrammes, semesters } = this.props
+    const { studyProgrammes, semesters, location } = this.props
     if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
       this.setState({ query: this.initialQuery() }) // eslint-disable-line
       this.props.getDegreesAndProgrammes()
@@ -69,14 +73,21 @@ class PopulationSearchForm extends Component {
     if (!semesters.years) {
       this.props.getSemesters()
     }
+    if (location.search) {
+      this.fetchPopulationFromUrlParams()
+    }
   }
 
-  componentDidUpdate() {
-    const { studyProgrammes } = this.props
+  componentDidUpdate(prevProps) {
+    const { studyProgrammes, location } = this.props
     if (studyProgrammes
       && Object.values(studyProgrammes).length === 1
       && !this.state.query.studyRights.programme) {
       this.handleProgrammeChange(null, { value: Object.values(studyProgrammes)[0].code })
+    }
+    const queryParamsChanged = prevProps.location.search !== this.props.location.search
+    if (location.search && queryParamsChanged) {
+      this.fetchPopulationFromUrlParams()
     }
   }
 
@@ -95,8 +106,34 @@ class PopulationSearchForm extends Component {
 
   clearPopulations = () => this.props.clearPopulations()
 
-  fetchPopulation = () => {
+  parseQueryFromUrl = () => {
+    const { location } = this.props
+    const initial = this.initialQuery()
+    const { studyRights, months, ...rest } = qs.parse(location.search)
+    const query = {
+      ...initial,
+      ...rest,
+      studyRights: JSON.parse(studyRights),
+      months: JSON.parse(months)
+    }
+    return query
+  }
+
+  pushQueryToUrl = (query) => {
+    const { history } = this.props
+    const { studyRights, ...rest } = query
+    const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
+    const searchString = qs.stringify(queryObject)
+    history.push({ search: searchString })
+  }
+
+  handleSubmit = () => {
     const { query } = this.state
+    this.pushQueryToUrl(query)
+    this.fetchPopulation(query)
+  }
+
+  fetchPopulation = (query) => {
     let queryCodes = []
     queryCodes = [...Object.values(query.studyRights).filter(e => e != null)]
     const backendQuery = { ...query, studyRights: queryCodes }
@@ -316,6 +353,12 @@ class PopulationSearchForm extends Component {
   }
 
   getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
+
+  fetchPopulationFromUrlParams() {
+    const query = this.parseQueryFromUrl()
+    this.setState({ query })
+    this.fetchPopulation(query)
+  }
 
   initialQuery = () => ({
     year: Datetime.moment('2017-01-01').year(),
@@ -612,7 +655,7 @@ class PopulationSearchForm extends Component {
 
         <Message error color="blue" header={errorText} />
 
-        <Form.Button onClick={this.fetchPopulation} disabled={isQueryInvalid}>
+        <Form.Button onClick={this.handleSubmit} disabled={isQueryInvalid}>
           {translate('populationStatistics.addPopulation')}
         </Form.Button>
       </Form>
@@ -634,7 +677,7 @@ const mapStateToProps = ({ semesters, settings, populations, populationDegreesAn
   })
 }
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   getPopulationStatistics,
   getPopulationCourses,
   getPopulationFilters,
@@ -644,4 +687,4 @@ export default connect(mapStateToProps, {
   clearPopulations,
   setLoading,
   getSemesters
-})(PopulationSearchForm)
+})(PopulationSearchForm))
