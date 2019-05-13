@@ -10,7 +10,9 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
   dispatchGetThroughput }) => {
   const morethan = x => (total, amount) => (amount >= x ? total + 1 : total)
   if (error) return <h1>Oh no so error {error}</h1>
-  const data = throughput ? throughput.data.filter(year => year.credits.length > 0) : []
+
+  const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
+
   let thesisTypes = []
   if (thesis) {
     thesisTypes = thesis.map(t => t.thesisType)
