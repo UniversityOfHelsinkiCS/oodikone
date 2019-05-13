@@ -233,6 +233,7 @@ services:
       NATS_URI: nats://nats:4222
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
+      TEST_DB_SCHEMA: updater_test
 
 
   analytics:

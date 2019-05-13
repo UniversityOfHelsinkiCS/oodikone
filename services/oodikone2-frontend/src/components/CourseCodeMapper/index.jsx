@@ -1,19 +1,21 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 import { connect } from 'react-redux'
-import { Header, Button, Message, Table, Input, Segment, Icon, Loader } from 'semantic-ui-react'
+import { Header, Button, Message, Table, Input, Segment, Icon, Loader, Label } from 'semantic-ui-react'
 import { getDuplicates, addDuplicate, removeDuplicate } from '../../redux/coursecodeduplicates'
 
 import CourseSearch from '../CourseSearch'
 import './courseCodeMapper.css'
 import { getTextIn } from '../../common'
+import { findCourses } from '../../redux/courses'
 
-const { func, shape, string } = PropTypes
+const { func, shape, string, objectOf, arrayOf, bool } = PropTypes
 
 class CourseCodeMapper extends Component {
   constructor(props) {
     super(props)
-    props.getDuplicates()
+    props.getDuplicates(props.studyprogramme)
   }
 
   state = {
@@ -29,53 +31,31 @@ class CourseCodeMapper extends Component {
   }
 
   getTableRows = () => {
-    const { courseCodeDuplicates, language } = this.props
+    const { courseCodeDuplicates } = this.props
+    const { codeFilter, nameFilter } = this.state
     const { data } = courseCodeDuplicates
-    const filteredKeys = this.filterNames(data, this.filterCodes(data))
+    const filteredKeys = Object.keys(data)
+      .filter(k => data[k].some(e => e.code.toLocaleLowerCase().includes(codeFilter.toLocaleLowerCase())))
+      .filter(k => data[k].some(e => this.getName(e.name).toLocaleLowerCase().includes(nameFilter.toLocaleLowerCase())))
     const rows = filteredKeys.map((key) => {
-      const course = courseCodeDuplicates.data[key]
+      const duplicates = _.sortBy(courseCodeDuplicates.data[key], ['code'])
+      const maincourse = duplicates.find(e => e.code === key)
       return (
-        <Table.Row key={key + Object.keys(course.alt).map(altkey => altkey + course.alt[key])}>
-          <Table.Cell>{key}</Table.Cell>
-          <Table.Cell>{this.getName(course.name)}</Table.Cell>
-          <Table.Cell>{course.main}</Table.Cell>
-          <Table.Cell>{Object.keys(course.alt).map(altkey => (
-            <React.Fragment key={course.alt[altkey] + altkey}>
-              {altkey}
-              <Icon color="red" name="remove circle" onClick={this.removeDuplicate(key, altkey)} />
-            </React.Fragment>))}
-          </Table.Cell>
+        <Table.Row key={key}>
+          <Table.Cell>{`${key} ${this.getName(maincourse.name)}`}</Table.Cell>
           <Table.Cell>
-            {Object.keys(course.alt).map(altKey => getTextIn(course.alt[altKey], language)).toString()}
+            <Label.Group>
+              {duplicates.map(e => (
+                <Label key={e.code}>
+                  {`${e.code} ${this.getName(e.name)}`}
+                  <Icon style={{ margin: '0 0 0 5px' }} color="red" name="remove circle" title="Remove from group" onClick={this.removeDuplicate(e.code)} />
+                </Label>
+              ))}
+            </Label.Group>
           </Table.Cell>
         </Table.Row>)
     })
     return rows
-  }
-
-  filterNames = (duplicates, keys) => {
-    const filter = this.state.nameFilter.toLocaleLowerCase()
-    return keys.filter((key) => {
-      const course = duplicates[key]
-      return (
-        this.getName(course.name).toLocaleLowerCase().includes(filter) ||
-        Object.values(course.alt).find(name =>
-          this.getName(name).toLocaleLowerCase().includes(filter))
-      )
-    })
-  }
-
-  filterCodes = (duplicates) => {
-    const filter = this.state.codeFilter.toLocaleLowerCase()
-    const keys = Object.keys(duplicates)
-    return keys.filter((key) => {
-      const course = duplicates[key]
-      return (
-        key.toLocaleLowerCase().includes(filter) ||
-        Object.keys(course.alt).find(code =>
-          code.toLocaleLowerCase().includes(filter))
-      )
-    })
   }
 
   handleCodeFilterChange = (e) => {
@@ -98,18 +78,19 @@ class CourseCodeMapper extends Component {
     this.props.addDuplicate(code1, code2)
   }
 
-  removeDuplicate = (code1, code2) => () => {
-    this.props.removeDuplicate(code1, code2)
+  removeDuplicate = code => () => {
+    this.props.removeDuplicate(code)
   }
 
   render() {
+    const { findCoursesDispatch } = this.props
     const { pending } = this.props.courseCodeDuplicates
     const disabled = !((this.state.code1 && this.state.code2) &&
       (this.state.code1 !== this.state.code2))
+    const find = (query, language) => findCoursesDispatch(query, language)
     return (
       <div className="segmentContainer">
         <Segment className="contentSegment">
-          <Header className="segmentTitle" size="large">Course Code Mapping</Header>
           <Message
             header="Map corresponding course codes to each other"
             content="By default courses with different codes are considered as separate courses.
@@ -133,8 +114,8 @@ class CourseCodeMapper extends Component {
               </Segment>
               <Segment>
                 <Header>Add new corresponding code</Header>
-                <CourseSearch handleResultSelect={this.handleResultSelect1} />
-                <CourseSearch handleResultSelect={this.handleResultSelect2} />
+                <CourseSearch handleResultSelect={this.handleResultSelect1} findFunction={find} />
+                <CourseSearch handleResultSelect={this.handleResultSelect2} findFunction={find} />
                 <Button
                   disabled={disabled}
                   className="button"
@@ -144,14 +125,11 @@ class CourseCodeMapper extends Component {
               </Segment>
             </Segment.Group>
           </Segment.Group>
-          <Table striped>
+          <Table striped celled>
             <Table.Header>
               <Table.Row>
-                <Table.HeaderCell>Code</Table.HeaderCell>
-                <Table.HeaderCell>Name</Table.HeaderCell>
-                <Table.HeaderCell>Main code</Table.HeaderCell>
-                <Table.HeaderCell>Alternative code(s)</Table.HeaderCell>
-                <Table.HeaderCell>Alternative name(s)</Table.HeaderCell>
+                <Table.HeaderCell>Main course</Table.HeaderCell>
+                <Table.HeaderCell>Grouped courses</Table.HeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -166,10 +144,23 @@ class CourseCodeMapper extends Component {
 
 CourseCodeMapper.propTypes = {
   language: string.isRequired,
+  studyprogramme: string.isRequired,
+  findCoursesDispatch: func.isRequired,
   getDuplicates: func.isRequired,
   addDuplicate: func.isRequired,
   removeDuplicate: func.isRequired,
-  courseCodeDuplicates: shape({}).isRequired
+  courseCodeDuplicates: shape({
+    pending: bool,
+    error: bool,
+    data: objectOf(arrayOf(shape({
+      name: shape({
+        en: string,
+        fi: string,
+        sv: string
+      }),
+      code: string
+    })))
+  }).isRequired
 }
 
 const mapStateToProps = ({ courseCodeDuplicates, settings }) => ({
@@ -178,12 +169,14 @@ const mapStateToProps = ({ courseCodeDuplicates, settings }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getDuplicates: () =>
-    dispatch(getDuplicates()),
+  getDuplicates: studyprogramme =>
+    dispatch(getDuplicates(studyprogramme)),
   addDuplicate: (code1, code2) =>
     dispatch(addDuplicate(code1, code2)),
-  removeDuplicate: (code1, code2) =>
-    dispatch(removeDuplicate(code1, code2))
+  removeDuplicate: code =>
+    dispatch(removeDuplicate(code)),
+  findCoursesDispatch: (query, language) =>
+    dispatch(findCourses(query, language))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(CourseCodeMapper)

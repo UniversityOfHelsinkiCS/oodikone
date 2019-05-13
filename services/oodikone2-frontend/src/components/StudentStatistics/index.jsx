@@ -12,7 +12,6 @@ import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
-
 class StudentStatistics extends Component { //eslint-disable-line
   render() {
     const { translate, match } = this.props
