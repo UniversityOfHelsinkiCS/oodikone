@@ -214,7 +214,6 @@ services:
       - NATS_URI=nats://nats:4222
       - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
       - TOKEN=toskab1gs8cret5
-    container_name: updater_api
 
   updater_writer:
     image: node:10-alpine
