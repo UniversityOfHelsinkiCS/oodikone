@@ -104,7 +104,7 @@ class PopulationStudents extends Component {
         .reduce((acc, elemArr) => {
           elemArr.filter(el => el.element_detail.type === 30).forEach(el =>
             acc.push(el.element_detail.name.fi))
-          return acc
+          return acc.join(', ')
         }, []))
 
     const columns = []
@@ -342,6 +342,7 @@ class PopulationStudents extends Component {
 
     const generateWorkbook = () => {
       const data = this.props.selectedStudents.map(sn => students[sn])
+      console.log(data[0])
       const sortedMandatory = _.sortBy(
         this.props.mandatoryCourses,
         [(m) => {
@@ -359,6 +360,7 @@ class PopulationStudents extends Component {
         'transferred from': (s.transferredStudyright ? transferFrom(s) : ''),
         priority: priorityText(s.studyrights),
         extent: extentCodes(s.studyrights),
+        studytrack: studytrack(s.studyrights),
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber),
         ...sortedMandatory.reduce((acc, m) => {
