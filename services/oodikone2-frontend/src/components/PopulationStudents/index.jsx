@@ -291,12 +291,20 @@ class PopulationStudents extends Component {
         menuItem: 'General',
         render: () => (
           <Tab.Pane>
-            <SortableTable
-              getRowKey={s => s.studentNumber}
-              tableProps={{ celled: true }}
-              columns={columns}
-              data={this.props.selectedStudents.map(sn => students[sn])}
-            />
+            <div style={{ overflowX: 'auto' }}>
+              <SortableTable
+                getRowKey={s => s.studentNumber}
+                tableProps={{
+                  collapsing: true,
+                  basic: true,
+                  compact: 'very',
+                  padded: false,
+                  celled: true
+                }}
+                columns={columns}
+                data={this.props.selectedStudents.map(sn => students[sn])}
+              />
+            </div>
           </Tab.Pane>
         )
       },

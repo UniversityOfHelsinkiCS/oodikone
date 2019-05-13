@@ -1,5 +1,8 @@
 const express = require('express')
 const _ = require('lodash')
+
+const morgan = require('morgan')
+
 const { redisClient } = require('./src/services/redis')
 
 const app = express()
@@ -7,6 +10,7 @@ const port = 4568
 const bodyParser = require('body-parser')
 
 app.use(bodyParser.json())
+app.use(morgan('tiny'))
 
 app.get('/ping', (req, res) => res.json({ message: 'pong'}))
 
@@ -31,8 +35,9 @@ const setCached = async (key, data) => {
 app.get('/productivity/:id', async (req, res) => {
   const { id } = req.params
   const data = await getCached('productivity')
-  console.log(data)
-  if (data) res.json({ [id]: data[id] })
+
+  if (data && data[id]) res.json({ [id]: data[id] })
+
   else res.json(null)
 })
 app.post('/productivity', async (req, res) => {
@@ -49,7 +54,9 @@ app.patch('/productivity', async (req, res) => {
 app.get('/throughput/:id', async (req, res) => {
   const { id } = req.params
   const data = await getCached('throughput')
-  if (data) res.json({ [id]: data[id] })
+
+  if (data && data[id]) res.json({ [id]: data[id] })
+
   else res.json(null)
 })
 app.post('/throughput', async (req, res) => {

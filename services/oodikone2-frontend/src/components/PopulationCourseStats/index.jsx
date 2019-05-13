@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Table, Form, Input, Popup, Button } from 'semantic-ui-react'
+import { Table, Form, Input, Popup, Button, Segment } from 'semantic-ui-react'
 import { func, arrayOf, object, number, shape, string, oneOf, bool } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
@@ -490,8 +490,9 @@ class PopulationCourseStats extends Component {
             </Button>
           </Form.Field>
         </Form>
-
-        {this.renderActiveView()}
+        <Segment basic style={{ overflowX: 'auto' }}>
+          {this.renderActiveView()}
+        </Segment>
       </div>
     )
   }
