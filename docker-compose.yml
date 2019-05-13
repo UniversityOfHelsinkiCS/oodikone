@@ -133,10 +133,12 @@ services:
   frontend:
     build:
       context: services/oodikone2-frontend
-      dockerfile: dev.Dockerfile
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run docker']
     restart: unless-stopped
     ports:
-      - "8081:8081"
+      - "8081:5000"
       - "7777:7777"
     environment:
       BACKEND_ADDR: backend
@@ -146,7 +148,6 @@ services:
       USAGE_ADMINER_URL: http://localhost:5050/?pgsql=usage_db&username=postgres
     volumes:
       - ./services/oodikone2-frontend/:/usr/src/app
-      - /usr/src/app/node_modules
     container_name: frontend
 
   # oodilearn:
@@ -168,11 +169,12 @@ services:
   userservice:
     build:
       context: services/oodikone2-userservice
-      dockerfile: dev.Dockerfile
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/oodikone2-userservice/:/usr/src/app
-      - /usr/src/app/node_modules
     ports:
       - 4567:4567
     environment:
@@ -187,7 +189,9 @@ services:
   usageservice:
     build:
       context: services/oodikone2-usageservice
-      dockerfile: dev.Dockerfile
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     ports:
       - 545:545
@@ -197,17 +201,17 @@ services:
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
     volumes:
       - ./services/oodikone2-usageservice/:/usr/src/app
-      - /usr/src/app/node_modules
     container_name: usageservice
 
   updater_api:
     build:
       context: services/updater_api
-      dockerfile: dev.Dockerfile
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/updater_api/:/usr/src/app
-      - /usr/src/app/node_modules
     depends_on:
       - nats
     environment:
@@ -219,11 +223,12 @@ services:
     image: node:10-alpine
     build:
       context: services/updater_writer
-      dockerfile: dev.Dockerfile
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/updater_writer/:/usr/src/app
-      - /usr/src/app/node_modules
       - ./shared/models:/usr/src/app/models
       - ./shared/migrations:/usr/src/app/database/migrations
     depends_on:
@@ -239,11 +244,12 @@ services:
   analytics:
     build:
       context: services/oodikone2-analytics
-      dockerfile: dev.Dockerfile
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/oodikone2-analytics/:/usr/src/app
-      - /usr/src/app/node_modules
     ports:
       - 4568:4568
     environment:
