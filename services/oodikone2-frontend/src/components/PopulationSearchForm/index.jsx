@@ -74,18 +74,20 @@ class PopulationSearchForm extends Component {
       this.props.getSemesters()
     }
     if (location.search) {
-      const query = this.parseQueryFromUrl()
-      this.setState({ query })
-      this.fetchPopulation(query)
+      this.fetchPopulationFromUrlParams()
     }
   }
 
-  componentDidUpdate() {
-    const { studyProgrammes } = this.props
+  componentDidUpdate(prevProps) {
+    const { studyProgrammes, location } = this.props
     if (studyProgrammes
       && Object.values(studyProgrammes).length === 1
       && !this.state.query.studyRights.programme) {
       this.handleProgrammeChange(null, { value: Object.values(studyProgrammes)[0].code })
+    }
+    const queryParamsChanged = prevProps.location.search !== this.props.location.search
+    if (location.search && queryParamsChanged) {
+      this.fetchPopulationFromUrlParams()
     }
   }
 
@@ -125,13 +127,18 @@ class PopulationSearchForm extends Component {
     history.push({ search: searchString })
   }
 
+  handleSubmit = () => {
+    const { query } = this.state
+    this.pushQueryToUrl(query)
+    this.fetchPopulation(query)
+  }
+
   fetchPopulation = (query) => {
     let queryCodes = []
     queryCodes = [...Object.values(query.studyRights).filter(e => e != null)]
     const backendQuery = { ...query, studyRights: queryCodes }
     const uuid = uuidv4()
     const request = { ...backendQuery, uuid }
-    this.pushQueryToUrl(query)
     this.setState({ isLoading: true })
     this.props.setLoading()
     Promise.all([
@@ -346,6 +353,12 @@ class PopulationSearchForm extends Component {
   }
 
   getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
+
+  fetchPopulationFromUrlParams() {
+    const query = this.parseQueryFromUrl()
+    this.setState({ query })
+    this.fetchPopulation(query)
+  }
 
   initialQuery = () => ({
     year: Datetime.moment('2017-01-01').year(),
@@ -642,7 +655,7 @@ class PopulationSearchForm extends Component {
 
         <Message error color="blue" header={errorText} />
 
-        <Form.Button onClick={() => this.fetchPopulation(query)} disabled={isQueryInvalid}>
+        <Form.Button onClick={this.handleSubmit} disabled={isQueryInvalid}>
           {translate('populationStatistics.addPopulation')}
         </Form.Button>
       </Form>
