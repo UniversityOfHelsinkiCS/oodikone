@@ -1,5 +1,5 @@
 
-describe('Population Statistics tests', () => {
+describe('Student Statistics tests', () => {
     beforeEach(() => {
         cy.server({
             onAnyRequest: function (route, proxy) {

@@ -18,23 +18,22 @@ const getAllStudentInformationFromApi = async studentnumber => {
     courseEnrollments
   }
 }
+
 const formatStudyrights = async (api, studentnumber) => {
   if (api.studyrights.length === 0) {
     console.log(`No studyrights for ${studentnumber}`)
-    return
+    return []
   }
-  for (let data of api.studyrights) {
-    const studyRightExtent = mapper.studyrightDataToExtent(data)
-    const studyright = mapper.getStudyRightFromData(data, studentnumber)
-    let elementDetails = []
-    let studyRightElements = []
-    for (let element of data.elements) {
-      elementDetails = [...elementDetails, mapper.elementDetailFromData(element)]
-      studyrightElements = [...studyRightElements, mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber)]
-    }
-    const transfers = mapper.getTransfersFromData(data, studentnumber)
+  return api.studyrights.map(studyrightData => {
+    const studyRightExtent = mapper.studyrightDataToExtent(studyrightData)
+    const studyright = mapper.getStudyRightFromData(studyrightData, studentnumber)
+
+    const elementDetails = studyrightData.elements.map(element => mapper.elementDetailFromData(element))
+    const studyRightElements = studyrightData.elements.map(element => mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber))
+
+    const transfers = mapper.getTransfersFromData(studyrightData, studentnumber)
     return { studyRightExtent, studyright, elementDetails, studyRightElements, transfers }
-  }
+  })
 }
 
 const formatCourseEnrollments = async (apidata, studentnumber) => await Promise.all(apidata.courseEnrollments.map(enrollment => mapper.studentEnrollmentToModels(enrollment, studentnumber)))
