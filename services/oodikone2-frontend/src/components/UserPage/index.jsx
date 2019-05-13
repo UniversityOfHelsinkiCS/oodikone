@@ -1,15 +1,16 @@
 import React, { Component } from 'react'
-import { Button, Card, Divider, Form, List, Icon, Transition } from 'semantic-ui-react'
+import { Button, Card, Divider, List, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
-import { getRolesWithoutRefreshToken, getIdWithoutRefreshToken, setToken, getTextIn } from '../../common'
-import { removeUserUnits, getAccessGroups, modifyAccessGroups } from '../../redux/users'
+import { getTextIn } from '../../common'
+import { removeUserUnits, getAccessGroups } from '../../redux/users'
 
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
 import { superLogin } from '../../apiConnection'
 import AccessRights from './AccessRights'
+import AccessGroups from './AccessGroups'
 
 const formatToDropdown = (elements, language) => {
   const options = Object.values(elements).map(e => ({
@@ -24,9 +25,7 @@ const formatToDropdown = (elements, language) => {
 class UserPage extends Component {
   state = {
     degree: undefined,
-    programme: undefined,
-    groups: this.props.user.accessgroup ? this.props.user.accessgroup.map(ag => ag.id) : [],
-    visible: false
+    programme: undefined
   }
 
   async componentDidMount() {
@@ -40,34 +39,6 @@ class UserPage extends Component {
   getDisabledUnits = (units, enabled) => {
     const enabledIds = new Set(enabled.map(element => element.code))
     return units.filter(u => !enabledIds.has(u.id))
-  }
-
-  handleChange = (e, { name, value }) => this.setState({ [name]: value })
-
-  enableAccessRightToUser = userid => async () => {
-    const { groups } = this.state
-
-    const accessGroups = this.props.accessGroups.reduce((acc, ag) => {
-      if (groups.includes(ag.id)) {
-        return { ...acc, [ag.group_code]: true }
-      }
-      return { ...acc, [ag.group_code]: false }
-    }, {})
-
-    await this.props.modifyAccessGroups(userid, accessGroups)
-    this.setState({
-      degree: undefined,
-      programme: undefined,
-      visible: true
-    })
-    setTimeout(() => {
-      if (userid === getIdWithoutRefreshToken()) {
-        setToken(null)
-        window.location.reload()
-      } else {
-        this.setState({ visible: false })
-      }
-    }, 5000)
   }
 
   removeAccess = (uid, unit) => () => this.props.removeUserUnits(uid, [unit])
@@ -106,14 +77,6 @@ class UserPage extends Component {
   }
 
   allSpecializationIds = () => this.specializationOptions().map(sp => sp.key)
-
-  accessGroupOptions = accessGroups => (accessGroups ?
-    accessGroups.map(ag => ({
-      key: ag.id,
-      text: ag.group_code,
-      value: ag.id,
-      description: ag.group_info
-    })) : [])
 
   showAs = async (uid) => {
     await superLogin(uid)
@@ -158,7 +121,7 @@ class UserPage extends Component {
   }
 
   render() {
-    const { user, pending, associations } = this.props
+    const { user, associations } = this.props
     // ugly trick to add associations to study tracks, should be moved to backend
     if (associations.programmes) {
       const programmes = user.elementdetails.filter(e => e.type === 20).map(e => e.code)
@@ -181,8 +144,6 @@ class UserPage extends Component {
       })
     }
 
-    const accessGroupOptions = this.accessGroupOptions(this.props.accessGroups)
-    const enabledAccessGroups = this.state.groups
     return this.props.accessGroups ?
       <div>
         <Button icon="arrow circle left" content="Back" onClick={this.props.goBack} />
@@ -210,41 +171,7 @@ class UserPage extends Component {
             <Card.Content>
               <Card.Header content="Add access group rights" />
               <Divider />
-              <Card.Description>
-                <Form loading={pending}>
-                  <Form.Dropdown
-                    name="groups"
-                    label="Access Groups"
-                    placeholder="Select access groups"
-                    fluid
-                    multiple
-                    options={accessGroupOptions}
-                    defaultValue={enabledAccessGroups}
-                    onChange={this.handleChange}
-                    clearable
-                  />
-                  <Divider />
-                  <Button
-                    basic
-                    fluid
-                    positive
-                    content="Save"
-                    onClick={this.enableAccessRightToUser(user.id)}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Transition.Group animation="drop" duration="1000">
-                      {this.state.visible && <Icon circular color="green" size="massive" name="check" />}
-                    </Transition.Group>
-                  </div>
-                  {this.props.isAdmin && user.is_enabled ? <Button
-                    basic
-                    fluid
-                    positive
-                    content="Show Oodikone as this user"
-                    onClick={() => this.showAs(user.username)}
-                  /> : null}
-                </Form>
-              </Card.Description>
+              <AccessGroups user={user} />
             </Card.Content>
           </Card>
           <Card fluid>
@@ -292,9 +219,7 @@ UserPage.propTypes = {
     push: func.isRequired
   }).isRequired,
   getAccessGroups: func.isRequired,
-  accessGroups: arrayOf(object).isRequired,
-  modifyAccessGroups: func.isRequired,
-  isAdmin: bool.isRequired
+  accessGroups: arrayOf(object).isRequired
 }
 
 const mapStateToProps = state => ({
@@ -302,13 +227,11 @@ const mapStateToProps = state => ({
   units: state.units.data,
   associations: state.populationDegreesAndProgrammesUnfiltered.data,
   pending: !!state.populationDegreesAndProgrammesUnfiltered.pending,
-  accessGroups: state.users.accessGroupsData || [],
-  isAdmin: getRolesWithoutRefreshToken().includes('admin')
+  accessGroups: state.users.accessGroupsData || []
 })
 
 export default connect(mapStateToProps, {
   removeUserUnits,
   getDegreesAndProgrammesUnfiltered,
-  getAccessGroups,
-  modifyAccessGroups
+  getAccessGroups
 })(withRouter(UserPage))
