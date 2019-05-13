@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { func, shape, arrayOf, string } from 'prop-types'
-import { Segment, Header, Popup, Button } from 'semantic-ui-react'
+import { func, shape, arrayOf, string, bool } from 'prop-types'
+import { Segment, Header, Popup, Button, Portal, Message } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 
@@ -14,8 +14,7 @@ import { refreshFilters } from '../../redux/populationFilters'
 
 const PopulationCourses = ({
   populationCourses,
-  filters,
-  courseTableFilters,
+  refreshNeeded,
   dispatchRefreshFilters,
   selectedStudents,
   translate,
@@ -28,24 +27,8 @@ const PopulationCourses = ({
     gpc({ ...populationCourses.query, uuid: uuidv4(), selectedStudents })
   }
 
-  const filtersAreEqual = () => {
-    if (filters.length !== courseTableFilters.length) return false
-    if (filters.find(fil => !courseTableFilters.includes(fil.id))) return false
-    return true
-  }
-
   return (
     <Segment>
-      <Button
-        content="Refresh table"
-        labelPosition="right"
-        primary
-        onClick={reloadCourses}
-        floated="right"
-        icon="refresh"
-        compact
-        disabled={filtersAreEqual()}
-      />
       <Header size="medium" dividing >
         <Popup
           trigger={<Header.Content>{translate('populationCourses.header')}</Header.Content>}
@@ -56,6 +39,27 @@ const PopulationCourses = ({
         />
         <InfoBox content={CoursesOf} />
       </Header>
+
+      <Portal open={refreshNeeded}>
+        <Message
+          style={{
+            left: '80%',
+            position: 'fixed',
+            top: '5%'
+          }}
+        >
+          Filters updated. Click to here to recalculate course table
+          <Button
+            key="refreshCourses"
+            primary
+            onClick={reloadCourses}
+            icon="refresh"
+            style={{ marginLeft: '10px' }}
+            compact
+            // disabled={filtersAreEqual()}
+          />
+        </Message>
+      </Portal>
       <SegmentDimmer translate={translate} isLoading={pending} />
       <PopulationCourseStats
         key={populationCourses.query.uuid}
@@ -70,8 +74,7 @@ const PopulationCourses = ({
 
 PopulationCourses.propTypes = {
   populationCourses: shape({}).isRequired,
-  filters: arrayOf(shape({})).isRequired,
-  courseTableFilters: arrayOf(string).isRequired,
+  refreshNeeded: bool.isRequired,
   translate: func.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   getPopulationCourses: func.isRequired,
@@ -80,8 +83,7 @@ PopulationCourses.propTypes = {
 
 const mapStateToProps = ({ populationCourses, locale, populationFilters }) => ({
   populationCourses,
-  filters: populationFilters.filters,
-  courseTableFilters: populationFilters.courseTableFilters,
+  refreshNeeded: populationFilters.refreshNeeded,
   translate: getTranslate(locale)
 })
 
