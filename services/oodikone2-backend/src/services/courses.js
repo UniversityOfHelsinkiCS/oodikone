@@ -4,9 +4,8 @@ const {
   sequelize, Student, Credit,
   Course, CourseType, Discipline,
   ElementDetails, StudyrightElement,
-  Studyright, Semester
+  Studyright, Semester, CourseDuplicates,
 } = require('../models')
-const { redisClient } = require('../services/redis')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../services/course_yearly_stats_counter')
 const _ = require('lodash')
@@ -388,102 +387,170 @@ const findDuplicates = async (oldPrefixes, newPrefixes) => {
    where(
     (${oldPrefixQuery})
     AND (${newPrefixQuery})
-    AND ou.name not like 'Kandidaatin%'
-    AND ou.name not like 'Muualla suoritetut%'
-    AND ou.name not like 'Tutkimusharjoittelu%'
-    AND ou.name not like 'Väitöskirja%'
-    AND ou.name not like '%erusopinnot%'
-    AND ou.name not like '%ineopinnot%'
-    AND ou.name not like '%Pro gradu -tutkielma%'
+    AND ou.name->>'fi' not like 'Kandidaatin%'
+    AND ou.name->>'fi' not like 'Muualla suoritetut%'
+    AND ou.name->>'fi' not like 'Tutkimusharjoittelu%'
+    AND ou.name->>'fi' not like 'Väitöskirja%'
+    AND ou.name->>'fi' not like '%erusopinnot%'
+    AND ou.name->>'fi' not like '%ineopinnot%'
+    AND ou.name->>'fi' not like '%Pro gradu -tutkielma%'
   )
   order by name`)
 }
 
-const getAllDuplicates = async () => {
+const getMainCodes = () => {
+  return CourseDuplicates.findAll()
+}
 
-  let results = await redisClient.getAsync('duplicates')
-  if (!results) {
-    await redisClient.setAsync('duplicates', '{}')
-    results = await redisClient.getAsync('duplicates')
+const deleteDuplicateCode = async (code) => {
+  await CourseDuplicates.destroy({
+    where: {
+      coursecode: code
+    }
+  })
+}
+
+const getDuplicateCodesWithCourses = () => {
+  return CourseDuplicates.findAll({
+    include: {
+      model: Course,
+    }
+  })
+}
+
+const getDuplicatesToIdMap = () => {
+  return getMainCodes().then(res => res.reduce((acc, e) => {
+    acc[e.coursecode] = e.groupid
+    return acc
+  }, {}))
+}
+
+const getIdToDuplicatesMapWithCourse = () => {
+  return getDuplicateCodesWithCourses().then(res => res.reduce((acc, e) => {
+    acc[e.groupid] = acc[e.groupid] || []
+    acc[e.groupid].push(e.course)
+    return acc
+  }, {}))
+}
+
+const getMainCodeToDuplicates = async () => {
+  const all = await getIdToDuplicatesMapWithCourse()
+  const maincodeToDuplicates = Object.values(all).reduce((acc, courses) => {
+    const main = _.orderBy(
+      courses,
+      [
+        (c) => {
+          if (c.code.match(/^A/)) return 4 // open university codes come last
+          if (c.code.match(/^\d/)) return 2 // old numeric codes come second
+          if (c.code.match(/^[A-Za-z]/)) return 1 // new letter based codes come first
+          return 3 // unknown, comes before open uni?
+        },
+        c => c.latest_instance_date || new Date,
+        'code'
+      ],
+      ['asc', 'desc', 'desc']
+    )[0]
+    acc[main.code] = {
+      maincourse: { code: main.code, name: main.name },
+      duplicates: courses.map( c => ({ code: c.code, name: c.name }))
+    }
+    return acc
+  }, {})
+  return maincodeToDuplicates
+}
+
+const getCodeToMainCodeMap = async () => {
+  try {
+    const maincodeToDuplicates = await getMainCodeToDuplicates()
+    const codeToMainCode = Object.values(maincodeToDuplicates).reduce((acc, d) => {
+      const maincode = d.maincourse.code
+      d.duplicates.forEach((c) => {
+        acc[c.code] = maincode
+      })
+      return acc
+    }, {})
+    return codeToMainCode
+  } catch (e) {
+    console.error(e)
   }
-  return JSON.parse(results)
+  return {}
+}
+
+const getMainCodesMap = async () => {
+  return await getCodeToMainCodeMap()
+}
+
+const getMaincodeToDuplicateCodesMap = async () => {
+  try {
+    const codeToMainCodeMap = await getCodeToMainCodeMap()
+    const codes = Object.keys(codeToMainCodeMap)
+    const mainCodeToCoursesMap = codes.reduce((acc, code) => {
+      const maincode = codeToMainCodeMap[code]
+      const duplicates = acc[maincode] || []
+      duplicates.push(code)
+      acc[maincode] = duplicates
+      return acc
+    }, {})
+    return mainCodeToCoursesMap
+  } catch (e) {
+    console.error(e)
+  }
+  return {}
+}
+
+const getMainCourseToCourseMap = async (/*programme*/) => {
+  try {
+    const codeToMainCodeMap = await getCodeToMainCodeMap()
+    const courses = await byCodes(Object.keys(codeToMainCodeMap))
+    const mainCodeToCoursesMap = courses.reduce((acc, course) => {
+      const maincode = codeToMainCodeMap[course.code]
+      const duplicates = acc[maincode] || []
+      duplicates.push(course)
+      acc[maincode] = duplicates
+      return acc
+    }, {})
+    return mainCodeToCoursesMap
+  } catch (e) {
+    console.error(e)
+  }
+  return {}
 }
 
 const getDuplicateCodes = async (code) => {
-  const allCodes = await getAllDuplicates()
-  const results = allCodes[code]
-  if (results) return results
-  return null
+  const maincodeToDuplicatesMap = await getMaincodeToDuplicateCodesMap()
+  const duplicates = maincodeToDuplicatesMap[code]
+  return duplicates
 }
 
-const getMainCode = async (code) => {
-  const codes = await getDuplicateCodes(code)
-  if (!codes) return code
-  return codes.main
-}
-
-
-const setDuplicateCode = async (code, duplicate) => {
-  // TODO: decide main code by choosing a course that has been held most recently
-  const isMainCode = (code) => code.slice(0, 2).split('').filter(c => Number(c)).length === 0
-
-  const course = await byCode(code)
-  const duplCourse = await byCode(duplicate)
-  if (!course || !duplCourse) {
-    return
-  }
-
-  // If an old code is mapped to another, select first alphabetically
-  const selectMain = (code, dupl) => {
-    const codes = [code, ...Object.keys(dupl.alt)]
-    return codes.sort()[0]
-  }
-
-  if (code !== duplicate) {
-    const all = await getAllDuplicates()
-    let main = ''
-    if (!all[code]) {
-      if (isMainCode(code)) {
-        if (isMainCode(duplicate)) {
-          main = code.localeCompare(duplicate) ? code : duplicate
+const setDuplicateCode = async (code1, code2) => {
+  if (code1 !== code2) {
+    try {
+      const course1 = await byCode(code1)
+      const course2 = await byCode(code2)
+      if (course1 && course2) {
+        const all = await getDuplicatesToIdMap()
+        // make sure both dont have a group
+        if ([all[code1], all[code2]].filter(e=>e).length <= 1) {
+          let groupid = all[code1] || all[code2]
+          if (!groupid) {
+            // neither has a group, make one
+            groupid = Math.max(0, ...Object.values(all).filter(e=>e))
+            groupid = groupid && !isNaN(groupid) ? groupid+1 : 1
+          }
+          await CourseDuplicates.bulkCreate([
+            { groupid, coursecode: code1 },
+            { groupid, coursecode: code2 }
+          ],
+          { ignoreDuplicates: true })
         } else {
-          main = course.code
+          // both have a group, must merge groups
+          await CourseDuplicates.update({ groupid: all[code1] }, { where: { groupid: all[code2] } })
         }
       }
-      all[code] = {
-        main: main,
-        name: course.name,
-        alt: {}
-      }
-    }
-
-    if (!Object.keys(all[code].alt).includes(duplicate)) {
-      if (isMainCode(duplicate)) {
-        all[code].main = duplCourse.code
-      }
-      all[code].alt[duplicate] = duplCourse.name
-      if (!all[code].main) {
-        all[code].main = selectMain(code, all[code])
-        all[code].name = course.name
-      }
-      await redisClient.setAsync('duplicates', JSON.stringify(all))
+    } catch (e) {
+      console.error(e)
     }
   }
-
-  const res = await getAllDuplicates()
-  return res
-}
-
-const removeDuplicateCode = async (code, duplicate) => {
-  let all = await getAllDuplicates(code)
-  if (all[code] && Object.keys(all[code].alt).includes(duplicate)) {
-    delete all[code].alt[duplicate]
-
-    if (Object.keys(all[code].alt).length === 0) delete all[code]
-    await redisClient.setAsync('duplicates', JSON.stringify(all))
-  }
-  const res = await getAllDuplicates()
-  return res
 }
 
 const getAllCourseTypes = () => CourseType.findAll()
@@ -621,11 +688,10 @@ module.exports = {
   createCourse,
   yearlyStatsOf,
   findDuplicates,
-  getDuplicateCodes,
   setDuplicateCode,
-  removeDuplicateCode,
-  getAllDuplicates,
-  getMainCode,
+  deleteDuplicateCode,
+  getMainCodesMap,
+  getMainCourseToCourseMap,
   getAllCourseTypes,
   getAllDisciplines,
   yearlyStatsOfNew,
