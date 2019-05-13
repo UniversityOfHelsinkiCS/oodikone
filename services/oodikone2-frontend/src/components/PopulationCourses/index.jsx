@@ -10,18 +10,42 @@ import PopulationCourseStats from '../PopulationCourseStats'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import { getPopulationCourses } from '../../redux/populationCourses'
+import { refreshFilters } from '../../redux/populationFilters'
 
-const PopulationCourses = ({ populationCourses, selectedStudents, translate, getPopulationCourses: gpc }) => {
+const PopulationCourses = ({
+  populationCourses,
+  filters,
+  courseTableFilters,
+  dispatchRefreshFilters,
+  selectedStudents,
+  translate,
+  getPopulationCourses: gpc
+}) => {
   const { CoursesOf } = infotooltips.PopulationStatistics
   const { pending } = populationCourses
-
   const reloadCourses = () => {
+    dispatchRefreshFilters()
     gpc({ ...populationCourses.query, uuid: uuidv4(), selectedStudents })
+  }
+
+  const filtersAreEqual = () => {
+    if (filters.length !== courseTableFilters.length) return false
+    if (filters.find(fil => !courseTableFilters.includes(fil.id))) return false
+    return true
   }
 
   return (
     <Segment>
-      <Button onClick={reloadCourses} floated="right" icon="refresh" compact />
+      <Button
+        content="Refresh table"
+        labelPosition="right"
+        primary
+        onClick={reloadCourses}
+        floated="right"
+        icon="refresh"
+        compact
+        disabled={filtersAreEqual()}
+      />
       <Header size="medium" dividing >
         <Popup
           trigger={<Header.Content>{translate('populationCourses.header')}</Header.Content>}
@@ -46,16 +70,21 @@ const PopulationCourses = ({ populationCourses, selectedStudents, translate, get
 
 PopulationCourses.propTypes = {
   populationCourses: shape({}).isRequired,
+  filters: arrayOf(shape({})).isRequired,
+  courseTableFilters: arrayOf(string).isRequired,
   translate: func.isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  getPopulationCourses: func.isRequired
+  getPopulationCourses: func.isRequired,
+  dispatchRefreshFilters: func.isRequired
 }
 
-const mapStateToProps = ({ populationCourses, locale }) => ({
+const mapStateToProps = ({ populationCourses, locale, populationFilters }) => ({
   populationCourses,
+  filters: populationFilters.filters,
+  courseTableFilters: populationFilters.courseTableFilters,
   translate: getTranslate(locale)
 })
 
 export default connect(mapStateToProps, {
-  getPopulationCourses
+  getPopulationCourses, dispatchRefreshFilters: refreshFilters
 })(PopulationCourses)
