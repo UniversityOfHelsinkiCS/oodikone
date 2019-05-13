@@ -19,24 +19,25 @@ stan.on('connect', function () {
     if (message === 'meta') {
       data = await getMeta()
       stan.publish('UpdateWrite', JSON.stringify(data))
+      msg.ack()
     } else {
       // TODO: check that its a valid studentnumber and just ack it if its not
       data = await getStudent(message)
+      try {
+        // TODO: check that data is properly structured(?)
+        stan.publish('UpdateWrite', JSON.stringify(data), (err, guid) => {
+          if (err) {
+            return err
+          } else {
+            msg.ack()
+            console.log('read from api and published for writing', guid)
+          }
+        })
+      } catch (e) {
+        console.log(e)
+      }
     }
-    try {
-      // TODO: check that data is properly structured(?)
-      stan.publish('UpdateWrite', JSON.stringify(data), (err, guid) => {
-        if (err) {
-          return err
-        } else {
-          msg.ack()
-          console.log('read from api and published for writing', guid)
-        }
-      })
-    } catch (e) {
-      console.log(e)
-    }
-  });
+  })
 
   prioSub.on('message', async (msg) => {
     await updateStudent(msg.getData())
