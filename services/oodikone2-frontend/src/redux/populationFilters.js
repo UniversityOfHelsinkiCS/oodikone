@@ -31,6 +31,10 @@ export const setComplementFilter = () => ({
   type: 'SET_COMPLEMENT_FILTER'
 })
 
+export const refreshFilters = () => ({
+  type: 'REFRESH_FILTERS'
+})
+
 export const savePopulationFilters = (preset) => {
   const route = '/v2/populationstatistics/filters'
   const prefix = 'SAVE_FILTER_'
@@ -57,7 +61,8 @@ export const getPopulationFilters = ({ studyRights }) => {
 const initial = {
   filters: [],
   filtersFromBackend: [],
-  complemented: true
+  complemented: true,
+  refreshNeeded: false // used to keep track whether the course table is refreshed or not
 }
 initial.complemented = false
 
@@ -66,12 +71,14 @@ const reducer = (state = initial, action) => {
     case 'ADD_POPULATION_FILTER':
       return {
         ...state,
-        filters: state.filters.concat(action.filter)
+        filters: state.filters.concat(action.filter),
+        refreshNeeded: true
       }
     case 'REMOVE_POPULATION_FILTER':
       return {
         ...state,
-        filters: state.filters.filter(f => f.id !== action.id)
+        filters: state.filters.filter(f => f.id !== action.id),
+        refreshNeeded: true
       }
     case 'REMOVE_POPULATION_FILTER_OF_COURSE': {
       const notRemoved = (filter) => {
@@ -79,18 +86,24 @@ const reducer = (state = initial, action) => {
           return true
         }
         const { course } = filter.params.course
-        return course.name !== action.course.name || course.code !== action.course.code
+
+        return (course.name.fi !== action.course.name.fi &&
+          course.name.en !== action.course.name.en &&
+          course.name.sv !== action.course.name.sv) ||
+          course.code !== action.course.code
       }
       return {
         ...state,
-        filters: state.filters.filter(notRemoved)
+        filters: state.filters.filter(notRemoved),
+        refreshNeeded: true
       }
     }
 
     case 'CLEAR_POPULATION_FILTERS':
       return {
         ...state,
-        filters: []
+        filters: [],
+        refreshNeeded: true
       }
     case 'ALTER_POPULATION_COURSE_FILTER': {
       const toAlter = state.filters.find(f => f.id === action.id)
@@ -100,13 +113,15 @@ const reducer = (state = initial, action) => {
       alteredFilter.id = toAlter.id
       return {
         ...state,
-        filters: state.filters.map(f => (f.id !== action.id ? f : alteredFilter))
+        filters: state.filters.map(f => (f.id !== action.id ? f : alteredFilter)),
+        refreshNeeded: true
       }
     }
     case 'SET_COMPLEMENT_FILTER': {
       return {
         ...state,
-        complemented: !state.complemented
+        complemented: !state.complemented,
+        refreshNeeded: true
       }
     }
     case 'SAVE_FILTER_ATTEMPT':
@@ -166,7 +181,12 @@ const reducer = (state = initial, action) => {
         error: false,
         filtersFromBackend: state.filtersFromBackend.filter(f => f.id !== action.response.id)
       }
-
+    case 'REFRESH_FILTERS':
+      return {
+        ...state,
+        courseTableFilters: state.filters.map(fil => fil.id),
+        refreshNeeded: false
+      }
     default:
       return state
   }
