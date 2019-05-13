@@ -220,7 +220,6 @@ services:
       - TOKEN=toskab1gs8cret5
 
   updater_writer:
-    image: node:10-alpine
     build:
       context: services/updater_writer
       args:
