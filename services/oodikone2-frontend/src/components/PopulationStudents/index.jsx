@@ -18,6 +18,7 @@ import infotooltips from '../../common/InfoToolTips'
 
 const popupTimeoutLength = 1000
 
+
 class PopulationStudents extends Component {
   state = { containsStudyTracks: false }
 

@@ -103,7 +103,9 @@ services:
   backend:
     build:
       context: services/oodikone2-backend
-      dockerfile: dev.Dockerfile
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -121,7 +123,6 @@ services:
       ANALYTICS_URL: http://analytics:4568
     volumes:
       - ./services/oodikone2-backend/:/usr/src/app
-      - /usr/src/app/node_modules
       - ./shared/models:/usr/src/app/src/models
       - ./shared/migrations:/usr/src/app/src/database/migrations
     container_name: backend
@@ -213,7 +214,6 @@ services:
       - NATS_URI=nats://nats:4222
       - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
       - TOKEN=toskab1gs8cret5
-    container_name: updater_api
 
   updater_writer:
     image: node:10-alpine
@@ -233,6 +233,7 @@ services:
       NATS_URI: nats://nats:4222
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
+      TEST_DB_SCHEMA: updater_test
 
 
   analytics:
