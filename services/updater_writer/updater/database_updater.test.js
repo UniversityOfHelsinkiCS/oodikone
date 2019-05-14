@@ -86,8 +86,8 @@ describe('Updater works', () => {
 
     })
     describe('Updater writes students the right way', () => {
-  
-      test('Student info is written to database', async () => {
+
+        test('Student info is written to database', async () => {
             const students = await Student.findAll({
                 order: [
                     ['studentnumber', 'DESC']]
@@ -289,14 +289,77 @@ describe('Updater works', () => {
     })
     describe('Updater updates existing students correctly', () => {
         beforeAll(async () => {
-            const { studentInfo, studyRights, studyAttainments, semesterEnrollments } = students[0]
-            students[0].studentInfo = { ...studentInfo, email: 'Calgary.Flames@NHLonJätettä.fi', mobile: '0400521981', address: 'Yliopistonkatu 4', creditcount: 322, age: 41, lastname: 'Tauriainen', gender_code: 1, abbreviatedname: 'Tauriainen Maria Helena' }
-            const newCredit = { id: 'ayyyyylmao', grade: '5', credits: 5, ordering: '2019.05.04', credittypecode: 1, student_studentnumber: '011120775', attainment_date: new Date(), course_code: '420_666', semestercode: 138, isStudyModule: false }
-            const newCourse = { code: '420_666', name: { fi: 'Kaljan juonti', en: 'Beer drinking', sv: 'dryckade öl' }, latest_instance_date: new Date(), is_study_module: false, coursetypecode: 1, disciplines: [], startdate: new Date(), enddate: new Date(), providers: [], courseproviders: [] }
-            const newCreditTeachers = [{ credit_id: 'ayyyyylmao', teacher_id: '9016417' }]
-            const newAttainment = { credit: newCredit, creditTeachers: newCreditTeachers, course: newCourse } 
-            students[0].studyAttainments = [...studyAttainments, newAttainment, { ...students[1].studyAttainments[2], credit: {  ...students[1].studyAttainments[2].credit, id:'Kvas', student_studentnumber: '011120775' }}]
-            students[0].studyAttainments[2] = { ...students[0].studyAttainments[2], credit:{ ...students[0].studyAttainments[2].credit ,  grade: '0' } } 
+            const { studentInfo, studyRights, studyAttainments } = students[0]
+            students[0].studentInfo = {
+                ...studentInfo,
+                email: 'Calgary.Flames@NHLonJätettä.fi',
+                mobile: '0400521981',
+                address: 'Yliopistonkatu 4',
+                creditcount: 322,
+                age: 41,
+                lastname: 'Tauriainen',
+                gender_code: 1,
+                abbreviatedname: 'Tauriainen Maria Helena'
+            }
+            const newCredit = {
+                id: 'ayyyyylmao',
+                grade: '5',
+                credits: 5,
+                ordering: '2019.05.04',
+                credittypecode: 1,
+                student_studentnumber: '011120775',
+                attainment_date: new Date(),
+                course_code: '420_666',
+                semestercode: 138,
+                isStudyModule: false
+            }
+            const newCourse = {
+                code: '420_666',
+                name: {
+                    fi: 'Kaljan juonti',
+                    en: 'Beer drinking',
+                    sv: 'dryckade öl'
+                },
+                latest_instance_date: new Date(),
+                is_study_module: false,
+                coursetypecode: 1,
+                disciplines: [],
+                startdate: new Date(),
+                enddate: new Date(),
+                providers: [],
+                courseproviders: []
+            }
+
+            const newCreditTeachers = [
+                {
+                    credit_id: 'ayyyyylmao',
+                    teacher_id: '9016417'
+                }
+            ]
+            const newAttainment = { credit: newCredit, creditTeachers: newCreditTeachers, course: newCourse }
+            students[0].studyAttainments = [
+                ...studyAttainments,
+                newAttainment,
+                {
+                    ...students[1].studyAttainments[2],
+                    creditTeachers: [],
+                    credit: {
+                        ...students[1].studyAttainments[2].credit,
+                        id: 'Kvas',
+                        student_studentnumber: '011120775'
+                    }
+                }
+            ]
+            students[0].studyAttainments[2] = {
+                ...students[0].studyAttainments[2],
+                credit: {
+                    ...students[0].studyAttainments[2].credit,
+                    grade: '0'
+                }
+            }
+            const newStudyRight = { ...studyRights[0], studyright: { ...studyRights[0].studyright, highlevelname: 'Kaljatiede' } }
+            students[0].studyRights = [newStudyRight]
+
             await updateStudent(students[0])
 
         })
@@ -319,7 +382,7 @@ describe('Updater works', () => {
             expect(age).toBe(41)
             expect(address).toBe('Yliopistonkatu 4')
             expect(mobile).toBe('0400521981')
-           
+
         })
         test('Existing courses are updated (not duplicated) in database', async () => {
             const courses = await Course.findAll({ order: [['code', 'ASC']] })
@@ -327,7 +390,7 @@ describe('Updater works', () => {
             expect(courses.length).toBe(148)
 
             expect(newCourse).not.toBe(undefined)
-            
+
         })
 
         test('Updating credits works', async () => {
@@ -335,6 +398,17 @@ describe('Updater works', () => {
             const updatedCredit = allCredits.find(_ => _.id === students[0].studyAttainments[2].credit.id)
             expect(allCredits.length).toBe(152)
             expect(updatedCredit.grade).toBe('0')
+        })
+
+        test('Studyrights are rewritten', async () => {
+            const updatedStudyRights = await Studyright.findAll({
+                where: {
+                    student_studentnumber: '011120775'
+                }
+            })
+            expect(updatedStudyRights.length).toBe(1)
+            expect(updatedStudyRights[0].highlevelname).toBe('Kaljatiede')
+            // theres really not a lot to test here since everything related to studyrights are just rewritten
         })
 
 
