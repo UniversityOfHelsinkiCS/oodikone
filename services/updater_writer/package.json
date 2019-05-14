@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test jest --runInBand --verbose",
-    "test_docker": "docker exec -t oodikone_updater_writer_1 /bin/bash -c 'npm test'",
+    "test_docker": "docker exec -t updater_writer /bin/bash -c 'npm test'",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },

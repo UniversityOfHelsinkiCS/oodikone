@@ -218,6 +218,7 @@ services:
       - NATS_URI=nats://nats:4222
       - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
       - TOKEN=toskab1gs8cret5
+    container_name: updater_api
 
   updater_writer:
     build:
@@ -238,16 +239,17 @@ services:
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       TEST_DB_SCHEMA: updater_test
+    container_name: updater_writer
 
   scheduler_mongo:
     image: mongo
     restart: unless-stopped
     volumes:
       - ./mongodata:/data/db
-    expose: 
+    expose:
       - "27017"
     container_name: scheduler_db
-    
+
   updater_scheduler:
     build:
       context: services/updater_scheduler
@@ -264,6 +266,7 @@ services:
       - NATS_URI=nats://nats:4222
       - MONGO_URI=mongodb://scheduler_mongo:27017
       - STUDENT_NUMBERS=./all_student_numbers.txt
+    container_name: updater_scheduler
 
 
   analytics:
