@@ -19,18 +19,16 @@ const testpopulate = async () => {
   console.log('täskit tehty lol')
 }
 stan.on('connect', async () => {
-  await testpopulate()
+  // await testpopulate()
   cron.schedule('* * * * *', async () => {
-    const tasks = await Schedule.find({ type: 'student' }).limit(5).sort({ 'updatedAt': 1 })
+    const tasks = await Schedule.find({ type: 'student' }).limit(10).sort({ 'updatedAt': 1 })
     for (const task of tasks) {
       stan.publish('UpdateApi', task.task, (err, guid) => {
         if (err) {
           console.log('publish failed')
-        } else {
-          console.log('published', task.task)
-        }
+        } 
       })
-      stan.publish('status', `${task.tast}:SCHEDULED`, (err) => {
+      stan.publish('status', `${task.task}:SCHEDULED`, (err) => {
         if(err) {
           console.log('publish failed')
         }
@@ -38,8 +36,10 @@ stan.on('connect', async () => {
     }
   })
   const statusSub = stan.subscribe('status')
-  statusSub.on('message', (msg) => {
-    console.log('ayyylamo')
+  statusSub.on('message', async (msg) => {
+    const message = msg.getData().split(':')
+    console.log(message)
+    await updateTask(message[0], message[1])
   })
 })
 

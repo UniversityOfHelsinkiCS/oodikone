@@ -11,7 +11,6 @@ const {
 const { updateAttainmentDates } = require('./update_attainment_dates')
 
 const deleteStudentStudyrights = async (studentnumber, transaction) => {
-  console.log(studentnumber)
   await Studyright.destroy({
     where: {
       student_studentnumber: studentnumber
