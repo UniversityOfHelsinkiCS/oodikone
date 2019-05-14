@@ -283,7 +283,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       thesisB: theses.BACHELOR || 0
     }
   }))
-  return { [studytrack]: { lastUpdated: moment(), status: null,  data: arr } }
+  return { id: studytrack, status: null,  data: arr }
 }
 
 module.exports = {
