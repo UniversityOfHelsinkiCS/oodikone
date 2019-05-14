@@ -110,8 +110,8 @@ router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
     if (!data) {
       try {
         const since = req.params.since ? req.params.since : new Date().getFullYear() - 5
-        data = await throughputStatsForStudytrack(req.params.id, since)
-        setThroughput(data)
+        const result = await throughputStatsForStudytrack(req.params.id, since)
+        data = await setThroughput(result)
       } catch (e) {
         console.error(e)
       }
