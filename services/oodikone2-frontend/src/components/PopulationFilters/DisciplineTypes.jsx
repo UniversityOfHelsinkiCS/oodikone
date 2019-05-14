@@ -71,6 +71,7 @@ class DisciplineTypes extends Component {
                     text: text.fi,
                     value
                   })), entry => entry.text)}
+                  selectOnBlur={false}
                 />
               </Form.Field>
               <Form.Field>
@@ -91,6 +92,7 @@ class DisciplineTypes extends Component {
                     text: text.fi,
                     value
                   })), entry => entry.text)}
+                  selectOnBlur={false}
                 />
               </Form.Field>
               <Form.Field>

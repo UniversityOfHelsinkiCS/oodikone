@@ -84,6 +84,7 @@ class ExtentGraduated extends Component {
                   name="complemented"
                   onChange={this.handleChange}
                   options={this.complementedOptions}
+                  selectOnBlur={false}
                 />
               </Form.Field>
               <Form.Field>
@@ -94,6 +95,7 @@ class ExtentGraduated extends Component {
                   placeholder="select graduation"
                   onChange={this.handleChange}
                   options={this.graduationOptions}
+                  selectOnBlur={false}
                 />
               </Form.Field>
               <Form.Field>
@@ -108,6 +110,7 @@ class ExtentGraduated extends Component {
                   }) => ({
                     value: ecode, text: getTextIn(name, language)
                   })).concat(allStudyRights), entry => entry.text)}
+                  selectOnBlur={false}
                 />
               </Form.Field>
               <Form.Field>
