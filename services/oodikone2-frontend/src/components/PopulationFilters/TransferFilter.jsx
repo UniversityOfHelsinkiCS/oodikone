@@ -102,6 +102,7 @@ class TransferFilter extends Component {
                     value,
                     text: text.name.fi
                   })), entry => entry.text)}
+                  selectOnBlur={false}
                 />
               </Form.Field>
               <Form.Field>
@@ -122,6 +123,7 @@ class TransferFilter extends Component {
                     value,
                     text: text.name.fi
                   })), entry => entry.text)}
+                  selectOnBlur={false}
                 />
               </Form.Field>
               <Form.Field>

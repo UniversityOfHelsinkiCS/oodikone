@@ -81,6 +81,10 @@ export const userRights = async () => {
   const { rights } = decoded
   return rights
 }
+export const userIsAdmin = async () => {
+  const roles = await userRoles()
+  return roles.includes('admin')
+}
 export const getAsUserWithoutRefreshToken = () => {
   const token = getTokenWithoutRefresh()
   if (!token) return null
