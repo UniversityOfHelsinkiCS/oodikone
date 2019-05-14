@@ -16,13 +16,12 @@ stan.on('connect', function () {
   sub.on('message', async (msg) => {
     const data = JSON.parse(msg.getData())
     if (data.studentInfo) {
-     await updateStudent(data)
-      console.log('student got')
+      await updateStudent(data)
     } else {
       await updateMeta(data)
-      console.log('meta got')
     }
     msg.ack()
+    stan.publish('status', `${data.studentInfo ? data.studentInfo.studentnumber : 'meta'}:DONE`, (err) => { if (err) console.log(err) })
   });
 
 })
