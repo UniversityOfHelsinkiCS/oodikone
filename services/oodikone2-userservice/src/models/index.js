@@ -51,9 +51,7 @@ const User = sequelize.define('users',
       unique: true
     },
     email: { type: Sequelize.STRING },
-    language: { type: Sequelize.STRING },
-    admin: { type: Sequelize.BOOLEAN },
-    czar: { type: Sequelize.BOOLEAN }
+    language: { type: Sequelize.STRING }
   },
   {
     tableName: 'users',
