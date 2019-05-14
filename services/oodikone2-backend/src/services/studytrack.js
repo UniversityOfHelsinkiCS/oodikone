@@ -170,11 +170,9 @@ const productivityStatsForStudytrack = async (studytrack, since) => {
     promises
   )
   return {
-    [studytrack]: {
-      lastUpdated: moment(),
-      status: null,
-      data: combineStatistics(creditStats, studyrightStats, thesisStats)
-    }
+    id: studytrack,
+    status: null,
+    data: combineStatistics(creditStats, studyrightStats, thesisStats)
   }
 }
 

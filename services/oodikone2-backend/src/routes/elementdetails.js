@@ -46,13 +46,13 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
     if (!data) {
       try {
         const since = '2017-08-01'
-        data = await productivityStatsForStudytrack(code, since)
-        setProductivity(data)
+        const stats = await productivityStatsForStudytrack(code, since)
+        data = await setProductivity(stats)
       } catch (e) {
         console.error(e)
       }
     }
-    return res.json({ ...data })
+    return res.json(data)
   } else {
     res.status(422)
   }
@@ -128,10 +128,8 @@ router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
   console.log('Throughput stats recalculation starting')
   const codes = code ? [code] : (await getAllProgrammes()).map(p => p.code)
   try {
-    await patchThroughput(codes.reduce((acc, c) => {
-      acc[c] = { status: 'RECALCULATING' }
-      return acc
-    }, {}))
+    const data = codes.reduce((acc, id) => ({ ...acc, [id]: { status: 'RECALCULATING' }}), {})
+    await patchThroughput(data)
     res.status(200).end()
   } catch (e) {
     console.error(e)
@@ -146,9 +144,7 @@ router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
       await setThroughput(data)
     } catch (e) {
       try {
-        await patchThroughput({
-          [code]: { status: 'RECALCULATION ERRORED' }
-        })
+        await patchThroughput({ [code]:  { status: 'RECALCULATION ERRORED' }})
       } catch (e) {
         console.error(e)
         return
