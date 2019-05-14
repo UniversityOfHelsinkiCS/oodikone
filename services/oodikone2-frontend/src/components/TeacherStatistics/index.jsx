@@ -7,14 +7,15 @@ import { getProviders } from '../../redux/providers'
 import { getSemesters } from '../../redux/semesters'
 import { getTeacherStatistics } from '../../redux/teacherStatistics'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
-import { userRights } from '../../common'
+import { userRights, userIsAdmin } from '../../common'
 
 const initial = {
   semesterStart: null,
   semesterEnd: null,
   providers: [],
   display: false,
-  userProviders: []
+  userProviders: [],
+  isAdmin: false
 }
 
 class TeacherStatistics extends Component {
@@ -22,8 +23,9 @@ class TeacherStatistics extends Component {
 
     async componentDidMount() {
       const rights = await userRights()
+      const isAdmin = await userIsAdmin()
       const userProviders = this.mapToProviders(rights)
-      this.setState({ userProviders })
+      this.setState({ userProviders, isAdmin })
       this.props.getProviders()
       this.props.getSemesters()
     }
@@ -77,9 +79,9 @@ class TeacherStatistics extends Component {
 
     render() {
       const { semesters, providers, statistics, pending } = this.props
-      const { display, semesterStart, semesterEnd, userProviders } = this.state
+      const { display, semesterStart, semesterEnd, userProviders, isAdmin } = this.state
       const invalidQueryParams = this.state.providers.length === 0 || !semesterStart
-      const providerOptions = providers.filter(p => userProviders.includes(p.value))
+      const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
       return (
         <div>
           <Message
