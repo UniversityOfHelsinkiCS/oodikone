@@ -118,6 +118,30 @@ services:
       - user_db
     container_name: userservice
 
+  usageservice:
+    image: toska/oodikone2-usageservice:latest
+    build:
+      context: services/oodikone2-usageservice
+    restart: unless-stopped
+    ports:
+      - 545:545
+    environment:
+      - PORT=545
+      - DB_URL=postgres://postgres@usage_db:5432/usage_db
+      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+    container_name: usageservice
+
+  usage_db:
+    image: postgres:9.6.3
+    ports:
+      - "5424:5432"
+    volumes:
+      - ./usage_pgdata:/var/lib/postgresql/data
+    container_name: oodi_usage_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=usage_db
+
   analytics:
     image: toska/oodikone2-analytics:latest
     build:
