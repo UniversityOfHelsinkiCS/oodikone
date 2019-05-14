@@ -142,7 +142,6 @@ const createUser = async (username, fullname, email) => {
   return User.create({
     username: username,
     full_name: fullname,
-    czar: false,
     email
   })
 }

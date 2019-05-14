@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
-import { Button, Card, Divider, List, Icon } from 'semantic-ui-react'
+import { Button, Card, Divider, List, Icon, Popup } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
-import { getTextIn } from '../../common'
+import { getTextIn, getRolesWithoutRefreshToken } from '../../common'
 import { removeUserUnits, getAccessGroups } from '../../redux/users'
-
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
 import { superLogin } from '../../apiConnection'
 import AccessRights from './AccessRights'
@@ -143,7 +142,6 @@ class UserPage extends Component {
         return e
       })
     }
-
     return this.props.accessGroups ?
       <div>
         <Button icon="arrow circle left" content="Back" onClick={this.props.goBack} />
@@ -151,7 +149,15 @@ class UserPage extends Component {
         <Card.Group>
           <Card fluid>
             <Card.Content>
-              <Card.Header content={user.full_name} />
+              <Card.Header>
+                { this.props.isAdmin && user.is_enabled && (
+                  <Popup
+                    content="Show Oodikone as this user"
+                    trigger={<Button floated="right" circular size="tiny" basic icon="spy" onClick={this.superLogin} />}
+                  />
+                )}
+                {user.full_name}
+              </Card.Header>
               <Divider />
               <Card.Meta content={user.username} />
               <Card.Meta content={user.email} />
@@ -219,15 +225,16 @@ UserPage.propTypes = {
     push: func.isRequired
   }).isRequired,
   getAccessGroups: func.isRequired,
-  accessGroups: arrayOf(object).isRequired
+  accessGroups: arrayOf(object).isRequired,
+  isAdmin: bool.isRequired
 }
-
 const mapStateToProps = state => ({
   language: state.settings.language,
   units: state.units.data,
   associations: state.populationDegreesAndProgrammesUnfiltered.data,
   pending: !!state.populationDegreesAndProgrammesUnfiltered.pending,
-  accessGroups: state.users.accessGroupsData || []
+  accessGroups: state.users.accessGroupsData || [],
+  isAdmin: getRolesWithoutRefreshToken().includes('admin')
 })
 
 export default connect(mapStateToProps, {
