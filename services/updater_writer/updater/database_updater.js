@@ -30,7 +30,7 @@ const updateAttainments = (studyAttainments, transaction) => studyAttainments.ma
     await Credit.upsert(credit, { transaction }),
   ])
   await Promise.all([
-    Promise.all(course.disciplines.map(async courseDiscipline => { CourseDisciplines.upsert(courseDiscipline, { transaction }) })),
+    Promise.all(course.disciplines.map(courseDiscipline => { CourseDisciplines.upsert(courseDiscipline, { transaction }) })),
     Promise.all(course.providers.map(provider => Provider.upsert(provider, { transaction }))),
     Promise.all(course.courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
     teachers && Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
