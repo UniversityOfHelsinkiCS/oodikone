@@ -23,27 +23,21 @@ const default_users = [
     full_name: 'Pekka Pouta',
     username: 'poutaukko',
     email: 'pekka.pouta@ilmatieteenlaitos.fi',
-    language: 'finnish',
-    admin: false,
-    czar: false
+    language: 'finnish'
   },
   {
     id: 666,
     full_name: 'Sylvester Stallone',
     username: 'rambo666',
     email: 'sylvester@rambo.com',
-    language: 'americano',
-    admin: false,
-    czar: true
+    language: 'americano'
   },
   {
     id: 665,
     full_name: 'Morgan Freeman',
     username: 'freeman',
     email: 'morgan@freeman.com',
-    language: 'americano',
-    admin: false,
-    czar: false
+    language: 'americano'
   }
 ]
 

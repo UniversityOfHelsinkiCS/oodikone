@@ -10,30 +10,58 @@ const {
 } = require('../models/index')
 const { updateAttainmentDates } = require('./update_attainment_dates')
 
+const deleteStudentStudyrights = async (studentnumber, transaction) => {
+  console.log(studentnumber)
+  await Studyright.destroy({
+    where: {
+      student_studentnumber: studentnumber
+    }
+  }, { transaction })
+  await StudyrightElement.destroy({
+    where: {
+      studentnumber
+    }
+  }, { transaction })
+}
+
+const updateAttainments = (studyAttainments, transaction) => studyAttainments.map(async ({ credit, creditTeachers, teachers, course }) => {
+  await Promise.all([
+    await Course.upsert(course, { transaction }),
+    await Credit.upsert(credit, { transaction }),
+  ])
+  await Promise.all([
+    Promise.all(course.disciplines.map(courseDiscipline => { CourseDisciplines.upsert(courseDiscipline, { transaction }) })),
+    Promise.all(course.providers.map(provider => Provider.upsert(provider, { transaction }))),
+    Promise.all(course.courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
+    teachers && Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
+    Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
+  ])
+})
+
+const updateStudyRights = (studyRights, transaction) => studyRights.map(async ({ studyRightExtent, studyright, elementDetails, studyRightElements, transfers }) => {
+  await Promise.all([
+    StudyrightExtent.upsert(studyRightExtent, { transaction }),
+    Studyright.create(studyright, { transaction })
+  ])
+  await Promise.all([
+    Promise.all(elementDetails.map(elementdetails => ElementDetails.upsert(elementdetails, { transaction }))),
+    Promise.all(studyRightElements.map(StudyRightElement => StudyrightElement.create(StudyRightElement, { transaction }))),
+    Promise.all(transfers.map(transfer => Transfers.upsert(transfer, { transaction })))
+  ])
+})
+
 const updateStudent = async (student) => {
   const { studentInfo, studyAttainments, semesterEnrollments, studyRights } = student
   const transaction = await sequelize.transaction()
   try {
+    await deleteStudentStudyrights(studentInfo.studentnumber, transaction) // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
+
     await Student.upsert(studentInfo, { transaction })
     await Promise.all(semesterEnrollments.map(SE => SemesterEnrollment.upsert(SE, { transaction })))
-    await Promise.all(studyAttainments.map(async ({ credit, creditTeachers, teachers, course }) => Promise.all([
-      Course.upsert(course, { transaction }),
-      course.disciplines && Promise.all(course.disciplines.map(async courseDiscipline => { CourseDisciplines.upsert(courseDiscipline, { transaction }) })),
-      course.providers && Promise.all(course.providers.map(provider => Provider.upsert(provider, { transaction }))),
-      course.courseproviders && Promise.all(course.courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
-      Credit.upsert(credit, { transaction }),
-      teachers && Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
-      creditTeachers && Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
-    ])))
-    if (studyRights) {
-      await Promise.all(studyRights.map(async ({ studyRightExtent, studyright, elementDetails, studyRightElements,transfers }) => Promise.all([
-        StudyrightExtent.upsert(studyRightExtent, { transaction }),
-        Studyright.upsert(studyright, { transaction }),
-        Promise.all(elementDetails.map(elementdetails => ElementDetails.upsert(elementdetails, { transaction }))),
-        Promise.all(studyRightElements.map(StudyRightElement => StudyrightElement.upsert(StudyRightElement, { transaction }))),
-        Promise.all(transfers.map(transfer => Transfers.upsert(transfer, { transaction })))
-      ])))
-    }
+    await Promise.all(updateAttainments(studyAttainments, transaction))
+
+    if (studyRights) await Promise.all(updateStudyRights(studyRights, transaction))
+
     await transaction.commit()
   } catch (err) {
     console.log(err)
