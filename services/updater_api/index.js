@@ -16,6 +16,11 @@ stan.on('connect', function () {
   sub.on('message', async (msg) => {
     let data = ''
     const message = msg.getData()
+    if (!message) {
+      console.log('undefined message')
+      msg.ack()
+      return
+    }
     if (message === 'meta') {
       data = await getMeta()
       stan.publish('UpdateWrite', JSON.stringify(data))

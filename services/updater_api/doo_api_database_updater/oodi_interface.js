@@ -44,7 +44,7 @@ const attemptGetFor = async (url, attempts = 5) => {
   }
 }
 
-if (process.env.NODE_ENV === 'dev') {
+if (process.env.NODE_ENV === 'development') {
 
   // axios.defaults.auth = {
   //   username: 'tktl',
@@ -55,6 +55,7 @@ if (process.env.NODE_ENV === 'dev') {
   }
 
 }
+console.log(process.env.NODE_ENV)
 
 const getStudent = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/info`
