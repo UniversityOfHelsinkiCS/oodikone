@@ -7,4 +7,4 @@ npm test --prefix services/oodikone2-analytics
 npm run --prefix services/oodikone2-userservice test_docker
 npm test --prefix services/oodikone2-usageservice
 npm run --prefix services/oodikone2-frontend test_docker
-npm run --prefix services/updater_writer test_docker
+# npm run --prefix services/updater_writer test_docker
