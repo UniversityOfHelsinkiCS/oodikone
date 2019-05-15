@@ -14,4 +14,4 @@ RUN if [ "${NODE_ENV}" != "production" ]; then cp -r /usr/src/app/node_modules /
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait /wait
 RUN chmod +x /wait
 
-CMD ["npm", "start"]
+CMD /wait && npm start
