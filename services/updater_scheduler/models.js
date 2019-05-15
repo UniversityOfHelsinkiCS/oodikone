@@ -7,6 +7,7 @@ const scheduleSchema = new mongoose.Schema(
     task: String,
     status: String,
     type: String,
+    active: Boolean,
     updatedAt: Date
   }
 )

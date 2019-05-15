@@ -16,5 +16,8 @@ RUN if [ "${NODE_ENV}" != "production" ]; then cp -r /usr/src/app/node_modules /
 
 RUN if [ "${NODE_ENV}" != "development" ]; then npm run dist && npm install -g serve; fi
 
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait /wait
+RUN chmod +x /wait
+
 EXPOSE 5000
-CMD ["serve", "-s", "-l", "5000", "dist"]
+CMD /wait && ["serve", "-s", "-l", "5000", "dist"]
