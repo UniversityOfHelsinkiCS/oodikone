@@ -327,7 +327,7 @@ const yearlyStatsOf = async (code, year, separate, language) => {
     }, resultProgrammes)
 
   const alternatives = await getDuplicateCodes(code)
-  const codes = alternatives ? [code, ...Object.keys(alternatives.alt)] : [code]
+  const codes = alternatives ? alternatives : [code]
   const allInstances = await creditsOf(codes)
   const yearInst = allInstances
     .filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-09-01', year.end + '-08-01'))
@@ -558,7 +558,7 @@ const getAllDisciplines = () => Discipline.findAll()
 
 const alternativeCodes = async code => {
   const alternatives = await getDuplicateCodes(code)
-  return alternatives ? [code, ...Object.keys(alternatives.alt)] : [code]
+  return alternatives ? alternatives : [code]
 }
 
 const formatStudyrightElement = ({ code, element_detail }) => ({
