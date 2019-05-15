@@ -121,6 +121,7 @@ services:
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       ANALYTICS_URL: http://analytics:4568
+      NATS_URI: nats://nats:4222
     volumes:
       - ./services/oodikone2-backend/:/usr/src/app
       - ./shared/models:/usr/src/app/src/models
@@ -201,6 +202,8 @@ services:
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
     volumes:
       - ./services/oodikone2-usageservice/:/usr/src/app
+    depends_on:
+      - usage_db
     container_name: usageservice
 
   updater_api:

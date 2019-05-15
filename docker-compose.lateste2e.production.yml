@@ -82,6 +82,7 @@ services:
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
+      NATS_URI: nats://nats:4222
     container_name: backend
     entrypoint: 'node --inspect=0.0.0.0:9229 --max_old_space_size=4096 index.js'
     depends_on:
@@ -129,6 +130,8 @@ services:
       - PORT=545
       - DB_URL=postgres://postgres@usage_db:5432/usage_db
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+    depends_on:
+      - usage_db
     container_name: usageservice
 
   usage_db:
