@@ -1,4 +1,4 @@
-const { updateStudent, updateMeta } = require('./database_updater')
+const { updateStudent, updateMeta, updateAttainmentMeta } = require('./database_updater')
 const { Student, Credit, Course,
     Organisation, CourseRealisationType,
     Semester, CreditType, CourseType,
@@ -22,6 +22,7 @@ describe('Updater works', () => {
         await updateStudent(students[0])
         await updateStudent(students[1])
         await updateStudent(students[2])
+        await updateAttainmentMeta()
     })
 
     afterAll(async () => {
