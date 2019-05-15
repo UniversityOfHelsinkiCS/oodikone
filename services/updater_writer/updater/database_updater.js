@@ -71,8 +71,10 @@ const updateStudent = async (student) => {
     console.log(err)
     await transaction.rollback()
   }
+}
+const updateAttainmentMeta = () => {
   try {
-    // await updateAttainmentDates()
+    await updateAttainmentDates()
   } catch (err) {
     console.log(err)
   }
@@ -87,23 +89,23 @@ const updateMeta = async ({
 
   try {
     await Promise.all([
-      Promise.all(courseTypeCodes.map(_ =>
-        CourseType.upsert(_, { transaction })
+      Promise.all(courseTypeCodes.map(cT =>
+        CourseType.upsert(cT, { transaction })
       )),
-      Promise.all(faculties.map(_ =>
-        Organisation.upsert(_, { transaction })
+      Promise.all(faculties.map(org =>
+        Organisation.upsert(org, { transaction })
       )),
-      Promise.all(courseRealisationsTypes.map(_ =>
-        CourseRealisationType.upsert(_, { transaction })
+      Promise.all(courseRealisationsTypes.map(cR =>
+        CourseRealisationType.upsert(cR, { transaction })
       )),
-      Promise.all(semesters.map(_ =>
-        Semester.upsert(_, { transaction })
+      Promise.all(semesters.map(s =>
+        Semester.upsert(s, { transaction })
       )),
-      Promise.all(creditTypeCodes.map(_ =>
-        CreditType.upsert(_, { transaction })
+      Promise.all(creditTypeCodes.map(cTC =>
+        CreditType.upsert(cTC, { transaction })
       )),
-      Promise.all(disciplines.map(_ =>
-        Discipline.upsert(_, { transaction })
+      Promise.all(disciplines.map(d =>
+        Discipline.upsert(d, { transaction })
       )),
     ])
     await transaction.commit()
@@ -114,5 +116,5 @@ const updateMeta = async ({
 
 }
 module.exports = {
-  updateStudent, updateMeta
+  updateStudent, updateMeta, updateAttainmentMeta
 }

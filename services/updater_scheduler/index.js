@@ -22,6 +22,7 @@ const testpopulate = async () => {
   Schedule.collection.insert(taskStudents, () => console.log('ayyyy'))
   console.log('täskit tehty lol')
 }
+
 stan.on('connect', async () => {
   // await testpopulate()
 
@@ -73,8 +74,6 @@ stan.on('connect', async () => {
         console.log('published', 'RefreshOverview')
       }
     })
-  })
-  cron.schedule('* 7 * * *', async () => {
     stan.publish('RefreshStudyrightAssociations', null, (err, guid) => {
       if (err) {
         console.log('publish failed', 'RefreshStudyrightAssociations')
@@ -82,7 +81,15 @@ stan.on('connect', async () => {
         console.log('published', 'RefreshStudyrightAssociations')
       }
     })
+    stan.publish('updateAttainmentDates', null, (err, guid) => {
+      if (err) {
+        console.log('publish failed', 'UpdateAttainmentDates')
+      } else {
+        console.log('published', 'UpdateAttainmentDates')
+      }
+    })
   })
+
   const statusSub = stan.subscribe('status')
 
   statusSub.on('message', async (msg) => {
