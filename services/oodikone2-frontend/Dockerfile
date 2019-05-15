@@ -14,8 +14,7 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 RUN if [ "${NODE_ENV}" != "production" ]; then cp -r /usr/src/app/node_modules /usr/src/cache/node_modules; fi
 
-RUN npm run dist
-RUN npm install -g serve
+RUN if [ "${NODE_ENV}" != "development" ]; then npm run dist && npm install -g serve; fi
 
 EXPOSE 5000
 CMD ["serve", "-s", "-l", "5000", "dist"]

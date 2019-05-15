@@ -6,7 +6,6 @@ import { Header, Button, Message, Table, Input, Segment, Icon, Loader, Label } f
 import { getDuplicates, addDuplicate, removeDuplicate } from '../../redux/coursecodeduplicates'
 
 import CourseSearch from '../CourseSearch'
-import './courseCodeMapper.css'
 import { getTextIn } from '../../common'
 import { findCourses } from '../../redux/courses'
 
