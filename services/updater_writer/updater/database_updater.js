@@ -35,7 +35,7 @@ const updateAttainments = (studyAttainments, transaction) => studyAttainments.ma
       providers.length > 0  && Promise.all(providers.map(provider => Provider.upsert(provider, { transaction }))),
       courseproviders.length > 0 && Promise.all( courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
       teachers.length > 0 && Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
-      creditTeachers > 0 && Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
+      creditTeachers.length > 0 && Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
     ])
   } catch (e) {
     console.log(e)
@@ -72,7 +72,7 @@ const updateStudent = async (student) => {
     await transaction.rollback()
   }
 }
-const updateAttainmentMeta = () => {
+const updateAttainmentMeta = async () => {
   try {
     await updateAttainmentDates()
   } catch (err) {
