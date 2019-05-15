@@ -15,4 +15,4 @@ ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait
 RUN chmod +x /wait
 
 EXPOSE 8080
-CMD /wait && ["npm", "start"]
+CMD /wait && npm start
