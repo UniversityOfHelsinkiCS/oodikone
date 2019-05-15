@@ -11,5 +11,8 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 RUN if [ "${NODE_ENV}" != "production" ]; then cp -r /usr/src/app/node_modules /usr/src/cache/node_modules; fi
 
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait /wait
+RUN chmod +x /wait
+
 EXPOSE 8080
-CMD ["npm", "start"]
+CMD /wait && ["npm", "start"]
