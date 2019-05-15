@@ -24,29 +24,34 @@ const deleteStudentStudyrights = async (studentnumber, transaction) => {
 }
 
 const updateAttainments = (studyAttainments, transaction) => studyAttainments.map(async ({ credit, creditTeachers, teachers, course }) => {
-  await Promise.all([
-    await Course.upsert(course, { transaction }),
-    await Credit.upsert(credit, { transaction }),
-  ])
-  await Promise.all([
-    Promise.all(course.disciplines.map(courseDiscipline => { CourseDisciplines.upsert(courseDiscipline, { transaction }) })),
-    Promise.all(course.providers.map(provider => Provider.upsert(provider, { transaction }))),
-    Promise.all(course.courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
-    teachers && Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
-    Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
-  ])
+  try {
+    await Promise.all([
+      Course.upsert(course, { transaction }),
+      Credit.upsert(credit, { transaction }),
+    ])
+
+    await Promise.all([
+      Promise.all(course.disciplines.map(courseDiscipline => CourseDisciplines.upsert(courseDiscipline, { transaction }))),
+      Promise.all(course.providers.map(provider => Provider.upsert(provider, { transaction }))),
+      Promise.all(course.courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
+      Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
+      Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
+    ])
+  } catch (e) {
+    console.log(e)
+  }
 })
 
 const updateStudyRights = (studyRights, transaction) => studyRights.map(async ({ studyRightExtent, studyright, elementDetails, studyRightElements, transfers }) => {
-  await Promise.all([
-    StudyrightExtent.upsert(studyRightExtent, { transaction }),
-    Studyright.create(studyright, { transaction })
-  ])
-  await Promise.all([
-    Promise.all(elementDetails.map(elementdetails => ElementDetails.upsert(elementdetails, { transaction }))),
-    Promise.all(studyRightElements.map(StudyRightElement => StudyrightElement.create(StudyRightElement, { transaction }))),
-    Promise.all(transfers.map(transfer => Transfers.upsert(transfer, { transaction })))
-  ])
+    await Promise.all([
+      StudyrightExtent.upsert(studyRightExtent, { transaction }),
+      Studyright.create(studyright, { transaction })
+    ])
+    return Promise.all([
+      Promise.all(elementDetails.map(elementdetails => ElementDetails.upsert(elementdetails, { transaction }))),
+      Promise.all(studyRightElements.map(StudyRightElement => StudyrightElement.create(StudyRightElement, { transaction }))),
+      Promise.all(transfers.map(transfer => Transfers.upsert(transfer, { transaction })))
+    ])
 })
 
 const updateStudent = async (student) => {
@@ -57,7 +62,7 @@ const updateStudent = async (student) => {
 
     await Student.upsert(studentInfo, { transaction })
     await Promise.all(semesterEnrollments.map(SE => SemesterEnrollment.upsert(SE, { transaction })))
-    await Promise.all(updateAttainments(studyAttainments, transaction))
+    if (studyAttainments) await Promise.all(updateAttainments(studyAttainments, transaction))
 
     if (studyRights) await Promise.all(updateStudyRights(studyRights, transaction))
 
@@ -66,7 +71,11 @@ const updateStudent = async (student) => {
     console.log(err)
     await transaction.rollback()
   }
-  await updateAttainmentDates()
+  try {
+    // await updateAttainmentDates()
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 const updateMeta = async ({

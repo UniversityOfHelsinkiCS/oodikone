@@ -250,23 +250,23 @@ services:
       - "27017"
     container_name: scheduler_db
 
-  updater_scheduler:
-    build:
-      context: services/updater_scheduler
-      args:
-        NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
-    restart: unless-stopped
-    volumes:
-      - ./services/updater_scheduler/:/usr/src/app
-    depends_on:
-      - nats
-      - scheduler_mongo
-    environment:
-      - NATS_URI=nats://nats:4222
-      - MONGO_URI=mongodb://scheduler_mongo:27017
-      - STUDENT_NUMBERS=./all_student_numbers.txt
-    container_name: updater_scheduler
+  # updater_scheduler:
+  #   build:
+  #     context: services/updater_scheduler
+  #     args:
+  #       NODE_ENV: 'development'
+  #   command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./services/updater_scheduler/:/usr/src/app
+  #   depends_on:
+  #     - nats
+  #     - scheduler_mongo
+  #   environment:
+  #     - NATS_URI=nats://nats:4222
+  #     - MONGO_URI=mongodb://scheduler_mongo:27017
+  #     - STUDENT_NUMBERS=./all_student_numbers.txt
+  #   container_name: updater_scheduler
 
 
   analytics:
