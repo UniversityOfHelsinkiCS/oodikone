@@ -29,13 +29,13 @@ const updateAttainments = (studyAttainments, transaction) => studyAttainments.ma
       Course.upsert(course, { transaction }),
       Credit.upsert(credit, { transaction }),
     ])
-
+    const { disciplines, providers, courseproviders } = course 
     await Promise.all([
-      Promise.all(course.disciplines.map(courseDiscipline => CourseDisciplines.upsert(courseDiscipline, { transaction }))),
-      Promise.all(course.providers.map(provider => Provider.upsert(provider, { transaction }))),
-      Promise.all(course.courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
-      Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
-      Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
+      disciplines && disciplines.length > 0 && Promise.all(disciplines.map(courseDiscipline => CourseDisciplines.upsert(courseDiscipline, { transaction }))),
+      providers.length > 0  && Promise.all(providers.map(provider => Provider.upsert(provider, { transaction }))),
+      courseproviders.length > 0 && Promise.all( courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
+      teachers.length > 0 && Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
+      creditTeachers > 0 && Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
     ])
   } catch (e) {
     console.log(e)
