@@ -403,11 +403,22 @@ const getMainCodes = () => {
 }
 
 const deleteDuplicateCode = async (code) => {
-  await CourseDuplicates.destroy({
-    where: {
-      coursecode: code
-    }
-  })
+  try {
+    await CourseDuplicates.destroy({
+      where: {
+        coursecode: code
+      }
+    })
+    await sequelize.query(
+      `DELETE FROM course_duplicates
+      WHERE groupid in ( SELECT groupid FROM course_duplicates
+      group by groupid
+      having count(*) = 1)`,
+      { type: sequelize.QueryTypes.BULKDELETE }
+    )
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 const getDuplicateCodesWithCourses = () => {
