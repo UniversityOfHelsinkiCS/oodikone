@@ -5,7 +5,7 @@ const fs = require('fs')
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
 const opts = stan.subscriptionOptions();
 opts.setManualAckMode(true);
-opts.setAckWait(15 * 1000); // 5min
+opts.setAckWait(1 * 60 * 1000); // 1min
 opts.setDeliverAllAvailable()
 opts.setDurableName('durable')
 opts.setMaxInFlight(1)

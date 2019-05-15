@@ -110,6 +110,7 @@ services:
     ports:
       - "8080:8080"
     environment:
+      WAIT_HOSTS: redis:6379,db:5421:5432
       REDIS: redis
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
@@ -179,10 +180,11 @@ services:
     ports:
       - 4567:4567
     environment:
-      - DB_URL=postgres://postgres@user_db:5432/user_db
-      - TEST_DB=postgres://postgres@user_db:5432/user_db_test
-      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
-      - TOKEN_SECRET=IWannaBeTheVeryBest
+      WAIT_HOSTS: user_db:5422:5432 
+      DB_URL: postgres://postgres@user_db:5432/user_db
+      TEST_DB: postgres://postgres@user_db:5432/user_db_test
+      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      TOKEN_SECRET: IWannaBeTheVeryBest
     depends_on:
       - user_db
     container_name: userservice
@@ -197,79 +199,81 @@ services:
     ports:
       - 545:545
     environment:
-      - PORT=545
-      - DB_URL=postgres://postgres@usage_db:5432/usage_db
-      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      WAIT_HOSTS: usage_db:5424:5432,
+      PORT: '545'
+      DB_URL: postgres://postgres@usage_db:5432/usage_db
+      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
     volumes:
       - ./services/oodikone2-usageservice/:/usr/src/app
     depends_on:
       - usage_db
     container_name: usageservice
 
-  updater_api:
-    build:
-      context: services/updater_api
-      args:
-        NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
-    restart: unless-stopped
-    volumes:
-      - ./services/updater_api/:/usr/src/app
-    depends_on:
-      - nats
-    environment:
-      - NATS_URI=nats://nats:4222
-      - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
-      - TOKEN=toskab1gs8cret5
-    container_name: updater_api
+  # updater_api:
+  #   build:
+  #     context: services/updater_api
+  #     args:
+  #       NODE_ENV: 'development'
+  #   command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./services/updater_api/:/usr/src/app
+  #   depends_on:
+  #     - nats
+  #   environment:
+  #     - NATS_URI=nats://nats:4222
+  #     - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
+  #     - TOKEN=toskab1gs8cret5
+  #   container_name: updater_api
 
-  updater_writer:
-    build:
-      context: services/updater_writer
-      args:
-        NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
-    restart: unless-stopped
-    volumes:
-      - ./services/updater_writer/:/usr/src/app
-      - ./shared/models:/usr/src/app/models
-      - ./shared/migrations:/usr/src/app/database/migrations
-    depends_on:
-      - nats
-      - db
-    environment:
-      NATS_URI: nats://nats:4222
-      DB_URL: postgres://postgres@db:5432/tkt_oodi
-      TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
-      TEST_DB_SCHEMA: updater_test
-    container_name: updater_writer
+  # updater_writer:
+  #   build:
+  #     context: services/updater_writer
+  #     args:
+  #       NODE_ENV: 'development'
+  #   command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./services/updater_writer/:/usr/src/app
+  #     - ./shared/models:/usr/src/app/models
+  #     - ./shared/migrations:/usr/src/app/database/migrations
+  #   depends_on:
+  #     - nats
+  #     - db
+  #   environment:
+  #     NATS_URI: nats://nats:4222
+  #     DB_URL: postgres://postgres@db:5432/tkt_oodi
+  #     TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
+  #     TEST_DB_SCHEMA: updater_test
+  #   container_name: updater_writer
 
-  scheduler_mongo:
-    image: mongo
-    restart: unless-stopped
-    volumes:
-      - ./mongodata:/data/db
-    expose:
-      - "27017"
-    container_name: scheduler_db
+  # scheduler_mongo:
+  #   image: mongo
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./mongodata:/data/db
+  #   expose:
+  #     - "27017"
+  #   container_name: scheduler_db
 
-  updater_scheduler:
-    build:
-      context: services/updater_scheduler
-      args:
-        NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
-    restart: unless-stopped
-    volumes:
-      - ./services/updater_scheduler/:/usr/src/app
-    depends_on:
-      - nats
-      - scheduler_mongo
-    environment:
-      - NATS_URI=nats://nats:4222
-      - MONGO_URI=mongodb://scheduler_mongo:27017
-      - STUDENT_NUMBERS=./all_student_numbers.txt
-    container_name: updater_scheduler
+  # updater_scheduler:
+  #   build:
+  #     context: services/updater_scheduler
+  #     args:
+  #       NODE_ENV: 'development'
+  #   command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./services/updater_scheduler/:/usr/src/app
+  #   depends_on:
+  #     - nats
+  #     - scheduler_mongo
+  #   environment:
+  #     - NATS_URI=nats://nats:4222
+  #     - MONGO_URI=mongodb://scheduler_mongo:27017
+  #     - STUDENT_NUMBERS=./all_student_numbers.txt
+  #     - ACTIVE_STUDENTS=./active_student_numbers.txt
+  #   container_name: updater_scheduler
 
 
   analytics:
@@ -284,14 +288,15 @@ services:
     ports:
       - 4568:4568
     environment:
-      - REDIS=analytics_redis
-      - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
-      - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
+      WAIT_HOSTS: analytics_db:5423
+      REDIS: analytics_redis
+      DB_URL: postgres://postgres@analytics_db:5432/analytics_db
+      TEST_DB: postgres://postgres@analytics_db:5432/analytics_db_test
     depends_on:
       - analytics_db
       - analytics_redis
     container_name: analytics
-
+    
   analytics_redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
