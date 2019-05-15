@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 import { func, arrayOf, object, shape, string, bool, oneOfType, number } from 'prop-types'
 import { Card, Icon, Button } from 'semantic-ui-react'
 import _ from 'lodash'
@@ -15,8 +16,13 @@ const PopulationQueryCard =
     units,
     updateStudentsFn,
     updating,
-    language
+    language,
+    history
   }) => {
+    const removePopulation = (uuid) => {
+      history.push('/populations')
+      removeSampleFn(uuid)
+    }
     const { uuid, year, semesters, months, studentStatuses } = query
     const { students } = population
     if (students.length > 0) {
@@ -27,7 +33,7 @@ const PopulationQueryCard =
             <Icon
               name="remove"
               className="controlIcon"
-              onClick={() => removeSampleFn(uuid)}
+              onClick={() => removePopulation(uuid)}
             />
           </Card.Header>
           <Card.Meta>
@@ -112,9 +118,10 @@ PopulationQueryCard.propTypes = {
   units: arrayOf(object).isRequired,
   unit: object, // eslint-disable-line
   updateStudentsFn: func.isRequired,
-  updating: bool.isRequired
+  updating: bool.isRequired,
+  history: shape({}).isRequired
 }
 
 const mapStateToProps = ({ settings }) => ({ language: settings.language })
 
-export default connect(mapStateToProps, null)(PopulationQueryCard)
+export default withRouter(connect(mapStateToProps, null)(PopulationQueryCard))
