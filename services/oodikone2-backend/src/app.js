@@ -4,8 +4,11 @@ const bodyParser = require('body-parser')
 const Raven = require('raven')
 const conf = require('./conf-backend')
 const routes = require('./routes')
+const { StartNats } = require('./events')
 const { PORT } = conf
 const app = express()
+
+StartNats()
 
 Raven.config(process.env.SENTRY_ADDR, { captureUnhandledRejections: true }).install()
 
