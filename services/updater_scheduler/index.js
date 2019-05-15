@@ -26,7 +26,7 @@ stan.on('connect', async () => {
       stan.publish('UpdateApi', task.task, (err, guid) => {
         if (err) {
           console.log('publish failed')
-        } 
+        }
       })
       stan.publish('status', `${task.task}:SCHEDULED`, (err) => {
         if(err) {
@@ -34,6 +34,24 @@ stan.on('connect', async () => {
         }
       })
     }
+  })
+  cron.schedule('* 3 * * *', async () => {
+    stan.publish('RefreshOverview', null, (err, guid) => {
+      if (err) {
+        console.log('publish failed', 'RefreshOverview')
+      } else {
+        console.log('published', 'RefreshOverview')
+      }
+    })
+  })
+  cron.schedule('* 3 * * *', async () => {
+    stan.publish('RefreshStudyrightAssociations', null, (err, guid) => {
+      if (err) {
+        console.log('publish failed', 'RefreshStudyrightAssociations')
+      } else {
+        console.log('published', 'RefreshStudyrightAssociations')
+      }
+    })
   })
   const statusSub = stan.subscribe('status')
   statusSub.on('message', async (msg) => {
