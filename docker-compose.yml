@@ -105,12 +105,12 @@ services:
       context: services/oodikone2-backend
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
     restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
-      WAIT_HOSTS: redis:6379,db:5421:5432
+      WAIT_HOSTS: redis:6379,db:5432,nats:4222
       REDIS: redis
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
@@ -131,13 +131,14 @@ services:
     depends_on:
       - db
       - redis
+      - nats
 
   frontend:
     build:
       context: services/oodikone2-frontend
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run docker']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run docker']
     restart: unless-stopped
     ports:
       - "8081:8081"
@@ -173,14 +174,14 @@ services:
       context: services/oodikone2-userservice
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/oodikone2-userservice/:/usr/src/app
     ports:
       - 4567:4567
     environment:
-      WAIT_HOSTS: user_db:5422:5432 
+      WAIT_HOSTS: user_db:5432
       DB_URL: postgres://postgres@user_db:5432/user_db
       TEST_DB: postgres://postgres@user_db:5432/user_db_test
       SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
@@ -194,12 +195,12 @@ services:
       context: services/oodikone2-usageservice
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
     restart: unless-stopped
     ports:
       - 545:545
     environment:
-      WAIT_HOSTS: usage_db:5424:5432,
+      WAIT_HOSTS: usage_db:5432
       PORT: '545'
       DB_URL: postgres://postgres@usage_db:5432/usage_db
       SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
@@ -214,13 +215,14 @@ services:
       context: services/updater_api
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/updater_api/:/usr/src/app
     depends_on:
       - nats
     environment:
+      - WAIT_HOSTS=nats:4222
       - NATS_URI=nats://nats:4222
       - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
       - TOKEN=toskab1gs8cret5
@@ -231,7 +233,7 @@ services:
       context: services/updater_writer
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/updater_writer/:/usr/src/app
@@ -241,6 +243,7 @@ services:
       - nats
       - db
     environment:
+      WAIT_HOSTS: nats:4222,db:5432
       NATS_URI: nats://nats:4222
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
@@ -261,7 +264,7 @@ services:
   #     context: services/updater_scheduler
   #     args:
   #       NODE_ENV: 'development'
-  #   command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+  #   command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
   #   restart: unless-stopped
   #   volumes:
   #     - ./services/updater_scheduler/:/usr/src/app
@@ -269,6 +272,7 @@ services:
   #     - nats
   #     - scheduler_mongo
   #   environment:
+  #     - WAIT_HOSTS=nats:4222,scheduler_mongo:27017
   #     - NATS_URI=nats://nats:4222
   #     - MONGO_URI=mongodb://scheduler_mongo:27017
   #     - STUDENT_NUMBERS=./all_student_numbers.txt
@@ -281,14 +285,14 @@ services:
       context: services/oodikone2-analytics
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/oodikone2-analytics/:/usr/src/app
     ports:
       - 4568:4568
     environment:
-      WAIT_HOSTS: analytics_db:5423
+      WAIT_HOSTS: analytics_db:5432,analytics_redis:6379
       REDIS: analytics_redis
       DB_URL: postgres://postgres@analytics_db:5432/analytics_db
       TEST_DB: postgres://postgres@analytics_db:5432/analytics_db_test
@@ -296,7 +300,7 @@ services:
       - analytics_db
       - analytics_redis
     container_name: analytics
-    
+
   analytics_redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]

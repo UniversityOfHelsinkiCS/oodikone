@@ -1,6 +1,13 @@
 version: '3'
 
 services:
+  nats:
+    image: nats-streaming
+    command: -cid updaterNATS
+    expose:
+      - "4222"
+    container_name: nats
+
   analytics_db:
     image: postgres:9.6.3
     ports:
@@ -72,6 +79,7 @@ services:
       - "8080:8080"
       - "9229:9229"
     environment:
+      WAIT_HOSTS: redis:6379,db:5432,nats:4222
       REDIS: redis
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
@@ -99,6 +107,7 @@ services:
     ports:
       - "5000:5000"
     environment:
+      WAIT_HOSTS: user_db:5432
       BACKEND_ADDR: backend
       ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
     container_name: frontend
@@ -111,6 +120,7 @@ services:
     ports:
       - 4567:4567
     environment:
+      - WAIT_HOSTS=user_db:5432
       - DB_URL=postgres://postgres@user_db:5432/user_db
       - TEST_DB=postgres://postgres@user_db:5432/user_db_test
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
@@ -127,6 +137,7 @@ services:
     ports:
       - 545:545
     environment:
+      - WAIT_HOSTS=usage_db:5432
       - PORT=545
       - DB_URL=postgres://postgres@usage_db:5432/usage_db
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
@@ -153,6 +164,7 @@ services:
     ports:
       - 4568:4568
     environment:
+      - WAIT_HOSTS=analytics_db:5432,analytics_redis:6379
       - REDIS=analytics_redis
       - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
       - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
