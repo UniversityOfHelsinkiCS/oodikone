@@ -110,6 +110,7 @@ services:
     ports:
       - "8080:8080"
     environment:
+      WAIT_HOSTS: redis:6379,db:5421:5432
       REDIS: redis
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
@@ -179,10 +180,11 @@ services:
     ports:
       - 4567:4567
     environment:
-      - DB_URL=postgres://postgres@user_db:5432/user_db
-      - TEST_DB=postgres://postgres@user_db:5432/user_db_test
-      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
-      - TOKEN_SECRET=IWannaBeTheVeryBest
+      WAIT_HOSTS: user_db:5422:5432 
+      DB_URL: postgres://postgres@user_db:5432/user_db
+      TEST_DB: postgres://postgres@user_db:5432/user_db_test
+      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      TOKEN_SECRET: IWannaBeTheVeryBest
     depends_on:
       - user_db
     container_name: userservice
@@ -197,9 +199,10 @@ services:
     ports:
       - 545:545
     environment:
-      - PORT=545
-      - DB_URL=postgres://postgres@usage_db:5432/usage_db
-      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      WAIT_HOSTS: usage_db:5424:5432,
+      PORT: '545'
+      DB_URL: postgres://postgres@usage_db:5432/usage_db
+      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
     volumes:
       - ./services/oodikone2-usageservice/:/usr/src/app
     depends_on:
@@ -285,14 +288,15 @@ services:
     ports:
       - 4568:4568
     environment:
-      - REDIS=analytics_redis
-      - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
-      - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
+      WAIT_HOSTS: analytics_db:5423
+      REDIS: analytics_redis
+      DB_URL: postgres://postgres@analytics_db:5432/analytics_db
+      TEST_DB: postgres://postgres@analytics_db:5432/analytics_db_test
     depends_on:
       - analytics_db
       - analytics_redis
     container_name: analytics
-
+    
   analytics_redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]

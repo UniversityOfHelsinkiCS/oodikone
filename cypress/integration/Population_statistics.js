@@ -109,8 +109,8 @@ describe('Population Statistics tests', () => {
       cy.contains("Matematiikan didaktiikka").siblings().eq(2).should("have.text", '9')
     })
 
-    cy.get(".refresh").eq(1).click()
     cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
+      cy.get(".refresh").click()
       cy.contains("number at least").siblings().within(() => cy.get("input").clear().type("0"))
       cy.contains("Matematiikan didaktiikka").siblings().eq(2).should("have.text", '1')
     })
