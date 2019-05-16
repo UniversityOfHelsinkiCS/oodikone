@@ -13,3 +13,6 @@ npm-debug.log
 studentnumbers.txt
 studentnumbers*.txt
 src/anonymized_API
+
+models
+migrations
