@@ -342,7 +342,6 @@ class PopulationStudents extends Component {
 
     const generateWorkbook = () => {
       const data = this.props.selectedStudents.map(sn => students[sn])
-      console.log(data[0])
       const sortedMandatory = _.sortBy(
         this.props.mandatoryCourses,
         [(m) => {

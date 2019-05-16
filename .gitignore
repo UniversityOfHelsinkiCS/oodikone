@@ -20,3 +20,7 @@ services/updater_writer/updater/test_assets/011120775.json
 services/updater_writer/updater/test_assets/014272112.json
 services/updater_writer/updater/test_assets/014441008.json
 services/updater_writer/updater/test_assets/meta.json
+services/updater_scheduler/all_student_numbers.txt
+services/updater_scheduler/debug.log
+services/updater_scheduler/active_student_numbers.txt
+services/oodikone2-backend/debug.log

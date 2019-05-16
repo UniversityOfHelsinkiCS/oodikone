@@ -1,6 +1,13 @@
 version: '3'
 
 services:
+  nats:
+    image: nats-streaming
+    command: -cid updaterNATS
+    expose:
+      - "4222"
+    container_name: nats
+
   analytics_db:
     image: postgres:9.6.3
     ports:
@@ -66,12 +73,14 @@ services:
   backend:
     image: toska/oodikone2-backend:latest
     build:
-      context: services/oodikone2-backend
+      context: services/backend
+      dockerfile: oodikone2-backend/Dockerfile
     restart: unless-stopped
     ports:
       - "8080:8080"
       - "9229:9229"
     environment:
+      WAIT_HOSTS: redis:6379,db:5432,nats:4222
       REDIS: redis
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
@@ -79,9 +88,12 @@ services:
       TOKEN_SECRET: IWannaBeTheVeryBest
       OODILEARN_URL: http://oodilearn:5000
       USERSERVICE_URL: http://userservice:4567
+      USAGESERVICE_URL: http://usageservice:545
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
+      ANALYTICS_URL: http://analytics:4568
+      NATS_URI: nats://nats:4222
     container_name: backend
     entrypoint: 'node --inspect=0.0.0.0:9229 --max_old_space_size=4096 index.js'
     depends_on:
@@ -98,6 +110,7 @@ services:
     ports:
       - "5000:5000"
     environment:
+      WAIT_HOSTS: user_db:5432
       BACKEND_ADDR: backend
       ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
     container_name: frontend
@@ -110,6 +123,7 @@ services:
     ports:
       - 4567:4567
     environment:
+      - WAIT_HOSTS=user_db:5432
       - DB_URL=postgres://postgres@user_db:5432/user_db
       - TEST_DB=postgres://postgres@user_db:5432/user_db_test
       - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
@@ -117,6 +131,33 @@ services:
     depends_on:
       - user_db
     container_name: userservice
+
+  usageservice:
+    image: toska/oodikone2-usageservice:latest
+    build:
+      context: services/oodikone2-usageservice
+    restart: unless-stopped
+    ports:
+      - 545:545
+    environment:
+      - WAIT_HOSTS=usage_db:5432
+      - PORT=545
+      - DB_URL=postgres://postgres@usage_db:5432/usage_db
+      - SECRET=Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+    depends_on:
+      - usage_db
+    container_name: usageservice
+
+  usage_db:
+    image: postgres:9.6.3
+    ports:
+      - "5424:5432"
+    volumes:
+      - ./usage_pgdata:/var/lib/postgresql/data
+    container_name: oodi_usage_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=usage_db
 
   analytics:
     image: toska/oodikone2-analytics:latest
@@ -126,6 +167,7 @@ services:
     ports:
       - 4568:4568
     environment:
+      - WAIT_HOSTS=analytics_db:5432,analytics_redis:6379
       - REDIS=analytics_redis
       - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
       - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test

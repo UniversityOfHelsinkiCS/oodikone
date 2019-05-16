@@ -58,3 +58,6 @@ jobs:
 
 after_script:
   - docker-compose logs
+
+after_failure:
+  - "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"Buildi on paskana! STOP AND FIX tai tulee kenkää! https://travis-ci.org/UniversityOfHelsinkiCS/oodikone\"}' https://hooks.slack.com/services/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"
