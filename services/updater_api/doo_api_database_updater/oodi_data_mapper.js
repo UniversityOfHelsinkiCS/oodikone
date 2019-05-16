@@ -103,11 +103,15 @@ const attainmentDataToCourse = (attainment) => {
   }
 }
 
-const getTeacherFromData = (teacher) => ({
-  id: teacher.teacher_id,
-  code: teacher.userid,
-  name: teacher.full_name
-})
+const getTeacherFromData = (teacher) => {
+  if (teacher) {
+    return {
+      id: teacher.teacher_id,
+      code: teacher.userid,
+      name: teacher.full_name
+    }
+  }
+}
 
 const ELEMENT_ID = {
   DEGREE_TITLE: 10,
@@ -196,21 +200,32 @@ const disciplineFromData = data => ({
   name: getTextsByLanguage(data.name)
 })
 
-const learningOpportunityDataToCourseDisciplines = data => data.disciplines.map(discipline => ({
-  discipline_id: discipline.discipline_id,
-  course_id: data.learningopportunity_id
-}))
+const learningOpportunityDataToCourseDisciplines = data => {
+  if (data) {
+    return data.disciplines.map(discipline => ({
+      discipline_id: discipline.discipline_id,
+      course_id: data.learningopportunity_id
+    }))
+  }
+}
 
-const learningOpportunityDataToCourse = data => ({
-  code: data.learningopportunity_id,
-  coursetypecode: data.learningopportunity_type_code,
-  disciplines: data.disciplines,
-  name: getTextsByLanguage(data.names),
-  startdate: parseDate(data.start_date),
-  enddate: parseDate(data.end_date)
-})
+const learningOpportunityDataToCourse = (data) => {
+  if (data) {
+    return {
+      code: data.learningopportunity_id,
+      coursetypecode: data.learningopportunity_type_code,
+      disciplines: data.disciplines,
+      name: getTextsByLanguage(data.names),
+      startdate: parseDate(data.start_date),
+      enddate: parseDate(data.end_date)
+    }
+  }
+}
 
 const learningOpportunityDataToCourseProviders = data => {
+  if (!data) {
+    return { providers: [], courseproviders: [] }
+  }
   const providers = data.organisations.map(organisation => ({
     providercode: organisation.code,
     name: getTextsByLanguage(organisation.name)
@@ -223,6 +238,7 @@ const learningOpportunityDataToCourseProviders = data => {
     providers,
     courseproviders
   }
+
 }
 
 const studyattainmentStatusCodeToCreditType = data => ({

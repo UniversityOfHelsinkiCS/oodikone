@@ -6,7 +6,7 @@ import SingleCourseStats from '../SingleCourseStats'
 import selectors from '../../../selectors/courseStats'
 
 class SingleCourse extends Component {
-  state={
+  state = {
     selected: this.props.selected
   }
 
@@ -30,7 +30,7 @@ class SingleCourse extends Component {
       <div>
         <Segment>
           <Form>
-            { courses ? courses.text : (
+            {courses ? courses.text : (
               <Form.Dropdown
                 name="selected"
                 options={courses}
@@ -40,11 +40,11 @@ class SingleCourse extends Component {
             )}
             <Divider />
             <Label.Group>
-              {selectedStatistic.alternatives.map(code => <Label key={code} content={code} />)}
+              <Label key={selectedStatistic.coursecode} content={`${selectedStatistic.alternatives.map(code => ` ${code}`)} ${selectedStatistic.name} `} />
             </Label.Group>
           </Form>
         </Segment>
-        { selected && <SingleCourseStats stats={selectedStatistic} /> }
+        {selected && <SingleCourseStats stats={selectedStatistic} />}
       </div>
     )
   }

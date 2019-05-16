@@ -190,4 +190,6 @@ run_e2e_setup () {
     db_anon_setup_full
     echo "Restarting Docker backend containers to run migrations, etc."
     docker-compose -f $1 restart backend userservice
+    echo "Restarting Docker nginx because it has old backend IP otherwise"
+    docker-compose -f $1 restart nginx
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { func, shape, arrayOf, string, bool } from 'prop-types'
-import { Segment, Header, Popup, Button, Portal, Message } from 'semantic-ui-react'
+import { Segment, Header, Popup, Button } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 
@@ -39,27 +39,17 @@ const PopulationCourses = ({
         />
         <InfoBox content={CoursesOf} />
       </Header>
+      <Button
+        key="refreshCourses"
+        content="Recalculate"
+        labelPosition="right"
+        primary
+        onClick={reloadCourses}
+        icon="refresh"
+        compact
+        disabled={!refreshNeeded}
+      />
 
-      <Portal open={refreshNeeded}>
-        <Message
-          style={{
-            left: '80%',
-            position: 'fixed',
-            top: '5%'
-          }}
-        >
-          Filters updated. Click to here to recalculate course table
-          <Button
-            key="refreshCourses"
-            primary
-            onClick={reloadCourses}
-            icon="refresh"
-            style={{ marginLeft: '10px' }}
-            compact
-            // disabled={filtersAreEqual()}
-          />
-        </Message>
-      </Portal>
       <SegmentDimmer translate={translate} isLoading={pending} />
       <PopulationCourseStats
         key={populationCourses.query.uuid}

@@ -1,0 +1,95 @@
+{
+  "name": "oodikone-backend",
+  "version": "0.0.1",
+  "description": "Backend for Oodikone",
+  "main": "index.js",
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./test/jest/globals.js"
+    ],
+    "testEnvironment": "node"
+  },
+  "scripts": {
+    "start": "node --max_old_space_size=4096 index.js",
+    "start-debug": "node --inspect-brk=0.0.0.0:9229 --max_old_space_size=4096 index.js",
+    "docker_local": "NODE_ENV=docker_local nodemon index.js",
+    "dev": "NODE_ENV=dev nodemon --max_old_space_size=4096 index.js",
+    "anon": "NODE_ENV=test nodemon index.js",
+    "test": "NODE_ENV=test jest --runInBand --verbose",
+    "test_docker": "docker exec -t backend /bin/bash -c 'npm test'",
+    "update_database_dev": "NODE_ENV=dev node src/services/doo_api_database_updater/run_updater.js",
+    "update_database": "node src/services/doo_api_database_updater/run_updater.js",
+    "update_database_anon": "NODE_ENV=anon node src/services/doo_api_database_updater/run_updater.js",
+    "init_redis": "node src/util/init_redis.js",
+    "seed_redis": "node src/util/add_json_duplicates_to_redis.js && node src/util/map_course_codes.js",
+    "studentnumbers_to_file": "NODE_ENV=dev node src/services/doo_api_database_updater/db_studentnumbers_to_file.js",
+    "lint": "eslint --parser babel-eslint src",
+    "force_sync_database": "node scripts/force_sync_database.js",
+    "update_studentnumbers_dev": "NODE_ENV=dev node src/services/doo_api_database_updater/student_list_updater.js",
+    "anonymize": "node src/anonymizer/anonymizer.js",
+    "seed_migrations": "node scripts/seed_migrations.js",
+    "update_top_teachers": "node scripts/update_top_teachers.js",
+    "update_students_not_modified_since": "node scripts/update_students_not_modified_since.js",
+    "refresh_studyright_associations": "node scripts/refresh_studyright_associations.js",
+    "update_attainment_dates": "node scripts/update_max_attainment_dates.js",
+    "create_defa_report": "node scripts/create_defa_report.js",
+    "seed_course_groups": "node scripts/create_course_groups_kayttis.js"
+  },
+  "author": "Matti Luukkainen",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "bluebird": "^3.5.3",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "dotenv": "^6.1.0",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.4.0",
+    "kafka-node": "^4.1.1",
+    "lodash": "^4.17.10",
+    "mkdirp": "^0.5.1",
+    "moment": "^2.22.2",
+    "morgan": "^1.9.1",
+    "node-nats-streaming": "^0.2.2",
+    "nodemailer": "^4.7.0",
+    "pg": "^7.7.1",
+    "raven": "^2.6.3",
+    "redis": "^2.8.0",
+    "sequelize": "^5.3.0",
+    "umzug": "^2.2.0",
+    "uuid": "^3.3.2",
+    "winston": "^3.0.0",
+    "winston-log2gelf": "^2.0.4",
+    "winston-transport": "^4.2.0"
+  },
+  "devDependencies": {
+    "ava": "^0.25.0",
+    "babel-eslint": "^8.2.6",
+    "eslint": "^5.9.0",
+    "faker": "^4.1.0",
+    "jest": "^24.1.0",
+    "nock": "^10.0.2",
+    "node-status": "^1.0.0",
+    "nodemon": "^1.18.7",
+    "nyc": "^13.1.0",
+    "supertest": "^3.1.0"
+  },
+  "ava": {
+    "files": [
+      "test/**/*_test.js"
+    ],
+    "source": [
+      "**/*.{js,jsx}",
+      "!test/**/*"
+    ],
+    "concurrency": 5,
+    "failFast": true,
+    "failWithoutAssertions": true,
+    "tap": true,
+    "powerAssert": false,
+    "require": [
+      "babel-register"
+    ],
+    "babel": "inherit"
+  }
+}

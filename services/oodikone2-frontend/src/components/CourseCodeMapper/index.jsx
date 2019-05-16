@@ -2,13 +2,15 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { connect } from 'react-redux'
-import { Header, Button, Message, Table, Input, Segment, Icon, Loader, Label } from 'semantic-ui-react'
+import { Button, Message, Table, Segment, Icon, Loader, Label, Grid } from 'semantic-ui-react'
 import { getDuplicates, addDuplicate, removeDuplicate } from '../../redux/coursecodeduplicates'
 
 import CourseSearch from '../CourseSearch'
-import './courseCodeMapper.css'
 import { getTextIn } from '../../common'
 import { findCourses } from '../../redux/courses'
+import {
+  getMandatoryCourses
+} from '../../redux/populationMandatoryCourses'
 
 const { func, shape, string, objectOf, arrayOf, bool } = PropTypes
 
@@ -16,13 +18,11 @@ class CourseCodeMapper extends Component {
   constructor(props) {
     super(props)
     props.getDuplicates(props.studyprogramme)
+    props.getMandatoryCourses(props.studyprogramme)
   }
 
   state = {
-    codeFilter: '',
-    nameFilter: '',
-    code1: '',
-    code2: ''
+    codes: {}
   }
 
   getName = (name) => {
@@ -31,18 +31,15 @@ class CourseCodeMapper extends Component {
   }
 
   getTableRows = () => {
-    const { courseCodeDuplicates } = this.props
-    const { codeFilter, nameFilter } = this.state
+    const { courseCodeDuplicates, mandatoryCourses, findCoursesDispatch } = this.props
     const { data } = courseCodeDuplicates
-    const filteredKeys = Object.keys(data)
-      .filter(k => data[k].some(e => e.code.toLocaleLowerCase().includes(codeFilter.toLocaleLowerCase())))
-      .filter(k => data[k].some(e => this.getName(e.name).toLocaleLowerCase().includes(nameFilter.toLocaleLowerCase())))
-    const rows = filteredKeys.map((key) => {
-      const duplicates = _.sortBy(courseCodeDuplicates.data[key], ['code'])
-      const maincourse = duplicates.find(e => e.code === key)
+    const find = (query, language) => findCoursesDispatch(query, language)
+    const rows = mandatoryCourses.data.map((course) => {
+      const maincode = Object.keys(data).find(k => data[k].map(e => e.code).includes(course.code))
+      const duplicates = maincode ? _.orderBy(data[maincode].filter(e => e.code !== course.code), ['code'], ['ASC']) : []
       return (
-        <Table.Row key={key}>
-          <Table.Cell>{`${key} ${this.getName(maincourse.name)}`}</Table.Cell>
+        <Table.Row key={course.code}>
+          <Table.Cell>{`${course.code} ${this.getName(course.name)}`}</Table.Cell>
           <Table.Cell>
             <Label.Group>
               {duplicates.map(e => (
@@ -53,25 +50,28 @@ class CourseCodeMapper extends Component {
               ))}
             </Label.Group>
           </Table.Cell>
+          <Table.Cell>
+            <Grid style={{ minWidth: '350px' }}>
+              <Grid.Column width={11}>
+                <CourseSearch
+                  handleResultSelect={
+                    (e, { result }) => this.setState(old => ({ codes: { ...old.codes, [course.code]: result.code } }))
+                  }
+                  findFunction={find}
+                />
+              </Grid.Column>
+              <Grid.Column width={5}>
+                <Button
+                  fluid
+                  content="Add"
+                  onClick={this.addDuplicate(course.code, this.state.codes[course.code])}
+                />
+              </Grid.Column>
+            </Grid>
+          </Table.Cell>
         </Table.Row>)
     })
     return rows
-  }
-
-  handleCodeFilterChange = (e) => {
-    this.setState({ codeFilter: e.target.value })
-  }
-
-  handleNameFilterChange = (e) => {
-    this.setState({ nameFilter: e.target.value })
-  }
-
-  handleResultSelect1 = (e, { result }) => {
-    this.setState({ code1: result.code })
-  }
-
-  handleResultSelect2 = (e, { result }) => {
-    this.setState({ code2: result.code })
   }
 
   addDuplicate = (code1, code2) => () => {
@@ -83,59 +83,30 @@ class CourseCodeMapper extends Component {
   }
 
   render() {
-    const { findCoursesDispatch } = this.props
-    const { pending } = this.props.courseCodeDuplicates
-    const disabled = !((this.state.code1 && this.state.code2) &&
-      (this.state.code1 !== this.state.code2))
-    const find = (query, language) => findCoursesDispatch(query, language)
+    const pending = this.props.courseCodeDuplicates.pending || this.props.mandatoryCourses.pending
+    const { data } = this.props.mandatoryCourses
     return (
       <div className="segmentContainer">
         <Segment className="contentSegment">
           <Message
-            header="Map corresponding course codes to each other"
+            header="Map mandatory courses to alternative courses"
             content="By default courses with different codes are considered as separate courses.
               If this is not the case use this to combine old and new course codes to each other."
           />
           <Loader active={pending} />
-          <Segment.Group>
-            <Segment.Group horizontal>
-              <Segment>
-                <Header content="Filter course codes" />
-                <Input
-                  fluid
-                  placeholder="By Code"
-                  onChange={this.handleCodeFilterChange}
-                />
-                <Input
-                  fluid
-                  placeholder="By Name"
-                  onChange={this.handleNameFilterChange}
-                />
-              </Segment>
-              <Segment>
-                <Header>Add new corresponding code</Header>
-                <CourseSearch handleResultSelect={this.handleResultSelect1} findFunction={find} />
-                <CourseSearch handleResultSelect={this.handleResultSelect2} findFunction={find} />
-                <Button
-                  disabled={disabled}
-                  className="button"
-                  content="Add"
-                  onClick={this.addDuplicate(this.state.code1, this.state.code2)}
-                />
-              </Segment>
-            </Segment.Group>
-          </Segment.Group>
           <Table striped celled>
             <Table.Header>
               <Table.Row>
-                <Table.HeaderCell>Main course</Table.HeaderCell>
-                <Table.HeaderCell>Grouped courses</Table.HeaderCell>
+                <Table.HeaderCell>Mandatory course</Table.HeaderCell>
+                <Table.HeaderCell>Alternative courses</Table.HeaderCell>
+                <Table.HeaderCell>Add alternative</Table.HeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {this.getTableRows()}
             </Table.Body>
           </Table>
+          {data.length === 0 && <Message info>You need to define mandatory courses first</Message>}
         </Segment>
       </div>
     )
@@ -149,6 +120,8 @@ CourseCodeMapper.propTypes = {
   getDuplicates: func.isRequired,
   addDuplicate: func.isRequired,
   removeDuplicate: func.isRequired,
+  getMandatoryCourses: func.isRequired,
+  mandatoryCourses: shape({}).isRequired,
   courseCodeDuplicates: shape({
     pending: bool,
     error: bool,
@@ -163,7 +136,8 @@ CourseCodeMapper.propTypes = {
   }).isRequired
 }
 
-const mapStateToProps = ({ courseCodeDuplicates, settings }) => ({
+const mapStateToProps = ({ courseCodeDuplicates, settings, populationMandatoryCourses }) => ({
+  mandatoryCourses: populationMandatoryCourses,
   courseCodeDuplicates,
   language: settings.language
 })
@@ -176,7 +150,9 @@ const mapDispatchToProps = dispatch => ({
   removeDuplicate: code =>
     dispatch(removeDuplicate(code)),
   findCoursesDispatch: (query, language) =>
-    dispatch(findCourses(query, language))
+    dispatch(findCourses(query, language)),
+  getMandatoryCourses: studyprogramme =>
+    dispatch(getMandatoryCourses(studyprogramme))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(CourseCodeMapper)

@@ -5,7 +5,7 @@ const { getStudent, getMeta } = require('./doo_api_database_updater/updater_form
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
 var opts = stan.subscriptionOptions();
 opts.setManualAckMode(true);
-opts.setAckWait(15 * 1000); // 5min
+opts.setAckWait(15 * 60 * 1000); // 5min
 opts.setDeliverAllAvailable()
 opts.setDurableName('durable')
 stan.on('connect', function () {
@@ -16,10 +16,16 @@ stan.on('connect', function () {
   sub.on('message', async (msg) => {
     let data = ''
     const message = msg.getData()
+    if (!message) {
+      console.log('undefined message')
+      msg.ack()
+      return
+    }
     if (message === 'meta') {
       data = await getMeta()
       stan.publish('UpdateWrite', JSON.stringify(data))
       msg.ack()
+      stan.publish('status', `${message}:FETCHED`, (err) => { if (err) console.log(err) })
     } else {
       // TODO: check that its a valid studentnumber and just ack it if its not
       data = await getStudent(message)
@@ -30,7 +36,7 @@ stan.on('connect', function () {
             return err
           } else {
             msg.ack()
-            console.log('read from api and published for writing', guid)
+            stan.publish('status', `${message}:FETCHED`, (err) => { if (err) console.log(err) })
           }
         })
       } catch (e) {

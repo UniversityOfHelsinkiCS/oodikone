@@ -1,0 +1,22 @@
+{
+  "name": "updater_writer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV=test jest --runInBand --verbose",
+    "test_docker": "docker exec -t updater_writer /bin/bash -c 'npm test'",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.0.0",
+    "jest": "^24.8.0",
+    "node-nats-streaming": "^0.2.2",
+    "nodemon": "^1.19.0",
+    "pg": "^7.10.0",
+    "sequelize": "^5.8.5"
+  }
+}
