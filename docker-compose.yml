@@ -102,7 +102,8 @@ services:
 
   backend:
     build:
-      context: services/oodikone2-backend
+      context: services/backend
+      dockerfile: oodikone2-backend/Dockerfile
       args:
         NODE_ENV: 'development'
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
@@ -124,9 +125,9 @@ services:
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
     volumes:
-      - ./services/oodikone2-backend/:/usr/src/app
-      - ./shared/models:/usr/src/app/src/models
-      - ./shared/migrations:/usr/src/app/src/database/migrations
+      - ./services/backend/oodikone2-backend/:/usr/src/app
+      - ./services/backend/shared/models:/usr/src/app/src/models
+      - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
     container_name: backend
     depends_on:
       - db
@@ -230,15 +231,16 @@ services:
 
   updater_writer:
     build:
-      context: services/updater_writer
+      context: services/backend
+      dockerfile: updater_writer/Dockerfile
       args:
         NODE_ENV: 'development'
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
     restart: unless-stopped
     volumes:
-      - ./services/updater_writer/:/usr/src/app
-      - ./shared/models:/usr/src/app/models
-      - ./shared/migrations:/usr/src/app/database/migrations
+      - ./services/backend/updater_writer/:/usr/src/app
+      - ./services/backend/shared/models:/usr/src/app/models
+      - ./services/backend/shared/migrations:/usr/src/app/database/migrations
     depends_on:
       - nats
       - db

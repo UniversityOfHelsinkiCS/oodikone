@@ -1,0 +1,5 @@
+**/node_modules
+updater_writer/**/models
+updater_writer/**/migrations
+oodikone2-backend/**/models
+oodikone2-backend/**/migrations
