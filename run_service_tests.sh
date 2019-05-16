@@ -2,9 +2,9 @@
 
 # stop on first error
 set -e
-npm run --prefix services/oodikone2-backend test_docker
-npm test --prefix services/oodikone2-analytics
-npm run --prefix services/oodikone2-userservice test_docker
-npm test --prefix services/oodikone2-usageservice
-npm run --prefix services/oodikone2-frontend test_docker
-# npm run --prefix services/updater_writer test_docker
+docker-compose exec -T backend npm test
+docker-compose exec -T userservice npm test
+docker-compose exec -T frontend npm test
+docker-compose exec -T analytics npm test
+docker-compose exec -T usageservice npm test
+# docker-compose exec -T updater_writer npm test
