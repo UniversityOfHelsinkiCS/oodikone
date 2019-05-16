@@ -35,7 +35,7 @@ jobs:
       deploy: # deploy is always skipped for PR
         provider: script
         skip_cleanup: true
-        script: "docker-compose -f docker-compose.lateste2e.yml push && curl --fail -k -X POST -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" https://toska.cs.helsinki.fi/toskawatch/release/ && curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"Staging auto deployment started!\"}' ${SLACKBOT_URL}"
+        script: "docker-compose -f docker-compose.lateste2e.yml push && curl --fail -k -X POST -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" https://toska.cs.helsinki.fi/toskawatch/release/ && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"Staging auto deployment started!\\\"}\" ${SLACKBOT_URL}"
         on:
           branch: master
     - # in parallel
@@ -53,12 +53,12 @@ jobs:
       deploy: # deploy is always skipped for PR
         provider: script
         skip_cleanup: true
-        script: "docker-compose -f docker-compose.lateste2e.production.yml push && curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"${TRAVIS_TAG} release waiting for manual deployment!\"}' ${SLACKBOT_URL}"
+        script: "docker-compose -f docker-compose.lateste2e.production.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release waiting for manual deployment!\\\"}\" ${SLACKBOT_URL}"
         on:
           tags: true
 
 after_script:
   - docker-compose logs
 
-after_failure:
-  - "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"STOP AND FIX tai tulee kenkää! ${AUTHOR_NAME} ${TRAVIS_BUILD_WEB_URL}\"}' ${SLACKBOT_URL}"
+# after_failure:
+#  - "curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"STOP AND FIX tai tulee kenkää! ${AUTHOR_NAME} ${TRAVIS_BUILD_WEB_URL}\\\"}\" ${SLACKBOT_URL}"
