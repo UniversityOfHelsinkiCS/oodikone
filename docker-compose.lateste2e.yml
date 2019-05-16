@@ -73,7 +73,8 @@ services:
   backend:
     image: toska/oodikone2-backend:staging
     build:
-      context: services/oodikone2-backend
+      context: services/backend
+      dockerfile: oodikone2-backend/Dockerfile
     restart: unless-stopped
     ports:
       - "8080:8080"
