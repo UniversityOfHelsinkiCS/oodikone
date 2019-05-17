@@ -160,7 +160,7 @@ const reducer = (state = initial, action) => {
         ...state,
         filterPending: false,
         error: false,
-        filtersFromBackend: state.filtersFromBackend.concat(action.response)
+        filtersFromBackend: action.response
       }
     case 'DELETE_FILTER_ATTEMPT':
       return {
