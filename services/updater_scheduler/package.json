@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node --max_old_space_size=4096 index.js",
+    "dev": "nodemon --max_old_space_size=4096 index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
+    "moment": "^2.24.0",
     "mongoose": "^5.5.8",
     "node-cron": "^2.0.3",
     "node-nats-streaming": "^0.2.2",
