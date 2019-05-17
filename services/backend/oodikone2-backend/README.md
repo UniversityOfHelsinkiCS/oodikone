@@ -1,9 +1,4 @@
 # oodikone2-backend
-Master:
-[![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-backend.svg?branch=master)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-backend)
-
-Trunk:
-[![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-backend.svg?branch=trunk)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone2-backend)
 
 ## Dev
 
@@ -69,34 +64,6 @@ Fill database with data from test.bak dump file:
 
 `cat test.bak | docker exec -i oodi_db psql -U postgres -d tkt_oodi_test`
 
-Install node
-https://nodejs.org/en/download/
-
-Clone the repository and install the packages in the root of the project:
-
-```
-git clone git@github.com:UniversityOfHelsinkiCS/oodikone2-backend.git`
-cd oodikone2-backend
-npm install
-```
-
-Create .env file containing
-```
-DB_URL=postgres://postgres@localhost:5421/tkt_oodi
-TEST_DB=postgres://postgres@localhost:5421/tkt_oodi_test
-FRONT_URL=http://localhost:8000
-REDIS=localhost
-TOKEN_SECRET=IWannaBeTheVeryBest
-```
-
-To initiate and seed the redis db, run: 
-
-`npm run init_redis`
-
-and
-
-`npm run seed_redis`
-
 ### Running 
 
 #### Dev
@@ -111,7 +78,7 @@ Run `npm test`
 
 Always deploy first to staging! 
 
-When merging from trunk to master Travis builds a docker image for staging and pushes it automatically.
+When merging from trunk to master Travis builds a docker image for staging and pushes it automatically to dockerh-hub. Currently **staging** is also automatically deployed after the image is pushed.
 
 When a release (or tag) is created in master branch Travis builds a docker image for production and pushes it automatically.
 
@@ -188,7 +155,7 @@ To update your database run `docker-compose run -d CONTAINER_NAME npm run update
 
 ### Anonymized data & E2E environment
 
-Use [oodikone2-cli](https://github.com/UniversityOfHelsinkiCS/oodikone2-cli) to setup you're environments.
+Use [oodikone-cli](https://github.com/UniversityOfHelsinkiCS/oodikone) to setup you're environments.
 
 Before running cli make yourself a deployment key for Anonyymioodi private repository and put it in your cli folder as `private.key`. This allows you to download the anonymized dumps from the repository.
 
