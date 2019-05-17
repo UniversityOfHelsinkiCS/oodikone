@@ -61,7 +61,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
                 .map(year => (
                   <Table.Row key={year.year}>
                     <Table.Cell>{year.year}</Table.Cell>
-                    <Table.Cell>{year.credits}</Table.Cell>
+                    <Table.Cell>{Math.floor(year.credits)}</Table.Cell>
                     {thesisTypes.includes('BACHELOR') && (
                       <Table.Cell>{year.bThesis}</Table.Cell>
                     )}
