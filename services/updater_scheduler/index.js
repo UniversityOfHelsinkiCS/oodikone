@@ -3,33 +3,28 @@ const cron = require('node-cron');
 const Schedule = require('./models')
 const fs = require('fs');
 const logger = require('./logger')
+const { updateStudentNumberList } = require('./student_list_updater')
 
 let updatedCount = 0
+let scheduledCount = 0
+let fetchedCount = 0
+
+const TIMEZONE = 'Europe/Helsinki'
 
 const updateTask = async (task, status, type) => {
   if (type) {
     await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type, active }, { upsert: true })
 
   } else {
-    await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date() }, { upsert: true })
+    await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type: 'other', active: true }, { upsert: true })
   }
-}
-const testpopulate = async () => {
-  await updateTask('meta', 'CREATED', 'other')
-  const students = fs.readFileSync(process.env.STUDENT_NUMBERS).toString().split("\n")
-  const activeStudents = fs.readFileSync(process.env.ACTIVE_STUDENTS).toString().split("\n")
-  const taskStudents = students.map(student => ({ task: student, status: 'CREATED', updatedAt: new Date(), type: 'student', active: student.includes(activeStudents) }))
-  Schedule.collection.insert(taskStudents, () => console.log('ayyyy'))
-  console.log('täskit tehty lol')
 }
 
 stan.on('connect', async () => {
-  // await testpopulate()
-
   cron.schedule('0 0 1 * *', async () => {
     // Update ALL students and meta every month
 
-    const tasks =['meta', ...( await Schedule.find({ type: 'student' }).sort({ 'updatedAt': 1 }))]
+    const tasks =['meta', ...( await Schedule.find({ type: 'student' }))]
     for (const task of tasks) {
       stan.publish('UpdateApi', task.task, (err, guid) => {
         if (err) {
@@ -42,6 +37,11 @@ stan.on('connect', async () => {
         }
       })
     }
+  }, { TIMEZONE })
+
+  cron.schedule('20 4 1 1,3,8,10 *', async () => {
+    // At 04:20 on day-of-month 1 in January, March, August, and October.”
+    updateStudentNumberList()
   })
   cron.schedule('0 23 * * *', async () => {
     // Update ACTIVE students every night
@@ -59,13 +59,15 @@ stan.on('connect', async () => {
         }
       })
     }
-  })
+  }, { TIMEZONE })
 
   cron.schedule('0 0-9 * * *', async () => {
     // Just log some statistics about updater during nights
-    logger.info(`${updatedCount} TASKS DONE IN LAST HOUR`)
+    logger.info(`${updatedCount} TASKS DONE IN LAST HOUR\n ${scheduledCount} TASKS SCHEDULED IN LAST HOUR\n ${fetchedCount} TASKS FETCHED FROM API IN LAST HOUR`)
     updatedCount = 0
-  })
+    fetchedCount = 0
+    scheduledCount = 0
+  }, { TIMEZONE })
   cron.schedule('* 7 * * *', async () => {
     stan.publish('RefreshOverview', null, (err, guid) => {
       if (err) {
@@ -88,14 +90,23 @@ stan.on('connect', async () => {
         console.log('published', 'UpdateAttainmentDates')
       }
     })
-  })
+  }, { TIMEZONE })
 
   const statusSub = stan.subscribe('status')
 
   statusSub.on('message', async (msg) => {
     const message = msg.getData().split(':')
-    if (message[1] === 'DONE') {
-      updatedCount = updatedCount + 1
+
+    switch (message[1]) {
+      case 'DONE':
+        updatedCount = updatedCount + 1
+        break
+      case 'FETCHED':
+        fetchedCount = fetchedCount + 1
+        break
+      case 'SCHEDULED':
+        scheduledCount = scheduledCount + 1
+        break
     }
     await updateTask(message[0], message[1])
   })
