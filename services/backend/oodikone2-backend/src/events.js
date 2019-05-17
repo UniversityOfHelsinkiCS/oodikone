@@ -11,17 +11,18 @@ const { setProductivity, setThroughput, patchProductivity, patchThroughput } = r
 
 const taskStatuses = { }
 const handleMessage = (asyncHandlerFunction) => async (msg) => {
-  if (taskStatuses[msg.getSubject()])
+  const key = msg.getSubject()+'_'+msg.getData()
+  if (taskStatuses[key])
     return
-  stan.publish('status', msg.getSubject()+'_'+msg.getData()+':RECEIVED', (err) => {
+  stan.publish('status', key+':RECEIVED', (err) => {
     if(err) {
       console.log('publish failed', err)
     }
   })
-  taskStatuses[msg.getSubject()] = true
+  taskStatuses[key] = true
   const success = await asyncHandlerFunction(msg)
-  taskStatuses[msg.getSubject()] = false
-  stan.publish('status', msg.getSubject()+'_'+msg.getData()+(success ? ':DONE' : ':ERRORED'), (err) => {
+  taskStatuses[key] = false
+  stan.publish('status', key+(success ? ':DONE' : ':ERRORED'), (err) => {
     if(err) {
       console.log('publish failed', err)
     }

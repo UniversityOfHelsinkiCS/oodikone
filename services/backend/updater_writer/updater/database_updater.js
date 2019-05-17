@@ -29,12 +29,12 @@ const updateAttainments = (studyAttainments, transaction) => studyAttainments.ma
       Course.upsert(course, { transaction }),
       Credit.upsert(credit, { transaction }),
     ])
-    const { disciplines, providers, courseproviders } = course 
+    const { disciplines, providers, courseproviders } = course
     await Promise.all([
       disciplines && disciplines.length > 0 && Promise.all(disciplines.map(courseDiscipline => CourseDisciplines.upsert(courseDiscipline, { transaction }))),
-      providers.length > 0  && Promise.all(providers.map(provider => Provider.upsert(provider, { transaction }))),
-      courseproviders.length > 0 && Promise.all( courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
-      teachers.length > 0 && Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
+      providers.length > 0 && Promise.all(providers.map(provider => Provider.upsert(provider, { transaction }))),
+      courseproviders.length > 0 && Promise.all(courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
+      teachers && teachers.length > 0 && Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
       creditTeachers.length > 0 && Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
     ])
   } catch (e) {
@@ -43,15 +43,15 @@ const updateAttainments = (studyAttainments, transaction) => studyAttainments.ma
 })
 
 const updateStudyRights = (studyRights, transaction) => studyRights.map(async ({ studyRightExtent, studyright, elementDetails, studyRightElements, transfers }) => {
-    await Promise.all([
-      StudyrightExtent.upsert(studyRightExtent, { transaction }),
-      Studyright.create(studyright, { transaction })
-    ])
-    return Promise.all([
-      Promise.all(elementDetails.map(elementdetails => ElementDetails.upsert(elementdetails, { transaction }))),
-      Promise.all(studyRightElements.map(StudyRightElement => StudyrightElement.create(StudyRightElement, { transaction }))),
-      Promise.all(transfers.map(transfer => Transfers.upsert(transfer, { transaction })))
-    ])
+  await Promise.all([
+    StudyrightExtent.upsert(studyRightExtent, { transaction }),
+    Studyright.create(studyright, { transaction })
+  ])
+  return Promise.all([
+    Promise.all(elementDetails.map(elementdetails => ElementDetails.upsert(elementdetails, { transaction }))),
+    Promise.all(studyRightElements.map(StudyRightElement => StudyrightElement.create(StudyRightElement, { transaction }))),
+    Promise.all(transfers.map(transfer => Transfers.upsert(transfer, { transaction })))
+  ])
 })
 
 const updateStudent = async (student) => {
@@ -61,7 +61,13 @@ const updateStudent = async (student) => {
     await deleteStudentStudyrights(studentInfo.studentnumber, transaction) // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
 
     await Student.upsert(studentInfo, { transaction })
-    await Promise.all(semesterEnrollments.map(SE => SemesterEnrollment.upsert(SE, { transaction })))
+    try {
+    await Promise.all(semesterEnrollments.map(SE =>
+      SemesterEnrollment.upsert(SE, { transaction })))
+    } catch(e) {
+      console.log(e)
+      process.kill()
+    }
     if (studyAttainments) await Promise.all(updateAttainments(studyAttainments, transaction))
 
     if (studyRights) await Promise.all(updateStudyRights(studyRights, transaction))
