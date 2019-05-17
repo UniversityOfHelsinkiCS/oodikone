@@ -95,7 +95,6 @@ services:
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
     container_name: backend
-    entrypoint: 'node --inspect=0.0.0.0:9229 --max_old_space_size=4096 index.js'
     depends_on:
       - db
       - redis
@@ -175,6 +174,73 @@ services:
       - analytics_db
       - analytics_redis
     container_name: analytics
+
+  updater_api:
+    image: toska/updater_api:staging
+    build:
+      context: services/updater_api
+    restart: unless-stopped
+    volumes:
+      - ./services/updater_api/:/usr/src/app
+    depends_on:
+      - nats
+    environment:
+      - WAIT_HOSTS=nats:4222
+      - NATS_URI=nats://nats:4222
+      - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
+      - TOKEN=toskab1gs8cret5
+    container_name: updater_api
+
+  updater_writer:
+    image: toska/updater_writer:staging
+    build:
+      context: services/backend
+      dockerfile: updater_writer/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./services/backend/updater_writer/:/usr/src/app
+      - ./services/backend/shared/models:/usr/src/app/models
+      - ./services/backend/shared/migrations:/usr/src/app/database/migrations
+    depends_on:
+      - nats
+      - db
+    environment:
+      WAIT_HOSTS: nats:4222,db:5432
+      NATS_URI: nats://nats:4222
+      DB_URL: postgres://postgres@db:5432/tkt_oodi
+      TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
+      TEST_DB_SCHEMA: updater_test
+    container_name: updater_writer
+
+  scheduler_mongo:
+    image: mongo
+    restart: unless-stopped
+    volumes:
+      - ./mongodata:/data/db
+    expose:
+      - "27017"
+    container_name: scheduler_db
+
+  updater_scheduler:
+    image: toska/updater_scheduler:staging
+    build:
+      context: services/updater_scheduler
+    command: ["echo", "mluukkai on orjuuttaja"]
+    restart: unless-stopped
+    volumes:
+      - ./services/updater_scheduler/:/usr/src/app
+    depends_on:
+      - nats
+      - scheduler_mongo
+    environment:
+      - WAIT_HOSTS=nats:4222,scheduler_mongo:27017
+      - NATS_URI=nats://nats:4222
+      - MONGO_URI=mongodb://scheduler_mongo:27017
+      - STUDENT_NUMBERS=./all_student_numbers.txt
+      - ACTIVE_STUDENTS=./active_student_numbers.txt
+      - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
+      - TOKEN=toskab1gs8cret5
+    container_name: updater_scheduler
 
   nginx:
     image: nginx:latest

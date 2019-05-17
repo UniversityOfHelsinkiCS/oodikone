@@ -104,10 +104,6 @@ ping_psql_real () {
 }
 
 db_setup_full () {
-    echo "Getting backups from the Oodikone server, this will prompt you for your password. "
-    get_oodikone_server_backup
-    echo "Unpacking compressed files"
-    unpack_oodikone_server_backup
     echo "Restoring PostgreSQL from backup"
     ping_psql_real "oodi_db" "tkt_oodi_real"
     retry restore_real_psql_from_backup
@@ -120,10 +116,6 @@ db_setup_full () {
 }
 
 db_anon_setup_full () {
-    echo "Getting anon backups from the private repository. "
-    get_anon_oodikone
-    echo "Unpacking compressed files"
-    unpack_oodikone_server_backup
     echo "Restoring PostgreSQL from backup"
     ping_psql "oodi_db" "tkt_oodi"
     retry restore_psql_from_backup
@@ -156,6 +148,12 @@ run_full_setup () {
     install_cli_npm_packages
     echo "Init dirs"
     init_dirs
+    echo "Getting backups from the Oodikone server, this will prompt you for your password. "
+    get_oodikone_server_backup
+    echo "Getting anon backups from the private repository. "
+    get_anon_oodikone
+    echo "Unpacking compressed files"
+    unpack_oodikone_server_backup
     echo "Building images, starting containers"
     docker_build
     echo "Setup oodikone db from dump, this will prompt you for your password."
@@ -170,6 +168,10 @@ run_anon_full_setup () {
     install_cli_npm_packages
     echo "Init dirs"
     init_dirs
+    echo "Getting anon backups from the private repository. "
+    get_anon_oodikone
+    echo "Unpacking compressed files"
+    unpack_oodikone_server_backup
     echo "Building images, starting containers"
     docker_build
     echo "Setup oodikone db from dump, this will prompt you for your password."
@@ -184,6 +186,10 @@ run_e2e_setup () {
     install_cli_npm_packages
     echo "Init dirs"
     init_dirs
+    echo "Getting anon backups from the private repository. "
+    get_anon_oodikone
+    echo "Unpacking compressed files"
+    unpack_oodikone_server_backup
     echo "Building images, starting containers"
     docker-compose -f $1 build && docker-compose -f $1 up -d
     echo "Setup oodikone db from dump, this will prompt you for your password."

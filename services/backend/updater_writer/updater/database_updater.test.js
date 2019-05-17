@@ -12,7 +12,7 @@ const meta = require('./test_assets/meta')
 const { sequelize, forceSyncDatabase } = require('../database/connection')
 const { seedMigrations } = require('../database/seed_migrations')
 const conf = require('../conf-backend')
-
+jest.setTimeout(10000)
 describe('Updater works', () => {
     beforeAll(async () => {
         await forceSyncDatabase()
@@ -77,13 +77,7 @@ describe('Updater works', () => {
             expect(disciplines.map(_ => _.name)[0]).toMatchObject({ fi: expect.any(String) })
         })
 
-        test('Course disciplines are written to database', async () => {
-            const courseDisciplines = await CourseDisciplines.findAll()
-            expect(courseDisciplines.length).toBe(40)
-            expect(courseDisciplines.map(_ => _.discipline_id)).not.toContain(null)
-            expect(courseDisciplines.map(_ => _.course_id)).not.toContain(null)
-
-        })
+       
 
     })
     describe('Updater writes students the right way', () => {
@@ -211,6 +205,13 @@ describe('Updater works', () => {
             expect(courseproviders.length).toBe(123)
             expect(courseproviders.map(_ => _.coursecode)).not.toContain(null)
             expect(courseproviders.map(_ => _.providercode)).not.toContain(null)
+        })
+        test('Course disciplines are written to database', async () => {
+            const courseDisciplines = await CourseDisciplines.findAll()
+            expect(courseDisciplines.length).toBe(40)
+            expect(courseDisciplines.map(_ => _.discipline_id)).not.toContain(null)
+            expect(courseDisciplines.map(_ => _.course_id)).not.toContain(null)
+
         })
 
         test('Study right extent are written to database', async () => {
