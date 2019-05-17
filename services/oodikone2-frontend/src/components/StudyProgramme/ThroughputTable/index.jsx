@@ -3,6 +3,7 @@ import moment from 'moment'
 import { Header, Loader, Table, Button, Grid } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, func } from 'prop-types'
 import { connect } from 'react-redux'
+import { flatten, uniq } from 'lodash'
 import { callApi } from '../../../apiConnection'
 import { getThroughput } from '../../../redux/throughput'
 
@@ -11,6 +12,8 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
   const morethan = x => (total, amount) => (amount >= x ? total + 1 : total)
   if (error) return <h1>Oh no so error {error}</h1>
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
+  const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
+  const renderGenders = genders.length > 0
   let thesisTypes = []
   if (thesis) {
     thesisTypes = thesis.map(t => t.thesisType)
@@ -51,7 +54,11 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
-            <Table.HeaderCell rowSpan="2">Students</Table.HeaderCell>
+            {
+              renderGenders ?
+                <Table.HeaderCell colSpan={genders.length + 1}>Students</Table.HeaderCell> :
+                <Table.HeaderCell rowSpan="2">Students</Table.HeaderCell>
+            }
             <Table.HeaderCell rowSpan="2">Graduated</Table.HeaderCell>
             <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
             {(thesisTypes.includes('BACHELOR') ||
@@ -61,7 +68,10 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
               </Table.HeaderCell>
             )}
           </Table.Row>
+
           <Table.Row>
+            {renderGenders ? <Table.HeaderCell content="Total" /> : null}
+            {genders.map(gender => <Table.HeaderCell key={gender} content={gender} />)}
             <Table.HeaderCell content=">= 30" />
             <Table.HeaderCell content=">= 60" />
             <Table.HeaderCell content=">= 90" />
@@ -84,6 +94,11 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
               <Table.Row key={year.year}>
                 <Table.Cell>{year.year}</Table.Cell>
                 <Table.Cell>{year.credits.length}</Table.Cell>
+                {genders.map(gender => (
+                  <Table.Cell key={year.year + year.genders[gender]}>
+                    {`${year.genders[gender]} (${Math.floor((year.genders[gender] / year.credits.length) * 100)}%)` || 0}
+                  </Table.Cell>
+                ))}
                 <Table.Cell>{year.graduated}</Table.Cell>
                 <Table.Cell>
                   {year.credits.reduce(morethan(30), 0)}
