@@ -130,6 +130,7 @@ class PopulationCourseStats extends Component {
       .filter(studentAmountFilter)
       .filter(c => !codeFilter || courseCodeFilter(c))
 
+
     const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
 
     const courseStatistics = _.orderBy(
@@ -246,21 +247,22 @@ class PopulationCourseStats extends Component {
   }
 
   renderActiveView() {
-    const { courses } = this.props
+    // const { courses } = this.props
     const { courseStatistics } = this.state
-    const courseStats = !(_.isEmpty(courseStatistics)) ? courseStatistics : courses.coursestatistics
+    // is there a point for this?
+    // const courseStats = !(_.isEmpty(courseStatistics)) ? courseStatistics : courses.coursestatistics
 
     switch (this.state.activeView) {
       case 'showGradeDistribution':
-        return this.renderGradeDistributionTable(courseStats)
+        return this.renderGradeDistributionTable(courseStatistics)
       case 'passingSemester':
         return (<PassingSemesters
-          courseStatistics={courseStats}
+          courseStatistics={courseStatistics}
           onCourseNameClickFn={this.onCourseNameCellClick}
           isActiveCourseFn={this.isActiveCourse}
         />)
       default:
-        return this.renderBasicTable(courseStats)
+        return this.renderBasicTable(courseStatistics)
     }
   }
 
