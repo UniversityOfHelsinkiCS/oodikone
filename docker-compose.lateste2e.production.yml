@@ -95,7 +95,6 @@ services:
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
     container_name: backend
-    entrypoint: 'node --inspect=0.0.0.0:9229 --max_old_space_size=4096 index.js'
     depends_on:
       - db
       - redis
