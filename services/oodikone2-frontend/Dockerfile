@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:10.15-alpine
 
 ARG BASE_PATH
 ENV BASE_PATH=$BASE_PATH
