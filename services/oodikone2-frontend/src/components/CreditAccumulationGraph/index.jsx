@@ -14,7 +14,6 @@ import { turquoise } from '../../styles/variables/colors'
 
 import './creditAccumulationGraph.css'
 import CreditGraphTooltip from '../CreditGraphTooltip'
-import OodikoneLine from './OodikoneLine'
 
 class CreditAccumulationGraph extends Component {
   state = {
@@ -171,7 +170,7 @@ class CreditAccumulationGraph extends Component {
 
   getStudentCreditsLine = (student, i, dot, hide) => {
     const { studentNumber } = student
-    return (<OodikoneLine
+    return (<Line
       key={`graph-${studentNumber}`}
       type="monotone"
       activeDot={{ r: 8 }}
@@ -262,7 +261,7 @@ class CreditAccumulationGraph extends Component {
       <div className="graphContainer">
         <Segment attached="bottom">
           <Loader active={this.state.loading} />
-          <ResponsiveContainer height={400}>
+          <ResponsiveContainer height={400} >
             <LineChart data={combinedStudentData}>
               <XAxis
                 dataKey="month"
