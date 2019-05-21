@@ -14,6 +14,7 @@ import StartingThisSemester from './StartingThisSemester'
 import CourseParticipation from './CourseParticipation'
 import CourseParticipationNTimes from './CourseParticipationNTimes'
 import ExtentGraduated from './ExtentGraduated'
+import SimpleExtentGraduated from './SimpleExtentGraduated'
 import Preset from './Preset'
 import SexFilter from './SexFilter'
 import DisciplineTypes from './DisciplineTypes'
@@ -30,6 +31,7 @@ import {
 import { presetFilter, getFilterFunction } from '../../populationFilters'
 import { getTextIn } from '../../common'
 
+
 const componentFor = {
   CreditsAtLeast,
   CreditsLessThan,
@@ -45,7 +47,8 @@ const componentFor = {
   TransferFilter,
   CanceledStudyright,
   PriorityStudyright,
-  TransferToStudyrightFilter
+  TransferToStudyrightFilter,
+  SimpleExtentGraduated
 }
 
 const advancedFilters = { // Filters that are too hard to use for common folk
