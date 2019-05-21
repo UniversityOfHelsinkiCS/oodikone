@@ -180,8 +180,6 @@ services:
     build:
       context: services/updater_api
     restart: unless-stopped
-    volumes:
-      - ./services/updater_api/:/usr/src/app
     depends_on:
       - nats
     environment:
@@ -197,10 +195,6 @@ services:
       context: services/backend
       dockerfile: updater_writer/Dockerfile
     restart: unless-stopped
-    volumes:
-      - ./services/backend/updater_writer/:/usr/src/app
-      - ./services/backend/shared/models:/usr/src/app/models
-      - ./services/backend/shared/migrations:/usr/src/app/database/migrations
     depends_on:
       - nats
       - db
@@ -227,8 +221,6 @@ services:
       context: services/updater_scheduler
     command: ["echo", "mluukkai on orjuuttaja"]
     restart: unless-stopped
-    volumes:
-      - ./services/updater_scheduler/:/usr/src/app
     depends_on:
       - nats
       - scheduler_mongo
