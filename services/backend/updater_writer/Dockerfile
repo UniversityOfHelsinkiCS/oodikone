@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:10.15-alpine
 
 COPY ./updater_writer /usr/src/app
 COPY ./shared/models /usr/src/app/models
