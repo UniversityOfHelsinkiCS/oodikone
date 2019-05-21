@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:10.15-alpine
 
 COPY ./oodikone2-backend /usr/src/app
 COPY ./shared/models /usr/src/app/src/models
