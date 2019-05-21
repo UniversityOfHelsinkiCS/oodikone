@@ -1,6 +1,7 @@
-const { Op } = require('sequelize')
+const sequelize = require('sequelize')
+const { Op } = sequelize
 const moment = require('moment')
-const { Credit, Course, Provider, Studyright, StudyrightElement,
+const { Credit, Student, Course, Provider, Studyright, StudyrightElement,
   ElementDetails, ThesisCourse, ThesisTypeEnums
 } = require('../models')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
@@ -56,7 +57,6 @@ const productivityStatsFromCredits = credits => {
   })
   return stats
 }
-
 const productivityStatsForProvider = async (providercode, since) => {
   const credits = await getCreditsForProvider(providercode, since)
   return productivityStatsFromCredits(credits)
@@ -254,10 +254,27 @@ const graduationsFromClass = async (studentnumbers, studytrack) => {
   })
 }
 
+const gendersFromClass = async (studentnumbers) => {
+  return Student.findAll({
+    attributes: [[sequelize.fn('count', sequelize.col('gender_en')), 'count'], 'gender_en'],
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumbers
+      },
+    },
+    group: ['gender_en'],
+    raw: true
+  }).reduce((acc, curr) => {
+    acc[curr.gender_en] = curr.count
+    return acc
+  }, {})
+}
+
 const productivityStats = async (studentnumbers, startDate, studytrack) => {
   return Promise.all([creditsAfter(studentnumbers, startDate),
     graduationsFromClass(studentnumbers, studytrack),
-    thesesFromClass(studentnumbers, startDate, studytrack)])
+    thesesFromClass(studentnumbers, startDate, studytrack),
+    gendersFromClass(studentnumbers)])
 }
 
 const getYears = (since) => {
@@ -274,13 +291,15 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     const startDate = `${year}-${semesterStart['FALL']}`
     const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
-    const [credits, graduated, theses] = await productivityStats(studentnumbers, startDate, studytrack)
+    const [credits, graduated, theses, genders] = await productivityStats(studentnumbers, startDate, studytrack)
+    delete genders[null]
     return {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
       graduated: graduated.length,
       thesisM: theses.MASTER || 0,
-      thesisB: theses.BACHELOR || 0
+      thesisB: theses.BACHELOR || 0,
+      genders
     }
   }))
   return { id: studytrack, status: null,  data: arr }
