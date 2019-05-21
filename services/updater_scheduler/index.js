@@ -68,7 +68,7 @@ stan.on('connect', async () => {
     fetchedCount = 0
     scheduledCount = 0
   }, { TIMEZONE })
-  cron.schedule('* 7 * * *', async () => {
+  cron.schedule('0 7 * * *', async () => {
     stan.publish('RefreshOverview', null, (err, guid) => {
       if (err) {
         console.log('publish failed', 'RefreshOverview')
