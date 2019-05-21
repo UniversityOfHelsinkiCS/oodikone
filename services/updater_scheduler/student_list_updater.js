@@ -6,7 +6,6 @@ const Schedule = require('./models')
 const moment = require('moment')
 
 async function updateStudentNumberList() {
-  console.log('lets fucking go')
   const { KEY_PATH, CERT_PATH, TOKEN, NODE_ENV, OODI_ADDR, STUDENT_NUMBERS } = process.env
   const agent = KEY_PATH && CERT_PATH ?
     new https.Agent({
