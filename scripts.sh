@@ -93,8 +93,8 @@ ping_psql () {
     retry docker exec -u postgres $1 pg_isready
     docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi" || echo "tkt_oodi DB already exists"
     echo "Pinging psql in container $1 with db name tkt_oodi_test"
-    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_test" || echo "tkt_oodi_test DB already exists"
     retry docker exec -u postgres $1 pg_isready
+    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_test" || echo "tkt_oodi_test DB already exists"
 }
 
 ping_psql_real () {

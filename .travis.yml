@@ -29,6 +29,7 @@ jobs:
         - source scripts.sh && time run_e2e_setup docker-compose.lateste2e.yml
         - docker ps
         - cat nginx/log
+        - docker-compose logs -f &
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
         - time npm run test_services
         - time CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
@@ -47,6 +48,7 @@ jobs:
         - source scripts.sh && time run_e2e_setup docker-compose.lateste2e.production.yml
         - docker ps
         - cat nginx/log
+        - docker-compose logs -f &
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
         - time npm run test_services
         - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
@@ -57,8 +59,5 @@ jobs:
         on:
           tags: true
 
-after_script:
-  - docker-compose logs
-
 after_failure:
-  - "curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${IMAGE} buildi paskana. STOP AND FIX tai tulee kenkää! ${AUTHOR_NAME} ${TRAVIS_BUILD_WEB_URL}\\\"}\" ${SLACKBOT_URL}"
+  - "curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${IMAGE} buildi paskana. STOP AND FIX tai tulee kenkää! *${AUTHOR_NAME}* ${TRAVIS_BUILD_WEB_URL}\\\"}\" ${SLACKBOT_URL}"
