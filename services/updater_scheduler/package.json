@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --max_old_space_size=4096 index.js",
-    "dev": "nodemon --max_old_space_size=4096 index.js"
+    "dev": "nodemon --max_old_space_size=4096 index.js",
+    "updateStudentNumberList": "node -e 'require(\"./student_list_updater.js\").updateStudentNumberList()'"
   },
   "author": "",
   "license": "ISC",
