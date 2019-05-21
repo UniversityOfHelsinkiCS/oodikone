@@ -162,7 +162,7 @@ export const studyrightTypes = { degree: '10', programme: '20', speciality: '30'
 /* This should be done in backend */
 export const removeInvalidCreditsFromStudent = student => ({
   ...student,
-  courses: student.courses.map(course => course)
+  courses: student.courses
 })
 
 export const removeInvalidCreditsFromStudents = students =>
