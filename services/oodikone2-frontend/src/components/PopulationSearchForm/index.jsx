@@ -133,15 +133,14 @@ class PopulationSearchForm extends Component {
   }
 
   fetchPopulation = (query) => {
-    let queryCodes = []
-    queryCodes = [...Object.values(query.studyRights).filter(e => e != null)]
-    const backendQuery = { ...query, studyRights: queryCodes }
+    const queryCodes = Object.values(query.studyRights).filter(e => e != null)
+
     const uuid = uuidv4()
-    const request = { ...backendQuery, uuid }
+    const request = { ...query, studyRights: queryCodes, uuid }
     this.setState({ isLoading: true })
     this.props.setLoading()
     Promise.all([
-      this.props.getPopulationStatistics(request),
+      this.props.getPopulationStatistics({ ...query, uuid }),
       this.props.getPopulationCourses(request),
       this.props.getPopulationFilters(request),
       this.props.getMandatoryCourses(query.studyRights.programme)
