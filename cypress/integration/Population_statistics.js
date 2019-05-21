@@ -80,7 +80,7 @@ describe('Population Statistics tests', () => {
 
     cy.contains("add").click()
     cy.contains("Add filters").siblings().within(() => {
-      cy.get(".form").should('have.length', 8)
+      cy.get(".form").should('have.length', 9)
     })
 
     checkAmountOfStudents(26)
@@ -153,6 +153,11 @@ describe('Population Statistics tests', () => {
     cy.contains("Spring 2018").parentsUntil("form").contains("set filter").click()
     cy.contains("Students that were present").should('have.text', "Students that were present during Fall 2018, Spring 2018")
 
+    cy.contains('graduated from Kasvatustieteiden kandiohjelma').contains('have/not').click().siblings().contains('have not').click()
+    cy.contains('graduated from Kasvatustieteiden kandiohjelma').contains('set filter').click()
+
+    cy.contains('Showing students that have not graduated from Kasvatustieteiden kandiohjelma')
+
     checkAmountOfStudents(17)
 
     cy.contains("have/haven't").click().siblings().contains('haven\'t').click()
@@ -200,6 +205,7 @@ describe('Population Statistics tests', () => {
 
     cy.contains('Excluded students that graduated')
 
+
     cy.contains("Students that has").parentsUntil("form").within(() => {
       cy.contains("degree").click().siblings().contains("any degree").click()
       cy.contains("programme").click().siblings().contains("Kasvatustieteiden kandiohjelma")
@@ -246,6 +252,6 @@ describe('Population Statistics tests', () => {
       })
     })
     cy.get("button").contains("Delete for good").click({ force: true })
-
+    
   })
 })
