@@ -24,3 +24,4 @@ services/updater_scheduler/all_student_numbers.txt
 services/updater_scheduler/debug.log
 services/updater_scheduler/active_student_numbers.txt
 services/oodikone2-backend/debug.log
+datastore

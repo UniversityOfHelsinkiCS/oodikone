@@ -102,7 +102,7 @@ describe('Population Statistics tests', () => {
     cy.contains("DIGI-000A")
     cy.go("back")
 
-   
+
 
     cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
       cy.contains("number at least").siblings().within(() => cy.get("input").clear().type("0"))
@@ -252,6 +252,6 @@ describe('Population Statistics tests', () => {
       })
     })
     cy.get("button").contains("Delete for good").click({ force: true })
-    
+
   })
 })
