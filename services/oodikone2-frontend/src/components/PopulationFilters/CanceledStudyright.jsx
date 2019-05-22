@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Dropdown, Icon, Form, Segment, Button } from 'semantic-ui-react'
-import { shape, func, arrayOf, string } from 'prop-types'
+import { shape, func, string } from 'prop-types'
 import InfoBox from '../InfoBox'
 import infoTooltips from '../../common/InfoToolTips'
 import { canceledStudyright } from '../../populationFilters'
@@ -12,7 +12,7 @@ class CanceledStudyright extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    studyrights: arrayOf(string).isRequired
+    studyrights: shape({ programme: string, degree: string, studyTrack: string }).isRequired
   }
 
   state = {

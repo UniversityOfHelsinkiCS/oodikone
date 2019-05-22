@@ -302,7 +302,7 @@ const parseQueryParams = query => {
     exchangeStudents,
     cancelledStudents,
     nondegreeStudents,
-    studyRights,
+    studyRights: Array.isArray(studyRights) ? studyRights : Object.values(studyRights),
     months,
     startDate,
     endDate

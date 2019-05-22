@@ -5,7 +5,7 @@ const { updateStudents } = require('../services/doo_api_database_updater/databas
 const StudyrightService = require('../services/studyrights')
 
 // POST instead of GET because of too long params and "sensitive" data
-router.post('/v2/populationstatistics/courses', async (req, res) => { 
+router.post('/v2/populationstatistics/courses', async (req, res) => {
   try {
     if (!req.body.year || !req.body.semesters || !req.body.studyRights) {
       res.status(400).json({ error: 'The body should have a year, semester and study rights defined' })
@@ -32,30 +32,33 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
 })
 
 router.get('/v3/populationstatistics', async (req, res) => {
-  console.log(req.query.year, req.query.semesters, req.query.studyRights)
+  const { year, semesters, studyRights: studyRightsJSON } = req.query
   try {
-    if (!req.query.year || !req.query.semesters || !req.query.studyRights) {
-      res.status(400).json({ error: 'The query should have a year, semester and study rights defined' })
+    if (!year || !semesters || !studyRightsJSON) {
+      res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
       return
     }
-    if (!Array.isArray(req.query.studyRights)) { // studyRights should always be an array
-      req.query.studyRights = [req.query.studyRights]
-    }
-    req.query.studyRights = req.query.studyRights.filter(sr => sr !== 'undefined')
-    const roles = req.decodedToken.roles
-    if (!roles || !roles.map(r => r.group_code).includes('admin')) {
-      const elements = new Set(req.decodedToken.rights)
-      if (req.query.studyRights.some(code => !elements.has(code))) {
-        res.status(403).json([])
-        return
+    let studyRights = null
+    try {
+      studyRights = JSON.parse(studyRightsJSON)
+      const { roles, rights } = req.decodedToken
+      if (!roles || !roles.map(r => r.group_code).includes('admin')) {
+        if (!rights.includes(studyRights.programme)) {
+          res.status(403).json([])
+          return
+        }
       }
+    } catch(e) {
+      console.error(e)
+      res.status(400).json({ error: 'The query had invalid studyRights' })
+      return
     }
-    
+
     if (req.query.months == null) {
       req.query.months = 12
     }
 
-    const result = await Population.optimizedStatisticsOf(req.query)
+    const result = await Population.optimizedStatisticsOf({ ...req.query, studyRights})
 
     if (result.error) {
       console.log(result.error)
