@@ -3,9 +3,11 @@ version: '3'
 services:
   nats:
     image: nats-streaming
-    command: -cid updaterNATS
+    command: -cid updaterNATS  --file_slice_max_bytes 0 --file_slice_max_age 100h -store file -dir datastore 
     expose:
       - "4222"
+    volumes:
+      - ./datastore:/datastore
     container_name: nats
 
   analytics_db:
