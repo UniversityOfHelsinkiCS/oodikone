@@ -447,7 +447,7 @@ const mapStateToProps = ({ settings, populations, populationCourses, populationM
     showNames: settings.namesVisible,
     showList: settings.studentlistVisible,
     language: settings.language,
-    queryStudyrights: populations.query.studyRights,
+    queryStudyrights: Object.values(populations.query.studyRights),
     mandatoryCourses: populationMandatoryCourses.data,
     mandatoryPassed
   }

@@ -43,13 +43,13 @@ class PopulationSearchHistory extends Component {
           population={populations.data}
           query={populations.query}
           queryId={0}
-          unit={units.data.programmes[populations.query.studyRights[0]]} // Possibly deprecated
+          unit={units.data.programmes[populations.query.studyRights.programme]} // Possibly deprecated
           units={
             ([
               ...Object.values(units.data.programmes),
               ...Object.values(units.data.degrees),
               ...Object.values(units.data.studyTracks)
-            ]).filter(u => populations.query.studyRights.includes(u.code))
+            ]).filter(u => Object.values(populations.query.studyRights).includes(u.code))
           }
           removeSampleFn={this.removePopulation}
           updateStudentsFn={() => this.props.updatePopulationStudents(studentNumberList)}

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Header, Button, Form, Radio, Modal, Icon, TextArea, Input } from 'semantic-ui-react'
-import { object, func, arrayOf, bool, string } from 'prop-types'
+import { object, func, arrayOf, bool, shape, string } from 'prop-types'
 import _ from 'lodash'
 import uuidv4 from 'uuid/v4'
 
@@ -71,7 +71,7 @@ class PopulationFilters extends Component {
     setComplementFilter: func.isRequired,
     savePopulationFilters: func.isRequired,
     setPopulationFilter: func.isRequired,
-    studyRights: arrayOf(string).isRequired,
+    studyRights: shape({ programme: string, degree: string, studyTrack: string }).isRequired,
     populationFilters: object.isRequired, //eslint-disable-line
     populationCourses: object.isRequired //eslint-disable-line
   }
@@ -138,7 +138,7 @@ class PopulationFilters extends Component {
       id: uuidv4(),
       name: this.state.presetName,
       description: this.state.presetDescription,
-      population: this.props.studyRights,
+      population: Object.values(this.props.studyRights),
       filters: this.props.filters
     }
     this.setState({ presetName: '', presetDescription: '' })
