@@ -14,7 +14,7 @@ const TIMEZONE = 'Europe/Helsinki'
 
 const updateTask = async (task, status, type) => {
   if (type) {
-    await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type, active }, { upsert: true })
+    await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type }, { upsert: true })
 
   } else {
     await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type: 'other', active: true }, { upsert: true })
@@ -97,7 +97,7 @@ stan.on('connect', async () => {
       }
       return false
     }
-    await updateTask(message[0], message[1], !!isValidStudentId(message[0]) ? 'student' : 'other')
+    await updateTask(taskmessage[0], message[1], !!isValidStudentId(message[0]) ? 'student' : 'other')
   })
  
 })
