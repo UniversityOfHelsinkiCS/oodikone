@@ -15,6 +15,30 @@ describe('Studyprogramme overview', () => {
     cy.contains("Study Programme", { timeout: 100000 })
   })
 
+  it('can search for course mappings', () => {
+    cy.contains("Tietojenkäsittelytieteen kandiohjelma").click()
+    cy.contains('Code Mapper').click()
+    cy.contains('tr', 'TKT20003 Käyttöjärjestelmät').get('input').type('582219')
+    cy.contains('tr', 'TKT20003 Käyttöjärjestelmät').get('.results').contains("Käyttöjärjestelmät (582219)")
+    cy.contains('tr', 'TKT20003 Käyttöjärjestelmät').contains('button', "Add")
+  })
+
+  it('can view course groups', () => {
+    cy.contains("Kasvatustieteiden kandiohjelma").click()
+    cy.contains('Course Groups').click()
+
+    cy.contains('tr', 'Test course group').get('i.edit').click()
+    cy.contains("Edit group")
+    cy.get('.prompt').type("Professori Pekka")
+    cy.contains("Add teacher").parent().contains("9000960")
+    cy.contains("Teachers in group").parent().contains("9000960")
+    cy.get("i.reply.link.icon").click()
+
+    cy.contains('tr a', 'Test course group').click()
+    cy.contains("Total teachers")
+    cy.get("i.reply.icon").click()
+  })
+
   it('renders progress and productivity tables', () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click()
     cy.get('table').should('have.length', 2)
@@ -40,5 +64,5 @@ describe('Studyprogramme overview', () => {
     cy.contains('Thesis Courses').click()
     cy.contains('Add thesis course').click()
     cy.contains('No results')
-  })  
+  })
 })

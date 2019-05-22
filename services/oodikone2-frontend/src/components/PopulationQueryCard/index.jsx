@@ -111,7 +111,7 @@ PopulationQueryCard.propTypes = {
   query: shape({
     year: oneOfType([string, number]),
     semester: string,
-    studyRights: arrayOf(string),
+    studyRights: shape({ programme: string, degree: string, studyTrack: string }),
     uuid: string
   }).isRequired,
   removeSampleFn: func.isRequired,
