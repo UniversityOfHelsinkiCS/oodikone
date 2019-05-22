@@ -121,16 +121,17 @@ export const courseParticipation = ({ field, course }) =>
   })
 
 export const extentGraduated = (params) => {
-  const { code, graduated, complemented, isExtent, studyright } = params
+  const { code, graduated, complemented, isExtent, studyright, simple } = params
   return ({
     id: uuidv4(),
-    type: 'ExtentGraduated',
+    type: simple ? 'SimpleExtentGraduated' : 'ExtentGraduated',
     params: {
       code,
       graduated,
       complemented,
       studyright,
-      isExtent
+      isExtent,
+      simple
     },
     filter: (student) => {
       if (isExtent) {
@@ -152,8 +153,8 @@ export const extentGraduated = (params) => {
           sr.extentcode).includes(code)
       }
       const foundStudyRight = student.studyrights.find(s => s.studyrightElements.map(e => e.code).includes(code))
-      const returnable = graduated !== 'grad' ? !!foundStudyRight : foundStudyRight && foundStudyRight.graduated
-      return complemented ? returnable : !returnable
+      const returnable = graduated !== 'grad' ? !!foundStudyRight : (foundStudyRight && foundStudyRight.graduated)
+      return complemented === 'true' ? !returnable : returnable
     }
   })
 }
@@ -270,6 +271,7 @@ const typeList = {
   CourseParticipation: courseParticipation,
   StartingThisSemester: startingThisSemester,
   ExtentGraduated: extentGraduated,
+  SimpleExtentGraduated: extentGraduated,
   EnrollmentStatus: enrollmentStatus,
   TransferFilter: transferFilter,
   CourseParticipationNTimes: courseParticipationNTimes,
