@@ -333,18 +333,21 @@ const getFilteredAssociations = async (codes) => {
   console.log(codes)
   const associations = await getAssociations()
   associations.programmes = _.pick(associations.programmes, codes)
+
+  const degrees = []
+  const studyTracks = []
   Object.keys(associations.programmes).forEach(k => {
     Object.keys(associations.programmes[k].enrollmentStartYears).forEach(year => {
       const yearData = associations.programmes[k].enrollmentStartYears[year]
-      yearData.degrees = _.pick(yearData.degrees, codes)
-      yearData.studyTracks = _.pick(yearData.studyTracks, codes)
+      degrees.push(...Object.keys(yearData.degrees))
+      studyTracks.push(...Object.keys(yearData.studyTracks))
     })
   })
-  associations.degrees = _.pick(associations.degrees, codes)
+  associations.degrees = _.pick(associations.degrees, degrees)
   Object.keys(associations.degrees).forEach(k => {
     associations.degrees[k].programmes = _.pick(associations.degrees[k].programmes, codes)
   })
-  associations.studyTracks = _.pick(associations.studyTracks, codes)
+  associations.studyTracks = _.pick(associations.studyTracks, studyTracks)
   Object.keys(associations.studyTracks).forEach(k => {
     associations.studyTracks[k].programmes = _.pick(associations.studyTracks[k].programmes, codes)
   })
