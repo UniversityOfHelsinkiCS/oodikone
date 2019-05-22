@@ -29,9 +29,11 @@ services:
 
   nats:
     image: nats-streaming
-    command: -cid updaterNATS
+    command: -cid updaterNATS  --file_slice_max_bytes 0 --file_slice_max_age 100h -store file -dir datastore 
     expose:
       - "4222"
+    volumes:
+      - ./datastore:/datastore
     ports:
       - "8222:8222"
       - "4222:4222"

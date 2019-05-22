@@ -83,7 +83,22 @@ stan.on('connect', async () => {
         scheduledCount = scheduledCount + 1
         break
     }
-    await updateTask(message[0], message[1])
+    const isValidStudentId = (id) => {
+      if (/^0\d{8}$/.test(id)) {
+        // is a 9 digit number
+        const multipliers = [7, 1, 3, 7, 1, 3, 7]
+        const checksum = id
+          .substring(1, 8)
+          .split('')
+          .reduce((sum, curr, index) => {
+            return (sum + curr * multipliers[index]) % 10
+          }, 0)
+        return (10 - checksum) % 10 == id[8]
+      }
+      return false
+    }
+    await updateTask(message[0], message[1], !!isValidStudentId(message[0]) ? 'student' : 'other')
   })
+ 
 })
 
