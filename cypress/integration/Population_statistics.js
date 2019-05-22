@@ -252,6 +252,6 @@ describe('Population Statistics tests', () => {
       })
     })
     cy.get("button").contains("Delete for good").click({ force: true })
-    
+
   })
 })
