@@ -184,10 +184,10 @@ export const canceledStudyright = (params) => {
     filter: (student) => {
       if (cancel === 'true') {
         return student.studyrights.filter(sr =>
-          sr.studyrightElements.some(e => studyrights.includes(e.code))).every(sr => sr.canceldate)
+          sr.studyrightElements.some(e => Object.values(studyrights).includes(e.code))).every(sr => sr.canceldate)
       }
       return !student.studyrights.filter(sr =>
-        sr.studyrightElements.some(e => studyrights.includes(e.code))).every(sr => sr.canceldate)
+        sr.studyrightElements.some(e => Object.values(studyrights).includes(e.code))).every(sr => sr.canceldate)
     }
   })
 }
