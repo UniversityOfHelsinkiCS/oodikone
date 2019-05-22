@@ -4,7 +4,11 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: false, useFindAndModi
 
 const scheduleSchema = new mongoose.Schema(
   {
-    task: String,
+    task: {
+      type: String,
+      index: true,
+      unique: true
+    },
     status: String,
     type: String,
     active: Boolean,

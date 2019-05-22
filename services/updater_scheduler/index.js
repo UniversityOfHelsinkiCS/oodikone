@@ -1,9 +1,10 @@
-const stan = require('node-nats-streaming').connect('updaterNATS', 'scheduler', process.env.NATS_URI)
+const { stan } = require('./src/nats_connection')
 const cron = require('node-cron');
 const Schedule = require('./models')
 const fs = require('fs');
 const logger = require('./logger')
-const { updateStudentNumberList } = require('./student_list_updater')
+const { updateStudentNumberList } = require('./src/student_list_updater')
+const { scheduleActiveStudents, scheduleAllStudentsAndMeta } = require('./src/schedule_students')
 
 let updatedCount = 0
 let scheduledCount = 0
@@ -23,20 +24,7 @@ const updateTask = async (task, status, type) => {
 stan.on('connect', async () => {
   cron.schedule('0 0 1 * *', async () => {
     // Update ALL students and meta every month
-
-    const tasks =['meta', ...( await Schedule.find({ type: 'student' }))]
-    for (const task of tasks) {
-      stan.publish('UpdateApi', task.task, (err, guid) => {
-        if (err) {
-          console.log('publish failed')
-        }
-      })
-      stan.publish('status', `${task.task}:SCHEDULED`, (err) => {
-        if (err) {
-          console.log('publish failed')
-        }
-      })
-    }
+    scheduleAllStudentsAndMeta()
   }, { TIMEZONE })
 
   cron.schedule('20 4 1 1,3,8,10 *', async () => {
@@ -45,20 +33,7 @@ stan.on('connect', async () => {
   })
   cron.schedule('0 23 * * *', async () => {
     // Update ACTIVE students every night
-
-    const tasks = [await Schedule.find({ type: 'student', active: true }).sort({ 'updatedAt': 1 })]
-    for (const task of tasks) {
-      stan.publish('UpdateApi', task.task, (err, guid) => {
-        if (err) {
-          console.log('publish failed')
-        }
-      })
-      stan.publish('status', `${task.task}:SCHEDULED`, (err) => {
-        if (err) {
-          console.log('publish failed')
-        }
-      })
-    }
+    scheduleActiveStudents()
   }, { TIMEZONE })
 
   cron.schedule('0 0-9 * * *', async () => {

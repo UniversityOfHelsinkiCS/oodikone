@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --max_old_space_size=4096 index.js",
     "dev": "nodemon --max_old_space_size=4096 index.js",
-    "updateStudentNumberList": "node -e 'require(\"./student_list_updater.js\").updateStudentNumberList()'"
+    "updateStudentNumberList": "node -e 'require(\"./src/student_list_updater.js\").updateStudentNumberList()'",
+    "scheduleActiveStudents": "NATS_CLIENTID=manualActiveSchedule node -e 'require(\"./src/schedule_students.js\").scheduleActiveStudents()'",
+    "scheduleAll": "NATS_CLIENTID=manualAllSchedule node -e 'require(\"./src/schedule_students.js\").scheduleAllStudentsAndMeta()'"
   },
   "author": "",
   "license": "ISC",
