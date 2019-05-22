@@ -8,7 +8,7 @@ import { getStudent, removeStudentSelection, resetStudent } from '../../redux/st
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraph from '../CreditAccumulationGraph'
 import SearchResultTable from '../SearchResultTable'
-import { removeInvalidCreditsFromStudent, byDateDesc, reformatDate, getTextIn } from '../../common'
+import { byDateDesc, reformatDate, getTextIn } from '../../common'
 
 class StudentDetails extends Component {
   componentDidMount() {
@@ -28,12 +28,10 @@ class StudentDetails extends Component {
 
   renderCreditsGraph = () => {
     const { translate, student } = this.props
-
-    const filteredStudent = removeInvalidCreditsFromStudent(student)
     return (
       <CreditAccumulationGraph
-        students={[filteredStudent]}
-        selectedStudents={[filteredStudent.studentNumber]}
+        students={[student]}
+        selectedStudents={[student.studentNumber]}
         title={translate('studentStatistics.chartTitle')}
         translate={translate}
         maxCredits={0}

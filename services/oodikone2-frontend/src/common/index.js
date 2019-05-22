@@ -160,13 +160,6 @@ export const studyRightRegex = new RegExp(/.*master|bachelor|doctor|licentiate|s
 
 export const studyrightTypes = { degree: '10', programme: '20', speciality: '30' } // speciality???
 /* This should be done in backend */
-export const removeInvalidCreditsFromStudent = student => ({
-  ...student,
-  courses: student.courses
-})
-
-export const removeInvalidCreditsFromStudents = students =>
-  students.map(student => removeInvalidCreditsFromStudent(student))
 
 export const getStudentTotalCredits = student => student.courses
   .filter(c => c.passed && !c.isStudyModuleCredit).reduce((a, b) => a + b.credits, 0)

@@ -2,7 +2,7 @@
 const axios = require('axios')
 const https = require('https')
 const fs = require('fs')
-const Schedule = require('./models')
+const Schedule = require('../models')
 const moment = require('moment')
 
 async function updateStudentNumberList() {
