@@ -71,7 +71,9 @@ stan.on('connect', async () => {
 
   statusSub.on('message', async (msg) => {
     const message = msg.getData().split(':')
-
+    if (message[1]) {
+      return
+    }
     switch (message[1]) {
       case 'DONE':
         updatedCount = updatedCount + 1
@@ -97,7 +99,7 @@ stan.on('connect', async () => {
       }
       return false
     }
-    await updateTask(taskmessage[0], message[1], !!isValidStudentId(message[0]) ? 'student' : 'other')
+    await updateTask(message[0], message[1], !!isValidStudentId(message[0]) ? 'student' : 'other')
   })
  
 })
