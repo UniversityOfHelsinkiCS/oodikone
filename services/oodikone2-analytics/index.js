@@ -19,7 +19,7 @@ const formatProductivity = stats => {
 
 const formatThroughput = stats => {
   const { id, updatedAt: lastUpdated, data, status } = stats
-  return { [id] : { lastUpdated, data, status } }
+  return { [id] : { lastUpdated, data: data.years, status, totals: data.totals } }
 }
 
 app.get('/productivity/:id', async (req, res) => {
