@@ -14,6 +14,7 @@ const Teachers = React.lazy(() => import('../Teachers'))
 const Sandbox = React.lazy(() => import('../Sandbox'))
 const UsageStatistics = React.lazy(() => import('../UsageStatistics'))
 const OodiLearn = React.lazy(() => import('../OodiLearn'))
+const Feedback = React.lazy(() => import('../Feedback'))
 
 const Routes = () => (
   <Suspense fallback={<Loader active inline="centered" />}>
@@ -30,6 +31,7 @@ const Routes = () => (
       <Route exact path={routes.usage.route} component={UsageStatistics} />
       <Route exact path={routes.sandbox.route} component={Sandbox} />
       <Route exact path={routes.oodilearn.route} component={OodiLearn} />
+      <Route exact path={routes.feedback.route} component={Feedback} />
     </Switch>
   </Suspense>
 )
