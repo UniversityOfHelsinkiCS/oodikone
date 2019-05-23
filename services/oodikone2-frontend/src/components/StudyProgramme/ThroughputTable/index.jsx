@@ -1,14 +1,21 @@
 import React from 'react'
 import moment from 'moment'
-import { Header, Loader, Table, Button, Grid } from 'semantic-ui-react'
+import { Header, Loader, Table, Button, Grid, Icon } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, func } from 'prop-types'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 import { flatten, uniq } from 'lodash'
 import { callApi } from '../../../apiConnection'
 import { getThroughput } from '../../../redux/throughput'
 
-const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
+const ThroughputTable = ({ history, throughput, thesis, loading, error, studyprogramme,
   dispatchGetThroughput }) => {
+  const showPopulationStatistics = (yearLabel) => {
+    const year = Number(yearLabel.slice(0, 4))
+    const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
+    history.push(`/populations?months=${months}&semesters=FALL&semesters=` +
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`)
+  }
   const morethan = x => (total, amount) => (amount >= x ? total + 1 : total)
   if (error) return <h1>Oh no so error {error}</h1>
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
@@ -35,7 +42,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
                     throughput.lastUpdated
                       ? moment(throughput.lastUpdated).format('HH:mm:ss MM-DD-YYYY')
                       : 'unknown'
-                  } ${throughput.status || ''}`}
+                    } ${throughput.status || ''}`}
                 </Header.Subheader>
               )}
             </Grid.Column>
@@ -64,9 +71,9 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
             {(thesisTypes.includes('BACHELOR') ||
               thesisTypes.includes('MASTER')) && (
               <Table.HeaderCell colSpan={thesisTypes.length}>
-                Thesis
+                  Thesis
               </Table.HeaderCell>
-            )}
+              )}
           </Table.Row>
 
           <Table.Row>
@@ -88,11 +95,14 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
         <Table.Body>
           {data
             .sort((year1, year2) =>
-                Number(year2.year.slice(0, 4)) -
-                Number(year1.year.slice(0, 4)))
+              Number(year2.year.slice(0, 4)) -
+              Number(year1.year.slice(0, 4)))
             .map(year => (
               <Table.Row key={year.year}>
-                <Table.Cell>{year.year}</Table.Cell>
+                <Table.Cell>
+                  {year.year}
+                  <Icon name="level up alternate" onClick={() => showPopulationStatistics(year.year)} />
+                </Table.Cell>
                 <Table.Cell>{year.credits.length}</Table.Cell>
                 {genders.map(gender => (
                   <Table.Cell key={year.year + year.genders[gender]}>
@@ -151,7 +161,10 @@ ThroughputTable.propTypes = {
   studyprogramme: string.isRequired,
   dispatchGetThroughput: func.isRequired,
   loading: bool.isRequired,
-  error: bool.isRequired
+  error: bool.isRequired,
+  history: shape({
+    push: func.isRequired
+  }).isRequired
 }
 
 ThroughputTable.defaultProps = {
@@ -159,9 +172,9 @@ ThroughputTable.defaultProps = {
   thesis: undefined
 }
 
-export default connect(
+export default withRouter(connect(
   null,
   {
     dispatchGetThroughput: getThroughput
   }
-)(ThroughputTable)
+)(ThroughputTable))
