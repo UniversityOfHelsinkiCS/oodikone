@@ -74,7 +74,6 @@ stan.on('connect', async () => {
     const task = message[0]
     const status = message[1]
 
-    console.log(message)
     switch (status) {
       case 'DONE':
         updatedCount = updatedCount + 1
