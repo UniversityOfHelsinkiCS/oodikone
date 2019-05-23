@@ -1,15 +1,21 @@
 import React from 'react'
 import moment from 'moment'
-import { Header, Loader, Table, Button, Grid } from 'semantic-ui-react'
+import { Header, Loader, Table, Button, Grid, Icon } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, func } from 'prop-types'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 import { flatten, uniq } from 'lodash'
 import { callApi } from '../../../apiConnection'
 import { getThroughput } from '../../../redux/throughput'
 
-const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
+const ThroughputTable = ({ history, throughput, thesis, loading, error, studyprogramme,
   dispatchGetThroughput }) => {
-  const morethan = x => (total, amount) => (amount >= x ? total + 1 : total)
+  const showPopulationStatistics = (yearLabel) => {
+    const year = Number(yearLabel.slice(0, 4))
+    const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
+    history.push(`/populations?months=${months}&semesters=FALL&semesters=` +
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`)
+  }
   if (error) return <h1>Oh no so error {error}</h1>
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
@@ -35,7 +41,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
                     throughput.lastUpdated
                       ? moment(throughput.lastUpdated).format('HH:mm:ss MM-DD-YYYY')
                       : 'unknown'
-                  } ${throughput.status || ''}`}
+                    } ${throughput.status || ''}`}
                 </Header.Subheader>
               )}
             </Grid.Column>
@@ -63,10 +69,10 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
             <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
             {(thesisTypes.includes('BACHELOR') ||
               thesisTypes.includes('MASTER')) && (
-              <Table.HeaderCell colSpan={thesisTypes.length}>
-                Thesis
-              </Table.HeaderCell>
-            )}
+                <Table.HeaderCell colSpan={thesisTypes.length}>
+                  Thesis
+                </Table.HeaderCell>
+              )}
           </Table.Row>
 
           <Table.Row>
@@ -88,11 +94,14 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
         <Table.Body>
           {data
             .sort((year1, year2) =>
-                Number(year2.year.slice(0, 4)) -
-                Number(year1.year.slice(0, 4)))
+              Number(year2.year.slice(0, 4)) -
+              Number(year1.year.slice(0, 4)))
             .map(year => (
               <Table.Row key={year.year}>
-                <Table.Cell>{year.year}</Table.Cell>
+                <Table.Cell>
+                  {year.year}
+                  <Icon name="level up alternate" onClick={() => showPopulationStatistics(year.year)} />
+                </Table.Cell>
                 <Table.Cell>{year.credits.length}</Table.Cell>
                 {genders.map(gender => (
                   <Table.Cell key={year.year + year.genders[gender]}>
@@ -100,21 +109,10 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
                   </Table.Cell>
                 ))}
                 <Table.Cell>{year.graduated}</Table.Cell>
-                <Table.Cell>
-                  {year.credits.reduce(morethan(30), 0)}
-                </Table.Cell>
-                <Table.Cell>
-                  {year.credits.reduce(morethan(60), 0)}
-                </Table.Cell>
-                <Table.Cell>
-                  {year.credits.reduce(morethan(90), 0)}
-                </Table.Cell>
-                <Table.Cell>
-                  {year.credits.reduce(morethan(120), 0)}
-                </Table.Cell>
-                <Table.Cell>
-                  {year.credits.reduce(morethan(150), 0)}
-                </Table.Cell>
+                {Object.keys(year.creditValues).map(creditKey => (
+                  <Table.Cell key={creditKey}>{year.creditValues[creditKey]}
+                  </Table.Cell>
+                ))}
                 {thesisTypes.includes('MASTER') ? (
                   <Table.Cell>{year.thesisM}</Table.Cell>
                 ) : null}
@@ -124,6 +122,29 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme,
               </Table.Row>
             ))}
         </Table.Body>
+        {throughput && throughput.totals ?
+          <Table.Footer>
+            <Table.Row>
+              <Table.HeaderCell style={{ fontWeight: 'bold' }}>Total</Table.HeaderCell>
+              <Table.HeaderCell>{throughput.totals.students}</Table.HeaderCell>
+              {Object.keys(throughput.totals.genders).map(genderKey => (
+                <Table.HeaderCell key={`${genderKey}total`}>
+                  {`${throughput.totals.genders[genderKey]} (${Math.floor((throughput.totals.genders[genderKey] / throughput.totals.students) * 100)}%)`}
+                </Table.HeaderCell>
+              ))}
+              <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
+              {Object.keys(throughput.totals.credits).map(creditKey => (
+                <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}
+                </Table.HeaderCell>
+              ))}
+              {thesisTypes.includes('MASTER') ? (
+                <Table.HeaderCell>{throughput.totals.thesisM}</Table.HeaderCell>
+              ) : null}
+              {thesisTypes.includes('BACHELOR') ? (
+                <Table.HeaderCell>{throughput.totals.thesisB}</Table.HeaderCell>
+              ) : null}
+            </Table.Row>
+          </Table.Footer> : null}
       </Table>
     </React.Fragment>
   )
@@ -151,7 +172,10 @@ ThroughputTable.propTypes = {
   studyprogramme: string.isRequired,
   dispatchGetThroughput: func.isRequired,
   loading: bool.isRequired,
-  error: bool.isRequired
+  error: bool.isRequired,
+  history: shape({
+    push: func.isRequired
+  }).isRequired
 }
 
 ThroughputTable.defaultProps = {
@@ -159,9 +183,9 @@ ThroughputTable.defaultProps = {
   thesis: undefined
 }
 
-export default connect(
+export default withRouter(connect(
   null,
   {
     dispatchGetThroughput: getThroughput
   }
-)(ThroughputTable)
+)(ThroughputTable))
