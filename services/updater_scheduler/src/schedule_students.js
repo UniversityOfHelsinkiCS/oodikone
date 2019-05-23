@@ -25,12 +25,12 @@ const publish  = async (tasks) => {
 const scheduleActiveStudents = async () => {
   const tasks = [...(await Schedule.find({ type: 'student', active: true }))]
   console.log(tasks.length, 'tasks to schedule')
-  publish()
+  publish(tasks)
 }
 const scheduleAllStudentsAndMeta = async () => {
 
   const tasks = ['meta', ...(await Schedule.find({ type: 'student' }))]
   console.log(tasks.length, 'tasks to schedule')
-  publish()
+  publish(tasks)
 }
 module.exports = { scheduleActiveStudents, scheduleAllStudentsAndMeta }
