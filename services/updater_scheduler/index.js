@@ -71,9 +71,10 @@ stan.on('connect', async () => {
 
   statusSub.on('message', async (msg) => {
     const message = msg.getData().split(':')
-    if (message[1]) {
+    if (!message[1]) {
       return
     }
+    console.log(message)
     switch (message[1]) {
       case 'DONE':
         updatedCount = updatedCount + 1
