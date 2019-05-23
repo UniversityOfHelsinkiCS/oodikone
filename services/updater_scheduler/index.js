@@ -71,11 +71,11 @@ stan.on('connect', async () => {
 
   statusSub.on('message', async (msg) => {
     const message = msg.getData().split(':')
-    if (!message[1]) {
-      return
-    }
+    const task = message[0]
+    const status = message[1]
+
     console.log(message)
-    switch (message[1]) {
+    switch (status) {
       case 'DONE':
         updatedCount = updatedCount + 1
         break
@@ -85,6 +85,8 @@ stan.on('connect', async () => {
       case 'SCHEDULED':
         scheduledCount = scheduledCount + 1
         break
+      default:
+        return
     }
     const isValidStudentId = (id) => {
       if (/^0\d{8}$/.test(id)) {
@@ -100,8 +102,10 @@ stan.on('connect', async () => {
       }
       return false
     }
-    await updateTask(message[0], message[1], !!isValidStudentId(message[0]) ? 'student' : 'other')
+    const isStudent = !!isValidStudentId(task)
+    logger.info(`Status changed for ${task} to ${status}`, { task: task, status: status, student: isStudent })
+    await updateTask(task, status, isStudent ? 'student' : 'other')
   })
- 
+
 })
 
