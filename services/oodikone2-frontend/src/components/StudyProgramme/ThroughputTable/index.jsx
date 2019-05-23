@@ -16,7 +16,6 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
     history.push(`/populations?months=${months}&semesters=FALL&semesters=` +
       `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`)
   }
-  const morethan = x => (total, amount) => (amount >= x ? total + 1 : total)
   if (error) return <h1>Oh no so error {error}</h1>
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
@@ -70,9 +69,9 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
             <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
             {(thesisTypes.includes('BACHELOR') ||
               thesisTypes.includes('MASTER')) && (
-              <Table.HeaderCell colSpan={thesisTypes.length}>
+                <Table.HeaderCell colSpan={thesisTypes.length}>
                   Thesis
-              </Table.HeaderCell>
+                </Table.HeaderCell>
               )}
           </Table.Row>
 
@@ -110,21 +109,10 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                   </Table.Cell>
                 ))}
                 <Table.Cell>{year.graduated}</Table.Cell>
-                <Table.Cell>
-                  {year.credits.reduce(morethan(30), 0)}
-                </Table.Cell>
-                <Table.Cell>
-                  {year.credits.reduce(morethan(60), 0)}
-                </Table.Cell>
-                <Table.Cell>
-                  {year.credits.reduce(morethan(90), 0)}
-                </Table.Cell>
-                <Table.Cell>
-                  {year.credits.reduce(morethan(120), 0)}
-                </Table.Cell>
-                <Table.Cell>
-                  {year.credits.reduce(morethan(150), 0)}
-                </Table.Cell>
+                {Object.keys(year.creditValues).map(creditKey => (
+                  <Table.Cell key={creditKey}>{year.creditValues[creditKey]}
+                  </Table.Cell>
+                ))}
                 {thesisTypes.includes('MASTER') ? (
                   <Table.Cell>{year.thesisM}</Table.Cell>
                 ) : null}
@@ -134,6 +122,29 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
               </Table.Row>
             ))}
         </Table.Body>
+        {throughput && throughput.totals ?
+          <Table.Footer>
+            <Table.Row>
+              <Table.HeaderCell style={{ fontWeight: 'bold' }}>Total</Table.HeaderCell>
+              <Table.HeaderCell>{throughput.totals.students}</Table.HeaderCell>
+              {Object.keys(throughput.totals.genders).map(genderKey => (
+                <Table.HeaderCell key={`${genderKey}total`}>
+                  {`${throughput.totals.genders[genderKey]} (${Math.floor((throughput.totals.genders[genderKey] / throughput.totals.students) * 100)}%)`}
+                </Table.HeaderCell>
+              ))}
+              <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
+              {Object.keys(throughput.totals.credits).map(creditKey => (
+                <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}
+                </Table.HeaderCell>
+              ))}
+              {thesisTypes.includes('MASTER') ? (
+                <Table.HeaderCell>{throughput.totals.thesisM}</Table.HeaderCell>
+              ) : null}
+              {thesisTypes.includes('BACHELOR') ? (
+                <Table.HeaderCell>{throughput.totals.thesisB}</Table.HeaderCell>
+              ) : null}
+            </Table.Row>
+          </Table.Footer> : null}
       </Table>
     </React.Fragment>
   )
