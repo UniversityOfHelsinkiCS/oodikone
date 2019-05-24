@@ -62,7 +62,6 @@ services:
 
   mongo_db:
     image: mongo
-    restart: unless-stopped
     volumes:
       - ./backups/mongo/oodilearn:/dump
       - ./mongodata:/data/db
@@ -75,7 +74,6 @@ services:
     build:
       context: services/backend
       dockerfile: oodikone2-backend/Dockerfile
-    restart: unless-stopped
     ports:
       - "8080:8080"
       - "9229:9229"
@@ -105,7 +103,6 @@ services:
       context: services/oodikone2-frontend
       args:
         BASE_PATH: /
-    restart: unless-stopped
     ports:
       - "5000:5000"
     environment:
@@ -118,7 +115,6 @@ services:
     image: toska/oodikone2-userservice:latest
     build:
       context: services/oodikone2-userservice
-    restart: unless-stopped
     ports:
       - 4567:4567
     environment:
@@ -135,7 +131,6 @@ services:
     image: toska/oodikone2-usageservice:latest
     build:
       context: services/oodikone2-usageservice
-    restart: unless-stopped
     ports:
       - 545:545
     environment:
@@ -162,7 +157,6 @@ services:
     image: toska/oodikone2-analytics:latest
     build:
       context: services/oodikone2-analytics
-    restart: unless-stopped
     ports:
       - 4568:4568
     environment:
@@ -179,7 +173,6 @@ services:
     image: toska/updater_api:latest
     build:
       context: services/updater_api
-    restart: unless-stopped
     depends_on:
       - nats
     environment:
@@ -194,7 +187,6 @@ services:
     build:
       context: services/backend
       dockerfile: updater_writer/Dockerfile
-    restart: unless-stopped
     depends_on:
       - nats
       - db
@@ -208,7 +200,6 @@ services:
 
   scheduler_mongo:
     image: mongo
-    restart: unless-stopped
     volumes:
       - ./mongodata:/data/db
     expose:
@@ -220,7 +211,6 @@ services:
     build:
       context: services/updater_scheduler
     command: ["echo", "mluukkai on orjuuttaja"]
-    restart: unless-stopped
     depends_on:
       - nats
       - scheduler_mongo
@@ -236,7 +226,6 @@ services:
 
   nginx:
     image: nginx:latest
-    restart: unless-stopped
     volumes:
       - ./nginx.production.conf:/etc/nginx/nginx.conf
       - ./nginx/error.log:/etc/nginx/error_log.log
