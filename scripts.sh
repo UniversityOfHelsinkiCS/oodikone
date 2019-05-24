@@ -91,21 +91,12 @@ db_oodikone_reset () {
 ping_psql () {
     echo "Pinging psql in container $1 with db name $2"
     retry docker exec -u postgres $1 pg_isready
-    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi" || echo "tkt_oodi DB already exists"
-    echo "Pinging psql in container $1 with db name tkt_oodi_test"
-    retry docker exec -u postgres $1 pg_isready
-    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_test" || echo "tkt_oodi_test DB already exists"
-}
-
-ping_psql_real () {
-    echo "Pinging psql in container $1 with db name $2"
-    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_real" || echo "tkt_oodi_real DB already exists"
-    retry docker exec -u postgres $1 pg_isready
+    docker exec -u postgres $1 psql -c "CREATE DATABASE $1" || echo "container $1 DB $2 already exists"
 }
 
 db_setup_full () {
     echo "Restoring PostgreSQL from backup"
-    ping_psql_real "oodi_db" "tkt_oodi_real"
+    ping_psql "oodi_db" "tkt_oodi_real"
     retry restore_real_psql_from_backup
     # echo "Restoring MongoDB from backup"
     # retry restore_mongodb_from_backup
@@ -118,6 +109,7 @@ db_setup_full () {
 db_anon_setup_full () {
     echo "Restoring PostgreSQL from backup"
     ping_psql "oodi_db" "tkt_oodi"
+    ping_psql "oodi_db" "tkt_oodi_test"
     retry restore_psql_from_backup
     # echo "Restoring MongoDB from backup"
     # retry restore_mongodb_from_backup
