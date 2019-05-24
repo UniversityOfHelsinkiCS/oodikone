@@ -96,6 +96,7 @@ services:
     depends_on:
       - db
       - redis
+      - nats
 
   frontend:
     image: toska/oodikone2-frontend:latest
