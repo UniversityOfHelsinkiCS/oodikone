@@ -368,13 +368,13 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
   const transferredStudyright = (s) => {
     const studyright = s.studyrights.find(s => s.studyrightElements
       .map(d => d.element_detail.code)
-      .includes(studyRights[0]))
+      .includes(studyRights.programme))
 
     if (studyright) {
       s.transferredStudyright = moment(startDate).isAfter(moment(studyright.startdate))
       if (s.transferredStudyright) {
         const previousRights = studyright.studyrightElements
-          .filter(e => e.element_detail.type === 20 && e.element_detail.code !== studyRights[0])
+          .filter(e => e.element_detail.type === 20 && e.element_detail.code !== studyRights.programme)
         s.previousRights = previousRights
       }
 
