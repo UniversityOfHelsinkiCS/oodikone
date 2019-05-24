@@ -66,6 +66,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 <Table.HeaderCell rowSpan="2">Students</Table.HeaderCell>
             }
             <Table.HeaderCell rowSpan="2">Graduated</Table.HeaderCell>
+            <Table.HeaderCell rowSpan="2">Transferred to this program</Table.HeaderCell>
             <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
             {(thesisTypes.includes('BACHELOR') ||
               thesisTypes.includes('MASTER')) && (
@@ -105,10 +106,11 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 <Table.Cell>{year.credits.length}</Table.Cell>
                 {genders.map(gender => (
                   <Table.Cell key={year.year + year.genders[gender]}>
-                    {`${year.genders[gender]} (${Math.floor((year.genders[gender] / year.credits.length) * 100)}%)` || 0}
+                    {`${year.genders[gender] || 0} (${Math.floor((year.genders[gender] / year.credits.length) * 100) || 0}%)`}
                   </Table.Cell>
                 ))}
                 <Table.Cell>{year.graduated}</Table.Cell>
+                <Table.Cell>{year.transferred}</Table.Cell>
                 {Object.keys(year.creditValues).map(creditKey => (
                   <Table.Cell key={creditKey}>{year.creditValues[creditKey]}
                   </Table.Cell>
@@ -133,6 +135,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 </Table.HeaderCell>
               ))}
               <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
+              <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
               {Object.keys(throughput.totals.credits).map(creditKey => (
                 <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}
                 </Table.HeaderCell>
