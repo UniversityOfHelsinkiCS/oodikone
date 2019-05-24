@@ -38,7 +38,7 @@ const updateAttainments = (studyAttainments, transaction) => studyAttainments.ma
       creditTeachers.length > 0 && Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
     ])
   } catch (e) {
-    console.log(e)
+    console.log('attainment update failed', e)
   }
 })
 
@@ -61,12 +61,9 @@ const updateStudent = async (student) => {
     await deleteStudentStudyrights(studentInfo.studentnumber, transaction) // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
 
     await Student.upsert(studentInfo, { transaction })
-    try {
     await Promise.all(semesterEnrollments.map(SE =>
       SemesterEnrollment.upsert(SE, { transaction })))
-    } catch(e) {
-      console.log(e)
-    }
+
     if (studyAttainments) await Promise.all(updateAttainments(studyAttainments, transaction))
 
     if (studyRights) await Promise.all(updateStudyRights(studyRights, transaction))

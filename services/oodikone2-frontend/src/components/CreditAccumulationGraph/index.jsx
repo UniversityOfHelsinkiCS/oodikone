@@ -126,7 +126,7 @@ class CreditAccumulationGraph extends Component {
       .filter(c => moment(c.date).isSameOrAfter(moment(startDate)))
 
     let totalCredits = 0
-    return filteredCourses.map((c) => {
+    return _.orderBy(filteredCourses, ['date'], ['asc']).map((c) => {
       const {
         course, date, credits, grade, passed, isStudyModuleCredit
       } = c
