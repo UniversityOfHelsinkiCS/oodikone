@@ -245,36 +245,70 @@ class PopulationStudents extends Component {
       ), 0)
     )
 
-    const mandatoryCourseColumns = [
-      ...(this.props.showNames) ? [
-        { key: 'lastname', title: 'last name', getRowVal: s => s.lastname, cellProps: { title: 'last name' } },
-        { key: 'firstname', title: 'first names', getRowVal: s => s.firstnames, cellProps: { title: 'first names' } },
-        { key: 'email', title: 'emails', getRowVal: s => s.email, cellProps: { title: 'emails' } }
-      ] : [],
+    const nameColumns = this.props.showNames ? [
+      { key: 'lastname', title: 'last name', getRowVal: s => s.lastname, cellProps: { title: 'last name' }, child: true },
+      { key: 'firstname', title: 'first names', getRowVal: s => s.firstnames, cellProps: { title: 'first names' }, child: true },
+      { key: 'email', title: 'emails', getRowVal: s => s.email, cellProps: { title: 'emails' }, child: true }
+    ] : []
+    nameColumns.push(
       {
         key: 'studentnumber',
         title: verticalTitle('student number'),
         cellProps: { title: 'student number' },
-        getRowVal: s => s.studentNumber
+        getRowVal: s => s.studentNumber,
+        child: true
       },
       {
         key: 'icon',
         title: '',
         getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
-        cellProps: { collapsing: true, className: 'iconCell' }
+        cellProps: { collapsing: true, className: 'iconCell' },
+        child: true
       },
       {
         key: 'totalpassed',
         title: verticalTitle('total passed'),
         getRowVal: s => totalMandatoryPassed(s.studentNumber),
-        cellProps: { title: 'total passed' }
-      },
-      ..._.sortBy(
-        this.props.mandatoryCourses,
+        cellProps: { title: 'total passed' },
+        child: true
+      }
+    )
+
+    const labelToMandatoryCourses = this.props.mandatoryCourses.reduce((acc, e) => {
+      const label = e.label || ''
+      acc[label] = acc[label] || []
+      acc[label].push(e)
+      return acc
+    }, {})
+
+    const mandatoryCourseLabels = _.orderBy(
+      Object.keys(labelToMandatoryCourses),
+      [e => e.length === 0, e => e],
+      ['asc', 'asc']
+    )
+
+    const mandatoryCourseColumns = [
+      ...nameColumns,
+      ...(mandatoryCourseLabels.reduce((acc, e) => acc + e.length, 0) > 0) ? [{
+        key: 'general',
+        title: <b>Labels:</b>,
+        parent: true,
+        headerProps: { colSpan: nameColumns.length, style: { textAlign: 'right' } }
+      }] : [],
+      ...mandatoryCourseLabels.map(e => ({
+        key: e,
+        title: (
+          <div style={{ overflowX: 'hidden' }}><div style={{ width: 0 }}>{e}</div></div>
+        ),
+        parent: true,
+        headerProps: { colSpan: labelToMandatoryCourses[e].length, width: labelToMandatoryCourses[e].length, title: e }
+      })),
+      ..._.flatten(mandatoryCourseLabels.map(e => _.sortBy(
+        labelToMandatoryCourses[e],
         [(m) => {
           const res = m.code.match(/\d+/)
           return res ? Number(res[0]) : Number.MAX_VALUE
-        }]
+        }, 'code']
       ).map(m => ({
         key: m.code,
         title: verticalTitle(<Fragment>{getTextIn(m.name, this.props.language)}<br />{m.code}</Fragment>),
@@ -282,8 +316,9 @@ class PopulationStudents extends Component {
         getRowVal: s => hasPassedMandatory(s.studentNumber, m.code),
         getRowContent: s => (
           hasPassedMandatory(s.studentNumber, m.code) ? (<Icon fitted name="check" color="green" />) : (null)
-        )
-      }))
+        ),
+        child: true
+      }))))
     ]
 
     const panes = [

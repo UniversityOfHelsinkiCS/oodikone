@@ -14,6 +14,14 @@ export const addMandatoryCourse = (id, course) => {
   return callController(route, prefix, data, method)
 }
 
+export const setMandatoryCourseLabel = (id, course, label) => {
+  const prefix = 'SET_MANDATORY_COURSE_LABEL_'
+  const route = `/mandatory_courses/${id}/label/${course}`
+  const method = 'post'
+  const data = { label }
+  return callController(route, prefix, data, method)
+}
+
 export const deleteMandatoryCourse = (id, course) => {
   const prefix = 'DELETE_MANDATORY_COURSE_'
   const route = `/mandatory_courses/${id}`
@@ -42,7 +50,7 @@ const reducer = (state = { data: [] }, action) => {
         error: false,
         data: action.response
       }
-    case 'ADD_MANDATORY_COURSES_ATTEMPT':
+    case 'ADD_MANDATORY_COURSE_ATTEMPT':
       return {
         ...state,
         pending: true
@@ -58,6 +66,23 @@ const reducer = (state = { data: [] }, action) => {
         pending: false,
         error: false,
         data: [...state.data, action.response]
+      }
+    case 'SET_MANDATORY_COURSE_LABEL_ATTEMPT':
+      return {
+        ...state,
+        pending: true
+      }
+    case 'SET_MANDATORY_COURSE_LABEL_FAILURE':
+      return {
+        ...state,
+        pending: false,
+        error: true
+      }
+    case 'SET_MANDATORY_COURSE_LABEL_SUCCESS':
+      return {
+        pending: false,
+        error: false,
+        data: state.data.map(e => (e.code === action.response.code ? action.response : e))
       }
     case 'DELETE_MANDATORY_COURSES_ATTEMPT':
       return {
