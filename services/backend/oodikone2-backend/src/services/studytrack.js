@@ -272,9 +272,9 @@ const gendersFromClass = async (studentnumbers) => {
 
 const productivityStats = async (studentnumbers, startDate, studytrack) => {
   return Promise.all([creditsAfter(studentnumbers, startDate),
-    graduationsFromClass(studentnumbers, studytrack),
-    thesesFromClass(studentnumbers, startDate, studytrack),
-    gendersFromClass(studentnumbers)])
+  graduationsFromClass(studentnumbers, studytrack),
+  thesesFromClass(studentnumbers, startDate, studytrack),
+  gendersFromClass(studentnumbers)])
 }
 
 const getYears = (since) => {
@@ -286,6 +286,20 @@ const getYears = (since) => {
 }
 
 const throughputStatsForStudytrack = async (studytrack, since) => {
+  const totals = {
+    credits: {
+      mte30: 0,
+      mte60: 0,
+      mte90: 0,
+      mte120: 0,
+      mte150: 0,
+    },
+    genders: {},
+    thesisM: 0,
+    thesisB: 0,
+    students: 0,
+    graduated: 0
+  }
   const years = getYears(since)
   const arr = await Promise.all(years.map(async year => {
     const startDate = `${year}-${semesterStart['FALL']}`
@@ -293,16 +307,38 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
     const [credits, graduated, theses, genders] = await productivityStats(studentnumbers, startDate, studytrack)
     delete genders[null]
+    const creditValues = credits.reduce((acc, curr) => {
+      acc.mte30 = curr >= 30 ? acc.mte30 + 1 : acc.mte30
+      acc.mte60 = curr >= 60 ? acc.mte60 + 1 : acc.mte60
+      acc.mte90 = curr >= 90 ? acc.mte90 + 1 : acc.mte90
+      acc.mte120 = curr >= 120 ? acc.mte120 + 1 : acc.mte120
+      acc.mte150 = curr >= 150 ? acc.mte150 + 1 : acc.mte150
+      return acc
+    }, { mte30: 0, mte60: 0, mte90: 0, mte120: 0, mte150: 0 })
+    Object.keys(totals.credits).forEach(key => {
+      totals.credits[key] += creditValues[key]
+    })
+    Object.keys(genders).forEach(genderKey => {
+      totals.genders[genderKey] = totals.genders[genderKey] ?
+        totals.genders[genderKey] + Number(genders[genderKey]) :
+        Number(genders[genderKey])
+    })
+    totals.thesisM = theses.MASTER ? totals.thesisM + theses.MASTER : totals.thesisM
+    totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
+    totals.students = totals.students + credits.length
+    totals.graduated = totals.graduated + graduated.length
     return {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
       graduated: graduated.length,
       thesisM: theses.MASTER || 0,
       thesisB: theses.BACHELOR || 0,
-      genders
+      genders,
+      creditValues
     }
   }))
-  return { id: studytrack, status: null,  data: arr }
+
+  return { id: studytrack, status: null, data: { years: arr, totals } }
 }
 
 module.exports = {

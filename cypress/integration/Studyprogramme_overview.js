@@ -65,4 +65,10 @@ describe('Studyprogramme overview', () => {
     cy.contains('Add thesis course').click()
     cy.contains('No results')
   })
+
+  it('can move to Population statistics page by clickin', () => {
+    cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+    cy.get('i.level.up.alternate.icon').eq(0).click()
+    cy.contains('Credit accumulation (for 9 students)')
+  })
 })

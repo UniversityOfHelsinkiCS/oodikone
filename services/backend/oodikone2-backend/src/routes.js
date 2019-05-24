@@ -18,6 +18,7 @@ const mandatoryCourses = require('./routes/mandatorycourses')
 const ping = require('./routes/ping')
 const oodi = require('./routes/oodi')
 const task = require('./routes/tasks')
+const feedback = require('./routes/feedback')
 
 module.exports = (app, url) => {
   app.use(url, log)
@@ -33,6 +34,7 @@ module.exports = (app, url) => {
   app.use(url, semesters)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
   app.use(`${url}/users`, auth.roles(['users']), users)
+  app.use(`${url}/feedback`, auth.roles(['users']), feedback)
   app.use(`${url}/usage`, auth.roles(['usage']), usage)
   app.use(`${url}/oodilearn`, auth.roles(['oodilearn']), oodilearn)
   app.use(`${url}/course-groups`, auth.roles(['coursegroups']), courseGroups)

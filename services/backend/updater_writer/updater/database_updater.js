@@ -66,7 +66,6 @@ const updateStudent = async (student) => {
       SemesterEnrollment.upsert(SE, { transaction })))
     } catch(e) {
       console.log(e)
-      process.kill()
     }
     if (studyAttainments) await Promise.all(updateAttainments(studyAttainments, transaction))
 
@@ -76,6 +75,10 @@ const updateStudent = async (student) => {
   } catch (err) {
     console.log(err)
     await transaction.rollback()
+    if (err.SequelizeDatabaseError === 'deadlock detected') {
+      console.log('AYYYYYLMAO LETS DIE')
+      process.kill()
+    }
   }
 }
 const updateAttainmentMeta = async () => {

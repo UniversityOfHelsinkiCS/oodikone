@@ -62,5 +62,22 @@ const message2 = email => {
     <img style="max-width: 13.5%;height: auto;" src="https://i.imgur.com/tnNDAJk.png" /> `,
   })
 }
+const feedback = (content, user) => {
+  return ({
+    to: 'Toska <grp-toska@helsinki.fi>',
+    subject: `New message from Oodikone feedback`,
+    text: `New message from user ${user}`,
+    html: `${content}
+    <p>send by user: ${user} </p>
+    <img src="cid:toskalogoustcid"/>`,
+    attachments: [
+      {
+        filename: 'toska.png',
+        path: `${process.cwd()}/assets/toska.png`,
+        cid: 'toskalogoustcid'
+      }
+    ]
+  })
+}
 
-module.exports = { transporter, message1, message2 }
+module.exports = { transporter, message1, message2, feedback }
