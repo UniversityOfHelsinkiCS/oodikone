@@ -423,6 +423,9 @@ const MandatoryCourse = sequelize.define('mandatory_course', {
   },
   studyprogramme_id: {
     type: Sequelize.STRING
+  },
+  label: {
+    type: Sequelize.STRING
   }
 })
 
