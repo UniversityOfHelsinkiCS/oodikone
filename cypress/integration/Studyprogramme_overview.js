@@ -18,9 +18,9 @@ describe('Studyprogramme overview', () => {
   it('can search for course mappings', () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click()
     cy.contains('Code Mapper').click()
-    cy.contains('tr', 'TKT20003 Käyttöjärjestelmät').get('input').type('582219')
-    cy.contains('tr', 'TKT20003 Käyttöjärjestelmät').get('.results').contains("Käyttöjärjestelmät (582219)")
-    cy.contains('tr', 'TKT20003 Käyttöjärjestelmät').contains('button', "Add")
+    cy.contains('tr', 'TKT20003 Käyttöjärjestelmät').within(($tr) => { cy.get('input').type('582219') })
+    cy.contains('tr', 'TKT20003 Käyttöjärjestelmät').within(($tr) => { cy.get('.results').contains("Käyttöjärjestelmät (582219)") })
+    cy.contains('tr', 'TKT20003 Käyttöjärjestelmät').within(($tr) => { cy.contains('button', "Add") })
   })
 
   it('can view course groups', () => {
