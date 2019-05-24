@@ -275,7 +275,7 @@ class PopulationStudents extends Component {
     )
 
     const labelToMandatoryCourses = this.props.mandatoryCourses.reduce((acc, e) => {
-      const label = e.label || ''
+      const label = e.label || ''
       acc[label] = acc[label] || []
       acc[label].push(e)
       return acc
