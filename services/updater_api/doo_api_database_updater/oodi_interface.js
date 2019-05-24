@@ -36,7 +36,7 @@ const attemptGetFor = async (url, attempts = 5) => {
     attempt += 1
     try {
       response = await getUrl(url)
-      logger.info('requested url', { url, status: response.status })
+      logger.info('requested url', { url, success: response.status === 200 })
       return response
     } catch (error) {
       if (attempt === attempts) {
@@ -63,7 +63,7 @@ console.log(process.env.NODE_ENV)
 const getStudent = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/info`
   try {
-    const response = await getUrl(url)
+    const response = await attemptGetFor(url)
     const data = response.data.data
     return data
   } catch (e) {

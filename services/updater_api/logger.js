@@ -16,8 +16,6 @@ if (process.env.NODE_ENV !== 'test') {
   transports.push(new winston.transports.File({ filename: 'debug.log' }))
 }
 
-transports.push(new winston.transports.Console({ level: 'debug' }))
-
 
 const logger = winston.createLogger({ transports })
 
