@@ -10,7 +10,7 @@ let updatedCount = 0
 let scheduledCount = 0
 let fetchedCount = 0
 
-const TIMEZONE = 'Europe/Helsinki'
+const timezone = 'Europe/Helsinki'
 
 const updateTask = async (task, status, type) => {
   if (type) {
@@ -25,7 +25,7 @@ stan.on('connect', async () => {
   cron.schedule('0 0 1 * *', async () => {
     // Update ALL students and meta every month
     scheduleAllStudentsAndMeta()
-  }, { TIMEZONE })
+  }, { timezone })
 
   cron.schedule('20 4 1 1,3,8,10 *', async () => {
     // At 04:20 on day-of-month 1 in January, March, August, and October.”
@@ -34,7 +34,7 @@ stan.on('connect', async () => {
   cron.schedule('0 23 * * *', async () => {
     // Update ACTIVE students every night
     scheduleActiveStudents()
-  }, { TIMEZONE })
+  }, { timezone })
 
   cron.schedule('0 0-9 * * *', async () => {
     // Just log some statistics about updater during nights
@@ -42,7 +42,7 @@ stan.on('connect', async () => {
     updatedCount = 0
     fetchedCount = 0
     scheduledCount = 0
-  }, { TIMEZONE })
+  }, { timezone })
   cron.schedule('0 7 * * *', async () => {
     stan.publish('RefreshOverview', null, (err, guid) => {
       if (err) {
@@ -65,14 +65,16 @@ stan.on('connect', async () => {
         console.log('published', 'UpdateAttainmentDates')
       }
     })
-  }, { TIMEZONE })
+  }, { timezone })
 
   const statusSub = stan.subscribe('status')
 
   statusSub.on('message', async (msg) => {
     const message = msg.getData().split(':')
+    const task = message[0]
+    const status = message[1]
 
-    switch (message[1]) {
+    switch (status) {
       case 'DONE':
         updatedCount = updatedCount + 1
         break
@@ -82,6 +84,8 @@ stan.on('connect', async () => {
       case 'SCHEDULED':
         scheduledCount = scheduledCount + 1
         break
+      default:
+        return
     }
     const isValidStudentId = (id) => {
       if (/^0\d{8}$/.test(id)) {
@@ -97,8 +101,10 @@ stan.on('connect', async () => {
       }
       return false
     }
-    await updateTask(taskmessage[0], message[1], !!isValidStudentId(message[0]) ? 'student' : 'other')
+    const isStudent = !!isValidStudentId(task)
+    logger.info(`Status changed for ${task} to ${status}`, { task: task, status: status, student: isStudent })
+    await updateTask(task, status, isStudent ? 'student' : 'other')
   })
- 
+
 })
 
