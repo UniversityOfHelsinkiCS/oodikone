@@ -91,7 +91,7 @@ db_oodikone_reset () {
 ping_psql () {
     echo "Pinging psql in container $1 with db name $2"
     retry docker exec -u postgres $1 pg_isready
-    docker exec -u postgres $1 psql -c "CREATE DATABASE $1" || echo "container $1 DB $2 already exists"
+    docker exec -u postgres $1 psql -c "CREATE DATABASE $2" || echo "container $1 DB $2 already exists"
 }
 
 db_setup_full () {
