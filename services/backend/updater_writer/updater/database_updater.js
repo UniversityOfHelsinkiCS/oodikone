@@ -38,7 +38,8 @@ const updateAttainments = (studyAttainments, transaction) => studyAttainments.ma
       creditTeachers.length > 0 && Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
     ])
   } catch (e) {
-    console.log('attainment update failed', e)
+    console.log('attainment update failed')
+    console.log(e.parent)
   }
 })
 
@@ -71,13 +72,15 @@ const updateStudent = async (student) => {
     await transaction.commit()
   } catch (err) {
     await transaction.rollback()
+    console.log(' GO BACK !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     if (err.parent.code === '25P02') {
       console.log('Transaction aborted')
     } else if (err.message === 'deadlock detected') {
       console.log('Deadlock suicide')
       process.kill()
     } else {
-      console.log(err.parent)
+      // console.log(err.parent)
+      console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
     }
   }
 }
@@ -85,7 +88,7 @@ const updateAttainmentMeta = async () => {
   try {
     await updateAttainmentDates()
   } catch (err) {
-    console.log(err)
+    console.log('vitun vittu')
   }
 }
 
@@ -120,7 +123,7 @@ const updateMeta = async ({
     await transaction.commit()
   } catch (err) {
     await transaction.rollback()
-    console.log(err)
+    console.log('aaaapuaaa')
   }
 
 }
