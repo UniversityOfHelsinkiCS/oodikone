@@ -270,11 +270,43 @@ const gendersFromClass = async (studentnumbers) => {
   }, {})
 }
 
-const productivityStats = async (studentnumbers, startDate, studytrack) => {
+const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, endDate) => {
+  return Studyright.findAndCountAll({
+    include: {
+      include: {
+        model: ElementDetails,
+        where: {
+          type: {
+            [Op.eq]: 20
+          }
+        }
+      },
+      model: StudyrightElement,
+      required: true,
+      where: {
+        code: {
+          [Op.eq]: studytrack
+        },
+        startdate: {
+          [Op.gt]: moment(startDate).add(1, 'days'), // because somehow startdates have a time that is not 00:00
+          [Op.lt]: new Date(endDate)
+        }
+      }
+    },
+    where: {
+      student_studentnumber: {
+        [Op.in]: studentnumbers
+      }
+    }
+  })
+}
+
+const productivityStats = async (studentnumbers, startDate, studytrack, endDate) => {
   return Promise.all([creditsAfter(studentnumbers, startDate),
-  graduationsFromClass(studentnumbers, studytrack),
-  thesesFromClass(studentnumbers, startDate, studytrack),
-  gendersFromClass(studentnumbers)])
+    graduationsFromClass(studentnumbers, studytrack),
+    thesesFromClass(studentnumbers, startDate, studytrack),
+    gendersFromClass(studentnumbers),
+    tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate)])
 }
 
 const getYears = (since) => {
@@ -298,14 +330,16 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     thesisM: 0,
     thesisB: 0,
     students: 0,
-    graduated: 0
+    graduated: 0,
+    transferred: 0
   }
   const years = getYears(since)
   const arr = await Promise.all(years.map(async year => {
     const startDate = `${year}-${semesterStart['FALL']}`
     const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
-    const [credits, graduated, theses, genders] = await productivityStats(studentnumbers, startDate, studytrack)
+    const [credits, graduated, theses, genders, transferred] =
+      await productivityStats(studentnumbers, startDate, studytrack, endDate)
     delete genders[null]
     const creditValues = credits.reduce((acc, curr) => {
       acc.mte30 = curr >= 30 ? acc.mte30 + 1 : acc.mte30
@@ -326,7 +360,8 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     totals.thesisM = theses.MASTER ? totals.thesisM + theses.MASTER : totals.thesisM
     totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
     totals.students = totals.students + credits.length
-    totals.graduated = totals.graduated + graduated.length
+    totals.graduated = totals.graduated + graduated.length,
+    totals.transferred = totals.transferred + transferred.count
     return {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
@@ -334,7 +369,8 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       thesisM: theses.MASTER || 0,
       thesisB: theses.BACHELOR || 0,
       genders,
-      creditValues
+      creditValues,
+      transferred: transferred.count
     }
   }))
 
