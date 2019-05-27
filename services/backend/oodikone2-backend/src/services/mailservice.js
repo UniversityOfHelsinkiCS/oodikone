@@ -68,7 +68,7 @@ const feedback = (content, user, email) => {
     subject: `New message from Oodikone feedback`,
     text: `New message from user ${user}`,
     html: `${content}
-    <p>send by user: ${user}, email: ${email}</p>
+    <p>sent by user: ${user}, email: ${email}</p>
     <img src="cid:toskalogoustcid"/>`,
     attachments: [
       {
