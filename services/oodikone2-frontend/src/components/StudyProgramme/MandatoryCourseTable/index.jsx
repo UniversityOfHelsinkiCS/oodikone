@@ -21,8 +21,9 @@ const MandatoryCourseTable = ({ studyProgramme, mandatoryCourses, language, dele
   const labelInput = code => (
     <Form>
       <Form.Group>
-        <Form.Input defaultValue={labels[code]} onChange={e => setLabels({ ...labels, [code]: e.target.value })} />
+        <Form.Input defaultValue={initialLabels[code]} onChange={e => setLabels({ ...labels, [code]: e.target.value })} />
         <Form.Button
+          disabled={initialLabels[code] === labels[code] || labels[code] == null || (initialLabels[code] == null && labels[code] === '')}
           onClick={() => setMandatoryCourseLabel(studyProgramme, code, labels[code])}
         >
           Save label
