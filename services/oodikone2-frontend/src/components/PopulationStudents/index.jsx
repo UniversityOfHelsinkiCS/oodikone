@@ -103,7 +103,7 @@ class PopulationStudents extends Component {
       this.studyrightCodes(studyrights, 'studyrightElements')
         .reduce((acc, elemArr) => {
           elemArr.filter(el => el.element_detail.type === 30).forEach(el =>
-            acc.push(el.element_detail.name.fi))
+            acc.push({ name: el.element_detail.name.fi, startdate: el.startdate }))
           return acc
         }, []))
 
@@ -150,7 +150,7 @@ class PopulationStudents extends Component {
       columns.push({
         key: 'studytrack',
         title: 'studytrack',
-        getRowVal: s => studytrack(s.studyrights)
+        getRowVal: s => studytrack(s.studyrights).sort((a, b) => new Date(b.startdate) - new Date(a.startdate)).map(st => st.name)[0]
       })
     }
 
@@ -385,8 +385,8 @@ class PopulationStudents extends Component {
         }]
       )
       const worksheet = XLSX.utils.json_to_sheet(data.map(s => ({
-        'last name': s.firstnames,
-        'first names': s.lastname,
+        'last name': s.lastname,
+        'first names': s.firstnames,
         'student number': s.studentNumber,
         'credits since start': getStudentTotalCredits(s),
         'all credits': s.credits,
@@ -394,7 +394,7 @@ class PopulationStudents extends Component {
         'transferred from': (s.transferredStudyright ? transferFrom(s) : ''),
         priority: priorityText(s.studyrights),
         extent: extentCodes(s.studyrights),
-        studytrack: studytrack(s.studyrights).join(', '),
+        studytrack: studytrack(s.studyrights).sort((a, b) => new Date(b.startdate) - new Date(a.startdate)).map(st => st.name)[0],
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber),
         ...sortedMandatory.reduce((acc, m) => {
