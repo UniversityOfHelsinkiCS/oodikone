@@ -5,6 +5,7 @@ const fs = require('fs');
 const logger = require('./logger')
 const { updateStudentNumberList } = require('./src/student_list_updater')
 const { scheduleActiveStudents, scheduleAllStudentsAndMeta } = require('./src/schedule_students')
+const { getOldestTasks, getCurrentStatus } = require('./src/SchedulingStatistics')
 
 let updatedCount = 0
 let scheduledCount = 0
@@ -35,7 +36,13 @@ stan.on('connect', async () => {
     // Update ACTIVE students every night
     scheduleActiveStudents()
   }, { timezone })
+  cron.schedule('0/5 * * * *', async () => {
+    const oldestTasks = await getOldestTasks()
+    const status = await getCurrentStatus()
+    logger.info('oldestTasks', { oldestTasks })
+    logger.info('updaterStatus', { status })
 
+  }, { timezone })
   cron.schedule('0 0-9 * * *', async () => {
     // Just log some statistics about updater during nights
     logger.info(`${updatedCount} TASKS DONE IN LAST HOUR\n ${scheduledCount} TASKS SCHEDULED IN LAST HOUR\n ${fetchedCount} TASKS FETCHED FROM API IN LAST HOUR`)
