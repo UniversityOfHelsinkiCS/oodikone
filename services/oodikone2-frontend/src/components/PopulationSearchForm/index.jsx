@@ -355,7 +355,6 @@ class PopulationSearchForm extends Component {
   fetchPopulationFromUrlParams() {
     const query = this.parseQueryFromUrl()
     this.setState({ query })
-    console.log('url params')
     this.fetchPopulation(query)
   }
 

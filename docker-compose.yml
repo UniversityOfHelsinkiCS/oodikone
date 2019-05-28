@@ -252,7 +252,7 @@ services:
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       TEST_DB_SCHEMA: updater_test
-    container_name: updater_writer
+    
 
   scheduler_mongo:
     image: mongo

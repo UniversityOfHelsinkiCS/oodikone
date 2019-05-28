@@ -247,10 +247,7 @@ class PopulationCourseStats extends Component {
   }
 
   renderActiveView() {
-    // const { courses } = this.props
     const { courseStatistics } = this.state
-    // is there a point for this?
-    // const courseStats = !(_.isEmpty(courseStatistics)) ? courseStatistics : courses.coursestatistics
 
     switch (this.state.activeView) {
       case 'showGradeDistribution':

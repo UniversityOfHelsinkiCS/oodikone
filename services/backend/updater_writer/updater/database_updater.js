@@ -24,22 +24,19 @@ const deleteStudentStudyrights = async (studentnumber, transaction) => {
 }
 
 const updateAttainments = (studyAttainments, transaction) => studyAttainments.map(async ({ credit, creditTeachers, teachers, course }) => {
-  try {
-    await Promise.all([
-      Course.upsert(course, { transaction }),
-      Credit.upsert(credit, { transaction }),
-    ])
-    const { disciplines, providers, courseproviders } = course
-    await Promise.all([
-      disciplines && disciplines.length > 0 && Promise.all(disciplines.map(courseDiscipline => CourseDisciplines.upsert(courseDiscipline, { transaction }))),
-      providers.length > 0 && Promise.all(providers.map(provider => Provider.upsert(provider, { transaction }))),
-      courseproviders.length > 0 && Promise.all(courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
-      teachers && teachers.length > 0 && Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
-      creditTeachers.length > 0 && Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
-    ])
-  } catch (e) {
-    console.log('attainment update failed', e)
-  }
+  await Promise.all([
+    Course.upsert(course, { transaction }),
+    Credit.upsert(credit, { transaction }),
+  ])
+  const { disciplines, providers, courseproviders } = course
+  await Promise.all([
+    disciplines && disciplines.length > 0 && Promise.all(disciplines.map(courseDiscipline => CourseDisciplines.upsert(courseDiscipline, { transaction }))),
+    providers.length > 0 && Promise.all(providers.map(provider => Provider.upsert(provider, { transaction }))),
+    courseproviders.length > 0 && Promise.all(courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction }))),
+    teachers && teachers.length > 0 && Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction }))),
+    creditTeachers.length > 0 && Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
+  ])
+
 })
 
 const updateStudyRights = (studyRights, transaction) => studyRights.map(async ({ studyRightExtent, studyright, elementDetails, studyRightElements, transfers }) => {
@@ -75,9 +72,9 @@ const updateStudent = async (student) => {
       console.log('Transaction aborted')
     } else if (err.message === 'deadlock detected') {
       console.log('Deadlock suicide')
-      process.kill()
+      process.exit(1)
     } else {
-      console.log(err.parent)
+     console.log(err.parent)
     }
   }
 }
@@ -85,7 +82,7 @@ const updateAttainmentMeta = async () => {
   try {
     await updateAttainmentDates()
   } catch (err) {
-    console.log(err)
+    console.log('vitun vittu')
   }
 }
 
@@ -120,7 +117,7 @@ const updateMeta = async ({
     await transaction.commit()
   } catch (err) {
     await transaction.rollback()
-    console.log(err)
+    console.log('aaaapuaaa')
   }
 
 }
