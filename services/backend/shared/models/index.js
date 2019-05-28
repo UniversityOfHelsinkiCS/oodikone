@@ -1,10 +1,150 @@
 const Sequelize = require('sequelize')
 const { sequelize, migrationPromise } = require('../database/connection')
+const conf = require('../conf-backend')
 
 const ThesisTypeEnums = {
   MASTER: 'MASTER',
   BACHELOR: 'BACHELOR'
 }
+
+const CourseGroup = sequelize.define('course_groups', {
+  id: {
+    primaryKey: true,
+    type: Sequelize.BIGINT,
+    autoIncrement: true
+  },
+  name: {
+    type: Sequelize.STRING,
+    unique: true
+  }
+},
+{
+  schema: conf.DB_SCHEMA_KONE
+})
+
+const TeacherCourseGroup = sequelize.define('teacher_course_groups', {
+  course_group_id: {
+    type: Sequelize.BIGINT,
+  },
+  teacher_id: {
+    type: Sequelize.STRING,
+  }
+},
+{
+  schema: conf.DB_SCHEMA_KONE
+})
+
+const MandatoryCourse = sequelize.define('mandatory_courses', {
+  course_code: {
+    type: Sequelize.STRING,
+  },
+  studyprogramme_id: {
+    type: Sequelize.STRING
+  },
+  label: {
+    type: Sequelize.STRING
+  }
+},
+{
+  schema: conf.DB_SCHEMA_KONE
+})
+
+const Filters = sequelize.define('filters',
+  {
+    id: {
+      type: Sequelize.STRING,
+      primaryKey: true
+    },
+    name: {
+      type: Sequelize.STRING
+    },
+    description: {
+      type: Sequelize.STRING
+    },
+    filters: {
+      type: Sequelize.JSONB
+    },
+    population: {
+      type: Sequelize.JSONB
+    }
+  },
+  {
+    schema: conf.DB_SCHEMA_KONE
+  }
+)
+
+const UsageStatistic = sequelize.define('usage_statistics', {
+  id: {
+    primaryKey: true,
+    type: Sequelize.STRING
+  },
+  username: {
+    type: Sequelize.STRING
+  },
+  name: {
+    type: Sequelize.STRING
+  },
+  time: {
+    type: Sequelize.INTEGER
+  },
+  admin: {
+    type: Sequelize.BOOLEAN
+  },
+  method: {
+    type: Sequelize.STRING
+  },
+  URL: {
+    type: Sequelize.STRING
+  },
+  status: {
+    type: Sequelize.INTEGER
+  },
+  data: {
+    type: Sequelize.JSONB
+  },
+
+}, {
+  timestamps: false,
+  schema: conf.DB_SCHEMA_KONE
+})
+
+const TagStudent = sequelize.define('tag_student',
+  {
+    taggedstudents_studentnumber: { type: Sequelize.STRING },
+    tags_tagname: { type: Sequelize.STRING },
+  },
+  {
+    tableName: 'tag_student',
+    timestamps: false,
+    schema: conf.DB_SCHEMA_KONE
+  }
+)
+TagStudent.removeAttribute('id')
+
+const Tag = sequelize.define('tag',
+  {
+    tagname: {
+      primaryKey: true,
+      type: Sequelize.STRING
+    },
+  },
+  {
+    tableName: 'tag',
+    timestamps: false,
+    schema: conf.DB_SCHEMA_KONE
+  }
+)
+
+const MigrationKone = sequelize.define('migrations', {
+  name: {
+    type: Sequelize.STRING,
+    primaryKey: true
+  }
+}, {
+  tablename: 'migrations',
+  timestamps: false,
+  schema: conf.DB_SCHEMA_KONE
+})
 
 const Student = sequelize.define('student',
   {
@@ -53,32 +193,6 @@ const Student = sequelize.define('student',
 Student.hasStarted = (student) => {
   return student.credits.length > 0
 }
-
-const TagStudent = sequelize.define('tag_student',
-  {
-    taggedstudents_studentnumber: { type: Sequelize.STRING },
-    tags_tagname: { type: Sequelize.STRING },
-  },
-  {
-    tableName: 'tag_student',
-    timestamps: false,
-  }
-)
-
-TagStudent.removeAttribute('id')
-
-const Tag = sequelize.define('tag',
-  {
-    tagname: {
-      primaryKey: true,
-      type: Sequelize.STRING
-    },
-  },
-  {
-    tableName: 'tag',
-    timestamps: false,
-  }
-)
 
 const Organisation = sequelize.define('organization',
   {
@@ -268,27 +382,6 @@ const StudentList = sequelize.define('student_list',
   }
 )
 
-const Filters = sequelize.define('filters',
-  {
-    id: {
-      type: Sequelize.STRING,
-      primaryKey: true
-    },
-    name: {
-      type: Sequelize.STRING
-    },
-    description: {
-      type: Sequelize.STRING
-    },
-    filters: {
-      type: Sequelize.JSONB
-    },
-    population: {
-      type: Sequelize.JSONB
-    }
-  }
-)
-
 const StudyrightExtent = sequelize.define('studyright_extent',
   {
     extentcode: {
@@ -413,22 +506,6 @@ const CourseProvider = sequelize.define('course_providers', {}, {
   ]
 })
 
-const MandatoryCourse = sequelize.define('mandatory_course', {
-  course_code: {
-    type: Sequelize.STRING,
-    references: {
-      model: Course,
-      key: 'code'
-    }
-  },
-  studyprogramme_id: {
-    type: Sequelize.STRING
-  },
-  label: {
-    type: Sequelize.STRING
-  }
-})
-
 const CourseRealisationType = sequelize.define('courserealisation_type', {
   realisationtypecode: {
     primaryKey: true,
@@ -476,18 +553,6 @@ const Migration = sequelize.define('migrations', {
   timestamps: false
 })
 
-const CourseGroup = sequelize.define('course_groups', {
-  id: {
-    primaryKey: true,
-    type: Sequelize.BIGINT,
-    autoIncrement: true
-  },
-  name: {
-    type: Sequelize.STRING,
-    unique: true
-  }
-})
-
 const CreditTeacher = sequelize.define('credit_teacher', {
   credit_id: {
     type: Sequelize.STRING,
@@ -497,40 +562,6 @@ const CreditTeacher = sequelize.define('credit_teacher', {
     type: Sequelize.STRING,
     primaryKey: true
   }
-})
-
-const UsageStatistic = sequelize.define('usage_statistics', {
-  id: {
-    primaryKey: true,
-    type: Sequelize.STRING
-  },
-  username: {
-    type: Sequelize.STRING
-  },
-  name: {
-    type: Sequelize.STRING
-  },
-  time: {
-    type: Sequelize.INTEGER
-  },
-  admin: {
-    type: Sequelize.BOOLEAN
-  },
-  method: {
-    type: Sequelize.STRING
-  },
-  URL: {
-    type: Sequelize.STRING
-  },
-  status: {
-    type: Sequelize.INTEGER
-  },
-  data: {
-    type: Sequelize.JSONB
-  },
-
-}, {
-  timestamps: false
 })
 
 const ThesisCourse = sequelize.define('thesis_courses', {
@@ -640,8 +671,8 @@ Student.belongsToMany(CourseRealisation, { through: CourseEnrollment, foreignKey
 Credit.belongsToMany(Teacher, { through: CreditTeacher, foreignKey: 'credit_id' })
 Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id' })
 
-Teacher.belongsToMany(CourseGroup, { through: 'teacher_course_group', foreignKey: 'teacher_id' })
-CourseGroup.belongsToMany(Teacher, { through: 'teacher_course_group', foreignKey: 'course_group_id' })
+Teacher.belongsToMany(CourseGroup, { through: TeacherCourseGroup, foreignKey: 'teacher_id' })
+CourseGroup.belongsToMany(Teacher, { through: TeacherCourseGroup, foreignKey: 'course_group_id' })
 CourseGroup.belongsTo(ElementDetails, { foreignKey: 'programmeid' })
 
 Credit.belongsTo(Semester, { foreignKey: { name: 'semestercode', allowNull: false } })
@@ -684,6 +715,7 @@ module.exports = {
   CourseRealisation,
   CourseEnrollment,
   Migration,
+  MigrationKone,
   CreditTeacher,
   UsageStatistic,
   CourseGroup,
