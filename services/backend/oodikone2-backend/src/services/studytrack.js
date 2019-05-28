@@ -62,9 +62,10 @@ const productivityStatsForProvider = async (providercode, since) => {
   return productivityStatsFromCredits(credits)
 }
 
-const formatGraduatedStudyright = ({ studyrightid, enddate }) => {
+const formatGraduatedStudyright = ({ studyrightid, enddate, studystartdate }) => {
   const year = enddate && enddate.getFullYear()
-  return { studyrightid, year }
+  const inTargetTime = moment(enddate).diff(moment(studystartdate), 'months') <= 60
+  return { studyrightid, year, inTargetTime }
 }
 
 const findGraduated = (studytrack, since) => Studyright.findAll({
@@ -331,6 +332,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     thesisB: 0,
     students: 0,
     graduated: 0,
+    inTargetTime: 0,
     transferred: 0
   }
   const years = getYears(since)
@@ -361,6 +363,8 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
     totals.students = totals.students + credits.length
     totals.graduated = totals.graduated + graduated.length,
+    totals.inTargetTime = totals.inTargetTime + graduated.filter(g =>
+      moment(g.enddate).diff(g.startstududate, 'months') <= 60).length,
     totals.transferred = totals.transferred + transferred.count
     return {
       year: `${year}-${year + 1}`,
