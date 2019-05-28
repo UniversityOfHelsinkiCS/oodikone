@@ -8,7 +8,7 @@ PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.bak"
 USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.bak"
 
 retry () {
-    for i in {1..10}
+    for i in {1..60}
     do
         $@ && break || echo "Retry attempt $i failed, waiting..." && sleep 10;
     done
@@ -44,7 +44,7 @@ get_anon_oodikone() {
     file=./private.key
     if [ -e "$file" ]; then
       echo "Private key exists"
-    else 
+    else
       echo "No private key, echoing from environment variable OODI_KEY"
       echo "$OODI_KEY" | awk  '{gsub("\\\\n","\n")};1' > private.key
       chmod 400 private.key
