@@ -8,6 +8,8 @@ const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { semesterStart, semesterEnd } = require('../util/semester')
 const isNumber = str => !Number.isNaN(Number(str))
 
+const FIVE_YEARS_IN_MONTHS = 60
+
 const studytrackToProviderCode = code => {
   const [left, right] = code.split('_')
   const prefix = [...left].filter(isNumber).join('')
@@ -62,9 +64,10 @@ const productivityStatsForProvider = async (providercode, since) => {
   return productivityStatsFromCredits(credits)
 }
 
-const formatGraduatedStudyright = ({ studyrightid, enddate }) => {
+const formatGraduatedStudyright = ({ studyrightid, enddate, studystartdate }) => {
   const year = enddate && enddate.getFullYear()
-  return { studyrightid, year }
+  const inTargetTime = moment(enddate).diff(moment(studystartdate), 'months') <= FIVE_YEARS_IN_MONTHS
+  return { studyrightid, year, inTargetTime }
 }
 
 const findGraduated = (studytrack, since) => Studyright.findAll({
@@ -331,6 +334,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     thesisB: 0,
     students: 0,
     graduated: 0,
+    inTargetTime: 0,
     transferred: 0
   }
   const years = getYears(since)
@@ -361,6 +365,8 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
     totals.students = totals.students + credits.length
     totals.graduated = totals.graduated + graduated.length,
+    totals.inTargetTime = totals.inTargetTime + graduated.filter(g =>
+      moment(g.enddate).diff(g.startstududate, 'months') <= FIVE_YEARS_IN_MONTHS).length,
     totals.transferred = totals.transferred + transferred.count
     return {
       year: `${year}-${year + 1}`,

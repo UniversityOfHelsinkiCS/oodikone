@@ -36,7 +36,7 @@ stan.on('connect', async () => {
     // Update ACTIVE students every night
     scheduleActiveStudents()
   }, { timezone })
-  cron.schedule('0/5 * * * *', async () => {
+  cron.schedule('*/5 * * * *', async () => {
     const oldestTasks = await getOldestTasks()
     const status = await getCurrentStatus()
     logger.info('oldestTasks', { oldestTasks })
