@@ -8,6 +8,8 @@ const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { semesterStart, semesterEnd } = require('../util/semester')
 const isNumber = str => !Number.isNaN(Number(str))
 
+const FIVE_YEARS_IN_MONTHS = 60
+
 const studytrackToProviderCode = code => {
   const [left, right] = code.split('_')
   const prefix = [...left].filter(isNumber).join('')
@@ -64,7 +66,7 @@ const productivityStatsForProvider = async (providercode, since) => {
 
 const formatGraduatedStudyright = ({ studyrightid, enddate, studystartdate }) => {
   const year = enddate && enddate.getFullYear()
-  const inTargetTime = moment(enddate).diff(moment(studystartdate), 'months') <= 60
+  const inTargetTime = moment(enddate).diff(moment(studystartdate), 'months') <= FIVE_YEARS_IN_MONTHS
   return { studyrightid, year, inTargetTime }
 }
 
@@ -364,7 +366,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     totals.students = totals.students + credits.length
     totals.graduated = totals.graduated + graduated.length,
     totals.inTargetTime = totals.inTargetTime + graduated.filter(g =>
-      moment(g.enddate).diff(g.startstududate, 'months') <= 60).length,
+      moment(g.enddate).diff(g.startstududate, 'months') <= FIVE_YEARS_IN_MONTHS).length,
     totals.transferred = totals.transferred + transferred.count
     return {
       year: `${year}-${year + 1}`,
