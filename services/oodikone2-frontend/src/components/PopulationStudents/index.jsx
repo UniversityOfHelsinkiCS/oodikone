@@ -104,6 +104,7 @@ class PopulationStudents extends Component {
         .reduce((acc, elemArr) => {
           elemArr.filter(el => el.element_detail.type === 30).forEach(el =>
             acc.push({ name: el.element_detail.name.fi, startdate: el.startdate }))
+          acc.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))
           return acc
         }, []))
 
@@ -150,7 +151,7 @@ class PopulationStudents extends Component {
       columns.push({
         key: 'studytrack',
         title: 'studytrack',
-        getRowVal: s => studytrack(s.studyrights).sort((a, b) => new Date(b.startdate) - new Date(a.startdate)).map(st => st.name)[0]
+        getRowVal: s => studytrack(s.studyrights).map(st => st.name)[0]
       })
     }
 
@@ -394,7 +395,7 @@ class PopulationStudents extends Component {
         'transferred from': (s.transferredStudyright ? transferFrom(s) : ''),
         priority: priorityText(s.studyrights),
         extent: extentCodes(s.studyrights),
-        studytrack: studytrack(s.studyrights).sort((a, b) => new Date(b.startdate) - new Date(a.startdate)).map(st => st.name)[0],
+        studytrack: studytrack(s.studyrights).map(st => st.name)[0],
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber),
         ...sortedMandatory.reduce((acc, m) => {
