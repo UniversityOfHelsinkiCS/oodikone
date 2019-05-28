@@ -68,7 +68,6 @@ const updateStudent = async (student) => {
     await transaction.commit()
   } catch (err) {
     await transaction.rollback()
-    console.log(' GO BACK !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     if (err.parent.code === '25P02') {
       console.log('Transaction aborted')
     } else if (err.message === 'deadlock detected') {

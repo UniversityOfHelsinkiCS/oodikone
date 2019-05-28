@@ -9,7 +9,9 @@
     "dev": "nodemon --max_old_space_size=4096 index.js",
     "updateStudentNumberList": "node --max_old_space_size=4096 -e 'require(\"./src/student_list_updater.js\").updateStudentNumberList()'",
     "scheduleActiveStudents": "NATS_CLIENTID=manualActiveSchedule node --max_old_space_size=4096 -e 'require(\"./src/schedule_students.js\").scheduleActiveStudents()'",
-    "scheduleAll": "NATS_CLIENTID=manualAllSchedule node --max_old_space_size=4096 -e 'require(\"./src/schedule_students.js\").scheduleAllStudentsAndMeta()'"
+    "scheduleAll": "NATS_CLIENTID=manualAllSchedule node --max_old_space_size=4096 -e 'require(\"./src/schedule_students.js\").scheduleAllStudentsAndMeta()'",
+    "getOldestTasks": "node --max_old_space_size=4096 -e 'require(\"./src/SchedulingStatistics.js\").getOldestTasks()'"
+
   },
   "author": "",
   "license": "ISC",
