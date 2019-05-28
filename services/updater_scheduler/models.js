@@ -6,13 +6,15 @@ const scheduleSchema = new mongoose.Schema(
   {
     task: {
       type: String,
-      index: true,
       unique: true
     },
     status: String,
     type: String,
     active: Boolean,
-    updatedAt: Date
+    updatedAt: {
+      type: Date,
+      index: true
+    }
   }
 )
 
