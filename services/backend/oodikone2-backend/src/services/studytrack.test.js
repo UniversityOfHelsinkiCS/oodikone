@@ -102,7 +102,6 @@ test('findGraduated finds graduated studyright', async () => {
 
 test('findGraduated formats graduated studyrights correctly', async () => {
   const studyrights = await findGraduated(studytrack, '2001-01-01')
-  console.log(studyrights)
   expect(studyrights).toContainEqual({ studyrightid: '10', year: 2016, inTargetTime: false })
 })
 
