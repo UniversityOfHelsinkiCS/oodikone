@@ -19,7 +19,9 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
   if (error) return <h1>Oh no so error {error}</h1>
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
+  const countries = data.length > 0 && throughput.totals.countries ? uniq(flatten(data.map(year => Object.keys(year.countries)))) : []
   const renderGenders = genders.length > 0
+  const renderCountries = countries.length > 0
   let thesisTypes = []
   if (thesis) {
     thesisTypes = thesis.map(t => t.thesisType)
@@ -67,6 +69,10 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
             }
             <Table.HeaderCell rowSpan="2">Graduated</Table.HeaderCell>
             <Table.HeaderCell rowSpan="2">Transferred to this program</Table.HeaderCell>
+            {
+              renderCountries ?
+                <Table.HeaderCell colSpan={countries.length}>Countries</Table.HeaderCell> : null
+            }
             <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
             {(thesisTypes.includes('BACHELOR') ||
               thesisTypes.includes('MASTER')) && (
@@ -79,6 +85,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
           <Table.Row>
             {renderGenders ? <Table.HeaderCell content="Total" /> : null}
             {genders.map(gender => <Table.HeaderCell key={gender} content={gender} />)}
+            {countries.map(country => <Table.HeaderCell key={country} content={country} />)}
             <Table.HeaderCell content=">= 30" />
             <Table.HeaderCell content=">= 60" />
             <Table.HeaderCell content=">= 90" />
@@ -111,6 +118,11 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 ))}
                 <Table.Cell>{year.graduated}</Table.Cell>
                 <Table.Cell>{year.transferred}</Table.Cell>
+                {countries.map(country => (
+                  <Table.Cell key={year.year + country}>
+                    {year.countries[country] || 0}
+                  </Table.Cell>
+                ))}
                 {Object.keys(year.creditValues).map(creditKey => (
                   <Table.Cell key={creditKey}>{year.creditValues[creditKey]}
                   </Table.Cell>
@@ -136,6 +148,11 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
               ))}
               <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
               <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
+              {renderCountries ? Object.keys(throughput.totals.countries).map(countryKey => (
+                <Table.HeaderCell key={`${countryKey}total`}>
+                  {throughput.totals.countries[countryKey]}
+                </Table.HeaderCell>
+              )) : null }
               {Object.keys(throughput.totals.credits).map(creditKey => (
                 <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}
                 </Table.HeaderCell>
