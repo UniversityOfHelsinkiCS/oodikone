@@ -60,15 +60,6 @@ services:
       - ./analytics-redis-data:/data
     container_name: analytics_redis
 
-  mongo_db:
-    image: mongo
-    volumes:
-      - ./backups/mongo/oodilearn:/dump
-      - ./mongodata:/data/db
-    ports:
-      - "27017:27017"
-    container_name: mongo_db
-
   backend:
     image: toska/oodikone2-backend:latest
     build:
