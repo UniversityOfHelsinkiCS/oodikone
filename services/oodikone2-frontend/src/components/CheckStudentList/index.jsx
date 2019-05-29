@@ -6,14 +6,15 @@ class CheckStudentList extends Component {
   state = { modalOpen: false, input: '', notInOodiRows: [], notInListRows: [] }
 
   checkStudents = (input) => {
-    const formattedInput = input.split('\n')
+    const inputArray = input.split('\n')
+    const formattedInput = inputArray.map(number => number.trim())
     const { students } = this.props
     const snums = students.map(s => s.studentNumber)
-    const notFound = formattedInput.filter(a => !snums.includes(a))
+    const notInOodi = formattedInput.filter(a => !snums.includes(a))
     const notInList = snums.filter(a => !formattedInput.includes(a))
 
     this.setState({
-      notInOodiRows: notFound.map(a => <div key={a}>{a}</div>),
+      notInOodiRows: notInOodi.map(a => <div key={a}>{a}</div>),
       notInListRows: notInList.map(a => <div key={a}>{a}</div>)
     })
   }
