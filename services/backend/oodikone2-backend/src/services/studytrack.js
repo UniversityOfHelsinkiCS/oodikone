@@ -338,6 +338,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     transferred: 0
   }
   const years = getYears(since)
+
   const arr = await Promise.all(years.map(async year => {
     const startDate = `${year}-${semesterStart['FALL']}`
     const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
