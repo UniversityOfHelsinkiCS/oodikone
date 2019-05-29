@@ -65,7 +65,9 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 <Table.HeaderCell colSpan={genders.length + 1}>Students</Table.HeaderCell> :
                 <Table.HeaderCell rowSpan="2">Students</Table.HeaderCell>
             }
-            <Table.HeaderCell rowSpan="2">Graduated</Table.HeaderCell>
+
+            <Table.HeaderCell colSpan="2">Graduated</Table.HeaderCell>
+
             <Table.HeaderCell rowSpan="2">Transferred to this program</Table.HeaderCell>
             <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
             {(thesisTypes.includes('BACHELOR') ||
@@ -77,6 +79,8 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
           </Table.Row>
 
           <Table.Row>
+            <Table.HeaderCell >Graduated overall</Table.HeaderCell>
+            <Table.HeaderCell >Graduated in time</Table.HeaderCell>
             {renderGenders ? <Table.HeaderCell content="Total" /> : null}
             {genders.map(gender => <Table.HeaderCell key={gender} content={gender} />)}
             <Table.HeaderCell content=">= 30" />
@@ -110,6 +114,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                   </Table.Cell>
                 ))}
                 <Table.Cell>{year.graduated}</Table.Cell>
+                <Table.Cell>{year.inTargetTime}</Table.Cell>
                 <Table.Cell>{year.transferred}</Table.Cell>
                 {Object.keys(year.creditValues).map(creditKey => (
                   <Table.Cell key={creditKey}>{year.creditValues[creditKey]}
@@ -135,6 +140,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 </Table.HeaderCell>
               ))}
               <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
+              <Table.HeaderCell>{throughput.totals.inTargetTime}</Table.HeaderCell>
               <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
               {Object.keys(throughput.totals.credits).map(creditKey => (
                 <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}
