@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { arrayOf, object } from 'prop-types'
-import { Button, Icon, Modal, Form, TextArea } from 'semantic-ui-react'
+import { Button, Modal, Form, TextArea } from 'semantic-ui-react'
 
 class CheckStudentList extends Component {
   state = { modalOpen: false, input: '', notInOodiRows: [], notInListRows: [] }
