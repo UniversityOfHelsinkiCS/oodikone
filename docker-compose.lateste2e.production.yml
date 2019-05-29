@@ -92,6 +92,7 @@ services:
       ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
+      DB_SCHEMA_KONE: kone_data
     container_name: backend
     depends_on:
       - db
