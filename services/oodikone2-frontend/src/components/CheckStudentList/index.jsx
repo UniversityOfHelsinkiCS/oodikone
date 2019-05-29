@@ -1,41 +1,40 @@
 import React, { Component } from 'react'
 import { arrayOf, object } from 'prop-types'
-import { Button, Icon, Modal, Form, TextArea } from 'semantic-ui-react'
+import { Button, Modal, Form, TextArea } from 'semantic-ui-react'
 
 class CheckStudentList extends Component {
   state = { modalOpen: false, input: '', notInOodiRows: [], notInListRows: [] }
 
   checkStudents = (input) => {
-    const formattedInput = input.split('\n')
+    const inputArray = input.split('\n')
+    const formattedInput = inputArray.map(number => number.trim())
     const { students } = this.props
     const snums = students.map(s => s.studentNumber)
-    const notFound = formattedInput.filter(a => !snums.includes(a))
+    const notInOodi = formattedInput.filter(a => !snums.includes(a))
     const notInList = snums.filter(a => !formattedInput.includes(a))
-    console.log(notFound)
-    console.log(notInList)
     this.setState({
-      notInOodiRows: notFound.map(a => <div key={a}>{a}</div>),
+      notInOodiRows: notInOodi.map(a => <div key={a}>{a}</div>),
       notInListRows: notInList.map(a => <div key={a}>{a}</div>)
     })
-    console.log(this.state.notInListRows)
   }
 
   renderResults() {
     return (
-      <Modal trigger={<Button color="green" onClick={() => this.checkStudents(this.state.input)}>Multiple Modals</Button>}>
+      <Modal trigger={<Button color="green" onClick={() => this.checkStudents(this.state.input)}>check students</Button>}>
         <Modal.Content>
           <Form>
-            <h2> under construction </h2>
-            {this.state.notInOodiRows.length > 0 ? (<div>student numbers in list not in oodi {this.state.notInOodiRows}</div>) : (<div>all numbers in oodi</div>)}
-            {this.state.notInListRows.lenght > 0 ? (<div> student numbers in oodi but not in list {this.state.notInListRows}</div>) : (<div>all numbers in list</div>)}
+            <h2> Results </h2>
+            {this.state.notInOodiRows.length > 0 ? (
+              <div>student numbers in list not in oodi {this.state.notInOodiRows}</div>) :
+              (<div>all numbers in oodi</div>)}
+
+            {this.state.notInListRows.length > 0 ?
+              (<div>student numbers in oodi but not in list {this.state.notInListRows}</div>) :
+              (<div>all numbers in list</div>)}
+
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button
-            negative
-            onClick={() => this.setState({ modalOpen: false })}
-          >Cancel
-          </Button>
           <Button
             color="green"
             onClick={() => {
@@ -43,7 +42,7 @@ class CheckStudentList extends Component {
             }}
             inverted
           >
-            <Icon name="checkmark" /> Check
+            Close
           </Button>
         </Modal.Actions>
       </Modal>
