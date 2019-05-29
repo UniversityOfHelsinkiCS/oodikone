@@ -439,7 +439,7 @@ class PopulationStudents extends Component {
         <Header dividing >
           {`Students (${this.props.selectedStudents.length}) `}
           <Button size="small" onClick={() => this.props.toggleStudentListVisibility()}>{toggleLabel}</Button>
-          {this.state.admin ? (<CheckStudentList student={this.state.students} />) : null}
+          {this.state.admin ? (<CheckStudentList students={this.state.students} />) : null}
           <InfoBox content={Students} />
         </Header>
         {this.renderStudentTable()}
