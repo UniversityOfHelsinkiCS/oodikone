@@ -39,8 +39,8 @@ stan.on('connect', async () => {
   cron.schedule('*/5 * * * *', async () => {
     const oldestTasks = await getOldestTasks()
     const status = await getCurrentStatus()
-    logger.info('oldestTasks', { oldestTasks })
-    logger.info('updaterStatus', { status })
+    logger.info('oldestTasks', oldestTasks)
+    logger.info('updaterStatus', status)
 
   }, { timezone })
   cron.schedule('0 0-9 * * *', async () => {

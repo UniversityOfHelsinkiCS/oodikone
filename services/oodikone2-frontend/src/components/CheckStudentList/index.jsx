@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { arrayOf, object } from 'prop-types'
 import { Button, Icon, Modal, Form, TextArea } from 'semantic-ui-react'
 
 class CheckStudentList extends Component {
@@ -77,6 +78,10 @@ class CheckStudentList extends Component {
       </Modal>
     )
   }
+}
+
+CheckStudentList.propTypes = {
+  students: arrayOf(object).isRequired
 }
 
 export default CheckStudentList
