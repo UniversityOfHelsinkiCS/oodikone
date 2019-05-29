@@ -1,17 +1,25 @@
 const fs = require('fs')
-const { Migration } = require('../models/index')
+const { Migration, MigrationKone } = require('../models/index')
 
 const DEFAULT_PATH = `${process.cwd()}/src/database/migrations`
+const DEFAULT_PATH_KONE = `${process.cwd()}/src/database/migrations_kone`
 
-const saveMigrationsToDatabase = async filenames => Promise.all(filenames.map(name => Migration.upsert({ name })))
+const saveMigrationsToDatabase = Migration => async filenames =>
+  Promise.all(filenames.map(name => Migration.upsert({ name })))
 
 const seedMigrations = async (migrationfilepath=DEFAULT_PATH) => {
   const filenames = fs.readdirSync(migrationfilepath)
-  await saveMigrationsToDatabase(filenames)
+  await saveMigrationsToDatabase(Migration)(filenames)
+}
+
+const seedMigrationsKone = async (migrationfilepath=DEFAULT_PATH_KONE) => {
+  const filenames = fs.readdirSync(migrationfilepath)
+  await saveMigrationsToDatabase(MigrationKone)(filenames)
 }
 
 const run = async () => {
   await seedMigrations()
+  await seedMigrationsKone()
 }
 
 module.exports = {

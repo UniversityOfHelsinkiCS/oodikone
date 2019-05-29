@@ -29,7 +29,7 @@ services:
 
   nats:
     image: nats-streaming
-    command: -cid updaterNATS  --file_slice_max_bytes 0 --file_slice_max_age 100h -store file -dir datastore 
+    command: -cid updaterNATS  --file_slice_max_bytes 0 --file_slice_max_age 100h -store file -dir datastore
     expose:
       - "4222"
     volumes:
@@ -126,6 +126,7 @@ services:
       USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
+      DB_SCHEMA_KONE: kone_data
     volumes:
       - ./services/backend/oodikone2-backend/:/usr/src/app
       - ./services/backend/shared/models:/usr/src/app/src/models
