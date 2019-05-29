@@ -4,8 +4,8 @@ DIR_PATH=$(dirname "$0")
 BACKUP_DIR=backups
 PSQL_DB_BACKUP="$BACKUP_DIR/anon.bak"
 USER_DB_BACKUP="$BACKUP_DIR/user-dump.bak"
-PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.bak"
-USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.bak"
+PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.sqz"
+USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
 
 retry () {
     for i in {1..60}
@@ -49,6 +49,7 @@ get_anon_oodikone() {
       echo "$OODI_KEY" | awk  '{gsub("\\\\n","\n")};1' > private.key
       chmod 400 private.key
     fi
+    rm -rf anonyymioodi
     GIT_SSH_COMMAND='ssh -i private.key' git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
     mv anonyymioodi/anon.bak.bz2 ./$BACKUP_DIR/anon.bak.bz2
     mv anonyymioodi/user-dump.bak.bz2 ./$BACKUP_DIR/user-dump.bak.bz2
@@ -64,7 +65,8 @@ restore_psql_from_backup () {
 }
 
 restore_real_psql_from_backup () {
-    cat $PSQL_REAL_DB_BACKUP | docker exec -i -u postgres oodi_db psql -d tkt_oodi_real
+    ping_psql "oodi_db" "tkt_oodi_real"
+    time pg_restore -U postgres -h localhost -p 5421 --no-owner -F c --dbname=tkt_oodi_real -j4 $PSQL_REAL_DB_BACKUP
 }
 
 restore_userdb_from_backup () {
@@ -74,7 +76,7 @@ restore_userdb_from_backup () {
 
 restore_real_userdb_from_backup () {
     docker exec -u postgres oodi_user_db psql -c "CREATE DATABASE user_db_real"
-    cat $USER_REAL_DB_BACKUP | docker exec -i -u postgres oodi_user_db psql -d user_db_real
+    time pg_restore -U postgres -h localhost -p 5422 --no-owner -F c --dbname=user_db_real -j4 $USER_REAL_DB_BACKUP
 }
 
 # oodilearn
@@ -90,13 +92,12 @@ db_oodikone_reset () {
 
 ping_psql () {
     echo "Pinging psql in container $1 with db name $2"
-    retry docker exec -u postgres $1 pg_isready
+    retry docker exec -u postgres $1 pg_isready --dbname=$2
     docker exec -u postgres $1 psql -c "CREATE DATABASE $2" || echo "container $1 DB $2 already exists"
 }
 
 db_setup_full () {
     echo "Restoring PostgreSQL from backup"
-    ping_psql "oodi_db" "tkt_oodi_real"
     retry restore_real_psql_from_backup
     # echo "Restoring MongoDB from backup"
     # retry restore_mongodb_from_backup
@@ -117,6 +118,30 @@ db_anon_setup_full () {
     ping_psql "oodi_user_db" "user_db"
     retry restore_userdb_from_backup
     echo "Database setup finished"
+}
+
+reset_real_db () {
+    docker-compose down
+    docker-compose up -d db user_db
+    ping_psql "oodi_db" "tkt_oodi_real"
+    docker exec -u postgres oodi_db dropdb "tkt_oodi_real"
+    ping_psql "oodi_user_db" "user_db_real"
+    docker exec -u postgres oodi_user_db dropdb "user_db_real"
+    db_setup_full
+    docker-compose down
+}
+
+reset_db () {
+    docker-compose down
+    docker-compose up -d db user_db
+    ping_psql "oodi_db" "tkt_oodi"
+    docker exec -u postgres oodi_db dropdb "tkt_oodi"
+    ping_psql "oodi_db" "tkt_oodi_test"
+    docker exec -u postgres oodi_db dropdb "tkt_oodi_test"
+    ping_psql "oodi_user_db" "user_db"
+    docker exec -u postgres oodi_user_db dropdb "user_db"
+    db_anon_setup_full
+    docker-compose down
 }
 
 install_cli_npm_packages () {
@@ -148,13 +173,14 @@ run_full_setup () {
     unpack_oodikone_server_backup
     echo "Building images, starting containers"
     docker_build
-    echo "Setup oodikone db from dump, this will prompt you for your password."
+    echo "Setup oodikone db from dump."
     db_setup_full
     db_anon_setup_full
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
     show_instructions
 }
+
 run_anon_full_setup () {
     echo "Setup npm packages"
     install_cli_npm_packages
@@ -166,7 +192,7 @@ run_anon_full_setup () {
     unpack_oodikone_server_backup
     echo "Building images, starting containers"
     docker_build
-    echo "Setup oodikone db from dump, this will prompt you for your password."
+    echo "Setup oodikone db from dump."
     db_anon_setup_full
     echo "Restarting Docker backend containers to run migrations, etc."
     docker_restart_backend
@@ -184,7 +210,7 @@ run_e2e_setup () {
     unpack_oodikone_server_backup
     echo "Building images, starting containers"
     docker-compose -f $1 build && docker-compose -f $1 up -d
-    echo "Setup oodikone db from dump, this will prompt you for your password."
+    echo "Setup oodikone db from dump."
     db_anon_setup_full
     echo "Restarting Docker backend containers to run migrations, etc."
     docker-compose -f $1 restart backend userservice
