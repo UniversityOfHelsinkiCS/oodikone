@@ -2,7 +2,8 @@ require('dotenv').config()
 
 const { NODE_ENV } = process.env
 let DB_URL = process.env.DB_URL
-if (NODE_ENV === 'test') {
+const isTest = process.env.NODE_ENV === 'test'
+if (isTest) {
   DB_URL = process.env.TEST_DB
 }
 else if (NODE_ENV === 'anon') {
@@ -12,13 +13,14 @@ const frontend_addr = process.env.FRONT_URL
 const redis = process.env.REDIS
 const TOKEN_SECRET = process.env.TOKEN_SECRET
 const DB_SCHEMA = process.env.DB_SCHEMA || 'public'
+const DB_SCHEMA_KONE = process.env.DB_SCHEMA_KONE || 'kone_data'
 const CERT_PATH = process.env.CERT_PATH // production/staging only
 const KEY_PATH = process.env.KEY_PATH // production/staging only
 const OODILEARN_URL = process.env.OODILEARN_URL
 const USERSERVICE_URL = process.env.USERSERVICE_URL
 const USAGESERVICE_URL = process.env.USAGESERVICE_URL
 const ANALYTICS_URL = process.env.ANALYTICS_URL
-const PORT = process.env.NODE_ENV === 'test' ? 8079 : 8080
+const PORT = isTest ? 8079 : 8080
 const OODI_SECRET = process.env.OODI_SECRET
 
 const FEATURES = {
@@ -51,14 +53,15 @@ let requiredGroup = 'grp-oodikone-users'
 if (process.env.NODE_ENV === 'staging') {
   requiredGroup = 'grp-oodikone-staging-users'
 }
-if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV === 'dev' || isTest) {
   requiredGroup = null
 }
 
 module.exports = {
-  frontend_addr, DB_URL, redis, TOKEN_SECRET, DB_SCHEMA, OODI_ADDR, CERT_PATH, KEY_PATH, FEATURES, OODILEARN_URL,
+  frontend_addr, DB_URL, redis, TOKEN_SECRET, DB_SCHEMA, DB_SCHEMA_KONE, OODI_ADDR, CERT_PATH, KEY_PATH, FEATURES, OODILEARN_URL,
   USERSERVICE_URL: formatURL(USERSERVICE_URL), ACCESS_TOKEN_HEADER_KEY, PORT,
   ANALYTICS_URL: formatURL(ANALYTICS_URL),
   USAGESERVICE_URL,
-  requiredGroup, OODI_SECRET, OODI_SECRET_HEADER_KEY
+  requiredGroup, OODI_SECRET, OODI_SECRET_HEADER_KEY,
+  isTest
 }
