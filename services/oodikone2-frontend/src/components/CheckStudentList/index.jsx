@@ -1,45 +1,42 @@
 import React, { Component } from 'react'
+import { arrayOf, object } from 'prop-types'
 import { Button, Icon, Modal, Form, TextArea } from 'semantic-ui-react'
 
 class CheckStudentList extends Component {
-  state = { modalOpen: false, list: '' }
+  state = { modalOpen: false, input: '', notInOodiRows: [], notInListRows: [] }
 
-  checkStudents = (list) => {
-    console.log(list)
+  checkStudents = (input) => {
+    const formattedInput = input.split('\n')
+    const { students } = this.props
+    const snums = students.map(s => s.studentNumber)
+    const notFound = formattedInput.filter(a => !snums.includes(a))
+    const notInList = snums.filter(a => !formattedInput.includes(a))
 
-    // const snums = this.props.map(s => s.studentNumber)
-    // console.log(this.props)
-    // console.log(list.filter(a => !snums.includes(a)))
+    this.setState({
+      notInOodiRows: notFound.map(a => <div key={a}>{a}</div>),
+      notInListRows: notInList.map(a => <div key={a}>{a}</div>)
+    })
   }
 
-  renderSomethingElse() {
+  renderResults() {
     return (
-      <Modal trigger={<Button>Multiple Modals</Button>}>
-        <Modal.Header>Modal #1</Modal.Header>
+      <Modal trigger={<Button color="green" onClick={() => this.checkStudents(this.state.input)}>check students</Button>}>
         <Modal.Content>
           <Form>
-            <h2> Check for studentnumbers </h2>
-            <Form.Field>
-              <em> Insert studentnumbers you wish to check here </em>
-              <TextArea placeholder="011111111" onChange={e => this.setState({ list: e.target.value })} />
-            </Form.Field>
+            <h2> Results </h2>
+            {this.state.notInOodiRows.length > 0 ? (<div>student numbers in list not in oodi {this.state.notInOodiRows}</div>) : (<div>all numbers in oodi</div>)}
+            {this.state.notInListRows.length > 0 ? (<div>student numbers in oodi but not in list {this.state.notInListRows}</div>) : (<div>all numbers in list</div>)}
           </Form>
         </Modal.Content>
         <Modal.Actions>
           <Button
-            negative
-            onClick={() => this.setState({ modalOpen: false })}
-          >Cancel
-          </Button>
-          <Button
             color="green"
             onClick={() => {
-              this.checkStudents(this.state.list)
               this.setState({ modalOpen: false })
             }}
             inverted
           >
-            <Icon name="checkmark" /> Check
+            <Icon name="checkmark" /> Close
           </Button>
         </Modal.Actions>
       </Modal>
@@ -59,7 +56,7 @@ class CheckStudentList extends Component {
             <h2> Check for studentnumbers </h2>
             <Form.Field>
               <em> Insert studentnumbers you wish to check here </em>
-              <TextArea placeholder="011111111" onChange={e => this.setState({ list: e.target.value })} />
+              <TextArea placeholder="011111111" onChange={e => this.setState({ input: e.target.value })} />
             </Form.Field>
           </Form>
         </Modal.Content>
@@ -69,22 +66,15 @@ class CheckStudentList extends Component {
             onClick={() => this.setState({ modalOpen: false })}
           >Cancel
           </Button>
-          <Button
-            disabled={this.state.presetName === ''}
-            color="green"
-            onClick={() => {
-              this.checkStudents(this.state.list)
-              this.setState({ modalOpen: false })
-            }}
-            inverted
-          >
-            <Icon name="checkmark" /> Check
-          </Button>
-          {this.renderSomethingElse()}
+          {this.renderResults()}
         </Modal.Actions>
       </Modal>
     )
   }
+}
+
+CheckStudentList.propTypes = {
+  students: arrayOf(object).isRequired
 }
 
 export default CheckStudentList
