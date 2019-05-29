@@ -60,6 +60,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_MULTIPLE_DATABASES=user_db,user_db_real
+
   usage_db:
     image: postgres:9.6.3
     ports:
@@ -253,7 +254,7 @@ services:
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       TEST_DB_SCHEMA: updater_test
-    
+
 
   scheduler_mongo:
     image: mongo

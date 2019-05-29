@@ -22,6 +22,10 @@ options=(
     "e2e setup"
     "Anon setup"
     "Full setup"
+    "Reset anon db"
+    "Reset real db"
+    "Download latest anon db"
+    "Download latest real db"
     "Full reset"
     "Quit"
 )
@@ -39,6 +43,20 @@ do
         "Full setup")
             mopo
             run_full_setup
+            ;;
+        "Reset anon db")
+            reset_db
+            ;;
+        "Reset real db")
+            reset_real_db
+            ;;
+        "Download latest anon db")
+            get_anon_oodikone
+            unpack_oodikone_server_backup
+            ;;
+        "Download latest real db")
+            get_oodikone_server_backup
+            unpack_oodikone_server_backup
             ;;
         "Full reset")
             purge
