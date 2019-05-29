@@ -273,6 +273,22 @@ const gendersFromClass = async (studentnumbers) => {
   }, {})
 }
 
+const countriesFromClass = async (studentnumbers) => {
+  return Student.findAll({
+    attributes: [[sequelize.fn('count', sequelize.col('country_en')), 'count'], 'country_en'],
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumbers
+      },
+    },
+    group: ['country_en'],
+    raw: true
+  }).reduce((acc, curr) => {
+    acc[curr.country_en] = curr.count
+    return acc
+  }, {})
+}
+
 const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, endDate) => {
   return Studyright.findAndCountAll({
     include: {
@@ -309,6 +325,7 @@ const productivityStats = async (studentnumbers, startDate, studytrack, endDate)
     graduationsFromClass(studentnumbers, studytrack),
     thesesFromClass(studentnumbers, startDate, studytrack),
     gendersFromClass(studentnumbers),
+    countriesFromClass(studentnumbers),
     tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate)])
 }
 
@@ -330,6 +347,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       mte150: 0,
     },
     genders: {},
+    countries: {},
     thesisM: 0,
     thesisB: 0,
     students: 0,
@@ -338,13 +356,16 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     transferred: 0
   }
   const years = getYears(since)
+
   const arr = await Promise.all(years.map(async year => {
     const startDate = `${year}-${semesterStart['FALL']}`
     const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
-    const [credits, graduated, theses, genders, transferred] =
+    const [credits, graduated, theses, genders, countries, transferred] =
       await productivityStats(studentnumbers, startDate, studytrack, endDate)
     delete genders[null]
+    delete countries[null]
+    
     const creditValues = credits.reduce((acc, curr) => {
       acc.mte30 = curr >= 30 ? acc.mte30 + 1 : acc.mte30
       acc.mte60 = curr >= 60 ? acc.mte60 + 1 : acc.mte60
@@ -361,20 +382,29 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
         totals.genders[genderKey] + Number(genders[genderKey]) :
         Number(genders[genderKey])
     })
+    Object.keys(countries).forEach(countryKey => {
+      totals.countries[countryKey] = totals.countries[countryKey] ?
+        totals.countries[countryKey] + Number(countries[countryKey]) :
+        Number(countries[countryKey])
+    })
+    const inTargetTime = graduated.filter(g =>
+      moment(g.enddate).diff(g.startstududate, 'months') <= FIVE_YEARS_IN_MONTHS).length
+
     totals.thesisM = theses.MASTER ? totals.thesisM + theses.MASTER : totals.thesisM
     totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
     totals.students = totals.students + credits.length
     totals.graduated = totals.graduated + graduated.length,
-    totals.inTargetTime = totals.inTargetTime + graduated.filter(g =>
-      moment(g.enddate).diff(g.startstududate, 'months') <= FIVE_YEARS_IN_MONTHS).length,
+    totals.inTargetTime = totals.inTargetTime + inTargetTime,
     totals.transferred = totals.transferred + transferred.count
     return {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
       graduated: graduated.length,
+      inTargetTime, 
       thesisM: theses.MASTER || 0,
       thesisB: theses.BACHELOR || 0,
       genders,
+      countries,
       creditValues,
       transferred: transferred.count
     }

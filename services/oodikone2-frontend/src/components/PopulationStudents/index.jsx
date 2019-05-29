@@ -15,12 +15,13 @@ import '../PopulationCourseStats/populationCourseStats.css'
 import SortableTable from '../SortableTable'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
+import CheckStudentList from '../CheckStudentList'
 
 const popupTimeoutLength = 1000
 
 
 class PopulationStudents extends Component {
-  state = { containsStudyTracks: false }
+  state = { containsStudyTracks: false, students: [] }
 
   async componentDidMount() {
     const roles = await userRoles()
@@ -34,6 +35,7 @@ class PopulationStudents extends Component {
       obj[s.studentNumber] = s
       return obj
     }, {})
+    this.setState({ students: this.props.samples })
     const allStudyrights = this.props.selectedStudents.map(sn => students[sn]).map(st => st.studyrights)
     return allStudyrights.map(studyrights => this.studyrightCodes(studyrights, 'studyrightElements')
       .reduce((acc, elemArr) => {
@@ -437,6 +439,7 @@ class PopulationStudents extends Component {
         <Header dividing >
           {`Students (${this.props.selectedStudents.length}) `}
           <Button size="small" onClick={() => this.props.toggleStudentListVisibility()}>{toggleLabel}</Button>
+          {this.state.admin ? (<CheckStudentList students={this.state.students} />) : null}
           <InfoBox content={Students} />
         </Header>
         {this.renderStudentTable()}
