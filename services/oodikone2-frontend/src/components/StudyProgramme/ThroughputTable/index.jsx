@@ -85,10 +85,10 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
           </Table.Row>
 
           <Table.Row>
-            <Table.HeaderCell >Graduated overall</Table.HeaderCell>
-            <Table.HeaderCell >Graduated in time</Table.HeaderCell>
             {renderGenders ? <Table.HeaderCell content="Total" /> : null}
             {genders.map(gender => <Table.HeaderCell key={gender} content={gender} />)}
+            <Table.HeaderCell >Graduated overall</Table.HeaderCell>
+            <Table.HeaderCell >Graduated in time</Table.HeaderCell>
             {countries.map(country => <Table.HeaderCell key={country} content={country} />)}
             <Table.HeaderCell content=">= 30" />
             <Table.HeaderCell content=">= 60" />
