@@ -361,17 +361,20 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
         totals.genders[genderKey] + Number(genders[genderKey]) :
         Number(genders[genderKey])
     })
+    const inTargetTime = graduated.filter(g =>
+      moment(g.enddate).diff(g.startstududate, 'months') <= FIVE_YEARS_IN_MONTHS).length
+
     totals.thesisM = theses.MASTER ? totals.thesisM + theses.MASTER : totals.thesisM
     totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
     totals.students = totals.students + credits.length
     totals.graduated = totals.graduated + graduated.length,
-    totals.inTargetTime = totals.inTargetTime + graduated.filter(g =>
-      moment(g.enddate).diff(g.startstududate, 'months') <= FIVE_YEARS_IN_MONTHS).length,
+    totals.inTargetTime = totals.inTargetTime + inTargetTime,
     totals.transferred = totals.transferred + transferred.count
     return {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
       graduated: graduated.length,
+      inTargetTime, 
       thesisM: theses.MASTER || 0,
       thesisB: theses.BACHELOR || 0,
       genders,
