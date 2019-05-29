@@ -1,9 +1,10 @@
 const { sequelize } = require('../database/connection')
+const conf = require('../conf-backend')
 
 const getStudentNumbers = () => sequelize.query(
-  `select 
+  `select
       studentnumber
-      from student 
+      from student
       order by studentnumber desc`,
   { type: sequelize.QueryTypes.SELECT }
 )
@@ -116,8 +117,8 @@ SELECT cg.id AS id,cg.name AS name,
     COUNT(DISTINCT c.course_code) AS courses,
     COALESCE(SUM(credits), 0) AS credits,
     COUNT(DISTINCT student_studentnumber) AS students
-FROM   course_groups cg
-    left join teacher_course_group tcg
+FROM   ${conf.DB_SCHEMA_KONE}.course_groups cg
+    left join ${conf.DB_SCHEMA_KONE}.teacher_course_groups tcg
            ON tcg.course_group_id = cg.id
     left join credit_teachers ct
            ON ct.teacher_id = tcg.teacher_id
@@ -130,7 +131,6 @@ GROUP BY cg.programmeid,cg.id,cg.name`,
     {
       replacements: { startSemester, endSemester, programmeid },
       type: sequelize.QueryTypes.SELECT,
-      logging: console.log
     }
   )
   return result
