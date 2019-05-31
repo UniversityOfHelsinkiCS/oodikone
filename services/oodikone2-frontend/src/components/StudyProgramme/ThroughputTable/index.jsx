@@ -21,7 +21,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
   const countries = data.length > 0 && throughput.totals.countries ? uniq(flatten(data.map(year => Object.keys(year.countries)))) : []
   const renderGenders = genders.length > 0
-  const renderCountries = countries.length > 0
+  const renderCountries = false // countries.length > 0, disabled for now
   let thesisTypes = []
   if (thesis) {
     thesisTypes = thesis.map(t => t.thesisType)
