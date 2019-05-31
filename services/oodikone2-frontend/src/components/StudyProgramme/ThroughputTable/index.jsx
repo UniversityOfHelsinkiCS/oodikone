@@ -88,7 +88,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
             {genders.map(gender => <Table.HeaderCell key={gender} content={gender} />)}
             <Table.HeaderCell >Graduated overall</Table.HeaderCell>
             <Table.HeaderCell >Graduated in time</Table.HeaderCell>
-            {countries.map(country => <Table.HeaderCell key={country} content={country} />)}
+            {renderCountries ? countries.map(country => <Table.HeaderCell key={country} content={country} />) : null}
             <Table.HeaderCell content=">= 30" />
             <Table.HeaderCell content=">= 60" />
             <Table.HeaderCell content=">= 90" />
@@ -122,11 +122,11 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 <Table.Cell>{year.graduated}</Table.Cell>
                 <Table.Cell>{year.inTargetTime}</Table.Cell>
                 <Table.Cell>{year.transferred}</Table.Cell>
-                {countries.map(country => (
+                {renderCountries ? countries.map(country => (
                   <Table.Cell key={year.year + country}>
                     {year.countries[country] || 0}
                   </Table.Cell>
-                ))}
+                )) : null}
                 {Object.keys(year.creditValues).map(creditKey => (
                   <Table.Cell key={creditKey}>{year.creditValues[creditKey]}
                   </Table.Cell>
