@@ -356,6 +356,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     transferred: 0
   }
   const years = getYears(since)
+  const graduationTimeLimit = studytrack[0] === 'K' ? 36 : 24 // studyprogramme starts with K if bachelors and M if masters
 
   const arr = await Promise.all(years.map(async year => {
     const startDate = `${year}-${semesterStart['FALL']}`
@@ -388,7 +389,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
         Number(countries[countryKey])
     })
     const inTargetTime = graduated.filter(g =>
-      moment(g.enddate).diff(g.startstududate, 'months') <= FIVE_YEARS_IN_MONTHS).length
+      moment(g.enddate).diff(g.startstududate, 'months') <= graduationTimeLimit).length
 
     totals.thesisM = theses.MASTER ? totals.thesisM + theses.MASTER : totals.thesisM
     totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
