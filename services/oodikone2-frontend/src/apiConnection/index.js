@@ -72,19 +72,6 @@ export const login = async () => {
   return response.data.token
 }
 
-export const superLogin = async (uid) => {
-  let options = null
-  if (isDevEnv) {
-    options = devOptions
-  }
-  if (isTestEnv) {
-    options = testOptions
-  }
-  const response = await getAxios().post(`/superlogin/${uid}`, null, options)
-  console.log(`Setting new token ${response.data.token}`)
-  await setToken(response.data.token)
-}
-
 export const returnToSelf = async () => {
   const token = await login()
   await setToken(token)
@@ -113,6 +100,12 @@ export const callApi = async (url, method = 'get', data, params, timeout = 0) =>
     default:
       return Promise.reject(new Error('Invalid http method'))
   }
+}
+
+export const superLogin = async (uid) => {
+  const response = await callApi(`/superlogin/${uid}`, 'post')
+  console.log(`Setting new token ${response.data.token}`)
+  await setToken(response.data.token)
 }
 
 export const callController = (route, prefix, data, method = 'get', query, params) => {

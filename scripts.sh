@@ -57,7 +57,7 @@ get_anon_oodikone() {
 }
 
 unpack_oodikone_server_backup() {
-    bunzip2 -d -v ./$BACKUP_DIR/*.bz2
+    bunzip2 --force --decompress --verbose ./$BACKUP_DIR/*.bz2
 }
 
 restore_psql_from_backup () {
