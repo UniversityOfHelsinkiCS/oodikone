@@ -158,11 +158,8 @@ class EnableUsers extends Component {
               title: '',
               getRowVal: user => (
                 <Button.Group compact widths={2}>
-                  <Button animated basic size="mini" onClick={this.openEditUserPage(user.id)}>
-                    <Button.Content hidden>Edit</Button.Content>
-                    <Button.Content visible>
-                      <Icon name="wrench" />
-                    </Button.Content>
+                  <Button basic size="mini" onClick={this.openEditUserPage(user.id)}>
+                    Edit
                   </Button>
                 </Button.Group>
               ),

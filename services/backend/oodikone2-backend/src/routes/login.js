@@ -27,7 +27,7 @@ router.post('/login', async (req, res) => {
       const mail = req.headers.mail || ''
       const hyGroups = parseHyGroups(req.headers['hygroupcn'])
       const affiliations = parseHyGroups(req.headers['edupersonaffiliation'])
-   
+
       console.log(uid, 'trying to login, referring to userservice.')
       let { token, isNew } = await userService.login(uid, full_name, hyGroups, affiliations, mail)
       isNew && sendEmail(uid)
@@ -36,26 +36,6 @@ router.post('/login', async (req, res) => {
       res.status(401).json({
         message: `Not enough headers login, uid: ${req.headers.uid}
         session-id ${req.headers['shib-session-id']}`
-      }).end()
-    }
-  } catch (err) {
-    console.log(err)
-    res.status(401).json({ message: 'problem with login', err })
-  }
-})
-
-router.post('/superlogin/:uid', async (req, res) => {
-  try {
-    const asUser = req.params.uid
-    const uid = req.headers['uid']
-    if (req.headers['shib-session-id'] && uid) {
-      console.log('super')
-      const token = await userService.superlogin(uid, asUser)
-      res.status(200).json({ token })
-    } else {
-      res.status(401).json({
-        message: `Not enough headers login, uid:
-        ${req.headers.uid} session-id ${req.headers['shib-session-id']}`
       }).end()
     }
   } catch (err) {
