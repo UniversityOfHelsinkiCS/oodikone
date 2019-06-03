@@ -84,7 +84,7 @@ app.post('/superlogin', async (req, res) => {
   if (token) {
     res.status(200).json(token)
   }
-  res.status(400)
+  res.status(400).end()
 })
 
 app.put('/user/:uid', async (req, res) => {
@@ -138,7 +138,7 @@ app.get('/access_groups', async (req, res) => {
     const groups = await AccessGroup.findAll()
     res.status(200).json(groups)
   } catch (e) {
-    res.status(400)
+    res.status(400).end()
   }
 })
 
