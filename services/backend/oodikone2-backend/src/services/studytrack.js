@@ -66,8 +66,8 @@ const productivityStatsForProvider = async (providercode, since) => {
 
 const formatGraduatedStudyright = ({ studyrightid, enddate, studystartdate }) => {
   const year = enddate && enddate.getFullYear()
-  const inTargetTime = moment(enddate).diff(moment(studystartdate), 'months') <= FIVE_YEARS_IN_MONTHS
-  return { studyrightid, year, inTargetTime }
+  const timeToGraduation = moment(enddate).diff(moment(studystartdate), 'days')
+  return { studyrightid, year, timeToGraduation }
 }
 
 const findGraduated = (studytrack, since) => Studyright.findAll({
@@ -153,6 +153,7 @@ const thesisProductivityForStudytrack = async code => {
 
 const combineStatistics = (creditStats, studyrightStats, thesisStats) => {
   const stats = { ...creditStats }
+  console.log(studyrightStats)
   Object.keys(stats).forEach(year => {
     const thesis = thesisStats[year] || {}
     stats[year].graduated = studyrightStats[year] || 0
