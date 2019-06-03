@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { sequelize, migrationPromise } = require('../database/connection')
+const { sequelize, sequelizeKone, migrationPromise } = require('../database/connection')
 const conf = require('../conf-backend')
 
 const ThesisTypeEnums = {
@@ -135,13 +135,13 @@ const Tag = sequelize.define('tag',
   }
 )
 
-const MigrationKone = sequelize.define('migrations', {
+const MigrationKone = sequelize.define('migrationsKone', {
   name: {
     type: Sequelize.STRING,
     primaryKey: true
   }
 }, {
-  tablename: 'migrations',
+  tableName: 'migrations',
   timestamps: false,
   schema: conf.DB_SCHEMA_KONE
 })
@@ -303,7 +303,7 @@ const StudyrightElement = sequelize.define('studyright_elements',
         fields: ['startdate']
       }
     ],
-    tablename: 'studyright_elements'
+    tableName: 'studyright_elements'
   }
 )
 
@@ -317,7 +317,7 @@ const ElementDetails = sequelize.define('element_details',
     type: { type: Sequelize.INTEGER }
   },
   {
-    tablename: 'element_details'
+    tableName: 'element_details'
   }
 )
 
@@ -549,7 +549,7 @@ const Migration = sequelize.define('migrations', {
     primaryKey: true
   }
 }, {
-  tablename: 'migrations',
+  tableName: 'migrations',
   timestamps: false
 })
 
@@ -695,6 +695,7 @@ module.exports = {
   Tag,
   Teacher,
   sequelize,
+  sequelizeKone,
   migrationPromise,
   Organisation,
   StudentList,

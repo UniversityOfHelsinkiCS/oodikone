@@ -1,5 +1,5 @@
 const { redisClient } = require('./redis')
-const { getSemestersAndYears } = require('./semesters')
+const { getSemestersAndYears, getMaxYearcode } = require('./semesters')
 const { Teacher, Semester, Credit, Course } = require('../models/index')
 const { Op } = require('sequelize')
 
@@ -126,6 +126,13 @@ const findTopTeachers = async (yearcode) => {
   }
 }
 
+const findAndSaveTeachers = async (startcode = 50, to) => {
+  const endcode = to ? to : await getMaxYearcode()
+  for (let code = startcode; code <= endcode; code++) {
+    await findAndSaveTopTeachers(code)
+  }
+}
+
 const findAndSaveTopTeachers = async yearcode => {
   const { all, openuni } = await findTopTeachers(yearcode)
   await setTeacherStats(ID.OPENUNI, yearcode, openuni)
@@ -138,6 +145,7 @@ module.exports = {
   setTeacherStats,
   getCategoriesAndYears,
   findTopTeachers,
+  findAndSaveTeachers,
   findAndSaveTopTeachers,
   ID
 }
