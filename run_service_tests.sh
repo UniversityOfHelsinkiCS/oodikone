@@ -2,9 +2,9 @@
 
 # stop on first error
 set -e
-docker-compose exec -T backend npm test
-docker-compose exec -T userservice npm test
-docker-compose exec -T frontend npm test
-docker-compose exec -T analytics npm test
-docker-compose exec -T usageservice npm test
-# docker-compose exec -T updater_writer npm test
+docker-compose exec backend npm test
+docker-compose exec userservice npm test
+docker-compose exec frontend npm test
+docker-compose exec analytics npm test
+docker-compose exec usageservice npm test
+# docker-compose exec updater_writer npm test
