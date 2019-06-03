@@ -1,12 +1,9 @@
-const { sequelize, sequelizeKone } = require('../src/models/index')
 const { seedAllMigrations } = require('../src/database/seed_migrations')
-
-const options = { force: true }
+const { forceSyncDatabase } = require('../src/database/connection')
 
 const sync = async () => {
   try {
-    await sequelize.sync(options)
-    await sequelizeKone.sync(options)
+    await forceSyncDatabase()
     await seedAllMigrations()
     console.log('Force sync succeeded. ')
     process.exit(0)
