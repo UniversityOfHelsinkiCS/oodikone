@@ -18,16 +18,6 @@ describe('Users tests', () => {
     cy.contains("Enable or disable access to Oodikone")
   })
 
-  it('Admin mocking user shows "mocking as"-button', () => {
-    cy.contains("mocking").should('not.exist')
-    cy.contains("tr", "Normaalikäyttäjä").within(($row) => {
-      cy.contains('button', 'Edit').click()
-    })
-
-    cy.get('i.spy').click()
-    cy.contains("mocking as normk")
-  })
-
   it("Admin mocking normal user shows only the mocked user's programmes", () => {
     cy.contains("mocking").should('not.exist')
     cy.contains("tr", "Normaalikäyttäjä").within(($row) => {
@@ -38,6 +28,7 @@ describe('Users tests', () => {
     })
 
     cy.get('i.spy').click()
+    cy.contains("mocking as normk")
     cy.contains("Study programme").click().siblings().contains("Search by class").click()
     cy.contains("label", "Study programme")
     cy.contains("label", "Study programme").siblings().within(($row) => {
