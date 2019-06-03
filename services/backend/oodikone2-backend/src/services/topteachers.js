@@ -66,14 +66,15 @@ const creditsWithTeachersForYear = yearcode => Credit.findAll({
   ]
 })
   
-const updatedStats = (statistics, teacher, passed, failed, credits) => {
+const updatedStats = (statistics, teacher, passed, failed, credits, transferred) => {
   const { id, name } = teacher
-  const stats = statistics[id] || { id, name, passed: 0, failed: 0, credits: 0 }
+  const stats = statistics[id] || { id, name, passed: 0, failed: 0, credits: 0, transferred: 0 }
   if (passed) {
     return { 
       ...stats, 
       passed: stats.passed + 1, 
-      credits: stats.credits + credits 
+      credits: transferred ? stats.credits : stats.credits + credits,
+      transferred: transferred ? stats.transferred + credits : stats.transferred
     }
   } else if (failed) {
     return {
@@ -102,19 +103,20 @@ const findTopTeachers = async (yearcode) => {
   credits
     .filter(isRegularCourse)
     .map(credit => {
-      const { credits, course } = credit
+      const { credits, course, credittypecode } = credit
       const teachers = credit.teachers.map(({ id, name }) => ({ id, name }))      
       const passed = Credit.passed(credit) || Credit.improved(credit)
       const failed = Credit.failed(credit)
+      const transferred = credittypecode === 9
       const isOpenUni = course.code[0] === 'A'
-      return { passed, failed, credits, teachers, isOpenUni }
+      return { passed, failed, credits, teachers, isOpenUni, transferred }
     })
     .forEach(credit => {
-      const { passed, failed, credits, teachers, isOpenUni } = credit
+      const { passed, failed, credits, teachers, isOpenUni, transferred } = credit
       teachers.forEach(teacher => {
-        all[teacher.id] = updatedStats(all, teacher, passed, failed, credits)
+        all[teacher.id] = updatedStats(all, teacher, passed, failed, credits, transferred)
         if (isOpenUni) {
-          openuni[teacher.id] = updatedStats(openuni, teacher, passed, failed, credits)
+          openuni[teacher.id] = updatedStats(openuni, teacher, passed, failed, credits, transferred)
         }
       })
     })
