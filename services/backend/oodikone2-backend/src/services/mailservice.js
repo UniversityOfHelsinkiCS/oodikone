@@ -65,6 +65,7 @@ const message2 = email => {
 const feedback = (content, user, email) => {
   return ({
     to: 'Toska <grp-toska@helsinki.fi>',
+    replyTo: email,
     subject: `New message from Oodikone feedback`,
     text: `New message from user ${user}`,
     html: `${content}
