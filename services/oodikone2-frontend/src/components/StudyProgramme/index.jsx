@@ -66,8 +66,8 @@ class StudyProgramme extends Component {
     return panes
   }
 
-  handleSelect = (target) => {
-    this.props.history.push(`/study-programme/${target[1]}`, { selected: target[1] })
+  handleSelect = (programme) => {
+    this.props.history.push(`/study-programme/${programme}`, { selected: programme })
   }
 
   select = (e, { activeIndex }) => {
