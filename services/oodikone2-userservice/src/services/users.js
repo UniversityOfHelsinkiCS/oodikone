@@ -108,7 +108,7 @@ const login = async (uid, full_name, hyGroups, affiliations, mail) => {
 }
 const superlogin = async (uid, asUser) => {
   const user = await byUsername(uid)
-  if (user.accessgroup.map(r => r.group_code).includes('admin')) {
+  if (user && user.accessgroup.map(r => r.group_code).includes('admin')) {
     const token = await generateToken(asUser, uid)
     return token
   }
