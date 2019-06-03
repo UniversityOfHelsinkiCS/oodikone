@@ -97,9 +97,10 @@ const graduatedStatsFromStudyrights = studyrights => {
     const graduated = stats[year] ? stats[year].graduated : 0
     stats[year] = {
       graduated: graduated + 1,
-      timesToGraduation: stats[year] ? [...stats[year].timesToGraduation, timeToGraduation] : [ timeToGraduation ]
+      timesToGraduation: stats[year] ?
+        [...stats[year].timesToGraduation, timeToGraduation || 0] : [ timeToGraduation || 0]
     }
-    graduationTimes = [...graduationTimes, timeToGraduation]
+    graduationTimes = [...graduationTimes, timeToGraduation || 0]
   })
   const median = (values) => {
     if (values.length === 0) return 0
@@ -174,8 +175,8 @@ const combineStatistics = (creditStats, studyrightStats, thesisStats) => {
   const stats = { ...creditStats }
   Object.keys(stats).forEach(year => {
     const thesis = thesisStats[year] || {}
-    stats[year].graduated = studyrightStats[year].graduated || 0
-    stats[year].medianGraduationTime = studyrightStats[year].medianGraduationTime || 0
+    stats[year].graduated = studyrightStats[year] ? studyrightStats[year].graduated : 0
+    stats[year].medianGraduationTime = studyrightStats[year] ? studyrightStats[year].medianGraduationTime : 0
     stats[year].bThesis = thesis.bThesis || 0
     stats[year].mThesis = thesis.mThesis || 0
   })
