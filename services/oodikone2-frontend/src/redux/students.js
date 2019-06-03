@@ -3,7 +3,7 @@ import { callController } from '../apiConnection'
 export const findStudents = (searchStr) => {
   const route = `/students/?searchTerm=${searchStr}`
   const prefix = 'FIND_STUDENTS_'
-  return callController(route, prefix)
+  return callController(route, prefix, undefined, undefined, searchStr)
 }
 
 export const getStudent = (studentNumber) => {
@@ -31,6 +31,7 @@ const reducer = (state = { data: [] }, action) => {
       return {
         pending: true,
         selected: state.selected,
+        lastSearch: action.requestSettings.query,
         data: state.data
       }
     case 'FIND_STUDENTS_FAILURE':
@@ -45,7 +46,9 @@ const reducer = (state = { data: [] }, action) => {
         pending: false,
         error: false,
         selected: state.selected,
-        data: [...state.data.filter(student => student.fetched), ...action.response]
+        data: state.lastSearch === action.query ?
+          [...state.data.filter(student => student.fetched), ...action.response] :
+          state.data
       }
     case 'GET_STUDENT_SUCCESS':
       return {
