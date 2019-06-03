@@ -4,7 +4,7 @@ const userService = require('../services/userService')
 
 router.post('/email', async (req, res) => {
   const { content } = req.body
-  const {uid} = req.headers
+  const { uid } = req.headers
   const { email } = await userService.byUsername(uid)
 
   const formattedEmail = content.split('\n\n').map(line => `<p> ${line} </p>`).join('')
