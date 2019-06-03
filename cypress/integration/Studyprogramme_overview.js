@@ -47,7 +47,7 @@ describe('Studyprogramme overview', () => {
     cy.contains("2018-2019").siblings().contains('9')
     cy.contains("2017-2018").siblings().contains('12').siblings().contains('7').siblings().contains('2')
     cy.get('table').eq(1).contains('2018').siblings().contains('443')
-    cy.get('table').eq(1).contains('2017').siblings().contains('383')
+    cy.get('table').eq(1).contains('2017').siblings().contains('381')
   })
 
   it('can search for mandatory courses', () => {

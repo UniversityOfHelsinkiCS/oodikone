@@ -176,7 +176,8 @@ const mapStateToProps = (state) => {
     name: teacher.name,
     credits: teacher.stats.credits,
     passed: teacher.stats.passed,
-    failed: teacher.stats.failed
+    failed: teacher.stats.failed,
+    transferred: teacher.stats.transferred
   }))
   return {
     providers: providerOptions,
