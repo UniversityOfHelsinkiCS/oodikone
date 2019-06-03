@@ -10,8 +10,8 @@ const DIRECTIONS = {
 
 class SortableTable extends Component {
     state={
-      direction: DIRECTIONS.ASC,
-      selected: this.props.columns[0].key
+      direction: this.props.defaultdescending ? DIRECTIONS.DESC : DIRECTIONS.ASC,
+      selected: this.props.defaultsortkey == null ? this.props.columns[0].key : this.props.defaultsortkey
     }
 
     handleSort = column => () => {
@@ -107,12 +107,16 @@ SortableTable.propTypes = {
     group: bool,
     children: arrayOf()
   })).isRequired,
-  data: arrayOf(shape({})).isRequired
+  data: arrayOf(shape({})).isRequired,
+  defaultdescending: bool,
+  defaultsortkey: string
 }
 
 SortableTable.defaultProps = {
   tableProps: undefined,
-  getRowProps: undefined
+  getRowProps: undefined,
+  defaultdescending: false,
+  defaultsortkey: null
 }
 
 export default SortableTable

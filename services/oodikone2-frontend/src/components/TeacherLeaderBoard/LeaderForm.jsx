@@ -1,29 +1,18 @@
 import React, { Component } from 'react'
 import { Segment, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { func, arrayOf, shape, string, any } from 'prop-types'
+import { func, arrayOf, shape, string, any, number } from 'prop-types'
 import { getTopTeachers } from '../../redux/teachersTop'
 
 class LeaderForm extends Component {
-  state={
-    selectedyear: null,
-    selectedcategory: null
-  }
-
   componentDidMount() {
     const { year, category } = this.defaultValues()
     if (year && category) {
-      this.updateAndSubmitForm({
+      this.props.updateAndSubmitForm({
         selectedyear: year,
         selectedcategory: category
       })
     }
-  }
-
-  updateAndSubmitForm = (args) => {
-    this.setState(args)
-    const { selectedyear, selectedcategory } = { ...this.state, ...args }
-    this.props.getTopTeachers(selectedyear, selectedcategory)
   }
 
   defaultValues = () => {
@@ -35,8 +24,6 @@ class LeaderForm extends Component {
       category: defaultcategory.value
     }
   }
-
-  handleChange = (e, { value, name }) => this.updateAndSubmitForm({ [name]: value })
 
   render() {
     const { yearoptions, categoryoptions } = this.props
@@ -51,8 +38,8 @@ class LeaderForm extends Component {
               options={yearoptions}
               selection
               search
-              value={this.state.selectedyear}
-              onChange={this.handleChange}
+              value={this.props.selectedyear}
+              onChange={this.props.handleChange}
             />
             <Form.Dropdown
               name="selectedcategory"
@@ -61,8 +48,8 @@ class LeaderForm extends Component {
               options={categoryoptions}
               selection
               search
-              value={this.state.selectedcategory}
-              onChange={this.handleChange}
+              value={this.props.selectedcategory}
+              onChange={this.props.handleChange}
             />
           </Form.Group>
         </Form>
@@ -74,7 +61,10 @@ class LeaderForm extends Component {
 LeaderForm.propTypes = {
   yearoptions: arrayOf(shape({})).isRequired,
   categoryoptions: arrayOf(shape({ key: any, value: any, text: string })).isRequired,
-  getTopTeachers: func.isRequired
+  updateAndSubmitForm: func.isRequired,
+  handleChange: func.isRequired,
+  selectedcategory: string, // eslint-disable-line
+  selectedyear: number // eslint-disable-line
 }
 
 export default connect(null, { getTopTeachers })(LeaderForm)
