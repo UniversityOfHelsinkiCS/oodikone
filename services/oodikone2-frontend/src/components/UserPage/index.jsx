@@ -153,7 +153,7 @@ class UserPage extends Component {
                 { this.props.isAdmin && user.is_enabled && (
                   <Popup
                     content="Show Oodikone as this user"
-                    trigger={<Button floated="right" circular size="tiny" basic icon="spy" onClick={this.superLogin} />}
+                    trigger={<Button floated="right" circular size="tiny" basic icon="spy" onClick={() => this.showAs(user.username)} />}
                   />
                 )}
                 {user.full_name}
