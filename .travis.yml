@@ -57,7 +57,7 @@ jobs:
       deploy: # deploy is always skipped for PR
         provider: script
         skip_cleanup: true
-        script: "docker-compose -f docker-compose.lateste2e.production.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release waiting for manual deployment!\\\"}\" ${SLACKBOT_URL}"
+        script: "docker-compose -f docker-compose.lateste2e.production.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release started auto deployment!\\\"}\" ${SLACKBOT_URL}"
         on:
           tags: true
 
