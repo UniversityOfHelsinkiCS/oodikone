@@ -27,7 +27,7 @@ router.post('/login', async (req, res) => {
       const mail = req.headers.mail || ''
       const hyGroups = parseHyGroups(req.headers['hygroupcn'])
       const affiliations = parseHyGroups(req.headers['edupersonaffiliation'])
-   
+
       console.log(uid, 'trying to login, referring to userservice.')
       let { token, isNew } = await userService.login(uid, full_name, hyGroups, affiliations, mail)
       isNew && sendEmail(uid)
@@ -59,8 +59,8 @@ router.post('/superlogin/:uid', async (req, res) => {
       }).end()
     }
   } catch (err) {
-    console.log(err)
-    res.status(401).json({ message: 'problem with login', err })
+    console.log(err.message)
+    res.status(401).json({ message: 'problem with login', err: err.message })
   }
 })
 
