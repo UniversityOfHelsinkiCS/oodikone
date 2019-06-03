@@ -62,7 +62,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
 
     if (result.error) {
       console.log(result.error)
-      res.status(400)
+      res.status(400).end()
       return
     }
 

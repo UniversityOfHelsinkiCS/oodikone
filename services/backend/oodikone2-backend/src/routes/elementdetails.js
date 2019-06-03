@@ -21,7 +21,7 @@ router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {
     const codes = await MandatoryCourses.byStudyprogramme(req.params.id)
     res.json(codes)
   } else {
-    res.status(422)
+    res.status(422).end()
   }
 })
 
@@ -30,7 +30,7 @@ router.get('/v2/studyprogrammes/ping', async (req, res) => {
     const result = await ping()
     res.json(result)
   } catch (e) {
-    res.status(500)
+    res.status(500).end()
   }
 })
 
@@ -54,7 +54,7 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
     }
     return res.json(data)
   } else {
-    res.status(422)
+    res.status(422).end()
   }
 })
 
@@ -118,7 +118,7 @@ router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
     }
     return res.json({ ...data, thesis: await thesisPromise })
   } else {
-    res.status(422)
+    res.status(422).end()
   }
 })
 
@@ -162,7 +162,7 @@ router.get('/v2/studyprogrammes/:id/thesis', async (req, res) => {
     const thesis = await findProgrammeTheses(id)
     res.json(thesis)
   } else {
-    res.status(422)
+    res.status(422).end()
   }
 })
 
@@ -173,7 +173,7 @@ router.post('/v2/studyprogrammes/:id/thesis', async (req, res) => {
     const thesis = await createThesisCourse(id, course, thesisType)
     res.status(201).json(thesis)
   } else {
-    res.status(422)
+    res.status(422).end()
   }
 })
 
@@ -183,7 +183,7 @@ router.delete('/v2/studyprogrammes/:id/thesis/:course', async (req, res) => {
     const deleted = await deleteThesisCourse(id, course)
     res.status(204).json(deleted)
   } else {
-    res.status(422)
+    res.status(422).end()
   }
 })
 
