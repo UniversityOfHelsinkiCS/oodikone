@@ -43,7 +43,7 @@ const getCreditsForProvider = (provider, since) => Credit.findAll({
   },
   where: {
     credittypecode: {
-      [Op.ne]: 10
+      [Op.notIn]: [10, 9]
     },
     attainment_date: {
       [Op.gte]: since
