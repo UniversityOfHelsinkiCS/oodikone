@@ -17,12 +17,11 @@ const seedMigrationsKone = async (migrationfilepath=DEFAULT_PATH_KONE) => {
   await saveMigrationsToDatabase(MigrationKone)(filenames)
 }
 
-const run = async () => {
+const seedAllMigrations = async () => {
   await seedMigrations()
   await seedMigrationsKone()
 }
 
 module.exports = {
-  run,
-  seedMigrations
+  seedAllMigrations
 }
