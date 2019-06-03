@@ -62,6 +62,11 @@ class TeacherStatisticsTable extends Component {
               sorted={sortDirection('credits')}
             />
             <Table.HeaderCell
+              content="Credits transferred"
+              onClick={this.handleSort('transferred')}
+              sorted={sortDirection('transferred')}
+            />
+            <Table.HeaderCell
               content="Passed"
               onClick={this.handleSort('passrate')}
               sorted={sortDirection('passrate')}
@@ -69,11 +74,12 @@ class TeacherStatisticsTable extends Component {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          { this.sortStatistics(statistics).map(({ id, name, credits, passrate }) => (
+          { this.sortStatistics(statistics).map(({ id, name, credits, passrate, transferred }) => (
             <Table.Row key={id}>
               <Table.Cell content={id} width={1} onClick={this.props.onClickFn} /> {/* eslint-disable-line*/}
               <Table.Cell content={name} textAlign="left" />
               <Table.Cell content={credits} width={2} />
+              <Table.Cell content={transferred} width={2} />
               <Table.Cell content={`${parseFloat(passrate).toFixed(2)} %`} width={2} />
             </Table.Row>
             ))}
@@ -87,6 +93,7 @@ TeacherStatisticsTable.propTypes = {
   statistics: arrayOf(shape({
     id: any,
     name: string,
+    transferred: number,
     credits: any,
     failed: number,
     passed: number
