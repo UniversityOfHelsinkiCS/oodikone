@@ -11,12 +11,11 @@
     "scheduleActiveStudents": "NATS_CLIENTID=manualActiveSchedule node --max_old_space_size=4096 -e 'require(\"./src/schedule_students.js\").scheduleActiveStudents()'",
     "scheduleAll": "NATS_CLIENTID=manualAllSchedule node --max_old_space_size=4096 -e 'require(\"./src/schedule_students.js\").scheduleAllStudentsAndMeta()'",
     "getOldestTasks": "node --max_old_space_size=4096 -e 'require(\"./src/SchedulingStatistics.js\").getOldestTasks()'"
-
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.19.0",
     "moment": "^2.24.0",
     "mongoose": "^5.5.8",
     "node-cron": "^2.0.3",
