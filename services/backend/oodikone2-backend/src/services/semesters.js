@@ -1,5 +1,6 @@
-const { Op } = require('sequelize')
+const sequelize = require('sequelize')
 const { Semester } = require('../models/index')
+const { Op } = sequelize
 
 const getSemestersAndYears = async before => {
   const semesters = await Semester.findAll({
@@ -24,6 +25,15 @@ const getSemestersAndYears = async before => {
   return result
 }
 
+const getMaxYearcode = async () => {
+  const aa = await Semester.findAll({
+    attributes: [[sequelize.fn('max', sequelize.col('yearcode')), 'maxYearCode']],
+    raw: true
+  })
+  return aa[0].maxYearCode
+}
+
 module.exports = {
-  getSemestersAndYears
+  getSemestersAndYears,
+  getMaxYearcode
 }

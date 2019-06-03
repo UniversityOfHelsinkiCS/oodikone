@@ -1,11 +1,11 @@
 const { sequelize } = require('../../src/models/index')
 const { redisClient } = require('../../src/services/redis')
 const { forceSyncDatabase } = require('../../src/database/connection')
-const { seedMigrations } = require('../../src/database/seed_migrations')
+const { seedAllMigrations } = require('../../src/database/seed_migrations')
 
 beforeAll(async () => {
   await forceSyncDatabase()
-  await seedMigrations()
+  await seedAllMigrations()
 })
 
 afterAll(async () => {
