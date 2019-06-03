@@ -76,8 +76,7 @@ const runMigrationsKone = async () => {
   }
 }
 
-const migrationPromise = !conf.isTest && conf.DB_SCHEMA === 'public' ? runMigrations().then(() => runMigrationsKone())
-  : Promise.resolve()
+const migrationPromise = !conf.isTest ? runMigrations().then(() => runMigrationsKone()) : Promise.resolve()
 
 const forceSyncDatabase = async () => {
   try {
@@ -90,8 +89,8 @@ const forceSyncDatabase = async () => {
   } catch (e) {
     // console.log(e)
   }
-  await sequelize.sync({ force: true, schema: conf.DB_SCHEMA, searchPath: conf.DB_SCHEMA })
-  await sequelizeKone.sync({ force: true, schema: conf.DB_SCHEMA_KONE, searchPath: conf.DB_SCHEMA_KONE })
+  await sequelize.sync({ force: true })
+  await sequelizeKone.sync({ force: true })
 }
 
 module.exports = {

@@ -20,6 +20,12 @@ router.get('/top', async (req, res) => {
   res.json(result)
 })
 
+router.post('/top', async (req, res) => {
+  const { startyearcode, endyearcode } = req.body
+  res.status(200).end()
+  await topteachers.findAndSaveTeachers(startyearcode, endyearcode)
+})
+
 router.get('/top/categories', async (req, res) => {
   const result = await topteachers.getCategoriesAndYears()
   res.json(result)

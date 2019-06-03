@@ -1,8 +1,8 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { withRouter } from 'react-router-dom'
 import { func, string, arrayOf, object, bool, shape } from 'prop-types'
 import { connect } from 'react-redux'
-import { Search, Segment, Icon } from 'semantic-ui-react'
+import { Search, Segment, Container } from 'semantic-ui-react'
 
 import { findStudents, getStudent, selectStudent } from '../../redux/students'
 import SegmentDimmer from '../SegmentDimmer'
@@ -10,7 +10,6 @@ import SortableTable from '../SortableTable'
 import Timeout from '../Timeout'
 import { makeFormatStudentRows } from '../../selectors/students'
 
-import './studentSearch.css'
 import { containsOnlyNumbers } from '../../common'
 
 const DEFAULT_STATE = {
@@ -89,25 +88,24 @@ class StudentSearch extends Component {
     }
 
     const columns = [
-      { key: 'studentnumber', title: translate('common.studentNumber'), getRowVal: s => s.studentNumber, headerProps: { onClick: null, sorted: null } },
-      { key: 'started', title: translate('common.started'), getRowVal: s => s.started, headerProps: { onClick: null, sorted: null } },
-      { key: 'credits', title: translate('common.credits'), getRowVal: s => s.credits, headerProps: { onClick: null, sorted: null, colSpan: showNames ? 1 : 2 } }
+      { key: 'studentnumber', title: translate('common.studentNumber'), getRowVal: s => s.studentNumber },
+      { key: 'started', title: translate('common.started'), getRowVal: s => s.started },
+      { key: 'credits', title: translate('common.credits'), getRowVal: s => s.credits }
     ]
 
     if (showNames) {
-      columns.push({ key: 'lastnames', title: 'last names', getRowVal: s => s.lastname, headerProps: { onClick: null, sorted: null } })
-      columns.push({ key: 'firstnames', title: 'first names', getRowVal: s => s.firstnames, headerProps: { onClick: null, sorted: null, colSpan: showNames ? 2 : 1 } })
+      columns.push({ key: 'lastnames', title: 'last names', getRowVal: s => s.lastname })
+      columns.push({ key: 'firstnames', title: 'first names', getRowVal: s => s.firstnames })
     }
-    columns.push({ key: 'icon', getRowVal: () => (<Icon name="level up alternate" />), cellProps: { collapsing: true }, headerProps: { onClick: null, sorted: null } })
 
     return (
       <SortableTable
         getRowKey={s => s.studentNumber}
         getRowProps={s => ({
-          className: 'clickable',
+          style: { cursor: 'pointer' },
           onClick: () => this.handleSearchSelect(s)
         })}
-        tableProps={{ celled: false, sortable: false }}
+        tableProps={{ celled: false }}
         columns={columns}
         data={students}
       />
@@ -124,21 +122,22 @@ class StudentSearch extends Component {
     const { isLoading, searchStr } = this.state
 
     return (
-      <div className="searchContainer">
-        <Search
-          className="studentSearch"
-          input={{ fluid: true }}
-          loading={isLoading}
-          onSearchChange={this.handleSearchChange}
-          showNoResults={false}
-          value={searchStr}
-          placeholder={translate('studentStatistics.searchPlaceholder')}
-        />
-        <Segment className="contentSegment">
+      <Fragment>
+        <Container>
+          <Search
+            input={{ fluid: true }}
+            loading={isLoading}
+            onSearchChange={this.handleSearchChange}
+            showNoResults={false}
+            value={searchStr}
+            placeholder={translate('studentStatistics.searchPlaceholder')}
+          />
+        </Container>
+        <Segment basic>
           <SegmentDimmer translate={translate} isLoading={isLoading} />
           {this.renderSearchResults()}
         </Segment>
-      </div>
+      </Fragment>
     )
   }
 }
