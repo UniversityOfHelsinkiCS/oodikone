@@ -51,7 +51,6 @@ class StudyProgrammeSelector extends Component {
         getRowKey={programme => programme.code}
         getRowProps={programme => ({ onClick: () => this.props.handleSelect(programme.code), style: { cursor: 'pointer' } })}
         data={studyprogrammes}
-        defaultdescending
       />
     )
   }

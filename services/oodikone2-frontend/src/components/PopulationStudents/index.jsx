@@ -93,12 +93,12 @@ class PopulationStudents extends Component {
 
     const priorityText = (studyRights) => {
       const codes = this.studyrightCodes(studyRights, 'prioritycode')
-      return codes.map(code => PRIORITYCODE_TEXTS[code] ? PRIORITYCODE_TEXTS[code] : code).join(', ') // eslint-disable-line
+      return codes.map(code => (PRIORITYCODE_TEXTS[code] ? PRIORITYCODE_TEXTS[code] : code)).join(', ')
     }
 
     const extentCodes = (studyRights) => {
       const codes = this.studyrightCodes(studyRights, 'extentcode')
-      return codes.join(', ') // eslint-disable-line
+      return codes.join(', ')
     }
 
     const studytrack = studyrights => (
@@ -290,22 +290,29 @@ class PopulationStudents extends Component {
       ['asc', 'asc']
     )
 
+    const labelColumns = []
+    if (mandatoryCourseLabels.reduce((acc, e) => acc + e.length, 0) > 0) {
+      labelColumns.push(
+        {
+          key: 'general',
+          title: <b>Labels:</b>,
+          parent: true,
+          headerProps: { colSpan: nameColumns.length, style: { textAlign: 'right' } }
+        },
+        ...mandatoryCourseLabels.map(e => ({
+          key: e,
+          title: (
+            <div style={{ overflowX: 'hidden' }}><div style={{ width: 0 }}>{e}</div></div>
+          ),
+          parent: true,
+          headerProps: { colSpan: labelToMandatoryCourses[e].length, width: labelToMandatoryCourses[e].length, title: e }
+        }))
+      )
+    }
+
     const mandatoryCourseColumns = [
       ...nameColumns,
-      ...(mandatoryCourseLabels.reduce((acc, e) => acc + e.length, 0) > 0) ? [{
-        key: 'general',
-        title: <b>Labels:</b>,
-        parent: true,
-        headerProps: { colSpan: nameColumns.length, style: { textAlign: 'right' } }
-      }] : [],
-      ...mandatoryCourseLabels.map(e => ({
-        key: e,
-        title: (
-          <div style={{ overflowX: 'hidden' }}><div style={{ width: 0 }}>{e}</div></div>
-        ),
-        parent: true,
-        headerProps: { colSpan: labelToMandatoryCourses[e].length, width: labelToMandatoryCourses[e].length, title: e }
-      })),
+      ...labelColumns,
       ..._.flatten(mandatoryCourseLabels.map(e => _.sortBy(
         labelToMandatoryCourses[e],
         [(m) => {
