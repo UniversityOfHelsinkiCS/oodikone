@@ -34,12 +34,12 @@ class StudyProgrammeSelector extends Component {
       {
         key: 'name',
         title: 'name',
-        getRowContent: prog => getTextIn(prog.name, language)
+        getRowVal: prog => getTextIn(prog.name, language)
       },
       {
         key: 'code',
         title: 'code',
-        getRowContent: prog => prog.code
+        getRowVal: prog => prog.code
       }
     ]
     if (studyprogrammes == null) {
