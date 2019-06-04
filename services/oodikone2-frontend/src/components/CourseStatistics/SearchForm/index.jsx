@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import { Segment, Header, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
+import qs from 'query-string'
 import { func, arrayOf, shape, bool } from 'prop-types'
 import { getSemesters } from '../../../redux/semesters'
 import { clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
-import { getCourseStats } from '../../../redux/coursestats'
+import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import { getCourseSearchResults } from '../../../selectors/courses'
@@ -30,8 +32,23 @@ class SearchForm extends Component {
   }
 
   componentDidMount() {
-    this.props.getSemesters()
-    this.props.clearCourses()
+    const { location } = this.props
+    if (location.search) {
+      console.log(location.search)
+      this.fetchStatisticsFromUrlParams()
+    } else {
+      this.props.getSemesters()
+      this.props.clearCourses()
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { location } = this.props
+    const queryParamsChanged = prevProps.location.search !== this.props.location.search
+    if (location.search && queryParamsChanged) {
+      console.log('shiiiii')
+      this.fetchStatisticsFromUrlParams()
+    }
   }
 
   onSelectCourse = (course) => {
@@ -69,7 +86,36 @@ class SearchForm extends Component {
       separate
     }
 
-    await this.props.getCourseStats(params)
+    // await this.props.getCourseStats(params)
+    this.pushQueryToUrl(params)
+  }
+
+  fetchStatisticsFromUrlParams() {
+    const query = this.parseQueryFromUrl()
+    this.setState({ query })
+    this.props.getCourseStats(query)
+  }
+
+  pushQueryToUrl = (query) => {
+    const { history } = this.props
+    const { courseCodes, ...rest } = query
+    const queryObject = { ...rest, courseCodes: JSON.stringify(courseCodes) }
+    const searchString = qs.stringify(queryObject)
+    history.push({ search: searchString })
+  }
+
+  parseQueryFromUrl = () => {
+    const { location } = this.props
+    const { courseCodes, fromYear, toYear, separate, ...rest } = qs.parse(location.search)
+    const query = {
+      ...this.state.INITIAL,
+      ...rest,
+      courseCodes: JSON.parse(courseCodes),
+      fromYear: JSON.parse(fromYear),
+      toYear: JSON.parse(toYear),
+      separate: JSON.parse(separate)
+    }
+    return query
   }
 
   fetchCourses = () => {
@@ -103,7 +149,7 @@ class SearchForm extends Component {
       coursename,
       coursecode
     } = this.state
-
+    console.log(this.state)
     const courses = matchingCourses.filter(c => !selectedcourses[c.code])
 
     const disabled = (!fromYear || Object.keys(selectedcourses).length === 0) || isLoading
@@ -187,7 +233,9 @@ SearchForm.propTypes = {
   matchingCourses: arrayOf(shape({})).isRequired,
   years: arrayOf(shape({})).isRequired,
   isLoading: bool.isRequired,
-  coursesLoading: bool.isRequired
+  coursesLoading: bool.isRequired,
+  history: shape({}).isRequired,
+  location: shape({}).isRequired
 }
 
 const mapStateToProps = (state) => {
@@ -205,9 +253,10 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   getSemesters,
   getCourseStats,
   clearCourses,
-  findCoursesV2
-})(SearchForm)
+  findCoursesV2,
+  clearCourseStats
+})(SearchForm))
