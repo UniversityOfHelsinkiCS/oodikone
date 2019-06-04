@@ -21,6 +21,37 @@ const formatCredit = credit => {
   return { id, year, credits }
 }
 
+const fuckup = (provider, since, studentnumbers) => Credit.findAll({
+  attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
+  include: {
+    model: Course,
+    attributes: ['code'],
+    required: true,
+    where: {
+      is_study_module: false
+    },
+    include: {
+      model: Provider,
+      attributes: [],
+      required: true,
+      where: {
+        providercode: provider
+      }
+    }
+  },
+  where: {
+    credittypecode: {
+      [Op.notIn]: [10, 9]
+    },
+    attainment_date: {
+      [Op.gte]: since
+    },
+    student_studentnumber: {
+      [Op.in]: studentnumbers
+    }
+  }
+}).map(formatCredit)
+
 const getCreditsForProvider = (provider, since) => Credit.findAll({
   attributes: ['id', 'course_code', 'credits', 'attainment_date'],
   include: {
@@ -183,6 +214,7 @@ const combineStatistics = (creditStats, studyrightStats, thesisStats) => {
   return Object.values(stats)
 }
 
+// providercode here
 const productivityStatsForStudytrack = async (studytrack, since) => {
   const providercode = studytrackToProviderCode(studytrack)
   const promises = [
@@ -341,14 +373,19 @@ const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, e
   })
 }
 
+const getCreditsFromStudyprogrammeStudents = async (studytrack, startDate, studentnumbers) => {
+  const providercode = studytrackToProviderCode(studytrack)
+  const test = await fuckup(providercode, startDate, studentnumbers)
+  return test.map(formatCredit)
+}
+
 const productivityStats = async (studentnumbers, startDate, studytrack, endDate) => {
   return Promise.all([creditsAfter(studentnumbers, startDate),
-    graduationsFromClass(studentnumbers, studytrack),
-    thesesFromClass(studentnumbers, startDate, studytrack),
-    gendersFromClass(studentnumbers),
-    countriesFromClass(studentnumbers),
-    tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate)
-  ])
+  graduationsFromClass(studentnumbers, studytrack),
+  thesesFromClass(studentnumbers, startDate, studytrack),
+  gendersFromClass(studentnumbers),
+  countriesFromClass(studentnumbers),
+  tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate)])
 }
 
 const getYears = (since) => {
@@ -385,10 +422,13 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     const startDate = `${year}-${semesterStart['FALL']}`
     const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
+    const creditsForStudyprogramme = await getCreditsFromStudyprogrammeStudents(studytrack, startDate, studentnumbers)
     const [credits, graduated, theses, genders, countries, transferred] =
       await productivityStats(studentnumbers, startDate, studytrack, endDate)
     delete genders[null]
     delete countries[null]
+    const test = creditsForStudyprogramme.map(formatCredit)
+    console.log(test)
 
     const creditValues = credits.reduce((acc, curr) => {
       acc.mte30 = curr >= 30 ? acc.mte30 + 1 : acc.mte30
@@ -418,11 +458,12 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
     totals.students = totals.students + credits.length
     totals.graduated = totals.graduated + graduated.length,
-    totals.inTargetTime = totals.inTargetTime + inTargetTime,
-    totals.transferred = totals.transferred + transferred.count
+      totals.inTargetTime = totals.inTargetTime + inTargetTime,
+      totals.transferred = totals.transferred + transferred.count
     return {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
+      creditsForStudyprogramme: creditsForStudyprogramme.map(cr => cr === null ? 0 : cr),
       graduated: graduated.length,
       inTargetTime,
       thesisM: theses.MASTER || 0,
