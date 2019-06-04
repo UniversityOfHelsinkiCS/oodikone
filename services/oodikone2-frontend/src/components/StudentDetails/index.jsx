@@ -3,12 +3,16 @@ import { func, shape, string, boolean, arrayOf, integer } from 'prop-types'
 import { connect } from 'react-redux'
 import { Segment, Table, Icon } from 'semantic-ui-react'
 import { isEmpty, sortBy } from 'lodash'
+import moment from 'moment'
+import qs from 'query-string'
 import { withRouter } from 'react-router-dom'
 import { getStudent, removeStudentSelection, resetStudent } from '../../redux/students'
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraph from '../CreditAccumulationGraph'
 import SearchResultTable from '../SearchResultTable'
 import { byDateDesc, reformatDate, getTextIn } from '../../common'
+import { clearCourseStats } from '../../redux/coursestats'
+
 
 class StudentDetails extends Component {
   componentDidMount() {
@@ -24,6 +28,16 @@ class StudentDetails extends Component {
     if (isEmpty(this.props.student) && this.props.studentNumber) {
       this.props.getStudent(this.props.studentNumber)
     }
+  }
+  
+  pushQueryToUrl = (query) => {
+    const { history } = this.props
+    const { courseCodes, ...rest } = query
+    const queryObject = { ...rest, courseCodes: JSON.stringify(courseCodes) }
+    const searchString = qs.stringify(queryObject)
+    this.props.clearCourseStats()
+    history.push('/coursestatistics/')
+    history.push({ search: searchString })
   }
 
   renderCreditsGraph = () => {
@@ -60,11 +74,13 @@ class StudentDetails extends Component {
       } else {
         icon = <Icon name="circle outline" color="red" />
       }
+      const year = -(moment(new Date('1.1.1950')).diff(new Date('2004'), 'years') - 1) // :D
       return [
         reformatDate(date, 'DD.MM.YYYY'),
         `${isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)} (${course.code})`,
         <div>{icon}{grade}</div>,
-        credits
+        credits,
+        <Icon name="arrow up" onClick={() => this.pushQueryToUrl({ courseCodes: [course.code], separate: false, fromYear: year, toYear: year })} />
       ]
     })
     return (
@@ -204,6 +220,7 @@ StudentDetails.propTypes = {
   removeStudentSelection: func.isRequired,
   studentNumber: string,
   translate: func.isRequired,
+  clearCourseStats: func.isRequired,
   student: shape({
     courses: arrayOf(shape({
       course: shape({
@@ -235,6 +252,7 @@ const mapStateToProps = ({ students, settings }) => ({
 })
 const mapDispatchToProps = dispatch => ({
   removeStudentSelection: () => dispatch(removeStudentSelection()),
+  clearCourseStats: () => dispatch(clearCourseStats()),
   resetStudent: () => dispatch(resetStudent()),
   getStudent: studentNumber =>
     dispatch(getStudent(studentNumber))
