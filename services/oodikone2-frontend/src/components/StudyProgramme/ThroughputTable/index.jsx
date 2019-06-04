@@ -89,11 +89,11 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
             <Table.HeaderCell >Graduated overall</Table.HeaderCell>
             <Table.HeaderCell >Graduated in time</Table.HeaderCell>
             {renderCountries ? countries.map(country => <Table.HeaderCell key={country} content={country} />) : null}
-            <Table.HeaderCell content=">= 30" />
-            <Table.HeaderCell content=">= 60" />
-            <Table.HeaderCell content=">= 90" />
-            <Table.HeaderCell content=">= 120" />
-            <Table.HeaderCell content=">= 150" />
+            <Table.HeaderCell content="≥ 30" />
+            <Table.HeaderCell content="≥ 60" />
+            <Table.HeaderCell content="≥ 90" />
+            <Table.HeaderCell content="≥ 120" />
+            <Table.HeaderCell content="≥ 150" />
             {thesisTypes.includes('MASTER') && (
               <Table.HeaderCell content="Master" />
             )}
