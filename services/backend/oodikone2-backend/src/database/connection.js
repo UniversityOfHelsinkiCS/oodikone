@@ -5,21 +5,16 @@ const conf = require('../conf-backend')
 const sequelize = new Sequelize(conf.DB_URL, {
   schema: conf.DB_SCHEMA,
   logging: false,
-  operatorsAliases: false,
-  dialectOptions: {
-    prependSearchPath: true
-  }
+  operatorsAliases: false
 })
+sequelize.query(`SET SESSION search_path to ${conf.DB_SCHEMA}`)
 
 const sequelizeKone = new Sequelize(conf.DB_URL, {
   schema: conf.DB_SCHEMA_KONE,
   logging: false,
-  operatorsAliases: false,
-  searchPath: conf.DB_SCHEMA_KONE,
-  dialectOptions: {
-    prependSearchPath: true
-  }
+  operatorsAliases: false
 })
+sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`) // See https://github.com/sequelize/sequelize/issues/10875
 
 const runMigrations = async () => {
   try {
