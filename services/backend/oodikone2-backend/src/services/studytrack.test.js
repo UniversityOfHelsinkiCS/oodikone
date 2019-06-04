@@ -125,8 +125,8 @@ test('graduatedStatsFromStudyrights calculates stats correctly', () => {
   ]
   const stats = graduatedStatsFromStudyrights(studyrights)
   expect(stats).toMatchObject({
-    2015: { graduated: 2., medianGraduationTime: 0, timesToGraduation: [ 0, 0 ]},
-    2014: { graduated: 1., medianGraduationTime: 0, timesToGraduation: [ 0 ]}
+    2015: { graduated: 2. },
+    2014: { graduated: 1. }
   })
 })
 
@@ -137,8 +137,8 @@ test('combineStatistics returns correctly formatted array', () => {
     2014: { year: 2014, credits: 20 }
   }
   const studyrightStats = {
-    2015: { graduated: 2, medianGraduationTime: 1.5, timesToGraduation: [1, 2] },
-    2016: { graduated: 1, medianGraduationTime: 0, timesToGraduation: [ 0 ] }
+    2015: { graduated: 2 },
+    2016: { graduated: 1 }
   }
   const thesisStats = {
     2014: { mThesis: 1 },
@@ -150,7 +150,6 @@ test('combineStatistics returns correctly formatted array', () => {
     mThesis: 2,
     bThesis: 1,
     credits: 40,
-    medianGraduationTime: 1.5,
     graduated: 2
   })
   expect(stats).toContainEqual({
@@ -159,7 +158,6 @@ test('combineStatistics returns correctly formatted array', () => {
     bThesis: 0,
     credits: 20,
     graduated: 0,
-    medianGraduationTime: 0
   })
   expect(stats).toContainEqual({
     year: 2016,
@@ -167,7 +165,6 @@ test('combineStatistics returns correctly formatted array', () => {
     bThesis: 0,
     credits: 5,
     graduated: 1,
-    medianGraduationTime: 0
   })
 })
 
@@ -178,16 +175,14 @@ test('productivityStatsForStudytrack integrates', async () => {
     graduated: 0,
     bThesis: 0,
     mThesis: 1,
-    credits: 40,
-    medianGraduationTime: 0
+    credits: 40
   })
   expect(stats.data).toContainEqual({
     year: 2016,
     graduated: 1,
     mThesis: 0,
     bThesis: 0,
-    credits: 5,
-    medianGraduationTime: 0
+    credits: 5
   })
 })
 
