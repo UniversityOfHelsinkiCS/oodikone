@@ -7,6 +7,7 @@ import { callApi } from '../../../apiConnection'
 import { getProductivity } from '../../../redux/productivity'
 
 const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramme, dispatchGetProductivity }) => {
+  console.log('eeaaat shit')
   if (error) return <h1>Oh no so error {error}</h1>
   let thesisTypes = []
   if (thesis) {
@@ -31,7 +32,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
                     productivity.lastUpdated
                       ? moment(productivity.lastUpdated).format('HH:mm:ss MM-DD-YYYY')
                       : 'unknown'
-                  } ${productivity.status || ''}`}
+                    } ${productivity.status || ''}`}
                 </Header.Subheader>
               )}
             </Grid.Column>
@@ -57,20 +58,22 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
         <Table.Body>
           {productivity && productivity.data
             ? productivity.data
-                .sort((year1, year2) => year2.year - year1.year)
-                .map(year => (
-                  <Table.Row key={year.year}>
-                    <Table.Cell>{year.year}</Table.Cell>
-                    <Table.Cell>{Math.floor(year.credits)}</Table.Cell>
-                    {thesisTypes.includes('BACHELOR') && (
-                      <Table.Cell>{year.bThesis}</Table.Cell>
-                    )}
-                    {thesisTypes.includes('MASTER') && (
-                      <Table.Cell>{year.mThesis}</Table.Cell>
-                    )}
-                    <Table.Cell>{year.graduated}</Table.Cell>
-                  </Table.Row>
-                ))
+              .sort((year1, year2) => year2.year - year1.year)
+              .map(year => (
+                <Table.Row key={year.year}>
+                  <Table.Cell>{year.year}</Table.Cell>
+                  <Table.Cell>{Math.floor(year.credits)}</Table.Cell>
+                  {thesisTypes.includes('BACHELOR') && (
+                    <Table.Cell>{year.bThesis}</Table.Cell>
+                  )}
+                  {thesisTypes.includes('MASTER') && (
+                    <Table.Cell>{year.mThesis}</Table.Cell>
+                  )}
+                  <Table.Cell>{year.graduated}</Table.Cell>
+                  {/* <Table.Cell>{year.creditsForPercetage}</Table.Cell> */}
+
+                </Table.Row>
+              ))
             : null}
         </Table.Body>
       </Table>
@@ -87,7 +90,8 @@ ProductivityTable.propTypes = {
       credits: number,
       mThesis: number,
       bThesis: number,
-      graduated: number
+      graduated: number,
+      creditsForPercetage: number
     }))
   }),
   thesis: arrayOf(shape({
