@@ -12,13 +12,12 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
   if (thesis) {
     thesisTypes = thesis.map(t => t.thesisType)
   }
-  const headerList = ['Year', 'Credits', thesisTypes.includes('MASTER') && 'Masters Thesis', thesisTypes.includes('BACHELOR') && 'Bachelors Thesis', 'Graduated', 'Graduation median time'].filter(_ => _)
+  const headerList = ['Year', 'Credits', thesisTypes.includes('MASTER') && 'Masters Thesis', thesisTypes.includes('BACHELOR') && 'Bachelors Thesis', 'Graduated', 'Credits given to students in selected programme'].filter(_ => _)
 
   const refresh = () => {
     callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, { code: studyprogramme })
       .then(() => { dispatchGetProductivity(studyprogramme) })
   }
-  console.log(productivity)
   return (
     <React.Fragment>
       <Header>
@@ -32,7 +31,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
                     productivity.lastUpdated
                       ? moment(productivity.lastUpdated).format('HH:mm:ss MM-DD-YYYY')
                       : 'unknown'
-                  } ${productivity.status || ''}`}
+                    } ${productivity.status || ''}`}
                 </Header.Subheader>
               )}
             </Grid.Column>
@@ -58,21 +57,21 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
         <Table.Body>
           {productivity && productivity.data
             ? productivity.data
-                .sort((year1, year2) => year2.year - year1.year)
-                .map(year => (
-                  <Table.Row key={year.year}>
-                    <Table.Cell>{year.year}</Table.Cell>
-                    <Table.Cell>{Math.floor(year.credits)}</Table.Cell>
-                    {thesisTypes.includes('BACHELOR') && (
-                      <Table.Cell>{year.bThesis}</Table.Cell>
-                    )}
-                    {thesisTypes.includes('MASTER') && (
-                      <Table.Cell>{year.mThesis}</Table.Cell>
-                    )}
-                    <Table.Cell>{year.graduated}</Table.Cell>
-                    <Table.Cell>{year.medianGraduationTime} months</Table.Cell>
-                  </Table.Row>
-                ))
+              .sort((year1, year2) => year2.year - year1.year)
+              .map(year => (
+                <Table.Row key={year.year}>
+                  <Table.Cell>{year.year}</Table.Cell>
+                  <Table.Cell>{Math.floor(year.credits)}</Table.Cell>
+                  {thesisTypes.includes('BACHELOR') && (
+                    <Table.Cell>{year.bThesis}</Table.Cell>
+                  )}
+                  {thesisTypes.includes('MASTER') && (
+                    <Table.Cell>{year.mThesis}</Table.Cell>
+                  )}
+                  <Table.Cell>{year.graduated}</Table.Cell>
+                  <Table.Cell>{year.creditsForPercentage}</Table.Cell>
+                </Table.Row>
+              ))
             : null}
         </Table.Body>
       </Table>
@@ -89,7 +88,8 @@ ProductivityTable.propTypes = {
       credits: number,
       mThesis: number,
       bThesis: number,
-      graduated: number
+      graduated: number,
+      creditsForPercentage: number
     }))
   }),
   thesis: arrayOf(shape({

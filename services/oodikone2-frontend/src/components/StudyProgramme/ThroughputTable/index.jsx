@@ -67,7 +67,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 <Table.HeaderCell colSpan={genders.length + 1}>Students</Table.HeaderCell> :
                 <Table.HeaderCell rowSpan="2">Students</Table.HeaderCell>
             }
-            <Table.HeaderCell colSpan="2">Graduated</Table.HeaderCell>
+            <Table.HeaderCell colSpan="3">Graduated</Table.HeaderCell>
 
             <Table.HeaderCell rowSpan="2">Transferred to this program</Table.HeaderCell>
             {
@@ -88,6 +88,8 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
             {genders.map(gender => <Table.HeaderCell key={gender} content={gender} />)}
             <Table.HeaderCell >Graduated overall</Table.HeaderCell>
             <Table.HeaderCell >Graduated in time</Table.HeaderCell>
+            <Table.HeaderCell >Graduation median time</Table.HeaderCell>
+
             {renderCountries ? countries.map(country => <Table.HeaderCell key={country} content={country} />) : null}
             <Table.HeaderCell content="≥ 30" />
             <Table.HeaderCell content="≥ 60" />
@@ -121,6 +123,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 ))}
                 <Table.Cell>{year.graduated}</Table.Cell>
                 <Table.Cell>{year.inTargetTime}</Table.Cell>
+                <Table.Cell>{year.medianGraduationTime ? `${year.medianGraduationTime} months` : '∞'}</Table.Cell>
                 <Table.Cell>{year.transferred}</Table.Cell>
                 {renderCountries ? countries.map(country => (
                   <Table.Cell key={year.year + country}>
@@ -152,6 +155,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
               ))}
               <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
               <Table.HeaderCell>{throughput.totals.inTargetTime}</Table.HeaderCell>
+              <Table.HeaderCell>{throughput.totals.medianGraduationTime ? `${throughput.totals.medianGraduationTime} months` : '∞'}</Table.HeaderCell>
               <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
               {renderCountries ? Object.keys(throughput.totals.countries).map(countryKey => (
                 <Table.HeaderCell key={`${countryKey}total`}>
