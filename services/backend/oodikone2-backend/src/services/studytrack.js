@@ -133,22 +133,6 @@ const graduatedStatsFromStudyrights = studyrights => {
     }
     graduationTimes = [...graduationTimes, timeToGraduation || 0]
   })
-  const median = (values) => {
-    if (values.length === 0) return 0
-
-    values.sort((a, b) => a - b)
-
-    var half = Math.floor(values.length / 2)
-
-    if (values.length % 2)
-      return values[half]
-
-    return (values[half - 1] + values[half]) / 2.0
-  }
-  Object.keys(stats).forEach(year => {
-    stats[year].medianGraduationTime = median(stats[year].timesToGraduation)
-  })
-  stats['medianGraduationTime'] = median(graduationTimes)
   return stats
 }
 
@@ -207,7 +191,7 @@ const combineStatistics = (creditStats, studyrightStats, thesisStats) => {
   Object.keys(stats).forEach(year => {
     const thesis = thesisStats[year] || {}
     stats[year].graduated = studyrightStats[year] ? studyrightStats[year].graduated : 0
-    stats[year].medianGraduationTime = studyrightStats[year] ? studyrightStats[year].medianGraduationTime : 0
+    // stats[year].medianGraduationTime = studyrightStats[year] ? studyrightStats[year].medianGraduationTime : 0
     stats[year].bThesis = thesis.bThesis || 0
     stats[year].mThesis = thesis.mThesis || 0
   })
@@ -381,11 +365,11 @@ const getCreditsFromStudyprogrammeStudents = async (studytrack, startDate, stude
 
 const productivityStats = async (studentnumbers, startDate, studytrack, endDate) => {
   return Promise.all([creditsAfter(studentnumbers, startDate),
-  graduationsFromClass(studentnumbers, studytrack),
-  thesesFromClass(studentnumbers, startDate, studytrack),
-  gendersFromClass(studentnumbers),
-  countriesFromClass(studentnumbers),
-  tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate)])
+    graduationsFromClass(studentnumbers, studytrack),
+    thesesFromClass(studentnumbers, startDate, studytrack),
+    gendersFromClass(studentnumbers),
+    countriesFromClass(studentnumbers),
+    tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate)])
 }
 
 const getYears = (since) => {
@@ -417,7 +401,19 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
   const years = getYears(since)
   // studyprogramme starts with K if bachelors and M if masters
   const graduationTimeLimit = studytrack[0] === 'K' ? 36 : 24
+  const median = (values) => {
+    if (values.length === 0) return 0
 
+    values.sort((a, b) => a - b)
+
+    var half = Math.floor(values.length / 2)
+
+    if (values.length % 2)
+      return values[half]
+
+    return (values[half - 1] + values[half]) / 2.0
+  }
+  let allGraduationTimes = []
   const arr = await Promise.all(years.map(async year => {
     const startDate = `${year}-${semesterStart['FALL']}`
     const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
@@ -427,8 +423,6 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       await productivityStats(studentnumbers, startDate, studytrack, endDate)
     delete genders[null]
     delete countries[null]
-    const test = creditsForStudyprogramme.map(formatCredit)
-    console.log(test)
 
     const creditValues = credits.reduce((acc, curr) => {
       acc.mte30 = curr >= 30 ? acc.mte30 + 1 : acc.mte30
@@ -451,20 +445,24 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
         totals.countries[countryKey] + Number(countries[countryKey]) :
         Number(countries[countryKey])
     })
-    const inTargetTime = graduated.filter(g =>
-      moment(g.enddate).diff(g.startstududate, 'months') <= graduationTimeLimit).length
-
+    const graduationTimes = graduated.map(g => moment(g.enddate).diff(g.studystartdate, 'months'))
+    const inTargetTime = graduationTimes.filter(time =>
+      time <= graduationTimeLimit).length
+    allGraduationTimes = [...allGraduationTimes, ...graduationTimes]
+    
     totals.thesisM = theses.MASTER ? totals.thesisM + theses.MASTER : totals.thesisM
     totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
     totals.students = totals.students + credits.length
     totals.graduated = totals.graduated + graduated.length,
-      totals.inTargetTime = totals.inTargetTime + inTargetTime,
-      totals.transferred = totals.transferred + transferred.count
+    totals.medianGraduationTime = median(allGraduationTimes)
+    totals.inTargetTime = totals.inTargetTime + inTargetTime
+    totals.transferred = totals.transferred + transferred.count
     return {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
       creditsForStudyprogramme: creditsForStudyprogramme.map(cr => cr === null ? 0 : cr),
       graduated: graduated.length,
+      medianGraduationTime: median(graduationTimes),
       inTargetTime,
       thesisM: theses.MASTER || 0,
       thesisB: theses.BACHELOR || 0,
