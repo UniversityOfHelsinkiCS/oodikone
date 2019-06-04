@@ -100,7 +100,7 @@ SortableTable.propTypes = {
     key: string,
     title: oneOfType([element, string]),
     headerProps: shape({}),
-    getRowVal: func,
+    getRowVal: func.isRequired,
     getRowContent: func,
     getCellProps: func,
     cellProps: shape({}),
