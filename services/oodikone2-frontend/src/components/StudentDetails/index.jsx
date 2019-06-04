@@ -29,7 +29,7 @@ class StudentDetails extends Component {
       this.props.getStudent(this.props.studentNumber)
     }
   }
-  
+
   pushQueryToUrl = (query) => {
     const { history } = this.props
     const { courseCodes, ...rest } = query
