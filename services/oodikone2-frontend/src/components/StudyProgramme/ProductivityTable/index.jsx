@@ -7,7 +7,6 @@ import { callApi } from '../../../apiConnection'
 import { getProductivity } from '../../../redux/productivity'
 
 const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramme, dispatchGetProductivity }) => {
-  console.log('eeaaat shit')
   if (error) return <h1>Oh no so error {error}</h1>
   let thesisTypes = []
   if (thesis) {
