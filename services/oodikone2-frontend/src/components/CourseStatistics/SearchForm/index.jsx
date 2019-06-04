@@ -46,7 +46,6 @@ class SearchForm extends Component {
     const { location } = this.props
     const queryParamsChanged = prevProps.location.search !== this.props.location.search
     if (location.search && queryParamsChanged) {
-      console.log('shiiiii')
       this.fetchStatisticsFromUrlParams()
     }
   }
@@ -92,7 +91,7 @@ class SearchForm extends Component {
 
   fetchStatisticsFromUrlParams() {
     const query = this.parseQueryFromUrl()
-    this.setState({ query })
+    this.setState({ ...query, selectedcourses: query.courseCodes })
     this.props.getCourseStats(query)
   }
 
@@ -149,7 +148,6 @@ class SearchForm extends Component {
       coursename,
       coursecode
     } = this.state
-    console.log(this.state)
     const courses = matchingCourses.filter(c => !selectedcourses[c.code])
 
     const disabled = (!fromYear || Object.keys(selectedcourses).length === 0) || isLoading
