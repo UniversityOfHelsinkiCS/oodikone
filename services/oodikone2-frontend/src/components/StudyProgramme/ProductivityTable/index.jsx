@@ -19,8 +19,10 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
     thesisTypes.includes('BACHELOR') && 'Bachelors Thesis',
     'Graduated',
     'Credits for studyprogramme majors',
-    'Credits for studyprogramme minors'
+    'Credits for studyprogramme minors',
+    'Hyväksiluettu (not included in Credits column)'
   ].filter(_ => _)
+  console.log(productivity)
   const refresh = () => {
     callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, { code: studyprogramme })
       .then(() => { dispatchGetProductivity(studyprogramme) })
@@ -78,6 +80,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
                   <Table.Cell>{year.graduated}</Table.Cell>
                   <Table.Cell>{year.creditsForMajors}</Table.Cell>
                   <Table.Cell>{year.credits - year.creditsForMajors}</Table.Cell>
+                  <Table.Cell>{year.transferredCredits}</Table.Cell>
                 </Table.Row>
               ))
             : null}
@@ -97,7 +100,8 @@ ProductivityTable.propTypes = {
       mThesis: number,
       bThesis: number,
       graduated: number,
-      creditsForMajors: number
+      creditsForMajors: number,
+      transferredCredits: number
     }))
   }),
   thesis: arrayOf(shape({
