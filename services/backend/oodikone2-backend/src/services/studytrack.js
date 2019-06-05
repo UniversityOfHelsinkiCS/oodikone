@@ -21,7 +21,35 @@ const formatCredit = credit => {
   return { id, year, credits }
 }
 
-const getCreditsForStudentsInThatProgram = (provider, since, studentnumbers, failed) => Credit.findAll({
+const getTransferredCredits = (provider, since) => Credit.findAll({
+  attributes: ['id', 'course_code', 'credits', 'attainment_date', 'credittypecode'],
+  include: {
+    model: Course,
+    attributes: ['code'],
+    required: true,
+    where: {
+      is_study_module: false
+    },
+    include: {
+      model: Provider,
+      attributes: [],
+      required: true,
+      where: {
+        providercode: provider
+      }
+    }
+  },
+  where: {
+    credittypecode: {
+      [Op.eq]: [9]
+    },
+    attainment_date: {
+      [Op.gte]: since
+    }
+  }
+})
+
+const getCreditsForMajors = (provider, since, studentnumbers) => Credit.findAll({
   attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
   include: {
     model: Course,
@@ -49,9 +77,6 @@ const getCreditsForStudentsInThatProgram = (provider, since, studentnumbers, fai
     student_studentnumber: {
       [Op.in]: studentnumbers
     },
-    grade: {
-      [Op.notIn]: failed
-    }
   }
 })
 
@@ -189,7 +214,7 @@ const thesisProductivityForStudytrack = async code => {
   return thesisProductivityFromCredits(credits)
 }
 
-const combineStatistics = (creditStats, studyrightStats, thesisStats, creditsForPercentage) => {
+const combineStatistics = (creditStats, studyrightStats, thesisStats, creditsForMajors, transferredCredits) => {
   const stats = { ...creditStats }
   Object.keys(stats).forEach(year => {
     const thesis = thesisStats[year] || {}
@@ -197,7 +222,8 @@ const combineStatistics = (creditStats, studyrightStats, thesisStats, creditsFor
     // stats[year].medianGraduationTime = studyrightStats[year] ? studyrightStats[year].medianGraduationTime : 0
     stats[year].bThesis = thesis.bThesis || 0
     stats[year].mThesis = thesis.mThesis || 0
-    stats[year].creditsForPercentage = creditsForPercentage[year] || 0
+    stats[year].creditsForMajors = creditsForMajors[year] || 0
+    stats[year].transferredCredits = transferredCredits[year] || 0
   })
   return Object.values(stats)
 }
@@ -212,15 +238,16 @@ const productivityStatsForStudytrack = async (studytrack, since) => {
     graduatedStatsForStudytrack(studytrack, since),
     productivityStatsForProvider(providercode, since),
     thesisProductivityForStudytrack(studytrack),
-    getCreditsFromStudyprogrammeStudents(studytrack, since, studentnumbers)
+    productivityCreditsFromStudyprogrammeStudents(studytrack, since, studentnumbers),
+    transferredCreditsForProductivity(studytrack, since)
   ]
-  const [studyrightStats, creditStats, thesisStats, creditsForPercentage] = await Promise.all(
+  const [studyrightStats, creditStats, thesisStats, creditsForMajors, transferredCredits] = await Promise.all(
     promises
   )
   return {
     id: studytrack,
     status: null,
-    data: combineStatistics(creditStats, studyrightStats, thesisStats, creditsForPercentage)
+    data: combineStatistics(creditStats, studyrightStats, thesisStats, creditsForMajors, transferredCredits)
   }
 }
 
@@ -365,7 +392,7 @@ const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, e
   })
 }
 
-const formatCreditsForPercentage = (credits) => {
+const formatCreditsForProductivity = (credits) => {
   return credits.map(formatCredit).reduce(function (acc, curr) {
     var key = curr['year']
     if (!acc[key]) {
@@ -376,12 +403,18 @@ const formatCreditsForPercentage = (credits) => {
   }, {})
 }
 
-const getCreditsFromStudyprogrammeStudents = async (studytrack, startDate, studentnumbers) => {
+const productivityCreditsFromStudyprogrammeStudents = async (studytrack, startDate, studentnumbers) => {
   const providercode = studytrackToProviderCode(studytrack)
-  const failed = ['0', 'Hyl.', 'Luop', 'Eisa']
-  const credits = await getCreditsForStudentsInThatProgram(providercode, startDate, studentnumbers, failed)
-  const formattedStudentCredits = formatCreditsForPercentage(credits)
+  const credits = await getCreditsForMajors(providercode, startDate, studentnumbers)
+  const formattedStudentCredits = formatCreditsForProductivity(credits)
   return formattedStudentCredits
+}
+
+const transferredCreditsForProductivity = async (studytrack, since) => {
+  const providercode = studytrackToProviderCode(studytrack)
+  const credits = await getTransferredCredits(providercode, since)
+  const formattedCredits = formatCreditsForProductivity(credits)
+  return formattedCredits
 }
 
 const productivityStats = async (studentnumbers, startDate, studytrack, endDate) => {
@@ -439,7 +472,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     const startDate = `${year}-${semesterStart['FALL']}`
     const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
-    const creditsForStudyprogramme = await getCreditsFromStudyprogrammeStudents(studytrack, startDate, studentnumbers)
+    const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(studytrack, startDate, studentnumbers)
 
     const [credits, graduated, theses, genders, countries, transferred] =
       await productivityStats(studentnumbers, startDate, studytrack, endDate)
