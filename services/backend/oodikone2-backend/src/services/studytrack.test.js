@@ -144,19 +144,24 @@ test('combineStatistics returns correctly formatted array', () => {
     2014: { mThesis: 1 },
     2015: { mThesis: 2, bThesis: 1 }
   }
-  const creditsForPercentage = {
+  const creditsForMajors = {
     2014: 10,
     2015: 22
   }
+  const transferredCredits = {
+    2014: 2,
+    2015: 4
+  }
 
-  const stats = combineStatistics(creditStats, studyrightStats, thesisStats, creditsForPercentage)
+  const stats = combineStatistics(creditStats, studyrightStats, thesisStats, creditsForMajors, transferredCredits)
   expect(stats).toContainEqual({
     year: 2015,
     mThesis: 2,
     bThesis: 1,
     credits: 40,
     graduated: 2,
-    creditsForPercentage: 22
+    creditsForMajors: 22,
+    transferredCredits: 4
   })
   expect(stats).toContainEqual({
     year: 2014,
@@ -164,7 +169,8 @@ test('combineStatistics returns correctly formatted array', () => {
     bThesis: 0,
     credits: 20,
     graduated: 0,
-    creditsForPercentage: 10
+    creditsForMajors: 10,
+    transferredCredits: 2
   })
   expect(stats).toContainEqual({
     year: 2016,
@@ -172,7 +178,8 @@ test('combineStatistics returns correctly formatted array', () => {
     bThesis: 0,
     credits: 5,
     graduated: 1,
-    creditsForPercentage: 0
+    creditsForMajors: 0,
+    transferredCredits: 0
   })
 })
 
@@ -184,7 +191,8 @@ test('productivityStatsForStudytrack integrates', async () => {
     bThesis: 0,
     mThesis: 1,
     credits: 40,
-    creditsForPercentage: 0
+    creditsForMajors: 0,
+    transferredCredits: 0
   })
   expect(stats.data).toContainEqual({
     year: 2016,
@@ -192,7 +200,8 @@ test('productivityStatsForStudytrack integrates', async () => {
     mThesis: 0,
     bThesis: 0,
     credits: 5,
-    creditsForPercentage: 0
+    creditsForMajors: 0,
+    transferredCredits: 0
   })
 })
 
