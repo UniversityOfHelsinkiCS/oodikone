@@ -12,8 +12,15 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
   if (thesis) {
     thesisTypes = thesis.map(t => t.thesisType)
   }
-  const headerList = ['Year', 'Credits', thesisTypes.includes('MASTER') && 'Masters Thesis', thesisTypes.includes('BACHELOR') && 'Bachelors Thesis', 'Graduated', 'Credits given to students in selected programme'].filter(_ => _)
-
+  const headerList = [
+    'Year',
+    'Credits',
+    thesisTypes.includes('MASTER') && 'Masters Thesis',
+    thesisTypes.includes('BACHELOR') && 'Bachelors Thesis',
+    'Graduated',
+    'Credits for studyprogramme majors',
+    'Credits for studyprogramme minors'
+  ].filter(_ => _)
   const refresh = () => {
     callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, { code: studyprogramme })
       .then(() => { dispatchGetProductivity(studyprogramme) })
@@ -69,7 +76,8 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
                     <Table.Cell>{year.mThesis}</Table.Cell>
                   )}
                   <Table.Cell>{year.graduated}</Table.Cell>
-                  <Table.Cell>{year.creditsForPercentage}</Table.Cell>
+                  <Table.Cell>{year.creditsForMajors}</Table.Cell>
+                  <Table.Cell>{year.credits - year.creditsForMajors}</Table.Cell>
                 </Table.Row>
               ))
             : null}
@@ -89,7 +97,7 @@ ProductivityTable.propTypes = {
       mThesis: number,
       bThesis: number,
       graduated: number,
-      creditsForPercentage: number
+      creditsForMajors: number
     }))
   }),
   thesis: arrayOf(shape({
