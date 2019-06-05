@@ -62,14 +62,14 @@ const message2 = email => {
     <img style="max-width: 13.5%;height: auto;" src="https://i.imgur.com/tnNDAJk.png" /> `,
   })
 }
-const feedback = (content, user, email) => {
+const feedback = (content, user, email, full_name) => {
   return ({
     to: 'Toska <grp-toska@helsinki.fi>',
     replyTo: email,
     subject: `New message from Oodikone feedback`,
     text: `New message from user ${user}`,
     html: `${content}
-    <p>sent by user: ${user}, email: ${email}</p>
+    <p>sent by ${full_name}, userid: ${user}, email: ${email}</p>
     <img src="cid:toskalogoustcid"/>`,
     attachments: [
       {
