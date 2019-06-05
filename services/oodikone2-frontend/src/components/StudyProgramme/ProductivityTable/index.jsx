@@ -22,7 +22,6 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
     'Credits for non major students',
     'Hyväksiluettu (not included in Credits column)'
   ].filter(_ => _)
-  console.log(productivity)
   const refresh = () => {
     callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, { code: studyprogramme })
       .then(() => { dispatchGetProductivity(studyprogramme) })
