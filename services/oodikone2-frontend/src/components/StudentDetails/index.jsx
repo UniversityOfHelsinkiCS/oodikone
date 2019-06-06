@@ -60,7 +60,8 @@ class StudentDetails extends Component {
       translate('common.date'),
       translate('common.course'),
       translate('common.grade'),
-      translate('common.credits')
+      translate('common.credits'),
+      ''
     ]
     const courseRows = student.courses.sort(byDateDesc).map((c) => {
       const {
@@ -80,7 +81,7 @@ class StudentDetails extends Component {
         `${isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)} (${course.code})`,
         <div>{icon}{grade}</div>,
         credits,
-        <Icon name="arrow up" onClick={() => this.pushQueryToUrl({ courseCodes: [course.code], separate: false, fromYear: year, toYear: year })} />
+        <Icon style={{ cursor: 'pointer' }} name="arrow up" onClick={() => this.pushQueryToUrl({ courseCodes: [course.code], separate: false, fromYear: year, toYear: year })} />
       ]
     })
     return (
