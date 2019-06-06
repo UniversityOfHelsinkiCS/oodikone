@@ -42,11 +42,13 @@ import oodilearnPopulationCourseSelect from './oodilearnPopulationCourseSelect'
 import thesisCourses from './thesisCourses'
 import accessGroups from './accessGroups'
 import feedback from './feedback'
+import mandatoryCourseLabels from './mandatoryCourseLabels'
 
 export default combineReducers({
   locale,
   actionHistory,
   users,
+  mandatoryCourseLabels,
   populations,
   populationCourses,
   populationFilters,
