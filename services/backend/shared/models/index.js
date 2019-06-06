@@ -18,9 +18,9 @@ const CourseGroup = sequelize.define('course_groups', {
     unique: true
   }
 },
-{
-  schema: conf.DB_SCHEMA_KONE
-})
+  {
+    schema: conf.DB_SCHEMA_KONE
+  })
 
 const TeacherCourseGroup = sequelize.define('teacher_course_groups', {
   course_group_id: {
@@ -30,9 +30,9 @@ const TeacherCourseGroup = sequelize.define('teacher_course_groups', {
     type: Sequelize.STRING,
   }
 },
-{
-  schema: conf.DB_SCHEMA_KONE
-})
+  {
+    schema: conf.DB_SCHEMA_KONE
+  })
 
 const MandatoryCourse = sequelize.define('mandatory_courses', {
   course_code: {
@@ -45,9 +45,9 @@ const MandatoryCourse = sequelize.define('mandatory_courses', {
     type: Sequelize.STRING
   }
 },
-{
-  schema: conf.DB_SCHEMA_KONE
-})
+  {
+    schema: conf.DB_SCHEMA_KONE
+  })
 
 const Filters = sequelize.define('filters',
   {
@@ -104,14 +104,15 @@ const UsageStatistic = sequelize.define('usage_statistics', {
   },
 
 }, {
-  timestamps: false,
-  schema: conf.DB_SCHEMA_KONE
-})
+    timestamps: false,
+    schema: conf.DB_SCHEMA_KONE
+  })
 
+//legacy?
 const TagStudent = sequelize.define('tag_student',
   {
-    taggedstudents_studentnumber: { type: Sequelize.STRING },
-    tags_tagname: { type: Sequelize.STRING },
+    studentnumber: { type: Sequelize.STRING },
+    tag_id: { type: Sequelize.STRING },
   },
   {
     tableName: 'tag_student',
@@ -124,9 +125,16 @@ TagStudent.removeAttribute('id')
 const Tag = sequelize.define('tag',
   {
     tagname: {
+      type: Sequelize.STRING
+    },
+    tag_id: {
       primaryKey: true,
       type: Sequelize.STRING
     },
+    studytrack: {
+      primaryKey: true,
+      type: Sequelize.STRING
+    }
   },
   {
     tableName: 'tag',
@@ -141,10 +149,10 @@ const MigrationKone = sequelize.define('migrationsKone', {
     primaryKey: true
   }
 }, {
-  tableName: 'migrations',
-  timestamps: false,
-  schema: conf.DB_SCHEMA_KONE
-})
+    tableName: 'migrations',
+    timestamps: false,
+    schema: conf.DB_SCHEMA_KONE
+  })
 
 const Student = sequelize.define('student',
   {
@@ -463,16 +471,16 @@ const SemesterEnrollment = sequelize.define('semester_enrollment', {
     type: Sequelize.DATE
   }
 }, {
-  indexes: [
-    {
-      fields: ['semestercode', 'studentnumber'],
-      unique: true
-    }, {
-      fields: ['studentnumber'],
-      name: 'semester_enrollment_studentnumber'
-    }
-  ]
-})
+    indexes: [
+      {
+        fields: ['semestercode', 'studentnumber'],
+        unique: true
+      }, {
+        fields: ['studentnumber'],
+        name: 'semester_enrollment_studentnumber'
+      }
+    ]
+  })
 
 const Provider = sequelize.define('provider', {
   providercode: {
@@ -489,13 +497,13 @@ const Transfers = sequelize.define('transfers', {
     type: Sequelize.DATE
   }
 }, {
-  indexes: [
-    {
-      fields: ['studentnumber'],
-      name: 'transfers_studentnumber'
-    }
-  ]
-})
+    indexes: [
+      {
+        fields: ['studentnumber'],
+        name: 'transfers_studentnumber'
+      }
+    ]
+  })
 
 const CourseProvider = sequelize.define('course_providers', {}, {
   indexes: [
@@ -549,9 +557,9 @@ const Migration = sequelize.define('migrations', {
     primaryKey: true
   }
 }, {
-  tableName: 'migrations',
-  timestamps: false
-})
+    tableName: 'migrations',
+    timestamps: false
+  })
 
 const CreditTeacher = sequelize.define('credit_teacher', {
   credit_id: {
@@ -618,8 +626,10 @@ Course.hasMany(Credit, { foreignKey: 'course_code' })
 
 MandatoryCourse.belongsTo(Course, { foreignKey: 'course_code' })
 
-Student.hasMany(TagStudent, { foreignKey: 'taggedstudents_studentnumber', sourceKey: 'studentnumber' })
-Tag.hasMany(TagStudent, { foreignKey: 'tags_tagname', sourceKey: 'tagname' })
+TagStudent.hasMany(Student, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+TagStudent.hasMany(Tag, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
+
+Tag.hasOne(ElementDetails, { foreignKey: 'code', sourceKey: 'studytrack' })
 
 Studyright.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyright, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
