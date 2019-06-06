@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIR_PATH=$(dirname "$0")
-ANONDB_DIR=backups
+ANONDB_DIR=anonyymioodi
 BACKUP_DIR=backups
 PSQL_DB_BACKUP="$ANONDB_DIR/anon.sqz"
 USER_DB_BACKUP="$ANONDB_DIR/user-dump.sqz"
