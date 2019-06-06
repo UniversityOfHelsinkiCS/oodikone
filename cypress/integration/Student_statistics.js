@@ -56,6 +56,14 @@ describe('Student Statistics tests', () => {
         cy.contains('Credits').should('not.exist')
     })
 
+    it('Can jump to course', () => {
+        cy.get('.prompt').type('Oinonen')
+        cy.contains('011143561').click()
+        cy.contains('Toinen kotimainen kieli (40061)').siblings().within(() => { cy.get('.arrow').click() })
+        cy.url().should('include', '/coursestatistics')
+        cy.contains('Toinen kotimainen kieli')
+    })
+
     it('Searching with bad inputs doesnt yield results', () => {
         cy.get('.prompt').type('Oin')
         cy.contains('Student number').should('not.exist')
