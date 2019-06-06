@@ -5,10 +5,9 @@ const userService = require('../services/userService')
 router.post('/email', async (req, res) => {
   const { content } = req.body
   const { uid } = req.headers
-  const { email } = await userService.byUsername(uid)
-
+  const { email, full_name } = await userService.byUsername(uid)
   const formattedEmail = content.split('\n\n').map(line => `<p> ${line} </p>`).join('')
-  const feedback = mailservice.feedback(formattedEmail, uid, email)
+  const feedback = mailservice.feedback(formattedEmail, uid, email, full_name)
 
   if (process.env.SMTP !== undefined && content) {
     await mailservice.transporter.sendMail(feedback, (error) => {
