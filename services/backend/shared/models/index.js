@@ -42,7 +42,7 @@ const MandatoryCourse = sequelize.define('mandatory_courses', {
     type: Sequelize.STRING
   },
   label: {
-    type: Sequelize.STRING
+    type: Sequelize.BIGINT
   }
 },
   {
@@ -139,6 +139,28 @@ const Tag = sequelize.define('tag',
   {
     tableName: 'tag',
     timestamps: false,
+    schema: conf.DB_SCHEMA_KONE
+  }
+)
+
+const MandatoryCourseLabels = sequelize.define('mandatory_course_labels',
+  {
+    id: {
+      primaryKey: true,
+      type: Sequelize.BIGINT,
+      autoIncrement: true
+    },
+    studyprogramme_id: {
+      type: Sequelize.STRING,
+    },
+    label: {
+      type: Sequelize.STRING
+    },
+    orderNumber: {
+      type: Sequelize.INTEGER,
+    },
+  },
+  {
     schema: conf.DB_SCHEMA_KONE
   }
 )
@@ -625,6 +647,8 @@ Credit.belongsTo(Course, { foreignKey: 'course_code' })
 Course.hasMany(Credit, { foreignKey: 'course_code' })
 
 MandatoryCourse.belongsTo(Course, { foreignKey: 'course_code' })
+MandatoryCourse.belongsTo(MandatoryCourseLabels, { foreignKey: 'label', sourceKey: 'id' })
+MandatoryCourseLabels.hasMany(MandatoryCourse, { foreignKey: 'label', sourceKey: 'id' })
 
 TagStudent.hasMany(Student, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 TagStudent.hasMany(Tag, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
@@ -733,5 +757,6 @@ module.exports = {
   ThesisCourse,
   CourseDuplicates,
   ThesisTypeEnums,
+  MandatoryCourseLabels,
   ErrorData
 }
