@@ -141,10 +141,6 @@ show_instructions () {
     cat ./assets/instructions.txt
 }
 
-docker_restart_backend () {
-    docker-compose restart backend userservice
-}
-
 run_full_setup () {
     echo "Setup npm packages"
     install_cli_npm_packages
@@ -154,13 +150,13 @@ run_full_setup () {
     get_oodikone_server_backup
     echo "Getting anon backups from the private repository. "
     get_anon_oodikone
-    echo "Building images, starting containers"
-    docker_build
+    echo "Building images"
+    docker-compose build
     echo "Setup oodikone db from dump."
+    docker-compose up -d db user_db
     db_setup_full
     db_anon_setup_full
-    echo "Restarting Docker backend containers to run migrations, etc."
-    docker_restart_backend
+    docker-compose down
     show_instructions
 }
 
@@ -171,12 +167,12 @@ run_anon_full_setup () {
     init_dirs
     echo "Getting anon backups from the private repository. "
     get_anon_oodikone
-    echo "Building images, starting containers"
-    docker_build
+    echo "Building images"
+    docker-compose build
     echo "Setup oodikone db from dump."
+    docker-compose up -d db user_db
     db_anon_setup_full
-    echo "Restarting Docker backend containers to run migrations, etc."
-    docker_restart_backend
+    docker-compose down
     show_instructions
 }
 
@@ -187,12 +183,11 @@ run_e2e_setup () {
     init_dirs
     echo "Getting anon backups from the private repository. "
     get_anon_oodikone
-    echo "Building images, starting containers"
-    docker-compose -f $1 build && docker-compose -f $1 up -d
+    echo "Building images"
+    docker-compose -f $1 build
     echo "Setup oodikone db from dump."
+    docker-compose -f $1 up -d db user_db
     db_anon_setup_full
-    echo "Restarting Docker backend containers to run migrations, etc."
-    docker-compose -f $1 restart backend userservice
-    echo "Restarting Docker nginx because it has old backend IP otherwise"
-    docker-compose -f $1 restart nginx
+    echo "Starting services."
+    docker-compose -f $1 up -d
 }

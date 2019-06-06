@@ -52,11 +52,9 @@ do
             ;;
         "Download latest anon db")
             get_anon_oodikone
-            unpack_oodikone_server_backup
             ;;
         "Download latest real db")
             get_oodikone_server_backup
-            unpack_oodikone_server_backup
             ;;
         "Full reset")
             purge
