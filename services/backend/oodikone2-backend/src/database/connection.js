@@ -4,6 +4,7 @@ const conf = require('../conf-backend')
 
 const sequelize = new Sequelize(conf.DB_URL, {
   schema: conf.DB_SCHEMA,
+  searchPath: conf.DB_SCHEMA,
   logging: false,
   operatorsAliases: false
 })
@@ -11,6 +12,7 @@ sequelize.query(`SET SESSION search_path to ${conf.DB_SCHEMA}`)
 
 const sequelizeKone = new Sequelize(conf.DB_URL, {
   schema: conf.DB_SCHEMA_KONE,
+  searchPath: conf.DB_SCHEMA_KONE,
   logging: false,
   operatorsAliases: false
 })
@@ -32,6 +34,7 @@ const runMigrations = async () => {
         ],
         path: `${process.cwd()}/src/database/migrations`,
         pattern: /\.js$/,
+        schema: conf.DB_SCHEMA
       }
     })
     const migrations = await migrator.up()
@@ -55,12 +58,11 @@ const runMigrationsKone = async () => {
       migrations: {
         params: [
           sequelizeKone.getQueryInterface(),
-          sequelizeKone
+          Sequelize
         ],
         path: `${process.cwd()}/src/database/migrations_kone`,
         pattern: /\.js$/,
-        schema: conf.DB_SCHEMA_KONE,
-        wrap: fn => () => fn(sequelizeKone.getQueryInterface(), sequelizeKone)
+        schema: conf.DB_SCHEMA_KONE
       },
     })
     const migrations = await migrator.up()
