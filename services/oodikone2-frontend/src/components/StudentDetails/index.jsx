@@ -75,13 +75,13 @@ class StudentDetails extends Component {
       } else {
         icon = <Icon name="circle outline" color="red" />
       }
-      const year = -(moment(new Date('1.1.1950')).diff(new Date(date), 'years') - 1) // :D
+      const year = -(moment(new Date('1.1.1950')).diff(new Date(date), 'years')) // :D
       return [
         reformatDate(date, 'DD.MM.YYYY'),
         `${isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)} (${course.code})`,
         <div>{icon}{grade}</div>,
         credits,
-        <Icon style={{ cursor: 'pointer' }} name="arrow up" onClick={() => this.pushQueryToUrl({ courseCodes: [course.code], separate: false, fromYear: year, toYear: year })} />
+        <Icon style={{ cursor: 'pointer' }} name="arrow up" onClick={() => this.pushQueryToUrl({ courseCodes: [course.code], separate: false, fromYear: year - 1, toYear: year + 1 })} />
       ]
     })
     return (
