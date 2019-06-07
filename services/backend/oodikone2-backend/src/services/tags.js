@@ -9,7 +9,18 @@ const createNewTag = async (tag) => {
   return Tag.create(tag)
 }
 
+const deleteTag = async (tag) => {
+  return Tag.destroy({
+    where: {
+      tag_id: {
+        [Op.eq]: tag.tag_id
+      }
+    }
+  })
+}
+
 module.exports = {
   createNewTag,
-  findTags
+  findTags,
+  deleteTag
 }

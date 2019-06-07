@@ -23,6 +23,18 @@ router.post('/tags', async (req, res) => {
   }
 })
 
+router.delete('/tags', async (req, res) => {
+  const { tag } = req.body
+  try {
+    const result = await Tags.deleteTag(tag)
+    res.status(200).json(result)
+  } catch (err) {
+    console.log(err)
+    res.status(400).json(err)
+  }
+
+})
+
 router.get('/studenttags', async (req, res) => {
   try {
     const result = await TagStudent.getStudentTags()
@@ -33,8 +45,26 @@ router.get('/studenttags', async (req, res) => {
   }
 })
 
-router.post('/studenttags', async (req,res) => {
-  console.log('trying to post?')
+router.post('/studenttags', async (req, res) => {
+  const { tag } = req.body
+  try {
+    const result = await TagStudent.createStudentTag(tag)
+    res.status(200).json(result)
+  } catch (err) {
+    console.log(err)
+    res.status(400).json(err)
+  }
+})
+
+router.delete('/studenttags', async (req, res) => {
+  const { tag } = req.body
+  try {
+    const result = await TagStudent.deleteStudentTag(tag)
+    res.status(200).json(result)
+  } catch (err) {
+    console.log(err)
+    res.status(400).json(err)
+  }
 })
 
 module.exports = router
