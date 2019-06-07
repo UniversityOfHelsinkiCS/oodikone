@@ -46,7 +46,7 @@ router.post('/:programme/label/:course', async (req, res) => {
         .json({
           name: updatedCourse.course.name,
           code: updatedCourse.course_code,
-          label: updatedCourse.label
+          label: updatedCourse.mandatory_course_label
         })
     } catch (err) {
       console.error(err)
