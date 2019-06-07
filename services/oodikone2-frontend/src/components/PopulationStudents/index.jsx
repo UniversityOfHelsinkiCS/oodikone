@@ -277,21 +277,25 @@ class PopulationStudents extends Component {
       }
     )
 
+    const mandatoryCourseLabels = []
+
     const labelToMandatoryCourses = this.props.mandatoryCourses.reduce((acc, e) => {
-      const label = e.label || ''
+      const label = e.label ? e.label.label : ''
       acc[label] = acc[label] || []
       acc[label].push(e)
+      if (e.label) mandatoryCourseLabels.push(e.label)
+      else mandatoryCourseLabels.push({ id: 'null', label: '' })
       return acc
     }, {})
 
-    const mandatoryCourseLabels = _.orderBy(
-      Object.keys(labelToMandatoryCourses),
-      [e => e.length === 0, e => e],
-      ['asc', 'asc']
+    const sortedlabels = _.orderBy(
+      _.uniqBy(mandatoryCourseLabels, l => l.label),
+      [e => e.orderNumber],
+      ['asc']
     )
 
     const labelColumns = []
-    if (mandatoryCourseLabels.reduce((acc, e) => acc + e.length, 0) > 0) {
+    if (sortedlabels.filter(e => e.label !== '').length > 0) {
       labelColumns.push(
         {
           key: 'general',
@@ -299,13 +303,13 @@ class PopulationStudents extends Component {
           parent: true,
           headerProps: { colSpan: nameColumns.length, style: { textAlign: 'right' } }
         },
-        ...mandatoryCourseLabels.map(e => ({
-          key: e,
+        ...sortedlabels.map(e => ({
+          key: e.id,
           title: (
-            <div style={{ overflowX: 'hidden' }}><div style={{ width: 0 }}>{e}</div></div>
+            <div style={{ overflowX: 'hidden' }}><div style={{ width: 0 }}>{e.label}</div></div>
           ),
           parent: true,
-          headerProps: { colSpan: labelToMandatoryCourses[e].length, width: labelToMandatoryCourses[e].length, title: e }
+          headerProps: { colSpan: labelToMandatoryCourses[e.label].length, title: e.label }
         }))
       )
     }
@@ -313,8 +317,8 @@ class PopulationStudents extends Component {
     const mandatoryCourseColumns = [
       ...nameColumns,
       ...labelColumns,
-      ..._.flatten(mandatoryCourseLabels.map(e => _.sortBy(
-        labelToMandatoryCourses[e],
+      ..._.flatten(sortedlabels.map(e => _.sortBy(
+        labelToMandatoryCourses[e.label],
         [(m) => {
           const res = m.code.match(/\d+/)
           return res ? Number(res[0]) : Number.MAX_VALUE

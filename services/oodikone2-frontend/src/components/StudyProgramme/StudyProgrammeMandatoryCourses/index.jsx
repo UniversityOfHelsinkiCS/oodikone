@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, string } from 'prop-types'
-import { Message } from 'semantic-ui-react'
+import { Message, Tab } from 'semantic-ui-react'
 import {
   getMandatoryCourses,
   addMandatoryCourse,
@@ -10,6 +10,7 @@ import {
 } from '../../../redux/populationMandatoryCourses'
 import MandatoryCourseTable from '../MandatoryCourseTable'
 import AddMandatoryCourses from '../AddMandatoryCourses'
+import MandatoryCourseLabels from '../MandatoryCourseLabels'
 
 class StudyProgrammeMandatoryCourses extends Component {
   static propTypes = {
@@ -24,7 +25,9 @@ class StudyProgrammeMandatoryCourses extends Component {
 
   componentDidMount() {
     const { studyProgramme } = this.props
-    if (studyProgramme) this.props.getMandatoryCourses(studyProgramme)
+    if (studyProgramme) {
+      this.props.getMandatoryCourses(studyProgramme)
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -38,6 +41,38 @@ class StudyProgrammeMandatoryCourses extends Component {
     const { studyProgramme, mandatoryCourses, language } = this.props
     if (!studyProgramme) return null
 
+    const panes = [
+      {
+        menuItem: 'Mandatory courses',
+        render: () => (
+          <Tab.Pane>
+            <AddMandatoryCourses
+              addMandatoryCourse={this.props.addMandatoryCourse}
+              studyProgramme={studyProgramme}
+            />
+            <MandatoryCourseTable
+              mandatoryCourses={mandatoryCourses.data}
+              studyProgramme={studyProgramme}
+              deleteMandatoryCourse={this.props.deleteMandatoryCourse}
+              setMandatoryCourseLabel={this.props.setMandatoryCourseLabel}
+              language={language}
+            />
+          </Tab.Pane>
+        )
+      },
+      {
+        menuItem: 'Group labels',
+        render: () => (
+          <Tab.Pane>
+            <MandatoryCourseLabels
+              studyProgramme={studyProgramme}
+              getMandatoryCourses={this.props.getMandatoryCourses}
+            />
+          </Tab.Pane>
+        )
+      }
+    ]
+
     return (
       <React.Fragment>
         <Message
@@ -45,17 +80,7 @@ class StudyProgrammeMandatoryCourses extends Component {
               in the 'Study programme' > 'Search by class' results page. The label is used to group the courses in different views.
               You can for example use labels '1. year', '2. year' to define groups of 1st year and second year mandatory courses."
         />
-        <AddMandatoryCourses
-          addMandatoryCourse={this.props.addMandatoryCourse}
-          studyProgramme={studyProgramme}
-        />
-        <MandatoryCourseTable
-          mandatoryCourses={mandatoryCourses.data}
-          studyProgramme={studyProgramme}
-          deleteMandatoryCourse={this.props.deleteMandatoryCourse}
-          setMandatoryCourseLabel={this.props.setMandatoryCourseLabel}
-          language={language}
-        />
+        <Tab panes={panes} />
       </React.Fragment >
     )
   }
