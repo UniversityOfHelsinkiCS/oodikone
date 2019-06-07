@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import moment from 'moment'
 import { Header, Loader, Table, Button, Grid, Icon } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, func } from 'prop-types'
@@ -7,9 +7,17 @@ import { withRouter } from 'react-router'
 import { flatten, uniq } from 'lodash'
 import { callApi } from '../../../apiConnection'
 import { getThroughput } from '../../../redux/throughput'
+import { userRoles } from '../../../common'
 
 const ThroughputTable = ({ history, throughput, thesis, loading, error, studyprogramme,
   dispatchGetThroughput }) => {
+  const [roles, setRoles] = useState(undefined)
+  const setFuckingRoles = async () => {
+    setRoles(await userRoles())
+  }
+  useEffect(() => {
+    setFuckingRoles()
+  }, [])
   const showPopulationStatistics = (yearLabel) => {
     const year = Number(yearLabel.slice(0, 4))
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
@@ -17,6 +25,10 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
       `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`)
   }
   if (error) return <h1>Oh no so error {error}</h1>
+  let GRADUATED_FEATURE_TOGGLED_ON = false
+  if (roles) {
+    GRADUATED_FEATURE_TOGGLED_ON = roles.includes('dev')
+  }
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
   const countries = data.length > 0 && throughput.totals.countries ? uniq(flatten(data.map(year => Object.keys(year.countries)))).sort() : []
@@ -67,7 +79,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 <Table.HeaderCell colSpan={genders.length + 1}>Students</Table.HeaderCell> :
                 <Table.HeaderCell rowSpan="2">Students</Table.HeaderCell>
             }
-            <Table.HeaderCell colSpan="3">Graduated</Table.HeaderCell>
+            <Table.HeaderCell colSpan={GRADUATED_FEATURE_TOGGLED_ON ? '3' : '1'}>Graduated</Table.HeaderCell>
 
             <Table.HeaderCell rowSpan="2">Transferred to this program</Table.HeaderCell>
             {
@@ -87,9 +99,12 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
             {renderGenders ? <Table.HeaderCell content="Total" /> : null}
             {genders.map(gender => <Table.HeaderCell key={gender} content={gender} />)}
             <Table.HeaderCell >Graduated overall</Table.HeaderCell>
-            <Table.HeaderCell >Graduated in time</Table.HeaderCell>
-            <Table.HeaderCell >Graduation median time</Table.HeaderCell>
-
+            {GRADUATED_FEATURE_TOGGLED_ON &&
+              <Fragment>
+                <Table.HeaderCell >Graduated in time</Table.HeaderCell>
+                <Table.HeaderCell >Graduation median time</Table.HeaderCell>
+              </Fragment>
+            }
             {renderCountries ? countries.map(country => <Table.HeaderCell key={country} content={country} />) : null}
             <Table.HeaderCell content="≥ 30" />
             <Table.HeaderCell content="≥ 60" />
@@ -122,8 +137,12 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                   </Table.Cell>
                 ))}
                 <Table.Cell>{year.graduated}</Table.Cell>
-                <Table.Cell>{year.inTargetTime}</Table.Cell>
-                <Table.Cell>{year.medianGraduationTime ? `${year.medianGraduationTime} months` : '∞'}</Table.Cell>
+                {GRADUATED_FEATURE_TOGGLED_ON &&
+                  <Fragment>
+                    <Table.Cell>{year.inTargetTime}</Table.Cell>
+                    <Table.Cell>{year.medianGraduationTime ? `${year.medianGraduationTime} months` : '∞'}</Table.Cell>
+                  </Fragment>
+                }
                 <Table.Cell>{year.transferred}</Table.Cell>
                 {renderCountries ? countries.map(country => (
                   <Table.Cell key={year.year + country}>
@@ -154,8 +173,12 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 </Table.HeaderCell>
               ))}
               <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
-              <Table.HeaderCell>{throughput.totals.inTargetTime}</Table.HeaderCell>
-              <Table.HeaderCell>{throughput.totals.medianGraduationTime ? `${throughput.totals.medianGraduationTime} months` : '∞'}</Table.HeaderCell>
+              {GRADUATED_FEATURE_TOGGLED_ON &&
+                <Fragment>
+                  <Table.HeaderCell>{throughput.totals.inTargetTime}</Table.HeaderCell>
+                  <Table.HeaderCell>{throughput.totals.medianGraduationTime ? `${throughput.totals.medianGraduationTime} months` : '∞'}</Table.HeaderCell>
+                </Fragment>
+              }
               <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
               {renderCountries ? Object.keys(throughput.totals.countries).map(countryKey => (
                 <Table.HeaderCell key={`${countryKey}total`}>

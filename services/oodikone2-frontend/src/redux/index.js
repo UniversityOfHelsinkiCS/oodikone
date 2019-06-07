@@ -43,6 +43,8 @@ import thesisCourses from './thesisCourses'
 import accessGroups from './accessGroups'
 import feedback from './feedback'
 import mandatoryCourseLabels from './mandatoryCourseLabels'
+import tags from './tags'
+import tagstudent from './tagstudent'
 
 export default combineReducers({
   locale,
@@ -88,5 +90,7 @@ export default combineReducers({
   oodilearnPopulationCourseSelect,
   thesisCourses,
   accessGroups,
-  feedback
+  feedback,
+  tags,
+  tagstudent
 })
