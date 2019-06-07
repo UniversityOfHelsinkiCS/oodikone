@@ -7,9 +7,17 @@ export const getStudentTags = () => {
 }
 
 export const createStudentTag = (tag) => {
-  const route = '/tags'
+  const route = '/studenttags'
   const prefix = 'CREATE_STUDENT_TAG_'
   const method = 'post'
+  const data = { tag }
+  return callController(route, prefix, data, method)
+}
+
+export const deleteStudentTag = (tag) => {
+  const route = '/studenttags'
+  const prefix = 'DELETE_STUDENT_TAG_'
+  const method = 'delete'
   const data = { tag }
   return callController(route, prefix, data, method)
 }
@@ -43,6 +51,21 @@ const reducer = (state = { data: [] }, action) => {
         pending: false
       }
     case 'CREATE_STUDENT_TAG_SUCCESS':
+      return {
+        ...state,
+        pending: false
+      }
+    case 'DELETE_STUDENT_TAG_ATTEMPT':
+      return {
+        ...state,
+        pending: true
+      }
+    case 'DELETE_STUDENT_TAG_FAILURE':
+      return {
+        ...state,
+        pending: false
+      }
+    case 'DELETE_STUDENT_TAG_SUCCESS':
       return {
         ...state,
         pending: false
