@@ -1,6 +1,6 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('tag_students', {
+    await queryInterface.createTable('tag_student', {
       createdAt: {
         type: Sequelize.DATE
       },

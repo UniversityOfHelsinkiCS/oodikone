@@ -44,6 +44,7 @@ import accessGroups from './accessGroups'
 import feedback from './feedback'
 import mandatoryCourseLabels from './mandatoryCourseLabels'
 import tags from './tags'
+import tagstudent from './tagstudent'
 
 export default combineReducers({
   locale,
@@ -90,5 +91,6 @@ export default combineReducers({
   thesisCourses,
   accessGroups,
   feedback,
-  tags
+  tags,
+  tagstudent
 })
