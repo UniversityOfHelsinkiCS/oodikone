@@ -14,8 +14,8 @@ router.get('/tags', async (req, res) => {
   }
 })
 
-router.post('/studytracktags', async (req, res) => {
-  const { tag } = req.params
+router.post('/tags', async (req, res) => {
+  const { tag } = req.body
   try {
     const result = await Tags.createNewTag(tag)
     res.status(200).json(result)
