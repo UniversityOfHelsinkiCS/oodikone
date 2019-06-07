@@ -392,7 +392,7 @@ const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, e
   })
 }
 
-const transferredFromStudyprogram = async (studentnumbers, startDate, studytrack, endDate) => {
+const endedStudyright = async (studentnumbers, startDate, studytrack, endDate) => {
   const enddate = new Date() < new Date(endDate) ? new Date() : new Date(endDate)
   return Studyright.findAndCountAll({
     include: {
@@ -422,6 +422,9 @@ const transferredFromStudyprogram = async (studentnumbers, startDate, studytrack
       },
       graduated: {
         [Op.eq]: 0
+      },
+      extentcode: {
+        [Op.eq]: 5
       }
     }
   })
@@ -460,7 +463,7 @@ const statsForClass = async (studentnumbers, startDate, studytrack, endDate) => 
     gendersFromClass(studentnumbers),
     countriesFromClass(studentnumbers),
     tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate),
-    transferredFromStudyprogram(studentnumbers, startDate, studytrack, endDate)
+    endedStudyright(studentnumbers, startDate, studytrack, endDate)
   ])
 }
 
@@ -513,7 +516,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     const creditsForStudyprogramme =
       await productivityCreditsFromStudyprogrammeStudents(studytrack, startDate, studentnumbers)
 
-    const [credits, graduated, theses, genders, countries, transferredTo, transferredFrom] =
+    const [credits, graduated, theses, genders, countries, transferredTo, endedStudyright] =
       await statsForClass(studentnumbers, startDate, studytrack, endDate)
     //console.log(year)
     //console.log(transferredFrom.rows.map(r => r.get({ plain: true })))
@@ -550,7 +553,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
     totals.students = totals.students + credits.length
     totals.graduated = totals.graduated + graduated.length,
-    totals.transferredFrom = totals.transferredFrom + transferredFrom.count,
+    totals.ended = totals.ended + endedStudyright.count,
     totals.medianGraduationTime = median(allGraduationTimes)
     totals.inTargetTime = totals.inTargetTime + inTargetTime
     totals.transferred = totals.transferred + transferredTo.count
@@ -567,7 +570,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       countries,
       creditValues,
       transferred: transferredTo.count,
-      transferredFrom: transferredFrom.count
+      ended: endedStudyright.count
     }
   }))
 
