@@ -14,6 +14,14 @@ export const createTag = (tag) => {
   return callController(route, prefix, data, method)
 }
 
+export const deleteTag = (tag) => {
+  const route = '/tags'
+  const prefix = 'DELETE_TAG_'
+  const method = 'delete'
+  const data = { tag }
+  return callController(route, prefix, data, method)
+}
+
 const reducer = (state = { data: [] }, action) => {
   switch (action.type) {
     case 'GET_TAGS_ATTEMPT':
@@ -43,6 +51,21 @@ const reducer = (state = { data: [] }, action) => {
         pending: false
       }
     case 'CREATE_TAG_SUCCESS':
+      return {
+        ...state,
+        pending: false
+      }
+    case 'DELETE_TAG_ATTEMPT':
+      return {
+        ...state,
+        pending: true
+      }
+    case 'DELETE_TAG_FAILURE':
+      return {
+        ...state,
+        pending: false
+      }
+    case 'DELETE_TAG_SUCCESS':
       return {
         ...state,
         pending: false
