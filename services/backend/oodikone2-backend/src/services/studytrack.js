@@ -392,6 +392,41 @@ const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, e
   })
 }
 
+const transferredFromStudyprogram = async (studentnumbers, startDate, studytrack, endDate) => {
+  const enddate = new Date() < new Date(endDate) ? new Date() : new Date(endDate)
+  return Studyright.findAndCountAll({
+    include: {
+      include: {
+        model: ElementDetails,
+        where: {
+          type: {
+            [Op.eq]: 20
+          }
+        }
+      },
+      model: StudyrightElement,
+      required: true,
+      where: {
+        code: {
+          [Op.eq]: studytrack
+        },
+        enddate: {
+          [Op.gte]: new Date(startDate),
+          [Op.lt]: enddate
+        }
+      }
+    },
+    where: {
+      student_studentnumber: {
+        [Op.in]: studentnumbers
+      },
+      graduated: {
+        [Op.eq]: 0
+      }
+    }
+  })
+}
+
 const formatCreditsForProductivity = (credits) => {
   return credits.map(formatCredit).reduce(function (acc, curr) {
     var key = curr['year']
@@ -417,13 +452,16 @@ const transferredCreditsForProductivity = async (studytrack, since) => {
   return formattedCredits
 }
 
-const productivityStats = async (studentnumbers, startDate, studytrack, endDate) => {
-  return Promise.all([creditsAfter(studentnumbers, startDate),
-  graduationsFromClass(studentnumbers, studytrack),
-  thesesFromClass(studentnumbers, startDate, studytrack),
-  gendersFromClass(studentnumbers),
-  countriesFromClass(studentnumbers),
-  tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate)])
+const statsForClass = async (studentnumbers, startDate, studytrack, endDate) => {
+  return Promise.all([
+    creditsAfter(studentnumbers, startDate),
+    graduationsFromClass(studentnumbers, studytrack),
+    thesesFromClass(studentnumbers, startDate, studytrack),
+    gendersFromClass(studentnumbers),
+    countriesFromClass(studentnumbers),
+    tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate),
+    transferredFromStudyprogram(studentnumbers, startDate, studytrack, endDate)
+  ])
 }
 
 const getYears = (since) => {
@@ -472,10 +510,14 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     const startDate = `${year}-${semesterStart['FALL']}`
     const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
-    const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(studytrack, startDate, studentnumbers)
+    const creditsForStudyprogramme =
+      await productivityCreditsFromStudyprogrammeStudents(studytrack, startDate, studentnumbers)
 
-    const [credits, graduated, theses, genders, countries, transferred] =
-      await productivityStats(studentnumbers, startDate, studytrack, endDate)
+    const [credits, graduated, theses, genders, countries, transferredTo, transferredFrom] =
+      await statsForClass(studentnumbers, startDate, studytrack, endDate)
+    //console.log(year)
+    //console.log(transferredFrom.rows.map(r => r.get({ plain: true })))
+    // theres so much shit in the data that transefferFrom doesnt rly mean anything
     delete genders[null]
     delete countries[null]
     const creditValues = credits.reduce((acc, curr) => {
@@ -508,9 +550,10 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
     totals.students = totals.students + credits.length
     totals.graduated = totals.graduated + graduated.length,
-      totals.medianGraduationTime = median(allGraduationTimes)
+    totals.transferredFrom = totals.transferredFrom + transferredFrom.count,
+    totals.medianGraduationTime = median(allGraduationTimes)
     totals.inTargetTime = totals.inTargetTime + inTargetTime
-    totals.transferred = totals.transferred + transferred.count
+    totals.transferred = totals.transferred + transferredTo.count
     return {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
@@ -523,7 +566,8 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       genders,
       countries,
       creditValues,
-      transferred: transferred.count
+      transferred: transferredTo.count,
+      transferredFrom: transferredFrom.count
     }
   }))
 
