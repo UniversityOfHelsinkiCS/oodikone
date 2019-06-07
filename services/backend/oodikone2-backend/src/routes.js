@@ -16,10 +16,12 @@ const semesters = require('./routes/semesters')
 const oodilearn = require('./routes/oodilearn')
 const courseGroups = require('./routes/courseGroups')
 const mandatoryCourses = require('./routes/mandatorycourses')
+const mandatoryCourseLabels = require('./routes/mandatorycourselabels')
 const ping = require('./routes/ping')
 const oodi = require('./routes/oodi')
 const task = require('./routes/tasks')
 const feedback = require('./routes/feedback')
+const tags = require('./routes/tags')
 
 module.exports = (app, url) => {
   app.use(url, log)
@@ -36,11 +38,13 @@ module.exports = (app, url) => {
   app.use(url, semesters)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
   app.use(`${url}/users`, auth.roles(['users']), users)
-  app.use(`${url}/feedback`, auth.roles(['users']), feedback)
+  app.use(`${url}/feedback`, feedback)
   app.use(`${url}/usage`, auth.roles(['usage']), usage)
   app.use(`${url}/oodilearn`, auth.roles(['oodilearn']), oodilearn)
   app.use(`${url}/course-groups`, auth.roles(['coursegroups']), courseGroups)
   app.use(`${url}/mandatory_courses`, mandatoryCourses),
+  app.use(`${url}/mandatory-course-labels`, mandatoryCourseLabels),
   app.use(`${url}/oodi`, auth.roles(['dev']), oodi)
   app.use(url, auth.roles(['dev', 'admin']), task)
+  app.use(url, tags)
 }
