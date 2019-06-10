@@ -111,7 +111,7 @@ const UsageStatistic = sequelize.define('usage_statistics', {
 const TagStudent = sequelize.define('tag_student',
   {
     studentnumber: { type: Sequelize.STRING },
-    tag_id: { type: Sequelize.STRING },
+    tag_id: { type: Sequelize.BIGINT },
   },
   {
     tableName: 'tag_student',
@@ -127,7 +127,8 @@ const Tag = sequelize.define('tag',
     },
     tag_id: {
       primaryKey: true,
-      type: Sequelize.STRING
+      type: Sequelize.BIGINT,
+      autoIncrement: true
     },
     studytrack: {
       primaryKey: true,
