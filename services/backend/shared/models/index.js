@@ -108,7 +108,6 @@ const UsageStatistic = sequelize.define('usage_statistics', {
     schema: conf.DB_SCHEMA_KONE
   })
 
-//legacy?
 const TagStudent = sequelize.define('tag_student',
   {
     studentnumber: { type: Sequelize.STRING },
@@ -116,7 +115,6 @@ const TagStudent = sequelize.define('tag_student',
   },
   {
     tableName: 'tag_student',
-    timestamps: false,
     schema: conf.DB_SCHEMA_KONE
   }
 )
@@ -138,7 +136,6 @@ const Tag = sequelize.define('tag',
   },
   {
     tableName: 'tag',
-    timestamps: false,
     schema: conf.DB_SCHEMA_KONE
   }
 )
