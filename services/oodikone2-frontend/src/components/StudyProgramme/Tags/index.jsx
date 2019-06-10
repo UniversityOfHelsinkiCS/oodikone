@@ -42,7 +42,6 @@ const Tags = ({ createTag, deleteTag, getTags, tags }) => {
   }
   const handleChange = ({ target }) => {
     setTagname(target.value)
-    console.log(tags)
   }
 
   const rows = tags.map(tag => <div key={tag.tag_id}>tag: {tag.tagname}, studytrack: {tag.studytrack} {deleteButton(tag)}</div>)
@@ -52,7 +51,6 @@ const Tags = ({ createTag, deleteTag, getTags, tags }) => {
       <Input onChange={handleChange} value={tagname} />
       <Input onChange={handleStudytrackChange} value={studytrack} />
       <Button onClick={handleSubmit}>submit me</Button>
-      <Button onClick={handleDeleteTag}>delete shit</Button>
       {rows}
     </div>
   )
@@ -69,4 +67,4 @@ Tags.propTypes = {
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired
 }
 
-export default withRouter(connect(mapStateToProps, { getTags: getTagsAction, createTag: createTagAction, deleteTa: deleteTagAction })(Tags))
+export default withRouter(connect(mapStateToProps, { getTags: getTagsAction, createTag: createTagAction, deleteTag: deleteTagAction })(Tags))
