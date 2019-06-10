@@ -11,6 +11,7 @@ import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
 import { getRolesWithoutRefreshToken, getRightsWithoutRefreshToken, getTextIn } from '../../common'
+import Tags from './Tags'
 
 class StudyProgramme extends Component {
   static propTypes = {
@@ -63,6 +64,12 @@ class StudyProgramme extends Component {
       menuItem: 'Thesis Courses',
       render: () => <ThesisCourses studyprogramme={studyProgrammeId} />
     })
+    if (getRolesWithoutRefreshToken().includes('admin')) {
+      panes.push({
+        menuItem: 'Tags',
+        render: () => <Tags />
+      })
+    }
     return panes
   }
 

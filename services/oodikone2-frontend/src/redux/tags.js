@@ -1,12 +1,12 @@
 import { callController } from '../apiConnection'
 
-export const getTags = () => {
+export const getTagsAction = () => {
   const route = '/tags'
   const prefix = 'GET_TAGS_'
   return callController(route, prefix)
 }
 
-export const createTag = (tag) => {
+export const createTagAction = (tag) => {
   const route = '/tags'
   const prefix = 'CREATE_TAG_'
   const method = 'post'
@@ -14,7 +14,7 @@ export const createTag = (tag) => {
   return callController(route, prefix, data, method)
 }
 
-export const deleteTag = (tag) => {
+export const deleteTagAction = (tag) => {
   const route = '/tags'
   const prefix = 'DELETE_TAG_'
   const method = 'delete'
