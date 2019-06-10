@@ -6,9 +6,8 @@ import { arrayOf, string, shape, func } from 'prop-types'
 
 import { getTagsAction, createTagAction, deleteTagAction } from '../../../redux/tags'
 
-const Tags = ({ createTag, deleteTag, getTags, tags }) => {
+const Tags = ({ createTag, deleteTag, getTags, tags, studyprogramme }) => {
   const [tagname, setTagname] = useState('')
-  const [studytrack, setStudytrack] = useState('')
 
   useEffect(() => {
     getTags()
@@ -29,17 +28,13 @@ const Tags = ({ createTag, deleteTag, getTags, tags }) => {
     event.preventDefault()
     const newTag = {
       tagname,
-      studytrack
+      studytrack: studyprogramme
     }
     createTag(newTag)
     setTagname('')
-    setStudytrack('')
     getTags()
   }
 
-  const handleStudytrackChange = ({ target }) => {
-    setStudytrack(target.value)
-  }
   const handleChange = ({ target }) => {
     setTagname(target.value)
   }
@@ -49,7 +44,6 @@ const Tags = ({ createTag, deleteTag, getTags, tags }) => {
   return (
     <div>
       <Input onChange={handleChange} value={tagname} />
-      <Input onChange={handleStudytrackChange} value={studytrack} />
       <Button onClick={handleSubmit}>submit me</Button>
       {rows}
     </div>

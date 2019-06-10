@@ -67,7 +67,7 @@ class StudyProgramme extends Component {
     if (getRolesWithoutRefreshToken().includes('admin')) {
       panes.push({
         menuItem: 'Tags',
-        render: () => <Tags />
+        render: () => <Tags studyprogramme={studyProgrammeId} />
       })
     }
     return panes
