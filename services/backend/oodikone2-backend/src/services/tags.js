@@ -5,6 +5,16 @@ const Op = Sequelize.Op
 
 const findTags = () => Tag.findAll({})
 
+const findTagsByStudytrack = (studytrack) => {
+  return Tag.findAll({
+    where: {
+      studytrack: {
+        [Op.eq]: studytrack
+      }
+    }
+  })
+}
+
 const createNewTag = async (tag) => {
   return Tag.create(tag)
 }
@@ -22,5 +32,6 @@ const deleteTag = async (tag) => {
 module.exports = {
   createNewTag,
   findTags,
+  findTagsByStudytrack,
   deleteTag
 }

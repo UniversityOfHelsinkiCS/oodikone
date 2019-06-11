@@ -12,6 +12,17 @@ router.get('/tags', async (req, res) => {
   }
 })
 
+router.get('/tags/:studytrack', async (req, res) => {
+  const { studytrack } = req.params
+  try {
+    const tags = await Tags.findTagsByStudytrack(studytrack)
+    res.status(200).json(tags)
+  } catch (err) {
+    console.log(err)
+    res.status(400).json(err)
+  }
+})
+
 router.post('/tags', async (req, res) => {
   const { tag } = req.body
   try {
