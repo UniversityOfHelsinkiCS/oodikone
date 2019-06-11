@@ -135,14 +135,15 @@ SortableTable.propTypes = {
   data: arrayOf(shape({})).isRequired,
   defaultdescending: bool,
   defaultsortkey: string,
-  collapsingHeaders: bool.isRequired
+  collapsingHeaders: bool
 }
 
 SortableTable.defaultProps = {
   tableProps: undefined,
   getRowProps: undefined,
   defaultdescending: false,
-  defaultsortkey: null
+  defaultsortkey: null,
+  collapsingHeaders: false
 }
 
 export default SortableTable
