@@ -58,10 +58,19 @@ class SortableTable extends Component {
 
 
   render() {
+    const calculateSkippedColumns = () => {
+      const { columns } = this.props
+      const { collapsed } = this.state
+      if (collapsed) {
+        const collapsedKeys = collapsed.map(c => c.key)
+        return collapsedKeys.reduce((acc, curr) => [...acc, acc.length > 0 ? acc[acc.length - 1] + columns.find(c => c.key === curr).headerProps.colSpan : columns.find(c => c.key === curr).headerProps.colSpan + 3], [])
+      }
+      return []
+    }
     const { tableProps, getRowProps, columns, getRowKey, collapsingHeaders } = this.props
     const { selected, direction, collapsed } = this.state
 
-    const columnsWithCollapsedHeaders = collapsingHeaders ? [...columns.filter(c => (c.headerProps && (!collapsed.map(cell => cell.headerProps.title).includes(c.headerProps.title) && !c.collapsed))), ...this.state.collapsed] : columns
+    const columnsWithCollapsedHeaders = collapsingHeaders ? [...columns.filter(c => (c.headerProps && (!collapsed.map(cell => cell.headerProps.title).includes(c.headerProps.title) && !c.collapsed))), ...this.state.collapsed].sort((a, b) => a.key - b.key) : columns
 
     const sortDirection = name => (selected === name ? direction : null)
 
@@ -100,15 +109,17 @@ class SortableTable extends Component {
               key={getRowKey(row)}
               {...getRowProps && getRowProps(row)}
             >
-              {columns.filter(c => !c.parent && !collapsed.map(cell => cell.headerProps.title).includes(c.childOf)).map(c => (
+              {/* eslint-disable-next-line no-nested-ternary */}
+              {columns.filter(c => !c.parent).map((c, i) => (collapsed.map(cell => cell.headerProps.title).includes(c.childOf) ?
+                calculateSkippedColumns().includes(i + 1) ? <Table.Cell /> : null
+                :
                 <Table.Cell
                   key={c.key}
                   content={c.getRowContent ? c.getRowContent(row) : c.getRowVal(row)}
                   {...c.cellProps}
                   {...c.getCellProps && c.getCellProps(row)}
                 />
-              ))
-              }
+              ))}
             </Table.Row>
           ))}
         </Table.Body>
