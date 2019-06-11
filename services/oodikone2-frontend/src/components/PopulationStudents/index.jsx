@@ -287,7 +287,6 @@ class PopulationStudents extends Component {
       else mandatoryCourseLabels.push({ id: 'null', label: '' })
       return acc
     }, {})
-
     const sortedlabels = _.orderBy(
       _.uniqBy(mandatoryCourseLabels, l => l.label),
       [e => e.orderNumber],
@@ -331,7 +330,8 @@ class PopulationStudents extends Component {
         getRowContent: s => (
           hasPassedMandatory(s.studentNumber, m.code) ? (<Icon fitted name="check" color="green" />) : (null)
         ),
-        child: true
+        child: true,
+        childOf: e.label
       }))))
     ]
 
@@ -375,6 +375,7 @@ class PopulationStudents extends Component {
                     singleLine: true,
                     textAlign: 'center'
                   }}
+                  collapsingHeaders
                   columns={mandatoryCourseColumns}
                   data={this.props.selectedStudents.map(sn => students[sn])}
                 />
