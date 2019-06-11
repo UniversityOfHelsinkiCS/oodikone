@@ -7,7 +7,8 @@
     "test": "NODE_ENV=test jest --runInBand --verbose",
     "test_docker": "docker exec -t updater_writer /bin/bash -c 'npm test'",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "force_sync": "node -e 'require(\"./database/connection.js\").forceSyncDatabase()'"
   },
   "author": "",
   "license": "ISC",
