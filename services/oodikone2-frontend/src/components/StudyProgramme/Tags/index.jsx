@@ -58,7 +58,8 @@ Tags.propTypes = {
   getTags: func.isRequired,
   createTag: func.isRequired,
   deleteTag: func.isRequired,
-  tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired
+  tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
+  studyprogramme: string.isRequired
 }
 
 export default withRouter(connect(mapStateToProps, { getTags: getTagsAction, createTag: createTagAction, deleteTag: deleteTagAction })(Tags))
