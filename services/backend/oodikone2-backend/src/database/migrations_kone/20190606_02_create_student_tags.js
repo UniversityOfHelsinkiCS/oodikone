@@ -8,7 +8,7 @@ module.exports = {
         type: Sequelize.DATE
       },
       tag_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.BIGINT,
         primaryKey: true,
         reference: {
           model: 'tag',

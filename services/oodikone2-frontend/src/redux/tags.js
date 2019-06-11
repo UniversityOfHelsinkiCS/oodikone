@@ -1,12 +1,18 @@
 import { callController } from '../apiConnection'
 
-export const getTags = () => {
+export const getTagsAction = () => {
   const route = '/tags'
   const prefix = 'GET_TAGS_'
   return callController(route, prefix)
 }
 
-export const createTag = (tag) => {
+export const getTagsByStudytrackAction = (studytrack) => {
+  const route = `/tags/${studytrack}`
+  const prefix = 'GET_TAGS_BY_ST_'
+  return callController(route, prefix)
+}
+
+export const createTagAction = (tag) => {
   const route = '/tags'
   const prefix = 'CREATE_TAG_'
   const method = 'post'
@@ -14,7 +20,7 @@ export const createTag = (tag) => {
   return callController(route, prefix, data, method)
 }
 
-export const deleteTag = (tag) => {
+export const deleteTagAction = (tag) => {
   const route = '/tags'
   const prefix = 'DELETE_TAG_'
   const method = 'delete'
@@ -30,6 +36,23 @@ const reducer = (state = { data: [] }, action) => {
         pending: true
       }
     case 'GET_TAGS_SUCCESS':
+      return {
+        ...state,
+        pending: false,
+        data: action.response || {}
+      }
+    case 'GET_TAGS_BY_ST_ATTEMPT':
+      return {
+        ...state,
+        pending: true
+      }
+    case 'GET_TAGS_BY_ST_SUCCESS':
+      return {
+        ...state,
+        pending: false,
+        data: action.response || {}
+      }
+    case 'GET_TAGS_BY_ST_FAILURE':
       return {
         ...state,
         pending: false,

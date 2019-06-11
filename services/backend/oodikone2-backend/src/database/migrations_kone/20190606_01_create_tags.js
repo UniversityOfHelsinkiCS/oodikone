@@ -11,7 +11,8 @@ module.exports = {
         type: Sequelize.STRING,
       },
       tag_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.BIGINT,
+        autoIncrement: true,
         primaryKey: true
       },
       studytrack: {
