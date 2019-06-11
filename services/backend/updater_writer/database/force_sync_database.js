@@ -1,5 +1,5 @@
-const { seedAllMigrations } = require('../src/database/seed_migrations')
-const { forceSyncDatabase } = require('../src/database/connection')
+const { seedAllMigrations } = require('./seed_migrations')
+const { forceSyncDatabase } = require('./connection')
 
 const sync = async () => {
   try {
