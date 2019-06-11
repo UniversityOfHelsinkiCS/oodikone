@@ -8,7 +8,7 @@
     "test_docker": "docker exec -t updater_writer /bin/bash -c 'npm test'",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "force_sync": "node -e './database/force_sync_database.js'"
+    "force_sync": "node -e '/database/force_sync_database.js'"
   },
   "author": "",
   "license": "ISC",
