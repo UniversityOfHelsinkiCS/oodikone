@@ -4,18 +4,18 @@ import { connect } from 'react-redux'
 import { Button, Input } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
-import { getTagsAction, createTagAction, deleteTagAction } from '../../../redux/tags'
+import { getTagsByStudytrackAction, createTagAction, deleteTagAction } from '../../../redux/tags'
 
-const Tags = ({ createTag, deleteTag, getTags, tags, studyprogramme }) => {
+const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme }) => {
   const [tagname, setTagname] = useState('')
 
   useEffect(() => {
-    getTags()
+    getTagsByStudytrack(studyprogramme)
   }, [])
 
   const handleDeleteTag = (tag) => {
     deleteTag(tag)
-    getTags()
+    getTagsByStudytrack(studyprogramme)
   }
 
   const deleteButton = tag => (
@@ -32,11 +32,12 @@ const Tags = ({ createTag, deleteTag, getTags, tags, studyprogramme }) => {
     }
     createTag(newTag)
     setTagname('')
-    getTags()
+    getTagsByStudytrack(studyprogramme)
   }
 
   const handleChange = ({ target }) => {
     setTagname(target.value)
+    console.log(tags)
   }
 
   const rows = tags.map(tag => <div key={tag.tag_id}>tag: {tag.tagname}, studytrack: {tag.studytrack} {deleteButton(tag)}</div>)
@@ -55,11 +56,11 @@ const mapStateToProps = ({ tags }) => ({
 })
 
 Tags.propTypes = {
-  getTags: func.isRequired,
+  getTagsByStudytrack: func.isRequired,
   createTag: func.isRequired,
   deleteTag: func.isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studyprogramme: string.isRequired
 }
 
-export default withRouter(connect(mapStateToProps, { getTags: getTagsAction, createTag: createTagAction, deleteTag: deleteTagAction })(Tags))
+export default withRouter(connect(mapStateToProps, { createTag: createTagAction, deleteTag: deleteTagAction, getTagsByStudytrack: getTagsByStudytrackAction })(Tags))

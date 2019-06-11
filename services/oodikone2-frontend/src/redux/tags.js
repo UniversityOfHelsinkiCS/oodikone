@@ -6,6 +6,12 @@ export const getTagsAction = () => {
   return callController(route, prefix)
 }
 
+export const getTagsByStudytrackAction = (studytrack) => {
+  const route = `/tags/${studytrack}`
+  const prefix = 'GET_TAGS_BY_ST_'
+  return callController(route, prefix)
+}
+
 export const createTagAction = (tag) => {
   const route = '/tags'
   const prefix = 'CREATE_TAG_'
@@ -30,6 +36,23 @@ const reducer = (state = { data: [] }, action) => {
         pending: true
       }
     case 'GET_TAGS_SUCCESS':
+      return {
+        ...state,
+        pending: false,
+        data: action.response || {}
+      }
+    case 'GET_TAGS_BY_ST_ATTEMPT':
+      return {
+        ...state,
+        pending: true
+      }
+    case 'GET_TAGS_BY_ST_SUCCESS':
+      return {
+        ...state,
+        pending: false,
+        data: action.response || {}
+      }
+    case 'GET_TAGS_BY_ST_FAILURE':
       return {
         ...state,
         pending: false,
