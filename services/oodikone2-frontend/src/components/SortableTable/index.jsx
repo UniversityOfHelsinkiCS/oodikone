@@ -61,9 +61,16 @@ class SortableTable extends Component {
     const calculateSkippedColumns = () => {
       const { columns } = this.props
       const { collapsed } = this.state
+      const defaultColumnCount = 3
       if (collapsed) {
         const collapsedKeys = collapsed.map(c => c.key)
-        return collapsedKeys.reduce((acc, curr) => [...acc, acc.length > 0 ? acc[acc.length - 1] + columns.find(c => c.key === curr).headerProps.colSpan : columns.find(c => c.key === curr).headerProps.colSpan + 3], [])
+        return collapsedKeys.reduce((acc, curr) => {
+          const previousCols = columns.filter(c => c.key < curr)
+          const sumOfPreviousColSpans = previousCols.reduce((a, b) => a + b.headerProps.colSpan, 0)
+          return [
+            ...acc,
+            sumOfPreviousColSpans + columns.find(c => c.key === curr).headerProps.colSpan + defaultColumnCount]
+        }, [])
       }
       return []
     }
@@ -109,17 +116,24 @@ class SortableTable extends Component {
               key={getRowKey(row)}
               {...getRowProps && getRowProps(row)}
             >
-              {/* eslint-disable-next-line no-nested-ternary */}
-              {columns.filter(c => !c.parent).map((c, i) => (collapsed.map(cell => cell.headerProps.title).includes(c.childOf) ?
-                calculateSkippedColumns().includes(i + 1) ? <Table.Cell warning /> : null
-                :
-                <Table.Cell
-                  key={c.key}
-                  content={c.getRowContent ? c.getRowContent(row) : c.getRowVal(row)}
-                  {...c.cellProps}
-                  {...c.getCellProps && c.getCellProps(row)}
-                />
-              ))}
+              {columns.filter(c => !c.parent).map((c, i) => {
+                if (collapsed.map(cell => cell.headerProps.title).includes(c.childOf)) {
+                  const skippedColumns = calculateSkippedColumns()
+                  if (skippedColumns.includes(i + 1)) {
+                    return <Table.Cell warning />
+                  }
+                  return null
+                }
+                return (
+                  <Table.Cell
+                    key={c.key}
+                    content={c.getRowContent ? c.getRowContent(row) : c.getRowVal(row)}
+                    {...c.cellProps}
+                    {...c.getCellProps && c.getCellProps(row)}
+                  />
+                )
+              })
+              }
             </Table.Row>
           ))}
         </Table.Body>
