@@ -110,8 +110,17 @@ const UsageStatistic = sequelize.define('usage_statistics', {
 
 const TagStudent = sequelize.define('tag_student',
   {
-    studentnumber: { type: Sequelize.STRING },
-    tag_id: { type: Sequelize.BIGINT },
+    id: {
+      primaryKey: true,
+      type: Sequelize.BIGINT,
+      autoIncrement: true
+    },
+    studentnumber: {
+      type: Sequelize.STRING,
+    },
+    tag_id: {
+      type: Sequelize.BIGINT,
+    },
   },
   {
     tableName: 'tag_student',
@@ -652,6 +661,7 @@ TagStudent.hasMany(Student, { foreignKey: 'studentnumber', sourceKey: 'studentnu
 TagStudent.hasMany(Tag, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
 
 Tag.hasOne(ElementDetails, { foreignKey: 'code', sourceKey: 'studytrack' })
+//Student.hasMany(Tag, {foreignKey: 'tag_id', sourceKey:'tag_id'})
 
 Studyright.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyright, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
