@@ -10,8 +10,6 @@ module.exports = {
         model: 'tag',
         key: 'tag_id'
       },
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
     })
   },
   down: async () => {
