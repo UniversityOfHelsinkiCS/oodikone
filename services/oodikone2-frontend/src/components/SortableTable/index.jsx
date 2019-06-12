@@ -111,7 +111,7 @@ class SortableTable extends Component {
             >
               {/* eslint-disable-next-line no-nested-ternary */}
               {columns.filter(c => !c.parent).map((c, i) => (collapsed.map(cell => cell.headerProps.title).includes(c.childOf) ?
-                calculateSkippedColumns().includes(i + 1) ? <Table.Cell /> : null
+                calculateSkippedColumns().includes(i + 1) ? <Table.Cell warning /> : null
                 :
                 <Table.Cell
                   key={c.key}
