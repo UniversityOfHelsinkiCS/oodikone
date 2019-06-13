@@ -376,6 +376,7 @@ class PopulationStudents extends Component {
                     textAlign: 'center'
                   }}
                   collapsingHeaders
+                  showNames={this.props.showNames}
                   columns={mandatoryCourseColumns}
                   data={this.props.selectedStudents.map(sn => students[sn])}
                 />
