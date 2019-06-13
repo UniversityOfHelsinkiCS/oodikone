@@ -74,7 +74,7 @@ class SortableTable extends Component {
       }
       return []
     }
-    const { tableProps, getRowProps, columns, getRowKey, collapsingHeaders, showNames } = this.props
+    const { tableProps, getRowProps, columns, getRowKey, collapsingHeaders } = this.props
     const { selected, direction, collapsed } = this.state
     const columnsWithCollapsedHeaders = collapsingHeaders ? [...columns.filter(c => (c.headerProps && (!collapsed.map(cell => cell.headerProps.title).includes(c.headerProps.title) && !c.collapsed))), ...this.state.collapsed].sort((a, b) => a.key - b.key) : columns
 
