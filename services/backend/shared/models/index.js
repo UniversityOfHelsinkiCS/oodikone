@@ -127,7 +127,6 @@ const TagStudent = sequelize.define('tag_student',
     schema: conf.DB_SCHEMA_KONE
   }
 )
-TagStudent.removeAttribute('id')
 
 const Tag = sequelize.define('tag',
   {
