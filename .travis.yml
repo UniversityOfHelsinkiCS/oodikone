@@ -38,7 +38,7 @@ jobs:
       deploy: # deploy is always skipped for PR
         provider: script
         skip_cleanup: true
-        script: "docker-compose -f docker-compose.lateste2e.yml push && curl --fail -k -X POST -H \"Authorization: token ${TRAVIS_ACCESS_TOKEN}\" https://toska.cs.helsinki.fi/toskawatch/release/ && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"Staging auto deployment started!\\\"}\" ${SLACKBOT_URL}"
+        script: "docker-compose -f docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"Staging auto deployment started!\\\"}\" ${SLACKBOT_URL}"
         on:
           branch: master
     - # in parallel
