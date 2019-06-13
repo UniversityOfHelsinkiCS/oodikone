@@ -59,9 +59,9 @@ class SortableTable extends Component {
 
   render() {
     const calculateSkippedColumns = () => {
-      const { columns } = this.props
+      const { columns, showNames } = this.props
       const { collapsed } = this.state
-      const defaultColumnCount = 3
+      const defaultColumnCount = showNames ? 6 : 3
       if (collapsed) {
         const collapsedKeys = collapsed.map(c => c.key)
         return collapsedKeys.reduce((acc, curr) => {
@@ -76,7 +76,6 @@ class SortableTable extends Component {
     }
     const { tableProps, getRowProps, columns, getRowKey, collapsingHeaders } = this.props
     const { selected, direction, collapsed } = this.state
-
     const columnsWithCollapsedHeaders = collapsingHeaders ? [...columns.filter(c => (c.headerProps && (!collapsed.map(cell => cell.headerProps.title).includes(c.headerProps.title) && !c.collapsed))), ...this.state.collapsed].sort((a, b) => a.key - b.key) : columns
 
     const sortDirection = name => (selected === name ? direction : null)
@@ -160,7 +159,8 @@ SortableTable.propTypes = {
   data: arrayOf(shape({})).isRequired,
   defaultdescending: bool,
   defaultsortkey: string,
-  collapsingHeaders: bool
+  collapsingHeaders: bool,
+  showNames: bool
 }
 
 SortableTable.defaultProps = {
@@ -168,7 +168,8 @@ SortableTable.defaultProps = {
   getRowProps: undefined,
   defaultdescending: false,
   defaultsortkey: null,
-  collapsingHeaders: false
+  collapsingHeaders: false,
+  showNames: undefined
 }
 
 export default SortableTable
