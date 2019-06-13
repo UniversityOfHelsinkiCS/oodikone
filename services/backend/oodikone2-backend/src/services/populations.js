@@ -3,7 +3,8 @@ const moment = require('moment')
 const { orderBy } = require('lodash')
 const {
   Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails,
-  Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement
+  Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement,
+  Tag, TagStudent
 } = require('../models')
 const { getMainCodesMap, byName } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
@@ -24,8 +25,9 @@ const formatStudentForPopulationStatistics = ({
   firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount,
   matriculationexamination, credits, abbreviatedname, email, studyrights,
   semester_enrollments, transfers, updatedAt, createdAt, gender_code,
-  gender_fi, gender_sv, gender_en
+  gender_fi, gender_sv, gender_en, tag_students
 }, startDate, endDate) => {
+
   const toCourse = ({ grade, attainment_date, credits, course, credittypecode, isStudyModule }) => {
     course = course.get()
 
@@ -97,7 +99,7 @@ const formatStudentForPopulationStatistics = ({
     email,
     semesterenrollments,
     updatedAt: updatedAt || createdAt,
-    tags: [],
+    tags: tag_students || [],
     studyrightStart: startDate,
     starting: moment(started).isBetween(startDate, endDate, null, '[]')
   }
@@ -136,7 +138,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
 
   const creditsOfStudent = ['320001', 'MH30_001'].includes(studyright[0]) ?
     creditsOfStudentLaakis : creditsOfStudentOther
-
+  
   const students = await Student.findAll({
     attributes: ['firstnames', 'lastname', 'studentnumber',
       'dateofuniversityenrollment', 'creditcount', 'matriculationexamination',
@@ -210,7 +212,18 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             }
           }
         }
+      },
+      {
+        model: TagStudent,
+        attributes: ['id'],
+        include: [
+          {
+            model: Tag,
+            attributes: ['tag_id','tagname']
+          }
+        ],
       }
+
     ],
     where: {
       studentnumber: {
@@ -352,18 +365,18 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   }, {
-    students: [],
-    extents: {},
-    semesters: {},
-    transfers: {
-      targets: {},
-      sources: {}
-    },
-    studyrights: {
-      degrees: [],
-      programmes: []
-    }
-  })
+      students: [],
+      extents: {},
+      semesters: {},
+      transfers: {
+        targets: {},
+        sources: {}
+      },
+      studyrights: {
+        degrees: [],
+        programmes: []
+      }
+    })
 
   const transferredStudyright = (s) => {
     const studyright = s.studyrights.find(s => s.studyrightElements
