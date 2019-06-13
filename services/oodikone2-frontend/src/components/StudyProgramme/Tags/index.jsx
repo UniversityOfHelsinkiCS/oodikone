@@ -37,7 +37,6 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
 
   const handleChange = ({ target }) => {
     setTagname(target.value)
-    console.log(tags)
   }
 
   const rows = tags.map(tag => <div key={tag.tag_id}>tag: {tag.tagname}, studytrack: {tag.studytrack} {deleteButton(tag)}</div>)

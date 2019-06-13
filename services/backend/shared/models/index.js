@@ -127,7 +127,6 @@ const TagStudent = sequelize.define('tag_student',
     schema: conf.DB_SCHEMA_KONE
   }
 )
-TagStudent.removeAttribute('id')
 
 const Tag = sequelize.define('tag',
   {
@@ -657,11 +656,12 @@ MandatoryCourse.belongsTo(Course, { foreignKey: 'course_code' })
 MandatoryCourse.belongsTo(MandatoryCourseLabels, { foreignKey: 'label', sourceKey: 'id' })
 MandatoryCourseLabels.hasMany(MandatoryCourse, { foreignKey: 'label', sourceKey: 'id' })
 
-TagStudent.hasMany(Student, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-TagStudent.hasMany(Tag, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
+TagStudent.belongsTo(Tag, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
+TagStudent.belongsTo(Student, { foreignKey: 'studentnumber' })
+Student.hasMany(TagStudent, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
 Tag.hasOne(ElementDetails, { foreignKey: 'code', sourceKey: 'studytrack' })
-//Student.hasMany(Tag, {foreignKey: 'tag_id', sourceKey:'tag_id'})
+Tag.hasMany(TagStudent, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
 
 Studyright.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyright, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
