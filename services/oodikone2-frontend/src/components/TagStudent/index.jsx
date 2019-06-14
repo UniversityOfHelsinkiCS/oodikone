@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, Dropdown } from 'semantic-ui-react'
+import { Button, Dropdown, List } from 'semantic-ui-react'
 import { arrayOf, string, shape, func, number } from 'prop-types'
 
 import { createStudentTagAction, getStudentTagsByStudentnumberAction, deleteStudentTagAction } from '../../redux/tagstudent'
@@ -33,6 +33,7 @@ const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, student
 
   const deleteTag = (event, { value }) => {
     event.preventDefault()
+    console.log(event)
     const tag = {
       tag_id: value,
       studentnumber
@@ -68,12 +69,28 @@ const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, student
     setTagOptions(newTagOptions)
   }
 
-  const studentsTags = allTags.filter(tag => studentsTagIds.includes(tag.tag_id)).map(tag => <Button key={tag.tag_id} onClick={deleteTag} value={tag.tag_id}>{tag.tagname} delete</Button>)
+  const studentsTags = allTags
+    .filter(tag => studentsTagIds.includes(tag.tag_id))
+    .map(tag => (
+      <List.Item key={tag.tag_id} >
+        <List.Content>
+          <List.Header>
+            Tag name
+          </List.Header>
+          {tag.tagname} <Button name="delete" onClick={deleteTag} value={tag.tag_id}>delete</Button>
+        </List.Content>
+      </List.Item>))
 
   return (
     <div>
-      {studentnumber}
-      {studentsTags}
+      <List horizontal>
+        <List.Item >
+          <List.Content>
+            {studentnumber}
+          </List.Content>
+        </List.Item>)
+        {studentsTags}
+      </List>
       <Dropdown
         placeholder="Tag"
         search
@@ -82,7 +99,7 @@ const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, student
         onChange={handleChange}
         value={selectedValue}
       />
-      <Button onClick={handleSubmit}>slam dunk tag to student</Button>
+      <Button onClick={handleSubmit}>give tag to student</Button>
     </div>
   )
 }
