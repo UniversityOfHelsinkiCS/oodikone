@@ -337,7 +337,7 @@ class PopulationStudents extends Component {
       }))))
     ]
 
-    const tagRows = this.props.samples.map(s => <div key={s.studentNumber}><TagStudent tags={this.props.tags} studentnumber={s.studentNumber} studentstags={s.tags} /></div>)
+    const tagRows = this.props.selectedStudents.map(sn => students[sn]).map(s => <div key={s.studentNumber}><TagStudent tags={this.props.tags} studentnumber={s.studentNumber} studentstags={s.tags} /></div>)
     const panes = [
       {
         menuItem: 'General',
