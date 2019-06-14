@@ -1,12 +1,12 @@
 import { callController } from '../apiConnection'
 
-export const getStudentTags = () => {
+export const getStudentTagsAction = () => {
   const route = '/studenttags'
   const prefix = 'GET_STUDENT_TAGS_'
   return callController(route, prefix)
 }
 
-export const createStudentTag = (tag) => {
+export const createStudentTagAction = (tag) => {
   const route = '/studenttags'
   const prefix = 'CREATE_STUDENT_TAG_'
   const method = 'post'
@@ -14,7 +14,13 @@ export const createStudentTag = (tag) => {
   return callController(route, prefix, data, method)
 }
 
-export const deleteStudentTag = (tag) => {
+export const getStudentTagsByStudentnumberAction = (studentnumber) => {
+  const route = `/studenttags/${studentnumber}`
+  const prefix = 'GET_STUDENT_TAG_BY_SN_'
+  return callController(route, prefix)
+}
+
+export const deleteStudentTagAction = (tag) => {
   const route = '/studenttags'
   const prefix = 'DELETE_STUDENT_TAG_'
   const method = 'delete'
@@ -39,6 +45,22 @@ const reducer = (state = { data: [] }, action) => {
       return {
         ...state,
         pending: false
+      }
+    case 'GET_STUDENT_TAG_BY_SN_ATTEMPT':
+      return {
+        ...state,
+        pending: true
+      }
+    case 'GET_STUDENT_TAG_BY_SN_FAILURE':
+      return {
+        ...state,
+        pending: false
+      }
+    case 'GET_STUDENT_TAG_BY_SN_SUCCESS':
+      return {
+        ...state,
+        pending: false,
+        data: action.response || []
       }
     case 'CREATE_STUDENT_TAG_ATTEMPT':
       return {
