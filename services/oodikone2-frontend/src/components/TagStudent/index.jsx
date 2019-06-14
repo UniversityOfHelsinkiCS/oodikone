@@ -4,9 +4,9 @@ import { connect } from 'react-redux'
 import { Button, Dropdown, List } from 'semantic-ui-react'
 import { arrayOf, string, shape, func, number } from 'prop-types'
 
-import { createStudentTagAction, getStudentTagsByStudentnumberAction, deleteStudentTagAction } from '../../redux/tagstudent'
+import { createStudentTagAction, deleteStudentTagAction } from '../../redux/tagstudent'
 
-const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, studentstags, tags, getStudentTagsByStudentnumber }) => {
+const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, studentstags, tags }) => {
   const [tagId, setTagId] = useState('')
   const [selectedValue, setValue] = useState('')
   const [allTags, setTags] = useState([])
@@ -48,16 +48,15 @@ const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, student
     setTagOptions(newTagOptions)
   }
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault()
     const tag = {
-      tag_id: Number(tagId),
+      tag_id: tagId,
       studentnumber
     }
     createStudentTag(tag)
     setTagId('')
     setValue('')
-    getStudentTagsByStudentnumber(studentnumber)
     const newTagIds = studentsTagIds.concat(tag.tag_id.toString())
     setStudentsTagIds(newTagIds)
     const newTagOptions = allTags.filter(t => !newTagIds.includes(t.tag_id)).map(t => ({
@@ -105,7 +104,6 @@ const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, student
 
 TagStudent.propTypes = {
   createStudentTag: func.isRequired,
-  getStudentTagsByStudentnumber: func.isRequired,
   deleteStudentTag: func.isRequired,
   studentnumber: string.isRequired,
   studentstags: arrayOf(shape({ tag: { tagname: string, tag_id: string }, id: number })).isRequired,
@@ -114,6 +112,5 @@ TagStudent.propTypes = {
 
 export default withRouter(connect(null, {
   createStudentTag: createStudentTagAction,
-  getStudentTagsByStudentnumber: getStudentTagsByStudentnumberAction,
   deleteStudentTag: deleteStudentTagAction
 })(TagStudent))
