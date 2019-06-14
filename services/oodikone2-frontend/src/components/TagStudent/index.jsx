@@ -25,8 +25,6 @@ const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, student
     setTagOptions(initialTagOptions)
   }, [])
 
-
-
   const handleChange = (event, { value }) => {
     event.preventDefault()
     setValue(value)
