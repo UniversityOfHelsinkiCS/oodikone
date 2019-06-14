@@ -9,6 +9,7 @@ import { getStudentTotalCredits, copyToClipboard, userRoles, reformatDate, getTe
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
+import { getTagsByStudytrackAction } from '../../redux/tags'
 
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 import '../PopulationCourseStats/populationCourseStats.css'
@@ -16,6 +17,7 @@ import SortableTable from '../SortableTable'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import CheckStudentList from '../CheckStudentList'
+import TagStudent from '../TagStudent'
 
 const popupTimeoutLength = 1000
 
@@ -26,7 +28,7 @@ class PopulationStudents extends Component {
   async componentDidMount() {
     const roles = await userRoles()
     const admin = roles.includes('admin')
-
+    await this.props.getTagsByStudytrack(this.props.queryStudyrights[0])
     this.setState({ admin, containsStudyTracks: this.containsStudyTracks() })
   }
 
@@ -335,6 +337,7 @@ class PopulationStudents extends Component {
       }))))
     ]
 
+    const tagRows = this.props.samples.map(s => <div key={s.studentNumber}><TagStudent tags={this.props.tags} studentnumber={s.studentNumber} studentstags={s.tags} /></div>)
     const panes = [
       {
         menuItem: 'General',
@@ -388,6 +391,14 @@ class PopulationStudents extends Component {
             </div>
           </Tab.Pane>
         )
+      },
+      {
+        menuItem: 'Tags',
+        render: () => (
+          <Tab.Pane>
+            {tagRows}
+          </Tab.Pane>
+        )
       }
     ]
 
@@ -422,7 +433,6 @@ class PopulationStudents extends Component {
       XLSX.utils.book_append_sheet(workbook, worksheet)
       return workbook
     }
-
     return (
       <Fragment>
         <Grid columns="two">
@@ -434,7 +444,7 @@ class PopulationStudents extends Component {
             </Button>
           </Grid.Column>
         </Grid>
-        <Tab panes={panes} />
+        {this.state.admin ? (<Tab panes={panes} />) : (<Tab panes={panes.slice(0, 2)} />)}
       </Fragment>
     )
   }
@@ -478,10 +488,12 @@ PopulationStudents.propTypes = {
     }).isRequired,
     code: string.isRequired
   })).isRequired,
-  mandatoryPassed: shape({}).isRequired
+  mandatoryPassed: shape({}).isRequired,
+  tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
+  getTagsByStudytrack: func.isRequired
 }
 
-const mapStateToProps = ({ settings, populations, populationCourses, populationMandatoryCourses }) => {
+const mapStateToProps = ({ settings, populations, populationCourses, populationMandatoryCourses, tags }) => {
   const mandatoryCodes = populationMandatoryCourses.data.map(c => c.code)
 
   let mandatoryPassed = {}
@@ -501,11 +513,12 @@ const mapStateToProps = ({ settings, populations, populationCourses, populationM
     language: settings.language,
     queryStudyrights: Object.values(populations.query.studyRights),
     mandatoryCourses: populationMandatoryCourses.data,
-    mandatoryPassed
+    mandatoryPassed,
+    tags: tags.data
   }
 }
 
 export default connect(
   mapStateToProps,
-  { toggleStudentListVisibility }
+  { toggleStudentListVisibility, getTagsByStudytrack: getTagsByStudytrackAction }
 )(withRouter(PopulationStudents))
