@@ -33,7 +33,6 @@ const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, student
 
   const deleteTag = (event, { value }) => {
     event.preventDefault()
-    console.log(event)
     const tag = {
       tag_id: value,
       studentnumber
@@ -41,7 +40,7 @@ const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, student
     deleteStudentTag(tag)
     const newTagIds = studentsTagIds.filter(id => id !== value)
     setStudentsTagIds(newTagIds)
-    const newTagOptions = allTags.filter(t => !studentsTagIds.includes(t.tag_id)).map(t => ({
+    const newTagOptions = allTags.filter(t => !newTagIds.includes(t.tag_id)).map(t => ({
       key: t.tag_id,
       text: t.tagname,
       value: t.tag_id
