@@ -14,6 +14,13 @@ export const createStudentTagAction = (tag) => {
   return callController(route, prefix, data, method)
 }
 
+export const getStudentTagsByStudytrackAction = (studytrack) => {
+  const route = `/studenttags/${studytrack}`
+  const prefix = 'GET_STUDENT_TAGS_BY_ST_'
+  const data = { studytrack }
+  return callController(route, prefix, data)
+}
+
 export const getStudentTagsByStudentnumberAction = (studentnumber) => {
   const route = `/studenttags/${studentnumber}`
   const prefix = 'GET_STUDENT_TAG_BY_SN_'
@@ -28,7 +35,7 @@ export const deleteStudentTagAction = (tag) => {
   return callController(route, prefix, data, method)
 }
 
-const reducer = (state = { data: [] }, action) => {
+const reducer = (state = { data: [], success: false }, action) => {
   switch (action.type) {
     case 'GET_STUDENT_TAGS_ATTEMPT':
       return {
@@ -45,6 +52,25 @@ const reducer = (state = { data: [] }, action) => {
       return {
         ...state,
         pending: false
+      }
+    case 'GET_STUDENT_TAGS_BY_ST_ATTEMPT':
+      return {
+        ...state,
+        pending: true,
+        success: false
+      }
+    case 'GET_STUDENT_TAGS_BY_ST_FAILURE':
+      return {
+        ...state,
+        pending: false,
+        success: false
+      }
+    case 'GET_STUDENT_TAGS_BY_ST_SUCCESS':
+      return {
+        ...state,
+        pending: false,
+        data: action.response || [],
+        success: true
       }
     case 'GET_STUDENT_TAG_BY_SN_ATTEMPT':
       return {
