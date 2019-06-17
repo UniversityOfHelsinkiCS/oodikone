@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, Input } from 'semantic-ui-react'
+import { Button, Input, List } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
 import { getTagsByStudytrackAction, createTagAction, deleteTagAction } from '../../../redux/tags'
@@ -39,14 +39,21 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     setTagname(target.value)
   }
 
-  const rows = tags.map(tag => <div key={tag.tag_id}>tag: {tag.tagname}, studytrack: {tag.studytrack} {deleteButton(tag)}</div>)
+  const rows = tags.map(tag => (
+    <List.Item divided verticalAlign="middle" key={tag.tag_id}>
+      <List.Content>
+        <List.Header>Tag name</List.Header>
+        {tag.tagname} {deleteButton(tag)}
+      </List.Content>
+    </List.Item >
+  ))
 
   return (
-    <div>
+    <List>
       <Input onChange={handleChange} value={tagname} />
-      <Button onClick={handleSubmit}>submit me</Button>
+      <Button onClick={handleSubmit}>add new tag</Button>
       {rows}
-    </div>
+    </List>
   )
 }
 
