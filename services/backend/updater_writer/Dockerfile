@@ -3,6 +3,8 @@ FROM node:10.15-alpine
 COPY ./updater_writer /usr/src/app
 COPY ./shared/models /usr/src/app/models
 COPY ./shared/migrations /usr/src/app/database/migrations
+COPY ./shared/migrations_kone /usr/src/app/database/migrations_kone
+
 WORKDIR /usr/src/app
 RUN npm ci
 
