@@ -1,9 +1,23 @@
 const Sequelize = require('sequelize')
-const { TagStudent } = require('../models')
+const { TagStudent, Tag } = require('../models')
 
 const Op = Sequelize.Op
 
 const getStudentTags = () => TagStudent.findAll({})
+
+const getStudentTagsByStudytrack = (studytrack) => {
+  return TagStudent.findAll({
+    include: {
+      model: Tag,
+      attributes: ['tag_id', 'tagname'],
+      where: {
+        studytrack: {
+          [Op.eq]: studytrack
+        }
+      }
+    }
+  })
+}
 
 const getStudentTagsByStudentnumber = async (studentnumber) => {
   return TagStudent.findAll({
@@ -35,6 +49,7 @@ const deleteStudentTag = async (tag) => {
 module.exports = {
   getStudentTags,
   getStudentTagsByStudentnumber,
+  getStudentTagsByStudytrack,
   createStudentTag,
   deleteStudentTag
 }
