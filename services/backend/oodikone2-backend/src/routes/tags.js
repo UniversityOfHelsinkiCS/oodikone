@@ -56,6 +56,29 @@ router.get('/studenttags', async (req, res) => {
   }
 })
 
+router.get('/studenttags/:studytrack', async (req, res) => {
+  const { studytrack } = req.params
+  try {
+    const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
+    res.status(200).json(result)
+  } catch (err) {
+    console.log(err)
+    res.status(400).json(err)
+  }
+})
+
+router.get('/studenttags/:studentnumber', async (req, res) => {
+  const { studentnumber } = req.params
+  try {
+    const result = await TagStudent.getStudentTagsByStudentnumber(studentnumber)
+    console.log(result)
+    res.status(200).json(result)
+  } catch (err) {
+    console.log(err)
+    res.status(400).json(err)
+  }
+})
+
 router.post('/studenttags', async (req, res) => {
   const { tag } = req.body
   try {
