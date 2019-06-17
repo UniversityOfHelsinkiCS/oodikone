@@ -29,7 +29,7 @@ const scheduleActiveStudents = async () => {
 }
 const scheduleAllStudentsAndMeta = async () => {
 
-  const tasks = ['meta', ...(await Schedule.find({ type: 'student' }))]
+  const tasks = [{ task:'meta', type: 'other', active: 'false' }, ...(await Schedule.find({ type: 'student' }))]
   console.log(tasks.length, 'tasks to schedule')
   publish(tasks)
 }
