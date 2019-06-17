@@ -2,11 +2,24 @@ import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Button, Dropdown, List } from 'semantic-ui-react'
-import { arrayOf, string, shape, func, number } from 'prop-types'
+import { arrayOf, string, shape, func, bool } from 'prop-types'
 
-import { createStudentTagAction, deleteStudentTagAction } from '../../redux/tagstudent'
+import {
+  createStudentTagAction,
+  deleteStudentTagAction,
+  getStudentTagsByStudytrackAction
+} from '../../redux/tagstudent'
 
-const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, studentstags, tags }) => {
+const TagStudent = ({
+  createStudentTag,
+  deleteStudentTag,
+  getStudentTagsByStudytrack,
+  studentnumber,
+  studentstags,
+  tags,
+  studytrack,
+  success,
+  data }) => {
   const [tagId, setTagId] = useState('')
   const [selectedValue, setValue] = useState('')
   const [allTags, setTags] = useState([])
@@ -25,46 +38,46 @@ const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, student
     setTagOptions(initialTagOptions)
   }, [])
 
+  useEffect(() => {
+    if (success) {
+      const studentData = data.filter(row => row.studentnumber === studentnumber)
+      const newTagIds = studentData.map(t => t.tag_id)
+      const filteredData = allTags.filter(tag => !newTagIds.includes(tag.tag_id)).map(tag => ({
+        key: tag.tag_id,
+        text: tag.tagname,
+        value: tag.tag_id
+      }))
+      setStudentsTagIds(newTagIds)
+      setTagOptions(filteredData)
+    }
+  }, [success])
+
   const handleChange = (event, { value }) => {
     event.preventDefault()
     setValue(value)
     setTagId(value)
   }
 
-  const deleteTag = (event, { value }) => {
+  const deleteTag = async (event, { value }) => {
     event.preventDefault()
     const tag = {
       tag_id: value,
       studentnumber
     }
-    deleteStudentTag(tag)
-    const newTagIds = studentsTagIds.filter(id => id !== value)
-    setStudentsTagIds(newTagIds)
-    const newTagOptions = allTags.filter(t => !newTagIds.includes(t.tag_id)).map(t => ({
-      key: t.tag_id,
-      text: t.tagname,
-      value: t.tag_id
-    }))
-    setTagOptions(newTagOptions)
+    await deleteStudentTag(tag)
+    getStudentTagsByStudytrack(studytrack)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     const tag = {
       tag_id: tagId,
       studentnumber
     }
-    createStudentTag(tag)
+    await createStudentTag(tag)
     setTagId('')
     setValue('')
-    const newTagIds = studentsTagIds.concat(tag.tag_id.toString())
-    setStudentsTagIds(newTagIds)
-    const newTagOptions = allTags.filter(t => !newTagIds.includes(t.tag_id)).map(t => ({
-      key: t.tag_id,
-      text: t.tagname,
-      value: t.tag_id
-    }))
-    setTagOptions(newTagOptions)
+    getStudentTagsByStudytrack(studytrack)
   }
 
   const studentsTags = allTags
@@ -105,12 +118,22 @@ const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, student
 TagStudent.propTypes = {
   createStudentTag: func.isRequired,
   deleteStudentTag: func.isRequired,
+  getStudentTagsByStudytrack: func.isRequired,
   studentnumber: string.isRequired,
-  studentstags: arrayOf(shape({ tag: { tagname: string, tag_id: string }, id: number })).isRequired,
-  tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired
+  studentstags: arrayOf(shape({ tag: shape({ tagname: string, tag_id: string }), id: string })).isRequired,
+  tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
+  studytrack: string.isRequired,
+  success: bool.isRequired,
+  data: arrayOf(shape({ studentnumber: string, tag_id: string })).isRequired
 }
 
-export default withRouter(connect(null, {
+const mapStateToProps = ({ tagstudent }) => ({
+  success: tagstudent.success,
+  data: tagstudent.data
+})
+
+export default withRouter(connect(mapStateToProps, {
   createStudentTag: createStudentTagAction,
-  deleteStudentTag: deleteStudentTagAction
+  deleteStudentTag: deleteStudentTagAction,
+  getStudentTagsByStudytrack: getStudentTagsByStudytrackAction
 })(TagStudent))
