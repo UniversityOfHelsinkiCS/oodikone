@@ -36,7 +36,7 @@ const scheduleActiveStudents = async () => {
 }
 const scheduleAllStudentsAndMeta = async () => {
 
-  const tasks = [{ task:'meta', type: 'other', active: 'false' }, ...shuffleArray(await Schedule.find({ type: 'student' })))]
+  const tasks = [{ task:'meta', type: 'other', active: 'false' }, ...shuffleArray(await Schedule.find({ type: 'student' }))]
   console.log(tasks.length, 'tasks to schedule')
   publish(tasks)
 }
