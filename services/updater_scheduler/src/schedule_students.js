@@ -22,14 +22,21 @@ const publish  = async (tasks) => {
     await sleep(15 * rampup)
   }
 }
+const shuffleArray = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array
+}
 const scheduleActiveStudents = async () => {
-  const tasks = [...(await Schedule.find({ type: 'student', active: true }))]
+  const tasks = [...shuffleArray(await Schedule.find({ type: 'student', active: true }))]
   console.log(tasks.length, 'tasks to schedule')
   publish(tasks)
 }
 const scheduleAllStudentsAndMeta = async () => {
 
-  const tasks = [{ task:'meta', type: 'other', active: 'false' }, ...(await Schedule.find({ type: 'student' }))]
+  const tasks = [{ task:'meta', type: 'other', active: 'false' }, ...shuffleArray(await Schedule.find({ type: 'student' })))]
   console.log(tasks.length, 'tasks to schedule')
   publish(tasks)
 }
