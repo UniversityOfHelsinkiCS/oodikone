@@ -261,6 +261,8 @@ services:
       HOST: db
       USER: postgres
       DBNAME: tkt_oodi
+      DB_SCHEMA_KONE: kone_data
+
 
 
   scheduler_mongo:
