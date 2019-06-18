@@ -14,7 +14,8 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
   const [selectedTag, setSelectedTag] = useState()
 
   const createOptions = () => {
-    const merge = samples.map(s => s.tags.map(t => ({ tagname: t.tag.tagname, tag_id: t.tag.tag_id }))).flat(1)
+    const tags = samples.map(s => s.tags.map(t => ({ tagname: t.tag.tagname, tag_id: t.tag.tag_id })))
+    const merge = tags.reduce((a, b) => a.concat(b), [])
     const uniqueTags = _.uniqBy(merge, 'tag_id')
     const createdOptions = uniqueTags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id }))
     setOptions(createdOptions)
@@ -68,7 +69,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
   }
   return (
     <Segment>
-      Students that have a tag {filter.params.tagname}
+      Students that have a tag {filter.params.text}
       <span style={{ float: 'right' }}>
         <Icon name="remove" onClick={clearFilter} />
       </span>
