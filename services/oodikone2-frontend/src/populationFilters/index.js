@@ -255,17 +255,17 @@ export const gradeMeanFilter = (params) => {
 }
 
 export const tagFilter = (params) => {
-  const { tag } = params
+  const { text, value } = params.tag
   return ({
     id: uuidv4(),
     type: 'TagFilter',
     params: {
-      tagname: tag.text,
-      tag_id: tag.value
+      text,
+      value
     },
     filter: (student) => {
       const studentTagIds = student.tags.map(t => t.tag.tag_id)
-      return studentTagIds.includes(tag.value)
+      return studentTagIds.includes(value)
     }
   })
 }
@@ -284,6 +284,7 @@ const typeList = {
   CreditsAtLeast: creditsAtLeast,
   HasMatriculation: matriculationFilter,
   SexFilter: sexFilter,
+  GradeMeanFilter: gradeMeanFilter,
   CourseParticipation: courseParticipation,
   StartingThisSemester: startingThisSemester,
   ExtentGraduated: extentGraduated,
@@ -294,7 +295,8 @@ const typeList = {
   CanceledStudyright: canceledStudyright,
   Preset: presetFilter,
   TransferToStudyrightFilter: transferTo,
-  PriorityStudyright: priorityStudyright
+  PriorityStudyright: priorityStudyright,
+  TagFilter: tagFilter
 }
 export const getFilterFunction = (type, params, populationCourses) => {
   switch (type) {
