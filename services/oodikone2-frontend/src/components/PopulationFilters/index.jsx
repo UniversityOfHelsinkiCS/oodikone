@@ -17,6 +17,7 @@ import ExtentGraduated from './ExtentGraduated'
 import SimpleExtentGraduated from './SimpleExtentGraduated'
 import Preset from './Preset'
 import SexFilter from './SexFilter'
+import TagFilter from './TagFilter'
 import DisciplineTypes from './DisciplineTypes'
 import EnrollmentStatus from './EnrollmentStatus'
 import TransferFilter from './TransferFilter'
@@ -29,7 +30,7 @@ import {
   clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter
 } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
-import { getTextIn } from '../../common'
+import { getTextIn, userIsAdmin } from '../../common'
 
 
 const componentFor = {
@@ -48,7 +49,8 @@ const componentFor = {
   CanceledStudyright,
   PriorityStudyright,
   TransferToStudyrightFilter,
-  SimpleExtentGraduated
+  SimpleExtentGraduated,
+  TagFilter
 }
 
 const advancedFilters = { // Filters that are too hard to use for common folk
@@ -82,11 +84,14 @@ class PopulationFilters extends Component {
     presetDescription: '',
     presetFilters: [],
     advancedUser: false,
-    modalOpen: false
+    modalOpen: false,
+    isAdmin: false
   }
 
   async componentDidMount() {
     this.initialFilterLoading()
+    const admin = await userIsAdmin()
+    this.setState({ isAdmin: admin })
   }
 
   initialFilterLoading = async () => {
@@ -216,9 +221,17 @@ class PopulationFilters extends Component {
         </div>
         {unsetFilters.map(filterName => {//eslint-disable-line
           if (componentFor[filterName]) { // THIS IS KINDA HACKED SOLUTION PLS FIX
-            return React.createElement(componentFor[filterName], {
-              filter: { notSet: true }, key: filterName, samples: this.props.samples, transfers, extents, allStudyRights
-            })
+            // this is awful, shame on who ever wrote this, pls fix
+            if (this.state.isAdmin) {
+              return React.createElement(componentFor[filterName], {
+                filter: { notSet: true }, key: filterName, samples: this.props.samples, transfers, extents, allStudyRights
+              })
+            }
+            if (!this.state.isAdmin && filterName !== 'TagFilter') {
+              return React.createElement(componentFor[filterName], {
+                filter: { notSet: true }, key: filterName, samples: this.props.samples, transfers, extents, allStudyRights
+              })
+            }
           }
           else {
             return React.createElement(Preset, {
