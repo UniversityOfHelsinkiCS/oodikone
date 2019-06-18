@@ -254,6 +254,22 @@ export const gradeMeanFilter = (params) => {
   })
 }
 
+export const tagFilter = (params) => {
+  const { tag } = params
+  return ({
+    id: uuidv4(),
+    type: 'TagFilter',
+    params: {
+      tagname: tag.text,
+      tag_id: tag.value
+    },
+    filter: (student) => {
+      const studentTagIds = student.tags.map(t => t.tag.tag_id)
+      return studentTagIds.includes(tag.value)
+    }
+  })
+}
+
 export const presetFilter = preset => ({
   id: preset.id,
   type: 'Preset',
