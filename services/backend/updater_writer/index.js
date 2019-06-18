@@ -1,5 +1,6 @@
 const stan = require('node-nats-streaming').connect('updaterNATS', process.env.HOSTNAME, process.env.NATS_URI);
 const { updateStudent, updateMeta, updateAttainmentMeta } = require('./updater/database_updater')
+const { dumpDatabase } = require('./database/dump_database')
 const fs = require('fs')
 
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
@@ -13,6 +14,7 @@ stan.on('connect', function () {
 
   const sub = stan.subscribe('UpdateWrite', 'updater.workers', opts)
   const attSub = stan.subscribe('UpdateAttainmentDates', opts)
+  const dumpSub = stan.subscribe('DumpDatabase')
 
   sub.on('message', async (msg) => {
     const data = JSON.parse(msg.getData())
@@ -28,5 +30,14 @@ stan.on('connect', function () {
     await updateAttainmentMeta()
     msg.ack()
   })
-
+  dumpSub.on('message', async (_) => {
+    await dumpDatabase()
+    stan.publish('ScheduleAll', null, (err, guid) => {
+      if (err) {
+        console.log(err)
+      } else {
+        console.log('calling re-scheduling database')
+      }
+    })
+  })
 })
