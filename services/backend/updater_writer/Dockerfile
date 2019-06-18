@@ -1,5 +1,7 @@
 FROM node:10.15-alpine
 
+RUN apk add postgresql-client
+
 COPY ./updater_writer /usr/src/app
 COPY ./shared/models /usr/src/app/models
 COPY ./shared/migrations /usr/src/app/database/migrations
@@ -7,7 +9,6 @@ COPY ./shared/migrations_kone /usr/src/app/database/migrations_kone
 
 WORKDIR /usr/src/app
 RUN npm ci
-
 COPY ./updater_writer/package.json /usr/src/cache/package.json
 COPY ./updater_writer/package-lock.json /usr/src/cache/package-lock.json
 

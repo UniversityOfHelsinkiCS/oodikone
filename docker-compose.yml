@@ -247,6 +247,8 @@ services:
       - ./services/backend/updater_writer/:/usr/src/app
       - ./services/backend/shared/models:/usr/src/app/models
       - ./services/backend/shared/migrations:/usr/src/app/database/migrations
+      - ./services/backend/shared/migrations_kone:/usr/src/app/database/migrations_kone
+
     depends_on:
       - nats
       - db
@@ -256,6 +258,11 @@ services:
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       TEST_DB_SCHEMA: updater_test
+      HOST: db
+      USER: postgres
+      DBNAME: tkt_oodi
+      DB_SCHEMA_KONE: kone_data
+
 
 
   scheduler_mongo:
