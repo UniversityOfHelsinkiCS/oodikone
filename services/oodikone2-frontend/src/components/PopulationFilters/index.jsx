@@ -17,6 +17,7 @@ import ExtentGraduated from './ExtentGraduated'
 import SimpleExtentGraduated from './SimpleExtentGraduated'
 import Preset from './Preset'
 import SexFilter from './SexFilter'
+import TagFilter from './TagFilter'
 import DisciplineTypes from './DisciplineTypes'
 import EnrollmentStatus from './EnrollmentStatus'
 import TransferFilter from './TransferFilter'
@@ -48,8 +49,8 @@ const componentFor = {
   CanceledStudyright,
   PriorityStudyright,
   TransferToStudyrightFilter,
-  SimpleExtentGraduated
-  // TagFilter
+  SimpleExtentGraduated,
+  TagFilter
 }
 
 const advancedFilters = { // Filters that are too hard to use for common folk
