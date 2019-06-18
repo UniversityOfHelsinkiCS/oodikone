@@ -1,10 +1,11 @@
 const spawn = require('child_process').spawn
 const fs = require('fs')
 const { sync } = require('./force_sync_database')
+const { DB_SCHEMA } = require('../conf-backend')
 
 const dumpDatabase = async () => {
   const { USER, HOST, DBNAME } = process.env
-  const dumpOptions = ['-Fc', `-U${USER}`, `--host=${HOST}`, `${DBNAME}`]
+  const dumpOptions = ['-Fc', `-U${USER}`, `--host=${HOST}`, `-n${DB_SCHEMA}`, `${DBNAME}`]
   console.log(dumpOptions)
   const dumpProcess = spawn('pg_dump', dumpOptions, { stdio: ['ignore', 'pipe', 'inherit'] })
   dumpProcess.on('error', (err) => {
