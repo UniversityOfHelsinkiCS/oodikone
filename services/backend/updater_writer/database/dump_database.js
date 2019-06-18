@@ -4,8 +4,8 @@ const { sync } = require('./force_sync_database')
 const { DB_SCHEMA } = require('../conf-backend')
 
 const dumpDatabase = async () => {
-  const { USER, HOST, DBNAME } = process.env
-  const dumpOptions = ['-Fc', `-U${USER}`, `--host=${HOST}`, `-n${DB_SCHEMA}`, `${DBNAME}`]
+  const { DB_URL } = process.env
+  const dumpOptions = ['-Fc', `-n${DB_SCHEMA}`, `${DB_URL}`]
   console.log(dumpOptions)
   const dumpProcess = spawn('pg_dump', dumpOptions, { stdio: ['ignore', 'pipe', 'inherit'] })
   dumpProcess.on('error', (err) => {

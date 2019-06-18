@@ -258,9 +258,6 @@ services:
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       TEST_DB_SCHEMA: updater_test
-      HOST: db
-      USER: postgres
-      DBNAME: tkt_oodi
       DB_SCHEMA_KONE: kone_data
 
 
