@@ -254,6 +254,22 @@ export const gradeMeanFilter = (params) => {
   })
 }
 
+export const tagFilter = (params) => {
+  const { text, value } = params.tag
+  return ({
+    id: uuidv4(),
+    type: 'TagFilter',
+    params: {
+      text,
+      value
+    },
+    filter: (student) => {
+      const studentTagIds = student.tags.map(t => t.tag.tag_id)
+      return studentTagIds.includes(value)
+    }
+  })
+}
+
 export const presetFilter = preset => ({
   id: preset.id,
   type: 'Preset',
@@ -268,6 +284,7 @@ const typeList = {
   CreditsAtLeast: creditsAtLeast,
   HasMatriculation: matriculationFilter,
   SexFilter: sexFilter,
+  GradeMeanFilter: gradeMeanFilter,
   CourseParticipation: courseParticipation,
   StartingThisSemester: startingThisSemester,
   ExtentGraduated: extentGraduated,
@@ -278,7 +295,8 @@ const typeList = {
   CanceledStudyright: canceledStudyright,
   Preset: presetFilter,
   TransferToStudyrightFilter: transferTo,
-  PriorityStudyright: priorityStudyright
+  PriorityStudyright: priorityStudyright,
+  TagFilter: tagFilter
 }
 export const getFilterFunction = (type, params, populationCourses) => {
   switch (type) {
