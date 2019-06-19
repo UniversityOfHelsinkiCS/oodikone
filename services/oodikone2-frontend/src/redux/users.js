@@ -39,6 +39,13 @@ export const removeUserUnits = (uid, codes) => {
   return callController(route, prefix, data, 'delete')
 }
 
+export const setFaculties = (uid, faculties) => {
+  const route = `/users/${uid}/faculties`
+  const data = { faculties }
+  const prefix = 'SET_USER_FACULTIES_'
+  return callController(route, prefix, data, 'post')
+}
+
 export const sendEmail = (email) => {
   const route = '/users/email'
   const prefix = 'SEND_EMAIL_'
@@ -132,6 +139,23 @@ const reducer = (state = { data: [], enabledOnly: true }, action) => {
         ...state,
         accessgroupPending: false,
         accessgroupError: false,
+        data: state.data.filter(user => user.id !== action.response.id)
+          .concat(action.response)
+      }
+    case 'SET_USER_FACULTIES_ATTEMPT':
+      return {
+        ...state,
+        setfacultypending: true
+      }
+    case 'SET_USER_FACULTIES_FAILURE':
+      return {
+        ...state,
+        setfacultypending: false
+      }
+    case 'SET_USER_FACULTIES_SUCCESS':
+      return {
+        ...state,
+        setfacultypending: false,
         data: state.data.filter(user => user.id !== action.response.id)
           .concat(action.response)
       }
