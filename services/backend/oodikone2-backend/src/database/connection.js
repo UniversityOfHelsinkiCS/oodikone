@@ -16,7 +16,8 @@ const sequelizeKone = new Sequelize(conf.DB_URL, {
   logging: false,
   operatorsAliases: false
 })
-sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`) // See https://github.com/sequelize/sequelize/issues/10875
+sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
+// See https://github.com/sequelize/sequelize/issues/10875
 
 const runMigrations = async () => {
   try {
