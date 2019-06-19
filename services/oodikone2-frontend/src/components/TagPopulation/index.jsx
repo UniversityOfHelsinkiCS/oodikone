@@ -19,13 +19,13 @@ const TagPopulation = ({ createStudentTag, tags, studentnumbers, getStudentTagsB
     setOptions(createdOptions)
   }, [])
 
-  const handleChange = ({ value }) => {
+  const handleChange = (event, { value }) => {
+    event.preventDefault()
     setSelected(value)
   }
 
   const handleSubmit = (event) => {
     event.preventDefault()
-
     studentnumbers.forEach((studentnumber) => {
       const tag = {
         tag_id: selectedValue,
