@@ -27,11 +27,11 @@ export const getStudentTagsByStudentnumberAction = (studentnumber) => {
   return callController(route, prefix)
 }
 
-export const deleteStudentTagAction = (tag) => {
+export const deleteStudentTagAction = (id) => {
   const route = '/studenttags'
   const prefix = 'DELETE_STUDENT_TAG_'
   const method = 'delete'
-  const data = { tag }
+  const data = { id }
   return callController(route, prefix, data, method)
 }
 
