@@ -22,7 +22,7 @@ const findAllEnabled = async () => {
 
 const login = async (uid, full_name, hyGroups, affiliations, email) => {
   const response = await client.post('/login', {
-    uid, full_name, hyGroups, affiliations, email, 
+    uid, full_name, hyGroups, affiliations, email,
   })
   return response.data
 }
@@ -83,6 +83,11 @@ const removeElementDetails = async (uid, codes) => {
   return response.data.user
 }
 
+const setFaculties = async (uid, faculties) => {
+  const response = await client.post('/set_faculties', { uid, faculties })
+  return response.data.user
+}
+
 const getUnitsFromElementDetails = async username => {
   const url = `/user/elementdetails/${username}`
   const response = await client.get(url)
@@ -116,5 +121,6 @@ module.exports = {
   modifyAccess,
   getAccessGroups,
   getUnitsFromElementDetails,
-  getRolesFor
+  getRolesFor,
+  setFaculties
 }

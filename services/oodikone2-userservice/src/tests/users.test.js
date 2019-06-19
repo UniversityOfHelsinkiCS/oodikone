@@ -168,19 +168,23 @@ describe('user tests', async () => {
 
 describe('user access right tests', async () => {
     test('adding and getting access rights works', async () => {
-      const rights1 = await userService.getUserElementDetails('sasumaki')
+      const user1 = await userService.byUsername('sasumaki')
+      const rights1 = userService.getUserElementDetails(user1)
       expect(rights1.length).toBe(0)
 
       await userService.enableElementDetails(69, ['Element_MATH'])
-      const rights2 = await userService.getUserElementDetails('sasumaki')
+      const user2 = await userService.byUsername('sasumaki')
+      const rights2 = userService.getUserElementDetails(user2)
       expect(rights2[0].type).toBe(20)
     })
     test('removing and getting access rights works', async () => {
-      const rights1 = await userService.getUserElementDetails('freeman')
+      const user1 = await userService.byUsername('freeman')
+      const rights1 = userService.getUserElementDetails(user1)
       expect(rights1.length).toBe(1)
 
       await userService.removeElementDetails(665, ['ELEMENT_CS'])
-      const rights2 = await userService.getUserElementDetails('freeman')
+      const user2 = await userService.byUsername('freeman')
+      const rights2 = userService.getUserElementDetails(user2)
       console.log(rights2)
       expect(rights2.length).toBe(0)
     })

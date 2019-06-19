@@ -16,22 +16,12 @@ app.get('/ping', (req, res) => res.json({ message: 'pong '}))
 
 app.get('/findall', async (req, res) => {
   const users = await User.findAll()
-  const returnedUsers = users.map(u => {
-    const enabled = requiredGroup === null || u.hy_group.some(e => e.code === requiredGroup)
-    return {...u.get(), is_enabled: enabled, hy_group: null}
-  })
-  res.json(returnedUsers)
+  res.json(users.map(User.getUserData))
 })
 
 app.get('/findallenabled', async (req, res) => {
   const users = await User.findAll()
-  const returnedUsers = users.filter(u => (
-    requiredGroup === null || u.hy_group.some(e => e.code === requiredGroup)
-  )).map(u => {
-    const enabled = requiredGroup === null || u.hy_group.some(e => e.code === requiredGroup)
-    return {...u.get(), is_enabled: enabled, hy_group: null}
-  })
-  res.json(returnedUsers)
+  res.json(users.map(User.getUserData).filter(u => u.is_enabled))
 })
 
 app.get('/user/:uid', async (req, res) => {
@@ -40,12 +30,13 @@ app.get('/user/:uid', async (req, res) => {
 
   console.log(JSON.stringify(user))
 
-  res.json(user)
+  res.json(User.getUserData(user))
 })
 
 app.get('/user/elementdetails/:username', async (req, res) => {
   const username = req.params.username
-  const elementdetails = await User.getUserElementDetails(username)
+  const user = await byUsername(username)
+  const elementdetails = User.getUserElementDetails(user)
 
   console.log(JSON.stringify(elementdetails))
 
@@ -58,7 +49,7 @@ app.get('/user/id/:id', async (req, res) => {
 
   console.log(JSON.stringify(user))
 
-  res.json(user)
+  res.json(User.getUserData(user))
 })
 
 app.post('/user', async (req, res) => {
@@ -95,7 +86,7 @@ app.put('/user/:uid', async (req, res) => {
   }
   await User.updateUser(user, req.body)
   const returnedUser = await User.byUsername(uid)
-  res.json(returnedUser)
+  res.json(User.getUserData(returnedUser))
 })
 
 app.post('/modifyaccess', async (req, res) => {
@@ -103,7 +94,7 @@ app.post('/modifyaccess', async (req, res) => {
   try {
     await User.modifyRights(uid, accessgroups)
     const user = await User.byId(uid)
-    res.status(200).json(user)
+    res.status(200).json(User.getUserData(user))
   } catch (e) {
     res.status(400).json({ e })
   }
@@ -115,7 +106,7 @@ app.post('/add_rights', async (req, res) => {
   try {
     await User.enableElementDetails(uid, codes)
     const user = await User.byId(uid)
-    res.status(200).json({ user })
+    res.status(200).json({ user: User.getUserData(user) })
 
   } catch (e) {
     res.status(400).json({ e })
@@ -127,9 +118,22 @@ app.post('/remove_rights', async (req, res) => {
   try {
     await User.removeElementDetails(uid, codes)
     const user = await User.byId(uid)
-    res.status(200).json({ user })
+    res.status(200).json({ user: User.getUserData(user) })
 
   } catch (e) {
+    console.log(e)
+    res.status(400).json({ e })
+  }
+})
+app.post('/set_faculties', async (req, res) => {
+  const { uid, faculties } = req.body
+  try {
+    await User.setFaculties(uid, faculties)
+    const user = await User.byId(uid)
+    res.status(200).json({ user: User.getUserData(user) })
+
+  } catch (e) {
+    console.log(e)
     res.status(400).json({ e })
   }
 })

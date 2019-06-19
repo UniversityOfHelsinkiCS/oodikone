@@ -37,6 +37,49 @@ const AccessGroup = sequelize.define('access_group',
     }
   })
 
+const UserFaculties = sequelize.define('user_faculties',
+{
+  userId: {
+    primaryKey: true,
+    type: Sequelize.BIGINT,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
+  },
+  faculty_code: {
+    primaryKey: true,
+    type: Sequelize.STRING,
+  },
+  createdAt: {
+    type: Sequelize.DATE
+  },
+  updatedAt: {
+    type: Sequelize.DATE
+  }
+})
+const FacultyProgrammes = sequelize.define('faculty_programmes',
+{
+  faculty_code: {
+    primaryKey: true,
+    type: Sequelize.STRING,
+  },
+  programme_code: {
+    primaryKey: true,
+    type: Sequelize.STRING,
+    references: {
+      model: 'element_details',
+      key: 'code'
+    }
+  },
+  createdAt: {
+    type: Sequelize.DATE
+  },
+  updatedAt: {
+    type: Sequelize.DATE
+  }
+})
+
 
 const User = sequelize.define('users',
   {
@@ -109,7 +152,7 @@ const Migration = sequelize.define('migrations', {
   })
 
 
-User.belongsToMany(ElementDetails, { through: 'user_elementdetails', as: 'elementdetails' })
+User.belongsToMany(ElementDetails, { through: 'user_elementdetails', as: 'programme' })
 ElementDetails.belongsToMany(User, { through: 'user_elementdetails' })
 
 User.belongsToMany(AccessGroup, { through: 'user_accessgroup', as: 'accessgroup' })
@@ -121,11 +164,18 @@ HyGroup.belongsToMany(User, { through: 'user_hy_group' })
 User.belongsToMany(Affiliation, { through: 'user_affiliation', as: 'affiliation' })
 Affiliation.belongsToMany(User, { through: 'user_affiliation' })
 
+User.hasMany(UserFaculties, { as: 'faculty', foreignKey: 'userId' })
+UserFaculties.hasMany(FacultyProgrammes, { as: 'programme', foreignKey: 'faculty_code', sourceKey: 'faculty_code' })
+FacultyProgrammes.hasOne(ElementDetails, { foreignKey: 'code', sourceKey: 'programme_code' })
+
 module.exports = {
   User,
   ElementDetails,
   Migration,
   AccessGroup,
   HyGroup,
-  Affiliation
+  Affiliation,
+  UserFaculties,
+  FacultyProgrammes,
+  sequelize
 }
