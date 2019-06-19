@@ -91,9 +91,9 @@ router.post('/studenttags', async (req, res) => {
 })
 
 router.delete('/studenttags', async (req, res) => {
-  const { tag } = req.body
+  const { id } = req.body
   try {
-    const result = await TagStudent.deleteStudentTag(tag)
+    const result = await TagStudent.deleteStudentTag(id)
     res.status(200).json(result)
   } catch (err) {
     console.log(err)
