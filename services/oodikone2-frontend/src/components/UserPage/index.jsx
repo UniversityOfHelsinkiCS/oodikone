@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
-import { Button, Card, Divider, List, Icon, Popup } from 'semantic-ui-react'
+import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
 import { getTextIn, getRolesWithoutRefreshToken } from '../../common'
-import { removeUserUnits, getAccessGroups } from '../../redux/users'
+import { removeUserUnits, getAccessGroups, setFaculties } from '../../redux/users'
+import { getFaculties } from '../../redux/faculties'
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
 import { superLogin } from '../../apiConnection'
 import AccessRights from './AccessRights'
@@ -33,6 +34,7 @@ class UserPage extends Component {
       this.props.getDegreesAndProgrammesUnfiltered()
       await this.props.getAccessGroups()
     }
+    await this.props.getFaculties()
   }
 
   getDisabledUnits = (units, enabled) => {
@@ -85,20 +87,11 @@ class UserPage extends Component {
 
   renderUnitList = (elementdetails, user) => {
     const { language } = this.props
-
     const nameInLanguage = element => getTextIn(element.name, language)
-
-    const byCode = (a, b) => {
-      const codeA = a.type === 30 && a.associations ? `${a.associations[0]}${nameInLanguage(a)}` : a.code
-      const codeB = b.type === 30 && b.associations ? `${b.associations[0]}${nameInLanguage(b)}` : b.code
-      return codeA < codeB ? -1 : 1
-    }
-
     if (!elementdetails) return null
-
     return (
       <List divided>
-        {elementdetails.sort(byCode).map(element => (
+        {_.sortBy(elementdetails, 'code').map(element => (
           <List.Item key={element.code}>
             <List.Content floated="right">
               <Button
@@ -120,28 +113,7 @@ class UserPage extends Component {
   }
 
   render() {
-    const { user, associations } = this.props
-    // ugly trick to add associations to study tracks, should be moved to backend
-    if (associations.programmes) {
-      const programmes = user.elementdetails.filter(e => e.type === 20).map(e => e.code)
-      user.elementdetails = user.elementdetails.map((element) => {
-        const e = Object.assign(element)
-        if (associations && (element.type === 30)) {
-          const studyright = associations.studyTracks[element.code]
-          if (studyright && studyright.programmes) {
-            e.associations = _.intersection(
-              programmes,
-              Object.keys(studyright.programmes)
-            )
-          } else {
-            e.associations = programmes
-          }
-        } else {
-          e.associations = []
-        }
-        return e
-      })
-    }
+    const { user, language } = this.props
     return this.props.accessGroups ?
       <div>
         <Button icon="arrow circle left" content="Back" onClick={this.props.goBack} />
@@ -191,9 +163,19 @@ class UserPage extends Component {
                     color: 'darkred',
                     border: '1px'
                   }}
-                  >everything!
+                  >Admin access!
                   </p> : null}
-                {this.renderUnitList(user.elementdetails, user)}
+                {this.renderUnitList(user.programme, user)}
+                <Header content="Faculties" />
+                <Dropdown
+                  placeholder="Select faculties"
+                  fluid
+                  multiple
+                  search
+                  value={this.props.user.faculty.map(f => f.faculty_code)}
+                  options={_.sortBy(this.props.faculties.map(f => ({ key: f.code, text: getTextIn(f.name, language), description: f.code, value: f.code })), ['text'])}
+                  onChange={(__, { value: facultycodes }) => this.props.setFaculties(user.id, facultycodes)}
+                />
               </Card.Description>
             </Card.Content>
           </Card>
@@ -213,9 +195,23 @@ UserPage.propTypes = {
       code: string,
       name: shape({}),
       type: number
+    })),
+    programme: arrayOf(shape({
+      code: string,
+      name: shape({}),
+      type: number
+    })),
+    faculty: arrayOf(shape({
+      faculty_code: string,
+      programme: arrayOf(shape({
+        code: string,
+        name: shape({}),
+        type: number
+      }))
     }))
   }).isRequired,
   removeUserUnits: func.isRequired,
+  setFaculties: func.isRequired,
   language: string.isRequired,
   goBack: func.isRequired,
   getDegreesAndProgrammesUnfiltered: func.isRequired,
@@ -225,12 +221,15 @@ UserPage.propTypes = {
     push: func.isRequired
   }).isRequired,
   getAccessGroups: func.isRequired,
+  getFaculties: func.isRequired,
+  faculties: arrayOf(shape({ code: string, name: shape({}) })).isRequired,
   accessGroups: arrayOf(object).isRequired,
   isAdmin: bool.isRequired
 }
 const mapStateToProps = state => ({
   language: state.settings.language,
   units: state.units.data,
+  faculties: state.faculties.data,
   associations: state.populationDegreesAndProgrammesUnfiltered.data,
   pending: !!state.populationDegreesAndProgrammesUnfiltered.pending,
   accessGroups: state.users.accessGroupsData || [],
@@ -239,6 +238,8 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   removeUserUnits,
+  setFaculties,
   getDegreesAndProgrammesUnfiltered,
-  getAccessGroups
+  getAccessGroups,
+  getFaculties
 })(withRouter(UserPage))
