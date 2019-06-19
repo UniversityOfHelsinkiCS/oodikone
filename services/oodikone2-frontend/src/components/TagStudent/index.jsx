@@ -28,7 +28,7 @@ const TagStudent = ({
 
   useEffect(() => {
     setTags(tags)
-    const tagIds = studentstags.map(t => t.tag.tag_id)
+    const tagIds = studentstags.map(t => ({ id: t.id, tag_id: t.tag.tag_id }))
     setStudentsTagIds(tagIds)
     const initialTagOptions = tags.filter(tag => !tagIds.includes(tag.tag_id)).map(tag => ({
       key: tag.tag_id,
@@ -47,7 +47,7 @@ const TagStudent = ({
         text: tag.tagname,
         value: tag.tag_id
       }))
-      setStudentsTagIds(newTagIds)
+      setStudentsTagIds(studentData)
       setTagOptions(filteredData)
     }
   }, [success])
@@ -60,11 +60,8 @@ const TagStudent = ({
 
   const deleteTag = async (event, { value }) => {
     event.preventDefault()
-    const tag = {
-      tag_id: value,
-      studentnumber
-    }
-    await deleteStudentTag(tag)
+    const removableTag = studentsTagIds.reduce(tag => tag.tag_id === value)
+    await deleteStudentTag(removableTag.id)
     getStudentTagsByStudytrack(studytrack)
   }
 
@@ -79,9 +76,8 @@ const TagStudent = ({
     setValue('')
     getStudentTagsByStudytrack(studytrack)
   }
-
   const studentsTags = allTags
-    .filter(tag => studentsTagIds.includes(tag.tag_id))
+    .filter(tag => studentsTagIds.map(t => t.tag_id).includes(tag.tag_id))
     .map(tag => (
       <List.Item key={tag.tag_id} >
         <List.Content>
