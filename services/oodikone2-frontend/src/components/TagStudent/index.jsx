@@ -52,8 +52,7 @@ const TagStudent = ({
     }
   }, [success])
 
-  const handleChange = (event, { value }) => {
-    event.preventDefault()
+  const handleChange = ({ value }) => {
     setValue(value)
     setTagId(value)
   }

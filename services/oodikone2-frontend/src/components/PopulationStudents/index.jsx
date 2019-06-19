@@ -18,6 +18,7 @@ import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import CheckStudentList from '../CheckStudentList'
 import TagStudent from '../TagStudent'
+import TagPopulation from '../TagPopulation'
 
 const popupTimeoutLength = 1000
 
@@ -406,6 +407,11 @@ class PopulationStudents extends Component {
         menuItem: 'Tags',
         render: () => (
           <Tab.Pane>
+            <TagPopulation
+              tags={this.props.tags}
+              studentnumbers={this.props.selectedStudents}
+              studytrack={this.props.queryStudyrights[0]}
+            />
             {tagRows}
           </Tab.Pane>
         )
