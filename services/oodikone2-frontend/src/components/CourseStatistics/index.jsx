@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Header, Segment, Tab } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { bool } from 'prop-types'
+import { withRouter } from 'react-router'
+import { bool, shape } from 'prop-types'
 import './courseStatistics.css'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
@@ -44,7 +45,8 @@ class CourseStatistics extends Component {
           key: 'query',
           content: MENU.QUERY,
           icon: 'search',
-          position: 'right'
+          position: 'right',
+          onClick: () => this.props.history.push('/coursestatistics')
         },
         render: () => <SearchForm />
       }
@@ -88,7 +90,8 @@ class CourseStatistics extends Component {
 
 CourseStatistics.propTypes = {
   statsIsEmpty: bool.isRequired,
-  singleCourseStats: bool.isRequired
+  singleCourseStats: bool.isRequired,
+  history: shape({}).isRequired
 }
 
 const mapStateToProps = ({ courseStats }) => {
@@ -101,4 +104,4 @@ const mapStateToProps = ({ courseStats }) => {
   }
 }
 
-export default connect(mapStateToProps, { clearCourseStats })(CourseStatistics)
+export default withRouter(connect(mapStateToProps, { clearCourseStats })(CourseStatistics))

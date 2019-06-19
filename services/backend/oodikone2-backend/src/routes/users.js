@@ -63,4 +63,12 @@ router.delete('/:uid/elements', async (req, res) => {
   res.json(user)
 })
 
+router.post('/:uid/faculties', async (req, res) => {
+  const { uid } = req.params
+  const { faculties } = req.body
+  const user = await userService.setFaculties(uid, faculties)
+  if (user && user.username != req.decodedToken.userId) await blacklist.addUserToBlacklist(user.username)
+  res.json(user)
+})
+
 module.exports = router
