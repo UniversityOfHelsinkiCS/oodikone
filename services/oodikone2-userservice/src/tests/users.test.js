@@ -100,7 +100,7 @@ beforeAll(async () => {
   await admin_user.addHy_group(hygroup)
   const normal_user = await User.findOne({ where: { id: 665 }})
   const CS_ED = await ElementDetails.findOne({ where: { code: 'ELEMENT_CS' }})
-  await normal_user.addElementdetail(CS_ED)
+  await normal_user.addProgramme(CS_ED)
   await normal_user.addHy_group(hygroup)
 })
 afterAll(async () => {
