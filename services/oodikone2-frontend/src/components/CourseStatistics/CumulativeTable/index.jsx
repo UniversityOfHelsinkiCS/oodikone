@@ -19,7 +19,7 @@ const getHeader = (categoryName) => {
 }
 
 const CumulativeTable = ({ categoryName, data, onClickCourse }) => (
-  <Table>
+  <Table style={{ cursor: 'pointer' }} selectable>
     {getHeader(categoryName)}
     <Table.Body>
       { data.map(course =>
