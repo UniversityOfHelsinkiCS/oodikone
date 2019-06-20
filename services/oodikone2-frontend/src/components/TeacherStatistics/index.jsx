@@ -134,8 +134,8 @@ class TeacherStatistics extends Component {
             <Segment>
               <TeacherStatisticsTable
                 statistics={statistics}
-                onClickFn={e =>
-                  this.props.history.push(`/teachers/${e.target.innerText}`)
+                onClickFn={id =>
+                  this.props.history.push(`/teachers/${id}`)
                 }
               />
             </Segment>

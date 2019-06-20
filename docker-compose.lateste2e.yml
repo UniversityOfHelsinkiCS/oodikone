@@ -75,7 +75,7 @@ services:
       REDIS: redis
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
-      FRONT_URL: http://localhost:1337/staging
+      FRONT_URL: http://localhost:1337
       TOKEN_SECRET: IWannaBeTheVeryBest
       OODILEARN_URL: http://oodilearn:5000
       USERSERVICE_URL: http://userservice:4567
@@ -97,7 +97,7 @@ services:
     build:
       context: services/oodikone2-frontend
       args:
-        BASE_PATH: /staging/
+        BASE_PATH: /
     ports:
       - "5000:5000"
     environment:
@@ -105,20 +105,7 @@ services:
       BACKEND_ADDR: backend
       ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
     container_name: frontend
-  newfrontend:
-    image: toska/oodikone2-frontend:newstaging
-    build:
-      context: services/oodikone2-frontend
-      args:
-        BASE_PATH: /
-    ports:
-      - "5001:5001"
-    environment:
-      WAIT_HOSTS: user_db:5432
-      BACKEND_ADDR: backend
-      ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
-    container_name: newfrontend
-
+    
   userservice:
     image: toska/oodikone2-userservice:staging
     build:
