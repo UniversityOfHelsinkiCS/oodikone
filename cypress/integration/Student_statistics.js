@@ -59,7 +59,7 @@ describe('Student Statistics tests', () => {
     it('Can jump to course', () => {
         cy.get('.prompt').type('Oinonen')
         cy.contains('011143561').click()
-        cy.contains('Toinen kotimainen kieli (40061)').siblings().within(() => { cy.get('.arrow').click() })
+        cy.contains('Toinen kotimainen kieli (40061)').siblings().within(() => { cy.get('.level').click() })
         cy.url().should('include', '/coursestatistics')
         cy.contains('Toinen kotimainen kieli')
     })
