@@ -72,7 +72,7 @@ class TeacherStatisticsTable extends Component {
         </Table.Header>
         <Table.Body>
           {this.sortStatistics(statistics).map(({ id, name, credits, passrate, transferred }) => (
-            <Table.Row key={id} onClick={onClickFn} style={{ cursor: 'pointer' }} >
+            <Table.Row key={id} onClick={() => onClickFn(id)} style={{ cursor: 'pointer' }} >
               <Table.Cell content={name} textAlign="left" />
               <Table.Cell content={credits} width={2} />
               <Table.Cell content={transferred} width={2} />
