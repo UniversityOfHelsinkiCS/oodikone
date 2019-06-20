@@ -1,7 +1,8 @@
 const Sequelize = require('sequelize')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
-const { User, ElementDetails, AccessGroup, HyGroup, Affiliation } = require('../models')
+const { flatMap } = require('lodash')
+const { User, ElementDetails, AccessGroup, HyGroup, Affiliation, FacultyProgrammes, UserFaculties, sequelize } = require('../models')
 const ElementService = require('./studyelements')
 const AccessService = require('./accessgroups')
 const AffiliationService = require('./affiliations')
@@ -11,15 +12,14 @@ const Op = Sequelize.Op
 
 const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
 const generateToken = async (uid, mockedBy = null) => {
-  let user = await byUsername(uid)
-  const elementdetails = await getUserElementDetails(user.username)
-  const elements = elementdetails.map(element => element.code)
-  const enabled = requiredGroup === null || user.hy_group.some(e => e.code === requiredGroup)
+  const user = await byUsername(uid)
+  const userData = getUserData(user)
+  const elements = userData.elementdetails.map(element => element.code)
   const payload = {
     id: user.id,
     userId: uid, // username
     name: user.full_name,
-    enabled,
+    enabled: userData.is_enabled,
     language: user.language,
     mockedBy,
     rights: elements,
@@ -114,28 +114,57 @@ const superlogin = async (uid, asUser) => {
   }
   return undefined
 }
+
+const userIncludes = [
+  {
+      model: ElementDetails,
+      as: 'programme'
+  },
+  {
+      model: AccessGroup,
+      as: 'accessgroup',
+      attributes: ['id', 'group_code', 'group_info']
+  },
+  {
+      model: HyGroup,
+      as: 'hy_group'
+  },
+  {
+    model: UserFaculties,
+    as: 'faculty',
+    include: {
+      model: FacultyProgrammes,
+      as: 'programme',
+      include: {
+        model: ElementDetails,
+      }
+    }
+  },
+  {
+      model: Affiliation,
+      as: 'affiliation'
+  }
+]
+
+const getUserData = user => {
+  if (user == null) return null
+  const newuser = user.get()
+  newuser.elementdetails = getUserElementDetails(newuser)
+  newuser.is_enabled = requiredGroup === null || newuser.hy_group.some(e => e.code === requiredGroup)
+  newuser.hy_group = null
+  return newuser
+}
+
 const byUsername = async (username) => {
-  return User.findOne({
+  const user = await User.findOne({
     where: {
       username: {
         [Op.eq]: username
       }
     },
-    include: [{
-      model: ElementDetails,
-      as: 'elementdetails'
-    }, {
-      model: AccessGroup,
-      as: 'accessgroup',
-      attributes: ['id', 'group_code', 'group_info']
-    }, {
-      model: HyGroup,
-      as: 'hy_group'
-    },{
-      model: Affiliation,
-      as: 'affiliation'
-    }]
+    include: userIncludes
   })
+  return user
 }
 
 const createUser = async (username, fullname, email) => {
@@ -152,32 +181,26 @@ const updateUser = async (userObject, values) => {
 
 
 const byId = async (id) => {
-  return User.findOne({
+  const user = await User.findOne({
     where: {
       id: {
         [Op.eq]: id
       }
     },
-    include: [{
-      model: ElementDetails,
-      as: 'elementdetails'
-    }, {
-      model: AccessGroup,
-      as: 'accessgroup',
-      attributes: ['id', 'group_code', 'group_info']
-    }]
+    include: userIncludes
   })
+  return user
 }
 
 const getUnitsFromElementDetails = async username => {
   const user = await byUsername(username)
-  const elementDetails = await user.getElementdetails()
-  return elementDetails.map(element => UnitService.parseUnitFromElement(element))
+  const userData = getUserData(user)
+  return userData.elementdetails.map(element => UnitService.parseUnitFromElement(element))
 }
 
-const getUserElementDetails = async username => {
-  const user = await byUsername(username)
-  return await user.getElementdetails()
+const getUserElementDetails = user => {
+  const elementdetails = [...user.programme, ...flatMap(user.faculty, f => f.programme.map(p => p.element_detail))]
+  return elementdetails
 }
 const getUserAccessGroups = async username => {
   const user = await byUsername(username)
@@ -185,32 +208,31 @@ const getUserAccessGroups = async username => {
 }
 
 const findAll = async () => {
-  return User.findAll({
-    include: [{
-      model: ElementDetails,
-      as: 'elementdetails'
-    },
-    {
-      model: AccessGroup,
-      as: 'accessgroup'
-    },
-    {
-      model: HyGroup,
-      as: 'hy_group'
-    }]
+  const users = await User.findAll({
+    include: userIncludes,
   })
+  return users
 }
 
 const enableElementDetails = async (uid, codes) => {
   const user = await byId(uid)
   const elements = await ElementService.byCodes(codes)
-  await user.addElementdetails(elements)
+  await user.addProgramme(elements)
 }
 
 const removeElementDetails = async (uid, codes) => {
   const user = await byId(uid)
   const elements = await ElementService.byCodes(codes)
-  await user.removeElementdetails(elements)
+  await user.removeProgramme(elements)
+}
+
+const setFaculties = async (uid, faculties) => {
+  await sequelize.transaction(async transaction => {
+    await UserFaculties.destroy({ where: { userId: uid }, transaction })
+    for (const faculty of faculties) {
+      await UserFaculties.create({ userId: uid, faculty_code: faculty }, { transaction })
+    }
+  })
 }
 
 const modifyRights = async (uid, rights) => {
@@ -254,6 +276,7 @@ module.exports = {
   superlogin,
   modifyRights,
   getUserAccessGroups,
-  getRoles
-
+  getRoles,
+  getUserData,
+  setFaculties
 }
