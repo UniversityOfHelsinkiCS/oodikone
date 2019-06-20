@@ -4,12 +4,13 @@ import { Form } from 'semantic-ui-react'
 
 const YearFilter = ({ years, fromYear, toYear, handleChange, separate, onToggleCheckbox }) => (
   <Fragment>
-    <Form.Group widths="equal">
+    <Form.Group widths="equal" inline>
       <Form.Dropdown
         label="From:"
         name="fromYear"
         options={years}
         selection
+        inline
         placeholder="Select academic year"
         onChange={handleChange}
         value={fromYear}
@@ -18,6 +19,7 @@ const YearFilter = ({ years, fromYear, toYear, handleChange, separate, onToggleC
         label="To:"
         name="toYear"
         options={years}
+        inline
         selection
         placeholder="Select academic year"
         onChange={handleChange}

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Header, Segment, Tab } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-import { bool, shape } from 'prop-types'
+import { bool, shape, func } from 'prop-types'
 import './courseStatistics.css'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
@@ -27,10 +27,10 @@ class CourseStatistics extends Component {
     return finishedGet ? { ...INITIAL } : { pending: props.pending }
   }
 
-  state={ ...INITIAL }
+  state = { ...INITIAL }
 
   getPanes = () => {
-    const { singleCourseStats } = this.props
+    const { singleCourseStats, clearCourseStats: clearaust, history } = this.props
     const panes = [
       {
         menuItem: MENU.SUM,
@@ -46,7 +46,10 @@ class CourseStatistics extends Component {
           content: MENU.QUERY,
           icon: 'search',
           position: 'right',
-          onClick: () => this.props.history.push('/coursestatistics')
+          onClick: () => {
+            history.push('/coursestatistics')
+            clearaust()
+          }
         },
         render: () => <SearchForm />
       }
@@ -74,7 +77,7 @@ class CourseStatistics extends Component {
           Course Statistics
         </Header>
         <Segment className="contentSegment" >
-          { statsIsEmpty ? <SearchForm /> : (
+          {statsIsEmpty ? <SearchForm /> : (
             <Tab
               menu={{ attached: false, borderless: false }}
               panes={panes}
@@ -91,7 +94,8 @@ class CourseStatistics extends Component {
 CourseStatistics.propTypes = {
   statsIsEmpty: bool.isRequired,
   singleCourseStats: bool.isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  clearCourseStats: func.isRequired
 }
 
 const mapStateToProps = ({ courseStats }) => {
