@@ -81,7 +81,7 @@ class StudentDetails extends Component {
         `${isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)} (${course.code})`,
         <div>{icon}{grade}</div>,
         credits,
-        <Icon style={{ cursor: 'pointer' }} name="arrow up" onClick={() => this.pushQueryToUrl({ courseCodes: [course.code], separate: false, fromYear: year - 1, toYear: year + 1 })} />
+        <Icon style={{ cursor: 'pointer' }} name="level up" onClick={() => this.pushQueryToUrl({ courseCodes: [course.code], separate: false, fromYear: year - 1, toYear: year + 1 })} />
       ]
     })
     return (
