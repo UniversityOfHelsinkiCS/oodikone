@@ -30,9 +30,9 @@ jobs:
         - docker ps
         - cat nginx/log
         - docker-compose logs -f &
-        - until $(curl --output /dev/null --silent --fail http://localhost:1337/staging/); do printf '.'; sleep 5; done
+        - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
         - time npm run test_services
-        - time CYPRESS_baseUrl=http://localhost:1337/staging/ npm run cypress:record
+        - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
         - docker ps -a
         - if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk '{ sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
       deploy: # deploy is always skipped for PR
