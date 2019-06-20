@@ -18,13 +18,10 @@ describe('Course Statistics tests', () => {
   })
 
   it('Searching single course having duplicate mappings shows course statistics', () => {
-    cy.contains("Fetch statistics").should('be.disabled')
     cy.url().should('include', '/coursestatistics')
     cy.contains("Search for courses")
     cy.get("input[placeholder='Search by entering a course code']").type('TKT20003')
-    cy.contains("tr", "TKT20003").within(($row) => {
-      cy.get('button').click()
-    })
+    cy.contains("tr", "TKT20003").click()
     cy.contains("Fetch statistics").should('be.enabled').click()
     cy.contains("Search for courses").should('not.exist')
 
@@ -51,16 +48,11 @@ describe('Course Statistics tests', () => {
   })
 
   it('Searching multiple courses having duplicate mappings shows course statistics', () => {
-    cy.contains("Fetch statistics").should('be.disabled')
     cy.url().should('include', '/coursestatistics')
     cy.contains("Search for courses")
     cy.get("input[placeholder='Search by entering a course code']").type('TKT')
-    cy.contains("tr", "TKT20003").within(($row) => {
-      cy.get('button').click()
-    })
-    cy.contains("tr", "TKT10002").within(($row) => {
-      cy.get('button').click()
-    })
+    cy.contains("tr", "TKT20003").click()
+    cy.contains("tr", "TKT10002").click()
     cy.contains("Fetch statistics").should('be.enabled').click()
     cy.contains("Search for courses").should('not.exist')
 
