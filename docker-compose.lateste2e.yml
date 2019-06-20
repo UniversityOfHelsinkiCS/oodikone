@@ -112,7 +112,7 @@ services:
       args:
         BASE_PATH: /
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
       WAIT_HOSTS: user_db:5432
       BACKEND_ADDR: backend
