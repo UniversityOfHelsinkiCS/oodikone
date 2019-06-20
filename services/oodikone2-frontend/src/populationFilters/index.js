@@ -245,7 +245,6 @@ export const gradeMeanFilter = (params) => {
     },
     filter: (student) => {
       const gradeMeanOfStudent = getStudentGradeMean(student)
-
       if (comparator === 'less') {
         return gradeMean > gradeMeanOfStudent
       }
