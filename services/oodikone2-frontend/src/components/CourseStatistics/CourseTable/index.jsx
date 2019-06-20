@@ -1,12 +1,12 @@
 import React from 'react'
 import _ from 'lodash'
-import { Segment, Table, Button } from 'semantic-ui-react'
+import { Segment, Table } from 'semantic-ui-react'
 import { func, arrayOf, shape, string, bool } from 'prop-types'
 import { getActiveYears } from '../courseStatisticsUtils'
 
 import './courseTable.css'
 
-const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, controlIcon, mandatory = false }) => {
+const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false }) => {
   const noContent = courses.length === 0
   const sortedCourses = !noContent && _.sortBy(courses, course => course.name)
 
@@ -17,33 +17,23 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, co
   )
 
   const toCourseRow = course => (
-    <Table.Row key={course.code}>
+    <Table.Row style={{ cursor: 'pointer' }} key={course.code} onClick={() => (course.min_attainment_date || mandatory ? onSelectCourse(course) : null)} >
       <Table.Cell width={10}>
         <div>{course.name}</div>
         <div>{getActiveYears(course)}</div>
       </Table.Cell>
       <Table.Cell content={course.code} />
-      <Table.Cell>
-        {course.min_attainment_date || mandatory ?
-          <Button
-            basic
-            className="controlIcon"
-            icon={controlIcon}
-            onClick={() => onSelectCourse(course)}
-          /> : null }
-      </Table.Cell>
     </Table.Row>
   )
 
   return (
     !hidden && (
       <Segment basic style={{ padding: '0' }} >
-        <Table>
+        <Table selectable>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell content={title} />
               <Table.HeaderCell content="Code" />
-              <Table.HeaderCell content="Select" />
             </Table.Row>
           </Table.Header>
           <Table.Body>

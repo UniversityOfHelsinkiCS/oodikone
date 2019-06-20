@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { Segment, Header, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
@@ -34,7 +34,6 @@ class SearchForm extends Component {
   componentDidMount() {
     const { location } = this.props
     if (location.search) {
-      console.log(location.search)
       this.fetchStatisticsFromUrlParams()
     } else {
       this.props.getSemesters()
@@ -158,45 +157,9 @@ class SearchForm extends Component {
     return (
       <Segment loading={isLoading}>
         <Form>
-          <Header content="Search parameters" as="h3" />
-          <YearFilter
-            fromYear={fromYear}
-            toYear={toYear}
-            years={years}
-            separate={separate}
-            handleChange={this.handleChange}
-            onToggleCheckbox={this.onToggleCheckbox}
-          />
-          <CourseTable
-            title="Selected courses"
-            hidden={noSelectedCourses}
-            courses={selected}
-            onSelectCourse={this.onSelectCourse}
-            controlIcon="remove"
-          />
-          <Form.Button
-            type="button"
-            disabled={disabled}
-            fluid
-            basic
-            positive
-            content="Fetch statistics"
-            onClick={this.onSubmitFormClick}
-          />
           <Header content="Search for courses" />
           <div style={{ marginBottom: '15px' }}>
             <Form.Group widths="equal">
-              <Form.Field>
-                <label>Code:</label>
-                <AutoSubmitSearchInput
-                  doSearch={this.fetchCourses}
-                  placeholder="Search by entering a course code"
-                  value={coursecode}
-                  onChange={cc => this.setState({ coursecode: cc })}
-                  loading={this.props.coursesLoading}
-                  minSearchLength={0}
-                />
-              </Form.Field>
               <Form.Field>
                 <label>Name:</label>
                 <AutoSubmitSearchInput
@@ -208,7 +171,48 @@ class SearchForm extends Component {
                   minSearchLength={0}
                 />
               </Form.Field>
+              <Form.Field>
+                <label>Code:</label>
+                <AutoSubmitSearchInput
+                  doSearch={this.fetchCourses}
+                  placeholder="Search by entering a course code"
+                  value={coursecode}
+                  onChange={cc => this.setState({ coursecode: cc })}
+                  loading={this.props.coursesLoading}
+                  minSearchLength={0}
+                />
+              </Form.Field>
             </Form.Group>
+            <CourseTable
+              title="Selected courses"
+              hidden={noSelectedCourses}
+              courses={selected}
+              onSelectCourse={this.onSelectCourse}
+              controlIcon="remove"
+            />
+            {!noSelectedCourses &&
+              <Fragment>
+                <YearFilter
+                  fromYear={fromYear}
+                  toYear={toYear}
+                  years={years}
+                  separate={separate}
+                  handleChange={this.handleChange}
+                  onToggleCheckbox={this.onToggleCheckbox}
+                />
+                <Form.Button
+                  type="button"
+                  disabled={disabled}
+                  fluid
+                  size="huge"
+                  primary
+                  basic
+                  positive
+                  content="Fetch statistics"
+                  onClick={this.onSubmitFormClick}
+                />
+              </Fragment>
+            }
             <CourseTable
               hidden={noQueryStrings || isLoading}
               courses={courses}
