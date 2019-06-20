@@ -33,14 +33,11 @@ const createStudentTag = async (tag) => {
   return TagStudent.create(tag)
 }
 
-const deleteStudentTag = async (tag) => {
+const deleteStudentTag = async (id) => {
   return TagStudent.destroy({
     where: {
-      tag_id: {
-        [Op.eq]: tag.tag_id
-      },
-      studentnumber: {
-        [Op.eq]: tag.studentnumber
+      id: {
+        [Op.eq]: id
       }
     }
   })

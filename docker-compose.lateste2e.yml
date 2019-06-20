@@ -105,6 +105,19 @@ services:
       BACKEND_ADDR: backend
       ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
     container_name: frontend
+  newfrontend:
+    image: toska/oodikone2-frontend:newstaging
+    build:
+      context: services/oodikone2-frontend
+      args:
+        BASE_PATH: /
+    ports:
+      - "5001:5001"
+    environment:
+      WAIT_HOSTS: user_db:5432
+      BACKEND_ADDR: backend
+      ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
+    container_name: newfrontend
 
   userservice:
     image: toska/oodikone2-userservice:staging

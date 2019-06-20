@@ -165,9 +165,8 @@ export const getStudentTotalCredits = student => student.courses
 
 export const getStudentGradeMean = (student) => {
   const gradedCourses = student.courses.filter(c => Number(c.grade))
-  const gradeTotal = gradedCourses.reduce((a, b) => a + b.grade, 0)
+  const gradeTotal = gradedCourses.reduce((a, b) => a + Number(b.grade), 0)
   const mean = gradeTotal / gradedCourses.length || 0
-
   return mean
 }
 
