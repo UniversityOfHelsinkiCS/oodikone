@@ -88,7 +88,7 @@ class TeacherLeaderBoard extends Component {
 
                 <TeacherStatisticsTable
                   statistics={statistics}
-                  onClickFn={e => this.props.history.push(`/teachers/${e.target.innerText}`)}
+                  onClickFn={id => this.props.history.push(`/teachers/${id}`)}
                 />
               </Segment>
             </div>
