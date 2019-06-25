@@ -24,7 +24,8 @@ class ResultTabs extends Component {
     const { viewMode } = this.state
 
     const paneMenuItems = [
-      { menuItem: { key: 'Table', icon: 'table', content: 'Table' },
+      {
+        menuItem: { key: 'Table', icon: 'table', content: 'Table' },
         renderFn: () =>
           (<Tables
             comparison={comparison}
@@ -32,7 +33,8 @@ class ResultTabs extends Component {
             viewMode={viewMode}
           />)
       },
-      { menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
+      {
+        menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
         renderFn: () =>
           (<PassRate
             comparison={comparison}
@@ -40,7 +42,8 @@ class ResultTabs extends Component {
             viewMode={viewMode}
           />)
       },
-      { menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
+      {
+        menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
         renderFn: () =>
           (<Distribution
             comparison={comparison}
@@ -59,9 +62,7 @@ class ResultTabs extends Component {
             <Grid.Row className="modeSelectorRow">
               {this.renderViewModeSelector()}
             </Grid.Row>
-            <Grid.Row>
-              {renderFn()}
-            </Grid.Row>
+            {renderFn()}
           </Grid>
         )
       }
