@@ -10,7 +10,7 @@ import {
 } from '../../redux/tagstudent'
 
 
-const TagPopulation = ({ createStudentTag, tags, checkedStudents, getStudentTagsByStudytrack, studytrack }) => {
+const TagPopulation = ({ falsifyChecks, createStudentTag, tags, checkedStudents, getStudentTagsByStudytrack, studytrack, created }) => {
   const [options, setOptions] = useState([])
   const [selectedValue, setSelected] = useState('')
 
@@ -19,6 +19,12 @@ const TagPopulation = ({ createStudentTag, tags, checkedStudents, getStudentTags
     setOptions(createdOptions)
   }, [])
 
+  useEffect(() => {
+    if (created) {
+      getStudentTagsByStudytrack(studytrack)
+    }
+  }, [created])
+
   const handleChange = (event, { value }) => {
     event.preventDefault()
     setSelected(value)
@@ -26,6 +32,7 @@ const TagPopulation = ({ createStudentTag, tags, checkedStudents, getStudentTags
 
   const handleSubmit = (event) => {
     event.preventDefault()
+    falsifyChecks()
     checkedStudents.forEach((student) => {
       if (student.checked) {
         const tag = {
@@ -36,7 +43,6 @@ const TagPopulation = ({ createStudentTag, tags, checkedStudents, getStudentTags
         setSelected('')
       }
     })
-    getStudentTagsByStudytrack(studytrack)
   }
 
   return (
@@ -59,8 +65,14 @@ TagPopulation.propTypes = {
   getStudentTagsByStudytrack: func.isRequired,
   checkedStudents: arrayOf(shape({ studentnumber: string, checked: bool })).isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
-  studytrack: string.isRequired
+  studytrack: string.isRequired,
+  created: bool.isRequired,
+  falsifyChecks: func.isRequired
 }
 
+const mapStateToProps = ({ tagstudent }) => ({
+  created: tagstudent.created
+})
 
-export default withRouter(connect(null, { createStudentTag: createStudentTagAction, getStudentTagsByStudytrack: getStudentTagsByStudytrackAction })(TagPopulation))
+
+export default withRouter(connect(mapStateToProps, { createStudentTag: createStudentTagAction, getStudentTagsByStudytrack: getStudentTagsByStudytrackAction })(TagPopulation))

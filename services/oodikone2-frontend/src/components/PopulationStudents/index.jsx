@@ -107,6 +107,19 @@ class PopulationStudents extends Component {
     this.setState({ checkedStudents: tempArr })
   }
 
+  falsifyChecks = () => {
+    const newCheckedStudents = []
+    this.props.selectedStudents.forEach((sn) => {
+      const check = {
+        studentnumber: sn,
+        checked: false
+      }
+      newCheckedStudents.push(check)
+    })
+    this.setState({ checkedStudents: newCheckedStudents })
+    this.setState({ checked: false })
+  }
+
   renderStudentTable() {
     if (!this.props.showList) {
       return null
@@ -456,6 +469,7 @@ class PopulationStudents extends Component {
               onChange={() => this.handleAllCheck()}
             />
             <TagPopulation
+              falsifyChecks={() => this.falsifyChecks()}
               tags={this.props.tags}
               checkedStudents={this.state.checkedStudents}
               studytrack={this.props.queryStudyrights[0]}
