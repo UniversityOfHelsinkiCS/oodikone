@@ -96,8 +96,14 @@ stan.on('connect', async () => {
   scheduleSub.on('message', async (_) => {
     scheduleAllStudentsAndMeta()
   })
+  const opts = stan.subscriptionOptions();
+  opts.setManualAckMode(true);
+  opts.setAckWait(30 * 60 * 1000); // 1min
+  opts.setDeliverAllAvailable()
+  opts.setDurableName('durable')
+  opts.setMaxInFlight(20)
 
-  const statusSub = stan.subscribe('status')
+  const statusSub = stan.subscribe('status', opts)
 
   statusSub.on('message', async (msg) => {
     const message = msg.getData().split(':')
@@ -134,6 +140,7 @@ stan.on('connect', async () => {
     const isStudent = !!isValidStudentId(task)
     logger.info(`Status changed for ${task} to ${status}`, { task: task, status: status, student: isStudent })
     await updateTask(task, status, isStudent ? 'student' : 'other')
+    msg.ack()
   })
 
 })
