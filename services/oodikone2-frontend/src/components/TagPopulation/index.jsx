@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, Dropdown } from 'semantic-ui-react'
+import { Button, Dropdown, Checkbox } from 'semantic-ui-react'
 import { arrayOf, string, shape, func, bool } from 'prop-types'
 
 import {
@@ -10,7 +10,16 @@ import {
 } from '../../redux/tagstudent'
 
 
-const TagPopulation = ({ falsifyChecks, createStudentTag, tags, checkedStudents, getStudentTagsByStudytrack, studytrack, created }) => {
+const TagPopulation = ({
+  allChecker,
+  handleAllCheck,
+  falsifyChecks,
+  createStudentTag,
+  tags,
+  checkedStudents,
+  getStudentTagsByStudytrack,
+  studytrack,
+  created }) => {
   const [options, setOptions] = useState([])
   const [selectedValue, setSelected] = useState('')
 
@@ -47,6 +56,10 @@ const TagPopulation = ({ falsifyChecks, createStudentTag, tags, checkedStudents,
 
   return (
     <div>
+      <Checkbox
+        checked={allChecker}
+        onChange={handleAllCheck}
+      />
       <Dropdown
         placeholder="Tag"
         search
@@ -67,7 +80,9 @@ TagPopulation.propTypes = {
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studytrack: string.isRequired,
   created: bool.isRequired,
-  falsifyChecks: func.isRequired
+  falsifyChecks: func.isRequired,
+  allChecker: bool.isRequired,
+  handleAllCheck: func.isRequired
 }
 
 const mapStateToProps = ({ tagstudent }) => ({
