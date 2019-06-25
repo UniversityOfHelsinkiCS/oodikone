@@ -89,25 +89,27 @@ const TagStudent = ({
       </List.Item>))
 
   return (
-    <div>
-      <List horizontal>
-        <List.Item >
-          <List.Content>
-            {studentnumber}
-          </List.Content>
-        </List.Item>)
-        {studentsTags}
-      </List>
-      <Dropdown
-        placeholder="Tag"
-        search
-        selection
-        options={tagOptions}
-        onChange={handleChange}
-        value={selectedValue}
-      />
-      <Button onClick={handleSubmit}>give tag to student</Button>
-    </div>
+    <List horizontal>
+      <List.Item >
+        <List.Content>
+          {studentnumber}
+        </List.Content>
+      </List.Item>
+      {studentsTags}
+      <List.Item>
+        <List.Content>
+          <Dropdown
+            placeholder="Tag"
+            search
+            selection
+            options={tagOptions}
+            onChange={handleChange}
+            value={selectedValue}
+          />
+          <Button onClick={handleSubmit}>give tag to student</Button>
+        </List.Content>
+      </List.Item>
+    </List>
   )
 }
 

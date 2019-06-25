@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Button, Icon, Popup, Tab, Grid } from 'semantic-ui-react'
+import { Header, Segment, Button, Icon, Popup, Tab, Grid, Checkbox } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import _ from 'lodash'
 import XLSX from 'xlsx'
@@ -24,13 +24,28 @@ const popupTimeoutLength = 1000
 
 
 class PopulationStudents extends Component {
-  state = { containsStudyTracks: false, students: [] }
+  state = {
+    containsStudyTracks: false,
+    students: [],
+    checked: false,
+    checkedStudents: []
+  }
 
   async componentDidMount() {
     const roles = await userRoles()
     const admin = roles.includes('admin')
     await this.props.getTagsByStudytrack(this.props.queryStudyrights[0])
     this.setState({ admin, containsStudyTracks: this.containsStudyTracks() })
+
+    const initialCheckedStudents = []
+    this.props.selectedStudents.forEach((sn) => {
+      const check = {
+        studentnumber: sn,
+        checked: false
+      }
+      initialCheckedStudents.push(check)
+    })
+    this.setState({ checkedStudents: initialCheckedStudents })
   }
 
   containsStudyTracks = () => {
@@ -69,6 +84,27 @@ class PopulationStudents extends Component {
   handlePopupClose = (id) => {
     this.setState({ [id]: false })
     clearTimeout(this.timeout)
+  }
+
+  handleAllCheck = () => {
+    const newCheckedStudents = []
+    this.props.selectedStudents.forEach((sn) => {
+      const check = {
+        studentnumber: sn,
+        checked: !this.state.checked
+      }
+      newCheckedStudents.push(check)
+    })
+    this.setState({ checkedStudents: newCheckedStudents })
+    this.setState({ checked: !this.state.checked })
+  }
+
+  handleSingleCheck = (studentnumber) => {
+    const checker = this.state.checkedStudents.find(check => check.studentnumber === studentnumber)
+    const idx = this.state.checkedStudents.indexOf(checker)
+    const tempArr = [...this.state.checkedStudents]
+    tempArr.splice(idx, 1, ({ studentnumber: checker.studentnumber, checked: !checker.checked }))
+    this.setState({ checkedStudents: tempArr })
   }
 
   renderStudentTable() {
@@ -340,15 +376,23 @@ class PopulationStudents extends Component {
 
     const tagRows = this.props.selectedStudents
       .map(sn => students[sn])
-      .map(s => (
-        <div key={s.studentNumber}>
-          <TagStudent
-            tags={this.props.tags}
-            studentnumber={s.studentNumber}
-            studentstags={s.tags}
-            studytrack={this.props.queryStudyrights[0]}
-          />
-        </div>))
+      .map((s) => {
+        const check = this.state.checkedStudents.find(c => c.studentnumber === s.studentNumber) || false
+        return (
+          <div key={s.studentNumber}>
+            <Checkbox
+              checked={check.checked}
+              onChange={() => this.handleSingleCheck(s.studentNumber)}
+            />
+            <TagStudent
+              tags={this.props.tags}
+              studentnumber={s.studentNumber}
+              studentstags={s.tags}
+              studytrack={this.props.queryStudyrights[0]}
+            />
+          </div>)
+      })
+
     const panes = [
       {
         menuItem: 'General',
@@ -407,9 +451,13 @@ class PopulationStudents extends Component {
         menuItem: 'Tags',
         render: () => (
           <Tab.Pane>
+            <Checkbox
+              checked={this.state.checked}
+              onChange={() => this.handleAllCheck()}
+            />
             <TagPopulation
               tags={this.props.tags}
-              studentnumbers={this.props.selectedStudents}
+              checkedStudents={this.state.checkedStudents}
               studytrack={this.props.queryStudyrights[0]}
             />
             {tagRows}
