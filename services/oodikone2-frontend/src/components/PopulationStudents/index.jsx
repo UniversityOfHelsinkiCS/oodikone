@@ -464,11 +464,9 @@ class PopulationStudents extends Component {
         menuItem: 'Tags',
         render: () => (
           <Tab.Pane>
-            <Checkbox
-              checked={this.state.checked}
-              onChange={() => this.handleAllCheck()}
-            />
             <TagPopulation
+              allChecker={this.state.checked}
+              handleAllCheck={() => this.handleAllCheck()}
               falsifyChecks={() => this.falsifyChecks()}
               tags={this.props.tags}
               checkedStudents={this.state.checkedStudents}
