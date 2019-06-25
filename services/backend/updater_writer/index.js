@@ -19,7 +19,7 @@ stan.on('connect', function () {
   sub.on('message', async (msg) => {
     const data = JSON.parse(msg.getData())
     if (data.studentInfo) {
-      await updateStudent(data)
+      await updateStudent(data, stan)
     } else {
       await updateMeta(data)
     }
