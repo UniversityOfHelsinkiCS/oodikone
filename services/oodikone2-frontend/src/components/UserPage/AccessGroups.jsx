@@ -45,7 +45,6 @@ class AccessGroups extends Component {
   }
 
   render() {
-    console.log(this.state.selected)
     const { pending, groups, savePending, saveError } = this.props
     return (
       <Form loading={savePending} error={!!saveError}>
