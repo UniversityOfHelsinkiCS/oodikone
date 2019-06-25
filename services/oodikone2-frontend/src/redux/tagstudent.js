@@ -35,7 +35,7 @@ export const deleteStudentTagAction = (id) => {
   return callController(route, prefix, data, method)
 }
 
-const reducer = (state = { data: [], success: false }, action) => {
+const reducer = (state = { data: [], success: false, created: false }, action) => {
   switch (action.type) {
     case 'GET_STUDENT_TAGS_ATTEMPT':
       return {
@@ -91,17 +91,20 @@ const reducer = (state = { data: [], success: false }, action) => {
     case 'CREATE_STUDENT_TAG_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
+        created: false
       }
     case 'CREATE_STUDENT_TAG_FAILURE':
       return {
         ...state,
-        pending: false
+        pending: false,
+        created: false
       }
     case 'CREATE_STUDENT_TAG_SUCCESS':
       return {
         ...state,
-        pending: false
+        pending: false,
+        created: true
       }
     case 'DELETE_STUDENT_TAG_ATTEMPT':
       return {

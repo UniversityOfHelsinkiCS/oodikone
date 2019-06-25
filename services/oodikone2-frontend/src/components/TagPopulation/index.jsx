@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Button, Dropdown } from 'semantic-ui-react'
-import { arrayOf, string, shape, func } from 'prop-types'
+import { arrayOf, string, shape, func, bool } from 'prop-types'
 
 import {
   createStudentTagAction,
@@ -10,7 +10,7 @@ import {
 } from '../../redux/tagstudent'
 
 
-const TagPopulation = ({ createStudentTag, tags, studentnumbers, getStudentTagsByStudytrack, studytrack }) => {
+const TagPopulation = ({ falsifyChecks, createStudentTag, tags, checkedStudents, getStudentTagsByStudytrack, studytrack, created }) => {
   const [options, setOptions] = useState([])
   const [selectedValue, setSelected] = useState('')
 
@@ -19,6 +19,12 @@ const TagPopulation = ({ createStudentTag, tags, studentnumbers, getStudentTagsB
     setOptions(createdOptions)
   }, [])
 
+  useEffect(() => {
+    if (created) {
+      getStudentTagsByStudytrack(studytrack)
+    }
+  }, [created])
+
   const handleChange = (event, { value }) => {
     event.preventDefault()
     setSelected(value)
@@ -26,15 +32,17 @@ const TagPopulation = ({ createStudentTag, tags, studentnumbers, getStudentTagsB
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    studentnumbers.forEach((studentnumber) => {
-      const tag = {
-        tag_id: selectedValue,
-        studentnumber
+    falsifyChecks()
+    checkedStudents.forEach((student) => {
+      if (student.checked) {
+        const tag = {
+          tag_id: selectedValue,
+          studentnumber: student.studentnumber
+        }
+        createStudentTag(tag)
+        setSelected('')
       }
-      createStudentTag(tag)
-      setSelected('')
     })
-    getStudentTagsByStudytrack(studytrack)
   }
 
   return (
@@ -47,7 +55,7 @@ const TagPopulation = ({ createStudentTag, tags, studentnumbers, getStudentTagsB
         onChange={handleChange}
         value={selectedValue}
       />
-      <Button onClick={handleSubmit}>add tag to population</Button>
+      <Button onClick={handleSubmit}>add tag to multiple students</Button>
     </div>
   )
 }
@@ -55,10 +63,16 @@ const TagPopulation = ({ createStudentTag, tags, studentnumbers, getStudentTagsB
 TagPopulation.propTypes = {
   createStudentTag: func.isRequired,
   getStudentTagsByStudytrack: func.isRequired,
-  studentnumbers: arrayOf(string).isRequired,
+  checkedStudents: arrayOf(shape({ studentnumber: string, checked: bool })).isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
-  studytrack: string.isRequired
+  studytrack: string.isRequired,
+  created: bool.isRequired,
+  falsifyChecks: func.isRequired
 }
 
+const mapStateToProps = ({ tagstudent }) => ({
+  created: tagstudent.created
+})
 
-export default withRouter(connect(null, { createStudentTag: createStudentTagAction, getStudentTagsByStudytrack: getStudentTagsByStudytrackAction })(TagPopulation))
+
+export default withRouter(connect(mapStateToProps, { createStudentTag: createStudentTagAction, getStudentTagsByStudytrack: getStudentTagsByStudytrackAction })(TagPopulation))
