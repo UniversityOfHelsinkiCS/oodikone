@@ -6,11 +6,6 @@ export const viewModeNames = {
   GRADES: 'Grades'
 }
 
-export const graphSeriesTypes = {
-  PRIMARY: { name: 'primary', multiplier: 1 },
-  COMPARISON: { name: 'comparison', multiplier: -1 }
-}
-
 export const getDataObject = (name, data, stack) => ({ name, data, stack })
 
 export const getMaxValueOfSeries = series => Object.values(series).reduce((acc, cur) => {
@@ -33,7 +28,7 @@ export const isThesisGrades = grades => Object.keys(grades)
 
 export const isThesisSeries = series => series && series.some(s => isThesisGrades(s))
 
-export const getThesisGradeSpread = (series, multiplier = 1) => {
+export const getThesisGradeSpread = (series) => {
   const thesisGradeAccumulator = {
     L: [],
     ECLA: [],
@@ -48,7 +43,7 @@ export const getThesisGradeSpread = (series, multiplier = 1) => {
     const currentEntries = Object.entries(cur)
 
     currentEntries.forEach(([k, v]) => {
-      acc[k].push(v * multiplier)
+      acc[k].push(v)
     })
 
     Object.entries(acc)
@@ -62,7 +57,7 @@ export const getThesisGradeSpread = (series, multiplier = 1) => {
   }, { ...thesisGradeAccumulator })
 }
 
-export const getGradeSpread = (series, multiplier = 1) => {
+export const getGradeSpread = (series) => {
   const failedKeys = ['Eisa', 'Hyl.', '0', 'Luop']
 
   const baseAccumalator = {
@@ -82,10 +77,10 @@ export const getGradeSpread = (series, multiplier = 1) => {
       if (failedKeys.includes(k)) {
         failed += v
       } else {
-        acc[k].push(v * multiplier)
+        acc[k].push(v)
       }
     })
-    acc[0].push(failed * multiplier)
+    acc[0].push(failed)
     Object.entries(acc)
       .forEach(([k, v]) => {
         if (v.length < i + 1) {
@@ -96,4 +91,3 @@ export const getGradeSpread = (series, multiplier = 1) => {
     return acc
   }, { ...baseAccumalator })
 }
-

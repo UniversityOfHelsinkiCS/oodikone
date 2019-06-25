@@ -88,14 +88,14 @@ export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
 export const TOKEN_NAME = window.location.pathname.includes('staging') ? 'staging_token' : window.location.pathname.includes('/testing') ? 'testing_token' : 'token' //eslint-disable-line
 
-export const passRateCumGraphOptions = (categories, max) => ({
+export const passRateCumGraphOptions = (categories, max, title) => ({
   chart: {
     type: 'column'
   },
   colors: [chartblue, green, red],
 
   title: {
-    text: 'Pass rate chart'
+    text: title
   },
 
   xAxis: {
@@ -119,14 +119,14 @@ export const passRateCumGraphOptions = (categories, max) => ({
   }
 })
 
-export const passRateStudGraphOptions = (categories, max) => ({
+export const passRateStudGraphOptions = (categories, max, title) => ({
   chart: {
     type: 'column'
   },
   colors: [chartblue, chartlgreen, chartdarkg, chartlred, chartdarkred],
 
   title: {
-    text: 'Pass rate chart'
+    text: title
   },
 
   xAxis: {
@@ -150,14 +150,14 @@ export const passRateStudGraphOptions = (categories, max) => ({
   }
 })
 
-export const gradeGraphOptions = (categories, max) => ({
+export const gradeGraphOptions = (categories, max, title) => ({
   chart: {
     type: 'column'
   },
   colors: [red, chartblue, chartblue, chartblue, chartblue, chartblue, green, green],
 
   title: {
-    text: 'Grades'
+    text: title
   },
 
   legend: {
