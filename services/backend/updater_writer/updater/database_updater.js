@@ -51,7 +51,7 @@ const updateStudyRights = (studyRights, transaction) => studyRights.map(async ({
   ])
 })
 
-const updateStudent = async (student) => {
+const updateStudent = async (student, stan) => {
   const { studentInfo, studyAttainments, semesterEnrollments, studyRights } = student
   const transaction = await sequelize.transaction()
   try {
@@ -72,6 +72,7 @@ const updateStudent = async (student) => {
       console.log('Transaction aborted')
     } else if (err.message === 'deadlock detected') {
       console.log('Deadlock suicide')
+      stan.close()
       process.exit(1)
     } else {
      console.log(err.parent)
