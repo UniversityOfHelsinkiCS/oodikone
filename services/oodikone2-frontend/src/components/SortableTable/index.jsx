@@ -63,20 +63,24 @@ class SortableTable extends Component {
       const { collapsed } = this.state
       const defaultColumnCount = showNames ? 6 : 3
       if (collapsed) {
-        const collapsedKeys = collapsed.map(c => c.key)
-        return collapsedKeys.reduce((acc, curr) => {
-          const previousCols = columns.filter(c => c.key < curr)
+        const collapsedOrderNumbers = collapsed.map(c => c.headerProps.ordernumber)
+        return collapsedOrderNumbers.reduce((acc, curr) => {
+          const previousCols = columns.filter(c => c.headerProps && c.headerProps.ordernumber < curr)
           const sumOfPreviousColSpans = previousCols.reduce((a, b) => a + b.headerProps.colSpan, 0)
           return [
             ...acc,
-            sumOfPreviousColSpans + columns.find(c => c.key === curr).headerProps.colSpan + defaultColumnCount]
+            sumOfPreviousColSpans + columns.find(c => c.headerProps && c.headerProps.ordernumber === curr).headerProps.colSpan + defaultColumnCount]
         }, [])
       }
       return []
     }
     const { tableProps, getRowProps, columns, getRowKey, collapsingHeaders } = this.props
     const { selected, direction, collapsed } = this.state
-    const columnsWithCollapsedHeaders = collapsingHeaders ? [...columns.filter(c => (c.headerProps && (!collapsed.map(cell => cell.headerProps.title).includes(c.headerProps.title) && !c.collapsed))), ...this.state.collapsed].sort((a, b) => a.key - b.key) : columns
+    const columnsWithCollapsedHeaders = collapsingHeaders ? [...columns.filter(c => (
+      c.headerProps && (!collapsed.map(cell => cell.headerProps.title).includes(c.headerProps.title) && !c.collapsed))),
+    ...this.state.collapsed].sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber)
+      :
+      columns
 
     const sortDirection = name => (selected === name ? direction : null)
 
