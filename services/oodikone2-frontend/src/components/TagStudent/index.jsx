@@ -26,13 +26,14 @@ const TagStudent = ({
 
   useEffect(() => {
     setTags(tags)
-    const tagIds = studentstags.map(t => ({ id: t.id, tag_id: t.tag.tag_id }))
-    setStudentsTagIds(tagIds)
+    const initialStudentsTagIds = studentstags.map(t => ({ id: t.id, tag_id: t.tag.tag_id }))
+    const tagIds = studentstags.map(t => t.tag.tag_id)
     const initialTagOptions = tags.filter(tag => !tagIds.includes(tag.tag_id)).map(tag => ({
       key: tag.tag_id,
       text: tag.tagname,
       value: tag.tag_id
     }))
+    setStudentsTagIds(initialStudentsTagIds)
     setTagOptions(initialTagOptions)
   }, [])
 
