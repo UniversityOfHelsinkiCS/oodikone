@@ -1,6 +1,7 @@
 /* eslint-disable quotes */
 import React from 'react'
 import { Grid } from 'semantic-ui-react'
+import { bool } from 'prop-types'
 import StackedBarChart from '../../../StackedBarChart'
 import { passRateCumGraphOptions, passRateStudGraphOptions } from '../../../../constants'
 import {
@@ -8,7 +9,8 @@ import {
   getDataObject,
   getMaxValueOfSeries,
   dataSeriesType,
-  viewModeType
+  viewModeType,
+  absoluteToRelative
 } from './util'
 
 const getPassRateCumSeriesFromStats = (stats) => {
@@ -23,12 +25,21 @@ const getPassRateCumSeriesFromStats = (stats) => {
     failed.push(f)
   })
 
-  return [
-    getDataObject(`all`, all, 'a'),
-    getDataObject(`passed`, passed, 'b'),
-    getDataObject(`failed`, failed, 'c')
-  ]
+  return {
+    absolute: [
+      getDataObject(`all`, all, 'a'),
+      getDataObject(`passed`, passed, 'b'),
+      getDataObject(`failed`, failed, 'c')
+    ],
+    relative: [
+      // eslint-disable-next-line no-unused-vars
+      getDataObject(`all`, all.map(_ => 1), 'a'),
+      getDataObject(`passed`, passed.map(absoluteToRelative(all)), 'b'),
+      getDataObject(`failed`, failed.map(absoluteToRelative(all)), 'c')
+    ]
+  }
 }
+
 
 const getPassRateStudSeriesFromStats = (stats) => {
   const all = []
@@ -52,16 +63,26 @@ const getPassRateStudSeriesFromStats = (stats) => {
     passedRetry.push(pr || 0)
   })
 
-  return [
-    getDataObject(`all`, all, 'a'),
-    getDataObject(` passed on first try`, passedFirst, 'b'),
-    getDataObject(`passed after retry`, passedRetry, 'b'),
-    getDataObject(`failed on first try`, failedFirst, 'c'),
-    getDataObject(`failed after retry`, failedRetry, 'c')
-  ]
+  return {
+    absolute: [
+      getDataObject(`all`, all, 'a'),
+      getDataObject(` passed on first try`, passedFirst, 'b'),
+      getDataObject(`passed after retry`, passedRetry, 'b'),
+      getDataObject(`failed on first try`, failedFirst, 'c'),
+      getDataObject(`failed after retry`, failedRetry, 'c')
+    ],
+    relative: [
+      // eslint-disable-next-line no-unused-vars
+      getDataObject(`all`, all.map(_ => 1), 'a'),
+      getDataObject(` passed on first try`, passedFirst.map(absoluteToRelative(all)), 'b'),
+      getDataObject(`passed after retry`, passedRetry.map(absoluteToRelative(all)), 'b'),
+      getDataObject(`failed on first try`, failedFirst.map(absoluteToRelative(all)), 'c'),
+      getDataObject(`failed after retry`, failedRetry.map(absoluteToRelative(all)), 'c')
+    ]
+  }
 }
 
-const PassRate = ({ primary, comparison, viewMode }) => {
+const PassRate = ({ primary, comparison, viewMode, isRelative = false }) => {
   const isCumulativeMode = viewMode === viewModeNames.CUMULATIVE
 
   const primaryStats = primary.stats
@@ -69,14 +90,10 @@ const PassRate = ({ primary, comparison, viewMode }) => {
   const comparisonStats = comparison ? comparison.stats : []
   const passGraphSerieFn = isCumulativeMode ? getPassRateCumSeriesFromStats : getPassRateStudSeriesFromStats
 
-  const passGraphSerie = [
-    ...passGraphSerieFn(primaryStats)
-  ]
-  const comparisonGraphSerie = [
-    ...passGraphSerieFn(comparisonStats)
-  ]
+  const passGraphSerie = passGraphSerieFn(primaryStats)
+  const comparisonGraphSerie = passGraphSerieFn(comparisonStats)
 
-  const maxPassRateVal = getMaxValueOfSeries(passGraphSerie)
+  const maxPassRateVal = isRelative ? 1 : getMaxValueOfSeries(passGraphSerie.absolute)
   const graphOptionsFn = isCumulativeMode ? passRateCumGraphOptions : passRateStudGraphOptions
   const primaryGraphOptions = comparison ? graphOptionsFn(statYears, maxPassRateVal, 'Primary pass rate chart') : graphOptionsFn(statYears, maxPassRateVal, 'Pass rate chart')
   const comparisonGraphOptions = graphOptionsFn(statYears, maxPassRateVal, 'Comparison pass rate chart')
@@ -87,7 +104,7 @@ const PassRate = ({ primary, comparison, viewMode }) => {
         <Grid.Column>
           <StackedBarChart
             options={primaryGraphOptions}
-            series={passGraphSerie}
+            series={isRelative ? passGraphSerie.relative : passGraphSerie.absolute}
           />
         </Grid.Column>
       </Grid.Row>
@@ -97,7 +114,7 @@ const PassRate = ({ primary, comparison, viewMode }) => {
           <Grid.Column>
             <StackedBarChart
               options={comparisonGraphOptions}
-              series={comparisonGraphSerie}
+              series={isRelative ? comparisonGraphSerie.relative : comparisonGraphSerie.absolute}
             />
           </Grid.Column>
         </Grid.Row>
@@ -109,11 +126,13 @@ const PassRate = ({ primary, comparison, viewMode }) => {
 PassRate.propTypes = {
   primary: dataSeriesType.isRequired,
   comparison: dataSeriesType,
-  viewMode: viewModeType.isRequired
+  viewMode: viewModeType.isRequired,
+  isRelative: bool
 }
 
 PassRate.defaultProps = {
-  comparison: undefined
+  comparison: undefined,
+  isRelative: false
 }
 
 export default PassRate
