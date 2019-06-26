@@ -16,12 +16,13 @@ const paneViewIndex = {
 class ResultTabs extends Component {
   state = {
     activeIndex: paneViewIndex.TABLE,
-    viewMode: viewModeNames.CUMULATIVE
+    viewMode: viewModeNames.CUMULATIVE,
+    isRelative: false
   }
 
   getPanes = () => {
     const { primary, comparison } = this.props
-    const { viewMode } = this.state
+    const { viewMode, isRelative } = this.state
 
     const paneMenuItems = [
       {
@@ -40,6 +41,7 @@ class ResultTabs extends Component {
             comparison={comparison}
             primary={primary}
             viewMode={viewMode}
+            isRelative={isRelative}
           />)
       },
       {
@@ -49,6 +51,7 @@ class ResultTabs extends Component {
             comparison={comparison}
             primary={primary}
             viewMode={viewMode}
+            isRelative={isRelative}
           />)
       }
     ]
@@ -106,15 +109,27 @@ class ResultTabs extends Component {
       const newMode = isToggleChecked ? viewModeNames.CUMULATIVE : viewModeNames.STUDENT
       const toggleId = 'viewModeToggle'
       return (
-        <div className="toggleContainer">
-          <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.CUMULATIVE}</label>
-          <Radio
-            id={toggleId}
-            checked={isToggleChecked}
-            toggle
-            onChange={() => this.handleModeChange(newMode)}
-          />
-          <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.STUDENT}</label>
+        <div style={{ display: 'flex' }}>
+          <div className="toggleContainer">
+            <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.CUMULATIVE}</label>
+            <Radio
+              id={toggleId}
+              checked={isToggleChecked}
+              toggle
+              onChange={() => this.handleModeChange(newMode)}
+            />
+            <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.STUDENT}</label>
+          </div>
+          {this.props.comparison &&
+            <div className="toggleContainer">
+              <label className="toggleLabel">Absolute</label>
+              <Radio
+                toggle
+                onChange={() => this.setState({ isRelative: !this.state.isRelative })}
+              />
+              <label className="toggleLabel">Relative</label>
+            </div>
+          }
         </div>
       )
     }
