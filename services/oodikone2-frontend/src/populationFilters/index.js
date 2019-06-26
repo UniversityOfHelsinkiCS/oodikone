@@ -63,7 +63,7 @@ export const enrollmentStatus = (params) => {
     },
     filter: student => student.semesterenrollments.filter(({ semestercode }) =>
       semesters.includes(semestercode)).map(({ enrollmenttype }) =>
-        enrollmenttype === enrolled).every(b => b === true)
+      enrollmenttype === enrolled).every(b => b === true)
   })
 }
 
@@ -144,13 +144,13 @@ export const extentGraduated = (params) => {
         } else if (complemented === 'true' && graduated === 'grad') {
           return !student.studyrights.filter(sr =>
             sr.extentcode === code && sr.graduated).map(sr =>
-              sr.extentcode).includes(code)
+            sr.extentcode).includes(code)
         } else if (complemented === 'false' && graduated === 'either') {
           return student.studyrights.map(sr => sr.extentcode).includes(code)
         }
         return student.studyrights.filter(sr =>
           sr.extentcode === code && sr.graduated).map(sr =>
-            sr.extentcode).includes(code)
+          sr.extentcode).includes(code)
       }
       const foundStudyRight = student.studyrights.find(s => s.studyrightElements.map(e => e.code).includes(code))
       const returnable = graduated !== 'grad' ? !!foundStudyRight : (foundStudyRight && foundStudyRight.graduated)
