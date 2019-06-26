@@ -76,7 +76,12 @@ class SortableTable extends Component {
     }
     const { tableProps, getRowProps, columns, getRowKey, collapsingHeaders } = this.props
     const { selected, direction, collapsed } = this.state
-    const columnsWithCollapsedHeaders = collapsingHeaders ? [...columns.filter(c => (c.headerProps && (!collapsed.map(cell => cell.headerProps.title).includes(c.headerProps.title) && !c.collapsed))), ...this.state.collapsed].sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber) : columns
+    const columnsWithCollapsedHeaders = collapsingHeaders ? [...columns.filter(c => (
+      c.headerProps && (!collapsed.map(cell => cell.headerProps.title).includes(c.headerProps.title) && !c.collapsed))),
+    ...this.state.collapsed].sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber)
+      :
+      columns
+
     const sortDirection = name => (selected === name ? direction : null)
 
     return (
