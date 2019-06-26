@@ -7,7 +7,7 @@ import { modifyAccessGroups } from '../../redux/users'
 import { getIdWithoutRefreshToken, setToken } from '../../common'
 
 class AccessGroups extends Component {
-  state={
+  state = {
     selected: this.props.userGroups
   }
 
