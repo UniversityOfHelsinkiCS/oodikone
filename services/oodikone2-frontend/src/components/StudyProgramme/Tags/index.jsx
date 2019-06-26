@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, Input, List } from 'semantic-ui-react'
+import { Button, Input, List, Label, Icon, Header } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
 import { getTagsByStudytrackAction, createTagAction, deleteTagAction } from '../../../redux/tags'
@@ -13,16 +13,11 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     getTagsByStudytrack(studyprogramme)
   }, [])
 
-  const handleDeleteTag = (tag) => {
+  const handleDeleteTag = (event, tag) => {
+    event.preventDefault()
     deleteTag(tag)
     getTagsByStudytrack(studyprogramme)
   }
-
-  const deleteButton = tag => (
-    <Button onClick={() => handleDeleteTag(tag)}>
-      Delete
-    </Button>
-  )
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -40,10 +35,11 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
   }
 
   const rows = tags.map(tag => (
-    <List.Item divided verticalAlign="middle" key={tag.tag_id}>
+    <List.Item key={tag.tag_id}>
       <List.Content>
-        <List.Header>Tag name</List.Header>
-        {tag.tagname} {deleteButton(tag)}
+        <Label>
+          {tag.tagname} <Icon name="delete" link onClick={event => handleDeleteTag(event, tag)} />
+        </Label>
       </List.Content>
     </List.Item >
   ))
@@ -52,6 +48,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     <List>
       <Input onChange={handleChange} value={tagname} />
       <Button onClick={handleSubmit}>add new tag</Button>
+      <Header size="medium">Study programme tags</Header>
       {rows}
     </List>
   )
