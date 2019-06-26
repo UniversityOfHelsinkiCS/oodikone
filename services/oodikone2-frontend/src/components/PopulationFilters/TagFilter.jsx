@@ -56,7 +56,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
             <Form.Field>
               <Dropdown
                 placeholder="select"
-                options={[{ key: 1, text: 'have', value: true }, { key: 2, text: `don't have`, value: false }]}
+                options={[{ key: 1, text: 'have', value: true }, { key: 2, text: 'don\'t have', value: false }]}
                 onChange={handleCompChange}
               />
             </Form.Field>
@@ -83,7 +83,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
   }
   return (
     <Segment>
-      Students that {filter.params.comp ? 'have' : `don't have`} a tag {filter.params.text}
+      Students that {filter.params.comp ? 'have' : 'don\'t have'} a tag {filter.params.text}
       <span style={{ float: 'right' }}>
         <Icon name="remove" onClick={clearFilter} />
       </span>

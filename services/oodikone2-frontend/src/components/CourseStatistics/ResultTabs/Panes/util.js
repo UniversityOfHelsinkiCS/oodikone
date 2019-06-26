@@ -28,6 +28,8 @@ export const isThesisGrades = grades => Object.keys(grades)
 
 export const isThesisSeries = series => series && series.some(s => isThesisGrades(s))
 
+export const absoluteToRelative = all => (p, i) => (p / all[i]) || 0
+
 export const getThesisGradeSpread = (series) => {
   const thesisGradeAccumulator = {
     L: [],
