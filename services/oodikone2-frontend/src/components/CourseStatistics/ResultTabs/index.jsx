@@ -41,7 +41,7 @@ class ResultTabs extends Component {
             comparison={comparison}
             primary={primary}
             viewMode={viewMode}
-            isRelative={isRelative}
+            isRelative={isRelative && comparison}
           />)
       },
       {
@@ -51,7 +51,7 @@ class ResultTabs extends Component {
             comparison={comparison}
             primary={primary}
             viewMode={viewMode}
-            isRelative={isRelative}
+            isRelative={isRelative && comparison}
           />)
       }
     ]
@@ -125,6 +125,7 @@ class ResultTabs extends Component {
               <label className="toggleLabel">Absolute</label>
               <Radio
                 toggle
+                checked={this.state.isRelative}
                 onChange={() => this.setState({ isRelative: !this.state.isRelative })}
               />
               <label className="toggleLabel">Relative</label>
