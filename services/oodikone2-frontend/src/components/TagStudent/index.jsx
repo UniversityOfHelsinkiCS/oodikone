@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, Dropdown, List } from 'semantic-ui-react'
+import { Dropdown, List, Label, Icon } from 'semantic-ui-react'
 import { arrayOf, string, shape, func, bool } from 'prop-types'
 
 import {
@@ -20,8 +20,6 @@ const TagStudent = ({
   studytrack,
   success,
   data }) => {
-  const [tagId, setTagId] = useState('')
-  const [selectedValue, setValue] = useState('')
   const [allTags, setTags] = useState([])
   const [studentsTagIds, setStudentsTagIds] = useState([])
   const [tagOptions, setTagOptions] = useState([])
@@ -52,39 +50,31 @@ const TagStudent = ({
     }
   }, [success])
 
-  const handleChange = (event, { value }) => {
+  const handleChange = async (event, { value }) => {
     event.preventDefault()
-    setValue(value)
-    setTagId(value)
+    const tag = {
+      tag_id: value,
+      studentnumber
+    }
+    await createStudentTag(tag)
+    getStudentTagsByStudytrack(studytrack)
   }
 
-  const deleteTag = async (event, { value }) => {
+  const deleteTag = async (event, tag) => {
     event.preventDefault()
-    const removableTag = studentsTagIds.find(tag => tag.tag_id === value)
+    const removableTag = studentsTagIds.find(t => t.tag_id === tag.tag_id)
     await deleteStudentTag(removableTag.id)
     getStudentTagsByStudytrack(studytrack)
   }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    const tag = {
-      tag_id: tagId,
-      studentnumber
-    }
-    await createStudentTag(tag)
-    setTagId('')
-    setValue('')
-    getStudentTagsByStudytrack(studytrack)
-  }
   const studentsTags = allTags
     .filter(tag => studentsTagIds.map(t => t.tag_id).includes(tag.tag_id))
     .map(tag => (
       <List.Item key={tag.tag_id} >
         <List.Content>
-          <List.Header>
-            Tag name
-          </List.Header>
-          {tag.tagname} <Button name="delete" onClick={deleteTag} value={tag.tag_id}>delete</Button>
+          <Label>
+            {tag.tagname} <Icon name="delete" link onClick={event => deleteTag(event, tag)} />
+          </Label>
         </List.Content>
       </List.Item>))
 
@@ -104,9 +94,7 @@ const TagStudent = ({
             selection
             options={tagOptions}
             onChange={handleChange}
-            value={selectedValue}
           />
-          <Button onClick={handleSubmit}>give tag to student</Button>
         </List.Content>
       </List.Item>
     </List>
