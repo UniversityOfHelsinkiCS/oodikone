@@ -360,7 +360,7 @@ class PopulationStudents extends Component {
             <div style={{ overflowX: 'hidden' }}><div style={{ width: 0 }}>{e.label}</div></div>
           ),
           parent: true,
-          headerProps: { colSpan: labelToMandatoryCourses[e.label].length, title: e.label }
+          headerProps: { colSpan: labelToMandatoryCourses[e.label].length, title: e.label, ordernumber: e.orderNumber }
         }))
       )
     }

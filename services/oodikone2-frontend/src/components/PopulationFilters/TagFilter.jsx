@@ -12,6 +12,7 @@ import { tagFilter } from '../../populationFilters'
 const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, filter, samples }) => {
   const [options, setOptions] = useState([])
   const [selectedTag, setSelectedTag] = useState()
+  const [selectedComp, setSelectedComp] = useState()
 
   const createOptions = () => {
     const tags = samples.map(s => s.tags.map(t => ({ tagname: t.tag.tagname, tag_id: t.tag.tag_id })))
@@ -26,13 +27,16 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
   }, [])
 
   const handleFilter = () => {
-    setPopulationFilterAction(tagFilter({ tag: selectedTag }))
+    setPopulationFilterAction(tagFilter({ tag: selectedTag, comp: selectedComp }))
+  }
+
+  const handleCompChange = (e, { value }) => {
+    setSelectedComp(value)
   }
 
   const handleChange = (e, { value }) => {
-    // any better solutions?
-    const selection = options.filter(tag => tag.value === value)
-    setSelectedTag(selection[0])
+    const selection = options.find(tag => tag.value === value)
+    setSelectedTag(selection)
   }
   const clearFilter = () => {
     removePopulationFilterAction(filter.id)
@@ -47,7 +51,17 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
           />
           <Form.Group inline>
             <Form.Field>
-              <label>Select students that have tag </label>
+              <label>Select students that </label>
+            </Form.Field>
+            <Form.Field>
+              <Dropdown
+                placeholder="select"
+                options={[{ key: 1, text: 'have', value: true }, { key: 2, text: 'don\'t have', value: false }]}
+                onChange={handleCompChange}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>a tag </label>
             </Form.Field>
             <Form.Field>
               <Dropdown
@@ -69,7 +83,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
   }
   return (
     <Segment>
-      Students that have a tag {filter.params.text}
+      Students that {filter.params.comp ? 'have' : 'don\'t have'} a tag {filter.params.text}
       <span style={{ float: 'right' }}>
         <Icon name="remove" onClick={clearFilter} />
       </span>

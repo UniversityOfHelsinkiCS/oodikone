@@ -255,16 +255,20 @@ export const gradeMeanFilter = (params) => {
 
 export const tagFilter = (params) => {
   const { text, value } = params.tag
+  const { comp } = params
   return ({
     id: uuidv4(),
     type: 'TagFilter',
     params: {
       text,
-      value
+      comp
     },
     filter: (student) => {
       const studentTagIds = student.tags.map(t => t.tag.tag_id)
-      return studentTagIds.includes(value)
+      if (comp) {
+        return studentTagIds.includes(value)
+      }
+      return !studentTagIds.includes(value)
     }
   })
 }
