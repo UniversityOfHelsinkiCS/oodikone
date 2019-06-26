@@ -33,7 +33,6 @@ const getPassRateCumSeriesFromStats = (stats) => {
     ],
     relative: [
       // eslint-disable-next-line no-unused-vars
-      getDataObject(`all`, all.map(_ => 1), 'a'),
       getDataObject(`passed`, passed.map(absoluteToRelative(all)), 'b'),
       getDataObject(`failed`, failed.map(absoluteToRelative(all)), 'c')
     ]
@@ -73,7 +72,6 @@ const getPassRateStudSeriesFromStats = (stats) => {
     ],
     relative: [
       // eslint-disable-next-line no-unused-vars
-      getDataObject(`all`, all.map(_ => 1), 'a'),
       getDataObject(` passed on first try`, passedFirst.map(absoluteToRelative(all)), 'b'),
       getDataObject(`passed after retry`, passedRetry.map(absoluteToRelative(all)), 'b'),
       getDataObject(`failed on first try`, failedFirst.map(absoluteToRelative(all)), 'c'),
@@ -95,8 +93,8 @@ const PassRate = ({ primary, comparison, viewMode, isRelative = false }) => {
 
   const maxPassRateVal = isRelative ? 1 : getMaxValueOfSeries(passGraphSerie.absolute)
   const graphOptionsFn = isCumulativeMode ? passRateCumGraphOptions : passRateStudGraphOptions
-  const primaryGraphOptions = comparison ? graphOptionsFn(statYears, maxPassRateVal, 'Primary pass rate chart') : graphOptionsFn(statYears, maxPassRateVal, 'Pass rate chart')
-  const comparisonGraphOptions = graphOptionsFn(statYears, maxPassRateVal, 'Comparison pass rate chart')
+  const primaryGraphOptions = comparison ? graphOptionsFn(statYears, maxPassRateVal, 'Primary pass rate chart', isRelative) : graphOptionsFn(statYears, maxPassRateVal, 'Pass rate chart', isRelative)
+  const comparisonGraphOptions = graphOptionsFn(statYears, maxPassRateVal, 'Comparison pass rate chart', isRelative)
 
   return (
     <>
