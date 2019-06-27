@@ -15,7 +15,9 @@ module.exports = (env, args) => {
   const isDev = mode === 'development'
   return {
     output: {
-      publicPath: BASE_PATH
+      publicPath: BASE_PATH,
+      filename: '[name]-[hash].js',
+      chunkFilename: '[id]-[hash].js',
     },
     entry: [
       'babel-polyfill',
@@ -70,7 +72,10 @@ module.exports = (env, args) => {
           USAGE_ADMINER_URL: JSON.stringify(process.env.USAGE_ADMINER_URL)
         }
       }),
-      new MiniCssExtractPlugin()
+      new MiniCssExtractPlugin({
+        filename: '[name]-[hash].css',
+        chunkFilename: '[id]-[hash].css'
+      })
     ],
     optimization: {
       minimizer: [new TerserPlugin({
