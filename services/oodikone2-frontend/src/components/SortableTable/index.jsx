@@ -81,7 +81,7 @@ class SortableTable extends Component {
     ...this.state.collapsed].sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber)
       :
       columns
-
+    console.log(columnsWithCollapsedHeaders)
     const sortDirection = name => (selected === name ? direction : null)
 
     return (
@@ -92,7 +92,9 @@ class SortableTable extends Component {
               <Table.HeaderCell
                 key={c.key}
                 content={c.title}
-                onClick={c.parent && collapsingHeaders ? this.handleCollapse({ title: this.verticalTitle(<Fragment>{c.headerProps.title}</Fragment>), headerProps: { ...c.headerProps, colSpan: 1, rowSpan: 2 }, key: c.key, collapsed: true, parent: c.parent }) : this.handleSort(c.key)}
+                onClick={c.parent && collapsingHeaders && c.key !== 'general' ?
+                  this.handleCollapse({ title: this.verticalTitle(<Fragment>{c.headerProps.title}</Fragment>), headerProps: { ...c.headerProps, colSpan: 1, rowSpan: 2 }, key: c.key, collapsed: true, parent: c.parent }) :
+                  this.handleSort(c.key)}
                 sorted={c.parent ? undefined : sortDirection(c.key)}
                 {...c.headerProps}
               />
