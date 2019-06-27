@@ -81,7 +81,6 @@ class SortableTable extends Component {
     ...this.state.collapsed].sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber)
       :
       columns
-    console.log(columnsWithCollapsedHeaders)
     const sortDirection = name => (selected === name ? direction : null)
 
     return (
