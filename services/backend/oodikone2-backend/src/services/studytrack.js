@@ -1,6 +1,7 @@
 const sequelize = require('sequelize')
 const { Op } = sequelize
 const moment = require('moment')
+const { flatMap } = require('lodash')
 const { Credit, Student, Course, Provider, Studyright, StudyrightElement,
   ElementDetails, ThesisCourse, ThesisTypeEnums
 } = require('../models')
@@ -215,9 +216,25 @@ const thesisProductivityForStudytrack = async code => {
 }
 
 const combineStatistics = (creditStats, studyrightStats, thesisStats, creditsForMajors, transferredCredits) => {
-  const stats = { ...creditStats }
-  Object.keys(stats).forEach(year => {
+  const allYears = [
+    ...new Set(
+      flatMap(
+        [
+          creditStats,
+          studyrightStats,
+          thesisStats,
+          creditsForMajors,
+          transferredCredits
+        ],
+        Object.keys
+      )
+    )
+  ]
+  const stats = {}
+  allYears.forEach(year => {
     const thesis = thesisStats[year] || {}
+    stats[year] = {}
+    stats[year] = creditStats[year] || { credits: 0, year }
     stats[year].graduated = studyrightStats[year] ? studyrightStats[year].graduated : 0
     // stats[year].medianGraduationTime = studyrightStats[year] ? studyrightStats[year].medianGraduationTime : 0
     stats[year].bThesis = thesis.bThesis || 0
