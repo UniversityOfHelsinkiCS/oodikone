@@ -18,7 +18,8 @@ import { getSemesters } from '../../redux/semesters'
 import { transferTo } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
-import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn } from '../../common'
+import { getTagsByStudytrackAction } from '../../redux/tags'
+import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, userIsAdmin } from '../../common'
 import { setLoading } from '../../redux/graphSpinner'
 import './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
@@ -48,7 +49,9 @@ class PopulationSearchForm extends Component {
     getSemesters: func.isRequired,
     semesters: shape({}).isRequired,
     history: shape({}).isRequired,
-    location: shape({}).isRequired
+    location: shape({}).isRequired,
+    getTagsByStudytrackAction: func.isRequired,
+    tags: arrayOf(shape({ tag_id: string, tagname: string })).isRequired
   }
 
   constructor() {
@@ -60,11 +63,13 @@ class PopulationSearchForm extends Component {
       isLoading: false,
       showAdvancedSettings: false,
       momentYear: Datetime.moment('2017-01-01'),
-      floatMonths: this.months('2017', 'FALL')
+      floatMonths: this.months('2017', 'FALL'),
+      selectedTag: '',
+      isAdmin: false
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { studyProgrammes, semesters, location } = this.props
     if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
       this.setState({ query: this.initialQuery() }) // eslint-disable-line
@@ -76,6 +81,8 @@ class PopulationSearchForm extends Component {
     if (location.search) {
       this.fetchPopulationFromUrlParams()
     }
+    const admin = await userIsAdmin()
+    this.setState({ isAdmin: admin })
   }
 
   componentDidUpdate(prevProps) {
@@ -113,6 +120,7 @@ class PopulationSearchForm extends Component {
     const query = {
       ...initial,
       ...rest,
+      tagYear: rest.year,
       studyRights: JSON.parse(studyRights),
       months: JSON.parse(months)
     }
@@ -132,15 +140,14 @@ class PopulationSearchForm extends Component {
     this.pushQueryToUrl(query)
   }
 
-  fetchPopulation = (query) => {
+  fetchPopulation = (query, tag) => {
     const queryCodes = Object.values(query.studyRights).filter(e => e != null)
-
     const uuid = uuidv4()
     const request = { ...query, studyRights: queryCodes, uuid }
     this.setState({ isLoading: true })
     this.props.setLoading()
     Promise.all([
-      this.props.getPopulationStatistics({ ...query, uuid }),
+      this.props.getPopulationStatistics({ ...query, uuid, tag }),
       this.props.getPopulationCourses(request),
       this.props.getPopulationFilters(request),
       this.props.getMandatoryCourses(query.studyRights.programme)
@@ -199,6 +206,7 @@ class PopulationSearchForm extends Component {
       query: {
         ...query,
         year: reformatDate(momentYear, YEAR_DATE_FORMAT),
+        tagYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
         months: this.months(
           reformatDate(momentYear, YEAR_DATE_FORMAT),
           this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING'
@@ -209,6 +217,20 @@ class PopulationSearchForm extends Component {
           degree
         }
       }
+    })
+  }
+
+  handleTagSearch = (event, { value }) => {
+    const { query } = this.state
+    const months = this.getMonths('2015', new Date(), 'FALL')
+    this.setState({
+      query: {
+        ...query,
+        year: '2018',
+        tagYear: '2015',
+        months
+      },
+      selectedTag: value
     })
   }
 
@@ -269,6 +291,7 @@ class PopulationSearchForm extends Component {
 
   handleProgrammeChange = (e, { value }) => {
     const programme = value
+    this.props.getTagsByStudytrackAction(value)
     if (programme === '') {
       this.handleClear('programme')
       return
@@ -360,6 +383,7 @@ class PopulationSearchForm extends Component {
 
   initialQuery = () => ({
     year: Datetime.moment('2017-01-01').year(),
+    tagYear: Datetime.moment('2017-01-01').year(),
     semesters: ['FALL', 'SPRING'],
     studentStatuses: [],
     studyRights: [],
@@ -471,10 +495,10 @@ class PopulationSearchForm extends Component {
       return (
         <Form.Group>
           <Form.Field width={8}>
-            { degreesToRender && degreesToRender.length > 1 ? renderableDegrees() : null }
+            {degreesToRender && degreesToRender.length > 1 ? renderableDegrees() : null}
           </Form.Field>
           <Form.Field width={8}>
-            { studyTracksToRender && studyTracksToRender.length > 0 ? renderableTracks() : null }
+            {studyTracksToRender && studyTracksToRender.length > 0 ? renderableTracks() : null}
           </Form.Field>
         </Form.Group>
       )
@@ -506,7 +530,6 @@ class PopulationSearchForm extends Component {
       const sortedStudyProgrammes = _.sortBy(studyProgrammes, s => getTextIn(s.name, language))
       programmesToRender = this.renderableList(sortedStudyProgrammes)
     }
-
     let degreesToRender
     let studyTracksToRender
     if (studyRights.programme && this.validYearCheck(momentYear)) {
@@ -536,9 +559,12 @@ class PopulationSearchForm extends Component {
     if (!this.state.showAdvancedSettings) {
       return null
     }
-    const { translate } = this.props
+
+    const { translate, tags } = this.props
     const { query } = this.state
     const { semesters, studentStatuses } = query
+    const options = this.state.isAdmin ? tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id })) : null
+
     return (
       <div>
         <Form.Group>
@@ -594,6 +620,17 @@ class PopulationSearchForm extends Component {
               checked={studentStatuses.includes('NONDEGREE')}
               onChange={this.handleStudentStatusSelection}
             />
+            {this.state.isAdmin ? (
+              <div>
+                <Form.Dropdown
+                  placeholder="select tag"
+                  fluid
+                  selection
+                  options={options}
+                  onChange={this.handleTagSearch}
+                />
+                <Button onClick={() => this.fetchPopulation(this.state.query, this.state.selectedTag)}> Search by tag</Button>
+              </div>) : null}
           </Form.Field>
         </Form.Group>
       </div>)
@@ -661,7 +698,7 @@ class PopulationSearchForm extends Component {
   }
 }
 
-const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, locale }) => {
+const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, locale, tags }) => {
   const { language } = settings
   const { pending } = populationDegreesAndProgrammes
   return ({
@@ -671,7 +708,8 @@ const mapStateToProps = ({ semesters, settings, populations, populationDegreesAn
     translate: getTranslate(locale),
     studyProgrammes: populationDegreesAndProgrammes.data.programmes || {},
     pending,
-    extents: populations.data.extents || []
+    extents: populations.data.extents || [],
+    tags: tags.data
   })
 }
 
@@ -684,5 +722,6 @@ export default withRouter(connect(mapStateToProps, {
   getDegreesAndProgrammes,
   clearPopulations,
   setLoading,
-  getSemesters
+  getSemesters,
+  getTagsByStudytrackAction
 })(PopulationSearchForm))

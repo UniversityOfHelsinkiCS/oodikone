@@ -48,7 +48,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
           return
         }
       }
-    } catch(e) {
+    } catch (e) {
       console.error(e)
       res.status(400).json({ error: 'The query had invalid studyRights' })
       return
@@ -57,8 +57,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     if (req.query.months == null) {
       req.query.months = 12
     }
-
-    const result = await Population.optimizedStatisticsOf({ ...req.query, studyRights})
+    const result = await Population.optimizedStatisticsOf({ ...req.query, studyRights })
 
     if (result.error) {
       console.log(result.error)

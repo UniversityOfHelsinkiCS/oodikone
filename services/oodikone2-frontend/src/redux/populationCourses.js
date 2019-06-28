@@ -1,12 +1,12 @@
 import { callController } from '../apiConnection'
 
 export const getPopulationCourses = ({
-  year, semesters, studentStatuses, studyRights, months, uuid, selectedStudents
+  year, semesters, studentStatuses, studyRights, months, uuid, selectedStudents, tagYear
 }) => {
   const route = '/v2/populationstatistics/courses'
   const prefix = 'GET_POPULATION_COURSES_'
   const query = {
-    year, semesters, studentStatuses, studyRights, uuid, selectedStudents, months
+    year, semesters, studentStatuses, studyRights, uuid, selectedStudents, months, tagYear
   }
   const body = {
     year,
@@ -14,7 +14,8 @@ export const getPopulationCourses = ({
     studentStatuses,
     months,
     studyRights,
-    selectedStudents
+    selectedStudents,
+    tagYear
   }
   return callController(route, prefix, body, 'post', query)
 }
@@ -26,21 +27,24 @@ const defaultState = { pending: false, error: false, data: {}, query: {} }
 const reducer = (state = defaultState, action) => {
   switch (action.type) {
     case 'GET_POPULATION_COURSES_ATTEMPT':
-      return { ...state,
+      return {
+        ...state,
         pending: true,
         error: false,
         data: {},
         query: action.requestSettings.query
       }
     case 'GET_POPULATION_COURSES_FAILURE':
-      return { ...state,
+      return {
+        ...state,
         pending: false,
         error: true,
         data: action.response || {},
         query: action.query
       }
     case 'GET_POPULATION_COURSES_SUCCESS':
-      return { ...state,
+      return {
+        ...state,
         pending: false,
         error: false,
         data: action.response || {},
