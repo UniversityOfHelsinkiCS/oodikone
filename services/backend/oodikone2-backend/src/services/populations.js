@@ -107,7 +107,13 @@ const formatStudentForPopulationStatistics = ({
 
 const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
 
-const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright) => {
+const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright, tag) => {
+  const tagQuery = tag ? {
+    tag_id: {
+      [Op.eq]: tag
+    }
+  } : null
+
   const creditsOfStudentOther = {
     student_studentnumber: {
       [Op.in]: studentnumbers
@@ -138,7 +144,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
 
   const creditsOfStudent = ['320001', 'MH30_001'].includes(studyright[0]) ?
     creditsOfStudentLaakis : creditsOfStudentOther
-  
+
   const students = await Student.findAll({
     attributes: ['firstnames', 'lastname', 'studentnumber',
       'dateofuniversityenrollment', 'creditcount', 'matriculationexamination',
@@ -216,10 +222,11 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       {
         model: TagStudent,
         attributes: ['id'],
+        where: tagQuery,
         include: [
           {
             model: Tag,
-            attributes: ['tag_id','tagname']
+            attributes: ['tag_id', 'tagname'],
           }
         ],
       }
@@ -301,10 +308,10 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
 }
 
 const parseQueryParams = query => {
-  const { semesters, studentStatuses, year, studyRights, months } = query
+  const { semesters, studentStatuses, studyRights, months, year, tagYear } = query
   const startDate = semesters.includes('FALL') ?
-    `${year}-${semesterStart[semesters.find(s => s === 'FALL')]}` :
-    `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
+    `${tagYear}-${semesterStart[semesters.find(s => s === 'FALL')]}` :
+    `${moment(tagYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
   const endDate = semesters.includes('SPRING') ?
     `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}` :
     `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
@@ -417,7 +424,7 @@ const optimizedStatisticsOf = async (query) => {
   }
 
   const {
-    studyRights, startDate, endDate, months, exchangeStudents, cancelledStudents, nondegreeStudents
+    studyRights, startDate, months, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
   } = parseQueryParams(query)
 
   const studentnumbers =
@@ -425,7 +432,7 @@ const optimizedStatisticsOf = async (query) => {
       studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
     )
   const students =
-    await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months), studyRights)
+    await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months), studyRights, query.tag)
 
   const formattedStudents = await formatStudentsForApi(students, startDate, endDate, query)
   return formattedStudents
