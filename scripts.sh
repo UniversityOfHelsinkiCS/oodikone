@@ -110,8 +110,10 @@ reset_real_db () {
     docker-compose up -d db user_db
     ping_psql "oodi_db" "tkt_oodi_real"
     docker exec -u postgres oodi_db dropdb "tkt_oodi_real"
+    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_real"
     ping_psql "oodi_user_db" "user_db_real"
     docker exec -u postgres oodi_user_db dropdb "user_db_real"
+    docker exec -u postgres oodi_user_db psql -c "CREATE DATABASE user_db_real"
     db_setup_full
     docker-compose down
 }
