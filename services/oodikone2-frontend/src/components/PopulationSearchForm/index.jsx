@@ -162,7 +162,6 @@ class PopulationSearchForm extends Component {
   handleYearSelection = (momentYear) => {
     const { query } = this.state
     const { studyProgrammes } = this.props
-
     if (!moment.isMoment(momentYear)) {
       this.setState({
         momentYear: null,
@@ -221,16 +220,21 @@ class PopulationSearchForm extends Component {
   }
 
   handleTagSearch = (event, { value }) => {
+    this.setState({
+      selectedTag: value
+    })
+  }
+
+  handleTagYearSelect = (momentYear) => {
     const { query } = this.state
-    const months = this.getMonths('2015', new Date(), 'FALL')
+    const months = this.getMonths(reformatDate(momentYear, YEAR_DATE_FORMAT), new Date(), 'FALL')
     this.setState({
       query: {
         ...query,
-        year: '2018',
-        tagYear: '2015',
+        tagYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
+        year: reformatDate(new Date(), YEAR_DATE_FORMAT),
         months
-      },
-      selectedTag: value
+      }
     })
   }
 
@@ -377,6 +381,7 @@ class PopulationSearchForm extends Component {
 
   fetchPopulationFromUrlParams() {
     const query = this.parseQueryFromUrl()
+    console.log(query)
     this.setState({ query })
     this.fetchPopulation(query)
   }
@@ -562,7 +567,7 @@ class PopulationSearchForm extends Component {
 
     const { translate, tags } = this.props
     const { query } = this.state
-    const { semesters, studentStatuses } = query
+    const { semesters, studentStatuses, tagYear } = query
     const options = this.state.isAdmin ? tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id })) : null
 
     return (
@@ -628,6 +633,17 @@ class PopulationSearchForm extends Component {
                   selection
                   options={options}
                   onChange={this.handleTagSearch}
+                />
+                <Datetime
+                  className="yearSelectInput"
+                  control={Datetime}
+                  dateFormat={YEAR_DATE_FORMAT}
+                  timeFormat={false}
+                  renderYear={(props, selectableYear) => <td {...props}>{`${selectableYear}-${selectableYear + 1}`}</td>}
+                  closeOnSelect
+                  value={`${tagYear}-${moment().year(tagYear).add(1, 'years').format('YYYY')}`}
+                  isValidDate={this.validYearCheck}
+                  onChange={this.handleTagYearSelect}
                 />
                 <Button onClick={() => this.fetchPopulation(this.state.query, this.state.selectedTag)}> Search by tag</Button>
               </div>) : null}

@@ -108,11 +108,6 @@ const formatStudentForPopulationStatistics = ({
 const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
 
 const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright, tag) => {
-  const tagQuery = tag ? {
-    tag_id: {
-      [Op.eq]: tag
-    }
-  } : null
 
   const creditsOfStudentOther = {
     student_studentnumber: {
@@ -222,7 +217,6 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       {
         model: TagStudent,
         attributes: ['id'],
-        where: tagQuery,
         include: [
           {
             model: Tag,
@@ -236,8 +230,20 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       studentnumber: {
         [Op.in]: studentnumbers
       }
-    }
+    },
   })
+
+
+  if (tag) {
+    const studentsWithSearchedTag = {}
+    students.forEach(student => {
+      if (student.tag_students.some(t => t.tag.tag_id === tag)) {
+        studentsWithSearchedTag[student.studentnumber] = true
+      }
+    })
+
+    return students.filter(student => studentsWithSearchedTag[student.studentnumber])
+  }
   return students
 }
 
@@ -308,6 +314,7 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
 }
 
 const parseQueryParams = query => {
+  // tagYear not a good variable name, need to change it
   const { semesters, studentStatuses, studyRights, months, year, tagYear } = query
   const startDate = semesters.includes('FALL') ?
     `${tagYear}-${semesterStart[semesters.find(s => s === 'FALL')]}` :
