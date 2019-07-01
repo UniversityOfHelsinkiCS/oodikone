@@ -314,14 +314,13 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
 }
 
 const parseQueryParams = query => {
-  // tagYear not a good variable name, need to change it
-  const { semesters, studentStatuses, studyRights, months, year, tagYear } = query
+  const { semesters, studentStatuses, studyRights, months, endYear, startYear } = query
   const startDate = semesters.includes('FALL') ?
-    `${tagYear}-${semesterStart[semesters.find(s => s === 'FALL')]}` :
-    `${moment(tagYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
+    `${startYear}-${semesterStart[semesters.find(s => s === 'FALL')]}` :
+    `${moment(startYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
   const endDate = semesters.includes('SPRING') ?
-    `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}` :
-    `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
+    `${moment(endYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}` :
+    `${endYear}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
   const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
   const cancelledStudents = studentStatuses && studentStatuses.includes('CANCELLED')
   const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
@@ -429,7 +428,6 @@ const optimizedStatisticsOf = async (query) => {
   ) {
     return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE' }
   }
-
   const {
     studyRights, startDate, months, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
   } = parseQueryParams(query)
@@ -557,7 +555,7 @@ const bottlenecksOf = async (query) => {
 
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
-      const semester = getPassingSemester(parseInt(query.year, 10), date)
+      const semester = getPassingSemester(parseInt(query.endYear, 10), date)
       coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
     })
 

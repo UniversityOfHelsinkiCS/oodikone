@@ -191,12 +191,11 @@ class PopulationCourseStats extends Component {
       clearCourseStats: clearCourseStatsfn,
       years
     } = this.props
-
     const yearCode = year => Object.values(years).find(yearObject =>
       yearObject.yearname.slice(0, 4).includes(year)).yearcode
-    const { year, months } = query
-    const fromYear = yearCode(year)
-    const toYear = yearCode(moment(moment(year, 'YYYY').add(months, 'months')).format('YYYY'))
+    const { startYear, months } = query
+    const fromYear = yearCode(startYear)
+    const toYear = yearCode(moment(moment(startYear, 'YYYY').add(months, 'months')).format('YYYY'))
     history.push('/coursestatistics/')
     clearCourseStatsfn()
     getStatsFn({

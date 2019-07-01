@@ -23,7 +23,7 @@ const PopulationQueryCard =
       history.push('/populations')
       removeSampleFn(uuid)
     }
-    const { uuid, year, semesters, months, studentStatuses } = query
+    const { uuid, startYear, semesters, months, studentStatuses } = query
     const { students } = population
     if (students.length > 0) {
       return (
@@ -40,7 +40,7 @@ const PopulationQueryCard =
             <div className="dateItem">
               <Icon name="calendar" size="small" />
               {`${semesters.map(s => translate(`populationStatistics.${s}`))}/
-                ${year}-${Number(year) + 1}, showing ${months} months.`}
+                ${startYear}-${Number(startYear) + 1}, showing ${months} months.`}
             </div>
             <div>
               {`${translate('populationStatistics.sampleSize', { amount: students.length })} `}
@@ -48,11 +48,11 @@ const PopulationQueryCard =
             <div>
               {`Updated at ${reformatDate(_.minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}
             </div>
-            <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes' } exchange students</div>
-            <div>{studentStatuses.includes('CANCELLED') ? 'Includes ' : 'Excludes ' }
+            <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students</div>
+            <div>{studentStatuses.includes('CANCELLED') ? 'Includes ' : 'Excludes '}
               students with cancelled study right
             </div>
-            <div>{studentStatuses.includes('NONDEGREE') ? 'Includes ' : 'Excludes ' }
+            <div>{studentStatuses.includes('NONDEGREE') ? 'Includes ' : 'Excludes '}
               students with non-degree study right
             </div>
             {updating ?
@@ -83,7 +83,7 @@ const PopulationQueryCard =
         <Card.Meta>
           <div className="dateItem">
             <Icon name="calendar" size="small" />
-            {`${semesters.map(s => translate(`populationStatistics.${s}`))}/${year}-${Number(year) + 1},
+            {`${semesters.map(s => translate(`populationStatistics.${s}`))}/${startYear}-${Number(startYear) + 1},
              showing ${months} months.`}
           </div>
           <div>
@@ -109,7 +109,7 @@ PopulationQueryCard.propTypes = {
   translate: func.isRequired,
   population: shape({ students: arrayOf(object), extents: arrayOf(object) }).isRequired,
   query: shape({
-    year: oneOfType([string, number]),
+    startYear: oneOfType([string, number]),
     semester: string,
     studyRights: shape({ programme: string, degree: string, studyTrack: string }),
     uuid: string

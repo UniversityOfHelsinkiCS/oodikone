@@ -120,7 +120,6 @@ class PopulationSearchForm extends Component {
     const query = {
       ...initial,
       ...rest,
-      tagYear: rest.year,
       studyRights: JSON.parse(studyRights),
       months: JSON.parse(months)
     }
@@ -199,13 +198,12 @@ class PopulationSearchForm extends Component {
         }
       }
     }
-
     this.setState({
       momentYear,
       query: {
         ...query,
-        year: reformatDate(momentYear, YEAR_DATE_FORMAT),
-        tagYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
+        endYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
+        startYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
         months: this.months(
           reformatDate(momentYear, YEAR_DATE_FORMAT),
           this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING'
@@ -231,22 +229,22 @@ class PopulationSearchForm extends Component {
     this.setState({
       query: {
         ...query,
-        tagYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
-        year: reformatDate(new Date(), YEAR_DATE_FORMAT),
+        startYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
+        endYear: reformatDate(new Date(), YEAR_DATE_FORMAT),
         months
       }
     })
   }
 
   addYear = () => {
-    const { year } = this.state.query
-    const nextYear = momentFromFormat(year, YEAR_DATE_FORMAT).add(1, 'year')
+    const { startYear } = this.state.query
+    const nextYear = momentFromFormat(startYear, YEAR_DATE_FORMAT).add(1, 'year')
     this.handleYearSelection(nextYear)
   }
 
   subtractYear = () => {
-    const { year } = this.state.query
-    const previousYear = momentFromFormat(year, YEAR_DATE_FORMAT).subtract(1, 'year')
+    const { startYear } = this.state.query
+    const previousYear = momentFromFormat(startYear, YEAR_DATE_FORMAT).subtract(1, 'year')
     this.handleYearSelection(previousYear)
   }
 
@@ -258,7 +256,7 @@ class PopulationSearchForm extends Component {
       query: {
         ...query,
         semesters,
-        months: this.months(this.state.query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING')
+        months: this.months(this.state.query.startYear, semesters.includes('FALL') ? 'FALL' : 'SPRING')
       }
     })
   }
@@ -331,7 +329,7 @@ class PopulationSearchForm extends Component {
 
   handleMonthsChange = (value) => {
     const { query } = this.state
-    const months = this.getMonths(query.year, value, this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING')
+    const months = this.getMonths(query.startYear, value, this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING')
     this.setState({
       query: {
         ...query,
@@ -353,17 +351,17 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  getMonths = (year, end, term) => {
+  getMonths = (startYear, end, term) => {
     const lastDayOfMonth = moment(end).endOf('month')
-    const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
+    const start = term === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`
     this.setState({
       floatMonths: moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths()
     })
     return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
   }
 
-  getMonthValue = (year, months) => {
-    const start = `${year}-08-01`
+  getMonthValue = (startYear, months) => {
+    const start = `${startYear}-08-01`
     return moment(start).add(months - 1, 'months').format('MMMM YY')
   }
 
@@ -377,7 +375,7 @@ class PopulationSearchForm extends Component {
     return this.props.studyProgrammes[this.state.query.studyRights.programme].enrollmentStartYears[momentYear.year()] != null
   }
 
-  getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
+  getMinSelection = (startYear, semester) => (semester === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`)
 
   fetchPopulationFromUrlParams() {
     const query = this.parseQueryFromUrl()
@@ -386,8 +384,8 @@ class PopulationSearchForm extends Component {
   }
 
   initialQuery = () => ({
-    year: Datetime.moment('2017-01-01').year(),
-    tagYear: Datetime.moment('2017-01-01').year(),
+    endYear: Datetime.moment('2017-01-01').year(),
+    startYear: Datetime.moment('2017-01-01').year(),
     semesters: ['FALL', 'SPRING'],
     studentStatuses: [],
     studyRights: [],
@@ -408,7 +406,7 @@ class PopulationSearchForm extends Component {
 
   renderEnrollmentDateSelector = () => {
     const { query, momentYear } = this.state
-    const { semesters, year } = query
+    const { semesters, startYear } = query
     return (
       <Form.Group key="year" className="enrollmentSelectorGroup">
         <Form.Field error={!this.validYearCheck(momentYear)} className="yearSelect">
@@ -420,7 +418,7 @@ class PopulationSearchForm extends Component {
             timeFormat={false}
             renderYear={(props, selectableYear) => <td {...props}>{`${selectableYear}-${selectableYear + 1}`}</td>}
             closeOnSelect
-            value={`${year}-${moment().year(year).add(1, 'years').format('YYYY')}`}
+            value={`${startYear}-${moment().year(startYear).add(1, 'years').format('YYYY')}`}
             isValidDate={this.validYearCheck}
             onChange={this.handleYearSelection}
           />
@@ -435,10 +433,10 @@ class PopulationSearchForm extends Component {
           <label>Statistics until</label>
           <Datetime
             dateFormat="MMMM YYYY"
-            defaultValue={this.getMonthValue(this.state.query.year, this.state.floatMonths)}
+            defaultValue={this.getMonthValue(this.state.query.startYear, this.state.floatMonths)}
             onChange={value => this.handleMonthsChange(value)}
             isValidDate={current => current.isBefore(moment()) &&
-              current.isAfter(this.getMinSelection(year, semesters[1] || semesters[0]))}
+              current.isAfter(this.getMinSelection(startYear, semesters[1] || semesters[0]))}
           />
         </Form.Field>
       </Form.Group>
@@ -566,7 +564,7 @@ class PopulationSearchForm extends Component {
 
     const { translate, tags } = this.props
     const { query } = this.state
-    const { semesters, studentStatuses, tagYear } = query
+    const { semesters, studentStatuses, startYear } = query
     const options = this.state.isAdmin ? tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id })) : null
 
     return (
@@ -640,7 +638,7 @@ class PopulationSearchForm extends Component {
                   timeFormat={false}
                   renderYear={(props, selectableYear) => <td {...props}>{`${selectableYear}-${selectableYear + 1}`}</td>}
                   closeOnSelect
-                  value={`${tagYear}-${moment().year(tagYear).add(1, 'years').format('YYYY')}`}
+                  value={`${startYear}-${moment().year(startYear).add(1, 'years').format('YYYY')}`}
                   isValidDate={this.validYearCheck}
                   onChange={this.handleTagYearSelect}
                 />
