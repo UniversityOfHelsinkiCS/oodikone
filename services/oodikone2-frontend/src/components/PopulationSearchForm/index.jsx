@@ -218,8 +218,9 @@ class PopulationSearchForm extends Component {
   }
 
   handleTagSearch = (event, { value }) => {
+    const tag = this.props.tags.find(t => t.tag_id === value)
     this.setState({
-      selectedTag: value
+      selectedTag: tag
     })
   }
 
