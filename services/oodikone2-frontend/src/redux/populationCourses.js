@@ -1,21 +1,21 @@
 import { callController } from '../apiConnection'
 
 export const getPopulationCourses = ({
-  year, semesters, studentStatuses, studyRights, months, uuid, selectedStudents, tagYear
+  endYear, semesters, studentStatuses, studyRights, months, uuid, selectedStudents, startYear
 }) => {
   const route = '/v2/populationstatistics/courses'
   const prefix = 'GET_POPULATION_COURSES_'
   const query = {
-    year, semesters, studentStatuses, studyRights, uuid, selectedStudents, months, tagYear
+    endYear, semesters, studentStatuses, studyRights, uuid, selectedStudents, months, startYear
   }
   const body = {
-    year,
+    endYear,
     semesters,
     studentStatuses,
     months,
     studyRights,
     selectedStudents,
-    tagYear
+    startYear
   }
   return callController(route, prefix, body, 'post', query)
 }
