@@ -108,11 +108,6 @@ const formatStudentForPopulationStatistics = ({
 const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
 
 const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright, tag) => {
-  const tagQuery = tag ? {
-    tag_id: {
-      [Op.eq]: tag
-    }
-  } : null
 
   const creditsOfStudentOther = {
     student_studentnumber: {
@@ -222,7 +217,6 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       {
         model: TagStudent,
         attributes: ['id'],
-        where: tagQuery,
         include: [
           {
             model: Tag,
@@ -236,8 +230,20 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       studentnumber: {
         [Op.in]: studentnumbers
       }
-    }
+    },
   })
+
+
+  if (tag) {
+    const studentsWithSearchedTag = {}
+    students.forEach(student => {
+      if (student.tag_students.some(t => t.tag.tag_id === tag)) {
+        studentsWithSearchedTag[student.studentnumber] = true
+      }
+    })
+
+    return students.filter(student => studentsWithSearchedTag[student.studentnumber])
+  }
   return students
 }
 
@@ -308,13 +314,13 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
 }
 
 const parseQueryParams = query => {
-  const { semesters, studentStatuses, studyRights, months, year, tagYear } = query
+  const { semesters, studentStatuses, studyRights, months, endYear, startYear } = query
   const startDate = semesters.includes('FALL') ?
-    `${tagYear}-${semesterStart[semesters.find(s => s === 'FALL')]}` :
-    `${moment(tagYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
+    `${startYear}-${semesterStart[semesters.find(s => s === 'FALL')]}` :
+    `${moment(startYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
   const endDate = semesters.includes('SPRING') ?
-    `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}` :
-    `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
+    `${moment(endYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}` :
+    `${endYear}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
   const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
   const cancelledStudents = studentStatuses && studentStatuses.includes('CANCELLED')
   const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
@@ -422,7 +428,6 @@ const optimizedStatisticsOf = async (query) => {
   ) {
     return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE' }
   }
-
   const {
     studyRights, startDate, months, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
   } = parseQueryParams(query)
@@ -550,7 +555,7 @@ const bottlenecksOf = async (query) => {
 
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
-      const semester = getPassingSemester(parseInt(query.year, 10), date)
+      const semester = getPassingSemester(parseInt(query.endYear, 10), date)
       coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
     })
 
