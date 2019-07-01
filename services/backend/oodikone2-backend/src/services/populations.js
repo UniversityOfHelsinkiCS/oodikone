@@ -107,7 +107,8 @@ const formatStudentForPopulationStatistics = ({
 
 const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
 
-const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright) => {
+const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright, tag) => {
+
   const creditsOfStudentOther = {
     student_studentnumber: {
       [Op.in]: studentnumbers
@@ -138,7 +139,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
 
   const creditsOfStudent = ['320001', 'MH30_001'].includes(studyright[0]) ?
     creditsOfStudentLaakis : creditsOfStudentOther
-  
+
   const students = await Student.findAll({
     attributes: ['firstnames', 'lastname', 'studentnumber',
       'dateofuniversityenrollment', 'creditcount', 'matriculationexamination',
@@ -219,7 +220,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         include: [
           {
             model: Tag,
-            attributes: ['tag_id','tagname']
+            attributes: ['tag_id', 'tagname'],
           }
         ],
       }
@@ -229,8 +230,18 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       studentnumber: {
         [Op.in]: studentnumbers
       }
-    }
+    },
   })
+  if (tag) {
+    const studentsWithSearchedTag = {}
+    students.forEach(student => {
+      if (student.tag_students.some(t => t.tag.tag_id === tag)) {
+        studentsWithSearchedTag[student.studentnumber] = true
+      }
+    })
+
+    return students.filter(student => studentsWithSearchedTag[student.studentnumber])
+  }
   return students
 }
 
@@ -301,13 +312,13 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
 }
 
 const parseQueryParams = query => {
-  const { semesters, studentStatuses, year, studyRights, months } = query
+  const { semesters, studentStatuses, studyRights, months, endYear, startYear } = query
   const startDate = semesters.includes('FALL') ?
-    `${year}-${semesterStart[semesters.find(s => s === 'FALL')]}` :
-    `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
+    `${startYear}-${semesterStart[semesters.find(s => s === 'FALL')]}` :
+    `${moment(startYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
   const endDate = semesters.includes('SPRING') ?
-    `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}` :
-    `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
+    `${moment(endYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}` :
+    `${endYear}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
   const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
   const cancelledStudents = studentStatuses && studentStatuses.includes('CANCELLED')
   const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
@@ -415,9 +426,8 @@ const optimizedStatisticsOf = async (query) => {
   ) {
     return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE' }
   }
-
   const {
-    studyRights, startDate, endDate, months, exchangeStudents, cancelledStudents, nondegreeStudents
+    studyRights, startDate, months, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
   } = parseQueryParams(query)
 
   const studentnumbers =
@@ -425,7 +435,7 @@ const optimizedStatisticsOf = async (query) => {
       studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
     )
   const students =
-    await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months), studyRights)
+    await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months), studyRights, query.tag)
 
   const formattedStudents = await formatStudentsForApi(students, startDate, endDate, query)
   return formattedStudents
@@ -543,7 +553,7 @@ const bottlenecksOf = async (query) => {
 
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
-      const semester = getPassingSemester(parseInt(query.year, 10), date)
+      const semester = getPassingSemester(parseInt(query.endYear, 10), date)
       coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
     })
 
