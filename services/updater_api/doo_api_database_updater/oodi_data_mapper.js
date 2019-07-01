@@ -30,6 +30,7 @@ const getStudentFromData = (student, studyrights) => {
   const language = getTextsByLanguage(student.language)
   const country = getTextsByLanguage(student.country)
   const gender = getTextsByLanguage(student.gender)
+  const home_country = getTextsByLanguage(student.home_country)
   return {
     studentnumber: student.student_number,
     email: student.email,
@@ -52,6 +53,9 @@ const getStudentFromData = (student, studyrights) => {
     country_fi: country.fi,
     country_sv: country.sv,
     country_en: country.en,
+    home_country_fi: home_country.fi,
+    home_country_sv: home_country.sv,
+    home_country_en: home_country.en,
     firstnames: student.first_names,
     communicationlanguage: language.en || language.fi || language.sv,
     dateofuniversityenrollment: universityEnrollmentDateFromStudyRights(studyrights),
