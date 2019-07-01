@@ -7,7 +7,7 @@ const StudyrightService = require('../services/studyrights')
 // POST instead of GET because of too long params and "sensitive" data
 router.post('/v2/populationstatistics/courses', async (req, res) => {
   try {
-    if (!req.body.year || !req.body.semesters || !req.body.studyRights) {
+    if (!req.body.startYear || !req.body.semesters || !req.body.studyRights) {
       res.status(400).json({ error: 'The body should have a year, semester and study rights defined' })
       return
     }
@@ -32,9 +32,9 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
 })
 
 router.get('/v3/populationstatistics', async (req, res) => {
-  const { year, semesters, studyRights: studyRightsJSON } = req.query
+  const { startYear, semesters, studyRights: studyRightsJSON } = req.query
   try {
-    if (!year || !semesters || !studyRightsJSON) {
+    if (!startYear || !semesters || !studyRightsJSON) {
       res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
       return
     }
