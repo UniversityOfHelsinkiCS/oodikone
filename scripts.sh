@@ -103,6 +103,7 @@ db_anon_setup_full () {
     ping_psql "oodi_db" "tkt_oodi_test"
     retry restore_psql_from_backup
     ping_psql "db_kone" "db_kone"
+    ping_psql "db_kone" "db_kone_test"
     retry restore_dbkone_from_backup
     # echo "Restoring MongoDB from backup"
     # retry restore_mongodb_from_backup
@@ -134,6 +135,8 @@ reset_db () {
     docker exec -u postgres oodi_db dropdb "tkt_oodi_test"
     ping_psql "db_kone" "db_kone"
     docker exec -u postgres db_kone dropdb "db_kone"
+    ping_psql "db_kone" "db_kone_test"
+    docker exec -u postgres db_kone dropdb "db_kone_test"
     ping_psql "oodi_user_db" "user_db"
     docker exec -u postgres oodi_user_db dropdb "user_db"
     db_anon_setup_full
