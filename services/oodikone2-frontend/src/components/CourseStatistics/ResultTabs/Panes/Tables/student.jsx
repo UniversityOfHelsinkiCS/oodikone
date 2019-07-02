@@ -3,7 +3,7 @@ import { Header } from 'semantic-ui-react'
 import { shape, string, number, oneOfType, arrayOf } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
 
-const formatPercentage = p => `${p.toFixed(2) * 100} %`
+const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
 const StudentTable = ({ stats, name }) => {
   const formatted = stats.map((statistic) => {
