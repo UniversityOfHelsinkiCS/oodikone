@@ -1,4 +1,4 @@
-const { ThesisCourse } = require('../models/index')
+const { ThesisCourse } = require('../models/models_kone')
 
 const createThesisCourse = (programme, course, type) => ThesisCourse.create({
   programmeCode: programme,

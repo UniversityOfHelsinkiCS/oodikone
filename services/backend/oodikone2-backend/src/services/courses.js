@@ -4,8 +4,11 @@ const {
   sequelize, Student, Credit,
   Course, CourseType, Discipline,
   ElementDetails, StudyrightElement,
-  Studyright, Semester, CourseDuplicates,
+  Studyright, Semester,
 } = require('../models')
+const {
+  sequelizeKone, CourseDuplicates,
+} = require('../models/models_kone')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../services/course_yearly_stats_counter')
 const _ = require('lodash')
@@ -409,7 +412,7 @@ const deleteDuplicateCode = async (code) => {
         coursecode: code
       }
     })
-    await sequelize.query(
+    await sequelizeKone.query(
       `DELETE FROM course_duplicates
       WHERE groupid in ( SELECT groupid FROM course_duplicates
       group by groupid
@@ -421,12 +424,17 @@ const deleteDuplicateCode = async (code) => {
   }
 }
 
-const getDuplicateCodesWithCourses = () => {
-  return CourseDuplicates.findAll({
-    include: {
-      model: Course,
+const getDuplicateCodesWithCourses = async () => {
+  const courseDuplicates = await CourseDuplicates.findAll()
+  const courses = await Course.findAll({
+    where: {
+      code: {
+        [Op.in]: courseDuplicates.map(e => e.coursecode)
+      }
     }
   })
+  const codeToCourse = courses.reduce((acc, c) => { acc[c.code] = c; return acc }, {})
+  return courseDuplicates.map(cd => ({ ...cd.get(), course: codeToCourse[cd.coursecode] }))
 }
 
 const getDuplicatesToIdMap = () => {

@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { Tag } = require('../models')
+const { Tag } = require('../models/models_kone')
 
 const Op = Sequelize.Op
 

@@ -5,6 +5,7 @@ ANONDB_DIR=anonyymioodi
 BACKUP_DIR=backups
 PSQL_DB_BACKUP="$ANONDB_DIR/anon.sqz"
 USER_DB_BACKUP="$ANONDB_DIR/user-dump.sqz"
+KONE_DB_BACKUP="$ANONDB_DIR/anon_kone.sqz"
 PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.sqz"
 USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
 
@@ -70,6 +71,10 @@ restore_real_userdb_from_backup () {
     time pg_restore -U postgres -h localhost -p 5422 --no-owner -F c --dbname=user_db_real -j4 $USER_REAL_DB_BACKUP
 }
 
+restore_dbkone_from_backup () {
+    time pg_restore -U postgres -h localhost -p 5425 --no-owner -F c --dbname=db_kone -j4 $KONE_DB_BACKUP
+}
+
 # oodilearn
 # restore_mongodb_from_backup () {
 #     docker exec -t mongo_db mongorestore -d oodilearn "/dump"
@@ -97,6 +102,9 @@ db_anon_setup_full () {
     ping_psql "oodi_db" "tkt_oodi"
     ping_psql "oodi_db" "tkt_oodi_test"
     retry restore_psql_from_backup
+    ping_psql "db_kone" "db_kone"
+    ping_psql "db_kone" "db_kone_test"
+    retry restore_dbkone_from_backup
     # echo "Restoring MongoDB from backup"
     # retry restore_mongodb_from_backup
     echo "Restore user db from backup"
@@ -120,11 +128,15 @@ reset_real_db () {
 
 reset_db () {
     docker-compose down
-    docker-compose up -d db user_db
+    docker-compose up -d db user_db db_kone
     ping_psql "oodi_db" "tkt_oodi"
     docker exec -u postgres oodi_db dropdb "tkt_oodi"
     ping_psql "oodi_db" "tkt_oodi_test"
     docker exec -u postgres oodi_db dropdb "tkt_oodi_test"
+    ping_psql "db_kone" "db_kone"
+    docker exec -u postgres db_kone dropdb "db_kone"
+    ping_psql "db_kone" "db_kone_test"
+    docker exec -u postgres db_kone dropdb "db_kone_test"
     ping_psql "oodi_user_db" "user_db"
     docker exec -u postgres oodi_user_db dropdb "user_db"
     db_anon_setup_full
@@ -155,7 +167,7 @@ run_full_setup () {
     echo "Building images"
     docker-compose build
     echo "Setup oodikone db from dump."
-    docker-compose up -d db user_db
+    docker-compose up -d db user_db db_kone
     db_setup_full
     db_anon_setup_full
     docker-compose down
@@ -172,7 +184,7 @@ run_anon_full_setup () {
     echo "Building images"
     docker-compose build
     echo "Setup oodikone db from dump."
-    docker-compose up -d db user_db
+    docker-compose up -d db user_db db_kone
     db_anon_setup_full
     docker-compose down
     show_instructions
@@ -188,7 +200,7 @@ run_e2e_setup () {
     echo "Building images"
     docker-compose -f $1 build
     echo "Setup oodikone db from dump."
-    docker-compose -f $1 up -d db user_db
+    docker-compose -f $1 up -d db user_db db_kone
     db_anon_setup_full
     echo "Starting services."
     docker-compose -f $1 up -d

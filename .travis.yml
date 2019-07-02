@@ -56,12 +56,12 @@ jobs:
         - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
         - docker ps -a
         - if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk '{ sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
-      deploy: # deploy is always skipped for PR
-        provider: script
-        skip_cleanup: true
-        script: "docker-compose -f docker-compose.lateste2e.production.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release started auto deployment!\\\"}\" ${SLACKBOT_URL}"
-        on:
-          tags: true
+      # deploy: # deploy is always skipped for PR
+      #   provider: script
+      #   skip_cleanup: true
+      #   script: "docker-compose -f docker-compose.lateste2e.production.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release started auto deployment!\\\"}\" ${SLACKBOT_URL}"
+      #   on:
+      #     tags: true
 
 after_failure:
   - "curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${IMAGE} buildi paskana. STOP AND FIX tai tulee kenkää! *${AUTHOR_NAME}* ${TRAVIS_BUILD_WEB_URL}\\\"}\" ${SLACKBOT_URL}"

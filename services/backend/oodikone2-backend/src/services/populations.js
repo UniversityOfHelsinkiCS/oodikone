@@ -3,9 +3,11 @@ const moment = require('moment')
 const { orderBy } = require('lodash')
 const {
   Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails,
-  Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement,
-  Tag, TagStudent
+  Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement
 } = require('../models')
+const {
+  Tag, TagStudent
+} = require('../models/models_kone')
 const { getMainCodesMap, byName } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
@@ -214,17 +216,6 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
           }
         }
       },
-      {
-        model: TagStudent,
-        attributes: ['id'],
-        include: [
-          {
-            model: Tag,
-            attributes: ['tag_id', 'tagname'],
-          }
-        ],
-      }
-
     ],
     where: {
       studentnumber: {
@@ -233,8 +224,25 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     },
   })
   if (tag) {
+    const studentTags = await TagStudent.findAll({
+      attributes: ['id', 'studentnumber'],
+      include: [
+        {
+          model: Tag,
+          attributes: ['tag_id', 'tagname'],
+        }
+      ],
+    })
+
+    const studentNumberToTags = studentTags.reduce((acc, t) => {
+      acc[t.studentnumber] = acc[t.studentnumber] || []
+      acc[t.studentnumber].push(t)
+      return acc
+    }, {})
+
     const studentsWithSearchedTag = {}
     students.forEach(student => {
+      student.tag_students = studentNumberToTags[student.studentnumber]
       if (student.tag_students.some(t => t.tag.tag_id === tag)) {
         studentsWithSearchedTag[student.studentnumber] = true
       }
@@ -376,18 +384,18 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   }, {
-      students: [],
-      extents: {},
-      semesters: {},
-      transfers: {
-        targets: {},
-        sources: {}
-      },
-      studyrights: {
-        degrees: [],
-        programmes: []
-      }
-    })
+    students: [],
+    extents: {},
+    semesters: {},
+    transfers: {
+      targets: {},
+      sources: {}
+    },
+    studyrights: {
+      degrees: [],
+      programmes: []
+    }
+  })
 
   const transferredStudyright = (s) => {
     const studyright = s.studyrights.find(s => s.studyrightElements
@@ -434,8 +442,13 @@ const optimizedStatisticsOf = async (query) => {
     await studentnumbersWithAllStudyrightElements(
       studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
     )
-  const students =
-    await getStudentsIncludeCoursesBetween(studentnumbers, startDate, dateMonthsFromNow(startDate, months), studyRights, query.tag)
+  const students = await getStudentsIncludeCoursesBetween(
+    studentnumbers,
+    startDate,
+    dateMonthsFromNow(startDate, months),
+    studyRights,
+    query.tag
+  )
 
   const formattedStudents = await formatStudentsForApi(students, startDate, endDate, query)
   return formattedStudents

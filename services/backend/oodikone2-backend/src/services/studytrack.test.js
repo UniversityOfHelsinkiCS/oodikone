@@ -11,7 +11,8 @@ const {
   thesisProductivityFromCredits,
   thesisProductivityForStudytrack
 } = require('./studytrack')
-const { sequelize, ThesisTypeEnums } = require('../models')
+const { sequelize } = require('../models')
+const { ThesisTypeEnums, ThesisCourse } = require('../models/models_kone')
 const { readFileSync } = require('fs')
 
 const { MASTER, BACHELOR } = ThesisTypeEnums
@@ -19,9 +20,15 @@ const { MASTER, BACHELOR } = ThesisTypeEnums
 const provider = '500-M010'
 const studytrack = 'MH50_010'
 
+const thesisCourse = {
+  // from studytrack.test.sql
+  programmeCode: 'MH50_010', courseCode: 'THESIS_01', thesisType: MASTER
+}
+
 beforeAll(async () => {
   const query = readFileSync('./src/services/studytrack.test.sql', 'utf8')
   await sequelize.query(query)
+  await ThesisCourse.create(thesisCourse)
 })
 
 test('Credits for provider should contain passed course credit', async () => {

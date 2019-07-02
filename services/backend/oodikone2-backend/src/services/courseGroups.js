@@ -1,5 +1,8 @@
 const { redisClient } = require('../services/redis')
-const { Teacher, CourseGroup } = require('../models')
+const { Teacher } = require('../models')
+const { CourseGroup, TeacherCourseGroup } = require('../models/models_kone')
+const { Op } = require('sequelize')
+const { flatMap } = require('lodash')
 
 const {
   getCurrentAcademicYear,
@@ -26,18 +29,27 @@ const getCurrentAcademicYearSemesterCode = async () => {
   return academicYear[0].semestercode
 }
 
-const getTeachersForCourseGroup = (courseGroupId) => {
-  return Teacher.findAll({
-    attributes: ['name', 'code', 'id'],
+const getTeachersForCourseGroup = async (courseGroupId) => {
+  const courseGroups = await CourseGroup.findAll({
+    model: CourseGroup,
     include: {
-      model: CourseGroup,
-      attributes: [],
+      model: TeacherCourseGroup,
       required: true,
-      where: {
-        id: courseGroupId
-      },
+    },
+    where: {
+      id: courseGroupId
     },
   })
+  const teacherIds = flatMap(courseGroups, e => e.teacher_course_groups.map(tcg => tcg.teacher_id))
+  const teachers = await Teacher.findAll({
+    attributes: ['name', 'code', 'id'],
+    where: {
+      id: {
+        [Op.in]: teacherIds
+      }
+    },
+  })
+  return teachers
 }
 
 const createCourseGroup = (name) => CourseGroup.create({ name })
@@ -141,17 +153,13 @@ const getCoursesByTeachers = async (teacherIds, semesterCode) => {
 }
 
 const addTeacher = async (courseGroupId, teacherid) => {
-  const group = await CourseGroup.findByPk(courseGroupId)
   const teacher = await Teacher.findByPk(teacherid)
-  if (!group || !teacher) return
-  return await group.addTeacher(teacher)
+  if (!teacher) return
+  return TeacherCourseGroup.create({ teacher_id: teacherid, course_group_id: courseGroupId })
 }
 
-const removeTeacher = async (courseGroupId, teacherid) => {
-  const group = await CourseGroup.findByPk(courseGroupId)
-  const teacher = await Teacher.findByPk(teacherid)
-  if (!group || !teacher) return
-  return await group.removeTeacher(teacher)
+const removeTeacher = (courseGroupId, teacherid) => {
+  return TeacherCourseGroup.destroy({ where: { teacher_id: teacherid, course_group_id: courseGroupId } })
 }
 
 module.exports = {
