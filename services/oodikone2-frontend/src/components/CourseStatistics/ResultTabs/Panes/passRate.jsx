@@ -39,7 +39,6 @@ const getPassRateCumSeriesFromStats = (stats) => {
   }
 }
 
-
 const getPassRateStudSeriesFromStats = (stats) => {
   const all = []
   const failedFirst = []

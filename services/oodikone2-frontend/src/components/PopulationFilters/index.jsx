@@ -32,7 +32,6 @@ import {
 import { presetFilter, getFilterFunction } from '../../populationFilters'
 import { getTextIn, userIsAdmin } from '../../common'
 
-
 const componentFor = {
   CreditsAtLeast,
   CreditsLessThan,

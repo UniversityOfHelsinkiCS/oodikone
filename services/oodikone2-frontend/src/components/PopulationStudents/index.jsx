@@ -22,7 +22,6 @@ import TagPopulation from '../TagPopulation'
 
 const popupTimeoutLength = 1000
 
-
 class PopulationStudents extends Component {
   state = {
     containsStudyTracks: false,

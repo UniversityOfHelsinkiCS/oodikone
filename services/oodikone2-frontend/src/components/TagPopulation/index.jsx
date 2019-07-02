@@ -9,7 +9,6 @@ import {
   getStudentTagsByStudytrackAction
 } from '../../redux/tagstudent'
 
-
 const TagPopulation = ({
   allChecker,
   handleAllCheck,
@@ -88,6 +87,5 @@ TagPopulation.propTypes = {
 const mapStateToProps = ({ tagstudent }) => ({
   created: tagstudent.created
 })
-
 
 export default withRouter(connect(mapStateToProps, { createStudentTag: createStudentTagAction, getStudentTagsByStudytrack: getStudentTagsByStudytrackAction })(TagPopulation))

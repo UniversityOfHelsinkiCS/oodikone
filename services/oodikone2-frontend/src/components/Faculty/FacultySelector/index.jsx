@@ -6,8 +6,6 @@ import { getFaculties } from '../../../redux/faculties'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 
-
-
 const FacultySelector = ({ language, handleSelect, dispatchGetFaculties, faculties }) => {
   const fetchFaculties = async () => {
     await dispatchGetFaculties()
@@ -29,7 +27,6 @@ const FacultySelector = ({ language, handleSelect, dispatchGetFaculties, faculti
       getRowVal: faculty => faculty.code
     }
   ]
-
 
   return (
     <SortableTable

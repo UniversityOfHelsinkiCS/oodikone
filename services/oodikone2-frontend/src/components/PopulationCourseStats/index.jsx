@@ -130,7 +130,6 @@ class PopulationCourseStats extends Component {
       .filter(studentAmountFilter)
       .filter(c => !codeFilter || courseCodeFilter(c))
 
-
     const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
 
     const courseStatistics = _.orderBy(

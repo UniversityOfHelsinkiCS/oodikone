@@ -1,6 +1,5 @@
 import { createSelector } from 'reselect'
 
-
 const getPopulations = state => state.populations
 
 export const flattenAndCleanPopulations = (populations) => {
