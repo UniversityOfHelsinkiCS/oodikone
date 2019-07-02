@@ -3,11 +3,11 @@ import { Segment, Header, Form } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
+import qs from 'query-string'
 import ResultTabs from '../ResultTabs'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import YearFilter from '../SearchForm/YearFilter'
-import qs from 'query-string'
 
 const countFilteredStudents = (stat, filter) => Object.entries(stat).reduce((acc, entry) => {
   const [category, students] = entry
@@ -31,6 +31,14 @@ class SingleCourseStats extends Component {
     }
   }
 
+  getProgrammeName = (progcode) => {
+    if (progcode === ALL.value) {
+      return 'All'
+    }
+    const { name } = this.props.stats.programmes[progcode]
+    return name.fi || name.en || name.sv
+  }
+
   parseQueryFromUrl = () => {
     const { location } = this.props
     const { separate, fromYear, toYear } = qs.parse(location.search)
@@ -41,14 +49,6 @@ class SingleCourseStats extends Component {
       toYear: JSON.parse(toYear),
       toYearInitial: JSON.parse(toYear)
     }
-  }
-
-  getProgrammeName = (progcode) => {
-    if (progcode === ALL.value) {
-      return 'All'
-    }
-    const { name } = this.props.stats.programmes[progcode]
-    return name.fi || name.en || name.sv
   }
 
   belongsToProgramme = (code) => {
@@ -143,7 +143,7 @@ class SingleCourseStats extends Component {
 
   render() {
     const { programmes } = this.props
-    const { fromYear, toYear } = this.state
+    const { fromYear, toYear } = this.state
     const { primary, comparison } = this.selectedProgrammes()
     const statistics = this.filteredProgrammeStatistics()
     const { filteredYears } = this.filteredYearsAndSemesters(true)
@@ -182,6 +182,7 @@ class SingleCourseStats extends Component {
               toYear={toYear}
               handleChange={this.handleChange}
               showCheckbox={false}
+              separate={false}
             />
           </Form>
         </Segment>
@@ -212,7 +213,10 @@ SingleCourseStats.propTypes = {
     name: string,
     coursecode: string
   }).isRequired,
-  programmes: arrayOf(shape({})).isRequired
+  programmes: arrayOf(shape({})).isRequired,
+  years: arrayOf(shape({})).isRequired,
+  semesters: arrayOf(shape({})).isRequired,
+  location: shape({}).isRequired
 }
 
 const mapStateToProps = (state) => {

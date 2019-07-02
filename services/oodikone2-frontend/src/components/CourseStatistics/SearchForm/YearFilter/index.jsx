@@ -44,13 +44,15 @@ YearFilter.propTypes = {
   fromYear: number,
   toYear: number,
   handleChange: func.isRequired,
-  onToggleCheckbox: func.isRequired,
-  separate: bool.isRequired
+  onToggleCheckbox: func,
+  separate: bool.isRequired,
+  showCheckbox: bool.isRequired
 }
 
 YearFilter.defaultProps = {
   fromYear: undefined,
-  toYear: undefined
+  toYear: undefined,
+  onToggleCheckbox: () => null
 }
 
 export default YearFilter
