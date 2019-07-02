@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Button, Icon, Popup, Tab, Grid, Checkbox } from 'semantic-ui-react'
+import { Header, Segment, Button, Icon, Popup, Tab, Grid, Checkbox, List } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import _ from 'lodash'
 import XLSX from 'xlsx'
@@ -393,16 +393,22 @@ class PopulationStudents extends Component {
         const check = this.state.checkedStudents.find(c => c.studentnumber === s.studentNumber) || false
         return (
           <div key={s.studentNumber}>
-            <Checkbox
-              checked={check.checked}
-              onChange={() => this.handleSingleCheck(s.studentNumber)}
-            />
-            <TagStudent
-              tags={this.props.tags}
-              studentnumber={s.studentNumber}
-              studentstags={s.tags}
-              studytrack={this.props.queryStudyrights[0]}
-            />
+            <List horizontal>
+              <List.Item>
+                <Checkbox
+                  checked={check.checked}
+                  onChange={() => this.handleSingleCheck(s.studentNumber)}
+                />
+              </List.Item>
+              <List.Item>
+                <TagStudent
+                  tags={this.props.tags}
+                  studentnumber={s.studentNumber}
+                  studentstags={s.tags}
+                  studytrack={this.props.queryStudyrights[0]}
+                />
+              </List.Item>
+            </List>
           </div>)
       })
 
