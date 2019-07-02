@@ -167,7 +167,7 @@ run_full_setup () {
     echo "Building images"
     docker-compose build
     echo "Setup oodikone db from dump."
-    docker-compose up -d db user_db
+    docker-compose up -d db user_db db_kone
     db_setup_full
     db_anon_setup_full
     docker-compose down
@@ -184,7 +184,7 @@ run_anon_full_setup () {
     echo "Building images"
     docker-compose build
     echo "Setup oodikone db from dump."
-    docker-compose up -d db user_db
+    docker-compose up -d db user_db db_kone
     db_anon_setup_full
     docker-compose down
     show_instructions
@@ -200,7 +200,7 @@ run_e2e_setup () {
     echo "Building images"
     docker-compose -f $1 build
     echo "Setup oodikone db from dump."
-    docker-compose -f $1 up -d db user_db
+    docker-compose -f $1 up -d db user_db db_kone
     db_anon_setup_full
     echo "Starting services."
     docker-compose -f $1 up -d
