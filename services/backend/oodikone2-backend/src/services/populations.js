@@ -232,8 +232,6 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       }
     },
   })
-
-
   if (tag) {
     const studentsWithSearchedTag = {}
     students.forEach(student => {

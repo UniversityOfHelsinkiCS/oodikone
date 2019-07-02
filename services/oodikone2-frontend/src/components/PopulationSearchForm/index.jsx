@@ -218,8 +218,9 @@ class PopulationSearchForm extends Component {
   }
 
   handleTagSearch = (event, { value }) => {
+    const tag = this.props.tags.find(t => t.tag_id === value)
     this.setState({
-      selectedTag: value
+      selectedTag: tag
     })
   }
 
@@ -636,9 +637,9 @@ class PopulationSearchForm extends Component {
                   control={Datetime}
                   dateFormat={YEAR_DATE_FORMAT}
                   timeFormat={false}
-                  renderYear={(props, selectableYear) => <td {...props}>{`${selectableYear}-${selectableYear + 1}`}</td>}
+                  renderYear={(props, selectableYear) => <td {...props}>{selectableYear}</td>}
                   closeOnSelect
-                  value={`${startYear}-${moment().year(startYear).add(1, 'years').format('YYYY')}`}
+                  value={startYear}
                   isValidDate={this.validYearCheck}
                   onChange={this.handleTagYearSelect}
                 />

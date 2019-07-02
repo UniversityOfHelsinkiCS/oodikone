@@ -1,6 +1,7 @@
 const sequelize = require('sequelize')
 const { Op } = sequelize
 const moment = require('moment')
+const { flatMap } = require('lodash')
 const { Credit, Student, Course, Provider, Studyright, StudyrightElement,
   ElementDetails, ThesisCourse, ThesisTypeEnums
 } = require('../models')
@@ -215,9 +216,25 @@ const thesisProductivityForStudytrack = async code => {
 }
 
 const combineStatistics = (creditStats, studyrightStats, thesisStats, creditsForMajors, transferredCredits) => {
-  const stats = { ...creditStats }
-  Object.keys(stats).forEach(year => {
+  const allYears = [
+    ...new Set(
+      flatMap(
+        [
+          creditStats,
+          studyrightStats,
+          thesisStats,
+          creditsForMajors,
+          transferredCredits
+        ],
+        Object.keys
+      )
+    )
+  ]
+  const stats = {}
+  allYears.forEach(year => {
     const thesis = thesisStats[year] || {}
+    stats[year] = {}
+    stats[year] = creditStats[year] || { credits: 0, year }
     stats[year].graduated = studyrightStats[year] ? studyrightStats[year].graduated : 0
     // stats[year].medianGraduationTime = studyrightStats[year] ? studyrightStats[year].medianGraduationTime : 0
     stats[year].bThesis = thesis.bThesis || 0
@@ -347,13 +364,13 @@ const gendersFromClass = async (studentnumbers) => {
 
 const countriesFromClass = async (studentnumbers) => {
   return Student.findAll({
-    attributes: [[sequelize.fn('count', sequelize.col('country_en')), 'count'], 'country_en'],
+    attributes: [[sequelize.fn('count', sequelize.col('home_country_en')), 'count'], 'home_country_en'],
     where: {
       studentnumber: {
         [Op.in]: studentnumbers
       },
     },
-    group: ['country_en'],
+    group: ['home_country_en'],
     raw: true
   }).reduce((acc, curr) => {
     acc[curr.country_en] = curr.count
@@ -515,9 +532,10 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
     const creditsForStudyprogramme =
       await productivityCreditsFromStudyprogrammeStudents(studytrack, startDate, studentnumbers)
-
+    console.log('ASDFASDFADSF')
     const [credits, graduated, theses, genders, countries, transferredTo, endedStudyright] =
       await statsForClass(studentnumbers, startDate, studytrack, endDate)
+    console.log(countries)
     //console.log(year)
     //console.log(transferredFrom.rows.map(r => r.get({ plain: true })))
     // theres so much shit in the data that transefferFrom doesnt rly mean anything
