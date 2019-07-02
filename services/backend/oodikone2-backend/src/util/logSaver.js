@@ -1,6 +1,6 @@
 const Transport = require('winston-transport')
 const uuid = require('uuid')
-const { UsageStatistic } = require('../models')
+const { UsageStatistic } = require('../models/models_kone')
 
 module.exports = class LogSaverTransport extends Transport {
   log(payload, callback) {
@@ -16,7 +16,7 @@ module.exports = class LogSaverTransport extends Transport {
         status: payload.status,
         data: payload
       }
-      
+
       UsageStatistic.create(object)
     }
     callback()

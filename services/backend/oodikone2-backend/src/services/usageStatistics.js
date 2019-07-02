@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const moment = require('moment')
-const { UsageStatistic } = require('../models')
+const { UsageStatistic } = require('../models/models_kone')
 const Sequelize = require('sequelize')
 const { Op } = Sequelize
 

@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { Filters } = require('../models')
+const { Filters } = require('../models/models_kone')
 
 const Op = Sequelize.Op
 

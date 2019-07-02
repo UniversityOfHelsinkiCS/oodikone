@@ -1,5 +1,6 @@
 data
 pgdata
+pgdata_kone
 user_pgdata
 analytics_pgdata
 usage_pgdata

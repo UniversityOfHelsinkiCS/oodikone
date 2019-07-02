@@ -42,6 +42,18 @@ services:
       - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
       - POSTGRES_USER=postgres
 
+  db_kone:
+    image: postgres:9.6.3
+    ports:
+      - "5425:5432"
+    volumes:
+      - ./pgdata_kone:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    container_name: db_kone
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=db_kone
+      - POSTGRES_USER=postgres
+
   redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
@@ -69,10 +81,12 @@ services:
       - "8080:8080"
       - "9229:9229"
     environment:
-      WAIT_HOSTS: redis:6379,db:5432,nats:4222
+      WAIT_HOSTS: redis:6379,db:5432,db_kone:5432,nats:4222
       REDIS: redis
       DB_URL: postgres://postgres@db:5432/tkt_oodi
+      DB_URL_KONE: postgres://postgres@db_kone:5432/db_kone
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
+      TEST_DB_KONE: postgres://postgres@db_kone:5432/db_kone_test
       FRONT_URL: http://localhost:1337
       TOKEN_SECRET: IWannaBeTheVeryBest
       OODILEARN_URL: http://oodilearn:5000
@@ -83,7 +97,6 @@ services:
       ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
-      DB_SCHEMA_KONE: kone_data
     container_name: backend
     depends_on:
       - db

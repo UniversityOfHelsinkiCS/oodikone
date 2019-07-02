@@ -3,8 +3,11 @@ const { Op } = sequelize
 const moment = require('moment')
 const { flatMap } = require('lodash')
 const { Credit, Student, Course, Provider, Studyright, StudyrightElement,
-  ElementDetails, ThesisCourse, ThesisTypeEnums
+  ElementDetails
 } = require('../models')
+const {
+  ThesisCourse, ThesisTypeEnums
+} = require('../models/models_kone')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { semesterStart, semesterEnd } = require('../util/semester')
 const isNumber = str => !Number.isNaN(Number(str))
@@ -170,30 +173,39 @@ const graduatedStatsForStudytrack = async (studytrack, since) => {
   return graduatedStatsFromStudyrights(studyrights)
 }
 
-const findProgrammeThesisCredits = code => Credit.findAll({
-  include: {
-    model: Course,
-    required: true,
+const findProgrammeThesisCredits = async code => {
+  const thesiscourses = await ThesisCourse.findAll({
+    model: ThesisCourse,
+    where: {
+      programmeCode: code
+    }
+  })
+  const courseCodeToThesisCourse = thesiscourses.reduce((acc, tc) => { acc[tc.courseCode] = tc; return acc }, {})
+
+  const credits = await Credit.findAll({
     include: {
-      model: ThesisCourse,
+      model: Course,
       required: true,
       where: {
-        programmeCode: code
+        code: {
+          [Op.in]: thesiscourses.map(tc => tc.courseCode)
+        }
+      }
+    },
+    where: {
+      credittypecode: {
+        [Op.ne]: 10
       }
     }
-  },
-  where: {
-    credittypecode: {
-      [Op.ne]: 10
-    }
-  }
-}).map(credit => {
-  const { id, course, attainment_date } = credit
-  const { code, thesis_courses } = course
-  const { thesisType: type } = thesis_courses[0]
-  const year = attainment_date && attainment_date.getFullYear()
-  return { id, code, type, year }
-})
+  })
+
+  return credits.map(credit => {
+    const { id, course, attainment_date } = credit
+    const { code } = course
+    const year = attainment_date && attainment_date.getFullYear()
+    return { id, code, type: courseCodeToThesisCourse[code].thesisType, year }
+  })
+}
 
 const thesisProductivityFromCredits = credits => {
   const stats = {}
@@ -290,16 +302,18 @@ const creditsAfter = (studentnumbers, startDate) => {
 }
 
 const thesesFromClass = async (studentnumbers, startDate, code) => {
-  return Credit.findAll({
+  const thesiscourses = await ThesisCourse.findAll({
+    where: {
+      programmeCode: code
+    }
+  })
+  const credits = await Credit.findAll({
     include: {
       model: Course,
       required: true,
-      include: {
-        attributes: ['thesisType'],
-        model: ThesisCourse,
-        required: true,
-        where: {
-          programmeCode: code
+      where: {
+        code: {
+          [Op.in]: thesiscourses.map(tc => tc.courseCode)
         }
       }
     },
@@ -314,12 +328,16 @@ const thesesFromClass = async (studentnumbers, startDate, code) => {
         [Op.in]: studentnumbers
       }
     }
-  }).reduce((acc, curr) => {
-    curr.course.thesis_courses.map(th => {
-      acc[th.thesisType] = acc[th.thesisType] ? acc[th.thesisType] + 1 : 1
-    })
+  })
+
+  const courseCodeToThesisCourse = thesiscourses.reduce((acc, tc) => { acc[tc.courseCode] = tc; return acc }, {})
+  const courseCodes = credits.map(c => c.course.code)
+  const theses = courseCodes.reduce((acc, code) => {
+    const thesisType = courseCodeToThesisCourse[code].thesisType
+    acc[thesisType] = acc[thesisType] ? acc[thesisType] + 1 : 1
     return acc
   }, {})
+  return theses
 }
 
 const graduationsFromClass = async (studentnumbers, studytrack) => {

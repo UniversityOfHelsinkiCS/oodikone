@@ -16,7 +16,7 @@ BEGIN
   VALUES
   (5, ts, ts)
   ;
-  
+
   INSERT INTO course
   ("code", "name", "is_study_module")
   VALUES
@@ -25,14 +25,14 @@ BEGIN
   (course_02, '{ "en": "COURSE_EN" }', 'false'),
   (thesis, '{ "en": "Bachelor thesis" }', 'false')
   ;
-  
+
   INSERT INTO credit_types
   ("credittypecode", "createdAt", "updatedAt")
   VALUES
   (10, ts, ts),
   (4, ts, ts)
   ;
-  
+
   INSERT INTO credit
   ("id", "createddate", "lastmodifieddate", "semestercode", "course_code", "credittypecode", "attainment_date", "credits")
   VALUES
@@ -44,14 +44,14 @@ BEGIN
   ('CREDIT_06', ts, ts, 5, course_01, 4, date_2015, 5),
   ('CREDIT_07', ts, ts, 5, thesis, 4, date_2015, 30)
   ;
-  
+
   INSERT INTO providers
   ("providercode", "createdAt", "updatedAt")
   VALUES
   (provider_01, ts, ts),
   (provider_02, ts, ts)
   ;
-  
+
   INSERT INTO course_providers
   ("coursecode", "providercode", "createdAt", "updatedAt")
   VALUES
@@ -84,8 +84,4 @@ BEGIN
   (12, studytrk_02, ts, ts)
   ;
 
-  INSERT INTO thesis_courses
-  ("programmeCode", "courseCode", "thesisType", "createdAt", "updatedAt")
-  VALUES
-  (studytrk_01, thesis, 'MASTER', ts, ts);
 END $$;
