@@ -2,14 +2,8 @@ const sequelize = require('sequelize')
 const { Semester } = require('../models/index')
 const { Op } = sequelize
 
-const getSemestersAndYears = async before => {
-  const semesters = await Semester.findAll({
-    where: {
-      startdate: {
-        [Op.lt]: before
-      }
-    }
-  })
+const getSemestersAndYears = async () => {
+  const semesters = await Semester.findAll({})
   const result = semesters.reduce((acc, semester) => {
     const { semestercode, name, yearcode, yearname }  = semester
     const semesters = { ...acc.semesters, [semestercode]: { semestercode, name, yearcode }}
