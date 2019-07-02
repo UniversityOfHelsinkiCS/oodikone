@@ -1,4 +1,4 @@
-const { sequelize } = require('../database/connection')
+const { sequelize, sequelizeKone } = require('../database/connection')
 const conf = require('../conf-backend')
 
 const getStudentNumbers = () => sequelize.query(
@@ -111,29 +111,52 @@ const getAcademicYearCoursesByTeacherIds = (teacherIds, startSemester) => {
 
 const getAcademicYearStatisticsForStudyProgramme = async (programmeid, startSemester) => {
   const endSemester = startSemester + 1
-  const result = await sequelize.query(
+  const courseGroupData = await sequelizeKone.query(
     `
-SELECT cg.id AS id,cg.name AS name,
-    COUNT(DISTINCT c.course_code) AS courses,
-    COALESCE(SUM(credits), 0) AS credits,
-    COUNT(DISTINCT student_studentnumber) AS students
-FROM   ${conf.DB_SCHEMA_KONE}.course_groups cg
-    left join ${conf.DB_SCHEMA_KONE}.teacher_course_groups tcg
+SELECT cg.id AS id, cg.name AS name, tcg.teacher_id as teacher_id, cg.programmeid as programmeid
+FROM   course_groups cg
+    left join teacher_course_groups tcg
            ON tcg.course_group_id = cg.id
-    left join credit_teachers ct
-           ON ct.teacher_id = tcg.teacher_id
-    left join credit c
-           ON c.id = ct.credit_id
-              AND c.semestercode >= :startSemester
-              AND c.semestercode <= :endSemester
 WHERE cg.programmeid = :programmeid
-GROUP BY cg.programmeid,cg.id,cg.name`,
+`,
     {
-      replacements: { startSemester, endSemester, programmeid },
+      replacements: { programmeid },
       type: sequelize.QueryTypes.SELECT,
     }
   )
-  return result
+
+  const courseGroupIdToCGData = courseGroupData.reduce((acc, cgd) => {
+    acc[cgd.id] = acc[cgd.id] || { name: cgd.name, id: cgd.id, programmeid: cgd.programmeid, teacherids: [] }
+    if (cgd.teacher_id) acc[cgd.id].teacherids.push(cgd.teacher_id)
+    return acc
+  }, {})
+
+  const resultPromises = Object.keys(courseGroupIdToCGData).map(async cgid => {
+    const { name, id, programmeid, teacherids } = courseGroupIdToCGData[cgid]
+    if (teacherids.length === 0) return { name, id, programmeid, courses: 0, credits: 0, students: 0 }
+    const stats = await sequelize.query(
+      `
+SELECT
+    COUNT(DISTINCT c.course_code) AS courses,
+    COALESCE(SUM(credits), 0) AS credits,
+    COUNT(DISTINCT student_studentnumber) AS students
+FROM   credit_teachers ct
+    left join credit c
+            ON c.id = ct.credit_id
+              AND c.semestercode >= :startSemester
+              AND c.semestercode <= :endSemester
+WHERE ct.teacher_id IN (:teacherids)
+  `,
+      {
+        replacements: { startSemester, endSemester, teacherids },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    )
+    if (stats.length !== 1) throw "expecting single row"
+    const { courses, credits, students } = stats[0]
+    return { name, id, programmeid, courses, credits, students }
+  })
+  return Promise.all(resultPromises)
 }
 
 module.exports = {

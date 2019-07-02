@@ -89,6 +89,7 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
         console.error(e)
         return
       }
+      console.error(e)
       console.log(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
     }
     ready += 1
@@ -149,6 +150,7 @@ router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
         console.error(e)
         return
       }
+      console.error(e)
       console.log(`Failed to update throughput stats for code: ${code}, reason: ${e.message}`)
     }
     ready += 1

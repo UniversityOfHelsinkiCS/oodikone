@@ -1,10 +1,7 @@
 const Sequelize = require('sequelize')
 const _ = require('lodash')
-const { MandatoryCourseLabels } = require('../models')
+const { MandatoryCourseLabels, sequelizeKone } = require('../models/models_kone')
 const { Op } = Sequelize
-const {
-  sequelize
-} = require('../models/index')
 
 const create = async (studyprogramme_id, { label }) => {
   const labels = await labelsByStudyprogramme(studyprogramme_id)
@@ -23,7 +20,7 @@ const move = async (studyprogramme_id, { id }, direction) => {
   if (indexToSwap < 0 || indexToSwap >= orderedlabels.length) return null;
   [orderedlabels[indexToMove], orderedlabels[indexToSwap]] = [orderedlabels[indexToSwap], orderedlabels[indexToMove]]
   const newOrder = orderedlabels.map((e, index) => ({ ...e, orderNumber: index }))
-  await sequelize.transaction(async transaction => {
+  await sequelizeKone.transaction(async transaction => {
     for (let e of newOrder) {
       await MandatoryCourseLabels.update(
         {orderNumber: e.orderNumber}, { where: { studyprogramme_id, id: e.id }, transaction }

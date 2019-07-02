@@ -10,14 +10,13 @@ const sequelize = new Sequelize(conf.DB_URL, {
 })
 sequelize.query(`SET SESSION search_path to ${conf.DB_SCHEMA}`)
 
-const sequelizeKone = new Sequelize(conf.DB_URL, {
+const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
   schema: conf.DB_SCHEMA_KONE,
   searchPath: conf.DB_SCHEMA_KONE,
   logging: false,
   operatorsAliases: false
 })
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
-// See https://github.com/sequelize/sequelize/issues/10875
 
 const runMigrations = async () => {
   try {
@@ -74,7 +73,8 @@ const runMigrationsKone = async () => {
   }
 }
 
-const migrationPromise = !conf.isTest ? runMigrations().then(() => runMigrationsKone()) : Promise.resolve()
+const migrationPromise = !conf.isTest ? runMigrations() : Promise.resolve()
+const migrationPromiseKone = !conf.isTest ? runMigrationsKone() : Promise.resolve()
 
 const forceSyncDatabase = async () => {
   try {
@@ -95,5 +95,6 @@ module.exports = {
   sequelize,
   sequelizeKone,
   migrationPromise,
+  migrationPromiseKone,
   forceSyncDatabase
 }

@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { Teacher, Credit, Course, Semester, Provider, CourseGroup } = require('../models/index')
+const { Teacher, Credit, Course, Semester, Provider } = require('../models/index')
 
 const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 
@@ -40,11 +40,6 @@ const bySearchTerm = async (rawTerm) => {
         codeLike(terms),
         matchesId(searchTerm)
       ]
-    },
-    include: {
-      model: CourseGroup,
-      attributes: ['id', 'name'],
-      required: false
     }
   })
 }
@@ -93,7 +88,7 @@ const markCredit = (stats, passed, failed, credits, transferred) => {
       ...stats,
       credits: transferred ? stats.credits : stats.credits + credits,
       passed: stats.passed + 1,
-      transferred: transferred ? stats.transferred + credits : stats.transferred 
+      transferred: transferred ? stats.transferred + credits : stats.transferred
     }
   } else if (failed) {
     return {

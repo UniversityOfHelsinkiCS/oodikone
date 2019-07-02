@@ -10,7 +10,7 @@ import './navigationBar.css'
 import { logout, login, returnToSelf } from '../../apiConnection'
 import LanguageChooser from '../LanguageChooser'
 
-const { USER_ADMINER_URL, ADMINER_URL, ANALYTICS_ADMINER_URL, USAGE_ADMINER_URL } = process.env
+const { USER_ADMINER_URL, ADMINER_URL, ANALYTICS_ADMINER_URL, USAGE_ADMINER_URL, KONE_ADMINER_URL } = process.env
 
 class NavigationBar extends Component {
   state = {
@@ -88,6 +88,16 @@ class NavigationBar extends Component {
                   win.focus()
                 }}
                 text="Analytics database"
+                icon="database"
+              />
+            )}
+            {KONE_ADMINER_URL && (
+              <Dropdown.Item
+                onClick={() => {
+                  const win = window.open(KONE_ADMINER_URL, '_blank')
+                  win.focus()
+                }}
+                text="Kone database"
                 icon="database"
               />
             )}

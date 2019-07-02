@@ -1,15 +1,12 @@
 const Sequelize = require('sequelize')
-const { Course, MandatoryCourse, MandatoryCourseLabels } = require('../models')
+const { Course } = require('../models')
+const { MandatoryCourse, MandatoryCourseLabels } = require('../models/models_kone')
 const { Op } = Sequelize
 
-const byStudyprogramme = (studyProgrammeId) => {
-  const courses = MandatoryCourse.findAll({
+const byStudyprogramme = async (studyProgrammeId) => {
+  const mandatoryCourses = await MandatoryCourse.findAll({
     attributes: ['course_code'],
     include: [
-      {
-        model: Course,
-        attributes: ['name'],
-      },
       {
         model: MandatoryCourseLabels,
         attributes: ['id', 'label', 'orderNumber'],
@@ -22,10 +19,20 @@ const byStudyprogramme = (studyProgrammeId) => {
     }
   })
 
-  return courses.map(course => ({
-    name: course.course.name,
-    code: course.course_code,
-    label: course.mandatory_course_label
+  const courses = await Course.findAll({
+    model: Course,
+    where: {
+      code: {
+        [Op.in]: mandatoryCourses.map(c => c.course_code)
+      }
+    }
+  })
+  const courseCodeToCourse = courses.reduce((acc, c) => { acc[c.code] = c; return acc }, {})
+
+  return mandatoryCourses.map(mc => ({
+    name: courseCodeToCourse[mc.course_code].name,
+    code: mc.course_code,
+    label: mc.mandatory_course_label
   }))
 }
 
@@ -36,14 +43,10 @@ const create = (studyProgrammeId, code) => {
   })
 }
 
-const find = (studyProgrammeId, code) => {
-  return MandatoryCourse.findOne({
+const find = async (studyProgrammeId, code) => {
+  const mandatoryCourse = await MandatoryCourse.findOne({
     attributes: ['course_code', 'label'],
     include: [
-      {
-        model: Course,
-        attributes: ['name'],
-      },
       {
         model: MandatoryCourseLabels,
         attributes: ['id', 'label', 'orderNumber'],
@@ -58,6 +61,14 @@ const find = (studyProgrammeId, code) => {
       }
     }
   })
+
+  const course = await Course.findOne({
+    where: {
+      code: mandatoryCourse.course_code
+    }
+  })
+
+  return { ...mandatoryCourse.get(), course: course.get() }
 }
 
 const remove = (studyProgrammeId, code) => {

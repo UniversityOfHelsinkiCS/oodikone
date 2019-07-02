@@ -1,5 +1,6 @@
 const { forceSyncDatabase } = require('../database/connection')
-const { Course, ElementDetails, ThesisTypeEnums, ThesisCourse } = require('../models')
+const { Course, ElementDetails } = require('../models')
+const { ThesisTypeEnums, ThesisCourse } = require('../models/models_kone')
 const { createThesisCourse, deleteThesisCourse, findProgrammeTheses }  = require('./thesis')
 
 const courseOne = {

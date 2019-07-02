@@ -1,5 +1,6 @@
 const fs = require('fs')
-const { Migration, MigrationKone } = require('../models/index')
+const { Migration } = require('../models/index')
+const { MigrationKone } = require('../models/models_kone')
 
 const DEFAULT_PATH = `${process.cwd()}/src/database/migrations`
 const DEFAULT_PATH_KONE = `${process.cwd()}/src/database/migrations_kone`
