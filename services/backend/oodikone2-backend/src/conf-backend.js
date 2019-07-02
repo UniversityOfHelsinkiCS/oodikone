@@ -6,11 +6,11 @@ let DB_URL = process.env.DB_URL
 let DB_URL_KONE = process.env.DB_URL_KONE
 if (isTest) {
   DB_URL = process.env.TEST_DB
-  DB_URL = process.env.TEST_DB_KONE
+  DB_URL_KONE = process.env.TEST_DB_KONE
 }
 else if (NODE_ENV === 'anon') {
   DB_URL = process.env.ANON_DB
-  DB_URL = process.env.ANON_DB_KONE
+  DB_URL_KONE = process.env.ANON_DB_KONE
 }
 const frontend_addr = process.env.FRONT_URL
 const redis = process.env.REDIS
