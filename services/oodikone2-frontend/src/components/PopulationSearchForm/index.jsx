@@ -565,7 +565,7 @@ class PopulationSearchForm extends Component {
 
     const { translate, tags } = this.props
     const { query } = this.state
-    const { semesters, studentStatuses, startYear } = query
+    const { semesters, studentStatuses } = query
     const options = this.state.isAdmin ? tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id })) : null
 
     return (
@@ -623,30 +623,39 @@ class PopulationSearchForm extends Component {
               checked={studentStatuses.includes('NONDEGREE')}
               onChange={this.handleStudentStatusSelection}
             />
-            {this.state.isAdmin ? (
-              <div>
-                <Form.Dropdown
-                  placeholder="select tag"
-                  fluid
-                  selection
-                  options={options}
-                  onChange={this.handleTagSearch}
-                />
-                <Datetime
-                  className="yearSelectInput"
-                  control={Datetime}
-                  dateFormat={YEAR_DATE_FORMAT}
-                  timeFormat={false}
-                  renderYear={(props, selectableYear) => <td {...props}>{selectableYear}</td>}
-                  closeOnSelect
-                  value={startYear}
-                  isValidDate={this.validYearCheck}
-                  onChange={this.handleTagYearSelect}
-                />
-                <Button onClick={() => this.fetchPopulation(this.state.query, this.state.selectedTag)}> Search by tag</Button>
-              </div>) : null}
           </Form.Field>
         </Form.Group>
+        {this.state.isAdmin ? (
+          <Form.Group>
+            <Form.Field>
+              <label>Select tag</label>
+              <Form.Dropdown
+                placeholder="select tag"
+                fluid
+                selection
+                options={options}
+                onChange={this.handleTagSearch}
+              />
+              <label>Select starting year</label>
+              <Datetime
+                className="yearSelectInput"
+                control={Datetime}
+                dateFormat={YEAR_DATE_FORMAT}
+                timeFormat={false}
+                renderYear={(props, selectableYear) => <td {...props}>{selectableYear}</td>}
+                closeOnSelect
+                value={null}
+                isValidDate={this.validYearCheck}
+                onChange={this.handleTagYearSelect}
+              />
+              <Button
+                disabled={!this.state.selectedTag}
+                onClick={() => this.fetchPopulation(this.state.query, this.state.selectedTag)}
+              >
+                Search by tag
+              </Button>
+            </Form.Field>
+          </Form.Group>) : null}
       </div>)
   }
 
