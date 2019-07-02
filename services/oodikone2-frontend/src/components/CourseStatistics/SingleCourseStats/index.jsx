@@ -2,9 +2,12 @@ import React, { Component } from 'react'
 import { Segment, Header, Form } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number } from 'prop-types'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 import ResultTabs from '../ResultTabs'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import selectors, { ALL } from '../../../selectors/courseStats'
+import YearFilter from '../SearchForm/YearFilter'
+import qs from 'query-string'
 
 const countFilteredStudents = (stat, filter) => Object.entries(stat).reduce((acc, entry) => {
   const [category, students] = entry
@@ -17,7 +20,27 @@ const countFilteredStudents = (stat, filter) => Object.entries(stat).reduce((acc
 class SingleCourseStats extends Component {
   state = {
     primary: ALL.value,
-    comparison: null
+    comparison: null,
+    separate: null
+  }
+
+  componentDidMount = () => {
+    const { location } = this.props
+    if (location.search) {
+      this.setState({ ...this.parseQueryFromUrl() })
+    }
+  }
+
+  parseQueryFromUrl = () => {
+    const { location } = this.props
+    const { separate, fromYear, toYear } = qs.parse(location.search)
+    return {
+      separate: JSON.parse(separate),
+      fromYear: JSON.parse(fromYear),
+      fromYearInitial: JSON.parse(fromYear),
+      toYear: JSON.parse(toYear),
+      toYearInitial: JSON.parse(toYear)
+    }
   }
 
   getProgrammeName = (progcode) => {
@@ -46,6 +69,33 @@ class SingleCourseStats extends Component {
     return programmes[code] || (code === ALL.value)
   }
 
+  filteredYearsAndSemesters = (useInitialValues = false) => {
+    const { years, semesters } = this.props
+    const { fromYearInitial, fromYear, toYearInitial, toYear } = this.state
+    if (!fromYearInitial || !toYearInitial) {
+      return {
+        filteredYears: years,
+        filteredSemesters: semesters
+      }
+    }
+    const timeFilter = ({ value }) => (
+      value >= (useInitialValues ? fromYearInitial : fromYear) &&
+      value <= (useInitialValues ? toYearInitial : toYear)
+    )
+    return {
+      filteredYears: years.filter(timeFilter),
+      filteredSemesters: semesters.filter(timeFilter)
+    }
+  }
+
+  isStatInYearRange = ({ name }) => {
+    const { separate } = this.state
+    const { filteredYears, filteredSemesters } = this.filteredYearsAndSemesters()
+    return separate ?
+      filteredSemesters.find(year => year.texts.includes(name)) :
+      filteredYears.find(year => year.text === name)
+  }
+
   statsForProgramme = (progcode) => {
     const { statistics } = this.props.stats
     const filter = this.belongsToProgramme(progcode)
@@ -59,7 +109,7 @@ class SingleCourseStats extends Component {
         categories: countFilteredStudents(allstudents.classes, filter)
       }
       return { code, name, cumulative, students }
-    })
+    }).filter(this.isStatInYearRange)
     return {
       code: progcode,
       name: this.getProgrammeName(progcode),
@@ -93,8 +143,10 @@ class SingleCourseStats extends Component {
 
   render() {
     const { programmes } = this.props
+    const { fromYear, toYear } = this.state
     const { primary, comparison } = this.selectedProgrammes()
     const statistics = this.filteredProgrammeStatistics()
+    const { filteredYears } = this.filteredYearsAndSemesters(true)
     return (
       <div>
         <Segment>
@@ -119,6 +171,18 @@ class SingleCourseStats extends Component {
                 onClear={() => this.setState({ comparison: undefined })}
               />
             </Form.Group>
+          </Form>
+        </Segment>
+        <Segment>
+          <Form>
+            <Header content="Filter statistics by time range" as="h4" />
+            <YearFilter
+              years={filteredYears}
+              fromYear={fromYear}
+              toYear={toYear}
+              handleChange={this.handleChange}
+              showCheckbox={false}
+            />
           </Form>
         </Segment>
         <ResultTabs
@@ -151,8 +215,22 @@ SingleCourseStats.propTypes = {
   programmes: arrayOf(shape({})).isRequired
 }
 
-const mapStateToProps = state => ({
-  programmes: selectors.getAllStudyProgrammes(state)
-})
+const mapStateToProps = (state) => {
+  const { semesters = [], years = [] } = state.semesters.data
 
-export default connect(mapStateToProps)(SingleCourseStats)
+  return {
+    programmes: selectors.getAllStudyProgrammes(state),
+    years: Object.values(years).map(({ yearcode, yearname }) => ({
+      key: yearcode,
+      text: yearname,
+      value: yearcode
+    })).reverse(),
+    semesters: Object.values(semesters).map(({ semestercode, name, yearcode }) => ({
+      key: semestercode,
+      texts: Object.values(name),
+      value: yearcode
+    })).reverse()
+  }
+}
+
+export default withRouter(connect(mapStateToProps)(SingleCourseStats))

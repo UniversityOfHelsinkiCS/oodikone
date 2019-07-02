@@ -13,7 +13,6 @@ import SearchResultTable from '../SearchResultTable'
 import { byDateDesc, reformatDate, getTextIn } from '../../common'
 import { clearCourseStats } from '../../redux/coursestats'
 
-
 class StudentDetails extends Component {
   componentDidMount() {
     this.props.history.listen((location, action) => {

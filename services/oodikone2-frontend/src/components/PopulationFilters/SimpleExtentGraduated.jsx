@@ -84,7 +84,6 @@ const SimpleExtentGraduated = (props) => {
   )
 }
 
-
 const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes }) => {
   const code = populations.query.studyRights.programme
   const studyrightName = populationDegreesAndProgrammes.data.programmes[code].name

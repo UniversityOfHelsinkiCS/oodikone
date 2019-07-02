@@ -14,5 +14,4 @@ const Faculty = () => (
   </div>
 )
 
-
 export default withRouter(Faculty)
