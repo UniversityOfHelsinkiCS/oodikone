@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, Dropdown, Checkbox } from 'semantic-ui-react'
+import { Button, Dropdown, Checkbox, List } from 'semantic-ui-react'
 import { arrayOf, string, shape, func, bool } from 'prop-types'
 
 import {
@@ -55,21 +55,25 @@ const TagPopulation = ({
   }
 
   return (
-    <div>
-      <Checkbox
-        checked={allChecker}
-        onChange={handleAllCheck}
-      />
-      <Dropdown
-        placeholder="Tag"
-        search
-        selection
-        options={options}
-        onChange={handleChange}
-        value={selectedValue}
-      />
+    <List horizontal>
+      <List.Item>
+        <Checkbox
+          checked={allChecker}
+          onChange={handleAllCheck}
+        />
+      </List.Item>
+      <List.Item>
+        <Dropdown
+          placeholder="Tag"
+          search
+          selection
+          options={options}
+          onChange={handleChange}
+          value={selectedValue}
+        />
+      </List.Item>
       <Button onClick={handleSubmit}>add tag to multiple students</Button>
-    </div>
+    </List>
   )
 }
 
