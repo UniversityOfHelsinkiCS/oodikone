@@ -550,15 +550,14 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
     const creditsForStudyprogramme =
       await productivityCreditsFromStudyprogrammeStudents(studytrack, startDate, studentnumbers)
-    console.log('ASDFASDFADSF')
     const [credits, graduated, theses, genders, countries, transferredTo, endedStudyright] =
       await statsForClass(studentnumbers, startDate, studytrack, endDate)
-    console.log(countries)
     //console.log(year)
     //console.log(transferredFrom.rows.map(r => r.get({ plain: true })))
     // theres so much shit in the data that transefferFrom doesnt rly mean anything
     delete genders[null]
     delete countries[null]
+    delete countries[undefined]
     const creditValues = credits.reduce((acc, curr) => {
       acc.mte30 = curr >= 30 ? acc.mte30 + 1 : acc.mte30
       acc.mte60 = curr >= 60 ? acc.mte60 + 1 : acc.mte60

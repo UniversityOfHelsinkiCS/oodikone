@@ -7,8 +7,6 @@ import _ from 'lodash'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { tagFilter } from '../../populationFilters'
 
-
-
 const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, filter, samples }) => {
   const [options, setOptions] = useState([])
   const [selectedTag, setSelectedTag] = useState()

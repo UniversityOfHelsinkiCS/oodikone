@@ -33,10 +33,10 @@ class SearchForm extends Component {
 
   componentDidMount() {
     const { location } = this.props
+    this.props.getSemesters()
     if (location.search) {
       this.fetchStatisticsFromUrlParams()
     } else {
-      this.props.getSemesters()
       this.props.clearCourses()
     }
   }
@@ -199,6 +199,7 @@ class SearchForm extends Component {
                   separate={separate}
                   handleChange={this.handleChange}
                   onToggleCheckbox={this.onToggleCheckbox}
+                  showCheckbox
                 />
                 <Form.Button
                   type="button"

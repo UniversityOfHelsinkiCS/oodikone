@@ -56,7 +56,6 @@ class SortableTable extends Component {
     </div>
   )
 
-
   render() {
     const calculateSkippedColumns = () => {
       const { columns, showNames } = this.props
