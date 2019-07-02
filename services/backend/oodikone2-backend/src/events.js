@@ -73,6 +73,7 @@ const StartNats = () => {
                 e
               )
             }
+            console.error(e)
             console.log(
               `Failed to update throughput stats for code: ${code}, reason: ${
                 e.message
@@ -93,6 +94,7 @@ const StartNats = () => {
             } catch (e) {
               console.error(e)
             }
+            console.error(e)
             console.log(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
           }
           ready += 1

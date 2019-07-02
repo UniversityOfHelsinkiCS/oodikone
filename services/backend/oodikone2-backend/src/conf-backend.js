@@ -1,19 +1,22 @@
 require('dotenv').config()
 
 const { NODE_ENV } = process.env
-let DB_URL = process.env.DB_URL
 const isTest = process.env.NODE_ENV === 'test'
+let DB_URL = process.env.DB_URL
+let DB_URL_KONE = process.env.DB_URL_KONE
 if (isTest) {
   DB_URL = process.env.TEST_DB
+  DB_URL = process.env.TEST_DB_KONE
 }
 else if (NODE_ENV === 'anon') {
   DB_URL = process.env.ANON_DB
+  DB_URL = process.env.ANON_DB_KONE
 }
 const frontend_addr = process.env.FRONT_URL
 const redis = process.env.REDIS
 const TOKEN_SECRET = process.env.TOKEN_SECRET
 const DB_SCHEMA = process.env.DB_SCHEMA || 'public'
-const DB_SCHEMA_KONE = process.env.DB_SCHEMA_KONE || 'kone_data'
+const DB_SCHEMA_KONE = process.env.DB_SCHEMA_KONE || 'public'
 const CERT_PATH = process.env.CERT_PATH // production/staging only
 const KEY_PATH = process.env.KEY_PATH // production/staging only
 const OODILEARN_URL = process.env.OODILEARN_URL
@@ -58,10 +61,25 @@ if (process.env.NODE_ENV === 'dev' || isTest) {
 }
 
 module.exports = {
-  frontend_addr, DB_URL, redis, TOKEN_SECRET, DB_SCHEMA, DB_SCHEMA_KONE, OODI_ADDR, CERT_PATH, KEY_PATH, FEATURES, OODILEARN_URL,
-  USERSERVICE_URL: formatURL(USERSERVICE_URL), ACCESS_TOKEN_HEADER_KEY, PORT,
+  frontend_addr,
+  DB_URL,
+  DB_URL_KONE,
+  redis,
+  TOKEN_SECRET,
+  DB_SCHEMA,
+  DB_SCHEMA_KONE,
+  OODI_ADDR,
+  CERT_PATH,
+  KEY_PATH,
+  FEATURES,
+  OODILEARN_URL,
+  USERSERVICE_URL: formatURL(USERSERVICE_URL),
+  ACCESS_TOKEN_HEADER_KEY,
+  PORT,
   ANALYTICS_URL: formatURL(ANALYTICS_URL),
   USAGESERVICE_URL,
-  requiredGroup, OODI_SECRET, OODI_SECRET_HEADER_KEY,
+  requiredGroup,
+  OODI_SECRET,
+  OODI_SECRET_HEADER_KEY,
   isTest
 }

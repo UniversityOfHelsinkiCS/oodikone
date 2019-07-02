@@ -84,6 +84,18 @@ services:
       - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test,tkt_oodi_real
       - POSTGRES_USER=postgres
 
+  db_kone:
+    image: postgres:9.6.3
+    ports:
+      - "5425:5432"
+    volumes:
+      - ./pgdata_kone:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    container_name: db_kone
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=db_kone
+      - POSTGRES_USER=postgres
+
   redis:
     image: redis
     command: ["redis-server", "--appendonly", "yes"]
@@ -117,7 +129,9 @@ services:
       WAIT_HOSTS: redis:6379,db:5432,nats:4222
       REDIS: redis
       DB_URL: postgres://postgres@db:5432/tkt_oodi
+      DB_URL_KONE: postgres://postgres@db_kone:5432/db_kone
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
+      TEST_DB_KONE: postgres://postgres@db_kone:5432/db_kone_test
       FRONT_URL: http://localhost:8000
       TOKEN_SECRET: IWannaBeTheVeryBest
       OODILEARN_URL: http://oodilearn:5000
@@ -127,7 +141,6 @@ services:
       USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
-      DB_SCHEMA_KONE: kone_data
     volumes:
       - ./services/backend/oodikone2-backend/:/usr/src/app
       - ./services/backend/shared/models:/usr/src/app/src/models
@@ -156,6 +169,7 @@ services:
       USER_ADMINER_URL: http://localhost:5050/?pgsql=user_db&username=postgres
       ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
       USAGE_ADMINER_URL: http://localhost:5050/?pgsql=usage_db&username=postgres
+      KONE_ADMINER_URL: http://localhost:5050/?pgsql=db_kone&username=postgres
     volumes:
       - ./services/oodikone2-frontend/:/usr/src/app
     container_name: frontend

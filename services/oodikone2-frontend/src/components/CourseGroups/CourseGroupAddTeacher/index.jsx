@@ -64,8 +64,7 @@ class CourseGroupAddTeacher extends Component {
     const searchResultColumns = [
       { key: 'teacherid', title: 'Teacher ID', getRowVal: s => s.id, headerProps: { onClick: null, sorted: null } },
       { key: 'username', title: 'Username', getRowVal: s => s.code, headerProps: { onClick: null, sorted: null } },
-      { key: 'name', title: 'Name', getRowVal: s => s.name, headerProps: { onClick: null, sorted: null } },
-      { key: 'coursegroup', title: 'Course groups', getRowVal: s => s.course_groups.map(cg => cg.name).join(), headerProps: { onClick: null, sorted: null, colSpan: 2 } },
+      { key: 'name', title: 'Name', getRowVal: s => s.name, headerProps: { onClick: null, sorted: null, colSpan: 2 } },
       { key: 'icon', getRowVal: () => (<Icon name="add user" />), cellProps: { collapsing: true }, headerProps: { onClick: null, sorted: null } }
     ]
 

@@ -11,7 +11,8 @@ const {
   thesisProductivityFromCredits,
   thesisProductivityForStudytrack
 } = require('./studytrack')
-const { sequelize, ThesisTypeEnums } = require('../models')
+const { sequelize } = require('../models')
+const { ThesisTypeEnums } = require('../models/models_kone')
 const { readFileSync } = require('fs')
 
 const { MASTER, BACHELOR } = ThesisTypeEnums

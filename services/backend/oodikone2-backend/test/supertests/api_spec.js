@@ -2,7 +2,7 @@ const test = require('ava')
 const supertest = require('supertest')
 const app = require('../../src/app')
 const api = supertest(app)
-const { sequelize } = require('../../src/models')
+const { sequelizeKone } = require('../../src/models/models_kone')
 const conf = require('../../src/conf-backend')
 const jwt = require('jsonwebtoken')
 
@@ -22,9 +22,9 @@ test.before(async () => {
     expiresIn: '24h'
   })
   //console.log(token)
-  sequelize.query(
-    `DELETE 
-      FROM tag_student 
+  sequelizeKone.query(
+    `DELETE
+      FROM tag_student
       WHERE tags_tagname = 'test3'`
   )
 })
