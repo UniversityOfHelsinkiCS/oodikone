@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import qs from 'query-string'
-import { func, arrayOf, shape, bool, string, object } from 'prop-types'
+import { func, arrayOf, shape, bool, string, object, oneOfType } from 'prop-types'
 import { Form, Button, Message, Icon, Grid } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
@@ -51,7 +51,10 @@ class PopulationSearchForm extends Component {
     history: shape({}).isRequired,
     location: shape({}).isRequired,
     getTagsByStudytrackAction: func.isRequired,
-    tags: arrayOf(shape({ tag_id: string, tagname: string })).isRequired
+    tags: oneOfType([
+      arrayOf(shape({ tag_id: string, tagname: string })),
+      object
+    ]).isRequired
   }
 
   constructor() {
@@ -566,7 +569,7 @@ class PopulationSearchForm extends Component {
     const { translate, tags } = this.props
     const { query } = this.state
     const { semesters, studentStatuses } = query
-    const options = this.state.isAdmin ? tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id })) : null
+    const options = this.state.isAdmin ? tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id })) : []
 
     return (
       <div>
