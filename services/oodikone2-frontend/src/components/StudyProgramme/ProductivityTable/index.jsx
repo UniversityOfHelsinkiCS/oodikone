@@ -94,7 +94,7 @@ ProductivityTable.propTypes = {
     lastUpdated: string,
     status: string,
     data: arrayOf(shape({
-      year: number,
+      year: string,
       credits: number,
       mThesis: number,
       bThesis: number,

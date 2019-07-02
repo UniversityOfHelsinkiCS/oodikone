@@ -31,9 +31,10 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
   }
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
-  const countries = data.length > 0 && throughput.totals.countries ? uniq(flatten(data.map(year => Object.keys(year.countries)))).sort() : []
+  const countries = data.length > 0 && throughput.totals.countries ?
+    uniq(flatten(data.map(year => Object.keys(year.countries)))).sort() : []
   const renderGenders = genders.length > 0
-  const renderCountries = false // countries.length > 0, disabled for now
+  const renderCountries = countries.length > 0
   let thesisTypes = []
   if (thesis) {
     thesisTypes = thesis.map(t => t.thesisType)
@@ -132,7 +133,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 </Table.Cell>
                 <Table.Cell>{year.credits.length}</Table.Cell>
                 {genders.map(gender => (
-                  <Table.Cell key={year.year + year.genders[gender]}>
+                  <Table.Cell key={`${year.year} gender:${gender}`}>
                     {`${year.genders[gender] || 0} (${Math.floor((year.genders[gender] / year.credits.length) * 100) || 0}%)`}
                   </Table.Cell>
                 ))}
@@ -145,12 +146,12 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 }
                 <Table.Cell>{year.transferred}</Table.Cell>
                 {renderCountries ? countries.map(country => (
-                  <Table.Cell key={year.year + country}>
+                  <Table.Cell key={`${year.year} country:${country}`}>
                     {year.countries[country] || 0}
                   </Table.Cell>
                 )) : null}
                 {Object.keys(year.creditValues).map(creditKey => (
-                  <Table.Cell key={creditKey}>{year.creditValues[creditKey]}
+                  <Table.Cell key={`${year.year} credit:${creditKey}`}>{year.creditValues[creditKey]}
                   </Table.Cell>
                 ))}
                 {thesisTypes.includes('MASTER') ? (
