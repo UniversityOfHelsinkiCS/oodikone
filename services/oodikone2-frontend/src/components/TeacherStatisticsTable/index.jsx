@@ -96,5 +96,4 @@ TeacherStatisticsTable.propTypes = {
   onClickFn: func.isRequired
 }
 
-
 export default TeacherStatisticsTable
