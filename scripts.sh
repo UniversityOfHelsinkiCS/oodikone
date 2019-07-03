@@ -56,23 +56,8 @@ get_anon_oodikone() {
 }
 
 restore_psql_from_backup () {
-    time pg_restore -U postgres -h localhost -p 5421 --no-owner -F c --dbname=tkt_oodi -j4 $PSQL_DB_BACKUP
-}
-
-restore_real_psql_from_backup () {
-    time pg_restore -U postgres -h localhost -p 5421 --no-owner -F c --dbname=tkt_oodi_real -j4 $PSQL_REAL_DB_BACKUP
-}
-
-restore_userdb_from_backup () {
-    time pg_restore -U postgres -h localhost -p 5422 --no-owner -F c --dbname=user_db -j4 $USER_DB_BACKUP
-}
-
-restore_real_userdb_from_backup () {
-    time pg_restore -U postgres -h localhost -p 5422 --no-owner -F c --dbname=user_db_real -j4 $USER_REAL_DB_BACKUP
-}
-
-restore_dbkone_from_backup () {
-    time pg_restore -U postgres -h localhost -p 5425 --no-owner -F c --dbname=db_kone -j4 $KONE_DB_BACKUP
+    docker cp $1 $2:/asd.sqz
+    docker exec -it $2 pg_restore -U postgres --no-owner -F c --dbname=$3 -j4 /asd.sqz
 }
 
 # oodilearn
@@ -81,19 +66,28 @@ restore_dbkone_from_backup () {
 # }
 
 ping_psql () {
+    drop_psql $1 $2
     echo "Pinging psql in container $1 with db name $2"
     retry docker exec -u postgres $1 pg_isready --dbname=$2
     docker exec -u postgres $1 psql -c "CREATE DATABASE $2" || echo "container $1 DB $2 already exists"
 }
 
+drop_psql () {
+    echo "Dropping psql in container $1 with db name $2"
+    retry docker exec -u postgres $1 pg_isready --dbname=$2
+    docker exec -u postgres $1 psql -c "DROP DATABASE $2" || echo "container $1 DB $2 doesn't exists"
+}
+
 db_setup_full () {
     echo "Restoring PostgreSQL from backup"
-    retry restore_real_psql_from_backup
+    ping_psql "oodi_db" "tkt_oodi_real"
+    ping_psql "oodi_user_db" "user_db_real"
+    restore_psql_from_backup $PSQL_REAL_DB_BACKUP oodi_db tkt_oodi_real
     # echo "Restoring MongoDB from backup"
     # retry restore_mongodb_from_backup
     echo "Restore user db from backup"
     ping_psql "oodi_user_db" "user_db_real"
-    retry restore_real_userdb_from_backup
+    restore_psql_from_backup $USER_REAL_DB_BACKUP oodi_user_db user_db_real
     echo "Database setup finished"
 }
 
@@ -101,27 +95,21 @@ db_anon_setup_full () {
     echo "Restoring PostgreSQL from backup"
     ping_psql "oodi_db" "tkt_oodi"
     ping_psql "oodi_db" "tkt_oodi_test"
-    retry restore_psql_from_backup
+    restore_psql_from_backup $PSQL_DB_BACKUP oodi_db tkt_oodi
     ping_psql "db_kone" "db_kone"
     ping_psql "db_kone" "db_kone_test"
-    retry restore_dbkone_from_backup
+    restore_psql_from_backup $KONE_DB_BACKUP db_kone db_kone
     # echo "Restoring MongoDB from backup"
     # retry restore_mongodb_from_backup
     echo "Restore user db from backup"
     ping_psql "oodi_user_db" "user_db"
-    retry restore_userdb_from_backup
+    restore_psql_from_backup $USER_DB_BACKUP oodi_user_db user_db
     echo "Database setup finished"
 }
 
 reset_real_db () {
     docker-compose down
     docker-compose up -d db user_db
-    ping_psql "oodi_db" "tkt_oodi_real"
-    docker exec -u postgres oodi_db dropdb "tkt_oodi_real"
-    docker exec -u postgres oodi_db psql -c "CREATE DATABASE tkt_oodi_real"
-    ping_psql "oodi_user_db" "user_db_real"
-    docker exec -u postgres oodi_user_db dropdb "user_db_real"
-    docker exec -u postgres oodi_user_db psql -c "CREATE DATABASE user_db_real"
     db_setup_full
     docker-compose down
 }
@@ -129,16 +117,6 @@ reset_real_db () {
 reset_db () {
     docker-compose down
     docker-compose up -d db user_db db_kone
-    ping_psql "oodi_db" "tkt_oodi"
-    docker exec -u postgres oodi_db dropdb "tkt_oodi"
-    ping_psql "oodi_db" "tkt_oodi_test"
-    docker exec -u postgres oodi_db dropdb "tkt_oodi_test"
-    ping_psql "db_kone" "db_kone"
-    docker exec -u postgres db_kone dropdb "db_kone"
-    ping_psql "db_kone" "db_kone_test"
-    docker exec -u postgres db_kone dropdb "db_kone_test"
-    ping_psql "oodi_user_db" "user_db"
-    docker exec -u postgres oodi_user_db dropdb "user_db"
     db_anon_setup_full
     docker-compose down
 }
