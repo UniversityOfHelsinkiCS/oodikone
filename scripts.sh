@@ -7,6 +7,7 @@ PSQL_DB_BACKUP="$ANONDB_DIR/anon.sqz"
 USER_DB_BACKUP="$ANONDB_DIR/user-dump.sqz"
 KONE_DB_BACKUP="$ANONDB_DIR/anon_kone.sqz"
 PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.sqz"
+KONE_REAL_DB_BACKUP="$BACKUP_DIR/latest-kone-pg.sqz"
 USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
 
 retry () {
@@ -24,18 +25,6 @@ init_dirs () {
 
 echo_path () {
     echo $(pwd)
-}
-
-purge () {
-    docker-compose down || echo "docker-compose down failed"
-    git clean -f -fdX
-}
-
-megapurge () {
-    git clean -f -fdX
-    docker stop $(docker ps -q)
-    docker container prune
-    docker rmi $(docker images -q)
 }
 
 get_oodikone_server_backup() {
@@ -67,7 +56,7 @@ restore_psql_from_backup () {
 
 ping_psql () {
     drop_psql $1 $2
-    echo "Pinging psql in container $1 with db name $2"
+    echo "Creating psql in container $1 with db name $2"
     retry docker exec -u postgres $1 pg_isready --dbname=$2
     docker exec -u postgres $1 psql -c "CREATE DATABASE $2" || echo "container $1 DB $2 already exists"
 }
@@ -81,13 +70,13 @@ drop_psql () {
 db_setup_full () {
     echo "Restoring PostgreSQL from backup"
     ping_psql "oodi_db" "tkt_oodi_real"
-    ping_psql "oodi_user_db" "user_db_real"
     restore_psql_from_backup $PSQL_REAL_DB_BACKUP oodi_db tkt_oodi_real
-    # echo "Restoring MongoDB from backup"
-    # retry restore_mongodb_from_backup
-    echo "Restore user db from backup"
+    ping_psql "db_kone" "db_kone_real"
+    restore_psql_from_backup $KONE_REAL_DB_BACKUP db_kone db_kone_real
     ping_psql "oodi_user_db" "user_db_real"
     restore_psql_from_backup $USER_REAL_DB_BACKUP oodi_user_db user_db_real
+    # echo "Restoring MongoDB from backup"
+    # retry restore_mongodb_from_backup
     echo "Database setup finished"
 }
 
@@ -99,17 +88,16 @@ db_anon_setup_full () {
     ping_psql "db_kone" "db_kone"
     ping_psql "db_kone" "db_kone_test"
     restore_psql_from_backup $KONE_DB_BACKUP db_kone db_kone
-    # echo "Restoring MongoDB from backup"
-    # retry restore_mongodb_from_backup
-    echo "Restore user db from backup"
     ping_psql "oodi_user_db" "user_db"
     restore_psql_from_backup $USER_DB_BACKUP oodi_user_db user_db
+    # echo "Restoring MongoDB from backup"
+    # retry restore_mongodb_from_backup
     echo "Database setup finished"
 }
 
 reset_real_db () {
     docker-compose down
-    docker-compose up -d db user_db
+    docker-compose up -d db user_db db_kone
     db_setup_full
     docker-compose down
 }
@@ -123,10 +111,6 @@ reset_db () {
 
 install_cli_npm_packages () {
     npm ci
-}
-
-docker_build () {
-    docker-compose up -d --build
 }
 
 show_instructions () {
