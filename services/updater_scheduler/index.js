@@ -23,33 +23,34 @@ const updateTask = async (task, status, type) => {
 }
 
 stan.on('connect', async () => {
-  // cron.schedule('0 0 1 * *', async () => {
-  //   // Update ALL students and meta every month
-  //   scheduleAllStudentsAndMeta()
-  // }, { timezone })
+  cron.schedule('0 0 1 * *', async () => {
+    // Update ALL students and meta every month
+    scheduleAllStudentsAndMeta()
+  }, { timezone })
 
   cron.schedule('20 4 1 1,3,8,10 *', async () => {
     // At 04:20 on day-of-month 1 in January, March, August, and October.”
     updateStudentNumberList()
   })
 
-  cron.schedule('0 * * * *'), async () => {
-    const allStudentTasks = await Schedule.find({ type: 'student' })
-    if (allStudentTasks && allStudentTasks.every(task => task.status === 'DONE')) {
+  // cron.schedule('0 * * * *'), async () => {
+  //   const allStudentTasks = await Schedule.find({ type: 'student' })
+  //   if (allStudentTasks && allStudentTasks.every(task => task.status === 'DONE')) {
 
-      stan.publish('DumpDatabase', null, (err, guid) => {
-        if (err) {
-          console.log('publish failed', 'DumpDatabase')
-        } else {
-          console.log('published', 'DumpDatabase')
-        }
-      })
-    }
-  }
-  // cron.schedule('0 23 * * *', async () => {
-  //   // Update ACTIVE students every night
-  //   scheduleActiveStudents()
-  // }, { timezone })
+  //     stan.publish('DumpDatabase', null, (err, guid) => {
+  //       if (err) {
+  //         console.log('publish failed', 'DumpDatabase')
+  //       } else {
+  //         console.log('published', 'DumpDatabase')
+  //       }
+  //     })
+  //   }
+  // }
+
+  cron.schedule('0 23 * * *', async () => {
+    // Update ACTIVE students every night
+    scheduleActiveStudents()
+  }, { timezone })
 
   cron.schedule('*/5 * * * *', async () => {
     const oldestTasks = await getOldestTasks()
@@ -67,29 +68,29 @@ stan.on('connect', async () => {
     scheduledCount = 0
   }, { timezone })
 
-  // cron.schedule('0 7 * * *', async () => {
-  //   stan.publish('RefreshOverview', null, (err, guid) => {
-  //     if (err) {
-  //       console.log('publish failed', 'RefreshOverview')
-  //     } else {
-  //       console.log('published', 'RefreshOverview')
-  //     }
-  //   })
-  //   stan.publish('RefreshStudyrightAssociations', null, (err, guid) => {
-  //     if (err) {
-  //       console.log('publish failed', 'RefreshStudyrightAssociations')
-  //     } else {
-  //       console.log('published', 'RefreshStudyrightAssociations')
-  //     }
-  //   })
-  //   stan.publish('updateAttainmentDates', null, (err, guid) => {
-  //     if (err) {
-  //       console.log('publish failed', 'UpdateAttainmentDates')
-  //     } else {
-  //       console.log('published', 'UpdateAttainmentDates')
-  //     }
-  //   })
-  // }, { timezone })
+  cron.schedule('0 7 * * *', async () => {
+    stan.publish('RefreshOverview', null, (err, guid) => {
+      if (err) {
+        console.log('publish failed', 'RefreshOverview')
+      } else {
+        console.log('published', 'RefreshOverview')
+      }
+    })
+    stan.publish('RefreshStudyrightAssociations', null, (err, guid) => {
+      if (err) {
+        console.log('publish failed', 'RefreshStudyrightAssociations')
+      } else {
+        console.log('published', 'RefreshStudyrightAssociations')
+      }
+    })
+    stan.publish('updateAttainmentDates', null, (err, guid) => {
+      if (err) {
+        console.log('publish failed', 'UpdateAttainmentDates')
+      } else {
+        console.log('published', 'UpdateAttainmentDates')
+      }
+    })
+  }, { timezone })
 
   const scheduleSub = stan.subscribe('ScheduleAll')
   
