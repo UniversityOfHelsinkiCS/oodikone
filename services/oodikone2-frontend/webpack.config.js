@@ -57,6 +57,7 @@ module.exports = (env, args) => {
       }),
       new HtmlWebpackPlugin({
         template: './index.html',
+        favicon: './favicon.png',
         baseHref: BASE_PATH
       }),
       new webpack.DefinePlugin({
