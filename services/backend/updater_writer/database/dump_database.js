@@ -1,6 +1,5 @@
 const spawn = require('child_process').spawn
 const fs = require('fs')
-const { sync } = require('./force_sync_database')
 const { DB_SCHEMA } = require('../conf-backend')
 
 const dumpDatabase = async () => {
@@ -19,8 +18,7 @@ const dumpDatabase = async () => {
     if (code !== 0) {
       throw new Error('pg_dump: Bad exit code (' + code + ')');
     } else {
-      console.log('database dump created, force syncing database')
-      await sync()
+      console.log('database dump created')
     }
   })
 }

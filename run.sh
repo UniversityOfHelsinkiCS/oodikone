@@ -26,7 +26,6 @@ options=(
     "Reset real db"
     "Download latest anon db"
     "Download latest real db"
-    "Full reset"
     "Quit"
 )
 select opt in "${options[@]}"
@@ -55,9 +54,6 @@ do
             ;;
         "Download latest real db")
             get_oodikone_server_backup
-            ;;
-        "Full reset")
-            purge
             ;;
         "Quit")
             break
