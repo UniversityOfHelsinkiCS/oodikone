@@ -471,7 +471,7 @@ const getMainCodeToDuplicates = async () => {
     )[0]
     acc[main.code] = {
       maincourse: { code: main.code, name: main.name },
-      duplicates: courses.map( c => ({ code: c.code, name: c.name }))
+      duplicates: courses.map(c => ({ code: c.code, name: c.name }))
     }
     return acc
   }, {})
@@ -549,18 +549,18 @@ const setDuplicateCode = async (code1, code2) => {
       if (course1 && course2) {
         const all = await getDuplicatesToIdMap()
         // make sure both dont have a group
-        if ([all[code1], all[code2]].filter(e=>e).length <= 1) {
+        if ([all[code1], all[code2]].filter(e => e).length <= 1) {
           let groupid = all[code1] || all[code2]
           if (!groupid) {
             // neither has a group, make one
-            groupid = Math.max(0, ...Object.values(all).filter(e=>e))
-            groupid = groupid && !isNaN(groupid) ? groupid+1 : 1
+            groupid = Math.max(0, ...Object.values(all).filter(e => e))
+            groupid = groupid && !isNaN(groupid) ? groupid + 1 : 1
           }
           await CourseDuplicates.bulkCreate([
             { groupid, coursecode: code1 },
             { groupid, coursecode: code2 }
           ],
-          { ignoreDuplicates: true })
+            { ignoreDuplicates: true })
         } else {
           // both have a group, must merge groups
           await CourseDuplicates.update({ groupid: all[code1] }, { where: { groupid: all[code2] } })
@@ -642,7 +642,6 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
 const courseYearlyStats = async (coursecodes, separate, startyearcode, endyearcode) => {
   const stats = await Promise.all(coursecodes
     .map(code => yearlyStatsOfNew(code, separate, startyearcode, endyearcode || startyearcode)))
-
   return stats
 }
 
