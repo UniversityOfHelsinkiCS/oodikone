@@ -221,7 +221,6 @@ SingleCourseStats.propTypes = {
 
 const mapStateToProps = (state) => {
   const { semesters = [], years = [] } = state.semesters.data
-
   return {
     programmes: selectors.getAllStudyProgrammes(state),
     years: Object.values(years).map(({ yearcode, yearname }) => ({
