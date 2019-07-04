@@ -100,7 +100,7 @@ const creditsForCourses = (codes) => Credit.findAll({
       attributes: ['studentnumber'],
       include: {
         model: StudyrightElement,
-        attributes: ['code'],
+        attributes: ['code', 'startdate'],
         include: [
           {
             model: ElementDetails,
@@ -580,9 +580,10 @@ const alternativeCodes = async code => {
   return alternatives ? alternatives : [code]
 }
 
-const formatStudyrightElement = ({ code, element_detail }) => ({
+const formatStudyrightElement = ({ code, element_detail, startdate }) => ({
   code,
-  name: element_detail.name
+  name: element_detail.name,
+  startdate
 })
 
 const parseCredit = credit => {
@@ -612,7 +613,6 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
       semestercode, semestername,
       yearcode, yearname, programmes
     } = parseCredit(credit)
-
     if (startyearcode <= yearcode && yearcode <= endyearcode) {
       const groupcode = separate ? semestercode : yearcode
       const groupname = separate ? semestername : yearname

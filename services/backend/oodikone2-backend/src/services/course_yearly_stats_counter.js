@@ -44,21 +44,29 @@ class CourseYearlyStatsCounter {
     return { attempted, passed, failed }
   }
 
-  markStudyProgramme(code, name, studentnumber) {
+  markStudyProgramme(code, name, studentnumber, startdate) {
     if (!this.programmes[code]) {
       this.initProgramme(code, name)
     }
     const prog = this.programmes[code]
 
-    if (!prog.students.includes(studentnumber) && !this.all.includes(studentnumber)) {
-      this.all.push(studentnumber)
+    // check if student has earlier studyright wrt course
+    this.all.forEach((student) => {
+      if (student.studentnumber === studentnumber && student.startdate > startdate) {
+        delete this.programmes[student.code]
+        this.all.splice(this.all.indexOf(student), 1)
+      }
+    })
+
+    if (!prog.students.includes(studentnumber)) {
+      this.all.push({ studentnumber, code, startdate })
       prog.students.push(studentnumber)
     }
   }
 
   markStudyProgrammes(studentnumber, programmes) {
-    programmes.forEach(({ code, name }) => {
-      this.markStudyProgramme(code, name, studentnumber)
+    programmes.forEach(({ code, name, startdate }) => {
+      this.markStudyProgramme(code, name, studentnumber, startdate)
     })
   }
 
