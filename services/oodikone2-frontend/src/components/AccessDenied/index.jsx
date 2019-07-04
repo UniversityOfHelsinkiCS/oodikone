@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Transition, Dimmer, Header, Image, Container, Button } from 'semantic-ui-react'
-import { bool } from 'prop-types'
+import { bool, func } from 'prop-types'
 import Highcharts from 'highcharts'
 import ReactHighchart from 'react-highcharts'
-import { logout } from '../../apiConnection'
+import { connect } from 'react-redux'
+import { logout as logoutAction } from '../../redux/auth'
 import { log, images } from '../../common'
 
 import MulticolorBarChart from '../MulticolorBarChart'
@@ -15,7 +16,7 @@ const dummyData = [
   { text: 'ttuotila', value: 59.7 }
 ]
 
-const AccessDenied = ({ notEnabled }) => {
+const AccessDenied = ({ notEnabled, logout }) => {
   const header = notEnabled ? 'Welcome to Oodikone!' : 'Something broke'
   const subheader = notEnabled ? `You're currently not allowed to enter 
   but you will get an email when you're authorized`
@@ -116,7 +117,15 @@ const AccessDenied = ({ notEnabled }) => {
 }
 
 AccessDenied.propTypes = {
-  notEnabled: bool.isRequired
+  notEnabled: bool.isRequired,
+  logout: func.isRequired
 }
 
-export default AccessDenied
+const mapDispatchToProps = {
+  logout: logoutAction
+}
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(AccessDenied)
