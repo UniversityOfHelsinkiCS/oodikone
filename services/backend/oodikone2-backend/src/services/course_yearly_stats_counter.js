@@ -8,6 +8,7 @@ const CATEGORY = {
 class CourseYearlyStatsCounter {
 
   constructor() {
+    this.all = []
     this.groups = {}
     this.programmes = {}
     this.history = {
@@ -48,7 +49,11 @@ class CourseYearlyStatsCounter {
       this.initProgramme(code, name)
     }
     const prog = this.programmes[code]
-    prog.students.push(studentnumber)
+
+    if (!prog.students.includes(studentnumber) && !this.all.includes(studentnumber)) {
+      this.all.push(studentnumber)
+      prog.students.push(studentnumber)
+    }
   }
 
   markStudyProgrammes(studentnumber, programmes) {
