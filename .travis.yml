@@ -38,7 +38,7 @@ jobs:
       deploy: # deploy is always skipped for PR
         provider: script
         skip_cleanup: true
-        script: "docker-compose -f docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"Staging auto deployment started!\\\"}\" ${SLACKBOT_URL}"
+        script: "docker-compose -f docker-compose.yml -f docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"Staging auto deployment started!\\\"}\" ${SLACKBOT_URL}"
         on:
           branch: master
     - # in parallel
@@ -59,7 +59,7 @@ jobs:
       deploy: # deploy is always skipped for PR
         provider: script
         skip_cleanup: true
-        script: "docker-compose -f docker-compose.lateste2e.production.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release started auto deployment!\\\"}\" ${SLACKBOT_URL}"
+        script: "docker-compose -f docker-compose.yml -f docker-compose.lateste2e.production.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release started auto deployment!\\\"}\" ${SLACKBOT_URL}"
         on:
           tags: true
 

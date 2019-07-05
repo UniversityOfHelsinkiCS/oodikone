@@ -17,14 +17,16 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
   )
 
   const toCourseRow = course => (
-    <Table.Row style={{ cursor: 'pointer' }} key={course.code} onClick={() => (course.min_attainment_date || mandatory ? onSelectCourse(course) : null)} >
-      <Table.Cell width={10}>
+    // kinda hax solution for the problem, after fetching course course is array of selected course code letters
+    <Table.Row style={{ cursor: 'pointer' }} key={course.code ? course.code : course[0]} onClick={() => (course.min_attainment_date || mandatory ? onSelectCourse(course) : null)} >
+      <Table.Cell key={course.code} width={10}>
         <div>{course.name}</div>
         <div>{getActiveYears(course)}</div>
       </Table.Cell>
       <Table.Cell content={course.code} />
     </Table.Row>
   )
+
 
   return (
     !hidden && (

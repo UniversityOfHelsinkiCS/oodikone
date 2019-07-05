@@ -29,7 +29,7 @@ services:
 
   nats:
     image: nats-streaming
-    command: -cid updaterNATS  --file_slice_max_bytes 0 --file_slice_max_age 100h -store file -dir datastore
+    command: -cid updaterNATS --file_slice_max_bytes 0 --file_slice_max_age 100h -store file -dir datastore
     expose:
       - "4222"
     volumes:
@@ -146,7 +146,6 @@ services:
       - ./services/backend/shared/models:/usr/src/app/src/models
       - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
       - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
-
     container_name: backend
     depends_on:
       - db
@@ -262,7 +261,6 @@ services:
       - ./services/backend/shared/models:/usr/src/app/models
       - ./services/backend/shared/migrations:/usr/src/app/database/migrations
       - ./services/backend/shared/migrations_kone:/usr/src/app/database/migrations_kone
-
     depends_on:
       - nats
       - db
@@ -273,8 +271,7 @@ services:
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       TEST_DB_SCHEMA: updater_test
       DB_SCHEMA_KONE: kone_data
-
-
+    container_name: updater_writer
 
   scheduler_mongo:
     image: mongo
@@ -308,9 +305,7 @@ services:
       - LOG_HOST=toska.cs.helsinki.fi
       - LOG_PORT=9501
       - LOG_HOSTNAME=updater_scheduler
-
     container_name: updater_scheduler
-
 
   analytics:
     build:
