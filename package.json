@@ -31,7 +31,5 @@
     "cypress": "^3.2.0",
     "husky": "^1.3.1"
   },
-  "dependencies": {
-    "umzug": "^2.2.0"
-  }
+  "dependencies": {}
 }
