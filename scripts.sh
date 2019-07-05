@@ -160,10 +160,10 @@ run_e2e_setup () {
     echo "Getting anon backups from the private repository. "
     get_anon_oodikone
     echo "Building images"
-    docker-compose -f docker-compose.yml -f $1 build
+    docker-compose -f $1 build
     echo "Setup oodikone db from dump."
-    docker-compose -f docker-compose.yml -f $1 up -d db user_db db_kone
+    docker-compose -f $1 up -d db user_db db_kone
     db_anon_setup_full
     echo "Starting services."
-    docker-compose -f docker-compose.yml -f $1 up -d
+    docker-compose -f $1 up -d
 }
