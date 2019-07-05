@@ -27,7 +27,7 @@ services:
       context: services/oodikone2-frontend
       args:
         BASE_PATH: /
-    command: /wait && serve -s -l 5000 dist
+    command: ['sh', '-c', '/wait && serve -s -l 5000 dist']
     ports:
       - "5000:5000"
     environment:
