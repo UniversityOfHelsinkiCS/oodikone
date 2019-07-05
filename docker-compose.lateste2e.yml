@@ -22,6 +22,7 @@ services:
     environment:
       FRONT_URL: http://localhost:1337
       ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
+    restart: "no"
 
   frontend:
     image: toska/oodikone2-frontend:staging
@@ -30,7 +31,6 @@ services:
         NODE_ENV: "production"
         BASE_PATH: /
     command: ["sh", "-c", "/wait && npm run serve -- -s -l 5000 dist"]
-    restart: "no"
     ports:
       - "5000:5000"
     environment:
