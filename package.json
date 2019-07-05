@@ -9,8 +9,7 @@
     "cypress:record": "cypress run --config videoUploadOnPasses=false -P ./",
     "concurrently": "concurrently",
     "test": "./run_all_tests.sh",
-    "test_services": "./run_service_tests.sh",
-    "serve": "serve"
+    "test_services": "./run_service_tests.sh"
   },
   "husky": {
     "hooks": {
