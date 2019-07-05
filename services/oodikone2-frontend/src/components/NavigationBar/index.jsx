@@ -5,9 +5,9 @@ import { func, shape, string } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { routes } from '../../constants'
-import { userRoles, userRights } from '../../common'
+import { userRoles, userRights, getAsUserWithoutRefreshToken } from '../../common'
 import './navigationBar.css'
-import { logout, login, returnToSelf } from '../../apiConnection'
+import { login as loginAction, logout as logoutAction } from '../../redux/auth'
 import LanguageChooser from '../LanguageChooser'
 
 const { USER_ADMINER_URL, ADMINER_URL, ANALYTICS_ADMINER_URL, USAGE_ADMINER_URL, KONE_ADMINER_URL } = process.env
@@ -21,9 +21,11 @@ class NavigationBar extends Component {
     await this.setNavigationRoutes()
   }
 
-  async componentWillReceiveProps() {
-    await this.setNavigationRoutes()
-    this.render()
+  async componentWillReceiveProps(nextProps) {
+    if (this.props.token !== nextProps.token) {
+      await this.setNavigationRoutes()
+      this.render()
+    }
   }
 
   setNavigationRoutes = async () => {
@@ -44,13 +46,12 @@ class NavigationBar extends Component {
   }
 
   returnToSelf = () => async () => {
-    await returnToSelf()
+    this.props.logout()
     this.props.history.push('/')
-    window.location.reload()
   }
 
   renderUserMenu = (itemWidth) => {
-    const { translate } = this.props
+    const { translate, login, logout } = this.props
     if (process.env.NODE_ENV === 'development') {
       const testUsers = ['tktl']
       return (
@@ -137,7 +138,8 @@ class NavigationBar extends Component {
   }
 
   render() {
-    const { translate: t, asUser } = this.props
+    const { translate: t } = this.props
+    const asUser = getAsUserWithoutRefreshToken()
     const { navigationRoutes } = this.state
     const menuWidth = asUser ? Object.keys(navigationRoutes).length + 3 : Object.keys(navigationRoutes).length + 2
     const itemWidth = 100 / menuWidth
@@ -215,18 +217,28 @@ class NavigationBar extends Component {
 
 NavigationBar.propTypes = {
   translate: func.isRequired,
-  asUser: string,
   history: shape({
     push: func.isRequired
-  }).isRequired
+  }).isRequired,
+  token: string,
+  login: func.isRequired,
+  logout: func.isRequired
 }
 
 NavigationBar.defaultProps = {
-  asUser: null
+  token: null
 }
 
-const mapStateToProps = ({ settings }) => ({
-  asUser: settings.asUser
+const mapStateToProps = ({ auth }) => ({
+  token: auth.token
 })
 
-export default connect(mapStateToProps)(withRouter(NavigationBar))
+const mapDispatchToProps = {
+  login: loginAction,
+  logout: logoutAction
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(NavigationBar))

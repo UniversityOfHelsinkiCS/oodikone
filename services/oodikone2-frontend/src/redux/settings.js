@@ -1,12 +1,10 @@
 import { callController } from '../apiConnection'
-import { getAsUserWithoutRefreshToken } from '../common'
 
 const initial = () => ({
   language: 'fi',
   namesVisible: false,
   studentlistVisible: false,
-  chartHeight: 600,
-  asUser: getAsUserWithoutRefreshToken()
+  chartHeight: 600
 })
 
 export const switchLanguage = (username, language) => {

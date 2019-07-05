@@ -420,7 +420,7 @@ class PopulationSearchForm extends Component {
             control={Datetime}
             dateFormat={YEAR_DATE_FORMAT}
             timeFormat={false}
-            renderYear={(props, selectableYear) => <td {...props}>{`${selectableYear}-${selectableYear + 1}`}</td>}
+            renderYear={(props, selectableYear) => <td {...props} >{`${selectableYear}`}-<br />{`${selectableYear + 1}`}</td>}
             closeOnSelect
             value={`${startYear}-${moment().year(startYear).add(1, 'years').format('YYYY')}`}
             isValidDate={this.validYearCheck}

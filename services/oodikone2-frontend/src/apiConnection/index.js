@@ -1,9 +1,8 @@
 import axios from 'axios'
-
-import { getToken, setToken, getAsUserWithoutRefreshToken } from '../common'
+import { getToken, setToken, getAsUserWithoutRefreshToken, getTokenWithoutRefresh } from '../common'
 import { API_BASE_PATH, TOKEN_NAME, BASE_PATH } from '../constants'
+import { login as loginAction } from '../redux/auth'
 
-const getAxios = () => axios.create({ baseURL: API_BASE_PATH })
 const isTestEnv = BASE_PATH === '/testing/'
 const isDevEnv = process.env.NODE_ENV === 'development'
 const devOptions = {
@@ -12,7 +11,6 @@ const devOptions = {
     displayName: 'Development Kayttaja',
     'shib-session-id': 'mock-session'
   }
-
 }
 
 const testOptions = {
@@ -34,18 +32,13 @@ const getDefaultConfig = () => {
   }
 }
 
-const createDefaultAxiosConfig = async () => {
+const createDefaultAxiosConfig = () => {
   const config = getDefaultConfig()
-  const token = await getToken()
   config.baseURL = API_BASE_PATH
-  config.headers['x-access-token'] = token
   return config
 }
 
-export const createConfiguredAxios = async () => {
-  const config = await createDefaultAxiosConfig()
-  return axios.create(config)
-}
+export const api = axios.create({ ...createDefaultAxiosConfig() })
 
 const types = {
   attempt: prefix => `${prefix}ATTEMPT`,
@@ -68,8 +61,15 @@ export const login = async () => {
   if (isTestEnv) {
     options = testOptions
   }
-  const response = await getAxios().post('/login', null, options)
+  const response = await api.post('/login', null, options)
   return response.data.token
+}
+
+export const logout = async () => {
+  const returnUrl = window.location.origin
+  const response = await api.delete('/logout', { data: { returnUrl } })
+  localStorage.removeItem(TOKEN_NAME)
+  window.location = response.data.logoutUrl
 }
 
 export const returnToSelf = async () => {
@@ -85,18 +85,16 @@ export const callApi = async (url, method = 'get', data, params, timeout = 0) =>
   if (isTestEnv) {
     options = testOptions
   }
-  const token = await getToken()
-  options.headers['x-access-token'] = token
 
   switch (method) {
     case 'get':
-      return getAxios().get(url, { ...options, params })
+      return api.get(url, { ...options, params })
     case 'post':
-      return getAxios().post(url, data, options)
+      return api.post(url, data, options)
     case 'put':
-      return getAxios().put(url, data, options)
+      return api.put(url, data, options)
     case 'delete':
-      return getAxios().delete(url, { headers: options.headers, data })
+      return api.delete(url, { headers: options.headers, data })
     default:
       return Promise.reject(new Error('Invalid http method'))
   }
@@ -104,8 +102,10 @@ export const callApi = async (url, method = 'get', data, params, timeout = 0) =>
 
 export const superLogin = async (uid) => {
   const response = await callApi(`/superlogin/${uid}`, 'post')
-  console.log(`Setting new token ${response.data.token}`)
-  await setToken(response.data.token)
+  const { token } = response.data
+  console.log(`Setting new token ${token}`)
+  await setToken(token)
+  return token
 }
 
 export const callController = (route, prefix, data, method = 'get', query, params) => {
@@ -132,29 +132,57 @@ export const handleRequest = store => next => async (action) => {
       store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
     } catch (e) {
       // Something failed. Assume it's the token and try again.
-      try {
-        const mock = getAsUserWithoutRefreshToken()
-        if (!mock) {
-          await getToken(true)
-          if (e.response.data.reloadPage) {
-            setTimeout(() => { window.location.reload() }, 1000)
-            return
-          }
-        }
-        const res = await callApi(route, method, data, params)
-        store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
-      } catch (err) {
-        store.dispatch({ type: `${prefix}FAILURE`, response: err, query })
+      if (e.response.data.reloadPage) {
+        setTimeout(() => { window.location.reload() }, 1000)
+        return
       }
+      store.dispatch(loginAction(true, requestSettings))
     }
   }
 }
 
-export const logout = async () => {
-  const returnUrl = window.location.origin
-  const response = await getAxios().delete('/logout', { data: { returnUrl } })
-  localStorage.removeItem(TOKEN_NAME)
-  window.location = response.data.logoutUrl
+export const handleAuth = store => next => async (action) => {
+  next(action)
+  const { type, force = false, retryRequestSettings, uid, refresh } = action
+  const {
+    route, method, data, prefix, query, params
+  } = retryRequestSettings || {}
+  if (type === 'LOGIN_SUCCESS' && refresh) window.location.reload()
+  if (type === 'LOGIN_ATTEMPT') {
+    try {
+      const mock = await getAsUserWithoutRefreshToken()
+      let token
+      if (mock && !uid) token = getTokenWithoutRefresh()
+      else if (uid) token = await superLogin(uid)
+      else token = await getToken(force)
+
+      api.defaults.headers.common = {
+        ...api.defaults.headers.common,
+        'x-access-token': token
+      }
+      store.dispatch({ type: 'LOGIN_SUCCESS', token, refresh: uid })
+      try {
+        if (retryRequestSettings) {
+          const res = await callApi(route, method, data, params)
+          store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
+        }
+      } catch (err) {
+        store.dispatch({ type: `${prefix}FAILURE`, response: err, query })
+      }
+    } catch (err) {
+      store.dispatch({ type: 'LOGIN_FAILURE' })
+      if (retryRequestSettings) {
+        store.dispatch({ type: `${prefix}FAILURE`, response: err, query })
+      }
+    }
+  } else if (type === 'LOGOUT_ATTEMPT') {
+    try {
+      await logout()
+      store.dispatch({ type: 'LOGOUT_SUCCESSFUL' })
+    } catch (err) {
+      store.dispatch({ type: 'LOGOUT_FAILURE' })
+    }
+  }
 }
 
 export const sendLog = async data => callApi('/log', 'post', data)

@@ -8,7 +8,7 @@ import { getTextIn, getRolesWithoutRefreshToken } from '../../common'
 import { removeUserUnits, getAccessGroups, setFaculties } from '../../redux/users'
 import { getFaculties } from '../../redux/faculties'
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
-import { superLogin } from '../../apiConnection'
+import { login } from '../../redux/auth'
 import AccessRights from './AccessRights'
 import AccessGroups from './AccessGroups'
 
@@ -80,9 +80,8 @@ class UserPage extends Component {
   allSpecializationIds = () => this.specializationOptions().map(sp => sp.key)
 
   showAs = async (uid) => {
-    await superLogin(uid)
+    this.props.login(false, null, uid)
     this.props.history.push('/')
-    window.location.reload()
   }
 
   renderUnitList = (elementdetails, user) => {
@@ -224,7 +223,8 @@ UserPage.propTypes = {
   getFaculties: func.isRequired,
   faculties: arrayOf(shape({ code: string, name: shape({}) })).isRequired,
   accessGroups: arrayOf(object).isRequired,
-  isAdmin: bool.isRequired
+  isAdmin: bool.isRequired,
+  login: func.isRequired
 }
 const mapStateToProps = state => ({
   language: state.settings.language,
@@ -241,5 +241,6 @@ export default connect(mapStateToProps, {
   setFaculties,
   getDegreesAndProgrammesUnfiltered,
   getAccessGroups,
-  getFaculties
+  getFaculties,
+  login
 })(withRouter(UserPage))
