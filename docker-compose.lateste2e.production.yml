@@ -26,6 +26,7 @@ services:
     build:
       context: services/oodikone2-frontend
       args:
+        NODE_ENV: 'production'
         BASE_PATH: /
     command: ['sh', '-c', '/wait && npm run serve -- -s -l 5000 dist']
     ports:
