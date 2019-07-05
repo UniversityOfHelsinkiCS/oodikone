@@ -14,8 +14,8 @@ services:
   backend:
     image: toska/oodikone2-backend:staging
     build:
-      context: services/backend
-      dockerfile: oodikone2-backend/Dockerfile
+      args:
+        NODE_ENV: "production"
     ports:
       - "8080:8080"
       - "9229:9229"
@@ -26,11 +26,11 @@ services:
   frontend:
     image: toska/oodikone2-frontend:staging
     build:
-      context: services/oodikone2-frontend
       args:
-        NODE_ENV: 'production'
+        NODE_ENV: "production"
         BASE_PATH: /
-    command: ['sh', '-c', '/wait && npm run serve -- -s -l 5000 dist']
+    command: ["sh", "-c", "/wait && npm run serve -- -s -l 5000 dist"]
+    restart: "no"
     ports:
       - "5000:5000"
     environment:
@@ -39,34 +39,39 @@ services:
   userservice:
     image: toska/oodikone2-userservice:staging
     build:
-      context: services/oodikone2-userservice
+      args:
+        NODE_ENV: "production"
 
   usageservice:
     image: toska/oodikone2-usageservice:staging
     build:
-      context: services/oodikone2-usageservice
+      args:
+        NODE_ENV: "production"
 
   updater_api:
     image: toska/updater_api:staging
     build:
-      context: services/updater_api
+      args:
+        NODE_ENV: "production"
 
   updater_writer:
     image: toska/updater_writer:staging
     build:
-      context: services/backend
-      dockerfile: updater_writer/Dockerfile
+      args:
+        NODE_ENV: "production"
 
   updater_scheduler:
     image: toska/updater_scheduler:staging
     build:
-      context: services/updater_scheduler
+      args:
+        NODE_ENV: "production"
     command: ["echo", "mluukkai on orjuuttaja"]
 
   analytics:
     image: toska/oodikone2-analytics:staging
     build:
-      context: services/oodikone2-analytics
+      args:
+        NODE_ENV: "production"
     container_name: analytics
 
   nginx:
