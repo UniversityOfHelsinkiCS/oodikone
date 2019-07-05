@@ -5,6 +5,7 @@ services:
     environment:
       DB_URL: postgres://postgres@db:5432/tkt_oodi_real
       DB_URL_KONE: postgres://postgres@db_kone:5432/db_kone_real
+
   userservice:
     environment:
       DB_URL: postgres://postgres@user_db:5432/user_db_real

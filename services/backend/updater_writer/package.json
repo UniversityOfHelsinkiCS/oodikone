@@ -19,6 +19,7 @@
     "node-nats-streaming": "^0.2.2",
     "nodemon": "^1.19.0",
     "pg": "^7.10.0",
-    "sequelize": "^5.8.5"
+    "sequelize": "^5.8.5",
+    "umzug": "^2.2.0"
   }
 }
