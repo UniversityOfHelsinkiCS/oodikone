@@ -1,4 +1,6 @@
 const Sequelize = require('sequelize')
+const Umzug = require('umzug')
+
 const conf = require('../conf-backend')
 
 const sequelize = new Sequelize(conf.DB_URL, {
