@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Form } from 'semantic-ui-react'
 import KeyValueTable from './KeyValueTable'
-import { createConfiguredAxios } from '../../apiConnection'
+import { api } from '../../apiConnection'
 
 class Postman extends Component {
     state={
@@ -13,16 +13,14 @@ class Postman extends Component {
     }
 
     doOodiApiRequest = async () => {
-      const axios = await createConfiguredAxios()
       const { route, secret } = this.state
       const headers = { 'x-oodi-secret': secret }
-      const { status, data } = await axios.post('/oodi', { route }, { headers })
+      const { status, data } = await api.post('/oodi', { route }, { headers })
       this.setState({ data: { status, data }, pending: false })
     }
 
     doBackendRequest = async () => {
-      const axios = await createConfiguredAxios()
-      const { status, data } = await axios.get(this.state.route)
+      const { status, data } = await api.get(this.state.route)
       this.setState({ data: { status, data }, pending: false })
     }
 

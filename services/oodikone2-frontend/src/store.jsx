@@ -5,7 +5,7 @@ import thunk from 'redux-thunk'
 
 import { AVAILABLE_LANGUAGES, DEFAULT_LANG } from './constants'
 import reducers from './redux'
-import { handleRequest } from './apiConnection'
+import { handleRequest, handleAuth } from './apiConnection'
 
 const translations = require('./i18n/translations.json')
 
@@ -14,7 +14,7 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 const store = createStore(
   reducers,
-  composeEnhancers(applyMiddleware(thunk, handleRequest))
+  composeEnhancers(applyMiddleware(thunk, handleRequest, handleAuth))
 )
 store.dispatch(initialize(AVAILABLE_LANGUAGES, { defaultLanguage: DEFAULT_LANG }))
 store.dispatch(addTranslation(translations))

@@ -2,7 +2,7 @@ import React from 'react'
 import moment from 'moment'
 import { Table, Header, Loader, Button, Grid } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { shape, number, arrayOf, bool, string, func } from 'prop-types'
+import { shape, number, arrayOf, bool, string, func, oneOfType } from 'prop-types'
 import { callApi } from '../../../apiConnection'
 import { getProductivity } from '../../../redux/productivity'
 
@@ -94,7 +94,7 @@ ProductivityTable.propTypes = {
     lastUpdated: string,
     status: string,
     data: arrayOf(shape({
-      year: string,
+      year: oneOfType([number, string]),
       credits: number,
       mThesis: number,
       bThesis: number,
