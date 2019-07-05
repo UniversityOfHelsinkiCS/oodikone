@@ -18,32 +18,6 @@ const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
 })
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
 
-const runMigrations = async () => {
-  try {
-    const migrator = new Umzug({
-      storage: 'sequelize',
-      storageOptions: {
-        sequelize: sequelize,
-        tableName: 'migrations'
-      },
-      logging: console.log,
-      migrations: {
-        params: [
-          sequelize.getQueryInterface(),
-          Sequelize
-        ],
-        path: `${process.cwd()}/src/database/migrations`,
-        pattern: /\.js$/,
-        schema: conf.DB_SCHEMA
-      }
-    })
-    const migrations = await migrator.up()
-
-    console.log('Migrations up to date', migrations)
-  } catch (e) {
-    console.log('Migration error, message:', e)
-  }
-}
 
 const runMigrationsKone = async () => {
   try {
@@ -73,7 +47,6 @@ const runMigrationsKone = async () => {
   }
 }
 
-const migrationPromise = !conf.isTest ? runMigrations() : Promise.resolve()
 const migrationPromiseKone = !conf.isTest ? runMigrationsKone() : Promise.resolve()
 
 const forceSyncDatabase = async () => {
@@ -94,7 +67,6 @@ const forceSyncDatabase = async () => {
 module.exports = {
   sequelize,
   sequelizeKone,
-  migrationPromise,
   migrationPromiseKone,
   forceSyncDatabase
 }
