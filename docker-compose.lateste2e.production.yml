@@ -21,6 +21,7 @@ services:
       FRONT_URL: http://localhost:1337
       TOKEN_SECRET: IWannaBeTheVeryBest
       ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
+    restart: "no"
 
   frontend:
     image: toska/oodikone2-frontend:latest
@@ -40,23 +41,28 @@ services:
     build:
       args:
         NODE_ENV: "production"
+    restart: "no"
+
   usageservice:
     image: toska/oodikone2-usageservice:latest
     build:
       args:
         NODE_ENV: "production"
+    restart: "no"
 
   updater_api:
     image: toska/updater_api:latest
     build:
       args:
         NODE_ENV: "production"
+    restart: "no"
 
   updater_writer:
     image: toska/updater_writer:latest
     build:
       args:
         NODE_ENV: "production"
+    restart: "no"
 
   updater_scheduler:
     image: toska/updater_scheduler:latest
@@ -64,6 +70,7 @@ services:
       args:
         NODE_ENV: "production"
     command: ["echo", "mluukkai on orjuuttaja"]
+    restart: "no"
 
   analytics:
     image: toska/oodikone2-analytics:latest
@@ -71,6 +78,7 @@ services:
       args:
         NODE_ENV: "production"
     container_name: analytics
+    restart: "no"
 
   nginx:
     image: nginx:latest
