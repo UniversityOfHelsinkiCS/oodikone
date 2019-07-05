@@ -35,30 +35,35 @@ services:
       - "5000:5000"
     environment:
       WAIT_HOSTS: user_db:5432
+    restart: "no"
 
   userservice:
     image: toska/oodikone2-userservice:staging
     build:
       args:
         NODE_ENV: "production"
+    restart: "no"
 
   usageservice:
     image: toska/oodikone2-usageservice:staging
     build:
       args:
         NODE_ENV: "production"
+    restart: "no"
 
   updater_api:
     image: toska/updater_api:staging
     build:
       args:
         NODE_ENV: "production"
+    restart: "no"
 
   updater_writer:
     image: toska/updater_writer:staging
     build:
       args:
         NODE_ENV: "production"
+    restart: "no"
 
   updater_scheduler:
     image: toska/updater_scheduler:staging
@@ -66,6 +71,7 @@ services:
       args:
         NODE_ENV: "production"
     command: ["echo", "mluukkai on orjuuttaja"]
+    restart: "no"
 
   analytics:
     image: toska/oodikone2-analytics:staging
@@ -73,6 +79,7 @@ services:
       args:
         NODE_ENV: "production"
     container_name: analytics
+    restart: "no"
 
   nginx:
     image: nginx:latest
