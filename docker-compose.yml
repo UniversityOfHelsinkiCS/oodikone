@@ -99,11 +99,6 @@ services:
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
       UPDATER_URL: http://updater_scheduler:3678
-    volumes:
-      - ./services/backend/oodikone2-backend/:/usr/src/app
-      - ./services/backend/shared/models:/usr/src/app/src/models
-      - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
-      - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
 
     container_name: backend
     depends_on:
