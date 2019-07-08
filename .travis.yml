@@ -26,10 +26,10 @@ jobs:
         - IMAGE=STAGING
       script:
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - source scripts.sh && time run_e2e_setup docker-compose.lateste2e.yml
+        - source scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.yml
         - docker ps
         - cat nginx/log
-        - docker-compose logs -f &
+        - docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f &
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
         - time npm run test_services
         - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
@@ -38,7 +38,7 @@ jobs:
       deploy: # deploy is always skipped for PR
         provider: script
         skip_cleanup: true
-        script: "docker-compose -f docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"Staging auto deployment started!\\\"}\" ${SLACKBOT_URL}"
+        script: "docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"Staging auto deployment started!\\\"}\" ${SLACKBOT_URL}"
         on:
           branch: master
     - # in parallel
@@ -47,10 +47,10 @@ jobs:
         - IMAGE=PRODUCTION
       script:
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - source scripts.sh && time run_e2e_setup docker-compose.lateste2e.production.yml
+        - source scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.production.yml
         - docker ps
         - cat nginx/log
-        - docker-compose logs -f &
+        - docker-compose -f docker-compose.yml -f ./docker/ocker-compose.lateste2e.production.yml logs -f &
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
         - time npm run test_services
         - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
@@ -59,7 +59,7 @@ jobs:
       deploy: # deploy is always skipped for PR
         provider: script
         skip_cleanup: true
-        script: "docker-compose -f docker-compose.lateste2e.production.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release started auto deployment!\\\"}\" ${SLACKBOT_URL}"
+        script: "docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.production.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release started auto deployment!\\\"}\" ${SLACKBOT_URL}"
         on:
           tags: true
 
