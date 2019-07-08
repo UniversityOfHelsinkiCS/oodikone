@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const Population = require('../services/populations')
 const Filters = require('../services/filters')
-const { updateStudents } = require('../services/doo_api_database_updater/database_updater')
+const { updateStudents }  = require('../services/updaterService')
 const StudyrightService = require('../services/studyrights')
 
 // POST instead of GET because of too long params and "sensitive" data
@@ -121,8 +121,8 @@ router.post('/updatedatabase', async (req, res) => {
   const studentnumbers = req.body
   console.log(studentnumbers)
   if (studentnumbers) {
-    await updateStudents(studentnumbers, 128)
-    res.status(200).json('Updated')
+    await updateStudents(studentnumbers)
+    res.status(200).json('Scheduled')
   } else {
     res.status(400).end()
   }

@@ -7,6 +7,7 @@ const moment = require('moment')
 
 async function updateStudentNumberList() {
   const { KEY_PATH, CERT_PATH, TOKEN, NODE_ENV, OODI_ADDR, STUDENT_NUMBERS } = process.env
+  console.log(TOKEN)
   const agent = KEY_PATH && CERT_PATH ?
     new https.Agent({
       cert: fs.readFileSync(CERT_PATH, 'utf8'),
@@ -22,25 +23,23 @@ async function updateStudentNumberList() {
   })
   instance.defaults.httpsAgent = agent
 
-  console.log(NODE_ENV)
   if (NODE_ENV === 'development') {
-    axios.defaults.params = {
+    instance.defaults.params['token'] = {
       token: TOKEN
     }
-
   }
-
+  
   const getStudentNumberChecksum = studentNumber => {
     const studentNumberString = String(studentNumber)
     let checksumNumbers = [7, 3, 1]
     let checksum = 0
-
+    
     for (let i = 0; i < studentNumberString.length; i++) {
       // go from end t start
       let currentNumber = studentNumberString[studentNumberString.length - (i + 1)]
       checksum += currentNumber * (checksumNumbers[i % checksumNumbers.length])
     }
-
+    
     return (10 - (checksum % 10)) % 10
   }
   const requestStudent = async (studentNumber) => {

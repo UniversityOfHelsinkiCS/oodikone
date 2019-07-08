@@ -6,8 +6,7 @@ const logger = require('./logger')
 const { updateStudentNumberList } = require('./src/student_list_updater')
 const { scheduleActiveStudents, scheduleAllStudentsAndMeta } = require('./src/schedule_students')
 const { getOldestTasks, getCurrentStatus } = require('./src/SchedulingStatistics')
-const { app } = require('./src/api')
-console.log(app)
+require('./src/api')
 
 let updatedCount = 0
 let scheduledCount = 0
