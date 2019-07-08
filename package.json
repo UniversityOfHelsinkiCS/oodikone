@@ -9,7 +9,17 @@
     "cypress:record": "cypress run --config videoUploadOnPasses=false -P ./",
     "concurrently": "concurrently",
     "test": "./run_all_tests.sh",
-    "test_services": "./run_service_tests.sh"
+    "test_services": "./run_service_tests.sh",
+    "docker": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml",
+    "docker:build": "npm run docker -- build",
+    "docker:up": "npm run docker -- up -d",
+    "docker:down": "npm run docker -- down",
+    "docker:logs": "npm run docker -- logs -f",
+    "docker:logs:backend": "npm run docker -- logs -f backend",
+    "docker:restart": "npm run docker -- restart",
+    "docker:restart:backend": "npm run docker -- restart backend",
+    "docker:obliterate": "docker stop $(docker ps -aq) && docker system prune",
+    "start": "npm run docker:up && npm run docker:logs"
   },
   "husky": {
     "hooks": {
