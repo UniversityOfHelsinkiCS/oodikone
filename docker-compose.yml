@@ -1,43 +1,17 @@
 version: '3'
 
 services:
-  # zookeeper:
-  #   image: wurstmeister/zookeeper
-  #   ports:
-  #     - "2181:2181"
-  #   environment:
-  #     - KAFKA_BROKER_ID=1
-  #   container_name: zookeeper
-
-  # kafka:
-  #   image: wurstmeister/kafka
-  #   container_name: kafka
-  #   depends_on:
-  #     - zookeeper
-  #   ports:
-  #     - "9092:9092"
-  #   environment:
-  #     - HOSTNAME_COMMAND=route -n | awk '/UG[ \t]/{print $$2}'
-  #     - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-  #     - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
-  #     - KAFKA_DELETE_TOPIC_ENABLE=true
-  #     - KAFKA_CREATE_TOPICS=studentnumbers:1:1,priority_studentnumbers:1:1
-  #     - KAFKA_LOG_DIRS=/kafka/kafka-logs-1
-  #   volumes:
-  #     - ./kafka/docker.sock:/var/run/docker.sock
-  #     - ./kafka/logs:/kafka/kafka-logs-1
-
   nats:
     image: nats-streaming
-    command: -cid updaterNATS  --file_slice_max_bytes 0 --file_slice_max_age 100h -store file -dir datastore
+    command: -cid updaterNATS --file_slice_max_bytes 0 --file_slice_max_age 100h -store file -dir datastore
     expose:
       - "4222"
-    volumes:
-      - ./datastore:/datastore
     ports:
       - "8222:8222"
       - "4222:4222"
     container_name: nats
+    volumes:
+      - ./datastore:/datastore
 
   analytics_db:
     image: postgres:9.6.3
@@ -59,7 +33,6 @@ services:
     container_name: oodi_user_db
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_MULTIPLE_DATABASES=user_db,user_db_real
 
   usage_db:
     image: postgres:9.6.3
@@ -81,7 +54,6 @@ services:
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
     container_name: oodi_db
     environment:
-      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test,tkt_oodi_real
       - POSTGRES_USER=postgres
 
   db_kone:
@@ -105,24 +77,10 @@ services:
       - ./redis-data:/data
     container_name: redis
 
-  # mongo_db:
-  #   image: mongo
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./backups/mongo/oodilearn:/dump
-  #     - ./mongodata:/data/db
-  #   ports:
-  #     - "27017:27017"
-  #   container_name: mongo_db
-
   backend:
     build:
       context: services/backend
       dockerfile: oodikone2-backend/Dockerfile
-      args:
-        NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
@@ -132,7 +90,6 @@ services:
       DB_URL_KONE: postgres://postgres@db_kone:5432/db_kone
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       TEST_DB_KONE: postgres://postgres@db_kone:5432/db_kone_test
-      FRONT_URL: http://localhost:8000
       TOKEN_SECRET: IWannaBeTheVeryBest
       OODILEARN_URL: http://oodilearn:5000
       USERSERVICE_URL: http://userservice:4567
@@ -141,12 +98,6 @@ services:
       USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
-    volumes:
-      - ./services/backend/oodikone2-backend/:/usr/src/app
-      - ./services/backend/shared/models:/usr/src/app/src/models
-      - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
-      - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
-
     container_name: backend
     depends_on:
       - db
@@ -156,49 +107,14 @@ services:
   frontend:
     build:
       context: services/oodikone2-frontend
-      args:
-        NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run docker']
-    restart: unless-stopped
-    ports:
-      - "8081:8081"
-      - "7777:7777"
     environment:
       BACKEND_ADDR: backend
       ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
-      USER_ADMINER_URL: http://localhost:5050/?pgsql=user_db&username=postgres
-      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
-      USAGE_ADMINER_URL: http://localhost:5050/?pgsql=usage_db&username=postgres
-      KONE_ADMINER_URL: http://localhost:5050/?pgsql=db_kone&username=postgres
-    volumes:
-      - ./services/oodikone2-frontend/:/usr/src/app
     container_name: frontend
-
-  # oodilearn:
-  #   build:
-  #     context: services/oodilearn/server
-  #     dockerfile: Dockerfile
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./services/oodilearn/data:/data
-  #     - ./services/oodilearn/server:/src
-  #     - ./services/oodilearn/models:/models
-  #   ports:
-  #     - "5000:5000"
-  #   environment:
-  #     - ENV=development
-  #     - MONGO_URI=mongodb://mongo_db:27017/oodilearn
-  #   container_name: oodilearn
 
   userservice:
     build:
       context: services/oodikone2-userservice
-      args:
-        NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
-    volumes:
-      - ./services/oodikone2-userservice/:/usr/src/app
     ports:
       - 4567:4567
     environment:
@@ -214,10 +130,6 @@ services:
   usageservice:
     build:
       context: services/oodikone2-usageservice
-      args:
-        NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
     ports:
       - 545:545
     environment:
@@ -234,12 +146,6 @@ services:
   updater_api:
     build:
       context: services/updater_api
-      args:
-        NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
-    volumes:
-      - ./services/updater_api/:/usr/src/app
     depends_on:
       - nats
     environment:
@@ -253,16 +159,6 @@ services:
     build:
       context: services/backend
       dockerfile: updater_writer/Dockerfile
-      args:
-        NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
-    volumes:
-      - ./services/backend/updater_writer/:/usr/src/app
-      - ./services/backend/shared/models:/usr/src/app/models
-      - ./services/backend/shared/migrations:/usr/src/app/database/migrations
-      - ./services/backend/shared/migrations_kone:/usr/src/app/database/migrations_kone
-
     depends_on:
       - nats
       - db
@@ -272,28 +168,19 @@ services:
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       TEST_DB_SCHEMA: updater_test
-      DB_SCHEMA_KONE: kone_data
-
-
+    container_name: updater_writer
 
   scheduler_mongo:
     image: mongo
-    restart: unless-stopped
     volumes:
       - ./mongodata:/data/db
     expose:
       - "27017"
-    container_name: scheduler_db
+    container_name: scheduler_mongo
 
   updater_scheduler:
     build:
       context: services/updater_scheduler
-      args:
-        NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
-    volumes:
-      - ./services/updater_scheduler/:/usr/src/app
     depends_on:
       - nats
       - scheduler_mongo
@@ -305,29 +192,18 @@ services:
       - ACTIVE_STUDENTS=./active_student_numbers.txt
       - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
       - TOKEN=toskab1gs8cret5
-      - LOG_HOST=toska.cs.helsinki.fi
-      - LOG_PORT=9501
-      - LOG_HOSTNAME=updater_scheduler
-
     container_name: updater_scheduler
-
 
   analytics:
     build:
       context: services/oodikone2-analytics
-      args:
-        NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
-    volumes:
-      - ./services/oodikone2-analytics/:/usr/src/app
     ports:
       - 4568:4568
     environment:
-      WAIT_HOSTS: analytics_db:5432,analytics_redis:6379
-      REDIS: analytics_redis
-      DB_URL: postgres://postgres@analytics_db:5432/analytics_db
-      TEST_DB: postgres://postgres@analytics_db:5432/analytics_db_test
+      - WAIT_HOSTS=analytics_db:5432,analytics_redis:6379
+      - REDIS=analytics_redis
+      - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
+      - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
     depends_on:
       - analytics_db
       - analytics_redis
@@ -341,14 +217,3 @@ services:
     volumes:
       - ./analytics-redis-data:/data
     container_name: analytics_redis
-
-  adminer:
-    image: adminer:4.6.2
-    environment:
-      - ADMINER_DESIGN=pepa-linha
-    volumes:
-      - ./adminer-plugins:/var/www/html/plugins-enabled
-    ports:
-      - 5050:8080
-    restart: always
-    container_name: adminer
