@@ -141,6 +141,8 @@ services:
       USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
+      UPDATER_URL: http://updater_scheduler:3678
+      
     volumes:
       - ./services/backend/oodikone2-backend/:/usr/src/app
       - ./services/backend/shared/models:/usr/src/app/src/models
@@ -308,6 +310,7 @@ services:
       - LOG_HOST=toska.cs.helsinki.fi
       - LOG_PORT=9501
       - LOG_HOSTNAME=updater_scheduler
+      - PORT=3678
 
     container_name: updater_scheduler
 
