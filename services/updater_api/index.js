@@ -41,11 +41,11 @@ const handleMessage = async (priority) => async (msg) => { // :d
     }
   }
 }
-stan.on('connect', function () {
+stan.on('connect', async () => {
 
   const sub = stan.subscribe('UpdateApi', 'updater.workers', opts)
   const prioSub = stan.subscribe('PriorityApi', 'updater.workers', opts)
-
-  sub.on('message', handleMessage(false))
-  prioSub.on('message', handleMessage(true))
+  
+  sub.on('message', await handleMessage(false))
+  prioSub.on('message', await handleMessage(true))
 })
