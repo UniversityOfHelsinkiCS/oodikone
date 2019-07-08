@@ -74,7 +74,8 @@ class StudentDetails extends Component {
       } else {
         icon = <Icon name="circle outline" color="red" />
       }
-      const year = -(moment(new Date('1.1.1950')).diff(new Date(date), 'years')) // :D
+      const year = (moment(new Date(date)).diff(new Date('1950-1-1'), 'years'))
+
       return [
         reformatDate(date, 'DD.MM.YYYY'),
         `${isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)} (${course.code})`,
