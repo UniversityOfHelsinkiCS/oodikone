@@ -2,7 +2,10 @@ const router = require('express').Router()
 const Population = require('../services/populations')
 const Filters = require('../services/filters')
 const { updateStudents }  = require('../services/updaterService')
+
+const Student = require('../services/students')
 const StudyrightService = require('../services/studyrights')
+const UserService = require('../services/userService')
 
 // POST instead of GET because of too long params and "sensitive" data
 router.post('/v2/populationstatistics/courses', async (req, res) => {
@@ -19,6 +22,37 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
       req.body.months = 12
     }
     const result = await Population.bottlenecksOf(req.body)
+
+    if (result.error) {
+      res.status(400).json(result)
+      return
+    }
+
+    res.json(result)
+  } catch (e) {
+    res.status(400).json({ error: e })
+  }
+})
+
+router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => {
+  try {
+    if (!req.body.yearcode || !req.body.coursecode) {
+      res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
+      return
+    }
+    const { coursecode, yearcode } = req.body
+    let studentnumberlist
+    const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
+
+    const { roles, userId } = req.decodedToken
+    if (roles && roles.map(r => r.group_code).includes('admin')) {
+      studentnumberlist = studentnumbers
+    } else {
+      const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
+      const codes = unitsUserCanAccess.map(unit => unit.id)
+      studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
+    }
+    const result = await Population.bottlenecksOf(req.body, studentnumberlist)
 
     if (result.error) {
       res.status(400).json(result)
@@ -72,6 +106,45 @@ router.get('/v3/populationstatistics', async (req, res) => {
     res.status(400).json({ error: e })
   }
 })
+
+router.get('/v3/populationstatisticsbycourse', async (req, res) => {
+  const { coursecode, yearcode } = req.query
+  const semesters = ['FALL', 'SPRING']
+  let studentnumberlist
+  console.log(coursecode, yearcode)
+  const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
+  console.log(studentnumbers)
+  const { roles, userId } = req.decodedToken
+  if (roles && roles.map(r => r.group_code).includes('admin')) {
+    studentnumberlist = studentnumbers
+  } else {
+    const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
+    const codes = unitsUserCanAccess.map(unit => unit.id)
+    studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
+  }
+  try {
+    const result = await Population.optimizedStatisticsOf({
+      startYear: 1900,
+      endYear: 2200,
+      studyRights: [],
+      semesters, 
+      months: 1000
+    }, studentnumberlist)
+
+    if (result.error) {
+      console.log(result.error)
+      res.status(400).end()
+      return
+    }
+
+    console.log(`request completed ${new Date()}`)
+    res.json(result)
+  } catch (e) {
+    console.log(e)
+    res.status(400).json({ error: e })
+  }
+})
+
 
 router.get('/v2/populationstatistics/filters', async (req, res) => {
 
