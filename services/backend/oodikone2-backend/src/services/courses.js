@@ -196,6 +196,7 @@ const creditsOf = async (codes) => {
       fail: credits.filter(Credit.failed).length,
       pass: credits.filter(Credit.passed).length,
       students: credits.length,
+      studentnumbers: credits.map(cr => cr.student_studentnumber)
     }
   }
 
@@ -238,7 +239,7 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
     return {
       studentsThatPassedThisYear, studentsThatFailedThisYear, allStudentsThatFailedEver,
       passedStudentsThatFailedBefore, passedStudentsOnFirstTry, failedStudentsThatFailedBefore,
-      failedStudentsOnFirstTry, gradeDistribution
+      failedStudentsOnFirstTry, gradeDistribution, studentnumbers: thisSemester.studentnumbers
     }
   }
   const stats = []
@@ -345,6 +346,7 @@ const yearlyStatsOf = async (code, year, separate, language) => {
   if (yearInst) {
     for (let year = start; year < end; year++) {
       stats = oneYearStats(yearInst, year, separate, allInstancesUntilYear)
+      console.logs(stats)
       if (stats.length > 0) {
         resultStats.push(...stats)
         resultProgrammes = getProgrammesFromStats(stats)
