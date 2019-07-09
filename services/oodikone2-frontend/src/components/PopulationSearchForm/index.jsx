@@ -159,6 +159,8 @@ class PopulationSearchForm extends Component {
         this.props.setPopulationFilter(transferTo(false))
       }
       this.setState({ isLoading: false })
+      // not a good solution FIX
+      this.setState({ selectedTag: '' })
     })
   }
 
