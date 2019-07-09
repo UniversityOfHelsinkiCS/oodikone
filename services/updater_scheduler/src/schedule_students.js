@@ -8,7 +8,7 @@ const publish = async (tasks, priority = false) => {
     if (rampup > 1) {
       rampup = rampup - 1
     }
-    stan.publish(priority ? 'UpdateApi' : 'PriorityApi', task.task, (err, guid) => {
+    stan.publish(priority ? 'PriorityApi' : 'UpdateApi', task.task, (err, guid) => {
       console.log(guid)
       if (err) {
         console.log('publish failed', err)
