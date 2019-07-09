@@ -137,7 +137,7 @@ class SingleCourseStats extends Component {
     const { primary: p, comparison: c } = this.state
     const { programmes } = this.props.stats
     const primary = !programmes[p] ? ALL.value : p
-    const comparison = !programmes[c] ? undefined : c
+    const comparison = (!programmes[c] && c !== ALL.value) ? undefined : c
     return { primary, comparison }
   }
 

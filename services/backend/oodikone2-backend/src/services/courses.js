@@ -346,7 +346,6 @@ const yearlyStatsOf = async (code, year, separate, language) => {
   if (yearInst) {
     for (let year = start; year < end; year++) {
       stats = oneYearStats(yearInst, year, separate, allInstancesUntilYear)
-      console.logs(stats)
       if (stats.length > 0) {
         resultStats.push(...stats)
         resultProgrammes = getProgrammesFromStats(stats)

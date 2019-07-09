@@ -14,7 +14,7 @@ stan.on('connect', function () {
 
   const sub = stan.subscribe('UpdateWrite', 'updater.workers', opts)
   const attSub = stan.subscribe('UpdateAttainmentDates', opts)
-  const prioSub = stan.subscribe('PriorityWrite', 'updater.workers', opts)
+  const prioSub = stan.subscribe('PriorityWrite', 'updater.workers.prio', opts)
 
   sub.on('message', async (msg) => {
     const data = JSON.parse(msg.getData())
