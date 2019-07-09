@@ -1,0 +1,170 @@
+version: '3'
+
+services:
+  user_db:
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=user_db,user_db_real
+
+  db:
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test,tkt_oodi_real
+
+  backend:
+    build:
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    restart: unless-stopped
+    environment:
+      FRONT_URL: http://localhost:8000
+    volumes:
+      - ./services/backend/oodikone2-backend/:/usr/src/app
+      - ./services/backend/shared/models:/usr/src/app/src/models
+      - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
+      - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
+
+  frontend:
+    build:
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run docker']
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+      - "7777:7777"
+    environment:
+      USER_ADMINER_URL: http://localhost:5050/?pgsql=user_db&username=postgres
+      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
+      USAGE_ADMINER_URL: http://localhost:5050/?pgsql=usage_db&username=postgres
+      KONE_ADMINER_URL: http://localhost:5050/?pgsql=db_kone&username=postgres
+    volumes:
+      - ./services/oodikone2-frontend/:/usr/src/app
+
+  userservice:
+    build:
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    restart: unless-stopped
+    volumes:
+      - ./services/oodikone2-userservice/:/usr/src/app
+
+  usageservice:
+    build:
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    restart: unless-stopped
+    volumes:
+      - ./services/oodikone2-usageservice/:/usr/src/app
+
+  updater_api:
+    build:
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    restart: unless-stopped
+    volumes:
+      - ./services/updater_api/:/usr/src/app
+
+  updater_writer:
+    build:
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    restart: unless-stopped
+    volumes:
+      - ./services/backend/updater_writer/:/usr/src/app
+      - ./services/backend/shared/models:/usr/src/app/models
+      - ./services/backend/shared/migrations:/usr/src/app/database/migrations
+      - ./services/backend/shared/migrations_kone:/usr/src/app/database/migrations_kone
+    environment:
+      DB_SCHEMA_KONE: kone_data
+
+  scheduler_mongo:
+    restart: unless-stopped
+
+  updater_scheduler:
+    build:
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    restart: unless-stopped
+    volumes:
+      - ./services/updater_scheduler/:/usr/src/app
+    environment:
+      - LOG_HOST=toska.cs.helsinki.fi
+      - LOG_PORT=9501
+      - LOG_HOSTNAME=updater_scheduler
+
+  analytics:
+    build:
+      args:
+        NODE_ENV: 'development'
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    restart: unless-stopped
+    volumes:
+      - ./services/oodikone2-analytics/:/usr/src/app
+
+  adminer:
+    image: adminer:4.6.2
+    environment:
+      - ADMINER_DESIGN=pepa-linha
+    volumes:
+      - ./adminer-plugins:/var/www/html/plugins-enabled
+    ports:
+      - 5050:8080
+    restart: always
+    container_name: adminer
+
+  # zookeeper:
+  #   image: wurstmeister/zookeeper
+  #   ports:
+  #     - "2181:2181"
+  #   environment:
+  #     - KAFKA_BROKER_ID=1
+  #   container_name: zookeeper
+
+  # kafka:
+  #   image: wurstmeister/kafka
+  #   container_name: kafka
+  #   depends_on:
+  #     - zookeeper
+  #   ports:
+  #     - "9092:9092"
+  #   environment:
+  #     - HOSTNAME_COMMAND=route -n | awk '/UG[ \t]/{print $$2}'
+  #     - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+  #     - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+  #     - KAFKA_DELETE_TOPIC_ENABLE=true
+  #     - KAFKA_CREATE_TOPICS=studentnumbers:1:1,priority_studentnumbers:1:1
+  #     - KAFKA_LOG_DIRS=/kafka/kafka-logs-1
+  #   volumes:
+  #     - ./kafka/docker.sock:/var/run/docker.sock
+  #     - ./kafka/logs:/kafka/kafka-logs-1
+
+  # mongo_db:
+  #   image: mongo
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./backups/mongo/oodilearn:/dump
+  #     - ./mongodata:/data/db
+  #   ports:
+  #     - "27017:27017"
+  #   container_name: mongo_db
+
+  # oodilearn:
+  #   build:
+  #     context: services/oodilearn/server
+  #     dockerfile: Dockerfile
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./services/oodilearn/data:/data
+  #     - ./services/oodilearn/server:/src
+  #     - ./services/oodilearn/models:/models
+  #   ports:
+  #     - "5000:5000"
+  #   environment:
+  #     - ENV=development
+  #     - MONGO_URI=mongodb://mongo_db:27017/oodilearn
+  #   container_name: oodilearn
