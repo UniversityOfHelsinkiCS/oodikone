@@ -41,7 +41,7 @@ jobs:
         script: "TAG=${TAG} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"Staging auto deployment started!\\\"}\" ${SLACKBOT_URL}"
         on:
           branch: master
-     - stage: build & test & push & deploy latest
+      - stage: build & test & push & deploy latest
         env:
           - IMAGE=PRODUCTION
           - TAG=latest
