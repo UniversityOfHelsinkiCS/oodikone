@@ -18,50 +18,50 @@ before_script:
   - docker-compose --version
   - export AUTHOR_NAME="$(git log -1 ${TRAVIS_COMMIT} --pretty="%aN")"
 
-jobs:
-  include:
-    - stage: build & test & push & deploy
-      if: NOT tag IS present
-      env:
-        - IMAGE=STAGING
-      script:
-        - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - source scripts.sh && time run_e2e_setup docker-compose.lateste2e.yml
-        - docker ps
-        - cat nginx/log
-        - docker-compose logs -f &
-        - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
-        - time npm run test_services
-        - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
-        - docker ps -a
-        - if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk '{ sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
-      deploy: # deploy is always skipped for PR
-        provider: script
-        skip_cleanup: true
-        script: "docker-compose -f docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"Staging auto deployment started!\\\"}\" ${SLACKBOT_URL}"
-        on:
-          branch: master
-    - # in parallel
-      if: type = pull_request OR NOT branch = master
-      env:
-        - IMAGE=PRODUCTION
-      script:
-        - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - source scripts.sh && time run_e2e_setup docker-compose.lateste2e.production.yml
-        - docker ps
-        - cat nginx/log
-        - docker-compose logs -f &
-        - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
-        - time npm run test_services
-        - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
-        - docker ps -a
-        - if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk '{ sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
-      deploy: # deploy is always skipped for PR
-        provider: script
-        skip_cleanup: true
-        script: "docker-compose -f docker-compose.lateste2e.production.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release started auto deployment!\\\"}\" ${SLACKBOT_URL}"
-        on:
-          tags: true
+stages:
+  - name: login to docker
+    script:
+      - docker login -u $DOCKER_USER -p $DOCKER_PASS
+  - name: build staging
+    if: NOT tag IS present
+    env:
+      - IMAGE=STAGING
+      - TAG=staging
+    script:
+      - source scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.yml ${TAG}
+  - name: build latest
+    if: tag IS present
+    env:
+      - IMAGE=PRODUCTION
+      - TAG=latest
+    script:
+      - source scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.yml ${TAG}
+  - name: run tests
+    script:
+      - docker ps
+      - cat nginx/log
+      - TAG=${TAG} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f &
+      - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
+      - time npm run test_services
+      - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
+      - docker ps -a
+      - if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk '{ sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
+  - name: deploy to staging
+    if: NOT tag IS present
+    deploy:
+      provider: script
+      skip_cleanup: true
+      script: "TAG=${TAG} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"Staging auto deployment started!\\\"}\" ${SLACKBOT_URL}"
+      on:
+        branch: master
+  - name: deploy to production
+    if: tag IS present
+    deploy:
+      provider: script
+      skip_cleanup: true
+      script: "TAG=${TAG} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release started auto deployment!\\\"}\" ${SLACKBOT_URL}"
+      on:
+        tags: true
 
 after_failure:
   - "curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${IMAGE} buildi paskana. STOP AND FIX tai tulee kenkää! *${AUTHOR_NAME}* ${TRAVIS_BUILD_WEB_URL}\\\"}\" ${SLACKBOT_URL}"
