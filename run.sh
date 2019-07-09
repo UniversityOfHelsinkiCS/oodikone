@@ -33,7 +33,7 @@ do
     case $opt in
         "e2e setup")
             mopo
-            run_e2e_setup ./docker/docker-compose.lateste2e.yml
+            run_e2e_setup ./docker/docker-compose.lateste2e.yml staging
             ;;
         "Anon setup")
             mopo
