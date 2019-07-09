@@ -14,7 +14,7 @@ stan.on('connect', function () {
 
   const sub = stan.subscribe('UpdateWrite', 'updater.workers', opts)
   const attSub = stan.subscribe('UpdateAttainmentDates', opts)
-  const dumpSub = stan.subscribe('DumpDatabase')
+  const prioSub = stan.subscribe('PriorityWrite', 'updater.workers', opts)
 
   sub.on('message', async (msg) => {
     const data = JSON.parse(msg.getData())
@@ -30,14 +30,10 @@ stan.on('connect', function () {
     await updateAttainmentMeta()
     msg.ack()
   })
-  dumpSub.on('message', async (_) => {
-    await dumpDatabase()
-    stan.publish('ScheduleAll', null, (err, guid) => {
-      if (err) {
-        console.log(err)
-      } else {
-        console.log('calling re-scheduling database')
-      }
-    })
+  prioSub.on('message', async (msg) => {
+    const data = JSON.parse(msg.getData())
+    await updateStudent(data, stan)
+    msg.ack()
+    stan.publish('status', `${data.studentInfo.studentnumber}:DONE`, (err) => { if (err) console.log(err) })
   })
 })
