@@ -58,27 +58,27 @@ The mapping of ports and environment variables are also defined in the docker-co
 #### With anonymized data:
 
 ```
-docker-compose up -d
+npm run docker:up
 ```
 
 #### With real data:
 
 ```
-docker-compose -f docker-compose.yml -f docker-compose.real.yml up -d
+docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml -f ./docker/docker-compose.dev.real.yml up -d
 ```
 
 ### Stop the development environment
 
 ```
-docker-compose down
+npm run docker:down
 ```
 
 ### Restart container(s)
 
 ```
-docker-compose restart          # all
+npm run docker:restart          # all
 
-docker-compose restart backend  # just backend
+npm run docker:restart:backend  # just backend
 ```
 
 ### View the containers in the running environment
@@ -90,9 +90,9 @@ docker-compose ps
 
 
 ```
-docker-compose logs -f          # all
+npm run docker:logs          # all
 
-docker-compose logs -f backend  # just backend
+npm run docker:logs:backend  # just backend
 ```
 
 
