@@ -65,7 +65,7 @@ jobs:
 stages:
   - name: build & test & push & deploy staging
     if: NOT tag IS present
-  - name: build & test & push & deploy latest
+  - name: build & test & push & deploy production
     if: tag IS present
 
 after_failure:
