@@ -27,7 +27,7 @@ const formatStudentForPopulationStatistics = ({
   firstnames, lastname, studentnumber, dateofuniversityenrollment, creditcount,
   matriculationexamination, credits, abbreviatedname, email, studyrights,
   semester_enrollments, transfers, updatedAt, createdAt, gender_code,
-  gender_fi, gender_sv, gender_en, tag_students
+  gender_fi, gender_sv, gender_en, tags
 }, startDate, endDate) => {
 
   const toCourse = ({ grade, attainment_date, credits, course, credittypecode, isStudyModule }) => {
@@ -101,7 +101,7 @@ const formatStudentForPopulationStatistics = ({
     email,
     semesterenrollments,
     updatedAt: updatedAt || createdAt,
-    tags: tag_students || [],
+    tags: tags || [],
     studyrightStart: startDate,
     starting: moment(started).isBetween(startDate, endDate, null, '[]')
   }
@@ -223,27 +223,36 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       }
     },
   })
+
+  const studentTags = await TagStudent.findAll({
+    attributes: ['id', 'studentnumber'],
+    include: [
+      {
+        model: Tag,
+        attributes: ['tag_id', 'tagname'],
+      }
+    ],
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumbers
+      }
+    }
+  })
+  const studentNumberToTags = studentTags.reduce((acc, t) => {
+    acc[t.studentnumber] = acc[t.studentnumber] || []
+    acc[t.studentnumber].push(t)
+    return acc
+  }, {})
+
+  students.forEach(student => {
+    student.tags = studentNumberToTags[student.studentnumber]
+  })
+
   if (tag) {
-    const studentTags = await TagStudent.findAll({
-      attributes: ['id', 'studentnumber'],
-      include: [
-        {
-          model: Tag,
-          attributes: ['tag_id', 'tagname'],
-        }
-      ],
-    })
-
-    const studentNumberToTags = studentTags.reduce((acc, t) => {
-      acc[t.studentnumber] = acc[t.studentnumber] || []
-      acc[t.studentnumber].push(t)
-      return acc
-    }, {})
-
     const studentsWithSearchedTag = {}
     students.forEach(student => {
-      student.tag_students = studentNumberToTags[student.studentnumber]
-      if (student.tag_students.some(t => t.tag.tag_id === tag)) {
+      student.tags = studentNumberToTags[student.studentnumber]
+      if (student.tags && student.tags.some(t => t.tag.tag_id === tag)) {
         studentsWithSearchedTag[student.studentnumber] = true
       }
     })
@@ -384,18 +393,18 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   }, {
-    students: [],
-    extents: {},
-    semesters: {},
-    transfers: {
-      targets: {},
-      sources: {}
-    },
-    studyrights: {
-      degrees: [],
-      programmes: []
-    }
-  })
+      students: [],
+      extents: {},
+      semesters: {},
+      transfers: {
+        targets: {},
+        sources: {}
+      },
+      studyrights: {
+        degrees: [],
+        programmes: []
+      }
+    })
 
   const transferredStudyright = (s) => {
     const studyright = s.studyrights.find(s => s.studyrightElements
