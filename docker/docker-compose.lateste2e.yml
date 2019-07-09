@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+  user_db:
+    environment:
+      - POSTGRES_DB=user_db
+
+  db:
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
+
+  backend:
+    image: toska/oodikone2-backend:${TAG}
+    ports:
+      - "9229:9229"
+    environment:
+      FRONT_URL: http://localhost:1337
+      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
+
+  frontend:
+    image: toska/oodikone2-frontend:${TAG}
+    build:
+      args:
+        BASE_PATH: /
+    ports:
+      - "5000:5000"
+
+  userservice:
+    image: toska/oodikone2-userservice:${TAG}
+
+  usageservice:
+    image: toska/oodikone2-usageservice:${TAG}
+
+  updater_api:
+    image: toska/updater_api:${TAG}
+
+  updater_writer:
+    image: toska/updater_writer:${TAG}
+
+  updater_scheduler:
+    image: toska/updater_scheduler:${TAG}
+    command: ["echo", "mluukkai on orjuuttaja"]
+
+  analytics:
+    image: toska/oodikone2-analytics:${TAG}
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/error.log:/etc/nginx/error_log.log
+      - ./nginx/log:/var/log/nginx/localhost.error_log
+      - ./nginx/cache/:/etc/nginx/cache
+      - /etc/letsencrypt/:/etc/letsencrypt/
+    ports:
+      -  1337:80
+    depends_on:
+      - frontend
+      - backend
+      - userservice
+      - analytics
+    container_name: nginx

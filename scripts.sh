@@ -10,6 +10,10 @@ PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.sqz"
 KONE_REAL_DB_BACKUP="$BACKUP_DIR/latest-kone-pg.sqz"
 USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
 
+docker-compose-dev () {
+    docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml "$@"
+}
+
 retry () {
     for i in {1..60}
     do
@@ -96,17 +100,17 @@ db_anon_setup_full () {
 }
 
 reset_real_db () {
-    docker-compose down
-    docker-compose up -d db user_db db_kone
+    docker-compose-dev down
+    docker-compose-dev up -d db user_db db_kone
     db_setup_full
-    docker-compose down
+    docker-compose-dev down
 }
 
 reset_db () {
-    docker-compose down
-    docker-compose up -d db user_db db_kone
+    docker-compose-dev down
+    docker-compose-dev up -d db user_db db_kone
     db_anon_setup_full
-    docker-compose down
+    docker-compose-dev down
 }
 
 install_cli_npm_packages () {
@@ -127,12 +131,12 @@ run_full_setup () {
     echo "Getting anon backups from the private repository. "
     get_anon_oodikone
     echo "Building images"
-    docker-compose build
+    docker-compose-dev build
     echo "Setup oodikone db from dump."
-    docker-compose up -d db user_db db_kone
+    docker-compose-dev up -d db user_db db_kone
     db_setup_full
     db_anon_setup_full
-    docker-compose down
+    docker-compose-dev down
     show_instructions
 }
 
@@ -144,11 +148,11 @@ run_anon_full_setup () {
     echo "Getting anon backups from the private repository. "
     get_anon_oodikone
     echo "Building images"
-    docker-compose build
+    docker-compose-dev build
     echo "Setup oodikone db from dump."
-    docker-compose up -d db user_db db_kone
+    docker-compose-dev up -d db user_db db_kone
     db_anon_setup_full
-    docker-compose down
+    docker-compose-dev down
     show_instructions
 }
 
@@ -160,10 +164,10 @@ run_e2e_setup () {
     echo "Getting anon backups from the private repository. "
     get_anon_oodikone
     echo "Building images"
-    docker-compose -f docker-compose.yml -f $1 build
+    TAG=$2 docker-compose -f docker-compose.yml -f $1 build
     echo "Setup oodikone db from dump."
-    docker-compose -f docker-compose.yml -f $1 up -d db user_db db_kone
+    TAG=$2 docker-compose -f docker-compose.yml -f $1 up -d db user_db db_kone
     db_anon_setup_full
     echo "Starting services."
-    docker-compose -f docker-compose.yml -f $1 up -d
+    TAG=$2 docker-compose -f docker-compose.yml -f $1 up -d
 }

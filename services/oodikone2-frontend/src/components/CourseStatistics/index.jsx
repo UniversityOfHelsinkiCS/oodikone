@@ -69,7 +69,7 @@ class CourseStatistics extends Component {
   }
 
   render() {
-    const { statsIsEmpty } = this.props
+    const { statsIsEmpty, history } = this.props
     const panes = this.getPanes()
     return (
       <div className="container">
@@ -77,7 +77,7 @@ class CourseStatistics extends Component {
           Course Statistics
         </Header>
         <Segment className="contentSegment" >
-          {statsIsEmpty ? <SearchForm /> : (
+          {statsIsEmpty || history.location.search === '' ? <SearchForm /> : (
             <Tab
               menu={{ attached: false, borderless: false }}
               panes={panes}
