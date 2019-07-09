@@ -35,8 +35,7 @@ class StudentDetails extends Component {
     const queryObject = { ...rest, courseCodes: JSON.stringify(courseCodes) }
     const searchString = qs.stringify(queryObject)
     this.props.clearCourseStats()
-    history.push('/coursestatistics/')
-    history.push({ search: searchString })
+    history.push(`/coursestatistics?${searchString}`)
   }
 
   renderCreditsGraph = () => {

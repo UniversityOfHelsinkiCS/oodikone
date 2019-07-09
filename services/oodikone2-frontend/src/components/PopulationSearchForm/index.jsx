@@ -142,14 +142,15 @@ class PopulationSearchForm extends Component {
     this.pushQueryToUrl(query)
   }
 
-  fetchPopulation = (query, tag) => {
+  fetchPopulation = (query) => {
+    const { selectedTag } = this.state
     const queryCodes = Object.values(query.studyRights).filter(e => e != null)
     const uuid = uuidv4()
     const request = { ...query, studyRights: queryCodes, uuid }
     this.setState({ isLoading: true })
     this.props.setLoading()
     Promise.all([
-      this.props.getPopulationStatistics({ ...query, uuid, tag }),
+      this.props.getPopulationStatistics({ ...query, uuid, tag: selectedTag }),
       this.props.getPopulationCourses(request),
       this.props.getPopulationFilters(request),
       this.props.getMandatoryCourses(query.studyRights.programme)
@@ -158,6 +159,8 @@ class PopulationSearchForm extends Component {
         this.props.setPopulationFilter(transferTo(false))
       }
       this.setState({ isLoading: false })
+      // not a good solution FIX
+      this.setState({ selectedTag: '' })
     })
   }
 
@@ -653,7 +656,7 @@ class PopulationSearchForm extends Component {
               />
               <Button
                 disabled={!this.state.selectedTag}
-                onClick={() => this.fetchPopulation(this.state.query, this.state.selectedTag)}
+                onClick={this.handleSubmit}
               >
                 Search by tag
               </Button>
@@ -668,7 +671,8 @@ class PopulationSearchForm extends Component {
   }
 
   render() {
-    if (!this.shouldRenderSearchForm()) {
+    const { location } = this.props
+    if (!this.shouldRenderSearchForm() && location.search !== '') {
       return null
     }
     const { translate } = this.props
