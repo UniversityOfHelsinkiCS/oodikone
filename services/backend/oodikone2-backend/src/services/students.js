@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize')
+const { sequelize } = require('../database/connection')
 const moment = require('moment')
 const { Student, Credit, Course, Studyright, StudyrightElement, ElementDetails } = require('../models')
 const Op = Sequelize.Op
@@ -40,6 +41,24 @@ const byId = async (id) => Student.findByPk(id, {
     }
   ]
 })
+
+
+const findByCourseAndSemesters = async (coursecode, yearcode) =>
+  sequelize.query(`
+    SELECT
+      studentnumber, credit.course_code, attainment_date
+    FROM student
+    INNER JOIN credit ON
+      student.studentnumber=credit.student_studentnumber
+    WHERE 
+      course_code=:coursecode AND
+      attainment_date
+    BETWEEN
+      (select startdate FROM semesters where yearcode=:yearcode ORDER BY semestercode LIMIT 1) AND
+      (select enddate FROM semesters where yearcode=:yearcode ORDER BY semestercode DESC LIMIT 1);
+  `,
+  { replacements: { coursecode, yearcode }, type: sequelize.QueryTypes.SELECT })
+    .map(st => st.studentnumber)
 
 const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   return Student.findAll({
@@ -280,10 +299,36 @@ const bySearchTermAndElementsNew = async (searchterm, codes) => {
   return matches.map(formatStudent)
 }
 
+const filterStudentnumbersByAccessrights = async (studentnumbers, codes) => {
+  const students = await Student.findAll({
+    include: {
+      model: StudyrightElement,
+      required: true,
+      where: {
+        code: {
+          [Op.in]: codes
+        }
+      }
+    },
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumbers
+      }
+    }
+  })
+  return students.map(student => student.studentnumber)
+}
+
 const NEW_SEARCH = true
 const bySearchTerm = NEW_SEARCH ? bySearchTermNew : bySearchTermOld
 const bySearchTermAndElements = NEW_SEARCH ? bySearchTermAndElementsNew : bySearchTermAndElementsOld
 
 module.exports = {
-  withId, bySearchTerm, createStudent, updateStudent, bySearchTermAndElements
+  withId,
+  bySearchTerm,
+  createStudent,
+  updateStudent,
+  bySearchTermAndElements,
+  filterStudentnumbersByAccessrights,
+  findByCourseAndSemesters
 }
