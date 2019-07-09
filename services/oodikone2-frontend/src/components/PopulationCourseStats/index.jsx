@@ -6,9 +6,10 @@ import { getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router-dom'
 import moment from 'moment'
+import qs from 'query-string'
 
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
-import { getCourseStats, clearCourseStats } from '../../redux/coursestats'
+import { clearCourseStats } from '../../redux/coursestats'
 
 import { courseParticipation } from '../../populationFilters'
 import PassingSemesters from './PassingSemesters'
@@ -89,7 +90,6 @@ class PopulationCourseStats extends Component {
     selectedCourses: arrayOf(object).isRequired,
     removePopulationFilterOfCourse: func.isRequired,
     history: shape({}).isRequired,
-    getCourseStats: func.isRequired,
     clearCourseStats: func.isRequired,
     language: string.isRequired,
     query: shape({}).isRequired,
@@ -186,7 +186,6 @@ class PopulationCourseStats extends Component {
     const {
       history,
       query,
-      getCourseStats: getStatsFn,
       clearCourseStats: clearCourseStatsfn,
       years
     } = this.props
@@ -195,14 +194,10 @@ class PopulationCourseStats extends Component {
     const { startYear, months } = query
     const fromYear = yearCode(startYear)
     const toYear = yearCode(moment(moment(startYear, 'YYYY').add(months, 'months')).format('YYYY'))
-    history.push('/coursestatistics/')
+    const queryObject = { toYear, fromYear, separate: false, courseCodes: JSON.stringify([code]) }
+    const searchString = qs.stringify(queryObject)
+    history.push(`/coursestatistics?${searchString}`)
     clearCourseStatsfn()
-    getStatsFn({
-      courseCodes: [code],
-      fromYear,
-      toYear,
-      separate: false
-    })
   }
 
   onCourseNameCellClick = (courseStats) => {
@@ -515,7 +510,6 @@ export default connect(
   {
     setPopulationFilter,
     removePopulationFilterOfCourse,
-    getCourseStats,
     clearCourseStats
   }
 )(withRouter(PopulationCourseStats))
