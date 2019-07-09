@@ -28,7 +28,7 @@ const handleMessage = async (priority) => async (msg) => { // :d
     data = await getStudent(message)
     try {
       // TODO: check that data is properly structured(?)
-      stan.publish(priority ? 'UpdateWrite' : 'PriorityWrite', JSON.stringify(data), (err, guid) => {
+      stan.publish(priority ? 'PriorityWrite' :'UpdateWrite' , JSON.stringify(data), (err, guid) => {
         if (err) {
           return err
         } else {
