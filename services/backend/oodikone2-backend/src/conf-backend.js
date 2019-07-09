@@ -21,6 +21,7 @@ const CERT_PATH = process.env.CERT_PATH // production/staging only
 const KEY_PATH = process.env.KEY_PATH // production/staging only
 const OODILEARN_URL = process.env.OODILEARN_URL
 const USERSERVICE_URL = process.env.USERSERVICE_URL
+const UPDATER_URL = process.env.UPDATER_URL
 const USAGESERVICE_URL = process.env.USAGESERVICE_URL
 const ANALYTICS_URL = process.env.ANALYTICS_URL
 const PORT = isTest ? 8079 : 8080
@@ -81,5 +82,6 @@ module.exports = {
   requiredGroup,
   OODI_SECRET,
   OODI_SECRET_HEADER_KEY,
-  isTest
+  isTest,
+  UPDATER_URL
 }

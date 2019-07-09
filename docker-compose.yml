@@ -98,6 +98,8 @@ services:
       USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
+      UPDATER_URL: http://updater_scheduler:3678
+
     container_name: backend
     depends_on:
       - db
@@ -190,6 +192,10 @@ services:
       - ACTIVE_STUDENTS=./active_student_numbers.txt
       - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
       - TOKEN=toskab1gs8cret5
+      - LOG_HOST=toska.cs.helsinki.fi
+      - LOG_PORT=9501
+      - LOG_HOSTNAME=updater_scheduler
+      - PORT=3678
     container_name: updater_scheduler
 
   analytics:
