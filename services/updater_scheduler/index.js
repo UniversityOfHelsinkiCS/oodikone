@@ -49,7 +49,10 @@ stan.on('connect', async () => {
   // }
 
   cron.schedule('0 23 * * *', async () => {
-    // Update ACTIVE students every night
+    // Update ACTIVE students every night except few first dates of the month when we're updating all students anyway
+    if (new Date().getDate() <= 5){
+      return
+    }
     scheduleActiveStudents()
   }, { timezone })
 
