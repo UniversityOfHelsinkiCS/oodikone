@@ -41,6 +41,11 @@ const scheduleAllStudentsAndMeta = async () => {
   publish(tasks)
 }
 
+const scheduleMeta = async () => {
+  console.log('scheduling meta')
+  publish([{task: 'meta', type: 'other', active: 'false'}])
+}
+
 const scheduleStudentsByArray = async (studentNumbers) => {
   try {
     const tasks = await Schedule.find({ type: 'student', task: { $in: studentNumbers } })
@@ -50,4 +55,4 @@ const scheduleStudentsByArray = async (studentNumbers) => {
   }
   return 'scheduled'
 }
-module.exports = { scheduleActiveStudents, scheduleAllStudentsAndMeta, scheduleStudentsByArray }
+module.exports = { scheduleActiveStudents, scheduleAllStudentsAndMeta, scheduleStudentsByArray, scheduleMeta }
