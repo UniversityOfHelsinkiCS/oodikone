@@ -102,7 +102,7 @@ const getStudent = async (studentnumber) => {
 
 const getMeta = async () => {
   const [faculties, courseRealisationsTypes, semesters, creditTypeCodes, courseTypeCodes, disciplines] = await Promise.all([
-    Oodi.getFaculties(),
+    (await Oodi.getFaculties()).map(mapper.getOrganisationFromData),
     (await Oodi.getCourseRealisationTypes()).map(mapper.courseRealisationTypeFromData),
     (await Oodi.getSemesters()).map(mapper.semesterFromData),
     (await Oodi.getStudyattainmentStatusCodes()).map(mapper.studyattainmentStatusCodeToCreditType),
