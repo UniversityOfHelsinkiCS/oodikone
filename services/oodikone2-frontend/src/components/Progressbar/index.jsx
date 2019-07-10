@@ -34,14 +34,15 @@ const Progressbar = ({ time, pending }) => {
     startTimer()
   }
 
-  return (
-    <Progress
-      percent={percentage}
-      disabled={complete}
-      progress
-      color="blue"
-    />
-  )
+  return null
+  //  (
+  //   <Progress
+  //     percent={percentage}
+  //     disabled={complete}
+  //     progress
+  //     color="blue"
+  //   />
+  // )
 }
 
 Progressbar.propTypes = {
