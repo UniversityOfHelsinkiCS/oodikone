@@ -38,6 +38,14 @@ class StudentDetails extends Component {
     history.push(`/coursestatistics?${searchString}`)
   }
 
+  showPopulationStatistics = (studyprogramme, date) => {
+    const { history } = this.props
+    const year = moment(date).isBefore(moment(`${date.slice(0, 4)}-08-01`)) ? date.slice(0, 4) - 1 : date.slice(0, 4)
+    const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
+    history.push(`/populations?months=${months}&semesters=FALL&semesters=` +
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`)
+  }
+
   renderCreditsGraph = () => {
     const { translate, student } = this.props
     return (
@@ -106,6 +114,7 @@ class StudentDetails extends Component {
         }))
       const programmes = sortBy(studyright.studyrightElements, 'enddate').filter(e => e.element_detail.type === 20)
         .map(programme => ({
+          code: programme.code,
           startdate: programme.startdate,
           enddate: programme.enddate,
           name: getTextIn(programme.element_detail.name, language)
@@ -161,7 +170,9 @@ class StudentDetails extends Component {
                   </Table.Cell>
                   <Table.Cell>
                     {c.elements.programmes.filter(filterDuplicates).map(programme => (
-                      <p key={programme.name}>{`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(programme.enddate, 'DD.MM.YYYY')})`}<br /> </p>
+                      <p key={programme.name}>{`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(programme.enddate, 'DD.MM.YYYY')})`}
+                        <Icon name="level up alternate" onClick={() => this.showPopulationStatistics(programme.code, programme.startdate)} /> <br />
+                      </p>
                     ))}
                   </Table.Cell>
                   <Table.Cell>

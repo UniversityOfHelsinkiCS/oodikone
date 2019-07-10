@@ -35,7 +35,7 @@ app.get('/user/:uid', async (req, res) => {
 
 app.get('/user/elementdetails/:username', async (req, res) => {
   const username = req.params.username
-  const user = await byUsername(username)
+  const user = await User.byUsername(username)
   const elementdetails = User.getUserElementDetails(user)
 
   console.log(JSON.stringify(elementdetails))
@@ -151,6 +151,16 @@ app.get('/get_roles/:user', async (req, res) => {
   try {
     const roles = await User.getRoles(user)
     res.status(200).json(roles)
+  } catch (e) {
+    res.status(400).json({ e })
+  }
+})
+
+app.get('/get_accessgroupcodes/:uid', async (req, res) => {
+  const { uid } = req.params
+  try {
+    const user = await User.byUsername(uid)
+    res.status(200).json(user.accessgroup.map(g => g.group_code))
   } catch (e) {
     res.status(400).json({ e })
   }

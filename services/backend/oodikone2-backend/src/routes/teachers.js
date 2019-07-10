@@ -45,14 +45,15 @@ const mapToProviders = rights => rights.map((r) => {
 })
 
 router.get('/stats', async (req, res) => {
-  const { rights, roles } = req.decodedToken
+  const { rights, roles } = req
+
   const { providers, semesterStart, semesterEnd } = req.query
   if (!providers || !semesterStart) {
     return res.status(422).send('Missing required query parameters.')
   }
   const providerRights = mapToProviders(rights)
 
-  if (!(providers.every(p => providerRights.includes(p)) || roles.map(r => r.group_code).includes('admin'))) {
+  if (!(providers.every(p => providerRights.includes(p)) || roles.includes('admin'))) {
     return res.status(403).send('You do not have rights to see this data')
   }
   const result = await teachers.yearlyStatistics(providers, semesterStart, semesterEnd||semesterStart + 1)

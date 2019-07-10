@@ -4,8 +4,9 @@ const userService = require('../services/userService')
 const Unit = require('../services/units')
 
 router.get('/students', async (req, res) => {
-  const { roles, userId } = req.decodedToken
-  if (roles && roles.map(r => r.group_code).includes('admin')) {
+  const { roles } = req
+
+  if (roles && roles.includes('admin')) {
     let results = []
     if (req.query.searchTerm) {
       results = await Student.bySearchTerm(req.query.searchTerm)
@@ -20,9 +21,10 @@ router.get('/students', async (req, res) => {
 })
 
 router.get('/students/:id', async (req, res) => {
-  const studentId = req.params.id
-  const { roles } = req.decodedToken
-  if (roles && roles.map(r => r.group_code).includes('admin')) {
+  const { id: studentId } = req.params
+  const { roles } = req
+
+  if (roles && roles.includes('admin')) {
     const results = await Student.withId(studentId)
     return res.json(results)
   }
@@ -41,7 +43,6 @@ router.get('/students/:id', async (req, res) => {
   } else {
     res.json([]).end()
   }
-
 })
 
 module.exports = router
