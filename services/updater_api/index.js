@@ -28,7 +28,7 @@ const handleMessage = async (priority) => async (msg) => { // :d
     data = await getStudent(message)
     try {
       // TODO: check that data is properly structured(?)
-      stan.publish(priority ? 'UpdateWrite' : 'PriorityWrite', JSON.stringify(data), (err, guid) => {
+      stan.publish(priority ? 'PriorityWrite' :'UpdateWrite' , JSON.stringify(data), (err, guid) => {
         if (err) {
           return err
         } else {
@@ -44,8 +44,8 @@ const handleMessage = async (priority) => async (msg) => { // :d
 stan.on('connect', async () => {
 
   const sub = stan.subscribe('UpdateApi', 'updater.workers', opts)
-  const prioSub = stan.subscribe('PriorityApi', 'updater.workers', opts)
-  
+  const prioSub = stan.subscribe('PriorityApi', 'updater.workers.prio', opts)
+
   sub.on('message', await handleMessage(false))
   prioSub.on('message', await handleMessage(true))
 })
