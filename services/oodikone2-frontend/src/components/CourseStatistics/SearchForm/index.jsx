@@ -9,6 +9,7 @@ import { clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
+import Progressbar from '../../Progressbar'
 import { getCourseSearchResults } from '../../../selectors/courses'
 import { getStartAndEndYearValues } from '../courseStatisticsUtils'
 import YearFilter from './YearFilter'
@@ -155,75 +156,78 @@ class SearchForm extends Component {
     const noQueryStrings = !coursename && !coursecode
 
     return (
-      <Segment loading={isLoading}>
-        <Form>
-          <Header content="Search for courses" />
-          <div style={{ marginBottom: '15px' }}>
-            <Form.Group widths="equal">
-              <Form.Field>
-                <label>Name:</label>
-                <AutoSubmitSearchInput
-                  doSearch={this.fetchCourses}
-                  placeholder="Search by entering a course name"
-                  value={coursename}
-                  onChange={cn => this.setState({ coursename: cn })}
-                  loading={this.props.coursesLoading}
-                  minSearchLength={0}
-                />
-              </Form.Field>
-              <Form.Field>
-                <label>Code:</label>
-                <AutoSubmitSearchInput
-                  doSearch={this.fetchCourses}
-                  placeholder="Search by entering a course code"
-                  value={coursecode}
-                  onChange={cc => this.setState({ coursecode: cc })}
-                  loading={this.props.coursesLoading}
-                  minSearchLength={0}
-                />
-              </Form.Field>
-            </Form.Group>
-            <CourseTable
-              title="Selected courses"
-              hidden={noSelectedCourses}
-              courses={selected}
-              onSelectCourse={this.onSelectCourse}
-              controlIcon="remove"
-            />
-            {!noSelectedCourses &&
-              <Fragment>
-                <YearFilter
-                  fromYear={fromYear}
-                  toYear={toYear}
-                  years={years}
-                  separate={separate}
-                  handleChange={this.handleChange}
-                  onToggleCheckbox={this.onToggleCheckbox}
-                  showCheckbox
-                />
-                <Form.Button
-                  type="button"
-                  disabled={disabled}
-                  fluid
-                  size="huge"
-                  primary
-                  basic
-                  positive
-                  content="Fetch statistics"
-                  onClick={this.onSubmitFormClick}
-                />
-              </Fragment>
-            }
-            <CourseTable
-              hidden={noQueryStrings || isLoading}
-              courses={courses}
-              title="Searched courses"
-              onSelectCourse={this.onSelectCourse}
-              controlIcon="plus"
-            />
-          </div>
-        </Form>
-      </Segment>
+      <React.Fragment>
+        <Segment loading={isLoading}>
+          <Form>
+            <Header content="Search for courses" />
+            <div style={{ marginBottom: '15px' }}>
+              <Form.Group widths="equal">
+                <Form.Field>
+                  <label>Name:</label>
+                  <AutoSubmitSearchInput
+                    doSearch={this.fetchCourses}
+                    placeholder="Search by entering a course name"
+                    value={coursename}
+                    onChange={cn => this.setState({ coursename: cn })}
+                    loading={this.props.coursesLoading}
+                    minSearchLength={0}
+                  />
+                </Form.Field>
+                <Form.Field>
+                  <label>Code:</label>
+                  <AutoSubmitSearchInput
+                    doSearch={this.fetchCourses}
+                    placeholder="Search by entering a course code"
+                    value={coursecode}
+                    onChange={cc => this.setState({ coursecode: cc })}
+                    loading={this.props.coursesLoading}
+                    minSearchLength={0}
+                  />
+                </Form.Field>
+              </Form.Group>
+              <CourseTable
+                title="Selected courses"
+                hidden={noSelectedCourses}
+                courses={selected}
+                onSelectCourse={this.onSelectCourse}
+                controlIcon="remove"
+              />
+              {!noSelectedCourses &&
+                <Fragment>
+                  <YearFilter
+                    fromYear={fromYear}
+                    toYear={toYear}
+                    years={years}
+                    separate={separate}
+                    handleChange={this.handleChange}
+                    onToggleCheckbox={this.onToggleCheckbox}
+                    showCheckbox
+                  />
+                  <Form.Button
+                    type="button"
+                    disabled={disabled}
+                    fluid
+                    size="huge"
+                    primary
+                    basic
+                    positive
+                    content="Fetch statistics"
+                    onClick={this.onSubmitFormClick}
+                  />
+                </Fragment>
+              }
+              <CourseTable
+                hidden={noQueryStrings || isLoading}
+                courses={courses}
+                title="Searched courses"
+                onSelectCourse={this.onSelectCourse}
+                controlIcon="plus"
+              />
+            </div>
+          </Form>
+        </Segment>
+        {isLoading ? <Progressbar time={100} pending={isLoading} /> : null}
+      </React.Fragment>
     )
   }
 }
