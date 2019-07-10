@@ -186,7 +186,6 @@ test.only('new api populations can be fetched', async t => {
     .expect('Content-Type', /application\/json/)
 
   const stats = res.body
-  console.log(stats)
   t.is(stats.length, 6)
 
 })

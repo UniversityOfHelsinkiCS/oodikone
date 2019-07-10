@@ -6,6 +6,7 @@ import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 
 import SegmentDimmer from '../SegmentDimmer'
+import Progressbar from '../Progressbar'
 import PopulationCourseStats from '../PopulationCourseStats'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
@@ -28,37 +29,40 @@ const PopulationCourses = ({
   }
 
   return (
-    <Segment>
-      <Header size="medium" dividing >
-        <Popup
-          trigger={<Header.Content>{translate('populationCourses.header')}</Header.Content>}
-          content="Sort by clicking columns. Click course name to limit observed population to students who
-          participated to the course."
-          wide
-          position="top left"
+    <React.Fragment>
+      <Progressbar time={140} pending={pending} />
+      <Segment>
+        <Header size="medium" dividing >
+          <Popup
+            trigger={<Header.Content>{translate('populationCourses.header')}</Header.Content>}
+            content="Sort by clicking columns. Click course name to limit observed population to students who
+            participated to the course."
+            wide
+            position="top left"
+          />
+          <InfoBox content={CoursesOf} />
+        </Header>
+        <Button
+          key="refreshCourses"
+          content="Recalculate"
+          labelPosition="right"
+          primary
+          onClick={reloadCourses}
+          icon="refresh"
+          compact
+          disabled={!refreshNeeded}
         />
-        <InfoBox content={CoursesOf} />
-      </Header>
-      <Button
-        key="refreshCourses"
-        content="Recalculate"
-        labelPosition="right"
-        primary
-        onClick={reloadCourses}
-        icon="refresh"
-        compact
-        disabled={!refreshNeeded}
-      />
 
-      <SegmentDimmer translate={translate} isLoading={pending} />
-      <PopulationCourseStats
-        key={populationCourses.query.uuid}
-        courses={populationCourses.data}
-        query={populationCourses.query}
-        pending={populationCourses.pending}
-        selectedStudents={selectedStudents}
-      />
-    </Segment>
+        <SegmentDimmer translate={translate} isLoading={pending} />
+        <PopulationCourseStats
+          key={populationCourses.query.uuid}
+          courses={populationCourses.data}
+          query={populationCourses.query}
+          pending={populationCourses.pending}
+          selectedStudents={selectedStudents}
+        />
+      </Segment>
+    </React.Fragment>
   )
 }
 

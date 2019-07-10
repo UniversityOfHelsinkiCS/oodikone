@@ -47,16 +47,6 @@ const WelcomePage = () => (
         Contact team Oodikone by email: grp-toska@helsinki.fi
       </p>
       <Divider section />
-
-      {/* <h4>
-            Settings
-          </h4>
-          <p>
-            Here you can modify settings of oodikone.
-             For example you can create custom course code correspondences.
-          </p>
-          <Divider section /> */}
-
     </Container>
     <Image src={images.toskaLogo} size="medium" centered style={{ bottom: 0 }} />
   </div>
