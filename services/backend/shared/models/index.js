@@ -342,9 +342,26 @@ const Provider = sequelize.define('provider', {
 })
 
 const Transfers = sequelize.define('transfers', {
+  id: {
+    primaryKey: true,
+    type: Sequelize.BIGINT,
+    autoIncrement: true
+  },
+  studyrightid: {
+    type: Sequelize.BIGINT,
+  },
+  sourcecode: {
+    type: Sequelize.STRING
+  },
+  targetcode: {
+    type: Sequelize.STRING
+  },
   transferdate: {
     type: Sequelize.DATE
-  }
+  },
+  studentnumber: {
+    type: Sequelize.STRING
+  },
 }, {
     indexes: [
       {

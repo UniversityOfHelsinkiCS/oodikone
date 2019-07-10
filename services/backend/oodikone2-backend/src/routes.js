@@ -38,15 +38,15 @@ module.exports = (app, url) => {
   app.use(url, providers)
   app.use(url, faculties)
   app.use(url, semesters)
+  app.use(url, tags)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
   app.use(`${url}/users`, auth.roles(['users']), users)
   app.use(`${url}/feedback`, feedback)
   app.use(`${url}/usage`, auth.roles(['usage']), usage)
   app.use(`${url}/oodilearn`, auth.roles(['oodilearn']), oodilearn)
   app.use(`${url}/course-groups`, auth.roles(['coursegroups']), courseGroups)
-  app.use(`${url}/mandatory_courses`, mandatoryCourses),
-  app.use(`${url}/mandatory-course-labels`, mandatoryCourseLabels),
+  app.use(`${url}/mandatory_courses`, mandatoryCourses)
+  app.use(`${url}/mandatory-course-labels`, mandatoryCourseLabels)
   app.use(`${url}/oodi`, auth.roles(['dev']), oodi)
   app.use(url, auth.roles(['dev', 'admin']), task)
-  app.use(url, tags)
 }

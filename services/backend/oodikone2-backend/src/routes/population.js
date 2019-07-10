@@ -1,7 +1,8 @@
 const router = require('express').Router()
 const Population = require('../services/populations')
 const Filters = require('../services/filters')
-const { updateStudents }  = require('../services/updaterService')
+const { updateStudents } = require('../services/updaterService')
+const { isValidStudentId } = require('../util/index')
 
 const Student = require('../services/students')
 const StudyrightService = require('../services/studyrights')
@@ -44,8 +45,9 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
     let studentnumberlist
     const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
 
-    const { roles, userId } = req.decodedToken
-    if (roles && roles.map(r => r.group_code).includes('admin')) {
+    const { decodedToken: { userId }, roles } = req
+
+    if (roles && roles.includes('admin')) {
       studentnumberlist = studentnumbers
     } else {
       const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
@@ -75,8 +77,9 @@ router.get('/v3/populationstatistics', async (req, res) => {
     let studyRights = null
     try {
       studyRights = JSON.parse(studyRightsJSON)
-      const { roles, rights } = req.decodedToken
-      if (!roles || !roles.map(r => r.group_code).includes('admin')) {
+      const { rights, roles } = req
+
+      if (!roles || !roles.includes('admin')) {
         if (!rights.includes(studyRights.programme)) {
           res.status(403).json([])
           return
@@ -114,8 +117,10 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   console.log(coursecode, yearcode)
   const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
   console.log(studentnumbers)
-  const { roles, userId } = req.decodedToken
-  if (roles && roles.map(r => r.group_code).includes('admin')) {
+
+  const { decodedToken: { userId }, roles } = req
+
+  if (roles && roles.includes('admin')) {
     studentnumberlist = studentnumbers
   } else {
     const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
@@ -127,7 +132,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
       startYear: 1900,
       endYear: 2200,
       studyRights: [],
-      semesters, 
+      semesters,
       months: 1000
     }, studentnumberlist)
 
@@ -192,19 +197,23 @@ router.delete('/v2/populationstatistics/filters', async (req, res) => {
 
 router.post('/updatedatabase', async (req, res) => {
   const studentnumbers = req.body
-  console.log(studentnumbers)
-  if (studentnumbers) {
-    await updateStudents(studentnumbers)
-    res.status(200).json('Scheduled')
-  } else {
+  if (!(studentnumbers && studentnumbers.every(sn => isValidStudentId(sn)))) {
     res.status(400).end()
+  }
+  try {
+    const response = await updateStudents(studentnumbers)
+    if (response) {
+      res.status(200).json('Scheduled')
+    }
+  } catch (err) {
+    res.status(418).json(err)
   }
 })
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   try {
-    const { rights, roles } = req.decodedToken
-    if (roles && roles.map(r => r.group_code).includes('admin')) {
+    const { rights, roles } = req
+    if (roles && roles.includes('admin')) {
       const studyrights = await StudyrightService.getAssociations()
       res.json(studyrights)
     } else {
