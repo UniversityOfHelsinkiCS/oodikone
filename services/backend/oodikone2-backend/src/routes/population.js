@@ -1,7 +1,8 @@
 const router = require('express').Router()
 const Population = require('../services/populations')
 const Filters = require('../services/filters')
-const { updateStudents }  = require('../services/updaterService')
+const { updateStudents } = require('../services/updaterService')
+const { isValidStudentId } = require('../util/index')
 
 const Student = require('../services/students')
 const StudyrightService = require('../services/studyrights')
@@ -127,7 +128,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
       startYear: 1900,
       endYear: 2200,
       studyRights: [],
-      semesters, 
+      semesters,
       months: 1000
     }, studentnumberlist)
 
@@ -192,12 +193,16 @@ router.delete('/v2/populationstatistics/filters', async (req, res) => {
 
 router.post('/updatedatabase', async (req, res) => {
   const studentnumbers = req.body
-  console.log(studentnumbers)
-  if (studentnumbers) {
-    await updateStudents(studentnumbers)
-    res.status(200).json('Scheduled')
-  } else {
+  if (!(studentnumbers && studentnumbers.every(sn => isValidStudentId(sn)))) {
     res.status(400).end()
+  }
+  try {
+    const response = await updateStudents(studentnumbers)
+    if (response) {
+      res.status(200).json('Scheduled')
+    }
+  } catch (err) {
+    res.status(418).json(err)
   }
 })
 
