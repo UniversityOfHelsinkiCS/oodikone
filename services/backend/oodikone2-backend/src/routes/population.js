@@ -45,8 +45,9 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
     let studentnumberlist
     const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
 
-    const { roles, userId } = req.decodedToken
-    if (roles && roles.map(r => r.group_code).includes('admin')) {
+    const { decodedToken: { userId }, roles } = req
+
+    if (roles && roles.includes('admin')) {
       studentnumberlist = studentnumbers
     } else {
       const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
@@ -76,8 +77,9 @@ router.get('/v3/populationstatistics', async (req, res) => {
     let studyRights = null
     try {
       studyRights = JSON.parse(studyRightsJSON)
-      const { roles, rights } = req.decodedToken
-      if (!roles || !roles.map(r => r.group_code).includes('admin')) {
+      const { rights, roles } = req
+
+      if (!roles || !roles.includes('admin')) {
         if (!rights.includes(studyRights.programme)) {
           res.status(403).json([])
           return
@@ -115,8 +117,10 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   console.log(coursecode, yearcode)
   const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
   console.log(studentnumbers)
-  const { roles, userId } = req.decodedToken
-  if (roles && roles.map(r => r.group_code).includes('admin')) {
+
+  const { decodedToken: { userId }, roles } = req
+
+  if (roles && roles.includes('admin')) {
     studentnumberlist = studentnumbers
   } else {
     const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
@@ -208,8 +212,8 @@ router.post('/updatedatabase', async (req, res) => {
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   try {
-    const { rights, roles } = req.decodedToken
-    if (roles && roles.map(r => r.group_code).includes('admin')) {
+    const { rights, roles } = req
+    if (roles && roles.includes('admin')) {
       const studyrights = await StudyrightService.getAssociations()
       res.json(studyrights)
     } else {

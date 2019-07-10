@@ -35,6 +35,13 @@ class TeacherStatisticsTable extends Component {
     return direction === 'ascending' ? sorted : sorted.reverse()
   }
 
+  roundStatisticCredits = statistics => (
+    statistics.map(s => ({
+      ...s,
+      credits: s.credits.toFixed(2)
+    }))
+  )
+
   render() {
     const { statistics, onClickFn } = this.props
     const { selected, direction } = this.state
@@ -71,7 +78,7 @@ class TeacherStatisticsTable extends Component {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {this.sortStatistics(statistics).map(({ id, name, credits, passrate, transferred }) => (
+          {this.roundStatisticCredits(this.sortStatistics(statistics)).map(({ id, name, credits, passrate, transferred }) => (
             <Table.Row key={id} onClick={() => onClickFn(id)} style={{ cursor: 'pointer' }} >
               <Table.Cell content={name} textAlign="left" />
               <Table.Cell content={credits} width={2} />

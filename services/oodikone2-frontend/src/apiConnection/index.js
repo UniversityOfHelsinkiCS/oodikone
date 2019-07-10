@@ -132,10 +132,6 @@ export const handleRequest = store => next => async (action) => {
       store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
     } catch (e) {
       // Something failed. Assume it's the token and try again.
-      if (e.response.data.reloadPage) {
-        setTimeout(() => { window.location.reload() }, 1000)
-        return
-      }
       store.dispatch(loginAction(true, requestSettings))
     }
   }

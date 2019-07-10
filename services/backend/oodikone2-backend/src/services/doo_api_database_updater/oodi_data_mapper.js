@@ -250,12 +250,7 @@ const getTransfersFromData = (data, studentnumber) => {
   const studytracks = data.elements.filter(element => element.element_id === 20)
   const sorted = _.sortBy(studytracks, 'end_date')
   let transfers = []
-  let i = 0
-  while (i < sorted.length) {
-    if (i === 0) {
-      i++
-      continue
-    }
+  for (let i = 1; i < sorted.length; ++i) {
     let target = sorted[i].code
     let source = sorted[i - 1].code
     let transferdate = sorted[i - 1].end_date
@@ -266,7 +261,6 @@ const getTransfersFromData = (data, studentnumber) => {
       transferdate,
       studentnumber,
       studyrightid: `${data.studyright_id}`})
-    i++
   }
   return(transfers)
 }
