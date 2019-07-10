@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Progress } from 'semantic-ui-react'
+import { useState, useEffect } from 'react'
+// import { Progress } from 'semantic-ui-react'
 import { number, bool } from 'prop-types'
 
 const Progressbar = ({ time, pending }) => {
