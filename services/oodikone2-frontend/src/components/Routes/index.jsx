@@ -8,7 +8,6 @@ const Populations = React.lazy(() => import('../PopulationStatistics'))
 const StudentStatistics = React.lazy(() => import('../StudentStatistics'))
 const CourseStatistics = React.lazy(() => import('../CourseStatistics'))
 const EnableUsers = React.lazy(() => import('../EnableUsers'))
-const Settings = React.lazy(() => import('../Settings'))
 const StudyProgramme = React.lazy(() => import('../StudyProgramme'))
 const Teachers = React.lazy(() => import('../Teachers'))
 const Sandbox = React.lazy(() => import('../Sandbox'))
@@ -27,7 +26,6 @@ const Routes = () => (
       <Route exact path={routes.students.route} component={StudentStatistics} />
       <Route exact path={routes.courseStatistics.route} component={CourseStatistics} />
       <Route exact path={routes.faculty.route} component={Faculty} />
-      <Route exact path={routes.settings.route} component={Settings} />
       <Route exact path={routes.users.route} component={EnableUsers} />
       <Route exact path={routes.teachers.route} component={Teachers} />
       <Route exact path={routes.usage.route} component={UsageStatistics} />

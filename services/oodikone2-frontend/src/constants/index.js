@@ -60,7 +60,6 @@ export const routes = {
   teachers: { menuRoute: '/teachers', route: '/teachers/:teacherid?', translateId: 'teachers', reqRights: ['teachers'] },
   users: { menuRoute: '/users', route: '/users/:userid?', translateId: 'users', reqRights: ['users'] },
   faculty: { menuRoute: '/faculties', route: '/faculties/:facultyid?', translateId: 'faculty', reqRights: ['dev'] },
-  settings: { menuRoute: '/settings', route: '/settings', translateId: 'settings', reqRights: ['dev'] },
   usage: { menuRoute: '/usage', route: '/usage', translateId: 'usage', reqRights: ['usage'] },
   sandbox: { menuRoute: '/sandbox', route: '/sandbox', translateId: 'sandbox', reqRights: ['dev'] },
   oodilearn: { menuRoute: '/oodilearn', route: '/oodilearn', translateId: 'oodilearn', reqRights: ['oodilearn'] },
