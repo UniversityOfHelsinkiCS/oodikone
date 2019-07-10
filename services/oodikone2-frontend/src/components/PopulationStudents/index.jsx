@@ -140,7 +140,7 @@ class PopulationStudents extends Component {
       copyToClipboard(clipboardString)
     }
 
-    const transferFrom = s => (s.previousRights[0] && getTextIn(s.previousRights[0].element_detail.name, this.props.language))
+    const transferFrom = s => getTextIn(s.transferSource.name, this.props.language)
 
     const priorityText = (studyRights) => {
       const codes = this.studyrightCodes(studyRights, 'prioritycode')

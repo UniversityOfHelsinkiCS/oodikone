@@ -393,32 +393,28 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   }, {
-      students: [],
-      extents: {},
-      semesters: {},
-      transfers: {
-        targets: {},
-        sources: {}
-      },
-      studyrights: {
-        degrees: [],
-        programmes: []
-      }
-    })
+    students: [],
+    extents: {},
+    semesters: {},
+    transfers: {
+      targets: {},
+      sources: {}
+    },
+    studyrights: {
+      degrees: [],
+      programmes: []
+    }
+  })
 
+  const [momentstart, momentend] = [moment(startDate), moment(endDate)]
   const transferredStudyright = (s) => {
-    const studyright = s.studyrights.find(s => s.studyrightElements
-      .map(d => d.element_detail.code)
-      .includes(studyRights.programme))
-
-    if (studyright) {
-      s.transferredStudyright = moment(startDate).isAfter(moment(studyright.startdate))
-      if (s.transferredStudyright) {
-        const previousRights = studyright.studyrightElements
-          .filter(e => e.element_detail.type === 20 && e.element_detail.code !== studyRights.programme)
-        s.previousRights = previousRights
-      }
-
+    const transferred_from = s.transfers.find(
+      t => t.target.code === studyRights.programme &&
+        moment(t.transferdate).isBetween(momentstart, momentend)
+    )
+    if (transferred_from) {
+      s.transferredStudyright = true
+      s.transferSource = transferred_from.source
     }
     return s
   }
