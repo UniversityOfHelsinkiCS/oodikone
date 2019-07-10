@@ -1,12 +1,11 @@
 const router = require('express').Router()
-
 const CourseGroupService = require('../services/courseGroups')
 
 router.get('/programme/:programmeId/:force?', async (req, res) => {
   const { programmeId, force } = req.params
-  const { rights, roles } = req.decodedToken
+  const { rights, roles } = req
   const semesterCode = req.query.semester
-  if (rights.includes(programmeId) || (roles && roles.map(r => r.group_code).includes('admin'))) {
+  if (rights.includes(programmeId) || (roles && roles.includes('admin'))) {
     const courseGroups = await CourseGroupService.getCourseGroupsWithTotals(
       programmeId, semesterCode, force === 'force'
     )
