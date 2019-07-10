@@ -3,7 +3,7 @@ const { Op } = sequelize
 const moment = require('moment')
 const { flatMap } = require('lodash')
 const { Credit, Student, Course, Provider, Studyright, StudyrightElement,
-  ElementDetails
+  ElementDetails, Transfers
 } = require('../models')
 const {
   ThesisCourse, ThesisTypeEnums
@@ -397,32 +397,15 @@ const countriesFromClass = async (studentnumbers) => {
 }
 
 const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, endDate) => {
-  return Studyright.findAndCountAll({
-    include: {
-      include: {
-        model: ElementDetails,
-        where: {
-          type: {
-            [Op.eq]: 20
-          }
-        }
-      },
-      model: StudyrightElement,
-      required: true,
-      where: {
-        code: {
-          [Op.eq]: studytrack
-        },
-        startdate: {
-          [Op.gt]: moment(startDate).add(1, 'days'), // because somehow startdates have a time that is not 00:00
-          [Op.lt]: new Date(endDate)
-        }
-      }
-    },
+  return Transfers.count({
     where: {
-      student_studentnumber: {
+      studentnumber: {
         [Op.in]: studentnumbers
-      }
+      },
+      transferdate: {
+        [Op.between]: [startDate, endDate]
+      },
+      targetcode: studytrack
     }
   })
 }
@@ -591,7 +574,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     totals.ended = totals.ended + endedStudyright.count,
     totals.medianGraduationTime = median(allGraduationTimes)
     totals.inTargetTime = totals.inTargetTime + inTargetTime
-    totals.transferred = totals.transferred + transferredTo.count
+    totals.transferred = totals.transferred + transferredTo
     return {
       year: `${year}-${year + 1}`,
       credits: credits.map(cr => cr === null ? 0 : cr),
@@ -604,7 +587,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       genders,
       countries,
       creditValues,
-      transferred: transferredTo.count,
+      transferred: transferredTo,
       ended: endedStudyright.count
     }
   }))
