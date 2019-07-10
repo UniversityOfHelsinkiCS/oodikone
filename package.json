@@ -13,6 +13,7 @@
     "docker": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml",
     "docker:build": "npm run docker -- build",
     "docker:up": "npm run docker -- up -d",
+    "docker:up:real": "npm run docker -- -f ./docker/docker-compose.dev.real.yml up",
     "docker:down": "npm run docker -- down",
     "docker:logs": "npm run docker -- logs -f",
     "docker:logs:backend": "npm run docker -- logs -f backend",
