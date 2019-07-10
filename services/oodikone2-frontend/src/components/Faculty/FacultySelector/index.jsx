@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
-import { string, func, arrayOf, shape } from 'prop-types'
+import { func, arrayOf, shape } from 'prop-types'
 import { getFaculties } from '../../../redux/faculties'
-import { getTextIn } from '../../../common'
+// import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 
-const FacultySelector = ({ language, handleSelect, dispatchGetFaculties, faculties }) => {
+const FacultySelector = ({ handleSelect, dispatchGetFaculties, faculties }) => {
   const fetchFaculties = async () => {
     await dispatchGetFaculties()
   }
@@ -19,7 +19,7 @@ const FacultySelector = ({ language, handleSelect, dispatchGetFaculties, faculti
     {
       key: 'name',
       title: 'name',
-      getRowVal: faculty => getTextIn(faculty.name, language)
+      getRowVal: faculty => faculty.name.fi // getTextIn(faculty.name, language) temp fix maybe
     },
     {
       key: 'code',
@@ -38,15 +38,15 @@ const FacultySelector = ({ language, handleSelect, dispatchGetFaculties, faculti
   )
 }
 FacultySelector.propTypes = {
-  language: string.isRequired,
+  // language: string.isRequired,
   handleSelect: func.isRequired,
   dispatchGetFaculties: func.isRequired,
   faculties: arrayOf(shape({})).isRequired
 }
 
-const mapStateToProps = ({ faculties, settings }) => ({
-  faculties: faculties.data,
-  language: settings.language
+const mapStateToProps = ({ faculties }) => ({
+  faculties: faculties.data
+  // language: settings.language
 })
 
 export default connect(mapStateToProps, { dispatchGetFaculties: getFaculties })(withRouter(FacultySelector))
