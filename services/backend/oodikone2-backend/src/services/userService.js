@@ -95,6 +95,11 @@ const getUnitsFromElementDetails = async username => {
   return elementDetails.map(element => UnitService.parseUnitFromElement(element))
 }
 
+const getCodesFromElementDetails = async uid => {
+  const elementDetails = await getUserElementDetails(uid)
+  return elementDetails.map(e => e.code)
+}
+
 const modifyAccess = async (body) => {
   const response = await client.post('/modifyaccess', body)
   return response.data
@@ -102,6 +107,11 @@ const modifyAccess = async (body) => {
 
 const getAccessGroups = async () => {
   const response = await client.get('/access_groups')
+  return response.data
+}
+
+const getAccessGroupCodesFor = async (user) => {
+  const response = await client.get(`/get_accessgroupcodes/${user}`)
   return response.data
 }
 
@@ -120,7 +130,9 @@ module.exports = {
   findAllEnabled,
   modifyAccess,
   getAccessGroups,
+  getAccessGroupCodesFor,
   getUnitsFromElementDetails,
+  getCodesFromElementDetails,
   getRolesFor,
   setFaculties
 }
