@@ -76,7 +76,7 @@ describe('Student Statistics tests', () => {
         cy.contains('011143561').click()
         cy.get('i.level.up.alternate.icon').eq(0).click()
         cy.contains('Population statistics')
-        cy.wait(1000)
+        cy.wait(5000)
         cy.contains('Credit accumulation (for 1 students)')
     })
 })
