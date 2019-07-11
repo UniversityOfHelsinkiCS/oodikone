@@ -75,6 +75,7 @@ describe('Student Statistics tests', () => {
         cy.get('.prompt').type('Oinonen')
         cy.contains('011143561').click()
         cy.get('i.level.up.alternate.icon').eq(0).click()
+        cy.wait(5000)
         cy.contains('Population statistics')
         cy.wait(5000)
         cy.contains('Credit accumulation (for 1 students)')
