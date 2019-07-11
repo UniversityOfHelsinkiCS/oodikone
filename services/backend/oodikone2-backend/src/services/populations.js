@@ -1,7 +1,5 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
-const fs = require('fs')
-const { orderBy } = require('lodash')
 const {
   Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails,
   Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement
