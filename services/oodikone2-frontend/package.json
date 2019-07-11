@@ -64,7 +64,7 @@
     "highcharts-react-official": "^1.5.2",
     "jStat": "^1.7.1",
     "jwt-decode": "^2.2.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "moment": "^2.24.0",
     "path-to-regexp": "^2.4.0",
     "prop-types": "^15.7.1",

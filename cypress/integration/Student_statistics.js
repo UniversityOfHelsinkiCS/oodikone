@@ -11,7 +11,6 @@ describe('Student Statistics tests', () => {
                 }
             }
         })
-        console.log(Cypress.config().baseUrl)
         cy.visit(Cypress.config().baseUrl)
         cy.contains("Student statistics").click()
         cy.contains("Student names hidden")
@@ -71,4 +70,16 @@ describe('Student Statistics tests', () => {
         cy.get('.prompt').clear().type('01114')
         cy.contains('Student number').should('not.exist')
     })
+
+    // why the fuck this test doesn't work TELL ME
+
+    // it('Can jump to population page', () => {
+    //     cy.get('.prompt').type('Oinonen')
+    //     cy.contains('011143561').click()
+    //     cy.get('i.level.up.alternate.icon').eq(0).click()
+    //     cy.wait(5000)
+    //     cy.contains('Population statistics')
+    //     cy.wait(5000)
+    //     cy.contains('Credit accumulation (for 1 students)')
+    // })
 })
