@@ -387,7 +387,7 @@ class PopulationSearchForm extends Component {
 
   fetchPopulationFromUrlParams() {
     const query = this.parseQueryFromUrl()
-    if (query.fetch) {
+    if (query.fetch || query.studyRights.programme !== this.state.query.studyRights.programme) {
       this.setState({ query })
       this.fetchPopulation(query)
     }
