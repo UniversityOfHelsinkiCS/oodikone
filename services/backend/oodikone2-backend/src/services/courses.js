@@ -39,7 +39,11 @@ const byName = (name, language) => Course.findAll({
         [Op.eq]: name
       }
     }
-  }
+  },
+  order: [
+    ['latest_instance_date', 'DESC']
+  ],
+  limit: 1
 })
 
 const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) => {

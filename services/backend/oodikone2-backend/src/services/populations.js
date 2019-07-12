@@ -1,5 +1,6 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
+const fs = require('fs')
 const { orderBy } = require('lodash')
 const {
   Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails,
@@ -393,18 +394,18 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   }, {
-    students: [],
-    extents: {},
-    semesters: {},
-    transfers: {
-      targets: {},
-      sources: {}
-    },
-    studyrights: {
-      degrees: [],
-      programmes: []
-    }
-  })
+      students: [],
+      extents: {},
+      semesters: {},
+      transfers: {
+        targets: {},
+        sources: {}
+      },
+      studyrights: {
+        degrees: [],
+        programmes: []
+      }
+    })
 
   const [momentstart, momentend] = [moment(startDate), moment(endDate)]
   const transferredStudyright = (s) => {
@@ -529,7 +530,6 @@ const bottlenecksOf = async (query, studentnumberlist) => {
       return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE' }
     }
     const { studyRights, startDate, endDate, months, exchangeStudents, cancelledStudents } = parseQueryParams(query)
-
     if (query.selectedStudents) {
       const allStudents =
         await studentnumbersWithAllStudyrightElements(
@@ -539,59 +539,51 @@ const bottlenecksOf = async (query, studentnumberlist) => {
         checkThatSelectedStudentsAreUnderRequestedStudyright(query.selectedStudents, allStudents)
       if (disallowedRequest) return { error: 'Trying to request unauthorized students data' }
     }
-
     const studentnumbers = query.selectedStudents ||
       await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate, exchangeStudents, cancelledStudents)
     allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
     courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
-
   } else {
     allstudents = studentnumberlist
     courses = await findCourses(allstudents, new Date())
   }
-
   const bottlenecks = {
     disciplines: {},
     coursetypes: {}
   }
-
   const codeduplicates = await getMainCodesMap()
+  const stats = {}
+  await Promise.all(
+    courses.map(course => (
+      new Promise(async res => {
+        let { code, name, disciplines, course_type } = course
+        if (name.fi && name.fi.includes('Avoin yo:')) {
+          const courses = await byName(name.fi.split(': ')[1], 'fi')
+          const theOne = courses.length > 0 ? courses[0] : { name, code }
+          code = theOne.code
+          name = theOne.name
+        }
+        const unifiedcode = getUnifiedCode(code, codeduplicates)
+        const coursestats = stats[unifiedcode] || new CourseStatsCounter(unifiedcode, name, allstudents)
 
-  const allcoursestatistics = await courses.reduce(async (coursestatistics, course) => {
-    const stats = await coursestatistics
-    let { code, name, disciplines, course_type } = course
-
-    if (name.fi && name.fi.includes('Avoin yo:')) {
-      const courses = await byName(name.fi.split(': ')[1], 'fi')
-      const theOne = courses.length > 0 ? orderBy(courses, ['date'], ['desc'])[0] : { name, code }
-      code = theOne.code
-      name = theOne.name
-    }
-
-    const unifiedcode = getUnifiedCode(code, codeduplicates)
-    const coursestats = stats[unifiedcode] || new CourseStatsCounter(unifiedcode, name, allstudents)
-
-    coursestats.addCourseType(course_type.coursetypecode, course_type.name)
-    bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
-    disciplines.forEach(({ discipline_id, name }) => {
-      coursestats.addCourseDiscipline(discipline_id, name)
-      bottlenecks.disciplines[discipline_id] = name
-    })
-
-    course.credits.forEach(credit => {
-      const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
-      const semester = getPassingSemester(parseInt(query.endYear, 10), date)
-      coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
-    })
-
-    stats[unifiedcode] = coursestats
-
-    return stats
-  }, Promise.resolve({}))
-
-  bottlenecks.coursestatistics = Object.values(allcoursestatistics)
+        coursestats.addCourseType(course_type.coursetypecode, course_type.name)
+        bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
+        disciplines.forEach(({ discipline_id, name }) => {
+          coursestats.addCourseDiscipline(discipline_id, name)
+          bottlenecks.disciplines[discipline_id] = name
+        })
+        course.credits.forEach(credit => {
+          const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
+          const semester = getPassingSemester(parseInt(query.endYear, 10), date)
+          coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
+        })
+        stats[unifiedcode] = coursestats
+        res()
+      })
+    ))
+  )
+  bottlenecks.coursestatistics = Object.values(stats)
     .map(coursestatistics => coursestatistics.getFinalStats())
-
   return bottlenecks
 }
 

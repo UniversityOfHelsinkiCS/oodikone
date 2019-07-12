@@ -41,13 +41,19 @@ describe('Studyprogramme overview', () => {
 
   it('renders progress and productivity tables', () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click()
-    cy.get('table').should('have.length', 2)
-    cy.contains('Population progress')
-    cy.contains('Yearly productivity')
-    cy.contains("2018-2019").siblings().contains('9')
-    cy.contains("2017-2018").siblings().contains('12').siblings().contains('7').siblings().contains('2')
-    cy.get('table').eq(1).contains('2018').siblings().contains('443')
-    cy.get('table').eq(1).contains('2017').siblings().contains('381')
+    cy.get('button:contains("Recalculate")').eq(0).click()
+    cy.get('button:contains("Recalculate")').eq(1).click()
+    cy.contains('Loading...').should('not.be.visible').then(() => {
+      cy.wait(1000)
+      cy.reload()
+      cy.get('table').should('have.length', 2)
+      cy.contains('Population progress')
+      cy.contains('Yearly productivity')
+      cy.contains("2018-2019").siblings().contains('9')
+      cy.contains("2017-2018").siblings().contains('12').siblings().contains('7').siblings().contains('2')
+      cy.get('table').eq(1).contains('2018').siblings().contains('443')
+      cy.get('table').eq(1).contains('2017').siblings().contains('381')
+    })
   })
 
   it('can search for mandatory courses', () => {
