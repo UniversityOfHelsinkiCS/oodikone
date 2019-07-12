@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { func, shape, string, boolean, arrayOf, integer } from 'prop-types'
+import { func, shape, string, boolean, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { Segment, Table, Icon } from 'semantic-ui-react'
 import { isEmpty, sortBy } from 'lodash'
@@ -39,11 +39,11 @@ class StudentDetails extends Component {
   }
 
   showPopulationStatistics = (studyprogramme, date) => {
-    const { history } = this.props
+    const { history, populationFound } = this.props
     const year = moment(date).isBefore(moment(`${date.slice(0, 4)}-08-01`)) ? date.slice(0, 4) - 1 : date.slice(0, 4)
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
     history.push(`/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}&fetch=true`)
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}&fetch=${!populationFound}`)
   }
 
   renderCreditsGraph = () => {
@@ -248,7 +248,8 @@ StudentDetails.propTypes = {
     started: string,
     studentNumber: string,
     tags: arrayOf(string)
-  })
+  }),
+  populationFound: bool.isRequired
 }
 
 StudentDetails.defaultProps = {
@@ -256,10 +257,12 @@ StudentDetails.defaultProps = {
   studentNumber: ''
 }
 
-const mapStateToProps = ({ students, settings }) => ({
+const mapStateToProps = ({ students, settings, populations }) => ({
   language: settings.language,
   student: students.data.find(student =>
-    student.studentNumber === students.selected)
+    student.studentNumber === students.selected),
+  populationFound: populations.data.students !== undefined
+
 })
 const mapDispatchToProps = dispatch => ({
   removeStudentSelection: () => dispatch(removeStudentSelection()),
