@@ -61,11 +61,11 @@ CREATE TABLE course (
     name jsonb,
     latest_instance_date timestamp with time zone,
     is_study_module boolean,
+    coursetypecode integer,
     startdate timestamp with time zone,
     enddate timestamp with time zone,
     max_attainment_date timestamp with time zone,
-    min_attainment_date timestamp with time zone,
-    coursetypecode integer
+    min_attainment_date timestamp with time zone
 );
 
 
@@ -152,10 +152,10 @@ CREATE TABLE courserealisations (
     enddate timestamp with time zone,
     parent character varying(255),
     root character varying(255),
-    coursecode character varying(255),
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
-    realisationtypecode character varying(255)
+    realisationtypecode character varying(255),
+    coursecode character varying(255)
 );
 
 
@@ -171,13 +171,13 @@ CREATE TABLE credit (
     student_studentnumber character varying(255),
     credits double precision,
     ordering character varying(255),
-    attainment_date timestamp with time zone,
-    "isStudyModule" boolean,
     createddate timestamp with time zone NOT NULL,
     lastmodifieddate timestamp with time zone NOT NULL,
-    course_code character varying(255),
     credittypecode integer,
-    semestercode integer NOT NULL
+    attainment_date timestamp with time zone,
+    course_code character varying(255),
+    semestercode integer NOT NULL,
+    "isStudyModule" boolean
 );
 
 
@@ -188,10 +188,10 @@ ALTER TABLE credit OWNER TO postgres;
 --
 
 CREATE TABLE credit_teachers (
+    "createdAt" timestamp with time zone,
+    "updatedAt" timestamp with time zone,
     credit_id character varying(255) NOT NULL,
-    teacher_id character varying(255) NOT NULL,
-    "createdAt" timestamp with time zone NOT NULL,
-    "updatedAt" timestamp with time zone NOT NULL
+    teacher_id character varying(255) NOT NULL
 );
 
 
@@ -269,18 +269,41 @@ CREATE SEQUENCE hibernate_sequence
 ALTER TABLE hibernate_sequence OWNER TO postgres;
 
 --
--- Name: ldapuser; Type: TABLE; Schema: public; Owner: postgres
+-- Name: mandatory_course_labels; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE ldapuser (
+CREATE TABLE mandatory_course_labels (
+    studyprogramme_id character varying(255),
     id bigint NOT NULL,
-    createddate timestamp without time zone,
-    lastmodifieddate timestamp without time zone,
-    username character varying(255) NOT NULL
+    label character varying(255),
+    "orderNumber" integer,
+    "createdAt" timestamp with time zone,
+    "updatedAt" timestamp with time zone
 );
 
 
-ALTER TABLE ldapuser OWNER TO postgres;
+ALTER TABLE mandatory_course_labels OWNER TO postgres;
+
+--
+-- Name: mandatory_course_labels_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mandatory_course_labels_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mandatory_course_labels_id_seq OWNER TO postgres;
+
+--
+-- Name: mandatory_course_labels_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mandatory_course_labels_id_seq OWNED BY mandatory_course_labels.id;
+
 
 --
 -- Name: migrations; Type: TABLE; Schema: public; Owner: postgres
@@ -326,11 +349,11 @@ ALTER TABLE providers OWNER TO postgres;
 CREATE TABLE semester_enrollments (
     id bigint NOT NULL,
     enrollmenttype integer,
-    enrollment_date timestamp with time zone,
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
     studentnumber character varying(255),
-    semestercode integer
+    semestercode integer,
+    enrollment_date timestamp with time zone
 );
 
 
@@ -366,10 +389,10 @@ CREATE TABLE semesters (
     name jsonb,
     startdate timestamp with time zone,
     enddate timestamp with time zone,
-    yearcode integer,
-    yearname character varying(255),
     "createdAt" timestamp with time zone NOT NULL,
-    "updatedAt" timestamp with time zone NOT NULL
+    "updatedAt" timestamp with time zone NOT NULL,
+    yearcode integer,
+    yearname character varying(255)
 );
 
 
@@ -558,20 +581,6 @@ CREATE TABLE teacher (
 ALTER TABLE teacher OWNER TO postgres;
 
 --
--- Name: teacher_course_group_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE teacher_course_group_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE teacher_course_group_id_seq OWNER TO postgres;
-
---
 -- Name: transfers; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -642,6 +651,13 @@ ALTER TABLE unit_id_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE unit_id_seq OWNED BY unit.id;
+
+
+--
+-- Name: mandatory_course_labels id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mandatory_course_labels ALTER COLUMN id SET DEFAULT nextval('mandatory_course_labels_id_seq'::regclass);
 
 
 --
@@ -792,19 +808,11 @@ ALTER TABLE ONLY error_data
 
 
 --
--- Name: ldapuser ldapuser_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: mandatory_course_labels mandatory_course_labels_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY ldapuser
-    ADD CONSTRAINT ldapuser_pkey PRIMARY KEY (id);
-
-
---
--- Name: ldapuser ldapuser_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY ldapuser
-    ADD CONSTRAINT ldapuser_username_key UNIQUE (username);
+ALTER TABLE ONLY mandatory_course_labels
+    ADD CONSTRAINT mandatory_course_labels_pkey PRIMARY KEY (id);
 
 
 --
@@ -970,6 +978,13 @@ CREATE INDEX credit_teachers_teacher_id ON credit_teachers USING btree (teacher_
 
 
 --
+-- Name: mandatory_course_labels_studyprogramme_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX mandatory_course_labels_studyprogramme_id ON mandatory_course_labels USING btree (studyprogramme_id);
+
+
+--
 -- Name: semester_enrollment_studentnumber; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -1079,7 +1094,7 @@ ALTER TABLE ONLY course_providers
 --
 
 ALTER TABLE ONLY courserealisations
-    ADD CONSTRAINT courserealisations_coursecode_fkey FOREIGN KEY (coursecode) REFERENCES course(code) ON UPDATE CASCADE;
+    ADD CONSTRAINT courserealisations_coursecode_fkey FOREIGN KEY (coursecode) REFERENCES course(code) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -1095,7 +1110,7 @@ ALTER TABLE ONLY courserealisations
 --
 
 ALTER TABLE ONLY credit
-    ADD CONSTRAINT credit_course_code_fkey FOREIGN KEY (course_code) REFERENCES course(code) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT credit_course_code_fkey FOREIGN KEY (course_code) REFERENCES course(code);
 
 
 --
@@ -1111,7 +1126,7 @@ ALTER TABLE ONLY credit
 --
 
 ALTER TABLE ONLY credit
-    ADD CONSTRAINT credit_semestercode_fkey FOREIGN KEY (semestercode) REFERENCES semesters(semestercode) ON UPDATE CASCADE;
+    ADD CONSTRAINT credit_semestercode_fkey FOREIGN KEY (semestercode) REFERENCES semesters(semestercode);
 
 
 --
@@ -1127,7 +1142,7 @@ ALTER TABLE ONLY credit
 --
 
 ALTER TABLE ONLY credit_teachers
-    ADD CONSTRAINT credit_teachers_credit_id_fkey FOREIGN KEY (credit_id) REFERENCES credit(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT credit_teachers_credit_id_fkey FOREIGN KEY (credit_id) REFERENCES credit(id);
 
 
 --
@@ -1135,7 +1150,7 @@ ALTER TABLE ONLY credit_teachers
 --
 
 ALTER TABLE ONLY credit_teachers
-    ADD CONSTRAINT credit_teachers_teacher_id_fkey FOREIGN KEY (teacher_id) REFERENCES teacher(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT credit_teachers_teacher_id_fkey FOREIGN KEY (teacher_id) REFERENCES teacher(id);
 
 
 --
@@ -1199,7 +1214,7 @@ ALTER TABLE ONLY studyright
 --
 
 ALTER TABLE ONLY transfers
-    ADD CONSTRAINT transfers_sourcecode_fkey FOREIGN KEY (sourcecode) REFERENCES element_details(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT transfers_sourcecode_fkey FOREIGN KEY (sourcecode) REFERENCES element_details(code) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -1207,7 +1222,7 @@ ALTER TABLE ONLY transfers
 --
 
 ALTER TABLE ONLY transfers
-    ADD CONSTRAINT transfers_studentnumber_fkey FOREIGN KEY (studentnumber) REFERENCES student(studentnumber) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT transfers_studentnumber_fkey FOREIGN KEY (studentnumber) REFERENCES student(studentnumber) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -1215,7 +1230,7 @@ ALTER TABLE ONLY transfers
 --
 
 ALTER TABLE ONLY transfers
-    ADD CONSTRAINT transfers_studyrightid_fkey FOREIGN KEY (studyrightid) REFERENCES studyright(studyrightid) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT transfers_studyrightid_fkey FOREIGN KEY (studyrightid) REFERENCES studyright(studyrightid) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -1223,7 +1238,7 @@ ALTER TABLE ONLY transfers
 --
 
 ALTER TABLE ONLY transfers
-    ADD CONSTRAINT transfers_targetcode_fkey FOREIGN KEY (targetcode) REFERENCES element_details(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT transfers_targetcode_fkey FOREIGN KEY (targetcode) REFERENCES element_details(code) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
