@@ -119,8 +119,9 @@ class PopulationSearchForm extends Component {
   parseQueryFromUrl = () => {
     const { location } = this.props
     const initial = this.initialQuery()
-    const { studyRights, months, ...rest } = qs.parse(location.search)
+    const { fetch, studyRights, months, ...rest } = qs.parse(location.search)
     const query = {
+      fetch: JSON.parse(fetch),
       ...initial,
       ...rest,
       studyRights: JSON.parse(studyRights),
@@ -132,7 +133,7 @@ class PopulationSearchForm extends Component {
   pushQueryToUrl = (query) => {
     const { history } = this.props
     const { studyRights, ...rest } = query
-    const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
+    const queryObject = { ...rest, studyRights: JSON.stringify(studyRights), fetch: true }
     const searchString = qs.stringify(queryObject)
     history.push({ search: searchString })
   }
@@ -386,8 +387,10 @@ class PopulationSearchForm extends Component {
 
   fetchPopulationFromUrlParams() {
     const query = this.parseQueryFromUrl()
-    this.setState({ query })
-    this.fetchPopulation(query)
+    if (query.fetch) {
+      this.setState({ query })
+      this.fetchPopulation(query)
+    }
   }
 
   initialQuery = () => ({
