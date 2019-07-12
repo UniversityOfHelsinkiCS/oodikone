@@ -32,7 +32,7 @@ const PopulationCourses = ({
     if (refreshNeeded) {
       reloadCourses()
     }
-  }, [ refreshNeeded ])
+  }, [refreshNeeded])
 
   return (
     <React.Fragment>
