@@ -117,7 +117,7 @@ export const courseParticipation = ({ field, course = {} }) =>
     },
     studentsOfSelectedField: course.students ? course.students[field] : {},
     filter: student =>
-      course.students ? course.students[field][student.studentNumber] === true : true
+      (course.students ? course.students[field][student.studentNumber] === true : false)
   })
 
 export const extentGraduated = (params) => {
