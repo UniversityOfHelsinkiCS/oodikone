@@ -78,6 +78,20 @@ describe('Population Statistics tests', () => {
       cy.contains("Excludes students with cancelled study right")
     })
 
+    cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
+      cy.get("tr").its('length').should('be.gte', 10)
+      cy.contains("Opiskelijan digitaidot: orientaatio").siblings().find(".level").click()
+      cy.wait(1000)
+      cy.url().should('include', '/coursestatistics')
+    })
+    cy.contains("DIGI-000A")
+    cy.go("back")
+
+    cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
+      cy.contains("number at least").siblings().within(() => cy.get("input").clear().type("0"))
+      cy.contains("Matematiikan didaktiikka").siblings().eq(2).should("have.text", '9')
+    })
+
     cy.contains("add").click()
     cy.contains("Add filters").siblings().within(() => {
       cy.get(".form").should('have.length', 10)
@@ -94,23 +108,6 @@ describe('Population Statistics tests', () => {
     })
 
     cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
-      cy.get("tr").its('length').should('be.gte', 10)
-      cy.contains("Opiskelijan digitaidot: orientaatio").siblings().find(".level").click()
-      cy.wait(1000)
-      cy.url().should('include', '/coursestatistics')
-    })
-    cy.contains("DIGI-000A")
-    cy.go("back")
-
-
-
-    cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
-      cy.contains("number at least").siblings().within(() => cy.get("input").clear().type("0"))
-      cy.contains("Matematiikan didaktiikka").siblings().eq(2).should("have.text", '9')
-    })
-
-    cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
-      cy.get(".refresh").click()
       cy.contains("number at least").siblings().within(() => cy.get("input").clear().type("0"))
       cy.contains("Matematiikan didaktiikka").siblings().eq(2).should("have.text", '1')
     })
@@ -204,7 +201,6 @@ describe('Population Statistics tests', () => {
     cy.contains('Alempi korkeakoulututkinto').parentsUntil("form").contains("set filter").click()
 
     cy.contains('Excluded students that graduated')
-
 
     cy.contains("Students that has").parentsUntil("form").within(() => {
       cy.contains("degree").click().siblings().contains("any degree").click()

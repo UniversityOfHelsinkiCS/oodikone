@@ -13,10 +13,9 @@ class DisciplineTypes extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    courseTypes: shape({}).isRequired,
-    disciplines: shape({}).isRequired,
-    courses: arrayOf(object).isRequired
-
+    courseTypes: shape({}),
+    disciplines: shape({}),
+    courses: arrayOf(object)
   }
 
   state = {
@@ -137,6 +136,12 @@ class DisciplineTypes extends Component {
       </Segment>
     )
   }
+}
+
+DisciplineTypes.defaultProps = {
+  courses: [],
+  disciplines: {},
+  courseTypes: {}
 }
 
 const mapStateToProps = ({ populationCourses }) => ({
