@@ -562,7 +562,8 @@ const bottlenecksOf = async (query, studentnumberlist) => {
           name = theOne.name
         }
         const unifiedcode = getUnifiedCode(code, codeduplicates)
-        const coursestats = stats[unifiedcode] || new CourseStatsCounter(unifiedcode, name, allstudents)
+        if (!stats[unifiedcode]) stats[unifiedcode] = new CourseStatsCounter(unifiedcode, name, allstudents)
+        const coursestats = stats[unifiedcode]
 
         coursestats.addCourseType(course_type.coursetypecode, course_type.name)
         bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
