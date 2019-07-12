@@ -22,7 +22,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
     const year = Number(yearLabel.slice(0, 4))
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
     history.push(`/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`)
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}&fetch=true`)
   }
   if (error) return <h1>Oh no so error {error}</h1>
   let GRADUATED_FEATURE_TOGGLED_ON = false

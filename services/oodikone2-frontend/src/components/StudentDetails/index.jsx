@@ -43,7 +43,7 @@ class StudentDetails extends Component {
     const year = moment(date).isBefore(moment(`${date.slice(0, 4)}-08-01`)) ? date.slice(0, 4) - 1 : date.slice(0, 4)
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
     history.push(`/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`)
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}&fetch=true`)
   }
 
   renderCreditsGraph = () => {
