@@ -107,7 +107,7 @@ export const transferTo = (params) => {
   })
 }
 
-export const courseParticipation = ({ field, course }) =>
+export const courseParticipation = ({ field, course = {} }) =>
   ({
     id: uuidv4(),
     type: 'CourseParticipation',
@@ -115,9 +115,9 @@ export const courseParticipation = ({ field, course }) =>
       field,
       course
     },
-    studentsOfSelectedField: course.students[field],
+    studentsOfSelectedField: course.students ? course.students[field] : {},
     filter: student =>
-      course.students[field][student.studentNumber] === true
+      (course.students ? course.students[field][student.studentNumber] === true : false)
   })
 
 export const extentGraduated = (params) => {

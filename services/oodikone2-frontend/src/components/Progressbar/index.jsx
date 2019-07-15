@@ -6,6 +6,7 @@ const Progressbar = ({ time, pending }) => {
   const [percentage, setPercentage] = useState(0)
   const [complete, setComplete] = useState(false)
   const [timerId, setTimerId] = useState(null)
+  const [timeoutId, setTimeoutId] = useState(null)
 
   const startTimer = () => {
     let amount = 0
@@ -18,6 +19,11 @@ const Progressbar = ({ time, pending }) => {
 
   useEffect(() => {
     if (pending) startTimer()
+
+    return () => {
+      clearInterval(timerId)
+      clearTimeout(timeoutId)
+    }
   }, [])
 
   if (percentage === 96) clearInterval(timerId)
@@ -25,7 +31,8 @@ const Progressbar = ({ time, pending }) => {
   if (!pending && !complete) {
     setPercentage(100)
     clearInterval(timerId)
-    setTimeout(setComplete(true), 1000)
+    const tid = setTimeout(setComplete(true), 1000)
+    setTimeoutId(tid)
   }
 
   if (pending && complete) {

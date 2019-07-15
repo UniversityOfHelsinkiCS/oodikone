@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, arrayOf, string, bool } from 'prop-types'
-import { Segment, Header, Popup, Button } from 'semantic-ui-react'
+import { Segment, Header, Popup } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 
@@ -28,6 +28,12 @@ const PopulationCourses = ({
     gpc({ ...populationCourses.query, uuid: uuidv4(), selectedStudents })
   }
 
+  useEffect(() => {
+    if (refreshNeeded) {
+      reloadCourses()
+    }
+  }, [refreshNeeded])
+
   return (
     <React.Fragment>
       <Progressbar time={140} pending={pending} />
@@ -42,17 +48,6 @@ const PopulationCourses = ({
           />
           <InfoBox content={CoursesOf} />
         </Header>
-        <Button
-          key="refreshCourses"
-          content="Recalculate"
-          labelPosition="right"
-          primary
-          onClick={reloadCourses}
-          icon="refresh"
-          compact
-          disabled={!refreshNeeded}
-        />
-
         <SegmentDimmer translate={translate} isLoading={pending} />
         <PopulationCourseStats
           key={populationCourses.query.uuid}
