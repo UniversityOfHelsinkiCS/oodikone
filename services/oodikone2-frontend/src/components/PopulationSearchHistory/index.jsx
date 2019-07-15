@@ -31,11 +31,11 @@ class PopulationSearchHistory extends Component {
   renderQueryCards = () => {
     const { populations, translate, units } = this.props
     const { QueryCard } = infotooltips.PopulationStatistics
-    if (!populations.data.students) {
+    if (!units.data.programmes || !populations.query || !populations.data.students) {
       return null
     }
     const studentNumberList = (populations.data.students.map(s => s.studentNumber))
-    return populations.query ? (
+    return (
       <React.Fragment>
         <PopulationQueryCard
           key={`population-${populations.query.uuid}`}
@@ -56,7 +56,7 @@ class PopulationSearchHistory extends Component {
           updating={populations.updating}
         />
         <InfoBox content={QueryCard} />
-      </React.Fragment>) : null
+      </React.Fragment>)
   }
 
   render() {
