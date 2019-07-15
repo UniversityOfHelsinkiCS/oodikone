@@ -1,7 +1,6 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
-const fs = require('fs')
-const { orderBy } = require('lodash')
+const AsyncLock = require('async-lock')
 const {
   Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails,
   Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement
@@ -552,6 +551,8 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     coursetypes: {}
   }
   const codeduplicates = await getMainCodesMap()
+
+  const lock = new AsyncLock()
   const stats = {}
   await Promise.all(
     courses.map(course => (
@@ -564,7 +565,13 @@ const bottlenecksOf = async (query, studentnumberlist) => {
           name = theOne.name
         }
         const unifiedcode = getUnifiedCode(code, codeduplicates)
-        const coursestats = stats[unifiedcode] || new CourseStatsCounter(unifiedcode, name, allstudents)
+        if (!stats[unifiedcode]) {
+          lock.acquire('stats', done => {
+            if (!stats[unifiedcode]) stats[unifiedcode] = new CourseStatsCounter(unifiedcode, name, allstudents)
+            done()
+          })
+        }
+        const coursestats = stats[unifiedcode]
 
         coursestats.addCourseType(course_type.coursetypecode, course_type.name)
         bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
