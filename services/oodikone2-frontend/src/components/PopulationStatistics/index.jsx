@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
-import { func, bool, shape, string } from 'prop-types'
+import { func, bool, shape } from 'prop-types'
 import { Header, Segment, Divider, Button } from 'semantic-ui-react'
 import qs from 'query-string'
 
@@ -20,7 +20,7 @@ class PopulationStatistics extends PureComponent {
     loading: bool.isRequired,
     location: shape({}).isRequired,
     query: shape({}).isRequired,
-    history: shape({}).isRequired,
+    history: shape({}).isRequired
   }
 
   constructor() {
@@ -29,7 +29,8 @@ class PopulationStatistics extends PureComponent {
       show: false
     }
   }
-  componentDidUpdate() {
+
+  componentWillMount() {
     this.setState({ show: false })
   }
 
@@ -56,7 +57,7 @@ class PopulationStatistics extends PureComponent {
         </Header>
         <PopulationSearchForm />
         <Divider />
-        {location.search !== '' || this.state.show ? (<PopulationSearchHistory />) : null}
+        {location.search !== '' ? (<PopulationSearchHistory />) : null}
         <SegmentDimmer translate={translate} isLoading={loading} />
       </Segment>
     )
@@ -69,7 +70,7 @@ class PopulationStatistics extends PureComponent {
         <Header className="segmentTitle" size="large">{translate('populationStatistics.header')}</Header>
         <Segment className="contentSegment">
           {this.renderPopulationSearch()}
-          {location.search !== '' || this.state.show ? (<PopulationDetails />) : null}
+          {location.search !== '' ? (<PopulationDetails />) : null}
           {populationFound && location.search === '' ? (
             <Segment>
               <Header>Your previous search</Header>
@@ -82,12 +83,12 @@ class PopulationStatistics extends PureComponent {
   }
 }
 
-const mapStateToProps = ({ locale, populations, settings }) => ({
+const mapStateToProps = ({ locale, populations }) => ({
   translate: getTranslate(locale),
   currentLanguage: getActiveLanguage(locale).value,
   loading: populations.pending,
   populationFound: populations.data.students !== undefined,
-  query: populations.query ? populations.query : {},
+  query: populations.query ? populations.query : {}
 })
 
 export default connect(mapStateToProps)(PopulationStatistics)
