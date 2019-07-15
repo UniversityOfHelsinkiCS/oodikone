@@ -19,10 +19,8 @@ class PopulationStatistics extends PureComponent {
     populationFound: bool.isRequired,
     loading: bool.isRequired,
     location: shape({}).isRequired,
-    language: string.isRequired,
     query: shape({}).isRequired,
     history: shape({}).isRequired,
-    studyrights: shape({}).isRequired
   }
 
   constructor() {
@@ -30,6 +28,9 @@ class PopulationStatistics extends PureComponent {
     this.state = {
       show: false
     }
+  }
+  componentDidUpdate() {
+    this.setState({ show: false })
   }
 
   handleClick = () => {
@@ -62,10 +63,7 @@ class PopulationStatistics extends PureComponent {
   }
 
   render() {
-    this.setState({ show: false })
-    const { translate, location, populationFound, studyrights, query, language } = this.props
-    // fuck lol drunk dont give a shit about this warning
-    const programmeInStore = studyrights.programmes ? studyrights.programmes.find(programme => programme.code === query.studyRights.programme) : []
+    const { translate, location, populationFound } = this.props
     return (
       <div className="segmentContainer">
         <Header className="segmentTitle" size="large">{translate('populationStatistics.header')}</Header>
@@ -74,8 +72,9 @@ class PopulationStatistics extends PureComponent {
           {location.search !== '' || this.state.show ? (<PopulationDetails />) : null}
           {populationFound && location.search === '' ? (
             <Segment>
-              <Header>Search history</Header>
-              <Button onClick={this.handleClick}>{programmeInStore.name[language]}</Button>
+              <Header>Your previous search</Header>
+              <PopulationSearchHistory />
+              <Button onClick={this.handleClick}>open this population</Button>
             </Segment>) : null}
         </Segment>
       </div>
@@ -88,9 +87,7 @@ const mapStateToProps = ({ locale, populations, settings }) => ({
   currentLanguage: getActiveLanguage(locale).value,
   loading: populations.pending,
   populationFound: populations.data.students !== undefined,
-  query: populations.query,
-  studyrights: populations.data.studyrights ? populations.data.studyrights : [],
-  language: settings.language
+  query: populations.query ? populations.query : {},
 })
 
 export default connect(mapStateToProps)(PopulationStatistics)
