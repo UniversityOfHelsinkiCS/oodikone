@@ -64,6 +64,7 @@ class PopulationStatistics extends PureComponent {
   render() {
     this.setState({ show: false })
     const { translate, location, populationFound, studyrights, query, language } = this.props
+    // fuck lol drunk dont give a shit about this warning
     const programmeInStore = studyrights.programmes ? studyrights.programmes.find(programme => programme.code === query.studyRights.programme) : []
     return (
       <div className="segmentContainer">
