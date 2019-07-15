@@ -23,19 +23,7 @@ class PopulationStatistics extends PureComponent {
     history: shape({}).isRequired
   }
 
-  constructor() {
-    super()
-    this.state = {
-      show: false
-    }
-  }
-
-  componentWillMount() {
-    this.setState({ show: false })
-  }
-
   handleClick = () => {
-    this.setState({ show: !this.state.show })
     const { query, history } = this.props
     const { startYear, endYear, studyRights, semesters, months } = query
     const queryObject = { startYear, endYear, studyRights: JSON.stringify(studyRights), semesters, months, fetch: false }
