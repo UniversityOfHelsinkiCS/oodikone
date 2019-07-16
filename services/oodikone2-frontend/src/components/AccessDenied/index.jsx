@@ -9,15 +9,15 @@ import { log, images } from '../../common'
 import MulticolorBarChart from '../MulticolorBarChart'
 
 const dummyData = [
-  { name: 'jakousa', data: [48.0,] },
-  { name: 'totutotu', data: [33.3] },
-  { name: 'mitiaine', data: [46.2] },
-  { name: 'ttuotila', data: [59.7] },
-
   { name: 'mluukkai', data: [48.0] },
-  { name: 'sasumaki', data: [33.3] },
-  { name: 'ikuisma', data: [46.2] },
-  { name: 'eero3', data: [59.7] }
+  { name: 'jakousa', data: [33.3] },
+  { name: 'totutotu', data: [46.2] },
+  { name: 'sasumaki', data: [59.7] },
+
+  { name: 'ikuisma', data: [48.0] },
+  { name: 'eero3', data: [33.3] },
+  { name: 'mitiaine', data: [46.2] },
+  { name: 'woltsu', data: [59.7] }
 ]
 
 const AccessDenied = ({ notEnabled, logout }) => {
