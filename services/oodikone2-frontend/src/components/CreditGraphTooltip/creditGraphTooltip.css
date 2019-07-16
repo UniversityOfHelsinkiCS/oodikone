@@ -8,6 +8,10 @@
 
 .tooltipHeader {
   font-size: 17px !important;
+  max-width: 400px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .tooltipMeta {
@@ -23,8 +27,7 @@
 
   flex-direction: column;
   position: relative;
-  margin-top: 0;
-  padding-bottom: 7px;
+  margin-bottom: 20px;
 }
 
 .tooltipBodyTitle {

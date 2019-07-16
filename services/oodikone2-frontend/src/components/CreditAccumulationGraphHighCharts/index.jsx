@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { renderToString } from 'react-dom/server'
 import { connect } from 'react-redux'
 import moment from 'moment'
 import { arrayOf, object, string, func, number } from 'prop-types'
@@ -8,9 +9,10 @@ import { Button } from 'semantic-ui-react'
 import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import './creditAccumulationGraphHC.css'
+import CreditGraphTooltip from '../CreditGraphTooltip'
 import { clearLoading } from '../../redux/graphSpinner'
 import { setChartHeight } from '../../redux/settings'
-import { reformatDate, sortDatesWithFormat } from '../../common'
+import { reformatDate } from '../../common'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
 
 boost(Highcharts)
@@ -27,21 +29,120 @@ class CreditAccumulationGraphHighCharts extends Component {
   async componentDidMount() {
     const { students } = this.props
     await this.getMoreCreditLines(students)
+
+    this.createGraphOptions(
+      students,
+      this.props.selectedStudents,
+      this.props.currentGraphSize
+    )
+  }
+
+  async componentWillReceiveProps(nextProps) {
+    if (nextProps.students) {
+      const nextStudents = nextProps.students.map(student => student.studentNumber)
+      const oldStudents = this.props.students.map(student => student.studentNumber)
+
+      const changed =
+        nextStudents.some(student => !oldStudents.includes(student)) ||
+        oldStudents.some(student => !nextStudents.includes(student))
+
+
+      this.createGraphOptions(
+        nextProps.students,
+        nextProps.selectedStudents,
+        nextProps.currentGraphSize
+      )
+
+      if (changed) {
+        const { students } = nextProps
+        await this.getMoreCreditLines(students)
+      }
+    }
+  }
+
+  getMoreCreditLines = async (students) => {
+    const studentCreditLines = this.state.studentCreditLines
+      .concat(this.createStudentCreditLines(students))
+    this.setState({ studentCreditLines })
+  }
+
+  getXAxisMonth = (date, startDate) =>
+    Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0)
+
+  sortCoursesByDate = courses => courses.sort((a, b) => (
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  ))
+
+  filterCoursesByDate = (courses, date) => courses.filter(c => (
+    moment(c.date).isSameOrAfter(moment(date))
+  ))
+
+  createTooltip = ({ points }) => {
+    const { students, language, translate } = this.props
+    const targetCourse = this.sortCoursesByDate(students[0].courses)
+      .find(c => c.course.code === points[0].key)
+
+    if (!targetCourse) return ''
+
+    const payload = [{
+      name: students[0].studentNumber,
+      payload: {
+        ...targetCourse,
+        date: reformatDate(targetCourse.date, DISPLAY_DATE_FORMAT),
+        title: targetCourse.course.name[language]
+      }
+    }]
+
+    return renderToString(<CreditGraphTooltip payload={payload} active translate={translate} />)
+  }
+
+  createGraphOptions = (students, selectedStudents, graphSize) => {
+    const dataOfSelected = this.state.studentCreditLines.filter(line =>
+      selectedStudents.includes(line.name))
+
+    let lastCredits = null
+    if (this.isSingleStudentGraph()) {
+      const started = moment(students[0].started)
+      const lastDate = moment(students.maxDate)
+      const lastMonth = Math.ceil(this.getXAxisMonth(lastDate, started))
+      lastCredits = lastMonth * (55 / 12)
+
+      dataOfSelected.push({
+        data: [
+          [students.minDate, 0],
+          [students.maxDate, lastCredits]
+        ],
+        seriesThreshold: 150,
+        color: '#96d7c3',
+        marker: {
+          enabled: false
+        }
+      })
+    }
     const self = this
-    const dataOfSelected = this.createStudentCreditLines(students).filter(line =>
-      this.props.selectedStudents.includes(line.name))
+
+    const tooltipOptions = this.isSingleStudentGraph() ?
+      {
+        formatter() {
+          return self.createTooltip(this)
+        },
+        shared: false,
+        useHTML: true,
+        style: {
+          all: 'unset',
+          display: 'none'
+        }
+      } : {}
 
     const options = {
-      chart: {
-        height: this.props.currentGraphSize
-      },
-
       plotOptions: {
         series: {
           point: {
             events: {
               click() {
-                self.props.history.push(`/students/${this.series.name}`)
+                if (!self.isSingleStudentGraph()) {
+                  self.props.history.push(`/students/${this.series.name}`)
+                }
               },
               mouseOver() {
                 if (this.series.halo) {
@@ -67,120 +168,60 @@ class CreditAccumulationGraphHighCharts extends Component {
           }
         }
       },
-      series: dataOfSelected,
+      yAxis: {
+        max: (lastCredits && lastCredits > students.maxCredits) ? lastCredits : students.maxCredits,
+        title: { text: 'Credits' }
+      },
       xAxis: {
-        ordinal: false,
         max: students.maxDate,
-        min: students.minDate
+        min: students.minDate,
+        ordinal: false
+      },
+      series: dataOfSelected,
+      chart: {
+        height: graphSize
+      },
+      tooltip: {
+        ...tooltipOptions
       }
     }
+
     this.setState({ options })
   }
 
-  async componentWillReceiveProps(nextProps) {
-    if (nextProps.students) {
-      const nextStudents = nextProps.students.map(student => student.studentNumber)
-      const oldStudents = this.props.students.map(student => student.studentNumber)
-
-      const changed =
-        nextStudents.some(student => !oldStudents.includes(student)) ||
-        oldStudents.some(student => !nextStudents.includes(student))
-      const dataOfSelected = this.state.studentCreditLines.filter(line =>
-        nextProps.selectedStudents.includes(line.name))
-
-      const options = {
-        ...this.state.options,
-        yAxis: {
-          max: nextProps.students.maxCredits,
-          title: { text: 'Credits' }
-        },
-        xAxis: {
-          max: nextProps.students.maxDate,
-          min: nextProps.students.minDate
-        },
-        series: dataOfSelected,
-        chart: {
-          height: nextProps.currentGraphSize
-        }
-      }
-      this.setState({ options })
-      if (changed) {
-        const { students } = nextProps
-        await this.getMoreCreditLines(students)
-      }
-    }
-  }
-
-  getXAxisMonth = (date, startDate) =>
-    Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0)
-
-  getStudentChartData = (student) => {
-    const { studentNumber, started } = student
-    return [
-      ...this.getStudentCourseData(student),
-      {
-        title: '',
-        [studentNumber]: 0,
-        credits: 0,
-        date: reformatDate(started, DISPLAY_DATE_FORMAT),
-        month: 0
-      }
-    ]
-  }
-
-  getStudentCourseData = (student) => {
-    const { studentNumber, courses, studyrightStart, started } = student
-
-    const startDate = this.props.selectedStudents.length === 1 ? started : studyrightStart
-
-    const filteredCourses = courses.filter(c => moment(c.date).isSameOrAfter(moment(startDate)))
-    let totalCredits = 0
-    return filteredCourses.map((c) => {
-      const { course, date, credits, grade, passed, isStudyModuleCredit } = c
-      if (passed && !isStudyModuleCredit) {
-        totalCredits += credits
-      }
-      return {
-        title: `${course.name} (${course.code})`,
-        [studentNumber]: totalCredits,
-        credits,
-        date: reformatDate(date, DISPLAY_DATE_FORMAT),
-        month: this.getXAxisMonth(date, startDate),
-        grade,
-        passed
-      }
-    })
-  }
-
-  getMoreCreditLines = async (students) => {
-    const studentCreditLines = this.state.studentCreditLines
-      .concat(this.createStudentCreditLines(students))
-    this.setState({ studentCreditLines })
-  }
-
-  createCombinedStudentData = (students) => {
-    const combinedStudentData = [].concat(...students.map(this.getStudentChartData))
-    try {
-      return combinedStudentData.sort((c1, c2) =>
-        sortDatesWithFormat(c1.date, c2.date, DISPLAY_DATE_FORMAT))
-    } catch (e) {
-      return null
-    }
-  }
+  isSingleStudentGraph = () => this.props.students.length === 1
 
   createStudentCreditLines = students =>
     students.map((student) => {
+      const { started, studyrightStart } = student
+      const startDate = this.props.selectedStudents.length === 1 ? started : studyrightStart
       let credits = 0
-      let points = student.courses.map((course) => {
+      let points = this.filterCoursesByDate(
+        this.sortCoursesByDate(student.courses),
+        startDate
+      ).map((course) => {
         if (course.passed && !course.isStudyModuleCredit) {
           credits += course.credits
         }
-        return [new Date(course.date).getTime(), credits]
+        const defaultPointOptions = this.isSingleStudentGraph() ? { name: course.course.code } : {}
+        return {
+          ...defaultPointOptions,
+          x: new Date(course.date).getTime(),
+          y: credits
+        }
       })
       if (points.length < 2) {
         points = [[students.minDate, 0], ...points]
       }
-      return { name: student.studentNumber, data: points, seriesThreshold: 150 }
+      return {
+        name: student.studentNumber,
+        data: points,
+        seriesThreshold: 150,
+        marker: {
+          enabled: this.isSingleStudentGraph(),
+          radius: 4
+        }
+      }
     })
 
   resizeChart = (size) => {
@@ -227,9 +268,12 @@ CreditAccumulationGraphHighCharts.propTypes = {
   students: arrayOf(object).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   setChartHeight: func.isRequired,
-  currentGraphSize: number.isRequired
+  currentGraphSize: number.isRequired,
+  language: string.isRequired,
+  translate: func.isRequired
 }
 const mapStateToProps = state => ({
+  language: state.settings.language,
   spinner: state.graphSpinner,
   currentGraphSize: state.settings.chartHeight
 })
