@@ -57,7 +57,6 @@ class StudentSearch extends Component {
       this.setState({ isLoading: true })
       this.props.getStudent(studentNumber).then(() => this.resetComponent())
     } else {
-      this.props.selectStudent(studentNumber)
       this.resetComponent()
     }
   }
