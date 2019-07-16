@@ -67,7 +67,7 @@ const CreditGraphTooltip = (props) => {
     } = payload[0].payload
     return (
       <Card>
-        <Card.Content >
+        <Card.Content>
           {getCardHeader(title, isStudyModuleCredit)}
           {getCardMeta(name, date)}
           {getCardDescription(translate, credits, grade, passed, isStudyModuleCredit)}
