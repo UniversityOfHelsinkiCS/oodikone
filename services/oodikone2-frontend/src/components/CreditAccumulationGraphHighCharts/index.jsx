@@ -104,8 +104,8 @@ class CreditAccumulationGraphHighCharts extends Component {
     if (this.isSingleStudentGraph()) {
       const started = moment(students[0].started)
       const lastDate = moment(students.maxDate)
-      const lastMonth = Math.floor(this.getXAxisMonth(lastDate, started))
-      lastCredits = Math.floor(lastMonth * (55 / 12))
+      const lastMonth = Math.ceil(this.getXAxisMonth(lastDate, started))
+      lastCredits = lastMonth * (55 / 12)
 
       dataOfSelected.push({
         data: [
