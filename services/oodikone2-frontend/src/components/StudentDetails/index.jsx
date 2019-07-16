@@ -54,15 +54,13 @@ class StudentDetails extends Component {
     sample.maxDate = Math.max(...dates)
     sample.minDate = new Date(student.started).getTime()
     return (
-      <div>
-        <CreditAccumulationGraphHighCharts
-          students={sample}
-          selectedStudents={[student.studentNumber]}
-          title={translate('studentStatistics.chartTitle')}
-          translate={translate}
-          maxCredits={sample.maxCredits}
-        />
-      </div>
+      <CreditAccumulationGraphHighCharts
+        students={sample}
+        selectedStudents={[student.studentNumber]}
+        title={translate('studentStatistics.chartTitle')}
+        translate={translate}
+        maxCredits={sample.maxCredits}
+      />
     )
   }
 
