@@ -41,7 +41,7 @@ const AccessDenied = ({ notEnabled, logout }) => {
 
   return (
     <div >
-      <Container style={{ margin: '5%' }}>
+      <Container style={{ display: 'flex', alignItems: 'stretch', height: '100vh', justifyContent: 'space-evenly' }}>
 
         <ReactHighchart
           highcharts={Highcharts}
