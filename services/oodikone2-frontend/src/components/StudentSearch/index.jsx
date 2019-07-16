@@ -4,7 +4,7 @@ import { func, string, arrayOf, object, bool, shape } from 'prop-types'
 import { connect } from 'react-redux'
 import { Search, Segment, Container } from 'semantic-ui-react'
 
-import { findStudents, getStudent, selectStudent } from '../../redux/students'
+import { findStudents, getStudent } from '../../redux/students'
 import SegmentDimmer from '../SegmentDimmer'
 import SortableTable from '../SortableTable'
 import Timeout from '../Timeout'
@@ -144,7 +144,6 @@ StudentSearch.propTypes = {
   translate: func.isRequired,
   findStudents: func.isRequired,
   getStudent: func.isRequired,
-  selectStudent: func.isRequired,
   studentNumber: string,
   students: arrayOf(object).isRequired,
   setTimeout: func.isRequired,
@@ -168,9 +167,7 @@ const mapDispatchToProps = dispatch => ({
   findStudents: searchStr =>
     dispatch(findStudents(searchStr)),
   getStudent: studentNumber =>
-    dispatch(getStudent(studentNumber)),
-  selectStudent: studentNumber =>
-    dispatch(selectStudent(studentNumber))
+    dispatch(getStudent(studentNumber))
 })
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Timeout(StudentSearch)))
