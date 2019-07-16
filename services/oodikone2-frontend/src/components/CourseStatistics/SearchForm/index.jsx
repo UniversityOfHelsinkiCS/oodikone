@@ -39,6 +39,7 @@ class SearchForm extends Component {
       this.fetchStatisticsFromUrlParams()
     } else {
       this.props.clearCourses()
+      this.props.clearCourseStats()
     }
   }
 
