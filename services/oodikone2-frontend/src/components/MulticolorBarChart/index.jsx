@@ -12,7 +12,7 @@ const MulticolorBarChart = (props) => {
       <ReactHighchart
         highcharts={Highcharts}
         constructorType="barChart"
-        neverReflow={true}
+        neverReflow
         config={{
           title: {
             text: chartTitle
