@@ -6,14 +6,18 @@ import ReactHighchart from 'react-highcharts'
 import { connect } from 'react-redux'
 import { logout as logoutAction } from '../../redux/auth'
 import { log, images } from '../../common'
-
 import MulticolorBarChart from '../MulticolorBarChart'
 
 const dummyData = [
-  { text: 'jakousa', value: 48.0 },
-  { text: 'totutotu', value: 33.3 },
-  { text: 'mitiaine', value: 46.2 },
-  { text: 'ttuotila', value: 59.7 }
+  { name: 'jakousa', data: [48.0,] },
+  { name: 'totutotu', data: [33.3] },
+  { name: 'mitiaine', data: [46.2] },
+  { name: 'ttuotila', data: [59.7] },
+
+  { name: 'mluukkai', data: [48.0] },
+  { name: 'sasumaki', data: [33.3] },
+  { name: 'ikuisma', data: [46.2] },
+  { name: 'eero3', data: [59.7] }
 ]
 
 const AccessDenied = ({ notEnabled, logout }) => {
@@ -89,7 +93,7 @@ const AccessDenied = ({ notEnabled, logout }) => {
           }}
         />
 
-        <MulticolorBarChart chartTitle="Your students future" chartData={dummyData.concat(dummyData)} />
+        <MulticolorBarChart chartTitle="Your students' future" chartData={dummyData} />
       </Container>
       <Dimmer
         active

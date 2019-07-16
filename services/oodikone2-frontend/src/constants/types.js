@@ -9,8 +9,8 @@ const {
 } = PropTypes
 
 export const graphDataType = shape({
-  text: string.isRequired,
-  value: number.isRequired
+  name: string.isRequired,
+  data: [number.isRequired]
 })
 
 export const displayableDateType = shape({
