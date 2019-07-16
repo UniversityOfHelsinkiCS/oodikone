@@ -51,7 +51,7 @@ class StudentDetails extends Component {
     const sample = [student]
     const dates = flattenDeep(student.courses.map(c => c.date)).map(d => new Date(d).getTime())
     sample.maxCredits = student.credits
-    sample.maxDate = Math.max(...dates)
+    sample.maxDate = dates.length > 0 ? Math.max(...dates) : new Date().getTime()
     sample.minDate = new Date(student.started).getTime()
     return (
       <CreditAccumulationGraphHighCharts
