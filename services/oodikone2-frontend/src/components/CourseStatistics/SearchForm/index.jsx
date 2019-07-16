@@ -238,6 +238,7 @@ SearchForm.propTypes = {
   getSemesters: func.isRequired,
   getCourseStats: func.isRequired,
   clearCourses: func.isRequired,
+  clearCourseStats: func.isRequired,
   matchingCourses: arrayOf(shape({})).isRequired,
   years: arrayOf(shape({})).isRequired,
   isLoading: bool.isRequired,
