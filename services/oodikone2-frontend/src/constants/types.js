@@ -10,7 +10,7 @@ const {
 
 export const graphDataType = shape({
   name: string.isRequired,
-  data: [number.isRequired]
+  data: arrayOf(number)
 })
 
 export const displayableDateType = shape({
