@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
-import { func, bool, shape, string } from 'prop-types'
+import { func, bool, shape } from 'prop-types'
 import { Header, Segment, Divider, Button } from 'semantic-ui-react'
 import qs from 'query-string'
 
@@ -19,21 +19,11 @@ class PopulationStatistics extends PureComponent {
     populationFound: bool.isRequired,
     loading: bool.isRequired,
     location: shape({}).isRequired,
-    language: string.isRequired,
     query: shape({}).isRequired,
-    history: shape({}).isRequired,
-    studyrights: shape({}).isRequired
-  }
-
-  constructor() {
-    super()
-    this.state = {
-      show: false
-    }
+    history: shape({}).isRequired
   }
 
   handleClick = () => {
-    this.setState({ show: !this.state.show })
     const { query, history } = this.props
     const { startYear, endYear, studyRights, semesters, months } = query
     const queryObject = { startYear, endYear, studyRights: JSON.stringify(studyRights), semesters, months, fetch: false }
@@ -55,26 +45,25 @@ class PopulationStatistics extends PureComponent {
         </Header>
         <PopulationSearchForm />
         <Divider />
-        {location.search !== '' || this.state.show ? (<PopulationSearchHistory />) : null}
+        {location.search !== '' ? (<PopulationSearchHistory />) : null}
         <SegmentDimmer translate={translate} isLoading={loading} />
       </Segment>
     )
   }
 
   render() {
-    this.setState({ show: false })
-    const { translate, location, populationFound, studyrights, query, language } = this.props
-    const programmeInStore = studyrights.programmes ? studyrights.programmes.find(programme => programme.code === query.studyRights.programme) : []
+    const { translate, location, populationFound } = this.props
     return (
       <div className="segmentContainer">
         <Header className="segmentTitle" size="large">{translate('populationStatistics.header')}</Header>
         <Segment className="contentSegment">
           {this.renderPopulationSearch()}
-          {location.search !== '' || this.state.show ? (<PopulationDetails />) : null}
+          {location.search !== '' ? (<PopulationDetails />) : null}
           {populationFound && location.search === '' ? (
             <Segment>
-              <Header>Search history</Header>
-              <Button onClick={this.handleClick}>{programmeInStore.name[language]}</Button>
+              <Header>Your previous search</Header>
+              <PopulationSearchHistory />
+              <Button onClick={this.handleClick}>open this population</Button>
             </Segment>) : null}
         </Segment>
       </div>
@@ -82,14 +71,12 @@ class PopulationStatistics extends PureComponent {
   }
 }
 
-const mapStateToProps = ({ locale, populations, settings }) => ({
+const mapStateToProps = ({ locale, populations }) => ({
   translate: getTranslate(locale),
   currentLanguage: getActiveLanguage(locale).value,
   loading: populations.pending,
   populationFound: populations.data.students !== undefined,
-  query: populations.query,
-  studyrights: populations.data.studyrights ? populations.data.studyrights : [],
-  language: settings.language
+  query: populations.query ? populations.query : {}
 })
 
 export default connect(mapStateToProps)(PopulationStatistics)

@@ -66,7 +66,7 @@ const reducer = (state = { data: [] }, action) => {
     case 'SELECT_STUDENTS_SUCCESS':
       return { ...state, selected: action.response }
     case 'RESET_STUDENT_SUCCESS':
-      return { ...state, data: [] }
+      return { ...state, data: [], lastSearch: '' }
     case 'REMOVE_SELECTED_SUCCESS':
       return { ...state, selected: null }
     default:
