@@ -24,8 +24,16 @@ const handleMessage = async (priority) => async (msg) => { // :d
     msg.ack()
     stan.publish('status', `${message}:FETCHED`, (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
   } else {
-    // TODO: check that its a valid studentnumber and just ack it if its not
-    data = await getStudent(message)
+    try {
+      data = await getStudent(message)
+    } catch (e) {
+      if (e.name === 'NO_STUDENT') {
+        msg.ack()
+        stan.publish('status', `${message}:NO_STUDENT`, (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
+      }
+      console.log(e)
+      return
+    }
     try {
       // TODO: check that data is properly structured(?)
       stan.publish(priority ? 'PriorityWrite' :'UpdateWrite' , JSON.stringify(data), (err, guid) => {

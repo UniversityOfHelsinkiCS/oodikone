@@ -77,10 +77,10 @@ class CreditAccumulationGraphHighCharts extends Component {
     moment(c.date).isSameOrAfter(moment(date))
   ))
 
-  createTooltip = ({ points }) => {
+  createTooltip = (point) => {
     const { students, language, translate } = this.props
     const targetCourse = this.sortCoursesByDate(students[0].courses)
-      .find(c => c.course.code === points[0].key)
+      .find(c => c.course.code === point.key)
 
     if (!targetCourse) return ''
 
@@ -131,12 +131,14 @@ class CreditAccumulationGraphHighCharts extends Component {
         style: {
           all: 'unset',
           display: 'none'
-        }
+        },
+        split: false
       } : {}
 
     const options = {
       plotOptions: {
         series: {
+          findNearestPointBy: 'xy',
           point: {
             events: {
               click() {
