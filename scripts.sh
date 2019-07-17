@@ -33,6 +33,7 @@ echo_path () {
 
 get_oodikone_server_backup() {
     scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
+    scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
 }
 
 get_anon_oodikone() {
