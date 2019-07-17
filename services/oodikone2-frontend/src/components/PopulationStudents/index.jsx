@@ -152,14 +152,26 @@ class PopulationStudents extends Component {
       return codes.join(', ')
     }
 
-    const studytrack = studyrights => (
-      this.studyrightCodes(studyrights, 'studyrightElements')
+    const studytrack = (studyrights) => {
+      const { queryStudyrights } = this.props
+      let startdate = '1900-01-01'
+      const res = this.studyrightCodes(studyrights, 'studyrightElements')
         .reduce((acc, elemArr) => {
-          elemArr.filter(el => el.element_detail.type === 30).forEach(el =>
-            acc.push({ name: el.element_detail.name.fi, startdate: el.startdate }))
+          elemArr.filter(el => el.element_detail.type === 20).forEach((el) => {
+            if (queryStudyrights.includes(el.code)) {
+              startdate = el.startdate // eslint-disable-line
+            }
+          })
+          elemArr.filter(el => el.element_detail.type === 30).forEach((el) => {
+            if (el.enddate > startdate) {
+              acc.push({ name: el.element_detail.name.fi, startdate: el.startdate, enddate: el.enddate })
+            }
+          })
           acc.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))
           return acc
-        }, []))
+        }, [])
+      return res
+    }
 
     const columns = []
     if (this.props.showNames) {
@@ -543,7 +555,7 @@ class PopulationStudents extends Component {
         <Header dividing >
           {`Students (${this.props.selectedStudents.length}) `}
           <Button size="small" onClick={() => this.props.toggleStudentListVisibility()}>{toggleLabel}</Button>
-          {this.state.admin ? (<CheckStudentList students={this.state.students} />) : null}
+          {this.state.admin ? (<CheckStudentList students={this.props.selectedStudents} />) : null}
           <InfoBox content={Students} />
         </Header>
         {this.renderStudentTable()}

@@ -2,13 +2,13 @@ import React, { Component } from 'react'
 import { func, shape, string, boolean, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { Segment, Table, Icon } from 'semantic-ui-react'
-import { isEmpty, sortBy } from 'lodash'
+import { isEmpty, sortBy, flattenDeep } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
 import { withRouter } from 'react-router-dom'
 import { getStudent, removeStudentSelection, resetStudent } from '../../redux/students'
 import StudentInfoCard from '../StudentInfoCard'
-import CreditAccumulationGraph from '../CreditAccumulationGraph'
+import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import SearchResultTable from '../SearchResultTable'
 import { byDateDesc, reformatDate, getTextIn } from '../../common'
 import { clearCourseStats } from '../../redux/coursestats'
@@ -48,13 +48,18 @@ class StudentDetails extends Component {
 
   renderCreditsGraph = () => {
     const { translate, student } = this.props
+    const sample = [student]
+    const dates = flattenDeep(student.courses.map(c => c.date)).map(d => new Date(d).getTime())
+    sample.maxCredits = student.credits
+    sample.maxDate = dates.length > 0 ? Math.max(...dates) : new Date().getTime()
+    sample.minDate = new Date(student.started).getTime()
     return (
-      <CreditAccumulationGraph
-        students={[student]}
+      <CreditAccumulationGraphHighCharts
+        students={sample}
         selectedStudents={[student.studentNumber]}
         title={translate('studentStatistics.chartTitle')}
         translate={translate}
-        maxCredits={0}
+        maxCredits={sample.maxCredits}
       />
     )
   }

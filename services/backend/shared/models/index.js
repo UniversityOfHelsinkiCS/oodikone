@@ -111,7 +111,6 @@ const CREDIT_TYPE_CODES = {
 }
 
 Credit.passed = ({ credittypecode }) => credittypecode === CREDIT_TYPE_CODES.PASSED ||
-  credittypecode === CREDIT_TYPE_CODES.IMPROVED ||
   credittypecode === CREDIT_TYPE_CODES.APPROVED
 Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
 Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED

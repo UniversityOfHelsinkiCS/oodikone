@@ -1,7 +1,7 @@
 import moment from 'moment'
 import jwtDecode from 'jwt-decode'
 import Datetime from 'react-datetime'
-import _ from 'lodash'
+import { uniqBy, filter } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, TOKEN_NAME } from '../constants'
 import toskaLogo from '../assets/toska.png'
@@ -11,7 +11,7 @@ import { sendLog, login } from '../apiConnection'
 export const setToken = token => localStorage.setItem(TOKEN_NAME, token)
 
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
-  _.filter(dropDownOptions, option => (option.text ?
+  filter(dropDownOptions, option => (option.text ?
     option.text.toLowerCase().concat(option.description.toLowerCase())
       .includes(param.toLowerCase())
     :
@@ -160,8 +160,11 @@ export const studyRightRegex = new RegExp(/.*master|bachelor|doctor|licentiate|s
 
 export const studyrightTypes = { degree: '10', programme: '20', speciality: '30' } // speciality???
 
-export const getStudentTotalCredits = student => student.courses
-  .filter(c => c.passed && !c.isStudyModuleCredit).reduce((a, b) => a + b.credits, 0)
+export const getStudentTotalCredits = (student) => {
+  const passedCourses = student.courses.filter(c => c.passed && !c.isStudyModuleCredit)
+  const uniqueCourses = uniqBy(passedCourses, 'course.code')
+  return uniqueCourses.reduce((a, b) => a + b.credits, 0)
+}
 
 export const getStudentGradeMean = (student) => {
   const gradedCourses = student.courses.filter(c => Number(c.grade))

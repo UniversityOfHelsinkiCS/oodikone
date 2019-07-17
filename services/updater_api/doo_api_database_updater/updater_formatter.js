@@ -88,7 +88,9 @@ const createOrUpdateCourseProviders = async data => {
 const getStudent = async (studentnumber) => {
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {
-    throw new Error(`API returned ${api.student} for studentnumber ${studentnumber}.`)
+    const error = new Error(`API returned ${api.student} for studentnumber ${studentnumber}.`)
+    error.name = 'NO_STUDENT'
+    throw error
   }
   const studentInfo = await mapper.getStudentFromData(api.student, api.studyrights)
   const [studyRights, studyAttainments, semesterEnrollments, courseEnrollments] = await Promise.all([
