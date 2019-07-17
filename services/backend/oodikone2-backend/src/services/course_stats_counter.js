@@ -82,7 +82,7 @@ class CourseStatsCounter {
       this.markImprovedGrade(studentnumber)
     } else if (failed) {
       this.markFailedGrade(studentnumber)
-    }
+    } 
   }
 
   failedBefore(studentnumber) {
@@ -93,7 +93,7 @@ class CourseStatsCounter {
     return (this.students.passed[studentnumber] !== undefined)
   }
 
-  removeFromFailed (studentnumber) {
+  removeFromFailed(studentnumber) {
     delete this.students.failed[studentnumber]
     delete this.students.failedMany[studentnumber]
   }
@@ -148,7 +148,7 @@ class CourseStatsCounter {
     cumulativeStats['0-SPRING'] = cumulativeStats['0-FALL'] + passingSemesters['0-SPRING']
 
     for (let i = 1; i < 7; i++) {
-      cumulativeStats[`${i}-FALL`] = cumulativeStats[`${i-1}-SPRING`] + passingSemesters[`${i}-FALL`]
+      cumulativeStats[`${i}-FALL`] = cumulativeStats[`${i - 1}-SPRING`] + passingSemesters[`${i}-FALL`]
       cumulativeStats[`${i}-SPRING`] = cumulativeStats[`${i}-FALL`] + passingSemesters[`${i}-SPRING`]
     }
 
