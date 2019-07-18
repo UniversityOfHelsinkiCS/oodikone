@@ -229,10 +229,8 @@ export const useTabs = (id, initialTab, { location, replace }) => {
 
   useEffect(() => {
     const params = qs.parse(location.search)
-    let queryTab = params[id]
-    queryTab === undefined ?
-      setTab(initialTab) :
-      setTab(JSON.parse(queryTab))
+    const queryTab = params[id]
+    setTab(queryTab === undefined ? initialTab : JSON.parse(queryTab))
     setDidMount(true)
   }, [])
 
