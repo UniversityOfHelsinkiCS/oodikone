@@ -4,10 +4,10 @@ import { func, shape, string } from 'prop-types'
 import { Message, Tab } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import {
-  getMandatoryCourses,
-  addMandatoryCourse,
-  deleteMandatoryCourse,
-  setMandatoryCourseLabel
+  getMandatoryCourses as getMandatoryCoursesAction,
+  addMandatoryCourse as addMandatoryCourseAction,
+  deleteMandatoryCourse as deleteMandatoryCourseAction,
+  setMandatoryCourseLabel as setMandatoryCourseLabelAction
 } from '../../../redux/populationMandatoryCourses'
 import MandatoryCourseTable from '../MandatoryCourseTable'
 import AddMandatoryCourses from '../AddMandatoryCourses'
@@ -15,20 +15,28 @@ import MandatoryCourseLabels from '../MandatoryCourseLabels'
 import { useTabs } from '../../../common'
 
 const StudyProgrammeMandatoryCourses = (props) => {
-  const [ tab, setTab ] = useTabs(
+  const {
+    getMandatoryCourses,
+    addMandatoryCourse,
+    deleteMandatoryCourse,
+    setMandatoryCourseLabel,
+    studyProgramme,
+    mandatoryCourses,
+    language,
+    history
+  } = props
+  const [tab, setTab] = useTabs(
     'p_m_tab',
     0,
-    props.history
+    history
   )
 
   useEffect(() => {
-    const { studyProgramme } = props
     if (studyProgramme) {
-      props.getMandatoryCourses(studyProgramme)
+      getMandatoryCourses(studyProgramme)
     }
-  }, [ props.studyProgramme ])
+  }, [studyProgramme])
 
-  const { studyProgramme, mandatoryCourses, language } = props
   if (!studyProgramme) return null
 
   const panes = [
@@ -37,14 +45,14 @@ const StudyProgrammeMandatoryCourses = (props) => {
       render: () => (
         <Tab.Pane>
           <AddMandatoryCourses
-            addMandatoryCourse={props.addMandatoryCourse}
+            addMandatoryCourse={addMandatoryCourse}
             studyProgramme={studyProgramme}
           />
           <MandatoryCourseTable
             mandatoryCourses={mandatoryCourses.data}
             studyProgramme={studyProgramme}
-            deleteMandatoryCourse={props.deleteMandatoryCourse}
-            setMandatoryCourseLabel={props.setMandatoryCourseLabel}
+            deleteMandatoryCourse={deleteMandatoryCourse}
+            setMandatoryCourseLabel={setMandatoryCourseLabel}
             language={language}
           />
         </Tab.Pane>
@@ -56,7 +64,7 @@ const StudyProgrammeMandatoryCourses = (props) => {
         <Tab.Pane>
           <MandatoryCourseLabels
             studyProgramme={studyProgramme}
-            getMandatoryCourses={props.getMandatoryCourses}
+            getMandatoryCourses={getMandatoryCourses}
           />
         </Tab.Pane>
       )
@@ -86,10 +94,17 @@ StudyProgrammeMandatoryCourses.propTypes = {
   history: shape({}).isRequired
 }
 
+const mapDispatchToProps = {
+  getMandatoryCourses: getMandatoryCoursesAction,
+  addMandatoryCourse: addMandatoryCourseAction,
+  deleteMandatoryCourse: deleteMandatoryCourseAction,
+  setMandatoryCourseLabel: setMandatoryCourseLabelAction
+}
+
 export default connect(
   ({ populationMandatoryCourses, settings }) => ({
     mandatoryCourses: populationMandatoryCourses,
     language: settings.language
   }),
-  { getMandatoryCourses, addMandatoryCourse, deleteMandatoryCourse, setMandatoryCourseLabel }
+  mapDispatchToProps
 )(withRouter(StudyProgrammeMandatoryCourses))

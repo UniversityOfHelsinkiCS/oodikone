@@ -18,7 +18,7 @@ const pane = (title, Content, icon) => ({
 })
 
 const TeachersTabs = withRouter(({ admin, history }) => {
-  const [ tab, setTab ] = useTabs(
+  const [tab, setTab] = useTabs(
     't_tab',
     0,
     history

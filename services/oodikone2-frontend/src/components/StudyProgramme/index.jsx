@@ -14,7 +14,7 @@ import { getRolesWithoutRefreshToken, getRightsWithoutRefreshToken, getTextIn, u
 import Tags from './Tags'
 
 const StudyProgramme = (props) => {
-  const [ tab, setTab ] = useTabs(
+  const [tab, setTab] = useTabs(
     'p_tab',
     props.match.params.courseGroupId ? 2 : 0,
     props.history
