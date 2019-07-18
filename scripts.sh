@@ -165,10 +165,10 @@ run_e2e_setup () {
     echo "Getting anon backups from the private repository. "
     get_anon_oodikone
     echo "Building images"
-    TAG=$2 docker-compose -f docker-compose.yml -f $1 build
+    TAG=$2 SENTRY_RELEASE_VERSION=$3 docker-compose -f docker-compose.yml -f $1 build
     echo "Setup oodikone db from dump."
-    TAG=$2 docker-compose -f docker-compose.yml -f $1 up -d db user_db db_kone
+    TAG=$2 SENTRY_RELEASE_VERSION=$3 docker-compose -f docker-compose.yml -f $1 up -d db user_db db_kone
     db_anon_setup_full
     echo "Starting services."
-    TAG=$2 docker-compose -f docker-compose.yml -f $1 up -d
+    TAG=$2 SENTRY_RELEASE_VERSION=$3 docker-compose -f docker-compose.yml -f $1 up -d
 }

@@ -57,6 +57,7 @@
     "@babel/preset-env": "^7.4.4",
     "@babel/preset-react": "^7.0.0",
     "@sentry/browser": "^4.5.3",
+    "@sentry/webpack-plugin": "^1.7.0",
     "axios": "^0.18.1",
     "babel-polyfill": "^6.26.0",
     "dotenv": "^6.2.0",
