@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { shape, string } from 'prop-types'
@@ -10,35 +10,17 @@ import Overview from './Overview'
 import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
-import { getRolesWithoutRefreshToken, getRightsWithoutRefreshToken, getTextIn } from '../../common'
+import { getRolesWithoutRefreshToken, getRightsWithoutRefreshToken, getTextIn, useTabs } from '../../common'
 import Tags from './Tags'
 
-class StudyProgramme extends Component {
-  static propTypes = {
-    match: shape({
-      params: shape({
-        studyProgrammeId: string,
-        courseGroupId: string
-      })
-    }),
-    programmes: shape({}),
-    language: string.isRequired,
-    history: shape({}).isRequired
-  }
-
-  static defaultProps = {
-    match: {
-      params: { studyProgrammeId: undefined }
-    },
-    programmes: {}
-  }
-
-  state = {
-    selected: this.props.match.params.courseGroupId ? 2 : 0
-  }
-
-  getPanes() {
-    const { match } = this.props
+const StudyProgramme = (props) => {
+  const [tab, setTab] = useTabs(
+    'p_tab',
+    props.match.params.courseGroupId ? 2 : 0,
+    props.history
+  )
+  const getPanes = () => {
+    const { match } = props
     const { studyProgrammeId, courseGroupId } = match.params
     const panes = []
     panes.push(
@@ -73,51 +55,63 @@ class StudyProgramme extends Component {
     return panes
   }
 
-  handleSelect = (programme) => {
-    this.props.history.push(`/study-programme/${programme}`, { selected: programme })
+  const handleSelect = (programme) => {
+    props.history.push(`/study-programme/${programme}`, { selected: programme })
   }
 
-  select = (e, { activeIndex }) => {
-    this.setState({ selected: activeIndex })
-  }
+  const { match, programmes, language } = props
+  const { studyProgrammeId } = match.params
+  const programmeName = programmes[studyProgrammeId] && getTextIn(programmes[studyProgrammeId].name, language)
+  const panes = getPanes()
+  return (
+    <div className="segmentContainer">
+      <Header className="segmentTitle" size="large">
+        Study Programme
+      </Header>
+      <Segment className="contentSegment">
+        <StudyProgrammeSelector handleSelect={handleSelect} selected={studyProgrammeId !== undefined} />
+        {
+          studyProgrammeId ? (
+            <React.Fragment>
+              <Card fluid className="cardContainer">
+                <Card.Content>
+                  <Card.Header className="cardHeader">
+                    {programmeName}
+                    <Icon
+                      name="remove"
+                      className="controlIcon"
+                      onClick={() => props.history.push('/study-programme')}
+                    />
+                  </Card.Header>
+                  <Card.Meta content={studyProgrammeId} />
+                </Card.Content>
+              </Card>
+              <Tab panes={panes} activeIndex={tab} onTabChange={setTab} />
+            </React.Fragment>
+          ) : null
+        }
+      </Segment>
+    </div>
+  )
+}
 
-  render() {
-    const { selected } = this.state
-    const { match, programmes, language } = this.props
-    const { studyProgrammeId } = match.params
-    const programmeName = programmes[studyProgrammeId] && getTextIn(programmes[studyProgrammeId].name, language)
-    const panes = this.getPanes()
-    return (
-      <div className="segmentContainer">
-        <Header className="segmentTitle" size="large">
-          Study Programme
-        </Header>
-        <Segment className="contentSegment">
-          <StudyProgrammeSelector handleSelect={this.handleSelect} selected={studyProgrammeId !== undefined} />
-          {
-            studyProgrammeId ? (
-              <React.Fragment>
-                <Card fluid className="cardContainer">
-                  <Card.Content>
-                    <Card.Header className="cardHeader">
-                      {programmeName}
-                      <Icon
-                        name="remove"
-                        className="controlIcon"
-                        onClick={() => this.props.history.push('/study-programme')}
-                      />
-                    </Card.Header>
-                    <Card.Meta content={studyProgrammeId} />
-                  </Card.Content>
-                </Card>
-                <Tab panes={panes} activeIndex={selected} onTabChange={this.select} />
-              </React.Fragment>
-            ) : null
-          }
-        </Segment>
-      </div>
-    )
-  }
+StudyProgramme.propTypes = {
+  match: shape({
+    params: shape({
+      studyProgrammeId: string,
+      courseGroupId: string
+    })
+  }),
+  programmes: shape({}),
+  language: string.isRequired,
+  history: shape({}).isRequired
+}
+
+StudyProgramme.defaultProps = {
+  match: {
+    params: { studyProgrammeId: undefined }
+  },
+  programmes: {}
 }
 
 const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
