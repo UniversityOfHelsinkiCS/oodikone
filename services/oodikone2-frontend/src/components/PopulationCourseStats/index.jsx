@@ -275,7 +275,7 @@ class PopulationCourseStats extends Component {
             reversed={reversed}
           />
           <Table.HeaderCell content={0} />
-          {courseGradesTypes.map(g => <Table.HeaderCell content={g} />)}
+          {courseGradesTypes.map(g => <Table.HeaderCell content={g} key={g} />)}
           <Table.HeaderCell content="Other passed" />
         </Table.Row>
       </Table.Header>
@@ -293,7 +293,7 @@ class PopulationCourseStats extends Component {
         const countSumReducer = (acc, cur) => acc + cur.count
         const gradeValues = grades ? Object.values(grades) : null
         attempts = gradeValues.reduce(countSumReducer, 0)
-        failedGrades = gradeValues.filter(g => g.status.failed).reduce(countSumReducer, 0)
+        failedGrades = gradeValues.filter(g => g.status.failingGrade).reduce(countSumReducer, 0)
         otherPassed = Object.values(_.omit(grades, courseGradesTypes))
           .filter(g => g.status.passingGrade || g.status.improvedGrade)
           .reduce(countSumReducer, 0)
