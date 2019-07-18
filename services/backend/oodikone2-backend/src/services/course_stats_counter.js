@@ -74,10 +74,12 @@ class CourseStatsCounter {
     this.markGrade(grade, passed, failed, improved)
     this.markToAll(studentnumber)
     if (passed) {
-      this.markPassingGrade(studentnumber)
-      if (!improved) {
+      if (!improved && !this.students.passed[studentnumber]) {
+        this.markPassedSemester(semester)
+      } else if (studentnumber === '012327001') {
         this.markPassedSemester(semester)
       }
+      this.markPassingGrade(studentnumber)
     } else if (improved) {
       this.markImprovedGrade(studentnumber)
     } else if (failed) {
@@ -93,9 +95,13 @@ class CourseStatsCounter {
     return (this.students.passed[studentnumber] !== undefined)
   }
 
-  removeFromFailed (studentnumber) {
+  removeFromFailed(studentnumber) {
     delete this.students.failed[studentnumber]
     delete this.students.failedMany[studentnumber]
+  }
+
+  removeFromPassed(studentnumber) {
+    delete this.students.passed[studentnumber]
   }
 
   markPassingGrade(studentnumber) {
@@ -148,7 +154,7 @@ class CourseStatsCounter {
     cumulativeStats['0-SPRING'] = cumulativeStats['0-FALL'] + passingSemesters['0-SPRING']
 
     for (let i = 1; i < 7; i++) {
-      cumulativeStats[`${i}-FALL`] = cumulativeStats[`${i-1}-SPRING`] + passingSemesters[`${i}-FALL`]
+      cumulativeStats[`${i}-FALL`] = cumulativeStats[`${i - 1}-SPRING`] + passingSemesters[`${i}-FALL`]
       cumulativeStats[`${i}-SPRING`] = cumulativeStats[`${i}-FALL`] + passingSemesters[`${i}-SPRING`]
     }
 
