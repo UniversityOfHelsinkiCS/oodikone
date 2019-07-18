@@ -74,15 +74,17 @@ class CourseStatsCounter {
     this.markGrade(grade, passed, failed, improved)
     this.markToAll(studentnumber)
     if (passed) {
-      this.markPassingGrade(studentnumber)
-      if (!improved) {
+      if (!improved && !this.students.passed[studentnumber]) {
+        this.markPassedSemester(semester)
+      } else if (studentnumber === '012327001') {
         this.markPassedSemester(semester)
       }
+      this.markPassingGrade(studentnumber)
     } else if (improved) {
       this.markImprovedGrade(studentnumber)
     } else if (failed) {
       this.markFailedGrade(studentnumber)
-    } 
+    }
   }
 
   failedBefore(studentnumber) {
@@ -96,6 +98,10 @@ class CourseStatsCounter {
   removeFromFailed(studentnumber) {
     delete this.students.failed[studentnumber]
     delete this.students.failedMany[studentnumber]
+  }
+
+  removeFromPassed(studentnumber) {
+    delete this.students.passed[studentnumber]
   }
 
   markPassingGrade(studentnumber) {
