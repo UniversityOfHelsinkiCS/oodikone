@@ -216,17 +216,17 @@ export const getTextIn = (texts, language) => {
   return null
 }
 
-export const useTabs = (id, initialTab, { location, push }) => {
-  const [ tab, setTab ] = useState(null)
-  const [ didMount, setDidMount ] = useState(false)
+export const useTabs = (id, initialTab, { location, push }) => {
+  const [tab, setTab] = useState(null)
+  const [didMount, setDidMount] = useState(false)
 
-  const pushToUrl = newTab => {
+  const pushToUrl = (newTab) => {
     push({
       pathname: location.pathname,
       search: qs.stringify({ ...qs.parse(location.search), [id]: newTab })
     })
   }
-  
+
   useEffect(() => {
     const params = qs.parse(location.search)
     let queryTab = params[id]

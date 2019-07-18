@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { Tab, Grid, Radio, Menu } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
+import { shape } from 'prop-types'
 import { dataSeriesType, viewModeNames } from './Panes/util'
 import PassRate from './Panes/passRate'
 import Distribution from './Panes/distribution'
 import Tables from './Panes/tables'
-import { useTabs } from '../../../common'
+import { useTabs } from '../../../common'
 
 import './resultTabs.css'
 
@@ -16,64 +17,13 @@ const paneViewIndex = {
 }
 
 const ResultTabs = (props) => {
-  const [ tab, setTab ] = useTabs(
+  const [tab, setTab] = useTabs(
     'cs_tab',
     0,
     props.history
   )
-  const [ viewMode, setViewMode ] = useState(viewModeNames.CUMULATIVE)
-  const [ isRelative, setIsRelative ] = useState(false)
-
-  const getPanes = () => {
-    const { primary, comparison } = props
-
-    const paneMenuItems = [
-      {
-        menuItem: { key: 'Table', icon: 'table', content: 'Table' },
-        renderFn: () =>
-          (<Tables
-            comparison={comparison}
-            primary={primary}
-            viewMode={viewMode}
-          />)
-      },
-      {
-        menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
-        renderFn: () =>
-          (<PassRate
-            comparison={comparison}
-            primary={primary}
-            viewMode={viewMode}
-            isRelative={isRelative && comparison}
-          />)
-      },
-      {
-        menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
-        renderFn: () =>
-          (<Distribution
-            comparison={comparison}
-            primary={primary}
-            viewMode={viewMode}
-            isRelative={isRelative && comparison}
-          />)
-      }
-    ]
-
-    return paneMenuItems.map((p) => {
-      const { menuItem, renderFn } = p
-      return {
-        menuItem,
-        render: () => (
-          <Grid padded="vertically" columns="equal">
-            <Grid.Row className="modeSelectorRow">
-              {renderViewModeSelector()}
-            </Grid.Row>
-            {renderFn()}
-          </Grid>
-        )
-      }
-    })
-  }
+  const [viewMode, setViewMode] = useState(viewModeNames.CUMULATIVE)
+  const [isRelative, setIsRelative] = useState(false)
 
   const handleTabChange = (...params) => {
     const resetViewMode = params[1].activeIndex === paneViewIndex.TABLE
@@ -83,8 +33,8 @@ const ResultTabs = (props) => {
     setViewMode(resetViewMode ? viewModeNames.CUMULATIVE : viewMode)
   }
 
-  const handleModeChange = (viewMode) => {
-    setViewMode(viewMode)
+  const handleModeChange = (newViewMode) => {
+    setViewMode(newViewMode)
   }
 
   const renderViewModeSelector = () => {
@@ -140,6 +90,57 @@ const ResultTabs = (props) => {
     )
   }
 
+  const getPanes = () => {
+    const { primary, comparison } = props
+
+    const paneMenuItems = [
+      {
+        menuItem: { key: 'Table', icon: 'table', content: 'Table' },
+        renderFn: () =>
+          (<Tables
+            comparison={comparison}
+            primary={primary}
+            viewMode={viewMode}
+          />)
+      },
+      {
+        menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
+        renderFn: () =>
+          (<PassRate
+            comparison={comparison}
+            primary={primary}
+            viewMode={viewMode}
+            isRelative={isRelative && comparison}
+          />)
+      },
+      {
+        menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
+        renderFn: () =>
+          (<Distribution
+            comparison={comparison}
+            primary={primary}
+            viewMode={viewMode}
+            isRelative={isRelative && comparison}
+          />)
+      }
+    ]
+
+    return paneMenuItems.map((p) => {
+      const { menuItem, renderFn } = p
+      return {
+        menuItem,
+        render: () => (
+          <Grid padded="vertically" columns="equal">
+            <Grid.Row className="modeSelectorRow">
+              {renderViewModeSelector()}
+            </Grid.Row>
+            {renderFn()}
+          </Grid>
+        )
+      }
+    })
+  }
+
   return (
     <div>
       <Tab
@@ -153,7 +154,8 @@ const ResultTabs = (props) => {
 
 ResultTabs.propTypes = {
   primary: dataSeriesType.isRequired,
-  comparison: dataSeriesType
+  comparison: dataSeriesType,
+  history: shape({}).isRequired
 }
 
 ResultTabs.defaultProps = {
