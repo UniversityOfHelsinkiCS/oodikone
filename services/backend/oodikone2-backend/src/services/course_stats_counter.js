@@ -76,8 +76,6 @@ class CourseStatsCounter {
     if (passed) {
       if (!improved && !this.students.passed[studentnumber]) {
         this.markPassedSemester(semester)
-      } else if (studentnumber === '012327001') {
-        this.markPassedSemester(semester)
       }
       this.markPassingGrade(studentnumber)
     } else if (improved) {
