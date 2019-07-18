@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react'
 import moment from 'moment'
 import jwtDecode from 'jwt-decode'
 import Datetime from 'react-datetime'
 import { uniqBy, filter } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
+import qs from 'query-string'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, TOKEN_NAME } from '../constants'
 import toskaLogo from '../assets/toska.png'
 import irtomikko from '../assets/irtomikko.png'
@@ -212,4 +214,39 @@ export const getTextIn = (texts, language) => {
     return texts[language] || texts.fi || texts.en || texts.sv || Object.values(texts)[0]
   }
   return null
+}
+
+export const useTabs = (id, initialTab, { location, push }) => {
+  const [ tab, setTab ] = useState(null)
+  const [ didMount, setDidMount ] = useState(false)
+
+  const pushToUrl = newTab => {
+    push({
+      pathname: location.pathname,
+      search: qs.stringify({ ...qs.parse(location.search), [id]: newTab })
+    })
+  }
+  
+  useEffect(() => {
+    const params = qs.parse(location.search)
+    let queryTab = params[id]
+    if (queryTab === undefined) {
+      setTab(initialTab)
+    } else {
+      queryTab = JSON.parse(queryTab)
+      if (tab !== queryTab) setTab(queryTab)
+    }
+    setDidMount(true)
+  }, [])
+
+  useEffect(() => {
+    if (tab !== undefined && didMount) pushToUrl(tab)
+  }, [tab])
+
+  return [
+    tab,
+    (e, { activeIndex }) => {
+      setTab(activeIndex)
+    }
+  ]
 }

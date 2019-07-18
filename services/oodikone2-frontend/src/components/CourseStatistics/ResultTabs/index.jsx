@@ -1,9 +1,11 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import { Tab, Grid, Radio, Menu } from 'semantic-ui-react'
+import { withRouter } from 'react-router-dom'
 import { dataSeriesType, viewModeNames } from './Panes/util'
 import PassRate from './Panes/passRate'
 import Distribution from './Panes/distribution'
 import Tables from './Panes/tables'
+import { useTabs } from '../../../common'
 
 import './resultTabs.css'
 
@@ -13,16 +15,17 @@ const paneViewIndex = {
   GRADE_DISTRIBUTION: 2
 }
 
-class ResultTabs extends Component {
-  state = {
-    activeIndex: paneViewIndex.TABLE,
-    viewMode: viewModeNames.CUMULATIVE,
-    isRelative: false
-  }
+const ResultTabs = (props) => {
+  const [ tab, setTab ] = useTabs(
+    'cs_tab',
+    0,
+    props.history
+  )
+  const [ viewMode, setViewMode ] = useState(viewModeNames.CUMULATIVE)
+  const [ isRelative, setIsRelative ] = useState(false)
 
-  getPanes = () => {
-    const { primary, comparison } = this.props
-    const { viewMode, isRelative } = this.state
+  const getPanes = () => {
+    const { primary, comparison } = props
 
     const paneMenuItems = [
       {
@@ -63,7 +66,7 @@ class ResultTabs extends Component {
         render: () => (
           <Grid padded="vertically" columns="equal">
             <Grid.Row className="modeSelectorRow">
-              {this.renderViewModeSelector()}
+              {renderViewModeSelector()}
             </Grid.Row>
             {renderFn()}
           </Grid>
@@ -72,25 +75,20 @@ class ResultTabs extends Component {
     })
   }
 
-  handleTabChange = (e, { activeIndex }) => {
-    const { viewMode, activeIndex: oldIndex } = this.state
-    const resetViewMode = oldIndex === paneViewIndex.TABLE
+  const handleTabChange = (...params) => {
+    const resetViewMode = params[1].activeIndex === paneViewIndex.TABLE
       && viewMode === viewModeNames.GRADES
 
-    this.setState({
-      activeIndex,
-      viewMode: resetViewMode ? viewModeNames.CUMULATIVE : viewMode
-    })
+    setTab(...params)
+    setViewMode(resetViewMode ? viewModeNames.CUMULATIVE : viewMode)
   }
 
-  handleModeChange = (viewMode) => {
-    this.setState({ viewMode })
+  const handleModeChange = (viewMode) => {
+    setViewMode(viewMode)
   }
 
-  renderViewModeSelector = () => {
-    const { activeIndex, viewMode } = this.state
-
-    const isTogglePane = activeIndex !== 0
+  const renderViewModeSelector = () => {
+    const isTogglePane = tab !== 0
 
     const getButtonMenu = () => (
       <Menu secondary>
@@ -99,7 +97,7 @@ class ResultTabs extends Component {
             key={name}
             name={name}
             active={viewMode === name}
-            onClick={() => this.handleModeChange(name)}
+            onClick={() => handleModeChange(name)}
           />))}
       </Menu>
     )
@@ -116,17 +114,17 @@ class ResultTabs extends Component {
               id={toggleId}
               checked={isToggleChecked}
               toggle
-              onChange={() => this.handleModeChange(newMode)}
+              onChange={() => handleModeChange(newMode)}
             />
             <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.STUDENT}</label>
           </div>
-          {this.props.comparison &&
+          {props.comparison &&
             <div className="toggleContainer">
               <label className="toggleLabel">Absolute</label>
               <Radio
                 toggle
-                checked={this.state.isRelative}
-                onChange={() => this.setState({ isRelative: !this.state.isRelative })}
+                checked={isRelative}
+                onChange={() => setIsRelative(!isRelative)}
               />
               <label className="toggleLabel">Relative</label>
             </div>
@@ -142,15 +140,15 @@ class ResultTabs extends Component {
     )
   }
 
-  render() {
-    return (
-      <div>
-        <Tab
-          panes={this.getPanes()}
-          onTabChange={this.handleTabChange}
-        />
-      </div>)
-  }
+  return (
+    <div>
+      <Tab
+        panes={getPanes()}
+        onTabChange={handleTabChange}
+        activeIndex={tab}
+      />
+    </div>
+  )
 }
 
 ResultTabs.propTypes = {
@@ -162,4 +160,4 @@ ResultTabs.defaultProps = {
   comparison: undefined
 }
 
-export default ResultTabs
+export default withRouter(ResultTabs)

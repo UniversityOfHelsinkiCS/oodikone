@@ -6,7 +6,7 @@ import TeacherSearchTab from '../TeacherSearchTab'
 import TeacherPage from '../TeacherPage'
 import TeacherStatistics from '../TeacherStatistics'
 import TeacherLeaderBoard from '../TeacherLeaderBoard'
-import { userRoles } from '../../common'
+import { userRoles, useTabs } from '../../common'
 
 const pane = (title, Content, icon) => ({
   menuItem: { key: title, content: title, icon },
@@ -17,7 +17,12 @@ const pane = (title, Content, icon) => ({
   )
 })
 
-const TeachersTabs = ({ admin }) => {
+const TeachersTabs = withRouter(({ admin, history }) => {
+  const [ tab, setTab ] = useTabs(
+    't_tab',
+    0,
+    history
+  )
   const panes = admin ? [
     pane('Statistics', TeacherStatistics, 'table'),
     pane('Leaderboard', TeacherLeaderBoard, 'trophy'),
@@ -28,9 +33,12 @@ const TeachersTabs = ({ admin }) => {
     <Tab
       menu={{ attached: false, borderless: true, tabular: true }}
       panes={panes}
+      activeIndex={tab}
+      onTabChange={setTab}
     />
   )
-}
+})
+
 class Teachers extends Component {
   state = {}
 
