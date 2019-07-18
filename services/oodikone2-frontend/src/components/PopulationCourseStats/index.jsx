@@ -275,7 +275,7 @@ class PopulationCourseStats extends Component {
             reversed={reversed}
           />
           <Table.HeaderCell content={0} />
-          {courseGradesTypes.map(g => <Table.HeaderCell content={g} />)}
+          {courseGradesTypes.map(g => <Table.HeaderCell content={g} key={g} />)}
           <Table.HeaderCell content="Other passed" />
         </Table.Row>
       </Table.Header>
