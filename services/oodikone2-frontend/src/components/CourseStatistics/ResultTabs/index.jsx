@@ -1,9 +1,12 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import { Tab, Grid, Radio, Menu } from 'semantic-ui-react'
+import { withRouter } from 'react-router-dom'
+import { shape } from 'prop-types'
 import { dataSeriesType, viewModeNames } from './Panes/util'
 import PassRate from './Panes/passRate'
 import Distribution from './Panes/distribution'
 import Tables from './Panes/tables'
+import { useTabs } from '../../../common'
 
 import './resultTabs.css'
 
@@ -13,16 +16,82 @@ const paneViewIndex = {
   GRADE_DISTRIBUTION: 2
 }
 
-class ResultTabs extends Component {
-  state = {
-    activeIndex: paneViewIndex.TABLE,
-    viewMode: viewModeNames.CUMULATIVE,
-    isRelative: false
+const ResultTabs = (props) => {
+  const [tab, setTab] = useTabs(
+    'cs_tab',
+    0,
+    props.history
+  )
+  const [viewMode, setViewMode] = useState(viewModeNames.CUMULATIVE)
+  const [isRelative, setIsRelative] = useState(false)
+
+  const handleTabChange = (...params) => {
+    const resetViewMode = params[1].activeIndex === paneViewIndex.TABLE
+      && viewMode === viewModeNames.GRADES
+
+    setTab(...params)
+    setViewMode(resetViewMode ? viewModeNames.CUMULATIVE : viewMode)
   }
 
-  getPanes = () => {
-    const { primary, comparison } = this.props
-    const { viewMode, isRelative } = this.state
+  const handleModeChange = (newViewMode) => {
+    setViewMode(newViewMode)
+  }
+
+  const renderViewModeSelector = () => {
+    const isTogglePane = tab !== 0
+
+    const getButtonMenu = () => (
+      <Menu secondary>
+        {Object.values(viewModeNames).map(name => (
+          <Menu.Item
+            key={name}
+            name={name}
+            active={viewMode === name}
+            onClick={() => handleModeChange(name)}
+          />))}
+      </Menu>
+    )
+
+    const getToggle = () => {
+      const isToggleChecked = viewMode === viewModeNames.STUDENT
+      const newMode = isToggleChecked ? viewModeNames.CUMULATIVE : viewModeNames.STUDENT
+      const toggleId = 'viewModeToggle'
+      return (
+        <div style={{ display: 'flex' }}>
+          <div className="toggleContainer">
+            <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.CUMULATIVE}</label>
+            <Radio
+              id={toggleId}
+              checked={isToggleChecked}
+              toggle
+              onChange={() => handleModeChange(newMode)}
+            />
+            <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.STUDENT}</label>
+          </div>
+          {props.comparison &&
+            <div className="toggleContainer">
+              <label className="toggleLabel">Absolute</label>
+              <Radio
+                toggle
+                checked={isRelative}
+                onChange={() => setIsRelative(!isRelative)}
+              />
+              <label className="toggleLabel">Relative</label>
+            </div>
+          }
+        </div>
+      )
+    }
+
+    return (
+      <div className="modeSelectorContainer">
+        {isTogglePane ? getToggle() : getButtonMenu()}
+      </div>
+    )
+  }
+
+  const getPanes = () => {
+    const { primary, comparison } = props
 
     const paneMenuItems = [
       {
@@ -63,7 +132,7 @@ class ResultTabs extends Component {
         render: () => (
           <Grid padded="vertically" columns="equal">
             <Grid.Row className="modeSelectorRow">
-              {this.renderViewModeSelector()}
+              {renderViewModeSelector()}
             </Grid.Row>
             {renderFn()}
           </Grid>
@@ -72,94 +141,25 @@ class ResultTabs extends Component {
     })
   }
 
-  handleTabChange = (e, { activeIndex }) => {
-    const { viewMode, activeIndex: oldIndex } = this.state
-    const resetViewMode = oldIndex === paneViewIndex.TABLE
-      && viewMode === viewModeNames.GRADES
-
-    this.setState({
-      activeIndex,
-      viewMode: resetViewMode ? viewModeNames.CUMULATIVE : viewMode
-    })
-  }
-
-  handleModeChange = (viewMode) => {
-    this.setState({ viewMode })
-  }
-
-  renderViewModeSelector = () => {
-    const { activeIndex, viewMode } = this.state
-
-    const isTogglePane = activeIndex !== 0
-
-    const getButtonMenu = () => (
-      <Menu secondary>
-        {Object.values(viewModeNames).map(name => (
-          <Menu.Item
-            key={name}
-            name={name}
-            active={viewMode === name}
-            onClick={() => this.handleModeChange(name)}
-          />))}
-      </Menu>
-    )
-
-    const getToggle = () => {
-      const isToggleChecked = viewMode === viewModeNames.STUDENT
-      const newMode = isToggleChecked ? viewModeNames.CUMULATIVE : viewModeNames.STUDENT
-      const toggleId = 'viewModeToggle'
-      return (
-        <div style={{ display: 'flex' }}>
-          <div className="toggleContainer">
-            <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.CUMULATIVE}</label>
-            <Radio
-              id={toggleId}
-              checked={isToggleChecked}
-              toggle
-              onChange={() => this.handleModeChange(newMode)}
-            />
-            <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.STUDENT}</label>
-          </div>
-          {this.props.comparison &&
-            <div className="toggleContainer">
-              <label className="toggleLabel">Absolute</label>
-              <Radio
-                toggle
-                checked={this.state.isRelative}
-                onChange={() => this.setState({ isRelative: !this.state.isRelative })}
-              />
-              <label className="toggleLabel">Relative</label>
-            </div>
-          }
-        </div>
-      )
-    }
-
-    return (
-      <div className="modeSelectorContainer">
-        {isTogglePane ? getToggle() : getButtonMenu()}
-      </div>
-    )
-  }
-
-  render() {
-    return (
-      <div>
-        <Tab
-          panes={this.getPanes()}
-          onTabChange={this.handleTabChange}
-        />
-      </div>)
-  }
+  return (
+    <div>
+      <Tab
+        panes={getPanes()}
+        onTabChange={handleTabChange}
+        activeIndex={tab}
+      />
+    </div>
+  )
 }
 
 ResultTabs.propTypes = {
   primary: dataSeriesType.isRequired,
-  comparison: dataSeriesType
+  comparison: dataSeriesType,
+  history: shape({}).isRequired
 }
 
 ResultTabs.defaultProps = {
   comparison: undefined
 }
 
-export default ResultTabs
+export default withRouter(ResultTabs)
