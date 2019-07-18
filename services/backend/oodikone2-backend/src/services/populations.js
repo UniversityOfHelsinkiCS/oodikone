@@ -554,6 +554,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   const lock = new AsyncLock()
   const stats = {}
+
   await Promise.all(
     courses.map(course => (
       new Promise(async res => {
@@ -579,6 +580,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
           coursestats.addCourseDiscipline(discipline_id, name)
           bottlenecks.disciplines[discipline_id] = name
         })
+
         course.credits.forEach(credit => {
           const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
           const semester = getPassingSemester(parseInt(query.endYear, 10), date)
