@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
 import { func, arrayOf, shape, bool, string, object, oneOfType } from 'prop-types'
 import { Form, Button, Message, Icon, Grid } from 'semantic-ui-react'

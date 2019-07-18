@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { string, func, arrayOf, shape } from 'prop-types'
 import { getFaculties } from '../../../redux/faculties'
