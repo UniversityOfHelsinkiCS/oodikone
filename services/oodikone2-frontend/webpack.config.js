@@ -11,6 +11,7 @@ const apiAddress = process.env.BACKEND_ADDR || 'localhost'
 const backendURL = `http://${apiAddress}:${apiServerPort}`
 const BASE_PATH = process.env.BASE_PATH || '/'
 const sentrydryrun = !Boolean(process.env.SENTRY_RELEASE_VERSION)
+const sentryreleaseversion = sentrydryrun ? 'dryRun' : process.env.SENTRY_RELEASE_VERSION
 
 module.exports = (env, args) => {
   const { mode } = args
@@ -73,7 +74,8 @@ module.exports = (env, args) => {
           USER_ADMINER_URL: JSON.stringify(process.env.USER_ADMINER_URL),
           ADMINER_URL: JSON.stringify(process.env.ADMINER_URL),
           KONE_ADMINER_URL: JSON.stringify(process.env.KONE_ADMINER_URL),
-          USAGE_ADMINER_URL: JSON.stringify(process.env.USAGE_ADMINER_URL)
+          USAGE_ADMINER_URL: JSON.stringify(process.env.USAGE_ADMINER_URL),
+          SENTRY_RELEASE_VERSION: JSON.stringify(sentryreleaseversion)
         }
       }),
       new MiniCssExtractPlugin({
@@ -84,7 +86,7 @@ module.exports = (env, args) => {
         include: 'dist',
         ignoreFile: '.sentrycliignore',
         ignore: ['node_modules', 'webpack.config.js'],
-        release: sentrydryrun ? 'dryRun' : process.env.SENTRY_RELEASE_VERSION,
+        release: sentryreleaseversion,
         dryRun: sentrydryrun
       })
     ],
