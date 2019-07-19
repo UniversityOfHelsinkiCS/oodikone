@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Segment, Header, Button, Placeholder } from 'semantic-ui-react'
 import { string, func, shape } from 'prop-types'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 
 import { getCompiledPath } from '../../../common'
 import { callApi } from '../../../apiConnection'

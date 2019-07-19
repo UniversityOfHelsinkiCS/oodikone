@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import { func, arrayOf, object, shape, string, bool, oneOfType, number } from 'prop-types'
 import { Card, Icon, Button } from 'semantic-ui-react'
 import _ from 'lodash'
