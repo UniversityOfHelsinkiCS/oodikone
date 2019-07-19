@@ -4,8 +4,7 @@ const conf = require('../conf')
 
 const sequelize = new Sequelize(conf.DB_URL, {
   schema: conf.DB_SCHEMA,
-  logging: false,
-  operatorsAliases: false
+  logging: false
 })
 const runMigrations = async () => {
   try {
