@@ -19,7 +19,8 @@ class CourseStatsCounter {
       failedMany: {},
       improvedPassedGrade: {},
       notParticipated: { ...allstudents },
-      notParticipatedOrFailed: { ...allstudents }
+      notParticipatedOrFailed: { ...allstudents },
+      markedToSemester: {}
     }
     this.stats = {
       students: 0,
@@ -67,6 +68,10 @@ class CourseStatsCounter {
     this.stats.passingSemesters[semester]++
   }
 
+  markToSemester(studentnumber) {
+    this.students.markedToSemester[studentnumber] = true
+  }
+
   markCredit(studentnumber, grade, passed, failed, improved, semester) {
     // studentnumber = `${shajs('sha256').update(process.env.key + studentnumber).digest('hex')}`
     this.markAttempt()
@@ -74,8 +79,9 @@ class CourseStatsCounter {
     this.markGrade(grade, passed, failed, improved)
     this.markToAll(studentnumber)
     if (passed) {
-      if (!improved && !this.students.passed[studentnumber]) {
+      if (!this.students.markedToSemester[studentnumber]) {
         this.markPassedSemester(semester)
+        this.markToSemester(studentnumber)
       }
       this.markPassingGrade(studentnumber)
     } else if (improved) {
