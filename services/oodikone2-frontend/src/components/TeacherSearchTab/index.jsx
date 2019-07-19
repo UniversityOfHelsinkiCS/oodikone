@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react'
 import { shape } from 'prop-types'
 import { Message } from 'semantic-ui-react'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import TeacherSearch from '../TeacherSearch'
 
 const TeacherSearchTab = ({ history }) => (

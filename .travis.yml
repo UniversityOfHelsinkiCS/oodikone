@@ -17,6 +17,7 @@ before_script:
   - docker --version
   - docker-compose --version
   - export AUTHOR_NAME="$(git log -1 ${TRAVIS_COMMIT} --pretty="%aN")"
+  - export SENTRY_RELEASE_VERSION=${IMAGE}-${TRAVIS_COMMIT}
 
 jobs:
   include:
@@ -26,10 +27,10 @@ jobs:
         - TAG=staging
       script:
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - source scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.yml ${TAG}
+        - source scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.yml ${TAG} ${SENTRY_RELEASE_VERSION}
         - docker ps
         - cat nginx/log
-        - TAG=${TAG} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f &
+        - TAG=${TAG} SENTRY_RELEASE_VERSION=${SENTRY_RELEASE_VERSION} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f &
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
         - time npm run test_services
         - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
@@ -38,7 +39,7 @@ jobs:
       deploy:
         provider: script
         skip_cleanup: true
-        script: "TAG=${TAG} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"Staging auto deployment started!\\\"}\" ${SLACKBOT_URL}"
+        script: "TAG=${TAG} SENTRY_RELEASE_VERSION=${SENTRY_RELEASE_VERSION} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"Staging auto deployment started!\\\"}\" ${SLACKBOT_URL}"
         on:
           branch: master
     - stage: build & test & push & deploy latest
@@ -47,10 +48,10 @@ jobs:
         - TAG=latest
       script:
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - source scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.yml ${TAG}
+        - source scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.yml ${TAG} ${SENTRY_RELEASE_VERSION}
         - docker ps
         - cat nginx/log
-        - TAG=${TAG} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f &
+        - TAG=${TAG} SENTRY_RELEASE_VERSION=${SENTRY_RELEASE_VERSION} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f &
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
         - time npm run test_services
         - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
@@ -59,7 +60,7 @@ jobs:
       deploy:
         provider: script
         skip_cleanup: true
-        script: "TAG=${TAG} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release started auto deployment!\\\"}\" ${SLACKBOT_URL}"
+        script: "TAG=${TAG} SENTRY_RELEASE_VERSION=${SENTRY_RELEASE_VERSION} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml push && curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"${TRAVIS_TAG} release started auto deployment!\\\"}\" ${SLACKBOT_URL}"
         on:
           tags: true
 stages:
