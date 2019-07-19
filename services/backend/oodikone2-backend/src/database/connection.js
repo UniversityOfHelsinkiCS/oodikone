@@ -5,16 +5,14 @@ const conf = require('../conf-backend')
 const sequelize = new Sequelize(conf.DB_URL, {
   schema: conf.DB_SCHEMA,
   searchPath: conf.DB_SCHEMA,
-  logging: false,
-  operatorsAliases: false
+  logging: false
 })
 sequelize.query(`SET SESSION search_path to ${conf.DB_SCHEMA}`)
 
 const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
   schema: conf.DB_SCHEMA_KONE,
   searchPath: conf.DB_SCHEMA_KONE,
-  logging: false,
-  operatorsAliases: false
+  logging: false
 })
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
 
