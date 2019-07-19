@@ -217,7 +217,7 @@ export const getTextIn = (texts, language) => {
 }
 
 export const useTabs = (id, initialTab, { location, replace }) => {
-  const [tab, setTab] = useState(null)
+  const [tab, setTab] = useState(-1)
   const [didMount, setDidMount] = useState(false)
 
   const pushToUrl = (newTab) => {
