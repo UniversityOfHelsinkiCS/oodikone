@@ -71,6 +71,7 @@ const updateStudent = async (student, stan) => {
     if (err.parent.code === '25P02') {
       console.log('Transaction aborted')
     } else if (err.message === 'deadlock detected') {
+      console.log(err)
       console.log('Deadlock suicide')
       stan.close()
       process.exit(1)
