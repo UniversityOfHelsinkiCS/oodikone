@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Header, Segment, Tab } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import { bool, shape, func } from 'prop-types'
 import './courseStatistics.css'
 import SearchForm from './SearchForm'

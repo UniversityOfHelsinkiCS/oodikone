@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { Header, Segment, Icon, Button } from 'semantic-ui-react'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import { func, shape, string } from 'prop-types'
 
 import { getCompiledPath } from '../../../common'

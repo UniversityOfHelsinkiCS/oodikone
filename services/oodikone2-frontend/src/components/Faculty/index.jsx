@@ -1,5 +1,5 @@
 import React from 'react'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
 import FacultySelector from './FacultySelector'
 
