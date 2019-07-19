@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Segment, Header, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
 import { func, arrayOf, shape, bool } from 'prop-types'
 import { getSemesters } from '../../../redux/semesters'
