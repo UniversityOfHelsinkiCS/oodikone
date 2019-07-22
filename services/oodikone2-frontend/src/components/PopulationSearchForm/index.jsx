@@ -12,7 +12,7 @@ import moment from 'moment'
 
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
-import { getPopulationFilters, setPopulationFilter } from '../../redux/populationFilters'
+import { getPopulationFilters, setPopulationFilter, clearPopulationFilters } from '../../redux/populationFilters'
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 import { getSemesters } from '../../redux/semesters'
 import { transferTo } from '../../populationFilters'
@@ -37,6 +37,7 @@ class PopulationSearchForm extends Component {
     getPopulationCourses: func.isRequired,
     getMandatoryCourses: func.isRequired,
     getPopulationFilters: func.isRequired,
+    clearPopulationFilters: func.isRequired,
     setPopulationFilter: func.isRequired,
     clearPopulations: func.isRequired,
     queries: shape({}).isRequired,
@@ -158,6 +159,8 @@ class PopulationSearchForm extends Component {
     ]).then(() => {
       if (queryCodes[0] === 'KH50_001') {
         this.props.setPopulationFilter(transferTo(false))
+      } else {
+        this.props.clearPopulationFilters()
       }
       this.setState({ isLoading: false })
       // not a good solution FIX
@@ -763,6 +766,7 @@ export default withRouter(connect(mapStateToProps, {
   getPopulationFilters,
   getMandatoryCourses,
   setPopulationFilter,
+  clearPopulationFilters,
   getDegreesAndProgrammes,
   clearPopulations,
   setLoading,
