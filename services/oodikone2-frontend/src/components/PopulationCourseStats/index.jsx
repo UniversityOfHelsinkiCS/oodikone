@@ -482,7 +482,7 @@ class PopulationCourseStats extends Component {
             </Button>
           </Form.Field>
         </Form>
-        <Segment basic style={{ overflowX: 'auto' }}>
+        <Segment basic style={{ overflowX: 'auto', maxHeight: '80vh' }}>
           {this.renderActiveView()}
         </Segment>
       </div>
