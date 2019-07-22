@@ -30,7 +30,7 @@ const MandatoryCourseLabels = ({
           <Form.Button content="Add" disabled={newLabel.length === 0 || labels.some(e => newLabel.trim() === e.label)} onClick={() => addLabel(studyProgramme, { label: newLabel.trim() }) && setNewLabel('')} />
         </Form.Group>
       </Form>
-      <Table compact>
+      <Table compact className="fixed-header">
         <Table.Body>
           {_.orderBy(labels, ['orderNumber']).map((label, index) => (
             <Table.Row key={label.id}>

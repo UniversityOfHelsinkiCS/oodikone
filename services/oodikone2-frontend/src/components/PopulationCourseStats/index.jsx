@@ -339,7 +339,7 @@ class PopulationCourseStats extends Component {
     }
 
     return (
-      <Table celled sortable>
+      <Table celled sortable className="fixed-header">
         {getTableHeader()}
         <Table.Body>
           {courseStatistics.map(getCoursePopUpRow)}
@@ -430,7 +430,7 @@ class PopulationCourseStats extends Component {
     }
 
     return (
-      <Table celled sortable>
+      <Table className="fixed-header" celled sortable>
         {getTableHeader()}
         <Table.Body>
           {courseStatistics.map(getCourseRow)}
@@ -481,7 +481,7 @@ class PopulationCourseStats extends Component {
             </Button>
           </Form.Field>
         </Form>
-        <Segment basic style={{ overflowX: 'auto', maxHeight: '80vh' }}>
+        <Segment basic style={{ overflow: 'scroll', maxHeight: '80vh', padding: 0 }}>
           {this.renderActiveView()}
         </Segment>
       </div>

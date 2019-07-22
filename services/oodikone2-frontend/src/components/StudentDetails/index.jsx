@@ -152,7 +152,7 @@ class StudentDetails extends Component {
     }
 
     return (
-      <Table>
+      <Table className="fixed-header">
         <Table.Header>
           <Table.Row>
             {studyRightHeaders.map((header, index) => (

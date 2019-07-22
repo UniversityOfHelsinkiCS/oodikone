@@ -46,6 +46,7 @@ const SearchResultTable = ({
         unstackable
         selectable={selectable}
         definition={definition}
+        className="fixed-header"
       >
         {getHeaderRow(headers)}
         {getTableBody(rows, rowClickFn, selectable)}

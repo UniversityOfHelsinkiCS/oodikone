@@ -8,7 +8,7 @@ import PopulationCourseSelect from './PopulationCourseSelect'
 const PopulationFilters = ({ form, setFormValue }) => (
   <div>
     <PopulationCourseSelect />
-    <Table definition textAlign="center">
+    <Table definition textAlign="center" className="fixed-header">
       <Table.Body>
         {Object.values(fields).map(field => (
           <Table.Row key={field}>
