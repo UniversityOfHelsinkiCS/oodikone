@@ -51,7 +51,7 @@ class TeacherStatisticsTable extends Component {
     return (statistics.length === 0 ?
       <Segment basic content="No statistics found for the given query." />
       :
-      <Table structured celled textAlign="center" sortable selectable>
+      <Table structured celled textAlign="center" sortable selectable className="fixed-header">
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell

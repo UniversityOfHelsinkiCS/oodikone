@@ -54,7 +54,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
       <Loader active={loading} inline="centered">
         Loading...
       </Loader>
-      <Table structured celled>
+      <Table structured celled className="fixed-header">
         <Table.Header>
           <Table.Row>
             {headerList.map(header => (

@@ -43,7 +43,7 @@ class UsageStatistics extends Component {
       {
         menuItem: 'By user',
         render: () => (
-          <Table celled>
+          <Table celled className="fixed-header">
             <Table.Body>
               {users.sort(byCount).map(user => (
                 <Table.Row key={user.name}>
@@ -62,7 +62,7 @@ class UsageStatistics extends Component {
       {
         menuItem: 'By endpoint',
         render: () => (
-          <Table celled>
+          <Table celled className="fixed-header">
             <Table.Body>
               {endpoints.sort(byCount).map(endpoint => (
                 <Table.Row key={endpoint.name}>
@@ -110,7 +110,7 @@ class UsageStatistics extends Component {
               className="controlIcon"
             />
           </h3>
-          <Table celled>
+          <Table celled className="fixed-header">
             <Table.Body>
               {entries.map(entry => (
                 <Table.Row key={entry.id}>
