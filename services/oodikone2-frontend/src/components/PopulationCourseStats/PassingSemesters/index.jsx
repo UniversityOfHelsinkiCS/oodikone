@@ -26,7 +26,7 @@ export default class PassingSemesters extends Component {
           onChange={this.handleChange}
           label="Show cumulative stats"
         />
-        <Table celled>
+        <Table celled className="fixed-header">
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell>Course name</Table.HeaderCell>

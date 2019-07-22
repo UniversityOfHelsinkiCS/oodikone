@@ -31,7 +31,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
   return (
     !hidden && (
       <Segment basic style={{ padding: '0' }} >
-        <Table selectable>
+        <Table selectable className="fixed-header">
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell content={title} />

@@ -40,3 +40,25 @@ html {
   justify-content: center;
   flex-direction: column;
 }
+
+/* --SEMANTIC UI STICKY TABLE HEADERS-- */
+
+.fixed-header thead tr:first-child th,
+.fixed-header thead tr:nth-child(2) th {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  z-index: 2;
+  background-color: white !important;
+}
+
+.fixed-header thead tr:nth-child(2) th {
+  top: 48px;
+}
+
+.fixed-header.table thead th:hover,
+.fixed-header.table thead th.sorted {
+  background-color: #f9fafb !important;
+}
+
+/* ------------------------------------ */
