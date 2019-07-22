@@ -18,22 +18,34 @@ stan.on('connect', function () {
 
   sub.on('message', async (msg) => {
     const data = JSON.parse(msg.getData())
-    if (data.studentInfo) {
-      await updateStudent(data, stan)
-    } else {
-      await updateMeta(data)
+    try {
+      if (data.studentInfo) {
+        await updateStudent(data, stan)
+      } else {
+        await updateMeta(data)
+      }
+      msg.ack()
+      stan.publish('status', `${data.studentInfo ? data.studentInfo.studentnumber : 'meta'}:DONE`, (err) => { if (err) console.log(err) })
+    } catch (err) {
+      console.log('update failed', err)
     }
-    msg.ack()
-    stan.publish('status', `${data.studentInfo ? data.studentInfo.studentnumber : 'meta'}:DONE`, (err) => { if (err) console.log(err) })
   })
   attSub.on('message', async (_) => {
-    await updateAttainmentMeta()
-    msg.ack()
+    try {
+      await updateAttainmentMeta()
+      msg.ack()
+    } catch (err) {
+      console.log('attainment meta update failed', err)
+    }
   })
   prioSub.on('message', async (msg) => {
-    const data = JSON.parse(msg.getData())
-    await updateStudent(data, stan)
-    msg.ack()
-    stan.publish('status', `${data.studentInfo.studentnumber}:DONE`, (err) => { if (err) console.log(err) })
+    try {
+      const data = JSON.parse(msg.getData())
+      await updateStudent(data, stan)
+      msg.ack()
+      stan.publish('status', `${data.studentInfo.studentnumber}:DONE`, (err) => { if (err) console.log(err) })
+    } catch (err) {
+      console.log('priority student update failed', err)
+    }
   })
 })
