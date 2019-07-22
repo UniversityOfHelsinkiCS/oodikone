@@ -71,7 +71,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
       <Loader active={loading} inline="centered">
         Loading...
       </Loader>
-      <Table celled structured>
+      <Table celled structured className="fixed-header">
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
