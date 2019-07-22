@@ -428,7 +428,7 @@ class PopulationStudents extends Component {
         menuItem: 'General',
         render: () => (
           <Tab.Pane>
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
               <SortableTable
                 getRowKey={s => s.studentNumber}
                 tableProps={{
@@ -450,7 +450,7 @@ class PopulationStudents extends Component {
         render: () => (
           <Tab.Pane>
             <div style={{ display: 'flex' }}>
-              <div style={{ overflowX: 'auto' }}>
+              <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
                 <SortableTable
                   getRowKey={s => s.studentNumber}
                   tableProps={{
@@ -481,15 +481,17 @@ class PopulationStudents extends Component {
         menuItem: 'Tags',
         render: () => (
           <Tab.Pane>
-            <TagPopulation
-              allChecker={this.state.checked}
-              handleAllCheck={() => this.handleAllCheck()}
-              falsifyChecks={() => this.falsifyChecks()}
-              tags={this.props.tags}
-              checkedStudents={this.state.checkedStudents}
-              studytrack={this.props.queryStudyrights[0]}
-            />
-            {tagRows}
+            <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
+              <TagPopulation
+                allChecker={this.state.checked}
+                handleAllCheck={() => this.handleAllCheck()}
+                falsifyChecks={() => this.falsifyChecks()}
+                tags={this.props.tags}
+                checkedStudents={this.state.checkedStudents}
+                studytrack={this.props.queryStudyrights[0]}
+              />
+              {tagRows}
+            </div>
           </Tab.Pane>
         )
       }
@@ -527,7 +529,7 @@ class PopulationStudents extends Component {
       return workbook
     }
     return (
-      <Fragment>
+      <Fragment style={{ overflowX: 'auto', maxHeight: '80vh' }}>
         <Grid columns="two">
           <Grid.Column><StudentNameVisibilityToggle /></Grid.Column>
           <Grid.Column textAlign="right">
