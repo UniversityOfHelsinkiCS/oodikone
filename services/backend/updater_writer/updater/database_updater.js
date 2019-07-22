@@ -60,7 +60,12 @@ const updateStudent = async (student, stan) => {
     console.log("old commit")
     console.timeEnd(studentInfo.studentnumber)
   } catch (err) {
-    await transaction.rollback()
+    console.log('could not commit', err2)
+    try {
+      await transaction.rollback()
+    } catch (err2) {
+      console.log('could not rollback', err2)
+    }
     if (err.parent.code === '25P02') {
       console.log('Transaction aborted')
     } else if (err.message === 'deadlock detected') {
@@ -69,7 +74,7 @@ const updateStudent = async (student, stan) => {
       stan.close()
       process.exit(1)
     } else {
-     console.log(err.parent)
+      console.log(err.parent)
     }
   }
 }
@@ -109,8 +114,12 @@ const updateMeta = async ({
     )
     await transaction.commit()
   } catch (err) {
-    await transaction.rollback()
-    console.log('aaaapuaaa')
+    console.log('could not commit', err)
+    try {
+      await transaction.rollback()
+    } catch (err2) {
+      console.log('could not rollback', err2)
+    }
   }
 }
 
