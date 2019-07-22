@@ -18,9 +18,9 @@ const updateAttainmentDates = async () => {
      WHERE course.code=cr.course_code`,
       { type: sequelize.QueryTypes.UPDATE, transaction, lock: transaction.LOCK.UPDATE }
     )
-    transaction.commit()
+    await transaction.commit()
   } catch (e) {
-    transaction.rollback()
+    await transaction.rollback()
   }
 }
 

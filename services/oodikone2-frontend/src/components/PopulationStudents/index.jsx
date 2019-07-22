@@ -529,7 +529,7 @@ class PopulationStudents extends Component {
       return workbook
     }
     return (
-      <Fragment style={{ overflowX: 'auto', maxHeight: '80vh' }}>
+      <Fragment>
         <Grid columns="two">
           <Grid.Column><StudentNameVisibilityToggle /></Grid.Column>
           <Grid.Column textAlign="right">

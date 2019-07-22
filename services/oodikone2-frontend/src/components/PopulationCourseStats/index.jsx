@@ -298,7 +298,6 @@ class PopulationCourseStats extends Component {
           .filter(g => g.status.passingGrade || g.status.improvedGrade)
           .reduce(countSumReducer, 0)
       }
-
       return (
         <Table.Row active={this.isActiveCourse(course)}>
           <Table.Cell
@@ -315,7 +314,7 @@ class PopulationCourseStats extends Component {
           <Table.Cell content={attempts} />
           <Table.Cell content={failedGrades} />
           {courseGradesTypes.map(g =>
-            <Table.Cell content={grades[g] ? grades[g].count || 0 : 0} />)
+            <Table.Cell content={grades[g] ? grades[g].count || 0 : 0} key={code + g} />)
           }
           <Table.Cell content={otherPassed} />
         </Table.Row>
