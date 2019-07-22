@@ -386,6 +386,9 @@ class PopulationSearchForm extends Component {
   getMinSelection = (startYear, semester) => (semester === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`)
 
   checkPreviousQuery = (query, previousQuery) => {
+    if (!previousQuery.studyRights) {
+      return false
+    }
     const sameProgramme = query.studyRights.programme === previousQuery.studyRights.programme
     const sameMonths = query.months === previousQuery.months
     const sameStartYear = query.startYear === previousQuery.startYear
