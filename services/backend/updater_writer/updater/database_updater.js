@@ -55,6 +55,7 @@ const updateStudent = async (student, stan) => {
   const { studentInfo, studyAttainments, semesterEnrollments, studyRights } = student
   const transaction = await sequelize.transaction()
   try {
+    console.time(studentInfo.studentnumber)
     await deleteStudentStudyrights(studentInfo.studentnumber, transaction) // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
 
     await Student.upsert(studentInfo, { transaction })
@@ -64,8 +65,12 @@ const updateStudent = async (student, stan) => {
     if (studyAttainments) await Promise.all(updateAttainments(studyAttainments, transaction))
 
     if (studyRights) await Promise.all(updateStudyRights(studyRights, transaction))
-
+    console.log("old transactions")
+    console.timeEnd(studentInfo.studentnumber)
+    console.time(studentInfo.studentnumber)
     await transaction.commit()
+    console.log("old commit")
+    console.timeEnd(studentInfo.studentnumber)
   } catch (err) {
     await transaction.rollback()
     if (err.parent.code === '25P02') {
@@ -121,8 +126,8 @@ const updateMeta = async ({
     await transaction.rollback()
     console.log('aaaapuaaa')
   }
-
 }
+
 module.exports = {
   updateStudent, updateMeta, updateAttainmentMeta
 }
