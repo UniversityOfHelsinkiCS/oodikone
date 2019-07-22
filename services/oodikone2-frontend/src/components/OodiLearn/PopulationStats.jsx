@@ -7,7 +7,7 @@ import selector from '../../selectors/oodilearnPopulations'
 const GRADES = ['Hyl.', 'TT', 'HT', 'Hyv.', '0', '1', '2', '3', '4', '5']
 
 const PopulationStats = ({ stats }) => (
-  <Table structured celled textAlign="center">
+  <Table structured celled textAlign="center" className="fixed-header">
     <Table.Header>
       <Table.Row>
         <Table.HeaderCell rowSpan={2} content="N" />

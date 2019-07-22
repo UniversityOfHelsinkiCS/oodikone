@@ -3,7 +3,7 @@ import { Table } from 'semantic-ui-react'
 import { shape, arrayOf, string } from 'prop-types'
 
 const ProfileTable = ({ series, categories, selected }) => (
-  <Table definition celled size="small">
+  <Table definition celled size="small" className="fixed-header">
     <Table.Header>
       <Table.Row>
         <Table.HeaderCell content={null} />

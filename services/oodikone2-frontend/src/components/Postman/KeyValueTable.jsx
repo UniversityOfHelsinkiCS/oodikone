@@ -10,7 +10,7 @@ const preStyle = {
 }
 
 const KeyValueTable = ({ data }) => (
-  <Table celled>
+  <Table celled className="fixed-header">
     <Table.Header>
       <Table.Row>
         <Table.HeaderCell content="Key" width={2} textAlign="center" />
