@@ -94,7 +94,7 @@ class CourseCodeMapper extends Component {
               If this is not the case use this to combine old and new course codes to each other."
           />
           <Loader active={pending} />
-          <Table striped celled>
+          <Table striped celled className="fixed-header">
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>Mandatory course</Table.HeaderCell>

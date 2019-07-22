@@ -83,22 +83,24 @@ class SortableTable extends Component {
     const sortDirection = name => (selected === name ? direction : null)
 
     return (
-      <Table sortable {...tableProps}>
+      <Table sortable {...tableProps} className="fixed-header">
         <Table.Header>
-          <Table.Row>
-            {columnsWithCollapsedHeaders.filter(c => !c.child && !(c.title == null)).map(c => (
-              <Table.HeaderCell
-                key={c.key}
-                content={c.title}
-                onClick={c.parent && collapsingHeaders && c.key !== 'general' ?
-                  this.handleCollapse({ title: this.verticalTitle(<Fragment>{c.headerProps.title}</Fragment>), headerProps: { ...c.headerProps, colSpan: 1, rowSpan: 2 }, key: c.key, collapsed: true, parent: c.parent }) :
-                  this.handleSort(c.key)}
-                sorted={c.parent ? undefined : sortDirection(c.key)}
-                {...c.headerProps}
-              />
-            ))
-            }
-          </Table.Row>
+          { columnsWithCollapsedHeaders.length > 0 &&
+            <Table.Row>
+              {columnsWithCollapsedHeaders.filter(c => !c.child && !(c.title == null)).map(c => (
+                <Table.HeaderCell
+                  key={c.key}
+                  content={c.title}
+                  onClick={c.parent && collapsingHeaders && c.key !== 'general' ?
+                    this.handleCollapse({ title: this.verticalTitle(<Fragment>{c.headerProps.title}</Fragment>), headerProps: { ...c.headerProps, colSpan: 1, rowSpan: 2 }, key: c.key, collapsed: true, parent: c.parent }) :
+                    this.handleSort(c.key)}
+                  sorted={c.parent ? undefined : sortDirection(c.key)}
+                  {...c.headerProps}
+                />
+              ))
+              }
+            </Table.Row>
+          }
           <Table.Row>
             {columns.filter(c => c.child && !(c.title == null) && !collapsed.map(cell => cell.headerProps.title).includes(c.childOf)).map(c =>
               (

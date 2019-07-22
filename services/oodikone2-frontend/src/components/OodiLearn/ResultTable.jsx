@@ -3,7 +3,7 @@ import { Table, Button } from 'semantic-ui-react'
 import { arrayOf, shape, func, oneOfType, string, number } from 'prop-types'
 
 const ResultTable = ({ results, idTitle, nameTitle }) => (results.length > 0) && (
-  <Table>
+  <Table className="fixed-header">
     <Table.Header>
       <Table.Row>
         <Table.HeaderCell content={idTitle} />
