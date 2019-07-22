@@ -12,7 +12,7 @@ class SearchResult extends Component {
         return (<Message content="No results matched query" />)
       }
       return (
-        <Table>
+        <Table className="fixed-header">
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell content="Student number" />
