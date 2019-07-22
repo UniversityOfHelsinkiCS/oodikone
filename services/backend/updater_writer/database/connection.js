@@ -6,12 +6,6 @@ const conf = require('../conf-backend')
 const sequelize = new Sequelize(conf.DB_URL, {
   schema: conf.DB_SCHEMA,
   searchPath: conf.DB_SCHEMA,
-  retry: {
-    max: 5,
-    match: [
-      Sequelize.TimeoutError
-    ]
-  },
   logging: false
 })
 sequelize.query(`SET SESSION search_path to ${conf.DB_SCHEMA}`)
