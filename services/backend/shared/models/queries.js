@@ -1,5 +1,4 @@
 const { sequelize, sequelizeKone } = require('../database/connection')
-const conf = require('../conf-backend')
 
 const getStudentNumbers = () => sequelize.query(
   `select
@@ -152,7 +151,7 @@ WHERE ct.teacher_id IN (:teacherids)
         type: sequelize.QueryTypes.SELECT,
       }
     )
-    if (stats.length !== 1) throw "expecting single row"
+    if (stats.length !== 1) throw 'expecting single row'
     const { courses, credits, students } = stats[0]
     return { name, id, programmeid, courses, credits, students }
   })

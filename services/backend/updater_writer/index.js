@@ -1,12 +1,10 @@
-const stan = require('node-nats-streaming').connect('updaterNATS', process.env.HOSTNAME, process.env.NATS_URI);
+const stan = require('node-nats-streaming').connect('updaterNATS', process.env.HOSTNAME, process.env.NATS_URI)
 const { updateStudent, updateMeta, updateAttainmentMeta } = require('./updater/database_updater')
-const { dumpDatabase } = require('./database/dump_database')
-const fs = require('fs')
 
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
-const opts = stan.subscriptionOptions();
-opts.setManualAckMode(true);
-opts.setAckWait(30 * 60 * 1000); // 1min
+const opts = stan.subscriptionOptions()
+opts.setManualAckMode(true)
+opts.setAckWait(30 * 60 * 1000) // 1min
 opts.setDeliverAllAvailable()
 opts.setDurableName('durable')
 opts.setMaxInFlight(1)
@@ -30,7 +28,7 @@ stan.on('connect', function () {
       console.log('update failed', err)
     }
   })
-  attSub.on('message', async (_) => {
+  attSub.on('message', async (msg) => {
     try {
       await updateAttainmentMeta()
       msg.ack()

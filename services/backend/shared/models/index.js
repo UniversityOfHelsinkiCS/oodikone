@@ -319,16 +319,16 @@ const SemesterEnrollment = sequelize.define('semester_enrollment', {
     type: Sequelize.DATE
   }
 }, {
-    indexes: [
-      {
-        fields: ['semestercode', 'studentnumber'],
-        unique: true
-      }, {
-        fields: ['studentnumber'],
-        name: 'semester_enrollment_studentnumber'
-      }
-    ]
-  })
+  indexes: [
+    {
+      fields: ['semestercode', 'studentnumber'],
+      unique: true
+    }, {
+      fields: ['studentnumber'],
+      name: 'semester_enrollment_studentnumber'
+    }
+  ]
+})
 
 const Provider = sequelize.define('provider', {
   providercode: {
@@ -362,13 +362,13 @@ const Transfers = sequelize.define('transfers', {
     type: Sequelize.STRING
   },
 }, {
-    indexes: [
-      {
-        fields: ['studentnumber'],
-        name: 'transfers_studentnumber'
-      }
-    ]
-  })
+  indexes: [
+    {
+      fields: ['studentnumber'],
+      name: 'transfers_studentnumber'
+    }
+  ]
+})
 
 const CourseProvider = sequelize.define('course_providers', {}, {
   indexes: [
@@ -422,9 +422,9 @@ const Migration = sequelize.define('migrations', {
     primaryKey: true
   }
 }, {
-    tableName: 'migrations',
-    timestamps: false
-  })
+  tableName: 'migrations',
+  timestamps: false
+})
 
 const CreditTeacher = sequelize.define('credit_teacher', {
   credit_id: {

@@ -11,50 +11,50 @@ const {
 const { updateAttainmentDates } = require('./update_attainment_dates')
 
 const updateAttainments = async (studyAttainments, transaction) => {
-  for ({ course } of studyAttainments) {
+  for (const { course } of studyAttainments) {
     await Course.upsert(course, { transaction })
   }
-  for ({ course } of studyAttainments) {
+  for (const { course } of studyAttainments) {
     const { disciplines } = course
     disciplines && disciplines.length > 0 && await Promise.all(disciplines.map(courseDiscipline => CourseDisciplines.upsert(courseDiscipline, { transaction })))
   }
-  for ({ course } of studyAttainments) {
+  for (const { course } of studyAttainments) {
     const { providers } = course
     providers.length > 0 && await Promise.all(providers.map(provider => Provider.upsert(provider, { transaction })))
   }
-  for ({ course } of studyAttainments) {
+  for (const { course } of studyAttainments) {
     const { courseproviders } = course
     courseproviders.length > 0 && await Promise.all(courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction })))
   }
-  for ({ credit } of studyAttainments) {
+  for (const { credit } of studyAttainments) {
     await Credit.upsert(credit, { transaction })
   }
-  for ({ creditTeachers } of studyAttainments) {
+  for (const { creditTeachers } of studyAttainments) {
     creditTeachers.length > 0 && await Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
   }
-  for ({ teachers } of studyAttainments) {
+  for (const { teachers } of studyAttainments) {
     teachers && teachers.length > 0 && await Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction })))
   }
 }
 
 const updateStudyRights = async (studentnumber, studyRights, transaction) => {
-  for ({ studyRightExtent } of studyRights) {
+  for (const { studyRightExtent } of studyRights) {
     await StudyrightExtent.upsert(studyRightExtent, { transaction })
   }
-  for ({ studyright } of studyRights) {
+  for (const { studyright } of studyRights) {
     // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
     await Studyright.destroy({ where: { student_studentnumber: studentnumber } }, { transaction })
     await Studyright.create(studyright, { transaction })
   }
-  for ({ elementDetails } of studyRights) {
+  for (const { elementDetails } of studyRights) {
     await Promise.all(elementDetails.map(elementdetails => ElementDetails.upsert(elementdetails, { transaction })))
   }
-  for ({ studyRightElements } of studyRights) {
+  for (const { studyRightElements } of studyRights) {
     // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
     await StudyrightElement.destroy({ where: { studentnumber } }, { transaction })
     await Promise.all(studyRightElements.map(StudyRightElement => StudyrightElement.create(StudyRightElement, { transaction })))
   }
-  for ({ transfers } of studyRights) {
+  for (const { transfers } of studyRights) {
     await Promise.all(transfers.map(transfer => Transfers.upsert(transfer, { transaction })))
   }
 }
@@ -71,11 +71,11 @@ const updateStudent = async (student, stan) => {
     if (studyAttainments) await updateAttainments(studyAttainments, transaction)
 
     if (studyRights) await updateStudyRights(studentInfo.studentnumber, studyRights, transaction)
-    console.log("old transactions")
+    console.log('old transactions')
     console.timeEnd(studentInfo.studentnumber)
     console.time(studentInfo.studentnumber)
     await transaction.commit()
-    console.log("old commit")
+    console.log('old commit')
     console.timeEnd(studentInfo.studentnumber)
   } catch (err) {
     console.log('could not commit', err)
