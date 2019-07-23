@@ -30,7 +30,7 @@ import {
   clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter
 } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
-import { getTextIn, userIsAdmin } from '../../common'
+import { getTextIn, userIsAdmin, cancelablePromise } from '../../common'
 
 const componentFor = {
   CreditsAtLeast,
@@ -87,10 +87,15 @@ class PopulationFilters extends Component {
     isAdmin: false
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     this.initialFilterLoading()
-    const admin = await userIsAdmin()
+    const admin = userIsAdmin()
     this.setState({ isAdmin: admin })
+  }
+
+  componentWillUnmount() {
+    if (this.untilCoursesLoaded) this.untilCoursesLoaded.cancel()
+    if (this.timeout) clearTimeout(this.timeout)
   }
 
   initialFilterLoading = async () => {
@@ -100,13 +105,14 @@ class PopulationFilters extends Component {
         if (data && !pending) {
           resolve()
         } else {
-          setTimeout(() => poll(resolve), 400)
+          this.timeout = setTimeout(() => poll(resolve), 400)
         }
       }
       return new Promise(poll)
     }
-    await untilCoursesLoaded()
-    this.updateFilterList(this.props.populationFilters.filtersFromBackend)
+    this.untilCoursesLoaded = cancelablePromise(untilCoursesLoaded())
+    const success = await this.untilCoursesLoaded.promise
+    if (success) this.updateFilterList(this.props.populationFilters.filtersFromBackend)
   }
 
   formatFilter = (filter) => {

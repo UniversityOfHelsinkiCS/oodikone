@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+// import { useState, useEffect } from 'react'
 // import { Progress } from 'semantic-ui-react'
 import { number, bool } from 'prop-types'
 
-const Progressbar = ({ time, pending }) => {
-  const [percentage, setPercentage] = useState(0)
+const Progressbar = (/* { time, pending } */) => (
+  /* const [percentage, setPercentage] = useState(0)
   const [complete, setComplete] = useState(false)
   const [timerId, setTimerId] = useState(null)
   const [timeoutId, setTimeoutId] = useState(null)
@@ -39,9 +39,9 @@ const Progressbar = ({ time, pending }) => {
     setPercentage(0)
     setComplete(false)
     startTimer()
-  }
+  } */
 
-  return null
+  null
   //  (
   //   <Progress
   //     percent={percentage}
@@ -50,7 +50,7 @@ const Progressbar = ({ time, pending }) => {
   //     color="blue"
   //   />
   // )
-}
+)
 
 Progressbar.propTypes = {
   time: number.isRequired,
