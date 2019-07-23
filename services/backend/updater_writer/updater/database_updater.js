@@ -37,7 +37,7 @@ const updateAttainments = async (studyAttainments, transaction) => {
   }
 }
 
-const updateStudyRights = async (studyRights, transaction) => {
+const updateStudyRights = async (studentnumber, studyRights, transaction) => {
   for ({ studyRightExtent } of studyRights) {
     await StudyrightExtent.upsert(studyRightExtent, { transaction })
   }
@@ -70,7 +70,7 @@ const updateStudent = async (student, stan) => {
 
     if (studyAttainments) await updateAttainments(studyAttainments, transaction)
 
-    if (studyRights) await updateStudyRights(studyRights, transaction)
+    if (studyRights) await updateStudyRights(studentInfo.studentnumber, studyRights, transaction)
     console.log("old transactions")
     console.timeEnd(studentInfo.studentnumber)
     console.time(studentInfo.studentnumber)
@@ -78,7 +78,7 @@ const updateStudent = async (student, stan) => {
     console.log("old commit")
     console.timeEnd(studentInfo.studentnumber)
   } catch (err) {
-    console.log('could not commit', err2)
+    console.log('could not commit', err)
     try {
       await transaction.rollback()
     } catch (err2) {
@@ -87,7 +87,6 @@ const updateStudent = async (student, stan) => {
     if (err.parent.code === '25P02') {
       console.log('Transaction aborted')
     } else if (err.message === 'deadlock detected') {
-      console.log(err)
       console.log('Deadlock suicide')
       stan.close()
       process.exit(1)
