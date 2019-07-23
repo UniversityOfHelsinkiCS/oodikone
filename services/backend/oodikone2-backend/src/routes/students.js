@@ -4,7 +4,7 @@ const userService = require('../services/userService')
 const Unit = require('../services/units')
 
 router.get('/students', async (req, res) => {
-  const { roles } = req
+  const { roles, decodedToken: { userId } } = req
 
   if (roles && roles.includes('admin')) {
     let results = []

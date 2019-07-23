@@ -1,6 +1,5 @@
 const sequelize = require('sequelize')
 const { Semester } = require('../models/index')
-const { Op } = sequelize
 
 const getSemestersAndYears = async () => {
   const semesters = await Semester.findAll({})
