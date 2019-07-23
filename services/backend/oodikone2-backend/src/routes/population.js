@@ -118,7 +118,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
   console.log(studentnumbers)
 
-  const { decodedToken: { userId }, roles } = req
+  const { decodedToken: { userId }, roles } = req
 
   if (roles && roles.includes('admin')) {
     studentnumberlist = studentnumbers
