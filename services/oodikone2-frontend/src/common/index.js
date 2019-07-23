@@ -71,20 +71,20 @@ export const getToken = async (forceNew = false) => {
   return token
 }
 
-export const userRoles = async () => {
-  const token = await getToken()
+export const userRoles = () => {
+  const token = getTokenWithoutRefresh()
   const decoded = decodeToken(token)
   const roles = decoded.roles.map(r => r.group_code)
   return roles
 }
-export const userRights = async () => {
-  const token = await getToken()
+export const userRights = () => {
+  const token = getTokenWithoutRefresh()
   const decoded = decodeToken(token)
   const { rights } = decoded
   return rights
 }
-export const userIsAdmin = async () => {
-  const roles = await userRoles()
+export const userIsAdmin = () => {
+  const roles = userRoles()
   return roles.includes('admin')
 }
 export const getAsUserWithoutRefreshToken = () => {
@@ -113,8 +113,8 @@ export const getIdWithoutRefreshToken = () => {
   const decoded = decodeToken(token)
   return decoded.id
 }
-export const getUserName = async () => {
-  const token = await getToken()
+export const getUserName = () => {
+  const token = getTokenWithoutRefresh()
   return token ? decodeToken(token).userId : null
 }
 
@@ -122,18 +122,18 @@ export const setUserLanguage = (language) => {
   localStorage.setItem('language', language)
 }
 
-export const getUserLanguage = async () => {
+export const getUserLanguage = () => {
   let lang = localStorage.getItem('language')
   if (!lang) {
-    const token = await getToken()
+    const token = getTokenWithoutRefresh()
     lang = decodeToken(token).language
     setUserLanguage(lang)
   }
   return lang
 }
 
-export const userIsEnabled = async () => {
-  const token = await getToken()
+export const userIsEnabled = () => {
+  const token = getTokenWithoutRefresh()
   return token ? decodeToken(token).enabled : false
 }
 
@@ -244,4 +244,26 @@ export const useTabs = (id, initialTab, { location, replace }) => {
       setTab(activeIndex)
     }
   ]
+}
+
+export const cancelablePromise = (promise) => {
+  let hasCanceled = false
+
+  const wrappedPromise = new Promise(async (res, rej) => {
+    try {
+      await promise
+      if (hasCanceled) res(false)
+      res(true)
+    } catch (e) {
+      console.log('e', e)
+      rej(e)
+    }
+  })
+
+  return {
+    promise: wrappedPromise,
+    cancel: () => {
+      hasCanceled = true
+    }
+  }
 }
