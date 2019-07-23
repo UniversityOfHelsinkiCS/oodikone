@@ -19,7 +19,7 @@ import { transferTo } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { getTagsByStudytrackAction } from '../../redux/tags'
-import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, userIsAdmin } from '../../common'
+import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, userIsAdmin, cancelablePromise } from '../../common'
 import { setLoading } from '../../redux/graphSpinner'
 import './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
@@ -73,7 +73,7 @@ class PopulationSearchForm extends Component {
     }
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const { studyProgrammes, semesters, location } = this.props
     if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
       this.setState({ query: this.initialQuery() }) // eslint-disable-line
@@ -85,7 +85,7 @@ class PopulationSearchForm extends Component {
     if (location.search) {
       this.fetchPopulationFromUrlParams()
     }
-    const admin = await userIsAdmin()
+    const admin = userIsAdmin()
     this.setState({ isAdmin: admin })
   }
 
@@ -100,6 +100,10 @@ class PopulationSearchForm extends Component {
     if (location.search && queryParamsChanged) {
       this.fetchPopulationFromUrlParams()
     }
+  }
+
+  componentWillUnmount() {
+    this.fetchPopulationPromises.cancel()
   }
 
   months(year, term) { // eslint-disable-line
@@ -144,19 +148,23 @@ class PopulationSearchForm extends Component {
     this.pushQueryToUrl(query)
   }
 
-  fetchPopulation = (query) => {
+  fetchPopulation = async (query) => {
     const { selectedTag } = this.state
     const queryCodes = Object.values(query.studyRights).filter(e => e != null)
     const uuid = uuidv4()
     const request = { ...query, studyRights: queryCodes, uuid }
     this.setState({ isLoading: true })
     this.props.setLoading()
-    Promise.all([
+
+    this.fetchPopulationPromises = cancelablePromise(Promise.all([
       this.props.getPopulationStatistics({ ...query, uuid, tag: selectedTag }),
       this.props.getPopulationCourses(request),
       this.props.getPopulationFilters(request),
       this.props.getMandatoryCourses(query.studyRights.programme)
-    ]).then(() => {
+    ]))
+
+    const success = await this.fetchPopulationPromises.promise
+    if (success) {
       if (queryCodes[0] === 'KH50_001') {
         this.props.setPopulationFilter(transferTo(false))
       } else {
@@ -165,7 +173,7 @@ class PopulationSearchForm extends Component {
       this.setState({ isLoading: false })
       // not a good solution FIX
       this.setState({ selectedTag: '' })
-    })
+    }
   }
 
   handleYearSelection = (momentYear) => {
