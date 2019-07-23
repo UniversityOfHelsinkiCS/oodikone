@@ -30,10 +30,10 @@ class PopulationStudents extends Component {
     checkedStudents: []
   }
 
-  async componentDidMount() {
-    const roles = await userRoles()
+  componentDidMount() {
+    const roles = userRoles()
     const admin = roles.includes('admin')
-    await this.props.getTagsByStudytrack(this.props.queryStudyrights[0])
+    this.props.getTagsByStudytrack(this.props.queryStudyrights[0])
     this.setState({ admin, containsStudyTracks: this.containsStudyTracks() })
 
     const initialCheckedStudents = []
