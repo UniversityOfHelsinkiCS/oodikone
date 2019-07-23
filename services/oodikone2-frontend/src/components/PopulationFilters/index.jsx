@@ -94,7 +94,7 @@ class PopulationFilters extends Component {
   }
 
   componentWillUnmount() {
-    this.untilCoursesLoaded.cancel()
+    if (this.untilCoursesLoaded) this.untilCoursesLoaded.cancel()
     if (this.timeout) clearTimeout(this.timeout)
   }
 
