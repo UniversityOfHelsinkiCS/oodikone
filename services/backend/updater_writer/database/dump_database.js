@@ -16,7 +16,7 @@ const dumpDatabase = async () => {
 
   dumpProcess.on('exit', async (code) => {
     if (code !== 0) {
-      throw new Error('pg_dump: Bad exit code (' + code + ')');
+      throw new Error('pg_dump: Bad exit code (' + code + ')')
     } else {
       console.log('database dump created')
     }

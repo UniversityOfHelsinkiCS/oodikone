@@ -33,7 +33,7 @@ test.after.always(async () => {
   const tagToAdd = { text: 'mooc-2013' }
   console.log('ennd  bfefore')
 
-  let res = await api
+  await api
     .delete('/api/students/014424850/tags')
     .send(tagToAdd)
     .set('x-access-token', token)

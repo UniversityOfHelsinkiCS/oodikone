@@ -1,5 +1,5 @@
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async (queryInterface) => {
     // If you need old migrations, you can find them from 86b1aa1a3930a94f527bb5fe63ba0c76e5ca4d75
     return queryInterface.sequelize.transaction(async transaction => {
       await queryInterface.sequelize.query(`
