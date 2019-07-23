@@ -151,7 +151,6 @@ class PopulationSearchForm extends Component {
     const request = { ...query, studyRights: queryCodes, uuid }
     this.setState({ isLoading: true })
     this.props.setLoading()
-    this.props.clearPopulationFilters()
     Promise.all([
       this.props.getPopulationStatistics({ ...query, uuid, tag: selectedTag }),
       this.props.getPopulationCourses(request),
@@ -160,6 +159,8 @@ class PopulationSearchForm extends Component {
     ]).then(() => {
       if (queryCodes[0] === 'KH50_001') {
         this.props.setPopulationFilter(transferTo(false))
+      } else {
+        this.props.clearPopulationFilters()
       }
       this.setState({ isLoading: false })
       // not a good solution FIX
