@@ -37,7 +37,7 @@ const updateAttainments = async (studyAttainments, transaction) => {
   }
 }
 
-const updateStudyRights = async (studyRights, transaction) => {
+const updateStudyRights = async (studentnumber, studyRights, transaction) => {
   for ({ studyRightExtent } of studyRights) {
     await StudyrightExtent.upsert(studyRightExtent, { transaction })
   }
@@ -70,7 +70,7 @@ const updateStudent = async (student, stan) => {
 
     if (studyAttainments) await updateAttainments(studyAttainments, transaction)
 
-    if (studyRights) await updateStudyRights(studyRights, transaction)
+    if (studyRights) await updateStudyRights(studentInfo.studentnumber, studyRights, transaction)
     console.log("old transactions")
     console.timeEnd(studentInfo.studentnumber)
     console.time(studentInfo.studentnumber)
