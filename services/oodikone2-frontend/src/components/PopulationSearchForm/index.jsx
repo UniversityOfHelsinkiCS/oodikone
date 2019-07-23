@@ -103,7 +103,7 @@ class PopulationSearchForm extends Component {
   }
 
   componentWillUnmount() {
-    this.fetchPopulationPromises.cancel()
+    if (this.fetchPopulationPromises) this.fetchPopulationPromises.cancel()
   }
 
   months(year, term) { // eslint-disable-line
