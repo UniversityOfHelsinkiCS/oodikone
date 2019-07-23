@@ -22,22 +22,17 @@ class CreditAccumulationGraphHighCharts extends Component {
     super(props)
     this.state = {
       studentCreditLines: [],
-      options: []
+      options: [],
+      updateGraph: false
     }
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const { students } = this.props
-    await this.getMoreCreditLines(students)
-
-    this.createGraphOptions(
-      students,
-      this.props.selectedStudents,
-      this.props.currentGraphSize
-    )
+    this.getMoreCreditLines(students)
   }
 
-  async componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.students) {
       const nextStudents = nextProps.students.map(student => student.studentNumber)
       const oldStudents = this.props.students.map(student => student.studentNumber)
@@ -46,24 +41,35 @@ class CreditAccumulationGraphHighCharts extends Component {
         nextStudents.some(student => !oldStudents.includes(student)) ||
         oldStudents.some(student => !nextStudents.includes(student))
 
-
-      this.createGraphOptions(
-        nextProps.students,
-        nextProps.selectedStudents,
-        nextProps.currentGraphSize
-      )
-
       if (changed) {
         const { students } = nextProps
-        await this.getMoreCreditLines(students)
+        this.getMoreCreditLines(students)
+      } else {
+        this.createGraphOptions(
+          nextProps.students,
+          nextProps.selectedStudents,
+          nextProps.currentGraphSize
+        )
       }
+    }
+  }
+
+  componentDidUpdate() {
+    const { updateGraph } = this.state
+    const { students, selectedStudents, currentGraphSize } = this.props
+    if (updateGraph) {
+      this.createGraphOptions(
+        students,
+        selectedStudents,
+        currentGraphSize
+      )
     }
   }
 
   getMoreCreditLines = async (students) => {
     const studentCreditLines = this.state.studentCreditLines
       .concat(this.createStudentCreditLines(students))
-    this.setState({ studentCreditLines })
+    this.setState({ studentCreditLines, updateGraph: true })
   }
 
   getXAxisMonth = (date, startDate) =>
@@ -191,7 +197,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       }
     }
 
-    this.setState({ options })
+    this.setState({ options, updateGraph: false })
   }
 
   isSingleStudentGraph = () => this.props.students.length === 1
