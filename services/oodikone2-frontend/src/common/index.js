@@ -249,18 +249,21 @@ export const useTabs = (id, initialTab, { location, replace }) => {
 export const cancelablePromise = (promise) => {
   let hasCanceled = false
 
-  const wrappedPromise = new Promise(async (res) => {
+  const wrappedPromise = new Promise(async (res, rej) => {
     try {
-      const val = await promise
-      if (hasCanceled) throw new Error('Request cancelled')
+      await promise
+      if (hasCanceled) res(false)
       res(true)
     } catch (e) {
-      res(false)
+      console.log('e', e)
+      rej(e)
     }
   })
 
   return {
     promise: wrappedPromise,
-    cancel: () => hasCanceled = true
+    cancel: () => {
+      hasCanceled = true
+    }
   }
 }
