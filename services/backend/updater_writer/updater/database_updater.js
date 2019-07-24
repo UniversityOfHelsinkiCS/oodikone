@@ -29,12 +29,13 @@ const updateAttainments = async (studyAttainments, transaction) => {
   for (const { credit } of studyAttainments) {
     await Credit.upsert(credit, { transaction })
   }
-  for (const { creditTeachers } of studyAttainments) {
-    creditTeachers.length > 0 && await Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
-  }
   for (const { teachers } of studyAttainments) {
     teachers && teachers.length > 0 && await Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction })))
   }
+  // must be after teachers inserted
+  for (const { creditTeachers } of studyAttainments) {
+    creditTeachers.length > 0 && await Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
+}
 }
 
 const updateStudyRights = async (studentnumber, studyRights, transaction) => {
