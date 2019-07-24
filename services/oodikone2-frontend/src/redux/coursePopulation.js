@@ -31,6 +31,6 @@ const reducer = (state = { data: {} }, action) => {
     default:
       return state
   }
-
 }
+
 export default reducer
