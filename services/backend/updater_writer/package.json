@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npm run lint",
+    "test": "npm run lint && npm run jest",
     "jest": "NODE_ENV=test jest --runInBand --verbose",
     "test_docker": "docker exec -t updater_writer /bin/bash -c 'npm test'",
     "lint": "eslint --parser babel-eslint .",

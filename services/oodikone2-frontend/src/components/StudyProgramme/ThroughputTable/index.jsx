@@ -10,7 +10,7 @@ import { getThroughput } from '../../../redux/throughput'
 import { userRoles } from '../../../common'
 
 const ThroughputTable = ({ history, throughput, thesis, loading, error, studyprogramme,
-  dispatchGetThroughput, populationFound }) => {
+  dispatchGetThroughput }) => {
   const [roles, setRoles] = useState(undefined)
   const setFuckingRoles = async () => {
     setRoles(await userRoles())
@@ -22,7 +22,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
     const year = Number(yearLabel.slice(0, 4))
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
     history.push(`/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}&fetch=${!populationFound}`)
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`)
   }
   if (error) return <h1>Oh no so error {error}</h1>
   let GRADUATED_FEATURE_TOGGLED_ON = false
@@ -228,8 +228,7 @@ ThroughputTable.propTypes = {
   error: bool.isRequired,
   history: shape({
     push: func.isRequired
-  }).isRequired,
-  populationFound: bool.isRequired
+  }).isRequired
 }
 
 ThroughputTable.defaultProps = {
@@ -237,12 +236,9 @@ ThroughputTable.defaultProps = {
   thesis: undefined
 }
 
-const mapStateToProps = ({ populations }) => ({
-  populationFound: populations.data.students !== undefined
-})
 
 export default withRouter(connect(
-  mapStateToProps,
+  null,
   {
     dispatchGetThroughput: getThroughput
   }
