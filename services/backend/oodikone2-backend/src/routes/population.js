@@ -114,9 +114,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecode, yearcode } = req.query
   const semesters = ['FALL', 'SPRING']
   let studentnumberlist
-  console.log(coursecode, yearcode)
   const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
-  console.log(studentnumbers)
 
   const { decodedToken: { userId }, roles } = req
 
