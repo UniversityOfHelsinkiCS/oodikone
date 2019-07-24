@@ -21,6 +21,7 @@ const updateAttainmentDates = async () => {
     await transaction.commit()
   } catch (e) {
     await transaction.rollback()
+    throw e
   }
 }
 
