@@ -15,10 +15,10 @@ stan.on('connect', function () {
   const prioSub = stan.subscribe('PriorityWrite', 'updater.workers.prio', opts)
 
   sub.on('message', async (msg) => {
-    const data = JSON.parse(msg.getData())
     try {
+      const data = JSON.parse(msg.getData())
       if (data.studentInfo) {
-        await updateStudent(data, stan)
+        await updateStudent(data)
       } else {
         await updateMeta(data)
       }
@@ -39,7 +39,7 @@ stan.on('connect', function () {
   prioSub.on('message', async (msg) => {
     try {
       const data = JSON.parse(msg.getData())
-      await updateStudent(data, stan)
+      await updateStudent(data)
       msg.ack()
       stan.publish('status', `${data.studentInfo.studentnumber}:DONE`, (err) => { if (err) console.log(err) })
     } catch (err) {
