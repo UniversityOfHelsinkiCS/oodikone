@@ -19,11 +19,6 @@ describe('Updater works', () => {
 
     await updateMeta(meta)
     await updateStudent(students[0])
-    const studentsx = await Student.findAll({
-      order: [
-        ['studentnumber', 'DESC']]
-    })
-    expect(studentsx.length).toBe(1)
     await updateStudent(students[1])
     await updateStudent(students[2])
     await updateAttainmentMeta()
@@ -282,7 +277,7 @@ describe('Updater works', () => {
       const { id, transferdate, createdAt, updatedAt, studentnumber, studyrightid, sourcecode, targetcode } = transfers[0]
 
       expect(transfers.length).toBe(1)
-      expect(id).toBe(1)
+      expect(id).toBe('1')
       expect(transferdate.toISOString()).toBe(new Date('2009-07-30 21:00:00+00').toISOString())
       expect(createdAt).not.toBe(undefined)
       expect(updatedAt).not.toBe(undefined)
