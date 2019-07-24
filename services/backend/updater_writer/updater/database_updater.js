@@ -10,31 +10,37 @@ const {
 } = require('../models/index')
 const { updateAttainmentDates } = require('./update_attainment_dates')
 
+const awaitforEach = async (arr, func) => {
+  for (let i = 0; i < arr.length; ++i) {
+    await func(arr[i], i, arr)
+  }
+}
+
 const updateAttainments = async (studyAttainments, transaction) => {
   for (const { course } of studyAttainments) {
     await Course.upsert(course, { transaction })
   }
   for (const { course } of studyAttainments) {
     const { disciplines } = course
-    disciplines && disciplines.length > 0 && await Promise.all(disciplines.map(courseDiscipline => CourseDisciplines.upsert(courseDiscipline, { transaction })))
+    disciplines && disciplines.length > 0 && await awaitforEach(disciplines, async courseDiscipline => await CourseDisciplines.upsert(courseDiscipline, { transaction }))
   }
   for (const { course } of studyAttainments) {
     const { providers } = course
-    providers.length > 0 && await Promise.all(providers.map(provider => Provider.upsert(provider, { transaction })))
+    providers.length > 0 && await awaitforEach(providers, async provider => await Provider.upsert(provider, { transaction }))
   }
   for (const { course } of studyAttainments) {
     const { courseproviders } = course
-    courseproviders.length > 0 && await Promise.all(courseproviders.map(courseProvider => CourseProvider.upsert(courseProvider, { transaction })))
+    courseproviders.length > 0 && await awaitforEach(courseproviders, async courseProvider => await CourseProvider.upsert(courseProvider, { transaction }))
   }
   for (const { credit } of studyAttainments) {
     await Credit.upsert(credit, { transaction })
   }
   for (const { teachers } of studyAttainments) {
-    teachers && teachers.length > 0 && await Promise.all(teachers.map(teacher => Teacher.upsert(teacher, { transaction })))
+    teachers && teachers.length > 0 && await awaitforEach(teachers, async teacher => await Teacher.upsert(teacher, { transaction }))
   }
   // must be after teachers inserted
   for (const { creditTeachers } of studyAttainments) {
-    creditTeachers.length > 0 && await Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
+    creditTeachers.length > 0 && await awaitforEach(creditTeachers, async cT => await CreditTeacher.upsert(cT, { transaction }))
   }
 }
 
@@ -46,13 +52,13 @@ const updateStudyRights = async (studyRights, transaction) => {
     await Studyright.create(studyright, { transaction })
   }
   for (const { elementDetails } of studyRights) {
-    await Promise.all(elementDetails.map(elementdetails => ElementDetails.upsert(elementdetails, { transaction })))
+    await awaitforEach(elementDetails, async elementdetails => await ElementDetails.upsert(elementdetails, { transaction }))
   }
   for (const { studyRightElements } of studyRights) {
-    await Promise.all(studyRightElements.map(StudyRightElement => StudyrightElement.create(StudyRightElement, { transaction })))
+    await awaitforEach(studyRightElements, async StudyRightElement => await StudyrightElement.create(StudyRightElement, { transaction }))
   }
   for (const { transfers } of studyRights) {
-    await Promise.all(transfers.map(transfer => Transfers.upsert(transfer, { transaction })))
+    await awaitforEach(transfers, async transfer => await Transfers.upsert(transfer, { transaction }))
   }
 }
 
@@ -69,7 +75,7 @@ const updateStudent = async (student) => {
     await deleteStudentStudyrights(studentInfo.studentnumber, transaction) // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
 
     await Student.upsert(studentInfo, { transaction })
-    await Promise.all(semesterEnrollments.map(SE => SemesterEnrollment.upsert(SE, { transaction })))
+    await awaitforEach(semesterEnrollments, async SE => await SemesterEnrollment.upsert(SE, { transaction }))
 
     if (studyAttainments) await updateAttainments(studyAttainments, transaction)
 
@@ -93,24 +99,12 @@ const updateMeta = async ({
   const transaction = await sequelize.transaction()
 
   try {
-    await Promise.all(
-      courseTypeCodes.map(cT => CourseType.upsert(cT, { transaction }))
-    )
-    await Promise.all(
-      faculties.map(org => Organisation.upsert(org, { transaction }))
-    )
-    await Promise.all(
-      courseRealisationsTypes.map(cR => CourseRealisationType.upsert(cR, { transaction }))
-    )
-    await Promise.all(
-      semesters.map(s => Semester.upsert(s, { transaction }))
-    )
-    await Promise.all(
-      creditTypeCodes.map(cTC => CreditType.upsert(cTC, { transaction }))
-    )
-    await Promise.all(
-      disciplines.map(d => Discipline.upsert(d, { transaction }))
-    )
+    await awaitforEach(courseTypeCodes, async cT => await CourseType.upsert(cT, { transaction }))
+    await awaitforEach(faculties, async org => await Organisation.upsert(org, { transaction }))
+    await awaitforEach(courseRealisationsTypes, async cR => await CourseRealisationType.upsert(cR, { transaction }))
+    await awaitforEach(semesters, async s => await Semester.upsert(s, { transaction }))
+    await awaitforEach(creditTypeCodes, async cTC => await CreditType.upsert(cTC, { transaction }))
+    await awaitforEach(disciplines, async d => await Discipline.upsert(d, { transaction }))
     await transaction.commit()
   } catch (err) {
     await transaction.rollback()
