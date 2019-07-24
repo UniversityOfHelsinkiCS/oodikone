@@ -35,24 +35,20 @@ const updateAttainments = async (studyAttainments, transaction) => {
   // must be after teachers inserted
   for (const { creditTeachers } of studyAttainments) {
     creditTeachers.length > 0 && await Promise.all(creditTeachers.map(cT => CreditTeacher.upsert(cT, { transaction })))
-}
+  }
 }
 
-const updateStudyRights = async (studentnumber, studyRights, transaction) => {
+const updateStudyRights = async (studyRights, transaction) => {
   for (const { studyRightExtent } of studyRights) {
     await StudyrightExtent.upsert(studyRightExtent, { transaction })
   }
   for (const { studyright } of studyRights) {
-    // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
-    await Studyright.destroy({ where: { student_studentnumber: studentnumber } }, { transaction })
     await Studyright.create(studyright, { transaction })
   }
   for (const { elementDetails } of studyRights) {
     await Promise.all(elementDetails.map(elementdetails => ElementDetails.upsert(elementdetails, { transaction })))
   }
   for (const { studyRightElements } of studyRights) {
-    // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
-    await StudyrightElement.destroy({ where: { studentnumber } }, { transaction })
     await Promise.all(studyRightElements.map(StudyRightElement => StudyrightElement.create(StudyRightElement, { transaction })))
   }
   for (const { transfers } of studyRights) {
@@ -60,48 +56,33 @@ const updateStudyRights = async (studentnumber, studyRights, transaction) => {
   }
 }
 
-const updateStudent = async (student, stan) => {
+const deleteStudentStudyrights = async (studentnumber, transaction) => {
+  await Studyright.destroy({ where: { student_studentnumber: studentnumber } }, { transaction })
+  await StudyrightElement.destroy({ where: { studentnumber } }, { transaction })
+}
+
+const updateStudent = async (student) => {
   const { studentInfo, studyAttainments, semesterEnrollments, studyRights } = student
   const transaction = await sequelize.transaction()
   try {
     console.time(studentInfo.studentnumber)
+    await deleteStudentStudyrights(studentInfo.studentnumber, transaction) // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
+
     await Student.upsert(studentInfo, { transaction })
-    await Promise.all(semesterEnrollments.map(SE =>
-      SemesterEnrollment.upsert(SE, { transaction })))
+    await Promise.all(semesterEnrollments.map(SE => SemesterEnrollment.upsert(SE, { transaction })))
 
     if (studyAttainments) await updateAttainments(studyAttainments, transaction)
 
-    if (studyRights) await updateStudyRights(studentInfo.studentnumber, studyRights, transaction)
-    console.log('old transactions')
-    console.timeEnd(studentInfo.studentnumber)
-    console.time(studentInfo.studentnumber)
+    if (studyRights) await updateStudyRights(studyRights, transaction)
     await transaction.commit()
-    console.log('old commit')
-    console.timeEnd(studentInfo.studentnumber)
   } catch (err) {
-    console.log('could not commit', err)
-    try {
-      await transaction.rollback()
-    } catch (err2) {
-      console.log('could not rollback', err2)
-    }
-    if (err.parent.code === '25P02') {
-      console.log('Transaction aborted')
-    } else if (err.message === 'deadlock detected') {
-      console.log('Deadlock suicide')
-      stan.close()
-      process.exit(1)
-    } else {
-      console.log(err.parent)
-    }
+    await transaction.rollback()
+    throw err
   }
 }
+
 const updateAttainmentMeta = async () => {
-  try {
-    await updateAttainmentDates()
-  } catch (err) {
-    console.log('vitun vittu')
-  }
+  await updateAttainmentDates()
 }
 
 const updateMeta = async ({
@@ -132,12 +113,8 @@ const updateMeta = async ({
     )
     await transaction.commit()
   } catch (err) {
-    console.log('could not commit', err)
-    try {
-      await transaction.rollback()
-    } catch (err2) {
-      console.log('could not rollback', err2)
-    }
+    await transaction.rollback()
+    throw err
   }
 }
 
