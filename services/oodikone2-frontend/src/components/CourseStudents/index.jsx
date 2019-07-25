@@ -35,8 +35,6 @@ const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCourse
           />
         </div>
       ) : (<div />)}
-
-      fuck
     </div>
   )
 }
