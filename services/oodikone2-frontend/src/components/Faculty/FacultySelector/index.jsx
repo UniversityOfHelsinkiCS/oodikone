@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { string, func, arrayOf, shape } from 'prop-types'
@@ -6,10 +6,19 @@ import { getFaculties } from '../../../redux/faculties'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 
-const FacultySelector = ({ language, handleSelect, dispatchGetFaculties, faculties }) => {
+const FacultySelector = ({ language, dispatchGetFaculties, faculties }) => {
+  const [ selectedFaculties, setSelectedFaculties ] = useState([])
+
+  const handleSelect = code => setSelectedFaculties(
+    selectedFaculties.includes(code) ?
+      selectedFaculties.filter(c => c !== code) :
+      selectedFaculties.concat(code)
+  )
+
   const fetchFaculties = async () => {
-    await dispatchGetFaculties()
+    dispatchGetFaculties()
   }
+
   useEffect(() => {
     fetchFaculties()
   }, [])
@@ -28,19 +37,46 @@ const FacultySelector = ({ language, handleSelect, dispatchGetFaculties, faculti
     }
   ]
 
+  const selectedHeaders = [
+    ...headers,
+    {
+      key: 'students',
+      title: 'Students',
+      getRowVal: () => 1
+    },
+    {
+      key: 'teachers',
+      title: 'Teachers',
+      getRowVal: () => 1
+    }
+  ]
+
+  const selectedLength = selectedFaculties.length
+
   return (
-    <SortableTable
-      columns={headers}
-      getRowKey={faculty => faculty.code}
-      getRowProps={faculty => ({ onClick: () => handleSelect(faculty.code), style: { cursor: 'pointer' } })}
-      data={faculties}
-    />
+    <div>
+      { selectedLength !== faculties.length &&
+        <SortableTable
+          columns={headers}
+          getRowKey={faculty => faculty.code}
+          getRowProps={faculty => ({ onClick: () => handleSelect(faculty.code), style: { cursor: 'pointer' } })}
+          data={faculties.filter(({ code }) => !selectedFaculties.includes(code))}
+        />
+      }
+      { selectedLength !== 0 &&
+        <SortableTable
+          columns={selectedHeaders}
+          getRowKey={faculty => faculty.code}
+          getRowProps={faculty => ({ onClick: () => handleSelect(faculty.code), style: { cursor: 'pointer' } })}
+          data={faculties.filter(({ code }) => selectedFaculties.includes(code))}
+        />
+      }
+    </div>
   )
 }
 
 FacultySelector.propTypes = {
   language: string.isRequired,
-  handleSelect: func.isRequired,
   dispatchGetFaculties: func.isRequired,
   faculties: arrayOf(shape({})).isRequired
 }
