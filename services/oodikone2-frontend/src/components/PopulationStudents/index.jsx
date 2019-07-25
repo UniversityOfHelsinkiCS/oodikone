@@ -606,7 +606,7 @@ const mapStateToProps = ({ settings, populations, populationCourses, populationM
     showNames: settings.namesVisible,
     showList: settings.studentlistVisible,
     language: settings.language,
-    queryStudyrights: Object.values(populations.query.studyRights),
+    queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
     mandatoryCourses: populationMandatoryCourses.data,
     mandatoryPassed,
     tags: tags.data
