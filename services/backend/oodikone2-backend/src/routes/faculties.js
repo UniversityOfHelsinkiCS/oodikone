@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { all } = require('../services/organisations')
-const { getFacultyYearlyStats } = require('../services/analyticsService')
+const { getFacultyYearlyStats } = require('../services/analyticsService')
 
 router.get('/faculties', async (req, res) => {
   const faculties = await all()

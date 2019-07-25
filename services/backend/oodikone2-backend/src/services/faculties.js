@@ -6,8 +6,8 @@ const { Credit, StudyrightElement } = require('../models')
 
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { 'secret': process.env.USERSERVICE_SECRET } })
 
-const calculateFacultyYearlyStats = async () => {
-  const { data: faculties } = await client.get('/faculty_programmes')
+const calculateFacultyYearlyStats = async () => {
+  const { data: faculties } = await client.get('/faculty_programmes')
   const res = {}
   const lock = new AsyncLock()
 
