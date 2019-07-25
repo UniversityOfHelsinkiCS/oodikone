@@ -27,7 +27,6 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
     </Table.Row>
   )
 
-
   return (
     !hidden && (
       <Segment basic style={{ padding: '0' }} >

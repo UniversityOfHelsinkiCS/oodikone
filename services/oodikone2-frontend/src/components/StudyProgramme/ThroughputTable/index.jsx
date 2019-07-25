@@ -236,7 +236,6 @@ ThroughputTable.defaultProps = {
   thesis: undefined
 }
 
-
 export default withRouter(connect(
   null,
   {
