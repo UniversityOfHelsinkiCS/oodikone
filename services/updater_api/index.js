@@ -1,11 +1,11 @@
-var stan = require('node-nats-streaming').connect('updaterNATS', process.env.HOSTNAME, process.env.NATS_URI);
+var stan = require('node-nats-streaming').connect('updaterNATS', process.env.HOSTNAME, process.env.NATS_URI)
 const { getStudent, getMeta } = require('./doo_api_database_updater/updater_formatter')
 
 
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
-var opts = stan.subscriptionOptions();
-opts.setManualAckMode(true);
-opts.setAckWait(15 * 60 * 1000); // 15min
+var opts = stan.subscriptionOptions()
+opts.setManualAckMode(true)
+opts.setAckWait(15 * 60 * 1000) // 15min
 opts.setDeliverAllAvailable()
 opts.setDurableName('durable')
 opts.setMaxInFlight(3)
@@ -36,7 +36,7 @@ const handleMessage = async (priority) => async (msg) => { // :d
     }
     try {
       // TODO: check that data is properly structured(?)
-      stan.publish(priority ? 'PriorityWrite' :'UpdateWrite' , JSON.stringify(data), (err, guid) => {
+      stan.publish(priority ? 'PriorityWrite' :'UpdateWrite' , JSON.stringify(data), (err) => {
         if (err) {
           return err
         } else {
