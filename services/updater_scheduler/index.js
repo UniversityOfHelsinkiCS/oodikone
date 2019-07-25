@@ -1,7 +1,6 @@
 const { stan } = require('./src/nats_connection')
-const cron = require('node-cron');
+const cron = require('node-cron')
 const Schedule = require('./models')
-const fs = require('fs');
 const logger = require('./logger')
 const { updateStudentNumberList } = require('./src/student_list_updater')
 const { scheduleActiveStudents, scheduleAllStudentsAndMeta } = require('./src/schedule_students')
@@ -73,21 +72,21 @@ stan.on('connect', async () => {
   }, { timezone })
 
   cron.schedule('0 7 * * *', async () => {
-    stan.publish('RefreshOverview', null, (err, guid) => {
+    stan.publish('RefreshOverview', null, (err) => {
       if (err) {
         console.log('publish failed', 'RefreshOverview')
       } else {
         console.log('published', 'RefreshOverview')
       }
     })
-    stan.publish('RefreshStudyrightAssociations', null, (err, guid) => {
+    stan.publish('RefreshStudyrightAssociations', null, (err) => {
       if (err) {
         console.log('publish failed', 'RefreshStudyrightAssociations')
       } else {
         console.log('published', 'RefreshStudyrightAssociations')
       }
     })
-    stan.publish('updateAttainmentDates', null, (err, guid) => {
+    stan.publish('updateAttainmentDates', null, (err) => {
       if (err) {
         console.log('publish failed', 'UpdateAttainmentDates')
       } else {
@@ -104,13 +103,13 @@ stan.on('connect', async () => {
   }, { timezone })
 
   const scheduleSub = stan.subscribe('ScheduleAll')
-  
-  scheduleSub.on('message', async (_) => {
+
+  scheduleSub.on('message', async () => {
     scheduleAllStudentsAndMeta()
   })
-  const opts = stan.subscriptionOptions();
-  opts.setManualAckMode(true);
-  opts.setAckWait(30 * 60 * 1000); // 1min
+  const opts = stan.subscriptionOptions()
+  opts.setManualAckMode(true)
+  opts.setAckWait(30 * 60 * 1000) // 1min
   opts.setDeliverAllAvailable()
   opts.setDurableName('durable')
   opts.setMaxInFlight(20)
@@ -123,17 +122,17 @@ stan.on('connect', async () => {
     const status = message[1]
 
     switch (status) {
-      case 'DONE':
-        updatedCount = updatedCount + 1
-        break
-      case 'FETCHED':
-        fetchedCount = fetchedCount + 1
-        break
-      case 'SCHEDULED':
-        scheduledCount = scheduledCount + 1
-        break
-      default:
-        return
+    case 'DONE':
+      updatedCount = updatedCount + 1
+      break
+    case 'FETCHED':
+      fetchedCount = fetchedCount + 1
+      break
+    case 'SCHEDULED':
+      scheduledCount = scheduledCount + 1
+      break
+    default:
+      return
     }
     const isValidStudentId = (id) => {
       if (/^0\d{8}$/.test(id)) {

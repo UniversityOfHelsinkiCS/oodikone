@@ -131,7 +131,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
       endYear: 2200,
       studyRights: [],
       semesters,
-      months: 1000
+      months: 10000
     }, studentnumberlist)
 
     if (result.error) {

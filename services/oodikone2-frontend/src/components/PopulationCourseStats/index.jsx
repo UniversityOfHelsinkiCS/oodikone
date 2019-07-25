@@ -86,7 +86,6 @@ class PopulationCourseStats extends Component {
     }).isRequired,
     translate: func.isRequired,
     setPopulationFilter: func.isRequired,
-    populationSize: number.isRequired,
     selectedCourses: arrayOf(object).isRequired,
     removePopulationFilterOfCourse: func.isRequired,
     history: shape({}).isRequired,
@@ -94,6 +93,7 @@ class PopulationCourseStats extends Component {
     language: string.isRequired,
     query: shape({}).isRequired,
     pending: bool.isRequired,
+    selectedStudents: arrayOf(string).isRequired,
     years: shape({}) // eslint-disable-line
   }
 
@@ -144,7 +144,7 @@ class PopulationCourseStats extends Component {
   state = {
     sortCriteria: tableColumnNames.STUDENTS,
     reversed: true,
-    studentAmountLimit: Math.round(this.props.populationSize * 0.3),
+    studentAmountLimit: Math.round(this.props.selectedStudents.length * 0.3),
     codeFilter: '',
     activeView: null
   }
@@ -498,9 +498,7 @@ const mapStateToProps = (state) => {
     translate: getTranslate(state.locale),
     query: state.populations.query,
     years,
-    selectedCourses,
-    populationSize: state.populations.data.students.length > 0 ?
-      state.populations.data.students.length : 0
+    selectedCourses
   }
 }
 

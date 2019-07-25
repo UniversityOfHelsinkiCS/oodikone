@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npm run lint",
+    "test": "npm run lint && npm run jest",
     "jest": "NODE_ENV=test jest --runInBand --verbose",
     "test_docker": "docker exec -t updater_writer /bin/bash -c 'npm test'",
     "lint": "eslint --parser babel-eslint .",
@@ -12,7 +12,6 @@
     "dev": "nodemon index.js",
     "force_sync": "node -e \"require('./database/force_sync_database').sync()\"",
     "dump": "node -e \"require('./database/dump_database').dumpDatabase()\""
-
   },
   "author": "",
   "license": "ISC",
@@ -21,10 +20,10 @@
     "dotenv": "^8.0.0",
     "eslint": "^6.1.0",
     "jest": "^24.8.0",
-    "node-nats-streaming": "^0.2.2",
-    "nodemon": "^1.19.0",
-    "pg": "^7.10.0",
-    "sequelize": "^5.8.5",
+    "node-nats-streaming": "^0.2.6",
+    "nodemon": "^1.19.1",
+    "pg": "^7.11.0",
+    "sequelize": "^5.10.2",
     "umzug": "^2.2.0"
   }
 }

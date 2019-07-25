@@ -80,11 +80,6 @@ const formatStudyattainments = async (api, studentnumber) => {
 }
 const formatSemesterEnrollments = async (apidata, studentnumber) => await Promise.all(apidata.semesterEnrollments.map(apiEnrollment => mapper.semesterEnrollmentFromData(apiEnrollment, studentnumber)))
 
-const createOrUpdateCourseProviders = async data => {
-  const { providers, courseproviders } = mapper.learningOpportunityDataToCourseProviders(data)
-  await Promise.all(providers.map(provider => Provider.upsert(provider)))
-  await Promise.all(courseproviders.map(courseprovider => CourseProvider.upsert(courseprovider)))
-}
 const getStudent = async (studentnumber) => {
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student === null || api.student === undefined) {

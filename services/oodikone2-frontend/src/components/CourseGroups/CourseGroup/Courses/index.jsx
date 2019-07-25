@@ -1,6 +1,6 @@
 import React, { Fragment, Component } from 'react'
 import { Header, List, Loader, Placeholder, Icon } from 'semantic-ui-react'
-import { arrayOf, string, number } from 'prop-types'
+import { arrayOf, string, number, shape } from 'prop-types'
 import sortBy from 'lodash/sortBy'
 import { callApi } from '../../../../apiConnection/index'
 import '../courseGroup.css'
@@ -14,7 +14,7 @@ const courseColumnTypes = {
   STUDENTS: 'students'
 }
 
-const CourseItem = ({ course }) => { // eslint-disable-line react/prop-types
+const CourseItem = ({ course }) => {
   const { coursecode, teachername, credits, students, coursenames } = course
   const coursename = coursenames.fi
   return (
@@ -28,6 +28,15 @@ const CourseItem = ({ course }) => { // eslint-disable-line react/prop-types
       </List.Content>
     </List.Item>
   )
+}
+CourseItem.propTypes = {
+  course: shape({
+    coursecode: string,
+    teachername: string,
+    credits: number,
+    students: number,
+    coursenames: shape({})
+  }).isRequired
 }
 
 class Index extends Component {

@@ -67,7 +67,7 @@ const reducer = (state = { data: [], selected: [] }, action) => {
         selected: []
       }
     case 'TOGGLE_COURSE_SELECT':
-      return { // eslint-disable-line no-return-assign
+      return {
         ...state,
         selected: state.selected.find(course => course.code === action.code) ?
           state.selected.filter(cr => cr.code !== action.code) :

@@ -128,16 +128,16 @@ const highlevelnameFromElements = elements => {
   elements.forEach(element => {
     const name = defaultNameFromTexts(element.name)
     switch (element.element_id) {
-      case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
+    case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
+      subject = name
+      break
+    case ELEMENT_ID.DEGREE_MAJOR:
+      if (subject === undefined) {
         subject = name
-        break
-      case ELEMENT_ID.DEGREE_MAJOR:
-        if (subject === undefined) {
-          subject = name
-        }
-        break
-      default:
-        break
+      }
+      break
+    default:
+      break
     }
   })
   return `${subject}`
