@@ -71,6 +71,7 @@ const updateStudent = async (student) => {
   const { studentInfo, studyAttainments, semesterEnrollments, studyRights } = student
   const transaction = await sequelize.transaction()
   try {
+    console.log('starting', studentInfo.studentnumber)
     console.time(studentInfo.studentnumber)
     await deleteStudentStudyrights(studentInfo.studentnumber, transaction) // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
 
@@ -81,6 +82,8 @@ const updateStudent = async (student) => {
 
     if (studyRights) await updateStudyRights(studyRights, transaction)
     await transaction.commit()
+    console.log('ending', studentInfo.studentnumber)
+    console.timeEnd(studentInfo.studentnumber)
   } catch (err) {
     await transaction.rollback()
     throw err
