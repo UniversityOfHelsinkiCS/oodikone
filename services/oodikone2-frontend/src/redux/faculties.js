@@ -6,7 +6,13 @@ export const getFaculties = () => {
   return callController(route, prefix)
 }
 
-const reducer = (state = { data: [], pending: false, error: false }, action) => {
+export const getFacultiesYearlyStats = () => {
+  const route = '/faculties/yearlystats'
+  const prefix = 'GET_FACULTIES_YEARLY_STATS_'
+  return callController(route, prefix)
+}
+
+const reducer = (state = { data: [], yearlyStats: [], pending: false, error: false }, action) => {
   switch (action.type) {
     case 'GET_FACULTIES_ATTEMPT':
       return {
@@ -24,6 +30,19 @@ const reducer = (state = { data: [], pending: false, error: false }, action) => 
       return {
         ...state,
         data: action.response,
+        pending: false,
+        error: true
+      }
+    case 'GET_FACULTIES_YEARLY_STATS_FAILURE':
+      return {
+        ...state,
+        pending: false,
+        error: true
+      }
+    case 'GET_FACULTIES_YEARLY_STATS_SUCCESS':
+      return {
+        ...state,
+        yearlyStats: action.response,
         pending: false,
         error: true
       }

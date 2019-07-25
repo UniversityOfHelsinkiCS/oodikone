@@ -94,6 +94,13 @@ stan.on('connect', async () => {
         console.log('published', 'UpdateAttainmentDates')
       }
     })
+    stan.publish('updateFacultyYearlyStats', null, (err, guid) => {
+      if (err) {
+        console.log('publish failed', 'updateFacultyYearlyStats')
+      } else {
+        console.log('published', 'updateFacultyYearlyStats')
+      }
+    })
   }, { timezone })
 
   const scheduleSub = stan.subscribe('ScheduleAll')
