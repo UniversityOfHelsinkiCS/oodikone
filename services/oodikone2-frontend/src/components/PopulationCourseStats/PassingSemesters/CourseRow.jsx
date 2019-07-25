@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import { Table } from 'semantic-ui-react'
+import { arrayOf, shape, string, func, bool } from 'prop-types'
 
 import '../populationCourseStats.css'
 
@@ -58,8 +59,7 @@ const renderCumulativeStatistics = passingSemesters => (
   </Fragment>
 )
 
-// eslint-disable-next-line react/prop-types
-export default ({ statistics, cumulative, onCourseNameClickFn, isActiveCourseFn }) => {
+const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, isActiveCourseFn }) => {
   const { stats, course } = statistics
   const passingSemesters = cumulative ? stats.passingSemestersCumulative : stats.passingSemesters
   const isActive = isActiveCourseFn(course)
@@ -85,3 +85,15 @@ export default ({ statistics, cumulative, onCourseNameClickFn, isActiveCourseFn 
     </Table.Row>
   )
 }
+
+CourseRow.propTypes = {
+  statistics: shape({
+    course: shape({ code: string, name: shape({}) }),
+    stats: shape({ students: arrayOf(shape({})), passed: bool, passingSemesters: shape({}), passingSemestersCumulative: shape({}) })
+  }).isRequired,
+  cumulative: bool.isRequired,
+  onCourseNameClickFn: func.isRequired,
+  isActiveCourseFn: func.isRequired
+}
+
+export default CourseRow
