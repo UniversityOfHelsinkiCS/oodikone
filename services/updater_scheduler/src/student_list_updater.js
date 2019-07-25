@@ -28,18 +28,18 @@ async function updateStudentNumberList() {
       token: TOKEN
     }
   }
-  
+
   const getStudentNumberChecksum = studentNumber => {
     const studentNumberString = String(studentNumber)
     let checksumNumbers = [7, 3, 1]
     let checksum = 0
-    
+
     for (let i = 0; i < studentNumberString.length; i++) {
       // go from end t start
       let currentNumber = studentNumberString[studentNumberString.length - (i + 1)]
       checksum += currentNumber * (checksumNumbers[i % checksumNumbers.length])
     }
-    
+
     return (10 - (checksum % 10)) % 10
   }
   const requestStudent = async (studentNumber) => {
@@ -69,13 +69,13 @@ async function updateStudentNumberList() {
       try {
         const bulkOperation = Schedule.collection.initializeUnorderedBulkOp()
         for (const task of tasks) {
-          bulkOperation.find({ task: task.task }).upsert().updateOne(task);
+          bulkOperation.find({ task: task.task }).upsert().updateOne(task)
         }
-        await bulkOperation.execute();
-        return true;
+        await bulkOperation.execute()
+        return true
       } catch (err) {
-        console.log(err);
-        return false;
+        console.log(err)
+        return false
       }
     }
     await insertOrUpdateBulk(tasks)
@@ -102,6 +102,7 @@ async function updateStudentNumberList() {
       try {
         await writeStudents(studentsToAdd)
       } catch (e) {
+        console.log(e)
       }
       studentsToAdd = []
       console.log(`${i - minStudentNumber}/${maxStudentNumber - minStudentNumber} STUDENT LIST PROGRESS`)
