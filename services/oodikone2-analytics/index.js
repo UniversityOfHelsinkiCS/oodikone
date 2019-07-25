@@ -1,7 +1,7 @@
 const express = require('express')
 const _ = require('lodash')
 const morgan = require('morgan')
-const { Productivity, Throughput } = require('./src/models')
+const { Productivity, Throughput, FacultyStats } = require('./src/models')
 
 const app = express()
 const port = 4568
@@ -69,4 +69,17 @@ app.patch('/throughput', async (req, res) => {
   }
   res.status(200).end()
 })
+
+app.get('/facultystats', async (req, res) => {
+  const results = await FacultyStats.findAll()
+  res.status(200).json(results)
+})
+
+app.patch('/facultystats', async (req, res) => {
+  for (let [id, data] of Object.entries(req.body.data)) {
+    await FacultyStats.upsert({ id, data })
+  }
+  res.status(200).end()
+})
+
 app.listen(port, () => console.log(`Analytics listening on port ${port}!`))

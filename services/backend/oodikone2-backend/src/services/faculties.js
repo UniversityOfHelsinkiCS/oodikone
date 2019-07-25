@@ -6,7 +6,7 @@ const { Credit, StudyrightElement } = require('../models')
 
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { 'secret': process.env.USERSERVICE_SECRET } })
 
-const refreshFacultyYearlyStats = async () => {
+const calculateFacultyYearlyStats = async () => {
   const { data: faculties } = await client.get('/faculty_programmes')
   const res = {}
   const lock = new AsyncLock()
@@ -48,13 +48,9 @@ const refreshFacultyYearlyStats = async () => {
       facultyRes()
     })
   )))
+  return res
 }
 
-const start = async () => {
-  let stamp = new Date().getTime()
-  await refreshFacultyYearlyStats()
-  let now = new Date().getTime()
-  console.log(now - stamp)
+module.exports = {
+  calculateFacultyYearlyStats
 }
-
-start()

@@ -38,6 +38,16 @@ const patchThroughput = async (data) => {
   return response.data
 }
 
+const patchFacultyYearlyStats = async (data) => {
+  const response = await client.patch('/facultystats', { data })
+  return response.data
+}
+
+const getFacultyYearlyStats = async (data) => {
+  const response = await client.get('/facultystats', { data })
+  return response.data
+}
+
 module.exports = {
   ping,
   getProductivity,
@@ -45,5 +55,7 @@ module.exports = {
   patchProductivity,
   getThroughput,
   setThroughput,
-  patchThroughput
+  patchThroughput,
+  patchFacultyYearlyStats,
+  getFacultyYearlyStats
 }
