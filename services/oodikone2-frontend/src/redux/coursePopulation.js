@@ -8,7 +8,18 @@ export const getCoursePopulation = ({ coursecode, yearcode }) => {
 
   return callController(route, prefix, null, 'get', query, params)
 }
-const reducer = (state = { data: {} }, action) => {
+
+export const getCoursePopulationCourses = ({ coursecode, yearcode }) => {
+  const route = '/v2/populationstatistics/coursesbycoursecode'
+  const prefix = 'GET_COURSES_OF_COURSE_POP_'
+  const params = { coursecode, yearcode }
+  const query = { coursecode, yearcode }
+  const body = { coursecode, yearcode }
+
+  return callController(route, prefix, body, 'post', query, params)
+}
+
+const reducer = (state = { students: {}, courses: {} }, action) => {
   switch (action.type) {
     case 'GET_STUDENTS_OF_COURSE_ATTEMPT':
       return {
@@ -26,7 +37,25 @@ const reducer = (state = { data: {} }, action) => {
       return {
         ...state,
         pending: false,
-        data: action.response
+        students: action.response
+      }
+    case 'GET_COURSES_OF_COURSE_POP_ATTEMPT':
+      return {
+        ...state,
+        pending: true
+      }
+
+    case 'GET_COURSES_OF_COURSE_POP_FAILURE':
+      return {
+        ...state,
+        pending: false
+      }
+
+    case 'GET_COURSES_OF_COURSE_POP_SUCCESS':
+      return {
+        ...state,
+        pending: false,
+        courses: action.response
       }
     default:
       return state
