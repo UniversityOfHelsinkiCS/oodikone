@@ -4,10 +4,20 @@ const { updateStudent, updateMeta, updateAttainmentMeta } = require('./updater/d
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
 const opts = stan.subscriptionOptions()
 opts.setManualAckMode(true)
-opts.setAckWait(30 * 60 * 1000) // 1min
+opts.setAckWait(30 * 60 * 1000) // 30min
 opts.setDeliverAllAvailable()
 opts.setDurableName('durable')
 opts.setMaxInFlight(1)
+
+const republish = (msg) => {
+  console.log('republishing', msg.getSubject())
+  stan.publish(msg.getSubject() , msg.getData(), (err) => {
+    if (err) {
+      console.log(err)
+    }
+  })
+}
+
 stan.on('connect', function () {
 
   const sub = stan.subscribe('UpdateWrite', 'updater.workers', opts)
@@ -23,7 +33,6 @@ stan.on('connect', function () {
       } else {
         await updateMeta(data)
       }
-      msg.ack()
       stan.publish('status', `${data.studentInfo ? data.studentInfo.studentnumber : 'meta'}:DONE`, (err) => { if (err) console.log(err) })
     } catch (err) {
       let id = 'null'
@@ -31,22 +40,24 @@ stan.on('connect', function () {
         id = data.studentInfo ? data.studentInfo.studentnumber : 'meta'
       }
       console.log('update failed', id, err)
+      republish(msg)
     }
+    msg.ack()
   })
   attSub.on('message', async (msg) => {
     try {
       await updateAttainmentMeta()
-      msg.ack()
     } catch (err) {
       console.log('attainment meta update failed', err)
+      republish(msg)
     }
+    msg.ack()
   })
   prioSub.on('message', async (msg) => {
     let data = null
     try {
       data = JSON.parse(msg.getData())
       await updateStudent(data)
-      msg.ack()
       stan.publish('status', `${data.studentInfo.studentnumber}:DONE`, (err) => { if (err) console.log(err) })
     } catch (err) {
       let id = 'null'
@@ -54,6 +65,8 @@ stan.on('connect', function () {
         id = data.studentInfo ? data.studentInfo.studentnumber : 'meta'
       }
       console.log('priority student update failed', id, err)
+      republish(msg)
     }
+    msg.ack()
   })
 })
