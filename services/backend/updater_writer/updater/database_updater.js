@@ -82,7 +82,6 @@ const updateStudent = async (student) => {
 
     if (studyRights) await updateStudyRights(studyRights, transaction)
     await transaction.commit()
-    console.log('ending', studentInfo.studentnumber)
     console.timeEnd(studentInfo.studentnumber)
   } catch (err) {
     await transaction.rollback()
