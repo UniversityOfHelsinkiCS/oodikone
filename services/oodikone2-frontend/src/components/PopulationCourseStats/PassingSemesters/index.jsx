@@ -1,8 +1,15 @@
 import React, { Component } from 'react'
 import { Table, Checkbox } from 'semantic-ui-react'
+import { arrayOf, shape, string, func } from 'prop-types'
 import CourseRow from './CourseRow'
 
 export default class PassingSemesters extends Component {
+  propTypes = {
+    courseStatistics: arrayOf(shape({ course: shape({ code: string }) })).isRequired,
+    onCourseNameClickFn: func.isRequired,
+    isActiveCourseFn: func.isRequired
+  }
+
   constructor(props) {
     super(props)
 
@@ -16,7 +23,6 @@ export default class PassingSemesters extends Component {
   }
 
   render() {
-    // eslint-disable-next-line react/prop-types
     const { courseStatistics, onCourseNameClickFn, isActiveCourseFn } = this.props
     return (
       <div>

@@ -52,7 +52,7 @@ class ClusterGraph extends PureComponent {
   render() {
     const { series, minX, minY, maxX, maxY } = this.state
 
-    if (series['5'].data.length == 0 && series['4'].data.length == 0 && series['3'].data.length == 0 && series['2'].data.length == 0 && series['1'].data.length == 0 && series['0'].data.length == 0) {
+    if (series['5'].data.length === 0 && series['4'].data.length === 0 && series['3'].data.length === 0 && series['2'].data.length === 0 && series['1'].data.length === 0 && series['0'].data.length === 0) {
       return (<p>rippistä</p>)
     }
 
