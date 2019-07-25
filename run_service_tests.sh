@@ -9,4 +9,5 @@ docker-compose exec -T updater_scheduler npm test
 docker-compose exec -T userservice npm test
 docker-compose exec -T frontend npm test
 docker-compose exec -T analytics npm test
+docker-compose exec -T userservice npm test
 docker-compose exec -T usageservice npm test
