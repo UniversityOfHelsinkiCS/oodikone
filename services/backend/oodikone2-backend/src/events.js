@@ -42,8 +42,8 @@ const StartNats = () => {
   stan.on('connect', async function() {
     stan.subscribe('updateFacultyYearlyStats').on('message', handleMessage(async () => {
       try {
-       const data = await calculateFacultyYearlyStats()
-       await patchFacultyYearlyStats(data)
+        const data = await calculateFacultyYearlyStats()
+        await patchFacultyYearlyStats(data)
       } catch (e) {
         console.error(e)
         return false

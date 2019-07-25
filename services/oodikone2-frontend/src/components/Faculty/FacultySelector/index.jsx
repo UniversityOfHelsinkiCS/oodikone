@@ -3,68 +3,64 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Segment, Form } from 'semantic-ui-react'
 import { string, func, arrayOf, shape } from 'prop-types'
-import { uniq } from 'lodash'
-import { getFaculties, getFacultiesYearlyStats } from '../../../redux/faculties'
+import { uniq } from 'lodash'
+import { getFaculties as getFacultiesAction, getFacultiesYearlyStats as getFacultiesYearlyStatsAction } from '../../../redux/faculties'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 import YearFilter from '../../CourseStatistics/SearchForm/YearFilter'
 
 const FacultySelector = ({ language, getFaculties, getFacultiesYearlyStats, faculties, facultyYearlyStats }) => {
-  const [ selectedFaculties, setSelectedFaculties ] = useState([])
-  const [ fromYear, setFromYear ] = useState(-1)
-  const [ toYear, setToYear ] = useState(-1)
-  const [ years, setYears ] = useState([])
-
-  const handleSelect = code => setSelectedFaculties(
-    selectedFaculties.includes(code) ?
-      selectedFaculties.filter(c => c !== code) :
-      selectedFaculties.concat(code)
-  )
+  const [selectedFaculties, setSelectedFaculties] = useState([])
+  const [fromYear, setFromYear] = useState(-1)
+  const [toYear, setToYear] = useState(-1)
+  const [years, setYears] = useState([])
 
   useEffect(() => {
     getFaculties()
     getFacultiesYearlyStats()
   }, [])
 
+  const handleSelect = code => setSelectedFaculties(selectedFaculties.includes(code) ?
+    selectedFaculties.filter(c => c !== code) :
+    selectedFaculties.concat(code))
+
+  const getYearFilterData = () => {
+    const filterYears = uniq(facultyYearlyStats
+      .filter(f => selectedFaculties.includes(f.id))
+      .map(({ data }) => Object.keys(data).map(y => parseInt(y, 10)))
+      .reduce((acc, curr) => [...acc, ...curr], []))
+      .sort((a, b) => b - a)
+
+    return {
+      fromYear: filterYears[years.length - 1],
+      toYear: filterYears[0],
+      years: filterYears.map(y => ({ key: y, text: y, value: y }))
+    }
+  }
+
   useEffect(() => {
     const { fromYear: newFromYear, toYear: newToYear, years: newYears } = getYearFilterData()
     if (fromYear < newFromYear || fromYear > newToYear) setFromYear(newFromYear)
     if (toYear < newFromYear || toYear > newToYear) setToYear(newToYear)
     setYears(newYears)
-  }, [ selectedFaculties ])
-
-  const getYearFilterData = () => {
-    const years = uniq(
-      facultyYearlyStats
-        .filter(f => selectedFaculties.includes(f.id))
-        .map(({ data }) => Object.keys(data).map(y => parseInt(y)))
-        .reduce((acc, curr) => [ ...acc, ...curr ], [])
-    ).sort((a, b) => b - a)
-
-    return {
-      fromYear: years[years.length - 1],
-      toYear: years[0],
-      years: years.map(y => ({ key: y, text: y, value: y }))
-    }
-  }
+  }, [selectedFaculties])
 
   const handleYearChange = (e, target) => {
-    const { name, value } = target
-    name === 'fromYear' ?
-      setFromYear(value) :
-      setToYear(value)
+    const { name, value } = target
+    if (name === 'fromYear') setFromYear(value)
+    else setToYear(value)
   }
 
   const calculateAccumulativeStatsFor = (facultyCode) => {
     const yearlyStats = facultyYearlyStats.find(f => f.id === facultyCode)
     return yearlyStats ?
       Math.round(Object.entries(yearlyStats.data)
-        .filter(([ year ]) => year >= fromYear && year <= toYear)
-        .reduce((acc, [ year, credits ]) => acc + credits, 0)) :
+        .filter(([year]) => year >= fromYear && year <= toYear)
+        .reduce((acc, [, credits]) => acc + credits, 0)) :
       0
   }
 
-  if (!faculties || !facultyYearlyStats) return null
+  if (!faculties || !facultyYearlyStats) return null
   const headers = [
     {
       key: 'name',
@@ -105,7 +101,7 @@ const FacultySelector = ({ language, getFaculties, getFacultiesYearlyStats, facu
               <YearFilter
                 fromYear={fromYear}
                 toYear={toYear}
-                years={years }
+                years={years}
                 handleChange={handleYearChange}
                 showCheckbox={false}
                 separate={false}
@@ -126,7 +122,8 @@ const FacultySelector = ({ language, getFaculties, getFacultiesYearlyStats, facu
 
 FacultySelector.propTypes = {
   language: string.isRequired,
-  dispatchGetFaculties: func.isRequired,
+  getFaculties: func.isRequired,
+  getFacultiesYearlyStats: func.isRequired,
   faculties: arrayOf(shape({})).isRequired,
   facultyYearlyStats: arrayOf(shape({})).isRequired
 }
@@ -137,4 +134,9 @@ const mapStateToProps = ({ faculties, settings }) => ({
   language: settings.language
 })
 
-export default connect(mapStateToProps, { getFaculties, getFacultiesYearlyStats })(withRouter(FacultySelector))
+const mapDispatchToProps = {
+  getFaculties: getFacultiesAction,
+  getFacultiesYearlyStats: getFacultiesYearlyStatsAction
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(FacultySelector))
