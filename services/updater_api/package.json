@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run lint",
+    "lint": "eslint .",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
@@ -19,5 +20,9 @@
     "nodemon": "^1.19.1",
     "winston": "^3.2.1",
     "winston-log2gelf": "^2.0.4"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.2",
+    "eslint": "^6.1.0"
   }
 }
