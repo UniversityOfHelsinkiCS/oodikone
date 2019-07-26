@@ -2,12 +2,12 @@ const express = require('express')
 
 const User = require('./src/services/users')
 const AccessGroup = require('./src/services/accessgroups')
+const FacultyProgrammes = require('./src/services/facultyprogrammes')
 
 const app = express()
 const port = 4567
 const bodyParser = require('body-parser')
 const checkSecret = require('./src/middlewares/secret')
-const { requiredGroup } = require('./src/conf')
 
 app.use(bodyParser.json())
 app.use(checkSecret)
@@ -82,7 +82,7 @@ app.put('/user/:uid', async (req, res) => {
   const uid = req.params.uid
   const user = await User.byUsername(uid)
   if (!user) {
-    return res.status(400).json({ error: "invalid username given" })
+    return res.status(400).json({ error: 'invalid username given' })
   }
   await User.updateUser(user, req.body)
   const returnedUser = await User.byUsername(uid)
@@ -102,7 +102,7 @@ app.post('/modifyaccess', async (req, res) => {
 })
 app.post('/add_rights', async (req, res) => {
   const { uid, codes } = req.body
-  console.log("adding rights to ", uid)
+  console.log('adding rights to ', uid)
   try {
     await User.enableElementDetails(uid, codes)
     const user = await User.byId(uid)
@@ -114,7 +114,7 @@ app.post('/add_rights', async (req, res) => {
 })
 app.post('/remove_rights', async (req, res) => {
   const { uid, codes } = req.body
-  console.log("removing rights from ", uid)
+  console.log('removing rights from ', uid)
   try {
     await User.removeElementDetails(uid, codes)
     const user = await User.byId(uid)
@@ -161,6 +161,15 @@ app.get('/get_accessgroupcodes/:uid', async (req, res) => {
   try {
     const user = await User.byUsername(uid)
     res.status(200).json(user.accessgroup.map(g => g.group_code))
+  } catch (e) {
+    res.status(400).json({ e })
+  }
+})
+
+app.get('/faculty_programmes', async (req, res) => {
+  try {
+    const facultyProgrammes = await FacultyProgrammes.findAll()
+    res.status(200).json(facultyProgrammes)
   } catch (e) {
     res.status(400).json({ e })
   }
