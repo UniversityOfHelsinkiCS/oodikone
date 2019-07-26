@@ -44,19 +44,19 @@ const getGradeColumns = isGradeSeries => (isGradeSeries
   : THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s[k]))
 )
 
-const GradesTable = ({ stats, name, history, coursecode }) => {
+const GradesTable = ({ stats, name, history }) => {
   const { cumulative: { grades } } = stats[0]
   const isGradeSeries = !isThesisGrades(grades)
   const admin = userIsAdmin()
 
-  const showPopulation = (yearcode) => {
+  const showPopulation = (yearcode, coursecode) => {
     const queryObject = { yearcode, coursecode }
     const searchString = qs.stringify(queryObject)
     history.push(`/coursepopulation?${searchString}`)
   }
 
   const columns = [
-    getSortableColumn('TIME', 'Time', s => s.code, s => (admin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code)} /></div>) : s.name)),
+    getSortableColumn('TIME', 'Time', s => s.code, s => (admin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.coursecode)} /></div>) : s.name)),
     getSortableColumn('ATTEMPTS', 'Attempts', s => s.attempts),
     ...getGradeColumns(isGradeSeries)
   ]
@@ -79,7 +79,6 @@ const GradesTable = ({ stats, name, history, coursecode }) => {
 GradesTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  coursecode: string.isRequired,
   history: shape({}).isRequired
 }
 export default GradesTable

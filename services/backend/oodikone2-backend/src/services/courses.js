@@ -565,7 +565,7 @@ const setDuplicateCode = async (code1, code2) => {
             { groupid, coursecode: code1 },
             { groupid, coursecode: code2 }
           ],
-          { ignoreDuplicates: true })
+            { ignoreDuplicates: true })
         } else {
           // both have a group, must merge groups
           await CourseDuplicates.update({ groupid: all[code1] }, { where: { groupid: all[code2] } })
@@ -592,7 +592,7 @@ const formatStudyrightElement = ({ code, element_detail, startdate }) => ({
 })
 
 const parseCredit = credit => {
-  const { student, semester, grade } = credit
+  const { student, semester, grade, course_code } = credit
   const { studentnumber, studyright_elements: elements } = student
   const { yearcode, yearname, semestercode, name: semestername } = semester
   return {
@@ -601,6 +601,7 @@ const parseCredit = credit => {
     yearname,
     semestercode,
     semestername,
+    coursecode: course_code,
     grade,
     passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),
     studentnumber,
@@ -616,7 +617,8 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
     const {
       studentnumber, grade, passed,
       semestercode, semestername,
-      yearcode, yearname, programmes
+      yearcode, yearname, programmes,
+      coursecode
     } = parseCredit(credit)
     if (startyearcode <= yearcode && yearcode <= endyearcode) {
       const groupcode = separate ? semestercode : yearcode
@@ -630,7 +632,7 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
         }
       }]
       counter.markStudyProgrammes(studentnumber, programmes.length === 0 ? unknownProgramme : programmes)
-      counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname)
+      counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode)
     } else {
       counter.markCreditToHistory(studentnumber, passed)
     }
