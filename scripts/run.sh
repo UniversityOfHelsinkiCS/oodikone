@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./scripts/scripts.sh
+source ./scripts.sh
 
 PS3='Please enter your choice: '
 
