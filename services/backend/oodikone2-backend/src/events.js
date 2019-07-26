@@ -1,130 +1,101 @@
-var stan = require('node-nats-streaming').connect(
-  'updaterNATS',
-  process.env.HOSTNAME,
-  process.env.NATS_URI
-)
-
+const cron = require('node-cron')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studytrack')
 const { calculateFacultyYearlyStats } = require('./services/faculties')
 const { setProductivity, setThroughput, patchProductivity, patchThroughput, patchFacultyYearlyStats } = require('./services/analyticsService')
 
-const taskStatuses = { }
-const handleMessage = (asyncHandlerFunction) => async (msg) => {
-  const key = msg.getSubject()+'_'+msg.getData()
-  if (taskStatuses[key])
-    return
-  stan.publish('status', key+':RECEIVED', (err) => {
-    if(err) {
-      console.log('publish failed', err)
-    }
-  })
-  taskStatuses[key] = true
-  const success = await asyncHandlerFunction(msg)
-  taskStatuses[key] = false
-  stan.publish('status', key+(success ? ':DONE' : ':ERRORED'), (err) => {
-    if(err) {
-      console.log('publish failed', err)
-    }
-  })
-  msg.ack()
+const refreshFacultyYearlyStats = async () => {
+  try {
+    console.log('Refreshing faculty yearly stats...')
+    const data = await calculateFacultyYearlyStats()
+    await patchFacultyYearlyStats(data)
+  } catch (e) {
+    console.error(e)
+  }
 }
 
-const StartNats = () => {
-  console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
-  var opts = stan.subscriptionOptions()
-  opts.setManualAckMode(true)
-  // opts.setAckWait(6*60*60*1000)
-  // opts.setDeliverAllAvailable()
-  // opts.setDurableName('durable')
-  opts.setMaxInFlight(1)
-  stan.on('connect', async function() {
-    stan.subscribe('updateFacultyYearlyStats').on('message', handleMessage(async () => {
-      try {
-        const data = await calculateFacultyYearlyStats()
-        await patchFacultyYearlyStats(data)
-      } catch (e) {
-        console.error(e)
-        return false
-      }
-      return true
-    }))
-    stan.subscribe('RefreshStudyrightAssociations', opts).on('message', handleMessage(async () => {
-      try {
-        await refreshAssociationsInRedis()
-      } catch (e) {
-        console.error(e)
-        return false
-      }
-      return true
-    }))
-    stan.subscribe('RefreshOverview', opts).on('message', handleMessage(async () => {
-      try {
-        console.log('RefreshOverview starting')
-        const codes = (await getAllProgrammes()).map(p => p.code)
+const refreshStudyrightAssociations = async () => {
+  try {
+    console.log('Refreshing studyright associations...')
+    await refreshAssociationsInRedis()
+  } catch (e) {
+    console.error(e)
+  }
+}
 
-        let ready = 0
-        for(const code of codes) {
-          try {
-            await patchThroughput({ [code]: { status: 'RECALCULATING' } })
-            const since = new Date().getFullYear() - 5
-            const data = await throughputStatsForStudytrack(
-              code,
-              since
-            )
-            await setThroughput(
-              data
-            )
-          } catch (e) {
-            try {
-              await patchThroughput({ [code]: { status: 'RECALCULATION ERRORED' } })
-            } catch (e) {
-              console.error(
-                e
-              )
-            }
-            console.error(e)
-            console.log(
-              `Failed to update throughput stats for code: ${code}, reason: ${
-                e.message
-              }`
-            )
-          }
-          try {
-            await patchProductivity({ [code]: { status: 'RECALCULATING' } })
-            const since = '2017-08-01'
-            const data = await productivityStatsForStudytrack(code, since)
-            await setProductivity(data)
-
-          } catch (e) {
-            try {
-              await patchProductivity({
-                [code]: { status: 'RECALCULATION ERRORED' }
-              })
-            } catch (e) {
-              console.error(e)
-            }
-            console.error(e)
-            console.log(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
-          }
-          ready += 1
-          console.log(
-            `RefreshOverview ${ready}/${
-              codes.length
-            } done`
+const refreshOverview = async () => {
+  try {
+    console.log('Refreshing overview...')
+    const codes = (await getAllProgrammes()).map(p => p.code)
+    let ready = 0
+    for (const code of codes) {
+      try {
+        await patchThroughput({ [code]: { status: 'RECALCULATING' } })
+        const since = new Date().getFullYear() - 5
+        const data = await throughputStatsForStudytrack(
+          code,
+          since
+        )
+        await setThroughput(
+          data
+        )
+      } catch (e) {
+        try {
+          await patchThroughput({ [code]: { status: 'RECALCULATION ERRORED' } })
+        } catch (e) {
+          console.error(
+            e
           )
         }
-      } catch (e) {
         console.error(e)
-        return false
+        console.log(
+          `Failed to update throughput stats for code: ${code}, reason: ${
+            e.message
+          }`
+        )
       }
-      return true
-    }))
-  })
-  return stan
+      try {
+        await patchProductivity({ [code]: { status: 'RECALCULATING' } })
+        const since = '2017-08-01'
+        const data = await productivityStatsForStudytrack(code, since)
+        await setProductivity(data)
+
+      } catch (e) {
+        try {
+          await patchProductivity({
+            [code]: { status: 'RECALCULATION ERRORED' }
+          })
+        } catch (e) {
+          console.error(e)
+        }
+        console.error(e)
+        console.log(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
+      }
+      ready += 1
+      console.log(
+        `RefreshOverview ${ready}/${
+          codes.length
+        } done`
+      )
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const timezone = 'Europe/Helsinki'
+
+const startCron = () => {
+  cron.schedule('0 7 * * *', async () => {
+    await Promise.all([
+      refreshFacultyYearlyStats(),
+      refreshStudyrightAssociations(),
+      refreshOverview()
+    ])
+  }, { timezone })
 }
 
 module.exports = {
-  StartNats
+  startCron
 }
