@@ -1,5 +1,5 @@
-const { AccessGroup, User } = require('../../models')
-defaultAccessGroups = [
+const { AccessGroup } = require('../../models')
+const defaultAccessGroups = [
   {
     group_code: 'users',
     group_info: 'grants access to users management',
@@ -18,7 +18,7 @@ defaultAccessGroups = [
   }
 ]
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async () => {
     AccessGroup.bulkCreate(defaultAccessGroups)
   },
   down: async () => {
