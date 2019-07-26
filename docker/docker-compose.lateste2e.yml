@@ -44,7 +44,6 @@ services:
 
   updater_scheduler:
     image: toska/updater_scheduler:${TAG}
-    command: ["echo", "mluukkai on orjuuttaja"]
 
   analytics:
     image: toska/oodikone2-analytics:${TAG}
