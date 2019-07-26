@@ -27,7 +27,7 @@ jobs:
         - TAG=staging
       script:
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - source scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.yml ${TAG} ${SENTRY_RELEASE_VERSION}
+        - source ./scripts/scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.yml ${TAG} ${SENTRY_RELEASE_VERSION}
         - docker ps
         - cat nginx/log
         - TAG=${TAG} SENTRY_RELEASE_VERSION=${SENTRY_RELEASE_VERSION} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f &
@@ -48,7 +48,7 @@ jobs:
         - TAG=latest
       script:
         - docker login -u $DOCKER_USER -p $DOCKER_PASS
-        - source scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.yml ${TAG} ${SENTRY_RELEASE_VERSION}
+        - source ./scripts/scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.yml ${TAG} ${SENTRY_RELEASE_VERSION}
         - docker ps
         - cat nginx/log
         - TAG=${TAG} SENTRY_RELEASE_VERSION=${SENTRY_RELEASE_VERSION} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f &
