@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "NODE_ENV=dev nodemon index.js",
-    "test": "NODE_ENV=test jest --runInBand --verbose --detectOpenHandles",
+    "test": "npm run lint && npm run jest",
+    "lint": "eslint .",
+    "jest": "NODE_ENV=test jest --runInBand --verbose --detectOpenHandles",
     "test_docker": "docker exec -t userservice /bin/bash -c 'npm test'"
   },
   "repository": {
@@ -30,6 +32,8 @@
     "umzug": "^2.2.0"
   },
   "devDependencies": {
+    "babel-eslint": "^10.0.2",
+    "eslint": "^6.1.0",
     "jest": "^24.8.0"
   }
 }

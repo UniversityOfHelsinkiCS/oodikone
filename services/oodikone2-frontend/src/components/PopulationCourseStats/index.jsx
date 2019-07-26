@@ -440,7 +440,7 @@ class PopulationCourseStats extends Component {
   }
 
   render() {
-    const { courses, translate, pending } = this.props
+    const { courses, translate, pending, history } = this.props
     const { studentAmountLimit } = this.state
     if (!courses) {
       return null
@@ -448,7 +448,6 @@ class PopulationCourseStats extends Component {
     if (pending) {
       return null
     }
-
     return (
       <div>
         <Form>
@@ -458,13 +457,15 @@ class PopulationCourseStats extends Component {
               value={studentAmountLimit}
               onChange={this.onStudentAmountLimitChange}
             />
-            <Button
-              active={this.state.activeView === 'passingSemester'}
-              floated="right"
-              onClick={() => this.setActiveView('passingSemester')}
-            >
-              when passed
-            </Button>
+            {history.location.pathname === '/coursepopulation' ? null : (
+              <Button
+                active={this.state.activeView === 'passingSemester'}
+                floated="right"
+                onClick={() => this.setActiveView('passingSemester')}
+              >
+                when passed
+              </Button>
+            )}
             <Button
               active={this.state.activeView === 'showGradeDistribution'}
               floated="right"
@@ -496,7 +497,7 @@ const mapStateToProps = (state) => {
   return {
     language: state.settings.language,
     translate: getTranslate(state.locale),
-    query: state.populations.query,
+    query: state.populations.query ? state.populations.query : state.coursePopulation.query,
     years,
     selectedCourses
   }

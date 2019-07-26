@@ -133,7 +133,7 @@ const faculty_to_programmes = {
 }
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async (queryInterface) => {
     await queryInterface.bulkDelete(
       'faculty_programmes'
     )

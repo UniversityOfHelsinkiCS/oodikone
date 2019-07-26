@@ -117,17 +117,17 @@ const superlogin = async (uid, asUser) => {
 
 const userIncludes = [
   {
-      model: ElementDetails,
-      as: 'programme'
+    model: ElementDetails,
+    as: 'programme'
   },
   {
-      model: AccessGroup,
-      as: 'accessgroup',
-      attributes: ['id', 'group_code', 'group_info']
+    model: AccessGroup,
+    as: 'accessgroup',
+    attributes: ['id', 'group_code', 'group_info']
   },
   {
-      model: HyGroup,
-      as: 'hy_group'
+    model: HyGroup,
+    as: 'hy_group'
   },
   {
     model: UserFaculties,
@@ -141,8 +141,8 @@ const userIncludes = [
     }
   },
   {
-      model: Affiliation,
-      as: 'affiliation'
+    model: Affiliation,
+    as: 'affiliation'
   }
 ]
 
@@ -190,12 +190,6 @@ const byId = async (id) => {
     include: userIncludes
   })
   return user
-}
-
-const getUnitsFromElementDetails = async username => {
-  const user = await byUsername(username)
-  const userData = getUserData(user)
-  return userData.elementdetails.map(element => UnitService.parseUnitFromElement(element))
 }
 
 const getUserElementDetails = user => {
@@ -268,7 +262,6 @@ module.exports = {
   updateUser,
   findAll,
   byId,
-  getUnitsFromElementDetails,
   getUserElementDetails,
   enableElementDetails,
   removeElementDetails,
