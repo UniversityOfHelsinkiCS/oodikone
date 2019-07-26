@@ -93,7 +93,7 @@ const startCron = () => {
       refreshStudyrightAssociations(),
       refreshOverview()
     ])
-  }, { timezone })
+  }, { timezone })
 }
 
 module.exports = {
