@@ -125,7 +125,7 @@ class PopulationStudents extends Component {
     }
 
     const { admin, containsStudyTracks } = this.state
-
+    const { history } = this.props
     const students = this.props.samples.reduce((obj, s) => {
       obj[s.studentNumber] = s
       return obj
@@ -204,15 +204,16 @@ class PopulationStudents extends Component {
         key: 'all credits',
         title: 'all credits',
         getRowVal: s => s.credits
-      },
-      {
+      }
+    )
+    if (history.location.pathname !== '/coursepopulation') {
+      columns.push({
         key: 'transferred from',
         title: 'transferred from',
         getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '')
-      }
-    )
-
-    if (containsStudyTracks) {
+      })
+    }
+    if (containsStudyTracks && history.location.pathname !== '/coursepopulation') {
       columns.push({
         key: 'studytrack',
         title: 'studytrack',
@@ -220,7 +221,7 @@ class PopulationStudents extends Component {
       })
     }
 
-    if (admin) {
+    if (admin && history.location.pathname !== '/coursepopulation') {
       columns.push(
         {
           key: 'priority',
@@ -232,12 +233,14 @@ class PopulationStudents extends Component {
           title: 'extent',
           getRowVal: s => extentCodes(s.studyrights)
         },
-        {
-          key: 'updatedAt',
-          title: 'last updated at',
-          getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss')
-        }
       )
+    }
+    if (admin) {
+      columns.push({
+        key: 'updatedAt',
+        title: 'last updated at',
+        getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss')
+      })
     }
     if (this.props.showNames) {
       columns.push(
@@ -528,6 +531,15 @@ class PopulationStudents extends Component {
       XLSX.utils.book_append_sheet(workbook, worksheet)
       return workbook
     }
+    const filteredPanes = (panesToFilter) => {
+      if (history.location.pathname === '/coursepopulation') {
+        return panesToFilter.slice(0, 1)
+      }
+      if (!this.state.admin) {
+        return panesToFilter.slice(0, 2)
+      }
+      return panesToFilter
+    }
     return (
       <Fragment>
         <Grid columns="two">
@@ -539,7 +551,7 @@ class PopulationStudents extends Component {
             </Button>
           </Grid.Column>
         </Grid>
-        {this.state.admin ? (<Tab panes={panes} />) : (<Tab panes={panes.slice(0, 2)} />)}
+        <Tab panes={filteredPanes(panes)} />
       </Fragment>
     )
   }
