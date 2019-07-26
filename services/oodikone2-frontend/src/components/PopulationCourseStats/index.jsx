@@ -389,6 +389,7 @@ class PopulationCourseStats extends Component {
     )
 
     const getCourseRow = (courseStats) => {
+      const { history } = this.props
       const { course, stats } = courseStats
       const { code, name } = course
       const {
@@ -409,11 +410,11 @@ class PopulationCourseStats extends Component {
             content={getTextIn(name, language)}
             className="clickableCell"
           />
-          <Table.Cell
+          {history.location.pathname === '/coursepopulation' ? <Table.Cell className="iconCell" /> : (<Table.Cell
             icon="level up alternate"
             onClick={() => this.onGoToCourseStatisticsClick(code)}
             className="iconCell"
-          />
+          />)}
           <Table.Cell content={code} />
           <Table.Cell content={passed + failed} />
           <Table.Cell content={passed} />
