@@ -142,11 +142,12 @@ class SingleCourseStats extends Component {
   }
 
   render() {
-    const { programmes } = this.props
+    const { programmes, stats } = this.props
     const { fromYear, toYear } = this.state
     const { primary, comparison } = this.selectedProgrammes()
     const statistics = this.filteredProgrammeStatistics()
     const { filteredYears } = this.filteredYearsAndSemesters(true)
+
     return (
       <div>
         <Segment>
@@ -189,6 +190,7 @@ class SingleCourseStats extends Component {
         <ResultTabs
           primary={statistics.primary}
           comparison={statistics.comparison}
+          coursecode={stats.coursecode}
         />
       </div>
     )

@@ -1,7 +1,9 @@
 import React from 'react'
+import qs from 'query-string'
 import { arrayOf, number, oneOfType, shape, string } from 'prop-types'
-import { Header } from 'semantic-ui-react'
+import { Header, Icon } from 'semantic-ui-react'
 import SortableTable from '../../../../SortableTable'
+import { userIsAdmin } from '../../../../../common'
 import { getGradeSpread, getThesisGradeSpread, isThesisGrades, THESIS_GRADE_KEYS } from '../util'
 
 const getSortableColumn = (key, title, getRowVal, getRowContent) => (
@@ -42,12 +44,19 @@ const getGradeColumns = isGradeSeries => (isGradeSeries
   : THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s[k]))
 )
 
-const GradesTable = ({ stats, name }) => {
+const GradesTable = ({ stats, name, history, coursecode }) => {
   const { cumulative: { grades } } = stats[0]
   const isGradeSeries = !isThesisGrades(grades)
+  const admin = userIsAdmin()
+
+  const showPopulation = (yearcode) => {
+    const queryObject = { yearcode, coursecode }
+    const searchString = qs.stringify(queryObject)
+    history.push(`/coursepopulation?${searchString}`)
+  }
 
   const columns = [
-    getSortableColumn('TIME', 'Time', s => s.code, s => s.name),
+    getSortableColumn('TIME', 'Time', s => s.code, s => (admin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code)} /></div>) : s.name)),
     getSortableColumn('ATTEMPTS', 'Attempts', s => s.attempts),
     ...getGradeColumns(isGradeSeries)
   ]
@@ -69,6 +78,8 @@ const GradesTable = ({ stats, name }) => {
 }
 GradesTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
-  name: oneOfType([number, string]).isRequired
+  name: oneOfType([number, string]).isRequired,
+  coursecode: string.isRequired,
+  history: shape({}).isRequired
 }
 export default GradesTable

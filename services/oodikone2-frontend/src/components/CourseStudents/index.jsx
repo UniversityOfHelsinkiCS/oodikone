@@ -2,18 +2,28 @@ import React, { useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { shape, func, bool } from 'prop-types'
+import qs from 'query-string'
 
 import { getCoursePopulation, getCoursePopulationCourses } from '../../redux/coursePopulation'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourseStats from '../PopulationCourseStats'
 
-const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCoursesDispatch, studentData, courses, pending }) => {
+const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCoursesDispatch, studentData, courses, pending, history }) => {
+  const parseQueryFromUrl = () => {
+    const { location } = history
+    const query = qs.parse(location.search)
+    return query
+  }
+
   useEffect(() => {
-    getCoursePopulationDispatch({ coursecode: '581325', yearcode: '67' })
-    getCoursePopulationCoursesDispatch({ coursecode: '581325', yearcode: '67' })
+    const query = parseQueryFromUrl()
+    getCoursePopulationDispatch({ coursecode: query.coursecode, yearcode: query.yearcode })
+    getCoursePopulationCoursesDispatch({ coursecode: query.coursecode, yearcode: query.yearcode })
   }, [])
+
   const selectedStudents = studentData.students ? studentData.students.map(student => student.studentNumber) : []
+
   return (
     <div>
       {studentData.students ? (
@@ -28,6 +38,7 @@ const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCourse
             // query={populationCourses.query}
             pending={pending}
             selectedStudents={selectedStudents}
+            query
           />
           <PopulationStudents
             samples={studentData.students}
@@ -44,7 +55,8 @@ CourseStudents.propTypes = {
   getCoursePopulationCoursesDispatch: func.isRequired,
   pending: bool.isRequired,
   courses: shape([]).isRequired,
-  studentData: shape({}).isRequired
+  studentData: shape({}).isRequired,
+  history: shape({}).isRequired
 }
 
 const mapStateToProps = ({ coursePopulation }) => ({
