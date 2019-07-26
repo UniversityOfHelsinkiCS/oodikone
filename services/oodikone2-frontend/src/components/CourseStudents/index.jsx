@@ -36,7 +36,7 @@ const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCourse
   return (
     <div className="segmentContainer">
       {studentData.students ? (
-        <div>
+        <Segment className="contentSegment">
           <Header className="segmentTitle" size="large" textAlign="center">Population of course {header}</Header>
           <Segment>
             <Header size="medium" dividing>
@@ -67,7 +67,7 @@ const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCourse
             samples={studentData.students}
             selectedStudents={selectedStudents}
           />
-        </div>
+        </Segment>
       ) : (<div />)}
     </div>
   )
