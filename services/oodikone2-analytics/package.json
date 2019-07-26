@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "NODE_ENV=dev nodemon index.js",
-    "test": "echo \"Error: no test specified\""
+    "test": "npm run lint",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,8 @@
     "umzug": "^2.2.0"
   },
   "devDependencies": {
+    "babel-eslint": "^10.0.2",
+    "eslint": "^6.1.0",
     "nodemon": "^1.19.1"
   }
 }

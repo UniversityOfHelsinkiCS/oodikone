@@ -1,7 +1,7 @@
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async (queryInterface) => {
     await queryInterface.sequelize.query('DELETE FROM throughput')
   },
-  down: (queryInterface) => {
+  down: () => {
   }
 }
