@@ -1,7 +1,7 @@
 const { AccessGroup, User } = require('../../models')
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
- 
+  up: async () => {
+
     AccessGroup.associate = models => {
       AccessGroup.belongsToMany(models.User, { through: 'user_accessgroup' })
     }
