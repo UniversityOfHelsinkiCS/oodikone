@@ -22,10 +22,11 @@ class CourseYearlyStatsCounter {
     this.programmes[code] = { name, students: [] }
   }
 
-  initGroup(groupcode, name) {
+  initGroup(groupcode, name, coursecode) {
     this.groups[groupcode] = {
       code: groupcode,
       name,
+      coursecode,
       attempts: {
         grades: {},
         classes: {
@@ -101,9 +102,9 @@ class CourseYearlyStatsCounter {
     }
   }
 
-  markCreditToGroup(studentnumber, passed, grade, groupcode, groupname) {
+  markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode) {
     if (!this.groups[groupcode]) {
-      this.initGroup(groupcode, groupname)
+      this.initGroup(groupcode, groupname, coursecode)
     }
     this.markCreditToStudents(studentnumber, passed, grade, groupcode)
     this.markCreditToAttempts(studentnumber, passed, grade, groupcode)

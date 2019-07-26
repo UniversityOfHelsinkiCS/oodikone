@@ -35,7 +35,7 @@ jobs:
         - time npm run test_services
         - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
         - docker ps -a
-        - if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk '{ sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
+        - if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
       deploy:
         provider: script
         skip_cleanup: true
@@ -56,7 +56,7 @@ jobs:
         - time npm run test_services
         - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
         - docker ps -a
-        - if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk '{ sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
+        - if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
       deploy:
         provider: script
         skip_cleanup: true

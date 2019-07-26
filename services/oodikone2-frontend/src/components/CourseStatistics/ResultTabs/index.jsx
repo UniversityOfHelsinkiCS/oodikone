@@ -91,8 +91,7 @@ const ResultTabs = (props) => {
   }
 
   const getPanes = () => {
-    const { primary, comparison } = props
-
+    const { primary, comparison, history } = props
     const paneMenuItems = [
       {
         menuItem: { key: 'Table', icon: 'table', content: 'Table' },
@@ -101,6 +100,7 @@ const ResultTabs = (props) => {
             comparison={comparison}
             primary={primary}
             viewMode={viewMode}
+            history={history}
           />)
       },
       {
