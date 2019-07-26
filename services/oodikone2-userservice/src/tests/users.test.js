@@ -2,7 +2,7 @@ const { sequelize, forceSyncDatabase } = require('../database/connection')
 const { User, ElementDetails, AccessGroup, HyGroup } = require('../models/index')
 const userService = require('../services/users')
 const AccessService = require('../services/accessgroups')
-const { DB_URL, DB_SCHEMA } = require('../conf')
+const { DB_SCHEMA } = require('../conf')
 
 const langify = name => ({
   en: `${name}_en`,
@@ -167,51 +167,51 @@ describe('user tests', async () => {
 })
 
 describe('user access right tests', async () => {
-    test('adding and getting access rights works', async () => {
-      const user1 = await userService.byUsername('sasumaki')
-      const rights1 = userService.getUserElementDetails(user1)
-      expect(rights1.length).toBe(0)
+  test('adding and getting access rights works', async () => {
+    const user1 = await userService.byUsername('sasumaki')
+    const rights1 = userService.getUserElementDetails(user1)
+    expect(rights1.length).toBe(0)
 
-      await userService.enableElementDetails(69, ['Element_MATH'])
-      const user2 = await userService.byUsername('sasumaki')
-      const rights2 = userService.getUserElementDetails(user2)
-      expect(rights2[0].type).toBe(20)
-    })
-    test('removing and getting access rights works', async () => {
-      const user1 = await userService.byUsername('freeman')
-      const rights1 = userService.getUserElementDetails(user1)
-      expect(rights1.length).toBe(1)
+    await userService.enableElementDetails(69, ['Element_MATH'])
+    const user2 = await userService.byUsername('sasumaki')
+    const rights2 = userService.getUserElementDetails(user2)
+    expect(rights2[0].type).toBe(20)
+  })
+  test('removing and getting access rights works', async () => {
+    const user1 = await userService.byUsername('freeman')
+    const rights1 = userService.getUserElementDetails(user1)
+    expect(rights1.length).toBe(1)
 
-      await userService.removeElementDetails(665, ['ELEMENT_CS'])
-      const user2 = await userService.byUsername('freeman')
-      const rights2 = userService.getUserElementDetails(user2)
-      console.log(rights2)
-      expect(rights2.length).toBe(0)
-    })
-    test('Access groups can be added and removed', async () => {
-      const id = 666
-      const user1 = await userService.byId(id)
-      expect(user1.accessgroup.length).toBe(0)
+    await userService.removeElementDetails(665, ['ELEMENT_CS'])
+    const user2 = await userService.byUsername('freeman')
+    const rights2 = userService.getUserElementDetails(user2)
+    console.log(rights2)
+    expect(rights2.length).toBe(0)
+  })
+  test('Access groups can be added and removed', async () => {
+    const id = 666
+    const user1 = await userService.byId(id)
+    expect(user1.accessgroup.length).toBe(0)
 
-      await userService.modifyRights(id, { teachers: true, admin: true })
-      const user2 = await userService.byId(id)
-      expect(user2.accessgroup.length).toBe(2)
-      const ags = user2.accessgroup.map(ag => ag.group_code)
-      expect(ags).toContain('teachers')
-      expect(ags).toContain('admin')
+    await userService.modifyRights(id, { teachers: true, admin: true })
+    const user2 = await userService.byId(id)
+    expect(user2.accessgroup.length).toBe(2)
+    const ags = user2.accessgroup.map(ag => ag.group_code)
+    expect(ags).toContain('teachers')
+    expect(ags).toContain('admin')
 
-      await userService.modifyRights(user1.id, { admin: false })
-      const user3 = await userService.byId(id)
-      expect(user3.accessgroup.length).toBe(1)
-      const ags2 = user3.accessgroup.map(ag => ag.group_code)
-      expect(ags2).toContain('teachers')
-      expect(ags2).not.toContain('admin')
-    })
-    test('get accessgroups for user workerinos ', async () => {
-      const id = 666
-      const user = await userService.byId(id)
-      await userService.modifyRights(id, { teachers: true, admin: true })
-      const ags = await userService.getUserAccessGroups(user.username)
-      expect(ags.length).toBe(2)
-    })
+    await userService.modifyRights(user1.id, { admin: false })
+    const user3 = await userService.byId(id)
+    expect(user3.accessgroup.length).toBe(1)
+    const ags2 = user3.accessgroup.map(ag => ag.group_code)
+    expect(ags2).toContain('teachers')
+    expect(ags2).not.toContain('admin')
+  })
+  test('get accessgroups for user workerinos ', async () => {
+    const id = 666
+    const user = await userService.byId(id)
+    await userService.modifyRights(id, { teachers: true, admin: true })
+    const ags = await userService.getUserAccessGroups(user.username)
+    expect(ags.length).toBe(2)
+  })
 })

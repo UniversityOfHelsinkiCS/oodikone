@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { sequelize, migrationPromise } = require('../database/connection')
+const { sequelize } = require('../database/connection')
 
 const ElementDetails = sequelize.define('element_details',
   {
@@ -38,47 +38,47 @@ const AccessGroup = sequelize.define('access_group',
   })
 
 const UserFaculties = sequelize.define('user_faculties',
-{
-  userId: {
-    primaryKey: true,
-    type: Sequelize.BIGINT,
-    references: {
-      model: 'users',
-      key: 'id'
+  {
+    userId: {
+      primaryKey: true,
+      type: Sequelize.BIGINT,
+      references: {
+        model: 'users',
+        key: 'id'
+      }
+    },
+    faculty_code: {
+      primaryKey: true,
+      type: Sequelize.STRING,
+    },
+    createdAt: {
+      type: Sequelize.DATE
+    },
+    updatedAt: {
+      type: Sequelize.DATE
     }
-  },
-  faculty_code: {
-    primaryKey: true,
-    type: Sequelize.STRING,
-  },
-  createdAt: {
-    type: Sequelize.DATE
-  },
-  updatedAt: {
-    type: Sequelize.DATE
-  }
-})
+  })
 const FacultyProgrammes = sequelize.define('faculty_programmes',
-{
-  faculty_code: {
-    primaryKey: true,
-    type: Sequelize.STRING,
-  },
-  programme_code: {
-    primaryKey: true,
-    type: Sequelize.STRING,
-    references: {
-      model: 'element_details',
-      key: 'code'
+  {
+    faculty_code: {
+      primaryKey: true,
+      type: Sequelize.STRING,
+    },
+    programme_code: {
+      primaryKey: true,
+      type: Sequelize.STRING,
+      references: {
+        model: 'element_details',
+        key: 'code'
+      }
+    },
+    createdAt: {
+      type: Sequelize.DATE
+    },
+    updatedAt: {
+      type: Sequelize.DATE
     }
-  },
-  createdAt: {
-    type: Sequelize.DATE
-  },
-  updatedAt: {
-    type: Sequelize.DATE
-  }
-})
+  })
 
 
 const User = sequelize.define('users',
@@ -121,7 +121,7 @@ const HyGroup = sequelize.define('hy_group',
 
   })
 
-  const Affiliation = sequelize.define('affiliations',
+const Affiliation = sequelize.define('affiliations',
   {
     id: {
       primaryKey:true,
@@ -147,9 +147,9 @@ const Migration = sequelize.define('migrations', {
     primaryKey: true
   }
 }, {
-    tablename: 'migrations',
-    timestamps: false
-  })
+  tablename: 'migrations',
+  timestamps: false
+})
 
 
 User.belongsToMany(ElementDetails, { through: 'user_elementdetails', as: 'programme' })

@@ -1,5 +1,4 @@
 const express = require('express')
-const _ = require('lodash')
 const morgan = require('morgan')
 const { Productivity, Throughput } = require('./src/models')
 
@@ -41,7 +40,7 @@ app.post('/productivity', async (req, res) => {
 
 app.patch('/productivity', async (req, res) => {
   for (let [id, data] of Object.entries(req.body.data)) {
-    await Productivity.upsert({ ...data, id })  
+    await Productivity.upsert({ ...data, id })
   }
   res.status(200).end()
 })
@@ -65,7 +64,7 @@ app.post('/throughput', async (req, res) => {
 
 app.patch('/throughput', async (req, res) => {
   for (let [id, data] of Object.entries(req.body.data)) {
-    await Throughput.upsert({ ...data, id })  
+    await Throughput.upsert({ ...data, id })
   }
   res.status(200).end()
 })
