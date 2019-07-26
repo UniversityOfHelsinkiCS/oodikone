@@ -107,7 +107,7 @@ afterAll(async () => {
   await sequelize.close()
 })
 
-describe('basic tests', async () => {
+describe('basic tests', () => {
   test('tests start', async () => {
     console.log('mayhem begins')
     expect(process.env.NODE_ENV).toBe('test')
@@ -124,7 +124,7 @@ describe('basic tests', async () => {
     expect(1).toBe(1)
   })
 })
-describe('user tests', async () => {
+describe('user tests', () => {
   test('finds all default users', async () => {
     const users = await userService.findAll()
     expect(users.length).toBe(default_users.length)
@@ -166,7 +166,7 @@ describe('user tests', async () => {
   })
 })
 
-describe('user access right tests', async () => {
+describe('user access right tests', () => {
   test('adding and getting access rights works', async () => {
     const user1 = await userService.byUsername('sasumaki')
     const rights1 = userService.getUserElementDetails(user1)

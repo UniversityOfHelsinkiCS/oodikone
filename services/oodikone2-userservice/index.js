@@ -2,6 +2,7 @@ const express = require('express')
 
 const User = require('./src/services/users')
 const AccessGroup = require('./src/services/accessgroups')
+const FacultyProgrammes = require('./src/services/facultyprogrammes')
 
 const app = express()
 const port = 4567
@@ -160,6 +161,15 @@ app.get('/get_accessgroupcodes/:uid', async (req, res) => {
   try {
     const user = await User.byUsername(uid)
     res.status(200).json(user.accessgroup.map(g => g.group_code))
+  } catch (e) {
+    res.status(400).json({ e })
+  }
+})
+
+app.get('/faculty_programmes', async (req, res) => {
+  try {
+    const facultyProgrammes = await FacultyProgrammes.findAll()
+    res.status(200).json(facultyProgrammes)
   } catch (e) {
     res.status(400).json({ e })
   }
