@@ -49,14 +49,14 @@ const GradesTable = ({ stats, name, history }) => {
   const isGradeSeries = !isThesisGrades(grades)
   const admin = userIsAdmin()
 
-  const showPopulation = (yearcode, coursecode) => {
-    const queryObject = { yearcode, coursecode }
+  const showPopulation = (yearcode, coursecode, year) => {
+    const queryObject = { yearcode, coursecode, year }
     const searchString = qs.stringify(queryObject)
     history.push(`/coursepopulation?${searchString}`)
   }
 
   const columns = [
-    getSortableColumn('TIME', 'Time', s => s.code, s => (admin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.coursecode)} /></div>) : s.name)),
+    getSortableColumn('TIME', 'Time', s => s.code, s => (admin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.coursecode, s.name)} /></div>) : s.name)),
     getSortableColumn('ATTEMPTS', 'Attempts', s => s.attempts),
     ...getGradeColumns(isGradeSeries)
   ]
