@@ -1,11 +1,21 @@
 import React from 'react'
-import { Header } from 'semantic-ui-react'
+import qs from 'query-string'
+import { Header, Icon } from 'semantic-ui-react'
 import { shape, string, number, oneOfType, arrayOf } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
+import { userIsAdmin } from '../../../../../common'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
-const StudentTable = ({ stats, name }) => {
+const StudentTable = ({ stats, name, history, coursecode }) => {
+  const admin = userIsAdmin()
+
+  const showPopulation = (yearcode) => {
+    const queryObject = { yearcode, coursecode }
+    const searchString = qs.stringify(queryObject)
+    history.push(`/coursepopulation?${searchString}`)
+  }
+
   const formatted = stats.map((statistic) => {
     const { name: n, code, students } = statistic
     const {
@@ -38,7 +48,7 @@ const StudentTable = ({ stats, name }) => {
             key: 'TIME',
             title: 'Time',
             getRowVal: s => s.code,
-            getRowContent: s => s.name,
+            getRowContent: s => (admin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code)} /></div>) : s.name),
             headerProps: { rowSpan: 2, width: 3 }
           }, {
             key: 'TOTAL',
@@ -103,7 +113,9 @@ const StudentTable = ({ stats, name }) => {
 
 StudentTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
-  name: oneOfType([number, string]).isRequired
+  name: oneOfType([number, string]).isRequired,
+  coursecode: string.isRequired,
+  history: shape({}).isRequired
 }
 
 export default StudentTable
