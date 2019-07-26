@@ -32,7 +32,7 @@ const FacultySelector = ({ language, getFaculties, getFacultiesYearlyStats, facu
       .sort((a, b) => b - a)
 
     return {
-      fromYear: filterYears[years.length - 1],
+      fromYear: filterYears[filterYears.length - 1],
       toYear: filterYears[0],
       years: filterYears.map(y => ({ key: y, text: y, value: y }))
     }
@@ -51,13 +51,35 @@ const FacultySelector = ({ language, getFaculties, getFacultiesYearlyStats, facu
     else setToYear(value)
   }
 
-  const calculateAccumulativeStatsFor = (facultyCode) => {
+  const calculateStatsFor = (facultyCode) => {
     const yearlyStats = facultyYearlyStats.find(f => f.id === facultyCode)
-    return yearlyStats ?
-      Math.round(Object.entries(yearlyStats.data)
-        .filter(([year]) => year >= fromYear && year <= toYear)
-        .reduce((acc, [, credits]) => acc + credits, 0)) :
-      0
+    const res = {
+      totalStudentCredits: 0,
+      totalCoursesPassed: 0,
+      totalCoursesFailed: 0
+    }
+    if (!yearlyStats) return res
+    Object.entries(yearlyStats.data)
+      .filter(([year]) => year >= fromYear && year <= toYear)
+      .forEach(([, stat]) => {
+        const { studentCredits, coursesPassed, coursesFailed } = stat
+        res.totalStudentCredits += studentCredits
+        res.totalCoursesPassed += coursesPassed
+        res.totalCoursesFailed += coursesFailed
+      })
+    return res
+  }
+
+  const calculateTotalPassedCoursesFor = (facultyCode) => {
+    const { totalCoursesPassed, totalCoursesFailed } = calculateStatsFor(facultyCode)
+    const ratio = ((totalCoursesPassed / (totalCoursesPassed + totalCoursesFailed)) * 100)
+    return Number.isNaN(ratio) ? 0 : ratio
+  }
+
+  const calculateTotalFailedCoursesFor = (facultyCode) => {
+    const totalPassedRatio = calculateTotalPassedCoursesFor(facultyCode)
+    if (totalPassedRatio === 0) return 0
+    return 100 - totalPassedRatio
   }
 
   if (!faculties || !facultyYearlyStats) return null
@@ -79,7 +101,19 @@ const FacultySelector = ({ language, getFaculties, getFacultiesYearlyStats, facu
     {
       key: 'students',
       title: 'Student credits',
-      getRowVal: faculty => calculateAccumulativeStatsFor(faculty.code)
+      getRowVal: ({ code }) => Math.round(calculateStatsFor(code).totalStudentCredits)
+    },
+    {
+      key: 'coursesPassed',
+      title: 'Courses passed',
+      getRowVal: ({ code }) => calculateTotalPassedCoursesFor(code),
+      getRowContent: ({ code }) => `${calculateTotalPassedCoursesFor(code).toFixed(2)}%`
+    },
+    {
+      key: 'coursesFailed',
+      title: 'Courses failed',
+      getRowVal: ({ code }) => calculateTotalFailedCoursesFor(code),
+      getRowContent: ({ code }) => `${calculateTotalFailedCoursesFor(code).toFixed(2)}%`
     }
   ]
 
