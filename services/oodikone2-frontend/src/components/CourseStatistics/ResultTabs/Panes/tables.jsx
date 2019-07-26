@@ -22,13 +22,13 @@ const Tables = ({ primary, comparison, viewMode, coursecode, history }) => {
 
   const getTables = (series) => {
     const { name, stats } = series
+
     return (
       <Grid.Column>
         {getViewMode(name, stats)}
       </Grid.Column>
     )
   }
-
   return (
     <Fragment>
       {primary && getTables(primary)}
