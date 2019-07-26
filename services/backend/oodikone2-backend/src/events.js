@@ -7,7 +7,8 @@ var stan = require('node-nats-streaming').connect(
 const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studytrack')
-const { setProductivity, setThroughput, patchProductivity, patchThroughput } = require('./services/analyticsService')
+const { calculateFacultyYearlyStats } = require('./services/faculties')
+const { setProductivity, setThroughput, patchProductivity, patchThroughput, patchFacultyYearlyStats } = require('./services/analyticsService')
 
 const taskStatuses = { }
 const handleMessage = (asyncHandlerFunction) => async (msg) => {
@@ -39,6 +40,16 @@ const StartNats = () => {
   // opts.setDurableName('durable')
   opts.setMaxInFlight(1)
   stan.on('connect', async function() {
+    stan.subscribe('updateFacultyYearlyStats').on('message', handleMessage(async () => {
+      try {
+        const data = await calculateFacultyYearlyStats()
+        await patchFacultyYearlyStats(data)
+      } catch (e) {
+        console.error(e)
+        return false
+      }
+      return true
+    }))
     stan.subscribe('RefreshStudyrightAssociations', opts).on('message', handleMessage(async () => {
       try {
         await refreshAssociationsInRedis()

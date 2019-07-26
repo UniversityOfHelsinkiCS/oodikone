@@ -497,7 +497,7 @@ const mapStateToProps = (state) => {
   return {
     language: state.settings.language,
     translate: getTranslate(state.locale),
-    query: state.populations.query,
+    query: state.populations.query ? state.populations.query : state.coursePopulation.query,
     years,
     selectedCourses
   }
