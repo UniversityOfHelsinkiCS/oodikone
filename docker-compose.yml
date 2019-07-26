@@ -204,20 +204,9 @@ services:
     ports:
       - 4568:4568
     environment:
-      - WAIT_HOSTS=analytics_db:5432,analytics_redis:6379
-      - REDIS=analytics_redis
+      - WAIT_HOSTS=analytics_db:5432
       - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
       - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
     depends_on:
       - analytics_db
-      - analytics_redis
     container_name: analytics
-
-  analytics_redis:
-    image: redis
-    command: ["redis-server", "--appendonly", "yes"]
-    ports:
-      - "6380:6379"
-    volumes:
-      - ./analytics-redis-data:/data
-    container_name: analytics_redis
