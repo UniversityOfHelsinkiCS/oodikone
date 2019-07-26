@@ -99,7 +99,7 @@ class SingleCourseStats extends Component {
   statsForProgramme = (progcode) => {
     const { statistics } = this.props.stats
     const filter = this.belongsToProgramme(progcode)
-    const progstats = statistics.map(({ code, name, students: allstudents, attempts }) => {
+    const progstats = statistics.map(({ code, name, students: allstudents, attempts, coursecode }) => {
       const cumulative = {
         grades: countFilteredStudents(attempts.grades, filter),
         categories: countFilteredStudents(attempts.classes, filter)
@@ -108,7 +108,7 @@ class SingleCourseStats extends Component {
         grades: countFilteredStudents(allstudents.grades, filter),
         categories: countFilteredStudents(allstudents.classes, filter)
       }
-      return { code, name, cumulative, students }
+      return { code, name, cumulative, students, coursecode }
     }).filter(this.isStatInYearRange)
     return {
       code: progcode,
@@ -147,6 +147,7 @@ class SingleCourseStats extends Component {
     const { primary, comparison } = this.selectedProgrammes()
     const statistics = this.filteredProgrammeStatistics()
     const { filteredYears } = this.filteredYearsAndSemesters(true)
+
     return (
       <div>
         <Segment>
