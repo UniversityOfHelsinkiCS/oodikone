@@ -19,7 +19,7 @@ export const getCoursePopulationCourses = ({ coursecode, yearcode }) => {
   return callController(route, prefix, body, 'post', query, params)
 }
 
-const reducer = (state = { students: {}, courses: {} }, action) => {
+const reducer = (state = { students: {}, courses: {}, pending: false, query: {} }, action) => {
   switch (action.type) {
     case 'GET_STUDENTS_OF_COURSE_ATTEMPT':
       return {
@@ -55,7 +55,8 @@ const reducer = (state = { students: {}, courses: {} }, action) => {
       return {
         ...state,
         pending: false,
-        courses: action.response
+        courses: action.response,
+        query: action.query
       }
     default:
       return state
