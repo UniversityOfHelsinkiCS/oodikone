@@ -565,7 +565,7 @@ const setDuplicateCode = async (code1, code2) => {
             { groupid, coursecode: code1 },
             { groupid, coursecode: code2 }
           ],
-            { ignoreDuplicates: true })
+          { ignoreDuplicates: true })
         } else {
           // both have a group, must merge groups
           await CourseDuplicates.update({ groupid: all[code1] }, { where: { groupid: all[code2] } })
