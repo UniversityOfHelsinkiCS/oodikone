@@ -10,8 +10,8 @@ const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 const StudentTable = ({ stats, name, history }) => {
   const admin = userIsAdmin()
 
-  const showPopulation = (yearcode, coursecode) => {
-    const queryObject = { yearcode, coursecode }
+  const showPopulation = (yearcode, coursecode, year) => {
+    const queryObject = { yearcode, coursecode, year }
     const searchString = qs.stringify(queryObject)
     history.push(`/coursepopulation?${searchString}`)
   }
@@ -48,7 +48,7 @@ const StudentTable = ({ stats, name, history }) => {
             key: 'TIME',
             title: 'Time',
             getRowVal: s => s.code,
-            getRowContent: s => (admin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.coursecode)} /></div>) : s.name),
+            getRowContent: s => (admin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.coursecode, s.name)} /></div>) : s.name),
             headerProps: { rowSpan: 2, width: 3 }
           }, {
             key: 'TOTAL',
