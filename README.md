@@ -23,7 +23,7 @@ Launch the CLI with the command below and follow the instructions.
 Before running cli [make yourself a deployment key](https://developer.github.com/v3/guides/managing-deploy-keys/#setup-2) for Anonyymioodi private repository and put it in your root folder as private.key. This allows you to download the anonymized dumps from the repository.
 
 ```
-bash run.sh
+bash ./scripts/run.sh
 ```
 
 For local development with anonymized data use `2) Anon setup` (you can run e2e tests with this).
