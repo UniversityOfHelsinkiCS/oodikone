@@ -4,9 +4,9 @@ const { updateStudent, updateMeta, updateAttainmentMeta } = require('./updater/d
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
 const opts = stan.subscriptionOptions()
 opts.setManualAckMode(true)
-opts.setAckWait(30 * 60 * 1000) // 30min
-opts.setDeliverAllAvailable()
-opts.setDurableName('durable')
+opts.setAckWait(5 * 60 * 1000) // 5min
+// opts.setDeliverAllAvailable()
+// opts.setDurableName('durable')
 opts.setMaxInFlight(1)
 
 const republish = (msg) => {

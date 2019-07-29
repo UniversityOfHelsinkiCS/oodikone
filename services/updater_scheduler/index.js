@@ -15,8 +15,11 @@ const timezone = 'Europe/Helsinki'
 
 const updateTask = async (task, status, type) => {
   if (type) {
+    if (status === 'DONE') {
     await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type }, { upsert: true })
-
+    } else {
+      await Schedule.findOneAndUpdate({ task }, { task, status, type }, { upsert: true })
+    }
   } else {
     await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type: 'other', active: true }, { upsert: true })
   }
@@ -25,18 +28,27 @@ const updateTask = async (task, status, type) => {
 stan.on('connect', async () => {
   cron.schedule('0 0 1 * *', async () => {
     // Update ALL students and meta every month
-    scheduleAllStudentsAndMeta()
+    try {
+      await scheduleAllStudentsAndMeta()
+    } catch (err) {
+      console.log('SCHEDULING ALL STUDENTS AND META FAILED')
+      console.log(err)
+    }
   }, { timezone })
 
   cron.schedule('20 4 1 1,3,8,10 *', async () => {
     // At 04:20 on day-of-month 1 in January, March, August, and October.”
-    updateStudentNumberList()
-  })
+    try {
+      await updateStudentNumberList()
+    } catch (err) {
+      console.log('UPDATING STUDENT NUMBER LIST FAILED')
+      console.log(err)
+    }
+  }, { timezone })
 
   // cron.schedule('0 * * * *'), async () => {
   //   const allStudentTasks = await Schedule.find({ type: 'student' })
   //   if (allStudentTasks && allStudentTasks.every(task => task.status === 'DONE')) {
-
   //     stan.publish('DumpDatabase', null, (err, guid) => {
   //       if (err) {
   //         console.log('publish failed', 'DumpDatabase')
@@ -52,7 +64,12 @@ stan.on('connect', async () => {
     if (new Date().getDate() <= 5){
       return
     }
-    scheduleActiveStudents()
+    try {
+      await scheduleActiveStudents()
+    } catch (err) {
+      console.log('SCHEDULING ACTIVE STUDENTS FAILED')
+      console.log(err)
+    }
   }, { timezone })
 
   cron.schedule('*/5 * * * *', async () => {
@@ -60,7 +77,6 @@ stan.on('connect', async () => {
     const status = await getCurrentStatus()
     logger.info('oldestTasks', oldestTasks)
     logger.info('updaterStatus', status)
-
   }, { timezone })
 
   cron.schedule('0 0-9 * * *', async () => {
@@ -89,8 +105,8 @@ stan.on('connect', async () => {
   const opts = stan.subscriptionOptions()
   opts.setManualAckMode(true)
   opts.setAckWait(30 * 60 * 1000) // 1min
-  opts.setDeliverAllAvailable()
-  opts.setDurableName('durable')
+  // opts.setDeliverAllAvailable()
+  // opts.setDurableName('durable')
   opts.setMaxInFlight(20)
 
   const statusSub = stan.subscribe('status', opts)
