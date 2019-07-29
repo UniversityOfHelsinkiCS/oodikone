@@ -16,7 +16,7 @@ const timezone = 'Europe/Helsinki'
 const updateTask = async (task, status, type) => {
   if (type) {
     if (status === 'DONE') {
-    await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type }, { upsert: true })
+      await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type }, { upsert: true })
     } else {
       await Schedule.findOneAndUpdate({ task }, { task, status, type }, { upsert: true })
     }
