@@ -5,10 +5,10 @@ const https = require('https')
 const fs = require('fs')
 const base_url = OODI_ADDR
 
-const agent = KEY_PATH && CERT_PATH ? 
+const agent = KEY_PATH && CERT_PATH ?
   new https.Agent({
     cert: fs.readFileSync(process.env.CERT_PATH, 'utf8'),
-    key: fs.readFileSync(process.env.KEY_PATH, 'utf8'), 
+    key: fs.readFileSync(process.env.KEY_PATH, 'utf8'),
   }) :
   new https.Agent({
     rejectUnauthorized: false
@@ -48,9 +48,10 @@ if (process.env.NODE_ENV === 'dev') {
     username: 'tktl',
     password: process.env.OODI_PW
   }
-  axios.defaults.params = {
-    token: process.env.TOKEN
-  }
+  instance.interceptors.request.use((config) => {
+    config.params = {token: process.env.TOKEN}
+    return config
+  })
 
 }
 

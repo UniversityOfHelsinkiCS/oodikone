@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Tab, Form } from 'semantic-ui-react'
 import { shape, string, arrayOf, func, number, oneOfType } from 'prop-types'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
+import { getTextIn } from '../../common'
 
 const CourseStatsTab = ({ statistics, options, doSelect, selected }) => (
   <div>
@@ -60,11 +63,11 @@ class CoursesTab extends Component {
       if (!courseid) {
         return []
       }
-      const { courses, semesters } = this.props
+      const { courses, semesters, language } = this.props
       const course = courses[courseid]
       return Object.entries(course.semesters).map(([semesterid, stats]) => ({
         id: semesterid,
-        name: semesters[semesterid].name.fi,
+        name: getTextIn(semesters[semesterid].name, language),
         ...stats
       }))
     }
@@ -73,34 +76,35 @@ class CoursesTab extends Component {
       if (!semesterid) {
         return []
       }
-      const { courses } = this.props
+      const { courses, language } = this.props
       return Object.values(courses)
         .filter(course => !!course.semesters[semesterid])
         .map(({ id, name, semesters }) => ({
           id,
-          name: name.fi,
+          name: getTextIn(name, language),
           ...semesters[semesterid]
         }))
     }
 
     semesterOptions() {
-      const { semesters } = this.props
+      const { semesters, language } = this.props
       return Object.values(semesters)
         .map(({ name, id }) => ({
           key: id,
           value: id,
-          text: name.fi
+          text: getTextIn(name, language)
         }))
         .sort((s1, s2) => s2.value - s1.value)
     }
 
     courseOptions() {
+      const { language } = this.props
       const courses = Object.values(this.props.courses)
       return courses.map(({ name, id }) => ({
         key: id,
         value: id,
         description: id,
-        text: name.fi
+        text: getTextIn(name, language)
       }))
     }
 
@@ -145,7 +149,12 @@ class CoursesTab extends Component {
 
 CoursesTab.propTypes = {
   courses: shape({}).isRequired,
-  semesters: shape({}).isRequired
+  semesters: shape({}).isRequired,
+  language: string.isRequired
 }
 
-export default CoursesTab
+const mapStateToProps = ({ localize }) => ({
+  language: getActiveLanguage(localize).code
+})
+
+export default connect(mapStateToProps)(CoursesTab)

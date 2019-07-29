@@ -3,11 +3,13 @@ import { Segment, Header, Form } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import { getActiveLanguage } from 'react-localize-redux'
 import qs from 'query-string'
 import ResultTabs from '../ResultTabs'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import YearFilter from '../SearchForm/YearFilter'
+import { getTextIn } from '../../../common'
 
 const countFilteredStudents = (stat, filter) => Object.entries(stat).reduce((acc, entry) => {
   const [category, students] = entry
@@ -35,8 +37,9 @@ class SingleCourseStats extends Component {
     if (progcode === ALL.value) {
       return 'All'
     }
+    const { activeLanguage } = this.props
     const { name } = this.props.stats.programmes[progcode]
-    return name.fi || name.en || name.sv
+    return getTextIn(name, activeLanguage)
   }
 
   parseQueryFromUrl = () => {
@@ -217,7 +220,8 @@ SingleCourseStats.propTypes = {
   programmes: arrayOf(shape({})).isRequired,
   years: arrayOf(shape({})).isRequired,
   semesters: arrayOf(shape({})).isRequired,
-  location: shape({}).isRequired
+  location: shape({}).isRequired,
+  activeLanguage: string.isRequired
 }
 
 const mapStateToProps = (state) => {
@@ -233,7 +237,8 @@ const mapStateToProps = (state) => {
       key: semestercode,
       texts: Object.values(name),
       value: yearcode
-    })).reverse()
+    })).reverse(),
+    activeLanguage: getActiveLanguage(state.localize).code
   }
 }
 

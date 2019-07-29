@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
 import infoTooltips from '../../common/InfoToolTips'
@@ -84,10 +85,10 @@ const SimpleExtentGraduated = (props) => {
   )
 }
 
-const mapStateToProps = ({ settings, populations, populationDegreesAndProgrammes }) => {
+const mapStateToProps = ({ localize, populations, populationDegreesAndProgrammes }) => {
   const code = populations.query.studyRights.programme
   const studyrightName = populationDegreesAndProgrammes.data.programmes[code].name
-  return { language: settings.language, programme: studyrightName, code }
+  return { language: getActiveLanguage(localize).code, programme: studyrightName, code }
 }
 
 export default connect(

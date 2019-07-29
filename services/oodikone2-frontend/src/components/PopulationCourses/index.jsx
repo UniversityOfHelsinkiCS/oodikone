@@ -70,10 +70,10 @@ PopulationCourses.propTypes = {
   dispatchRefreshFilters: func.isRequired
 }
 
-const mapStateToProps = ({ populationCourses, locale, populationFilters }) => ({
+const mapStateToProps = ({ populationCourses, localize, populationFilters }) => ({
   populationCourses,
   refreshNeeded: populationFilters.refreshNeeded,
-  translate: getTranslate(locale)
+  translate: getTranslate(localize)
 })
 
 export default connect(mapStateToProps, {

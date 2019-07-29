@@ -17,7 +17,7 @@ const StudentTable = ({ stats, name, history }) => {
   }
 
   const formatted = stats.map((statistic) => {
-    const { name: n, code, students } = statistic
+    const { name: n, code, students, coursecode } = statistic
     const {
       passedFirst = 0,
       passedRetry = 0,
@@ -28,6 +28,7 @@ const StudentTable = ({ stats, name, history }) => {
     return ({
       name: n,
       code,
+      coursecode,
       students: total,
       passedFirst,
       passedRetry,

@@ -1,10 +1,13 @@
 import React, { Component } from 'react'
-import { shape } from 'prop-types'
+import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
+import { shape, string } from 'prop-types'
 import _ from 'lodash'
 import { Card, Tab, Icon } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import CoursesTab from './CoursesTab'
+import { getTextIn } from '../../common'
 import '../PopulationQueryCard/populationQueryCard.css'
 
 const statisticsTableTab = (title, statistics) => ({
@@ -12,14 +15,14 @@ const statisticsTableTab = (title, statistics) => ({
   render: () => <TeacherStatisticsTable statistics={statistics} onClickFn={null} />
 })
 
-const formatStatisticsForTable = (statistics) => {
+const formatStatisticsForTable = (statistics, language) => {
   if (!statistics) {
     return []
   }
   return Object.values(statistics).map(({ name, stats, ...rest }) => ({
     ...rest,
     ...stats,
-    name: _.isString(name) ? name : name.fi
+    name: _.isString(name) ? name : getTextIn(name, language)
   }))
 }
 
@@ -27,7 +30,7 @@ class TeacherDetails extends Component {
     state={}
 
     render() {
-      const { teacher } = this.props
+      const { teacher, language } = this.props
       const { courses, years, semesters } = teacher.statistics
 
       const panes = [
@@ -35,8 +38,8 @@ class TeacherDetails extends Component {
           menuItem: 'Courses',
           render: () => <CoursesTab courses={courses} semesters={semesters} />
         },
-        statisticsTableTab('Semesters', formatStatisticsForTable(semesters)),
-        statisticsTableTab('Years', formatStatisticsForTable(years))
+        statisticsTableTab('Semesters', formatStatisticsForTable(semesters, language)),
+        statisticsTableTab('Years', formatStatisticsForTable(years, language))
       ]
 
       return (
@@ -63,7 +66,12 @@ class TeacherDetails extends Component {
 
 TeacherDetails.propTypes = {
   teacher: shape({}).isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  language: string.isRequired
 }
 
-export default withRouter(TeacherDetails)
+const mapStateToProps = ({ localize }) => ({
+  language: getActiveLanguage(localize).code
+})
+
+export default connect(mapStateToProps)(withRouter(TeacherDetails))

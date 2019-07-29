@@ -1,7 +1,7 @@
 const { stan } = require('./nats_connection')
 const Schedule = require('../models')
+const { sleep } = require('./util')
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 const publish = async (tasks, priority = false) => {
   let rampup = 300
   for (const task of tasks) {
@@ -22,34 +22,36 @@ const publish = async (tasks, priority = false) => {
     await sleep(15 * rampup)
   }
 }
-const shuffleArray = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]]
-  }
-  return array
-}
+
+// const shuffleArray = (array) => {
+//   for (let i = array.length - 1; i > 0; i--) {
+//     const j = Math.floor(Math.random() * (i + 1));
+//     [array[i], array[j]] = [array[j], array[i]]
+//   }
+//   return array
+// }
+
 const scheduleActiveStudents = async () => {
-  const tasks = [...shuffleArray(await Schedule.find({ type: 'student', active: true }))]
+  const tasks = [...await Schedule.find({ type: 'student', active: true }).sort({ updatedAt: 1 })]
   console.log(tasks.length, 'tasks to schedule')
-  publish(tasks)
+  await publish(tasks)
 }
 const scheduleAllStudentsAndMeta = async () => {
 
-  const tasks = [{ task: 'meta', type: 'other', active: 'false' }, ...shuffleArray(await Schedule.find({ type: 'student' }))]
+  const tasks = [{ task: 'meta', type: 'other', active: 'false' }, ...await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 })]
   console.log(tasks.length, 'tasks to schedule')
-  publish(tasks)
+  await publish(tasks)
 }
 
 const scheduleMeta = async () => {
   console.log('scheduling meta')
-  publish([{task: 'meta', type: 'other', active: 'false'}])
+  await publish([{task: 'meta', type: 'other', active: 'false'}])
 }
 
 const scheduleStudentsByArray = async (studentNumbers) => {
   try {
     const tasks = await Schedule.find({ type: 'student', task: { $in: studentNumbers } })
-    publish(tasks, true)
+    await publish(tasks, true)
   } catch (e) {
     return e
   }

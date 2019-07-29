@@ -33,10 +33,10 @@ class CourseSearch extends Component {
   }
 
   fetchCoursesList = (searchStr) => {
-    const { language } = this.props
+    const { activeLanguage } = this.props
     if (searchStr.length >= 3) {
       this.setState({ isLoading: true })
-      this.props.findFunction(searchStr, language)
+      this.props.findFunction(searchStr, activeLanguage)
         .then(() => this.setState({ isLoading: false }))
     } else {
       this.props.findFunction('')
@@ -70,21 +70,20 @@ class CourseSearch extends Component {
 }
 
 CourseSearch.propTypes = {
-  language: string.isRequired,
   findFunction: func.isRequired,
   courseList: arrayOf(object).isRequired,
   setTimeout: func.isRequired,
   clearTimeout: func.isRequired,
-  handleResultSelect: func.isRequired
+  handleResultSelect: func.isRequired,
+  activeLanguage: string.isRequired
 }
 
 const sortCourses = makeSortCourses()
 
-const mapStateToProps = ({ locale, courses, settings }) => ({
-  language: settings.language,
+const mapStateToProps = ({ localize, courses }) => ({
   courseList: sortCourses(courses),
-  translate: getTranslate(locale),
-  currentLanguage: getActiveLanguage(locale).value
+  translate: getTranslate(localize),
+  activeLanguage: getActiveLanguage(localize).code
 })
 
 export default connect(mapStateToProps)(Timeout(CourseSearch))
