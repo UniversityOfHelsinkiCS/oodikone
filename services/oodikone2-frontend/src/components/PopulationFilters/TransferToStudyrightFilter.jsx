@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Icon, Button, Form, Popup, Dropdown } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
 
@@ -94,7 +95,7 @@ const mapStateToProps = (state) => {
   const code = state.populations.query.studyRights.programme
   const studyrightName = state.populationDegreesAndProgrammes.data.programmes[code].name
   return ({
-    language: state.settings.language,
+    language: getActiveLanguage(state.localize).code,
     studyrightName
   })
 }

@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { Button, Radio, Icon, Header, Segment, Confirm, Loader, Label, Message } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf } from 'prop-types'
-import { getTranslate } from 'react-localize-redux'
+import { getTranslate, getActiveLanguage } from 'react-localize-redux'
 import { getUsers, getEnabledUsers, sendEmail } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { makeSortUsers } from '../../selectors/users'
@@ -227,9 +227,9 @@ EnableUsers.propTypes = {
 
 const sortUsers = makeSortUsers()
 
-const mapStateToProps = ({ locale, users, units, settings }) => ({
-  language: settings.language,
-  translate: getTranslate(locale),
+const mapStateToProps = ({ localize, users, units }) => ({
+  language: getActiveLanguage(localize).code,
+  translate: getTranslate(localize),
   units: units.data,
   enabledOnly: users.enabledOnly,
   users: sortUsers(users),

@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { shape, func, arrayOf, bool } from 'prop-types'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 import { getProviders } from '../../redux/providers'
 import { getSemesters } from '../../redux/semesters'
 import { getTeacherStatistics } from '../../redux/teacherStatistics'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
-import { userRights, userIsAdmin } from '../../common'
+import { userRights, userIsAdmin, getTextIn } from '../../common'
 
 const initial = {
   semesterStart: null,
@@ -162,7 +163,7 @@ const mapStateToProps = (state) => {
   const providerOptions = providers.data.map(p => ({
     key: p.providercode,
     value: p.providercode,
-    text: p.name.fi || p.name.en
+    text: getTextIn(p.name, getActiveLanguage(state.localize).code)
   }))
   const semesterOptions = !semesters
     ? []

@@ -20,4 +20,4 @@ const Main = () => (
   </div>
 )
 
-export default localize(Main, 'locale')
+export default localize(Main, 'localize')

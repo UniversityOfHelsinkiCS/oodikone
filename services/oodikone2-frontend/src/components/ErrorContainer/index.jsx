@@ -21,9 +21,9 @@ const ErrorContainer = (props) => {
   return (<div className="segmentContainer">{errors}</div>)
 }
 
-const mapStateToProps = ({ errors, locale }) => ({
+const mapStateToProps = ({ errors, localize }) => ({
   errors: errors.length ? errors : [],
-  translate: getTranslate(locale)
+  translate: getTranslate(localize)
 })
 
 ErrorContainer.defaultProps = {

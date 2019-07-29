@@ -1,7 +1,8 @@
 import { createSelector } from 'reselect'
+import { getActiveLanguage } from 'react-localize-redux'
 import { getTextIn } from '../common'
 
-const languageSelector = state => state.settings.language
+const languageSelector = state => getActiveLanguage(state.localize).code
 const associationsSelector = state => state.populationDegreesAndProgrammesUnfiltered.data
 
 const toOptions = (elements, language) => (!elements ? [] : Object.values(elements).map(element => ({

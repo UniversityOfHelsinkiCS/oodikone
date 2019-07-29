@@ -21,9 +21,9 @@ Header.propTypes = {
   }).isRequired
 }
 
-const mapStateToProps = ({ locale }) => ({
-  translate: getTranslate(locale),
-  currentLanguage: getActiveLanguage(locale).value
+const mapStateToProps = ({ localize }) => ({
+  translate: getTranslate(localize),
+  currentLanguage: getActiveLanguage(localize).code
 })
 
 export default withRouter(connect(mapStateToProps)(Header))

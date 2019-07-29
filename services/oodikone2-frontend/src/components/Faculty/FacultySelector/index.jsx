@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Form } from 'semantic-ui-react'
 import { string, func, arrayOf, shape } from 'prop-types'
 import { uniq } from 'lodash'
@@ -162,10 +163,10 @@ FacultySelector.propTypes = {
   facultyYearlyStats: arrayOf(shape({})).isRequired
 }
 
-const mapStateToProps = ({ faculties, settings }) => ({
+const mapStateToProps = ({ faculties, localize }) => ({
   faculties: faculties.data,
   facultyYearlyStats: faculties.yearlyStats,
-  language: settings.language
+  language: getActiveLanguage(localize).code
 })
 
 const mapDispatchToProps = {

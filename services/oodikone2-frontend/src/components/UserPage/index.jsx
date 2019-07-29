@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
@@ -227,7 +228,7 @@ UserPage.propTypes = {
   login: func.isRequired
 }
 const mapStateToProps = state => ({
-  language: state.settings.language,
+  language: getActiveLanguage(state.localize).code,
   units: state.units.data,
   faculties: state.faculties.data,
   associations: state.populationDegreesAndProgrammesUnfiltered.data,

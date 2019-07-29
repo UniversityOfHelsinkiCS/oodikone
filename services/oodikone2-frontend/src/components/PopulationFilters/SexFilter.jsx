@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Radio, Icon, Form, Segment, Button } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
 import { getTextIn } from '../../common'
@@ -74,8 +75,8 @@ class SexFilter extends Component {
   }
 }
 
-const mapStateToProps = ({ settings }) => ({
-  language: settings.language
+const mapStateToProps = ({ localize }) => ({
+  language: getActiveLanguage(localize).code
 })
 
 export default connect(

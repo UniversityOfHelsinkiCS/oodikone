@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Icon, Dropdown, Button, Form, Popup } from 'semantic-ui-react'
-import { shape, func } from 'prop-types'
+import { shape, func, string } from 'prop-types'
 import _ from 'lodash'
 
 import infoTooltips from '../../common/InfoToolTips'
+import { getTextIn } from '../../common'
 import { transferFilter } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -13,7 +15,8 @@ class TransferFilter extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    transfers: shape({}).isRequired
+    transfers: shape({}).isRequired,
+    activeLanguage: string.isRequired
   }
 
   state = {
@@ -22,9 +25,9 @@ class TransferFilter extends Component {
   }
 
   getName = (code) => {
-    const { transfers } = this.props
+    const { transfers, activeLanguage } = this.props
     const mergedTransfers = { ...Object.values(transfers)[0], ...Object.values(transfers)[1] }
-    return mergedTransfers[code].name.fi
+    return getTextIn(mergedTransfers[code].name, activeLanguage)
   }
 
   handleChange = (e, data) => {
@@ -57,7 +60,7 @@ class TransferFilter extends Component {
   }
 
   render() {
-    const { filter, transfers } = this.props
+    const { filter, transfers, activeLanguage } = this.props
     const { sources, targets } = transfers
     sources.anywhere = { name: { en: 'Anywhere', fi: 'Anywhere' }, targets }
     targets.anywhere = { name: { en: 'Anywhere', fi: 'Anywhere' }, sources }
@@ -100,7 +103,7 @@ class TransferFilter extends Component {
                   value={this.state.courseType}
                   options={_.sortBy(Object.entries(filteredSources).map(([value, text]) => ({
                     value,
-                    text: text.name.fi
+                    text: getTextIn(text.name, activeLanguage)
                   })), entry => entry.text)}
                   selectOnBlur={false}
                 />
@@ -121,7 +124,7 @@ class TransferFilter extends Component {
                   value={this.state.discipline}
                   options={_.sortBy(Object.entries(filteredTargets).map(([value, text]) => ({
                     value,
-                    text: text.name.fi
+                    text: getTextIn(text.name, activeLanguage)
                   })), entry => entry.text)}
                   selectOnBlur={false}
                 />
@@ -154,10 +157,11 @@ class TransferFilter extends Component {
   }
 }
 
-const mapStateToProps = ({ populationCourses }) => ({
+const mapStateToProps = ({ populationCourses, localize }) => ({
   courseTypes: populationCourses.data.coursetypes,
   disciplines: populationCourses.data.disciplines,
-  courses: populationCourses.data.coursestatistics
+  courses: populationCourses.data.coursestatistics,
+  activeLanguage: getActiveLanguage(localize).code
 })
 
 export default connect(
