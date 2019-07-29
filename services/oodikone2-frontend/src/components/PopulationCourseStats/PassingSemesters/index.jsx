@@ -4,7 +4,7 @@ import { arrayOf, shape, string, func } from 'prop-types'
 import CourseRow from './CourseRow'
 
 export default class PassingSemesters extends Component {
-  propTypes = {
+  static propTypes = {
     courseStatistics: arrayOf(shape({ course: shape({ code: string }) })).isRequired,
     onCourseNameClickFn: func.isRequired,
     isActiveCourseFn: func.isRequired

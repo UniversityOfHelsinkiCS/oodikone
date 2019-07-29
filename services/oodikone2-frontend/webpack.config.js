@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const DeadCodePlugin = require('webpack-deadcode-plugin')
-// const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+const SentryWebpackPlugin = require('@sentry/webpack-plugin')
 
 const devServerPort = 8081
 const apiServerPort = 8080
@@ -81,14 +81,14 @@ module.exports = (env, args) => {
       new MiniCssExtractPlugin({
         filename: '[name]-[hash].css',
         chunkFilename: '[id]-[hash].css'
+      }),
+      new SentryWebpackPlugin({
+        include: 'dist',
+        ignoreFile: '.sentrycliignore',
+        ignore: ['node_modules', 'webpack.config.js'],
+        release: sentryreleaseversion,
+        dryRun: noSentryVersion
       })
-      // new SentryWebpackPlugin({
-      //   include: 'dist',
-      //   ignoreFile: '.sentrycliignore',
-      //   ignore: ['node_modules', 'webpack.config.js'],
-      //   release: sentryreleaseversion,
-      //   dryRun: noSentryVersion
-      // })
     ],
     optimization: {
       minimizer: [new TerserPlugin({

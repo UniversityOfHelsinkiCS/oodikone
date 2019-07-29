@@ -17,7 +17,9 @@ before_script:
   - docker --version
   - docker-compose --version
   - export AUTHOR_NAME="$(git log -1 ${TRAVIS_COMMIT} --pretty="%aN")"
-  - export SENTRY_RELEASE_VERSION=${IMAGE}-${TRAVIS_COMMIT}
+  - if [[ -n "$TRAVIS_TAG" || ("$TRAVIS_BRANCH" = "master" && "$TRAVIS_PULL_REQUEST" = "false") ]];
+    then export SENTRY_RELEASE_VERSION=${IMAGE}-${TRAVIS_COMMIT};
+    fi
 
 jobs:
   include:
