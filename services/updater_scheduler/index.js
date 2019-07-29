@@ -72,32 +72,11 @@ stan.on('connect', async () => {
   }, { timezone })
 
   cron.schedule('0 7 * * *', async () => {
-    stan.publish('RefreshOverview', null, (err) => {
-      if (err) {
-        console.log('publish failed', 'RefreshOverview')
-      } else {
-        console.log('published', 'RefreshOverview')
-      }
-    })
-    stan.publish('RefreshStudyrightAssociations', null, (err) => {
-      if (err) {
-        console.log('publish failed', 'RefreshStudyrightAssociations')
-      } else {
-        console.log('published', 'RefreshStudyrightAssociations')
-      }
-    })
     stan.publish('updateAttainmentDates', null, (err) => {
       if (err) {
         console.log('publish failed', 'UpdateAttainmentDates')
       } else {
         console.log('published', 'UpdateAttainmentDates')
-      }
-    })
-    stan.publish('updateFacultyYearlyStats', null, (err) => {
-      if (err) {
-        console.log('publish failed', 'updateFacultyYearlyStats')
-      } else {
-        console.log('published', 'updateFacultyYearlyStats')
       }
     })
   }, { timezone })
