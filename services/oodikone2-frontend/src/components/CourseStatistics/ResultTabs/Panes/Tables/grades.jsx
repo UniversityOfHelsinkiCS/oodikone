@@ -15,7 +15,7 @@ const getSortableColumn = (key, title, getRowVal, getRowContent) => (
   })
 
 const getTableData = (stats, isGradeSeries) => stats.map(((stat) => {
-  const { name, code, cumulative: { grades } } = stat
+  const { name, code, cumulative: { grades }, coursecode } = stat
 
   const spread = isGradeSeries
     ? getGradeSpread([grades])
@@ -26,6 +26,7 @@ const getTableData = (stats, isGradeSeries) => stats.map(((stat) => {
   return {
     name,
     code,
+    coursecode,
     attempts,
     ...spread
   }

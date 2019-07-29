@@ -13,9 +13,10 @@ axios.defaults.auth = {
   username: 'tktl',
 }
 
-axios.defaults.params = {
-  token: process.env.TOKEN
-}
+instance.interceptors.request.use((config) => {
+  config.params = {token: process.env.TOKEN}
+  return config
+})
 
 const getStudent = (studentNumber) => {
   return instance.get(`${process.env.OODI_ADDR}/students/${studentNumber}/info`)

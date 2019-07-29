@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Icon, Popup } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
 
@@ -92,8 +93,8 @@ class CourseParticipation extends Component {
   }
 }
 
-const mapStateToProps = ({ settings }) => ({
-  language: settings.language
+const mapStateToProps = ({ localize }) => ({
+  language: getActiveLanguage(localize).code
 })
 
 export default connect(mapStateToProps, {

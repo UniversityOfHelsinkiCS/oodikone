@@ -1,32 +1,30 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { getActiveLanguage, setActiveLanguage, getLanguages } from 'react-localize-redux'
 import { Dropdown } from 'semantic-ui-react'
 import PropTypes from 'prop-types'
 
 import { getUserName, setUserLanguage, getUserLanguage } from '../../common'
 import { switchLanguage, initLanguage } from '../../redux/settings'
 
-const { func, shape, string } = PropTypes
-
-const languages = [
-  { key: 'fi', text: 'fi', value: 'fi' },
-  { key: 'en', text: 'en', value: 'en' },
-  { key: 'sv', text: 'sv', value: 'sv' }
-]
+const { func, shape, string, arrayOf } = PropTypes
 
 class LanguageChooser extends Component {
   async componentDidMount() {
     const initialLanguage = await getUserLanguage()
     this.props.initLanguage(initialLanguage)
+    this.props.setActiveLanguage(initialLanguage)
   }
 
   change = () => async (e, { value }) => {
     const name = await getUserName()
+    this.props.setActiveLanguage(value)
     this.props.switchLanguage(name, value)
     await setUserLanguage(value)
   }
 
   render() {
+    const { language, languages } = this.props
     return (
       <Dropdown
         size="small"
@@ -34,7 +32,7 @@ class LanguageChooser extends Component {
         floating
         icon="world"
         onChange={this.change()}
-        text={this.props.settings.language}
+        text={language}
         options={languages}
         button
       />
@@ -42,21 +40,23 @@ class LanguageChooser extends Component {
   }
 }
 
-const mapStateToProps = ({ settings }) => ({
-  settings
+const mapStateToProps = ({ localize }) => ({
+  language: getActiveLanguage(localize).code,
+  languages: getLanguages(localize).map(l => ({ ...l, key: l.code, text: l.code, value: l.code }))
 })
 
-const mapDispatchToProps = dispatch => ({
-  switchLanguage: (username, language) =>
-    dispatch(switchLanguage(username, language)),
-  initLanguage: language =>
-    dispatch(initLanguage(language))
-})
+const mapDispatchToProps = {
+  switchLanguage,
+  initLanguage,
+  setActiveLanguage
+}
 
 LanguageChooser.propTypes = {
-  settings: shape({ language: string.isRequired }).isRequired,
   switchLanguage: func.isRequired,
-  initLanguage: func.isRequired
+  initLanguage: func.isRequired,
+  setActiveLanguage: func.isRequired,
+  language: string.isRequired,
+  languages: arrayOf(shape({})).isRequired
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LanguageChooser)
