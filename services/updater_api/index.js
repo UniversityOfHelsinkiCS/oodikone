@@ -10,14 +10,6 @@ opts.setAckWait(5 * 60 * 1000) // 5min
 // opts.setDurableName('durable')
 opts.setMaxInFlight(1)
 
-const republish = (msg) => {
-  stan.publish(msg.getSubject() , msg.getData(), (err) => {
-    if (err) {
-      console.log(err)
-    }
-  })
-}
-
 const handleMessage = (priority) => async (msg) => {
   try {
     let data = ''
@@ -52,7 +44,6 @@ const handleMessage = (priority) => async (msg) => {
     }
   } catch (e) {
     console.log(e)
-    republish(msg)
   }
   msg.ack()
 }
