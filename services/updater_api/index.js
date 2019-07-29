@@ -5,10 +5,10 @@ const { getStudent, getMeta } = require('./doo_api_database_updater/updater_form
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
 var opts = stan.subscriptionOptions()
 opts.setManualAckMode(true)
-opts.setAckWait(15 * 60 * 1000) // 15min
-opts.setDeliverAllAvailable()
-opts.setDurableName('durable')
-opts.setMaxInFlight(3)
+opts.setAckWait(5 * 60 * 1000) // 5min
+// opts.setDeliverAllAvailable()
+// opts.setDurableName('durable')
+opts.setMaxInFlight(1)
 
 const republish = (msg) => {
   stan.publish(msg.getSubject() , msg.getData(), (err) => {
