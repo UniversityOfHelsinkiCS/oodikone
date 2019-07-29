@@ -9,15 +9,6 @@ opts.setAckWait(5 * 60 * 1000) // 5min
 // opts.setDurableName('durable')
 opts.setMaxInFlight(1)
 
-const republish = (msg) => {
-  console.log('republishing', msg.getSubject())
-  stan.publish(msg.getSubject() , msg.getData(), (err) => {
-    if (err) {
-      console.log(err)
-    }
-  })
-}
-
 stan.on('connect', function () {
 
   const sub = stan.subscribe('UpdateWrite', 'updater.workers', opts)
@@ -40,7 +31,6 @@ stan.on('connect', function () {
         id = data.studentInfo ? data.studentInfo.studentnumber : 'meta'
       }
       console.log('update failed', id, err)
-      republish(msg)
     }
     msg.ack()
   })
@@ -49,7 +39,6 @@ stan.on('connect', function () {
       await updateAttainmentMeta()
     } catch (err) {
       console.log('attainment meta update failed', err)
-      republish(msg)
     }
     msg.ack()
   })
@@ -65,7 +54,6 @@ stan.on('connect', function () {
         id = data.studentInfo ? data.studentInfo.studentnumber : 'meta'
       }
       console.log('priority student update failed', id, err)
-      republish(msg)
     }
     msg.ack()
   })
