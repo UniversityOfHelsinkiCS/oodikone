@@ -2,7 +2,7 @@ import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { Table } from 'semantic-ui-react'
-import { arrayOf, shape, string, func, bool } from 'prop-types'
+import { number, shape, string, func, bool } from 'prop-types'
 import { getTextIn } from '../../../common'
 import '../populationCourseStats.css'
 
@@ -91,7 +91,7 @@ const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, isActiveCourse
 CourseRow.propTypes = {
   statistics: shape({
     course: shape({ code: string, name: shape({}) }),
-    stats: shape({ students: arrayOf(shape({})), passed: bool, passingSemesters: shape({}), passingSemestersCumulative: shape({}) })
+    stats: shape({ students: number, passed: number, passingSemesters: shape({}), passingSemestersCumulative: shape({}) })
   }).isRequired,
   cumulative: bool.isRequired,
   onCourseNameClickFn: func.isRequired,
