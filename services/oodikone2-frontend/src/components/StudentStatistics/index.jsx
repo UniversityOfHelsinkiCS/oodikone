@@ -47,9 +47,9 @@ StudentStatistics.defaultProps = {
   }
 }
 
-const mapStateToProps = ({ locale, students }) => ({
-  translate: getTranslate(locale),
-  currentLanguage: getActiveLanguage(locale).value,
+const mapStateToProps = ({ localize, students }) => ({
+  translate: getTranslate(localize),
+  currentLanguage: getActiveLanguage(localize).value,
   student: students.data.find(student =>
     student.studentNumber === students.selected)
 })

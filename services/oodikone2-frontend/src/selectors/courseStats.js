@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect'
+import { getActiveLanguage } from 'react-localize-redux'
 import { getTextIn } from '../common'
 
 const nameAsString = (data, language) => {
@@ -9,7 +10,6 @@ const nameAsString = (data, language) => {
 }
 
 const getCourseStats = (state) => {
-  const { language } = state.settings
   const stats = {}
   Object.entries(state.courseStats.data).forEach((entry) => {
     const [coursecode, data] = entry
@@ -18,12 +18,14 @@ const getCourseStats = (state) => {
       ...data,
       statistics: statistics.map(stat => ({
         ...stat,
-        name: nameAsString(stat.name, language)
+        name: nameAsString(stat.name, getActiveLanguage(state.localize).code)
       }))
     }
   })
   return stats
 }
+
+const languageSelector = state => getActiveLanguage(state.localize).code
 
 const getQueryInfo = (state) => {
   const courseStats = Object.values(getCourseStats(state))
@@ -51,7 +53,7 @@ export const ALL = {
 
 const mergeUnique = (arr1, arr2) => [...new Set([...arr1, ...arr2])]
 
-const getAllStudyProgrammes = createSelector([getCourseStats], (courseStats) => {
+const getAllStudyProgrammes = createSelector([getCourseStats, languageSelector], (courseStats, language) => {
   const all = {}
   let studentnumbers = []
   Object.values(courseStats).forEach((stat) => {
@@ -64,7 +66,7 @@ const getAllStudyProgrammes = createSelector([getCourseStats], (courseStats) => 
         all[code] = {
           key: code,
           value: code,
-          text: name.fi || name.en || name.sv,
+          text: getTextIn(name, language),
           students
         }
       } else {

@@ -1,7 +1,9 @@
 import React, { Fragment } from 'react'
+import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Table } from 'semantic-ui-react'
 import { arrayOf, shape, string, func, bool } from 'prop-types'
-
+import { getTextIn } from '../../../common'
 import '../populationCourseStats.css'
 
 const getYearCount = (year, passingSemesters) => passingSemesters[`${year}-FALL`] + passingSemesters[`${year}-SPRING`]
@@ -59,7 +61,7 @@ const renderCumulativeStatistics = passingSemesters => (
   </Fragment>
 )
 
-const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, isActiveCourseFn }) => {
+const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, isActiveCourseFn, activeLanguage }) => {
   const { stats, course } = statistics
   const passingSemesters = cumulative ? stats.passingSemestersCumulative : stats.passingSemesters
   const isActive = isActiveCourseFn(course)
@@ -67,7 +69,7 @@ const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, isActiveCourse
   return (
     <Table.Row key={course.code} active={isActive}>
       <Table.Cell onClick={() => onCourseNameClickFn(statistics)} className="clickableCell">
-        {course.name.fi}
+        {getTextIn(course.name, activeLanguage)}
       </Table.Cell>
       <Table.Cell>
         {course.code}
@@ -93,7 +95,12 @@ CourseRow.propTypes = {
   }).isRequired,
   cumulative: bool.isRequired,
   onCourseNameClickFn: func.isRequired,
-  isActiveCourseFn: func.isRequired
+  isActiveCourseFn: func.isRequired,
+  activeLanguage: string.isRequired
 }
 
-export default CourseRow
+const mapStateToProps = ({ localize }) => ({
+  activeLanguage: getActiveLanguage(localize).code
+})
+
+export default connect(mapStateToProps)(CourseRow)

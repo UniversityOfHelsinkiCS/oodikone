@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { shape, func, arrayOf, object, string } from 'prop-types'
 import _ from 'lodash'
@@ -141,7 +142,7 @@ class ExtentGraduated extends Component {
   }
 }
 
-const mapStateToProps = ({ settings }) => ({ language: settings.language })
+const mapStateToProps = ({ localize }) => ({ language: getActiveLanguage(localize).code })
 
 export default connect(
   mapStateToProps,

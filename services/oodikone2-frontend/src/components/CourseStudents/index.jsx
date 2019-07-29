@@ -85,11 +85,11 @@ CourseStudents.propTypes = {
   courseData: shape({}).isRequired
 }
 
-const mapStateToProps = ({ coursePopulation, locale, courseStats }) => ({
+const mapStateToProps = ({ coursePopulation, localize, courseStats }) => ({
   studentData: coursePopulation.students,
   courses: coursePopulation.courses,
   pending: coursePopulation.pending,
-  translate: getTranslate(locale),
+  translate: getTranslate(localize),
   query: coursePopulation.query,
   courseData: courseStats.data
 })

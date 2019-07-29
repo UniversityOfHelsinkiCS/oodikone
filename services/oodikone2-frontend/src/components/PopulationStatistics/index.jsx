@@ -71,9 +71,9 @@ class PopulationStatistics extends PureComponent {
   }
 }
 
-const mapStateToProps = ({ locale, populations }) => ({
-  translate: getTranslate(locale),
-  currentLanguage: getActiveLanguage(locale).value,
+const mapStateToProps = ({ localize, populations }) => ({
+  translate: getTranslate(localize),
+  currentLanguage: getActiveLanguage(localize).value,
   loading: populations.pending,
   populationFound: populations.data.students !== undefined,
   query: populations.query ? populations.query : {}

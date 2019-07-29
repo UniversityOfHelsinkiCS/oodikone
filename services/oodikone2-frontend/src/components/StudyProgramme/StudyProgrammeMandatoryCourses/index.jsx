@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { func, shape, string } from 'prop-types'
 import { Message, Tab } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
@@ -102,9 +103,9 @@ const mapDispatchToProps = {
 }
 
 export default connect(
-  ({ populationMandatoryCourses, settings }) => ({
+  ({ populationMandatoryCourses, localize }) => ({
     mandatoryCourses: populationMandatoryCourses,
-    language: settings.language
+    language: getActiveLanguage(localize).code
   }),
   mapDispatchToProps
 )(withRouter(StudyProgrammeMandatoryCourses))
