@@ -4,6 +4,7 @@ const https = require('https')
 const fs = require('fs')
 const Schedule = require('../models')
 const moment = require('moment')
+const { sleep } = require('./util')
 
 async function updateStudentNumberList() {
   const { KEY_PATH, CERT_PATH, TOKEN, NODE_ENV, OODI_ADDR, STUDENT_NUMBERS } = process.env
@@ -21,12 +22,14 @@ async function updateStudentNumberList() {
   const instance = axios.create({
     httpsAgent: agent
   })
+
   instance.defaults.httpsAgent = agent
 
   if (NODE_ENV === 'development') {
-    instance.defaults.params['token'] = {
-      token: TOKEN
-    }
+    instance.interceptors.request.use((config) => {
+      config.params = {token: TOKEN}
+      return config
+    })
   }
 
   const getStudentNumberChecksum = studentNumber => {
@@ -63,7 +66,7 @@ async function updateStudentNumberList() {
     let tasks = []
     for (const student of studentsToAdd) {
       const active = await getActive(student)
-      tasks = [...tasks, ({ task: student, status: 'CREATED', updatedAt: new Date(), type: 'student', active })]
+      tasks = [...tasks, ({ task: student, status: 'CREATED', type: 'student', active })]
     }
     const insertOrUpdateBulk = async (tasks) => {
       try {
@@ -89,23 +92,29 @@ async function updateStudentNumberList() {
   let minStudentNumber = 1010000
   // minStudentNumber = allStudentsInDb.length > 0 ? Number((allStudentsInDb.sort((a, b) => b - a)[0]) / 10).toFixed(0) : 1010000
 
-  const maxStudentNumber = 1010000 + 500000
+  const maxStudentNumber = minStudentNumber + 500000
   let studentsToAdd = []
   console.log(`SEARCHING STUDENTS FROM ${minStudentNumber} TO ${maxStudentNumber}`)
-  for (let i = minStudentNumber; i < maxStudentNumber; i++) {
-    const studentNumber = '0' + i + getStudentNumberChecksum(i)
-    const response = await requestStudent(studentNumber)
-    if (!response.data.data || !response.data.data.student_number) continue
-    if (allStudentsInDb.includes(response.data.data.student_number)) continue
-    studentsToAdd = [...studentsToAdd, response.data.data.student_number]
-    if (studentsToAdd.length % 1000 === 0) {
-      try {
-        await writeStudents(studentsToAdd)
-      } catch (e) {
-        console.log(e)
+  for (let i = minStudentNumber; i < maxStudentNumber;) {
+    try {
+      const studentNumber = '0' + i + getStudentNumberChecksum(i)
+      const response = await requestStudent(studentNumber)
+      if (!response.data.data || !response.data.data.student_number) continue
+      if (allStudentsInDb.includes(response.data.data.student_number)) continue
+      studentsToAdd = [...studentsToAdd, response.data.data.student_number]
+      if (studentsToAdd.length % 1000 === 0) {
+        try {
+          await writeStudents(studentsToAdd)
+        } catch (e) {
+          console.log(e)
+        }
+        studentsToAdd = []
+        console.log(`${i - minStudentNumber}/${maxStudentNumber - minStudentNumber} STUDENT LIST PROGRESS`)
       }
-      studentsToAdd = []
-      console.log(`${i - minStudentNumber}/${maxStudentNumber - minStudentNumber} STUDENT LIST PROGRESS`)
+      i++
+    } catch (err) {
+      console.log(err)
+      await sleep(1*60*1000)
     }
   }
   await writeStudents(studentsToAdd)
