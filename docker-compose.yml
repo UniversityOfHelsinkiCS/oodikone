@@ -46,7 +46,7 @@ services:
       - POSTGRES_DB=usage_db
 
   db:
-    image: postgres:9.6.3
+    image: postgres:10-alpine
     ports:
       - "5421:5432"
     volumes:

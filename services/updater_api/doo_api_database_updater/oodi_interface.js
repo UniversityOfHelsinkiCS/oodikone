@@ -53,9 +53,10 @@ if (process.env.NODE_ENV === 'development') {
   //   username: 'tktl',
   //   password: process.env.OODI_PW
   // }
-  axios.defaults.params = {
-    token: process.env.TOKEN
-  }
+  instance.interceptors.request.use((config) => {
+    config.params = {token: process.env.TOKEN}
+    return config
+  })
 
 }
 console.log(process.env.NODE_ENV)
