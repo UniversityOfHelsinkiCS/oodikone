@@ -4,19 +4,10 @@ const { updateStudent, updateMeta, updateAttainmentMeta } = require('./updater/d
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
 const opts = stan.subscriptionOptions()
 opts.setManualAckMode(true)
-opts.setAckWait(30 * 60 * 1000) // 30min
-opts.setDeliverAllAvailable()
-opts.setDurableName('durable')
+opts.setAckWait(5 * 60 * 1000) // 5min
+// opts.setDeliverAllAvailable()
+// opts.setDurableName('durable')
 opts.setMaxInFlight(1)
-
-const republish = (msg) => {
-  console.log('republishing', msg.getSubject())
-  stan.publish(msg.getSubject() , msg.getData(), (err) => {
-    if (err) {
-      console.log(err)
-    }
-  })
-}
 
 stan.on('connect', function () {
 
@@ -40,7 +31,6 @@ stan.on('connect', function () {
         id = data.studentInfo ? data.studentInfo.studentnumber : 'meta'
       }
       console.log('update failed', id, err)
-      republish(msg)
     }
     msg.ack()
   })
@@ -49,7 +39,6 @@ stan.on('connect', function () {
       await updateAttainmentMeta()
     } catch (err) {
       console.log('attainment meta update failed', err)
-      republish(msg)
     }
     msg.ack()
   })
@@ -65,7 +54,6 @@ stan.on('connect', function () {
         id = data.studentInfo ? data.studentInfo.studentnumber : 'meta'
       }
       console.log('priority student update failed', id, err)
-      republish(msg)
     }
     msg.ack()
   })
