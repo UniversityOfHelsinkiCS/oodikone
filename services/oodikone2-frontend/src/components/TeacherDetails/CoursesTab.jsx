@@ -18,7 +18,7 @@ const CourseStatsTab = ({ statistics, options, doSelect, selected }) => (
         onChange={(_, { value }) => doSelect(value)}
       />
     </Form>
-    {selected && <TeacherStatisticsTable statistics={statistics} onClickFn={null} />}
+    {selected && <TeacherStatisticsTable statistics={statistics} onClickFn={() => {}} />}
   </div>
 )
 

@@ -12,7 +12,7 @@ import '../PopulationQueryCard/populationQueryCard.css'
 
 const statisticsTableTab = (title, statistics) => ({
   menuItem: title,
-  render: () => <TeacherStatisticsTable statistics={statistics} onClickFn={null} />
+  render: () => <TeacherStatisticsTable statistics={statistics} onClickFn={() => {}} />
 })
 
 const formatStatisticsForTable = (statistics, language) => {
@@ -30,7 +30,7 @@ class TeacherDetails extends Component {
     state={}
 
     render() {
-      const { teacher, language } = this.props
+      const { teacher, language, history } = this.props
       const { courses, years, semesters } = teacher.statistics
 
       const panes = [
@@ -51,7 +51,7 @@ class TeacherDetails extends Component {
                 <Icon
                   name="remove"
                   className="controlIcon"
-                  onClick={() => this.props.history.goBack()}
+                  onClick={() => history.goBack()}
                 />
               </Card.Header>
               <Card.Meta content={teacher.code} />
