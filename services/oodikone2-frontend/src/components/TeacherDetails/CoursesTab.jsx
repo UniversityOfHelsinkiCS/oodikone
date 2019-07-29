@@ -46,12 +46,12 @@ class CoursesTab extends Component {
       const semesterOptions = this.semesterOptions()
       const courseOptions = this.courseOptions()
       const courseWithMostCredits = Object.values(courses)
-        .reduce((c1, c2) => (c1.stats.credits > c2.stats.credits ? c1 : c2))
+        .reduce((c1, c2) => (c1.stats.credits > c2.stats.credits ? c1 : c2), null)
       this.setState({
         semesterOptions,
         courseOptions,
-        selectedSemester: semesterOptions[0].value,
-        selectedCourse: courseWithMostCredits.id
+        selectedSemester: semesterOptions.length > 0 ? semesterOptions[0].value : null,
+        selectedCourse: courseWithMostCredits != null ? courseWithMostCredits.id : null
       })
     }
 
