@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
 import { Header, Segment, Button, Icon, Popup, Tab, Grid, Checkbox, List } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
@@ -48,6 +49,7 @@ class PopulationStudents extends Component {
   }
 
   containsStudyTracks = () => {
+    const { language } = this.props
     const students = this.props.samples.reduce((obj, s) => {
       obj[s.studentNumber] = s
       return obj
@@ -57,7 +59,7 @@ class PopulationStudents extends Component {
     return allStudyrights.map(studyrights => this.studyrightCodes(studyrights, 'studyrightElements')
       .reduce((acc, elemArr) => {
         elemArr.filter(el => el.element_detail.type === 30).forEach(el =>
-          acc.push(el.element_detail.name.fi))
+          acc.push(getTextIn(el.element_detail.name, language)))
         return acc
       }, []).length > 0).some(el => el === true)
   }
@@ -600,7 +602,7 @@ PopulationStudents.propTypes = {
   getTagsByStudytrack: func.isRequired
 }
 
-const mapStateToProps = ({ settings, populations, populationCourses, populationMandatoryCourses, tags }) => {
+const mapStateToProps = ({ localize, settings, populations, populationCourses, populationMandatoryCourses, tags }) => {
   const mandatoryCodes = populationMandatoryCourses.data.map(c => c.code)
 
   let mandatoryPassed = {}
@@ -617,7 +619,7 @@ const mapStateToProps = ({ settings, populations, populationCourses, populationM
   return {
     showNames: settings.namesVisible,
     showList: settings.studentlistVisible,
-    language: settings.language,
+    language: getActiveLanguage(localize).code,
     queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
     mandatoryCourses: populationMandatoryCourses.data,
     mandatoryPassed,

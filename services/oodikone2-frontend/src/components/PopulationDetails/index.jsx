@@ -245,7 +245,7 @@ const mapStateToProps = (state) => {
     samples,
     selectedStudents,
     complemented,
-    translate: getTranslate(state.locale),
+    translate: getTranslate(state.localize),
     queryIsSet: !!state.populations.query,
     isLoading: state.populations.pending === true
   }

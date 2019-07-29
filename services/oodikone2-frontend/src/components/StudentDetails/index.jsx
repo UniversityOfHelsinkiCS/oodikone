@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { func, shape, string, boolean, arrayOf, integer } from 'prop-types'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Table, Icon } from 'semantic-ui-react'
 import { isEmpty, sortBy, flattenDeep } from 'lodash'
 import moment from 'moment'
@@ -261,8 +262,8 @@ StudentDetails.defaultProps = {
   studentNumber: ''
 }
 
-const mapStateToProps = ({ students, settings }) => ({
-  language: settings.language,
+const mapStateToProps = ({ students, localize }) => ({
+  language: getActiveLanguage(localize).code,
   student: students.data.find(student =>
     student.studentNumber === students.selected)
 

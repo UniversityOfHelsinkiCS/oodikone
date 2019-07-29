@@ -1,5 +1,10 @@
 
 describe('Users tests', () => {
+  before(() => {
+    cy.visit(Cypress.config().baseUrl)
+    cy.get(".world").parent().click().contains('fi').click()
+  })
+
   beforeEach(() => {
     cy.server({
       onAnyRequest: function (route, proxy) {

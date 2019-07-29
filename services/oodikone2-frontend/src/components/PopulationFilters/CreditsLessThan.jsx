@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Icon, Input, Button, Form, Popup } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
 
@@ -79,8 +80,8 @@ class CreditsLessThan extends Component {
   }
 }
 
-const mapStateToProps = ({ settings }) => ({
-  language: settings.language
+const mapStateToProps = ({ localize }) => ({
+  language: getActiveLanguage(localize).code
 })
 
 export default connect(
