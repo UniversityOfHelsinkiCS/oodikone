@@ -30,12 +30,9 @@ const getOodiApi = async relative => {
 }
 
 const attemptGetFor = async (url, attempts = 5) => {
-  let attempt = 0
-  let response = 0
-  while (attempt <= attempts) {
-    attempt += 1
+  for (let attempt = 1; attempt <= attempts; ++attempt) {
     try {
-      response = await getUrl(url)
+      const response = await getUrl(url)
       logger.info('requested url', { url, success: response.status === 200 })
       return response
     } catch (error) {
