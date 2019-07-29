@@ -1,6 +1,7 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { shape, string } from 'prop-types'
 import { Header, Segment, Tab, Card, Icon } from 'semantic-ui-react'
 import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
@@ -114,10 +115,10 @@ StudyProgramme.defaultProps = {
   programmes: {}
 }
 
-const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
+const mapStateToProps = ({ populationDegreesAndProgrammes, localize }) => {
   const programmes = populationDegreesAndProgrammes.data ?
     populationDegreesAndProgrammes.data.programmes : {}
-  return { programmes, language: settings.language }
+  return { programmes, language: getActiveLanguage(localize).code }
 }
 
 export default connect(mapStateToProps)(withRouter(StudyProgramme))

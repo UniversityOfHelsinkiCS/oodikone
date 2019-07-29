@@ -5,7 +5,7 @@ import { object, func, arrayOf, bool, shape, string } from 'prop-types'
 import _ from 'lodash'
 import uuidv4 from 'uuid/v4'
 
-import { getTranslate } from 'react-localize-redux'
+import { getTranslate, getActiveLanguage } from 'react-localize-redux'
 import CreditsLessThan from './CreditsLessThan'
 import CreditsLessThanFromMandatory from './CreditsLessThanFromMandatory'
 import CreditsAtLeast from './CreditsAtLeast'
@@ -354,19 +354,18 @@ class PopulationFilters extends Component {
 
 const mapStateToProps = ({
   populationFilters,
-  locale,
+  localize,
   graphSpinner,
   populations,
-  populationCourses,
-  settings
+  populationCourses
 }) => ({
   populationCourses,
   populationFilters,
   filters: populationFilters.filters,
   complemented: populationFilters.complemented,
-  translate: getTranslate(locale),
+  translate: getTranslate(localize),
   loading: graphSpinner,
-  language: settings.language,
+  language: getActiveLanguage(localize).code,
   studyRights: populations.query.studyRights,
   allStudyRights: populations.data.studyrights,
   extents: populations.data.extents,

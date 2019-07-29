@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { withRouter } from 'react-router-dom'
 import { func, arrayOf, object, shape, string, bool, oneOfType, number } from 'prop-types'
 import { Card, Icon, Button } from 'semantic-ui-react'
@@ -125,6 +126,6 @@ PopulationQueryCard.propTypes = {
   history: shape({}).isRequired
 }
 
-const mapStateToProps = ({ settings }) => ({ language: settings.language })
+const mapStateToProps = ({ localize }) => ({ language: getActiveLanguage(localize).code })
 
 export default withRouter(connect(mapStateToProps, null)(PopulationQueryCard))

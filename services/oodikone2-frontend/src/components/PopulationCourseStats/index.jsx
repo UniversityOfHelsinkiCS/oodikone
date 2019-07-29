@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Table, Form, Input, Popup, Button, Segment } from 'semantic-ui-react'
 import { func, arrayOf, object, number, shape, string, oneOf, bool } from 'prop-types'
-import { getTranslate } from 'react-localize-redux'
+import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import _ from 'lodash'
 import { withRouter } from 'react-router-dom'
 import moment from 'moment'
@@ -496,8 +496,8 @@ const mapStateToProps = (state) => {
   const courseFilters = state.populationFilters.filters.filter(f => f.type === 'CourseParticipation')
   const selectedCourses = courseFilters.map(f => f.params.course.course)
   return {
-    language: state.settings.language,
-    translate: getTranslate(state.locale),
+    language: getActiveLanguage(state.localize).code,
+    translate: getTranslate(state.localize),
     query: state.populations.query ? state.populations.query : state.coursePopulation.query,
     years,
     selectedCourses

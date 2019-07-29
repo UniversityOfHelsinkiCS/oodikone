@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
 import infoTooltips from '../../common/InfoToolTips'
@@ -156,8 +157,8 @@ class PriorityStudyright extends Component {
   }
 }
 
-const mapStateToProps = ({ settings, populations }) => ({
-  language: settings.language,
+const mapStateToProps = ({ localize, populations }) => ({
+  language: getActiveLanguage(localize).code,
   studyrights: populations.data.studyrights
 })
 

@@ -752,14 +752,14 @@ class PopulationSearchForm extends Component {
   }
 }
 
-const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, locale, tags }) => {
+const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, localize, tags }) => {
   const { language } = settings
   const { pending } = populationDegreesAndProgrammes
   return ({
     semesters: semesters.data,
     language,
     queries: populations.query || {},
-    translate: getTranslate(locale),
+    translate: getTranslate(localize),
     studyProgrammes: populationDegreesAndProgrammes.data.programmes || {},
     pending,
     extents: populations.data.extents || [],
