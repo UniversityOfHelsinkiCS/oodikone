@@ -11,6 +11,8 @@ import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import Progressbar from '../../Progressbar'
 import { getCourseSearchResults } from '../../../selectors/courses'
+import { useSearchHistory } from '../../../common'
+import SearchHistory from '../../SearchHistory'
 import { getStartAndEndYearValues } from '../courseStatisticsUtils'
 import YearFilter from './YearFilter'
 
@@ -27,6 +29,7 @@ const SearchForm = (props) => {
   const [state, setState] = useState({
     ...INITIAL
   })
+  const [searchHistory, addItemToSearchHistory] = useSearchHistory('courseSearch', 6)
 
   const {
     courseName,
@@ -88,6 +91,10 @@ const SearchForm = (props) => {
     }
 
     // await this.props.getCourseStats(params)
+    addItemToSearchHistory({
+      text: params.courseCodes.join(', '),
+      params
+    })
     pushQueryToUrl(params)
   }
 
@@ -217,6 +224,10 @@ const SearchForm = (props) => {
           </div>
         </Form>
       </Segment>
+      <SearchHistory
+        handleSearch={pushQueryToUrl}
+        items={searchHistory}
+      />
       {isLoading ? <Progressbar time={100} pending={isLoading} /> : null}
     </React.Fragment>
   )
