@@ -257,18 +257,18 @@ describe('Updater works', () => {
     })
 
     test('study right elements are written to database', async () => {
-      const studyrightElements = await StudyrightElement.findAll({ order: [['id', 'DESC']] })
+      const studyrightElements = await StudyrightElement.findAll({ order: ['startdate', 'enddate', 'studyrightid', 'code'] })
       const { id, startdate, enddate, createdAt, updatedAt, studyrightid, code, studentnumber } = studyrightElements[0]
 
 
       expect(studyrightElements.length).toBe(21)
-      expect(id).toBe(21)
-      expect(startdate.toISOString()).toBe(new Date('2003-07-31 21:00:00+00').toISOString())
-      expect(enddate.toISOString()).toBe(new Date('2010-07-30 21:00:00+00').toISOString())
+      expect(id).toBe(11)
+      expect(startdate.toISOString()).toBe(new Date('2003-07-31T21:00:00.000Z').toISOString())
+      expect(enddate.toISOString()).toBe(new Date('2007-08-24T21:00:00.000Z').toISOString())
       expect(createdAt).not.toBe(undefined)
       expect(updatedAt).not.toBe(undefined)
-      expect(studyrightid).toBe('62346253')
-      expect(code).toBe('0394')
+      expect(studyrightid).toBe('45853818')
+      expect(code).toBe('A1995MAAT')
       expect(studentnumber).toBe('014272112')
 
     })
