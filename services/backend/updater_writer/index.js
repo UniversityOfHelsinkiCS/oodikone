@@ -15,7 +15,7 @@ stan.on('connect', function () {
   const attSub = stan.subscribe('UpdateAttainmentDates', opts)
   const prioSub = stan.subscribe('PriorityWrite', 'updater.workers.prio', opts)
 
-  sub.on('message', async (msg) => {
+  const writeStudent = async (msg) => {
     let data = null
     try {
       data = JSON.parse(msg.getData())
@@ -33,27 +33,16 @@ stan.on('connect', function () {
       console.log('update failed', id, err)
     }
     msg.ack()
-  })
+  }
+
+  sub.on('message', writeStudent)
+  prioSub.on('message', writeStudent)
+
   attSub.on('message', async (msg) => {
     try {
       await updateAttainmentMeta()
     } catch (err) {
       console.log('attainment meta update failed', err)
-    }
-    msg.ack()
-  })
-  prioSub.on('message', async (msg) => {
-    let data = null
-    try {
-      data = JSON.parse(msg.getData())
-      await updateStudent(data)
-      stan.publish('status', `${data.studentInfo.studentnumber}:DONE`, (err) => { if (err) console.log(err) })
-    } catch (err) {
-      let id = 'null'
-      if (data) {
-        id = data.studentInfo ? data.studentInfo.studentnumber : 'meta'
-      }
-      console.log('priority student update failed', id, err)
     }
     msg.ack()
   })
