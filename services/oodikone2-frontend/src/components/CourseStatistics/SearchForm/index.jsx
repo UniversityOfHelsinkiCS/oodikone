@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { useState, useEffect, Fragment } from 'react'
 import { Segment, Header, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -15,100 +15,101 @@ import { getStartAndEndYearValues } from '../courseStatisticsUtils'
 import YearFilter from './YearFilter'
 
 const INITIAL = {
-  displaycourses: false,
-  coursename: '',
-  coursecode: '',
-  selectedcourses: {},
+  courseName: '',
+  courseCode: '',
+  selectedCourses: {},
   fromYear: undefined,
   toYear: undefined,
   separate: false,
-  discipline: undefined,
-  type: undefined,
-  prefilled: undefined
 }
 
-class SearchForm extends Component {
-  state = {
+const SearchForm = (props) => {
+  const [state, setState] = useState({
     ...INITIAL
-  }
+  })
 
-  componentDidMount() {
-    const { location } = this.props
-    this.props.getSemesters()
+  const {
+    courseName,
+    courseCode,
+    selectedCourses,
+    fromYear,
+    toYear,
+    separate,
+  } = state
+
+  useEffect(() => {
+    const { location } = props
+    props.getSemesters()
+    if (!location.search) {
+      props.clearCourses()
+      props.clearCourseStats()
+    }
+  }, [])
+
+  useEffect(() => {
+    const { location } = props
     if (location.search) {
-      this.fetchStatisticsFromUrlParams()
-    } else {
-      this.props.clearCourses()
-      this.props.clearCourseStats()
+      fetchStatisticsFromUrlParams()
     }
-  }
+  }, [ props.location.search ])
 
-  componentDidUpdate(prevProps) {
-    const { location } = this.props
-    const queryParamsChanged = prevProps.location.search !== this.props.location.search
-    if (location.search && queryParamsChanged) {
-      this.fetchStatisticsFromUrlParams()
-    }
-  }
-
-  onSelectCourse = (course) => {
+  const onSelectCourse = (course) => {
     course.selected = !course.selected
-    const { selectedcourses } = this.state
-    const isSelected = !!selectedcourses[course.code]
-    const { fromYear, toYear } = getStartAndEndYearValues(course, this.props.years)
+    const isSelected = !!selectedCourses[course.code]
+    const { fromYear: newFromYear, toYear: newToYear } = getStartAndEndYearValues(course, props.years)
 
     if (isSelected) {
-      const { [course.code]: omit, ...rest } = selectedcourses
-      this.setState({ selectedcourses: rest })
+      const { [course.code]: omit, ...rest } = selectedCourses
+      setState({ ...state, selectedCourses: rest })
     } else {
-      this.setState({
-        selectedcourses: {
-          ...selectedcourses,
+      setState({
+        ...state,
+        selectedCourses: {
+          ...selectedCourses,
           [course.code]: { ...course, selected: true }
         },
-        fromYear: this.state.fromYear < fromYear ? this.state.fromYear : fromYear,
-        toYear: this.state.toYear > toYear ? this.state.toYear : toYear
+        fromYear: fromYear < newFromYear ? fromYear : newFromYear,
+        toYear: toYear > newToYear ? toYear : newToYear
       })
     }
   }
 
-  onToggleCheckbox = (e, target) => {
+  const onToggleCheckbox = (e, target) => {
     const { name } = target
-    this.setState({ [name]: !this.state[name] })
+    setState({ ...state, [name]: !state[name] })
   }
 
-  onSubmitFormClick = async () => {
-    const { fromYear, toYear, selectedcourses, separate } = this.state
+  const onSubmitFormClick = async () => {
     const params = {
       fromYear,
       toYear,
-      courseCodes: Object.keys(selectedcourses),
+      courseCodes: Object.keys(selectedCourses),
       separate
     }
 
     // await this.props.getCourseStats(params)
-    this.pushQueryToUrl(params)
+    pushQueryToUrl(params)
   }
 
-  fetchStatisticsFromUrlParams() {
-    const query = this.parseQueryFromUrl()
-    this.setState({ ...query, selectedcourses: query.courseCodes })
-    this.props.getCourseStats(query)
+  const fetchStatisticsFromUrlParams = () => {
+    const query = parseQueryFromUrl()
+    setState({ ...state, ...query, selectedCourses: query.courseCodes })
+    props.getCourseStats(query)
   }
 
-  pushQueryToUrl = (query) => {
-    const { history } = this.props
+  const pushQueryToUrl = (query) => {
+    const { history } = props
     const { courseCodes, ...rest } = query
     const queryObject = { ...rest, courseCodes: JSON.stringify(courseCodes) }
     const searchString = qs.stringify(queryObject)
     history.push({ search: searchString })
   }
 
-  parseQueryFromUrl = () => {
-    const { location } = this.props
+  const parseQueryFromUrl = () => {
+    const { location } = props
     const { courseCodes, fromYear, toYear, separate, ...rest } = qs.parse(location.search)
     const query = {
-      ...this.state.INITIAL,
+      ...INITIAL,
       ...rest,
       courseCodes: JSON.parse(courseCodes),
       fromYear: JSON.parse(fromYear),
@@ -118,119 +119,107 @@ class SearchForm extends Component {
     return query
   }
 
-  fetchCourses = () => {
-    const { coursename: name, coursecode: code } = this.state
-
+  const fetchCourses = () => {
     const validateParam = (param, minLength) => param && param.length >= minLength
-    const isValidName = validateParam(name, 5)
-    const isValidCode = validateParam(code, 2)
+    const isValidName = validateParam(courseName, 5)
+    const isValidCode = validateParam(courseCode, 2)
 
     if (isValidName || isValidCode) {
-      return this.props.findCoursesV2({ name, code })
+      return props.findCoursesV2({ name: courseName, code: courseCode })
     }
-    if (name.length === 0 && code.length === 0) {
-      this.props.clearCourses()
+    if (courseName.length === 0 && courseCode.length === 0) {
+      props.clearCourses()
     }
     return Promise.resolve()
   }
 
-  handleChange = (e, target) => {
+  const handleChange = (e, target) => {
     const { name, value } = target
-    this.setState({ [name]: value })
+    setState({ ...state, [name]: value })
   }
 
-  render() {
-    const { years, isLoading, matchingCourses } = this.props
-    const {
-      selectedcourses,
-      fromYear,
-      toYear,
-      separate,
-      coursename,
-      coursecode
-    } = this.state
-    const courses = matchingCourses.filter(c => !selectedcourses[c.code])
+  const { years, isLoading, matchingCourses } = props
+  const courses = matchingCourses.filter(c => !selectedCourses[c.code])
 
-    const disabled = (!fromYear || Object.keys(selectedcourses).length === 0) || isLoading
-    const selected = Object.values(selectedcourses).map(course => ({ ...course, selected: true }))
-    const noSelectedCourses = selected.length === 0
-    const noQueryStrings = !coursename && !coursecode
+  const disabled = (!fromYear || Object.keys(selectedCourses).length === 0) || isLoading
+  const selected = Object.values(selectedCourses).map(course => ({ ...course, selected: true }))
+  const noSelectedCourses = selected.length === 0
+  const noQueryStrings = !courseName && !courseCode
 
-    return (
-      <React.Fragment>
-        <Segment loading={isLoading}>
-          <Form>
-            <Header content="Search for courses" />
-            <div style={{ marginBottom: '15px' }}>
-              <Form.Group widths="equal">
-                <Form.Field>
-                  <label>Name:</label>
-                  <AutoSubmitSearchInput
-                    doSearch={this.fetchCourses}
-                    placeholder="Search by entering a course name"
-                    value={coursename}
-                    onChange={cn => this.setState({ coursename: cn })}
-                    loading={this.props.coursesLoading}
-                    minSearchLength={0}
-                  />
-                </Form.Field>
-                <Form.Field>
-                  <label>Code:</label>
-                  <AutoSubmitSearchInput
-                    doSearch={this.fetchCourses}
-                    placeholder="Search by entering a course code"
-                    value={coursecode}
-                    onChange={cc => this.setState({ coursecode: cc })}
-                    loading={this.props.coursesLoading}
-                    minSearchLength={0}
-                  />
-                </Form.Field>
-              </Form.Group>
-              <CourseTable
-                title="Selected courses"
-                hidden={noSelectedCourses}
-                courses={selected}
-                onSelectCourse={this.onSelectCourse}
-                controlIcon="remove"
-              />
-              {!noSelectedCourses &&
-                <Fragment>
-                  <YearFilter
-                    fromYear={fromYear}
-                    toYear={toYear}
-                    years={years}
-                    separate={separate}
-                    handleChange={this.handleChange}
-                    onToggleCheckbox={this.onToggleCheckbox}
-                    showCheckbox
-                  />
-                  <Form.Button
-                    type="button"
-                    disabled={disabled}
-                    fluid
-                    size="huge"
-                    primary
-                    basic
-                    positive
-                    content="Fetch statistics"
-                    onClick={this.onSubmitFormClick}
-                  />
-                </Fragment>
-              }
-              <CourseTable
-                hidden={noQueryStrings || isLoading}
-                courses={courses}
-                title="Searched courses"
-                onSelectCourse={this.onSelectCourse}
-                controlIcon="plus"
-              />
-            </div>
-          </Form>
-        </Segment>
-        {isLoading ? <Progressbar time={100} pending={isLoading} /> : null}
-      </React.Fragment>
-    )
-  }
+  return (
+    <React.Fragment>
+      <Segment loading={isLoading}>
+        <Form>
+          <Header content="Search for courses" />
+          <div style={{ marginBottom: '15px' }}>
+            <Form.Group widths="equal">
+              <Form.Field>
+                <label>Name:</label>
+                <AutoSubmitSearchInput
+                  doSearch={fetchCourses}
+                  placeholder="Search by entering a course name"
+                  value={courseName}
+                  onChange={cn => setState({ ...state, courseName: cn })}
+                  loading={props.coursesLoading}
+                  minSearchLength={0}
+                />
+              </Form.Field>
+              <Form.Field>
+                <label>Code:</label>
+                <AutoSubmitSearchInput
+                  doSearch={fetchCourses}
+                  placeholder="Search by entering a course code"
+                  value={courseCode}
+                  onChange={cc => setState({ ...state, courseCode: cc })}
+                  loading={props.coursesLoading}
+                  minSearchLength={0}
+                />
+              </Form.Field>
+            </Form.Group>
+            <CourseTable
+              title="Selected courses"
+              hidden={noSelectedCourses}
+              courses={selected}
+              onSelectCourse={onSelectCourse}
+              controlIcon="remove"
+            />
+            {!noSelectedCourses &&
+              <Fragment>
+                <YearFilter
+                  fromYear={fromYear}
+                  toYear={toYear}
+                  years={years}
+                  separate={separate}
+                  handleChange={handleChange}
+                  onToggleCheckbox={onToggleCheckbox}
+                  showCheckbox
+                />
+                <Form.Button
+                  type="button"
+                  disabled={disabled}
+                  fluid
+                  size="huge"
+                  primary
+                  basic
+                  positive
+                  content="Fetch statistics"
+                  onClick={onSubmitFormClick}
+                />
+              </Fragment>
+            }
+            <CourseTable
+              hidden={noQueryStrings || isLoading}
+              courses={courses}
+              title="Searched courses"
+              onSelectCourse={onSelectCourse}
+              controlIcon="plus"
+            />
+          </div>
+        </Form>
+      </Segment>
+      {isLoading ? <Progressbar time={100} pending={isLoading} /> : null}
+    </React.Fragment>
+  )
 }
 
 SearchForm.propTypes = {
