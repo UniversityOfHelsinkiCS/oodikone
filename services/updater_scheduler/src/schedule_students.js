@@ -57,4 +57,15 @@ const scheduleStudentsByArray = async (studentNumbers) => {
   }
   return 'scheduled'
 }
-module.exports = { scheduleActiveStudents, scheduleAllStudentsAndMeta, scheduleStudentsByArray, scheduleMeta }
+
+const scheduleOldestNStudents = async (amount) => {
+  try {
+    const tasks = [...await Schedule.find({ type: 'student' }).limit(Number(amount)).sort({ updatedAt: 1 })]
+    await publish(tasks, true)
+  } catch (e) {
+    return e
+  }
+  return 'scheduled'
+}
+
+module.exports = { scheduleActiveStudents, scheduleAllStudentsAndMeta, scheduleStudentsByArray, scheduleOldestNStudents, scheduleMeta }

@@ -121,13 +121,14 @@ stan.on('connect', async () => {
       updatedCount = updatedCount + 1
       break
     case 'FETCHED':
+    case 'NO_STUDENT':
       fetchedCount = fetchedCount + 1
       break
     case 'SCHEDULED':
       scheduledCount = scheduledCount + 1
       break
     default:
-      throw 'unknown status in status message'
+      throw 'unknown status: ' + msg.getData()
     }
     const isValidStudentId = (id) => {
       if (/^0\d{8}$/.test(id)) {

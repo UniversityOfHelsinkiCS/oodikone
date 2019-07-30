@@ -33,6 +33,12 @@ export const updatePopulationStudents = (students) => {
 
   return callController(route, prefix, students, 'post')
 }
+export const updatePopulationOldestStudents = (amount) => {
+  const route = '/updatedatabase/oldest'
+  const prefix = 'UPDATE_POPULATION_OLDEST_STUDENTS_'
+
+  return callController(route, prefix, amount, 'post')
+}
 export const clearPopulations = () => ({
   type: 'CLEAR_POPULATIONS'
 })

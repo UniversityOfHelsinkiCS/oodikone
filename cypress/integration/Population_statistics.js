@@ -103,6 +103,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Credits gained during first").parentsUntil(".tab").get("table").within(() => {
       cy.get("tr").eq(1).find("td").eq(1).invoke("text").then(text => filteredStudents = Number(text))
       cy.get("tr").eq(1).click()
+      cy.wait(1000)
     }).then(() => {
       checkAmountOfStudents(filteredStudents)
     })
