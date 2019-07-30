@@ -111,42 +111,45 @@ stan.on('connect', async () => {
 
   const statusSub = stan.subscribe('status', opts)
 
+  const handleStatusMessage = async (msg) => {
+    const message = msg.getData().split(':')
+    const task = message[0]
+    const status = message[1]
+
+    switch (status) {
+    case 'DONE':
+      updatedCount = updatedCount + 1
+      break
+    case 'FETCHED':
+      fetchedCount = fetchedCount + 1
+      break
+    case 'SCHEDULED':
+      scheduledCount = scheduledCount + 1
+      break
+    default:
+      throw 'unknown status in status message'
+    }
+    const isValidStudentId = (id) => {
+      if (/^0\d{8}$/.test(id)) {
+        // is a 9 digit number
+        const multipliers = [7, 1, 3, 7, 1, 3, 7]
+        const checksum = id
+          .substring(1, 8)
+          .split('')
+          .reduce((sum, curr, index) => {
+            return (sum + curr * multipliers[index]) % 10
+          }, 0)
+        return (10 - checksum) % 10 == id[8]
+      }
+      return false
+    }
+    const isStudent = !!isValidStudentId(task)
+    logger.info(`Status changed for ${task} to ${status}`, { task: task, status: status, student: isStudent })
+    await updateTask(task, status, isStudent ? 'student' : 'other')
+  }
   statusSub.on('message', async (msg) => {
     try {
-      const message = msg.getData().split(':')
-      const task = message[0]
-      const status = message[1]
-
-      switch (status) {
-      case 'DONE':
-        updatedCount = updatedCount + 1
-        break
-      case 'FETCHED':
-        fetchedCount = fetchedCount + 1
-        break
-      case 'SCHEDULED':
-        scheduledCount = scheduledCount + 1
-        break
-      default:
-        return
-      }
-      const isValidStudentId = (id) => {
-        if (/^0\d{8}$/.test(id)) {
-          // is a 9 digit number
-          const multipliers = [7, 1, 3, 7, 1, 3, 7]
-          const checksum = id
-            .substring(1, 8)
-            .split('')
-            .reduce((sum, curr, index) => {
-              return (sum + curr * multipliers[index]) % 10
-            }, 0)
-          return (10 - checksum) % 10 == id[8]
-        }
-        return false
-      }
-      const isStudent = !!isValidStudentId(task)
-      logger.info(`Status changed for ${task} to ${status}`, { task: task, status: status, student: isStudent })
-      await updateTask(task, status, isStudent ? 'student' : 'other')
+      await handleStatusMessage(msg)
     } catch (err) {
       console.log(err)
     }
