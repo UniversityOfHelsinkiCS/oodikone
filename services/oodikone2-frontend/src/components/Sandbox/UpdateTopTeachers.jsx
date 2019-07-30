@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Button, Progress, Message } from 'semantic-ui-react'
 import { api } from '../../apiConnection'
 import KeyValueTable from '../Postman/KeyValueTable'
+import { updatePopulationOldestStudents } from '../../redux/populations'
 
 const TASK_URL = '/tasks/topteachers'
 
@@ -53,6 +54,11 @@ class UpdateTopTeachers extends Component {
             icon="clock outline"
             onClick={this.checkStatus}
             loading={fetching}
+          />
+          <Button
+            content="Update 2000 oldest students"
+            icon="refresh"
+            onClick={() => updatePopulationOldestStudents(2000)}
           />
         </Button.Group>
         { status && <KeyValueTable data={status} /> }
