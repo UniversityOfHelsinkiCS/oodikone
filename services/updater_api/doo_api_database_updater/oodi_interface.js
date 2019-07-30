@@ -1,11 +1,19 @@
 require('dotenv').config()
 const axios = require('axios')
+const { setupCache } = require('axios-cache-adapter')
 const https = require('https')
 const fs = require('fs')
 const logger = require('../logger')
 
 const { OODI_ADDR, KEY_PATH, CERT_PATH } = process.env
 const base_url = OODI_ADDR
+
+const cache = setupCache({
+  maxAge: 15 * 60 * 1000,
+  exclude: {
+    paths: ['/students/'],
+  },
+})
 
 const agent = KEY_PATH && CERT_PATH ?
   new https.Agent({
@@ -18,7 +26,8 @@ const agent = KEY_PATH && CERT_PATH ?
   })
 
 const instance = axios.create({
-  httpsAgent: agent
+  httpsAgent: agent,
+  adapter: cache.adapter
 })
 
 const getUrl = instance.get
