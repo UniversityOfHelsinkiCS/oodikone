@@ -273,6 +273,23 @@ export const tagFilter = (params) => {
   })
 }
 
+export const gradeFilter = (params) => {
+  const { coursecode, grade, coursename } = params
+  return ({
+    id: uuidv4(),
+    type: 'GradeFilter',
+    params: {
+      coursecode,
+      grade,
+      coursename
+    },
+    filter: (student) => {
+      const course = student.courses.find(c => c.course.code === coursecode)
+      return Number(course.grade) === grade
+    }
+  })
+}
+
 export const presetFilter = preset => ({
   id: preset.id,
   type: 'Preset',
