@@ -5,8 +5,8 @@
   "main": "./scripts/run.sh",
   "scripts": {
     "cypress:open": "CYPRESS_baseUrl=http://localhost:8081 cypress open",
-    "cypress:run": "CYPRESS_baseUrl=http://localhost:8081 cypress run --config video=true -P ./",
-    "cypress:record": "cypress run --config videoUploadOnPasses=false -P ./",
+    "cypress:run": "CYPRESS_baseUrl=http://localhost:8081 cypress run --config video=true --config videoCompression=false -P ./",
+    "cypress:record": "cypress run --config videoUploadOnPasses=false --config videoCompression=false -P ./",
     "concurrently": "concurrently",
     "test": "./scripts/run_all_tests.sh",
     "test_services": "./scripts/run_service_tests.sh",
