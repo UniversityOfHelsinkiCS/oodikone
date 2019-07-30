@@ -5,7 +5,7 @@
   "main": "./scripts/run.sh",
   "scripts": {
     "cypress:open": "CYPRESS_baseUrl=http://localhost:8081 cypress open",
-    "cypress:run": "CYPRESS_baseUrl=http://localhost:8081 cypress run --config video=false -P ./",
+    "cypress:run": "CYPRESS_baseUrl=http://localhost:8081 cypress run --config video=true -P ./",
     "cypress:record": "cypress run --config videoUploadOnPasses=false -P ./",
     "concurrently": "concurrently",
     "test": "./scripts/run_all_tests.sh",
