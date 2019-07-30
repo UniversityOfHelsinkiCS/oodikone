@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { func, shape, arrayOf } from 'prop-types'
-import _ from 'lodash'
+import { uniqBy } from 'lodash'
 
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { tagFilter } from '../../populationFilters'
@@ -15,7 +15,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
   const createOptions = () => {
     const tags = samples.map(s => s.tags.map(t => ({ tagname: t.tag.tagname, tag_id: t.tag.tag_id })))
     const merge = tags.reduce((a, b) => a.concat(b), [])
-    const uniqueTags = _.uniqBy(merge, 'tag_id')
+    const uniqueTags = uniqBy(merge, 'tag_id')
     const createdOptions = uniqueTags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id }))
     setOptions(createdOptions)
   }
