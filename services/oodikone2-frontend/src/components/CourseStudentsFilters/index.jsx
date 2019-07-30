@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Header, Button, Form, Radio } from 'semantic-ui-react'
-import { func, arrayOf, bool, shape } from 'prop-types'
+import { func, arrayOf, bool, shape, string } from 'prop-types'
 import _ from 'lodash'
 
 import CreditsLessThan from '../PopulationFilters/CreditsLessThan'
@@ -11,12 +11,14 @@ import CourseParticipation from '../PopulationFilters/CourseParticipation'
 import SexFilter from '../PopulationFilters/SexFilter'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
+import GradeFilter from './GradeFilter'
 import {
   clearPopulationFilters, setComplementFilter
 } from '../../redux/populationFilters'
 
 
 const componentFor = {
+  GradeFilter,
   CreditsAtLeast,
   CreditsLessThan,
   GradeMeanFilter,
@@ -24,7 +26,7 @@ const componentFor = {
   CourseParticipation
 }
 
-const CourseStudentsFilters = ({ samples, filters, clearPopulationFiltersDispatch, complemented, setComplementFilterDispatch }) => {
+const CourseStudentsFilters = ({ samples, filters, clearPopulationFiltersDispatch, complemented, setComplementFilterDispatch, allStudyrights, coursecode }) => {
   const [visible, setVisible] = useState(false)
 
   const renderAddFilters = () => {
@@ -55,7 +57,7 @@ const CourseStudentsFilters = ({ samples, filters, clearPopulationFiltersDispatc
     return (
       <Segment>
         <Header>Add filters <InfoBox content={Add} /></Header>
-        {unsetFilters.map(filterName => React.createElement(componentFor[filterName], { filter: { notSet: true }, key: filterName, samples }))}
+        {unsetFilters.map(filterName => React.createElement(componentFor[filterName], { filter: { notSet: true }, key: filterName, samples, allStudyrights, coursecode }))}
         <Button onClick={() => setVisible(false)}>cancel</Button>
       </Segment>
     )
@@ -71,7 +73,7 @@ const CourseStudentsFilters = ({ samples, filters, clearPopulationFiltersDispatc
     return (
       <Segment>
         <Header>Filters <InfoBox content={Filters} /></Header>
-        {filters.map(filter => React.createElement(componentFor[filter.type], { filter, key: filter.id, samples }))}
+        {filters.map(filter => React.createElement(componentFor[filter.type], { filter, key: filter.id, samples, allStudyrights, coursecode }))}
         <Form>
           <Form.Group inline>
             <Form.Field>
@@ -103,12 +105,15 @@ CourseStudentsFilters.propTypes = {
   complemented: bool.isRequired,
   samples: arrayOf(shape([])).isRequired,
   clearPopulationFiltersDispatch: func.isRequired,
-  setComplementFilterDispatch: func.isRequired
+  setComplementFilterDispatch: func.isRequired,
+  coursecode: string.isRequired,
+  allStudyrights: shape({}).isRequired
 }
 
-const mapStateToProps = ({ populationFilters }) => ({
+const mapStateToProps = ({ populationFilters, coursePopulation }) => ({
   filters: populationFilters.filters,
-  complemented: populationFilters.complemented
+  complemented: populationFilters.complemented,
+  allStudyrights: coursePopulation.students.studyrights
 })
 
 export default connect(mapStateToProps, {

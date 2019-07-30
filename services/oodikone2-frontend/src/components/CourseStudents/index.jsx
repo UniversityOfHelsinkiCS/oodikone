@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { shape, func, bool, arrayOf } from 'prop-types'
+import { shape, func, bool, arrayOf, string } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 import { Segment, Header } from 'semantic-ui-react'
 import qs from 'query-string'
@@ -34,12 +34,13 @@ const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCourse
   }, [])
   const { CreditAccumulationGraph, CoursesOf } = infoTooltips.PopulationStatistics
   const header = courseData[code] ? `${courseData[code].name} ${headerYear}` : null
+
   return (
     <div className="segmentContainer">
       {studentData.students ? (
         <Segment className="contentSegment">
           <Header className="segmentTitle" size="large" textAlign="center">Population of course {header}</Header>
-          <CourseStudentsFilters samples={studentData.students} />
+          <CourseStudentsFilters samples={studentData.students} coursecode={code} />
           <Segment>
             <Header size="medium" dividing>
               {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
@@ -85,7 +86,7 @@ CourseStudents.propTypes = {
   history: shape({}).isRequired,
   translate: func.isRequired,
   courseData: shape({}).isRequired,
-  selectedStudents: arrayOf(shape([])).isRequired
+  selectedStudents: arrayOf(string).isRequired
 }
 
 const mapStateToProps = ({ coursePopulation, localize, courseStats, populationFilters }) => {
@@ -120,4 +121,8 @@ const mapStateToProps = ({ coursePopulation, localize, courseStats, populationFi
   })
 }
 
-export default withRouter(connect(mapStateToProps, { getCoursePopulationDispatch: getCoursePopulation, getCoursePopulationCoursesDispatch: getCoursePopulationCourses, getCourseStatsDispatch: getCourseStats })(CourseStudents))
+export default withRouter(connect(mapStateToProps, {
+  getCoursePopulationDispatch: getCoursePopulation,
+  getCoursePopulationCoursesDispatch: getCoursePopulationCourses,
+  getCourseStatsDispatch: getCourseStats
+})(CourseStudents))
