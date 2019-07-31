@@ -19,12 +19,13 @@ import { transferTo } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { getTagsByStudytrackAction } from '../../redux/tags'
-import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, userIsAdmin, cancelablePromise } from '../../common'
+import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, userIsAdmin, cancelablePromise, useSearchHistory } from '../../common'
 import { setLoading } from '../../redux/graphSpinner'
 import './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
 import InfoBox from '../InfoBox'
 import infoToolTips from '../../common/InfoToolTips'
+import SearchHistory from '../SearchHistory'
 
 const YEAR_DATE_FORMAT = 'YYYY'
 
@@ -53,6 +54,7 @@ const PopulationSearchForm = (props) => {
     isAdmin: false
   })
   const [didMount, setDidMount] = useState(false)
+  const [searchHistory, addItemToSearchHistory] = useSearchHistory('populationSearch', 8)
 
   const fetchPopulationPromises = useRef()
 
@@ -133,7 +135,23 @@ const PopulationSearchForm = (props) => {
     history.push({ search: searchString })
   }
 
-  const handleSubmit = () => pushQueryToUrl(query)
+  const getSearchHistoryTextFromQuery = () => {
+    const { studyRights, semesters, months, startYear, endYear, studentStatuses } = query
+
+    const studyRightsText = Object.values(studyRights).filter(s => s).join(', ')
+    const timeText = `${semesters.join(', ')}/${startYear}-${parseInt(endYear) + 1}, ${months} months`
+    const studentStatusesText = studentStatuses.length > 0 ?  `includes ${studentStatuses.map(s => s.toLowerCase()).join(', ')} students` : null
+
+    return [studyRightsText, timeText, studentStatusesText].filter(t => t).join(' - ')
+  }
+
+  const handleSubmit = () => {
+    addItemToSearchHistory({
+      text: getSearchHistoryTextFromQuery(),
+      params: query
+    })
+    pushQueryToUrl(query)
+  }
 
   const fetchPopulation = async (query) => {
     const queryCodes = Object.values(query.studyRights).filter(e => e != null)
@@ -685,33 +703,39 @@ const PopulationSearchForm = (props) => {
   }
 
   return (
-    <Form error={isQueryInvalid} loading={isLoading}>
-      <Grid divided padded="vertically">
-        <Grid.Row>
-          <Grid.Column width={10}>
-            {renderEnrollmentDateSelector()}
-            {renderStudyGroupSelector()}
-          </Grid.Column>
-          <Grid.Column width={6}>
-            <Form.Field style={{ margin: 'auto' }}>
-              <label>Advanced settings <InfoBox content={Advanced} /></label>
-              <Form.Radio
-                toggle
-                checked={showAdvancedSettings}
-                onClick={() => { setState({ showAdvancedSettings: !showAdvancedSettings }) }}
-              />
-            </Form.Field>
-            {renderAdvancedSettingsSelector()}
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
+    <div>
+      <Form error={isQueryInvalid} loading={isLoading}>
+        <Grid divided padded="vertically">
+          <Grid.Row>
+            <Grid.Column width={10}>
+              {renderEnrollmentDateSelector()}
+              {renderStudyGroupSelector()}
+            </Grid.Column>
+            <Grid.Column width={6}>
+              <Form.Field style={{ margin: 'auto' }}>
+                <label>Advanced settings <InfoBox content={Advanced} /></label>
+                <Form.Radio
+                  toggle
+                  checked={showAdvancedSettings}
+                  onClick={() => { setState({ showAdvancedSettings: !showAdvancedSettings }) }}
+                />
+              </Form.Field>
+              {renderAdvancedSettingsSelector()}
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
 
-      <Message error color="blue" header={errorText} />
+        <Message error color="blue" header={errorText} />
 
-      <Form.Button onClick={handleSubmit} disabled={isQueryInvalid}>
-        {translate('populationStatistics.addPopulation')}
-      </Form.Button>
-    </Form>
+        <Form.Button onClick={handleSubmit} disabled={isQueryInvalid}>
+          {translate('populationStatistics.addPopulation')}
+        </Form.Button>
+      </Form>
+      <SearchHistory
+        items={searchHistory}
+        handleSearch={pushQueryToUrl}
+      />
+    </div>
   )
 }
 
