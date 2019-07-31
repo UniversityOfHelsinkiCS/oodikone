@@ -9,7 +9,6 @@ const publish = async (tasks, priority = false) => {
       rampup = rampup - 1
     }
     stan.publish(priority ? 'PriorityApi' : 'UpdateApi', task.task, (err, guid) => {
-      console.log(guid)
       if (err) {
         console.log('publish failed', err)
       }
