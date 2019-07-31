@@ -298,3 +298,13 @@ export const useSearchHistory = (id, capacity = 5) => {
 
   return [ searchHistory, addItem ]
 }
+
+export const flattenStudyrights = (studyrights) => {
+  const studyrightcodes = []
+  studyrights.forEach((sr) => {
+    sr.studyrightElements.forEach((srE) => {
+      studyrightcodes.push(srE.code)
+    })
+  })
+  return studyrightcodes
+}
