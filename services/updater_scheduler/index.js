@@ -94,7 +94,8 @@ stan.on('connect', async () => {
   }, { timezone })
 
   cron.schedule('0 7 * * *', async () => {
-    stan.publish('updateAttainmentDates', null, (err) => {
+    console.log('SCHEDULING ATTAINMENT UPDATE')
+    stan.publish('UpdateAttainmentDates', null, (err) => {
       if (err) {
         console.log('publish failed', 'UpdateAttainmentDates')
       } else {
