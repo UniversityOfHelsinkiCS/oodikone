@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
@@ -28,102 +28,93 @@ import infoToolTips from '../../common/InfoToolTips'
 
 const YEAR_DATE_FORMAT = 'YYYY'
 
-class PopulationSearchForm extends Component {
-  static propTypes = {
-    language: string.isRequired,
-    translate: func.isRequired,
-    getDegreesAndProgrammes: func.isRequired,
-    getPopulationStatistics: func.isRequired,
-    getPopulationCourses: func.isRequired,
-    getMandatoryCourses: func.isRequired,
-    getPopulationFilters: func.isRequired,
-    clearPopulationFilters: func.isRequired,
-    setPopulationFilter: func.isRequired,
-    clearPopulations: func.isRequired,
-    queries: shape({}).isRequired,
-    studyProgrammes: shape({}), //eslint-disable-line
-    degrees: arrayOf(dropdownType), //eslint-disable-line
-    studyTracks: arrayOf(dropdownType), //eslint-disable-line
-    setLoading: func.isRequired,
-    extents: arrayOf(object).isRequired,
-    pending: bool, //eslint-disable-line
-    getSemesters: func.isRequired,
-    semesters: shape({}).isRequired,
-    history: shape({}).isRequired,
-    location: shape({}).isRequired,
-    getTagsByStudytrackAction: func.isRequired,
-    tags: oneOfType([
-      arrayOf(shape({ tag_id: string, tagname: string })),
-      object
-    ]).isRequired
-  }
+const months = (year, term) => {
+  const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')
+  return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
+}
 
-  constructor() {
-    super()
+const initialQuery = () => ({
+  endYear: Datetime.moment('2017-01-01').year(),
+  startYear: Datetime.moment('2017-01-01').year(),
+  semesters: ['FALL', 'SPRING'],
+  studentStatuses: [],
+  studyRights: [],
+  months: months('2017', 'FALL')
+})
 
-    const query = this.initialQuery()
-    this.state = {
-      query,
-      isLoading: false,
-      showAdvancedSettings: false,
-      momentYear: Datetime.moment('2017-01-01'),
-      floatMonths: this.months('2017', 'FALL'),
-      selectedTag: '',
-      isAdmin: false
-    }
-  }
+const PopulationSearchForm = (props) => {
+  const [totalState, setTotalState] = useState({
+    query: initialQuery(),
+    isLoading: false,
+    showAdvancedSettings: false,
+    momentYear: Datetime.moment('2017-01-01'),
+    floatMonths: months('2017', 'FALL'),
+    selectedTag: '',
+    isAdmin: false
+  })
+  const [didMount, setDidMount] = useState(false)
 
-  componentDidMount() {
-    const { studyProgrammes, semesters, location } = this.props
+  const fetchPopulationPromises = useRef()
+
+  const setState = (newState) => setTotalState({ ...totalState, ...newState })
+
+  const {
+    query,
+    isLoading,
+    showAdvancedSettings,
+    momentYear,
+    floatMonths,
+    selectedTag,
+    isAdmin
+  } = totalState
+
+  useEffect(() => {
+    const { studyProgrammes, semesters, location } = props
     if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
-      this.setState({ query: this.initialQuery() }) // eslint-disable-line
-      this.props.getDegreesAndProgrammes()
+      setState({ query: initialQuery() }) // eslint-disable-line
+      props.getDegreesAndProgrammes()
     }
     if (!semesters.years) {
-      this.props.getSemesters()
+      props.getSemesters()
     }
     if (location.search) {
-      this.fetchPopulationFromUrlParams()
+      fetchPopulationFromUrlParams()
     }
     const admin = userIsAdmin()
-    this.setState({ isAdmin: admin })
-  }
+    setState({ isAdmin: admin })
+    setDidMount(true)
 
-  componentDidUpdate(prevProps) {
-    const { studyProgrammes, location } = this.props
+    return () => {
+      if (fetchPopulationPromises.current) fetchPopulationPromises.current.cancel()
+    }
+  }, [])
+
+  useEffect(() => {
+    const { studyProgrammes } = props
     if (studyProgrammes
       && Object.values(studyProgrammes).length === 1
-      && !this.state.query.studyRights.programme) {
-      this.handleProgrammeChange(null, { value: Object.values(studyProgrammes)[0].code })
+      && !query.studyRights.programme
+      && didMount) {
+      handleProgrammeChange(null, { value: Object.values(studyProgrammes)[0].code })
     }
-    const queryParamsChanged = prevProps.location.search !== this.props.location.search
-    if (location.search && queryParamsChanged) {
-      this.fetchPopulationFromUrlParams()
+  })
+
+  useEffect(() => {
+    if (props.location.search && didMount) {
+      fetchPopulationFromUrlParams()
     }
-  }
+  }, [ props.location.search ])
 
-  componentWillUnmount() {
-    if (this.fetchPopulationPromises) this.fetchPopulationPromises.cancel()
-  }
-
-  months(year, term) { // eslint-disable-line
-    const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')
-    return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
-  }
-
-  validateQuery = () => {
-    const { queries } = this.props
-    const { query } = this.state
+  const validateQuery = () => {
+    const { queries } = props
     const compare = { ...queries }
     delete compare.uuid
     return _.isEqual(compare, query)
   }
 
-  clearPopulations = () => this.props.clearPopulations()
-
-  parseQueryFromUrl = () => {
-    const { location } = this.props
-    const initial = this.initialQuery()
+  const parseQueryFromUrl = () => {
+    const { location } = props
+    const initial = initialQuery()
     const { studyRights, months, ...rest } = qs.parse(location.search)
     const query = {
       ...initial,
@@ -134,52 +125,47 @@ class PopulationSearchForm extends Component {
     return query
   }
 
-  pushQueryToUrl = (query) => {
-    const { history } = this.props
+  const pushQueryToUrl = (query) => {
+    const { history } = props
     const { studyRights, ...rest } = query
     const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
     const searchString = qs.stringify(queryObject)
     history.push({ search: searchString })
   }
 
-  handleSubmit = () => {
-    const { query } = this.state
-    this.pushQueryToUrl(query)
-  }
+  const handleSubmit = () => pushQueryToUrl(query)
 
-  fetchPopulation = async (query) => {
-    const { selectedTag } = this.state
+  const fetchPopulation = async (query) => {
     const queryCodes = Object.values(query.studyRights).filter(e => e != null)
     const uuid = uuidv4()
     const request = { ...query, studyRights: queryCodes, uuid }
-    this.setState({ isLoading: true })
-    this.props.setLoading()
+    setState({ isLoading: true })
+    props.setLoading()
 
-    this.fetchPopulationPromises = cancelablePromise(Promise.all([
-      this.props.getPopulationStatistics({ ...query, uuid, tag: selectedTag }),
-      this.props.getPopulationCourses(request),
-      this.props.getPopulationFilters(request),
-      this.props.getMandatoryCourses(query.studyRights.programme)
+    fetchPopulationPromises.current = cancelablePromise(Promise.all([
+      props.getPopulationStatistics({ ...query, uuid, tag: selectedTag }),
+      props.getPopulationCourses(request),
+      props.getPopulationFilters(request),
+      props.getMandatoryCourses(query.studyRights.programme)
     ]))
 
-    const success = await this.fetchPopulationPromises.promise
+    const success = await fetchPopulationPromises.current.promise
     if (success) {
       if (queryCodes[0] === 'KH50_001') {
-        this.props.setPopulationFilter(transferTo(false))
+        props.setPopulationFilter(transferTo(false))
       } else {
-        this.props.clearPopulationFilters()
+        props.clearPopulationFilters()
       }
-      this.setState({ isLoading: false })
+      setState({ isLoading: false })
       // not a good solution FIX
-      this.setState({ selectedTag: '' })
+      setState({ selectedTag: '' })
     }
   }
 
-  handleYearSelection = (momentYear) => {
-    const { query } = this.state
-    const { studyProgrammes } = this.props
+  const handleYearSelection = (momentYear) => {
+    const { studyProgrammes } = props
     if (!moment.isMoment(momentYear)) {
-      this.setState({
+      setState({
         momentYear: null,
         query: {
           ...query,
@@ -195,7 +181,7 @@ class PopulationSearchForm extends Component {
 
     // When changing year, remove degree and track selections
     // if they are no longer possible to select
-    let { degree, studyTrack } = this.state.query.studyRights
+    let { degree, studyTrack } = query.studyRights
     if (degree || studyTrack) {
       if (!query.studyRights.programme) {
         degree = null
@@ -206,24 +192,24 @@ class PopulationSearchForm extends Component {
           degree = null
           studyTrack = null
         } else {
-          if (!associations.degrees[this.state.query.studyRights.degree]) {
+          if (!associations.degrees[query.studyRights.degree]) {
             degree = null
           }
-          if (!associations.studyTracks[this.state.query.studyRights.studyTrack]) {
+          if (!associations.studyTracks[query.studyRights.studyTrack]) {
             studyTrack = null
           }
         }
       }
     }
-    this.setState({
+    setState({
       momentYear,
       query: {
         ...query,
         endYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
         startYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
-        months: this.months(
+        months: months(
           reformatDate(momentYear, YEAR_DATE_FORMAT),
-          this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING'
+          query.semesters.includes('FALL') ? 'FALL' : 'SPRING'
         ),
         studyRights: {
           ...query.studyRights,
@@ -234,17 +220,16 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  handleTagSearch = (event, { value }) => {
-    const tag = this.props.tags.find(t => t.tag_id === value)
-    this.setState({
+  const handleTagSearch = (event, { value }) => {
+    const tag = props.tags.find(t => t.tag_id === value)
+    setState({
       selectedTag: tag
     })
   }
 
-  handleTagYearSelect = (momentYear) => {
-    const { query } = this.state
-    const months = this.getMonths(reformatDate(momentYear, YEAR_DATE_FORMAT), new Date(), 'FALL')
-    this.setState({
+  const handleTagYearSelect = (momentYear) => {
+    const months = getMonths(reformatDate(momentYear, YEAR_DATE_FORMAT), new Date(), 'FALL')
+    setState({
       query: {
         ...query,
         startYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
@@ -254,36 +239,34 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  addYear = () => {
-    const { startYear } = this.state.query
+  const addYear = () => {
+    const { startYear } = query
     const nextYear = momentFromFormat(startYear, YEAR_DATE_FORMAT).add(1, 'year')
-    this.handleYearSelection(nextYear)
+    handleYearSelection(nextYear)
   }
 
-  subtractYear = () => {
-    const { startYear } = this.state.query
+  const subtractYear = () => {
+    const { startYear } = query
     const previousYear = momentFromFormat(startYear, YEAR_DATE_FORMAT).subtract(1, 'year')
-    this.handleYearSelection(previousYear)
+    handleYearSelection(previousYear)
   }
 
-  handleSemesterSelection = (e, { value }) => {
-    const { query } = this.state
+  const handleSemesterSelection = (e, { value }) => {
     const semesters = query.semesters.includes(value) ?
       query.semesters.filter(s => s !== value) : [...query.semesters, value]
-    this.setState({
+    setState({
       query: {
         ...query,
         semesters,
-        months: this.months(this.state.query.startYear, semesters.includes('FALL') ? 'FALL' : 'SPRING')
+        months: months(query.startYear, semesters.includes('FALL') ? 'FALL' : 'SPRING')
       }
     })
   }
 
-  handleStudentStatusSelection = (e, { value }) => {
-    const { query } = this.state
+  const handleStudentStatusSelection = (e, { value }) => {
     const studentStatuses = query.studentStatuses.includes(value) ?
       query.studentStatuses.filter(s => s !== value) : [...query.studentStatuses, value]
-    this.setState({
+    setState({
       query: {
         ...query,
         studentStatuses
@@ -291,14 +274,13 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  handleDegreeChange = (e, { value }) => {
-    const { query } = this.state
+  const handleDegreeChange = (e, { value }) => {
     const degree = value
     if (degree === '') {
-      this.handleClear('degree')
+      handleClear('degree')
       return
     }
-    this.setState({
+    setState({
       query: {
         ...query,
         studyRights: {
@@ -309,15 +291,14 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  handleProgrammeChange = (e, { value }) => {
+  const handleProgrammeChange = (e, { value }) => {
     const programme = value
-    this.props.getTagsByStudytrackAction(value)
+    props.getTagsByStudytrackAction(value)
     if (programme === '') {
-      this.handleClear('programme')
+      handleClear('programme')
       return
     }
-    const { query } = this.state
-    this.setState({
+    setState({
       query: {
         ...query,
         studyRights: {
@@ -327,14 +308,13 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  handleStudyTrackChange = (e, { value }) => {
-    const { query } = this.state
+  const handleStudyTrackChange = (e, { value }) => {
     const studyTrack = value
     if (studyTrack === '') {
-      this.handleClear('studyTrack')
+      handleClear('studyTrack')
       return
     }
-    this.setState({
+    setState({
       query: {
         ...query,
         studyRights: {
@@ -345,10 +325,9 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  handleMonthsChange = (value) => {
-    const { query } = this.state
-    const months = this.getMonths(query.startYear, value, this.state.query.semesters.includes('FALL') ? 'FALL' : 'SPRING')
-    this.setState({
+  const handleMonthsChange = (value) => {
+    const months = getMonths(query.startYear, value, query.semesters.includes('FALL') ? 'FALL' : 'SPRING')
+    setState({
       query: {
         ...query,
         months
@@ -356,9 +335,8 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  handleClear = (type) => {
-    const { query } = this.state
-    this.setState({
+  const handleClear = (type) => {
+    setState({
       query: {
         ...query,
         studyRights: {
@@ -369,33 +347,33 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  getMonths = (startYear, end, term) => {
+  const getMonths = (startYear, end, term) => {
     const lastDayOfMonth = moment(end).endOf('month')
     const start = term === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`
-    this.setState({
+    setState({
       floatMonths: moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths()
     })
     return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
   }
 
-  getMonthValue = (startYear, months) => {
+  const getMonthValue = (startYear, months) => {
     const start = `${startYear}-08-01`
     return moment(start).add(months - 1, 'months').format('MMMM YY')
   }
 
-  validYearCheck = (momentYear) => {
+  const validYearCheck = (momentYear) => {
     if (!moment.isMoment(momentYear)) {
       return false
     }
-    if (!this.state.query.studyRights.programme) {
+    if (!query.studyRights.programme) {
       return momentYear.year() >= 1900 && momentYear.isSameOrBefore(moment().subtract(6, 'months'))
     }
-    return this.props.studyProgrammes[this.state.query.studyRights.programme].enrollmentStartYears[momentYear.year()] != null
+    return props.studyProgrammes[query.studyRights.programme].enrollmentStartYears[momentYear.year()] != null
   }
 
-  getMinSelection = (startYear, semester) => (semester === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`)
+  const getMinSelection = (startYear, semester) => (semester === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`)
 
-  checkPreviousQuery = (query, previousQuery) => {
+  const checkPreviousQuery = (query, previousQuery) => {
     if (!previousQuery.studyRights) {
       return false
     }
@@ -405,26 +383,17 @@ class PopulationSearchForm extends Component {
     return sameProgramme && sameMonths && sameStartYear
   }
 
-  fetchPopulationFromUrlParams() {
-    const previousQuery = this.props.queries
-    const query = this.parseQueryFromUrl()
-    if (!this.checkPreviousQuery(query, previousQuery)) {
-      this.setState({ query })
-      this.fetchPopulation(query)
+  const fetchPopulationFromUrlParams = () => {
+    const previousQuery = props.queries
+    const query = parseQueryFromUrl()
+    if (!checkPreviousQuery(query, previousQuery)) {
+      setState({ query })
+      fetchPopulation(query)
     }
   }
 
-  initialQuery = () => ({
-    endYear: Datetime.moment('2017-01-01').year(),
-    startYear: Datetime.moment('2017-01-01').year(),
-    semesters: ['FALL', 'SPRING'],
-    studentStatuses: [],
-    studyRights: [],
-    months: this.months('2017', 'FALL')
-  })
-
-  renderableList = (list) => {
-    const { language } = this.props
+  const renderableList = (list) => {
+    const { language } = props
     return list.map((sp) => {
       const { type, name, code } = sp
       const shh = { type, name, code }
@@ -435,46 +404,45 @@ class PopulationSearchForm extends Component {
     })
   }
 
-  renderEnrollmentDateSelector = () => {
-    const { query, momentYear } = this.state
+  const renderEnrollmentDateSelector = () => {
     const { semesters, startYear } = query
     return (
       <Form.Group key="year" className="enrollmentSelectorGroup">
-        <Form.Field error={!this.validYearCheck(momentYear)} className="yearSelect">
+        <Form.Field error={!validYearCheck(momentYear)} className="yearSelect">
           <label>Class of</label>
           <Datetime
             className="yearSelectInput"
             control={Datetime}
             dateFormat={YEAR_DATE_FORMAT}
             timeFormat={false}
-            renderYear={(props, selectableYear) => <td {...props} >{`${selectableYear}`}-<br />{`${selectableYear + 1}`}</td>}
+            renderYear={(p, selectableYear) => <td {...p} >{`${selectableYear}`}-<br />{`${selectableYear + 1}`}</td>}
             closeOnSelect
             value={`${startYear}-${moment().year(startYear).add(1, 'years').format('YYYY')}`}
-            isValidDate={this.validYearCheck}
-            onChange={this.handleYearSelection}
+            isValidDate={validYearCheck}
+            onChange={handleYearSelection}
           />
         </Form.Field>
         <Form.Field className="yearControl">
           <Button.Group basic vertical className="yearControlButtonGroup">
-            <Button icon="plus" className="yearControlButton" onClick={this.addYear} tabIndex="-1" />
-            <Button icon="minus" className="yearControlButton" onClick={this.subtractYear} tabIndex="-1" />
+            <Button icon="plus" className="yearControlButton" onClick={addYear} tabIndex="-1" />
+            <Button icon="minus" className="yearControlButton" onClick={subtractYear} tabIndex="-1" />
           </Button.Group>
         </Form.Field>
         <Form.Field>
           <label>Statistics until</label>
           <Datetime
             dateFormat="MMMM YYYY"
-            defaultValue={this.getMonthValue(this.state.query.startYear, this.state.floatMonths)}
-            onChange={value => this.handleMonthsChange(value)}
+            defaultValue={getMonthValue(query.startYear, floatMonths)}
+            onChange={value => handleMonthsChange(value)}
             isValidDate={current => current.isBefore(moment()) &&
-              current.isAfter(this.getMinSelection(startYear, semesters[1] || semesters[0]))}
+              current.isAfter(getMinSelection(startYear, semesters[1] || semesters[0]))}
           />
         </Form.Field>
       </Form.Group>
     )
   }
 
-  renderStudyProgrammeDropdown = (studyRights, programmesToRender) => (
+  const renderStudyProgrammeDropdown = (studyRights, programmesToRender) => (
     <Form.Field>
       <label>Study programme</label>
       <Form.Dropdown
@@ -484,14 +452,14 @@ class PopulationSearchForm extends Component {
         noResultsMessage="No selectable study programmes"
         value={studyRights.programme}
         options={programmesToRender}
-        onChange={this.handleProgrammeChange}
+        onChange={handleProgrammeChange}
         closeOnChange
         clearable
         fluid
       />
     </Form.Field>
   )
-  renderAdditionalDegreeOrStudyTrackDropdown = (studyRights, studyTracksToRender, degreesToRender) => { //eslint-disable-line
+  const renderAdditionalDegreeOrStudyTrackDropdown = (studyRights, studyTracksToRender, degreesToRender) => {
     const renderableDegrees = () => (
       <React.Fragment>
         <label>Degree (Optional)</label>
@@ -503,7 +471,7 @@ class PopulationSearchForm extends Component {
           noResultsMessage="No selectable degrees"
           value={studyRights.degree}
           options={degreesToRender}
-          onChange={this.handleDegreeChange}
+          onChange={handleDegreeChange}
           closeOnChange
           clearable
         />
@@ -519,7 +487,7 @@ class PopulationSearchForm extends Component {
           noResultsMessage="No selectable study track"
           value={studyRights.studyTrack}
           options={studyTracksToRender}
-          onChange={this.handleStudyTrackChange}
+          onChange={handleStudyTrackChange}
           closeOnChange
           clearable
         />
@@ -539,16 +507,15 @@ class PopulationSearchForm extends Component {
     return null
   }
 
-  renderStudyGroupSelector = () => {
-    const { studyProgrammes, language } = this.props
-    const { studyRights } = this.state.query
-    const { momentYear } = this.state
-    if (this.props.pending) {
+  const renderStudyGroupSelector = () => {
+    const { studyProgrammes, language } = props
+    const { studyRights } = query
+    if (props.pending || !didMount) {
       return (
         <Icon name="spinner" loading size="big" color="black" style={{ marginLeft: '45%' }} />
       )
     }
-    if (Object.values(studyProgrammes).length === 0 && !this.props.pending) {
+    if (Object.values(studyProgrammes).length === 0 && !props.pending) {
       return (
         <Message
           error
@@ -561,25 +528,25 @@ class PopulationSearchForm extends Component {
     let programmesToRender
     if (Object.values(studyProgrammes).length !== 0) {
       const sortedStudyProgrammes = _.sortBy(studyProgrammes, s => getTextIn(s.name, language))
-      programmesToRender = this.renderableList(sortedStudyProgrammes)
+      programmesToRender = renderableList(sortedStudyProgrammes)
     }
     let degreesToRender
     let studyTracksToRender
-    if (studyRights.programme && this.validYearCheck(momentYear)) {
+    if (studyRights.programme && validYearCheck(momentYear)) {
       const associations = studyProgrammes[studyRights.programme].enrollmentStartYears[momentYear.year()]
       if (associations) {
         const sortedStudyDegrees = _.sortBy(associations.degrees, s => getTextIn(s.name, language))
-        degreesToRender = this.renderableList(sortedStudyDegrees)
+        degreesToRender = renderableList(sortedStudyDegrees)
 
         const sortedStudyTracks = _.sortBy(associations.studyTracks, s => getTextIn(s.name, language))
-        studyTracksToRender = this.renderableList(sortedStudyTracks)
+        studyTracksToRender = renderableList(sortedStudyTracks)
       }
     }
 
     return (
       <div>
-        {this.renderStudyProgrammeDropdown(studyRights, programmesToRender)}
-        {this.renderAdditionalDegreeOrStudyTrackDropdown(
+        {renderStudyProgrammeDropdown(studyRights, programmesToRender)}
+        {renderAdditionalDegreeOrStudyTrackDropdown(
           studyRights,
           studyTracksToRender,
           degreesToRender
@@ -588,15 +555,14 @@ class PopulationSearchForm extends Component {
     )
   }
 
-  renderAdvancedSettingsSelector = () => {
-    if (!this.state.showAdvancedSettings) {
+  const renderAdvancedSettingsSelector = () => {
+    if (!showAdvancedSettings) {
       return null
     }
 
-    const { translate, tags } = this.props
-    const { query } = this.state
+    const { translate, tags } = props
     const { semesters, studentStatuses } = query
-    const options = this.state.isAdmin ? tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id })) : []
+    const options = isAdmin ? tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id })) : []
 
     return (
       <div>
@@ -610,7 +576,7 @@ class PopulationSearchForm extends Component {
               value="FALL"
               name="semesterGroup"
               checked={semesters.includes('FALL')}
-              onChange={this.handleSemesterSelection}
+              onChange={handleSemesterSelection}
             />
             <Form.Checkbox
               className="populationStatisticsRadio"
@@ -619,7 +585,7 @@ class PopulationSearchForm extends Component {
               value="SPRING"
               name="semesterGroup"
               checked={semesters.includes('SPRING')}
-              onChange={this.handleSemesterSelection}
+              onChange={handleSemesterSelection}
             />
           </Form.Field>
         </Form.Group>
@@ -633,7 +599,7 @@ class PopulationSearchForm extends Component {
               value="EXCHANGE"
               name="studentStatusGroup"
               checked={studentStatuses.includes('EXCHANGE')}
-              onChange={this.handleStudentStatusSelection}
+              onChange={handleStudentStatusSelection}
             />
             <Form.Checkbox
               className="populationStatisticsRadio"
@@ -642,7 +608,7 @@ class PopulationSearchForm extends Component {
               value="CANCELLED"
               name="studentStatusGroup"
               checked={studentStatuses.includes('CANCELLED')}
-              onChange={this.handleStudentStatusSelection}
+              onChange={handleStudentStatusSelection}
             />
             <Form.Checkbox
               className="populationStatisticsRadio"
@@ -651,11 +617,11 @@ class PopulationSearchForm extends Component {
               value="NONDEGREE"
               name="studentStatusGroup"
               checked={studentStatuses.includes('NONDEGREE')}
-              onChange={this.handleStudentStatusSelection}
+              onChange={handleStudentStatusSelection}
             />
           </Form.Field>
         </Form.Group>
-        {this.state.isAdmin ? (
+        {isAdmin ? (
           <Form.Group>
             <Form.Field>
               <label>Select tag</label>
@@ -664,7 +630,7 @@ class PopulationSearchForm extends Component {
                 fluid
                 selection
                 options={options}
-                onChange={this.handleTagSearch}
+                onChange={handleTagSearch}
               />
               <label>Select starting year</label>
               <Datetime
@@ -675,12 +641,12 @@ class PopulationSearchForm extends Component {
                 renderYear={(props, selectableYear) => <td {...props}>{selectableYear}</td>}
                 closeOnSelect
                 value={null}
-                isValidDate={this.validYearCheck}
-                onChange={this.handleTagYearSelect}
+                isValidDate={validYearCheck}
+                onChange={handleTagYearSelect}
               />
               <Button
-                disabled={!this.state.selectedTag}
-                onClick={this.handleSubmit}
+                disabled={!selectedTag}
+                onClick={handleSubmit}
               >
                 Search by tag
               </Button>
@@ -689,67 +655,93 @@ class PopulationSearchForm extends Component {
       </div>)
   }
 
-  shouldRenderSearchForm = () => {
-    const queryIsEmpty = Object.getOwnPropertyNames(this.props.queries).length > 0
+  const shouldRenderSearchForm = () => {
+    const queryIsEmpty = Object.getOwnPropertyNames(props.queries).length > 0
     return !queryIsEmpty
   }
 
-  render() {
-    const { location } = this.props
-    if (!this.shouldRenderSearchForm() && location.search !== '') {
-      return null
-    }
-    const { translate } = this.props
-    const { isLoading, momentYear, query } = this.state
-    const { Advanced } = infoToolTips.PopulationStatistics
-    let errorText = translate('populationStatistics.alreadyFetched')
-    let isQueryInvalid = this.validateQuery()
-
-    if (!this.validYearCheck(momentYear)) {
-      isQueryInvalid = true
-      errorText = translate('populationStatistics.selectValidYear')
-    }
-
-    if (query.semesters.length === 0) {
-      isQueryInvalid = true
-      errorText = 'Select at least one semester'
-    }
-
-    if (!query.studyRights.programme) {
-      isQueryInvalid = true
-      errorText = translate('populationStatistics.selectStudyRights')
-    }
-
-    return (
-      <Form error={isQueryInvalid} loading={isLoading}>
-        <Grid divided padded="vertically">
-          <Grid.Row>
-            <Grid.Column width={10}>
-              {this.renderEnrollmentDateSelector()}
-              {this.renderStudyGroupSelector()}
-            </Grid.Column>
-            <Grid.Column width={6}>
-              <Form.Field style={{ margin: 'auto' }}>
-                <label>Advanced settings <InfoBox content={Advanced} /></label>
-                <Form.Radio
-                  toggle
-                  checked={this.state.showAdvancedSettings}
-                  onClick={() => { this.setState({ showAdvancedSettings: !this.state.showAdvancedSettings }) }}
-                />
-              </Form.Field>
-              {this.renderAdvancedSettingsSelector()}
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-
-        <Message error color="blue" header={errorText} />
-
-        <Form.Button onClick={this.handleSubmit} disabled={isQueryInvalid}>
-          {translate('populationStatistics.addPopulation')}
-        </Form.Button>
-      </Form>
-    )
+  const { location } = props
+  if (!shouldRenderSearchForm() && location.search !== '') {
+    return null
   }
+  const { translate } = props
+  const { Advanced } = infoToolTips.PopulationStatistics
+  let errorText = translate('populationStatistics.alreadyFetched')
+  let isQueryInvalid = validateQuery()
+
+  if (!validYearCheck(momentYear)) {
+    isQueryInvalid = true
+    errorText = translate('populationStatistics.selectValidYear')
+  }
+
+  if (query.semesters.length === 0) {
+    isQueryInvalid = true
+    errorText = 'Select at least one semester'
+  }
+
+  if (!query.studyRights.programme) {
+    isQueryInvalid = true
+    errorText = translate('populationStatistics.selectStudyRights')
+  }
+
+  return (
+    <Form error={isQueryInvalid} loading={isLoading}>
+      <Grid divided padded="vertically">
+        <Grid.Row>
+          <Grid.Column width={10}>
+            {renderEnrollmentDateSelector()}
+            {renderStudyGroupSelector()}
+          </Grid.Column>
+          <Grid.Column width={6}>
+            <Form.Field style={{ margin: 'auto' }}>
+              <label>Advanced settings <InfoBox content={Advanced} /></label>
+              <Form.Radio
+                toggle
+                checked={showAdvancedSettings}
+                onClick={() => { setState({ showAdvancedSettings: !showAdvancedSettings }) }}
+              />
+            </Form.Field>
+            {renderAdvancedSettingsSelector()}
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+
+      <Message error color="blue" header={errorText} />
+
+      <Form.Button onClick={handleSubmit} disabled={isQueryInvalid}>
+        {translate('populationStatistics.addPopulation')}
+      </Form.Button>
+    </Form>
+  )
+}
+
+PopulationSearchForm.propTypes = {
+  language: string.isRequired,
+  translate: func.isRequired,
+  getDegreesAndProgrammes: func.isRequired,
+  getPopulationStatistics: func.isRequired,
+  getPopulationCourses: func.isRequired,
+  getMandatoryCourses: func.isRequired,
+  getPopulationFilters: func.isRequired,
+  clearPopulationFilters: func.isRequired,
+  setPopulationFilter: func.isRequired,
+  clearPopulations: func.isRequired,
+  queries: shape({}).isRequired,
+  studyProgrammes: shape({}), //eslint-disable-line
+  degrees: arrayOf(dropdownType), //eslint-disable-line
+  studyTracks: arrayOf(dropdownType), //eslint-disable-line
+  setLoading: func.isRequired,
+  extents: arrayOf(object).isRequired,
+  pending: bool, //eslint-disable-line
+  getSemesters: func.isRequired,
+  semesters: shape({}).isRequired,
+  history: shape({}).isRequired,
+  location: shape({}).isRequired,
+  getTagsByStudytrackAction: func.isRequired,
+  tags: oneOfType([
+    arrayOf(shape({ tag_id: string, tagname: string })),
+    object
+  ]).isRequired
 }
 
 const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, localize, tags }) => {

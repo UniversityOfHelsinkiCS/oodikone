@@ -11,6 +11,7 @@ const calculateFacultyYearlyStats = async () => {
   const res = {}
   const lock = new AsyncLock()
 
+  let amountDone = 0
   await Promise.all(faculties.map(({ faculty_code, programme_code }) => (
     new Promise(async (facultyRes) => {
       if (!res[faculty_code]) res[faculty_code] = {}
@@ -57,6 +58,8 @@ const calculateFacultyYearlyStats = async () => {
           studentRes()
         })
       )))
+      amountDone += 1
+      console.log(`Faculties done ${amountDone}/${faculties.length}`)
       facultyRes()
     })
   )))
