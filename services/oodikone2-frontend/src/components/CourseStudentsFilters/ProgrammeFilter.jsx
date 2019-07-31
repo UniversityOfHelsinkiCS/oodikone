@@ -16,7 +16,7 @@ const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterActi
   }
   const handleChange = (e, { value }) => {
     setProgramme(value)
-    const chosenProgrammeName = allStudyrights.find(sr => sr.code === value)
+    const chosenProgrammeName = allStudyrights.programmes.find(sr => sr.code === value)
     setName(chosenProgrammeName.name.fi)
   }
   const clearFilter = () => {
