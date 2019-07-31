@@ -288,12 +288,13 @@ export const gradeFilter = (params) => {
 }
 
 export const programmeFilter = (params) => {
-  const { programme } = params
+  const { programme, programmeName } = params
   return ({
     id: uuidv4(),
     type: 'ProgrammeFilter',
     params: {
-      programme
+      programme,
+      programmeName
     },
     filter: (student) => {
       const studentStudyrightCodes = flattenStudyrights(student.studyrights)
