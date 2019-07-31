@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Search } from 'semantic-ui-react'
 import { connect } from 'react-redux'
@@ -11,62 +11,50 @@ import './courseSearch.css'
 
 const { func, string, arrayOf, object } = PropTypes
 
-class CourseSearch extends Component {
-  state = {
-    isLoading: false,
-    searchStr: ''
-  }
+const CourseSearch = (props) => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [searchStr, setSearchStr] = useState('')
 
-  resetComponent = () => {
-    this.setState({
-      isLoading: false,
-      searchStr: ''
-    })
-  }
-
-  handleSearchChange = (e, { value: searchStr }) => {
-    this.props.clearTimeout('search')
-    this.setState({ searchStr })
-    this.props.setTimeout('search', () => {
-      this.fetchCoursesList(searchStr)
-    }, 250)
-  }
-
-  fetchCoursesList = (searchStr) => {
-    const { activeLanguage } = this.props
-    if (searchStr.length >= 3) {
-      this.setState({ isLoading: true })
-      this.props.findFunction(searchStr, activeLanguage)
-        .then(() => this.setState({ isLoading: false }))
+  const fetchCoursesList = (str) => {
+    const { activeLanguage } = props
+    if (str.length >= 3) {
+      setIsLoading(true)
+      props.findFunction(str, activeLanguage)
+        .then(() => setIsLoading(false))
     } else {
-      this.props.findFunction('')
+      props.findFunction('')
     }
   }
 
-  selectCourse = (a, b) => {
-    this.setState({ searchStr: b.result.title })
-    this.props.handleResultSelect(a, b)
+  const handleSearchChange = (e, { value }) => {
+    props.clearTimeout('search')
+    setSearchStr(value)
+    props.setTimeout('search', () => {
+      fetchCoursesList(value)
+    }, 250)
   }
 
-  render() {
-    const { isLoading, searchStr } = this.state
-    const { courseList } = this.props
-
-    const coursesToRender = courseList.slice(0, 20)
-
-    return (
-      <Search
-        className="courseSearch"
-        input={{ fluid: true }}
-        loading={isLoading}
-        placeholder="Search by entering a course code or name"
-        onResultSelect={this.selectCourse}
-        onSearchChange={this.handleSearchChange}
-        results={coursesToRender}
-        value={searchStr}
-      />
-    )
+  const selectCourse = (a, b) => {
+    setSearchStr(b.result.title)
+    props.handleResultSelect(a, b)
   }
+
+  const { courseList } = props
+
+  const coursesToRender = courseList.slice(0, 20)
+
+  return (
+    <Search
+      className="courseSearch"
+      input={{ fluid: true }}
+      loading={isLoading}
+      placeholder="Search by entering a course code or name"
+      onResultSelect={selectCourse}
+      onSearchChange={handleSearchChange}
+      results={coursesToRender}
+      value={searchStr}
+    />
+  )
 }
 
 CourseSearch.propTypes = {

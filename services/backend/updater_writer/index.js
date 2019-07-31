@@ -1,10 +1,11 @@
 const stan = require('node-nats-streaming').connect('updaterNATS', process.env.HOSTNAME, process.env.NATS_URI)
 const { updateStudent, updateMeta, updateAttainmentMeta } = require('./updater/database_updater')
+const logger = require('./logger')
 
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
 const opts = stan.subscriptionOptions()
 opts.setManualAckMode(true)
-opts.setAckWait(5 * 60 * 1000) // 5min
+opts.setAckWait(10 * 60 * 1000) // some students have taken over 5 min to write!
 // opts.setDeliverAllAvailable()
 // opts.setDurableName('durable')
 opts.setMaxInFlight(1)
@@ -18,19 +19,17 @@ stan.on('connect', function () {
   const writeStudent = async (msg) => {
     let data = null
     try {
+      const start = new Date()
       data = JSON.parse(msg.getData())
-      if (data.studentInfo) {
-        await updateStudent(data)
-      } else {
+      if (data.task === 'meta') {
         await updateMeta(data)
+      } else {
+        await updateStudent(data)
       }
-      stan.publish('status', `${data.studentInfo ? data.studentInfo.studentnumber : 'meta'}:DONE`, (err) => { if (err) console.log(err) })
+      stan.publish('status', JSON.stringify({ task: data.task, status: 'DONE', timems: new Date() - start }), (err) => { if (err) console.log(err) })
     } catch (err) {
-      let id = 'null'
-      if (data) {
-        id = data.studentInfo ? data.studentInfo.studentnumber : 'meta'
-      }
-      console.log('update failed', id, err)
+      console.log('update failed', data.task, err)
+      logger.info('failure', { service: 'WRITER' })
     }
     msg.ack()
   }
@@ -43,6 +42,7 @@ stan.on('connect', function () {
       await updateAttainmentMeta()
     } catch (err) {
       console.log('attainment meta update failed', err)
+      logger.info('failure', { service: 'WRITER' })
     }
     msg.ack()
   })

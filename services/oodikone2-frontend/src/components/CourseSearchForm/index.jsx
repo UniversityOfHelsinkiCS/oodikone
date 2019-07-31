@@ -1,69 +1,62 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { func, bool } from 'prop-types'
 import { Form } from 'semantic-ui-react'
 import { clearCourses, findCoursesV2 } from '../../redux/coursesearch'
 import AutoSubmitSearchInput from '../AutoSubmitSearchInput'
 
-class CourseSearchForm extends Component {
-  state = {
-    coursename: '',
-    coursecode: ''
-  }
+const CourseSearchForm = (props) => {
+  const [courseName, setCourseName] = useState('')
+  const [courseCode, setCourseCode] = useState('')
 
-  componentDidMount() {
-    this.props.clearCourses()
-  }
+  useEffect(() => {
+    props.clearCourses()
+  }, [])
 
-  fetchCourses = () => {
-    const { coursename: name, coursecode: code } = this.state
-
+  const fetchCourses = () => {
     const validateParam = (param, minLength) => param && param.length >= minLength
-    const isValidName = validateParam(name, 5)
-    const isValidCode = validateParam(code, 2)
+    const isValidName = validateParam(courseName, 5)
+    const isValidCode = validateParam(courseCode, 2)
 
     if (isValidName || isValidCode) {
-      return this.props.findCoursesV2({ name, code })
+      return props.findCoursesV2({ courseName, courseCode })
     }
-    if (name.length === 0 && code.length === 0) {
-      this.props.clearCourses()
+    if (courseName.length === 0 && courseCode.length === 0) {
+      props.clearCourses()
     }
     return Promise.resolve()
   }
 
-  render() {
-    const { coursename, coursecode } = this.state
-    const { pending } = this.props
+  const { pending } = props
 
-    return (
-      <Form>
-        <Form.Group widths="equal">
-          <Form.Field>
-            <label>Code:</label>
-            <AutoSubmitSearchInput
-              doSearch={this.fetchCourses}
-              placeholder="Search by entering a course code"
-              value={coursecode}
-              onChange={cc => this.setState({ coursecode: cc })}
-              loading={pending}
-              minSearchLength={0}
-            />
-          </Form.Field>
-          <Form.Field>
-            <label>Name:</label>
-            <AutoSubmitSearchInput
-              doSearch={this.fetchCourses}
-              placeholder="Search by entering a course name"
-              value={coursename}
-              onChange={cn => this.setState({ coursename: cn })}
-              loading={pending}
-              minSearchLength={0}
-            />
-          </Form.Field>
-        </Form.Group>
-      </Form>
-    )
-  }
+  return (
+    <Form>
+      <Form.Group widths="equal">
+        <Form.Field>
+          <label>Code:</label>
+          <AutoSubmitSearchInput
+            doSearch={fetchCourses}
+            placeholder="Search by entering a course code"
+            value={courseCode}
+            onChange={cc => setCourseCode(cc)}
+            loading={pending}
+            minSearchLength={0}
+          />
+        </Form.Field>
+        <Form.Field>
+          <label>Name:</label>
+          <AutoSubmitSearchInput
+            doSearch={fetchCourses}
+            placeholder="Search by entering a course name"
+            value={courseName}
+            onChange={cn => setCourseName(cn)}
+            loading={pending}
+            minSearchLength={0}
+          />
+        </Form.Field>
+      </Form.Group>
+    </Form>
+  )
 }
 
 CourseSearchForm.propTypes = {

@@ -197,6 +197,7 @@ router.post('/updatedatabase', async (req, res) => {
   const studentnumbers = req.body
   if (!(studentnumbers && studentnumbers.every(sn => isValidStudentId(sn)))) {
     res.status(400).end()
+    return
   }
   try {
     const response = await updateStudents(studentnumbers)
@@ -209,9 +210,10 @@ router.post('/updatedatabase', async (req, res) => {
 })
 
 router.post('/updatedatabase/oldest', async (req, res) => {
-  const amount = req.body
+  const { amount } = req.body
   if (!Number.isInteger(Number(amount))) {
     res.status(400).end()
+    return
   }
   try {
     const response = await updateOldestStudents(amount)
