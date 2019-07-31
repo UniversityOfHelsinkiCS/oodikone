@@ -1,5 +1,5 @@
 import uuidv4 from 'uuid/v4'
-import { getStudentTotalCredits, getStudentTotalCreditsFromMandatory, getStudentGradeMean } from '../common'
+import { getStudentTotalCredits, getStudentTotalCreditsFromMandatory, getStudentGradeMean, flattenStudyrights } from '../common'
 
 export const creditsLessThan = (params) => {
   const { credit } = params
@@ -62,8 +62,7 @@ export const enrollmentStatus = (params) => {
       enrolled
     },
     filter: student => student.semesterenrollments.filter(({ semestercode }) =>
-      semesters.includes(semestercode)).map(({ enrollmenttype }) =>
-      enrollmenttype === enrolled).every(b => b === true)
+      semesters.includes(semestercode)).map(({ enrollmenttype }) => enrollmenttype === enrolled).every(b => b === true)
   })
 }
 
@@ -143,14 +142,12 @@ export const extentGraduated = (params) => {
           return !thisStudyright || thisStudyright.extentcode !== code
         } else if (complemented === 'true' && graduated === 'grad') {
           return !student.studyrights.filter(sr =>
-            sr.extentcode === code && sr.graduated).map(sr =>
-            sr.extentcode).includes(code)
+            sr.extentcode === code && sr.graduated).map(sr => sr.extentcode).includes(code)
         } else if (complemented === 'false' && graduated === 'either') {
           return student.studyrights.map(sr => sr.extentcode).includes(code)
         }
         return student.studyrights.filter(sr =>
-          sr.extentcode === code && sr.graduated).map(sr =>
-          sr.extentcode).includes(code)
+          sr.extentcode === code && sr.graduated).map(sr => sr.extentcode).includes(code)
       }
       const foundStudyRight = student.studyrights.find(s => s.studyrightElements.map(e => e.code).includes(code))
       const returnable = graduated !== 'grad' ? !!foundStudyRight : (foundStudyRight && foundStudyRight.graduated)
@@ -286,6 +283,22 @@ export const gradeFilter = (params) => {
     filter: (student) => {
       const course = student.courses.find(c => c.course.code === coursecode)
       return Number(course.grade) === grade
+    }
+  })
+}
+
+export const programmeFilter = (params) => {
+  const { programme, programmeName } = params
+  return ({
+    id: uuidv4(),
+    type: 'ProgrammeFilter',
+    params: {
+      programme,
+      programmeName
+    },
+    filter: (student) => {
+      const studentStudyrightCodes = flattenStudyrights(student.studyrights)
+      return studentStudyrightCodes.find(code => code === programme)
     }
   })
 }
