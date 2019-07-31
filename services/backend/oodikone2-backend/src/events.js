@@ -87,7 +87,7 @@ const refreshOverview = async () => {
 const timezone = 'Europe/Helsinki'
 
 const startCron = () => {
-  cron.schedule('0 7 * * *', async () => {
+  cron.schedule('0 6 * * *', async () => {
     await refreshFacultyYearlyStats()
     await refreshStudyrightAssociations()
     await refreshOverview()
