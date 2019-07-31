@@ -4,7 +4,7 @@ const { updateStudent, updateMeta, updateAttainmentMeta } = require('./updater/d
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
 const opts = stan.subscriptionOptions()
 opts.setManualAckMode(true)
-opts.setAckWait(5 * 60 * 1000) // 5min
+opts.setAckWait(10 * 60 * 1000) // some students have taken over 5 min to write!
 // opts.setDeliverAllAvailable()
 // opts.setDurableName('durable')
 opts.setMaxInFlight(1)

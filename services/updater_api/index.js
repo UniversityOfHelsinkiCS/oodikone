@@ -5,7 +5,7 @@ const { getStudent, getMeta } = require('./doo_api_database_updater/updater_form
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
 var opts = stan.subscriptionOptions()
 opts.setManualAckMode(true)
-opts.setAckWait(5 * 60 * 1000) // 5min
+opts.setAckWait(10 * 60 * 1000)
 // opts.setDeliverAllAvailable()
 // opts.setDurableName('durable')
 opts.setMaxInFlight(1)

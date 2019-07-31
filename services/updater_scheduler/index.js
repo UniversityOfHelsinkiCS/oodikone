@@ -104,7 +104,7 @@ stan.on('connect', async () => {
   })
   const opts = stan.subscriptionOptions()
   opts.setManualAckMode(true)
-  opts.setAckWait(30 * 60 * 1000) // 1min
+  opts.setAckWait(5 * 60 * 1000)
   // opts.setDeliverAllAvailable()
   // opts.setDurableName('durable')
   opts.setMaxInFlight(20)
