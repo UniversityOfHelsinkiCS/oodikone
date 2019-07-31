@@ -31,6 +31,7 @@
     "babel/no-invalid-this": 2,
     "lines-between-class-members": [2, "always"],
     "no-plusplus": 0,
+    "no-shadow": 0,
     "babel/semi": [
       2,
       "never"

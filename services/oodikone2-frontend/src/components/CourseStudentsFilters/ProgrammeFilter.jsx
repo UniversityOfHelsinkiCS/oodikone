@@ -2,23 +2,28 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { func, shape, string } from 'prop-types'
+import { programmeFilter } from '../../populationFilters'
 
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
-import { gradeFilter } from '../../populationFilters'
 
-const GradeFilter = ({ coursecode, courseData, filter, setPopulationFilterAction, removePopulationFilterAction }) => {
-  const [grade, setGrade] = useState(0)
+const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterAction, allStudyrights, filter, language }) => {
+  const [programme, setProgramme] = useState('')
+  const [programmeName, setName] = useState('')
+
   const handleFilter = () => {
-    setPopulationFilterAction(gradeFilter({ grade, coursecode, coursename: courseData[coursecode].name }))
+    setPopulationFilterAction(programmeFilter({ programme, programmeName }))
   }
-
   const handleChange = (e, { value }) => {
-    setGrade(value)
+    setProgramme(value)
+    const chosenProgrammeName = allStudyrights.programmes.find(sr => sr.code === value)
+    setName(chosenProgrammeName.name[language])
   }
   const clearFilter = () => {
     removePopulationFilterAction(filter.id)
+    setProgramme('')
+    setName('')
   }
-
+  const options = allStudyrights.programmes.map(p => ({ key: p.code, text: p.name[language], value: p.code }))
   if (filter.notSet) {
     return (
       <Segment>
@@ -28,21 +33,14 @@ const GradeFilter = ({ coursecode, courseData, filter, setPopulationFilterAction
           />
           <Form.Group inline>
             <Form.Field>
-              <label>Select students that grade </label>
+              <label>Select students that are in programme </label>
             </Form.Field>
             <Form.Field>
               <Dropdown
                 placeholder="select"
-                options={[{ key: 1, text: '1', value: 1 },
-                { key: 2, text: '2', value: 2 },
-                { key: 3, text: '3', value: 3 },
-                { key: 4, text: '4', value: 4 },
-                { key: 5, text: '5', value: 5 }]}
+                options={options}
                 onChange={handleChange}
               />
-            </Form.Field>
-            <Form.Field>
-              <label>from course {courseData[coursecode].name}</label>
             </Form.Field>
             <Form.Field>
               <Button onClick={handleFilter}>
@@ -56,27 +54,26 @@ const GradeFilter = ({ coursecode, courseData, filter, setPopulationFilterAction
   }
   return (
     <Segment>
-      Students that have grade {filter.params.grade} from course {filter.params.coursename}
+      Students that are in programme {filter.params.programmeName}
       <span style={{ float: 'right' }}>
         <Icon name="remove" onClick={clearFilter} />
       </span>
     </Segment>
   )
 }
-
-GradeFilter.propTypes = {
+ProgrammeFilter.propTypes = {
   setPopulationFilterAction: func.isRequired,
   removePopulationFilterAction: func.isRequired,
   filter: shape({}).isRequired,
-  courseData: shape({}).isRequired,
-  coursecode: string.isRequired
+  allStudyrights: shape({}).isRequired,
+  language: string.isRequired
 }
 
-const mapStateToProps = ({ courseStats }) => ({
-  courseData: courseStats.data
+const mapStateToProps = ({ settings }) => ({
+  language: settings.language
 })
 
 export default connect(mapStateToProps, {
   setPopulationFilterAction: setPopulationFilter,
   removePopulationFilterAction: removePopulationFilter
-})(GradeFilter)
+})(ProgrammeFilter)

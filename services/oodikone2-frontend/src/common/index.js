@@ -267,3 +267,46 @@ export const cancelablePromise = (promise) => {
     }
   }
 }
+
+export const useSearchHistory = (id, capacity = 5) => {
+  const [searchHistory, setSearchHistory] = useState([])
+  const [didMount, setDidMount] = useState(false)
+
+  const getSearchHistoryStore = () => JSON.parse(localStorage.getItem('searchHistoryStore')) || {}
+
+  const saveSearchHistoryStore = newStore => localStorage.setItem('searchHistoryStore', JSON.stringify(newStore))
+
+  const saveSearchHistory = () => {
+    const searchHistoryStore = getSearchHistoryStore()
+    searchHistoryStore[id] = searchHistory
+    saveSearchHistoryStore(searchHistoryStore)
+  }
+
+  useEffect(() => {
+    setSearchHistory(getSearchHistoryStore()[id] || [])
+    setDidMount(true)
+  }, [])
+
+  useEffect(() => {
+    if (didMount) {
+      saveSearchHistory()
+    }
+  }, [searchHistory])
+
+  const addItem = (item) => {
+    if (!searchHistory[id]) searchHistory[id] = []
+    setSearchHistory(searchHistory.concat({ ...item, timestamp: new Date() }).slice(-capacity))
+  }
+
+  return [searchHistory, addItem]
+}
+
+export const flattenStudyrights = (studyrights) => {
+  const studyrightcodes = []
+  studyrights.forEach((sr) => {
+    sr.studyrightElements.forEach((srE) => {
+      studyrightcodes.push(srE.code)
+    })
+  })
+  return studyrightcodes
+}
