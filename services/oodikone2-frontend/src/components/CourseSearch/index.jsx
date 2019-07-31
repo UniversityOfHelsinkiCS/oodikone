@@ -15,23 +15,23 @@ const CourseSearch = (props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [searchStr, setSearchStr] = useState('')
 
-  const handleSearchChange = (e, { value: searchStr }) => {
-    props.clearTimeout('search')
-    setSearchStr(searchStr)
-    props.setTimeout('search', () => {
-      fetchCoursesList(searchStr)
-    }, 250)
-  }
-
-  const fetchCoursesList = (searchStr) => {
+  const fetchCoursesList = (str) => {
     const { activeLanguage } = props
-    if (searchStr.length >= 3) {
+    if (str.length >= 3) {
       setIsLoading(true)
-      props.findFunction(searchStr, activeLanguage)
+      props.findFunction(str, activeLanguage)
         .then(() => setIsLoading(false))
     } else {
       props.findFunction('')
     }
+  }
+
+  const handleSearchChange = (e, { value }) => {
+    props.clearTimeout('search')
+    setSearchStr(value)
+    props.setTimeout('search', () => {
+      fetchCoursesList(value)
+    }, 250)
   }
 
   const selectCourse = (a, b) => {

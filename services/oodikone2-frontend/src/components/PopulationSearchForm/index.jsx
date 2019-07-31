@@ -10,7 +10,7 @@ import Datetime from 'react-datetime'
 import _ from 'lodash'
 import moment from 'moment'
 
-import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
+import { getPopulationStatistics } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationFilters, setPopulationFilter, clearPopulationFilters } from '../../redux/populationFilters'
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
@@ -58,7 +58,7 @@ const PopulationSearchForm = (props) => {
 
   const fetchPopulationPromises = useRef()
 
-  const setState = (newState) => setTotalState({ ...totalState, ...newState })
+  const setState = newState => setTotalState({ ...totalState, ...newState })
 
   const {
     query,
@@ -70,52 +70,18 @@ const PopulationSearchForm = (props) => {
     isAdmin
   } = totalState
 
-  useEffect(() => {
-    const { studyProgrammes, semesters, location } = props
-    if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
-      setState({ query: initialQuery() }) // eslint-disable-line
-      props.getDegreesAndProgrammes()
-    }
-    if (!semesters.years) {
-      props.getSemesters()
-    }
-    if (location.search) {
-      fetchPopulationFromUrlParams()
-    }
-    const admin = userIsAdmin()
-    setState({ isAdmin: admin })
-    setDidMount(true)
-
-    return () => {
-      if (fetchPopulationPromises.current) fetchPopulationPromises.current.cancel()
-    }
-  }, [])
-
-  useEffect(() => {
-    const { studyProgrammes } = props
-    if (studyProgrammes
-      && Object.values(studyProgrammes).length === 1
-      && !query.studyRights.programme
-      && didMount) {
-      handleProgrammeChange(null, { value: Object.values(studyProgrammes)[0].code })
-    }
-  })
-
-  useEffect(() => {
-    if (props.location.search && didMount) {
-      fetchPopulationFromUrlParams()
-    }
-  }, [ props.location.search ])
-
-  const validateQuery = () => {
-    const { queries } = props
-    const compare = { ...queries }
-    delete compare.uuid
-    return _.isEqual(compare, query)
-  }
+  const {
+    studyProgrammes,
+    location,
+    semesters,
+    queries,
+    history,
+    tags,
+    language,
+    translate
+  } = props
 
   const parseQueryFromUrl = () => {
-    const { location } = props
     const initial = initialQuery()
     const { studyRights, months, ...rest } = qs.parse(location.search)
     const query = {
@@ -127,30 +93,14 @@ const PopulationSearchForm = (props) => {
     return query
   }
 
-  const pushQueryToUrl = (query) => {
-    const { history } = props
-    const { studyRights, ...rest } = query
-    const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
-    const searchString = qs.stringify(queryObject)
-    history.push({ search: searchString })
-  }
-
-  const getSearchHistoryTextFromQuery = () => {
-    const { studyRights, semesters, months, startYear, endYear, studentStatuses } = query
-
-    const studyRightsText = Object.values(studyRights).filter(s => s).join(', ')
-    const timeText = `${semesters.join(', ')}/${startYear}-${parseInt(endYear) + 1}, ${months} months`
-    const studentStatusesText = studentStatuses.length > 0 ?  `includes ${studentStatuses.map(s => s.toLowerCase()).join(', ')} students` : null
-
-    return [studyRightsText, timeText, studentStatusesText].filter(t => t).join(' - ')
-  }
-
-  const handleSubmit = () => {
-    addItemToSearchHistory({
-      text: getSearchHistoryTextFromQuery(),
-      params: query
-    })
-    pushQueryToUrl(query)
+  const checkPreviousQuery = (query, previousQuery) => {
+    if (!previousQuery.studyRights) {
+      return false
+    }
+    const sameProgramme = query.studyRights.programme === previousQuery.studyRights.programme
+    const sameMonths = query.months === previousQuery.months
+    const sameStartYear = query.startYear === previousQuery.startYear
+    return sameProgramme && sameMonths && sameStartYear
   }
 
   const fetchPopulation = async (query) => {
@@ -180,8 +130,111 @@ const PopulationSearchForm = (props) => {
     }
   }
 
+  const fetchPopulationFromUrlParams = () => {
+    const previousQuery = queries
+    const query = parseQueryFromUrl()
+    if (!checkPreviousQuery(query, previousQuery)) {
+      setState({ query })
+      fetchPopulation(query)
+    }
+  }
+
+  useEffect(() => {
+    if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
+      setState({ query: initialQuery() }) // eslint-disable-line
+      props.getDegreesAndProgrammes()
+    }
+    if (!semesters.years) {
+      props.getSemesters()
+    }
+    if (location.search) {
+      fetchPopulationFromUrlParams()
+    }
+    const admin = userIsAdmin()
+    setState({ isAdmin: admin })
+    setDidMount(true)
+
+    return () => {
+      if (fetchPopulationPromises.current) fetchPopulationPromises.current.cancel()
+    }
+  }, [])
+
+  const handleClear = (type) => {
+    setState({
+      query: {
+        ...query,
+        studyRights: {
+          ...query.studyRights,
+          [type]: undefined
+        }
+      }
+    })
+  }
+
+  const handleProgrammeChange = (e, { value }) => {
+    const programme = value
+    props.getTagsByStudytrackAction(value)
+    if (programme === '') {
+      handleClear('programme')
+      return
+    }
+    setState({
+      query: {
+        ...query,
+        studyRights: {
+          programme
+        }
+      }
+    })
+  }
+
+  useEffect(() => {
+    if (studyProgrammes
+      && Object.values(studyProgrammes).length === 1
+      && !query.studyRights.programme
+      && didMount) {
+      handleProgrammeChange(null, { value: Object.values(studyProgrammes)[0].code })
+    }
+  })
+
+  useEffect(() => {
+    if (props.location.search && didMount) {
+      fetchPopulationFromUrlParams()
+    }
+  }, [props.location.search])
+
+  const validateQuery = () => {
+    const compare = { ...queries }
+    delete compare.uuid
+    return _.isEqual(compare, query)
+  }
+
+  const pushQueryToUrl = (query) => {
+    const { studyRights, ...rest } = query
+    const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
+    const searchString = qs.stringify(queryObject)
+    history.push({ search: searchString })
+  }
+
+  const getSearchHistoryTextFromQuery = () => {
+    const { studyRights, semesters, months, startYear, endYear, studentStatuses } = query
+
+    const studyRightsText = Object.values(studyRights).filter(s => s).join(', ')
+    const timeText = `${semesters.join(', ')}/${startYear}-${parseInt(endYear, 10) + 1}, ${months} months`
+    const studentStatusesText = studentStatuses.length > 0 ? `includes ${studentStatuses.map(s => s.toLowerCase()).join(', ')} students` : null
+
+    return [studyRightsText, timeText, studentStatusesText].filter(t => t).join(' - ')
+  }
+
+  const handleSubmit = () => {
+    addItemToSearchHistory({
+      text: getSearchHistoryTextFromQuery(),
+      params: query
+    })
+    pushQueryToUrl(query)
+  }
+
   const handleYearSelection = (momentYear) => {
-    const { studyProgrammes } = props
     if (!moment.isMoment(momentYear)) {
       setState({
         momentYear: null,
@@ -239,10 +292,19 @@ const PopulationSearchForm = (props) => {
   }
 
   const handleTagSearch = (event, { value }) => {
-    const tag = props.tags.find(t => t.tag_id === value)
+    const tag = tags.find(t => t.tag_id === value)
     setState({
       selectedTag: tag
     })
+  }
+
+  const getMonths = (startYear, end, term) => {
+    const lastDayOfMonth = moment(end).endOf('month')
+    const start = term === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`
+    setState({
+      floatMonths: moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths()
+    })
+    return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
   }
 
   const handleTagYearSelect = (momentYear) => {
@@ -309,23 +371,6 @@ const PopulationSearchForm = (props) => {
     })
   }
 
-  const handleProgrammeChange = (e, { value }) => {
-    const programme = value
-    props.getTagsByStudytrackAction(value)
-    if (programme === '') {
-      handleClear('programme')
-      return
-    }
-    setState({
-      query: {
-        ...query,
-        studyRights: {
-          programme
-        }
-      }
-    })
-  }
-
   const handleStudyTrackChange = (e, { value }) => {
     const studyTrack = value
     if (studyTrack === '') {
@@ -353,27 +398,6 @@ const PopulationSearchForm = (props) => {
     })
   }
 
-  const handleClear = (type) => {
-    setState({
-      query: {
-        ...query,
-        studyRights: {
-          ...query.studyRights,
-          [type]: undefined
-        }
-      }
-    })
-  }
-
-  const getMonths = (startYear, end, term) => {
-    const lastDayOfMonth = moment(end).endOf('month')
-    const start = term === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`
-    setState({
-      floatMonths: moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths()
-    })
-    return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
-  }
-
   const getMonthValue = (startYear, months) => {
     const start = `${startYear}-08-01`
     return moment(start).add(months - 1, 'months').format('MMMM YY')
@@ -391,36 +415,14 @@ const PopulationSearchForm = (props) => {
 
   const getMinSelection = (startYear, semester) => (semester === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`)
 
-  const checkPreviousQuery = (query, previousQuery) => {
-    if (!previousQuery.studyRights) {
-      return false
-    }
-    const sameProgramme = query.studyRights.programme === previousQuery.studyRights.programme
-    const sameMonths = query.months === previousQuery.months
-    const sameStartYear = query.startYear === previousQuery.startYear
-    return sameProgramme && sameMonths && sameStartYear
-  }
-
-  const fetchPopulationFromUrlParams = () => {
-    const previousQuery = props.queries
-    const query = parseQueryFromUrl()
-    if (!checkPreviousQuery(query, previousQuery)) {
-      setState({ query })
-      fetchPopulation(query)
-    }
-  }
-
-  const renderableList = (list) => {
-    const { language } = props
-    return list.map((sp) => {
-      const { type, name, code } = sp
-      const shh = { type, name, code }
-      shh.text = (sp.name[language] || `${(sp.name.fi || sp.name.en || sp.name.sv)} (translation not found)`)
-      shh.description = sp.code
-      shh.value = sp.code
-      return shh
-    })
-  }
+  const renderableList = list => list.map((sp) => {
+    const { type, name, code } = sp
+    const shh = { type, name, code }
+    shh.text = (sp.name[language] || `${(sp.name.fi || sp.name.en || sp.name.sv)} (translation not found)`)
+    shh.description = sp.code
+    shh.value = sp.code
+    return shh
+  })
 
   const renderEnrollmentDateSelector = () => {
     const { semesters, startYear } = query
@@ -526,7 +528,6 @@ const PopulationSearchForm = (props) => {
   }
 
   const renderStudyGroupSelector = () => {
-    const { studyProgrammes, language } = props
     const { studyRights } = query
     if (props.pending || !didMount) {
       return (
@@ -578,7 +579,6 @@ const PopulationSearchForm = (props) => {
       return null
     }
 
-    const { translate, tags } = props
     const { semesters, studentStatuses } = query
     const options = isAdmin ? tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id })) : []
 
@@ -678,11 +678,9 @@ const PopulationSearchForm = (props) => {
     return !queryIsEmpty
   }
 
-  const { location } = props
   if (!shouldRenderSearchForm() && location.search !== '') {
     return null
   }
-  const { translate } = props
   const { Advanced } = infoToolTips.PopulationStatistics
   let errorText = translate('populationStatistics.alreadyFetched')
   let isQueryInvalid = validateQuery()
@@ -749,13 +747,11 @@ PopulationSearchForm.propTypes = {
   getPopulationFilters: func.isRequired,
   clearPopulationFilters: func.isRequired,
   setPopulationFilter: func.isRequired,
-  clearPopulations: func.isRequired,
   queries: shape({}).isRequired,
   studyProgrammes: shape({}), //eslint-disable-line
   degrees: arrayOf(dropdownType), //eslint-disable-line
   studyTracks: arrayOf(dropdownType), //eslint-disable-line
   setLoading: func.isRequired,
-  extents: arrayOf(object).isRequired,
   pending: bool, //eslint-disable-line
   getSemesters: func.isRequired,
   semesters: shape({}).isRequired,
@@ -778,7 +774,6 @@ const mapStateToProps = ({ semesters, settings, populations, populationDegreesAn
     translate: getTranslate(localize),
     studyProgrammes: populationDegreesAndProgrammes.data.programmes || {},
     pending,
-    extents: populations.data.extents || [],
     tags: tags.data
   })
 }
@@ -791,7 +786,6 @@ export default withRouter(connect(mapStateToProps, {
   setPopulationFilter,
   clearPopulationFilters,
   getDegreesAndProgrammes,
-  clearPopulations,
   setLoading,
   getSemesters,
   getTagsByStudytrackAction
