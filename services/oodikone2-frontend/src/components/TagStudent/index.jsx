@@ -95,6 +95,8 @@ const TagStudent = ({
             selection
             options={tagOptions}
             onChange={handleChange}
+            selectOnBlur={false}
+            selectOnNavigation={false}
           />
         </List.Content>
       </List.Item>
