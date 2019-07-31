@@ -59,7 +59,7 @@ const scheduleStudentsByArray = async (studentNumbers) => {
 
 const scheduleOldestNStudents = async (amount) => {
   try {
-    const tasks = [...await Schedule.find({ type: 'student' }).limit(Number(amount)).sort({ updatedAt: 1 })]
+    const tasks = [...await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 }).limit(Number(amount))]
     await publish(tasks, true)
   } catch (e) {
     return e
