@@ -20,10 +20,11 @@
     "dotenv": "^8.0.0",
     "eslint": "^6.1.0",
     "jest": "^24.8.0",
+    "lodash": "^4.17.15",
     "node-nats-streaming": "^0.2.6",
     "nodemon": "^1.19.1",
-    "pg": "^7.11.0",
-    "sequelize": "^5.10.2",
+    "pg": "^7.12.0",
+    "sequelize": "^5.11.0",
     "umzug": "^2.2.0"
   }
 }

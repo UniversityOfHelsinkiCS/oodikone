@@ -1,4 +1,5 @@
 const { sequelize, } = require('../database/connection')
+const { sortBy, flatMap } = require('lodash')
 
 const {
   Student, Credit, Course, CreditTeacher, Teacher,
@@ -17,48 +18,62 @@ const awaitforEach = async (arr, func) => {
 }
 
 const updateAttainments = async (studyAttainments, transaction) => {
-  for (const { course } of studyAttainments) {
+  // sort data to avoid deadlocks
+  const courses = sortBy(studyAttainments.map(e => e.course), 'code')
+  const disciplines = sortBy(flatMap(studyAttainments, e => e.course.disciplines || []), 'discipline_id', 'course_id')
+  const providers = sortBy(flatMap(studyAttainments, e => e.course.providers), 'providercode')
+  const courseproviders = sortBy(flatMap(studyAttainments, e => e.course.courseproviders), 'coursecode', 'providercode')
+  const credits = sortBy(studyAttainments.map(e => e.credit), 'id')
+  const teachers = sortBy(flatMap(studyAttainments, e => e.teachers || []), 'id')
+  const creditTeachers = sortBy(flatMap(studyAttainments, e => e.creditTeachers), 'teacher_id', 'credit_id')
+
+  for (const course of courses) {
     await Course.upsert(course, { transaction })
   }
-  for (const { course } of studyAttainments) {
-    const { disciplines } = course
-    disciplines && disciplines.length > 0 && await awaitforEach(disciplines, async courseDiscipline => await CourseDisciplines.upsert(courseDiscipline, { transaction }))
+  for (const courseDiscipline of disciplines) {
+    await CourseDisciplines.upsert(courseDiscipline, { transaction })
   }
-  for (const { course } of studyAttainments) {
-    const { providers } = course
-    providers.length > 0 && await awaitforEach(providers, async provider => await Provider.upsert(provider, { transaction }))
+  for (const provider of providers) {
+    await Provider.upsert(provider, { transaction })
   }
-  for (const { course } of studyAttainments) {
-    const { courseproviders } = course
-    courseproviders.length > 0 && await awaitforEach(courseproviders, async courseProvider => await CourseProvider.upsert(courseProvider, { transaction }))
+  // must be after providers inserted
+  for (const courseProvider of courseproviders) {
+    await CourseProvider.upsert(courseProvider, { transaction })
   }
-  for (const { credit } of studyAttainments) {
+  for (const credit of credits) {
     await Credit.upsert(credit, { transaction })
   }
-  for (const { teachers } of studyAttainments) {
-    teachers && teachers.length > 0 && await awaitforEach(teachers, async teacher => await Teacher.upsert(teacher, { transaction }))
+  for (const teacher of teachers) {
+    await Teacher.upsert(teacher, { transaction })
   }
   // must be after teachers inserted
-  for (const { creditTeachers } of studyAttainments) {
-    creditTeachers.length > 0 && await awaitforEach(creditTeachers, async cT => await CreditTeacher.upsert(cT, { transaction }))
+  for (const creditTeacher of creditTeachers) {
+    await CreditTeacher.upsert(creditTeacher, { transaction })
   }
 }
 
 const updateStudyRights = async (studyRights, transaction) => {
-  for (const { studyRightExtent } of studyRights) {
+  // sort data to avoid deadlocks
+  const studyRightExtents = sortBy(studyRights.map(e => e.studyRightExtent), 'extentcode')
+  const studyrights = sortBy(studyRights.map(e => e.studyright), 'studyrightid')
+  const elementDetails = sortBy(flatMap(studyRights, e => e.elementDetails), 'code')
+  const studyRightElements = sortBy(flatMap(studyRights, e => e.studyRightElements), 'startdate', 'enddate', 'studyrightid', 'code')
+  const transfers = sortBy(flatMap(studyRights, e => e.transfers), 'transferdate', 'studentnumber', 'studyrightid', 'sourcecode', 'targetcode')
+
+  for (const studyRightExtent of studyRightExtents) {
     await StudyrightExtent.upsert(studyRightExtent, { transaction })
   }
-  for (const { studyright } of studyRights) {
+  for (const studyright of studyrights) {
     await Studyright.create(studyright, { transaction })
   }
-  for (const { elementDetails } of studyRights) {
-    await awaitforEach(elementDetails, async elementdetails => await ElementDetails.upsert(elementdetails, { transaction }))
+  for (const elementdetail of elementDetails) {
+    await ElementDetails.upsert(elementdetail, { transaction })
   }
-  for (const { studyRightElements } of studyRights) {
-    await awaitforEach(studyRightElements, async StudyRightElement => await StudyrightElement.create(StudyRightElement, { transaction }))
+  for (const StudyRightElement of studyRightElements) {
+    await StudyrightElement.create(StudyRightElement, { transaction })
   }
-  for (const { transfers } of studyRights) {
-    await awaitforEach(transfers, async transfer => await Transfers.upsert(transfer, { transaction }))
+  for (const transfer of transfers) {
+    await Transfers.upsert(transfer, { transaction })
   }
 }
 
@@ -68,11 +83,15 @@ const deleteStudentStudyrights = async (studentnumber, transaction) => {
 }
 
 const updateStudent = async (student) => {
-  const { studentInfo, studyAttainments, semesterEnrollments, studyRights } = student
+  let { studentInfo, studyAttainments, semesterEnrollments, studyRights } = student
+  console.log('starting', studentInfo.studentnumber)
+  console.time(studentInfo.studentnumber)
+
+  // sort data to avoid deadlocks
+  semesterEnrollments = sortBy(semesterEnrollments, 'studentnumber', 'semestercode')
+
   const transaction = await sequelize.transaction()
   try {
-    console.log('starting', studentInfo.studentnumber)
-    console.time(studentInfo.studentnumber)
     await deleteStudentStudyrights(studentInfo.studentnumber, transaction) // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
 
     await Student.upsert(studentInfo, { transaction })

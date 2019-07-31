@@ -14,8 +14,14 @@ const updateStudents = async (studentNumbers) => {
   return response.data
 }
 
+const updateOldestStudents = async (amount) => {
+  const response = await client.post('/update/oldest', amount)
+  return response.data
+}
+
 
 module.exports = {
   ping,
-  updateStudents
+  updateStudents,
+  updateOldestStudents
 }
