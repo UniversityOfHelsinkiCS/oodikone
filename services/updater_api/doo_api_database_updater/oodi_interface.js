@@ -42,7 +42,7 @@ const attemptGetFor = async (url, attempts = 5) => {
   for (let attempt = 1; attempt <= attempts; ++attempt) {
     try {
       const response = await getUrl(url)
-      logger.info('requested url', { url, success: response.status === 200 })
+      logger.info('requested url', { url, success: response.status === 200, fromcache: Boolean(response.request.fromCache) })
       return response
     } catch (error) {
       if (attempt === attempts) {
