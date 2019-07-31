@@ -1,30 +1,30 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
-import { func, shape } from 'prop-types'
+import { func, shape, string } from 'prop-types'
 import { programmeFilter } from '../../populationFilters'
 
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
 
-const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterAction, allStudyrights, filter }) => {
+const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterAction, allStudyrights, filter, language }) => {
   const [programme, setProgramme] = useState('')
   const [programmeName, setName] = useState('')
 
   const handleFilter = () => {
-    setPopulationFilterAction(programmeFilter({ programme }))
+    setPopulationFilterAction(programmeFilter({ programme, programmeName }))
   }
   const handleChange = (e, { value }) => {
     setProgramme(value)
     const chosenProgrammeName = allStudyrights.programmes.find(sr => sr.code === value)
-    setName(chosenProgrammeName.name.fi)
+    setName(chosenProgrammeName.name[language])
   }
   const clearFilter = () => {
     removePopulationFilterAction(filter.id)
     setProgramme('')
     setName('')
   }
-  const options = allStudyrights.programmes.map(p => ({ key: p.code, text: p.name.fi, value: p.code }))
+  const options = allStudyrights.programmes.map(p => ({ key: p.code, text: p.name[language], value: p.code }))
   if (filter.notSet) {
     return (
       <Segment>
@@ -55,7 +55,7 @@ const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterActi
   }
   return (
     <Segment>
-      Students that are in programme {programmeName}
+      Students that are in programme {filter.params.programmeName}
       <span style={{ float: 'right' }}>
         <Icon name="remove" onClick={clearFilter} />
       </span>
@@ -66,10 +66,15 @@ ProgrammeFilter.propTypes = {
   setPopulationFilterAction: func.isRequired,
   removePopulationFilterAction: func.isRequired,
   filter: shape({}).isRequired,
-  allStudyrights: shape({}).isRequired
+  allStudyrights: shape({}).isRequired,
+  language: string.isRequired
 }
 
-export default connect(null, {
+const mapStateToProps = ({ settings }) => ({
+  language: settings.language
+})
+
+export default connect(mapStateToProps, {
   setPopulationFilterAction: setPopulationFilter,
   removePopulationFilterAction: removePopulationFilter
 })(ProgrammeFilter)
