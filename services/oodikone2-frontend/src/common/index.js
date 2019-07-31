@@ -267,3 +267,13 @@ export const cancelablePromise = (promise) => {
     }
   }
 }
+
+export const flattenStudyrights = (studyrights) => {
+  const studyrightcodes = []
+  studyrights.forEach((sr) => {
+    sr.studyrightElements.forEach((srE) => {
+      studyrightcodes.push(srE.code)
+    })
+  })
+  return studyrightcodes
+}
