@@ -8,12 +8,12 @@ const publish = async (tasks, priority = false) => {
     if (rampup > 1) {
       rampup = rampup - 1
     }
-    stan.publish(priority ? 'PriorityApi' : 'UpdateApi', task.task, (err, guid) => {
+    stan.publish(priority ? 'PriorityApi' : 'UpdateApi', JSON.stringify({ task: task.task }), (err) => {
       if (err) {
         console.log('publish failed', err)
       }
     })
-    stan.publish('status', `${task.task}:SCHEDULED`, (err) => {
+    stan.publish('status', JSON.stringify({ task: task.task, status: 'SCHEDULED' }), (err) => {
       if (err) {
         console.log('publish failed')
       }

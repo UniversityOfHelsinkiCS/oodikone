@@ -118,9 +118,8 @@ stan.on('connect', async () => {
   const statusSub = stan.subscribe('status', opts)
 
   const handleStatusMessage = async (msg) => {
-    const message = msg.getData().split(':')
-    const task = message[0]
-    const status = message[1]
+    const data = JSON.parse(msg.getData())
+    const { task, status, timems } = data
 
     switch (status) {
     case 'DONE':
@@ -151,7 +150,7 @@ stan.on('connect', async () => {
       return false
     }
     const isStudent = !!isValidStudentId(task)
-    logger.info(`Status changed for ${task} to ${status}`, { task: task, status: status, student: isStudent })
+    logger.info(`Status changed for ${task} to ${status}`, { task: task, status: status, student: isStudent, timems: timems })
     await updateTask(task, status, isStudent ? 'student' : 'other')
   }
   statusSub.on('message', async (msg) => {
