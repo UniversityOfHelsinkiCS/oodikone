@@ -6,7 +6,6 @@ import { func, shape, string } from 'prop-types'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { gradeFilter } from '../../populationFilters'
 
-
 const GradeFilter = ({ coursecode, courseData, filter, setPopulationFilterAction, removePopulationFilterAction }) => {
   const [grade, setGrade] = useState(0)
   const handleFilter = () => {

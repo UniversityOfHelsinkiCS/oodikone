@@ -22,7 +22,7 @@ const INITIAL = {
   selectedCourses: {},
   fromYear: undefined,
   toYear: undefined,
-  separate: false,
+  separate: false
 }
 
 const SearchForm = (props) => {
@@ -37,8 +37,28 @@ const SearchForm = (props) => {
     selectedCourses,
     fromYear,
     toYear,
-    separate,
+    separate
   } = state
+
+  const parseQueryFromUrl = () => {
+    const { location } = props
+    const { courseCodes, fromYear, toYear, separate, ...rest } = qs.parse(location.search)
+    const query = {
+      ...INITIAL,
+      ...rest,
+      courseCodes: JSON.parse(courseCodes),
+      fromYear: JSON.parse(fromYear),
+      toYear: JSON.parse(toYear),
+      separate: JSON.parse(separate)
+    }
+    return query
+  }
+
+  const fetchStatisticsFromUrlParams = () => {
+    const query = parseQueryFromUrl()
+    setState({ ...state, ...query, selectedCourses: query.courseCodes })
+    props.getCourseStats(query)
+  }
 
   useEffect(() => {
     const { location } = props
@@ -54,7 +74,7 @@ const SearchForm = (props) => {
     if (location.search) {
       fetchStatisticsFromUrlParams()
     }
-  }, [ props.location.search ])
+  }, [props.location.search])
 
   const onSelectCourse = (course) => {
     course.selected = !course.selected
@@ -82,6 +102,14 @@ const SearchForm = (props) => {
     setState({ ...state, [name]: !state[name] })
   }
 
+  const pushQueryToUrl = (query) => {
+    const { history } = props
+    const { courseCodes, ...rest } = query
+    const queryObject = { ...rest, courseCodes: JSON.stringify(courseCodes) }
+    const searchString = qs.stringify(queryObject)
+    history.push({ search: searchString })
+  }
+
   const onSubmitFormClick = async () => {
     const params = {
       fromYear,
@@ -96,34 +124,6 @@ const SearchForm = (props) => {
       params
     })
     pushQueryToUrl(params)
-  }
-
-  const fetchStatisticsFromUrlParams = () => {
-    const query = parseQueryFromUrl()
-    setState({ ...state, ...query, selectedCourses: query.courseCodes })
-    props.getCourseStats(query)
-  }
-
-  const pushQueryToUrl = (query) => {
-    const { history } = props
-    const { courseCodes, ...rest } = query
-    const queryObject = { ...rest, courseCodes: JSON.stringify(courseCodes) }
-    const searchString = qs.stringify(queryObject)
-    history.push({ search: searchString })
-  }
-
-  const parseQueryFromUrl = () => {
-    const { location } = props
-    const { courseCodes, fromYear, toYear, separate, ...rest } = qs.parse(location.search)
-    const query = {
-      ...INITIAL,
-      ...rest,
-      courseCodes: JSON.parse(courseCodes),
-      fromYear: JSON.parse(fromYear),
-      toYear: JSON.parse(toYear),
-      separate: JSON.parse(separate)
-    }
-    return query
   }
 
   const fetchCourses = () => {
