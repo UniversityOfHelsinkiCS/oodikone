@@ -3,6 +3,7 @@ const {
   Studyright, Credit, StudyrightExtent, Semester
 } = require('../../../src/models/index')
 const { optimizedStatisticsOf } = require('../../../src/services/populations')
+jest.setTimeout(10000)
 
 const langify = name => ({
   en: `${name}_en`,
