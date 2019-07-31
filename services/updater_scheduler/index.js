@@ -29,20 +29,24 @@ stan.on('connect', async () => {
   cron.schedule('0 0 1 * *', async () => {
     // Update ALL students and meta every month
     try {
+      console.log('SCHEDULING ALL STUDENTS AND META')
       await scheduleAllStudentsAndMeta()
     } catch (err) {
       console.log('SCHEDULING ALL STUDENTS AND META FAILED')
       console.log(err)
+      logger.info('failure', { service: 'SCHEDULER' })
     }
   }, { timezone })
 
   cron.schedule('20 4 1 1,3,8,10 *', async () => {
     // At 04:20 on day-of-month 1 in January, March, August, and October.”
     try {
+      console.log('UPDATING STUDENT NUMBER LIST')
       await updateStudentNumberList()
     } catch (err) {
       console.log('UPDATING STUDENT NUMBER LIST FAILED')
       console.log(err)
+      logger.info('failure', { service: 'SCHEDULER' })
     }
   }, { timezone })
 
@@ -65,10 +69,12 @@ stan.on('connect', async () => {
       return
     }
     try {
+      console.log('SCHEDULING ACTIVE STUDENTS')
       await scheduleActiveStudents()
     } catch (err) {
       console.log('SCHEDULING ACTIVE STUDENTS FAILED')
       console.log(err)
+      logger.info('failure', { service: 'SCHEDULER' })
     }
   }, { timezone })
 
@@ -153,6 +159,7 @@ stan.on('connect', async () => {
       await handleStatusMessage(msg)
     } catch (err) {
       console.log(err)
+      logger.info('failure', { service: 'SCHEDULER' })
     }
     msg.ack()
   })

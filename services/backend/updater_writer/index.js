@@ -1,5 +1,6 @@
 const stan = require('node-nats-streaming').connect('updaterNATS', process.env.HOSTNAME, process.env.NATS_URI)
 const { updateStudent, updateMeta, updateAttainmentMeta } = require('./updater/database_updater')
+const logger = require('./logger')
 
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
 const opts = stan.subscriptionOptions()
@@ -31,6 +32,7 @@ stan.on('connect', function () {
         id = data.studentInfo ? data.studentInfo.studentnumber : 'meta'
       }
       console.log('update failed', id, err)
+      logger.info('failure', { service: 'WRITER' })
     }
     msg.ack()
   }
@@ -43,6 +45,7 @@ stan.on('connect', function () {
       await updateAttainmentMeta()
     } catch (err) {
       console.log('attainment meta update failed', err)
+      logger.info('failure', { service: 'WRITER' })
     }
     msg.ack()
   })

@@ -1,5 +1,6 @@
 var stan = require('node-nats-streaming').connect('updaterNATS', process.env.HOSTNAME, process.env.NATS_URI)
 const { getStudent, getMeta } = require('./doo_api_database_updater/updater_formatter')
+const logger = require('./logger')
 
 
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
@@ -44,6 +45,7 @@ const handleMessage = (priority) => async (msg) => {
     }
   } catch (e) {
     console.log(e)
+    logger.info('failure', { service: 'API' })
   }
   msg.ack()
 }
