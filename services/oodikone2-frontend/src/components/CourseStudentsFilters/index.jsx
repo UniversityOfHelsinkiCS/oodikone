@@ -12,6 +12,7 @@ import SexFilter from '../PopulationFilters/SexFilter'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import GradeFilter from './GradeFilter'
+import ProgrammeFilter from './ProgrammeFilter'
 import {
   clearPopulationFilters, setComplementFilter
 } from '../../redux/populationFilters'
@@ -19,6 +20,7 @@ import {
 
 const componentFor = {
   GradeFilter,
+  ProgrammeFilter,
   CreditsAtLeast,
   CreditsLessThan,
   GradeMeanFilter,
