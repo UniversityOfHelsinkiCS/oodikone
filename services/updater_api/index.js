@@ -14,34 +14,25 @@ opts.setMaxInFlight(1)
 const handleMessage = (priority) => async (msg) => {
   try {
     let data = ''
-    const message = msg.getData()
-    if (!message) {
-      console.log('undefined message')
-      return
-    }
-    if (message === 'meta') {
+    const task = JSON.parse(msg.getData())
+    if (task.task === 'meta') {
       data = await getMeta()
       stan.publish('UpdateWrite', JSON.stringify(data))
-      stan.publish('status', `${message}:FETCHED`, (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
+      stan.publish('status', JSON.stringify({ task: task.task, status: 'FETCHED' }), (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
     } else {
       try {
-        data = await getStudent(message)
+        data = await getStudent(task.task)
       } catch (e) {
         if (e.name === 'NO_STUDENT') {
-          stan.publish('status', `${message}:NO_STUDENT`, (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
+          stan.publish('status', JSON.stringify({ task: task.task, status: 'NO_STUDENT' }), (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
           return
         } else {
           throw e
         }
       }
       // TODO: check that data is properly structured(?)
-      stan.publish(priority ? 'PriorityWrite' :'UpdateWrite' , JSON.stringify(data), (err) => {
-        if (err) {
-          console.log(err)
-        } else {
-          stan.publish('status', `${message}:FETCHED`, (err) => { if (err) console.log('STATUS PUBLISH FAIELD', err) })
-        }
-      })
+      stan.publish(priority ? 'PriorityWrite' :'UpdateWrite' , JSON.stringify({ task: task.task, data }), (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
+      stan.publish('status', JSON.stringify({ task: task.task, status: 'FETCHED' }), (err) => { if (err) console.log('STATUS PUBLISH FAIELD', err) })
     }
   } catch (e) {
     console.log(e)
