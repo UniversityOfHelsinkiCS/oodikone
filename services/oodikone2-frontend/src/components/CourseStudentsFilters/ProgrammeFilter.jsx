@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { func, shape, string } from 'prop-types'
 import { programmeFilter } from '../../populationFilters'
+import { textAndDescriptionSearch } from '../../common'
 
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -24,7 +25,7 @@ const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterActi
     setProgramme('')
     setName('')
   }
-  const options = allStudyrights.programmes.map(p => ({ key: p.code, text: p.name[language], value: p.code }))
+  const options = allStudyrights.programmes.map(p => ({ key: p.code, text: p.name[language], value: p.code, description: p.code }))
   if (filter.notSet) {
     return (
       <Segment>
@@ -37,14 +38,22 @@ const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterActi
               <label>Select students that are in programme </label>
             </Form.Field>
             <Form.Field>
-              <Dropdown
+              <Form.Dropdown
                 placeholder="select"
                 options={options}
                 onChange={handleChange}
+                search={textAndDescriptionSearch}
+                noResultsMessage="No selectable study programmes"
+                closeOnChange
+                style={{ width: "500px" }}
+                selection
               />
             </Form.Field>
             <Form.Field>
-              <Button onClick={handleFilter}>
+              <Button
+                onClick={handleFilter}
+                disabled={programme.length < 1}
+              >
                 set filter
               </Button>
             </Form.Field>
