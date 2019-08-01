@@ -3,7 +3,7 @@ const cron = require('node-cron')
 const Schedule = require('./models')
 const logger = require('./logger')
 const { updateStudentNumberList } = require('./src/student_list_updater')
-const { scheduleActiveStudents, scheduleAllStudentsAndMeta } = require('./src/schedule_students')
+const { scheduleActiveStudents, scheduleAllStudentsAndMeta, scheduleAttainmentUpdate } = require('./src/schedule_students')
 const { getOldestTasks, getCurrentStatus } = require('./src/SchedulingStatistics')
 require('./src/api')
 
@@ -13,15 +13,19 @@ let fetchedCount = 0
 
 const timezone = 'Europe/Helsinki'
 
-const updateTask = async (task, status, type) => {
+const updateTask = async (task, status, type, updatetime) => {
   if (type) {
-    if (status === 'DONE') {
+    if (updatetime) {
       await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type }, { upsert: true })
     } else {
       await Schedule.findOneAndUpdate({ task }, { task, status, type }, { upsert: true })
     }
   } else {
-    await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type: 'other', active: true }, { upsert: true })
+    if (updatetime) {
+      await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type: 'other', active: true }, { upsert: true })
+    } else {
+      await Schedule.findOneAndUpdate({ task }, { task, status, type: 'other', active: true }, { upsert: true })
+    }
   }
 }
 
@@ -68,13 +72,7 @@ stan.on('connect', async () => {
 
   cron.schedule('0 12 * * *', async () => {
     console.log('SCHEDULING ATTAINMENT UPDATE')
-    stan.publish('UpdateAttainmentDates', null, (err) => {
-      if (err) {
-        console.log('publish failed', 'UpdateAttainmentDates')
-      } else {
-        console.log('published', 'UpdateAttainmentDates')
-      }
-    })
+    await scheduleAttainmentUpdate()
   }, { timezone })
 
   cron.schedule('*/5 * * * *', async () => {
@@ -109,13 +107,14 @@ stan.on('connect', async () => {
   const handleStatusMessage = async (msg) => {
     const data = JSON.parse(msg.getData())
     const { task, status, timems } = data
-
+    let updatetime = false
     switch (status) {
     case 'DONE':
+    case 'NO_STUDENT':
       updatedCount = updatedCount + 1
+      updatetime = true
       break
     case 'FETCHED':
-    case 'NO_STUDENT':
       fetchedCount = fetchedCount + 1
       break
     case 'SCHEDULED':
@@ -140,7 +139,7 @@ stan.on('connect', async () => {
     }
     const isStudent = !!isValidStudentId(task)
     logger.info(`Status changed for ${task} to ${status}`, { task: task, status: status, student: isStudent, timems: timems })
-    await updateTask(task, status, isStudent ? 'student' : 'other')
+    await updateTask(task, status, isStudent ? 'student' : 'other', updatetime)
   }
   statusSub.on('message', async (msg) => {
     try {
