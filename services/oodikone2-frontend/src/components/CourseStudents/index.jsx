@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { shape, func, bool, arrayOf, string } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
-import { Segment, Header } from 'semantic-ui-react'
+import { Segment, Header, Loader } from 'semantic-ui-react'
 import qs from 'query-string'
 import { intersection, difference } from 'lodash'
 import { getCoursePopulation, getCoursePopulationCourses } from '../../redux/coursePopulation'
@@ -37,7 +37,7 @@ const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCourse
 
   return (
     <div className="segmentContainer">
-      {studentData.students ? (
+      {studentData.students && !pending ? (
         <Segment className="contentSegment">
           <Header className="segmentTitle" size="large" textAlign="center">Population of course {header}</Header>
           <CourseStudentsFilters samples={studentData.students} coursecode={code} />
@@ -71,7 +71,7 @@ const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCourse
             selectedStudents={selectedStudents}
           />
         </Segment>
-      ) : (<div />)}
+      ) : (<Loader active={pending} inline="centered" />)}
     </div>
   )
 }
