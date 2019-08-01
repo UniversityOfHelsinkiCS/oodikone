@@ -106,6 +106,7 @@ const PopulationSearchForm = (props) => {
   const formatQueryParamsToArrays = (query, params) => {
     const res = { ...query }
     params.forEach((p) => {
+      if (!res[p]) return
       res[p] = Array.isArray(res[p]) ? res[p] : [res[p]]
     })
     return res

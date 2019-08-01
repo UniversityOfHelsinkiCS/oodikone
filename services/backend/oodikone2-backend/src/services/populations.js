@@ -430,7 +430,10 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
 
 const formatQueryParamArrays = (query, params) => {
   let res = {...query}
-  params.forEach(p => res[p] = Array.isArray(res[p]) ? res[p] : [res[p]])
+  params.forEach(p => {
+    if (!res[p]) return
+    res[p] = Array.isArray(res[p]) ? res[p] : [res[p]]
+  })
   return res
 }
 
