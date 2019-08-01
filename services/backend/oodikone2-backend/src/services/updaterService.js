@@ -15,7 +15,7 @@ const updateStudents = async (studentNumbers) => {
 }
 
 const updateOldestStudents = async (amount) => {
-  const response = await client.post('/update/oldest', amount)
+  const response = await client.post('/update/oldest', { amount })
   return response.data
 }
 
