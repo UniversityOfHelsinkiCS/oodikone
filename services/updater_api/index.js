@@ -11,7 +11,7 @@ opts.setAckWait(10 * 60 * 1000)
 // opts.setDurableName('durable')
 opts.setMaxInFlight(1)
 
-const handleMessage = (priority) => async (msg) => {
+const fetchData = async (priority, msg) => {
   try {
     let data = ''
     const task = JSON.parse(msg.getData())
@@ -38,6 +38,10 @@ const handleMessage = (priority) => async (msg) => {
     console.log(e)
     logger.info('failure', { service: 'API' })
   }
+}
+
+const handleMessage = (priority) => async (msg) => {
+  await fetchData(priority, msg)
   msg.ack()
 }
 
