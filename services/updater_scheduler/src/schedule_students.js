@@ -3,11 +3,8 @@ const Schedule = require('../models')
 const { sleep } = require('./util')
 
 const publish = async (tasks, priority = false) => {
-  let rampup = 300
-  for (const task of tasks) {
-    if (rampup > 1) {
-      rampup = rampup - 1
-    }
+  const taskspermin = 200
+  for (const [index, task] of tasks.entries()) {
     stan.publish(priority ? 'PriorityApi' : 'UpdateApi', JSON.stringify({ task: task.task }), (err) => {
       if (err) {
         console.log('publish failed', err)
@@ -18,17 +15,11 @@ const publish = async (tasks, priority = false) => {
         console.log('publish failed')
       }
     })
-    await sleep(15 * rampup)
+    if ((index+1)%taskspermin === 0) {
+      await sleep(60*1000)
+    }
   }
 }
-
-// const shuffleArray = (array) => {
-//   for (let i = array.length - 1; i > 0; i--) {
-//     const j = Math.floor(Math.random() * (i + 1));
-//     [array[i], array[j]] = [array[j], array[i]]
-//   }
-//   return array
-// }
 
 const scheduleActiveStudents = async () => {
   const tasks = [...await Schedule.find({ type: 'student', active: true }).sort({ updatedAt: 1 })]
