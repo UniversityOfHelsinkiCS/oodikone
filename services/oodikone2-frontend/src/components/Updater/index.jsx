@@ -14,6 +14,8 @@ const Updater = () => {
   const updateAttainmentDates = () => callApi('/updater/update/attainment', 'post')
   const updateMetadata = () => callApi('/updater/update/meta', 'post')
   const updateStudentlist = () => callApi('/updater/update/studentlist', 'post')
+  const rescheduleScheduled = () => callApi('/updater/reschedule/scheduled', 'post')
+  const rescheduleFetched = () => callApi('/updater/reschedule/fetched', 'post')
 
   const statusRef = useRef()
   useEffect(() => {
@@ -55,6 +57,8 @@ const Updater = () => {
             icon="refresh"
             onClick={() => updateAllStudents()}
           />
+        </Form.Group>
+        <Form.Group>
           <Form.Button
             content="Update attainment dates"
             icon="refresh"
@@ -69,6 +73,16 @@ const Updater = () => {
             content="Update student list"
             icon="refresh"
             onClick={() => updateStudentlist()}
+          />
+          <Form.Button
+            content="Reschedule all 'SCHEDULED' students"
+            icon="refresh"
+            onClick={() => rescheduleScheduled()}
+          />
+          <Form.Button
+            content="Reschedule all 'FETCHED' students"
+            icon="refresh"
+            onClick={() => rescheduleFetched()}
           />
         </Form.Group>
       </Form>

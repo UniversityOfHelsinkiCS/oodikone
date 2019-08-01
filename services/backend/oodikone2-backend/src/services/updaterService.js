@@ -49,6 +49,16 @@ const getStatuses = async () => {
   return response.data
 }
 
+const rescheduleScheduled = async () => {
+  const response = await client.post('/reschedule/scheduled')
+  return response.data
+}
+
+const rescheduleFetched = async () => {
+  const response = await client.post('/reschedule/fetched')
+  return response.data
+}
+
 module.exports = {
   ping,
   updateStudents,
@@ -58,5 +68,7 @@ module.exports = {
   updateMetadata,
   updateAttainments,
   updateStudentlist,
-  getStatuses
+  getStatuses,
+  rescheduleScheduled,
+  rescheduleFetched
 }

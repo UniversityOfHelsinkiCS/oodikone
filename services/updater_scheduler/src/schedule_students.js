@@ -76,4 +76,26 @@ const scheduleAttainmentUpdate = async () => {
   })
 }
 
-module.exports = { scheduleActiveStudents, scheduleAllStudentsAndMeta, scheduleStudentsByArray, scheduleOldestNStudents, scheduleMeta, scheduleAllStudents, scheduleAttainmentUpdate }
+const rescheduleScheduled = async () => {
+  const tasks = [...await Schedule.find({ type: 'student', status: 'SCHEDULED' }).sort({ updatedAt: 1 })]
+  console.log(tasks.length, 'tasks to schedule')
+  await publish(tasks)
+}
+
+const rescheduleFetched = async () => {
+  const tasks = [...await Schedule.find({ type: 'student', status: 'FETCHED' }).sort({ updatedAt: 1 })]
+  console.log(tasks.length, 'tasks to schedule')
+  await publish(tasks)
+}
+
+module.exports = {
+  scheduleActiveStudents,
+  scheduleAllStudentsAndMeta,
+  scheduleStudentsByArray,
+  scheduleOldestNStudents,
+  scheduleMeta,
+  scheduleAllStudents,
+  scheduleAttainmentUpdate,
+  rescheduleScheduled,
+  rescheduleFetched
+}
