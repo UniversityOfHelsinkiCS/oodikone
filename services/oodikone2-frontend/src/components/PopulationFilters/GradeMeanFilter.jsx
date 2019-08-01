@@ -23,6 +23,7 @@ class GradeMeanFilter extends Component {
     this.props.setPopulationFilter(gradeMeanFilter({
       gradeMean: this.state.gradeMean, comparator: this.state.comparator
     }))
+    this.setState({ gradeMean: 0, comparator: '' })
   }
 
   clearFilter = () => {
@@ -66,7 +67,10 @@ class GradeMeanFilter extends Component {
 
               </Form.Field>
               <Form.Field>
-                <Button onClick={this.handleFilter}>
+                <Button
+                  onClick={this.handleFilter}
+                  disabled={this.state.gradeMean === 0 || this.state.comparator.length < 1}
+                >
                   set filter
                 </Button>
               </Form.Field>
