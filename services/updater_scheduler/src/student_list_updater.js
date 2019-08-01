@@ -5,8 +5,14 @@ const fs = require('fs')
 const Schedule = require('../models')
 const moment = require('moment')
 const { sleep } = require('./util')
+const { stan } = require('./nats_connection')
 
 async function updateStudentNumberList() {
+  stan.publish('status', JSON.stringify({ task: 'studentnumberlist', status: 'SCHEDULED' }), (err) => {
+    if (err) {
+      console.log('publish failed')
+    }
+  })
   const { KEY_PATH, CERT_PATH, TOKEN, NODE_ENV, OODI_ADDR, STUDENT_NUMBERS } = process.env
   const agent = KEY_PATH && CERT_PATH ?
     new https.Agent({
@@ -118,5 +124,10 @@ async function updateStudentNumberList() {
   }
   await writeStudents(studentsToAdd)
 
+  stan.publish('status', JSON.stringify({ task: 'studentnumberlist', status: 'DONE' }), (err) => {
+    if (err) {
+      console.log('publish failed')
+    }
+  })
 }
 module.exports = { updateStudentNumberList }

@@ -23,6 +23,7 @@ const oodi = require('./routes/oodi')
 const task = require('./routes/tasks')
 const feedback = require('./routes/feedback')
 const tags = require('./routes/tags')
+const updater = require('./routes/updater')
 
 module.exports = (app, url) => {
   app.use(url, log)
@@ -39,6 +40,7 @@ module.exports = (app, url) => {
   app.use(url, faculties)
   app.use(url, semesters)
   app.use(url, tags)
+  app.use(`${url}/updater`, auth.roles(['admin']), updater)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
   app.use(`${url}/users`, auth.roles(['users']), users)
   app.use(`${url}/feedback`, feedback)

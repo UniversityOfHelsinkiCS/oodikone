@@ -40,7 +40,11 @@ stan.on('connect', function () {
   attSub.on('message', async (msg) => {
     try {
       await updateAttainmentMeta()
-      logger.info('attainment status', { status: 'DONE' })
+      stan.publish('status', JSON.stringify({ task: 'attainment', status: 'DONE' }), (err) => {
+        if (err) {
+          console.log('publish failed')
+        }
+      })
     } catch (err) {
       console.log('attainment meta update failed', err)
       logger.info('failure', { service: 'WRITER' })
