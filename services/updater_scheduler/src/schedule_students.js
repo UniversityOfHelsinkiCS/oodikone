@@ -26,9 +26,9 @@ const scheduleActiveStudents = async () => {
   console.log(tasks.length, 'tasks to schedule')
   await publish(tasks)
 }
-const scheduleAllStudentsAndMeta = async () => {
 
-  const tasks = [{ task: 'meta', type: 'other', active: 'false' }, ...await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 })]
+const scheduleAllStudents = async () => {
+  const tasks = [...await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 })]
   console.log(tasks.length, 'tasks to schedule')
   await publish(tasks)
 }
@@ -38,14 +38,18 @@ const scheduleMeta = async () => {
   await publish([{task: 'meta', type: 'other', active: 'false'}])
 }
 
+const scheduleAllStudentsAndMeta = async () => {
+  await scheduleMeta()
+  await scheduleAllStudents()
+}
+
 const scheduleStudentsByArray = async (studentNumbers) => {
   try {
     const tasks = await Schedule.find({ type: 'student', task: { $in: studentNumbers } })
     await publish(tasks, true)
   } catch (e) {
-    return e
+    console.log(e)
   }
-  return 'scheduled'
 }
 
 const scheduleOldestNStudents = async (amount) => {
@@ -53,9 +57,23 @@ const scheduleOldestNStudents = async (amount) => {
     const tasks = [...await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 }).limit(Number(amount))]
     await publish(tasks, true)
   } catch (e) {
-    return e
+    console.log(e)
   }
-  return 'scheduled'
 }
 
-module.exports = { scheduleActiveStudents, scheduleAllStudentsAndMeta, scheduleStudentsByArray, scheduleOldestNStudents, scheduleMeta }
+const scheduleAttainmentUpdate = async () => {
+  stan.publish('status', JSON.stringify({ task: 'attainment', status: 'SCHEDULED' }), (err) => {
+    if (err) {
+      console.log('publish failed')
+    }
+  })
+  stan.publish('UpdateAttainmentDates', null, (err) => {
+    if (err) {
+      console.log('publish failed', 'UpdateAttainmentDates')
+    } else {
+      console.log('published', 'UpdateAttainmentDates')
+    }
+  })
+}
+
+module.exports = { scheduleActiveStudents, scheduleAllStudentsAndMeta, scheduleStudentsByArray, scheduleOldestNStudents, scheduleMeta, scheduleAllStudents, scheduleAttainmentUpdate }

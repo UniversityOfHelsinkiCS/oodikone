@@ -2,21 +2,86 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT
 const bodyParser = require('body-parser')
-const { scheduleStudentsByArray, scheduleOldestNStudents } = require('./schedule_students')
-app.use(bodyParser.json())
+const { scheduleStudentsByArray, scheduleOldestNStudents, scheduleAllStudents, scheduleActiveStudents, scheduleMeta, scheduleAttainmentUpdate } = require('./schedule_students')
+const { getOldestTasks, getCurrentStatus } = require('./SchedulingStatistics')
+const { updateStudentNumberList } = require('./student_list_updater')
 
+app.use(bodyParser.json())
 
 app.get('/ping', (req, res) => res.json({ message: 'pong '}))
 
 app.post('/update', async (req, res) => {
-  const msg = await scheduleStudentsByArray(req.body)
-  res.json({ message: msg })
+  scheduleStudentsByArray(req.body)
+  res.json({ message: 'scheduled' })
 })
 
 app.post('/update/oldest', async (req, res) => {
   const { amount } = req.body
-  const msg = await scheduleOldestNStudents(amount)
-  res.json({ message: msg })
+  scheduleOldestNStudents(amount)
+  res.json({ message: 'scheduled' })
+})
+
+app.post('/update/all', async (req, res) => {
+  scheduleAllStudents()
+  res.json({ message: 'scheduled' })
+})
+
+app.post('/update/active', async (req, res) => {
+  scheduleActiveStudents()
+  res.json({ message: 'scheduled' })
+})
+
+app.post('/update/attainment', async (req, res) => {
+  scheduleAttainmentUpdate()
+  res.json({ message: 'scheduled' })
+})
+
+app.post('/update/meta', async (req, res) => {
+  scheduleMeta()
+  res.json({ message: 'scheduled' })
+})
+
+app.post('/update/studentlist', async (req, res) => {
+  updateStudentNumberList()
+  res.json({ message: 'scheduled' })
+})
+
+app.get('/statuses', async (req, res) => {
+  const statuses = []
+
+  const {
+    oldestChangedStatus: {
+      studentnumber,
+      updatedAt
+    },
+    oldestActiveStudentDone: {
+      studentnumber: studentnumberActive,
+      updatedAt: updatedAtActive
+    },
+    oldestMetaTask,
+    oldestAttainmentTask,
+    oldestStudentNumberLisTask
+  } = await getOldestTasks()
+
+  const { allTasksScheduled, allTasksFetched, allTasksDone } = await getCurrentStatus()
+
+  statuses.push(
+    { label: 'oldest student studentnumber', value: studentnumber},
+    { label: 'oldest student timestamp', value: updatedAt},
+    { label: 'oldest active student studentnumber', value: studentnumberActive},
+    { label: 'oldest active student timestamp', value: updatedAtActive},
+    { label: 'currently tasks scheduled', value: allTasksScheduled},
+    { label: 'currently tasks fetched', value: allTasksFetched},
+    { label: 'currently tasks done', value: allTasksDone},
+    { label: 'oldest metadata update', value: oldestMetaTask.updatedAt},
+    { label: 'current metadata status', value: oldestMetaTask.status},
+    { label: 'oldest attainment update', value: oldestAttainmentTask.updatedAt},
+    { label: 'current attainment status', value: oldestAttainmentTask.status},
+    { label: 'oldest studentnumberlist update', value: oldestStudentNumberLisTask.updatedAt},
+    { label: 'current studentnumberlist status', value: oldestStudentNumberLisTask.status},
+  )
+
+  res.json(statuses)
 })
 
 app.listen(port, () => console.log(`listening on port ${port}!`))

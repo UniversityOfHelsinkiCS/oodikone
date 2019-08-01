@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const Population = require('../services/populations')
 const Filters = require('../services/filters')
-const { updateStudents, updateOldestStudents } = require('../services/updaterService')
+const { updateStudents } = require('../services/updaterService')
 const { isValidStudentId } = require('../util/index')
 
 const Student = require('../services/students')
@@ -201,22 +201,6 @@ router.post('/updatedatabase', async (req, res) => {
   }
   try {
     const response = await updateStudents(studentnumbers)
-    if (response) {
-      res.status(200).json('Scheduled')
-    }
-  } catch (err) {
-    res.status(418).json(err)
-  }
-})
-
-router.post('/updatedatabase/oldest', async (req, res) => {
-  const { amount } = req.body
-  if (!Number.isInteger(Number(amount))) {
-    res.status(400).end()
-    return
-  }
-  try {
-    const response = await updateOldestStudents(amount)
     if (response) {
       res.status(200).json('Scheduled')
     }
