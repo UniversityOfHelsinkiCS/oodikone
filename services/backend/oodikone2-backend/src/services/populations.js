@@ -428,12 +428,24 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
   }
 }
 
+const formatQueryParamArrays = (query, params) => {
+  let res = {...query}
+  params.forEach(p => {
+    if (!res[p]) return
+    res[p] = Array.isArray(res[p]) ? res[p] : [res[p]]
+  })
+  return res
+}
+
 const optimizedStatisticsOf = async (query, studentnumberlist) => {
-  if (!query.semesters.map(semester => semester === 'FALL' || semester === 'SPRING').every(e => e === true)) {
+  const formattedQueryParams = formatQueryParamArrays(query, ['semesters', 'studentStatuses'])
+
+  if (!formattedQueryParams.semesters.map(semester => semester === 'FALL' || semester === 'SPRING').every(e => e === true)) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
-  if (query.studentStatuses &&
-    !query.studentStatuses.map(
+
+  if (formattedQueryParams.studentStatuses &&
+    !formattedQueryParams.studentStatuses.map(
       status => status === 'CANCELLED' || status === 'EXCHANGE' || status === 'NONDEGREE'
     ).every(e => e === true)
   ) {
@@ -441,7 +453,7 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
   }
   const {
     studyRights, startDate, months, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
-  } = parseQueryParams(query)
+  } = parseQueryParams(formattedQueryParams)
 
   const studentnumbers = studentnumberlist ?
     studentnumberlist :
@@ -453,10 +465,10 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     startDate,
     dateMonthsFromNow(startDate, months),
     studyRights,
-    query.tag
+    formattedQueryParams.tag
   )
 
-  const formattedStudents = await formatStudentsForApi(students, startDate, endDate, query)
+  const formattedStudents = await formatStudentsForApi(students, startDate, endDate, formattedQueryParams)
   return formattedStudents
 }
 
