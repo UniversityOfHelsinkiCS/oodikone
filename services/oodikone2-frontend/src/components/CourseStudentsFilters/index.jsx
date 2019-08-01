@@ -17,7 +17,6 @@ import {
   clearPopulationFilters, setComplementFilter
 } from '../../redux/populationFilters'
 
-
 const componentFor = {
   GradeFilter,
   ProgrammeFilter,

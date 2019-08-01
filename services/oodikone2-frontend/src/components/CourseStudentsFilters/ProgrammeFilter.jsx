@@ -7,7 +7,6 @@ import { textAndDescriptionSearch } from '../../common'
 
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
-
 const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterAction, allStudyrights, filter, language }) => {
   const [programme, setProgramme] = useState('')
   const [programmeName, setName] = useState('')

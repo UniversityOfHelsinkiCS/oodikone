@@ -29,20 +29,24 @@ stan.on('connect', async () => {
   cron.schedule('0 0 1 * *', async () => {
     // Update ALL students and meta every month
     try {
+      console.log('SCHEDULING ALL STUDENTS AND META')
       await scheduleAllStudentsAndMeta()
     } catch (err) {
       console.log('SCHEDULING ALL STUDENTS AND META FAILED')
       console.log(err)
+      logger.info('failure', { service: 'SCHEDULER' })
     }
   }, { timezone })
 
   cron.schedule('20 4 1 1,3,8,10 *', async () => {
     // At 04:20 on day-of-month 1 in January, March, August, and October.”
     try {
+      console.log('UPDATING STUDENT NUMBER LIST')
       await updateStudentNumberList()
     } catch (err) {
       console.log('UPDATING STUDENT NUMBER LIST FAILED')
       console.log(err)
+      logger.info('failure', { service: 'SCHEDULER' })
     }
   }, { timezone })
 
@@ -65,10 +69,12 @@ stan.on('connect', async () => {
       return
     }
     try {
+      console.log('SCHEDULING ACTIVE STUDENTS')
       await scheduleActiveStudents()
     } catch (err) {
       console.log('SCHEDULING ACTIVE STUDENTS FAILED')
       console.log(err)
+      logger.info('failure', { service: 'SCHEDULER' })
     }
   }, { timezone })
 
@@ -88,7 +94,8 @@ stan.on('connect', async () => {
   }, { timezone })
 
   cron.schedule('0 7 * * *', async () => {
-    stan.publish('updateAttainmentDates', null, (err) => {
+    console.log('SCHEDULING ATTAINMENT UPDATE')
+    stan.publish('UpdateAttainmentDates', null, (err) => {
       if (err) {
         console.log('publish failed', 'UpdateAttainmentDates')
       } else {
@@ -104,7 +111,7 @@ stan.on('connect', async () => {
   })
   const opts = stan.subscriptionOptions()
   opts.setManualAckMode(true)
-  opts.setAckWait(30 * 60 * 1000) // 1min
+  opts.setAckWait(5 * 60 * 1000)
   // opts.setDeliverAllAvailable()
   // opts.setDurableName('durable')
   opts.setMaxInFlight(20)
@@ -112,9 +119,8 @@ stan.on('connect', async () => {
   const statusSub = stan.subscribe('status', opts)
 
   const handleStatusMessage = async (msg) => {
-    const message = msg.getData().split(':')
-    const task = message[0]
-    const status = message[1]
+    const data = JSON.parse(msg.getData())
+    const { task, status, timems } = data
 
     switch (status) {
     case 'DONE':
@@ -145,7 +151,7 @@ stan.on('connect', async () => {
       return false
     }
     const isStudent = !!isValidStudentId(task)
-    logger.info(`Status changed for ${task} to ${status}`, { task: task, status: status, student: isStudent })
+    logger.info(`Status changed for ${task} to ${status}`, { task: task, status: status, student: isStudent, timems: timems })
     await updateTask(task, status, isStudent ? 'student' : 'other')
   }
   statusSub.on('message', async (msg) => {
@@ -153,6 +159,7 @@ stan.on('connect', async () => {
       await handleStatusMessage(msg)
     } catch (err) {
       console.log(err)
+      logger.info('failure', { service: 'SCHEDULER' })
     }
     msg.ack()
   })
