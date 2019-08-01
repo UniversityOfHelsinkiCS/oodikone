@@ -14,7 +14,8 @@ app.post('/update', async (req, res) => {
 })
 
 app.post('/update/oldest', async (req, res) => {
-  const msg = await scheduleOldestNStudents(req.body)
+  const { amount } = req.body
+  const msg = await scheduleOldestNStudents(amount)
   res.json({ message: msg })
 })
 

@@ -22,9 +22,9 @@ stan.on('connect', function () {
       const start = new Date()
       data = JSON.parse(msg.getData())
       if (data.task === 'meta') {
-        await updateMeta(data)
+        await updateMeta(data.data)
       } else {
-        await updateStudent(data)
+        await updateStudent(data.data)
       }
       stan.publish('status', JSON.stringify({ task: data.task, status: 'DONE', timems: new Date() - start }), (err) => { if (err) console.log(err) })
     } catch (err) {
@@ -40,6 +40,7 @@ stan.on('connect', function () {
   attSub.on('message', async (msg) => {
     try {
       await updateAttainmentMeta()
+      logger.info('attainment status', { status: 'DONE' })
     } catch (err) {
       console.log('attainment meta update failed', err)
       logger.info('failure', { service: 'WRITER' })
