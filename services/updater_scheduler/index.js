@@ -26,8 +26,8 @@ const updateTask = async (task, status, type) => {
 }
 
 stan.on('connect', async () => {
-  cron.schedule('0 0 1 * *', async () => {
-    // Update ALL students and meta every month
+  cron.schedule('0 0 2 * *', async () => {
+    // Update ALL students and meta on 3nd of every month
     try {
       console.log('SCHEDULING ALL STUDENTS AND META')
       await scheduleAllStudentsAndMeta()
@@ -38,8 +38,8 @@ stan.on('connect', async () => {
     }
   }, { timezone })
 
-  cron.schedule('20 4 1 1,3,8,10 *', async () => {
-    // At 04:20 on day-of-month 1 in January, March, August, and October.”
+  cron.schedule('0 0 1 1,3,8,10 *', async () => {
+    // Update student list 2nd of January, March, August, and October.”
     try {
       console.log('UPDATING STUDENT NUMBER LIST')
       await updateStudentNumberList()
@@ -50,22 +50,10 @@ stan.on('connect', async () => {
     }
   }, { timezone })
 
-  // cron.schedule('0 * * * *'), async () => {
-  //   const allStudentTasks = await Schedule.find({ type: 'student' })
-  //   if (allStudentTasks && allStudentTasks.every(task => task.status === 'DONE')) {
-  //     stan.publish('DumpDatabase', null, (err, guid) => {
-  //       if (err) {
-  //         console.log('publish failed', 'DumpDatabase')
-  //       } else {
-  //         console.log('published', 'DumpDatabase')
-  //       }
-  //     })
-  //   }
-  // }
-
-  cron.schedule('0 23 * * *', async () => {
+  cron.schedule('0 0 * * *', async () => {
     // Update ACTIVE students every night except few first dates of the month when we're updating all students anyway
     if (new Date().getDate() <= 5){
+      console.log('NOT SCHEDULING ACTIVE STUDENTS BECAUSE BEGINNING OF MONTH WHEN ALL STUDENTS UPDATED ANYWAYS')
       return
     }
     try {
@@ -76,6 +64,17 @@ stan.on('connect', async () => {
       console.log(err)
       logger.info('failure', { service: 'SCHEDULER' })
     }
+  }, { timezone })
+
+  cron.schedule('0 12 * * *', async () => {
+    console.log('SCHEDULING ATTAINMENT UPDATE')
+    stan.publish('UpdateAttainmentDates', null, (err) => {
+      if (err) {
+        console.log('publish failed', 'UpdateAttainmentDates')
+      } else {
+        console.log('published', 'UpdateAttainmentDates')
+      }
+    })
   }, { timezone })
 
   cron.schedule('*/5 * * * *', async () => {
@@ -91,17 +90,6 @@ stan.on('connect', async () => {
     updatedCount = 0
     fetchedCount = 0
     scheduledCount = 0
-  }, { timezone })
-
-  cron.schedule('0 7 * * *', async () => {
-    console.log('SCHEDULING ATTAINMENT UPDATE')
-    stan.publish('UpdateAttainmentDates', null, (err) => {
-      if (err) {
-        console.log('publish failed', 'UpdateAttainmentDates')
-      } else {
-        console.log('published', 'UpdateAttainmentDates')
-      }
-    })
   }, { timezone })
 
   const scheduleSub = stan.subscribe('ScheduleAll')
