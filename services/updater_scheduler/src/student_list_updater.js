@@ -8,7 +8,6 @@ const { sleep } = require('./util')
 
 async function updateStudentNumberList() {
   const { KEY_PATH, CERT_PATH, TOKEN, NODE_ENV, OODI_ADDR, STUDENT_NUMBERS } = process.env
-  console.log(TOKEN)
   const agent = KEY_PATH && CERT_PATH ?
     new https.Agent({
       cert: fs.readFileSync(CERT_PATH, 'utf8'),

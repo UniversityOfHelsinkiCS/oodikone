@@ -7,7 +7,7 @@ import { Segment, Header, Loader } from 'semantic-ui-react'
 import qs from 'query-string'
 import { intersection, difference } from 'lodash'
 import { getCoursePopulation, getCoursePopulationCourses } from '../../redux/coursePopulation'
-import { getCourseStats } from '../../redux/coursestats'
+import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourses from '../PopulationCourseStats'
@@ -16,7 +16,7 @@ import InfoBox from '../InfoBox'
 import SegmentDimmer from '../SegmentDimmer'
 import CourseStudentsFilters from '../CourseStudentsFilters'
 
-const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCoursesDispatch, getCourseStatsDispatch, studentData, courses, pending, history, translate, courseData, selectedStudents }) => {
+const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCoursesDispatch, getSingleCourseStatsDispatch, studentData, courses, pending, history, translate, courseData, selectedStudents }) => {
   const parseQueryFromUrl = () => {
     const { location } = history
     const query = qs.parse(location.search)
@@ -28,12 +28,12 @@ const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCourse
     const query = parseQueryFromUrl()
     getCoursePopulationDispatch({ coursecode: query.coursecode, yearcode: query.yearcode })
     getCoursePopulationCoursesDispatch({ coursecode: query.coursecode, yearcode: query.yearcode })
-    getCourseStatsDispatch({ fromYear: query.yearcode, toYear: query.yearcode, courseCodes: [query.coursecode], separate: false })
+    getSingleCourseStatsDispatch({ fromYear: query.yearcode, toYear: query.yearcode, courseCodes: [query.coursecode], separate: false })
     setCode(query.coursecode)
     setYear(query.year)
   }, [])
   const { CreditAccumulationGraph, CoursesOf } = infoTooltips.PopulationStatistics
-  const header = courseData[code] ? `${courseData[code].name} ${headerYear}` : null
+  const header = courseData ? `${courseData.name} ${headerYear}` : null
 
   return (
     <div className="segmentContainer">
@@ -79,7 +79,7 @@ const CourseStudents = ({ getCoursePopulationDispatch, getCoursePopulationCourse
 CourseStudents.propTypes = {
   getCoursePopulationDispatch: func.isRequired,
   getCoursePopulationCoursesDispatch: func.isRequired,
-  getCourseStatsDispatch: func.isRequired,
+  getSingleCourseStatsDispatch: func.isRequired,
   pending: bool.isRequired,
   courses: shape([]).isRequired,
   studentData: shape({}).isRequired,
@@ -89,7 +89,7 @@ CourseStudents.propTypes = {
   selectedStudents: arrayOf(string).isRequired
 }
 
-const mapStateToProps = ({ coursePopulation, localize, courseStats, populationFilters }) => {
+const mapStateToProps = ({ coursePopulation, localize, singleCourseStats, populationFilters }) => {
   const samples = coursePopulation.students.students ? coursePopulation.students.students : []
   let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
   const { complemented } = populationFilters
@@ -116,7 +116,7 @@ const mapStateToProps = ({ coursePopulation, localize, courseStats, populationFi
     pending: coursePopulation.pending,
     translate: getTranslate(localize),
     query: coursePopulation.query,
-    courseData: courseStats.data,
+    courseData: singleCourseStats.stats,
     selectedStudents
   })
 }
@@ -124,5 +124,5 @@ const mapStateToProps = ({ coursePopulation, localize, courseStats, populationFi
 export default withRouter(connect(mapStateToProps, {
   getCoursePopulationDispatch: getCoursePopulation,
   getCoursePopulationCoursesDispatch: getCoursePopulationCourses,
-  getCourseStatsDispatch: getCourseStats
+  getSingleCourseStatsDispatch: getSingleCourseStats
 })(CourseStudents))
