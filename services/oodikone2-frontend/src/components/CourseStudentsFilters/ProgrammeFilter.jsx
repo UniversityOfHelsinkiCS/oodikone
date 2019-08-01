@@ -38,14 +38,14 @@ const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterActi
               <label>Select students that are in programme </label>
             </Form.Field>
             <Form.Field>
-              <Form.Dropdown
+              <Dropdown
                 placeholder="select"
                 options={options}
                 onChange={handleChange}
                 search={textAndDescriptionSearch}
                 noResultsMessage="No selectable study programmes"
                 closeOnChange
-                style={{ width: "500px" }}
+                style={{ width: '500px' }}
                 selection
               />
             </Form.Field>
