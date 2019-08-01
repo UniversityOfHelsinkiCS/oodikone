@@ -70,7 +70,10 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
               />
             </Form.Field>
             <Form.Field>
-              <Button onClick={handleFilter}>
+              <Button
+                onClick={handleFilter}
+                disabled={!selectedTag || !selectedComp}
+              >
                 set filter
               </Button>
             </Form.Field>

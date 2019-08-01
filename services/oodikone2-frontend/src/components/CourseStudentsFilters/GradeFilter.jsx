@@ -45,7 +45,10 @@ const GradeFilter = ({ coursecode, courseData, filter, setPopulationFilterAction
               <label>from course {courseData[coursecode].name}</label>
             </Form.Field>
             <Form.Field>
-              <Button onClick={handleFilter}>
+              <Button
+                onClick={handleFilter}
+                disabled={grade === 0}
+              >
                 set filter
               </Button>
             </Form.Field>
