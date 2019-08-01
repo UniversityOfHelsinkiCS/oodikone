@@ -103,18 +103,25 @@ const PopulationSearchForm = (props) => {
     return sameProgramme && sameMonths && sameStartYear
   }
 
+  const formatQueryParamsToArrays = (query, params) => {
+    let res = {...query}
+    params.forEach(p => res[p] = Array.isArray(res[p]) ? res[p] : [res[p]])
+    return res
+  }
+
   const fetchPopulation = async (query) => {
+    const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses'])
     const queryCodes = Object.values(query.studyRights).filter(e => e != null)
     const uuid = uuidv4()
-    const request = { ...query, studyRights: queryCodes, uuid }
+    const request = { ...formattedQueryParams, studyRights: queryCodes, uuid }
     setState({ isLoading: true })
     props.setLoading()
 
     fetchPopulationPromises.current = cancelablePromise(Promise.all([
-      props.getPopulationStatistics({ ...query, uuid, tag: selectedTag }),
+      props.getPopulationStatistics({ ...formattedQueryParams, uuid, tag: selectedTag }),
       props.getPopulationCourses(request),
       props.getPopulationFilters(request),
-      props.getMandatoryCourses(query.studyRights.programme)
+      props.getMandatoryCourses(formattedQueryParams.studyRights.programme)
     ]))
 
     const success = await fetchPopulationPromises.current.promise
