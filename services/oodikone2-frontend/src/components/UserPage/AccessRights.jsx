@@ -18,7 +18,7 @@ const initialState = {
   loading: false
 }
 
-const AccessRights = ({ uid, rights, programmes, ...props }) => {
+const AccessRights = ({ uid, programmes, ...props }) => {
   const [state, setState] = useState({ ...initialState })
   const { programme, loading } = state
   const handleClick = async () => {
@@ -61,14 +61,13 @@ const AccessRights = ({ uid, rights, programmes, ...props }) => {
 AccessRights.propTypes = {
   addUserUnits: PropTypes.func.isRequired,
   uid: PropTypes.string.isRequired,
-  rights: PropTypes.arrayOf(PropTypes.shape({
-    code: PropTypes.string
-  })).isRequired,
+  // used in filteredDropdownProgrammeSelector
+  rights: PropTypes.arrayOf(PropTypes.string).isRequired,
   programmes: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 }
 
 const mapStateToProps = (state, props) => {
-  const options = selectors.filteredDropdownAssociationsSelector(state, props)
+  const options = selectors.filteredDropdownProgrammeSelector(state, props)
   const programmes = options.map(formatToOptions).sort((p1, p2) => p1.text.localeCompare(p2.text))
   return {
     programmes

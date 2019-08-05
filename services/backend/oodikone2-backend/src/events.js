@@ -1,9 +1,11 @@
-const cron = require('node-cron')
+const { CronJob } = require('cron')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studytrack')
 const { calculateFacultyYearlyStats } = require('./services/faculties')
 const { setProductivity, setThroughput, patchProductivity, patchThroughput, patchFacultyYearlyStats } = require('./services/analyticsService')
+
+const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
 const refreshFacultyYearlyStats = async () => {
   try {
@@ -84,14 +86,12 @@ const refreshOverview = async () => {
   }
 }
 
-const timezone = 'Europe/Helsinki'
-
 const startCron = () => {
-  cron.schedule('0 6 * * *', async () => {
+  schedule('0 6 * * *', async () => {
     await refreshFacultyYearlyStats()
     await refreshStudyrightAssociations()
     await refreshOverview()
-  }, { timezone })
+  })
 }
 
 module.exports = {

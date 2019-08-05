@@ -1,14 +1,8 @@
 const { sequelize, forceSyncDatabase } = require('../database/connection')
-const { User, ElementDetails, AccessGroup, HyGroup } = require('../models/index')
+const { User, AccessGroup, HyGroup, UserElementDetails } = require('../models/index')
 const userService = require('../services/users')
 const AccessService = require('../services/accessgroups')
 const { DB_SCHEMA } = require('../conf')
-
-const langify = name => ({
-  en: `${name}_en`,
-  fi: `${name}_fi`,
-  sv: `${name}_sv`
-})
 
 const default_users = [
   {
@@ -41,24 +35,6 @@ const default_users = [
   }
 ]
 
-const default_elementdetails = [
-  {
-    code: 'Element_BSC',
-    type: 10,
-    name: langify('Bachelor of Science')
-  },
-  {
-    code: 'Element_MATH',
-    type: 20,
-    name: langify('Mathematics')
-  },
-  {
-    code: 'ELEMENT_CS',
-    type: 20,
-    name: langify('Computer Science')
-  }
-
-]
 const default_accessgroups = [
   {
     id: 1,
@@ -90,7 +66,6 @@ beforeAll(async () => {
   await sequelize.createSchema(DB_SCHEMA)
   await forceSyncDatabase()
   await User.bulkCreate(default_users)
-  await ElementDetails.bulkCreate(default_elementdetails)
   await AccessGroup.bulkCreate(default_accessgroups)
   await HyGroup.bulkCreate(default_hygroups)
   const admin_user = await User.findOne({ where: { id: 69 }})
@@ -99,8 +74,7 @@ beforeAll(async () => {
   const hygroup = await HyGroup.findByPk(1)
   await admin_user.addHy_group(hygroup)
   const normal_user = await User.findOne({ where: { id: 665 }})
-  const CS_ED = await ElementDetails.findOne({ where: { code: 'ELEMENT_CS' }})
-  await normal_user.addProgramme(CS_ED)
+  await UserElementDetails.upsert({ userId: normal_user.id, elementDetailCode: 'ELEMENT_CS' })
   await normal_user.addHy_group(hygroup)
 })
 afterAll(async () => {
@@ -169,23 +143,22 @@ describe('user tests', () => {
 describe('user access right tests', () => {
   test('adding and getting access rights works', async () => {
     const user1 = await userService.byUsername('sasumaki')
-    const rights1 = userService.getUserElementDetails(user1)
+    const rights1 = userService.getUserProgrammes(user1)
     expect(rights1.length).toBe(0)
 
-    await userService.enableElementDetails(69, ['Element_MATH'])
+    await userService.addProgrammes(69, ['Element_MATH'])
     const user2 = await userService.byUsername('sasumaki')
-    const rights2 = userService.getUserElementDetails(user2)
-    expect(rights2[0].type).toBe(20)
+    const rights2 = userService.getUserProgrammes(user2)
+    expect(rights2[0]).toBe('Element_MATH')
   })
   test('removing and getting access rights works', async () => {
     const user1 = await userService.byUsername('freeman')
-    const rights1 = userService.getUserElementDetails(user1)
+    const rights1 = userService.getUserProgrammes(user1)
     expect(rights1.length).toBe(1)
 
-    await userService.removeElementDetails(665, ['ELEMENT_CS'])
+    await userService.removeProgrammes(665, ['ELEMENT_CS'])
     const user2 = await userService.byUsername('freeman')
-    const rights2 = userService.getUserElementDetails(user2)
-    console.log(rights2)
+    const rights2 = userService.getUserProgrammes(user2)
     expect(rights2.length).toBe(0)
   })
   test('Access groups can be added and removed', async () => {

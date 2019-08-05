@@ -27,20 +27,14 @@ app.get('/findallenabled', async (req, res) => {
 app.get('/user/:uid', async (req, res) => {
   const uid = req.params.uid
   const user = await User.byUsername(uid)
-
-  console.log(JSON.stringify(user))
-
   res.json(User.getUserData(user))
 })
 
 app.get('/user/elementdetails/:username', async (req, res) => {
   const username = req.params.username
   const user = await User.byUsername(username)
-  const elementdetails = User.getUserElementDetails(user)
-
-  console.log(JSON.stringify(elementdetails))
-
-  res.json(elementdetails)
+  const programmes = User.getUserProgrammes(user)
+  res.json(programmes)
 })
 
 app.get('/user/id/:id', async (req, res) => {
@@ -104,11 +98,12 @@ app.post('/add_rights', async (req, res) => {
   const { uid, codes } = req.body
   console.log('adding rights to ', uid)
   try {
-    await User.enableElementDetails(uid, codes)
+    await User.addProgrammes(uid, codes)
     const user = await User.byId(uid)
     res.status(200).json({ user: User.getUserData(user) })
 
   } catch (e) {
+    console.log(e)
     res.status(400).json({ e })
   }
 })
@@ -116,7 +111,7 @@ app.post('/remove_rights', async (req, res) => {
   const { uid, codes } = req.body
   console.log('removing rights from ', uid)
   try {
-    await User.removeElementDetails(uid, codes)
+    await User.removeProgrammes(uid, codes)
     const user = await User.byId(uid)
     res.status(200).json({ user: User.getUserData(user) })
 
