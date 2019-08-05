@@ -18,7 +18,7 @@ const updateTask = async ({ task, status, type, updatetime, active }) => {
   if (updatetime) doc.updatedAt = new Date()
   if (active != null) doc.active = active
   await Schedule.findOneAndUpdate({ task }, doc, { upsert: true })
-    }
+}
 
 stan.on('connect', async () => {
   schedule('0 0 2 * *', async () => {
