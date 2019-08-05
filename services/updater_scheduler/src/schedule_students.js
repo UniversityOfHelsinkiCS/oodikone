@@ -45,12 +45,12 @@ const publishSingle = async ({ priority, task }) => {
     })
   })
   return await promise
-  }
+}
 
 const publishAll = async (tasks, priority = false) => {
   for (const task of tasks) {
     await publishSingle({ task, priority })
-}
+  }
 }
 
 const scheduleActiveStudents = async () => {
