@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { func, bool, shape } from 'prop-types'
-import { Header, Segment, Divider, Button } from 'semantic-ui-react'
+import { Header, Segment, Divider } from 'semantic-ui-react'
 import qs from 'query-string'
 
 import PopulationSearchForm from '../PopulationSearchForm'
@@ -52,19 +52,13 @@ class PopulationStatistics extends PureComponent {
   }
 
   render() {
-    const { translate, location, populationFound } = this.props
+    const { translate, location } = this.props
     return (
       <div className="segmentContainer">
         <Header className="segmentTitle" size="large">{translate('populationStatistics.header')}</Header>
         <Segment className="contentSegment">
           {this.renderPopulationSearch()}
           {location.search !== '' ? (<PopulationDetails />) : null}
-          {populationFound && location.search === '' ? (
-            <Segment>
-              <Header>Your previous search</Header>
-              <PopulationSearchHistory />
-              <Button onClick={this.handleClick}>open this population</Button>
-            </Segment>) : null}
         </Segment>
       </div>
     )
