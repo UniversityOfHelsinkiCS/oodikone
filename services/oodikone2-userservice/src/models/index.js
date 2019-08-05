@@ -1,17 +1,19 @@
 const Sequelize = require('sequelize')
 const { sequelize } = require('../database/connection')
 
-const ElementDetails = sequelize.define('element_details',
+const UserElementDetails = sequelize.define('user_elementdetails',
   {
-    code: {
+    userId: {
+      primaryKey: true,
+      type: Sequelize.BIGINT
+    },
+    elementDetailCode: {
       primaryKey: true,
       type: Sequelize.STRING
-    },
-    name: { type: Sequelize.JSONB },
-    type: { type: Sequelize.INTEGER }
+    }
   },
   {
-    tablename: 'element_details'
+    tablename: 'user_elementdetails'
   }
 )
 
@@ -66,11 +68,7 @@ const FacultyProgrammes = sequelize.define('faculty_programmes',
     },
     programme_code: {
       primaryKey: true,
-      type: Sequelize.STRING,
-      references: {
-        model: 'element_details',
-        key: 'code'
-      }
+      type: Sequelize.STRING
     },
     createdAt: {
       type: Sequelize.DATE
@@ -152,8 +150,8 @@ const Migration = sequelize.define('migrations', {
 })
 
 
-User.belongsToMany(ElementDetails, { through: 'user_elementdetails', as: 'programme' })
-ElementDetails.belongsToMany(User, { through: 'user_elementdetails' })
+User.hasMany(UserElementDetails, { as: 'programme' })
+UserElementDetails.belongsTo(User)
 
 User.belongsToMany(AccessGroup, { through: 'user_accessgroup', as: 'accessgroup' })
 AccessGroup.belongsToMany(User, { through: 'user_accessgroup' })
@@ -166,11 +164,10 @@ Affiliation.belongsToMany(User, { through: 'user_affiliation' })
 
 User.hasMany(UserFaculties, { as: 'faculty', foreignKey: 'userId' })
 UserFaculties.hasMany(FacultyProgrammes, { as: 'programme', foreignKey: 'faculty_code', sourceKey: 'faculty_code' })
-FacultyProgrammes.hasOne(ElementDetails, { foreignKey: 'code', sourceKey: 'programme_code' })
 
 module.exports = {
   User,
-  ElementDetails,
+  UserElementDetails,
   Migration,
   AccessGroup,
   HyGroup,
