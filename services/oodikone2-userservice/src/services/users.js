@@ -2,8 +2,16 @@ const Sequelize = require('sequelize')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const { flatMap } = require('lodash')
-const { User, ElementDetails, AccessGroup, HyGroup, Affiliation, FacultyProgrammes, UserFaculties, sequelize } = require('../models')
-const ElementService = require('./studyelements')
+const {
+  User,
+  UserElementDetails,
+  AccessGroup,
+  HyGroup,
+  Affiliation,
+  FacultyProgrammes,
+  UserFaculties,
+  sequelize
+} = require('../models')
 const AccessService = require('./accessgroups')
 const AffiliationService = require('./affiliations')
 const HyGroupService = require('./hygroups')
@@ -14,7 +22,7 @@ const TOKEN_VERSION = 1 // When token structure changes, increment in userservic
 const generateToken = async (uid, mockedBy = null) => {
   const user = await byUsername(uid)
   const userData = getUserData(user)
-  const elements = userData.elementdetails.map(element => element.code)
+  const programmes = userData.elementdetails
   const payload = {
     id: user.id,
     userId: uid, // username
@@ -22,7 +30,7 @@ const generateToken = async (uid, mockedBy = null) => {
     enabled: userData.is_enabled,
     language: user.language,
     mockedBy,
-    rights: elements,
+    rights: programmes,
     roles: user.accessgroup,
     createdAt: moment().toISOString(),
     version: TOKEN_VERSION,
@@ -117,7 +125,7 @@ const superlogin = async (uid, asUser) => {
 
 const userIncludes = [
   {
-    model: ElementDetails,
+    model: UserElementDetails,
     as: 'programme'
   },
   {
@@ -134,10 +142,7 @@ const userIncludes = [
     as: 'faculty',
     include: {
       model: FacultyProgrammes,
-      as: 'programme',
-      include: {
-        model: ElementDetails,
-      }
+      as: 'programme'
     }
   },
   {
@@ -149,7 +154,7 @@ const userIncludes = [
 const getUserData = user => {
   if (user == null) return null
   const newuser = user.get()
-  newuser.elementdetails = getUserElementDetails(newuser)
+  newuser.elementdetails = getUserProgrammes(newuser)
   newuser.is_enabled = requiredGroup === null || newuser.hy_group.some(e => e.code === requiredGroup)
   newuser.hy_group = null
   return newuser
@@ -192,8 +197,8 @@ const byId = async (id) => {
   return user
 }
 
-const getUserElementDetails = user => {
-  const elementdetails = [...user.programme, ...flatMap(user.faculty, f => f.programme.map(p => p.element_detail))]
+const getUserProgrammes = user => {
+  const elementdetails = [...user.programme.map(p => p.elementDetailCode), ...flatMap(user.faculty, f => f.programme.map(p => p.programme_code))]
   return elementdetails
 }
 const getUserAccessGroups = async username => {
@@ -208,16 +213,16 @@ const findAll = async () => {
   return users
 }
 
-const enableElementDetails = async (uid, codes) => {
-  const user = await byId(uid)
-  const elements = await ElementService.byCodes(codes)
-  await user.addProgramme(elements)
+const addProgrammes = async (uid, codes) => {
+  for (const code of codes) {
+    await UserElementDetails.upsert({ userId: uid, elementDetailCode: code })
+  }
 }
 
-const removeElementDetails = async (uid, codes) => {
-  const user = await byId(uid)
-  const elements = await ElementService.byCodes(codes)
-  await user.removeProgramme(elements)
+const removeProgrammes = async (uid, codes) => {
+  for (const code of codes) {
+    await UserElementDetails.destroy({ where: { userId: uid, elementDetailCode: code } })
+  }
 }
 
 const setFaculties = async (uid, faculties) => {
@@ -262,9 +267,9 @@ module.exports = {
   updateUser,
   findAll,
   byId,
-  getUserElementDetails,
-  enableElementDetails,
-  removeElementDetails,
+  getUserProgrammes,
+  addProgrammes,
+  removeProgrammes,
   login,
   superlogin,
   modifyRights,

@@ -12,6 +12,7 @@ import studyProgrammeProductivity from './productivity'
 import studyProgrammeThroughput from './throughput'
 import faculties from './faculties'
 import units from './units'
+import elementdetails from './elementdetails'
 import students from './students'
 import errors from './errors'
 import courses from './courses'
@@ -95,6 +96,7 @@ export default combineReducers({
   oodilearnPopulationCourseSelect,
   thesisCourses,
   accessGroups,
+  elementdetails,
   feedback,
   tags,
   tagstudent,
