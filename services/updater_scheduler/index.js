@@ -1,5 +1,5 @@
 const { stan } = require('./src/nats_connection')
-const cron = require('node-cron')
+const { CronJob } = require('cron')
 const Schedule = require('./models')
 const logger = require('./logger')
 const { updateStudentNumberList } = require('./src/student_list_updater')
@@ -7,11 +7,11 @@ const { scheduleActiveStudents, scheduleAllStudentsAndMeta, scheduleAttainmentUp
 const { getOldestTasks, getCurrentStatus } = require('./src/SchedulingStatistics')
 require('./src/api')
 
+const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
+
 let updatedCount = 0
 let scheduledCount = 0
 let fetchedCount = 0
-
-const timezone = 'Europe/Helsinki'
 
 const updateTask = async (task, status, type, updatetime) => {
   if (type) {
@@ -30,7 +30,7 @@ const updateTask = async (task, status, type, updatetime) => {
 }
 
 stan.on('connect', async () => {
-  cron.schedule('0 0 2 * *', async () => {
+  schedule('0 0 2 * *', async () => {
     // Update ALL students and meta on 3nd of every month
     try {
       console.log('SCHEDULING ALL STUDENTS AND META')
@@ -40,9 +40,9 @@ stan.on('connect', async () => {
       console.log(err)
       logger.info('failure', { service: 'SCHEDULER' })
     }
-  }, { timezone })
+  })
 
-  cron.schedule('0 0 1 1,3,8,10 *', async () => {
+  schedule('0 0 1 1,3,8,10 *', async () => {
     // Update student list 2nd of January, March, August, and October.”
     try {
       console.log('UPDATING STUDENT NUMBER LIST')
@@ -52,9 +52,9 @@ stan.on('connect', async () => {
       console.log(err)
       logger.info('failure', { service: 'SCHEDULER' })
     }
-  }, { timezone })
+  })
 
-  cron.schedule('0 0 * * *', async () => {
+  schedule('0 0 * * *', async () => {
     // Update ACTIVE students every night except few first dates of the month when we're updating all students anyway
     if (new Date().getDate() <= 5){
       console.log('NOT SCHEDULING ACTIVE STUDENTS BECAUSE BEGINNING OF MONTH WHEN ALL STUDENTS UPDATED ANYWAYS')
@@ -68,27 +68,27 @@ stan.on('connect', async () => {
       console.log(err)
       logger.info('failure', { service: 'SCHEDULER' })
     }
-  }, { timezone })
+  })
 
-  cron.schedule('0 12 * * *', async () => {
+  schedule('0 12 * * *', async () => {
     console.log('SCHEDULING ATTAINMENT UPDATE')
     await scheduleAttainmentUpdate()
-  }, { timezone })
+  })
 
-  cron.schedule('*/5 * * * *', async () => {
+  schedule('*/5 * * * *', async () => {
     const oldestTasks = await getOldestTasks()
     const status = await getCurrentStatus()
     logger.info('oldestTasks', oldestTasks)
     logger.info('updaterStatus', status)
-  }, { timezone })
+  })
 
-  cron.schedule('0 0-9 * * *', async () => {
+  schedule('0 0-9 * * *', async () => {
     // Just log some statistics about updater during nights
     logger.info(`${updatedCount} TASKS DONE IN LAST HOUR\n ${scheduledCount} TASKS SCHEDULED IN LAST HOUR\n ${fetchedCount} TASKS FETCHED FROM API IN LAST HOUR`)
     updatedCount = 0
     fetchedCount = 0
     scheduledCount = 0
-  }, { timezone })
+  })
 
   const scheduleSub = stan.subscribe('ScheduleAll')
 

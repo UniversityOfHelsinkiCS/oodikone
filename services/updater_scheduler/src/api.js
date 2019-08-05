@@ -2,7 +2,16 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT
 const bodyParser = require('body-parser')
-const { scheduleStudentsByArray, scheduleOldestNStudents, scheduleAllStudents, scheduleActiveStudents, scheduleMeta, scheduleAttainmentUpdate } = require('./schedule_students')
+const {
+  scheduleStudentsByArray,
+  scheduleOldestNStudents,
+  scheduleAllStudents,
+  scheduleActiveStudents,
+  scheduleMeta,
+  scheduleAttainmentUpdate,
+  rescheduleScheduled,
+  rescheduleFetched
+} = require('./schedule_students')
 const { getOldestTasks, getCurrentStatus } = require('./SchedulingStatistics')
 const { updateStudentNumberList } = require('./student_list_updater')
 
@@ -43,6 +52,16 @@ app.post('/update/meta', async (req, res) => {
 
 app.post('/update/studentlist', async (req, res) => {
   updateStudentNumberList()
+  res.json({ message: 'scheduled' })
+})
+
+app.post('/reschedule/scheduled', async (req, res) => {
+  rescheduleScheduled()
+  res.json({ message: 'scheduled' })
+})
+
+app.post('/reschedule/fetched', async (req, res) => {
+  rescheduleFetched()
   res.json({ message: 'scheduled' })
 })
 

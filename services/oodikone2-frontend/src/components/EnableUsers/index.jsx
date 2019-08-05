@@ -2,10 +2,11 @@ import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Button, Radio, Icon, Header, Segment, Confirm, Loader, Label, Message } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { func, shape, string, bool, arrayOf } from 'prop-types'
+import { func, shape, string, bool, arrayOf, number } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
 import { getUsers, getEnabledUsers, sendEmail } from '../../redux/users'
 import { getUnits } from '../../redux/units'
+import { getElementDetails } from '../../redux/elementdetails'
 import { makeSortUsers } from '../../selectors/users'
 import { copyToClipboard, getTextIn } from '../../common'
 import UserPageNew from '../UserPage'
@@ -19,6 +20,7 @@ class EnableUsers extends Component {
   }
 
   componentDidMount() {
+    if (this.props.elementdetails.length === 0) this.props.getElementDetails()
     if (this.props.units.length === 0) this.props.getUnits()
     if (this.props.users.length === 0) this.props.getEnabledUsers()
   }
@@ -66,7 +68,7 @@ class EnableUsers extends Component {
 
   renderUserSearchList = () => {
     const { enabledOnly } = this.state
-    const { users, error } = this.props
+    const { users, error, elementdetails } = this.props
     let usersToRender
     if (enabledOnly) {
       usersToRender = users.filter(u => u.is_enabled)
@@ -122,17 +124,22 @@ class EnableUsers extends Component {
                 user.accessgroup.map(ag => ag.group_code).sort()
               )
             }, {
-              key: 'STUDYTRACKS',
-              title: 'Studytracks',
+              key: 'PROGRAMMES',
+              title: 'Programmes',
               getRowVal: (user) => {
-                const nameInLanguage = element =>
-                  getTextIn(element.name, this.props.language)
+                const nameInLanguage = (code) => {
+                  const elem = elementdetails.find(e => e.code === code)
+                  if (!elem) return null
+                  return getTextIn(elem.name, this.props.language)
+                }
 
                 if (!user.elementdetails || user.elementdetails.length === 0) return null
+                const name = nameInLanguage(user.elementdetails[0])
+                if (!name) return `${user.elementdetails.length} programmes`
                 if (user.elementdetails.length >= 2) {
                   return `${nameInLanguage(user.elementdetails[0])} +${user.elementdetails.length - 1} others`
                 }
-                return nameInLanguage(user.elementdetails[0])
+                return name
               }
             }, {
               key: 'OODIACCESS',
@@ -222,15 +229,18 @@ EnableUsers.propTypes = {
   })).isRequired,
   error: bool.isRequired,
   units: arrayOf(shape({})).isRequired,
+  elementdetails: arrayOf(shape({ code: string, type: number, name: shape({}) })).isRequired,
+  getElementDetails: func.isRequired,
   history: shape({}).isRequired
 }
 
 const sortUsers = makeSortUsers()
 
-const mapStateToProps = ({ localize, users, units }) => ({
+const mapStateToProps = ({ localize, users, units, elementdetails }) => ({
   language: getActiveLanguage(localize).code,
   translate: getTranslate(localize),
   units: units.data,
+  elementdetails: elementdetails.data,
   enabledOnly: users.enabledOnly,
   users: sortUsers(users),
   pending: (typeof (users.pending) === 'boolean') ? users.pending : true,
@@ -241,5 +251,6 @@ export default withRouter(connect(mapStateToProps, {
   getUsers,
   getEnabledUsers,
   getUnits,
-  sendEmail
+  sendEmail,
+  getElementDetails
 })(EnableUsers))

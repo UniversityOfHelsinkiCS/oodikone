@@ -1,5 +1,15 @@
 const router = require('express').Router()
-const { updateOldestStudents, getStatuses, updateActiveStudents, updateAllStudents, updateAttainments, updateMetadata, updateStudentlist } = require('../services/updaterService')
+const {
+  updateOldestStudents,
+  getStatuses,
+  updateActiveStudents,
+  updateAllStudents,
+  updateAttainments,
+  updateMetadata,
+  updateStudentlist,
+  rescheduleScheduled,
+  rescheduleFetched
+} = require('../services/updaterService')
 
 router.post('/update/oldest', async (req, res) => {
   const { amount } = req.body
@@ -79,6 +89,28 @@ router.get('/status', async (req, res) => {
   } catch (err) {
     console.log(err)
     res.status(500).json([{ label: 'request status', value: 'request failed' }])
+  }
+})
+
+router.post('/reschedule/scheduled', async (req, res) => {
+  try {
+    const response = await rescheduleScheduled()
+    if (response) {
+      res.status(200).json('Scheduled')
+    }
+  } catch (err) {
+    res.status(418).json(err)
+  }
+})
+
+router.post('/reschedule/fetched', async (req, res) => {
+  try {
+    const response = await rescheduleFetched()
+    if (response) {
+      res.status(200).json('Scheduled')
+    }
+  } catch (err) {
+    res.status(418).json(err)
   }
 })
 
