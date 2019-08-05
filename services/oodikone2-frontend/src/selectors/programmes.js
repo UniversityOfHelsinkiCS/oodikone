@@ -10,75 +10,27 @@ const toOptions = (elements, language) => (!elements ? [] : Object.values(elemen
   name: getTextIn(element.name, language)
 })))
 
-const formatOptions = (elements, language) => (!elements ? [] : Object.values(elements).map(elem => ({
-  code: elem.code,
-  name: getTextIn(elem.name, language),
-  progs: Object.keys(elem.programmes)
-})))
+const userRightsPropSelector = (_, props) => props.rights
 
-const dropdownOptionsSelector = createSelector(
-  languageSelector,
-  associationsSelector,
-  (language, associations) => {
-    const { degrees, programmes, studyTracks } = associations
-    return {
-      degrees: toOptions(degrees, language),
-      programmes: toOptions(programmes, language),
-      tracks: toOptions(studyTracks, language)
-    }
-  }
-)
-
-const groupByProgramme = (elements) => {
-  const acc = {}
-  elements.forEach(({ code, name, progs }) => {
-    progs.forEach((progcode) => {
-      const programme = acc[progcode] || (acc[progcode] = [])
-      programme.push({ code, name })
-    })
-  })
-  return acc
-}
-
-const userRightsPropSelector = (_, props) => props.rights.map(r => r.code)
-
-const dropdownAssociationsSelector = createSelector(
+const dropdownProgrammeSelector = createSelector(
   languageSelector,
   associationsSelector,
   (language, assocs) => {
-    const degrees = formatOptions(assocs.degrees, language)
-    const tracks = formatOptions(assocs.studyTracks, language)
-    const programmeDegrees = groupByProgramme(degrees)
-    const programmeTracks = groupByProgramme(tracks)
-    const programmes = toOptions(assocs.programmes, language).map(({ code, name }) => ({
-      code,
-      name,
-      degrees: programmeDegrees[code] || [],
-      tracks: programmeTracks[code] || []
-    }))
+    const programmes = toOptions(assocs.programmes, language)
     return programmes
   }
 )
 
-const filteredDropdownAssociationsSelector = createSelector(
-  dropdownAssociationsSelector,
+const filteredDropdownProgrammeSelector = createSelector(
+  dropdownProgrammeSelector,
   userRightsPropSelector,
-  (associations, rights) => {
+  (programmes, rights) => {
     const rightsSet = new Set(rights)
-    const notSelected = ({ code, tracks, degrees }) => !(rightsSet.has(code) && tracks.length === 0 && degrees.length === 0)
-    const programmes = associations.map(({ degrees, tracks, ...rest }) => ({
-      degrees: degrees.filter(d => !rightsSet.has(d.code)),
-      tracks: tracks.filter(t => !rightsSet.has(t.code)),
-      ...rest
-    }))
-    const filtered = programmes.filter(notSelected)
-    return filtered
+    const notSelected = ({ code }) => !rightsSet.has(code)
+    return programmes.filter(notSelected)
   }
 )
 
 export default {
-  dropdownOptionsSelector,
-  associationsSelector,
-  dropdownAssociationsSelector,
-  filteredDropdownAssociationsSelector
+  filteredDropdownProgrammeSelector
 }

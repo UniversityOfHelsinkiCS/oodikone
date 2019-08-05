@@ -2,22 +2,43 @@ const { stan } = require('./nats_connection')
 const Schedule = require('../models')
 const { sleep } = require('./util')
 
-const publish = async (tasks, priority = false) => {
+
+stan.on('connect', async () => {
   const taskspermin = 200
-  for (const [index, task] of tasks.entries()) {
-    stan.publish(priority ? 'PriorityApi' : 'UpdateApi', JSON.stringify({ task: task.task }), (err) => {
+  const opts = stan.subscriptionOptions()
+  opts.setManualAckMode(true)
+  opts.setAckWait(5 * 60 * 1000)
+  opts.setMaxInFlight(taskspermin)
+
+  const scheduleSub = stan.subscribe('schedule', opts)
+  scheduleSub.on('message', async (msg) => {
+    try {
+      const { task, priority } = JSON.parse(msg.getData())
+      stan.publish(priority ? 'PriorityApi' : 'UpdateApi', JSON.stringify({ task }), (err) => {
+        if (err) {
+          console.log('publish failed', err)
+        }
+      })
+      stan.publish('status', JSON.stringify({ task: task.task, status: 'SCHEDULED' }), (err) => {
+        if (err) {
+          console.log('publish failed')
+        }
+      })
+      await sleep(60*1000)
+    } catch (err) {
+      console.log(err)
+    }
+    msg.ack()
+  })
+})
+
+const publish = async (tasks, priority = false) => {
+  for (const task of tasks) {
+    stan.publish('schedule', JSON.stringify({ task: task.task, priority }), (err) => {
       if (err) {
         console.log('publish failed', err)
       }
     })
-    stan.publish('status', JSON.stringify({ task: task.task, status: 'SCHEDULED' }), (err) => {
-      if (err) {
-        console.log('publish failed')
-      }
-    })
-    if ((index+1)%taskspermin === 0) {
-      await sleep(60*1000)
-    }
   }
 }
 
