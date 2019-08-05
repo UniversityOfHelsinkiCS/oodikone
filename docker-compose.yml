@@ -188,13 +188,6 @@ services:
       - WAIT_HOSTS=nats:4222,scheduler_mongo:27017
       - NATS_URI=nats://nats:4222
       - MONGO_URI=mongodb://scheduler_mongo:27017
-      - STUDENT_NUMBERS=./all_student_numbers.txt
-      - ACTIVE_STUDENTS=./active_student_numbers.txt
-      - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
-      - TOKEN=toskab1gs8cret5
-      - LOG_HOST=toska.cs.helsinki.fi
-      - LOG_PORT=9501
-      - LOG_HOSTNAME=updater_scheduler
       - PORT=3678
     container_name: updater_scheduler
 

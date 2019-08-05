@@ -34,8 +34,10 @@ const getCurrentStatus = async () => {
   const allTasksScheduled = await Schedule.count({ type: 'student', status: 'SCHEDULED' })
   const allTasksFetched = await Schedule.count({ type: 'student', status: 'FETCHED' })
   const allTasksDone = await Schedule.count({ type: 'student', status: 'DONE' })
+  const allTasksCreated = await Schedule.count({ type: 'student', status: 'CREATED' })
+  const allTasksActive = await Schedule.count({ type: 'student', active: true })
 
-  return { allTasksScheduled, allTasksFetched, allTasksDone }
+  return { allTasksScheduled, allTasksFetched, allTasksDone, allTasksCreated, allTasksActive }
 }
 
 module.exports = { getOldestTasks, getCurrentStatus }

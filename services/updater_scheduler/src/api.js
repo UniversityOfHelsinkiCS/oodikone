@@ -82,16 +82,18 @@ app.get('/statuses', async (req, res) => {
     oldestStudentNumberLisTask
   } = await getOldestTasks()
 
-  const { allTasksScheduled, allTasksFetched, allTasksDone } = await getCurrentStatus()
+  const { allTasksScheduled, allTasksFetched, allTasksDone, allTasksCreated, allTasksActive } = await getCurrentStatus()
 
   statuses.push(
     { label: 'oldest student studentnumber', value: studentnumber},
     { label: 'oldest student timestamp', value: updatedAt},
     { label: 'oldest active student studentnumber', value: studentnumberActive},
     { label: 'oldest active student timestamp', value: updatedAtActive},
-    { label: 'currently tasks scheduled', value: allTasksScheduled},
-    { label: 'currently tasks fetched', value: allTasksFetched},
-    { label: 'currently tasks done', value: allTasksDone},
+    { label: 'student status created', value: allTasksCreated},
+    { label: 'student status scheduled', value: allTasksScheduled},
+    { label: 'student status fetched', value: allTasksFetched},
+    { label: 'student status done', value: allTasksDone},
+    { label: 'student type active', value: allTasksActive},
     { label: 'oldest metadata update', value: oldestMetaTask.updatedAt},
     { label: 'current metadata status', value: oldestMetaTask.status},
     { label: 'oldest attainment update', value: oldestAttainmentTask.updatedAt},

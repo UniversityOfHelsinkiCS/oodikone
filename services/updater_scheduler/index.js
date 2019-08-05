@@ -13,21 +13,12 @@ let updatedCount = 0
 let scheduledCount = 0
 let fetchedCount = 0
 
-const updateTask = async (task, status, type, updatetime) => {
-  if (type) {
-    if (updatetime) {
-      await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type }, { upsert: true })
-    } else {
-      await Schedule.findOneAndUpdate({ task }, { task, status, type }, { upsert: true })
+const updateTask = async ({ task, status, type, updatetime, active }) => {
+  const doc = { task, status, type, active }
+  if (updatetime) doc.updatedAt = new Date()
+  if (active != null) doc.active = active
+  await Schedule.findOneAndUpdate({ task }, doc, { upsert: true })
     }
-  } else {
-    if (updatetime) {
-      await Schedule.findOneAndUpdate({ task }, { task, status, updatedAt: new Date(), type: 'other', active: true }, { upsert: true })
-    } else {
-      await Schedule.findOneAndUpdate({ task }, { task, status, type: 'other', active: true }, { upsert: true })
-    }
-  }
-}
 
 stan.on('connect', async () => {
   schedule('0 0 2 * *', async () => {
@@ -106,7 +97,7 @@ stan.on('connect', async () => {
 
   const handleStatusMessage = async (msg) => {
     const data = JSON.parse(msg.getData())
-    const { task, status, timems } = data
+    const { task, status, timems, active } = data
     let updatetime = false
     switch (status) {
     case 'DONE':
@@ -139,7 +130,7 @@ stan.on('connect', async () => {
     }
     const isStudent = !!isValidStudentId(task)
     logger.info(`Status changed for ${task} to ${status}`, { task: task, status: status, student: isStudent, timems: timems })
-    await updateTask(task, status, isStudent ? 'student' : 'other', updatetime)
+    await updateTask({ task, status, type: isStudent ? 'student' : 'other', updatetime, active })
   }
   statusSub.on('message', async (msg) => {
     try {
