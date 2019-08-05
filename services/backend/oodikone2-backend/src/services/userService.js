@@ -1,6 +1,7 @@
 const axios = require('axios')
 const { USERSERVICE_URL } = require('../conf-backend')
 const UnitService = require('./units')
+const elementDetailService = require('./elementdetails')
 
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { 'secret': process.env.USERSERVICE_SECRET } })
 
@@ -43,7 +44,8 @@ const byUsername = async (uid) => {
 const getUserElementDetails = async (username) => {
   const url = `/user/elementdetails/${username}`
   const response = await client.get(url)
-  return response.data
+  const elementdetailcodes = response.data
+  return elementDetailService.byCodes(elementdetailcodes)
 }
 
 const byId = async (id) => {
@@ -89,9 +91,7 @@ const setFaculties = async (uid, faculties) => {
 }
 
 const getUnitsFromElementDetails = async username => {
-  const url = `/user/elementdetails/${username}`
-  const response = await client.get(url)
-  const elementDetails = response.data
+  const elementDetails = await getUserElementDetails(username)
   return elementDetails.map(element => UnitService.parseUnitFromElement(element))
 }
 

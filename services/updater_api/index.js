@@ -17,7 +17,7 @@ const fetchData = async (priority, msg) => {
     const task = JSON.parse(msg.getData())
     if (task.task === 'meta') {
       data = await getMeta()
-      stan.publish('UpdateWrite', JSON.stringify(data))
+      stan.publish('UpdateWrite', JSON.stringify({ task: task.task, data }))
       stan.publish('status', JSON.stringify({ task: task.task, status: 'FETCHED' }), (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
     } else {
       try {
