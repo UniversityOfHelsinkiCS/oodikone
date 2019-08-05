@@ -26,7 +26,7 @@ stan.on('connect', function () {
       } else {
         await updateStudent(data.data)
       }
-      stan.publish('status', JSON.stringify({ task: data.task, status: 'DONE', timems: new Date() - start }), (err) => { if (err) console.log(err) })
+      stan.publish('status', JSON.stringify({ task: data.task, status: 'DONE', timems: new Date() - start, active: data.active }), (err) => { if (err) console.log(err) })
     } catch (err) {
       console.log('update failed', data.task, err)
       logger.info('failure', { service: 'WRITER' })

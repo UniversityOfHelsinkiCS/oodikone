@@ -19,7 +19,7 @@ stan.on('connect', async () => {
           console.log('publish failed', err)
         }
       })
-      stan.publish('status', JSON.stringify({ task: task.task, status: 'SCHEDULED' }), (err) => {
+      stan.publish('status', JSON.stringify({ task, status: 'SCHEDULED' }), (err) => {
         if (err) {
           console.log('publish failed')
         }
@@ -32,31 +32,42 @@ stan.on('connect', async () => {
   })
 })
 
-const publish = async (tasks, priority = false) => {
-  for (const task of tasks) {
-    stan.publish('schedule', JSON.stringify({ task: task.task, priority }), (err) => {
+const publishSingle = async ({ priority, task }) => {
+  const promise = new Promise((resolve) => {
+    stan.publish('schedule', JSON.stringify({ task: task.task, priority }), async (err) => {
       if (err) {
-        console.log('publish failed', err)
+        console.log('publish failed, waiting 10 seconds and republishing', err)
+        await sleep(10*1000)
+        resolve(await publishSingle({ priority, task }))
+      } else {
+        resolve(true)
       }
     })
+  })
+  return await promise
   }
+
+const publishAll = async (tasks, priority = false) => {
+  for (const task of tasks) {
+    await publishSingle({ task, priority })
+}
 }
 
 const scheduleActiveStudents = async () => {
   const tasks = [...await Schedule.find({ type: 'student', active: true }).sort({ updatedAt: 1 })]
   console.log(tasks.length, 'tasks to schedule')
-  await publish(tasks)
+  await publishAll(tasks)
 }
 
 const scheduleAllStudents = async () => {
   const tasks = [...await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 })]
   console.log(tasks.length, 'tasks to schedule')
-  await publish(tasks)
+  await publishAll(tasks)
 }
 
 const scheduleMeta = async () => {
   console.log('scheduling meta')
-  await publish([{task: 'meta', type: 'other', active: 'false'}])
+  await publishAll([{task: 'meta', type: 'other', active: 'false'}])
 }
 
 const scheduleAllStudentsAndMeta = async () => {
@@ -67,7 +78,7 @@ const scheduleAllStudentsAndMeta = async () => {
 const scheduleStudentsByArray = async (studentNumbers) => {
   try {
     const tasks = await Schedule.find({ type: 'student', task: { $in: studentNumbers } })
-    await publish(tasks, true)
+    await publishAll(tasks, true)
   } catch (e) {
     console.log(e)
   }
@@ -76,7 +87,7 @@ const scheduleStudentsByArray = async (studentNumbers) => {
 const scheduleOldestNStudents = async (amount) => {
   try {
     const tasks = [...await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 }).limit(Number(amount))]
-    await publish(tasks, true)
+    await publishAll(tasks, true)
   } catch (e) {
     console.log(e)
   }
@@ -100,13 +111,13 @@ const scheduleAttainmentUpdate = async () => {
 const rescheduleScheduled = async () => {
   const tasks = [...await Schedule.find({ type: 'student', status: 'SCHEDULED' }).sort({ updatedAt: 1 })]
   console.log(tasks.length, 'tasks to schedule')
-  await publish(tasks)
+  await publishAll(tasks)
 }
 
 const rescheduleFetched = async () => {
   const tasks = [...await Schedule.find({ type: 'student', status: 'FETCHED' }).sort({ updatedAt: 1 })]
   console.log(tasks.length, 'tasks to schedule')
-  await publish(tasks)
+  await publishAll(tasks)
 }
 
 module.exports = {
