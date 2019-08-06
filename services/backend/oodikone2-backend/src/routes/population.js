@@ -205,7 +205,7 @@ router.post('/updatedatabase', async (req, res) => {
       res.status(200).json('Scheduled')
     }
   } catch (err) {
-    res.status(418).json(err)
+    res.status(500).json(err)
   }
 })
 

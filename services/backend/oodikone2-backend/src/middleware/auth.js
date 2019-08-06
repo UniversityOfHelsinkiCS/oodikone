@@ -34,9 +34,7 @@ const checkAuth = async (req, res, next) => {
 const roles = requiredRoles => async (req, res, next) => {
   if (req.decodedToken) {
     const { roles } = req
-    console.log(`Request has roles: ${ roles }`)
     if (requiredRoles.every(r => roles.indexOf(r) >= 0) || roles.includes('admin')) {
-      console.log(`Authorized for ${ requiredRoles }`)
       next()
       return
     }

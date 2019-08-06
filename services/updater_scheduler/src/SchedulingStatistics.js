@@ -5,7 +5,6 @@ const getOldestTasks = async () => {
   const oldestActiveTask = (await Schedule.find({ type: 'student', active: true }).sort({ updatedAt: 1 }).limit(1))[0]
   const oldestMetaTask = (await Schedule.find({ type: 'other', task: 'meta' }).sort({ updatedAt: 1 }).limit(1))[0]
   const oldestAttainmentTask = (await Schedule.find({ type: 'other', task: 'attainment' }).sort({ updatedAt: 1 }).limit(1))[0]
-  const oldestStudentNumberLisTask = (await Schedule.find({ type: 'other', task: 'studentnumberlist' }).sort({ updatedAt: 1 }).limit(1))[0]
 
   return {
     oldestChangedStatus: {
@@ -23,21 +22,19 @@ const getOldestTasks = async () => {
     oldestAttainmentTask: {
       updatedAt: oldestAttainmentTask ? oldestAttainmentTask.updatedAt : null,
       status: oldestAttainmentTask ? oldestAttainmentTask.status : null
-    },
-    oldestStudentNumberLisTask: {
-      updatedAt: oldestStudentNumberLisTask ? oldestStudentNumberLisTask.updatedAt : null,
-      status: oldestAttainmentTask ? oldestAttainmentTask.status : null
     }
   }
 }
+
 const getCurrentStatus = async () => {
   const allTasksScheduled = await Schedule.count({ type: 'student', status: 'SCHEDULED' })
   const allTasksFetched = await Schedule.count({ type: 'student', status: 'FETCHED' })
   const allTasksDone = await Schedule.count({ type: 'student', status: 'DONE' })
   const allTasksCreated = await Schedule.count({ type: 'student', status: 'CREATED' })
+  const allTasksNoStudent = await Schedule.count({ type: 'student', status: 'NO_STUDENT' })
   const allTasksActive = await Schedule.count({ type: 'student', active: true })
 
-  return { allTasksScheduled, allTasksFetched, allTasksDone, allTasksCreated, allTasksActive }
+  return { allTasksScheduled, allTasksFetched, allTasksDone, allTasksCreated, allTasksActive, allTasksNoStudent }
 }
 
 module.exports = { getOldestTasks, getCurrentStatus }
