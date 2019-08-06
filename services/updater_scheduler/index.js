@@ -2,9 +2,7 @@ const { stan } = require('./src/nats_connection')
 const { CronJob } = require('cron')
 const Schedule = require('./models')
 const logger = require('./logger')
-const { updateStudentNumberList } = require('./src/student_list_updater')
-const { scheduleActiveStudents, scheduleAllStudentsAndMeta, scheduleAttainmentUpdate } = require('./src/schedule_students')
-const { getOldestTasks, getCurrentStatus } = require('./src/SchedulingStatistics')
+const { scheduleActiveStudents, scheduleAllStudents, scheduleStudentCheck, scheduleAttainmentUpdate, scheduleMeta } = require('./src/schedule_students')
 require('./src/api')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
@@ -21,36 +19,45 @@ const updateTask = async ({ task, status, type, updatetime, active }) => {
 }
 
 stan.on('connect', async () => {
-  schedule('0 0 2 * *', async () => {
-    // Update ALL students and meta on 3nd of every month
+  schedule('0 21 * * 5', async () => {
+    // Every Friday at 21:00
     try {
-      console.log('SCHEDULING ALL STUDENTS AND META')
-      await scheduleAllStudentsAndMeta()
+      console.log('SCHEDULING STUDENTNUMBER CHECK')
+      await scheduleStudentCheck()
     } catch (err) {
-      console.log('SCHEDULING ALL STUDENTS AND META FAILED')
+      console.log('SCHEDULING STUDENTNUMBER CHECK FAILED')
       console.log(err)
       logger.info('failure', { service: 'SCHEDULER' })
     }
   })
 
-  schedule('0 0 1 1,3,8,10 *', async () => {
-    // Update student list 2nd of January, March, August, and October.”
+  schedule('0 21 * * 6', async () => {
+    // Every Saturday at 21:00
     try {
-      console.log('UPDATING STUDENT NUMBER LIST')
-      await updateStudentNumberList()
+      console.log('SCHEDULING ALL STUDENTS')
+      await scheduleAllStudents()
     } catch (err) {
-      console.log('UPDATING STUDENT NUMBER LIST FAILED')
+      console.log('SCHEDULING ALL STUDENTS FAILED')
       console.log(err)
       logger.info('failure', { service: 'SCHEDULER' })
     }
   })
 
-  schedule('0 0 * * *', async () => {
-    // Update ACTIVE students every night except few first dates of the month when we're updating all students anyway
-    if (new Date().getDate() <= 5){
-      console.log('NOT SCHEDULING ACTIVE STUDENTS BECAUSE BEGINNING OF MONTH WHEN ALL STUDENTS UPDATED ANYWAYS')
-      return
+  schedule('0 6 * * 1-5', async () => {
+    // Every Monday through Friday at 06:00
+    try {
+      console.log('SCHEDULING META AND ATTAINMENT')
+      await scheduleMeta()
+      await scheduleAttainmentUpdate()
+    } catch (err) {
+      console.log('SCHEDULING META AND ATTAINMENT')
+      console.log(err)
+      logger.info('failure', { service: 'SCHEDULER' })
     }
+  })
+
+  schedule('0 21 * * 1-5', async () => {
+    // Every Monday through Thursday at 21:00
     try {
       console.log('SCHEDULING ACTIVE STUDENTS')
       await scheduleActiveStudents()
@@ -61,31 +68,14 @@ stan.on('connect', async () => {
     }
   })
 
-  schedule('0 12 * * *', async () => {
-    console.log('SCHEDULING ATTAINMENT UPDATE')
-    await scheduleAttainmentUpdate()
-  })
-
-  schedule('*/5 * * * *', async () => {
-    const oldestTasks = await getOldestTasks()
-    const status = await getCurrentStatus()
-    logger.info('oldestTasks', oldestTasks)
-    logger.info('updaterStatus', status)
-  })
-
-  schedule('0 0-9 * * *', async () => {
-    // Just log some statistics about updater during nights
-    logger.info(`${updatedCount} TASKS DONE IN LAST HOUR\n ${scheduledCount} TASKS SCHEDULED IN LAST HOUR\n ${fetchedCount} TASKS FETCHED FROM API IN LAST HOUR`)
+  schedule('0 * * * *', async () => {
+    // Every hour
+    logger.info(`${updatedCount} TASKS DONE IN LAST HOUR. ${scheduledCount} TASKS SCHEDULED IN LAST HOUR. ${fetchedCount} TASKS FETCHED FROM API IN LAST HOUR`)
     updatedCount = 0
     fetchedCount = 0
     scheduledCount = 0
   })
 
-  const scheduleSub = stan.subscribe('ScheduleAll')
-
-  scheduleSub.on('message', async () => {
-    scheduleAllStudentsAndMeta()
-  })
   const opts = stan.subscriptionOptions()
   opts.setManualAckMode(true)
   opts.setAckWait(5 * 60 * 1000)
