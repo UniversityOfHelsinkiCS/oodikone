@@ -132,12 +132,7 @@ module.exports = {
   scheduleAllStudents,
   scheduleAttainmentUpdate,
   rescheduleScheduled,
-<<<<<<< HEAD
   rescheduleFetched,
   rescheduleCreated,
   scheduleStudentCheck
 }
-=======
-  rescheduleFetched
-}
->>>>>>> 646e68bb6a7613d631b3339bc86cf34c60383733
