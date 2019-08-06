@@ -228,8 +228,7 @@ const PopulationSearchForm = (props) => {
 
   const getSearchHistoryTextFromQuery = () => {
     const { studyRights, semesters, months, startYear, endYear, studentStatuses } = query
-
-    const studyRightsText = Object.values(studyRights).filter(s => s).join(', ')
+    const studyRightsText = `${studyProgrammes[studyRights.programme].name[language]} ${Object.values(studyRights).filter(s => s).join(', ')}`
     const timeText = `${semesters.join(', ')}/${startYear}-${parseInt(endYear, 10) + 1}, ${months} months`
     const studentStatusesText = studentStatuses.length > 0 ? `includes ${studentStatuses.map(s => s.toLowerCase()).join(', ')} students` : null
 
