@@ -1,6 +1,7 @@
 import axios from 'axios'
+import * as Sentry from '@sentry/browser'
 import { getToken, setToken, getAsUserWithoutRefreshToken, getTokenWithoutRefresh } from '../common'
-import { API_BASE_PATH, TOKEN_NAME, BASE_PATH } from '../constants'
+import { API_BASE_PATH, TOKEN_NAME, BASE_PATH, ERROR_STATUSES_TO_CAPTURE } from '../constants'
 import { login as loginAction } from '../redux/auth'
 
 const isTestEnv = BASE_PATH === '/testing/'
@@ -137,6 +138,15 @@ export const handleRequest = store => next => async (action) => {
   }
 }
 
+const handleError = (err) => {
+  const { response } = err
+  if (response && response.status) {
+    if (ERROR_STATUSES_TO_CAPTURE.includes(response.status)) {
+      Sentry.captureException(err)
+    }
+  }
+}
+
 export const handleAuth = store => next => async (action) => {
   next(action)
   const { type, force = false, retryRequestSettings, uid, refresh } = action
@@ -164,11 +174,13 @@ export const handleAuth = store => next => async (action) => {
         }
       } catch (err) {
         store.dispatch({ type: `${prefix}FAILURE`, response: err, query })
+        handleError(err)
       }
     } catch (err) {
       store.dispatch({ type: 'LOGIN_FAILURE' })
       if (retryRequestSettings) {
         store.dispatch({ type: `${prefix}FAILURE`, response: err, query })
+        handleError(err)
       }
     }
   } else if (type === 'LOGOUT_ATTEMPT') {
@@ -177,6 +189,7 @@ export const handleAuth = store => next => async (action) => {
       store.dispatch({ type: 'LOGOUT_SUCCESSFUL' })
     } catch (err) {
       store.dispatch({ type: 'LOGOUT_FAILURE' })
+      handleError(err)
     }
   }
 }

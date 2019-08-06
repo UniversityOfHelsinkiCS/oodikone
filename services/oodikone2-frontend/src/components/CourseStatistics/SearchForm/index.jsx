@@ -117,10 +117,12 @@ const SearchForm = (props) => {
       courseCodes: Object.keys(selectedCourses),
       separate
     }
-
-    // await this.props.getCourseStats(params)
+    const { years } = props
+    const from = years.find(year => year.key === fromYear)
+    const to = years.find(year => year.key === toYear)
+    const searchHistoryText = params.courseCodes.map(code => `${selectedCourses[code].name} ${code}`)
     addItemToSearchHistory({
-      text: params.courseCodes.join(', '),
+      text: `${searchHistoryText.join(', ')} from: ${from.text} to: ${to.text}`,
       params
     })
     pushQueryToUrl(params)
