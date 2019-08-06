@@ -12,6 +12,7 @@ import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegrees
 import { login } from '../../redux/auth'
 import AccessRights from './AccessRights'
 import AccessGroups from './AccessGroups'
+import { getElementDetails } from '../../redux/elementdetails'
 
 const formatToDropdown = (elements, language) => {
   const options = Object.values(elements).map(e => ({
@@ -30,7 +31,8 @@ class UserPage extends Component {
   }
 
   async componentDidMount() {
-    const { associations, pending } = this.props
+    const { associations, pending, getElementDetails } = this.props
+    getElementDetails()
     if (Object.keys(associations).length === 0 && !pending) {
       this.props.getDegreesAndProgrammesUnfiltered()
       await this.props.getAccessGroups()
@@ -85,35 +87,39 @@ class UserPage extends Component {
     this.props.history.push('/')
   }
 
-  renderUnitList = (elementdetails, user) => {
+  renderUnitList = (elementdetailcodes, elementdetails, user) => {
+    if (!elementdetailcodes) return null
     const { language } = this.props
     const nameInLanguage = element => getTextIn(element.name, language)
-    if (!elementdetails) return null
+    elementdetailcodes.sort()
     return (
       <List divided>
-        {_.sortBy(elementdetails, 'code').map(element => (
-          <List.Item key={element.code}>
-            <List.Content floated="right">
-              <Button
-                basic
-                negative
-                floated="right"
-                onClick={this.removeAccess(user.id, element.code)}
-                content="Remove"
-                size="tiny"
-              />
-            </List.Content>
-            <List.Content>
-              {element.type === 30 ? <Icon name="minus" /> : null} {`${nameInLanguage(element)} (${element.code})`}
-            </List.Content>
-          </List.Item>
-        ))}
+        {elementdetails && elementdetails.length > 0 && elementdetailcodes.map(({ elementDetailCode: code }) => {
+          const element = elementdetails.find(e => e.code === code)
+          return (
+            <List.Item key={code}>
+              <List.Content floated="right">
+                <Button
+                  basic
+                  negative
+                  floated="right"
+                  onClick={this.removeAccess(user.id, code)}
+                  content="Remove"
+                  size="tiny"
+                />
+              </List.Content>
+              <List.Content>
+                {element.type === 30 ? <Icon name="minus" /> : null} {`${nameInLanguage(element)} (${code})`}
+              </List.Content>
+            </List.Item>
+          )
+        })}
       </List>
     )
   }
 
   render() {
-    const { user, language } = this.props
+    const { user, language, elementdetails } = this.props
     return this.props.accessGroups ?
       <div>
         <Button icon="arrow circle left" content="Back" onClick={this.props.goBack} />
@@ -165,7 +171,7 @@ class UserPage extends Component {
                   }}
                   >Admin access!
                   </p> : null}
-                {this.renderUnitList(user.programme, user)}
+                {this.renderUnitList(user.programme, elementdetails, user)}
                 <Header content="Faculties" />
                 <Dropdown
                   placeholder="Select faculties"
@@ -191,11 +197,7 @@ UserPage.propTypes = {
     id: string,
     full_name: string,
     is_enabled: bool,
-    elementdetails: arrayOf(shape({
-      code: string,
-      name: shape({}),
-      type: number
-    })),
+    elementdetails: arrayOf(string),
     programme: arrayOf(shape({
       code: string,
       name: shape({}),
@@ -222,6 +224,8 @@ UserPage.propTypes = {
   }).isRequired,
   getAccessGroups: func.isRequired,
   getFaculties: func.isRequired,
+  getElementDetails: func.isRequired,
+  elementdetails: arrayOf(shape({ type: number, code: string, name: shape({}) })).isRequired,
   faculties: arrayOf(shape({ code: string, name: shape({}) })).isRequired,
   accessGroups: arrayOf(object).isRequired,
   isAdmin: bool.isRequired,
@@ -233,6 +237,7 @@ const mapStateToProps = state => ({
   faculties: state.faculties.data,
   associations: state.populationDegreesAndProgrammesUnfiltered.data,
   pending: !!state.populationDegreesAndProgrammesUnfiltered.pending,
+  elementdetails: state.elementdetails.data,
   accessGroups: state.users.accessGroupsData || [],
   isAdmin: getRolesWithoutRefreshToken().includes('admin')
 })
@@ -243,5 +248,6 @@ export default connect(mapStateToProps, {
   getDegreesAndProgrammesUnfiltered,
   getAccessGroups,
   getFaculties,
+  getElementDetails,
   login
 })(withRouter(UserPage))

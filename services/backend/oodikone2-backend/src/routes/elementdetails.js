@@ -1,10 +1,19 @@
 const router = require('express').Router()
-const { getAllDegreesAndProgrammes, getAllProgrammes } = require('../services/studyrights')
+const { getAllDegreesAndProgrammes, getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
 const MandatoryCourses = require('../services/mandatoryCourses')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('../services/studytrack')
 const { findProgrammeTheses, createThesisCourse, deleteThesisCourse } = require('../services/thesis')
 const { getProductivity, setProductivity, getThroughput, setThroughput,
   patchProductivity, patchThroughput, ping } = require('../services/analyticsService')
+
+router.get('/elementdetails/all', async (req, res) => {
+  try {
+    const elementdetails = await getAllElementDetails()
+    res.json(elementdetails)
+  } catch (e) {
+    res.status(500).json(e)
+  }
+})
 
 router.get('/studyprogrammes', async (req, res) => {
   try {

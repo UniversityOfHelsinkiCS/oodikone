@@ -92,10 +92,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./services/updater_scheduler/:/usr/src/app
-    environment:
-      - LOG_HOST=toska.cs.helsinki.fi
-      - LOG_PORT=9501
-      - LOG_HOSTNAME=updater_scheduler
 
   analytics:
     build:

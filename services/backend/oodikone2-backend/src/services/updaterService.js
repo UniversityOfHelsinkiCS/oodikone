@@ -19,9 +19,56 @@ const updateOldestStudents = async (amount) => {
   return response.data
 }
 
+const updateAllStudents = async () => {
+  const response = await client.post('/update/all')
+  return response.data
+}
+
+const updateActiveStudents = async () => {
+  const response = await client.post('/update/active')
+  return response.data
+}
+
+const updateMetadata = async () => {
+  const response = await client.post('/update/meta')
+  return response.data
+}
+
+const updateAttainments = async () => {
+  const response = await client.post('/update/attainment')
+  return response.data
+}
+
+const updateStudentlist = async () => {
+  const response = await client.post('/update/studentlist')
+  return response.data
+}
+
+const getStatuses = async () => {
+  const response = await client.get('/statuses')
+  return response.data
+}
+
+const rescheduleScheduled = async () => {
+  const response = await client.post('/reschedule/scheduled')
+  return response.data
+}
+
+const rescheduleFetched = async () => {
+  const response = await client.post('/reschedule/fetched')
+  return response.data
+}
 
 module.exports = {
   ping,
   updateStudents,
-  updateOldestStudents
+  updateOldestStudents,
+  updateAllStudents,
+  updateActiveStudents,
+  updateMetadata,
+  updateAttainments,
+  updateStudentlist,
+  getStatuses,
+  rescheduleScheduled,
+  rescheduleFetched
 }

@@ -2,60 +2,132 @@ const { stan } = require('./nats_connection')
 const Schedule = require('../models')
 const { sleep } = require('./util')
 
-const publish = async (tasks, priority = false) => {
+
+stan.on('connect', async () => {
   const taskspermin = 200
-  for (const [index, task] of tasks.entries()) {
-    stan.publish(priority ? 'PriorityApi' : 'UpdateApi', JSON.stringify({ task: task.task }), (err) => {
-      if (err) {
-        console.log('publish failed', err)
-      }
-    })
-    stan.publish('status', JSON.stringify({ task: task.task, status: 'SCHEDULED' }), (err) => {
-      if (err) {
-        console.log('publish failed')
-      }
-    })
-    if ((index+1)%taskspermin === 0) {
+  const opts = stan.subscriptionOptions()
+  opts.setManualAckMode(true)
+  opts.setAckWait(5 * 60 * 1000)
+  opts.setMaxInFlight(taskspermin)
+
+  const scheduleSub = stan.subscribe('schedule', opts)
+  scheduleSub.on('message', async (msg) => {
+    try {
+      const { task, priority } = JSON.parse(msg.getData())
+      stan.publish(priority ? 'PriorityApi' : 'UpdateApi', JSON.stringify({ task }), (err) => {
+        if (err) {
+          console.log('publish failed', err)
+        }
+      })
+      stan.publish('status', JSON.stringify({ task, status: 'SCHEDULED' }), (err) => {
+        if (err) {
+          console.log('publish failed')
+        }
+      })
       await sleep(60*1000)
+    } catch (err) {
+      console.log(err)
     }
+    msg.ack()
+  })
+})
+
+const publishSingle = async ({ priority, task }) => {
+  const promise = new Promise((resolve) => {
+    stan.publish('schedule', JSON.stringify({ task: task.task, priority }), async (err) => {
+      if (err) {
+        console.log('publish failed, waiting 10 seconds and republishing', err)
+        await sleep(10*1000)
+        resolve(await publishSingle({ priority, task }))
+      } else {
+        resolve(true)
+      }
+    })
+  })
+  return await promise
+}
+
+const publishAll = async (tasks, priority = false) => {
+  for (const task of tasks) {
+    await publishSingle({ task, priority })
   }
 }
 
 const scheduleActiveStudents = async () => {
   const tasks = [...await Schedule.find({ type: 'student', active: true }).sort({ updatedAt: 1 })]
   console.log(tasks.length, 'tasks to schedule')
-  await publish(tasks)
+  await publishAll(tasks)
 }
-const scheduleAllStudentsAndMeta = async () => {
 
-  const tasks = [{ task: 'meta', type: 'other', active: 'false' }, ...await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 })]
+const scheduleAllStudents = async () => {
+  const tasks = [...await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 })]
   console.log(tasks.length, 'tasks to schedule')
-  await publish(tasks)
+  await publishAll(tasks)
 }
 
 const scheduleMeta = async () => {
   console.log('scheduling meta')
-  await publish([{task: 'meta', type: 'other', active: 'false'}])
+  await publishAll([{task: 'meta', type: 'other', active: 'false'}])
+}
+
+const scheduleAllStudentsAndMeta = async () => {
+  await scheduleMeta()
+  await scheduleAllStudents()
 }
 
 const scheduleStudentsByArray = async (studentNumbers) => {
   try {
     const tasks = await Schedule.find({ type: 'student', task: { $in: studentNumbers } })
-    await publish(tasks, true)
+    await publishAll(tasks, true)
   } catch (e) {
-    return e
+    console.log(e)
   }
-  return 'scheduled'
 }
 
 const scheduleOldestNStudents = async (amount) => {
   try {
     const tasks = [...await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 }).limit(Number(amount))]
-    await publish(tasks, true)
+    await publishAll(tasks, true)
   } catch (e) {
-    return e
+    console.log(e)
   }
-  return 'scheduled'
 }
 
-module.exports = { scheduleActiveStudents, scheduleAllStudentsAndMeta, scheduleStudentsByArray, scheduleOldestNStudents, scheduleMeta }
+const scheduleAttainmentUpdate = async () => {
+  stan.publish('status', JSON.stringify({ task: 'attainment', status: 'SCHEDULED' }), (err) => {
+    if (err) {
+      console.log('publish failed')
+    }
+  })
+  stan.publish('UpdateAttainmentDates', null, (err) => {
+    if (err) {
+      console.log('publish failed', 'UpdateAttainmentDates')
+    } else {
+      console.log('published', 'UpdateAttainmentDates')
+    }
+  })
+}
+
+const rescheduleScheduled = async () => {
+  const tasks = [...await Schedule.find({ type: 'student', status: 'SCHEDULED' }).sort({ updatedAt: 1 })]
+  console.log(tasks.length, 'tasks to schedule')
+  await publishAll(tasks)
+}
+
+const rescheduleFetched = async () => {
+  const tasks = [...await Schedule.find({ type: 'student', status: 'FETCHED' }).sort({ updatedAt: 1 })]
+  console.log(tasks.length, 'tasks to schedule')
+  await publishAll(tasks)
+}
+
+module.exports = {
+  scheduleActiveStudents,
+  scheduleAllStudentsAndMeta,
+  scheduleStudentsByArray,
+  scheduleOldestNStudents,
+  scheduleMeta,
+  scheduleAllStudents,
+  scheduleAttainmentUpdate,
+  rescheduleScheduled,
+  rescheduleFetched
+}

@@ -156,12 +156,12 @@ const getAllStudyrightElementsAndAssociations = async () => {
 }
 
 const getStudyrightElementsAndAssociationsForUser = async username => {
-  const studyrightelements = await getUserElementDetails(username)
-  if (studyrightelements.length === 0) {
+  const studyrightelementcodes = await getUserElementDetails(username)
+  if (studyrightelementcodes.length === 0) {
     return []
   }
-  const associations = await getAssociatedStudyrights(studyrightelements.map(element => element.code))
-  return formatStudyrightElements(studyrightelements, associations)
+  const associations = await getAssociatedStudyrights(studyrightelementcodes)
+  return formatStudyrightElements(studyrightelementcodes, associations)
 }
 
 const getAllDegreesAndProgrammes = async () => {
@@ -184,6 +184,11 @@ const getAllProgrammes = async () => {
       }
     }
   })
+  return elementDetails
+}
+
+const getAllElementDetails = async () => {
+  const elementDetails = ElementDetails.findAll()
   return elementDetails
 }
 
@@ -355,8 +360,7 @@ const getFilteredAssociations = async (codes) => {
 }
 
 const getUserAssociations = async (userid) => {
-  const elements = await getUserElementDetails(userid)
-  const codes = elements.map(e => e.code)
+  const codes = await getUserElementDetails(userid)
   const associations = await getFilteredAssociations(codes)
   return associations
 }
@@ -375,5 +379,6 @@ module.exports = {
   getFilteredAssociations,
   getUserAssociations,
   refreshAssociationsInRedis,
-  getAllProgrammes
+  getAllProgrammes,
+  getAllElementDetails
 }
