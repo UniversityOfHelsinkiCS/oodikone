@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Input } from 'semantic-ui-react'
 import { func, string, number, bool } from 'prop-types'
 import Timeout from '../Timeout'
@@ -21,9 +21,7 @@ const AutoSubmitSearchInput = ({
   loading,
   disabled
 }) => {
-  const resetComponent = () => {
-    onChange('')
-  }
+  const [input, setInput] = useState(value)
 
   const executeSearch = (searchterm) => {
     setTimeout(TIMEOUTS.FETCH, () => {
@@ -33,15 +31,23 @@ const AutoSubmitSearchInput = ({
     })
   }
 
+  useEffect(() => {
+    if (input && input.length >= minSearchLength) {
+      executeSearch(input)
+    }
+  }, [input])
+
+  const resetComponent = () => {
+    onChange('')
+  }
+
   const handleSearchChange = (e, { value: val }) => {
     clearTimeout(TIMEOUTS.SEARCH)
     if (val.length >= 0) {
       onChange(val)
-      if (val.length >= minSearchLength) {
-        setTimeout(TIMEOUTS.SEARCH, () => {
-          executeSearch(val)
-        }, latency)
-      }
+      setTimeout(TIMEOUTS.SEARCH, () => {
+        setInput(val)
+      }, latency)
     } else {
       resetComponent()
     }
