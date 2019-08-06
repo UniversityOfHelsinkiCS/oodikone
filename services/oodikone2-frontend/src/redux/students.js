@@ -25,7 +25,11 @@ export const resetStudent = () => ({
   type: 'RESET_STUDENT_SUCCESS'
 })
 
-const reducer = (state = { data: [] }, action) => {
+export const clearStudentError = () => ({
+  type: 'CLEAR_STUDENT_ERROR'
+})
+
+const reducer = (state = { data: [], pending: false, error: false }, action) => {
   switch (action.type) {
     case 'FIND_STUDENTS_ATTEMPT':
       return {
@@ -52,6 +56,18 @@ const reducer = (state = { data: [] }, action) => {
           [...state.data.filter(student => student.fetched), ...action.response] :
           state.data
       }
+    case 'GET_STUDENT_ATTEMPT':
+      return {
+        ...state,
+        pending: true,
+        error: false
+      }
+    case 'GET_STUDENT_FAILURE':
+      return {
+        ...state,
+        pending: false,
+        error: true
+      }
     case 'GET_STUDENT_SUCCESS':
       return {
         pending: false,
@@ -63,10 +79,15 @@ const reducer = (state = { data: [] }, action) => {
         { ...action.response, ...{ fetched: true } }
         ]
       }
+    case 'CLEAR_STUDENT_ERROR':
+      return {
+        ...state,
+        error: false
+      }
     case 'SELECT_STUDENTS_SUCCESS':
       return { ...state, selected: action.response }
     case 'RESET_STUDENT_SUCCESS':
-      return { ...state, data: [], lastSearch: '' }
+      return { ...state, data: [], lastSearch: '', error: false, pending: false }
     case 'REMOVE_SELECTED_SUCCESS':
       return { ...state, selected: null }
     default:
