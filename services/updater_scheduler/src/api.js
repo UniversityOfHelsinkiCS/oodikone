@@ -9,11 +9,13 @@ const {
   scheduleActiveStudents,
   scheduleMeta,
   scheduleAttainmentUpdate,
+  scheduleStudentCheck,
   rescheduleScheduled,
-  rescheduleFetched
+  rescheduleFetched,
+  rescheduleCreated
 } = require('./schedule_students')
 const { getOldestTasks, getCurrentStatus } = require('./SchedulingStatistics')
-const { updateStudentNumberList } = require('./student_list_updater')
+const { createTasks } = require('./student_list_updater')
 
 app.use(bodyParser.json())
 
@@ -50,8 +52,18 @@ app.post('/update/meta', async (req, res) => {
   res.json({ message: 'scheduled' })
 })
 
+app.post('/update/no_student', async (req, res) => {
+  scheduleStudentCheck()
+  res.json({ message: 'scheduled' })
+})
+
 app.post('/update/studentlist', async (req, res) => {
-  updateStudentNumberList()
+  createTasks()
+  res.json({ message: 'scheduled' })
+})
+
+app.post('/reschedule/created', async (req, res) => {
+  rescheduleCreated()
   res.json({ message: 'scheduled' })
 })
 
@@ -79,27 +91,25 @@ app.get('/statuses', async (req, res) => {
     },
     oldestMetaTask,
     oldestAttainmentTask,
-    oldestStudentNumberLisTask
   } = await getOldestTasks()
 
-  const { allTasksScheduled, allTasksFetched, allTasksDone, allTasksCreated, allTasksActive } = await getCurrentStatus()
+  const { allTasksScheduled, allTasksFetched, allTasksDone, allTasksCreated, allTasksActive, allTasksNoStudent } = await getCurrentStatus()
 
   statuses.push(
+    { label: 'CREATED', value: allTasksCreated},
+    { label: 'SCHEDULED', value: allTasksScheduled},
+    { label: 'FETCHED', value: allTasksFetched},
+    { label: 'DONE', value: allTasksDone},
+    { label: 'NO_STUDENT', value: allTasksNoStudent},
+    { label: 'ACTIVE', value: allTasksActive},
     { label: 'oldest student studentnumber', value: studentnumber},
     { label: 'oldest student timestamp', value: updatedAt},
     { label: 'oldest active student studentnumber', value: studentnumberActive},
     { label: 'oldest active student timestamp', value: updatedAtActive},
-    { label: 'student status created', value: allTasksCreated},
-    { label: 'student status scheduled', value: allTasksScheduled},
-    { label: 'student status fetched', value: allTasksFetched},
-    { label: 'student status done', value: allTasksDone},
-    { label: 'student type active', value: allTasksActive},
     { label: 'oldest metadata update', value: oldestMetaTask.updatedAt},
     { label: 'current metadata status', value: oldestMetaTask.status},
     { label: 'oldest attainment update', value: oldestAttainmentTask.updatedAt},
     { label: 'current attainment status', value: oldestAttainmentTask.status},
-    { label: 'oldest studentnumberlist update', value: oldestStudentNumberLisTask.updatedAt},
-    { label: 'current studentnumberlist status', value: oldestStudentNumberLisTask.status},
   )
 
   res.json(statuses)

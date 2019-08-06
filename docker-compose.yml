@@ -152,8 +152,8 @@ services:
       - WAIT_HOSTS=nats:4222
       - NATS_URI=nats://nats:4222
       - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
-      - TOKEN=toskab1gs8cret5
-    container_name: updater_api
+      - TOKEN=M1kkoVanh4LonkeroM0n5teri
+    #container_name: updater_api
 
   updater_writer:
     build:
@@ -168,7 +168,7 @@ services:
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       TEST_DB_SCHEMA: updater_test
-    container_name: updater_writer
+    #container_name: updater_writer
 
   scheduler_mongo:
     image: mongo:4.0.10

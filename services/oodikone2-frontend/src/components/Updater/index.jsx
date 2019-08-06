@@ -5,15 +5,16 @@ import { callApi } from '../../apiConnection'
 import { cancelablePromise } from '../../common'
 
 const Updater = () => {
-  const [amount, setAmount] = useState(2000)
+  const [amount, setAmount] = useState('')
   const [statuses, setStatuses] = useState(null)
 
   const updateOldestStudents = amount => amount !== 0 && callApi('/updater/update/oldest', 'post', { amount })
   const updateAllStudents = () => callApi('/updater/update/all', 'post')
   const updateActiveStudents = () => callApi('/updater/update/active', 'post')
+  const updateNoStudents = () => callApi('/updater/update/no_student', 'post')
   const updateAttainmentDates = () => callApi('/updater/update/attainment', 'post')
   const updateMetadata = () => callApi('/updater/update/meta', 'post')
-  const updateStudentlist = () => callApi('/updater/update/studentlist', 'post')
+  const createTasks = () => callApi('/updater/update/studentlist', 'post')
   const rescheduleScheduled = () => callApi('/updater/reschedule/scheduled', 'post')
   const rescheduleFetched = () => callApi('/updater/reschedule/fetched', 'post')
 
@@ -48,12 +49,12 @@ const Updater = () => {
             actionPosition="left"
           />
           <Form.Button
-            content="Update active students"
+            content="Update ACTIVE students"
             icon="refresh"
             onClick={() => updateActiveStudents()}
           />
           <Form.Button
-            content="Update all students"
+            content="Update ALL students"
             icon="refresh"
             onClick={() => updateAllStudents()}
           />
@@ -70,17 +71,22 @@ const Updater = () => {
             onClick={() => updateMetadata()}
           />
           <Form.Button
-            content="Update student list"
+            content="create tasks"
             icon="refresh"
-            onClick={() => updateStudentlist()}
+            onClick={() => createTasks()}
           />
           <Form.Button
-            content="Reschedule all 'SCHEDULED' students"
+            content="Update NO_STUDENT students"
+            icon="refresh"
+            onClick={() => updateNoStudents()}
+          />
+          <Form.Button
+            content="Update all 'SCHEDULED' students"
             icon="refresh"
             onClick={() => rescheduleScheduled()}
           />
           <Form.Button
-            content="Reschedule all 'FETCHED' students"
+            content="Update all 'FETCHED' students"
             icon="refresh"
             onClick={() => rescheduleFetched()}
           />
@@ -88,9 +94,9 @@ const Updater = () => {
       </Form>
       <Header>Status:</Header>
       <Segment loading={!statuses} basic>
-        <Table>
+        <Table striped >
           <Table.Body>
-            {statuses && statuses.map(e => <Table.Row key={e.label}><Table.Cell>{e.label}</Table.Cell><Table.Cell>{e.value}</Table.Cell></Table.Row>)}
+            {statuses && statuses.map(e => <Table.Row key={e.label}><Table.Cell collapsing>{e.label}</Table.Cell><Table.Cell>{e.value}</Table.Cell></Table.Row>)}
           </Table.Body>
         </Table>
       </Segment>

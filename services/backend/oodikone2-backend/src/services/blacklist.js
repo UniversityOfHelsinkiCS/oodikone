@@ -12,7 +12,6 @@ const isUserBlacklisted = async (userId, tokenCreatedAt) => {
   const isBlacklisted = async () => {
     const blacklistTimestamp = await redisClient.getAsync(MAKE_REDIS_HASH_KEY(userId))
     const status = !!(tokenCreatedAt && blacklistTimestamp && moment(tokenCreatedAt) < moment(blacklistTimestamp))
-    console.log('BLACKLISTED? ', {isBlacklisted: status, userId, tokenCreatedAt, blacklistTimestamp})
     return status
   }
   const timer = () => new Promise(resolve => setTimeout(() => resolve(true), 5000))
