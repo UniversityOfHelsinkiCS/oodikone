@@ -295,7 +295,8 @@ export const useSearchHistory = (id, capacity = 5) => {
 
   const addItem = (item) => {
     if (!searchHistory[id]) searchHistory[id] = []
-    setSearchHistory(searchHistory.concat({ ...item, timestamp: new Date() }).slice(-capacity))
+    const filtered = searchHistory.filter(sh => sh.text !== item.text)
+    setSearchHistory(filtered.concat({ ...item, timestamp: new Date() }).slice(-capacity))
   }
 
   return [searchHistory, addItem]
