@@ -1,18 +1,11 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import { Button, Progress, Message } from 'semantic-ui-react'
-import { func } from 'prop-types'
 import { api } from '../../apiConnection'
 import KeyValueTable from '../Postman/KeyValueTable'
-import { updatePopulationOldestStudents } from '../../redux/populations'
 
 const TASK_URL = '/tasks/topteachers'
 
 class UpdateTopTeachers extends Component {
-  static propTypes = {
-    updatePopulationOldestStudents: func.isRequired
-  }
-
   state={
     status: undefined,
     progress: undefined,
@@ -61,11 +54,6 @@ class UpdateTopTeachers extends Component {
             onClick={this.checkStatus}
             loading={fetching}
           />
-          <Button
-            content="Update 2000 oldest students"
-            icon="refresh"
-            onClick={() => this.props.updatePopulationOldestStudents(2000)}
-          />
         </Button.Group>
         { status && <KeyValueTable data={status} /> }
         { !!computing && <Progress autoSuccess active={computing} percent={progress} />}
@@ -74,4 +62,4 @@ class UpdateTopTeachers extends Component {
   }
 }
 
-export default connect(null, { updatePopulationOldestStudents })(UpdateTopTeachers)
+export default UpdateTopTeachers

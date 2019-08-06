@@ -5,18 +5,16 @@ const updateAttainmentDates = async () => {
   const transaction = await sequelize.transaction()
   try {
     await sequelize.query(
-      `UPDATE  ${schema}.course
-     SET max_attainment_date = cr.max
-     FROM (select course_code, max(attainment_date) from ${schema}.credit group by course_code) cr
-     WHERE course.code=cr.course_code`,
-      { type: sequelize.QueryTypes.UPDATE, transaction, lock: transaction.LOCK.UPDATE }
-    )
-    await sequelize.query(
-      `UPDATE  ${schema}.course
-     SET min_attainment_date = cr.min
-     FROM (select course_code, min(attainment_date) from ${schema}.credit group by course_code) cr
-     WHERE course.code=cr.course_code`,
-      { type: sequelize.QueryTypes.UPDATE, transaction, lock: transaction.LOCK.UPDATE }
+      `
+      -- Block writing to table to avoid deadlocks:
+      LOCK TABLE ONLY ${schema}.course IN EXCLUSIVE MODE;
+
+      UPDATE  ${schema}.course
+      SET max_attainment_date = cr.max, min_attainment_date = cr.min
+      FROM (select course_code, max(attainment_date), min(attainment_date) from ${schema}.credit group by course_code) cr
+      WHERE course.code=cr.course_code;
+     `,
+      { transaction }
     )
     await transaction.commit()
   } catch (e) {

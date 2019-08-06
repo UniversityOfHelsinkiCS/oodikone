@@ -16,6 +16,7 @@ const OodiLearn = React.lazy(() => import('../OodiLearn'))
 const Feedback = React.lazy(() => import('../Feedback'))
 const Faculty = React.lazy(() => import('../Faculty'))
 const CourseStudents = React.lazy(() => import('../CourseStudents'))
+const Updater = React.lazy(() => import('../Updater'))
 
 const Routes = () => (
   <Suspense fallback={<Loader active inline="centered" />}>
@@ -34,6 +35,7 @@ const Routes = () => (
       <Route exact path={routes.oodilearn.route} component={OodiLearn} />
       <Route exact path={routes.feedback.route} component={Feedback} />
       <Route exact path={routes.coursepopulation.route} component={CourseStudents} />
+      <Route exact path="/updater" component={Updater} />
     </Switch>
   </Suspense>
 )

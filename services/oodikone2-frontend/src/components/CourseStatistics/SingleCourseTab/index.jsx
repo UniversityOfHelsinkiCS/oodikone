@@ -5,7 +5,7 @@ import { shape, arrayOf, oneOfType, number, string } from 'prop-types'
 import SingleCourseStats from '../SingleCourseStats'
 import selectors from '../../../selectors/courseStats'
 
-class SingleCourse extends Component {
+class SingleCourseTab extends Component {
   state = {
     selected: this.props.selected
   }
@@ -50,13 +50,13 @@ class SingleCourse extends Component {
   }
 }
 
-SingleCourse.propTypes = {
+SingleCourseTab.propTypes = {
   stats: shape({}).isRequired,
   courses: arrayOf(shape({})).isRequired,
   selected: oneOfType([number, string])
 }
 
-SingleCourse.defaultProps = {
+SingleCourseTab.defaultProps = {
   selected: undefined
 }
 
@@ -70,4 +70,4 @@ const mapStateToProps = state => ({
   }))
 })
 
-export default connect(mapStateToProps)(SingleCourse)
+export default connect(mapStateToProps)(SingleCourseTab)
