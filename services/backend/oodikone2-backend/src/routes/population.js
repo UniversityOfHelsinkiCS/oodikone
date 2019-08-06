@@ -112,6 +112,10 @@ router.get('/v3/populationstatistics', async (req, res) => {
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecode, yearcode } = req.query
+  if (!coursecode || !yearcode) {
+    res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
+    return
+  }
   const semesters = ['FALL', 'SPRING']
   let studentnumberlist
   const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
