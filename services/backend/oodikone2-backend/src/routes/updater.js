@@ -8,7 +8,8 @@ const {
   updateMetadata,
   updateStudentlist,
   rescheduleScheduled,
-  rescheduleFetched
+  rescheduleFetched,
+  updateNoStudents
 } = require('../services/updaterService')
 
 router.post('/update/oldest', async (req, res) => {
@@ -23,7 +24,7 @@ router.post('/update/oldest', async (req, res) => {
       res.status(200).json('Scheduled')
     }
   } catch (err) {
-    res.status(418).json(err)
+    res.status(500).json(err)
   }
 })
 
@@ -34,7 +35,7 @@ router.post('/update/all', async (req, res) => {
       res.status(200).json('Scheduled')
     }
   } catch (err) {
-    res.status(418).json(err)
+    res.status(500).json(err)
   }
 })
 
@@ -45,7 +46,18 @@ router.post('/update/active', async (req, res) => {
       res.status(200).json('Scheduled')
     }
   } catch (err) {
-    res.status(418).json(err)
+    res.status(500).json(err)
+  }
+})
+
+router.post('/update/no_student', async (req, res) => {
+  try {
+    const response = await updateNoStudents()
+    if (response) {
+      res.status(200).json('Scheduled')
+    }
+  } catch (err) {
+    res.status(500).json(err)
   }
 })
 
@@ -56,7 +68,7 @@ router.post('/update/attainment', async (req, res) => {
       res.status(200).json('Scheduled')
     }
   } catch (err) {
-    res.status(418).json(err)
+    res.status(500).json(err)
   }
 })
 
@@ -67,7 +79,7 @@ router.post('/update/meta', async (req, res) => {
       res.status(200).json('Scheduled')
     }
   } catch (err) {
-    res.status(418).json(err)
+    res.status(500).json(err)
   }
 })
 
@@ -78,7 +90,7 @@ router.post('/update/studentlist', async (req, res) => {
       res.status(200).json('Scheduled')
     }
   } catch (err) {
-    res.status(418).json(err)
+    res.status(500).json(err)
   }
 })
 
@@ -99,7 +111,7 @@ router.post('/reschedule/scheduled', async (req, res) => {
       res.status(200).json('Scheduled')
     }
   } catch (err) {
-    res.status(418).json(err)
+    res.status(500).json(err)
   }
 })
 
@@ -110,7 +122,7 @@ router.post('/reschedule/fetched', async (req, res) => {
       res.status(200).json('Scheduled')
     }
   } catch (err) {
-    res.status(418).json(err)
+    res.status(500).json(err)
   }
 })
 

@@ -29,6 +29,11 @@ const updateActiveStudents = async () => {
   return response.data
 }
 
+const updateNoStudents = async () => {
+  const response = await client.post('/update/no_student')
+  return response.data
+}
+
 const updateMetadata = async () => {
   const response = await client.post('/update/meta')
   return response.data
@@ -70,5 +75,6 @@ module.exports = {
   updateStudentlist,
   getStatuses,
   rescheduleScheduled,
-  rescheduleFetched
+  rescheduleFetched,
+  updateNoStudents
 }
