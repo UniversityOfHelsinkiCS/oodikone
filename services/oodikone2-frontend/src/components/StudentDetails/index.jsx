@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { func, shape, string, boolean, arrayOf, integer } from 'prop-types'
+import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Table, Icon } from 'semantic-ui-react'
@@ -16,8 +16,8 @@ import { clearCourseStats } from '../../redux/coursestats'
 
 class StudentDetails extends Component {
   componentDidMount() {
-    this.props.history.listen((location, action) => {
-      if (action === 'POP' || location.pathname !== '/students') {
+    this.unlistenHistory = this.props.history.listen((location, action) => {
+      if (action === 'POP' || location.pathname !== '/students' || this.props.error) {
         this.props.resetStudent()
         this.props.removeStudentSelection()
       }
@@ -25,9 +25,13 @@ class StudentDetails extends Component {
   }
 
   componentDidUpdate() {
-    if (isEmpty(this.props.student) && this.props.studentNumber) {
+    if (isEmpty(this.props.student) && this.props.studentNumber && !this.props.error) {
       this.props.getStudent(this.props.studentNumber)
     }
+  }
+
+  componentWillUnmount() {
+    this.unlistenHistory()
   }
 
   pushQueryToUrl = (query) => {
@@ -208,12 +212,14 @@ class StudentDetails extends Component {
   }
 
   render() {
-    const { translate, student, studentNumber } = this.props
-    if (!studentNumber) {
-      return null
-    }
-    if (isEmpty(student)) {
-      return null
+    const { translate, student, studentNumber, pending, error } = this.props
+    if ((pending || !studentNumber || isEmpty(student)) && !error) return null
+    if (error) {
+      return (
+        <Segment textAlign="center">
+          <p>Student not found or no sufficient permissions</p>
+        </Segment>
+      )
     }
     return (
       <Segment className="contentSegment" >
@@ -247,14 +253,16 @@ StudentDetails.propTypes = {
       credits: integer,
       date: string,
       grade: string,
-      passed: boolean
+      passed: bool
     })),
     credits: integer,
-    fetched: boolean,
+    fetched: bool,
     started: string,
     studentNumber: string,
     tags: arrayOf(string)
-  })
+  }),
+  pending: bool.isRequired,
+  error: bool.isRequired
 }
 
 StudentDetails.defaultProps = {
@@ -265,15 +273,16 @@ StudentDetails.defaultProps = {
 const mapStateToProps = ({ students, localize }) => ({
   language: getActiveLanguage(localize).code,
   student: students.data.find(student =>
-    student.studentNumber === students.selected)
+    student.studentNumber === students.selected),
+  pending: students.pending,
+  error: students.error
+})
 
-})
-const mapDispatchToProps = dispatch => ({
-  removeStudentSelection: () => dispatch(removeStudentSelection()),
-  clearCourseStats: () => dispatch(clearCourseStats()),
-  resetStudent: () => dispatch(resetStudent()),
-  getStudent: studentNumber =>
-    dispatch(getStudent(studentNumber))
-})
+const mapDispatchToProps = {
+  removeStudentSelection,
+  clearCourseStats,
+  resetStudent,
+  getStudent
+}
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentDetails))
