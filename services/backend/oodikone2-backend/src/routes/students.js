@@ -26,11 +26,16 @@ router.get('/students/:id', async (req, res) => {
 
   if (roles && roles.includes('admin')) {
     const results = await Student.withId(studentId)
-    return res.json(results)
+    return results.error ?
+      res.status(400).json({ error: 'error finding student' }) :
+      res.json(results)
   }
 
   const uid = req.decodedToken.userId
   const student = await Student.withId(studentId)
+  if (student.error) {
+    return res.status(400).json({ error: 'error finding student' })
+  }
   const units = await userService.getUnitsFromElementDetails(uid)
 
   const rights = await Promise.all(units.map(async unit => {
@@ -41,7 +46,7 @@ router.get('/students/:id', async (req, res) => {
   if (rights.some(right => right !== null)) {
     res.json(student).end()
   } else {
-    res.json([]).end()
+    res.status(400).json({ error: 'error finding student' })
   }
 })
 
