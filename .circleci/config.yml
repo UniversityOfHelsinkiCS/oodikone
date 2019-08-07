@@ -6,7 +6,6 @@ jobs:
     machine:
       image: circleci/node:10.15.3
     steps:
-      - setup_remote_docker
       - run: docker --version
       - run: docker-compose --version
       - checkout
