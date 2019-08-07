@@ -12,11 +12,12 @@ jobs:
       - checkout
       - run: echo 'export IMAGE=CIRCLE' >> $BASH_ENV
       - run: echo 'export TAG=circle' >> $BASH_ENV
-      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml pull
+      - run: docker pull node:10.15-alpine
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml pull --ignore-pull-failures
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml build --parallel
 
       - run: git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
-      - run: docker-compose -f docker-compose.yml -f $1 up -d db user_db db_kone
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d db user_db db_kone
       - run: source ./scripts/scripts.sh && db_anon_setup_full && init_dirs
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d --no-recreate
       - run: docker ps
