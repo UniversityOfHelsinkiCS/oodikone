@@ -1,8 +1,7 @@
 version: 2.1
 jobs:
   build:
-    machine:
-      - image: circleci/node:10.15.3
+    machine: true
     steps:
       - run: docker --version
       - run: docker-compose --version
