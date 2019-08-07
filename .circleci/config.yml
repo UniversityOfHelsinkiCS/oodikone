@@ -1,12 +1,6 @@
 version: 2.1
 orbs:
   cypress: cypress-io/cypress@1.8.0
-executors:
-  base10-custom-url:
-    docker:
-      - image: 'cypress/base:10'
-    environment:
-      CYPRESS_baseUrl: http://localhost:1337/
 jobs:
   build:
     docker:
@@ -29,8 +23,8 @@ jobs:
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
       - run: npm run test_services
       - cypress/run:
-          executor: base10-custom-url
           store_artifacts: true
+          command: cypress run --config video=true --port 1337
 
       - run: docker ps -a
       - run: if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
