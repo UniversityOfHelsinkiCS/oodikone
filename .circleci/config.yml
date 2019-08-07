@@ -17,4 +17,3 @@ jobs:
       - run: docker-compose -f docker-compose.lateste2e.yml up -d
       - run: docker ps
       - run: docker-compose logs
-
