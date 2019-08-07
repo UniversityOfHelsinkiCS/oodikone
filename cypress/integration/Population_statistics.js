@@ -121,6 +121,29 @@ describe('Population Statistics tests', () => {
     cy.contains("Oinonen").invoke('text').then((text) => expect(text).to.equal('Oinonen Heidi Eeva Elisabet, 014473717'))
   })
 
+  it('Student list checking works as intended', () => {
+    cy.contains("Select study programme").click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
+    cy.contains("See population").click()
+    cy.get("button").contains("show").click()
+    cy.contains("010483918")
+    cy.contains("666666666").should('not.exist')
+    cy.contains('button', "Check studentnumbers").click()
+    cy.contains('Check for studentnumbers')
+    cy.get('textarea').type("010483918").type('{enter}').type("666666666")
+    cy.contains('button', 'check students').click()
+    cy.contains('form', 'Results').within(e => {
+      cy.get('div').eq(0).within(e => {
+        cy.contains('student numbers in list but not in oodi')
+        cy.contains('666666666')
+      })
+      cy.get('div').eq(2).within(e => {
+        cy.contains('student numbers in oodi but not in list')
+        cy.contains('014896381')
+      })
+      cy.contains('010483918').should('not.exist')
+    })
+  })
+
   it('All filters working', () => {
     cy.contains("Select study programme", { timeout: 50000 }).click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
     cy.contains("See population").click()
