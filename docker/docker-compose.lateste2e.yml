@@ -55,7 +55,6 @@ services:
       - ./nginx/error.log:/etc/nginx/error_log.log
       - ./nginx/log:/var/log/nginx/localhost.error_log
       - ./nginx/cache/:/etc/nginx/cache
-      - /etc/letsencrypt/:/etc/letsencrypt/
     ports:
       -  1337:80
     depends_on:
