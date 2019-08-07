@@ -16,7 +16,7 @@ jobs:
 
       - run: git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
       - run: docker-compose -f docker-compose.yml -f $1 up -d db user_db db_kone
-      - run: source ./scripts/scripts.sh && db_anon_setup_full
+      - run: source ./scripts/scripts.sh && db_anon_setup_full && init_dirs
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d --no-recreate
       - run: docker ps
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f &
