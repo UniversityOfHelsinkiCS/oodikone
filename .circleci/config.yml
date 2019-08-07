@@ -3,7 +3,7 @@ orbs:
   cypress: cypress-io/cypress@1.7.0
 jobs:
   build:
-    docker:
+    machine:
       - image: circleci/node:10.15.3
     steps:
       - setup_remote_docker
