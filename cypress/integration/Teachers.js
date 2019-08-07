@@ -17,6 +17,18 @@ describe('Teachers page tests', () => {
     cy.contains("Teacher statistics by course providers")
   })
 
+  it("Check Statistics", () => {
+    cy.get(':nth-child(1) > .ui > .search').click()
+    cy.contains('Autumn 2017').click()
+    cy.get('.form > :nth-child(2) > .ui').click()
+    cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+    cy.get('.form > .fluid').click()
+    cy.contains('Name')
+    cy.contains('Wu')
+    cy.contains('Jämsä')
+    cy.contains('Kuusinen')
+  })
+
   it("Teacher search works", () => {
     cy.url().should('include', '/teachers')
     cy.get('.borderless > :nth-child(3)').click()
@@ -41,5 +53,19 @@ describe('Teachers page tests', () => {
     cy.get('.prompt').type('Pekka')
     cy.contains('Professori').click()
     cy.contains('Name').should('not.exist')
+  })
+
+  it("Check leaderboad works", () => {
+    cy.get('.borderless > :nth-child(2)').click()
+    cy.get(':nth-child(1) > .ui > .search').click()
+    cy.contains('2018-19').click()
+    cy.contains("Recalculate this year").click()
+    cy.wait(50000)
+    cy.reload()
+    cy.get(':nth-child(1) > .ui > .search').click()
+    cy.contains('2018-19').click()
+    cy.contains("Passed")
+    cy.contains("Auvinen")
+    cy.contains("Ulfvens")
   })
 })
