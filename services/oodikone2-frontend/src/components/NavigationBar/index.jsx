@@ -1,217 +1,198 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Menu, Dropdown, Button } from 'semantic-ui-react'
 import { NavLink, Link, withRouter } from 'react-router-dom'
 import { func, shape, string } from 'prop-types'
 import { connect } from 'react-redux'
-import { routes } from '../../constants'
 import { userRoles, userRights, getAsUserWithoutRefreshToken } from '../../common'
-import './navigationBar.css'
 import { login as loginAction, logout as logoutAction } from '../../redux/auth'
 import LanguageChooser from '../LanguageChooser'
+import './navigationBar.css'
 
 const { USER_ADMINER_URL, ADMINER_URL, ANALYTICS_ADMINER_URL, USAGE_ADMINER_URL, KONE_ADMINER_URL } = process.env
+const adminerUrls = [
+  { url: ADMINER_URL, text: 'Database' },
+  { url: USER_ADMINER_URL, text: 'User database' },
+  { url: ANALYTICS_ADMINER_URL, text: 'Analytics database' },
+  { url: KONE_ADMINER_URL, text: 'Kone database' },
+  { url: USAGE_ADMINER_URL, text: 'Usage database' }
+]
 
-class NavigationBar extends Component {
-  state = {
-    navigationRoutes: routes
-  }
+const allNavigationItems = {
+  populations: {
+    translateId: 'studyProgramme',
+    items: [
+      { path: '/populations', translateId: 'class' },
+      { path: '/study-programme', translateId: 'overview' }
+    ]
+  },
+  students: { path: '/students', translateId: 'students' },
+  courseStatistics: { path: '/coursestatistics', translateId: 'courseStatistics' },
+  teachers: { path: '/teachers', translateId: 'teachers', reqRights: ['teachers'] },
+  users: { path: '/users', translateId: 'users', reqRights: ['users'] },
+  faculty: { path: '/faculties', translateId: 'faculty', reqRights: ['dev'] },
+  usage: { path: '/usage', translateId: 'usage', reqRights: ['usage'] },
+  sandbox: { path: '/sandbox', translateId: 'sandbox', reqRights: ['dev'] },
+  oodilearn: { path: '/oodilearn', translateId: 'oodilearn', reqRights: ['oodilearn'] },
+  feedback: { path: '/feedback', translateId: 'feedback' }
+}
 
-  async componentDidMount() {
-    await this.setNavigationRoutes()
-  }
+const NavigationBar = (props) => {
+  const {
+    token,
+    logout,
+    history,
+    translate: t,
+    login
+  } = props
+  const [visibleNavigationItems, setVisibleNavigationItems] = useState(allNavigationItems)
 
-  async componentWillReceiveProps(nextProps) {
-    if (this.props.token !== nextProps.token) {
-      await this.setNavigationRoutes()
-      this.render()
-    }
-  }
-
-  setNavigationRoutes = async () => {
-    const navigationRoutes = { ...routes }
-    const roles = await userRoles()
-    Object.keys(navigationRoutes).forEach((key) => {
-      if (navigationRoutes[key].reqRights && roles.every(r => navigationRoutes[key].reqRights.indexOf(r) === -1)) {
-        delete navigationRoutes[key]
+  const refreshNavigationRoutes = () => {
+    const visibleNavigationItems = {}
+    const roles = userRoles()
+    const rights = userRights()
+    Object.keys(allNavigationItems).forEach((key) => {
+      if (key === 'courseStatistics') {
+        if (!roles.includes('admin') && rights.length === 0) {
+          return
+        }
+      }
+      const { reqRights } = allNavigationItems[key]
+      if (!reqRights || roles.some(r => reqRights.indexOf(r) !== -1)) {
+        visibleNavigationItems[key] = allNavigationItems[key]
       }
     })
-    const rights = await userRights()
-    if (!roles.includes('admin')) {
-      if (rights.length === 0) {
-        delete navigationRoutes.courseStatistics
-      }
-    }
-    this.setState({ navigationRoutes })
+    setVisibleNavigationItems({ ...visibleNavigationItems })
   }
 
-  returnToSelf = () => async () => {
-    this.props.logout()
-    this.props.history.push('/')
+  useEffect(() => {
+    refreshNavigationRoutes()
+  }, [token])
+
+  const returnToSelf = () => {
+    logout()
+    history.push('/')
   }
 
-  renderUserMenu = (itemWidth) => {
-    const { translate, login, logout } = this.props
-    if (process.env.NODE_ENV === 'development') {
-      const testUsers = ['tktl']
-      return (
+  const renderHome = () => (
+    <Menu.Item
+      as={Link}
+      to="/"
+      tabIndex="-1"
+    >
+      <span className="logo">
+        <h2 className="logoText">oodikone</h2>
+      </span>
+    </Menu.Item>
+  )
+
+  const renderNavigationRoutes = () => (
+    Object.values(visibleNavigationItems).map(({ items, path, translateId }) => (
+      items ?
+        (
+          <Menu.Item
+            as={Dropdown}
+            key={`menu-item-drop-${translateId}`}
+            tabIndex="-1"
+            text={t(`navigationBar.${translateId}`)}
+          >
+            <Dropdown.Menu>
+              {items.map(i => (
+                <Dropdown.Item
+                  as={NavLink}
+                  key={`menu-item-${i.path}`}
+                  to={i.path}
+                  tabIndex="-1"
+                >
+                  {t(`navigationBar.${i.translateId}`)}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Menu.Item>
+        ) :
+        (
+          <Menu.Item
+            as={NavLink}
+            key={`menu-item-${path}`}
+            to={path}
+            tabIndex="-1"
+          >
+            {t(`navigationBar.${translateId}`)}
+          </Menu.Item>
+        )
+    ))
+  )
+
+  const testUsers = ['tktl']
+  const renderUserMenu = () => (
+    process.env.NODE_ENV === 'development' ?
+      (
         <Menu.Item
           as={Dropdown}
-          style={{ backgroundColor: 'purple', color: 'white', width: `${itemWidth}%` }}
+          style={{ backgroundColor: 'purple', color: 'white' }}
           text="Dev controls"
           tabIndex="-1"
         >
           <Dropdown.Menu>
-            {ADMINER_URL && (
-              <Dropdown.Item
-                onClick={() => {
-                  const win = window.open(ADMINER_URL, '_blank')
-                  win.focus()
-                }}
-                text="Database"
-                icon="database"
-              />
-            )}
-            {USER_ADMINER_URL && (
-              <Dropdown.Item
-                onClick={() => {
-                  const win = window.open(USER_ADMINER_URL, '_blank')
-                  win.focus()
-                }}
-                text="User database"
-                icon="database"
-              />
-            )}
-            {ANALYTICS_ADMINER_URL && (
-              <Dropdown.Item
-                onClick={() => {
-                  const win = window.open(ANALYTICS_ADMINER_URL, '_blank')
-                  win.focus()
-                }}
-                text="Analytics database"
-                icon="database"
-              />
-            )}
-            {KONE_ADMINER_URL && (
-              <Dropdown.Item
-                onClick={() => {
-                  const win = window.open(KONE_ADMINER_URL, '_blank')
-                  win.focus()
-                }}
-                text="Kone database"
-                icon="database"
-              />
-            )}
-            {USAGE_ADMINER_URL && (
-              <Dropdown.Item
-                onClick={() => {
-                  const win = window.open(USAGE_ADMINER_URL, '_blank')
-                  win.focus()
-                }}
-                text="Usage database"
-                icon="database"
-              />
-            )}
-            {testUsers.map(user => (
-              <Dropdown.Item
-                key={user}
-                icon="user"
-                text={`Use as: ${user}`}
-                onClick={() => login()}
-              />
-            ))}
+            {
+              adminerUrls.map(({ url, text }) => (
+                <Dropdown.Item
+                  key={url}
+                  onClick={() => {
+                    const win = window.open(url, '_blank')
+                    win.focus()
+                  }}
+                  text={text}
+                  icon="database"
+                />
+              ))
+            }
+            {
+              testUsers.map(user => (
+                <Dropdown.Item
+                  key={user}
+                  icon="user"
+                  text={`Use as: ${user}`}
+                  onClick={() => login()}
+                />
+              ))
+            }
             <Dropdown.Item
               icon="log out"
-              text={translate('navigationBar.logout')}
+              text={t('navigationBar.logout')}
               onClick={logout}
             />
           </Dropdown.Menu>
         </Menu.Item>
+      ) :
+      (
+        <Menu.Item link onClick={logout} icon="log out" tabIndex="-1">
+          {t('navigationBar.logout')}
+        </Menu.Item>
       )
-    }
+  )
 
-    return (
-      <Menu.Item link onClick={logout} icon="log out" tabIndex="-1" style={{ width: `${itemWidth}%` }}>
-        {translate('navigationBar.logout')}
-      </Menu.Item>
-    )
-  }
+  const renderLanguageChooser = () => (
+    <Menu.Item>
+      <LanguageChooser />
+    </Menu.Item>
+  )
 
-  render() {
-    const { translate: t } = this.props
-    const asUser = getAsUserWithoutRefreshToken()
-    const { navigationRoutes } = this.state
-    const menuWidth = asUser ? Object.keys(navigationRoutes).length + 3 : Object.keys(navigationRoutes).length + 2
-    const itemWidth = 100 / menuWidth
-    return (
-      <Menu stackable fluid widths={menuWidth} className="navBar">
-        <Menu.Item
-          style={{ width: `${itemWidth}%` }}
-          as={Link}
-          to={navigationRoutes.index.route}
-          tabIndex="-1"
-        >
-          <span className="logo">
-            <h2 className="logoText">oodikone</h2>
-          </span>
-        </Menu.Item>
-        {
-          Object.values(navigationRoutes).map((value) => {
-            const viewableRoute = value.menuRoute
-            if (value.items) {
-              return (
-                <Menu.Item
-                  style={{ width: `${itemWidth}%` }}
-                  as={Dropdown}
-                  key={`menu-item-drop-${value.translateId}`}
-                  tabIndex="-1"
-                  text={t(`navigationBar.${value.translateId}`)}
-                >
-                  <Dropdown.Menu>
-                    {value.items.map(i => (
-                      <Dropdown.Item
-                        as={NavLink}
-                        key={`menu-item-${i.menuRoute}`}
-                        to={i.menuRoute}
-                        tabIndex="-1"
-                      >
-                        {t(`navigationBar.${i.translateId}`)}
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Menu>
-                </Menu.Item>
-              )
-            }
-            if (!viewableRoute) {
-              return null
-            }
-            return (
-              <Menu.Item
-                style={{ width: `${itemWidth}%` }}
-                as={NavLink}
-                key={`menu-item-${viewableRoute}`}
-                to={viewableRoute}
-                tabIndex="-1"
-              >
-                {t(`navigationBar.${value.translateId}`)}
-              </Menu.Item>
-            )
-          })
-        }
-        {this.renderUserMenu(itemWidth)}
-        <Menu.Item
-          style={{ width: `${itemWidth}%` }}
-        >
-          <LanguageChooser />
-        </Menu.Item>
-        {asUser ?
-          <Menu.Item
-            style={{ width: `${itemWidth}%` }}
-          >
-            <Button onClick={this.returnToSelf()}>Stop mocking as {asUser}</Button>
-          </Menu.Item>
-          : null}
-      </Menu>)
-  }
+  const asUser = getAsUserWithoutRefreshToken()
+  const renderStopMockingButton = () => (
+    <Menu.Item>
+      <Button onClick={returnToSelf}>Stop mocking as {asUser}</Button>
+    </Menu.Item>
+  )
+
+  return (
+    <Menu stackable fluid className="navBar">
+      { renderHome() }
+      { renderNavigationRoutes() }
+      { renderUserMenu() }
+      { renderLanguageChooser() }
+      { asUser && renderStopMockingButton() }
+    </Menu>
+  )
 }
 
 NavigationBar.propTypes = {
