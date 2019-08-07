@@ -13,7 +13,7 @@ opts.setMaxInFlight(1)
 stan.on('connect', function () {
 
   const sub = stan.subscribe('UpdateWrite', 'updater.workers', opts)
-  const attSub = stan.subscribe('UpdateAttainmentDates', opts)
+  const attSub = stan.subscribe('UpdateAttainmentDates', 'updater.workers.attainments', opts)
   const prioSub = stan.subscribe('PriorityWrite', 'updater.workers.prio', opts)
 
   const writeStudent = async (msg) => {
