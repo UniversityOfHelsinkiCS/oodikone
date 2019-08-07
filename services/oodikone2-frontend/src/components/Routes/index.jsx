@@ -1,7 +1,6 @@
 import React, { Suspense } from 'react'
 import { Route, Switch } from 'react-router-dom'
 import { Loader } from 'semantic-ui-react'
-import { routes } from '../../constants'
 
 const WelcomePage = React.lazy(() => import('../WelcomePage'))
 const Populations = React.lazy(() => import('../PopulationStatistics'))
@@ -18,23 +17,36 @@ const Faculty = React.lazy(() => import('../Faculty'))
 const CourseStudents = React.lazy(() => import('../CourseStudents'))
 const Updater = React.lazy(() => import('../Updater'))
 
+const routes = {
+  students: '/students/:studentNumber?',
+  courseStatistics: '/coursestatistics',
+  teachers: '/teachers/:teacherid?',
+  users: '/users/:userid?',
+  faculty: '/faculties/:facultyid?',
+  usage: '/usage',
+  sandbox: '/sandbox',
+  oodilearn: '/oodilearn',
+  feedback: '/feedback',
+  coursepopulation: '/coursepopulation'
+}
+
 const Routes = () => (
   <Suspense fallback={<Loader active inline="centered" />}>
     <Switch>
-      <Route exact path={routes.index.route} component={WelcomePage} />
+      <Route exact path="/" component={WelcomePage} />
       <Route exact path="/populations" component={Populations} />
       <Route exact path="/study-programme/:studyProgrammeId?" component={StudyProgramme} />
       <Route exact path="/study-programme/:studyProgrammeId/course-group/:courseGroupId" component={StudyProgramme} />
-      <Route exact path={routes.students.route} component={StudentStatistics} />
-      <Route exact path={routes.courseStatistics.route} component={CourseStatistics} />
-      <Route exact path={routes.faculty.route} component={Faculty} />
-      <Route exact path={routes.users.route} component={EnableUsers} />
-      <Route exact path={routes.teachers.route} component={Teachers} />
-      <Route exact path={routes.usage.route} component={UsageStatistics} />
-      <Route exact path={routes.sandbox.route} component={Sandbox} />
-      <Route exact path={routes.oodilearn.route} component={OodiLearn} />
-      <Route exact path={routes.feedback.route} component={Feedback} />
-      <Route exact path={routes.coursepopulation.route} component={CourseStudents} />
+      <Route exact path={routes.students} component={StudentStatistics} />
+      <Route exact path={routes.courseStatistics} component={CourseStatistics} />
+      <Route exact path={routes.faculty} component={Faculty} />
+      <Route exact path={routes.users} component={EnableUsers} />
+      <Route exact path={routes.teachers} component={Teachers} />
+      <Route exact path={routes.usage} component={UsageStatistics} />
+      <Route exact path={routes.sandbox} component={Sandbox} />
+      <Route exact path={routes.oodilearn} component={OodiLearn} />
+      <Route exact path={routes.feedback} component={Feedback} />
+      <Route exact path={routes.coursepopulation} component={CourseStudents} />
       <Route exact path="/updater" component={Updater} />
     </Switch>
   </Suspense>
