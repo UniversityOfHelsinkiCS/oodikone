@@ -1,7 +1,8 @@
 version: 2.1
 jobs:
   build:
-    machine: 'ubuntu-1604:201903-01' # enable latest latest docker compose version with --parallel flag
+    machine:
+      image: ubuntu-1604:201903-01 # enable latest latest docker compose version with --parallel flag
     steps:
       - run: docker --version
       - run: docker-compose --version
