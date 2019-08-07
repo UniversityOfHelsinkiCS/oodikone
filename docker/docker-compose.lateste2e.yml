@@ -50,11 +50,11 @@ services:
 
   nginx:
     image: nginx:latest
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/error.log:/etc/nginx/error_log.log
-      - ./nginx/log:/var/log/nginx/localhost.error_log
-      - ./nginx/cache/:/etc/nginx/cache
+    # volumes:
+    #   - ./nginx.conf:/etc/nginx/nginx.conf
+    #   - ./nginx/error.log:/etc/nginx/error_log.log
+    #   - ./nginx/log:/var/log/nginx/localhost.error_log
+    #   - ./nginx/cache/:/etc/nginx/cache
     ports:
       -  1337:80
     depends_on:
