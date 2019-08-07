@@ -12,14 +12,18 @@ jobs:
       - checkout
       - run: echo 'export IMAGE=CIRCLE' >> $BASH_ENV
       - run: echo 'export TAG=circle' >> $BASH_ENV
-      - run: npm ci
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml build --parallel
+
       - run: git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
-      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml build
-      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d
-
-      - run: docker-compose -f docker-compose.lateste2e.yml pull --ignore-pull-failures
-      - run: docker-compose -f docker-compose.lateste2e.yml build
-      - run: docker-compose -f docker-compose.lateste2e.yml up -d
+      - run: docker-compose -f docker-compose.yml -f $1 up -d db user_db db_kone
+      - run: source ./scripts/scripts.sh && db_anon_setup_full
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d --no-recreate
       - run: docker ps
-      - run: docker-compose logs
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f &
+      - run: until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
+      - run: npm ci
+      - run: npm run test_services
+      - run: CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
 
+      - run: docker ps -a
+      - run: if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
