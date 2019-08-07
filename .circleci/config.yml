@@ -1,0 +1,19 @@
+version: 2.1
+orbs:
+  cypress: cypress-io/cypress@1.7.0
+jobs:
+  build:
+    docker:
+      - image: circleci/node:10.15.3
+    steps:
+      - setup_remote_docker
+      - run: docker --version
+      - run: docker-compose --version
+      - checkout
+      - run: docker pull node:10
+      - run: docker-compose -f docker-compose.lateste2e.yml pull --ignore-pull-failures
+      - run: docker-compose -f docker-compose.lateste2e.yml build
+      - run: docker-compose -f docker-compose.lateste2e.yml up -d
+      - run: docker ps
+      - run: docker-compose logs
+
