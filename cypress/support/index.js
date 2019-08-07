@@ -19,13 +19,13 @@ import './commands'
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-describe('Before all tests', () => {
-    it('reset anon database', () => {
-      cy.exec(
-        'source ./scripts/scripts.sh && time reset_db_for_cypress',
-        { timeout: 5*60*1000 }
-      ).then(result => {
-        console.log(result)
-      })
-    })
-})
+// describe('Before all tests', () => {
+//     it('reset anon database', () => {
+//       cy.exec(
+//         'source ./scripts/scripts.sh && time reset_db_for_cypress',
+//         { timeout: 5*60*1000 }
+//       ).then(result => {
+//         console.log(result)
+//       })
+//     })
+// })
