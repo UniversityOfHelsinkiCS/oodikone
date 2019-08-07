@@ -12,9 +12,10 @@ jobs:
       - run: export IMAGE=CIRCLE
       - run: export TAG=circle
       - checkout
-      - run: source ./scripts/scripts.sh && time run_e2e_setup ./docker/docker-compose.lateste2e.yml ${TAG} ${SENTRY_RELEASE_VERSION}
-      - run: docker-compose -f docker-compose.lateste2e.yml build
-      - run: docker-compose -f docker-compose.lateste2e.yml up -d
+      - run: npm ci
+      - run: git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml build
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d
       - run: docker ps
       - run: docker-compose logs
 
