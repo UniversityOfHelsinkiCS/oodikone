@@ -80,8 +80,9 @@ describe('Population Statistics tests', () => {
 
     cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
       cy.get("tr").its('length').should('be.gte', 10)
+      cy.route('/api/v3/courseyearlystats**').as('coursePage')
       cy.contains("Opiskelijan digitaidot: orientaatio").siblings().find(".level").click()
-      cy.wait(1000)
+      cy.wait('@coursePage')
       cy.url().should('include', '/coursestatistics')
     })
     cy.contains("DIGI-000A")
@@ -102,15 +103,15 @@ describe('Population Statistics tests', () => {
     let filteredStudents = 1328493
     cy.contains("Credits gained during first").parentsUntil(".tab").get("table").within(() => {
       cy.get("tr").eq(1).find("td").eq(1).invoke("text").then(text => filteredStudents = Number(text))
+      cy.route('POST', '/api/v2/populationstatistics/courses**').as('courseData')
       cy.get("tr").eq(1).click()
-      cy.wait(1000)
+      cy.wait('@courseData')
     }).then(() => {
       checkAmountOfStudents(filteredStudents)
     })
 
     cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
       cy.contains("number at least").siblings().within(() => cy.get("input").clear())
-      cy.wait(1000)
       cy.contains("number at least").siblings().within(() => cy.get("input").type("0"))
       cy.contains("Matematiikan didaktiikka").siblings().eq(2).should("have.text", '1')
     })
