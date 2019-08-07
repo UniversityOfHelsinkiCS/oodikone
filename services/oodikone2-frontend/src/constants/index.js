@@ -46,30 +46,6 @@ lightgreen: '#90EE90',
 */
 import { chartblue, red, green, chartdarkg, chartlgreen, chartdarkred, chartlred } from '../styles/variables/colors'
 
-export const routes = {
-  index: { route: '/' },
-  populations: {
-    translateId: 'studyProgramme',
-    items: [
-      { menuRoute: '/populations', translateId: 'class' },
-      { menuRoute: '/study-programme', translateId: 'overview' }
-    ]
-  },
-  students: { menuRoute: '/students', route: '/students/:studentNumber?', translateId: 'students' },
-  courseStatistics: { menuRoute: '/coursestatistics', route: '/coursestatistics', translateId: 'courseStatistics' },
-  teachers: { menuRoute: '/teachers', route: '/teachers/:teacherid?', translateId: 'teachers', reqRights: ['teachers'] },
-  users: { menuRoute: '/users', route: '/users/:userid?', translateId: 'users', reqRights: ['users'] },
-  faculty: { menuRoute: '/faculties', route: '/faculties/:facultyid?', translateId: 'faculty', reqRights: ['dev'] },
-  usage: { menuRoute: '/usage', route: '/usage', translateId: 'usage', reqRights: ['usage'] },
-  sandbox: { menuRoute: '/sandbox', route: '/sandbox', translateId: 'sandbox', reqRights: ['dev'] },
-  oodilearn: { menuRoute: '/oodilearn', route: '/oodilearn', translateId: 'oodilearn', reqRights: ['oodilearn'] },
-  feedback: { menuRoute: '/feedback', route: '/feedback', translateId: 'feedback' },
-  coursepopulation: { menuRoute: null, route: '/coursepopulation', translateId: 'coursepopulation' }
-}
-
-export const hiddenRoutes = {
-}
-
 const assumeBasename = () => {
   const POSSIBLE_BASENAMES = ['testing']
   const haystack = window.location.pathname.split('/')

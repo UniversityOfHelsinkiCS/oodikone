@@ -1,7 +1,20 @@
 /* stylelint-disable */
 
 .navBar {
+  display: grid !important;
+  grid-auto-flow: column !important;
   border-radius: 0 !important;
+}
+
+.navBar::after {
+  content: none !important;
+}
+
+.navBar .item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: pink;
 }
 
 .logo {
