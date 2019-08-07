@@ -28,3 +28,9 @@ jobs:
 
       - run: docker ps -a
       - run: if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
+
+workflows:
+  build:
+    jobs:
+      - build
+      - cypress/run
