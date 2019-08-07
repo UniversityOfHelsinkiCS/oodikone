@@ -33,4 +33,6 @@ workflows:
   build:
     jobs:
       - build
-      - cypress/run
+      - cypress/run:
+        store_artifacts: true
+        command: cypress run --config video=true --port 1337
