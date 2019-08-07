@@ -4,7 +4,7 @@ describe('Teachers page tests', () => {
     cy.server({
       onAnyRequest: function (route, proxy) {
         if (Cypress.config().baseUrl.includes("http://localhost:1337/")) {
-          proxy.xhr.setRequestHeader('uid', 'admink')
+          proxy.xhr.setRequestHeader('uid', 'tktl')
           proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
           proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
           proxy.xhr.setRequestHeader('edupersonaffiliation', 'asdasd')
