@@ -18,7 +18,7 @@ const CourseStatsTab = ({ statistics, options, doSelect, selected }) => (
         onChange={(_, { value }) => doSelect(value)}
       />
     </Form>
-    {selected && <TeacherStatisticsTable statistics={statistics} onClickFn={() => {}} />}
+    {selected && <TeacherStatisticsTable statistics={statistics} onClickFn={() => { }} />}
   </div>
 )
 
@@ -34,117 +34,117 @@ CourseStatsTab.defaultProps = {
 }
 
 class CoursesTab extends Component {
-    state={
-      selectedSemester: null,
-      selectedCourse: null,
-      semesterOptions: [],
-      courseOptions: []
+  state = {
+    selectedSemester: null,
+    selectedCourse: null,
+    semesterOptions: [],
+    courseOptions: []
+  }
+
+  componentDidMount() {
+    const { courses } = this.props
+    const semesterOptions = this.semesterOptions()
+    const courseOptions = this.courseOptions()
+    const courseWithMostCredits = Object.values(courses).length > 0 ?
+      Object.values(courses).reduce((c1, c2) => (c1.stats.credits > c2.stats.credits ? c1 : c2)) : null
+    this.setState({
+      semesterOptions,
+      courseOptions,
+      selectedSemester: semesterOptions.length > 0 ? semesterOptions[0].value : null,
+      selectedCourse: courseWithMostCredits != null ? courseWithMostCredits.id : null
+    })
+  }
+
+  setCourse = selectedCourse => this.setState({ selectedCourse })
+
+  setSemester = selectedSemester => this.setState({ selectedSemester })
+
+  getCourseStats(courseid) {
+    if (!courseid) {
+      return []
     }
+    const { courses, semesters, language } = this.props
+    const course = courses[courseid]
+    return Object.entries(course.semesters).map(([semesterid, stats]) => ({
+      id: semesterid,
+      name: getTextIn(semesters[semesterid].name, language),
+      ...stats
+    }))
+  }
 
-    componentDidMount() {
-      const { courses } = this.props
-      const semesterOptions = this.semesterOptions()
-      const courseOptions = this.courseOptions()
-      const courseWithMostCredits = Object.values(courses)
-        .reduce((c1, c2) => (c1.stats.credits > c2.stats.credits ? c1 : c2), null)
-      this.setState({
-        semesterOptions,
-        courseOptions,
-        selectedSemester: semesterOptions.length > 0 ? semesterOptions[0].value : null,
-        selectedCourse: courseWithMostCredits != null ? courseWithMostCredits.id : null
-      })
+  getSemesterStats(semesterid) {
+    if (!semesterid) {
+      return []
     }
-
-    setCourse = selectedCourse => this.setState({ selectedCourse })
-
-    setSemester = selectedSemester => this.setState({ selectedSemester })
-
-    getCourseStats(courseid) {
-      if (!courseid) {
-        return []
-      }
-      const { courses, semesters, language } = this.props
-      const course = courses[courseid]
-      return Object.entries(course.semesters).map(([semesterid, stats]) => ({
-        id: semesterid,
-        name: getTextIn(semesters[semesterid].name, language),
-        ...stats
+    const { courses, language } = this.props
+    return Object.values(courses)
+      .filter(course => !!course.semesters[semesterid])
+      .map(({ id, name, semesters }) => ({
+        id,
+        name: getTextIn(name, language),
+        ...semesters[semesterid]
       }))
-    }
+  }
 
-    getSemesterStats(semesterid) {
-      if (!semesterid) {
-        return []
-      }
-      const { courses, language } = this.props
-      return Object.values(courses)
-        .filter(course => !!course.semesters[semesterid])
-        .map(({ id, name, semesters }) => ({
-          id,
-          name: getTextIn(name, language),
-          ...semesters[semesterid]
-        }))
-    }
-
-    semesterOptions() {
-      const { semesters, language } = this.props
-      return Object.values(semesters)
-        .map(({ name, id }) => ({
-          key: id,
-          value: id,
-          text: getTextIn(name, language)
-        }))
-        .sort((s1, s2) => s2.value - s1.value)
-    }
-
-    courseOptions() {
-      const { language } = this.props
-      const courses = Object.values(this.props.courses)
-      return courses.map(({ name, id }) => ({
+  semesterOptions() {
+    const { semesters, language } = this.props
+    return Object.values(semesters)
+      .map(({ name, id }) => ({
         key: id,
         value: id,
-        description: id,
         text: getTextIn(name, language)
       }))
-    }
+      .sort((s1, s2) => s2.value - s1.value)
+  }
 
-    dropdownOptions = () => ({
-      courses: this.courseOptions(),
-      semesters: this.semesterOptions()
-    })
+  courseOptions() {
+    const { language } = this.props
+    const courses = Object.values(this.props.courses)
+    return courses.map(({ name, id }) => ({
+      key: id,
+      value: id,
+      description: id,
+      text: getTextIn(name, language)
+    }))
+  }
 
-    render = () => {
-      const { selectedCourse, selectedSemester, courseOptions, semesterOptions } = this.state
-      return (
-        <Tab
-          menu={{ secondary: true, pointing: true }}
-          panes={[
-                {
-                    menuItem: 'Semester',
-                    render: () => (
-                      <CourseStatsTab
-                        options={semesterOptions}
-                        doSelect={this.setSemester}
-                        selected={selectedSemester}
-                        statistics={this.getSemesterStats(selectedSemester)}
-                      />
-                    )
-                },
-                {
-                    menuItem: 'Course',
-                    render: () => (
-                      <CourseStatsTab
-                        options={courseOptions}
-                        statistics={this.getCourseStats(selectedCourse)}
-                        doSelect={this.setCourse}
-                        selected={selectedCourse}
-                      />
-                    )
-                }
-            ]}
-        />
-      )
-    }
+  dropdownOptions = () => ({
+    courses: this.courseOptions(),
+    semesters: this.semesterOptions()
+  })
+
+  render = () => {
+    const { selectedCourse, selectedSemester, courseOptions, semesterOptions } = this.state
+    return (
+      <Tab
+        menu={{ secondary: true, pointing: true }}
+        panes={[
+          {
+            menuItem: 'Semester',
+            render: () => (
+              <CourseStatsTab
+                options={semesterOptions}
+                doSelect={this.setSemester}
+                selected={selectedSemester}
+                statistics={this.getSemesterStats(selectedSemester)}
+              />
+            )
+          },
+          {
+            menuItem: 'Course',
+            render: () => (
+              <CourseStatsTab
+                options={courseOptions}
+                statistics={this.getCourseStats(selectedCourse)}
+                doSelect={this.setCourse}
+                selected={selectedCourse}
+              />
+            )
+          }
+        ]}
+      />
+    )
+  }
 }
 
 CoursesTab.propTypes = {
