@@ -60,7 +60,7 @@ describe('Teachers page tests', () => {
     cy.get(':nth-child(1) > .ui > .search').click()
     cy.contains('2018-19').click()
     cy.contains("Recalculate this year").click()
-    cy.wait(50000)
+    cy.wait(5000)
     cy.reload()
     cy.get(':nth-child(1) > .ui > .search').click()
     cy.contains('2018-19').click()
