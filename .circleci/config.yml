@@ -9,13 +9,17 @@ jobs:
       - setup_remote_docker
       - run: docker --version
       - run: docker-compose --version
+      - checkout
       - run: export IMAGE=CIRCLE
       - run: export TAG=circle
-      - checkout
       - run: npm ci
       - run: git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml build
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d
+
+      - run: docker-compose -f docker-compose.lateste2e.yml pull --ignore-pull-failures
+      - run: docker-compose -f docker-compose.lateste2e.yml build
+      - run: docker-compose -f docker-compose.lateste2e.yml up -d
       - run: docker ps
       - run: docker-compose logs
 
