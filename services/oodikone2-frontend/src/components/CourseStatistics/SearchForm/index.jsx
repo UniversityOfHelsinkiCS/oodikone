@@ -9,7 +9,6 @@ import { clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
-import Progressbar from '../../Progressbar'
 import { getCourseSearchResults } from '../../../selectors/courses'
 import { useSearchHistory } from '../../../common'
 import SearchHistory from '../../SearchHistory'
@@ -230,7 +229,6 @@ const SearchForm = (props) => {
         handleSearch={pushQueryToUrl}
         items={searchHistory}
       />
-      {isLoading ? <Progressbar time={100} pending={isLoading} /> : null}
     </React.Fragment>
   )
 }
