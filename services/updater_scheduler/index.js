@@ -12,7 +12,7 @@ let scheduledCount = 0
 let fetchedCount = 0
 
 const updateTask = async ({ task, status, type, updatetime, active }) => {
-  const doc = { task, status, type, active }
+  const doc = { task, status, type }
   if (updatetime) doc.updatedAt = new Date()
   if (active != null) doc.active = active
   await Schedule.findOneAndUpdate({ task }, doc, { upsert: true })

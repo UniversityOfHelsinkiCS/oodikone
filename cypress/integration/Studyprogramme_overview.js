@@ -56,13 +56,51 @@ describe('Studyprogramme overview', () => {
     })
   })
 
-  it('can search for mandatory courses', () => {
+  it('can add and delete mandatory courses and labels', () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click()
     cy.contains('Mandatory Courses').click()
     cy.get('button').contains('Add Courses').click()
-    cy.get('input').eq(0).type('CSM')
+    cy.route('/api/v2/coursesmulti**').as('searchResponse')
+    cy.get('input').eq(1).type('Code Generation')
+    cy.wait('@searchResponse')
     cy.contains('Searched courses')
-    cy.contains('Code Generation')
+    cy.get('table').eq(0).contains('Code Generation').click()
+    cy.get('table').eq(1).contains('tr', 'Code Generation').contains('select label')
+
+    cy.contains('Group labels').click()
+    const label = 'cypress test label'
+    cy.contains(label).should('not.exist')
+    cy.contains('button', 'Add').should('be.disabled')
+    cy.get('input').eq(0).type(label)
+    cy.contains('button', 'Add').should('be.enabled').click()
+    cy.contains('button', 'Add').should('be.disabled')
+    cy.contains('table', label)
+
+    cy.contains('Mandatory courses').click()
+    cy.get('table').eq(0).contains('tr', 'Code Generation').contains('select label').click()
+    cy.contains(label).click()
+    cy.get('table').eq(0).contains('tr', 'Code Generation').within((el) => {
+      cy.get('div.dropdown>div').eq(0).within((el) => {
+        cy.contains('select label').should('not.exist')
+        cy.contains(label)
+      })
+      cy.get('i.clear').click()
+      cy.get('div.dropdown>div').eq(0).within((el) => {
+        cy.contains(label).should('not.exist')
+        cy.contains('select label')
+      })
+    })
+    cy.get('table').eq(0).contains('tr', 'Code Generation').contains('select label').click()
+    cy.contains(label).click()
+    cy.get('table').eq(0).contains('tr', 'Code Generation').contains('button', 'Delete').click()
+    cy.contains('Code Generation').should('not.exist')
+
+    cy.contains('Group labels').click()
+    cy.contains('tr', label).within((el) => {
+      cy.get('i.remove').click()
+    })
+    cy.contains('button', 'Remove').click()
+    cy.contains(label).should('not.exist')
   })
 
   it('can open Thesis page', () => {
