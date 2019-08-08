@@ -84,8 +84,6 @@ const deleteStudentStudyrights = async (studentnumber, transaction) => {
 
 const updateStudent = async (student) => {
   let { studentInfo, studyAttainments, semesterEnrollments, studyRights } = student
-  console.log('starting', studentInfo.studentnumber)
-  console.time(studentInfo.studentnumber)
 
   // sort data to avoid deadlocks
   semesterEnrollments = sortBy(semesterEnrollments, 'studentnumber', 'semestercode')
@@ -101,7 +99,6 @@ const updateStudent = async (student) => {
 
     if (studyRights) await updateStudyRights(studyRights, transaction)
     await transaction.commit()
-    console.timeEnd(studentInfo.studentnumber)
   } catch (err) {
     await transaction.rollback()
     throw err
