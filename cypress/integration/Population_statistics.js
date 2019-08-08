@@ -80,8 +80,9 @@ describe('Population Statistics tests', () => {
 
     cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
       cy.get("tr").its('length').should('be.gte', 10)
+      cy.route('/api/v3/courseyearlystats**').as('coursePage')
       cy.contains("Opiskelijan digitaidot: orientaatio").siblings().find(".level").click()
-      cy.wait(1000)
+      cy.wait('@coursePage')
       cy.url().should('include', '/coursestatistics')
     })
     cy.contains("DIGI-000A")
@@ -102,15 +103,15 @@ describe('Population Statistics tests', () => {
     let filteredStudents = 1328493
     cy.contains("Credits gained during first").parentsUntil(".tab").get("table").within(() => {
       cy.get("tr").eq(1).find("td").eq(1).invoke("text").then(text => filteredStudents = Number(text))
+      cy.route('POST', '/api/v2/populationstatistics/courses**').as('courseData')
       cy.get("tr").eq(1).click()
-      cy.wait(1000)
+      cy.wait('@courseData')
     }).then(() => {
       checkAmountOfStudents(filteredStudents)
     })
 
     cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
       cy.contains("number at least").siblings().within(() => cy.get("input").clear())
-      cy.wait(1000)
       cy.contains("number at least").siblings().within(() => cy.get("input").type("0"))
       cy.contains("Matematiikan didaktiikka").siblings().eq(2).should("have.text", '1')
     })
@@ -119,6 +120,29 @@ describe('Population Statistics tests', () => {
     cy.contains("Student names hidden").click()
     cy.contains("Oinonen").siblings().eq(2).click()
     cy.contains("Oinonen").invoke('text').then((text) => expect(text).to.equal('Oinonen Heidi Eeva Elisabet, 014473717'))
+  })
+
+  it('Student list checking works as intended', () => {
+    cy.contains("Select study programme").click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
+    cy.contains("See population").click()
+    cy.get("button").contains("show").click()
+    cy.contains("010483918")
+    cy.contains("666666666").should('not.exist')
+    cy.contains('button', "Check studentnumbers").click()
+    cy.contains('Check for studentnumbers')
+    cy.get('textarea').type("010483918").type('{enter}').type("666666666")
+    cy.contains('button', 'check students').click()
+    cy.contains('form', 'Results').within(e => {
+      cy.get('div').eq(0).within(e => {
+        cy.contains('student numbers in list but not in oodi')
+        cy.contains('666666666')
+      })
+      cy.get('div').eq(2).within(e => {
+        cy.contains('student numbers in oodi but not in list')
+        cy.contains('014896381')
+      })
+      cy.contains('010483918').should('not.exist')
+    })
   })
 
   it('All filters working', () => {

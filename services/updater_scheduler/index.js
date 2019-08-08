@@ -12,15 +12,15 @@ let scheduledCount = 0
 let fetchedCount = 0
 
 const updateTask = async ({ task, status, type, updatetime, active }) => {
-  const doc = { task, status, type, active }
+  const doc = { task, status, type }
   if (updatetime) doc.updatedAt = new Date()
   if (active != null) doc.active = active
   await Schedule.findOneAndUpdate({ task }, doc, { upsert: true })
 }
 
 stan.on('connect', async () => {
-  schedule('0 21 * * 5', async () => {
-    // Every Friday at 21:00
+  schedule('0 0 * * 6', async () => {
+    // Every Saturday at 00:00
     try {
       console.log('SCHEDULING STUDENTNUMBER CHECK')
       await scheduleStudentCheck()
@@ -31,8 +31,8 @@ stan.on('connect', async () => {
     }
   })
 
-  schedule('0 21 * * 6', async () => {
-    // Every Saturday at 21:00
+  schedule('0 12 * * 6', async () => {
+    // Every Saturday at 12:00
     try {
       console.log('SCHEDULING ALL STUDENTS')
       await scheduleAllStudents()
@@ -56,8 +56,8 @@ stan.on('connect', async () => {
     }
   })
 
-  schedule('0 21 * * 1-5', async () => {
-    // Every Monday through Thursday at 21:00
+  schedule('0 22 * * 1-4', async () => {
+    // Every Monday through Thursday at 22:00
     try {
       console.log('SCHEDULING ACTIVE STUDENTS')
       await scheduleActiveStudents()
@@ -119,7 +119,7 @@ stan.on('connect', async () => {
       return false
     }
     const isStudent = !!isValidStudentId(task)
-    logger.info(`Status changed for ${task} to ${status}`, { task: task, status: status, student: isStudent, timems: timems })
+    logger.info(`Status changed for ${task} to ${status}`, { task, status, student: isStudent, timems, active })
     await updateTask({ task, status, type: isStudent ? 'student' : 'other', updatetime, active })
   }
   statusSub.on('message', async (msg) => {
