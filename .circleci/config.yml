@@ -1,6 +1,7 @@
 version: 2.1
 jobs:
   build:
+    working_directory: ~/app
     machine:
       image: ubuntu-1604:201903-01 # enable latest latest docker compose version with --parallel flag
     steps:
@@ -9,7 +10,7 @@ jobs:
       - checkout
       - run: echo 'export IMAGE=CIRCLE' >> $BASH_ENV
       - run: echo 'export TAG=circle' >> $BASH_ENV
-      - run: docker pull node:10.15-alpine
+      - run: docker pull node:10.15-alpine # pull base image that everything inherits only once
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml build --parallel
 
       - run: git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
@@ -22,6 +23,10 @@ jobs:
       - run: npm ci
       - run: npm run test_services
       - run: CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
+      - store_artifacts:
+          path: cypress/videos
+      - store_artifacts:
+          path: cypress/screenshots
 
       - run: docker ps -a
       - run: if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
