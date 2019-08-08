@@ -152,7 +152,7 @@ services:
       - WAIT_HOSTS=nats:4222
       - NATS_URI=nats://nats:4222
       - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
-      - TOKEN=M1kkoVanh4LonkeroM0n5teri
+      - TOKEN=jotaindiibadaabaa
     #container_name: updater_api
 
   updater_writer:
