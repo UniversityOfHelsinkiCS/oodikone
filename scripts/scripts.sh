@@ -51,7 +51,7 @@ get_anon_oodikone() {
 
 restore_psql_from_backup () {
     docker cp $1 $2:/asd.sqz
-    docker exec -it $2 pg_restore -U postgres --no-owner -F c --dbname=$3 -j4 /asd.sqz
+    docker exec $2 pg_restore -U postgres --no-owner -F c --dbname=$3 -j4 /asd.sqz
 }
 
 # oodilearn
@@ -112,6 +112,16 @@ reset_db () {
     docker-compose-dev up -d db user_db db_kone
     db_anon_setup_full
     docker-compose-dev down
+}
+
+reset_db_for_cypress () {
+    # stop any service with connections to DB
+    docker-compose stop backend updater_writer
+    db_anon_setup_full
+    # restart services, run migrations
+    docker-compose restart backend updater_writer
+    # wait until backend is up
+    retry curl --silent --fail localhost:8080/ping
 }
 
 install_cli_npm_packages () {

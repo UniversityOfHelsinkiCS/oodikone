@@ -14,7 +14,7 @@ opts.setMaxInFlight(1)
 
 const hasActiveEnrollment = (semesterEnrollments) => {
   if (semesterEnrollments) {
-    const currentSemester = Math.floor((moment(new Date()).diff(moment('1950', 'YYYY'), 'months')) / 6)
+    const currentSemester = Math.floor((moment().diff(moment('1950', 'YYYY'), 'months')) / 6)
     const active = semesterEnrollments.find(e => e.semester_code === currentSemester && e.semester_enrollment_type_code === 1)
     return active ? true : false
   }
