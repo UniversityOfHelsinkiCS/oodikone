@@ -125,6 +125,7 @@ const superlogin = async (uid, asUser) => {
 
 const userIncludes = [
   {
+    separate: true,
     model: UserElementDetails,
     as: 'programme'
   },
