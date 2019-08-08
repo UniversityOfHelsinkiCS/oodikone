@@ -1,60 +1,52 @@
-// import { useState, useEffect } from 'react'
-// import { Progress } from 'semantic-ui-react'
-import { number, bool } from 'prop-types'
+import React, { useState, useEffect, useRef } from 'react'
+import { Progress } from 'semantic-ui-react'
+import { number } from 'prop-types'
+import { useDidMount } from '../../common'
+import './progressBar.css'
 
-const Progressbar = (/* { time, pending } */) => (
-  /* const [percentage, setPercentage] = useState(0)
-  const [complete, setComplete] = useState(false)
-  const [timerId, setTimerId] = useState(null)
-  const [timeoutId, setTimeoutId] = useState(null)
-
-  const startTimer = () => {
-    let amount = 0
-    const id = setInterval(() => {
-      amount += 1
-      setPercentage(amount)
-    }, time)
-    setTimerId(id)
-  }
+const ProgressBar = ({ progress }) => {
+  const timeoutId = useRef()
+  const [hidden, setHidden] = useState(true)
+  const [visible, setVisible] = useState(true)
+  const didMount = useDidMount()
 
   useEffect(() => {
-    if (pending) startTimer()
+    if (progress !== 100) {
+      setHidden(false)
+    }
 
     return () => {
-      clearInterval(timerId)
-      clearTimeout(timeoutId)
+      if (timeoutId.current) clearTimeout(timeoutId.current)
     }
-  }, [])
+  }, [didMount])
 
-  if (percentage === 96) clearInterval(timerId)
-
-  if (!pending && !complete) {
-    setPercentage(100)
-    clearInterval(timerId)
-    const tid = setTimeout(setComplete(true), 1000)
-    setTimeoutId(tid)
-  }
-
-  if (pending && complete) {
-    setPercentage(0)
-    setComplete(false)
-    startTimer()
-  } */
-
-  null
-  //  (
-  //   <Progress
-  //     percent={percentage}
-  //     disabled={complete}
-  //     progress
-  //     color="blue"
-  //   />
-  // )
-)
-
-Progressbar.propTypes = {
-  time: number.isRequired,
-  pending: bool.isRequired
+  useEffect(() => {
+    if (!didMount) return
+    if (progress === 100) {
+      setVisible(false)
+      timeoutId.current = setTimeout(() => {
+        setHidden(true)
+      }, 2000)
+    } else if (hidden || visible) {
+      setVisible(true)
+      setHidden(false)
+    }
+  }, [progress])
+  return (
+    hidden ?
+      null :
+      <Progress
+        percent={progress}
+        disabled={progress === 100}
+        progress
+        color="blue"
+        className={visible ? 'progressBar' : 'progressBarHidden'}
+      />
+  )
 }
 
-export default Progressbar
+ProgressBar.propTypes = {
+  progress: number.isRequired
+}
+
+export default ProgressBar
