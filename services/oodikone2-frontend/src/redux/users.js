@@ -6,12 +6,6 @@ export const getUsers = () => {
   return callController(route, prefix)
 }
 
-export const getEnabledUsers = () => {
-  const route = '/users/enabled'
-  const prefix = 'GET_ENABLED_USERS_'
-  return callController(route, prefix)
-}
-
 export const getAccessGroups = () => {
   const route = '/users/access_groups'
   const prefix = 'GET_ACCESSGROUPS_'
@@ -70,26 +64,6 @@ const reducer = (state = { data: [], enabledOnly: true }, action) => {
         data: action.response
       }
     case 'GET_USERS_SUCCESS':
-      return {
-        ...state,
-        pending: false,
-        error: false,
-        data: action.response
-      }
-    case 'GET_ENABLED_USERS_ATTEMPT':
-      return {
-        ...state,
-        enabledOnly: true,
-        pending: true
-      }
-    case 'GET_ENABLED_USERS_FAILURE':
-      return {
-        ...state,
-        pending: false,
-        error: true,
-        data: action.response
-      }
-    case 'GET_ENABLED_USERS_SUCCESS':
       return {
         ...state,
         pending: false,
