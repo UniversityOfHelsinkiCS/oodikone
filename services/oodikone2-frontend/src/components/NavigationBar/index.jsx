@@ -69,8 +69,8 @@ const NavigationBar = (props) => {
   }, [token])
 
   const returnToSelf = () => {
-    logout()
     history.push('/')
+    login(true, null, null, true)
   }
 
   const renderHome = () => (

@@ -1,8 +1,9 @@
-export const login = (force = false, retryRequestSettings = null, uid = null) => ({
+export const login = (force = false, retryRequestSettings = null, uid = null, refresh = false) => ({
   type: 'LOGIN_ATTEMPT',
   force,
   retryRequestSettings,
-  uid
+  uid,
+  refresh
 })
 
 export const logout = () => ({ type: 'LOGOUT_ATTEMPT' })

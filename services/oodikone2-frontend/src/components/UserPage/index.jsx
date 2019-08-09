@@ -83,7 +83,7 @@ class UserPage extends Component {
   allSpecializationIds = () => this.specializationOptions().map(sp => sp.key)
 
   showAs = async (uid) => {
-    this.props.login(false, null, uid)
+    this.props.login(false, null, uid, true)
     this.props.history.push('/')
   }
 
