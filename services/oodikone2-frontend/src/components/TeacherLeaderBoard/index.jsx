@@ -3,6 +3,7 @@ import { Segment, Message, Button, Popup } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { func, arrayOf, bool, shape, any, string } from 'prop-types'
+import moment from 'moment'
 import { getTopTeachersCategories } from '../../redux/teachersTopCategories'
 import { getTopTeachers } from '../../redux/teachersTop'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
@@ -50,7 +51,12 @@ class TeacherLeaderBoard extends Component {
   render() {
     const { statistics, updated, isLoading, yearoptions, categoryoptions } = this.props
     const { selectedcategory, selectedyear, recalculating } = this.state
-    const filterYearoptions = yearoptions.filter(year => year.text.slice(0, 4) <= new Date().getFullYear())
+    const filterYearoptions = yearoptions.filter((year) => {
+      const options = moment(new Date())
+        .diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0 ?
+        year.text.slice(0, 4) <= new Date().getFullYear() : year.text.slice(0, 4) < new Date().getFullYear()
+      return options
+    })
     return (
       <div>
         {isLoading
