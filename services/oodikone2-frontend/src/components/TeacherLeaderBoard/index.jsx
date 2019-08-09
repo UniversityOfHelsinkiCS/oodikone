@@ -50,6 +50,7 @@ class TeacherLeaderBoard extends Component {
   render() {
     const { statistics, updated, isLoading, yearoptions, categoryoptions } = this.props
     const { selectedcategory, selectedyear, recalculating } = this.state
+    const filterYearoptions = yearoptions.filter(year => year.text.slice(0, 4) <= new Date().getFullYear())
     return (
       <div>
         {isLoading
@@ -61,7 +62,7 @@ class TeacherLeaderBoard extends Component {
                 Teachers who have produced the most credits from all departments.
               </Message>
               <LeaderForm
-                yearoptions={yearoptions}
+                yearoptions={filterYearoptions}
                 categoryoptions={categoryoptions}
                 handleChange={this.handleChange}
                 updateAndSubmitForm={this.updateAndSubmitForm}
