@@ -4,7 +4,7 @@ import { getActiveLanguage } from 'react-localize-redux'
 import { withRouter } from 'react-router-dom'
 import { func, arrayOf, object, shape, string, bool, oneOfType, number } from 'prop-types'
 import { Card, Icon, Button } from 'semantic-ui-react'
-import _ from 'lodash'
+import { minBy } from 'lodash'
 import './populationQueryCard.css'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
 import { reformatDate, getTextIn } from '../../common'
@@ -50,7 +50,7 @@ const PopulationQueryCard =
               {`${translate('populationStatistics.sampleSize', { amount: students.length })} `}
             </div>
             <div>
-              {`Updated at ${reformatDate(_.minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}
+              {`Updated at ${reformatDate(minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}
             </div>
             <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students</div>
             <div>{studentStatuses.includes('CANCELLED') ? 'Includes ' : 'Excludes '}

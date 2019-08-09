@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Header, Button, Form, Radio } from 'semantic-ui-react'
 import { func, arrayOf, bool, shape, string } from 'prop-types'
-import _ from 'lodash'
+import { union, uniq, difference } from 'lodash'
 
 import CreditsLessThan from '../PopulationFilters/CreditsLessThan'
 import CreditsAtLeast from '../PopulationFilters/CreditsAtLeast'
@@ -32,14 +32,14 @@ const CourseStudentsFilters = ({ samples, filters, clearPopulationFiltersDispatc
 
   const renderAddFilters = () => {
     const { Add } = infotooltips.PopulationStatistics.Filters
-    const allFilters = _.union(Object.keys(componentFor))
+    const allFilters = union(Object.keys(componentFor))
 
-    const setFilters = _.union(
+    const setFilters = union(
       filters.map(f => f.type),
       filters.filter(f => f.type === 'Preset').map(f => f.id),
     )
 
-    const unsetFilters = _.uniq(_.difference(allFilters, setFilters))
+    const unsetFilters = uniq(difference(allFilters, setFilters))
     if (unsetFilters.length === 0) {
       return null
     }

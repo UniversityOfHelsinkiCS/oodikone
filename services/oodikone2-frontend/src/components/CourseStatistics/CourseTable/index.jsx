@@ -1,5 +1,5 @@
 import React from 'react'
-import _ from 'lodash'
+import { sortBy } from 'lodash'
 import { Segment, Table } from 'semantic-ui-react'
 import { func, arrayOf, shape, string, bool } from 'prop-types'
 import { getActiveYears } from '../courseStatisticsUtils'
@@ -8,7 +8,7 @@ import './courseTable.css'
 
 const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false }) => {
   const noContent = courses.length === 0
-  const sortedCourses = !noContent && _.sortBy(courses, course => course.name)
+  const sortedCourses = !noContent && sortBy(courses, course => course.name)
 
   const getEmptyListRow = () => (
     <Table.Row>

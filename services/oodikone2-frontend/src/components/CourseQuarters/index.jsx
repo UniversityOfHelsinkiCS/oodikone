@@ -1,13 +1,13 @@
 import React from 'react'
 import { jStat } from 'jStat'
-import _ from 'lodash'
+import { sortBy } from 'lodash'
 import { func, arrayOf, object } from 'prop-types'
 
 import SearchResultTable from '../SearchResultTable'
 import { getStudentTotalCredits } from '../../common'
 
 const getStudentSampleInSplitQuarters = (students) => {
-  const sortedStudents = _.sortBy(students, student => getStudentTotalCredits(student))
+  const sortedStudents = sortBy(students, student => getStudentTotalCredits(student))
   const quarterSize = Math.floor(sortedStudents.length / 4)
   return [
     sortedStudents.slice(0, quarterSize),
