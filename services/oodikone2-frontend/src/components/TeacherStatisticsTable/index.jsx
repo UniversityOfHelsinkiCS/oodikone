@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Table, Segment } from 'semantic-ui-react'
 import { shape, arrayOf, any, string, number, func } from 'prop-types'
-import _ from 'lodash'
+import { sortBy } from 'lodash'
 
 const calculatePassrate = (pass, fail) => (100 * pass) / (pass + fail)
 
@@ -31,7 +31,7 @@ class TeacherStatisticsTable extends Component {
       ...stat,
       passrate: calculatePassrate(stat.passed, stat.failed)
     }))
-    const sorted = _.sortBy(formatted, selected)
+    const sorted = sortBy(formatted, selected)
     return direction === 'ascending' ? sorted : sorted.reverse()
   }
 

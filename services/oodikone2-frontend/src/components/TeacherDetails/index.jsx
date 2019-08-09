@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { shape, string } from 'prop-types'
-import _ from 'lodash'
+import { isString } from 'lodash'
 import { Card, Tab, Icon } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
@@ -22,7 +22,7 @@ const formatStatisticsForTable = (statistics, language) => {
   return Object.values(statistics).map(({ name, stats, ...rest }) => ({
     ...rest,
     ...stats,
-    name: _.isString(name) ? name : getTextIn(name, language)
+    name: isString(name) ? name : getTextIn(name, language)
   }))
 }
 

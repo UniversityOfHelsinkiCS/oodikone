@@ -4,6 +4,7 @@
   "description": "Simple CLI tool for setting up the development environment for Oodikone. The entire development environment runs inside of a Docker network that's defined in the docker-compose.yml file. The specifics of what this means for setting up the environment and accessing logs is discussed in a later section.",
   "main": "./scripts/run.sh",
   "scripts": {
+    "cypress": "cypress",
     "cypress:open": "CYPRESS_baseUrl=http://localhost:8081 cypress open",
     "cypress:run": "CYPRESS_baseUrl=http://localhost:8081 cypress run --config video=true --config videoCompression=false -P ./",
     "cypress:record": "cypress run --config videoUploadOnPasses=false --config videoCompression=false -P ./",

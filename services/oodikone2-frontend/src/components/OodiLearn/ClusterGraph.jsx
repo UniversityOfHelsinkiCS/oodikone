@@ -4,7 +4,7 @@ import { Segment } from 'semantic-ui-react'
 import Highcharts from 'highcharts'
 import ReactHighchart from 'react-highcharts'
 
-import _ from 'lodash'
+import { min, max } from 'lodash'
 
 class ClusterGraph extends PureComponent {
   state = {
@@ -26,10 +26,10 @@ class ClusterGraph extends PureComponent {
 
   componentDidMount() {
     const { name, points, students, grades } = this.props.data.course // eslint-disable-line
-    const minY = _.min(points.map(p => p[1]))
-    const maxY = _.max(points.map(p => p[1]))
-    const minX = _.min(points.map(p => p[0]))
-    const maxX = _.max(points.map(p => p[0]))
+    const minY = min(points.map(p => p[1]))
+    const maxY = max(points.map(p => p[1]))
+    const minX = min(points.map(p => p[0]))
+    const maxX = max(points.map(p => p[0]))
 
     let { series } = this.state
 
