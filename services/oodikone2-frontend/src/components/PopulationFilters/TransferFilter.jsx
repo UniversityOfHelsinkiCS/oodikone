@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Icon, Dropdown, Button, Form, Popup } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
-import _ from 'lodash'
+import { sortBy } from 'lodash'
 
 import infoTooltips from '../../common/InfoToolTips'
 import { getTextIn } from '../../common'
@@ -101,7 +101,7 @@ class TransferFilter extends Component {
                   placeholder="select source"
                   onChange={this.handleChange}
                   value={this.state.courseType}
-                  options={_.sortBy(Object.entries(filteredSources).map(([value, text]) => ({
+                  options={sortBy(Object.entries(filteredSources).map(([value, text]) => ({
                     value,
                     text: getTextIn(text.name, activeLanguage)
                   })), entry => entry.text)}
@@ -122,7 +122,7 @@ class TransferFilter extends Component {
                   placeholder="select target"
                   onChange={this.handleChange}
                   value={this.state.discipline}
-                  options={_.sortBy(Object.entries(filteredTargets).map(([value, text]) => ({
+                  options={sortBy(Object.entries(filteredTargets).map(([value, text]) => ({
                     value,
                     text: getTextIn(text.name, activeLanguage)
                   })), entry => entry.text)}

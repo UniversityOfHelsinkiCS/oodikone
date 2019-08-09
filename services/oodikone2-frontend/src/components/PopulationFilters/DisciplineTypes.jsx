@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Dropdown, Button, Form, Input, Popup } from 'semantic-ui-react'
 import { shape, func, arrayOf, object } from 'prop-types'
-import _ from 'lodash'
+import { sortBy } from 'lodash'
 
 import infoTooltips from '../../common/InfoToolTips'
 import { courseParticipation } from '../../populationFilters'
@@ -66,7 +66,7 @@ class DisciplineTypes extends Component {
                   placeholder="course type"
                   onChange={this.handleChange}
                   value={this.state.courseType}
-                  options={_.sortBy(Object.entries(courseTypes).map(([value, text]) => ({
+                  options={sortBy(Object.entries(courseTypes).map(([value, text]) => ({
                     text: text.fi,
                     value
                   })), entry => entry.text)}
@@ -87,7 +87,7 @@ class DisciplineTypes extends Component {
                   placeholder="discipline"
                   onChange={this.handleChange}
                   value={this.state.discipline}
-                  options={_.sortBy(Object.entries(disciplines).map(([value, text]) => ({
+                  options={sortBy(Object.entries(disciplines).map(([value, text]) => ({
                     text: text.fi,
                     value
                   })), entry => entry.text)}

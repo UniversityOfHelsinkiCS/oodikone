@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Header, Button, Form, Radio, Modal, Icon, TextArea, Input, Loader } from 'semantic-ui-react'
 import { object, func, arrayOf, bool, shape, string } from 'prop-types'
-import _ from 'lodash'
+import { union, uniq, difference } from 'lodash'
 import uuidv4 from 'uuid/v4'
 
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
@@ -186,16 +186,16 @@ class PopulationFilters extends Component {
   renderAddFilters(allStudyRights) {
     const { extents, transfers, populationCourses } = this.props
     const { Add } = infotooltips.PopulationStatistics.Filters
-    const allFilters = _.union(Object.keys(componentFor).filter(f =>
+    const allFilters = union(Object.keys(componentFor).filter(f =>
       !(Object.keys(advancedFilters).includes(f) && !this.state.advancedUser)).map(f =>
         String(f)), this.state.presetFilters.map(f => f.id).filter(f => this.state.advancedUser))
 
-    const setFilters = _.union(
+    const setFilters = union(
       this.props.filters.map(f => f.type),
       this.props.filters.filter(f => f.type === 'Preset').map(f => f.id),
 
     )
-    const unsetFilters = _.uniq(_.difference(allFilters, setFilters.filter(setFilter => !Object.keys(persistantFilters).includes(setFilter))))
+    const unsetFilters = uniq(difference(allFilters, setFilters.filter(setFilter => !Object.keys(persistantFilters).includes(setFilter))))
     if (unsetFilters.length === 0) {
       return null
     }

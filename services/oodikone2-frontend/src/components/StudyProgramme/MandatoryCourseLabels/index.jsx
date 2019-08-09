@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import _ from 'lodash'
+import { orderBy } from 'lodash'
 import { Segment, Form, Table, Button, Modal, Header } from 'semantic-ui-react'
 import { string, func, shape, arrayOf } from 'prop-types'
 import {
@@ -32,7 +32,7 @@ const MandatoryCourseLabels = ({
       </Form>
       <Table compact className="fixed-header">
         <Table.Body>
-          {_.orderBy(labels, ['orderNumber']).map((label, index) => (
+          {orderBy(labels, ['orderNumber']).map((label, index) => (
             <Table.Row key={label.id}>
               <Table.Cell>{label.label}</Table.Cell>
               <Table.Cell collapsing>

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import _ from 'lodash'
+import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
 import { getTextIn, getRolesWithoutRefreshToken } from '../../common'
@@ -21,7 +21,7 @@ const formatToDropdown = (elements, language) => {
     description: e.code,
     text: getTextIn(e.name, language)
   }))
-  return _.sortBy(options, 'text')
+  return sortBy(options, 'text')
 }
 
 class UserPage extends Component {
@@ -179,7 +179,7 @@ class UserPage extends Component {
                   multiple
                   search
                   value={this.props.user.faculty.map(f => f.faculty_code)}
-                  options={_.sortBy(this.props.faculties.map(f => ({ key: f.code, text: getTextIn(f.name, language), description: f.code, value: f.code })), ['text'])}
+                  options={sortBy(this.props.faculties.map(f => ({ key: f.code, text: getTextIn(f.name, language), description: f.code, value: f.code })), ['text'])}
                   onChange={(__, { value: facultycodes }) => this.props.setFaculties(user.id, facultycodes)}
                 />
               </Card.Description>
