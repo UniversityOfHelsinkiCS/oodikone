@@ -181,13 +181,13 @@ class SingleCourseStats extends Component {
         </Segment>
         <Segment>
           <Form>
-            <Header content="Filter statistics by study programme" as="h4" />
+            <Header content="Filter statistics by study programmes" as="h4" />
             <Form.Group widths="equal" >
               <ProgrammeDropdown
                 name="primary"
                 options={programmes}
                 label="Primary group"
-                placeholder="Select a study programme"
+                placeholder="Select study programmes"
                 value={primary}
                 onChange={this.handleSelect}
               />
