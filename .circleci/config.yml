@@ -26,11 +26,11 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - npmcache-v1-{{ checksum "package-lock.json" }}
+            - npmcache-v1-{{ checksum "package-lock.json" }}-
             - npmcache-v1-
       - run: npm install
       - save_cache:
-          key: npmcache-v1-{{ checksum "package-lock.json" }}
+          key: npmcache-v1-{{ checksum "package-lock.json" }}-{{ epoch }}
           paths:
             - node_modules
             - ~/.cache
