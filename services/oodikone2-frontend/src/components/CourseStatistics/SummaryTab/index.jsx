@@ -35,10 +35,10 @@ class SummaryTab extends Component {
         <div>
           <Segment>
             <Form>
-              <Header content="Filter statistics by study programme" as="h4" />
+              <Header content="Filter statistics by study programmes" as="h4" />
               <ProgrammeDropdown
                 options={programmes}
-                label="Study programme:"
+                label="Study programmes:"
                 name={fields.programmes}
                 onChange={this.handleChange}
                 value={this.props.form[fields.programmes]}
