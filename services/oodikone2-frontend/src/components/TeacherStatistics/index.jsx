@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { shape, func, arrayOf, bool } from 'prop-types'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
+import moment from 'moment'
 import { getProviders } from '../../redux/providers'
 import { getSemesters } from '../../redux/semesters'
 import { getTeacherStatistics } from '../../redux/teacherStatistics'
@@ -83,6 +84,13 @@ class TeacherStatistics extends Component {
       const { display, semesterStart, semesterEnd, userProviders, isAdmin } = this.state
       const invalidQueryParams = this.state.providers.length === 0 || !semesterStart
       const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
+      const filteredOptions = semesters.filter((sem) => {
+        const options = moment(new Date())
+          .diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0 ?
+          Number(sem.text.replace(/[^0-9]/g, '')) <= new Date().getFullYear() :
+          Number(sem.text.replace(/[^0-9]/g, '')) < new Date().getFullYear()
+        return options
+      })
       return (
         <div>
           <Message
@@ -99,7 +107,7 @@ class TeacherStatistics extends Component {
                   label="Start semester"
                   selection
                   search
-                  options={semesters}
+                  options={filteredOptions}
                   value={semesterStart}
                   onChange={this.setStartSemester}
                 />
@@ -109,7 +117,7 @@ class TeacherStatistics extends Component {
                   label="End semester"
                   selection
                   search
-                  options={semesters.filter(semester => semester.value > semesterStart)}
+                  options={filteredOptions.filter(semester => semester.value > semesterStart)}
                   disabled={!semesterStart}
                   value={semesterEnd}
                   onChange={this.handleChange}
