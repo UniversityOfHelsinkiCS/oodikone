@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import _ from 'lodash'
+import { orderBy } from 'lodash'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { Button, Message, Table, Segment, Icon, Loader, Label, Grid } from 'semantic-ui-react'
@@ -37,7 +37,7 @@ class CourseCodeMapper extends Component {
     const find = (query, language) => findCoursesDispatch(query, language)
     const rows = mandatoryCourses.data.map((course) => {
       const maincode = Object.keys(data).find(k => data[k].map(e => e.code).includes(course.code))
-      const duplicates = maincode ? _.orderBy(data[maincode].filter(e => e.code !== course.code), ['code'], ['ASC']) : []
+      const duplicates = maincode ? orderBy(data[maincode].filter(e => e.code !== course.code), ['code'], ['ASC']) : []
       return (
         <Table.Row key={course.code}>
           <Table.Cell>{`${course.code} ${this.getName(course.name)}`}</Table.Cell>
