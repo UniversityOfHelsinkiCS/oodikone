@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Header, Button, Form, Radio, Modal, Icon, TextArea, Input } from 'semantic-ui-react'
+import { Segment, Header, Button, Form, Radio, Modal, Icon, TextArea, Input, Loader } from 'semantic-ui-react'
 import { object, func, arrayOf, bool, shape, string } from 'prop-types'
 import _ from 'lodash'
 import uuidv4 from 'uuid/v4'
@@ -203,6 +203,7 @@ class PopulationFilters extends Component {
       return (
         <Segment>
           <Header>Add filters <InfoBox content={Add} /></Header>
+          <Loader active={populationCourses.pending} inline="centered" />
           <Button
             onClick={() => this.setState({ visible: true })}
             disabled={populationCourses.pending}

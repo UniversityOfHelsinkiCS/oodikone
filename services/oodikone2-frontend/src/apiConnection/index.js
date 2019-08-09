@@ -78,7 +78,7 @@ export const returnToSelf = async () => {
   await setToken(token)
 }
 
-export const callApi = async (url, method = 'get', data, params, timeout = 0) => {
+export const callApi = async (url, method = 'get', data, params, timeout = 0, progressCallback = null) => {
   let options = { headers: {}, timeout }
   if (isDevEnv) {
     options = devOptions
@@ -87,9 +87,13 @@ export const callApi = async (url, method = 'get', data, params, timeout = 0) =>
     options = testOptions
   }
 
+  const onDownloadProgress = ({ loaded, total }) => {
+    if (progressCallback) progressCallback(Math.round((loaded / total) * 100))
+  }
+
   switch (method) {
     case 'get':
-      return api.get(url, { ...options, params })
+      return api.get(url, { ...options, params, onDownloadProgress })
     case 'post':
       return api.post(url, data, options)
     case 'put':
@@ -109,14 +113,15 @@ export const superLogin = async (uid) => {
   return token
 }
 
-export const callController = (route, prefix, data, method = 'get', query, params) => {
+export const callController = (route, prefix, data, method = 'get', query, params, onProgress = null) => {
   const requestSettings = {
     route,
     method,
     data,
     prefix,
     query,
-    params
+    params,
+    onProgress
   }
   return { type: `${prefix}ATTEMPT`, requestSettings }
 }
@@ -126,10 +131,17 @@ export const handleRequest = store => next => async (action) => {
   const { requestSettings } = action
   if (requestSettings) {
     const {
-      route, method, data, prefix, query, params
+      route, method, data, prefix, query, params, onProgress
     } = requestSettings
     try {
-      const res = await callApi(route, method, data, params)
+      const res = await callApi(
+        route,
+        method,
+        data,
+        params,
+        0,
+        onProgress
+      )
       store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
     } catch (e) {
       // Something failed. Assume it's the token and try again.
@@ -151,7 +163,7 @@ export const handleAuth = store => next => async (action) => {
   next(action)
   const { type, force = false, retryRequestSettings, uid, refresh } = action
   const {
-    route, method, data, prefix, query, params
+    route, method, data, prefix, query, params, onProgress
   } = retryRequestSettings || {}
   if (type === 'LOGIN_SUCCESS' && refresh) window.location.reload()
   if (type === 'LOGIN_ATTEMPT') {
@@ -169,7 +181,7 @@ export const handleAuth = store => next => async (action) => {
       store.dispatch({ type: 'LOGIN_SUCCESS', token, refresh: uid })
       try {
         if (retryRequestSettings) {
-          const res = await callApi(route, method, data, params)
+          const res = await callApi(route, method, data, params, 0, onProgress)
           store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
         }
       } catch (err) {

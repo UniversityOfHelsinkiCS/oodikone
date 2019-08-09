@@ -1,0 +1,31 @@
+.progressBar,
+.progressBarHidden {
+  margin: 10px 0 10px 0 !important;
+}
+
+.progressBarHidden {
+  -webkit-animation-name: hide;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-fill-mode: forwards;
+  animation-name: hide;
+  animation-duration: 2s;
+  animation-fill-mode: forwards;
+}
+
+.progressBar.fixed,
+.progressBarHidden.fixed {
+  position: fixed;
+  bottom: 0;
+  left: 10px;
+  right: 10px;
+}
+
+@keyframes hide {
+  from {
+    opacity: 0.35;
+  }
+
+  to {
+    opacity: 0;
+  }
+}

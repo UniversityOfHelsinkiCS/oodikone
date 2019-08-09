@@ -6,7 +6,6 @@ import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 
 import SegmentDimmer from '../SegmentDimmer'
-import Progressbar from '../Progressbar'
 import PopulationCourseStats from '../PopulationCourseStats'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
@@ -36,7 +35,6 @@ const PopulationCourses = ({
 
   return (
     <React.Fragment>
-      <Progressbar time={140} pending={pending} />
       <Segment>
         <Header size="medium" dividing >
           <Popup

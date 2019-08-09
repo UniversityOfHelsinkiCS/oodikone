@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import moment from 'moment'
 import jwtDecode from 'jwt-decode'
 import Datetime from 'react-datetime'
@@ -310,4 +310,81 @@ export const flattenStudyrights = (studyrights) => {
     })
   })
   return studyrightcodes
+}
+
+export const useInterval = (callback, delay) => {
+  const savedCallback = useRef()
+  const savedId = useRef()
+
+  const clear = () => {
+    if (savedId.current) {
+      clearInterval(savedId.current)
+    }
+  }
+
+  useEffect(() => {
+    savedCallback.current = callback
+  }, [callback])
+
+  useEffect(() => {
+    const tick = () => savedCallback.current()
+    clear()
+    if (delay !== null) {
+      savedId.current = setInterval(tick, delay)
+    }
+    return clear
+  }, [delay])
+}
+
+export const useDidMount = () => {
+  const [didMount, setDidMount] = useState(false)
+  useEffect(() => {
+    setDidMount(true)
+  }, [])
+  return didMount
+}
+
+export const useProgress = (loading) => {
+  const didMount = useDidMount()
+  const [progress, setProgress] = useState(100)
+  const [delay, setDelay] = useState(null)
+  const amountToProgress = delay ? Math.ceil(Math.random() * 4) : 0
+
+  useInterval(() => {
+    setProgress(progress + amountToProgress > 50 ?
+      50 :
+      progress + amountToProgress)
+  }, delay)
+
+  useEffect(() => {
+    if (delay && progress >= 50) {
+      setDelay(null)
+    }
+  }, [progress])
+
+  const restartProgress = () => {
+    setProgress(0)
+    setDelay(500)
+  }
+
+  const finishProgress = () => {
+    setDelay(null)
+    setImmediate(() => setProgress(100))
+  }
+
+  useEffect(() => {
+    if (loading) restartProgress()
+    else if (didMount) finishProgress()
+  }, [loading])
+
+  const onProgress = (p) => {
+    if (p > 0) {
+      setProgress(50 + Math.floor(p / 2))
+    }
+  }
+
+  return {
+    progress,
+    onProgress
+  }
 }
