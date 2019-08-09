@@ -16,7 +16,6 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
   const handleDeleteTag = (event, tag) => {
     event.preventDefault()
     deleteTag(tag)
-    getTagsByStudytrack(studyprogramme)
   }
 
   const handleSubmit = (event) => {
@@ -27,7 +26,6 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     }
     createTag(newTag)
     setTagname('')
-    getTagsByStudytrack(studyprogramme)
   }
 
   const handleChange = ({ target }) => {

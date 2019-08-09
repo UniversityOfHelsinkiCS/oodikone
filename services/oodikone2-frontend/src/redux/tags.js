@@ -76,7 +76,8 @@ const reducer = (state = { data: [] }, action) => {
     case 'CREATE_TAG_SUCCESS':
       return {
         ...state,
-        pending: false
+        pending: false,
+        data: action.response
       }
     case 'DELETE_TAG_ATTEMPT':
       return {
@@ -91,7 +92,8 @@ const reducer = (state = { data: [] }, action) => {
     case 'DELETE_TAG_SUCCESS':
       return {
         ...state,
-        pending: false
+        pending: false,
+        data: action.response
       }
     default:
       return state
