@@ -4,7 +4,7 @@ import { Button, Radio, Icon, Header, Segment, Confirm, Loader, Label, Message }
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf, number } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
-import { getUsers, getEnabledUsers, sendEmail } from '../../redux/users'
+import { getUsers, sendEmail } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { getElementDetails } from '../../redux/elementdetails'
 import { makeSortUsers } from '../../selectors/users'
@@ -22,7 +22,7 @@ class EnableUsers extends Component {
   componentDidMount() {
     if (this.props.elementdetails.length === 0) this.props.getElementDetails()
     if (this.props.units.length === 0) this.props.getUnits()
-    if (this.props.users.length === 0) this.props.getEnabledUsers()
+    if (this.props.users.length === 0) this.props.getUsers()
   }
 
   toggleEnabledOnly() {
@@ -212,7 +212,6 @@ EnableUsers.propTypes = {
   }).isRequired,
   language: string.isRequired,
   getUsers: func.isRequired,
-  getEnabledUsers: func.isRequired,
   pending: bool.isRequired,
   getUnits: func.isRequired,
   sendEmail: func.isRequired,
@@ -249,7 +248,6 @@ const mapStateToProps = ({ localize, users, units, elementdetails }) => ({
 
 export default withRouter(connect(mapStateToProps, {
   getUsers,
-  getEnabledUsers,
   getUnits,
   sendEmail,
   getElementDetails

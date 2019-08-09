@@ -17,7 +17,7 @@ import { clearCourseStats } from '../../redux/coursestats'
 class StudentDetails extends Component {
   componentDidMount() {
     this.unlistenHistory = this.props.history.listen((location, action) => {
-      if (action === 'POP' || location.pathname !== '/students' || this.props.error) {
+      if (action === 'POP' || location.pathname === '/students' || location.pathname !== '/students' || this.props.error) {
         this.props.resetStudent()
         this.props.removeStudentSelection()
       }

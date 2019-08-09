@@ -1,38 +1,32 @@
-import React, { PureComponent } from 'react'
+import React, { memo } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { func, bool, shape } from 'prop-types'
 import { Header, Segment, Divider } from 'semantic-ui-react'
-import qs from 'query-string'
 
 import PopulationSearchForm from '../PopulationSearchForm'
 import PopulationSearchHistory from '../PopulationSearchHistory'
 import PopulationDetails from '../PopulationDetails'
-import SegmentDimmer from '../SegmentDimmer'
 import InfoBox from '../InfoBox'
+import ProgressBar from '../ProgressBar'
 
 import infoTooltips from '../../common/InfoToolTips'
+import { useProgress } from '../../common'
 
-class PopulationStatistics extends PureComponent {
-  static propTypes = {
-    translate: func.isRequired,
-    populationFound: bool.isRequired,
-    loading: bool.isRequired,
-    location: shape({}).isRequired,
-    query: shape({}).isRequired,
-    history: shape({}).isRequired
-  }
+const PopulationStatistics = memo((props) => {
+  const {
+    translate,
+    populationFound,
+    loading,
+    location
+  } = props
 
-  handleClick = () => {
-    const { query, history } = this.props
-    const { startYear, endYear, studyRights, semesters, months } = query
-    const queryObject = { startYear, endYear, studyRights: JSON.stringify(studyRights), semesters, months, fetch: false }
-    const searchString = qs.stringify(queryObject)
-    history.push(`/populations?${searchString}`)
-  }
+  const {
+    onProgress,
+    progress
+  } = useProgress(loading)
 
-  renderPopulationSearch = () => {
-    const { translate, populationFound, loading, location } = this.props
+  const renderPopulationSearch = () => {
     const { Main } = infoTooltips.PopulationStatistics
     const title = populationFound ?
       translate('populationStatistics.foundTitle') :
@@ -43,26 +37,30 @@ class PopulationStatistics extends PureComponent {
         <Header size="medium">{title}
           {!populationFound && <InfoBox content={Main} />}
         </Header>
-        <PopulationSearchForm />
+        <PopulationSearchForm onProgress={onProgress} />
         <Divider />
         {location.search !== '' ? (<PopulationSearchHistory />) : null}
-        <SegmentDimmer translate={translate} isLoading={loading} />
+        <ProgressBar progress={progress} />
       </Segment>
     )
   }
 
-  render() {
-    const { translate, location } = this.props
-    return (
-      <div className="segmentContainer">
-        <Header className="segmentTitle" size="large">{translate('populationStatistics.header')}</Header>
-        <Segment className="contentSegment">
-          {this.renderPopulationSearch()}
-          {location.search !== '' ? (<PopulationDetails />) : null}
-        </Segment>
-      </div>
-    )
-  }
+  return (
+    <div className="segmentContainer">
+      <Header className="segmentTitle" size="large">{translate('populationStatistics.header')}</Header>
+      <Segment className="contentSegment">
+        {renderPopulationSearch()}
+        {location.search !== '' ? (<PopulationDetails />) : null}
+      </Segment>
+    </div>
+  )
+})
+
+PopulationStatistics.propTypes = {
+  translate: func.isRequired,
+  populationFound: bool.isRequired,
+  loading: bool.isRequired,
+  location: shape({}).isRequired
 }
 
 const mapStateToProps = ({ localize, populations }) => ({

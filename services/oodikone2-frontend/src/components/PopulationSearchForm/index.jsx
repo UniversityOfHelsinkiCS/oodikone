@@ -78,7 +78,8 @@ const PopulationSearchForm = (props) => {
     history,
     tags,
     language,
-    translate
+    translate,
+    onProgress
   } = props
 
   const parseQueryFromUrl = () => {
@@ -121,7 +122,7 @@ const PopulationSearchForm = (props) => {
     props.setLoading()
 
     fetchPopulationPromises.current = cancelablePromise(Promise.all([
-      props.getPopulationStatistics({ ...formattedQueryParams, uuid, tag: selectedTag }),
+      props.getPopulationStatistics({ ...formattedQueryParams, uuid, tag: selectedTag, onProgress }),
       props.getPopulationCourses(request),
       props.getPopulationFilters(request),
       props.getMandatoryCourses(formattedQueryParams.studyRights.programme)
@@ -770,7 +771,8 @@ PopulationSearchForm.propTypes = {
   tags: oneOfType([
     arrayOf(shape({ tag_id: string, tagname: string })),
     object
-  ]).isRequired
+  ]).isRequired,
+  onProgress: func.isRequired
 }
 
 const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, localize, tags }) => {

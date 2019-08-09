@@ -19,11 +19,6 @@ app.get('/findall', async (req, res) => {
   res.json(users.map(User.getUserData))
 })
 
-app.get('/findallenabled', async (req, res) => {
-  const users = await User.findAll()
-  res.json(users.map(User.getUserData).filter(u => u.is_enabled))
-})
-
 app.get('/user/:uid', async (req, res) => {
   const uid = req.params.uid
   const user = await User.byUsername(uid)
