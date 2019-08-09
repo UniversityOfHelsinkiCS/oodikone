@@ -56,7 +56,7 @@ const SearchForm = (props) => {
   const fetchStatisticsFromUrlParams = () => {
     const query = parseQueryFromUrl()
     setState({ ...state, ...query, selectedCourses: query.courseCodes })
-    props.getCourseStats(query)
+    props.getCourseStats(query, props.onProgress)
   }
 
   useEffect(() => {
@@ -233,6 +233,10 @@ const SearchForm = (props) => {
   )
 }
 
+SearchForm.defaultProps = {
+  onProgress: null
+}
+
 SearchForm.propTypes = {
   findCoursesV2: func.isRequired,
   getSemesters: func.isRequired,
@@ -244,7 +248,8 @@ SearchForm.propTypes = {
   isLoading: bool.isRequired,
   coursesLoading: bool.isRequired,
   history: shape({}).isRequired,
-  location: shape({}).isRequired
+  location: shape({}).isRequired,
+  onProgress: func
 }
 
 const mapStateToProps = (state) => {
