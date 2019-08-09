@@ -10,15 +10,15 @@ services:
       - "8222:8222"
       - "4222:4222"
     container_name: nats
-    # volumes:
-    #   - ./datastore:/datastore
+    volumes:
+      - ./datastore:/datastore
 
   analytics_db:
     image: postgres:9.6.3
     ports:
       - "5423:5432"
-    # volumes:
-    #   - ./analytics_pgdata:/var/lib/postgresql/data
+    volumes:
+      - ./analytics_pgdata:/var/lib/postgresql/data
     container_name: oodi_analytics_db
     environment:
       - POSTGRES_USER=postgres
@@ -28,8 +28,8 @@ services:
     image: postgres:9.6.3
     ports:
       - "5422:5432"
-    # volumes:
-    #   - ./user_pgdata:/var/lib/postgresql/data
+    volumes:
+      - ./user_pgdata:/var/lib/postgresql/data
     container_name: oodi_user_db
     environment:
       - POSTGRES_USER=postgres
@@ -38,8 +38,8 @@ services:
     image: postgres:9.6.3
     ports:
       - "5424:5432"
-    # volumes:
-    #   - ./usage_pgdata:/var/lib/postgresql/data
+    volumes:
+      - ./usage_pgdata:/var/lib/postgresql/data
     container_name: oodi_usage_db
     environment:
       - POSTGRES_USER=postgres
@@ -49,9 +49,9 @@ services:
     image: postgres:10-alpine
     ports:
       - "5421:5432"
-    # volumes:
-    #   - ./pgdata:/var/lib/postgresql/data
-    #   - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
     container_name: oodi_db
     environment:
       - POSTGRES_USER=postgres
@@ -60,9 +60,9 @@ services:
     image: postgres:9.6.3
     ports:
       - "5425:5432"
-    # volumes:
-    #   - ./pgdata_kone:/var/lib/postgresql/data
-    #   - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    volumes:
+      - ./pgdata_kone:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
     container_name: db_kone
     environment:
       - POSTGRES_MULTIPLE_DATABASES=db_kone
@@ -73,8 +73,8 @@ services:
     command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "6379:6379"
-    # volumes:
-    #   - ./redis-data:/data
+    volumes:
+      - ./redis-data:/data
     container_name: redis
 
   backend:
@@ -172,8 +172,8 @@ services:
 
   scheduler_mongo:
     image: mongo:4.0.10
-    # volumes:
-    #   - ./mongodata:/data/db
+    volumes:
+      - ./mongodata:/data/db
     expose:
       - "27017"
     container_name: scheduler_mongo
