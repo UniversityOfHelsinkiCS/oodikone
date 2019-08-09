@@ -7,7 +7,7 @@ import { Form, Button, Message, Icon, Grid } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
-import _ from 'lodash'
+import { isEqual, sortBy } from 'lodash'
 import moment from 'moment'
 
 import { getPopulationStatistics } from '../../redux/populations'
@@ -217,7 +217,7 @@ const PopulationSearchForm = (props) => {
   const validateQuery = () => {
     const compare = { ...queries }
     delete compare.uuid
-    return _.isEqual(compare, query)
+    return isEqual(compare, query)
   }
 
   const pushQueryToUrl = (query) => {
@@ -556,7 +556,7 @@ const PopulationSearchForm = (props) => {
 
     let programmesToRender
     if (Object.values(studyProgrammes).length !== 0) {
-      const sortedStudyProgrammes = _.sortBy(studyProgrammes, s => getTextIn(s.name, language))
+      const sortedStudyProgrammes = sortBy(studyProgrammes, s => getTextIn(s.name, language))
       programmesToRender = renderableList(sortedStudyProgrammes)
     }
     let degreesToRender
@@ -564,10 +564,10 @@ const PopulationSearchForm = (props) => {
     if (studyRights.programme && validYearCheck(momentYear)) {
       const associations = studyProgrammes[studyRights.programme].enrollmentStartYears[momentYear.year()]
       if (associations) {
-        const sortedStudyDegrees = _.sortBy(associations.degrees, s => getTextIn(s.name, language))
+        const sortedStudyDegrees = sortBy(associations.degrees, s => getTextIn(s.name, language))
         degreesToRender = renderableList(sortedStudyDegrees)
 
-        const sortedStudyTracks = _.sortBy(associations.studyTracks, s => getTextIn(s.name, language))
+        const sortedStudyTracks = sortBy(associations.studyTracks, s => getTextIn(s.name, language))
         studyTracksToRender = renderableList(sortedStudyTracks)
       }
     }
