@@ -33,6 +33,7 @@ jobs:
           key: npmcache-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
+            - ~/.cache
       - run: docker pull node:10.15-alpine # pull base image that everything inherits only once
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml build
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d db user_db db_kone
@@ -42,7 +43,7 @@ jobs:
       - run: docker ps -a && docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
       - run: npm run test_services
       - run: docker ps -a && docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
-      - run: until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
+      - run: timeout 5m bash -c 'until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf .; sleep 5; done'
       - run: npm run cypress -- run --config video=true --config videoCompression=false --config baseUrl=http://localhost:1337/
       - run: docker ps -a && docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
       - store_artifacts:
