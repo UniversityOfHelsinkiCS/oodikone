@@ -4,7 +4,7 @@ import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
 import { Header, Segment, Button, Icon, Popup, Tab, Grid, Checkbox, List } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
-import _ from 'lodash'
+import { orderBy, uniqBy, flatten, sortBy } from 'lodash'
 import XLSX from 'xlsx'
 import { getStudentTotalCredits, copyToClipboard, userRoles, reformatDate, getTextIn, roundToTwo } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
@@ -179,7 +179,7 @@ class PopulationStudents extends Component {
     if (this.props.showNames) {
       columns.push(
         { key: 'lastname', title: 'last name', getRowVal: s => s.lastname },
-        { key: 'firstname', title: 'first names', getRowVal: s => s.firstnames }
+        { key: 'firstname', title: 'given names', getRowVal: s => s.firstnames }
       )
     }
     columns.push(
@@ -318,8 +318,8 @@ class PopulationStudents extends Component {
 
     const nameColumns = this.props.showNames ? [
       { key: 'lastname', title: 'last name', getRowVal: s => s.lastname, cellProps: { title: 'last name' }, child: true },
-      { key: 'firstname', title: 'first names', getRowVal: s => s.firstnames, cellProps: { title: 'first names' }, child: true },
-      { key: 'email', title: 'emails', getRowVal: s => s.email, cellProps: { title: 'emails' }, child: true }
+      { key: 'firstname', title: 'given names', getRowVal: s => s.firstnames, cellProps: { title: 'first names' }, child: true },
+      { key: 'email', title: 'email', getRowVal: s => s.email, cellProps: { title: 'emails' }, child: true }
     ] : []
     nameColumns.push(
       {
@@ -355,8 +355,8 @@ class PopulationStudents extends Component {
       else mandatoryCourseLabels.push({ id: 'null', label: '' })
       return acc
     }, {})
-    const sortedlabels = _.orderBy(
-      _.uniqBy(mandatoryCourseLabels, l => l.label),
+    const sortedlabels = orderBy(
+      uniqBy(mandatoryCourseLabels, l => l.label),
       [e => e.orderNumber],
       ['asc']
     )
@@ -384,7 +384,7 @@ class PopulationStudents extends Component {
     const mandatoryCourseColumns = [
       ...nameColumns,
       ...labelColumns,
-      ..._.flatten(sortedlabels.map(e => _.sortBy(
+      ...flatten(sortedlabels.map(e => sortBy(
         labelToMandatoryCourses[e.label],
         [(m) => {
           const res = m.code.match(/\d+/)
@@ -504,7 +504,7 @@ class PopulationStudents extends Component {
 
     const generateWorkbook = () => {
       const data = this.props.selectedStudents.map(sn => students[sn])
-      const sortedMandatory = _.sortBy(
+      const sortedMandatory = sortBy(
         this.props.mandatoryCourses,
         [(m) => {
           const res = m.code.match(/\d+/)
@@ -513,7 +513,7 @@ class PopulationStudents extends Component {
       )
       const worksheet = XLSX.utils.json_to_sheet(data.map(s => ({
         'last name': s.lastname,
-        'first names': s.firstnames,
+        'given names': s.firstnames,
         'student number': s.studentNumber,
         'credits since start': getStudentTotalCredits(s),
         'all credits': s.credits,

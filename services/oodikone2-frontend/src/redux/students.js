@@ -34,6 +34,7 @@ const reducer = (state = { data: [], pending: false, error: false }, action) => 
     case 'FIND_STUDENTS_ATTEMPT':
       return {
         pending: true,
+        error: false,
         selected: state.selected,
         lastSearch: action.requestSettings.query,
         data: state.data
