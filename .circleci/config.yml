@@ -16,13 +16,16 @@ jobs:
             echo 'export SENTRY_RELEASE_VERSION=PRODUCTION-${CIRCLE_SHA1}' >> $BASH_ENV;
             echo 'export TAG=latest' >> $BASH_ENV;
             echo 'export DEPLOY=true' >> $BASH_ENV;
+            echo 'export CACHE_TAG=staging' >> $BASH_ENV;
           elif [[ "false" = "true" && "$CIRCLE_BRANCH" = "master" && -z "$CIRCLE_PULL_REQUEST" ]]; then
             echo 'export SENTRY_RELEASE_VERSION=STAGING-${CIRCLE_SHA1}' >> $BASH_ENV;
             echo 'export TAG=staging' >> $BASH_ENV;
             echo 'export DEPLOY=true' >> $BASH_ENV;
+            echo 'export CACHE_TAG=trunk' >> $BASH_ENV;
           else
             echo 'export TAG=trunk' >> $BASH_ENV;
             echo 'export DEPLOY=true' >> $BASH_ENV;
+            echo 'export CACHE_TAG=trunk' >> $BASH_ENV;
           fi
       - checkout
       - restore_cache:
@@ -34,9 +37,7 @@ jobs:
           paths:
             - ~/.cache
       - run: docker pull node:10.15-alpine # pull base image that everything inherits only once
-      - run: TAG=trunk docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml pull --ignore-pull-failures
-      - run: TAG=staging docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml pull --ignore-pull-failures
-      - run: TAG=latest docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml pull --ignore-pull-failures
+      - run: TAG=${CACHE_TAG} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml pull --ignore-pull-failures
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml build
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d db user_db db_kone
       - run: git clone --depth 1 git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
