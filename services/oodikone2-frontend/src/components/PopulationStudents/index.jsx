@@ -179,7 +179,7 @@ class PopulationStudents extends Component {
     if (this.props.showNames) {
       columns.push(
         { key: 'lastname', title: 'last name', getRowVal: s => s.lastname },
-        { key: 'firstname', title: 'first names', getRowVal: s => s.firstnames }
+        { key: 'firstname', title: 'given names', getRowVal: s => s.firstnames }
       )
     }
     columns.push(
@@ -318,8 +318,8 @@ class PopulationStudents extends Component {
 
     const nameColumns = this.props.showNames ? [
       { key: 'lastname', title: 'last name', getRowVal: s => s.lastname, cellProps: { title: 'last name' }, child: true },
-      { key: 'firstname', title: 'first names', getRowVal: s => s.firstnames, cellProps: { title: 'first names' }, child: true },
-      { key: 'email', title: 'emails', getRowVal: s => s.email, cellProps: { title: 'emails' }, child: true }
+      { key: 'firstname', title: 'given names', getRowVal: s => s.firstnames, cellProps: { title: 'first names' }, child: true },
+      { key: 'email', title: 'email', getRowVal: s => s.email, cellProps: { title: 'emails' }, child: true }
     ] : []
     nameColumns.push(
       {
@@ -513,7 +513,7 @@ class PopulationStudents extends Component {
       )
       const worksheet = XLSX.utils.json_to_sheet(data.map(s => ({
         'last name': s.lastname,
-        'first names': s.firstnames,
+        'given names': s.firstnames,
         'student number': s.studentNumber,
         'credits since start': getStudentTotalCredits(s),
         'all credits': s.credits,

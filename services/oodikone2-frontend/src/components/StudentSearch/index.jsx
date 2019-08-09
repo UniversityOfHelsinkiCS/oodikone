@@ -94,7 +94,7 @@ class StudentSearch extends Component {
 
     if (showNames) {
       columns.push({ key: 'lastnames', title: 'last names', getRowVal: s => s.lastname })
-      columns.push({ key: 'firstnames', title: 'first names', getRowVal: s => s.firstnames })
+      columns.push({ key: 'firstnames', title: 'given names', getRowVal: s => s.firstnames })
     }
 
     return (
