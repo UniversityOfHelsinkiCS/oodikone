@@ -13,7 +13,7 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     environment:
       FRONT_URL: http://localhost:8000
@@ -27,7 +27,7 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run docker']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run docker']
     restart: unless-stopped
     ports:
       - "8081:8081"
@@ -44,7 +44,7 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/oodikone2-userservice/:/usr/src/app
@@ -53,7 +53,7 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/oodikone2-usageservice/:/usr/src/app
@@ -62,7 +62,7 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/updater_api/:/usr/src/app
@@ -71,7 +71,7 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/backend/updater_writer/:/usr/src/app
@@ -88,7 +88,7 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/updater_scheduler/:/usr/src/app
@@ -97,7 +97,7 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     restart: unless-stopped
     volumes:
       - ./services/oodikone2-analytics/:/usr/src/app
