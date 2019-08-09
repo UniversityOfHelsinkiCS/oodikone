@@ -319,7 +319,7 @@ class PopulationStudents extends Component {
     const nameColumns = this.props.showNames ? [
       { key: 'lastname', title: 'last name', getRowVal: s => s.lastname, cellProps: { title: 'last name' }, child: true },
       { key: 'firstname', title: 'first names', getRowVal: s => s.firstnames, cellProps: { title: 'first names' }, child: true },
-      { key: 'email', title: 'emails', getRowVal: s => s.email, cellProps: { title: 'emails' }, child: true }
+      { key: 'email', title: 'email', getRowVal: s => s.email, cellProps: { title: 'emails' }, child: true }
     ] : []
     nameColumns.push(
       {
