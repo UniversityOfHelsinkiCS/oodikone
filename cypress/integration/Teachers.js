@@ -55,10 +55,9 @@ describe('Teachers page tests', () => {
     cy.contains('Name').should('not.exist')
   })
 
-  it.only("Check leaderboad works", () => {
+  it("Check leaderboad works", () => {
     cy.get('.borderless > :nth-child(2)').click()
     cy.get(':nth-child(1) > .ui > .search').click()
-    cy.wait(5000)
     cy.contains('2017-18').click()
     cy.contains("Recalculate this year").click()
     cy.wait(5000)
