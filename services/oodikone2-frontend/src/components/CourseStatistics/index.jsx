@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import { Header, Segment, Tab } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -7,6 +7,8 @@ import './courseStatistics.css'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
 import SummaryTab from './SummaryTab'
+import ProgressBar from '../ProgressBar'
+import { useProgress } from '../../common'
 import { clearCourseStats } from '../../redux/coursestats'
 
 const MENU = {
@@ -15,30 +17,37 @@ const MENU = {
   QUERY: 'New query'
 }
 
-const INITIAL = {
-  activeIndex: 0,
-  selected: undefined,
-  pending: false
-}
+const CourseStatistics = (props) => {
+  const {
+    singleCourseStats,
+    clearCourseStats,
+    history,
+    statsIsEmpty,
+    loading
+  } = props
 
-class CourseStatistics extends Component {
-  static getDerivedStateFromProps(props, state) {
-    const finishedGet = !props.pending && state.pending && !props.error
-    return finishedGet ? { ...INITIAL } : { pending: props.pending }
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [selected, setSelected] = useState(undefined)
+
+  const {
+    onProgress,
+    progress
+  } = useProgress(loading)
+
+  const switchToCourse = (coursecode) => {
+    setActiveIndex(1)
+    setSelected(coursecode)
   }
 
-  state = { ...INITIAL }
-
-  getPanes = () => {
-    const { singleCourseStats, clearCourseStats: clearaust, history } = this.props
+  const getPanes = () => {
     const panes = [
       {
         menuItem: MENU.SUM,
-        render: () => <SummaryTab onClickCourse={this.switchToCourse} />
+        render: () => <SummaryTab onClickCourse={switchToCourse} />
       },
       {
         menuItem: MENU.COURSE,
-        render: () => <SingleCourseTab selected={this.state.selected} />
+        render: () => <SingleCourseTab selected={selected} />
       },
       {
         menuItem: {
@@ -48,7 +57,7 @@ class CourseStatistics extends Component {
           position: 'right',
           onClick: () => {
             history.push('/coursestatistics')
-            clearaust()
+            clearCourseStats()
           }
         },
         render: () => <SearchForm />
@@ -57,45 +66,37 @@ class CourseStatistics extends Component {
     return !singleCourseStats ? panes : panes.filter(p => p.menuItem !== MENU.SUM)
   }
 
-  handleTabChange = (e, { activeIndex }) => {
-    this.setState({ activeIndex })
+  const handleTabChange = (e, { activeIndex }) => {
+    setActiveIndex(activeIndex)
   }
 
-  switchToCourse = (coursecode) => {
-    this.setState({
-      activeIndex: 1,
-      selected: coursecode
-    })
-  }
-
-  render() {
-    const { statsIsEmpty, history } = this.props
-    const panes = this.getPanes()
-    return (
-      <div className="container">
-        <Header className="segmentTitle" size="large">
-          Course Statistics
-        </Header>
-        <Segment className="contentSegment" >
-          {statsIsEmpty || history.location.search === '' ? <SearchForm /> : (
-            <Tab
-              menu={{ attached: false, borderless: false }}
-              panes={panes}
-              activeIndex={this.state.activeIndex}
-              onTabChange={this.handleTabChange}
-            />
-          )}
-        </Segment>
-      </div>
-    )
-  }
+  const panes = getPanes()
+  return (
+    <div className="container">
+      <Header className="segmentTitle" size="large">
+        Course Statistics
+      </Header>
+      <Segment className="contentSegment" >
+        {statsIsEmpty || history.location.search === '' ? <SearchForm onProgress={onProgress} /> : (
+          <Tab
+            menu={{ attached: false, borderless: false }}
+            panes={panes}
+            activeIndex={activeIndex}
+            onTabChange={handleTabChange}
+          />
+        )}
+        <ProgressBar fixed progress={progress} />
+      </Segment>
+    </div>
+  )
 }
 
 CourseStatistics.propTypes = {
   statsIsEmpty: bool.isRequired,
   singleCourseStats: bool.isRequired,
   history: shape({}).isRequired,
-  clearCourseStats: func.isRequired
+  clearCourseStats: func.isRequired,
+  loading: bool.isRequired
 }
 
 const mapStateToProps = ({ courseStats }) => {
@@ -104,7 +105,8 @@ const mapStateToProps = ({ courseStats }) => {
     pending: courseStats.pending,
     error: courseStats.error,
     statsIsEmpty: courses.length === 0,
-    singleCourseStats: courses.length === 1
+    singleCourseStats: courses.length === 1,
+    loading: courseStats.pending
   }
 }
 

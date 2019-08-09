@@ -17,7 +17,7 @@ class LeaderForm extends Component {
 
   defaultValues = () => {
     const { yearoptions, categoryoptions } = this.props
-    const [defaultyear = {}] = yearoptions
+    const [defaultyear = {}] = [yearoptions.find(year => Number(year.text.slice(0, 4)) === new Date().getFullYear() - 1)]
     const [defaultcategory = {}] = categoryoptions
     return {
       year: defaultyear.value,

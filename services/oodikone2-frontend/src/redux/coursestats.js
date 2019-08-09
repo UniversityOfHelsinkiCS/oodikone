@@ -7,7 +7,7 @@ const { reset } = actions(prefix)
 
 export const clearCourseStats = reset
 
-export const getCourseStats = ({ fromYear, toYear, courseCodes, separate }) => {
+export const getCourseStats = ({ fromYear, toYear, courseCodes, separate }, onProgress) => {
   const route = '/v3/courseyearlystats'
   const params = {
     codes: courseCodes,
@@ -15,7 +15,7 @@ export const getCourseStats = ({ fromYear, toYear, courseCodes, separate }) => {
     endyearcode: toYear,
     separate
   }
-  return callController(route, prefix, [], 'get', params, params)
+  return callController(route, prefix, [], 'get', params, params, onProgress)
 }
 
 const responseToObj = (coursestats) => {

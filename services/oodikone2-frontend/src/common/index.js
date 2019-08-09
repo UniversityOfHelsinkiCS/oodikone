@@ -348,7 +348,7 @@ export const useProgress = (loading) => {
   const didMount = useDidMount()
   const [progress, setProgress] = useState(100)
   const [delay, setDelay] = useState(null)
-  const [amountToProgress, setAmountToProgress] = useState(2)
+  const amountToProgress = delay ? Math.ceil(Math.random() * 4) : 0
 
   useInterval(() => {
     setProgress(progress + amountToProgress > 50 ?
@@ -363,14 +363,12 @@ export const useProgress = (loading) => {
   }, [progress])
 
   const restartProgress = () => {
-    setAmountToProgress(2)
     setProgress(0)
     setDelay(500)
   }
 
   const finishProgress = () => {
     setDelay(null)
-    setAmountToProgress(0)
     setImmediate(() => setProgress(100))
   }
 
