@@ -35,6 +35,7 @@ jobs:
             - node_modules
             - ~/.cache
       - run: docker pull node:10.15-alpine # pull base image that everything inherits only once
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml pull
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml build
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d db user_db db_kone
       - run: git clone --depth 1 git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
