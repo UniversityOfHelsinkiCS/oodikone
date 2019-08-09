@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Progress } from 'semantic-ui-react'
-import { number } from 'prop-types'
+import { bool, number } from 'prop-types'
 import { useDidMount } from '../../common'
 import './progressBar.css'
 
-const ProgressBar = ({ progress }) => {
+const ProgressBar = ({ progress, fixed }) => {
   const timeoutId = useRef()
   const [hidden, setHidden] = useState(true)
   const [visible, setVisible] = useState(true)
@@ -32,6 +32,11 @@ const ProgressBar = ({ progress }) => {
       setHidden(false)
     }
   }, [progress])
+
+  const classNames = []
+  classNames.push(visible ? 'progressBar' : 'progressBarHidden')
+  if (fixed) classNames.push('fixed')
+
   return (
     hidden ?
       null :
@@ -40,13 +45,18 @@ const ProgressBar = ({ progress }) => {
         disabled={progress === 100}
         progress
         color="blue"
-        className={visible ? 'progressBar' : 'progressBarHidden'}
+        className={classNames.join(' ')}
       />
   )
 }
 
+ProgressBar.defaultProps = {
+  fixed: false
+}
+
 ProgressBar.propTypes = {
-  progress: number.isRequired
+  progress: number.isRequired,
+  fixed: bool
 }
 
 export default ProgressBar

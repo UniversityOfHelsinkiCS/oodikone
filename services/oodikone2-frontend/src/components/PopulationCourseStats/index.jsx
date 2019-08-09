@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Table, Form, Input, Popup, Button, Segment } from 'semantic-ui-react'
 import { func, arrayOf, object, number, shape, string, oneOf, bool } from 'prop-types'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
-import _ from 'lodash'
+import { replace, sortBy, orderBy, omit } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import moment from 'moment'
 import qs from 'query-string'
@@ -71,8 +71,8 @@ SortableHeaderCell.defaultProps = {
 }
 
 const formatGradeDistribution = grades =>
-  _.replace(JSON.stringify(
-    _.sortBy(Object.entries(grades)
+  replace(JSON.stringify(
+    sortBy(Object.entries(grades)
       .map(([key, value]) => ({ [key]: value.count })), o => -Object.keys(o)),
     null, 1
   ), /\[\n|{\n*|{\s|}|\s*}|]|"|,/g, '')
@@ -132,7 +132,7 @@ class PopulationCourseStats extends Component {
 
     const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
 
-    const courseStatistics = _.orderBy(
+    const courseStatistics = orderBy(
       filteredCourses,
       [course => course.stats[sortCriteria], course => course.course.code],
       [lodashSortOrder, lodashSortOrderTypes.ASC]
@@ -294,7 +294,7 @@ class PopulationCourseStats extends Component {
         const gradeValues = grades ? Object.values(grades) : null
         attempts = gradeValues.reduce(countSumReducer, 0)
         failedGrades = gradeValues.filter(g => g.status.failingGrade).reduce(countSumReducer, 0)
-        otherPassed = Object.values(_.omit(grades, courseGradesTypes))
+        otherPassed = Object.values(omit(grades, courseGradesTypes))
           .filter(g => g.status.passingGrade || g.status.improvedGrade)
           .reduce(countSumReducer, 0)
       }

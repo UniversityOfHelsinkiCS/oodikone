@@ -4,7 +4,7 @@ import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
 import { Header, Segment, Button, Icon, Popup, Tab, Grid, Checkbox, List } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
-import _ from 'lodash'
+import { orderBy, uniqBy, flatten, sortBy } from 'lodash'
 import XLSX from 'xlsx'
 import { getStudentTotalCredits, copyToClipboard, userRoles, reformatDate, getTextIn, roundToTwo } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
@@ -355,8 +355,8 @@ class PopulationStudents extends Component {
       else mandatoryCourseLabels.push({ id: 'null', label: '' })
       return acc
     }, {})
-    const sortedlabels = _.orderBy(
-      _.uniqBy(mandatoryCourseLabels, l => l.label),
+    const sortedlabels = orderBy(
+      uniqBy(mandatoryCourseLabels, l => l.label),
       [e => e.orderNumber],
       ['asc']
     )
@@ -384,7 +384,7 @@ class PopulationStudents extends Component {
     const mandatoryCourseColumns = [
       ...nameColumns,
       ...labelColumns,
-      ..._.flatten(sortedlabels.map(e => _.sortBy(
+      ...flatten(sortedlabels.map(e => sortBy(
         labelToMandatoryCourses[e.label],
         [(m) => {
           const res = m.code.match(/\d+/)
@@ -504,7 +504,7 @@ class PopulationStudents extends Component {
 
     const generateWorkbook = () => {
       const data = this.props.selectedStudents.map(sn => students[sn])
-      const sortedMandatory = _.sortBy(
+      const sortedMandatory = sortBy(
         this.props.mandatoryCourses,
         [(m) => {
           const res = m.code.match(/\d+/)

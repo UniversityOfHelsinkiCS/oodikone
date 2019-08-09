@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Form, Input, Button } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
-import _ from 'lodash'
+import { intersection } from 'lodash'
 
 import { courseParticipationNTimes } from '../../populationFilters'
 import { removePopulationFilter, alterPopulationCourseFilter, setPopulationFilter } from '../../redux/populationFilters'
@@ -39,7 +39,7 @@ class CourseParticipationNTimes extends Component {
   }
 
   courseInPopulation = () =>
-    _.intersection(this.studyRights(), ['MH30_001', '320001']).length > 0
+    intersection(this.studyRights(), ['MH30_001', '320001']).length > 0
 
   render() {
     const { filter } = this.props

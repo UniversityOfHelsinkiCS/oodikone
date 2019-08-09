@@ -1,6 +1,6 @@
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
-import { getToken, setToken, getAsUserWithoutRefreshToken, getTokenWithoutRefresh } from '../common'
+import { getToken, setToken } from '../common'
 import { API_BASE_PATH, TOKEN_NAME, BASE_PATH, ERROR_STATUSES_TO_CAPTURE } from '../constants'
 import { login as loginAction } from '../redux/auth'
 
@@ -71,11 +71,6 @@ export const logout = async () => {
   const response = await api.delete('/logout', { data: { returnUrl } })
   localStorage.removeItem(TOKEN_NAME)
   window.location = response.data.logoutUrl
-}
-
-export const returnToSelf = async () => {
-  const token = await login()
-  await setToken(token)
 }
 
 export const callApi = async (url, method = 'get', data, params, timeout = 0, progressCallback = null) => {
@@ -168,17 +163,15 @@ export const handleAuth = store => next => async (action) => {
   if (type === 'LOGIN_SUCCESS' && refresh) window.location.reload()
   if (type === 'LOGIN_ATTEMPT') {
     try {
-      const mock = await getAsUserWithoutRefreshToken()
       let token
-      if (mock && !uid) token = getTokenWithoutRefresh()
-      else if (uid) token = await superLogin(uid)
+      if (uid) token = await superLogin(uid)
       else token = await getToken(force)
 
       api.defaults.headers.common = {
         ...api.defaults.headers.common,
         'x-access-token': token
       }
-      store.dispatch({ type: 'LOGIN_SUCCESS', token, refresh: uid })
+      store.dispatch({ type: 'LOGIN_SUCCESS', token, refresh })
       try {
         if (retryRequestSettings) {
           const res = await callApi(route, method, data, params, 0, onProgress)
