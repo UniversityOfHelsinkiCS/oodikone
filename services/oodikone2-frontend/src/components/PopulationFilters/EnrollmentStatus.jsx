@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { shape, func, object, arrayOf } from 'prop-types'
 import moment from 'moment'
-import _ from 'lodash'
+import { range } from 'lodash'
 
 import infoTooltips from '../../common/InfoToolTips'
 import { enrollmentStatus } from '../../populationFilters'
@@ -39,7 +39,7 @@ class EnrollmentStatus extends Component {
   createPossibleOptions = ({ minDate, maxDate }) => {
     const firstSemester = Math.floor(moment(minDate).diff(moment('1950', 'YYYY'), 'months') / 6)
     const lastSemester = Math.floor(moment(maxDate).diff(moment('1950', 'YYYY'), 'months') / 6)
-    const allSemesters = _.range(firstSemester, lastSemester + 1)
+    const allSemesters = range(firstSemester, lastSemester + 1)
     const options = allSemesters.map(semester =>
       ({ key: semester, text: this.formatSemesterCodeToText(semester), value: semester }))
 

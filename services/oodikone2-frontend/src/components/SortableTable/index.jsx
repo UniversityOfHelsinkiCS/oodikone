@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Table } from 'semantic-ui-react'
 import { shape, arrayOf, string, func, bool, element, oneOfType } from 'prop-types'
-import _ from 'lodash'
+import { sortBy } from 'lodash'
 
 const DIRECTIONS = {
   ASC: 'ascending',
@@ -45,7 +45,7 @@ class SortableTable extends Component {
       return this.props.data
     }
     const { getRowVal } = column
-    const sorted = _.sortBy(this.props.data, [getRowVal])
+    const sorted = sortBy(this.props.data, [getRowVal])
     return direction === DIRECTIONS.ASC ? sorted : sorted.reverse()
   }
 

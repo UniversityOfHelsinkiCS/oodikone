@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool } from 'prop-types'
 import { Segment, Header, Message, Button, Icon, Tab } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
-import _ from 'lodash'
+import { intersection, difference, flattenDeep } from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
 
 import { makePopulationsToData } from '../../selectors/populationDetails'
@@ -218,10 +218,10 @@ const mapStateToProps = (state) => {
     }
 
     const matchingStudents = state.populationFilters.filters.map(studentsForFilter)
-    selectedStudents = _.intersection(...matchingStudents)
+    selectedStudents = intersection(...matchingStudents)
 
     if (complemented) {
-      selectedStudents = _.difference(samples.map(s => s.studentNumber), selectedStudents)
+      selectedStudents = difference(samples.map(s => s.studentNumber), selectedStudents)
     }
   }
 
@@ -235,7 +235,7 @@ const mapStateToProps = (state) => {
     })
     const credits = creditsAndDates.map(cd => cd.passedCredits)
     let dates = creditsAndDates.map(cd => cd.dates)
-    dates = _.flattenDeep(dates).map(date => new Date(date).getTime())
+    dates = flattenDeep(dates).map(date => new Date(date).getTime())
     samples.maxCredits = Math.max(...credits)
     samples.maxDate = Math.max(...dates)
     samples.minDate = Math.min(...dates)
