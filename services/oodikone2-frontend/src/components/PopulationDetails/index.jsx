@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool } from 'prop-types'
 import { Segment, Header, Message, Button, Icon, Tab } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
-import { intersection, difference, flatten } from 'lodash'
+import { intersection, difference, flattenDeep } from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
 
 import { makePopulationsToData } from '../../selectors/populationDetails'
