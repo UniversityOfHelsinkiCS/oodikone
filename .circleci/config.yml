@@ -69,7 +69,7 @@ jobs:
       - run: npm run test_services
       - *check_exit_statuses
       - run: timeout 5m bash -c 'until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf .; sleep 5; done'
-      - run: npm run cypress -- run --config video=true --config videoCompression=false --config baseUrl=http://localhost:1337/
+      - run: npm run cypress:ci
       - *check_exit_statuses
       - store_artifacts:
           path: cypress/videos
