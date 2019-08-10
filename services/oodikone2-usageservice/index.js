@@ -2,10 +2,21 @@ const express = require('express')
 const conf = require('./src/conf-usageservice')
 const { PORT } = conf
 const router = require('./src/routes')
-const app = express()
+const { initializeDatabaseConnection } = require('./src/database/connection')
 
-app.use(router)
+initializeDatabaseConnection().then(() => {
+  const app = express()
 
-module.exports = app.listen(PORT, () => {
-  console.log('Example app listening on port ' + PORT + '!')
+  app.use(router)
+
+  const server = app.listen(PORT, () => console.log(`Usageservice listening on port ${PORT}!`))
+  process.on('SIGTERM', () => {
+    server.close(() => {
+      console.log('Process terminated')
+    })
+  })
+})
+.catch(e => {
+  process.exitCode = 1
+  console.log(e)
 })
