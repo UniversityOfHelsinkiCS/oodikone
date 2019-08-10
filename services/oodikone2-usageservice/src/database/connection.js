@@ -8,7 +8,7 @@ const sequelize = new Sequelize(conf.DB_URL, {
 })
 
 const initializeDatabaseConnection = async () => {
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
   const waitSeconds = 60
   for (let i = 1; i <= waitSeconds; i++) {
     try {
