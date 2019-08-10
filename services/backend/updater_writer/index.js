@@ -56,8 +56,7 @@ initializeDatabaseConnection().then(() => {
       msg.ack()
     })
   })
-})
-.catch(e => {
+}).catch(e => {
   process.exitCode = 1
   console.log(e)
 })

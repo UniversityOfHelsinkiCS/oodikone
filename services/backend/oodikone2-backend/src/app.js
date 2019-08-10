@@ -40,8 +40,7 @@ initializeDatabaseConnection().then(() => {
       console.log('Process terminated')
     })
   })
-})
-.catch(e => {
+}).catch(e => {
   process.exitCode = 1
   console.log(e)
 })
