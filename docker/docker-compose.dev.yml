@@ -1,4 +1,4 @@
-version: '3'
+version: '3.2'
 
 services:
   user_db:
@@ -14,7 +14,6 @@ services:
       args:
         NODE_ENV: 'development'
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
-    restart: unless-stopped
     environment:
       FRONT_URL: http://localhost:8000
     volumes:
@@ -28,7 +27,6 @@ services:
       args:
         NODE_ENV: 'development'
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run docker']
-    restart: unless-stopped
     ports:
       - "8081:8081"
       - "7777:7777"
@@ -45,7 +43,6 @@ services:
       args:
         NODE_ENV: 'development'
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
-    restart: unless-stopped
     volumes:
       - ./services/oodikone2-userservice/:/usr/src/app
 
@@ -54,7 +51,6 @@ services:
       args:
         NODE_ENV: 'development'
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
-    restart: unless-stopped
     volumes:
       - ./services/oodikone2-usageservice/:/usr/src/app
 
@@ -63,7 +59,6 @@ services:
       args:
         NODE_ENV: 'development'
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
-    restart: unless-stopped
     volumes:
       - ./services/updater_api/:/usr/src/app
 
@@ -72,7 +67,6 @@ services:
       args:
         NODE_ENV: 'development'
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
-    restart: unless-stopped
     volumes:
       - ./services/backend/updater_writer/:/usr/src/app
       - ./services/backend/shared/models:/usr/src/app/models
@@ -81,15 +75,11 @@ services:
     environment:
       DB_SCHEMA_KONE: kone_data
 
-  scheduler_mongo:
-    restart: unless-stopped
-
   updater_scheduler:
     build:
       args:
         NODE_ENV: 'development'
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
-    restart: unless-stopped
     volumes:
       - ./services/updater_scheduler/:/usr/src/app
 
@@ -98,7 +88,6 @@ services:
       args:
         NODE_ENV: 'development'
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
-    restart: unless-stopped
     volumes:
       - ./services/oodikone2-analytics/:/usr/src/app
 
@@ -110,7 +99,6 @@ services:
       - ./adminer-plugins:/var/www/html/plugins-enabled
     ports:
       - 5050:8080
-    restart: always
     container_name: adminer
 
   # zookeeper:
@@ -141,7 +129,6 @@ services:
 
   # mongo_db:
   #   image: mongo
-  #   restart: unless-stopped
   #   volumes:
   #     - ./backups/mongo/oodilearn:/dump
   #     - ./mongodata:/data/db
@@ -153,7 +140,6 @@ services:
   #   build:
   #     context: services/oodilearn/server
   #     dockerfile: Dockerfile
-  #   restart: unless-stopped
   #   volumes:
   #     - ./services/oodilearn/data:/data
   #     - ./services/oodilearn/server:/src
