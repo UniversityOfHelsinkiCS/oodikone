@@ -81,4 +81,9 @@ app.patch('/facultystats', async (req, res) => {
   res.status(200).end()
 })
 
-app.listen(port, () => console.log(`Analytics listening on port ${port}!`))
+const server = app.listen(port, () => console.log(`Analytics listening on port ${port}!`))
+process.on('SIGTERM', () => {
+  server.close(() => {
+    console.log('Process terminated')
+  })
+})
