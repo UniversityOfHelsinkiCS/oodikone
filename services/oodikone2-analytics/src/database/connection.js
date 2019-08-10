@@ -7,6 +7,23 @@ const sequelize = new Sequelize(conf.DB_URL, {
   logging: false
 })
 const runMigrations = async () => {
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const waitSeconds = 60
+  for (let i = 1; i <= waitSeconds; i++) {
+    try {
+      await sequelize.authenticate()
+      break
+    } catch (e) {
+      if (i === waitSeconds) {
+        console.log(`Could not connect to database in ${waitSeconds} seconds`, e)
+        process.exitCode = 1
+        process.kill(process.pid, 'SIGTERM')
+        return
+      }
+      console.log('.')
+      await sleep(1000)
+    }
+  }
   try {
     const migrator = new Umzug({
       storage: 'sequelize',
@@ -31,8 +48,8 @@ const runMigrations = async () => {
     console.log('Migration error, message:', e)
   }
 }
-const migrationPromise = process.env.NODE_ENV != 'test' ? runMigrations().catch((e) => { console.log(e); process.exitCode = 1; process.kill(process.pid, 'SIGTERM') })
-  : Promise.resolve()
+
+const migrationPromise = async process.env.NODE_ENV != 'test' ? runMigrations() : Promise.resolve()
 
 const forceSyncDatabase = async () => {
   await sequelize.sync({ force: true })
