@@ -8,13 +8,15 @@ executors:
 
 aliases:
   - &check_exit_statuses
-    run: |
-      docker ps -a
-      if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
-        echo 'Some process had nonzero exit code';
-        docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
-        exit 1;
-      fi
+    run:
+      name: check_exit_statuses
+      command: |
+        docker ps -a
+        if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
+          echo 'Some process had nonzero exit code';
+          docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
+          exit 1;
+        fi
 
 jobs:
   build:
@@ -54,6 +56,11 @@ jobs:
       - run: source ./scripts/scripts.sh && init_dirs && db_anon_setup_full
       - *check_exit_statuses
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d --no-recreate
+      - run:
+          name: log_in_background
+          background: true
+          command: |
+            docker ps -a && docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f
       - *check_exit_statuses
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f & npm run test_services
       - *check_exit_statuses
