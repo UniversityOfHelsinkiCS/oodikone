@@ -31,7 +31,7 @@ const runMigrations = async () => {
     console.log('Migration error, message:', e)
   }
 }
-const migrationPromise = conf.DB_SCHEMA === 'public' && process.env.NODE_ENV != 'test' ? runMigrations()
+const migrationPromise = process.env.NODE_ENV != 'test' ? runMigrations().catch((e) => { console.log(e); process.exitCode = 1; process.kill(process.pid, 'SIGTERM'); })
   : Promise.resolve()
 
 const forceSyncDatabase = async () => {
