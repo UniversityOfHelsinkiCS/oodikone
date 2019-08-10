@@ -6,7 +6,7 @@ const conf = require('./conf-backend')
 const routes = require('./routes')
 const { startCron } = require('./events')
 const { PORT } = conf
-const { initializeDatabaseConnection } = require('./src/database/connection')
+const { initializeDatabaseConnection } = require('./database/connection')
 
 initializeDatabaseConnection().then(() => {
   const app = express()
