@@ -18,7 +18,7 @@ sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
 
 
 const initializeDatabaseConnection = async () => {
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
   const waitSeconds = 60
   for (let i = 1; i <= waitSeconds; i++) {
     try {
