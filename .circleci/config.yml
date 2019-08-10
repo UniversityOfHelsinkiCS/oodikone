@@ -6,6 +6,16 @@ executors:
     machine:
       image: ubuntu-1604:201903-01
 
+aliases:
+  - &check_exit_statuses
+    run: |
+      docker ps -a
+      if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
+        echo 'Some process had nonzero exit code';
+        docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
+        exit 1;
+      fi
+
 jobs:
   build:
     executor: my-executor
@@ -36,23 +46,24 @@ jobs:
           key: npmcache-v2-{{ checksum "package-lock.json" }}
           paths:
             - ~/.cache
-      - run: docker pull node:10.15-alpine # pull base image that everything inherits only once
       - run: TAG=${CACHE_TAG} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml pull --ignore-pull-failures
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml build
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d db user_db db_kone
+      - *check_exit_statuses
       - run: git clone --depth 1 git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
       - run: source ./scripts/scripts.sh && init_dirs && db_anon_setup_full
+      - *check_exit_statuses
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d --no-recreate
-      - run: docker ps -a && docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
+      - *check_exit_statuses
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f & npm run test_services
+      - *check_exit_statuses
       - run: timeout 5m bash -c 'until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf .; sleep 5; done'
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f & npm run cypress -- run --config video=true --config videoCompression=false --config baseUrl=http://localhost:1337/
-      - run: docker ps -a && docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
+      - *check_exit_statuses
       - store_artifacts:
           path: cypress/videos
       - store_artifacts:
           path: cypress/screenshots
-      - run: if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
       - deploy:
           command: |
             if [ "${DEPLOY}" == "true" ]; then
