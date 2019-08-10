@@ -42,12 +42,11 @@ jobs:
       - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d db user_db db_kone
       - run: git clone --depth 1 git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
       - run: source ./scripts/scripts.sh && init_dirs && db_anon_setup_full
-      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d --no-recreate
       - run: docker ps -a && docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
-      - run: npm run test_services
-      - run: docker ps -a && docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f & npm run test_services
       - run: timeout 5m bash -c 'until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf .; sleep 5; done'
-      - run: npm run cypress -- run --config video=true --config videoCompression=false --config baseUrl=http://localhost:1337/
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f & npm run cypress -- run --config video=true --config videoCompression=false --config baseUrl=http://localhost:1337/
       - run: docker ps -a && docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
       - store_artifacts:
           path: cypress/videos
