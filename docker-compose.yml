@@ -9,6 +9,7 @@ services:
     ports:
       - "8222:8222"
       - "4222:4222"
+    restart: unless-stopped
     container_name: nats
     volumes:
       - ./datastore:/datastore
@@ -19,6 +20,7 @@ services:
       - "5423:5432"
     volumes:
       - ./analytics_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
     container_name: oodi_analytics_db
     environment:
       - POSTGRES_USER=postgres
@@ -30,6 +32,7 @@ services:
       - "5422:5432"
     volumes:
       - ./user_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
     container_name: oodi_user_db
     environment:
       - POSTGRES_USER=postgres
@@ -40,6 +43,7 @@ services:
       - "5424:5432"
     volumes:
       - ./usage_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
     container_name: oodi_usage_db
     environment:
       - POSTGRES_USER=postgres
@@ -52,6 +56,7 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
     container_name: oodi_db
     environment:
       - POSTGRES_USER=postgres
@@ -63,6 +68,7 @@ services:
     volumes:
       - ./pgdata_kone:/var/lib/postgresql/data
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
     container_name: db_kone
     environment:
       - POSTGRES_MULTIPLE_DATABASES=db_kone
@@ -75,6 +81,7 @@ services:
       - "6379:6379"
     volumes:
       - ./redis-data:/data
+    restart: unless-stopped
     container_name: redis
 
   backend:
@@ -98,7 +105,7 @@ services:
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
       UPDATER_URL: http://updater_scheduler:3678
-
+    restart: unless-stopped
     container_name: backend
     depends_on:
       - db
@@ -111,6 +118,7 @@ services:
     environment:
       BACKEND_ADDR: backend
       ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
+    restart: unless-stopped
     container_name: frontend
 
   userservice:
@@ -125,6 +133,7 @@ services:
       TOKEN_SECRET: IWannaBeTheVeryBest
     depends_on:
       - user_db
+    restart: unless-stopped
     container_name: userservice
 
   usageservice:
@@ -138,6 +147,7 @@ services:
       SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
     depends_on:
       - usage_db
+    restart: unless-stopped
     container_name: usageservice
 
   updater_api:
@@ -149,6 +159,7 @@ services:
       - NATS_URI=nats://nats:4222
       - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
       - TOKEN=jotaindiibadaabaa
+    restart: unless-stopped
     #container_name: updater_api
 
   updater_writer:
@@ -163,6 +174,7 @@ services:
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       TEST_DB_SCHEMA: updater_test
+    restart: unless-stopped
     #container_name: updater_writer
 
   scheduler_mongo:
@@ -171,6 +183,7 @@ services:
       - ./mongodata:/data/db
     expose:
       - "27017"
+    restart: unless-stopped
     container_name: scheduler_mongo
 
   updater_scheduler:
@@ -183,6 +196,7 @@ services:
       - NATS_URI=nats://nats:4222
       - MONGO_URI=mongodb://scheduler_mongo:27017
       - PORT=3678
+    restart: unless-stopped
     container_name: updater_scheduler
 
   analytics:
@@ -195,4 +209,5 @@ services:
       - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
     depends_on:
       - analytics_db
+    restart: unless-stopped
     container_name: analytics
