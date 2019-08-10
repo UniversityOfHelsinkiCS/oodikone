@@ -22,23 +22,27 @@ jobs:
   build:
     executor: my-executor
     steps:
-      - run: echo 'export AUTHOR_NAME="$(git log -1 ${CIRCLE_SHA1} --pretty="%aN")"' >> $BASH_ENV
-      - run: |
-          if [[ -n "$CIRCLE_TAG" ]]; then
-            echo 'export SENTRY_RELEASE_VERSION=PRODUCTION-${CIRCLE_SHA1}' >> $BASH_ENV;
-            echo 'export TAG=latest' >> $BASH_ENV;
-            echo 'export DEPLOY=true' >> $BASH_ENV;
-            echo 'export CACHE_TAG=staging' >> $BASH_ENV;
-          elif [[ "false" = "true" && "$CIRCLE_BRANCH" = "master" && -z "$CIRCLE_PULL_REQUEST" ]]; then
-            echo 'export SENTRY_RELEASE_VERSION=STAGING-${CIRCLE_SHA1}' >> $BASH_ENV;
-            echo 'export TAG=staging' >> $BASH_ENV;
-            echo 'export DEPLOY=true' >> $BASH_ENV;
-            echo 'export CACHE_TAG=trunk' >> $BASH_ENV;
-          else
-            echo 'export TAG=trunk' >> $BASH_ENV;
-            echo 'export DEPLOY=true' >> $BASH_ENV;
-            echo 'export CACHE_TAG=trunk' >> $BASH_ENV;
-          fi
+      - run:
+          name: set_env_variables
+          command: |
+            if [[ -n "$CIRCLE_TAG" ]]; then
+              echo 'export SENTRY_RELEASE_VERSION=PRODUCTION-${CIRCLE_SHA1}' >> $BASH_ENV;
+              echo 'export TAG=latest' >> $BASH_ENV;
+              echo 'export DEPLOY=true' >> $BASH_ENV;
+              echo 'export CACHE_TAG=staging' >> $BASH_ENV;
+              echo 'USING RELEASE CONFIG';
+            elif [[ "false" = "true" && "$CIRCLE_BRANCH" = "master" && -z "$CIRCLE_PULL_REQUEST" ]]; then
+              echo 'export SENTRY_RELEASE_VERSION=STAGING-${CIRCLE_SHA1}' >> $BASH_ENV;
+              echo 'export TAG=staging' >> $BASH_ENV;
+              echo 'export DEPLOY=true' >> $BASH_ENV;
+              echo 'export CACHE_TAG=trunk' >> $BASH_ENV;
+              echo 'USING STAGING CONFIG';
+            else
+              echo 'export TAG=trunk' >> $BASH_ENV;
+              echo 'export DEPLOY=true' >> $BASH_ENV;
+              echo 'export CACHE_TAG=trunk' >> $BASH_ENV;
+              echo 'USING TRUNK CONFIG';
+            fi
       - checkout
       - restore_cache:
           keys:
@@ -62,10 +66,10 @@ jobs:
           command: |
             docker ps -a && docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f
       - *check_exit_statuses
-      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f & npm run test_services
+      - run: npm run test_services
       - *check_exit_statuses
       - run: timeout 5m bash -c 'until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf .; sleep 5; done'
-      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f & npm run cypress -- run --config video=true --config videoCompression=false --config baseUrl=http://localhost:1337/
+      - run: npm run cypress -- run --config video=true --config videoCompression=false --config baseUrl=http://localhost:1337/
       - *check_exit_statuses
       - store_artifacts:
           path: cypress/videos
