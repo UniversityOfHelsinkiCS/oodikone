@@ -4,6 +4,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const DeadCodePlugin = require('webpack-deadcode-plugin')
 const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+const os = require('os')
 
 const devServerPort = 8081
 const apiServerPort = 8080
@@ -93,7 +94,7 @@ module.exports = (env, args) => {
     optimization: {
       minimizer: [new TerserPlugin({
         cache: true,
-        parallel: true,
+        parallel: os.cpus().length,
         sourceMap: true
       })]
     },
