@@ -49,14 +49,14 @@ describe('Population Statistics tests', () => {
 
     cy.get("@enrollmentSelect").its(`${[0]}.value`).then((beforeVal) => {
       cy.get("@enrollmentSelect").click()
-      cy.get("table").contains("2014-2015").click()
+      cy.contains("table", "2014-2015").click()
       cy.get("@enrollmentSelect").should('not.have.value', beforeVal)
     })
 
 
     cy.contains("Statistics until").siblings().within(() => {
       cy.get("input").click()
-      cy.get("table").contains(`${new Date().getFullYear()}`).click()
+      cy.contains("table", `${new Date().getFullYear()}`).click()
       cy.contains("2018").click()
       cy.contains("Oct").click()
       cy.get("input").should("have.value", "October 2018")
@@ -116,7 +116,7 @@ describe('Population Statistics tests', () => {
       cy.contains("Matematiikan didaktiikka").siblings().eq(2).should("have.text", '1')
     })
 
-    cy.get("button").contains("show").click()
+    cy.contains("button", "show").click()
     cy.contains("Student names hidden").click()
     cy.contains("Oinonen").siblings().eq(2).click()
     cy.contains("Oinonen").invoke('text').then((text) => expect(text).to.equal('Oinonen Heidi Eeva Elisabet, 014473717'))
@@ -125,7 +125,7 @@ describe('Population Statistics tests', () => {
   it('Student list checking works as intended', () => {
     cy.contains("Select study programme").click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
     cy.contains("See population").click()
-    cy.get("button").contains("show").click()
+    cy.contains("button", "show").click()
     cy.contains("010483918")
     cy.contains("666666666").should('not.exist')
     cy.contains('button', "Check studentnumbers").click()
@@ -242,7 +242,7 @@ describe('Population Statistics tests', () => {
 
     cy.contains("Save filters as preset").click()
     cy.contains("This filter is saved").siblings().within(() => { cy.get("input").type(`Advanced filters-${new Date().getTime()}`, { delay: 0 }) })
-    cy.contains("Save current filters as preset").parentsUntil(".dimmer").within(() => { cy.get("button").contains("Save").click() })
+    cy.contains("Save current filters as preset").parentsUntil(".dimmer").within(() => { cy.contains("button", "Save").click() })
 
     cy.visit("/populations")
     cy.contains("Select study programme", { timeout: 50000 }).click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
@@ -258,14 +258,14 @@ describe('Population Statistics tests', () => {
       cy.wrap($f).parentsUntil("form").contains("set filter").click()
     })
 
-    cy.get(".header").contains("Filters").siblings().within(() => {
+    cy.contains(".header", "Filters").siblings().within(() => {
       cy.get("label:contains(Basic filters)").each(($f) => {
         cy.wrap($f).parentsUntil(".segment").within(() => {
           cy.get(".trash").click()
         })
       })
     })
-    cy.get("button").contains("Delete for good").click({ force: true })
+    cy.contains("button", "Delete for good").click({ force: true })
 
     cy.contains("Filters").siblings().within(() => {
       cy.get("label:contains(Advanced filters-)").each(($f) => {
@@ -274,7 +274,7 @@ describe('Population Statistics tests', () => {
         })
       })
     })
-    cy.get("button").contains("Delete for good").click({ force: true })
+    cy.contains("button", "Delete for good").click({ force: true })
 
   })
 })
