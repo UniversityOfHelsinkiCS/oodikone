@@ -43,7 +43,6 @@ const ProgressBar = ({ progress, fixed }) => {
       <Progress
         percent={progress}
         disabled={progress === 100}
-        progress
         color="blue"
         className={classNames.join(' ')}
       />
