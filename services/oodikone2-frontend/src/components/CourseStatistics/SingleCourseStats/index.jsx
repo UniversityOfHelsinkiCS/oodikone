@@ -21,8 +21,8 @@ const countFilteredStudents = (stat, filter) => Object.entries(stat).reduce((acc
 
 class SingleCourseStats extends Component {
   state = {
-    primary: ALL.value,
-    comparison: null,
+    primary: [ALL.value],
+    comparison: [],
     separate: null
   }
 
@@ -54,16 +54,19 @@ class SingleCourseStats extends Component {
     }
   }
 
-  belongsToProgramme = (code) => {
-    if (code === ALL.value) {
-      return () => true
-    }
+  belongsToAtLeastOneProgramme = (codes) => {
+    if (codes.includes(ALL.value)) return () => true
+
     const { programmes } = this.props.stats
-    const programme = programmes[code]
-    if (!programme) {
-      return () => false
-    }
-    const numberset = new Set(programme.students)
+    const studentNumbers = []
+    codes.forEach((code) => {
+      if (programmes[code]) {
+        studentNumbers.push(...programmes[code].students)
+      }
+    })
+
+    const numberset = new Set(studentNumbers)
+    if (!numberset.size) return () => false
     return studentnumber => numberset.has(studentnumber)
   }
 
@@ -99,10 +102,10 @@ class SingleCourseStats extends Component {
       filteredYears.find(year => year.text === name)
   }
 
-  statsForProgramme = (progcode) => {
+  statsForProgrammes = (progCodes, name) => {
     const { statistics } = this.props.stats
-    const filter = this.belongsToProgramme(progcode)
-    const progstats = statistics.map(({ code, name, students: allstudents, attempts, coursecode }) => {
+    const filter = this.belongsToAtLeastOneProgramme(progCodes)
+    const progStats = statistics.map(({ code, name, students: allstudents, attempts, coursecode }) => {
       const cumulative = {
         grades: countFilteredStudents(attempts.grades, filter),
         categories: countFilteredStudents(attempts.classes, filter)
@@ -114,10 +117,20 @@ class SingleCourseStats extends Component {
       return { code, name, cumulative, students, coursecode }
     }).filter(this.isStatInYearRange)
     return {
-      code: progcode,
-      name: this.getProgrammeName(progcode),
-      stats: progstats
+      codes: progCodes,
+      name,
+      stats: progStats
     }
+  }
+
+  handleSelect = (e, { name, value }) => {
+    let selected = [...value].filter(v => v !== ALL.value)
+
+    if ((!this.state[name].includes(ALL.value) && value.includes(ALL.value)) || (name === 'primary' && value.length === 0)) {
+      selected = [ALL.value]
+    }
+
+    this.setState({ [name]: selected })
   }
 
   handleChange = (e, { name, value }) => {
@@ -126,57 +139,33 @@ class SingleCourseStats extends Component {
 
   filteredProgrammeStatistics = () => {
     const { primary, comparison } = this.state
-    const pstats = !this.validProgCode(primary) ? undefined : this.statsForProgramme(primary)
-    const cstats = !this.validProgCode(comparison)
-      ? undefined
-      : this.statsForProgramme(comparison)
-    return {
-      primary: pstats,
-      comparison: cstats
-    }
-  }
+    const filter = p => this.validProgCode(p)
 
-  selectedProgrammes = () => {
-    const { primary: p, comparison: c } = this.state
-    const { programmes } = this.props.stats
-    const primary = !programmes[p] ? ALL.value : p
-    const comparison = (!programmes[c] && c !== ALL.value) ? undefined : c
-    return { primary, comparison }
+    const primaryProgrammes = primary.filter(filter)
+    const comparisonProgrammes = comparison.filter(filter)
+    const pstats = primaryProgrammes.length ? this.statsForProgrammes(
+      primaryProgrammes,
+      primaryProgrammes.length === 1 ? this.getProgrammeName(primaryProgrammes[0]) : 'Primary'
+    ) : undefined
+    const cstats = comparisonProgrammes.length ? this.statsForProgrammes(
+      comparisonProgrammes,
+      comparisonProgrammes.length === 1 ? this.getProgrammeName(comparisonProgrammes[0]) : 'Comparison'
+    ) : undefined
+
+    return {
+      primary: pstats || undefined,
+      comparison: cstats || undefined
+    }
   }
 
   render() {
     const { programmes } = this.props
-    const { fromYear, toYear } = this.state
-    const { primary, comparison } = this.selectedProgrammes()
+    const { fromYear, toYear, primary, comparison } = this.state
     const statistics = this.filteredProgrammeStatistics()
     const { filteredYears } = this.filteredYearsAndSemesters(true)
 
     return (
       <div>
-        <Segment>
-          <Form>
-            <Header content="Filter statistics by study programme" as="h4" />
-            <Form.Group widths="equal" >
-              <ProgrammeDropdown
-                name="primary"
-                options={programmes}
-                label="Primary group"
-                placeholder="Select a study programme"
-                value={primary}
-                onChange={this.handleChange}
-              />
-              <ProgrammeDropdown
-                name="comparison"
-                options={programmes}
-                label="Comparison group"
-                placeholder="Optional"
-                value={comparison}
-                onChange={this.handleChange}
-                onClear={() => this.setState({ comparison: undefined })}
-              />
-            </Form.Group>
-          </Form>
-        </Segment>
         <Segment>
           <Form>
             <Header content="Filter statistics by time range" as="h4" />
@@ -188,6 +177,29 @@ class SingleCourseStats extends Component {
               showCheckbox={false}
               separate={false}
             />
+          </Form>
+        </Segment>
+        <Segment>
+          <Form>
+            <Header content="Filter statistics by study programmes" as="h4" />
+            <Form.Group widths="equal" >
+              <ProgrammeDropdown
+                name="primary"
+                options={programmes}
+                label="Primary group"
+                placeholder="Select study programmes"
+                value={primary}
+                onChange={this.handleSelect}
+              />
+              <ProgrammeDropdown
+                name="comparison"
+                options={programmes}
+                label="Comparison group"
+                placeholder="Optional"
+                value={comparison}
+                onChange={this.handleSelect}
+              />
+            </Form.Group>
           </Form>
         </Segment>
         <ResultTabs

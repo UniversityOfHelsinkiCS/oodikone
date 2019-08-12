@@ -6,14 +6,12 @@ import { arrayOf, string, shape, func, bool } from 'prop-types'
 
 import {
   createStudentTagAction,
-  deleteStudentTagAction,
-  getStudentTagsByStudytrackAction
+  deleteStudentTagAction
 } from '../../redux/tagstudent'
 
 const TagStudent = ({
   createStudentTag,
   deleteStudentTag,
-  getStudentTagsByStudytrack,
   studentnumber,
   studentstags,
   tags,
@@ -57,15 +55,13 @@ const TagStudent = ({
       tag_id: value,
       studentnumber
     }
-    await createStudentTag(tag)
-    getStudentTagsByStudytrack(studytrack)
+    await createStudentTag(tag, studytrack)
   }
 
   const deleteTag = async (event, tag) => {
     event.preventDefault()
     const removableTag = studentsTagIds.find(t => t.tag_id === tag.tag_id)
-    await deleteStudentTag(removableTag.id)
-    getStudentTagsByStudytrack(studytrack)
+    await deleteStudentTag(removableTag.id, studytrack)
   }
 
   const studentsTags = allTags
@@ -107,7 +103,6 @@ const TagStudent = ({
 TagStudent.propTypes = {
   createStudentTag: func.isRequired,
   deleteStudentTag: func.isRequired,
-  getStudentTagsByStudytrack: func.isRequired,
   studentnumber: string.isRequired,
   studentstags: arrayOf(shape({ tag: shape({ tagname: string, tag_id: string }), id: string })).isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
@@ -123,6 +118,5 @@ const mapStateToProps = ({ tagstudent }) => ({
 
 export default withRouter(connect(mapStateToProps, {
   createStudentTag: createStudentTagAction,
-  deleteStudentTag: deleteStudentTagAction,
-  getStudentTagsByStudytrack: getStudentTagsByStudytrackAction
+  deleteStudentTag: deleteStudentTagAction
 })(TagStudent))
