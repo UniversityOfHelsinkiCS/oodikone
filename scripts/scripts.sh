@@ -41,10 +41,8 @@ get_anon_oodikone() {
     if [ -e "$file" ]; then
       echo "Private key exists"
     else
-      echo "No private key, echoing from environment variable OODI_KEY!"
-      echo "You can generate valid OODI_KEY by adding a deploy key to the github repository and base64 encoding the generated private key"
-      echo "You can then remove any newlines from the encoded data and store it to OODI_KEY env variable."
-      echo "$OODI_KEY" | base64 -d > private.key
+      echo "No private key, echoing from environment variable OODI_KEY"
+      echo "$OODI_KEY" | awk  '{gsub("\\\\n","\n")};1' > private.key
       chmod 400 private.key
     fi
     rm -rf anonyymioodi
