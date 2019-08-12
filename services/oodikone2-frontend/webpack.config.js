@@ -4,7 +4,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const DeadCodePlugin = require('webpack-deadcode-plugin')
 const SentryWebpackPlugin = require('@sentry/webpack-plugin')
-const os = require('os')
 
 const devServerPort = 8081
 const apiServerPort = 8080
