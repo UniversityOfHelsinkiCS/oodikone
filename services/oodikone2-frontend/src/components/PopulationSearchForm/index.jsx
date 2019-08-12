@@ -130,10 +130,9 @@ const PopulationSearchForm = (props) => {
 
     const success = await fetchPopulationPromises.current.promise
     if (success) {
+      props.clearPopulationFilters()
       if (queryCodes[0] === 'KH50_001') {
         props.setPopulationFilter(transferTo(false))
-      } else {
-        props.clearPopulationFilters()
       }
       setState({ isLoading: false })
       // not a good solution FIX
