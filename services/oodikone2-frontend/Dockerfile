@@ -1,30 +1,28 @@
 FROM node:10.15-alpine
 
-ARG BASE_PATH
-ENV BASE_PATH=$BASE_PATH
-
-COPY . /usr/src/app
 WORKDIR /usr/src/app
-RUN npm ci
+EXPOSE 5000
+CMD serve -s -l 5000 dist
 
+COPY package.json /usr/src/app/package.json
+COPY package-lock.json /usr/src/app/package-lock.json
 COPY package.json /usr/src/cache/package.json
 COPY package-lock.json /usr/src/cache/package-lock.json
+RUN npm ci
 
-ARG SENTRY_RELEASE_VERSION
-ENV SENTRY_RELEASE_VERSION=${SENTRY_RELEASE_VERSION}
+ARG BASE_PATH=/
+ENV BASE_PATH=$BASE_PATH
 ARG SENTRY_URL
 ARG SENTRY_AUTH_TOKEN
 ARG SENTRY_ORG
 ARG SENTRY_PROJECT
-
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 RUN if [ "${NODE_ENV}" != "production" ]; then cp -r /usr/src/app/node_modules /usr/src/cache/node_modules; fi
 
-RUN if [ "${NODE_ENV}" != "development" ]; then npm run dist && npm install -g serve; fi
-
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait /wait
-RUN chmod +x /wait
-
-EXPOSE 5000
-CMD /wait && serve -s -l 5000 dist
+COPY . /usr/src/app
+RUN if [ "${NODE_ENV}" != "development" ]; then \
+      export CHECKSUM="$(find . ! -path */node_modules/* -type f -exec md5sum {} \; | sort -k 2 | printf "$(cat - )\\nBASE_PATH ${BASE_PATH}" | md5sum | awk '{ print $1 }')" && \
+      SENTRY_RELEASE_VERSION="${NODE_ENV}-${CHECKSUM}" npm run dist && \
+      npm install -g serve; \
+    fi

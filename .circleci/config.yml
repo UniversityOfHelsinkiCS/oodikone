@@ -1,0 +1,84 @@
+version: 2.1
+
+executors:
+  my-executor:
+    working_directory: ~/app
+    machine:
+      image: ubuntu-1604:201903-01
+
+aliases:
+  - &check_exit_statuses
+    run:
+      name: check_exit_statuses
+      command: |
+        docker ps -a
+        if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
+          echo 'Some process had nonzero exit code';
+          docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs
+          exit 1;
+        fi
+
+jobs:
+  build:
+    executor: my-executor
+    steps:
+      - run:
+          name: set_env_variables
+          command: |
+            if [[ "$CIRCLE_BRANCH" = "master" && -n "$CIRCLE_TAG" ]]; then
+              echo 'export SENTRY_RELEASE_VERSION=PRODUCTION-${CIRCLE_SHA1}' >> $BASH_ENV;
+              echo 'export TAG=latest' >> $BASH_ENV;
+              echo 'export DEPLOY=true' >> $BASH_ENV;
+              echo 'export CACHE_TAG=staging' >> $BASH_ENV;
+              echo 'USING RELEASE CONFIG';
+            elif [[ "$CIRCLE_BRANCH" = "master" && -z "$CIRCLE_PULL_REQUEST" ]]; then
+              echo 'export SENTRY_RELEASE_VERSION=STAGING-${CIRCLE_SHA1}' >> $BASH_ENV;
+              echo 'export TAG=staging' >> $BASH_ENV;
+              echo 'export DEPLOY=true' >> $BASH_ENV;
+              echo 'export CACHE_TAG=trunk' >> $BASH_ENV;
+              echo 'USING STAGING CONFIG';
+            else
+              echo 'export TAG=trunk' >> $BASH_ENV;
+              echo 'export DEPLOY=true' >> $BASH_ENV;
+              echo 'export CACHE_TAG=trunk' >> $BASH_ENV;
+              echo 'USING TRUNK CONFIG';
+            fi
+      - checkout
+      - restore_cache:
+          keys:
+            - npmcache-v2-{{ checksum "package-lock.json" }}
+      - run: npm ci
+      - run: npm run cypress -- verify
+      - save_cache:
+          key: npmcache-v2-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.cache
+      - run: TAG=${CACHE_TAG} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml pull --ignore-pull-failures
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml build
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d db user_db db_kone
+      - *check_exit_statuses
+      - run: git clone --depth 1 git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
+      - run: source ./scripts/scripts.sh && init_dirs && db_anon_setup_full
+      - *check_exit_statuses
+      - run: docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml up -d --no-recreate
+      - run:
+          name: log_in_background
+          background: true
+          command: |
+            docker ps -a && docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f
+      - *check_exit_statuses
+      - run: npm run test_services
+      - *check_exit_statuses
+      - run: timeout 5m bash -c 'until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf .; sleep 5; done'
+      - run: npm run cypress:ci
+      - *check_exit_statuses
+      - store_artifacts:
+          path: cypress/videos
+      - store_artifacts:
+          path: cypress/screenshots
+      - deploy:
+          command: |
+            if [ "${DEPLOY}" == "true" ]; then
+              docker login -u $DOCKER_USER -p $DOCKER_PASS
+              docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml push
+            fi

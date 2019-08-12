@@ -84,7 +84,7 @@ const getAllStudyProgrammes = createSelector([getCourseStats, languageSelector],
   ]
 })
 
-const getProgrammesFromProps = (state, { programme, programmes }) => ({ programme, programmes })
+const getProgrammesFromProps = (state, { programmeCodes, programmes }) => ({ programmeCodes, programmes })
 
 const calculatePassRate = (passed, failed) => {
   const passRate = (100 * passed) / (passed + failed)
@@ -125,10 +125,11 @@ const getSummaryStats = (statistics, filterStudentFn) => {
 const summaryStatistics = createSelector(
   getCourseStats,
   getProgrammesFromProps,
-  (courseStats, { programme: code, programmes }) => {
-    const programme = programmes.find(p => p.key === code)
-    const { students } = programme
-    const filterStudentFn = studentNumber => students && students.includes(studentNumber)
+  (courseStats, { programmeCodes, programmes }) => {
+    const filteredProgrammes = programmes.filter(p => programmeCodes.includes(p.key))
+    const students = new Set(filteredProgrammes.reduce((acc, p) => [...acc, ...p.students], []))
+
+    const filterStudentFn = studentNumber => students && students.has(studentNumber)
     return Object.entries(courseStats).map((entry) => {
       const [coursecode, data] = entry
       const { statistics, name } = data

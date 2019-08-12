@@ -54,7 +54,8 @@ class TeacherLeaderBoard extends Component {
     const filterYearoptions = yearoptions.filter((year) => {
       const options = moment(new Date())
         .diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0 ?
-        year.text.slice(0, 4) <= new Date().getFullYear() : year.text.slice(0, 4) < new Date().getFullYear()
+        year.text.slice(0, 4) <= new Date().getFullYear() :
+        year.text.slice(0, 4) < new Date().getFullYear()
       return options
     })
     return (
