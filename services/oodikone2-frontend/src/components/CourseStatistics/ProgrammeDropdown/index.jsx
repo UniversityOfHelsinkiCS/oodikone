@@ -14,10 +14,12 @@ const ProgrammeDropdown = ({ options, label, name, onChange, onClear, value, ...
         ...rest
     }))}
     selection
+    multiple
     fluid
     label={label}
     name={name}
     onChange={onChange}
+    search
     value={value}
     {...props}
   />
@@ -28,7 +30,7 @@ ProgrammeDropdown.propTypes = {
   name: string.isRequired,
   onChange: func.isRequired,
   onClear: func,
-  value: oneOfType([string, number]),
+  value: arrayOf(string),
   options: arrayOf(shape({
     code: oneOfType([string, number]),
     count: oneOfType([string, number]),
@@ -39,7 +41,7 @@ ProgrammeDropdown.propTypes = {
 }
 
 ProgrammeDropdown.defaultProps = {
-  value: undefined,
+  value: [],
   onClear: undefined
 }
 
