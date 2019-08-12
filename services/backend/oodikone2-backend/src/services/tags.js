@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { Tag } = require('../models/models_kone')
+const { Tag, TagStudent } = require('../models/models_kone')
 
 const Op = Sequelize.Op
 
@@ -20,6 +20,13 @@ const createNewTag = async (tag) => {
 }
 
 const deleteTag = async (tag) => {
+  await TagStudent.destroy({
+    where: {
+      tag_id: {
+        [Op.eq]: tag.tag_id
+      }
+    }
+  })
   return Tag.destroy({
     where: {
       tag_id: {
