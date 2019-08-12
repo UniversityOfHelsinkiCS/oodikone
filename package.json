@@ -14,6 +14,7 @@
     "lint": "./scripts/run_service_lints.sh",
     "docker": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml",
     "docker:real": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml -f ./docker/docker-compose.dev.real.yml",
+    "docker:ci": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml",
     "docker:build": "npm run docker -- build",
     "docker:up": "npm run docker -- up -d",
     "docker:up:real": "npm run docker:real -- up -d",

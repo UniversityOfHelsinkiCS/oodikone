@@ -11,8 +11,12 @@ const apiServerPort = 8080
 const apiAddress = process.env.BACKEND_ADDR || 'localhost'
 const backendURL = `http://${apiAddress}:${apiServerPort}`
 const BASE_PATH = process.env.BASE_PATH || '/'
-const noSentryVersion = !Boolean(process.env.SENTRY_RELEASE_VERSION)
-const sentryreleaseversion = noSentryVersion ? 'unknown' : process.env.SENTRY_RELEASE_VERSION
+const { SENTRY_RELEASE_VERSION, SENTRY_PROJECT, SENTRY_ORG, SENTRY_URL } = process.env
+const noSentryVersion = !Boolean(SENTRY_RELEASE_VERSION)
+const sentryreleaseversion = noSentryVersion ? 'unknown' : SENTRY_RELEASE_VERSION
+const sentryDryRun = noSentryVersion || !Boolean(SENTRY_PROJECT) || !Boolean(SENTRY_ORG) || !Boolean(SENTRY_URL)
+
+console.log('sentry settings:', { sentryDryRun, SENTRY_RELEASE_VERSION })
 
 module.exports = (env, args) => {
   const { mode } = args
@@ -88,7 +92,7 @@ module.exports = (env, args) => {
         ignoreFile: '.sentrycliignore',
         ignore: ['node_modules', 'webpack.config.js'],
         release: sentryreleaseversion,
-        dryRun: noSentryVersion
+        dryRun: sentryDryRun
       })
     ],
     optimization: {
