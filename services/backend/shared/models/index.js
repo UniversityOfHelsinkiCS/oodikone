@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { sequelize, migrationPromise } = require('../database/connection')
+const { sequelize } = require('../database/connection')
 
 const Student = sequelize.define('student',
   {
@@ -531,6 +531,5 @@ module.exports = {
   CreditTeacher,
   ErrorData,
   Migration,
-  migrationPromise,
   sequelize
 }
