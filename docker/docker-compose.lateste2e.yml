@@ -27,7 +27,6 @@ services:
     build:
       args:
         BASE_PATH: /
-        SENTRY_RELEASE_VERSION: ${SENTRY_RELEASE_VERSION}
         SENTRY_URL: ${SENTRY_URL}
         SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
         SENTRY_ORG: sentry
