@@ -1,7 +1,6 @@
 const Sequelize = require('sequelize')
 const {
-  sequelizeKone,
-  migrationPromiseKone
+  sequelizeKone
 } = require('../database/connection')
 
 const ThesisTypeEnums = {
@@ -234,6 +233,5 @@ module.exports = {
   ThesisTypeEnums,
   MandatoryCourseLabels,
   MigrationKone,
-  migrationPromiseKone,
   sequelizeKone
 }
