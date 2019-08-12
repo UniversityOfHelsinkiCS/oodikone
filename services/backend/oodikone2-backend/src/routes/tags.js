@@ -27,7 +27,7 @@ router.post('/tags', async (req, res) => {
   const { tag } = req.body
   try {
     await Tags.createNewTag(tag)
-    const tags = await Tags.findTagsByStudytrack(tag.studytrack) 
+    const tags = await Tags.findTagsByStudytrack(tag.studytrack)
     res.status(200).json(tags)
   } catch (err) {
     console.log(err)
@@ -73,7 +73,18 @@ router.get('/studenttags/:studentnumber', async (req, res) => {
   const { studentnumber } = req.params
   try {
     const result = await TagStudent.getStudentTagsByStudentnumber(studentnumber)
-    console.log(result)
+    res.status(200).json(result)
+  } catch (err) {
+    console.log(err)
+    res.status(400).json(err)
+  }
+})
+
+router.post('/studenttags/:studentnumber', async (req, res) => {
+  const { tag, studytrack } = req.body
+  try {
+    await TagStudent.createStudentTag(tag)
+    const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
     res.status(200).json(result)
   } catch (err) {
     console.log(err)
@@ -82,9 +93,10 @@ router.get('/studenttags/:studentnumber', async (req, res) => {
 })
 
 router.post('/studenttags', async (req, res) => {
-  const { tag } = req.body
+  const { tags, studytrack } = req.body
   try {
-    const result = await TagStudent.createStudentTag(tag)
+    await TagStudent.createMultipleStudentTags(tags)
+    const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
     res.status(200).json(result)
   } catch (err) {
     console.log(err)
@@ -93,9 +105,10 @@ router.post('/studenttags', async (req, res) => {
 })
 
 router.delete('/studenttags', async (req, res) => {
-  const { id } = req.body
+  const { id, studytrack } = req.body
   try {
-    const result = await TagStudent.deleteStudentTag(id)
+    await TagStudent.deleteStudentTag(id)
+    const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
     res.status(200).json(result)
   } catch (err) {
     console.log(err)
