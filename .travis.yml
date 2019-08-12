@@ -56,7 +56,7 @@ jobs:
         - TAG=${TAG} SENTRY_RELEASE_VERSION=${SENTRY_RELEASE_VERSION} docker-compose -f docker-compose.yml -f ./docker/docker-compose.lateste2e.yml logs -f &
         - until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf '.'; sleep 5; done
         - time npm run test_services
-        - time CYPRESS_baseUrl=http://localhost:1337/ npm run cypress:record
+        - time npm run cypress:ci
         - docker ps -a
         - if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then echo 'Some process had nonzero exit code'; exit 1; fi
       deploy:
