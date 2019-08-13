@@ -307,6 +307,11 @@ class SingleCourseStats extends Component {
   }
 }
 
+SingleCourseStats.defaultProps = {
+  fromYear: null,
+  toYear: null
+}
+
 SingleCourseStats.propTypes = {
   stats: shape({
     alternatives: arrayOf(string),
@@ -331,9 +336,9 @@ SingleCourseStats.propTypes = {
   location: shape({}).isRequired,
   activeLanguage: string.isRequired,
   setFromYear: func.isRequired,
-  fromYear: number.isRequired,
+  fromYear: number,
   setToYear: func.isRequired,
-  toYear: number.isRequired,
+  toYear: number,
   setSelectedCourse: func.isRequired,
   clearSelectedCourse: func.isRequired
 }
