@@ -27,7 +27,7 @@ jobs:
           command: |
             echo $CIRCLE_BRANCH;
             echo $CIRCLE_TAG;
-            if [[ "$CIRCLE_BRANCH" = "master" && -n "$CIRCLE_TAG" ]]; then
+            if [[ -n "$CIRCLE_TAG" ]]; then
               echo 'export TAG=latest' >> $BASH_ENV;
               echo 'export DEPLOY=true' >> $BASH_ENV;
               echo 'export CACHE_TAG=staging' >> $BASH_ENV;
