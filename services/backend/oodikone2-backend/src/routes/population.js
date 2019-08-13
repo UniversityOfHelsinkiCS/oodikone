@@ -43,16 +43,20 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
     }
     const { coursecode, yearcode } = req.body
     let studentnumberlist
-    const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
+    if (!req.body.studentnumberlist) {
+      const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
 
-    const { decodedToken: { userId }, roles } = req
+      const { decodedToken: { userId }, roles } = req
 
-    if (roles && roles.includes('admin')) {
-      studentnumberlist = studentnumbers
+      if (roles && roles.includes('admin')) {
+        studentnumberlist = studentnumbers
+      } else {
+        const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
+        const codes = unitsUserCanAccess.map(unit => unit.id)
+        studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
+      }
     } else {
-      const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
-      const codes = unitsUserCanAccess.map(unit => unit.id)
-      studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
+      studentnumberlist = req.body.studentnumberlist
     }
     const result = await Population.bottlenecksOf(req.body, studentnumberlist)
 
