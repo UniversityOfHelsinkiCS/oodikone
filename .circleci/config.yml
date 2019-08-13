@@ -25,14 +25,14 @@ jobs:
       - run:
           name: set_env_variables
           command: |
-            if [[ "$CIRCLE_BRANCH" = "master" && -n "$CIRCLE_TAG" ]]; then
-              echo 'export SENTRY_RELEASE_VERSION=PRODUCTION-${CIRCLE_SHA1}' >> $BASH_ENV;
+            echo $CIRCLE_BRANCH;
+            echo $CIRCLE_TAG;
+            if [[ -n "$CIRCLE_TAG" ]]; then
               echo 'export TAG=latest' >> $BASH_ENV;
               echo 'export DEPLOY=true' >> $BASH_ENV;
               echo 'export CACHE_TAG=staging' >> $BASH_ENV;
               echo 'USING RELEASE CONFIG';
             elif [[ "$CIRCLE_BRANCH" = "master" && -z "$CIRCLE_PULL_REQUEST" ]]; then
-              echo 'export SENTRY_RELEASE_VERSION=STAGING-${CIRCLE_SHA1}' >> $BASH_ENV;
               echo 'export TAG=staging' >> $BASH_ENV;
               echo 'export DEPLOY=true' >> $BASH_ENV;
               echo 'export CACHE_TAG=trunk' >> $BASH_ENV;
