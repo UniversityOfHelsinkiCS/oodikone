@@ -9,7 +9,7 @@ import { courseCreditFilter } from '../../populationFilters'
 const CourseCreditFilter = ({ coursecode, courseData, filter, setPopulationFilterAction, removePopulationFilterAction }) => {
   const [credits, setCredits] = useState(0)
   const handleFilter = () => {
-    setPopulationFilterAction(courseCreditFilter({ credits, coursecode, coursename: courseData[coursecode].name }))
+    setPopulationFilterAction(courseCreditFilter({ credits, coursecode, coursename: courseData.name }))
   }
 
   const handleChange = (e, { value }) => {
@@ -38,7 +38,7 @@ const CourseCreditFilter = ({ coursecode, courseData, filter, setPopulationFilte
               />
             </Form.Field>
             <Form.Field>
-              <label>credits from course {courseData[coursecode].name}</label>
+              <label>credits from course {courseData.name}</label>
             </Form.Field>
             <Form.Field>
               <Button
@@ -71,8 +71,8 @@ CourseCreditFilter.propTypes = {
   coursecode: string.isRequired
 }
 
-const mapStateToProps = ({ courseStats }) => ({
-  courseData: courseStats.data
+const mapStateToProps = ({ singleCourseStats }) => ({
+  courseData: singleCourseStats.stats
 })
 
 export default connect(mapStateToProps, {

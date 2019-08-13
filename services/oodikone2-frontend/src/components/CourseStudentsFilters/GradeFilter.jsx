@@ -9,7 +9,7 @@ import { gradeFilter } from '../../populationFilters'
 const GradeFilter = ({ coursecode, courseData, filter, setPopulationFilterAction, removePopulationFilterAction }) => {
   const [grade, setGrade] = useState(0)
   const handleFilter = () => {
-    setPopulationFilterAction(gradeFilter({ grade, coursecode, coursename: courseData[coursecode].name }))
+    setPopulationFilterAction(gradeFilter({ grade, coursecode, coursename: courseData.name }))
   }
 
   const handleChange = (e, { value }) => {
@@ -42,7 +42,7 @@ const GradeFilter = ({ coursecode, courseData, filter, setPopulationFilterAction
               />
             </Form.Field>
             <Form.Field>
-              <label>from course {courseData[coursecode].name}</label>
+              <label>from course {courseData.name}</label>
             </Form.Field>
             <Form.Field>
               <Button
@@ -75,8 +75,8 @@ GradeFilter.propTypes = {
   coursecode: string.isRequired
 }
 
-const mapStateToProps = ({ courseStats }) => ({
-  courseData: courseStats.data
+const mapStateToProps = ({ singleCourseStats }) => ({
+  courseData: singleCourseStats.stats
 })
 
 export default connect(mapStateToProps, {
