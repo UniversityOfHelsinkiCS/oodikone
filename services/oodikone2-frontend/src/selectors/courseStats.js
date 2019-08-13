@@ -9,26 +9,35 @@ const nameAsString = (data, language) => {
   return getTextIn(data, language)
 }
 
-const getCourseStats = (state) => {
+const courseStatsSelector = state => state.courseStats.data
+
+const yearSelector = state => ({ fromYear: state.singleCourseStats.fromYear, toYear: state.singleCourseStats.toYear })
+
+const languageSelector = state => getActiveLanguage(state.localize).code
+
+const getCourseStats = createSelector([courseStatsSelector, yearSelector, languageSelector], (courseStats, { fromYear, toYear }, lang) => {
   const stats = {}
-  Object.entries(state.courseStats.data).forEach((entry) => {
+  Object.entries(courseStats).forEach((entry) => {
     const [coursecode, data] = entry
     const { statistics } = data
     stats[coursecode] = {
       ...data,
       statistics: statistics.map(stat => ({
         ...stat,
-        name: nameAsString(stat.name, getActiveLanguage(state.localize).code)
-      }))
+        name: nameAsString(stat.name, lang)
+      })).filter(({ yearcode }) => {
+        if (!fromYear || !toYear) return true
+        return yearcode >= fromYear && yearcode <= toYear
+      })
     }
   })
   return stats
-}
+})
 
-const languageSelector = state => getActiveLanguage(state.localize).code
+const selectedCourseSelector = state => state.singleCourseStats.selectedCourse
 
-const getQueryInfo = (state) => {
-  const courseStats = Object.values(getCourseStats(state))
+const getQueryInfo = createSelector([getCourseStats], (stats) => {
+  const courseStats = Object.values(stats)
   const semesters = {}
   const courses = []
   courseStats.forEach((c) => {
@@ -43,7 +52,7 @@ const getQueryInfo = (state) => {
   })
   const timeframe = Object.values(semesters).sort((t1, t2) => t1.code > t2.code)
   return { courses, timeframe }
-}
+})
 
 export const ALL = {
   key: 'ALL',
@@ -53,33 +62,44 @@ export const ALL = {
 
 const mergeUnique = (arr1, arr2) => [...new Set([...arr1, ...arr2])]
 
-const getAllStudyProgrammes = createSelector([getCourseStats, languageSelector], (courseStats, language) => {
+const getAllStudyProgrammes = createSelector([getCourseStats, languageSelector, selectedCourseSelector], (courseStats, language, selectedCourseCode) => {
+  const studentsIncluded = new Set(selectedCourseCode ?
+    courseStats[selectedCourseCode].statistics.reduce((res, curr) => [...res, ...curr.students.studentnumbers], []) :
+    Object.values(courseStats).reduce((totalStudents, programme) => {
+      const programmeStudents = programme.statistics.reduce((res, curr) => (
+        [...res, ...curr.students.studentnumbers]
+      ), [])
+      return [...totalStudents, ...programmeStudents]
+    }, []))
+
   const all = {}
-  let studentnumbers = []
   Object.values(courseStats).forEach((stat) => {
     const { programmes: p } = stat
     Object.entries(p).forEach((entry) => {
       const [code, info] = entry
       const { name, students } = info
-      studentnumbers = mergeUnique(studentnumbers, students)
+      const filteredStudents = students.filter(s => studentsIncluded.has(s))
       if (!all[code]) {
         all[code] = {
           key: code,
           value: code,
           text: getTextIn(name, language),
-          students
+          students: filteredStudents
         }
       } else {
         const programme = all[code]
-        programme.students = mergeUnique(students, programme.students)
+        programme.students = mergeUnique(filteredStudents, programme.students)
       }
     })
   })
+
+  const allStudents = Object.values(all).reduce((res, curr) => [...res, ...curr.students], [])
   const programmes = Object.values(all)
     .map(p => ({ ...p, size: p.students.length || 0 }))
     .sort((p1, p2) => p2.size - p1.size)
+    .filter(p => p.size > 0)
   return [
-    { ...ALL, students: studentnumbers, size: studentnumbers.length },
+    { ...ALL, students: [...allStudents], size: allStudents.length },
     ...programmes
   ]
 })

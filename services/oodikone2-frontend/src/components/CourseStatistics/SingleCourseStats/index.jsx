@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
-import { Segment, Header, Form } from 'semantic-ui-react'
-import { shape, string, arrayOf, objectOf, oneOfType, number } from 'prop-types'
+import { Segment, Header, Form, Grid } from 'semantic-ui-react'
+import { shape, string, arrayOf, objectOf, oneOfType, number, func } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { getActiveLanguage } from 'react-localize-redux'
+import { difference } from 'lodash'
 import qs from 'query-string'
 import ResultTabs from '../ResultTabs'
+import { setFromYear, setToYear, setSelectedCourse, clearSelectedCourse } from '../../../redux/singleCourseStats'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import YearFilter from '../SearchForm/YearFilter'
@@ -27,32 +29,60 @@ class SingleCourseStats extends Component {
   }
 
   componentDidMount = () => {
-    const { location } = this.props
+    const { setFromYear, setToYear, setSelectedCourse, location, stats: { coursecode } } = this.props
     if (location.search) {
-      this.setState({ ...this.parseQueryFromUrl() })
+      const { fromYear, toYear, ...rest } = this.parseQueryFromUrl()
+      setFromYear(fromYear)
+      setToYear(toYear)
+      this.setState({ ...rest })
     }
+    setSelectedCourse(coursecode)
+  }
+
+  componentDidUpdate = (prevProps) => {
+    const { primary } = this.state
+    if (this.props.programmes.length !== prevProps.programmes.length) {
+      if (primary.every(c => !this.props.programmes.map(p => p.key).includes(c))) {
+        this.setState({ // eslint-disable-line
+          primary: [ALL.value]
+        })
+      }
+    }
+  }
+
+  componentWillUnmount = () => {
+    const { setFromYear, setToYear, clearSelectedCourse } = this.props
+    const { fromYear, toYear } = this.parseQueryFromUrl()
+    setFromYear(fromYear)
+    setToYear(toYear)
+    clearSelectedCourse()
   }
 
   getProgrammeName = (progcode) => {
     if (progcode === ALL.value) {
       return 'All'
+    } else if (progcode === 'EXCLUDED') {
+      return 'Excluded'
     }
     const { activeLanguage } = this.props
     const { name } = this.props.stats.programmes[progcode]
     return getTextIn(name, activeLanguage)
   }
 
-  parseQueryFromUrl = () => {
-    const { location } = this.props
-    const { separate, fromYear, toYear } = qs.parse(location.search)
-    return {
-      separate: JSON.parse(separate),
-      fromYear: JSON.parse(fromYear),
-      fromYearInitial: JSON.parse(fromYear),
-      toYear: JSON.parse(toYear),
-      toYearInitial: JSON.parse(toYear)
-    }
-  }
+  setExcludedToComparison = () => this.setState({
+    comparison: this.state.primary.includes(ALL.value) ?
+      [] :
+      ['EXCLUDED']
+  })
+
+  getExcluded = () => (
+    this.state.primary.includes(ALL.value) ?
+      [] :
+      difference(
+        this.props.programmes.map(p => p.value).filter(v => v !== ALL.value),
+        this.state.primary
+      )
+  )
 
   belongsToAtLeastOneProgramme = (codes) => {
     if (codes.includes(ALL.value)) return () => true
@@ -72,12 +102,12 @@ class SingleCourseStats extends Component {
 
   validProgCode = (code) => {
     const { programmes } = this.props.stats
-    return programmes[code] || (code === ALL.value)
+    return programmes[code] || (code === ALL.value || (code === 'EXCLUDED'))
   }
 
   filteredYearsAndSemesters = (useInitialValues = false) => {
-    const { years, semesters } = this.props
-    const { fromYearInitial, fromYear, toYearInitial, toYear } = this.state
+    const { years, semesters, fromYear, toYear } = this.props
+    const { fromYearInitial, toYearInitial } = this.state
     if (!fromYearInitial || !toYearInitial) {
       return {
         filteredYears: years,
@@ -105,7 +135,7 @@ class SingleCourseStats extends Component {
   statsForProgrammes = (progCodes, name) => {
     const { statistics } = this.props.stats
     const filter = this.belongsToAtLeastOneProgramme(progCodes)
-    const progStats = statistics.map(({ code, name, students: allstudents, attempts, coursecode }) => {
+    const progStats = statistics.filter(this.isStatInYearRange).map(({ code, name, students: allstudents, attempts, coursecode }) => {
       const cumulative = {
         grades: countFilteredStudents(attempts.grades, filter),
         categories: countFilteredStudents(attempts.classes, filter)
@@ -115,7 +145,7 @@ class SingleCourseStats extends Component {
         categories: countFilteredStudents(allstudents.classes, filter)
       }
       return { code, name, cumulative, students, coursecode }
-    }).filter(this.isStatInYearRange)
+    })
     return {
       codes: progCodes,
       name,
@@ -125,6 +155,10 @@ class SingleCourseStats extends Component {
 
   handleSelect = (e, { name, value }) => {
     let selected = [...value].filter(v => v !== ALL.value)
+
+    if (name === 'primary') {
+      this.setState({ comparison: this.state.comparison.filter(p => p !== 'EXCLUDED') })
+    }
 
     if ((!this.state[name].includes(ALL.value) && value.includes(ALL.value)) || (name === 'primary' && value.length === 0)) {
       selected = [ALL.value]
@@ -137,12 +171,22 @@ class SingleCourseStats extends Component {
     this.setState({ [name]: value })
   }
 
+  handleYearChange = (e, { name, value }) => {
+    const { setFromYear, setToYear } = this.props
+    if (name === 'fromYear') setFromYear(value)
+    else setToYear(value)
+  }
+
   filteredProgrammeStatistics = () => {
     const { primary, comparison } = this.state
     const filter = p => this.validProgCode(p)
 
-    const primaryProgrammes = primary.filter(filter)
+    const excludedProgrammes = this.getExcluded()
+
+    const primaryProgrammes = primary
     const comparisonProgrammes = comparison.filter(filter)
+    if (comparison.includes('EXCLUDED')) comparisonProgrammes.push(...excludedProgrammes)
+
     const pstats = primaryProgrammes.length ? this.statsForProgrammes(
       primaryProgrammes,
       primaryProgrammes.length === 1 ? this.getProgrammeName(primaryProgrammes[0]) : 'Primary'
@@ -158,9 +202,43 @@ class SingleCourseStats extends Component {
     }
   }
 
+  parseQueryFromUrl = () => {
+    const { location } = this.props
+    const { separate, fromYear, toYear } = qs.parse(location.search)
+    return {
+      separate: JSON.parse(separate),
+      fromYear: JSON.parse(fromYear),
+      fromYearInitial: JSON.parse(fromYear),
+      toYear: JSON.parse(toYear),
+      toYearInitial: JSON.parse(toYear)
+    }
+  }
+
+  clearComparison = () => this.setState({ comparison: [] })
+
+  comparisonProgrammes = () => {
+    const { primary, comparison } = this.state
+    const result = this.props.programmes.filter(({ key }) => key !== 'EXCLUDED')
+    const excludedProgrammes = this.getExcluded()
+
+    if (!primary.includes(ALL.value)) {
+      const excludedStudents = result
+        .filter(({ key }) => excludedProgrammes.includes(key) && key !== 'ALL')
+        .reduce((res, { students }) => [...res, ...students], [])
+      result.push({
+        key: 'EXCLUDED',
+        size: excludedStudents.length,
+        students: excludedStudents,
+        text: 'Excluded',
+        value: 'EXCLUDED'
+      })
+    }
+    return result.filter(({ key }) => !comparison.includes('EXCLUDED') || !excludedProgrammes.includes(key))
+  }
+
   render() {
-    const { programmes } = this.props
-    const { fromYear, toYear, primary, comparison } = this.state
+    const { fromYear, toYear, programmes } = this.props
+    const { primary, comparison } = this.state
     const statistics = this.filteredProgrammeStatistics()
     const { filteredYears } = this.filteredYearsAndSemesters(true)
 
@@ -173,7 +251,7 @@ class SingleCourseStats extends Component {
               years={filteredYears}
               fromYear={fromYear}
               toYear={toYear}
-              handleChange={this.handleChange}
+              handleChange={this.handleYearChange}
               showCheckbox={false}
               separate={false}
             />
@@ -182,24 +260,42 @@ class SingleCourseStats extends Component {
         <Segment>
           <Form>
             <Header content="Filter statistics by study programmes" as="h4" />
-            <Form.Group widths="equal" >
-              <ProgrammeDropdown
-                name="primary"
-                options={programmes}
-                label="Primary group"
-                placeholder="Select study programmes"
-                value={primary}
-                onChange={this.handleSelect}
-              />
-              <ProgrammeDropdown
-                name="comparison"
-                options={programmes}
-                label="Comparison group"
-                placeholder="Optional"
-                value={comparison}
-                onChange={this.handleSelect}
-              />
-            </Form.Group>
+            <Grid>
+              <Grid.Column width={8}>
+                <ProgrammeDropdown
+                  name="primary"
+                  options={programmes}
+                  label="Primary group"
+                  placeholder="Select study programmes"
+                  value={primary}
+                  onChange={this.handleSelect}
+                />
+              </Grid.Column>
+              <Grid.Column width={8}>
+                <ProgrammeDropdown
+                  name="comparison"
+                  options={this.comparisonProgrammes()}
+                  label="Comparison group"
+                  placeholder="Optional"
+                  value={comparison}
+                  onChange={this.handleSelect}
+                />
+              </Grid.Column>
+              <Grid.Column width={8} />
+              <Grid.Column width={8}>
+                <Form.Group>
+                  <Form.Button
+                    content="Select excluded study programmes"
+                    onClick={this.setExcludedToComparison}
+                    disabled={primary.length === 1 && primary[0] === ALL.value}
+                  />
+                  <Form.Button
+                    content="Clear"
+                    onClick={this.clearComparison}
+                  />
+                </Form.Group>
+              </Grid.Column>
+            </Grid>
           </Form>
         </Segment>
         <ResultTabs
@@ -209,6 +305,11 @@ class SingleCourseStats extends Component {
       </div>
     )
   }
+}
+
+SingleCourseStats.defaultProps = {
+  fromYear: null,
+  toYear: null
 }
 
 SingleCourseStats.propTypes = {
@@ -233,7 +334,13 @@ SingleCourseStats.propTypes = {
   years: arrayOf(shape({})).isRequired,
   semesters: arrayOf(shape({})).isRequired,
   location: shape({}).isRequired,
-  activeLanguage: string.isRequired
+  activeLanguage: string.isRequired,
+  setFromYear: func.isRequired,
+  fromYear: number,
+  setToYear: func.isRequired,
+  toYear: number,
+  setSelectedCourse: func.isRequired,
+  clearSelectedCourse: func.isRequired
 }
 
 const mapStateToProps = (state) => {
@@ -250,8 +357,17 @@ const mapStateToProps = (state) => {
       texts: Object.values(name),
       value: yearcode
     })).reverse(),
-    activeLanguage: getActiveLanguage(state.localize).code
+    activeLanguage: getActiveLanguage(state.localize).code,
+    fromYear: state.singleCourseStats.fromYear,
+    toYear: state.singleCourseStats.toYear
   }
 }
 
-export default withRouter(connect(mapStateToProps)(SingleCourseStats))
+const mapDispatchToProps = {
+  setFromYear,
+  setToYear,
+  setSelectedCourse,
+  clearSelectedCourse
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SingleCourseStats))
