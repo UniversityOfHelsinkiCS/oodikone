@@ -632,7 +632,7 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
         }
       }]
       counter.markStudyProgrammes(studentnumber, programmes.length === 0 ? unknownProgramme : programmes)
-      counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode)
+      counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode, yearcode)
     } else {
       counter.markCreditToHistory(studentnumber, passed)
     }
