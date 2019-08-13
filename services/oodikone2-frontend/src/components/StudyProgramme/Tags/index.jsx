@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, Input, List, Label, Icon, Header } from 'semantic-ui-react'
+import { Button, Input, List, Label, Icon, Header, Confirm } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
+import TagModal from '../TagModal'
 import { getTagsByStudytrackAction, createTagAction, deleteTagAction } from '../../../redux/tags'
 
 const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme }) => {
   const [tagname, setTagname] = useState('')
+  const [confirm, setConfirm] = useState(false)
 
   useEffect(() => {
     getTagsByStudytrack(studyprogramme)
   }, [])
 
+
+  const open = () => setConfirm(true)
+
+  const close = () => setConfirm(false)
+
   const handleDeleteTag = (event, tag) => {
     event.preventDefault()
     deleteTag(tag)
+    setConfirm(false)
   }
 
   const handleSubmit = (event) => {
@@ -36,8 +44,16 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     <List.Item key={tag.tag_id}>
       <List.Content>
         <Label>
-          {tag.tagname} <Icon name="delete" link onClick={event => handleDeleteTag(event, tag)} />
+          {tag.tagname} <Icon name="delete" link onClick={open} />
         </Label>
+        <Confirm
+          open={confirm}
+          onCancel={close}
+          onConfirm={event => handleDeleteTag(event, tag)}
+          content={`Are you sure you want to delete tag "${tag.tagname}"? If you press confirm you will delete it from all students that have it. You and other users won't be able to use this tag again.`}
+          cancelButton="Cancel"
+          confirmButton="Confirm"
+        />
       </List.Content>
     </List.Item >
   ))
@@ -46,6 +62,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     <List>
       <Input onChange={handleChange} value={tagname} />
       <Button onClick={handleSubmit}>add new tag</Button>
+      <TagModal tags={tags} studytrack={studyprogramme} />
       <Header size="medium">Study programme tags</Header>
       {rows}
     </List>
@@ -64,4 +81,8 @@ Tags.propTypes = {
   studyprogramme: string.isRequired
 }
 
-export default withRouter(connect(mapStateToProps, { createTag: createTagAction, deleteTag: deleteTagAction, getTagsByStudytrack: getTagsByStudytrackAction })(Tags))
+export default withRouter(connect(mapStateToProps, {
+  createTag: createTagAction,
+  deleteTag: deleteTagAction,
+  getTagsByStudytrack: getTagsByStudytrackAction
+})(Tags))

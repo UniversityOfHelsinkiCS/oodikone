@@ -33,6 +33,10 @@ const createStudentTag = async (tag) => {
   return TagStudent.create(tag)
 }
 
+const createMultipleStudentTags = async (tags) => {
+  return TagStudent.bulkCreate(tags)
+}
+
 const deleteStudentTag = async (id) => {
   return TagStudent.destroy({
     where: {
@@ -48,5 +52,6 @@ module.exports = {
   getStudentTagsByStudentnumber,
   getStudentTagsByStudytrack,
   createStudentTag,
+  createMultipleStudentTags,
   deleteStudentTag
 }

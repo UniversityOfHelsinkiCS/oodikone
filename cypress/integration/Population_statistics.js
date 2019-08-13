@@ -116,7 +116,7 @@ describe('Population Statistics tests', () => {
       cy.contains("Matematiikan didaktiikka").siblings().eq(2).should("have.text", '1')
     })
 
-    cy.get("button").contains("show").click()
+    cy.contains("button", "show").click()
     cy.contains("Student names hidden").click()
     cy.contains("Oinonen").siblings().eq(2).click()
     cy.contains("Oinonen").invoke('text').then((text) => expect(text).to.equal('Oinonen Heidi Eeva Elisabet, 014473717'))
@@ -125,7 +125,7 @@ describe('Population Statistics tests', () => {
   it('Student list checking works as intended', () => {
     cy.contains("Select study programme").click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
     cy.contains("See population").click()
-    cy.get("button").contains("show").click()
+    cy.contains("button", "show").click()
     cy.contains("010483918")
     cy.contains("666666666").should('not.exist')
     cy.contains('button', "Check studentnumbers").click()
