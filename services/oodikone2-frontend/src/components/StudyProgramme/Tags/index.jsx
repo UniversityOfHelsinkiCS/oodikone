@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Button, Input, List, Label, Icon, Header, Confirm } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
+import TagModal from '../TagModal'
 import { getTagsByStudytrackAction, createTagAction, deleteTagAction } from '../../../redux/tags'
 
 const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme }) => {
@@ -61,6 +62,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     <List>
       <Input onChange={handleChange} value={tagname} />
       <Button onClick={handleSubmit}>add new tag</Button>
+      <TagModal tags={tags} studytrack={studyprogramme} />
       <Header size="medium">Study programme tags</Header>
       {rows}
     </List>
@@ -79,4 +81,8 @@ Tags.propTypes = {
   studyprogramme: string.isRequired
 }
 
-export default withRouter(connect(mapStateToProps, { createTag: createTagAction, deleteTag: deleteTagAction, getTagsByStudytrack: getTagsByStudytrackAction })(Tags))
+export default withRouter(connect(mapStateToProps, {
+  createTag: createTagAction,
+  deleteTag: deleteTagAction,
+  getTagsByStudytrack: getTagsByStudytrackAction
+})(Tags))

@@ -43,7 +43,7 @@ export const deleteStudentTagAction = (id, studytrack) => {
   return callController(route, prefix, data, method)
 }
 
-const reducer = (state = { data: [], success: false, created: false }, action) => {
+const reducer = (state = { data: [], success: false, created: false, pending: false }, action) => {
   switch (action.type) {
     case 'GET_STUDENT_TAGS_ATTEMPT':
       return {
