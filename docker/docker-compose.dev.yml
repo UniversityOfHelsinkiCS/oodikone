@@ -1,20 +1,21 @@
-version: '3'
+version: '3.2'
 
 services:
   user_db:
     environment:
       - POSTGRES_MULTIPLE_DATABASES=user_db,user_db_real
+    restart: unless-stopped
 
   db:
     environment:
       - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test,tkt_oodi_real
+    restart: unless-stopped
 
   backend:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     environment:
       FRONT_URL: http://localhost:8000
     volumes:
@@ -22,13 +23,13 @@ services:
       - ./services/backend/shared/models:/usr/src/app/src/models
       - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
       - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
+    restart: unless-stopped
 
   frontend:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run docker']
-    restart: unless-stopped
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run docker']
     ports:
       - "8081:8081"
       - "7777:7777"
@@ -39,40 +40,40 @@ services:
       KONE_ADMINER_URL: http://localhost:5050/?pgsql=db_kone&username=postgres
     volumes:
       - ./services/oodikone2-frontend/:/usr/src/app
+    restart: unless-stopped
 
   userservice:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     volumes:
       - ./services/oodikone2-userservice/:/usr/src/app
+    restart: unless-stopped
 
   usageservice:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     volumes:
       - ./services/oodikone2-usageservice/:/usr/src/app
+    restart: unless-stopped
 
   updater_api:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     volumes:
       - ./services/updater_api/:/usr/src/app
+    restart: unless-stopped
 
   updater_writer:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     volumes:
       - ./services/backend/updater_writer/:/usr/src/app
       - ./services/backend/shared/models:/usr/src/app/models
@@ -80,27 +81,25 @@ services:
       - ./services/backend/shared/migrations_kone:/usr/src/app/database/migrations_kone
     environment:
       DB_SCHEMA_KONE: kone_data
-
-  scheduler_mongo:
     restart: unless-stopped
 
   updater_scheduler:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     volumes:
       - ./services/updater_scheduler/:/usr/src/app
+    restart: unless-stopped
 
   analytics:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && /wait && npm run dev']
-    restart: unless-stopped
+    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     volumes:
       - ./services/oodikone2-analytics/:/usr/src/app
+    restart: unless-stopped
 
   adminer:
     image: adminer:4.6.2
@@ -110,8 +109,8 @@ services:
       - ./adminer-plugins:/var/www/html/plugins-enabled
     ports:
       - 5050:8080
-    restart: always
     container_name: adminer
+    restart: unless-stopped
 
   # zookeeper:
   #   image: wurstmeister/zookeeper
@@ -141,7 +140,6 @@ services:
 
   # mongo_db:
   #   image: mongo
-  #   restart: unless-stopped
   #   volumes:
   #     - ./backups/mongo/oodilearn:/dump
   #     - ./mongodata:/data/db
@@ -153,7 +151,6 @@ services:
   #   build:
   #     context: services/oodilearn/server
   #     dockerfile: Dockerfile
-  #   restart: unless-stopped
   #   volumes:
   #     - ./services/oodilearn/data:/data
   #     - ./services/oodilearn/server:/src

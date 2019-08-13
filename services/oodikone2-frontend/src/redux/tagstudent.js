@@ -6,11 +6,19 @@ export const getStudentTagsAction = () => {
   return callController(route, prefix)
 }
 
-export const createStudentTagAction = (tag) => {
-  const route = '/studenttags'
+export const createStudentTagAction = (tag, studytrack) => {
+  const route = `/studenttags/${tag.studentnumber}`
   const prefix = 'CREATE_STUDENT_TAG_'
   const method = 'post'
-  const data = { tag }
+  const data = { tag, studytrack }
+  return callController(route, prefix, data, method)
+}
+
+export const createMultipleStudentTagAction = (tags, studytrack) => {
+  const route = '/studenttags'
+  const prefix = 'CREATE_MULTIPLE_TAGS_'
+  const method = 'post'
+  const data = { tags, studytrack }
   return callController(route, prefix, data, method)
 }
 
@@ -27,15 +35,15 @@ export const getStudentTagsByStudentnumberAction = (studentnumber) => {
   return callController(route, prefix)
 }
 
-export const deleteStudentTagAction = (id) => {
+export const deleteStudentTagAction = (id, studytrack) => {
   const route = '/studenttags'
   const prefix = 'DELETE_STUDENT_TAG_'
   const method = 'delete'
-  const data = { id }
+  const data = { id, studytrack }
   return callController(route, prefix, data, method)
 }
 
-const reducer = (state = { data: [], success: false, created: false }, action) => {
+const reducer = (state = { data: [], success: false, created: false, pending: false }, action) => {
   switch (action.type) {
     case 'GET_STUDENT_TAGS_ATTEMPT':
       return {
@@ -92,34 +100,58 @@ const reducer = (state = { data: [], success: false, created: false }, action) =
       return {
         ...state,
         pending: true,
-        created: false
+        success: false
       }
     case 'CREATE_STUDENT_TAG_FAILURE':
       return {
         ...state,
         pending: false,
-        created: false
+        success: false
       }
     case 'CREATE_STUDENT_TAG_SUCCESS':
       return {
         ...state,
         pending: false,
-        created: true
+        success: true,
+        data: action.response
       }
     case 'DELETE_STUDENT_TAG_ATTEMPT':
       return {
         ...state,
+        success: false,
         pending: true
       }
     case 'DELETE_STUDENT_TAG_FAILURE':
       return {
         ...state,
+        success: false,
         pending: false
       }
     case 'DELETE_STUDENT_TAG_SUCCESS':
       return {
         ...state,
-        pending: false
+        pending: false,
+        success: true,
+        data: action.response
+      }
+    case 'CREATE_MULTIPLE_TAGS_ATTEMPT':
+      return {
+        ...state,
+        pending: true,
+        success: false
+      }
+    case 'CREATE_MULTIPLE_TAGS_FAILURE':
+      return {
+        ...state,
+        pending: false,
+        success: false
+      }
+    case 'CREATE_MULTIPLE_TAGS_SUCCESS':
+      return {
+        ...state,
+        pending: false,
+        success: true,
+        data: action.response
       }
     default:
       return state

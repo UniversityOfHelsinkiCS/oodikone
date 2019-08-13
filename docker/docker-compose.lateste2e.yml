@@ -1,4 +1,4 @@
-version: '3'
+version: '3.2'
 
 services:
   user_db:
@@ -11,6 +11,11 @@ services:
 
   backend:
     image: toska/oodikone2-backend:${TAG}
+    build:
+      cache_from:
+        - toska/oodikone2-backend:trunk
+        - toska/oodikone2-backend:staging
+        - toska/oodikone2-backend:latest
     ports:
       - "9229:9229"
     environment:
@@ -22,31 +27,64 @@ services:
     build:
       args:
         BASE_PATH: /
-        SENTRY_RELEASE_VERSION: ${SENTRY_RELEASE_VERSION}
         SENTRY_URL: ${SENTRY_URL}
         SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
         SENTRY_ORG: sentry
         SENTRY_PROJECT: oodifront
+      cache_from:
+        - toska/oodikone2-frontend:trunk
+        - toska/oodikone2-frontend:staging
+        - toska/oodikone2-frontend:latest
     ports:
       - "5000:5000"
 
   userservice:
     image: toska/oodikone2-userservice:${TAG}
+    build:
+      cache_from:
+        - toska/oodikone2-userservice:trunk
+        - toska/oodikone2-userservice:staging
+        - toska/oodikone2-userservice:latest
 
   usageservice:
     image: toska/oodikone2-usageservice:${TAG}
+    build:
+      cache_from:
+        - toska/oodikone2-usageservice:trunk
+        - toska/oodikone2-usageservice:staging
+        - toska/oodikone2-usageservice:latest
 
   updater_api:
     image: toska/updater_api:${TAG}
+    build:
+      cache_from:
+        - toska/updater_api:trunk
+        - toska/updater_api:staging
+        - toska/updater_api:latest
 
   updater_writer:
     image: toska/updater_writer:${TAG}
+    build:
+      cache_from:
+        - toska/updater_writer:trunk
+        - toska/updater_writer:staging
+        - toska/updater_writer:latest
 
   updater_scheduler:
     image: toska/updater_scheduler:${TAG}
+    build:
+      cache_from:
+        - toska/updater_scheduler:trunk
+        - toska/updater_scheduler:staging
+        - toska/updater_scheduler:latest
 
   analytics:
     image: toska/oodikone2-analytics:${TAG}
+    build:
+      cache_from:
+        - toska/oodikone2-analytics:trunk
+        - toska/oodikone2-analytics:staging
+        - toska/oodikone2-analytics:latest
 
   nginx:
     image: nginx:latest
@@ -55,7 +93,6 @@ services:
       - ./nginx/error.log:/etc/nginx/error_log.log
       - ./nginx/log:/var/log/nginx/localhost.error_log
       - ./nginx/cache/:/etc/nginx/cache
-      - /etc/letsencrypt/:/etc/letsencrypt/
     ports:
       -  1337:80
     depends_on:

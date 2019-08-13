@@ -5,20 +5,17 @@ import { Button, Dropdown, Checkbox, List } from 'semantic-ui-react'
 import { arrayOf, string, shape, func, bool } from 'prop-types'
 
 import {
-  createStudentTagAction,
-  getStudentTagsByStudytrackAction
+  createMultipleStudentTagAction
 } from '../../redux/tagstudent'
 
 const TagPopulation = ({
   allChecker,
   handleAllCheck,
   falsifyChecks,
-  createStudentTag,
+  createMultipleStudentTag,
   tags,
   checkedStudents,
-  getStudentTagsByStudytrack,
-  studytrack,
-  created }) => {
+  studytrack }) => {
   const [options, setOptions] = useState([])
   const [selectedValue, setSelected] = useState('')
 
@@ -27,31 +24,30 @@ const TagPopulation = ({
     setOptions(createdOptions)
   }, [])
 
-  useEffect(() => {
-    if (created) {
-      getStudentTagsByStudytrack(studytrack)
-    }
-  }, [created])
 
   const handleChange = (event, { value }) => {
     event.preventDefault()
     setSelected(value)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    falsifyChecks()
+    const tagList = []
     checkedStudents.forEach((student) => {
       if (student.checked) {
         const tag = {
           tag_id: selectedValue,
           studentnumber: student.studentnumber
         }
-        createStudentTag(tag)
-        setSelected('')
+        tagList.push(tag)
       }
     })
+    setSelected('')
+    falsifyChecks()
+    await createMultipleStudentTag(tagList, studytrack)
   }
+
+  const checkCount = checkedStudents.reduce((n, student) => n + (student.checked), 0)
 
   return (
     <List horizontal>
@@ -71,18 +67,16 @@ const TagPopulation = ({
           value={selectedValue}
         />
       </List.Item>
-      <Button onClick={handleSubmit}>add tag to multiple students</Button>
+      <Button onClick={handleSubmit} disabled={selectedValue === '' || checkCount === 0}>add tag to multiple students</Button>
     </List>
   )
 }
 
 TagPopulation.propTypes = {
-  createStudentTag: func.isRequired,
-  getStudentTagsByStudytrack: func.isRequired,
+  createMultipleStudentTag: func.isRequired,
   checkedStudents: arrayOf(shape({ studentnumber: string, checked: bool })).isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studytrack: string.isRequired,
-  created: bool.isRequired,
   falsifyChecks: func.isRequired,
   allChecker: bool.isRequired,
   handleAllCheck: func.isRequired
@@ -92,4 +86,6 @@ const mapStateToProps = ({ tagstudent }) => ({
   created: tagstudent.created
 })
 
-export default withRouter(connect(mapStateToProps, { createStudentTag: createStudentTagAction, getStudentTagsByStudytrack: getStudentTagsByStudytrackAction })(TagPopulation))
+export default withRouter(connect(mapStateToProps, {
+  createMultipleStudentTag: createMultipleStudentTagAction
+})(TagPopulation))

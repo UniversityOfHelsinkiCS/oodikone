@@ -109,7 +109,7 @@ const mapStateToProps = ({ coursePopulation, localize, singleCourseStats, popula
       selectedStudents = difference(samples.map(s => s.studentNumber), selectedStudents)
     }
   }
-
+  console.log(singleCourseStats)
   return ({
     studentData: coursePopulation.students,
     courses: coursePopulation.courses,
