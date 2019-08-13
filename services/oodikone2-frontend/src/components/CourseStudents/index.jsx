@@ -114,7 +114,10 @@ CourseStudents.propTypes = {
   history: shape({}).isRequired,
   translate: func.isRequired,
   courseData: shape({}).isRequired,
-  selectedStudents: arrayOf(string).isRequired
+  selectedStudents: arrayOf(string).isRequired,
+  refreshNeeded: bool.isRequired,
+  getCoursePopulationCoursesByStudentnumbersDispatch: func.isRequired,
+  dispatchRefreshFilters: func.isRequired
 }
 
 const mapStateToProps = ({ coursePopulation, localize, singleCourseStats, populationFilters }) => {
