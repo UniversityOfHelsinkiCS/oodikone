@@ -287,6 +287,23 @@ export const gradeFilter = (params) => {
   })
 }
 
+export const courseCreditFilter = (params) => {
+  const { coursecode, credits, coursename } = params
+  return ({
+    id: uuidv4(),
+    type: 'GradeFilter',
+    params: {
+      coursecode,
+      credits,
+      coursename
+    },
+    filter: (student) => {
+      const course = student.courses.find(c => c.course.code === coursecode)
+      return Number(course.credits) === Number(credits)
+    }
+  })
+}
+
 export const programmeFilter = (params) => {
   const { programme, programmeName } = params
   return ({
