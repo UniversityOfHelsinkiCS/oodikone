@@ -13,12 +13,14 @@ import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import GradeFilter from './GradeFilter'
 import ProgrammeFilter from './ProgrammeFilter'
+import CourseCreditFilter from './CourseCreditFilter'
 import {
   clearPopulationFilters, setComplementFilter
 } from '../../redux/populationFilters'
 
 const componentFor = {
   GradeFilter,
+  CourseCreditFilter,
   ProgrammeFilter,
   CreditsAtLeast,
   CreditsLessThan,
