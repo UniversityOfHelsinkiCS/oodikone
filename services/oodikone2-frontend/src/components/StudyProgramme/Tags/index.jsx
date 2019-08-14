@@ -15,7 +15,6 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     getTagsByStudytrack(studyprogramme)
   }, [])
 
-
   const open = () => setConfirm(true)
 
   const close = () => setConfirm(false)

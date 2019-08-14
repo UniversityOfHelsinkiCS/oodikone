@@ -66,8 +66,10 @@ const CourseStatistics = (props) => {
     return !singleCourseStats ? panes : panes.filter(p => p.menuItem !== MENU.SUM)
   }
 
-  const handleTabChange = (e, { activeIndex }) => {
-    setActiveIndex(activeIndex)
+  const handleTabChange = (e, { activeIndex, panes }) => {
+    if (panes[activeIndex].menuItem.key !== 'query') {
+      setActiveIndex(activeIndex)
+    }
   }
 
   const panes = getPanes()
