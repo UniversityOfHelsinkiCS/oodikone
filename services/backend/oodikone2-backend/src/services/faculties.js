@@ -7,12 +7,12 @@ const { Credit, StudyrightElement } = require('../models')
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { 'secret': process.env.USERSERVICE_SECRET } })
 
 const calculateFacultyYearlyStats = async () => {
-  const { data: faculties } = await client.get('/faculty_programmes')
+  const { data: facultyProgrammes } = await client.get('/faculty_programmes')
   const res = {}
   const lock = new AsyncLock()
 
   let amountDone = 0
-  await Promise.all(faculties.map(({ faculty_code, programme_code }) => (
+  await Promise.all(facultyProgrammes.map(({ faculty_code, programme_code }) => (
     new Promise(async (facultyRes) => {
       if (!res[faculty_code]) res[faculty_code] = {}
 
@@ -59,7 +59,7 @@ const calculateFacultyYearlyStats = async () => {
         })
       )))
       amountDone += 1
-      console.log(`Faculties done ${amountDone}/${faculties.length}`)
+      console.log(`Faculty programmes done ${amountDone}/${facultyProgrammes.length}`)
       facultyRes()
     })
   )))
