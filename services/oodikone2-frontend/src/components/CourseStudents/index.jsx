@@ -10,7 +10,7 @@ import { getCoursePopulation, getCoursePopulationCourses, getCoursePopulationCou
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
-import PopulationCourses from '../PopulationCourseStats'
+import PopulationCourseStats from '../PopulationCourseStats'
 import infoTooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
 import SegmentDimmer from '../SegmentDimmer'
@@ -88,7 +88,7 @@ const CourseStudents = ({
               <InfoBox content={CoursesOf} />
             </Header>
             <SegmentDimmer translate={translate} isLoading={pending} />
-            <PopulationCourses
+            <PopulationCourseStats
               courses={courses}
               pending={pending}
               selectedStudents={selectedStudents}

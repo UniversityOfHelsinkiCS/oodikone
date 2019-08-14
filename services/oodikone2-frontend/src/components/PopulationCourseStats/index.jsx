@@ -100,7 +100,7 @@ class PopulationCourseStats extends Component {
   static getDerivedStateFromProps(props, state) {
     if (state && props.courses) {
       const studentAmountLimit = state.studentAmountLimit > props.selectedStudents.length
-        ? Math.round(props.selectedStudents.length / 2) : state.studentAmountLimit
+        ? Math.round(props.selectedStudents.length / 2) : Math.round(props.selectedStudents.length * 0.3)
 
       return {
         ...state,
@@ -137,7 +137,6 @@ class PopulationCourseStats extends Component {
       [course => course.stats[sortCriteria], course => course.course.code],
       [lodashSortOrder, lodashSortOrderTypes.ASC]
     )
-
     return courseStatistics
   }
 
