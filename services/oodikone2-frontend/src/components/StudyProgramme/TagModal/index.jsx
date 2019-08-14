@@ -40,7 +40,6 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
     setSelected(value)
   }
 
-
   const createdOptions = tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id }))
 
   return (

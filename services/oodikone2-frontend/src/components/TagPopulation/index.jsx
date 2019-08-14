@@ -24,7 +24,6 @@ const TagPopulation = ({
     setOptions(createdOptions)
   }, [])
 
-
   const handleChange = (event, { value }) => {
     event.preventDefault()
     setSelected(value)

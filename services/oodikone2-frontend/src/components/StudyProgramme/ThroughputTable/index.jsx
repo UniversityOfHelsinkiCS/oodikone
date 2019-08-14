@@ -31,10 +31,15 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
   }
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
-  const countries = data.length > 0 && throughput.totals.countries ?
-    uniq(flatten(data.map(year => Object.keys(year.countries)))).sort() : []
   const renderGenders = genders.length > 0
-  const renderCountries = countries.length > 0
+
+  const calculateTotalNationalities = () => (
+    data.length > 0 ?
+      Object.values(throughput.totals.nationalities).reduce((res, curr) => res + curr, 0) :
+      0
+  )
+
+  const renderRatioOfFinns = calculateTotalNationalities() > 0
   let thesisTypes = []
   if (thesis) {
     thesisTypes = thesis.map(t => t.thesisType)
@@ -43,6 +48,27 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
     callApi('/v2/studyprogrammes/throughput/recalculate', 'get', null, { code: studyprogramme })
       .then(() => { dispatchGetThroughput(studyprogramme) })
   }
+
+  const renderStudentsHeader = () => {
+    let colSpan = 1
+    let rowSpan = 1
+
+    if (renderGenders) colSpan += genders.length
+    if (renderRatioOfFinns) colSpan += 1
+    if (!renderGenders && !renderRatioOfFinns) rowSpan += 1
+
+    return <Table.HeaderCell colSpan={colSpan} rowSpan={rowSpan}>Students</Table.HeaderCell>
+  }
+
+  const ratioOfFinnsIn = (year) => {
+    const total = Object.values(year.nationalities).reduce((res, curr) => res + curr, 0)
+    return (
+      <Table.Cell>
+        {`${year.nationalities.Finland || 0} (${Math.floor((year.nationalities.Finland / total) * 100) || 0}%)`}
+      </Table.Cell>
+    )
+  }
+
   return (
     <React.Fragment>
       <Header>
@@ -76,17 +102,11 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
           <Table.Row>
             <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
             {
-              renderGenders ?
-                <Table.HeaderCell colSpan={genders.length + 1}>Students</Table.HeaderCell> :
-                <Table.HeaderCell rowSpan="2">Students</Table.HeaderCell>
+              renderStudentsHeader()
             }
             <Table.HeaderCell colSpan={GRADUATED_FEATURE_TOGGLED_ON ? '3' : '1'}>Graduated</Table.HeaderCell>
 
             <Table.HeaderCell rowSpan="2">Transferred to this program</Table.HeaderCell>
-            {
-              renderCountries ?
-                <Table.HeaderCell colSpan={countries.length}>Countries</Table.HeaderCell> : null
-            }
             <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
             {(thesisTypes.includes('BACHELOR') ||
               thesisTypes.includes('MASTER')) && (
@@ -97,8 +117,9 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
           </Table.Row>
 
           <Table.Row>
-            {renderGenders ? <Table.HeaderCell content="Total" /> : null}
+            {renderGenders || renderRatioOfFinns ? <Table.HeaderCell content="Total" /> : null}
             {genders.map(gender => <Table.HeaderCell key={gender} content={gender} />)}
+            {renderRatioOfFinns ? <Table.HeaderCell content="Finnish" /> : null}
             <Table.HeaderCell >Graduated overall</Table.HeaderCell>
             {GRADUATED_FEATURE_TOGGLED_ON &&
               <Fragment>
@@ -106,7 +127,6 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 <Table.HeaderCell >Graduation median time</Table.HeaderCell>
               </Fragment>
             }
-            {renderCountries ? countries.map(country => <Table.HeaderCell key={country} content={country} />) : null}
             <Table.HeaderCell content="≥ 30" />
             <Table.HeaderCell content="≥ 60" />
             <Table.HeaderCell content="≥ 90" />
@@ -137,6 +157,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                     {`${year.genders[gender] || 0} (${Math.floor((year.genders[gender] / year.credits.length) * 100) || 0}%)`}
                   </Table.Cell>
                 ))}
+                { renderRatioOfFinns && ratioOfFinnsIn(year) }
                 <Table.Cell>{year.graduated}</Table.Cell>
                 {GRADUATED_FEATURE_TOGGLED_ON &&
                   <Fragment>
@@ -145,11 +166,6 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                   </Fragment>
                 }
                 <Table.Cell>{year.transferred}</Table.Cell>
-                {renderCountries ? countries.map(country => (
-                  <Table.Cell key={`${year.year} country:${country}`}>
-                    {year.countries[country] || 0}
-                  </Table.Cell>
-                )) : null}
                 {Object.keys(year.creditValues).map(creditKey => (
                   <Table.Cell key={`${year.year} credit:${creditKey}`}>{year.creditValues[creditKey]}
                   </Table.Cell>
@@ -173,6 +189,13 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                   {`${throughput.totals.genders[genderKey]} (${Math.floor((throughput.totals.genders[genderKey] / throughput.totals.students) * 100)}%)`}
                 </Table.HeaderCell>
               ))}
+              {
+                renderRatioOfFinns ?
+                  <Table.HeaderCell>
+                    {`${throughput.totals.nationalities.Finland || 0} (${Math.floor((throughput.totals.nationalities.Finland / calculateTotalNationalities()) * 100) || 0}%)`}
+                  </Table.HeaderCell> :
+                  null
+              }
               <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
               {GRADUATED_FEATURE_TOGGLED_ON &&
                 <Fragment>
@@ -181,11 +204,6 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 </Fragment>
               }
               <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
-              {renderCountries ? Object.keys(throughput.totals.countries).map(countryKey => (
-                <Table.HeaderCell key={`${countryKey}total`}>
-                  {throughput.totals.countries[countryKey]}
-                </Table.HeaderCell>
-              )) : null}
               {Object.keys(throughput.totals.credits).map(creditKey => (
                 <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}
                 </Table.HeaderCell>
