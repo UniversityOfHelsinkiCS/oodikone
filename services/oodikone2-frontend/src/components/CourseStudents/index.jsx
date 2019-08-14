@@ -10,7 +10,7 @@ import { getCoursePopulation, getCoursePopulationCourses, getCoursePopulationCou
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
-import PopulationCourseStats from '../PopulationCourseStats'
+import CourseStudentCourses from '../CourseStudentCourses'
 import infoTooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
 import SegmentDimmer from '../SegmentDimmer'
@@ -22,7 +22,6 @@ const CourseStudents = ({
   getCoursePopulationCoursesDispatch,
   getSingleCourseStatsDispatch,
   studentData,
-  courses,
   pending,
   history,
   translate,
@@ -88,10 +87,10 @@ const CourseStudents = ({
               <InfoBox content={CoursesOf} />
             </Header>
             <SegmentDimmer translate={translate} isLoading={pending} />
-            <PopulationCourseStats
-              courses={courses}
-              pending={pending}
+            <CourseStudentCourses
               selectedStudents={selectedStudents}
+              code={code}
+              yearCode={yearCode}
             />
           </Segment>
           <PopulationStudents
@@ -109,7 +108,6 @@ CourseStudents.propTypes = {
   getCoursePopulationCoursesDispatch: func.isRequired,
   getSingleCourseStatsDispatch: func.isRequired,
   pending: bool.isRequired,
-  courses: shape([]).isRequired,
   studentData: shape({}).isRequired,
   history: shape({}).isRequired,
   translate: func.isRequired,
