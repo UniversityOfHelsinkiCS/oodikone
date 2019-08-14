@@ -41,6 +41,10 @@ html {
   flex-direction: column;
 }
 
+.level.up.icon {
+  cursor: pointer;
+}
+
 /* --SEMANTIC UI STICKY TABLE HEADERS-- */
 
 .fixed-header thead tr:first-child th,
