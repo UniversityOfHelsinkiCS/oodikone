@@ -271,34 +271,34 @@ export const tagFilter = (params) => {
 }
 
 export const gradeFilter = (params) => {
-  const { coursecode, grade, coursename } = params
+  const { coursecodes, grade, coursename } = params
   return ({
     id: uuidv4(),
     type: 'GradeFilter',
     params: {
-      coursecode,
+      coursecodes,
       grade,
       coursename
     },
     filter: (student) => {
-      const course = student.courses.find(c => c.course.code === coursecode)
+      const course = student.courses.find(c => coursecodes.includes(c.course.code))
       return Number(course.grade) === grade
     }
   })
 }
 
 export const courseCreditFilter = (params) => {
-  const { coursecode, credits, coursename } = params
+  const { coursecodes, credits, coursename } = params
   return ({
     id: uuidv4(),
     type: 'GradeFilter',
     params: {
-      coursecode,
+      coursecodes,
       credits,
       coursename
     },
     filter: (student) => {
-      const course = student.courses.find(c => c.course.code === coursecode)
+      const course = student.courses.find(c => coursecodes.includes(c.course.code))
       return Number(course.credits) === Number(credits)
     }
   })
