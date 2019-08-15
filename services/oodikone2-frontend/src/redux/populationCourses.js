@@ -20,20 +20,6 @@ export const getPopulationCourses = ({
   return callController(route, prefix, body, 'post', query)
 }
 
-export const getPopulationCoursesByCodeAndSemesters = ({
-  coursecode, yearcode
-}) => {
-  const route = '/v2/populationstatistics/coursesbycoursecode'
-  const prefix = 'GET_POPULATION_COURSES_'
-  const query = {
-    coursecode, yearcode
-  }
-  const body = {
-    coursecode, yearcode
-  }
-  return callController(route, prefix, body, 'post', query)
-}
-
 export const clearPopulationCourses = () => ({
   type: 'CLEAR_POPULATIONS_COURSES'
 })
