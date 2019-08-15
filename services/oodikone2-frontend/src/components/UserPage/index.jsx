@@ -176,6 +176,7 @@ class UserPage extends Component {
                 <Dropdown
                   placeholder="Select faculties"
                   fluid
+                  selection
                   multiple
                   search
                   value={this.props.user.faculty.map(f => f.faculty_code)}
