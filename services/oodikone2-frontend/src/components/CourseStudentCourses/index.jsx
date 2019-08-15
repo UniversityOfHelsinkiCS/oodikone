@@ -18,13 +18,13 @@ const CourseStudentCourses = ({
   pending,
   selectedStudents,
   getCoursePopulationCoursesByStudentnumbersDispatch,
-  code,
+  codes,
   yearCode,
   query
 }) => {
   const reloadCourses = () => {
     dispatchRefreshFilters()
-    getCoursePopulationCoursesByStudentnumbersDispatch({ coursecode: code, yearcode: yearCode, studentnumberlist: selectedStudents })
+    getCoursePopulationCoursesByStudentnumbersDispatch({ coursecodes: codes, yearcode: yearCode, studentnumberlist: selectedStudents })
   }
 
   useEffect(() => {
@@ -63,7 +63,7 @@ CourseStudentCourses.propTypes = {
   refreshNeeded: bool.isRequired,
   getCoursePopulationCoursesByStudentnumbersDispatch: func.isRequired,
   dispatchRefreshFilters: func.isRequired,
-  code: string.isRequired,
+  codes: arrayOf(string).isRequired,
   yearCode: string.isRequired,
   query: shape({}).isRequired
 }
