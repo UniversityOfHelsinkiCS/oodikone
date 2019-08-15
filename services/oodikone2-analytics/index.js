@@ -8,7 +8,7 @@ initializeDatabaseConnection().then(() => {
   const app = express()
   const port = 4568
 
-  app.use(bodyParser.json())
+  app.use(bodyParser.json({ limit: '50mb' }))
   app.use(morgan('tiny'))
 
   app.get('/ping', (req, res) => res.json({ message: 'pong'}))
