@@ -43,7 +43,7 @@ const byId = async (id) => Student.findByPk(id, {
 })
 
 
-const findByCourseAndSemesters = async (coursecode, yearcode) =>
+const findByCourseAndSemesters = async (coursecodes, yearcode) =>
   sequelize.query(`
     SELECT
       studentnumber, credit.course_code, attainment_date
@@ -51,13 +51,13 @@ const findByCourseAndSemesters = async (coursecode, yearcode) =>
     INNER JOIN credit ON
       student.studentnumber=credit.student_studentnumber
     WHERE 
-      course_code=:coursecode AND
+      course_code IN (:coursecodes) AND
       attainment_date
     BETWEEN
       (select startdate FROM semesters where yearcode=:yearcode ORDER BY semestercode LIMIT 1) AND
       (select enddate FROM semesters where yearcode=:yearcode ORDER BY semestercode DESC LIMIT 1);
   `,
-  { replacements: { coursecode, yearcode }, type: sequelize.QueryTypes.SELECT })
+  { replacements: { coursecodes, yearcode }, type: sequelize.QueryTypes.SELECT })
     .map(st => st.studentnumber)
 
 const byAbreviatedNameOrStudentNumber = (searchTerm) => {

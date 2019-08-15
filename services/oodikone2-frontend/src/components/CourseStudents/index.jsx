@@ -6,7 +6,7 @@ import { getTranslate } from 'react-localize-redux'
 import { Segment, Header, Loader } from 'semantic-ui-react'
 import qs from 'query-string'
 import { intersection, difference } from 'lodash'
-import { getCoursePopulation, getCoursePopulationCourses, getCoursePopulationCoursesByStudentnumbers } from '../../redux/coursePopulation'
+import { getCoursePopulation, getCoursePopulationCourses } from '../../redux/coursePopulation'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
@@ -15,7 +15,6 @@ import infoTooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
 import SegmentDimmer from '../SegmentDimmer'
 import CourseStudentsFilters from '../CourseStudentsFilters'
-import { refreshFilters } from '../../redux/populationFilters'
 
 const CourseStudents = ({
   getCoursePopulationDispatch,
@@ -26,38 +25,25 @@ const CourseStudents = ({
   history,
   translate,
   courseData,
-  selectedStudents,
-  refreshNeeded,
-  getCoursePopulationCoursesByStudentnumbersDispatch,
-  dispatchRefreshFilters }) => {
+  selectedStudents }) => {
   const parseQueryFromUrl = () => {
     const { location } = history
     const query = qs.parse(location.search)
     return query
   }
-  const [code, setCode] = useState('')
+  const [codes, setCodes] = useState('')
   const [headerYear, setYear] = useState('')
   const [yearCode, setYearCode] = useState('')
   useEffect(() => {
     const query = parseQueryFromUrl()
-    getCoursePopulationDispatch({ coursecode: query.coursecode, yearcode: query.yearcode })
-    getCoursePopulationCoursesDispatch({ coursecode: query.coursecode, yearcode: query.yearcode })
-    getSingleCourseStatsDispatch({ fromYear: query.yearcode, toYear: query.yearcode, courseCodes: [query.coursecode], separate: false })
-    setCode(query.coursecode)
+    getCoursePopulationDispatch({ coursecodes: query.coursecodes, yearcode: query.yearcode })
+    getCoursePopulationCoursesDispatch({ coursecodes: query.coursecodes, yearcode: query.yearcode })
+    getSingleCourseStatsDispatch({ fromYear: query.yearcode, toYear: query.yearcode, courseCodes: query.coursecodes, separate: false })
+    setCodes(query.coursecodes)
     setYearCode(query.yearcode)
     setYear(query.year)
   }, [])
 
-  const reloadCourses = () => {
-    dispatchRefreshFilters()
-    getCoursePopulationCoursesByStudentnumbersDispatch({ coursecode: code, yearcode: yearCode, studentnumberlist: selectedStudents })
-  }
-
-  useEffect(() => {
-    if (refreshNeeded) {
-      reloadCourses()
-    }
-  }, [refreshNeeded])
 
   const { CreditAccumulationGraph, CoursesOf } = infoTooltips.PopulationStatistics
   const header = courseData ? `${courseData.name} ${headerYear}` : null
@@ -67,7 +53,7 @@ const CourseStudents = ({
       {studentData.students && !pending ? (
         <Segment className="contentSegment">
           <Header className="segmentTitle" size="large" textAlign="center">Population of course {header}</Header>
-          <CourseStudentsFilters samples={studentData.students} coursecode={code} />
+          <CourseStudentsFilters samples={studentData.students} coursecodes={codes} />
           <Segment>
             <Header size="medium" dividing>
               {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
@@ -89,7 +75,7 @@ const CourseStudents = ({
             <SegmentDimmer translate={translate} isLoading={pending} />
             <CourseStudentCourses
               selectedStudents={selectedStudents}
-              code={code}
+              codes={codes}
               yearCode={yearCode}
             />
           </Segment>
@@ -112,10 +98,7 @@ CourseStudents.propTypes = {
   history: shape({}).isRequired,
   translate: func.isRequired,
   courseData: shape({}).isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  refreshNeeded: bool.isRequired,
-  getCoursePopulationCoursesByStudentnumbersDispatch: func.isRequired,
-  dispatchRefreshFilters: func.isRequired
+  selectedStudents: arrayOf(string).isRequired
 }
 
 const mapStateToProps = ({ coursePopulation, localize, singleCourseStats, populationFilters }) => {
@@ -145,15 +128,12 @@ const mapStateToProps = ({ coursePopulation, localize, singleCourseStats, popula
     translate: getTranslate(localize),
     query: coursePopulation.query,
     courseData: singleCourseStats.stats,
-    selectedStudents,
-    refreshNeeded: populationFilters.refreshNeeded
+    selectedStudents
   })
 }
 
 export default withRouter(connect(mapStateToProps, {
   getCoursePopulationDispatch: getCoursePopulation,
   getCoursePopulationCoursesDispatch: getCoursePopulationCourses,
-  getSingleCourseStatsDispatch: getSingleCourseStats,
-  dispatchRefreshFilters: refreshFilters,
-  getCoursePopulationCoursesByStudentnumbersDispatch: getCoursePopulationCoursesByStudentnumbers
+  getSingleCourseStatsDispatch: getSingleCourseStats
 })(CourseStudents))
