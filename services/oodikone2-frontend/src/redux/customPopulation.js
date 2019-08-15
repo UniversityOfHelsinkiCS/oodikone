@@ -1,12 +1,12 @@
 import { callController } from '../apiConnection'
 
-export const getCoursePopulation = ({ coursecodes, yearcode }) => {
-  const route = '/v3/populationstatisticsbycourse'
-  const prefix = 'GET_STUDENTS_OF_COURSE_'
-  const params = { coursecodes, yearcode }
-  const query = { coursecodes, yearcode }
-
-  return callController(route, prefix, null, 'get', query, params)
+export const getCustomPopulation = ({ studentnumberlist }) => {
+  const route = '/v3/populationstatisticsbystudentnumbers'
+  const prefix = 'GET_CUSTOM_POP_'
+  const params = { studentnumberlist }
+  const query = { studentnumberlist }
+  const body = { studentnumberlist }
+  return callController(route, prefix, body, 'post', query, params)
 }
 
 export const getCoursePopulationCourses = ({ coursecodes, yearcode }) => {
@@ -31,19 +31,19 @@ export const getCoursePopulationCoursesByStudentnumbers = ({ coursecodes, yearco
 
 const reducer = (state = { students: {}, courses: {}, pending: false, query: {}, coursesPending: false }, action) => {
   switch (action.type) {
-    case 'GET_STUDENTS_OF_COURSE_ATTEMPT':
+    case 'GET_CUSTOM_POP_ATTEMPT':
       return {
         ...state,
         pending: true
       }
 
-    case 'GET_STUDENTS_OF_COURSE_FAILURE':
+    case 'GET_CUSTOM_POP_FAILURE':
       return {
         ...state,
         pending: false
       }
 
-    case 'GET_STUDENTS_OF_COURSE_SUCCESS':
+    case 'GET_CUSTOM_POP_SUCCESS':
       return {
         ...state,
         pending: false,

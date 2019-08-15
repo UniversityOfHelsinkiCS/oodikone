@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Input, Popup } from 'semantic-ui-react'
-import { func, shape, string } from 'prop-types'
+import { func, shape, string, arrayOf } from 'prop-types'
 
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { courseCreditFilter } from '../../populationFilters'
 
-const CourseCreditFilter = ({ coursecode, courseData, filter, setPopulationFilterAction, removePopulationFilterAction }) => {
+const CourseCreditFilter = ({ coursecodes, courseData, filter, setPopulationFilterAction, removePopulationFilterAction }) => {
   const [credits, setCredits] = useState(0)
   const handleFilter = () => {
-    setPopulationFilterAction(courseCreditFilter({ credits, coursecode, coursename: courseData.name }))
+    setPopulationFilterAction(courseCreditFilter({ credits, coursecodes, coursename: courseData.name }))
   }
 
   const handleChange = (e, { value }) => {
@@ -68,7 +68,7 @@ CourseCreditFilter.propTypes = {
   removePopulationFilterAction: func.isRequired,
   filter: shape({}).isRequired,
   courseData: shape({}).isRequired,
-  coursecode: string.isRequired
+  coursecodes: arrayOf(string).isRequired
 }
 
 const mapStateToProps = ({ singleCourseStats }) => ({
