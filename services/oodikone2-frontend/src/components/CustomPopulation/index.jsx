@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Button, Modal, Form, TextArea } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
-import { shape, func } from 'prop-types'
+import { shape, func, arrayOf } from 'prop-types'
 
 import { userIsAdmin } from '../../common'
 import { getCustomPopulation } from '../../redux/customPopulation'
@@ -77,13 +77,13 @@ const CustomPopulation = ({ getCustomPopulationDispatch, custompop, translate })
 
 CustomPopulation.propTypes = {
   translate: func.isRequired,
-  custompop: shape({}).isRequired,
+  custompop: arrayOf(shape({})).isRequired,
   getCustomPopulationDispatch: func.isRequired
 }
 
 const mapStateToProps = ({ customPopulation, localize }) => ({
   translate: getTranslate(localize),
-  custompop: customPopulation.students.students || {}
+  custompop: customPopulation.students.students || []
 })
 
 export default connect(mapStateToProps, { getCustomPopulationDispatch: getCustomPopulation })(CustomPopulation)
