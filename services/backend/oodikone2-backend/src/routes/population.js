@@ -31,7 +31,8 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
 
     res.json(result)
   } catch (e) {
-    res.status(400).json({ error: e })
+    console.log(e)
+    res.status(500).json({ error: e })
   }
 })
 
@@ -63,7 +64,8 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
 
     res.json(result)
   } catch (e) {
-    res.status(400).json({ error: e })
+    console.log(e)
+    res.status(500).json({ error: e })
   }
 })
 
@@ -106,7 +108,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     res.json(result)
   } catch (e) {
     console.log(e)
-    res.status(400).json({ error: e })
+    res.status(500).json({ error: e })
   }
 })
 
@@ -148,7 +150,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     res.json(result)
   } catch (e) {
     console.log(e)
-    res.status(400).json({ error: e })
+    res.status(500).json({ error: e })
   }
 })
 
