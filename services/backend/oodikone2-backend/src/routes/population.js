@@ -156,6 +156,27 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   }
 })
 
+router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
+  const { studentnumberlist } = req.body
+  try {
+    const result = await Population.optimizedStatisticsOf({
+      startYear: 1900,
+      endYear: 2200,
+      studyRights: [],
+      semesters: ['FALL', 'SPRING'],
+      months: 10000
+    }, studentnumberlist)
+    if (result.error) {
+      console.log(result.error)
+      res.status(400).end()
+      return
+    }
+    res.status(200).json(result)
+  } catch (err) {
+    console.log(err)
+    res.status(400).end()
+  }
+})
 
 router.get('/v2/populationstatistics/filters', async (req, res) => {
 

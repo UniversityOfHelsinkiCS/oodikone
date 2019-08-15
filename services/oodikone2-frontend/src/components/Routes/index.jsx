@@ -15,6 +15,7 @@ const OodiLearn = React.lazy(() => import('../OodiLearn'))
 const Feedback = React.lazy(() => import('../Feedback'))
 const Faculty = React.lazy(() => import('../Faculty'))
 const CourseStudents = React.lazy(() => import('../CourseStudents'))
+const CustomPopulation = React.lazy(() => import('../CustomPopulation'))
 const Updater = React.lazy(() => import('../Updater'))
 
 const routes = {
@@ -27,7 +28,8 @@ const routes = {
   sandbox: '/sandbox',
   oodilearn: '/oodilearn',
   feedback: '/feedback',
-  coursepopulation: '/coursepopulation'
+  coursepopulation: '/coursepopulation',
+  custompopulation: '/custompopulation'
 }
 
 const Routes = () => (
@@ -47,6 +49,7 @@ const Routes = () => (
       <Route exact path={routes.oodilearn} component={OodiLearn} />
       <Route exact path={routes.feedback} component={Feedback} />
       <Route exact path={routes.coursepopulation} component={CourseStudents} />
+      <Route exact path={routes.custompopulation} component={CustomPopulation} />
       <Route exact path="/updater" component={Updater} />
     </Switch>
   </Suspense>

@@ -50,6 +50,7 @@ import tagstudent from './tagstudent'
 import auth from './auth'
 import coursePopulation from './coursePopulation'
 import singleCourseStats from './singleCourseStats'
+import customPopulation from './customPopulation'
 
 export default combineReducers({
   localize,
@@ -102,5 +103,6 @@ export default combineReducers({
   tagstudent,
   auth,
   coursePopulation,
-  singleCourseStats
+  singleCourseStats,
+  customPopulation
 })
