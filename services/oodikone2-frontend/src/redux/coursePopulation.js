@@ -1,30 +1,30 @@
 import { callController } from '../apiConnection'
 
-export const getCoursePopulation = ({ coursecode, yearcode }) => {
+export const getCoursePopulation = ({ coursecodes, yearcode }) => {
   const route = '/v3/populationstatisticsbycourse'
   const prefix = 'GET_STUDENTS_OF_COURSE_'
-  const params = { coursecode, yearcode }
-  const query = { coursecode, yearcode }
+  const params = { coursecodes, yearcode }
+  const query = { coursecodes, yearcode }
 
   return callController(route, prefix, null, 'get', query, params)
 }
 
-export const getCoursePopulationCourses = ({ coursecode, yearcode }) => {
+export const getCoursePopulationCourses = ({ coursecodes, yearcode }) => {
   const route = '/v2/populationstatistics/coursesbycoursecode'
   const prefix = 'GET_COURSES_OF_COURSE_POP_'
-  const params = { coursecode, yearcode }
-  const query = { coursecode, yearcode }
-  const body = { coursecode, yearcode }
+  const params = { coursecodes, yearcode }
+  const query = { coursecodes, yearcode }
+  const body = { coursecodes, yearcode }
 
   return callController(route, prefix, body, 'post', query, params)
 }
 
-export const getCoursePopulationCoursesByStudentnumbers = ({ coursecode, yearcode, studentnumberlist }) => {
+export const getCoursePopulationCoursesByStudentnumbers = ({ coursecodes, yearcode, studentnumberlist }) => {
   const route = '/v2/populationstatistics/coursesbycoursecode'
   const prefix = 'GET_COURSES_OF_COURSE_POP_'
-  const params = { coursecode, yearcode, studentnumberlist }
-  const query = { coursecode, yearcode, studentnumberlist }
-  const body = { coursecode, yearcode, studentnumberlist }
+  const params = { coursecodes, yearcode, studentnumberlist }
+  const query = { coursecodes, yearcode, studentnumberlist }
+  const body = { coursecodes, yearcode, studentnumberlist }
 
   return callController(route, prefix, body, 'post', query, params)
 }

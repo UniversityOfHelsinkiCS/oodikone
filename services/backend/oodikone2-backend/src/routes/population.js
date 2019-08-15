@@ -37,14 +37,14 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
 
 router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => {
   try {
-    if (!req.body.yearcode || !req.body.coursecode) {
+    if (!req.body.yearcode || !req.body.coursecodes) {
       res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
       return
     }
-    const { coursecode, yearcode } = req.body
+    const { coursecodes, yearcode } = req.body
     let studentnumberlist
     if (!req.body.studentnumberlist) {
-      const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
+      const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, yearcode)
 
       const { decodedToken: { userId }, roles } = req
 
@@ -115,14 +115,14 @@ router.get('/v3/populationstatistics', async (req, res) => {
 })
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
-  const { coursecode, yearcode } = req.query
-  if (!coursecode || !yearcode) {
+  const { coursecodes, yearcode } = req.query
+  if (!coursecodes || !yearcode) {
     res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
     return
   }
   const semesters = ['FALL', 'SPRING']
   let studentnumberlist
-  const studentnumbers = await Student.findByCourseAndSemesters(coursecode, yearcode)
+  const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, yearcode)
 
   const { decodedToken: { userId }, roles } = req
 
