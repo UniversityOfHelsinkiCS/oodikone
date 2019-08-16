@@ -24,7 +24,6 @@ const TagPopulation = ({
     setOptions(createdOptions)
   }, [])
 
-
   const handleChange = (event, { value }) => {
     event.preventDefault()
     setSelected(value)
@@ -47,6 +46,8 @@ const TagPopulation = ({
     await createMultipleStudentTag(tagList, studytrack)
   }
 
+  const checkCount = checkedStudents.reduce((n, student) => n + (student.checked), 0)
+
   return (
     <List horizontal>
       <List.Item>
@@ -65,7 +66,7 @@ const TagPopulation = ({
           value={selectedValue}
         />
       </List.Item>
-      <Button onClick={handleSubmit}>add tag to multiple students</Button>
+      <Button onClick={handleSubmit} disabled={selectedValue === '' || checkCount === 0}>add tag to multiple students</Button>
     </List>
   )
 }

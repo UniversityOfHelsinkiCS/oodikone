@@ -13,12 +13,14 @@ import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import GradeFilter from './GradeFilter'
 import ProgrammeFilter from './ProgrammeFilter'
+import CourseCreditFilter from './CourseCreditFilter'
 import {
   clearPopulationFilters, setComplementFilter
 } from '../../redux/populationFilters'
 
 const componentFor = {
   GradeFilter,
+  CourseCreditFilter,
   ProgrammeFilter,
   CreditsAtLeast,
   CreditsLessThan,
@@ -27,7 +29,7 @@ const componentFor = {
   CourseParticipation
 }
 
-const CourseStudentsFilters = ({ samples, filters, clearPopulationFiltersDispatch, complemented, setComplementFilterDispatch, allStudyrights, coursecode }) => {
+const CourseStudentsFilters = ({ samples, filters, clearPopulationFiltersDispatch, complemented, setComplementFilterDispatch, allStudyrights, coursecodes }) => {
   const [visible, setVisible] = useState(false)
 
   const renderAddFilters = () => {
@@ -58,7 +60,7 @@ const CourseStudentsFilters = ({ samples, filters, clearPopulationFiltersDispatc
     return (
       <Segment>
         <Header>Add filters <InfoBox content={Add} /></Header>
-        {unsetFilters.map(filterName => React.createElement(componentFor[filterName], { filter: { notSet: true }, key: filterName, samples, allStudyrights, coursecode }))}
+        {unsetFilters.map(filterName => React.createElement(componentFor[filterName], { filter: { notSet: true }, key: filterName, samples, allStudyrights, coursecodes }))}
         <Button onClick={() => setVisible(false)}>cancel</Button>
       </Segment>
     )
@@ -74,7 +76,7 @@ const CourseStudentsFilters = ({ samples, filters, clearPopulationFiltersDispatc
     return (
       <Segment>
         <Header>Filters <InfoBox content={Filters} /></Header>
-        {filters.map(filter => React.createElement(componentFor[filter.type], { filter, key: filter.id, samples, allStudyrights, coursecode }))}
+        {filters.map(filter => React.createElement(componentFor[filter.type], { filter, key: filter.id, samples, allStudyrights, coursecodes }))}
         <Form>
           <Form.Group inline>
             <Form.Field>
@@ -107,7 +109,7 @@ CourseStudentsFilters.propTypes = {
   samples: arrayOf(shape([])).isRequired,
   clearPopulationFiltersDispatch: func.isRequired,
   setComplementFilterDispatch: func.isRequired,
-  coursecode: string.isRequired,
+  coursecodes: arrayOf(string).isRequired,
   allStudyrights: shape({}).isRequired
 }
 
