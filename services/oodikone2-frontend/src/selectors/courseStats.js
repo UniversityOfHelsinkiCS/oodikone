@@ -99,7 +99,7 @@ const getAllStudyProgrammes = createSelector([getCourseStats, languageSelector, 
     .sort((p1, p2) => p2.size - p1.size)
     .filter(p => p.size > 0)
   return [
-    { ...ALL, students: [...allStudents], size: allStudents.length },
+    { ...ALL, students: allStudents, size: allStudents.length },
     ...programmes
   ]
 })
