@@ -4,6 +4,7 @@ import actionHistory from './actionHistory'
 import users from './users'
 import populations from './populations'
 import populationCourses from './populationCourses'
+import populationSelectedStudentCourses from './populationSelectedStudentCourses'
 import populationFilters from './populationFilters'
 import populationDegreesAndProgrammes from './populationDegreesAndProgrammes'
 import populationDegreesAndProgrammesUnfiltered from './populationDegreesAndProgrammesUnfiltered'
@@ -58,6 +59,7 @@ export default combineReducers({
   mandatoryCourseLabels,
   populations,
   populationCourses,
+  populationSelectedStudentCourses,
   populationFilters,
   populationDegreesAndProgrammes,
   populationDegreesAndProgrammesUnfiltered,
