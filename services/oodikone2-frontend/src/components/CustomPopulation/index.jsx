@@ -57,7 +57,6 @@ const CustomPopulation = ({ getCustomPopulationDispatch, custompop, translate })
     </Modal>
   )
 
-
   const renderCustomPopulation = () => {
     const selectedStudents = custompop.map(student => student.studentNumber)
     return (
