@@ -105,7 +105,7 @@ const Faculty = ({ getFaculties, getFacultiesYearlyStats, getFacultyProgrammes, 
                 handleSelect={setSelectedFaculty}
               /> :
               <FacultyStats
-                selectedFacultyProgrammesStats={selectedFacultyProgrammesStats ? selectedFacultyProgrammesStats.data : null}
+                selectedFacultyProgrammesStats={selectedFacultyProgrammesStats ? selectedFacultyProgrammesStats.data : {}}
                 fromYear={fromYear}
                 toYear={toYear}
               />

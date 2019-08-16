@@ -44,7 +44,6 @@ const CourseStudents = ({
     setYear(query.year)
   }, [])
 
-
   const { CreditAccumulationGraph, CoursesOf } = infoTooltips.PopulationStatistics
   const header = courseData ? `${courseData.name} ${headerYear}` : null
 
