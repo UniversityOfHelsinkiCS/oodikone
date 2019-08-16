@@ -73,8 +73,9 @@ class PopulationFilters extends Component {
     savePopulationFilters: func.isRequired,
     setPopulationFilter: func.isRequired,
     studyRights: shape({ programme: string, degree: string, studyTrack: string }).isRequired,
-    populationFilters: object.isRequired, //eslint-disable-line
-    populationCourses: object.isRequired //eslint-disable-line
+    populationFilters: shape({}).isRequired,
+    populationSelectedStudentCourses: shape({}).isRequired,
+    populationCourses: shape({}).isRequired
   }
 
   state = {
@@ -101,7 +102,8 @@ class PopulationFilters extends Component {
   initialFilterLoading = async () => {
     const untilCoursesLoaded = () => {
       const poll = (resolve) => {
-        const { data, pending } = this.props.populationCourses
+        const selectedPopulationCourses = this.props.populationSelectedStudentCourses.data ? this.props.populationSelectedStudentCourses : this.props.populationCourses
+        const { data, pending } = selectedPopulationCourses
         if (data && !pending) {
           resolve()
         } else {
@@ -163,13 +165,14 @@ class PopulationFilters extends Component {
   }
 
   updateFilterList(filtersToCreate) {
+    const selectedPopulationCourses = this.props.populationSelectedStudentCourses.data ? this.props.populationSelectedStudentCourses : this.props.populationCourses
     // sorry for the uglyness but it kinda works (I think)
     const regenerateFilterFunctions = filters =>    /* eslint-disable */
       filters.map(f => f.type === 'Preset' ?
         getFilterFunction(f.type, { ...f, filters: regenerateFilterFunctions(f.filters) },
-          this.props.populationCourses.data)
+        selectedPopulationCourses.data)
         :
-        getFilterFunction(f.type, f.params, this.props.populationCourses.data))
+        getFilterFunction(f.type, f.params, selectedPopulationCourses.data))
 
     if (filtersToCreate) {
       const newFilters = filtersToCreate.map(newFilter =>
@@ -184,8 +187,9 @@ class PopulationFilters extends Component {
 
 
   renderAddFilters(allStudyRights) {
-    const { extents, transfers, populationCourses } = this.props
+    const { extents, transfers, populationSelectedStudentCourses, populationCourses } = this.props
     const { Add } = infotooltips.PopulationStatistics.Filters
+    const selectedPopulationCourses = populationSelectedStudentCourses.data ? populationSelectedStudentCourses : populationCourses
     const allFilters = union(Object.keys(componentFor).filter(f =>
       !(Object.keys(advancedFilters).includes(f) && !this.state.advancedUser)).map(f =>
         String(f)), this.state.presetFilters.map(f => f.id).filter(f => this.state.advancedUser))
@@ -203,10 +207,10 @@ class PopulationFilters extends Component {
       return (
         <Segment>
           <Header>Add filters <InfoBox content={Add} /></Header>
-          <Loader active={populationCourses.pending} inline="centered" />
+          <Loader active={selectedPopulationCourses.pending} inline="centered" />
           <Button
             onClick={() => this.setState({ visible: true })}
-            disabled={populationCourses.pending}
+            disabled={selectedPopulationCourses.pending}
           >
             add
           </Button>
@@ -358,8 +362,10 @@ const mapStateToProps = ({
   localize,
   graphSpinner,
   populations,
+  populationSelectedStudentCourses,
   populationCourses
 }) => ({
+  populationSelectedStudentCourses,
   populationCourses,
   populationFilters,
   filters: populationFilters.filters,

@@ -144,11 +144,19 @@ DisciplineTypes.defaultProps = {
   courseTypes: {}
 }
 
-const mapStateToProps = ({ populationCourses }) => ({
-  courseTypes: populationCourses.data.coursetypes,
-  disciplines: populationCourses.data.disciplines,
-  courses: populationCourses.data.coursestatistics
-})
+const mapStateToProps = ({
+  populationSelectedStudentCourses,
+  populationCourses
+}) => {
+  const selectedPopulationCourses = populationSelectedStudentCourses.data
+    ? populationSelectedStudentCourses
+    : populationCourses
+  return {
+    courseTypes: selectedPopulationCourses.data.coursetypes,
+    disciplines: selectedPopulationCourses.data.disciplines,
+    courses: selectedPopulationCourses.data.coursestatistics
+  }
+}
 
 export default connect(
   mapStateToProps,

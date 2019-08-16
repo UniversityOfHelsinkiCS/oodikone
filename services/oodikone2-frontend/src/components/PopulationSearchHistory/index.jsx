@@ -5,7 +5,6 @@ import { getTranslate } from 'react-localize-redux'
 
 import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation, updatePopulationStudents } from '../../redux/populations'
-import { clearPopulationCourses } from '../../redux/populationCourses'
 import { clearPopulationFilters } from '../../redux/populationFilters'
 
 import './populationSearchHistory.css'
@@ -77,7 +76,6 @@ const mapStateToProps = ({ populations, populationDegreesAndProgrammes, localize
 const mapDispatchToProps = dispatch => ({
   removePopulation: (uuid) => {
     dispatch(removePopulation(uuid))
-    dispatch(clearPopulationCourses())
     dispatch(clearPopulationFilters())
   },
   updatePopulationStudents: students => dispatch(updatePopulationStudents(students))

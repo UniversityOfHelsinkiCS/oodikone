@@ -1,6 +1,5 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
-const AsyncLock = require('async-lock')
 const {
   Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails,
   Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement
@@ -8,7 +7,7 @@ const {
 const {
   Tag, TagStudent
 } = require('../models/models_kone')
-const { getMainCodesMap, byName } = require('./courses')
+const { getCodeToMainCourseMap } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
 
@@ -479,10 +478,10 @@ const unifyOpenUniversity = (code) => {
   return code
 }
 
-const getUnifiedCode = (code, codeduplicates) => {
-  const formattedcode = unifyOpenUniversity(code)
-  const unifiedcode = codeduplicates[formattedcode]
-  return !unifiedcode ? formattedcode : unifiedcode
+const getMainCourse = (course, codeduplicates) => {
+  const formattedcode = unifyOpenUniversity(course.code)
+  const maincourse = codeduplicates[formattedcode]
+  return maincourse || course
 }
 
 const findCourses = (studentnumbers, beforeDate) => {
@@ -500,8 +499,7 @@ const findCourses = (studentnumbers, beforeDate) => {
           attainment_date: {
             [Op.lt]: beforeDate
           }
-        },
-        order: 'attainment_date'
+        }
       },
       {
         model: Discipline
@@ -562,47 +560,33 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     disciplines: {},
     coursetypes: {}
   }
-  const codeduplicates = await getMainCodesMap()
+  const codeToMainCourse = await getCodeToMainCourseMap()
 
-  const lock = new AsyncLock()
   const stats = {}
 
-  await Promise.all(
-    courses.map(course => (
-      new Promise(async res => {
-        let { code, name, disciplines, course_type } = course
-        if (name.fi && name.fi.includes('Avoin yo:')) {
-          const courses = await byName(name.fi.split(': ')[1], 'fi')
-          const theOne = courses.length > 0 ? courses[0] : { name, code }
-          code = theOne.code
-          name = theOne.name
-        }
-        const unifiedcode = getUnifiedCode(code, codeduplicates)
-        if (!stats[unifiedcode]) {
-          lock.acquire('stats', done => {
-            if (!stats[unifiedcode]) stats[unifiedcode] = new CourseStatsCounter(unifiedcode, name, allstudents)
-            done()
-          })
-        }
-        const coursestats = stats[unifiedcode]
+  const startYear = parseInt(query.endYear, 10)
+  courses.map(course => {
+    let { disciplines, course_type } = course
+    const maincourse = getMainCourse(course, codeToMainCourse)
+    if (!stats[maincourse.code]) {
+      stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudents)
+    }
+    const coursestats = stats[maincourse.code]
 
-        coursestats.addCourseType(course_type.coursetypecode, course_type.name)
-        bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
-        disciplines.forEach(({ discipline_id, name }) => {
-          coursestats.addCourseDiscipline(discipline_id, name)
-          bottlenecks.disciplines[discipline_id] = name
-        })
+    coursestats.addCourseType(course_type.coursetypecode, course_type.name)
+    bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
+    disciplines.forEach(({ discipline_id, name }) => {
+      coursestats.addCourseDiscipline(discipline_id, name)
+      bottlenecks.disciplines[discipline_id] = name
+    })
 
-        course.credits.forEach(credit => {
-          const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
-          const semester = getPassingSemester(parseInt(query.endYear, 10), date)
-          coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
-        })
-        stats[unifiedcode] = coursestats
-        res()
-      })
-    ))
-  )
+    course.credits.forEach(credit => {
+      const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
+      const semester = getPassingSemester(startYear, date)
+      coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
+    })
+    stats[maincourse.code] = coursestats
+  })
   bottlenecks.coursestatistics = Object.values(stats)
     .map(coursestatistics => coursestatistics.getFinalStats())
   return bottlenecks

@@ -336,8 +336,8 @@ export const getFilterFunction = (type, params, populationCourses) => {
     case 'CourseParticipation':
       return courseParticipation({
         field: params.field,
-        course: populationCourses.coursestatistics.filter(c =>
-          c.course.code === params.course.course.code)[0]
+        course: populationCourses.coursestatistics.find(c =>
+          c.course.code === params.course.course.code)
       })
     default:
       return typeList[type](params)
