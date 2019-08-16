@@ -1,89 +1,62 @@
-import React, { useEffect, useState } from 'react'
-import { withRouter } from 'react-router-dom'
+import React, { useMemo } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { Segment, Form } from 'semantic-ui-react'
-import { string, func, arrayOf, shape } from 'prop-types'
-import { uniq } from 'lodash'
-import { getFaculties as getFacultiesAction, getFacultiesYearlyStats as getFacultiesYearlyStatsAction } from '../../../redux/faculties'
+import { string, arrayOf, shape, number, func } from 'prop-types'
+import {
+  calculateTotalPassedCourses,
+  calculateTotalFailedCourses
+} from '../facultyUtils'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
-import YearFilter from '../../CourseStatistics/SearchForm/YearFilter'
+import FacultyStatsGraph from '../FacultyStatsGraph'
 
-const FacultySelector = ({ language, getFaculties, getFacultiesYearlyStats, faculties, facultyYearlyStats }) => {
-  const [selectedFaculties, setSelectedFaculties] = useState([])
-  const [fromYear, setFromYear] = useState(-1)
-  const [toYear, setToYear] = useState(-1)
-  const [years, setYears] = useState([])
-
-  useEffect(() => {
-    getFaculties()
-    getFacultiesYearlyStats()
-  }, [])
-
-  const handleSelect = code => setSelectedFaculties(selectedFaculties.includes(code) ?
-    selectedFaculties.filter(c => c !== code) :
-    selectedFaculties.concat(code))
-
-  const getYearFilterData = () => {
-    const filterYears = uniq(facultyYearlyStats
-      .filter(f => selectedFaculties.includes(f.id))
-      .map(({ data }) => Object.keys(data).map(y => parseInt(y, 10)))
-      .reduce((acc, curr) => [...acc, ...curr], []))
-      .sort((a, b) => b - a)
-
-    return {
-      fromYear: filterYears[filterYears.length - 1],
-      toYear: filterYears[0],
-      years: filterYears.map(y => ({ key: y, text: y, value: y }))
+const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, toYear, handleSelect }) => {
+  const calculateYearlyStatsForFaculty = (facultyCode) => {
+    const res = {}
+    const yearData = {
+      studentCredits: 0,
+      coursesPassed: 0,
+      coursesFailed: 0
     }
+
+    const faculty = facultyYearlyStats.find(f => f.id === facultyCode)
+    if (!faculty) return res
+    Object.values(faculty.data).forEach((programmeYearlyStats) => {
+      Object.entries(programmeYearlyStats).forEach(([year, stat]) => {
+        if (!res[year]) res[year] = { ...yearData }
+        res[year].studentCredits += stat.studentCredits
+        res[year].coursesPassed += stat.coursesPassed
+        res[year].coursesFailed += stat.coursesFailed
+      })
+    })
+    return res
   }
 
-  useEffect(() => {
-    const { fromYear: newFromYear, toYear: newToYear, years: newYears } = getYearFilterData()
-    if (fromYear < newFromYear || fromYear > newToYear) setFromYear(newFromYear)
-    if (toYear < newFromYear || toYear > newToYear) setToYear(newToYear)
-    setYears(newYears)
-  }, [selectedFaculties])
-
-  const handleYearChange = (e, target) => {
-    const { name, value } = target
-    if (name === 'fromYear') setFromYear(value)
-    else setToYear(value)
-  }
-
-  const calculateStatsFor = (facultyCode) => {
-    const yearlyStats = facultyYearlyStats.find(f => f.id === facultyCode)
-    const res = {
+  const calculateTotalStatsForFaculty = (facultyCode) => {
+    const initial = {
       totalStudentCredits: 0,
       totalCoursesPassed: 0,
       totalCoursesFailed: 0
     }
-    if (!yearlyStats) return res
-    Object.entries(yearlyStats.data)
+    return Object.entries(calculateYearlyStatsForFaculty(facultyCode))
       .filter(([year]) => year >= fromYear && year <= toYear)
-      .forEach(([, stat]) => {
-        const { studentCredits, coursesPassed, coursesFailed } = stat
-        res.totalStudentCredits += studentCredits
-        res.totalCoursesPassed += coursesPassed
-        res.totalCoursesFailed += coursesFailed
-      })
-    return res
+      .reduce((res, [, curr]) => ({
+        totalStudentCredits: res.totalStudentCredits + curr.studentCredits,
+        totalCoursesPassed: res.totalCoursesPassed + curr.coursesPassed,
+        totalCoursesFailed: res.totalCoursesFailed + curr.coursesFailed
+      }), { ...initial })
   }
 
-  const calculateTotalPassedCoursesFor = (facultyCode) => {
-    const { totalCoursesPassed, totalCoursesFailed } = calculateStatsFor(facultyCode)
-    const ratio = ((totalCoursesPassed / (totalCoursesPassed + totalCoursesFailed)) * 100)
-    return Number.isNaN(ratio) ? 0 : ratio
-  }
+  const totalStats = useMemo(() => faculties.reduce((res, { code }) => {
+    res[code] = calculateTotalStatsForFaculty(code)
+    return { ...res }
+  }, {}), [fromYear, toYear])
 
-  const calculateTotalFailedCoursesFor = (facultyCode) => {
-    const totalPassedRatio = calculateTotalPassedCoursesFor(facultyCode)
-    if (totalPassedRatio === 0) return 0
-    return 100 - totalPassedRatio
-  }
+  const graphData = useMemo(() => faculties.map(({ code, name }) => ({
+    name: getTextIn(name, language),
+    data: calculateYearlyStatsForFaculty(code)
+  })), [])
 
-  if (!faculties || !facultyYearlyStats) return null
   const headers = [
     {
       key: 'name',
@@ -94,84 +67,52 @@ const FacultySelector = ({ language, getFaculties, getFacultiesYearlyStats, facu
       key: 'code',
       title: 'code',
       getRowVal: faculty => faculty.code
-    }
-  ]
-
-  const selectedHeaders = [
-    ...headers,
+    },
     {
       key: 'students',
       title: 'Student credits',
-      getRowVal: ({ code }) => Math.round(calculateStatsFor(code).totalStudentCredits)
+      getRowVal: ({ code }) => Math.round(totalStats[code].totalStudentCredits)
     },
     {
       key: 'coursesPassed',
       title: 'Courses passed',
-      getRowVal: ({ code }) => calculateTotalPassedCoursesFor(code),
-      getRowContent: ({ code }) => `${calculateTotalPassedCoursesFor(code).toFixed(2)}%`
+      getRowVal: ({ code }) => calculateTotalPassedCourses(totalStats[code]),
+      getRowContent: ({ code }) => `${calculateTotalPassedCourses(totalStats[code]).toFixed(2)}%`
     },
     {
       key: 'coursesFailed',
       title: 'Courses failed',
-      getRowVal: ({ code }) => calculateTotalFailedCoursesFor(code),
-      getRowContent: ({ code }) => `${calculateTotalFailedCoursesFor(code).toFixed(2)}%`
+      getRowVal: ({ code }) => calculateTotalFailedCourses(totalStats[code]),
+      getRowContent: ({ code }) => `${calculateTotalFailedCourses(totalStats[code]).toFixed(2)}%`
     }
   ]
 
-  const selectedLength = selectedFaculties.length
   return (
-    <div>
-      { selectedLength !== faculties.length &&
-        <SortableTable
-          columns={headers}
-          getRowKey={faculty => faculty.code}
-          getRowProps={faculty => ({ onClick: () => handleSelect(faculty.code), style: { cursor: 'pointer' } })}
-          data={faculties.filter(({ code }) => !selectedFaculties.includes(code))}
-        />
-      }
-      { selectedLength !== 0 && (
-        <div>
-          <Segment>
-            <Form>
-              <YearFilter
-                fromYear={fromYear}
-                toYear={toYear}
-                years={years}
-                handleChange={handleYearChange}
-                showCheckbox={false}
-                separate={false}
-              />
-            </Form>
-          </Segment>
-          <SortableTable
-            columns={selectedHeaders}
-            getRowKey={faculty => faculty.code}
-            getRowProps={faculty => ({ onClick: () => handleSelect(faculty.code), style: { cursor: 'pointer' } })}
-            data={faculties.filter(({ code }) => selectedFaculties.includes(code))}
-          />
-        </div>
-      ) }
-    </div>
+    <React.Fragment>
+      <SortableTable
+        columns={headers}
+        getRowKey={faculty => faculty.code}
+        getRowProps={faculty => ({ onClick: () => handleSelect(faculty.code), style: { cursor: 'pointer' } })}
+        data={faculties}
+      />
+      <FacultyStatsGraph
+        data={graphData}
+      />
+    </React.Fragment>
   )
 }
 
 FacultySelector.propTypes = {
   language: string.isRequired,
-  getFaculties: func.isRequired,
-  getFacultiesYearlyStats: func.isRequired,
   faculties: arrayOf(shape({})).isRequired,
-  facultyYearlyStats: arrayOf(shape({})).isRequired
+  facultyYearlyStats: arrayOf(shape({})).isRequired,
+  fromYear: number.isRequired,
+  toYear: number.isRequired,
+  handleSelect: func.isRequired
 }
 
-const mapStateToProps = ({ faculties, localize }) => ({
-  faculties: faculties.data,
-  facultyYearlyStats: faculties.yearlyStats,
+const mapStateToProps = ({ localize }) => ({
   language: getActiveLanguage(localize).code
 })
 
-const mapDispatchToProps = {
-  getFaculties: getFacultiesAction,
-  getFacultiesYearlyStats: getFacultiesYearlyStatsAction
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(FacultySelector))
+export default connect(mapStateToProps)(FacultySelector)

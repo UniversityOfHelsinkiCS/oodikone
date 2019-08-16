@@ -7,14 +7,15 @@ const { Credit, StudyrightElement } = require('../models')
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { 'secret': process.env.USERSERVICE_SECRET } })
 
 const calculateFacultyYearlyStats = async () => {
-  const { data: faculties } = await client.get('/faculty_programmes')
+  const { data: facultyProgrammes } = await client.get('/faculty_programmes')
   const res = {}
   const lock = new AsyncLock()
 
   let amountDone = 0
-  await Promise.all(faculties.map(({ faculty_code, programme_code }) => (
+  await Promise.all(facultyProgrammes.map(({ faculty_code, programme_code }) => (
     new Promise(async (facultyRes) => {
       if (!res[faculty_code]) res[faculty_code] = {}
+      if (!res[faculty_code][programme_code]) res[faculty_code][programme_code] = {}
 
       const facultyStudents = await StudyrightElement.findAll({
         where: {
@@ -37,17 +38,17 @@ const calculateFacultyYearlyStats = async () => {
             const attainmentYear = moment(c.attainment_date).year()
             if (!res[faculty_code][attainmentYear]) {
               lock.acquire(faculty_code, (done) => {
-                if (!res[faculty_code][attainmentYear]) {
+                if (!res[faculty_code][programme_code][attainmentYear]) {
                   const facultyYearStats = {}
                   facultyYearStats.studentCredits = 0
                   facultyYearStats.coursesPassed = 0
                   facultyYearStats.coursesFailed = 0
-                  res[faculty_code][attainmentYear] = facultyYearStats
+                  res[faculty_code][programme_code][attainmentYear] = facultyYearStats
                 }
                 done()
               })
             }
-            const facultyYearStats = res[faculty_code][attainmentYear]
+            const facultyYearStats = res[faculty_code][programme_code][attainmentYear]
             if (c.credittypecode === 4) {
               facultyYearStats.studentCredits += c.credits
               facultyYearStats.coursesPassed += 1
@@ -59,7 +60,7 @@ const calculateFacultyYearlyStats = async () => {
         })
       )))
       amountDone += 1
-      console.log(`Faculties done ${amountDone}/${faculties.length}`)
+      console.log(`Faculty programmes done ${amountDone}/${facultyProgrammes.length}`)
       facultyRes()
     })
   )))

@@ -1,19 +1,19 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
+import { Segment, Icon, Button, Form, Input, Popup } from 'semantic-ui-react'
 import { func, shape, string, arrayOf } from 'prop-types'
 
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
-import { gradeFilter } from '../../populationFilters'
+import { courseCreditFilter } from '../../populationFilters'
 
-const GradeFilter = ({ coursecodes, courseData, filter, setPopulationFilterAction, removePopulationFilterAction }) => {
-  const [grade, setGrade] = useState(0)
+const CourseCreditFilter = ({ coursecodes, courseData, filter, setPopulationFilterAction, removePopulationFilterAction }) => {
+  const [credits, setCredits] = useState(0)
   const handleFilter = () => {
-    setPopulationFilterAction(gradeFilter({ grade, coursecodes, coursename: courseData.name }))
+    setPopulationFilterAction(courseCreditFilter({ credits, coursecodes, coursename: courseData.name }))
   }
 
   const handleChange = (e, { value }) => {
-    setGrade(value)
+    setCredits(value)
   }
   const clearFilter = () => {
     removePopulationFilterAction(filter.id)
@@ -28,26 +28,22 @@ const GradeFilter = ({ coursecodes, courseData, filter, setPopulationFilterActio
           />
           <Form.Group inline>
             <Form.Field>
-              <label>Select students that grade </label>
+              <label>Select students that </label>
             </Form.Field>
             <Form.Field>
-              <Dropdown
-                placeholder="select"
-                options={[{ key: 1, text: '1', value: 1 },
-                { key: 2, text: '2', value: 2 },
-                { key: 3, text: '3', value: 3 },
-                { key: 4, text: '4', value: 4 },
-                { key: 5, text: '5', value: 5 }]}
+              <Input
+                type="number"
                 onChange={handleChange}
+                value={credits}
               />
             </Form.Field>
             <Form.Field>
-              <label>from course {courseData.name}</label>
+              <label>credits from course {courseData.name}</label>
             </Form.Field>
             <Form.Field>
               <Button
                 onClick={handleFilter}
-                disabled={grade === 0}
+                disabled={credits === 0}
               >
                 set filter
               </Button>
@@ -59,7 +55,7 @@ const GradeFilter = ({ coursecodes, courseData, filter, setPopulationFilterActio
   }
   return (
     <Segment>
-      Students that have grade {filter.params.grade} from course {filter.params.coursename}
+      Students that have {filter.params.credits} credits from course {filter.params.coursename}
       <span style={{ float: 'right' }}>
         <Icon name="remove" onClick={clearFilter} />
       </span>
@@ -67,7 +63,7 @@ const GradeFilter = ({ coursecodes, courseData, filter, setPopulationFilterActio
   )
 }
 
-GradeFilter.propTypes = {
+CourseCreditFilter.propTypes = {
   setPopulationFilterAction: func.isRequired,
   removePopulationFilterAction: func.isRequired,
   filter: shape({}).isRequired,
@@ -82,4 +78,4 @@ const mapStateToProps = ({ singleCourseStats }) => ({
 export default connect(mapStateToProps, {
   setPopulationFilterAction: setPopulationFilter,
   removePopulationFilterAction: removePopulationFilter
-})(GradeFilter)
+})(CourseCreditFilter)

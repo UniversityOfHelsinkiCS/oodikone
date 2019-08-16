@@ -380,18 +380,18 @@ const gendersFromClass = async (studentnumbers) => {
   }, {})
 }
 
-const countriesFromClass = async (studentnumbers) => {
+const nationalitiesFromClass = async (studentnumbers) => {
   return Student.findAll({
-    attributes: [[sequelize.fn('count', sequelize.col('home_country_en')), 'count'], 'home_country_en'],
     where: {
       studentnumber: {
         [Op.in]: studentnumbers
-      },
+      }
     },
-    group: ['home_country_en'],
-    raw: true
-  }).reduce((acc, curr) => {
-    acc[curr.country_en] = curr.count
+    attributes: ['home_country_en']
+  }).reduce((acc, { home_country_en }) => {
+    const country = home_country_en || 'Unknown'
+    if (!acc[country]) acc[country] = 0
+    acc[country] += 1
     return acc
   }, {})
 }
@@ -479,9 +479,9 @@ const statsForClass = async (studentnumbers, startDate, studytrack, endDate) => 
     graduationsFromClass(studentnumbers, studytrack),
     thesesFromClass(studentnumbers, startDate, studytrack),
     gendersFromClass(studentnumbers),
-    countriesFromClass(studentnumbers),
     tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate),
-    endedStudyright(studentnumbers, startDate, studytrack, endDate)
+    endedStudyright(studentnumbers, startDate, studytrack, endDate),
+    nationalitiesFromClass(studentnumbers)
   ])
 }
 
@@ -503,13 +503,13 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       mte150: 0,
     },
     genders: {},
-    countries: {},
     thesisM: 0,
     thesisB: 0,
     students: 0,
     graduated: 0,
     inTargetTime: 0,
-    transferred: 0
+    transferred: 0,
+    nationalities: {}
   }
   const years = getYears(since)
   // studyprogramme starts with K if bachelors and M if masters
@@ -533,14 +533,12 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
     const creditsForStudyprogramme =
       await productivityCreditsFromStudyprogrammeStudents(studytrack, startDate, studentnumbers)
-    const [credits, graduated, theses, genders, countries, transferredTo, endedStudyright] =
+    const [credits, graduated, theses, genders, transferredTo, endedStudyright, nationalities] =
       await statsForClass(studentnumbers, startDate, studytrack, endDate)
     //console.log(year)
     //console.log(transferredFrom.rows.map(r => r.get({ plain: true })))
     // theres so much shit in the data that transefferFrom doesnt rly mean anything
     delete genders[null]
-    delete countries[null]
-    delete countries[undefined]
     const creditValues = credits.reduce((acc, curr) => {
       acc.mte30 = curr >= 30 ? acc.mte30 + 1 : acc.mte30
       acc.mte60 = curr >= 60 ? acc.mte60 + 1 : acc.mte60
@@ -557,10 +555,9 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
         totals.genders[genderKey] + Number(genders[genderKey]) :
         Number(genders[genderKey])
     })
-    Object.keys(countries).forEach(countryKey => {
-      totals.countries[countryKey] = totals.countries[countryKey] ?
-        totals.countries[countryKey] + Number(countries[countryKey]) :
-        Number(countries[countryKey])
+    Object.keys(nationalities).forEach(nationality => {
+      if (!totals.nationalities[nationality]) totals.nationalities[nationality] = 0
+      totals.nationalities[nationality] += nationalities[nationality]
     })
     const graduationTimes = graduated.map(g => moment(g.enddate).diff(g.studystartdate, 'months'))
     const inTargetTime = graduationTimes.filter(time =>
@@ -585,13 +582,12 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       thesisM: theses.MASTER || 0,
       thesisB: theses.BACHELOR || 0,
       genders,
-      countries,
       creditValues,
       transferred: transferredTo,
-      ended: endedStudyright.count
+      ended: endedStudyright.count,
+      nationalities
     }
   }))
-
   return { id: studytrack, status: null, data: { years: arr, totals } }
 }
 

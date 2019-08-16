@@ -1,7 +1,13 @@
 const { ElementDetails } = require('../models/index')
 const { Op } = require('sequelize')
 
-const byId = id =>  ElementDetails.findByPk(id)
+const byId = id => ElementDetails.findByPk(id)
+
+const byType = type => ElementDetails.findAll({
+  where: {
+    type
+  }
+})
 
 const byCodes = codes => ElementDetails.findAll({
   where: {
@@ -11,4 +17,4 @@ const byCodes = codes => ElementDetails.findAll({
   }
 })
 
-module.exports = { byId, byCodes }
+module.exports = { byId, byType, byCodes }
