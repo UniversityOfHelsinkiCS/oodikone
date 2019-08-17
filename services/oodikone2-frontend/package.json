@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "webpack-dev-server --mode=development --hot --inline",
     "docker": "webpack-dev-server --mode=development --hot --inline --host 0.0.0.0",
-    "dist": "webpack --mode=production --profile --progress",
+    "dist": "webpack --mode=production",
     "lint": "concurrently 'npm run lint:js' 'npm run lint:css'",
     "lint:css": "stylelint 'src/**/*.css'",
     "lint:js": "eslint server ./ --ext .jsx,.js",
