@@ -526,46 +526,64 @@ const parseCreditInfo = credit => ({
 })
 
 const bottlenecksOf = async (query, studentnumberlist) => {
-  let allstudents
-  let courses
-  if (!studentnumberlist) {
-    if (!query.semesters.map(semester => semester === 'FALL' || semester === 'SPRING').every(e => e === true)) {
+  const isValidRequest = async (query, params) => {
+    const { studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents } = params
+    if (!query.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
       return { error: 'Semester should be either SPRING OR FALL' }
     }
     if (query.studentStatuses &&
-      !query.studentStatuses.map(
+      !query.studentStatuses.every(
         status => status === 'CANCELLED' || status === 'EXCHANGE' || status === 'NONDEGREE'
-      ).every(e => e === true)) {
+      )) {
       return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE' }
     }
-    const { studyRights, startDate, endDate, months, exchangeStudents, cancelledStudents } = parseQueryParams(query)
     if (query.selectedStudents) {
       const allStudents =
         await studentnumbersWithAllStudyrightElements(
-          studyRights, startDate, endDate, exchangeStudents, cancelledStudents
+          studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
         )
       const disallowedRequest =
         checkThatSelectedStudentsAreUnderRequestedStudyright(query.selectedStudents, allStudents)
       if (disallowedRequest) return { error: 'Trying to request unauthorized students data' }
     }
-    const studentnumbers = query.selectedStudents ||
-      await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate, exchangeStudents, cancelledStudents)
-    allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
-    courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
-  } else {
-    allstudents = studentnumberlist
-    courses = await findCourses(allstudents, new Date())
+    return null
   }
+  const getStudentsAndCourses = async (selectedStudents, studentnumberlist) => {
+    if (!studentnumberlist) {
+      const { months, studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents } = params
+      const studentnumbers = selectedStudents ||
+        await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents)
+      const allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
+      const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
+      return [allstudents, courses]
+    } else {
+      const allstudents = studentnumberlist
+      const courses = await findCourses(allstudents, new Date())
+      return [allstudents, courses]
+    }
+  }
+  const params = parseQueryParams(query)
+  const [[allstudents, courses], codeToMainCourse, error] = await Promise.all(
+    [
+      getStudentsAndCourses(query.selectedStudents, studentnumberlist),
+      getCodeToMainCourseMap(),
+      isValidRequest(
+        query,
+        params
+      )
+    ]
+  )
+  if (error) return error
+
   const bottlenecks = {
     disciplines: {},
     coursetypes: {}
   }
-  const codeToMainCourse = await getCodeToMainCourseMap()
 
   const stats = {}
 
   const startYear = parseInt(query.endYear, 10)
-  courses.map(course => {
+  courses.forEach(course => {
     let { disciplines, course_type } = course
     const maincourse = getMainCourse(course, codeToMainCourse)
     if (!stats[maincourse.code]) {
