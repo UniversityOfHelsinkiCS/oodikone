@@ -186,10 +186,9 @@ class EnableUsers extends Component {
     return (
       <div className="segmentContainer">
         <Header className="segmentTitle" size="large">
-          Enable or disable access to Oodikone
+          Oodikone users
         </Header>
-        <Radio toggle onClick={() => this.toggleEnabledOnly()} />
-        <Message>Showing {enabledOnly ? 'only enabled' : 'all'} users</Message>
+        <Radio label={`Showing ${enabledOnly ? 'only enabled' : 'all'} users`} toggle onClick={() => this.toggleEnabledOnly()} />
         <Segment loading={pending} className="contentSegment">
           {!userid ? this.renderUserSearchList() : this.renderUserPage(userid)}
         </Segment>
