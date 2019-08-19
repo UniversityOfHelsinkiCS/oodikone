@@ -6,11 +6,6 @@ export const getUsers = () => {
   return callController(route, prefix)
 }
 
-export const getAccessGroups = () => {
-  const route = '/users/access_groups'
-  const prefix = 'GET_ACCESSGROUPS_'
-  return callController(route, prefix)
-}
 export const modifyAccessGroups = (uid, accessgroups) => {
   const route = '/users/modifyaccess'
   const prefix = 'MODIFY_ACCESSGROUPS_'
@@ -69,26 +64,6 @@ const reducer = (state = { data: [], enabledOnly: true }, action) => {
         pending: false,
         error: false,
         data: action.response
-      }
-    case 'GET_ACCESSGROUPS_ATTEMPT':
-      return {
-        ...state,
-        accessgroupPending: true,
-        error: state.error
-      }
-    case 'GET_ACCESSGROUPS_FAILURE':
-      return {
-        ...state,
-        accessgroupPending: false,
-        error: true,
-        accessGroupsData: action.response
-      }
-    case 'GET_ACCESSGROUPS_SUCCESS':
-      return {
-        ...state,
-        accessgroupPending: false,
-        error: false,
-        accessGroupsData: action.response
       }
     case 'EDIT_USER_UNIT_SUCCESS':
       return {
