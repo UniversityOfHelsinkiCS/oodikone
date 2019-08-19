@@ -68,7 +68,7 @@ const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, isActiveCourse
 
   return (
     <Table.Row key={course.code} active={isActive}>
-      <Table.Cell onClick={() => onCourseNameClickFn(statistics)} className="clickableCell">
+      <Table.Cell onClick={() => onCourseNameClickFn(course.code)} className="clickableCell">
         {getTextIn(course.name, activeLanguage)}
       </Table.Cell>
       <Table.Cell>

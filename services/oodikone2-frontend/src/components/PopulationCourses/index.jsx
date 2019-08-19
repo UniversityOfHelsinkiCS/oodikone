@@ -9,22 +9,25 @@ import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
-import { getPopulationCourses } from '../../redux/populationCourses'
+import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 import { refreshFilters } from '../../redux/populationFilters'
 
 const PopulationCourses = ({
+  populationSelectedStudentCourses,
   populationCourses,
   refreshNeeded,
   dispatchRefreshFilters,
   selectedStudents,
   translate,
-  getPopulationCourses: gpc
+  getPopulationSelectedStudentCourses: gpc
 }) => {
+  const selectedPopulationCourses = populationSelectedStudentCourses.data ? populationSelectedStudentCourses : populationCourses
+
   const { CoursesOf } = infotooltips.PopulationStatistics
-  const { pending } = populationCourses
+  const { pending } = selectedPopulationCourses
   const reloadCourses = () => {
     dispatchRefreshFilters()
-    gpc({ ...populationCourses.query, uuid: uuidv4(), selectedStudents })
+    gpc({ ...selectedPopulationCourses.query, uuid: uuidv4(), selectedStudents })
   }
 
   useEffect(() => {
@@ -48,10 +51,10 @@ const PopulationCourses = ({
         </Header>
         <SegmentDimmer translate={translate} isLoading={pending} />
         <PopulationCourseStats
-          key={populationCourses.query.uuid}
-          courses={populationCourses.data}
-          query={populationCourses.query}
-          pending={populationCourses.pending}
+          key={selectedPopulationCourses.query.uuid}
+          courses={selectedPopulationCourses.data}
+          query={selectedPopulationCourses.query}
+          pending={pending}
           selectedStudents={selectedStudents}
         />
       </Segment>
@@ -60,20 +63,22 @@ const PopulationCourses = ({
 }
 
 PopulationCourses.propTypes = {
-  populationCourses: shape({}).isRequired,
+  populationSelectedStudentCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
+  populationCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
   refreshNeeded: bool.isRequired,
   translate: func.isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  getPopulationCourses: func.isRequired,
+  getPopulationSelectedStudentCourses: func.isRequired,
   dispatchRefreshFilters: func.isRequired
 }
 
-const mapStateToProps = ({ populationCourses, localize, populationFilters }) => ({
+const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses, localize, populationFilters }) => ({
   populationCourses,
+  populationSelectedStudentCourses,
   refreshNeeded: populationFilters.refreshNeeded,
   translate: getTranslate(localize)
 })
 
 export default connect(mapStateToProps, {
-  getPopulationCourses, dispatchRefreshFilters: refreshFilters
+  getPopulationSelectedStudentCourses, dispatchRefreshFilters: refreshFilters
 })(PopulationCourses)

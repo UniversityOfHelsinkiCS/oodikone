@@ -209,8 +209,7 @@ describe('Population Statistics tests', () => {
     cy.contains("and at least").parentsUntil("form").contains("set filter").click()
 
     cy.contains("Filters").siblings().within(() => {
-      cy.contains('Kehittävä').should('have.text', 'Kehittävä työntutkimus')
-      cy.contains('Kvalitatiiviset').should('have.text', 'Kvalitatiiviset tutkimusmenetelmät I')
+      cy.contains('Kehittävä').should('have.text', 'Avoin yo: Kehittävä työntutkimus')
     })
 
     checkAmountOfStudents(1)
@@ -236,7 +235,7 @@ describe('Population Statistics tests', () => {
       cy.contains("set filter").click()
     })
 
-    checkAmountOfStudents(1)
+    checkAmountOfStudents(3)
 
     cy.contains("Basic filters").parentsUntil("form").contains("set filter").click()
 

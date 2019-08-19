@@ -157,10 +157,7 @@ class TransferFilter extends Component {
   }
 }
 
-const mapStateToProps = ({ populationCourses, localize }) => ({
-  courseTypes: populationCourses.data.coursetypes,
-  disciplines: populationCourses.data.disciplines,
-  courses: populationCourses.data.coursestatistics,
+const mapStateToProps = ({ localize }) => ({
   activeLanguage: getActiveLanguage(localize).code
 })
 

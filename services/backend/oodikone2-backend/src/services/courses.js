@@ -483,13 +483,12 @@ const getMainCodeToDuplicates = async () => {
   return maincodeToDuplicates
 }
 
-const getCodeToMainCodeMap = async () => {
+const getCodeToMainCourseMap = async () => {
   try {
     const maincodeToDuplicates = await getMainCodeToDuplicates()
     const codeToMainCode = Object.values(maincodeToDuplicates).reduce((acc, d) => {
-      const maincode = d.maincourse.code
       d.duplicates.forEach((c) => {
-        acc[c.code] = maincode
+        acc[c.code] = d.maincourse
       })
       return acc
     }, {})
@@ -500,19 +499,15 @@ const getCodeToMainCodeMap = async () => {
   return {}
 }
 
-const getMainCodesMap = async () => {
-  return await getCodeToMainCodeMap()
-}
-
 const getMaincodeToDuplicateCodesMap = async () => {
   try {
-    const codeToMainCodeMap = await getCodeToMainCodeMap()
-    const codes = Object.keys(codeToMainCodeMap)
+    const codeToMainCourseMap = await getCodeToMainCourseMap()
+    const codes = Object.keys(codeToMainCourseMap)
     const mainCodeToCoursesMap = codes.reduce((acc, code) => {
-      const maincode = codeToMainCodeMap[code]
-      const duplicates = acc[maincode] || []
+      const maincourse = codeToMainCourseMap[code]
+      const duplicates = acc[maincourse.code] || []
       duplicates.push(code)
-      acc[maincode] = duplicates
+      acc[maincourse.code] = duplicates
       return acc
     }, {})
     return mainCodeToCoursesMap
@@ -524,13 +519,13 @@ const getMaincodeToDuplicateCodesMap = async () => {
 
 const getMainCourseToCourseMap = async (/*programme*/) => {
   try {
-    const codeToMainCodeMap = await getCodeToMainCodeMap()
+    const codeToMainCodeMap = await getCodeToMainCourseMap()
     const courses = await byCodes(Object.keys(codeToMainCodeMap))
     const mainCodeToCoursesMap = courses.reduce((acc, course) => {
-      const maincode = codeToMainCodeMap[course.code]
-      const duplicates = acc[maincode] || []
+      const maincourse = codeToMainCodeMap[course.code]
+      const duplicates = acc[maincourse.code] || []
       duplicates.push(course)
-      acc[maincode] = duplicates
+      acc[maincourse.code] = duplicates
       return acc
     }, {})
     return mainCodeToCoursesMap
@@ -715,7 +710,7 @@ module.exports = {
   findDuplicates,
   setDuplicateCode,
   deleteDuplicateCode,
-  getMainCodesMap,
+  getCodeToMainCourseMap,
   getMainCourseToCourseMap,
   getAllCourseTypes,
   getAllDisciplines,
