@@ -93,7 +93,7 @@ const getAllStudyProgrammes = createSelector([getCourseStats, languageSelector, 
     })
   })
 
-  const allStudents = Object.values(all).reduce((res, curr) => [...res, ...curr.students], [])
+  const allStudents = [...new Set(Object.values(all).reduce((res, curr) => [...res, ...curr.students], []))]
   const programmes = Object.values(all)
     .map(p => ({ ...p, size: p.students.length || 0 }))
     .sort((p1, p2) => p2.size - p1.size)
@@ -149,7 +149,7 @@ const summaryStatistics = createSelector(
     const filteredProgrammes = programmes.filter(p => programmeCodes.includes(p.key))
     const students = new Set(filteredProgrammes.reduce((acc, p) => [...acc, ...p.students], []))
 
-    const filterStudentFn = studentNumber => students && students.has(studentNumber)
+    const filterStudentFn = studentNumber => students.has(studentNumber)
     return Object.entries(courseStats).map((entry) => {
       const [coursecode, data] = entry
       const { statistics, name } = data

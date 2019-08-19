@@ -8,7 +8,6 @@ const CATEGORY = {
 class CourseYearlyStatsCounter {
 
   constructor() {
-    this.all = []
     this.groups = {}
     this.programmes = {}
     this.history = {
@@ -46,29 +45,18 @@ class CourseYearlyStatsCounter {
     return { attempted, passed, failed }
   }
 
-  markStudyProgramme(code, name, studentnumber, startdate) {
+  markStudyProgramme(code, name, studentnumber) {
     if (!this.programmes[code]) {
       this.initProgramme(code, name)
     }
-    const prog = this.programmes[code]
-
-    // check if student has earlier studyright wrt course
-    this.all.forEach((student) => {
-      if (student.studentnumber === studentnumber && student.startdate > startdate) {
-        delete this.programmes[student.code]
-        this.all.splice(this.all.indexOf(student), 1)
-      }
-    })
-
-    if (!prog.students.includes(studentnumber)) {
-      this.all.push({ studentnumber, code, startdate })
-      prog.students.push(studentnumber)
+    if (!this.programmes[code].students.includes(studentnumber)) {
+      this.programmes[code].students.push(studentnumber)
     }
   }
 
   markStudyProgrammes(studentnumber, programmes) {
-    programmes.forEach(({ code, name, startdate }) => {
-      this.markStudyProgramme(code, name, studentnumber, startdate)
+    programmes.forEach(({ code, name }) => {
+      this.markStudyProgramme(code, name, studentnumber)
     })
   }
 
@@ -147,8 +135,13 @@ class CourseYearlyStatsCounter {
   }
 
   getFinalStatistics() {
+    // change students set to list
+    const programmes = Object.keys(this.programmes).reduce((acc, code) => {
+      acc[code] = { ...this.programmes[code], students: [...this.programmes[code].students] }
+      return acc
+    }, {})
     return {
-      programmes: this.programmes,
+      programmes,
       statistics: this.formatGroupStatistics()
     }
   }
