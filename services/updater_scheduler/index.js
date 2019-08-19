@@ -2,7 +2,7 @@ const { stan } = require('./src/nats_connection')
 const { CronJob } = require('cron')
 const Schedule = require('./models')
 const logger = require('./logger')
-const { scheduleActiveStudents, scheduleAllStudents, scheduleStudentCheck, scheduleAttainmentUpdate, scheduleMeta } = require('./src/schedule_students')
+const { scheduleActiveStudents, scheduleAllStudents, scheduleAttainmentUpdate, scheduleMeta } = require('./src/schedule_students')
 require('./src/api')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
@@ -20,19 +20,7 @@ const updateTask = async ({ task, status, type, updatetime, active }) => {
 
 stan.on('connect', async () => {
   schedule('0 0 * * 6', async () => {
-    // Every Saturday at 00:00
-    try {
-      console.log('SCHEDULING STUDENTNUMBER CHECK')
-      await scheduleStudentCheck()
-    } catch (err) {
-      console.log('SCHEDULING STUDENTNUMBER CHECK FAILED')
-      console.log(err)
-      logger.info('failure', { service: 'SCHEDULER' })
-    }
-  })
-
-  schedule('0 12 * * 6', async () => {
-    // Every Saturday at 12:00
+    // Every Friday-Saturday midnight
     try {
       console.log('SCHEDULING ALL STUDENTS')
       await scheduleAllStudents()
