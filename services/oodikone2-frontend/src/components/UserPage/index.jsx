@@ -6,7 +6,8 @@ import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
 import { getTextIn, getRolesWithoutRefreshToken } from '../../common'
-import { removeUserUnits, getAccessGroups, setFaculties } from '../../redux/users'
+import { removeUserUnits, setFaculties } from '../../redux/users'
+import { getAccessGroups } from '../../redux/accessGroups'
 import { getFaculties } from '../../redux/faculties'
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
 import { login } from '../../redux/auth'
@@ -31,13 +32,13 @@ class UserPage extends Component {
   }
 
   async componentDidMount() {
-    const { associations, pending, getElementDetails } = this.props
-    getElementDetails()
+    const { associations, pending, getElementDetails, elementdetails, accessGroups, faculties } = this.props
+    if (elementdetails.length === 0) getElementDetails()
+    if (accessGroups.data.length === 0) await this.props.getAccessGroups()
+    if (faculties.length === 0) await this.props.getFaculties()
     if (Object.keys(associations).length === 0 && !pending) {
       this.props.getDegreesAndProgrammesUnfiltered()
-      await this.props.getAccessGroups()
     }
-    await this.props.getFaculties()
   }
 
   getDisabledUnits = (units, enabled) => {
@@ -94,7 +95,7 @@ class UserPage extends Component {
     elementdetailcodes.sort()
     return (
       <List divided>
-        {elementdetails && elementdetails.length > 0 && elementdetailcodes.map(({ elementDetailCode: code }) => {
+        {elementdetails.length > 0 && elementdetailcodes.map(({ elementDetailCode: code }) => {
           const element = elementdetails.find(e => e.code === code)
           return (
             <List.Item key={code}>
@@ -239,7 +240,7 @@ const mapStateToProps = state => ({
   associations: state.populationDegreesAndProgrammesUnfiltered.data,
   pending: !!state.populationDegreesAndProgrammesUnfiltered.pending,
   elementdetails: state.elementdetails.data,
-  accessGroups: state.users.accessGroupsData || [],
+  accessGroups: state.accessGroups,
   isAdmin: getRolesWithoutRefreshToken().includes('admin')
 })
 

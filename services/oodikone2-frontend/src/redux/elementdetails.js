@@ -18,7 +18,7 @@ const reducer = (state = { data: [] }, action) => {
       return {
         pending: false,
         error: true,
-        data: action.response
+        data: []
       }
     case 'GET_ELEMENTDETAILS_SUCCESS':
       return {

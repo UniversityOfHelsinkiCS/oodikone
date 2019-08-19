@@ -15,7 +15,7 @@ describe('Users tests', () => {
     cy.visit(Cypress.config().baseUrl)
     cy.reload()
     cy.contains("Users").click()
-    cy.contains("Enable or disable access to Oodikone")
+    cy.contains("Oodikone users")
   })
 
   it("Admin mocking normal user shows only the mocked user's programmes", () => {

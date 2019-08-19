@@ -87,11 +87,13 @@ const refreshOverview = async () => {
 }
 
 const startCron = () => {
-  schedule('0 6 * * *', async () => {
-    await refreshFacultyYearlyStats()
-    await refreshStudyrightAssociations()
-    await refreshOverview()
-  })
+  if (process.env.NODE_ENV === 'production') {
+    schedule('0 6 * * *', async () => {
+      await refreshFacultyYearlyStats()
+      await refreshStudyrightAssociations()
+      await refreshOverview()
+    })
+  }
 }
 
 module.exports = {
