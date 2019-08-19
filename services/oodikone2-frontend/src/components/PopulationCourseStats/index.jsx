@@ -86,6 +86,7 @@ class PopulationCourseStats extends Component {
     }).isRequired,
     translate: func.isRequired,
     setPopulationFilter: func.isRequired,
+    populationCourses: shape({ data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) }) }).isRequired,
     selectedCourses: arrayOf(object).isRequired,
     removePopulationFilterOfCourse: func.isRequired,
     history: shape({}).isRequired,
@@ -201,12 +202,15 @@ class PopulationCourseStats extends Component {
     clearCourseStatsfn()
   }
 
-  onCourseNameCellClick = (courseStats) => {
-    if (!this.isActiveCourse(courseStats.course)) {
-      const params = { course: courseStats, field: 'all' }
-      this.props.setPopulationFilter(courseParticipation(params))
-    } else {
-      this.props.removePopulationFilterOfCourse(courseStats.course)
+  onCourseNameCellClick = (code) => {
+    const courseStatistic = this.props.populationCourses.data.coursestatistics.find(cs => cs.course.code === code)
+    if (courseStatistic) {
+      if (!this.isActiveCourse(courseStatistic.course)) {
+        const params = { course: courseStatistic, field: 'all' }
+        this.props.setPopulationFilter(courseParticipation(params))
+      } else {
+        this.props.removePopulationFilterOfCourse(courseStatistic.course)
+      }
     }
   }
 
@@ -302,7 +306,7 @@ class PopulationCourseStats extends Component {
       return (
         <Table.Row active={this.isActiveCourse(course)}>
           <Table.Cell
-            onClick={() => this.onCourseNameCellClick(courseStats)}
+            onClick={() => this.onCourseNameCellClick(code)}
             content={getTextIn(name, language)}
             className="clickableCell"
           />
@@ -407,7 +411,7 @@ class PopulationCourseStats extends Component {
       return ((
         <Table.Row key={code} active={this.isActiveCourse(course)}>
           <Table.Cell
-            onClick={() => this.onCourseNameCellClick(courseStats)}
+            onClick={() => this.onCourseNameCellClick(code)}
             content={getTextIn(name, language)}
             className="clickableCell"
           />
@@ -501,7 +505,8 @@ const mapStateToProps = (state) => {
     translate: getTranslate(state.localize),
     query: state.populations.query ? state.populations.query : state.coursePopulation.query,
     years,
-    selectedCourses
+    selectedCourses,
+    populationCourses: state.populationCourses
   }
 }
 

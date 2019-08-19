@@ -61,12 +61,14 @@ const find = async (studyProgrammeId, code) => {
       }
     }
   })
+  if (!mandatoryCourse) return null
 
   const course = await Course.findOne({
     where: {
       code: mandatoryCourse.course_code
     }
   })
+  if (!course) return null
 
   return { ...mandatoryCourse.get(), course: course.get() }
 }

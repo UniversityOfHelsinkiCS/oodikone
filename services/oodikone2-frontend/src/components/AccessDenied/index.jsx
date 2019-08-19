@@ -4,27 +4,37 @@ import { bool, func } from 'prop-types'
 import Highcharts from 'highcharts'
 import ReactHighchart from 'react-highcharts'
 import { connect } from 'react-redux'
+import { random } from 'lodash'
 import { logout as logoutAction } from '../../redux/auth'
 import { log, images } from '../../common'
 import MulticolorBarChart from '../MulticolorBarChart'
 
-const dummyData = [
-  { name: 'mluukkai', data: [48.0] },
-  { name: 'jakousa', data: [33.3] },
-  { name: 'totutotu', data: [46.2] },
-  { name: 'sasumaki', data: [59.7] },
-
-  { name: 'ikuisma', data: [48.0] },
-  { name: 'eero3', data: [33.3] },
-  { name: 'mitiaine', data: [46.2] },
-  { name: 'woltsu', data: [59.7] }
+const names = [
+  'mluukkai',
+  'jakousa',
+  'totutotu',
+  'sasumaki',
+  'ikuisma',
+  'eero3',
+  'mitiaine',
+  'rimi',
+  'esakemp',
+  'woltsu'
 ]
+const dummyData = names.map(name => ({
+  name,
+  data: [0, 1, 2, 3, 4, 5, 6, 7]
+    .reduce((acc, i) => {
+      acc[i] = (acc[i - 1] || 0) + (random(0, 3) === 0 ? 0 : random(10.0, 100.0))
+      return acc
+    }, [])
+}))
 
 const AccessDenied = ({ notEnabled, logout }) => {
   const header = notEnabled ? 'Welcome to Oodikone!' : 'Something broke'
-  const subheader = notEnabled ? `You're currently not allowed to enter 
+  const subheader = notEnabled ? `You're currently not allowed to enter
   but you will get an email when you're authorized`
-    : `If this was not intended try refreshing your browser window, 
+    : `If this was not intended try refreshing your browser window,
     pressing log out or contacting grp-toska@helsinki.fi`
 
   const [easterEgg, setEasterEgg] = useState(false)
@@ -66,34 +76,11 @@ const AccessDenied = ({ notEnabled, logout }) => {
               }
             },
 
-            series: [{
-              name: 'mluukkai',
-              data: [18937, 29057, 33213, 40949, 55880, 60421, 77543, 87691]
-            }, {
-              name: 'jakousa',
-              data: [15411, 17960, 34037, 58382, 56367, 63103, 79570, 83898]
-            }, {
-              name: 'totutotu',
-              data: [12482, 26592, 32348, 69576, 78155, 80379, 83568, 83165]
-            }, {
-              name: 'sasumaki',
-              data: [17358, 24823, 36578, 47617, 59341, 68391, 72326, 96022]
-            }, {
-              name: 'ikuisma',
-              data: [8536, 21650, 35013, 45562, 65750, 68431, 74402, 83202]
-            },
-            {
-              name: 'eero3',
-              data: [18855, 24929, 38722, 45049, 51706, 68569, 66225, 72269]
-            },
-            {
-              name: 'mitiaine',
-              data: [500, 1000, 20000, 56000, 59000, 65425, 69800, 80000]
-            }]
+            series: dummyData
           }}
         />
 
-        <MulticolorBarChart chartTitle="Your students' future" chartData={dummyData} />
+        <MulticolorBarChart chartTitle="Your students' future" chartData={dummyData.map(e => ({ name: e.name, data: [Math.max(...e.data)] }))} />
       </Container>
       <Dimmer
         active

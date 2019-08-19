@@ -12,7 +12,7 @@ class CourseParticipationNTimes extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    populationCourses: shape({}).isRequired
+    selectedPopulationCourses: shape({}).isRequired
   }
 
   state = {
@@ -24,8 +24,8 @@ class CourseParticipationNTimes extends Component {
   }
 
   studyRights = () => {
-    const { populationCourses } = this.props
-    return populationCourses ? populationCourses.query.studyRights : []
+    const { selectedPopulationCourses } = this.props
+    return selectedPopulationCourses ? selectedPopulationCourses.query.studyRights : []
   }
 
   handleLimit = () => {
@@ -98,8 +98,13 @@ class CourseParticipationNTimes extends Component {
   }
 }
 
-const mapStateToProps = ({ populationCourses }) => ({
+const mapStateToProps = ({
+  populationSelectedStudentCourses,
   populationCourses
+}) => ({
+  selectedPopulationCourses: populationSelectedStudentCourses.data
+    ? populationSelectedStudentCourses
+    : populationCourses
 })
 
 export default connect(mapStateToProps, {

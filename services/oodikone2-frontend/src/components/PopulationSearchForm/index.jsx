@@ -12,6 +12,7 @@ import moment from 'moment'
 
 import { getPopulationStatistics } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
+import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 import { getPopulationFilters, setPopulationFilter, clearPopulationFilters } from '../../redux/populationFilters'
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 import { getSemesters } from '../../redux/semesters'
@@ -130,7 +131,6 @@ const PopulationSearchForm = (props) => {
 
     const success = await fetchPopulationPromises.current.promise
     if (success) {
-      props.clearPopulationFilters()
       if (queryCodes[0] === 'KH50_001') {
         props.setPopulationFilter(transferTo(false))
       }
@@ -754,7 +754,6 @@ PopulationSearchForm.propTypes = {
   getPopulationCourses: func.isRequired,
   getMandatoryCourses: func.isRequired,
   getPopulationFilters: func.isRequired,
-  clearPopulationFilters: func.isRequired,
   setPopulationFilter: func.isRequired,
   queries: shape({}).isRequired,
   studyProgrammes: shape({}), //eslint-disable-line
@@ -791,6 +790,7 @@ const mapStateToProps = ({ semesters, settings, populations, populationDegreesAn
 export default withRouter(connect(mapStateToProps, {
   getPopulationStatistics,
   getPopulationCourses,
+  getPopulationSelectedStudentCourses,
   getPopulationFilters,
   getMandatoryCourses,
   setPopulationFilter,
