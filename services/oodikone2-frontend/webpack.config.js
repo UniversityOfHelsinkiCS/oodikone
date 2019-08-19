@@ -79,7 +79,8 @@ module.exports = (env, args) => {
           ADMINER_URL: JSON.stringify(process.env.ADMINER_URL),
           KONE_ADMINER_URL: JSON.stringify(process.env.KONE_ADMINER_URL),
           USAGE_ADMINER_URL: JSON.stringify(process.env.USAGE_ADMINER_URL),
-          SENTRY_RELEASE_VERSION: JSON.stringify(sentryreleaseversion)
+          SENTRY_RELEASE_VERSION: JSON.stringify(sentryreleaseversion),
+          BUILT_AT: JSON.stringify(new Date().toISOString())
         }
       }),
       new MiniCssExtractPlugin({

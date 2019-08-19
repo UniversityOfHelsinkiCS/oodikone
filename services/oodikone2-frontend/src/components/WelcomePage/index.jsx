@@ -1,5 +1,6 @@
 import React from 'react'
 import { Container, Header, Image, Divider } from 'semantic-ui-react'
+import moment from 'moment'
 import { images } from '../../common'
 
 const WelcomePage = () => (
@@ -47,6 +48,7 @@ const WelcomePage = () => (
         Contact team Oodikone by email: grp-toska@helsinki.fi
       </p>
       <Divider section />
+      <p>Site updated at: {moment(process.env.BUILT_AT).toDate().toLocaleString()}</p>
     </Container>
     <Image src={images.toskaLogo} size="medium" centered style={{ bottom: 0 }} />
   </div>
