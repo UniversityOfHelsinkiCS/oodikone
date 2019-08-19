@@ -19,42 +19,44 @@ const updateTask = async ({ task, status, type, updatetime, active }) => {
 }
 
 stan.on('connect', async () => {
-  schedule('0 0 * * 6', async () => {
-    // Every Friday-Saturday midnight
-    try {
-      console.log('SCHEDULING ALL STUDENTS')
-      await scheduleAllStudents()
-    } catch (err) {
-      console.log('SCHEDULING ALL STUDENTS FAILED')
-      console.log(err)
-      logger.info('failure', { service: 'SCHEDULER' })
-    }
-  })
+  if (process.env.NODE_ENV === 'production') {
+    schedule('0 0 * * 6', async () => {
+      // Every Friday-Saturday midnight
+      try {
+        console.log('SCHEDULING ALL STUDENTS')
+        await scheduleAllStudents()
+      } catch (err) {
+        console.log('SCHEDULING ALL STUDENTS FAILED')
+        console.log(err)
+        logger.info('failure', { service: 'SCHEDULER' })
+      }
+    })
 
-  schedule('0 6 * * 1-5', async () => {
-    // Every Monday through Friday at 06:00
-    try {
-      console.log('SCHEDULING META AND ATTAINMENT')
-      await scheduleMeta()
-      await scheduleAttainmentUpdate()
-    } catch (err) {
-      console.log('SCHEDULING META AND ATTAINMENT')
-      console.log(err)
-      logger.info('failure', { service: 'SCHEDULER' })
-    }
-  })
+    schedule('0 6 * * 1-5', async () => {
+      // Every Monday through Friday at 06:00
+      try {
+        console.log('SCHEDULING META AND ATTAINMENT')
+        await scheduleMeta()
+        await scheduleAttainmentUpdate()
+      } catch (err) {
+        console.log('SCHEDULING META AND ATTAINMENT')
+        console.log(err)
+        logger.info('failure', { service: 'SCHEDULER' })
+      }
+    })
 
-  schedule('0 22 * * 1-4', async () => {
-    // Every Monday through Thursday at 22:00
-    try {
-      console.log('SCHEDULING ACTIVE STUDENTS')
-      await scheduleActiveStudents()
-    } catch (err) {
-      console.log('SCHEDULING ACTIVE STUDENTS FAILED')
-      console.log(err)
-      logger.info('failure', { service: 'SCHEDULER' })
-    }
-  })
+    schedule('0 22 * * 1-4', async () => {
+      // Every Monday through Thursday at 22:00
+      try {
+        console.log('SCHEDULING ACTIVE STUDENTS')
+        await scheduleActiveStudents()
+      } catch (err) {
+        console.log('SCHEDULING ACTIVE STUDENTS FAILED')
+        console.log(err)
+        logger.info('failure', { service: 'SCHEDULER' })
+      }
+    })
+  }
 
   schedule('0 * * * *', async () => {
     // Every hour
