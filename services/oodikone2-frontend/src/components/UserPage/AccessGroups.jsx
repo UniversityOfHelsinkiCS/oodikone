@@ -12,7 +12,7 @@ class AccessGroups extends Component {
   }
 
   componentDidMount() {
-    this.props.getAccessGroups()
+    if (this.props.groups.length === 0) this.props.getAccessGroups()
   }
 
   componentDidUpdate(prevState) {
@@ -88,7 +88,7 @@ AccessGroups.propTypes = {
 }
 
 const mapStateToProps = ({ accessGroups, users }, { user }) => {
-  const { data = [], pending } = accessGroups
+  const { data, pending } = accessGroups
   const { accessgroupError: saveError, accessgroupPending: savePending } = users
   const groups = data.map(group => ({
     key: group.id,

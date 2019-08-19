@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Button, Radio, Icon, Header, Segment, Confirm, Loader, Label, Message } from 'semantic-ui-react'
+import { Button, Radio, Icon, Header, Segment, Confirm, Loader, Label } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf, number } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
