@@ -671,7 +671,7 @@ const nameLikeTerm = (name) => {
 
 const codeLikeTerm = (code) => !code ? undefined : {
   code: {
-    [Op.iLike]: `${code.trim()}%`
+    [Op.iLike]: `%${code.trim()}%`
   }
 }
 
