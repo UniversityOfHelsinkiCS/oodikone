@@ -20,17 +20,7 @@ export const clearSelectedCourse = () => ({
   type: 'CLEAR_SELECTED_COURSE'
 })
 
-export const setFromYear = fromYear => ({
-  type: 'SET_SINGLE_COURSE_FROM_YEAR',
-  fromYear
-})
-
-export const setToYear = toYear => ({
-  type: 'SET_SINGLE_COURSE_TO_YEAR',
-  toYear
-})
-
-const reducer = (state = { stats: {}, pending: false, error: false, fromYear: null, toYear: null, selectedCourse: null }, action) => {
+const reducer = (state = { stats: {}, pending: false, error: false, selectedCourse: null }, action) => {
   switch (action.type) {
     case 'GET_SINGLE_COURSE_STATS_ATTEMPT':
       return {
@@ -51,16 +41,6 @@ const reducer = (state = { stats: {}, pending: false, error: false, fromYear: nu
         ...state,
         pending: false,
         error: true
-      }
-    case 'SET_SINGLE_COURSE_FROM_YEAR':
-      return {
-        ...state,
-        fromYear: action.fromYear
-      }
-    case 'SET_SINGLE_COURSE_TO_YEAR':
-      return {
-        ...state,
-        toYear: action.toYear
       }
     case 'SET_SELECTED_COURSE':
       return {

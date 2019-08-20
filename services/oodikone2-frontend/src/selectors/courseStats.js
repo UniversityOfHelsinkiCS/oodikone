@@ -11,11 +11,9 @@ const nameAsString = (data, language) => {
 
 const courseStatsSelector = state => state.courseStats.data
 
-const yearSelector = state => ({ fromYear: state.singleCourseStats.fromYear, toYear: state.singleCourseStats.toYear })
-
 const languageSelector = state => getActiveLanguage(state.localize).code
 
-const getCourseStats = createSelector([courseStatsSelector, yearSelector, languageSelector], (courseStats, { fromYear, toYear }, lang) => {
+const getCourseStats = createSelector([courseStatsSelector, languageSelector], (courseStats, lang) => {
   const stats = {}
   Object.entries(courseStats).forEach((entry) => {
     const [coursecode, data] = entry
@@ -25,10 +23,7 @@ const getCourseStats = createSelector([courseStatsSelector, yearSelector, langua
       statistics: statistics.map(stat => ({
         ...stat,
         name: nameAsString(stat.name, lang)
-      })).filter(({ yearcode }) => {
-        if (!fromYear || !toYear) return true
-        return yearcode >= fromYear && yearcode <= toYear
-      })
+      }))
     }
   })
   return stats
