@@ -118,7 +118,7 @@ const PopulationSearchForm = (props) => {
     const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses'])
     const queryCodes = Object.values(query.studyRights).filter(e => e != null)
     const uuid = uuidv4()
-    const request = { ...formattedQueryParams, studyRights: queryCodes, uuid }
+    const request = { ...formattedQueryParams, studyRights: queryCodes, uuid, tag: selectedTag }
     setState({ isLoading: true })
     props.setLoading()
 
