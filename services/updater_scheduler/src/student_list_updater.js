@@ -43,7 +43,7 @@ const createTasks = async () => {
   }
 
   const minStudentNumber = 1010000
-  const maxStudentNumber = minStudentNumber + 500000
+  const maxStudentNumber = 1530000
   const mongoWriteBatchSize = 1000
   let studentnumbers = []
   for (let i = minStudentNumber; i <= maxStudentNumber; ++i) {
