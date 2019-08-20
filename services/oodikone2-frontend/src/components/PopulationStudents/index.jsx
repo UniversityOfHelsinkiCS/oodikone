@@ -534,7 +534,7 @@ class PopulationStudents extends Component {
       return workbook
     }
     const filteredPanes = (panesToFilter) => {
-      if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
+      if (['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
         return panesToFilter.slice(0, 1)
       }
       if (!this.state.admin) {
