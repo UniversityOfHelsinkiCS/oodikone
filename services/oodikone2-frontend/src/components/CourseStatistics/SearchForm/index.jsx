@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Segment, Header, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -13,7 +13,6 @@ import { getCourseSearchResults } from '../../../selectors/courses'
 import { useSearchHistory } from '../../../common'
 import SearchHistory from '../../SearchHistory'
 import { getStartAndEndYearValues } from '../courseStatisticsUtils'
-import YearFilter from './YearFilter'
 
 const INITIAL = {
   courseName: '',
@@ -78,27 +77,32 @@ const SearchForm = (props) => {
   const onSelectCourse = (course) => {
     course.selected = !course.selected
     const isSelected = !!selectedCourses[course.code]
-    const { fromYear: newFromYear, toYear: newToYear } = getStartAndEndYearValues(course, props.years)
 
+    let newSelectedCourses = null
     if (isSelected) {
       const { [course.code]: omit, ...rest } = selectedCourses
-      setState({ ...state, selectedCourses: rest })
+      newSelectedCourses = rest
     } else {
-      setState({
-        ...state,
-        selectedCourses: {
-          ...selectedCourses,
-          [course.code]: { ...course, selected: true }
-        },
-        fromYear: fromYear < newFromYear ? fromYear : newFromYear,
-        toYear: toYear > newToYear ? toYear : newToYear
-      })
+      newSelectedCourses = {
+        ...selectedCourses,
+        [course.code]: { ...course, selected: true }
+      }
     }
-  }
 
-  const onToggleCheckbox = (e, target) => {
-    const { name } = target
-    setState({ ...state, [name]: !state[name] })
+    const [fromYear, toYear] = Object.values(newSelectedCourses).reduce(([from, to], c) => {
+      const { fromYear, toYear } = getStartAndEndYearValues(c, props.years)
+      return [
+        from == null || fromYear < from ? fromYear : from,
+        to == null || toYear > to ? toYear : to
+      ]
+    }, [null, null])
+
+    setState({
+      ...state,
+      selectedCourses: newSelectedCourses,
+      fromYear,
+      toYear
+    })
   }
 
   const pushQueryToUrl = (query) => {
@@ -141,12 +145,7 @@ const SearchForm = (props) => {
     return Promise.resolve()
   }
 
-  const handleChange = (e, target) => {
-    const { name, value } = target
-    setState({ ...state, [name]: value })
-  }
-
-  const { years, isLoading, matchingCourses } = props
+  const { isLoading, matchingCourses } = props
   const courses = matchingCourses.filter(c => !selectedCourses[c.code])
 
   const disabled = (!fromYear || Object.keys(selectedCourses).length === 0) || isLoading
@@ -192,28 +191,17 @@ const SearchForm = (props) => {
               controlIcon="remove"
             />
             {!noSelectedCourses &&
-              <Fragment>
-                <YearFilter
-                  fromYear={fromYear}
-                  toYear={toYear}
-                  years={years}
-                  separate={separate}
-                  handleChange={handleChange}
-                  onToggleCheckbox={onToggleCheckbox}
-                  showCheckbox
-                />
-                <Form.Button
-                  type="button"
-                  disabled={disabled}
-                  fluid
-                  size="huge"
-                  primary
-                  basic
-                  positive
-                  content="Fetch statistics"
-                  onClick={onSubmitFormClick}
-                />
-              </Fragment>
+              <Form.Button
+                type="button"
+                disabled={disabled}
+                fluid
+                size="huge"
+                primary
+                basic
+                positive
+                content="Fetch statistics"
+                onClick={onSubmitFormClick}
+              />
             }
             <CourseTable
               hidden={noQueryStrings || isLoading}
