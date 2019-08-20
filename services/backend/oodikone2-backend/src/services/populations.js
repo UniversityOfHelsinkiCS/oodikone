@@ -1,5 +1,7 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
+const { intersection } = require('lodash')
+
 const {
   Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails,
   Discipline, CourseType, SemesterEnrollment, Semester, Transfers, StudyrightElement
@@ -270,7 +272,7 @@ const count = (column, count, distinct = false) => {
   )
 }
 
-const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents) => { // eslint-disable-line
+const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents, tag) => { // eslint-disable-line
   const filteredExtents = []
   let studyrightWhere = {
     extentcode: {
@@ -286,7 +288,6 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
   if (!cancelledStudents) {
     studyrightWhere.canceldate = null
   }
-
   const students = await Studyright.findAll({
     attributes: ['student_studentnumber'],
     include: {
@@ -324,11 +325,21 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
     having: count('studyright_elements.code', studyRights.length, true),
   })
 
-  return [...new Set(students.map(s => s.student_studentnumber))]
+  const taggedStudentnumbers = await TagStudent.findAll({
+    attributes: ['studentnumber'],
+    where: {
+      tag_id: {
+        [Op.eq]: tag
+      }
+    }
+  })
+  const normalStudentNumberList = [...new Set(students.map(s => s.student_studentnumber))]
+  const studentnumbers = taggedStudentnumbers.map(sn => sn.studentnumber)
+  return studentnumbers.length > 0 ? intersection(normalStudentNumberList, studentnumbers) : normalStudentNumberList
 }
 
 const parseQueryParams = query => {
-  const { semesters, studentStatuses, studyRights, months, endYear, startYear } = query
+  const { semesters, studentStatuses, studyRights, months, endYear, startYear, tag } = query
   const startDate = semesters.includes('FALL') ?
     `${startYear}-${semesterStart[semesters.find(s => s === 'FALL')]}` :
     `${moment(startYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
@@ -345,7 +356,8 @@ const parseQueryParams = query => {
     studyRights: Array.isArray(studyRights) ? studyRights : Object.values(studyRights),
     months,
     startDate,
-    endDate
+    endDate,
+    tag
   }
 }
 
@@ -540,7 +552,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     if (query.selectedStudents) {
       const allStudents =
         await studentnumbersWithAllStudyrightElements(
-          studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
+          studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents, query.tag
         )
       const disallowedRequest =
         checkThatSelectedStudentsAreUnderRequestedStudyright(query.selectedStudents, allStudents)
@@ -550,9 +562,9 @@ const bottlenecksOf = async (query, studentnumberlist) => {
   }
   const getStudentsAndCourses = async (selectedStudents, studentnumberlist) => {
     if (!studentnumberlist) {
-      const { months, studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents } = params
+      const { months, studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents, tag } = params
       const studentnumbers = selectedStudents ||
-        await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents)
+        await studentnumbersWithAllStudyrightElements(studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents, tag)
       const allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
       const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
       return [allstudents, courses]
