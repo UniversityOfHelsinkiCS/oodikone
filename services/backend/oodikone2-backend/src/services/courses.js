@@ -334,8 +334,7 @@ const yearlyStatsOf = async (code, year, separate, language) => {
       return b
     }, resultProgrammes)
 
-  const alternatives = await getDuplicateCodes(code)
-  const codes = alternatives ? alternatives : [code]
+  const codes = await alternativeCodes(code)
   const allInstances = await creditsOf(codes)
   const yearInst = allInstances
     .filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-09-01', year.end + '-08-01'))
