@@ -208,14 +208,14 @@ class PopulationStudents extends Component {
         getRowVal: s => s.credits
       }
     )
-    if (history.location.pathname !== '/coursepopulation') {
+    if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
       columns.push({
         key: 'transferred from',
         title: 'transferred from',
         getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '')
       })
     }
-    if (containsStudyTracks && history.location.pathname !== '/coursepopulation') {
+    if (containsStudyTracks && !['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
       columns.push({
         key: 'studytrack',
         title: 'studytrack',
@@ -223,7 +223,7 @@ class PopulationStudents extends Component {
       })
     }
 
-    if (admin && history.location.pathname !== '/coursepopulation') {
+    if (admin && !['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
       columns.push(
         {
           key: 'priority',
@@ -534,7 +534,7 @@ class PopulationStudents extends Component {
       return workbook
     }
     const filteredPanes = (panesToFilter) => {
-      if (history.location.pathname === '/coursepopulation') {
+      if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
         return panesToFilter.slice(0, 1)
       }
       if (!this.state.admin) {
