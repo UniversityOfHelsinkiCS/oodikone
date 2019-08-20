@@ -498,22 +498,8 @@ const getCodeToMainCourseMap = async () => {
   return {}
 }
 
-const getMaincodeToDuplicateCodesMap = async () => {
-  try {
-    const codeToMainCourseMap = await getCodeToMainCourseMap()
-    const codes = Object.keys(codeToMainCourseMap)
-    const mainCodeToCoursesMap = codes.reduce((acc, code) => {
-      const maincourse = codeToMainCourseMap[code]
-      const duplicates = acc[maincourse.code] || []
-      duplicates.push(code)
-      acc[maincourse.code] = duplicates
-      return acc
-    }, {})
-    return mainCodeToCoursesMap
-  } catch (e) {
-    console.error(e)
-  }
-  return {}
+const getMainCodeToDuplicatesAndCodeToMainCode = async () => {
+  return [await getMainCodeToDuplicates(), await getCodeToMainCourseMap()]
 }
 
 const getMainCourseToCourseMap = async (/*programme*/) => {
@@ -535,9 +521,10 @@ const getMainCourseToCourseMap = async (/*programme*/) => {
 }
 
 const getDuplicateCodes = async (code) => {
-  const maincodeToDuplicatesMap = await getMaincodeToDuplicateCodesMap()
-  const duplicates = maincodeToDuplicatesMap[code]
-  return duplicates
+  const [mainCodeToDuplicates, codeToMainCourseMap] = await getMainCodeToDuplicatesAndCodeToMainCode()
+  const maincourse = codeToMainCourseMap[code]
+  if (!maincourse) return null
+  return mainCodeToDuplicates[maincourse.code].duplicates.map(e => e.code)
 }
 
 const setDuplicateCode = async (code1, code2) => {
@@ -713,5 +700,6 @@ module.exports = {
   yearlyStatsOfNew,
   courseYearlyStats,
   byNameAndOrCodeLike,
-  byCodes
+  byCodes,
+  getMainCodeToDuplicatesAndCodeToMainCode
 }
