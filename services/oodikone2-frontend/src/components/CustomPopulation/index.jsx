@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Button, Modal, Form, TextArea } from 'semantic-ui-react'
+import { Button, Modal, Form, TextArea, Segment, Header } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { shape, func, arrayOf } from 'prop-types'
 
 import { userIsAdmin } from '../../common'
 import { getCustomPopulation } from '../../redux/customPopulation'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
+import PopulationStudents from '../PopulationStudents'
 
 const CustomPopulation = ({ getCustomPopulationDispatch, custompop, translate }) => {
   const [admin, setAdmin] = useState(false)
@@ -60,7 +61,18 @@ const CustomPopulation = ({ getCustomPopulationDispatch, custompop, translate })
   const renderCustomPopulation = () => {
     const selectedStudents = custompop.map(student => student.studentNumber)
     return (
-      <CreditAccumulationGraphHighCharts students={custompop} selectedStudents={selectedStudents} translate={translate} />
+      <div>
+        <Segment>
+          <Header size="medium" dividing>
+            {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
+          </Header>
+          <CreditAccumulationGraphHighCharts students={custompop} selectedStudents={selectedStudents} translate={translate} />
+        </Segment>
+        <PopulationStudents
+          samples={custompop}
+          selectedStudents={selectedStudents}
+        />
+      </div>
     )
   }
 
