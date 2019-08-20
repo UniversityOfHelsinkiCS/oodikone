@@ -18,7 +18,7 @@ class CheckStudentList extends Component {
 
   renderResults() {
     return (
-      <Modal trigger={<Button color="green" onClick={() => this.checkStudents(this.state.input)}>check students</Button>}>
+      <Modal trigger={<Button color="green" disabled={this.state.input.length === 0} onClick={() => this.checkStudents(this.state.input)}>check students</Button>}>
         <Modal.Content>
           <Form>
             <h2> Results </h2>
