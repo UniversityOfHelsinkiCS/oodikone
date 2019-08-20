@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Fragment } from 'react'
 import { Segment, Header, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -123,6 +123,11 @@ const SearchForm = (props) => {
     return Promise.resolve()
   }
 
+  const onToggleCheckbox = (e, target) => {
+    const { name } = target
+    setState({ ...state, [name]: !state[name] })
+  }
+
   const { isLoading, matchingCourses } = props
   const courses = matchingCourses.filter(c => !selectedCourses[c.code])
 
@@ -169,17 +174,25 @@ const SearchForm = (props) => {
               controlIcon="remove"
             />
             {!noSelectedCourses &&
-              <Form.Button
-                type="button"
-                disabled={disabled}
-                fluid
-                size="huge"
-                primary
-                basic
-                positive
-                content="Fetch statistics"
-                onClick={onSubmitFormClick}
-              />
+              <Fragment>
+                <Form.Checkbox
+                  label="Separate statistics for Spring and Fall semesters"
+                  name="separate"
+                  onChange={onToggleCheckbox}
+                  checked={separate}
+                />
+                <Form.Button
+                  type="button"
+                  disabled={disabled}
+                  fluid
+                  size="huge"
+                  primary
+                  basic
+                  positive
+                  content="Fetch statistics"
+                  onClick={onSubmitFormClick}
+                />
+              </Fragment>
             }
             <CourseTable
               hidden={noQueryStrings || isLoading}
