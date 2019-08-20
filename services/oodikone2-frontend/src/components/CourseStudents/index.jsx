@@ -122,7 +122,6 @@ const mapStateToProps = ({ coursePopulation, localize, singleCourseStats, popula
   }
   return ({
     studentData: coursePopulation.students,
-    courses: coursePopulation.courses,
     pending: coursePopulation.pending,
     translate: getTranslate(localize),
     query: coursePopulation.query,
