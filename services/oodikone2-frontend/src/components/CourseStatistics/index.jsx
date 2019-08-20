@@ -60,7 +60,7 @@ const CourseStatistics = (props) => {
             clearCourseStats()
           }
         },
-        render: () => <SearchForm />
+        render: () => null
       }
     ]
     return !singleCourseStats ? panes : panes.filter(p => p.menuItem !== MENU.SUM)

@@ -4,14 +4,15 @@ import { shape, string, arrayOf, objectOf, oneOfType, number, func } from 'prop-
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { getActiveLanguage } from 'react-localize-redux'
-import { difference } from 'lodash'
+import { difference, min, max } from 'lodash'
 import qs from 'query-string'
 import ResultTabs from '../ResultTabs'
-import { setFromYear, setToYear, setSelectedCourse, clearSelectedCourse } from '../../../redux/singleCourseStats'
+import { setSelectedCourse, clearSelectedCourse } from '../../../redux/singleCourseStats'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import YearFilter from '../SearchForm/YearFilter'
 import { getTextIn } from '../../../common'
+import { getSemesters } from '../../../redux/semesters'
 
 const countFilteredStudents = (stat, filter) => Object.entries(stat).reduce((acc, entry) => {
   const [category, students] = entry
@@ -22,19 +23,28 @@ const countFilteredStudents = (stat, filter) => Object.entries(stat).reduce((acc
 }, {})
 
 class SingleCourseStats extends Component {
-  state = {
-    primary: [ALL.value],
-    comparison: [],
-    separate: null
+  constructor(props) {
+    super(props)
+
+    const yearcodes = props.stats.statistics.map(s => s.code)
+    const fromYear = min(yearcodes)
+    const toYear = max(yearcodes)
+
+    this.state = {
+      primary: [ALL.value],
+      comparison: [],
+      fromYear,
+      toYear,
+      separate: null
+    }
   }
 
-  componentDidMount = () => {
-    const { setFromYear, setToYear, setSelectedCourse, location, stats: { coursecode } } = this.props
+  componentWillMount = () => {
+    const { setSelectedCourse, location, stats: { coursecode }, getSemesters, years, semesters } = this.props
+    if (years.length === 0 || semesters.length === 0) getSemesters()
     if (location.search) {
-      const { fromYear, toYear, ...rest } = this.parseQueryFromUrl()
-      setFromYear(fromYear)
-      setToYear(toYear)
-      this.setState({ ...rest })
+      const params = this.parseQueryFromUrl()
+      this.setState(params)
     }
     setSelectedCourse(coursecode)
   }
@@ -51,10 +61,7 @@ class SingleCourseStats extends Component {
   }
 
   componentWillUnmount = () => {
-    const { setFromYear, setToYear, clearSelectedCourse } = this.props
-    const { fromYear, toYear } = this.parseQueryFromUrl()
-    setFromYear(fromYear)
-    setToYear(toYear)
+    const { clearSelectedCourse } = this.props
     clearSelectedCourse()
   }
 
@@ -105,19 +112,18 @@ class SingleCourseStats extends Component {
     return programmes[code] || (code === ALL.value || (code === 'EXCLUDED'))
   }
 
-  filteredYearsAndSemesters = (useInitialValues = false) => {
-    const { years, semesters, fromYear, toYear } = this.props
-    const { fromYearInitial, toYearInitial } = this.state
-    if (!fromYearInitial || !toYearInitial) {
+  filteredYearsAndSemesters = () => {
+    const { years, semesters, stats } = this.props
+    const yearcodes = stats.statistics.map(s => s.code)
+    const from = min(yearcodes)
+    const to = max(yearcodes)
+    if (from == null || to == null) {
       return {
         filteredYears: years,
         filteredSemesters: semesters
       }
     }
-    const timeFilter = ({ value }) => (
-      value >= (useInitialValues ? fromYearInitial : fromYear) &&
-      value <= (useInitialValues ? toYearInitial : toYear)
-    )
+    const timeFilter = ({ value }) => value >= from && value <= to
     return {
       filteredYears: years.filter(timeFilter),
       filteredSemesters: semesters.filter(timeFilter)
@@ -125,8 +131,11 @@ class SingleCourseStats extends Component {
   }
 
   isStatInYearRange = ({ name }) => {
-    const { separate } = this.state
-    const { filteredYears, filteredSemesters } = this.filteredYearsAndSemesters()
+    const { separate, fromYear, toYear } = this.state
+    const { years, semesters } = this.props
+    const timeFilter = ({ value }) => value >= fromYear && value <= toYear
+    const filteredSemesters = semesters.filter(timeFilter)
+    const filteredYears = years.filter(timeFilter)
     return separate ?
       filteredSemesters.find(year => year.texts.includes(name)) :
       filteredYears.find(year => year.text === name)
@@ -172,9 +181,8 @@ class SingleCourseStats extends Component {
   }
 
   handleYearChange = (e, { name, value }) => {
-    const { setFromYear, setToYear } = this.props
-    if (name === 'fromYear') setFromYear(value)
-    else setToYear(value)
+    if (name === 'fromYear') this.setState({ fromYear: value })
+    else this.setState({ toYear: value })
   }
 
   filteredProgrammeStatistics = () => {
@@ -204,13 +212,9 @@ class SingleCourseStats extends Component {
 
   parseQueryFromUrl = () => {
     const { location } = this.props
-    const { separate, fromYear, toYear } = qs.parse(location.search)
+    const { separate } = qs.parse(location.search)
     return {
-      separate: JSON.parse(separate),
-      fromYear: JSON.parse(fromYear),
-      fromYearInitial: JSON.parse(fromYear),
-      toYear: JSON.parse(toYear),
-      toYearInitial: JSON.parse(toYear)
+      separate: JSON.parse(separate)
     }
   }
 
@@ -237,10 +241,10 @@ class SingleCourseStats extends Component {
   }
 
   render() {
-    const { fromYear, toYear, programmes } = this.props
-    const { primary, comparison } = this.state
+    const { programmes } = this.props
+    const { primary, comparison, fromYear, toYear } = this.state
     const statistics = this.filteredProgrammeStatistics()
-    const { filteredYears } = this.filteredYearsAndSemesters(true)
+    const { filteredYears } = this.filteredYearsAndSemesters()
 
     return (
       <div>
@@ -307,11 +311,6 @@ class SingleCourseStats extends Component {
   }
 }
 
-SingleCourseStats.defaultProps = {
-  fromYear: null,
-  toYear: null
-}
-
 SingleCourseStats.propTypes = {
   stats: shape({
     alternatives: arrayOf(string),
@@ -335,12 +334,9 @@ SingleCourseStats.propTypes = {
   semesters: arrayOf(shape({})).isRequired,
   location: shape({}).isRequired,
   activeLanguage: string.isRequired,
-  setFromYear: func.isRequired,
-  fromYear: number,
-  setToYear: func.isRequired,
-  toYear: number,
   setSelectedCourse: func.isRequired,
-  clearSelectedCourse: func.isRequired
+  clearSelectedCourse: func.isRequired,
+  getSemesters: func.isRequired
 }
 
 const mapStateToProps = (state) => {
@@ -357,17 +353,14 @@ const mapStateToProps = (state) => {
       texts: Object.values(name),
       value: yearcode
     })).reverse(),
-    activeLanguage: getActiveLanguage(state.localize).code,
-    fromYear: state.singleCourseStats.fromYear,
-    toYear: state.singleCourseStats.toYear
+    activeLanguage: getActiveLanguage(state.localize).code
   }
 }
 
 const mapDispatchToProps = {
-  setFromYear,
-  setToYear,
   setSelectedCourse,
-  clearSelectedCourse
+  clearSelectedCourse,
+  getSemesters
 }
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SingleCourseStats))
