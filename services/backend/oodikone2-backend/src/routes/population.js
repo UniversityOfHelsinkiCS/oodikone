@@ -59,7 +59,13 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
     } else {
       studentnumberlist = req.body.studentnumberlist
     }
-    const result = await Population.bottlenecksOf(req.body, studentnumberlist)
+    const result = await Population.bottlenecksOf({
+      startYear: 1900,
+      endYear: 2200,
+      studyRights: [],
+      semesters: ['FALL', 'SPRING'],
+      months: 10000
+    }, studentnumberlist)
 
     if (result.error) {
       res.status(400).json(result)
