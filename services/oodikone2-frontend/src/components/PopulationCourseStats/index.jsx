@@ -415,7 +415,7 @@ class PopulationCourseStats extends Component {
             content={getTextIn(name, language)}
             className="clickableCell"
           />
-          {history.location.pathname === '/coursepopulation' ? <Table.Cell className="iconCell" /> : (<Table.Cell
+          {['/coursepopulation', '/custompopulation'].includes(history.location.pathname) ? <Table.Cell className="iconCell" /> : (<Table.Cell
             icon="level up alternate"
             onClick={() => this.onGoToCourseStatisticsClick(code)}
             className="iconCell"
@@ -463,7 +463,7 @@ class PopulationCourseStats extends Component {
               value={studentAmountLimit}
               onChange={this.onStudentAmountLimitChange}
             />
-            {history.location.pathname === '/coursepopulation' ? null : (
+            {['/coursepopulation', '/custompopulation'].includes(history.location.pathname) ? null : (
               <Button
                 active={this.state.activeView === 'passingSemester'}
                 floated="right"
