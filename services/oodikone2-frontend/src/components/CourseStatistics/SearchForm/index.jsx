@@ -54,7 +54,7 @@ const SearchForm = (props) => {
 
   const fetchStatisticsFromUrlParams = () => {
     const query = parseQueryFromUrl()
-    setState({ ...state, ...query, selectedCourses: query.courseCodes })
+    setState({ ...state, ...query })
     props.getCourseStats(query, props.onProgress)
   }
 
