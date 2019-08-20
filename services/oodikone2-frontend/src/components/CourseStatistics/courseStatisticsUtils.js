@@ -58,8 +58,8 @@ const getStartAndEndYearValues = (course, years) => {
   const endYear = Number(start.substring(0, 4) === MAX_YEAR) ?
     maximumYear(years) :
     years.find(year => year.text === end)
-  const fromYear = startYear ? startYear.value : undefined
-  const toYear = endYear ? endYear.value : undefined
+  const fromYear = startYear ? startYear.value : null
+  const toYear = endYear ? endYear.value : null
   return { fromYear, toYear }
 }
 
