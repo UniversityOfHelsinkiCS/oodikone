@@ -91,8 +91,6 @@ const Faculty = ({ getFaculties, getFacultiesYearlyStats, getFacultyProgrammes, 
                   toYear={toYear}
                   years={years}
                   handleChange={handleYearChange}
-                  showCheckbox={false}
-                  separate={false}
                 />
               </Form>
             </Segment>

@@ -26,7 +26,7 @@ class SingleCourseStats extends Component {
   constructor(props) {
     super(props)
 
-    const yearcodes = props.stats.statistics.map(s => s.code)
+    const yearcodes = props.stats.statistics.map(s => s.yearcode)
     const fromYear = min(yearcodes)
     const toYear = max(yearcodes)
 
@@ -114,7 +114,7 @@ class SingleCourseStats extends Component {
 
   filteredYearsAndSemesters = () => {
     const { years, semesters, stats } = this.props
-    const yearcodes = stats.statistics.map(s => s.code)
+    const yearcodes = stats.statistics.map(s => s.yearcode)
     const from = min(yearcodes)
     const to = max(yearcodes)
     if (from == null || to == null) {
@@ -256,8 +256,6 @@ class SingleCourseStats extends Component {
               fromYear={fromYear}
               toYear={toYear}
               handleChange={this.handleYearChange}
-              showCheckbox={false}
-              separate={false}
             />
           </Form>
         </Segment>
