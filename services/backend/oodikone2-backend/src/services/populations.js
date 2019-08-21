@@ -484,10 +484,9 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
 }
 
 const unifyOpenUniversity = (code) => {
-  if (code[0] === 'A') {
-    return code.substring(code[1] === 'Y' ? 2 : 1)
-  }
-  return code
+  const regexresult = code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+  if (!regexresult) return code
+  return regexresult[1]
 }
 
 const getMainCourse = (course, codeduplicates) => {
