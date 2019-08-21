@@ -51,8 +51,8 @@ describe('Course Statistics tests', () => {
     cy.url().should('include', '/coursestatistics')
     cy.contains("Search for courses")
     cy.get("input[placeholder='Search by entering a course code']").type('TKT')
-    cy.contains("tr", "TKT20003").click()
-    cy.contains("tr", "TKT10002").click()
+    cy.contains("td", "TKT20003").click()
+    cy.contains("td", /^TKT10002/).click()
     cy.contains("Fetch statistics").should('be.enabled').click()
     cy.contains("Search for courses").should('not.exist')
 

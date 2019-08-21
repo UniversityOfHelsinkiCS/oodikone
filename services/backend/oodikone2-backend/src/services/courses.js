@@ -334,8 +334,7 @@ const yearlyStatsOf = async (code, year, separate, language) => {
       return b
     }, resultProgrammes)
 
-  const alternatives = await getDuplicateCodes(code)
-  const codes = alternatives ? alternatives : [code]
+  const codes = await alternativeCodes(code)
   const allInstances = await creditsOf(codes)
   const yearInst = allInstances
     .filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-09-01', year.end + '-08-01'))
@@ -499,22 +498,8 @@ const getCodeToMainCourseMap = async () => {
   return {}
 }
 
-const getMaincodeToDuplicateCodesMap = async () => {
-  try {
-    const codeToMainCourseMap = await getCodeToMainCourseMap()
-    const codes = Object.keys(codeToMainCourseMap)
-    const mainCodeToCoursesMap = codes.reduce((acc, code) => {
-      const maincourse = codeToMainCourseMap[code]
-      const duplicates = acc[maincourse.code] || []
-      duplicates.push(code)
-      acc[maincourse.code] = duplicates
-      return acc
-    }, {})
-    return mainCodeToCoursesMap
-  } catch (e) {
-    console.error(e)
-  }
-  return {}
+const getMainCodeToDuplicatesAndCodeToMainCode = async () => {
+  return [await getMainCodeToDuplicates(), await getCodeToMainCourseMap()]
 }
 
 const getMainCourseToCourseMap = async (/*programme*/) => {
@@ -536,9 +521,10 @@ const getMainCourseToCourseMap = async (/*programme*/) => {
 }
 
 const getDuplicateCodes = async (code) => {
-  const maincodeToDuplicatesMap = await getMaincodeToDuplicateCodesMap()
-  const duplicates = maincodeToDuplicatesMap[code]
-  return duplicates
+  const [mainCodeToDuplicates, codeToMainCourseMap] = await getMainCodeToDuplicatesAndCodeToMainCode()
+  const maincourse = codeToMainCourseMap[code]
+  if (!maincourse) return null
+  return mainCodeToDuplicates[maincourse.code].duplicates.map(e => e.code)
 }
 
 const setDuplicateCode = async (code1, code2) => {
@@ -604,7 +590,7 @@ const parseCredit = credit => {
   }
 }
 
-const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode) => {
+const yearlyStatsOfNew = async (coursecode, separate) => {
   const codes = await alternativeCodes(coursecode)
   const [credits, course] = await Promise.all([creditsForCourses(codes), Course.findByPk(coursecode)])
   const counter = new CourseYearlyStatsCounter()
@@ -615,22 +601,19 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
       yearcode, yearname, programmes,
       coursecode
     } = parseCredit(credit)
-    if (startyearcode <= yearcode && yearcode <= endyearcode) {
-      const groupcode = separate ? semestercode : yearcode
-      const groupname = separate ? semestername : yearname
-      const unknownProgramme = [{
-        code: 'OTHER',
-        name: {
-          en: 'Other',
-          fi: 'Muu',
-          sv: 'Andra'
-        }
-      }]
-      counter.markStudyProgrammes(studentnumber, programmes.length === 0 ? unknownProgramme : programmes)
-      counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode, yearcode)
-    } else {
-      counter.markCreditToHistory(studentnumber, passed)
-    }
+    const groupcode = separate ? semestercode : yearcode
+    const groupname = separate ? semestername : yearname
+    const unknownProgramme = [{
+      code: 'OTHER',
+      name: {
+        en: 'Other',
+        fi: 'Muu',
+        sv: 'Andra'
+      }
+    }]
+    counter.markStudyProgrammes(studentnumber, programmes.length === 0 ? unknownProgramme : programmes)
+    counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode, yearcode)
+    counter.markCreditToHistory(studentnumber, passed)
   }
   const statistics = counter.getFinalStatistics()
   return {
@@ -641,9 +624,9 @@ const yearlyStatsOfNew = async (coursecode, separate, startyearcode, endyearcode
   }
 }
 
-const courseYearlyStats = async (coursecodes, separate, startyearcode, endyearcode) => {
+const courseYearlyStats = async (coursecodes, separate) => {
   const stats = await Promise.all(coursecodes
-    .map(code => yearlyStatsOfNew(code, separate, startyearcode, endyearcode || startyearcode)))
+    .map(code => yearlyStatsOfNew(code, separate)))
   return stats
 }
 
@@ -671,7 +654,7 @@ const nameLikeTerm = (name) => {
 
 const codeLikeTerm = (code) => !code ? undefined : {
   code: {
-    [Op.iLike]: `${code.trim()}%`
+    [Op.iLike]: `%${code.trim()}%`
   }
 }
 
@@ -717,5 +700,6 @@ module.exports = {
   yearlyStatsOfNew,
   courseYearlyStats,
   byNameAndOrCodeLike,
-  byCodes
+  byCodes,
+  getMainCodeToDuplicatesAndCodeToMainCode
 }

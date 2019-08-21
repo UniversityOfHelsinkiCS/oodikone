@@ -135,13 +135,8 @@ class CourseYearlyStatsCounter {
   }
 
   getFinalStatistics() {
-    // change students set to list
-    const programmes = Object.keys(this.programmes).reduce((acc, code) => {
-      acc[code] = { ...this.programmes[code], students: [...this.programmes[code].students] }
-      return acc
-    }, {})
     return {
-      programmes,
+      programmes: this.programmes,
       statistics: this.formatGroupStatistics()
     }
   }

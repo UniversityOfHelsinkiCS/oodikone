@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Fragment } from 'react'
 import { Segment, Header, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
+import { sortBy } from 'lodash'
 import { func, arrayOf, shape, bool } from 'prop-types'
-import { getSemesters } from '../../../redux/semesters'
 import { clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
@@ -12,14 +12,11 @@ import CourseTable from '../CourseTable'
 import { getCourseSearchResults } from '../../../selectors/courses'
 import { useSearchHistory } from '../../../common'
 import SearchHistory from '../../SearchHistory'
-import { getStartAndEndYearValues } from '../courseStatisticsUtils'
 
 const INITIAL = {
   courseName: '',
   courseCode: '',
   selectedCourses: {},
-  fromYear: undefined,
-  toYear: undefined,
   separate: false
 }
 
@@ -33,20 +30,16 @@ const SearchForm = (props) => {
     courseName,
     courseCode,
     selectedCourses,
-    fromYear,
-    toYear,
     separate
   } = state
 
   const parseQueryFromUrl = () => {
     const { location } = props
-    const { courseCodes, fromYear, toYear, separate, ...rest } = qs.parse(location.search)
+    const { courseCodes, separate, ...rest } = qs.parse(location.search)
     const query = {
       ...INITIAL,
       ...rest,
       courseCodes: JSON.parse(courseCodes),
-      fromYear: JSON.parse(fromYear),
-      toYear: JSON.parse(toYear),
       separate: JSON.parse(separate)
     }
     return query
@@ -54,13 +47,12 @@ const SearchForm = (props) => {
 
   const fetchStatisticsFromUrlParams = () => {
     const query = parseQueryFromUrl()
-    setState({ ...state, ...query, selectedCourses: query.courseCodes })
+    setState({ ...state, ...query })
     props.getCourseStats(query, props.onProgress)
   }
 
   useEffect(() => {
     const { location } = props
-    props.getSemesters()
     if (!location.search) {
       props.clearCourses()
       props.clearCourseStats()
@@ -78,31 +70,21 @@ const SearchForm = (props) => {
     course.selected = !course.selected
     const isSelected = !!selectedCourses[course.code]
 
-    let newSelectedCourses = null
     if (isSelected) {
       const { [course.code]: omit, ...rest } = selectedCourses
-      newSelectedCourses = rest
+      setState({
+        ...state,
+        selectedCourses: rest
+      })
     } else {
-      newSelectedCourses = {
-        ...selectedCourses,
-        [course.code]: { ...course, selected: true }
-      }
+      setState({
+        ...state,
+        selectedCourses: {
+          ...selectedCourses,
+          [course.code]: { ...course, selected: true }
+        }
+      })
     }
-
-    const [fromYear, toYear] = Object.values(newSelectedCourses).reduce(([from, to], c) => {
-      const { fromYear, toYear } = getStartAndEndYearValues(c, props.years)
-      return [
-        from == null || fromYear < from ? fromYear : from,
-        to == null || toYear > to ? toYear : to
-      ]
-    }, [null, null])
-
-    setState({
-      ...state,
-      selectedCourses: newSelectedCourses,
-      fromYear,
-      toYear
-    })
   }
 
   const pushQueryToUrl = (query) => {
@@ -114,18 +96,14 @@ const SearchForm = (props) => {
   }
 
   const onSubmitFormClick = async () => {
+    const codes = sortBy(Object.keys(selectedCourses))
     const params = {
-      fromYear,
-      toYear,
-      courseCodes: Object.keys(selectedCourses),
+      courseCodes: codes,
       separate
     }
-    const { years } = props
-    const from = years.find(year => year.key === fromYear)
-    const to = years.find(year => year.key === toYear)
-    const searchHistoryText = params.courseCodes.map(code => `${selectedCourses[code].name} ${code}`)
+    const searchHistoryText = codes.map(code => `${selectedCourses[code].name} ${code}`)
     addItemToSearchHistory({
-      text: `${searchHistoryText.join(', ')} from: ${from.text} to: ${to.text}`,
+      text: searchHistoryText.join(', '),
       params
     })
     pushQueryToUrl(params)
@@ -145,10 +123,15 @@ const SearchForm = (props) => {
     return Promise.resolve()
   }
 
+  const onToggleCheckbox = (e, target) => {
+    const { name } = target
+    setState({ ...state, [name]: !state[name] })
+  }
+
   const { isLoading, matchingCourses } = props
   const courses = matchingCourses.filter(c => !selectedCourses[c.code])
 
-  const disabled = (!fromYear || Object.keys(selectedCourses).length === 0) || isLoading
+  const disabled = isLoading || Object.keys(selectedCourses).length === 0
   const selected = Object.values(selectedCourses).map(course => ({ ...course, selected: true }))
   const noSelectedCourses = selected.length === 0
   const noQueryStrings = !courseName && !courseCode
@@ -191,17 +174,25 @@ const SearchForm = (props) => {
               controlIcon="remove"
             />
             {!noSelectedCourses &&
-              <Form.Button
-                type="button"
-                disabled={disabled}
-                fluid
-                size="huge"
-                primary
-                basic
-                positive
-                content="Fetch statistics"
-                onClick={onSubmitFormClick}
-              />
+              <Fragment>
+                <Form.Checkbox
+                  label="Separate statistics for Spring and Fall semesters"
+                  name="separate"
+                  onChange={onToggleCheckbox}
+                  checked={separate}
+                />
+                <Form.Button
+                  type="button"
+                  disabled={disabled}
+                  fluid
+                  size="huge"
+                  primary
+                  basic
+                  positive
+                  content="Fetch statistics"
+                  onClick={onSubmitFormClick}
+                />
+              </Fragment>
             }
             <CourseTable
               hidden={noQueryStrings || isLoading}
@@ -227,12 +218,10 @@ SearchForm.defaultProps = {
 
 SearchForm.propTypes = {
   findCoursesV2: func.isRequired,
-  getSemesters: func.isRequired,
   getCourseStats: func.isRequired,
   clearCourses: func.isRequired,
   clearCourseStats: func.isRequired,
   matchingCourses: arrayOf(shape({})).isRequired,
-  years: arrayOf(shape({})).isRequired,
   isLoading: bool.isRequired,
   coursesLoading: bool.isRequired,
   history: shape({}).isRequired,
@@ -241,22 +230,15 @@ SearchForm.propTypes = {
 }
 
 const mapStateToProps = (state) => {
-  const { years = [] } = state.semesters.data
   const { pending: courseStatsPending } = state.courseStats
   return {
     matchingCourses: getCourseSearchResults(state),
-    years: Object.values(years).map(({ yearcode, yearname }) => ({
-      key: yearcode,
-      text: yearname,
-      value: yearcode
-    })).reverse(),
     isLoading: courseStatsPending,
     coursesLoading: state.courseSearch.pending
   }
 }
 
 export default withRouter(connect(mapStateToProps, {
-  getSemesters,
   getCourseStats,
   clearCourses,
   findCoursesV2,

@@ -69,6 +69,7 @@ const GradesTable = ({ stats, name, history }) => {
     <div>
       <Header as="h3" content={name} textAlign="center" />
       <SortableTable
+        defaultdescending
         getRowKey={s => s.code}
         tableProps={{ celled: true, structured: true }}
         columns={columns}
