@@ -193,21 +193,24 @@ class PopulationStudents extends Component {
         key: 'icon',
         getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
         cellProps: { collapsing: true, className: 'iconCell' }
-      },
-      {
+      }
+    )
+    if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
+      columns.push({
         key: 'credits since start',
         title: 'credits since start',
         getRowVal: (s) => {
           const credits = getStudentTotalCredits(s)
           return roundToTwo(credits)
         }
-      },
-      {
-        key: 'all credits',
-        title: 'all credits',
-        getRowVal: s => s.credits
-      }
-    )
+      })
+    }
+    columns.push({
+      key: 'all credits',
+      title: 'all credits',
+      getRowVal: s => s.credits
+    })
+
     if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
       columns.push({
         key: 'transferred from',
