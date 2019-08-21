@@ -44,21 +44,18 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
     }
     const { coursecodes, yearcode } = req.body
     let studentnumberlist
-    if (!req.body.studentnumberlist) {
-      const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, yearcode)
+    const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, yearcode)
 
-      const { decodedToken: { userId }, roles } = req
+    const { decodedToken: { userId }, roles } = req
 
-      if (roles && roles.includes('admin')) {
-        studentnumberlist = studentnumbers
-      } else {
-        const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
-        const codes = unitsUserCanAccess.map(unit => unit.id)
-        studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
-      }
+    if (roles && roles.includes('admin')) {
+      studentnumberlist = studentnumbers
     } else {
-      studentnumberlist = req.body.studentnumberlist
+      const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
+      const codes = unitsUserCanAccess.map(unit => unit.id)
+      studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
     }
+
     const result = await Population.bottlenecksOf({
       startYear: 1900,
       endYear: 2200,
@@ -76,6 +73,43 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
   } catch (e) {
     console.log(e)
     res.status(500).json({ error: e })
+  }
+})
+
+router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, res) => {
+  try {
+    if (!req.body.studentnumberlist) {
+      res.status(400).json({ error: 'The body should have a studentnumberlist defined' })
+      return
+    }
+    let studentnumberlist
+    const { decodedToken: { userId }, roles } = req
+
+    if (roles && roles.includes('admin')) {
+      studentnumberlist = req.body.studentnumberlist
+    } else {
+      const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
+      const codes = unitsUserCanAccess.map(unit => unit.id)
+      studentnumberlist = await Student.filterStudentnumbersByAccessrights(req.body.studentnumberlist, codes)
+    }
+
+    const result = await Population.bottlenecksOf({
+      startYear: 1900,
+      endYear: 2200,
+      studyRights: [],
+      semesters: ['FALL', 'SPRING'],
+      months: 10000
+    }, studentnumberlist)
+    if (result.error) {
+      res.status(400).json(result)
+      return
+    }
+
+    res.json(result)
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: err })
   }
 })
 

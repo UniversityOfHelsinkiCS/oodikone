@@ -27,6 +27,7 @@ const CourseStudentCourses = ({
     getCoursePopulationCoursesByStudentnumbersDispatch({ coursecodes: codes, yearcode: yearCode, studentnumberlist: selectedStudents })
   }
 
+
   useEffect(() => {
     if (refreshNeeded) {
       reloadCourses()
@@ -38,8 +39,7 @@ const CourseStudentCourses = ({
       <Header size="medium" dividing >
         <Popup
           trigger={<Header.Content>{translate('populationCourses.header')}</Header.Content>}
-          content="Sort by clicking columns. Click course name to limit observed population to students who
-            participated to the course."
+          content="Sort by clicking columns. Click course name to limit observed population to students who participated to the course."
           wide
           position="top left"
         />

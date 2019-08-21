@@ -20,7 +20,7 @@ export const getCoursePopulationCourses = ({ coursecodes, yearcode }) => {
 }
 
 export const getCoursePopulationCoursesByStudentnumbers = ({ coursecodes, yearcode, studentnumberlist }) => {
-  const route = '/v2/populationstatistics/coursesbycoursecode'
+  const route = '/v2/populationstatistics/coursesbystudentnumberlist'
   const prefix = 'GET_COURSES_OF_COURSE_POP_'
   const params = { coursecodes, yearcode, studentnumberlist }
   const query = { coursecodes, yearcode, studentnumberlist }
