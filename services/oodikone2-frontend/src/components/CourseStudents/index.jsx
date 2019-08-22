@@ -6,7 +6,8 @@ import { getTranslate } from 'react-localize-redux'
 import { Segment, Header, Loader } from 'semantic-ui-react'
 import qs from 'query-string'
 import { intersection, difference } from 'lodash'
-import { getCoursePopulation, getCoursePopulationCourses } from '../../redux/coursePopulation'
+import { getCoursePopulation } from '../../redux/populations'
+import { getCoursePopulationCourses } from '../../redux/populationCourses'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
@@ -31,15 +32,15 @@ const CourseStudents = ({
     const query = qs.parse(location.search)
     return query
   }
-  const [codes, setCodes] = useState('')
+  const [codes, setCodes] = useState([])
   const [headerYear, setYear] = useState('')
   const [yearCode, setYearCode] = useState('')
   useEffect(() => {
     const query = parseQueryFromUrl()
     getCoursePopulationDispatch({ coursecodes: query.coursecodes, yearcode: query.yearcode })
-    getCoursePopulationCoursesDispatch({ coursecodes: query.coursecodes, yearcode: query.yearcode })
-    getSingleCourseStatsDispatch({ fromYear: query.yearcode, toYear: query.yearcode, courseCodes: query.coursecodes, separate: false })
-    setCodes(query.coursecodes)
+    getCoursePopulationCoursesDispatch({ coursecodes: JSON.parse(query.coursecodes), yearcode: query.yearcode })
+    getSingleCourseStatsDispatch({ fromYear: query.yearcode, toYear: query.yearcode, courseCodes: JSON.parse(query.coursecodes), separate: false })
+    setCodes(JSON.parse(query.coursecodes))
     setYearCode(query.yearcode)
     setYear(query.year)
   }, [])
@@ -100,8 +101,8 @@ CourseStudents.propTypes = {
   selectedStudents: arrayOf(string).isRequired
 }
 
-const mapStateToProps = ({ coursePopulation, localize, singleCourseStats, populationFilters }) => {
-  const samples = coursePopulation.students.students ? coursePopulation.students.students : []
+const mapStateToProps = ({ localize, singleCourseStats, populationFilters, populations }) => {
+  const samples = populations.data.students ? populations.data.students : []
   let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
   const { complemented } = populationFilters
 
@@ -121,11 +122,11 @@ const mapStateToProps = ({ coursePopulation, localize, singleCourseStats, popula
     }
   }
   return ({
-    studentData: coursePopulation.students,
-    pending: coursePopulation.pending,
+    studentData: populations.data,
+    pending: populations.pending,
     translate: getTranslate(localize),
-    query: coursePopulation.query,
-    courseData: singleCourseStats.stats,
+    query: populations.query,
+    courseData: singleCourseStats.stats || {},
     selectedStudents
   })
 }

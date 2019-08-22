@@ -7,8 +7,7 @@ import { getTranslate } from 'react-localize-redux'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import { refreshFilters } from '../../redux/populationFilters'
-import { getCoursePopulation, getCoursePopulationCourses, getCoursePopulationCoursesByStudentnumbers } from '../../redux/coursePopulation'
-import { getSingleCourseStats } from '../../redux/singleCourseStats'
+import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 
 const CourseStudentCourses = ({
   refreshNeeded,
@@ -17,14 +16,12 @@ const CourseStudentCourses = ({
   courses,
   pending,
   selectedStudents,
-  getCoursePopulationCoursesByStudentnumbersDispatch,
-  codes,
-  yearCode,
+  getCustomPopulationCoursesByStudentnumbersDispatch,
   query
 }) => {
   const reloadCourses = () => {
     dispatchRefreshFilters()
-    getCoursePopulationCoursesByStudentnumbersDispatch({ coursecodes: codes, yearcode: yearCode, studentnumberlist: selectedStudents })
+    getCustomPopulationCoursesByStudentnumbersDispatch({ studentnumberlist: selectedStudents })
   }
 
 
@@ -61,27 +58,20 @@ CourseStudentCourses.propTypes = {
   translate: func.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   refreshNeeded: bool.isRequired,
-  getCoursePopulationCoursesByStudentnumbersDispatch: func.isRequired,
+  getCustomPopulationCoursesByStudentnumbersDispatch: func.isRequired,
   dispatchRefreshFilters: func.isRequired,
-  codes: arrayOf(string).isRequired,
-  yearCode: string.isRequired,
   query: shape({}).isRequired
 }
 
-const mapStateToProps = ({ coursePopulation, localize, singleCourseStats, populationFilters }) => ({
-  studentData: coursePopulation.students,
-  courses: coursePopulation.courses,
-  pending: coursePopulation.coursesPending,
+const mapStateToProps = ({ localize, populationFilters, populationCourses }) => ({
+  courses: populationCourses.data,
+  pending: populationCourses.pending,
   translate: getTranslate(localize),
-  query: coursePopulation.query,
-  courseData: singleCourseStats.stats,
+  query: populationCourses.query,
   refreshNeeded: populationFilters.refreshNeeded
 })
 
 export default connect(mapStateToProps, {
-  getCoursePopulationDispatch: getCoursePopulation,
-  getCoursePopulationCoursesDispatch: getCoursePopulationCourses,
-  getSingleCourseStatsDispatch: getSingleCourseStats,
   dispatchRefreshFilters: refreshFilters,
-  getCoursePopulationCoursesByStudentnumbersDispatch: getCoursePopulationCoursesByStudentnumbers
+  getCustomPopulationCoursesByStudentnumbersDispatch: getCustomPopulationCoursesByStudentnumbers
 })(CourseStudentCourses)

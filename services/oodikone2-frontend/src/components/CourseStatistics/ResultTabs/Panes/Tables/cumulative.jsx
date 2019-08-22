@@ -1,6 +1,7 @@
 import React from 'react'
 import qs from 'query-string'
 import { Header, Icon } from 'semantic-ui-react'
+import { uniq } from 'lodash'
 import { shape, string, number, oneOfType, arrayOf } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
 import { userIsAdmin } from '../../../../../common'
@@ -9,7 +10,7 @@ const CumulativeTable = ({ stats, name, history }) => {
   const admin = userIsAdmin()
   const showPopulation = (yearcode, year) => {
     const coursecodes = stats.map(s => s.coursecode)
-    const queryObject = { yearcode, coursecodes, year }
+    const queryObject = { yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), year }
     const searchString = qs.stringify(queryObject)
     history.push(`/coursepopulation?${searchString}`)
   }
