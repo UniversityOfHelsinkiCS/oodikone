@@ -61,7 +61,7 @@ const TagStudent = ({
   const deleteTag = async (event, tag) => {
     event.preventDefault()
     const removableTag = studentsTagIds.find(t => t.tag_id === tag.tag_id)
-    await deleteStudentTag(removableTag.id, studytrack)
+    await deleteStudentTag(removableTag.tag_id, studentnumber, studytrack)
   }
 
   const studentsTags = allTags
