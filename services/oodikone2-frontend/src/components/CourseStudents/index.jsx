@@ -10,7 +10,7 @@ import { getCoursePopulation } from '../../redux/populations'
 import { getCoursePopulationCourses } from '../../redux/populationCourses'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-// import PopulationStudents from '../PopulationStudents'
+import PopulationStudents from '../PopulationStudents'
 import CourseStudentCourses from '../CourseStudentCourses'
 import infoTooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
@@ -79,10 +79,10 @@ const CourseStudents = ({
               yearCode={yearCode}
             />
           </Segment>
-          {/* <PopulationStudents
+          <PopulationStudents
             samples={studentData.students}
             selectedStudents={selectedStudents}
-          /> */}
+          />
         </Segment>
       ) : (<Loader active={pending} inline="centered" />)}
     </div>
