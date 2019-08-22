@@ -27,6 +27,25 @@ export const getPopulationStatistics = ({
   }
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }
+
+export const getCoursePopulation = ({ coursecodes, yearcode }) => {
+  const route = '/v3/populationstatisticsbycourse'
+  const prefix = 'GET_STUDENTS_OF_COURSE_'
+  const params = { coursecodes, yearcode }
+  const query = { coursecodes, yearcode, studyRights: { programme: 'KH555' } }
+
+  return callController(route, prefix, null, 'get', query, params)
+}
+
+export const getCustomPopulation = ({ studentnumberlist }) => {
+  const route = '/v3/populationstatisticsbystudentnumbers'
+  const prefix = 'GET_CUSTOM_POP_'
+  const params = { studentnumberlist }
+  const query = { studentnumberlist, studyRights: { programme: 'KH555' } }
+  const body = { studentnumberlist }
+  return callController(route, prefix, body, 'post', query, params)
+}
+
 export const updatePopulationStudents = (students) => {
   const route = '/updatedatabase'
   const prefix = 'UPDATE_POPULATION_STUDENTS_'
@@ -67,6 +86,48 @@ const reducer = (state = initialState, action) => {
         error: false,
         data: action.response,
         query: action.query,
+        updating: false
+      }
+    case 'GET_STUDENTS_OF_COURSE_ATTEMPT':
+      return {
+        pending: true,
+        error: false,
+        data: {},
+        updating: false
+      }
+    case 'GET_STUDENTS_OF_COURSE_FAILURE':
+      return {
+        pending: false,
+        error: true,
+        data: action.response,
+        updating: false
+      }
+    case 'GET_STUDENTS_OF_COURSE_SUCCESS':
+      return {
+        pending: false,
+        error: false,
+        data: action.response,
+        updating: false
+      }
+    case 'GET_CUSTOM_POP_ATTEMPT':
+      return {
+        pending: true,
+        error: false,
+        data: {},
+        updating: false
+      }
+    case 'GET_CUSTOM_POP_FAILURE':
+      return {
+        pending: false,
+        error: true,
+        data: action.response,
+        updating: false
+      }
+    case 'GET_CUSTOM_POP_SUCCESS':
+      return {
+        pending: false,
+        error: false,
+        data: action.response,
         updating: false
       }
     case 'UPDATE_POPULATION_STUDENTS_ATTEMPT':

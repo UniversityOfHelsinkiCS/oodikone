@@ -45,7 +45,6 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
     const { coursecodes, yearcode } = req.body
     let studentnumberlist
     const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, yearcode)
-
     const { decodedToken: { userId }, roles } = req
 
     if (roles && roles.includes('admin')) {
@@ -164,8 +163,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   }
   const semesters = ['FALL', 'SPRING']
   let studentnumberlist
-  const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, yearcode)
-
+  const studentnumbers = await Student.findByCourseAndSemesters(JSON.parse(coursecodes), yearcode)
   const { decodedToken: { userId }, roles } = req
 
   if (roles && roles.includes('admin')) {
