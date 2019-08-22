@@ -2,6 +2,7 @@ import React from 'react'
 import qs from 'query-string'
 import { arrayOf, number, oneOfType, shape, string } from 'prop-types'
 import { Header, Icon } from 'semantic-ui-react'
+import { uniq } from 'lodash'
 import SortableTable from '../../../../SortableTable'
 import { userIsAdmin } from '../../../../../common'
 import { getGradeSpread, getThesisGradeSpread, isThesisGrades, THESIS_GRADE_KEYS } from '../util'
@@ -52,7 +53,7 @@ const GradesTable = ({ stats, name, history }) => {
 
   const showPopulation = (yearcode, year) => {
     const coursecodes = stats.map(s => s.coursecode)
-    const queryObject = { yearcode, coursecodes, year }
+    const queryObject = { yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), year }
     const searchString = qs.stringify(queryObject)
     history.push(`/coursepopulation?${searchString}`)
   }
