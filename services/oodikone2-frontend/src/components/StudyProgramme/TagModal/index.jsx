@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { arrayOf, string, bool, func, shape } from 'prop-types'
-import { Button, Modal, Form, TextArea, Dropdown } from 'semantic-ui-react'
+import { Button, Modal, Form, TextArea, Dropdown, Message } from 'semantic-ui-react'
 
 import {
   createMultipleStudentTagAction
 } from '../../../redux/tagstudent'
 
-const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success }) => {
+const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success, error }) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [input, setInput] = useState('')
   const [selectedValue, setSelected] = useState('')
@@ -17,22 +17,19 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
     if (!pending) {
       if (success) {
         setModalOpen(false)
+        setSelected('')
+        setInput('')
       }
     }
   }, [pending])
 
   const handleClick = (event) => {
     event.preventDefault()
-    const studentnumbers = input.match(/[0-9]+/g).filter(string => string.length === 9)
-    const studentList = []
-    studentnumbers.forEach((sn) => {
-      const tag = {
-        tag_id: selectedValue,
-        studentnumber: sn
-      }
-      studentList.push(tag)
-    })
-    createMultipleStudentTag(studentList, studytrack)
+    const studentnumbers = input.match(/[^\s,]+/g)
+    createMultipleStudentTag(studentnumbers.map(sn => ({
+      tag_id: selectedValue,
+      studentnumber: sn
+    })), studytrack)
   }
 
   const handleChange = (event, { value }) => {
@@ -48,22 +45,30 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
       open={modalOpen}
       onClose={() => setModalOpen(false)}
       size="small"
+      closeOnEscape={false}
     >
       <Modal.Content>
         <Form>
           <h2> Add tags to students </h2>
+          <Message hidden={!error} content={error} negative />
           <Form.Field>
             <em> Select a tag </em>
             <Dropdown
               placeholder="Tag"
               search
               selection
+              selectOnBlur={false}
+              selectOnNavigation={false}
               options={createdOptions}
               onChange={handleChange}
               value={selectedValue}
             />
             <em> Insert studentnumbers you wish to add tags to </em>
-            <TextArea placeholder="011111111" onChange={e => setInput(e.target.value)} />
+            <TextArea
+              placeholder="011111111"
+              onChange={e => setInput(e.target.value)}
+              value={input}
+            />
           </Form.Field>
         </Form>
       </Modal.Content>
@@ -76,7 +81,7 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
         <Button
           positive
           onClick={event => handleClick(event)}
-          disabled={pending}
+          disabled={pending || selectedValue.length === 0 || !input.match(/[^\s,]+/g)}
         >
           Add tags
         </Button>
@@ -85,17 +90,23 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
   )
 }
 
+TagModal.defaultProps = {
+  error: null
+}
+
 TagModal.propTypes = {
   createMultipleStudentTag: func.isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studytrack: string.isRequired,
   pending: bool.isRequired,
-  success: bool.isRequired
+  success: bool.isRequired,
+  error: string
 }
 
 const mapStateToProps = ({ tagstudent }) => ({
   pending: tagstudent.pending,
-  success: tagstudent.success
+  success: tagstudent.success,
+  error: tagstudent.error
 })
 
 export default withRouter(connect(mapStateToProps, {
