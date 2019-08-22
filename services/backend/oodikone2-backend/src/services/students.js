@@ -42,7 +42,6 @@ const byId = async (id) => Student.findByPk(id, {
   ]
 })
 
-
 const findByCourseAndSemesters = async (coursecodes, yearcode) =>
   sequelize.query(`
     SELECT

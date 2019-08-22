@@ -6,12 +6,12 @@ import { shape, func, arrayOf, bool } from 'prop-types'
 
 import { userIsAdmin } from '../../common'
 import { getCustomPopulation } from '../../redux/customPopulation'
-import { getCoursePopulationCoursesByStudentnumbers } from '../../redux/coursePopulation'
+import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-import PopulationStudents from '../PopulationStudents'
+// import PopulationStudents from '../PopulationStudents'
 import PopulationCourseStats from '../PopulationCourseStats'
 
-const CustomPopulation = ({ getCustomPopulationDispatch, getCoursePopulationCoursesByStudentnumbers, custompop, translate, courses, pending }) => {
+const CustomPopulation = ({ getCustomPopulationDispatch, getCustomPopulationCoursesByStudentnumbers, custompop, translate, courses, pending }) => {
   const [admin, setAdmin] = useState(false)
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
@@ -25,7 +25,7 @@ const CustomPopulation = ({ getCustomPopulationDispatch, getCoursePopulationCour
     e.preventDefault()
     const studentnumbers = input.match(/[0-9]+/g)
     getCustomPopulationDispatch({ studentnumberlist: studentnumbers })
-    getCoursePopulationCoursesByStudentnumbers({ yearcode: 1, coursecodes: [], studentnumberlist: studentnumbers })
+    getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: studentnumbers })
     setModal(false)
   }
   const renderCustomPopulationSearch = () => (
@@ -78,10 +78,10 @@ const CustomPopulation = ({ getCustomPopulationDispatch, getCoursePopulationCour
             selectedStudents={selectedStudents}
           />
         </Segment>
-        <PopulationStudents
+        {/* <PopulationStudents
           samples={custompop}
           selectedStudents={selectedStudents}
-        />
+        /> */}
       </div>
     )
   }
@@ -100,16 +100,16 @@ CustomPopulation.propTypes = {
   translate: func.isRequired,
   custompop: arrayOf(shape({})).isRequired,
   getCustomPopulationDispatch: func.isRequired,
-  getCoursePopulationCoursesByStudentnumbers: func.isRequired,
+  getCustomPopulationCoursesByStudentnumbers: func.isRequired,
   courses: shape({}).isRequired,
   pending: bool.isRequired
 }
 
-const mapStateToProps = ({ customPopulation, localize, coursePopulation }) => ({
+const mapStateToProps = ({ customPopulation, localize, populationCourses }) => ({
   translate: getTranslate(localize),
   custompop: customPopulation.students.students || [],
-  courses: coursePopulation.courses,
-  pending: coursePopulation.pending
+  courses: populationCourses.data,
+  pending: populationCourses.pending
 })
 
-export default connect(mapStateToProps, { getCustomPopulationDispatch: getCustomPopulation, getCoursePopulationCoursesByStudentnumbers })(CustomPopulation)
+export default connect(mapStateToProps, { getCustomPopulationDispatch: getCustomPopulation, getCustomPopulationCoursesByStudentnumbers })(CustomPopulation)
