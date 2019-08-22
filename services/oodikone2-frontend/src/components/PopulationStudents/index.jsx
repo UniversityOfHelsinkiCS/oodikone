@@ -154,6 +154,11 @@ class PopulationStudents extends Component {
       return codes.join(', ')
     }
 
+    const tags = (tags) => {
+      const studentTags = tags.map(t => t.tag.tagname)
+      return studentTags.join(', ')
+    }
+
     const studytrack = (studyrights) => {
       const { queryStudyrights } = this.props
       let startdate = '1900-01-01'
@@ -238,6 +243,11 @@ class PopulationStudents extends Component {
           title: 'extent',
           getRowVal: s => extentCodes(s.studyrights)
         },
+        {
+          key: 'tags',
+          title: 'tags',
+          getRowVal: s => tags(s.tags)
+        }
       )
     }
     if (admin) {
