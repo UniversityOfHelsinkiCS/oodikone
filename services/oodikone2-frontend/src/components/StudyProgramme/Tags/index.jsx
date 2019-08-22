@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, Input, List, Label, Icon, Header, Confirm } from 'semantic-ui-react'
+import { Button, List, Label, Icon, Header, Confirm, Form } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
 import TagModal from '../TagModal'
@@ -9,26 +9,22 @@ import { getTagsByStudytrackAction, createTagAction, deleteTagAction } from '../
 
 const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme }) => {
   const [tagname, setTagname] = useState('')
-  const [confirm, setConfirm] = useState(false)
+  const [confirm, setConfirm] = useState(null)
 
   useEffect(() => {
     getTagsByStudytrack(studyprogramme)
   }, [])
 
-  const open = () => setConfirm(true)
-
-  const close = () => setConfirm(false)
-
   const handleDeleteTag = (event, tag) => {
     event.preventDefault()
     deleteTag(tag)
-    setConfirm(false)
+    setConfirm(null)
   }
 
   const handleSubmit = (event) => {
     event.preventDefault()
     const newTag = {
-      tagname,
+      tagname: tagname.trim(),
       studytrack: studyprogramme
     }
     createTag(newTag)
@@ -43,11 +39,11 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     <List.Item key={tag.tag_id}>
       <List.Content>
         <Label>
-          {tag.tagname} <Icon name="delete" link onClick={open} />
+          {tag.tagname} <Icon name="delete" link onClick={() => setConfirm(tag.tag_id)} />
         </Label>
         <Confirm
-          open={confirm}
-          onCancel={close}
+          open={confirm === tag.tag_id}
+          onCancel={() => setConfirm(null)}
           onConfirm={event => handleDeleteTag(event, tag)}
           content={`Are you sure you want to delete tag "${tag.tagname}"? If you press confirm you will delete it from all students that have it. You and other users won't be able to use this tag again.`}
           cancelButton="Cancel"
@@ -59,9 +55,12 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
 
   return (
     <List>
-      <Input onChange={handleChange} value={tagname} />
-      <Button onClick={handleSubmit}>add new tag</Button>
-      <TagModal tags={tags} studytrack={studyprogramme} />
+      <Form>
+        <Form.Group>
+          <Form.Input onChange={handleChange} value={tagname} action={<Button disabled={!tagname.trim() || tags.find(t => t.tagname === tagname.trim())} onClick={handleSubmit}>add new tag</Button>} />
+          <TagModal tags={tags} studytrack={studyprogramme} />
+        </Form.Group>
+      </Form>
       <Header size="medium">Study programme tags</Header>
       {rows}
     </List>

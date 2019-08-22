@@ -34,15 +34,14 @@ const createStudentTag = async (tag) => {
 }
 
 const createMultipleStudentTags = async (tags) => {
-  return TagStudent.bulkCreate(tags)
+  return TagStudent.bulkCreate(tags, { ignoreDuplicates: true })
 }
 
-const deleteStudentTag = async (id) => {
+const deleteStudentTag = async (studentnumber, tag_id) => {
   return TagStudent.destroy({
     where: {
-      id: {
-        [Op.eq]: id
-      }
+      tag_id,
+      studentnumber
     }
   })
 }

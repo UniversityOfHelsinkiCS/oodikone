@@ -1,6 +1,5 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
-const { intersection } = require('lodash')
 
 const {
   Student, Credit, Course, sequelize, Studyright, StudyrightExtent, ElementDetails,
@@ -226,7 +225,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
   })
 
   const studentTags = await TagStudent.findAll({
-    attributes: ['id', 'studentnumber'],
+    attributes: ['tag_id', 'studentnumber'],
     include: [
       {
         model: Tag,
@@ -246,20 +245,10 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
   }, {})
 
   students.forEach(student => {
-    student.tags = studentNumberToTags[student.studentnumber]
+    student.tags = studentNumberToTags[student.studentnumber] || []
   })
 
-  if (tag) {
-    const studentsWithSearchedTag = {}
-    students.forEach(student => {
-      student.tags = studentNumberToTags[student.studentnumber]
-      if (student.tags && student.tags.some(t => t.tag.tag_id === tag)) {
-        studentsWithSearchedTag[student.studentnumber] = true
-      }
-    })
-
-    return students.filter(student => studentsWithSearchedTag[student.studentnumber])
-  }
+  if (tag) return students.filter(student => student.tags.some(t => t.tag_id === tag))
   return students
 }
 
@@ -288,6 +277,22 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
   if (!cancelledStudents) {
     studyrightWhere.canceldate = null
   }
+
+  let studentWhere = {}
+  if (tag) {
+    const taggedStudentnumbers = await TagStudent.findAll({
+      attributes: ['studentnumber'],
+      where: {
+        tag_id: tag
+      }
+    })
+    studentWhere.where = {
+      student_studentnumber: {
+        [Op.in]: taggedStudentnumbers.map(sn => sn.studentnumber)
+      }
+    }
+  }
+
   const students = await Studyright.findAll({
     attributes: ['student_studentnumber'],
     include: {
@@ -321,21 +326,12 @@ const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, e
         }
       ],
       ...studyrightWhere
+
     },
+    ...studentWhere,
     having: count('studyright_elements.code', studyRights.length, true),
   })
-
-  const taggedStudentnumbers = await TagStudent.findAll({
-    attributes: ['studentnumber'],
-    where: {
-      tag_id: {
-        [Op.eq]: tag
-      }
-    }
-  })
-  const normalStudentNumberList = [...new Set(students.map(s => s.student_studentnumber))]
-  const studentnumbers = taggedStudentnumbers.map(sn => sn.studentnumber)
-  return studentnumbers.length > 0 ? intersection(normalStudentNumberList, studentnumbers) : normalStudentNumberList
+  return [...new Set(students.map(s => s.student_studentnumber))]
 }
 
 const parseQueryParams = query => {
