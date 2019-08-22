@@ -23,7 +23,7 @@ const Feedback = ({ sendFeedback, success }) => {
       setConfirm(false)
     }
   }, [success])
-
+  // just a dummy commit
   const open = () => setConfirm(true)
 
   const close = () => setConfirm(false)
