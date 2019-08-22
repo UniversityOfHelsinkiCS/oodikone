@@ -154,6 +154,21 @@ class PopulationStudents extends Component {
       return codes.join(', ')
     }
 
+    const tags = (tags) => {
+      const studentTags = tags.map(t => t.tag.tagname)
+      return studentTags.join(', ')
+    }
+
+    const mainProgramme = (studyrights) => {
+      const studyprogrammes = []
+      studyrights.forEach((sr) => {
+        const newestStudyrightElement = sr.studyrightElements.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
+        studyprogrammes.push({ name: sr.highlevelname, startdate: newestStudyrightElement.startdate })
+      })
+      const programme = studyprogrammes.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
+      return programme.name
+    }
+
     const studytrack = (studyrights) => {
       const { queryStudyrights } = this.props
       let startdate = '1900-01-01'
@@ -238,8 +253,29 @@ class PopulationStudents extends Component {
           title: 'extent',
           getRowVal: s => extentCodes(s.studyrights)
         },
+        {
+          key: 'tags',
+          title: 'tags',
+          getRowVal: s => tags(s.tags)
+        }
       )
     }
+
+    if (['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
+      columns.push(
+        {
+          key: 'programme',
+          title: 'studyprogramme',
+          getRowVal: s => mainProgramme(s.studyrights)
+        },
+        {
+          key: 'startyear',
+          title: 'start year',
+          getRowVal: s => reformatDate(s.started, 'YYYY')
+        }
+      )
+    }
+
     if (admin) {
       columns.push({
         key: 'updatedAt',
