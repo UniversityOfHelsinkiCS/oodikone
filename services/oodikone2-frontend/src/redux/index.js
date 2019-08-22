@@ -49,9 +49,7 @@ import mandatoryCourseLabels from './mandatoryCourseLabels'
 import tags from './tags'
 import tagstudent from './tagstudent'
 import auth from './auth'
-import coursePopulation from './coursePopulation'
 import singleCourseStats from './singleCourseStats'
-import customPopulation from './customPopulation'
 
 export default combineReducers({
   localize,
@@ -104,7 +102,5 @@ export default combineReducers({
   tags,
   tagstudent,
   auth,
-  coursePopulation,
-  singleCourseStats,
-  customPopulation
+  singleCourseStats
 })

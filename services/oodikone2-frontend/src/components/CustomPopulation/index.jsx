@@ -5,10 +5,10 @@ import { getTranslate } from 'react-localize-redux'
 import { shape, func, arrayOf, bool } from 'prop-types'
 
 import { userIsAdmin } from '../../common'
-import { getCustomPopulation } from '../../redux/customPopulation'
+import { getCustomPopulation } from '../../redux/populations'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-// import PopulationStudents from '../PopulationStudents'
+import PopulationStudents from '../PopulationStudents'
 import PopulationCourseStats from '../PopulationCourseStats'
 
 const CustomPopulation = ({ getCustomPopulationDispatch, getCustomPopulationCoursesByStudentnumbers, custompop, translate, courses, pending }) => {
@@ -78,10 +78,10 @@ const CustomPopulation = ({ getCustomPopulationDispatch, getCustomPopulationCour
             selectedStudents={selectedStudents}
           />
         </Segment>
-        {/* <PopulationStudents
+        <PopulationStudents
           samples={custompop}
           selectedStudents={selectedStudents}
-        /> */}
+        />
       </div>
     )
   }
@@ -105,9 +105,9 @@ CustomPopulation.propTypes = {
   pending: bool.isRequired
 }
 
-const mapStateToProps = ({ customPopulation, localize, populationCourses }) => ({
+const mapStateToProps = ({ populations, localize, populationCourses }) => ({
   translate: getTranslate(localize),
-  custompop: customPopulation.students.students || [],
+  custompop: populations.data.students || [],
   courses: populationCourses.data,
   pending: populationCourses.pending
 })
