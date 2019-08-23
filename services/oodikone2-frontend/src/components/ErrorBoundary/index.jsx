@@ -23,7 +23,7 @@ class ErrorBoundary extends Component {
   componentDidUpdate() {
     const { auth, actionHistory } = this.props
     Sentry.configureScope((scope) => {
-      scope.setUser({ username: auth.token.userId })
+      if (auth.token) scope.setUser({ username: auth.token.userId })
       scope.setExtra('actionHistory', JSON.stringify(actionHistory))
     })
   }
