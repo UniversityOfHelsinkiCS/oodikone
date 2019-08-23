@@ -28,7 +28,7 @@ const CourseCreditFilter = ({ coursecodes, courseData, filter, setPopulationFilt
           />
           <Form.Group inline>
             <Form.Field>
-              <label>Select students that </label>
+              <label>Select students that have </label>
             </Form.Field>
             <Form.Field>
               <Input
