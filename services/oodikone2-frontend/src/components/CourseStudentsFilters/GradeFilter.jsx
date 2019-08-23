@@ -28,7 +28,7 @@ const GradeFilter = ({ coursecodes, courseData, filter, setPopulationFilterActio
           />
           <Form.Group inline>
             <Form.Field>
-              <label>Select students that grade </label>
+              <label>Select students that have grade </label>
             </Form.Field>
             <Form.Field>
               <Dropdown
