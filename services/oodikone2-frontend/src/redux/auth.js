@@ -1,8 +1,7 @@
 import { decodeToken } from '../common'
 
-export const login = (retryRequestSettings = null) => ({
-  type: 'LOGIN_ATTEMPT',
-  retryRequestSettings
+export const login = () => ({
+  type: 'LOGIN_ATTEMPT'
 })
 
 export const logout = () => ({ type: 'LOGOUT_ATTEMPT' })
