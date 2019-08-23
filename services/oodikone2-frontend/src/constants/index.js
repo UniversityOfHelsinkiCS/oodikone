@@ -209,7 +209,5 @@ export const PRIORITYCODE_TEXTS = {
   30: 'Graduated'
 }
 
-export const ERROR_STATUSES_TO_CAPTURE = [
-  400,
-  500
+export const ERROR_STATUSES_NOT_TO_CAPTURE = [
 ]
