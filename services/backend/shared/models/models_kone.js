@@ -106,15 +106,12 @@ const UsageStatistic = sequelizeKone.define(
 const TagStudent = sequelizeKone.define(
   'tag_student',
   {
-    id: {
-      primaryKey: true,
-      type: Sequelize.BIGINT,
-      autoIncrement: true
-    },
     studentnumber: {
+      primaryKey: true,
       type: Sequelize.STRING
     },
     tag_id: {
+      primaryKey: true,
       type: Sequelize.BIGINT
     }
   },
@@ -135,7 +132,6 @@ const Tag = sequelizeKone.define(
       autoIncrement: true
     },
     studytrack: {
-      primaryKey: true,
       type: Sequelize.STRING
     }
   },

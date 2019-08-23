@@ -1,7 +1,7 @@
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
 import { getToken, setToken } from '../common'
-import { API_BASE_PATH, TOKEN_NAME, BASE_PATH, ERROR_STATUSES_TO_CAPTURE } from '../constants'
+import { API_BASE_PATH, TOKEN_NAME, BASE_PATH, ERROR_STATUSES_NOT_TO_CAPTURE } from '../constants'
 import { login as loginAction } from '../redux/auth'
 
 const isTestEnv = BASE_PATH === '/testing/'
@@ -148,7 +148,7 @@ export const handleRequest = store => next => async (action) => {
 const handleError = (err) => {
   const { response } = err
   if (response && response.status) {
-    if (ERROR_STATUSES_TO_CAPTURE.includes(response.status)) {
+    if (!ERROR_STATUSES_NOT_TO_CAPTURE.includes(response.status)) {
       Sentry.captureException(err)
     }
   }
