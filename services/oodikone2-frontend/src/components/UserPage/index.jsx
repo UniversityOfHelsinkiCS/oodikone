@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
-import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
+import { string, number, shape, bool, arrayOf, func } from 'prop-types'
 import { getTextIn, getUserRoles, setMocking } from '../../common'
 import { removeUserUnits, setFaculties } from '../../redux/users'
 import { getAccessGroups } from '../../redux/accessGroups'
@@ -229,7 +229,7 @@ UserPage.propTypes = {
   getElementDetails: func.isRequired,
   elementdetails: arrayOf(shape({ type: number, code: string, name: shape({}) })).isRequired,
   faculties: arrayOf(shape({ code: string, name: shape({}) })).isRequired,
-  accessGroups: arrayOf(object).isRequired,
+  accessGroups: shape({}).isRequired,
   isAdmin: bool.isRequired
 }
 const mapStateToProps = state => ({
