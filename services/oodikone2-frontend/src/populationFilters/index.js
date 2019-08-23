@@ -291,7 +291,7 @@ export const courseCreditFilter = (params) => {
   const { coursecodes, credits, coursename } = params
   return ({
     id: uuidv4(),
-    type: 'GradeFilter',
+    type: 'CourseCreditFilter',
     params: {
       coursecodes,
       credits,
