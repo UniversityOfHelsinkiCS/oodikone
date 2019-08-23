@@ -66,8 +66,6 @@ export const DEFAULT_LANG = 'fi'
 export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
 export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
-export const TOKEN_NAME = window.location.pathname.includes('staging') ? 'staging_token' : window.location.pathname.includes('/testing') ? 'testing_token' : 'token' //eslint-disable-line
-
 export const passRateCumGraphOptions = (categories, max, title, skipFirstColor) => ({
   chart: {
     type: 'column'

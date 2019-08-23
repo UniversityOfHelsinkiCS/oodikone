@@ -2,32 +2,26 @@ import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { shape, func, arrayOf, bool } from 'prop-types'
+import { shape, func, arrayOf, bool, string } from 'prop-types'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 import moment from 'moment'
 import { getProviders } from '../../redux/providers'
 import { getSemesters } from '../../redux/semesters'
 import { getTeacherStatistics } from '../../redux/teacherStatistics'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
-import { userRights, userIsAdmin, getTextIn } from '../../common'
+import { getTextIn, getUserIsAdmin } from '../../common'
 
 const initial = {
   semesterStart: null,
   semesterEnd: null,
   providers: [],
-  display: false,
-  userProviders: [],
-  isAdmin: false
+  display: false
 }
 
 class TeacherStatistics extends Component {
     state=initial
 
-    async componentDidMount() {
-      const rights = await userRights()
-      const isAdmin = await userIsAdmin()
-      const userProviders = this.mapToProviders(rights)
-      this.setState({ userProviders, isAdmin })
+    componentDidMount() {
       this.props.getProviders()
       this.props.getSemesters()
     }
@@ -80,8 +74,9 @@ class TeacherStatistics extends Component {
     }
 
     render() {
-      const { semesters, providers, statistics, pending } = this.props
-      const { display, semesterStart, semesterEnd, userProviders, isAdmin } = this.state
+      const { semesters, providers, statistics, pending, isAdmin } = this.props
+      const { display, semesterStart, semesterEnd } = this.state
+      const userProviders = this.mapToProviders(this.props.rights)
       const invalidQueryParams = this.state.providers.length === 0 || !semesterStart
       const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
       const filteredOptions = semesters.filter((sem) => {
@@ -162,11 +157,13 @@ TeacherStatistics.propTypes = {
   getProviders: func.isRequired,
   getTeacherStatistics: func.isRequired,
   pending: bool.isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  rights: arrayOf(string).isRequired,
+  isAdmin: bool.isRequired
 }
 
 const mapStateToProps = (state) => {
-  const { providers, teacherStatistics } = state
+  const { providers, teacherStatistics, auth: { token: { rights, roles } } } = state
   const { semesters } = state.semesters.data
   const providerOptions = providers.data.map(p => ({
     key: p.providercode,
@@ -193,7 +190,9 @@ const mapStateToProps = (state) => {
     semesters: semesterOptions,
     statistics,
     pending: teacherStatistics.pending,
-    error: teacherStatistics.error
+    error: teacherStatistics.error,
+    rights,
+    isAdmin: getUserIsAdmin(roles)
   }
 }
 

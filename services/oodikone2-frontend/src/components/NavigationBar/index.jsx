@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Menu, Dropdown, Button } from 'semantic-ui-react'
-import { NavLink, Link, withRouter } from 'react-router-dom'
-import { func, shape, string } from 'prop-types'
+import { NavLink, Link } from 'react-router-dom'
+import { func, string, arrayOf } from 'prop-types'
 import { connect } from 'react-redux'
-import { userRoles, userRights, getAsUserWithoutRefreshToken } from '../../common'
-import { login as loginAction, logout as logoutAction } from '../../redux/auth'
+import { getUserRoles, setMocking, setTestUser } from '../../common'
+import { logout as logoutAction } from '../../redux/auth'
 import LanguageChooser from '../LanguageChooser'
 import './navigationBar.css'
 
@@ -38,39 +38,35 @@ const allNavigationItems = {
 
 const NavigationBar = (props) => {
   const {
-    token,
     logout,
-    history,
     translate: t,
-    login
+    userRoles,
+    rights,
+    mockedBy,
+    userId
   } = props
-  const [visibleNavigationItems, setVisibleNavigationItems] = useState(allNavigationItems)
 
   const refreshNavigationRoutes = () => {
     const visibleNavigationItems = {}
-    const roles = userRoles()
-    const rights = userRights()
     Object.keys(allNavigationItems).forEach((key) => {
       if (key === 'courseStatistics') {
-        if (!roles.includes('admin') && rights.length === 0) {
+        if (!userRoles.includes('admin') && rights.length === 0) {
           return
         }
       }
       const { reqRights } = allNavigationItems[key]
-      if (!reqRights || roles.some(r => reqRights.indexOf(r) !== -1)) {
+      if (!reqRights || userRoles.some(r => reqRights.includes(r))) {
         visibleNavigationItems[key] = allNavigationItems[key]
       }
     })
-    setVisibleNavigationItems({ ...visibleNavigationItems })
+    return { ...visibleNavigationItems }
   }
 
-  useEffect(() => {
-    refreshNavigationRoutes()
-  }, [token])
+  const visibleNavigationItems = refreshNavigationRoutes()
 
   const returnToSelf = () => {
-    history.push('/')
-    login(true, null, null, true)
+    setMocking(null)
+    window.location.reload()
   }
 
   const renderHome = () => (
@@ -122,7 +118,7 @@ const NavigationBar = (props) => {
     ))
   )
 
-  const testUsers = ['tktl']
+  const testUsers = ['tktl', 'mluukkai']
   const renderUserMenu = () => (
     process.env.NODE_ENV === 'development' ?
       (
@@ -152,7 +148,10 @@ const NavigationBar = (props) => {
                   key={user}
                   icon="user"
                   text={`Use as: ${user}`}
-                  onClick={() => login()}
+                  onClick={() => {
+                    setTestUser(user)
+                    window.location.reload()
+                  }}
                 />
               ))
             }
@@ -177,10 +176,9 @@ const NavigationBar = (props) => {
     </Menu.Item>
   )
 
-  const asUser = getAsUserWithoutRefreshToken()
   const renderStopMockingButton = () => (
     <Menu.Item>
-      <Button onClick={returnToSelf}>Stop mocking as {asUser}</Button>
+      <Button onClick={returnToSelf}>Stop mocking as {userId}</Button>
     </Menu.Item>
   )
 
@@ -190,35 +188,39 @@ const NavigationBar = (props) => {
       { renderNavigationRoutes() }
       { renderUserMenu() }
       { renderLanguageChooser() }
-      { asUser && renderStopMockingButton() }
+      { mockedBy && renderStopMockingButton() }
     </Menu>
   )
 }
 
 NavigationBar.propTypes = {
   translate: func.isRequired,
-  history: shape({
-    push: func.isRequired
-  }).isRequired,
-  token: string,
-  login: func.isRequired,
-  logout: func.isRequired
+  logout: func.isRequired,
+  userRoles: arrayOf(string),
+  rights: arrayOf(string),
+  mockedBy: string,
+  userId: string
 }
 
 NavigationBar.defaultProps = {
-  token: null
+  mockedBy: null,
+  userId: 'unknown',
+  userRoles: [],
+  rights: []
 }
 
-const mapStateToProps = ({ auth }) => ({
-  token: auth.token
+const mapStateToProps = ({ auth: { token: { roles, rights, mockedBy, userId } } }) => ({
+  userRoles: getUserRoles(roles),
+  rights,
+  mockedBy,
+  userId
 })
 
 const mapDispatchToProps = {
-  login: loginAction,
   logout: logoutAction
 }
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(NavigationBar))
+)(NavigationBar)

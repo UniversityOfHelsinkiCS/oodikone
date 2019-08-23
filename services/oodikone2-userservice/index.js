@@ -61,7 +61,7 @@ initializeDatabaseConnection().then(() => {
 
   app.post('/superlogin', async (req, res) => {
     const { uid, asUser  } = req.body
-    console.log(`${uid} superlogging`)
+    console.log(`${uid} superlogging as ${asUser}`)
     const token = await User.superlogin(uid, asUser)
     if (token) {
       res.status(200).json(token)

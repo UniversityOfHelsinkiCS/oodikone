@@ -6,7 +6,7 @@ import ReactHighchart from 'react-highcharts'
 import { connect } from 'react-redux'
 import { random } from 'lodash'
 import { logout as logoutAction } from '../../redux/auth'
-import { log, images } from '../../common'
+import { images } from '../../common'
 import MulticolorBarChart from '../MulticolorBarChart'
 
 const names = [
@@ -41,7 +41,6 @@ const AccessDenied = ({ notEnabled, logout }) => {
 
   useEffect(() => {
     if (notEnabled) {
-      log('Not enabled')
       setTimeout(
         () => setEasterEgg(true),
         Math.floor(Math.random() * 1800000) + 600000

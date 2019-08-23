@@ -1,13 +1,13 @@
 import React from 'react'
 import qs from 'query-string'
 import { Header, Icon } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 import { uniq } from 'lodash'
-import { shape, string, number, oneOfType, arrayOf } from 'prop-types'
+import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
-import { userIsAdmin } from '../../../../../common'
+import { getUserIsAdmin } from '../../../../../common'
 
-const CumulativeTable = ({ stats, name, history }) => {
-  const admin = userIsAdmin()
+const CumulativeTable = ({ stats, name, history, isAdmin }) => {
   const showPopulation = (yearcode, year) => {
     const coursecodes = stats.map(s => s.coursecode)
     const queryObject = { yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), year }
@@ -27,7 +27,7 @@ const CumulativeTable = ({ stats, name, history }) => {
             key: 'TIME',
             title: 'Time',
             getRowVal: s => s.code,
-            getRowContent: s => (admin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name, s)} /></div>) : s.name),
+            getRowContent: s => (isAdmin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name, s)} /></div>) : s.name),
             cellProps: { width: 4 }
           },
           { key: 'PASSED', title: 'Passed', getRowVal: s => s.cumulative.categories.passed, cellProps: { width: 4 } },
@@ -51,7 +51,8 @@ const CumulativeTable = ({ stats, name, history }) => {
 CumulativeTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  isAdmin: bool.isRequired
 }
 
-export default CumulativeTable
+export default connect(({ auth: { token: { roles } } }) => ({ isAdmin: getUserIsAdmin(roles) }))(CumulativeTable)

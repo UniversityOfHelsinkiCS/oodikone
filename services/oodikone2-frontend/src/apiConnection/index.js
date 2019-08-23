@@ -1,14 +1,13 @@
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
-import { getToken, setToken } from '../common'
-import { API_BASE_PATH, TOKEN_NAME, BASE_PATH, ERROR_STATUSES_NOT_TO_CAPTURE } from '../constants'
-import { login as loginAction } from '../redux/auth'
+import { API_BASE_PATH, BASE_PATH, ERROR_STATUSES_NOT_TO_CAPTURE } from '../constants'
+import { getMocked, getToken, setMocking, setTestUser, getTestUser } from '../common'
 
 const isTestEnv = BASE_PATH === '/testing/'
 const isDevEnv = process.env.NODE_ENV === 'development'
 const devOptions = {
   headers: {
-    uid: 'tktl',
+    uid: getTestUser() || 'tktl',
     displayName: 'Development Kayttaja',
     'shib-session-id': 'mock-session'
   }
@@ -55,7 +54,6 @@ export const actionTypes = prefix => ({
 
 export const login = async () => {
   let options = null
-  console.log(isDevEnv)
   if (isDevEnv) {
     options = devOptions
   }
@@ -67,9 +65,10 @@ export const login = async () => {
 }
 
 export const logout = async () => {
+  setMocking(null)
+  setTestUser(null)
   const returnUrl = window.location.origin
   const response = await api.delete('/logout', { data: { returnUrl } })
-  localStorage.removeItem(TOKEN_NAME)
   window.location = response.data.logoutUrl
 }
 
@@ -98,14 +97,6 @@ export const callApi = async (url, method = 'get', data, params, timeout = 0, pr
     default:
       return Promise.reject(new Error('Invalid http method'))
   }
-}
-
-export const superLogin = async (uid) => {
-  const response = await callApi(`/superlogin/${uid}`, 'post')
-  const { token } = response.data
-  console.log(`Setting new token ${token}`)
-  await setToken(token)
-  return token
 }
 
 export const callController = (route, prefix, data, method = 'get', query, params, onProgress = null) => {
@@ -139,8 +130,7 @@ export const handleRequest = store => next => async (action) => {
       )
       store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
     } catch (e) {
-      // Something failed. Assume it's the token and try again.
-      store.dispatch(loginAction(true, requestSettings))
+      store.dispatch({ type: `${prefix}FAILURE`, response: e, query })
     }
   }
 }
@@ -156,22 +146,22 @@ const handleError = (err) => {
 
 export const handleAuth = store => next => async (action) => {
   next(action)
-  const { type, force = false, retryRequestSettings, uid, refresh } = action
+  const { type, retryRequestSettings } = action
   const {
     route, method, data, prefix, query, params, onProgress
   } = retryRequestSettings || {}
-  if (type === 'LOGIN_SUCCESS' && refresh) window.location.reload()
   if (type === 'LOGIN_ATTEMPT') {
     try {
       let token
-      if (uid) token = await superLogin(uid)
-      else token = await getToken(force)
+      const mocked = getMocked()
+      if (mocked) token = (await callApi(`/superlogin/${mocked}`, 'post')).data
+      else token = await getToken()
 
       api.defaults.headers.common = {
         ...api.defaults.headers.common,
         'x-access-token': token
       }
-      store.dispatch({ type: 'LOGIN_SUCCESS', token, refresh })
+      store.dispatch({ type: 'LOGIN_SUCCESS', token })
       try {
         if (retryRequestSettings) {
           const res = await callApi(route, method, data, params, 0, onProgress)
