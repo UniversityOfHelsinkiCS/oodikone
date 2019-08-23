@@ -1,10 +1,11 @@
 import React from 'react'
 import qs from 'query-string'
-import { arrayOf, number, oneOfType, shape, string } from 'prop-types'
+import { arrayOf, number, oneOfType, shape, string, bool } from 'prop-types'
+import { connect } from 'react-redux'
 import { Header, Icon } from 'semantic-ui-react'
 import { uniq } from 'lodash'
 import SortableTable from '../../../../SortableTable'
-import { userIsAdmin } from '../../../../../common'
+import { getUserIsAdmin } from '../../../../../common'
 import { getGradeSpread, getThesisGradeSpread, isThesisGrades, THESIS_GRADE_KEYS } from '../util'
 
 const getSortableColumn = (key, title, getRowVal, getRowContent) => (
@@ -46,10 +47,9 @@ const getGradeColumns = isGradeSeries => (isGradeSeries
   : THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s[k]))
 )
 
-const GradesTable = ({ stats, name, history }) => {
+const GradesTable = ({ stats, name, history, isAdmin }) => {
   const { cumulative: { grades } } = stats[0]
   const isGradeSeries = !isThesisGrades(grades)
-  const admin = userIsAdmin()
 
   const showPopulation = (yearcode, year) => {
     const coursecodes = stats.map(s => s.coursecode)
@@ -59,7 +59,7 @@ const GradesTable = ({ stats, name, history }) => {
   }
 
   const columns = [
-    getSortableColumn('TIME', 'Time', s => s.code, s => (admin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name)} /></div>) : s.name)),
+    getSortableColumn('TIME', 'Time', s => s.code, s => (isAdmin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name)} /></div>) : s.name)),
     getSortableColumn('ATTEMPTS', 'Attempts', s => s.attempts),
     ...getGradeColumns(isGradeSeries)
   ]
@@ -83,6 +83,7 @@ const GradesTable = ({ stats, name, history }) => {
 GradesTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  isAdmin: bool.isRequired
 }
-export default GradesTable
+export default connect(({ auth: { token: { roles } } }) => ({ isAdmin: getUserIsAdmin(roles) }))(GradesTable)

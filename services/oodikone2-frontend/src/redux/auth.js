@@ -1,18 +1,18 @@
-export const login = (force = false, retryRequestSettings = null, uid = null, refresh = false) => ({
+import { decodeToken } from '../common'
+
+export const login = (retryRequestSettings = null) => ({
   type: 'LOGIN_ATTEMPT',
-  force,
-  retryRequestSettings,
-  uid,
-  refresh
+  retryRequestSettings
 })
 
 export const logout = () => ({ type: 'LOGOUT_ATTEMPT' })
 
-const reducer = (state = { token: null }, action) => {
+const reducer = (state = { pending: false, error: false, token: null }, action) => {
   switch (action.type) {
     case 'LOGIN_ATTEMPT': return ({
       ...state,
-      pending: true
+      pending: true,
+      error: false
     })
 
     case 'LOGIN_FAILURE': return ({
@@ -24,13 +24,14 @@ const reducer = (state = { token: null }, action) => {
     case 'LOGIN_SUCCESS': return ({
       ...state,
       pending: false,
-      token: action.token,
-      error: false
+      error: false,
+      token: decodeToken(action.token)
     })
 
     case 'LOGOUT_ATTEMPT': return ({
       ...state,
-      pending: true
+      pending: true,
+      error: false
     })
 
     case 'LOGOUT_FAILURE': return ({
