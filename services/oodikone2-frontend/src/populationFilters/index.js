@@ -281,8 +281,9 @@ export const gradeFilter = (params) => {
       coursename
     },
     filter: (student) => {
-      const course = student.courses.find(c => coursecodes.includes(c.course.code))
-      return Number(course.grade) === grade
+      const courses = student.courses.filter(c => coursecodes.includes(c.course.code))
+      const newestCourse = courses.sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+      return newestCourse.grade === grade
     }
   })
 }
