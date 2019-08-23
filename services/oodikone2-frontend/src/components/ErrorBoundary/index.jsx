@@ -20,12 +20,13 @@ class ErrorBoundary extends Component {
     this.props.login()
   }
 
-  componentDidUpdate() {
-    const { auth, actionHistory } = this.props
+  static getDerivedStateFromProps(props) {
+    const { auth, actionHistory } = props
     Sentry.configureScope((scope) => {
       if (auth.token) scope.setUser({ username: auth.token.userId })
       scope.setExtra('actionHistory', JSON.stringify(actionHistory))
     })
+    return null
   }
 
   componentDidCatch = (e) => {

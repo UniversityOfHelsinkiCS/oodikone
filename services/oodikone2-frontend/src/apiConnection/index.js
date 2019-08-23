@@ -112,6 +112,15 @@ export const callController = (route, prefix, data, method = 'get', query, param
   return { type: `${prefix}ATTEMPT`, requestSettings }
 }
 
+const handleError = (err) => {
+  const { response } = err
+  if (response && response.status) {
+    if (!ERROR_STATUSES_NOT_TO_CAPTURE.includes(response.status)) {
+      Sentry.captureException(err)
+    }
+  }
+}
+
 export const handleRequest = store => next => async (action) => {
   next(action)
   const { requestSettings } = action
@@ -131,25 +140,14 @@ export const handleRequest = store => next => async (action) => {
       store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
     } catch (e) {
       store.dispatch({ type: `${prefix}FAILURE`, response: e, query })
-    }
-  }
-}
-
-const handleError = (err) => {
-  const { response } = err
-  if (response && response.status) {
-    if (!ERROR_STATUSES_NOT_TO_CAPTURE.includes(response.status)) {
-      Sentry.captureException(err)
+      handleError(e)
     }
   }
 }
 
 export const handleAuth = store => next => async (action) => {
   next(action)
-  const { type, retryRequestSettings } = action
-  const {
-    route, method, data, prefix, query, params, onProgress
-  } = retryRequestSettings || {}
+  const { type } = action
   if (type === 'LOGIN_ATTEMPT') {
     try {
       let token
@@ -162,21 +160,9 @@ export const handleAuth = store => next => async (action) => {
         'x-access-token': token
       }
       store.dispatch({ type: 'LOGIN_SUCCESS', token })
-      try {
-        if (retryRequestSettings) {
-          const res = await callApi(route, method, data, params, 0, onProgress)
-          store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
-        }
-      } catch (err) {
-        store.dispatch({ type: `${prefix}FAILURE`, response: err, query })
-        handleError(err)
-      }
     } catch (err) {
       store.dispatch({ type: 'LOGIN_FAILURE' })
-      if (retryRequestSettings) {
-        store.dispatch({ type: `${prefix}FAILURE`, response: err, query })
-        handleError(err)
-      }
+      handleError(err)
     }
   } else if (type === 'LOGOUT_ATTEMPT') {
     try {
