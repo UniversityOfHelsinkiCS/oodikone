@@ -9,18 +9,20 @@ import { intersection, difference } from 'lodash'
 import { getCoursePopulation } from '../../redux/populations'
 import { getCoursePopulationCourses } from '../../redux/populationCourses'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
+import { clearPopulationFilters } from '../../redux/populationFilters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
 import CourseStudentCourses from '../CourseStudentCourses'
 import infoTooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
-import SegmentDimmer from '../SegmentDimmer'
 import CourseStudentsFilters from '../CourseStudentsFilters'
+import CourseStudentsCreditDist from '../CourseStudentsCreditDist'
 
 const CourseStudents = ({
   getCoursePopulationDispatch,
   getCoursePopulationCoursesDispatch,
   getSingleCourseStatsDispatch,
+  clearPopulationFiltersDispatch,
   studentData,
   pending,
   history,
@@ -43,9 +45,10 @@ const CourseStudents = ({
     setCodes(JSON.parse(query.coursecodes))
     setYearCode(query.yearcode)
     setYear(query.year)
+    clearPopulationFiltersDispatch()
   }, [])
 
-  const { CreditAccumulationGraph, CoursesOf } = infoTooltips.PopulationStatistics
+  const { CreditAccumulationGraph } = infoTooltips.PopulationStatistics
   const header = courseData ? `${courseData.name} ${headerYear}` : null
 
   return (
@@ -64,21 +67,16 @@ const CourseStudents = ({
               selectedStudents={selectedStudents}
               title={`${translate('populationStatistics.sampleId')}`}
               translate={translate}
-
             />
           </Segment>
           <Segment>
-            <Header size="medium" dividing >
-              <Header.Content>{translate('populationCourses.header')}</Header.Content>
-              <InfoBox content={CoursesOf} />
-            </Header>
-            <SegmentDimmer translate={translate} isLoading={pending} />
-            <CourseStudentCourses
-              selectedStudents={selectedStudents}
-              codes={codes}
-              yearCode={yearCode}
-            />
+            <CourseStudentsCreditDist yearcode={yearCode} selectedStudents={selectedStudents} />
           </Segment>
+          <CourseStudentCourses
+            selectedStudents={selectedStudents}
+            codes={codes}
+            yearCode={yearCode}
+          />
           <PopulationStudents
             samples={studentData.students}
             selectedStudents={selectedStudents}
@@ -93,6 +91,7 @@ CourseStudents.propTypes = {
   getCoursePopulationDispatch: func.isRequired,
   getCoursePopulationCoursesDispatch: func.isRequired,
   getSingleCourseStatsDispatch: func.isRequired,
+  clearPopulationFiltersDispatch: func.isRequired,
   pending: bool.isRequired,
   studentData: shape({}).isRequired,
   history: shape({}).isRequired,
@@ -134,5 +133,6 @@ const mapStateToProps = ({ localize, singleCourseStats, populationFilters, popul
 export default withRouter(connect(mapStateToProps, {
   getCoursePopulationDispatch: getCoursePopulation,
   getCoursePopulationCoursesDispatch: getCoursePopulationCourses,
-  getSingleCourseStatsDispatch: getSingleCourseStats
+  getSingleCourseStatsDispatch: getSingleCourseStats,
+  clearPopulationFiltersDispatch: clearPopulationFilters
 })(CourseStudents))
