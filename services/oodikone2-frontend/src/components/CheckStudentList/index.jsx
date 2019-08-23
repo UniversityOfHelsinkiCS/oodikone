@@ -6,7 +6,7 @@ class CheckStudentList extends Component {
   state = { modalOpen: false, input: '', notInOodiRows: [], notInListRows: [] }
 
   checkStudents = (input) => {
-    const studentnumbers = input.match(/[0-9]+/g)
+    const studentnumbers = input.match(/[^\s,]+/g) || []
     const { students } = this.props
     const notInOodi = studentnumbers.filter(a => !students.includes(a))
     const notInList = students.filter(a => !studentnumbers.includes(a))
