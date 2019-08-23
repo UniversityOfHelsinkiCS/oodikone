@@ -23,7 +23,7 @@ const CourseStudentsCreditDist = ({ singleCourseStats, yearcode, pending, select
     }
   }, [pending, selectedStudents])
   const setFilter = (row) => {
-    setPopulationFilterDispatch(gradeFilter({ grade: Number(row[0]), coursecodes: singleCourseStats.alternatives, coursename: singleCourseStats.name }))
+    setPopulationFilterDispatch(gradeFilter({ grade: row[0], coursecodes: singleCourseStats.alternatives, coursename: singleCourseStats.name }))
   }
 
   const rows = courseGrades.map(g => [`${g.grade}`, g.amount, <Progress style={{ margin: '0px' }} percent={Math.round((g.amount / selectedStudents.length) * 100)} progress />])
