@@ -67,7 +67,7 @@ class CreditAccumulationGraphHighCharts extends Component {
     }
   }
 
-  getMoreCreditLines = async (students) => {
+  getMoreCreditLines = (students) => {
     const studentCreditLines = this.state.studentCreditLines
       .concat(this.createStudentCreditLines(students))
     this.setState({ studentCreditLines, updateGraph: true })

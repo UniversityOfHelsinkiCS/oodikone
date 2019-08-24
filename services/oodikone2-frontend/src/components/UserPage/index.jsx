@@ -30,11 +30,11 @@ class UserPage extends Component {
     programme: undefined
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const { associations, pending, getElementDetails, elementdetails, accessGroups, faculties } = this.props
     if (elementdetails.length === 0) getElementDetails()
-    if (accessGroups.data.length === 0) await this.props.getAccessGroups()
-    if (faculties.length === 0) await this.props.getFaculties()
+    if (accessGroups.data.length === 0) this.props.getAccessGroups()
+    if (faculties.length === 0) this.props.getFaculties()
     if (Object.keys(associations).length === 0 && !pending) {
       this.props.getDegreesAndProgrammesUnfiltered()
     }
@@ -82,7 +82,7 @@ class UserPage extends Component {
 
   allSpecializationIds = () => this.specializationOptions().map(sp => sp.key)
 
-  showAs = async (uid) => {
+  showAs = (uid) => {
     setMocking(uid)
     this.props.history.push('/')
     window.location.reload()
