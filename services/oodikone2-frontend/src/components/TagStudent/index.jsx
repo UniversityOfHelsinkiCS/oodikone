@@ -49,19 +49,19 @@ const TagStudent = ({
     }
   }, [success])
 
-  const handleChange = async (event, { value }) => {
+  const handleChange = (event, { value }) => {
     event.preventDefault()
     const tag = {
       tag_id: value,
       studentnumber
     }
-    await createStudentTag(tag, studytrack)
+    createStudentTag(tag, studytrack)
   }
 
-  const deleteTag = async (event, tag) => {
+  const deleteTag = (event, tag) => {
     event.preventDefault()
     const removableTag = studentsTagIds.find(t => t.tag_id === tag.tag_id)
-    await deleteStudentTag(removableTag.tag_id, studentnumber, studytrack)
+    deleteStudentTag(removableTag.tag_id, studentnumber, studytrack)
   }
 
   const studentsTags = allTags

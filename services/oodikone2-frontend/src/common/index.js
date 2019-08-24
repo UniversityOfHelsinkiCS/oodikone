@@ -8,7 +8,6 @@ import qs from 'query-string'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
 import toskaLogo from '../assets/toska.png'
 import irtomikko from '../assets/irtomikko.png'
-import { login } from '../apiConnection'
 
 const MOCK_USERID = 'MOCK_USERID'
 export const setMocking = userid => (userid ? localStorage.setItem(MOCK_USERID, userid) : localStorage.removeItem(MOCK_USERID))
@@ -36,16 +35,6 @@ export const decodeToken = (token) => {
 export const images = {
   toskaLogo,
   irtomikko
-}
-
-export const getToken = async () => {
-  try {
-    const token = await login()
-    return token
-  } catch (e) {
-    console.log('mayhem, reloading', e)
-    throw e
-  }
 }
 
 export const getUserRoles = roles => (roles ? roles.map(r => r.group_code) : [])

@@ -65,9 +65,23 @@ const reducer = (state = { data: [], enabledOnly: true }, action) => {
         error: false,
         data: action.response
       }
+    case 'EDIT_USER_UNIT_ATTEMPT':
+      return {
+        ...state,
+        userunitpending: true,
+        useruniterror: false
+      }
+    case 'EDIT_USER_UNIT_FAILURE':
+      return {
+        ...state,
+        userunitpending: false,
+        useruniterror: true
+      }
     case 'EDIT_USER_UNIT_SUCCESS':
       return {
         ...state,
+        userunitpending: false,
+        useruniterror: false,
         data: state.data.filter(user => user.id !== action.response.id)
           .concat(action.response)
       }

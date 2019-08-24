@@ -1,7 +1,7 @@
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
 import { API_BASE_PATH, BASE_PATH, ERROR_STATUSES_NOT_TO_CAPTURE } from '../constants'
-import { getMocked, getToken, setMocking, setTestUser, getTestUser } from '../common'
+import { getMocked, setMocking, setTestUser, getTestUser } from '../common'
 
 const isTestEnv = BASE_PATH === '/testing/'
 const isDevEnv = process.env.NODE_ENV === 'development'
@@ -51,18 +51,6 @@ export const actionTypes = prefix => ({
   failure: types.failure(prefix),
   success: types.success(prefix)
 })
-
-export const login = async () => {
-  let options = null
-  if (isDevEnv) {
-    options = devOptions
-  }
-  if (isTestEnv) {
-    options = testOptions
-  }
-  const response = await api.post('/login', null, options)
-  return response.data.token
-}
 
 export const logout = async () => {
   setMocking(null)
@@ -152,8 +140,12 @@ export const handleAuth = store => next => async (action) => {
     try {
       let token
       const mocked = getMocked()
-      if (mocked) token = (await callApi(`/superlogin/${mocked}`, 'post')).data
-      else token = await getToken()
+      if (mocked) {
+        token = (await callApi(`/superlogin/${mocked}`, 'post')).data
+      } else {
+        // eslint-disable-next-line prefer-destructuring
+        token = (await callApi('/login', 'post')).data.token
+      }
 
       api.defaults.headers.common = {
         ...api.defaults.headers.common,
