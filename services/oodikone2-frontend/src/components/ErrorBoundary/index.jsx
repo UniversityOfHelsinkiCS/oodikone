@@ -59,6 +59,7 @@ ErrorBoundary.propTypes = {
     }),
     error: bool
   }).isRequired,
+  // eslint-disable-next-line react/no-unused-prop-types
   actionHistory: arrayOf(shape({})),
   login: func.isRequired,
   children: node.isRequired
