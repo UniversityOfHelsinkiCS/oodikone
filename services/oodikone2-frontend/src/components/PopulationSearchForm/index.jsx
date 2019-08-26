@@ -130,6 +130,7 @@ const PopulationSearchForm = (props) => {
 
     const success = await fetchPopulationPromises.current.promise
     if (success) {
+      props.clearPopulationFilters()
       if (queryCodes[0] === 'KH50_001') {
         props.setPopulationFilter(transferTo(false))
       }
@@ -753,6 +754,7 @@ PopulationSearchForm.propTypes = {
   getMandatoryCourses: func.isRequired,
   getPopulationFilters: func.isRequired,
   setPopulationFilter: func.isRequired,
+  clearPopulationFilters: func.isRequired,
   queries: shape({}).isRequired,
   studyProgrammes: shape({}), //eslint-disable-line
   degrees: arrayOf(dropdownType), //eslint-disable-line
