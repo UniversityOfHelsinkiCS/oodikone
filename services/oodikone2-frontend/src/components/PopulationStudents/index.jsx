@@ -168,7 +168,10 @@ class PopulationStudents extends Component {
         }
       })
       const programme = studyprogrammes.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
-      return programme.name
+      if (programme) {
+        return programme.name
+      }
+      return 'No programme'
     }
 
     const studytrack = (studyrights) => {
