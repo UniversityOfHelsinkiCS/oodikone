@@ -218,7 +218,7 @@ export const getNewestProgramme = (studyrights) => {
   if (programme) {
     return programme
   }
-  return null
+  return { name: 'No programme', startdate: '', code: '' }
 }
 
 export const useInterval = (callback, delay) => {
