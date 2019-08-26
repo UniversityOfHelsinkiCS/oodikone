@@ -116,7 +116,7 @@ CourseStudentsFilters.propTypes = {
 const mapStateToProps = ({ populationFilters, populations }) => ({
   filters: populationFilters.filters,
   complemented: populationFilters.complemented,
-  allStudyrights: populations.data.studyrights
+  allStudyrights: populations.data.studyrights || {}
 })
 
 export default connect(mapStateToProps, {
