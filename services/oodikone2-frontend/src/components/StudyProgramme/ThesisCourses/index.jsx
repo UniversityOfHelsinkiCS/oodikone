@@ -9,7 +9,7 @@ import Expandable from '../../Expandable'
 import { createNewThesisCourse, getThesisCourses } from '../../../redux/thesisCourses'
 
 const ThesisCourses = ({ studyprogramme, createThesis, getTheses }) => {
-  const handleClick = (course, thesis) => async () => {
+  const handleClick = (course, thesis) => () => {
     createThesis(studyprogramme, course, thesis)
       .then(() => { getTheses(studyprogramme) })
   }

@@ -20,7 +20,7 @@ import { transferTo } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { getTagsByStudytrackAction } from '../../redux/tags'
-import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, userIsAdmin, cancelablePromise, useSearchHistory } from '../../common'
+import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, cancelablePromise, useSearchHistory, getUserRoles } from '../../common'
 import { setLoading } from '../../redux/graphSpinner'
 import './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
@@ -51,8 +51,7 @@ const PopulationSearchForm = (props) => {
     showAdvancedSettings: false,
     momentYear: Datetime.moment('2017-01-01'),
     floatMonths: months('2017', 'FALL'),
-    selectedTag: '',
-    isAdmin: false
+    selectedTag: ''
   })
   const [didMount, setDidMount] = useState(false)
   const [searchHistory, addItemToSearchHistory] = useSearchHistory('populationSearch', 8)
@@ -67,8 +66,7 @@ const PopulationSearchForm = (props) => {
     showAdvancedSettings,
     momentYear,
     floatMonths,
-    selectedTag,
-    isAdmin
+    selectedTag
   } = totalState
 
   const {
@@ -80,7 +78,8 @@ const PopulationSearchForm = (props) => {
     tags,
     language,
     translate,
-    onProgress
+    onProgress,
+    isAdmin
   } = props
 
   const parseQueryFromUrl = () => {
@@ -131,6 +130,7 @@ const PopulationSearchForm = (props) => {
 
     const success = await fetchPopulationPromises.current.promise
     if (success) {
+      props.clearPopulationFilters()
       if (queryCodes[0] === 'KH50_001') {
         props.setPopulationFilter(transferTo(false))
       }
@@ -160,8 +160,7 @@ const PopulationSearchForm = (props) => {
     if (location.search) {
       fetchPopulationFromUrlParams()
     }
-    const admin = userIsAdmin()
-    setState({ isAdmin: admin })
+    setState({ isAdmin })
     setDidMount(true)
 
     return () => {
@@ -755,6 +754,7 @@ PopulationSearchForm.propTypes = {
   getMandatoryCourses: func.isRequired,
   getPopulationFilters: func.isRequired,
   setPopulationFilter: func.isRequired,
+  clearPopulationFilters: func.isRequired,
   queries: shape({}).isRequired,
   studyProgrammes: shape({}), //eslint-disable-line
   degrees: arrayOf(dropdownType), //eslint-disable-line
@@ -770,10 +770,11 @@ PopulationSearchForm.propTypes = {
     arrayOf(shape({ tag_id: string, tagname: string })),
     object
   ]).isRequired,
-  onProgress: func.isRequired
+  onProgress: func.isRequired,
+  isAdmin: bool.isRequired
 }
 
-const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, localize, tags }) => {
+const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, localize, tags, auth: { roles } }) => {
   const { language } = settings
   const { pending } = populationDegreesAndProgrammes
   return ({
@@ -783,7 +784,8 @@ const mapStateToProps = ({ semesters, settings, populations, populationDegreesAn
     translate: getTranslate(localize),
     studyProgrammes: populationDegreesAndProgrammes.data.programmes || {},
     pending,
-    tags: tags.data
+    tags: tags.data,
+    isAdmin: getUserRoles(roles).includes('admin')
   })
 }
 

@@ -1,19 +1,15 @@
 import React, { Component, Suspense } from 'react'
 import { connect } from 'react-redux'
-import { node, shape, string, bool, func } from 'prop-types'
+import { node, shape, bool, func, arrayOf } from 'prop-types'
 import { Loader } from 'semantic-ui-react'
 import * as Sentry from '@sentry/browser'
 import { login as loginAction } from '../../redux/auth'
-
-import { getUserName, userIsEnabled } from '../../common'
 
 const AccessDenied = React.lazy(() => import('../AccessDenied'))
 
 class ErrorBoundary extends Component {
   state = {
-    hasError: false,
-    enabled: false,
-    loaded: false
+    hasError: false
   }
 
   static getDerivedStateFromError() {
@@ -24,38 +20,32 @@ class ErrorBoundary extends Component {
     this.props.login()
   }
 
-  componentDidUpdate() {
-    if (!this.state.loaded) {
-      this.init()
-    }
+  static getDerivedStateFromProps(props) {
+    const { auth, actionHistory } = props
+    Sentry.configureScope((scope) => {
+      if (auth.token) scope.setUser({ username: auth.token.userId })
+      scope.setExtra('actionHistory', JSON.stringify(actionHistory))
+    })
+    return null
   }
 
   componentDidCatch = (e) => {
     Sentry.captureException(e)
   }
 
-  init = () => {
-    const { auth: { token, error } } = this.props
-    if (token || error) {
-      const enabled = userIsEnabled()
-      const name = getUserName()
-      Sentry.configureScope(scope => scope.setUser({ username: name }))
-      this.setState({ enabled, loaded: true })
-    }
-  }
-
   render() {
-    if (!this.state.loaded) {
-      return <Loader active inline="centered" />
-    }
+    const { token, error, pending } = this.props.auth
 
-    if (!this.state.hasError && this.state.enabled) {
-      return this.props.children
+    if (!error && !this.state.hasError) {
+      if (!token || pending) {
+        return <Loader active inline="centered" />
+      }
+      if (token.enabled) return this.props.children
     }
 
     return (
       <Suspense fallback={<Loader active inline="centered" />}>
-        <AccessDenied notEnabled={!this.state.enabled} />
+        <AccessDenied notEnabled={!token || !token.enabled} />
       </Suspense>
     )
   }
@@ -63,27 +53,25 @@ class ErrorBoundary extends Component {
 
 ErrorBoundary.propTypes = {
   auth: shape({
-    token: string,
+    token: shape({
+      enabled: bool,
+      pending: bool
+    }),
     error: bool
-  }),
+  }).isRequired,
+  // eslint-disable-next-line react/no-unused-prop-types
+  actionHistory: arrayOf(shape({})),
   login: func.isRequired,
   children: node.isRequired
 }
 
 ErrorBoundary.defaultProps = {
-  auth: {
-    token: null,
-    error: false
-  }
+  actionHistory: null
 }
 
-const mapStateToProps = ({ actionHistory, auth }) => {
-  Sentry.configureScope(async (scope) => {
-    scope.setExtra('actionHistory', JSON.stringify(actionHistory))
-  })
-  return {
-    auth
-  }
-}
+const mapStateToProps = ({ actionHistory, auth }) => ({
+  auth,
+  actionHistory
+})
 
 export default connect(mapStateToProps, { login: loginAction })(ErrorBoundary)

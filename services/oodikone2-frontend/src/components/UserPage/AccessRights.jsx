@@ -18,17 +18,16 @@ const initialState = {
   loading: false
 }
 
-const AccessRights = ({ uid, programmes, ...props }) => {
+const AccessRights = ({ uid, programmes, pending, ...props }) => {
   const [state, setState] = useState({ ...initialState })
-  const { programme, loading } = state
-  const handleClick = async () => {
-    setState({ ...state, loading: true })
+  const { programme } = state
+  const handleClick = () => {
     const codes = [programme].filter(e => !!e)
-    await props.addUserUnits(uid, codes)
+    props.addUserUnits(uid, codes)
     setState({ ...state, ...initialState })
   }
   return (
-    <Form loading={loading}>
+    <Form loading={pending}>
       <Form.Dropdown
         name="programme"
         label="Study programme"
@@ -63,14 +62,16 @@ AccessRights.propTypes = {
   uid: PropTypes.string.isRequired,
   // used in filteredDropdownProgrammeSelector
   rights: PropTypes.arrayOf(PropTypes.string).isRequired,
-  programmes: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+  programmes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  pending: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = (state, props) => {
   const options = selectors.filteredDropdownProgrammeSelector(state, props)
   const programmes = options.map(formatToOptions).sort((p1, p2) => p1.text.localeCompare(p2.text))
   return {
-    programmes
+    programmes,
+    pending: state.users.userunitpending
   }
 }
 

@@ -4,7 +4,6 @@ import { Form, Button, Divider, Message } from 'semantic-ui-react'
 import PropTypes from 'prop-types'
 import { getAccessGroups } from '../../redux/accessGroups'
 import { modifyAccessGroups } from '../../redux/users'
-import { getIdWithoutRefreshToken, setToken } from '../../common'
 
 class AccessGroups extends Component {
   state = {
@@ -23,16 +22,6 @@ class AccessGroups extends Component {
     }
   }
 
-  doRefreshIfNeeded = () => {
-    const { id: userid } = this.props.user
-    if (userid === getIdWithoutRefreshToken()) {
-      setTimeout(() => {
-        setToken(null)
-        window.location.reload()
-      }, 5000)
-    }
-  }
-
   submit = () => {
     const { user, groups } = this.props
     const { selected } = this.state
@@ -41,7 +30,6 @@ class AccessGroups extends Component {
       rights[value] = true
     })
     this.props.modifyAccessGroups(user.id, rights)
-    this.doRefreshIfNeeded()
   }
 
   render() {

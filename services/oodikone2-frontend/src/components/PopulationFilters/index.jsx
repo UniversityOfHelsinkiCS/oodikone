@@ -30,7 +30,7 @@ import {
   clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter
 } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
-import { getTextIn, userIsAdmin, cancelablePromise } from '../../common'
+import { getTextIn, getUserIsAdmin, cancelablePromise } from '../../common'
 
 const componentFor = {
   CreditsAtLeast,
@@ -75,7 +75,8 @@ class PopulationFilters extends Component {
     studyRights: shape({ programme: string, degree: string, studyTrack: string }).isRequired,
     populationFilters: shape({}).isRequired,
     populationSelectedStudentCourses: shape({}).isRequired,
-    populationCourses: shape({}).isRequired
+    populationCourses: shape({}).isRequired,
+    isAdmin: bool.isRequired
   }
 
   state = {
@@ -84,14 +85,11 @@ class PopulationFilters extends Component {
     presetDescription: '',
     presetFilters: [],
     advancedUser: false,
-    modalOpen: false,
-    isAdmin: false
+    modalOpen: false
   }
 
   componentDidMount() {
     this.initialFilterLoading()
-    const admin = userIsAdmin()
-    this.setState({ isAdmin: admin })
   }
 
   componentWillUnmount() {
@@ -232,12 +230,7 @@ class PopulationFilters extends Component {
         {unsetFilters.map(filterName => {//eslint-disable-line
           if (componentFor[filterName]) { // THIS IS KINDA HACKED SOLUTION PLS FIX
             // this is awful, shame on who ever wrote this, pls fix
-            if (this.state.isAdmin) {
-              return React.createElement(componentFor[filterName], {
-                filter: { notSet: true }, key: filterName, samples: this.props.samples, transfers, extents, allStudyRights
-              })
-            }
-            if (!this.state.isAdmin && filterName !== 'TagFilter') {
+            if (filterName !== 'TagFilter' || this.props.isAdmin) {
               return React.createElement(componentFor[filterName], {
                 filter: { notSet: true }, key: filterName, samples: this.props.samples, transfers, extents, allStudyRights
               })
@@ -363,7 +356,8 @@ const mapStateToProps = ({
   graphSpinner,
   populations,
   populationSelectedStudentCourses,
-  populationCourses
+  populationCourses,
+  auth: { token: { roles } }
 }) => ({
   populationSelectedStudentCourses,
   populationCourses,
@@ -376,7 +370,8 @@ const mapStateToProps = ({
   studyRights: populations.query.studyRights,
   allStudyRights: populations.data.studyrights,
   extents: populations.data.extents,
-  transfers: populations.data.transfers
+  transfers: populations.data.transfers,
+  isAdmin: getUserIsAdmin(roles)
 })
 
 export default connect(mapStateToProps, {
