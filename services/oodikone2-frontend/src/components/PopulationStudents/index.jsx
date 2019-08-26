@@ -6,7 +6,7 @@ import { Header, Segment, Button, Icon, Popup, Tab, Grid, Checkbox, List } from 
 import { withRouter } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy } from 'lodash'
 import XLSX from 'xlsx'
-import { getStudentTotalCredits, copyToClipboard, reformatDate, getTextIn, getUserRoles } from '../../common'
+import { getStudentTotalCredits, copyToClipboard, reformatDate, getTextIn, getUserRoles, getNewestProgramme } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
@@ -159,15 +159,7 @@ class PopulationStudents extends Component {
     }
 
     const mainProgramme = (studyrights) => {
-      const studyprogrammes = []
-      studyrights.forEach((sr) => {
-        const studyrightElements = sr.studyrightElements.filter(srE => srE.element_detail.type === 20)
-        if (studyrightElements.length > 0) {
-          const newestStudyrightElement = studyrightElements.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
-          studyprogrammes.push({ name: sr.highlevelname, startdate: newestStudyrightElement.startdate })
-        }
-      })
-      const programme = studyprogrammes.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
+      const programme = getNewestProgramme(studyrights)
       if (programme) {
         return programme.name
       }
