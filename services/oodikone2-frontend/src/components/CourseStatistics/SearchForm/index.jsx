@@ -95,7 +95,7 @@ const SearchForm = (props) => {
     history.push({ search: searchString })
   }
 
-  const onSubmitFormClick = async () => {
+  const onSubmitFormClick = () => {
     const codes = sortBy(Object.keys(selectedCourses))
     const params = {
       courseCodes: codes,
