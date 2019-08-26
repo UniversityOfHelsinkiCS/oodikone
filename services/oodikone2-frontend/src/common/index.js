@@ -205,6 +205,22 @@ export const flattenStudyrights = (studyrights) => {
   return studyrightcodes
 }
 
+export const getNewestProgramme = (studyrights) => {
+  const studyprogrammes = []
+  studyrights.forEach((sr) => {
+    const studyrightElements = sr.studyrightElements.filter(srE => srE.element_detail.type === 20)
+    if (studyrightElements.length > 0) {
+      const newestStudyrightElement = studyrightElements.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
+      studyprogrammes.push({ name: sr.highlevelname, startdate: newestStudyrightElement.startdate, code: newestStudyrightElement.element_detail.code })
+    }
+  })
+  const programme = studyprogrammes.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
+  if (programme) {
+    return programme
+  }
+  return null
+}
+
 export const useInterval = (callback, delay) => {
   const savedCallback = useRef()
   const savedId = useRef()
