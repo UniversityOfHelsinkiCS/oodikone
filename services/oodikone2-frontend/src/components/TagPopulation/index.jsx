@@ -29,7 +29,7 @@ const TagPopulation = ({
     setSelected(value)
   }
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault()
     const tagList = []
     checkedStudents.forEach((student) => {
@@ -43,7 +43,7 @@ const TagPopulation = ({
     })
     setSelected('')
     falsifyChecks()
-    await createMultipleStudentTag(tagList, studytrack)
+    createMultipleStudentTag(tagList, studytrack)
   }
 
   const checkCount = checkedStudents.reduce((n, student) => n + (student.checked), 0)

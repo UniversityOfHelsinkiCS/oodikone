@@ -47,16 +47,16 @@ class Index extends Component {
     sortReverse: false
   }
 
-  async componentDidMount() {
-    await this.fetchCourses()
+  componentDidMount() {
+    this.fetchCourses()
   }
 
-  async componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps) {
     const { teacherIds, semesterCode } = this.props
     const isNewTeachers = prevProps.teacherIds.length !== teacherIds.length
     const isNewSemester = prevProps.semesterCode !== semesterCode
     if (isNewTeachers || isNewSemester) {
-      await this.fetchCourses()
+      this.fetchCourses()
     }
   }
 
@@ -70,7 +70,7 @@ class Index extends Component {
     })
   }
 
-  fetchCourses = async () => {
+  fetchCourses = () => {
     const { teacherIds, semesterCode } = this.props
 
     let path = `${CG_API_BASE_PATH}/courses/?teacherIds=${JSON.stringify(teacherIds)}`
