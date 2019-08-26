@@ -16,7 +16,8 @@ import CourseStudentCourses from '../CourseStudentCourses'
 import infoTooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
 import CourseStudentsFilters from '../CourseStudentsFilters'
-import CourseStudentsCreditDist from '../CourseStudentsCreditDist'
+import CourseStudentsGradeDist from '../CourseStudentsGradeDist'
+import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
 
 const CourseStudents = ({
   getCoursePopulationDispatch,
@@ -70,7 +71,12 @@ const CourseStudents = ({
             />
           </Segment>
           <Segment>
-            <CourseStudentsCreditDist yearcode={yearCode} selectedStudents={selectedStudents} />
+            <Header>Grade distribution</Header>
+            <CourseStudentsGradeDist yearcode={yearCode} selectedStudents={selectedStudents} />
+          </Segment>
+          <Segment>
+            <Header>Programme distribution</Header>
+            <CustomPopulationProgrammeDist samples={studentData.students} selectedStudents={selectedStudents} />
           </Segment>
           <CourseStudentCourses
             selectedStudents={selectedStudents}
