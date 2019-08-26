@@ -5,7 +5,6 @@ import { func, arrayOf, object, number, shape, string, oneOf, bool } from 'prop-
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { replace, sortBy, orderBy, omit } from 'lodash'
 import { withRouter } from 'react-router-dom'
-import moment from 'moment'
 import qs from 'query-string'
 
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
@@ -92,7 +91,6 @@ class PopulationCourseStats extends Component {
     history: shape({}).isRequired,
     clearCourseStats: func.isRequired,
     language: string.isRequired,
-    query: shape({}).isRequired,
     pending: bool.isRequired,
     selectedStudents: arrayOf(string).isRequired,
     years: shape({}) // eslint-disable-line
@@ -187,16 +185,9 @@ class PopulationCourseStats extends Component {
   onGoToCourseStatisticsClick = (code) => {
     const {
       history,
-      query,
-      clearCourseStats: clearCourseStatsfn,
-      years
+      clearCourseStats: clearCourseStatsfn
     } = this.props
-    const yearCode = year => Object.values(years).find(yearObject =>
-      yearObject.yearname.slice(0, 4).includes(year)).yearcode
-    const { startYear, months } = query
-    const fromYear = yearCode(startYear)
-    const toYear = yearCode(moment(moment(startYear, 'YYYY').add(months, 'months')).format('YYYY'))
-    const queryObject = { toYear, fromYear, separate: false, courseCodes: JSON.stringify([code]) }
+    const queryObject = { separate: false, courseCodes: JSON.stringify([code]) }
     const searchString = qs.stringify(queryObject)
     history.push(`/coursestatistics?${searchString}`)
     clearCourseStatsfn()
@@ -394,7 +385,6 @@ class PopulationCourseStats extends Component {
     )
 
     const getCourseRow = (courseStats) => {
-      const { history } = this.props
       const { course, stats } = courseStats
       const { code, name } = course
       const {
@@ -415,11 +405,11 @@ class PopulationCourseStats extends Component {
             content={getTextIn(name, language)}
             className="clickableCell"
           />
-          {['/coursepopulation', '/custompopulation'].includes(history.location.pathname) ? <Table.Cell className="iconCell" /> : (<Table.Cell
+          <Table.Cell
             icon="level up alternate"
             onClick={() => this.onGoToCourseStatisticsClick(code)}
             className="iconCell"
-          />)}
+          />
           <Table.Cell content={code} />
           <Table.Cell content={passed + failed} />
           <Table.Cell content={passed} />
@@ -503,7 +493,6 @@ const mapStateToProps = (state) => {
   return {
     language: getActiveLanguage(state.localize).code,
     translate: getTranslate(state.localize),
-    query: state.populations.query ? state.populations.query : {},
     years,
     selectedCourses,
     populationCourses: state.populationCourses
