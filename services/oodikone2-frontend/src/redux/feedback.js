@@ -9,25 +9,28 @@ export const sendFeedbackAction = (content) => {
   return callController(route, prefix, data, method)
 }
 
-const reducer = (state = { data: [], enabledOnly: true, success: false }, action) => {
+const reducer = (state = { data: [], enabledOnly: true, success: false, pending: false, error: false }, action) => {
   switch (action.type) {
     case 'SEND_FEEDBACK_ATTEMPT':
       return {
         ...state,
         success: false,
-        pending: true
+        pending: true,
+        error: false
       }
     case 'SEND_FEEDBACK_SUCCESS':
       return {
         ...state,
         success: true,
-        pending: false
+        pending: false,
+        error: false
       }
     case 'SEND_FEEDBACK_FAILURE':
       return {
         ...state,
         success: false,
-        pending: false
+        pending: false,
+        error: true
       }
     default:
       return state
