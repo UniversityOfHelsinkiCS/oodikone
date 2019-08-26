@@ -1,5 +1,5 @@
 import uuidv4 from 'uuid/v4'
-import { getStudentTotalCredits, getStudentTotalCreditsFromMandatory, getStudentGradeMean, flattenStudyrights } from '../common'
+import { getStudentTotalCredits, getStudentTotalCreditsFromMandatory, getStudentGradeMean, getNewestProgramme } from '../common'
 
 export const creditsLessThan = (params) => {
   const { credit } = params
@@ -315,8 +315,8 @@ export const programmeFilter = (params) => {
       programmeName
     },
     filter: (student) => {
-      const studentStudyrightCodes = flattenStudyrights(student.studyrights)
-      return studentStudyrightCodes.find(code => code === programme)
+      const studentStudyrightCode = getNewestProgramme(student.studyrights)
+      return studentStudyrightCode.code === programme
     }
   })
 }
