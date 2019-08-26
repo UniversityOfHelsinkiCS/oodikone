@@ -1,15 +1,35 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
-import { func, shape, string } from 'prop-types'
+import { func, shape, string, arrayOf } from 'prop-types'
 import { programmeFilter } from '../../populationFilters'
-import { textAndDescriptionSearch } from '../../common'
+import { textAndDescriptionSearch, getNewestProgramme } from '../../common'
 
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
-const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterAction, allStudyrights, filter, language }) => {
+const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterAction, allStudyrights, filter, language, samples }) => {
   const [programme, setProgramme] = useState('')
   const [programmeName, setName] = useState('')
+  const [options, setOptions] = useState([])
+
+  useEffect(() => {
+    const allProgrammes = {}
+    samples.forEach((student) => {
+      const programme = getNewestProgramme(student.studyrights)
+      if (programme) {
+        if (allProgrammes[programme.code]) {
+          allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
+        } else {
+          allProgrammes[programme.code] = { programme, students: [] }
+          allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
+        }
+      }
+    })
+    const optionsToSet = Object.keys(allProgrammes)
+      .map(code => ({ key: code, text: allProgrammes[code].programme.name, value: code, description: code }))
+
+    setOptions(optionsToSet)
+  }, [])
 
   const handleFilter = () => {
     setPopulationFilterAction(programmeFilter({ programme, programmeName }))
@@ -24,7 +44,7 @@ const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterActi
     setProgramme('')
     setName('')
   }
-  const options = allStudyrights.programmes.map(p => ({ key: p.code, text: p.name[language], value: p.code, description: p.code }))
+
   if (filter.notSet) {
     return (
       <Segment>
@@ -75,7 +95,8 @@ ProgrammeFilter.propTypes = {
   removePopulationFilterAction: func.isRequired,
   filter: shape({}).isRequired,
   allStudyrights: shape({}).isRequired,
-  language: string.isRequired
+  language: string.isRequired,
+  samples: arrayOf(shape({})).isRequired
 }
 
 const mapStateToProps = ({ settings }) => ({
