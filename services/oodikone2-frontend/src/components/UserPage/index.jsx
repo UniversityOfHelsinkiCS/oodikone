@@ -4,13 +4,12 @@ import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
-import { string, number, shape, bool, arrayOf, func, object } from 'prop-types'
-import { getTextIn, getRolesWithoutRefreshToken } from '../../common'
+import { string, number, shape, bool, arrayOf, func } from 'prop-types'
+import { getTextIn, getUserRoles, setMocking } from '../../common'
 import { removeUserUnits, setFaculties } from '../../redux/users'
 import { getAccessGroups } from '../../redux/accessGroups'
 import { getFaculties } from '../../redux/faculties'
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
-import { login } from '../../redux/auth'
 import AccessRights from './AccessRights'
 import AccessGroups from './AccessGroups'
 import { getElementDetails } from '../../redux/elementdetails'
@@ -84,8 +83,9 @@ class UserPage extends Component {
   allSpecializationIds = () => this.specializationOptions().map(sp => sp.key)
 
   showAs = async (uid) => {
-    this.props.login(false, null, uid, true)
+    setMocking(uid)
     this.props.history.push('/')
+    window.location.reload()
   }
 
   renderUnitList = (elementdetailcodes, elementdetails, user) => {
@@ -229,9 +229,8 @@ UserPage.propTypes = {
   getElementDetails: func.isRequired,
   elementdetails: arrayOf(shape({ type: number, code: string, name: shape({}) })).isRequired,
   faculties: arrayOf(shape({ code: string, name: shape({}) })).isRequired,
-  accessGroups: arrayOf(object).isRequired,
-  isAdmin: bool.isRequired,
-  login: func.isRequired
+  accessGroups: shape({}).isRequired,
+  isAdmin: bool.isRequired
 }
 const mapStateToProps = state => ({
   language: getActiveLanguage(state.localize).code,
@@ -241,7 +240,7 @@ const mapStateToProps = state => ({
   pending: !!state.populationDegreesAndProgrammesUnfiltered.pending,
   elementdetails: state.elementdetails.data,
   accessGroups: state.accessGroups,
-  isAdmin: getRolesWithoutRefreshToken().includes('admin')
+  isAdmin: getUserRoles(state.auth.token.roles).includes('admin')
 })
 
 export default connect(mapStateToProps, {
@@ -250,6 +249,5 @@ export default connect(mapStateToProps, {
   getDegreesAndProgrammesUnfiltered,
   getAccessGroups,
   getFaculties,
-  getElementDetails,
-  login
+  getElementDetails
 })(withRouter(UserPage))

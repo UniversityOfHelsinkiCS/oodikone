@@ -1,25 +1,19 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Button, Modal, Form, TextArea, Segment, Header } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { shape, func, arrayOf, bool } from 'prop-types'
 
-import { userIsAdmin } from '../../common'
+import { getUserIsAdmin } from '../../common'
 import { getCustomPopulation } from '../../redux/populations'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourseStats from '../PopulationCourseStats'
 
-const CustomPopulation = ({ getCustomPopulationDispatch, getCustomPopulationCoursesByStudentnumbers, custompop, translate, courses, pending }) => {
-  const [admin, setAdmin] = useState(false)
+const CustomPopulation = ({ getCustomPopulationDispatch, getCustomPopulationCoursesByStudentnumbers, custompop, translate, courses, pending, isAdmin }) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
-
-  useEffect(() => {
-    const isAdmin = userIsAdmin()
-    setAdmin(isAdmin)
-  }, [])
 
   const onClicker = (e) => {
     e.preventDefault()
@@ -86,7 +80,7 @@ const CustomPopulation = ({ getCustomPopulationDispatch, getCustomPopulationCour
     )
   }
 
-  if (!admin) return <div>you are not an admin, go away</div>
+  if (!isAdmin) return <div>you are not an admin, go away</div>
 
   return (
     <div>
@@ -102,14 +96,16 @@ CustomPopulation.propTypes = {
   getCustomPopulationDispatch: func.isRequired,
   getCustomPopulationCoursesByStudentnumbers: func.isRequired,
   courses: shape({}).isRequired,
-  pending: bool.isRequired
+  pending: bool.isRequired,
+  isAdmin: bool.isRequired
 }
 
-const mapStateToProps = ({ populations, localize, populationCourses }) => ({
+const mapStateToProps = ({ populations, localize, populationCourses, auth: { token: { roles } } }) => ({
   translate: getTranslate(localize),
   custompop: populations.data.students || [],
   courses: populationCourses.data,
-  pending: populationCourses.pending
+  pending: populationCourses.pending,
+  isAdmin: getUserIsAdmin(roles)
 })
 
 export default connect(mapStateToProps, { getCustomPopulationDispatch: getCustomPopulation, getCustomPopulationCoursesByStudentnumbers })(CustomPopulation)

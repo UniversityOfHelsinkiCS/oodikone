@@ -3,12 +3,11 @@ const userService = require('../services/userService')
 
 router.post('/:uid', async (req, res) => {
   try {
-    const asUser = req.params.uid
-    const uid = req.decodedToken.mockedBy == null ? req.headers['uid'] : req.decodedToken.mockedBy
+    const uid = req.headers['uid']
     if (req.headers['shib-session-id'] && uid) {
-      console.log('super')
+      const asUser = req.params.uid
       const token = await userService.superlogin(uid, asUser)
-      res.status(200).json({ token })
+      res.status(200).json(token)
     } else {
       res.status(401).json({
         message: `Not enough headers login, uid:
@@ -17,7 +16,7 @@ router.post('/:uid', async (req, res) => {
     }
   } catch (err) {
     console.log(err.message)
-    res.status(401).json({ message: 'problem with login', err: err.message })
+    res.status(500).json({ message: 'problem with login' })
   }
 })
 

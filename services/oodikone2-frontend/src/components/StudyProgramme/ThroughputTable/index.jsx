@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment } from 'react'
 import moment from 'moment'
 import { Header, Loader, Table, Button, Grid, Icon } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, func } from 'prop-types'
@@ -7,17 +7,18 @@ import { withRouter } from 'react-router-dom'
 import { flatten, uniq } from 'lodash'
 import { callApi } from '../../../apiConnection'
 import { getThroughput } from '../../../redux/throughput'
-import { userRoles } from '../../../common'
+import { getUserRoles } from '../../../common'
 
-const ThroughputTable = ({ history, throughput, thesis, loading, error, studyprogramme,
-  dispatchGetThroughput }) => {
-  const [roles, setRoles] = useState(undefined)
-  const setFuckingRoles = async () => {
-    setRoles(await userRoles())
-  }
-  useEffect(() => {
-    setFuckingRoles()
-  }, [])
+const ThroughputTable = ({
+  history,
+  throughput,
+  thesis,
+  loading,
+  error,
+  studyprogramme,
+  dispatchGetThroughput,
+  userRoles
+}) => {
   const showPopulationStatistics = (yearLabel) => {
     const year = Number(yearLabel.slice(0, 4))
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
@@ -25,10 +26,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
       `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`)
   }
   if (error) return <h1>Oh no so error {error}</h1>
-  let GRADUATED_FEATURE_TOGGLED_ON = false
-  if (roles) {
-    GRADUATED_FEATURE_TOGGLED_ON = roles.includes('dev')
-  }
+  const GRADUATED_FEATURE_TOGGLED_ON = userRoles.includes('dev')
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
   const renderGenders = genders.length > 0
@@ -246,7 +244,8 @@ ThroughputTable.propTypes = {
   error: bool.isRequired,
   history: shape({
     push: func.isRequired
-  }).isRequired
+  }).isRequired,
+  userRoles: arrayOf(string).isRequired
 }
 
 ThroughputTable.defaultProps = {
@@ -255,7 +254,7 @@ ThroughputTable.defaultProps = {
 }
 
 export default withRouter(connect(
-  null,
+  ({ auth: { token: { roles } } }) => ({ userRoles: getUserRoles(roles) }),
   {
     dispatchGetThroughput: getThroughput
   }
