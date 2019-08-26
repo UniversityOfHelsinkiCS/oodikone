@@ -6,7 +6,7 @@ import { Header, Segment, Button, Icon, Popup, Tab, Grid, Checkbox, List } from 
 import { withRouter } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy } from 'lodash'
 import XLSX from 'xlsx'
-import { getStudentTotalCredits, copyToClipboard, userRoles, reformatDate, getTextIn, roundToTwo } from '../../common'
+import { getStudentTotalCredits, copyToClipboard, reformatDate, getTextIn, getUserRoles } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
@@ -32,8 +32,7 @@ class PopulationStudents extends Component {
   }
 
   componentDidMount() {
-    const roles = userRoles()
-    const admin = roles.includes('admin')
+    const admin = this.props.userRoles.includes('admin')
     this.props.getTagsByStudytrack(this.props.queryStudyrights[0])
     this.setState({ admin, containsStudyTracks: this.containsStudyTracks() })
 
@@ -219,7 +218,7 @@ class PopulationStudents extends Component {
         title: 'credits since start',
         getRowVal: (s) => {
           const credits = getStudentTotalCredits(s)
-          return roundToTwo(credits)
+          return credits.toFixed(2)
         }
       })
     }
@@ -641,10 +640,19 @@ PopulationStudents.propTypes = {
   })).isRequired,
   mandatoryPassed: shape({}).isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
-  getTagsByStudytrack: func.isRequired
+  getTagsByStudytrack: func.isRequired,
+  userRoles: arrayOf(string).isRequired
 }
 
-const mapStateToProps = ({ localize, settings, populations, populationCourses, populationMandatoryCourses, tags }) => {
+const mapStateToProps = ({
+  localize,
+  settings,
+  populations,
+  populationCourses,
+  populationMandatoryCourses,
+  tags,
+  auth: { token: { roles } }
+}) => {
   const mandatoryCodes = populationMandatoryCourses.data.map(c => c.code)
 
   let mandatoryPassed = {}
@@ -653,7 +661,9 @@ const mapStateToProps = ({ localize, settings, populations, populationCourses, p
     const courses = populationCourses.data.coursestatistics
     mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
       const foundCourse = !!courses.find(c => c.course.code === code)
-      obj[code] = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
+      obj[code] = foundCourse
+        ? Object.keys(courses.find(c => c.course.code === code).students.passed)
+        : null
       return obj
     }, {})
   }
@@ -662,10 +672,13 @@ const mapStateToProps = ({ localize, settings, populations, populationCourses, p
     showNames: settings.namesVisible,
     showList: settings.studentlistVisible,
     language: getActiveLanguage(localize).code,
-    queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
+    queryStudyrights: populations.query
+      ? Object.values(populations.query.studyRights)
+      : [],
     mandatoryCourses: populationMandatoryCourses.data,
     mandatoryPassed,
-    tags: tags.data
+    tags: tags.data,
+    userRoles: getUserRoles(roles)
   }
 }
 

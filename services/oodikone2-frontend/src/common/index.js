@@ -5,12 +5,17 @@ import Datetime from 'react-datetime'
 import { uniqBy, filter } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
 import qs from 'query-string'
-import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, TOKEN_NAME } from '../constants'
+import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
 import toskaLogo from '../assets/toska.png'
 import irtomikko from '../assets/irtomikko.png'
-import { sendLog, login } from '../apiConnection'
+import { login } from '../apiConnection'
 
-export const setToken = token => localStorage.setItem(TOKEN_NAME, token)
+const MOCK_USERID = 'MOCK_USERID'
+export const setMocking = userid => (userid ? localStorage.setItem(MOCK_USERID, userid) : localStorage.removeItem(MOCK_USERID))
+export const getMocked = () => localStorage.getItem(MOCK_USERID)
+const TEST_USERID = 'TEST_USERID'
+export const setTestUser = userid => (userid ? localStorage.setItem(TEST_USERID, userid) : localStorage.removeItem(TEST_USERID))
+export const getTestUser = () => localStorage.getItem(TEST_USERID)
 
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   filter(dropDownOptions, option => (option.text ?
@@ -24,118 +29,27 @@ export const decodeToken = (token) => {
   try {
     return jwtDecode(token)
   } catch (e) {
-    return {}
+    return null
   }
 }
+
 export const images = {
   toskaLogo,
   irtomikko
 }
 
-export const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
-
-export const tokenAccessInvalid = (token) => {
-  const decodedToken = decodeToken(token)
-  // Expired
-  if (!decodedToken || decodedToken.exp < (new Date().getTime() / 1000)) {
-    return true
-  }
-  // Misses fields
-  if (decodedToken.version !== TOKEN_VERSION) {
-    console.log('Token is of invalid version, re-logging in')
-    return true
-  }
-  // User is not enabled
-  return !decodedToken.enabled
-}
-
-export const getTokenWithoutRefresh = () => {
-  const token = localStorage.getItem(TOKEN_NAME)
-  if (token && !tokenAccessInvalid(token)) {
+export const getToken = async () => {
+  try {
+    const token = await login()
     return token
+  } catch (e) {
+    console.log('mayhem, reloading', e)
+    throw e
   }
-  return null
 }
 
-export const getToken = async (forceNew = false) => {
-  let token = getTokenWithoutRefresh()
-  if (!token || forceNew) {
-    try {
-      token = await login()
-      setToken(token)
-    } catch (e) {
-      console.log('mayhem, reloading')
-      window.location.reload(true)
-    }
-  }
-  return token
-}
-
-export const userRoles = () => {
-  const token = getTokenWithoutRefresh()
-  const decoded = decodeToken(token)
-  const roles = decoded.roles.map(r => r.group_code)
-  return roles
-}
-export const userRights = () => {
-  const token = getTokenWithoutRefresh()
-  const decoded = decodeToken(token)
-  const { rights } = decoded
-  return rights
-}
-export const userIsAdmin = () => {
-  const roles = userRoles()
-  return roles.includes('admin')
-}
-export const getAsUserWithoutRefreshToken = () => {
-  const token = getTokenWithoutRefresh()
-  if (!token) return null
-  const decoded = decodeToken(token)
-  return decoded.mockedBy ? decoded.userId : null
-}
-export const getRolesWithoutRefreshToken = () => {
-  const token = getTokenWithoutRefresh()
-  if (!token) return []
-  const decoded = decodeToken(token)
-  const roles = decoded.roles.map(r => r.group_code)
-  return roles
-}
-export const getRightsWithoutRefreshToken = () => {
-  const token = getTokenWithoutRefresh()
-  if (!token) return []
-  const decoded = decodeToken(token)
-  const { rights } = decoded
-  return rights
-}
-export const getIdWithoutRefreshToken = () => {
-  const token = getTokenWithoutRefresh()
-  if (!token) return []
-  const decoded = decodeToken(token)
-  return decoded.id
-}
-export const getUserName = () => {
-  const token = getTokenWithoutRefresh()
-  return token ? decodeToken(token).userId : null
-}
-
-export const setUserLanguage = (language) => {
-  localStorage.setItem('language', language)
-}
-
-export const getUserLanguage = () => {
-  let lang = localStorage.getItem('language')
-  if (!lang) {
-    const token = getTokenWithoutRefresh()
-    lang = decodeToken(token).language
-    setUserLanguage(lang)
-  }
-  return lang
-}
-
-export const userIsEnabled = () => {
-  const token = getTokenWithoutRefresh()
-  return token ? decodeToken(token).enabled : false
-}
+export const getUserRoles = roles => (roles ? roles.map(r => r.group_code) : [])
+export const getUserIsAdmin = roles => getUserRoles(roles).includes('admin')
 
 export const containsOnlyNumbers = str => str.match('^\\d+$')
 
@@ -185,13 +99,6 @@ export const getStudentTotalCreditsFromMandatory = (student, mandatoryCourses) =
 export const getTotalCreditsFromCourses = courses =>
   courses.filter(c => c.passed && !c.isStudyModuleCredit).reduce((a, b) => a + b.credits, 0)
 
-export const log = async (msg, meta) => {
-  const token = await getToken()
-  const decoded = decodeToken(token)
-  const combinedMeta = { ...decoded, ...meta }
-  sendLog({ message: msg, full_message: combinedMeta })
-}
-
 export const copyToClipboard = (text) => {
   const textField = document.createElement('textarea')
   textField.innerText = text
@@ -205,9 +112,6 @@ export const getCompiledPath = (template, parameters) => {
   const toPath = pathToRegexp.compile(template)
   return toPath(parameters)
 }
-
-// https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
-export const roundToTwo = num => +(`${Math.round(`${num}e+2`)}e-2`)
 
 export const getTextIn = (texts, language) => {
   if (texts) {

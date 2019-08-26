@@ -1,7 +1,8 @@
 import { callController } from '../apiConnection'
+import { DEFAULT_LANG } from '../constants'
 
 const initial = () => ({
-  language: 'fi',
+  language: DEFAULT_LANG,
   namesVisible: false,
   studentlistVisible: false,
   chartHeight: 600

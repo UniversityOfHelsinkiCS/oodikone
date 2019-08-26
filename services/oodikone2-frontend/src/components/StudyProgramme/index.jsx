@@ -2,7 +2,7 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { shape, string } from 'prop-types'
+import { shape, string, arrayOf } from 'prop-types'
 import { Header, Segment, Tab, Card, Icon } from 'semantic-ui-react'
 import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
 import CourseCodeMapper from '../CourseCodeMapper'
@@ -11,7 +11,7 @@ import Overview from './Overview'
 import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
-import { getRolesWithoutRefreshToken, getRightsWithoutRefreshToken, getTextIn, useTabs } from '../../common'
+import { getTextIn, useTabs, getUserRoles } from '../../common'
 import Tags from './Tags'
 
 const StudyProgramme = (props) => {
@@ -21,7 +21,7 @@ const StudyProgramme = (props) => {
     props.history
   )
   const getPanes = () => {
-    const { match } = props
+    const { match, rights, userRoles } = props
     const { studyProgrammeId, courseGroupId } = match.params
     const panes = []
     panes.push(
@@ -35,9 +35,9 @@ const StudyProgramme = (props) => {
       },
       { menuItem: 'Code Mapper', render: () => <CourseCodeMapper studyprogramme={studyProgrammeId} /> },
     )
-    if ((getRolesWithoutRefreshToken().includes('coursegroups') &&
-      getRightsWithoutRefreshToken().includes(studyProgrammeId)) ||
-      getRolesWithoutRefreshToken().includes('admin')) {
+    if ((userRoles.includes('coursegroups') &&
+      rights.includes(studyProgrammeId)) ||
+      userRoles.includes('admin')) {
       panes.push({
         menuItem: 'Course Groups',
         render: () => <AggregateView programmeId={studyProgrammeId} courseGroupId={courseGroupId} />
@@ -47,7 +47,7 @@ const StudyProgramme = (props) => {
       menuItem: 'Thesis Courses',
       render: () => <ThesisCourses studyprogramme={studyProgrammeId} />
     })
-    if (getRolesWithoutRefreshToken().includes('admin')) {
+    if (userRoles.includes('admin')) {
       panes.push({
         menuItem: 'Tags',
         render: () => <Tags studyprogramme={studyProgrammeId} />
@@ -105,7 +105,9 @@ StudyProgramme.propTypes = {
   }),
   programmes: shape({}),
   language: string.isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  rights: arrayOf(string).isRequired,
+  userRoles: arrayOf(string).isRequired
 }
 
 StudyProgramme.defaultProps = {
@@ -115,10 +117,10 @@ StudyProgramme.defaultProps = {
   programmes: {}
 }
 
-const mapStateToProps = ({ populationDegreesAndProgrammes, localize }) => {
+const mapStateToProps = ({ populationDegreesAndProgrammes, localize, auth: { token: { rights, roles } } }) => {
   const programmes = populationDegreesAndProgrammes.data ?
     populationDegreesAndProgrammes.data.programmes : {}
-  return { programmes, language: getActiveLanguage(localize).code }
+  return { programmes, language: getActiveLanguage(localize).code, rights, userRoles: getUserRoles(roles) }
 }
 
 export default connect(mapStateToProps)(withRouter(StudyProgramme))

@@ -1,16 +1,15 @@
 import React from 'react'
 import qs from 'query-string'
 import { Header, Icon } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 import { uniq } from 'lodash'
-import { shape, string, number, oneOfType, arrayOf } from 'prop-types'
+import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
-import { userIsAdmin } from '../../../../../common'
+import { getUserIsAdmin } from '../../../../../common'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
-const StudentTable = ({ stats, name, history }) => {
-  const admin = userIsAdmin()
-
+const StudentTable = ({ stats, name, history, isAdmin }) => {
   const showPopulation = (yearcode, year) => {
     const coursecodes = stats.map(s => s.coursecode)
     const queryObject = { yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), year }
@@ -52,7 +51,7 @@ const StudentTable = ({ stats, name, history }) => {
             key: 'TIME',
             title: 'Time',
             getRowVal: s => s.code,
-            getRowContent: s => (admin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name)} /></div>) : s.name),
+            getRowContent: s => (isAdmin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name)} /></div>) : s.name),
             headerProps: { rowSpan: 2, width: 3 }
           }, {
             key: 'TOTAL',
@@ -118,7 +117,8 @@ const StudentTable = ({ stats, name, history }) => {
 StudentTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  isAdmin: bool.isRequired
 }
 
-export default StudentTable
+export default connect(({ auth: { token: { roles } } }) => ({ isAdmin: getUserIsAdmin(roles) }))(StudentTable)
