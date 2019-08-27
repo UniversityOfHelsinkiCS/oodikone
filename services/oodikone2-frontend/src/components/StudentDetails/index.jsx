@@ -1,8 +1,8 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { Segment, Table, Icon } from 'semantic-ui-react'
+import { Segment, Table, Icon, Label, Header } from 'semantic-ui-react'
 import { isEmpty, sortBy, flattenDeep } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
@@ -13,6 +13,7 @@ import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCha
 import SearchResultTable from '../SearchResultTable'
 import { byDateDesc, reformatDate, getTextIn } from '../../common'
 import { clearCourseStats } from '../../redux/coursestats'
+import SortableTable from '../SortableTable'
 
 class StudentDetails extends Component {
   componentDidMount() {
@@ -102,11 +103,53 @@ class StudentDetails extends Component {
       ]
     })
     return (
-      <SearchResultTable
-        headers={courseHeaders}
-        rows={courseRows}
-        noResultText={translate('common.noResults')}
-      />
+      <Fragment>
+        <Header content="Courses" />
+        <SearchResultTable
+          headers={courseHeaders}
+          rows={courseRows}
+          noResultText={translate('common.noResults')}
+        />
+      </Fragment>
+    )
+  }
+
+  renderTags = () => {
+    const { student, language } = this.props
+    const data = Object.values(student.tags.reduce((acc, t) => {
+      if (!acc[t.programme.code]) acc[t.programme.code] = { programme: t.programme, tags: [] }
+      acc[t.tag.studytrack].tags.push(t)
+      return acc
+    }, {}))
+    if (data.length === 0) return null
+    return (
+      <Fragment>
+        <Header content="Tags" />
+        <SortableTable
+          data={data}
+          getRowKey={t => t.programme.code}
+          columns={[
+            {
+              key: 'PROGRAMME',
+              title: 'Programme',
+              getRowVal: t => getTextIn(t.programme.name, language),
+              cellProps: { collapsing: true }
+            },
+            {
+              key: 'CODE',
+              title: 'Code',
+              getRowVal: t => t.programme.code,
+              cellProps: { collapsing: true }
+            },
+            {
+              key: 'TAGS',
+              title: 'Tags',
+              getRowVal: t => sortBy(t.tags.map(tt => tt.tag.tagname)).join(':'),
+              getRowContent: t => sortBy(t.tags, t => t.tag.tagname).map(t => <Label key={t.tag.tag_id} content={t.tag.tagname} />)
+            }
+          ]}
+        />
+      </Fragment>
     )
   }
 
@@ -157,57 +200,60 @@ class StudentDetails extends Component {
     }
 
     return (
-      <Table className="fixed-header">
-        <Table.Header>
-          <Table.Row>
-            {studyRightHeaders.map((header, index) => (
-              <Table.HeaderCell key={index}/* eslint-disable-line */>
-                {header}
-              </Table.HeaderCell>
-            ))
-            }
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {studyRightRows.map((c) => {
-            if (c.elements.programmes.length > 0 || c.elements.degrees.length > 0) {
-              return (
-                <Table.Row key={c.studyrightid}>
-                  <Table.Cell verticalAlign="middle">
-                    {c.elements.degrees.filter(filterDuplicates).map(degree => (
-                      <p key={degree.name}>{`${degree.name} (${reformatDate(degree.startdate, 'DD.MM.YYYY')} - ${reformatDate(degree.enddate, 'DD.MM.YYYY')})`} <br /> </p>
-                    ))}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {c.elements.programmes.filter(filterDuplicates).map(programme => (
-                      <p key={programme.name}>{`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(programme.enddate, 'DD.MM.YYYY')})`}
-                        <Icon name="level up alternate" onClick={() => this.showPopulationStatistics(programme.code, programme.startdate)} /> <br />
-                      </p>
-                    ))}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {c.elements.studytracks.filter(filterDuplicates).map(studytrack => (
-                      <p key={studytrack.name}>{`${studytrack.name} (${reformatDate(studytrack.startdate, 'DD.MM.YYYY')} - ${reformatDate(studytrack.enddate, 'DD.MM.YYYY')})`}<br /> </p>
-                    ))}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {c.canceldate ? // eslint-disable-line
-                      <div><p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p></div>
-                      :
-                      c.graduated ?
-                        <div><Icon name="check circle outline" color="green" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
+      <Fragment>
+        <Header content="Studyrights" />
+        <Table className="fixed-header">
+          <Table.Header>
+            <Table.Row>
+              {studyRightHeaders.map(header => (
+                <Table.HeaderCell key={header}>
+                  {header}
+                </Table.HeaderCell>
+              ))
+              }
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {studyRightRows.map((c) => {
+              if (c.elements.programmes.length > 0 || c.elements.degrees.length > 0) {
+                return (
+                  <Table.Row key={c.studyrightid}>
+                    <Table.Cell verticalAlign="middle">
+                      {c.elements.degrees.filter(filterDuplicates).map(degree => (
+                        <p key={degree.name}>{`${degree.name} (${reformatDate(degree.startdate, 'DD.MM.YYYY')} - ${reformatDate(degree.enddate, 'DD.MM.YYYY')})`} <br /> </p>
+                      ))}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {c.elements.programmes.filter(filterDuplicates).map(programme => (
+                        <p key={programme.name}>{`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(programme.enddate, 'DD.MM.YYYY')})`}
+                          <Icon name="level up alternate" onClick={() => this.showPopulationStatistics(programme.code, programme.startdate)} /> <br />
+                        </p>
+                      ))}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {c.elements.studytracks.filter(filterDuplicates).map(studytrack => (
+                        <p key={studytrack.name}>{`${studytrack.name} (${reformatDate(studytrack.startdate, 'DD.MM.YYYY')} - ${reformatDate(studytrack.enddate, 'DD.MM.YYYY')})`}<br /> </p>
+                      ))}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {c.canceldate ? // eslint-disable-line
+                        <div><p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p></div>
                         :
-                        <div><Icon name="circle outline" color="red" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
-                    }
+                        c.graduated ?
+                          <div><Icon name="check circle outline" color="green" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
+                          :
+                          <div><Icon name="circle outline" color="red" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
+                      }
 
-                  </Table.Cell>
-                </Table.Row>
-              )
-            }
-            return null
-          })}
-        </Table.Body>
-      </Table>
+                    </Table.Cell>
+                  </Table.Row>
+                )
+              }
+              return null
+            })}
+          </Table.Body>
+        </Table>
+      </Fragment>
     )
   }
 
@@ -228,6 +274,7 @@ class StudentDetails extends Component {
           translate={translate}
         />
         {this.renderCreditsGraph()}
+        {this.renderTags()}
         {this.renderStudyRights()}
         {this.renderCourseParticipation()}
       </Segment>
@@ -259,7 +306,11 @@ StudentDetails.propTypes = {
     fetched: bool,
     started: string,
     studentNumber: string,
-    tags: arrayOf(string)
+    tags: arrayOf(shape({
+      programme: shape({ code: string, name: shape({}) }),
+      studentnumber: string,
+      tag: shape({ studytrack: string, tagname: string })
+    }))
   }),
   pending: bool.isRequired,
   error: bool.isRequired

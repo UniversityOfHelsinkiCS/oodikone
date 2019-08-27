@@ -774,7 +774,7 @@ PopulationSearchForm.propTypes = {
   isAdmin: bool.isRequired
 }
 
-const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, localize, tags, auth: { roles } }) => {
+const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, localize, tags, auth: { token: { roles } } }) => {
   const { language } = settings
   const { pending } = populationDegreesAndProgrammes
   return ({

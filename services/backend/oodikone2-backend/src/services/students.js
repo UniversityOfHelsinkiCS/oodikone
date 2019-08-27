@@ -2,6 +2,10 @@ const Sequelize = require('sequelize')
 const { sequelize } = require('../database/connection')
 const moment = require('moment')
 const { Student, Credit, Course, Studyright, StudyrightElement, ElementDetails } = require('../models')
+const {
+  TagStudent,
+  Tag
+} = require('../models/models_kone')
 const Op = Sequelize.Op
 
 const createStudent = student => Student.create(student)
@@ -16,31 +20,57 @@ const updateStudent = student => {
   })
 }
 
-const byId = async (id) => Student.findByPk(id, {
-  include: [
-    {
-      model: Credit,
-      separate: true,
-      include: {
-        model: Course,
-      }
-    },
-    {
-      model: Studyright,
-      include: {
-        model: StudyrightElement,
-        include: {
-          model: ElementDetails,
-          where: {
-            type: {
-              [Op.in]: [10, 20, 30]
+const byId = async (id) => {
+  const [student, tags] = await Promise.all([
+    Student.findByPk(id, {
+      include: [
+        {
+          model: Credit,
+          separate: true,
+          include: {
+            model: Course,
+          }
+        },
+        {
+          model: Studyright,
+          include: {
+            model: StudyrightElement,
+            include: {
+              model: ElementDetails,
+              where: {
+                type: {
+                  [Op.in]: [10, 20, 30]
+                }
+              }
             }
           }
         }
+      ]
+    }),
+    TagStudent.findAll({
+      include: [
+        {
+          model: Tag
+        }
+      ],
+      where: {
+        studentnumber: id
+      }
+    })
+  ])
+  const tagprogrammes = await ElementDetails.findAll({
+    where: {
+      code: {
+        [Op.in]: tags.map(t => t.tag.studytrack)
       }
     }
-  ]
-})
+  })
+  student.tags = tags.map(t => ({
+    ...t.get(),
+    programme: tagprogrammes.find(p => p.code === t.tag.studytrack)
+  }))
+  return student
+}
 
 const findByCourseAndSemesters = async (coursecodes, yearcode) =>
   sequelize.query(`
@@ -49,7 +79,7 @@ const findByCourseAndSemesters = async (coursecodes, yearcode) =>
     FROM student
     INNER JOIN credit ON
       student.studentnumber=credit.student_studentnumber
-    WHERE 
+    WHERE
       course_code IN (:coursecodes) AND
       attainment_date
     BETWEEN
@@ -94,7 +124,8 @@ const formatStudent = ({
   semester_enrollments,
   transfers,
   updatedAt,
-  createdAt
+  createdAt,
+  tags
 }) => {
   const toCourse = ({
     grade,
@@ -172,7 +203,7 @@ const formatStudent = ({
     email,
     semesterenrollments,
     updatedAt: updatedAt || createdAt,
-    tags: []
+    tags
   }
 }
 
