@@ -42,6 +42,8 @@ const AcademicYearFilter = ({ academicYears, semesterCode, handleSemesterCodeCha
             options={academicYearSelectOptions}
             value={semesterCode}
             onChange={handleSemesterCodeChangeFn}
+            selectOnBlur={false}
+            selectOnNavigation={false}
           />
         </div>
         <Button

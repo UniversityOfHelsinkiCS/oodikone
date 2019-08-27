@@ -56,6 +56,8 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
                 placeholder="select"
                 options={[{ key: 1, text: 'have', value: true }, { key: 2, text: 'don\'t have', value: false }]}
                 onChange={handleCompChange}
+                selectOnBlur={false}
+                selectOnNavigation={false}
               />
             </Form.Field>
             <Form.Field>
@@ -67,6 +69,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
                 options={options}
                 onChange={handleChange}
                 selectOnBlur={false}
+                selectOnNavigation={false}
               />
             </Form.Field>
             <Form.Field>

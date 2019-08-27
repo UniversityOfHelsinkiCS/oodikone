@@ -65,6 +65,8 @@ class StartingThisSemester extends Component {
                   defaultValue="started"
                   onChange={this.handleChange}
                   options={dropDownOptions}
+                  selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
               </Form.Field>
               <Form.Field>

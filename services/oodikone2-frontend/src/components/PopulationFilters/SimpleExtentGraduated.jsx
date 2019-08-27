@@ -55,6 +55,7 @@ const SimpleExtentGraduated = (props) => {
                 onChange={handleChange}
                 options={complementedOptions}
                 selectOnBlur={false}
+                selectOnNavigation={false}
               />
             </Form.Field>
             {`graduated from ${getTextIn(programme, language)}`}
