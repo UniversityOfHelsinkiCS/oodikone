@@ -41,7 +41,8 @@ const initialQuery = () => ({
   semesters: ['FALL', 'SPRING'],
   studentStatuses: [],
   studyRights: [],
-  months: months('2017', 'FALL')
+  months: months('2017', 'FALL'),
+  tag: ''
 })
 
 const PopulationSearchForm = (props) => {
@@ -50,8 +51,7 @@ const PopulationSearchForm = (props) => {
     isLoading: false,
     showAdvancedSettings: false,
     momentYear: Datetime.moment('2017-01-01'),
-    floatMonths: months('2017', 'FALL'),
-    selectedTag: ''
+    floatMonths: months('2017', 'FALL')
   })
   const [didMount, setDidMount] = useState(false)
   const [searchHistory, addItemToSearchHistory] = useSearchHistory('populationSearch', 8)
@@ -65,8 +65,7 @@ const PopulationSearchForm = (props) => {
     isLoading,
     showAdvancedSettings,
     momentYear,
-    floatMonths,
-    selectedTag
+    floatMonths
   } = totalState
 
   const {
@@ -117,12 +116,13 @@ const PopulationSearchForm = (props) => {
     const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses'])
     const queryCodes = Object.values(query.studyRights).filter(e => e != null)
     const uuid = uuidv4()
-    const request = { ...formattedQueryParams, studyRights: queryCodes, uuid, tag: selectedTag }
+    const request = { ...formattedQueryParams, studyRights: queryCodes, uuid }
+    console.log(request)
     setState({ isLoading: true })
     props.setLoading()
 
     fetchPopulationPromises.current = cancelablePromise(Promise.all([
-      props.getPopulationStatistics({ ...formattedQueryParams, uuid, tag: selectedTag, onProgress }),
+      props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }),
       props.getPopulationCourses(request),
       props.getPopulationFilters(request),
       props.getMandatoryCourses(formattedQueryParams.studyRights.programme)
@@ -136,7 +136,7 @@ const PopulationSearchForm = (props) => {
       }
       setState({ isLoading: false })
       // not a good solution FIX
-      setState({ selectedTag: '' })
+      setState({ query: { tag: '' } })
     }
   }
 
@@ -302,7 +302,10 @@ const PopulationSearchForm = (props) => {
   const handleTagSearch = (event, { value }) => {
     const tag = tags.find(t => t.tag_id === value)
     setState({
-      selectedTag: tag
+      query: {
+        ...query,
+        tag: tag.tag_id
+      }
     })
   }
 
@@ -678,12 +681,6 @@ const PopulationSearchForm = (props) => {
                 isValidDate={validYearCheck}
                 onChange={handleTagYearSelect}
               />
-              <Button
-                disabled={!selectedTag}
-                onClick={handleSubmit}
-              >
-                Search by tag
-              </Button>
             </Form.Field>
           </Form.Group>) : null}
       </div>)

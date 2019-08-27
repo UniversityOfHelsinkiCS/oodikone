@@ -22,9 +22,10 @@ export const getPopulationStatistics = ({
     studentStatuses,
     months,
     studyRights,
-    tag: tag ? tag.tag_id : null,
+    tag,
     startYear
   }
+  console.log(tag)
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }
 
