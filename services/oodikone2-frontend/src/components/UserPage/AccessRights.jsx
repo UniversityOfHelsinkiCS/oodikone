@@ -71,7 +71,7 @@ const mapStateToProps = (state, props) => {
   const programmes = options.map(formatToOptions).sort((p1, p2) => p1.text.localeCompare(p2.text))
   return {
     programmes,
-    pending: state.users.userunitpending
+    pending: Boolean(state.users.userunitpending)
   }
 }
 
