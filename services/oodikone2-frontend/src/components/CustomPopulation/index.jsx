@@ -2,16 +2,28 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Button, Modal, Form, TextArea, Segment, Header } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
-import { shape, func, arrayOf, bool } from 'prop-types'
+import { shape, func, arrayOf, bool, string } from 'prop-types'
+import { intersection, difference } from 'lodash'
 
 import { getUserIsAdmin } from '../../common'
 import { getCustomPopulation } from '../../redux/populations'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
+import { clearPopulationFilters } from '../../redux/populationFilters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
-import PopulationCourseStats from '../PopulationCourseStats'
+import CustomPopulationFilters from '../CustomPopulationFilters'
+import CustomPopulationCourses from '../CustomPopulationCourses'
+import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
 
-const CustomPopulation = ({ getCustomPopulationDispatch, getCustomPopulationCoursesByStudentnumbers, custompop, translate, courses, pending, isAdmin }) => {
+const CustomPopulation = ({
+  getCustomPopulationDispatch,
+  getCustomPopulationCoursesByStudentnumbers,
+  custompop,
+  translate,
+  isAdmin,
+  selectedStudents,
+  clearPopulationFiltersDispatch
+}) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
 
@@ -20,6 +32,7 @@ const CustomPopulation = ({ getCustomPopulationDispatch, getCustomPopulationCour
     const studentnumbers = input.match(/[0-9]+/g)
     getCustomPopulationDispatch({ studentnumberlist: studentnumbers })
     getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: studentnumbers })
+    clearPopulationFiltersDispatch()
     setModal(false)
   }
   const renderCustomPopulationSearch = () => (
@@ -55,30 +68,31 @@ const CustomPopulation = ({ getCustomPopulationDispatch, getCustomPopulationCour
     </Modal>
   )
 
-  const renderCustomPopulation = () => {
-    const selectedStudents = custompop.map(student => student.studentNumber)
-    return (
-      <div>
+  const renderCustomPopulation = () => (
+    <div>
+      <Segment>
+        <CustomPopulationFilters samples={custompop} coursecodes={[]} />
         <Segment>
           <Header size="medium" dividing>
             {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
           </Header>
           <CreditAccumulationGraphHighCharts students={custompop} selectedStudents={selectedStudents} translate={translate} />
         </Segment>
-        <Segment>
-          <PopulationCourseStats
-            courses={courses}
-            pending={pending}
-            selectedStudents={selectedStudents}
-          />
-        </Segment>
-        <PopulationStudents
-          samples={custompop}
-          selectedStudents={selectedStudents}
-        />
-      </div>
-    )
-  }
+      </Segment>
+      <Segment>
+        <Header>Programme distribution</Header>
+        <CustomPopulationProgrammeDist samples={custompop} selectedStudents={selectedStudents} />
+      </Segment>
+      <CustomPopulationCourses
+        selectedStudents={selectedStudents}
+      />
+      <PopulationStudents
+        samples={custompop}
+        selectedStudents={selectedStudents}
+      />
+    </div>
+  )
+
 
   if (!isAdmin) return <div>you are not an admin, go away</div>
 
@@ -95,17 +109,44 @@ CustomPopulation.propTypes = {
   custompop: arrayOf(shape({})).isRequired,
   getCustomPopulationDispatch: func.isRequired,
   getCustomPopulationCoursesByStudentnumbers: func.isRequired,
-  courses: shape({}).isRequired,
-  pending: bool.isRequired,
-  isAdmin: bool.isRequired
+  clearPopulationFiltersDispatch: func.isRequired,
+  isAdmin: bool.isRequired,
+  selectedStudents: arrayOf(string).isRequired
 }
 
-const mapStateToProps = ({ populations, localize, populationCourses, auth: { token: { roles } } }) => ({
-  translate: getTranslate(localize),
-  custompop: populations.data.students || [],
-  courses: populationCourses.data,
-  pending: populationCourses.pending,
-  isAdmin: getUserIsAdmin(roles)
-})
+const mapStateToProps = ({ populationFilters, populations, localize, populationCourses, auth: { token: { roles } } }) => {
+  const samples = populations.data.students ? populations.data.students : []
+  let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
+  const { complemented } = populationFilters
 
-export default connect(mapStateToProps, { getCustomPopulationDispatch: getCustomPopulation, getCustomPopulationCoursesByStudentnumbers })(CustomPopulation)
+  if (samples.length > 0 && populationFilters.filters.length > 0) {
+    const studentsForFilter = (f) => {
+      if (f.type === 'CourseParticipation') {
+        return Object.keys(f.studentsOfSelectedField)
+      }
+      return samples.filter(f.filter).map(s => s.studentNumber)
+    }
+
+    const matchingStudents = populationFilters.filters.map(studentsForFilter)
+    selectedStudents = intersection(...matchingStudents)
+
+    if (complemented) {
+      selectedStudents = difference(samples.map(s => s.studentNumber), selectedStudents)
+    }
+  }
+
+  return ({
+    translate: getTranslate(localize),
+    custompop: populations.data.students || [],
+    courses: populationCourses.data,
+    pending: populationCourses.pending,
+    isAdmin: getUserIsAdmin(roles),
+    selectedStudents
+  })
+}
+
+export default connect(mapStateToProps, {
+  getCustomPopulationDispatch: getCustomPopulation,
+  getCustomPopulationCoursesByStudentnumbers,
+  clearPopulationFiltersDispatch: clearPopulationFilters
+})(CustomPopulation)

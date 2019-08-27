@@ -9,7 +9,7 @@ import PopulationCourseStats from '../PopulationCourseStats'
 import { refreshFilters } from '../../redux/populationFilters'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 
-const CourseStudentCourses = ({
+const CustomPopulationCourses = ({
   refreshNeeded,
   dispatchRefreshFilters,
   translate,
@@ -52,7 +52,7 @@ const CourseStudentCourses = ({
   )
 }
 
-CourseStudentCourses.propTypes = {
+CustomPopulationCourses.propTypes = {
   pending: bool.isRequired,
   courses: shape([]).isRequired,
   translate: func.isRequired,
@@ -74,4 +74,4 @@ const mapStateToProps = ({ localize, populationFilters, populationCourses }) => 
 export default connect(mapStateToProps, {
   dispatchRefreshFilters: refreshFilters,
   getCustomPopulationCoursesByStudentnumbersDispatch: getCustomPopulationCoursesByStudentnumbers
-})(CourseStudentCourses)
+})(CustomPopulationCourses)
