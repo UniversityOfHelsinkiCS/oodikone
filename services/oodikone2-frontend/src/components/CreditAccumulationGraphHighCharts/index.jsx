@@ -209,7 +209,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       let credits = 0
       let points = this.filterCoursesByDate(
         this.sortCoursesByDate(student.courses),
-        new Date(startDate).setFullYear(2017)
+        startDate
       ).map((course) => {
         if (course.passed && !course.isStudyModuleCredit) {
           credits += course.credits
