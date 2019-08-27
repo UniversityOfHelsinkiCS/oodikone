@@ -80,6 +80,7 @@ class EnrollmentStatus extends Component {
                   onChange={(e, data) => this.setState({ enrolled: data.value })}
                   options={[{ key: 1, text: 'present', value: 1 }, { key: 2, text: 'absent', value: 2 }]}
                   selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
 
               </Form.Field>
@@ -94,6 +95,7 @@ class EnrollmentStatus extends Component {
                   options={this.state.options}
                   onChange={this.handleTime}
                   selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
 
               </Form.Field>

@@ -40,6 +40,8 @@ class LeaderForm extends Component {
               search
               value={this.props.selectedyear}
               onChange={this.props.handleChange}
+              selectOnBlur={false}
+              selectOnNavigation={false}
             />
             <Form.Dropdown
               name="selectedcategory"
@@ -50,6 +52,8 @@ class LeaderForm extends Component {
               search
               value={this.props.selectedcategory}
               onChange={this.props.handleChange}
+              selectOnBlur={false}
+              selectOnNavigation={false}
             />
           </Form.Group>
         </Form>

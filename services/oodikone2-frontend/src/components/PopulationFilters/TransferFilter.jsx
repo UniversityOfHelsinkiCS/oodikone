@@ -106,6 +106,7 @@ class TransferFilter extends Component {
                     text: getTextIn(text.name, activeLanguage)
                   })), entry => entry.text)}
                   selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
               </Form.Field>
               <Form.Field>
@@ -127,6 +128,7 @@ class TransferFilter extends Component {
                     text: getTextIn(text.name, activeLanguage)
                   })), entry => entry.text)}
                   selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
               </Form.Field>
               <Form.Field>

@@ -15,6 +15,8 @@ const PopulationFilters = ({ courses, selectedCourse, setSelectedCourse }) => (
     clearable
     selection
     search
+    selectOnBlur={false}
+    selectOnNavigation={false}
   />
 )
 

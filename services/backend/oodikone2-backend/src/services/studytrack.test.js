@@ -1,5 +1,4 @@
 const {
-  studytrackToProviderCode,
   getCreditsForProvider,
   productivityStatsFromCredits,
   productivityStatsForProvider,
@@ -14,6 +13,7 @@ const {
 const { sequelize } = require('../models')
 const { ThesisTypeEnums, ThesisCourse } = require('../models/models_kone')
 const { readFileSync } = require('fs')
+const { mapToProviders } = require('../util/utils')
 
 const { MASTER, BACHELOR } = ThesisTypeEnums
 
@@ -67,13 +67,13 @@ test('Credits for provider should not contain credit for passed study module', a
 
 test('KH50_005 track code maps to 500-K005 provider code', () => {
   const track = 'KH50_005'
-  const provider = studytrackToProviderCode(track)
+  const provider = mapToProviders([track])[0]
   expect(provider).toBe('500-K005')
 })
 
 test('MH50_010 track code maps to 500-M010 provider code', () => {
   const track = 'MH50_010'
-  const provider = studytrackToProviderCode(track)
+  const provider = mapToProviders([track])[0]
   expect(provider).toBe('500-M010')
 })
 

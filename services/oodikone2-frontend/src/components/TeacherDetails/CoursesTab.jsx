@@ -16,6 +16,8 @@ const CourseStatsTab = ({ statistics, options, doSelect, selected }) => (
         search
         value={selected}
         onChange={(_, { value }) => doSelect(value)}
+        selectOnBlur={false}
+        selectOnNavigation={false}
       />
     </Form>
     {selected && <TeacherStatisticsTable statistics={statistics} onClickFn={() => { }} />}

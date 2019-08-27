@@ -2,6 +2,7 @@ const teachers = require('../services/teachers')
 const topteachers = require('../services/topteachers')
 const r = require('./router').routerWithWrapper()
 const { FEATURES } = require('../conf-backend')
+const { mapToProviders } = require('../util/utils')
 
 const router = FEATURES.ERROR_HANDLER ? r.wrapper : r.router
 
@@ -29,19 +30,6 @@ router.post('/top', async (req, res) => {
 router.get('/top/categories', async (req, res) => {
   const result = await topteachers.getCategoriesAndYears()
   res.json(result)
-})
-
-const mapToProviders = rights => rights.map((r) => {
-  if (r.includes('_')) {
-    let newPrefix = ''
-    let newSuffix = ''
-    const split = r.split('_')
-    newPrefix = `${split[0][2]}00`
-    newSuffix = `${split[0][0]}${split[1]}`
-    const providercode = `${newPrefix}-${newSuffix}`
-    return providercode
-  }
-  return r
 })
 
 router.get('/stats', async (req, res) => {

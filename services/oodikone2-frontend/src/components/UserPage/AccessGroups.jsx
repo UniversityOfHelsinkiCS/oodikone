@@ -48,6 +48,8 @@ class AccessGroups extends Component {
           value={this.state.selected}
           onChange={(_, { value }) => this.setState({ selected: value })}
           clearable
+          selectOnBlur={false}
+          selectOnNavigation={false}
         />
         <Divider />
         <Button
