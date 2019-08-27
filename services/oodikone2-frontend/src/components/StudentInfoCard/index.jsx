@@ -48,17 +48,10 @@ const StudentInfoCard = (props) => {
           <p style={{ fontSize: 14 }}>{`Updated at ${reformatDate(student.updatedAt, DISPLAY_DATE_FORMAT)}`}</p>
         </Card.Description>
         <div style={{ paddingTop: '4px' }}>
-          {updating ?
-            <Button disabled compact size="medium" labelPosition="left" onClick={() => props.updatePopulationStudents([student.studentNumber])} >
-              <Icon loading name="refresh" />
-              update student
-            </Button>
-            :
-            <Button compact floated="left" size="medium" labelPosition="left" onClick={() => props.updatePopulationStudents([student.studentNumber])} >
-              <Icon name="refresh" />
-              update student
-            </Button>
-          }
+          <Button disabled={updating} compact size="medium" labelPosition="left" onClick={() => props.updatePopulationStudents([student.studentNumber])} >
+            <Icon loading={updating} name="refresh" />
+            update student
+          </Button>
         </div>
       </Card.Content>
     </Card>
