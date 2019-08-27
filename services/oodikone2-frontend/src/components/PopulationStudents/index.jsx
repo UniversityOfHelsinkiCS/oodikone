@@ -336,7 +336,7 @@ class PopulationStudents extends Component {
 
     const verticalTitle = title => (
       // https://stackoverflow.com/a/41396815
-      <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>
+      <div style={{ writingMode: 'vertical-rl', minWidth: '32px', maxHeight: '20vh', overflowY: 'hidden', textAlign: 'left' }}>
         {title}
       </div>
     )
@@ -430,6 +430,7 @@ class PopulationStudents extends Component {
         key: m.code,
         title: verticalTitle(<Fragment>{getTextIn(m.name, this.props.language)}<br />{m.code}</Fragment>),
         cellProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
+        headerProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
         getRowVal: s => hasPassedMandatory(s.studentNumber, m.code),
         getRowContent: s => (
           hasPassedMandatory(s.studentNumber, m.code) ? (<Icon fitted name="check" color="green" />) : (null)
