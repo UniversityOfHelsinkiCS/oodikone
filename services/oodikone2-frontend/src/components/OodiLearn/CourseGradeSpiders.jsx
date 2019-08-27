@@ -56,6 +56,8 @@ class CourseGradeSpiders extends Component {
                     onChange={this.handleChange}
                     options={options}
                     value={selected}
+                    selectOnBlur={false}
+                    selectOnNavigation={false}
                   />
                 </Form.Field>
               </Form.Group>

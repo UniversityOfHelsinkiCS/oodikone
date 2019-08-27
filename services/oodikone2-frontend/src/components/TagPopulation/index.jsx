@@ -64,6 +64,8 @@ const TagPopulation = ({
           options={options}
           onChange={handleChange}
           value={selectedValue}
+          selectOnBlur={false}
+          selectOnNavigation={false}
         />
       </List.Item>
       <Button onClick={handleSubmit} disabled={selectedValue === '' || checkCount === 0}>add tag to multiple students</Button>

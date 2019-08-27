@@ -97,6 +97,7 @@ class PriorityStudyright extends Component {
                   onChange={this.handleChange}
                   options={degreeOptions}
                   selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
               </Form.Field>
               <Form.Field>
@@ -113,6 +114,7 @@ class PriorityStudyright extends Component {
                   onChange={this.handleChange}
                   options={programmeOptions}
                   selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
               </Form.Field>
               <Form.Field>
@@ -126,6 +128,7 @@ class PriorityStudyright extends Component {
                   onChange={this.handleChange}
                   options={this.priorityOptions}
                   selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
               </Form.Field>
               <Form.Field>

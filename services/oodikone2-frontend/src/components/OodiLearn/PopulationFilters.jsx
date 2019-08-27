@@ -22,6 +22,8 @@ const PopulationFilters = ({ form, setFormValue }) => (
                 value={form[field]}
                 onChange={(e, { value }) => setFormValue(field, value)}
                 placeholder="Any"
+                selectOnBlur={false}
+                selectOnNavigation={false}
               />
             </Table.Cell>
           </Table.Row>
