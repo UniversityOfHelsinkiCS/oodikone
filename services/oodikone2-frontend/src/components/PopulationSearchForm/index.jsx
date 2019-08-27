@@ -117,7 +117,6 @@ const PopulationSearchForm = (props) => {
     const queryCodes = Object.values(query.studyRights).filter(e => e != null)
     const uuid = uuidv4()
     const request = { ...formattedQueryParams, studyRights: queryCodes, uuid }
-    console.log(request)
     setState({ isLoading: true })
     props.setLoading()
 
