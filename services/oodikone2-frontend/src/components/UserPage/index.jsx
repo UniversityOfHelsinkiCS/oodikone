@@ -183,6 +183,8 @@ class UserPage extends Component {
                   value={this.props.user.faculty.map(f => f.faculty_code)}
                   options={sortBy(this.props.faculties.map(f => ({ key: f.code, text: getTextIn(f.name, language), description: f.code, value: f.code })), ['text'])}
                   onChange={(__, { value: facultycodes }) => this.props.setFaculties(user.id, facultycodes)}
+                  selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
               </Card.Description>
             </Card.Content>

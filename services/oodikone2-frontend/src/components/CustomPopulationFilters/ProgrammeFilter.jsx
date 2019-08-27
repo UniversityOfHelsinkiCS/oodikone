@@ -66,6 +66,8 @@ const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterActi
                 closeOnChange
                 style={{ width: '500px' }}
                 selection
+                selectOnBlur={false}
+                selectOnNavigation={false}
               />
             </Form.Field>
             <Form.Field>

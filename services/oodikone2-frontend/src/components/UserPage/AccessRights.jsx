@@ -42,6 +42,7 @@ const AccessRights = ({ uid, programmes, pending, ...props }) => {
         search={textAndDescriptionSearch}
         selection
         clearable
+        selectOnBlur={false}
         selectOnNavigation={false}
       />
       <Divider />

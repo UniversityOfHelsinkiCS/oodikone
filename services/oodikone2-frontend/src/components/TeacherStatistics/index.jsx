@@ -105,6 +105,8 @@ class TeacherStatistics extends Component {
                   options={filteredOptions}
                   value={semesterStart}
                   onChange={this.setStartSemester}
+                  selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
                 <Form.Dropdown
                   name="semesterEnd"
@@ -116,6 +118,8 @@ class TeacherStatistics extends Component {
                   disabled={!semesterStart}
                   value={semesterEnd}
                   onChange={this.handleChange}
+                  selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
               </Form.Group>
               <Form.Field>
@@ -129,6 +133,8 @@ class TeacherStatistics extends Component {
                   options={providerOptions}
                   value={this.state.providers}
                   onChange={this.handleChange}
+                  selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
               </Form.Field>
               <Button fluid content="Search" onClick={this.handleSubmit} disabled={invalidQueryParams} />

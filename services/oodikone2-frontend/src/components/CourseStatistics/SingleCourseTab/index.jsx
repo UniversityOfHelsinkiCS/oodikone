@@ -36,6 +36,8 @@ class SingleCourseTab extends Component {
                 options={courses}
                 onChange={(e, { value }) => this.setState({ selected: value })}
                 value={selected || courses.value}
+                selectOnBlur={false}
+                selectOnNavigation={false}
               />
             )}
             <Divider />
