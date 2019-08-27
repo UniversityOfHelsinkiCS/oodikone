@@ -4,8 +4,7 @@ import { node, shape, bool, func, arrayOf } from 'prop-types'
 import { Loader } from 'semantic-ui-react'
 import * as Sentry from '@sentry/browser'
 import { login as loginAction } from '../../redux/auth'
-
-const AccessDenied = React.lazy(() => import('../AccessDenied'))
+import AccessDenied from '../AccessDenied'
 
 class ErrorBoundary extends Component {
   state = {

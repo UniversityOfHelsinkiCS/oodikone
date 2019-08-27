@@ -2,21 +2,45 @@ import React, { Suspense } from 'react'
 import { Route, Switch } from 'react-router-dom'
 import { Loader } from 'semantic-ui-react'
 
-const WelcomePage = React.lazy(() => import('../WelcomePage'))
-const Populations = React.lazy(() => import('../PopulationStatistics'))
-const StudentStatistics = React.lazy(() => import('../StudentStatistics'))
-const CourseStatistics = React.lazy(() => import('../CourseStatistics'))
-const EnableUsers = React.lazy(() => import('../EnableUsers'))
-const StudyProgramme = React.lazy(() => import('../StudyProgramme'))
-const Teachers = React.lazy(() => import('../Teachers'))
-const Sandbox = React.lazy(() => import('../Sandbox'))
-const UsageStatistics = React.lazy(() => import('../UsageStatistics'))
-const OodiLearn = React.lazy(() => import('../OodiLearn'))
-const Feedback = React.lazy(() => import('../Feedback'))
-const Faculty = React.lazy(() => import('../Faculty'))
-const CoursePopulation = React.lazy(() => import('../CoursePopulation'))
-const CustomPopulation = React.lazy(() => import('../CustomPopulation'))
-const Updater = React.lazy(() => import('../Updater'))
+// From https://dev.to/goenning/how-to-retry-when-react-lazy-fails-mb5
+const retry = async (fn, retriesLeft = 3, interval = 500) => (
+  new Promise((resolve, reject) => {
+    fn()
+      .then(resolve)
+      .catch((error) => {
+        if (retriesLeft <= 1) {
+          if (error && error.message && error.message.match(/Loading .* chunk .* failed/)) {
+            // We probably made a release which deletes old js and css
+            // lazy load thus fails and user must reload page
+            resolve(null)
+            window.location.reload()
+          } else {
+            error(null)
+          }
+          return
+        }
+        setTimeout(() => {
+          retry(fn, retriesLeft - 1, interval).then(resolve, reject)
+        }, interval)
+      })
+  })
+)
+
+const WelcomePage = React.lazy(() => retry(() => import('../WelcomePage')))
+const Populations = React.lazy(() => retry(() => import('../PopulationStatistics')))
+const StudentStatistics = React.lazy(() => retry(() => import('../StudentStatistics')))
+const CourseStatistics = React.lazy(() => retry(() => import('../CourseStatistics')))
+const EnableUsers = React.lazy(() => retry(() => import('../EnableUsers')))
+const StudyProgramme = React.lazy(() => retry(() => import('../StudyProgramme')))
+const Teachers = React.lazy(() => retry(() => import('../Teachers')))
+const Sandbox = React.lazy(() => retry(() => import('../Sandbox')))
+const UsageStatistics = React.lazy(() => retry(() => import('../UsageStatistics')))
+const OodiLearn = React.lazy(() => retry(() => import('../OodiLearn')))
+const Feedback = React.lazy(() => retry(() => import('../Feedback')))
+const Faculty = React.lazy(() => retry(() => import('../Faculty')))
+const CoursePopulation = React.lazy(() => retry(() => import('../CoursePopulation')))
+const CustomPopulation = React.lazy(() => retry(() => import('../CustomPopulation')))
+const Updater = React.lazy(() => retry(() => import('../Updater')))
 
 const routes = {
   students: '/students/:studentNumber?',
