@@ -22,6 +22,8 @@ const ProgrammeDropdown = ({ options, label, name, onChange, onClear, value, ...
     search
     value={value}
     {...props}
+    selectOnBlur={false}
+    selectOnNavigation={false}
   />
 )
 

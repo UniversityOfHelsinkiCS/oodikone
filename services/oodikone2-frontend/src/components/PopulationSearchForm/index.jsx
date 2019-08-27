@@ -486,6 +486,8 @@ const PopulationSearchForm = (props) => {
         closeOnChange
         clearable
         fluid
+        selectOnBlur={false}
+        selectOnNavigation={false}
       />
     </Form.Field>
   )
@@ -504,6 +506,8 @@ const PopulationSearchForm = (props) => {
           onChange={handleDegreeChange}
           closeOnChange
           clearable
+          selectOnBlur={false}
+          selectOnNavigation={false}
         />
       </React.Fragment>)
     const renderableTracks = () => (
@@ -520,6 +524,8 @@ const PopulationSearchForm = (props) => {
           onChange={handleStudyTrackChange}
           closeOnChange
           clearable
+          selectOnBlur={false}
+          selectOnNavigation={false}
         />
       </React.Fragment>)
     if (studyRights.programme) {
@@ -659,6 +665,8 @@ const PopulationSearchForm = (props) => {
                 selection
                 options={options}
                 onChange={handleTagSearch}
+                selectOnBlur={false}
+                selectOnNavigation={false}
               />
               <label>Select starting year</label>
               <Datetime

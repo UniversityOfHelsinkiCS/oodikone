@@ -14,6 +14,8 @@ const YearFilter = ({ years, fromYear, toYear, handleChange }) => (
         placeholder="Select academic year"
         onChange={handleChange}
         value={fromYear}
+        selectOnBlur={false}
+        selectOnNavigation={false}
       />
       <Form.Dropdown
         label="To:"
@@ -24,6 +26,8 @@ const YearFilter = ({ years, fromYear, toYear, handleChange }) => (
         placeholder="Select academic year"
         onChange={handleChange}
         value={toYear}
+        selectOnBlur={false}
+        selectOnNavigation={false}
       />
     </Form.Group>
   </Fragment>

@@ -55,6 +55,7 @@ class CanceledStudyright extends Component {
                   onChange={this.handleChange}
                   options={this.options}
                   selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
               </Form.Field>
               <Form.Field>
