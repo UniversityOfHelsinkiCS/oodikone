@@ -41,6 +41,8 @@ const GradeFilter = ({ coursecodes, courseData, filter, setPopulationFilterActio
                 { key: 6, text: 'Hyv.', value: 'Hyv.' },
                 { key: 7, text: 'Hyl.', value: 'Hyl.' }]}
                 onChange={handleChange}
+                selectOnBlur={false}
+                selectOnNavigation={false}
               />
             </Form.Field>
             <Form.Field>

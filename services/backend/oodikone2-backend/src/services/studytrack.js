@@ -10,14 +10,7 @@ const {
 } = require('../models/models_kone')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { semesterStart, semesterEnd } = require('../util/semester')
-const isNumber = str => !Number.isNaN(Number(str))
-
-const studytrackToProviderCode = code => {
-  const [left, right] = code.split('_')
-  const prefix = [...left].filter(isNumber).join('')
-  const suffix = `${left[0]}${right}`
-  return `${prefix}0-${suffix}`
-}
+const { mapToProviders } = require('../util/utils')
 
 const formatCredit = credit => {
   const { id, credits, attainment_date } = credit
@@ -258,7 +251,7 @@ const combineStatistics = (creditStats, studyrightStats, thesisStats, creditsFor
 }
 
 const productivityStatsForStudytrack = async (studytrack, since) => {
-  const providercode = studytrackToProviderCode(studytrack)
+  const providercode = mapToProviders([studytrack])[0]
   const year = new Date(since).getFullYear()
   const startDate = `${year}-${semesterStart['FALL']}`
   const endDate = `${moment(since, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
@@ -460,14 +453,14 @@ const formatCreditsForProductivity = (credits) => {
 }
 
 const productivityCreditsFromStudyprogrammeStudents = async (studytrack, startDate, studentnumbers) => {
-  const providercode = studytrackToProviderCode(studytrack)
+  const providercode = mapToProviders([studytrack])[0]
   const credits = await getCreditsForMajors(providercode, startDate, studentnumbers)
   const formattedStudentCredits = formatCreditsForProductivity(credits)
   return formattedStudentCredits
 }
 
 const transferredCreditsForProductivity = async (studytrack, since) => {
-  const providercode = studytrackToProviderCode(studytrack)
+  const providercode = mapToProviders([studytrack])[0]
   const credits = await getTransferredCredits(providercode, since)
   const formattedCredits = formatCreditsForProductivity(credits)
   return formattedCredits
@@ -592,7 +585,6 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
 }
 
 module.exports = {
-  studytrackToProviderCode,
   getCreditsForProvider,
   productivityStatsFromCredits,
   productivityStatsForProvider,

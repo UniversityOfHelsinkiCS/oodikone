@@ -50,6 +50,7 @@ class GradeMeanFilter extends Component {
                   onChange={(e, data) => this.setState({ comparator: data.value })}
                   options={[{ key: 1, text: 'less than', value: 'less' }, { key: 2, text: 'more than', value: 'more' }]}
                   selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
 
               </Form.Field>
@@ -63,6 +64,7 @@ class GradeMeanFilter extends Component {
                   { key: 5, text: '5', value: 5 }]}
                   onChange={(e, data) => this.setState({ gradeMean: data.value })}
                   selectOnBlur={false}
+                  selectOnNavigation={false}
                 />
 
               </Form.Field>
