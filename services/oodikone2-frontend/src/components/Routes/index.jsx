@@ -14,7 +14,7 @@ const UsageStatistics = React.lazy(() => import('../UsageStatistics'))
 const OodiLearn = React.lazy(() => import('../OodiLearn'))
 const Feedback = React.lazy(() => import('../Feedback'))
 const Faculty = React.lazy(() => import('../Faculty'))
-const CourseStudents = React.lazy(() => import('../CourseStudents'))
+const CoursePopulation = React.lazy(() => import('../CoursePopulation'))
 const CustomPopulation = React.lazy(() => import('../CustomPopulation'))
 const Updater = React.lazy(() => import('../Updater'))
 
@@ -48,7 +48,7 @@ const Routes = () => (
       <Route exact path={routes.sandbox} component={Sandbox} />
       <Route exact path={routes.oodilearn} component={OodiLearn} />
       <Route exact path={routes.feedback} component={Feedback} />
-      <Route exact path={routes.coursepopulation} component={CourseStudents} />
+      <Route exact path={routes.coursepopulation} component={CoursePopulation} />
       <Route exact path={routes.custompopulation} component={CustomPopulation} />
       <Route exact path="/updater" component={Updater} />
     </Switch>

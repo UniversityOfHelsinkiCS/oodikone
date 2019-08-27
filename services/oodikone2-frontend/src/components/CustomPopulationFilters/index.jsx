@@ -29,7 +29,7 @@ const componentFor = {
   CourseParticipation
 }
 
-const CourseStudentsFilters = ({ samples, filters, clearPopulationFiltersDispatch, complemented, setComplementFilterDispatch, allStudyrights, coursecodes }) => {
+const CustomPopulationFilters = ({ samples, filters, clearPopulationFiltersDispatch, complemented, setComplementFilterDispatch, allStudyrights, coursecodes }) => {
   const [visible, setVisible] = useState(false)
 
   const renderAddFilters = () => {
@@ -60,7 +60,12 @@ const CourseStudentsFilters = ({ samples, filters, clearPopulationFiltersDispatc
     return (
       <Segment>
         <Header>Add filters <InfoBox content={Add} /></Header>
-        {unsetFilters.map(filterName => React.createElement(componentFor[filterName], { filter: { notSet: true }, key: filterName, samples, allStudyrights, coursecodes }))}
+        {unsetFilters.map((filterName) => {
+          if (window.location.pathname === '/custompopulation' && ['GradeFilter', 'CourseCreditFilter'].includes(filterName)) {
+            return null
+          }
+          return React.createElement(componentFor[filterName], { filter: { notSet: true }, key: filterName, samples, allStudyrights, coursecodes })
+        })}
         <Button onClick={() => setVisible(false)}>cancel</Button>
       </Segment>
     )
@@ -103,7 +108,7 @@ const CourseStudentsFilters = ({ samples, filters, clearPopulationFiltersDispatc
   )
 }
 
-CourseStudentsFilters.propTypes = {
+CustomPopulationFilters.propTypes = {
   filters: arrayOf(shape([])).isRequired,
   complemented: bool.isRequired,
   samples: arrayOf(shape([])).isRequired,
@@ -116,10 +121,10 @@ CourseStudentsFilters.propTypes = {
 const mapStateToProps = ({ populationFilters, populations }) => ({
   filters: populationFilters.filters,
   complemented: populationFilters.complemented,
-  allStudyrights: populations.data.studyrights
+  allStudyrights: populations.data.studyrights || {}
 })
 
 export default connect(mapStateToProps, {
   clearPopulationFiltersDispatch: clearPopulationFilters,
   setComplementFilterDispatch: setComplementFilter
-})(CourseStudentsFilters)
+})(CustomPopulationFilters)
