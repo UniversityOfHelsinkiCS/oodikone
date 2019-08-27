@@ -108,7 +108,7 @@ class StudentDetails extends Component {
         <SearchResultTable
           headers={courseHeaders}
           rows={courseRows}
-          noResultText={translate('common.noResults')}
+          noResultText="Student has courses marked"
         />
       </Fragment>
     )
