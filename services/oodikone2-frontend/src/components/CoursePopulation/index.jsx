@@ -12,14 +12,14 @@ import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import { clearPopulationFilters } from '../../redux/populationFilters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
-import CourseStudentCourses from '../CourseStudentCourses'
 import infoTooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
-import CourseStudentsFilters from '../CourseStudentsFilters'
+import CustomPopulationFilters from '../CustomPopulationFilters'
 import CourseStudentsGradeDist from '../CourseStudentsGradeDist'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
+import CustomPopulationCourses from '../CustomPopulationCourses'
 
-const CourseStudents = ({
+const CoursePopulation = ({
   getCoursePopulationDispatch,
   getCoursePopulationCoursesDispatch,
   getSingleCourseStatsDispatch,
@@ -57,7 +57,7 @@ const CourseStudents = ({
       {studentData.students && !pending ? (
         <Segment className="contentSegment">
           <Header className="segmentTitle" size="large" textAlign="center">Population of course {header}</Header>
-          <CourseStudentsFilters samples={studentData.students} coursecodes={codes} />
+          <CustomPopulationFilters samples={studentData.students} coursecodes={codes} />
           <Segment>
             <Header size="medium" dividing>
               {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
@@ -78,10 +78,8 @@ const CourseStudents = ({
             <Header>Programme distribution</Header>
             <CustomPopulationProgrammeDist samples={studentData.students} selectedStudents={selectedStudents} />
           </Segment>
-          <CourseStudentCourses
+          <CustomPopulationCourses
             selectedStudents={selectedStudents}
-            codes={codes}
-            yearCode={yearCode}
           />
           <PopulationStudents
             samples={studentData.students}
@@ -93,7 +91,7 @@ const CourseStudents = ({
   )
 }
 
-CourseStudents.propTypes = {
+CoursePopulation.propTypes = {
   getCoursePopulationDispatch: func.isRequired,
   getCoursePopulationCoursesDispatch: func.isRequired,
   getSingleCourseStatsDispatch: func.isRequired,
@@ -141,4 +139,4 @@ export default withRouter(connect(mapStateToProps, {
   getCoursePopulationCoursesDispatch: getCoursePopulationCourses,
   getSingleCourseStatsDispatch: getSingleCourseStats,
   clearPopulationFiltersDispatch: clearPopulationFilters
-})(CourseStudents))
+})(CoursePopulation))
