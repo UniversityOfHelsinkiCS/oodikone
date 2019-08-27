@@ -25,7 +25,6 @@ export const getPopulationStatistics = ({
     tag,
     startYear
   }
-  console.log(tag)
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }
 
