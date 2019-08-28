@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Progress } from 'semantic-ui-react'
-import { intersection } from 'lodash'
+import { intersection, orderBy } from 'lodash'
 import { shape, func, bool, arrayOf, string } from 'prop-types'
 
 import SearchResultTable from '../SearchResultTable'
@@ -17,11 +17,7 @@ const CoursePopulationCreditDist = ({ singleCourseStats, yearcode, pending, sele
       const grades = statistics ? Object.keys(statistics.students.grades) : []
       grades.forEach((grade) => {
         const filteredGrades = intersection(selectedStudents, statistics.students.grades[grade])
-        if (Number(grade) || grade === '0') {
-          array.push({ grade: Number(grade), amount: filteredGrades.length })
-        } else {
-          array.push({ grade, amount: filteredGrades.length })
-        }
+        array.push({ grade, amount: filteredGrades.length })
       })
       setGrades(array)
     }
@@ -29,7 +25,14 @@ const CoursePopulationCreditDist = ({ singleCourseStats, yearcode, pending, sele
   const setFilter = (row) => {
     setPopulationFilterDispatch(gradeFilter({ grade: row[0], coursecodes: singleCourseStats.alternatives, coursename: singleCourseStats.name }))
   }
-  const sortedCourseGrades = courseGrades.sort((a, b) => ((typeof Number(b.grade) === 'number') - (typeof Number(a.grade) === 'number')) || (b.grade > a.grade ? 1 : -1))
+
+  const sortedCourseGrades = orderBy(courseGrades, e => {
+    if (Number(e.grade)) {
+      return '_' + e.grade
+    }
+    return e.grade
+  }, ['desc'])
+
   const rows = sortedCourseGrades.map(g => [`${g.grade}`, g.amount, <Progress style={{ margin: '0px' }} percent={Math.round((g.amount / selectedStudents.length) * 100)} progress />])
   const headers = [
     'Grades',
