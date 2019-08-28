@@ -262,6 +262,7 @@ const count = (column, count, distinct = false) => {
 }
 
 const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents, tag) => { // eslint-disable-line
+
   const filteredExtents = []
   let studyrightWhere = {
     extentcode: {
@@ -459,14 +460,15 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE' }
   }
   const {
-    studyRights, startDate, months, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
+    studyRights, startDate, months, endDate, exchangeStudents, cancelledStudents, nondegreeStudents, tag
   } = parseQueryParams(formattedQueryParams)
 
   const studentnumbers = studentnumberlist ?
     studentnumberlist :
     await studentnumbersWithAllStudyrightElements(
-      studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
+      studyRights, tag !== '' ? '1900-01-01' : startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
     )
+    
   const students = await getStudentsIncludeCoursesBetween(
     studentnumbers,
     startDate,
