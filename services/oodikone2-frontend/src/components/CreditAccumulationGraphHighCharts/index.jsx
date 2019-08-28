@@ -111,7 +111,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       selectedStudents.includes(line.name))
 
     let lastCredits = null
-    if (this.isSingleStudentGraph()) {
+    if (this.isSingleStudentGraph() && !['/custompopulation', '/coursepopulation'].includes(window.location.pathname)) {
       const started = moment(students[0].started)
       const lastDate = moment(students.maxDate)
       const lastMonth = Math.ceil(this.getXAxisMonth(lastDate, started))
@@ -143,7 +143,6 @@ class CreditAccumulationGraphHighCharts extends Component {
         },
         split: false
       } : {}
-
     const options = {
       plotOptions: {
         series: {
