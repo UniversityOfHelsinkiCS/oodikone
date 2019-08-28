@@ -15,7 +15,7 @@ const retry = async (fn, retriesLeft = 3, interval = 500) => (
             resolve(null)
             window.location.reload()
           } else {
-            error(null)
+            reject(error)
           }
           return
         }

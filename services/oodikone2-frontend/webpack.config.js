@@ -3,19 +3,17 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const DeadCodePlugin = require('webpack-deadcode-plugin')
-const SentryWebpackPlugin = require('@sentry/webpack-plugin')
 
 const devServerPort = 8081
 const apiServerPort = 8080
 const apiAddress = process.env.BACKEND_ADDR || 'localhost'
 const backendURL = `http://${apiAddress}:${apiServerPort}`
 const BASE_PATH = process.env.BASE_PATH || '/'
-const { SENTRY_RELEASE_VERSION, SENTRY_PROJECT, SENTRY_ORG, SENTRY_URL } = process.env
-const noSentryVersion = !Boolean(SENTRY_RELEASE_VERSION)
+const { SENTRY_RELEASE_VERSION } = process.env
+const noSentryVersion = !SENTRY_RELEASE_VERSION
 const sentryreleaseversion = noSentryVersion ? 'unknown' : SENTRY_RELEASE_VERSION
-const sentryDryRun = noSentryVersion || !Boolean(SENTRY_PROJECT) || !Boolean(SENTRY_ORG) || !Boolean(SENTRY_URL)
 
-console.log('sentry settings:', { sentryDryRun, SENTRY_RELEASE_VERSION })
+console.log('sentry settings:', { SENTRY_RELEASE_VERSION })
 
 module.exports = (env, args) => {
   const { mode } = args
@@ -86,13 +84,6 @@ module.exports = (env, args) => {
       new MiniCssExtractPlugin({
         filename: '[name]-[hash].css',
         chunkFilename: '[id]-[hash].css'
-      }),
-      new SentryWebpackPlugin({
-        include: 'dist',
-        ignoreFile: '.sentrycliignore',
-        ignore: ['node_modules', 'webpack.config.js'],
-        release: sentryreleaseversion,
-        dryRun: sentryDryRun
       })
     ],
     optimization: {
