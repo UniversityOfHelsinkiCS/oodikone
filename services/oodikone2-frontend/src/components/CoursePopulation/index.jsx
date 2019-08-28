@@ -15,7 +15,7 @@ import PopulationStudents from '../PopulationStudents'
 import infoTooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
 import CustomPopulationFilters from '../CustomPopulationFilters'
-import CourseStudentsGradeDist from '../CourseStudentsGradeDist'
+import CoursePopulationGradeDist from '../CoursePopulationGradeDist'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
 import CustomPopulationCourses from '../CustomPopulationCourses'
 
@@ -72,7 +72,7 @@ const CoursePopulation = ({
           </Segment>
           <Segment>
             <Header>Grade distribution</Header>
-            <CourseStudentsGradeDist yearcode={yearCode} selectedStudents={selectedStudents} />
+            <CoursePopulationGradeDist yearcode={yearCode} selectedStudents={selectedStudents} />
           </Segment>
           <Segment>
             <Header>Programme distribution</Header>
