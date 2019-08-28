@@ -134,8 +134,8 @@ const PopulationSearchForm = (props) => {
         props.setPopulationFilter(transferTo(false))
       }
       setState({ isLoading: false })
-      // not a good solution FIX
-      setState({ query: { tag: '' } })
+      // not a good solution FIX, breaks shit even
+      // setState({ query: { tag: '' } })
     }
   }
 
