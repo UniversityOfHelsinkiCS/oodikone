@@ -26,13 +26,12 @@ const CoursePopulationCreditDist = ({ singleCourseStats, yearcode, pending, sele
     setPopulationFilterDispatch(gradeFilter({ grade: row[0], coursecodes: singleCourseStats.alternatives, coursename: singleCourseStats.name }))
   }
 
-  const sortedCourseGrades = orderBy(courseGrades, e => {
+  const sortedCourseGrades = orderBy(courseGrades, (e) => {
     if (Number(e.grade)) {
-      return '_' + e.grade
+      return `_${e.grade}`
     }
     return e.grade
   }, ['desc'])
-
   const rows = sortedCourseGrades.map(g => [`${g.grade}`, g.amount, <Progress style={{ margin: '0px' }} percent={Math.round((g.amount / selectedStudents.length) * 100)} progress />])
   const headers = [
     'Grades',
