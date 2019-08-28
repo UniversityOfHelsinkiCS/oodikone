@@ -1,22 +1,8 @@
 const Schedule = require('../models')
-const { sleep } = require('./util')
+const { sleep, getStudentNumberChecksum } = require('./util')
 
 const createTasks = async () => {
   console.log('Creating studentnumbers to DB...')
-
-  const getStudentNumberChecksum = studentNumber => {
-    const studentNumberString = String(studentNumber)
-    let checksumNumbers = [7, 3, 1]
-    let checksum = 0
-
-    for (let i = 0; i < studentNumberString.length; i++) {
-      // go from end t start
-      let currentNumber = studentNumberString[studentNumberString.length - (i + 1)]
-      checksum += currentNumber * (checksumNumbers[i % checksumNumbers.length])
-    }
-
-    return (10 - (checksum % 10)) % 10
-  }
 
   const writeStudents = async (studentsToAdd) => {
     const tasks = studentsToAdd.map(student => ({ task: student, status: 'CREATED', type: 'student', active: true }))
