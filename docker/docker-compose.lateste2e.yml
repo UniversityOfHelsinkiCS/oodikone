@@ -27,10 +27,6 @@ services:
     build:
       args:
         BASE_PATH: /
-        SENTRY_URL: ${SENTRY_URL}
-        SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
-        SENTRY_ORG: sentry
-        SENTRY_PROJECT: oodifront
       cache_from:
         - toska/oodikone2-frontend:trunk
         - toska/oodikone2-frontend:staging
