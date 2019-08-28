@@ -83,7 +83,8 @@ jobs:
                 sh -c 'npm run sentry-cli -- releases new --finalize "$(cat /SENTRY_RELEASE_VERSION)" && \
                 npm run sentry-cli -- releases files "$(cat /SENTRY_RELEASE_VERSION)" upload-sourcemaps --rewrite dist'
             fi
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            echo "$DOCKER_PASS" > DOCKER_PASS
+            cat DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
             npm run docker:ci -- push
             if [ "${DEPLOY}" == "true" ]; then
               curl --silent -X POST -H 'Content-type: application/json' --data "{\"text\":\"${CIRCLE_BRANCH}${CIRCLE_TAG} started auto deployment!\"}" ${SLACKBOT_URL}
