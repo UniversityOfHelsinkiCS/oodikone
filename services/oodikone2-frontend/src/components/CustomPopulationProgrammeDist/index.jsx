@@ -35,7 +35,7 @@ const CustomPopulationProgrammeDist = ({ samples, selectedStudents, setPopulatio
     const rows = Object.keys(allProgrammes)
       .map(code =>
         [`${allProgrammes[code].programme.name}, ${code}`, allProgrammes[code].students.length, <Progress style={{ margin: '0px' }} percent={Math.round((allProgrammes[code].students.length / selectedStudents.length) * 100)} progress />])
-    const sortedRows = rows.sort((a, b) => b[1] > a[1])
+    const sortedRows = rows.sort((a, b) => b[1] - a[1])
     setRows(sortedRows)
   }, [selectedStudents])
 
