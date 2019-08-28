@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table } from 'semantic-ui-react'
+import { Table, Segment } from 'semantic-ui-react'
 import { arrayOf, array, string, func, bool } from 'prop-types'
 
 import './searchResultsTable.css'
@@ -42,15 +42,17 @@ const SearchResultTable = ({
 }) => {
   if (rows.length > 0) {
     return (
-      <Table
-        unstackable
-        selectable={selectable}
-        definition={definition}
-        className="fixed-header"
-      >
-        {getHeaderRow(headers)}
-        {getTableBody(rows, rowClickFn, selectable)}
-      </Table>)
+      <Segment style={{ overflow: 'scroll', maxHeight: '80vh', padding: 0 }}>
+        <Table
+          unstackable
+          selectable={selectable}
+          definition={definition}
+          className="fixed-header"
+        >
+          {getHeaderRow(headers)}
+          {getTableBody(rows, rowClickFn, selectable)}
+        </Table>
+      </Segment>)
   }
   return <div>{noResultText}</div>
 }
