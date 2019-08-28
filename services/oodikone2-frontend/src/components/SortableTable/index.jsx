@@ -57,22 +57,6 @@ class SortableTable extends Component {
   )
 
   render() {
-    const calculateSkippedColumns = () => {
-      const { columns, showNames } = this.props
-      const { collapsed } = this.state
-      const defaultColumnCount = showNames ? 6 : 3
-      if (collapsed) {
-        const collapsedOrderNumbers = collapsed.map(c => c.headerProps.ordernumber)
-        return collapsedOrderNumbers.reduce((acc, curr) => {
-          const previousCols = columns.filter(c => c.headerProps && c.headerProps.ordernumber < curr)
-          const sumOfPreviousColSpans = previousCols.reduce((a, b) => a + b.headerProps.colSpan, 0)
-          return [
-            ...acc,
-            sumOfPreviousColSpans + columns.find(c => c.headerProps && c.headerProps.ordernumber === curr).headerProps.colSpan + defaultColumnCount]
-        }, [])
-      }
-      return []
-    }
     const { tableProps, getRowProps, columns, getRowKey, collapsingHeaders } = this.props
     const { selected, direction, collapsed } = this.state
     const columnsWithCollapsedHeaders = collapsingHeaders ? [...columns.filter(c => (
@@ -121,12 +105,8 @@ class SortableTable extends Component {
               key={getRowKey(row)}
               {...getRowProps && getRowProps(row)}
             >
-              {columns.filter(c => !c.parent).map((c, i) => {
+              {columns.filter(c => !c.parent).map((c) => {
                 if (collapsed.map(cell => cell.headerProps.title).includes(c.childOf)) {
-                  const skippedColumns = calculateSkippedColumns()
-                  if (skippedColumns.includes(i + 1)) {
-                    return <Table.Cell warning />
-                  }
                   return null
                 }
                 return (
@@ -139,6 +119,7 @@ class SortableTable extends Component {
                 )
               })
               }
+              {collapsed.map(() => <Table.Cell warning />)}
             </Table.Row>
           ))}
         </Table.Body>
