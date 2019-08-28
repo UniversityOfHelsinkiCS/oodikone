@@ -392,8 +392,6 @@ class PopulationStudents extends Component {
       return acc
     }, {})
 
-    if (mandatoryCourseLabels.length === 0) mandatoryCourseLabels.push({ id: 'null', label: '' })
-
     const sortedlabels = orderBy(
       uniqBy(mandatoryCourseLabels, l => l.label),
       [e => e.orderNumber],
