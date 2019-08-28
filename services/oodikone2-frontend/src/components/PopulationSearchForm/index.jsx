@@ -133,9 +133,14 @@ const PopulationSearchForm = (props) => {
       if (queryCodes[0] === 'KH50_001') {
         props.setPopulationFilter(transferTo(false))
       }
-      setState({ isLoading: false })
-      // not a good solution FIX, breaks shit even
-      // setState({ query: { tag: '' } })
+      setState({
+        isLoading: false,
+        query: {
+          ...query,
+          endYear: query.startYear,
+          tag: ''
+        }
+      })
     }
   }
 
