@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import { Table } from 'semantic-ui-react'
 import { shape, arrayOf, string, func, bool, element, oneOfType } from 'prop-types'
 import { sortBy } from 'lodash'
@@ -76,7 +76,7 @@ class SortableTable extends Component {
                   key={c.key}
                   content={c.title}
                   onClick={c.parent && collapsingHeaders && c.key !== 'general' ?
-                    this.handleCollapse({ title: this.verticalTitle(<Fragment>{c.headerProps.title}</Fragment>), headerProps: { ...c.headerProps, colSpan: 1, rowSpan: 2 }, key: c.key, collapsed: true, parent: c.parent }) :
+                    this.handleCollapse({ title: this.verticalTitle(c.headerProps.title), headerProps: { ...c.headerProps, colSpan: 1, rowSpan: 2 }, key: c.key, collapsed: true, parent: c.parent }) :
                     this.handleSort(c.key)}
                   sorted={c.parent ? undefined : sortDirection(c.key)}
                   {...c.headerProps}
@@ -119,7 +119,7 @@ class SortableTable extends Component {
                 )
               })
               }
-              {collapsed.map(() => <Table.Cell warning />)}
+              {collapsed.map(e => <Table.Cell key={e.key} warning />)}
             </Table.Row>
           ))}
         </Table.Body>
