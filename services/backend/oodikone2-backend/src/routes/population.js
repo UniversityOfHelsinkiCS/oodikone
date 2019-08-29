@@ -214,7 +214,7 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
     studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
   }
   try {
-    studyRights = JSON.parse(studyRightsJSON)
+    const studyRights = JSON.parse(studyRightsJSON)
     const newStartYear = await Population.getEarliestYear(studentnumberlist, studyRights)
     const result = await Population.optimizedStatisticsOf({
       startYear: newStartYear,
