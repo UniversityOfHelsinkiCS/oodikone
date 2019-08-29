@@ -1,7 +1,6 @@
 const { stan } = require('./nats_connection')
 const Schedule = require('../models')
-const { sleep } = require('./util')
-
+const { sleep, getStudentNumberChecksum } = require('./util')
 
 stan.on('connect', async () => {
   const taskspermin = 300
@@ -14,14 +13,14 @@ stan.on('connect', async () => {
   scheduleSub.on('message', async (msg) => {
     try {
       const { task, priority } = JSON.parse(msg.getData())
-      stan.publish(priority ? 'PriorityApi' : 'UpdateApi', JSON.stringify({ task }), (err) => {
+      stan.publish('status', JSON.stringify({ task, status: 'SCHEDULED', priority }), (err) => {
         if (err) {
           console.log('publish failed', err)
         }
       })
-      stan.publish('status', JSON.stringify({ task, status: 'SCHEDULED' }), (err) => {
+      stan.publish(priority ? 'PriorityApi' : 'UpdateApi', JSON.stringify({ task }), (err) => {
         if (err) {
-          console.log('publish failed')
+          console.log('publish failed', err)
         }
       })
       await sleep(60*1000)
@@ -100,7 +99,7 @@ const scheduleStudentsByArray = async (studentNumbers) => {
 const scheduleOldestNStudents = async (amount) => {
   try {
     const tasks = [...await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 }).limit(Number(amount))]
-    await publishAll(tasks, true)
+    await publishAll(tasks)
   } catch (e) {
     console.log(e)
   }
@@ -124,6 +123,31 @@ const rescheduleFetched = async () => {
   await publishAll(tasks)
 }
 
+const scheduleDaily = async () => {
+  const findStudentsRange = 10000
+  const highestStudentNumber = (await Schedule.find({ type: 'student', status: { $in: ['DONE', 'FETCHED'] } }).sort({ task: -1 }).limit(1))[0]
+  const regexResult = highestStudentNumber ? highestStudentNumber.task.match(/0(\d{7})\d/) : null
+  const minstudentnumber = 1000000
+  const studentNumberMid = regexResult && Number(regexResult[1]) || minstudentnumber+findStudentsRange
+  const min = Math.max(studentNumberMid-findStudentsRange, minstudentnumber)
+  const max = Math.min(studentNumberMid+findStudentsRange, 9999999)
+
+  console.log({ findStudentsRange, minstudentnumber, studentNumberMid, min, max })
+
+  const studentnumbers = []
+  const activeStudents = [...await Schedule.find({ type: 'student', active: true }).sort({ updatedAt: 1 })]
+  studentnumbers.push(...activeStudents.map(t => t.task))
+  for (let i = min; i <= max; ++i) {
+    studentnumbers.push(`0${i}${getStudentNumberChecksum(i)}`)
+  }
+  const oldestStudents = [...await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 }).limit(10000)]
+  studentnumbers.push(...oldestStudents.map(t => t.task))
+
+  const tasks = [...new Set(studentnumbers)].map(sn => ({ task: sn }))
+  console.log(tasks.length, 'tasks to schedule')
+  await publishAll(tasks)
+}
+
 module.exports = {
   scheduleActiveStudents,
   scheduleStudentsByArray,
@@ -134,5 +158,6 @@ module.exports = {
   rescheduleScheduled,
   rescheduleFetched,
   rescheduleCreated,
+  scheduleDaily,
   scheduleStudentCheck
 }

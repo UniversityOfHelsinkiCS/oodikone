@@ -262,6 +262,7 @@ const count = (column, count, distinct = false) => {
 }
 
 const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents, tag) => { // eslint-disable-line
+
   const filteredExtents = []
   let studyrightWhere = {
     extentcode: {
@@ -589,7 +590,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   const stats = {}
 
-  const startYear = parseInt(query.endYear, 10)
+  const startYear = parseInt(query.startYear, 10)
   courses.forEach(course => {
     let { disciplines, course_type } = course
     const maincourse = getMainCourse(course, codeToMainCourse)

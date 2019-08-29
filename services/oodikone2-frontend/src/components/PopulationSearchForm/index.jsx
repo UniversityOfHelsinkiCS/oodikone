@@ -12,7 +12,7 @@ import moment from 'moment'
 
 import { getPopulationStatistics } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
-import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
+import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/populationSelectedStudentCourses'
 import { getPopulationFilters, setPopulationFilter, clearPopulationFilters } from '../../redux/populationFilters'
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 import { getSemesters } from '../../redux/semesters'
@@ -119,7 +119,7 @@ const PopulationSearchForm = (props) => {
     const request = { ...formattedQueryParams, studyRights: queryCodes, uuid }
     setState({ isLoading: true })
     props.setLoading()
-
+    props.clearSelected()
     fetchPopulationPromises.current = cancelablePromise(Promise.all([
       props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }),
       props.getPopulationCourses(request),
@@ -780,7 +780,8 @@ PopulationSearchForm.propTypes = {
     object
   ]).isRequired,
   onProgress: func.isRequired,
-  isAdmin: bool.isRequired
+  isAdmin: bool.isRequired,
+  clearSelected: func.isRequired
 }
 
 const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, localize, tags, auth: { token: { roles } } }) => {
@@ -809,5 +810,6 @@ export default withRouter(connect(mapStateToProps, {
   getDegreesAndProgrammes,
   setLoading,
   getSemesters,
-  getTagsByStudytrackAction
+  getTagsByStudytrackAction,
+  clearSelected
 })(PopulationSearchForm))

@@ -82,7 +82,7 @@ const formatSemesterEnrollments = async (apidata, studentnumber) => await Promis
 
 const getStudent = async (studentnumber) => {
   const api = await getAllStudentInformationFromApi(studentnumber)
-  if (api.student === null || api.student === undefined) {
+  if (api.student == null) {
     const error = new Error(`API returned ${api.student} for studentnumber ${studentnumber}.`)
     error.name = 'NO_STUDENT'
     throw error
