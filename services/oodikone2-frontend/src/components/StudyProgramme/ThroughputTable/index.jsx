@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import moment from 'moment'
-import { Header, Loader, Table, Button, Grid, Icon } from 'semantic-ui-react'
+import { Header, Table, Button, Grid, Icon, Label, Segment } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, func } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -80,7 +80,8 @@ const ThroughputTable = ({
                     throughput.lastUpdated
                       ? moment(throughput.lastUpdated).format('HH:mm:ss MM-DD-YYYY')
                       : 'unknown'
-                    } ${throughput.status || ''}`}
+                    }`}
+                  {throughput.status === 'RECALCULATING' && <Label content="Recalculating! Refresh page in a few minutes" color="red" />}
                 </Header.Subheader>
               )}
             </Grid.Column>
@@ -92,129 +93,128 @@ const ThroughputTable = ({
           </Grid.Row>
         </Grid>
       </Header>
-      <Loader active={loading} inline="centered">
-        Loading...
-      </Loader>
-      <Table celled structured className="fixed-header">
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
-            {
-              renderStudentsHeader()
-            }
-            <Table.HeaderCell colSpan={GRADUATED_FEATURE_TOGGLED_ON ? '3' : '1'}>Graduated</Table.HeaderCell>
-
-            <Table.HeaderCell rowSpan="2">Transferred to this program</Table.HeaderCell>
-            <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
-            {(thesisTypes.includes('BACHELOR') ||
-              thesisTypes.includes('MASTER')) && (
-                <Table.HeaderCell colSpan={thesisTypes.length}>
-                  Thesis
-                </Table.HeaderCell>
-              )}
-          </Table.Row>
-
-          <Table.Row>
-            {renderGenders || renderRatioOfFinns ? <Table.HeaderCell content="Total" /> : null}
-            {genders.map(gender => <Table.HeaderCell key={gender} content={gender} />)}
-            {renderRatioOfFinns ? <Table.HeaderCell content="Finnish" /> : null}
-            <Table.HeaderCell >Graduated overall</Table.HeaderCell>
-            {GRADUATED_FEATURE_TOGGLED_ON &&
-              <Fragment>
-                <Table.HeaderCell >Graduated in time</Table.HeaderCell>
-                <Table.HeaderCell >Graduation median time</Table.HeaderCell>
-              </Fragment>
-            }
-            <Table.HeaderCell content="≥ 30" />
-            <Table.HeaderCell content="≥ 60" />
-            <Table.HeaderCell content="≥ 90" />
-            <Table.HeaderCell content="≥ 120" />
-            <Table.HeaderCell content="≥ 150" />
-            {thesisTypes.includes('MASTER') && (
-              <Table.HeaderCell content="Master" />
-            )}
-            {thesisTypes.includes('BACHELOR') && (
-              <Table.HeaderCell content="Bachelor" />
-            )}
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {data
-            .sort((year1, year2) =>
-              Number(year2.year.slice(0, 4)) -
-              Number(year1.year.slice(0, 4)))
-            .map(year => (
-              <Table.Row key={year.year}>
-                <Table.Cell>
-                  {year.year}
-                  <Icon name="level up alternate" onClick={() => showPopulationStatistics(year.year)} />
-                </Table.Cell>
-                <Table.Cell>{year.credits.length}</Table.Cell>
-                {genders.map(gender => (
-                  <Table.Cell key={`${year.year} gender:${gender}`}>
-                    {`${year.genders[gender] || 0} (${Math.floor((year.genders[gender] / year.credits.length) * 100) || 0}%)`}
-                  </Table.Cell>
-                ))}
-                { renderRatioOfFinns && ratioOfFinnsIn(year) }
-                <Table.Cell>{year.graduated}</Table.Cell>
-                {GRADUATED_FEATURE_TOGGLED_ON &&
-                  <Fragment>
-                    <Table.Cell>{year.inTargetTime}</Table.Cell>
-                    <Table.Cell>{year.medianGraduationTime ? `${year.medianGraduationTime} months` : '∞'}</Table.Cell>
-                  </Fragment>
-                }
-                <Table.Cell>{year.transferred}</Table.Cell>
-                {Object.keys(year.creditValues).map(creditKey => (
-                  <Table.Cell key={`${year.year} credit:${creditKey}`}>{year.creditValues[creditKey]}
-                  </Table.Cell>
-                ))}
-                {thesisTypes.includes('MASTER') ? (
-                  <Table.Cell>{year.thesisM}</Table.Cell>
-                ) : null}
-                {thesisTypes.includes('BACHELOR') ? (
-                  <Table.Cell>{year.thesisB}</Table.Cell>
-                ) : null}
-              </Table.Row>
-            ))}
-        </Table.Body>
-        {throughput && throughput.totals ?
-          <Table.Footer>
+      <Segment basic loading={loading}>
+        <Table celled structured className="fixed-header">
+          <Table.Header>
             <Table.Row>
-              <Table.HeaderCell style={{ fontWeight: 'bold' }}>Total</Table.HeaderCell>
-              <Table.HeaderCell>{throughput.totals.students}</Table.HeaderCell>
-              {Object.keys(throughput.totals.genders).map(genderKey => (
-                <Table.HeaderCell key={`${genderKey}total`}>
-                  {`${throughput.totals.genders[genderKey]} (${Math.floor((throughput.totals.genders[genderKey] / throughput.totals.students) * 100)}%)`}
-                </Table.HeaderCell>
-              ))}
+              <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
               {
-                renderRatioOfFinns ?
-                  <Table.HeaderCell>
-                    {`${throughput.totals.nationalities.Finland || 0} (${Math.floor((throughput.totals.nationalities.Finland / calculateTotalNationalities()) * 100) || 0}%)`}
-                  </Table.HeaderCell> :
-                  null
+                renderStudentsHeader()
               }
-              <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
+              <Table.HeaderCell colSpan={GRADUATED_FEATURE_TOGGLED_ON ? '3' : '1'}>Graduated</Table.HeaderCell>
+
+              <Table.HeaderCell rowSpan="2">Transferred to this program</Table.HeaderCell>
+              <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
+              {(thesisTypes.includes('BACHELOR') ||
+                thesisTypes.includes('MASTER')) && (
+                  <Table.HeaderCell colSpan={thesisTypes.length}>
+                    Thesis
+                  </Table.HeaderCell>
+                )}
+            </Table.Row>
+
+            <Table.Row>
+              {renderGenders || renderRatioOfFinns ? <Table.HeaderCell content="Total" /> : null}
+              {genders.map(gender => <Table.HeaderCell key={gender} content={gender} />)}
+              {renderRatioOfFinns ? <Table.HeaderCell content="Finnish" /> : null}
+              <Table.HeaderCell >Graduated overall</Table.HeaderCell>
               {GRADUATED_FEATURE_TOGGLED_ON &&
                 <Fragment>
-                  <Table.HeaderCell>{throughput.totals.inTargetTime}</Table.HeaderCell>
-                  <Table.HeaderCell>{throughput.totals.medianGraduationTime ? `${throughput.totals.medianGraduationTime} months` : '∞'}</Table.HeaderCell>
+                  <Table.HeaderCell >Graduated in time</Table.HeaderCell>
+                  <Table.HeaderCell >Graduation median time</Table.HeaderCell>
                 </Fragment>
               }
-              <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
-              {Object.keys(throughput.totals.credits).map(creditKey => (
-                <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}
-                </Table.HeaderCell>
-              ))}
-              {thesisTypes.includes('MASTER') ? (
-                <Table.HeaderCell>{throughput.totals.thesisM}</Table.HeaderCell>
-              ) : null}
-              {thesisTypes.includes('BACHELOR') ? (
-                <Table.HeaderCell>{throughput.totals.thesisB}</Table.HeaderCell>
-              ) : null}
+              <Table.HeaderCell content="≥ 30" />
+              <Table.HeaderCell content="≥ 60" />
+              <Table.HeaderCell content="≥ 90" />
+              <Table.HeaderCell content="≥ 120" />
+              <Table.HeaderCell content="≥ 150" />
+              {thesisTypes.includes('MASTER') && (
+                <Table.HeaderCell content="Master" />
+              )}
+              {thesisTypes.includes('BACHELOR') && (
+                <Table.HeaderCell content="Bachelor" />
+              )}
             </Table.Row>
-          </Table.Footer> : null}
-      </Table>
+          </Table.Header>
+          <Table.Body>
+            {data
+              .sort((year1, year2) =>
+                Number(year2.year.slice(0, 4)) -
+                Number(year1.year.slice(0, 4)))
+              .map(year => (
+                <Table.Row key={year.year}>
+                  <Table.Cell>
+                    {year.year}
+                    <Icon name="level up alternate" onClick={() => showPopulationStatistics(year.year)} />
+                  </Table.Cell>
+                  <Table.Cell>{year.credits.length}</Table.Cell>
+                  {genders.map(gender => (
+                    <Table.Cell key={`${year.year} gender:${gender}`}>
+                      {`${year.genders[gender] || 0} (${Math.floor((year.genders[gender] / year.credits.length) * 100) || 0}%)`}
+                    </Table.Cell>
+                  ))}
+                  { renderRatioOfFinns && ratioOfFinnsIn(year) }
+                  <Table.Cell>{year.graduated}</Table.Cell>
+                  {GRADUATED_FEATURE_TOGGLED_ON &&
+                    <Fragment>
+                      <Table.Cell>{year.inTargetTime}</Table.Cell>
+                      <Table.Cell>{year.medianGraduationTime ? `${year.medianGraduationTime} months` : '∞'}</Table.Cell>
+                    </Fragment>
+                  }
+                  <Table.Cell>{year.transferred}</Table.Cell>
+                  {Object.keys(year.creditValues).map(creditKey => (
+                    <Table.Cell key={`${year.year} credit:${creditKey}`}>{year.creditValues[creditKey]}
+                    </Table.Cell>
+                  ))}
+                  {thesisTypes.includes('MASTER') ? (
+                    <Table.Cell>{year.thesisM}</Table.Cell>
+                  ) : null}
+                  {thesisTypes.includes('BACHELOR') ? (
+                    <Table.Cell>{year.thesisB}</Table.Cell>
+                  ) : null}
+                </Table.Row>
+              ))}
+          </Table.Body>
+          {throughput && throughput.totals ?
+            <Table.Footer>
+              <Table.Row>
+                <Table.HeaderCell style={{ fontWeight: 'bold' }}>Total</Table.HeaderCell>
+                <Table.HeaderCell>{throughput.totals.students}</Table.HeaderCell>
+                {Object.keys(throughput.totals.genders).map(genderKey => (
+                  <Table.HeaderCell key={`${genderKey}total`}>
+                    {`${throughput.totals.genders[genderKey]} (${Math.floor((throughput.totals.genders[genderKey] / throughput.totals.students) * 100)}%)`}
+                  </Table.HeaderCell>
+                ))}
+                {
+                  renderRatioOfFinns ?
+                    <Table.HeaderCell>
+                      {`${throughput.totals.nationalities.Finland || 0} (${Math.floor((throughput.totals.nationalities.Finland / calculateTotalNationalities()) * 100) || 0}%)`}
+                    </Table.HeaderCell> :
+                    null
+                }
+                <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
+                {GRADUATED_FEATURE_TOGGLED_ON &&
+                  <Fragment>
+                    <Table.HeaderCell>{throughput.totals.inTargetTime}</Table.HeaderCell>
+                    <Table.HeaderCell>{throughput.totals.medianGraduationTime ? `${throughput.totals.medianGraduationTime} months` : '∞'}</Table.HeaderCell>
+                  </Fragment>
+                }
+                <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
+                {Object.keys(throughput.totals.credits).map(creditKey => (
+                  <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}
+                  </Table.HeaderCell>
+                ))}
+                {thesisTypes.includes('MASTER') ? (
+                  <Table.HeaderCell>{throughput.totals.thesisM}</Table.HeaderCell>
+                ) : null}
+                {thesisTypes.includes('BACHELOR') ? (
+                  <Table.HeaderCell>{throughput.totals.thesisB}</Table.HeaderCell>
+                ) : null}
+              </Table.Row>
+            </Table.Footer> : null}
+        </Table>
+      </Segment>
     </React.Fragment>
   )
 }

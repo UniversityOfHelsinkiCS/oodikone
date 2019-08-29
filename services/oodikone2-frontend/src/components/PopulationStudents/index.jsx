@@ -626,11 +626,7 @@ PopulationStudents.propTypes = {
   history: shape({}).isRequired,
   queryStudyrights: arrayOf(string).isRequired,
   mandatoryCourses: arrayOf(shape({
-    name: shape({
-      en: string.isRequired,
-      fi: string.isRequired,
-      sv: string.isRequired
-    }).isRequired,
+    name: shape({}).isRequired,
     code: string.isRequired
   })).isRequired,
   mandatoryPassed: shape({}).isRequired,
