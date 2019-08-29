@@ -391,6 +391,7 @@ class PopulationStudents extends Component {
       else mandatoryCourseLabels.push({ id: 'null', label: '' })
       return acc
     }, {})
+
     const sortedlabels = orderBy(
       uniqBy(mandatoryCourseLabels, l => l.label),
       [e => e.orderNumber],
@@ -398,24 +399,22 @@ class PopulationStudents extends Component {
     )
 
     const labelColumns = []
-    if (sortedlabels.filter(e => e.label !== '').length > 0) {
-      labelColumns.push(
-        {
-          key: 'general',
-          title: <b>Labels:</b>,
-          parent: true,
-          headerProps: { colSpan: nameColumns.length, style: { textAlign: 'right' } }
-        },
-        ...sortedlabels.map(e => ({
-          key: e.id,
-          title: (
-            <div style={{ overflowX: 'hidden' }}><div style={{ width: 0 }}>{e.label}</div></div>
-          ),
-          parent: true,
-          headerProps: { colSpan: labelToMandatoryCourses[e.label].length, title: e.label, ordernumber: e.orderNumber }
-        }))
-      )
-    }
+    labelColumns.push(
+      {
+        key: 'general',
+        title: <b>Labels:</b>,
+        parent: true,
+        headerProps: { colSpan: nameColumns.length, style: { textAlign: 'right' } }
+      },
+      ...sortedlabels.map(e => ({
+        key: e.id,
+        title: (
+          <div style={{ overflowX: 'hidden' }}><div style={{ width: 0 }}>{e.label}</div></div>
+        ),
+        parent: true,
+        headerProps: { colSpan: labelToMandatoryCourses[e.label].length, title: e.label, ordernumber: e.orderNumber }
+      }))
+    )
 
     const mandatoryCourseColumns = [
       ...nameColumns,
