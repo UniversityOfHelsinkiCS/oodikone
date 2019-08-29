@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import { Table } from 'semantic-ui-react'
 import { shape, arrayOf, string, func, bool, element, oneOfType } from 'prop-types'
 import { sortBy } from 'lodash'
@@ -57,22 +57,6 @@ class SortableTable extends Component {
   )
 
   render() {
-    const calculateSkippedColumns = () => {
-      const { columns, showNames } = this.props
-      const { collapsed } = this.state
-      const defaultColumnCount = showNames ? 6 : 3
-      if (collapsed) {
-        const collapsedOrderNumbers = collapsed.map(c => c.headerProps.ordernumber)
-        return collapsedOrderNumbers.reduce((acc, curr) => {
-          const previousCols = columns.filter(c => c.headerProps && c.headerProps.ordernumber < curr)
-          const sumOfPreviousColSpans = previousCols.reduce((a, b) => a + b.headerProps.colSpan, 0)
-          return [
-            ...acc,
-            sumOfPreviousColSpans + columns.find(c => c.headerProps && c.headerProps.ordernumber === curr).headerProps.colSpan + defaultColumnCount]
-        }, [])
-      }
-      return []
-    }
     const { tableProps, getRowProps, columns, getRowKey, collapsingHeaders } = this.props
     const { selected, direction, collapsed } = this.state
     const columnsWithCollapsedHeaders = collapsingHeaders ? [...columns.filter(c => (
@@ -92,7 +76,7 @@ class SortableTable extends Component {
                   key={c.key}
                   content={c.title}
                   onClick={c.parent && collapsingHeaders && c.key !== 'general' ?
-                    this.handleCollapse({ title: this.verticalTitle(<Fragment>{c.headerProps.title}</Fragment>), headerProps: { ...c.headerProps, colSpan: 1, rowSpan: 2 }, key: c.key, collapsed: true, parent: c.parent }) :
+                    this.handleCollapse({ title: this.verticalTitle(c.headerProps.title), headerProps: { ...c.headerProps, colSpan: 1, rowSpan: 2 }, key: c.key, collapsed: true, parent: c.parent }) :
                     this.handleSort(c.key)}
                   sorted={c.parent ? undefined : sortDirection(c.key)}
                   {...c.headerProps}
@@ -121,12 +105,8 @@ class SortableTable extends Component {
               key={getRowKey(row)}
               {...getRowProps && getRowProps(row)}
             >
-              {columns.filter(c => !c.parent).map((c, i) => {
+              {columns.filter(c => !c.parent).map((c) => {
                 if (collapsed.map(cell => cell.headerProps.title).includes(c.childOf)) {
-                  const skippedColumns = calculateSkippedColumns()
-                  if (skippedColumns.includes(i + 1)) {
-                    return <Table.Cell warning />
-                  }
                   return null
                 }
                 return (
@@ -139,6 +119,7 @@ class SortableTable extends Component {
                 )
               })
               }
+              {collapsed.map(e => <Table.Cell key={e.key} warning />)}
             </Table.Row>
           ))}
         </Table.Body>
