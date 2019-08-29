@@ -20,7 +20,7 @@ initializeDatabaseConnection().then(() => {
     const attSub = stan.subscribe('UpdateAttainmentDates', 'updater.workers.attainments', opts)
     const prioSub = stan.subscribe('PriorityWrite', 'updater.workers.prio', opts)
 
-    const writeStudent = async (msg) => {
+    const writeStudent = priority => async (msg) => {
       let data = null
       try {
         const start = new Date()
@@ -30,7 +30,7 @@ initializeDatabaseConnection().then(() => {
         } else {
           await updateStudent(data.data)
         }
-        stan.publish('status', JSON.stringify({ task: data.task, status: 'DONE', timems: new Date() - start }), (err) => { if (err) console.log(err) })
+        stan.publish('status', JSON.stringify({ task: data.task, status: 'DONE', timems: new Date() - start }, priority), (err) => { if (err) console.log(err) })
       } catch (err) {
         console.log('update failed', data.task, err)
         logger.info('failure', { service: 'WRITER' })
@@ -38,8 +38,8 @@ initializeDatabaseConnection().then(() => {
       msg.ack()
     }
 
-    sub.on('message', writeStudent)
-    prioSub.on('message', writeStudent)
+    sub.on('message', writeStudent(false))
+    prioSub.on('message', writeStudent(true))
 
     attSub.on('message', async (msg) => {
       try {
