@@ -1,12 +1,12 @@
 import { callController } from '../apiConnection'
 
 export const getPopulationSelectedStudentCourses = ({
-  endYear, semesters, studentStatuses, studyRights, months, uuid, selectedStudents, startYear
+  endYear, semesters, studentStatuses, studyRights, months, uuid, selectedStudents, startYear, tag
 }) => {
   const route = '/v2/populationstatistics/courses'
   const prefix = 'GET_POPULATION_SELECTEDSTUDENTS_COURSES_'
   const query = {
-    endYear, semesters, studentStatuses, studyRights, uuid, selectedStudents, months, startYear
+    endYear, semesters, studentStatuses, studyRights, uuid, selectedStudents, months, startYear, tag
   }
   const body = {
     endYear,
@@ -15,10 +15,15 @@ export const getPopulationSelectedStudentCourses = ({
     months,
     studyRights,
     selectedStudents,
-    startYear
+    startYear,
+    tag
   }
   return callController(route, prefix, body, 'post', query)
 }
+
+export const clearSelected = () => ({
+  type: 'CLEAR_SELECTED'
+})
 
 const defaultState = { pending: false, error: false, data: null, query: {} }
 const reducer = (state = defaultState, action) => {
@@ -45,6 +50,10 @@ const reducer = (state = defaultState, action) => {
         error: false,
         data: action.response,
         query: action.query
+      }
+    case 'CLEAR_SELECTED':
+      return {
+        state: defaultState
       }
     default:
       return state

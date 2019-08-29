@@ -109,6 +109,17 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
   })
 }
 
+const findByTag = (tag) => {
+  return TagStudent.findAll({
+    attributes: ['studentnumber'],
+    where: {
+      tag_id: {
+        [Op.eq]: tag
+      }
+    }
+  }).map(st => st.studentnumber)
+}
+
 const formatStudent = ({
   firstnames,
   lastname,
@@ -360,5 +371,6 @@ module.exports = {
   updateStudent,
   bySearchTermAndElements,
   filterStudentnumbersByAccessrights,
-  findByCourseAndSemesters
+  findByCourseAndSemesters,
+  findByTag
 }
