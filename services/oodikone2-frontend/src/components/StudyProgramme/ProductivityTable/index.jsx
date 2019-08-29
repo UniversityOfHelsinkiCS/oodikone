@@ -69,7 +69,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
               .map(year => (
                 <Table.Row key={year.year}>
                   <Table.Cell>{year.year}</Table.Cell>
-                  <Table.Cell>{Math.floor(year.credits)}</Table.Cell>
+                  <Table.Cell>{year.credits.toFixed(2)}</Table.Cell>
                   {thesisTypes.includes('BACHELOR') && (
                     <Table.Cell>{year.bThesis}</Table.Cell>
                   )}
@@ -77,9 +77,9 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
                     <Table.Cell>{year.mThesis}</Table.Cell>
                   )}
                   <Table.Cell>{year.graduated}</Table.Cell>
-                  <Table.Cell>{year.creditsForMajors}</Table.Cell>
-                  <Table.Cell>{year.credits - year.creditsForMajors}</Table.Cell>
-                  <Table.Cell>{year.transferredCredits}</Table.Cell>
+                  <Table.Cell>{year.creditsForMajors.toFixed(2)}</Table.Cell>
+                  <Table.Cell>{(year.credits - year.creditsForMajors).toFixed(2)}</Table.Cell>
+                  <Table.Cell>{year.transferredCredits.toFixed(2)}</Table.Cell>
                 </Table.Row>
               ))
             : null}
