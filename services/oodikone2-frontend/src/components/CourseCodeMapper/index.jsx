@@ -127,11 +127,7 @@ CourseCodeMapper.propTypes = {
     pending: bool,
     error: bool,
     data: objectOf(arrayOf(shape({
-      name: shape({
-        en: string,
-        fi: string,
-        sv: string
-      }),
+      name: shape({}),
       code: string
     })))
   }).isRequired
