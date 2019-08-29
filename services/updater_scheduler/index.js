@@ -2,7 +2,8 @@ const { stan } = require('./src/nats_connection')
 const { CronJob } = require('cron')
 const Schedule = require('./models')
 const logger = require('./logger')
-const { scheduleActiveStudents, scheduleAllStudents, scheduleAttainmentUpdate, scheduleMeta } = require('./src/schedule_students')
+const { scheduleDaily, scheduleAllStudents, scheduleAttainmentUpdate, scheduleMeta } = require('./src/schedule_students')
+const { isValidStudentId } = require('./src/util')
 require('./src/api')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
@@ -45,13 +46,13 @@ stan.on('connect', async () => {
       }
     })
 
-    schedule('0 22 * * 1-4', async () => {
-      // Every Monday through Thursday at 22:00
+    schedule('0 20 * * 1-4', async () => {
+      // Every Monday through Thursday at 20:00
       try {
-        console.log('SCHEDULING ACTIVE STUDENTS')
-        await scheduleActiveStudents()
+        console.log('SCHEDULING DAILY TASKS')
+        await scheduleDaily()
       } catch (err) {
-        console.log('SCHEDULING ACTIVE STUDENTS FAILED')
+        console.log('SCHEDULING DAILY TASKS FAILED')
         console.log(err)
         logger.info('failure', { service: 'SCHEDULER' })
       }
@@ -77,7 +78,7 @@ stan.on('connect', async () => {
 
   const handleStatusMessage = async (msg) => {
     const data = JSON.parse(msg.getData())
-    const { task, status, timems, active } = data
+    const { task, status, timems, active, priority } = data
     let updatetime = false
     switch (status) {
     case 'DONE':
@@ -94,22 +95,8 @@ stan.on('connect', async () => {
     default:
       throw 'unknown status: ' + msg.getData()
     }
-    const isValidStudentId = (id) => {
-      if (/^0\d{8}$/.test(id)) {
-        // is a 9 digit number
-        const multipliers = [7, 1, 3, 7, 1, 3, 7]
-        const checksum = id
-          .substring(1, 8)
-          .split('')
-          .reduce((sum, curr, index) => {
-            return (sum + curr * multipliers[index]) % 10
-          }, 0)
-        return (10 - checksum) % 10 == id[8]
-      }
-      return false
-    }
     const isStudent = !!isValidStudentId(task)
-    logger.info(`Status changed for ${task} to ${status}`, { task, status, student: isStudent, timems, active })
+    logger.info(`Status changed for ${task} to ${status}`, { task, status, student: isStudent, timems, active, priority })
     await updateTask({ task, status, type: isStudent ? 'student' : 'other', updatetime, active })
   }
   statusSub.on('message', async (msg) => {
