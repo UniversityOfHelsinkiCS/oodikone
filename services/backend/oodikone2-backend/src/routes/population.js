@@ -75,6 +75,47 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
   }
 })
 
+router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
+  try {
+    const { tag } = req.body
+    if (!tag) {
+      res.status(400).json({ error: 'The body should have a tag defined' })
+      return
+    }
+    let studentnumberlist
+    const studentnumbers = await Student.findByTag(tag)
+    const { decodedToken: { userId }, roles } = req
+    if (roles && roles.includes('admin')) {
+      studentnumberlist = studentnumbers
+    } else {
+      const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
+      const codes = unitsUserCanAccess.map(unit => unit.id)
+      studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
+    }
+    const result = await Population.bottlenecksOf({
+      startYear: 1900,
+      endYear: 2200,
+      studyRights: [],
+      semesters: ['FALL', 'SPRING'],
+      months: 10000,
+      tag
+    }, studentnumberlist)
+
+    if (result.error) {
+      console.log(result.error)
+      res.status(400).end()
+      return
+    }
+
+    console.log(`request completed ${new Date()}`)
+    res.json(result)
+
+  } catch (e) {
+    console.log(e)
+    res.status(500).json({ error: e })
+  }
+})
+
 router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, res) => {
   try {
     if (!req.body.studentnumberlist) {
@@ -140,6 +181,46 @@ router.get('/v3/populationstatistics', async (req, res) => {
       req.query.months = 12
     }
     const result = await Population.optimizedStatisticsOf({ ...req.query, studyRights })
+
+    if (result.error) {
+      console.log(result.error)
+      res.status(400).end()
+      return
+    }
+
+    console.log(`request completed ${new Date()}`)
+    res.json(result)
+  } catch (e) {
+    console.log(e)
+    res.status(500).json({ error: e })
+  }
+})
+
+router.get('/v3/populationstatisticsbytag', async (req, res) => {
+  const { tag } = req.query
+  if (!tag) {
+    res.status(400).json({ error: 'The query should have a tag defined' })
+    return
+  }
+  const semesters = ['FALL', 'SPRING']
+  let studentnumberlist
+  const studentnumbers = await Student.findByTag(tag)
+  const { decodedToken: { userId }, roles } = req
+  if (roles && roles.includes('admin')) {
+    studentnumberlist = studentnumbers
+  } else {
+    const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
+    const codes = unitsUserCanAccess.map(unit => unit.id)
+    studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
+  }
+  try {
+    const result = await Population.optimizedStatisticsOf({
+      startYear: 1900,
+      endYear: 2200,
+      studyRights: [],
+      semesters,
+      months: 10000
+    }, studentnumberlist)
 
     if (result.error) {
       console.log(result.error)
