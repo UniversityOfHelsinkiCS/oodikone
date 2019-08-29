@@ -401,18 +401,18 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   }, {
-      students: [],
-      extents: {},
-      semesters: {},
-      transfers: {
-        targets: {},
-        sources: {}
-      },
-      studyrights: {
-        degrees: [],
-        programmes: []
-      }
-    })
+    students: [],
+    extents: {},
+    semesters: {},
+    transfers: {
+      targets: {},
+      sources: {}
+    },
+    studyrights: {
+      degrees: [],
+      programmes: []
+    }
+  })
 
   const [momentstart, momentend] = [moment(startDate), moment(endDate)]
   const transferredStudyright = (s) => {
@@ -590,7 +590,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   const stats = {}
 
-  const startYear = parseInt(query.endYear, 10)
+  const startYear = parseInt(query.startYear, 10)
   courses.forEach(course => {
     let { disciplines, course_type } = course
     const maincourse = getMainCourse(course, codeToMainCourse)
