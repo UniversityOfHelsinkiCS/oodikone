@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { arrayOf, string } from 'prop-types'
-import { Button, Modal, Form, TextArea, Accordion, Header } from 'semantic-ui-react'
+import { Button, Modal, Form, TextArea, Accordion, Header, List, Segment } from 'semantic-ui-react'
 
 const CheckStudentList = ({ students }) => {
   const [modalOpen, setModalOpen] = useState(false)
@@ -14,29 +14,32 @@ const CheckStudentList = ({ students }) => {
     const foundStudents = studentnumbers.filter(a => students.includes(a))
     const notInOodi = studentnumbers.filter(a => !students.includes(a))
     const notInList = students.filter(a => !studentnumbers.includes(a))
-    setFoundStudents(foundStudents.map(a => <div key={a}>{a}</div>))
-    setNotInOodiRows(notInOodi.map(a => <div key={a}>{a}</div>))
-    setNotInListRows(notInList.map(a => <div key={a}>{a}</div>))
+    setFoundStudents(foundStudents)
+    setNotInOodiRows(notInOodi)
+    setNotInListRows(notInList)
   }
 
   const panels = [
     {
+      key: 'found',
       title: 'Student numbers in list and in oodi',
-      content: foundStudents.length === 0 ? 'no numbers in list and oodi' : foundStudents
+      content: { content: foundStudents.length === 0 ? 'no numbers in list and oodi' : <List id="found" items={foundStudents} /> }
     },
     {
+      key: 'not found',
       title: 'Student numbers in list but not in oodi',
-      content: notInOodiRows.length === 0 ? 'all numbers in oodi' : notInOodiRows
+      content: { content: notInOodiRows.length === 0 ? 'all numbers in oodi' : <List id="notfound" items={notInOodiRows} /> }
     },
     {
+      key: 'not searched',
       title: 'Student numbers in oodi but not in list',
-      content: notInListRows.length === 0 ? 'all numbers in list' : notInListRows
+      content: { content: notInListRows.length === 0 ? 'all numbers in list' : <List id="notsearched" items={notInListRows} /> }
     }
   ]
 
   const renderResults = () => (
     <Modal trigger={<Button color="green" disabled={input.length === 0} onClick={() => checkStudents(input)}>check students</Button>}>
-      <Modal.Content>
+      <Modal.Content id="checkstudentsresults">
         <Header content="Results" />
         <Accordion styled exclusive={false} panels={panels} fluid />
       </Modal.Content>
