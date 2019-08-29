@@ -401,18 +401,18 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   }, {
-    students: [],
-    extents: {},
-    semesters: {},
-    transfers: {
-      targets: {},
-      sources: {}
-    },
-    studyrights: {
-      degrees: [],
-      programmes: []
-    }
-  })
+      students: [],
+      extents: {},
+      semesters: {},
+      transfers: {
+        targets: {},
+        sources: {}
+      },
+      studyrights: {
+        degrees: [],
+        programmes: []
+      }
+    })
 
   const [momentstart, momentend] = [moment(startDate), moment(endDate)]
   const transferredStudyright = (s) => {
@@ -460,15 +460,14 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE' }
   }
   const {
-    studyRights, startDate, months, endDate, exchangeStudents, cancelledStudents, nondegreeStudents, tag
+    studyRights, startDate, months, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
   } = parseQueryParams(formattedQueryParams)
 
   const studentnumbers = studentnumberlist ?
     studentnumberlist :
     await studentnumbersWithAllStudyrightElements(
-      studyRights, tag !== '' ? '1900-01-01' : startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
+      studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents
     )
-    
   const students = await getStudentsIncludeCoursesBetween(
     studentnumbers,
     startDate,
