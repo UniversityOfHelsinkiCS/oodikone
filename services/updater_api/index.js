@@ -26,18 +26,18 @@ const fetchData = async (priority, msg) => {
     const task = JSON.parse(msg.getData())
     if (task.task === 'meta') {
       const data = await getMeta()
-      stan.publish('status', JSON.stringify({ task: task.task, status: 'FETCHED' }), (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
+      stan.publish('status', JSON.stringify({ task: task.task, status: 'FETCHED', priority }), (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
       stan.publish(priority ? 'PriorityWrite' :'UpdateWrite', JSON.stringify({ task: task.task, data }))
     } else {
       try {
         const data = await getStudent(task.task)
         // TODO: check that data is properly structured(?)
         const active = hasActiveEnrollment(data.semesterEnrollments)
-        stan.publish('status', JSON.stringify({ task: task.task, status: 'FETCHED', active }), (err) => { if (err) console.log('STATUS PUBLISH FAIELD', err) })
+        stan.publish('status', JSON.stringify({ task: task.task, status: 'FETCHED', active, priority }), (err) => { if (err) console.log('STATUS PUBLISH FAIELD', err) })
         stan.publish(priority ? 'PriorityWrite' :'UpdateWrite' , JSON.stringify({ task: task.task, data, active }), (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
       } catch (e) {
         if (e.name === 'NO_STUDENT') {
-          stan.publish('status', JSON.stringify({ task: task.task, status: 'NO_STUDENT', active: false }), (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
+          stan.publish('status', JSON.stringify({ task: task.task, status: 'NO_STUDENT', active: false, priority }), (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
           return
         } else {
           throw e

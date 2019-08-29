@@ -528,8 +528,6 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       await productivityCreditsFromStudyprogrammeStudents(studytrack, startDate, studentnumbers)
     const [credits, graduated, theses, genders, transferredTo, endedStudyright, nationalities] =
       await statsForClass(studentnumbers, startDate, studytrack, endDate)
-    //console.log(year)
-    //console.log(transferredFrom.rows.map(r => r.get({ plain: true })))
     // theres so much shit in the data that transefferFrom doesnt rly mean anything
     delete genders[null]
     const creditValues = credits.reduce((acc, curr) => {
