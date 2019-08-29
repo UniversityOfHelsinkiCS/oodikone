@@ -1,6 +1,6 @@
 import React from 'react'
 import moment from 'moment'
-import { Table, Header, Loader, Button, Grid } from 'semantic-ui-react'
+import { Table, Header, Button, Grid, Label, Segment } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { shape, number, arrayOf, bool, string, func, oneOfType } from 'prop-types'
 import { callApi } from '../../../apiConnection'
@@ -39,7 +39,8 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
                     productivity.lastUpdated
                       ? moment(productivity.lastUpdated).format('HH:mm:ss MM-DD-YYYY')
                       : 'unknown'
-                    } ${productivity.status || ''}`}
+                    }`}
+                    {productivity.status === 'RECALCULATING' && <Label content="Recalculating! Refresh page in a few minutes" color="red" />}
                 </Header.Subheader>
               )}
             </Grid.Column>
@@ -51,40 +52,39 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
           </Grid.Row>
         </Grid>
       </Header>
-      <Loader active={loading} inline="centered">
-        Loading...
-      </Loader>
-      <Table structured celled className="fixed-header">
-        <Table.Header>
-          <Table.Row>
-            {headerList.map(header => (
-              <Table.HeaderCell key={header}>{header}</Table.HeaderCell>
-            ))}
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {productivity && productivity.data
-            ? productivity.data
-              .sort((year1, year2) => year2.year - year1.year)
-              .map(year => (
-                <Table.Row key={year.year}>
-                  <Table.Cell>{year.year}</Table.Cell>
-                  <Table.Cell>{year.credits.toFixed(2)}</Table.Cell>
-                  {thesisTypes.includes('BACHELOR') && (
-                    <Table.Cell>{year.bThesis}</Table.Cell>
-                  )}
-                  {thesisTypes.includes('MASTER') && (
-                    <Table.Cell>{year.mThesis}</Table.Cell>
-                  )}
-                  <Table.Cell>{year.graduated}</Table.Cell>
-                  <Table.Cell>{year.creditsForMajors.toFixed(2)}</Table.Cell>
-                  <Table.Cell>{(year.credits - year.creditsForMajors).toFixed(2)}</Table.Cell>
-                  <Table.Cell>{year.transferredCredits.toFixed(2)}</Table.Cell>
-                </Table.Row>
-              ))
-            : null}
-        </Table.Body>
-      </Table>
+      <Segment basic loading={loading}>
+        <Table structured celled className="fixed-header">
+          <Table.Header>
+            <Table.Row>
+              {headerList.map(header => (
+                <Table.HeaderCell key={header}>{header}</Table.HeaderCell>
+              ))}
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {productivity && productivity.data
+              ? productivity.data
+                .sort((year1, year2) => year2.year - year1.year)
+                .map(year => (
+                  <Table.Row key={year.year}>
+                    <Table.Cell>{year.year}</Table.Cell>
+                    <Table.Cell>{year.credits.toFixed(2)}</Table.Cell>
+                    {thesisTypes.includes('BACHELOR') && (
+                      <Table.Cell>{year.bThesis}</Table.Cell>
+                    )}
+                    {thesisTypes.includes('MASTER') && (
+                      <Table.Cell>{year.mThesis}</Table.Cell>
+                    )}
+                    <Table.Cell>{year.graduated}</Table.Cell>
+                    <Table.Cell>{year.creditsForMajors.toFixed(2)}</Table.Cell>
+                    <Table.Cell>{(year.credits - year.creditsForMajors).toFixed(2)}</Table.Cell>
+                    <Table.Cell>{year.transferredCredits.toFixed(2)}</Table.Cell>
+                  </Table.Row>
+                ))
+              : null}
+          </Table.Body>
+        </Table>
+      </Segment>
     </React.Fragment>
   )
 }
