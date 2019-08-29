@@ -5,7 +5,7 @@ import { getActiveLanguage } from 'react-localize-redux'
 import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { string, number, shape, bool, arrayOf, func } from 'prop-types'
-import { getTextIn, getUserRoles, setMocking } from '../../common'
+import { getTextIn, getUserRoles, setMocking, textAndDescriptionSearch } from '../../common'
 import { removeUserUnits, setFaculties } from '../../redux/users'
 import { getAccessGroups } from '../../redux/accessGroups'
 import { getFaculties } from '../../redux/faculties'
@@ -179,10 +179,10 @@ class UserPage extends Component {
                   fluid
                   selection
                   multiple
-                  search
                   value={this.props.user.faculty.map(f => f.faculty_code)}
                   options={sortBy(this.props.faculties.map(f => ({ key: f.code, text: getTextIn(f.name, language), description: f.code, value: f.code })), ['text'])}
                   onChange={(__, { value: facultycodes }) => this.props.setFaculties(user.id, facultycodes)}
+                  search={textAndDescriptionSearch}
                   selectOnBlur={false}
                   selectOnNavigation={false}
                 />
