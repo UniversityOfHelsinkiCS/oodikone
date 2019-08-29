@@ -132,16 +132,13 @@ describe('Population Statistics tests', () => {
     cy.contains('Check for studentnumbers')
     cy.get('textarea').type("010483918").type('{enter}').type("666666666")
     cy.contains('button', 'check students').click()
-    cy.contains('form', 'Results').within(e => {
-      cy.get('div').eq(0).within(e => {
-        cy.contains('student numbers in list but not in oodi')
-        cy.contains('666666666')
-      })
-      cy.get('div').eq(2).within(e => {
-        cy.contains('student numbers in oodi but not in list')
-        cy.contains('014896381')
-      })
-      cy.contains('010483918').should('not.exist')
+    cy.contains('#checkstudentsresults', 'Results').within(e => {
+      cy.contains('Student numbers in list and in oodi').click()
+      cy.contains('#found', '010483918')
+      cy.contains('Student numbers in list but not in oodi').click()
+      cy.contains('#notfound', '666666666')
+      cy.contains('Student numbers in oodi but not in list').click()
+      cy.contains('#notsearched', '014896381')
     })
   })
 
