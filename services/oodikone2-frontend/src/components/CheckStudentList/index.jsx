@@ -1,80 +1,83 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import { arrayOf, string } from 'prop-types'
-import { Button, Modal, Form, TextArea } from 'semantic-ui-react'
+import { Button, Modal, Form, TextArea, Accordion, Header } from 'semantic-ui-react'
 
-class CheckStudentList extends Component {
-  state = { modalOpen: false, input: '', notInOodiRows: [], notInListRows: [] }
+const CheckStudentList = ({ students }) => {
+  const [modalOpen, setModalOpen] = useState(false)
+  const [input, setInput] = useState('')
+  const [foundStudents, setFoundStudents] = useState([])
+  const [notInOodiRows, setNotInOodiRows] = useState([])
+  const [notInListRows, setNotInListRows] = useState([])
 
-  checkStudents = (input) => {
+  const checkStudents = (input) => {
     const studentnumbers = input.match(/[^\s,]+/g) || []
-    const { students } = this.props
+    const foundStudents = studentnumbers.filter(a => students.includes(a))
     const notInOodi = studentnumbers.filter(a => !students.includes(a))
     const notInList = students.filter(a => !studentnumbers.includes(a))
-    this.setState({
-      notInOodiRows: notInOodi.map(a => <div key={a}>{a}</div>),
-      notInListRows: notInList.map(a => <div key={a}>{a}</div>)
-    })
+    setFoundStudents(foundStudents.map(a => <div key={a}>{a}</div>))
+    setNotInOodiRows(notInOodi.map(a => <div key={a}>{a}</div>))
+    setNotInListRows(notInList.map(a => <div key={a}>{a}</div>))
   }
 
-  renderResults() {
-    return (
-      <Modal trigger={<Button color="green" disabled={this.state.input.length === 0} onClick={() => this.checkStudents(this.state.input)}>check students</Button>}>
-        <Modal.Content>
-          <Form>
-            <h2> Results </h2>
-            {this.state.notInOodiRows.length > 0 ? (
-              <div>student numbers in list but not in oodi {this.state.notInOodiRows}</div>) :
-              (<div>all numbers in oodi</div>)}
+  const panels = [
+    {
+      title: 'Student numbers in list and in oodi',
+      content: foundStudents.length === 0 ? 'no numbers in list and oodi' : foundStudents
+    },
+    {
+      title: 'Student numbers in list but not in oodi',
+      content: notInOodiRows.length === 0 ? 'all numbers in oodi' : notInOodiRows
+    },
+    {
+      title: 'Student numbers in oodi but not in list',
+      content: notInListRows.length === 0 ? 'all numbers in list' : notInListRows
+    }
+  ]
 
-            {this.state.notInListRows.length > 0 ?
-              (<div>student numbers in oodi but not in list {this.state.notInListRows}</div>) :
-              (<div>all numbers in list</div>)}
+  const renderResults = () => (
+    <Modal trigger={<Button color="green" disabled={input.length === 0} onClick={() => checkStudents(input)}>check students</Button>}>
+      <Modal.Content>
+        <Header content="Results" />
+        <Accordion styled exclusive={false} panels={panels} fluid />
+      </Modal.Content>
+      <Modal.Actions>
+        <Button
+          color="green"
+          onClick={() => setModalOpen(false)}
+          inverted
+        >
+          Close
+        </Button>
+      </Modal.Actions>
+    </Modal>
+  )
 
-          </Form>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button
-            color="green"
-            onClick={() => {
-              this.setState({ modalOpen: false })
-            }}
-            inverted
-          >
-            Close
-          </Button>
-        </Modal.Actions>
-      </Modal>
-    )
-  }
-
-  render() {
-    return (
-      <Modal
-        trigger={<Button size="small" onClick={() => this.setState({ modalOpen: true })}>Check studentnumbers</Button>}
-        open={this.state.modalOpen}
-        onClose={() => this.setState({ modalOpen: false })}
-        size="small"
-      >
-        <Modal.Content>
-          <Form>
-            <h2> Check for studentnumbers </h2>
-            <Form.Field>
-              <em> Insert studentnumbers you wish to check here </em>
-              <TextArea placeholder="011111111" onChange={e => this.setState({ input: e.target.value })} />
-            </Form.Field>
-          </Form>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button
-            negative
-            onClick={() => this.setState({ modalOpen: false })}
-          >Cancel
-          </Button>
-          {this.renderResults()}
-        </Modal.Actions>
-      </Modal>
-    )
-  }
+  return (
+    <Modal
+      trigger={<Button size="small" onClick={() => setModalOpen(true)}>Check studentnumbers</Button>}
+      open={modalOpen}
+      onClose={() => setModalOpen(false)}
+      size="small"
+    >
+      <Modal.Content>
+        <Form>
+          <h2> Check for studentnumbers </h2>
+          <Form.Field>
+            <em> Insert studentnumbers you wish to check here </em>
+            <TextArea placeholder="011111111" onChange={e => setInput(e.target.value)} />
+          </Form.Field>
+        </Form>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button
+          negative
+          onClick={() => setModalOpen(false)}
+        >Cancel
+        </Button>
+        {renderResults()}
+      </Modal.Actions>
+    </Modal>
+  )
 }
 
 CheckStudentList.propTypes = {
