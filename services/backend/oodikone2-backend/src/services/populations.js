@@ -261,6 +261,22 @@ const count = (column, count, distinct = false) => {
   )
 }
 
+const getEarliestYear = async (studentnumberlist, studyRights) => {
+  const startdates = await StudyrightElement.findAll({
+    attributes: ['startdate'],
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumberlist
+      },
+      code: {
+        [Op.eq]: studyRights.programme
+      }
+    }
+  })
+  const startyears = startdates.map(l => Number(new Date(l.startdate).getFullYear()))
+  return Math.min(...startyears)
+}
+
 const studentnumbersWithAllStudyrightElements = async (studyRights, startDate, endDate, exchangeStudents, cancelledStudents, nondegreeStudents, tag) => { // eslint-disable-line
 
   const filteredExtents = []
@@ -401,18 +417,18 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
     stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
     return stats
   }, {
-    students: [],
-    extents: {},
-    semesters: {},
-    transfers: {
-      targets: {},
-      sources: {}
-    },
-    studyrights: {
-      degrees: [],
-      programmes: []
-    }
-  })
+      students: [],
+      extents: {},
+      semesters: {},
+      transfers: {
+        targets: {},
+        sources: {}
+      },
+      studyrights: {
+        degrees: [],
+        programmes: []
+      }
+    })
 
   const [momentstart, momentend] = [moment(startDate), moment(endDate)]
   const transferredStudyright = (s) => {
@@ -622,5 +638,6 @@ module.exports = {
   studentnumbersWithAllStudyrightElements,
   universityEnrolmentDates,
   optimizedStatisticsOf,
-  bottlenecksOf
+  bottlenecksOf,
+  getEarliestYear
 }
