@@ -59,6 +59,18 @@ const CoursePopulation = ({
           <Header className="segmentTitle" size="large" textAlign="center">Population of course {header}</Header>
           <CustomPopulationFilters samples={studentData.students} coursecodes={codes} />
           <Segment>
+            <Header>Grade distribution</Header>
+            <CoursePopulationGradeDist yearcode={yearCode} selectedStudents={selectedStudents} />
+          </Segment>
+          <Segment>
+            <Header>Programme distribution</Header>
+            <CustomPopulationProgrammeDist samples={studentData.students} selectedStudents={selectedStudents} />
+          </Segment>
+          <PopulationStudents
+            samples={studentData.students}
+            selectedStudents={selectedStudents}
+          />
+          <Segment>
             <Header size="medium" dividing>
               {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
               <InfoBox content={CreditAccumulationGraph} />
@@ -70,19 +82,7 @@ const CoursePopulation = ({
               translate={translate}
             />
           </Segment>
-          <Segment>
-            <Header>Grade distribution</Header>
-            <CoursePopulationGradeDist yearcode={yearCode} selectedStudents={selectedStudents} />
-          </Segment>
-          <Segment>
-            <Header>Programme distribution</Header>
-            <CustomPopulationProgrammeDist samples={studentData.students} selectedStudents={selectedStudents} />
-          </Segment>
           <CustomPopulationCourses
-            selectedStudents={selectedStudents}
-          />
-          <PopulationStudents
-            samples={studentData.students}
             selectedStudents={selectedStudents}
           />
         </Segment>
