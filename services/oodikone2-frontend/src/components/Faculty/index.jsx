@@ -77,11 +77,11 @@ const Faculty = ({ getFaculties, getFacultiesYearlyStats, getFacultyProgrammes, 
   return (
     <div className="segmentContainer">
       <Header className="segmentTitle" size="large">
-        { hasLoaded && getTitle() }
+        {hasLoaded && getTitle()}
       </Header>
       <Segment className="contentSegment" loading={!hasLoaded}>
-        { !hasLoaded && null }
-        { hasLoaded && (
+        {!hasLoaded && null}
+        {hasLoaded && (
           <React.Fragment>
             <Segment>
               <Form>
@@ -94,7 +94,7 @@ const Faculty = ({ getFaculties, getFacultiesYearlyStats, getFacultyProgrammes, 
                 />
               </Form>
             </Segment>
-            { !selectedFaculty ?
+            {!selectedFaculty ?
               <FacultySelector
                 faculties={faculties}
                 facultyYearlyStats={facultyYearlyStats}
@@ -104,6 +104,7 @@ const Faculty = ({ getFaculties, getFacultiesYearlyStats, getFacultyProgrammes, 
               /> :
               <FacultyStats
                 selectedFacultyProgrammesStats={selectedFacultyProgrammesStats ? selectedFacultyProgrammesStats.data : {}}
+                history={history}
                 fromYear={fromYear}
                 toYear={toYear}
               />
