@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { string, arrayOf, shape, number } from 'prop-types'
-import { Segment } from 'semantic-ui-react'
+import { string, arrayOf, shape, number, func } from 'prop-types'
+import { Segment, Icon } from 'semantic-ui-react'
 import { getTextIn } from '../../../common'
 import {
   calculateStatsForProgramme,
@@ -12,11 +12,15 @@ import {
 import SortableTable from '../../SortableTable'
 import FacultyStatsGraph from '../FacultyStatsGraph'
 
-const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, language, fromYear, toYear }) => {
+const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, language, fromYear, toYear, history }) => {
   const totalStats = useMemo(() => Object.entries(selectedFacultyProgrammesStats).reduce((res, [code, stats]) => {
     res[code] = calculateStatsForProgramme(stats, fromYear, toYear)
     return { ...res }
   }, {}), [fromYear, toYear])
+
+  const showProgrammeOverView = (code) => {
+    history.push(`/study-programme/${code}`)
+  }
 
   const getNameOfProgramme = (code) => {
     const foundProgramme = facultyProgrammes.find(p => p.code === code)
@@ -37,7 +41,7 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
     {
       key: 'name',
       title: 'name',
-      getRowVal: ({ code }) => getNameOfProgramme(code)
+      getRowVal: ({ code }) => <div> {getNameOfProgramme(code)} <Icon name="level up alternate" onClick={() => showProgrammeOverView(code)} /></div> //eslint-disable-line
     },
     {
       key: 'code',
@@ -82,7 +86,10 @@ FacultyStats.propTypes = {
   selectedFacultyProgrammesStats: shape({}).isRequired,
   language: string.isRequired,
   fromYear: number.isRequired,
-  toYear: number.isRequired
+  toYear: number.isRequired,
+  history: shape({
+    push: func.isRequired
+  }).isRequired
 }
 
 const mapStateToProps = ({ faculties, localize }) => ({
