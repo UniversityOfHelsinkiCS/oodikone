@@ -9,7 +9,7 @@ const retry = async (fn, retriesLeft = 3, interval = 500) => (
       .then(resolve)
       .catch((error) => {
         if (retriesLeft <= 1) {
-          if (error && error.message && error.message.match(/Loading .* chunk .* failed/)) {
+          if (error && error.message && error.message.match(/loading.+chunk.+failed/ig)) {
             // We probably made a release which deletes old js and css
             // lazy load thus fails and user must reload page
             resolve(null)
