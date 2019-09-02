@@ -4,7 +4,7 @@ import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
 import { Header, Segment, Button, Icon, Popup, Tab, Grid, Checkbox, List } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
-import { orderBy, uniqBy, flatten, sortBy } from 'lodash'
+import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import XLSX from 'xlsx'
 import { getStudentTotalCredits, copyToClipboard, reformatDate, getTextIn, getUserRoles, getNewestProgramme } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
@@ -353,29 +353,30 @@ class PopulationStudents extends Component {
     )
 
     const nameColumns = this.props.showNames ? [
-      { key: 'lastname', title: 'last name', getRowVal: s => s.lastname, cellProps: { title: 'last name' }, child: true },
-      { key: 'firstname', title: 'given names', getRowVal: s => s.firstnames, cellProps: { title: 'first names' }, child: true },
-      { key: 'email', title: 'email', getRowVal: s => s.email, cellProps: { title: 'emails' }, child: true }
+      { key: 'lastname', title: 'last name', getRowVal: s => (s.total ? null : s.lastname), cellProps: { title: 'last name' }, child: true },
+      { key: 'firstname', title: 'given names', getRowVal: s => (s.total ? null : s.firstnames), cellProps: { title: 'first names' }, child: true },
+      { key: 'email', title: 'email', getRowVal: s => (s.total ? null : s.email), cellProps: { title: 'emails' }, child: true }
     ] : []
     nameColumns.push(
       {
         key: 'studentnumber',
         title: verticalTitle('student number'),
         cellProps: { title: 'student number' },
-        getRowVal: s => s.studentNumber,
+        getRowVal: s => (s.total ? '*' : s.studentNumber),
+        getRowContent: s => (s.total ? 'Summary:' : s.studentNumber),
         child: true
       },
       {
         key: 'icon',
         title: '',
-        getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
+        getRowVal: s => (!s.total && <Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
         cellProps: { collapsing: true, className: 'iconCell' },
         child: true
       },
       {
         key: 'totalpassed',
         title: verticalTitle('total passed'),
-        getRowVal: s => totalMandatoryPassed(s.studentNumber),
+        getRowVal: s => (s.total ? Object.values(s).filter(isNumber).reduce((acc, e) => acc + e, 0) : totalMandatoryPassed(s.studentNumber)),
         cellProps: { title: 'total passed' },
         child: true
       }
@@ -416,6 +417,8 @@ class PopulationStudents extends Component {
       }))
     )
 
+    const getTotalRowVal = (t, m) => t[m.code]
+
     const mandatoryCourseColumns = [
       ...nameColumns,
       ...labelColumns,
@@ -430,10 +433,11 @@ class PopulationStudents extends Component {
         title: verticalTitle(<Fragment>{getTextIn(m.name, this.props.language)}<br />{m.code}</Fragment>),
         cellProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
         headerProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
-        getRowVal: s => hasPassedMandatory(s.studentNumber, m.code),
-        getRowContent: s => (
-          hasPassedMandatory(s.studentNumber, m.code) ? (<Icon fitted name="check" color="green" />) : (null)
-        ),
+        getRowVal: s => (s.total ? getTotalRowVal(s, m) : hasPassedMandatory(s.studentNumber, m.code)),
+        getRowContent: (s) => {
+          if (s.total) return getTotalRowVal(s, m)
+          return hasPassedMandatory(s.studentNumber, m.code) ? (<Icon fitted name="check" color="green" />) : null
+        },
         child: true,
         childOf: e.label
       }))))
@@ -464,6 +468,18 @@ class PopulationStudents extends Component {
           </div>)
       })
 
+    const selectedStudentsData = this.props.selectedStudents.map(sn => students[sn])
+    const totals = selectedStudentsData.reduce((acc, s) => {
+      this.props.mandatoryCourses.forEach((m) => {
+        if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
+      })
+      return acc
+    }, this.props.mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true }))
+    const mandatoryCourseData = [
+      totals,
+      ...selectedStudentsData
+    ]
+
     const panes = [
       {
         menuItem: 'General',
@@ -493,7 +509,7 @@ class PopulationStudents extends Component {
             <div style={{ display: 'flex' }}>
               <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
                 <SortableTable
-                  getRowKey={s => s.studentNumber}
+                  getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
                   tableProps={{
                     celled: true,
                     compact: 'very',
@@ -507,7 +523,7 @@ class PopulationStudents extends Component {
                   collapsingHeaders
                   showNames={this.props.showNames}
                   columns={mandatoryCourseColumns}
-                  data={this.props.selectedStudents.map(sn => students[sn])}
+                  data={mandatoryCourseData}
                 />
               </div>
               <div style={{ paddingLeft: '2em' }}>

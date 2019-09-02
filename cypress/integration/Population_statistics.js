@@ -70,6 +70,7 @@ describe('Population Statistics tests', () => {
 
   it('Population statistics is usable on general level', () => {
     cy.contains("Select study programme").click().siblings().contains("Kasvatustieteiden kandiohjelma").click()
+    cy.get(':nth-child(3) > .rdt > .form-control').click().clear().type('August 2019')
     cy.contains("See population").click()
     cy.get(".card").within(() => {
       cy.contains("Kasvatustieteiden kandiohjelma")
