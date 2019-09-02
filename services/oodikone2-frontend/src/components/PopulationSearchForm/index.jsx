@@ -303,16 +303,6 @@ const PopulationSearchForm = (props) => {
     })
   }
 
-  const handleTagSearch = (event, { value }) => {
-    const tag = tags.find(t => t.tag_id === value)
-    setState({
-      query: {
-        ...query,
-        tag: tag.tag_id
-      }
-    })
-  }
-
   const getMonths = (startYear, end, term) => {
     const lastDayOfMonth = moment(end).endOf('month')
     const start = term === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`
@@ -322,13 +312,15 @@ const PopulationSearchForm = (props) => {
     return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
   }
 
-  const handleTagYearSelect = (momentYear) => {
-    const months = getMonths(reformatDate(momentYear, YEAR_DATE_FORMAT), new Date(), 'FALL')
+  const handleTagSearch = (event, { value }) => {
+    const tag = tags.find(t => t.tag_id === value)
+    const months = getMonths(reformatDate(moment(tag.year), YEAR_DATE_FORMAT), moment(), 'FALL')
     setState({
       query: {
         ...query,
-        startYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
-        endYear: reformatDate(new Date(), YEAR_DATE_FORMAT),
+        tag: tag.tag_id,
+        startYear: reformatDate(moment(tag.year), YEAR_DATE_FORMAT),
+        endYear: reformatDate(moment(), YEAR_DATE_FORMAT),
         months
       }
     })
@@ -666,24 +658,11 @@ const PopulationSearchForm = (props) => {
               <label>Select tag</label>
               <Form.Dropdown
                 placeholder="select tag"
-                fluid
                 selection
                 options={options}
                 onChange={handleTagSearch}
                 selectOnBlur={false}
                 selectOnNavigation={false}
-              />
-              <label>Select starting year</label>
-              <Datetime
-                className="yearSelectInput"
-                control={Datetime}
-                dateFormat={YEAR_DATE_FORMAT}
-                timeFormat={false}
-                renderYear={(props, selectableYear) => <td {...props}>{selectableYear}</td>}
-                closeOnSelect
-                value={null}
-                isValidDate={validYearCheck}
-                onChange={handleTagYearSelect}
               />
             </Form.Field>
           </Form.Group>) : null}
