@@ -133,6 +133,9 @@ const Tag = sequelizeKone.define(
     },
     studytrack: {
       type: Sequelize.STRING
+    },
+    year: {
+      type:Sequelize.STRING
     }
   },
   {
