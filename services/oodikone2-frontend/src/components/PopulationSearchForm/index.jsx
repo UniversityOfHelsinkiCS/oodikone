@@ -314,12 +314,12 @@ const PopulationSearchForm = (props) => {
 
   const handleTagSearch = (event, { value }) => {
     const tag = tags.find(t => t.tag_id === value)
-    const months = getMonths(reformatDate(moment(tag.year), YEAR_DATE_FORMAT), moment(), 'FALL')
+    const months = getMonths(reformatDate(moment(`${tag.year}-01-01`), YEAR_DATE_FORMAT), moment(), 'FALL')
     setState({
       query: {
         ...query,
         tag: tag.tag_id,
-        startYear: reformatDate(moment(tag.year), YEAR_DATE_FORMAT),
+        startYear: tag.year,
         endYear: reformatDate(moment(), YEAR_DATE_FORMAT),
         months
       }
