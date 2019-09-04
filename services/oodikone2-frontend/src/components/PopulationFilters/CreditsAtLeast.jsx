@@ -19,7 +19,9 @@ class CreditsAtLeast extends Component {
   }
 
   handleChange = (e) => {
-    this.setState({ limit: e.target.value })
+    if (Number(e.target.value) > -1) {
+      this.setState({ limit: e.target.value })
+    }
   }
 
   handleLimit = () => {
