@@ -312,7 +312,7 @@ const PopulationSearchForm = (props) => {
       })
       return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
     }
-    return null
+    return -1
   }
 
   const handleTagSearch = (event, { value }) => {
@@ -458,7 +458,7 @@ const PopulationSearchForm = (props) => {
             <Button icon="minus" className="yearControlButton" onClick={subtractYear} tabIndex="-1" />
           </Button.Group>
         </Form.Field>
-        <Form.Field error={!query.months || query.months < 0}>
+        <Form.Field error={query.months < 0}>
           <label>Statistics until</label>
           <Datetime
             dateFormat="MMMM YYYY"
@@ -725,7 +725,7 @@ const PopulationSearchForm = (props) => {
 
         <Message error color="blue" header={errorText} />
 
-        <Form.Button onClick={handleSubmit} disabled={isQueryInvalid || !query.months || query.months < 0}>
+        <Form.Button onClick={handleSubmit} disabled={isQueryInvalid || query.months < 0}>
           {translate('populationStatistics.addPopulation')}
         </Form.Button>
       </Form>
