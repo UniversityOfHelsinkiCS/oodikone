@@ -210,7 +210,7 @@ class PopulationStudents extends Component {
     if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
       columns.push({
         key: 'credits since start',
-        title: 'credits since start',
+        title: 'credits since start of studyright',
         getRowVal: (s) => {
           const credits = getStudentTotalCredits(s)
           return credits.toFixed(2)
