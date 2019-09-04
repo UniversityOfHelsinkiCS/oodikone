@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect'
 import { getActiveLanguage } from 'react-localize-redux'
+import { sortBy } from 'lodash'
 import { getTextIn } from '../common'
 
 const nameAsString = (data, language) => {
@@ -45,7 +46,7 @@ const getQueryInfo = createSelector([getCourseStats], (stats) => {
       semesters[code] = { name, code }
     })
   })
-  const timeframe = Object.values(semesters).sort((t1, t2) => t1.code > t2.code)
+  const timeframe = sortBy(Object.values(semesters), 'code')
   return { courses, timeframe }
 })
 
@@ -91,8 +92,8 @@ const getAllStudyProgrammes = createSelector([getCourseStats, languageSelector, 
   const allStudents = [...new Set(Object.values(all).reduce((res, curr) => [...res, ...curr.students], []))]
   const programmes = Object.values(all)
     .map(p => ({ ...p, size: p.students.length || 0 }))
-    .sort((p1, p2) => p2.size - p1.size)
     .filter(p => p.size > 0)
+    .sort((p1, p2) => p2.size - p1.size)
   return [
     { ...ALL, students: allStudents, size: allStudents.length },
     ...programmes
