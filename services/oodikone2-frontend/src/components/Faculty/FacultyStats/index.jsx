@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, shape, number, func } from 'prop-types'
-import { Segment, Icon } from 'semantic-ui-react'
+import { Segment, Icon, Header } from 'semantic-ui-react'
 import { getTextIn } from '../../../common'
 import {
   calculateStatsForProgramme,
@@ -67,12 +67,23 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
     }
   ]
 
+  const data = Object.entries(selectedFacultyProgrammesStats).map(([code, stats]) => ({ code, stats }))
+  const bachelors = data.filter(programme => programme.code.includes('KH'))
+  const masters = data.filter(programme => programme.code.includes('MH'))
+
   return (
     <React.Fragment>
+      <Header>Bachelor degrees</Header>
       <SortableTable
         columns={headers}
         getRowKey={({ code }) => code}
-        data={Object.entries(selectedFacultyProgrammesStats).map(([code, stats]) => ({ code, stats }))}
+        data={bachelors}
+      />
+      <Header>Masters degrees</Header>
+      <SortableTable
+        columns={headers}
+        getRowKey={({ code }) => code}
+        data={masters}
       />
       <FacultyStatsGraph
         data={graphData}
