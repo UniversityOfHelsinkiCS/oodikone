@@ -25,10 +25,7 @@ export default {
   `,
   Filters: {
     Add: `Harmaata ”add” painiketta klikkaamalla aukeaa filters- eli suodatinvalikko, 
-    josta voi lisätä haluamiaan suodattimia, jotka rajaavat valittua populaatiota. 
-    Huom.! Filtterit eivät automaattisesti vaikuta ”Courses of population” taulukkoon (alempana). 
-    "Courses of population" taulukon saa päivittymään filttereiden mukaiseksi painamalla harmaata 
-    "refresh" -painiketta.`,
+    josta voi lisätä haluamiaan suodattimia, jotka rajaavat valittua populaatiota.`,
     Filters: `Valitut suodattimet näkyvät tässä. Suodattimia voi poistaa klikkaamalla mustaa rastia.
     <br> <br>
     **Show excluded students only**: Tällä liukukytkimellä voi valita filtteri-suodatuksien komplementin,
@@ -68,9 +65,6 @@ export default {
   CoursesOf: `Courses of population
     <br> <br>
     Tämä taulukko sisältää kaikkien populaatioon liittyvien opiskelijoiden kaikki kurssisuoritukset.
-    <br> <br>
-    **Huom.!** Filtterit eivät automaattisesti vaikuta ”Courses of population” taulukkoon. Taulukon saa 
-    päivittymään filttereiden mukaiseksi painamalla harmaata "refresh" -painiketta.
     <br> <br>
     Taulukon tietoja voi suodattaa kohdassa ”limit to courses where student number at least” 
     kirjoittamalla haluamansa opiskelijalukumäärän kenttään sekä kohdassa ”code (filter here)” 
