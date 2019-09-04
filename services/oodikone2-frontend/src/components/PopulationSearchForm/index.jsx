@@ -304,22 +304,25 @@ const PopulationSearchForm = (props) => {
   }
 
   const getMonths = (startYear, end, term) => {
-    const lastDayOfMonth = moment(end).endOf('month')
-    const start = term === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`
-    setState({
-      floatMonths: moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths()
-    })
-    return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
+    if (moment.isMoment(end)) {
+      const lastDayOfMonth = moment(end).endOf('month')
+      const start = term === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`
+      setState({
+        floatMonths: moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths()
+      })
+      return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
+    }
+    return -1
   }
 
   const handleTagSearch = (event, { value }) => {
     const tag = tags.find(t => t.tag_id === value)
-    const months = getMonths(reformatDate(moment(tag.year), YEAR_DATE_FORMAT), moment(), 'FALL')
+    const months = getMonths(reformatDate(moment(`${tag.year}-01-01`), YEAR_DATE_FORMAT), moment(), 'FALL')
     setState({
       query: {
         ...query,
         tag: tag.tag_id,
-        startYear: reformatDate(moment(tag.year), YEAR_DATE_FORMAT),
+        startYear: tag.year,
         endYear: reformatDate(moment(), YEAR_DATE_FORMAT),
         months
       }
@@ -407,7 +410,7 @@ const PopulationSearchForm = (props) => {
 
   const getMonthValue = (startYear, months) => {
     const start = `${startYear}-08-01`
-    return moment(start).add(months - 1, 'months').format('MMMM YY')
+    return moment(start).add(months - 1, 'months').format('MMMM YYYY')
   }
 
   const validYearCheck = (momentYear) => {
@@ -455,10 +458,11 @@ const PopulationSearchForm = (props) => {
             <Button icon="minus" className="yearControlButton" onClick={subtractYear} tabIndex="-1" />
           </Button.Group>
         </Form.Field>
-        <Form.Field>
+        <Form.Field error={query.months < 0}>
           <label>Statistics until</label>
           <Datetime
             dateFormat="MMMM YYYY"
+            closeOnSelect
             defaultValue={getMonthValue(query.startYear, floatMonths)}
             onChange={value => handleMonthsChange(value)}
             isValidDate={current => current.isBefore(moment()) &&
@@ -721,7 +725,7 @@ const PopulationSearchForm = (props) => {
 
         <Message error color="blue" header={errorText} />
 
-        <Form.Button onClick={handleSubmit} disabled={isQueryInvalid}>
+        <Form.Button onClick={handleSubmit} disabled={isQueryInvalid || query.months < 0}>
           {translate('populationStatistics.addPopulation')}
         </Form.Button>
       </Form>
