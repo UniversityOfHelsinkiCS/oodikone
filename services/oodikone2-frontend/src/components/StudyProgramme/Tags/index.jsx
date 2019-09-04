@@ -14,7 +14,7 @@ const YEAR_DATE_FORMAT = 'YYYY'
 const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme }) => {
   const [tagname, setTagname] = useState('')
   const [confirm, setConfirm] = useState(null)
-  const [year, setYear] = useState('')
+  const [year, setYear] = useState(null)
 
   useEffect(() => {
     getTagsByStudytrack(studyprogramme)
@@ -27,7 +27,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
   }
 
   const handleTagYearSelect = (momentYear) => {
-    setYear(reformatDate(momentYear, YEAR_DATE_FORMAT))
+    setYear(momentYear)
   }
 
   const handleSubmit = (event) => {
@@ -35,17 +35,16 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     const newTag = {
       tagname: tagname.trim(),
       studytrack: studyprogramme,
-      year
+      year: reformatDate(year, YEAR_DATE_FORMAT)
     }
     createTag(newTag)
     setTagname('')
-    setYear('')
+    setYear(null)
   }
 
   const handleChange = ({ target }) => {
     setTagname(target.value)
   }
-
 
   const rows = tags.map(tag => (
     <List.Item key={tag.tag_id}>
