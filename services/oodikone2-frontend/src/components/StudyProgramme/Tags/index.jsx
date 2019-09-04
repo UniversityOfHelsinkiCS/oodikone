@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react'
 import Datetime from 'react-datetime'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, List, Label, Icon, Header, Confirm, Form } from 'semantic-ui-react'
+import { Button, List, Segment, Header, Confirm, Form } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
 import TagModal from '../TagModal'
 import { reformatDate } from '../../../common'
+import SortableTable from '../../SortableTable'
 import { getTagsByStudytrackAction, createTagAction, deleteTagAction } from '../../../redux/tags'
 
 const YEAR_DATE_FORMAT = 'YYYY'
@@ -46,58 +47,82 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     setTagname(target.value)
   }
 
-  const rows = tags.map(tag => (
-    <List.Item key={tag.tag_id}>
-      <List.Content>
-        <Label>
-          tagname: {tag.tagname}, year: {tag.year}  <Icon name="delete" link onClick={() => setConfirm(tag.tag_id)} />
-        </Label>
-        <Confirm
-          open={confirm === tag.tag_id}
-          onCancel={() => setConfirm(null)}
-          onConfirm={event => handleDeleteTag(event, tag)}
-          content={`Are you sure you want to delete tag "${tag.tagname}"? If you press confirm you will delete it from all students that have it. You and other users won't be able to use this tag again.`}
-          cancelButton="Cancel"
-          confirmButton="Confirm"
-        />
-      </List.Content>
-    </List.Item >
-  ))
+  const deleteButton = tag => (
+    <Button onClick={() => setConfirm(tag)}>
+      Delete
+    </Button>
+  )
+
+  const columns = [
+    {
+      key: 'name',
+      title: 'Name',
+      getRowVal: tag => tag.tagname
+    },
+    {
+      key: 'year',
+      title: 'Associated start year',
+      getRowVal: tag => tag.year
+    },
+    {
+      key: 'delete',
+      title: 'Delete',
+      getRowVal: tag => (
+        <Form.Field>
+          {deleteButton(tag.tag_id)}
+          <Confirm
+            open={confirm === tag.tag_id}
+            onCancel={() => setConfirm(null)}
+            onConfirm={event => handleDeleteTag(event, tag)}
+            content={`Are you sure you want to delete tag "${tag.tagname}"? If you press confirm you will delete it from all students that have it. You and other users won't be able to use this tag again.`}
+            cancelButton="Cancel"
+            confirmButton="Confirm"
+          />
+        </Form.Field>
+      )
+    }
+  ]
 
   return (
     <List>
       <Form>
-        <Form.Group>
-          <Form.Field>
-            <label>
-              Tag name
-            </label>
-            <Form.Input
-              onChange={handleChange}
-              value={tagname}
-            />
-          </Form.Field>
-          <Form.Field>
-            <label>
-              Associated start year
-            </label>
-            <Datetime
-              className="yearSelectInput"
-              control={Datetime}
-              dateFormat={YEAR_DATE_FORMAT}
-              timeFormat={false}
-              renderYear={(props, selectableYear) => <td {...props}>{selectableYear}</td>}
-              closeOnSelect
-              value={year}
-              onChange={handleTagYearSelect}
-            />
-          </Form.Field>
-          <Button disabled={!tagname.trim() || tags.find(t => t.tagname === tagname.trim()) || !year} onClick={handleSubmit}> add new tag </Button>
-          <TagModal tags={tags} studytrack={studyprogramme} />
-        </Form.Group>
+        <Segment>
+          <Form.Group>
+            <Form.Field>
+              <label>
+                Tag name
+              </label>
+              <Form.Input
+                onChange={handleChange}
+                value={tagname}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>
+                Associated start year
+              </label>
+              <Datetime
+                className="yearSelectInput"
+                control={Datetime}
+                dateFormat={YEAR_DATE_FORMAT}
+                timeFormat={false}
+                renderYear={(props, selectableYear) => <td {...props}>{selectableYear}</td>}
+                closeOnSelect
+                value={year}
+                onChange={handleTagYearSelect}
+              />
+            </Form.Field>
+            <Button disabled={!tagname.trim() || tags.find(t => t.tagname === tagname.trim()) || !year} onClick={handleSubmit}> Create new tag </Button>
+            <TagModal tags={tags} studytrack={studyprogramme} />
+          </Form.Group>
+        </Segment>
       </Form>
       <Header size="medium">Study programme tags</Header>
-      {rows}
+      <SortableTable
+        columns={columns}
+        data={tags}
+        getRowKey={row => row.tag_id}
+      />
     </List >
   )
 }
