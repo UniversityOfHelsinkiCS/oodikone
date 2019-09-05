@@ -46,7 +46,7 @@ get_anon_oodikone() {
       chmod 400 private.key
     fi
     rm -rf anonyymioodi
-    GIT_SSH_COMMAND='ssh -i private.key' git clone git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
+    GIT_SSH_COMMAND='ssh -i private.key' git clone --depth=1 git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
 }
 
 restore_psql_from_backup () {

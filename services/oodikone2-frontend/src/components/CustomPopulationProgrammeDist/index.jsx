@@ -39,7 +39,6 @@ const CustomPopulationProgrammeDist = ({ samples, selectedStudents, setPopulatio
     setRows(sortedRows)
   }, [selectedStudents])
 
-
   const setFilter = (row) => {
     const splitRow = row[0].split(', ')
     setPopulationFilterDispatch(programmeFilter({ programme: splitRow[1], programmeName: splitRow[0] }))
@@ -67,7 +66,6 @@ CustomPopulationProgrammeDist.propTypes = {
   selectedStudents: arrayOf(string).isRequired,
   setPopulationFilterDispatch: func.isRequired
 }
-
 
 export default connect(null, {
   setPopulationFilterDispatch: setPopulationFilter

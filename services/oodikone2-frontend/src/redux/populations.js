@@ -28,22 +28,22 @@ export const getPopulationStatistics = ({
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }
 
-export const getCoursePopulation = ({ coursecodes, yearcode }) => {
+export const getCoursePopulation = ({ coursecodes, yearcode, onProgress }) => {
   const route = '/v3/populationstatisticsbycourse'
   const prefix = 'GET_STUDENTS_OF_COURSE_'
   const params = { coursecodes, yearcode }
-  const query = { coursecodes, yearcode, studyRights: { programme: 'KH555' } }
+  const query = { coursecodes, yearcode, studyRights: { programme: 'KH555' } } // why is programme defined to some garbo?
 
-  return callController(route, prefix, null, 'get', query, params)
+  return callController(route, prefix, null, 'get', query, params, onProgress)
 }
 
-export const getCustomPopulation = ({ studentnumberlist }) => {
+export const getCustomPopulation = ({ studentnumberlist, onProgress }) => {
   const route = '/v3/populationstatisticsbystudentnumbers'
   const prefix = 'GET_CUSTOM_POP_'
   const params = { studentnumberlist }
   const query = { studentnumberlist, studyRights: { programme: 'KH555' } }
   const body = { studentnumberlist }
-  return callController(route, prefix, body, 'post', query, params)
+  return callController(route, prefix, body, 'post', query, params, onProgress)
 }
 
 export const updatePopulationStudents = (students) => {
