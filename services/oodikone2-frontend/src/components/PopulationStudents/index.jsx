@@ -133,6 +133,10 @@ class PopulationStudents extends Component {
     this.setState({ checked: false })
   }
 
+  handleRef = (node) => {
+    this.studentsRef.current = node
+  }
+
   renderStudentTable() {
     if (!this.props.showList) {
       return null
@@ -622,8 +626,6 @@ class PopulationStudents extends Component {
       </Fragment>
     )
   }
-
-  handleRef = (node) => this.studentsRef.current = node
 
   render() {
     const { Students } = infotooltips.PopulationStatistics
