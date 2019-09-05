@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Form, Label, Segment, Header } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { shape, arrayOf, func, oneOfType, number, string } from 'prop-types'
+import { flatten } from 'lodash'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import { fields, setValue } from '../../../redux/coursesSummaryForm'
 import CumulativeTable from '../CumulativeTable'
@@ -37,7 +38,7 @@ class SummaryTab extends Component {
             <Form>
               <Header content="Filter statistics by study programmes" as="h4" />
               <ProgrammeDropdown
-                options={programmes}
+                options={programmes.map(e => ({ ...e, size: new Set(flatten(Object.values(e.students))).size })).filter(e => e.size > 0)}
                 label="Study programmes:"
                 name={fields.programmes}
                 onChange={this.handleChange}
