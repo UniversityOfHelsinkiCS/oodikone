@@ -319,7 +319,7 @@ SingleCourseStats.propTypes = {
     alternatives: arrayOf(string),
     programmes: objectOf(shape({
       name: shape({}),
-      students: arrayOf(string)
+      students: shape({})
     })),
     statistics: arrayOf(shape({
       code: oneOfType([number, string]),
