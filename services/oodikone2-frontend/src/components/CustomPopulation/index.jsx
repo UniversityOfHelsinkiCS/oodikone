@@ -5,7 +5,7 @@ import { getTranslate } from 'react-localize-redux'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
 import { intersection, difference } from 'lodash'
 
-import { getUserIsAdmin } from '../../common'
+import { getUserIsAdmin, useProgress } from '../../common'
 import { getCustomPopulation } from '../../redux/populations'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import { clearPopulationFilters } from '../../redux/populationFilters'
@@ -14,6 +14,7 @@ import PopulationStudents from '../PopulationStudents'
 import CustomPopulationFilters from '../CustomPopulationFilters'
 import CustomPopulationCourses from '../CustomPopulationCourses'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
+import ProgressBar from '../ProgressBar'
 
 const CustomPopulation = ({
   getCustomPopulationDispatch,
@@ -22,15 +23,21 @@ const CustomPopulation = ({
   translate,
   isAdmin,
   selectedStudents,
-  clearPopulationFiltersDispatch
+  clearPopulationFiltersDispatch,
+  loading
 }) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
 
+  const {
+    onProgress,
+    progress
+  } = useProgress(loading)
+
   const onClicker = (e) => {
     e.preventDefault()
     const studentnumbers = input.match(/[0-9]+/g)
-    getCustomPopulationDispatch({ studentnumberlist: studentnumbers })
+    getCustomPopulationDispatch({ studentnumberlist: studentnumbers, onProgress })
     getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: studentnumbers })
     clearPopulationFiltersDispatch()
     setModal(false)
@@ -99,7 +106,11 @@ const CustomPopulation = ({
   return (
     <div>
       {renderCustomPopulationSearch()}
-      {custompop.length > 0 ? (renderCustomPopulation()) : null}
+      {custompop.length > 0 ? (renderCustomPopulation()) : (
+        <Segment className="contentSegment">
+          <ProgressBar progress={progress} />
+        </Segment>
+      )}
     </div>
   )
 }
@@ -111,7 +122,8 @@ CustomPopulation.propTypes = {
   getCustomPopulationCoursesByStudentnumbers: func.isRequired,
   clearPopulationFiltersDispatch: func.isRequired,
   isAdmin: bool.isRequired,
-  selectedStudents: arrayOf(string).isRequired
+  selectedStudents: arrayOf(string).isRequired,
+  loading: bool.isRequired
 }
 
 const mapStateToProps = ({ populationFilters, populations, localize, populationCourses, auth: { token: { roles } } }) => {
@@ -137,6 +149,7 @@ const mapStateToProps = ({ populationFilters, populations, localize, populationC
 
   return ({
     translate: getTranslate(localize),
+    loading: populations.pending,
     custompop: populations.data.students || [],
     courses: populationCourses.data,
     pending: populationCourses.pending,
