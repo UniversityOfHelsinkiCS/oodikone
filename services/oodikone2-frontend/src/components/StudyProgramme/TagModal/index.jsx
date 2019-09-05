@@ -41,7 +41,7 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
 
   return (
     <Modal
-      trigger={<Button size="small" onClick={() => setModalOpen(true)}>Add tags to students</Button>}
+      trigger={<Button size="small" disabled={!tags.length} onClick={() => setModalOpen(true)}>Add tags to students</Button>}
       open={modalOpen}
       onClose={() => setModalOpen(false)}
       size="small"

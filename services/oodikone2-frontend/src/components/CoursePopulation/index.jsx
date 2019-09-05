@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { shape, func, bool, arrayOf, string } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
-import { Segment, Header, Loader } from 'semantic-ui-react'
+import { Segment, Header } from 'semantic-ui-react'
 import qs from 'query-string'
 import { intersection, difference } from 'lodash'
 import { getCoursePopulation } from '../../redux/populations'
@@ -18,6 +18,8 @@ import CustomPopulationFilters from '../CustomPopulationFilters'
 import CoursePopulationGradeDist from '../CoursePopulationGradeDist'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
 import CustomPopulationCourses from '../CustomPopulationCourses'
+import ProgressBar from '../ProgressBar'
+import { useProgress } from '../../common'
 
 const CoursePopulation = ({
   getCoursePopulationDispatch,
@@ -38,9 +40,15 @@ const CoursePopulation = ({
   const [codes, setCodes] = useState([])
   const [headerYear, setYear] = useState('')
   const [yearCode, setYearCode] = useState('')
+
+  const {
+    onProgress,
+    progress
+  } = useProgress((pending && !studentData.students))
+
   useEffect(() => {
     const query = parseQueryFromUrl()
-    getCoursePopulationDispatch({ coursecodes: query.coursecodes, yearcode: query.yearcode })
+    getCoursePopulationDispatch({ coursecodes: query.coursecodes, yearcode: query.yearcode, onProgress })
     getCoursePopulationCoursesDispatch({ coursecodes: JSON.parse(query.coursecodes), yearcode: query.yearcode })
     getSingleCourseStatsDispatch({ fromYear: query.yearcode, toYear: query.yearcode, courseCodes: JSON.parse(query.coursecodes), separate: false })
     setCodes(JSON.parse(query.coursecodes))
@@ -54,7 +62,7 @@ const CoursePopulation = ({
 
   return (
     <div className="segmentContainer">
-      {studentData.students && !pending ? (
+      {studentData.students ? (
         <Segment className="contentSegment">
           <Header className="segmentTitle" size="large" textAlign="center">Population of course {header}</Header>
           <CustomPopulationFilters samples={studentData.students} coursecodes={codes} />
@@ -86,7 +94,13 @@ const CoursePopulation = ({
             selectedStudents={selectedStudents}
           />
         </Segment>
-      ) : (<Loader active={pending} inline="centered" />)}
+      ) :
+        (
+          <Segment className="contentSegment">
+            <ProgressBar progress={progress} />
+          </Segment>
+        )
+      }
     </div>
   )
 }

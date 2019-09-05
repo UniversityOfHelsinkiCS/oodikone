@@ -2,10 +2,11 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Button, Icon, Popup, Tab, Grid, Checkbox, List } from 'semantic-ui-react'
+import { Header, Segment, Button, Icon, Popup, Tab, Grid, Checkbox, List, Ref } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import XLSX from 'xlsx'
+import scrollToComponent from 'react-scroll-to-component'
 import { getStudentTotalCredits, copyToClipboard, reformatDate, getTextIn, getUserRoles, getNewestProgramme } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
@@ -24,11 +25,17 @@ import TagPopulation from '../TagPopulation'
 const popupTimeoutLength = 1000
 
 class PopulationStudents extends Component {
-  state = {
-    containsStudyTracks: false,
-    students: [],
-    checked: false,
-    checkedStudents: []
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      containsStudyTracks: false,
+      students: [],
+      checked: false,
+      checkedStudents: []
+    }
+
+    this.studentsRef = React.createRef()
   }
 
   componentDidMount() {
@@ -45,6 +52,12 @@ class PopulationStudents extends Component {
       initialCheckedStudents.push(check)
     })
     this.setState({ checkedStudents: initialCheckedStudents })
+  }
+
+  componentDidUpdate = (prevProps) => {
+    if (!prevProps.showList && this.props.showList) {
+      scrollToComponent(this.studentsRef.current, { align: 'bottom' })
+    }
   }
 
   containsStudyTracks = () => {
@@ -118,6 +131,10 @@ class PopulationStudents extends Component {
     })
     this.setState({ checkedStudents: newCheckedStudents })
     this.setState({ checked: false })
+  }
+
+  handleRef = (node) => {
+    this.studentsRef.current = node
   }
 
   renderStudentTable() {
@@ -210,7 +227,7 @@ class PopulationStudents extends Component {
     if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
       columns.push({
         key: 'credits since start',
-        title: 'credits since start',
+        title: 'credits since start of studyright',
         getRowVal: (s) => {
           const credits = getStudentTotalCredits(s)
           return credits.toFixed(2)
@@ -619,15 +636,17 @@ class PopulationStudents extends Component {
     const toggleLabel = this.props.showList ? 'hide' : 'show'
 
     return (
-      <Segment>
-        <Header dividing >
-          {`Students (${this.props.selectedStudents.length}) `}
-          <Button size="small" onClick={() => this.props.toggleStudentListVisibility()}>{toggleLabel}</Button>
-          {this.state.admin ? (<CheckStudentList students={this.props.selectedStudents} />) : null}
-          <InfoBox content={Students} />
-        </Header>
-        {this.renderStudentTable()}
-      </Segment>
+      <Ref innerRef={this.handleRef}>
+        <Segment>
+          <Header dividing >
+            {`Students (${this.props.selectedStudents.length}) `}
+            <Button size="small" onClick={() => this.props.toggleStudentListVisibility()}>{toggleLabel}</Button>
+            {this.state.admin ? (<CheckStudentList students={this.props.selectedStudents} />) : null}
+            <InfoBox content={Students} />
+          </Header>
+          {this.renderStudentTable()}
+        </Segment>
+      </Ref>
     )
   }
 }
