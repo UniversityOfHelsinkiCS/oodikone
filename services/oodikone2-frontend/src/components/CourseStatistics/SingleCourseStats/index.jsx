@@ -4,7 +4,7 @@ import { shape, string, arrayOf, objectOf, oneOfType, number, func } from 'prop-
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { getActiveLanguage } from 'react-localize-redux'
-import { difference, min, max } from 'lodash'
+import { difference, min, max, flatten, pickBy } from 'lodash'
 import qs from 'query-string'
 import ResultTabs from '../ResultTabs'
 import { setSelectedCourse, clearSelectedCourse } from '../../../redux/singleCourseStats'
@@ -98,12 +98,11 @@ class SingleCourseStats extends Component {
     const studentNumbers = []
     codes.forEach((code) => {
       if (programmes[code]) {
-        studentNumbers.push(...programmes[code].students)
+        studentNumbers.push(...flatten(Object.values(programmes[code].students)))
       }
     })
 
     const numberset = new Set(studentNumbers)
-    if (!numberset.size) return () => false
     return studentnumber => numberset.has(studentnumber)
   }
 
@@ -220,15 +219,15 @@ class SingleCourseStats extends Component {
 
   clearComparison = () => this.setState({ comparison: [] })
 
-  comparisonProgrammes = () => {
+  comparisonProgrammes = (programmes) => {
     const { primary, comparison } = this.state
-    const result = this.props.programmes.filter(({ key }) => key !== 'EXCLUDED')
+    const result = programmes.filter(({ key }) => key !== 'EXCLUDED')
     const excludedProgrammes = this.getExcluded()
 
     if (!primary.includes(ALL.value)) {
       const excludedStudents = result
         .filter(({ key }) => excludedProgrammes.includes(key) && key !== 'ALL')
-        .reduce((res, { students }) => [...res, ...students], [])
+        .reduce((res, { students }) => [...res, ...flatten(Object.values(students))], [])
       result.push({
         key: 'EXCLUDED',
         size: excludedStudents.length,
@@ -245,6 +244,12 @@ class SingleCourseStats extends Component {
     const { primary, comparison, fromYear, toYear } = this.state
     const statistics = this.filteredProgrammeStatistics()
     const { filteredYears } = this.filteredYearsAndSemesters()
+
+    const timeFilter = (_, value) => value >= fromYear && value <= toYear
+    const filteredProgrammes = programmes.map((e) => {
+      const students = new Set(flatten(Object.values(pickBy(e.students, timeFilter))))
+      return { ...e, students: [...students], size: students.size }
+    }).filter(e => e.size > 0)
 
     return (
       <div>
@@ -266,7 +271,7 @@ class SingleCourseStats extends Component {
               <Grid.Column width={8}>
                 <ProgrammeDropdown
                   name="primary"
-                  options={programmes}
+                  options={filteredProgrammes}
                   label="Primary group"
                   placeholder="Select study programmes"
                   value={primary}
@@ -276,7 +281,7 @@ class SingleCourseStats extends Component {
               <Grid.Column width={8}>
                 <ProgrammeDropdown
                   name="comparison"
-                  options={this.comparisonProgrammes()}
+                  options={this.comparisonProgrammes(filteredProgrammes)}
                   label="Comparison group"
                   placeholder="Optional"
                   value={comparison}
@@ -314,7 +319,7 @@ SingleCourseStats.propTypes = {
     alternatives: arrayOf(string),
     programmes: objectOf(shape({
       name: shape({}),
-      students: arrayOf(string)
+      students: shape({})
     })),
     statistics: arrayOf(shape({
       code: oneOfType([number, string]),
