@@ -61,8 +61,7 @@ const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
   const { language } = settings
 
   return {
-    studyprogrammes: programmes ? Object.values(programmes).filter(programme =>
-      programme.code.includes('_') || programme.code.startsWith('T92')) : null,
+    studyprogrammes: programmes,
     language
   }
 }
