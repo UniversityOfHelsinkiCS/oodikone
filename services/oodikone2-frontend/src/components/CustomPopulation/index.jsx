@@ -100,7 +100,6 @@ const CustomPopulation = ({
     </div>
   )
 
-
   if (!isAdmin) return <div>you are not an admin, go away</div>
 
   return (
