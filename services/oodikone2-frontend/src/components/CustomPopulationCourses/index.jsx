@@ -24,7 +24,6 @@ const CustomPopulationCourses = ({
     getCustomPopulationCoursesByStudentnumbersDispatch({ studentnumberlist: selectedStudents })
   }
 
-
   useEffect(() => {
     if (refreshNeeded) {
       reloadCourses()
