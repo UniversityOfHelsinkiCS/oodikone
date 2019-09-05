@@ -454,8 +454,8 @@ const PopulationSearchForm = (props) => {
         </Form.Field>
         <Form.Field className="yearControl">
           <Button.Group basic vertical className="yearControlButtonGroup">
-            <Button icon="plus" className="yearControlButton" onClick={addYear} tabIndex="-1" />
-            <Button icon="minus" className="yearControlButton" onClick={subtractYear} tabIndex="-1" />
+            <Button type="button" icon="plus" className="yearControlButton" onClick={addYear} tabIndex="-1" />
+            <Button type="button" icon="minus" className="yearControlButton" onClick={subtractYear} tabIndex="-1" />
           </Button.Group>
         </Form.Field>
         <Form.Field error={query.months < 0}>
