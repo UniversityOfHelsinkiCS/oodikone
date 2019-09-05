@@ -40,7 +40,7 @@ const PopulationStatistics = memo((props) => {
         <PopulationSearchForm onProgress={onProgress} />
         <Divider />
         {location.search !== '' ? (<PopulationSearchHistory />) : null}
-        <ProgressBar progress={progress} />
+        <ProgressBar fixed progress={progress} />
       </Segment>
     )
   }
