@@ -21,7 +21,6 @@ import CustomPopulationCourses from '../CustomPopulationCourses'
 import ProgressBar from '../ProgressBar'
 import { useProgress } from '../../common'
 
-
 const CoursePopulation = ({
   getCoursePopulationDispatch,
   getCoursePopulationCoursesDispatch,
