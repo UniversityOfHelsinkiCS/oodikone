@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 import { getActiveLanguage } from 'react-localize-redux'
-import { sortBy } from 'lodash'
+import { sortBy, flatten } from 'lodash'
 import { getTextIn } from '../common'
 
 const nameAsString = (data, language) => {
@@ -56,7 +56,16 @@ export const ALL = {
   text: 'All'
 }
 
-const mergeUnique = (arr1, arr2) => [...new Set([...arr1, ...arr2])]
+const mergeStudents = (students1, students2) => {
+  Object.keys(students2).forEach((k) => {
+    if (students1[k]) {
+      students1[k] = [...students1[k], ...students2[k]]
+    } else {
+      students1[k] = students2[k]
+    }
+  })
+  return students1
+}
 
 const getAllStudyProgrammes = createSelector([getCourseStats, languageSelector, selectedCourseSelector], (courseStats, language, selectedCourseCode) => {
   const studentsIncluded = new Set(selectedCourseCode ?
@@ -70,11 +79,11 @@ const getAllStudyProgrammes = createSelector([getCourseStats, languageSelector, 
 
   const all = {}
   Object.values(courseStats).forEach((stat) => {
-    const { programmes: p } = stat
-    Object.entries(p).forEach((entry) => {
+    const { programmes } = stat
+    Object.entries(programmes).forEach((entry) => {
       const [code, info] = entry
       const { name, students } = info
-      const filteredStudents = students.filter(s => studentsIncluded.has(s))
+      const filteredStudents = Object.keys(students).reduce((acc, k) => ({ ...acc, [k]: students[k].filter(s => studentsIncluded.has(s)) }), {})
       if (!all[code]) {
         all[code] = {
           key: code,
@@ -83,19 +92,17 @@ const getAllStudyProgrammes = createSelector([getCourseStats, languageSelector, 
           students: filteredStudents
         }
       } else {
-        const programme = all[code]
-        programme.students = mergeUnique(filteredStudents, programme.students)
+        all[code].students = mergeStudents(all[code].students, filteredStudents)
       }
     })
   })
 
-  const allStudents = [...new Set(Object.values(all).reduce((res, curr) => [...res, ...curr.students], []))]
+  let allStudents = {}
+  Object.values(all).forEach((curr) => { allStudents = mergeStudents(allStudents, curr.students) })
   const programmes = Object.values(all)
-    .map(p => ({ ...p, size: p.students.length || 0 }))
-    .filter(p => p.size > 0)
-    .sort((p1, p2) => p2.size - p1.size)
+    .map(p => ({ ...p, size: p.students.length }))
   return [
-    { ...ALL, students: allStudents, size: allStudents.length },
+    { ...ALL, students: allStudents },
     ...programmes
   ]
 })
@@ -143,7 +150,7 @@ const summaryStatistics = createSelector(
   getProgrammesFromProps,
   (courseStats, { programmeCodes, programmes }) => {
     const filteredProgrammes = programmes.filter(p => programmeCodes.includes(p.key))
-    const students = new Set(filteredProgrammes.reduce((acc, p) => [...acc, ...p.students], []))
+    const students = new Set(filteredProgrammes.reduce((acc, p) => [...acc, ...flatten(Object.values(p.students))], []))
 
     const filterStudentFn = studentNumber => students.has(studentNumber)
     return Object.entries(courseStats).map((entry) => {

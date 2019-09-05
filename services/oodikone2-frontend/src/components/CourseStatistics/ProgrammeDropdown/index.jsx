@@ -1,17 +1,17 @@
 import React from 'react'
 import { Form } from 'semantic-ui-react'
 import { string, arrayOf, shape, func, oneOfType, number } from 'prop-types'
+import { orderBy } from 'lodash'
 import DropdownItem from './DropdownItem'
 import ClearableItem from './ClearableItem'
 
 const ProgrammeDropdown = ({ options, label, name, onChange, onClear, value, ...props }) => (
   <Form.Dropdown
-    options={options.map(({ key, size, value: v, text, ...rest }) => ({
+    options={orderBy(options, ['size'], ['desc']).map(({ key, size, value: v, text }) => ({
         key,
         content: <DropdownItem name={text} code={key} size={size} />,
         text: !onClear ? text : <ClearableItem name={text} onClear={onClear} />,
-        value: v,
-        ...rest
+        value: v
     }))}
     selection
     multiple
