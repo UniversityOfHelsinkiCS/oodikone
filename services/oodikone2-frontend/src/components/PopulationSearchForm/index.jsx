@@ -7,7 +7,7 @@ import { Form, Button, Message, Icon, Grid } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
-import { isEqual, sortBy } from 'lodash'
+import { sortBy } from 'lodash'
 import moment from 'moment'
 
 import { getPopulationStatistics } from '../../redux/populations'
@@ -215,12 +215,6 @@ const PopulationSearchForm = (props) => {
       fetchPopulationFromUrlParams()
     }
   }, [props.location.search])
-
-  const validateQuery = () => {
-    const compare = { ...queries }
-    delete compare.uuid
-    return isEqual(compare, query)
-  }
 
   const pushQueryToUrl = (query) => {
     const { studyRights, ...rest } = query
@@ -683,7 +677,7 @@ const PopulationSearchForm = (props) => {
   }
   const { Advanced } = infoToolTips.PopulationStatistics
   let errorText = translate('populationStatistics.alreadyFetched')
-  let isQueryInvalid = validateQuery()
+  let isQueryInvalid = false
 
   if (!validYearCheck(momentYear)) {
     isQueryInvalid = true
