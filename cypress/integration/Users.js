@@ -21,7 +21,7 @@ describe('Users tests', () => {
   it("Admin mocking normal user shows only the mocked user's programmes", () => {
     cy.contains("mocking").should('not.exist')
     cy.contains("tr", "Normaalikäyttäjä").within(($row) => {
-      cy.contains('button', 'Edit').click()
+      cy.contains('.button', 'Edit').click()
     })
     cy.contains("Access rights").siblings().within(($row) => {
       cy.get("div[role='listitem']").should('have.length', 1).contains("Tietojenkäsittelytieteen kandiohjelma")

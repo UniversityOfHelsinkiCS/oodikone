@@ -42,7 +42,7 @@ const SearchResultTable = ({
 }) => {
   if (rows.length > 0) {
     return (
-      <Segment style={{ overflow: 'scroll', maxHeight: '80vh', padding: 0 }}>
+      <Segment style={{ maxHeight: '80vh', padding: 0 }}>
         <Table
           unstackable
           selectable={selectable}

@@ -1,5 +1,14 @@
 import React, { Component } from 'react'
-import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
+import {
+  Button,
+  Card,
+  Divider,
+  List,
+  Icon,
+  Popup,
+  Dropdown,
+  Header
+} from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { sortBy } from 'lodash'
@@ -12,6 +21,7 @@ import { getFaculties } from '../../redux/faculties'
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
 import AccessRights from './AccessRights'
 import AccessGroups from './AccessGroups'
+import EmailNotification from './EmailNotification'
 import { getElementDetails } from '../../redux/elementdetails'
 
 const formatToDropdown = (elements, language) => {
@@ -120,16 +130,30 @@ class UserPage extends Component {
   }
 
   render() {
-    const { user, language, elementdetails } = this.props
-    return this.props.accessGroups ?
+    const {
+      user,
+      language,
+      elementdetails,
+      accessGroups,
+      isAdmin,
+      faculties,
+      setFaculties,
+      goBack
+    } = this.props
+
+    if (!accessGroups) {
+      return null
+    }
+
+    return (
       <div>
-        <Button icon="arrow circle left" content="Back" onClick={this.props.goBack} />
+        <Button icon="arrow circle left" content="Back" onClick={goBack} />
         <Divider />
         <Card.Group>
           <Card fluid>
             <Card.Content>
               <Card.Header>
-                { this.props.isAdmin && user.is_enabled && (
+                {isAdmin && user.is_enabled && (
                   <Popup
                     content="Show Oodikone as this user"
                     trigger={<Button floated="right" circular size="tiny" basic icon="spy" onClick={() => this.showAs(user.username)} />}
@@ -179,9 +203,9 @@ class UserPage extends Component {
                   fluid
                   selection
                   multiple
-                  value={this.props.user.faculty.map(f => f.faculty_code)}
-                  options={sortBy(this.props.faculties.map(f => ({ key: f.code, text: getTextIn(f.name, language), description: f.code, value: f.code })), ['text'])}
-                  onChange={(__, { value: facultycodes }) => this.props.setFaculties(user.id, facultycodes)}
+                  value={user.faculty.map(f => f.faculty_code)}
+                  options={sortBy(faculties.map(f => ({ key: f.code, text: getTextIn(f.name, language), description: f.code, value: f.code })), ['text'])}
+                  onChange={(__, { value: facultycodes }) => setFaculties(user.id, facultycodes)}
                   search={textAndDescriptionSearch}
                   selectOnBlur={false}
                   selectOnNavigation={false}
@@ -189,10 +213,18 @@ class UserPage extends Component {
               </Card.Description>
             </Card.Content>
           </Card>
+          <Card fluid>
+            <Card.Content>
+              <Card.Header content="Notify user of new access rights" />
+              <Card.Description>
+                <Divider />
+                <EmailNotification />
+              </Card.Description>
+            </Card.Content>
+          </Card>
         </Card.Group>
-      </div >
-      :
-      null
+      </div>
+    )
   }
 }
 
