@@ -1,5 +1,14 @@
 import React, { Component } from 'react'
-import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
+import {
+  Button,
+  Card,
+  Divider,
+  List,
+  Icon,
+  Popup,
+  Dropdown,
+  Header
+} from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { sortBy } from 'lodash'
@@ -12,6 +21,7 @@ import { getFaculties } from '../../redux/faculties'
 import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
 import AccessRights from './AccessRights'
 import AccessGroups from './AccessGroups'
+import EmailNotification from './EmailNotification'
 import { getElementDetails } from '../../redux/elementdetails'
 
 const formatToDropdown = (elements, language) => {
@@ -200,6 +210,15 @@ class UserPage extends Component {
                   selectOnBlur={false}
                   selectOnNavigation={false}
                 />
+              </Card.Description>
+            </Card.Content>
+          </Card>
+          <Card fluid>
+            <Card.Content>
+              <Card.Header content="Notify user of new access rights" />
+              <Card.Description>
+                <Divider />
+                <EmailNotification />
               </Card.Description>
             </Card.Content>
           </Card>
