@@ -611,7 +611,7 @@ const yearlyStatsOfNew = async (coursecode, separate) => {
         sv: 'Andra'
       }
     }]
-    counter.markStudyProgrammes(studentnumber, programmes.length === 0 ? unknownProgramme : programmes)
+    counter.markStudyProgrammes(studentnumber, programmes.length === 0 ? unknownProgramme : programmes, yearcode)
     counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode, yearcode)
     counter.markCreditToHistory(studentnumber, passed)
   }

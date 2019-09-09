@@ -18,7 +18,7 @@ class CourseYearlyStatsCounter {
   }
 
   initProgramme(code, name) {
-    this.programmes[code] = { name, students: [] }
+    this.programmes[code] = { name, students: {} }
   }
 
   initGroup(groupcode, name, coursecode, yearcode) {
@@ -45,18 +45,17 @@ class CourseYearlyStatsCounter {
     return { attempted, passed, failed }
   }
 
-  markStudyProgramme(code, name, studentnumber) {
+  markStudyProgramme(code, name, studentnumber, yearcode) {
     if (!this.programmes[code]) {
       this.initProgramme(code, name)
     }
-    if (!this.programmes[code].students.includes(studentnumber)) {
-      this.programmes[code].students.push(studentnumber)
-    }
+    this.programmes[code].students[yearcode] = this.programmes[code].students[yearcode] || []
+    this.programmes[code].students[yearcode].push(studentnumber)
   }
 
-  markStudyProgrammes(studentnumber, programmes) {
+  markStudyProgrammes(studentnumber, programmes, yearcode) {
     programmes.forEach(({ code, name }) => {
-      this.markStudyProgramme(code, name, studentnumber)
+      this.markStudyProgramme(code, name, studentnumber, yearcode)
     })
   }
 
