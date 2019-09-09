@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import { Button, Radio, Icon, Header, Segment, Confirm, Loader, Label } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf, number } from 'prop-types'
@@ -33,11 +33,6 @@ class EnableUsers extends Component {
 
   sendMailPopup = user => () => {
     this.setState({ confirm: true, email: user.email })
-  }
-
-  openEditUserPage = userid => () => {
-    const { history } = this.props
-    history.push(`users/${userid}`)
   }
 
   openUsersPage = () => {
@@ -165,7 +160,7 @@ class EnableUsers extends Component {
               title: '',
               getRowVal: user => (
                 <Button.Group compact widths={2}>
-                  <Button basic size="mini" onClick={this.openEditUserPage(user.id)}>
+                  <Button basic size="mini" as={Link} to={`users/${user.id}`}>
                     Edit
                   </Button>
                 </Button.Group>
