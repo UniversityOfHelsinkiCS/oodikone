@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import moment from 'moment'
-import { arrayOf, object, string, func, number } from 'prop-types'
+import { arrayOf, object, string, func, number, shape } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import Highcharts from 'highcharts/highstock'
 import { Button } from 'semantic-ui-react'
@@ -115,17 +115,37 @@ class CreditAccumulationGraphHighCharts extends Component {
       const started = moment(students[0].started)
       const lastDate = moment(students.maxDate)
       const lastMonth = Math.ceil(this.getXAxisMonth(lastDate, started))
-      lastCredits = lastMonth * (55 / 12)
+
+      let totalAbsenceMonths = 0
+      const absencePoints = this.props.absences.reduce((res, { startdate, enddate }) => {
+        const targetCreditsBeforeAbsence = (Math.ceil(this.getXAxisMonth(moment(startdate), started)) - totalAbsenceMonths) * (55 / 12)
+        if (enddate < students.maxDate) {
+          res.push([startdate, targetCreditsBeforeAbsence])
+          res.push([enddate, targetCreditsBeforeAbsence])
+          totalAbsenceMonths += moment(enddate).diff(moment(startdate), 'months')
+        }
+        return res
+      }, [])
+
+      const zoneStart = absencePoints.length ? [absencePoints[0][0]] : []
+      const zones = absencePoints.reduce((acc, [start], i) => [...acc, { value: start, color: i % 2 === 0 ? '#96d7c3' : 'red' }], zoneStart)
+
+      lastCredits = (lastMonth - totalAbsenceMonths) * (55 / 12)
       dataOfSelected.push({
         data: [
-          [students.minDate, 0],
-          [students.maxDate, lastCredits]
+          ...[
+            [students.minDate, 0],
+            ...absencePoints,
+            [students.maxDate, lastCredits]
+          ].sort((a, b) => a[0] - b[0])
         ],
         seriesThreshold: 150,
         color: '#96d7c3',
         marker: {
           enabled: false
-        }
+        },
+        zones,
+        zoneAxis: 'x'
       })
     }
     const self = this
@@ -274,14 +294,21 @@ class CreditAccumulationGraphHighCharts extends Component {
     )
   }
 }
+
+CreditAccumulationGraphHighCharts.defaultProps = {
+  absences: []
+}
+
 CreditAccumulationGraphHighCharts.propTypes = {
   students: arrayOf(object).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   setChartHeight: func.isRequired,
   currentGraphSize: number.isRequired,
   language: string.isRequired,
-  translate: func.isRequired
+  translate: func.isRequired,
+  absences: arrayOf(shape({}))
 }
+
 const mapStateToProps = state => ({
   language: getActiveLanguage(state.localize).code,
   spinner: state.graphSpinner,

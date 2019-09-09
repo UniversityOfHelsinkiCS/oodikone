@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const { sequelize } = require('../database/connection')
 const moment = require('moment')
-const { Student, Credit, Course, Studyright, StudyrightElement, ElementDetails } = require('../models')
+const { Student, Credit, Course, Studyright, StudyrightElement, ElementDetails, SemesterEnrollment } = require('../models')
 const {
   TagStudent,
   Tag
@@ -44,6 +44,9 @@ const byId = async (id) => {
               }
             }
           }
+        },
+        {
+          model: SemesterEnrollment
         }
       ]
     }),
