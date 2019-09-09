@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { withRouter, Link } from 'react-router-dom'
-import { Button, Radio, Icon, Header, Segment, Confirm, Loader, Label } from 'semantic-ui-react'
+import { Button, Radio, Icon, Header, Segment, Loader, Label } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf, number } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
-import { getUsers, sendEmail } from '../../redux/users'
+import { getUsers } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { getElementDetails } from '../../redux/elementdetails'
 import { makeSortUsers } from '../../selectors/users'
@@ -14,8 +14,6 @@ import SortableTable from '../SortableTable'
 
 class EnableUsers extends Component {
   state = {
-    confirm: false,
-    email: '',
     enabledOnly: true
   }
 
@@ -29,10 +27,6 @@ class EnableUsers extends Component {
     if (this.props.enabledOnly) this.props.getUsers()
     const { enabledOnly } = this.state
     this.setState({ enabledOnly: !enabledOnly })
-  }
-
-  sendMailPopup = user => () => {
-    this.setState({ confirm: true, email: user.email })
   }
 
   openUsersPage = () => {
@@ -72,25 +66,6 @@ class EnableUsers extends Component {
     }
     return error ? null : (
       <div>
-        {this.state.confirm ? <Confirm
-          style={{
-            marginTop: 'auto !important',
-            display: 'inline-block !important',
-            position: 'relative'
-            // top: '20%',
-            // left: '33%'
-          }}
-          open={this.state.confirm}
-          cancelButton="no"
-          confirmButton="send"
-          content="Do you want to notify this person by email about receiving access to oodikone?"
-          onCancel={() => { this.setState({ confirm: false }) }}
-          onConfirm={() => {
-            this.setState({ confirm: false })
-            this.props.sendEmail(this.state.email)
-          }}
-          size="small"
-        /> : null}
         <SortableTable
           getRowKey={user => user.id}
           tableProps={{ celled: true, structured: true }}
@@ -148,14 +123,6 @@ class EnableUsers extends Component {
                 />
               )
             }, {
-              key: 'SENDMAIL',
-              title: '',
-              getRowVal: user => user.is_enabled,
-              getRowContent: user => (
-                <Button onClick={this.sendMailPopup(user)} basic fluid size="mini">Send mail</Button>
-              ),
-              headerProps: { onClick: null, sorted: null }
-            }, {
               key: 'EDIT',
               title: '',
               getRowVal: user => (
@@ -208,7 +175,6 @@ EnableUsers.propTypes = {
   getUsers: func.isRequired,
   pending: bool.isRequired,
   getUnits: func.isRequired,
-  sendEmail: func.isRequired,
   enabledOnly: bool.isRequired,
   users: arrayOf(shape({
     id: string,
@@ -243,6 +209,5 @@ const mapStateToProps = ({ localize, users, units, elementdetails }) => ({
 export default withRouter(connect(mapStateToProps, {
   getUsers,
   getUnits,
-  sendEmail,
   getElementDetails
 })(EnableUsers))
