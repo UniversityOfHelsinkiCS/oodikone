@@ -50,6 +50,7 @@ import tags from './tags'
 import tagstudent from './tagstudent'
 import auth from './auth'
 import singleCourseStats from './singleCourseStats'
+import userAccessEmail from './userAccessEmail'
 
 export default combineReducers({
   localize,
@@ -102,5 +103,6 @@ export default combineReducers({
   tags,
   tagstudent,
   auth,
-  singleCourseStats
+  singleCourseStats,
+  userAccessEmail
 })

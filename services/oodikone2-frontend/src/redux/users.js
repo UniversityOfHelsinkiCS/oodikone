@@ -35,14 +35,6 @@ export const setFaculties = (uid, faculties) => {
   return callController(route, prefix, data, 'post')
 }
 
-export const sendEmail = (email) => {
-  const route = '/users/email'
-  const prefix = 'SEND_EMAIL_'
-  const data = { email }
-  const method = 'post'
-  return callController(route, prefix, data, method)
-}
-
 const reducer = (state = { data: [], enabledOnly: true }, action) => {
   switch (action.type) {
     case 'GET_USERS_ATTEMPT':
@@ -121,21 +113,6 @@ const reducer = (state = { data: [], enabledOnly: true }, action) => {
         setfacultypending: false,
         data: state.data.filter(user => user.id !== action.response.id)
           .concat(action.response)
-      }
-    case 'SEND_EMAIL_ATTEMPT':
-      return {
-        ...state,
-        pending: true
-      }
-    case 'SEND_EMAIL_SUCCESS':
-      return {
-        ...state,
-        pending: false
-      }
-    case 'SEND_EMAIL_FAILURE':
-      return {
-        ...state,
-        pending: false
       }
     default:
       return state
