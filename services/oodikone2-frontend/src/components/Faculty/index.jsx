@@ -4,18 +4,19 @@ import { withRouter } from 'react-router-dom'
 import { getActiveLanguage } from 'react-localize-redux'
 import { Header, Segment, Form } from 'semantic-ui-react'
 import { uniq } from 'lodash'
-import { string, arrayOf, shape, func } from 'prop-types'
+import { string, arrayOf, shape, func, bool } from 'prop-types'
 import { getTextIn } from '../../common'
-import { getFaculties, getFacultiesYearlyStats, getFacultyProgrammes } from '../../redux/faculties'
+import { getUserFaculties, getFacultiesYearlyStats, getFacultyProgrammes } from '../../redux/faculties'
 import YearFilter from '../CourseStatistics/SearchForm/YearFilter'
 import FacultySelector from './FacultySelector'
 import FacultyStats from './FacultyStats'
 
-const Faculty = ({ getFaculties, getFacultiesYearlyStats, getFacultyProgrammes, faculties, facultyYearlyStats, history, match, language }) => {
+const Faculty = ({ getUserFaculties, getFacultiesYearlyStats, getFacultyProgrammes, faculties, pending, error, facultyYearlyStats, history, match, language }) => {
   const [selectedFaculty, setSelectedFaculty] = useState(null)
   const [fromYear, setFromYear] = useState(-1)
   const [toYear, setToYear] = useState(-1)
   const [years, setYears] = useState([])
+  const [initialized, setInitialized] = useState(false)
 
   const facultyCodes = faculties.map(({ code }) => code)
   const selectedFacultyProgrammesStats = facultyYearlyStats.find(({ id }) => id === selectedFaculty)
@@ -34,9 +35,10 @@ const Faculty = ({ getFaculties, getFacultiesYearlyStats, getFacultyProgrammes, 
   }, [history.location.pathname])
 
   useEffect(() => {
-    getFaculties()
+    getUserFaculties()
     getFacultiesYearlyStats()
     getFacultyProgrammes()
+    setInitialized(true)
   }, [])
 
   const getYearFilterData = () => {
@@ -73,6 +75,12 @@ const Faculty = ({ getFaculties, getFacultiesYearlyStats, getFacultyProgrammes, 
       getTextIn(faculties.find(({ code }) => code === selectedFaculty).name, language) :
       'Faculties'
   )
+
+  if (!(faculties.length || pending) && initialized) {
+    return !error ?
+      <Header textAlign="center" content="No access to any faculties!" as="h1" /> :
+      <Header textAlign="center" content="Not authorized for faculties!" as="h1" />
+  }
 
   return (
     <div className="segmentContainer">
@@ -117,24 +125,28 @@ const Faculty = ({ getFaculties, getFacultiesYearlyStats, getFacultyProgrammes, 
 }
 
 Faculty.propTypes = {
-  getFaculties: func.isRequired,
+  getUserFaculties: func.isRequired,
   getFacultiesYearlyStats: func.isRequired,
   getFacultyProgrammes: func.isRequired,
   faculties: arrayOf(shape({})).isRequired,
   facultyYearlyStats: arrayOf(shape({})).isRequired,
   history: shape({}).isRequired,
   match: shape({}).isRequired,
-  language: string.isRequired
+  language: string.isRequired,
+  pending: bool.isRequired,
+  error: bool.isRequired
 }
 
 const mapStateToProps = ({ faculties, localize }) => ({
   faculties: faculties.data,
   facultyYearlyStats: faculties.yearlyStats,
-  language: getActiveLanguage(localize).code
+  language: getActiveLanguage(localize).code,
+  pending: faculties.userFacultiesPending,
+  error: faculties.userFacultiesError
 })
 
 const mapDispatchToProps = {
-  getFaculties,
+  getUserFaculties,
   getFacultiesYearlyStats,
   getFacultyProgrammes
 }
