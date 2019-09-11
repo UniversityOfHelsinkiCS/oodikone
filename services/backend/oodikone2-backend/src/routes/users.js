@@ -25,6 +25,11 @@ router.post('/modifyaccess', async (req, res) => {
   }
 })
 
+router.get('/email/preview', (req, res) => {
+  const { subject, html } = mailservice.message2(null)
+  res.json({ subject, html })
+})
+
 router.post('/email', async (req, res) => {
   if (!process.env.SMTP) {
     return res
