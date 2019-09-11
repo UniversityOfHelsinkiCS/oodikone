@@ -218,7 +218,7 @@ class UserPage extends Component {
               <Card.Header content="Notify user of new access rights" />
               <Card.Description>
                 <Divider />
-                <EmailNotification />
+                <EmailNotification userEmail={user.email} />
               </Card.Description>
             </Card.Content>
           </Card>
