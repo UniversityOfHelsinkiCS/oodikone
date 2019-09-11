@@ -3,6 +3,7 @@ import { Menu, Dropdown, Button } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
 import { func, string, arrayOf } from 'prop-types'
 import { connect } from 'react-redux'
+import { isEqual } from 'lodash'
 import { getUserRoles, setMocking, setTestUser } from '../../common'
 import { logout as logoutAction } from '../../redux/auth'
 import LanguageChooser from '../LanguageChooser'
@@ -222,5 +223,9 @@ const mapDispatchToProps = {
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
+  null,
+  {
+    areStatePropsEqual: isEqual
+  }
 )(NavigationBar)
