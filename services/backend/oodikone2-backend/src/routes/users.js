@@ -44,7 +44,7 @@ router.post('/email', async (req, res) => {
     res.status(200).end()
   } catch (e) {
     console.error('Error occurred while sending user email', e)
-    res.status(500).json({ error: e })
+    res.status(500).json({ error: e.message })
   }
 })
 
