@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Form, Divider } from 'semantic-ui-react'
 import PropTypes from 'prop-types'
+import { isEqual } from 'lodash'
 import { textAndDescriptionSearch } from '../../common'
 import selectors from '../../selectors/programmes'
 import { addUserUnits } from '../../redux/users'
@@ -76,4 +77,11 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(mapStateToProps, { addUserUnits })(AccessRights)
+export default connect(
+  mapStateToProps,
+  { addUserUnits },
+  null,
+  {
+    areStatePropsEqual: isEqual
+  }
+)(AccessRights)
