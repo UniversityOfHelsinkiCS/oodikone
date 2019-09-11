@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const conf = require('../conf-backend')
 const blacklist = require('../services/blacklist')
-const { getAccessGroupCodesFor, getCodesFromElementDetails } = require('../services/userService')
+const { getUserDataFor } = require('../services/userService')
 const { ACCESS_TOKEN_HEADER_KEY } = require('../conf-backend')
 const { hasRequiredGroup, parseHyGroups } = require('../util/utils')
 
@@ -15,9 +15,9 @@ const checkAuth = async (req, res, next) => {
     if (err) return res.status(403).json(err)
     if (decoded.version !== TOKEN_VERSION) return res.status(401).json({ error: 'Token needs to be refreshed - invalid version' })
     if (decoded.mockedBy ? decoded.mockedBy !== uid : decoded.userId !== uid) return res.status(403).json({ error: 'User shibboleth id and token id did not match' })
+    const userData = await getUserDataFor(decoded.userId)
     req.decodedToken = decoded
-    req.roles = await getAccessGroupCodesFor(decoded.userId)
-    req.rights = await getCodesFromElementDetails(decoded.userId)
+    Object.assign(req, userData)
     next()
   })
 }

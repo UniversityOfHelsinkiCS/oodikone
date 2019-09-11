@@ -90,11 +90,6 @@ const getUnitsFromElementDetails = async username => {
   return elementDetails.map(element => UnitService.parseUnitFromElement(element))
 }
 
-const getCodesFromElementDetails = async uid => {
-  const elementDetails = await getUserElementDetails(uid)
-  return elementDetails.map(e => e.code)
-}
-
 const modifyAccess = async (body) => {
   const response = await client.post('/modifyaccess', body)
   return response.data
@@ -105,9 +100,13 @@ const getAccessGroups = async () => {
   return response.data
 }
 
-const getAccessGroupCodesFor = async (user) => {
-  const response = await client.get(`/get_accessgroupcodes/${user}`)
-  return response.data
+const getUserDataFor = async (uid) => {
+  const user = await byUsername(uid)
+  return {
+    roles: user.accessgroup.map(({ group_code }) => group_code),
+    rights: user.elementdetails,
+    faculties: new Set(user.faculty.map(({ faculty_code }) => faculty_code))
+  }
 }
 
 module.exports = {
@@ -124,9 +123,8 @@ module.exports = {
   findAll,
   modifyAccess,
   getAccessGroups,
-  getAccessGroupCodesFor,
   getUnitsFromElementDetails,
-  getCodesFromElementDetails,
   getRolesFor,
-  setFaculties
+  setFaculties,
+  getUserDataFor
 }

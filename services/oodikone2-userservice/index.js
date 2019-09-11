@@ -147,17 +147,7 @@ initializeDatabaseConnection().then(() => {
       res.status(400).json({ e })
     }
   })
-
-  app.get('/get_accessgroupcodes/:uid', async (req, res) => {
-    const { uid } = req.params
-    try {
-      const user = await User.byUsername(uid)
-      res.status(200).json(user.accessgroup.map(g => g.group_code))
-    } catch (e) {
-      res.status(400).json({ e })
-    }
-  })
-
+  
   app.get('/faculty_programmes', async (req, res) => {
     try {
       const facultyProgrammes = await FacultyProgrammes.findAll()
