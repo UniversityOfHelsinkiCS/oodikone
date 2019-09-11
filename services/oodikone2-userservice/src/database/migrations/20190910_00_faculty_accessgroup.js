@@ -1,14 +1,14 @@
+const { AccessGroup } = require('../../models')
+const accessGroup = {
+  group_code: 'faculties',
+  group_info: 'grants access to faculty statistics',
+}
+
 module.exports = {
-  up: async (queryInterface) => {
-    return queryInterface.bulkInsert('access_groups', [
-      {
-        group_code: 'faculties',
-        group_info: 'grants access to faculty statistics',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    ])
+  up: async () => {
+    AccessGroup.create(accessGroup)
   },
   down: async () => {
+    AccessGroup.destroy({ where: { group_code: ['faculties'] } })
   }
 }
