@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom'
 import { getActiveLanguage } from 'react-localize-redux'
 import { Header, Segment, Form } from 'semantic-ui-react'
 import { uniq } from 'lodash'
-import { string, arrayOf, shape, func } from 'prop-types'
+import { string, arrayOf, shape, func, bool } from 'prop-types'
 import { getTextIn } from '../../common'
 import { getUserFaculties, getFacultiesYearlyStats, getFacultyProgrammes } from '../../redux/faculties'
 import YearFilter from '../CourseStatistics/SearchForm/YearFilter'
@@ -78,8 +78,8 @@ const Faculty = ({ getUserFaculties, getFacultiesYearlyStats, getFacultyProgramm
 
   if (!(faculties.length || pending) && initialized) {
     return !error ?
-      <Header textAlign='center' content='No access to any faculties!' as='h1' /> :
-      <Header textAlign='center' content='Not authorized for faculties!' as='h1' />
+      <Header textAlign="center" content="No access to any faculties!" as="h1" /> :
+      <Header textAlign="center" content="Not authorized for faculties!" as="h1" />
   }
 
   return (
@@ -125,14 +125,16 @@ const Faculty = ({ getUserFaculties, getFacultiesYearlyStats, getFacultyProgramm
 }
 
 Faculty.propTypes = {
-  getFaculties: func.isRequired,
+  getUserFaculties: func.isRequired,
   getFacultiesYearlyStats: func.isRequired,
   getFacultyProgrammes: func.isRequired,
   faculties: arrayOf(shape({})).isRequired,
   facultyYearlyStats: arrayOf(shape({})).isRequired,
   history: shape({}).isRequired,
   match: shape({}).isRequired,
-  language: string.isRequired
+  language: string.isRequired,
+  pending: bool.isRequired,
+  error: bool.isRequired
 }
 
 const mapStateToProps = ({ faculties, localize }) => ({
