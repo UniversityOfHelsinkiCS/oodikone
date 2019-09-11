@@ -25,6 +25,9 @@ export const clearErrors = () => ({
   type: CLEAR_USER_ACCESS_ERRORS
 })
 
+const extractAxiosError = response =>
+  response.data && (response.data.error || response.data)
+
 const sendingPending = (state = false, action) => {
   switch (action.type) {
     case sendingTypes.attempt:
@@ -44,7 +47,7 @@ const sendingError = (state = null, action) => {
     case CLEAR_USER_ACCESS_ERRORS:
       return null
     case sendingTypes.failure:
-      return action.response.response.data.error
+      return extractAxiosError(action.response.response)
     default:
       return state
   }
@@ -82,7 +85,7 @@ const previewError = (state = null, action) => {
     case CLEAR_USER_ACCESS_ERRORS:
       return null
     case previewTypes.failure:
-      return action.response.response.data.error
+      return extractAxiosError(action.response.response)
     default:
       return state
   }

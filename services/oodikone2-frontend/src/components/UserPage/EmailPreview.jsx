@@ -1,6 +1,6 @@
 import React, { useEffect, Fragment } from 'react'
 import { bool, func, string, node } from 'prop-types'
-import { Label, Segment } from 'semantic-ui-react'
+import { Label, Message, Segment } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { getPreview } from '../../redux/userAccessEmail'
 
@@ -69,10 +69,16 @@ const EmailPreview = ({
         placeholder={isLoading}
         loading={isLoading}
         height={isLoading ? '200px' : undefined}
-        color={error ? 'red' : undefined}
         style={{ background: '#f7f7f7' }}
       >
-        {!isLoading && (
+        {error && (
+          <Message
+            error
+            header="Could not get email preview"
+            list={[error]}
+          />
+        )}
+        {!isLoading && !error && (
           <iframe
             sandbox=""
             referrerPolicy="no-referrer"
