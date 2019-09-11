@@ -215,7 +215,7 @@ class UserPage extends Component {
           </Card>
           <Card fluid>
             <Card.Content>
-              <Card.Header content="Notify user of new access rights" />
+              <Card.Header content="Send email about receiving access to oodikone" />
               <Card.Description>
                 <Divider />
                 <EmailNotification userEmail={user.email} />

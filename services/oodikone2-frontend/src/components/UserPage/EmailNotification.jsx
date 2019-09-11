@@ -1,18 +1,12 @@
 import React, { useState, useEffect, useCallback, Fragment } from 'react'
 import { bool, func, string } from 'prop-types'
-import { Button, Divider, Icon, Modal, Message } from 'semantic-ui-react'
+import { Button, Icon, Modal, Message } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { sendEmail, clearErrors } from '../../redux/userAccessEmail'
 import EmailPreview from './EmailPreview'
 
 const SendEmailButton = props => (
-  <Button
-    basic
-    fluid
-    positive
-    content="Send email about receiving access to oodikone ..."
-    {...props}
-  />
+  <Button basic fluid positive content="Preview email ..." {...props} />
 )
 
 const DisabledEmailButton = props => (
@@ -24,6 +18,19 @@ const DisabledEmailButton = props => (
     {...props}
   />
 )
+
+const SendFailBanner = ({ userEmail, error }) => (
+  <Message
+    error
+    header={`Email could not be sent to ${userEmail}`}
+    list={[error]}
+  />
+)
+
+SendFailBanner.propTypes = {
+  userEmail: string.isRequired,
+  error: string.isRequired
+}
 
 const EmailConfirm = ({
   userEmail,
@@ -38,11 +45,6 @@ const EmailConfirm = ({
     <Modal.Content scrolling>
       <Modal.Description>
         {error && <SendFailBanner userEmail={userEmail} error={error} />}
-        <p>
-          Do you want to notify this person by email about receiving access to
-          oodikone?
-        </p>
-        <Divider />
         <EmailPreview userEmail={userEmail} />
       </Modal.Description>
     </Modal.Content>
@@ -76,19 +78,6 @@ EmailConfirm.propTypes = {
   isLoading: bool.isRequired,
   onCancel: func.isRequired,
   onConfirm: func.isRequired
-}
-
-const SendFailBanner = ({ userEmail, error }) => (
-  <Message
-    error
-    header={`Email could not be sent to ${userEmail}`}
-    list={[error]}
-  />
-)
-
-SendFailBanner.propTypes = {
-  userEmail: string.isRequired,
-  error: string.isRequired
 }
 
 const EmailNotification = ({
