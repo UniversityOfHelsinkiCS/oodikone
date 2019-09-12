@@ -3,6 +3,7 @@ import { Menu, Dropdown, Button } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
 import { func, string, arrayOf } from 'prop-types'
 import { connect } from 'react-redux'
+import { isEqual } from 'lodash'
 import { getUserRoles, setMocking, setTestUser } from '../../common'
 import { logout as logoutAction } from '../../redux/auth'
 import LanguageChooser from '../LanguageChooser'
@@ -29,7 +30,7 @@ const allNavigationItems = {
   courseStatistics: { path: '/coursestatistics', translateId: 'courseStatistics' },
   teachers: { path: '/teachers', translateId: 'teachers', reqRights: ['teachers'] },
   users: { path: '/users', translateId: 'users', reqRights: ['users'] },
-  faculty: { path: '/faculties', translateId: 'faculty', reqRights: ['dev'] },
+  faculty: { path: '/faculties', translateId: 'faculty', reqRights: ['faculties'] },
   usage: { path: '/usage', translateId: 'usage', reqRights: ['usage'] },
   sandbox: { path: '/sandbox', translateId: 'sandbox', reqRights: ['dev'] },
   oodilearn: { path: '/oodilearn', translateId: 'oodilearn', reqRights: ['oodilearn'] },
@@ -222,5 +223,9 @@ const mapDispatchToProps = {
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
+  null,
+  {
+    areStatePropsEqual: isEqual
+  }
 )(NavigationBar)

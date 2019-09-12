@@ -2,12 +2,13 @@ import React, { Component, Fragment } from 'react'
 import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { Segment, Table, Icon, Label, Header } from 'semantic-ui-react'
+import { Segment, Table, Icon, Label, Header, Loader } from 'semantic-ui-react'
 import { isEmpty, sortBy, flattenDeep } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
 import { withRouter } from 'react-router-dom'
 import { getStudent, removeStudentSelection, resetStudent } from '../../redux/students'
+import { getSemesters } from '../../redux/semesters'
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import SearchResultTable from '../SearchResultTable'
@@ -17,6 +18,7 @@ import SortableTable from '../SortableTable'
 
 class StudentDetails extends Component {
   componentDidMount() {
+    this.props.getSemesters()
     this.unlistenHistory = this.props.history.listen((location, action) => {
       if (action === 'POP' || location.pathname === '/students' || location.pathname !== '/students' || this.props.error) {
         this.props.resetStudent()
@@ -33,6 +35,56 @@ class StudentDetails extends Component {
 
   componentWillUnmount() {
     this.unlistenHistory()
+  }
+
+  getAbsentYears = () => {
+    const { semesters, student: { semesterenrollments } } = this.props
+    semesterenrollments.sort((a, b) => a.semestercode - b.semestercode)
+    const mappedSemesters = Object.values(semesters.semesters).reduce((acc, { semestercode, startdate, enddate }) => ({ ...acc, [semestercode]: { startdate, enddate } }), {})
+
+    // If a student has been absent for a long period, then the enrollments aren't marked in oodi...
+    // Therefore we need to manually patch empty enrollment ranges with absences
+    const now = new Date().getTime()
+    const latestSemester = parseInt(Object.entries(mappedSemesters).find(([, { startdate, enddate }]) => now <= new Date(enddate).getTime() && now >= new Date(startdate).getTime())[0], 10)
+    const mappedSemesterenrollments = semesterenrollments.reduce((res, curr) => ({ ...res, [curr.semestercode]: curr }), {})
+    const patchedSemesterenrollments = []
+    if (semesterenrollments.length) {
+      let runningSemestercode = semesterenrollments[0].semestercode
+      while (runningSemestercode <= latestSemester) {
+        if (!mappedSemesterenrollments[runningSemestercode]) patchedSemesterenrollments.push({ semestercode: runningSemestercode, enrollmenttype: 2 })
+        else patchedSemesterenrollments.push(mappedSemesterenrollments[runningSemestercode])
+        runningSemestercode++
+      }
+    }
+
+    const formatAbsence = ({ semestercode }) => {
+      const { startdate, enddate } = mappedSemesters[semestercode]
+      return {
+        semestercode,
+        startdate: new Date(startdate).getTime(),
+        enddate: new Date(enddate).getTime()
+      }
+    }
+
+    const mergeAbsences = (absences) => {
+      const res = []
+      let currentSemestercode = -1
+      if (absences.length) {
+        res.push(absences[0])
+        currentSemestercode = absences[0].semestercode
+      }
+      absences.forEach((absence, i) => {
+        if (i === 0) return
+        if (absence.semestercode === currentSemestercode + 1) res[res.length - 1].enddate = absence.enddate
+        else res.push(absence)
+        currentSemestercode = absence.semestercode
+      })
+      return res
+    }
+
+    return mergeAbsences(patchedSemesterenrollments
+      .filter(({ enrollmenttype }) => enrollmenttype !== 1) // 1 = present & 2 = absent
+      .map(absence => formatAbsence(absence)))
   }
 
   pushQueryToUrl = (query) => {
@@ -66,6 +118,7 @@ class StudentDetails extends Component {
         title={translate('studentStatistics.chartTitle')}
         translate={translate}
         maxCredits={sample.maxCredits}
+        absences={this.getAbsentYears()}
       />
     )
   }
@@ -258,8 +311,8 @@ class StudentDetails extends Component {
   }
 
   render() {
-    const { translate, student, studentNumber, pending, error } = this.props
-    if ((pending || !studentNumber || isEmpty(student)) && !error) return null
+    const { translate, student, studentNumber, pending, error, semesters } = this.props
+    if ((pending || !studentNumber || isEmpty(student) || !semesters) && !error) return <Loader active={pending} />
     if (error) {
       return (
         <Segment textAlign="center">
@@ -313,7 +366,12 @@ StudentDetails.propTypes = {
     }))
   }),
   pending: bool.isRequired,
-  error: bool.isRequired
+  error: bool.isRequired,
+  getSemesters: func.isRequired,
+  semesters: shape({
+    semesters: shape({}),
+    years: shape({})
+  }).isRequired
 }
 
 StudentDetails.defaultProps = {
@@ -321,19 +379,22 @@ StudentDetails.defaultProps = {
   studentNumber: ''
 }
 
-const mapStateToProps = ({ students, localize }) => ({
+const mapStateToProps = ({ students, localize, semesters }) => ({
   language: getActiveLanguage(localize).code,
   student: students.data.find(student =>
     student.studentNumber === students.selected),
   pending: students.pending,
-  error: students.error
+  error: students.error,
+  semesters: semesters.data
 })
+
 
 const mapDispatchToProps = {
   removeStudentSelection,
   clearCourseStats,
   resetStudent,
-  getStudent
+  getStudent,
+  getSemesters
 }
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentDetails))

@@ -18,13 +18,15 @@ const PopulationQueryCard =
     updateStudentsFn,
     updating,
     language,
-    history
+    history,
+    tags
   }) => {
     const removePopulation = (uuid) => {
       history.push('/populations')
       removeSampleFn(uuid)
     }
     const { uuid, startYear, endYear, semesters, months, studentStatuses, tag } = query
+    const tagname = tag ? tags.find(t => t.tag_id === tag).tagname : ''
     const { students } = population
     if (students.length > 0) {
       return (
@@ -45,7 +47,7 @@ const PopulationQueryCard =
                 `${semesters.map(s => translate(`populationStatistics.${s}`))}/
                 ${startYear}-${Number(startYear) + 1}, showing ${months} months.`}
             </div>
-            {tag ? (<div>{`Tagged with: ${tag.tagname}`}</div>) : null}
+            {tag ? (<div>{`Tagged with: ${tagname}`}</div>) : null}
             <div>
               {`${translate('populationStatistics.sampleSize', { amount: students.length })} `}
             </div>
@@ -123,7 +125,8 @@ PopulationQueryCard.propTypes = {
   unit: object, // eslint-disable-line
   updateStudentsFn: func.isRequired,
   updating: bool.isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  tags: arrayOf(shape({})).isRequired
 }
 
 const mapStateToProps = ({ localize }) => ({ language: getActiveLanguage(localize).code })

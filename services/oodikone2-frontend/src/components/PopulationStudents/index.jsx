@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Button, Icon, Popup, Tab, Grid, Checkbox, List, Ref } from 'semantic-ui-react'
+import { Header, Segment, Button, Icon, Popup, Tab, Grid, Ref } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import XLSX from 'xlsx'
@@ -12,6 +12,7 @@ import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
 import { getTagsByStudytrackAction } from '../../redux/tags'
+import { getStudentTagsByStudytrackAction } from '../../redux/tagstudent'
 
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 import '../PopulationCourseStats/populationCourseStats.css'
@@ -19,8 +20,10 @@ import SortableTable from '../SortableTable'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import CheckStudentList from '../CheckStudentList'
-import TagStudent from '../TagStudent'
 import TagPopulation from '../TagPopulation'
+import TagList from '../TagList'
+import selector from '../../selectors/populationDetails'
+
 
 const popupTimeoutLength = 1000
 
@@ -30,9 +33,7 @@ class PopulationStudents extends Component {
 
     this.state = {
       containsStudyTracks: false,
-      students: [],
-      checked: false,
-      checkedStudents: []
+      students: []
     }
 
     this.studentsRef = React.createRef()
@@ -41,17 +42,8 @@ class PopulationStudents extends Component {
   componentDidMount() {
     const admin = this.props.userRoles.includes('admin')
     this.props.getTagsByStudytrack(this.props.queryStudyrights[0])
+    this.props.getStudentTagsStudyTrack(this.props.queryStudyrights[0])
     this.setState({ admin, containsStudyTracks: this.containsStudyTracks() })
-
-    const initialCheckedStudents = []
-    this.props.selectedStudents.forEach((sn) => {
-      const check = {
-        studentnumber: sn,
-        checked: false
-      }
-      initialCheckedStudents.push(check)
-    })
-    this.setState({ checkedStudents: initialCheckedStudents })
   }
 
   componentDidUpdate = (prevProps) => {
@@ -97,40 +89,6 @@ class PopulationStudents extends Component {
   handlePopupClose = (id) => {
     this.setState({ [id]: false })
     clearTimeout(this.timeout)
-  }
-
-  handleAllCheck = () => {
-    const newCheckedStudents = []
-    this.props.selectedStudents.forEach((sn) => {
-      const check = {
-        studentnumber: sn,
-        checked: !this.state.checked
-      }
-      newCheckedStudents.push(check)
-    })
-    this.setState({ checkedStudents: newCheckedStudents })
-    this.setState({ checked: !this.state.checked })
-  }
-
-  handleSingleCheck = (studentnumber) => {
-    const checker = this.state.checkedStudents.find(check => check.studentnumber === studentnumber)
-    const idx = this.state.checkedStudents.indexOf(checker)
-    const tempArr = [...this.state.checkedStudents]
-    tempArr.splice(idx, 1, ({ studentnumber: checker.studentnumber, checked: !checker.checked }))
-    this.setState({ checkedStudents: tempArr })
-  }
-
-  falsifyChecks = () => {
-    const newCheckedStudents = []
-    this.props.selectedStudents.forEach((sn) => {
-      const check = {
-        studentnumber: sn,
-        checked: false
-      }
-      newCheckedStudents.push(check)
-    })
-    this.setState({ checkedStudents: newCheckedStudents })
-    this.setState({ checked: false })
   }
 
   handleRef = (node) => {
@@ -284,7 +242,7 @@ class PopulationStudents extends Component {
         },
         {
           key: 'startyear',
-          title: 'start year',
+          title: 'start year at university',
           getRowVal: s => reformatDate(s.started, 'YYYY')
         }
       )
@@ -460,35 +418,10 @@ class PopulationStudents extends Component {
       }))))
     ]
 
-    const tagRows = this.props.selectedStudents
-      .map(sn => students[sn])
-      .map((s) => {
-        const check = this.state.checkedStudents.find(c => c.studentnumber === s.studentNumber) || false
-        return (
-          <div key={s.studentNumber}>
-            <List horizontal>
-              <List.Item>
-                <Checkbox
-                  checked={check.checked}
-                  onChange={() => this.handleSingleCheck(s.studentNumber)}
-                />
-              </List.Item>
-              <List.Item>
-                <TagStudent
-                  tags={this.props.tags}
-                  studentnumber={s.studentNumber}
-                  studentstags={s.tags}
-                  studytrack={this.props.queryStudyrights[0]}
-                />
-              </List.Item>
-            </List>
-          </div>)
-      })
-
     const selectedStudentsData = this.props.selectedStudents.map(sn => students[sn])
     const totals = selectedStudentsData.reduce((acc, s) => {
       this.props.mandatoryCourses.forEach((m) => {
-        if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
+        if (hasPassedMandatory(s.studentNumber, m.code))++acc[m.code]
       })
       return acc
     }, this.props.mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true }))
@@ -557,14 +490,11 @@ class PopulationStudents extends Component {
           <Tab.Pane>
             <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
               <TagPopulation
-                allChecker={this.state.checked}
-                handleAllCheck={() => this.handleAllCheck()}
-                falsifyChecks={() => this.falsifyChecks()}
                 tags={this.props.tags}
-                checkedStudents={this.state.checkedStudents}
+                selectedStudents={this.props.selectedStudents}
                 studytrack={this.props.queryStudyrights[0]}
               />
-              {tagRows}
+              <TagList studytrack={this.props.queryStudyrights[0]} />
             </div>
           </Tab.Pane>
         )
@@ -634,7 +564,6 @@ class PopulationStudents extends Component {
     }
 
     const toggleLabel = this.props.showList ? 'hide' : 'show'
-
     return (
       <Ref innerRef={this.handleRef}>
         <Segment>
@@ -667,18 +596,22 @@ PopulationStudents.propTypes = {
   mandatoryPassed: shape({}).isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   getTagsByStudytrack: func.isRequired,
+  getStudentTagsStudyTrack: func.isRequired,
   userRoles: arrayOf(string).isRequired
 }
 
-const mapStateToProps = ({
-  localize,
-  settings,
-  populations,
-  populationCourses,
-  populationMandatoryCourses,
-  tags,
-  auth: { token: { roles } }
-}) => {
+const mapStateToProps = (state) => {
+  const {
+    localize,
+    settings,
+    populations,
+    populationCourses,
+    populationMandatoryCourses,
+    tags,
+    tagstudent,
+    auth: { token: { roles } }
+  } = state
+  const { selectedStudents, samples } = selector.makePopulationsToData(state)
   const mandatoryCodes = populationMandatoryCourses.data.map(c => c.code)
 
   let mandatoryPassed = {}
@@ -704,11 +637,14 @@ const mapStateToProps = ({
     mandatoryCourses: populationMandatoryCourses.data,
     mandatoryPassed,
     tags: tags.data,
-    userRoles: getUserRoles(roles)
+    userRoles: getUserRoles(roles),
+    tagstudent: tagstudent.data,
+    selectedStudents,
+    samples
   }
 }
 
 export default connect(
   mapStateToProps,
-  { toggleStudentListVisibility, getTagsByStudytrack: getTagsByStudytrackAction }
+  { toggleStudentListVisibility, getTagsByStudytrack: getTagsByStudytrackAction, getStudentTagsStudyTrack: getStudentTagsByStudytrackAction }
 )(withRouter(PopulationStudents))
