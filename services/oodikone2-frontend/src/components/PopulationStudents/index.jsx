@@ -284,7 +284,7 @@ class PopulationStudents extends Component {
         },
         {
           key: 'startyear',
-          title: 'start year',
+          title: 'start year at university',
           getRowVal: s => reformatDate(s.started, 'YYYY')
         }
       )
