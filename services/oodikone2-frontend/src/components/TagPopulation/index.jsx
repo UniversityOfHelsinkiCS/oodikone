@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, Dropdown, Checkbox, List } from 'semantic-ui-react'
-import { arrayOf, string, shape, func, bool } from 'prop-types'
+import { Button, Dropdown, List } from 'semantic-ui-react'
+import { arrayOf, string, shape, func } from 'prop-types'
 
 import {
   createMultipleStudentTagAction
 } from '../../redux/tagstudent'
 
 const TagPopulation = ({
-  allChecker,
-  handleAllCheck,
-  falsifyChecks,
   createMultipleStudentTag,
   tags,
-  checkedStudents,
-  studytrack }) => {
+  studytrack,
+  selectedStudents
+}) => {
   const [options, setOptions] = useState([])
   const [selectedValue, setSelected] = useState('')
 
@@ -32,30 +30,19 @@ const TagPopulation = ({
   const handleSubmit = (event) => {
     event.preventDefault()
     const tagList = []
-    checkedStudents.forEach((student) => {
-      if (student.checked) {
-        const tag = {
-          tag_id: selectedValue,
-          studentnumber: student.studentnumber
-        }
-        tagList.push(tag)
+    selectedStudents.forEach((sn) => {
+      const tag = {
+        tag_id: selectedValue,
+        studentnumber: sn
       }
+      tagList.push(tag)
     })
     setSelected('')
-    falsifyChecks()
     createMultipleStudentTag(tagList, studytrack)
   }
 
-  const checkCount = checkedStudents.reduce((n, student) => n + (student.checked), 0)
-
   return (
     <List horizontal>
-      <List.Item>
-        <Checkbox
-          checked={allChecker}
-          onChange={handleAllCheck}
-        />
-      </List.Item>
       <List.Item>
         <Dropdown
           placeholder="Tag"
@@ -68,19 +55,16 @@ const TagPopulation = ({
           selectOnNavigation={false}
         />
       </List.Item>
-      <Button onClick={handleSubmit} disabled={selectedValue === '' || checkCount === 0}>add tag to multiple students</Button>
+      <Button onClick={handleSubmit} disabled={selectedValue === ''}>add tag to {selectedStudents.length} students</Button>
     </List>
   )
 }
 
 TagPopulation.propTypes = {
   createMultipleStudentTag: func.isRequired,
-  checkedStudents: arrayOf(shape({ studentnumber: string, checked: bool })).isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studytrack: string.isRequired,
-  falsifyChecks: func.isRequired,
-  allChecker: bool.isRequired,
-  handleAllCheck: func.isRequired
+  selectedStudents: arrayOf(string).isRequired
 }
 
 const mapStateToProps = ({ tagstudent }) => ({
