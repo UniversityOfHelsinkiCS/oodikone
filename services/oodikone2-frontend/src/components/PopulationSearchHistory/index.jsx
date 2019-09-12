@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, shape, object, bool } from 'prop-types'
+import { func, shape, object, bool, arrayOf } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
 
 import PopulationQueryCard from '../PopulationQueryCard'
@@ -22,13 +22,14 @@ class PopulationSearchHistory extends Component {
       query: object
     }).isRequired,
     units: object, // eslint-disable-line
-    updatePopulationStudents: func.isRequired
+    updatePopulationStudents: func.isRequired,
+    tags: arrayOf(shape({})).isRequired
   }
 
   removePopulation = uuid => this.props.removePopulation(uuid)
 
   renderQueryCards = () => {
-    const { populations, translate, units } = this.props
+    const { populations, translate, units, tags } = this.props
     const { QueryCard } = infotooltips.PopulationStatistics
     if (!units.data.programmes || !populations.query || !populations.data.students) {
       return null
@@ -53,6 +54,7 @@ class PopulationSearchHistory extends Component {
           removeSampleFn={this.removePopulation}
           updateStudentsFn={() => this.props.updatePopulationStudents(studentNumberList)}
           updating={populations.updating}
+          tags={tags}
         />
         <InfoBox content={QueryCard} />
       </React.Fragment>)
@@ -67,10 +69,11 @@ class PopulationSearchHistory extends Component {
   }
 }
 
-const mapStateToProps = ({ populations, populationDegreesAndProgrammes, localize }) => ({
+const mapStateToProps = ({ populations, populationDegreesAndProgrammes, localize, tags }) => ({
   populations,
   units: populationDegreesAndProgrammes,
-  translate: getTranslate(localize)
+  translate: getTranslate(localize),
+  tags: tags.data
 })
 
 const mapDispatchToProps = dispatch => ({
