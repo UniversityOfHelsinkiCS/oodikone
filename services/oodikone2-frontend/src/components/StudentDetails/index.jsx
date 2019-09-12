@@ -312,7 +312,7 @@ class StudentDetails extends Component {
 
   render() {
     const { translate, student, studentNumber, pending, error, semesters } = this.props
-    if ((pending || !studentNumber || isEmpty(student) || !semesters) && !error) return null
+    if ((pending || !studentNumber || isEmpty(student) || !semesters) && !error) return <Loader active={pending} />
     if (error) {
       return (
         <Segment textAlign="center">
@@ -320,7 +320,6 @@ class StudentDetails extends Component {
         </Segment>
       )
     }
-    if (pending) return <Loader active={pending} />
     return (
       <Segment className="contentSegment" >
         <StudentInfoCard
@@ -388,6 +387,7 @@ const mapStateToProps = ({ students, localize, semesters }) => ({
   error: students.error,
   semesters: semesters.data
 })
+
 
 const mapDispatchToProps = {
   removeStudentSelection,
