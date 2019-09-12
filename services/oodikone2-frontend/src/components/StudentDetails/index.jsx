@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { Segment, Table, Icon, Label, Header } from 'semantic-ui-react'
+import { Segment, Table, Icon, Label, Header, Loader } from 'semantic-ui-react'
 import { isEmpty, sortBy, flattenDeep } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
@@ -320,6 +320,7 @@ class StudentDetails extends Component {
         </Segment>
       )
     }
+    if (pending) return <Loader active={pending} />
     return (
       <Segment className="contentSegment" >
         <StudentInfoCard
