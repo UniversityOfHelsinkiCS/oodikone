@@ -3,7 +3,6 @@ const axios = require('axios')
 const { setupCache } = require('axios-cache-adapter')
 const https = require('https')
 const fs = require('fs')
-const logger = require('../logger')
 
 const { OODI_ADDR, KEY_PATH, CERT_PATH } = process.env
 const base_url = OODI_ADDR
