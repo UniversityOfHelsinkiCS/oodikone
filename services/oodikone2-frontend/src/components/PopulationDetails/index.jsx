@@ -3,10 +3,10 @@ import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool } from 'prop-types'
 import { Segment, Header, Message, Button, Icon, Tab } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
-import { intersection, difference, flattenDeep } from 'lodash'
+import { flattenDeep } from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
 
-import { makePopulationsToData } from '../../selectors/populationDetails'
+import selectors from '../../selectors/populationDetails'
 
 import { getTotalCreditsFromCourses } from '../../common'
 import PopulationFilters from '../PopulationFilters'
@@ -156,8 +156,6 @@ class PopulationDetails extends Component {
       {this.renderCourseStatistics()}
       <PopulationCourses ref={this.courses} selectedStudents={this.props.selectedStudents} />
       <PopulationStudents
-        samples={this.props.samples}
-        selectedStudents={this.props.selectedStudents}
         ref={this.students}
       />
     </div>
@@ -200,32 +198,10 @@ class PopulationDetails extends Component {
   }
 }
 
-const populationsToData = makePopulationsToData()
-
 const mapStateToProps = (state) => {
-  const samples = populationsToData(state)
-  const { complemented } = state.populationFilters
-  let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
+  const { samples, selectedStudents, complemented } = selectors.makePopulationsToData(state)
 
-  // TODO refactor to more functional approach where the whole sample is not tested for each filter
-
-  if (samples.length > 0 && state.populationFilters.filters.length > 0) {
-    const studentsForFilter = (f) => {
-      if (f.type === 'CourseParticipation') {
-        return Object.keys(f.studentsOfSelectedField)
-      }
-      return samples.filter(f.filter).map(s => s.studentNumber)
-    }
-
-    const matchingStudents = state.populationFilters.filters.map(studentsForFilter)
-    selectedStudents = intersection(...matchingStudents)
-
-    if (complemented) {
-      selectedStudents = difference(samples.map(s => s.studentNumber), selectedStudents)
-    }
-  }
-
-  // REFACTOR ??
+  // REFACTOR YES, IF YOU SEE THIS COMMENT YOU ARE OBLIGATED TO FIX IT
   if (samples.length > 0) {
     const creditsAndDates = samples.map((s) => {
       const passedCourses = s.courses.filter(c => c.passed)

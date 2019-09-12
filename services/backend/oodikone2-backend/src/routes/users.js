@@ -25,20 +25,31 @@ router.post('/modifyaccess', async (req, res) => {
   }
 })
 
+router.get('/email/preview', (req, res) => {
+  const { subject, html } = mailservice.message2(null)
+  res.json({ subject, html })
+})
+
 router.post('/email', async (req, res) => {
+  if (!process.env.SMTP) {
+    return res
+      .status(500)
+      .json({ error: 'Email system has not been configured' })
+  }
+
   const email = req.body.email
-  if (process.env.SMTP !== undefined && email) {
-    const message = mailservice.message2(email)
-    await mailservice.transporter.sendMail(message, (error) => {
-      if (error) {
-        console.log('Error occurred')
-        res.status(400).end()
-      } else {
-        console.log('Message sent successfully!')
-        res.status(200).end()
-      }
-      mailservice.transporter.close()
-    })
+  if (!email) {
+    return res.status(400).json({ error: 'email is missing' })
+  }
+
+  const message = mailservice.message2(email)
+  try {
+    const info = await mailservice.transporter.sendMail(message)
+    console.log('Message sent successfully', info)
+    res.status(200).end()
+  } catch (e) {
+    console.error('Error occurred while sending user email', e)
+    res.status(500).json({ error: e.message })
   }
 })
 

@@ -124,13 +124,14 @@ const PopulationSearchForm = (props) => {
       props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }),
       props.getPopulationCourses(request),
       props.getPopulationFilters(request),
-      props.getMandatoryCourses(formattedQueryParams.studyRights.programme)
+      props.getMandatoryCourses(formattedQueryParams.studyRights.programme),
+      props.getTagsByStudytrackAction(query.studyRights.programme)
     ]))
 
     const success = await fetchPopulationPromises.current.promise
     if (success) {
       props.clearPopulationFilters()
-      if (queryCodes[0] === 'KH50_001') {
+      if (query.studyRights.programme === 'KH50_001') {
         props.setPopulationFilter(transferTo(false))
       }
       setState({
