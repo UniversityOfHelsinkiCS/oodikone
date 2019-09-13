@@ -54,7 +54,7 @@ const PopulationSearchForm = (props) => {
     floatMonths: months('2017', 'FALL')
   })
   const [didMount, setDidMount] = useState(false)
-  const [searchHistory, addItemToSearchHistory] = useSearchHistory('populationSearch', 8)
+  const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
 
   const fetchPopulationPromises = useRef()
 
@@ -726,6 +726,7 @@ const PopulationSearchForm = (props) => {
       </Form>
       <SearchHistory
         items={searchHistory}
+        updateItem={updateItemInSearchHistory}
         handleSearch={pushQueryToUrl}
       />
     </div>

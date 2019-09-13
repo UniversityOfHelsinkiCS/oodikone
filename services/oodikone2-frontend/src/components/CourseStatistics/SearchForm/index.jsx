@@ -24,7 +24,7 @@ const SearchForm = (props) => {
   const [state, setState] = useState({
     ...INITIAL
   })
-  const [searchHistory, addItemToSearchHistory] = useSearchHistory('courseSearch', 6)
+  const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
 
   const {
     courseName,
@@ -207,6 +207,7 @@ const SearchForm = (props) => {
       <SearchHistory
         handleSearch={pushQueryToUrl}
         items={searchHistory}
+        updateItem={updateItemInSearchHistory}
       />
     </React.Fragment>
   )
