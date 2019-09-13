@@ -204,7 +204,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       },
       xAxis: {
         max: students.maxDate,
-        min: students.minDate,
+        min: students.minDateWithCredits || students.minDate,
         ordinal: false
       },
       series: dataOfSelected,
