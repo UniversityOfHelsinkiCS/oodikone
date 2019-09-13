@@ -187,12 +187,16 @@ export const useSearchHistory = (id, capacity = 5) => {
   }, [searchHistory])
 
   const addItem = (item) => {
-    if (!searchHistory[id]) searchHistory[id] = []
-    const filtered = searchHistory.filter(sh => sh.text !== item.text)
-    setSearchHistory(filtered.concat({ ...item, timestamp: new Date() }).slice(-capacity))
+    const filteredSearchHistory = searchHistory.filter(sh => sh.text !== item.text)
+    setSearchHistory(filteredSearchHistory.concat({ ...item, timestamp: new Date() }).slice(-capacity))
   }
 
-  return [searchHistory, addItem]
+  const updateItem = (item) => {
+    const updatedSearchHistory = [{ ...item, timestamp: new Date() }].concat(searchHistory.filter(s => s.timestamp !== item.timestamp))
+    setSearchHistory(updatedSearchHistory)
+  }
+
+  return [searchHistory, addItem, updateItem]
 }
 
 export const flattenStudyrights = (studyrights) => {
