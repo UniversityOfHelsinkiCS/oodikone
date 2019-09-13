@@ -110,13 +110,13 @@ const formatStudentForPopulationStatistics = ({
 const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
 
 const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright, tag) => {
-
+  const attainmentDateFrom = tag ? moment(startDate).year(tag.year) : startDate
   const creditsOfStudentOther = {
     student_studentnumber: {
       [Op.in]: studentnumbers
     },
     attainment_date: {
-      [Op.between]: [startDate, endDate]
+      [Op.between]: [attainmentDateFrom, endDate]
     }
   }
 
@@ -128,7 +128,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     [Op.or]: [
       {
         attainment_date: {
-          [Op.between]: [startDate, endDate]
+          [Op.between]: [attainmentDateFrom, endDate]
         }
       },
       {
@@ -248,7 +248,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     student.tags = studentNumberToTags[student.studentnumber] || []
   })
 
-  if (tag) return students.filter(student => student.tags.some(t => t.tag_id === tag))
+  if (tag) return students.filter(student => student.tags.some(t => t.tag_id === tag.tag_id))
   return students
 }
 
