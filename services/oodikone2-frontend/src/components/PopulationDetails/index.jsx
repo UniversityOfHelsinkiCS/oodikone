@@ -207,14 +207,16 @@ const mapStateToProps = (state) => {
       const passedCourses = s.courses.filter(c => c.passed)
       const passedCredits = getTotalCreditsFromCourses(passedCourses)
       const dates = passedCourses.map(c => c.date)
-      return { passedCredits, dates }
+      const datesWithCredits = passedCourses.filter(c => c.credits > 0).map(c => c.date)
+      return { passedCredits, dates, datesWithCredits }
     })
     const credits = creditsAndDates.map(cd => cd.passedCredits)
-    let dates = creditsAndDates.map(cd => cd.dates)
-    dates = flattenDeep(dates).map(date => new Date(date).getTime())
+    const dates = flattenDeep(creditsAndDates.map(cd => cd.dates)).map(date => new Date(date).getTime())
+    const datesWithCredits = flattenDeep(creditsAndDates.map(cd => cd.datesWithCredits)).map(date => new Date(date).getTime())
     samples.maxCredits = Math.max(...credits)
     samples.maxDate = Math.max(...dates)
     samples.minDate = Math.min(...dates)
+    samples.minDateWithCredits = Math.min(...datesWithCredits)
   }
 
   return {
