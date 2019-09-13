@@ -7,6 +7,7 @@ const { isValidStudentId } = require('../util/index')
 const Student = require('../services/students')
 const StudyrightService = require('../services/studyrights')
 const UserService = require('../services/userService')
+const TagService = require('../services/tags')
 
 // POST instead of GET because of too long params and "sensitive" data
 router.post('/v2/populationstatistics/courses', async (req, res) => {
@@ -198,10 +199,11 @@ router.get('/v3/populationstatistics', async (req, res) => {
 
 router.get('/v3/populationstatisticsbytag', async (req, res) => {
   const { tag, studyRights: studyRightsJSON } = req.query
-  if (!tag) {
-    res.status(400).json({ error: 'The query should have a tag defined' })
-    return
-  }
+
+  if (!tag) return res.status(400).json({ error: 'The query should have a tag defined' })
+  const foundTag = await TagService.findTagById(tag)
+  if (!foundTag) return res.status(404).json({ error: 'Tag not found' })
+
   const semesters = ['FALL', 'SPRING']
   let studentnumberlist
   const studentnumbers = await Student.findByTag(tag)
@@ -221,7 +223,8 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
       endYear: 2200,
       studyRights,
       semesters,
-      months: 10000
+      months: 10000,
+      tag: foundTag
     }, studentnumberlist)
 
     if (result.error) {
