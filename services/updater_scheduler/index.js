@@ -61,7 +61,7 @@ stan.on('connect', async () => {
 
   schedule('0 * * * *', async () => {
     // Every hour
-    logger.info(`${updatedCount} TASKS DONE IN LAST HOUR. ${scheduledCount} TASKS SCHEDULED IN LAST HOUR. ${fetchedCount} TASKS FETCHED FROM API IN LAST HOUR`)
+    console.log(`${updatedCount} TASKS DONE IN LAST HOUR. ${scheduledCount} TASKS SCHEDULED IN LAST HOUR. ${fetchedCount} TASKS FETCHED FROM API IN LAST HOUR`)
     updatedCount = 0
     fetchedCount = 0
     scheduledCount = 0
@@ -96,7 +96,7 @@ stan.on('connect', async () => {
       throw 'unknown status: ' + msg.getData()
     }
     const isStudent = !!isValidStudentId(task)
-    logger.info(`Status changed for ${task} to ${status}`, { task, status, student: isStudent, timems, active, priority })
+    if (status === 'DONE') logger.info(`Status changed for ${task} to ${status}`, { task, status, student: isStudent, timems, active, priority })
     await updateTask({ task, status, type: isStudent ? 'student' : 'other', updatetime, active })
   }
   statusSub.on('message', async (msg) => {

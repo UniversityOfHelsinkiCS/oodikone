@@ -311,7 +311,9 @@ class StudentDetails extends Component {
   }
 
   render() {
-    const { translate, student, studentNumber, pending, error, semesters } = this.props
+    const { translate, student, studentNumber, pending, error, semesters, fetching } = this.props
+
+    if (fetching) return <Loader active={fetching} />
     if ((pending || !studentNumber || isEmpty(student) || !semesters) && !error) return null
     if (error) {
       return (
@@ -320,7 +322,6 @@ class StudentDetails extends Component {
         </Segment>
       )
     }
-    if (pending) return <Loader active={pending} />
     return (
       <Segment className="contentSegment" >
         <StudentInfoCard
@@ -368,6 +369,7 @@ StudentDetails.propTypes = {
   }),
   pending: bool.isRequired,
   error: bool.isRequired,
+  fetching: bool.isRequired,
   getSemesters: func.isRequired,
   semesters: shape({
     semesters: shape({}),
@@ -386,8 +388,10 @@ const mapStateToProps = ({ students, localize, semesters }) => ({
     student.studentNumber === students.selected),
   pending: students.pending,
   error: students.error,
-  semesters: semesters.data
+  semesters: semesters.data,
+  fetching: students.fetching
 })
+
 
 const mapDispatchToProps = {
   removeStudentSelection,
