@@ -3,7 +3,6 @@ const axios = require('axios')
 const { setupCache } = require('axios-cache-adapter')
 const https = require('https')
 const fs = require('fs')
-const logger = require('../logger')
 
 const { OODI_ADDR, KEY_PATH, CERT_PATH } = process.env
 const base_url = OODI_ADDR
@@ -42,7 +41,7 @@ const attemptGetFor = async (url, attempts = 5) => {
   for (let attempt = 1; attempt <= attempts; ++attempt) {
     try {
       const response = await getUrl(url)
-      logger.info('requested url', { url, success: response.status === 200, responsetype: response.request.fromCache ? 'FROM_CACHE' : 'FROM_OODI' })
+      // logger.info('requested url', { url, success: response.status === 200, responsetype: response.request.fromCache ? 'FROM_CACHE' : 'FROM_OODI' })
       return response
     } catch (error) {
       if (attempt === attempts) {
