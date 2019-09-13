@@ -392,7 +392,6 @@ const mapStateToProps = ({ students, localize, semesters }) => ({
   fetching: students.fetching
 })
 
-
 const mapDispatchToProps = {
   removeStudentSelection,
   clearCourseStats,

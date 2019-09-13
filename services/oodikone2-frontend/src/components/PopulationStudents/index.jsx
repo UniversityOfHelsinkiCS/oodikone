@@ -24,7 +24,6 @@ import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
 import selector from '../../selectors/populationDetails'
 
-
 const popupTimeoutLength = 1000
 
 class PopulationStudents extends Component {
