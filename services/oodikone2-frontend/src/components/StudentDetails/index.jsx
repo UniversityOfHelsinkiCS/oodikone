@@ -311,8 +311,10 @@ class StudentDetails extends Component {
   }
 
   render() {
-    const { translate, student, studentNumber, pending, error, semesters } = this.props
-    if ((pending || !studentNumber || isEmpty(student) || !semesters) && !error) return <Loader active={pending} />
+    const { translate, student, studentNumber, pending, error, semesters, fetching } = this.props
+
+    if (fetching) return <Loader active={fetching} />
+    if ((pending || !studentNumber || isEmpty(student) || !semesters) && !error) return null
     if (error) {
       return (
         <Segment textAlign="center">
@@ -367,6 +369,7 @@ StudentDetails.propTypes = {
   }),
   pending: bool.isRequired,
   error: bool.isRequired,
+  fetching: bool.isRequired,
   getSemesters: func.isRequired,
   semesters: shape({
     semesters: shape({}),
@@ -385,7 +388,8 @@ const mapStateToProps = ({ students, localize, semesters }) => ({
     student.studentNumber === students.selected),
   pending: students.pending,
   error: students.error,
-  semesters: semesters.data
+  semesters: semesters.data,
+  fetching: students.fetching
 })
 
 
