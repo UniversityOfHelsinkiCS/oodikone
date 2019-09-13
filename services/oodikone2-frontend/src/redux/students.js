@@ -29,7 +29,7 @@ export const clearStudentError = () => ({
   type: 'CLEAR_STUDENT_ERROR'
 })
 
-const reducer = (state = { data: [], pending: false, error: false }, action) => {
+const reducer = (state = { data: [], pending: false, error: false, fetching: false }, action) => {
   switch (action.type) {
     case 'FIND_STUDENTS_ATTEMPT':
       return {
@@ -61,18 +61,21 @@ const reducer = (state = { data: [], pending: false, error: false }, action) => 
       return {
         ...state,
         pending: true,
-        error: false
+        error: false,
+        fetching: true
       }
     case 'GET_STUDENT_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
+        fetching: false
       }
     case 'GET_STUDENT_SUCCESS':
       return {
         pending: false,
         error: false,
+        fetching: false,
         selected: action.response.studentNumber,
         lastSearch: state.lastSearch,
         data: [...state.data.filter(student =>
