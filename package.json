@@ -25,7 +25,8 @@
     "docker:restart": "npm run docker -- restart",
     "docker:restart:backend": "npm run docker -- restart backend",
     "docker:obliterate": "docker stop $(docker ps -aq) ; docker rmi -f $(docker images -a -q) ; docker system prune -a",
-    "start": "npm run docker:up && npm run docker:logs"
+    "start": "npm run docker:up && npm run docker:logs",
+    "start:real": "npm run docker:real -- up -d && npm run docker:real -- logs -f"
   },
   "husky": {
     "hooks": {
