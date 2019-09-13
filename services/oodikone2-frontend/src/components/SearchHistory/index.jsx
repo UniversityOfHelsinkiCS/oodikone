@@ -4,7 +4,7 @@ import { sortBy } from 'lodash'
 import { Segment, Form, Header } from 'semantic-ui-react'
 import { arrayOf, date, func, shape, string } from 'prop-types'
 
-const SearchHistory = ({ items, handleSearch }) => {
+const SearchHistory = ({ items, handleSearch, updateItem }) => {
   const [selected, setSelected] = useState(null)
 
   const sortedItems = sortBy(items, i => -new Date(i.timestamp).getTime())
@@ -12,6 +12,7 @@ const SearchHistory = ({ items, handleSearch }) => {
   const handleChange = (e, { value }) => {
     setSelected(value)
     handleSearch(sortedItems[value - 1].params)
+    updateItem(sortedItems[value - 1])
   }
 
   return (
@@ -43,7 +44,8 @@ SearchHistory.propTypes = {
     params: shape({}),
     timestamp: date
   })).isRequired,
-  handleSearch: func.isRequired
+  handleSearch: func.isRequired,
+  updateItem: func.isRequired
 }
 
 export default SearchHistory
