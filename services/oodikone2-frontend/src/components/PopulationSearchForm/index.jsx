@@ -225,12 +225,13 @@ const PopulationSearchForm = (props) => {
   }
 
   const getSearchHistoryTextFromQuery = () => {
-    const { studyRights, semesters, months, startYear, endYear, studentStatuses } = query
+    const { studyRights, semesters, months, startYear, endYear, studentStatuses, tag } = query
     const studyRightsText = `${studyProgrammes[studyRights.programme].name[language]} ${Object.values(studyRights).filter(s => s).join(', ')}`
     const timeText = `${semesters.join(', ')}/${startYear}-${parseInt(endYear, 10) + 1}, ${months} months`
     const studentStatusesText = studentStatuses.length > 0 ? `includes ${studentStatuses.map(s => s.toLowerCase()).join(', ')} students` : null
+    const tagText = tag === '' ? null : `Tag: ${tags.find(t => t.tag_id === tag).tagname}`
 
-    return [studyRightsText, timeText, studentStatusesText].filter(t => t).join(' - ')
+    return [studyRightsText, timeText, studentStatusesText, tagText].filter(t => t).join(' - ')
   }
 
   const handleSubmit = () => {
