@@ -33,6 +33,7 @@ const reducer = (state = { data: [], pending: false, error: false, fetching: fal
   switch (action.type) {
     case 'FIND_STUDENTS_ATTEMPT':
       return {
+        ...state,
         pending: true,
         error: false,
         selected: state.selected,
@@ -41,6 +42,7 @@ const reducer = (state = { data: [], pending: false, error: false, fetching: fal
       }
     case 'FIND_STUDENTS_FAILURE':
       return {
+        ...state,
         pending: false,
         error: true,
         selected: state.selected,
@@ -49,6 +51,7 @@ const reducer = (state = { data: [], pending: false, error: false, fetching: fal
       }
     case 'FIND_STUDENTS_SUCCESS':
       return {
+        ...state,
         pending: false,
         error: false,
         selected: state.selected,
