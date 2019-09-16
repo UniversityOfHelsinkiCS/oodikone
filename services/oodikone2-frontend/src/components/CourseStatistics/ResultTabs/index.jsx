@@ -16,24 +16,19 @@ const paneViewIndex = {
   GRADE_DISTRIBUTION: 2
 }
 
-const ResultTabs = (props) => {
-  const [tab, setTab] = useTabs(
-    'cs_tab',
-    0,
-    props.history
-  )
+const ResultTabs = props => {
+  const [tab, setTab] = useTabs('cs_tab', 0, props.history)
   const [viewMode, setViewMode] = useState(viewModeNames.CUMULATIVE)
   const [isRelative, setIsRelative] = useState(false)
 
   const handleTabChange = (...params) => {
-    const resetViewMode = params[1].activeIndex === paneViewIndex.TABLE
-      && viewMode === viewModeNames.GRADES
+    const resetViewMode = params[1].activeIndex === paneViewIndex.TABLE && viewMode === viewModeNames.GRADES
 
     setTab(...params)
     setViewMode(resetViewMode ? viewModeNames.CUMULATIVE : viewMode)
   }
 
-  const handleModeChange = (newViewMode) => {
+  const handleModeChange = newViewMode => {
     setViewMode(newViewMode)
   }
 
@@ -43,12 +38,8 @@ const ResultTabs = (props) => {
     const getButtonMenu = () => (
       <Menu secondary>
         {Object.values(viewModeNames).map(name => (
-          <Menu.Item
-            key={name}
-            name={name}
-            active={viewMode === name}
-            onClick={() => handleModeChange(name)}
-          />))}
+          <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
+        ))}
       </Menu>
     )
 
@@ -59,35 +50,26 @@ const ResultTabs = (props) => {
       return (
         <div style={{ display: 'flex' }}>
           <div className="toggleContainer">
-            <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.CUMULATIVE}</label>
-            <Radio
-              id={toggleId}
-              checked={isToggleChecked}
-              toggle
-              onChange={() => handleModeChange(newMode)}
-            />
-            <label className="toggleLabel" htmlFor={toggleId}>{viewModeNames.STUDENT}</label>
+            <label className="toggleLabel" htmlFor={toggleId}>
+              {viewModeNames.CUMULATIVE}
+            </label>
+            <Radio id={toggleId} checked={isToggleChecked} toggle onChange={() => handleModeChange(newMode)} />
+            <label className="toggleLabel" htmlFor={toggleId}>
+              {viewModeNames.STUDENT}
+            </label>
           </div>
-          {props.comparison &&
+          {props.comparison && (
             <div className="toggleContainer">
               <label className="toggleLabel">Absolute</label>
-              <Radio
-                toggle
-                checked={isRelative}
-                onChange={() => setIsRelative(!isRelative)}
-              />
+              <Radio toggle checked={isRelative} onChange={() => setIsRelative(!isRelative)} />
               <label className="toggleLabel">Relative</label>
             </div>
-          }
+          )}
         </div>
       )
     }
 
-    return (
-      <div className="modeSelectorContainer">
-        {isTogglePane ? getToggle() : getButtonMenu()}
-      </div>
-    )
+    return <div className="modeSelectorContainer">{isTogglePane ? getToggle() : getButtonMenu()}</div>
   }
 
   const getPanes = () => {
@@ -95,45 +77,39 @@ const ResultTabs = (props) => {
     const paneMenuItems = [
       {
         menuItem: { key: 'Table', icon: 'table', content: 'Table' },
-        renderFn: () =>
-          (<Tables
-            comparison={comparison}
-            primary={primary}
-            viewMode={viewMode}
-            history={history}
-          />)
+        renderFn: () => <Tables comparison={comparison} primary={primary} viewMode={viewMode} history={history} />
       },
       {
         menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
-        renderFn: () =>
-          (<PassRate
+        renderFn: () => (
+          <PassRate
             comparison={comparison}
             primary={primary}
             viewMode={viewMode}
             isRelative={isRelative && comparison}
-          />)
+          />
+        )
       },
       {
         menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
-        renderFn: () =>
-          (<Distribution
+        renderFn: () => (
+          <Distribution
             comparison={comparison}
             primary={primary}
             viewMode={viewMode}
             isRelative={isRelative && comparison}
-          />)
+          />
+        )
       }
     ]
 
-    return paneMenuItems.map((p) => {
+    return paneMenuItems.map(p => {
       const { menuItem, renderFn } = p
       return {
         menuItem,
         render: () => (
           <Grid padded="vertically" columns="equal">
-            <Grid.Row className="modeSelectorRow">
-              {renderViewModeSelector()}
-            </Grid.Row>
+            <Grid.Row className="modeSelectorRow">{renderViewModeSelector()}</Grid.Row>
             {renderFn()}
           </Grid>
         )
@@ -143,11 +119,7 @@ const ResultTabs = (props) => {
 
   return (
     <div>
-      <Tab
-        panes={getPanes()}
-        onTabChange={handleTabChange}
-        activeIndex={tab}
-      />
+      <Tab panes={getPanes()} onTabChange={handleTabChange} activeIndex={tab} />
     </div>
   )
 }

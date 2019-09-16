@@ -21,7 +21,9 @@ const PopulationCourses = ({
   translate,
   getPopulationSelectedStudentCourses: gpc
 }) => {
-  const selectedPopulationCourses = populationSelectedStudentCourses.data ? populationSelectedStudentCourses : populationCourses
+  const selectedPopulationCourses = populationSelectedStudentCourses.data
+    ? populationSelectedStudentCourses
+    : populationCourses
 
   const { CoursesOf } = infotooltips.PopulationStatistics
   const { pending } = selectedPopulationCourses
@@ -39,7 +41,7 @@ const PopulationCourses = ({
   return (
     <React.Fragment>
       <Segment>
-        <Header size="medium" dividing >
+        <Header size="medium" dividing>
           <Popup
             trigger={<Header.Content>{translate('populationCourses.header')}</Header.Content>}
             content="Sort by clicking columns. Click course name to limit observed population to students who
@@ -79,6 +81,10 @@ const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses, 
   translate: getTranslate(localize)
 })
 
-export default connect(mapStateToProps, {
-  getPopulationSelectedStudentCourses, dispatchRefreshFilters: refreshFilters
-})(PopulationCourses)
+export default connect(
+  mapStateToProps,
+  {
+    getPopulationSelectedStudentCourses,
+    dispatchRefreshFilters: refreshFilters
+  }
+)(PopulationCourses)

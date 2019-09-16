@@ -36,6 +36,9 @@ const mapStateToProps = state => ({
   selectedCourse: selector.selectedCourseSelector(state)
 })
 
-export default connect(mapStateToProps, {
-  setSelectedCourse: setCourse
-})(PopulationFilters)
+export default connect(
+  mapStateToProps,
+  {
+    setSelectedCourse: setCourse
+  }
+)(PopulationFilters)

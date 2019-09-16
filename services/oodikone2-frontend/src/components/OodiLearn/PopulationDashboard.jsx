@@ -15,40 +15,37 @@ based on the composition of the selected population.
 `
 
 class PopulationDashboard extends Component {
-    state={}
+  state = {}
 
-    render() {
-      return (
-        <Grid>
-          <Grid.Row>
-            <Grid.Column>
-              <Message
-                header={HEADER}
-                content={DESCRIPTION}
-              />
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column>
-              <PopulationStats />
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row stretched>
-            <Grid.Column width={6}>
-              <PopulationFilters />
-            </Grid.Column>
-            <Grid.Column width={10} verticalAlign="middle">
-              <PopulationStackedBar />
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column>
-              <PopulationCategoryGraph data={this.props.populationGraphSeries} />
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      )
-    }
+  render() {
+    return (
+      <Grid>
+        <Grid.Row>
+          <Grid.Column>
+            <Message header={HEADER} content={DESCRIPTION} />
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column>
+            <PopulationStats />
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row stretched>
+          <Grid.Column width={6}>
+            <PopulationFilters />
+          </Grid.Column>
+          <Grid.Column width={10} verticalAlign="middle">
+            <PopulationStackedBar />
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column>
+            <PopulationCategoryGraph data={this.props.populationGraphSeries} />
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+    )
+  }
 }
 
 PopulationDashboard.propTypes = {

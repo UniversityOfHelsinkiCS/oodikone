@@ -19,17 +19,19 @@ class CreditsLessThanFromMandatory extends Component {
     limit: ''
   }
 
-  handleChange = (e) => {
+  handleChange = e => {
     if (Number(e.target.value) > -1) {
       this.setState({ limit: e.target.value })
     }
   }
 
   handleLimit = () => {
-    this.props.setPopulationFilter(creditsLessThanFromMandatory({
-      amount: this.state.limit,
-      courses: this.props.courses
-    }))
+    this.props.setPopulationFilter(
+      creditsLessThanFromMandatory({
+        amount: this.state.limit,
+        courses: this.props.courses
+      })
+    )
     this.setState({ limit: '' })
   }
 
@@ -54,20 +56,13 @@ class CreditsLessThanFromMandatory extends Component {
                 <label>Show only students with credits less than </label>
               </Form.Field>
               <Form.Field>
-                <Input
-                  type="number"
-                  onChange={this.handleChange}
-                  value={this.state.limit}
-                />
+                <Input type="number" onChange={this.handleChange} value={this.state.limit} />
               </Form.Field>
               <Form.Field>
                 <label>from mandatory courses</label>
               </Form.Field>
               <Form.Field>
-                <Button
-                  onClick={this.handleLimit}
-                  disabled={this.state.limit.length === 0}
-                >
+                <Button onClick={this.handleLimit} disabled={this.state.limit.length === 0}>
                   set filter
                 </Button>
               </Form.Field>

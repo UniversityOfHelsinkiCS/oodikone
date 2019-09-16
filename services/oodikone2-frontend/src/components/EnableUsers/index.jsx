@@ -37,22 +37,15 @@ class EnableUsers extends Component {
   copyEmailsToClippoard = () => {
     const clipboardString = this.props.users
       .filter(u => u.is_enabled && u.email)
-      .map(u => u.email).join('; ')
+      .map(u => u.email)
+      .join('; ')
     copyToClipboard(clipboardString)
   }
 
-  renderUserPage = (userid) => {
+  renderUserPage = userid => {
     const { users } = this.props
     const user = users.find(u => u.id === userid)
-    return !user
-      ? <Loader active />
-      : (
-        <UserPageNew
-          userid={userid}
-          user={user}
-          goBack={this.openUsersPage}
-        />
-      )
+    return !user ? <Loader active /> : <UserPageNew userid={userid} user={user} goBack={this.openUsersPage} />
   }
 
   renderUserSearchList = () => {
@@ -73,31 +66,37 @@ class EnableUsers extends Component {
             {
               key: 'NAME',
               title: 'Name',
-              getRowVal: (user) => {
+              getRowVal: user => {
                 const nameparts = user.full_name.split(' ')
                 return nameparts[nameparts.length - 1]
               },
               getRowContent: user => user.full_name
-            }, {
+            },
+            {
               key: 'USERNAME',
               title: 'Username',
               getRowVal: user => user.username
-            }, {
+            },
+            {
               key: 'ROLE',
               title: 'Role',
               getRowContent: user => (
                 <Label.Group>
-                  {user.accessgroup.map(ag => ag.group_code).sort().map(code => <Label key={code} content={code} />)}
+                  {user.accessgroup
+                    .map(ag => ag.group_code)
+                    .sort()
+                    .map(code => (
+                      <Label key={code} content={code} />
+                    ))}
                 </Label.Group>
               ),
-              getRowVal: user => (
-                user.accessgroup.map(ag => ag.group_code).sort()
-              )
-            }, {
+              getRowVal: user => user.accessgroup.map(ag => ag.group_code).sort()
+            },
+            {
               key: 'PROGRAMMES',
               title: 'Programmes',
-              getRowVal: (user) => {
-                const nameInLanguage = (code) => {
+              getRowVal: user => {
+                const nameInLanguage = code => {
                   const elem = elementdetails.find(e => e.code === code)
                   if (!elem) return null
                   return getTextIn(elem.name, this.props.language)
@@ -111,7 +110,8 @@ class EnableUsers extends Component {
                 }
                 return name
               }
-            }, {
+            },
+            {
               key: 'OODIACCESS',
               title: 'Has access',
               getRowVal: user => user.is_enabled,
@@ -122,7 +122,8 @@ class EnableUsers extends Component {
                   name={user.is_enabled ? 'check' : 'remove'}
                 />
               )
-            }, {
+            },
+            {
               key: 'EDIT',
               title: '',
               getRowVal: user => (
@@ -150,16 +151,15 @@ class EnableUsers extends Component {
         <Header className="segmentTitle" size="large">
           Oodikone users
         </Header>
-        <Radio label={`Showing ${enabledOnly ? 'only enabled' : 'all'} users`} toggle onClick={() => this.toggleEnabledOnly()} />
+        <Radio
+          label={`Showing ${enabledOnly ? 'only enabled' : 'all'} users`}
+          toggle
+          onClick={() => this.toggleEnabledOnly()}
+        />
         <Segment loading={pending} className="contentSegment">
           {!userid ? this.renderUserSearchList() : this.renderUserPage(userid)}
         </Segment>
-        <Icon
-          link
-          name="envelope"
-          onClick={this.copyEmailsToClippoard}
-          style={{ float: 'right' }}
-        />
+        <Icon link name="envelope" onClick={this.copyEmailsToClippoard} style={{ float: 'right' }} />
       </div>
     )
   }
@@ -176,16 +176,20 @@ EnableUsers.propTypes = {
   pending: bool.isRequired,
   getUnits: func.isRequired,
   enabledOnly: bool.isRequired,
-  users: arrayOf(shape({
-    id: string,
-    full_name: string,
-    is_enabled: bool,
-    username: string,
-    units: arrayOf(shape({
+  users: arrayOf(
+    shape({
       id: string,
-      name: shape({}).isRequired
-    }))
-  })).isRequired,
+      full_name: string,
+      is_enabled: bool,
+      username: string,
+      units: arrayOf(
+        shape({
+          id: string,
+          name: shape({}).isRequired
+        })
+      )
+    })
+  ).isRequired,
   error: bool.isRequired,
   units: arrayOf(shape({})).isRequired,
   elementdetails: arrayOf(shape({ code: string, type: number, name: shape({}) })).isRequired,
@@ -202,12 +206,17 @@ const mapStateToProps = ({ localize, users, units, elementdetails }) => ({
   elementdetails: elementdetails.data,
   enabledOnly: users.enabledOnly,
   users: sortUsers(users),
-  pending: (typeof (users.pending) === 'boolean') ? users.pending : true,
+  pending: typeof users.pending === 'boolean' ? users.pending : true,
   error: users.error || false
 })
 
-export default withRouter(connect(mapStateToProps, {
-  getUsers,
-  getUnits,
-  getElementDetails
-})(EnableUsers))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    {
+      getUsers,
+      getUnits,
+      getElementDetails
+    }
+  )(EnableUsers)
+)

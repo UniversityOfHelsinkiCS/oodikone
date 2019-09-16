@@ -70,7 +70,7 @@ class Index extends Component {
     }
   }
 
-  handleTeacherHeaderClick = (columnName) => {
+  handleTeacherHeaderClick = columnName => {
     const { sortColumn, sortReverse } = this.state
     const isSortColumn = columnName === sortColumn
     this.setState({
@@ -86,14 +86,9 @@ class Index extends Component {
       const isActive = columnName === sortColumn
 
       return (
-        <div
-          className={className}
-          onClick={() => this.handleTeacherHeaderClick(columnName)}
-        >
+        <div className={className} onClick={() => this.handleTeacherHeaderClick(columnName)}>
           {label}
-          {isActive
-            ? <Icon name={`caret ${sortReverse ? 'down' : 'up'}`} />
-            : null}
+          {isActive ? <Icon name={`caret ${sortReverse ? 'down' : 'up'}`} /> : null}
         </div>
       )
     }
@@ -112,12 +107,7 @@ class Index extends Component {
 
   render() {
     const { handleFilterClick, handleActiveToggleChange, showOnlyActiveTeachers, activeTeacherIds } = this.props
-    const {
-      viewableTeachers,
-      activeTeacherCount,
-      sortColumn,
-      sortReverse
-    } = this.state
+    const { viewableTeachers, activeTeacherCount, sortColumn, sortReverse } = this.state
 
     const toggleId = 'toggle'
     const sortedTeachers = sortBy(viewableTeachers, sortColumn)
@@ -143,12 +133,10 @@ class Index extends Component {
         </Header>
         <List celled>
           {this.renderListHeader()}
-          {sortedTeachers.map((t) => {
+          {sortedTeachers.map(t => {
             const isActive = activeTeacherIds.includes(t.id)
             return <TeacherItem key={t.id} teacher={t} isActive={isActive} handleFilterClick={handleFilterClick} />
-          })
-          }
-
+          })}
         </List>
       </Fragment>
     )

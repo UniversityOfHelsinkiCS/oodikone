@@ -34,7 +34,6 @@ import {
   chart33,
   chart34,
   chart35
-
 } from '../styles/variables'
 /*
 lightgreen: '#90EE90',
@@ -56,11 +55,7 @@ const assumeBasename = () => {
 export const BASE_PATH = assumeBasename()
 
 export const API_BASE_PATH = `${assumeBasename()}api`
-export const AVAILABLE_LANGUAGES = [
-  { name: 'fi', code: 'fi' },
-  { name: 'en', code: 'en' },
-  { name: 'sv', code: 'sv' }
-]
+export const AVAILABLE_LANGUAGES = [{ name: 'fi', code: 'fi' }, { name: 'en', code: 'en' }, { name: 'sv', code: 'sv' }]
 export const DEFAULT_LANG = 'fi'
 
 export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
@@ -101,7 +96,9 @@ export const passRateStudGraphOptions = (categories, max, title, skipFirstColor)
   chart: {
     type: 'column'
   },
-  colors: skipFirstColor ? [chartlgreen, chartdarkg, chartlred, chartdarkred] : [chartblue, chartlgreen, chartdarkg, chartlred, chartdarkred],
+  colors: skipFirstColor
+    ? [chartlgreen, chartdarkg, chartlred, chartdarkred]
+    : [chartblue, chartlgreen, chartdarkg, chartlred, chartdarkred],
 
   title: {
     text: title
@@ -207,5 +204,4 @@ export const PRIORITYCODE_TEXTS = {
   30: 'Graduated'
 }
 
-export const ERROR_STATUSES_NOT_TO_CAPTURE = [
-]
+export const ERROR_STATUSES_NOT_TO_CAPTURE = []

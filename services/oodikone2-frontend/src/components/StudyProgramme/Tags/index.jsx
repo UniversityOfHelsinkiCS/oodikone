@@ -27,11 +27,11 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     setConfirm(null)
   }
 
-  const handleTagYearSelect = (momentYear) => {
+  const handleTagYearSelect = momentYear => {
     setYear(momentYear)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = event => {
     event.preventDefault()
     const newTag = {
       tagname: tagname.trim(),
@@ -47,11 +47,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     setTagname(target.value)
   }
 
-  const deleteButton = tag => (
-    <Button onClick={() => setConfirm(tag)}>
-      Delete
-    </Button>
-  )
+  const deleteButton = tag => <Button onClick={() => setConfirm(tag)}>Delete</Button>
 
   const columns = [
     {
@@ -89,18 +85,11 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
         <Segment>
           <Form.Group>
             <Form.Field>
-              <label>
-                Tag name
-              </label>
-              <Form.Input
-                onChange={handleChange}
-                value={tagname}
-              />
+              <label>Tag name</label>
+              <Form.Input onChange={handleChange} value={tagname} />
             </Form.Field>
             <Form.Field>
-              <label>
-                Associated start year
-              </label>
+              <label>Associated start year</label>
               <Datetime
                 className="yearSelectInput"
                 control={Datetime}
@@ -112,18 +101,20 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
                 onChange={handleTagYearSelect}
               />
             </Form.Field>
-            <Button disabled={!tagname.trim() || tags.find(t => t.tagname === tagname.trim()) || !year} onClick={handleSubmit}> Create new tag </Button>
+            <Button
+              disabled={!tagname.trim() || tags.find(t => t.tagname === tagname.trim()) || !year}
+              onClick={handleSubmit}
+            >
+              {' '}
+              Create new tag{' '}
+            </Button>
             <TagModal tags={tags} studytrack={studyprogramme} />
           </Form.Group>
         </Segment>
       </Form>
       <Header size="medium">Study programme tags</Header>
-      <SortableTable
-        columns={columns}
-        data={tags}
-        getRowKey={row => row.tag_id}
-      />
-    </List >
+      <SortableTable columns={columns} data={tags} getRowKey={row => row.tag_id} />
+    </List>
   )
 }
 
@@ -139,8 +130,13 @@ Tags.propTypes = {
   studyprogramme: string.isRequired
 }
 
-export default withRouter(connect(mapStateToProps, {
-  createTag: createTagAction,
-  deleteTag: deleteTagAction,
-  getTagsByStudytrack: getTagsByStudytrackAction
-})(Tags))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    {
+      createTag: createTagAction,
+      deleteTag: deleteTagAction,
+      getTagsByStudytrack: getTagsByStudytrackAction
+    }
+  )(Tags)
+)

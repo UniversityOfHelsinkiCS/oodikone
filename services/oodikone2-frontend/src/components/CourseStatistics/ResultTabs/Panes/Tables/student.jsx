@@ -17,16 +17,11 @@ const StudentTable = ({ stats, name, history, isAdmin }) => {
     history.push(`/coursepopulation?${searchString}`)
   }
 
-  const formatted = stats.map((statistic) => {
+  const formatted = stats.map(statistic => {
     const { name: n, code, students, coursecode } = statistic
-    const {
-      passedFirst = 0,
-      passedRetry = 0,
-      failedFirst = 0,
-      failedRetry = 0
-    } = students.categories
+    const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = students.categories
     const total = passedFirst + passedRetry + failedFirst + failedRetry
-    return ({
+    return {
       name: n,
       code,
       coursecode,
@@ -37,7 +32,7 @@ const StudentTable = ({ stats, name, history, isAdmin }) => {
       failedFirst,
       failedRetry,
       failRate: (failedFirst + failedRetry) / total
-    })
+    }
   })
   return (
     <div>
@@ -51,55 +46,72 @@ const StudentTable = ({ stats, name, history, isAdmin }) => {
             key: 'TIME',
             title: 'Time',
             getRowVal: s => s.code,
-            getRowContent: s => (isAdmin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name)} /></div>) : s.name),
+            getRowContent: s =>
+              isAdmin ? (
+                <div>
+                  {s.name}
+                  <Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name)} />
+                </div>
+              ) : (
+                s.name
+              ),
             headerProps: { rowSpan: 2, width: 3 }
-          }, {
+          },
+          {
             key: 'TOTAL',
             title: 'Students',
             getRowVal: s => s.students,
             headerProps: { rowSpan: 2, width: 3 }
-          }, {
+          },
+          {
             key: 'PASSED',
             title: 'Passed',
             parent: true,
             headerProps: { colSpan: 3, width: 5 }
-          }, {
+          },
+          {
             key: 'PASS_FIRST',
             title: 'first try',
             getRowVal: s => s.passedFirst,
             cellProps: { width: 2 },
             child: true
-          }, {
+          },
+          {
             key: 'PASS_RETRY',
             title: 'after retry',
             getRowVal: s => s.passedRetry,
             cellProps: { width: 2 },
             child: true
-          }, {
+          },
+          {
             key: 'PASS_RATE',
             title: 'percentage',
             getRowVal: s => s.passRate,
             getRowContent: s => formatPercentage(s.passRate),
             cellProps: { width: 1 },
             child: true
-          }, {
+          },
+          {
             key: 'FAIL',
             title: 'Failed',
             parent: true,
             headerProps: { colSpan: 3, width: 5 }
-          }, {
+          },
+          {
             key: 'FAIL_FIRST',
             title: 'first try',
             getRowVal: s => s.failedFirst,
             cellProps: { width: 2 },
             child: true
-          }, {
+          },
+          {
             key: 'FAIL_RETRY',
             title: 'after retry',
             getRowVal: s => s.failedRetry,
             cellProps: { width: 2 },
             child: true
-          }, {
+          },
+          {
             key: 'FAIL_RATE',
             title: 'percentage',
             getRowVal: s => s.failRate,

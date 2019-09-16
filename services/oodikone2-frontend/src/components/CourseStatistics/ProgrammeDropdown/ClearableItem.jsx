@@ -17,7 +17,7 @@ const styles = {
   }
 }
 
-const handler = onClick => (e) => {
+const handler = onClick => e => {
   e.stopPropagation()
   onClick()
 }

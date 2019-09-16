@@ -6,7 +6,13 @@ import { func, shape, string, arrayOf } from 'prop-types'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { courseCreditFilter } from '../../populationFilters'
 
-const CourseCreditFilter = ({ coursecodes, courseData, filter, setPopulationFilterAction, removePopulationFilterAction }) => {
+const CourseCreditFilter = ({
+  coursecodes,
+  courseData,
+  filter,
+  setPopulationFilterAction,
+  removePopulationFilterAction
+}) => {
   const [credits, setCredits] = useState(0)
   const handleFilter = () => {
     setPopulationFilterAction(courseCreditFilter({ credits, coursecodes, coursename: courseData.name }))
@@ -23,28 +29,19 @@ const CourseCreditFilter = ({ coursecodes, courseData, filter, setPopulationFilt
     return (
       <Segment>
         <Form>
-          <Popup
-            trigger={<Icon style={{ float: 'right' }} name="info" />}
-          />
+          <Popup trigger={<Icon style={{ float: 'right' }} name="info" />} />
           <Form.Group inline>
             <Form.Field>
               <label>Select students that have </label>
             </Form.Field>
             <Form.Field>
-              <Input
-                type="number"
-                onChange={handleChange}
-                value={credits}
-              />
+              <Input type="number" onChange={handleChange} value={credits} />
             </Form.Field>
             <Form.Field>
               <label>credits from course {courseData.name}</label>
             </Form.Field>
             <Form.Field>
-              <Button
-                onClick={handleFilter}
-                disabled={credits === 0}
-              >
+              <Button onClick={handleFilter} disabled={credits === 0}>
                 set filter
               </Button>
             </Form.Field>
@@ -75,7 +72,10 @@ const mapStateToProps = ({ singleCourseStats }) => ({
   courseData: singleCourseStats.stats
 })
 
-export default connect(mapStateToProps, {
-  setPopulationFilterAction: setPopulationFilter,
-  removePopulationFilterAction: removePopulationFilter
-})(CourseCreditFilter)
+export default connect(
+  mapStateToProps,
+  {
+    setPopulationFilterAction: setPopulationFilter,
+    removePopulationFilterAction: removePopulationFilter
+  }
+)(CourseCreditFilter)

@@ -21,25 +21,23 @@ class CourseGroupAddTeacher extends Component {
   state = DEFAULT_STATE
 
   componentDidMount() {
-    callApi(`/course-groups/${this.props.groupId}`)
-      .then((res) => {
-        this.setState({
-          courseGroup: res.data,
-          isLoading: false
-        })
+    callApi(`/course-groups/${this.props.groupId}`).then(res => {
+      this.setState({
+        courseGroup: res.data,
+        isLoading: false
       })
+    })
   }
 
   resetComponent = () => {
     this.setState(DEFAULT_STATE)
   }
 
-  fetchTeachers = (searchterm) => {
+  fetchTeachers = searchterm => {
     if (searchterm.length <= 3 || (Number(searchterm) && searchterm.length < 6)) {
       return
     }
-    this.props.setTimeout('fetch', () => {
-    }, 250)
+    this.props.setTimeout('fetch', () => {}, 250)
     this.props.findTeachers(searchterm).then(() => {
       this.setState({ displayResults: true })
       this.props.clearTimeout('fetch')
@@ -50,9 +48,13 @@ class CourseGroupAddTeacher extends Component {
     this.props.clearTimeout('search')
     if (value.length > 0) {
       this.setState({ searchterm: value })
-      this.props.setTimeout('search', () => {
-        this.fetchTeachers(value)
-      }, 250)
+      this.props.setTimeout(
+        'search',
+        () => {
+          this.fetchTeachers(value)
+        },
+        250
+      )
     } else {
       this.resetComponent()
     }
@@ -65,7 +67,12 @@ class CourseGroupAddTeacher extends Component {
       { key: 'teacherid', title: 'Teacher ID', getRowVal: s => s.id, headerProps: { onClick: null, sorted: null } },
       { key: 'username', title: 'Username', getRowVal: s => s.code, headerProps: { onClick: null, sorted: null } },
       { key: 'name', title: 'Name', getRowVal: s => s.name, headerProps: { onClick: null, sorted: null, colSpan: 2 } },
-      { key: 'icon', getRowVal: () => (<Icon name="add user" />), cellProps: { collapsing: true }, headerProps: { onClick: null, sorted: null } }
+      {
+        key: 'icon',
+        getRowVal: () => <Icon name="add user" />,
+        cellProps: { collapsing: true },
+        headerProps: { onClick: null, sorted: null }
+      }
     ]
 
     const groupColumns = [
@@ -78,25 +85,23 @@ class CourseGroupAddTeacher extends Component {
         getRowVal: () => '',
         getCellProps: t => ({
           collapsing: true,
-          icon: <Icon
-            name="remove user"
-            link
-            onClick={
-              () => {
+          icon: (
+            <Icon
+              name="remove user"
+              link
+              onClick={() => {
                 this.setState({ isLoading: true })
-                callApi(`/course-groups/${this.props.groupId}/remove/${t.id}`, 'post')
-                  .then(() => {
-                    callApi(`/course-groups/${this.props.groupId}`)
-                    .then((res) => {
-                      this.setState({
-                        courseGroup: res.data,
-                        isLoading: false
-                      })
+                callApi(`/course-groups/${this.props.groupId}/remove/${t.id}`, 'post').then(() => {
+                  callApi(`/course-groups/${this.props.groupId}`).then(res => {
+                    this.setState({
+                      courseGroup: res.data,
+                      isLoading: false
                     })
                   })
-              }
-            }
-          />,
+                })
+              }}
+            />
+          ),
           textAlign: 'center'
         }),
         headerProps: { onClick: null, sorted: null }
@@ -107,9 +112,7 @@ class CourseGroupAddTeacher extends Component {
       <Segment loading={isLoading}>
         {!courseGroup ? null : (
           <Fragment>
-            <Header size="large">
-              {courseGroup.name}
-            </Header>
+            <Header size="large">{courseGroup.name}</Header>
             <Segment>
               <Header size="medium">Add teacher</Header>
               <Search
@@ -119,41 +122,38 @@ class CourseGroupAddTeacher extends Component {
                 onSearchChange={this.handleSearchChange}
                 showNoResults={false}
               />
-              { this.state.displayResults && (
+              {this.state.displayResults && (
                 <Fragment>
-                  {this.props.teachers.length <= 0 ? <div>No teachers matched your search</div> :
-                  <SortableTable
-                    getRowKey={s => s.id}
-                    getRowProps={teacher => ({
-                      className: 'clickable',
-                      onClick: () => {
-                        this.setState({ isLoading: true })
-                        callApi(`/course-groups/${this.props.groupId}/add/${teacher.id}`, 'post')
-                          .then(() => {
-                            callApi(`/course-groups/${this.props.groupId}`)
-                            .then((res) => {
+                  {this.props.teachers.length <= 0 ? (
+                    <div>No teachers matched your search</div>
+                  ) : (
+                    <SortableTable
+                      getRowKey={s => s.id}
+                      getRowProps={teacher => ({
+                        className: 'clickable',
+                        onClick: () => {
+                          this.setState({ isLoading: true })
+                          callApi(`/course-groups/${this.props.groupId}/add/${teacher.id}`, 'post').then(() => {
+                            callApi(`/course-groups/${this.props.groupId}`).then(res => {
                               this.setState({
                                 courseGroup: res.data,
                                 isLoading: false
                               })
                             })
                           })
-                      }
-                    })}
-                    tableProps={{ celled: false, sortable: false }}
-                    columns={searchResultColumns}
-                    data={this.props.teachers}
-                  />}
+                        }
+                      })}
+                      tableProps={{ celled: false, sortable: false }}
+                      columns={searchResultColumns}
+                      data={this.props.teachers}
+                    />
+                  )}
                 </Fragment>
               )}
             </Segment>
             <Segment>
               <Header size="medium">Teachers in group</Header>
-              <SortableTable
-                getRowKey={gc => gc.id}
-                columns={groupColumns}
-                data={courseGroup.teachers}
-              />
+              <SortableTable getRowKey={gc => gc.id} columns={groupColumns} data={courseGroup.teachers} />
             </Segment>
           </Fragment>
         )}
@@ -177,4 +177,9 @@ const mapStateToProps = ({ teachers }) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps, { findTeachers })(Timeout(CourseGroupAddTeacher)))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    { findTeachers }
+  )(Timeout(CourseGroupAddTeacher))
+)

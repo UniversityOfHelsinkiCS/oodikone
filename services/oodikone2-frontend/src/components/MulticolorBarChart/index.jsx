@@ -5,7 +5,7 @@ import ReactHighchart from 'react-highcharts'
 import { graphDataType } from '../../constants/types'
 import './multicolorBarChart.css'
 
-const MulticolorBarChart = (props) => {
+const MulticolorBarChart = props => {
   const { chartTitle, chartData } = props
   if (chartData.length > 0) {
     return (
@@ -18,9 +18,7 @@ const MulticolorBarChart = (props) => {
             text: chartTitle
           },
           xAxis: {
-            categories: [
-              '2018'
-            ]
+            categories: ['2018']
           },
           yAxis: {
             title: {

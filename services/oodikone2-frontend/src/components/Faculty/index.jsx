@@ -11,7 +11,18 @@ import YearFilter from '../CourseStatistics/SearchForm/YearFilter'
 import FacultySelector from './FacultySelector'
 import FacultyStats from './FacultyStats'
 
-const Faculty = ({ getUserFaculties, getFacultiesYearlyStats, getFacultyProgrammes, faculties, pending, error, facultyYearlyStats, history, match, language }) => {
+const Faculty = ({
+  getUserFaculties,
+  getFacultiesYearlyStats,
+  getFacultyProgrammes,
+  faculties,
+  pending,
+  error,
+  facultyYearlyStats,
+  history,
+  match,
+  language
+}) => {
   const [selectedFaculty, setSelectedFaculty] = useState(null)
   const [fromYear, setFromYear] = useState(-1)
   const [toYear, setToYear] = useState(-1)
@@ -20,7 +31,7 @@ const Faculty = ({ getUserFaculties, getFacultiesYearlyStats, getFacultyProgramm
 
   const facultyCodes = faculties.map(({ code }) => code)
   const selectedFacultyProgrammesStats = facultyYearlyStats.find(({ id }) => id === selectedFaculty)
-  const hasLoaded = (faculties.length > 0 && facultyYearlyStats.length > 0)
+  const hasLoaded = faculties.length > 0 && facultyYearlyStats.length > 0
 
   useEffect(() => {
     if (selectedFaculty) {
@@ -29,7 +40,9 @@ const Faculty = ({ getUserFaculties, getFacultiesYearlyStats, getFacultyProgramm
   }, [selectedFaculty])
 
   useEffect(() => {
-    const { params: { facultyid } } = match
+    const {
+      params: { facultyid }
+    } = match
     if (facultyid) setSelectedFaculty(facultyid)
     else setSelectedFaculty(null)
   }, [history.location.pathname])
@@ -42,11 +55,14 @@ const Faculty = ({ getUserFaculties, getFacultiesYearlyStats, getFacultyProgramm
   }, [])
 
   const getYearFilterData = () => {
-    const filterYears = uniq(facultyYearlyStats
-      .filter(f => facultyCodes.includes(f.id))
-      .map(({ data }) => Object.values(data).reduce((res, curr) => [...res, ...Object.keys(curr)], []))
-      .reduce((acc, curr) => [...acc, ...curr], []))
-      .sort((a, b) => b - a).map(year => parseInt(year, 10))
+    const filterYears = uniq(
+      facultyYearlyStats
+        .filter(f => facultyCodes.includes(f.id))
+        .map(({ data }) => Object.values(data).reduce((res, curr) => [...res, ...Object.keys(curr)], []))
+        .reduce((acc, curr) => [...acc, ...curr], [])
+    )
+      .sort((a, b) => b - a)
+      .map(year => parseInt(year, 10))
 
     return {
       fromYear: filterYears[filterYears.length - 1],
@@ -70,16 +86,17 @@ const Faculty = ({ getUserFaculties, getFacultiesYearlyStats, getFacultyProgramm
     else setToYear(value)
   }
 
-  const getTitle = () => (
-    selectedFaculty && hasLoaded ?
-      getTextIn(faculties.find(({ code }) => code === selectedFaculty).name, language) :
-      'Faculties'
-  )
+  const getTitle = () =>
+    selectedFaculty && hasLoaded
+      ? getTextIn(faculties.find(({ code }) => code === selectedFaculty).name, language)
+      : 'Faculties'
 
   if (!(faculties.length || pending) && initialized) {
-    return !error ?
-      <Header textAlign="center" content="No access to any faculties!" as="h1" /> :
+    return !error ? (
+      <Header textAlign="center" content="No access to any faculties!" as="h1" />
+    ) : (
       <Header textAlign="center" content="Not authorized for faculties!" as="h1" />
+    )
   }
 
   return (
@@ -94,29 +111,27 @@ const Faculty = ({ getUserFaculties, getFacultiesYearlyStats, getFacultyProgramm
             <Segment>
               <Form>
                 <Header content="Filter by time range" as="h4" />
-                <YearFilter
-                  fromYear={fromYear}
-                  toYear={toYear}
-                  years={years}
-                  handleChange={handleYearChange}
-                />
+                <YearFilter fromYear={fromYear} toYear={toYear} years={years} handleChange={handleYearChange} />
               </Form>
             </Segment>
-            {!selectedFaculty ?
+            {!selectedFaculty ? (
               <FacultySelector
                 faculties={faculties}
                 facultyYearlyStats={facultyYearlyStats}
                 fromYear={fromYear}
                 toYear={toYear}
                 handleSelect={setSelectedFaculty}
-              /> :
+              />
+            ) : (
               <FacultyStats
-                selectedFacultyProgrammesStats={selectedFacultyProgrammesStats ? selectedFacultyProgrammesStats.data : {}}
+                selectedFacultyProgrammesStats={
+                  selectedFacultyProgrammesStats ? selectedFacultyProgrammesStats.data : {}
+                }
                 history={history}
                 fromYear={fromYear}
                 toYear={toYear}
               />
-            }
+            )}
           </React.Fragment>
         )}
       </Segment>
@@ -151,4 +166,7 @@ const mapDispatchToProps = {
   getFacultyProgrammes
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Faculty))
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(Faculty))

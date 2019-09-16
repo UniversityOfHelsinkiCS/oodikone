@@ -6,13 +6,13 @@ export const getTagsAction = () => {
   return callController(route, prefix)
 }
 
-export const getTagsByStudytrackAction = (studytrack) => {
+export const getTagsByStudytrackAction = studytrack => {
   const route = `/tags/${studytrack}`
   const prefix = 'GET_TAGS_BY_ST_'
   return callController(route, prefix)
 }
 
-export const createTagAction = (tag) => {
+export const createTagAction = tag => {
   const route = '/tags'
   const prefix = 'CREATE_TAG_'
   const method = 'post'
@@ -20,7 +20,7 @@ export const createTagAction = (tag) => {
   return callController(route, prefix, data, method)
 }
 
-export const deleteTagAction = (tag) => {
+export const deleteTagAction = tag => {
   const route = '/tags'
   const prefix = 'DELETE_TAG_'
   const method = 'delete'

@@ -41,14 +41,17 @@ class MatriculationFilter extends Component {
               </Form.Field>
               <Form.Field>
                 <Radio name="matr" onChange={this.handleChange} value label="Yes" checked={this.state.matr === true} />
-                <Radio name="matr" onChange={this.handleChange} value={false} label="No" checked={this.state.matr === false} />
+                <Radio
+                  name="matr"
+                  onChange={this.handleChange}
+                  value={false}
+                  label="No"
+                  checked={this.state.matr === false}
+                />
               </Form.Field>
               <Form.Field>
-                <Button
-                  onClick={this.handleMatr}
-                  disabled={this.state.matr === undefined}
-                >
-                    set filter
+                <Button onClick={this.handleMatr} disabled={this.state.matr === undefined}>
+                  set filter
                 </Button>
               </Form.Field>
             </Form.Group>
@@ -59,7 +62,9 @@ class MatriculationFilter extends Component {
 
     return (
       <Segment>
-        {filter.params.matriculationexamination ? 'Showing students that have done matriculation examination' : 'Showing students that have not done matriculation examination'}
+        {filter.params.matriculationexamination
+          ? 'Showing students that have done matriculation examination'
+          : 'Showing students that have not done matriculation examination'}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

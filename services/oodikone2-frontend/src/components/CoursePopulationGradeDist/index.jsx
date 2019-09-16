@@ -8,36 +8,48 @@ import SearchResultTable from '../SearchResultTable'
 import { gradeFilter } from '../../populationFilters'
 import { setPopulationFilter } from '../../redux/populationFilters'
 
-const CoursePopulationCreditDist = ({ singleCourseStats, yearcode, pending, selectedStudents, setPopulationFilterDispatch }) => {
+const CoursePopulationCreditDist = ({
+  singleCourseStats,
+  yearcode,
+  pending,
+  selectedStudents,
+  setPopulationFilterDispatch
+}) => {
   const [courseGrades, setGrades] = useState([])
   useEffect(() => {
     if (singleCourseStats.statistics) {
       const array = []
       const statistics = singleCourseStats.statistics.find(stats => stats.code === Number(yearcode))
       const grades = statistics ? Object.keys(statistics.students.grades) : []
-      grades.forEach((grade) => {
+      grades.forEach(grade => {
         const filteredGrades = intersection(selectedStudents, statistics.students.grades[grade])
         array.push({ grade, amount: filteredGrades.length })
       })
       setGrades(array)
     }
   }, [pending, selectedStudents])
-  const setFilter = (row) => {
-    setPopulationFilterDispatch(gradeFilter({ grade: row[0], coursecodes: singleCourseStats.alternatives, coursename: singleCourseStats.name }))
+  const setFilter = row => {
+    setPopulationFilterDispatch(
+      gradeFilter({ grade: row[0], coursecodes: singleCourseStats.alternatives, coursename: singleCourseStats.name })
+    )
   }
 
-  const sortedCourseGrades = orderBy(courseGrades, (e) => {
-    if (Number(e.grade)) {
-      return `_${e.grade}`
-    }
-    return e.grade
-  }, ['desc'])
-  const rows = sortedCourseGrades.map(g => [`${g.grade}`, g.amount, <Progress style={{ margin: '0px' }} percent={Math.round((g.amount / selectedStudents.length) * 100)} progress />])
-  const headers = [
-    'Grades',
-    `Students (all=${selectedStudents.length})`,
-    'Percentage of population'
-  ]
+  const sortedCourseGrades = orderBy(
+    courseGrades,
+    e => {
+      if (Number(e.grade)) {
+        return `_${e.grade}`
+      }
+      return e.grade
+    },
+    ['desc']
+  )
+  const rows = sortedCourseGrades.map(g => [
+    `${g.grade}`,
+    g.amount,
+    <Progress style={{ margin: '0px' }} percent={Math.round((g.amount / selectedStudents.length) * 100)} progress />
+  ])
+  const headers = ['Grades', `Students (all=${selectedStudents.length})`, 'Percentage of population']
 
   return (
     <SearchResultTable
@@ -64,6 +76,9 @@ const mapStateToProps = ({ singleCourseStats, populationFilters }) => ({
   filters: populationFilters.filters.filter(f => f.type === 'GradeFilter')
 })
 
-export default connect(mapStateToProps, {
-  setPopulationFilterDispatch: setPopulationFilter
-})(CoursePopulationCreditDist)
+export default connect(
+  mapStateToProps,
+  {
+    setPopulationFilterDispatch: setPopulationFilter
+  }
+)(CoursePopulationCreditDist)

@@ -24,7 +24,7 @@ class TransferFilter extends Component {
     selectedTarget: ''
   }
 
-  getName = (code) => {
+  getName = code => {
     const { transfers, activeLanguage } = this.props
     const mergedTransfers = { ...Object.values(transfers)[0], ...Object.values(transfers)[1] }
     return getTextIn(mergedTransfers[code].name, activeLanguage)
@@ -36,17 +36,19 @@ class TransferFilter extends Component {
 
   handleFilter = () => {
     const { selectedSource, selectedTarget } = this.state
-    this.props.setPopulationFilter(transferFilter({
-      source: selectedSource,
-      target: selectedTarget
-    }))
+    this.props.setPopulationFilter(
+      transferFilter({
+        source: selectedSource,
+        target: selectedTarget
+      })
+    )
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
   }
 
-  renderFilterText = (filter) => {
+  renderFilterText = filter => {
     const sourceName = this.getName(filter.params.source)
     const targetName = this.getName(filter.params.target)
     let returnText = 'Showing students that transferred'
@@ -90,9 +92,7 @@ class TransferFilter extends Component {
               <Form.Field>
                 <label>Students that transferred from </label>
               </Form.Field>
-              <Form.Field
-                style={{ width: 300 }}
-              >
+              <Form.Field style={{ width: 300 }}>
                 <Dropdown
                   search
                   fluid
@@ -101,10 +101,13 @@ class TransferFilter extends Component {
                   placeholder="select source"
                   onChange={this.handleChange}
                   value={this.state.courseType}
-                  options={sortBy(Object.entries(filteredSources).map(([value, text]) => ({
-                    value,
-                    text: getTextIn(text.name, activeLanguage)
-                  })), entry => entry.text)}
+                  options={sortBy(
+                    Object.entries(filteredSources).map(([value, text]) => ({
+                      value,
+                      text: getTextIn(text.name, activeLanguage)
+                    })),
+                    entry => entry.text
+                  )}
                   selectOnBlur={false}
                   selectOnNavigation={false}
                 />
@@ -112,9 +115,7 @@ class TransferFilter extends Component {
               <Form.Field>
                 <label> to </label>
               </Form.Field>
-              <Form.Field
-                style={{ width: 300 }}
-              >
+              <Form.Field style={{ width: 300 }}>
                 <Dropdown
                   search
                   icon={null}
@@ -123,10 +124,13 @@ class TransferFilter extends Component {
                   placeholder="select target"
                   onChange={this.handleChange}
                   value={this.state.discipline}
-                  options={sortBy(Object.entries(filteredTargets).map(([value, text]) => ({
-                    value,
-                    text: getTextIn(text.name, activeLanguage)
-                  })), entry => entry.text)}
+                  options={sortBy(
+                    Object.entries(filteredTargets).map(([value, text]) => ({
+                      value,
+                      text: getTextIn(text.name, activeLanguage)
+                    })),
+                    entry => entry.text
+                  )}
                   selectOnBlur={false}
                   selectOnNavigation={false}
                 />
@@ -134,13 +138,10 @@ class TransferFilter extends Component {
               <Form.Field>
                 <Button
                   onClick={this.handleFilter}
-                  disabled={this.state.selectedSource === '' ||
-                    this.state.selectedTarget === ''
-                  }
+                  disabled={this.state.selectedSource === '' || this.state.selectedTarget === ''}
                 >
                   set filter
                 </Button>
-
               </Form.Field>
             </Form.Group>
           </Form>

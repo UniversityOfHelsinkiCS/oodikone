@@ -6,16 +6,9 @@ import { withRouter } from 'react-router-dom'
 
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
-const StudentNameVisibilityToggle = ({
-  showNames, toggleLabel, toggleStudentNameVisibility: toggle
-}) => (
+const StudentNameVisibilityToggle = ({ showNames, toggleLabel, toggleStudentNameVisibility: toggle }) => (
   <div style={{ marginTop: 15, marginBottom: 10 }}>
-    <Radio
-      toggle
-      label={toggleLabel}
-      checked={showNames}
-      onChange={toggle}
-    />
+    <Radio toggle label={toggleLabel} checked={showNames} onChange={toggle} />
   </div>
 )
 

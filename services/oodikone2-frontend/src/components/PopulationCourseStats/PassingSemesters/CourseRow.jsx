@@ -71,19 +71,11 @@ const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, isActiveCourse
       <Table.Cell onClick={() => onCourseNameClickFn(course.code)} className="clickableCell">
         {getTextIn(course.name, activeLanguage)}
       </Table.Cell>
-      <Table.Cell>
-        {course.code}
-      </Table.Cell>
-      <Table.Cell>
-        {stats.students}
-      </Table.Cell>
-      <Table.Cell>
-        {stats.passed}
-      </Table.Cell>
+      <Table.Cell>{course.code}</Table.Cell>
+      <Table.Cell>{stats.students}</Table.Cell>
+      <Table.Cell>{stats.passed}</Table.Cell>
 
-      {cumulative
-        ? renderCumulativeStatistics(passingSemesters)
-        : renderStatistics(passingSemesters)}
+      {cumulative ? renderCumulativeStatistics(passingSemesters) : renderStatistics(passingSemesters)}
     </Table.Row>
   )
 }
@@ -91,7 +83,12 @@ const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, isActiveCourse
 CourseRow.propTypes = {
   statistics: shape({
     course: shape({ code: string, name: shape({}) }),
-    stats: shape({ students: number, passed: number, passingSemesters: shape({}), passingSemestersCumulative: shape({}) })
+    stats: shape({
+      students: number,
+      passed: number,
+      passingSemesters: shape({}),
+      passingSemestersCumulative: shape({})
+    })
   }).isRequired,
   cumulative: bool.isRequired,
   onCourseNameClickFn: func.isRequired,

@@ -53,7 +53,7 @@ const listreducer = (prefix, resToObject, rewriteData = true) => {
   }
 }
 
-export const actions = (prefix) => {
+export const actions = prefix => {
   const types = additionalTypes(prefix)
   return {
     reset: () => ({ type: types.reset })

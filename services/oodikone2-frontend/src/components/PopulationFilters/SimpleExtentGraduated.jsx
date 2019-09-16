@@ -8,7 +8,7 @@ import { extentGraduated } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { getTextIn } from '../../common'
 
-const SimpleExtentGraduated = (props) => {
+const SimpleExtentGraduated = props => {
   SimpleExtentGraduated.propTypes = {
     setPopulationFilter: func.isRequired,
     programme: shape({}).isRequired,
@@ -44,9 +44,7 @@ const SimpleExtentGraduated = (props) => {
             trigger={<Icon style={{ float: 'right' }} name="info" />}
           />
           <Form.Group inline>
-            <Form.Field>
-              Students that
-            </Form.Field>
+            <Form.Field>Students that</Form.Field>
             <Form.Field>
               <Dropdown
                 fluid
@@ -61,12 +59,7 @@ const SimpleExtentGraduated = (props) => {
             {`graduated from ${getTextIn(programme, language)}`}
 
             <Form.Field>
-              <Button
-                onClick={handleLimit}
-              >
-                set filter
-              </Button>
-
+              <Button onClick={handleLimit}>set filter</Button>
             </Form.Field>
           </Form.Group>
         </Form>
@@ -77,7 +70,9 @@ const SimpleExtentGraduated = (props) => {
   return (
     <Segment>
       <label>
-        {`Showing students that ${filter.params.complemented === 'true' ? 'have not' : 'have'} graduated from ${getTextIn(programme, language)}`}
+        {`Showing students that ${
+          filter.params.complemented === 'true' ? 'have not' : 'have'
+        } graduated from ${getTextIn(programme, language)}`}
       </label>
       <span style={{ float: 'right' }}>
         <Icon name="remove" onClick={clearFilter} />

@@ -5,8 +5,10 @@ import { arrayOf, shape, string, func } from 'prop-types'
 import { getCourseSearchResults } from '../../../selectors/courses'
 import SortableTable from '../../SortableTable'
 
-const SearchResult = ({ courses, getCourseActions }) => (courses.length === 0
-  ? <Segment content="No results" /> : (
+const SearchResult = ({ courses, getCourseActions }) =>
+  courses.length === 0 ? (
+    <Segment content="No results" />
+  ) : (
     <SortableTable
       getRowKey={c => c.code}
       tableProps={{ celled: true }}
@@ -32,13 +34,15 @@ const SearchResult = ({ courses, getCourseActions }) => (courses.length === 0
       ]}
       data={courses}
     />
-  ))
+  )
 
 SearchResult.propTypes = {
-  courses: arrayOf(shape({
-    code: string,
-    name: string
-  })),
+  courses: arrayOf(
+    shape({
+      code: string,
+      name: string
+    })
+  ),
   getCourseActions: func.isRequired
 }
 

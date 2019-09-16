@@ -100,7 +100,7 @@ export const callController = (route, prefix, data, method = 'get', query, param
   return { type: `${prefix}ATTEMPT`, requestSettings }
 }
 
-const handleError = (err) => {
+const handleError = err => {
   const { response } = err
   if (response && response.status) {
     if (!ERROR_STATUSES_NOT_TO_CAPTURE.includes(response.status)) {
@@ -109,22 +109,13 @@ const handleError = (err) => {
   }
 }
 
-export const handleRequest = store => next => async (action) => {
+export const handleRequest = store => next => async action => {
   next(action)
   const { requestSettings } = action
   if (requestSettings) {
-    const {
-      route, method, data, prefix, query, params, onProgress
-    } = requestSettings
+    const { route, method, data, prefix, query, params, onProgress } = requestSettings
     try {
-      const res = await callApi(
-        route,
-        method,
-        data,
-        params,
-        0,
-        onProgress
-      )
+      const res = await callApi(route, method, data, params, 0, onProgress)
       store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
     } catch (e) {
       store.dispatch({ type: `${prefix}FAILURE`, response: e, query })
@@ -133,7 +124,7 @@ export const handleRequest = store => next => async (action) => {
   }
 }
 
-export const handleAuth = store => next => async (action) => {
+export const handleAuth = store => next => async action => {
   next(action)
   const { type } = action
   if (type === 'LOGIN_ATTEMPT') {

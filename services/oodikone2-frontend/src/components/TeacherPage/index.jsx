@@ -7,7 +7,7 @@ import { getTeacher } from '../../redux/teachers'
 import TeacherDetails from '../TeacherDetails'
 
 class TeacherPage extends Component {
-  state={
+  state = {
     initialized: false
   }
 
@@ -26,9 +26,7 @@ class TeacherPage extends Component {
     } else if (!teacher) {
       return <Redirect to="/teachers" />
     }
-    return (
-      <TeacherDetails teacher={teacher} />
-    )
+    return <TeacherDetails teacher={teacher} />
   }
 }
 
@@ -52,4 +50,7 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(mapStateToProps, { getTeacher })(TeacherPage)
+export default connect(
+  mapStateToProps,
+  { getTeacher }
+)(TeacherPage)

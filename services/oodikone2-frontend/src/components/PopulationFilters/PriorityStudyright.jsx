@@ -23,10 +23,7 @@ class PriorityStudyright extends Component {
     programme: undefined
   }
 
-  graduationOptions = [
-    { value: 'grad', text: 'graduated' },
-    { value: 'either', text: 'studying' }
-  ] // illegal to pass boolean values as Dropdown options value :(
+  graduationOptions = [{ value: 'grad', text: 'graduated' }, { value: 'either', text: 'studying' }] // illegal to pass boolean values as Dropdown options value :(
 
   priorityOptions = [{ value: 1, text: 'primary studies' }, { value: 2, text: 'non-primary studies' }]
 
@@ -36,9 +33,13 @@ class PriorityStudyright extends Component {
 
   handleLimit = () => {
     const { prioritycode, degree, programme } = this.state
-    this.props.setPopulationFilter(priorityStudyright({
-      prioritycode, degree, programme
-    }))
+    this.props.setPopulationFilter(
+      priorityStudyright({
+        prioritycode,
+        degree,
+        programme
+      })
+    )
   }
 
   clearFilter = () => {
@@ -68,12 +69,10 @@ class PriorityStudyright extends Component {
   render() {
     const { filter, language, studyrights } = this.props
 
-    let degreeOptions = studyrights.degrees.map(sr =>
-      ({ value: sr.code, text: getTextIn(sr.name, language) }))
+    let degreeOptions = studyrights.degrees.map(sr => ({ value: sr.code, text: getTextIn(sr.name, language) }))
     degreeOptions = [{ value: 'anyDegree', text: 'any degree' }, ...degreeOptions]
 
-    let programmeOptions = studyrights.programmes.map(sr =>
-      ({ value: sr.code, text: getTextIn(sr.name, language) }))
+    let programmeOptions = studyrights.programmes.map(sr => ({ value: sr.code, text: getTextIn(sr.name, language) }))
     programmeOptions = [{ value: 'anyProgramme', text: 'any programme' }, ...programmeOptions]
 
     if (filter.notSet) {
@@ -101,9 +100,7 @@ class PriorityStudyright extends Component {
                 />
               </Form.Field>
               <Form.Field>
-                <label>
-                  and
-                </label>
+                <label>and</label>
               </Form.Field>
               <Form.Field>
                 <Dropdown
@@ -134,12 +131,13 @@ class PriorityStudyright extends Component {
               <Form.Field>
                 <Button
                   onClick={this.handleLimit}
-                  disabled={this.state.prioritycode === undefined ||
-                    (this.state.degree === undefined && this.state.programme === undefined)}
+                  disabled={
+                    this.state.prioritycode === undefined ||
+                    (this.state.degree === undefined && this.state.programme === undefined)
+                  }
                 >
                   set filter
                 </Button>
-
               </Form.Field>
             </Form.Group>
           </Form>
@@ -149,9 +147,7 @@ class PriorityStudyright extends Component {
 
     return (
       <Segment>
-        <label>
-          {this.renderSetText(filter, studyrights)}
-        </label>
+        <label>{this.renderSetText(filter, studyrights)}</label>
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

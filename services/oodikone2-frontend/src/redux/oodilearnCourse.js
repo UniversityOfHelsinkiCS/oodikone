@@ -3,7 +3,7 @@ import { callController } from '../apiConnection/index'
 
 const prefix = 'OODILEARN_GET_COURSE_'
 
-export const getOodiLearnCourse = (code) => {
+export const getOodiLearnCourse = code => {
   const route = `/oodilearn/courses/${code}`
   return callController(route, prefix)
 }
