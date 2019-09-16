@@ -37,6 +37,7 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
     return <Segment textAlign="center">No data</Segment>
   }
 
+  /* eslint-disable react/prop-types */
   const headers = [
     {
       key: 'name',
@@ -46,7 +47,7 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
           {' '}
           {getNameOfProgramme(code)} <Icon name="level up alternate" onClick={() => showProgrammeOverView(code)} />
         </div>
-      ) //eslint-disable-line
+      )
     },
     {
       key: 'code',
@@ -71,6 +72,7 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
       getRowContent: ({ code }) => `${calculateTotalFailedCourses(totalStats[code]).toFixed(2)}%`
     }
   ]
+  /* eslint-enable react/prop-types */
 
   const data = Object.entries(selectedFacultyProgrammesStats).map(([code, stats]) => ({ code, stats }))
   const bachelors = data.filter(programme => programme.code.includes('KH'))

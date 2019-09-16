@@ -217,6 +217,7 @@ class PopulationCourseStats extends Component {
   setActiveView = activeView => this.setState({ activeView })
 
   handleCourseStatisticsCriteriaChange = () => {
+    // eslint-disable-next-line react/no-access-state-in-setstate
     const courseStatistics = PopulationCourseStats.updateCourseStatisticsCriteria(this.props, this.state)
     this.setState({ courseStatistics })
   }

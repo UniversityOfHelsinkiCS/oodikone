@@ -61,8 +61,8 @@ class SingleCourseStats extends Component {
     const { primary } = this.state
     if (this.props.programmes.length !== prevProps.programmes.length) {
       if (primary.every(c => !this.props.programmes.map(p => p.key).includes(c))) {
+        // eslint-disable-next-line react/no-did-update-set-state
         this.setState({
-          // eslint-disable-line
           primary: [ALL.value]
         })
       }
@@ -77,7 +77,8 @@ class SingleCourseStats extends Component {
   getProgrammeName = progcode => {
     if (progcode === ALL.value) {
       return 'All'
-    } else if (progcode === 'EXCLUDED') {
+    }
+    if (progcode === 'EXCLUDED') {
       return 'Excluded'
     }
     const { activeLanguage } = this.props
@@ -87,6 +88,7 @@ class SingleCourseStats extends Component {
 
   setExcludedToComparison = () =>
     this.setState({
+      // eslint-disable-next-line react/no-access-state-in-setstate
       comparison: this.state.primary.includes(ALL.value) ? [] : ['EXCLUDED']
     })
 
@@ -171,7 +173,10 @@ class SingleCourseStats extends Component {
     let selected = [...value].filter(v => v !== ALL.value)
 
     if (name === 'primary') {
-      this.setState({ comparison: this.state.comparison.filter(p => p !== 'EXCLUDED') })
+      this.setState({
+        // eslint-disable-next-line react/no-access-state-in-setstate
+        comparison: this.state.comparison.filter(p => p !== 'EXCLUDED')
+      })
     }
 
     if (

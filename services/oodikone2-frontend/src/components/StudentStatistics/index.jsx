@@ -12,8 +12,8 @@ import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
+// eslint-disable-next-line react/prefer-stateless-function
 class StudentStatistics extends Component {
-  //eslint-disable-line
   render() {
     const { translate, match } = this.props
     const { studentNumber } = match.params

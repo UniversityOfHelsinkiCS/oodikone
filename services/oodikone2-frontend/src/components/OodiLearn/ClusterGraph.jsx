@@ -50,6 +50,7 @@ class ClusterGraph extends PureComponent {
 
   setName = series => {
     console.log(series.target)
+    // eslint-disable-next-line react/no-access-state-in-setstate
     this.setState({ name: this.state.series[series.target.name].data.name[series.target.index] })
   }
 

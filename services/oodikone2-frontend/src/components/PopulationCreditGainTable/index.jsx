@@ -28,7 +28,8 @@ const filterStudents = (students, minCredits, maxCredits = Infinity) => {
       maxCredits,
       amount: students.filter(s => s === minCredits).length
     }
-  } else if (maxCredits === Infinity) {
+  }
+  if (maxCredits === Infinity) {
     return {
       minCredits,
       maxCredits: '',
@@ -72,7 +73,8 @@ const PopulationCreditGainTable = props => {
           progress
         />
       ]
-    } else if (a.maxCredits) {
+    }
+    if (a.maxCredits) {
       return [
         `${a.minCredits} ≤ credits < ${a.maxCredits}`,
         a.amount,

@@ -24,7 +24,8 @@ const testOptions = {
 const getDefaultConfig = () => {
   if (isTestEnv) {
     return { ...testOptions }
-  } else if (isDevEnv) {
+  }
+  if (isDevEnv) {
     return { ...devOptions }
   }
   return {
