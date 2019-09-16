@@ -1,8 +1,8 @@
-const { sequelize } = require('../database/connection')
+const { sequelize } = require("../database/connection");
 
 const updateAttainmentDates = async () => {
-  const { schema } = sequelize.options
-  const transaction = await sequelize.transaction()
+  const { schema } = sequelize.options;
+  const transaction = await sequelize.transaction();
   try {
     await sequelize.query(
       `
@@ -15,14 +15,14 @@ const updateAttainmentDates = async () => {
       WHERE course.code=cr.course_code;
      `,
       { transaction }
-    )
-    await transaction.commit()
+    );
+    await transaction.commit();
   } catch (e) {
-    await transaction.rollback()
-    throw e
+    await transaction.rollback();
+    throw e;
   }
-}
+};
 
 module.exports = {
   updateAttainmentDates
-}
+};
