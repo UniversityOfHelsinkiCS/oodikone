@@ -37,15 +37,20 @@ class CreditAccumulationGraphHighCharts extends Component {
     if (nextProps.students) {
       const nextStudents = nextProps.students.map(student => student.studentNumber)
       const oldStudents = this.props.students.map(student => student.studentNumber)
+      const nextMinDate = nextProps.students.minDate
+      const oldMinDate = this.props.students.minDate
+      const clear = nextMinDate !== oldMinDate
+      const changedStudentAmount = nextProps.selectedStudents.length !== this.props.selectedStudents.length
 
       const changed =
         nextStudents.some(student => !oldStudents.includes(student)) ||
-        oldStudents.some(student => !nextStudents.includes(student))
+        oldStudents.some(student => !nextStudents.includes(student)) ||
+        clear
 
       if (changed) {
         const { students } = nextProps
-        this.getMoreCreditLines(students)
-      } else {
+        this.getMoreCreditLines(students, clear)
+      } else if (changedStudentAmount) {
         this.createGraphOptions(
           nextProps.students,
           nextProps.selectedStudents,
@@ -55,9 +60,16 @@ class CreditAccumulationGraphHighCharts extends Component {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(nextProps) {
     const { updateGraph } = this.state
     const { students, selectedStudents, currentGraphSize } = this.props
+    const nextMinDate = nextProps.students.minDate
+    const oldMinDate = this.props.students.minDate
+    const clear = nextMinDate !== oldMinDate
+    if (nextMinDate !== oldMinDate) {
+      const { students } = nextProps
+      this.getMoreCreditLines(students, clear)
+    }
     if (updateGraph) {
       this.createGraphOptions(
         students,
@@ -67,7 +79,11 @@ class CreditAccumulationGraphHighCharts extends Component {
     }
   }
 
-  getMoreCreditLines = (students) => {
+  getMoreCreditLines = (students, clear) => {
+    if (clear && this.state.studentCreditLines.length > 1) {
+      const removed = this.state.studentCreditLines.splice(0, 1)
+      this.setState({ studentCreditLines: removed })
+    }
     const studentCreditLines = this.state.studentCreditLines
       .concat(this.createStudentCreditLines(students))
     this.setState({ studentCreditLines, updateGraph: true })
@@ -112,12 +128,12 @@ class CreditAccumulationGraphHighCharts extends Component {
 
     let lastCredits = null
     if (this.isSingleStudentGraph() && !['/custompopulation', '/coursepopulation'].includes(window.location.pathname)) {
-      const started = moment(students[0].started)
+      const started = moment(students.minDate)
       const lastDate = moment(students.maxDate)
       const lastMonth = Math.ceil(this.getXAxisMonth(lastDate, started))
 
       let totalAbsenceMonths = 0
-      const absencePoints = this.props.absences.reduce((res, { startdate, enddate }) => {
+      const absencePoints = this.props.absences.filter(a => a.startdate > started).reduce((res, { startdate, enddate }) => {
         const targetCreditsBeforeAbsence = (Math.ceil(this.getXAxisMonth(moment(startdate), started)) - totalAbsenceMonths) * (55 / 12)
         if (enddate < students.maxDate) {
           res.push([startdate, targetCreditsBeforeAbsence])
