@@ -3,19 +3,19 @@ const { Filters } = require('../models/models_kone')
 
 const Op = Sequelize.Op
 
-const findForPopulation = (pops) => Filters.findAll({
-  where: {
-    population: {
-      [Op.eq]: pops
+const findForPopulation = pops =>
+  Filters.findAll({
+    where: {
+      population: {
+        [Op.eq]: pops
+      }
     }
-  }
-})
+  })
 
-
-const createNewFilter = async (filter) => {
+const createNewFilter = async filter => {
   return Filters.create(filter)
 }
-const deleteFilter = async (filter) => {
+const deleteFilter = async filter => {
   Filters.destroy({
     where: {
       id: {
@@ -23,7 +23,7 @@ const deleteFilter = async (filter) => {
       }
     }
   })
-  return(filter)
+  return filter
 }
 module.exports = {
   createNewFilter,

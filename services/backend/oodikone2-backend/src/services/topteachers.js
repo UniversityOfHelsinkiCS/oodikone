@@ -3,7 +3,7 @@ const { getSemestersAndYears, getMaxYearcode } = require('./semesters')
 const { Teacher, Semester, Credit, Course } = require('../models/index')
 const { Op } = require('sequelize')
 
-const category = (name, rediskey) => ({ name, rediskey})
+const category = (name, rediskey) => ({ name, rediskey })
 
 const ID = {
   ALL: 'all',
@@ -15,7 +15,7 @@ const categories = {
   [ID.OPENUNI]: category('Open University', 'TOP_TEACHERS_OPEN_UNI')
 }
 
-const deleteCategory = async (categoryid) => {
+const deleteCategory = async categoryid => {
   const { rediskey } = categories[categoryid]
   await redisClient.delAsync(rediskey)
 }
@@ -40,39 +40,40 @@ const getCategoriesAndYears = async () => {
   }
 }
 
-const creditsWithTeachersForYear = yearcode => Credit.findAll({
-  attributes: ['id', 'credits', 'credittypecode', 'isStudyModule'],
-  include: [
-    {
-      model: Semester,
-      required: true,
-      attributes: [],
-      where: {
-        yearcode: {
-          [Op.eq]: yearcode
+const creditsWithTeachersForYear = yearcode =>
+  Credit.findAll({
+    attributes: ['id', 'credits', 'credittypecode', 'isStudyModule'],
+    include: [
+      {
+        model: Semester,
+        required: true,
+        attributes: [],
+        where: {
+          yearcode: {
+            [Op.eq]: yearcode
+          }
         }
+      },
+      {
+        model: Teacher,
+        attributes: ['id', 'name', 'code'],
+        required: true
+      },
+      {
+        model: Course,
+        attributes: ['code', 'name', 'coursetypecode'],
+        required: true
       }
-    },
-    {
-      model: Teacher,
-      attributes: ['id', 'name', 'code'],
-      required: true
-    },
-    {
-      model: Course,
-      attributes: ['code', 'name', 'coursetypecode'],
-      required: true
-    }
-  ]
-})
-  
+    ]
+  })
+
 const updatedStats = (statistics, teacher, passed, failed, credits, transferred) => {
   const { id, name } = teacher
   const stats = statistics[id] || { id, name, passed: 0, failed: 0, credits: 0, transferred: 0 }
   if (passed) {
-    return { 
-      ...stats, 
-      passed: stats.passed + 1, 
+    return {
+      ...stats,
+      passed: stats.passed + 1,
       credits: transferred ? stats.credits : stats.credits + credits,
       transferred: transferred ? stats.transferred + credits : stats.transferred
     }
@@ -87,16 +88,17 @@ const updatedStats = (statistics, teacher, passed, failed, credits, transferred)
 }
 
 const isRegularCourse = credit => !credit.isStudyModule
-  
-const filterTopTeachers = (stats, limit=50) => Object.values(stats)
-  .sort((t1, t2) => t2.credits - t1.credits)
-  .slice(0, limit)
-  .map(({ credits, ...rest }) => ({
-    ...rest,
-    credits: Math.floor(credits)
-  }))
-  
-const findTopTeachers = async (yearcode) => {
+
+const filterTopTeachers = (stats, limit = 50) =>
+  Object.values(stats)
+    .sort((t1, t2) => t2.credits - t1.credits)
+    .slice(0, limit)
+    .map(({ credits, ...rest }) => ({
+      ...rest,
+      credits: Math.floor(credits)
+    }))
+
+const findTopTeachers = async yearcode => {
   const credits = await creditsWithTeachersForYear(yearcode)
   const all = {}
   const openuni = {}
@@ -104,7 +106,7 @@ const findTopTeachers = async (yearcode) => {
     .filter(isRegularCourse)
     .map(credit => {
       const { credits, course, credittypecode } = credit
-      const teachers = credit.teachers.map(({ id, name }) => ({ id, name }))      
+      const teachers = credit.teachers.map(({ id, name }) => ({ id, name }))
       const passed = Credit.passed(credit) || Credit.improved(credit)
       const failed = Credit.failed(credit)
       const transferred = credittypecode === 9

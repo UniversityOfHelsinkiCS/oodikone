@@ -1,6 +1,12 @@
 const {
-  Student, Course, ElementDetails, StudyrightElement,
-  Studyright, Credit, StudyrightExtent, Semester
+  Student,
+  Course,
+  ElementDetails,
+  StudyrightElement,
+  Studyright,
+  Credit,
+  StudyrightExtent,
+  Semester
 } = require('../../../src/models/index')
 const { optimizedStatisticsOf } = require('../../../src/services/populations')
 jest.setTimeout(10000)
@@ -65,11 +71,9 @@ const createQueryObject = (year, semester, codes, months) => ({
   months
 })
 
-afterAll(async () => {
-})
+afterAll(async () => {})
 
 describe('optimizedStatisticsOf tests', () => {
-
   const courseinstanceFall = {
     id: 1,
     course_code: courses.elements_of_ai.code,
@@ -83,13 +87,13 @@ describe('optimizedStatisticsOf tests', () => {
   }
 
   const student = {
-    studentnumber: '1234',
+    studentnumber: '1234'
   }
 
   const studyrightextents = {
     bachelors: {
       extentcode: 1,
-      name: langify('bachelor\'s degree extent')
+      name: langify("bachelor's degree extent")
     }
   }
 
@@ -121,14 +125,14 @@ describe('optimizedStatisticsOf tests', () => {
       enddate: Date('2016-12-20 22:00:00+00'),
       studyrightid: studyright.studyrightid,
       code: elementdetails.bsc.code,
-      studentnumber: student.studentnumber,
+      studentnumber: student.studentnumber
     },
     maths: {
       startdate: new Date('2011-07-31 21:00:00+00'),
       enddate: Date('2016-12-20 22:00:00+00'),
       studyrightid: studyright.studyrightid,
       code: elementdetails.maths.code,
-      studentnumber: student.studentnumber,
+      studentnumber: student.studentnumber
     }
   }
 
@@ -138,7 +142,6 @@ describe('optimizedStatisticsOf tests', () => {
     - Mathematics studyright (2011-07-31 – 2016-12-20),
     - Two credits in 2011-09-31 and 2012-02-31.
     `, () => {
-
     beforeAll(async () => {
       await Semester.bulkCreate([semesters.fall, semesters.spring])
       await Student.create(student)
@@ -211,9 +214,11 @@ describe('optimizedStatisticsOf tests', () => {
       const courseinstances = result.courses
       expect(courseinstances.length).toBe(1)
       expect(
-        courseinstances.some(instance =>
-          (instance.date.getTime() === courseinstanceFall.coursedate.getTime()) &&
-            (instance.course.code === courseinstanceFall.course_code))
+        courseinstances.some(
+          instance =>
+            instance.date.getTime() === courseinstanceFall.coursedate.getTime() &&
+            instance.course.code === courseinstanceFall.course_code
+        )
       ).toBe(true)
     })
 
@@ -222,7 +227,5 @@ describe('optimizedStatisticsOf tests', () => {
       const { students } = await optimizedStatisticsOf(query)
       expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(true)
     })
-
   })
-
 })

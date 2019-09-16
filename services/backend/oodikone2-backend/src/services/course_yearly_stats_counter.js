@@ -6,7 +6,6 @@ const CATEGORY = {
 }
 
 class CourseYearlyStatsCounter {
-
   constructor() {
     this.groups = {}
     this.programmes = {}
@@ -139,7 +138,6 @@ class CourseYearlyStatsCounter {
       statistics: this.formatGroupStatistics()
     }
   }
-
 }
 
 module.exports = { CourseYearlyStatsCounter, CATEGORY }

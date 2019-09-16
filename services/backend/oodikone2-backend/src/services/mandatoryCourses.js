@@ -3,13 +3,13 @@ const { Course } = require('../models')
 const { MandatoryCourse, MandatoryCourseLabels } = require('../models/models_kone')
 const { Op } = Sequelize
 
-const byStudyprogramme = async (studyProgrammeId) => {
+const byStudyprogramme = async studyProgrammeId => {
   const mandatoryCourses = await MandatoryCourse.findAll({
     attributes: ['course_code'],
     include: [
       {
         model: MandatoryCourseLabels,
-        attributes: ['id', 'label', 'orderNumber'],
+        attributes: ['id', 'label', 'orderNumber']
       }
     ],
     where: {
@@ -27,7 +27,10 @@ const byStudyprogramme = async (studyProgrammeId) => {
       }
     }
   })
-  const courseCodeToCourse = courses.reduce((acc, c) => { acc[c.code] = c; return acc }, {})
+  const courseCodeToCourse = courses.reduce((acc, c) => {
+    acc[c.code] = c
+    return acc
+  }, {})
 
   return mandatoryCourses.map(mc => ({
     name: courseCodeToCourse[mc.course_code].name,
@@ -49,7 +52,7 @@ const find = async (studyProgrammeId, code) => {
     include: [
       {
         model: MandatoryCourseLabels,
-        attributes: ['id', 'label', 'orderNumber'],
+        attributes: ['id', 'label', 'orderNumber']
       }
     ],
     where: {

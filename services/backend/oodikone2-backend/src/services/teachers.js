@@ -11,7 +11,7 @@ const nameLike = terms => ({
   }
 })
 
-const codeLike = (terms) => {
+const codeLike = terms => {
   if (terms.length !== 1) {
     return undefined
   }
@@ -24,7 +24,7 @@ const codeLike = (terms) => {
 
 const matchesId = searchTerm => ({ id: { [Op.eq]: searchTerm } })
 
-const bySearchTerm = async (rawTerm) => {
+const bySearchTerm = async rawTerm => {
   const searchTerm = rawTerm.trim()
   if (!searchTerm) {
     return []
@@ -35,33 +35,30 @@ const bySearchTerm = async (rawTerm) => {
       exclude: ['createdAt', 'updatedAt']
     },
     where: {
-      [Op.or]: [
-        nameLike(terms),
-        codeLike(terms),
-        matchesId(searchTerm)
-      ]
+      [Op.or]: [nameLike(terms), codeLike(terms), matchesId(searchTerm)]
     }
   })
 }
 
-const findTeacherCredits = teacherid => Teacher.findByPk(teacherid, {
-  attributes: ['name', 'code', 'id'],
-  include: {
-    model: Credit,
-    attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
-    include: [
-      {
-        model: Course,
-        attributes: ['name', 'code'],
-        required: true
-      },
-      {
-        model: Semester,
-        attributes: ['semestercode', 'name', 'yearname', 'yearcode']
-      }
-    ]
-  }
-})
+const findTeacherCredits = teacherid =>
+  Teacher.findByPk(teacherid, {
+    attributes: ['name', 'code', 'id'],
+    include: {
+      model: Credit,
+      attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
+      include: [
+        {
+          model: Course,
+          attributes: ['name', 'code'],
+          required: true
+        },
+        {
+          model: Semester,
+          attributes: ['semestercode', 'name', 'yearname', 'yearcode']
+        }
+      ]
+    }
+  })
 
 const parseCreditInfo = credit => ({
   studentnumber: credit.student_studentnumber,
@@ -148,18 +145,21 @@ const markCreditForCourse = (courses, credit) => {
   }
 }
 
-const teacherStats = async (teacherid) => {
+const teacherStats = async teacherid => {
   const teacher = await findTeacherCredits(teacherid)
-  const statistics = teacher.credits.filter(isRegularCourse).reduce(({ semesters, years, courses, ...rest }, credit) => ({
-    ...rest,
-    semesters: markCreditForSemester(semesters, credit),
-    years: markCreditForYear(years, credit),
-    courses: markCreditForCourse(courses, credit)
-  }), {
-    semesters: {},
-    courses: {},
-    years: {}
-  })
+  const statistics = teacher.credits.filter(isRegularCourse).reduce(
+    ({ semesters, years, courses, ...rest }, credit) => ({
+      ...rest,
+      semesters: markCreditForSemester(semesters, credit),
+      years: markCreditForYear(years, credit),
+      courses: markCreditForCourse(courses, credit)
+    }),
+    {
+      semesters: {},
+      courses: {},
+      years: {}
+    }
+  )
   return {
     name: teacher.name,
     code: teacher.code,
@@ -207,62 +207,70 @@ const activeTeachers = async (providers, semestercodeStart, semestercodeEnd) => 
   return teachers.map(({ id }) => id)
 }
 
-const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) => Teacher.findAll({
-  attributes: ['name', 'code', 'id'],
-  include: {
-    model: Credit,
-    attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
-    include: [
-      {
-        model: Course,
-        required: true
-      },
-      {
-        model: Semester,
-        required: true,
-        attributes: ['semestercode', 'name', 'yearname', 'yearcode'],
-        where: {
-          semestercode: {
-            [Op.between]: [semestercodeStart, semestercodeEnd]
+const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) =>
+  Teacher.findAll({
+    attributes: ['name', 'code', 'id'],
+    include: {
+      model: Credit,
+      attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
+      include: [
+        {
+          model: Course,
+          required: true
+        },
+        {
+          model: Semester,
+          required: true,
+          attributes: ['semestercode', 'name', 'yearname', 'yearcode'],
+          where: {
+            semestercode: {
+              [Op.between]: [semestercodeStart, semestercodeEnd]
+            }
           }
         }
+      ]
+    },
+    where: {
+      id: {
+        [Op.in]: teacherIds
       }
-    ]
-  },
-  where: {
-    id: {
-      [Op.in]: teacherIds
     }
-  }
-})
+  })
 
 const isRegularCourse = credit => !credit.isStudyModule
 
-const calculateCreditStatistics = credits => credits.reduce((stats, credit) => {
-  if (isRegularCourse(credit)) {
-    const { passed, failed, credits, transferred } = parseCreditInfo(credit)
-    return markCredit(stats, passed, failed, credits, transferred)
-  }
-  return stats
-}, {
-  passed: 0,
-  failed: 0,
-  credits: 0,
-  transferred: 0
-})
+const calculateCreditStatistics = credits =>
+  credits.reduce(
+    (stats, credit) => {
+      if (isRegularCourse(credit)) {
+        const { passed, failed, credits, transferred } = parseCreditInfo(credit)
+        return markCredit(stats, passed, failed, credits, transferred)
+      }
+      return stats
+    },
+    {
+      passed: 0,
+      failed: 0,
+      credits: 0,
+      transferred: 0
+    }
+  )
 
 const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) => {
   const ids = await activeTeachers(providers, semestercodeStart, semestercodeEnd)
   const teachers = await getCredits(ids, semestercodeStart, semestercodeEnd)
-  const statistics = teachers.reduce((acc, teacher) => ({
-    ...acc,
-    [teacher.id]: {
-      name: teacher.name,
-      code: teacher.code,
-      id: teacher.id,
-      stats: calculateCreditStatistics(teacher.credits)
-    }
-  }), {})
+  const statistics = teachers.reduce(
+    (acc, teacher) => ({
+      ...acc,
+      [teacher.id]: {
+        name: teacher.name,
+        code: teacher.code,
+        id: teacher.id,
+        stats: calculateCreditStatistics(teacher.credits)
+      }
+    }),
+    {}
+  )
   return statistics
 }
 

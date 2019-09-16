@@ -17,9 +17,8 @@ const studentsNotModifiedSince = async since => {
 }
 
 const basiclogger = (studentnumbers, nstamps = 100) => {
-
   const total = studentnumbers.length
-  const divisor = Math.floor(total/nstamps)
+  const divisor = Math.floor(total / nstamps)
 
   const dolog = iter => {
     if (iter % divisor === 0) {

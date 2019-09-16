@@ -5,17 +5,19 @@ const status = require('node-status')
 const { getStudentNumbers } = require('../../models/queries')
 
 const readStudentNumbersFromFile = async filename => {
-  const studentnumbers = fs.readFileSync(filename, 'utf-8').split('\n').map(s => s.replace(/\D/g, ''))
-  return studentnumbers.filter(studentnumber => !!studentnumber).map(s => s.startsWith('0') ? s : '0' + s)
+  const studentnumbers = fs
+    .readFileSync(filename, 'utf-8')
+    .split('\n')
+    .map(s => s.replace(/\D/g, ''))
+  return studentnumbers.filter(studentnumber => !!studentnumber).map(s => (s.startsWith('0') ? s : '0' + s))
 }
 
 const readStudentNumbersFromDb = async () => {
   const studentnumbers = await getStudentNumbers().map(s => s.studentnumber)
-  return studentnumbers.filter(studentnumber => !!studentnumber).map(s => s.startsWith('0') ? s : '0' + s)
+  return studentnumbers.filter(studentnumber => !!studentnumber).map(s => (s.startsWith('0') ? s : '0' + s))
 }
 
-
-const parseArguments = (args) => {
+const parseArguments = args => {
   return args.slice(2).reduce((args, arg) => {
     const split = arg.split('=')
     if (split[0] === 'file') {
@@ -25,11 +27,9 @@ const parseArguments = (args) => {
     }
     return args
   }, {})
-
 }
 
-const fancylogger = (studentnumbers) => {
-
+const fancylogger = studentnumbers => {
   const counter = status.addItem('students', { max: studentnumbers.length })
 
   const start = () => {
@@ -55,7 +55,6 @@ const fancylogger = (studentnumbers) => {
 }
 
 const basiclogger = (studentnumbers, nstamps = 100) => {
-
   const total = studentnumbers.length
   const divisor = Math.floor(total / nstamps)
 
@@ -88,7 +87,6 @@ const basiclogger = (studentnumbers, nstamps = 100) => {
 }
 
 const run = async (index = 0, basiclogging = true) => {
-
   const args = parseArguments(process.argv)
   index = args.index || index
   basiclogging = args.basiclogging || basiclogging

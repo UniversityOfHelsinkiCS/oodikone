@@ -22,19 +22,26 @@ const wildcarded = url => {
 const formatForGroup = url => {
   const query = url.indexOf('?')
 
-  if (query!==-1) {
+  if (query !== -1) {
     return url.substr(0, query)
   }
 
   return wildcarded(url)
 }
 
-const stripExtraFields = ({ id, username, name, time, admin, method, URL }) =>
-  ({ id, username, name, time, admin, method, URL })
+const stripExtraFields = ({ id, username, name, time, admin, method, URL }) => ({
+  id,
+  username,
+  name,
+  time,
+  admin,
+  method,
+  URL
+})
 
 const withoutRequestsByAdmins = results => results.filter(u => !u.admin)
 
-const byDate = (results) => {
+const byDate = results => {
   const getDateForRequest = req => moment(req.time * 1000).format('YYYY-MM-DD')
   const requestsByDate = _.groupBy(withoutRequestsByAdmins(results).map(stripExtraFields), getDateForRequest)
 

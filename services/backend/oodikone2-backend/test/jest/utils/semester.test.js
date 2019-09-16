@@ -2,7 +2,6 @@ const moment = require('moment')
 const semesterUtils = require('../../../src/util/semester')
 
 describe('Semester utils tests', () => {
-
   test('Get passing semester', () => {
     expect(semesterUtils.getPassingSemester(2018, moment('2017-09-09'))).toBe('BEFORE')
     expect(semesterUtils.getPassingSemester(2018, moment('2018-09-09'))).toBe('0-FALL')
@@ -12,5 +11,4 @@ describe('Semester utils tests', () => {
     expect(semesterUtils.getPassingSemester(2018, moment('2026-05-01'))).toBe('LATER')
     expect(semesterUtils.getPassingSemester(2018, moment('2018-05-01'))).toBe('BEFORE')
   })
-
 })

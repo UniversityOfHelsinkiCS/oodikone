@@ -4,7 +4,7 @@ const createstamper = () => {
     timestamp = new Date()
   }
 
-  const stamp = (msg) => {
+  const stamp = msg => {
     console.log(`${msg}, duration: ${new Date() - timestamp}`)
     timestamp = new Date()
   }

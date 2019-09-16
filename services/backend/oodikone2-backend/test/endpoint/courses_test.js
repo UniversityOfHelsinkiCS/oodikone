@@ -6,12 +6,20 @@ const supertest = require('supertest')
 const jwt = require('jsonwebtoken')
 
 const { Course, CourseInstance, CourseTeacher, Credit, Teacher, Student, sequelize } = require('../../src/models')
-const { generateCourses, generateCourseInstances, generateCredits, generateTeachers, generateStudents, generateCourseTeachers } = require('../utils')
+const {
+  generateCourses,
+  generateCourseInstances,
+  generateCredits,
+  generateTeachers,
+  generateStudents,
+  generateCourseTeachers
+} = require('../utils')
 const app = require('../../src/app')
 const conf = require('../../src/conf-backend')
 const api = supertest(app)
 
-const uid = 'tktl', fullname = ''
+const uid = 'tktl',
+  fullname = ''
 const payload = { userId: uid, name: fullname }
 
 const token = jwt.sign(payload, conf.TOKEN_SECRET, {
@@ -22,7 +30,6 @@ const INSTANCE_COUNT = 4
 
 let courses
 let courseInstances
-
 
 test.skip.before(async () => {
   await sequelize.createSchema(schema)
@@ -46,8 +53,7 @@ test.skip.after.always(async () => {
 })
 
 test.skip('should pong when pinged', async t => {
-  const res = await api
-    .get('/ping')
+  const res = await api.get('/ping')
 
   t.is(res.status, 200)
   t.deepEqual(res.body, { data: 'pong' })

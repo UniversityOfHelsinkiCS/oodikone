@@ -3,7 +3,7 @@ const { USERSERVICE_URL } = require('../conf-backend')
 const UnitService = require('./units')
 const elementDetailService = require('./elementdetails')
 
-const client = axios.create({ baseURL: USERSERVICE_URL, headers: { 'secret': process.env.USERSERVICE_SECRET } })
+const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: process.env.USERSERVICE_SECRET } })
 
 const ping = async () => {
   const url = '/ping'
@@ -18,32 +18,37 @@ const findAll = async () => {
 
 const login = async (uid, full_name, hyGroups, affiliations, email) => {
   const response = await client.post('/login', {
-    uid, full_name, hyGroups, affiliations, email,
+    uid,
+    full_name,
+    hyGroups,
+    affiliations,
+    email
   })
   return response.data
 }
 
 const superlogin = async (uid, asUser) => {
   const response = await client.post('/superlogin', {
-    uid, asUser
+    uid,
+    asUser
   })
   return response.data
 }
 
-const byUsername = async (uid) => {
+const byUsername = async uid => {
   const url = `/user/${uid}`
   const response = await client.get(url)
   return response.data
 }
 
-const getUserElementDetails = async (username) => {
+const getUserElementDetails = async username => {
   const url = `/user/elementdetails/${username}`
   const response = await client.get(url)
   const elementdetailcodes = response.data
   return elementDetailService.byCodes(elementdetailcodes)
 }
 
-const byId = async (id) => {
+const byId = async id => {
   const url = `/user/id/${id}`
   const response = await client.get(url)
   return response.data
@@ -55,7 +60,7 @@ const updateUser = async (uid, fields) => {
   return response.data
 }
 
-const getRolesFor = async (user) => {
+const getRolesFor = async user => {
   console.log('roles for', user)
   const url = `/get_roles/${user}`
   const response = await client.get(url)
@@ -65,7 +70,9 @@ const getRolesFor = async (user) => {
 
 const createUser = async (username, full_name, email) => {
   const response = await client.post('/user', {
-    username, full_name, email
+    username,
+    full_name,
+    email
   })
   return response.data
 }
@@ -90,7 +97,7 @@ const getUnitsFromElementDetails = async username => {
   return elementDetails.map(element => UnitService.parseUnitFromElement(element))
 }
 
-const modifyAccess = async (body) => {
+const modifyAccess = async body => {
   const response = await client.post('/modifyaccess', body)
   return response.data
 }
@@ -100,7 +107,7 @@ const getAccessGroups = async () => {
   return response.data
 }
 
-const getUserDataFor = async (uid) => {
+const getUserDataFor = async uid => {
   const user = await byUsername(uid)
   return {
     roles: user.accessgroup.map(({ group_code }) => group_code),

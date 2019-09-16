@@ -1,12 +1,11 @@
 const moment = require('moment')
 const _ = require('lodash')
 
-const getStudyRightIdStrings = (data) =>
-  data['data'].map(elements => elements[0])
+const getStudyRightIdStrings = data => data['data'].map(elements => elements[0])
 
 const getTextsByLanguage = texts => {
   const names = {}
-  texts.forEach(text => names[text.langcode] = text.text)
+  texts.forEach(text => (names[text.langcode] = text.text))
   return { fi: null, sv: null, en: null, ...names }
 }
 
@@ -21,8 +20,7 @@ const jsonNamesFromTexts = texts => {
 }
 
 const universityEnrollmentDateFromStudyRights = studyRightArray => {
-  return _.sortBy(studyRightArray.map(s => s.start_date), n =>
-    moment(n).valueOf())[0]
+  return _.sortBy(studyRightArray.map(s => s.start_date), n => moment(n).valueOf())[0]
 }
 
 const getStudentFromData = (student, studyrights) => {
@@ -64,7 +62,7 @@ const getStudentFromData = (student, studyrights) => {
   }
 }
 
-const getSemesterCode = attainment_date => ((moment(attainment_date).diff(moment('1950', 'YYYY'), 'months')) / 6)
+const getSemesterCode = attainment_date => moment(attainment_date).diff(moment('1950', 'YYYY'), 'months') / 6
 
 const getDate = (date, format = 'DD.MM.YYYY') => {
   if (!date) return null
@@ -93,7 +91,7 @@ const attainmentDataToCredit = (attainment, studentnumber) => {
   }
 }
 
-const attainmentDataToCourse = (attainment) => {
+const attainmentDataToCourse = attainment => {
   const { learningopportunity_name, attainment_date } = attainment
   return {
     code: attainment.learningopportunity_id,
@@ -112,7 +110,7 @@ const getTeacherFromData = teacher => ({
 const ELEMENT_ID = {
   DEGREE_TITLE: 10,
   DEGREE_STUDY_PROGRAM: 20,
-  DEGREE_MAJOR: 40,
+  DEGREE_MAJOR: 40
 }
 
 const highlevelnameFromElements = elements => {
@@ -120,22 +118,22 @@ const highlevelnameFromElements = elements => {
   elements.forEach(element => {
     const name = defaultNameFromTexts(element.name)
     switch (element.element_id) {
-    case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
-      subject = name
-      break
-    case ELEMENT_ID.DEGREE_MAJOR:
-      if (subject === undefined) {
+      case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
         subject = name
-      }
-      break
-    default:
-      break
+        break
+      case ELEMENT_ID.DEGREE_MAJOR:
+        if (subject === undefined) {
+          subject = name
+        }
+        break
+      default:
+        break
     }
   })
   return `${subject}`
 }
 
-const parseDate = (date, format='YYYY-MM-DD') => date && moment.utc(date, format).toDate()
+const parseDate = (date, format = 'YYYY-MM-DD') => date && moment.utc(date, format).toDate()
 
 const getStudyRightFromData = (data, studentNumber) => {
   return {
@@ -177,9 +175,10 @@ const studyrightElementFromData = (element, studyrightid, studentnumber) => {
   }
 }
 
-const attainmentDataToTeachers = data => data.teachers.map(teacherdata => ({
-  id: teacherdata.teacher_id,
-}))
+const attainmentDataToTeachers = data =>
+  data.teachers.map(teacherdata => ({
+    id: teacherdata.teacher_id
+  }))
 
 const studyrightDataToExtent = data => ({
   extentcode: data.extent_code,
@@ -196,10 +195,11 @@ const disciplineFromData = data => ({
   name: getTextsByLanguage(data.name)
 })
 
-const learningOpportunityDataToCourseDisciplines = data => data.disciplines.map(discipline => ({
-  discipline_id: discipline.discipline_id,
-  course_id: data.learningopportunity_id
-}))
+const learningOpportunityDataToCourseDisciplines = data =>
+  data.disciplines.map(discipline => ({
+    discipline_id: discipline.discipline_id,
+    course_id: data.learningopportunity_id
+  }))
 
 const learningOpportunityDataToCourse = data => ({
   code: data.learningopportunity_id,
@@ -260,9 +260,10 @@ const getTransfersFromData = (data, studentnumber) => {
       targetcode: target,
       transferdate,
       studentnumber,
-      studyrightid: `${data.studyright_id}`})
+      studyrightid: `${data.studyright_id}`
+    })
   }
-  return(transfers)
+  return transfers
 }
 
 const courseRealisationTypeFromData = data => ({
@@ -303,10 +304,10 @@ const courseUnitRealisationDataToModels = data => {
     coursecode: `${data.learningopportunity_id}`,
     name: getTextsByLanguage(data.realisation_name),
     realisationtypecode: `${data.realisation_type_code}`,
-    parent: `${data.parent_id}`,
+    parent: `${data.parent_id}`
   }
   const course = {
-    code: courserealisation.coursecode,
+    code: courserealisation.coursecode
   }
   const students = data.students.map(({ student_number }) => ({
     studentnumber: student_number

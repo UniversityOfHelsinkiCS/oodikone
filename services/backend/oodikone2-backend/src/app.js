@@ -8,39 +8,41 @@ const { startCron } = require('./events')
 const { PORT } = conf
 const { initializeDatabaseConnection } = require('./database/connection')
 
-initializeDatabaseConnection().then(() => {
-  const app = express()
+initializeDatabaseConnection()
+  .then(() => {
+    const app = express()
 
-  startCron()
+    startCron()
 
-  Raven.config(process.env.SENTRY_ADDR, { captureUnhandledRejections: true }).install()
+    Raven.config(process.env.SENTRY_ADDR, { captureUnhandledRejections: true }).install()
 
-  app.use(cors({ credentials: true, origin: conf.frontend_addr }))
-  app.use(bodyParser.json())
+    app.use(cors({ credentials: true, origin: conf.frontend_addr }))
+    app.use(bodyParser.json())
 
-  app.get('/ping', async (req, res) => {
-    res.json({ data: 'pong' })
-  })
+    app.get('/ping', async (req, res) => {
+      res.json({ data: 'pong' })
+    })
 
-  let BASE_URL = ''
-  if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test') {
-    BASE_URL = '/api'
-  }
+    let BASE_URL = ''
+    if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test') {
+      BASE_URL = '/api'
+    }
 
-  routes(app, BASE_URL)
+    routes(app, BASE_URL)
 
-  app.get('*', async (req, res) => {
-    const results = { error: 'unknown endpoint' }
-    res.status(404).json(results)
-  })
+    app.get('*', async (req, res) => {
+      const results = { error: 'unknown endpoint' }
+      res.status(404).json(results)
+    })
 
-  const server = app.listen(PORT, () => console.log(`Backend listening on port ${PORT}!`))
-  process.on('SIGTERM', () => {
-    server.close(() => {
-      console.log('Process terminated')
+    const server = app.listen(PORT, () => console.log(`Backend listening on port ${PORT}!`))
+    process.on('SIGTERM', () => {
+      server.close(() => {
+        console.log('Process terminated')
+      })
     })
   })
-}).catch(e => {
-  process.exitCode = 1
-  console.log(e)
-})
+  .catch(e => {
+    process.exitCode = 1
+    console.log(e)
+  })

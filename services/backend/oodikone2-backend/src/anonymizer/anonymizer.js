@@ -1,5 +1,3 @@
-
-
 const faker = require('faker')
 const moment = require('moment')
 const mkdirp = require('mkdirp')
@@ -15,7 +13,6 @@ const status = require('node-status')
 require('dotenv').config()
 const startTime = moment()
 
-
 let student_numbers = []
 
 // few objects to save connections between anonymized and real data to keep relations.
@@ -27,17 +24,21 @@ const startCodesStatusBar = () => {
   status.start({ pattern: 'Running: {uptime.time} {spinner.monkey.blue} | {codes.bar} | codes anonymized: {codes}' })
 }
 const startStudentsStatusBar = () => {
-  status.start({ pattern: 'Running: {uptime.time} {spinner.hearts.magenta} | {students.bar} | students anonymized: {students}' })
+  status.start({
+    pattern: 'Running: {uptime.time} {spinner.hearts.magenta} | {students.bar} | students anonymized: {students}'
+  })
 }
 const startRealisationsStatusBar = () => {
-  status.start({ pattern: 'Running: {uptime.time} {spinner.clock.red} | {realisations.bar} | realisations anonymized: {realisations}' })
+  status.start({
+    pattern: 'Running: {uptime.time} {spinner.clock.red} | {realisations.bar} | realisations anonymized: {realisations}'
+  })
 }
 const stopStatusBar = () => {
   status.stamp()
   status.stop()
 }
 
-const getAnonymizedTeacher = async (teacherId) => {
+const getAnonymizedTeacher = async teacherId => {
   if (teacherRelations[teacherId]) {
     return teacherRelations[teacherId]
   }
@@ -61,7 +62,7 @@ const getAnonymizedTeacher = async (teacherId) => {
 
 const generateRandomId = () => String(Math.floor(Math.random() * (999999999 - 100000000 + 1) + 100000000))
 
-const anonymizeStudentInfo = async (id) => {
+const anonymizeStudentInfo = async id => {
   let student = await oodi.getStudent(id)
   let anonStudent = undefined
   if (student) {
@@ -72,7 +73,16 @@ const anonymizeStudentInfo = async (id) => {
       ...student,
       first_names: faker.name.firstName(),
       last_name: faker.name.lastName(),
-      birthdate: new Date(moment(moment('1940', 'YYYY').valueOf() + Math.random() * (moment().subtract(17, 'years').valueOf() - moment('1940', 'YYYY').valueOf()))),
+      birthdate: new Date(
+        moment(
+          moment('1940', 'YYYY').valueOf() +
+            Math.random() *
+              (moment()
+                .subtract(17, 'years')
+                .valueOf() -
+                moment('1940', 'YYYY').valueOf())
+        )
+      ),
       email: faker.internet.email(),
       mobile_phone: faker.phone.phoneNumberFormat(),
       national_student_number: null,
@@ -111,19 +121,19 @@ const anonymizeStudentInfo = async (id) => {
 
   return anonStudent
 }
-const getRandomAmount = (attainments) => {
-  const rate = (Math.random() * (0.375 - 0.05) + 0.05)
+const getRandomAmount = attainments => {
+  const rate = Math.random() * (0.375 - 0.05) + 0.05
   const amount = Math.floor(rate * attainments.length)
   return amount
 }
-const dropRandomAttainments = (attainments) => {
+const dropRandomAttainments = attainments => {
   if (student_numbers.length < 1) {
     return attainments
   }
   const dropAmount = getRandomAmount(attainments)
   let i = 0
   while (i < dropAmount) {
-    let randomIndex = Math.floor(Math.random() * (attainments.length))
+    let randomIndex = Math.floor(Math.random() * attainments.length)
     attainments.splice(randomIndex, 1)
     i++
   }
@@ -138,7 +148,11 @@ const addRandomAttainments = (attainments, studentnumber_attainments) => {
   let i = 0
   while (i < addAmount) {
     let randomStudentNumber = _.sample(studentnumbers)
-    let randomAttainment = _.sample(_.flattenDeep(studentnumber_attainments.filter(s => s.student_number === randomStudentNumber).map(s => s.attainments)))
+    let randomAttainment = _.sample(
+      _.flattenDeep(
+        studentnumber_attainments.filter(s => s.student_number === randomStudentNumber).map(s => s.attainments)
+      )
+    )
     if (!randomAttainment) {
       continue
     }
@@ -148,7 +162,7 @@ const addRandomAttainments = (attainments, studentnumber_attainments) => {
   }
   return attainments
 }
-const populateAnonymizedTeachers = async (teachers) => {
+const populateAnonymizedTeachers = async teachers => {
   let anonTeachers = []
   for (let teacher of teachers) {
     let anonTeacher = await getAnonymizedTeacher(teacher.teacher_id)
@@ -172,7 +186,7 @@ const anonymizeStudentAttainments = async (id, studentInfo, studentnumber_attain
       }
       anonLearningOpportunity = {
         ...learningOpportunity,
-        disciplines: [disciplines.data.data[Math.floor(Math.random() * 12)]] ,
+        disciplines: [disciplines.data.data[Math.floor(Math.random() * 12)]],
         learningopportunity_id: generateRandomId(),
         names: [
           {
@@ -188,17 +202,26 @@ const anonymizeStudentAttainments = async (id, studentInfo, studentnumber_attain
         materials: [],
         organisations: [],
         learningopportunity_internal: generateRandomId(),
-        start_date: moment(learningOpportunity.start_date).add(_.sample([-3, 0, 3]), 'months').add(_.sample(Math.floor(Math.random() * 100) - 50, 'days')),
-        end_date: moment(learningOpportunity.start_date).add(_.sample([-3, 0, 3]), 'months').add(_.sample(Math.floor(Math.random() * 100) - 50, 'days')).add(100, 'years'),
+        start_date: moment(learningOpportunity.start_date)
+          .add(_.sample([-3, 0, 3]), 'months')
+          .add(_.sample(Math.floor(Math.random() * 100) - 50, 'days')),
+        end_date: moment(learningOpportunity.start_date)
+          .add(_.sample([-3, 0, 3]), 'months')
+          .add(_.sample(Math.floor(Math.random() * 100) - 50, 'days'))
+          .add(100, 'years')
       }
       learningOpportunityRelations[attainment.learningopportunity_id] = anonLearningOpportunity
-      APIWriter(`./src/anonymized_API/learningopportunities/${anonLearningOpportunity.learningopportunity_id}`, { data: { data: anonLearningOpportunity } })
+      APIWriter(`./src/anonymized_API/learningopportunities/${anonLearningOpportunity.learningopportunity_id}`, {
+        data: { data: anonLearningOpportunity }
+      })
     }
     let teachers = []
     teachers = await populateAnonymizedTeachers(attainment.teachers)
 
     // semester code is calculated as "code * 6 months since 1950-1-1", Im bucketing all study attainments in 3 month periods by semester code abstracting real study attainment dates
-    const attainment_date = new Date(moment(moment('1950', 'YYYY').add((attainment.semester_code * 6) + _.sample([-3, 0, 3]), 'months')))
+    const attainment_date = new Date(
+      moment(moment('1950', 'YYYY').add(attainment.semester_code * 6 + _.sample([-3, 0, 3]), 'months'))
+    )
     attainment = {
       ...attainment,
       studyattainment_id: generateRandomId(),
@@ -223,40 +246,42 @@ const anonymizeStudentStudyRights = async (id, studentInfo) => {
       program = _.sample(['i', 'j', 'k', 'l', 'm', 'h'])
       degree = 'master'
     }
-    const elements = studyright.elements.filter(element => element.element_id === 10 || element.element_id === 20).map(element => {
-      if (element.element_id === 10) {
-        return {
-          ...element,
-          code: studyRightCodes[degree].code,
-          name: [
-            {
-              langcode: 'en',
-              text: studyRightCodes[degree].name
-            },
-            {
-              langcode: 'fi',
-              text: studyRightCodes[degree].name
-            }
-          ]
+    const elements = studyright.elements
+      .filter(element => element.element_id === 10 || element.element_id === 20)
+      .map(element => {
+        if (element.element_id === 10) {
+          return {
+            ...element,
+            code: studyRightCodes[degree].code,
+            name: [
+              {
+                langcode: 'en',
+                text: studyRightCodes[degree].name
+              },
+              {
+                langcode: 'fi',
+                text: studyRightCodes[degree].name
+              }
+            ]
+          }
+        } else if (element.element_id === 20) {
+          return {
+            ...element,
+            code: studyRightCodes[program].code,
+            name: [
+              {
+                langcode: 'en',
+                text: studyRightCodes[program].name
+              },
+              {
+                langcode: 'fi',
+                text: studyRightCodes[program].name
+              }
+            ]
+          }
         }
-      } else if (element.element_id === 20) {
-        return {
-          ...element,
-          code: studyRightCodes[program].code,
-          name: [
-            {
-              langcode: 'en',
-              text: studyRightCodes[program].name
-            },
-            {
-              langcode: 'fi',
-              text: studyRightCodes[program].name
-            }
-          ]
-        }
-      }
-      return
-    })
+        return
+      })
 
     let anonStudyright = {
       ...studyright,
@@ -278,8 +303,10 @@ const anonymizeStudentStudyRights = async (id, studentInfo) => {
   }
   return anonStudyRights
 }
-const getElapsedTime = () => `${moment().diff(startTime, 'minutes')} m, ${moment().diff(startTime, 'seconds') / (moment().diff(startTime, 'minutes') * 60)} s.`
-const anonymizeSemesterEnrollments = async (id) => {
+const getElapsedTime = () =>
+  `${moment().diff(startTime, 'minutes')} m, ${moment().diff(startTime, 'seconds') /
+    (moment().diff(startTime, 'minutes') * 60)} s.`
+const anonymizeSemesterEnrollments = async id => {
   const data = await oodi.getSemesterEnrollments(id)
   let anonymizedData = []
   for (const enrollment of data) {
@@ -299,8 +326,16 @@ const anonymizeStudent = async (id, student_numbers) => {
   const info = await anonymizeStudentInfo(id)
 
   const attainments = await anonymizeStudentAttainments(id, info, studentnumber_attainments)
-  studentnumber_attainments = studentnumber_attainments.concat({ student_number: info.student_number, attainments: attainments })
-  info.studyattainments = attainments.filter(attainment => ['Hyv.', '1', '2', '3', '4', '5'].includes(attainment.grade[0].text) && attainment.credits < 25).map(attainment => attainment.credits).reduce((acc, curr) => acc + curr, 0)
+  studentnumber_attainments = studentnumber_attainments.concat({
+    student_number: info.student_number,
+    attainments: attainments
+  })
+  info.studyattainments = attainments
+    .filter(
+      attainment => ['Hyv.', '1', '2', '3', '4', '5'].includes(attainment.grade[0].text) && attainment.credits < 25
+    )
+    .map(attainment => attainment.credits)
+    .reduce((acc, curr) => acc + curr, 0)
 
   const studyrights = await anonymizeStudentStudyRights(id, info)
 
@@ -319,14 +354,14 @@ const anonymizeStudent = async (id, student_numbers) => {
   APIWriter(semesterEnrollmentPath, { data: { data: semesterEnrollments } })
   return student_numbers
 }
-const anonymizeCourseUnitRealisations = async () => { 
+const anonymizeCourseUnitRealisations = async () => {
   const courseUnitRealisations = await oodi.courseUnitRealisations()
   const realisationsCounter = status.addItem('realisations', { max: courseUnitRealisations.length })
   startRealisationsStatusBar()
   let anonRealisations = []
   for (const realisation of courseUnitRealisations) {
     continue
-    realisationsCounter.inc()// eslint-disable-line
+    realisationsCounter.inc() // eslint-disable-line
     if (!learningOpportunityRelations[realisation.learningopportunity_id]) {
       continue
     }
@@ -373,30 +408,42 @@ const anonymizeCourseUnitRealisations = async () => {
       descriptions: [],
       languages: []
     }
-    await APIWriter(`src/anonymized_API/courseunitrealisations/${anonCourseUnitRealisation.course_id}`, { data: { data: anonCourseUnitRealisation } })
+    await APIWriter(`src/anonymized_API/courseunitrealisations/${anonCourseUnitRealisation.course_id}`, {
+      data: { data: anonCourseUnitRealisation }
+    })
   }
-  await APIWriter('src/anonymized_API/courseunitrealisations/changes/ids/0000-12-24', { data: { data: anonRealisations } })
+  await APIWriter('src/anonymized_API/courseunitrealisations/changes/ids/0000-12-24', {
+    data: { data: anonRealisations }
+  })
   stopStatusBar()
   return
 }
 
 const APIWriter = async (path, data) => {
   mkdirp(getDirName(path), async () => {
-    fs.writeFile(path, JSON.stringify(data, null, 4), (error) => { if (error) { console.log(error) } })
+    fs.writeFile(path, JSON.stringify(data, null, 4), error => {
+      if (error) {
+        console.log(error)
+      }
+    })
     return 'succeeee'
   })
 }
 
-
 let studentnumber_attainments = []
-
 
 const anonymize = async () => {
   logger.verbose(`starting time: ${startTime.format('HH:mm:ss')}`)
   const filename = './studentnumbers.txt'
   const readStudentNumbersFromFile = async filename => {
-    let studentnumbers = fs.readFileSync(filename, 'utf-8').split('\n').map(s => s.replace(' ', ''))
-    const randomCopies = _.sampleSize(studentnumbers, Math.floor((Math.random() * (1 - 0.33) + 0.33) * studentnumbers.length))
+    let studentnumbers = fs
+      .readFileSync(filename, 'utf-8')
+      .split('\n')
+      .map(s => s.replace(' ', ''))
+    const randomCopies = _.sampleSize(
+      studentnumbers,
+      Math.floor((Math.random() * (1 - 0.33) + 0.33) * studentnumbers.length)
+    )
     studentnumbers = studentnumbers.concat(randomCopies)
     studentnumbers = _.shuffle(studentnumbers)
     return studentnumbers.filter(studentnumber => !!studentnumber)
@@ -411,7 +458,7 @@ const anonymize = async () => {
   codeCounter.inc()
   const courseTypeCodes = { data: { data: await oodi.getCourseTypeCodes() } }
   codeCounter.inc()
-  const courseDisciplines = disciplines 
+  const courseDisciplines = disciplines
   codeCounter.inc()
   await APIWriter('./src/anonymized_API/codes/semesters', semesters)
   await APIWriter('./src/anonymized_API/codes/courseunitrealisations/types', courseUnitRealisationsTypes)

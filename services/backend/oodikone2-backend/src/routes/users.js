@@ -32,9 +32,7 @@ router.get('/email/preview', (req, res) => {
 
 router.post('/email', async (req, res) => {
   if (!process.env.SMTP) {
-    return res
-      .status(500)
-      .json({ error: 'Email system has not been configured' })
+    return res.status(500).json({ error: 'Email system has not been configured' })
   }
 
   const email = req.body.email
