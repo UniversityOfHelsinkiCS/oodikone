@@ -3,7 +3,7 @@ import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Table, Icon, Label, Header, Loader } from 'semantic-ui-react'
-import { isEmpty, sortBy, flattenDeep } from 'lodash'
+import { isEmpty, sortBy, flattenDeep, cloneDeep } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
 import { withRouter } from 'react-router-dom'
@@ -17,6 +17,14 @@ import { clearCourseStats } from '../../redux/coursestats'
 import SortableTable from '../SortableTable'
 
 class StudentDetails extends Component {
+  constructor() {
+    super()
+    this.state = {
+      graphYearStart: null,
+      degreename: ''
+    }
+  }
+
   componentDidMount() {
     this.props.getSemesters()
     this.unlistenHistory = this.props.history.listen((location, action) => {
@@ -104,13 +112,40 @@ class StudentDetails extends Component {
       `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`)
   }
 
+  handleStartDateChange = (degree) => {
+    const { degreename, graphYearStart } = this.state
+    const { name, startdate } = degree
+
+    if (name === degreename && graphYearStart === startdate) {
+      this.setState({
+        graphYearStart: null,
+        degreename: ''
+      })
+    } else {
+      this.setState({
+        graphYearStart: degree.startdate,
+        degreename: degree.name
+      })
+    }
+  }
+
   renderCreditsGraph = () => {
     const { translate, student } = this.props
-    const sample = [student]
+    const { graphYearStart } = this.state
+    const selectedStart = graphYearStart || student.started
+    const filteredCourses = student.courses.filter(c => new Date(c.date) > new Date(selectedStart))
+    const newStudent = cloneDeep(student)
+    newStudent.courses = filteredCourses
+    const sample = [newStudent]
+
     const dates = flattenDeep(student.courses.map(c => c.date)).map(d => new Date(d).getTime())
-    sample.maxCredits = student.credits
+    sample.maxCredits = newStudent.courses.reduce((a, c) => {
+      if (c.isStudyModuleCredit || !c.passed) { return a + 0 }
+      return a + c.credits
+    }, 0)
     sample.maxDate = dates.length > 0 ? Math.max(...dates) : new Date().getTime()
-    sample.minDate = new Date(student.started).getTime()
+    sample.minDate = new Date(selectedStart).getTime()
+
     return (
       <CreditAccumulationGraphHighCharts
         students={sample}
@@ -208,16 +243,17 @@ class StudentDetails extends Component {
 
   renderStudyRights = () => {
     const { student, language } = this.props
+    const { graphYearStart, degreename } = this.state
     const studyRightHeaders = ['Degree', 'Programme', 'Study Track', 'Graduated']
     const studyRightRows = student.studyrights.map((studyright) => {
-      const degrees = sortBy(studyright.studyrightElements, 'enddate').filter(e => e.element_detail.type === 10)
-        .map(degree => ({
-          startdate: degree.startdate,
-          enddate: degree.enddate,
-          name: getTextIn(degree.element_detail.name, language),
-          graduateionDate: degree.graduationDate,
-          canceldate: degree.canceldate
-        }))
+      const degree = sortBy(studyright.studyrightElements, 'enddate').find(e => e.element_detail.type === 10)
+      const formattedDegree = {
+        startdate: degree.startdate,
+        enddate: degree.enddate,
+        name: getTextIn(degree.element_detail.name, language),
+        graduateionDate: degree.graduationDate,
+        canceldate: degree.canceldate
+      }
       const programmes = sortBy(studyright.studyrightElements, 'enddate').filter(e => e.element_detail.type === 20)
         .map(programme => ({
           code: programme.code,
@@ -236,7 +272,7 @@ class StudentDetails extends Component {
         graduated: studyright.graduated,
         canceldate: studyright.canceldate,
         enddate: studyright.enddate,
-        elements: { degrees, programmes, studytracks }
+        elements: { degree: formattedDegree, programmes, studytracks }
       }
     })
 
@@ -268,13 +304,18 @@ class StudentDetails extends Component {
           </Table.Header>
           <Table.Body>
             {studyRightRows.map((c) => {
-              if (c.elements.programmes.length > 0 || c.elements.degrees.length > 0) {
+              if (c.elements.programmes.length > 0 || c.elements.degree) {
                 return (
-                  <Table.Row key={c.studyrightid}>
+                  <Table.Row
+                    active={graphYearStart === c.elements.degree.startdate && degreename === c.elements.degree.name}
+                    key={c.studyrightid}
+                    onClick={() => this.handleStartDateChange(c.elements.degree)}
+                  >
                     <Table.Cell verticalAlign="middle">
-                      {c.elements.degrees.filter(filterDuplicates).map(degree => (
-                        <p key={degree.name}>{`${degree.name} (${reformatDate(degree.startdate, 'DD.MM.YYYY')} - ${reformatDate(degree.enddate, 'DD.MM.YYYY')})`} <br /> </p>
-                      ))}
+                      <p key={c.elements.degree.name}>
+                        {`${c.elements.degree.name} (${reformatDate(c.elements.degree.startdate, 'DD.MM.YYYY')} - ${reformatDate(c.elements.degree.enddate, 'DD.MM.YYYY')})`}
+                        <br />
+                      </p>
                     </Table.Cell>
                     <Table.Cell>
                       {c.elements.programmes.filter(filterDuplicates).map(programme => (
