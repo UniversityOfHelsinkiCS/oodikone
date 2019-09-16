@@ -35,7 +35,7 @@ const getTableBody = (rows, rowClickFn, selectable) => (
 const SearchResultTable = ({ headers, rows, rowClickFn, noResultText, selectable, definition }) => {
   if (rows.length > 0) {
     return (
-      <Segment style={{ maxHeight: '80vh', padding: 0 }}>
+      <Segment style={{ maxHeight: '80vh', overflowY: 'auto', padding: 0 }}>
         <Table unstackable selectable={selectable} definition={definition} className="fixed-header">
           {getHeaderRow(headers)}
           {getTableBody(rows, rowClickFn, selectable)}
