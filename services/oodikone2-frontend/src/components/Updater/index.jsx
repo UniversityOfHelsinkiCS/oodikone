@@ -20,10 +20,12 @@ const Updater = () => {
 
   const statusRef = useRef()
   useEffect(() => {
-    statusRef.current = cancelablePromise((async () => {
-      const result = await callApi('/updater/status', 'get')
-      setStatuses(result.data)
-    })())
+    statusRef.current = cancelablePromise(
+      (async () => {
+        const result = await callApi('/updater/status', 'get')
+        setStatuses(result.data)
+      })()
+    )
     return () => {
       if (statusRef.current) statusRef.current.cancel()
     }
@@ -40,63 +42,33 @@ const Updater = () => {
             value={amount}
             onChange={(_, { value }) => setAmount(value)}
             action={
-              <Button
-                content="Update oldest students:"
-                icon="refresh"
-                onClick={() => updateOldestStudents(amount)}
-              />
+              <Button content="Update oldest students:" icon="refresh" onClick={() => updateOldestStudents(amount)} />
             }
             actionPosition="left"
           />
-          <Form.Button
-            content="Update ACTIVE students"
-            icon="refresh"
-            onClick={() => updateActiveStudents()}
-          />
-          <Form.Button
-            content="Update ALL students"
-            icon="refresh"
-            onClick={() => updateAllStudents()}
-          />
+          <Form.Button content="Update ACTIVE students" icon="refresh" onClick={() => updateActiveStudents()} />
+          <Form.Button content="Update ALL students" icon="refresh" onClick={() => updateAllStudents()} />
         </Form.Group>
         <Form.Group>
-          <Form.Button
-            content="Update attainment dates"
-            icon="refresh"
-            onClick={() => updateAttainmentDates()}
-          />
-          <Form.Button
-            content="Update metadata"
-            icon="refresh"
-            onClick={() => updateMetadata()}
-          />
-          <Form.Button
-            content="create tasks"
-            icon="refresh"
-            onClick={() => createTasks()}
-          />
-          <Form.Button
-            content="Update NO_STUDENT students"
-            icon="refresh"
-            onClick={() => updateNoStudents()}
-          />
-          <Form.Button
-            content="Update all 'SCHEDULED' students"
-            icon="refresh"
-            onClick={() => rescheduleScheduled()}
-          />
-          <Form.Button
-            content="Update all 'FETCHED' students"
-            icon="refresh"
-            onClick={() => rescheduleFetched()}
-          />
+          <Form.Button content="Update attainment dates" icon="refresh" onClick={() => updateAttainmentDates()} />
+          <Form.Button content="Update metadata" icon="refresh" onClick={() => updateMetadata()} />
+          <Form.Button content="create tasks" icon="refresh" onClick={() => createTasks()} />
+          <Form.Button content="Update NO_STUDENT students" icon="refresh" onClick={() => updateNoStudents()} />
+          <Form.Button content="Update all 'SCHEDULED' students" icon="refresh" onClick={() => rescheduleScheduled()} />
+          <Form.Button content="Update all 'FETCHED' students" icon="refresh" onClick={() => rescheduleFetched()} />
         </Form.Group>
       </Form>
       <Header>Status:</Header>
       <Segment loading={!statuses} basic>
-        <Table striped >
+        <Table striped>
           <Table.Body>
-            {statuses && statuses.map(e => <Table.Row key={e.label}><Table.Cell collapsing>{e.label}</Table.Cell><Table.Cell>{e.value}</Table.Cell></Table.Row>)}
+            {statuses &&
+              statuses.map(e => (
+                <Table.Row key={e.label}>
+                  <Table.Cell collapsing>{e.label}</Table.Cell>
+                  <Table.Cell>{e.value}</Table.Cell>
+                </Table.Row>
+              ))}
           </Table.Body>
         </Table>
       </Segment>
@@ -104,10 +76,11 @@ const Updater = () => {
   )
 }
 
-Updater.propTypes = {
-}
+Updater.propTypes = {}
 
-Updater.defaultProps = {
-}
+Updater.defaultProps = {}
 
-export default connect(null, null)(Updater)
+export default connect(
+  null,
+  null
+)(Updater)

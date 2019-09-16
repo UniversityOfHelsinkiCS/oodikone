@@ -1,16 +1,18 @@
 {
-  "extends": "stylelint-config-standard",
+  "extends": ["stylelint-config-standard", "stylelint-prettier/recommended"],
   "rules": {
-    "selector-type-no-unknown": [true, {
-    "ignoreTypes": ["/^--/", "--"]
-  }],
+    "selector-type-no-unknown": [
+      true,
+      {
+        "ignoreTypes": ["/^--/", "--"]
+      }
+    ],
     "selector-pseudo-class-no-unknown": [
       true,
       {
-        "ignorePseudoClasses": [
-          "global"
-        ]
+        "ignorePseudoClasses": ["global"]
       }
-    ]
+    ],
+    "prettier/prettier": true
   }
 }

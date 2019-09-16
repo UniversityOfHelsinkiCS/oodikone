@@ -1,11 +1,9 @@
 const { CourseYearlyStatsCounter, CATEGORY } = require('./course_yearly_stats_counter')
 
 describe('Marking credit to history', () => {
-
   const studentnumber = '12345678'
 
   describe('Student history to empty counter', () => {
-
     const counter = new CourseYearlyStatsCounter()
     const history = counter.studentHistory(studentnumber)
 
@@ -14,11 +12,9 @@ describe('Marking credit to history', () => {
       expect(history.failed).toBe(false)
       expect(history.failed).toBe(false)
     })
-
   })
 
   describe('Mark passed credit to empty counter', () => {
-    
     const counter = new CourseYearlyStatsCounter()
     counter.markCreditToHistory(studentnumber, true)
     const history = counter.studentHistory(studentnumber)
@@ -28,11 +24,9 @@ describe('Marking credit to history', () => {
       expect(history.passed).toBe(true)
       expect(history.failed).toBe(false)
     })
-
   })
 
   describe('Mark failed credit to empty counter', () => {
-
     const counter = new CourseYearlyStatsCounter()
     counter.markCreditToHistory(studentnumber, false)
     const history = counter.studentHistory(studentnumber)
@@ -42,11 +36,9 @@ describe('Marking credit to history', () => {
       expect(history.passed).toBe(false)
       expect(history.failed).toBe(true)
     })
-
   })
 
   describe('Mark failed credit after passed credit', () => {
-
     const counter = new CourseYearlyStatsCounter()
     counter.markCreditToHistory(studentnumber, true)
     counter.markCreditToHistory(studentnumber, false)
@@ -59,11 +51,9 @@ describe('Marking credit to history', () => {
     test('student history failed should be false', () => {
       expect(history.failed).toBe(false)
     })
-
   })
 
   describe('Mark passed credit after failed credit', () => {
-
     const counter = new CourseYearlyStatsCounter()
     counter.markCreditToHistory(studentnumber, false)
     counter.markCreditToHistory(studentnumber, true)
@@ -77,11 +67,9 @@ describe('Marking credit to history', () => {
       expect(history.failed).toBe(false)
     })
   })
-
 })
 
 describe('Marking credit to group', () => {
-
   const studentnumber = '123456789'
   const groupcode = 'GROUP'
   const groupname = 'Group name'
@@ -92,19 +80,17 @@ describe('Marking credit to group', () => {
   const markFail = counter => counter.markCreditToGroup(studentnumber, false, FAILGRADE, groupcode, groupname)
 
   describe('Marking passed credit to group for empty counter', () => {
-
     const counter = new CourseYearlyStatsCounter()
     markPass(counter)
 
     describe('group students tests', () => {
-
       const { students } = counter.groups[groupcode]
       const { category, grade, passed } = students[studentnumber]
 
       test('student category in group should be PASS_FIRST', () => {
         expect(category).toBe(CATEGORY.PASS_FIRST)
       })
-    
+
       test('student grade in group should be the given grade', () => {
         expect(grade).toBe(PASSGRADE)
       })
@@ -131,18 +117,14 @@ describe('Marking credit to group', () => {
       test('failed should not contain studentnumber', () => {
         expect(failed).not.toContain(studentnumber)
       })
-
     })
-
   })
 
   describe('Marking failed credit to group for empty counter', () => {
-
     const counter = new CourseYearlyStatsCounter()
     markFail(counter)
 
     describe('group students tests', () => {
-    
       const { students } = counter.groups[groupcode]
       const { category, grade, passed } = students[studentnumber]
 
@@ -157,11 +139,9 @@ describe('Marking credit to group', () => {
       test('student passed should be false', () => {
         expect(passed).toBe(false)
       })
-
     })
 
     describe('group attempts tests', () => {
-
       const { attempts } = counter.groups[groupcode]
       const { passed, failed } = attempts.classes
 
@@ -172,7 +152,6 @@ describe('Marking credit to group', () => {
       test('failed should contain studentnumber', () => {
         expect(failed).toContain(studentnumber)
       })
-
     })
 
     test('student history should contain correct values for student', () => {
@@ -181,11 +160,9 @@ describe('Marking credit to group', () => {
       expect(history.passed).toBe(false)
       expect(history.failed).toBe(true)
     })
-
   })
 
   describe('Mark failed credit then passed credit to same group', () => {
-    
     const counter = new CourseYearlyStatsCounter()
     markFail(counter)
     markPass(counter)
@@ -220,7 +197,5 @@ describe('Marking credit to group', () => {
       expect(history.failed).toBe(false)
       expect(history.attempted).toBe(true)
     })
-
   })
-
 })

@@ -1,7 +1,6 @@
 const { CourseStatsCounter } = require('./course_stats_counter')
 
 describe('CourseStatsCounter tests', () => {
-  
   const studentnumbers = ['1', '2', '3', '4', '5']
   const allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
   const coursecode = 'COURSE_01'
@@ -10,28 +9,24 @@ describe('CourseStatsCounter tests', () => {
   const createCounter = () => new CourseStatsCounter(coursecode, coursename, allstudents)
 
   describe('counter constructor should set course values correctly', () => {
-
     const counter = createCounter()
 
     test('course name should be set after creation', () => {
       expect(counter.course.name).toBe(coursename)
     })
-    
+
     test('course code should be set after creation', () => {
       expect(counter.course.code).toBe(coursecode)
     })
-    
   })
 
   describe('mark passed credit for student', () => {
-
     const student = studentnumbers[0]
     const grade = '5'
     const counter = createCounter()
 
     counter.markCredit(student, grade, true, false, false)
     const { all, failed, passed, notParticipated, notParticipatedOrFailed } = counter.students
-
 
     test('all should have studentnumber as key', () => {
       expect(all).toHaveProperty(student)
@@ -52,11 +47,9 @@ describe('CourseStatsCounter tests', () => {
     test('notParticipatedOrFailed should not have studentnumber as key', () => {
       expect(notParticipatedOrFailed).not.toHaveProperty(student)
     })
-
   })
 
   describe('mark failed credit for student', () => {
-
     const student = studentnumbers[0]
     const grade = '0'
     const counter = createCounter()
@@ -84,11 +77,9 @@ describe('CourseStatsCounter tests', () => {
     test('notParticipatedOrFailed should have studentnumber as key', () => {
       expect(notParticipatedOrFailed).toHaveProperty(student)
     })
-
   })
 
   describe('mark failed credit then passed credit for student', () => {
-    
     const student = studentnumbers[0]
     const counter = createCounter()
 
@@ -112,11 +103,9 @@ describe('CourseStatsCounter tests', () => {
     test('notParticipatedOrFailed should not have studentnumber as key', () => {
       expect(notParticipatedOrFailed).not.toHaveProperty(student)
     })
-
   })
 
   describe('mark passed credit then failed credit for student', () => {
-    
     const student = studentnumbers[0]
     const counter = createCounter()
 
@@ -140,11 +129,9 @@ describe('CourseStatsCounter tests', () => {
     test('notParticipatedOrFailed should not have student', () => {
       expect(notParticipatedOrFailed).not.toHaveProperty(student)
     })
-
   })
 
   describe('mark failed credit then failed credit for student', () => {
-
     const student = studentnumbers[0]
     const counter = createCounter()
 
@@ -164,18 +151,16 @@ describe('CourseStatsCounter tests', () => {
     test('failed many students should have students', () => {
       expect(failedMany).toHaveProperty(student)
     })
-
   })
 
   describe('mark passed then failed then failed for student', () => {
-
     const student = studentnumbers[0]
     const counter = createCounter()
 
     counter.markCredit(student, '5', true, false, false)
     counter.markCredit(student, '0', false, true, false)
     counter.markCredit(student, '0', false, true, false)
-    
+
     const { passed, failed, failedMany, notParticipatedOrFailed, retryPassed } = counter.students
 
     test('passed students should have studentnumber', () => {
@@ -197,11 +182,9 @@ describe('CourseStatsCounter tests', () => {
     test('retryPassed should have studentnumber', () => {
       expect(retryPassed).toHaveProperty(student)
     })
-
   })
 
   describe('mark passed then improved grade for student', () => {
-
     const student = studentnumbers[0]
     const counter = createCounter()
 
@@ -217,11 +200,9 @@ describe('CourseStatsCounter tests', () => {
     test('improvedPassedGrade should have student', () => {
       expect(improvedPassedGrade).toHaveProperty(student)
     })
-
   })
 
   describe('mark improved grade then failed for student', () => {
-
     const student = studentnumbers[0]
     const counter = createCounter()
 
@@ -237,11 +218,9 @@ describe('CourseStatsCounter tests', () => {
     test('improvedPassedGrade should contain student', () => {
       expect(improvedPassedGrade).toHaveProperty(student)
     })
-    
+
     test('failed should not contain student', () => {
       expect(failed).not.toHaveProperty(student)
     })
-
   })
-
 })

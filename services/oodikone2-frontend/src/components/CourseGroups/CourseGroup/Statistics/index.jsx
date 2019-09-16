@@ -16,8 +16,11 @@ const Index = ({ totalStudents, totalCourses, totalCredits, totalTeachers, activ
     const lineKeys = [1, 2, 3, 4, 5]
     return (
       <Placeholder>
-        {lineKeys.map(k => <Placeholder.Line key={k} length="full" />)}
-      </Placeholder>)
+        {lineKeys.map(k => (
+          <Placeholder.Line key={k} length="full" />
+        ))}
+      </Placeholder>
+    )
   }
   let teacherAmount = totalTeachers
   let studentAmount = totalStudents

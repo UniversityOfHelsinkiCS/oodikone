@@ -9,9 +9,7 @@ import { getDuplicates, addDuplicate, removeDuplicate } from '../../redux/course
 import CourseSearch from '../CourseSearch'
 import { getTextIn } from '../../common'
 import { findCourses } from '../../redux/courses'
-import {
-  getMandatoryCourses
-} from '../../redux/populationMandatoryCourses'
+import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 
 const { func, shape, string, objectOf, arrayOf, bool } = PropTypes
 
@@ -26,7 +24,7 @@ class CourseCodeMapper extends Component {
     codes: {}
   }
 
-  getName = (name) => {
+  getName = name => {
     const { language } = this.props
     return getTextIn(name, language)
   }
@@ -35,7 +33,7 @@ class CourseCodeMapper extends Component {
     const { courseCodeDuplicates, mandatoryCourses, findCoursesDispatch } = this.props
     const { data } = courseCodeDuplicates
     const find = (query, language) => findCoursesDispatch(query, language)
-    const rows = mandatoryCourses.data.map((course) => {
+    const rows = mandatoryCourses.data.map(course => {
       const maincode = Object.keys(data).find(k => data[k].map(e => e.code).includes(course.code))
       const duplicates = maincode ? orderBy(data[maincode].filter(e => e.code !== course.code), ['code'], ['ASC']) : []
       return (
@@ -46,7 +44,13 @@ class CourseCodeMapper extends Component {
               {duplicates.map(e => (
                 <Label key={e.code}>
                   {`${e.code} ${this.getName(e.name)}`}
-                  <Icon style={{ margin: '0 0 0 5px' }} color="red" name="remove circle" title="Remove from group" onClick={this.removeDuplicate(e.code)} />
+                  <Icon
+                    style={{ margin: '0 0 0 5px' }}
+                    color="red"
+                    name="remove circle"
+                    title="Remove from group"
+                    onClick={this.removeDuplicate(e.code)}
+                  />
                 </Label>
               ))}
             </Label.Group>
@@ -55,22 +59,19 @@ class CourseCodeMapper extends Component {
             <Grid style={{ minWidth: '350px' }}>
               <Grid.Column width={11}>
                 <CourseSearch
-                  handleResultSelect={
-                    (e, { result }) => this.setState(old => ({ codes: { ...old.codes, [course.code]: result.code } }))
+                  handleResultSelect={(e, { result }) =>
+                    this.setState(old => ({ codes: { ...old.codes, [course.code]: result.code } }))
                   }
                   findFunction={find}
                 />
               </Grid.Column>
               <Grid.Column width={5}>
-                <Button
-                  fluid
-                  content="Add"
-                  onClick={this.addDuplicate(course.code, this.state.codes[course.code])}
-                />
+                <Button fluid content="Add" onClick={this.addDuplicate(course.code, this.state.codes[course.code])} />
               </Grid.Column>
             </Grid>
           </Table.Cell>
-        </Table.Row>)
+        </Table.Row>
+      )
     })
     return rows
   }
@@ -103,9 +104,7 @@ class CourseCodeMapper extends Component {
                 <Table.HeaderCell>Add alternative</Table.HeaderCell>
               </Table.Row>
             </Table.Header>
-            <Table.Body>
-              {this.getTableRows()}
-            </Table.Body>
+            <Table.Body>{this.getTableRows()}</Table.Body>
           </Table>
           {data.length === 0 && <Message info>You need to define mandatory courses first</Message>}
         </Segment>
@@ -126,10 +125,14 @@ CourseCodeMapper.propTypes = {
   courseCodeDuplicates: shape({
     pending: bool,
     error: bool,
-    data: objectOf(arrayOf(shape({
-      name: shape({}),
-      code: string
-    })))
+    data: objectOf(
+      arrayOf(
+        shape({
+          name: shape({}),
+          code: string
+        })
+      )
+    )
   }).isRequired
 }
 
@@ -140,16 +143,14 @@ const mapStateToProps = ({ courseCodeDuplicates, populationMandatoryCourses, loc
 })
 
 const mapDispatchToProps = dispatch => ({
-  getDuplicates: studyprogramme =>
-    dispatch(getDuplicates(studyprogramme)),
-  addDuplicate: (code1, code2) =>
-    dispatch(addDuplicate(code1, code2)),
-  removeDuplicate: code =>
-    dispatch(removeDuplicate(code)),
-  findCoursesDispatch: (query, language) =>
-    dispatch(findCourses(query, language)),
-  getMandatoryCourses: studyprogramme =>
-    dispatch(getMandatoryCourses(studyprogramme))
+  getDuplicates: studyprogramme => dispatch(getDuplicates(studyprogramme)),
+  addDuplicate: (code1, code2) => dispatch(addDuplicate(code1, code2)),
+  removeDuplicate: code => dispatch(removeDuplicate(code)),
+  findCoursesDispatch: (query, language) => dispatch(findCourses(query, language)),
+  getMandatoryCourses: studyprogramme => dispatch(getMandatoryCourses(studyprogramme))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(CourseCodeMapper)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CourseCodeMapper)

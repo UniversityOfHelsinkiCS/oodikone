@@ -73,12 +73,7 @@ class StartingThisSemester extends Component {
                 <label>chosen semester</label>
               </Form.Field>
               <Form.Field>
-                <Button
-                  onClick={this.handleRadio}
-                >
-                  set filter
-                </Button>
-
+                <Button onClick={this.handleRadio}>set filter</Button>
               </Form.Field>
             </Form.Group>
           </Form>

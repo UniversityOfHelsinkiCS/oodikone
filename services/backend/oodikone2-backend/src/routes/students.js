@@ -4,7 +4,10 @@ const userService = require('../services/userService')
 const Unit = require('../services/units')
 
 router.get('/students', async (req, res) => {
-  const { roles, decodedToken: { userId } } = req
+  const {
+    roles,
+    decodedToken: { userId }
+  } = req
 
   if (roles && roles.includes('admin')) {
     let results = []
@@ -26,9 +29,7 @@ router.get('/students/:id', async (req, res) => {
 
   if (roles && roles.includes('admin')) {
     const results = await Student.withId(studentId)
-    return results.error ?
-      res.status(400).json({ error: 'error finding student' }) :
-      res.json(results)
+    return results.error ? res.status(400).json({ error: 'error finding student' }) : res.json(results)
   }
 
   const uid = req.decodedToken.userId
@@ -38,10 +39,12 @@ router.get('/students/:id', async (req, res) => {
   }
   const units = await userService.getUnitsFromElementDetails(uid)
 
-  const rights = await Promise.all(units.map(async unit => {
-    const jtn = await Unit.hasStudent(unit.id, student.studentNumber)
-    return jtn
-  }))
+  const rights = await Promise.all(
+    units.map(async unit => {
+      const jtn = await Unit.hasStudent(unit.id, student.studentNumber)
+      return jtn
+    })
+  )
 
   if (rights.some(right => right !== null)) {
     res.json(student).end()

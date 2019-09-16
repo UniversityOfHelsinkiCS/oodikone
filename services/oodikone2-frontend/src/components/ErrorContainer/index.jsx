@@ -5,11 +5,11 @@ import { getTranslate } from 'react-localize-redux'
 
 import ErrorMessage from '../ErrorMessage'
 
-const ErrorContainer = (props) => {
-  if (!props.errors) return (null)
+const ErrorContainer = props => {
+  if (!props.errors) return null
   const errors = props.errors.map((error, index) => (
     <ErrorMessage
-        // eslint-disable-next-line react/no-array-index-key
+      // eslint-disable-next-line react/no-array-index-key
       key={index}
       code={error.code}
       message={error.error}
@@ -18,7 +18,7 @@ const ErrorContainer = (props) => {
       translate={props.translate}
     />
   ))
-  return (<div className="segmentContainer">{errors}</div>)
+  return <div className="segmentContainer">{errors}</div>
 }
 
 const mapStateToProps = ({ errors, localize }) => ({

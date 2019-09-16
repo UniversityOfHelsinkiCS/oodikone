@@ -7,12 +7,12 @@ const DEFAULT_PATH_KONE = `${process.cwd()}/database/migrations_kone`
 const saveMigrationsToDatabase = Migration => async filenames =>
   Promise.all(filenames.map(name => Migration.upsert({ name })))
 
-const seedMigrations = async (migrationfilepath=DEFAULT_PATH) => {
+const seedMigrations = async (migrationfilepath = DEFAULT_PATH) => {
   const filenames = fs.readdirSync(migrationfilepath)
   await saveMigrationsToDatabase(Migration)(filenames)
 }
 
-const seedMigrationsKone = async (migrationfilepath=DEFAULT_PATH_KONE) => {
+const seedMigrationsKone = async (migrationfilepath = DEFAULT_PATH_KONE) => {
   const filenames = fs.readdirSync(migrationfilepath)
   await saveMigrationsToDatabase(MigrationKone)(filenames)
 }

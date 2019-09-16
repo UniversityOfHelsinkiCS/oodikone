@@ -28,7 +28,12 @@ class StudentDetails extends Component {
   componentDidMount() {
     this.props.getSemesters()
     this.unlistenHistory = this.props.history.listen((location, action) => {
-      if (action === 'POP' || location.pathname === '/students' || location.pathname !== '/students' || this.props.error) {
+      if (
+        action === 'POP' ||
+        location.pathname === '/students' ||
+        location.pathname !== '/students' ||
+        this.props.error
+      ) {
         this.props.resetStudent()
         this.props.removeStudentSelection()
       }
@@ -46,20 +51,35 @@ class StudentDetails extends Component {
   }
 
   getAbsentYears = () => {
-    const { semesters, student: { semesterenrollments } } = this.props
+    const {
+      semesters,
+      student: { semesterenrollments }
+    } = this.props
     semesterenrollments.sort((a, b) => a.semestercode - b.semestercode)
-    const mappedSemesters = Object.values(semesters.semesters).reduce((acc, { semestercode, startdate, enddate }) => ({ ...acc, [semestercode]: { startdate, enddate } }), {})
+    const mappedSemesters = Object.values(semesters.semesters).reduce(
+      (acc, { semestercode, startdate, enddate }) => ({ ...acc, [semestercode]: { startdate, enddate } }),
+      {}
+    )
 
     // If a student has been absent for a long period, then the enrollments aren't marked in oodi...
     // Therefore we need to manually patch empty enrollment ranges with absences
     const now = new Date().getTime()
-    const latestSemester = parseInt(Object.entries(mappedSemesters).find(([, { startdate, enddate }]) => now <= new Date(enddate).getTime() && now >= new Date(startdate).getTime())[0], 10)
-    const mappedSemesterenrollments = semesterenrollments.reduce((res, curr) => ({ ...res, [curr.semestercode]: curr }), {})
+    const latestSemester = parseInt(
+      Object.entries(mappedSemesters).find(
+        ([, { startdate, enddate }]) => now <= new Date(enddate).getTime() && now >= new Date(startdate).getTime()
+      )[0],
+      10
+    )
+    const mappedSemesterenrollments = semesterenrollments.reduce(
+      (res, curr) => ({ ...res, [curr.semestercode]: curr }),
+      {}
+    )
     const patchedSemesterenrollments = []
     if (semesterenrollments.length) {
       let runningSemestercode = semesterenrollments[0].semestercode
       while (runningSemestercode <= latestSemester) {
-        if (!mappedSemesterenrollments[runningSemestercode]) patchedSemesterenrollments.push({ semestercode: runningSemestercode, enrollmenttype: 2 })
+        if (!mappedSemesterenrollments[runningSemestercode])
+          patchedSemesterenrollments.push({ semestercode: runningSemestercode, enrollmenttype: 2 })
         else patchedSemesterenrollments.push(mappedSemesterenrollments[runningSemestercode])
         runningSemestercode++
       }
@@ -74,7 +94,7 @@ class StudentDetails extends Component {
       }
     }
 
-    const mergeAbsences = (absences) => {
+    const mergeAbsences = absences => {
       const res = []
       let currentSemestercode = -1
       if (absences.length) {
@@ -90,12 +110,14 @@ class StudentDetails extends Component {
       return res
     }
 
-    return mergeAbsences(patchedSemesterenrollments
-      .filter(({ enrollmenttype }) => enrollmenttype !== 1) // 1 = present & 2 = absent
-      .map(absence => formatAbsence(absence)))
+    return mergeAbsences(
+      patchedSemesterenrollments
+        .filter(({ enrollmenttype }) => enrollmenttype !== 1) // 1 = present & 2 = absent
+        .map(absence => formatAbsence(absence))
+    )
   }
 
-  pushQueryToUrl = (query) => {
+  pushQueryToUrl = query => {
     const { history } = this.props
     const { courseCodes, ...rest } = query
     const queryObject = { ...rest, courseCodes: JSON.stringify(courseCodes) }
@@ -108,11 +130,13 @@ class StudentDetails extends Component {
     const { history } = this.props
     const year = moment(date).isBefore(moment(`${date.slice(0, 4)}-08-01`)) ? date.slice(0, 4) - 1 : date.slice(0, 4)
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
-    history.push(`/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`)
+    history.push(
+      `/populations?months=${months}&semesters=FALL&semesters=` +
+        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`
+    )
   }
 
-  handleStartDateChange = (degree) => {
+  handleStartDateChange = degree => {
     const { degreename, graphYearStart } = this.state
     const { name, startdate } = degree
 
@@ -140,7 +164,7 @@ class StudentDetails extends Component {
 
     const dates = flattenDeep(student.courses.map(c => c.date)).map(d => new Date(d).getTime())
     sample.maxCredits = newStudent.courses.reduce((a, c) => {
-      if (c.isStudyModuleCredit || !c.passed) { return a + 0 }
+      if (c.isStudyModuleCredit || !c.passed) return a + 0
       return a + c.credits
     }, 0)
     sample.maxDate = dates.length > 0 ? Math.max(...dates) : new Date().getTime()
@@ -168,10 +192,8 @@ class StudentDetails extends Component {
       translate('common.credits'),
       ''
     ]
-    const courseRows = student.courses.sort(byDateDesc).map((c) => {
-      const {
-        date, grade, credits, course, isStudyModuleCredit, passed
-      } = c
+    const courseRows = student.courses.sort(byDateDesc).map(c => {
+      const { date, grade, credits, course, isStudyModuleCredit, passed } = c
       let icon = null
       if (isStudyModuleCredit) {
         icon = <Icon name="certificate" color="purple" />
@@ -180,35 +202,44 @@ class StudentDetails extends Component {
       } else {
         icon = <Icon name="circle outline" color="red" />
       }
-      const year = (moment(new Date(date)).diff(new Date('1950-1-1'), 'years'))
+      const year = moment(new Date(date)).diff(new Date('1950-1-1'), 'years')
 
       return [
         reformatDate(date, 'DD.MM.YYYY'),
-        `${isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)} (${course.code})`,
-        <div>{icon}{grade}</div>,
+        `${
+          isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)
+        } (${course.code})`,
+        <div>
+          {icon}
+          {grade}
+        </div>,
         credits,
-        <Icon style={{ cursor: 'pointer' }} name="level up" onClick={() => this.pushQueryToUrl({ courseCodes: [course.code], separate: false, fromYear: year - 1, toYear: year + 1 })} />
+        <Icon
+          style={{ cursor: 'pointer' }}
+          name="level up"
+          onClick={() =>
+            this.pushQueryToUrl({ courseCodes: [course.code], separate: false, fromYear: year - 1, toYear: year + 1 })
+          }
+        />
       ]
     })
     return (
       <Fragment>
         <Header content="Courses" />
-        <SearchResultTable
-          headers={courseHeaders}
-          rows={courseRows}
-          noResultText="Student has courses marked"
-        />
+        <SearchResultTable headers={courseHeaders} rows={courseRows} noResultText="Student has courses marked" />
       </Fragment>
     )
   }
 
   renderTags = () => {
     const { student, language } = this.props
-    const data = Object.values(student.tags.reduce((acc, t) => {
-      if (!acc[t.programme.code]) acc[t.programme.code] = { programme: t.programme, tags: [] }
-      acc[t.tag.studytrack].tags.push(t)
-      return acc
-    }, {}))
+    const data = Object.values(
+      student.tags.reduce((acc, t) => {
+        if (!acc[t.programme.code]) acc[t.programme.code] = { programme: t.programme, tags: [] }
+        acc[t.tag.studytrack].tags.push(t)
+        return acc
+      }, {})
+    )
     if (data.length === 0) return null
     return (
       <Fragment>
@@ -233,7 +264,8 @@ class StudentDetails extends Component {
               key: 'TAGS',
               title: 'Tags',
               getRowVal: t => sortBy(t.tags.map(tt => tt.tag.tagname)).join(':'),
-              getRowContent: t => sortBy(t.tags, t => t.tag.tagname).map(t => <Label key={t.tag.tag_id} content={t.tag.tagname} />)
+              getRowContent: t =>
+                sortBy(t.tags, t => t.tag.tagname).map(t => <Label key={t.tag.tag_id} content={t.tag.tagname} />)
             }
           ]}
         />
@@ -245,7 +277,7 @@ class StudentDetails extends Component {
     const { student, language } = this.props
     const { graphYearStart, degreename } = this.state
     const studyRightHeaders = ['Degree', 'Programme', 'Study Track', 'Graduated']
-    const studyRightRows = student.studyrights.map((studyright) => {
+    const studyRightRows = student.studyrights.map(studyright => {
       const degree = sortBy(studyright.studyrightElements, 'enddate').find(e => e.element_detail.type === 10)
       const formattedDegree = {
         startdate: degree.startdate,
@@ -254,14 +286,16 @@ class StudentDetails extends Component {
         graduateionDate: degree.graduationDate,
         canceldate: degree.canceldate
       }
-      const programmes = sortBy(studyright.studyrightElements, 'enddate').filter(e => e.element_detail.type === 20)
+      const programmes = sortBy(studyright.studyrightElements, 'enddate')
+        .filter(e => e.element_detail.type === 20)
         .map(programme => ({
           code: programme.code,
           startdate: programme.startdate,
           enddate: programme.enddate,
           name: getTextIn(programme.element_detail.name, language)
         }))
-      const studytracks = sortBy(studyright.studyrightElements, 'enddate').filter(e => e.element_detail.type === 30)
+      const studytracks = sortBy(studyright.studyrightElements, 'enddate')
+        .filter(e => e.element_detail.type === 30)
         .map(studytrack => ({
           startdate: studytrack.startdate,
           enddate: studytrack.enddate,
@@ -279,9 +313,11 @@ class StudentDetails extends Component {
     const filterDuplicates = (elem1, index, array) => {
       for (let i = 0; i < array.length; i++) {
         const elem2 = array[i]
-        if (elem1.name === elem2.name &&
+        if (
+          elem1.name === elem2.name &&
           ((elem1.startdate > elem2.startdate && elem1.enddate <= elem2.enddate) ||
-            (elem1.enddate < elem2.enddate && elem1.startdate >= elem2.startdate))) {
+            (elem1.enddate < elem2.enddate && elem1.startdate >= elem2.startdate))
+        ) {
           return false
         }
       }
@@ -295,15 +331,12 @@ class StudentDetails extends Component {
           <Table.Header>
             <Table.Row>
               {studyRightHeaders.map(header => (
-                <Table.HeaderCell key={header}>
-                  {header}
-                </Table.HeaderCell>
-              ))
-              }
+                <Table.HeaderCell key={header}>{header}</Table.HeaderCell>
+              ))}
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {studyRightRows.map((c) => {
+            {studyRightRows.map(c => {
               if (c.elements.programmes.length > 0 || c.elements.degree) {
                 return (
                   <Table.Row
@@ -313,32 +346,54 @@ class StudentDetails extends Component {
                   >
                     <Table.Cell verticalAlign="middle">
                       <p key={c.elements.degree.name}>
-                        {`${c.elements.degree.name} (${reformatDate(c.elements.degree.startdate, 'DD.MM.YYYY')} - ${reformatDate(c.elements.degree.enddate, 'DD.MM.YYYY')})`}
+                        {`${c.elements.degree.name} 
+                        (${reformatDate(c.elements.degree.startdate, 'DD.MM.YYYY')} - 
+                        ${reformatDate(c.elements.degree.enddate, 'DD.MM.YYYY')})`}
                         <br />
                       </p>
                     </Table.Cell>
                     <Table.Cell>
                       {c.elements.programmes.filter(filterDuplicates).map(programme => (
-                        <p key={programme.name}>{`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(programme.enddate, 'DD.MM.YYYY')})`}
-                          <Icon name="level up alternate" onClick={() => this.showPopulationStatistics(programme.code, programme.startdate)} /> <br />
+                        <p key={programme.name}>
+                          {`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(
+                            programme.enddate,
+                            'DD.MM.YYYY'
+                          )})`}
+                          <Icon
+                            name="level up alternate"
+                            onClick={() => this.showPopulationStatistics(programme.code, programme.startdate)}
+                          />{' '}
+                          <br />
                         </p>
                       ))}
                     </Table.Cell>
                     <Table.Cell>
                       {c.elements.studytracks.filter(filterDuplicates).map(studytrack => (
-                        <p key={studytrack.name}>{`${studytrack.name} (${reformatDate(studytrack.startdate, 'DD.MM.YYYY')} - ${reformatDate(studytrack.enddate, 'DD.MM.YYYY')})`}<br /> </p>
+                        <p key={studytrack.name}>
+                          {`${studytrack.name} (${reformatDate(studytrack.startdate, 'DD.MM.YYYY')} - ${reformatDate(
+                            studytrack.enddate,
+                            'DD.MM.YYYY'
+                          )})`}
+                          <br />{' '}
+                        </p>
                       ))}
                     </Table.Cell>
                     <Table.Cell>
-                      {c.canceldate ? // eslint-disable-line
-                        <div><p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p></div>
-                        :
-                        c.graduated ?
-                          <div><Icon name="check circle outline" color="green" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
-                          :
-                          <div><Icon name="circle outline" color="red" /><p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p></div>
-                      }
-
+                      {c.canceldate ? ( // eslint-disable-line
+                        <div>
+                          <p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p>
+                        </div>
+                      ) : c.graduated ? (
+                        <div>
+                          <Icon name="check circle outline" color="green" />
+                          <p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p>
+                        </div>
+                      ) : (
+                        <div>
+                          <Icon name="circle outline" color="red" />
+                          <p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p>
+                        </div>
+                      )}
                     </Table.Cell>
                   </Table.Row>
                 )
@@ -364,11 +419,8 @@ class StudentDetails extends Component {
       )
     }
     return (
-      <Segment className="contentSegment" >
-        <StudentInfoCard
-          student={student}
-          translate={translate}
-        />
+      <Segment className="contentSegment">
+        <StudentInfoCard student={student} translate={translate} />
         {this.renderCreditsGraph()}
         {this.renderTags()}
         {this.renderStudyRights()}
@@ -388,25 +440,29 @@ StudentDetails.propTypes = {
   translate: func.isRequired,
   clearCourseStats: func.isRequired,
   student: shape({
-    courses: arrayOf(shape({
-      course: shape({
-        code: string,
-        name: Object
-      }),
-      credits: integer,
-      date: string,
-      grade: string,
-      passed: bool
-    })),
+    courses: arrayOf(
+      shape({
+        course: shape({
+          code: string,
+          name: Object
+        }),
+        credits: integer,
+        date: string,
+        grade: string,
+        passed: bool
+      })
+    ),
     credits: integer,
     fetched: bool,
     started: string,
     studentNumber: string,
-    tags: arrayOf(shape({
-      programme: shape({ code: string, name: shape({}) }),
-      studentnumber: string,
-      tag: shape({ studytrack: string, tagname: string })
-    }))
+    tags: arrayOf(
+      shape({
+        programme: shape({ code: string, name: shape({}) }),
+        studentnumber: string,
+        tag: shape({ studytrack: string, tagname: string })
+      })
+    )
   }),
   pending: bool.isRequired,
   error: bool.isRequired,
@@ -425,8 +481,7 @@ StudentDetails.defaultProps = {
 
 const mapStateToProps = ({ students, localize, semesters }) => ({
   language: getActiveLanguage(localize).code,
-  student: students.data.find(student =>
-    student.studentNumber === students.selected),
+  student: students.data.find(student => student.studentNumber === students.selected),
   pending: students.pending,
   error: students.error,
   semesters: semesters.data,
@@ -441,4 +496,9 @@ const mapDispatchToProps = {
   getSemesters
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentDetails))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(StudentDetails)
+)

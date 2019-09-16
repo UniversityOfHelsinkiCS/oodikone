@@ -19,24 +19,24 @@ const initial = {
 }
 
 class TeacherStatistics extends Component {
-    state=initial
+  state = initial
 
-    componentDidMount() {
-      this.props.getProviders()
-      this.props.getSemesters()
+  componentDidMount() {
+    this.props.getProviders()
+    this.props.getSemesters()
+  }
+
+  setStartSemester = (_, { value }) => {
+    const { semesterEnd } = this.state
+    this.setState({ semesterStart: value })
+    if (semesterEnd <= value) {
+      this.setState({
+        semesterEnd: value + 1
+      })
     }
+  }
 
-    setStartSemester = (_, { value }) => {
-      const { semesterEnd } = this.state
-      this.setState({ semesterStart: value })
-      if (semesterEnd <= value) {
-        this.setState({
-          semesterEnd: value + 1
-        })
-      }
-    }
-
-    /*
+  /*
     Maps new studyright codes to providercodes. Just a wild guess on how the codes are structured....
     --------
     KH50_005
@@ -50,7 +50,8 @@ class TeacherStatistics extends Component {
     --------
     etcetc...
     */
-    mapToProviders = rights => rights.map((r) => {
+  mapToProviders = rights =>
+    rights.map(r => {
       if (r.includes('_')) {
         let newPrefix = ''
         let newSuffix = ''
@@ -63,96 +64,94 @@ class TeacherStatistics extends Component {
       return r
     })
 
-    handleChange = (_, { name, value }) => {
-      this.setState({ [name]: value })
-    }
+  handleChange = (_, { name, value }) => {
+    this.setState({ [name]: value })
+  }
 
-    handleSubmit = async () => {
-      const { semesterStart, semesterEnd, providers } = this.state
-      await this.props.getTeacherStatistics(semesterStart, semesterEnd, providers)
-      this.setState({ display: true })
-    }
+  handleSubmit = async () => {
+    const { semesterStart, semesterEnd, providers } = this.state
+    await this.props.getTeacherStatistics(semesterStart, semesterEnd, providers)
+    this.setState({ display: true })
+  }
 
-    render() {
-      const { semesters, providers, statistics, pending, isAdmin } = this.props
-      const { display, semesterStart, semesterEnd } = this.state
-      const userProviders = this.mapToProviders(this.props.rights)
-      const invalidQueryParams = this.state.providers.length === 0 || !semesterStart
-      const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
-      const filteredOptions = semesters.filter((sem) => {
-        const options = moment(new Date())
-          .diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0 ?
-          Number(sem.text.replace(/[^0-9]/g, '')) <= new Date().getFullYear() :
-          Number(sem.text.replace(/[^0-9]/g, '')) < new Date().getFullYear()
-        return options
-      })
-      return (
-        <div>
-          <Message
-            header="Teacher statistics by course providers"
-            content="Statistics for teachers that admitted credits during
+  render() {
+    const { semesters, providers, statistics, pending, isAdmin } = this.props
+    const { display, semesterStart, semesterEnd } = this.state
+    const userProviders = this.mapToProviders(this.props.rights)
+    const invalidQueryParams = this.state.providers.length === 0 || !semesterStart
+    const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
+    const filteredOptions = semesters.filter(sem => {
+      const options =
+        moment(new Date()).diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0
+          ? Number(sem.text.replace(/[^0-9]/g, '')) <= new Date().getFullYear()
+          : Number(sem.text.replace(/[^0-9]/g, '')) < new Date().getFullYear()
+      return options
+    })
+    return (
+      <div>
+        <Message
+          header="Teacher statistics by course providers"
+          content="Statistics for teachers that admitted credits during
               and between the given semesters for one of the given course providers."
-          />
-          <Segment>
-            <Form loading={pending}>
-              <Form.Group widths="equal">
-                <Form.Dropdown
-                  name="semesterStart"
-                  placeholder="Semester"
-                  label="Start semester"
-                  selection
-                  search
-                  options={filteredOptions}
-                  value={semesterStart}
-                  onChange={this.setStartSemester}
-                  selectOnBlur={false}
-                  selectOnNavigation={false}
-                />
-                <Form.Dropdown
-                  name="semesterEnd"
-                  placeholder="Semester"
-                  label="End semester"
-                  selection
-                  search
-                  options={filteredOptions.filter(semester => semester.value > semesterStart)}
-                  disabled={!semesterStart}
-                  value={semesterEnd}
-                  onChange={this.handleChange}
-                  selectOnBlur={false}
-                  selectOnNavigation={false}
-                />
-              </Form.Group>
-              <Form.Field>
-                <label>Course providers</label>
-                <Dropdown
-                  name="providers"
-                  placeholder="Providers"
-                  multiple
-                  selection
-                  search
-                  options={providerOptions}
-                  value={this.state.providers}
-                  onChange={this.handleChange}
-                  selectOnBlur={false}
-                  selectOnNavigation={false}
-                />
-              </Form.Field>
-              <Button fluid content="Search" onClick={this.handleSubmit} disabled={invalidQueryParams} />
-            </Form>
-          </Segment>
-          { display && !pending && (
-            <Segment>
-              <TeacherStatisticsTable
-                statistics={statistics}
-                onClickFn={id =>
-                  this.props.history.push(`/teachers/${id}`)
-                }
+        />
+        <Segment>
+          <Form loading={pending}>
+            <Form.Group widths="equal">
+              <Form.Dropdown
+                name="semesterStart"
+                placeholder="Semester"
+                label="Start semester"
+                selection
+                search
+                options={filteredOptions}
+                value={semesterStart}
+                onChange={this.setStartSemester}
+                selectOnBlur={false}
+                selectOnNavigation={false}
               />
-            </Segment>
-          )}
-        </div>
-      )
-    }
+              <Form.Dropdown
+                name="semesterEnd"
+                placeholder="Semester"
+                label="End semester"
+                selection
+                search
+                options={filteredOptions.filter(semester => semester.value > semesterStart)}
+                disabled={!semesterStart}
+                value={semesterEnd}
+                onChange={this.handleChange}
+                selectOnBlur={false}
+                selectOnNavigation={false}
+              />
+            </Form.Group>
+            <Form.Field>
+              <label>Course providers</label>
+              <Dropdown
+                name="providers"
+                placeholder="Providers"
+                multiple
+                selection
+                search
+                options={providerOptions}
+                value={this.state.providers}
+                onChange={this.handleChange}
+                selectOnBlur={false}
+                selectOnNavigation={false}
+              />
+            </Form.Field>
+            <Button fluid content="Search" onClick={this.handleSubmit} disabled={invalidQueryParams} />
+          </Form>
+        </Segment>
+        {display && !pending && (
+          <Segment>
+            <TeacherStatisticsTable
+              statistics={statistics}
+              onClickFn={id => this.props.history.push(`/teachers/${id}`)}
+            />
+          </Segment>
+        )}
+      </div>
+    )
+  }
 }
 
 TeacherStatistics.propTypes = {
@@ -168,8 +167,14 @@ TeacherStatistics.propTypes = {
   isAdmin: bool.isRequired
 }
 
-const mapStateToProps = (state) => {
-  const { providers, teacherStatistics, auth: { token: { rights, roles } } } = state
+const mapStateToProps = state => {
+  const {
+    providers,
+    teacherStatistics,
+    auth: {
+      token: { rights, roles }
+    }
+  } = state
   const { semesters } = state.semesters.data
   const providerOptions = providers.data.map(p => ({
     key: p.providercode,
@@ -178,11 +183,13 @@ const mapStateToProps = (state) => {
   }))
   const semesterOptions = !semesters
     ? []
-    : Object.values(semesters).reverse().map(({ semestercode, name }, idx) => ({
-      key: idx,
-      value: semestercode,
-      text: name.en
-    }))
+    : Object.values(semesters)
+        .reverse()
+        .map(({ semestercode, name }, idx) => ({
+          key: idx,
+          value: semestercode,
+          text: name.en
+        }))
   const statistics = Object.values(teacherStatistics.data).map(teacher => ({
     id: teacher.id,
     name: teacher.name,
@@ -202,8 +209,11 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, {
-  getProviders,
-  getSemesters,
-  getTeacherStatistics
-})(withRouter(TeacherStatistics))
+export default connect(
+  mapStateToProps,
+  {
+    getProviders,
+    getSemesters,
+    getTeacherStatistics
+  }
+)(withRouter(TeacherStatistics))

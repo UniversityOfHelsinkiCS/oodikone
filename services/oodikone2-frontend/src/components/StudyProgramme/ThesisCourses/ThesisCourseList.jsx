@@ -20,42 +20,39 @@ class ThesisCourseList extends Component {
     const { pending, data } = this.props
     return (
       <React.Fragment>
-        <Dimmer inverted active={pending} >
+        <Dimmer inverted active={pending}>
           <Loader />
         </Dimmer>
-        {
-          data.length === 0
-            ? <Segment content="No thesis courses" /> : (
-              <SortableTable
-                tableProps={{ celled: true }}
-                data={data}
-                getRowKey={c => c.courseCode}
-                columns={[
-                  {
-                    key: 'code',
-                    title: 'Code',
-                    headerProps: { width: 2 },
-                    getRowVal: c => c.courseCode
-                  },
-                  {
-                    key: 'type',
-                    title: 'Type',
-                    headerProps: { width: 13 },
-                    getRowVal: c => c.thesisType
-                  },
-                  {
-                    key: 'action',
-                    title: 'Remove',
-                    headerProps: { width: 1, textAlign: 'center' },
-                    cellProps: { textAlign: 'center' },
-                    getRowContent: c => (
-                      <Button basic icon="trash" onClick={this.handleDelete(c.courseCode)} />
-                    )
-                  }
-                ]}
-              />
-          )
-        }
+        {data.length === 0 ? (
+          <Segment content="No thesis courses" />
+        ) : (
+          <SortableTable
+            tableProps={{ celled: true }}
+            data={data}
+            getRowKey={c => c.courseCode}
+            columns={[
+              {
+                key: 'code',
+                title: 'Code',
+                headerProps: { width: 2 },
+                getRowVal: c => c.courseCode
+              },
+              {
+                key: 'type',
+                title: 'Type',
+                headerProps: { width: 13 },
+                getRowVal: c => c.thesisType
+              },
+              {
+                key: 'action',
+                title: 'Remove',
+                headerProps: { width: 1, textAlign: 'center' },
+                cellProps: { textAlign: 'center' },
+                getRowContent: c => <Button basic icon="trash" onClick={this.handleDelete(c.courseCode)} />
+              }
+            ]}
+          />
+        )}
       </React.Fragment>
     )
   }
@@ -66,10 +63,12 @@ ThesisCourseList.propTypes = {
   pending: bool.isRequired,
   getThesisCourses: func.isRequired,
   deleteThesisCourse: func.isRequired,
-  data: arrayOf(shape({
-    courseCode: string,
-    thesisType: string
-  }))
+  data: arrayOf(
+    shape({
+      courseCode: string,
+      thesisType: string
+    })
+  )
 }
 
 ThesisCourseList.defaultProps = {
@@ -84,4 +83,7 @@ const mapStateToProps = ({ thesisCourses }) => {
   }
 }
 
-export default connect(mapStateToProps, { getThesisCourses, deleteThesisCourse })(ThesisCourseList)
+export default connect(
+  mapStateToProps,
+  { getThesisCourses, deleteThesisCourse }
+)(ThesisCourseList)

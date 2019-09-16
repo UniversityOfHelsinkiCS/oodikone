@@ -20,14 +20,10 @@ const Tables = ({ primary, comparison, viewMode, history }) => {
     }
   }
 
-  const getTables = (series) => {
+  const getTables = series => {
     const { name, stats } = series
 
-    return (
-      <Grid.Column>
-        {getViewMode(name, stats)}
-      </Grid.Column>
-    )
+    return <Grid.Column>{getViewMode(name, stats)}</Grid.Column>
   }
   return (
     <Fragment>

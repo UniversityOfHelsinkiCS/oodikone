@@ -23,7 +23,7 @@ class FoldableRow extends Component {
     const hasRealisations = realisations.length && realisations.length > 0
     const showCourseRealisations = hasRealisations && isUnfolded
 
-    const getCell = content => (<Table.Cell content={content} />)
+    const getCell = content => <Table.Cell content={content} />
 
     const getRow = (rowId, rowData, isMainRow = true) => {
       const { passed, failed, passrate, realisation } = rowData
@@ -33,10 +33,19 @@ class FoldableRow extends Component {
           <Table.Cell
             className={showFoldIcon ? 'foldControlCell' : ''}
             onClick={() => isMainRow && this.setState({ isUnfolded: !isUnfolded })}
-          >{showFoldIcon ? <Icon name={`angle ${isUnfolded ? 'down' : 'right'}`} /> : null}
+          >
+            {showFoldIcon ? <Icon name={`angle ${isUnfolded ? 'down' : 'right'}`} /> : null}
           </Table.Cell>
           <Table.Cell
-            content={isMainRow ? <Fragment>{category} <span>{id}</span></Fragment> : realisation}
+            content={
+              isMainRow ? (
+                <Fragment>
+                  {category} <span>{id}</span>
+                </Fragment>
+              ) : (
+                realisation
+              )
+            }
             className={isMainRow ? 'courseNameCell' : 'courseRealisationCell'}
             onClick={() => onClickFn(id)}
           />
@@ -51,11 +60,11 @@ class FoldableRow extends Component {
       <Fragment>
         {getRow(id, courseData)}
         {showCourseRealisations
-          ? realisations.map((r) => {
-            const { realisation } = r
-            const realisationId = `${id}-${realisation}`
-            return getRow(realisationId, r, false)
-        })
+          ? realisations.map(r => {
+              const { realisation } = r
+              const realisationId = `${id}-${realisation}`
+              return getRow(realisationId, r, false)
+            })
           : null}
       </Fragment>
     )

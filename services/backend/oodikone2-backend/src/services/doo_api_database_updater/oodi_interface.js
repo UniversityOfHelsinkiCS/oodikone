@@ -5,14 +5,15 @@ const https = require('https')
 const fs = require('fs')
 const base_url = OODI_ADDR
 
-const agent = KEY_PATH && CERT_PATH ?
-  new https.Agent({
-    cert: fs.readFileSync(process.env.CERT_PATH, 'utf8'),
-    key: fs.readFileSync(process.env.KEY_PATH, 'utf8'),
-  }) :
-  new https.Agent({
-    rejectUnauthorized: false
-  })
+const agent =
+  KEY_PATH && CERT_PATH
+    ? new https.Agent({
+        cert: fs.readFileSync(process.env.CERT_PATH, 'utf8'),
+        key: fs.readFileSync(process.env.KEY_PATH, 'utf8')
+      })
+    : new https.Agent({
+        rejectUnauthorized: false
+      })
 
 const instance = axios.create({
   httpsAgent: agent
@@ -43,16 +44,14 @@ const attemptGetFor = async (url, attempts = 5) => {
 }
 
 if (process.env.NODE_ENV === 'dev') {
-
   axios.defaults.auth = {
     username: 'tktl',
     password: process.env.OODI_PW
   }
-  instance.interceptors.request.use((config) => {
-    config.params = {token: process.env.TOKEN}
+  instance.interceptors.request.use(config => {
+    config.params = { token: process.env.TOKEN }
     return config
   })
-
 }
 
 const getStudent = async studentNumber => {
@@ -92,7 +91,7 @@ const getCourseTypeCodes = async () => {
   return response.data.data
 }
 
-const getLearningOpportunity = async (id) => {
+const getLearningOpportunity = async id => {
   const url = `${base_url}/learningopportunities/${id}`
   const response = await attemptGetFor(url)
   return response.data.data
@@ -140,7 +139,7 @@ const courseUnitRealisationsSince = async sinceDate => {
   return response.data.data
 }
 
-const learningOpportunitiesSince = async (sinceDate='0000-01-01') => {
+const learningOpportunitiesSince = async (sinceDate = '0000-01-01') => {
   const url = `${base_url}/learningopportunities/changes/ids/${sinceDate}`
   const response = await attemptGetFor(url)
   return response.data.data

@@ -1,4 +1,3 @@
-
 .cardHeader {
   display: flex !important;
   justify-content: space-between !important;
@@ -10,9 +9,4 @@
 
 .controlIcon {
   cursor: pointer;
-
-  &:hover {
-    font-size: large;
-    color: var(--deepBlack);
-  }
 }

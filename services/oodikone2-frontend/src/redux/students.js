@@ -1,12 +1,12 @@
 import { callController } from '../apiConnection'
 
-export const findStudents = (searchStr) => {
+export const findStudents = searchStr => {
   const route = `/students/?searchTerm=${searchStr}`
   const prefix = 'FIND_STUDENTS_'
   return callController(route, prefix, undefined, undefined, searchStr)
 }
 
-export const getStudent = (studentNumber) => {
+export const getStudent = studentNumber => {
   const route = `/students/${studentNumber}`
   const prefix = 'GET_STUDENT_'
   return callController(route, prefix)
@@ -56,9 +56,10 @@ const reducer = (state = { data: [], pending: false, error: false, fetching: fal
         error: false,
         selected: state.selected,
         lastSearch: state.lastSearch,
-        data: state.lastSearch === action.query ?
-          [...state.data.filter(student => student.fetched), ...action.response] :
-          state.data
+        data:
+          state.lastSearch === action.query
+            ? [...state.data.filter(student => student.fetched), ...action.response]
+            : state.data
       }
     case 'GET_STUDENT_ATTEMPT':
       return {
@@ -81,9 +82,9 @@ const reducer = (state = { data: [], pending: false, error: false, fetching: fal
         fetching: false,
         selected: action.response.studentNumber,
         lastSearch: state.lastSearch,
-        data: [...state.data.filter(student =>
-          student.studentNumber !== action.response.studentNumber),
-        { ...action.response, ...{ fetched: true } }
+        data: [
+          ...state.data.filter(student => student.studentNumber !== action.response.studentNumber),
+          { ...action.response, ...{ fetched: true } }
         ]
       }
     case 'CLEAR_STUDENT_ERROR':

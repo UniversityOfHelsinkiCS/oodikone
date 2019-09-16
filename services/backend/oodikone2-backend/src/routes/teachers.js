@@ -44,7 +44,7 @@ router.get('/stats', async (req, res) => {
   if (!(providers.every(p => providerRights.includes(p)) || roles.includes('admin'))) {
     return res.status(403).send('You do not have rights to see this data')
   }
-  const result = await teachers.yearlyStatistics(providers, semesterStart, semesterEnd||semesterStart + 1)
+  const result = await teachers.yearlyStatistics(providers, semesterStart, semesterEnd || semesterStart + 1)
   res.json(result)
 })
 

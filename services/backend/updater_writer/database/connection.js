@@ -10,7 +10,6 @@ const sequelize = new Sequelize(conf.DB_URL, {
 })
 sequelize.query(`SET SESSION search_path to ${conf.DB_SCHEMA}`)
 
-
 const initializeDatabaseConnection = async () => {
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
   const waitSeconds = 60
@@ -37,10 +36,7 @@ const initializeDatabaseConnection = async () => {
         },
         logging: console.log,
         migrations: {
-          params: [
-            sequelize.getQueryInterface(),
-            Sequelize
-          ],
+          params: [sequelize.getQueryInterface(), Sequelize],
           path: `${process.cwd()}/database/migrations`,
           pattern: /\.js$/,
           schema: conf.DB_SCHEMA

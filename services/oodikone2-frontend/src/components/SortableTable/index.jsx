@@ -51,43 +51,58 @@ class SortableTable extends Component {
 
   verticalTitle = title => (
     // https://stackoverflow.com/a/41396815
-    <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>
-      {title}
-    </div>
+    <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>{title}</div>
   )
 
   render() {
     const { tableProps, getRowProps, columns, getRowKey, collapsingHeaders } = this.props
     const { selected, direction, collapsed } = this.state
-    const columnsWithCollapsedHeaders = collapsingHeaders ? [...columns.filter(c => (
-      c.headerProps && (!collapsed.map(cell => cell.headerProps.title).includes(c.headerProps.title) && !c.collapsed))),
-    ...this.state.collapsed].sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber)
-      :
-      columns
+    const columnsWithCollapsedHeaders = collapsingHeaders
+      ? [
+          ...columns.filter(
+            c =>
+              c.headerProps &&
+              (!collapsed.map(cell => cell.headerProps.title).includes(c.headerProps.title) && !c.collapsed)
+          ),
+          ...this.state.collapsed
+        ].sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber)
+      : columns
     const sortDirection = name => (selected === name ? direction : null)
 
     return (
       <Table sortable {...tableProps} className="fixed-header">
         <Table.Header>
-          { columnsWithCollapsedHeaders.length > 0 &&
+          {columnsWithCollapsedHeaders.length > 0 && (
             <Table.Row>
-              {columnsWithCollapsedHeaders.filter(c => !c.child && !(c.title == null)).map(c => (
-                <Table.HeaderCell
-                  key={c.key}
-                  content={c.title}
-                  onClick={c.parent && collapsingHeaders && c.key !== 'general' ?
-                    this.handleCollapse({ title: this.verticalTitle(c.headerProps.title), headerProps: { ...c.headerProps, colSpan: 1, rowSpan: 2 }, key: c.key, collapsed: true, parent: c.parent }) :
-                    this.handleSort(c.key)}
-                  sorted={c.parent ? undefined : sortDirection(c.key)}
-                  {...c.headerProps}
-                />
-              ))
-              }
+              {columnsWithCollapsedHeaders
+                .filter(c => !c.child && !(c.title == null))
+                .map(c => (
+                  <Table.HeaderCell
+                    key={c.key}
+                    content={c.title}
+                    onClick={
+                      c.parent && collapsingHeaders && c.key !== 'general'
+                        ? this.handleCollapse({
+                            title: this.verticalTitle(c.headerProps.title),
+                            headerProps: { ...c.headerProps, colSpan: 1, rowSpan: 2 },
+                            key: c.key,
+                            collapsed: true,
+                            parent: c.parent
+                          })
+                        : this.handleSort(c.key)
+                    }
+                    sorted={c.parent ? undefined : sortDirection(c.key)}
+                    {...c.headerProps}
+                  />
+                ))}
             </Table.Row>
-          }
+          )}
           <Table.Row>
-            {columns.filter(c => c.child && !(c.title == null) && !collapsed.map(cell => cell.headerProps.title).includes(c.childOf)).map(c =>
-              (
+            {columns
+              .filter(
+                c => c.child && !(c.title == null) && !collapsed.map(cell => cell.headerProps.title).includes(c.childOf)
+              )
+              .map(c => (
                 <Table.HeaderCell
                   key={c.key}
                   content={c.title}
@@ -95,31 +110,30 @@ class SortableTable extends Component {
                   sorted={sortDirection(c.key)}
                   {...c.headerProps}
                 />
-              ))
-            }
+              ))}
           </Table.Row>
         </Table.Header>
         <Table.Body>
           {this.sortedRows().map(row => (
-            <Table.Row
-              key={getRowKey(row)}
-              {...getRowProps && getRowProps(row)}
-            >
-              {columns.filter(c => !c.parent).map((c) => {
-                if (collapsed.map(cell => cell.headerProps.title).includes(c.childOf)) {
-                  return null
-                }
-                return (
-                  <Table.Cell
-                    key={c.key}
-                    content={c.getRowContent ? c.getRowContent(row) : c.getRowVal(row)}
-                    {...c.cellProps}
-                    {...c.getCellProps && c.getCellProps(row)}
-                  />
-                )
-              })
-              }
-              {collapsed.map(e => <Table.Cell key={e.key} warning />)}
+            <Table.Row key={getRowKey(row)} {...(getRowProps && getRowProps(row))}>
+              {columns
+                .filter(c => !c.parent)
+                .map(c => {
+                  if (collapsed.map(cell => cell.headerProps.title).includes(c.childOf)) {
+                    return null
+                  }
+                  return (
+                    <Table.Cell
+                      key={c.key}
+                      content={c.getRowContent ? c.getRowContent(row) : c.getRowVal(row)}
+                      {...c.cellProps}
+                      {...(c.getCellProps && c.getCellProps(row))}
+                    />
+                  )
+                })}
+              {collapsed.map(e => (
+                <Table.Cell key={e.key} warning />
+              ))}
             </Table.Row>
           ))}
         </Table.Body>
@@ -132,17 +146,19 @@ SortableTable.propTypes = {
   tableProps: shape({}),
   getRowKey: func.isRequired,
   getRowProps: func,
-  columns: arrayOf(shape({
-    key: string.isRequired,
-    title: oneOfType([element, string]),
-    headerProps: shape({}),
-    getRowVal: func,
-    getRowContent: func,
-    getCellProps: func,
-    cellProps: shape({}),
-    group: bool,
-    children: arrayOf()
-  })).isRequired,
+  columns: arrayOf(
+    shape({
+      key: string.isRequired,
+      title: oneOfType([element, string]),
+      headerProps: shape({}),
+      getRowVal: func,
+      getRowContent: func,
+      getCellProps: func,
+      cellProps: shape({}),
+      group: bool,
+      children: arrayOf()
+    })
+  ).isRequired,
   data: arrayOf(shape({})).isRequired,
   defaultdescending: bool,
   defaultsortkey: string,

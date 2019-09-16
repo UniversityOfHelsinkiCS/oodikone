@@ -10,7 +10,9 @@ const CourseParticipationFilters = ({ filters }) => {
 
   return (
     <div>
-      {filters.map(f => <CourseParticipation key={f.id} filter={f} />)}
+      {filters.map(f => (
+        <CourseParticipation key={f.id} filter={f} />
+      ))}
     </div>
   )
 }

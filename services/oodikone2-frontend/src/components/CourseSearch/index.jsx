@@ -11,16 +11,15 @@ import './courseSearch.css'
 
 const { func, string, arrayOf, object } = PropTypes
 
-const CourseSearch = (props) => {
+const CourseSearch = props => {
   const [isLoading, setIsLoading] = useState(false)
   const [searchStr, setSearchStr] = useState('')
 
-  const fetchCoursesList = (str) => {
+  const fetchCoursesList = str => {
     const { activeLanguage } = props
     if (str.length >= 3) {
       setIsLoading(true)
-      props.findFunction(str, activeLanguage)
-        .then(() => setIsLoading(false))
+      props.findFunction(str, activeLanguage).then(() => setIsLoading(false))
     } else {
       props.findFunction('')
     }
@@ -29,9 +28,13 @@ const CourseSearch = (props) => {
   const handleSearchChange = (e, { value }) => {
     props.clearTimeout('search')
     setSearchStr(value)
-    props.setTimeout('search', () => {
-      fetchCoursesList(value)
-    }, 250)
+    props.setTimeout(
+      'search',
+      () => {
+        fetchCoursesList(value)
+      },
+      250
+    )
   }
 
   const selectCourse = (a, b) => {

@@ -13,8 +13,10 @@ const checkAuth = async (req, res, next) => {
   if (!token) return res.status(403).json({ error: 'No token in headers' })
   jwt.verify(token, conf.TOKEN_SECRET, async (err, decoded) => {
     if (err) return res.status(403).json(err)
-    if (decoded.version !== TOKEN_VERSION) return res.status(401).json({ error: 'Token needs to be refreshed - invalid version' })
-    if (decoded.mockedBy ? decoded.mockedBy !== uid : decoded.userId !== uid) return res.status(403).json({ error: 'User shibboleth id and token id did not match' })
+    if (decoded.version !== TOKEN_VERSION)
+      return res.status(401).json({ error: 'Token needs to be refreshed - invalid version' })
+    if (decoded.mockedBy ? decoded.mockedBy !== uid : decoded.userId !== uid)
+      return res.status(403).json({ error: 'User shibboleth id and token id did not match' })
     const userData = await getUserDataFor(decoded.userId)
     req.decodedToken = decoded
     Object.assign(req, userData)
@@ -30,7 +32,7 @@ const roles = requiredRoles => async (req, res, next) => {
       return
     }
   }
-  console.log(`Missing required roles ${ requiredRoles }`)
+  console.log(`Missing required roles ${requiredRoles}`)
   res.status(403).json({ error: 'missing required roles' })
 }
 
@@ -60,5 +62,8 @@ const checkUserBlacklisting = async (req, res, next) => {
 }
 
 module.exports = {
-  checkAuth, roles, checkRequiredGroup, checkUserBlacklisting
+  checkAuth,
+  roles,
+  checkRequiredGroup,
+  checkUserBlacklisting
 }
