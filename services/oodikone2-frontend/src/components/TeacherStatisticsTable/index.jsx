@@ -25,7 +25,7 @@ class TeacherStatisticsTable extends Component {
     }
   }
 
-  sortStatistics = (statistics) => {
+  sortStatistics = statistics => {
     const { selected, direction } = this.state
     const formatted = statistics.map(stat => ({
       ...stat,
@@ -35,12 +35,11 @@ class TeacherStatisticsTable extends Component {
     return direction === 'ascending' ? sorted : sorted.reverse()
   }
 
-  roundStatisticCredits = statistics => (
+  roundStatisticCredits = statistics =>
     statistics.map(s => ({
       ...s,
       credits: s.credits.toFixed(2)
     }))
-  )
 
   render() {
     const { statistics, onClickFn } = this.props
@@ -48,9 +47,9 @@ class TeacherStatisticsTable extends Component {
 
     const sortDirection = name => (selected === name ? direction : null)
 
-    return (statistics.length === 0 ?
+    return statistics.length === 0 ? (
       <Segment basic content="No statistics found for the given query." />
-      :
+    ) : (
       <Table structured celled textAlign="center" sortable selectable className="fixed-header">
         <Table.Header>
           <Table.Row>
@@ -78,28 +77,32 @@ class TeacherStatisticsTable extends Component {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {this.roundStatisticCredits(this.sortStatistics(statistics)).map(({ id, name, credits, passrate, transferred }) => (
-            <Table.Row key={id} onClick={() => onClickFn(id)} style={{ cursor: 'pointer' }} >
-              <Table.Cell content={name} textAlign="left" />
-              <Table.Cell content={credits} width={2} />
-              <Table.Cell content={transferred} width={2} />
-              <Table.Cell content={`${parseFloat(passrate).toFixed(2)} %`} width={2} />
-            </Table.Row>
-          ))}
+          {this.roundStatisticCredits(this.sortStatistics(statistics)).map(
+            ({ id, name, credits, passrate, transferred }) => (
+              <Table.Row key={id} onClick={() => onClickFn(id)} style={{ cursor: 'pointer' }}>
+                <Table.Cell content={name} textAlign="left" />
+                <Table.Cell content={credits} width={2} />
+                <Table.Cell content={transferred} width={2} />
+                <Table.Cell content={`${parseFloat(passrate).toFixed(2)} %`} width={2} />
+              </Table.Row>
+            )
+          )}
         </Table.Body>
       </Table>
     )
   }
 }
 TeacherStatisticsTable.propTypes = {
-  statistics: arrayOf(shape({
-    id: any,
-    name: string,
-    transferred: number,
-    credits: any,
-    failed: number,
-    passed: number
-  })).isRequired,
+  statistics: arrayOf(
+    shape({
+      id: any,
+      name: string,
+      transferred: number,
+      credits: any,
+      failed: number,
+      passed: number
+    })
+  ).isRequired,
   onClickFn: func.isRequired
 }
 

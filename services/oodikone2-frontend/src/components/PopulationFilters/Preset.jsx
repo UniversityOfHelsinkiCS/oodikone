@@ -16,7 +16,7 @@ class Preset extends Component {
 
   state = { open: false }
 
-  handleSetFilter = (filter) => {
+  handleSetFilter = filter => {
     this.props.filter.notSet = false
     this.props.setPopulationFilter(presetFilter(filter))
   }
@@ -38,14 +38,10 @@ class Preset extends Component {
             <Form.Group inline>
               <Form.Field>
                 <label>{filter.name}</label>
-                <em>
-                  {filter.description}
-                </em>
+                <em>{filter.description}</em>
               </Form.Field>
               <Form.Field>
-                <Button onClick={() => this.handleSetFilter(filter)}>
-                  set filter
-                </Button>
+                <Button onClick={() => this.handleSetFilter(filter)}>set filter</Button>
               </Form.Field>
             </Form.Group>
           </Form>
@@ -54,17 +50,13 @@ class Preset extends Component {
     }
 
     return (
-      <Segment >
+      <Segment>
         <Grid>
           <Grid.Column floated="left" width={12}>
             <Form>
               <Form.Field inline>
-                <label>
-                  {filter.name}
-                </label>
-                <em>
-                  {filter.description}
-                </em>
+                <label>{filter.name}</label>
+                <em>{filter.description}</em>
               </Form.Field>
             </Form>
           </Grid.Column>
@@ -72,16 +64,16 @@ class Preset extends Component {
             <Form style={{ float: 'right' }}>
               <Form.Group inline>
                 <Form.Field>
-                  <Icon
-                    name="trash"
-                    onClick={() => this.setState({ open: true })}
-                  />
+                  <Icon name="trash" onClick={() => this.setState({ open: true })} />
                   <Confirm
                     open={this.state.open}
                     cancelButton="Just remove from use"
                     confirmButton="Delete for good"
                     content="Are you sure you want to delete this filter?"
-                    onCancel={() => { this.setState({ open: false }); this.clearFilter() }}
+                    onCancel={() => {
+                      this.setState({ open: false })
+                      this.clearFilter()
+                    }}
                     onConfirm={() => {
                       this.clearFilter(true)
                       this.props.deletePopulationFilter(filter)
@@ -90,14 +82,14 @@ class Preset extends Component {
                     size="small"
                   />
                 </Form.Field>
-                <Form.Field >
+                <Form.Field>
                   <Icon name="remove" onClick={() => this.clearFilter(false)} />
                 </Form.Field>
               </Form.Group>
             </Form>
           </Grid.Column>
         </Grid>
-      </Segment >
+      </Segment>
     )
   }
 }

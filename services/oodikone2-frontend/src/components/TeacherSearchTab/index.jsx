@@ -6,11 +6,11 @@ import TeacherSearch from '../TeacherSearch'
 
 const TeacherSearchTab = ({ history }) => (
   <Fragment>
-    <Message header="Teacher search" content="Search for a teacher and click the search result to view their individual statistics from their entire career. " />
-    <TeacherSearch
-      onClick={teacher => (history.push(`/teachers/${teacher.id}`))}
-      icon="level up alternate"
+    <Message
+      header="Teacher search"
+      content="Search for a teacher and click the search result to view their individual statistics from their entire career. "
     />
+    <TeacherSearch onClick={teacher => history.push(`/teachers/${teacher.id}`)} icon="level up alternate" />
   </Fragment>
 )
 

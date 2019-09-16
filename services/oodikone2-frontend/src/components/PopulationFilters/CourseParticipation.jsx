@@ -26,25 +26,24 @@ class CourseParticipation extends Component {
     }
   }
 
-  renderFilterSegment = (type, text, active) =>
-    (
-      <Segment
-        inverted={active(type)}
-        secondary={active(type)}
-        onClick={this.selectField(type)}
-        style={{
-          width: 30,
-          height: 60,
-          fontSize: 13,
-          textAlign: 'center',
-          verticalAlign: 'middle',
-          lineHeight: 1,
-          paddingTop: 15
-        }}
-      >
-        {text}
-      </Segment>
-    )
+  renderFilterSegment = (type, text, active) => (
+    <Segment
+      inverted={active(type)}
+      secondary={active(type)}
+      onClick={this.selectField(type)}
+      style={{
+        width: 30,
+        height: 60,
+        fontSize: 13,
+        textAlign: 'center',
+        verticalAlign: 'middle',
+        lineHeight: 1,
+        paddingTop: 15
+      }}
+    >
+      {text}
+    </Segment>
+  )
 
   render() {
     const { filter, language } = this.props
@@ -54,30 +53,30 @@ class CourseParticipation extends Component {
     const { course, field } = filter.params
     const selectedField = field
 
-    const active = field2 =>
-      (selectedField === field2)
+    const active = field2 => selectedField === field2
 
     return (
       <div>
         <Segment.Group horizontal size="small">
           <Popup
             trigger={
-              <Segment
-                style={{ width: '30%', height: 40 }}
-              >
-                <em style={{ float: 'left',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  width: '80%'
-                }}
+              <Segment style={{ width: '30%', height: 40 }}>
+                <em
+                  style={{
+                    float: 'left',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    width: '80%'
+                  }}
                 >
                   {getTextIn(course.course.name, language)}
                 </em>
                 <span style={{ float: 'right' }}>
                   <Icon name="remove" onClick={this.clearFilter} />
                 </span>
-              </Segment>}
+              </Segment>
+            }
             content={getTextIn(course.course.name, language)}
           />
           {this.renderFilterSegment('all', 'all', active)}
@@ -97,6 +96,10 @@ const mapStateToProps = ({ localize }) => ({
   language: getActiveLanguage(localize).code
 })
 
-export default connect(mapStateToProps, {
-  removePopulationFilter, alterPopulationCourseFilter
-})(CourseParticipation)
+export default connect(
+  mapStateToProps,
+  {
+    removePopulationFilter,
+    alterPopulationCourseFilter
+  }
+)(CourseParticipation)

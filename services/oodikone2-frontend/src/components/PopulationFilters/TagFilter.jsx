@@ -44,9 +44,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
     return (
       <Segment>
         <Form>
-          <Popup
-            trigger={<Icon style={{ float: 'right' }} name="info" />}
-          />
+          <Popup trigger={<Icon style={{ float: 'right' }} name="info" />} />
           <Form.Group inline>
             <Form.Field>
               <label>Select students that </label>
@@ -54,7 +52,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
             <Form.Field>
               <Dropdown
                 placeholder="select"
-                options={[{ key: 1, text: 'have', value: true }, { key: 2, text: 'don\'t have', value: false }]}
+                options={[{ key: 1, text: 'have', value: true }, { key: 2, text: "don't have", value: false }]}
                 onChange={handleCompChange}
                 selectOnBlur={false}
                 selectOnNavigation={false}
@@ -73,10 +71,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
               />
             </Form.Field>
             <Form.Field>
-              <Button
-                onClick={handleFilter}
-                disabled={!selectedTag || !selectedComp}
-              >
+              <Button onClick={handleFilter} disabled={!selectedTag || !selectedComp}>
                 set filter
               </Button>
             </Form.Field>
@@ -87,7 +82,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
   }
   return (
     <Segment>
-      Students that {filter.params.comp ? 'have' : 'don\'t have'} a tag {filter.params.text}
+      Students that {filter.params.comp ? 'have' : "don't have"} a tag {filter.params.text}
       <span style={{ float: 'right' }}>
         <Icon name="remove" onClick={clearFilter} />
       </span>

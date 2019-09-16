@@ -17,28 +17,26 @@ const ACADEMIC_YEAR_START_SEMESTER = 111 // academic year 2005-06
 
 const COURSE_GROUP_STATISTICS_KEY = (programmeId, semesterCode) =>
   `course_group_statistics_${programmeId}_${semesterCode}`
-const TEACHER_COURSES_KEY = (teacherId, semesterCode) =>
-  `course_group_courses_${teacherId}_${semesterCode}`
+const TEACHER_COURSES_KEY = (teacherId, semesterCode) => `course_group_courses_${teacherId}_${semesterCode}`
 const REDIS_CACHE_TTL = 12 * 60 * 60
 
-const getAcademicYears = async () =>
-  getAcademicYearsFrom(ACADEMIC_YEAR_START_SEMESTER)
+const getAcademicYears = async () => getAcademicYearsFrom(ACADEMIC_YEAR_START_SEMESTER)
 
 const getCurrentAcademicYearSemesterCode = async () => {
   const academicYear = await getCurrentAcademicYear()
   return academicYear[0].semestercode
 }
 
-const getTeachersForCourseGroup = async (courseGroupId) => {
+const getTeachersForCourseGroup = async courseGroupId => {
   const courseGroups = await CourseGroup.findAll({
     model: CourseGroup,
     include: {
       model: TeacherCourseGroup,
-      required: true,
+      required: true
     },
     where: {
       id: courseGroupId
-    },
+    }
   })
   const teacherIds = flatMap(courseGroups, e => e.teacher_course_groups.map(tcg => tcg.teacher_id))
   const teachers = await Teacher.findAll({
@@ -47,12 +45,12 @@ const getTeachersForCourseGroup = async (courseGroupId) => {
       id: {
         [Op.in]: teacherIds
       }
-    },
+    }
   })
   return teachers
 }
 
-const createCourseGroup = (name) => CourseGroup.create({ name })
+const createCourseGroup = name => CourseGroup.create({ name })
 
 const getCourseGroupsWithTotals = async (programmeId, semesterCode, forceRefresh = false) => {
   if (!forceRefresh) {
@@ -61,20 +59,20 @@ const getCourseGroupsWithTotals = async (programmeId, semesterCode, forceRefresh
       return JSON.parse(cachedStats)
     }
   }
-  const startSemester = semesterCode || await getCurrentAcademicYearSemesterCode()
+  const startSemester = semesterCode || (await getCurrentAcademicYearSemesterCode())
   const result = await getAcademicYearStatisticsForStudyProgramme(programmeId, startSemester)
 
   await redisClient.setAsync(
     COURSE_GROUP_STATISTICS_KEY(programmeId, semesterCode),
     JSON.stringify(result),
     'EX',
-    6*4*7*24*60*60 // 6 months in seconds
+    6 * 4 * 7 * 24 * 60 * 60 // 6 months in seconds
   )
   return result
 }
 
 const getCourseGroup = async (courseGroupId, semesterCode) => {
-  const startSemester = semesterCode || await getCurrentAcademicYearSemesterCode()
+  const startSemester = semesterCode || (await getCurrentAcademicYearSemesterCode())
   const teacherBasicInfo = await getTeachersForCourseGroup(courseGroupId)
   const courseGroup = await CourseGroup.findByPk(courseGroupId)
 
@@ -99,23 +97,21 @@ const getCourseGroup = async (courseGroupId, semesterCode) => {
 
   const { credits, students, courses } = statistics[0]
 
-  const mergedTeachers = [...teacherBasicInfo.map(e => e.get()), ...teacherStats]
-    .reduce((acc, cur) => {
-      if (acc[cur.id]) {
-        acc[cur.id] = { ...cur, ...acc[cur.id] }
-      } else {
-        acc[cur.id] = cur
-      }
-      return acc
-    }, {})
+  const mergedTeachers = [...teacherBasicInfo.map(e => e.get()), ...teacherStats].reduce((acc, cur) => {
+    if (acc[cur.id]) {
+      acc[cur.id] = { ...cur, ...acc[cur.id] }
+    } else {
+      acc[cur.id] = cur
+    }
+    return acc
+  }, {})
 
-  const teachers = Object.values(mergedTeachers)
-    .map(t => ({
-      ...t,
-      courses: t.courses ? Number(t.courses) : 0,
-      credits: t.credits ? Number(t.credits) : 0,
-      students: t.students ? Number(t.students) : 0
-    }))
+  const teachers = Object.values(mergedTeachers).map(t => ({
+    ...t,
+    courses: t.courses ? Number(t.courses) : 0,
+    credits: t.credits ? Number(t.credits) : 0,
+    students: t.students ? Number(t.students) : 0
+  }))
 
   const courseGroupInfo = {
     id: courseGroupId,
@@ -131,7 +127,7 @@ const getCourseGroup = async (courseGroupId, semesterCode) => {
 }
 
 const getCoursesByTeachers = async (teacherIds, semesterCode) => {
-  const startSemester = semesterCode || await getCurrentAcademicYearSemesterCode()
+  const startSemester = semesterCode || (await getCurrentAcademicYearSemesterCode())
   const cacheKey = TEACHER_COURSES_KEY(teacherIds, startSemester)
   const cachedData = await redisClient.getAsync(cacheKey)
 
@@ -142,7 +138,7 @@ const getCoursesByTeachers = async (teacherIds, semesterCode) => {
   const courses = await getAcademicYearCoursesByTeacherIds(teacherIds, startSemester)
 
   // Sequelize returns credis sums as string
-  courses.forEach((course) => {
+  courses.forEach(course => {
     course.credits = Number(course.credits)
     course.students = Number(course.students)
   })

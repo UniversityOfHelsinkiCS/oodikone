@@ -14,13 +14,14 @@ import YearFilter from '../SearchForm/YearFilter'
 import { getTextIn } from '../../../common'
 import { getSemesters } from '../../../redux/semesters'
 
-const countFilteredStudents = (stat, filter) => Object.entries(stat).reduce((acc, entry) => {
-  const [category, students] = entry
-  return {
-    ...acc,
-    [category]: students.filter(filter).length
-  }
-}, {})
+const countFilteredStudents = (stat, filter) =>
+  Object.entries(stat).reduce((acc, entry) => {
+    const [category, students] = entry
+    return {
+      ...acc,
+      [category]: students.filter(filter).length
+    }
+  }, {})
 
 class SingleCourseStats extends Component {
   constructor(props) {
@@ -40,7 +41,14 @@ class SingleCourseStats extends Component {
   }
 
   componentWillMount = () => {
-    const { setSelectedCourse, location, stats: { coursecode }, getSemesters, years, semesters } = this.props
+    const {
+      setSelectedCourse,
+      location,
+      stats: { coursecode },
+      getSemesters,
+      years,
+      semesters
+    } = this.props
     if (years.length === 0 || semesters.length === 0) getSemesters()
     if (location.search) {
       const params = this.parseQueryFromUrl()
@@ -49,11 +57,12 @@ class SingleCourseStats extends Component {
     setSelectedCourse(coursecode)
   }
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = prevProps => {
     const { primary } = this.state
     if (this.props.programmes.length !== prevProps.programmes.length) {
       if (primary.every(c => !this.props.programmes.map(p => p.key).includes(c))) {
-        this.setState({ // eslint-disable-line
+        // eslint-disable-next-line react/no-did-update-set-state
+        this.setState({
           primary: [ALL.value]
         })
       }
@@ -65,10 +74,11 @@ class SingleCourseStats extends Component {
     clearSelectedCourse()
   }
 
-  getProgrammeName = (progcode) => {
+  getProgrammeName = progcode => {
     if (progcode === ALL.value) {
       return 'All'
-    } else if (progcode === 'EXCLUDED') {
+    }
+    if (progcode === 'EXCLUDED') {
       return 'Excluded'
     }
     const { activeLanguage } = this.props
@@ -76,27 +86,23 @@ class SingleCourseStats extends Component {
     return getTextIn(name, activeLanguage)
   }
 
-  setExcludedToComparison = () => this.setState({
-    comparison: this.state.primary.includes(ALL.value) ?
-      [] :
-      ['EXCLUDED']
-  })
+  setExcludedToComparison = () =>
+    this.setState({
+      // eslint-disable-next-line react/no-access-state-in-setstate
+      comparison: this.state.primary.includes(ALL.value) ? [] : ['EXCLUDED']
+    })
 
-  getExcluded = () => (
-    this.state.primary.includes(ALL.value) ?
-      [] :
-      difference(
-        this.props.programmes.map(p => p.value).filter(v => v !== ALL.value),
-        this.state.primary
-      )
-  )
+  getExcluded = () =>
+    this.state.primary.includes(ALL.value)
+      ? []
+      : difference(this.props.programmes.map(p => p.value).filter(v => v !== ALL.value), this.state.primary)
 
-  belongsToAtLeastOneProgramme = (codes) => {
+  belongsToAtLeastOneProgramme = codes => {
     if (codes.includes(ALL.value)) return () => true
 
     const { programmes } = this.props.stats
     const studentNumbers = []
-    codes.forEach((code) => {
+    codes.forEach(code => {
       if (programmes[code]) {
         studentNumbers.push(...flatten(Object.values(programmes[code].students)))
       }
@@ -106,9 +112,9 @@ class SingleCourseStats extends Component {
     return studentnumber => numberset.has(studentnumber)
   }
 
-  validProgCode = (code) => {
+  validProgCode = code => {
     const { programmes } = this.props.stats
-    return programmes[code] || (code === ALL.value || (code === 'EXCLUDED'))
+    return programmes[code] || (code === ALL.value || code === 'EXCLUDED')
   }
 
   filteredYearsAndSemesters = () => {
@@ -135,25 +141,27 @@ class SingleCourseStats extends Component {
     const timeFilter = ({ value }) => value >= fromYear && value <= toYear
     const filteredSemesters = semesters.filter(timeFilter)
     const filteredYears = years.filter(timeFilter)
-    return separate ?
-      filteredSemesters.find(year => year.texts.includes(name)) :
-      filteredYears.find(year => year.text === name)
+    return separate
+      ? filteredSemesters.find(year => year.texts.includes(name))
+      : filteredYears.find(year => year.text === name)
   }
 
   statsForProgrammes = (progCodes, name) => {
     const { statistics } = this.props.stats
     const filter = this.belongsToAtLeastOneProgramme(progCodes)
-    const progStats = statistics.filter(this.isStatInYearRange).map(({ code, name, students: allstudents, attempts, coursecode }) => {
-      const cumulative = {
-        grades: countFilteredStudents(attempts.grades, filter),
-        categories: countFilteredStudents(attempts.classes, filter)
-      }
-      const students = {
-        grades: countFilteredStudents(allstudents.grades, filter),
-        categories: countFilteredStudents(allstudents.classes, filter)
-      }
-      return { code, name, cumulative, students, coursecode }
-    })
+    const progStats = statistics
+      .filter(this.isStatInYearRange)
+      .map(({ code, name, students: allstudents, attempts, coursecode }) => {
+        const cumulative = {
+          grades: countFilteredStudents(attempts.grades, filter),
+          categories: countFilteredStudents(attempts.classes, filter)
+        }
+        const students = {
+          grades: countFilteredStudents(allstudents.grades, filter),
+          categories: countFilteredStudents(allstudents.classes, filter)
+        }
+        return { code, name, cumulative, students, coursecode }
+      })
     return {
       codes: progCodes,
       name,
@@ -165,10 +173,16 @@ class SingleCourseStats extends Component {
     let selected = [...value].filter(v => v !== ALL.value)
 
     if (name === 'primary') {
-      this.setState({ comparison: this.state.comparison.filter(p => p !== 'EXCLUDED') })
+      this.setState({
+        // eslint-disable-next-line react/no-access-state-in-setstate
+        comparison: this.state.comparison.filter(p => p !== 'EXCLUDED')
+      })
     }
 
-    if ((!this.state[name].includes(ALL.value) && value.includes(ALL.value)) || (name === 'primary' && value.length === 0)) {
+    if (
+      (!this.state[name].includes(ALL.value) && value.includes(ALL.value)) ||
+      (name === 'primary' && value.length === 0)
+    ) {
       selected = [ALL.value]
     }
 
@@ -194,14 +208,18 @@ class SingleCourseStats extends Component {
     const comparisonProgrammes = comparison.filter(filter)
     if (comparison.includes('EXCLUDED')) comparisonProgrammes.push(...excludedProgrammes)
 
-    const pstats = primaryProgrammes.length ? this.statsForProgrammes(
-      primaryProgrammes,
-      primaryProgrammes.length === 1 ? this.getProgrammeName(primaryProgrammes[0]) : 'Primary'
-    ) : undefined
-    const cstats = comparisonProgrammes.length ? this.statsForProgrammes(
-      comparisonProgrammes,
-      comparisonProgrammes.length === 1 ? this.getProgrammeName(comparisonProgrammes[0]) : 'Comparison'
-    ) : undefined
+    const pstats = primaryProgrammes.length
+      ? this.statsForProgrammes(
+          primaryProgrammes,
+          primaryProgrammes.length === 1 ? this.getProgrammeName(primaryProgrammes[0]) : 'Primary'
+        )
+      : undefined
+    const cstats = comparisonProgrammes.length
+      ? this.statsForProgrammes(
+          comparisonProgrammes,
+          comparisonProgrammes.length === 1 ? this.getProgrammeName(comparisonProgrammes[0]) : 'Comparison'
+        )
+      : undefined
 
     return {
       primary: pstats || undefined,
@@ -219,7 +237,7 @@ class SingleCourseStats extends Component {
 
   clearComparison = () => this.setState({ comparison: [] })
 
-  comparisonProgrammes = (programmes) => {
+  comparisonProgrammes = programmes => {
     const { primary, comparison } = this.state
     const result = programmes.filter(({ key }) => key !== 'EXCLUDED')
     const excludedProgrammes = this.getExcluded()
@@ -246,10 +264,12 @@ class SingleCourseStats extends Component {
     const { filteredYears } = this.filteredYearsAndSemesters()
 
     const timeFilter = (_, value) => value >= fromYear && value <= toYear
-    const filteredProgrammes = programmes.map((e) => {
-      const students = new Set(flatten(Object.values(pickBy(e.students, timeFilter))))
-      return { ...e, students: [...students], size: students.size }
-    }).filter(e => e.size > 0)
+    const filteredProgrammes = programmes
+      .map(e => {
+        const students = new Set(flatten(Object.values(pickBy(e.students, timeFilter))))
+        return { ...e, students: [...students], size: students.size }
+      })
+      .filter(e => e.size > 0)
 
     return (
       <div>
@@ -296,19 +316,13 @@ class SingleCourseStats extends Component {
                     onClick={this.setExcludedToComparison}
                     disabled={primary.length === 1 && primary[0] === ALL.value}
                   />
-                  <Form.Button
-                    content="Clear"
-                    onClick={this.clearComparison}
-                  />
+                  <Form.Button content="Clear" onClick={this.clearComparison} />
                 </Form.Group>
               </Grid.Column>
             </Grid>
           </Form>
         </Segment>
-        <ResultTabs
-          primary={statistics.primary}
-          comparison={statistics.comparison}
-        />
+        <ResultTabs primary={statistics.primary} comparison={statistics.comparison} />
       </div>
     )
   }
@@ -317,18 +331,24 @@ class SingleCourseStats extends Component {
 SingleCourseStats.propTypes = {
   stats: shape({
     alternatives: arrayOf(string),
-    programmes: objectOf(shape({
-      name: shape({}),
-      students: shape({})
-    })),
-    statistics: arrayOf(shape({
-      code: oneOfType([number, string]),
-      name: string,
-      attempts: objectOf(shape({
-        failed: arrayOf(string),
-        passed: arrayOf(string)
-      }))
-    })),
+    programmes: objectOf(
+      shape({
+        name: shape({}),
+        students: shape({})
+      })
+    ),
+    statistics: arrayOf(
+      shape({
+        code: oneOfType([number, string]),
+        name: string,
+        attempts: objectOf(
+          shape({
+            failed: arrayOf(string),
+            passed: arrayOf(string)
+          })
+        )
+      })
+    ),
     name: string,
     coursecode: string
   }).isRequired,
@@ -342,20 +362,24 @@ SingleCourseStats.propTypes = {
   getSemesters: func.isRequired
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const { semesters = [], years = [] } = state.semesters.data
   return {
     programmes: selectors.getAllStudyProgrammes(state),
-    years: Object.values(years).map(({ yearcode, yearname }) => ({
-      key: yearcode,
-      text: yearname,
-      value: yearcode
-    })).reverse(),
-    semesters: Object.values(semesters).map(({ semestercode, name, yearcode }) => ({
-      key: semestercode,
-      texts: Object.values(name),
-      value: yearcode
-    })).reverse(),
+    years: Object.values(years)
+      .map(({ yearcode, yearname }) => ({
+        key: yearcode,
+        text: yearname,
+        value: yearcode
+      }))
+      .reverse(),
+    semesters: Object.values(semesters)
+      .map(({ semestercode, name, yearcode }) => ({
+        key: semestercode,
+        texts: Object.values(name),
+        value: yearcode
+      }))
+      .reverse(),
     activeLanguage: getActiveLanguage(state.localize).code
   }
 }
@@ -366,4 +390,9 @@ const mapDispatchToProps = {
   getSemesters
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SingleCourseStats))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(SingleCourseStats)
+)

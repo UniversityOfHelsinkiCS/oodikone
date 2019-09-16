@@ -9,7 +9,7 @@ const createStudyright = apiData => Studyright.create(apiData)
 
 const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS'
 
-const byStudent = (studentNumber) => {
+const byStudent = studentNumber => {
   return Studyright.findAll({
     where: {
       student_studentnumber: {
@@ -19,8 +19,7 @@ const byStudent = (studentNumber) => {
   })
 }
 
-const ofPopulations = (conf) => {
-
+const ofPopulations = conf => {
   const studyrightRules = conf.units.map(sr => ({ [Op.eq]: sr.name }))
 
   return Studyright.findAll({
@@ -49,15 +48,10 @@ const studentNumbersWithAllStudyRightElements = async (codes, startedAfter, star
         [Op.between]: [startedAfter, startedBefore]
       }
     },
-    group:[
-      col('studentnumber')
-    ],
-    having: where(
-      fn('count', fn('distinct', col('code'))),
-      {
-        [Op.eq]: codes.length
-      }
-    ),
+    group: [col('studentnumber')],
+    having: where(fn('count', fn('distinct', col('code'))), {
+      [Op.eq]: codes.length
+    })
   })
   return studyrights.map(srelement => srelement.studentnumber)
 }
@@ -81,7 +75,9 @@ const associationArraysToMapping = associations => {
   return removeDuplicatesFromValues(mapping)
 }
 
-const uniqueStudyrightCodeArrays = elementcodes => sequelize.query(`
+const uniqueStudyrightCodeArrays = elementcodes =>
+  sequelize.query(
+    `
   SELECT
     DISTINCT(array_agg(studyright_elements.code)) AS associations
   FROM
@@ -98,12 +94,15 @@ const uniqueStudyrightCodeArrays = elementcodes => sequelize.query(`
     studyright_elements.studyrightid
   ;
 `,
-{
-  type: sequelize.QueryTypes.SELECT,
-  replacements: { elementcodes }
-})
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: { elementcodes }
+    }
+  )
 
-const allUniqueStudyrightCodeArrays = () => sequelize.query(`
+const allUniqueStudyrightCodeArrays = () =>
+  sequelize.query(
+    `
   SELECT
     DISTINCT(array_agg(studyright_elements.code)) AS associations
   FROM
@@ -118,9 +117,10 @@ const allUniqueStudyrightCodeArrays = () => sequelize.query(`
     studyright_elements.studyrightid
   ;
 `,
-{
-  type: sequelize.QueryTypes.SELECT
-})
+    {
+      type: sequelize.QueryTypes.SELECT
+    }
+  )
 
 const uniqueStudyrightAssocations = elementcodes => {
   if (elementcodes === undefined) {
@@ -135,21 +135,23 @@ const getAssociatedStudyrights = async elementcodes => {
   return associationArraysToMapping(codesByStudyrights)
 }
 
-const formatStudyrightElements = (elements, associations) => elements.map(element => ({
-  id: element.code,
-  name: element.name,
-  enabled: true,
-  type: element.type,
-  associations: associations && associations[element.code]
-}))
+const formatStudyrightElements = (elements, associations) =>
+  elements.map(element => ({
+    id: element.code,
+    name: element.name,
+    enabled: true,
+    type: element.type,
+    associations: associations && associations[element.code]
+  }))
 
 const getAllStudyrightElementsAndAssociations = async () => {
   let studyrightElements = await redisClient.getAsync('studyrightElements')
   if (!studyrightElements) {
-    const [ associations, studyrightelements ] = await Promise.all([ getAssociatedStudyrights(),
-      ElementDetails.findAll() ])
-    await redisClient.setAsync('studyrightElements', JSON.stringify(formatStudyrightElements(studyrightelements,
-      associations)))
+    const [associations, studyrightelements] = await Promise.all([getAssociatedStudyrights(), ElementDetails.findAll()])
+    await redisClient.setAsync(
+      'studyrightElements',
+      JSON.stringify(formatStudyrightElements(studyrightelements, associations))
+    )
     studyrightElements = await redisClient.getAsync('studyrightElements')
   }
   return JSON.parse(studyrightElements)
@@ -165,7 +167,6 @@ const getStudyrightElementsAndAssociationsForUser = async username => {
 }
 
 const getAllDegreesAndProgrammes = async () => {
-
   const elementDetails = ElementDetails.findAll({
     where: {
       type: {
@@ -200,8 +201,8 @@ const associatedStudyrightElements = async (offset, limit) => {
       attributes: ['studyrightid', 'startdate', 'enddate'],
       include: {
         model: ElementDetails,
-        attributes: ['type', 'name', 'code'],
-      },
+        attributes: ['type', 'name', 'code']
+      }
     },
     limit,
     offset
@@ -217,7 +218,7 @@ const associatedStudyrightElements = async (offset, limit) => {
   return groupings
 }
 
-const calculateAssociationsFromDb = async (chunksize=100000) => {
+const calculateAssociationsFromDb = async (chunksize = 100000) => {
   const getSemester = momentstartdate => {
     if (momentstartdate < moment(`${momentstartdate.utc().year()}-07-31 21:00:00+00`)) return 'SPRING'
     return 'FALL'
@@ -230,52 +231,64 @@ const calculateAssociationsFromDb = async (chunksize=100000) => {
   let offset = 0
   const types = new Set([10, 20, 30]) // degree, programme, studytrack
   const isValid = ({ type }) => types.has(type)
-  const associations = { programmes: {},  degrees: {},  studyTracks: {}}
-  while(offset <= total) {
+  const associations = { programmes: {}, degrees: {}, studyTracks: {} }
+  while (offset <= total) {
     console.log(`${offset}/${total}`)
     const elementgroups = await associatedStudyrightElements(offset, chunksize)
-    elementgroups
-      .forEach(fullgroup => {
-        const group = fullgroup.filter(isValid)
-        group.forEach(({ type, code, name, studyrightid, startdate, enddate }) => {
-          if (type === 10) {
-            associations.degrees[code] = associations.degrees[code] || {
-              type, name, code, programmes: {}
-            }
+    elementgroups.forEach(fullgroup => {
+      const group = fullgroup.filter(isValid)
+      group.forEach(({ type, code, name, studyrightid, startdate, enddate }) => {
+        if (type === 10) {
+          associations.degrees[code] = associations.degrees[code] || {
+            type,
+            name,
+            code,
+            programmes: {}
           }
-          if (type === 30) {
-            associations.studyTracks[code] = associations.studyTracks[code] || {
-              type, name, code, programmes: {}
-            }
+        }
+        if (type === 30) {
+          associations.studyTracks[code] = associations.studyTracks[code] || {
+            type,
+            name,
+            code,
+            programmes: {}
           }
-          if (type === 20) {
-            associations.programmes[code] = associations.programmes[code] || {
-              type: type,
-              name: name,
-              code: code,
-              enrollmentStartYears: {}
-            }
-            const momentstartdate = moment(startdate)
-            const enrollment = getEnrollmentStartYear(momentstartdate)
-            const enrollmentStartYears = associations.programmes[code].enrollmentStartYears
-            enrollmentStartYears[enrollment] = enrollmentStartYears[enrollment] || {
-              degrees: {},
-              studyTracks: {}
-            }
-            const enrollmentStartYear = enrollmentStartYears[enrollment]
+        }
+        if (type === 20) {
+          associations.programmes[code] = associations.programmes[code] || {
+            type: type,
+            name: name,
+            code: code,
+            enrollmentStartYears: {}
+          }
+          const momentstartdate = moment(startdate)
+          const enrollment = getEnrollmentStartYear(momentstartdate)
+          const enrollmentStartYears = associations.programmes[code].enrollmentStartYears
+          enrollmentStartYears[enrollment] = enrollmentStartYears[enrollment] || {
+            degrees: {},
+            studyTracks: {}
+          }
+          const enrollmentStartYear = enrollmentStartYears[enrollment]
 
-            group.filter(e => e.studyrightid === studyrightid && e.code !== code).forEach(e => {
+          group
+            .filter(e => e.studyrightid === studyrightid && e.code !== code)
+            .forEach(e => {
               if (e.type == 10) {
                 enrollmentStartYear.degrees[e.code] = {
-                  type: e.type, name: e.name, code: e.code
+                  type: e.type,
+                  name: e.name,
+                  code: e.code
                 }
                 associations.degrees[e.code] = associations.degrees[e.code] || {
-                  type: e.type, name: e.name, code: e.code, programmes: {}
+                  type: e.type,
+                  name: e.name,
+                  code: e.code,
+                  programmes: {}
                 }
                 associations.degrees[e.code].programmes[code] = {
                   type: type,
                   name: name,
-                  code: code,
+                  code: code
                 }
               }
               if (e.type == 30) {
@@ -283,27 +296,34 @@ const calculateAssociationsFromDb = async (chunksize=100000) => {
                 const estartdate = moment(e.startdate)
                 const eenddate = moment(e.enddate)
                 // check that programme and studytrack time ranges overlap
-                if ((momentstartdate <= estartdate && momentenddate >= estartdate) ||
-                    (momentstartdate <= eenddate && momentenddate >= eenddate) ||
-                    (estartdate <= momentstartdate && eenddate >= momentstartdate) ||
-                    (estartdate <= momentenddate && eenddate >= momentenddate)) {
+                if (
+                  (momentstartdate <= estartdate && momentenddate >= estartdate) ||
+                  (momentstartdate <= eenddate && momentenddate >= eenddate) ||
+                  (estartdate <= momentstartdate && eenddate >= momentstartdate) ||
+                  (estartdate <= momentenddate && eenddate >= momentenddate)
+                ) {
                   enrollmentStartYear.studyTracks[e.code] = {
-                    type: e.type, name: e.name, code: e.code
+                    type: e.type,
+                    name: e.name,
+                    code: e.code
                   }
                 }
                 associations.studyTracks[e.code] = associations.studyTracks[e.code] || {
-                  type: e.type, name: e.name, code: e.code, programmes: {}
+                  type: e.type,
+                  name: e.name,
+                  code: e.code,
+                  programmes: {}
                 }
                 associations.studyTracks[e.code].programmes[code] = {
                   type: type,
                   name: name,
-                  code: code,
+                  code: code
                 }
               }
             })
-          }
-        })
+        }
       })
+    })
     offset += chunksize
   }
   return associations
@@ -323,7 +343,7 @@ const refreshAssociationsInRedis = async () => {
   await saveAssociationsToRedis(associations)
 }
 
-const getAssociations = async (doRefresh=false) => {
+const getAssociations = async (doRefresh = false) => {
   const studyrights = await getAssociationsFromRedis()
   if (!studyrights || doRefresh) {
     const associations = await calculateAssociationsFromDb()
@@ -334,7 +354,7 @@ const getAssociations = async (doRefresh=false) => {
   }
 }
 
-const getFilteredAssociations = async (codes) => {
+const getFilteredAssociations = async codes => {
   console.log(codes)
   const associations = await getAssociations()
   associations.programmes = _.pick(associations.programmes, codes)
@@ -359,12 +379,11 @@ const getFilteredAssociations = async (codes) => {
   return associations
 }
 
-const getUserAssociations = async (userid) => {
+const getUserAssociations = async userid => {
   const codes = await getUserElementDetails(userid)
   const associations = await getFilteredAssociations(codes)
   return associations
 }
-
 
 module.exports = {
   byStudent,

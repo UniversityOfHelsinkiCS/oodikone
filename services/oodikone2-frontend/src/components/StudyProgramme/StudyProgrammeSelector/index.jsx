@@ -49,7 +49,10 @@ class StudyProgrammeSelector extends Component {
       <SortableTable
         columns={headers}
         getRowKey={programme => programme.code}
-        getRowProps={programme => ({ onClick: () => this.props.handleSelect(programme.code), style: { cursor: 'pointer' } })}
+        getRowProps={programme => ({
+          onClick: () => this.props.handleSelect(programme.code),
+          style: { cursor: 'pointer' }
+        })}
         data={studyprogrammes}
       />
     )
@@ -66,4 +69,7 @@ const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
   }
 }
 
-export default connect(mapStateToProps, { getDegreesAndProgrammes })(StudyProgrammeSelector)
+export default connect(
+  mapStateToProps,
+  { getDegreesAndProgrammes }
+)(StudyProgrammeSelector)

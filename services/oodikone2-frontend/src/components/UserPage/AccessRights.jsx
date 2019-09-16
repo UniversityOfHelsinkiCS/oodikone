@@ -35,10 +35,12 @@ const AccessRights = ({ uid, programmes, pending, ...props }) => {
         placeholder="Select unit"
         options={programmes}
         value={programme}
-        onChange={(_, { value }) => setState({
-          ...state,
-          programme: value
-        })}
+        onChange={(_, { value }) =>
+          setState({
+            ...state,
+            programme: value
+          })
+        }
         fluid
         search={textAndDescriptionSearch}
         selection
@@ -47,14 +49,7 @@ const AccessRights = ({ uid, programmes, pending, ...props }) => {
         selectOnNavigation={false}
       />
       <Divider />
-      <Form.Button
-        disabled={!programme}
-        basic
-        fluid
-        positive
-        content="Save"
-        onClick={handleClick}
-      />
+      <Form.Button disabled={!programme} basic fluid positive content="Save" onClick={handleClick} />
     </Form>
   )
 }

@@ -60,4 +60,4 @@ const studyRightCodes = {
     code: '666mast'
   }
 }
-module.exports = {studyRightCodes}
+module.exports = { studyRightCodes }

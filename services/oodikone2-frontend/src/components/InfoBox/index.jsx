@@ -4,11 +4,7 @@ import { string } from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 
 const InfoBox = ({ content }) => (
-  <Popup
-    trigger={<Icon style={{ float: 'right' }} name="info" />}
-    wide="very"
-    position="left center"
-  >
+  <Popup trigger={<Icon style={{ float: 'right' }} name="info" />} wide="very" position="left center">
     <Popup.Content>
       <ReactMarkdown source={content} escapeHtml={false} />
     </Popup.Content>

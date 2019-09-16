@@ -16,7 +16,6 @@ const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
 })
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
 
-
 const initializeDatabaseConnection = async () => {
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
   const waitSeconds = 60
@@ -45,14 +44,11 @@ const initializeDatabaseConnection = async () => {
         },
         logging: console.log,
         migrations: {
-          params: [
-            sequelizeKone.getQueryInterface(),
-            Sequelize
-          ],
+          params: [sequelizeKone.getQueryInterface(), Sequelize],
           path: `${process.cwd()}/src/database/migrations_kone`,
           pattern: /\.js$/,
           schema: conf.DB_SCHEMA_KONE
-        },
+        }
       })
       const migrations = await migrator.up()
 

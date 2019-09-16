@@ -13,13 +13,19 @@ const CustomPopulationProgrammeDist = ({ samples, selectedStudents, setPopulatio
   useEffect(() => {
     const allProgrammes = {}
     const filteredSamples = samples.filter(student => selectedStudents.includes(student.studentNumber))
-    filteredSamples.forEach((student) => {
+    filteredSamples.forEach(student => {
       const studyprogrammes = []
-      student.studyrights.forEach((sr) => {
+      student.studyrights.forEach(sr => {
         const studyrightElements = sr.studyrightElements.filter(srE => srE.element_detail.type === 20)
         if (studyrightElements.length > 0) {
-          const newestStudyrightElement = studyrightElements.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
-          studyprogrammes.push({ name: sr.highlevelname, startdate: newestStudyrightElement.startdate, code: newestStudyrightElement.element_detail.code })
+          const newestStudyrightElement = studyrightElements.sort(
+            (a, b) => new Date(b.startdate) - new Date(a.startdate)
+          )[0]
+          studyprogrammes.push({
+            name: sr.highlevelname,
+            startdate: newestStudyrightElement.startdate,
+            code: newestStudyrightElement.element_detail.code
+          })
         }
       })
       const programme = studyprogrammes.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
@@ -32,23 +38,25 @@ const CustomPopulationProgrammeDist = ({ samples, selectedStudents, setPopulatio
         }
       }
     })
-    const rows = Object.keys(allProgrammes)
-      .map(code =>
-        [`${allProgrammes[code].programme.name}, ${code}`, allProgrammes[code].students.length, <Progress style={{ margin: '0px' }} percent={Math.round((allProgrammes[code].students.length / selectedStudents.length) * 100)} progress />])
+    const rows = Object.keys(allProgrammes).map(code => [
+      `${allProgrammes[code].programme.name}, ${code}`,
+      allProgrammes[code].students.length,
+      <Progress
+        style={{ margin: '0px' }}
+        percent={Math.round((allProgrammes[code].students.length / selectedStudents.length) * 100)}
+        progress
+      />
+    ])
     const sortedRows = rows.sort((a, b) => b[1] - a[1])
     setRows(sortedRows)
   }, [selectedStudents])
 
-  const setFilter = (row) => {
+  const setFilter = row => {
     const splitRow = row[0].split(', ')
     setPopulationFilterDispatch(programmeFilter({ programme: splitRow[1], programmeName: splitRow[0] }))
   }
 
-  const headers = [
-    'Programmes',
-    `Students (all=${selectedStudents.length})`,
-    'Percentage of population'
-  ]
+  const headers = ['Programmes', `Students (all=${selectedStudents.length})`, 'Percentage of population']
 
   return (
     <SearchResultTable
@@ -67,6 +75,9 @@ CustomPopulationProgrammeDist.propTypes = {
   setPopulationFilterDispatch: func.isRequired
 }
 
-export default connect(null, {
-  setPopulationFilterDispatch: setPopulationFilter
-})(CustomPopulationProgrammeDist)
+export default connect(
+  null,
+  {
+    setPopulationFilterDispatch: setPopulationFilter
+  }
+)(CustomPopulationProgrammeDist)

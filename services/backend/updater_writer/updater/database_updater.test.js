@@ -1,12 +1,26 @@
 const { updateStudent, updateMeta, updateAttainmentMeta } = require('./database_updater')
-const { Student, Credit, Course,
-  Organisation, CourseRealisationType,
-  Semester, CreditType, CourseType,
-  Discipline, CourseDisciplines, Teacher,
-  CreditTeacher, SemesterEnrollment,
-  Provider, CourseProvider, Studyright,
-  StudyrightExtent, ElementDetails,
-  StudyrightElement, Transfers } = require('../models/index')
+const {
+  Student,
+  Credit,
+  Course,
+  Organisation,
+  CourseRealisationType,
+  Semester,
+  CreditType,
+  CourseType,
+  Discipline,
+  CourseDisciplines,
+  Teacher,
+  CreditTeacher,
+  SemesterEnrollment,
+  Provider,
+  CourseProvider,
+  Studyright,
+  StudyrightExtent,
+  ElementDetails,
+  StudyrightElement,
+  Transfers
+} = require('../models/index')
 const { students } = require('./test_assets/test_students')
 const meta = require('./test_assets/meta')
 const { sequelize, forceSyncDatabase } = require('../database/connection')
@@ -32,21 +46,31 @@ describe('Updater works', () => {
     test('Organisations are written to database', async () => {
       const organizations = await Organisation.findAll()
       expect(organizations.length).toBe(17)
-      expect(organizations.find(_ => _.code === 'H50').name.find(n => n.langcode === 'fi').text).toBe('Matemaattis-luonnontieteellinen tiedekunta')
+      expect(organizations.find(_ => _.code === 'H50').name.find(n => n.langcode === 'fi').text).toBe(
+        'Matemaattis-luonnontieteellinen tiedekunta'
+      )
     })
 
     test('Course realisation types are written to database', async () => {
       const courseRealisationTypes = await CourseRealisationType.findAll()
       expect(courseRealisationTypes.length).toBe(18)
       expect(courseRealisationTypes.map(_ => _.realisationtypecode)).not.toContain(null)
-      expect(courseRealisationTypes.map(_ => _.name)[0]).toMatchObject({ en: expect.any(String), fi: expect.any(String), sv: expect.any(String) })
+      expect(courseRealisationTypes.map(_ => _.name)[0]).toMatchObject({
+        en: expect.any(String),
+        fi: expect.any(String),
+        sv: expect.any(String)
+      })
     })
 
     test('Semesters are written to database', async () => {
       const semesters = await Semester.findAll()
       expect(semesters.length).toBe(160)
       expect(semesters.map(_ => _.semestercode)).toEqual(expect.arrayContaining([...Array(160).keys()].map(_ => ++_)))
-      expect(semesters.map(_ => _.name)[0]).toMatchObject({ en: expect.any(String), fi: expect.any(String), sv: expect.any(String) })
+      expect(semesters.map(_ => _.name)[0]).toMatchObject({
+        en: expect.any(String),
+        fi: expect.any(String),
+        sv: expect.any(String)
+      })
       expect(semesters.map(_ => _.startdate)).not.toContain(null)
       expect(semesters.map(_ => _.enddate)).not.toContain(null)
       expect(semesters.map(_ => _.createdAt)).not.toContain(null)
@@ -59,38 +83,55 @@ describe('Updater works', () => {
       const creditTypes = await CreditType.findAll()
       expect(creditTypes.length).toBe(11)
       expect(creditTypes.map(_ => _.credittypecode)).toEqual(expect.arrayContaining([expect.any(Number)]))
-      expect(creditTypes.map(_ => _.name)[0]).toMatchObject({ en: expect.any(String), fi: expect.any(String), sv: expect.any(String) })
+      expect(creditTypes.map(_ => _.name)[0]).toMatchObject({
+        en: expect.any(String),
+        fi: expect.any(String),
+        sv: expect.any(String)
+      })
     })
 
     test('Course types are written to database', async () => {
       const courseTypes = await CourseType.findAll()
       expect(courseTypes.length).toBe(35)
       expect(courseTypes.map(_ => _.coursetypecode)).toEqual(expect.arrayContaining([expect.any(Number)]))
-      expect(courseTypes.map(_ => _.name)[0]).toMatchObject({ en: expect.any(String), fi: expect.any(String), sv: expect.any(String) })
+      expect(courseTypes.map(_ => _.name)[0]).toMatchObject({
+        en: expect.any(String),
+        fi: expect.any(String),
+        sv: expect.any(String)
+      })
     })
 
     test('Disciplines are written to database', async () => {
       const disciplines = await Discipline.findAll()
       expect(disciplines.length).toBe(430)
       expect(disciplines.map(_ => _.discipline_id)).toEqual(expect.arrayContaining([expect.any(String)]))
-      expect(disciplines.map(_ => _.name)[0]).toMatchObject({ fi: expect.any(String) })
+      expect(disciplines.map(_ => _.name)[0]).toMatchObject({
+        fi: expect.any(String)
+      })
     })
-
-
-
   })
   describe('Updater writes students the right way', () => {
-
     test('Student info is written to database', async () => {
       const students = await Student.findAll({
-        order: [
-          ['studentnumber', 'DESC']]
+        order: [['studentnumber', 'DESC']]
       })
       expect(students.length).toBe(3)
-      const { studentnumber, lastname, firstnames, abbreviatedname,
-        birthdate, communicationlanguage, creditcount,
-        dateofuniversityenrollment, city_fi, city_sv, gender_code,
-        gender_fi, createdAt, updatedAt } = students[0]
+      const {
+        studentnumber,
+        lastname,
+        firstnames,
+        abbreviatedname,
+        birthdate,
+        communicationlanguage,
+        creditcount,
+        dateofuniversityenrollment,
+        city_fi,
+        city_sv,
+        gender_code,
+        gender_fi,
+        createdAt,
+        updatedAt
+      } = students[0]
 
       expect(studentnumber).toBe('014441008')
       expect(lastname).toBe('Orttenvuori')
@@ -115,7 +156,17 @@ describe('Updater works', () => {
 
     test('Courses are written to database', async () => {
       const courses = await Course.findAll({ order: [['code', 'ASC']] })
-      const { code, name, latest_instance_date, is_study_module, startdate, enddate, max_attainment_date, min_attainment_date, coursetypecode } = courses[0]
+      const {
+        code,
+        name,
+        latest_instance_date,
+        is_study_module,
+        startdate,
+        enddate,
+        max_attainment_date,
+        min_attainment_date,
+        coursetypecode
+      } = courses[0]
 
       expect(courses.length).toBe(147)
       expect(code).toBe('00031')
@@ -138,7 +189,18 @@ describe('Updater works', () => {
 
     test('Credits are written to database', async () => {
       const allCredits = await Credit.findAll({ order: [['id', 'ASC']] })
-      const { id, grade, student_studentnumber, credits, ordering, attainment_date, isStudyModule, lastmodifieddate, course_code, credittypecode /*, semestercode*/ } = allCredits[0]
+      const {
+        id,
+        grade,
+        student_studentnumber,
+        credits,
+        ordering,
+        attainment_date,
+        isStudyModule,
+        lastmodifieddate,
+        course_code,
+        credittypecode /*, semestercode*/
+      } = allCredits[0]
 
       expect(allCredits.length).toBe(150)
       expect(id).toBe('2340421')
@@ -176,7 +238,9 @@ describe('Updater works', () => {
     })
 
     test('Semester enrollments are written to database', async () => {
-      const semesterEnrollments = await SemesterEnrollment.findAll({ order: [['semestercode', 'ASC']] })
+      const semesterEnrollments = await SemesterEnrollment.findAll({
+        order: [['semestercode', 'ASC']]
+      })
       const { id, enrollmenttype, enrollment_date, studentnumber, semestercode } = semesterEnrollments[0]
 
       expect(semesterEnrollments.length).toBe(28)
@@ -185,18 +249,22 @@ describe('Updater works', () => {
       expect(enrollment_date.toISOString()).toBe(new Date('2003-08-17 00:00:00+00').toISOString())
       expect(studentnumber).toBe('014272112')
       expect(semestercode).toBe(107)
-
     })
 
     test('Providers are written to database', async () => {
-      const providers = await Provider.findAll({ order: [['providercode', 'DESC']] })
+      const providers = await Provider.findAll({
+        order: [['providercode', 'DESC']]
+      })
       const { providercode, name } = providers[0]
 
       expect(providers.length).toBe(20)
       expect(providercode).toBe('H906')
-      expect(name).toMatchObject({ en: 'Language Centre', fi: 'Kielikeskus', sv: 'Språkcentrum' })
+      expect(name).toMatchObject({
+        en: 'Language Centre',
+        fi: 'Kielikeskus',
+        sv: 'Språkcentrum'
+      })
       expect(providers.map(_ => _.providercode)).not.toContain(null)
-
     })
     test('Course providers are written to database', async () => {
       const courseproviders = await CourseProvider.findAll()
@@ -210,7 +278,6 @@ describe('Updater works', () => {
       expect(courseDisciplines.length).toBe(40)
       expect(courseDisciplines.map(_ => _.discipline_id)).not.toContain(null)
       expect(courseDisciplines.map(_ => _.course_id)).not.toContain(null)
-
     })
 
     test('Study right extent are written to database', async () => {
@@ -219,14 +286,29 @@ describe('Updater works', () => {
 
       expect(studyrightextent.length).toBe(2)
       expect(extentcode).toBe(1)
-      expect(name.en).toBe('Bachelor\'s Degree')
+      expect(name.en).toBe("Bachelor's Degree")
       expect(createdAt).not.toBe(undefined)
       expect(updatedAt).not.toBe(undefined)
     })
 
     test('Study rights are written to database', async () => {
-      const studyrights = await Studyright.findAll({ order: [['studyrightid', 'DESC']] })
-      const { studyrightid/*, canceldate*/, cancelorganisation, enddate, givendate, graduated, highlevelname, prioritycode, startdate, studystartdate, organization_code, student_studentnumber, extentcode } = studyrights[0]
+      const studyrights = await Studyright.findAll({
+        order: [['studyrightid', 'DESC']]
+      })
+      const {
+        studyrightid /*, canceldate*/,
+        cancelorganisation,
+        enddate,
+        givendate,
+        graduated,
+        highlevelname,
+        prioritycode,
+        startdate,
+        studystartdate,
+        organization_code,
+        student_studentnumber,
+        extentcode
+      } = studyrights[0]
 
       expect(studyrights.length).toBe(4)
       expect(studyrightid).toBe('67628057')
@@ -241,11 +323,12 @@ describe('Updater works', () => {
       expect(organization_code).toBe('4325')
       expect(student_studentnumber).toBe('011120775')
       expect(extentcode).toBe(1)
-
     })
 
     test('element details are written to database', async () => {
-      const elementDetails = await ElementDetails.findAll({ order: [['code', 'DESC']] })
+      const elementDetails = await ElementDetails.findAll({
+        order: [['code', 'DESC']]
+      })
       const { code, name, type, createdAt, updatedAt } = elementDetails[0]
 
       expect(elementDetails.length).toBe(12)
@@ -257,9 +340,10 @@ describe('Updater works', () => {
     })
 
     test('study right elements are written to database', async () => {
-      const studyrightElements = await StudyrightElement.findAll({ order: ['startdate', 'enddate', 'studyrightid', 'code'] })
+      const studyrightElements = await StudyrightElement.findAll({
+        order: ['startdate', 'enddate', 'studyrightid', 'code']
+      })
       const { id, startdate, enddate, createdAt, updatedAt, studyrightid, code, studentnumber } = studyrightElements[0]
-
 
       expect(studyrightElements.length).toBe(21)
       expect(id).toBe(11)
@@ -270,11 +354,19 @@ describe('Updater works', () => {
       expect(studyrightid).toBe('45853818')
       expect(code).toBe('A1995MAAT')
       expect(studentnumber).toBe('014272112')
-
     })
     test('transfers are written to database', async () => {
       const transfers = await Transfers.findAll()
-      const { id, transferdate, createdAt, updatedAt, studentnumber, studyrightid, sourcecode, targetcode } = transfers[0]
+      const {
+        id,
+        transferdate,
+        createdAt,
+        updatedAt,
+        studentnumber,
+        studyrightid,
+        sourcecode,
+        targetcode
+      } = transfers[0]
 
       expect(transfers.length).toBe(1)
       expect(id).toBe('1')
@@ -285,7 +377,6 @@ describe('Updater works', () => {
       expect(studyrightid).toBe('62346253')
       expect(sourcecode).toBe('820016')
       expect(targetcode).toBe('820042')
-
     })
   })
   describe('Updater updates existing students correctly', () => {
@@ -337,7 +428,11 @@ describe('Updater works', () => {
           teacher_id: '9016417'
         }
       ]
-      const newAttainment = { credit: newCredit, creditTeachers: newCreditTeachers, course: newCourse }
+      const newAttainment = {
+        credit: newCredit,
+        creditTeachers: newCreditTeachers,
+        course: newCourse
+      }
       students[0].studyAttainments = [
         ...studyAttainments,
         newAttainment,
@@ -358,11 +453,16 @@ describe('Updater works', () => {
           grade: '0'
         }
       }
-      const newStudyRight = { ...studyRights[0], studyright: { ...studyRights[0].studyright, highlevelname: 'Kaljatiede' } }
+      const newStudyRight = {
+        ...studyRights[0],
+        studyright: {
+          ...studyRights[0].studyright,
+          highlevelname: 'Kaljatiede'
+        }
+      }
       students[0].studyRights = [newStudyRight]
 
       await updateStudent(students[0])
-
     })
 
     test('StudentInfo for existing student is updated correclty', async () => {
@@ -371,8 +471,17 @@ describe('Updater works', () => {
           studentnumber: '011120775'
         }
       })
-      const { studentnumber, lastname, abbreviatedname,
-        gender_code, email, age, gender_fi, address, mobile } = updatedStudent
+      const {
+        studentnumber,
+        lastname,
+        abbreviatedname,
+        gender_code,
+        email,
+        age,
+        gender_fi,
+        address,
+        mobile
+      } = updatedStudent
 
       expect(studentnumber).toBe('011120775')
       expect(lastname).toBe('Tauriainen')
@@ -383,7 +492,6 @@ describe('Updater works', () => {
       expect(age).toBe(41)
       expect(address).toBe('Yliopistonkatu 4')
       expect(mobile).toBe('0400521981')
-
     })
     test('Existing courses are updated (not duplicated) in database', async () => {
       const courses = await Course.findAll({ order: [['code', 'ASC']] })
@@ -391,7 +499,6 @@ describe('Updater works', () => {
       expect(courses.length).toBe(148)
 
       expect(newCourse).not.toBe(undefined)
-
     })
 
     test('Updating credits works', async () => {
@@ -411,8 +518,5 @@ describe('Updater works', () => {
       expect(updatedStudyRights[0].highlevelname).toBe('Kaljatiede')
       // theres really not a lot to test here since everything related to studyrights are just rewritten
     })
-
-
   })
-
 })

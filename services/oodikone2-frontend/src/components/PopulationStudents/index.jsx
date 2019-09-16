@@ -7,7 +7,14 @@ import { withRouter } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import XLSX from 'xlsx'
 import scrollToComponent from 'react-scroll-to-component'
-import { getStudentTotalCredits, copyToClipboard, reformatDate, getTextIn, getUserRoles, getNewestProgramme } from '../../common'
+import {
+  getStudentTotalCredits,
+  copyToClipboard,
+  reformatDate,
+  getTextIn,
+  getUserRoles,
+  getNewestProgramme
+} from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
@@ -45,7 +52,7 @@ class PopulationStudents extends Component {
     this.setState({ admin, containsStudyTracks: this.containsStudyTracks() })
   }
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = prevProps => {
     if (!prevProps.showList && this.props.showList) {
       scrollToComponent(this.studentsRef.current, { align: 'bottom' })
     }
@@ -59,25 +66,30 @@ class PopulationStudents extends Component {
     }, {})
     this.setState({ students: this.props.samples })
     const allStudyrights = this.props.selectedStudents.map(sn => students[sn]).map(st => st.studyrights)
-    return allStudyrights.map(studyrights => this.studyrightCodes(studyrights, 'studyrightElements')
-      .reduce((acc, elemArr) => {
-        elemArr.filter(el => el.element_detail.type === 30).forEach(el =>
-          acc.push(getTextIn(el.element_detail.name, language)))
-        return acc
-      }, []).length > 0).some(el => el === true)
+    return allStudyrights
+      .map(
+        studyrights =>
+          this.studyrightCodes(studyrights, 'studyrightElements').reduce((acc, elemArr) => {
+            elemArr
+              .filter(el => el.element_detail.type === 30)
+              .forEach(el => acc.push(getTextIn(el.element_detail.name, language)))
+            return acc
+          }, []).length > 0
+      )
+      .some(el => el === true)
   }
 
   studyrightCodes = (studyrights, value) => {
     const { queryStudyrights } = this.props
-    return studyrights.filter((sr) => {
-      const { studyrightElements } = sr
-      return studyrightElements.filter(sre => (
-        queryStudyrights.includes(sre.code)
-      )).length >= queryStudyrights.length
-    }).map(a => a[value])
+    return studyrights
+      .filter(sr => {
+        const { studyrightElements } = sr
+        return studyrightElements.filter(sre => queryStudyrights.includes(sre.code)).length >= queryStudyrights.length
+      })
+      .map(a => a[value])
   }
 
-  handlePopupOpen = (id) => {
+  handlePopupOpen = id => {
     this.setState({ [id]: true })
 
     this.timeout = setTimeout(() => {
@@ -85,12 +97,12 @@ class PopulationStudents extends Component {
     }, popupTimeoutLength)
   }
 
-  handlePopupClose = (id) => {
+  handlePopupClose = id => {
     this.setState({ [id]: false })
     clearTimeout(this.timeout)
   }
 
-  handleRef = (node) => {
+  handleRef = node => {
     this.studentsRef.current = node
   }
 
@@ -117,22 +129,22 @@ class PopulationStudents extends Component {
 
     const transferFrom = s => getTextIn(s.transferSource.name, this.props.language)
 
-    const priorityText = (studyRights) => {
+    const priorityText = studyRights => {
       const codes = this.studyrightCodes(studyRights, 'prioritycode')
       return codes.map(code => (PRIORITYCODE_TEXTS[code] ? PRIORITYCODE_TEXTS[code] : code)).join(', ')
     }
 
-    const extentCodes = (studyRights) => {
+    const extentCodes = studyRights => {
       const codes = this.studyrightCodes(studyRights, 'extentcode')
       return codes.join(', ')
     }
 
-    const tags = (tags) => {
+    const tags = tags => {
       const studentTags = tags.map(t => t.tag.tagname)
       return studentTags.join(', ')
     }
 
-    const mainProgramme = (studyrights) => {
+    const mainProgramme = studyrights => {
       const programme = getNewestProgramme(studyrights)
       if (programme) {
         return programme.name
@@ -140,24 +152,27 @@ class PopulationStudents extends Component {
       return 'No programme'
     }
 
-    const studytrack = (studyrights) => {
+    const studytrack = studyrights => {
       const { queryStudyrights } = this.props
       let startdate = '1900-01-01'
-      const res = this.studyrightCodes(studyrights, 'studyrightElements')
-        .reduce((acc, elemArr) => {
-          elemArr.filter(el => el.element_detail.type === 20).forEach((el) => {
+      const res = this.studyrightCodes(studyrights, 'studyrightElements').reduce((acc, elemArr) => {
+        elemArr
+          .filter(el => el.element_detail.type === 20)
+          .forEach(el => {
             if (queryStudyrights.includes(el.code)) {
               startdate = el.startdate // eslint-disable-line
             }
           })
-          elemArr.filter(el => el.element_detail.type === 30).forEach((el) => {
+        elemArr
+          .filter(el => el.element_detail.type === 30)
+          .forEach(el => {
             if (el.enddate > startdate) {
               acc.push({ name: el.element_detail.name.fi, startdate: el.startdate, enddate: el.enddate })
             }
           })
-          acc.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))
-          return acc
-        }, [])
+        acc.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))
+        return acc
+      }, [])
       return res
     }
 
@@ -177,7 +192,7 @@ class PopulationStudents extends Component {
       },
       {
         key: 'icon',
-        getRowVal: s => (<Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
+        getRowVal: s => <Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />,
         cellProps: { collapsing: true, className: 'iconCell' }
       }
     )
@@ -185,7 +200,7 @@ class PopulationStudents extends Component {
       columns.push({
         key: 'credits since start',
         title: 'credits since start of studyright',
-        getRowVal: (s) => {
+        getRowVal: s => {
           const credits = getStudentTotalCredits(s)
           return credits.toFixed(2)
         }
@@ -262,13 +277,7 @@ class PopulationStudents extends Component {
             <Fragment>
               email
               <Popup
-                trigger={
-                  <Icon
-                    link
-                    name="copy"
-                    onClick={copyToClipboardAll}
-                    style={{ float: 'right' }}
-                  />}
+                trigger={<Icon link name="copy" onClick={copyToClipboardAll} style={{ float: 'right' }} />}
                 content="Copied email list!"
                 on="click"
                 open={this.state['0']}
@@ -283,16 +292,12 @@ class PopulationStudents extends Component {
         },
         {
           key: 'copy email',
-          getRowVal: s => (
-            s.email
-              ? <Popup
+          getRowVal: s =>
+            s.email ? (
+              <Popup
                 trigger={
-                  <Icon
-                    link
-                    name="copy outline"
-                    onClick={() => copyToClipboard(s.email)}
-                    style={{ float: 'right' }}
-                  />}
+                  <Icon link name="copy outline" onClick={() => copyToClipboard(s.email)} style={{ float: 'right' }} />
+                }
                 content="Email copied!"
                 on="click"
                 open={this.state[s.studentNumber]}
@@ -300,8 +305,7 @@ class PopulationStudents extends Component {
                 onOpen={() => this.handlePopupOpen(s.studentNumber)}
                 position="top right"
               />
-              : null
-          ),
+            ) : null,
           headerProps: { onClick: null, sorted: null },
           cellProps: { collapsing: true, className: 'iconCell' }
         }
@@ -310,27 +314,50 @@ class PopulationStudents extends Component {
 
     const verticalTitle = title => (
       // https://stackoverflow.com/a/41396815
-      <div style={{ writingMode: 'vertical-rl', minWidth: '32px', maxHeight: '20vh', overflowY: 'hidden', textAlign: 'left' }}>
+      <div
+        style={{
+          writingMode: 'vertical-rl',
+          minWidth: '32px',
+          maxHeight: '20vh',
+          overflowY: 'hidden',
+          textAlign: 'left'
+        }}
+      >
         {title}
       </div>
     )
 
-    const hasPassedMandatory = (studentNumber, code) => (
+    const hasPassedMandatory = (studentNumber, code) =>
       this.props.mandatoryPassed[code] && this.props.mandatoryPassed[code].includes(studentNumber)
-    )
 
-    const totalMandatoryPassed = studentNumber => (
-      this.props.mandatoryCourses.reduce((acc, m) => (
-        hasPassedMandatory(studentNumber, m.code) ?
-          acc + 1 : acc
-      ), 0)
-    )
+    const totalMandatoryPassed = studentNumber =>
+      this.props.mandatoryCourses.reduce((acc, m) => (hasPassedMandatory(studentNumber, m.code) ? acc + 1 : acc), 0)
 
-    const nameColumns = this.props.showNames ? [
-      { key: 'lastname', title: 'last name', getRowVal: s => (s.total ? null : s.lastname), cellProps: { title: 'last name' }, child: true },
-      { key: 'firstname', title: 'given names', getRowVal: s => (s.total ? null : s.firstnames), cellProps: { title: 'first names' }, child: true },
-      { key: 'email', title: 'email', getRowVal: s => (s.total ? null : s.email), cellProps: { title: 'emails' }, child: true }
-    ] : []
+    const nameColumns = this.props.showNames
+      ? [
+          {
+            key: 'lastname',
+            title: 'last name',
+            getRowVal: s => (s.total ? null : s.lastname),
+            cellProps: { title: 'last name' },
+            child: true
+          },
+          {
+            key: 'firstname',
+            title: 'given names',
+            getRowVal: s => (s.total ? null : s.firstnames),
+            cellProps: { title: 'first names' },
+            child: true
+          },
+          {
+            key: 'email',
+            title: 'email',
+            getRowVal: s => (s.total ? null : s.email),
+            cellProps: { title: 'emails' },
+            child: true
+          }
+        ]
+      : []
     nameColumns.push(
       {
         key: 'studentnumber',
@@ -343,14 +370,19 @@ class PopulationStudents extends Component {
       {
         key: 'icon',
         title: '',
-        getRowVal: s => (!s.total && <Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />),
+        getRowVal: s => !s.total && <Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />,
         cellProps: { collapsing: true, className: 'iconCell' },
         child: true
       },
       {
         key: 'totalpassed',
         title: verticalTitle('total passed'),
-        getRowVal: s => (s.total ? Object.values(s).filter(isNumber).reduce((acc, e) => acc + e, 0) : totalMandatoryPassed(s.studentNumber)),
+        getRowVal: s =>
+          s.total
+            ? Object.values(s)
+                .filter(isNumber)
+                .reduce((acc, e) => acc + e, 0)
+            : totalMandatoryPassed(s.studentNumber),
         cellProps: { title: 'total passed' },
         child: true
       }
@@ -367,11 +399,7 @@ class PopulationStudents extends Component {
       return acc
     }, {})
 
-    const sortedlabels = orderBy(
-      uniqBy(mandatoryCourseLabels, l => l.label),
-      [e => e.orderNumber],
-      ['asc']
-    )
+    const sortedlabels = orderBy(uniqBy(mandatoryCourseLabels, l => l.label), [e => e.orderNumber], ['asc'])
 
     const labelColumns = []
     labelColumns.push(
@@ -384,7 +412,9 @@ class PopulationStudents extends Component {
       ...sortedlabels.map(e => ({
         key: e.id,
         title: (
-          <div style={{ overflowX: 'hidden' }}><div style={{ width: 0 }}>{e.label}</div></div>
+          <div style={{ overflowX: 'hidden' }}>
+            <div style={{ width: 0 }}>{e.label}</div>
+          </div>
         ),
         parent: true,
         headerProps: { colSpan: labelToMandatoryCourses[e.label].length, title: e.label, ordernumber: e.orderNumber }
@@ -396,38 +426,45 @@ class PopulationStudents extends Component {
     const mandatoryCourseColumns = [
       ...nameColumns,
       ...labelColumns,
-      ...flatten(sortedlabels.map(e => sortBy(
-        labelToMandatoryCourses[e.label],
-        [(m) => {
-          const res = m.code.match(/\d+/)
-          return res ? Number(res[0]) : Number.MAX_VALUE
-        }, 'code']
-      ).map(m => ({
-        key: m.code,
-        title: verticalTitle(<Fragment>{getTextIn(m.name, this.props.language)}<br />{m.code}</Fragment>),
-        cellProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
-        headerProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
-        getRowVal: s => (s.total ? getTotalRowVal(s, m) : hasPassedMandatory(s.studentNumber, m.code)),
-        getRowContent: (s) => {
-          if (s.total) return getTotalRowVal(s, m)
-          return hasPassedMandatory(s.studentNumber, m.code) ? (<Icon fitted name="check" color="green" />) : null
-        },
-        child: true,
-        childOf: e.label
-      }))))
+      ...flatten(
+        sortedlabels.map(e =>
+          sortBy(labelToMandatoryCourses[e.label], [
+            m => {
+              const res = m.code.match(/\d+/)
+              return res ? Number(res[0]) : Number.MAX_VALUE
+            },
+            'code'
+          ]).map(m => ({
+            key: m.code,
+            title: verticalTitle(
+              <Fragment>
+                {getTextIn(m.name, this.props.language)}
+                <br />
+                {m.code}
+              </Fragment>
+            ),
+            cellProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
+            headerProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
+            getRowVal: s => (s.total ? getTotalRowVal(s, m) : hasPassedMandatory(s.studentNumber, m.code)),
+            getRowContent: s => {
+              if (s.total) return getTotalRowVal(s, m)
+              return hasPassedMandatory(s.studentNumber, m.code) ? <Icon fitted name="check" color="green" /> : null
+            },
+            child: true,
+            childOf: e.label
+          }))
+        )
+      )
     ]
 
     const selectedStudentsData = this.props.selectedStudents.map(sn => students[sn])
     const totals = selectedStudentsData.reduce((acc, s) => {
-      this.props.mandatoryCourses.forEach((m) => {
-        if (hasPassedMandatory(s.studentNumber, m.code))++acc[m.code]
+      this.props.mandatoryCourses.forEach(m => {
+        if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
       })
       return acc
     }, this.props.mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true }))
-    const mandatoryCourseData = [
-      totals,
-      ...selectedStudentsData
-    ]
+    const mandatoryCourseData = [totals, ...selectedStudentsData]
 
     const panes = [
       {
@@ -476,8 +513,9 @@ class PopulationStudents extends Component {
                 />
               </div>
               <div style={{ paddingLeft: '2em' }}>
-                {this.props.mandatoryCourses.length === 0 &&
-                  <h1>Please define mandatory courses at study program overview panel!</h1>}
+                {this.props.mandatoryCourses.length === 0 && (
+                  <h1>Please define mandatory courses at study program overview panel!</h1>
+                )}
               </div>
             </div>
           </Tab.Pane>
@@ -502,36 +540,37 @@ class PopulationStudents extends Component {
 
     const generateWorkbook = () => {
       const data = this.props.selectedStudents.map(sn => students[sn])
-      const sortedMandatory = sortBy(
-        this.props.mandatoryCourses,
-        [(m) => {
+      const sortedMandatory = sortBy(this.props.mandatoryCourses, [
+        m => {
           const res = m.code.match(/\d+/)
           return res ? Number(res[0]) : Number.MAX_VALUE
-        }]
+        }
+      ])
+      const worksheet = XLSX.utils.json_to_sheet(
+        data.map(s => ({
+          'last name': s.lastname,
+          'given names': s.firstnames,
+          'student number': s.studentNumber,
+          'credits since start': getStudentTotalCredits(s),
+          'all credits': s.credits,
+          email: s.email,
+          'transferred from': s.transferredStudyright ? transferFrom(s) : '',
+          priority: priorityText(s.studyrights),
+          extent: extentCodes(s.studyrights),
+          studytrack: studytrack(s.studyrights).map(st => st.name)[0],
+          'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
+          'mandatory total passed': totalMandatoryPassed(s.studentNumber),
+          ...sortedMandatory.reduce((acc, m) => {
+            acc[`${getTextIn(m.name, this.props.language)}\n${m.code}`] = hasPassedMandatory(s.studentNumber, m.code)
+            return acc
+          }, {})
+        }))
       )
-      const worksheet = XLSX.utils.json_to_sheet(data.map(s => ({
-        'last name': s.lastname,
-        'given names': s.firstnames,
-        'student number': s.studentNumber,
-        'credits since start': getStudentTotalCredits(s),
-        'all credits': s.credits,
-        email: s.email,
-        'transferred from': (s.transferredStudyright ? transferFrom(s) : ''),
-        priority: priorityText(s.studyrights),
-        extent: extentCodes(s.studyrights),
-        studytrack: studytrack(s.studyrights).map(st => st.name)[0],
-        'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
-        'mandatory total passed': totalMandatoryPassed(s.studentNumber),
-        ...sortedMandatory.reduce((acc, m) => {
-          acc[`${getTextIn(m.name, this.props.language)}\n${m.code}`] = hasPassedMandatory(s.studentNumber, m.code)
-          return acc
-        }, {})
-      })))
       const workbook = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(workbook, worksheet)
       return workbook
     }
-    const filteredPanes = (panesToFilter) => {
+    const filteredPanes = panesToFilter => {
       if (['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
         return panesToFilter.slice(0, 1)
       }
@@ -543,7 +582,9 @@ class PopulationStudents extends Component {
     return (
       <Fragment>
         <Grid columns="two">
-          <Grid.Column><StudentNameVisibilityToggle /></Grid.Column>
+          <Grid.Column>
+            <StudentNameVisibilityToggle />
+          </Grid.Column>
           <Grid.Column textAlign="right">
             <Button icon labelPosition="right" onClick={() => XLSX.writeFile(generateWorkbook(), 'students.xlsx')}>
               Download
@@ -566,10 +607,12 @@ class PopulationStudents extends Component {
     return (
       <Ref innerRef={this.handleRef}>
         <Segment>
-          <Header dividing >
+          <Header dividing>
             {`Students (${this.props.selectedStudents.length}) `}
-            <Button size="small" onClick={() => this.props.toggleStudentListVisibility()}>{toggleLabel}</Button>
-            {this.state.admin ? (<CheckStudentList students={this.props.selectedStudents} />) : null}
+            <Button size="small" onClick={() => this.props.toggleStudentListVisibility()}>
+              {toggleLabel}
+            </Button>
+            {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
             <InfoBox content={Students} />
           </Header>
           {this.renderStudentTable()}
@@ -588,10 +631,12 @@ PopulationStudents.propTypes = {
   language: string.isRequired,
   history: shape({}).isRequired,
   queryStudyrights: arrayOf(string).isRequired,
-  mandatoryCourses: arrayOf(shape({
-    name: shape({}).isRequired,
-    code: string.isRequired
-  })).isRequired,
+  mandatoryCourses: arrayOf(
+    shape({
+      name: shape({}).isRequired,
+      code: string.isRequired
+    })
+  ).isRequired,
   mandatoryPassed: shape({}).isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   getTagsByStudytrack: func.isRequired,
@@ -599,7 +644,7 @@ PopulationStudents.propTypes = {
   userRoles: arrayOf(string).isRequired
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const {
     localize,
     settings,
@@ -608,7 +653,9 @@ const mapStateToProps = (state) => {
     populationMandatoryCourses,
     tags,
     tagstudent,
-    auth: { token: { roles } }
+    auth: {
+      token: { roles }
+    }
   } = state
   const { selectedStudents, samples } = selector.makePopulationsToData(state)
   const mandatoryCodes = populationMandatoryCourses.data.map(c => c.code)
@@ -619,9 +666,7 @@ const mapStateToProps = (state) => {
     const courses = populationCourses.data.coursestatistics
     mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
       const foundCourse = !!courses.find(c => c.course.code === code)
-      obj[code] = foundCourse
-        ? Object.keys(courses.find(c => c.course.code === code).students.passed)
-        : null
+      obj[code] = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
       return obj
     }, {})
   }
@@ -630,9 +675,7 @@ const mapStateToProps = (state) => {
     showNames: settings.namesVisible,
     showList: settings.studentlistVisible,
     language: getActiveLanguage(localize).code,
-    queryStudyrights: populations.query
-      ? Object.values(populations.query.studyRights)
-      : [],
+    queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
     mandatoryCourses: populationMandatoryCourses.data,
     mandatoryPassed,
     tags: tags.data,
@@ -645,5 +688,9 @@ const mapStateToProps = (state) => {
 
 export default connect(
   mapStateToProps,
-  { toggleStudentListVisibility, getTagsByStudytrack: getTagsByStudytrackAction, getStudentTagsStudyTrack: getStudentTagsByStudytrackAction }
+  {
+    toggleStudentListVisibility,
+    getTagsByStudytrack: getTagsByStudytrackAction,
+    getStudentTagsStudyTrack: getStudentTagsByStudytrackAction
+  }
 )(withRouter(PopulationStudents))

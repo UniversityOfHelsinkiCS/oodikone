@@ -34,26 +34,38 @@ class ClusterGraph extends PureComponent {
     let { series } = this.state
 
     for (let i = 0; i < points.length; i++) {
-      series[grades[i]].data = series[grades[i]].data.concat({ x: points[i][0], y: points[i][1], name: `0${students[i]}` })
+      series[grades[i]].data = series[grades[i]].data.concat({
+        x: points[i][0],
+        y: points[i][1],
+        name: `0${students[i]}`
+      })
     }
 
     this.setState({ series, minX, maxX, minY, maxY })
   }
 
-  setActive = (series) => {
+  setActive = series => {
     console.log(series)
   }
 
-  setName = (series) => {
+  setName = series => {
     console.log(series.target)
+    // eslint-disable-next-line react/no-access-state-in-setstate
     this.setState({ name: this.state.series[series.target.name].data.name[series.target.index] })
   }
 
   render() {
     const { series, minX, minY, maxX, maxY } = this.state
 
-    if (series['5'].data.length === 0 && series['4'].data.length === 0 && series['3'].data.length === 0 && series['2'].data.length === 0 && series['1'].data.length === 0 && series['0'].data.length === 0) {
-      return (<p>rippistä</p>)
+    if (
+      series['5'].data.length === 0 &&
+      series['4'].data.length === 0 &&
+      series['3'].data.length === 0 &&
+      series['2'].data.length === 0 &&
+      series['1'].data.length === 0 &&
+      series['0'].data.length === 0
+    ) {
+      return <p>rippistä</p>
     }
 
     console.log(this.state)
@@ -128,8 +140,7 @@ class ClusterGraph extends PureComponent {
             ]
           }}
         />
-
-      </Segment >
+      </Segment>
     )
   }
 }

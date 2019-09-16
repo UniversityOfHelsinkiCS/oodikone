@@ -5,9 +5,7 @@ import { arrayOf, string, shape, func } from 'prop-types'
 import { Button, Dropdown } from 'semantic-ui-react'
 import SortableTable from '../../SortableTable'
 import { getTextIn } from '../../../common'
-import {
-  GetMandatoryCourseLabels
-} from '../../../redux/mandatoryCourseLabels'
+import { GetMandatoryCourseLabels } from '../../../redux/mandatoryCourseLabels'
 
 const MandatoryCourseTable = ({
   studyProgramme,
@@ -18,15 +16,16 @@ const MandatoryCourseTable = ({
   labels,
   getLabels
 }) => {
-  useEffect(() => { getLabels(studyProgramme) }, [])
+  useEffect(() => {
+    getLabels(studyProgramme)
+  }, [])
 
-  const deleteButton = code => (
-    <Button onClick={() => deleteMandatoryCourse(studyProgramme, code)}>
-      Delete
-    </Button>
-  )
+  const deleteButton = code => <Button onClick={() => deleteMandatoryCourse(studyProgramme, code)}>Delete</Button>
 
-  const idtolabel = labels.reduce((acc, e) => { acc[e.id] = e; return acc }, {})
+  const idtolabel = labels.reduce((acc, e) => {
+    acc[e.id] = e
+    return acc
+  }, {})
   const options = sortBy(labels, ['label']).map(e => ({ key: e.id, text: e.label, value: e.id }))
   const columns = [
     {
@@ -38,10 +37,7 @@ const MandatoryCourseTable = ({
     {
       key: 'label',
       title: 'Label',
-      getRowVal: course =>
-        course.label &&
-        idtolabel[course.label.id] &&
-        idtolabel[course.label.id].label,
+      getRowVal: course => course.label && idtolabel[course.label.id] && idtolabel[course.label.id].label,
       getRowContent: course => (
         <Dropdown
           clearable
@@ -66,13 +62,7 @@ const MandatoryCourseTable = ({
     }
   ]
 
-  return (
-    <SortableTable
-      columns={columns}
-      data={mandatoryCourses}
-      getRowKey={row => row.code}
-    />
-  )
+  return <SortableTable columns={columns} data={mandatoryCourses} getRowKey={row => row.code} />
 }
 
 MandatoryCourseTable.propTypes = {
@@ -93,4 +83,7 @@ const mapDispatchToProps = dispatch => ({
   getLabels: studyProgramme => dispatch(GetMandatoryCourseLabels(studyProgramme))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(MandatoryCourseTable)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(MandatoryCourseTable)

@@ -5,7 +5,7 @@ const Op = Sequelize.Op
 
 const getStudentTags = () => TagStudent.findAll({})
 
-const getStudentTagsByStudytrack = (studytrack) => {
+const getStudentTagsByStudytrack = studytrack => {
   return TagStudent.findAll({
     include: {
       model: Tag,
@@ -19,7 +19,7 @@ const getStudentTagsByStudytrack = (studytrack) => {
   })
 }
 
-const getStudentTagsByStudentnumber = async (studentnumber) => {
+const getStudentTagsByStudentnumber = async studentnumber => {
   return TagStudent.findAll({
     where: {
       studentnumber: {
@@ -29,11 +29,11 @@ const getStudentTagsByStudentnumber = async (studentnumber) => {
   })
 }
 
-const createStudentTag = async (tag) => {
+const createStudentTag = async tag => {
   return TagStudent.create(tag)
 }
 
-const createMultipleStudentTags = async (tags) => {
+const createMultipleStudentTags = async tags => {
   return TagStudent.bulkCreate(tags, { ignoreDuplicates: true })
 }
 

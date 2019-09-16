@@ -37,15 +37,8 @@ const ProgressBar = ({ progress, fixed }) => {
   classNames.push(visible ? 'progressBar' : 'progressBarHidden')
   if (fixed) classNames.push('fixed')
 
-  return (
-    hidden ?
-      null :
-      <Progress
-        percent={progress}
-        disabled={progress === 100}
-        color="blue"
-        className={classNames.join(' ')}
-      />
+  return hidden ? null : (
+    <Progress percent={progress} disabled={progress === 100} color="blue" className={classNames.join(' ')} />
   )
 }
 

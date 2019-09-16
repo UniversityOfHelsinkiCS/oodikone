@@ -20,7 +20,7 @@ const CourseStatsTab = ({ statistics, options, doSelect, selected }) => (
         selectOnNavigation={false}
       />
     </Form>
-    {selected && <TeacherStatisticsTable statistics={statistics} onClickFn={() => { }} />}
+    {selected && <TeacherStatisticsTable statistics={statistics} onClickFn={() => {}} />}
   </div>
 )
 
@@ -47,8 +47,10 @@ class CoursesTab extends Component {
     const { courses } = this.props
     const semesterOptions = this.semesterOptions()
     const courseOptions = this.courseOptions()
-    const courseWithMostCredits = Object.values(courses).length > 0 ?
-      Object.values(courses).reduce((c1, c2) => (c1.stats.credits > c2.stats.credits ? c1 : c2)) : null
+    const courseWithMostCredits =
+      Object.values(courses).length > 0
+        ? Object.values(courses).reduce((c1, c2) => (c1.stats.credits > c2.stats.credits ? c1 : c2))
+        : null
     this.setState({
       semesterOptions,
       courseOptions,

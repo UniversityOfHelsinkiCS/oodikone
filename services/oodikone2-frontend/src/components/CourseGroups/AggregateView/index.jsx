@@ -25,12 +25,13 @@ class AggregateView extends Component {
 
   componentDidMount() {
     callApi(`/course-groups/programme/${this.props.programmeId}`)
-      .then((res) => {
+      .then(res => {
         this.setState({
           courseGroups: res.data,
           isLoading: false
         })
-      }).catch(() => {
+      })
+      .catch(() => {
         this.setState({ courseGroups: [], isLoading: false })
       })
   }
@@ -38,12 +39,13 @@ class AggregateView extends Component {
   handleForceRefresh() {
     this.setState({ isLoading: true })
     callApi(`/course-groups/programme/${this.props.programmeId}/force`)
-      .then((res) => {
+      .then(res => {
         this.setState({
           courseGroups: res.data,
           isLoading: false
         })
-      }).catch(() => {
+      })
+      .catch(() => {
         this.setState({ courseGroups: [], isLoading: false })
       })
   }
@@ -70,7 +72,8 @@ class AggregateView extends Component {
             >
               {courseGroup.name}
             </a>
-          </Fragment>)
+          </Fragment>
+        )
       },
       { key: 'Credits', title: 'Credits', getRowVal: cg => cg.credits },
       { key: 'Students', title: 'Students', getRowVal: cg => cg.students },
@@ -91,12 +94,9 @@ class AggregateView extends Component {
 
     const renderEditCourseGroup = () => (
       <Fragment>
-        <Header size="medium">Edit group
-          <Icon
-            name="reply"
-            onClick={() => this.setState({ editedCourseGroup: null })}
-            link
-          />
+        <Header size="medium">
+          Edit group
+          <Icon name="reply" onClick={() => this.setState({ editedCourseGroup: null })} link />
         </Header>
         <CourseGroupAddTeacher groupId={editedCourseGroup} />
       </Fragment>
@@ -111,19 +111,16 @@ class AggregateView extends Component {
             floated="right"
             size="small"
             style={{ marginBottom: '10px' }}
-            onClick={() => { this.handleForceRefresh() }}
+            onClick={() => {
+              this.handleForceRefresh()
+            }}
           />
         </Header>
-        {courseGroups.length === 0 ?
+        {courseGroups.length === 0 ? (
           <Segment>No course groups defined</Segment>
-          :
-          <SortableTable
-            getRowKey={gc => gc.id}
-            tableProps={{ celled: false }}
-            columns={columns}
-            data={courseGroups}
-          />
-        }
+        ) : (
+          <SortableTable getRowKey={gc => gc.id} tableProps={{ celled: false }} columns={columns} data={courseGroups} />
+        )}
       </Fragment>
     )
 

@@ -1,5 +1,5 @@
 module.exports = {
-  up: async (queryInterface) => {
+  up: async queryInterface => {
     await queryInterface.sequelize.query(`
 -- Adminer 4.6.2 PostgreSQL dump
 
@@ -130,6 +130,5 @@ CREATE TABLE "public"."unit_tag" (
 -- 2019-07-01 15:26:14.147541+00
 `)
   },
-  down: async () => {
-  }
+  down: async () => {}
 }

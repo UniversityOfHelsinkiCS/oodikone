@@ -2,16 +2,13 @@ import React, { useMemo } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, shape, number, func } from 'prop-types'
-import {
-  calculateTotalPassedCourses,
-  calculateTotalFailedCourses
-} from '../facultyUtils'
+import { calculateTotalPassedCourses, calculateTotalFailedCourses } from '../facultyUtils'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 import FacultyStatsGraph from '../FacultyStatsGraph'
 
 const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, toYear, handleSelect }) => {
-  const calculateYearlyStatsForFaculty = (facultyCode) => {
+  const calculateYearlyStatsForFaculty = facultyCode => {
     const res = {}
     const yearData = {
       studentCredits: 0,
@@ -21,7 +18,7 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
 
     const faculty = facultyYearlyStats.find(f => f.id === facultyCode)
     if (!faculty) return res
-    Object.values(faculty.data).forEach((programmeYearlyStats) => {
+    Object.values(faculty.data).forEach(programmeYearlyStats => {
       Object.entries(programmeYearlyStats).forEach(([year, stat]) => {
         if (!res[year]) res[year] = { ...yearData }
         res[year].studentCredits += stat.studentCredits
@@ -32,7 +29,7 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
     return res
   }
 
-  const calculateTotalStatsForFaculty = (facultyCode) => {
+  const calculateTotalStatsForFaculty = facultyCode => {
     const initial = {
       totalStudentCredits: 0,
       totalCoursesPassed: 0,
@@ -40,22 +37,33 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
     }
     return Object.entries(calculateYearlyStatsForFaculty(facultyCode))
       .filter(([year]) => year >= fromYear && year <= toYear)
-      .reduce((res, [, curr]) => ({
-        totalStudentCredits: res.totalStudentCredits + curr.studentCredits,
-        totalCoursesPassed: res.totalCoursesPassed + curr.coursesPassed,
-        totalCoursesFailed: res.totalCoursesFailed + curr.coursesFailed
-      }), { ...initial })
+      .reduce(
+        (res, [, curr]) => ({
+          totalStudentCredits: res.totalStudentCredits + curr.studentCredits,
+          totalCoursesPassed: res.totalCoursesPassed + curr.coursesPassed,
+          totalCoursesFailed: res.totalCoursesFailed + curr.coursesFailed
+        }),
+        { ...initial }
+      )
   }
 
-  const totalStats = useMemo(() => faculties.reduce((res, { code }) => {
-    res[code] = calculateTotalStatsForFaculty(code)
-    return { ...res }
-  }, {}), [fromYear, toYear])
+  const totalStats = useMemo(
+    () =>
+      faculties.reduce((res, { code }) => {
+        res[code] = calculateTotalStatsForFaculty(code)
+        return { ...res }
+      }, {}),
+    [fromYear, toYear]
+  )
 
-  const graphData = useMemo(() => faculties.map(({ code, name }) => ({
-    name: getTextIn(name, language),
-    data: calculateYearlyStatsForFaculty(code)
-  })), [])
+  const graphData = useMemo(
+    () =>
+      faculties.map(({ code, name }) => ({
+        name: getTextIn(name, language),
+        data: calculateYearlyStatsForFaculty(code)
+      })),
+    []
+  )
 
   const headers = [
     {
@@ -95,9 +103,7 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
         getRowProps={faculty => ({ onClick: () => handleSelect(faculty.code), style: { cursor: 'pointer' } })}
         data={faculties}
       />
-      <FacultyStatsGraph
-        data={graphData}
-      />
+      <FacultyStatsGraph data={graphData} />
     </React.Fragment>
   )
 }

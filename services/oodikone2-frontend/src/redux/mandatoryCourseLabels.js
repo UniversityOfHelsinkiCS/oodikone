@@ -1,6 +1,6 @@
 import { callController } from '../apiConnection/index'
 
-export const GetMandatoryCourseLabels = (programme) => {
+export const GetMandatoryCourseLabels = programme => {
   const prefix = 'GET_MANDATORY_COURSE_LABELS_'
   const route = `/mandatory-course-labels/${programme}/labels`
   return callController(route, prefix)

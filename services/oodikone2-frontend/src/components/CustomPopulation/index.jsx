@@ -29,12 +29,9 @@ const CustomPopulation = ({
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
 
-  const {
-    onProgress,
-    progress
-  } = useProgress(loading)
+  const { onProgress, progress } = useProgress(loading)
 
-  const onClicker = (e) => {
+  const onClicker = e => {
     e.preventDefault()
     const studentnumbers = input.match(/[0-9]+/g)
     getCustomPopulationDispatch({ studentnumberlist: studentnumbers, onProgress })
@@ -44,7 +41,11 @@ const CustomPopulation = ({
   }
   const renderCustomPopulationSearch = () => (
     <Modal
-      trigger={<Button size="small" onClick={() => setModal(true)}>Custom population</Button>}
+      trigger={
+        <Button size="small" onClick={() => setModal(true)}>
+          Custom population
+        </Button>
+      }
       open={modal}
       onClose={() => setModal(false)}
       size="small"
@@ -59,16 +60,10 @@ const CustomPopulation = ({
         </Form>
       </Modal.Content>
       <Modal.Actions>
-        <Button
-          negative
-          onClick={() => setModal(false)}
-        >
+        <Button negative onClick={() => setModal(false)}>
           Cancel
         </Button>
-        <Button
-          positive
-          onClick={e => onClicker(e)}
-        >
+        <Button positive onClick={e => onClicker(e)}>
           Search population
         </Button>
       </Modal.Actions>
@@ -83,20 +78,19 @@ const CustomPopulation = ({
           <Header size="medium" dividing>
             {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
           </Header>
-          <CreditAccumulationGraphHighCharts students={custompop} selectedStudents={selectedStudents} translate={translate} />
+          <CreditAccumulationGraphHighCharts
+            students={custompop}
+            selectedStudents={selectedStudents}
+            translate={translate}
+          />
         </Segment>
       </Segment>
       <Segment>
         <Header>Programme distribution</Header>
         <CustomPopulationProgrammeDist samples={custompop} selectedStudents={selectedStudents} />
       </Segment>
-      <CustomPopulationCourses
-        selectedStudents={selectedStudents}
-      />
-      <PopulationStudents
-        samples={custompop}
-        selectedStudents={selectedStudents}
-      />
+      <CustomPopulationCourses selectedStudents={selectedStudents} />
+      <PopulationStudents samples={custompop} selectedStudents={selectedStudents} />
     </div>
   )
 
@@ -105,7 +99,9 @@ const CustomPopulation = ({
   return (
     <div>
       {renderCustomPopulationSearch()}
-      {custompop.length > 0 ? (renderCustomPopulation()) : (
+      {custompop.length > 0 ? (
+        renderCustomPopulation()
+      ) : (
         <Segment className="contentSegment">
           <ProgressBar progress={progress} />
         </Segment>
@@ -125,13 +121,21 @@ CustomPopulation.propTypes = {
   loading: bool.isRequired
 }
 
-const mapStateToProps = ({ populationFilters, populations, localize, populationCourses, auth: { token: { roles } } }) => {
+const mapStateToProps = ({
+  populationFilters,
+  populations,
+  localize,
+  populationCourses,
+  auth: {
+    token: { roles }
+  }
+}) => {
   const samples = populations.data.students ? populations.data.students : []
   let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
   const { complemented } = populationFilters
 
   if (samples.length > 0 && populationFilters.filters.length > 0) {
-    const studentsForFilter = (f) => {
+    const studentsForFilter = f => {
       if (f.type === 'CourseParticipation') {
         return Object.keys(f.studentsOfSelectedField)
       }
@@ -146,7 +150,7 @@ const mapStateToProps = ({ populationFilters, populations, localize, populationC
     }
   }
 
-  return ({
+  return {
     translate: getTranslate(localize),
     loading: populations.pending,
     custompop: populations.data.students || [],
@@ -154,11 +158,14 @@ const mapStateToProps = ({ populationFilters, populations, localize, populationC
     pending: populationCourses.pending,
     isAdmin: getUserIsAdmin(roles),
     selectedStudents
-  })
+  }
 }
 
-export default connect(mapStateToProps, {
-  getCustomPopulationDispatch: getCustomPopulation,
-  getCustomPopulationCoursesByStudentnumbers,
-  clearPopulationFiltersDispatch: clearPopulationFilters
-})(CustomPopulation)
+export default connect(
+  mapStateToProps,
+  {
+    getCustomPopulationDispatch: getCustomPopulation,
+    getCustomPopulationCoursesByStudentnumbers,
+    clearPopulationFiltersDispatch: clearPopulationFilters
+  }
+)(CustomPopulation)

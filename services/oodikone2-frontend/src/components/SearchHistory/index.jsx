@@ -25,7 +25,12 @@ const SearchHistory = ({ items, handleSearch, updateItem }) => {
           search
           selection
           value={selected}
-          options={sortedItems.map(({ text, timestamp }, i) => ({ key: i + 1, value: i + 1, text, description: moment(timestamp).format('DD.MM LT') }))}
+          options={sortedItems.map(({ text, timestamp }, i) => ({
+            key: i + 1,
+            value: i + 1,
+            text,
+            description: moment(timestamp).format('DD.MM LT')
+          }))}
           onChange={handleChange}
           closeOnChange
           clearable
@@ -39,11 +44,13 @@ const SearchHistory = ({ items, handleSearch, updateItem }) => {
 }
 
 SearchHistory.propTypes = {
-  items: arrayOf(shape({
-    text: string,
-    params: shape({}),
-    timestamp: date
-  })).isRequired,
+  items: arrayOf(
+    shape({
+      text: string,
+      params: shape({}),
+      timestamp: date
+    })
+  ).isRequired,
   handleSearch: func.isRequired,
   updateItem: func.isRequired
 }
