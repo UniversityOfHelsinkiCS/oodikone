@@ -12,11 +12,6 @@
 
 .controlIcon {
   cursor: pointer;
-
-  &:hover {
-    font-size: large;
-    color: var(--deepBlack);
-  }
 }
 
 .dateItem {
