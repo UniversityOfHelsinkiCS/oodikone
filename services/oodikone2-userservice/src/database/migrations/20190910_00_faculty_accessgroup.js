@@ -1,12 +1,14 @@
 module.exports = {
-  up: async (queryInterface) => {
-    return new Promise(async (res) => { // eslint-disable-line
+  up: async queryInterface => {
+    return new Promise(async res => {
+      // eslint-disable-line
       // For some reason sequelize tried to create a new
       // access group with an already existing id (= 8).
       // Therefore we need to "update" sequelize's auto increment
       // by deleting the corrupted id.
       const buggedAccessGroup = (await queryInterface.sequelize.query(
-        'SELECT * FROM access_groups WHERE id = ?', {
+        'SELECT * FROM access_groups WHERE id = ?',
+        {
           replacements: [8],
           type: queryInterface.sequelize.QueryTypes.SELECT
         }
@@ -36,6 +38,5 @@ module.exports = {
       res()
     })
   },
-  down: async () => {
-  }
+  down: async () => {}
 }

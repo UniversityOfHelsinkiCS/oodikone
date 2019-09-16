@@ -1,5 +1,10 @@
 const { sequelize, forceSyncDatabase } = require('../database/connection')
-const { User, AccessGroup, HyGroup, UserElementDetails } = require('../models/index')
+const {
+  User,
+  AccessGroup,
+  HyGroup,
+  UserElementDetails
+} = require('../models/index')
 const userService = require('../services/users')
 const AccessService = require('../services/accessgroups')
 const { DB_SCHEMA } = require('../conf')
@@ -10,7 +15,7 @@ const default_users = [
     full_name: 'Saus Maekinen',
     username: 'sasumaki',
     email: 'vittuilu.email@gmail.com',
-    language: 'finnish',
+    language: 'finnish'
   },
   {
     id: 42,
@@ -68,13 +73,16 @@ beforeAll(async () => {
   await User.bulkCreate(default_users)
   await AccessGroup.bulkCreate(default_accessgroups)
   await HyGroup.bulkCreate(default_hygroups)
-  const admin_user = await User.findOne({ where: { id: 69 }})
+  const admin_user = await User.findOne({ where: { id: 69 } })
   const admin = await AccessService.byId(2)
   await admin_user.addAccessgroup(admin)
   const hygroup = await HyGroup.findByPk(1)
   await admin_user.addHy_group(hygroup)
-  const normal_user = await User.findOne({ where: { id: 665 }})
-  await UserElementDetails.upsert({ userId: normal_user.id, elementDetailCode: 'ELEMENT_CS' })
+  const normal_user = await User.findOne({ where: { id: 665 } })
+  await UserElementDetails.upsert({
+    userId: normal_user.id,
+    elementDetailCode: 'ELEMENT_CS'
+  })
   await normal_user.addHy_group(hygroup)
 })
 afterAll(async () => {
@@ -115,13 +123,25 @@ describe('user tests', () => {
   })
 
   test('login works if user already exists', async () => {
-    const { token, isNew } = await userService.login('poutaukko', 'Pekka Pouta', [], [], 'pekka.pouta@ilmatieteenlaitos.fi')
+    const { token, isNew } = await userService.login(
+      'poutaukko',
+      'Pekka Pouta',
+      [],
+      [],
+      'pekka.pouta@ilmatieteenlaitos.fi'
+    )
     expect(token).toBeTruthy()
     expect(isNew).toBe(false)
   })
 
   test('login creates user if user does not exist', async () => {
-    const { token, isNew } = await userService.login('rtz', 'Artour Babaev', [], [], 'rtz@eg.com')
+    const { token, isNew } = await userService.login(
+      'rtz',
+      'Artour Babaev',
+      [],
+      [],
+      'rtz@eg.com'
+    )
     expect(token).toBeTruthy()
     expect(isNew).toBe(true)
     const users = await userService.findAll()
@@ -131,7 +151,7 @@ describe('user tests', () => {
   })
 
   test('superlogin fails if not admin', async () => {
-    const token  = await userService.superlogin('rambo666', 'sasumaki')
+    const token = await userService.superlogin('rambo666', 'sasumaki')
     expect(token).toBe(undefined)
   })
   test('superlogin succeeds if admin', async () => {
