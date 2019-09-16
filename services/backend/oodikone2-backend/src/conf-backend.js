@@ -7,8 +7,7 @@ let DB_URL_KONE = process.env.DB_URL_KONE
 if (isTest) {
   DB_URL = process.env.TEST_DB
   DB_URL_KONE = process.env.TEST_DB_KONE
-}
-else if (NODE_ENV === 'anon') {
+} else if (NODE_ENV === 'anon') {
   DB_URL = process.env.ANON_DB
   DB_URL_KONE = process.env.ANON_DB_KONE
 }
@@ -32,16 +31,18 @@ const FEATURES = {
 }
 
 const formatURL = url => {
-  return (!!url && !url.startsWith('http')) ? `http://${url}` : url
+  return !!url && !url.startsWith('http') ? `http://${url}` : url
 }
 
 if (process.env.NODE_ENV === 'dev' && process.env.FEATURES) {
   const toggled = process.env.FEATURES.split(',')
-  toggled.map(toggle => toggle.trim()).forEach(feature => {
-    if (FEATURES[feature] !== undefined) {
-      FEATURES[feature] = true
-    }
-  })
+  toggled
+    .map(toggle => toggle.trim())
+    .forEach(feature => {
+      if (FEATURES[feature] !== undefined) {
+        FEATURES[feature] = true
+      }
+    })
 }
 
 const OODI = {

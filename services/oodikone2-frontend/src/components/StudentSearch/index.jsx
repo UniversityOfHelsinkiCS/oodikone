@@ -39,19 +39,22 @@ class StudentSearch extends Component {
     this.props.clearTimeout('search')
     if (value.length > 0) {
       this.setState({ searchStr: value })
-      this.props.setTimeout('search', () => {
-        this.fetchStudentList(value)
-      }, 250)
+      this.props.setTimeout(
+        'search',
+        () => {
+          this.fetchStudentList(value)
+        },
+        250
+      )
     } else {
       this.resetComponent()
     }
   }
 
-  handleSearchSelect = (student) => {
+  handleSearchSelect = student => {
     const { studentNumber } = student
     this.props.history.push(`/students/${studentNumber}`, { selected: studentNumber })
-    const studentObject = this.props.students.find(person =>
-      person.studentNumber === studentNumber)
+    const studentObject = this.props.students.find(person => person.studentNumber === studentNumber)
     const fetched = studentObject ? studentObject.fetched : false
     if (!fetched) {
       this.setState({ isLoading: true })
@@ -61,13 +64,17 @@ class StudentSearch extends Component {
     }
   }
 
-  fetchStudentList = (searchStr) => {
+  fetchStudentList = searchStr => {
     if (searchStr.length < 4 || (Number(searchStr) && searchStr.length < 6)) {
       return
     }
-    this.props.setTimeout('fetch', () => {
-      this.setState({ isLoading: true })
-    }, 250)
+    this.props.setTimeout(
+      'fetch',
+      () => {
+        this.setState({ isLoading: true })
+      },
+      250
+    )
     this.props.findStudents(searchStr).then(() => {
       this.props.clearTimeout('fetch')
       this.setState({ isLoading: false, showResults: true })
@@ -164,10 +171,13 @@ const mapStateToProps = ({ students, settings }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  findStudents: searchStr =>
-    dispatch(findStudents(searchStr)),
-  getStudent: studentNumber =>
-    dispatch(getStudent(studentNumber))
+  findStudents: searchStr => dispatch(findStudents(searchStr)),
+  getStudent: studentNumber => dispatch(getStudent(studentNumber))
 })
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Timeout(StudentSearch)))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Timeout(StudentSearch))
+)

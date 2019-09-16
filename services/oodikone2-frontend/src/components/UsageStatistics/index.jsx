@@ -47,12 +47,8 @@ class UsageStatistics extends Component {
             <Table.Body>
               {users.sort(byCount).map(user => (
                 <Table.Row key={user.name}>
-                  <Table.Cell onClick={() => this.setState({ user: user.name })}>
-                    {user.name}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {user.count}
-                  </Table.Cell>
+                  <Table.Cell onClick={() => this.setState({ user: user.name })}>{user.name}</Table.Cell>
+                  <Table.Cell>{user.count}</Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>
@@ -66,12 +62,8 @@ class UsageStatistics extends Component {
             <Table.Body>
               {endpoints.sort(byCount).map(endpoint => (
                 <Table.Row key={endpoint.name}>
-                  <Table.Cell>
-                    {endpoint.name}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {endpoint.count}
-                  </Table.Cell>
+                  <Table.Cell>{endpoint.name}</Table.Cell>
+                  <Table.Cell>{endpoint.count}</Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>
@@ -85,13 +77,11 @@ class UsageStatistics extends Component {
     ]
 
     if (this.state.user) {
-      const entries = this.state.all
-        .filter(e => e.username === this.state.user)
-        .sort((e1, e2) => e2.time - e1.time)
+      const entries = this.state.all.filter(e => e.username === this.state.user).sort((e1, e2) => e2.time - e1.time)
 
       const usersName = entries[0].name
 
-      const toTime = (stamp) => {
+      const toTime = stamp => {
         const zeroed = v => (v < 10 ? `0${v}` : v)
 
         const date = new Date(stamp * 1000)
@@ -104,25 +94,15 @@ class UsageStatistics extends Component {
         <div>
           <h3>
             {usersName} ({this.state.user})
-            <Icon
-              onClick={() => this.setState({ user: null })}
-              name="remove"
-              className="controlIcon"
-            />
+            <Icon onClick={() => this.setState({ user: null })} name="remove" className="controlIcon" />
           </h3>
           <Table celled className="fixed-header">
             <Table.Body>
               {entries.map(entry => (
                 <Table.Row key={entry.id}>
-                  <Table.Cell>
-                    {entry.method}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {entry.URL}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {toTime(entry.time)}
-                  </Table.Cell>
+                  <Table.Cell>{entry.method}</Table.Cell>
+                  <Table.Cell>{entry.URL}</Table.Cell>
+                  <Table.Cell>{toTime(entry.time)}</Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>
@@ -138,7 +118,9 @@ class UsageStatistics extends Component {
     return (
       <div>
         <Container text style={{ paddingTop: 50 }}>
-          <Header as="h1" textAlign="center">Usage statistics</Header>
+          <Header as="h1" textAlign="center">
+            Usage statistics
+          </Header>
           {this.renderStats()}
         </Container>
       </div>

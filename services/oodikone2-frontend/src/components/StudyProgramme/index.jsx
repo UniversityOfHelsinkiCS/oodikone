@@ -14,12 +14,8 @@ import '../PopulationQueryCard/populationQueryCard.css'
 import { getTextIn, useTabs, getUserRoles } from '../../common'
 import Tags from './Tags'
 
-const StudyProgramme = (props) => {
-  const [tab, setTab] = useTabs(
-    'p_tab',
-    props.match.params.courseGroupId ? 2 : 0,
-    props.history
-  )
+const StudyProgramme = props => {
+  const [tab, setTab] = useTabs('p_tab', props.match.params.courseGroupId ? 2 : 0, props.history)
   const getPanes = () => {
     const { match, rights, userRoles } = props
     const { studyProgrammeId, courseGroupId } = match.params
@@ -33,11 +29,9 @@ const StudyProgramme = (props) => {
         menuItem: 'Mandatory Courses',
         render: () => <StudyProgrammeMandatoryCourses studyProgramme={studyProgrammeId} />
       },
-      { menuItem: 'Code Mapper', render: () => <CourseCodeMapper studyprogramme={studyProgrammeId} /> },
+      { menuItem: 'Code Mapper', render: () => <CourseCodeMapper studyprogramme={studyProgrammeId} /> }
     )
-    if ((userRoles.includes('coursegroups') &&
-      rights.includes(studyProgrammeId)) ||
-      userRoles.includes('admin')) {
+    if ((userRoles.includes('coursegroups') && rights.includes(studyProgrammeId)) || userRoles.includes('admin')) {
       panes.push({
         menuItem: 'Course Groups',
         render: () => <AggregateView programmeId={studyProgrammeId} courseGroupId={courseGroupId} />
@@ -56,7 +50,7 @@ const StudyProgramme = (props) => {
     return panes
   }
 
-  const handleSelect = (programme) => {
+  const handleSelect = programme => {
     props.history.push(`/study-programme/${programme}`, { selected: programme })
   }
 
@@ -71,26 +65,20 @@ const StudyProgramme = (props) => {
       </Header>
       <Segment className="contentSegment">
         <StudyProgrammeSelector handleSelect={handleSelect} selected={studyProgrammeId !== undefined} />
-        {
-          studyProgrammeId ? (
-            <React.Fragment>
-              <Card fluid className="cardContainer">
-                <Card.Content>
-                  <Card.Header className="cardHeader">
-                    {programmeName}
-                    <Icon
-                      name="remove"
-                      className="controlIcon"
-                      onClick={() => props.history.push('/study-programme')}
-                    />
-                  </Card.Header>
-                  <Card.Meta content={studyProgrammeId} />
-                </Card.Content>
-              </Card>
-              <Tab panes={panes} activeIndex={tab} onTabChange={setTab} />
-            </React.Fragment>
-          ) : null
-        }
+        {studyProgrammeId ? (
+          <React.Fragment>
+            <Card fluid className="cardContainer">
+              <Card.Content>
+                <Card.Header className="cardHeader">
+                  {programmeName}
+                  <Icon name="remove" className="controlIcon" onClick={() => props.history.push('/study-programme')} />
+                </Card.Header>
+                <Card.Meta content={studyProgrammeId} />
+              </Card.Content>
+            </Card>
+            <Tab panes={panes} activeIndex={tab} onTabChange={setTab} />
+          </React.Fragment>
+        ) : null}
       </Segment>
     </div>
   )
@@ -117,9 +105,14 @@ StudyProgramme.defaultProps = {
   programmes: {}
 }
 
-const mapStateToProps = ({ populationDegreesAndProgrammes, localize, auth: { token: { rights, roles } } }) => {
-  const programmes = populationDegreesAndProgrammes.data ?
-    populationDegreesAndProgrammes.data.programmes : {}
+const mapStateToProps = ({
+  populationDegreesAndProgrammes,
+  localize,
+  auth: {
+    token: { rights, roles }
+  }
+}) => {
+  const programmes = populationDegreesAndProgrammes.data ? populationDegreesAndProgrammes.data.programmes : {}
   return { programmes, language: getActiveLanguage(localize).code, rights, userRoles: getUserRoles(roles) }
 }
 

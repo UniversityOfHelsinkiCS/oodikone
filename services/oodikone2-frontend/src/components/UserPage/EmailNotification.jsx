@@ -5,26 +5,14 @@ import { connect } from 'react-redux'
 import { sendEmail, clearErrors } from '../../redux/userAccessEmail'
 import EmailPreview from './EmailPreview'
 
-const SendEmailButton = props => (
-  <Button basic fluid positive content="Preview email ..." {...props} />
-)
+const SendEmailButton = props => <Button basic fluid positive content="Preview email ..." {...props} />
 
 const DisabledEmailButton = props => (
-  <Button
-    basic
-    fluid
-    disabled
-    content="Cannot send email - user has no email address"
-    {...props}
-  />
+  <Button basic fluid disabled content="Cannot send email - user has no email address" {...props} />
 )
 
 const SendFailBanner = ({ userEmail, error }) => (
-  <Message
-    error
-    header={`Email could not be sent to ${userEmail}`}
-    list={[error]}
-  />
+  <Message error header={`Email could not be sent to ${userEmail}`} list={[error]} />
 )
 
 SendFailBanner.propTypes = {
@@ -32,14 +20,7 @@ SendFailBanner.propTypes = {
   error: string.isRequired
 }
 
-const EmailConfirm = ({
-  userEmail,
-  isLoading,
-  error,
-  open,
-  onCancel,
-  onConfirm
-}) => (
+const EmailConfirm = ({ userEmail, isLoading, error, open, onCancel, onConfirm }) => (
   <Modal open={open} onClose={onCancel}>
     <Modal.Header>Send email about receiving access to oodikone</Modal.Header>
     <Modal.Content scrolling>
@@ -52,14 +33,7 @@ const EmailConfirm = ({
       <Button disabled={isLoading} onClick={onCancel}>
         Cancel
       </Button>
-      <Button
-        primary
-        onClick={onConfirm}
-        disabled={isLoading}
-        loading={isLoading}
-        icon
-        labelPosition="right"
-      >
+      <Button primary onClick={onConfirm} disabled={isLoading} loading={isLoading} icon labelPosition="right">
         Send
         <Icon name="send" />
       </Button>
@@ -80,13 +54,7 @@ EmailConfirm.propTypes = {
   onConfirm: func.isRequired
 }
 
-const EmailNotification = ({
-  userEmail,
-  onEmailSend,
-  isSendLoading,
-  sendError,
-  onClearErrors
-}) => {
+const EmailNotification = ({ userEmail, onEmailSend, isSendLoading, sendError, onClearErrors }) => {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   useEffect(() => {

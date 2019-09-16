@@ -12,7 +12,7 @@ const getCourseYears = course => ({
   endYear: moment(course.max_attainment_date).year()
 })
 
-const getActiveYears = (course) => {
+const getActiveYears = course => {
   const { startYear, endYear } = getCourseYears(course)
   if (!startYear && !endYear) return 'No attainments yet'
   const startYearText = getYearText(startYear, isSpring(course.min_attainment_date))
@@ -32,7 +32,4 @@ const getActiveYears = (course) => {
   return `${startYearText} — ${endYearText}`
 }
 
-export {
-  getActiveYears,
-  getYearText
-}
+export { getActiveYears, getYearText }

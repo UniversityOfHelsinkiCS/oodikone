@@ -13,33 +13,26 @@ import ProgressBar from '../ProgressBar'
 import infoTooltips from '../../common/InfoToolTips'
 import { useProgress } from '../../common'
 
-const PopulationStatistics = memo((props) => {
-  const {
-    translate,
-    populationFound,
-    loading,
-    location
-  } = props
+const PopulationStatistics = memo(props => {
+  const { translate, populationFound, loading, location } = props
 
-  const {
-    onProgress,
-    progress
-  } = useProgress(loading)
+  const { onProgress, progress } = useProgress(loading)
 
   const renderPopulationSearch = () => {
     const { Main } = infoTooltips.PopulationStatistics
-    const title = populationFound ?
-      translate('populationStatistics.foundTitle') :
-      translate('populationStatistics.searchTitle')
+    const title = populationFound
+      ? translate('populationStatistics.foundTitle')
+      : translate('populationStatistics.searchTitle')
 
     return (
       <Segment>
-        <Header size="medium">{title}
+        <Header size="medium">
+          {title}
           {!populationFound && <InfoBox content={Main} />}
         </Header>
         <PopulationSearchForm onProgress={onProgress} />
         <Divider />
-        {location.search !== '' ? (<PopulationSearchHistory />) : null}
+        {location.search !== '' ? <PopulationSearchHistory /> : null}
         <ProgressBar fixed progress={progress} />
       </Segment>
     )
@@ -47,10 +40,12 @@ const PopulationStatistics = memo((props) => {
 
   return (
     <div className="segmentContainer">
-      <Header className="segmentTitle" size="large">{translate('populationStatistics.header')}</Header>
+      <Header className="segmentTitle" size="large">
+        {translate('populationStatistics.header')}
+      </Header>
       <Segment className="contentSegment">
         {renderPopulationSearch()}
-        {location.search !== '' ? (<PopulationDetails />) : null}
+        {location.search !== '' ? <PopulationDetails /> : null}
       </Segment>
     </div>
   )

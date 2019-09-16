@@ -24,7 +24,18 @@ export const getFacultyProgrammes = () => {
   return callController(route, prefix)
 }
 
-const reducer = (state = { data: [], yearlyStats: [], facultyProgrammes: [], pending: false, error: false, userFacultiesPending: false, userFacultiesError: false }, action) => {
+const reducer = (
+  state = {
+    data: [],
+    yearlyStats: [],
+    facultyProgrammes: [],
+    pending: false,
+    error: false,
+    userFacultiesPending: false,
+    userFacultiesError: false
+  },
+  action
+) => {
   switch (action.type) {
     case 'GET_FACULTIES_ATTEMPT':
       return {

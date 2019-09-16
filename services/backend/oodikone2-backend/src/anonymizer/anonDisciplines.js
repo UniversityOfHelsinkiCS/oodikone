@@ -112,4 +112,4 @@ const disciplines = {
     ]
   }
 }
-module.exports = {disciplines}
+module.exports = { disciplines }

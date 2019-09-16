@@ -29,8 +29,8 @@ class EnrollmentStatus extends Component {
     }
   }
 
-  formatSemesterCodeToText = (semester) => {
-    const text = moment(moment('1950', 'YYYY').add((semester * 6), 'months')).format('YYYY.MM')
+  formatSemesterCodeToText = semester => {
+    const text = moment(moment('1950', 'YYYY').add(semester * 6, 'months')).format('YYYY.MM')
     const split = text.split('.')
     const formatted = split[1] > 6 ? `Fall ${split[0]}` : `Spring ${split[0]}`
     return formatted
@@ -40,8 +40,11 @@ class EnrollmentStatus extends Component {
     const firstSemester = Math.floor(moment(minDate).diff(moment('1950', 'YYYY'), 'months') / 6)
     const lastSemester = Math.floor(moment(maxDate).diff(moment('1950', 'YYYY'), 'months') / 6)
     const allSemesters = range(firstSemester, lastSemester + 1)
-    const options = allSemesters.map(semester =>
-      ({ key: semester, text: this.formatSemesterCodeToText(semester), value: semester }))
+    const options = allSemesters.map(semester => ({
+      key: semester,
+      text: this.formatSemesterCodeToText(semester),
+      value: semester
+    }))
 
     return options
   }
@@ -51,9 +54,12 @@ class EnrollmentStatus extends Component {
   }
 
   handleFilter = () => {
-    this.props.setPopulationFilter(enrollmentStatus({
-      semesters: this.state.semesters, enrolled: this.state.enrolled
-    }))
+    this.props.setPopulationFilter(
+      enrollmentStatus({
+        semesters: this.state.semesters,
+        enrolled: this.state.enrolled
+      })
+    )
   }
 
   clearFilter = () => {
@@ -82,7 +88,6 @@ class EnrollmentStatus extends Component {
                   selectOnBlur={false}
                   selectOnNavigation={false}
                 />
-
               </Form.Field>
               <Form.Field>
                 <label> during </label>
@@ -97,16 +102,11 @@ class EnrollmentStatus extends Component {
                   selectOnBlur={false}
                   selectOnNavigation={false}
                 />
-
               </Form.Field>
               <Form.Field>
-                <Button
-                  onClick={this.handleFilter}
-                  disabled={this.state.semesters.length === 0}
-                >
+                <Button onClick={this.handleFilter} disabled={this.state.semesters.length === 0}>
                   set filter
                 </Button>
-
               </Form.Field>
             </Form.Group>
           </Form>
@@ -116,11 +116,8 @@ class EnrollmentStatus extends Component {
 
     return (
       <Segment>
-        Students that were {filter.params.enrolled === 1 ?
-          'present' :
-          'absent'} during {
-          filter.params.semesters.map(semester => this.formatSemesterCodeToText(semester)).join(', ')
-        }
+        Students that were {filter.params.enrolled === 1 ? 'present' : 'absent'} during{' '}
+        {filter.params.semesters.map(semester => this.formatSemesterCodeToText(semester)).join(', ')}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

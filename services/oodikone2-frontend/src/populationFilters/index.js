@@ -1,127 +1,135 @@
 import uuidv4 from 'uuid/v4'
-import { getStudentTotalCredits, getStudentTotalCreditsFromMandatory, getStudentGradeMean, getNewestProgramme } from '../common'
+import {
+  getStudentTotalCredits,
+  getStudentTotalCreditsFromMandatory,
+  getStudentGradeMean,
+  getNewestProgramme
+} from '../common'
 
-export const creditsLessThan = (params) => {
+export const creditsLessThan = params => {
   const { credit } = params
 
-  return ({
+  return {
     id: uuidv4(),
     type: 'CreditsLessThan',
     params: {
       credit
     },
-    filter: (student) => {
+    filter: student => {
       const creditsOfStudent = getStudentTotalCredits(student)
       return credit > creditsOfStudent
     }
-  })
+  }
 }
-export const sexFilter = (params) => {
+export const sexFilter = params => {
   const { gender } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'SexFilter',
     params: {
       gender
     },
     filter: student => student.gender_code === gender
-  })
+  }
 }
-export const matriculationFilter = (params) => {
+export const matriculationFilter = params => {
   const { matriculationexamination } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'HasMatriculation',
     params: {
       matriculationexamination
     },
     filter: student => student.matriculationexamination === matriculationexamination
-  })
+  }
 }
-export const creditsAtLeast = (params) => {
+export const creditsAtLeast = params => {
   const { credit } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'CreditsAtLeast',
     params: {
       credit
     },
-    filter: (student) => {
+    filter: student => {
       const creditsOfStudent = getStudentTotalCredits(student)
       return credit <= creditsOfStudent
     }
-  })
+  }
 }
-export const enrollmentStatus = (params) => {
+export const enrollmentStatus = params => {
   const { semesters, enrolled } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'EnrollmentStatus',
     params: {
       semesters,
       enrolled
     },
-    filter: student => student.semesterenrollments.filter(({ semestercode }) =>
-      semesters.includes(semestercode)).map(({ enrollmenttype }) => enrollmenttype === enrolled).every(b => b === true)
-  })
+    filter: student =>
+      student.semesterenrollments
+        .filter(({ semestercode }) => semesters.includes(semestercode))
+        .map(({ enrollmenttype }) => enrollmenttype === enrolled)
+        .every(b => b === true)
+  }
 }
 
-export const transferFilter = (params) => {
+export const transferFilter = params => {
   const { source, target } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'TransferFilter',
     params: {
       source,
       target
     },
-    filter: student => student.transfers.map(transfer =>
-      (source === 'anywhere' || transfer.source.code === source) &&
-      (target === 'anywhere' || transfer.target.code === target))
-      .some(b => b === true)
-
-  })
+    filter: student =>
+      student.transfers
+        .map(
+          transfer =>
+            (source === 'anywhere' || transfer.source.code === source) &&
+            (target === 'anywhere' || transfer.target.code === target)
+        )
+        .some(b => b === true)
+  }
 }
 
-export const startingThisSemester = (params) => {
+export const startingThisSemester = params => {
   const { starting } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'StartingThisSemester',
     params: {
       starting
     },
-    filter: student =>
-      student.starting === starting
-  })
+    filter: student => student.starting === starting
+  }
 }
 
-export const transferTo = (params) => {
+export const transferTo = params => {
   const { negated } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'TransferToStudyrightFilter',
     params: { negated },
     filter: student => (negated ? student.transferredStudyright : !student.transferredStudyright)
-  })
+  }
 }
 
-export const courseParticipation = ({ field, course = {} }) =>
-  ({
-    id: uuidv4(),
-    type: 'CourseParticipation',
-    params: {
-      field,
-      course
-    },
-    studentsOfSelectedField: course.students ? course.students[field] : {},
-    filter: student =>
-      (course.students ? course.students[field][student.studentNumber] === true : false)
-  })
+export const courseParticipation = ({ field, course = {} }) => ({
+  id: uuidv4(),
+  type: 'CourseParticipation',
+  params: {
+    field,
+    course
+  },
+  studentsOfSelectedField: course.students ? course.students[field] : {},
+  filter: student => (course.students ? course.students[field][student.studentNumber] === true : false)
+})
 
-export const extentGraduated = (params) => {
+export const extentGraduated = params => {
   const { code, graduated, complemented, isExtent, studyright, simple } = params
-  return ({
+  return {
     id: uuidv4(),
     type: simple ? 'SimpleExtentGraduated' : 'ExtentGraduated',
     params: {
@@ -132,67 +140,75 @@ export const extentGraduated = (params) => {
       isExtent,
       simple
     },
-    filter: (student) => {
+    filter: student => {
       if (isExtent) {
         if (complemented === 'true' && graduated === 'either') {
           // jos koodi 7 eli exchange student
-          const thisStudyright = student.studyrights
-            .find(s => s.studyrightElements.map(e => e.code).includes(studyright))
+          const thisStudyright = student.studyrights.find(s =>
+            s.studyrightElements.map(e => e.code).includes(studyright)
+          )
 
           return !thisStudyright || thisStudyright.extentcode !== code
-        } else if (complemented === 'true' && graduated === 'grad') {
-          return !student.studyrights.filter(sr =>
-            sr.extentcode === code && sr.graduated).map(sr => sr.extentcode).includes(code)
-        } else if (complemented === 'false' && graduated === 'either') {
+        }
+        if (complemented === 'true' && graduated === 'grad') {
+          return !student.studyrights
+            .filter(sr => sr.extentcode === code && sr.graduated)
+            .map(sr => sr.extentcode)
+            .includes(code)
+        }
+        if (complemented === 'false' && graduated === 'either') {
           return student.studyrights.map(sr => sr.extentcode).includes(code)
         }
-        return student.studyrights.filter(sr =>
-          sr.extentcode === code && sr.graduated).map(sr => sr.extentcode).includes(code)
+        return student.studyrights
+          .filter(sr => sr.extentcode === code && sr.graduated)
+          .map(sr => sr.extentcode)
+          .includes(code)
       }
       const foundStudyRight = student.studyrights.find(s => s.studyrightElements.map(e => e.code).includes(code))
-      const returnable = graduated !== 'grad' ? !!foundStudyRight : (foundStudyRight && foundStudyRight.graduated)
+      const returnable = graduated !== 'grad' ? !!foundStudyRight : foundStudyRight && foundStudyRight.graduated
       return complemented === 'true' ? !returnable : returnable
     }
-  })
+  }
 }
 
-export const courseParticipationNTimes = (params) => {
+export const courseParticipationNTimes = params => {
   const { amount, courses } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'CourseParticipationNTimes',
     params: {
       amount,
       courses
     },
-    filter: student => student.courses
-      .filter(cr => courses.includes(cr.course.code)).length < amount
-  })
+    filter: student => student.courses.filter(cr => courses.includes(cr.course.code)).length < amount
+  }
 }
 
-export const canceledStudyright = (params) => {
+export const canceledStudyright = params => {
   const { studyrights, cancel } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'CanceledStudyright',
     params: {
       studyrights,
       cancel
     },
-    filter: (student) => {
+    filter: student => {
       if (cancel === 'true') {
-        return student.studyrights.filter(sr =>
-          sr.studyrightElements.some(e => Object.values(studyrights).includes(e.code))).every(sr => sr.canceldate)
+        return student.studyrights
+          .filter(sr => sr.studyrightElements.some(e => Object.values(studyrights).includes(e.code)))
+          .every(sr => sr.canceldate)
       }
-      return !student.studyrights.filter(sr =>
-        sr.studyrightElements.some(e => Object.values(studyrights).includes(e.code))).every(sr => sr.canceldate)
+      return !student.studyrights
+        .filter(sr => sr.studyrightElements.some(e => Object.values(studyrights).includes(e.code)))
+        .every(sr => sr.canceldate)
     }
-  })
+  }
 }
 
-export const creditsLessThanFromMandatory = (params) => {
+export const creditsLessThanFromMandatory = params => {
   const { amount, courses } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'CreditsLessThanFromMandatory',
     params: {
@@ -200,12 +216,12 @@ export const creditsLessThanFromMandatory = (params) => {
       courses
     },
     filter: student => amount > getStudentTotalCreditsFromMandatory(student, courses)
-  })
+  }
 }
 
-export const priorityStudyright = (params) => {
+export const priorityStudyright = params => {
   const { prioritycode, degree, programme } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'PriorityStudyright',
     params: {
@@ -214,7 +230,7 @@ export const priorityStudyright = (params) => {
       programme
     },
     filter: student =>
-      student.studyrights.some((sr) => {
+      student.studyrights.some(sr => {
         if (sr.prioritycode === prioritycode) {
           const elements = sr.studyrightElements.map(e => e.code)
           let bools = []
@@ -228,51 +244,51 @@ export const priorityStudyright = (params) => {
         }
         return false
       })
-  })
+  }
 }
 
-export const gradeMeanFilter = (params) => {
+export const gradeMeanFilter = params => {
   const { gradeMean, comparator } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'GradeMeanFilter',
     params: {
       gradeMean,
       comparator
     },
-    filter: (student) => {
+    filter: student => {
       const gradeMeanOfStudent = getStudentGradeMean(student)
       if (comparator === 'less') {
         return gradeMean > gradeMeanOfStudent
       }
       return gradeMean <= gradeMeanOfStudent
     }
-  })
+  }
 }
 
-export const tagFilter = (params) => {
+export const tagFilter = params => {
   const { text, value } = params.tag
   const { comp } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'TagFilter',
     params: {
       text,
       comp
     },
-    filter: (student) => {
+    filter: student => {
       const studentTagIds = student.tags.map(t => t.tag.tag_id)
       if (comp) {
         return studentTagIds.includes(value)
       }
       return !studentTagIds.includes(value)
     }
-  })
+  }
 }
 
-export const gradeFilter = (params) => {
+export const gradeFilter = params => {
   const { coursecodes, grade, coursename } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'GradeFilter',
     params: {
@@ -280,17 +296,17 @@ export const gradeFilter = (params) => {
       grade,
       coursename
     },
-    filter: (student) => {
+    filter: student => {
       const courses = student.courses.filter(c => coursecodes.includes(c.course.code))
       const newestCourse = courses.sort((a, b) => new Date(b.date) - new Date(a.date))[0]
       return newestCourse.grade === grade
     }
-  })
+  }
 }
 
-export const courseCreditFilter = (params) => {
+export const courseCreditFilter = params => {
   const { coursecodes, credits, coursename } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'CourseCreditFilter',
     params: {
@@ -298,27 +314,27 @@ export const courseCreditFilter = (params) => {
       credits,
       coursename
     },
-    filter: (student) => {
+    filter: student => {
       const course = student.courses.find(c => coursecodes.includes(c.course.code))
       return Number(course.credits) === Number(credits)
     }
-  })
+  }
 }
 
-export const programmeFilter = (params) => {
+export const programmeFilter = params => {
   const { programme, programmeName } = params
-  return ({
+  return {
     id: uuidv4(),
     type: 'ProgrammeFilter',
     params: {
       programme,
       programmeName
     },
-    filter: (student) => {
+    filter: student => {
       const studentStudyrightCode = getNewestProgramme(student.studyrights)
       return studentStudyrightCode.code === programme
     }
-  })
+  }
 }
 
 export const presetFilter = preset => ({
@@ -354,11 +370,9 @@ export const getFilterFunction = (type, params, populationCourses) => {
     case 'CourseParticipation':
       return courseParticipation({
         field: params.field,
-        course: populationCourses.coursestatistics.find(c =>
-          c.course.code === params.course.course.code)
+        course: populationCourses.coursestatistics.find(c => c.course.code === params.course.course.code)
       })
     default:
       return typeList[type](params)
   }
 }
-

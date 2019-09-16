@@ -18,7 +18,7 @@ export const calculateStatsForProgramme = (stats, fromYear, toYear) => {
 }
 
 export const calculateTotalPassedCourses = ({ totalCoursesPassed, totalCoursesFailed }) => {
-  const ratio = ((totalCoursesPassed / (totalCoursesPassed + totalCoursesFailed)) * 100)
+  const ratio = (totalCoursesPassed / (totalCoursesPassed + totalCoursesFailed)) * 100
   return Number.isNaN(ratio) ? 0 : ratio
 }
 

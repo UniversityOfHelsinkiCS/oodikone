@@ -58,10 +58,8 @@ class AddMandatoryCourses extends Component {
     return (
       <Segment>
         <Header>Add courses</Header>
-        <Button onClick={() => this.toggleVisibility(visible)}>
-          {!visible ? 'Add Courses' : 'Hide'}
-        </Button>
-        {visible ?
+        <Button onClick={() => this.toggleVisibility(visible)}>{!visible ? 'Add Courses' : 'Hide'}</Button>
+        {visible ? (
           <Form loading={pending}>
             <Form.Group widths="equal" style={{ marginTop: '15px' }}>
               <Form.Field>
@@ -95,21 +93,25 @@ class AddMandatoryCourses extends Component {
               controlIcon="plus"
               mandatory
             />
-          </Form> :
-          null
-        }
-      </Segment>)
+          </Form>
+        ) : null}
+      </Segment>
+    )
   }
 }
 
 const mapStateToProps = state => ({
   matchingCourses: getCourseSearchResults(state),
   pending: state.courseSearch.pending,
-  mandatoryCourseCodes: state.populationMandatoryCourses.data ?
-    state.populationMandatoryCourses.data.map(man => man.code) : []
+  mandatoryCourseCodes: state.populationMandatoryCourses.data
+    ? state.populationMandatoryCourses.data.map(man => man.code)
+    : []
 })
 
-export default connect(mapStateToProps, {
-  findCoursesV2,
-  clearCourses
-})(AddMandatoryCourses)
+export default connect(
+  mapStateToProps,
+  {
+    findCoursesV2,
+    clearCourses
+  }
+)(AddMandatoryCourses)

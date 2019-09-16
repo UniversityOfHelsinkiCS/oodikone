@@ -8,26 +8,19 @@ import selector from '../../selectors/populationDetails'
 import { getTagsByStudytrackAction } from '../../redux/tags'
 import { getStudentTagsByStudytrackAction } from '../../redux/tagstudent'
 
-const Row = memo(({
-  studentsTags,
-  sn,
-  studytrack,
-  tagOptions }) => (
+const Row = memo(
+  ({ studentsTags, sn, studytrack, tagOptions }) => (
     <div>
       <List horizontal>
+        <List.Item></List.Item>
         <List.Item>
-        </List.Item>
-        <List.Item>
-          <TagStudent
-            studentnumber={sn}
-            studentstags={studentsTags}
-            studytrack={studytrack}
-            tagOptions={tagOptions}
-          />
+          <TagStudent studentnumber={sn} studentstags={studentsTags} studytrack={studytrack} tagOptions={tagOptions} />
         </List.Item>
       </List>
     </div>
-), (prevProps, newProps) => prevProps.studentsTags.length === newProps.studentsTags.length)
+  ),
+  (prevProps, newProps) => prevProps.studentsTags.length === newProps.studentsTags.length
+)
 
 Row.propTypes = {
   studentsTags: arrayOf(shape({})).isRequired,
@@ -42,30 +35,40 @@ const TagList = ({ selectedStudents, tagstudent, tags, studytrack, getStudentTag
     getStudentTagsStudyTrack(studytrack)
   }, [])
 
-  const tagRows = selectedStudents
-    .map((sn) => {
-      const studentsTags = tagstudent.filter(tag => tag.studentnumber === sn)
-      const tagIds = studentsTags.map(t => t.tag.tag_id)
-      const studentTagOptions = tags.filter(tag => !tagIds.includes(tag.tag_id)).map(tag => ({
+  const tagRows = selectedStudents.map(sn => {
+    const studentsTags = tagstudent.filter(tag => tag.studentnumber === sn)
+    const tagIds = studentsTags.map(t => t.tag.tag_id)
+    const studentTagOptions = tags
+      .filter(tag => !tagIds.includes(tag.tag_id))
+      .map(tag => ({
         key: tag.tag_id,
         text: tag.tagname,
         value: tag.tag_id
       }))
-      return <Row key={sn} tags={tags} studentsTags={studentsTags} sn={sn} studytrack={studytrack} tagOptions={studentTagOptions} />
-    })
+    return (
+      <Row
+        key={sn}
+        tags={tags}
+        studentsTags={studentsTags}
+        sn={sn}
+        studytrack={studytrack}
+        tagOptions={studentTagOptions}
+      />
+    )
+  })
 
   return tagRows
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const { tagstudent, tags } = state
   const { selectedStudents, programme } = selector.makePopulationsToData(state)
-  return ({
+  return {
     tagstudent: tagstudent.data,
     tags: tags.data,
     selectedStudents,
     studytrack: programme
-  })
+  }
 }
 
 TagList.propTypes = {
@@ -77,7 +80,10 @@ TagList.propTypes = {
   tagstudent: arrayOf(shape({})).isRequired
 }
 
-export default connect(mapStateToProps, {
-  getTagsByStudytrack: getTagsByStudytrackAction,
-  getStudentTagsStudyTrack: getStudentTagsByStudytrackAction
-})(TagList)
+export default connect(
+  mapStateToProps,
+  {
+    getTagsByStudytrack: getTagsByStudytrackAction,
+    getStudentTagsStudyTrack: getStudentTagsByStudytrackAction
+  }
+)(TagList)

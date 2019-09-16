@@ -23,9 +23,8 @@ const AutoSubmitSearchInput = ({
 }) => {
   const [input, setInput] = useState(value)
 
-  const executeSearch = (searchterm) => {
-    setTimeout(TIMEOUTS.FETCH, () => {
-    }, latency)
+  const executeSearch = searchterm => {
+    setTimeout(TIMEOUTS.FETCH, () => {}, latency)
     doSearch(searchterm).then(() => {
       clearTimeout(TIMEOUTS.FETCH)
     })
@@ -45,9 +44,13 @@ const AutoSubmitSearchInput = ({
     clearTimeout(TIMEOUTS.SEARCH)
     if (val.length >= 0) {
       onChange(val)
-      setTimeout(TIMEOUTS.SEARCH, () => {
-        setInput(val)
-      }, latency)
+      setTimeout(
+        TIMEOUTS.SEARCH,
+        () => {
+          setInput(val)
+        },
+        latency
+      )
     } else {
       resetComponent()
     }

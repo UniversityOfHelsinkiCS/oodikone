@@ -23,10 +23,7 @@ class StackedBarChart extends Component {
   render() {
     return (
       <div>
-        <ReactHighcharts
-          highcharts={Highcharts}
-          config={this.state.graphOptions}
-        />
+        <ReactHighcharts highcharts={Highcharts} config={this.state.graphOptions} />
       </div>
     )
   }

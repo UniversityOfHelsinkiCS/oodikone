@@ -31,7 +31,8 @@ const CoursePopulation = ({
   history,
   translate,
   courseData,
-  selectedStudents }) => {
+  selectedStudents
+}) => {
   const parseQueryFromUrl = () => {
     const { location } = history
     const query = qs.parse(location.search)
@@ -41,16 +42,18 @@ const CoursePopulation = ({
   const [headerYear, setYear] = useState('')
   const [yearCode, setYearCode] = useState('')
 
-  const {
-    onProgress,
-    progress
-  } = useProgress((pending && !studentData.students))
+  const { onProgress, progress } = useProgress(pending && !studentData.students)
 
   useEffect(() => {
     const query = parseQueryFromUrl()
     getCoursePopulationDispatch({ coursecodes: query.coursecodes, yearcode: query.yearcode, onProgress })
     getCoursePopulationCoursesDispatch({ coursecodes: JSON.parse(query.coursecodes), yearcode: query.yearcode })
-    getSingleCourseStatsDispatch({ fromYear: query.yearcode, toYear: query.yearcode, courseCodes: JSON.parse(query.coursecodes), separate: false })
+    getSingleCourseStatsDispatch({
+      fromYear: query.yearcode,
+      toYear: query.yearcode,
+      courseCodes: JSON.parse(query.coursecodes),
+      separate: false
+    })
     setCodes(JSON.parse(query.coursecodes))
     setYearCode(query.yearcode)
     setYear(query.year)
@@ -64,7 +67,9 @@ const CoursePopulation = ({
     <div className="segmentContainer">
       {studentData.students ? (
         <Segment className="contentSegment">
-          <Header className="segmentTitle" size="large" textAlign="center">Population of course {header}</Header>
+          <Header className="segmentTitle" size="large" textAlign="center">
+            Population of course {header}
+          </Header>
           <CustomPopulationFilters samples={studentData.students} coursecodes={codes} />
           <Segment>
             <Header>Grade distribution</Header>
@@ -74,10 +79,7 @@ const CoursePopulation = ({
             <Header>Programme distribution</Header>
             <CustomPopulationProgrammeDist samples={studentData.students} selectedStudents={selectedStudents} />
           </Segment>
-          <PopulationStudents
-            samples={studentData.students}
-            selectedStudents={selectedStudents}
-          />
+          <PopulationStudents samples={studentData.students} selectedStudents={selectedStudents} />
           <Segment>
             <Header size="medium" dividing>
               {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
@@ -90,17 +92,13 @@ const CoursePopulation = ({
               translate={translate}
             />
           </Segment>
-          <CustomPopulationCourses
-            selectedStudents={selectedStudents}
-          />
+          <CustomPopulationCourses selectedStudents={selectedStudents} />
         </Segment>
-      ) :
-        (
-          <Segment className="contentSegment">
-            <ProgressBar progress={progress} />
-          </Segment>
-        )
-      }
+      ) : (
+        <Segment className="contentSegment">
+          <ProgressBar progress={progress} />
+        </Segment>
+      )}
     </div>
   )
 }
@@ -124,7 +122,7 @@ const mapStateToProps = ({ localize, singleCourseStats, populationFilters, popul
   const { complemented } = populationFilters
 
   if (samples.length > 0 && populationFilters.filters.length > 0) {
-    const studentsForFilter = (f) => {
+    const studentsForFilter = f => {
       if (f.type === 'CourseParticipation') {
         return Object.keys(f.studentsOfSelectedField)
       }
@@ -138,19 +136,24 @@ const mapStateToProps = ({ localize, singleCourseStats, populationFilters, popul
       selectedStudents = difference(samples.map(s => s.studentNumber), selectedStudents)
     }
   }
-  return ({
+  return {
     studentData: populations.data,
     pending: populations.pending,
     translate: getTranslate(localize),
     query: populations.query,
     courseData: singleCourseStats.stats || {},
     selectedStudents
-  })
+  }
 }
 
-export default withRouter(connect(mapStateToProps, {
-  getCoursePopulationDispatch: getCoursePopulation,
-  getCoursePopulationCoursesDispatch: getCoursePopulationCourses,
-  getSingleCourseStatsDispatch: getSingleCourseStats,
-  clearPopulationFiltersDispatch: clearPopulationFilters
-})(CoursePopulation))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    {
+      getCoursePopulationDispatch: getCoursePopulation,
+      getCoursePopulationCoursesDispatch: getCoursePopulationCourses,
+      getSingleCourseStatsDispatch: getSingleCourseStats,
+      clearPopulationFiltersDispatch: clearPopulationFilters
+    }
+  )(CoursePopulation)
+)

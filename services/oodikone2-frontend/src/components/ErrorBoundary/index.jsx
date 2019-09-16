@@ -21,14 +21,14 @@ class ErrorBoundary extends Component {
 
   static getDerivedStateFromProps(props) {
     const { auth, actionHistory } = props
-    Sentry.configureScope((scope) => {
+    Sentry.configureScope(scope => {
       if (auth.token) scope.setUser({ username: auth.token.userId })
       scope.setExtra('actionHistory', JSON.stringify(actionHistory))
     })
     return null
   }
 
-  componentDidCatch = (e) => {
+  componentDidCatch = e => {
     Sentry.captureException(e)
   }
 
@@ -73,4 +73,7 @@ const mapStateToProps = ({ actionHistory, auth }) => ({
   actionHistory
 })
 
-export default connect(mapStateToProps, { login: loginAction })(ErrorBoundary)
+export default connect(
+  mapStateToProps,
+  { login: loginAction }
+)(ErrorBoundary)

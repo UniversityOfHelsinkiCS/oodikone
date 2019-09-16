@@ -60,7 +60,7 @@ class Index extends Component {
     }
   }
 
-  onCourseHeaderClick = (columnName) => {
+  onCourseHeaderClick = columnName => {
     const { sortColumn, sortReverse } = this.state
     const isSortColumn = columnName === sortColumn
 
@@ -78,10 +78,8 @@ class Index extends Component {
       path = `${path}&semester=${semesterCode}`
     }
 
-    this.setState(
-      { isLoading: true, courses: [] },
-      () => callApi(path)
-        .then(({ data: courses }) => this.setState({ isLoading: false, courses }))
+    this.setState({ isLoading: true, courses: [] }, () =>
+      callApi(path).then(({ data: courses }) => this.setState({ isLoading: false, courses }))
     )
   }
 
@@ -89,7 +87,9 @@ class Index extends Component {
     const placeholderKeys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     return (
       <Placeholder fluid>
-        {placeholderKeys.map(k => <Placeholder.Line key={k} length="full" />)}
+        {placeholderKeys.map(k => (
+          <Placeholder.Line key={k} length="full" />
+        ))}
       </Placeholder>
     )
   }
@@ -100,14 +100,9 @@ class Index extends Component {
     const getHeader = (className, label, columnName) => {
       const isActive = columnName === sortColumn
       return (
-        <div
-          className={className}
-          onClick={() => this.onCourseHeaderClick(columnName)}
-        >
+        <div className={className} onClick={() => this.onCourseHeaderClick(columnName)}>
           {label}
-          {isActive
-            ? <Icon name={`caret ${sortReverse ? 'down' : 'up'}`} />
-            : null}
+          {isActive ? <Icon name={`caret ${sortReverse ? 'down' : 'up'}`} /> : null}
         </div>
       )
     }
@@ -137,15 +132,16 @@ class Index extends Component {
       <Fragment>
         <Header size="medium" content="Courses" />
         <Loader active={isLoading} inline="centered" />
-        {isLoading
-         ? this.renderPlaceholder()
-         :
-         <List celled>
-           {this.renderListHeader()}
-           {sortedCourses.map(c =>
-             <CourseItem key={`${c.coursecode}-${c.teachercode}`} course={c} />)}
-         </List>
-        }
+        {isLoading ? (
+          this.renderPlaceholder()
+        ) : (
+          <List celled>
+            {this.renderListHeader()}
+            {sortedCourses.map(c => (
+              <CourseItem key={`${c.coursecode}-${c.teachercode}`} course={c} />
+            ))}
+          </List>
+        )}
       </Fragment>
     )
   }

@@ -1,23 +1,26 @@
 const { ThesisCourse } = require('../models/models_kone')
 
-const createThesisCourse = (programme, course, type) => ThesisCourse.create({
-  programmeCode: programme,
-  courseCode: course,
-  thesisType: type
-})
-
-const deleteThesisCourse = (programme, course) => ThesisCourse.destroy({
-  where: {
+const createThesisCourse = (programme, course, type) =>
+  ThesisCourse.create({
     programmeCode: programme,
-    courseCode: course
-  }
-})
+    courseCode: course,
+    thesisType: type
+  })
 
-const findProgrammeTheses = programme => ThesisCourse.findAll({
-  where: {
-    programmeCode: programme
-  }
-})
+const deleteThesisCourse = (programme, course) =>
+  ThesisCourse.destroy({
+    where: {
+      programmeCode: programme,
+      courseCode: course
+    }
+  })
+
+const findProgrammeTheses = programme =>
+  ThesisCourse.findAll({
+    where: {
+      programmeCode: programme
+    }
+  })
 
 module.exports = {
   createThesisCourse,

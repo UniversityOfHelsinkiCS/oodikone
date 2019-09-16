@@ -59,7 +59,6 @@ router.delete('/tags', async (req, res) => {
     console.log(err)
     res.status(500).json(err)
   }
-
 })
 
 router.get('/studenttags', async (req, res) => {
@@ -129,7 +128,10 @@ router.post('/studenttags', async (req, res) => {
     const studentnumbers = tags.map(t => t.studentnumber)
     const students = await Students.filterStudentnumbersByAccessrights(studentnumbers, [studytrack])
     const missingStudents = difference(studentnumbers, students)
-    if (missingStudents.length !== 0) return res.status(400).json({ error: `Could not find the following students from the programme: ${missingStudents.join(', ')}` })
+    if (missingStudents.length !== 0)
+      return res
+        .status(400)
+        .json({ error: `Could not find the following students from the programme: ${missingStudents.join(', ')}` })
 
     await TagStudent.createMultipleStudentTags(tags)
     const result = await TagStudent.getStudentTagsByStudytrack(studytrack)

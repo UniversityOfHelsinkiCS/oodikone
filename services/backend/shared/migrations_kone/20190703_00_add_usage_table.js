@@ -1,5 +1,5 @@
 module.exports = {
-  up: async (queryInterface) => {
+  up: async queryInterface => {
     await queryInterface.sequelize.query(`
 -- Adminer 4.6.2 PostgreSQL dump
 
@@ -20,6 +20,5 @@ CREATE TABLE IF NOT EXISTS "public"."usage_statistics" (
 -- 2019-07-03 15:39:09.675736+00
 `)
   },
-  down: async () => {
-  }
+  down: async () => {}
 }

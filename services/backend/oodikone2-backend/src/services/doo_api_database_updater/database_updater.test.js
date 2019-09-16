@@ -11,12 +11,13 @@ beforeAll(async () => {
   await sequelize.query(query)
 })
 
-const findStudent = snumber => Student.findByPk(snumber, {
-  include: {
-    model: Studyright,
-    include: StudyrightElement
-  }
-})
+const findStudent = snumber =>
+  Student.findByPk(snumber, {
+    include: {
+      model: Studyright,
+      include: StudyrightElement
+    }
+  })
 
 test('deleteStudentStudyrights deletes associated studyrights and elements', async () => {
   const studentBefore = await findStudent(SNUMBER)
@@ -26,6 +27,6 @@ test('deleteStudentStudyrights deletes associated studyrights and elements', asy
   const studentAfter = await findStudent(SNUMBER)
   expect(studentAfter).toBeTruthy()
   expect(studentAfter.studyrights.length).toBe(0)
-  const elements = await StudyrightElement.findAll({ where: { studentnumber: SNUMBER }})
+  const elements = await StudyrightElement.findAll({ where: { studentnumber: SNUMBER } })
   expect(elements.length).toBe(0)
 })

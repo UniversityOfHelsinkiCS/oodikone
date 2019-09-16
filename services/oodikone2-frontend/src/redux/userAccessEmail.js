@@ -9,7 +9,7 @@ const sendingTypes = actionTypes(sendingPrefix)
 const previewPrefix = 'GET_USER_ACCESS_EMAIL_PREVIEW_'
 const previewTypes = actionTypes(previewPrefix)
 
-export const sendEmail = (recipientAddress) => {
+export const sendEmail = recipientAddress => {
   const route = '/users/email'
   const data = { email: recipientAddress }
   const method = 'post'
@@ -25,8 +25,7 @@ export const clearErrors = () => ({
   type: CLEAR_USER_ACCESS_ERRORS
 })
 
-const extractAxiosError = response =>
-  response.data && (response.data.error || response.data)
+const extractAxiosError = response => response.data && (response.data.error || response.data)
 
 const sendingPending = (state = false, action) => {
   switch (action.type) {

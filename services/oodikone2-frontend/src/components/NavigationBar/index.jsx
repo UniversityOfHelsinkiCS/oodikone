@@ -21,10 +21,7 @@ const adminerUrls = [
 const allNavigationItems = {
   populations: {
     translateId: 'studyProgramme',
-    items: [
-      { path: '/populations', translateId: 'class' },
-      { path: '/study-programme', translateId: 'overview' }
-    ]
+    items: [{ path: '/populations', translateId: 'class' }, { path: '/study-programme', translateId: 'overview' }]
   },
   students: { path: '/students', translateId: 'students' },
   courseStatistics: { path: '/coursestatistics', translateId: 'courseStatistics' },
@@ -37,19 +34,12 @@ const allNavigationItems = {
   feedback: { path: '/feedback', translateId: 'feedback' }
 }
 
-const NavigationBar = (props) => {
-  const {
-    logout,
-    translate: t,
-    userRoles,
-    rights,
-    mockedBy,
-    userId
-  } = props
+const NavigationBar = props => {
+  const { logout, translate: t, userRoles, rights, mockedBy, userId } = props
 
   const refreshNavigationRoutes = () => {
     const visibleNavigationItems = {}
-    Object.keys(allNavigationItems).forEach((key) => {
+    Object.keys(allNavigationItems).forEach(key => {
       if (key === 'courseStatistics') {
         if (!userRoles.includes('admin') && rights.length === 0) {
           return
@@ -71,105 +61,72 @@ const NavigationBar = (props) => {
   }
 
   const renderHome = () => (
-    <Menu.Item
-      as={Link}
-      to="/"
-      tabIndex="-1"
-    >
+    <Menu.Item as={Link} to="/" tabIndex="-1">
       <span className="logo">
         <h2 className="logoText">oodikone</h2>
       </span>
     </Menu.Item>
   )
 
-  const renderNavigationRoutes = () => (
-    Object.values(visibleNavigationItems).map(({ items, path, translateId }) => (
-      items ?
-        (
-          <Menu.Item
-            as={Dropdown}
-            key={`menu-item-drop-${translateId}`}
-            tabIndex="-1"
-            text={t(`navigationBar.${translateId}`)}
-          >
-            <Dropdown.Menu>
-              {items.map(i => (
-                <Dropdown.Item
-                  as={NavLink}
-                  key={`menu-item-${i.path}`}
-                  to={i.path}
-                  tabIndex="-1"
-                >
-                  {t(`navigationBar.${i.translateId}`)}
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Menu.Item>
-        ) :
-        (
-          <Menu.Item
-            as={NavLink}
-            key={`menu-item-${path}`}
-            to={path}
-            tabIndex="-1"
-          >
-            {t(`navigationBar.${translateId}`)}
-          </Menu.Item>
-        )
-    ))
-  )
-
-  const testUsers = ['tktl', 'mluukkai']
-  const renderUserMenu = () => (
-    process.env.NODE_ENV === 'development' ?
-      (
+  const renderNavigationRoutes = () =>
+    Object.values(visibleNavigationItems).map(({ items, path, translateId }) =>
+      items ? (
         <Menu.Item
           as={Dropdown}
-          style={{ backgroundColor: 'purple', color: 'white' }}
-          text="Dev controls"
+          key={`menu-item-drop-${translateId}`}
           tabIndex="-1"
+          text={t(`navigationBar.${translateId}`)}
         >
           <Dropdown.Menu>
-            {
-              adminerUrls.map(({ url, text }) => (
-                <Dropdown.Item
-                  key={url}
-                  onClick={() => {
-                    const win = window.open(url, '_blank')
-                    win.focus()
-                  }}
-                  text={text}
-                  icon="database"
-                />
-              ))
-            }
-            {
-              testUsers.map(user => (
-                <Dropdown.Item
-                  key={user}
-                  icon="user"
-                  text={`Use as: ${user}`}
-                  onClick={() => {
-                    setTestUser(user)
-                    window.location.reload()
-                  }}
-                />
-              ))
-            }
-            <Dropdown.Item
-              icon="log out"
-              text={t('navigationBar.logout')}
-              onClick={logout}
-            />
+            {items.map(i => (
+              <Dropdown.Item as={NavLink} key={`menu-item-${i.path}`} to={i.path} tabIndex="-1">
+                {t(`navigationBar.${i.translateId}`)}
+              </Dropdown.Item>
+            ))}
           </Dropdown.Menu>
         </Menu.Item>
-      ) :
-      (
-        <Menu.Item link onClick={logout} icon="log out" tabIndex="-1">
-          {t('navigationBar.logout')}
+      ) : (
+        <Menu.Item as={NavLink} key={`menu-item-${path}`} to={path} tabIndex="-1">
+          {t(`navigationBar.${translateId}`)}
         </Menu.Item>
       )
-  )
+    )
+
+  const testUsers = ['tktl', 'mluukkai']
+  const renderUserMenu = () =>
+    process.env.NODE_ENV === 'development' ? (
+      <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls" tabIndex="-1">
+        <Dropdown.Menu>
+          {adminerUrls.map(({ url, text }) => (
+            <Dropdown.Item
+              key={url}
+              onClick={() => {
+                const win = window.open(url, '_blank')
+                win.focus()
+              }}
+              text={text}
+              icon="database"
+            />
+          ))}
+          {testUsers.map(user => (
+            <Dropdown.Item
+              key={user}
+              icon="user"
+              text={`Use as: ${user}`}
+              onClick={() => {
+                setTestUser(user)
+                window.location.reload()
+              }}
+            />
+          ))}
+          <Dropdown.Item icon="log out" text={t('navigationBar.logout')} onClick={logout} />
+        </Dropdown.Menu>
+      </Menu.Item>
+    ) : (
+      <Menu.Item link onClick={logout} icon="log out" tabIndex="-1">
+        {t('navigationBar.logout')}
+      </Menu.Item>
+    )
 
   const renderLanguageChooser = () => (
     <Menu.Item>
@@ -185,11 +142,11 @@ const NavigationBar = (props) => {
 
   return (
     <Menu stackable fluid className="navBar">
-      { renderHome() }
-      { renderNavigationRoutes() }
-      { renderUserMenu() }
-      { renderLanguageChooser() }
-      { mockedBy && renderStopMockingButton() }
+      {renderHome()}
+      {renderNavigationRoutes()}
+      {renderUserMenu()}
+      {renderLanguageChooser()}
+      {mockedBy && renderStopMockingButton()}
     </Menu>
   )
 }
@@ -210,7 +167,11 @@ NavigationBar.defaultProps = {
   rights: []
 }
 
-const mapStateToProps = ({ auth: { token: { roles, rights, mockedBy, userId } } }) => ({
+const mapStateToProps = ({
+  auth: {
+    token: { roles, rights, mockedBy, userId }
+  }
+}) => ({
   userRoles: getUserRoles(roles),
   rights,
   mockedBy,

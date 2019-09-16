@@ -4,7 +4,14 @@ import { connect } from 'react-redux'
 import { shape, arrayOf, string } from 'prop-types'
 import Highcharts from 'highcharts'
 import {
-  HighchartsChart, withHighcharts, Chart, XAxis, YAxis, ColumnRangeSeries, Tooltip, Legend
+  HighchartsChart,
+  withHighcharts,
+  Chart,
+  XAxis,
+  YAxis,
+  ColumnRangeSeries,
+  Tooltip,
+  Legend
 } from 'react-jsx-highcharts'
 import selector from '../../selectors/oodilearnPopulations'
 
@@ -35,7 +42,7 @@ PopulationStackedBar.propTypes = {
   series: shape({}).isRequired
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const { categories, series } = selector.getPopulationStackedSeries(state)
   return { categories, series }
 }

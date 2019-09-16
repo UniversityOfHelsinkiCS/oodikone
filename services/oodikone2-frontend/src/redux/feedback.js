@@ -1,6 +1,6 @@
 import { callController } from '../apiConnection'
 
-export const sendFeedbackAction = (content) => {
+export const sendFeedbackAction = content => {
   const route = '/feedback/email'
   const prefix = 'SEND_FEEDBACK_'
   const data = { content }
