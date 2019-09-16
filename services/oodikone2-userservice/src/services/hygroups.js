@@ -1,17 +1,18 @@
 const { HyGroup } = require('../models/index')
 const { Op } = require('sequelize')
 
-const byId = id =>  HyGroup.findByPk(id)
+const byId = id => HyGroup.findByPk(id)
 
 const findAll = () => HyGroup.findAll()
 
-const byCodes = codes => HyGroup.findAll({
-  where: {
-    code: {
-      [Op.in]: codes
+const byCodes = codes =>
+  HyGroup.findAll({
+    where: {
+      code: {
+        [Op.in]: codes
+      }
     }
-  }
-})
+  })
 
 const create = code => HyGroup.create({ code })
 

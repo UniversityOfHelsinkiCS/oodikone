@@ -2,7 +2,7 @@ const { AccessGroup } = require('../../models')
 const defaultAccessGroups = [
   {
     group_code: 'teachers',
-    group_info: 'grants access to teacher statistics',
+    group_info: 'grants access to teacher statistics'
   },
   {
     group_code: 'admin',
