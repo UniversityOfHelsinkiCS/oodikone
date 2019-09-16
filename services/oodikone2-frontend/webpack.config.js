@@ -22,32 +22,29 @@ module.exports = (env, args) => {
     output: {
       publicPath: BASE_PATH,
       filename: '[name]-[hash].js',
-      chunkFilename: '[id]-[hash].js',
+      chunkFilename: '[id]-[hash].js'
     },
-    entry: [
-      'babel-polyfill',
-      './src/app'
-    ],
+    entry: ['babel-polyfill', './src/app'],
     resolve: {
       extensions: ['.js', '.jsx']
     },
     module: {
       rules: [
-        { // Load JS files
+        {
+          // Load JS files
           test: /\.js$|.jsx$/,
           exclude: /node_modules/,
           use: {
             loader: 'babel-loader'
           }
         },
-        { // Load CSS files
+        {
+          // Load CSS files
           test: /\.css$/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            'css-loader'
-          ]
+          use: [MiniCssExtractPlugin.loader, 'css-loader']
         },
-        { // Load other files
+        {
+          // Load other files
           test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
           use: ['file-loader']
         }
@@ -55,10 +52,7 @@ module.exports = (env, args) => {
     },
     plugins: [
       new DeadCodePlugin({
-        exclude: [
-          '**/node_modules/**',
-          '**/*.(storybook|spec).(js|jsx)'
-        ]
+        exclude: ['**/node_modules/**', '**/*.(storybook|spec).(js|jsx)']
       }),
       new HtmlWebpackPlugin({
         template: './index.html',
@@ -87,11 +81,13 @@ module.exports = (env, args) => {
       })
     ],
     optimization: {
-      minimizer: [new TerserPlugin({
-        cache: true,
-        parallel: true,
-        sourceMap: true
-      })]
+      minimizer: [
+        new TerserPlugin({
+          cache: true,
+          parallel: true,
+          sourceMap: true
+        })
+      ]
     },
     devtool: isDev ? 'eval-source-map' : 'source-map',
     devServer: {

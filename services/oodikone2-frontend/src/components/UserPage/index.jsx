@@ -1,14 +1,5 @@
 import React, { Component } from 'react'
-import {
-  Button,
-  Card,
-  Divider,
-  List,
-  Icon,
-  Popup,
-  Dropdown,
-  Header
-} from 'semantic-ui-react'
+import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { sortBy } from 'lodash'
@@ -92,7 +83,7 @@ class UserPage extends Component {
 
   allSpecializationIds = () => this.specializationOptions().map(sp => sp.key)
 
-  showAs = (uid) => {
+  showAs = uid => {
     setMocking(uid)
     this.props.history.push('/')
     window.location.reload()
@@ -105,41 +96,33 @@ class UserPage extends Component {
     elementdetailcodes.sort()
     return (
       <List divided>
-        {elementdetails.length > 0 && elementdetailcodes.map(({ elementDetailCode: code }) => {
-          const element = elementdetails.find(e => e.code === code)
-          return (
-            <List.Item key={code}>
-              <List.Content floated="right">
-                <Button
-                  basic
-                  negative
-                  floated="right"
-                  onClick={this.removeAccess(user.id, code)}
-                  content="Remove"
-                  size="tiny"
-                />
-              </List.Content>
-              <List.Content>
-                {element.type === 30 ? <Icon name="minus" /> : null} {`${nameInLanguage(element)} (${code})`}
-              </List.Content>
-            </List.Item>
-          )
-        })}
+        {elementdetails.length > 0 &&
+          elementdetailcodes.map(({ elementDetailCode: code }) => {
+            const element = elementdetails.find(e => e.code === code)
+            return (
+              <List.Item key={code}>
+                <List.Content floated="right">
+                  <Button
+                    basic
+                    negative
+                    floated="right"
+                    onClick={this.removeAccess(user.id, code)}
+                    content="Remove"
+                    size="tiny"
+                  />
+                </List.Content>
+                <List.Content>
+                  {element.type === 30 ? <Icon name="minus" /> : null} {`${nameInLanguage(element)} (${code})`}
+                </List.Content>
+              </List.Item>
+            )
+          })}
       </List>
     )
   }
 
   render() {
-    const {
-      user,
-      language,
-      elementdetails,
-      accessGroups,
-      isAdmin,
-      faculties,
-      setFaculties,
-      goBack
-    } = this.props
+    const { user, language, elementdetails, accessGroups, isAdmin, faculties, setFaculties, goBack } = this.props
 
     if (!accessGroups) {
       return null
@@ -156,7 +139,16 @@ class UserPage extends Component {
                 {isAdmin && user.is_enabled && (
                   <Popup
                     content="Show Oodikone as this user"
-                    trigger={<Button floated="right" circular size="tiny" basic icon="spy" onClick={() => this.showAs(user.username)} />}
+                    trigger={
+                      <Button
+                        floated="right"
+                        circular
+                        size="tiny"
+                        basic
+                        icon="spy"
+                        onClick={() => this.showAs(user.username)}
+                      />
+                    }
                   />
                 )}
                 {user.full_name}
@@ -187,15 +179,18 @@ class UserPage extends Component {
             <Card.Content>
               <Card.Header content="Access rights" />
               <Card.Description>
-                {user.accessgroup.map(ag => ag.group_code).includes('admin') ?
-                  <p style={{
-                    fontSize: '34px',
-                    fontFamily: 'Comic Sans',
-                    color: 'darkred',
-                    border: '1px'
-                  }}
-                  >Admin access!
-                  </p> : null}
+                {user.accessgroup.map(ag => ag.group_code).includes('admin') ? (
+                  <p
+                    style={{
+                      fontSize: '34px',
+                      fontFamily: 'Comic Sans',
+                      color: 'darkred',
+                      border: '1px'
+                    }}
+                  >
+                    Admin access!
+                  </p>
+                ) : null}
                 {this.renderUnitList(user.programme, elementdetails, user)}
                 <Header content="Faculties" />
                 <Dropdown
@@ -204,7 +199,15 @@ class UserPage extends Component {
                   selection
                   multiple
                   value={user.faculty.map(f => f.faculty_code)}
-                  options={sortBy(faculties.map(f => ({ key: f.code, text: getTextIn(f.name, language), description: f.code, value: f.code })), ['text'])}
+                  options={sortBy(
+                    faculties.map(f => ({
+                      key: f.code,
+                      text: getTextIn(f.name, language),
+                      description: f.code,
+                      value: f.code
+                    })),
+                    ['text']
+                  )}
                   onChange={(__, { value: facultycodes }) => setFaculties(user.id, facultycodes)}
                   search={textAndDescriptionSearch}
                   selectOnBlur={false}
@@ -234,19 +237,25 @@ UserPage.propTypes = {
     full_name: string,
     is_enabled: bool,
     elementdetails: arrayOf(string),
-    programme: arrayOf(shape({
-      code: string,
-      name: shape({}),
-      type: number
-    })),
-    faculty: arrayOf(shape({
-      faculty_code: string,
-      programme: arrayOf(shape({
+    programme: arrayOf(
+      shape({
         code: string,
         name: shape({}),
         type: number
-      }))
-    }))
+      })
+    ),
+    faculty: arrayOf(
+      shape({
+        faculty_code: string,
+        programme: arrayOf(
+          shape({
+            code: string,
+            name: shape({}),
+            type: number
+          })
+        )
+      })
+    )
   }).isRequired,
   removeUserUnits: func.isRequired,
   setFaculties: func.isRequired,
@@ -277,11 +286,14 @@ const mapStateToProps = state => ({
   isAdmin: getUserRoles(state.auth.token.roles).includes('admin')
 })
 
-export default connect(mapStateToProps, {
-  removeUserUnits,
-  setFaculties,
-  getDegreesAndProgrammesUnfiltered,
-  getAccessGroups,
-  getFaculties,
-  getElementDetails
-})(withRouter(UserPage))
+export default connect(
+  mapStateToProps,
+  {
+    removeUserUnits,
+    setFaculties,
+    getDegreesAndProgrammesUnfiltered,
+    getAccessGroups,
+    getFaculties,
+    getElementDetails
+  }
+)(withRouter(UserPage))

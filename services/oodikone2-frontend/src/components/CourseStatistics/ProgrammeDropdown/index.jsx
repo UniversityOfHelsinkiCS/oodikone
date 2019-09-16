@@ -8,10 +8,10 @@ import ClearableItem from './ClearableItem'
 const ProgrammeDropdown = ({ options, label, name, onChange, onClear, value, ...props }) => (
   <Form.Dropdown
     options={orderBy(options, ['size'], ['desc']).map(({ key, size, value: v, text }) => ({
-        key,
-        content: <DropdownItem name={text} code={key} size={size} />,
-        text: !onClear ? text : <ClearableItem name={text} onClear={onClear} />,
-        value: v
+      key,
+      content: <DropdownItem name={text} code={key} size={size} />,
+      text: !onClear ? text : <ClearableItem name={text} onClear={onClear} />,
+      value: v
     }))}
     selection
     multiple
@@ -33,13 +33,15 @@ ProgrammeDropdown.propTypes = {
   onChange: func.isRequired,
   onClear: func,
   value: arrayOf(string),
-  options: arrayOf(shape({
-    code: oneOfType([string, number]),
-    count: oneOfType([string, number]),
-    value: oneOfType([string, number]),
-    text: oneOfType([string, number]),
-    size: oneOfType([string, number])
-  })).isRequired
+  options: arrayOf(
+    shape({
+      code: oneOfType([string, number]),
+      count: oneOfType([string, number]),
+      value: oneOfType([string, number]),
+      text: oneOfType([string, number]),
+      size: oneOfType([string, number])
+    })
+  ).isRequired
 }
 
 ProgrammeDropdown.defaultProps = {

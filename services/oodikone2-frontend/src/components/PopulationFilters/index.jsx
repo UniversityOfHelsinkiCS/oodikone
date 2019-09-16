@@ -27,7 +27,10 @@ import PriorityStudyright from './PriorityStudyright'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import {
-  clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter
+  clearPopulationFilters,
+  setComplementFilter,
+  savePopulationFilters,
+  setPopulationFilter
 } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
 import { getTextIn, getUserIsAdmin, cancelablePromise } from '../../common'
@@ -52,14 +55,16 @@ const componentFor = {
   TagFilter
 }
 
-const advancedFilters = { // Filters that are too hard to use for common folk
+const advancedFilters = {
+  // Filters that are too hard to use for common folk
   DisciplineTypes,
   TransferFilter,
   ExtentGraduated,
   PriorityStudyright
 }
 
-const persistantFilters = { // Filters that can be duplicated with different values
+const persistantFilters = {
+  // Filters that can be duplicated with different values
   ExtentGraduated,
   TransferFilter
 }
@@ -99,8 +104,10 @@ class PopulationFilters extends Component {
 
   initialFilterLoading = async () => {
     const untilCoursesLoaded = () => {
-      const poll = (resolve) => {
-        const selectedPopulationCourses = this.props.populationSelectedStudentCourses.data ? this.props.populationSelectedStudentCourses : this.props.populationCourses
+      const poll = resolve => {
+        const selectedPopulationCourses = this.props.populationSelectedStudentCourses.data
+          ? this.props.populationSelectedStudentCourses
+          : this.props.populationCourses
         const { data, pending } = selectedPopulationCourses
         if (data && !pending) {
           resolve()
@@ -115,7 +122,7 @@ class PopulationFilters extends Component {
     if (success) this.updateFilterList(this.props.populationFilters.filtersFromBackend)
   }
 
-  formatFilter = (filter) => {
+  formatFilter = filter => {
     let filterToSave = {}
     if (filter.type === 'Preset') {
       filterToSave = {
@@ -125,18 +132,18 @@ class PopulationFilters extends Component {
     } else {
       filterToSave = {
         ...filter,
-        params: filter.type === 'CourseParticipation' ?
-          {
-            field: filter.params.field,
-            course: {
-              course: {
-                name: filter.params.course.course.name,
-                code: filter.params.course.course.code
+        params:
+          filter.type === 'CourseParticipation'
+            ? {
+                field: filter.params.field,
+                course: {
+                  course: {
+                    name: filter.params.course.course.name,
+                    code: filter.params.course.course.code
+                  }
+                }
               }
-            }
-          }
-          :
-          filter.params
+            : filter.params
       }
     }
     return filterToSave
@@ -162,53 +169,63 @@ class PopulationFilters extends Component {
   }
 
   updateFilterList(filtersToCreate) {
-    const selectedPopulationCourses = this.props.populationSelectedStudentCourses.data ? this.props.populationSelectedStudentCourses : this.props.populationCourses
+    const selectedPopulationCourses = this.props.populationSelectedStudentCourses.data
+      ? this.props.populationSelectedStudentCourses
+      : this.props.populationCourses
     // sorry for the uglyness but it kinda works (I think)
-    const regenerateFilterFunctions = filters =>    /* eslint-disable */
-      filters.map(f => f.type === 'Preset' ?
-        getFilterFunction(f.type, { ...f, filters: regenerateFilterFunctions(f.filters) },
-        selectedPopulationCourses.data)
-        :
-        getFilterFunction(f.type, f.params, selectedPopulationCourses.data))
+    const regenerateFilterFunctions = (filters /* eslint-disable */) =>
+      filters.map(f =>
+        f.type === 'Preset'
+          ? getFilterFunction(
+              f.type,
+              { ...f, filters: regenerateFilterFunctions(f.filters) },
+              selectedPopulationCourses.data
+            )
+          : getFilterFunction(f.type, f.params, selectedPopulationCourses.data)
+      )
 
     if (filtersToCreate) {
-      const newFilters = filtersToCreate.map(newFilter =>
-        ({
-          ...newFilter,
-          filters: regenerateFilterFunctions(newFilter.filters)
-        }))
+      const newFilters = filtersToCreate.map(newFilter => ({
+        ...newFilter,
+        filters: regenerateFilterFunctions(newFilter.filters)
+      }))
       this.setState({ presetFilters: this.state.presetFilters.concat(newFilters) })
     }
   }
-  destroyFromAllFilters = id => this.setState({ presetFilters: this.state.presetFilters.filter(filter => filter.id !== id) })
-
+  destroyFromAllFilters = id =>
+    this.setState({ presetFilters: this.state.presetFilters.filter(filter => filter.id !== id) })
 
   renderAddFilters(allStudyRights) {
     const { extents, transfers, populationSelectedStudentCourses, populationCourses } = this.props
     const { Add } = infotooltips.PopulationStatistics.Filters
-    const selectedPopulationCourses = populationSelectedStudentCourses.data ? populationSelectedStudentCourses : populationCourses
-    const allFilters = union(Object.keys(componentFor).filter(f =>
-      !(Object.keys(advancedFilters).includes(f) && !this.state.advancedUser)).map(f =>
-        String(f)), this.state.presetFilters.map(f => f.id).filter(f => this.state.advancedUser))
+    const selectedPopulationCourses = populationSelectedStudentCourses.data
+      ? populationSelectedStudentCourses
+      : populationCourses
+    const allFilters = union(
+      Object.keys(componentFor)
+        .filter(f => !(Object.keys(advancedFilters).includes(f) && !this.state.advancedUser))
+        .map(f => String(f)),
+      this.state.presetFilters.map(f => f.id).filter(f => this.state.advancedUser)
+    )
 
     const setFilters = union(
       this.props.filters.map(f => f.type),
-      this.props.filters.filter(f => f.type === 'Preset').map(f => f.id),
-
+      this.props.filters.filter(f => f.type === 'Preset').map(f => f.id)
     )
-    const unsetFilters = uniq(difference(allFilters, setFilters.filter(setFilter => !Object.keys(persistantFilters).includes(setFilter))))
+    const unsetFilters = uniq(
+      difference(allFilters, setFilters.filter(setFilter => !Object.keys(persistantFilters).includes(setFilter)))
+    )
     if (unsetFilters.length === 0) {
       return null
     }
     if (!this.state.visible) {
       return (
         <Segment>
-          <Header>Add filters <InfoBox content={Add} /></Header>
+          <Header>
+            Add filters <InfoBox content={Add} />
+          </Header>
           <Loader active={selectedPopulationCourses.pending} inline="centered" />
-          <Button
-            onClick={() => this.setState({ visible: true })}
-            disabled={selectedPopulationCourses.pending}
-          >
+          <Button onClick={() => this.setState({ visible: true })} disabled={selectedPopulationCourses.pending}>
             add
           </Button>
         </Segment>
@@ -217,7 +234,9 @@ class PopulationFilters extends Component {
 
     return (
       <Segment>
-        <Header>Add filters <InfoBox content={Add} /></Header>
+        <Header>
+          Add filters <InfoBox content={Add} />
+        </Header>
         <div>
           <Radio
             toggle
@@ -226,16 +245,22 @@ class PopulationFilters extends Component {
             onChange={() => this.setState({ advancedUser: !this.state.advancedUser })}
           />
         </div>
-        {unsetFilters.map(filterName => {//eslint-disable-line
-          if (componentFor[filterName]) { // THIS IS KINDA HACKED SOLUTION PLS FIX
+        {unsetFilters.map(filterName => {
+          //eslint-disable-line
+          if (componentFor[filterName]) {
+            // THIS IS KINDA HACKED SOLUTION PLS FIX
             // this is awful, shame on who ever wrote this, pls fix
-            if (filterName !== 'TagFilter' || this.props.isAdmin) {
+            if (filterName !== 'TagFilter' || this.props.isAdmin) {
               return React.createElement(componentFor[filterName], {
-                filter: { notSet: true }, key: filterName, samples: this.props.samples, transfers, extents, allStudyRights
+                filter: { notSet: true },
+                key: filterName,
+                samples: this.props.samples,
+                transfers,
+                extents,
+                allStudyRights
               })
             }
-          }
-          else {
+          } else {
             return React.createElement(Preset, {
               filter: {
                 ...this.state.presetFilters.find(f => f.id === filterName),
@@ -245,13 +270,11 @@ class PopulationFilters extends Component {
               destroy: this.destroyFromAllFilters
             })
           }
-        })
-        }
+        })}
         <Button onClick={() => this.setState({ visible: false })}>cancel</Button>
       </Segment>
     )
   }
-
 
   renderSetFilters(handleSave, allStudyRights) {
     const setFilters = this.props.filters.map(f => f.type)
@@ -262,13 +285,24 @@ class PopulationFilters extends Component {
 
     return (
       <Segment>
-        <Header>Filters <InfoBox content={Filters} /></Header>
+        <Header>
+          Filters <InfoBox content={Filters} />
+        </Header>
         {this.props.filters.map(filter => {
           if (filter.type !== 'Preset') {
-            return React.createElement(componentFor[filter.type], { filter, key: filter.id, samples: this.props.samples, transfers: this.props.transfers, extents: this.props.extents, allStudyRights })
+            return React.createElement(componentFor[filter.type], {
+              filter,
+              key: filter.id,
+              samples: this.props.samples,
+              transfers: this.props.transfers,
+              extents: this.props.extents,
+              allStudyRights
+            })
           }
           return React.createElement(Preset, {
-            filter, key: filter.id, destroy: this.destroyFromAllFilters
+            filter,
+            key: filter.id,
+            destroy: this.destroyFromAllFilters
           })
         })}
         <Form>
@@ -277,23 +311,18 @@ class PopulationFilters extends Component {
               <label>Show excluded students only</label>
             </Form.Field>
             <Form.Field>
-              <Radio
-                toggle
-                checked={this.props.complemented}
-                onClick={this.props.setComplementFilter}
-              />
+              <Radio toggle checked={this.props.complemented} onClick={this.props.setComplementFilter} />
             </Form.Field>
           </Form.Group>
         </Form>
 
-
         <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
-        {this.state.advancedUser ?
+        {this.state.advancedUser ? (
           <Modal
             trigger={<Button onClick={() => this.setState({ modalOpen: true })}>Save filters as preset</Button>}
             open={this.state.modalOpen}
             onClose={() => this.setState({ modalOpen: false })}
-            size='small'
+            size="small"
           >
             <Header />
             <Modal.Content>
@@ -301,34 +330,40 @@ class PopulationFilters extends Component {
                 <Form.Field>
                   <h2> Save current filters as preset </h2>
                   <em> This filter is saved in this population for future use </em>
-                  <Input placeholder="Name..." maxLength={40} onChange={e => this.setState({ presetName: e.target.value })} />
+                  <Input
+                    placeholder="Name..."
+                    maxLength={40}
+                    onChange={e => this.setState({ presetName: e.target.value })}
+                  />
                 </Form.Field>
                 <Form.Field>
                   <em> explain what your filter is doing here </em>
-                  <TextArea placeholder="Description..." maxLength={160} onChange={e => this.setState({ presetDescription: e.target.value })} />
+                  <TextArea
+                    placeholder="Description..."
+                    maxLength={160}
+                    onChange={e => this.setState({ presetDescription: e.target.value })}
+                  />
                 </Form.Field>
               </Form>
             </Modal.Content>
             <Modal.Actions>
-              <Button
-                negative
-                onClick={() => this.setState({ modalOpen: false })}
-              >Cancel
-                </Button>
+              <Button negative onClick={() => this.setState({ modalOpen: false })}>
+                Cancel
+              </Button>
               <Button
                 disabled={this.state.presetName === ''}
-                color='green'
+                color="green"
                 onClick={() => {
                   handleSave()
                   this.setState({ modalOpen: false })
                 }}
-                inverted>
-                <Icon name='checkmark' /> Save
-            </Button>
+                inverted
+              >
+                <Icon name="checkmark" /> Save
+              </Button>
             </Modal.Actions>
           </Modal>
-          : null
-        }
+        ) : null}
       </Segment>
     )
   }
@@ -337,7 +372,10 @@ class PopulationFilters extends Component {
     const { allStudyRights, language } = this.props
     let allStudyRightOptions = []
     if (allStudyRights) {
-      allStudyRightOptions = Object.values(allStudyRights).reduce((options, level) => [...options, ...level.map(sr => ({ value: sr.code, text: getTextIn(sr.name, language) }))], [])
+      allStudyRightOptions = Object.values(allStudyRights).reduce(
+        (options, level) => [...options, ...level.map(sr => ({ value: sr.code, text: getTextIn(sr.name, language) }))],
+        []
+      )
     }
     return (
       <div>
@@ -348,7 +386,6 @@ class PopulationFilters extends Component {
   }
 }
 
-
 const mapStateToProps = ({
   populationFilters,
   localize,
@@ -356,7 +393,9 @@ const mapStateToProps = ({
   populations,
   populationSelectedStudentCourses,
   populationCourses,
-  auth: { token: { roles } }
+  auth: {
+    token: { roles }
+  }
 }) => ({
   populationSelectedStudentCourses,
   populationCourses,
@@ -373,6 +412,12 @@ const mapStateToProps = ({
   isAdmin: getUserIsAdmin(roles)
 })
 
-export default connect(mapStateToProps, {
-  clearPopulationFilters, setComplementFilter, savePopulationFilters, setPopulationFilter
-})(PopulationFilters)
+export default connect(
+  mapStateToProps,
+  {
+    clearPopulationFilters,
+    setComplementFilter,
+    savePopulationFilters,
+    setPopulationFilter
+  }
+)(PopulationFilters)

@@ -10,7 +10,7 @@ import { setPopulationFilter, removePopulationFilter } from '../../redux/populat
 
 const getTotal = students => students.map(student => getStudentTotalCredits(student))
 
-const expectedAmountOfCredits = months => ([
+const expectedAmountOfCredits = months => [
   [Math.ceil(months * (55 / 12))],
   [Math.ceil(months * (50 / 12)), Math.ceil(months * (55 / 12))],
   [Math.ceil(months * (40 / 12)), Math.ceil(months * (50 / 12))],
@@ -19,7 +19,7 @@ const expectedAmountOfCredits = months => ([
   [Math.ceil(months * (10 / 12)), Math.ceil(months * (20 / 12))],
   [1, Math.ceil(months * (10 / 12))],
   [0, 0]
-])
+]
 
 const filterStudents = (students, minCredits, maxCredits = Infinity) => {
   if (minCredits === 0) {
@@ -42,8 +42,8 @@ const filterStudents = (students, minCredits, maxCredits = Infinity) => {
   }
 }
 
-const PopulationCreditGainTable = (props) => {
-  const setCreditFilter = (row) => {
+const PopulationCreditGainTable = props => {
+  const setCreditFilter = row => {
     props.filters.map(filter => props.removePopulationFilter(filter.id))
     const credits = row[0].split(/(\d+)/).map(count => Number(count))
     if (credits[1]) {
@@ -61,13 +61,37 @@ const PopulationCreditGainTable = (props) => {
   const limits = expectedAmountOfCredits(months)
   const arr = limits.map(l => filterStudents(stats, ...l))
 
-  const rows = arr.map((a) => {
+  const rows = arr.map(a => {
     if (a.maxCredits === 0) {
-      return [`${a.maxCredits}`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />]
+      return [
+        `${a.maxCredits}`,
+        a.amount,
+        <Progress
+          style={{ margin: '0px' }}
+          percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)}
+          progress
+        />
+      ]
     } else if (a.maxCredits) {
-      return [`${a.minCredits} ≤ credits < ${a.maxCredits}`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />]
+      return [
+        `${a.minCredits} ≤ credits < ${a.maxCredits}`,
+        a.amount,
+        <Progress
+          style={{ margin: '0px' }}
+          percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)}
+          progress
+        />
+      ]
     }
-    return [`${a.minCredits} ≤ credits`, a.amount, <Progress style={{ margin: '0px' }} percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)} progress />]
+    return [
+      `${a.minCredits} ≤ credits`,
+      a.amount,
+      <Progress
+        style={{ margin: '0px' }}
+        percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)}
+        progress
+      />
+    ]
   })
 
   const headers = [
@@ -98,7 +122,6 @@ PopulationCreditGainTable.propTypes = {
   setPopulationFilter: func.isRequired,
   removePopulationFilter: func.isRequired,
   filters: arrayOf(object).isRequired
-
 }
 
 export default connect(

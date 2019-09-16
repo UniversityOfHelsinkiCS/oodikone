@@ -13,7 +13,8 @@ const AcademicYearFilter = ({ academicYears, semesterCode, handleSemesterCodeCha
   const academicYearSelectOptions = academicYears.map(ac => ({
     key: ac.semestercode,
     value: ac.semestercode,
-    text: ac.yearname }))
+    text: ac.yearname
+  }))
 
   const semesterCodeDifference = 2
   const academicYearSelectId = 'academicYearSelect'
@@ -28,10 +29,7 @@ const AcademicYearFilter = ({ academicYears, semesterCode, handleSemesterCodeCha
           type="button"
           icon="angle left"
           className={isMinSemesterCode ? 'hiddenButton' : 'filterButton'}
-          onClick={e => handleSemesterCodeChangeFn(
-            e,
-            { value: semesterCode - semesterCodeDifference }
-            )}
+          onClick={e => handleSemesterCodeChangeFn(e, { value: semesterCode - semesterCodeDifference })}
         />
         <div className="academicYearSelectContainer">
           <Dropdown
@@ -50,10 +48,7 @@ const AcademicYearFilter = ({ academicYears, semesterCode, handleSemesterCodeCha
           type="button"
           icon="angle right"
           className={isMaxSemesterCode ? 'hiddenButton' : 'filterButton'}
-          onClick={e => handleSemesterCodeChangeFn(
-              e,
-              { value: semesterCode + semesterCodeDifference }
-              )}
+          onClick={e => handleSemesterCodeChangeFn(e, { value: semesterCode + semesterCodeDifference })}
         />
       </div>
     </Fragment>

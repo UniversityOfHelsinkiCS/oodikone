@@ -46,11 +46,7 @@ class CreditAccumulationGraphHighCharts extends Component {
         const { students } = nextProps
         this.getMoreCreditLines(students)
       } else {
-        this.createGraphOptions(
-          nextProps.students,
-          nextProps.selectedStudents,
-          nextProps.currentGraphSize
-        )
+        this.createGraphOptions(nextProps.students, nextProps.selectedStudents, nextProps.currentGraphSize)
       }
     }
   }
@@ -59,56 +55,46 @@ class CreditAccumulationGraphHighCharts extends Component {
     const { updateGraph } = this.state
     const { students, selectedStudents, currentGraphSize } = this.props
     if (updateGraph) {
-      this.createGraphOptions(
-        students,
-        selectedStudents,
-        currentGraphSize
-      )
+      this.createGraphOptions(students, selectedStudents, currentGraphSize)
     }
   }
 
-  getMoreCreditLines = (students) => {
-    const studentCreditLines = this.state.studentCreditLines
-      .concat(this.createStudentCreditLines(students))
+  getMoreCreditLines = students => {
+    const studentCreditLines = this.state.studentCreditLines.concat(this.createStudentCreditLines(students))
     this.setState({ studentCreditLines, updateGraph: true })
   }
 
   getXAxisMonth = (date, startDate) =>
     Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0)
 
-  sortCoursesByDate = courses => courses.sort((a, b) => (
-    new Date(a.date).getTime() - new Date(b.date).getTime()
-  ))
+  sortCoursesByDate = courses => courses.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
-  filterCoursesByDate = (courses, date) => courses.filter(c => (
-    moment(c.date).isSameOrAfter(moment(date))
-  ))
+  filterCoursesByDate = (courses, date) => courses.filter(c => moment(c.date).isSameOrAfter(moment(date)))
 
-  createTooltip = (point) => {
+  createTooltip = point => {
     const { students, language, translate } = this.props
-    const targetCourse = this.sortCoursesByDate(students[0].courses)
-      .find(c => (
-        point.key === c.course.code &&
-        point.x === new Date(c.date).getTime()
-      ))
+    const targetCourse = this.sortCoursesByDate(students[0].courses).find(
+      c => point.key === c.course.code && point.x === new Date(c.date).getTime()
+    )
 
     if (!targetCourse) return ''
 
-    const payload = [{
-      name: students[0].studentNumber,
-      payload: {
-        ...targetCourse,
-        date: reformatDate(targetCourse.date, DISPLAY_DATE_FORMAT),
-        title: targetCourse.course.name[language]
+    const payload = [
+      {
+        name: students[0].studentNumber,
+        payload: {
+          ...targetCourse,
+          date: reformatDate(targetCourse.date, DISPLAY_DATE_FORMAT),
+          title: targetCourse.course.name[language]
+        }
       }
-    }]
+    ]
 
     return renderToString(<CreditGraphTooltip payload={payload} active translate={translate} />)
   }
 
   createGraphOptions = (students, selectedStudents, graphSize) => {
-    const dataOfSelected = this.state.studentCreditLines.filter(line =>
-      selectedStudents.includes(line.name))
+    const dataOfSelected = this.state.studentCreditLines.filter(line => selectedStudents.includes(line.name))
 
     let lastCredits = null
     if (this.isSingleStudentGraph() && !['/custompopulation', '/coursepopulation'].includes(window.location.pathname)) {
@@ -118,7 +104,8 @@ class CreditAccumulationGraphHighCharts extends Component {
 
       let totalAbsenceMonths = 0
       const absencePoints = this.props.absences.reduce((res, { startdate, enddate }) => {
-        const targetCreditsBeforeAbsence = (Math.ceil(this.getXAxisMonth(moment(startdate), started)) - totalAbsenceMonths) * (55 / 12)
+        const targetCreditsBeforeAbsence =
+          (Math.ceil(this.getXAxisMonth(moment(startdate), started)) - totalAbsenceMonths) * (55 / 12)
         if (enddate < students.maxDate) {
           res.push([startdate, targetCreditsBeforeAbsence])
           res.push([enddate, targetCreditsBeforeAbsence])
@@ -128,16 +115,15 @@ class CreditAccumulationGraphHighCharts extends Component {
       }, [])
 
       const zoneStart = absencePoints.length ? [absencePoints[0][0]] : []
-      const zones = absencePoints.reduce((acc, [start], i) => [...acc, { value: start, color: i % 2 === 0 ? '#96d7c3' : 'red' }], zoneStart)
+      const zones = absencePoints.reduce(
+        (acc, [start], i) => [...acc, { value: start, color: i % 2 === 0 ? '#96d7c3' : 'red' }],
+        zoneStart
+      )
 
       lastCredits = (lastMonth - totalAbsenceMonths) * (55 / 12)
       dataOfSelected.push({
         data: [
-          ...[
-            [students.minDate, 0],
-            ...absencePoints,
-            [students.maxDate, lastCredits]
-          ].sort((a, b) => a[0] - b[0])
+          ...[[students.minDate, 0], ...absencePoints, [students.maxDate, lastCredits]].sort((a, b) => a[0] - b[0])
         ],
         seriesThreshold: 150,
         color: '#96d7c3',
@@ -150,19 +136,20 @@ class CreditAccumulationGraphHighCharts extends Component {
     }
     const self = this
 
-    const tooltipOptions = this.isSingleStudentGraph() ?
-      {
-        formatter() {
-          return self.createTooltip(this)
-        },
-        shared: false,
-        useHTML: true,
-        style: {
-          all: 'unset',
-          display: 'none'
-        },
-        split: false
-      } : {}
+    const tooltipOptions = this.isSingleStudentGraph()
+      ? {
+          formatter() {
+            return self.createTooltip(this)
+          },
+          shared: false,
+          useHTML: true,
+          style: {
+            all: 'unset',
+            display: 'none'
+          },
+          split: false
+        }
+      : {}
     const options = {
       plotOptions: {
         series: {
@@ -199,7 +186,7 @@ class CreditAccumulationGraphHighCharts extends Component {
         }
       },
       yAxis: {
-        max: (lastCredits && lastCredits > students.maxCredits) ? lastCredits : students.maxCredits,
+        max: lastCredits && lastCredits > students.maxCredits ? lastCredits : students.maxCredits,
         title: { text: 'Credits' }
       },
       xAxis: {
@@ -222,14 +209,11 @@ class CreditAccumulationGraphHighCharts extends Component {
   isSingleStudentGraph = () => this.props.students.length === 1
 
   createStudentCreditLines = students =>
-    students.map((student) => {
+    students.map(student => {
       const { started, studyrightStart } = student
       const startDate = this.props.selectedStudents.length === 1 ? started : studyrightStart
       let credits = 0
-      let points = this.filterCoursesByDate(
-        this.sortCoursesByDate(student.courses),
-        startDate
-      ).map((course) => {
+      let points = this.filterCoursesByDate(this.sortCoursesByDate(student.courses), startDate).map(course => {
         if (course.passed && !course.isStudyModuleCredit) {
           credits += course.credits
         }
@@ -254,7 +238,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       }
     })
 
-  resizeChart = (size) => {
+  resizeChart = size => {
     if (this.chart) {
       this.props.setChartHeight(size)
     }
@@ -283,7 +267,7 @@ class CreditAccumulationGraphHighCharts extends Component {
           </div>
           <ReactHighstock
             highcharts={Highcharts}
-            ref={(HighchartsReact) => {
+            ref={HighchartsReact => {
               this.chart = HighchartsReact
             }}
             constructorType="stockChart"

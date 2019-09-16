@@ -4,7 +4,15 @@ import { shape, string } from 'prop-types'
 import Highcharts from 'highcharts'
 import addHighchartsMore from 'highcharts/highcharts-more'
 import {
-  HighchartsChart, withHighcharts, XAxis, YAxis, Title, Tooltip, Legend, SplineSeries, AreaSplineRangeSeries
+  HighchartsChart,
+  withHighcharts,
+  XAxis,
+  YAxis,
+  Title,
+  Tooltip,
+  Legend,
+  SplineSeries,
+  AreaSplineRangeSeries
 } from 'react-jsx-highcharts'
 
 addHighchartsMore(Highcharts)
@@ -12,7 +20,7 @@ addHighchartsMore(Highcharts)
 const PopulationCategorySpider = ({ data, title }) => (
   <Segment basic>
     <HighchartsChart>
-      {title && (<Title>{title}</Title>)}
+      {title && <Title>{title}</Title>}
       <XAxis min={0} tickmarkPlacement="on" categories={data.dimensions} lineWidth={0} />
       <YAxis min={0} max={5} lineWidth={0}>
         <AreaSplineRangeSeries data={data.ranges} name="Below and Above" />

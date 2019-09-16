@@ -74,8 +74,7 @@ const reducer = (state = { data: [], enabledOnly: true }, action) => {
         ...state,
         userunitpending: false,
         useruniterror: false,
-        data: state.data.filter(user => user.id !== action.response.id)
-          .concat(action.response)
+        data: state.data.filter(user => user.id !== action.response.id).concat(action.response)
       }
     case 'MODIFY_ACCESSGROUPS_ATTEMPT':
       return {
@@ -94,8 +93,7 @@ const reducer = (state = { data: [], enabledOnly: true }, action) => {
         ...state,
         accessgroupPending: false,
         accessgroupError: false,
-        data: state.data.filter(user => user.id !== action.response.id)
-          .concat(action.response)
+        data: state.data.filter(user => user.id !== action.response.id).concat(action.response)
       }
     case 'SET_USER_FACULTIES_ATTEMPT':
       return {
@@ -111,8 +109,7 @@ const reducer = (state = { data: [], enabledOnly: true }, action) => {
       return {
         ...state,
         setfacultypending: false,
-        data: state.data.filter(user => user.id !== action.response.id)
-          .concat(action.response)
+        data: state.data.filter(user => user.id !== action.response.id).concat(action.response)
       }
     default:
       return state

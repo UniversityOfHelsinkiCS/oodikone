@@ -19,7 +19,7 @@ class CourseParticipationNTimes extends Component {
     participationAmount: 0
   }
 
-  handleChange = (e) => {
+  handleChange = e => {
     this.setState({ participationAmount: e.target.value })
   }
 
@@ -29,17 +29,19 @@ class CourseParticipationNTimes extends Component {
   }
 
   handleLimit = () => {
-    this.props.setPopulationFilter(courseParticipationNTimes({
-      amount: this.state.participationAmount, courses: ['375063', '339101']
-    }))
+    this.props.setPopulationFilter(
+      courseParticipationNTimes({
+        amount: this.state.participationAmount,
+        courses: ['375063', '339101']
+      })
+    )
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
   }
 
-  courseInPopulation = () =>
-    intersection(this.studyRights(), ['MH30_001', '320001']).length > 0
+  courseInPopulation = () => intersection(this.studyRights(), ['MH30_001', '320001']).length > 0
 
   render() {
     const { filter } = this.props
@@ -47,9 +49,7 @@ class CourseParticipationNTimes extends Component {
     if (!this.courseInPopulation()) {
       return null
     }
-    const courseName = this.studyRights().includes('MH30_001')
-      ? 'International progress test'
-      : 'Progress test'
+    const courseName = this.studyRights().includes('MH30_001') ? 'International progress test' : 'Progress test'
 
     if (filter.notSet) {
       return (
@@ -57,25 +57,16 @@ class CourseParticipationNTimes extends Component {
           <Form>
             <Form.Group inline>
               <Form.Field>
-                <label>
-                  Show only students that have participated in {courseName} less than
-                </label>
+                <label>Show only students that have participated in {courseName} less than</label>
               </Form.Field>
               <Form.Field>
-                <Input
-                  type="number"
-                  onChange={this.handleChange}
-                  value={participationAmount}
-                />
+                <Input type="number" onChange={this.handleChange} value={participationAmount} />
               </Form.Field>
               <Form.Field>
                 <label>times</label>
               </Form.Field>
               <Form.Field>
-                <Button
-                  onClick={this.handleLimit}
-                  disabled={participationAmount === 0}
-                >
+                <Button onClick={this.handleLimit} disabled={participationAmount === 0}>
                   set filter
                 </Button>
               </Form.Field>
@@ -98,15 +89,17 @@ class CourseParticipationNTimes extends Component {
   }
 }
 
-const mapStateToProps = ({
-  populationSelectedStudentCourses,
-  populationCourses
-}) => ({
+const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses }) => ({
   selectedPopulationCourses: populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
     : populationCourses
 })
 
-export default connect(mapStateToProps, {
-  removePopulationFilter, alterPopulationCourseFilter, setPopulationFilter
-})(CourseParticipationNTimes)
+export default connect(
+  mapStateToProps,
+  {
+    removePopulationFilter,
+    alterPopulationCourseFilter,
+    setPopulationFilter
+  }
+)(CourseParticipationNTimes)

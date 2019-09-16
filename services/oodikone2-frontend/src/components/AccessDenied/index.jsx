@@ -23,16 +23,16 @@ const names = [
 ]
 const dummyData = names.map(name => ({
   name,
-  data: [0, 1, 2, 3, 4, 5, 6, 7]
-    .reduce((acc, i) => {
-      acc[i] = (acc[i - 1] || 0) + (random(0, 3) === 0 ? 0 : random(10.0, 100.0))
-      return acc
-    }, [])
+  data: [0, 1, 2, 3, 4, 5, 6, 7].reduce((acc, i) => {
+    acc[i] = (acc[i - 1] || 0) + (random(0, 3) === 0 ? 0 : random(10.0, 100.0))
+    return acc
+  }, [])
 }))
 
 const AccessDenied = ({ notEnabled, logout }) => {
   const header = notEnabled ? 'Welcome to Oodikone!' : 'Something broke'
-  const subheader = notEnabled ? `You're currently not allowed to enter
+  const subheader = notEnabled
+    ? `You're currently not allowed to enter
   but you will get an email when you're authorized`
     : `If this was not intended try refreshing your browser window,
     pressing log out or contacting grp-toska@helsinki.fi`
@@ -41,17 +41,13 @@ const AccessDenied = ({ notEnabled, logout }) => {
 
   useEffect(() => {
     if (notEnabled) {
-      setTimeout(
-        () => setEasterEgg(true),
-        Math.floor(Math.random() * 1800000) + 600000
-      )
+      setTimeout(() => setEasterEgg(true), Math.floor(Math.random() * 1800000) + 600000)
     }
   }, [])
 
   return (
-    <div >
+    <div>
       <Container style={{ display: 'flex', alignItems: 'stretch', height: '100vh', justifyContent: 'space-evenly' }}>
-
         <ReactHighchart
           highcharts={Highcharts}
           constructorType="stockChart"
@@ -79,18 +75,21 @@ const AccessDenied = ({ notEnabled, logout }) => {
           }}
         />
 
-        <MulticolorBarChart chartTitle="Your students' future" chartData={dummyData.map(e => ({ name: e.name, data: [Math.max(...e.data)] }))} />
+        <MulticolorBarChart
+          chartTitle="Your students' future"
+          chartData={dummyData.map(e => ({ name: e.name, data: [Math.max(...e.data)] }))}
+        />
       </Container>
-      <Dimmer
-        active
-        page
-      >
+      <Dimmer active page>
         <Image src={images.toskaLogo} size="medium" centered style={{ paddingTop: '2%' }} />
         <Header as="h2" inverted>
           <p>{header}</p>
           <Header.Subheader>{subheader}</Header.Subheader>
           <br />
-          <Button onClick={logout} color="pink"> Log out </Button>
+          <Button onClick={logout} color="pink">
+            {' '}
+            Log out{' '}
+          </Button>
         </Header>
       </Dimmer>
       <Transition visible={easterEgg} animation="fly up" duration={10000}>

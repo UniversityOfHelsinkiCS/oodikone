@@ -4,16 +4,9 @@ import { connect } from 'react-redux'
 import { Button, Dropdown, List } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
-import {
-  createMultipleStudentTagAction
-} from '../../redux/tagstudent'
+import { createMultipleStudentTagAction } from '../../redux/tagstudent'
 
-const TagPopulation = ({
-  createMultipleStudentTag,
-  tags,
-  studytrack,
-  selectedStudents
-}) => {
+const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStudents }) => {
   const [options, setOptions] = useState([])
   const [selectedValue, setSelected] = useState('')
 
@@ -27,10 +20,10 @@ const TagPopulation = ({
     setSelected(value)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = event => {
     event.preventDefault()
     const tagList = []
-    selectedStudents.forEach((sn) => {
+    selectedStudents.forEach(sn => {
       const tag = {
         tag_id: selectedValue,
         studentnumber: sn
@@ -55,7 +48,9 @@ const TagPopulation = ({
           selectOnNavigation={false}
         />
       </List.Item>
-      <Button onClick={handleSubmit} disabled={selectedValue === ''}>add tag to {selectedStudents.length} students</Button>
+      <Button onClick={handleSubmit} disabled={selectedValue === ''}>
+        add tag to {selectedStudents.length} students
+      </Button>
     </List>
   )
 }
@@ -71,6 +66,11 @@ const mapStateToProps = ({ tagstudent }) => ({
   created: tagstudent.created
 })
 
-export default withRouter(connect(mapStateToProps, {
-  createMultipleStudentTag: createMultipleStudentTagAction
-})(TagPopulation))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    {
+      createMultipleStudentTag: createMultipleStudentTagAction
+    }
+  )(TagPopulation)
+)

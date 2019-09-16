@@ -14,39 +14,37 @@ class SuggestCourseGraph extends Component {
   }
 
   generateWholeRoute = () => {
-    callApi('/oodilearn/suggest_route')
-      .then((res) => {
-        const { data } = res
-        const route = []
-        data.forEach((course) => {
-          const item = course.split('_')
-          if (item.length > 1) {
-            const period = item[0]
-            const code = item[1]
-            route[period] = { ...route[period], [code]: true }
-          }
-        })
-        this.setState({ courses: route })
+    callApi('/oodilearn/suggest_route').then(res => {
+      const { data } = res
+      const route = []
+      data.forEach(course => {
+        const item = course.split('_')
+        if (item.length > 1) {
+          const period = item[0]
+          const code = item[1]
+          route[period] = { ...route[period], [code]: true }
+        }
       })
+      this.setState({ courses: route })
+    })
   }
 
   handleClick = (e, { value }) => {
     const courses = this.state.courses.slice(0, value + 1)
     const doneCourses = []
-    courses.forEach((period) => {
+    courses.forEach(period => {
       const c = Object.keys(period).filter(course => period[course])
       doneCourses.push(...c)
     })
-    callApi('/oodilearn/suggest_course', 'get', null, { doneCourses, period: 274 })
-      .then((res) => {
-        const { data } = res
-        const newCourses = {}
-        data.forEach((course) => {
-          newCourses[course] = false
-        })
-        courses.push(newCourses)
-        this.setState({ courses })
+    callApi('/oodilearn/suggest_course', 'get', null, { doneCourses, period: 274 }).then(res => {
+      const { data } = res
+      const newCourses = {}
+      data.forEach(course => {
+        newCourses[course] = false
       })
+      courses.push(newCourses)
+      this.setState({ courses })
+    })
   }
 
   selectCourse = (e, { value }) => {
@@ -69,14 +67,7 @@ class SuggestCourseGraph extends Component {
         <Grid.Row>
           {this.state.courses.map((period, i) => (
             <Grid.Column width={2} style={{ paddingBottom: '1em' }}>
-              <Button
-                fluid
-                size="tiny"
-                color="blue"
-                content="next"
-                value={i}
-                onClick={this.handleClick}
-              />
+              <Button fluid size="tiny" color="blue" content="next" value={i} onClick={this.handleClick} />
               <Divider />
               {Object.keys(period).map(course => (
                 <Button
@@ -88,7 +79,7 @@ class SuggestCourseGraph extends Component {
                   onClick={this.selectCourse}
                   content={course}
                 />
-                ))}
+              ))}
             </Grid.Column>
           ))}
         </Grid.Row>

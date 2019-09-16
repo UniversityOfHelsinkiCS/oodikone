@@ -4,44 +4,49 @@ import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, shape, number, func } from 'prop-types'
 import { Segment, Icon, Header } from 'semantic-ui-react'
 import { getTextIn } from '../../../common'
-import {
-  calculateStatsForProgramme,
-  calculateTotalPassedCourses,
-  calculateTotalFailedCourses
-} from '../facultyUtils'
+import { calculateStatsForProgramme, calculateTotalPassedCourses, calculateTotalFailedCourses } from '../facultyUtils'
 import SortableTable from '../../SortableTable'
 import FacultyStatsGraph from '../FacultyStatsGraph'
 
 const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, language, fromYear, toYear, history }) => {
-  const totalStats = useMemo(() => Object.entries(selectedFacultyProgrammesStats).reduce((res, [code, stats]) => {
-    res[code] = calculateStatsForProgramme(stats, fromYear, toYear)
-    return { ...res }
-  }, {}), [fromYear, toYear])
+  const totalStats = useMemo(
+    () =>
+      Object.entries(selectedFacultyProgrammesStats).reduce((res, [code, stats]) => {
+        res[code] = calculateStatsForProgramme(stats, fromYear, toYear)
+        return { ...res }
+      }, {}),
+    [fromYear, toYear]
+  )
 
-  const showProgrammeOverView = (code) => {
+  const showProgrammeOverView = code => {
     history.push(`/study-programme/${code}`)
   }
 
-  const getNameOfProgramme = (code) => {
+  const getNameOfProgramme = code => {
     const foundProgramme = facultyProgrammes.find(p => p.code === code)
     return foundProgramme ? getTextIn(foundProgramme.name, language) : code
   }
 
-  const graphData = useMemo(() => Object.entries(selectedFacultyProgrammesStats).map(([code, data]) => ({ name: getNameOfProgramme(code), data })), [])
+  const graphData = useMemo(
+    () =>
+      Object.entries(selectedFacultyProgrammesStats).map(([code, data]) => ({ name: getNameOfProgramme(code), data })),
+    []
+  )
 
   if (!Object.keys(selectedFacultyProgrammesStats).length) {
-    return (
-      <Segment textAlign="center">
-        No data
-      </Segment>
-    )
+    return <Segment textAlign="center">No data</Segment>
   }
 
   const headers = [
     {
       key: 'name',
       title: 'name',
-      getRowVal: ({ code }) => <div> {getNameOfProgramme(code)} <Icon name="level up alternate" onClick={() => showProgrammeOverView(code)} /></div> //eslint-disable-line
+      getRowVal: ({ code }) => (
+        <div>
+          {' '}
+          {getNameOfProgramme(code)} <Icon name="level up alternate" onClick={() => showProgrammeOverView(code)} />
+        </div>
+      ) //eslint-disable-line
     },
     {
       key: 'code',
@@ -74,20 +79,10 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
   return (
     <React.Fragment>
       <Header>Bachelor degrees</Header>
-      <SortableTable
-        columns={headers}
-        getRowKey={({ code }) => code}
-        data={bachelors}
-      />
+      <SortableTable columns={headers} getRowKey={({ code }) => code} data={bachelors} />
       <Header>Masters degrees</Header>
-      <SortableTable
-        columns={headers}
-        getRowKey={({ code }) => code}
-        data={masters}
-      />
-      <FacultyStatsGraph
-        data={graphData}
-      />
+      <SortableTable columns={headers} getRowKey={({ code }) => code} data={masters} />
+      <FacultyStatsGraph data={graphData} />
     </React.Fragment>
   )
 }

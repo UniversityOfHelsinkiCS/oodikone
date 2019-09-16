@@ -19,7 +19,7 @@ class CreditsLessThan extends Component {
     limit: ''
   }
 
-  handleChange = (e) => {
+  handleChange = e => {
     if (Number(e.target.value) > -1) {
       this.setState({ limit: e.target.value })
     }
@@ -50,20 +50,12 @@ class CreditsLessThan extends Component {
                 <label>Show only students with credits less than</label>
               </Form.Field>
               <Form.Field>
-                <Input
-                  type="number"
-                  onChange={this.handleChange}
-                  value={this.state.limit}
-                />
+                <Input type="number" onChange={this.handleChange} value={this.state.limit} />
               </Form.Field>
               <Form.Field>
-                <Button
-                  onClick={this.handleLimit}
-                  disabled={this.state.limit.length === 0}
-                >
+                <Button onClick={this.handleLimit} disabled={this.state.limit.length === 0}>
                   set filter
                 </Button>
-
               </Form.Field>
             </Form.Group>
           </Form>

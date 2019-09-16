@@ -27,41 +27,37 @@ const formatStatisticsForTable = (statistics, language) => {
 }
 
 class TeacherDetails extends Component {
-    state={}
+  state = {}
 
-    render() {
-      const { teacher, language, history } = this.props
-      const { courses, years, semesters } = teacher.statistics
+  render() {
+    const { teacher, language, history } = this.props
+    const { courses, years, semesters } = teacher.statistics
 
-      const panes = [
-        {
-          menuItem: 'Courses',
-          render: () => <CoursesTab courses={courses} semesters={semesters} />
-        },
-        statisticsTableTab('Semesters', formatStatisticsForTable(semesters, language)),
-        statisticsTableTab('Years', formatStatisticsForTable(years, language))
-      ]
+    const panes = [
+      {
+        menuItem: 'Courses',
+        render: () => <CoursesTab courses={courses} semesters={semesters} />
+      },
+      statisticsTableTab('Semesters', formatStatisticsForTable(semesters, language)),
+      statisticsTableTab('Years', formatStatisticsForTable(years, language))
+    ]
 
-      return (
-        <div>
-          <Card fluid className="cardContainer">
-            <Card.Content>
-              <Card.Header className="cardHeader">
-                {teacher.name}
-                <Icon
-                  name="remove"
-                  className="controlIcon"
-                  onClick={() => history.goBack()}
-                />
-              </Card.Header>
-              <Card.Meta content={teacher.code} />
-              <Card.Meta content={teacher.id} />
-            </Card.Content>
-          </Card>
-          <Tab panes={panes} style={{ paddingTop: '0.5rem' }} />
-        </div>
-      )
-    }
+    return (
+      <div>
+        <Card fluid className="cardContainer">
+          <Card.Content>
+            <Card.Header className="cardHeader">
+              {teacher.name}
+              <Icon name="remove" className="controlIcon" onClick={() => history.goBack()} />
+            </Card.Header>
+            <Card.Meta content={teacher.code} />
+            <Card.Meta content={teacher.id} />
+          </Card.Content>
+        </Card>
+        <Tab panes={panes} style={{ paddingTop: '0.5rem' }} />
+      </div>
+    )
+  }
 }
 
 TeacherDetails.propTypes = {

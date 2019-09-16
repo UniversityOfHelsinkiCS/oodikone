@@ -16,9 +16,9 @@ export const getCourseStats = ({ courseCodes, separate }, onProgress) => {
   return callController(route, prefix, [], 'get', params, params, onProgress)
 }
 
-const responseToObj = (coursestats) => {
+const responseToObj = coursestats => {
   const data = {}
-  coursestats.forEach((stat) => {
+  coursestats.forEach(stat => {
     data[stat.coursecode] = stat
   })
   return data

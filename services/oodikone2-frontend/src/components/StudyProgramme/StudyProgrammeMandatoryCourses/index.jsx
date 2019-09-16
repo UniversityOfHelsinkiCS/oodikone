@@ -15,7 +15,7 @@ import AddMandatoryCourses from '../AddMandatoryCourses'
 import MandatoryCourseLabels from '../MandatoryCourseLabels'
 import { useTabs } from '../../../common'
 
-const StudyProgrammeMandatoryCourses = (props) => {
+const StudyProgrammeMandatoryCourses = props => {
   const {
     getMandatoryCourses,
     addMandatoryCourse,
@@ -26,11 +26,7 @@ const StudyProgrammeMandatoryCourses = (props) => {
     language,
     history
   } = props
-  const [tab, setTab] = useTabs(
-    'p_m_tab',
-    0,
-    history
-  )
+  const [tab, setTab] = useTabs('p_m_tab', 0, history)
 
   useEffect(() => {
     if (studyProgramme) {
@@ -45,10 +41,7 @@ const StudyProgrammeMandatoryCourses = (props) => {
       menuItem: 'Mandatory courses',
       render: () => (
         <Tab.Pane>
-          <AddMandatoryCourses
-            addMandatoryCourse={addMandatoryCourse}
-            studyProgramme={studyProgramme}
-          />
+          <AddMandatoryCourses addMandatoryCourse={addMandatoryCourse} studyProgramme={studyProgramme} />
           <MandatoryCourseTable
             mandatoryCourses={mandatoryCourses.data}
             studyProgramme={studyProgramme}
@@ -63,10 +56,7 @@ const StudyProgrammeMandatoryCourses = (props) => {
       menuItem: 'Group labels',
       render: () => (
         <Tab.Pane>
-          <MandatoryCourseLabels
-            studyProgramme={studyProgramme}
-            getMandatoryCourses={getMandatoryCourses}
-          />
+          <MandatoryCourseLabels studyProgramme={studyProgramme} getMandatoryCourses={getMandatoryCourses} />
         </Tab.Pane>
       )
     }
@@ -80,7 +70,7 @@ const StudyProgrammeMandatoryCourses = (props) => {
             You can for example use labels '1. year', '2. year' to define groups of 1st year and second year mandatory courses."
       />
       <Tab activeIndex={tab} panes={panes} onTabChange={setTab} />
-    </React.Fragment >
+    </React.Fragment>
   )
 }
 

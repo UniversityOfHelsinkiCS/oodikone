@@ -30,7 +30,9 @@ class SingleCourseTab extends Component {
       <div>
         <Segment>
           <Form>
-            {courses ? courses.text : (
+            {courses ? (
+              courses.text
+            ) : (
               <Form.Dropdown
                 name="selected"
                 options={courses}
@@ -42,7 +44,10 @@ class SingleCourseTab extends Component {
             )}
             <Divider />
             <Label.Group>
-              <Label key={selectedStatistic.coursecode} content={`${selectedStatistic.alternatives.map(code => ` ${code}`)} ${selectedStatistic.name} `} />
+              <Label
+                key={selectedStatistic.coursecode}
+                content={`${selectedStatistic.alternatives.map(code => ` ${code}`)} ${selectedStatistic.name} `}
+              />
             </Label.Group>
           </Form>
         </Segment>

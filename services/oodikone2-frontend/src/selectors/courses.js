@@ -6,7 +6,7 @@ const getData = obj => obj
 
 const getInstanceData = obj => obj.data
 
-export const sortInstances = (courseInstances) => {
+export const sortInstances = courseInstances => {
   if (courseInstances) {
     return courseInstances.sort(byDateDesc).map(instance => ({
       key: instance.id,
@@ -18,23 +18,30 @@ export const sortInstances = (courseInstances) => {
   return []
 }
 
-export const sortCourses = courseList => Object.values(courseList.data)
-  .sort(byDateDesc)
-  .map(course => ({
-    ...course, title: `${course.name} (${course.code})`, key: `${course.name}-${course.code}`, selected: courseList.selected.some(c => course.code === c.code)
+export const sortCourses = courseList =>
+  Object.values(courseList.data)
+    .sort(byDateDesc)
+    .map(course => ({
+      ...course,
+      title: `${course.name} (${course.code})`,
+      key: `${course.name}-${course.code}`,
+      selected: courseList.selected.some(c => course.code === c.code)
+    }))
+
+export const makeSortCourseInstances = () =>
+  createSelector(
+    getInstanceData,
+    sortInstances
+  )
+
+export const makeSortCourses = () =>
+  createSelector(
+    getData,
+    sortCourses
+  )
+
+export const getCourseSearchResults = state =>
+  state.courseSearch.data.map(({ name, ...rest }) => ({
+    ...rest,
+    name: getTextIn(name, getActiveLanguage(state.localize).code)
   }))
-
-export const makeSortCourseInstances = () => createSelector(
-  getInstanceData,
-  sortInstances
-)
-
-export const makeSortCourses = () => createSelector(
-  getData,
-  sortCourses
-)
-
-export const getCourseSearchResults = state => state.courseSearch.data.map(({ name, ...rest }) => ({
-  ...rest,
-  name: getTextIn(name, getActiveLanguage(state.localize).code)
-}))

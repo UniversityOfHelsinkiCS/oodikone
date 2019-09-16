@@ -25,10 +25,7 @@ class ExtentGraduated extends Component {
     complemented: 'false'
   }
 
-  graduationOptions = [
-    { value: 'grad', text: 'graduated' },
-    { value: 'either', text: 'studying' }
-  ] // illegal to pass boolean values as Dropdown options value :(
+  graduationOptions = [{ value: 'grad', text: 'graduated' }, { value: 'either', text: 'studying' }] // illegal to pass boolean values as Dropdown options value :(
 
   complementedOptions = [{ value: 'false', text: 'are' }, { value: 'true', text: 'are not' }]
 
@@ -38,7 +35,9 @@ class ExtentGraduated extends Component {
 
   handleLimit = () => {
     const { code, graduated, complemented } = this.state
-    this.props.setPopulationFilter(extentGraduated({ code, graduated, complemented, isExtent: (typeof code === 'number') }))
+    this.props.setPopulationFilter(
+      extentGraduated({ code, graduated, complemented, isExtent: typeof code === 'number' })
+    )
   }
 
   clearFilter = () => {
@@ -50,16 +49,25 @@ class ExtentGraduated extends Component {
     const { code, graduated, complemented, isExtent } = filter.params
     let returnText = ''
     if (graduated === 'grad') {
-      returnText = ('students that graduated from')
+      returnText = 'students that graduated from'
     } else if (graduated === 'either') {
-      returnText = ('students that are studying ')
+      returnText = 'students that are studying '
     }
-    const postText = isExtent ? (` ${getTextIn(extents.find(extent => extent.extentcode === code).name, language)} `) : (` ${allStudyRights.find(sr => sr.value === code).text}`)
+    const postText = isExtent
+      ? ` ${getTextIn(extents.find(extent => extent.extentcode === code).name, language)} `
+      : ` ${allStudyRights.find(sr => sr.value === code).text}`
 
-    return complemented === 'true' ?
-      <span><b>Excluded</b> {returnText}<b>{postText}</b></span>
-      :
-      <span><b>Included</b> {returnText}<b>{postText}</b></span>
+    return complemented === 'true' ? (
+      <span>
+        <b>Excluded</b> {returnText}
+        <b>{postText}</b>
+      </span>
+    ) : (
+      <span>
+        <b>Included</b> {returnText}
+        <b>{postText}</b>
+      </span>
+    )
   }
 
   render() {
@@ -75,9 +83,7 @@ class ExtentGraduated extends Component {
               trigger={<Icon style={{ float: 'right' }} name="info" />}
             />
             <Form.Group inline>
-              <Form.Field>
-                Students that
-              </Form.Field>
+              <Form.Field>Students that</Form.Field>
               <Form.Field>
                 <Dropdown
                   fluid
@@ -108,11 +114,15 @@ class ExtentGraduated extends Component {
                   name="code"
                   placeholder="select extent"
                   onChange={this.handleChange}
-                  options={sortBy(Object.values(extents).map(({
-                    extentcode: ecode, name
-                  }) => ({
-                    value: ecode, text: getTextIn(name, language)
-                  })).concat(allStudyRights), entry => entry.text)}
+                  options={sortBy(
+                    Object.values(extents)
+                      .map(({ extentcode: ecode, name }) => ({
+                        value: ecode,
+                        text: getTextIn(name, language)
+                      }))
+                      .concat(allStudyRights),
+                    entry => entry.text
+                  )}
                   selectOnBlur={false}
                   selectOnNavigation={false}
                 />
@@ -124,7 +134,6 @@ class ExtentGraduated extends Component {
                 >
                   set filter
                 </Button>
-
               </Form.Field>
             </Form.Group>
           </Form>
@@ -134,9 +143,7 @@ class ExtentGraduated extends Component {
 
     return (
       <Segment>
-        <label>
-          {this.renderSetText(extents, filter, allStudyRights)}
-        </label>
+        <label>{this.renderSetText(extents, filter, allStudyRights)}</label>
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

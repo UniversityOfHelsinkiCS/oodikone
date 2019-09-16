@@ -14,9 +14,7 @@ import infotooltips from '../../common/InfoToolTips'
 import GradeFilter from './GradeFilter'
 import ProgrammeFilter from './ProgrammeFilter'
 import CourseCreditFilter from './CourseCreditFilter'
-import {
-  clearPopulationFilters, setComplementFilter
-} from '../../redux/populationFilters'
+import { clearPopulationFilters, setComplementFilter } from '../../redux/populationFilters'
 
 const componentFor = {
   GradeFilter,
@@ -29,17 +27,22 @@ const componentFor = {
   CourseParticipation
 }
 
-const CustomPopulationFilters = ({ samples, filters, clearPopulationFiltersDispatch, complemented, setComplementFilterDispatch, allStudyrights, coursecodes }) => {
+const CustomPopulationFilters = ({
+  samples,
+  filters,
+  clearPopulationFiltersDispatch,
+  complemented,
+  setComplementFilterDispatch,
+  allStudyrights,
+  coursecodes
+}) => {
   const [visible, setVisible] = useState(false)
 
   const renderAddFilters = () => {
     const { Add } = infotooltips.PopulationStatistics.Filters
     const allFilters = union(Object.keys(componentFor))
 
-    const setFilters = union(
-      filters.map(f => f.type),
-      filters.filter(f => f.type === 'Preset').map(f => f.id),
-    )
+    const setFilters = union(filters.map(f => f.type), filters.filter(f => f.type === 'Preset').map(f => f.id))
 
     const unsetFilters = uniq(difference(allFilters, setFilters))
     if (unsetFilters.length === 0) {
@@ -48,23 +51,32 @@ const CustomPopulationFilters = ({ samples, filters, clearPopulationFiltersDispa
     if (!visible) {
       return (
         <Segment>
-          <Header>Add filters <InfoBox content={Add} /></Header>
-          <Button
-            onClick={() => setVisible(true)}
-          >
-            add
-          </Button>
+          <Header>
+            Add filters <InfoBox content={Add} />
+          </Header>
+          <Button onClick={() => setVisible(true)}>add</Button>
         </Segment>
       )
     }
     return (
       <Segment>
-        <Header>Add filters <InfoBox content={Add} /></Header>
-        {unsetFilters.map((filterName) => {
-          if (window.location.pathname === '/custompopulation' && ['GradeFilter', 'CourseCreditFilter'].includes(filterName)) {
+        <Header>
+          Add filters <InfoBox content={Add} />
+        </Header>
+        {unsetFilters.map(filterName => {
+          if (
+            window.location.pathname === '/custompopulation' &&
+            ['GradeFilter', 'CourseCreditFilter'].includes(filterName)
+          ) {
             return null
           }
-          return React.createElement(componentFor[filterName], { filter: { notSet: true }, key: filterName, samples, allStudyrights, coursecodes })
+          return React.createElement(componentFor[filterName], {
+            filter: { notSet: true },
+            key: filterName,
+            samples,
+            allStudyrights,
+            coursecodes
+          })
         })}
         <Button onClick={() => setVisible(false)}>cancel</Button>
       </Segment>
@@ -80,19 +92,25 @@ const CustomPopulationFilters = ({ samples, filters, clearPopulationFiltersDispa
 
     return (
       <Segment>
-        <Header>Filters <InfoBox content={Filters} /></Header>
-        {filters.map(filter => React.createElement(componentFor[filter.type], { filter, key: filter.id, samples, allStudyrights, coursecodes }))}
+        <Header>
+          Filters <InfoBox content={Filters} />
+        </Header>
+        {filters.map(filter =>
+          React.createElement(componentFor[filter.type], {
+            filter,
+            key: filter.id,
+            samples,
+            allStudyrights,
+            coursecodes
+          })
+        )}
         <Form>
           <Form.Group inline>
             <Form.Field>
               <label>Show excluded students only</label>
             </Form.Field>
             <Form.Field>
-              <Radio
-                toggle
-                checked={complemented}
-                onClick={setComplementFilterDispatch}
-              />
+              <Radio toggle checked={complemented} onClick={setComplementFilterDispatch} />
             </Form.Field>
           </Form.Group>
         </Form>
@@ -124,7 +142,10 @@ const mapStateToProps = ({ populationFilters, populations }) => ({
   allStudyrights: populations.data.studyrights || {}
 })
 
-export default connect(mapStateToProps, {
-  clearPopulationFiltersDispatch: clearPopulationFilters,
-  setComplementFilterDispatch: setComplementFilter
-})(CustomPopulationFilters)
+export default connect(
+  mapStateToProps,
+  {
+    clearPopulationFiltersDispatch: clearPopulationFilters,
+    setComplementFilterDispatch: setComplementFilter
+  }
+)(CustomPopulationFilters)

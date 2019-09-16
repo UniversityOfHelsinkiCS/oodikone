@@ -22,7 +22,7 @@ class CourseGradeSpiders extends Component {
     }
   }
 
-  setGradeCategory = (selected) => {
+  setGradeCategory = selected => {
     const { profiles } = this.props
     this.setState({ selected, profile: profiles[selected] })
   }
@@ -39,10 +39,7 @@ class CourseGradeSpiders extends Component {
       <Grid centered textAlign="center">
         <Grid.Row>
           <Grid.Column>
-            <Message
-              header="Average profile dimensions per course grade"
-              content={DESCRIPTION}
-            />
+            <Message header="Average profile dimensions per course grade" content={DESCRIPTION} />
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
@@ -62,11 +59,7 @@ class CourseGradeSpiders extends Component {
                 </Form.Field>
               </Form.Group>
             </Form>
-            <ProfileTable
-              series={series}
-              categories={categories}
-              selected={selected}
-            />
+            <ProfileTable series={series} categories={categories} selected={selected} />
           </Grid.Column>
           <Grid.Column width={10}>
             <SpiderGraph profile={profile} title={null} />
@@ -93,7 +86,7 @@ CourseGradeSpiders.propTypes = {
   options: arrayOf(shape({})).isRequired
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const { categories, series, profiles } = selector.courseProfileSeries(state)
   return {
     categories,

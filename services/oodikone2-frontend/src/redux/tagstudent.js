@@ -22,14 +22,14 @@ export const createMultipleStudentTagAction = (tags, studytrack) => {
   return callController(route, prefix, data, method)
 }
 
-export const getStudentTagsByStudytrackAction = (studytrack) => {
+export const getStudentTagsByStudytrackAction = studytrack => {
   const route = `/studenttags/${studytrack}`
   const prefix = 'GET_STUDENT_TAGS_BY_ST_'
   const data = { studytrack }
   return callController(route, prefix, data)
 }
 
-export const getStudentTagsByStudentnumberAction = (studentnumber) => {
+export const getStudentTagsByStudentnumberAction = studentnumber => {
   const route = `/studenttags/${studentnumber}`
   const prefix = 'GET_STUDENT_TAG_BY_SN_'
   return callController(route, prefix)

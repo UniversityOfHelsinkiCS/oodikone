@@ -22,9 +22,7 @@ const KeyValueTable = ({ data }) => (
         <Table.Row key={key}>
           <Table.Cell content={key} textAlign="center" />
           <Table.Cell textAlign="left">
-            <pre style={preStyle}>
-              {JSON.stringify(value, null, 2)}
-            </pre>
+            <pre style={preStyle}>{JSON.stringify(value, null, 2)}</pre>
           </Table.Cell>
         </Table.Row>
       ))}
