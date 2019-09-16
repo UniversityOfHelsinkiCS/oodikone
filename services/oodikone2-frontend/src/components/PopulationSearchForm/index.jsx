@@ -744,8 +744,8 @@ const PopulationSearchForm = props => {
         <Form.Button onClick={handleSubmit} disabled={isQueryInvalid || query.months < 0}>
           {translate('populationStatistics.addPopulation')}
         </Form.Button>
+        <SearchHistory items={searchHistory} updateItem={updateItemInSearchHistory} handleSearch={pushQueryToUrl} />
       </Form>
-      <SearchHistory items={searchHistory} updateItem={updateItemInSearchHistory} handleSearch={pushQueryToUrl} />
     </div>
   )
 }
