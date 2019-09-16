@@ -4,7 +4,7 @@ const SPRING = { start: 0, end: 6 }
 
 const isSpring = date => SPRING.start <= date.month() && date.month() <= SPRING.end
 
-const getSemester = date => isSpring(date) ? 'SPRING' : 'FALL'
+const getSemester = date => (isSpring(date) ? 'SPRING' : 'FALL')
 
 const semesterStart = {
   SPRING: '01-01',
@@ -26,7 +26,7 @@ const getPassingSemester = (startYear, date) => {
     return 'BEFORE'
   }
 
-  return (yearCount < 6) ? `${yearCount}-${semester}` : 'LATER'
+  return yearCount < 6 ? `${yearCount}-${semester}` : 'LATER'
 }
 
 module.exports = {

@@ -1,7 +1,7 @@
 const { forceSyncDatabase } = require('../database/connection')
 const { Course, ElementDetails } = require('../models')
 const { ThesisTypeEnums, ThesisCourse } = require('../models/models_kone')
-const { createThesisCourse, deleteThesisCourse, findProgrammeTheses }  = require('./thesis')
+const { createThesisCourse, deleteThesisCourse, findProgrammeTheses } = require('./thesis')
 
 const courseOne = {
   code: 'COURSE',
@@ -15,7 +15,7 @@ const courseTwo = {
 
 const progOne = {
   code: 'CS_BSC',
-  name: { en: 'CS_BSC' },
+  name: { en: 'CS_BSC' }
 }
 
 const progTwo = {
@@ -23,7 +23,7 @@ const progTwo = {
   name: { en: 'CS_MSC' }
 }
 
-beforeEach(async() => {
+beforeEach(async () => {
   await forceSyncDatabase()
   await Course.create(courseOne)
   await Course.create(courseTwo)

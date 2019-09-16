@@ -1,11 +1,16 @@
 const Sequelize = require('sequelize')
 const { sequelize } = require('../database/connection')
 const moment = require('moment')
-const { Student, Credit, Course, Studyright, StudyrightElement, ElementDetails, SemesterEnrollment } = require('../models')
 const {
-  TagStudent,
-  Tag
-} = require('../models/models_kone')
+  Student,
+  Credit,
+  Course,
+  Studyright,
+  StudyrightElement,
+  ElementDetails,
+  SemesterEnrollment
+} = require('../models')
+const { TagStudent, Tag } = require('../models/models_kone')
 const Op = Sequelize.Op
 
 const createStudent = student => Student.create(student)
@@ -20,7 +25,7 @@ const updateStudent = student => {
   })
 }
 
-const byId = async (id) => {
+const byId = async id => {
   const [student, tags] = await Promise.all([
     Student.findByPk(id, {
       include: [
@@ -28,7 +33,7 @@ const byId = async (id) => {
           model: Credit,
           separate: true,
           include: {
-            model: Course,
+            model: Course
           }
         },
         {
@@ -76,7 +81,9 @@ const byId = async (id) => {
 }
 
 const findByCourseAndSemesters = async (coursecodes, yearcode) =>
-  sequelize.query(`
+  sequelize
+    .query(
+      `
     SELECT
       studentnumber, credit.course_code, attainment_date
     FROM student
@@ -89,10 +96,11 @@ const findByCourseAndSemesters = async (coursecodes, yearcode) =>
       (select startdate FROM semesters where yearcode=:yearcode ORDER BY semestercode LIMIT 1) AND
       (select enddate FROM semesters where yearcode=:yearcode ORDER BY semestercode DESC LIMIT 1);
   `,
-  { replacements: { coursecodes, yearcode }, type: sequelize.QueryTypes.SELECT })
+      { replacements: { coursecodes, yearcode }, type: sequelize.QueryTypes.SELECT }
+    )
     .map(st => st.studentnumber)
 
-const byAbreviatedNameOrStudentNumber = (searchTerm) => {
+const byAbreviatedNameOrStudentNumber = searchTerm => {
   return Student.findAll({
     where: {
       [Op.or]: [
@@ -107,12 +115,11 @@ const byAbreviatedNameOrStudentNumber = (searchTerm) => {
           }
         }
       ]
-
     }
   })
 }
 
-const findByTag = (tag) => {
+const findByTag = tag => {
   return TagStudent.findAll({
     attributes: ['studentnumber'],
     where: {
@@ -141,14 +148,7 @@ const formatStudent = ({
   createdAt,
   tags
 }) => {
-  const toCourse = ({
-    grade,
-    credits,
-    credittypecode,
-    attainment_date,
-    course,
-    isStudyModule
-  }) => {
+  const toCourse = ({ grade, credits, credittypecode, attainment_date, course, isStudyModule }) => {
     course = course.get()
     return {
       course: {
@@ -168,32 +168,33 @@ const formatStudent = ({
     studyrights === undefined
       ? []
       : studyrights.map(
-        ({
-          studyrightid,
-          highlevelname,
-          startdate,
-          enddate,
-          canceldate,
-          extentcode,
-          graduated,
-          graduation_date,
-          studyright_elements
-        }) => ({
-          studyrightid,
-          highlevelname,
-          extentcode,
-          startdate,
-          graduationDate: graduation_date,
-          studyrightElements: studyright_elements,
-          enddate,
-          canceldate,
-          graduated: Boolean(graduated)
-        })
-      )
+          ({
+            studyrightid,
+            highlevelname,
+            startdate,
+            enddate,
+            canceldate,
+            extentcode,
+            graduated,
+            graduation_date,
+            studyright_elements
+          }) => ({
+            studyrightid,
+            highlevelname,
+            extentcode,
+            startdate,
+            graduationDate: graduation_date,
+            studyrightElements: studyright_elements,
+            enddate,
+            canceldate,
+            graduated: Boolean(graduated)
+          })
+        )
   semester_enrollments = semester_enrollments || []
-  const semesterenrollments = semester_enrollments.map(
-    ({ semestercode, enrollmenttype }) => ({ semestercode, enrollmenttype })
-  )
+  const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({
+    semestercode,
+    enrollmenttype
+  }))
 
   const courseByDate = (a, b) => {
     return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
@@ -221,7 +222,7 @@ const formatStudent = ({
   }
 }
 
-const bySearchTermOld = async (term) => {
+const bySearchTermOld = async term => {
   try {
     const result = await byAbreviatedNameOrStudentNumber(`%${term}%`)
     return result.map(formatStudent)
@@ -232,7 +233,7 @@ const bySearchTermOld = async (term) => {
   }
 }
 
-const withId = async (id) => {
+const withId = async id => {
   try {
     const result = await byId(id)
     return formatStudent(result)
@@ -283,7 +284,7 @@ const columnLike = (column, term) => ({
   }
 })
 
-const nameLike = (terms) => {
+const nameLike = terms => {
   const [first, second] = terms
   if (!second) {
     return columnLike('abbreviatedname', first)
@@ -308,14 +309,11 @@ const studentnumberLike = terms => {
   }
 }
 
-const bySearchTermNew = async (searchterm) => {
+const bySearchTermNew = async searchterm => {
   const terms = splitByEmptySpace(searchterm)
   const matches = await Student.findAll({
     where: {
-      [Op.or]: [
-        nameLike(terms),
-        studentnumberLike(terms)
-      ]
+      [Op.or]: [nameLike(terms), studentnumberLike(terms)]
     }
   })
   return matches.map(formatStudent)
@@ -334,10 +332,7 @@ const bySearchTermAndElementsNew = async (searchterm, codes) => {
       }
     },
     where: {
-      [Op.or]: [
-        nameLike(terms),
-        studentnumberLike(terms)
-      ]
+      [Op.or]: [nameLike(terms), studentnumberLike(terms)]
     }
   })
   return matches.map(formatStudent)

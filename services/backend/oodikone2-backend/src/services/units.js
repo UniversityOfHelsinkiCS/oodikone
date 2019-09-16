@@ -2,12 +2,13 @@ const Sequelize = require('sequelize')
 const { ElementDetails, StudyrightElement } = require('../models')
 const Op = Sequelize.Op
 
-const hasStudent = async (code, studentnumber) => StudyrightElement.findOne({
-  where: {
-    studentnumber,
-    code
-  }
-})
+const hasStudent = async (code, studentnumber) =>
+  StudyrightElement.findOne({
+    where: {
+      studentnumber,
+      code
+    }
+  })
 
 const parseUnitFromElement = element => ({
   id: element.code,
@@ -17,11 +18,13 @@ const parseUnitFromElement = element => ({
 })
 
 const getUnitsFromElementDetails = async () => {
-  const elementdetails = await ElementDetails.findAll({ where: { 
-    type: {
-      [Op.or]: ['10', '20']
+  const elementdetails = await ElementDetails.findAll({
+    where: {
+      type: {
+        [Op.or]: ['10', '20']
+      }
     }
-  }})
+  })
   return elementdetails.map(parseUnitFromElement)
 }
 
@@ -31,5 +34,8 @@ const getUnitFromElementDetail = async id => {
 }
 
 module.exports = {
-  hasStudent, getUnitsFromElementDetails, getUnitFromElementDetail, parseUnitFromElement
+  hasStudent,
+  getUnitsFromElementDetails,
+  getUnitFromElementDetail,
+  parseUnitFromElement
 }

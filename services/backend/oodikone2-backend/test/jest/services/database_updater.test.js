@@ -23,11 +23,9 @@ beforeAll(async () => {
   configureAxios()
 })
 
-afterAll(async () => {
-})
+afterAll(async () => {})
 
 describe('Database updater for saving faculties', () => {
-
   let organisation
 
   beforeAll(async () => {
@@ -48,5 +46,4 @@ describe('Database updater for saving faculties', () => {
   test('Saved faculty name in DB is the Finnish name returned by the API', () => {
     expect(organisation.name.fi).toBe('FAC 1 FIN')
   })
-
 })

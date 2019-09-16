@@ -1,7 +1,7 @@
 const fs = require('fs')
 const { Student } = require('../../models/index')
 
-const getStudentNumbers = async (writefilepath='./studentnumbers.txt') => {
+const getStudentNumbers = async (writefilepath = './studentnumbers.txt') => {
   const file = fs.openSync(writefilepath, 'w')
   const students = await Student.findAll()
   for (let student of students) {

@@ -2,7 +2,6 @@ const axios = require('axios')
 const https = require('https')
 require('dotenv').config()
 
-
 const instance = axios.create({
   httpsAgent: new https.Agent({
     rejectUnauthorized: false
@@ -10,16 +9,17 @@ const instance = axios.create({
 })
 
 axios.defaults.auth = {
-  username: 'tktl',
+  username: 'tktl'
 }
 
-instance.interceptors.request.use((config) => {
-  config.params = {token: process.env.TOKEN}
+instance.interceptors.request.use(config => {
+  config.params = { token: process.env.TOKEN }
   return config
 })
 
-const getStudent = (studentNumber) => {
-  return instance.get(`${process.env.OODI_ADDR}/students/${studentNumber}/info`)
+const getStudent = studentNumber => {
+  return instance
+    .get(`${process.env.OODI_ADDR}/students/${studentNumber}/info`)
     .then(response => {
       return response.data.data
     })
@@ -54,7 +54,6 @@ const getStudyattainmentStatusCodes = async () => {
   return response.data.data
 }
 
-
 const getSemesters = async () => {
   const url = `${process.env.OODI_ADDR}/codes/semesters`
   const response = await instance.get(url)
@@ -67,14 +66,13 @@ const getSemesterEnrollments = async studentnumber => {
   return response.data.data
 }
 
-
 const getCourseRealisationTypes = async () => {
   const url = `${process.env.OODI_ADDR}/codes/courseunitrealisations/types`
   const response = await instance.get(url)
   return response.data.data
 }
 
-const getLearningOpportunity = async (id) => {
+const getLearningOpportunity = async id => {
   const url = `${process.env.OODI_ADDR}/learningopportunities/${id}`
   const response = await instance.get(url)
   return response.data.data

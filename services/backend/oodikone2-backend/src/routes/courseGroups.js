@@ -7,7 +7,9 @@ router.get('/programme/:programmeId/:force?', async (req, res) => {
   const semesterCode = req.query.semester
   if (rights.includes(programmeId) || (roles && roles.includes('admin'))) {
     const courseGroups = await CourseGroupService.getCourseGroupsWithTotals(
-      programmeId, semesterCode, force === 'force'
+      programmeId,
+      semesterCode,
+      force === 'force'
     )
     return res.json(courseGroups)
   }

@@ -1,8 +1,7 @@
 const lengthOf = obj => Object.keys(obj).length
-const percentageOf = (num, denom) => Number((100 * num / denom).toFixed(2))
+const percentageOf = (num, denom) => Number(((100 * num) / denom).toFixed(2))
 
 class CourseStatsCounter {
-
   constructor(code, name, allstudents) {
     this.studentsInTotal = Object.keys(allstudents).length
     this.course = {
@@ -92,11 +91,11 @@ class CourseStatsCounter {
   }
 
   failedBefore(studentnumber) {
-    return (this.students.failed[studentnumber] !== undefined)
+    return this.students.failed[studentnumber] !== undefined
   }
 
   passedBefore(studentnumber) {
-    return (this.students.passed[studentnumber] !== undefined)
+    return this.students.passed[studentnumber] !== undefined
   }
 
   removeFromFailed(studentnumber) {
@@ -151,7 +150,7 @@ class CourseStatsCounter {
   getPassingSemestersCumulative() {
     const passingSemesters = this.stats.passingSemesters
     const cumulativeStats = {
-      'BEFORE': passingSemesters['BEFORE']
+      BEFORE: passingSemesters['BEFORE']
     }
 
     cumulativeStats['0-FALL'] = passingSemesters['BEFORE'] + passingSemesters['0-FALL']
@@ -190,7 +189,6 @@ class CourseStatsCounter {
       grades: this.grades
     }
   }
-
 }
 
 module.exports = {
