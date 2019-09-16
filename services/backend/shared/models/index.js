@@ -1,7 +1,8 @@
 const Sequelize = require('sequelize')
 const { sequelize } = require('../database/connection')
 
-const Student = sequelize.define('student',
+const Student = sequelize.define(
+  'student',
   {
     studentnumber: {
       primaryKey: true,
@@ -38,20 +39,20 @@ const Student = sequelize.define('student',
     gender_code: { type: Sequelize.INTEGER },
     gender_fi: { type: Sequelize.STRING },
     gender_sv: { type: Sequelize.STRING },
-    gender_en: { type: Sequelize.STRING },
-
+    gender_en: { type: Sequelize.STRING }
   },
   {
     tableName: 'student',
-    timestamps: true,
+    timestamps: true
   }
 )
 
-Student.hasStarted = (student) => {
+Student.hasStarted = student => {
   return student.credits.length > 0
 }
 
-const Organisation = sequelize.define('organization',
+const Organisation = sequelize.define(
+  'organization',
   {
     code: {
       primaryKey: true,
@@ -61,11 +62,12 @@ const Organisation = sequelize.define('organization',
   },
   {
     tableName: 'organization',
-    timestamps: false,
+    timestamps: false
   }
 )
 
-const Credit = sequelize.define('credit',
+const Credit = sequelize.define(
+  'credit',
   {
     id: {
       primaryKey: true,
@@ -99,7 +101,7 @@ const Credit = sequelize.define('credit',
   }
 )
 
-Credit.notUnnecessary = (credit) => {
+Credit.notUnnecessary = credit => {
   return credit.credits > 0 && credit.credits <= 12
 }
 
@@ -110,12 +112,13 @@ const CREDIT_TYPE_CODES = {
   APPROVED: 9
 }
 
-Credit.passed = ({ credittypecode }) => credittypecode === CREDIT_TYPE_CODES.PASSED ||
-  credittypecode === CREDIT_TYPE_CODES.APPROVED
+Credit.passed = ({ credittypecode }) =>
+  credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.APPROVED
 Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
 Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED
 
-const Studyright = sequelize.define('studyright',
+const Studyright = sequelize.define(
+  'studyright',
   {
     studyrightid: {
       primaryKey: true,
@@ -131,7 +134,7 @@ const Studyright = sequelize.define('studyright',
     startdate: { type: Sequelize.DATE },
     studystartdate: { type: Sequelize.DATE },
     organization_code: { type: Sequelize.STRING },
-    student_studentnumber: { type: Sequelize.STRING },
+    student_studentnumber: { type: Sequelize.STRING }
   },
   {
     tableName: 'studyright',
@@ -145,7 +148,8 @@ const Studyright = sequelize.define('studyright',
   }
 )
 
-const StudyrightElement = sequelize.define('studyright_elements',
+const StudyrightElement = sequelize.define(
+  'studyright_elements',
   {
     startdate: { type: Sequelize.DATE },
     enddate: { type: Sequelize.DATE }
@@ -155,7 +159,8 @@ const StudyrightElement = sequelize.define('studyright_elements',
       {
         unique: true,
         fields: ['startdate', 'enddate', 'studyrightid', 'code']
-      }, {
+      },
+      {
         fields: ['startdate']
       }
     ],
@@ -163,7 +168,8 @@ const StudyrightElement = sequelize.define('studyright_elements',
   }
 )
 
-const ElementDetails = sequelize.define('element_details',
+const ElementDetails = sequelize.define(
+  'element_details',
   {
     code: {
       primaryKey: true,
@@ -177,7 +183,8 @@ const ElementDetails = sequelize.define('element_details',
   }
 )
 
-const Course = sequelize.define('course',
+const Course = sequelize.define(
+  'course',
   {
     code: {
       primaryKey: true,
@@ -193,26 +200,28 @@ const Course = sequelize.define('course',
   },
   {
     tableName: 'course',
-    timestamps: false,
+    timestamps: false
   }
 )
 
-const Teacher = sequelize.define('teacher',
+const Teacher = sequelize.define(
+  'teacher',
   {
     id: {
       primaryKey: true,
       type: Sequelize.STRING
     },
     code: { type: Sequelize.STRING },
-    name: { type: Sequelize.STRING },
+    name: { type: Sequelize.STRING }
   },
   {
     tableName: 'teacher',
-    timestamps: false,
+    timestamps: false
   }
 )
 
-const StudentList = sequelize.define('student_list',
+const StudentList = sequelize.define(
+  'student_list',
   {
     id: {
       type: Sequelize.INTEGER,
@@ -234,33 +243,29 @@ const StudentList = sequelize.define('student_list',
   },
   {
     tableName: 'student_list',
-    timestamps: false,
+    timestamps: false
   }
 )
 
-const StudyrightExtent = sequelize.define('studyright_extent',
-  {
-    extentcode: {
-      type: Sequelize.INTEGER,
-      primaryKey: true
-    },
-    name: {
-      type: Sequelize.JSONB,
-    }
+const StudyrightExtent = sequelize.define('studyright_extent', {
+  extentcode: {
+    type: Sequelize.INTEGER,
+    primaryKey: true
+  },
+  name: {
+    type: Sequelize.JSONB
   }
-)
+})
 
-const Discipline = sequelize.define('discipline',
-  {
-    discipline_id: {
-      type: Sequelize.STRING,
-      primaryKey: true
-    },
-    name: {
-      type: Sequelize.JSONB
-    }
+const Discipline = sequelize.define('discipline', {
+  discipline_id: {
+    type: Sequelize.STRING,
+    primaryKey: true
+  },
+  name: {
+    type: Sequelize.JSONB
   }
-)
+})
 
 const CourseDisciplines = sequelize.define('course_disciplines', {})
 
@@ -306,29 +311,34 @@ const Semester = sequelize.define('semester', {
   }
 })
 
-const SemesterEnrollment = sequelize.define('semester_enrollment', {
-  id: {
-    primaryKey: true,
-    type: Sequelize.BIGINT,
-    autoIncrement: true
-  },
-  enrollmenttype: {
-    type: Sequelize.INTEGER
-  },
-  enrollment_date: {
-    type: Sequelize.DATE
-  }
-}, {
-  indexes: [
-    {
-      fields: ['semestercode', 'studentnumber'],
-      unique: true
-    }, {
-      fields: ['studentnumber'],
-      name: 'semester_enrollment_studentnumber'
+const SemesterEnrollment = sequelize.define(
+  'semester_enrollment',
+  {
+    id: {
+      primaryKey: true,
+      type: Sequelize.BIGINT,
+      autoIncrement: true
+    },
+    enrollmenttype: {
+      type: Sequelize.INTEGER
+    },
+    enrollment_date: {
+      type: Sequelize.DATE
     }
-  ]
-})
+  },
+  {
+    indexes: [
+      {
+        fields: ['semestercode', 'studentnumber'],
+        unique: true
+      },
+      {
+        fields: ['studentnumber'],
+        name: 'semester_enrollment_studentnumber'
+      }
+    ]
+  }
+)
 
 const Provider = sequelize.define('provider', {
   providercode: {
@@ -340,44 +350,52 @@ const Provider = sequelize.define('provider', {
   }
 })
 
-const Transfers = sequelize.define('transfers', {
-  id: {
-    primaryKey: true,
-    type: Sequelize.BIGINT,
-    autoIncrement: true
-  },
-  studyrightid: {
-    type: Sequelize.BIGINT,
-  },
-  sourcecode: {
-    type: Sequelize.STRING
-  },
-  targetcode: {
-    type: Sequelize.STRING
-  },
-  transferdate: {
-    type: Sequelize.DATE
-  },
-  studentnumber: {
-    type: Sequelize.STRING
-  },
-}, {
-  indexes: [
-    {
-      fields: ['studentnumber'],
-      name: 'transfers_studentnumber'
+const Transfers = sequelize.define(
+  'transfers',
+  {
+    id: {
+      primaryKey: true,
+      type: Sequelize.BIGINT,
+      autoIncrement: true
+    },
+    studyrightid: {
+      type: Sequelize.BIGINT
+    },
+    sourcecode: {
+      type: Sequelize.STRING
+    },
+    targetcode: {
+      type: Sequelize.STRING
+    },
+    transferdate: {
+      type: Sequelize.DATE
+    },
+    studentnumber: {
+      type: Sequelize.STRING
     }
-  ]
-})
+  },
+  {
+    indexes: [
+      {
+        fields: ['studentnumber'],
+        name: 'transfers_studentnumber'
+      }
+    ]
+  }
+)
 
-const CourseProvider = sequelize.define('course_providers', {}, {
-  indexes: [
-    {
-      fields: ['providercode', 'coursecode'],
-      unique: true
-    }
-  ]
-})
+const CourseProvider = sequelize.define(
+  'course_providers',
+  {},
+  {
+    indexes: [
+      {
+        fields: ['providercode', 'coursecode'],
+        unique: true
+      }
+    ]
+  }
+)
 
 const CourseRealisationType = sequelize.define('courserealisation_type', {
   realisationtypecode: {
@@ -416,15 +434,19 @@ const CourseRealisation = sequelize.define('courserealisation', {
 
 const CourseEnrollment = sequelize.define('course_enrollment', {})
 
-const Migration = sequelize.define('migrations', {
-  name: {
-    type: Sequelize.STRING,
-    primaryKey: true
+const Migration = sequelize.define(
+  'migrations',
+  {
+    name: {
+      type: Sequelize.STRING,
+      primaryKey: true
+    }
+  },
+  {
+    tableName: 'migrations',
+    timestamps: false
   }
-}, {
-  tableName: 'migrations',
-  timestamps: false
-})
+)
 
 const CreditTeacher = sequelize.define('credit_teacher', {
   credit_id: {
