@@ -69,9 +69,9 @@ const reducer = (state = { data: [], selected: [] }, action) => {
     case 'TOGGLE_COURSE_SELECT':
       return {
         ...state,
-        selected: state.selected.find(course => course.code === action.code) ?
-          state.selected.filter(cr => cr.code !== action.code) :
-          [...state.selected, state.data.find(course => course.code === action.code)]
+        selected: state.selected.find(course => course.code === action.code)
+          ? state.selected.filter(cr => cr.code !== action.code)
+          : [...state.selected, state.data.find(course => course.code === action.code)]
       }
     default:
       return state

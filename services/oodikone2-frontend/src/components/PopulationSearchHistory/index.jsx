@@ -34,7 +34,7 @@ class PopulationSearchHistory extends Component {
     if (!units.data.programmes || !populations.query || !populations.data.students) {
       return null
     }
-    const studentNumberList = (populations.data.students.map(s => s.studentNumber))
+    const studentNumberList = populations.data.students.map(s => s.studentNumber)
     return (
       <React.Fragment>
         <PopulationQueryCard
@@ -44,28 +44,23 @@ class PopulationSearchHistory extends Component {
           query={populations.query}
           queryId={0}
           unit={units.data.programmes[populations.query.studyRights.programme]} // Possibly deprecated
-          units={
-            ([
-              ...Object.values(units.data.programmes),
-              ...Object.values(units.data.degrees),
-              ...Object.values(units.data.studyTracks)
-            ]).filter(u => Object.values(populations.query.studyRights).includes(u.code))
-          }
+          units={[
+            ...Object.values(units.data.programmes),
+            ...Object.values(units.data.degrees),
+            ...Object.values(units.data.studyTracks)
+          ].filter(u => Object.values(populations.query.studyRights).includes(u.code))}
           removeSampleFn={this.removePopulation}
           updateStudentsFn={() => this.props.updatePopulationStudents(studentNumberList)}
           updating={populations.updating}
           tags={tags}
         />
         <InfoBox content={QueryCard} />
-      </React.Fragment>)
+      </React.Fragment>
+    )
   }
 
   render() {
-    return (
-      <div className="historyContainer" >
-        {this.renderQueryCards()}
-      </div>
-    )
+    return <div className="historyContainer">{this.renderQueryCards()}</div>
   }
 }
 
@@ -77,12 +72,14 @@ const mapStateToProps = ({ populations, populationDegreesAndProgrammes, localize
 })
 
 const mapDispatchToProps = dispatch => ({
-  removePopulation: (uuid) => {
+  removePopulation: uuid => {
     dispatch(removePopulation(uuid))
     dispatch(clearPopulationFilters())
   },
   updatePopulationStudents: students => dispatch(updatePopulationStudents(students))
-
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(PopulationSearchHistory)

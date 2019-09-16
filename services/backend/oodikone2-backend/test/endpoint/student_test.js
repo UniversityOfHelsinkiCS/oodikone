@@ -6,8 +6,7 @@ const supertest = require('supertest')
 const jwt = require('jsonwebtoken')
 
 const { Course, CourseInstance, Credit, Student, sequelize } = require('../../src/models')
-const { generateStudents, generateCredits, 
-  generateCourses, generateCourseInstances,  } = require('../utils')
+const { generateStudents, generateCredits, generateCourses, generateCourseInstances } = require('../utils')
 
 const app = require('../../src/app')
 const conf = require('../../src/conf-backend')

@@ -1,13 +1,27 @@
-const { sequelize, } = require('../database/connection')
+const { sequelize } = require('../database/connection')
 const { sortBy, flatMap } = require('lodash')
 
 const {
-  Student, Credit, Course, CreditTeacher, Teacher,
-  Organisation, CourseRealisationType,
-  Semester, CreditType, CourseType, Discipline,
-  CourseDisciplines, SemesterEnrollment, Provider,
-  CourseProvider, Studyright, StudyrightExtent,
-  ElementDetails, StudyrightElement, Transfers
+  Student,
+  Credit,
+  Course,
+  CreditTeacher,
+  Teacher,
+  Organisation,
+  CourseRealisationType,
+  Semester,
+  CreditType,
+  CourseType,
+  Discipline,
+  CourseDisciplines,
+  SemesterEnrollment,
+  Provider,
+  CourseProvider,
+  Studyright,
+  StudyrightExtent,
+  ElementDetails,
+  StudyrightElement,
+  Transfers
 } = require('../models/index')
 const { updateAttainmentDates } = require('./update_attainment_dates')
 
@@ -57,8 +71,21 @@ const updateStudyRights = async (studyRights, transaction) => {
   const studyRightExtents = sortBy(studyRights.map(e => e.studyRightExtent), 'extentcode')
   const studyrights = sortBy(studyRights.map(e => e.studyright), 'studyrightid')
   const elementDetails = sortBy(flatMap(studyRights, e => e.elementDetails), 'code')
-  const studyRightElements = sortBy(flatMap(studyRights, e => e.studyRightElements), 'startdate', 'enddate', 'studyrightid', 'code')
-  const transfers = sortBy(flatMap(studyRights, e => e.transfers), 'transferdate', 'studentnumber', 'studyrightid', 'sourcecode', 'targetcode')
+  const studyRightElements = sortBy(
+    flatMap(studyRights, e => e.studyRightElements),
+    'startdate',
+    'enddate',
+    'studyrightid',
+    'code'
+  )
+  const transfers = sortBy(
+    flatMap(studyRights, e => e.transfers),
+    'transferdate',
+    'studentnumber',
+    'studyrightid',
+    'sourcecode',
+    'targetcode'
+  )
 
   for (const studyRightExtent of studyRightExtents) {
     await StudyrightExtent.upsert(studyRightExtent, { transaction })
@@ -82,7 +109,7 @@ const deleteStudentStudyrights = async (studentnumber, transaction) => {
   await StudyrightElement.destroy({ where: { studentnumber } }, { transaction })
 }
 
-const updateStudent = async (student) => {
+const updateStudent = async student => {
   let { studentInfo, studyAttainments, semesterEnrollments, studyRights } = student
 
   // sort data to avoid deadlocks
@@ -110,9 +137,12 @@ const updateAttainmentMeta = async () => {
 }
 
 const updateMeta = async ({
-  faculties, courseRealisationsTypes,
-  semesters, creditTypeCodes, courseTypeCodes,
-  disciplines,
+  faculties,
+  courseRealisationsTypes,
+  semesters,
+  creditTypeCodes,
+  courseTypeCodes,
+  disciplines
 }) => {
   const transaction = await sequelize.transaction()
 
@@ -131,5 +161,7 @@ const updateMeta = async ({
 }
 
 module.exports = {
-  updateStudent, updateMeta, updateAttainmentMeta
+  updateStudent,
+  updateMeta,
+  updateAttainmentMeta
 }

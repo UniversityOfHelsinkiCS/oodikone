@@ -10,27 +10,27 @@ import { clear } from '../../redux/oodilearnPopulationForm'
 import { courseSelectActions } from '../../redux/oodilearnPopulationCourseSelect'
 
 class PopulationPage extends Component {
-    state={}
+  state = {}
 
-    componentDidMount() {
-      this.props.clearFilters()
-      this.props.clearCourseSelection()
-      this.props.getOodilearnPopulation(this.props.population)
-    }
+  componentDidMount() {
+    this.props.clearFilters()
+    this.props.clearCourseSelection()
+    this.props.getOodilearnPopulation(this.props.population)
+  }
 
-    render() {
-      return (
-        <Segment basic>
-          <Menu>
-            <Menu.Item icon="arrow circle left" onClick={this.props.goBack} />
-            <Menu.Item header content={this.props.population} />
-          </Menu>
-          <Segment loading={this.props.loading}>
-            { this.props.loading ? <PagePlaceholder /> : <PopulationDashboard /> }
-          </Segment>
+  render() {
+    return (
+      <Segment basic>
+        <Menu>
+          <Menu.Item icon="arrow circle left" onClick={this.props.goBack} />
+          <Menu.Item header content={this.props.population} />
+        </Menu>
+        <Segment loading={this.props.loading}>
+          {this.props.loading ? <PagePlaceholder /> : <PopulationDashboard />}
         </Segment>
-      )
-    }
+      </Segment>
+    )
+  }
 }
 
 PopulationPage.propTypes = {
@@ -47,8 +47,11 @@ const mapStateToProps = state => ({
   loading: selector.populationIsLoading(state)
 })
 
-export default connect(mapStateToProps, {
-  getOodilearnPopulation,
-  clearFilters: clear,
-  clearCourseSelection: courseSelectActions.clear
-})(PopulationPage)
+export default connect(
+  mapStateToProps,
+  {
+    getOodilearnPopulation,
+    clearFilters: clear,
+    clearCourseSelection: courseSelectActions.clear
+  }
+)(PopulationPage)

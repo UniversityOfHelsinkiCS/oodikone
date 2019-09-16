@@ -32,7 +32,7 @@ const CustomPopulationCourses = ({
 
   return (
     <Segment>
-      <Header size="medium" dividing >
+      <Header size="medium" dividing>
         <Popup
           trigger={<Header.Content>{translate('populationCourses.header')}</Header.Content>}
           content="Sort by clicking columns. Click course name to limit observed population to students who participated to the course."
@@ -41,12 +41,7 @@ const CustomPopulationCourses = ({
         />
       </Header>
       <SegmentDimmer translate={translate} isLoading={pending} />
-      <PopulationCourseStats
-        courses={courses}
-        query={query}
-        pending={pending}
-        selectedStudents={selectedStudents}
-      />
+      <PopulationCourseStats courses={courses} query={query} pending={pending} selectedStudents={selectedStudents} />
     </Segment>
   )
 }
@@ -70,7 +65,10 @@ const mapStateToProps = ({ localize, populationFilters, populationCourses }) => 
   refreshNeeded: populationFilters.refreshNeeded
 })
 
-export default connect(mapStateToProps, {
-  dispatchRefreshFilters: refreshFilters,
-  getCustomPopulationCoursesByStudentnumbersDispatch: getCustomPopulationCoursesByStudentnumbers
-})(CustomPopulationCourses)
+export default connect(
+  mapStateToProps,
+  {
+    dispatchRefreshFilters: refreshFilters,
+    getCustomPopulationCoursesByStudentnumbersDispatch: getCustomPopulationCoursesByStudentnumbers
+  }
+)(CustomPopulationCourses)

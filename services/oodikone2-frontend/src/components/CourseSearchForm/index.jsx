@@ -5,7 +5,7 @@ import { Form } from 'semantic-ui-react'
 import { clearCourses, findCoursesV2 } from '../../redux/coursesearch'
 import AutoSubmitSearchInput from '../AutoSubmitSearchInput'
 
-const CourseSearchForm = (props) => {
+const CourseSearchForm = props => {
   const [courseName, setCourseName] = useState('')
   const [courseCode, setCourseCode] = useState('')
 
@@ -69,7 +69,10 @@ const mapStateToProps = state => ({
   pending: state.courseSearch.pending
 })
 
-export default connect(mapStateToProps, {
-  findCoursesV2,
-  clearCourses
-})(CourseSearchForm)
+export default connect(
+  mapStateToProps,
+  {
+    findCoursesV2,
+    clearCourses
+  }
+)(CourseSearchForm)

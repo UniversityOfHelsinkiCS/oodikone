@@ -12,7 +12,8 @@ import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
-class StudentStatistics extends Component { //eslint-disable-line
+// eslint-disable-next-line react/prefer-stateless-function
+class StudentStatistics extends Component {
   render() {
     const { translate, match } = this.props
     const { studentNumber } = match.params
@@ -50,17 +51,18 @@ StudentStatistics.defaultProps = {
 const mapStateToProps = ({ localize, students }) => ({
   translate: getTranslate(localize),
   currentLanguage: getActiveLanguage(localize).value,
-  student: students.data.find(student =>
-    student.studentNumber === students.selected)
+  student: students.data.find(student => student.studentNumber === students.selected)
 })
 const mapDispatchToProps = dispatch => ({
   toggleStudentNameVisibility,
-  findStudents: searchStr =>
-    dispatch(findStudents(searchStr)),
-  getStudent: studentNumber =>
-    dispatch(getStudent(studentNumber)),
-  selectStudent: studentNumber =>
-    dispatch(selectStudent(studentNumber))
+  findStudents: searchStr => dispatch(findStudents(searchStr)),
+  getStudent: studentNumber => dispatch(getStudent(studentNumber)),
+  selectStudent: studentNumber => dispatch(selectStudent(studentNumber))
 })
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentStatistics))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(StudentStatistics)
+)

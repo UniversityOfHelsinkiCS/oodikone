@@ -4,7 +4,7 @@ const userService = require('../services/userService')
 router.post('/language', async (req, res) => {
   const { language } = req.body
   const { userId } = req.decodedToken
-  if (!['fi','sv','en'].includes(language)) {
+  if (!['fi', 'sv', 'en'].includes(language)) {
     return res.status(400).json('invalid language')
   }
   try {

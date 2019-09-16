@@ -9,7 +9,7 @@ const CheckStudentList = ({ students }) => {
   const [notInOodiRows, setNotInOodiRows] = useState([])
   const [notInListRows, setNotInListRows] = useState([])
 
-  const checkStudents = (input) => {
+  const checkStudents = input => {
     const studentnumbers = input.match(/[^\s,]+/g) || []
     const foundStudents = studentnumbers.filter(a => students.includes(a))
     const notInOodi = studentnumbers.filter(a => !students.includes(a))
@@ -23,32 +23,40 @@ const CheckStudentList = ({ students }) => {
     {
       key: 'found',
       title: 'Student numbers in list and in oodi',
-      content: { content: foundStudents.length === 0 ? 'no numbers in list and oodi' : <List id="found" items={foundStudents} /> }
+      content: {
+        content: foundStudents.length === 0 ? 'no numbers in list and oodi' : <List id="found" items={foundStudents} />
+      }
     },
     {
       key: 'not found',
       title: 'Student numbers in list but not in oodi',
-      content: { content: notInOodiRows.length === 0 ? 'all numbers in oodi' : <List id="notfound" items={notInOodiRows} /> }
+      content: {
+        content: notInOodiRows.length === 0 ? 'all numbers in oodi' : <List id="notfound" items={notInOodiRows} />
+      }
     },
     {
       key: 'not searched',
       title: 'Student numbers in oodi but not in list',
-      content: { content: notInListRows.length === 0 ? 'all numbers in list' : <List id="notsearched" items={notInListRows} /> }
+      content: {
+        content: notInListRows.length === 0 ? 'all numbers in list' : <List id="notsearched" items={notInListRows} />
+      }
     }
   ]
 
   const renderResults = () => (
-    <Modal trigger={<Button color="green" disabled={input.length === 0} onClick={() => checkStudents(input)}>check students</Button>}>
+    <Modal
+      trigger={
+        <Button color="green" disabled={input.length === 0} onClick={() => checkStudents(input)}>
+          check students
+        </Button>
+      }
+    >
       <Modal.Content id="checkstudentsresults">
         <Header content="Results" />
         <Accordion styled exclusive={false} panels={panels} fluid />
       </Modal.Content>
       <Modal.Actions>
-        <Button
-          color="green"
-          onClick={() => setModalOpen(false)}
-          inverted
-        >
+        <Button color="green" onClick={() => setModalOpen(false)} inverted>
           Close
         </Button>
       </Modal.Actions>
@@ -57,7 +65,11 @@ const CheckStudentList = ({ students }) => {
 
   return (
     <Modal
-      trigger={<Button size="small" onClick={() => setModalOpen(true)}>Check studentnumbers</Button>}
+      trigger={
+        <Button size="small" onClick={() => setModalOpen(true)}>
+          Check studentnumbers
+        </Button>
+      }
       open={modalOpen}
       onClose={() => setModalOpen(false)}
       size="small"
@@ -72,10 +84,8 @@ const CheckStudentList = ({ students }) => {
         </Form>
       </Modal.Content>
       <Modal.Actions>
-        <Button
-          negative
-          onClick={() => setModalOpen(false)}
-        >Cancel
+        <Button negative onClick={() => setModalOpen(false)}>
+          Cancel
         </Button>
         {renderResults()}
       </Modal.Actions>

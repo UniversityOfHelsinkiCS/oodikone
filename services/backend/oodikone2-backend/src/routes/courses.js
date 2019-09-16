@@ -14,7 +14,12 @@ router.get('/courses', async (req, res) => {
 router.get('/coursesmulti', async (req, res) => {
   let results = []
   if (req.query.name || req.query.discipline || req.query.type) {
-    results = await Course.bySearchTermTypeAndDiscipline(req.query.name, req.query.type, req.query.discipline, req.query.language) // eslint-disable-line
+    results = await Course.bySearchTermTypeAndDiscipline(
+      req.query.name,
+      req.query.type,
+      req.query.discipline,
+      req.query.language
+    ) // eslint-disable-line
   }
   res.json(results)
 })
@@ -49,8 +54,9 @@ router.get('/v2/courseyearlystats', async (req, res) => {
   if (req.query.start && req.query.codes && req.query.end) {
     const { codes } = req.query
     const years = { start: req.query.start, end: req.query.end }
-    results = await Promise.all(JSON.parse(codes)
-      .map(code => Course.yearlyStatsOf(code, years, req.query.separate, req.query.language)))
+    results = await Promise.all(
+      JSON.parse(codes).map(code => Course.yearlyStatsOf(code, years, req.query.separate, req.query.language))
+    )
   }
   res.json(results)
 })

@@ -1,12 +1,6 @@
 import PropTypes from 'prop-types'
 
-const {
-  number,
-  shape,
-  string,
-  oneOfType,
-  arrayOf
-} = PropTypes
+const { number, shape, string, oneOfType, arrayOf } = PropTypes
 
 export const graphDataType = shape({
   name: string.isRequired,

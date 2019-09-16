@@ -6,7 +6,7 @@ import ThroughputTable from '../ThroughputTable'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
 
-const Overview = (props) => {
+const Overview = props => {
   const { productivity, throughput, studyprogramme, dispatchGetProductivity, dispatchGetThroughput } = props
 
   useEffect(() => {

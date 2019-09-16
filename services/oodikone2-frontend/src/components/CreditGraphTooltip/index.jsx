@@ -4,16 +4,12 @@ import { func, bool, arrayOf, object } from 'prop-types'
 
 import './creditGraphTooltip.css'
 
-const getCardHeader = (title, isStudyModuleCredit) => (
-  isStudyModuleCredit ?
-    <Card.Header className="tooltipHeader">
-      {`${title} [Study Module]`}
-    </Card.Header>
-    :
-    <Card.Header className="tooltipHeader">
-      {title}
-    </Card.Header>
-)
+const getCardHeader = (title, isStudyModuleCredit) =>
+  isStudyModuleCredit ? (
+    <Card.Header className="tooltipHeader">{`${title} [Study Module]`}</Card.Header>
+  ) : (
+    <Card.Header className="tooltipHeader">{title}</Card.Header>
+  )
 
 const getCardMeta = (name, date) => (
   <Card.Meta className="tooltipMeta">
@@ -36,7 +32,6 @@ const getCardDescription = (translate, credits, grade, passed, isStudyModuleCred
     <div className="tooltipBodyItem">
       <div className="tooltipBodyTitle">{translate('common.credits')}</div>
       <div className="tooltipBodyValue">{credits}</div>
-
     </div>
     <div className="tooltipBodyItem">
       <div className="tooltipBodyTitle">{translate('common.grade')}</div>
@@ -45,26 +40,24 @@ const getCardDescription = (translate, credits, grade, passed, isStudyModuleCred
     <div className="tooltipBodyItem">
       <div className="tooltipBodyTitle">{isStudyModuleCredit ? 'module' : translate('common.passed')}</div>
       <div className="tooltipBodyValue">
-        {
-          isStudyModuleCredit // eslint-disable-line
-            ? (<Icon name="certificate" color="purple" />)
-            : passed
-              ? (<Icon name="check circle outline" color="green" />)
-              : (<Icon name="circle outline" color="red" />)
-        }
+        {isStudyModuleCredit ? ( // eslint-disable-line
+          <Icon name="certificate" color="purple" />
+        ) : passed ? (
+          <Icon name="check circle outline" color="green" />
+        ) : (
+          <Icon name="circle outline" color="red" />
+        )}
       </div>
     </div>
   </Card.Description>
 )
 
-const CreditGraphTooltip = (props) => {
+const CreditGraphTooltip = props => {
   const { active, translate } = props
   if (active && props.payload && props.payload.length > 0) {
     const { payload } = props
     const { name } = payload[0]
-    const {
-      title, credits, date, grade, passed, isStudyModuleCredit
-    } = payload[0].payload
+    const { title, credits, date, grade, passed, isStudyModuleCredit } = payload[0].payload
     return (
       <Card>
         <Card.Content>

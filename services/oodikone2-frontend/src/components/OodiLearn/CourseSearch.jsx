@@ -10,39 +10,38 @@ import ResultTable from './ResultTable'
 const MIN_SEARCH_LENGTH = 5
 
 class StudentSearch extends Component {
-    state={
-      searchterm: ''
-    }
+  state = {
+    searchterm: ''
+  }
 
-    componentDidMount() {
-      this.props.getCourses()
-    }
+  componentDidMount() {
+    this.props.getCourses()
+  }
 
-    render() {
-      const { courses } = this.props
-      const { searchterm } = this.state
-      return (
-        <Segment basic>
-          <AutoSubmitSearchInput
-            placeholder="Search for courses by name or code..."
-            doSearch={() => {}}
-            value={searchterm}
-            onChange={val => this.setState({ searchterm: val })}
-            loading={false}
-            minSearchLength={MIN_SEARCH_LENGTH}
-            disabled
-          />
-          <ResultTable
-            results={courses.map(({ code: id, name }) => ({
-              id,
-              name,
-              handleClick: () => this.props.onClickResult(id)
-              }))
-            }
-          />
-        </Segment>
-      )
-    }
+  render() {
+    const { courses } = this.props
+    const { searchterm } = this.state
+    return (
+      <Segment basic>
+        <AutoSubmitSearchInput
+          placeholder="Search for courses by name or code..."
+          doSearch={() => {}}
+          value={searchterm}
+          onChange={val => this.setState({ searchterm: val })}
+          loading={false}
+          minSearchLength={MIN_SEARCH_LENGTH}
+          disabled
+        />
+        <ResultTable
+          results={courses.map(({ code: id, name }) => ({
+            id,
+            name,
+            handleClick: () => this.props.onClickResult(id)
+          }))}
+        />
+      </Segment>
+    )
+  }
 }
 
 StudentSearch.propTypes = {
@@ -55,6 +54,9 @@ const mapStateToProps = state => ({
   courses: oodilearnSelector.getSearchedCourses(state)
 })
 
-export default connect(mapStateToProps, {
-  getCourses
-})(StudentSearch)
+export default connect(
+  mapStateToProps,
+  {
+    getCourses
+  }
+)(StudentSearch)

@@ -3,7 +3,7 @@ import listreducer from './common/listreducer'
 
 const prefix = 'STUDYPROGRAMME_PRODUCTIVITY_'
 
-export const getProductivity = (studyprogrammeId) => {
+export const getProductivity = studyprogrammeId => {
   const route = `v2/studyprogrammes/${studyprogrammeId}/productivity`
   return callController(route, prefix, [], 'get')
 }

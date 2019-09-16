@@ -6,7 +6,7 @@ import KeyValueTable from '../Postman/KeyValueTable'
 const TASK_URL = '/tasks/topteachers'
 
 class UpdateTopTeachers extends Component {
-  state={
+  state = {
     status: undefined,
     progress: undefined,
     computing: false,
@@ -40,23 +40,13 @@ class UpdateTopTeachers extends Component {
     const { status, computing, progress, fetching, error } = this.state
     return (
       <React.Fragment>
-        { error && <Message error content={error} /> }
+        {error && <Message error content={error} />}
         <Button.Group fluid widths="8">
-          <Button
-            content="Update Top Teachers"
-            icon="refresh"
-            onClick={this.doUpdate}
-            disabled={computing}
-          />
-          <Button
-            content="Check Status"
-            icon="clock outline"
-            onClick={this.checkStatus}
-            loading={fetching}
-          />
+          <Button content="Update Top Teachers" icon="refresh" onClick={this.doUpdate} disabled={computing} />
+          <Button content="Check Status" icon="clock outline" onClick={this.checkStatus} loading={fetching} />
         </Button.Group>
-        { status && <KeyValueTable data={status} /> }
-        { !!computing && <Progress autoSuccess active={computing} percent={progress} />}
+        {status && <KeyValueTable data={status} />}
+        {!!computing && <Progress autoSuccess active={computing} percent={progress} />}
       </React.Fragment>
     )
   }

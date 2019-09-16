@@ -16,7 +16,8 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
       res.status(400).json({ error: 'The body should have a year, semester and study rights defined' })
       return
     }
-    if (!Array.isArray(req.body.studyRights)) { // studyRights should always be an array
+    if (!Array.isArray(req.body.studyRights)) {
+      // studyRights should always be an array
       req.body.studyRights = [req.body.studyRights]
     }
 
@@ -46,7 +47,10 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
     const { coursecodes, yearcode } = req.body
     let studentnumberlist
     const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, yearcode)
-    const { decodedToken: { userId }, roles } = req
+    const {
+      decodedToken: { userId },
+      roles
+    } = req
 
     if (roles && roles.includes('admin')) {
       studentnumberlist = studentnumbers
@@ -56,13 +60,16 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
       studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
     }
 
-    const result = await Population.bottlenecksOf({
-      startYear: 1900,
-      endYear: 2200,
-      studyRights: [],
-      semesters: ['FALL', 'SPRING'],
-      months: 10000
-    }, studentnumberlist)
+    const result = await Population.bottlenecksOf(
+      {
+        startYear: 1900,
+        endYear: 2200,
+        studyRights: [],
+        semesters: ['FALL', 'SPRING'],
+        months: 10000
+      },
+      studentnumberlist
+    )
 
     if (result.error) {
       res.status(400).json(result)
@@ -85,7 +92,10 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
     }
     let studentnumberlist
     const studentnumbers = await Student.findByTag(tag)
-    const { decodedToken: { userId }, roles } = req
+    const {
+      decodedToken: { userId },
+      roles
+    } = req
     if (roles && roles.includes('admin')) {
       studentnumberlist = studentnumbers
     } else {
@@ -93,14 +103,17 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
       const codes = unitsUserCanAccess.map(unit => unit.id)
       studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
     }
-    const result = await Population.bottlenecksOf({
-      startYear: 1900,
-      endYear: 2200,
-      studyRights: [],
-      semesters: ['FALL', 'SPRING'],
-      months: 10000,
-      tag
-    }, studentnumberlist)
+    const result = await Population.bottlenecksOf(
+      {
+        startYear: 1900,
+        endYear: 2200,
+        studyRights: [],
+        semesters: ['FALL', 'SPRING'],
+        months: 10000,
+        tag
+      },
+      studentnumberlist
+    )
 
     if (result.error) {
       console.log(result.error)
@@ -110,7 +123,6 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
 
     console.log(`request completed ${new Date()}`)
     res.json(result)
-
   } catch (e) {
     console.log(e)
     res.status(500).json({ error: e })
@@ -124,7 +136,10 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
       return
     }
     let studentnumberlist
-    const { decodedToken: { userId }, roles } = req
+    const {
+      decodedToken: { userId },
+      roles
+    } = req
 
     if (roles && roles.includes('admin')) {
       studentnumberlist = req.body.studentnumberlist
@@ -134,20 +149,22 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
       studentnumberlist = await Student.filterStudentnumbersByAccessrights(req.body.studentnumberlist, codes)
     }
 
-    const result = await Population.bottlenecksOf({
-      startYear: 1900,
-      endYear: 2200,
-      studyRights: [],
-      semesters: ['FALL', 'SPRING'],
-      months: 10000
-    }, studentnumberlist)
+    const result = await Population.bottlenecksOf(
+      {
+        startYear: 1900,
+        endYear: 2200,
+        studyRights: [],
+        semesters: ['FALL', 'SPRING'],
+        months: 10000
+      },
+      studentnumberlist
+    )
     if (result.error) {
       res.status(400).json(result)
       return
     }
 
     res.json(result)
-
   } catch (err) {
     console.log(err)
     res.status(500).json({ error: err })
@@ -207,7 +224,10 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
   const semesters = ['FALL', 'SPRING']
   let studentnumberlist
   const studentnumbers = await Student.findByTag(tag)
-  const { decodedToken: { userId }, roles } = req
+  const {
+    decodedToken: { userId },
+    roles
+  } = req
   if (roles && roles.includes('admin')) {
     studentnumberlist = studentnumbers
   } else {
@@ -218,14 +238,17 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
   try {
     const studyRights = JSON.parse(studyRightsJSON)
     const newStartYear = await Population.getEarliestYear(studentnumberlist, studyRights)
-    const result = await Population.optimizedStatisticsOf({
-      startYear: newStartYear,
-      endYear: 2200,
-      studyRights,
-      semesters,
-      months: 10000,
-      tag: foundTag
-    }, studentnumberlist)
+    const result = await Population.optimizedStatisticsOf(
+      {
+        startYear: newStartYear,
+        endYear: 2200,
+        studyRights,
+        semesters,
+        months: 10000,
+        tag: foundTag
+      },
+      studentnumberlist
+    )
 
     if (result.error) {
       console.log(result.error)
@@ -250,7 +273,10 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const semesters = ['FALL', 'SPRING']
   let studentnumberlist
   const studentnumbers = await Student.findByCourseAndSemesters(JSON.parse(coursecodes), yearcode)
-  const { decodedToken: { userId }, roles } = req
+  const {
+    decodedToken: { userId },
+    roles
+  } = req
 
   if (roles && roles.includes('admin')) {
     studentnumberlist = studentnumbers
@@ -260,13 +286,16 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
   }
   try {
-    const result = await Population.optimizedStatisticsOf({
-      startYear: 1900,
-      endYear: 2200,
-      studyRights: [],
-      semesters,
-      months: 10000
-    }, studentnumberlist)
+    const result = await Population.optimizedStatisticsOf(
+      {
+        startYear: 1900,
+        endYear: 2200,
+        studyRights: [],
+        semesters,
+        months: 10000
+      },
+      studentnumberlist
+    )
 
     if (result.error) {
       console.log(result.error)
@@ -292,13 +321,16 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
     return
   } else {
     try {
-      const result = await Population.optimizedStatisticsOf({
-        startYear: 1900,
-        endYear: 2200,
-        studyRights: [],
-        semesters: ['FALL', 'SPRING'],
-        months: 10000
-      }, studentnumberlist)
+      const result = await Population.optimizedStatisticsOf(
+        {
+          startYear: 1900,
+          endYear: 2200,
+          studyRights: [],
+          semesters: ['FALL', 'SPRING'],
+          months: 10000
+        },
+        studentnumberlist
+      )
       if (result.error) {
         console.log(result.error)
         res.status(400).end()
@@ -313,21 +345,19 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
 })
 
 router.get('/v2/populationstatistics/filters', async (req, res) => {
-
   let results = []
   let rights = req.query.studyRights
-  if (!Array.isArray(rights)) { // studyRights should always be an array
+  if (!Array.isArray(rights)) {
+    // studyRights should always be an array
     rights = [rights]
   }
   try {
     results = await Filters.findForPopulation(rights)
     res.status(200).json(results)
-
   } catch (err) {
     console.log(err)
     res.status(400).end()
   }
-
 })
 router.post('/v2/populationstatistics/filters', async (req, res) => {
   let results = []
@@ -336,12 +366,10 @@ router.post('/v2/populationstatistics/filters', async (req, res) => {
   try {
     results = await Filters.createNewFilter(filter)
     res.status(200).json(results)
-
   } catch (err) {
     console.log(err)
     res.status(400).end()
   }
-
 })
 router.delete('/v2/populationstatistics/filters', async (req, res) => {
   let results = []
@@ -349,11 +377,9 @@ router.delete('/v2/populationstatistics/filters', async (req, res) => {
   try {
     results = await Filters.deleteFilter(filter)
     res.status(200).json(results)
-
   } catch (err) {
     res.status(400).end()
   }
-
 })
 
 router.post('/updatedatabase', async (req, res) => {

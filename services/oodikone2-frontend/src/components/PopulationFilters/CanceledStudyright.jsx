@@ -19,17 +19,19 @@ class CanceledStudyright extends Component {
     cancel: 'true'
   }
 
-  options = [{ value: 'false', text: 'haven\'t' }, { value: 'true', text: 'have' }]
+  options = [{ value: 'false', text: "haven't" }, { value: 'true', text: 'have' }]
 
   handleChange = (e, { value }) => {
     this.setState({ cancel: value })
   }
 
   handleCancel = () => {
-    this.props.setPopulationFilter(canceledStudyright({
-      studyrights: this.props.studyrights,
-      cancel: this.state.cancel
-    }))
+    this.props.setPopulationFilter(
+      canceledStudyright({
+        studyrights: this.props.studyrights,
+        cancel: this.state.cancel
+      })
+    )
   }
 
   clearFilter = () => {
@@ -62,12 +64,7 @@ class CanceledStudyright extends Component {
                 <label> canceled this studyright </label>
               </Form.Field>
               <Form.Field>
-                <Button
-                  onClick={this.handleCancel}
-                >
-                  set filter
-                </Button>
-
+                <Button onClick={this.handleCancel}>set filter</Button>
               </Form.Field>
             </Form.Group>
           </Form>
@@ -77,10 +74,13 @@ class CanceledStudyright extends Component {
 
     return (
       <Segment>
-        {filter.params.cancel === 'true' ?
-          'Showing students that have canceled this studyright' :
-          <span><b>Excluded</b> students whose studyright is cancelled</span>
-        }
+        {filter.params.cancel === 'true' ? (
+          'Showing students that have canceled this studyright'
+        ) : (
+          <span>
+            <b>Excluded</b> students whose studyright is cancelled
+          </span>
+        )}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

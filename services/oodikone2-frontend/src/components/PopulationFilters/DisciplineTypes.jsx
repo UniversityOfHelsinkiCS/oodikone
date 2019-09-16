@@ -29,10 +29,12 @@ class DisciplineTypes extends Component {
   }
 
   handleFilter = () => {
-    const courses = this.props.courses.filter(({ course, stats }) =>
-      course.disciplines[this.state.discipline] &&
-      course.coursetypes[this.state.courseType] &&
-      stats.students >= this.state.atleast)
+    const courses = this.props.courses.filter(
+      ({ course, stats }) =>
+        course.disciplines[this.state.discipline] &&
+        course.coursetypes[this.state.courseType] &&
+        stats.students >= this.state.atleast
+    )
     courses.forEach(course => this.props.setPopulationFilter(courseParticipation({ field: 'all', course })))
     this.setState({ discipline: '', courseType: '' })
   }
@@ -55,9 +57,7 @@ class DisciplineTypes extends Component {
               <Form.Field>
                 <label>Filter by </label>
               </Form.Field>
-              <Form.Field
-                style={{ width: 135 }}
-              >
+              <Form.Field style={{ width: 135 }}>
                 <Dropdown
                   search
                   fluid
@@ -66,10 +66,13 @@ class DisciplineTypes extends Component {
                   placeholder="course type"
                   onChange={this.handleChange}
                   value={this.state.courseType}
-                  options={sortBy(Object.entries(courseTypes).map(([value, text]) => ({
-                    text: text.fi,
-                    value
-                  })), entry => entry.text)}
+                  options={sortBy(
+                    Object.entries(courseTypes).map(([value, text]) => ({
+                      text: text.fi,
+                      value
+                    })),
+                    entry => entry.text
+                  )}
                   selectOnBlur={false}
                   selectOnNavigation={false}
                 />
@@ -77,9 +80,7 @@ class DisciplineTypes extends Component {
               <Form.Field>
                 <label> of </label>
               </Form.Field>
-              <Form.Field
-                style={{ width: 200 }}
-              >
+              <Form.Field style={{ width: 200 }}>
                 <Dropdown
                   search
                   icon={null}
@@ -88,10 +89,13 @@ class DisciplineTypes extends Component {
                   placeholder="discipline"
                   onChange={this.handleChange}
                   value={this.state.discipline}
-                  options={sortBy(Object.entries(disciplines).map(([value, text]) => ({
-                    text: text.fi,
-                    value
-                  })), entry => entry.text)}
+                  options={sortBy(
+                    Object.entries(disciplines).map(([value, text]) => ({
+                      text: text.fi,
+                      value
+                    })),
+                    entry => entry.text
+                  )}
                   selectOnBlur={false}
                   selectOnNavigation={false}
                 />
@@ -115,13 +119,14 @@ class DisciplineTypes extends Component {
               <Form.Field>
                 <Button
                   onClick={this.handleFilter}
-                  disabled={this.state.discipline.length === 0 ||
+                  disabled={
+                    this.state.discipline.length === 0 ||
                     this.state.courseType.length === 0 ||
-                    !String(this.state.atleast).match(/^[0-9]+$/)}
+                    !String(this.state.atleast).match(/^[0-9]+$/)
+                  }
                 >
                   set filter
                 </Button>
-
               </Form.Field>
             </Form.Group>
           </Form>
@@ -146,10 +151,7 @@ DisciplineTypes.defaultProps = {
   courseTypes: {}
 }
 
-const mapStateToProps = ({
-  populationSelectedStudentCourses,
-  populationCourses
-}) => {
+const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses }) => {
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
     : populationCourses

@@ -4,19 +4,9 @@ import { connect } from 'react-redux'
 import { Dropdown, List, Label, Icon } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
-import {
-  createStudentTagAction,
-  deleteStudentTagAction
-} from '../../redux/tagstudent'
+import { createStudentTagAction, deleteStudentTagAction } from '../../redux/tagstudent'
 
-const TagStudent = ({
-  createStudentTag,
-  deleteStudentTag,
-  studentnumber,
-  studentstags,
-  studytrack,
-  tagOptions
-}) => {
+const TagStudent = ({ createStudentTag, deleteStudentTag, studentnumber, studentstags, studytrack, tagOptions }) => {
   const handleChange = (event, { value }) => {
     event.preventDefault()
     const tag = {
@@ -30,22 +20,20 @@ const TagStudent = ({
     deleteStudentTag(tag.tag_id, studentnumber, studytrack)
   }
 
-  const studentsTags = studentstags
-    .map(t => (
-      <List.Item key={`${studentnumber}-${t.tag.tag_id}`} >
-        <List.Content>
-          <Label>
-            {t.tag.tagname} <Icon name="delete" link onClick={event => deleteTag(event, t.tag)} />
-          </Label>
-        </List.Content>
-      </List.Item>))
+  const studentsTags = studentstags.map(t => (
+    <List.Item key={`${studentnumber}-${t.tag.tag_id}`}>
+      <List.Content>
+        <Label>
+          {t.tag.tagname} <Icon name="delete" link onClick={event => deleteTag(event, t.tag)} />
+        </Label>
+      </List.Content>
+    </List.Item>
+  ))
 
   return (
     <List horizontal>
-      <List.Item >
-        <List.Content>
-          {studentnumber}
-        </List.Content>
+      <List.Item>
+        <List.Content>{studentnumber}</List.Content>
       </List.Item>
       {studentsTags}
       <List.Item>
@@ -74,7 +62,12 @@ TagStudent.propTypes = {
   tagOptions: arrayOf(shape({})).isRequired
 }
 
-export default withRouter(connect(null, {
-  createStudentTag: createStudentTagAction,
-  deleteStudentTag: deleteStudentTagAction
-})(TagStudent))
+export default withRouter(
+  connect(
+    null,
+    {
+      createStudentTag: createStudentTagAction,
+      deleteStudentTag: deleteStudentTagAction
+    }
+  )(TagStudent)
+)

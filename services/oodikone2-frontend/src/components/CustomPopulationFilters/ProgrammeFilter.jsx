@@ -7,14 +7,21 @@ import { textAndDescriptionSearch, getNewestProgramme } from '../../common'
 
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
-const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterAction, allStudyrights, filter, language, samples }) => {
+const ProgrammeFilter = ({
+  removePopulationFilterAction,
+  setPopulationFilterAction,
+  allStudyrights,
+  filter,
+  language,
+  samples
+}) => {
   const [programme, setProgramme] = useState('')
   const [programmeName, setName] = useState('')
   const [options, setOptions] = useState([])
 
   useEffect(() => {
     const allProgrammes = {}
-    samples.forEach((student) => {
+    samples.forEach(student => {
       const programme = getNewestProgramme(student.studyrights)
       if (programme) {
         if (allProgrammes[programme.code]) {
@@ -25,8 +32,12 @@ const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterActi
         }
       }
     })
-    const optionsToSet = Object.keys(allProgrammes)
-      .map(code => ({ key: code, text: allProgrammes[code].programme.name, value: code, description: code }))
+    const optionsToSet = Object.keys(allProgrammes).map(code => ({
+      key: code,
+      text: allProgrammes[code].programme.name,
+      value: code,
+      description: code
+    }))
 
     setOptions(optionsToSet)
   }, [])
@@ -49,9 +60,7 @@ const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterActi
     return (
       <Segment>
         <Form>
-          <Popup
-            trigger={<Icon style={{ float: 'right' }} name="info" />}
-          />
+          <Popup trigger={<Icon style={{ float: 'right' }} name="info" />} />
           <Form.Group inline>
             <Form.Field>
               <label>Select students that are in programme </label>
@@ -71,10 +80,7 @@ const ProgrammeFilter = ({ removePopulationFilterAction, setPopulationFilterActi
               />
             </Form.Field>
             <Form.Field>
-              <Button
-                onClick={handleFilter}
-                disabled={programme.length < 1}
-              >
+              <Button onClick={handleFilter} disabled={programme.length < 1}>
                 set filter
               </Button>
             </Form.Field>
@@ -105,7 +111,10 @@ const mapStateToProps = ({ settings }) => ({
   language: settings.language
 })
 
-export default connect(mapStateToProps, {
-  setPopulationFilterAction: setPopulationFilter,
-  removePopulationFilterAction: removePopulationFilter
-})(ProgrammeFilter)
+export default connect(
+  mapStateToProps,
+  {
+    setPopulationFilterAction: setPopulationFilter,
+    removePopulationFilterAction: removePopulationFilter
+  }
+)(ProgrammeFilter)

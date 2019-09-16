@@ -3,13 +3,13 @@ import { Route, Switch } from 'react-router-dom'
 import { Loader } from 'semantic-ui-react'
 
 // From https://dev.to/goenning/how-to-retry-when-react-lazy-fails-mb5
-const retry = async (fn, retriesLeft = 3, interval = 500) => (
+const retry = async (fn, retriesLeft = 3, interval = 500) =>
   new Promise((resolve, reject) => {
     fn()
       .then(resolve)
-      .catch((error) => {
+      .catch(error => {
         if (retriesLeft <= 1) {
-          if (error && error.message && error.message.match(/loading.+chunk.+failed/ig)) {
+          if (error && error.message && error.message.match(/loading.+chunk.+failed/gi)) {
             // We probably made a release which deletes old js and css
             // lazy load thus fails and user must reload page
             resolve(null)
@@ -24,7 +24,6 @@ const retry = async (fn, retriesLeft = 3, interval = 500) => (
         }, interval)
       })
   })
-)
 
 const WelcomePage = React.lazy(() => retry(() => import('../WelcomePage')))
 const Populations = React.lazy(() => retry(() => import('../PopulationStatistics')))
