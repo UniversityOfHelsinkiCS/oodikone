@@ -14,6 +14,7 @@ class CourseGradeGraph extends Component {
     const { name } = event.target
     event.preventDefault()
     this.setState({
+      // eslint-disable-next-line react/no-access-state-in-setstate
       focused: this.state.focused !== name ? name : undefined
     })
   }

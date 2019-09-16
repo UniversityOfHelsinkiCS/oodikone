@@ -23,7 +23,8 @@ class TeacherPage extends Component {
     const { teacher, isLoading } = this.props
     if (!this.state.initialized || isLoading) {
       return <Segment basic loading={isLoading} />
-    } else if (!teacher) {
+    }
+    if (!teacher) {
       return <Redirect to="/teachers" />
     }
     return <TeacherDetails teacher={teacher} />

@@ -60,6 +60,7 @@ class CreditAccumulationGraphHighCharts extends Component {
   }
 
   getMoreCreditLines = students => {
+    // eslint-disable-next-line react/no-access-state-in-setstate
     const studentCreditLines = this.state.studentCreditLines.concat(this.createStudentCreditLines(students))
     this.setState({ studentCreditLines, updateGraph: true })
   }

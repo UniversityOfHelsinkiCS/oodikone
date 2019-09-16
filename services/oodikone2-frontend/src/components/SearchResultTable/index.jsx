@@ -19,13 +19,14 @@ const getTableBody = (rows, rowClickFn, selectable) => (
     {rows.map((row, i) => (
       <Table.Row
         className={selectable ? 'selectableRow' : ''}
-        key={`row-${i}`} // eslint-disable-line react/no-array-index-key
+        // eslint-disable-next-line react/no-array-index-key
+        key={`row-${i}`}
         onClick={e => rowClickFn(e, row)}
       >
         {Object.values(row).map((value, index) => (
+          // eslint-disable-next-line react/no-array-index-key
           <Table.Cell key={`cell-${index}`}>{value}</Table.Cell>
-        )) // eslint-disable-line react/no-array-index-key
-        }
+        ))}
       </Table.Row>
     ))}
   </Table.Body>

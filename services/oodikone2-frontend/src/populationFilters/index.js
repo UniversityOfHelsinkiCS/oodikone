@@ -149,12 +149,14 @@ export const extentGraduated = params => {
           )
 
           return !thisStudyright || thisStudyright.extentcode !== code
-        } else if (complemented === 'true' && graduated === 'grad') {
+        }
+        if (complemented === 'true' && graduated === 'grad') {
           return !student.studyrights
             .filter(sr => sr.extentcode === code && sr.graduated)
             .map(sr => sr.extentcode)
             .includes(code)
-        } else if (complemented === 'false' && graduated === 'either') {
+        }
+        if (complemented === 'false' && graduated === 'either') {
           return student.studyrights.map(sr => sr.extentcode).includes(code)
         }
         return student.studyrights

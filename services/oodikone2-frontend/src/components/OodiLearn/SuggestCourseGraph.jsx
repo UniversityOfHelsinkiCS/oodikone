@@ -48,6 +48,7 @@ class SuggestCourseGraph extends Component {
   }
 
   selectCourse = (e, { value }) => {
+    // eslint-disable-next-line react/no-access-state-in-setstate
     const courses = [...this.state.courses]
     const period = value.split('_')[0]
     const course = value.split('_')[1]
