@@ -37,8 +37,6 @@ const refreshStudyrightAssociations = async () => {
 }
 
 const refreshOverview = async () => {
-  const since = defaultStudyTrackSince()
-
   try {
     console.log('Refreshing overview...')
     const codes = (await getAllProgrammes()).map(p => p.code)
@@ -46,6 +44,7 @@ const refreshOverview = async () => {
     for (const code of codes) {
       try {
         await patchThroughput({ [code]: { status: 'RECALCULATING' } })
+        const since = defaultStudyTrackSince()
         const data = await throughputStatsForStudytrack(code, since)
         await setThroughput(data)
       } catch (e) {
@@ -59,6 +58,7 @@ const refreshOverview = async () => {
       }
       try {
         await patchProductivity({ [code]: { status: 'RECALCULATING' } })
+        const since = '2017-08-01'
         const data = await productivityStatsForStudytrack(code, since)
         await setProductivity(data)
       } catch (e) {
