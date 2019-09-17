@@ -1,6 +1,5 @@
 module.exports = {
   up: async queryInterface => {
-    // eslint-disable-line
     // For some reason sequelize tried to create a new
     // access group with an already existing id (= 8).
     // Therefore we need to "update" sequelize's auto increment
