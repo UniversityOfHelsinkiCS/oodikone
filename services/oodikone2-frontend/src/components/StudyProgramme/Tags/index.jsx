@@ -146,7 +146,8 @@ Tags.propTypes = {
   createTag: func.isRequired,
   deleteTag: func.isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
-  studyprogramme: string.isRequired
+  studyprogramme: string.isRequired,
+  userId: string.isRequired
 }
 
 export default withRouter(
