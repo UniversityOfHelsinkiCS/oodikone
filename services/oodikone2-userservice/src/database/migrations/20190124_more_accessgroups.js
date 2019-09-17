@@ -2,7 +2,7 @@ const { AccessGroup } = require('../../models')
 const defaultAccessGroups = [
   {
     group_code: 'users',
-    group_info: 'grants access to users management',
+    group_info: 'grants access to users management'
   },
   {
     group_code: 'usage',
@@ -22,6 +22,8 @@ module.exports = {
     AccessGroup.bulkCreate(defaultAccessGroups)
   },
   down: async () => {
-    AccessGroup.destroy({ where: { group_code: ['users', 'usage', 'oodilearn', 'coursegroups'] } })
+    AccessGroup.destroy({
+      where: { group_code: ['users', 'usage', 'oodilearn', 'coursegroups'] }
+    })
   }
 }
