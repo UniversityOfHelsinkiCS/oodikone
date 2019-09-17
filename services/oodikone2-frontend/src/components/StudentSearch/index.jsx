@@ -65,9 +65,18 @@ class StudentSearch extends Component {
   }
 
   fetchStudentList = searchStr => {
-    if (searchStr.length < 4 || (Number(searchStr) && searchStr.length < 6)) {
+    const removeEmptySpaces = str => str.replace(/\s\s+/g, ' ')
+    const splitByEmptySpace = str => removeEmptySpaces(str).split(' ')
+
+    if (
+      !splitByEmptySpace(searchStr.trim())
+        .slice(0, 2)
+        .find(t => t.length > 3) ||
+      (Number(searchStr) && searchStr.trim().length < 6)
+    ) {
       return
     }
+
     this.props.setTimeout(
       'fetch',
       () => {
@@ -75,17 +84,17 @@ class StudentSearch extends Component {
       },
       250
     )
-    this.props.findStudents(searchStr).then(() => {
+    this.props.findStudents(searchStr.trim()).then(() => {
       this.props.clearTimeout('fetch')
       this.setState({ isLoading: false, showResults: true })
     })
   }
 
   renderSearchResults = () => {
-    const { translate, students, showNames } = this.props
+    const { translate, students, showNames, pending } = this.props
     const { showResults } = this.state
 
-    if (!showResults) {
+    if (!showResults || pending) {
       // so that the loading spinner doesn't go on top of the search box
       return <div style={{ margin: 100 }} />
     }
@@ -156,7 +165,8 @@ StudentSearch.propTypes = {
   setTimeout: func.isRequired,
   clearTimeout: func.isRequired,
   showNames: bool.isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  pending: bool.isRequired
 }
 StudentSearch.defaultProps = {
   studentNumber: undefined
@@ -167,7 +177,8 @@ const formatStudentRows = makeFormatStudentRows()
 const mapStateToProps = ({ students, settings }) => ({
   students: formatStudentRows(students),
   showNames: settings.namesVisible,
-  selected: students.selected
+  selected: students.selected,
+  pending: students.pending
 })
 
 const mapDispatchToProps = dispatch => ({
