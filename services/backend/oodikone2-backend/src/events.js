@@ -1,7 +1,11 @@
 const { CronJob } = require('cron')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
-const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studytrack')
+const {
+  productivityStatsForStudytrack,
+  throughputStatsForStudytrack,
+  defaultStudyTrackSince
+} = require('./services/studytrack')
 const { calculateFacultyYearlyStats } = require('./services/faculties')
 const {
   setProductivity,
@@ -40,7 +44,7 @@ const refreshOverview = async () => {
     for (const code of codes) {
       try {
         await patchThroughput({ [code]: { status: 'RECALCULATING' } })
-        const since = new Date().getFullYear() - 5
+        const since = defaultStudyTrackSince()
         const data = await throughputStatsForStudytrack(code, since)
         await setThroughput(data)
       } catch (e) {

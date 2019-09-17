@@ -65,9 +65,18 @@ class StudentSearch extends Component {
   }
 
   fetchStudentList = searchStr => {
-    if (searchStr.length < 4 || (Number(searchStr) && searchStr.length < 6)) {
+    const removeEmptySpaces = str => str.replace(/\s\s+/g, ' ')
+    const splitByEmptySpace = str => removeEmptySpaces(str).split(' ')
+
+    if (
+      !splitByEmptySpace(searchStr.trim())
+        .slice(0, 2)
+        .find(t => t.length > 3) ||
+      (Number(searchStr) && searchStr.trim().length < 6)
+    ) {
       return
     }
+
     this.props.setTimeout(
       'fetch',
       () => {
@@ -75,7 +84,7 @@ class StudentSearch extends Component {
       },
       250
     )
-    this.props.findStudents(searchStr).then(() => {
+    this.props.findStudents(searchStr.trim()).then(() => {
       this.props.clearTimeout('fetch')
       this.setState({ isLoading: false, showResults: true })
     })
