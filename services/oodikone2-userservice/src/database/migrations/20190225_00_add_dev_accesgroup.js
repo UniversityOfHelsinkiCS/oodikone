@@ -1,7 +1,7 @@
 const { AccessGroup } = require('../../models')
 const accessGroup = {
   group_code: 'dev',
-  group_info: 'grants access to developer UI',
+  group_info: 'grants access to developer UI'
 }
 
 module.exports = {

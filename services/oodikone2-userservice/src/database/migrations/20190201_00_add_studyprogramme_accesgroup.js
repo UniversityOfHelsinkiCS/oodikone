@@ -1,7 +1,7 @@
 const { AccessGroup } = require('../../models')
 const accessGroup = {
   group_code: 'studyprogramme',
-  group_info: 'grants access to studyprogramme page',
+  group_info: 'grants access to studyprogramme page'
 }
 
 module.exports = {
