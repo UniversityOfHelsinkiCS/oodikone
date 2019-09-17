@@ -9,7 +9,7 @@ const getStudentTagsByStudytrack = studytrack => {
   return TagStudent.findAll({
     include: {
       model: Tag,
-      attributes: ['tag_id', 'tagname'],
+      attributes: ['tag_id', 'tagname', 'personal_user_id'],
       where: {
         studytrack: {
           [Op.eq]: studytrack
@@ -25,6 +25,10 @@ const getStudentTagsByStudentnumber = async studentnumber => {
       studentnumber: {
         [Op.eq]: studentnumber
       }
+    },
+    include: {
+      model: Tag,
+      attributes: ['tag_id', 'tagname', 'personal_user_id']
     }
   })
 }

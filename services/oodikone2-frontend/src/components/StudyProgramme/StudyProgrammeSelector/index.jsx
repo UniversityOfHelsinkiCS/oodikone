@@ -64,7 +64,7 @@ const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
   const { language } = settings
 
   return {
-    studyprogrammes: programmes,
+    studyprogrammes: programmes ? Object.values(programmes) : programmes,
     language
   }
 }

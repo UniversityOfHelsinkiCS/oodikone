@@ -100,25 +100,6 @@ const findByCourseAndSemesters = async (coursecodes, yearcode) =>
     )
     .map(st => st.studentnumber)
 
-const byAbreviatedNameOrStudentNumber = searchTerm => {
-  return Student.findAll({
-    where: {
-      [Op.or]: [
-        {
-          studentnumber: {
-            [Op.like]: searchTerm
-          }
-        },
-        {
-          abbreviatedname: {
-            [Op.iLike]: searchTerm
-          }
-        }
-      ]
-    }
-  })
-}
-
 const findByTag = tag => {
   return TagStudent.findAll({
     attributes: ['studentnumber'],
@@ -222,17 +203,6 @@ const formatStudent = ({
   }
 }
 
-const bySearchTermOld = async term => {
-  try {
-    const result = await byAbreviatedNameOrStudentNumber(`%${term}%`)
-    return result.map(formatStudent)
-  } catch (e) {
-    return {
-      error: e
-    }
-  }
-}
-
 const withId = async id => {
   try {
     const result = await byId(id)
@@ -245,36 +215,9 @@ const withId = async id => {
   }
 }
 
-const bySearchTermAndElementsOld = async (searchterm, elementcodes) => {
-  const likeSearchTerm = `%${searchterm}%`
-  const students = await Student.findAll({
-    where: {
-      [Op.or]: [
-        {
-          studentnumber: {
-            [Op.like]: likeSearchTerm
-          }
-        },
-        {
-          abbreviatedname: {
-            [Op.iLike]: likeSearchTerm
-          }
-        }
-      ]
-    },
-    include: {
-      model: StudyrightElement,
-      where: {
-        code: {
-          [Op.in]: elementcodes
-        }
-      }
-    }
-  })
-  return students.map(formatStudent)
-}
+const removeEmptySpaces = str => str.replace(/\s\s+/g, ' ')
 
-const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
+const splitByEmptySpace = str => removeEmptySpaces(str).split(' ')
 
 const likefy = term => `%${term}%`
 
@@ -309,7 +252,7 @@ const studentnumberLike = terms => {
   }
 }
 
-const bySearchTermNew = async searchterm => {
+const bySearchTerm = async searchterm => {
   const terms = splitByEmptySpace(searchterm)
   const matches = await Student.findAll({
     where: {
@@ -319,7 +262,7 @@ const bySearchTermNew = async searchterm => {
   return matches.map(formatStudent)
 }
 
-const bySearchTermAndElementsNew = async (searchterm, codes) => {
+const bySearchTermAndElements = async (searchterm, codes) => {
   const terms = splitByEmptySpace(searchterm)
   const matches = await Student.findAll({
     include: {
@@ -358,10 +301,6 @@ const filterStudentnumbersByAccessrights = async (studentnumbers, codes) => {
   return students.map(student => student.studentnumber)
 }
 
-const NEW_SEARCH = true
-const bySearchTerm = NEW_SEARCH ? bySearchTermNew : bySearchTermOld
-const bySearchTermAndElements = NEW_SEARCH ? bySearchTermAndElementsNew : bySearchTermAndElementsOld
-
 module.exports = {
   withId,
   bySearchTerm,
@@ -370,5 +309,6 @@ module.exports = {
   bySearchTermAndElements,
   filterStudentnumbersByAccessrights,
   findByCourseAndSemesters,
-  findByTag
+  findByTag,
+  splitByEmptySpace
 }

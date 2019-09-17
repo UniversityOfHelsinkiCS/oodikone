@@ -131,6 +131,9 @@ const Tag = sequelizeKone.define(
     },
     year: {
       type: Sequelize.STRING
+    },
+    personal_user_id: {
+      type: Sequelize.BIGINT
     }
   },
   {

@@ -41,6 +41,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       const oldMinDate = this.props.students.minDate
       const clear = nextMinDate !== oldMinDate
       const changedStudentAmount = nextProps.selectedStudents.length !== this.props.selectedStudents.length
+      const changedGraphSize = nextProps.currentGraphSize !== this.props.currentGraphSize
 
       const changed =
         nextStudents.some(student => !oldStudents.includes(student)) ||
@@ -50,36 +51,32 @@ class CreditAccumulationGraphHighCharts extends Component {
       if (changed) {
         const { students } = nextProps
         this.getMoreCreditLines(students, clear)
-      } else if (changedStudentAmount) {
+      } else if (changedStudentAmount || changedGraphSize) {
         this.createGraphOptions(nextProps.students, nextProps.selectedStudents, nextProps.currentGraphSize)
       }
     }
   }
 
-  componentDidUpdate(nextProps) {
+  componentDidUpdate() {
     const { updateGraph } = this.state
     const { students, selectedStudents, currentGraphSize } = this.props
-    const nextMinDate = nextProps.students.minDate
-    const oldMinDate = this.props.students.minDate
-    const clear = nextMinDate !== oldMinDate
-    if (nextMinDate !== oldMinDate) {
-      const { students } = nextProps
-      this.getMoreCreditLines(students, clear)
-    }
+
     if (updateGraph) {
       this.createGraphOptions(students, selectedStudents, currentGraphSize)
     }
   }
 
   getMoreCreditLines = (students, clear) => {
-    if (clear && this.state.studentCreditLines.length > 1) {
+    if (clear) {
       // eslint-disable-next-line react/no-access-state-in-setstate
-      const removed = this.state.studentCreditLines.splice(0, 1)
-      this.setState({ studentCreditLines: removed })
+      const removed = this.state.studentCreditLines.splice(0, 0)
+      const studentCreditLines = removed.concat(this.createStudentCreditLines(students))
+      this.setState({ studentCreditLines, updateGraph: true })
+    } else {
+      // eslint-disable-next-line react/no-access-state-in-setstate
+      const studentCreditLines = this.state.studentCreditLines.concat(this.createStudentCreditLines(students))
+      this.setState({ studentCreditLines, updateGraph: true })
     }
-    // eslint-disable-next-line react/no-access-state-in-setstate
-    const studentCreditLines = this.state.studentCreditLines.concat(this.createStudentCreditLines(students))
-    this.setState({ studentCreditLines, updateGraph: true })
   }
 
   getXAxisMonth = (date, startDate) =>
@@ -113,7 +110,6 @@ class CreditAccumulationGraphHighCharts extends Component {
 
   createGraphOptions = (students, selectedStudents, graphSize) => {
     const dataOfSelected = this.state.studentCreditLines.filter(line => selectedStudents.includes(line.name))
-
     let lastCredits = null
     if (this.isSingleStudentGraph() && !['/custompopulation', '/coursepopulation'].includes(window.location.pathname)) {
       const started = moment(students.minDate)
@@ -231,6 +227,7 @@ class CreditAccumulationGraphHighCharts extends Component {
   createStudentCreditLines = students =>
     students.map(student => {
       const { started, studyrightStart } = student
+
       const startDate = this.props.selectedStudents.length === 1 ? started : studyrightStart
       let credits = 0
       let points = this.filterCoursesByDate(this.sortCoursesByDate(student.courses), startDate).map(course => {
