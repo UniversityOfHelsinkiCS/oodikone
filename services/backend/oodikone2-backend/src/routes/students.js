@@ -10,9 +10,11 @@ router.get('/students', async (req, res) => {
     query: { searchTerm }
   } = req
 
+  const trimmedSearchTerm = searchTerm ? searchTerm.trim() : undefined
+
   if (
-    searchTerm &&
-    !Student.splitByEmptySpace(searchTerm.trim())
+    trimmedSearchTerm &&
+    !Student.splitByEmptySpace(trimmedSearchTerm)
       .slice(0, 2)
       .find(t => t.length > 3)
   ) {
@@ -21,14 +23,14 @@ router.get('/students', async (req, res) => {
 
   if (roles && roles.includes('admin')) {
     let results = []
-    if (searchTerm) {
-      results = await Student.bySearchTerm(searchTerm)
+    if (trimmedSearchTerm) {
+      results = await Student.bySearchTerm(trimmedSearchTerm)
     }
     return res.json(results)
   } else {
     const unitsUserCanAccess = await userService.getUnitsFromElementDetails(userId)
     const codes = unitsUserCanAccess.map(unit => unit.id)
-    const matchingStudents = await Student.bySearchTermAndElements(searchTerm, codes)
+    const matchingStudents = await Student.bySearchTermAndElements(trimmedSearchTerm, codes)
     res.json(matchingStudents)
   }
 })
