@@ -82,10 +82,10 @@ class StudentSearch extends Component {
   }
 
   renderSearchResults = () => {
-    const { translate, students, showNames } = this.props
+    const { translate, students, showNames, pending } = this.props
     const { showResults } = this.state
 
-    if (!showResults) {
+    if (!showResults || pending) {
       // so that the loading spinner doesn't go on top of the search box
       return <div style={{ margin: 100 }} />
     }
@@ -156,7 +156,8 @@ StudentSearch.propTypes = {
   setTimeout: func.isRequired,
   clearTimeout: func.isRequired,
   showNames: bool.isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  pending: bool.isRequired
 }
 StudentSearch.defaultProps = {
   studentNumber: undefined
@@ -167,7 +168,8 @@ const formatStudentRows = makeFormatStudentRows()
 const mapStateToProps = ({ students, settings }) => ({
   students: formatStudentRows(students),
   showNames: settings.namesVisible,
-  selected: students.selected
+  selected: students.selected,
+  pending: students.pending
 })
 
 const mapDispatchToProps = dispatch => ({
