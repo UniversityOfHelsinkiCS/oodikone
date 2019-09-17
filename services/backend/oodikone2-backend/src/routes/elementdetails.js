@@ -65,7 +65,7 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
     }
     if (!data) {
       try {
-        const since = defaultStudyTrackSince()
+        const since = `2017-08-01`
         const stats = await productivityStatsForStudytrack(code, since)
         data = await setProductivity(stats)
       } catch (e) {
@@ -99,7 +99,7 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
   let ready = 0
   for (const code of codes) {
     try {
-      const since = defaultStudyTrackSince()
+      const since = `2017-08-01`
       const data = await productivityStatsForStudytrack(code, since)
       await setProductivity(data)
     } catch (e) {
