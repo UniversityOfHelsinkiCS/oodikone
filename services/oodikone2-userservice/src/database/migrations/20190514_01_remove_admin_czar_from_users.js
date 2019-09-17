@@ -1,8 +1,7 @@
 module.exports = {
-  up: async (queryInterface) => {
+  up: async queryInterface => {
     await queryInterface.removeColumn('users', 'czar')
-    await queryInterface.removeColumn('users', 'admin') 
+    await queryInterface.removeColumn('users', 'admin')
   },
-  down: async () => {
-  }
+  down: async () => {}
 }
