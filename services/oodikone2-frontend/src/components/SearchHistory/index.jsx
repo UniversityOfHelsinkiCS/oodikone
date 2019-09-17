@@ -17,28 +17,26 @@ const SearchHistory = ({ items, handleSearch, updateItem }) => {
 
   return (
     <Segment>
-      <Form>
-        <Header content="Previous searches" icon="clock outline" />
-        <Form.Dropdown
-          placeholder="Select a previous search"
-          noResultsMessage="No previous searches"
-          search
-          selection
-          value={selected}
-          options={sortedItems.map(({ text, timestamp }, i) => ({
-            key: i + 1,
-            value: i + 1,
-            text,
-            description: moment(timestamp).format('DD.MM LT')
-          }))}
-          onChange={handleChange}
-          closeOnChange
-          clearable
-          fluid
-          selectOnBlur={false}
-          selectOnNavigation={false}
-        />
-      </Form>
+      <Header content="Previous searches" icon="clock outline" />
+      <Form.Dropdown
+        placeholder="Select a previous search"
+        noResultsMessage="No previous searches"
+        search
+        selection
+        value={selected}
+        options={sortedItems.map(({ text, timestamp }, i) => ({
+          key: i + 1,
+          value: i + 1,
+          text,
+          description: moment(timestamp).format('DD.MM LT')
+        }))}
+        onChange={handleChange}
+        closeOnChange
+        clearable
+        fluid
+        selectOnBlur={false}
+        selectOnNavigation={false}
+      />
     </Segment>
   )
 }
