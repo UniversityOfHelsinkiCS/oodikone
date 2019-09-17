@@ -17,6 +17,8 @@ const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { semesterStart, semesterEnd } = require('../util/semester')
 const { mapToProviders } = require('../util/utils')
 
+const defaultStudyTrackSince = () => new Date().getFullYear() - 10
+
 const formatCredit = credit => {
   const { id, credits, attainment_date } = credit
   const year = attainment_date && attainment_date.getFullYear()
@@ -618,5 +620,6 @@ module.exports = {
   throughputStatsForStudytrack,
   findProgrammeThesisCredits,
   thesisProductivityFromCredits,
-  thesisProductivityForStudytrack
+  thesisProductivityForStudytrack,
+  defaultStudyTrackSince
 }
