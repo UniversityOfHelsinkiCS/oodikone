@@ -6,19 +6,29 @@ const Unit = require('../services/units')
 router.get('/students', async (req, res) => {
   const {
     roles,
-    decodedToken: { userId }
+    decodedToken: { userId },
+    query: { searchTerm }
   } = req
+
+  if (
+    searchTerm &&
+    !Student.splitByEmptySpace(searchTerm.trim())
+      .slice(0, 2)
+      .find(t => t.length > 3)
+  ) {
+    return res.status(400).json({ error: 'at least one search term must be longer than 3 characters' })
+  }
 
   if (roles && roles.includes('admin')) {
     let results = []
-    if (req.query.searchTerm) {
-      results = await Student.bySearchTerm(req.query.searchTerm)
+    if (searchTerm) {
+      results = await Student.bySearchTerm(searchTerm)
     }
     return res.json(results)
   } else {
     const unitsUserCanAccess = await userService.getUnitsFromElementDetails(userId)
     const codes = unitsUserCanAccess.map(unit => unit.id)
-    const matchingStudents = await Student.bySearchTermAndElements(req.query.searchTerm, codes)
+    const matchingStudents = await Student.bySearchTermAndElements(searchTerm, codes)
     res.json(matchingStudents)
   }
 })
