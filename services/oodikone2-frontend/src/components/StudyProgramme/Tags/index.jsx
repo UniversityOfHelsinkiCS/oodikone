@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Datetime from 'react-datetime'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, List, Segment, Header, Confirm, Form } from 'semantic-ui-react'
+import { Button, List, Segment, Header, Confirm, Form, Icon, Popup } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
 import TagModal from '../TagModal'
@@ -12,10 +12,11 @@ import { getTagsByStudytrackAction, createTagAction, deleteTagAction } from '../
 
 const YEAR_DATE_FORMAT = 'YYYY'
 
-const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme }) => {
+const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme, userId }) => {
   const [tagname, setTagname] = useState('')
   const [confirm, setConfirm] = useState(null)
   const [year, setYear] = useState(null)
+  const [personal, setPersonal] = useState(false)
 
   useEffect(() => {
     getTagsByStudytrack(studyprogramme)
@@ -36,11 +37,13 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     const newTag = {
       tagname: tagname.trim(),
       studytrack: studyprogramme,
-      year: reformatDate(year, YEAR_DATE_FORMAT)
+      year: reformatDate(year, YEAR_DATE_FORMAT),
+      personal_user_id: personal ? userId : null
     }
     createTag(newTag)
     setTagname('')
     setYear(null)
+    setPersonal(false)
   }
 
   const handleChange = ({ target }) => {
@@ -49,11 +52,22 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
 
   const deleteButton = tag => <Button onClick={() => setConfirm(tag)}>Delete</Button>
 
+  const decorateTagName = tag => {
+    if (tag.personal_user_id)
+      return (
+        <>
+          {tag.tagname}
+          <Popup content="Only you can see this tag." trigger={<Icon style={{ marginLeft: '1em' }} name="eye" />} />
+        </>
+      )
+    return tag.tagname
+  }
+
   const columns = [
     {
       key: 'name',
       title: 'Name',
-      getRowVal: tag => tag.tagname
+      getRowVal: tag => decorateTagName(tag)
     },
     {
       key: 'year',
@@ -101,6 +115,10 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
                 onChange={handleTagYearSelect}
               />
             </Form.Field>
+            <Form.Field>
+              <label>Personal tag</label>
+              <Form.Checkbox toggle checked={personal} onClick={() => setPersonal(!personal)} />
+            </Form.Field>
             <Button
               disabled={!tagname.trim() || tags.find(t => t.tagname === tagname.trim()) || !year}
               onClick={handleSubmit}
@@ -118,8 +136,9 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
   )
 }
 
-const mapStateToProps = ({ tags }) => ({
-  tags: tags.data
+const mapStateToProps = state => ({
+  tags: state.tags.data,
+  userId: state.auth.token.id
 })
 
 Tags.propTypes = {
