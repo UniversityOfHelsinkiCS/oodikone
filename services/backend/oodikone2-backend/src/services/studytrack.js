@@ -582,9 +582,9 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       totals.thesisM = theses.MASTER ? totals.thesisM + theses.MASTER : totals.thesisM
       totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
       totals.students = totals.students + credits.length
-      ;(totals.graduated = totals.graduated + graduated.length),
-        (totals.ended = totals.ended + endedStudyright.count),
-        (totals.medianGraduationTime = median(allGraduationTimes))
+      totals.graduated = totals.graduated + graduated.length
+      totals.ended = totals.ended + endedStudyright.count
+      totals.medianGraduationTime = median(allGraduationTimes)
       totals.inTargetTime = totals.inTargetTime + inTargetTime
       totals.transferred = totals.transferred + transferredTo
       return {
