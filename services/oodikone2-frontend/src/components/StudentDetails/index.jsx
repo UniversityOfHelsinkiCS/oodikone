@@ -279,7 +279,7 @@ class StudentDetails extends Component {
     const studyRightHeaders = ['Degree', 'Programme', 'Study Track', 'Graduated']
     const studyRightRows = student.studyrights.map(studyright => {
       const degree = sortBy(studyright.studyrightElements, 'enddate').find(e => e.element_detail.type === 10)
-      const formattedDegree = {
+      const formattedDegree = degree && {
         startdate: degree.startdate,
         enddate: degree.enddate,
         name: getTextIn(degree.element_detail.name, language),
