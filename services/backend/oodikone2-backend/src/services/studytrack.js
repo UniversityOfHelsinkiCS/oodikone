@@ -17,6 +17,8 @@ const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { semesterStart, semesterEnd } = require('../util/semester')
 const { mapToProviders } = require('../util/utils')
 
+const defaultStudyTrackSince = () => new Date().getFullYear() - 10
+
 const formatCredit = credit => {
   const { id, credits, attainment_date } = credit
   const year = attainment_date && attainment_date.getFullYear()
@@ -582,9 +584,9 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       totals.thesisM = theses.MASTER ? totals.thesisM + theses.MASTER : totals.thesisM
       totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
       totals.students = totals.students + credits.length
-      ;(totals.graduated = totals.graduated + graduated.length),
-        (totals.ended = totals.ended + endedStudyright.count),
-        (totals.medianGraduationTime = median(allGraduationTimes))
+      totals.graduated = totals.graduated + graduated.length
+      totals.ended = totals.ended + endedStudyright.count
+      totals.medianGraduationTime = median(allGraduationTimes)
       totals.inTargetTime = totals.inTargetTime + inTargetTime
       totals.transferred = totals.transferred + transferredTo
       return {
@@ -618,5 +620,6 @@ module.exports = {
   throughputStatsForStudytrack,
   findProgrammeThesisCredits,
   thesisProductivityFromCredits,
-  thesisProductivityForStudytrack
+  thesisProductivityForStudytrack,
+  defaultStudyTrackSince
 }
