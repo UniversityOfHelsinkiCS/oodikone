@@ -65,7 +65,7 @@ class PopulationStudents extends Component {
       return obj
     }, {})
     this.setState({ students: this.props.samples })
-    const allStudyrights = this.props.selectedStudentNumbers.map(sn => students[sn]).map(st => st.studyrights)
+    const allStudyrights = this.props.selectedStudents.map(sn => students[sn]).map(st => st.studyrights)
     return allStudyrights
       .map(
         studyrights =>
@@ -121,7 +121,7 @@ class PopulationStudents extends Component {
     const pushToHistoryFn = studentNumber => this.props.history.push(`/students/${studentNumber}`)
 
     const copyToClipboardAll = () => {
-      const studentsInfo = this.props.selectedStudentNumbers.map(number => students[number])
+      const studentsInfo = this.props.selectedStudents.map(number => students[number])
       const emails = studentsInfo.filter(s => s.email).map(s => s.email)
       const clipboardString = emails.join('; ')
       copyToClipboard(clipboardString)
@@ -457,14 +457,14 @@ class PopulationStudents extends Component {
       )
     ]
 
-    const selectedStudentNumbersData = this.props.selectedStudentNumbers.map(sn => students[sn])
-    const totals = selectedStudentNumbersData.reduce((acc, s) => {
+    const selectedStudentsData = this.props.selectedStudents.map(sn => students[sn])
+    const totals = selectedStudentsData.reduce((acc, s) => {
       this.props.mandatoryCourses.forEach(m => {
         if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
       })
       return acc
     }, this.props.mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true }))
-    const mandatoryCourseData = [totals, ...selectedStudentNumbersData]
+    const mandatoryCourseData = [totals, ...selectedStudentsData]
 
     const panes = [
       {
@@ -482,7 +482,7 @@ class PopulationStudents extends Component {
                   celled: true
                 }}
                 columns={columns}
-                data={this.props.selectedStudentNumbers.map(sn => students[sn])}
+                data={this.props.selectedStudents.map(sn => students[sn])}
               />
             </div>
           </Tab.Pane>
@@ -528,10 +528,13 @@ class PopulationStudents extends Component {
             <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
               <TagPopulation
                 tags={this.props.tags}
-                selectedStudents={this.props.selectedStudentNumbers}
+                selectedStudents={this.props.selectedStudents}
                 studytrack={this.props.queryStudyrights[0]}
               />
-              <TagList studytrack={this.props.queryStudyrights[0]} />
+              <TagList
+                studytrack={this.props.queryStudyrights[0]}
+                selectedStudents={this.props.selectedStudents.map(sn => students[sn])}
+              />
             </div>
           </Tab.Pane>
         )
@@ -539,7 +542,7 @@ class PopulationStudents extends Component {
     ]
 
     const generateWorkbook = () => {
-      const data = this.props.selectedStudentNumbers.map(sn => students[sn])
+      const data = this.props.selectedStudents.map(sn => students[sn])
       const sortedMandatory = sortBy(this.props.mandatoryCourses, [
         m => {
           const res = m.code.match(/\d+/)
@@ -608,11 +611,11 @@ class PopulationStudents extends Component {
       <Ref innerRef={this.handleRef}>
         <Segment>
           <Header dividing>
-            {`Students (${this.props.selectedStudentNumbers.length}) `}
+            {`Students (${this.props.selectedStudents.length}) `}
             <Button size="small" onClick={() => this.props.toggleStudentListVisibility()}>
               {toggleLabel}
             </Button>
-            {this.state.admin ? <CheckStudentList students={this.props.selectedStudentNumbers} /> : null}
+            {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
             <InfoBox content={Students} />
           </Header>
           {this.renderStudentTable()}
@@ -624,7 +627,7 @@ class PopulationStudents extends Component {
 
 PopulationStudents.propTypes = {
   samples: arrayOf(object).isRequired,
-  selectedStudentNumbers: arrayOf(string).isRequired,
+  selectedStudents: arrayOf(string).isRequired,
   toggleStudentListVisibility: func.isRequired,
   showNames: bool.isRequired,
   showList: bool.isRequired,
@@ -682,7 +685,7 @@ const mapStateToProps = state => {
     tags: tags.data,
     userRoles: getUserRoles(roles),
     tagstudent: tagstudent.data,
-    selectedStudentNumbers: selectedStudents.map(({ studentNumber }) => studentNumber),
+    selectedStudents,
     samples
   }
 }

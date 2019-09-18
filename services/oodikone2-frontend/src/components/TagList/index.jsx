@@ -70,11 +70,10 @@ const TagList = ({ selectedStudents, tagstudent, tags, studytrack, getStudentTag
 
 const mapStateToProps = state => {
   const { tagstudent, tags } = state
-  const { selectedStudents, programme } = selector.makePopulationsToData(state)
+  const { programme } = selector.makePopulationsToData(state)
   return {
     tagstudent: tagstudent.data,
     tags: tags.data,
-    selectedStudents,
     studytrack: programme
   }
 }
