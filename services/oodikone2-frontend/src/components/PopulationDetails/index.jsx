@@ -22,7 +22,7 @@ class PopulationDetails extends Component {
   static propTypes = {
     translate: func.isRequired,
     samples: arrayOf(object).isRequired,
-    selectedStudents: arrayOf(string).isRequired,
+    selectedStudentNumbers: arrayOf(string).isRequired,
     queryIsSet: bool.isRequired,
     isLoading: bool.isRequired
   }
@@ -52,7 +52,7 @@ class PopulationDetails extends Component {
               render: () => (
                 <Tab.Pane attached={false}>
                   <PopulationCreditGainTable
-                    sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
+                    sample={samples.filter(s => this.props.selectedStudentNumbers.includes(s.studentNumber))}
                     translate={translate}
                   />
                 </Tab.Pane>
@@ -63,7 +63,7 @@ class PopulationDetails extends Component {
               render: () => (
                 <Tab.Pane attached={false}>
                   <CourseQuarters
-                    sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
+                    sample={samples.filter(s => this.props.selectedStudentNumbers.includes(s.studentNumber))}
                     translate={translate}
                   />
                 </Tab.Pane>
@@ -94,14 +94,15 @@ class PopulationDetails extends Component {
         translate={translate}
         label={samples.label}
         maxCredits={samples.maxCredits}
-        selectedStudents={this.props.selectedStudents}
+        selectedStudents={this.props.selectedStudentNumbers}
         ref={this.chart}
       />
     )
     return (
       <Segment>
         <Header size="medium" dividing>
-          {translate('populationStatistics.graphSegmentHeader')} (for {this.props.selectedStudents.length} students)
+          {translate('populationStatistics.graphSegmentHeader')} (for {this.props.selectedStudentNumbers.length}{' '}
+          students)
           <InfoBox content={CreditAccumulationGraph} />
         </Header>
         {samples.length > 0 ? graphs : null}
@@ -145,7 +146,7 @@ class PopulationDetails extends Component {
       <PopulationFilters ref={this.filters} samples={this.props.samples} />
       {this.renderCreditGainGraphs()}
       {this.renderCourseStatistics()}
-      <PopulationCourses ref={this.courses} selectedStudents={this.props.selectedStudents} />
+      <PopulationCourses ref={this.courses} selectedStudents={this.props.selectedStudentNumbers} />
       <PopulationStudents ref={this.students} />
     </div>
   )
@@ -210,7 +211,7 @@ const mapStateToProps = state => {
 
   return {
     samples,
-    selectedStudents,
+    selectedStudentNumbers: selectedStudents.map(({ studentNumber }) => studentNumber),
     complemented,
     translate: getTranslate(state.localize),
     queryIsSet: !!state.populations.query,
