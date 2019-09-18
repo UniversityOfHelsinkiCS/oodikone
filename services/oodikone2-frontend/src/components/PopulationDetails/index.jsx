@@ -101,8 +101,7 @@ class PopulationDetails extends Component {
     return (
       <Segment>
         <Header size="medium" dividing>
-          {translate('populationStatistics.graphSegmentHeader')} (for {this.props.selectedStudents.length}{' '}
-          students)
+          {translate('populationStatistics.graphSegmentHeader')} (for {this.props.selectedStudents.length} students)
           <InfoBox content={CreditAccumulationGraph} />
         </Header>
         {samples.length > 0 ? graphs : null}
