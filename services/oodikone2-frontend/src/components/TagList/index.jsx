@@ -9,12 +9,18 @@ import { getTagsByStudytrackAction } from '../../redux/tags'
 import { getStudentTagsByStudytrackAction } from '../../redux/tagstudent'
 
 const Row = memo(
-  ({ studentsTags, sn, studytrack, tagOptions }) => (
+  ({ studentsTags, sn, studytrack, tagOptions, name }) => (
     <div>
       <List horizontal>
         <List.Item></List.Item>
         <List.Item>
-          <TagStudent studentnumber={sn} studentstags={studentsTags} studytrack={studytrack} tagOptions={tagOptions} />
+          <TagStudent
+            studentnumber={sn}
+            studentname={name}
+            studentstags={studentsTags}
+            studytrack={studytrack}
+            tagOptions={tagOptions}
+          />
         </List.Item>
       </List>
     </div>
@@ -26,7 +32,8 @@ Row.propTypes = {
   studentsTags: arrayOf(shape({})).isRequired,
   sn: string.isRequired,
   studytrack: string.isRequired,
-  tagOptions: arrayOf(shape({})).isRequired
+  tagOptions: arrayOf(shape({})).isRequired,
+  name: string.isRequired
 }
 
 const TagList = ({ selectedStudents, tagstudent, tags, studytrack, getStudentTagsStudyTrack, getTagsByStudytrack }) => {
@@ -35,7 +42,7 @@ const TagList = ({ selectedStudents, tagstudent, tags, studytrack, getStudentTag
     getStudentTagsStudyTrack(studytrack)
   }, [])
 
-  const tagRows = selectedStudents.map(sn => {
+  const tagRows = selectedStudents.map(({ studentNumber: sn, name }) => {
     const studentsTags = tagstudent.filter(tag => tag.studentnumber === sn)
     const tagIds = studentsTags.map(t => t.tag.tag_id)
     const studentTagOptions = tags
@@ -51,6 +58,7 @@ const TagList = ({ selectedStudents, tagstudent, tags, studytrack, getStudentTag
         tags={tags}
         studentsTags={studentsTags}
         sn={sn}
+        name={name}
         studytrack={studytrack}
         tagOptions={studentTagOptions}
       />
@@ -74,7 +82,7 @@ const mapStateToProps = state => {
 TagList.propTypes = {
   getTagsByStudytrack: func.isRequired,
   getStudentTagsStudyTrack: func.isRequired,
-  selectedStudents: arrayOf(string).isRequired,
+  selectedStudents: arrayOf(shape({})).isRequired,
   tags: arrayOf(shape({})).isRequired,
   studytrack: string.isRequired,
   tagstudent: arrayOf(shape({})).isRequired
