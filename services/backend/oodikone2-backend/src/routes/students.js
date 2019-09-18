@@ -3,6 +3,10 @@ const Student = require('../services/students')
 const userService = require('../services/userService')
 const Unit = require('../services/units')
 
+const filterRelevantStudentTags = (studentTags, userId) => {
+  return studentTags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
+}
+
 router.get('/students', async (req, res) => {
   const {
     roles,
@@ -26,7 +30,10 @@ router.get('/students', async (req, res) => {
     if (trimmedSearchTerm) {
       results = await Student.bySearchTerm(trimmedSearchTerm)
     }
-    return res.json(results)
+    return res
+      .status(200)
+      .json(results)
+      .end()
   } else {
     const unitsUserCanAccess = await userService.getUnitsFromElementDetails(userId)
     const codes = unitsUserCanAccess.map(unit => unit.id)
@@ -37,17 +44,28 @@ router.get('/students', async (req, res) => {
 
 router.get('/students/:id', async (req, res) => {
   const { id: studentId } = req.params
-  const { roles } = req
+  const { roles, decodedToken } = req
 
   if (roles && roles.includes('admin')) {
     const results = await Student.withId(studentId)
-    return results.error ? res.status(400).json({ error: 'error finding student' }) : res.json(results)
+    return results.error
+      ? res
+          .status(400)
+          .json({ error: 'error finding student' })
+          .end()
+      : res
+          .status(200)
+          .json(results)
+          .end()
   }
 
   const uid = req.decodedToken.userId
   const student = await Student.withId(studentId)
   if (student.error) {
-    return res.status(400).json({ error: 'error finding student' })
+    return res
+      .status(400)
+      .json({ error: 'error finding student' })
+      .end()
   }
   const units = await userService.getUnitsFromElementDetails(uid)
 
@@ -59,9 +77,19 @@ router.get('/students/:id', async (req, res) => {
   )
 
   if (rights.some(right => right !== null)) {
-    res.json(student).end()
+    const studentWithFilteredTags = {
+      ...student,
+      tags: filterRelevantStudentTags(student.tags, decodedToken.id)
+    }
+    res
+      .status(200)
+      .json(studentWithFilteredTags)
+      .end()
   } else {
-    res.status(400).json({ error: 'error finding student' })
+    res
+      .status(400)
+      .json({ error: 'error finding student' })
+      .end()
   }
 })
 
