@@ -13,10 +13,7 @@ const makePopulationsToData = createSelector(
 
     const samples = pending || !data.students ? [] : data.students
     const { complemented } = populationFilters
-    let selectedStudents =
-      samples.length > 0
-        ? samples.map(({ studentNumber }) => studentNumber)
-        : []
+    let selectedStudents = samples.length > 0 ? samples.map(({ studentNumber }) => studentNumber) : []
 
     if (samples.length > 0 && populationFilters.filters.length > 0) {
       const studentsForFilter = f => {
