@@ -531,7 +531,10 @@ class PopulationStudents extends Component {
                 selectedStudents={this.props.selectedStudents}
                 studytrack={this.props.queryStudyrights[0]}
               />
-              <TagList studytrack={this.props.queryStudyrights[0]} />
+              <TagList
+                studytrack={this.props.queryStudyrights[0]}
+                selectedStudents={this.props.selectedStudents.map(sn => students[sn])}
+              />
             </div>
           </Tab.Pane>
         )
@@ -657,6 +660,7 @@ const mapStateToProps = state => {
       token: { roles }
     }
   } = state
+
   const { selectedStudents, samples } = selector.makePopulationsToData(state)
   const mandatoryCodes = populationMandatoryCourses.data.map(c => c.code)
 
