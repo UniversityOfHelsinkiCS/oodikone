@@ -278,7 +278,7 @@ export const tagFilter = params => {
     },
     filter: student => {
       const studentTagIds = student.tags.map(t => t.tag.tag_id)
-      if (comp) {
+      if (comp === 'true') {
         return studentTagIds.includes(value)
       }
       return !studentTagIds.includes(value)
