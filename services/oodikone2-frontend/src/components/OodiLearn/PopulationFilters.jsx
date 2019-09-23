@@ -42,6 +42,9 @@ const mapStateToProps = state => ({
   form: state.oodilearnPopulationForm
 })
 
-export default connect(mapStateToProps, {
-  setFormValue: setValue
-})(PopulationFilters)
+export default connect(
+  mapStateToProps,
+  {
+    setFormValue: setValue
+  }
+)(PopulationFilters)

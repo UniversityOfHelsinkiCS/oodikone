@@ -47,14 +47,23 @@ class SexFilter extends Component {
                 <label>Filter by gender</label>
               </Form.Field>
               <Form.Field>
-                <Radio name="sex" onChange={this.handleChange} value={1} label={getTextIn(genderMale, language)} checked={this.state.sex === 1} />
-                <Radio name="sex" onChange={this.handleChange} value={2} label={getTextIn(genderFemale, language)} checked={this.state.sex === 2} />
+                <Radio
+                  name="sex"
+                  onChange={this.handleChange}
+                  value={1}
+                  label={getTextIn(genderMale, language)}
+                  checked={this.state.sex === 1}
+                />
+                <Radio
+                  name="sex"
+                  onChange={this.handleChange}
+                  value={2}
+                  label={getTextIn(genderFemale, language)}
+                  checked={this.state.sex === 2}
+                />
               </Form.Field>
               <Form.Field>
-                <Button
-                  onClick={this.handleSex}
-                  disabled={this.state.sex === ''}
-                >
+                <Button onClick={this.handleSex} disabled={this.state.sex === ''}>
                   set filter
                 </Button>
               </Form.Field>
@@ -66,7 +75,9 @@ class SexFilter extends Component {
 
     return (
       <Segment>
-        {`Showing only students classified as: "${filter.params.gender === 1 ? getTextIn(genderMale, language) : getTextIn(genderFemale, language)}"`}
+        {`Showing only students classified as: "${
+          filter.params.gender === 1 ? getTextIn(genderMale, language) : getTextIn(genderFemale, language)
+        }"`}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>

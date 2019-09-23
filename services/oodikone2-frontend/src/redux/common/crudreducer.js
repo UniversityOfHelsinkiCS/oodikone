@@ -4,12 +4,15 @@ const additionalTypes = prefix => ({
   reset: `${prefix}_CLEAR`
 })
 
-const createReducer = (prefix, {
-  reduceGET = (_, action) => action.response,
-  reducePOST = (data, action) => data.concat(action.response),
-  reduceDELETE = (data, action) => data.filter(d => d.id === action.query.id),
-  defaults = undefined
-}) => {
+const createReducer = (
+  prefix,
+  {
+    reduceGET = (_, action) => action.response,
+    reducePOST = (data, action) => data.concat(action.response),
+    reduceDELETE = (data, action) => data.filter(d => d.id === action.query.id),
+    defaults = undefined
+  }
+) => {
   const prefixGET = `${prefix}GET_`
   const prefixPOST = `${prefix}POST_`
   const prefixDELETE = `${prefix}DELETE_`
@@ -72,7 +75,10 @@ const createReducer = (prefix, {
     }
   }
   return {
-    reducer, prefixGET, prefixPOST, prefixDELETE
+    reducer,
+    prefixGET,
+    prefixPOST,
+    prefixDELETE
   }
 }
 

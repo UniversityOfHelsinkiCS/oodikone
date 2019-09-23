@@ -77,4 +77,7 @@ LanguageChooser.propTypes = {
   initialLanguage: string.isRequired
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LanguageChooser)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(LanguageChooser)

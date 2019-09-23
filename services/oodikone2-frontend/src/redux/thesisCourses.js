@@ -10,7 +10,7 @@ const options = {
 
 const { reducer, prefixGET, prefixPOST, prefixDELETE } = createReducer(prefix, options)
 
-export const getThesisCourses = (studyprogramme) => {
+export const getThesisCourses = studyprogramme => {
   const route = `/v2/studyprogrammes/${studyprogramme}/thesis`
   return callController(route, prefixGET, [], 'get')
 }

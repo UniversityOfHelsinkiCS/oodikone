@@ -1,29 +1,23 @@
 import React, { Fragment } from 'react'
 import moment from 'moment'
-import { Header, Table, Button, Grid, Icon, Label, Segment } from 'semantic-ui-react'
+import { Header, Table, Grid, Icon, Label, Segment } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, func } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { flatten, uniq } from 'lodash'
-import { callApi } from '../../../apiConnection'
 import { getThroughput } from '../../../redux/throughput'
 import { getUserRoles } from '../../../common'
+import InfoBox from '../../InfoBox'
+import infotooltips from '../../../common/InfoToolTips'
 
-const ThroughputTable = ({
-  history,
-  throughput,
-  thesis,
-  loading,
-  error,
-  studyprogramme,
-  dispatchGetThroughput,
-  userRoles
-}) => {
-  const showPopulationStatistics = (yearLabel) => {
+const ThroughputTable = ({ history, throughput, thesis, loading, error, studyprogramme, userRoles }) => {
+  const showPopulationStatistics = yearLabel => {
     const year = Number(yearLabel.slice(0, 4))
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
-    history.push(`/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`)
+    history.push(
+      `/populations?months=${months}&semesters=FALL&semesters=` +
+        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`
+    )
   }
   if (error) return <h1>Oh no so error {error}</h1>
   const GRADUATED_FEATURE_TOGGLED_ON = userRoles.includes('dev')
@@ -31,20 +25,13 @@ const ThroughputTable = ({
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
   const renderGenders = genders.length > 0
 
-  const calculateTotalNationalities = () => (
-    data.length > 0 ?
-      Object.values(throughput.totals.nationalities).reduce((res, curr) => res + curr, 0) :
-      0
-  )
+  const calculateTotalNationalities = () =>
+    data.length > 0 ? Object.values(throughput.totals.nationalities).reduce((res, curr) => res + curr, 0) : 0
 
   const renderRatioOfFinns = calculateTotalNationalities() > 0
   let thesisTypes = []
   if (thesis) {
     thesisTypes = thesis.map(t => t.thesisType)
-  }
-  const refresh = () => {
-    callApi('/v2/studyprogrammes/throughput/recalculate', 'get', null, { code: studyprogramme })
-      .then(() => { dispatchGetThroughput(studyprogramme) })
   }
 
   const renderStudentsHeader = () => {
@@ -55,10 +42,14 @@ const ThroughputTable = ({
     if (renderRatioOfFinns) colSpan += 1
     if (!renderGenders && !renderRatioOfFinns) rowSpan += 1
 
-    return <Table.HeaderCell colSpan={colSpan} rowSpan={rowSpan}>Students</Table.HeaderCell>
+    return (
+      <Table.HeaderCell colSpan={colSpan} rowSpan={rowSpan}>
+        Students
+      </Table.HeaderCell>
+    )
   }
 
-  const ratioOfFinnsIn = (year) => {
+  const ratioOfFinnsIn = year => {
     const total = Object.values(year.nationalities).reduce((res, curr) => res + curr, 0)
     return (
       <Table.Cell>
@@ -77,18 +68,16 @@ const ThroughputTable = ({
               {throughput && (
                 <Header.Subheader>
                   {`Last updated ${
-                    throughput.lastUpdated
-                      ? moment(throughput.lastUpdated).format('HH:mm:ss MM-DD-YYYY')
-                      : 'unknown'
-                    }`}
-                  {throughput.status === 'RECALCULATING' && <Label content="Recalculating! Refresh page in a few minutes" color="red" />}
+                    throughput.lastUpdated ? moment(throughput.lastUpdated).format('HH:mm:ss MM-DD-YYYY') : 'unknown'
+                  }`}
+                  {throughput.status === 'RECALCULATING' && (
+                    <Label content="Recalculating! Refresh page in a few minutes" color="red" />
+                  )}
                 </Header.Subheader>
               )}
             </Grid.Column>
             <Grid.Column>
-              <Button floated="right" onClick={refresh}>
-                Recalculate
-              </Button>
+              <InfoBox content={infotooltips.PopulationOverview.Overview} />
             </Grid.Column>
           </Grid.Row>
         </Grid>
@@ -98,50 +87,41 @@ const ThroughputTable = ({
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
-              {
-                renderStudentsHeader()
-              }
+              {renderStudentsHeader()}
               <Table.HeaderCell colSpan={GRADUATED_FEATURE_TOGGLED_ON ? '3' : '1'}>Graduated</Table.HeaderCell>
 
               <Table.HeaderCell rowSpan="2">Transferred to this program</Table.HeaderCell>
               <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
-              {(thesisTypes.includes('BACHELOR') ||
-                thesisTypes.includes('MASTER')) && (
-                  <Table.HeaderCell colSpan={thesisTypes.length}>
-                    Thesis
-                  </Table.HeaderCell>
-                )}
+              {(thesisTypes.includes('BACHELOR') || thesisTypes.includes('MASTER')) && (
+                <Table.HeaderCell colSpan={thesisTypes.length}>Thesis</Table.HeaderCell>
+              )}
             </Table.Row>
 
             <Table.Row>
               {renderGenders || renderRatioOfFinns ? <Table.HeaderCell content="Total" /> : null}
-              {genders.map(gender => <Table.HeaderCell key={gender} content={gender} />)}
+              {genders.map(gender => (
+                <Table.HeaderCell key={gender} content={gender} />
+              ))}
               {renderRatioOfFinns ? <Table.HeaderCell content="Finnish" /> : null}
-              <Table.HeaderCell >Graduated overall</Table.HeaderCell>
-              {GRADUATED_FEATURE_TOGGLED_ON &&
+              <Table.HeaderCell>Graduated overall</Table.HeaderCell>
+              {GRADUATED_FEATURE_TOGGLED_ON && (
                 <Fragment>
-                  <Table.HeaderCell >Graduated in time</Table.HeaderCell>
-                  <Table.HeaderCell >Graduation median time</Table.HeaderCell>
+                  <Table.HeaderCell>Graduated in time</Table.HeaderCell>
+                  <Table.HeaderCell>Graduation median time</Table.HeaderCell>
                 </Fragment>
-              }
+              )}
               <Table.HeaderCell content="≥ 30" />
               <Table.HeaderCell content="≥ 60" />
               <Table.HeaderCell content="≥ 90" />
               <Table.HeaderCell content="≥ 120" />
               <Table.HeaderCell content="≥ 150" />
-              {thesisTypes.includes('MASTER') && (
-                <Table.HeaderCell content="Master" />
-              )}
-              {thesisTypes.includes('BACHELOR') && (
-                <Table.HeaderCell content="Bachelor" />
-              )}
+              {thesisTypes.includes('MASTER') && <Table.HeaderCell content="Master" />}
+              {thesisTypes.includes('BACHELOR') && <Table.HeaderCell content="Bachelor" />}
             </Table.Row>
           </Table.Header>
           <Table.Body>
             {data
-              .sort((year1, year2) =>
-                Number(year2.year.slice(0, 4)) -
-                Number(year1.year.slice(0, 4)))
+              .sort((year1, year2) => Number(year2.year.slice(0, 4)) - Number(year1.year.slice(0, 4)))
               .map(year => (
                 <Table.Row key={year.year}>
                   <Table.Cell>
@@ -151,59 +131,61 @@ const ThroughputTable = ({
                   <Table.Cell>{year.credits.length}</Table.Cell>
                   {genders.map(gender => (
                     <Table.Cell key={`${year.year} gender:${gender}`}>
-                      {`${year.genders[gender] || 0} (${Math.floor((year.genders[gender] / year.credits.length) * 100) || 0}%)`}
+                      {`${year.genders[gender] || 0} (${Math.floor(
+                        (year.genders[gender] / year.credits.length) * 100
+                      ) || 0}%)`}
                     </Table.Cell>
                   ))}
-                  { renderRatioOfFinns && ratioOfFinnsIn(year) }
+                  {renderRatioOfFinns && ratioOfFinnsIn(year)}
                   <Table.Cell>{year.graduated}</Table.Cell>
-                  {GRADUATED_FEATURE_TOGGLED_ON &&
+                  {GRADUATED_FEATURE_TOGGLED_ON && (
                     <Fragment>
                       <Table.Cell>{year.inTargetTime}</Table.Cell>
                       <Table.Cell>{year.medianGraduationTime ? `${year.medianGraduationTime} months` : '∞'}</Table.Cell>
                     </Fragment>
-                  }
+                  )}
                   <Table.Cell>{year.transferred}</Table.Cell>
                   {Object.keys(year.creditValues).map(creditKey => (
-                    <Table.Cell key={`${year.year} credit:${creditKey}`}>{year.creditValues[creditKey]}
-                    </Table.Cell>
+                    <Table.Cell key={`${year.year} credit:${creditKey}`}>{year.creditValues[creditKey]}</Table.Cell>
                   ))}
-                  {thesisTypes.includes('MASTER') ? (
-                    <Table.Cell>{year.thesisM}</Table.Cell>
-                  ) : null}
-                  {thesisTypes.includes('BACHELOR') ? (
-                    <Table.Cell>{year.thesisB}</Table.Cell>
-                  ) : null}
+                  {thesisTypes.includes('MASTER') ? <Table.Cell>{year.thesisM}</Table.Cell> : null}
+                  {thesisTypes.includes('BACHELOR') ? <Table.Cell>{year.thesisB}</Table.Cell> : null}
                 </Table.Row>
               ))}
           </Table.Body>
-          {throughput && throughput.totals ?
+          {throughput && throughput.totals ? (
             <Table.Footer>
               <Table.Row>
                 <Table.HeaderCell style={{ fontWeight: 'bold' }}>Total</Table.HeaderCell>
                 <Table.HeaderCell>{throughput.totals.students}</Table.HeaderCell>
                 {Object.keys(throughput.totals.genders).map(genderKey => (
                   <Table.HeaderCell key={`${genderKey}total`}>
-                    {`${throughput.totals.genders[genderKey]} (${Math.floor((throughput.totals.genders[genderKey] / throughput.totals.students) * 100)}%)`}
+                    {`${throughput.totals.genders[genderKey]} (${Math.floor(
+                      (throughput.totals.genders[genderKey] / throughput.totals.students) * 100
+                    )}%)`}
                   </Table.HeaderCell>
                 ))}
-                {
-                  renderRatioOfFinns ?
-                    <Table.HeaderCell>
-                      {`${throughput.totals.nationalities.Finland || 0} (${Math.floor((throughput.totals.nationalities.Finland / calculateTotalNationalities()) * 100) || 0}%)`}
-                    </Table.HeaderCell> :
-                    null
-                }
+                {renderRatioOfFinns ? (
+                  <Table.HeaderCell>
+                    {`${throughput.totals.nationalities.Finland || 0} (${Math.floor(
+                      (throughput.totals.nationalities.Finland / calculateTotalNationalities()) * 100
+                    ) || 0}%)`}
+                  </Table.HeaderCell>
+                ) : null}
                 <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
-                {GRADUATED_FEATURE_TOGGLED_ON &&
+                {GRADUATED_FEATURE_TOGGLED_ON && (
                   <Fragment>
                     <Table.HeaderCell>{throughput.totals.inTargetTime}</Table.HeaderCell>
-                    <Table.HeaderCell>{throughput.totals.medianGraduationTime ? `${throughput.totals.medianGraduationTime} months` : '∞'}</Table.HeaderCell>
+                    <Table.HeaderCell>
+                      {throughput.totals.medianGraduationTime
+                        ? `${throughput.totals.medianGraduationTime} months`
+                        : '∞'}
+                    </Table.HeaderCell>
                   </Fragment>
-                }
+                )}
                 <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
                 {Object.keys(throughput.totals.credits).map(creditKey => (
-                  <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}
-                  </Table.HeaderCell>
+                  <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}</Table.HeaderCell>
                 ))}
                 {thesisTypes.includes('MASTER') ? (
                   <Table.HeaderCell>{throughput.totals.thesisM}</Table.HeaderCell>
@@ -212,7 +194,8 @@ const ThroughputTable = ({
                   <Table.HeaderCell>{throughput.totals.thesisB}</Table.HeaderCell>
                 ) : null}
               </Table.Row>
-            </Table.Footer> : null}
+            </Table.Footer>
+          ) : null}
         </Table>
       </Segment>
     </React.Fragment>
@@ -223,23 +206,26 @@ ThroughputTable.propTypes = {
   throughput: shape({
     lastUpdated: string,
     status: string,
-    data: arrayOf(shape({
-      year: string,
-      credits: arrayOf(number),
-      thesisM: number,
-      thesisB: number,
-      graduated: number
-    }))
+    data: arrayOf(
+      shape({
+        year: string,
+        credits: arrayOf(number),
+        thesisM: number,
+        thesisB: number,
+        graduated: number
+      })
+    )
   }),
-  thesis: arrayOf(shape({
-    programmeCode: string,
-    courseCode: string,
-    thesisType: string,
-    createdAt: string,
-    updatedAt: string
-  })),
+  thesis: arrayOf(
+    shape({
+      programmeCode: string,
+      courseCode: string,
+      thesisType: string,
+      createdAt: string,
+      updatedAt: string
+    })
+  ),
   studyprogramme: string.isRequired,
-  dispatchGetThroughput: func.isRequired,
   loading: bool.isRequired,
   error: bool.isRequired,
   history: shape({
@@ -253,9 +239,15 @@ ThroughputTable.defaultProps = {
   thesis: undefined
 }
 
-export default withRouter(connect(
-  ({ auth: { token: { roles } } }) => ({ userRoles: getUserRoles(roles) }),
-  {
-    dispatchGetThroughput: getThroughput
-  }
-)(ThroughputTable))
+export default withRouter(
+  connect(
+    ({
+      auth: {
+        token: { roles }
+      }
+    }) => ({ userRoles: getUserRoles(roles) }),
+    {
+      dispatchGetThroughput: getThroughput
+    }
+  )(ThroughputTable)
+)

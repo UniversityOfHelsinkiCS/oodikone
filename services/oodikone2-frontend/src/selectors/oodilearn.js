@@ -4,7 +4,7 @@ const notNumeric = str => !Number(str)
 
 const formatGradeName = name => name.slice(0, -2)
 
-const getSearchedCourses = (state) => {
+const getSearchedCourses = state => {
   const { settings, oodilearnCourses } = state
   const { language } = settings
   return oodilearnCourses.data.map(({ code, name }) => ({
@@ -13,7 +13,7 @@ const getSearchedCourses = (state) => {
   }))
 }
 
-const getGradeProfiles = (state) => {
+const getGradeProfiles = state => {
   const { data } = state.oodilearnCourse
   if (!data) {
     return null
@@ -32,7 +32,7 @@ const getGradeProfiles = (state) => {
 
 const courseProfileSeries = createSelector(
   [getGradeProfiles],
-  (gradeProfiles) => {
+  gradeProfiles => {
     if (!gradeProfiles) {
       return null
     }

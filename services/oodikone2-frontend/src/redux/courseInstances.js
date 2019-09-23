@@ -1,12 +1,12 @@
 import { callController } from '../apiConnection'
 
-export const findCourseInstances = (code) => {
+export const findCourseInstances = code => {
   const route = `/v2/courselist?code=${code}`
   const prefix = 'FIND_COURSE_INSTANCES_'
   return callController(route, prefix)
 }
 
-export const getCourseInstanceStatistics = (query) => {
+export const getCourseInstanceStatistics = query => {
   const { date, code, months } = query
   const route = `/v2/courseinstancestatistics?date=${date}&code=${code}&months=${months}`
   const prefix = 'GET_COURSE_INSTANCE_STATISTICS_'
@@ -44,15 +44,15 @@ const reducer = (state = { data: [], selected: [] }, action) => {
         pending: false,
         error: false,
         selected: [...state.selected, action.query.id],
-        data: [...state.data.filter(instance =>
-          instance.id !== action.query.id),
-        {
-          ...state.data.find(instance => instance.id === action.query.id),
-          ...{
-            statistics: { ...action.response, query: action.query },
-            course: action.query.course
+        data: [
+          ...state.data.filter(instance => instance.id !== action.query.id),
+          {
+            ...state.data.find(instance => instance.id === action.query.id),
+            ...{
+              statistics: { ...action.response, query: action.query },
+              course: action.query.course
+            }
           }
-        }
         ]
       }
     case 'REMOVE_INSTANCE':

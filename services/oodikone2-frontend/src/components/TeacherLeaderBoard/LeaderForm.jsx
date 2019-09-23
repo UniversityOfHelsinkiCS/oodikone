@@ -17,7 +17,9 @@ class LeaderForm extends Component {
 
   defaultValues = () => {
     const { yearoptions, categoryoptions } = this.props
-    const [defaultyear = {}] = [yearoptions.find(year => Number(year.text.slice(0, 4)) === new Date().getFullYear() - 1)]
+    const [defaultyear = {}] = [
+      yearoptions.find(year => Number(year.text.slice(0, 4)) === new Date().getFullYear() - 1)
+    ]
     const [defaultcategory = {}] = categoryoptions
     return {
       year: defaultyear.value,
@@ -71,4 +73,7 @@ LeaderForm.propTypes = {
   selectedyear: number // eslint-disable-line
 }
 
-export default connect(null, { getTopTeachers })(LeaderForm)
+export default connect(
+  null,
+  { getTopTeachers }
+)(LeaderForm)

@@ -18,12 +18,12 @@ const types = {
   }
 }
 
-export const findTeachers = (searchString) => {
+export const findTeachers = searchString => {
   const route = `/teachers/?searchTerm=${searchString}`
   return callController(route, prefix.find)
 }
 
-export const getTeacher = (teacherid) => {
+export const getTeacher = teacherid => {
   const route = `/teachers/${teacherid}`
   return callController(route, prefix.get)
 }

@@ -20,18 +20,13 @@ const INITIAL = {
   separate: false
 }
 
-const SearchForm = (props) => {
+const SearchForm = props => {
   const [state, setState] = useState({
     ...INITIAL
   })
-  const [searchHistory, addItemToSearchHistory] = useSearchHistory('courseSearch', 6)
+  const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
 
-  const {
-    courseName,
-    courseCode,
-    selectedCourses,
-    separate
-  } = state
+  const { courseName, courseCode, selectedCourses, separate } = state
 
   const parseQueryFromUrl = () => {
     const { location } = props
@@ -66,7 +61,7 @@ const SearchForm = (props) => {
     }
   }, [props.location.search])
 
-  const onSelectCourse = (course) => {
+  const onSelectCourse = course => {
     course.selected = !course.selected
     const isSelected = !!selectedCourses[course.code]
 
@@ -87,7 +82,7 @@ const SearchForm = (props) => {
     }
   }
 
-  const pushQueryToUrl = (query) => {
+  const pushQueryToUrl = query => {
     const { history } = props
     const { courseCodes, ...rest } = query
     const queryObject = { ...rest, courseCodes: JSON.stringify(courseCodes) }
@@ -173,7 +168,7 @@ const SearchForm = (props) => {
               onSelectCourse={onSelectCourse}
               controlIcon="remove"
             />
-            {!noSelectedCourses &&
+            {!noSelectedCourses && (
               <Fragment>
                 <Form.Checkbox
                   label="Separate statistics for Spring and Fall semesters"
@@ -193,7 +188,7 @@ const SearchForm = (props) => {
                   onClick={onSubmitFormClick}
                 />
               </Fragment>
-            }
+            )}
             <CourseTable
               hidden={noQueryStrings || isLoading}
               courses={courses}
@@ -204,10 +199,7 @@ const SearchForm = (props) => {
           </div>
         </Form>
       </Segment>
-      <SearchHistory
-        handleSearch={pushQueryToUrl}
-        items={searchHistory}
-      />
+      <SearchHistory handleSearch={pushQueryToUrl} items={searchHistory} updateItem={updateItemInSearchHistory} />
     </React.Fragment>
   )
 }
@@ -229,7 +221,7 @@ SearchForm.propTypes = {
   onProgress: func
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const { pending: courseStatsPending } = state.courseStats
   return {
     matchingCourses: getCourseSearchResults(state),
@@ -238,9 +230,14 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps, {
-  getCourseStats,
-  clearCourses,
-  findCoursesV2,
-  clearCourseStats
-})(SearchForm))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    {
+      getCourseStats,
+      clearCourses,
+      findCoursesV2,
+      clearCourseStats
+    }
+  )(SearchForm)
+)

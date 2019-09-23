@@ -1,9 +1,9 @@
 const Course = require('../services/courses')
 const { setDuplicateCode } = require('../services/courses')
-const { redisClient }= require('../services/redis')
+const { redisClient } = require('../services/redis')
 
 // two tables of prefixes, for example new prefixes of  Matlu courses:
-// ['CSM', 'DATA', 'FYS', 'MAT', 'TKT', 'KEK'] 
+// ['CSM', 'DATA', 'FYS', 'MAT', 'TKT', 'KEK']
 // and old prefixes
 // ['5', '7']
 
@@ -14,14 +14,15 @@ const mapCourseCodes = async (newPrefixes, oldPrefixes) => {
   }
   const res = await Course.findDuplicates(newPrefixes, oldPrefixes)
   const mappedCodes = res ? res[0] : []
-  const formattedCodes = mappedCodes.map(r => { return { [r.code1]: r.code2 } })
+  const formattedCodes = mappedCodes.map(r => {
+    return { [r.code1]: r.code2 }
+  })
   await updateRedis(formattedCodes)
   console.log('Mapped course codes with similar names with codes starting with ', newPrefixes, ' to  ', oldPrefixes)
   process.exit()
 }
 
-const updateRedis = async (codes) => {
-
+const updateRedis = async codes => {
   for (const i in codes) {
     let code = codes[i]
     const newCode = Object.keys(code)[0]

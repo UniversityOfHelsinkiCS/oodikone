@@ -12,7 +12,7 @@ const startTopTeacherUpdate = async (from, to) => {
   TOPTEACHER.status = 'Update started'
   TOPTEACHER.progress = 0
   try {
-    for (let year=from; year<=to; year++) {
+    for (let year = from; year <= to; year++) {
       await findAndSaveTopTeachers(year)
       TOPTEACHER.status = `Top teachers from year with id ${year} updated.`
       TOPTEACHER.progress = ((year - from) / (to - from)) * 100

@@ -37,13 +37,11 @@ router.post('/:programme/label/:course', async (req, res) => {
     await MandatoryCourses.updateLabel(programme, course, label)
     const updatedCourse = await MandatoryCourses.find(programme, course)
     if (!updatedCourse) return res.status(400).end()
-    res
-      .status(200)
-      .json({
-        name: updatedCourse.course.name,
-        code: updatedCourse.course_code,
-        label: updatedCourse.mandatory_course_label
-      })
+    res.status(200).json({
+      name: updatedCourse.course.name,
+      code: updatedCourse.course_code,
+      label: updatedCourse.mandatory_course_label
+    })
   } catch (err) {
     console.error(err)
     res.status(500).json(err.message)

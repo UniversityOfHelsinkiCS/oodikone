@@ -7,8 +7,7 @@ const isTest = NODE_ENV === 'test'
 if (isTest) {
   DB_URL = process.env.TEST_DB
   DB_SCHEMA = process.env.TEST_DB_SCHEMA
-}
-else if (NODE_ENV === 'anon') {
+} else if (NODE_ENV === 'anon') {
   DB_URL = process.env.ANON_DB
 }
 const frontend_addr = process.env.FRONT_URL
@@ -28,16 +27,18 @@ const FEATURES = {
 }
 
 const formatURL = url => {
-  return (!!url && !url.startsWith('http')) ? `http://${url}` : url
+  return !!url && !url.startsWith('http') ? `http://${url}` : url
 }
 
 if (process.env.NODE_ENV === 'dev' && process.env.FEATURES) {
   const toggled = process.env.FEATURES.split(',')
-  toggled.map(toggle => toggle.trim()).forEach(feature => {
-    if (FEATURES[feature] !== undefined) {
-      FEATURES[feature] = true
-    }
-  })
+  toggled
+    .map(toggle => toggle.trim())
+    .forEach(feature => {
+      if (FEATURES[feature] !== undefined) {
+        FEATURES[feature] = true
+      }
+    })
 }
 
 const OODI = {
@@ -58,10 +59,23 @@ if (process.env.NODE_ENV === 'dev' || isTest) {
 }
 
 module.exports = {
-  frontend_addr, DB_URL, redis, TOKEN_SECRET, DB_SCHEMA, OODI_ADDR, CERT_PATH, KEY_PATH, FEATURES, OODILEARN_URL,
-  USERSERVICE_URL: formatURL(USERSERVICE_URL), ACCESS_TOKEN_HEADER_KEY, PORT,
+  frontend_addr,
+  DB_URL,
+  redis,
+  TOKEN_SECRET,
+  DB_SCHEMA,
+  OODI_ADDR,
+  CERT_PATH,
+  KEY_PATH,
+  FEATURES,
+  OODILEARN_URL,
+  USERSERVICE_URL: formatURL(USERSERVICE_URL),
+  ACCESS_TOKEN_HEADER_KEY,
+  PORT,
   ANALYTICS_URL: formatURL(ANALYTICS_URL),
   USAGESERVICE_URL,
-  requiredGroup, OODI_SECRET, OODI_SECRET_HEADER_KEY,
+  requiredGroup,
+  OODI_SECRET,
+  OODI_SECRET_HEADER_KEY,
   isTest
 }

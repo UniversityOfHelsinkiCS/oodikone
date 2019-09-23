@@ -1,10 +1,21 @@
 const router = require('express').Router()
 const { getAllDegreesAndProgrammes, getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
 const MandatoryCourses = require('../services/mandatoryCourses')
-const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('../services/studytrack')
+const {
+  productivityStatsForStudytrack,
+  throughputStatsForStudytrack,
+  defaultStudyTrackSince
+} = require('../services/studytrack')
 const { findProgrammeTheses, createThesisCourse, deleteThesisCourse } = require('../services/thesis')
-const { getProductivity, setProductivity, getThroughput, setThroughput,
-  patchProductivity, patchThroughput, ping } = require('../services/analyticsService')
+const {
+  getProductivity,
+  setProductivity,
+  getThroughput,
+  setThroughput,
+  patchProductivity,
+  patchThroughput,
+  ping
+} = require('../services/analyticsService')
 
 router.get('/elementdetails/all', async (req, res) => {
   try {
@@ -54,7 +65,7 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
     }
     if (!data) {
       try {
-        const since = '2017-08-01'
+        const since = `2017-08-01`
         const stats = await productivityStatsForStudytrack(code, since)
         data = await setProductivity(stats)
       } catch (e) {
@@ -73,10 +84,12 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
   console.log('Productivity stats recalculation starting')
   const codes = code ? [code] : (await getAllProgrammes()).map(p => p.code)
   try {
-    await patchProductivity(codes.reduce((acc, c) => {
-      acc[c] = { status: 'RECALCULATING' }
-      return acc
-    }, {}))
+    await patchProductivity(
+      codes.reduce((acc, c) => {
+        acc[c] = { status: 'RECALCULATING' }
+        return acc
+      }, {})
+    )
     res.status(200).end()
   } catch (e) {
     console.error(e)
@@ -84,9 +97,9 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
   }
 
   let ready = 0
-  for(const code of codes) {
+  for (const code of codes) {
     try {
-      const since = '2017-08-01'
+      const since = `2017-08-01`
       const data = await productivityStatsForStudytrack(code, since)
       await setProductivity(data)
     } catch (e) {
@@ -119,7 +132,7 @@ router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
     }
     if (!data) {
       try {
-        const since = req.params.since ? req.params.since : new Date().getFullYear() - 5
+        const since = defaultStudyTrackSince()
         const result = await throughputStatsForStudytrack(req.params.id, since)
         data = await setThroughput(result)
       } catch (e) {
@@ -138,7 +151,7 @@ router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
   console.log('Throughput stats recalculation starting')
   const codes = code ? [code] : (await getAllProgrammes()).map(p => p.code)
   try {
-    const data = codes.reduce((acc, id) => ({ ...acc, [id]: { status: 'RECALCULATING' }}), {})
+    const data = codes.reduce((acc, id) => ({ ...acc, [id]: { status: 'RECALCULATING' } }), {})
     await patchThroughput(data)
     res.status(200).end()
   } catch (e) {
@@ -147,14 +160,14 @@ router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
   }
 
   let ready = 0
-  for(const code of codes) {
+  for (const code of codes) {
     try {
-      const since = req.params.since ? req.params.since : new Date().getFullYear() - 5
+      const since = defaultStudyTrackSince()
       const data = await throughputStatsForStudytrack(code, since)
       await setThroughput(data)
     } catch (e) {
       try {
-        await patchThroughput({ [code]:  { status: 'RECALCULATION ERRORED' }})
+        await patchThroughput({ [code]: { status: 'RECALCULATION ERRORED' } })
       } catch (e) {
         console.error(e)
         return

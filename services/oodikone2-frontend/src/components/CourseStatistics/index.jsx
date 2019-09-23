@@ -17,24 +17,15 @@ const MENU = {
   QUERY: 'New query'
 }
 
-const CourseStatistics = (props) => {
-  const {
-    singleCourseStats,
-    clearCourseStats,
-    history,
-    statsIsEmpty,
-    loading
-  } = props
+const CourseStatistics = props => {
+  const { singleCourseStats, clearCourseStats, history, statsIsEmpty, loading } = props
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [selected, setSelected] = useState(undefined)
 
-  const {
-    onProgress,
-    progress
-  } = useProgress(loading)
+  const { onProgress, progress } = useProgress(loading)
 
-  const switchToCourse = (coursecode) => {
+  const switchToCourse = coursecode => {
     setActiveIndex(1)
     setSelected(coursecode)
   }
@@ -78,8 +69,10 @@ const CourseStatistics = (props) => {
       <Header className="segmentTitle" size="large">
         Course Statistics
       </Header>
-      <Segment className="contentSegment" >
-        {statsIsEmpty || history.location.search === '' ? <SearchForm onProgress={onProgress} /> : (
+      <Segment className="contentSegment">
+        {statsIsEmpty || history.location.search === '' ? (
+          <SearchForm onProgress={onProgress} />
+        ) : (
           <Tab
             menu={{ attached: false, borderless: false }}
             panes={panes}
@@ -112,4 +105,9 @@ const mapStateToProps = ({ courseStats }) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps, { clearCourseStats })(CourseStatistics))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    { clearCourseStats }
+  )(CourseStatistics)
+)

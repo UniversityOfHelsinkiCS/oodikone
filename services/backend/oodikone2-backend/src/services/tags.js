@@ -3,9 +3,16 @@ const { Tag } = require('../models/models_kone')
 
 const Op = Sequelize.Op
 
+const findTagById = tag_id =>
+  Tag.findOne({
+    where: {
+      tag_id
+    }
+  })
+
 const findTags = () => Tag.findAll({})
 
-const findTagsByStudytrack = async (studytrack) => {
+const findTagsByStudytrack = async studytrack => {
   return Tag.findAll({
     where: {
       studytrack: {
@@ -26,11 +33,11 @@ const findTagsFromStudytrackById = async (studytrack, tag_ids) => {
   })
 }
 
-const createNewTag = async (tag) => {
+const createNewTag = async tag => {
   return Tag.create(tag)
 }
 
-const deleteTag = async (tag) => {
+const deleteTag = async tag => {
   return Tag.destroy({
     where: {
       tag_id: {
@@ -41,6 +48,7 @@ const deleteTag = async (tag) => {
 }
 
 module.exports = {
+  findTagById,
   createNewTag,
   findTags,
   findTagsByStudytrack,

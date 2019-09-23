@@ -8,15 +8,16 @@ const findAndSaveTeachers = async (startcode, endcode) => {
   }
 }
 
-const parseargs = (args, SEPARATOR='=')=> args
-  .filter(arg => arg.includes(SEPARATOR))
-  .reduce((acc, arg) => {
-    const [ key, val ] = arg.split(SEPARATOR)
-    return { 
-      ...acc, 
-      [key.trim()]: val.trim()
-    }
-  }, {})
+const parseargs = (args, SEPARATOR = '=') =>
+  args
+    .filter(arg => arg.includes(SEPARATOR))
+    .reduce((acc, arg) => {
+      const [key, val] = arg.split(SEPARATOR)
+      return {
+        ...acc,
+        [key.trim()]: val.trim()
+      }
+    }, {})
 
 const run = async () => {
   try {

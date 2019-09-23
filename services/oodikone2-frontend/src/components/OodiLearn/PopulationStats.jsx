@@ -19,7 +19,7 @@ const PopulationStats = ({ stats }) => (
         <Table.HeaderCell content="Average" />
         {GRADES.map(grade => (
           <Table.HeaderCell key={grade} content={grade} />
-          ))}
+        ))}
       </Table.Row>
     </Table.Header>
     <Table.Body>
@@ -28,12 +28,8 @@ const PopulationStats = ({ stats }) => (
         <Table.Cell content={stats.credits.total} width={2} />
         <Table.Cell content={stats.credits.average} width={2} />
         {GRADES.map(grade => (
-          <Table.Cell
-            key={grade}
-            content={stats.grades[grade] || 0}
-            width={1}
-          />
-          ))}
+          <Table.Cell key={grade} content={stats.grades[grade] || 0} width={1} />
+        ))}
       </Table.Row>
     </Table.Body>
   </Table>

@@ -3,7 +3,7 @@
 .navBar {
   display: grid !important;
   grid-auto-flow: column !important;
-  border-radius: 0 !important;
+  border-radius: 0 !important;;
 }
 
 .navBar::after {
@@ -18,9 +18,9 @@
 }
 
 .logo {
-  text-decoration: none;
+  text-decoration: none;;
 }
 
 .logoText {
-  color: var(--black);
+  color: var(--black) ;;
 }

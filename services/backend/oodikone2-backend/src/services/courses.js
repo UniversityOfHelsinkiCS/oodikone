@@ -1,90 +1,99 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const {
-  sequelize, Student, Credit,
-  Course, CourseType, Discipline,
-  ElementDetails, StudyrightElement,
-  Studyright, Semester,
+  sequelize,
+  Student,
+  Credit,
+  Course,
+  CourseType,
+  Discipline,
+  ElementDetails,
+  StudyrightElement,
+  Studyright,
+  Semester
 } = require('../models')
-const {
-  sequelizeKone, CourseDuplicates,
-} = require('../models/models_kone')
+const { sequelizeKone, CourseDuplicates } = require('../models/models_kone')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../services/course_yearly_stats_counter')
 const _ = require('lodash')
 
-const byNameOrCode = (searchTerm, language) => Course.findAll({
-  where: {
-    [Op.or]: [
-      {
-        name: {
-          [language]: {
-            [Op.iLike]: searchTerm
+const byNameOrCode = (searchTerm, language) =>
+  Course.findAll({
+    where: {
+      [Op.or]: [
+        {
+          name: {
+            [language]: {
+              [Op.iLike]: searchTerm
+            }
+          }
+        },
+        {
+          code: {
+            [Op.like]: searchTerm
           }
         }
-      },
-      {
-        code: {
-          [Op.like]: searchTerm
+      ]
+    }
+  })
+
+const byName = (name, language) =>
+  Course.findAll({
+    where: {
+      name: {
+        [language]: {
+          [Op.eq]: name
         }
       }
-    ]
-  }
-})
-
-const byName = (name, language) => Course.findAll({
-  where: {
-    name: {
-      [language]: {
-        [Op.eq]: name
-      }
-    }
-  },
-  order: [
-    ['latest_instance_date', 'DESC']
-  ],
-  limit: 1
-})
+    },
+    order: [['latest_instance_date', 'DESC']],
+    limit: 1
+  })
 
 const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) => {
-  const includeDiscipline = discipline ? {
-    include: {
-      model: Discipline,
-      where: {
-        discipline_id: {
-          [Op.eq]: discipline
-        }
-      }
-    }
-  } : null
-
-  const whereNameOrCode = searchTerm ? {
-    [Op.or]: [
-      {
-        name: {
-          [language]: {
-            [Op.iLike]: `%${searchTerm}%`
+  const includeDiscipline = discipline
+    ? {
+        include: {
+          model: Discipline,
+          where: {
+            discipline_id: {
+              [Op.eq]: discipline
+            }
           }
         }
-      },
-      {
-        code: {
-          [Op.iLike]: `%${searchTerm}%`
-        }
       }
-    ],
+    : null
 
-  } : null
-
-  const whereType = type ? {
-    [Op.and]: [
-      {
-        coursetypecode: {
-          [Op.eq]: type
-        }
+  const whereNameOrCode = searchTerm
+    ? {
+        [Op.or]: [
+          {
+            name: {
+              [language]: {
+                [Op.iLike]: `%${searchTerm}%`
+              }
+            }
+          },
+          {
+            code: {
+              [Op.iLike]: `%${searchTerm}%`
+            }
+          }
+        ]
       }
-    ]
-  } : null
+    : null
+
+  const whereType = type
+    ? {
+        [Op.and]: [
+          {
+            coursetypecode: {
+              [Op.eq]: type
+            }
+          }
+        ]
+      }
+    : null
 
   return Course.findAll({
     ...includeDiscipline,
@@ -97,51 +106,52 @@ const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) =
 
 const byCode = code => Course.findByPk(code)
 
-const creditsForCourses = (codes) => Credit.findAll({
-  include: [
-    {
-      model: Student,
-      attributes: ['studentnumber'],
-      include: {
-        model: StudyrightElement,
-        attributes: ['code', 'startdate'],
-        include: [
-          {
-            model: ElementDetails,
-            attributes: ['name', 'type'],
-            where: {
-              type: {
-                [Op.eq]: 20
+const creditsForCourses = codes =>
+  Credit.findAll({
+    include: [
+      {
+        model: Student,
+        attributes: ['studentnumber'],
+        include: {
+          model: StudyrightElement,
+          attributes: ['code', 'startdate'],
+          include: [
+            {
+              model: ElementDetails,
+              attributes: ['name', 'type'],
+              where: {
+                type: {
+                  [Op.eq]: 20
+                }
+              }
+            },
+            {
+              model: Studyright,
+              attributes: ['prioritycode'],
+              where: {
+                prioritycode: {
+                  [Op.eq]: 1
+                }
               }
             }
-          },
-          {
-            model: Studyright,
-            attributes: ['prioritycode'],
-            where: {
-              prioritycode: {
-                [Op.eq]: 1
-              }
-            }
-          }
-        ],
+          ]
+        }
+      },
+      {
+        model: Semester,
+        attributes: ['semestercode', 'name', 'yearcode', 'yearname']
       }
-    }, {
-      model: Semester,
-      attributes: ['semestercode', 'name', 'yearcode', 'yearname']
-    }],
-  where: {
-    course_code: {
-      [Op.in]: codes
-    }
-  },
-  order: [
-    ['attainment_date', 'ASC']
-  ]
-})
+    ],
+    where: {
+      course_code: {
+        [Op.in]: codes
+      }
+    },
+    order: [['attainment_date', 'ASC']]
+  })
 
 const bySearchTerm = async (term, language) => {
-  const formatCourse = (course) => ({
+  const formatCourse = course => ({
     name: course.name[language],
     code: course.code,
     date: course.latest_instance_date
@@ -158,12 +168,12 @@ const bySearchTerm = async (term, language) => {
 }
 
 const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) => {
-  const formatCourse = (course) => ({
+  const formatCourse = course => ({
     name: course.name[language],
     code: course.code,
     date: course.latest_instance_date
   })
-  const removeDuplicates = (courses) => {
+  const removeDuplicates = courses => {
     let newList = []
     courses.map(course => {
       const nameDuplicates = courses.filter(c => course.name === c.name)
@@ -189,9 +199,8 @@ const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) =
   }
 }
 
-const creditsOf = async (codes) => {
-
-  const formatCredit = (credit) => {
+const creditsOf = async codes => {
+  const formatCredit = credit => {
     const credits = [credit]
     return {
       id: credit.id,
@@ -216,56 +225,75 @@ const creditsOf = async (codes) => {
 }
 
 const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
-
   const calculateStats = (thisSemester, allInstancesUntilSemester) => {
-    const studentsThatPassedThisYear = _.uniq(_.flattenDeep(thisSemester
-      .map(inst => inst.credits.filter(Credit.passed).map(c => c.student))))
+    const studentsThatPassedThisYear = _.uniq(
+      _.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.passed).map(c => c.student)))
+    )
 
-    const gradeDistribution = _.groupBy(_.uniq(_.flattenDeep(thisSemester
-      .map(inst => inst.credits))), 'grade')
+    const gradeDistribution = _.groupBy(_.uniq(_.flattenDeep(thisSemester.map(inst => inst.credits))), 'grade')
 
-    const studentsThatFailedThisYear = _.uniq(_.flattenDeep(thisSemester
-      .map(inst => inst.credits.filter(Credit.failed).map(c => c.student))))
+    const studentsThatFailedThisYear = _.uniq(
+      _.flattenDeep(thisSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student)))
+    )
 
-    const allStudentsThatFailedEver = _.flattenDeep(allInstancesUntilSemester
-      .map(inst => inst.credits.filter(Credit.failed).map(c => c.student)))
+    const allStudentsThatFailedEver = _.flattenDeep(
+      allInstancesUntilSemester.map(inst => inst.credits.filter(Credit.failed).map(c => c.student))
+    )
 
-    const passedStudentsThatFailedBefore = _.uniq(studentsThatPassedThisYear
-      .filter(student => allStudentsThatFailedEver.map(s => s.studentnumber).includes(student.studentnumber)))
+    const passedStudentsThatFailedBefore = _.uniq(
+      studentsThatPassedThisYear.filter(student =>
+        allStudentsThatFailedEver.map(s => s.studentnumber).includes(student.studentnumber)
+      )
+    )
 
     const passedStudentsOnFirstTry = _.difference(studentsThatPassedThisYear, passedStudentsThatFailedBefore)
-    const failedStudentsThatFailedBefore = _.uniq(_.flattenDeep(studentsThatFailedThisYear.filter(student =>
-      Object.entries(_.countBy(allStudentsThatFailedEver, 'studentnumber'))
-        .some(([number, count]) => number === student.studentnumber && count > 1))))
+    const failedStudentsThatFailedBefore = _.uniq(
+      _.flattenDeep(
+        studentsThatFailedThisYear.filter(student =>
+          Object.entries(_.countBy(allStudentsThatFailedEver, 'studentnumber')).some(
+            ([number, count]) => number === student.studentnumber && count > 1
+          )
+        )
+      )
+    )
 
     const failedStudentsOnFirstTry = _.difference(studentsThatFailedThisYear, failedStudentsThatFailedBefore)
 
     return {
-      studentsThatPassedThisYear, studentsThatFailedThisYear, allStudentsThatFailedEver,
-      passedStudentsThatFailedBefore, passedStudentsOnFirstTry, failedStudentsThatFailedBefore,
-      failedStudentsOnFirstTry, gradeDistribution, studentnumbers: thisSemester.studentnumbers
+      studentsThatPassedThisYear,
+      studentsThatFailedThisYear,
+      allStudentsThatFailedEver,
+      passedStudentsThatFailedBefore,
+      passedStudentsOnFirstTry,
+      failedStudentsThatFailedBefore,
+      failedStudentsOnFirstTry,
+      gradeDistribution,
+      studentnumbers: thisSemester.studentnumbers
     }
   }
   const stats = []
   if (separate === 'true') {
-    const fallInstances = instances.
-      filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-01-15'))
+    const fallInstances = instances.filter(inst =>
+      moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-01-15')
+    )
 
-    const allInstancesUntilFall = allInstancesUntilYear
-      .filter(inst => moment(inst.date).isBefore(String(year + 1) + '-01-15'))
+    const allInstancesUntilFall = allInstancesUntilYear.filter(inst =>
+      moment(inst.date).isBefore(String(year + 1) + '-01-15')
+    )
 
-    const springInstances = instances
-      .filter(inst => moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-08-01'))
+    const springInstances = instances.filter(inst =>
+      moment(inst.date).isBetween(String(year + 1) + '-01-15', String(year + 1) + '-08-01')
+    )
 
     let fallStatistics = calculateStats(fallInstances, allInstancesUntilFall)
 
     let springStatistics = calculateStats(springInstances, allInstancesUntilYear)
 
-    const passedF = fallInstances.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
-    const failedF = fallInstances.reduce((a, b) => b.fail ? a = a.concat(b.credits[0].student) : a, [])
+    const passedF = fallInstances.reduce((a, b) => (b.pass ? (a = a.concat(b.credits[0].student)) : a), [])
+    const failedF = fallInstances.reduce((a, b) => (b.fail ? (a = a.concat(b.credits[0].student)) : a), [])
 
-    const passedS = springInstances.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
-    const failedS = springInstances.reduce((a, b) => b.fail ? a = a.concat(b.credits[0].student) : a, [])
+    const passedS = springInstances.reduce((a, b) => (b.pass ? (a = a.concat(b.credits[0].student)) : a), [])
+    const failedS = springInstances.reduce((a, b) => (b.fail ? (a = a.concat(b.credits[0].student)) : a), [])
 
     if (fallStatistics.studentsThatPassedThisYear.length + fallStatistics.studentsThatFailedThisYear.length > 0) {
       stats.push({
@@ -295,14 +323,14 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
         time: String(year + 1) + ' Spring'
       })
     }
-
   } else {
-    const yearInst = instances
-      .filter(inst => moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-08-01'))
+    const yearInst = instances.filter(inst =>
+      moment(inst.date).isBetween(String(year) + '-08-01', String(year + 1) + '-08-01')
+    )
 
     let statistics = calculateStats(yearInst, allInstancesUntilYear)
-    const passed = yearInst.reduce((a, b) => b.pass ? a = a.concat(b.credits[0].student) : a, [])
-    const failed = yearInst.reduce((a, b) => b.fail ? a = a.concat(b.credits[0].student) : a, [])
+    const passed = yearInst.reduce((a, b) => (b.pass ? (a = a.concat(b.credits[0].student)) : a), [])
+    const failed = yearInst.reduce((a, b) => (b.fail ? (a = a.concat(b.credits[0].student)) : a), [])
 
     stats.push({
       studentsThatPassedThisYear: statistics.studentsThatPassedThisYear || 0,
@@ -322,22 +350,23 @@ const oneYearStats = (instances, year, separate, allInstancesUntilYear) => {
 }
 
 const yearlyStatsOf = async (code, year, separate, language) => {
-  const getProgrammesFromStats = (stats) => _.flattenDeep(stats
-    .map(year =>
-      _.union(year.courseLevelPassed, year.courseLevelFailed)
-        .map(s => s.studyright_elements
-          .map(e => e))))
-    .reduce((b, a) => {
-      b[a.code] = b[a.code] ?
-        { ...b[a.code], amount: b[a.code].amount + 1 } :
-        { name: a.element_detail.name, amount: 1 }
+  const getProgrammesFromStats = stats =>
+    _.flattenDeep(
+      stats.map(year =>
+        _.union(year.courseLevelPassed, year.courseLevelFailed).map(s => s.studyright_elements.map(e => e))
+      )
+    ).reduce((b, a) => {
+      b[a.code] = b[a.code]
+        ? { ...b[a.code], amount: b[a.code].amount + 1 }
+        : { name: a.element_detail.name, amount: 1 }
       return b
     }, resultProgrammes)
 
   const codes = await alternativeCodes(code)
   const allInstances = await creditsOf(codes)
-  const yearInst = allInstances
-    .filter(inst => moment(new Date(inst.date)).isBetween(year.start + '-09-01', year.end + '-08-01'))
+  const yearInst = allInstances.filter(inst =>
+    moment(new Date(inst.date)).isBetween(year.start + '-09-01', year.end + '-08-01')
+  )
 
   const allInstancesUntilYear = allInstances.filter(inst => moment(new Date(inst.date)).isBefore(year.end + '-08-01'))
   const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name[language]
@@ -357,19 +386,23 @@ const yearlyStatsOf = async (code, year, separate, language) => {
     return {
       code,
       alternativeCodes: codes.filter(cd => cd !== code),
-      start, end, separate,
-      stats: resultStats, programmes: resultProgrammes,
+      start,
+      end,
+      separate,
+      stats: resultStats,
+      programmes: resultProgrammes,
       name
     }
   }
   return
 }
 
-const createCourse = async (code, name, latest_instance_date) => Course.create({
-  code,
-  name,
-  latest_instance_date
-})
+const createCourse = async (code, name, latest_instance_date) =>
+  Course.create({
+    code,
+    name,
+    latest_instance_date
+  })
 
 const findDuplicates = async (oldPrefixes, newPrefixes) => {
   let oldPrefixQuery = ''
@@ -409,7 +442,7 @@ const getMainCodes = () => {
   return CourseDuplicates.findAll()
 }
 
-const deleteDuplicateCode = async (code) => {
+const deleteDuplicateCode = async code => {
   try {
     await CourseDuplicates.destroy({
       where: {
@@ -437,23 +470,30 @@ const getDuplicateCodesWithCourses = async () => {
       }
     }
   })
-  const codeToCourse = courses.reduce((acc, c) => { acc[c.code] = c; return acc }, {})
+  const codeToCourse = courses.reduce((acc, c) => {
+    acc[c.code] = c
+    return acc
+  }, {})
   return courseDuplicates.map(cd => ({ ...cd.get(), course: codeToCourse[cd.coursecode] }))
 }
 
 const getDuplicatesToIdMap = () => {
-  return getMainCodes().then(res => res.reduce((acc, e) => {
-    acc[e.coursecode] = e.groupid
-    return acc
-  }, {}))
+  return getMainCodes().then(res =>
+    res.reduce((acc, e) => {
+      acc[e.coursecode] = e.groupid
+      return acc
+    }, {})
+  )
 }
 
 const getIdToDuplicatesMapWithCourse = () => {
-  return getDuplicateCodesWithCourses().then(res => res.reduce((acc, e) => {
-    acc[e.groupid] = acc[e.groupid] || []
-    acc[e.groupid].push(e.course)
-    return acc
-  }, {}))
+  return getDuplicateCodesWithCourses().then(res =>
+    res.reduce((acc, e) => {
+      acc[e.groupid] = acc[e.groupid] || []
+      acc[e.groupid].push(e.course)
+      return acc
+    }, {})
+  )
 }
 
 const getMainCodeToDuplicates = async () => {
@@ -462,13 +502,13 @@ const getMainCodeToDuplicates = async () => {
     const main = _.orderBy(
       courses,
       [
-        (c) => {
+        c => {
           if (c.code.match(/^A/)) return 4 // open university codes come last
           if (c.code.match(/^\d/)) return 2 // old numeric codes come second
           if (c.code.match(/^[A-Za-z]/)) return 1 // new letter based codes come first
           return 3 // unknown, comes before open uni?
         },
-        c => c.latest_instance_date || new Date,
+        c => c.latest_instance_date || new Date(),
         'code'
       ],
       ['asc', 'desc', 'desc']
@@ -486,7 +526,7 @@ const getCodeToMainCourseMap = async () => {
   try {
     const maincodeToDuplicates = await getMainCodeToDuplicates()
     const codeToMainCode = Object.values(maincodeToDuplicates).reduce((acc, d) => {
-      d.duplicates.forEach((c) => {
+      d.duplicates.forEach(c => {
         acc[c.code] = d.maincourse
       })
       return acc
@@ -520,7 +560,7 @@ const getMainCourseToCourseMap = async (/*programme*/) => {
   return {}
 }
 
-const getDuplicateCodes = async (code) => {
+const getDuplicateCodes = async code => {
   const [mainCodeToDuplicates, codeToMainCourseMap] = await getMainCodeToDuplicatesAndCodeToMainCode()
   const maincourse = codeToMainCourseMap[code]
   if (!maincourse) return null
@@ -542,11 +582,9 @@ const setDuplicateCode = async (code1, code2) => {
             groupid = Math.max(0, ...Object.values(all).filter(e => e))
             groupid = groupid && !isNaN(groupid) ? groupid + 1 : 1
           }
-          await CourseDuplicates.bulkCreate([
-            { groupid, coursecode: code1 },
-            { groupid, coursecode: code2 }
-          ],
-          { ignoreDuplicates: true })
+          await CourseDuplicates.bulkCreate([{ groupid, coursecode: code1 }, { groupid, coursecode: code2 }], {
+            ignoreDuplicates: true
+          })
         } else {
           // both have a group, must merge groups
           await CourseDuplicates.update({ groupid: all[code1] }, { where: { groupid: all[code2] } })
@@ -596,21 +634,28 @@ const yearlyStatsOfNew = async (coursecode, separate) => {
   const counter = new CourseYearlyStatsCounter()
   for (let credit of credits) {
     const {
-      studentnumber, grade, passed,
-      semestercode, semestername,
-      yearcode, yearname, programmes,
+      studentnumber,
+      grade,
+      passed,
+      semestercode,
+      semestername,
+      yearcode,
+      yearname,
+      programmes,
       coursecode
     } = parseCredit(credit)
     const groupcode = separate ? semestercode : yearcode
     const groupname = separate ? semestername : yearname
-    const unknownProgramme = [{
-      code: 'OTHER',
-      name: {
-        en: 'Other',
-        fi: 'Muu',
-        sv: 'Andra'
+    const unknownProgramme = [
+      {
+        code: 'OTHER',
+        name: {
+          en: 'Other',
+          fi: 'Muu',
+          sv: 'Andra'
+        }
       }
-    }]
+    ]
     counter.markStudyProgrammes(studentnumber, programmes.length === 0 ? unknownProgramme : programmes, yearcode)
     counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode, yearcode)
     counter.markCreditToHistory(studentnumber, passed)
@@ -624,13 +669,56 @@ const yearlyStatsOfNew = async (coursecode, separate) => {
   }
 }
 
+const maxYearsToCreatePopulationFrom = async coursecodes => {
+  const maxAttainmentDate = new Date(
+    Math.max(
+      ...(await Course.findAll({
+        where: {
+          code: {
+            [Op.in]: coursecodes
+          }
+        },
+        attributes: ['max_attainment_date']
+      }).map(c => new Date(c.max_attainment_date).getTime()))
+    )
+  )
+  const attainmentThreshold = new Date(maxAttainmentDate.getFullYear(), 0, 1)
+  attainmentThreshold.setFullYear(attainmentThreshold.getFullYear() - 6)
+
+  const credits = await Credit.findAll({
+    where: {
+      course_code: {
+        [Op.in]: coursecodes
+      },
+      attainment_date: {
+        [Op.gt]: attainmentThreshold
+      }
+    },
+    order: [['attainment_date', 'ASC']]
+  })
+
+  const yearlyStudents = Object.values(
+    credits.reduce((res, credit) => {
+      const attainmentYear = new Date(credit.attainment_date).getFullYear()
+      if (!res[attainmentYear]) res[attainmentYear] = 0
+      res[attainmentYear]++
+      return res
+    }, {})
+  )
+  const maxYearsToCreatePopulationFrom = Math.floor(
+    1200 / // Lower this value to get a smaller result if necessary
+      (yearlyStudents.reduce((acc, curr) => acc + curr, 0) / yearlyStudents.length)
+  )
+
+  return maxYearsToCreatePopulationFrom
+}
+
 const courseYearlyStats = async (coursecodes, separate) => {
-  const stats = await Promise.all(coursecodes
-    .map(code => yearlyStatsOfNew(code, separate)))
+  const stats = await Promise.all(coursecodes.map(code => yearlyStatsOfNew(code, separate)))
   return stats
 }
 
-const nameLikeTerm = (name) => {
+const nameLikeTerm = name => {
   if (!name) {
     return undefined
   }
@@ -652,18 +740,24 @@ const nameLikeTerm = (name) => {
   }
 }
 
-const codeLikeTerm = (code) => !code ? undefined : {
-  code: {
-    [Op.iLike]: `%${code.trim()}%`
-  }
-}
+const codeLikeTerm = code =>
+  !code
+    ? undefined
+    : {
+        code: {
+          [Op.iLike]: `%${code.trim()}%`
+        }
+      }
 
 const byNameAndOrCodeLike = (name, code) => {
   return Course.findAll({
     attributes: [
-      'name', 'code',
+      'name',
+      'code',
       ['latest_instance_date', 'date'],
-      'startdate', 'enddate', 'max_attainment_date',
+      'startdate',
+      'enddate',
+      'max_attainment_date',
       'min_attainment_date'
     ],
     where: {
@@ -673,7 +767,7 @@ const byNameAndOrCodeLike = (name, code) => {
   })
 }
 
-const byCodes = (codes) => {
+const byCodes = codes => {
   return Course.findAll({
     where: {
       code: {
@@ -701,5 +795,6 @@ module.exports = {
   courseYearlyStats,
   byNameAndOrCodeLike,
   byCodes,
-  getMainCodeToDuplicatesAndCodeToMainCode
+  getMainCodeToDuplicatesAndCodeToMainCode,
+  maxYearsToCreatePopulationFrom
 }

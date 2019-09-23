@@ -4,9 +4,7 @@ import { Label, Message, Segment } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { getPreview } from '../../redux/userAccessEmail'
 
-const Light = ({ children }) => (
-  <span style={{ fontWeight: 'normal' }}>{children}</span>
-)
+const Light = ({ children }) => <span style={{ fontWeight: 'normal' }}>{children}</span>
 
 Light.propTypes = {
   children: node.isRequired
@@ -50,14 +48,7 @@ EmailHeader.propTypes = {
   to: string
 }
 
-const EmailPreview = ({
-  userEmail,
-  isLoading,
-  error,
-  subject,
-  html,
-  onPreviewRequested
-}) => {
+const EmailPreview = ({ userEmail, isLoading, error, subject, html, onPreviewRequested }) => {
   useEffect(() => {
     onPreviewRequested()
   }, [])
@@ -71,13 +62,7 @@ const EmailPreview = ({
         height={isLoading ? '200px' : undefined}
         style={{ background: '#f7f7f7' }}
       >
-        {error && (
-          <Message
-            error
-            header="Could not get email preview"
-            list={[error]}
-          />
-        )}
+        {error && <Message error header="Could not get email preview" list={[error]} />}
         {!isLoading && !error && (
           <iframe
             sandbox=""

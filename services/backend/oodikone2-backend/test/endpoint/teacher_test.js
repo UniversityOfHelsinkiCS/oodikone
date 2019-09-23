@@ -25,10 +25,8 @@ test.after.always(async () => {
   await sequelize.dropSchema(schema)
 })
 
-
 test('should pong when pinged', async t => {
-  const res = await api
-    .get('/ping')
+  const res = await api.get('/ping')
 
   t.is(res.status, 200)
   t.deepEqual(res.body, { data: 'pong' })

@@ -40,7 +40,7 @@ class TeacherLeaderBoard extends Component {
     callApi('/teachers/top', 'post', { startyearcode: selectedyear, endyearcode: selectedyear + 1 }, null)
   }
 
-  updateAndSubmitForm = (args) => {
+  updateAndSubmitForm = args => {
     this.setState({ recalculating: false, ...args })
     const { selectedyear, selectedcategory } = { ...this.state, ...args }
     this.props.getTopTeachers(selectedyear, selectedcategory)
@@ -51,57 +51,57 @@ class TeacherLeaderBoard extends Component {
   render() {
     const { statistics, updated, isLoading, yearoptions, categoryoptions } = this.props
     const { selectedcategory, selectedyear, recalculating } = this.state
-    const filterYearoptions = yearoptions.filter((year) => {
-      const options = moment(new Date())
-        .diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0 ?
-        year.text.slice(0, 4) <= new Date().getFullYear() :
-        year.text.slice(0, 4) < new Date().getFullYear()
+    const filterYearoptions = yearoptions.filter(year => {
+      const options =
+        moment(new Date()).diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0
+          ? year.text.slice(0, 4) <= new Date().getFullYear()
+          : year.text.slice(0, 4) < new Date().getFullYear()
       return options
     })
     return (
       <div>
-        {isLoading
-          ? <Segment basic loading={isLoading} />
-          : (
-            <div>
-              <Message>
-                <Message.Header>Teacher leaderboard</Message.Header>
-                Teachers who have produced the most credits from all departments.
-              </Message>
-              <LeaderForm
-                yearoptions={filterYearoptions}
-                categoryoptions={categoryoptions}
-                handleChange={this.handleChange}
-                updateAndSubmitForm={this.updateAndSubmitForm}
-                selectedcategory={selectedcategory}
-                selectedyear={selectedyear}
+        {isLoading ? (
+          <Segment basic loading={isLoading} />
+        ) : (
+          <div>
+            <Message>
+              <Message.Header>Teacher leaderboard</Message.Header>
+              Teachers who have produced the most credits from all departments.
+            </Message>
+            <LeaderForm
+              yearoptions={filterYearoptions}
+              categoryoptions={categoryoptions}
+              handleChange={this.handleChange}
+              updateAndSubmitForm={this.updateAndSubmitForm}
+              selectedcategory={selectedcategory}
+              selectedyear={selectedyear}
+            />
+            <Segment>
+              <Message>{`Last updated: ${updated}`}</Message>
+              <Popup
+                trigger={
+                  <Button
+                    disabled={recalculating}
+                    content="Recalculate this year"
+                    onClick={() => {
+                      this.refresh()
+                    }}
+                  />
+                }
+                content="Recalculation started. Recalculation might take multiple minutes. Refresh page to see the results"
+                on="click"
+                open={this.state.isOpen}
+                onClose={this.handleClose}
+                onOpen={this.handleOpen}
               />
-              <Segment>
-                <Message>
-                  {`Last updated: ${updated}`}
-                </Message>
-                <Popup
-                  trigger={
-                    <Button
-                      disabled={recalculating}
-                      content="Recalculate this year"
-                      onClick={() => { this.refresh() }}
-                    />}
-                  content="Recalculation started. Recalculation might take multiple minutes. Refresh page to see the results"
-                  on="click"
-                  open={this.state.isOpen}
-                  onClose={this.handleClose}
-                  onOpen={this.handleOpen}
-                />
 
-                <TeacherStatisticsTable
-                  statistics={statistics}
-                  onClickFn={id => this.props.history.push(`/teachers/${id}`)}
-                />
-              </Segment>
-            </div>
-          )
-        }
+              <TeacherStatisticsTable
+                statistics={statistics}
+                onClickFn={id => this.props.history.push(`/teachers/${id}`)}
+              />
+            </Segment>
+          </div>
+        )}
       </div>
     )
   }
@@ -132,7 +132,8 @@ const mapStateToProps = ({ teachersTop, teachersTopCategories }) => {
         key: yearcode,
         value: yearcode,
         text: yearname
-      })).sort((y1, y2) => y2.value - y1.value),
+      }))
+      .sort((y1, y2) => y2.value - y1.value),
     categoryoptions: Object.values(categories).map(({ id, name }) => ({
       key: id,
       value: id,
@@ -141,7 +142,10 @@ const mapStateToProps = ({ teachersTop, teachersTopCategories }) => {
   }
 }
 
-export default connect(mapStateToProps, {
-  getTopTeachersCategories,
-  getTopTeachers
-})(withRouter(TeacherLeaderBoard))
+export default connect(
+  mapStateToProps,
+  {
+    getTopTeachersCategories,
+    getTopTeachers
+  }
+)(withRouter(TeacherLeaderBoard))

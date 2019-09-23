@@ -6,32 +6,32 @@ import Population from './Population'
 import SuggestCourseGraph from './SuggestCourseGraph'
 
 class ContentTabs extends Component {
-    state={}
+  state = {}
 
-    render() {
-      return (
-        <Tab
-          panes={[
-            {
-              menuItem: 'Courses',
-              render: () => <Course />
-            },
-            {
-              menuItem: 'Population',
-              render: () => <Population />
-            },
-            {
-              menuItem: 'Student',
-              render: () => <Student />
-            },
-            {
-              menuItem: 'Route',
-              render: () => <SuggestCourseGraph />
-            }
-          ]}
-        />
-      )
-    }
+  render() {
+    return (
+      <Tab
+        panes={[
+          {
+            menuItem: 'Courses',
+            render: () => <Course />
+          },
+          {
+            menuItem: 'Population',
+            render: () => <Population />
+          },
+          {
+            menuItem: 'Student',
+            render: () => <Student />
+          },
+          {
+            menuItem: 'Route',
+            render: () => <SuggestCourseGraph />
+          }
+        ]}
+      />
+    )
+  }
 }
 
 export default ContentTabs

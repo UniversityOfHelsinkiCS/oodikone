@@ -26,23 +26,28 @@ class ErrorMessage extends Component {
   }
 
   render() {
-    const {
-      code, message, url, translate
-    } = this.props
+    const { code, message, url, translate } = this.props
     return (
       <Message error onDismiss={this.handleDismiss}>
         <Message.Header>{translate('error.connectionError')}</Message.Header>
-        <p>{translate('error.errorInResponseTo')}: {url}</p>
-        <code>{code} – {message}</code>
-      </Message>)
+        <p>
+          {translate('error.errorInResponseTo')}: {url}
+        </p>
+        <code>
+          {code} – {message}
+        </code>
+      </Message>
+    )
   }
 }
 
 const mapStateToProps = () => ({})
 
 const mapDispatchToProps = dispatch => ({
-  removeError: uuid =>
-    dispatch(removeError(uuid))
+  removeError: uuid => dispatch(removeError(uuid))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(ErrorMessage)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ErrorMessage)

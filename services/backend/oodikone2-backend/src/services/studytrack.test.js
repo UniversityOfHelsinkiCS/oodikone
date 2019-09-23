@@ -22,7 +22,9 @@ const studytrack = 'MH50_010'
 
 const thesisCourse = {
   // from studytrack.test.sql
-  programmeCode: 'MH50_010', courseCode: 'THESIS_01', thesisType: MASTER
+  programmeCode: 'MH50_010',
+  courseCode: 'THESIS_01',
+  thesisType: MASTER
 }
 
 beforeAll(async () => {
@@ -125,15 +127,11 @@ test('findGraduated does return graduated studyrights from other studytracks', a
 })
 
 test('graduatedStatsFromStudyrights calculates stats correctly', () => {
-  const studyrights = [
-    { year: 2015 },
-    { year: 2015 },
-    { year: 2014 }
-  ]
+  const studyrights = [{ year: 2015 }, { year: 2015 }, { year: 2014 }]
   const stats = graduatedStatsFromStudyrights(studyrights)
   expect(stats).toMatchObject({
-    2015: { graduated: 2. },
-    2014: { graduated: 1. }
+    2015: { graduated: 2 },
+    2014: { graduated: 1 }
   })
 })
 
