@@ -1,24 +1,16 @@
 import React, { Fragment } from 'react'
 import moment from 'moment'
-import { Header, Table, Button, Grid, Icon, Label, Segment } from 'semantic-ui-react'
+import { Header, Table, Grid, Icon, Label, Segment } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, func } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { flatten, uniq } from 'lodash'
-import { callApi } from '../../../apiConnection'
 import { getThroughput } from '../../../redux/throughput'
 import { getUserRoles } from '../../../common'
+import InfoBox from '../../InfoBox'
+import infotooltips from '../../../common/InfoToolTips'
 
-const ThroughputTable = ({
-  history,
-  throughput,
-  thesis,
-  loading,
-  error,
-  studyprogramme,
-  dispatchGetThroughput,
-  userRoles
-}) => {
+const ThroughputTable = ({ history, throughput, thesis, loading, error, studyprogramme, userRoles }) => {
   const showPopulationStatistics = yearLabel => {
     const year = Number(yearLabel.slice(0, 4))
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
@@ -40,11 +32,6 @@ const ThroughputTable = ({
   let thesisTypes = []
   if (thesis) {
     thesisTypes = thesis.map(t => t.thesisType)
-  }
-  const refresh = () => {
-    callApi('/v2/studyprogrammes/throughput/recalculate', 'get', null, { code: studyprogramme }).then(() => {
-      dispatchGetThroughput(studyprogramme)
-    })
   }
 
   const renderStudentsHeader = () => {
@@ -90,9 +77,7 @@ const ThroughputTable = ({
               )}
             </Grid.Column>
             <Grid.Column>
-              <Button floated="right" onClick={refresh}>
-                Recalculate
-              </Button>
+              <InfoBox content={infotooltips.PopulationOverview.Overview} />
             </Grid.Column>
           </Grid.Row>
         </Grid>
@@ -241,7 +226,6 @@ ThroughputTable.propTypes = {
     })
   ),
   studyprogramme: string.isRequired,
-  dispatchGetThroughput: func.isRequired,
   loading: bool.isRequired,
   error: bool.isRequired,
   history: shape({

@@ -1,12 +1,11 @@
 import React from 'react'
 import moment from 'moment'
-import { Table, Header, Button, Grid, Label, Segment } from 'semantic-ui-react'
+import { Table, Header, Grid, Label, Segment } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { shape, number, arrayOf, bool, string, func, oneOfType } from 'prop-types'
-import { callApi } from '../../../apiConnection'
+import { shape, number, arrayOf, bool, string, oneOfType } from 'prop-types'
 import { getProductivity } from '../../../redux/productivity'
 
-const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramme, dispatchGetProductivity }) => {
+const ProductivityTable = ({ productivity, thesis, loading, error }) => {
   if (error) return <h1>Oh no so error {error}</h1>
   let thesisTypes = []
   if (thesis) {
@@ -22,11 +21,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
     'Credits for non major students',
     'Hyväksiluettu (not included in Credits column)'
   ].filter(_ => _)
-  const refresh = () => {
-    callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, { code: studyprogramme }).then(() => {
-      dispatchGetProductivity(studyprogramme)
-    })
-  }
+
   return (
     <React.Fragment>
       <Header>
@@ -46,11 +41,6 @@ const ProductivityTable = ({ productivity, thesis, loading, error, studyprogramm
                   )}
                 </Header.Subheader>
               )}
-            </Grid.Column>
-            <Grid.Column>
-              <Button floated="right" onClick={refresh}>
-                Recalculate
-              </Button>
             </Grid.Column>
           </Grid.Row>
         </Grid>
@@ -113,8 +103,6 @@ ProductivityTable.propTypes = {
       updatedAt: string
     })
   ),
-  studyprogramme: string.isRequired,
-  dispatchGetProductivity: func.isRequired,
   loading: bool.isRequired,
   error: bool.isRequired
 }
