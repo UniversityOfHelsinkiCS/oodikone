@@ -1,3 +1,3 @@
 export default {
-  Overview: 'lorem ipsum'
+  Overview: 'Tämä koontisivu sisältää koulutusohjelman vuosikurssien perustiedot. Mustista nuolista voi siirtyä tarkastelemaan tietyn vuosikurssin tarkempia tietoja.'
 }
