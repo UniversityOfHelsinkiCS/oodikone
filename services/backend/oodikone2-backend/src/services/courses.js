@@ -709,7 +709,7 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
     Math.floor(
       1200 / // Lower this value to get a smaller result if necessary
         (yearlyStudents.reduce((acc, curr) => acc + curr, 0) / yearlyStudents.length)
-    ) || 100
+    )
 
   return maxYearsToCreatePopulationFrom
 }
