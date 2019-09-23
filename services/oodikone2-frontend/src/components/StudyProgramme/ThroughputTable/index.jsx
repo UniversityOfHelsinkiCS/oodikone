@@ -15,7 +15,11 @@ const PopulationStatisticsLink = ({ studyprogramme, year: yearLabel, children })
   const href =
     `/populations?months=${months}&semesters=FALL&semesters=` +
     `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`
-  return <Link to={href}>{children}</Link>
+  return (
+    <Link title={`Population statistics of class ${yearLabel}`} to={href}>
+      {children}
+    </Link>
+  )
 }
 
 PopulationStatisticsLink.propTypes = {
