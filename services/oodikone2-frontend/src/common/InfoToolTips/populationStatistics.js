@@ -49,7 +49,9 @@ export default {
     ExtentGraduated: `Suodattaa opiskelijat, jotka ovat/eivät ole valmistuneet.`,
     TransferFilter: `Voit valita opiskelijat, jotka ovat vaihtaneet annetusta koulutusohjelmasta toiseen.
       Vaihtaminen tarkoittaa sitä, kun opiskelija vaihtaa koulutusohjelmaansa kesken opinto-oikeutensa.
-      (eikä opiskelijaa joka saa opinto-oikeuden joltakin toiselta instituutiolta)`
+      (eikä opiskelijaa joka saa opinto-oikeuden joltakin toiselta instituutiolta)`,
+    PriorityStudyright: ``,
+    TransferToStudyrightFilter: ``
   },
   CreditAccumulationGraph: `Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina. Kun
     hiiren vie kuvaajien päälle, saa näkyviin jokaista kuvaajaa vastaavan opiskelijanumeron. Opiskelijanumeron
