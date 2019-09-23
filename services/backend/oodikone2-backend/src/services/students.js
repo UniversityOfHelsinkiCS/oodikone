@@ -80,23 +80,23 @@ const byId = async id => {
   return student
 }
 
-const findByCourseAndSemesters = async (coursecodes, yearcode) =>
+const findByCourseAndSemesters = async (coursecodes, from, to) =>
   sequelize
     .query(
       `
-    SELECT
-      studentnumber, credit.course_code, attainment_date
-    FROM student
-    INNER JOIN credit ON
-      student.studentnumber=credit.student_studentnumber
-    WHERE
-      course_code IN (:coursecodes) AND
-      attainment_date
-    BETWEEN
-      (select startdate FROM semesters where yearcode=:yearcode ORDER BY semestercode LIMIT 1) AND
-      (select enddate FROM semesters where yearcode=:yearcode ORDER BY semestercode DESC LIMIT 1);
-  `,
-      { replacements: { coursecodes, yearcode }, type: sequelize.QueryTypes.SELECT }
+  SELECT
+    studentnumber, credit.course_code, attainment_date
+  FROM student
+  INNER JOIN credit ON
+    student.studentnumber=credit.student_studentnumber
+  WHERE
+    course_code IN (:coursecodes) AND
+    attainment_date
+  BETWEEN
+    (select startdate FROM semesters where yearcode=:minYearCode ORDER BY semestercode LIMIT 1) AND
+    (select enddate FROM semesters where yearcode=:maxYearCode ORDER BY semestercode DESC LIMIT 1);
+`,
+      { replacements: { coursecodes, minYearCode: from, maxYearCode: to }, type: sequelize.QueryTypes.SELECT }
     )
     .map(st => st.studentnumber)
 

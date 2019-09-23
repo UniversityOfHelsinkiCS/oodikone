@@ -305,18 +305,6 @@ ALTER TABLE mandatory_course_labels_id_seq OWNER TO postgres;
 
 ALTER SEQUENCE mandatory_course_labels_id_seq OWNED BY mandatory_course_labels.id;
 
-
---
--- Name: migrations; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE migrations (
-    name character varying(255) NOT NULL
-);
-
-
-ALTER TABLE migrations OWNER TO postgres;
-
 --
 -- Name: organization; Type: TABLE; Schema: public; Owner: postgres
 --
