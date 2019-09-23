@@ -1,24 +1,31 @@
 import React, { Fragment } from 'react'
 import moment from 'moment'
 import { Header, Table, Grid, Icon, Label, Segment } from 'semantic-ui-react'
-import { shape, number, arrayOf, bool, string, func } from 'prop-types'
+import { shape, number, arrayOf, bool, string, func, node } from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import { flatten, uniq } from 'lodash'
 import { getThroughput } from '../../../redux/throughput'
 import { getUserRoles } from '../../../common'
 import InfoBox from '../../InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
 
+const PopulationStatisticsLink = ({ studyprogramme, year: yearLabel, children }) => {
+  const year = Number(yearLabel.slice(0, 4))
+  const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
+  const href =
+    `/populations?months=${months}&semesters=FALL&semesters=` +
+    `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`
+  return <Link to={href}>{children}</Link>
+}
+
+PopulationStatisticsLink.propTypes = {
+  studyprogramme: string.isRequired,
+  year: string.isRequired,
+  children: node.isRequired
+}
+
 const ThroughputTable = ({ history, throughput, thesis, loading, error, studyprogramme, userRoles }) => {
-  const showPopulationStatistics = yearLabel => {
-    const year = Number(yearLabel.slice(0, 4))
-    const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
-    history.push(
-      `/populations?months=${months}&semesters=FALL&semesters=` +
-        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`
-    )
-  }
   if (error) return <h1>Oh no so error {error}</h1>
   const GRADUATED_FEATURE_TOGGLED_ON = userRoles.includes('dev')
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
@@ -126,7 +133,9 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 <Table.Row key={year.year}>
                   <Table.Cell>
                     {year.year}
-                    <Icon name="level up alternate" onClick={() => showPopulationStatistics(year.year)} />
+                    <PopulationStatisticsLink studyprogramme={studyprogramme} year={year.year}>
+                      <Icon name="level up alternate" />
+                    </PopulationStatisticsLink>
                   </Table.Cell>
                   <Table.Cell>{year.credits.length}</Table.Cell>
                   {genders.map(gender => (
