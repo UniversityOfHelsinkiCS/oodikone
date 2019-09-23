@@ -1,9 +1,19 @@
 const { CronJob } = require('cron')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
-const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studytrack')
+const {
+  productivityStatsForStudytrack,
+  throughputStatsForStudytrack,
+  defaultStudyTrackSince
+} = require('./services/studytrack')
 const { calculateFacultyYearlyStats } = require('./services/faculties')
-const { setProductivity, setThroughput, patchProductivity, patchThroughput, patchFacultyYearlyStats } = require('./services/analyticsService')
+const {
+  setProductivity,
+  setThroughput,
+  patchProductivity,
+  patchThroughput,
+  patchFacultyYearlyStats
+} = require('./services/analyticsService')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
@@ -34,35 +44,23 @@ const refreshOverview = async () => {
     for (const code of codes) {
       try {
         await patchThroughput({ [code]: { status: 'RECALCULATING' } })
-        const since = new Date().getFullYear() - 5
-        const data = await throughputStatsForStudytrack(
-          code,
-          since
-        )
-        await setThroughput(
-          data
-        )
+        const since = defaultStudyTrackSince()
+        const data = await throughputStatsForStudytrack(code, since)
+        await setThroughput(data)
       } catch (e) {
         try {
           await patchThroughput({ [code]: { status: 'RECALCULATION ERRORED' } })
         } catch (e) {
-          console.error(
-            e
-          )
+          console.error(e)
         }
         console.error(e)
-        console.log(
-          `Failed to update throughput stats for code: ${code}, reason: ${
-            e.message
-          }`
-        )
+        console.log(`Failed to update throughput stats for code: ${code}, reason: ${e.message}`)
       }
       try {
         await patchProductivity({ [code]: { status: 'RECALCULATING' } })
         const since = '2017-08-01'
         const data = await productivityStatsForStudytrack(code, since)
         await setProductivity(data)
-
       } catch (e) {
         try {
           await patchProductivity({
@@ -75,11 +73,7 @@ const refreshOverview = async () => {
         console.log(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
       }
       ready += 1
-      console.log(
-        `RefreshOverview ${ready}/${
-          codes.length
-        } done`
-      )
+      console.log(`RefreshOverview ${ready}/${codes.length} done`)
     }
   } catch (e) {
     console.error(e)

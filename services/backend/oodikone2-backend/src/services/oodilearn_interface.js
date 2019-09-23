@@ -13,9 +13,9 @@ const query = query => instance.get(query)
 
 const getStudentData = studentnumber => instance.get(`/student/${studentnumber}`)
 
-const getStudentsData = studentnumbers => instance.get('/students/',{ params: { 'student': studentnumbers } })
+const getStudentsData = studentnumbers => instance.get('/students/', { params: { student: studentnumbers } })
 
-const getCourseData = gradeStudents => instance.get('/averages/',{ params: gradeStudents })
+const getCourseData = gradeStudents => instance.get('/averages/', { params: gradeStudents })
 
 const getStudents = async numbers => {
   console.log(numbers)
@@ -23,18 +23,19 @@ const getStudents = async numbers => {
   const datas = request.data
   console.log(datas)
   const students = {}
-  datas.forEach((student) => {
+  datas.forEach(student => {
     const formattedStudent = { ...student, studentnumber: `0${student.Opiskelijanumero}` }
     delete formattedStudent.Opiskelijanumero
     students[formattedStudent.studentnumber] = formattedStudent
   })
   return students
 }
-const getCluster = (code) => instance.get(`/${code}`)
+const getCluster = code => instance.get(`/${code}`)
 
 const getPopulationData = population => instance.get(`/groups/${population}`)
 
-const getCourseSuggestion = (doneCourses, period) => instance.get('suggest_new_course', { params: { 'doneCourses': doneCourses, 'period': period } })
+const getCourseSuggestion = (doneCourses, period) =>
+  instance.get('suggest_new_course', { params: { doneCourses: doneCourses, period: period } })
 
 const getRouteSuggestion = () => instance.get('suggest_route_to_graduation')
 

@@ -2,42 +2,64 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Progress } from 'semantic-ui-react'
 import { intersection, orderBy } from 'lodash'
-import { shape, func, bool, arrayOf, string } from 'prop-types'
+import { shape, func, bool, arrayOf, string, number } from 'prop-types'
 
 import SearchResultTable from '../SearchResultTable'
 import { gradeFilter } from '../../populationFilters'
 import { setPopulationFilter } from '../../redux/populationFilters'
 
-const CoursePopulationCreditDist = ({ singleCourseStats, yearcode, pending, selectedStudents, setPopulationFilterDispatch }) => {
+const CoursePopulationCreditDist = ({
+  singleCourseStats,
+  yearcodes,
+  pending,
+  selectedStudents,
+  setPopulationFilterDispatch
+}) => {
   const [courseGrades, setGrades] = useState([])
   useEffect(() => {
     if (singleCourseStats.statistics) {
       const array = []
-      const statistics = singleCourseStats.statistics.find(stats => stats.code === Number(yearcode))
-      const grades = statistics ? Object.keys(statistics.students.grades) : []
-      grades.forEach((grade) => {
-        const filteredGrades = intersection(selectedStudents, statistics.students.grades[grade])
+      const statisticsInRange = singleCourseStats.statistics.filter(stats => yearcodes.includes(stats.code))
+      const grades = statisticsInRange.reduce((res, curr) => {
+        const currGrades = curr.students.grades
+        Object.entries(currGrades).forEach(([grade, students]) => {
+          if (!res[grade]) res[grade] = []
+          res[grade].push(...students)
+        })
+        return res
+      }, {})
+
+      Object.keys(grades).forEach(grade => {
+        const filteredGrades = intersection(selectedStudents, grades[grade])
         array.push({ grade, amount: filteredGrades.length })
       })
       setGrades(array)
     }
   }, [pending, selectedStudents])
-  const setFilter = (row) => {
-    setPopulationFilterDispatch(gradeFilter({ grade: row[0], coursecodes: singleCourseStats.alternatives, coursename: singleCourseStats.name }))
+  const setFilter = row => {
+    setPopulationFilterDispatch(
+      gradeFilter({ grade: row[0], coursecodes: singleCourseStats.alternatives, coursename: singleCourseStats.name })
+    )
   }
 
-  const sortedCourseGrades = orderBy(courseGrades, (e) => {
-    if (Number(e.grade)) {
-      return `_${e.grade}`
-    }
-    return e.grade
-  }, ['desc'])
-  const rows = sortedCourseGrades.map(g => [`${g.grade}`, g.amount, <Progress style={{ margin: '0px' }} percent={Math.round((g.amount / selectedStudents.length) * 100)} progress />])
-  const headers = [
-    'Grades',
-    `Students (all=${selectedStudents.length})`,
-    'Percentage of population'
-  ]
+  const totalAmount = courseGrades.reduce((acc, curr) => acc + curr.amount, 0)
+
+  const sortedCourseGrades = orderBy(
+    courseGrades,
+    e => {
+      if (Number(e.grade)) {
+        return `_${e.grade}`
+      }
+      return e.grade
+    },
+    ['desc']
+  )
+  const rows = sortedCourseGrades.map(g => [
+    `${g.grade}`,
+    g.amount,
+    <Progress style={{ margin: '0px' }} percent={Math.round((g.amount / totalAmount) * 100)} progress />
+  ])
+  const headers = ['Grades', `Students (all=${selectedStudents.length})`, 'Percentage of population']
 
   return (
     <SearchResultTable
@@ -45,14 +67,14 @@ const CoursePopulationCreditDist = ({ singleCourseStats, yearcode, pending, sele
       rows={rows}
       selectable
       rowClickFn={(e, row) => setFilter(row)}
-      noResultText="placeholder"
+      noResultText="no data available"
     />
   )
 }
 
 CoursePopulationCreditDist.propTypes = {
   singleCourseStats: shape({}).isRequired,
-  yearcode: string.isRequired,
+  yearcodes: arrayOf(number).isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   setPopulationFilterDispatch: func.isRequired
@@ -64,6 +86,9 @@ const mapStateToProps = ({ singleCourseStats, populationFilters }) => ({
   filters: populationFilters.filters.filter(f => f.type === 'GradeFilter')
 })
 
-export default connect(mapStateToProps, {
-  setPopulationFilterDispatch: setPopulationFilter
-})(CoursePopulationCreditDist)
+export default connect(
+  mapStateToProps,
+  {
+    setPopulationFilterDispatch: setPopulationFilter
+  }
+)(CoursePopulationCreditDist)

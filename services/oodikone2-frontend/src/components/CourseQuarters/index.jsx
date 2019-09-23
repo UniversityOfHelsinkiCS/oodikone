@@ -6,7 +6,7 @@ import { func, arrayOf, object } from 'prop-types'
 import SearchResultTable from '../SearchResultTable'
 import { getStudentTotalCredits } from '../../common'
 
-const getStudentSampleInSplitQuarters = (students) => {
+const getStudentSampleInSplitQuarters = students => {
   const sortedStudents = sortBy(students, student => getStudentTotalCredits(student))
   const quarterSize = Math.floor(sortedStudents.length / 4)
   return [
@@ -17,7 +17,7 @@ const getStudentSampleInSplitQuarters = (students) => {
   ]
 }
 
-const getValues = (students) => {
+const getValues = students => {
   const creditsList = students.map(student => getStudentTotalCredits(student))
 
   const n2z = value => (isNaN(value) ? 0 : value) // eslint-disable-line
@@ -32,10 +32,12 @@ const getValues = (students) => {
   }
 }
 
-const getCreditStatsForTable = (students, studentsInQuarters) =>
-  [getValues(students), ...studentsInQuarters.map(s => getValues(s))]
+const getCreditStatsForTable = (students, studentsInQuarters) => [
+  getValues(students),
+  ...studentsInQuarters.map(s => getValues(s))
+]
 
-const CourseQuarters = (props) => {
+const CourseQuarters = props => {
   const { translate, sample } = props
 
   const quarters = getStudentSampleInSplitQuarters(sample)
@@ -59,14 +61,7 @@ const CourseQuarters = (props) => {
     ['standardDeviation', ...stats.map(stat => stat.standardDeviation)]
   ]
 
-  return (
-    <SearchResultTable
-      headers={headers}
-      rows={rows}
-      noResultText={translate('common.noResults')}
-      definition
-    />
-  )
+  return <SearchResultTable headers={headers} rows={rows} noResultText={translate('common.noResults')} definition />
 }
 
 CourseQuarters.propTypes = {

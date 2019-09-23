@@ -5,12 +5,14 @@ const LogSaverTransport = require('./logSaver')
 const transports = []
 
 if (process.env.LOG_PORT && process.env.LOG_HOST) {
-  transports.push(new Log2gelf({
-    hostname: process.env.LOG_HOSTNAME || 'oodikone-backend',
-    host: process.env.LOG_HOST,
-    port: process.env.LOG_PORT,
-    protocol: 'http'
-  }))
+  transports.push(
+    new Log2gelf({
+      hostname: process.env.LOG_HOSTNAME || 'oodikone-backend',
+      host: process.env.LOG_HOST,
+      port: process.env.LOG_PORT,
+      protocol: 'http'
+    })
+  )
 }
 
 if (process.env.NODE_ENV !== 'test') {

@@ -3,19 +3,11 @@ import { Segment } from 'semantic-ui-react'
 import { shape, number, string } from 'prop-types'
 import Highcharts from 'highcharts'
 import addHighchartsMore from 'highcharts/highcharts-more'
-import {
-  HighchartsChart, withHighcharts, XAxis, YAxis, Pane, AreaSeries, Title, Tooltip
-} from 'react-jsx-highcharts'
+import { HighchartsChart, withHighcharts, XAxis, YAxis, Pane, AreaSeries, Title, Tooltip } from 'react-jsx-highcharts'
 
 addHighchartsMore(Highcharts)
 
-const CATEGORIES = [
-  'Deep',
-  'Burnout',
-  'Surface',
-  'Organized',
-  'Self-efficacy'
-]
+const CATEGORIES = ['Deep', 'Burnout', 'Surface', 'Organized', 'Self-efficacy']
 
 const ProfileSpiderGraph = ({ profile: p, title }) => {
   const data = [p.Deep, p.SBI, p.Surface, p.Organised, p.SE]

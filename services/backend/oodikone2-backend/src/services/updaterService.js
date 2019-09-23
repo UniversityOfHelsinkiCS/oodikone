@@ -9,12 +9,12 @@ const ping = async () => {
   return response.data
 }
 
-const updateStudents = async (studentNumbers) => {
+const updateStudents = async studentNumbers => {
   const response = await client.post('/update', studentNumbers)
   return response.data
 }
 
-const updateOldestStudents = async (amount) => {
+const updateOldestStudents = async amount => {
   const response = await client.post('/update/oldest', { amount })
   return response.data
 }

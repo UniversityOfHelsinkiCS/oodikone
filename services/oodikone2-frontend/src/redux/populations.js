@@ -9,12 +9,27 @@ const initialState = {
 }
 
 export const getPopulationStatistics = ({
-  endYear, semesters, studentStatuses, studyRights, months, uuid, tag, startYear, onProgress
+  endYear,
+  semesters,
+  studentStatuses,
+  studyRights,
+  months,
+  uuid,
+  tag,
+  startYear,
+  onProgress
 }) => {
   const route = tag === '' ? '/v3/populationstatistics/' : '/v3/populationstatisticsbytag'
   const prefix = 'GET_POPULATION_STATISTICS_'
   const query = {
-    endYear, semesters, studentStatuses, studyRights, uuid, months, tag, startYear
+    endYear,
+    semesters,
+    studentStatuses,
+    studyRights,
+    uuid,
+    months,
+    tag,
+    startYear
   }
   const params = {
     endYear,
@@ -28,11 +43,11 @@ export const getPopulationStatistics = ({
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }
 
-export const getCoursePopulation = ({ coursecodes, yearcode, onProgress }) => {
+export const getCoursePopulation = ({ coursecodes, from, to, onProgress }) => {
   const route = '/v3/populationstatisticsbycourse'
   const prefix = 'GET_STUDENTS_OF_COURSE_'
-  const params = { coursecodes, yearcode }
-  const query = { coursecodes, yearcode, studyRights: { programme: 'KH555' } } // why is programme defined to some garbo?
+  const params = { coursecodes, from, to }
+  const query = { coursecodes, from, to, studyRights: { programme: 'KH555' } } // why is programme defined to some garbo?
 
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }
@@ -46,7 +61,7 @@ export const getCustomPopulation = ({ studentnumberlist, onProgress }) => {
   return callController(route, prefix, body, 'post', query, params, onProgress)
 }
 
-export const updatePopulationStudents = (students) => {
+export const updatePopulationStudents = students => {
   const route = '/updatedatabase'
   const prefix = 'UPDATE_POPULATION_STUDENTS_'
 

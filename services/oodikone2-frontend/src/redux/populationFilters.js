@@ -35,14 +35,14 @@ export const refreshFilters = () => ({
   type: 'REFRESH_FILTERS'
 })
 
-export const savePopulationFilters = (preset) => {
+export const savePopulationFilters = preset => {
   const route = '/v2/populationstatistics/filters'
   const prefix = 'SAVE_FILTER_'
   const data = preset
   const method = 'post'
   return callController(route, prefix, data, method)
 }
-export const deletePopulationFilter = (preset) => {
+export const deletePopulationFilter = preset => {
   const route = '/v2/populationstatistics/filters'
   const prefix = 'DELETE_FILTER_'
   const data = preset
@@ -81,16 +81,18 @@ const reducer = (state = initial, action) => {
         refreshNeeded: true
       }
     case 'REMOVE_POPULATION_FILTER_OF_COURSE': {
-      const notRemoved = (filter) => {
+      const notRemoved = filter => {
         if (filter.type !== 'CourseParticipation') {
           return true
         }
         const { course } = filter.params.course
 
-        return (course.name.fi !== action.course.name.fi &&
-          course.name.en !== action.course.name.en &&
-          course.name.sv !== action.course.name.sv) ||
+        return (
+          (course.name.fi !== action.course.name.fi &&
+            course.name.en !== action.course.name.en &&
+            course.name.sv !== action.course.name.sv) ||
           course.code !== action.course.code
+        )
       }
       return {
         ...state,

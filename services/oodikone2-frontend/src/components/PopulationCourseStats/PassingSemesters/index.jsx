@@ -19,6 +19,7 @@ export default class PassingSemesters extends Component {
   }
 
   handleChange = () => {
+    // eslint-disable-next-line react/no-access-state-in-setstate
     this.setState({ cumulativeStats: !this.state.cumulativeStats })
   }
 

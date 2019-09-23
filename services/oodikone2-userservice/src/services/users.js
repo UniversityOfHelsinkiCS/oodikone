@@ -33,7 +33,7 @@ const generateToken = async (uid, mockedBy = null) => {
     rights: programmes,
     roles: user.accessgroup,
     createdAt: moment().toISOString(),
-    version: TOKEN_VERSION,
+    version: TOKEN_VERSION
   }
   const token = jwt.sign(payload, process.env.TOKEN_SECRET)
 
@@ -51,28 +51,34 @@ const createMissingGroups = async (group, service) => {
 }
 
 const updateGroups = async (user, affiliations, hyGroups) => {
-  let affiliationsToBeUpdated = (await user.getAffiliation()).map(af => af.code)
+  let affiliationsToBeUpdated = (await user.getAffiliation()).map(
+    af => af.code
+  )
   let affiliationsToAdd = []
   let affiliationsToDelete = []
 
-  affiliations.forEach(async (affilitation) => {
+  affiliations.forEach(async affilitation => {
     if (!affiliationsToBeUpdated.includes(affilitation)) {
       affiliationsToAdd = affiliationsToAdd.concat(affilitation)
     }
   })
   affiliationsToBeUpdated.forEach(async affilitation => {
     if (!affiliations.includes(affilitation)) {
-      affiliationsToDelete  = affiliationsToDelete.concat(affilitation)
+      affiliationsToDelete = affiliationsToDelete.concat(affilitation)
     }
   })
-  await user.addAffiliation(await AffiliationService.byCodes(affiliationsToAdd))
-  await user.removeAffiliation(await AffiliationService.byCodes(affiliationsToDelete))
+  await user.addAffiliation(
+    await AffiliationService.byCodes(affiliationsToAdd)
+  )
+  await user.removeAffiliation(
+    await AffiliationService.byCodes(affiliationsToDelete)
+  )
 
   let hyGroupsToBeUpdated = (await user.getHy_group()).map(hg => hg.code)
   let hyGroupsToAdd = []
   let hyGroupsToDelete = []
 
-  hyGroups.forEach(async (hyGroup) => {
+  hyGroups.forEach(async hyGroup => {
     if (!hyGroupsToBeUpdated.includes(hyGroup)) {
       hyGroupsToAdd = hyGroupsToAdd.concat(hyGroup)
     }
@@ -111,8 +117,7 @@ const login = async (uid, full_name, hyGroups, affiliations, mail) => {
   console.log('Generating token')
   const token = await generateToken(uid)
   console.log('Token done')
-  return ({ token, isNew })
-
+  return { token, isNew }
 }
 const superlogin = async (uid, asUser) => {
   const user = await byUsername(uid)
@@ -156,12 +161,14 @@ const getUserData = user => {
   if (user == null) return null
   const newuser = user.get()
   newuser.elementdetails = getUserProgrammes(newuser)
-  newuser.is_enabled = requiredGroup === null || newuser.hy_group.some(e => e.code === requiredGroup)
+  newuser.is_enabled =
+    requiredGroup === null ||
+    newuser.hy_group.some(e => e.code === requiredGroup)
   newuser.hy_group = null
   return newuser
 }
 
-const byUsername = async (username) => {
+const byUsername = async username => {
   const user = await User.findOne({
     where: {
       username: {
@@ -185,8 +192,7 @@ const updateUser = async (userObject, values) => {
   return userObject.update(values)
 }
 
-
-const byId = async (id) => {
+const byId = async id => {
   const user = await User.findOne({
     where: {
       id: {
@@ -199,7 +205,10 @@ const byId = async (id) => {
 }
 
 const getUserProgrammes = user => {
-  const elementdetails = [...user.programme.map(p => p.elementDetailCode), ...flatMap(user.faculty, f => f.programme.map(p => p.programme_code))]
+  const elementdetails = [
+    ...user.programme.map(p => p.elementDetailCode),
+    ...flatMap(user.faculty, f => f.programme.map(p => p.programme_code))
+  ]
   return elementdetails
 }
 const getUserAccessGroups = async username => {
@@ -209,7 +218,7 @@ const getUserAccessGroups = async username => {
 
 const findAll = async () => {
   const users = await User.findAll({
-    include: userIncludes,
+    include: userIncludes
   })
   return users
 }
@@ -222,7 +231,9 @@ const addProgrammes = async (uid, codes) => {
 
 const removeProgrammes = async (uid, codes) => {
   for (const code of codes) {
-    await UserElementDetails.destroy({ where: { userId: uid, elementDetailCode: code } })
+    await UserElementDetails.destroy({
+      where: { userId: uid, elementDetailCode: code }
+    })
   }
 }
 
@@ -230,23 +241,30 @@ const setFaculties = async (uid, faculties) => {
   await sequelize.transaction(async transaction => {
     await UserFaculties.destroy({ where: { userId: uid }, transaction })
     for (const faculty of faculties) {
-      await UserFaculties.create({ userId: uid, faculty_code: faculty }, { transaction })
+      await UserFaculties.create(
+        { userId: uid, faculty_code: faculty },
+        { transaction }
+      )
     }
   })
 }
 
 const modifyRights = async (uid, rights) => {
   console.log(uid, rights)
-  const rightsToAdd = Object.entries(rights).map(([code, val]) => {
-    if (val === true) {
-      return code
-    }
-  }).filter(code => code)
-  const rightsToRemove = Object.entries(rights).map(([code, val]) => {
-    if (val === false) {
-      return code
-    }
-  }).filter(code => code)
+  const rightsToAdd = Object.entries(rights)
+    .map(([code, val]) => {
+      if (val === true) {
+        return code
+      }
+    })
+    .filter(code => code)
+  const rightsToRemove = Object.entries(rights)
+    .map(([code, val]) => {
+      if (val === false) {
+        return code
+      }
+    })
+    .filter(code => code)
 
   const user = await byId(uid)
   const accessGroupsToAdd = await AccessService.byCodes(rightsToAdd)
@@ -255,12 +273,10 @@ const modifyRights = async (uid, rights) => {
   await user.addAccessgroup(accessGroupsToAdd)
   await user.removeAccessgroup(accessGroupsToRemove)
 }
-const getRoles = async (user) => {
+const getRoles = async user => {
   const foundUser = byUsername(user)
   return foundUser.accessgroup
 }
-
-
 
 module.exports = {
   byUsername,

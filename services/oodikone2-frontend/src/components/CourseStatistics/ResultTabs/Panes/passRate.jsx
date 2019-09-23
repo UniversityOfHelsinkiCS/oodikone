@@ -13,12 +13,12 @@ import {
   absoluteToRelative
 } from './util'
 
-const getPassRateCumSeriesFromStats = (stats) => {
+const getPassRateCumSeriesFromStats = stats => {
   const all = []
   const passed = []
   const failed = []
 
-  stats.forEach((year) => {
+  stats.forEach(year => {
     const { passed: p, failed: f } = year.cumulative.categories
     all.push(p + f)
     passed.push(p)
@@ -39,20 +39,15 @@ const getPassRateCumSeriesFromStats = (stats) => {
   }
 }
 
-const getPassRateStudSeriesFromStats = (stats) => {
+const getPassRateStudSeriesFromStats = stats => {
   const all = []
   const failedFirst = []
   const failedRetry = []
   const passedFirst = []
   const passedRetry = []
 
-  stats.forEach((year) => {
-    const {
-      failedFirst: ff,
-      failedRetry: fr,
-      passedFirst: pf,
-      passedRetry: pr
-    } = year.students.categories
+  stats.forEach(year => {
+    const { failedFirst: ff, failedRetry: fr, passedFirst: pf, passedRetry: pr } = year.students.categories
 
     all.push((ff || 0) + (fr || 0) + (pf || 0) + (pr || 0))
     failedFirst.push(ff || 0)
@@ -92,7 +87,9 @@ const PassRate = ({ primary, comparison, viewMode, isRelative = false }) => {
 
   const maxPassRateVal = isRelative ? 1 : getMaxValueOfSeries(passGraphSerie.absolute)
   const graphOptionsFn = isCumulativeMode ? passRateCumGraphOptions : passRateStudGraphOptions
-  const primaryGraphOptions = comparison ? graphOptionsFn(statYears, maxPassRateVal, 'Primary pass rate chart', isRelative) : graphOptionsFn(statYears, maxPassRateVal, 'Pass rate chart', isRelative)
+  const primaryGraphOptions = comparison
+    ? graphOptionsFn(statYears, maxPassRateVal, 'Primary pass rate chart', isRelative)
+    : graphOptionsFn(statYears, maxPassRateVal, 'Pass rate chart', isRelative)
   const comparisonGraphOptions = graphOptionsFn(statYears, maxPassRateVal, 'Comparison pass rate chart', isRelative)
 
   return (
@@ -105,8 +102,7 @@ const PassRate = ({ primary, comparison, viewMode, isRelative = false }) => {
           />
         </Grid.Column>
       </Grid.Row>
-      {
-        comparison &&
+      {comparison && (
         <Grid.Row>
           <Grid.Column>
             <StackedBarChart
@@ -115,7 +111,7 @@ const PassRate = ({ primary, comparison, viewMode, isRelative = false }) => {
             />
           </Grid.Column>
         </Grid.Row>
-      }
+      )}
     </>
   )
 }

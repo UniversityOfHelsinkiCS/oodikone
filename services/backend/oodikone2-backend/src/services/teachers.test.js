@@ -12,9 +12,7 @@ beforeAll(async () => {
 })
 
 describe('teacher service tests', () => {
-
   describe('teacher by search term tests', () => {
-
     const teacherIsInResults = (id, matches) => matches.some(teacher => teacher.id === 'TID_001')
 
     test('Search by `usercode` finds teacher', async () => {
@@ -51,7 +49,5 @@ describe('teacher service tests', () => {
       const matches = await service.bySearchTerm('TID_001')
       expect(teacherIsInResults(teacher.id, matches)).toBe(true)
     })
-
   })
-
 })

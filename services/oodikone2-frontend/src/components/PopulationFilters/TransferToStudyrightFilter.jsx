@@ -45,7 +45,7 @@ class TransferToStudyrightFilter extends Component {
         <Segment>
           <Form>
             <Popup
-              content={infoTooltips.PopulationStatistics.Filters.StartingThisSemester}
+              content={infoTooltips.PopulationStatistics.Filters.TransferToStudyrightFilter}
               trigger={<Icon style={{ float: 'right' }} name="info" />}
             />
             <Form.Group inline>
@@ -67,11 +67,7 @@ class TransferToStudyrightFilter extends Component {
                 <label>{toggleLabel}</label>
               </Form.Field>
               <Form.Field>
-                <Button
-                  onClick={this.handleRadio}
-                >
-                  set filter
-                </Button>
+                <Button onClick={this.handleRadio}>set filter</Button>
               </Form.Field>
             </Form.Group>
           </Form>
@@ -92,13 +88,13 @@ class TransferToStudyrightFilter extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const code = state.populations.query.studyRights.programme
   const studyrightName = state.populationDegreesAndProgrammes.data.programmes[code].name
-  return ({
+  return {
     language: getActiveLanguage(state.localize).code,
     studyrightName
-  })
+  }
 }
 
 export default connect(

@@ -1,30 +1,25 @@
 const Sequelize = require('sequelize')
-const {
-  sequelizeKone
-} = require('../database/connection')
+const { sequelizeKone } = require('../database/connection')
 
 const ThesisTypeEnums = {
   MASTER: 'MASTER',
   BACHELOR: 'BACHELOR'
 }
 
-const CourseGroup = sequelizeKone.define(
-  'course_groups',
-  {
-    id: {
-      primaryKey: true,
-      type: Sequelize.BIGINT,
-      autoIncrement: true
-    },
-    name: {
-      type: Sequelize.STRING,
-      unique: true
-    },
-    programmeid: {
-      type: Sequelize.STRING,
-    }
+const CourseGroup = sequelizeKone.define('course_groups', {
+  id: {
+    primaryKey: true,
+    type: Sequelize.BIGINT,
+    autoIncrement: true
+  },
+  name: {
+    type: Sequelize.STRING,
+    unique: true
+  },
+  programmeid: {
+    type: Sequelize.STRING
   }
-)
+})
 
 const TeacherCourseGroup = sequelizeKone.define('teacher_course_groups', {
   course_group_id: {
@@ -135,7 +130,10 @@ const Tag = sequelizeKone.define(
       type: Sequelize.STRING
     },
     year: {
-      type:Sequelize.STRING
+      type: Sequelize.STRING
+    },
+    personal_user_id: {
+      type: Sequelize.BIGINT
     }
   },
   {
@@ -180,7 +178,7 @@ const CourseDuplicates = sequelizeKone.define('course_duplicates', {
     type: Sequelize.INTEGER
   },
   coursecode: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING
   }
 })
 

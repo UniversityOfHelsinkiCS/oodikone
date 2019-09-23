@@ -54,20 +54,18 @@ class CourseGroup extends Component {
   handleSemesterCodeChange = (e, { value }) => {
     const { groupId } = this.props
 
-    this.setState(
-      { semesterCode: value, isLoading: true },
-      () => callApi(`${CG_API_BASE_PATH}/${groupId}/?semester=${value}`)
-        .then(({ data }) => {
-          const { totalCredits, totalStudents, totalCourses, teachers } = data
+    this.setState({ semesterCode: value, isLoading: true }, () =>
+      callApi(`${CG_API_BASE_PATH}/${groupId}/?semester=${value}`).then(({ data }) => {
+        const { totalCredits, totalStudents, totalCourses, teachers } = data
 
-          this.setState({
-            isLoading: false,
-            totalCredits,
-            totalStudents,
-            totalCourses,
-            teachers
-          })
+        this.setState({
+          isLoading: false,
+          totalCredits,
+          totalStudents,
+          totalCourses,
+          teachers
         })
+      })
     )
   }
 
@@ -76,7 +74,7 @@ class CourseGroup extends Component {
     this.setState({ showOnlyActiveTeachers: !showOnlyActiveTeachers })
   }
 
-  handleTeacherFilterClick = (teacherId) => {
+  handleTeacherFilterClick = teacherId => {
     const { showOnlyActiveTeachers, activeTeacherIds } = this.state
     this.setState({ isLoading: true }, () => {
       const isActiveTeacher = activeTeacherIds.includes(teacherId)
@@ -101,16 +99,17 @@ class CourseGroup extends Component {
       const lineKeys = [1, 2, 3, 4]
       return (
         <Placeholder>
-          {lineKeys.map(k => <Placeholder.Line key={k} length="full" />)}
-        </Placeholder>)
+          {lineKeys.map(k => (
+            <Placeholder.Line key={k} length="full" />
+          ))}
+        </Placeholder>
+      )
     }
 
     const getTeacherIds = teach => teach.map(t => t.id)
 
     const hasActiveTeachers = activeTeacherIds.length > 0
-    const teacherIds = hasActiveTeachers
-      ? activeTeacherIds
-      : getTeacherIds(teachers)
+    const teacherIds = hasActiveTeachers ? activeTeacherIds : getTeacherIds(teachers)
 
     return (
       <Fragment>
@@ -120,7 +119,6 @@ class CourseGroup extends Component {
           handleFilterClick={this.handleTeacherFilterClick}
           handleActiveToggleChange={this.handleTeacherActiveToggleChange}
           showOnlyActiveTeachers={showOnlyActiveTeachers}
-
         />
         <Courses teacherIds={teacherIds} semesterCode={semesterCode} />
       </Fragment>
@@ -141,9 +139,12 @@ class CourseGroup extends Component {
       academicYears
     } = this.state
 
-    const navigateTo = programme => history.push(getCompiledPath('/study-programme/:programme', {
-      programme
-    }))
+    const navigateTo = programme =>
+      history.push(
+        getCompiledPath('/study-programme/:programme', {
+          programme
+        })
+      )
     const statisticsTeachers = teachers.filter(t => activeTeacherIds.includes(t.id))
 
     return (
@@ -157,11 +158,7 @@ class CourseGroup extends Component {
               handleSemesterCodeChangeFn={this.handleSemesterCodeChange}
             />
           </div>
-          <Button
-            icon="reply"
-            onClick={() => navigateTo(studyProgrammeId)}
-            className="headerIconButton"
-          />
+          <Button icon="reply" onClick={() => navigateTo(studyProgrammeId)} className="headerIconButton" />
         </Header>
         <Statistics
           isLoading={isLoading}

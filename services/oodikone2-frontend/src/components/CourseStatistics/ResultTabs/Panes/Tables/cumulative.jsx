@@ -8,9 +8,9 @@ import SortableTable from '../../../../SortableTable'
 import { getUserIsAdmin } from '../../../../../common'
 
 const CumulativeTable = ({ stats, name, history, isAdmin }) => {
-  const showPopulation = (yearcode, year) => {
+  const showPopulation = (yearcode, years) => {
     const coursecodes = stats.map(s => s.coursecode)
-    const queryObject = { yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), year }
+    const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), years }
     const searchString = qs.stringify(queryObject)
     history.push(`/coursepopulation?${searchString}`)
   }
@@ -27,7 +27,15 @@ const CumulativeTable = ({ stats, name, history, isAdmin }) => {
             key: 'TIME',
             title: 'Time',
             getRowVal: s => s.code,
-            getRowContent: s => (isAdmin ? (<div>{s.name}<Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name, s)} /></div>) : s.name),
+            getRowContent: s =>
+              isAdmin ? (
+                <div>
+                  {s.name}
+                  <Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name, s)} />
+                </div>
+              ) : (
+                s.name
+              ),
             cellProps: { width: 4 }
           },
           { key: 'PASSED', title: 'Passed', getRowVal: s => s.cumulative.categories.passed, cellProps: { width: 4 } },
@@ -35,10 +43,13 @@ const CumulativeTable = ({ stats, name, history, isAdmin }) => {
           {
             key: 'PASSRATE',
             title: 'Pass rate',
-            getRowVal: s => s.cumulative.categories.passed /
-              (s.cumulative.categories.failed + s.cumulative.categories.passed),
-            getRowContent: stat => `${Number((100 * stat.cumulative.categories.passed) /
-              (stat.cumulative.categories.failed + stat.cumulative.categories.passed) || 0).toFixed(2)} %`,
+            getRowVal: s =>
+              s.cumulative.categories.passed / (s.cumulative.categories.failed + s.cumulative.categories.passed),
+            getRowContent: stat =>
+              `${Number(
+                (100 * stat.cumulative.categories.passed) /
+                  (stat.cumulative.categories.failed + stat.cumulative.categories.passed) || 0
+              ).toFixed(2)} %`,
             cellProps: { width: 4 }
           }
         ]}

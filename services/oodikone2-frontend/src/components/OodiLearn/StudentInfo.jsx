@@ -5,13 +5,7 @@ import ProfileSpiderGraph from './ProfileSpiderGraph'
 
 const SearchResult = ({ student, goBack }) => (
   <Segment basic>
-    <Button
-      icon="arrow circle left"
-      basic
-      content="Back"
-      size="small"
-      onClick={goBack}
-    />
+    <Button icon="arrow circle left" basic content="Back" size="small" onClick={goBack} />
     <Divider />
     <Card
       fluid

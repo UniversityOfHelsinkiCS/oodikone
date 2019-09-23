@@ -10,8 +10,9 @@ import { createNewThesisCourse, getThesisCourses } from '../../../redux/thesisCo
 
 const ThesisCourses = ({ studyprogramme, createThesis, getTheses }) => {
   const handleClick = (course, thesis) => () => {
-    createThesis(studyprogramme, course, thesis)
-      .then(() => { getTheses(studyprogramme) })
+    createThesis(studyprogramme, course, thesis).then(() => {
+      getTheses(studyprogramme)
+    })
   }
   return (
     <React.Fragment>
@@ -39,7 +40,10 @@ ThesisCourses.propTypes = {
   getTheses: func.isRequired
 }
 
-export default connect(null, {
-  createThesis: createNewThesisCourse,
-  getTheses: getThesisCourses
-})(ThesisCourses)
+export default connect(
+  null,
+  {
+    createThesis: createNewThesisCourse,
+    getTheses: getThesisCourses
+  }
+)(ThesisCourses)

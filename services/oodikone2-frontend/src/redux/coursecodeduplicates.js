@@ -1,6 +1,6 @@
 import { callController } from '../apiConnection'
 
-export const getDuplicates = (programme) => {
+export const getDuplicates = programme => {
   const route = `/courses/duplicatecodes/${programme}`
   const prefix = 'GET_ALL_DUPLICATES_'
   return callController(route, prefix)
@@ -13,7 +13,7 @@ export const addDuplicate = (code1, code2) => {
   return callController(route, prefix, {}, method)
 }
 
-export const removeDuplicate = (code) => {
+export const removeDuplicate = code => {
   const route = `/courses/duplicatecodes/${code}`
   const prefix = 'REMOVE_DUPLICATE_'
   const method = 'delete'

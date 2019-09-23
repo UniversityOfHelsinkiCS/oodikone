@@ -4,9 +4,7 @@ import { connect } from 'react-redux'
 import { arrayOf, string, bool, func, shape } from 'prop-types'
 import { Button, Modal, Form, TextArea, Dropdown, Message } from 'semantic-ui-react'
 
-import {
-  createMultipleStudentTagAction
-} from '../../../redux/tagstudent'
+import { createMultipleStudentTagAction } from '../../../redux/tagstudent'
 
 const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success, error }) => {
   const [modalOpen, setModalOpen] = useState(false)
@@ -23,13 +21,16 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
     }
   }, [pending])
 
-  const handleClick = (event) => {
+  const handleClick = event => {
     event.preventDefault()
     const studentnumbers = input.match(/[^\s,]+/g)
-    createMultipleStudentTag(studentnumbers.map(sn => ({
-      tag_id: selectedValue,
-      studentnumber: sn
-    })), studytrack)
+    createMultipleStudentTag(
+      studentnumbers.map(sn => ({
+        tag_id: selectedValue,
+        studentnumber: sn
+      })),
+      studytrack
+    )
   }
 
   const handleChange = (event, { value }) => {
@@ -41,7 +42,11 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
 
   return (
     <Modal
-      trigger={<Button size="small" disabled={!tags.length} onClick={() => setModalOpen(true)}>Add tags to students</Button>}
+      trigger={
+        <Button size="small" disabled={!tags.length} onClick={() => setModalOpen(true)}>
+          Add tags to students
+        </Button>
+      }
       open={modalOpen}
       onClose={() => setModalOpen(false)}
       size="small"
@@ -64,19 +69,13 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
               value={selectedValue}
             />
             <em> Insert studentnumbers you wish to add tags to </em>
-            <TextArea
-              placeholder="011111111"
-              onChange={e => setInput(e.target.value)}
-              value={input}
-            />
+            <TextArea placeholder="011111111" onChange={e => setInput(e.target.value)} value={input} />
           </Form.Field>
         </Form>
       </Modal.Content>
       <Modal.Actions>
-        <Button
-          negative
-          onClick={() => setModalOpen(false)}
-        >Cancel
+        <Button negative onClick={() => setModalOpen(false)}>
+          Cancel
         </Button>
         <Button
           positive
@@ -109,6 +108,11 @@ const mapStateToProps = ({ tagstudent }) => ({
   error: tagstudent.error
 })
 
-export default withRouter(connect(mapStateToProps, {
-  createMultipleStudentTag: createMultipleStudentTagAction
-})(TagModal))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    {
+      createMultipleStudentTag: createMultipleStudentTagAction
+    }
+  )(TagModal)
+)

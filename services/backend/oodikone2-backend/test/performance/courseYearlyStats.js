@@ -1,7 +1,6 @@
 const Course = require('../../src/services/courses')
 const { createstamper } = require('./stamper')
 
-
 const query1 = [
   'TKT10005',
   {
@@ -27,7 +26,7 @@ const run = async () => {
   stamper.start()
   await Course.yearlyStatsOf(...query1)
   stamper.stamp('after query 1')
-  
+
   stamper.start()
   await Course.yearlyStatsOf(...query2)
   stamper.stamp('after query 2')

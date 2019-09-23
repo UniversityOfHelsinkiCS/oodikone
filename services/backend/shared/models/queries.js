@@ -1,15 +1,17 @@
 const { sequelize, sequelizeKone } = require('../database/connection')
 
-const getStudentNumbers = () => sequelize.query(
-  `select
+const getStudentNumbers = () =>
+  sequelize.query(
+    `select
       studentnumber
       from student
       order by studentnumber desc`,
-  { type: sequelize.QueryTypes.SELECT }
-)
+    { type: sequelize.QueryTypes.SELECT }
+  )
 
-const getCurrentAcademicYear = () => sequelize.query(
-  `select
+const getCurrentAcademicYear = () =>
+  sequelize.query(
+    `select
       semestercode,
       yearname
     from semesters
@@ -17,22 +19,23 @@ const getCurrentAcademicYear = () => sequelize.query(
       and date_part('month', startdate) = 7
     order by startdate desc
     fetch first row only`,
-  { type: sequelize.QueryTypes.SELECT }
-)
+    { type: sequelize.QueryTypes.SELECT }
+  )
 
-const getAcademicYearsFrom = startSemesterCode => sequelize.query(
-  `select
+const getAcademicYearsFrom = startSemesterCode =>
+  sequelize.query(
+    `select
       distinct on (yearname) yearname,
       semestercode
     from semesters
     where semestercode >= :startSemesterCode
     and startdate <= now()
       order by yearname, semestercode`,
-  {
-    replacements: { startSemesterCode },
-    type: sequelize.QueryTypes.SELECT
-  }
-)
+    {
+      replacements: { startSemesterCode },
+      type: sequelize.QueryTypes.SELECT
+    }
+  )
 
 const getAcademicYearStatistics = (teacherIds, startSemester) => {
   const endSemester = startSemester + 1
@@ -120,7 +123,7 @@ WHERE cg.programmeid = :programmeid
 `,
     {
       replacements: { programmeid },
-      type: sequelize.QueryTypes.SELECT,
+      type: sequelize.QueryTypes.SELECT
     }
   )
 
@@ -148,7 +151,7 @@ WHERE ct.teacher_id IN (:teacherids)
   `,
       {
         replacements: { startSemester, endSemester, teacherids },
-        type: sequelize.QueryTypes.SELECT,
+        type: sequelize.QueryTypes.SELECT
       }
     )
     if (stats.length !== 1) throw 'expecting single row'

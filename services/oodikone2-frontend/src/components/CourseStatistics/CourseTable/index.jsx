@@ -17,7 +17,11 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
   )
 
   const toCourseRow = course => (
-    <Table.Row style={{ cursor: 'pointer' }} key={course.code} onClick={() => (course.min_attainment_date || mandatory ? onSelectCourse(course) : null)} >
+    <Table.Row
+      style={{ cursor: 'pointer' }}
+      key={course.code}
+      onClick={() => (course.min_attainment_date || mandatory ? onSelectCourse(course) : null)}
+    >
       <Table.Cell width={10}>
         <div>{course.name}</div>
         <div>{getActiveYears(course)}</div>
@@ -28,7 +32,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
 
   return (
     !hidden && (
-      <Segment basic style={{ padding: '0' }} >
+      <Segment basic style={{ padding: '0' }}>
         <Table selectable className="fixed-header">
           <Table.Header>
             <Table.Row>
@@ -36,13 +40,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
               <Table.HeaderCell content="Code" />
             </Table.Row>
           </Table.Header>
-          <Table.Body>
-            {
-              noContent
-                ? getEmptyListRow()
-                : sortedCourses.map(toCourseRow)
-            }
-          </Table.Body>
+          <Table.Body>{noContent ? getEmptyListRow() : sortedCourses.map(toCourseRow)}</Table.Body>
         </Table>
       </Segment>
     )

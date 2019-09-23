@@ -16,17 +16,17 @@ class AccessGroups extends Component {
 
   componentDidUpdate(prevState) {
     const { savePending, userGroups } = this.props
-    const finishedRequest = (!savePending && prevState.savePending)
+    const finishedRequest = !savePending && prevState.savePending
     if (finishedRequest) {
-      this.setState({ selected: userGroups })  // eslint-disable-line
+      this.setState({ selected: userGroups }) // eslint-disable-line
     }
   }
 
   submit = () => {
     const { user, groups } = this.props
     const { selected } = this.state
-    const rights = groups.reduce(((acc, { value }) => ({ ...acc, [value]: false })), {})
-    selected.forEach((value) => {
+    const rights = groups.reduce((acc, { value }) => ({ ...acc, [value]: false }), {})
+    selected.forEach(value => {
       rights[value] = true
     })
     this.props.modifyAccessGroups(user.id, rights)
@@ -52,13 +52,7 @@ class AccessGroups extends Component {
           selectOnNavigation={false}
         />
         <Divider />
-        <Button
-          basic
-          fluid
-          positive
-          content="Save"
-          onClick={this.submit}
-        />
+        <Button basic fluid positive content="Save" onClick={this.submit} />
       </Form>
     )
   }
@@ -96,7 +90,10 @@ const mapStateToProps = ({ accessGroups, users }, { user }) => {
   }
 }
 
-export default connect(mapStateToProps, {
-  getAccessGroups,
-  modifyAccessGroups
-})(AccessGroups)
+export default connect(
+  mapStateToProps,
+  {
+    getAccessGroups,
+    modifyAccessGroups
+  }
+)(AccessGroups)

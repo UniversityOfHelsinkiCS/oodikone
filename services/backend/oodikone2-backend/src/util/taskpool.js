@@ -1,5 +1,4 @@
-const taskpool = (poolsize=5) => {
-
+const taskpool = (poolsize = 5) => {
   const queue = []
   let hasPendingTask = false
   let getPendingTask = undefined
@@ -23,7 +22,7 @@ const taskpool = (poolsize=5) => {
   }
 
   const enqueue = task => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (queue.length < poolsize) {
         queue.push(task)
         resolve()
@@ -42,7 +41,7 @@ const taskpool = (poolsize=5) => {
   }
 
   const complete = () => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       queue.unshift(() => {
         resolve()
       })

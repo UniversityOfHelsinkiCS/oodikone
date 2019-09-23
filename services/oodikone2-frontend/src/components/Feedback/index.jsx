@@ -31,7 +31,7 @@ const Feedback = ({ sendFeedback, success, pending, error }) => {
     setFeedback(target.value)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = event => {
     event.preventDefault()
     sendFeedback(feedback)
   }
@@ -40,22 +40,25 @@ const Feedback = ({ sendFeedback, success, pending, error }) => {
     <div align="center">
       {show === true ? (
         <div className="ui positive message" align="center" style={{ maxWidth: 1000 }}>
-          <div className="header">
-            Your question/feedback was sent
-          </div>
+          <div className="header">Your question/feedback was sent</div>
           <p>Thank you for contacting us. We will contact you soon.</p>
-        </div>) : null}
+        </div>
+      ) : null}
       {showError === true ? (
         <div className="ui negative message" align="center" style={{ maxWidth: 1000 }}>
-          <div className="header">
-            Your question/feedback was not sent
-          </div>
+          <div className="header">Your question/feedback was not sent</div>
           <p>An error occured while trying to send your message. Please try again.</p>
-        </div>) : null}
-      <Form >
+        </div>
+      ) : null}
+      <Form>
         Questions/feedback:
         <div>
-          <TextArea placeholder="Tell us more" style={{ minHeight: 400, maxWidth: 1000 }} onChange={handleTyping} value={feedback} />
+          <TextArea
+            placeholder="Tell us more"
+            style={{ minHeight: 400, maxWidth: 1000 }}
+            onChange={handleTyping}
+            value={feedback}
+          />
         </div>
         <div>
           <Modal
@@ -74,7 +77,7 @@ const Feedback = ({ sendFeedback, success, pending, error }) => {
           />
         </div>
       </Form>
-    </div >
+    </div>
   )
 }
 
@@ -91,4 +94,9 @@ Feedback.propTypes = {
   error: PropTypes.bool.isRequired
 }
 
-export default withRouter(connect(mapStateToProps, { sendFeedback: sendFeedbackAction })(Feedback))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    { sendFeedback: sendFeedbackAction }
+  )(Feedback)
+)

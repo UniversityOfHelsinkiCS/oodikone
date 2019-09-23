@@ -52,25 +52,26 @@ class PopulationDetails extends Component {
               render: () => (
                 <Tab.Pane attached={false}>
                   <PopulationCreditGainTable
-                    sample={samples.filter(s =>
-                      this.props.selectedStudents.includes(s.studentNumber))}
+                    sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
                     translate={translate}
                   />
-                </Tab.Pane>)
+                </Tab.Pane>
+              )
             },
             {
               menuItem: 'Quarters',
               render: () => (
                 <Tab.Pane attached={false}>
                   <CourseQuarters
-                    sample={samples.filter(s =>
-                      this.props.selectedStudents.includes(s.studentNumber))}
+                    sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
                     translate={translate}
                   />
                 </Tab.Pane>
               )
-            }]}
-        />)
+            }
+          ]}
+        />
+      )
     }
     return (
       <Segment>
@@ -111,7 +112,7 @@ class PopulationDetails extends Component {
   renderNavigationPanel = () => (
     <div>
       <Segment className="navigationpanel" style={{ position: 'fixed', right: '2%', bottom: '2%' }}>
-        <Header size="medium" textAlign="center" >
+        <Header size="medium" textAlign="center">
           Navigation
           <Button
             className="navigationbuttonclose"
@@ -123,25 +124,15 @@ class PopulationDetails extends Component {
             <Icon name="chevron right" />
           </Button>
         </Header>
-        <Button.Group vertical >
-          <Button
-            onClick={() => scrollToComponent(this.filters.current, { align: 'top', offset: -40 })}
-          >
+        <Button.Group vertical>
+          <Button onClick={() => scrollToComponent(this.filters.current, { align: 'top', offset: -40 })}>
             Go To Filters
           </Button>
-          <Button
-            onClick={() => scrollToComponent(this.chart.current, { align: 'middle' })}
-          >
-            Go To Chart
-          </Button>
-          <Button
-            onClick={() => scrollToComponent(this.courses.current, { align: 'top', offset: -40 })}
-          >
+          <Button onClick={() => scrollToComponent(this.chart.current, { align: 'middle' })}>Go To Chart</Button>
+          <Button onClick={() => scrollToComponent(this.courses.current, { align: 'top', offset: -40 })}>
             Go To Course List
           </Button>
-          <Button
-            onClick={() => scrollToComponent(this.students.current, { align: 'top', offset: -40 })}
-          >
+          <Button onClick={() => scrollToComponent(this.students.current, { align: 'top', offset: -40 })}>
             Go To Student List
           </Button>
         </Button.Group>
@@ -155,9 +146,7 @@ class PopulationDetails extends Component {
       {this.renderCreditGainGraphs()}
       {this.renderCourseStatistics()}
       <PopulationCourses ref={this.courses} selectedStudents={this.props.selectedStudents} />
-      <PopulationStudents
-        ref={this.students}
-      />
+      <PopulationStudents ref={this.students} />
     </div>
   )
 
@@ -167,9 +156,7 @@ class PopulationDetails extends Component {
       return null
     }
     if (samples.length === 0) {
-      return (
-        <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
-      )
+      return <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
     }
     if (this.state.navigationVisible) {
       return (
@@ -198,23 +185,27 @@ class PopulationDetails extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const { samples, selectedStudents, complemented } = selectors.makePopulationsToData(state)
 
   // REFACTOR YES, IF YOU SEE THIS COMMENT YOU ARE OBLIGATED TO FIX IT
   if (samples.length > 0) {
-    const creditsAndDates = samples.map((s) => {
+    const creditsAndDates = samples.map(s => {
       const passedCourses = s.courses.filter(c => c.passed)
       const passedCredits = getTotalCreditsFromCourses(passedCourses)
       const dates = passedCourses.map(c => c.date)
-      return { passedCredits, dates }
+      const datesWithCredits = passedCourses.filter(c => c.credits > 0).map(c => c.date)
+      return { passedCredits, dates, datesWithCredits }
     })
     const credits = creditsAndDates.map(cd => cd.passedCredits)
-    let dates = creditsAndDates.map(cd => cd.dates)
-    dates = flattenDeep(dates).map(date => new Date(date).getTime())
+    const dates = flattenDeep(creditsAndDates.map(cd => cd.dates)).map(date => new Date(date).getTime())
+    const datesWithCredits = flattenDeep(creditsAndDates.map(cd => cd.datesWithCredits)).map(date =>
+      new Date(date).getTime()
+    )
     samples.maxCredits = Math.max(...credits)
     samples.maxDate = Math.max(...dates)
     samples.minDate = Math.min(...dates)
+    samples.minDateWithCredits = Math.min(...datesWithCredits)
   }
 
   return {

@@ -19,16 +19,14 @@ const pane = (title, Content, icon) => ({
 })
 
 const TeachersTabs = withRouter(({ admin, history }) => {
-  const [tab, setTab] = useTabs(
-    't_tab',
-    0,
-    history
-  )
-  const panes = admin ? [
-    pane('Statistics', TeacherStatistics, 'table'),
-    pane('Leaderboard', TeacherLeaderBoard, 'trophy'),
-    pane('Search', TeacherSearchTab, 'user')
-  ] : [pane('Statistics', TeacherStatistics, 'table')]
+  const [tab, setTab] = useTabs('t_tab', 0, history)
+  const panes = admin
+    ? [
+        pane('Statistics', TeacherStatistics, 'table'),
+        pane('Leaderboard', TeacherLeaderBoard, 'trophy'),
+        pane('Search', TeacherSearchTab, 'user')
+      ]
+    : [pane('Statistics', TeacherStatistics, 'table')]
 
   return (
     <Tab
@@ -40,14 +38,16 @@ const TeachersTabs = withRouter(({ admin, history }) => {
   )
 })
 
-const Teachers = ({ match: { params: { teacherid } }, isAdmin }) => (
+const Teachers = ({
+  match: {
+    params: { teacherid }
+  },
+  isAdmin
+}) => (
   <div className="segmentContainer">
     <Header className="segmentTitle" size="large" content="Teacher statistics" />
     <Segment className="contentSegment">
-      {teacherid
-        ? <TeacherPage teacherid={teacherid} />
-        : <TeachersTabs admin={isAdmin} />
-      }
+      {teacherid ? <TeacherPage teacherid={teacherid} /> : <TeachersTabs admin={isAdmin} />}
     </Segment>
   </div>
 )
@@ -70,8 +70,6 @@ Teachers.defaultProps = {
   }
 }
 
-export default connect(({
-  auth: { token: { roles } }
-}) => ({
+export default connect(({ auth: { token: { roles } } }) => ({
   isAdmin: getUserIsAdmin(roles)
 }))(withRouter(Teachers))

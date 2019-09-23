@@ -2,12 +2,9 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Dropdown, List, Label, Icon } from 'semantic-ui-react'
-import { arrayOf, string, shape, func } from 'prop-types'
+import { arrayOf, string, shape, func, bool } from 'prop-types'
 
-import {
-  createStudentTagAction,
-  deleteStudentTagAction
-} from '../../redux/tagstudent'
+import { createStudentTagAction, deleteStudentTagAction } from '../../redux/tagstudent'
 
 const TagStudent = ({
   createStudentTag,
@@ -15,7 +12,9 @@ const TagStudent = ({
   studentnumber,
   studentstags,
   studytrack,
-  tagOptions
+  tagOptions,
+  studentname,
+  namesVisible
 }) => {
   const handleChange = (event, { value }) => {
     event.preventDefault()
@@ -30,22 +29,21 @@ const TagStudent = ({
     deleteStudentTag(tag.tag_id, studentnumber, studytrack)
   }
 
-  const studentsTags = studentstags
-    .map(t => (
-      <List.Item key={`${studentnumber}-${t.tag.tag_id}`} >
-        <List.Content>
-          <Label>
-            {t.tag.tagname} <Icon name="delete" link onClick={event => deleteTag(event, t.tag)} />
-          </Label>
-        </List.Content>
-      </List.Item>))
+  const studentsTags = studentstags.map(t => (
+    <List.Item key={`${studentnumber}-${t.tag.tag_id}`}>
+      <List.Content>
+        <Label>
+          {t.tag.tagname} <Icon name="delete" link onClick={event => deleteTag(event, t.tag)} />
+        </Label>
+      </List.Content>
+    </List.Item>
+  ))
 
   return (
-    <List horizontal>
-      <List.Item >
-        <List.Content>
-          {studentnumber}
-        </List.Content>
+    <List horizontal style={{ display: 'flex', alignItems: 'center' }}>
+      <List.Item>
+        {namesVisible && <List.Content>{studentname}</List.Content>}
+        <List.Content>{studentnumber}</List.Content>
       </List.Item>
       {studentsTags}
       <List.Item>
@@ -69,12 +67,23 @@ TagStudent.propTypes = {
   createStudentTag: func.isRequired,
   deleteStudentTag: func.isRequired,
   studentnumber: string.isRequired,
+  studentname: string.isRequired,
   studentstags: arrayOf(shape({ tag: shape({ tagname: string, tag_id: string }), id: string })).isRequired,
   studytrack: string.isRequired,
-  tagOptions: arrayOf(shape({})).isRequired
+  tagOptions: arrayOf(shape({})).isRequired,
+  namesVisible: bool.isRequired
 }
 
-export default withRouter(connect(null, {
-  createStudentTag: createStudentTagAction,
-  deleteStudentTag: deleteStudentTagAction
-})(TagStudent))
+const mapStateToProps = ({ settings }) => ({
+  namesVisible: settings.namesVisible
+})
+
+export default withRouter(
+  connect(
+    mapStateToProps,
+    {
+      createStudentTag: createStudentTagAction,
+      deleteStudentTag: deleteStudentTagAction
+    }
+  )(TagStudent)
+)

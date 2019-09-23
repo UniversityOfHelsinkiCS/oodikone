@@ -7,29 +7,20 @@ const ProfileTable = ({ series, categories, selected }) => (
     <Table.Header>
       <Table.Row>
         <Table.HeaderCell content={null} />
-        { categories.map(c => (
-          <Table.HeaderCell
-            key={c}
-            content={c}
-            textAlign="center"
-          />
+        {categories.map(c => (
+          <Table.HeaderCell key={c} content={c} textAlign="center" />
         ))}
       </Table.Row>
     </Table.Header>
     <Table.Body>
-      { series.map(({ name, data }) => (
+      {series.map(({ name, data }) => (
         <Table.Row key={name}>
           <Table.Cell content={name} width={3} textAlign="center" />
-          { data.map((value, i) => (
-            <Table.Cell
-              key={categories[i]}
-              content={value}
-              textAlign="center"
-              active={selected === categories[i]}
-            />
+          {data.map((value, i) => (
+            <Table.Cell key={categories[i]} content={value} textAlign="center" active={selected === categories[i]} />
           ))}
         </Table.Row>
-    ))}
+      ))}
     </Table.Body>
   </Table>
 )

@@ -32,12 +32,9 @@ const initializeDatabaseConnection = async () => {
         },
         logging: console.log,
         migrations: {
-          params: [
-            sequelize.getQueryInterface(),
-            Sequelize
-          ],
+          params: [sequelize.getQueryInterface(), Sequelize],
           path: `${process.cwd()}/src/database/migrations`,
-          pattern: /\.js$/,
+          pattern: /\.js$/
         }
       })
       const migrations = await migrator.up()

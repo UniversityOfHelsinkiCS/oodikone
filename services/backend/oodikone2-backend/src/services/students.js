@@ -1,11 +1,16 @@
 const Sequelize = require('sequelize')
 const { sequelize } = require('../database/connection')
 const moment = require('moment')
-const { Student, Credit, Course, Studyright, StudyrightElement, ElementDetails, SemesterEnrollment } = require('../models')
 const {
-  TagStudent,
-  Tag
-} = require('../models/models_kone')
+  Student,
+  Credit,
+  Course,
+  Studyright,
+  StudyrightElement,
+  ElementDetails,
+  SemesterEnrollment
+} = require('../models')
+const { TagStudent, Tag } = require('../models/models_kone')
 const Op = Sequelize.Op
 
 const createStudent = student => Student.create(student)
@@ -20,7 +25,7 @@ const updateStudent = student => {
   })
 }
 
-const byId = async (id) => {
+const byId = async id => {
   const [student, tags] = await Promise.all([
     Student.findByPk(id, {
       include: [
@@ -28,7 +33,7 @@ const byId = async (id) => {
           model: Credit,
           separate: true,
           include: {
-            model: Course,
+            model: Course
           }
         },
         {
@@ -75,44 +80,27 @@ const byId = async (id) => {
   return student
 }
 
-const findByCourseAndSemesters = async (coursecodes, yearcode) =>
-  sequelize.query(`
-    SELECT
-      studentnumber, credit.course_code, attainment_date
-    FROM student
-    INNER JOIN credit ON
-      student.studentnumber=credit.student_studentnumber
-    WHERE
-      course_code IN (:coursecodes) AND
-      attainment_date
-    BETWEEN
-      (select startdate FROM semesters where yearcode=:yearcode ORDER BY semestercode LIMIT 1) AND
-      (select enddate FROM semesters where yearcode=:yearcode ORDER BY semestercode DESC LIMIT 1);
-  `,
-  { replacements: { coursecodes, yearcode }, type: sequelize.QueryTypes.SELECT })
+const findByCourseAndSemesters = async (coursecodes, from, to) =>
+  sequelize
+    .query(
+      `
+  SELECT
+    studentnumber, credit.course_code, attainment_date
+  FROM student
+  INNER JOIN credit ON
+    student.studentnumber=credit.student_studentnumber
+  WHERE
+    course_code IN (:coursecodes) AND
+    attainment_date
+  BETWEEN
+    (select startdate FROM semesters where yearcode=:minYearCode ORDER BY semestercode LIMIT 1) AND
+    (select enddate FROM semesters where yearcode=:maxYearCode ORDER BY semestercode DESC LIMIT 1);
+`,
+      { replacements: { coursecodes, minYearCode: from, maxYearCode: to }, type: sequelize.QueryTypes.SELECT }
+    )
     .map(st => st.studentnumber)
 
-const byAbreviatedNameOrStudentNumber = (searchTerm) => {
-  return Student.findAll({
-    where: {
-      [Op.or]: [
-        {
-          studentnumber: {
-            [Op.like]: searchTerm
-          }
-        },
-        {
-          abbreviatedname: {
-            [Op.iLike]: searchTerm
-          }
-        }
-      ]
-
-    }
-  })
-}
-
-const findByTag = (tag) => {
+const findByTag = tag => {
   return TagStudent.findAll({
     attributes: ['studentnumber'],
     where: {
@@ -141,14 +129,7 @@ const formatStudent = ({
   createdAt,
   tags
 }) => {
-  const toCourse = ({
-    grade,
-    credits,
-    credittypecode,
-    attainment_date,
-    course,
-    isStudyModule
-  }) => {
+  const toCourse = ({ grade, credits, credittypecode, attainment_date, course, isStudyModule }) => {
     course = course.get()
     return {
       course: {
@@ -168,32 +149,33 @@ const formatStudent = ({
     studyrights === undefined
       ? []
       : studyrights.map(
-        ({
-          studyrightid,
-          highlevelname,
-          startdate,
-          enddate,
-          canceldate,
-          extentcode,
-          graduated,
-          graduation_date,
-          studyright_elements
-        }) => ({
-          studyrightid,
-          highlevelname,
-          extentcode,
-          startdate,
-          graduationDate: graduation_date,
-          studyrightElements: studyright_elements,
-          enddate,
-          canceldate,
-          graduated: Boolean(graduated)
-        })
-      )
+          ({
+            studyrightid,
+            highlevelname,
+            startdate,
+            enddate,
+            canceldate,
+            extentcode,
+            graduated,
+            graduation_date,
+            studyright_elements
+          }) => ({
+            studyrightid,
+            highlevelname,
+            extentcode,
+            startdate,
+            graduationDate: graduation_date,
+            studyrightElements: studyright_elements,
+            enddate,
+            canceldate,
+            graduated: Boolean(graduated)
+          })
+        )
   semester_enrollments = semester_enrollments || []
-  const semesterenrollments = semester_enrollments.map(
-    ({ semestercode, enrollmenttype }) => ({ semestercode, enrollmenttype })
-  )
+  const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({
+    semestercode,
+    enrollmenttype
+  }))
 
   const courseByDate = (a, b) => {
     return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
@@ -221,18 +203,7 @@ const formatStudent = ({
   }
 }
 
-const bySearchTermOld = async (term) => {
-  try {
-    const result = await byAbreviatedNameOrStudentNumber(`%${term}%`)
-    return result.map(formatStudent)
-  } catch (e) {
-    return {
-      error: e
-    }
-  }
-}
-
-const withId = async (id) => {
+const withId = async id => {
   try {
     const result = await byId(id)
     return formatStudent(result)
@@ -244,36 +215,9 @@ const withId = async (id) => {
   }
 }
 
-const bySearchTermAndElementsOld = async (searchterm, elementcodes) => {
-  const likeSearchTerm = `%${searchterm}%`
-  const students = await Student.findAll({
-    where: {
-      [Op.or]: [
-        {
-          studentnumber: {
-            [Op.like]: likeSearchTerm
-          }
-        },
-        {
-          abbreviatedname: {
-            [Op.iLike]: likeSearchTerm
-          }
-        }
-      ]
-    },
-    include: {
-      model: StudyrightElement,
-      where: {
-        code: {
-          [Op.in]: elementcodes
-        }
-      }
-    }
-  })
-  return students.map(formatStudent)
-}
+const removeEmptySpaces = str => str.replace(/\s\s+/g, ' ')
 
-const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
+const splitByEmptySpace = str => removeEmptySpaces(str).split(' ')
 
 const likefy = term => `%${term}%`
 
@@ -283,7 +227,7 @@ const columnLike = (column, term) => ({
   }
 })
 
-const nameLike = (terms) => {
+const nameLike = terms => {
   const [first, second] = terms
   if (!second) {
     return columnLike('abbreviatedname', first)
@@ -308,20 +252,17 @@ const studentnumberLike = terms => {
   }
 }
 
-const bySearchTermNew = async (searchterm) => {
+const bySearchTerm = async searchterm => {
   const terms = splitByEmptySpace(searchterm)
   const matches = await Student.findAll({
     where: {
-      [Op.or]: [
-        nameLike(terms),
-        studentnumberLike(terms)
-      ]
+      [Op.or]: [nameLike(terms), studentnumberLike(terms)]
     }
   })
   return matches.map(formatStudent)
 }
 
-const bySearchTermAndElementsNew = async (searchterm, codes) => {
+const bySearchTermAndElements = async (searchterm, codes) => {
   const terms = splitByEmptySpace(searchterm)
   const matches = await Student.findAll({
     include: {
@@ -334,10 +275,7 @@ const bySearchTermAndElementsNew = async (searchterm, codes) => {
       }
     },
     where: {
-      [Op.or]: [
-        nameLike(terms),
-        studentnumberLike(terms)
-      ]
+      [Op.or]: [nameLike(terms), studentnumberLike(terms)]
     }
   })
   return matches.map(formatStudent)
@@ -363,10 +301,6 @@ const filterStudentnumbersByAccessrights = async (studentnumbers, codes) => {
   return students.map(student => student.studentnumber)
 }
 
-const NEW_SEARCH = true
-const bySearchTerm = NEW_SEARCH ? bySearchTermNew : bySearchTermOld
-const bySearchTermAndElements = NEW_SEARCH ? bySearchTermAndElementsNew : bySearchTermAndElementsOld
-
 module.exports = {
   withId,
   bySearchTerm,
@@ -375,5 +309,6 @@ module.exports = {
   bySearchTermAndElements,
   filterStudentnumbersByAccessrights,
   findByCourseAndSemesters,
-  findByTag
+  findByTag,
+  splitByEmptySpace
 }
