@@ -35,12 +35,12 @@ export default {
     <br> <br>
     **Save filters as preset**: Voit tallentaa tekemäsi filtteri-yhdistelmän myöhempää käyttöä varten.`,
     CreditsAtLeast: 'Suodattaa pois opiskelijat, joilla on alle annetun määrän opintopisteitä',
-    CreditsLessThan: 'Suodattaa opiskelijat, joilla on yli annetun määrän opintopisteitä',
+    CreditsLessThan: 'Suodattaa pois opiskelijat, joilla on yli annetun määrän opintopisteitä',
     GradeMeanFilter: 'Suodattaa pois opiskelijat, joilla on yli/alle annetun numeron keskiarvo',
     CreditsLessThanFromMandatory: `Suodattaa pois opiskelijat, joilla on yli
     annetun määrän opintopisteitä pakollisista kursseista`,
     StartingThisSemester: `Suodattaa opiskelijat, jotka aloittivat opiskelun valittuna lukuvuonna tai sitä ennen`,
-    EnrollmentStatus: 'Näytä opiskelijat, jotka olivat läsnä- tai poissaolevana valittuina lukukausina',
+    EnrollmentStatus: 'Näyttää opiskelijat, jotka olivat läsnä- tai poissaolevana valittuina lukukausina',
     CanceledStudyright: `Suodattaa opiskelijat, jotka ovat/eivät ole peruuttaneet virallisesti
     opinto-oikeutensa`,
     DisciplineTypes: `Asettaa annetun tyyppisille annettujen tieteenalojen
