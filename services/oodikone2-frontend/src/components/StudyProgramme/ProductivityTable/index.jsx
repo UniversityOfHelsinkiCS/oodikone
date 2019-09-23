@@ -27,7 +27,10 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits }
     showCredits ? (
       <Table.Cell>{content}</Table.Cell>
     ) : (
-      <Table.Cell className="not-available" title="Credits productivity statistics not available for old programmes">
+      <Table.Cell
+        className="productivity-table__not-available"
+        title="Credits productivity statistics not available for old programmes"
+      >
         Not available
       </Table.Cell>
     )
