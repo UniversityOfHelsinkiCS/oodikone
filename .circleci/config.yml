@@ -67,10 +67,20 @@ jobs:
           command: |
             docker ps -a && npm run docker:ci -- logs -f
       - *check_exit_statuses
-      - run: npm run test_services
+      - run:
+          name: test services
+          command: |
+            if [ "${DEPLOY}" != "true" ]; then
+              npm run test_services
+            fi
       - *check_exit_statuses
-      - run: timeout 5m bash -c 'until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf .; sleep 5; done'
-      - run: npm run cypress:ci
+      - run:
+          name: run cypress tests
+          command: |
+            if [ "${DEPLOY}" != "true" ]; then
+              timeout 5m bash -c 'until $(curl --output /dev/null --silent --fail http://localhost:1337/); do printf .; sleep 5; done'
+              npm run cypress:ci
+            fi
       - *check_exit_statuses
       - store_artifacts:
           path: cypress/videos
