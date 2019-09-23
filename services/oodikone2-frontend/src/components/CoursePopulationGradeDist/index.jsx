@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Progress } from 'semantic-ui-react'
 import { intersection, orderBy } from 'lodash'
-import { shape, func, bool, arrayOf, string } from 'prop-types'
+import { shape, func, bool, arrayOf, string, number } from 'prop-types'
 
 import SearchResultTable from '../SearchResultTable'
 import { gradeFilter } from '../../populationFilters'
@@ -10,7 +10,7 @@ import { setPopulationFilter } from '../../redux/populationFilters'
 
 const CoursePopulationCreditDist = ({
   singleCourseStats,
-  yearcode,
+  yearcodes,
   pending,
   selectedStudents,
   setPopulationFilterDispatch
@@ -19,10 +19,18 @@ const CoursePopulationCreditDist = ({
   useEffect(() => {
     if (singleCourseStats.statistics) {
       const array = []
-      const statistics = singleCourseStats.statistics.find(stats => stats.code === Number(yearcode))
-      const grades = statistics ? Object.keys(statistics.students.grades) : []
-      grades.forEach(grade => {
-        const filteredGrades = intersection(selectedStudents, statistics.students.grades[grade])
+      const statisticsInRange = singleCourseStats.statistics.filter(stats => yearcodes.includes(stats.code))
+      const grades = statisticsInRange.reduce((res, curr) => {
+        const currGrades = curr.students.grades
+        Object.entries(currGrades).forEach(([grade, students]) => {
+          if (!res[grade]) res[grade] = []
+          res[grade].push(...students)
+        })
+        return res
+      }, {})
+
+      Object.keys(grades).forEach(grade => {
+        const filteredGrades = intersection(selectedStudents, grades[grade])
         array.push({ grade, amount: filteredGrades.length })
       })
       setGrades(array)
@@ -33,6 +41,8 @@ const CoursePopulationCreditDist = ({
       gradeFilter({ grade: row[0], coursecodes: singleCourseStats.alternatives, coursename: singleCourseStats.name })
     )
   }
+
+  const totalAmount = courseGrades.reduce((acc, curr) => acc + curr.amount, 0)
 
   const sortedCourseGrades = orderBy(
     courseGrades,
@@ -47,7 +57,7 @@ const CoursePopulationCreditDist = ({
   const rows = sortedCourseGrades.map(g => [
     `${g.grade}`,
     g.amount,
-    <Progress style={{ margin: '0px' }} percent={Math.round((g.amount / selectedStudents.length) * 100)} progress />
+    <Progress style={{ margin: '0px' }} percent={Math.round((g.amount / totalAmount) * 100)} progress />
   ])
   const headers = ['Grades', `Students (all=${selectedStudents.length})`, 'Percentage of population']
 
@@ -57,14 +67,14 @@ const CoursePopulationCreditDist = ({
       rows={rows}
       selectable
       rowClickFn={(e, row) => setFilter(row)}
-      noResultText="placeholder"
+      noResultText="no data available"
     />
   )
 }
 
 CoursePopulationCreditDist.propTypes = {
   singleCourseStats: shape({}).isRequired,
-  yearcode: string.isRequired,
+  yearcodes: arrayOf(number).isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   setPopulationFilterDispatch: func.isRequired
