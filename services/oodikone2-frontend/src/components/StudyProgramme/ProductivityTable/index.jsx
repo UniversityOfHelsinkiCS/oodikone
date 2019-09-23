@@ -59,7 +59,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits }
         </Grid>
       </Header>
       <Segment basic loading={loading}>
-        <Table structured celled className="fixed-header">
+        <Table structured celled compact striped selectable className="fixed-header">
           <Table.Header>
             <Table.Row>
               {headerList.map(header => (

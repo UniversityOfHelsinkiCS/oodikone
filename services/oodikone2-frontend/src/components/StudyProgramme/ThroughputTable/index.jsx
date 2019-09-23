@@ -83,7 +83,7 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
         </Grid>
       </Header>
       <Segment basic loading={loading}>
-        <Table celled structured className="fixed-header">
+        <Table celled structured compact striped selectable className="fixed-header">
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
