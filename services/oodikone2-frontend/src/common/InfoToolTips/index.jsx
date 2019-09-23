@@ -1,7 +1,9 @@
 import PopulationStatistics from './populationStatistics'
+import PopulationOverview from './populationOverview'
 
 const infotooltips = {
-  PopulationStatistics
+  PopulationStatistics,
+  PopulationOverview
 }
 
 export default infotooltips
