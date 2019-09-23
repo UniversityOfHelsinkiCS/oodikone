@@ -1,11 +1,10 @@
 import React, { Fragment } from 'react'
 import moment from 'moment'
 import { Header, Table, Grid, Icon, Label, Segment } from 'semantic-ui-react'
-import { shape, number, arrayOf, bool, string, func, node } from 'prop-types'
+import { shape, number, arrayOf, bool, string, node } from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { flatten, uniq } from 'lodash'
-import { getThroughput } from '../../../redux/throughput'
 import { getUserRoles } from '../../../common'
 import InfoBox from '../../InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
@@ -25,7 +24,7 @@ PopulationStatisticsLink.propTypes = {
   children: node.isRequired
 }
 
-const ThroughputTable = ({ history, throughput, thesis, loading, error, studyprogramme, userRoles }) => {
+const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, userRoles }) => {
   if (error) return <h1>Oh no so error {error}</h1>
   const GRADUATED_FEATURE_TOGGLED_ON = userRoles.includes('dev')
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
@@ -237,9 +236,6 @@ ThroughputTable.propTypes = {
   studyprogramme: string.isRequired,
   loading: bool.isRequired,
   error: bool.isRequired,
-  history: shape({
-    push: func.isRequired
-  }).isRequired,
   userRoles: arrayOf(string).isRequired
 }
 
@@ -248,15 +244,10 @@ ThroughputTable.defaultProps = {
   thesis: undefined
 }
 
-export default withRouter(
-  connect(
-    ({
-      auth: {
-        token: { roles }
-      }
-    }) => ({ userRoles: getUserRoles(roles) }),
-    {
-      dispatchGetThroughput: getThroughput
-    }
-  )(ThroughputTable)
-)
+const mapStateToProps = ({
+  auth: {
+    token: { roles }
+  }
+}) => ({ userRoles: getUserRoles(roles) })
+
+export default connect(mapStateToProps)(ThroughputTable)
