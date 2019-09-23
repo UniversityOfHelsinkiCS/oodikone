@@ -55,9 +55,9 @@ const GradesTable = ({ stats, name, history, isAdmin }) => {
   } = stats[0]
   const isGradeSeries = !isThesisGrades(grades)
 
-  const showPopulation = (yearcode, year) => {
+  const showPopulation = (yearcode, years) => {
     const coursecodes = stats.map(s => s.coursecode)
-    const queryObject = { yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), year }
+    const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), years }
     const searchString = qs.stringify(queryObject)
     history.push(`/coursepopulation?${searchString}`)
   }

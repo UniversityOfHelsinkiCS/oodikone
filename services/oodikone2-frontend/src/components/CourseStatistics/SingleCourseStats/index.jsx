@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Segment, Header, Form, Grid } from 'semantic-ui-react'
+import { Segment, Header, Form, Grid, Button, Popup } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number, func } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -7,7 +7,11 @@ import { getActiveLanguage } from 'react-localize-redux'
 import { difference, min, max, flatten, pickBy } from 'lodash'
 import qs from 'query-string'
 import ResultTabs from '../ResultTabs'
-import { setSelectedCourse, clearSelectedCourse } from '../../../redux/singleCourseStats'
+import {
+  setSelectedCourse,
+  clearSelectedCourse,
+  getMaxYearsToCreatePopulationFrom
+} from '../../../redux/singleCourseStats'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import YearFilter from '../SearchForm/YearFilter'
@@ -72,6 +76,12 @@ class SingleCourseStats extends Component {
   componentWillUnmount = () => {
     const { clearSelectedCourse } = this.props
     clearSelectedCourse()
+  }
+
+  componentDidMount = () => {
+    this.props.getMaxYearsToCreatePopulationFrom({
+      courseCodes: JSON.stringify(this.props.stats.alternatives)
+    })
   }
 
   getProgrammeName = progcode => {
@@ -194,8 +204,9 @@ class SingleCourseStats extends Component {
   }
 
   handleYearChange = (e, { name, value }) => {
-    if (name === 'fromYear') this.setState({ fromYear: value })
-    else this.setState({ toYear: value })
+    const { fromYear, toYear } = this.state
+    if (name === 'fromYear' && value <= toYear) this.setState({ fromYear: value })
+    else if (name === 'toYear' && value >= fromYear) this.setState({ toYear: value })
   }
 
   filteredProgrammeStatistics = () => {
@@ -257,8 +268,23 @@ class SingleCourseStats extends Component {
     return result.filter(({ key }) => !comparison.includes('EXCLUDED') || !excludedProgrammes.includes(key))
   }
 
+  showPopulation = () => {
+    const { fromYear: from, toYear: to } = this.state
+    const {
+      stats: { alternatives },
+      history,
+      years: yearCodes
+    } = this.props
+    const years = `${yearCodes.find(s => s.value === from).text.split('-')[0]}-${
+      yearCodes.find(s => s.value === to).text.split('-')[1]
+    }`
+    const queryObject = { from, to, coursecodes: JSON.stringify(alternatives), years }
+    const searchString = qs.stringify(queryObject)
+    history.push(`/coursepopulation?${searchString}`)
+  }
+
   render() {
-    const { programmes } = this.props
+    const { programmes, maxYearsToCreatePopulationFrom } = this.props
     const { primary, comparison, fromYear, toYear } = this.state
     const statistics = this.filteredProgrammeStatistics()
     const { filteredYears } = this.filteredYearsAndSemesters()
@@ -275,13 +301,25 @@ class SingleCourseStats extends Component {
       <div>
         <Segment>
           <Form>
-            <Header content="Filter statistics by time range" as="h4" />
+            <Header content="Statistics by time range" as="h4" />
             <YearFilter
               years={filteredYears}
               fromYear={fromYear}
               toYear={toYear}
               handleChange={this.handleYearChange}
             />
+            {maxYearsToCreatePopulationFrom < toYear - fromYear ? (
+              <Popup
+                content={`Max years to create a population from for this course is ${maxYearsToCreatePopulationFrom}`}
+                trigger={
+                  <span>
+                    <Button disabled onClick={this.showPopulation} content="Show population" />
+                  </span>
+                }
+              />
+            ) : (
+              <Button onClick={this.showPopulation} content="Show population" />
+            )}
           </Form>
         </Segment>
         <Segment>
@@ -359,7 +397,12 @@ SingleCourseStats.propTypes = {
   activeLanguage: string.isRequired,
   setSelectedCourse: func.isRequired,
   clearSelectedCourse: func.isRequired,
-  getSemesters: func.isRequired
+  getSemesters: func.isRequired,
+  history: shape({
+    push: func
+  }).isRequired,
+  getMaxYearsToCreatePopulationFrom: func.isRequired,
+  maxYearsToCreatePopulationFrom: number.isRequired
 }
 
 const mapStateToProps = state => {
@@ -380,14 +423,16 @@ const mapStateToProps = state => {
         value: yearcode
       }))
       .reverse(),
-    activeLanguage: getActiveLanguage(state.localize).code
+    activeLanguage: getActiveLanguage(state.localize).code,
+    maxYearsToCreatePopulationFrom: state.singleCourseStats.maxYearsToCreatePopulationFrom
   }
 }
 
 const mapDispatchToProps = {
   setSelectedCourse,
   clearSelectedCourse,
-  getSemesters
+  getSemesters,
+  getMaxYearsToCreatePopulationFrom
 }
 
 export default withRouter(

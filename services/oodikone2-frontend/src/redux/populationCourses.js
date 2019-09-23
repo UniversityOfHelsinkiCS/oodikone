@@ -35,12 +35,12 @@ export const getPopulationCourses = ({
   return callController(route, prefix, body, 'post', query)
 }
 
-export const getCoursePopulationCourses = ({ coursecodes, yearcode }) => {
+export const getCoursePopulationCourses = ({ coursecodes, from, to }) => {
   const route = '/v2/populationstatistics/coursesbycoursecode'
   const prefix = 'GET_COURSES_OF_COURSE_POP_'
-  const params = { coursecodes, yearcode }
-  const query = { coursecodes, yearcode }
-  const body = { coursecodes, yearcode }
+  const params = { coursecodes, from, to }
+  const query = { coursecodes, from, to }
+  const body = { coursecodes, from, to }
 
   return callController(route, prefix, body, 'post', query, params)
 }

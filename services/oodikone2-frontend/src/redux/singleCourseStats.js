@@ -20,7 +20,19 @@ export const clearSelectedCourse = () => ({
   type: 'CLEAR_SELECTED_COURSE'
 })
 
-const reducer = (state = { stats: {}, pending: false, error: false, selectedCourse: null }, action) => {
+export const getMaxYearsToCreatePopulationFrom = ({ courseCodes }) => {
+  const route = '/v3/populationstatistics/maxYearsToCreatePopulationFrom'
+  const params = {
+    courseCodes
+  }
+
+  return callController(route, 'GET_MAX_YEARS_TO_CREATE_POPULATION_FROM_', null, 'get', null, params)
+}
+
+const reducer = (
+  state = { stats: {}, pending: false, error: false, selectedCourse: null, maxYearsToCreatePopulationFrom: -1 },
+  action
+) => {
   switch (action.type) {
     case 'GET_SINGLE_COURSE_STATS_ATTEMPT':
       return {
@@ -51,6 +63,11 @@ const reducer = (state = { stats: {}, pending: false, error: false, selectedCour
       return {
         ...state,
         selectedCourse: null
+      }
+    case 'GET_MAX_YEARS_TO_CREATE_POPULATION_FROM_SUCCESS':
+      return {
+        ...state,
+        maxYearsToCreatePopulationFrom: action.response
       }
     default:
       return state
