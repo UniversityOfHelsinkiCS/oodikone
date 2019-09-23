@@ -80,7 +80,7 @@ class PriorityStudyright extends Component {
         <Segment>
           <Form>
             <Popup
-              content={infoTooltips.PopulationStatistics.Filters.ExtentGraduated}
+              content={infoTooltips.PopulationStatistics.Filters.PriorityStudyright}
               trigger={<Icon style={{ float: 'right' }} name="info" />}
             />
             <Form.Group inline>

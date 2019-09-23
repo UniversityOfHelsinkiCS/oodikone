@@ -669,6 +669,50 @@ const yearlyStatsOfNew = async (coursecode, separate) => {
   }
 }
 
+const maxYearsToCreatePopulationFrom = async coursecodes => {
+  const maxAttainmentDate = new Date(
+    Math.max(
+      ...(await Course.findAll({
+        where: {
+          code: {
+            [Op.in]: coursecodes
+          }
+        },
+        attributes: ['max_attainment_date']
+      }).map(c => new Date(c.max_attainment_date).getTime()))
+    )
+  )
+  const attainmentThreshold = new Date(maxAttainmentDate.getFullYear(), 0, 1)
+  attainmentThreshold.setFullYear(attainmentThreshold.getFullYear() - 6)
+
+  const credits = await Credit.findAll({
+    where: {
+      course_code: {
+        [Op.in]: coursecodes
+      },
+      attainment_date: {
+        [Op.gt]: attainmentThreshold
+      }
+    },
+    order: [['attainment_date', 'ASC']]
+  })
+
+  const yearlyStudents = Object.values(
+    credits.reduce((res, credit) => {
+      const attainmentYear = new Date(credit.attainment_date).getFullYear()
+      if (!res[attainmentYear]) res[attainmentYear] = 0
+      res[attainmentYear]++
+      return res
+    }, {})
+  )
+  const maxYearsToCreatePopulationFrom = Math.floor(
+    1200 / // Lower this value to get a smaller result if necessary
+      (yearlyStudents.reduce((acc, curr) => acc + curr, 0) / yearlyStudents.length)
+  )
+
+  return maxYearsToCreatePopulationFrom
+}
+
 const courseYearlyStats = async (coursecodes, separate) => {
   const stats = await Promise.all(coursecodes.map(code => yearlyStatsOfNew(code, separate)))
   return stats
@@ -751,5 +795,6 @@ module.exports = {
   courseYearlyStats,
   byNameAndOrCodeLike,
   byCodes,
-  getMainCodeToDuplicatesAndCodeToMainCode
+  getMainCodeToDuplicatesAndCodeToMainCode,
+  maxYearsToCreatePopulationFrom
 }

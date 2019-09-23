@@ -45,7 +45,7 @@ class TransferToStudyrightFilter extends Component {
         <Segment>
           <Form>
             <Popup
-              content={infoTooltips.PopulationStatistics.Filters.StartingThisSemester}
+              content={infoTooltips.PopulationStatistics.Filters.TransferToStudyrightFilter}
               trigger={<Icon style={{ float: 'right' }} name="info" />}
             />
             <Form.Group inline>

@@ -8,6 +8,7 @@ const Student = require('../services/students')
 const StudyrightService = require('../services/studyrights')
 const UserService = require('../services/userService')
 const TagService = require('../services/tags')
+const CourseService = require('../services/courses')
 
 // POST instead of GET because of too long params and "sensitive" data
 router.post('/v2/populationstatistics/courses', async (req, res) => {
@@ -40,13 +41,16 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
 
 router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => {
   try {
-    if (!req.body.yearcode || !req.body.coursecodes) {
-      res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
-      return
+    const { from, to, coursecodes } = req.body
+    if (!from || !to || !coursecodes) {
+      return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
     }
-    const { coursecodes, yearcode } = req.body
+    const maxYearsToCreatePopulationFrom = await CourseService.maxYearsToCreatePopulationFrom(coursecodes)
+    if (Math.abs(to - from) > maxYearsToCreatePopulationFrom) {
+      return res.status(400).json({ error: `Max years to create population from is ${maxYearsToCreatePopulationFrom}` })
+    }
     let studentnumberlist
-    const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, yearcode)
+    const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, from, to)
     const {
       decodedToken: { userId },
       roles
@@ -265,14 +269,19 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
 })
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
-  const { coursecodes, yearcode } = req.query
-  if (!coursecodes || !yearcode) {
-    res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
-    return
+  const { coursecodes, from, to } = req.query
+
+  if (!coursecodes || !from || !to) {
+    return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
+  }
+
+  const maxYearsToCreatePopulationFrom = await CourseService.maxYearsToCreatePopulationFrom(JSON.parse(coursecodes))
+  if (Math.abs(to - from) > maxYearsToCreatePopulationFrom) {
+    return res.status(400).json({ error: `Max years to create population from is ${maxYearsToCreatePopulationFrom}` })
   }
   const semesters = ['FALL', 'SPRING']
   let studentnumberlist
-  const studentnumbers = await Student.findByCourseAndSemesters(JSON.parse(coursecodes), yearcode)
+  const studentnumbers = await Student.findByCourseAndSemesters(JSON.parse(coursecodes), from, to)
   const {
     decodedToken: { userId },
     roles
@@ -417,6 +426,16 @@ router.get('/v3/populationstatistics/studyprogrammes/unfiltered', async (req, re
   try {
     const studyrights = await StudyrightService.getAssociations()
     res.json(studyrights)
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
+router.get('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
+  try {
+    const { courseCodes } = req.query
+    const maxYearsToCreatePopulationFrom = await CourseService.maxYearsToCreatePopulationFrom(JSON.parse(courseCodes))
+    return res.json(maxYearsToCreatePopulationFrom)
   } catch (err) {
     res.status(500).json(err)
   }
