@@ -278,7 +278,7 @@ export const tagFilter = params => {
     },
     filter: student => {
       const studentTagIds = student.tags.map(t => t.tag.tag_id)
-      if (comp) {
+      if (comp === 'true') {
         return studentTagIds.includes(value)
       }
       return !studentTagIds.includes(value)
@@ -337,6 +337,21 @@ export const programmeFilter = params => {
   }
 }
 
+export const creditsBeforeStudyright = params => {
+  const { credit } = params
+  return {
+    id: uuidv4(),
+    type: 'CreditsBeforeStudyright',
+    params: {
+      credit
+    },
+    filter: student => {
+      const credits = getStudentTotalCredits(student)
+      return student.credits - credits > credit
+    }
+  }
+}
+
 export const presetFilter = preset => ({
   id: preset.id,
   type: 'Preset',
@@ -363,7 +378,8 @@ const typeList = {
   Preset: presetFilter,
   TransferToStudyrightFilter: transferTo,
   PriorityStudyright: priorityStudyright,
-  TagFilter: tagFilter
+  TagFilter: tagFilter,
+  CreditsBeforeStudyright: creditsBeforeStudyright
 }
 export const getFilterFunction = (type, params, populationCourses) => {
   switch (type) {

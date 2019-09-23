@@ -2,21 +2,17 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { func, shape, arrayOf } from 'prop-types'
-import { uniqBy } from 'lodash'
 
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { tagFilter } from '../../populationFilters'
 
-const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, filter, samples }) => {
+const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, filter, tags }) => {
   const [options, setOptions] = useState([])
   const [selectedTag, setSelectedTag] = useState()
   const [selectedComp, setSelectedComp] = useState()
 
   const createOptions = () => {
-    const tags = samples.map(s => s.tags.map(t => ({ tagname: t.tag.tagname, tag_id: t.tag.tag_id })))
-    const merge = tags.reduce((a, b) => a.concat(b), [])
-    const uniqueTags = uniqBy(merge, 'tag_id')
-    const createdOptions = uniqueTags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id }))
+    const createdOptions = tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id }))
     setOptions(createdOptions)
   }
 
@@ -52,7 +48,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
             <Form.Field>
               <Dropdown
                 placeholder="select"
-                options={[{ key: 1, text: 'have', value: true }, { key: 2, text: "don't have", value: false }]}
+                options={[{ key: 1, text: 'have', value: 'true' }, { key: 2, text: "don't have", value: 'false' }]}
                 onChange={handleCompChange}
                 selectOnBlur={false}
                 selectOnNavigation={false}
@@ -94,10 +90,17 @@ TagFilter.propTypes = {
   setPopulationFilterAction: func.isRequired,
   removePopulationFilterAction: func.isRequired,
   filter: shape({}).isRequired,
-  samples: arrayOf(shape({})).isRequired
+  tags: arrayOf(shape({})).isRequired
 }
 
+const mapStateToProps = ({ tags }) => ({
+  tags: tags.data
+})
+
 export default connect(
-  null,
-  { setPopulationFilterAction: setPopulationFilter, removePopulationFilterAction: removePopulationFilter }
+  mapStateToProps,
+  {
+    setPopulationFilterAction: setPopulationFilter,
+    removePopulationFilterAction: removePopulationFilter
+  }
 )(TagFilter)

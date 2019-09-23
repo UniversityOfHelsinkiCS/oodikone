@@ -24,6 +24,7 @@ import TransferFilter from './TransferFilter'
 import TransferToStudyrightFilter from './TransferToStudyrightFilter'
 import CanceledStudyright from './CanceledStudyright'
 import PriorityStudyright from './PriorityStudyright'
+import CreditsBeforeStudyright from './CreditsBeforeStudyright'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import {
@@ -52,7 +53,8 @@ const componentFor = {
   PriorityStudyright,
   TransferToStudyrightFilter,
   SimpleExtentGraduated,
-  TagFilter
+  TagFilter,
+  CreditsBeforeStudyright
 }
 
 const advancedFilters = {
@@ -60,7 +62,8 @@ const advancedFilters = {
   DisciplineTypes,
   TransferFilter,
   ExtentGraduated,
-  PriorityStudyright
+  PriorityStudyright,
+  CreditsBeforeStudyright
 }
 
 const persistantFilters = {
@@ -177,10 +180,10 @@ class PopulationFilters extends Component {
       filters.map(f =>
         f.type === 'Preset'
           ? getFilterFunction(
-              f.type,
-              { ...f, filters: regenerateFilterFunctions(f.filters) },
-              selectedPopulationCourses.data
-            )
+            f.type,
+            { ...f, filters: regenerateFilterFunctions(f.filters) },
+            selectedPopulationCourses.data
+          )
           : getFilterFunction(f.type, f.params, selectedPopulationCourses.data)
       )
 
@@ -201,6 +204,7 @@ class PopulationFilters extends Component {
     const selectedPopulationCourses = populationSelectedStudentCourses.data
       ? populationSelectedStudentCourses
       : populationCourses
+
     const allFilters = union(
       Object.keys(componentFor)
         .filter(f => !(Object.keys(advancedFilters).includes(f) && !this.state.advancedUser))
