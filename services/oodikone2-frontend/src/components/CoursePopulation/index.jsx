@@ -39,29 +39,30 @@ const CoursePopulation = ({
     return query
   }
   const [codes, setCodes] = useState([])
-  const [headerYear, setYear] = useState('')
-  const [yearCode, setYearCode] = useState('')
+  const [headerYears, setYears] = useState('')
+  const [yearCodes, setYearCodes] = useState([])
 
   const { onProgress, progress } = useProgress(pending && !studentData.students)
 
   useEffect(() => {
-    const query = parseQueryFromUrl()
-    getCoursePopulationDispatch({ coursecodes: query.coursecodes, yearcode: query.yearcode, onProgress })
-    getCoursePopulationCoursesDispatch({ coursecodes: JSON.parse(query.coursecodes), yearcode: query.yearcode })
+    const { coursecodes, from, to, years } = parseQueryFromUrl()
+    const parsedCourseCodes = JSON.parse(coursecodes)
+    getCoursePopulationDispatch({ coursecodes, from, to, onProgress })
+    getCoursePopulationCoursesDispatch({ coursecodes: parsedCourseCodes, from, to })
     getSingleCourseStatsDispatch({
-      fromYear: query.yearcode,
-      toYear: query.yearcode,
-      courseCodes: JSON.parse(query.coursecodes),
+      fromYear: from,
+      toYear: to,
+      courseCodes: parsedCourseCodes,
       separate: false
     })
-    setCodes(JSON.parse(query.coursecodes))
-    setYearCode(query.yearcode)
-    setYear(query.year)
+    setCodes(parsedCourseCodes)
+    setYearCodes([...Array(Number(to) + 1).keys()].slice(Number(from), Number(to) + 1))
+    setYears(years)
     clearPopulationFiltersDispatch()
   }, [])
 
   const { CreditAccumulationGraph } = infoTooltips.PopulationStatistics
-  const header = courseData ? `${courseData.name} ${headerYear}` : null
+  const header = courseData ? `${courseData.name} ${headerYears}` : null
 
   return (
     <div className="segmentContainer">
@@ -73,7 +74,7 @@ const CoursePopulation = ({
           <CustomPopulationFilters samples={studentData.students} coursecodes={codes} />
           <Segment>
             <Header>Grade distribution</Header>
-            <CoursePopulationGradeDist yearcode={yearCode} selectedStudents={selectedStudents} />
+            <CoursePopulationGradeDist yearcodes={yearCodes} selectedStudents={selectedStudents} />
           </Segment>
           <Segment>
             <Header>Programme distribution</Header>
