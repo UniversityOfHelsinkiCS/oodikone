@@ -805,14 +805,6 @@ ALTER TABLE ONLY mandatory_course_labels
 
 
 --
--- Name: migrations migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY migrations
-    ADD CONSTRAINT migrations_pkey PRIMARY KEY (name);
-
-
---
 -- Name: organization organization_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
