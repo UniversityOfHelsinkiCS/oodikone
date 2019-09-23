@@ -4,7 +4,7 @@ import { Form } from 'semantic-ui-react'
 
 const YearFilter = ({ years, fromYear, toYear, handleChange }) => (
   <Fragment>
-    <Form.Group widths="equal" inline>
+    <Form.Group inline>
       <Form.Dropdown
         label="From:"
         name="fromYear"
