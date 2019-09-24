@@ -9,6 +9,7 @@ const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: proce
 const calculateFacultyYearlyStats = async () => {
   const { data: facultyProgrammes } = await client.get('/faculty_programmes')
   const res = {}
+  const studentSets = {}
   const lock = new AsyncLock()
 
   let amountDone = 0
@@ -16,8 +17,14 @@ const calculateFacultyYearlyStats = async () => {
     facultyProgrammes.map(
       ({ faculty_code, programme_code }) =>
         new Promise(async facultyRes => {
-          if (!res[faculty_code]) res[faculty_code] = {}
-          if (!res[faculty_code][programme_code]) res[faculty_code][programme_code] = {}
+          if (!res[faculty_code]) {
+            res[faculty_code] = {}
+            studentSets[faculty_code] = {}
+          }
+          if (!res[faculty_code][programme_code]) {
+            res[faculty_code][programme_code] = {}
+            studentSets[faculty_code][programme_code] = {}
+          }
 
           const facultyStudents = await StudyrightElement.findAll({
             where: {
@@ -47,12 +54,19 @@ const calculateFacultyYearlyStats = async () => {
                           facultyYearStats.studentCredits = 0
                           facultyYearStats.coursesPassed = 0
                           facultyYearStats.coursesFailed = 0
+                          facultyYearStats.students = 0
                           res[faculty_code][programme_code][attainmentYear] = facultyYearStats
+                          studentSets[faculty_code][programme_code][attainmentYear] = new Set()
                         }
                         done()
                       })
                     }
                     const facultyYearStats = res[faculty_code][programme_code][attainmentYear]
+                    const studentSet = studentSets[faculty_code][programme_code][attainmentYear]
+                    if (!studentSet.has(c.student_studentnumber)) {
+                      facultyYearStats.students++
+                      studentSet.add(c.student_studentnumber)
+                    }
                     if (c.credittypecode === 4) {
                       facultyYearStats.studentCredits += c.credits
                       facultyYearStats.coursesPassed += 1

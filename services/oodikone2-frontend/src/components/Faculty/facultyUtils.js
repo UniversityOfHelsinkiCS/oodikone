@@ -2,16 +2,18 @@ export const calculateStatsForProgramme = (stats, fromYear, toYear) => {
   const res = {
     totalStudentCredits: 0,
     totalCoursesPassed: 0,
-    totalCoursesFailed: 0
+    totalCoursesFailed: 0,
+    totalStudents: 0
   }
 
   Object.entries(stats)
     .filter(([year]) => year >= fromYear && year <= toYear)
     .forEach(([, stat]) => {
-      const { studentCredits, coursesPassed, coursesFailed } = stat
+      const { studentCredits, coursesPassed, coursesFailed, students } = stat
       res.totalStudentCredits += studentCredits
       res.totalCoursesPassed += coursesPassed
       res.totalCoursesFailed += coursesFailed
+      res.totalStudents += students
     })
 
   return res
