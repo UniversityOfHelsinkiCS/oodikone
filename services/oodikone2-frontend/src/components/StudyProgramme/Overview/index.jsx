@@ -6,6 +6,8 @@ import ThroughputTable from '../ThroughputTable'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
 
+const isNewStudyprogramme = programmeId => programmeId.includes('_')
+
 const Overview = props => {
   const { productivity, throughput, studyprogramme, dispatchGetProductivity, dispatchGetThroughput } = props
 
@@ -28,7 +30,7 @@ const Overview = props => {
         thesis={throughput.data.thesis}
         loading={productivity.pending}
         error={productivity.error}
-        studyprogramme={studyprogramme}
+        showCredits={isNewStudyprogramme(studyprogramme)}
       />
     </React.Fragment>
   )

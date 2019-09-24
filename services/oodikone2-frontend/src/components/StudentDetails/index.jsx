@@ -265,7 +265,9 @@ class StudentDetails extends Component {
               title: 'Tags',
               getRowVal: t => sortBy(t.tags.map(tt => tt.tag.tagname)).join(':'),
               getRowContent: t =>
-                sortBy(t.tags, t => t.tag.tagname).map(t => <Label key={t.tag.tag_id} content={t.tag.tagname} />)
+                sortBy(t.tags, t => t.tag.tagname).map(t => (
+                  <Label key={t.tag.tag_id} content={t.tag.tagname} color={t.tag.personal_user_id ? 'purple' : null} />
+                ))
             }
           ]}
         />

@@ -32,7 +32,7 @@ const TagStudent = ({
   const studentsTags = studentstags.map(t => (
     <List.Item key={`${studentnumber}-${t.tag.tag_id}`}>
       <List.Content>
-        <Label>
+        <Label color={t.tag.personal_user_id ? 'purple' : null}>
           {t.tag.tagname} <Icon name="delete" link onClick={event => deleteTag(event, t.tag)} />
         </Label>
       </List.Content>
