@@ -57,7 +57,10 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
       return (
         <>
           {tag.tagname}
-          <Popup content="Only you can see this tag." trigger={<Icon style={{ marginLeft: '1em' }} name="eye" />} />
+          <Popup
+            content="Only you can see this tag."
+            trigger={<Icon style={{ marginLeft: '1em' }} name="eye" color="purple" />}
+          />
         </>
       )
     return tag.tagname
