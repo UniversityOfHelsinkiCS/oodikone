@@ -3,8 +3,11 @@ const Student = require('../services/students')
 const userService = require('../services/userService')
 const Unit = require('../services/units')
 
-const filterRelevantStudentTags = (studentTags, userId) => {
-  return studentTags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
+const filterStudentTags = (student, userId) => {
+  return {
+    ...student,
+    tags: student.tags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
+  }
 }
 
 router.get('/students', async (req, res) => {
@@ -55,7 +58,7 @@ router.get('/students/:id', async (req, res) => {
           .end()
       : res
           .status(200)
-          .json(results)
+          .json(filterStudentTags(results, decodedToken.id))
           .end()
   }
 
@@ -77,13 +80,9 @@ router.get('/students/:id', async (req, res) => {
   )
 
   if (rights.some(right => right !== null)) {
-    const studentWithFilteredTags = {
-      ...student,
-      tags: filterRelevantStudentTags(student.tags, decodedToken.id)
-    }
     res
       .status(200)
-      .json(studentWithFilteredTags)
+      .json(filterStudentTags(student, decodedToken.id))
       .end()
   } else {
     res
