@@ -13,7 +13,8 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
     const yearData = {
       studentCredits: 0,
       coursesPassed: 0,
-      coursesFailed: 0
+      coursesFailed: 0,
+      students: 0
     }
 
     const faculty = facultyYearlyStats.find(f => f.id === facultyCode)
@@ -24,6 +25,7 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
         res[year].studentCredits += stat.studentCredits
         res[year].coursesPassed += stat.coursesPassed
         res[year].coursesFailed += stat.coursesFailed
+        res[year].students += stat.students
       })
     })
     return res
@@ -33,7 +35,8 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
     const initial = {
       totalStudentCredits: 0,
       totalCoursesPassed: 0,
-      totalCoursesFailed: 0
+      totalCoursesFailed: 0,
+      totalStudents: 0
     }
     return Object.entries(calculateYearlyStatsForFaculty(facultyCode))
       .filter(([year]) => year >= fromYear && year <= toYear)
@@ -41,7 +44,8 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
         (res, [, curr]) => ({
           totalStudentCredits: res.totalStudentCredits + curr.studentCredits,
           totalCoursesPassed: res.totalCoursesPassed + curr.coursesPassed,
-          totalCoursesFailed: res.totalCoursesFailed + curr.coursesFailed
+          totalCoursesFailed: res.totalCoursesFailed + curr.coursesFailed,
+          totalStudents: res.totalStudents + curr.students
         }),
         { ...initial }
       )
@@ -77,7 +81,7 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
       getRowVal: faculty => faculty.code
     },
     {
-      key: 'students',
+      key: 'studentCredits',
       title: 'Student credits',
       getRowVal: ({ code }) => Math.round(totalStats[code].totalStudentCredits)
     },
@@ -92,6 +96,11 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
       title: 'Courses failed',
       getRowVal: ({ code }) => calculateTotalFailedCourses(totalStats[code]),
       getRowContent: ({ code }) => `${calculateTotalFailedCourses(totalStats[code]).toFixed(2)}%`
+    },
+    {
+      key: 'students',
+      title: 'Students',
+      getRowVal: ({ code }) => totalStats[code].totalStudents
     }
   ]
 
