@@ -55,7 +55,7 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
       getRowVal: ({ code }) => code
     },
     {
-      key: 'students',
+      key: 'studentCredits',
       title: 'Student credits',
       getRowVal: ({ code }) => Math.round(totalStats[code].totalStudentCredits)
     },
@@ -70,6 +70,11 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
       title: 'Courses failed',
       getRowVal: ({ code }) => calculateTotalFailedCourses(totalStats[code]),
       getRowContent: ({ code }) => `${calculateTotalFailedCourses(totalStats[code]).toFixed(2)}%`
+    },
+    {
+      key: 'students',
+      title: 'Students',
+      getRowVal: ({ code }) => totalStats[code].totalStudents
     }
   ]
   /* eslint-enable react/prop-types */
