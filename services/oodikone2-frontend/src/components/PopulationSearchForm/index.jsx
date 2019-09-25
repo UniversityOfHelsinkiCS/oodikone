@@ -26,8 +26,7 @@ import {
   textAndDescriptionSearch,
   getTextIn,
   cancelablePromise,
-  useSearchHistory,
-  getUserRoles
+  useSearchHistory
 } from '../../common'
 import { setLoading } from '../../redux/graphSpinner'
 import './populationSearchForm.css'
@@ -70,18 +69,7 @@ const PopulationSearchForm = props => {
 
   const { query, isLoading, showAdvancedSettings, momentYear, floatMonths } = totalState
 
-  const {
-    studyProgrammes,
-    location,
-    semesters,
-    queries,
-    history,
-    tags,
-    language,
-    translate,
-    onProgress,
-    isAdmin
-  } = props
+  const { studyProgrammes, location, semesters, queries, history, tags, language, translate, onProgress } = props
 
   const parseQueryFromUrl = () => {
     const initial = initialQuery()
@@ -169,7 +157,6 @@ const PopulationSearchForm = props => {
     if (location.search) {
       fetchPopulationFromUrlParams()
     }
-    setState({ isAdmin })
     setDidMount(true)
 
     return () => {
@@ -607,7 +594,7 @@ const PopulationSearchForm = props => {
     }
 
     const { semesters, studentStatuses } = query
-    const options = isAdmin ? tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id })) : []
+    const options = tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id })) || []
 
     return (
       <div>
@@ -666,21 +653,19 @@ const PopulationSearchForm = props => {
             />
           </Form.Field>
         </Form.Group>
-        {isAdmin ? (
-          <Form.Group>
-            <Form.Field>
-              <label>Select tag</label>
-              <Form.Dropdown
-                placeholder="select tag"
-                selection
-                options={options}
-                onChange={handleTagSearch}
-                selectOnBlur={false}
-                selectOnNavigation={false}
-              />
-            </Form.Field>
-          </Form.Group>
-        ) : null}
+        <Form.Group>
+          <Form.Field>
+            <label>Select tag</label>
+            <Form.Dropdown
+              placeholder="select tag"
+              selection
+              options={options}
+              onChange={handleTagSearch}
+              selectOnBlur={false}
+              selectOnNavigation={false}
+            />
+          </Form.Field>
+        </Form.Group>
       </div>
     )
   }
@@ -773,21 +758,10 @@ PopulationSearchForm.propTypes = {
   getTagsByStudytrackAction: func.isRequired,
   tags: oneOfType([arrayOf(shape({ tag_id: string, tagname: string })), object]).isRequired,
   onProgress: func.isRequired,
-  isAdmin: bool.isRequired,
   clearSelected: func.isRequired
 }
 
-const mapStateToProps = ({
-  semesters,
-  settings,
-  populations,
-  populationDegreesAndProgrammes,
-  localize,
-  tags,
-  auth: {
-    token: { roles }
-  }
-}) => {
+const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, localize, tags }) => {
   const { language } = settings
   const { pending } = populationDegreesAndProgrammes
   return {
@@ -797,8 +771,7 @@ const mapStateToProps = ({
     translate: getTranslate(localize),
     studyProgrammes: populationDegreesAndProgrammes.data.programmes || {},
     pending,
-    tags: tags.data,
-    isAdmin: getUserRoles(roles).includes('admin')
+    tags: tags.data
   }
 }
 

@@ -238,14 +238,14 @@ class PopulationStudents extends Component {
           key: 'extent',
           title: 'extent',
           getRowVal: s => extentCodes(s.studyrights)
-        },
-        {
-          key: 'tags',
-          title: 'tags',
-          getRowVal: s => tags(s.tags)
         }
       )
     }
+    columns.push({
+      key: 'tags',
+      title: 'tags',
+      getRowVal: s => tags(s.tags)
+    })
 
     if (['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
       columns.push(
@@ -576,9 +576,6 @@ class PopulationStudents extends Component {
     const filteredPanes = panesToFilter => {
       if (['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
         return panesToFilter.slice(0, 1)
-      }
-      if (!this.state.admin) {
-        return panesToFilter.slice(0, 2)
       }
       return panesToFilter
     }
