@@ -1,3 +1,4 @@
+const shibbolethHeadersFix = require('unfuck-utf8-headers-middleware')
 const accessLogger = require('./middleware/accesslogger')
 const log = require('./routes/log')
 const courses = require('./routes/courses')
@@ -27,6 +28,7 @@ const tags = require('./routes/tags')
 const updater = require('./routes/updater')
 
 module.exports = (app, url) => {
+  app.use(shibbolethHeadersFix(['hyGroupCn', 'SHIB_LOGOUT_URL', 'eduPersonAffiliation', 'uid', 'displayName', 'mail']))
   app.use(url, log)
   app.use(url, login)
   app.use(`${url}/superlogin`, superlogin)
