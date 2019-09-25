@@ -41,12 +41,10 @@ const StudyProgramme = props => {
       menuItem: 'Thesis Courses',
       render: () => <ThesisCourses studyprogramme={studyProgrammeId} />
     })
-    if (userRoles.includes('admin')) {
-      panes.push({
-        menuItem: 'Tags',
-        render: () => <Tags studyprogramme={studyProgrammeId} />
-      })
-    }
+    panes.push({
+      menuItem: 'Tags',
+      render: () => <Tags studyprogramme={studyProgrammeId} />
+    })
     return panes
   }
 
