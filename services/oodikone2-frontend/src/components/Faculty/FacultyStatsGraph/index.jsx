@@ -9,6 +9,7 @@ boost(Highcharts)
 
 const FacultyStatsGraph = ({ data }) => {
   const [mode, setMode] = useState('studentCredits')
+  const defaultStartTimestamp = new Date(2000, 0, 1).getTime()
 
   const series = useMemo(
     () =>
@@ -43,7 +44,7 @@ const FacultyStatsGraph = ({ data }) => {
     findNearestPointBy: 'xy',
     series,
     xAxis: {
-      min,
+      min: Math.max(min, defaultStartTimestamp),
       max,
       ordinal: false
     }
