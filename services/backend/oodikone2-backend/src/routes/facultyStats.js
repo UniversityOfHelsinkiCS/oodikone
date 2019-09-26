@@ -6,22 +6,14 @@ const { getFacultyYearlyStats } = require('../services/analyticsService')
 router.get('/faculties', async (req, res) => {
   const { roles, faculties } = req
   const allFaculties = await all()
-  res.json(
-    roles.includes('admin') ?
-      allFaculties :
-      allFaculties.filter(({ code }) => faculties.has(code))
-  )
+  res.json(roles.includes('admin') ? allFaculties : allFaculties.filter(({ code }) => faculties.has(code)))
 })
 
 router.get('/yearlystats', async (req, res) => {
   try {
     const { roles, faculties } = req
     const facultyYearlyStats = await getFacultyYearlyStats()
-    res.json(
-      roles.includes('admin') ?
-        facultyYearlyStats :
-        facultyYearlyStats.filter(({ id }) => faculties.has(id))
-    )
+    res.json(roles.includes('admin') ? facultyYearlyStats : facultyYearlyStats.filter(({ id }) => faculties.has(id)))
   } catch (e) {
     res.status(400).json({ error: e })
   }
