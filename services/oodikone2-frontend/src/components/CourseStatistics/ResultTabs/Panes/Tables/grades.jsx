@@ -1,8 +1,9 @@
 import React from 'react'
 import qs from 'query-string'
+import { Link } from 'react-router-dom'
 import { arrayOf, number, oneOfType, shape, string, bool } from 'prop-types'
 import { connect } from 'react-redux'
-import { Header, Icon } from 'semantic-ui-react'
+import { Header, Icon, Item } from 'semantic-ui-react'
 import { uniq } from 'lodash'
 import SortableTable from '../../../../SortableTable'
 import { getUserIsAdmin } from '../../../../../common'
@@ -49,7 +50,7 @@ const getGradeColumns = isGradeSeries =>
       ]
     : THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s[k]))
 
-const GradesTable = ({ stats, name, history, isAdmin }) => {
+const GradesTable = ({ stats, name, isAdmin }) => {
   const {
     cumulative: { grades }
   } = stats[0]
@@ -59,7 +60,7 @@ const GradesTable = ({ stats, name, history, isAdmin }) => {
     const coursecodes = stats.map(s => s.coursecode)
     const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), years }
     const searchString = qs.stringify(queryObject)
-    history.push(`/coursepopulation?${searchString}`)
+    return `/coursepopulation?${searchString}`
   }
 
   const columns = [
@@ -71,7 +72,9 @@ const GradesTable = ({ stats, name, history, isAdmin }) => {
         isAdmin ? (
           <div>
             {s.name}
-            <Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name)} />
+            <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+              <Icon name="level up alternate" />
+            </Item>
           </div>
         ) : (
           s.name
@@ -99,7 +102,6 @@ const GradesTable = ({ stats, name, history, isAdmin }) => {
 GradesTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  history: shape({}).isRequired,
   isAdmin: bool.isRequired
 }
 export default connect(({ auth: { token: { roles } } }) => ({ isAdmin: getUserIsAdmin(roles) }))(GradesTable)
