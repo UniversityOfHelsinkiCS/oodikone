@@ -64,6 +64,12 @@ npm run docker:up
 #### With real data:
 
 ```
+npm run start:real
+```
+
+OR
+
+```
 docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml -f ./docker/docker-compose.dev.real.yml up -d
 ```
 
