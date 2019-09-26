@@ -79,7 +79,8 @@ describe('Population Statistics tests', () => {
     cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
       cy.get("tr").its('length').should('be.gte', 10)
       cy.route('/api/v3/courseyearlystats**').as('coursePage')
-      cy.contains("Opiskelijan digitaidot: orientaatio").siblings().find(".level").click()
+      cy.contains("Opiskelijan digitaidot: orientaatio")
+      cy.get(':nth-child(2) > .iconCell > p > .item > .level').click()
       cy.wait('@coursePage')
       cy.url().should('include', '/coursestatistics')
     })
