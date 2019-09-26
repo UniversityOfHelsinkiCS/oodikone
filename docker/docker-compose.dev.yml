@@ -6,6 +6,11 @@ services:
       - POSTGRES_MULTIPLE_DATABASES=user_db,user_db_real
     restart: unless-stopped
 
+  analytics_db:
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=analytics_db,analytics_db_real
+    restart: unless-stopped
+
   db:
     environment:
       - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test,tkt_oodi_real
