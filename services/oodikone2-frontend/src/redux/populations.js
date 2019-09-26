@@ -19,7 +19,7 @@ export const getPopulationStatistics = ({
   startYear,
   onProgress
 }) => {
-  const route = tag === '' ? '/v3/populationstatistics/' : '/v3/populationstatisticsbytag'
+  const route = !tag ? '/v3/populationstatistics/' : '/v3/populationstatisticsbytag'
   const prefix = 'GET_POPULATION_STATISTICS_'
   const query = {
     endYear,
