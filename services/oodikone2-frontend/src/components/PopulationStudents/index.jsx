@@ -2,8 +2,8 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Button, Icon, Popup, Tab, Grid, Ref } from 'semantic-ui-react'
-import { withRouter } from 'react-router-dom'
+import { Header, Segment, Button, Icon, Popup, Tab, Grid, Ref, Item } from 'semantic-ui-react'
+import { withRouter, Link } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import XLSX from 'xlsx'
 import scrollToComponent from 'react-scroll-to-component'
@@ -192,7 +192,11 @@ class PopulationStudents extends Component {
       },
       {
         key: 'icon',
-        getRowVal: s => <Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />,
+        getRowVal: s => (
+          <Item as={Link} to={`students/${s.studentNumber}`}>
+            <Icon name="level up alternate" />
+          </Item>
+        ),
         cellProps: { collapsing: true, className: 'iconCell' }
       }
     )
