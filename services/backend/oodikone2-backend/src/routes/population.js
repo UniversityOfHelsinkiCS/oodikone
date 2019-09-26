@@ -232,7 +232,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
 })
 
 router.get('/v3/populationstatisticsbytag', async (req, res) => {
-  const { tag, studyRights: studyRightsJSON } = req.query
+  const { tag, studyRights: studyRightsJSON, endYear, months, startYear } = req.query
   const { decodedToken } = req
 
   if (!tag) return res.status(400).json({ error: 'The query should have a tag defined' })
@@ -256,13 +256,15 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
   try {
     const studyRights = JSON.parse(studyRightsJSON)
     const newStartYear = await Population.getEarliestYear(studentnumberlist, studyRights)
+    const yearDifference = Number(startYear) - Number(newStartYear)
+    const newMonths = Number(months) + 12 * yearDifference
     const result = await Population.optimizedStatisticsOf(
       {
         startYear: newStartYear,
-        endYear: 2200,
+        endYear,
         studyRights,
         semesters,
-        months: 10000,
+        months: newMonths,
         tag: foundTag
       },
       studentnumberlist

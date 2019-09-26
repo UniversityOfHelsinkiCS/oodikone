@@ -63,9 +63,6 @@ describe('Population Statistics tests', () => {
     })
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen koulutusohjelma").click()
     cy.contains("Select degree").click().siblings().contains("Luonnontieteiden kandidaatti")
-    cy.get(".toggle").click()
-    cy.contains("Exchange students")
-    cy.contains("See population").should('be.enabled')
   })
 
   it('Population statistics is usable on general level', () => {

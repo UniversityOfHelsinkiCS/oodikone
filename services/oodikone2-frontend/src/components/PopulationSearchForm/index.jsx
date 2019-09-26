@@ -7,7 +7,7 @@ import { Form, Button, Message, Icon, Grid } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
-import { sortBy } from 'lodash'
+import { sortBy, isEqual } from 'lodash'
 import moment from 'moment'
 
 import { getPopulationStatistics } from '../../redux/populations'
@@ -31,8 +31,6 @@ import {
 import { setLoading } from '../../redux/graphSpinner'
 import './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
-import InfoBox from '../InfoBox'
-import infoToolTips from '../../common/InfoToolTips'
 import SearchHistory from '../SearchHistory'
 
 const YEAR_DATE_FORMAT = 'YYYY'
@@ -47,7 +45,7 @@ const initialQuery = () => ({
   startYear: Datetime.moment('2017-01-01').year(),
   semesters: ['FALL', 'SPRING'],
   studentStatuses: [],
-  studyRights: [],
+  studyRights: {},
   months: months('2017', 'FALL'),
   tag: ''
 })
@@ -56,7 +54,6 @@ const PopulationSearchForm = props => {
   const [totalState, setTotalState] = useState({
     query: initialQuery(),
     isLoading: false,
-    showAdvancedSettings: false,
     momentYear: Datetime.moment('2017-01-01'),
     floatMonths: months('2017', 'FALL')
   })
@@ -67,7 +64,7 @@ const PopulationSearchForm = props => {
 
   const setState = newState => setTotalState({ ...totalState, ...newState })
 
-  const { query, isLoading, showAdvancedSettings, momentYear, floatMonths } = totalState
+  const { query, isLoading, momentYear, floatMonths } = totalState
 
   const { studyProgrammes, location, semesters, queries, history, tags, language, translate, onProgress } = props
 
@@ -84,13 +81,20 @@ const PopulationSearchForm = props => {
   }
 
   const checkPreviousQuery = (query, previousQuery) => {
-    if (!previousQuery.studyRights) {
-      return false
-    }
+    if (!previousQuery.studyRights) return false
+
     const sameProgramme = query.studyRights.programme === previousQuery.studyRights.programme
     const sameMonths = query.months === previousQuery.months
     const sameStartYear = query.startYear === previousQuery.startYear
-    return sameProgramme && sameMonths && sameStartYear
+    const sameSemesters = previousQuery.semesters
+      ? isEqual(previousQuery.semesters, query.semesters)
+      : !(query.semesters.length > 0)
+    const sameStudentStatuses = previousQuery.studentStatuses
+      ? isEqual(query.studentStatuses, previousQuery.studentStatuses)
+      : !(query.studentStatuses.length > 0)
+    const sameTag = previousQuery.tag !== '' ? previousQuery.tag === query.tag : query.tag === ''
+
+    return sameProgramme && sameMonths && sameStartYear && sameSemesters && sameStudentStatuses && sameTag
   }
 
   const formatQueryParamsToArrays = (query, params) => {
@@ -127,12 +131,7 @@ const PopulationSearchForm = props => {
         props.setPopulationFilter(transferTo(false))
       }
       setState({
-        isLoading: false,
-        query: {
-          ...query,
-          endYear: query.startYear,
-          tag: ''
-        }
+        isLoading: false
       })
     }
   }
@@ -157,12 +156,22 @@ const PopulationSearchForm = props => {
     if (location.search) {
       fetchPopulationFromUrlParams()
     }
+    if (!location.search) {
+      setState({
+        query: {
+          ...query,
+          studentStatuses: [],
+          semesters: ['FALL', 'SPRING'],
+          tag: '',
+          endYear: query.startYear
+        }
+      })
+    }
     setDidMount(true)
-
     return () => {
       if (fetchPopulationPromises.current) fetchPopulationPromises.current.cancel()
     }
-  }, [])
+  }, [location.search])
 
   const handleClear = type => {
     setState({
@@ -276,6 +285,7 @@ const PopulationSearchForm = props => {
       query: {
         ...query,
         endYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
+        tag: '',
         startYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
         months: months(
           reformatDate(momentYear, YEAR_DATE_FORMAT),
@@ -302,20 +312,6 @@ const PopulationSearchForm = props => {
     return -1
   }
 
-  const handleTagSearch = (event, { value }) => {
-    const tag = tags.find(t => t.tag_id === value)
-    const months = getMonths(reformatDate(moment(`${tag.year}-01-01`), YEAR_DATE_FORMAT), moment(), 'FALL')
-    setState({
-      query: {
-        ...query,
-        tag: tag.tag_id,
-        startYear: tag.year,
-        endYear: reformatDate(moment(), YEAR_DATE_FORMAT),
-        months
-      }
-    })
-  }
-
   const addYear = () => {
     const { startYear } = query
     const nextYear = momentFromFormat(startYear, YEAR_DATE_FORMAT).add(1, 'year')
@@ -326,31 +322,6 @@ const PopulationSearchForm = props => {
     const { startYear } = query
     const previousYear = momentFromFormat(startYear, YEAR_DATE_FORMAT).subtract(1, 'year')
     handleYearSelection(previousYear)
-  }
-
-  const handleSemesterSelection = (e, { value }) => {
-    const semesters = query.semesters.includes(value)
-      ? query.semesters.filter(s => s !== value)
-      : [...query.semesters, value]
-    setState({
-      query: {
-        ...query,
-        semesters,
-        months: months(query.startYear, semesters.includes('FALL') ? 'FALL' : 'SPRING')
-      }
-    })
-  }
-
-  const handleStudentStatusSelection = (e, { value }) => {
-    const studentStatuses = query.studentStatuses.includes(value)
-      ? query.studentStatuses.filter(s => s !== value)
-      : [...query.studentStatuses, value]
-    setState({
-      query: {
-        ...query,
-        studentStatuses
-      }
-    })
   }
 
   const handleDegreeChange = (e, { value }) => {
@@ -412,6 +383,31 @@ const PopulationSearchForm = props => {
       return momentYear.year() >= 1900 && momentYear.isSameOrBefore(moment().subtract(6, 'months'))
     }
     return props.studyProgrammes[query.studyRights.programme].enrollmentStartYears[momentYear.year()] != null
+  }
+
+  const handleTagSelection = (e, { value }) => {
+    const tag = tags.find(t => t.tag_id === value)
+    if (!tag) {
+      setState({
+        query: {
+          ...query,
+          tag: '',
+          endYear: query.startYear,
+          months: query.months
+        }
+      })
+    } else {
+      const months = getMonths(reformatDate(moment(`${tag.year}-01-01`), YEAR_DATE_FORMAT), moment(), 'FALL')
+      setState({
+        query: {
+          ...query,
+          tag: tag.tag_id,
+          startYear: tag.year,
+          endYear: reformatDate(moment(), YEAR_DATE_FORMAT),
+          months
+        }
+      })
+    }
   }
 
   const getMinSelection = (startYear, semester) => (semester === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`)
@@ -493,7 +489,30 @@ const PopulationSearchForm = props => {
       />
     </Form.Field>
   )
-  const renderAdditionalDegreeOrStudyTrackDropdown = (studyRights, studyTracksToRender, degreesToRender) => {
+
+  const renderTagDropdown = (tagOptions, chosenTag) => (
+    <Form.Field>
+      <label>Select tag (Optional)</label>
+      <Form.Dropdown
+        placeholder="select tag"
+        selection
+        value={chosenTag.tag_id}
+        options={tagOptions}
+        onChange={handleTagSelection}
+        selectOnBlur={false}
+        selectOnNavigation={false}
+      />
+    </Form.Field>
+  )
+
+  const renderAdditionalDegreeOrStudyTrackOrTagDropdown = (
+    studyRights,
+    studyTracksToRender,
+    degreesToRender,
+    shouldRenderTags,
+    tagOptions,
+    chosenTag
+  ) => {
     const renderableDegrees = () => (
       <React.Fragment>
         <label>Degree (Optional)</label>
@@ -536,6 +555,7 @@ const PopulationSearchForm = props => {
       return (
         <Form.Group>
           <Form.Field width={8}>
+            {shouldRenderTags ? renderTagDropdown(tagOptions, chosenTag) : null}
             {degreesToRender && degreesToRender.length > 1 ? renderableDegrees() : null}
           </Form.Field>
           <Form.Field width={8}>
@@ -579,93 +599,22 @@ const PopulationSearchForm = props => {
         studyTracksToRender = renderableList(sortedStudyTracks)
       }
     }
+    const tagOptions = [{ key: 0, text: '', value: '' }]
+    tags.forEach(tag => tagOptions.push({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id }))
+    const chosenTag = tags.find(tag => tag.tag_id === query.tag) || { tagname: '', tag_id: '' }
+    const shouldRenderTags = tags.filter(tag => tag.studytrack === query.studyRights.programme).length > 0
 
     return (
       <div>
         {renderStudyProgrammeDropdown(studyRights, programmesToRender)}
-        {renderAdditionalDegreeOrStudyTrackDropdown(studyRights, studyTracksToRender, degreesToRender)}
-      </div>
-    )
-  }
-
-  const renderAdvancedSettingsSelector = () => {
-    if (!showAdvancedSettings) {
-      return null
-    }
-
-    const { semesters, studentStatuses } = query
-    const options = tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id })) || []
-
-    return (
-      <div>
-        <Form.Group>
-          <Form.Field>
-            <label>Semesters</label>
-            <Form.Checkbox
-              className="populationStatisticsRadio"
-              key="FALL"
-              label={translate(`populationStatistics.${'FALL'}`)}
-              value="FALL"
-              name="semesterGroup"
-              checked={semesters.includes('FALL')}
-              onChange={handleSemesterSelection}
-            />
-            <Form.Checkbox
-              className="populationStatisticsRadio"
-              key="SPRING"
-              label={translate(`populationStatistics.${'SPRING'}`)}
-              value="SPRING"
-              name="semesterGroup"
-              checked={semesters.includes('SPRING')}
-              onChange={handleSemesterSelection}
-            />
-          </Form.Field>
-        </Form.Group>
-        <Form.Group>
-          <Form.Field>
-            <label>Include</label>
-            <Form.Checkbox
-              className="populationStatisticsRadio"
-              key="EXCHANGE"
-              label="Exchange students"
-              value="EXCHANGE"
-              name="studentStatusGroup"
-              checked={studentStatuses.includes('EXCHANGE')}
-              onChange={handleStudentStatusSelection}
-            />
-            <Form.Checkbox
-              className="populationStatisticsRadio"
-              key="CANCELLED"
-              label="Students with cancelled study right"
-              value="CANCELLED"
-              name="studentStatusGroup"
-              checked={studentStatuses.includes('CANCELLED')}
-              onChange={handleStudentStatusSelection}
-            />
-            <Form.Checkbox
-              className="populationStatisticsRadio"
-              key="NONDEGREE"
-              label="Students with non-degree study right"
-              value="NONDEGREE"
-              name="studentStatusGroup"
-              checked={studentStatuses.includes('NONDEGREE')}
-              onChange={handleStudentStatusSelection}
-            />
-          </Form.Field>
-        </Form.Group>
-        <Form.Group>
-          <Form.Field>
-            <label>Select tag</label>
-            <Form.Dropdown
-              placeholder="select tag"
-              selection
-              options={options}
-              onChange={handleTagSearch}
-              selectOnBlur={false}
-              selectOnNavigation={false}
-            />
-          </Form.Field>
-        </Form.Group>
+        {renderAdditionalDegreeOrStudyTrackOrTagDropdown(
+          studyRights,
+          studyTracksToRender,
+          degreesToRender,
+          shouldRenderTags,
+          tagOptions,
+          chosenTag
+        )}
       </div>
     )
   }
@@ -678,7 +627,6 @@ const PopulationSearchForm = props => {
   if (!shouldRenderSearchForm() && location.search !== '') {
     return null
   }
-  const { Advanced } = infoToolTips.PopulationStatistics
   let errorText = translate('populationStatistics.alreadyFetched')
   let isQueryInvalid = false
 
@@ -704,28 +652,12 @@ const PopulationSearchForm = props => {
           <Grid.Row>
             <Grid.Column width={10}>
               {renderEnrollmentDateSelector()}
+              {/* {tags.length > 0 && query.studyRights.programme ? renderTagDropdown(options, chosenTag) : null} */}
               {renderStudyGroupSelector()}
-            </Grid.Column>
-            <Grid.Column width={6}>
-              <Form.Field style={{ margin: 'auto' }}>
-                <label>
-                  Advanced settings <InfoBox content={Advanced} />
-                </label>
-                <Form.Radio
-                  toggle
-                  checked={showAdvancedSettings}
-                  onClick={() => {
-                    setState({ showAdvancedSettings: !showAdvancedSettings })
-                  }}
-                />
-              </Form.Field>
-              {renderAdvancedSettingsSelector()}
             </Grid.Column>
           </Grid.Row>
         </Grid>
-
         <Message error color="blue" header={errorText} />
-
         <Form.Button onClick={handleSubmit} disabled={isQueryInvalid || query.months < 0}>
           {translate('populationStatistics.addPopulation')}
         </Form.Button>
