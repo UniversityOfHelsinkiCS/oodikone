@@ -19,6 +19,7 @@ services:
       - "5423:5432"
     volumes:
       - analytics_pgdata:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
     container_name: oodi_analytics_db
     environment:
       - POSTGRES_USER=postgres
