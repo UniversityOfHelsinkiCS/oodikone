@@ -44,7 +44,9 @@ const SimpleExtentGraduated = props => {
             trigger={<Icon style={{ float: 'right' }} name="info" />}
           />
           <Form.Group inline>
-            <Form.Field>Students that</Form.Field>
+            <Form.Field>
+              <label>Students that</label>
+            </Form.Field>
             <Form.Field>
               <Dropdown
                 fluid
@@ -56,8 +58,7 @@ const SimpleExtentGraduated = props => {
                 selectOnNavigation={false}
               />
             </Form.Field>
-            {`graduated from ${getTextIn(programme, language)}`}
-
+            <label>{`graduated from ${getTextIn(programme, language)}`}</label>
             <Form.Field>
               <Button onClick={handleLimit}>set filter</Button>
             </Form.Field>
