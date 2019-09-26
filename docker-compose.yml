@@ -22,7 +22,6 @@ services:
     container_name: oodi_analytics_db
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=analytics_db
 
   user_db:
     image: postgres:9.6.3

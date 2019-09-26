@@ -3,12 +3,16 @@
 DIR_PATH=$(dirname "$0")
 ANONDB_DIR=anonyymioodi
 BACKUP_DIR=backups
+
 PSQL_DB_BACKUP="$ANONDB_DIR/anon.sqz"
 USER_DB_BACKUP="$ANONDB_DIR/user-dump.sqz"
 KONE_DB_BACKUP="$ANONDB_DIR/anon_kone.sqz"
+ANALYTICS_DB_BACKUP="$ANONDB_DIR/analytics-dump.sqz"
+
 PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.sqz"
 KONE_REAL_DB_BACKUP="$BACKUP_DIR/latest-kone-pg.sqz"
 USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
+ANALYTICS_REAL_DB_BACKUP="$BACKUP_DIR/latest-analytics-pg.sqz"
 
 docker-compose-dev () {
     docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml "$@"
@@ -80,6 +84,8 @@ db_setup_full () {
     restore_psql_from_backup $KONE_REAL_DB_BACKUP db_kone db_kone_real
     ping_psql "oodi_user_db" "user_db_real"
     restore_psql_from_backup $USER_REAL_DB_BACKUP oodi_user_db user_db_real
+    ping_psql "oodi_analytics_db" "analytics_db_real"
+    restore_psql_from_backup $ANALYTICS_REAL_DB_BACKUP oodi_analytics_db analytics_db_real
     # echo "Restoring MongoDB from backup"
     # retry restore_mongodb_from_backup
     echo "Database setup finished"
@@ -90,11 +96,16 @@ db_anon_setup_full () {
     ping_psql "oodi_db" "tkt_oodi"
     ping_psql "oodi_db" "tkt_oodi_test"
     restore_psql_from_backup $PSQL_DB_BACKUP oodi_db tkt_oodi
+
     ping_psql "db_kone" "db_kone"
     ping_psql "db_kone" "db_kone_test"
     restore_psql_from_backup $KONE_DB_BACKUP db_kone db_kone
+
     ping_psql "oodi_user_db" "user_db"
     restore_psql_from_backup $USER_DB_BACKUP oodi_user_db user_db
+
+    ping_psql "oodi_analytics_db" "analytics_db"
+    restore_psql_from_backup $ANALYTICS_DB_BACKUP oodi_analytics_db analytics_db
     # echo "Restoring MongoDB from backup"
     # retry restore_mongodb_from_backup
     echo "Database setup finished"
@@ -102,14 +113,14 @@ db_anon_setup_full () {
 
 reset_real_db () {
     docker-compose-dev down
-    docker-compose-dev up -d db user_db db_kone
+    docker-compose-dev up -d db user_db db_kone analytics_db
     db_setup_full
     docker-compose-dev down
 }
 
 reset_db () {
     docker-compose-dev down
-    docker-compose-dev up -d db user_db db_kone
+    docker-compose-dev up -d db user_db db_kone analytics_db
     db_anon_setup_full
     docker-compose-dev down
 }
@@ -144,7 +155,7 @@ run_full_setup () {
     echo "Building images"
     docker-compose-dev build
     echo "Setup oodikone db from dump."
-    docker-compose-dev up -d db user_db db_kone
+    docker-compose-dev up -d db user_db db_kone analytics_db
     db_setup_full
     db_anon_setup_full
     docker-compose-dev down
@@ -161,7 +172,7 @@ run_anon_full_setup () {
     echo "Building images"
     docker-compose-dev build
     echo "Setup oodikone db from dump."
-    docker-compose-dev up -d db user_db db_kone
+    docker-compose-dev up -d db user_db db_kone analytics_db
     db_anon_setup_full
     docker-compose-dev down
     show_instructions
@@ -177,7 +188,7 @@ run_e2e_setup () {
     echo "Building images"
     TAG=$2 SENTRY_RELEASE_VERSION=$3 docker-compose -f docker-compose.yml -f $1 build
     echo "Setup oodikone db from dump."
-    TAG=$2 SENTRY_RELEASE_VERSION=$3 docker-compose -f docker-compose.yml -f $1 up -d db user_db db_kone
+    TAG=$2 SENTRY_RELEASE_VERSION=$3 docker-compose -f docker-compose.yml -f $1 up -d db user_db db_kone analytics_db
     db_anon_setup_full
     echo "Starting services."
     TAG=$2 SENTRY_RELEASE_VERSION=$3 docker-compose -f docker-compose.yml -f $1 up -d
