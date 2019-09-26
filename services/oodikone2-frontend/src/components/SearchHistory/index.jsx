@@ -2,14 +2,15 @@ import React, { useState } from 'react'
 import moment from 'moment'
 import { sortBy } from 'lodash'
 import { Segment, Form, Header } from 'semantic-ui-react'
-import { arrayOf, date, func, shape, string } from 'prop-types'
+import { arrayOf, date, func, shape, string, bool } from 'prop-types'
 
-const SearchHistory = ({ items, handleSearch, updateItem }) => {
+const SearchHistory = ({ items, handleSearch, updateItem, disabled }) => {
   const [selected, setSelected] = useState(null)
 
   const sortedItems = sortBy(items, i => -new Date(i.timestamp).getTime())
 
   const handleChange = (e, { value }) => {
+    if (disabled) return
     setSelected(value)
     handleSearch(sortedItems[value - 1].params)
     updateItem(sortedItems[value - 1])
@@ -17,8 +18,9 @@ const SearchHistory = ({ items, handleSearch, updateItem }) => {
 
   return (
     <Segment>
-      <Header content="Previous searches" icon="clock outline" />
+      <Header disabled={disabled} content="Previous searches" icon="clock outline" />
       <Form.Dropdown
+        disabled={disabled}
         placeholder="Select a previous search"
         noResultsMessage="No previous searches"
         search
@@ -41,6 +43,10 @@ const SearchHistory = ({ items, handleSearch, updateItem }) => {
   )
 }
 
+SearchHistory.defaultProps = {
+  disabled: false
+}
+
 SearchHistory.propTypes = {
   items: arrayOf(
     shape({
@@ -50,7 +56,8 @@ SearchHistory.propTypes = {
     })
   ).isRequired,
   handleSearch: func.isRequired,
-  updateItem: func.isRequired
+  updateItem: func.isRequired,
+  disabled: bool
 }
 
 export default SearchHistory
