@@ -199,7 +199,12 @@ const SearchForm = props => {
           </div>
         </Form>
       </Segment>
-      <SearchHistory handleSearch={pushQueryToUrl} items={searchHistory} updateItem={updateItemInSearchHistory} />
+      <SearchHistory
+        disabled={isLoading}
+        handleSearch={pushQueryToUrl}
+        items={searchHistory}
+        updateItem={updateItemInSearchHistory}
+      />
     </React.Fragment>
   )
 }
