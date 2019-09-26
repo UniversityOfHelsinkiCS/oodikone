@@ -80,7 +80,7 @@ describe('Population Statistics tests', () => {
       cy.get("tr").its('length').should('be.gte', 10)
       cy.route('/api/v3/courseyearlystats**').as('coursePage')
       cy.contains("Opiskelijan digitaidot: orientaatio")
-      cy.get(':nth-child(2) > .iconCell > p > .item > .level').click()
+      cy.get(':nth-child(2) > .iconCell > p > .item > .level').click({ force: true })
       cy.wait('@coursePage')
       cy.url().should('include', '/coursestatistics')
     })
