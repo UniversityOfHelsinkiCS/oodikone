@@ -98,9 +98,18 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
             <Table.Row>
               <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
               {renderStudentsHeader()}
+              <Table.HeaderCell rowSpan="2" colSpan="1">
+                Started
+              </Table.HeaderCell>
+              <Table.HeaderCell rowSpan="2" colSpan="1">
+                Cancelled
+              </Table.HeaderCell>
+
               <Table.HeaderCell colSpan={GRADUATED_FEATURE_TOGGLED_ON ? '3' : '1'}>Graduated</Table.HeaderCell>
 
-              <Table.HeaderCell rowSpan="2">Transferred to this program</Table.HeaderCell>
+              <Table.HeaderCell rowSpan="1" colSpan="2">
+                Transferred
+              </Table.HeaderCell>
               <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
               {(thesisTypes.includes('BACHELOR') || thesisTypes.includes('MASTER')) && (
                 <Table.HeaderCell colSpan={thesisTypes.length}>Thesis</Table.HeaderCell>
@@ -120,6 +129,9 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                   <Table.HeaderCell>Graduation median time</Table.HeaderCell>
                 </Fragment>
               )}
+              <Table.HeaderCell content="to" />
+              <Table.HeaderCell content="from" />
+
               <Table.HeaderCell content="≥ 30" />
               <Table.HeaderCell content="≥ 60" />
               <Table.HeaderCell content="≥ 90" />
@@ -149,6 +161,8 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                     </Table.Cell>
                   ))}
                   {renderRatioOfFinns && ratioOfFinnsIn(year)}
+                  <Table.Cell>{year.started}</Table.Cell>
+                  <Table.Cell>{year.cancelled}</Table.Cell>
                   <Table.Cell>{year.graduated}</Table.Cell>
                   {GRADUATED_FEATURE_TOGGLED_ON && (
                     <Fragment>
@@ -156,7 +170,9 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                       <Table.Cell>{year.medianGraduationTime ? `${year.medianGraduationTime} months` : '∞'}</Table.Cell>
                     </Fragment>
                   )}
+
                   <Table.Cell>{year.transferred}</Table.Cell>
+                  <Table.Cell>{year.transferredFrom}</Table.Cell>
                   {Object.keys(year.creditValues).map(creditKey => (
                     <Table.Cell key={`${year.year} credit:${creditKey}`}>{year.creditValues[creditKey]}</Table.Cell>
                   ))}
@@ -184,6 +200,8 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                     ) || 0}%)`}
                   </Table.HeaderCell>
                 ) : null}
+                <Table.HeaderCell>{throughput.totals.started}</Table.HeaderCell>
+                <Table.HeaderCell>{throughput.totals.cancelled}</Table.HeaderCell>
                 <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
                 {GRADUATED_FEATURE_TOGGLED_ON && (
                   <Fragment>
@@ -195,7 +213,9 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                     </Table.HeaderCell>
                   </Fragment>
                 )}
+
                 <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
+                <Table.HeaderCell>{throughput.totals.transferredFrom}</Table.HeaderCell>
                 {Object.keys(throughput.totals.credits).map(creditKey => (
                   <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}</Table.HeaderCell>
                 ))}
