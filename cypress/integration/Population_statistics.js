@@ -79,7 +79,8 @@ describe('Population Statistics tests', () => {
     cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
       cy.get("tr").its('length').should('be.gte', 10)
       cy.route('/api/v3/courseyearlystats**').as('coursePage')
-      cy.contains("Opiskelijan digitaidot: orientaatio").siblings().find(".level").click()
+      cy.contains("Opiskelijan digitaidot: orientaatio")
+      cy.get(':nth-child(2) > .iconCell > p > .item > .level').click({ force: true })
       cy.wait('@coursePage')
       cy.url().should('include', '/coursestatistics')
     })
@@ -171,9 +172,8 @@ describe('Population Statistics tests', () => {
     cy.contains("Spring 2018").click()
     cy.contains("Spring 2018").parentsUntil("form").contains("set filter").click()
     cy.contains("Students that were present").should('have.text', "Students that were present during Fall 2018, Spring 2018")
-
-    cy.contains('graduated from Kasvatustieteiden kandiohjelma').contains('have/not').click().siblings().contains('have not').click()
-    cy.contains('graduated from Kasvatustieteiden kandiohjelma').contains('set filter').click()
+    cy.get(':nth-child(7) > .form > .inline > :nth-child(2) > .ui > .default').click().siblings().contains('have not').click()
+    cy.contains("Students that").parentsUntil("form").contains("set filter").click()
 
     cy.contains('Showing students that have not graduated from Kasvatustieteiden kandiohjelma')
 

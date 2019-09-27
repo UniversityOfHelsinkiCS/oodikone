@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Table, Form, Input, Popup, Button, Segment } from 'semantic-ui-react'
+import { Table, Form, Input, Popup, Button, Segment, Icon, Item } from 'semantic-ui-react'
 import { func, arrayOf, object, number, shape, string, oneOf, bool } from 'prop-types'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { replace, sortBy, orderBy, omit } from 'lodash'
-import { withRouter } from 'react-router-dom'
-import qs from 'query-string'
+import { withRouter, Link } from 'react-router-dom'
 
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
 import { clearCourseStats } from '../../redux/coursestats'
@@ -194,11 +193,8 @@ class PopulationCourseStats extends Component {
     )
   }
 
-  onGoToCourseStatisticsClick = code => {
-    const { history, clearCourseStats: clearCourseStatsfn } = this.props
-    const queryObject = { separate: false, courseCodes: JSON.stringify([code]) }
-    const searchString = qs.stringify(queryObject)
-    history.push(`/coursestatistics?${searchString}`)
+  onGoToCourseStatisticsClick = () => {
+    const { clearCourseStats: clearCourseStatsfn } = this.props
     clearCourseStatsfn()
   }
 
@@ -315,11 +311,13 @@ class PopulationCourseStats extends Component {
             content={getTextIn(name, language)}
             className="clickableCell"
           />
-          <Table.Cell
-            icon="level up alternate"
-            onClick={() => this.onGoToCourseStatisticsClick(code)}
-            className="iconCell"
-          />
+          <Table.Cell className="iconCell">
+            <p>
+              <Item as={Link} to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false`}>
+                <Icon name="level up alternate" onClick={() => this.onGoToCourseStatisticsClick()} />
+              </Item>
+            </p>
+          </Table.Cell>
           <Table.Cell content={code} />
           <Table.Cell content={attempts} />
           <Table.Cell content={failedGrades} />
@@ -418,11 +416,13 @@ class PopulationCourseStats extends Component {
             content={getTextIn(name, language)}
             className="clickableCell"
           />
-          <Table.Cell
-            icon="level up alternate"
-            onClick={() => this.onGoToCourseStatisticsClick(code)}
-            className="iconCell"
-          />
+          <Table.Cell className="iconCell">
+            <p>
+              <Item as={Link} to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false`}>
+                <Icon name="level up alternate" onClick={() => this.onGoToCourseStatisticsClick()} />
+              </Item>
+            </p>
+          </Table.Cell>
           <Table.Cell content={code} />
           <Table.Cell content={passed + failed} />
           <Table.Cell content={passed} />
