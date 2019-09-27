@@ -2,11 +2,11 @@ import React, { Component, Fragment } from 'react'
 import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { Segment, Table, Icon, Label, Header, Loader } from 'semantic-ui-react'
+import { Segment, Table, Icon, Label, Header, Loader, Item } from 'semantic-ui-react'
 import { isEmpty, sortBy, flattenDeep, cloneDeep } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import { getStudent, removeStudentSelection, resetStudent } from '../../redux/students'
 import { getSemesters } from '../../redux/semesters'
 import StudentInfoCard from '../StudentInfoCard'
@@ -118,21 +118,19 @@ class StudentDetails extends Component {
   }
 
   pushQueryToUrl = query => {
-    const { history } = this.props
     const { courseCodes, ...rest } = query
     const queryObject = { ...rest, courseCodes: JSON.stringify(courseCodes) }
     const searchString = qs.stringify(queryObject)
     this.props.clearCourseStats()
-    history.push(`/coursestatistics?${searchString}`)
+    return `/coursestatistics?${searchString}`
   }
 
   showPopulationStatistics = (studyprogramme, date) => {
-    const { history } = this.props
     const year = moment(date).isBefore(moment(`${date.slice(0, 4)}-08-01`)) ? date.slice(0, 4) - 1 : date.slice(0, 4)
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
-    history.push(
+    return (
       `/populations?months=${months}&semesters=FALL&semesters=` +
-        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`
     )
   }
 
@@ -214,13 +212,17 @@ class StudentDetails extends Component {
           {grade}
         </div>,
         credits,
-        <Icon
-          style={{ cursor: 'pointer' }}
-          name="level up"
-          onClick={() =>
-            this.pushQueryToUrl({ courseCodes: [course.code], separate: false, fromYear: year - 1, toYear: year + 1 })
-          }
-        />
+        <Item
+          as={Link}
+          to={this.pushQueryToUrl({
+            courseCodes: [course.code],
+            separate: false,
+            fromYear: year - 1,
+            toYear: year + 1
+          })}
+        >
+          <Icon name="level up alternate" />
+        </Item>
       ]
     })
     return (
@@ -361,10 +363,9 @@ class StudentDetails extends Component {
                             programme.enddate,
                             'DD.MM.YYYY'
                           )})`}
-                          <Icon
-                            name="level up alternate"
-                            onClick={() => this.showPopulationStatistics(programme.code, programme.startdate)}
-                          />{' '}
+                          <Item as={Link} to={this.showPopulationStatistics(programme.code, programme.startdate)}>
+                            <Icon name="level up alternate" />
+                          </Item>{' '}
                           <br />
                         </p>
                       ))}

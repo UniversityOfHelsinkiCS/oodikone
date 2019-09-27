@@ -1,18 +1,19 @@
 import React from 'react'
 import qs from 'query-string'
-import { Header, Icon } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
+import { Header, Icon, Item } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { uniq } from 'lodash'
 import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
 import { getUserIsAdmin } from '../../../../../common'
 
-const CumulativeTable = ({ stats, name, history, isAdmin }) => {
+const CumulativeTable = ({ stats, name, isAdmin }) => {
   const showPopulation = (yearcode, years) => {
     const coursecodes = stats.map(s => s.coursecode)
     const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), years }
     const searchString = qs.stringify(queryObject)
-    history.push(`/coursepopulation?${searchString}`)
+    return `/coursepopulation?${searchString}`
   }
 
   return (
@@ -31,7 +32,9 @@ const CumulativeTable = ({ stats, name, history, isAdmin }) => {
               isAdmin ? (
                 <div>
                   {s.name}
-                  <Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name, s)} />
+                  <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+                    <Icon name="level up alternate" />
+                  </Item>
                 </div>
               ) : (
                 s.name
@@ -62,7 +65,6 @@ const CumulativeTable = ({ stats, name, history, isAdmin }) => {
 CumulativeTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  history: shape({}).isRequired,
   isAdmin: bool.isRequired
 }
 
