@@ -1,7 +1,7 @@
 import React, { memo, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { List } from 'semantic-ui-react'
-import { func, string, arrayOf, shape } from 'prop-types'
+import { Table } from 'semantic-ui-react'
+import { func, string, arrayOf, shape, bool } from 'prop-types'
 
 import TagStudent from '../TagStudent'
 import selector from '../../selectors/populationDetails'
@@ -10,20 +10,13 @@ import { getStudentTagsByStudytrackAction } from '../../redux/tagstudent'
 
 const Row = memo(
   ({ studentsTags, sn, studytrack, tagOptions, name }) => (
-    <div>
-      <List horizontal>
-        <List.Item></List.Item>
-        <List.Item>
-          <TagStudent
-            studentnumber={sn}
-            studentname={name}
-            studentstags={studentsTags}
-            studytrack={studytrack}
-            tagOptions={tagOptions}
-          />
-        </List.Item>
-      </List>
-    </div>
+    <TagStudent
+      studentnumber={sn}
+      studentname={name}
+      studentstags={studentsTags}
+      studytrack={studytrack}
+      tagOptions={tagOptions}
+    />
   ),
   (prevProps, newProps) => prevProps.studentsTags.length === newProps.studentsTags.length
 )
@@ -36,7 +29,15 @@ Row.propTypes = {
   name: string.isRequired
 }
 
-const TagList = ({ selectedStudents, tagstudent, tags, studytrack, getStudentTagsStudyTrack, getTagsByStudytrack }) => {
+const TagList = ({
+  selectedStudents,
+  tagstudent,
+  tags,
+  studytrack,
+  getStudentTagsStudyTrack,
+  getTagsByStudytrack,
+  namesVisible
+}) => {
   useEffect(() => {
     getTagsByStudytrack(studytrack)
     getStudentTagsStudyTrack(studytrack)
@@ -65,16 +66,30 @@ const TagList = ({ selectedStudents, tagstudent, tags, studytrack, getStudentTag
     )
   })
 
-  return tagRows
+  return (
+    <Table celled>
+      <Table.Header>
+        <Table.Row>
+          {namesVisible && <Table.HeaderCell>student name</Table.HeaderCell>}
+          <Table.HeaderCell>studentnumber</Table.HeaderCell>
+          <Table.HeaderCell>tags</Table.HeaderCell>
+          <Table.HeaderCell>add tags</Table.HeaderCell>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>{tagRows}</Table.Body>
+    </Table>
+  )
 }
 
 const mapStateToProps = state => {
   const { tagstudent, tags } = state
+  const { settings } = state
   const { programme } = selector.makePopulationsToData(state)
   return {
     tagstudent: tagstudent.data,
     tags: tags.data,
-    studytrack: programme
+    studytrack: programme,
+    namesVisible: settings.namesVisible
   }
 }
 
@@ -84,7 +99,8 @@ TagList.propTypes = {
   selectedStudents: arrayOf(shape({})).isRequired,
   tags: arrayOf(shape({})).isRequired,
   studytrack: string.isRequired,
-  tagstudent: arrayOf(shape({})).isRequired
+  tagstudent: arrayOf(shape({})).isRequired,
+  namesVisible: bool.isRequired
 }
 
 export default connect(
