@@ -49,6 +49,11 @@ const updateStudentlist = async () => {
   return response.data
 }
 
+const updateDaily = async () => {
+  const response = await client.post('/update/daily')
+  return response.data
+}
+
 const getStatuses = async () => {
   const response = await client.get('/statuses')
   return response.data
@@ -76,5 +81,6 @@ module.exports = {
   getStatuses,
   rescheduleScheduled,
   rescheduleFetched,
-  updateNoStudents
+  updateNoStudents,
+  updateDaily
 }
