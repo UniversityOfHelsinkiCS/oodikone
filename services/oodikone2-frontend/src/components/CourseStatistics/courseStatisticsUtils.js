@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { orderBy } from 'lodash'
 
 const MIN_YEAR = 1899
 const MAX_YEAR = 2112
@@ -32,4 +33,56 @@ const getActiveYears = course => {
   return `${startYearText} — ${endYearText}`
 }
 
-export { getActiveYears, getYearText }
+const sortAlternatives = alternatives =>
+  orderBy(
+    alternatives,
+    [
+      a => {
+        if (a.code.match(/^A/)) return 4 // open university codes come last
+        if (a.code.match(/^\d/)) return 2 // old numeric codes come second
+        if (a.code.match(/^[A-Za-z]/)) return 1 // new letter based codes come first
+        return 3 // unknown, comes before open uni?
+      },
+      a => a.latestInstanceDate || new Date(),
+      'code'
+    ],
+    ['asc', 'desc', 'desc']
+  )
+
+const mergeCourses = (groups, courses) => {
+  const mergedCourses = {}
+
+  courses.forEach(course => {
+    const groupId = groups[course.code] || course.code
+
+    if (!mergedCourses[groupId]) {
+      mergedCourses[groupId] = {
+        ...course,
+        alternatives: [{ code: course.code, latestInstanceDate: new Date(course.latest_instance_date) }],
+        min_attainment_date: new Date(course.min_attainment_date),
+        max_attainment_date: new Date(course.max_attainment_date)
+      }
+    } else {
+      const mergedCourse = mergedCourses[groupId]
+      mergedCourse.min_attainment_date = Math.min(
+        mergedCourse.min_attainment_date,
+        new Date(course.min_attainment_date)
+      )
+      mergedCourse.max_attainment_date = Math.max(
+        mergedCourse.max_attainment_date,
+        new Date(course.max_attainment_date)
+      )
+      mergedCourse.alternatives.push({
+        code: course.code,
+        latestInstanceDate: new Date(course.latest_instance_date)
+      })
+    }
+  })
+
+  return Object.values(mergedCourses).map(c => ({
+    ...c,
+    alternatives: sortAlternatives(c.alternatives)
+  }))
+}
+
+export { getActiveYears, getYearText, mergeCourses }

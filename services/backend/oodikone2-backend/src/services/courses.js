@@ -604,6 +604,15 @@ const alternativeCodes = async code => {
   return alternatives ? alternatives : [code]
 }
 
+const getGroupId = async code => {
+  const duplicates = await CourseDuplicates.findOne({
+    where: {
+      coursecode: code
+    }
+  })
+  return duplicates ? duplicates.groupid : null
+}
+
 const formatStudyrightElement = ({ code, element_detail, startdate }) => ({
   code,
   name: element_detail.name,
@@ -749,8 +758,8 @@ const codeLikeTerm = code =>
         }
       }
 
-const byNameAndOrCodeLike = (name, code) => {
-  return Course.findAll({
+const byNameAndOrCodeLike = async (name, code) => {
+  const courses = await Course.findAll({
     attributes: [
       'name',
       'code',
@@ -765,6 +774,20 @@ const byNameAndOrCodeLike = (name, code) => {
       ...codeLikeTerm(code)
     }
   })
+
+  const groups = {}
+  await Promise.all(
+    courses.map(
+      course =>
+        new Promise(async res => {
+          const groupid = await getGroupId(course.code)
+          groups[course.code] = groupid
+          res()
+        })
+    )
+  )
+
+  return { courses, groups }
 }
 
 const byCodes = codes => {
