@@ -46,9 +46,12 @@ class PopulationStudents extends Component {
   }
 
   componentDidMount() {
+    const queryStudyright = this.props.queryStudyrights[0]
     const admin = this.props.userRoles.includes('admin')
-    this.props.getTagsByStudytrack(this.props.queryStudyrights[0])
-    this.props.getStudentTagsStudyTrack(this.props.queryStudyrights[0])
+    if (queryStudyright) {
+      this.props.getTagsByStudytrack(queryStudyright)
+      this.props.getStudentTagsStudyTrack(queryStudyright)
+    }
     this.setState({ admin, containsStudyTracks: this.containsStudyTracks() })
   }
 
