@@ -1,7 +1,7 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Dropdown, List, Label, Icon } from 'semantic-ui-react'
+import { Dropdown, Label, Icon, Table } from 'semantic-ui-react'
 import { arrayOf, string, shape, func, bool } from 'prop-types'
 
 import { createStudentTagAction, deleteStudentTagAction } from '../../redux/tagstudent'
@@ -30,36 +30,28 @@ const TagStudent = ({
   }
 
   const studentsTags = studentstags.map(t => (
-    <List.Item key={`${studentnumber}-${t.tag.tag_id}`}>
-      <List.Content>
-        <Label color={t.tag.personal_user_id ? 'purple' : null}>
-          {t.tag.tagname} <Icon name="delete" link onClick={event => deleteTag(event, t.tag)} />
-        </Label>
-      </List.Content>
-    </List.Item>
+    <Label key={`${studentnumber}-${t.tag.tag_id}`} color={t.tag.personal_user_id ? 'purple' : null}>
+      {t.tag.tagname} <Icon name="delete" link onClick={event => deleteTag(event, t.tag)} />
+    </Label>
   ))
 
   return (
-    <List horizontal style={{ display: 'flex', alignItems: 'center' }}>
-      <List.Item>
-        {namesVisible && <List.Content>{studentname}</List.Content>}
-        <List.Content>{studentnumber}</List.Content>
-      </List.Item>
-      {studentsTags}
-      <List.Item>
-        <List.Content>
-          <Dropdown
-            placeholder="Tag"
-            search
-            selection
-            options={tagOptions}
-            onChange={handleChange}
-            selectOnBlur={false}
-            selectOnNavigation={false}
-          />
-        </List.Content>
-      </List.Item>
-    </List>
+    <Table.Row>
+      {namesVisible && <Table.Cell>{studentname}</Table.Cell>}
+      <Table.Cell>{studentnumber}</Table.Cell>
+      <Table.Cell>{studentsTags}</Table.Cell>
+      <Table.Cell>
+        <Dropdown
+          placeholder="Tag"
+          search
+          selection
+          options={tagOptions}
+          onChange={handleChange}
+          selectOnBlur={false}
+          selectOnNavigation={false}
+        />
+      </Table.Cell>
+    </Table.Row>
   )
 }
 
