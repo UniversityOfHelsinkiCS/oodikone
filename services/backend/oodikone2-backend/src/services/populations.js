@@ -273,9 +273,6 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
           where: {
             startdate: {
               [Op.between]: [startDate, endDate]
-            },
-            enddate: {
-              [Op.between]: [startDate, endDate]
             }
           }
         }
