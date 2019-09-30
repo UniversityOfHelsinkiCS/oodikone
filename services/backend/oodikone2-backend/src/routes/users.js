@@ -2,6 +2,7 @@ const router = require('express').Router()
 const userService = require('../services/userService')
 const mailservice = require('../services/mailservice')
 const blacklist = require('../services/blacklist')
+const { userDataCache } = require('../services/cache')
 
 router.get('/', async (req, res) => {
   const results = await userService.findAll()
@@ -18,6 +19,7 @@ router.post('/modifyaccess', async (req, res) => {
     const { uid } = req.body
     const result = await userService.modifyAccess(req.body)
     const user = await userService.byId(uid)
+    userDataCache.del(user.username)
     if (user && user.username != req.decodedToken.userId) await blacklist.addUserToBlacklist(user.username)
     res.status(200).json(result)
   } catch (e) {
@@ -55,6 +57,7 @@ router.post('/:uid/elements', async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
   const user = await userService.enableElementDetails(uid, codes)
+  userDataCache.del(user.username)
   if (user && user.username != req.decodedToken.userId) await blacklist.addUserToBlacklist(user.username)
   res.json(user)
 })
@@ -63,6 +66,7 @@ router.delete('/:uid/elements', async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
   const user = await userService.removeElementDetails(uid, codes)
+  userDataCache.del(user.username)
   if (user && user.username != req.decodedToken.userId) await blacklist.addUserToBlacklist(user.username)
   res.json(user)
 })
@@ -71,6 +75,7 @@ router.post('/:uid/faculties', async (req, res) => {
   const { uid } = req.params
   const { faculties } = req.body
   const user = await userService.setFaculties(uid, faculties)
+  userDataCache.del(user.username)
   if (user && user.username != req.decodedToken.userId) await blacklist.addUserToBlacklist(user.username)
   res.json(user)
 })

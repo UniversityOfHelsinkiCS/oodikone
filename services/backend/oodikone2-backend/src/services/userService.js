@@ -2,7 +2,7 @@ const axios = require('axios')
 const { USERSERVICE_URL } = require('../conf-backend')
 const UnitService = require('./units')
 const elementDetailService = require('./elementdetails')
-
+const { userDataCache } = require('./cache')
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: process.env.USERSERVICE_SECRET } })
 
 const ping = async () => {
@@ -61,6 +61,7 @@ const byId = async id => {
 }
 
 const updateUser = async (uid, fields) => {
+  userDataCache.del(uid)
   const url = `/user/${uid}`
   const response = await client.put(url, fields)
   return response.data
@@ -114,7 +115,12 @@ const getAccessGroups = async () => {
 }
 
 const getUserDataFor = async uid => {
-  const userData = await byUsernameData(uid)
+  let userData = userDataCache.get(uid)
+  if (!userData) {
+    userData = await byUsernameData(uid)
+    userDataCache.set(uid, userData)
+  }
+
   return {
     ...userData,
     faculties: new Set(userData.faculties)
