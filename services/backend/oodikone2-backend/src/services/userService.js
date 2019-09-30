@@ -41,6 +41,12 @@ const byUsername = async uid => {
   return response.data
 }
 
+const byUsernameData = async uid => {
+  const url = `/user/${uid}/user_data`
+  const response = await client.get(url)
+  return response.data
+}
+
 const getUserElementDetails = async username => {
   const url = `/user/elementdetails/${username}`
   const response = await client.get(url)
@@ -108,11 +114,10 @@ const getAccessGroups = async () => {
 }
 
 const getUserDataFor = async uid => {
-  const user = await byUsername(uid)
+  const userData = await byUsernameData(uid)
   return {
-    roles: user.accessgroup.map(({ group_code }) => group_code),
-    rights: user.elementdetails,
-    faculties: new Set(user.faculty.map(({ faculty_code }) => faculty_code))
+    ...userData,
+    faculties: new Set(userData.faculties)
   }
 }
 
