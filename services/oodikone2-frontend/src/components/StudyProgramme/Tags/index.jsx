@@ -129,7 +129,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
               <Form.Checkbox toggle checked={personal} onClick={() => setPersonal(!personal)} />
             </Form.Field>
             <Button
-              disabled={!tagname.trim() || tags.find(t => t.tagname === tagname.trim()) || !year}
+              disabled={!tagname.trim() || tags.some(t => t.tagname === tagname.trim()) || !year}
               onClick={handleSubmit}
             >
               {' '}
