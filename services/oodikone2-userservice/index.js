@@ -28,6 +28,20 @@ initializeDatabaseConnection()
       res.json(User.getUserData(user))
     })
 
+    app.get('/user/:uid/user_data', async (req, res) => {
+      const uid = req.params.uid
+      const user = await User.byUsernameMinified(uid)
+      const roles = user.accessgroup.map(({ group_code }) => group_code)
+      const rights = User.getUserProgrammes(user)
+      const faculties = user.faculty.map(({ faculty_code }) => faculty_code)
+
+      res.json({
+        roles,
+        rights,
+        faculties
+      })
+    })
+
     app.get('/user/elementdetails/:username', async (req, res) => {
       const username = req.params.username
       const user = await User.byUsername(username)
