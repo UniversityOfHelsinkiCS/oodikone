@@ -26,7 +26,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
         <div>{course.name}</div>
         <div>{getActiveYears(course)}</div>
       </Table.Cell>
-      <Table.Cell content={course.alternatives.map(a => a.code).join(', ')} />
+      <Table.Cell content={!course.alternatives ? course.code : course.alternatives.map(a => a.code).join(', ')} />
     </Table.Row>
   )
 
