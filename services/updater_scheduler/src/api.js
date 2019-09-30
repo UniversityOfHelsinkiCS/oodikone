@@ -12,7 +12,8 @@ const {
   scheduleStudentCheck,
   rescheduleScheduled,
   rescheduleFetched,
-  rescheduleCreated
+  rescheduleCreated,
+  scheduleDaily
 } = require('./schedule_students')
 const { getOldestTasks, getCurrentStatus } = require('./SchedulingStatistics')
 const { createTasks } = require('./student_list_updater')
@@ -59,6 +60,11 @@ app.post('/update/no_student', async (req, res) => {
 
 app.post('/update/studentlist', async (req, res) => {
   createTasks()
+  res.json({ message: 'scheduled' })
+})
+
+app.post('/update/daily', async (req, res) => {
+  scheduleDaily()
   res.json({ message: 'scheduled' })
 })
 
