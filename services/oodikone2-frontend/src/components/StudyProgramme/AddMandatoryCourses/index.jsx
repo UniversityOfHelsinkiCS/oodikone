@@ -101,7 +101,7 @@ class AddMandatoryCourses extends Component {
 }
 
 const mapStateToProps = state => ({
-  matchingCourses: getCourseSearchResults(state),
+  matchingCourses: getCourseSearchResults(state).courses,
   pending: state.courseSearch.pending,
   mandatoryCourseCodes: state.populationMandatoryCourses.data
     ? state.populationMandatoryCourses.data.map(man => man.code)

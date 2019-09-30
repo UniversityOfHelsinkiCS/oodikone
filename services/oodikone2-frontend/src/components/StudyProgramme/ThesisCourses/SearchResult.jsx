@@ -50,6 +50,6 @@ SearchResult.defaultProps = {
   courses: []
 }
 
-const mapStateToProps = state => ({ courses: getCourseSearchResults(state) })
+const mapStateToProps = state => ({ courses: getCourseSearchResults(state).courses })
 
 export default connect(mapStateToProps)(SearchResult)

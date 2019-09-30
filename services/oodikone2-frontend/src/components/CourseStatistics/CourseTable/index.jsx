@@ -8,7 +8,7 @@ import './courseTable.css'
 
 const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false }) => {
   const noContent = courses.length === 0
-  const sortedCourses = !noContent && sortBy(courses, course => course.name)
+  const sortCourses = courses => sortBy(courses, course => course.name)
 
   const getEmptyListRow = () => (
     <Table.Row>
@@ -26,7 +26,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
         <div>{course.name}</div>
         <div>{getActiveYears(course)}</div>
       </Table.Cell>
-      <Table.Cell content={course.code} />
+      <Table.Cell content={!course.alternatives ? course.code : course.alternatives.map(a => a.code).join(', ')} />
     </Table.Row>
   )
 
@@ -40,7 +40,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
               <Table.HeaderCell content="Code" />
             </Table.Row>
           </Table.Header>
-          <Table.Body>{noContent ? getEmptyListRow() : sortedCourses.map(toCourseRow)}</Table.Body>
+          <Table.Body>{noContent ? getEmptyListRow() : sortCourses(courses).map(toCourseRow)}</Table.Body>
         </Table>
       </Segment>
     )
