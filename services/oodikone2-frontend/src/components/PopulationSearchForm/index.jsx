@@ -652,7 +652,6 @@ const PopulationSearchForm = props => {
           <Grid.Row>
             <Grid.Column width={10}>
               {renderEnrollmentDateSelector()}
-              {/* {tags.length > 0 && query.studyRights.programme ? renderTagDropdown(options, chosenTag) : null} */}
               {renderStudyGroupSelector()}
             </Grid.Column>
           </Grid.Row>
