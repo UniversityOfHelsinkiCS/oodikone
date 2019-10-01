@@ -5,11 +5,11 @@ const client = axios.create({ baseURL: USAGESERVICE_URL, headers: { secret: proc
 
 const ping = async () => {
   const url = '/ping'
-  client.get(url)
+  await client.get(url)
 }
 
 const log = async (message, meta) => {
-  client.post('/log', { message, meta })
+  await client.post('/log', { message, meta })
 }
 
 const get = async (from, to) => {
