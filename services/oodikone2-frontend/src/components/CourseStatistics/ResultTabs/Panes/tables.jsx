@@ -1,20 +1,19 @@
 import React, { Fragment } from 'react'
 import { Grid } from 'semantic-ui-react'
-import { shape } from 'prop-types'
 import { dataSeriesType, viewModeNames, viewModeType } from './util'
 import CumulativeTable from './Tables/cumulative'
 import StudentTable from './Tables/student'
 import GradesTable from './Tables/grades'
 
-const Tables = ({ primary, comparison, viewMode, history }) => {
+const Tables = ({ primary, comparison, viewMode }) => {
   const getViewMode = (name, stats) => {
     switch (viewMode) {
       case viewModeNames.CUMULATIVE:
-        return <CumulativeTable name={name} stats={stats} history={history} />
+        return <CumulativeTable name={name} stats={stats} />
       case viewModeNames.STUDENT:
-        return <StudentTable name={name} stats={stats} history={history} />
+        return <StudentTable name={name} stats={stats} />
       case viewModeNames.GRADES:
-        return <GradesTable name={name} stats={stats} history={history} />
+        return <GradesTable name={name} stats={stats} />
       default:
         return null
     }
@@ -36,8 +35,7 @@ const Tables = ({ primary, comparison, viewMode, history }) => {
 Tables.propTypes = {
   primary: dataSeriesType.isRequired,
   comparison: dataSeriesType,
-  viewMode: viewModeType.isRequired,
-  history: shape({}).isRequired
+  viewMode: viewModeType.isRequired
 }
 
 Tables.defaultProps = {

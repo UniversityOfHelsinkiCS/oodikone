@@ -4,8 +4,9 @@ import { Table, Header, Grid, Label, Segment } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { shape, number, arrayOf, bool, string, oneOfType } from 'prop-types'
 import { getProductivity } from '../../../redux/productivity'
+import './productivityTable.css'
 
-const ProductivityTable = ({ productivity, thesis, loading, error }) => {
+const ProductivityTable = ({ productivity, thesis, loading, error, showCredits }) => {
   if (error) return <h1>Oh no so error {error}</h1>
   let thesisTypes = []
   if (thesis) {
@@ -21,6 +22,18 @@ const ProductivityTable = ({ productivity, thesis, loading, error }) => {
     'Credits for non major students',
     'Hyväksiluettu (not included in Credits column)'
   ].filter(_ => _)
+
+  const creditCell = content =>
+    showCredits ? (
+      <Table.Cell>{content}</Table.Cell>
+    ) : (
+      <Table.Cell
+        className="productivity-table__not-available"
+        title="Credits productivity statistics not available for old programmes"
+      >
+        Not available
+      </Table.Cell>
+    )
 
   return (
     <React.Fragment>
@@ -46,7 +59,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error }) => {
         </Grid>
       </Header>
       <Segment basic loading={loading}>
-        <Table structured celled className="fixed-header">
+        <Table structured celled compact striped selectable className="fixed-header">
           <Table.Header>
             <Table.Row>
               {headerList.map(header => (
@@ -61,13 +74,13 @@ const ProductivityTable = ({ productivity, thesis, loading, error }) => {
                   .map(year => (
                     <Table.Row key={year.year}>
                       <Table.Cell>{year.year}</Table.Cell>
-                      <Table.Cell>{year.credits.toFixed(2)}</Table.Cell>
+                      {creditCell(year.credits.toFixed(2))}
                       {thesisTypes.includes('BACHELOR') && <Table.Cell>{year.bThesis}</Table.Cell>}
                       {thesisTypes.includes('MASTER') && <Table.Cell>{year.mThesis}</Table.Cell>}
                       <Table.Cell>{year.graduated}</Table.Cell>
-                      <Table.Cell>{year.creditsForMajors.toFixed(2)}</Table.Cell>
-                      <Table.Cell>{(year.credits - year.creditsForMajors).toFixed(2)}</Table.Cell>
-                      <Table.Cell>{year.transferredCredits.toFixed(2)}</Table.Cell>
+                      {creditCell(year.creditsForMajors.toFixed(2))}
+                      {creditCell((year.credits - year.creditsForMajors).toFixed(2))}
+                      {creditCell(year.transferredCredits.toFixed(2))}
                     </Table.Row>
                   ))
               : null}
@@ -104,7 +117,8 @@ ProductivityTable.propTypes = {
     })
   ),
   loading: bool.isRequired,
-  error: bool.isRequired
+  error: bool.isRequired,
+  showCredits: bool.isRequired
 }
 
 ProductivityTable.defaultProps = {

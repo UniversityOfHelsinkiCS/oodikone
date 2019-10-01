@@ -2,8 +2,8 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Button, Icon, Popup, Tab, Grid, Ref } from 'semantic-ui-react'
-import { withRouter } from 'react-router-dom'
+import { Header, Segment, Button, Icon, Popup, Tab, Grid, Ref, Item } from 'semantic-ui-react'
+import { withRouter, Link } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import XLSX from 'xlsx'
 import scrollToComponent from 'react-scroll-to-component'
@@ -46,9 +46,12 @@ class PopulationStudents extends Component {
   }
 
   componentDidMount() {
+    const queryStudyright = this.props.queryStudyrights[0]
     const admin = this.props.userRoles.includes('admin')
-    this.props.getTagsByStudytrack(this.props.queryStudyrights[0])
-    this.props.getStudentTagsStudyTrack(this.props.queryStudyrights[0])
+    if (queryStudyright) {
+      this.props.getTagsByStudytrack(queryStudyright)
+      this.props.getStudentTagsStudyTrack(queryStudyright)
+    }
     this.setState({ admin, containsStudyTracks: this.containsStudyTracks() })
   }
 
@@ -192,7 +195,11 @@ class PopulationStudents extends Component {
       },
       {
         key: 'icon',
-        getRowVal: s => <Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />,
+        getRowVal: s => (
+          <Item as={Link} to={`students/${s.studentNumber}`}>
+            <Icon name="level up alternate" />
+          </Item>
+        ),
         cellProps: { collapsing: true, className: 'iconCell' }
       }
     )
@@ -238,14 +245,14 @@ class PopulationStudents extends Component {
           key: 'extent',
           title: 'extent',
           getRowVal: s => extentCodes(s.studyrights)
-        },
-        {
-          key: 'tags',
-          title: 'tags',
-          getRowVal: s => tags(s.tags)
         }
       )
     }
+    columns.push({
+      key: 'tags',
+      title: 'tags',
+      getRowVal: s => tags(s.tags)
+    })
 
     if (['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
       columns.push(
@@ -576,9 +583,6 @@ class PopulationStudents extends Component {
     const filteredPanes = panesToFilter => {
       if (['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
         return panesToFilter.slice(0, 1)
-      }
-      if (!this.state.admin) {
-        return panesToFilter.slice(0, 2)
       }
       return panesToFilter
     }

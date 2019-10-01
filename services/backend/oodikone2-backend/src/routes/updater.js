@@ -9,7 +9,8 @@ const {
   updateStudentlist,
   rescheduleScheduled,
   rescheduleFetched,
-  updateNoStudents
+  updateNoStudents,
+  updateDaily
 } = require('../services/updaterService')
 
 router.post('/update/oldest', async (req, res) => {
@@ -118,6 +119,17 @@ router.post('/reschedule/scheduled', async (req, res) => {
 router.post('/reschedule/fetched', async (req, res) => {
   try {
     const response = await rescheduleFetched()
+    if (response) {
+      res.status(200).json('Scheduled')
+    }
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
+router.post('/update/daily', async (req, res) => {
+  try {
+    const response = await updateDaily()
     if (response) {
       res.status(200).json('Scheduled')
     }

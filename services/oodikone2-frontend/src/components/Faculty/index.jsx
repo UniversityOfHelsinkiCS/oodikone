@@ -74,7 +74,7 @@ const Faculty = ({
   useEffect(() => {
     if (faculties.length && facultyYearlyStats.length) {
       const { fromYear: newFromYear, toYear: newToYear, years: newYears } = getYearFilterData()
-      if (fromYear < newFromYear || fromYear > newToYear) setFromYear(newFromYear)
+      if (fromYear < newFromYear || fromYear > newToYear) setFromYear(Math.max(newFromYear, 2000))
       if (toYear < newFromYear || toYear > newToYear) setToYear(newToYear)
       setYears(newYears)
     }

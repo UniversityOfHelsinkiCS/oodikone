@@ -41,7 +41,15 @@ export const makeSortCourses = () =>
   )
 
 export const getCourseSearchResults = state =>
-  state.courseSearch.data.map(({ name, ...rest }) => ({
-    ...rest,
-    name: getTextIn(name, getActiveLanguage(state.localize).code)
-  }))
+  state.courseSearch.data.courses
+    ? {
+        courses: state.courseSearch.data.courses.map(({ name, ...rest }) => ({
+          ...rest,
+          name: getTextIn(name, getActiveLanguage(state.localize).code)
+        })),
+        groups: state.courseSearch.data.groups
+      }
+    : {
+        courses: [],
+        groups: {}
+      }

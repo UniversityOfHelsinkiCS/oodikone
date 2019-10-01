@@ -171,6 +171,39 @@ const getUserData = user => {
   return newuser
 }
 
+const byUsernameMinified = async username => {
+  const userMinified = await User.findOne({
+    where: {
+      username
+    },
+    include: [
+      {
+        separate: true,
+        model: UserElementDetails,
+        as: 'programme',
+        attributes: ['elementDetailCode']
+      },
+      {
+        model: AccessGroup,
+        as: 'accessgroup',
+        attributes: ['group_code']
+      },
+      {
+        separate: true,
+        model: UserFaculties,
+        as: 'faculty',
+        include: {
+          model: FacultyProgrammes,
+          as: 'programme',
+          attributes: ['programme_code']
+        },
+        attributes: ['faculty_code']
+      },
+    ]
+  })
+  return userMinified
+}
+
 const byUsername = async username => {
   const user = await User.findOne({
     where: {
@@ -185,7 +218,7 @@ const byUsername = async username => {
 
 const createUser = async (username, fullname, email) => {
   return User.create({
-    username: username,
+    username: username, 
     full_name: fullname,
     email
   })
@@ -283,6 +316,7 @@ const getRoles = async user => {
 
 module.exports = {
   byUsername,
+  byUsernameMinified,
   createUser,
   updateUser,
   findAll,

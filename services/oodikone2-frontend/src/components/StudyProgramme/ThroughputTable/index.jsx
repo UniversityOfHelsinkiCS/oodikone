@@ -1,24 +1,34 @@
 import React, { Fragment } from 'react'
 import moment from 'moment'
 import { Header, Table, Grid, Icon, Label, Segment } from 'semantic-ui-react'
-import { shape, number, arrayOf, bool, string, func } from 'prop-types'
+import { shape, number, arrayOf, bool, string, node } from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { flatten, uniq } from 'lodash'
-import { getThroughput } from '../../../redux/throughput'
 import { getUserRoles } from '../../../common'
 import InfoBox from '../../InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
 
-const ThroughputTable = ({ history, throughput, thesis, loading, error, studyprogramme, userRoles }) => {
-  const showPopulationStatistics = yearLabel => {
-    const year = Number(yearLabel.slice(0, 4))
-    const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
-    history.push(
-      `/populations?months=${months}&semesters=FALL&semesters=` +
-        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`
-    )
-  }
+const PopulationStatisticsLink = ({ studyprogramme, year: yearLabel, children }) => {
+  const year = Number(yearLabel.slice(0, 4))
+  const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
+  const href =
+    `/populations?months=${months}&semesters=FALL&semesters=` +
+    `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`
+  return (
+    <Link title={`Population statistics of class ${yearLabel}`} to={href}>
+      {children}
+    </Link>
+  )
+}
+
+PopulationStatisticsLink.propTypes = {
+  studyprogramme: string.isRequired,
+  year: string.isRequired,
+  children: node.isRequired
+}
+
+const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, userRoles }) => {
   if (error) return <h1>Oh no so error {error}</h1>
   const GRADUATED_FEATURE_TOGGLED_ON = userRoles.includes('dev')
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
@@ -83,14 +93,23 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
         </Grid>
       </Header>
       <Segment basic loading={loading}>
-        <Table celled structured className="fixed-header">
+        <Table celled structured compact striped selectable className="fixed-header">
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
               {renderStudentsHeader()}
+              <Table.HeaderCell rowSpan="2" colSpan="1">
+                Started
+              </Table.HeaderCell>
+              <Table.HeaderCell rowSpan="2" colSpan="1">
+                Cancelled
+              </Table.HeaderCell>
+
               <Table.HeaderCell colSpan={GRADUATED_FEATURE_TOGGLED_ON ? '3' : '1'}>Graduated</Table.HeaderCell>
 
-              <Table.HeaderCell rowSpan="2">Transferred to this program</Table.HeaderCell>
+              <Table.HeaderCell rowSpan="1" colSpan="2">
+                Transferred
+              </Table.HeaderCell>
               <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
               {(thesisTypes.includes('BACHELOR') || thesisTypes.includes('MASTER')) && (
                 <Table.HeaderCell colSpan={thesisTypes.length}>Thesis</Table.HeaderCell>
@@ -110,6 +129,9 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                   <Table.HeaderCell>Graduation median time</Table.HeaderCell>
                 </Fragment>
               )}
+              <Table.HeaderCell content="to" />
+              <Table.HeaderCell content="from" />
+
               <Table.HeaderCell content="≥ 30" />
               <Table.HeaderCell content="≥ 60" />
               <Table.HeaderCell content="≥ 90" />
@@ -126,7 +148,9 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                 <Table.Row key={year.year}>
                   <Table.Cell>
                     {year.year}
-                    <Icon name="level up alternate" onClick={() => showPopulationStatistics(year.year)} />
+                    <PopulationStatisticsLink studyprogramme={studyprogramme} year={year.year}>
+                      <Icon name="level up alternate" />
+                    </PopulationStatisticsLink>
                   </Table.Cell>
                   <Table.Cell>{year.credits.length}</Table.Cell>
                   {genders.map(gender => (
@@ -137,6 +161,8 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                     </Table.Cell>
                   ))}
                   {renderRatioOfFinns && ratioOfFinnsIn(year)}
+                  <Table.Cell>{year.started}</Table.Cell>
+                  <Table.Cell>{year.cancelled}</Table.Cell>
                   <Table.Cell>{year.graduated}</Table.Cell>
                   {GRADUATED_FEATURE_TOGGLED_ON && (
                     <Fragment>
@@ -144,7 +170,9 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                       <Table.Cell>{year.medianGraduationTime ? `${year.medianGraduationTime} months` : '∞'}</Table.Cell>
                     </Fragment>
                   )}
+
                   <Table.Cell>{year.transferred}</Table.Cell>
+                  <Table.Cell>{year.transferredFrom}</Table.Cell>
                   {Object.keys(year.creditValues).map(creditKey => (
                     <Table.Cell key={`${year.year} credit:${creditKey}`}>{year.creditValues[creditKey]}</Table.Cell>
                   ))}
@@ -172,6 +200,8 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                     ) || 0}%)`}
                   </Table.HeaderCell>
                 ) : null}
+                <Table.HeaderCell>{throughput.totals.started}</Table.HeaderCell>
+                <Table.HeaderCell>{throughput.totals.cancelled}</Table.HeaderCell>
                 <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
                 {GRADUATED_FEATURE_TOGGLED_ON && (
                   <Fragment>
@@ -183,7 +213,9 @@ const ThroughputTable = ({ history, throughput, thesis, loading, error, studypro
                     </Table.HeaderCell>
                   </Fragment>
                 )}
+
                 <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
+                <Table.HeaderCell>{throughput.totals.transferredFrom}</Table.HeaderCell>
                 {Object.keys(throughput.totals.credits).map(creditKey => (
                   <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}</Table.HeaderCell>
                 ))}
@@ -228,9 +260,6 @@ ThroughputTable.propTypes = {
   studyprogramme: string.isRequired,
   loading: bool.isRequired,
   error: bool.isRequired,
-  history: shape({
-    push: func.isRequired
-  }).isRequired,
   userRoles: arrayOf(string).isRequired
 }
 
@@ -239,15 +268,10 @@ ThroughputTable.defaultProps = {
   thesis: undefined
 }
 
-export default withRouter(
-  connect(
-    ({
-      auth: {
-        token: { roles }
-      }
-    }) => ({ userRoles: getUserRoles(roles) }),
-    {
-      dispatchGetThroughput: getThroughput
-    }
-  )(ThroughputTable)
-)
+const mapStateToProps = ({
+  auth: {
+    token: { roles }
+  }
+}) => ({ userRoles: getUserRoles(roles) })
+
+export default connect(mapStateToProps)(ThroughputTable)

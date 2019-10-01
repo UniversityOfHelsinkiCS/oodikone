@@ -9,6 +9,10 @@ services:
     environment:
       - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
 
+  analytics_db:
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=analytics_db
+
   backend:
     image: toska/oodikone2-backend:${TAG}
     build:

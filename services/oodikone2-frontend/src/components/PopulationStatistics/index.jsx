@@ -14,7 +14,7 @@ import infoTooltips from '../../common/InfoToolTips'
 import { useProgress } from '../../common'
 
 const PopulationStatistics = memo(props => {
-  const { translate, populationFound, loading, location } = props
+  const { translate, populationFound, loading, location, history } = props
 
   const { onProgress, progress } = useProgress(loading)
 
@@ -32,7 +32,7 @@ const PopulationStatistics = memo(props => {
         </Header>
         <PopulationSearchForm onProgress={onProgress} />
         <Divider />
-        {location.search !== '' ? <PopulationSearchHistory /> : null}
+        {location.search !== '' ? <PopulationSearchHistory history={history} /> : null}
         <ProgressBar fixed progress={progress} />
       </Segment>
     )
@@ -55,7 +55,8 @@ PopulationStatistics.propTypes = {
   translate: func.isRequired,
   populationFound: bool.isRequired,
   loading: bool.isRequired,
-  location: shape({}).isRequired
+  location: shape({}).isRequired,
+  history: shape({}).isRequired
 }
 
 const mapStateToProps = ({ localize, populations }) => ({

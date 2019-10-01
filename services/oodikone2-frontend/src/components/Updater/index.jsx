@@ -14,6 +14,7 @@ const Updater = () => {
   const updateNoStudents = () => callApi('/updater/update/no_student', 'post')
   const updateAttainmentDates = () => callApi('/updater/update/attainment', 'post')
   const updateMetadata = () => callApi('/updater/update/meta', 'post')
+  const updateDaily = () => callApi('/updater/update/daily', 'post')
   const createTasks = () => callApi('/updater/update/studentlist', 'post')
   const rescheduleScheduled = () => callApi('/updater/reschedule/scheduled', 'post')
   const rescheduleFetched = () => callApi('/updater/reschedule/fetched', 'post')
@@ -56,6 +57,7 @@ const Updater = () => {
           <Form.Button content="Update NO_STUDENT students" icon="refresh" onClick={() => updateNoStudents()} />
           <Form.Button content="Update all 'SCHEDULED' students" icon="refresh" onClick={() => rescheduleScheduled()} />
           <Form.Button content="Update all 'FETCHED' students" icon="refresh" onClick={() => rescheduleFetched()} />
+          <Form.Button content="Daily update" icon="refresh" onClick={() => updateDaily()} />
         </Form.Group>
       </Form>
       <Header>Status:</Header>

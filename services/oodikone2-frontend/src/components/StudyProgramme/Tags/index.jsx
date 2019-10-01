@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Datetime from 'react-datetime'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, List, Segment, Header, Confirm, Form, Icon, Popup } from 'semantic-ui-react'
+import { Button, List, Segment, Header, Confirm, Form, Icon, Popup, Message } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
 import TagModal from '../TagModal'
@@ -57,7 +57,10 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
       return (
         <>
           {tag.tagname}
-          <Popup content="Only you can see this tag." trigger={<Icon style={{ marginLeft: '1em' }} name="eye" />} />
+          <Popup
+            content="Only you can see this tag."
+            trigger={<Icon style={{ marginLeft: '1em' }} name="eye" color="purple" />}
+          />
         </>
       )
     return tag.tagname
@@ -96,6 +99,12 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
   return (
     <List>
       <Form>
+        <Message
+          header="Create tags for study programme"
+          content="Here you can create tags for study programme. You can either create public tags or personal tags. 
+          Tags can be used to combine students from other starting years. 'Associated start year' means what year you want to use as a start year for the students in that tag.
+          For example with this you can move student from earlier starting year to next year if the student was absent during first year."
+        />
         <Segment>
           <Form.Group>
             <Form.Field>
@@ -120,7 +129,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
               <Form.Checkbox toggle checked={personal} onClick={() => setPersonal(!personal)} />
             </Form.Field>
             <Button
-              disabled={!tagname.trim() || tags.find(t => t.tagname === tagname.trim()) || !year}
+              disabled={!tagname.trim() || tags.some(t => t.tagname === tagname.trim()) || !year}
               onClick={handleSubmit}
             >
               {' '}
