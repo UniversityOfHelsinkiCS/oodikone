@@ -24,7 +24,11 @@ router.get('/log', async (req, res) => {
 
 router.post('/log', async (req, res) => {
   try {
-    await usageLogger.info(req.body.message, req.body.meta)
+    await usageLogger.info(req.body.message, {
+      ...req.body.meta,
+      // pass this as a custom field so we can filter by it in graylog
+      isUsageStats: true
+    })
     res.status(201).end()
   } catch (e) {
     res.status(500).json({ error: e.message })
