@@ -31,6 +31,9 @@ PopulationStatisticsLink.propTypes = {
 const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, userRoles }) => {
   if (error) return <h1>Oh no so error {error}</h1>
   const GRADUATED_FEATURE_TOGGLED_ON = userRoles.includes('dev')
+  const TRANSFERRED_FROM_FEATURE_TOGGLED_ON = userRoles.includes('admin')
+  const CANCELLED_FEATURE_TOGGLED_ON = userRoles.includes('admin')
+
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
   const renderGenders = genders.length > 0
@@ -101,13 +104,15 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
               <Table.HeaderCell rowSpan="2" colSpan="1">
                 Started
               </Table.HeaderCell>
-              <Table.HeaderCell rowSpan="2" colSpan="1">
-                Cancelled
-              </Table.HeaderCell>
+              {CANCELLED_FEATURE_TOGGLED_ON && (
+                <Table.HeaderCell rowSpan="2" colSpan="1">
+                  Cancelled
+                </Table.HeaderCell>
+              )}
 
               <Table.HeaderCell colSpan={GRADUATED_FEATURE_TOGGLED_ON ? '3' : '1'}>Graduated</Table.HeaderCell>
 
-              <Table.HeaderCell rowSpan="1" colSpan="2">
+              <Table.HeaderCell rowSpan="1" colSpan={TRANSFERRED_FROM_FEATURE_TOGGLED_ON ? '2' : '1'}>
                 Transferred
               </Table.HeaderCell>
               <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
@@ -130,7 +135,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                 </Fragment>
               )}
               <Table.HeaderCell content="to" />
-              <Table.HeaderCell content="from" />
+              {TRANSFERRED_FROM_FEATURE_TOGGLED_ON && <Table.HeaderCell content="from" />}
 
               <Table.HeaderCell content="≥ 30" />
               <Table.HeaderCell content="≥ 60" />
@@ -162,7 +167,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                   ))}
                   {renderRatioOfFinns && ratioOfFinnsIn(year)}
                   <Table.Cell>{year.started}</Table.Cell>
-                  <Table.Cell>{year.cancelled}</Table.Cell>
+                  {CANCELLED_FEATURE_TOGGLED_ON && <Table.Cell>{year.cancelled}</Table.Cell>}
                   <Table.Cell>{year.graduated}</Table.Cell>
                   {GRADUATED_FEATURE_TOGGLED_ON && (
                     <Fragment>
@@ -172,7 +177,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                   )}
 
                   <Table.Cell>{year.transferred}</Table.Cell>
-                  <Table.Cell>{year.transferredFrom}</Table.Cell>
+                  {TRANSFERRED_FROM_FEATURE_TOGGLED_ON && <Table.Cell>{year.transferredFrom}</Table.Cell>}
                   {Object.keys(year.creditValues).map(creditKey => (
                     <Table.Cell key={`${year.year} credit:${creditKey}`}>{year.creditValues[creditKey]}</Table.Cell>
                   ))}
@@ -201,7 +206,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                   </Table.HeaderCell>
                 ) : null}
                 <Table.HeaderCell>{throughput.totals.started}</Table.HeaderCell>
-                <Table.HeaderCell>{throughput.totals.cancelled}</Table.HeaderCell>
+                {CANCELLED_FEATURE_TOGGLED_ON && <Table.HeaderCell>{throughput.totals.cancelled}</Table.HeaderCell>}
                 <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
                 {GRADUATED_FEATURE_TOGGLED_ON && (
                   <Fragment>
@@ -215,7 +220,9 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                 )}
 
                 <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
-                <Table.HeaderCell>{throughput.totals.transferredFrom}</Table.HeaderCell>
+                {TRANSFERRED_FROM_FEATURE_TOGGLED_ON && (
+                  <Table.HeaderCell>{throughput.totals.transferredFrom}</Table.HeaderCell>
+                )}
                 {Object.keys(throughput.totals.credits).map(creditKey => (
                   <Table.HeaderCell key={`${creditKey}total`}>{throughput.totals.credits[creditKey]}</Table.HeaderCell>
                 ))}
