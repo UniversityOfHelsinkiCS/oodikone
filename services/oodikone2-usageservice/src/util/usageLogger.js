@@ -12,9 +12,7 @@ if (process.env.LOG_PORT && process.env.LOG_HOST) {
       hostname: process.env.LOG_HOSTNAME || 'oodikone-usageservice',
       host: process.env.LOG_HOST,
       port: process.env.LOG_PORT,
-      protocol: 'http',
-      // pass this as a custom field so we can filter by it in graylog
-      _isUsageStats: true
+      protocol: 'http'
     })
   )
 }
