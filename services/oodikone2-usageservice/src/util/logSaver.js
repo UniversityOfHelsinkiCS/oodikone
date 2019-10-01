@@ -19,7 +19,6 @@ module.exports = class LogSaverTransport extends Transport {
 
       await UsageStatistic.create(object)
       callback()
-
     }
   }
 }

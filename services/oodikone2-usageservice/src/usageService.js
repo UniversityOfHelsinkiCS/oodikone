@@ -12,56 +12,59 @@ const wildcarded = url => {
     return `${zeroedUrl.substr(0, end)}/00000`
   }
 
-  if (url.includes('/students/')
-    || url.includes('/teachers/')
-    || url.includes('/users/')
-    || url.includes('oodilearn/student')
-    || url.includes('courseGroups/')) {
+  if (
+    url.includes('/students/') ||
+    url.includes('/teachers/') ||
+    url.includes('/users/') ||
+    url.includes('oodilearn/student') ||
+    url.includes('courseGroups/')
+  ) {
     return url.replace(/\d/g, '0')
   }
 
-
   // if post to /thesis/xxxx
-  if (url.includes('/studyprogrammes/') &&  url.includes('/thesis/')) {
-    const aa =  url.split('/')
+  if (url.includes('/studyprogrammes/') && url.includes('/thesis/')) {
+    const aa = url.split('/')
     aa[aa.length - 1] = '00000'
     aa[aa.length - 3] = '00000'
     return aa.join('/')
   }
 
-  if ((url.includes('/studyprogrammes/') &&  url.includes('/mandatory_courses'))
-  || (url.includes('/studyprogrammes/') &&  url.includes('/productivity')) 
-  || (url.includes('/studyprogrammes/') &&  url.includes('/thesis'))
-  || (url.includes('/studyprogrammes/') &&  url.includes('/throughput'))) {
-    const aa =  url.split('/')
+  if (
+    (url.includes('/studyprogrammes/') && url.includes('/mandatory_courses')) ||
+    (url.includes('/studyprogrammes/') && url.includes('/productivity')) ||
+    (url.includes('/studyprogrammes/') && url.includes('/thesis')) ||
+    (url.includes('/studyprogrammes/') && url.includes('/throughput'))
+  ) {
+    const aa = url.split('/')
     aa[aa.length - 2] = '00000'
     return aa.join('/')
   }
 
   if (url.includes('oodilearn/courses/')) {
-    const aa =  url.split('/')
+    const aa = url.split('/')
     aa[aa.length - 1] = '00000'
     return aa.join('/')
   }
 
   if (url.includes('oodilearn/') && !url.includes('ping') && !url.includes('populations')) {
-    const aa =  url.split('/')
+    const aa = url.split('/')
     aa[aa.length - 1] = '00000'
     return aa.join('/')
   }
 
-  if(url.includes('mandatory_courses')) {
+  if (url.includes('mandatory_courses')) {
     return '/mandatory_courses/00000'
   }
 
-  if(url.includes('course-groups/')) {
-    if(url.includes('programme')) {
-      if(url.includes('force')) {
-        const aa =  url.split('/')
+  if (url.includes('course-groups/')) {
+    if (url.includes('programme')) {
+      if (url.includes('force')) {
+        const aa = url.split('/')
         aa[aa.length - 2] = '00000'
         return aa.join('/')
       } else {
-        const aa =  url.split('/')
+        const aa = url.split('/')
         aa[aa.length - 1] = '00000'
         return aa.join('/')
       }
@@ -75,19 +78,26 @@ const wildcarded = url => {
 const formatForGroup = url => {
   const query = url.indexOf('?')
 
-  if (query!==-1) {
+  if (query !== -1) {
     return url.substr(0, query)
   }
 
   return wildcarded(url)
 }
 
-const stripExtraFields = ({ id, username, name, time, admin, method, URL }) =>
-  ({ id, username, name, time, admin, method, URL })
+const stripExtraFields = ({ id, username, name, time, admin, method, URL }) => ({
+  id,
+  username,
+  name,
+  time,
+  admin,
+  method,
+  URL
+})
 
 const withoutRequestsByAdmins = results => results.filter(u => !u.admin)
 
-const byDate = (results) => {
+const byDate = results => {
   const getDateForRequest = req => moment(req.time * 1000).format('YYYY-MM-DD')
   const requestsByDate = groupBy(withoutRequestsByAdmins(results).map(stripExtraFields), getDateForRequest)
 
