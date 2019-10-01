@@ -6,12 +6,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\"",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "lintfix": "prettier --write '**/*.{js,json}'"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^1.18.10"
+    "nodemon": "^1.18.10",
+    "prettier": "^1.18.2"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
