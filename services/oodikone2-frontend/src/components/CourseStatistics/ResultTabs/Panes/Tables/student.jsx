@@ -1,6 +1,7 @@
 import React from 'react'
 import qs from 'query-string'
-import { Header, Icon } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
+import { Header, Icon, Item } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { uniq } from 'lodash'
 import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
@@ -9,12 +10,12 @@ import { getUserIsAdmin } from '../../../../../common'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
-const StudentTable = ({ stats, name, history, isAdmin }) => {
+const StudentTable = ({ stats, name, isAdmin }) => {
   const showPopulation = (yearcode, years) => {
     const coursecodes = stats.map(s => s.coursecode)
     const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), years }
     const searchString = qs.stringify(queryObject)
-    history.push(`/coursepopulation?${searchString}`)
+    return `/coursepopulation?${searchString}`
   }
 
   const formatted = stats.map(statistic => {
@@ -50,7 +51,9 @@ const StudentTable = ({ stats, name, history, isAdmin }) => {
               isAdmin ? (
                 <div>
                   {s.name}
-                  <Icon name="level up alternate" onClick={() => showPopulation(s.code, s.name)} />
+                  <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+                    <Icon name="level up alternate" />
+                  </Item>
                 </div>
               ) : (
                 s.name
@@ -129,7 +132,6 @@ const StudentTable = ({ stats, name, history, isAdmin }) => {
 StudentTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  history: shape({}).isRequired,
   isAdmin: bool.isRequired
 }
 

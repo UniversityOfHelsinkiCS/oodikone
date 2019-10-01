@@ -73,11 +73,11 @@ const ResultTabs = props => {
   }
 
   const getPanes = () => {
-    const { primary, comparison, history } = props
+    const { primary, comparison } = props
     const paneMenuItems = [
       {
         menuItem: { key: 'Table', icon: 'table', content: 'Table' },
-        renderFn: () => <Tables comparison={comparison} primary={primary} viewMode={viewMode} history={history} />
+        renderFn: () => <Tables comparison={comparison} primary={primary} viewMode={viewMode} />
       },
       {
         menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },

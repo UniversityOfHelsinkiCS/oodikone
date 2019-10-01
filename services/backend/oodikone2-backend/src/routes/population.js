@@ -10,6 +10,18 @@ const UserService = require('../services/userService')
 const TagService = require('../services/tags')
 const CourseService = require('../services/courses')
 
+const filterPersonalTags = (population, userId) => {
+  return {
+    ...population,
+    students: population.students.map(student => {
+      return {
+        ...student,
+        tags: student.tags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
+      }
+    })
+  }
+}
+
 // POST instead of GET because of too long params and "sensitive" data
 router.post('/v2/populationstatistics/courses', async (req, res) => {
   try {
@@ -177,6 +189,7 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
 
 router.get('/v3/populationstatistics', async (req, res) => {
   const { startYear, semesters, studyRights: studyRightsJSON } = req.query
+  const { decodedToken } = req
   try {
     if (!startYear || !semesters || !studyRightsJSON) {
       res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
@@ -211,7 +224,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     }
 
     console.log(`request completed ${new Date()}`)
-    res.json(result)
+    res.json(filterPersonalTags(result, decodedToken.id))
   } catch (e) {
     console.log(e)
     res.status(500).json({ error: e })
@@ -219,7 +232,8 @@ router.get('/v3/populationstatistics', async (req, res) => {
 })
 
 router.get('/v3/populationstatisticsbytag', async (req, res) => {
-  const { tag, studyRights: studyRightsJSON } = req.query
+  const { tag, studyRights: studyRightsJSON, endYear, months, startYear } = req.query
+  const { decodedToken } = req
 
   if (!tag) return res.status(400).json({ error: 'The query should have a tag defined' })
   const foundTag = await TagService.findTagById(tag)
@@ -242,13 +256,15 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
   try {
     const studyRights = JSON.parse(studyRightsJSON)
     const newStartYear = await Population.getEarliestYear(studentnumberlist, studyRights)
+    const yearDifference = Number(startYear) - Number(newStartYear)
+    const newMonths = Number(months) + 12 * yearDifference
     const result = await Population.optimizedStatisticsOf(
       {
         startYear: newStartYear,
-        endYear: 2200,
+        endYear,
         studyRights,
         semesters,
-        months: 10000,
+        months: newMonths,
         tag: foundTag
       },
       studentnumberlist
@@ -261,7 +277,7 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
     }
 
     console.log(`request completed ${new Date()}`)
-    res.json(result)
+    res.json(filterPersonalTags(result, decodedToken.id))
   } catch (e) {
     console.log(e)
     res.status(500).json({ error: e })
@@ -270,6 +286,7 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecodes, from, to } = req.query
+  const { decodedToken } = req
 
   if (!coursecodes || !from || !to) {
     return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
@@ -313,7 +330,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     }
 
     console.log(`request completed ${new Date()}`)
-    res.json(result)
+    res.json(filterPersonalTags(result, decodedToken.id))
   } catch (e) {
     console.log(e)
     res.status(500).json({ error: e })
@@ -322,7 +339,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
 
 router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
   const { studentnumberlist } = req.body
-  const { roles } = req
+  const { roles, decodedToken } = req
 
   if (!(roles && roles.includes('admin'))) {
     console.log('no rights')
@@ -345,7 +362,7 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
         res.status(400).end()
         return
       }
-      res.status(200).json(result)
+      res.status(200).json(filterPersonalTags(result, decodedToken.id))
     } catch (err) {
       console.log(err)
       res.status(400).end()

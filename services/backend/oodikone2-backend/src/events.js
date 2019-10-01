@@ -1,11 +1,7 @@
 const { CronJob } = require('cron')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
-const {
-  productivityStatsForStudytrack,
-  throughputStatsForStudytrack,
-  defaultStudyTrackSince
-} = require('./services/studytrack')
+const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studytrack')
 const { calculateFacultyYearlyStats } = require('./services/faculties')
 const {
   setProductivity,
@@ -39,13 +35,13 @@ const refreshStudyrightAssociations = async () => {
 const refreshOverview = async () => {
   try {
     console.log('Refreshing overview...')
+    const programmeStatsSince = new Date('2000-07-31')
     const codes = (await getAllProgrammes()).map(p => p.code)
     let ready = 0
     for (const code of codes) {
       try {
         await patchThroughput({ [code]: { status: 'RECALCULATING' } })
-        const since = defaultStudyTrackSince()
-        const data = await throughputStatsForStudytrack(code, since)
+        const data = await throughputStatsForStudytrack(code, programmeStatsSince.getFullYear())
         await setThroughput(data)
       } catch (e) {
         try {
@@ -58,8 +54,7 @@ const refreshOverview = async () => {
       }
       try {
         await patchProductivity({ [code]: { status: 'RECALCULATING' } })
-        const since = '2017-08-01'
-        const data = await productivityStatsForStudytrack(code, since)
+        const data = await productivityStatsForStudytrack(code, programmeStatsSince)
         await setProductivity(data)
       } catch (e) {
         try {

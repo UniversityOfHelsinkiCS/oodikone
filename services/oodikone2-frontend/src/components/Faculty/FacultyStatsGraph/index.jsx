@@ -9,6 +9,7 @@ boost(Highcharts)
 
 const FacultyStatsGraph = ({ data }) => {
   const [mode, setMode] = useState('studentCredits')
+  const defaultStartTimestamp = new Date(2000, 0, 1).getTime()
 
   const series = useMemo(
     () =>
@@ -17,7 +18,9 @@ const FacultyStatsGraph = ({ data }) => {
         data: Object.entries(entryData).map(([year, stats]) => ({
           x: new Date(parseInt(year, 10), 0, 1, 0, 0, 0, 0).getTime(),
           y: Math.round(
-            mode === 'studentCredits' ? stats[mode] : (stats[mode] / (stats.coursesPassed + stats.coursesFailed)) * 100
+            ['coursesPassed', 'coursesFailed'].includes(mode)
+              ? (stats[mode] / (stats.coursesPassed + stats.coursesFailed)) * 100
+              : stats[mode]
           )
         }))
       })),
@@ -43,7 +46,7 @@ const FacultyStatsGraph = ({ data }) => {
     findNearestPointBy: 'xy',
     series,
     xAxis: {
-      min,
+      min: Math.max(min, defaultStartTimestamp),
       max,
       ordinal: false
     }
@@ -62,6 +65,9 @@ const FacultyStatsGraph = ({ data }) => {
       </Button>
       <Button active={mode === 'coursesFailed'} onClick={handleClick} name="coursesFailed">
         % of courses failed
+      </Button>
+      <Button active={mode === 'students'} onClick={handleClick} name="students">
+        Amount of students
       </Button>
     </Segment>
   )

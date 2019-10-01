@@ -273,9 +273,6 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
           where: {
             startdate: {
               [Op.between]: [startDate, endDate]
-            },
-            enddate: {
-              [Op.between]: [startDate, endDate]
             }
           }
         }
@@ -293,7 +290,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     include: [
       {
         model: Tag,
-        attributes: ['tag_id', 'tagname']
+        attributes: ['tag_id', 'tagname', 'personal_user_id']
       }
     ],
     where: {

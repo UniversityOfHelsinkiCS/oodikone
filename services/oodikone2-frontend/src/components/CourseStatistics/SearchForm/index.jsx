@@ -11,6 +11,7 @@ import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import { getCourseSearchResults } from '../../../selectors/courses'
 import { useSearchHistory } from '../../../common'
+import { mergeCourses } from '../courseStatisticsUtils'
 import SearchHistory from '../../SearchHistory'
 
 const INITIAL = {
@@ -199,7 +200,12 @@ const SearchForm = props => {
           </div>
         </Form>
       </Segment>
-      <SearchHistory handleSearch={pushQueryToUrl} items={searchHistory} updateItem={updateItemInSearchHistory} />
+      <SearchHistory
+        disabled={isLoading}
+        handleSearch={pushQueryToUrl}
+        items={searchHistory}
+        updateItem={updateItemInSearchHistory}
+      />
     </React.Fragment>
   )
 }
@@ -222,9 +228,11 @@ SearchForm.propTypes = {
 }
 
 const mapStateToProps = state => {
+  const { groups, courses } = getCourseSearchResults(state)
   const { pending: courseStatsPending } = state.courseStats
+
   return {
-    matchingCourses: getCourseSearchResults(state),
+    matchingCourses: mergeCourses(groups, courses),
     isLoading: courseStatsPending,
     coursesLoading: state.courseSearch.pending
   }
