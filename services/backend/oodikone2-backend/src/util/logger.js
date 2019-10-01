@@ -1,6 +1,5 @@
 const winston = require('winston')
 const Log2gelf = require('winston-log2gelf')
-const LogSaverTransport = require('./logSaver')
 
 const transports = []
 
@@ -20,8 +19,6 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 transports.push(new winston.transports.Console({ level: 'debug' }))
-
-transports.push(new LogSaverTransport())
 
 const logger = winston.createLogger({ transports })
 
