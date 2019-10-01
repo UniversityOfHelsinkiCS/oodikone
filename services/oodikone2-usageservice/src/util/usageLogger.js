@@ -1,22 +1,25 @@
 const winston = require('winston')
 const Log2gelf = require('winston-log2gelf')
+const LogSaverTransport = require('./logSaver')
 
 const transports = []
+
+// don't spam console/file system with logs, only use this for sending usage logs to graylog & db
 
 if (process.env.LOG_PORT && process.env.LOG_HOST) {
   transports.push(
     new Log2gelf({
-      // push warnings & errors to graylog
-      level: 'warn',
       hostname: process.env.LOG_HOSTNAME || 'oodikone-usageservice',
       host: process.env.LOG_HOST,
       port: process.env.LOG_PORT,
-      protocol: 'http'
+      protocol: 'http',
+      // pass this as a custom field so we can filter by it in graylog
+      _isUsageStats: true
     })
   )
 }
 
-transports.push(new winston.transports.Console({ level: 'info' }))
+transports.push(new LogSaverTransport())
 
 const logger = new winston.createLogger({ transports })
 
