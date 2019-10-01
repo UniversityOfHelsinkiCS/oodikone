@@ -17,7 +17,7 @@ router.get('/log', async (req, res) => {
     const results = await between(from, to)
     res.json(results)
   } catch (e) {
-    res.status(500).send(e.message)
+    res.status(500).json({ error: e.message })
     logger.error('error retrieving logs', e)
   }
 })
@@ -27,7 +27,7 @@ router.post('/log', async (req, res) => {
     await usageLogger.info(req.body.message, req.body.meta)
     res.status(201).end()
   } catch (e) {
-    res.status(500).send(e.message)
+    res.status(500).json({ error: e.message })
     logger.error('error saving logs', e)
   }
 })
