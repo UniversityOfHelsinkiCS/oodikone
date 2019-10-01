@@ -209,7 +209,7 @@ class PopulationStudents extends Component {
         title: 'credits since start of studyright',
         getRowVal: s => {
           const credits = getStudentTotalCredits(s)
-          return credits.toFixed(2)
+          return credits
         }
       })
     }
