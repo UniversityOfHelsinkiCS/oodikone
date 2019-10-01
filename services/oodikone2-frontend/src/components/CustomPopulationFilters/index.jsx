@@ -8,6 +8,7 @@ import CreditsLessThan from '../PopulationFilters/CreditsLessThan'
 import CreditsAtLeast from '../PopulationFilters/CreditsAtLeast'
 import GradeMeanFilter from '../PopulationFilters/GradeMeanFilter'
 import CourseParticipation from '../PopulationFilters/CourseParticipation'
+import CourseParticipationNTimes from '../PopulationFilters/CourseParticipationNTimes'
 import SexFilter from '../PopulationFilters/SexFilter'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
@@ -24,7 +25,8 @@ const componentFor = {
   CreditsLessThan,
   GradeMeanFilter,
   SexFilter,
-  CourseParticipation
+  CourseParticipation,
+  CourseParticipationNTimes
 }
 
 const CustomPopulationFilters = ({

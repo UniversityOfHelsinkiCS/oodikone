@@ -140,10 +140,13 @@ const userIncludes = [
     attributes: ['id', 'group_code', 'group_info']
   },
   {
+    required: false,
     model: HyGroup,
-    as: 'hy_group'
+    as: 'hy_group',
+    where: { code: requiredGroup }
   },
   {
+    separate: true,
     model: UserFaculties,
     as: 'faculty',
     include: {
