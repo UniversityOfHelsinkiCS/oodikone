@@ -4,6 +4,14 @@ const mailservice = require('../services/mailservice')
 const blacklist = require('../services/blacklist')
 const { userDataCache } = require('../services/cache')
 
+const addUserToBlacklist = async (user, decodedToken) => {
+  if (user) {
+    const { username } = user
+    userDataCache.del(username)
+    if (username != decodedToken.userId) await blacklist.addUserToBlacklist(username)
+  }
+}
+
 router.get('/', async (req, res) => {
   const results = await userService.findAll()
   res.json(results)
@@ -19,8 +27,7 @@ router.post('/modifyaccess', async (req, res) => {
     const { uid } = req.body
     const result = await userService.modifyAccess(req.body)
     const user = await userService.byId(uid)
-    userDataCache.del(user.username)
-    if (user && user.username != req.decodedToken.userId) await blacklist.addUserToBlacklist(user.username)
+    await addUserToBlacklist(user, req.decodedToken)
     res.status(200).json(result)
   } catch (e) {
     res.status(400).json(e)
@@ -57,8 +64,7 @@ router.post('/:uid/elements', async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
   const user = await userService.enableElementDetails(uid, codes)
-  userDataCache.del(user.username)
-  if (user && user.username != req.decodedToken.userId) await blacklist.addUserToBlacklist(user.username)
+  await addUserToBlacklist(user, req.decodedToken)
   res.json(user)
 })
 
@@ -66,8 +72,7 @@ router.delete('/:uid/elements', async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
   const user = await userService.removeElementDetails(uid, codes)
-  userDataCache.del(user.username)
-  if (user && user.username != req.decodedToken.userId) await blacklist.addUserToBlacklist(user.username)
+  await addUserToBlacklist(user, req.decodedToken)
   res.json(user)
 })
 
@@ -75,8 +80,7 @@ router.post('/:uid/faculties', async (req, res) => {
   const { uid } = req.params
   const { faculties } = req.body
   const user = await userService.setFaculties(uid, faculties)
-  userDataCache.del(user.username)
-  if (user && user.username != req.decodedToken.userId) await blacklist.addUserToBlacklist(user.username)
+  await addUserToBlacklist(user, req.decodedToken)
   res.json(user)
 })
 
