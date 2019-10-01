@@ -2,7 +2,7 @@ const axios = require('axios')
 const { USERSERVICE_URL } = require('../conf-backend')
 const UnitService = require('./units')
 const elementDetailService = require('./elementdetails')
-
+const { userDataCache } = require('./cache')
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: process.env.USERSERVICE_SECRET } })
 
 const ping = async () => {
@@ -41,6 +41,12 @@ const byUsername = async uid => {
   return response.data
 }
 
+const byUsernameData = async uid => {
+  const url = `/user/${uid}/user_data`
+  const response = await client.get(url)
+  return response.data
+}
+
 const getUserElementDetails = async username => {
   const url = `/user/elementdetails/${username}`
   const response = await client.get(url)
@@ -55,6 +61,7 @@ const byId = async id => {
 }
 
 const updateUser = async (uid, fields) => {
+  userDataCache.del(uid)
   const url = `/user/${uid}`
   const response = await client.put(url, fields)
   return response.data
@@ -108,11 +115,15 @@ const getAccessGroups = async () => {
 }
 
 const getUserDataFor = async uid => {
-  const user = await byUsername(uid)
+  let userData = userDataCache.get(uid)
+  if (!userData) {
+    userData = await byUsernameData(uid)
+    userDataCache.set(uid, userData)
+  }
+
   return {
-    roles: user.accessgroup.map(({ group_code }) => group_code),
-    rights: user.elementdetails,
-    faculties: new Set(user.faculty.map(({ faculty_code }) => faculty_code))
+    ...userData,
+    faculties: new Set(userData.faculties)
   }
 }
 
