@@ -17,6 +17,7 @@ router.get('/log', async (req, res) => {
     const results = await between(from, to)
     res.json(results)
   } catch (e) {
+    res.status(500).send(e.message)
     logger.error('error retrieving logs', e)
   }
 })
