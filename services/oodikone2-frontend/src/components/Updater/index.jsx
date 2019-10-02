@@ -61,7 +61,7 @@ const Updater = () => {
           <Form.Button content="Update all 'FETCHED' students" icon="refresh" onClick={() => rescheduleFetched()} />
           <Form.Button content="Daily update" icon="refresh" onClick={() => updateDaily()} />
         </Form.Group>
-        <Form.Group >
+        <Form.Group>
           <TextArea onChange={(_, { value }) => setNums(value)} />
           <Form.Button onClick={updatePopulationStudents} content="Update students by student number" icon="refresh" />
         </Form.Group>
