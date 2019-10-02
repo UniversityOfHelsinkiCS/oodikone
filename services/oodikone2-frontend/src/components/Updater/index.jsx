@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Header, Segment, Form, Button, Table } from 'semantic-ui-react'
+import { Header, Segment, Form, Button, Table, TextArea } from 'semantic-ui-react'
 import { callApi } from '../../apiConnection'
 import { cancelablePromise } from '../../common'
 
 const Updater = () => {
   const [amount, setAmount] = useState('')
   const [statuses, setStatuses] = useState(null)
+  const [nums, setNums] = useState('')
 
   const updateOldestStudents = amount => amount !== 0 && callApi('/updater/update/oldest', 'post', { amount })
   const updateAllStudents = () => callApi('/updater/update/all', 'post')
@@ -18,6 +19,7 @@ const Updater = () => {
   const createTasks = () => callApi('/updater/update/studentlist', 'post')
   const rescheduleScheduled = () => callApi('/updater/reschedule/scheduled', 'post')
   const rescheduleFetched = () => callApi('/updater/reschedule/fetched', 'post')
+  const updatePopulationStudents = () => callApi('/updatedatabase', 'post', nums.split('\n'))
 
   const statusRef = useRef()
   useEffect(() => {
@@ -58,6 +60,10 @@ const Updater = () => {
           <Form.Button content="Update all 'SCHEDULED' students" icon="refresh" onClick={() => rescheduleScheduled()} />
           <Form.Button content="Update all 'FETCHED' students" icon="refresh" onClick={() => rescheduleFetched()} />
           <Form.Button content="Daily update" icon="refresh" onClick={() => updateDaily()} />
+        </Form.Group>
+        <Form.Group >
+          <TextArea onChange={(_, { value }) => setNums(value)} />
+          <Form.Button onClick={updatePopulationStudents} content="Update students by student number" icon="refresh" />
         </Form.Group>
       </Form>
       <Header>Status:</Header>
