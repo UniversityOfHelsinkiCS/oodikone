@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const bodyParser = require('body-parser')
+const usageLogger = require('./util/usageLogger')
 const logger = require('./util/logger')
 const { between } = require('./usageService')
 
@@ -16,17 +17,22 @@ router.get('/log', async (req, res) => {
     const results = await between(from, to)
     res.json(results)
   } catch (e) {
-    console.log('error retrieving logs, msg: ', e.message)
+    res.status(500).json({ error: e.message })
+    logger.error('error retrieving logs', e)
   }
 })
 
 router.post('/log', async (req, res) => {
   try {
-    await logger.info(req.body.message, req.body.meta)
+    await usageLogger.info(req.body.message, {
+      ...req.body.meta,
+      // pass this as a custom field so we can filter by it in graylog
+      isUsageStats: true
+    })
     res.status(201).end()
   } catch (e) {
-    console.log('error Saving logs: ', e.message)
-    res.status(500).send(e.message)
+    res.status(500).json({ error: e.message })
+    logger.error('error saving logs', e)
   }
 })
 
