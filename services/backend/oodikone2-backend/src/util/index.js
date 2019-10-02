@@ -42,11 +42,14 @@ const oldToNew = code => {
   return mappedCode ? mappedCode : code
 }
 
+const validateParamLength = (param, minLength) => param && param.trim().length >= minLength
+
 module.exports = {
   arrayUnique,
   getStudentNumberChecksum,
   plainPrint,
   plainify,
   isValidStudentId,
-  oldToNew
+  oldToNew,
+  validateParamLength
 }

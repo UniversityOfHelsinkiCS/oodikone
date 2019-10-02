@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const Course = require('../services/courses')
+const { validateParamLength } = require('../util')
 const logger = require('../util/logger')
 
 router.get('/courses', async (req, res) => {
@@ -26,9 +27,13 @@ router.get('/coursesmulti', async (req, res) => {
 
 router.get('/v2/coursesmulti', async (req, res) => {
   let results = { courses: [], groups: {} }
-  if (req.query.name || req.query.code) {
-    results = await Course.byNameAndOrCodeLike(req.query.name, req.query.code)
+  const { name, code } = req.query
+
+  if (!(validateParamLength(name, 5) || validateParamLength(code, 2))) {
+    return res.status(400).json({ error: 'name or code invalid' })
   }
+
+  results = await Course.byNameAndOrCodeLike(name, code)
   res.json(results)
 })
 

@@ -106,7 +106,7 @@ const SearchForm = props => {
   }
 
   const fetchCourses = () => {
-    const validateParam = (param, minLength) => param && param.length >= minLength
+    const validateParam = (param, minLength) => param && param.trim().length >= minLength
     const isValidName = validateParam(courseName, 5)
     const isValidCode = validateParam(courseCode, 2)
 
