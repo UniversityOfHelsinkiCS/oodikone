@@ -72,10 +72,10 @@ describe('Student Statistics tests', () => {
     })
 
     it('Can jump to population page', () => {
-        cy.get('.prompt').type('Oinonen')
-        cy.contains('014473717').click()
+        cy.get('.prompt').type('Veli-Matti')
+        cy.contains('014824094').click()
         cy.get('i.level.up.alternate.icon').eq(0).click()
         cy.contains('Population statistics')
-        cy.contains('Credit accumulation (for 562 students)')
+        cy.contains('Credit accumulation (for 5 students)')
     })
 })

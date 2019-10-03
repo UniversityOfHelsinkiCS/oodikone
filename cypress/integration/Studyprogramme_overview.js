@@ -112,8 +112,8 @@ describe('Studyprogramme overview', () => {
   })
 
   it('can move to Population statistics page by clickin', () => {
-    cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+    cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
     cy.get('i.level.up.alternate.icon').eq(0).click()
-    cy.contains('Credit accumulation (for 219 students)')
+    cy.contains('Credit accumulation (for 29 students)')
   })
 })
