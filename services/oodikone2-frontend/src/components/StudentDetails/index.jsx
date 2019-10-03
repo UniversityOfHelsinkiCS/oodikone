@@ -11,10 +11,10 @@ import { getStudent, removeStudentSelection, resetStudent } from '../../redux/st
 import { getSemesters } from '../../redux/semesters'
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-import SearchResultTable from '../SearchResultTable'
 import { byDateDesc, reformatDate, getTextIn } from '../../common'
 import { clearCourseStats } from '../../redux/coursestats'
 import SortableTable from '../SortableTable'
+import StudentCourseTable from '../StudentCourseTable'
 
 class StudentDetails extends Component {
   constructor() {
@@ -198,7 +198,9 @@ class StudentDetails extends Component {
       translate('common.credits'),
       ''
     ]
-    const courseRows = student.courses.sort(byDateDesc).map(c => {
+
+    const courseRowsByAcademicYear = {}
+    student.courses.sort(byDateDesc).forEach(c => {
       const { date, grade, credits, course, isStudyModuleCredit, passed } = c
       let icon = null
       if (isStudyModuleCredit) {
@@ -210,33 +212,85 @@ class StudentDetails extends Component {
       }
       const year = moment(new Date(date)).diff(new Date('1950-1-1'), 'years')
 
-      return [
-        reformatDate(date, 'DD.MM.YYYY'),
-        `${
-          isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)
-        } (${course.code})`,
-        <div>
-          {icon}
-          {grade}
-        </div>,
-        credits,
-        <Item
-          as={Link}
-          to={this.pushQueryToUrl({
-            courseCodes: [course.code],
-            separate: false,
-            fromYear: year - 1,
-            toYear: year + 1
-          })}
-        >
-          <Icon name="level up alternate" />
-        </Item>
-      ]
+      if (!courseRowsByAcademicYear[`${new Date(date).getFullYear()}-${new Date(date).getFullYear() + 1}`]) {
+        courseRowsByAcademicYear[`${new Date(date).getFullYear()}-${new Date(date).getFullYear() + 1}`] = []
+      }
+      if (!courseRowsByAcademicYear[`${new Date(date).getFullYear() - 1}-${new Date(date).getFullYear()}`]) {
+        courseRowsByAcademicYear[`${new Date(date).getFullYear() - 1}-${new Date(date).getFullYear()}`] = []
+      }
+
+      if (new Date(date).getMonth() < 7) {
+        courseRowsByAcademicYear[`${new Date(date).getFullYear() - 1}-${new Date(date).getFullYear()}`].push([
+          reformatDate(date, 'DD.MM.YYYY'),
+          `${
+            isStudyModuleCredit
+              ? `${getTextIn(course.name, language)} [Study Module]`
+              : getTextIn(course.name, language)
+          } (${course.code})`,
+          <div>
+            {icon}
+            {grade}
+          </div>,
+          credits,
+          <Item
+            as={Link}
+            to={this.pushQueryToUrl({
+              courseCodes: [course.code],
+              separate: false,
+              fromYear: year - 1,
+              toYear: year + 1
+            })}
+          >
+            <Icon name="level up alternate" />
+          </Item>
+        ])
+      } else {
+        courseRowsByAcademicYear[`${new Date(date).getFullYear()}-${new Date(date).getFullYear() + 1}`].push([
+          reformatDate(date, 'DD.MM.YYYY'),
+          `${
+            isStudyModuleCredit
+              ? `${getTextIn(course.name, language)} [Study Module]`
+              : getTextIn(course.name, language)
+          } (${course.code})`,
+          <div>
+            {icon}
+            {grade}
+          </div>,
+          credits,
+          <Item
+            as={Link}
+            to={this.pushQueryToUrl({
+              courseCodes: [course.code],
+              separate: false,
+              fromYear: year - 1,
+              toYear: year + 1
+            })}
+          >
+            <Icon name="level up alternate" />
+          </Item>
+        ])
+      }
     })
+
+    const courseTables = Object.keys(courseRowsByAcademicYear).map(academicYear => {
+      if (courseRowsByAcademicYear[academicYear] < 1) return null
+
+      return (
+        <Fragment key={academicYear}>
+          <Header content={academicYear} />
+          <StudentCourseTable
+            headers={courseHeaders}
+            rows={courseRowsByAcademicYear[academicYear]}
+            noResultText="Student has courses marked"
+          />
+        </Fragment>
+      )
+    })
+
     return (
       <Fragment>
         <Header content="Courses" />
-        <SearchResultTable headers={courseHeaders} rows={courseRows} noResultText="Student has courses marked" />
+        <Segment style={{ maxHeight: '80vh', overflowY: 'auto', padding: 10 }}>{courseTables}</Segment>
       </Fragment>
     )
   }
