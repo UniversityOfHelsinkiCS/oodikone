@@ -156,7 +156,7 @@ router.post('/studenttags', async (req, res) => {
   }
 })
 
-router.delete('/studenttags', async (req, res) => {
+router.delete('/studenttags/delete_one', async (req, res) => {
   try {
     const { tag_id, studentnumber, studytrack } = req.body
     const { rights, roles, decodedToken } = req
@@ -172,6 +172,25 @@ router.delete('/studenttags', async (req, res) => {
   } catch (err) {
     console.log(err)
     res.status(500).json(err)
+  }
+})
+
+router.delete('/studenttags/delete_many', async (req, res) => {
+  try {
+    const { tagId, studentnumbers, studytrack } = req.body
+    const { rights, roles, decodedToken } = req
+
+    if (!rights.includes(studytrack) && !(roles && roles.includes('admin'))) return res.status(403).end()
+
+    const tags = await Tags.findTagsFromStudytrackById(studytrack, [tagId])
+    if (tags.length === 0) return res.status(403).json({ error: 'The tag does not exist' })
+
+    await TagStudent.deleteMultipleStudentTags(tagId, studentnumbers)
+    const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
+    res.status(200).json(filterRelevantStudentTags(result, decodedToken.id))
+  } catch (err) {
+    console.log(err)
+    res.status(400).json(err)
   }
 })
 
