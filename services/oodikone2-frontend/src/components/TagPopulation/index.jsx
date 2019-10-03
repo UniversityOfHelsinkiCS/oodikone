@@ -4,9 +4,9 @@ import { connect } from 'react-redux'
 import { Button, Dropdown, List } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
-import { createMultipleStudentTagAction } from '../../redux/tagstudent'
+import { createMultipleStudentTagAction, deleteMultipleStudentTagAction } from '../../redux/tagstudent'
 
-const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStudents }) => {
+const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStudents, deleteMultipleStudentTag }) => {
   const [options, setOptions] = useState([])
   const [selectedValue, setSelected] = useState('')
 
@@ -20,8 +20,12 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
     setSelected(value)
   }
 
-  const handleSubmit = event => {
-    event.preventDefault()
+  const handleDelete = () => {
+    deleteMultipleStudentTag(selectedValue, selectedStudents, studytrack)
+    setSelected('')
+  }
+
+  const handleSubmit = () => {
     const tagList = []
     selectedStudents.forEach(sn => {
       const tag = {
@@ -48,8 +52,11 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
           selectOnNavigation={false}
         />
       </List.Item>
-      <Button onClick={handleSubmit} disabled={selectedValue === ''}>
+      <Button onClick={() => handleSubmit()} disabled={selectedValue === ''}>
         add tag to {selectedStudents.length} students
+      </Button>
+      <Button onClick={() => handleDelete()} disabled={selectedValue === ''}>
+        delete tag from {selectedStudents.length} students
       </Button>
     </List>
   )
@@ -57,6 +64,7 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
 
 TagPopulation.propTypes = {
   createMultipleStudentTag: func.isRequired,
+  deleteMultipleStudentTag: func.isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studytrack: string.isRequired,
   selectedStudents: arrayOf(string).isRequired
@@ -70,7 +78,8 @@ export default withRouter(
   connect(
     mapStateToProps,
     {
-      createMultipleStudentTag: createMultipleStudentTagAction
+      createMultipleStudentTag: createMultipleStudentTagAction,
+      deleteMultipleStudentTag: deleteMultipleStudentTagAction
     }
   )(TagPopulation)
 )
