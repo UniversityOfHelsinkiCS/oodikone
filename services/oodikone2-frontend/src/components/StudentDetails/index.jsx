@@ -50,6 +50,14 @@ class StudentDetails extends Component {
     this.unlistenHistory()
   }
 
+  componentWillReceiveProps(nextProps) {
+    const changedStudent = nextProps.studentNumber !== this.props.studentNumber
+
+    if (changedStudent) {
+      this.setState({ graphYearStart: null })
+    }
+  }
+
   getAbsentYears = () => {
     const {
       semesters,
