@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, Dropdown, List } from 'semantic-ui-react'
+import { Button, Dropdown, List, Confirm } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 
 import { createMultipleStudentTagAction, deleteMultipleStudentTagAction } from '../../redux/tagstudent'
@@ -9,6 +9,9 @@ import { createMultipleStudentTagAction, deleteMultipleStudentTagAction } from '
 const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStudents, deleteMultipleStudentTag }) => {
   const [options, setOptions] = useState([])
   const [selectedValue, setSelected] = useState('')
+  const [selectedTag, setSelectedTag] = useState(null)
+  const [confirmAdd, setConfirmAdd] = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState(null)
 
   useEffect(() => {
     const createdOptions = tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id }))
@@ -18,14 +21,17 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
   const handleChange = (event, { value }) => {
     event.preventDefault()
     setSelected(value)
+    const foundTag = tags.find(tag => tag.tag_id === value)
+    setSelectedTag(foundTag)
   }
 
   const handleDelete = () => {
     deleteMultipleStudentTag(selectedValue, selectedStudents, studytrack)
     setSelected('')
+    setConfirmDelete(null)
   }
 
-  const handleSubmit = () => {
+  const handleAdd = () => {
     const tagList = []
     selectedStudents.forEach(sn => {
       const tag = {
@@ -36,7 +42,34 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
     })
     setSelected('')
     createMultipleStudentTag(tagList, studytrack)
+    setConfirmAdd(null)
   }
+
+  const addConfirm = (
+    <Confirm
+      open={confirmAdd === selectedTag && selectedTag}
+      onCancel={() => setConfirmAdd(null)}
+      onConfirm={() => handleAdd()}
+      content={`Are you sure you want to add tag "${selectedTag ? selectedTag.tagname : null}" to ${
+        selectedStudents.length
+      } students?`}
+      cancelButton="Cancel"
+      confirmButton="Confirm"
+    />
+  )
+
+  const deleteConfirm = (
+    <Confirm
+      open={confirmDelete === selectedTag && selectedTag}
+      onCancel={() => setConfirmDelete(null)}
+      onConfirm={() => handleDelete()}
+      content={`Are you sure you want to delete tag "${selectedTag ? selectedTag.tagname : null}" from ${
+        selectedStudents.length
+      } students?`}
+      cancelButton="Cancel"
+      confirmButton="Confirm"
+    />
+  )
 
   return (
     <List horizontal>
@@ -52,12 +85,14 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
           selectOnNavigation={false}
         />
       </List.Item>
-      <Button onClick={() => handleSubmit()} disabled={selectedValue === ''}>
+      <Button onClick={() => setConfirmAdd(selectedTag)} disabled={selectedValue === ''}>
         add tag to {selectedStudents.length} students
       </Button>
-      <Button onClick={() => handleDelete()} disabled={selectedValue === ''}>
+      <Button onClick={() => setConfirmDelete(selectedTag)} disabled={selectedValue === ''}>
         delete tag from {selectedStudents.length} students
       </Button>
+      {deleteConfirm}
+      {addConfirm}
     </List>
   )
 }
