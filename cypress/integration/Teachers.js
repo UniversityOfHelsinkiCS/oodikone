@@ -43,8 +43,8 @@ describe('Teachers page tests', () => {
     cy.url().should('include', '/teachers')
     cy.get('.borderless > :nth-child(3)').click()
     cy.get('.prompt').type('Pekka')
-    cy.contains('Saren').click()
-    cy.contains('English Academic & Professional Skills: Reading, Writing & Spoken Communication (CEFR B2)*')
+    cy.contains('Leinonen').click()
+    cy.contains('Academic and Professional Communication in English 1 & 2 (CEFR B2)')
   })
 
   it("Can check teacher page if teacher doesn't have courses", () => {
@@ -65,7 +65,7 @@ describe('Teachers page tests', () => {
     cy.get(':nth-child(1) > .ui > .search').click()
     cy.contains('2017-18').click()
     cy.contains("Passed")
-    cy.contains("Valtonen")
-    cy.contains("Wahlström")
+    cy.contains("Antero")
+    cy.contains("Sassmannshausen")
   })
 })

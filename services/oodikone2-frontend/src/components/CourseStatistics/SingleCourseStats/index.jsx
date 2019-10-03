@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Segment, Header, Form, Grid, Button, Popup } from 'semantic-ui-react'
-import { shape, string, arrayOf, objectOf, oneOfType, number, func } from 'prop-types'
+import { shape, string, arrayOf, objectOf, oneOfType, number, func, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { getActiveLanguage } from 'react-localize-redux'
@@ -15,7 +15,7 @@ import {
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import YearFilter from '../SearchForm/YearFilter'
-import { getTextIn } from '../../../common'
+import { getTextIn, getUserIsAdmin } from '../../../common'
 import { getSemesters } from '../../../redux/semesters'
 
 const countFilteredStudents = (stat, filter) =>
@@ -283,6 +283,12 @@ class SingleCourseStats extends Component {
     history.push(`/coursepopulation?${searchString}`)
   }
 
+  renderShowPopulation() {
+    const { isAdmin } = this.props
+    if (!isAdmin) return null
+    return <Button onClick={this.showPopulation} content="Show population" />
+  }
+
   render() {
     const { programmes, maxYearsToCreatePopulationFrom } = this.props
     const { primary, comparison, fromYear, toYear } = this.state
@@ -311,14 +317,10 @@ class SingleCourseStats extends Component {
             {maxYearsToCreatePopulationFrom < toYear - fromYear ? (
               <Popup
                 content={`Max years to create a population from for this course is ${maxYearsToCreatePopulationFrom}`}
-                trigger={
-                  <span>
-                    <Button disabled onClick={this.showPopulation} content="Show population" />
-                  </span>
-                }
+                trigger={<span>{this.renderShowPopulation()}</span>}
               />
             ) : (
-              <Button onClick={this.showPopulation} content="Show population" />
+              this.renderShowPopulation()
             )}
           </Form>
         </Segment>
@@ -402,10 +404,16 @@ SingleCourseStats.propTypes = {
     push: func
   }).isRequired,
   getMaxYearsToCreatePopulationFrom: func.isRequired,
-  maxYearsToCreatePopulationFrom: number.isRequired
+  maxYearsToCreatePopulationFrom: number.isRequired,
+  isAdmin: bool.isRequired
 }
 
 const mapStateToProps = state => {
+  const {
+    auth: {
+      token: { roles }
+    }
+  } = state
   const { semesters = [], years = [] } = state.semesters.data
   return {
     programmes: selectors.getAllStudyProgrammes(state),
@@ -424,7 +432,8 @@ const mapStateToProps = state => {
       }))
       .reverse(),
     activeLanguage: getActiveLanguage(state.localize).code,
-    maxYearsToCreatePopulationFrom: state.singleCourseStats.maxYearsToCreatePopulationFrom
+    maxYearsToCreatePopulationFrom: state.singleCourseStats.maxYearsToCreatePopulationFrom,
+    isAdmin: getUserIsAdmin(roles)
   }
 }
 

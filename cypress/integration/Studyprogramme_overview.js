@@ -30,10 +30,10 @@ describe('Studyprogramme overview', () => {
     cy.contains('tr', 'Test course group').get('i.edit').click()
     cy.contains("Edit group")
     cy.get('.prompt').type("Professori Pekka")
-    cy.contains("Add teacher").parent().contains("9000960")
-    cy.contains("Teachers in group").parent().contains("9000960")
-    cy.get("i.reply.link.icon").click()
+    cy.contains("Add teacher").parent().contains("000960").click()
+    cy.contains("Teachers in group").parent().contains("000960")
 
+    cy.get("i.reply.link.icon").click()
     cy.contains('tr a', 'Test course group').click()
     cy.contains("Total teachers")
     cy.get("i.reply.icon").click()
@@ -112,8 +112,8 @@ describe('Studyprogramme overview', () => {
   })
 
   it('can move to Population statistics page by clickin', () => {
-    cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+    cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
     cy.get('i.level.up.alternate.icon').eq(0).click()
-    cy.contains('Credit accumulation (for 9 students)')
+    cy.contains('Credit accumulation (for 29 students)')
   })
 })
