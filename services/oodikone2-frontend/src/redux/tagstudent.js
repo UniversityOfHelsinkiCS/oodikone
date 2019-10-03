@@ -22,6 +22,14 @@ export const createMultipleStudentTagAction = (tags, studytrack) => {
   return callController(route, prefix, data, method)
 }
 
+export const deleteMultipleStudentTagAction = (tagId, studentnumbers, studytrack) => {
+  const route = '/studenttags/delete_many'
+  const prefix = 'DELETE_MULTIPLE_TAGS_'
+  const method = 'delete'
+  const data = { tagId, studentnumbers, studytrack }
+  return callController(route, prefix, data, method)
+}
+
 export const getStudentTagsByStudytrackAction = studytrack => {
   const route = `/studenttags/${studytrack}`
   const prefix = 'GET_STUDENT_TAGS_BY_ST_'
@@ -36,7 +44,7 @@ export const getStudentTagsByStudentnumberAction = studentnumber => {
 }
 
 export const deleteStudentTagAction = (tagId, studentnumber, studytrack) => {
-  const route = '/studenttags'
+  const route = '/studenttags/delete_one'
   const prefix = 'DELETE_STUDENT_TAG_'
   const method = 'delete'
   const data = { tag_id: tagId, studentnumber, studytrack }
@@ -148,6 +156,28 @@ const reducer = (state = { data: [], success: false, created: false, pending: fa
         success: true,
         data: action.response,
         error: null
+      }
+    case 'DELETE_MULTIPLE_TAGS_ATTEMPT':
+      return {
+        ...state,
+        pending: true,
+        success: false,
+        error: null
+      }
+    case 'DELETE_MULTIPLE_TAGS_FAILURE':
+      return {
+        ...state,
+        pending: false,
+        success: false,
+        error: action.response.response.data.error
+      }
+    case 'DELETE_MULTIPLE_TAGS_SUCCESS':
+      return {
+        ...state,
+        pending: false,
+        success: true,
+        error: null,
+        data: action.response
       }
     case 'CREATE_MULTIPLE_TAGS_ATTEMPT':
       return {
