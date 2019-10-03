@@ -138,7 +138,7 @@ describe('Population Statistics tests', () => {
     })
   })
 
-  it.only('All filters working', () => {
+  it('All filters working', () => {
     cy.contains("Select study programme", { timeout: 50000 }).click().siblings().contains("Tietojenkäsittelytieteen kandiohjelma").click()
     cy.contains("See population").click()
 
