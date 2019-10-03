@@ -41,6 +41,19 @@ const createMultipleStudentTags = async tags => {
   return TagStudent.bulkCreate(tags, { ignoreDuplicates: true })
 }
 
+const deleteMultipleStudentTags = async (tagId, studentnumbers) => {
+  return TagStudent.destroy({
+    where: {
+      tag_id: {
+        [Op.eq]: tagId
+      },
+      studentnumber: {
+        [Op.in]: studentnumbers
+      }
+    }
+  })
+}
+
 const deleteStudentTag = async (studentnumber, tag_id) => {
   return TagStudent.destroy({
     where: {
@@ -56,5 +69,6 @@ module.exports = {
   getStudentTagsByStudytrack,
   createStudentTag,
   createMultipleStudentTags,
-  deleteStudentTag
+  deleteStudentTag,
+  deleteMultipleStudentTags
 }
