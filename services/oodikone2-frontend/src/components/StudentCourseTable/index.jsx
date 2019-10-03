@@ -41,7 +41,7 @@ const StudentCourseTable = ({ headers, rows, noResultText }) => {
   if (rows.length > 0) {
     return (
       <Segment style={{ padding: 0 }}>
-        <Table unstackable className="fixed-header">
+        <Table unstackable>
           {getHeaderRow(headers)}
           {getTableBody(rows)}
         </Table>
