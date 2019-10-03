@@ -489,6 +489,7 @@ const getDuplicatesToIdMap = () => {
 const getIdToDuplicatesMapWithCourse = () => {
   return getDuplicateCodesWithCourses().then(res =>
     res.reduce((acc, e) => {
+      if (!e.course) return acc
       acc[e.groupid] = acc[e.groupid] || []
       acc[e.groupid].push(e.course)
       return acc
