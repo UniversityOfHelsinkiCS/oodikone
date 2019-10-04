@@ -201,10 +201,12 @@ describe('Population Statistics tests', () => {
 
     checkAmountOfStudents(0)
   
-    cy.get('.filter-segment').should('have.length', 11)
-    cy.contains('.filter-segment', 'Laskennan mallit').should('exist')
-    removeFilter('Laskennan mallit')
-    cy.get('.filter-segment').should('have.length', 10)
+    cy.get('.filter-segment').its('length')
+      .then(originalLength => {
+        cy.contains('.filter-segment', 'Laskennan mallit').should('exist')
+        removeFilter('Laskennan mallit')
+        cy.get('.filter-segment').should('have.length', originalLength - 1)
+      })
 
     cy.contains("select source").click().siblings().contains("Anywhere").click()
     cy.contains("select target").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
