@@ -7,6 +7,7 @@ import { arrayOf, object, string, func, number, shape } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import Highcharts from 'highcharts/highstock'
 import { Button } from 'semantic-ui-react'
+import boostcanvas from 'highcharts/modules/boost-canvas'
 import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import './creditAccumulationGraphHC.css'
@@ -16,6 +17,7 @@ import { setChartHeight } from '../../redux/settings'
 import { reformatDate } from '../../common'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
 
+boostcanvas(Highcharts)
 boost(Highcharts)
 
 class CreditAccumulationGraphHighCharts extends Component {
