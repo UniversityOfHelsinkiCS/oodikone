@@ -17,6 +17,8 @@ import { setChartHeight } from '../../redux/settings'
 import { reformatDate } from '../../common'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
 
+// boost canvas needed because tests break with large population
+// https://www.highcharts.com/errors/26/
 boostcanvas(Highcharts)
 boost(Highcharts)
 
@@ -167,7 +169,10 @@ class CreditAccumulationGraphHighCharts extends Component {
           },
           split: false
         }
-      : {}
+      : {
+          shared: false,
+          split: false
+        }
     const options = {
       plotOptions: {
         series: {
