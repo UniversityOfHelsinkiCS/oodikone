@@ -23,11 +23,9 @@ describe('Population Statistics tests', () => {
       students = Number(text.match(/\d+/g)[0])
       expect(students).to.equal(assertion)
     })
-    /* cy.contains("Credit accumulation").siblings().within(() => {
-      cy.get(".highcharts-series-group").within(() => {
-        cy.get("path").its('length').should('be.equal', (students * 2) + 2) // For each student there should be 2 paths in the graph + 2 for the scrollbar
-      })
-    }) */
+    cy.contains("Credit accumulation").siblings().within(() => {
+      cy.get(".highcharts-series-group").find("path").should('have.length', students ? (students * 2) + 2 : 0) // For each student there should be 2 paths in the graph + 2 for the scrollbar
+    })
   }
 
   const removeFilter = (text) => {
