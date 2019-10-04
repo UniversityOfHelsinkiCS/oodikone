@@ -49,7 +49,7 @@ const sortAlternatives = alternatives =>
     ['asc', 'desc', 'desc']
   )
 
-const mergeCourses = (groups, courses) => {
+const mergeCourses = (groups, courses, names) => {
   const mergedCourses = {}
 
   courses.forEach(course => {
@@ -58,6 +58,7 @@ const mergeCourses = (groups, courses) => {
     if (!mergedCourses[groupId]) {
       mergedCourses[groupId] = {
         ...course,
+        name: names[groupId] || course.name,
         alternatives: [{ code: course.code, latestInstanceDate: new Date(course.latest_instance_date) }],
         min_attainment_date: new Date(course.min_attainment_date),
         max_attainment_date: new Date(course.max_attainment_date)

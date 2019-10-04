@@ -199,13 +199,12 @@ describe('Population Statistics tests', () => {
     cy.contains("discipline").click().siblings().contains("Tietojenkäsittelytiede").click()
     cy.contains("and at least").parentsUntil("form").contains("set filter").click()
 
-    cy.contains("Filters").siblings().within(() => {
-      cy.contains('Rinnakkaisohjelmointi').should('exist')
-    })
-
     checkAmountOfStudents(0)
-
-    removeFilter('Rinnakkaisohjelmointi')
+  
+    cy.get('.filter-segment').should('have.length', 11)
+    cy.contains('.filter-segment', 'Laskennan mallit').should('exist')
+    removeFilter('Laskennan mallit')
+    cy.get('.filter-segment').should('have.length', 10)
 
     cy.contains("select source").click().siblings().contains("Anywhere").click()
     cy.contains("select target").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
