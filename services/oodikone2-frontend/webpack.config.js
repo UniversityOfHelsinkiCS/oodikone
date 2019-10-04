@@ -98,7 +98,8 @@ module.exports = (env, args) => {
           context: ['/api'],
           target: backendURL
         }
-      ]
+      ],
+      disableHostCheck: true
     }
   }
 }
