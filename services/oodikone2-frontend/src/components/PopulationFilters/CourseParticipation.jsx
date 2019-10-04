@@ -56,7 +56,7 @@ class CourseParticipation extends Component {
     const active = field2 => selectedField === field2
 
     return (
-      <div>
+      <div className="filter-segment">
         <Segment.Group horizontal size="small">
           <Popup
             trigger={

@@ -777,18 +777,22 @@ const byNameAndOrCodeLike = async (name, code) => {
   })
 
   const groups = {}
+  const names = {}
+  const codeToMainCourseMap = await getCodeToMainCourseMap()
   await Promise.all(
     courses.map(
       course =>
         new Promise(async res => {
           const groupid = await getGroupId(course.code)
           groups[course.code] = groupid
+          if (!names[groupid] && codeToMainCourseMap[course.code])
+            names[groupid] = codeToMainCourseMap[course.code].name
           res()
         })
     )
   )
 
-  return { courses, groups }
+  return { courses, groups, names }
 }
 
 const byCodes = codes => {

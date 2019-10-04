@@ -23,11 +23,9 @@ describe('Population Statistics tests', () => {
       students = Number(text.match(/\d+/g)[0])
       expect(students).to.equal(assertion)
     })
-    /* cy.contains("Credit accumulation").siblings().within(() => {
-      cy.get(".highcharts-series-group").within(() => {
-        cy.get("path").its('length').should('be.equal', (students * 2) + 2) // For each student there should be 2 paths in the graph + 2 for the scrollbar
-      })
-    }) */
+    cy.contains("Credit accumulation").siblings().within(() => {
+      cy.get(".highcharts-series-group").find("path").should('have.length', students ? (students * 2) + 2 : 0) // For each student there should be 2 paths in the graph + 2 for the scrollbar
+    })
   }
 
   const removeFilter = (text) => {
@@ -201,13 +199,14 @@ describe('Population Statistics tests', () => {
     cy.contains("discipline").click().siblings().contains("Tietojenkäsittelytiede").click()
     cy.contains("and at least").parentsUntil("form").contains("set filter").click()
 
-    cy.contains("Filters").siblings().within(() => {
-      cy.contains('Rinnakkaisohjelmointi').should('exist')
-    })
-
     checkAmountOfStudents(0)
-
-    removeFilter('Rinnakkaisohjelmointi')
+  
+    cy.get('.filter-segment').its('length')
+      .then(originalLength => {
+        cy.contains('.filter-segment', 'Laskennan mallit').should('exist')
+        removeFilter('Laskennan mallit')
+        cy.get('.filter-segment').should('have.length', originalLength - 1)
+      })
 
     cy.contains("select source").click().siblings().contains("Anywhere").click()
     cy.contains("select target").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
