@@ -169,7 +169,10 @@ class CreditAccumulationGraphHighCharts extends Component {
           },
           split: false
         }
-      : {}
+      : {
+          shared: false,
+          split: false
+        }
     const options = {
       plotOptions: {
         series: {
