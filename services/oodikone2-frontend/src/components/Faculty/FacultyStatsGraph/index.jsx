@@ -2,10 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { arrayOf, string, number, shape } from 'prop-types'
 import { Segment, Button } from 'semantic-ui-react'
 import Highcharts from 'highcharts/highstock'
-import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
-
-boost(Highcharts)
 
 const FacultyStatsGraph = ({ data }) => {
   const [mode, setMode] = useState('studentCredits')
