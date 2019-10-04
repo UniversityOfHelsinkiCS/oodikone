@@ -228,11 +228,11 @@ SearchForm.propTypes = {
 }
 
 const mapStateToProps = state => {
-  const { groups, courses } = getCourseSearchResults(state)
+  const { groups, courses, names } = getCourseSearchResults(state)
   const { pending: courseStatsPending } = state.courseStats
 
   return {
-    matchingCourses: mergeCourses(groups, courses),
+    matchingCourses: mergeCourses(groups, courses, names),
     isLoading: courseStatsPending,
     coursesLoading: state.courseSearch.pending
   }
