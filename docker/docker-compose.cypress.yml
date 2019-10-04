@@ -1,0 +1,11 @@
+version: '3.2'
+services:
+  cypress:
+    image: "cypress/included:3.4.1"
+    environment:
+      - CYPRESS_baseUrl=${CYPRESS_baseUrl}
+    working_dir: /e2e
+    volumes:
+      - ./cypress:/e2e/cypress
+      - ./cypress.json:/e2e/cypress.json
+    container_name: cypress
