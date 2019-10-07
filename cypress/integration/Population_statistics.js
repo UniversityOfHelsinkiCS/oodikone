@@ -51,21 +51,12 @@ describe('Population Statistics tests', () => {
       cy.get("@enrollmentSelect").should('not.have.value', beforeVal)
     })
 
-
-    cy.contains("Statistics until").siblings().within(() => {
-      cy.get("input").click()
-      cy.get("table").contains(`${new Date().getFullYear()}`).click()
-      cy.contains("2018").click()
-      cy.contains("Oct").click()
-      cy.get("input").should("have.value", "October 2018")
-    })
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen koulutusohjelma").click()
     cy.contains("Select degree").click().siblings().contains("Luonnontieteiden kandidaatti")
   })
 
   it('Population statistics is usable on general level', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
-    cy.get(':nth-child(3) > .rdt > .form-control').click().clear().type('August 2019')
     cy.contains("See population").click()
     cy.get(".card").within(() => {
       cy.contains("Tietojenkäsittelytieteen maisteriohjelma")
