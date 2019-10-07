@@ -70,7 +70,7 @@ class SortableTable extends Component {
     const sortDirection = name => (selected === name ? direction : null)
 
     return (
-      <Table sortable {...tableProps} className="fixed-header">
+      <Table sortable {...tableProps} className="fixed-header" striped>
         <Table.Header>
           {columnsWithCollapsedHeaders.length > 0 && (
             <Table.Row>
@@ -104,6 +104,7 @@ class SortableTable extends Component {
               )
               .map(c => (
                 <Table.HeaderCell
+                  // width='2'
                   key={c.key}
                   content={c.title}
                   onClick={this.handleSort(c.key)}
@@ -121,6 +122,17 @@ class SortableTable extends Component {
                 .map(c => {
                   if (collapsed.map(cell => cell.headerProps.title).includes(c.childOf)) {
                     return null
+                  }
+                  if (c.key.includes('programmecode') || c.key.includes('programmename')) {
+                    return (
+                      <Table.Cell
+                        width={c.key === 'programmecode' ? '1' : '16'}
+                        key={c.key}
+                        content={c.getRowContent ? c.getRowContent(row) : c.getRowVal(row)}
+                        {...c.cellProps}
+                        {...(c.getCellProps && c.getCellProps(row))}
+                      />
+                    )
                   }
                   return (
                     <Table.Cell
