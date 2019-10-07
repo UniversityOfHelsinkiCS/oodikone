@@ -1,4 +1,4 @@
-import itemreducer, { actions } from './common/itemreducer'
+import { actions } from './common/itemreducer'
 import { callController } from '../apiConnection/index'
 
 const prefix = 'GET_COURSE_SEARCH_RESULT_'
@@ -19,6 +19,33 @@ export const findCoursesV2 = ({ name, code }) => {
   return callController(route, prefix, [], 'get', params, params)
 }
 
-const reducer = itemreducer(prefix)
+const reducer = (state = { data: {}, pending: false }, action) => {
+  switch (action.type) {
+    case 'GET_COURSE_SEARCH_RESULT_ATTEMPT':
+      return {
+        ...state,
+        pending: true,
+        lastSearch: action.requestSettings.query
+      }
+    case 'GET_COURSE_SEARCH_RESULT_FAILURE':
+      return {
+        ...state,
+        pending: false,
+        error: true
+      }
+    case 'GET_COURSE_SEARCH_RESULT_SUCCESS':
+      return {
+        ...state,
+        pending: false,
+        error: false,
+        data:
+          action.query.code === state.lastSearch.code && action.query.name === state.lastSearch.name
+            ? action.response
+            : state.data
+      }
+    default:
+      return state
+  }
+}
 
 export default reducer
