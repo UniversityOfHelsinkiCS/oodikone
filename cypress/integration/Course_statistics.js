@@ -18,6 +18,7 @@ describe('Course Statistics tests', () => {
   })
 
   it('Searching single course having duplicate mappings shows course statistics', () => {
+    expect(true).toBe(false)
     cy.url().should('include', '/coursestatistics')
     cy.contains("Search for courses")
     cy.get("input[placeholder='Search by entering a course code']").type('TKT20003')
