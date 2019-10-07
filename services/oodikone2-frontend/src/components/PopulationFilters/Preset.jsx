@@ -76,7 +76,7 @@ class Preset extends Component {
                     }}
                     onConfirm={() => {
                       this.clearFilter(true)
-                      this.props.deletePopulationFilter(filter)
+                      this.props.deletePopulationFilter({ id: filter.id })
                       this.setState({ open: false })
                     }}
                     size="small"
