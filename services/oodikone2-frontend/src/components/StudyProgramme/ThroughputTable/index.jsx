@@ -95,7 +95,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
           </Grid.Row>
         </Grid>
       </Header>
-      <Segment basic loading={loading} style={{overflowX: 'auto'}}>
+      <Segment basic loading={loading} style={{ overflowX: 'auto' }}>
         <Table celled structured compact striped selectable className="fixed-header">
           <Table.Header>
             <Table.Row>

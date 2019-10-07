@@ -58,8 +58,8 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits }
           </Grid.Row>
         </Grid>
       </Header>
-      <Segment basic loading={loading} style={{overflowX: 'auto'}}>
-        <Table structured celled compact striped selectable className="fixed-header" >
+      <Segment basic loading={loading} style={{ overflowX: 'auto' }}>
+        <Table structured celled compact striped selectable className="fixed-header">
           <Table.Header>
             <Table.Row>
               {headerList.map(header => (
