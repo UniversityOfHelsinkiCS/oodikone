@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import Datetime from 'react-datetime'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Button, List, Segment, Header, Confirm, Form, Icon, Popup, Message } from 'semantic-ui-react'
+import { Button, List, Segment, Header, Confirm, Form, Icon, Popup, Message, Item } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
+import moment from 'moment'
 
 import TagModal from '../TagModal'
 import { reformatDate } from '../../../common'
@@ -52,18 +53,38 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
 
   const deleteButton = tag => <Button onClick={() => setConfirm(tag)}>Delete</Button>
 
+  const populationUrl = tag => {
+    const months = Math.ceil(moment.duration(moment().diff(`${tag.year}-08-01`)).asMonths())
+    const href =
+      `/populations?months=${months}&semesters=FALL&semesters=` +
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${
+        tag.year
+      }&endYear=${new Date().getFullYear()}&tag=${tag.tag_id}`
+    return href
+  }
+
   const decorateTagName = tag => {
     if (tag.personal_user_id)
       return (
         <>
           {tag.tagname}
+          <Item as={Link} to={populationUrl(tag)}>
+            <Icon name="level up alternate" />
+          </Item>
           <Popup
             content="Only you can see this tag."
             trigger={<Icon style={{ marginLeft: '1em' }} name="eye" color="purple" />}
           />
         </>
       )
-    return tag.tagname
+    return (
+      <>
+        {tag.tagname}
+        <Item as={Link} to={populationUrl(tag)}>
+          <Icon name="level up alternate" />
+        </Item>
+      </>
+    )
   }
 
   const columns = [
