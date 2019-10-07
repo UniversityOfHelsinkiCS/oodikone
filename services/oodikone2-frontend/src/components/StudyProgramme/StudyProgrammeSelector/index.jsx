@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { arrayOf, func, string, bool, shape } from 'prop-types'
-import { Loader, Message } from 'semantic-ui-react'
+import { Loader, Message, Header, Form } from 'semantic-ui-react'
 import { getDegreesAndProgrammes } from '../../../redux/populationDegreesAndProgrammes'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
@@ -15,6 +15,14 @@ class StudyProgrammeSelector extends Component {
     language: string.isRequired
   }
 
+  constructor() {
+    super()
+    this.state = {
+      filter: ''
+    }
+    this.timer = null
+  }
+
   static defaultProps = {
     studyprogrammes: null
   }
@@ -25,36 +33,103 @@ class StudyProgrammeSelector extends Component {
     }
   }
 
+  handleFilterChange = value => {
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => {
+      this.setState({ filter: value })
+    }, 250)
+  }
+
   render() {
     const { studyprogrammes, selected, language } = this.props
+    const { filter } = this.state
     if (selected) return null
     if (!studyprogrammes) return <Loader active>Loading</Loader>
 
     const headers = [
       {
-        key: 'name',
-        title: 'name',
-        getRowVal: prog => getTextIn(prog.name, language)
-      },
-      {
-        key: 'code',
+        key: 'programmecode',
         title: 'code',
         getRowVal: prog => prog.code
+      },
+      {
+        key: 'programmename',
+        title: 'name',
+        getRowVal: prog => getTextIn(prog.name, language)
       }
     ]
     if (studyprogrammes == null) {
       return <Message>You do not have access to any programmes</Message>
     }
+    const bachelorProgrammes = []
+    const masterProgrammes = []
+    const otherProgrammes = []
+    const filteredStudyprogrammes = studyprogrammes.filter(
+      programme =>
+        programme.code.toLowerCase().includes(filter) || programme.name[language].toLowerCase().includes(filter)
+    )
+
+    filteredStudyprogrammes.forEach(programme => {
+      if (programme.code.includes('MH')) {
+        masterProgrammes.push(programme)
+      } else if (programme.code.includes('KH')) {
+        bachelorProgrammes.push(programme)
+      } else {
+        otherProgrammes.push(programme)
+      }
+    })
     return (
-      <SortableTable
-        columns={headers}
-        getRowKey={programme => programme.code}
-        getRowProps={programme => ({
-          onClick: () => this.props.handleSelect(programme.code),
-          style: { cursor: 'pointer' }
-        })}
-        data={studyprogrammes}
-      />
+      <>
+        {studyprogrammes.length > 10 ? (
+          <Form>
+            Filter programmes:
+            <Form.Input onChange={e => this.handleFilterChange(e.target.value)} width="4" />
+          </Form>
+        ) : null}
+        {bachelorProgrammes.length > 0 ? (
+          <>
+            <Header>Bachelor programmes</Header>
+            <SortableTable
+              columns={headers}
+              getRowKey={programme => programme.code}
+              getRowProps={programme => ({
+                onClick: () => this.props.handleSelect(programme.code),
+                style: { cursor: 'pointer' }
+              })}
+              data={bachelorProgrammes}
+            />
+          </>
+        ) : null}
+        {masterProgrammes.length > 0 ? (
+          <>
+            <Header>Master programmes</Header>
+            <SortableTable
+              columns={headers}
+              getRowKey={programme => programme.code}
+              getRowProps={programme => ({
+                onClick: () => this.props.handleSelect(programme.code),
+                style: { cursor: 'pointer' }
+              })}
+              data={masterProgrammes}
+            />
+          </>
+        ) : null}
+
+        {otherProgrammes.length > 0 ? (
+          <>
+            <Header>Doctoral programmes and old programmes</Header>
+            <SortableTable
+              columns={headers}
+              getRowKey={programme => programme.code}
+              getRowProps={programme => ({
+                onClick: () => this.props.handleSelect(programme.code),
+                style: { cursor: 'pointer' }
+              })}
+              data={otherProgrammes}
+            />
+          </>
+        ) : null}
+      </>
     )
   }
 }
