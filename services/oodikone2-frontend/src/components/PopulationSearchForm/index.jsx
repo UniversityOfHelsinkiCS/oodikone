@@ -54,8 +54,7 @@ const PopulationSearchForm = props => {
   const [totalState, setTotalState] = useState({
     query: initialQuery(),
     isLoading: false,
-    momentYear: Datetime.moment('2017-01-01'),
-    floatMonths: months('2017', 'FALL')
+    momentYear: Datetime.moment('2017-01-01')
   })
   const [didMount, setDidMount] = useState(false)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
@@ -64,7 +63,7 @@ const PopulationSearchForm = props => {
 
   const setState = newState => setTotalState({ ...totalState, ...newState })
 
-  const { query, isLoading, momentYear, floatMonths } = totalState
+  const { query, isLoading, momentYear } = totalState
 
   const { studyProgrammes, location, semesters, queries, history, tags, language, translate, onProgress } = props
 
@@ -304,9 +303,6 @@ const PopulationSearchForm = props => {
     if (moment.isMoment(end)) {
       const lastDayOfMonth = moment(end).endOf('month')
       const start = term === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`
-      setState({
-        floatMonths: moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths()
-      })
       return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
     }
     return -1
@@ -358,23 +354,6 @@ const PopulationSearchForm = props => {
     })
   }
 
-  const handleMonthsChange = value => {
-    const months = getMonths(query.startYear, value, query.semesters.includes('FALL') ? 'FALL' : 'SPRING')
-    setState({
-      query: {
-        ...query,
-        months
-      }
-    })
-  }
-
-  const getMonthValue = (startYear, months) => {
-    const start = `${startYear}-08-01`
-    return moment(start)
-      .add(months - 1, 'months')
-      .format('MMMM YYYY')
-  }
-
   const validYearCheck = momentYear => {
     if (!moment.isMoment(momentYear)) {
       return false
@@ -410,8 +389,6 @@ const PopulationSearchForm = props => {
     }
   }
 
-  const getMinSelection = (startYear, semester) => (semester === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`)
-
   const renderableList = list =>
     list.map(sp => {
       const { type, name, code } = sp
@@ -423,7 +400,7 @@ const PopulationSearchForm = props => {
     })
 
   const renderEnrollmentDateSelector = () => {
-    const { semesters, startYear } = query
+    const { startYear } = query
     return (
       <Form.Group key="year" className="enrollmentSelectorGroup">
         <Form.Field error={!validYearCheck(momentYear)} className="yearSelect">
@@ -453,18 +430,6 @@ const PopulationSearchForm = props => {
             <Button type="button" icon="plus" className="yearControlButton" onClick={addYear} tabIndex="-1" />
             <Button type="button" icon="minus" className="yearControlButton" onClick={subtractYear} tabIndex="-1" />
           </Button.Group>
-        </Form.Field>
-        <Form.Field error={query.months < 0}>
-          <label>Statistics until</label>
-          <Datetime
-            dateFormat="MMMM YYYY"
-            closeOnSelect
-            defaultValue={getMonthValue(query.startYear, floatMonths)}
-            onChange={value => handleMonthsChange(value)}
-            isValidDate={current =>
-              current.isBefore(moment()) && current.isAfter(getMinSelection(startYear, semesters[1] || semesters[0]))
-            }
-          />
         </Form.Field>
       </Form.Group>
     )

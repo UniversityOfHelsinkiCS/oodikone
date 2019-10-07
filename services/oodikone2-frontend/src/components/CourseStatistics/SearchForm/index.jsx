@@ -130,7 +130,6 @@ const SearchForm = props => {
   const disabled = isLoading || Object.keys(selectedCourses).length === 0
   const selected = Object.values(selectedCourses).map(course => ({ ...course, selected: true }))
   const noSelectedCourses = selected.length === 0
-  const noQueryStrings = !courseName && !courseCode
 
   return (
     <React.Fragment>
@@ -191,7 +190,7 @@ const SearchForm = props => {
               </Fragment>
             )}
             <CourseTable
-              hidden={noQueryStrings || isLoading}
+              hidden={isLoading}
               courses={courses}
               title="Searched courses"
               onSelectCourse={onSelectCourse}
