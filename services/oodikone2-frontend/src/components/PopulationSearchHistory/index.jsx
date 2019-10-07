@@ -5,6 +5,7 @@ import { getTranslate } from 'react-localize-redux'
 import { Form, Button } from 'semantic-ui-react'
 import moment from 'moment'
 import qs from 'query-string'
+import Datetime from 'react-datetime'
 
 import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation, updatePopulationStudents } from '../../redux/populations'
@@ -72,7 +73,6 @@ class PopulationSearchHistory extends Component {
 
   handleSemesterSelection = (e, { value }) => {
     const { query } = this.state
-    console.log(query.tag)
     const semesters = query.semesters.includes(value)
       ? query.semesters.filter(s => s !== value)
       : [...query.semesters, value]
@@ -100,6 +100,24 @@ class PopulationSearchHistory extends Component {
     })
   }
 
+  handleMonthsChange = value => {
+    const { query } = this.state
+    const months = this.getMonths(query.startYear, value, query.semesters.includes('FALL') ? 'FALL' : 'SPRING')
+    this.setState({
+      query: {
+        ...query,
+        months
+      }
+    })
+  }
+
+  getMonthValue = (startYear, months) => {
+    const start = `${startYear}-08-01`
+    return moment(start)
+      .add(months - 1, 'months')
+      .format('MMMM YYYY')
+  }
+
   pushQueryToUrl = () => {
     const { studyRights, tag } = this.props.populations.query
     const { studentStatuses, semesters, months, endYear, startYear } = this.state.query
@@ -117,6 +135,8 @@ class PopulationSearchHistory extends Component {
     this.props.history.push({ search: searchString })
   }
 
+  getMinSelection = (startYear, semester) => (semester === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`)
+
   removePopulation = uuid => this.props.removePopulation(uuid)
 
   renderAdvancedSettingsSelector = () => {
@@ -128,64 +148,76 @@ class PopulationSearchHistory extends Component {
     const { semesters, studentStatuses } = query
 
     return (
-      <div>
-        <Form.Group>
-          {!populations.query.tag ? (
-            <Form.Field>
-              <label>Semesters</label>
-              <Form.Checkbox
-                className="populationStatisticsRadio"
-                key="FALL"
-                label={translate(`populationStatistics.${'FALL'}`)}
-                value="FALL"
-                name="semesterGroup"
-                checked={semesters.includes('FALL')}
-                onChange={this.handleSemesterSelection}
-              />
-              <Form.Checkbox
-                className="populationStatisticsRadio"
-                key="SPRING"
-                label={translate(`populationStatistics.${'SPRING'}`)}
-                value="SPRING"
-                name="semesterGroup"
-                checked={semesters.includes('SPRING')}
-                onChange={this.handleSemesterSelection}
-              />
-            </Form.Field>
-          ) : null}
+      <Form.Group>
+        <Form.Field error={query.months < 0}>
+          <b>Statistics until</b>
+          <Datetime
+            dateFormat="MMMM YYYY"
+            closeOnSelect
+            defaultValue={this.getMonthValue(query.startYear, query.months)}
+            onChange={value => this.handleMonthsChange(value)}
+            isValidDate={current =>
+              current.isBefore(moment()) &&
+              current.isAfter(this.getMinSelection(query.startYear, query.semesters[1] || query.semesters[0]))
+            }
+          />
+        </Form.Field>
+
+        {!populations.query.tag ? (
           <Form.Field>
-            <label>Include</label>
+            <b>Semesters</b>
             <Form.Checkbox
               className="populationStatisticsRadio"
-              key="EXCHANGE"
-              label="Exchange students"
-              value="EXCHANGE"
-              name="studentStatusGroup"
-              checked={studentStatuses.includes('EXCHANGE')}
-              onChange={this.handleStudentStatusSelection}
+              key="FALL"
+              label={translate(`populationStatistics.${'FALL'}`)}
+              value="FALL"
+              name="semesterGroup"
+              checked={semesters.includes('FALL')}
+              onChange={this.handleSemesterSelection}
             />
             <Form.Checkbox
               className="populationStatisticsRadio"
-              key="CANCELLED"
-              label="Students with cancelled study right"
-              value="CANCELLED"
-              name="studentStatusGroup"
-              checked={studentStatuses.includes('CANCELLED')}
-              onChange={this.handleStudentStatusSelection}
-            />
-            <Form.Checkbox
-              className="populationStatisticsRadio"
-              key="NONDEGREE"
-              label="Students with non-degree study right"
-              value="NONDEGREE"
-              name="studentStatusGroup"
-              checked={studentStatuses.includes('NONDEGREE')}
-              onChange={this.handleStudentStatusSelection}
+              key="SPRING"
+              label={translate(`populationStatistics.${'SPRING'}`)}
+              value="SPRING"
+              name="semesterGroup"
+              checked={semesters.includes('SPRING')}
+              onChange={this.handleSemesterSelection}
             />
           </Form.Field>
-          <Button onClick={this.pushQueryToUrl}>Fetch population with new settings</Button>
-        </Form.Group>
-      </div>
+        ) : null}
+        <Form.Field>
+          <b>Include</b>
+          <Form.Checkbox
+            className="populationStatisticsRadio"
+            key="EXCHANGE"
+            label="Exchange students"
+            value="EXCHANGE"
+            name="studentStatusGroup"
+            checked={studentStatuses.includes('EXCHANGE')}
+            onChange={this.handleStudentStatusSelection}
+          />
+          <Form.Checkbox
+            className="populationStatisticsRadio"
+            key="CANCELLED"
+            label="Students with cancelled study right"
+            value="CANCELLED"
+            name="studentStatusGroup"
+            checked={studentStatuses.includes('CANCELLED')}
+            onChange={this.handleStudentStatusSelection}
+          />
+          <Form.Checkbox
+            className="populationStatisticsRadio"
+            key="NONDEGREE"
+            label="Students with non-degree study right"
+            value="NONDEGREE"
+            name="studentStatusGroup"
+            checked={studentStatuses.includes('NONDEGREE')}
+            onChange={this.handleStudentStatusSelection}
+          />
+        </Form.Field>
+        <Button onClick={this.pushQueryToUrl}>Fetch population with new settings</Button>
+      </Form.Group>
     )
   }
 
@@ -199,28 +231,34 @@ class PopulationSearchHistory extends Component {
     const studentNumberList = populations.data.students.map(s => s.studentNumber)
     return (
       <React.Fragment>
-        <PopulationQueryCard
-          key={`population-${populations.query.uuid}`}
-          translate={translate}
-          population={populations.data}
-          query={populations.query}
-          queryId={0}
-          unit={units.data.programmes[populations.query.studyRights.programme]} // Possibly deprecated
-          units={[
-            ...Object.values(units.data.programmes),
-            ...Object.values(units.data.degrees),
-            ...Object.values(units.data.studyTracks)
-          ].filter(u => Object.values(populations.query.studyRights).includes(u.code))}
-          removeSampleFn={this.removePopulation}
-          updateStudentsFn={() => this.props.updatePopulationStudents(studentNumberList)}
-          updating={populations.updating}
-          tags={tags}
-        />
-        <InfoBox content={QueryCard} />
-
+        <Form.Group inline style={{ marginRight: '100px' }}>
+          <InfoBox content={QueryCard} style={{ margin: 'auto' }} />
+          <PopulationQueryCard
+            key={`population-${populations.query.uuid}`}
+            translate={translate}
+            population={populations.data}
+            query={populations.query}
+            queryId={0}
+            unit={units.data.programmes[populations.query.studyRights.programme]} // Possibly deprecated
+            units={[
+              ...Object.values(units.data.programmes),
+              ...Object.values(units.data.degrees),
+              ...Object.values(units.data.studyTracks)
+            ].filter(u => Object.values(populations.query.studyRights).includes(u.code))}
+            removeSampleFn={this.removePopulation}
+            updateStudentsFn={() => this.props.updatePopulationStudents(studentNumberList)}
+            updating={populations.updating}
+            tags={tags}
+          />
+        </Form.Group>
         <Form.Group>
+          {showAdvancedSettings ? (
+            <Form.Group>
+              <InfoBox content={Advanced} />
+            </Form.Group>
+          ) : null}
           <Form.Field style={{ margin: 'auto' }}>
-            <label>Advanced settings</label>
+            <b>Advanced settings</b>
             <Form.Radio
               toggle
               checked={showAdvancedSettings}
@@ -230,9 +268,6 @@ class PopulationSearchHistory extends Component {
             />
           </Form.Field>
           {this.renderAdvancedSettingsSelector()}
-        </Form.Group>
-        <Form.Group>
-          <InfoBox content={Advanced} />
         </Form.Group>
       </React.Fragment>
     )
