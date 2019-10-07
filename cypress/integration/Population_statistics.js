@@ -3,7 +3,7 @@ describe('Population Statistics tests', () => {
   beforeEach(() => {
     cy.server({
       onAnyRequest: function (route, proxy) {
-        if (Cypress.config().baseUrl.includes("http://localhost:1337/")) {
+        if (Cypress.config().baseUrl.includes("http://nginx/")) {
           proxy.xhr.setRequestHeader('uid', 'tktl')
           proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
           proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
@@ -249,22 +249,18 @@ describe('Population Statistics tests', () => {
       cy.wrap($f).parentsUntil("form").contains("set filter").click()
     })
 
-    cy.get(".header").contains("Filters").siblings().within(() => {
-      cy.get("label:contains(Basic filters)").each(($f) => {
-        cy.wrap($f).parentsUntil(".segment").within(() => {
-          cy.get(".trash").click()
-        })
+    cy.get("label:contains(Basic filters)").each(($f) => {
+      cy.wrap($f).parentsUntil(".segment").within(() => {
+        cy.get(".trash").click()
       })
+      cy.root().get("button").contains("Delete for good").click({ force: true })
     })
-    cy.get("button").contains("Delete for good").click({ force: true })
 
-    cy.contains("Filters").siblings().within(() => {
-      cy.get("label:contains(Advanced filters-)").each(($f) => {
-        cy.wrap($f).parentsUntil(".segment").within(() => {
-          cy.get(".trash").click()
-        })
+    cy.get("label:contains(Advanced filters-)").each(($f) => {
+      cy.wrap($f).parentsUntil(".segment").within(() => {
+        cy.get(".trash").click()
       })
+      cy.root().get("button").contains("Delete for good").click({ force: true })
     })
-    cy.get("button").contains("Delete for good").click({ force: true })
   })
 })
