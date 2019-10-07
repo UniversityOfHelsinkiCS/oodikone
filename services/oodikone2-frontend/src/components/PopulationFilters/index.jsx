@@ -170,6 +170,20 @@ class PopulationFilters extends Component {
     this.props.setPopulationFilter(presetFilter(preset))
   }
 
+  handlePresetName = value => {
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => {
+      this.setState({ presetName: value })
+    }, 500)
+  }
+
+  handlePresetDescription = value => {
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => {
+      this.setState({ presetDescription: value })
+    }, 500)
+  }
+
   updateFilterList(filtersToCreate) {
     const selectedPopulationCourses = this.props.populationSelectedStudentCourses.data
       ? this.props.populationSelectedStudentCourses
@@ -334,7 +348,7 @@ class PopulationFilters extends Component {
                   <Input
                     placeholder="Name..."
                     maxLength={40}
-                    onChange={e => this.setState({ presetName: e.target.value })}
+                    onChange={e => this.handlePresetName(e.target.value)}
                   />
                 </Form.Field>
                 <Form.Field>
@@ -342,7 +356,7 @@ class PopulationFilters extends Component {
                   <TextArea
                     placeholder="Description..."
                     maxLength={160}
-                    onChange={e => this.setState({ presetDescription: e.target.value })}
+                    onChange={e => this.handlePresetDescription(e.target.value)}
                   />
                 </Form.Field>
               </Form>
