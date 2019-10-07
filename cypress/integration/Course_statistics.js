@@ -3,7 +3,7 @@ describe('Course Statistics tests', () => {
   beforeEach(() => {
     cy.server({
       onAnyRequest: function (route, proxy) {
-        if (Cypress.config().baseUrl.includes("http://localhost:1337/")) {
+        if (Cypress.config().baseUrl.includes("http://nginx/")) {
           proxy.xhr.setRequestHeader('uid', 'tktl')
           proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
           proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
