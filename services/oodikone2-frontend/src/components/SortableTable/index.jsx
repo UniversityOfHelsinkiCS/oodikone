@@ -104,7 +104,6 @@ class SortableTable extends Component {
               )
               .map(c => (
                 <Table.HeaderCell
-                  // width='2'
                   key={c.key}
                   content={c.title}
                   onClick={this.handleSort(c.key)}
