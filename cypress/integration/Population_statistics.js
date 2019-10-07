@@ -3,7 +3,7 @@ describe('Population Statistics tests', () => {
   beforeEach(() => {
     cy.server({
       onAnyRequest: function (route, proxy) {
-        if (Cypress.config().baseUrl.includes("http://localhost:1337/")) {
+        if (Cypress.config().baseUrl.includes("http://nginx/")) {
           proxy.xhr.setRequestHeader('uid', 'tktl')
           proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
           proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
@@ -51,21 +51,12 @@ describe('Population Statistics tests', () => {
       cy.get("@enrollmentSelect").should('not.have.value', beforeVal)
     })
 
-
-    cy.contains("Statistics until").siblings().within(() => {
-      cy.get("input").click()
-      cy.get("table").contains(`${new Date().getFullYear()}`).click()
-      cy.contains("2018").click()
-      cy.contains("Oct").click()
-      cy.get("input").should("have.value", "October 2018")
-    })
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen koulutusohjelma").click()
     cy.contains("Select degree").click().siblings().contains("Luonnontieteiden kandidaatti")
   })
 
   it('Population statistics is usable on general level', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
-    cy.get(':nth-child(3) > .rdt > .form-control').click().clear().type('August 2019')
     cy.contains("See population").click()
     cy.get(".card").within(() => {
       cy.contains("Tietojenkäsittelytieteen maisteriohjelma")
@@ -249,22 +240,18 @@ describe('Population Statistics tests', () => {
       cy.wrap($f).parentsUntil("form").contains("set filter").click()
     })
 
-    cy.get(".header").contains("Filters").siblings().within(() => {
-      cy.get("label:contains(Basic filters)").each(($f) => {
-        cy.wrap($f).parentsUntil(".segment").within(() => {
-          cy.get(".trash").click()
-        })
+    cy.get("label:contains(Basic filters)").each(($f) => {
+      cy.wrap($f).parentsUntil(".segment").within(() => {
+        cy.get(".trash").click()
       })
+      cy.root().get("button").contains("Delete for good").click({ force: true })
     })
-    cy.get("button").contains("Delete for good").click({ force: true })
 
-    cy.contains("Filters").siblings().within(() => {
-      cy.get("label:contains(Advanced filters-)").each(($f) => {
-        cy.wrap($f).parentsUntil(".segment").within(() => {
-          cy.get(".trash").click()
-        })
+    cy.get("label:contains(Advanced filters-)").each(($f) => {
+      cy.wrap($f).parentsUntil(".segment").within(() => {
+        cy.get(".trash").click()
       })
+      cy.root().get("button").contains("Delete for good").click({ force: true })
     })
-    cy.get("button").contains("Delete for good").click({ force: true })
   })
 })
