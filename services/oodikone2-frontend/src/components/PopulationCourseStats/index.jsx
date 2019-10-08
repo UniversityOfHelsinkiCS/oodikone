@@ -160,7 +160,10 @@ class PopulationCourseStats extends Component {
     const {
       target: { value }
     } = e
-    this.setState({ codeFilter: value })
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => {
+      this.setState({ codeFilter: value })
+    }, 1000)
   }
 
   onSetCodeFilterKeyPress = e => {
@@ -176,7 +179,10 @@ class PopulationCourseStats extends Component {
     const {
       target: { value }
     } = e
-    this.setState({ studentAmountLimit: value }, () => this.handleCourseStatisticsCriteriaChange())
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => {
+      this.setState({ studentAmountLimit: value }, () => this.handleCourseStatisticsCriteriaChange())
+    }, 1000)
   }
 
   onSortableColumnHeaderClick = criteria => {
@@ -225,14 +231,12 @@ class PopulationCourseStats extends Component {
 
   renderCodeFilterInputHeaderCell = () => {
     const { translate } = this.props
-    const { codeFilter } = this.state
     return (
       <Table.HeaderCell>
         {translate('populationCourses.code')}
         <Input
           className="courseCodeInput"
           transparent
-          value={codeFilter}
           placeholder="(filter here)"
           onChange={this.onCodeFilterChange}
           onKeyPress={this.onSetCodeFilterKeyPress}
@@ -460,7 +464,7 @@ class PopulationCourseStats extends Component {
         <Form>
           <Form.Field inline>
             <label>{translate('populationCourses.limit')}</label>
-            <Input value={studentAmountLimit} onChange={this.onStudentAmountLimitChange} />
+            <Input defaultValue={studentAmountLimit} onChange={this.onStudentAmountLimitChange} />
             {['/coursepopulation', '/custompopulation'].includes(history.location.pathname) ? null : (
               <Button
                 active={this.state.activeView === 'passingSemester'}
