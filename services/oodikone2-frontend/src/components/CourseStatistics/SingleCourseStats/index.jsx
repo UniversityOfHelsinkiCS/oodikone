@@ -283,10 +283,10 @@ class SingleCourseStats extends Component {
     history.push(`/coursepopulation?${searchString}`)
   }
 
-  renderShowPopulation() {
+  renderShowPopulation(disabled = false) {
     const { isAdmin } = this.props
     if (!isAdmin) return null
-    return <Button onClick={this.showPopulation} content="Show population" />
+    return <Button disabled={disabled} onClick={this.showPopulation} content="Show population" />
   }
 
   render() {
@@ -317,7 +317,7 @@ class SingleCourseStats extends Component {
             {maxYearsToCreatePopulationFrom < toYear - fromYear ? (
               <Popup
                 content={`Max years to create a population from for this course is ${maxYearsToCreatePopulationFrom}`}
-                trigger={<span>{this.renderShowPopulation()}</span>}
+                trigger={<span>{this.renderShowPopulation(true)}</span>}
               />
             ) : (
               this.renderShowPopulation()

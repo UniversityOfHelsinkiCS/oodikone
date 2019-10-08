@@ -15,6 +15,7 @@ const {
 const { sequelizeKone, CourseDuplicates } = require('../models/models_kone')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../services/course_yearly_stats_counter')
+const { unifyOpenUniversity } = require('./populations')
 const _ = require('lodash')
 
 const byNameOrCode = (searchTerm, language) =>
@@ -611,7 +612,7 @@ const getGroupId = async code => {
       coursecode: code
     }
   })
-  return duplicates ? duplicates.groupid : null
+  return duplicates ? duplicates.groupid : code
 }
 
 const formatStudyrightElement = ({ code, element_detail, startdate }) => ({
@@ -777,22 +778,28 @@ const byNameAndOrCodeLike = async (name, code) => {
   })
 
   const groups = {}
-  const names = {}
+  const groupMeta = {}
   const codeToMainCourseMap = await getCodeToMainCourseMap()
   await Promise.all(
     courses.map(
       course =>
         new Promise(async res => {
-          const groupid = await getGroupId(course.code)
+          const formattedCode = unifyOpenUniversity(course.code)
+          const groupid = await getGroupId(formattedCode)
           groups[course.code] = groupid
-          if (!names[groupid] && codeToMainCourseMap[course.code])
-            names[groupid] = codeToMainCourseMap[course.code].name
+          if (!groupMeta[groupid] && codeToMainCourseMap[formattedCode]) {
+            const { name, code } = codeToMainCourseMap[formattedCode]
+            groupMeta[groupid] = {
+              name,
+              code
+            }
+          }
           res()
         })
     )
   )
 
-  return { courses, groups, names }
+  return { courses, groups, groupMeta }
 }
 
 const byCodes = codes => {

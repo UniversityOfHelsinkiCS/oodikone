@@ -741,5 +741,6 @@ module.exports = {
   universityEnrolmentDates,
   optimizedStatisticsOf,
   bottlenecksOf,
-  getEarliestYear
+  getEarliestYear,
+  unifyOpenUniversity
 }

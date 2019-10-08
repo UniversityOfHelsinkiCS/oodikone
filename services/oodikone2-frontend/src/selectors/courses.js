@@ -48,13 +48,16 @@ export const getCourseSearchResults = state =>
           name: getTextIn(name, getActiveLanguage(state.localize).code)
         })),
         groups: state.courseSearch.data.groups,
-        names: Object.entries(state.courseSearch.data.names).reduce((res, [groupId, name]) => {
-          res[groupId] = getTextIn(name, getActiveLanguage(state.localize).code)
+        groupMeta: Object.entries(state.courseSearch.data.groupMeta).reduce((res, [groupId, { name, ...rest }]) => {
+          res[groupId] = {
+            ...rest,
+            name: getTextIn(name, getActiveLanguage(state.localize).code)
+          }
           return res
         }, {})
       }
     : {
         courses: [],
         groups: {},
-        names: {}
+        groupMeta: {}
       }
