@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
@@ -48,9 +48,12 @@ const StudyProgramme = props => {
     return panes
   }
 
-  const handleSelect = programme => {
-    props.history.push(`/study-programme/${programme}`, { selected: programme })
-  }
+  const handleSelect = useCallback(
+    programme => {
+      props.history.push(`/study-programme/${programme}`, { selected: programme })
+    },
+    [props.history]
+  )
 
   const { match, programmes, language } = props
   const { studyProgrammeId } = match.params
