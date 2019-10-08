@@ -19,7 +19,11 @@ export const findCoursesV2 = ({ name, code }) => {
   return callController(route, prefix, [], 'get', params, params)
 }
 
-const reducer = (state = { data: {}, pending: false }, action) => {
+export const toggleUnifyOpenUniCourses = () => ({
+  type: 'TOGGLE_UNIFY_OPEN_UNI_COURSES'
+})
+
+const reducer = (state = { data: {}, pending: false, unifyOpenUniCourses: false }, action) => {
   switch (action.type) {
     case 'GET_COURSE_SEARCH_RESULT_ATTEMPT':
       return {
@@ -42,6 +46,11 @@ const reducer = (state = { data: {}, pending: false }, action) => {
           action.query.code === state.lastSearch.code && action.query.name === state.lastSearch.name
             ? action.response
             : state.data
+      }
+    case 'TOGGLE_UNIFY_OPEN_UNI_COURSES':
+      return {
+        ...state,
+        unifyOpenUniCourses: !state.unifyOpenUniCourses
       }
     default:
       return state

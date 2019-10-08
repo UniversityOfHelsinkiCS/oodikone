@@ -39,13 +39,15 @@ router.get('/tags/:studytrack', async (req, res) => {
 
 router.post('/tags', async (req, res) => {
   try {
-    const { tag } = req.body
+    const {
+      tag: { studytrack, tagname, year }
+    } = req.body
     const { rights, roles, decodedToken } = req
 
-    if (!rights.includes(tag.studytrack) && !(roles && roles.includes('admin'))) return res.status(403).end()
+    if (!rights.includes(studytrack) && !(roles && roles.includes('admin'))) return res.status(403).end()
 
-    await Tags.createNewTag(tag)
-    const tags = await Tags.findTagsByStudytrack(tag.studytrack)
+    await Tags.createNewTag({ studytrack, tagname, year, personal_user_id: decodedToken.id })
+    const tags = await Tags.findTagsByStudytrack(studytrack)
     res.status(200).json(filterRelevantTags(tags, decodedToken.id))
   } catch (err) {
     console.log(err)

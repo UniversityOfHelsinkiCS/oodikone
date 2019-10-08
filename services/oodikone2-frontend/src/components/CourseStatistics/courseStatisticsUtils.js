@@ -49,16 +49,19 @@ const sortAlternatives = alternatives =>
     ['asc', 'desc', 'desc']
   )
 
-const mergeCourses = (groups, courses, names) => {
+const mergeCourses = (groups, courses, groupMeta, unifyOpenUniCourses = false) => {
   const mergedCourses = {}
 
   courses.forEach(course => {
-    const groupId = groups[course.code] || course.code
+    const isAvoin = course.code.slice(0, 2) === 'AY'
+
+    const groupId = isAvoin && !unifyOpenUniCourses ? course.code : groups[course.code]
 
     if (!mergedCourses[groupId]) {
       mergedCourses[groupId] = {
         ...course,
-        name: names[groupId] || course.name,
+        code: (groupMeta[groupId] && groupMeta[groupId].code) || course.code,
+        name: (groupMeta[groupId] && groupMeta[groupId].name) || course.name,
         alternatives: [{ code: course.code, latestInstanceDate: new Date(course.latest_instance_date) }],
         min_attainment_date: new Date(course.min_attainment_date),
         max_attainment_date: new Date(course.max_attainment_date)

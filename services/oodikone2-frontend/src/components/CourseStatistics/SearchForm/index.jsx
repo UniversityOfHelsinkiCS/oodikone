@@ -5,7 +5,7 @@ import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
 import { sortBy } from 'lodash'
 import { func, arrayOf, shape, bool } from 'prop-types'
-import { clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
+import { clearCourses, findCoursesV2, toggleUnifyOpenUniCourses } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
@@ -31,12 +31,13 @@ const SearchForm = props => {
 
   const parseQueryFromUrl = () => {
     const { location } = props
-    const { courseCodes, separate, ...rest } = qs.parse(location.search)
+    const { courseCodes, separate, unifyOpenUniCourses, ...rest } = qs.parse(location.search)
     const query = {
       ...INITIAL,
       ...rest,
       courseCodes: JSON.parse(courseCodes),
-      separate: JSON.parse(separate)
+      separate: JSON.parse(separate),
+      unifyOpenUniCourses: JSON.parse(unifyOpenUniCourses)
     }
     return query
   }
@@ -95,7 +96,8 @@ const SearchForm = props => {
     const codes = sortBy(Object.keys(selectedCourses))
     const params = {
       courseCodes: codes,
-      separate
+      separate,
+      unifyOpenUniCourses: props.unifyOpenUniCourses
     }
     const searchHistoryText = codes.map(code => `${selectedCourses[code].name} ${code}`)
     addItemToSearchHistory({
@@ -124,12 +126,19 @@ const SearchForm = props => {
     setState({ ...state, [name]: !state[name] })
   }
 
-  const { isLoading, matchingCourses } = props
+  const onToggleUnifyOpenUniCoursesCheckbox = () => {
+    setState({ ...state, selectedCourses: {} })
+    props.toggleUnifyOpenUniCourses()
+  }
+
+  const { isLoading, matchingCourses, unifyOpenUniCourses } = props
   const courses = matchingCourses.filter(c => !selectedCourses[c.code])
 
   const disabled = isLoading || Object.keys(selectedCourses).length === 0
   const selected = Object.values(selectedCourses).map(course => ({ ...course, selected: true }))
   const noSelectedCourses = selected.length === 0
+
+  const MAP_AVOIN_CODES_FEATURE_TOGGLE = false
 
   return (
     <React.Fragment>
@@ -160,6 +169,18 @@ const SearchForm = props => {
                   minSearchLength={0}
                 />
               </Form.Field>
+              {MAP_AVOIN_CODES_FEATURE_TOGGLE && (
+                <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
+                  <label>Unify open university courses:</label>
+                  <span style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                    <Form.Checkbox
+                      name="unifyOpenUniCourses"
+                      onChange={onToggleUnifyOpenUniCoursesCheckbox}
+                      checked={unifyOpenUniCourses}
+                    />
+                  </span>
+                </Form.Field>
+              )}
             </Form.Group>
             <CourseTable
               title="Selected courses"
@@ -223,17 +244,21 @@ SearchForm.propTypes = {
   coursesLoading: bool.isRequired,
   history: shape({}).isRequired,
   location: shape({}).isRequired,
+  unifyOpenUniCourses: bool.isRequired,
+  toggleUnifyOpenUniCourses: func.isRequired,
   onProgress: func
 }
 
 const mapStateToProps = state => {
-  const { groups, courses, names } = getCourseSearchResults(state)
+  const { groups, courses, groupMeta } = getCourseSearchResults(state)
   const { pending: courseStatsPending } = state.courseStats
+  const { unifyOpenUniCourses } = state.courseSearch
 
   return {
-    matchingCourses: mergeCourses(groups, courses, names),
+    matchingCourses: mergeCourses(groups, courses, groupMeta, unifyOpenUniCourses),
     isLoading: courseStatsPending,
-    coursesLoading: state.courseSearch.pending
+    coursesLoading: state.courseSearch.pending,
+    unifyOpenUniCourses
   }
 }
 
@@ -244,7 +269,8 @@ export default withRouter(
       getCourseStats,
       clearCourses,
       findCoursesV2,
-      clearCourseStats
+      clearCourseStats,
+      toggleUnifyOpenUniCourses
     }
   )(SearchForm)
 )
