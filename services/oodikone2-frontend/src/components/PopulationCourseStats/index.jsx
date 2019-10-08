@@ -317,7 +317,7 @@ class PopulationCourseStats extends Component {
           />
           <Table.Cell className="iconCell">
             <p>
-              <Item as={Link} to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false`}>
+              <Item as={Link} to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&unifyOpenUniCourses=false`}>
                 <Icon name="level up alternate" onClick={() => this.onGoToCourseStatisticsClick()} />
               </Item>
             </p>
@@ -422,7 +422,7 @@ class PopulationCourseStats extends Component {
           />
           <Table.Cell className="iconCell">
             <p>
-              <Item as={Link} to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false`}>
+              <Item as={Link} to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&unifyOpenUniCourses=false`}>
                 <Icon name="level up alternate" onClick={() => this.onGoToCourseStatisticsClick()} />
               </Item>
             </p>

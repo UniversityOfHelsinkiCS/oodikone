@@ -37,7 +37,7 @@ const SearchForm = props => {
       ...rest,
       courseCodes: JSON.parse(courseCodes),
       separate: JSON.parse(separate),
-      unifyOpenUniCourses: JSON.parse(unifyOpenUniCourses)
+      unifyOpenUniCourses: JSON.parse(!!unifyOpenUniCourses)
     }
     return query
   }
