@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { shape, string, arrayOf } from 'prop-types'
@@ -72,7 +72,9 @@ const StudyProgramme = props => {
               <Card.Content>
                 <Card.Header className="cardHeader">
                   {programmeName}
-                  <Icon name="remove" className="controlIcon" onClick={() => props.history.push('/study-programme')} />
+                  <Link to="/study-programme" className="controlIconLink">
+                    <Icon name="remove" className="controlIcon" />
+                  </Link>
                 </Card.Header>
                 <Card.Meta content={studyProgrammeId} />
               </Card.Content>
