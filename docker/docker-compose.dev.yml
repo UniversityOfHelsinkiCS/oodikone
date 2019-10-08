@@ -117,6 +117,9 @@ services:
     container_name: adminer
     restart: unless-stopped
 
+networks:
+  default:
+
   # zookeeper:
   #   image: wurstmeister/zookeeper
   #   ports:

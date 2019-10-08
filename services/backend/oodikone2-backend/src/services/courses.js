@@ -15,7 +15,6 @@ const {
 const { sequelizeKone, CourseDuplicates } = require('../models/models_kone')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../services/course_yearly_stats_counter')
-const { unifyOpenUniversity } = require('./populations')
 const _ = require('lodash')
 
 const byNameOrCode = (searchTerm, language) =>
@@ -760,6 +759,12 @@ const codeLikeTerm = code =>
         }
       }
 
+const unifyOpenUniversity = code => {
+  const regexresult = code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+  if (!regexresult) return code
+  return regexresult[1]
+}
+
 const byNameAndOrCodeLike = async (name, code) => {
   const courses = await Course.findAll({
     attributes: [
@@ -831,5 +836,6 @@ module.exports = {
   byNameAndOrCodeLike,
   byCodes,
   getMainCodeToDuplicatesAndCodeToMainCode,
-  maxYearsToCreatePopulationFrom
+  maxYearsToCreatePopulationFrom,
+  unifyOpenUniversity
 }
