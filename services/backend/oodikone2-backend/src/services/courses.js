@@ -638,8 +638,26 @@ const parseCredit = credit => {
   }
 }
 
-const yearlyStatsOfNew = async (coursecode, separate) => {
+const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses) => {
   const codes = await alternativeCodes(coursecode)
+
+  if (unifyOpenUniCourses) {
+    const nonOpenUniCodes = codes.filter(c => !isOpenUniCourseCode(c))
+    const matchingOpenUniCourseCodes = nonOpenUniCodes.length
+      ? await Course.findAll({
+          where: {
+            code: {
+              [Op.regexp]: {
+                [Op.any]: nonOpenUniCodes.map(c => `^AY?${c}(en|fi|sv)?$`)
+              }
+            }
+          }
+        }).map(course => course.code)
+      : []
+
+    codes.push(...matchingOpenUniCourseCodes)
+  }
+
   const [credits, course] = await Promise.all([creditsForCourses(codes), Course.findByPk(coursecode)])
   const counter = new CourseYearlyStatsCounter()
   for (let credit of credits) {
@@ -723,8 +741,8 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
   return maxYearsToCreatePopulationFrom
 }
 
-const courseYearlyStats = async (coursecodes, separate) => {
-  const stats = await Promise.all(coursecodes.map(code => yearlyStatsOfNew(code, separate)))
+const courseYearlyStats = async (coursecodes, separate, unifyOpenUniCourses) => {
+  const stats = await Promise.all(coursecodes.map(code => yearlyStatsOfNew(code, separate, unifyOpenUniCourses)))
   return stats
 }
 
@@ -759,8 +777,10 @@ const codeLikeTerm = code =>
         }
       }
 
+const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+
 const unifyOpenUniversity = code => {
-  const regexresult = code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+  const regexresult = isOpenUniCourseCode(code)
   if (!regexresult) return code
   return regexresult[1]
 }
@@ -792,11 +812,13 @@ const byNameAndOrCodeLike = async (name, code) => {
           const formattedCode = unifyOpenUniversity(course.code)
           const groupid = await getGroupId(formattedCode)
           groups[course.code] = groupid
-          if (!groupMeta[groupid] && codeToMainCourseMap[formattedCode]) {
-            const { name, code } = codeToMainCourseMap[formattedCode]
-            groupMeta[groupid] = {
-              name,
-              code
+          if (!groupMeta[groupid]) {
+            const mainCourse = codeToMainCourseMap[formattedCode]
+            if ((mainCourse && !isOpenUniCourseCode(course.code)) || !isOpenUniCourseCode(course.code)) {
+              groupMeta[groupid] = {
+                name: mainCourse ? mainCourse.name : course.name,
+                code: mainCourse ? mainCourse.code : course.code
+              }
             }
           }
           res()
