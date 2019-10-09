@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { shape, func, bool, arrayOf, string } from 'prop-types'
-import { getTranslate } from 'react-localize-redux'
 import { Segment, Header } from 'semantic-ui-react'
 import qs from 'query-string'
 import { intersection, difference } from 'lodash'
@@ -10,14 +9,11 @@ import { getCoursePopulation } from '../../redux/populations'
 import { getCoursePopulationCourses } from '../../redux/populationCourses'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import { clearPopulationFilters } from '../../redux/populationFilters'
-import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
-import infoTooltips from '../../common/InfoToolTips'
-import InfoBox from '../InfoBox'
+
 import CustomPopulationFilters from '../CustomPopulationFilters'
 import CoursePopulationGradeDist from '../CoursePopulationGradeDist'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
-import CustomPopulationCourses from '../CustomPopulationCourses'
 import ProgressBar from '../ProgressBar'
 import { useProgress } from '../../common'
 
@@ -29,7 +25,6 @@ const CoursePopulation = ({
   studentData,
   pending,
   history,
-  translate,
   courseData,
   selectedStudents
 }) => {
@@ -61,7 +56,6 @@ const CoursePopulation = ({
     clearPopulationFiltersDispatch()
   }, [])
 
-  const { CreditAccumulationGraph } = infoTooltips.PopulationStatistics
   const header = courseData ? `${courseData.name} ${headerYears}` : null
 
   return (
@@ -81,19 +75,6 @@ const CoursePopulation = ({
             <CustomPopulationProgrammeDist samples={studentData.students} selectedStudents={selectedStudents} />
           </Segment>
           <PopulationStudents samples={studentData.students} selectedStudents={selectedStudents} />
-          <Segment>
-            <Header size="medium" dividing>
-              {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
-              <InfoBox content={CreditAccumulationGraph} />
-            </Header>
-            <CreditAccumulationGraphHighCharts
-              students={studentData.students}
-              selectedStudents={selectedStudents}
-              title={`${translate('populationStatistics.sampleId')}`}
-              translate={translate}
-            />
-          </Segment>
-          <CustomPopulationCourses selectedStudents={selectedStudents} />
         </Segment>
       ) : (
         <Segment className="contentSegment">
@@ -112,12 +93,11 @@ CoursePopulation.propTypes = {
   pending: bool.isRequired,
   studentData: shape({}).isRequired,
   history: shape({}).isRequired,
-  translate: func.isRequired,
   courseData: shape({}).isRequired,
   selectedStudents: arrayOf(string).isRequired
 }
 
-const mapStateToProps = ({ localize, singleCourseStats, populationFilters, populations }) => {
+const mapStateToProps = ({ singleCourseStats, populationFilters, populations }) => {
   const samples = populations.data.students ? populations.data.students : []
   let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
   const { complemented } = populationFilters
@@ -140,7 +120,6 @@ const mapStateToProps = ({ localize, singleCourseStats, populationFilters, popul
   return {
     studentData: populations.data,
     pending: populations.pending,
-    translate: getTranslate(localize),
     query: populations.query,
     courseData: singleCourseStats.stats || {},
     selectedStudents
