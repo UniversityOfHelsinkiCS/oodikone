@@ -116,16 +116,27 @@ export const transferTo = params => {
   }
 }
 
-export const courseParticipation = ({ field, course = {} }) => ({
-  id: uuidv4(),
-  type: 'CourseParticipation',
-  params: {
-    field,
-    course
-  },
-  studentsOfSelectedField: course.students ? course.students[field] : {},
-  filter: student => (course.students ? course.students[field][student.studentNumber] === true : false)
-})
+export const courseParticipation = ({ field, course = {} }) => {
+  let filterFunc = student => (course.students ? course.students[field][student.studentNumber] === true : false)
+  if (field === 'notParticipated') {
+    filterFunc = student => (course.students ? !course.students.all[student.studentNumber] : false)
+  }
+  if (field === 'notParticipatedOrFailed') {
+    filterFunc = student =>
+      course.students
+        ? !course.students.all[student.studentNumber] || course.students.failed[student.studentNumber]
+        : false
+  }
+  return {
+    id: uuidv4(),
+    type: 'CourseParticipation',
+    params: {
+      field,
+      course
+    },
+    filter: filterFunc
+  }
+}
 
 export const extentGraduated = params => {
   const { code, graduated, complemented, isExtent, studyright, simple } = params
