@@ -207,12 +207,6 @@ const PopulationSearchForm = props => {
     }
   })
 
-  useEffect(() => {
-    if (props.location.search && didMount) {
-      fetchPopulationFromUrlParams()
-    }
-  }, [props.location.search])
-
   const pushQueryToUrl = query => {
     const { studyRights, ...rest } = query
     const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
