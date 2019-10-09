@@ -58,7 +58,7 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
       return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
     }
     const maxYearsToCreatePopulationFrom = await CourseService.maxYearsToCreatePopulationFrom(coursecodes)
-    if (Math.abs(to - from) > maxYearsToCreatePopulationFrom) {
+    if (Math.abs(to - from + 1) > maxYearsToCreatePopulationFrom) {
       return res.status(400).json({ error: `Max years to create population from is ${maxYearsToCreatePopulationFrom}` })
     }
     let studentnumberlist

@@ -10,10 +10,9 @@ import { getUserIsAdmin } from '../../../../../common'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
-const StudentTable = ({ stats, name, isAdmin }) => {
+const StudentTable = ({ stats, name, isAdmin, alternatives }) => {
   const showPopulation = (yearcode, years) => {
-    const coursecodes = stats.map(s => s.coursecode)
-    const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), years }
+    const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(alternatives)), years }
     const searchString = qs.stringify(queryObject)
     return `/coursepopulation?${searchString}`
   }
@@ -132,7 +131,8 @@ const StudentTable = ({ stats, name, isAdmin }) => {
 StudentTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  isAdmin: bool.isRequired
+  isAdmin: bool.isRequired,
+  alternatives: arrayOf(string).isRequired
 }
 
 export default connect(({ auth: { token: { roles } } }) => ({ isAdmin: getUserIsAdmin(roles) }))(StudentTable)

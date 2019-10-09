@@ -50,15 +50,14 @@ const getGradeColumns = isGradeSeries =>
       ]
     : THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s[k]))
 
-const GradesTable = ({ stats, name, isAdmin }) => {
+const GradesTable = ({ stats, name, isAdmin, alternatives }) => {
   const {
     cumulative: { grades }
   } = stats[0]
   const isGradeSeries = !isThesisGrades(grades)
 
   const showPopulation = (yearcode, years) => {
-    const coursecodes = stats.map(s => s.coursecode)
-    const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), years }
+    const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(alternatives)), years }
     const searchString = qs.stringify(queryObject)
     return `/coursepopulation?${searchString}`
   }
@@ -102,6 +101,7 @@ const GradesTable = ({ stats, name, isAdmin }) => {
 GradesTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  isAdmin: bool.isRequired
+  isAdmin: bool.isRequired,
+  alternatives: arrayOf(string).isRequired
 }
 export default connect(({ auth: { token: { roles } } }) => ({ isAdmin: getUserIsAdmin(roles) }))(GradesTable)
