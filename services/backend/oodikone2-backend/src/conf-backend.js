@@ -25,7 +25,6 @@ const USAGESERVICE_URL = process.env.USAGESERVICE_URL
 const ANALYTICS_URL = process.env.ANALYTICS_URL
 const PORT = isTest ? 8079 : 8080
 const OODI_SECRET = process.env.OODI_SECRET
-const ANALYTICS_INFLUXDB_URL = process.env.ANALYTICS_INFLUXDB_URL
 
 const FEATURES = {
   ERROR_HANDLER: false
@@ -85,6 +84,5 @@ module.exports = {
   OODI_SECRET,
   OODI_SECRET_HEADER_KEY,
   isTest,
-  UPDATER_URL,
-  ANALYTICS_INFLUXDB_URL: ANALYTICS_INFLUXDB_URL // might be udp
+  UPDATER_URL
 }
