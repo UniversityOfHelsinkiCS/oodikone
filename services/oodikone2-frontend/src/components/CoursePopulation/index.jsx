@@ -63,6 +63,7 @@ const CoursePopulation = ({
 
   const { CreditAccumulationGraph } = infoTooltips.PopulationStatistics
   const header = courseData ? `${courseData.name} ${headerYears}` : null
+  const subHeader = codes.join(', ')
 
   return (
     <div className="segmentContainer">
@@ -70,6 +71,9 @@ const CoursePopulation = ({
         <Segment className="contentSegment">
           <Header className="segmentTitle" size="large" textAlign="center">
             Population of course {header}
+          </Header>
+          <Header className="segmentTitle" size="medium" textAlign="center">
+            {subHeader}
           </Header>
           <CustomPopulationFilters samples={studentData.students} coursecodes={codes} />
           <Segment>

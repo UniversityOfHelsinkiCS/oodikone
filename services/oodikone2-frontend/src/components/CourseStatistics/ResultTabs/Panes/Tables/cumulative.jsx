@@ -8,10 +8,9 @@ import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
 import { getUserIsAdmin } from '../../../../../common'
 
-const CumulativeTable = ({ stats, name, isAdmin }) => {
+const CumulativeTable = ({ stats, name, isAdmin, alternatives }) => {
   const showPopulation = (yearcode, years) => {
-    const coursecodes = stats.map(s => s.coursecode)
-    const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(coursecodes)), years }
+    const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(alternatives)), years }
     const searchString = qs.stringify(queryObject)
     return `/coursepopulation?${searchString}`
   }
@@ -65,7 +64,8 @@ const CumulativeTable = ({ stats, name, isAdmin }) => {
 CumulativeTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  isAdmin: bool.isRequired
+  isAdmin: bool.isRequired,
+  alternatives: arrayOf(string).isRequired
 }
 
 export default connect(({ auth: { token: { roles } } }) => ({ isAdmin: getUserIsAdmin(roles) }))(CumulativeTable)

@@ -53,7 +53,8 @@ const mergeCourses = (groups, courses, groupMeta, unifyOpenUniCourses = false) =
   const mergedCourses = {}
 
   courses.forEach(course => {
-    const isAvoin = course.code.slice(0, 2) === 'AY'
+    const avoinRegex = !!course.code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+    const isAvoin = avoinRegex
 
     const groupId = isAvoin && !unifyOpenUniCourses ? course.code : groups[course.code]
 
