@@ -98,6 +98,7 @@ services:
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
       UPDATER_URL: http://updater_scheduler:3678
+      # ANALYTICS_INFLUXDB_URL:
     container_name: backend
     depends_on:
       - db
