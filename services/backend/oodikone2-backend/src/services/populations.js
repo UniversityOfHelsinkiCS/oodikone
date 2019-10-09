@@ -17,7 +17,7 @@ const {
   StudyrightElement
 } = require('../models')
 const { Tag, TagStudent } = require('../models/models_kone')
-const { getCodeToMainCourseMap } = require('./courses')
+const { getCodeToMainCourseMap, unifyOpenUniversity } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
 
@@ -578,12 +578,6 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
 
   const formattedStudents = await formatStudentsForApi(students, startDate, endDate, formattedQueryParams)
   return formattedStudents
-}
-
-const unifyOpenUniversity = code => {
-  const regexresult = code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
-  if (!regexresult) return code
-  return regexresult[1]
 }
 
 const getMainCourse = (course, codeduplicates) => {

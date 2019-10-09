@@ -26,7 +26,7 @@ router.get('/coursesmulti', async (req, res) => {
 })
 
 router.get('/v2/coursesmulti', async (req, res) => {
-  let results = { courses: [], groups: {}, names: {} }
+  let results = { courses: [], groups: {}, groupMeta: {} }
   const { name, code } = req.query
 
   if (!(validateParamLength(name, 5) || validateParamLength(code, 2))) {
@@ -77,12 +77,14 @@ router.get('/v3/courseyearlystats', async (req, res) => {
         return res.status(403).json({ error: 'No programmes so no access to course stats' })
       }
     }
-    const { codes, separate: sep } = req.query
+    const { codes, separate: sep, unifyOpenUniCourses: unify } = req.query
+
     const separate = !sep ? false : JSON.parse(sep)
+    const unifyOpenUniCourses = !unify ? false : JSON.parse(unify)
     if (!codes) {
       res.status(422).send('Missing required query parameters')
     } else {
-      const results = await Course.courseYearlyStats(codes, separate)
+      const results = await Course.courseYearlyStats(codes, separate, unifyOpenUniCourses)
       res.json(results)
     }
   } catch (e) {

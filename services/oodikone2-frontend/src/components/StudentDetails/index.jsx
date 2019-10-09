@@ -237,6 +237,7 @@ class StudentDetails extends Component {
             to={this.pushQueryToUrl({
               courseCodes: [course.code],
               separate: false,
+              unifyOpenUniCourses: false,
               fromYear: year - 1,
               toYear: year + 1
             })}
