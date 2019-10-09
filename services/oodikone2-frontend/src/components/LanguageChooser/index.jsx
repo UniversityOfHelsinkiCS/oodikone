@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { setActiveLanguage, getLanguages } from 'react-localize-redux'
 import { Dropdown } from 'semantic-ui-react'
+import { isEqual } from 'lodash'
 import PropTypes from 'prop-types'
 
 import { switchLanguage, initLanguage } from '../../redux/settings'
@@ -79,5 +80,7 @@ LanguageChooser.propTypes = {
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
+  null,
+  { areStatePropsEqual: isEqual }
 )(LanguageChooser)

@@ -1,9 +1,10 @@
-import React from 'react'
-import { withRouter } from 'react-router-dom'
+import React, { useCallback, useEffect } from 'react'
+import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { shape, string, arrayOf } from 'prop-types'
 import { Header, Segment, Tab, Card, Icon } from 'semantic-ui-react'
+import { isEqual } from 'lodash'
 import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
 import CourseCodeMapper from '../CourseCodeMapper'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
@@ -12,10 +13,12 @@ import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
 import { getTextIn, useTabs, getUserRoles } from '../../common'
+import TSA, { bakeTsaHooks } from '../../common/tsa'
 import Tags from './Tags'
 
 const StudyProgramme = props => {
   const [tab, setTab] = useTabs('p_tab', props.match.params.courseGroupId ? 2 : 0, props.history)
+
   const getPanes = () => {
     const { match, rights, userRoles } = props
     const { studyProgrammeId, courseGroupId } = match.params
@@ -48,9 +51,12 @@ const StudyProgramme = props => {
     return panes
   }
 
-  const handleSelect = programme => {
-    props.history.push(`/study-programme/${programme}`, { selected: programme })
-  }
+  const handleSelect = useCallback(
+    programme => {
+      props.history.push(`/study-programme/${programme}`, { selected: programme })
+    },
+    [props.history]
+  )
 
   const { match, programmes, language } = props
   const { studyProgrammeId } = match.params
@@ -69,7 +75,9 @@ const StudyProgramme = props => {
               <Card.Content>
                 <Card.Header className="cardHeader">
                   {programmeName}
-                  <Icon name="remove" className="controlIcon" onClick={() => props.history.push('/study-programme')} />
+                  <Link to="/study-programme" className="controlIconLink">
+                    <Icon name="remove" className="controlIcon" />
+                  </Link>
                 </Card.Header>
                 <Card.Meta content={studyProgrammeId} />
               </Card.Content>
@@ -114,4 +122,21 @@ const mapStateToProps = ({
   return { programmes, language: getActiveLanguage(localize).code, rights, userRoles: getUserRoles(roles) }
 }
 
-export default connect(mapStateToProps)(withRouter(StudyProgramme))
+const withPopulationUsageTsa = bakeTsaHooks(props => {
+  const studyProgrammeId = props.match && props.match.params && props.match.params.studyProgrammeId
+
+  useEffect(() => {
+    if (!studyProgrammeId) {
+      return
+    }
+
+    TSA.sendEvent({ group: 'Populations Usage', name: 'study programme overview', label: studyProgrammeId })
+  }, [studyProgrammeId])
+})
+
+export default connect(
+  mapStateToProps,
+  null,
+  null,
+  { areStatePropsEqual: isEqual }
+)(withRouter(withPopulationUsageTsa(StudyProgramme)))

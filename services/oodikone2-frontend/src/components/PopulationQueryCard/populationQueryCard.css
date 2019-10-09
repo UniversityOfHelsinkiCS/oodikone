@@ -18,3 +18,7 @@
 .dateItem {
   display: inline-block;
 }
+
+.controlIconLink {
+  color: inherit;
+}
