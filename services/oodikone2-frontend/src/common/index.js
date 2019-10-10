@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import moment from 'moment'
 import jwtDecode from 'jwt-decode'
 import Datetime from 'react-datetime'
-import { uniqBy, filter } from 'lodash'
+import { uniqBy, filter, maxBy } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
 import qs from 'query-string'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
@@ -236,6 +236,26 @@ export const getNewestProgramme = studyrights => {
     return programme
   }
   return { name: 'No programme', startdate: '', code: '' }
+}
+
+export const getHighestGradeOfCourseBetweenRange = (courses, yearRange) => {
+  const lowerBound = `${yearRange.split('-')[0]}-08-01`
+  const upperBound = `20${yearRange.split('-')[1]}-07-31`
+
+  const grades = []
+  courses.forEach(course => {
+    if (lowerBound <= course.date && course.date <= upperBound) {
+      if (course.grade === 'Hyv.') {
+        grades.push({ grade: course.grade, value: 1 })
+      } else if (!Number(course.grade)) {
+        grades.push({ grade: course.grade, value: 0 })
+      } else {
+        grades.push({ grade: course.grade, value: Number(course.grade) })
+      }
+    }
+  })
+
+  return maxBy(grades, grade => grade.value)
 }
 
 export const useInterval = (callback, delay) => {
