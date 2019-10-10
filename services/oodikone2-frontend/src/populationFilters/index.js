@@ -3,7 +3,8 @@ import {
   getStudentTotalCredits,
   getStudentTotalCreditsFromMandatory,
   getStudentGradeMean,
-  getNewestProgramme
+  getNewestProgramme,
+  getHighestGradeOfCourseBetweenRange
 } from '../common'
 
 export const creditsLessThan = params => {
@@ -298,7 +299,7 @@ export const tagFilter = params => {
 }
 
 export const gradeFilter = params => {
-  const { coursecodes, grade, coursename } = params
+  const { coursecodes, grade, coursename, yearRange } = params
   return {
     id: uuidv4(),
     type: 'GradeFilter',
@@ -309,8 +310,8 @@ export const gradeFilter = params => {
     },
     filter: student => {
       const courses = student.courses.filter(c => coursecodes.includes(c.course.code))
-      const newestCourse = courses.sort((a, b) => new Date(b.date) - new Date(a.date))[0]
-      return newestCourse.grade === grade
+      const highestGrade = getHighestGradeOfCourseBetweenRange(courses, yearRange)
+      return highestGrade.grade === grade
     }
   }
 }
