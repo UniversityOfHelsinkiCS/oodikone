@@ -8,6 +8,10 @@
   background-color: darkgray;
 }
 
+.iconCellNoPointer {
+  border-left: 0 !important;
+}
+
 .iconCell {
   border-left: 0 !important;
   cursor: pointer;

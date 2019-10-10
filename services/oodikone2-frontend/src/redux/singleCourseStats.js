@@ -1,12 +1,13 @@
 import { callController } from '../apiConnection/index'
 
-export const getSingleCourseStats = ({ fromYear, toYear, courseCodes, separate }) => {
+export const getSingleCourseStats = ({ fromYear, toYear, courseCodes, separate, unifyOpenUniCourses }) => {
   const route = '/v3/courseyearlystats'
   const params = {
     codes: courseCodes,
     startyearcode: fromYear,
     endyearcode: toYear,
-    separate
+    separate,
+    unifyOpenUniCourses
   }
   return callController(route, 'GET_SINGLE_COURSE_STATS_', [], 'get', params, params)
 }

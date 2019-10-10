@@ -42,6 +42,11 @@ const CustomPopulationProgrammeDist = ({
           allProgrammes[programme.code] = { programme, students: [] }
           allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
         }
+      } else {
+        if (!allProgrammes['00000']) {
+          allProgrammes['00000'] = { programme: { name: 'No programme', code: '' }, students: [] }
+        }
+        allProgrammes['00000'].students.push({ studentnumber: student.studentnumber })
       }
     })
     const rows = Object.keys(allProgrammes).map(code => [
