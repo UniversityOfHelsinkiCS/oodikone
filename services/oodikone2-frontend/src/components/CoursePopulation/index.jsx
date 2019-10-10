@@ -57,6 +57,7 @@ const CoursePopulation = ({
   }, [])
 
   const header = courseData ? `${courseData.name} ${headerYears}` : null
+  const subHeader = codes.join(', ')
 
   return (
     <div className="segmentContainer">
@@ -64,6 +65,9 @@ const CoursePopulation = ({
         <Segment className="contentSegment">
           <Header className="segmentTitle" size="large" textAlign="center">
             Population of course {header}
+          </Header>
+          <Header className="segmentTitle" size="medium" textAlign="center">
+            {subHeader}
           </Header>
           <CustomPopulationFilters samples={studentData.students} coursecodes={codes} yearRange={headerYears} />
           <Segment>
@@ -109,9 +113,6 @@ const mapStateToProps = ({ singleCourseStats, populationFilters, populations }) 
 
   if (samples.length > 0 && populationFilters.filters.length > 0) {
     const studentsForFilter = f => {
-      if (f.type === 'CourseParticipation') {
-        return Object.keys(f.studentsOfSelectedField)
-      }
       return samples.filter(f.filter).map(s => s.studentNumber)
     }
 

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
@@ -13,6 +13,7 @@ import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
 import { getTextIn, useTabs, getUserRoles } from '../../common'
+import TSA, { bakeTsaHooks } from '../../common/tsa'
 import Tags from './Tags'
 
 const StudyProgramme = props => {
@@ -121,9 +122,21 @@ const mapStateToProps = ({
   return { programmes, language: getActiveLanguage(localize).code, rights, userRoles: getUserRoles(roles) }
 }
 
+const withPopulationUsageTsa = bakeTsaHooks(props => {
+  const studyProgrammeId = props.match && props.match.params && props.match.params.studyProgrammeId
+
+  useEffect(() => {
+    if (!studyProgrammeId) {
+      return
+    }
+
+    TSA.sendEvent({ group: 'Populations Usage', name: 'study programme overview', label: studyProgrammeId })
+  }, [studyProgrammeId])
+})
+
 export default connect(
   mapStateToProps,
   null,
   null,
   { areStatePropsEqual: isEqual }
-)(withRouter(StudyProgramme))
+)(withRouter(withPopulationUsageTsa(StudyProgramme)))
