@@ -314,9 +314,12 @@ class SingleCourseStats extends Component {
               toYear={toYear}
               handleChange={this.handleYearChange}
             />
-            {maxYearsToCreatePopulationFrom < toYear - fromYear ? (
+            {maxYearsToCreatePopulationFrom < toYear - fromYear + 1 ? (
               <Popup
-                content={`Max years to create a population from for this course is ${maxYearsToCreatePopulationFrom}`}
+                content={`Max years to create a population from for this course is ${Math.max(
+                  0,
+                  maxYearsToCreatePopulationFrom
+                )}`}
                 trigger={<span>{this.renderShowPopulation(true)}</span>}
               />
             ) : (

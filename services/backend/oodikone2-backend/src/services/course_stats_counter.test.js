@@ -26,7 +26,7 @@ describe('CourseStatsCounter tests', () => {
     const counter = createCounter()
 
     counter.markCredit(student, grade, true, false, false)
-    const { all, failed, passed, notParticipated, notParticipatedOrFailed } = counter.students
+    const { all, failed, passed } = counter.students
 
     test('all should have studentnumber as key', () => {
       expect(all).toHaveProperty(student)
@@ -39,14 +39,6 @@ describe('CourseStatsCounter tests', () => {
     test('failed students should not have studentnumber as key', () => {
       expect(failed).not.toHaveProperty(student)
     })
-
-    test('notParticipated should not have studentnumber as key', () => {
-      expect(notParticipated).not.toHaveProperty(student)
-    })
-
-    test('notParticipatedOrFailed should not have studentnumber as key', () => {
-      expect(notParticipatedOrFailed).not.toHaveProperty(student)
-    })
   })
 
   describe('mark failed credit for student', () => {
@@ -56,7 +48,7 @@ describe('CourseStatsCounter tests', () => {
 
     counter.markCredit(student, grade, false, true, false)
 
-    const { all, failed, passed, notParticipated, notParticipatedOrFailed } = counter.students
+    const { all, failed, passed } = counter.students
 
     test('all should have studentnumber as key', () => {
       expect(all).toHaveProperty(student)
@@ -69,14 +61,6 @@ describe('CourseStatsCounter tests', () => {
     test('passed students should not have studentnumber as key', () => {
       expect(passed).not.toHaveProperty(student)
     })
-
-    test('notParticipated should not have studentnumber as key', () => {
-      expect(notParticipated).not.toHaveProperty(student)
-    })
-
-    test('notParticipatedOrFailed should have studentnumber as key', () => {
-      expect(notParticipatedOrFailed).toHaveProperty(student)
-    })
   })
 
   describe('mark failed credit then passed credit for student', () => {
@@ -86,7 +70,7 @@ describe('CourseStatsCounter tests', () => {
     counter.markCredit(student, '0', false, true, false)
     counter.markCredit(student, '5', true, false, false)
 
-    const { passed, failed, retryPassed, notParticipatedOrFailed } = counter.students
+    const { passed, failed, retryPassed } = counter.students
 
     test('failed students should not have studentnumber as key', () => {
       expect(failed).not.toHaveProperty(student)
@@ -99,10 +83,6 @@ describe('CourseStatsCounter tests', () => {
     test('retryPassed should have studentnumber as key', () => {
       expect(retryPassed).toHaveProperty(student)
     })
-
-    test('notParticipatedOrFailed should not have studentnumber as key', () => {
-      expect(notParticipatedOrFailed).not.toHaveProperty(student)
-    })
   })
 
   describe('mark passed credit then failed credit for student', () => {
@@ -112,7 +92,7 @@ describe('CourseStatsCounter tests', () => {
     counter.markCredit(student, '5', true, false, false)
     counter.markCredit(student, '0', false, true, false)
 
-    const { passed, failed, retryPassed, notParticipatedOrFailed } = counter.students
+    const { passed, failed, retryPassed } = counter.students
 
     test('failed students should not have studentnumber as key', () => {
       expect(failed).not.toHaveProperty(student)
@@ -124,10 +104,6 @@ describe('CourseStatsCounter tests', () => {
 
     test('retryPassed should have student', () => {
       expect(retryPassed).toHaveProperty(student)
-    })
-
-    test('notParticipatedOrFailed should not have student', () => {
-      expect(notParticipatedOrFailed).not.toHaveProperty(student)
     })
   })
 
@@ -161,7 +137,7 @@ describe('CourseStatsCounter tests', () => {
     counter.markCredit(student, '0', false, true, false)
     counter.markCredit(student, '0', false, true, false)
 
-    const { passed, failed, failedMany, notParticipatedOrFailed, retryPassed } = counter.students
+    const { passed, failed, failedMany, retryPassed } = counter.students
 
     test('passed students should have studentnumber', () => {
       expect(passed).toHaveProperty(student)
@@ -173,10 +149,6 @@ describe('CourseStatsCounter tests', () => {
 
     test('failedMany should not have studentnumber', () => {
       expect(failedMany).not.toHaveProperty(student)
-    })
-
-    test('notParticipatedOrFailed should not have studentnumber', () => {
-      expect(notParticipatedOrFailed).not.toHaveProperty(student)
     })
 
     test('retryPassed should have studentnumber', () => {

@@ -37,7 +37,7 @@ const SearchForm = props => {
       ...rest,
       courseCodes: JSON.parse(courseCodes),
       separate: JSON.parse(separate),
-      unifyOpenUniCourses: JSON.parse(!!unifyOpenUniCourses)
+      unifyOpenUniCourses: JSON.parse(unifyOpenUniCourses || false)
     }
     return query
   }
@@ -138,8 +138,6 @@ const SearchForm = props => {
   const selected = Object.values(selectedCourses).map(course => ({ ...course, selected: true }))
   const noSelectedCourses = selected.length === 0
 
-  const MAP_AVOIN_CODES_FEATURE_TOGGLE = false
-
   return (
     <React.Fragment>
       <Segment loading={isLoading}>
@@ -169,18 +167,16 @@ const SearchForm = props => {
                   minSearchLength={0}
                 />
               </Form.Field>
-              {MAP_AVOIN_CODES_FEATURE_TOGGLE && (
-                <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
-                  <label>Unify open university courses:</label>
-                  <span style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                    <Form.Checkbox
-                      name="unifyOpenUniCourses"
-                      onChange={onToggleUnifyOpenUniCoursesCheckbox}
-                      checked={unifyOpenUniCourses}
-                    />
-                  </span>
-                </Form.Field>
-              )}
+              <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
+                <label>Unify open university courses:</label>
+                <span style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                  <Form.Checkbox
+                    name="unifyOpenUniCourses"
+                    onChange={onToggleUnifyOpenUniCoursesCheckbox}
+                    checked={unifyOpenUniCourses}
+                  />
+                </span>
+              </Form.Field>
             </Form.Group>
             <CourseTable
               title="Selected courses"
