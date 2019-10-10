@@ -356,9 +356,11 @@ const yearlyStatsOf = async (code, year, separate, language) => {
         _.union(year.courseLevelPassed, year.courseLevelFailed).map(s => s.studyright_elements.map(e => e))
       )
     ).reduce((b, a) => {
-      b[a.code] = b[a.code]
-        ? { ...b[a.code], amount: b[a.code].amount + 1 }
-        : { name: a.element_detail.name, amount: 1 }
+      if (b[a.code]) {
+        b[a.code].amount++
+      } else {
+        b[a.code] = { name: a.element_detail.name, amount: 1 }
+      }
       return b
     }, resultProgrammes)
 

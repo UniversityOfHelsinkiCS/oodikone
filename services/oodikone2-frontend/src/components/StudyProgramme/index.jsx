@@ -2,8 +2,8 @@ import React, { useCallback, useEffect } from 'react'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { shape, string, arrayOf } from 'prop-types'
-import { Header, Segment, Tab, Card, Icon } from 'semantic-ui-react'
+import { shape, string, arrayOf, func, bool } from 'prop-types'
+import { Header, Segment, Tab, Card, Icon, Button } from 'semantic-ui-react'
 import { isEqual } from 'lodash'
 import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
 import CourseCodeMapper from '../CourseCodeMapper'
@@ -12,12 +12,31 @@ import Overview from './Overview'
 import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
-import { getTextIn, useTabs, getUserRoles } from '../../common'
+import { getTextIn, useTabs, getUserRoles, getUserIsAdmin } from '../../common'
 import TSA, { bakeTsaHooks } from '../../common/tsa'
 import Tags from './Tags'
 
+import { getThroughput } from '../../redux/throughput'
+import { getProductivity } from '../../redux/productivity'
+import { callApi } from '../../apiConnection'
+
 const StudyProgramme = props => {
   const [tab, setTab] = useTabs('p_tab', props.match.params.courseGroupId ? 2 : 0, props.history)
+
+  const refreshProductivity = () => {
+    callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, {
+      code: props.match.params.studyProgrammeId
+    }).then(() => {
+      props.getProductivityDispatch(props.match.params.studyProgrammeId)
+    })
+  }
+  const refreshThroughput = () => {
+    callApi('/v2/studyprogrammes/throughput/recalculate', 'get', null, {
+      code: props.match.params.studyProgrammeId
+    }).then(() => {
+      props.getThroughputDispatch(props.match.params.studyProgrammeId)
+    })
+  }
 
   const getPanes = () => {
     const { match, rights, userRoles } = props
@@ -48,6 +67,17 @@ const StudyProgramme = props => {
       menuItem: 'Tags',
       render: () => <Tags studyprogramme={studyProgrammeId} />
     })
+    if (props.isAdmin) {
+      panes.push({
+        menuItem: 'Admin',
+        render: () => (
+          <>
+            <Button onClick={() => refreshThroughput()}>recalculate throughput</Button>
+            <Button onClick={() => refreshProductivity()}>recalculate productivity</Button>
+          </>
+        )
+      })
+    }
     return panes
   }
 
@@ -101,7 +131,10 @@ StudyProgramme.propTypes = {
   language: string.isRequired,
   history: shape({}).isRequired,
   rights: arrayOf(string).isRequired,
-  userRoles: arrayOf(string).isRequired
+  userRoles: arrayOf(string).isRequired,
+  getProductivityDispatch: func.isRequired,
+  getThroughputDispatch: func.isRequired,
+  isAdmin: bool.isRequired
 }
 
 StudyProgramme.defaultProps = {
@@ -119,7 +152,13 @@ const mapStateToProps = ({
   }
 }) => {
   const programmes = populationDegreesAndProgrammes.data ? populationDegreesAndProgrammes.data.programmes : {}
-  return { programmes, language: getActiveLanguage(localize).code, rights, userRoles: getUserRoles(roles) }
+  return {
+    programmes,
+    language: getActiveLanguage(localize).code,
+    rights,
+    userRoles: getUserRoles(roles),
+    isAdmin: getUserIsAdmin(roles)
+  }
 }
 
 const withPopulationUsageTsa = bakeTsaHooks(props => {
@@ -136,7 +175,12 @@ const withPopulationUsageTsa = bakeTsaHooks(props => {
 
 export default connect(
   mapStateToProps,
+  {
+    getThroughputDispatch: getThroughput,
+    getProductivityDispatch: getProductivity
+  },
   null,
-  null,
-  { areStatePropsEqual: isEqual }
+  {
+    areStatePropsEqual: isEqual
+  }
 )(withRouter(withPopulationUsageTsa(StudyProgramme)))

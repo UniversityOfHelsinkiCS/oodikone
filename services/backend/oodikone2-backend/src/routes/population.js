@@ -14,10 +14,8 @@ const filterPersonalTags = (population, userId) => {
   return {
     ...population,
     students: population.students.map(student => {
-      return {
-        ...student,
-        tags: student.tags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
-      }
+      student.tags = student.tags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
+      return student
     })
   }
 }
