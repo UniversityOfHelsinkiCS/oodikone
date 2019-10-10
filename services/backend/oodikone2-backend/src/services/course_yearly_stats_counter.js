@@ -115,14 +115,14 @@ class CourseYearlyStatsCounter {
   formatStudentStatistics(students) {
     const grades = {}
     const classes = {}
-    const studentnumbers = []
+    const studentnumbers = new Set()
     Object.entries(students).forEach(([studentnumber, stat]) => {
       const { grade, category } = stat
       grades[grade] = grades[grade] ? grades[grade].concat(studentnumber) : [studentnumber]
       classes[category] = classes[category] ? classes[category].concat(studentnumber) : [studentnumber]
-      studentnumbers.includes(studentnumber) ? null : studentnumbers.push(studentnumber)
+      studentnumbers.add(studentnumber)
     })
-    return { grades, classes, studentnumbers }
+    return { grades, classes, studentnumbers: [...studentnumbers] }
   }
 
   formatGroupStatistics() {
