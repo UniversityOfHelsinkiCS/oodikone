@@ -28,10 +28,12 @@ const CoursePopulationCreditDist = ({
       samples.forEach(student => {
         const courses = student.courses.filter(c => singleCourseStats.alternatives.includes(c.course.code))
         const highestGrade = getHighestGradeOfCourseBetweenRange(courses, yearRange)
-        if (!grades[highestGrade.grade]) {
-          grades[highestGrade.grade] = []
+        if (highestGrade) {
+          if (!grades[highestGrade.grade]) {
+            grades[highestGrade.grade] = []
+          }
+          grades[highestGrade.grade].push(student.studentNumber)
         }
-        grades[highestGrade.grade].push(student.studentNumber)
       })
       Object.keys(grades).forEach(grade => {
         const filteredGrades = intersection(selectedStudents, grades[grade])
