@@ -235,7 +235,7 @@ export const getNewestProgramme = studyrights => {
   if (programme) {
     return programme
   }
-  return { name: 'No programme', startdate: '', code: '' }
+  return { name: 'No programme', startdate: '', code: '00000' }
 }
 
 export const getHighestGradeOfCourseBetweenRange = (courses, yearRange) => {
@@ -254,7 +254,6 @@ export const getHighestGradeOfCourseBetweenRange = (courses, yearRange) => {
       }
     }
   })
-
   return maxBy(grades, grade => grade.value)
 }
 

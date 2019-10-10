@@ -85,7 +85,7 @@ const findByCourseAndSemesters = async (coursecodes, from, to) =>
     .query(
       `
   SELECT
-    studentnumber, credit.course_code, attainment_date
+    studentnumber
   FROM student
   INNER JOIN credit ON
     student.studentnumber=credit.student_studentnumber
@@ -96,7 +96,11 @@ const findByCourseAndSemesters = async (coursecodes, from, to) =>
     (select startdate FROM semesters where yearcode=:minYearCode ORDER BY semestercode LIMIT 1) AND
     (select enddate FROM semesters where yearcode=:maxYearCode ORDER BY semestercode DESC LIMIT 1);
 `,
-      { replacements: { coursecodes, minYearCode: from, maxYearCode: to }, type: sequelize.QueryTypes.SELECT }
+      {
+        replacements: { coursecodes, minYearCode: from, maxYearCode: to },
+        type: sequelize.QueryTypes.SELECT,
+        raw: true
+      }
     )
     .map(st => st.studentnumber)
 
@@ -283,7 +287,9 @@ const bySearchTermAndElements = async (searchterm, codes) => {
 
 const filterStudentnumbersByAccessrights = async (studentnumbers, codes) => {
   const students = await Student.findAll({
+    attributes: ['studentnumber'],
     include: {
+      attributes: [],
       model: StudyrightElement,
       required: true,
       where: {
@@ -296,7 +302,8 @@ const filterStudentnumbersByAccessrights = async (studentnumbers, codes) => {
       studentnumber: {
         [Op.in]: studentnumbers
       }
-    }
+    },
+    raw: true
   })
   return students.map(student => student.studentnumber)
 }
