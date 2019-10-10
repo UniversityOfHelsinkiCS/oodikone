@@ -73,7 +73,7 @@ const CustomPopulation = ({
   const renderCustomPopulation = () => (
     <div>
       <Segment>
-        <CustomPopulationFilters samples={custompop} coursecodes={[]} />
+        <CustomPopulationFilters samples={custompop} />
         <Segment>
           <Header size="medium" dividing>
             {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
@@ -136,9 +136,6 @@ const mapStateToProps = ({
 
   if (samples.length > 0 && populationFilters.filters.length > 0) {
     const studentsForFilter = f => {
-      if (f.type === 'CourseParticipation') {
-        return Object.keys(f.studentsOfSelectedField)
-      }
       return samples.filter(f.filter).map(s => s.studentNumber)
     }
 

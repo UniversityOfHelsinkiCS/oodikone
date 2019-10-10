@@ -3,7 +3,8 @@ import {
   getStudentTotalCredits,
   getStudentTotalCreditsFromMandatory,
   getStudentGradeMean,
-  getNewestProgramme
+  getNewestProgramme,
+  getHighestGradeOfCourseBetweenRange
 } from '../common'
 
 export const creditsLessThan = params => {
@@ -116,16 +117,27 @@ export const transferTo = params => {
   }
 }
 
-export const courseParticipation = ({ field, course = {} }) => ({
-  id: uuidv4(),
-  type: 'CourseParticipation',
-  params: {
-    field,
-    course
-  },
-  studentsOfSelectedField: course.students ? course.students[field] : {},
-  filter: student => (course.students ? course.students[field][student.studentNumber] === true : false)
-})
+export const courseParticipation = ({ field, course = {} }) => {
+  let filterFunc = student => (course.students ? course.students[field][student.studentNumber] === true : false)
+  if (field === 'notParticipated') {
+    filterFunc = student => (course.students ? !course.students.all[student.studentNumber] : false)
+  }
+  if (field === 'notParticipatedOrFailed') {
+    filterFunc = student =>
+      course.students
+        ? !course.students.all[student.studentNumber] || course.students.failed[student.studentNumber]
+        : false
+  }
+  return {
+    id: uuidv4(),
+    type: 'CourseParticipation',
+    params: {
+      field,
+      course
+    },
+    filter: filterFunc
+  }
+}
 
 export const extentGraduated = params => {
   const { code, graduated, complemented, isExtent, studyright, simple } = params
@@ -287,7 +299,7 @@ export const tagFilter = params => {
 }
 
 export const gradeFilter = params => {
-  const { coursecodes, grade, coursename } = params
+  const { coursecodes, grade, coursename, yearRange } = params
   return {
     id: uuidv4(),
     type: 'GradeFilter',
@@ -298,8 +310,8 @@ export const gradeFilter = params => {
     },
     filter: student => {
       const courses = student.courses.filter(c => coursecodes.includes(c.course.code))
-      const newestCourse = courses.sort((a, b) => new Date(b.date) - new Date(a.date))[0]
-      return newestCourse.grade === grade
+      const highestGrade = getHighestGradeOfCourseBetweenRange(courses, yearRange)
+      return highestGrade.grade === grade
     }
   }
 }

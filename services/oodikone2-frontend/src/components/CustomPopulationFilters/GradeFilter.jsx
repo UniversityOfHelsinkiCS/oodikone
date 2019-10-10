@@ -6,10 +6,17 @@ import { func, shape, string, arrayOf } from 'prop-types'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { gradeFilter } from '../../populationFilters'
 
-const GradeFilter = ({ coursecodes, courseData, filter, setPopulationFilterAction, removePopulationFilterAction }) => {
+const GradeFilter = ({
+  coursecodes,
+  courseData,
+  filter,
+  setPopulationFilterAction,
+  removePopulationFilterAction,
+  yearRange
+}) => {
   const [grade, setGrade] = useState(0)
   const handleFilter = () => {
-    setPopulationFilterAction(gradeFilter({ grade, coursecodes, coursename: courseData.name }))
+    setPopulationFilterAction(gradeFilter({ grade, coursecodes, coursename: courseData.name, yearRange }))
   }
 
   const handleChange = (e, { value }) => {
@@ -68,12 +75,17 @@ const GradeFilter = ({ coursecodes, courseData, filter, setPopulationFilterActio
   )
 }
 
+GradeFilter.defaultProps = {
+  yearRange: ''
+}
+
 GradeFilter.propTypes = {
   setPopulationFilterAction: func.isRequired,
   removePopulationFilterAction: func.isRequired,
   filter: shape({}).isRequired,
   courseData: shape({}).isRequired,
-  coursecodes: arrayOf(string).isRequired
+  coursecodes: arrayOf(string).isRequired,
+  yearRange: string
 }
 
 const mapStateToProps = ({ singleCourseStats }) => ({

@@ -17,9 +17,6 @@ const makePopulationsToData = createSelector(
 
     if (samples.length > 0 && populationFilters.filters.length > 0) {
       const studentsForFilter = f => {
-        if (f.type === 'CourseParticipation') {
-          return Object.keys(f.studentsOfSelectedField)
-        }
         return samples.filter(f.filter).map(s => s.studentNumber)
       }
 
