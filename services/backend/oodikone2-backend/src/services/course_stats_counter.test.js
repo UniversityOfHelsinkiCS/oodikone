@@ -2,11 +2,10 @@ const { CourseStatsCounter } = require('./course_stats_counter')
 
 describe('CourseStatsCounter tests', () => {
   const studentnumbers = ['1', '2', '3', '4', '5']
-  const allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
   const coursecode = 'COURSE_01'
   const coursename = 'COURSE NAME'
 
-  const createCounter = () => new CourseStatsCounter(coursecode, coursename, allstudents)
+  const createCounter = () => new CourseStatsCounter(coursecode, coursename, studentnumbers.length)
 
   describe('counter constructor should set course values correctly', () => {
     const counter = createCounter()
