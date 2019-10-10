@@ -13,7 +13,7 @@ const {
   ping
 } = require('../services/analyticsService')
 
-const programmeStatsSince = new Date('2000-07-31')
+const programmeStatsSince = new Date('2017-07-31')
 
 router.get('/elementdetails/all', async (req, res) => {
   try {
