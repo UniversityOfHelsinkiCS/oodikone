@@ -1,5 +1,6 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
+const _ = require('lodash')
 
 const {
   Student,
@@ -57,15 +58,18 @@ const formatStudentForPopulationStatistics = (
     tags
   },
   startDate,
-  endDate
+  endDate,
+  startDateMoment,
+  endDateMoment
 ) => {
   const toCourse = ({ grade, attainment_date, credits, course, credittypecode, isStudyModule }) => {
     course = course.get()
 
-    const momentStarted = moment(startDate)
-
-    const attainment_date_normailized = moment(attainment_date).isBefore(momentStarted)
-      ? momentStarted.add(1, 'day').toISOString()
+    const attainment_date_normailized = moment(attainment_date).isBefore(startDateMoment)
+      ? startDateMoment
+          .clone()
+          .add(1, 'day')
+          .toISOString()
       : attainment_date
 
     return {
@@ -116,10 +120,6 @@ const formatStudentForPopulationStatistics = (
     enrollmentdate: enrollment_date
   }))
 
-  const courseByDate = (a, b) => {
-    return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
-  }
-
   if (credits === undefined) {
     credits = []
   }
@@ -132,7 +132,7 @@ const formatStudentForPopulationStatistics = (
     started,
     studentNumber: studentnumber,
     credits: creditcount || 0,
-    courses: credits.sort(courseByDate).map(toCourse),
+    courses: _.sortBy(credits, 'attainment_date').map(toCourse),
     name: abbreviatedname,
     transfers: transfers || [],
     matriculationexamination,
@@ -143,7 +143,7 @@ const formatStudentForPopulationStatistics = (
     updatedAt: updatedAt || createdAt,
     tags: tags || [],
     studyrightStart: startDate,
-    starting: moment(started).isBetween(startDate, endDate, null, '[]')
+    starting: moment(started).isBetween(startDateMoment, endDateMoment, null, '[]')
   }
 }
 
@@ -155,9 +155,6 @@ const dateMonthsFromNow = (date, months) =>
 const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright, tag) => {
   const attainmentDateFrom = tag ? moment(startDate).year(tag.year) : startDate
   const creditsOfStudentOther = {
-    student_studentnumber: {
-      [Op.in]: studentnumbers
-    },
     attainment_date: {
       [Op.between]: [attainmentDateFrom, endDate]
     }
@@ -220,6 +217,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       {
         model: Transfers,
         attributes: ['transferdate'],
+        separate: true,
         include: [
           {
             model: ElementDetails,
@@ -246,6 +244,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
           'canceldate',
           'prioritycode'
         ],
+        separate: true,
         include: [
           {
             model: StudyrightExtent,
@@ -255,6 +254,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
           {
             model: StudyrightElement,
             required: true,
+            attributes: ['id', 'startdate', 'enddate', 'studyrightid', 'code', 'studentnumber'],
             include: {
               model: ElementDetails
             }
@@ -410,7 +410,8 @@ const studentnumbersWithAllStudyrightElements = async (
       ...studyrightWhere
     },
     ...studentWhere,
-    having: count('studyright_elements.code', studyRights.length, true)
+    having: count('studyright_elements.code', studyRights.length, true),
+    raw: true
   })
   return [...new Set(students.map(s => s.student_studentnumber))]
 }
@@ -443,6 +444,8 @@ const parseQueryParams = query => {
 }
 
 const formatStudentsForApi = async (students, startDate, endDate, { studyRights }) => {
+  const startDateMoment = moment(startDate)
+  const endDateMoment = moment(endDate)
   const result = students.reduce(
     (stats, student) => {
       student.transfers.forEach(transfer => {
@@ -483,7 +486,9 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
         stats.semesters[semestercode] = semester
       })
 
-      stats.students.push(formatStudentForPopulationStatistics(student, startDate, endDate))
+      stats.students.push(
+        formatStudentForPopulationStatistics(student, startDate, endDate, startDateMoment, endDateMoment)
+      )
       return stats
     },
     {
@@ -501,10 +506,9 @@ const formatStudentsForApi = async (students, startDate, endDate, { studyRights 
     }
   )
 
-  const [momentstart, momentend] = [moment(startDate), moment(endDate)]
   const transferredStudyright = s => {
     const transferred_from = s.transfers.find(
-      t => t.target.code === studyRights.programme && moment(t.transferdate).isBetween(momentstart, momentend)
+      t => t.target.code === studyRights.programme && moment(t.transferdate).isBetween(startDateMoment, endDateMoment)
     )
     if (transferred_from) {
       s.transferredStudyright = true
@@ -586,8 +590,8 @@ const getMainCourse = (course, codeduplicates) => {
   return maincourse || course
 }
 
-const findCourses = (studentnumbers, beforeDate) => {
-  return Course.findAll({
+const findCourses = async (studentnumbers, beforeDate) => {
+  const res = await Course.findAll({
     attributes: ['code', 'name', 'coursetypecode'],
     include: [
       {
@@ -604,14 +608,17 @@ const findCourses = (studentnumbers, beforeDate) => {
         }
       },
       {
+        attributes: ['discipline_id', 'name'],
         model: Discipline
       },
       {
+        attributes: ['coursetypecode', 'name'],
         model: CourseType,
         required: true
       }
     ]
   })
+  return res
 }
 
 const checkThatSelectedStudentsAreUnderRequestedStudyright = (selectedStudents, allStudents) =>
@@ -683,7 +690,10 @@ const bottlenecksOf = async (query, studentnumberlist) => {
       const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
       return [allstudents, courses]
     } else {
-      const allstudents = studentnumberlist.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
+      const allstudents = studentnumberlist.reduce((numbers, num) => {
+        numbers[num] = true
+        return numbers
+      }, {})
       const courses = await findCourses(studentnumberlist, new Date())
       return [allstudents, courses]
     }
@@ -704,11 +714,12 @@ const bottlenecksOf = async (query, studentnumberlist) => {
   const stats = {}
 
   const startYear = parseInt(query.startYear, 10)
+  const allstudentslength = Object.keys(allstudents).length
   courses.forEach(course => {
     let { disciplines, course_type } = course
     const maincourse = getMainCourse(course, codeToMainCourse)
     if (!stats[maincourse.code]) {
-      stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudents)
+      stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
     }
     const coursestats = stats[maincourse.code]
 
