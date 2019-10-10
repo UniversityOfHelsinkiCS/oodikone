@@ -1,9 +1,16 @@
 const lengthOf = obj => Object.keys(obj).length
-const percentageOf = (num, denom) => Number(((100 * num) / denom).toFixed(2))
+const percentageOf = (num, denom) => Math.round(((100 * num) / denom) * 100) / 100
+
+const fall = []
+const spring = []
+for (let i = 0; i < 7; i++) {
+  fall[i] = `${i}-FALL`
+  spring[i] = `${i}-SPRING`
+}
 
 class CourseStatsCounter {
-  constructor(code, name, allstudents) {
-    this.studentsInTotal = Object.keys(allstudents).length
+  constructor(code, name, studentsInTotal) {
+    this.studentsInTotal = studentsInTotal
     this.course = {
       code,
       name,
@@ -42,8 +49,8 @@ class CourseStatsCounter {
     }
 
     for (let i = 0; i < 7; i++) {
-      passingSemesters[`${i}-FALL`] = 0
-      passingSemesters[`${i}-SPRING`] = 0
+      passingSemesters[fall[i]] = 0
+      passingSemesters[spring[i]] = 0
     }
 
     return passingSemesters
@@ -149,8 +156,8 @@ class CourseStatsCounter {
     cumulativeStats['0-SPRING'] = cumulativeStats['0-FALL'] + passingSemesters['0-SPRING']
 
     for (let i = 1; i < 7; i++) {
-      cumulativeStats[`${i}-FALL`] = cumulativeStats[`${i - 1}-SPRING`] + passingSemesters[`${i}-FALL`]
-      cumulativeStats[`${i}-SPRING`] = cumulativeStats[`${i}-FALL`] + passingSemesters[`${i}-SPRING`]
+      cumulativeStats[fall[i]] = cumulativeStats[spring[i - 1]] + passingSemesters[fall[i]]
+      cumulativeStats[spring[i]] = cumulativeStats[fall[i]] + passingSemesters[spring[i]]
     }
 
     cumulativeStats['LATER'] = cumulativeStats['6-SPRING'] + passingSemesters['LATER']
