@@ -73,7 +73,7 @@ const CustomPopulation = ({
   const renderCustomPopulation = () => (
     <div>
       <Segment>
-        <CustomPopulationFilters samples={custompop} coursecodes={[]} />
+        <CustomPopulationFilters samples={custompop} />
         <Segment>
           <Header size="medium" dividing>
             {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
