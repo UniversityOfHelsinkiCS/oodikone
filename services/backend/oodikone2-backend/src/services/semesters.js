@@ -6,12 +6,9 @@ const getSemestersAndYears = async () => {
   const result = semesters.reduce(
     (acc, semester) => {
       const { semestercode, name, yearcode, yearname, startdate, enddate } = semester
-      const semesters = { ...acc.semesters, [semestercode]: { semestercode, name, yearcode, startdate, enddate } }
-      const years = { ...acc.years, [yearcode]: { yearcode, yearname } }
-      return {
-        semesters,
-        years
-      }
+      acc.semesters[semestercode] = { semestercode, name, yearcode, startdate, enddate }
+      acc.years[yearcode] = { yearcode, yearname }
+      return acc
     },
     {
       years: {},
