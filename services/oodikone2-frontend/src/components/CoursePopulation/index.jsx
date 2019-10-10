@@ -6,7 +6,6 @@ import { Segment, Header } from 'semantic-ui-react'
 import qs from 'query-string'
 import { intersection, difference } from 'lodash'
 import { getCoursePopulation } from '../../redux/populations'
-import { getCoursePopulationCourses } from '../../redux/populationCourses'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import { clearPopulationFilters } from '../../redux/populationFilters'
 import PopulationStudents from '../PopulationStudents'
@@ -19,7 +18,6 @@ import { useProgress } from '../../common'
 
 const CoursePopulation = ({
   getCoursePopulationDispatch,
-  getCoursePopulationCoursesDispatch,
   getSingleCourseStatsDispatch,
   clearPopulationFiltersDispatch,
   studentData,
@@ -43,7 +41,6 @@ const CoursePopulation = ({
     const { coursecodes, from, to, years } = parseQueryFromUrl()
     const parsedCourseCodes = JSON.parse(coursecodes)
     getCoursePopulationDispatch({ coursecodes, from, to, onProgress })
-    getCoursePopulationCoursesDispatch({ coursecodes: parsedCourseCodes, from, to })
     getSingleCourseStatsDispatch({
       fromYear: from,
       toYear: to,
@@ -96,7 +93,6 @@ const CoursePopulation = ({
 
 CoursePopulation.propTypes = {
   getCoursePopulationDispatch: func.isRequired,
-  getCoursePopulationCoursesDispatch: func.isRequired,
   getSingleCourseStatsDispatch: func.isRequired,
   clearPopulationFiltersDispatch: func.isRequired,
   pending: bool.isRequired,
@@ -137,7 +133,6 @@ export default withRouter(
     mapStateToProps,
     {
       getCoursePopulationDispatch: getCoursePopulation,
-      getCoursePopulationCoursesDispatch: getCoursePopulationCourses,
       getSingleCourseStatsDispatch: getSingleCourseStats,
       clearPopulationFiltersDispatch: clearPopulationFilters
     }

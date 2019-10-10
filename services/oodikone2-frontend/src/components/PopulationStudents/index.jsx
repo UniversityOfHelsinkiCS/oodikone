@@ -125,7 +125,7 @@ class PopulationStudents extends Component {
 
     const copyToClipboardAll = () => {
       const studentsInfo = this.props.selectedStudents.map(number => students[number])
-      const emails = studentsInfo.filter(s => s.email).map(s => s.email)
+      const emails = studentsInfo.filter(s => s.email && !s.obfuscated).map(s => s.email)
       const clipboardString = emails.join('; ')
       copyToClipboard(clipboardString)
     }
@@ -190,17 +190,18 @@ class PopulationStudents extends Component {
       {
         key: 'studentnumber',
         title: 'student number',
-        getRowVal: s => s.studentNumber,
+        getRowVal: s => (!s.obfuscated ? s.studentNumber : 'Obfuscated'),
         headerProps: { colSpan: 2 }
       },
       {
         key: 'icon',
-        getRowVal: s => (
-          <Item as={Link} to={`students/${s.studentNumber}`}>
-            <Icon name="level up alternate" />
-          </Item>
-        ),
-        cellProps: { collapsing: true, className: 'iconCell' }
+        getRowVal: s =>
+          !s.obfuscated ? (
+            <Item as={Link} to={`students/${s.studentNumber}`}>
+              <Icon name="level up alternate" />
+            </Item>
+          ) : null,
+        cellProps: { collapsing: true, className: 'iconCellNoPointer' }
       }
     )
     if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
@@ -251,7 +252,7 @@ class PopulationStudents extends Component {
     columns.push({
       key: 'tags',
       title: 'tags',
-      getRowVal: s => tags(s.tags)
+      getRowVal: s => (!s.obfuscated ? tags(s.tags) : 'Obfuscated')
     })
 
     if (['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
@@ -264,7 +265,7 @@ class PopulationStudents extends Component {
         {
           key: 'startyear',
           title: 'start year at university',
-          getRowVal: s => reformatDate(s.started, 'YYYY')
+          getRowVal: s => (!s.obfuscated ? reformatDate(s.started, 'YYYY') : 'Obfuscated')
         }
       )
     }
@@ -300,7 +301,7 @@ class PopulationStudents extends Component {
         {
           key: 'copy email',
           getRowVal: s =>
-            s.email ? (
+            s.email && !s.obfuscated ? (
               <Popup
                 trigger={
                   <Icon link name="copy outline" onClick={() => copyToClipboard(s.email)} style={{ float: 'right' }} />
@@ -314,7 +315,7 @@ class PopulationStudents extends Component {
               />
             ) : null,
           headerProps: { onClick: null, sorted: null },
-          cellProps: { collapsing: true, className: 'iconCell' }
+          cellProps: { collapsing: true, className: 'iconCellNoPointer' }
         }
       )
     }
