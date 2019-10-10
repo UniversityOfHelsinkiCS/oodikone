@@ -5,9 +5,15 @@ import { func, arrayOf, string, shape } from 'prop-types'
 
 import SearchResultTable from '../SearchResultTable'
 import { programmeFilter } from '../../populationFilters'
-import { setPopulationFilter } from '../../redux/populationFilters'
+import { setPopulationFilter, removePopulationFilter } from '../../redux/populationFilters'
 
-const CustomPopulationProgrammeDist = ({ samples, selectedStudents, setPopulationFilterDispatch }) => {
+const CustomPopulationProgrammeDist = ({
+  samples,
+  selectedStudents,
+  setPopulationFilterDispatch,
+  removePopulationFilterDispatch,
+  filters
+}) => {
   const [tableRows, setRows] = useState([])
 
   useEffect(() => {
@@ -53,6 +59,7 @@ const CustomPopulationProgrammeDist = ({ samples, selectedStudents, setPopulatio
 
   const setFilter = row => {
     const splitRow = row[0].split(', ')
+    filters.map(filter => removePopulationFilterDispatch(filter.id))
     setPopulationFilterDispatch(programmeFilter({ programme: splitRow[1], programmeName: splitRow[0] }))
   }
 
@@ -72,12 +79,19 @@ const CustomPopulationProgrammeDist = ({ samples, selectedStudents, setPopulatio
 CustomPopulationProgrammeDist.propTypes = {
   samples: arrayOf(shape({})).isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  setPopulationFilterDispatch: func.isRequired
+  setPopulationFilterDispatch: func.isRequired,
+  removePopulationFilterDispatch: func.isRequired,
+  filters: arrayOf(shape({})).isRequired
+}
+
+const mapStateToProps = ({ populationFilters }) => {
+  return { filters: populationFilters.filters.filter(f => f.type === 'ProgrammeFilter') }
 }
 
 export default connect(
-  null,
+  mapStateToProps,
   {
-    setPopulationFilterDispatch: setPopulationFilter
+    setPopulationFilterDispatch: setPopulationFilter,
+    removePopulationFilterDispatch: removePopulationFilter
   }
 )(CustomPopulationProgrammeDist)

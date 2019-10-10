@@ -2,43 +2,54 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Progress } from 'semantic-ui-react'
 import { intersection, orderBy } from 'lodash'
-import { shape, func, bool, arrayOf, string, number } from 'prop-types'
+import { shape, func, bool, arrayOf, string } from 'prop-types'
 
 import SearchResultTable from '../SearchResultTable'
 import { gradeFilter } from '../../populationFilters'
-import { setPopulationFilter } from '../../redux/populationFilters'
+import { setPopulationFilter, removePopulationFilter } from '../../redux/populationFilters'
+import { getHighestGradeOfCourseBetweenRange } from '../../common'
 
 const CoursePopulationCreditDist = ({
   singleCourseStats,
-  yearcodes,
   pending,
   selectedStudents,
-  setPopulationFilterDispatch
+  setPopulationFilterDispatch,
+  removePopulationFilterDispatch,
+  yearRange,
+  samples,
+  filters
 }) => {
   const [courseGrades, setGrades] = useState([])
   useEffect(() => {
-    if (singleCourseStats.statistics) {
-      const array = []
-      const statisticsInRange = singleCourseStats.statistics.filter(stats => yearcodes.includes(stats.code))
-      const grades = statisticsInRange.reduce((res, curr) => {
-        const currGrades = curr.students.grades
-        Object.entries(currGrades).forEach(([grade, students]) => {
-          if (!res[grade]) res[grade] = []
-          res[grade].push(...students)
-        })
-        return res
-      }, {})
+    if (samples && singleCourseStats.alternatives) {
+      const filteredGradeArray = []
 
+      const grades = {}
+      samples.forEach(student => {
+        const courses = student.courses.filter(c => singleCourseStats.alternatives.includes(c.course.code))
+        const highestGrade = getHighestGradeOfCourseBetweenRange(courses, yearRange)
+        if (!grades[highestGrade.grade]) {
+          grades[highestGrade.grade] = []
+        }
+        grades[highestGrade.grade].push(student.studentNumber)
+      })
       Object.keys(grades).forEach(grade => {
         const filteredGrades = intersection(selectedStudents, grades[grade])
-        array.push({ grade, amount: filteredGrades.length })
+        filteredGradeArray.push({ grade, amount: filteredGrades.length })
       })
-      setGrades(array)
+      setGrades(filteredGradeArray)
     }
   }, [pending, selectedStudents])
   const setFilter = row => {
+    filters.map(filter => removePopulationFilterDispatch(filter.id))
+
     setPopulationFilterDispatch(
-      gradeFilter({ grade: row[0], coursecodes: singleCourseStats.alternatives, coursename: singleCourseStats.name })
+      gradeFilter({
+        grade: row[0],
+        coursecodes: singleCourseStats.alternatives,
+        coursename: singleCourseStats.name,
+        yearRange
+      })
     )
   }
 
@@ -74,10 +85,13 @@ const CoursePopulationCreditDist = ({
 
 CoursePopulationCreditDist.propTypes = {
   singleCourseStats: shape({}).isRequired,
-  yearcodes: arrayOf(number).isRequired,
+  yearRange: string.isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  setPopulationFilterDispatch: func.isRequired
+  setPopulationFilterDispatch: func.isRequired,
+  removePopulationFilterDispatch: func.isRequired,
+  samples: arrayOf(shape({})).isRequired,
+  filters: arrayOf(shape({})).isRequired
 }
 
 const mapStateToProps = ({ singleCourseStats, populationFilters }) => ({
@@ -89,6 +103,7 @@ const mapStateToProps = ({ singleCourseStats, populationFilters }) => ({
 export default connect(
   mapStateToProps,
   {
-    setPopulationFilterDispatch: setPopulationFilter
+    setPopulationFilterDispatch: setPopulationFilter,
+    removePopulationFilterDispatch: removePopulationFilter
   }
 )(CoursePopulationCreditDist)
