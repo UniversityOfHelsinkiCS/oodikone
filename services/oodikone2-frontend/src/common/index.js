@@ -254,7 +254,6 @@ export const getHighestGradeOfCourseBetweenRange = (courses, yearRange) => {
       }
     }
   })
-
   return maxBy(grades, grade => grade.value)
 }
 
