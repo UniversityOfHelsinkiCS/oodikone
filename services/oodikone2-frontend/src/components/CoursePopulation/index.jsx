@@ -69,10 +69,15 @@ const CoursePopulation = ({
           <Header className="segmentTitle" size="medium" textAlign="center">
             {subHeader}
           </Header>
-          <CustomPopulationFilters samples={studentData.students} coursecodes={codes} />
+          <CustomPopulationFilters samples={studentData.students} coursecodes={codes} yearRange={headerYears} />
           <Segment>
             <Header>Grade distribution</Header>
-            <CoursePopulationGradeDist yearcodes={yearCodes} selectedStudents={selectedStudents} />
+            <CoursePopulationGradeDist
+              yearcodes={yearCodes}
+              selectedStudents={selectedStudents}
+              yearRange={headerYears}
+              samples={studentData.students}
+            />
           </Segment>
           <Segment>
             <Header>Programme distribution</Header>
