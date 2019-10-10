@@ -311,7 +311,7 @@ export const gradeFilter = params => {
     filter: student => {
       const courses = student.courses.filter(c => coursecodes.includes(c.course.code))
       const highestGrade = getHighestGradeOfCourseBetweenRange(courses, yearRange)
-      return highestGrade.grade === grade
+      return highestGrade && highestGrade.grade === grade
     }
   }
 }

@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const router = require('express').Router()
 const Population = require('../services/populations')
 const Filters = require('../services/filters')
@@ -284,31 +285,19 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecodes, from, to } = req.query
-  const { decodedToken } = req
+  const { decodedToken, roles } = req
 
   if (!coursecodes || !from || !to) {
     return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
   }
 
   const maxYearsToCreatePopulationFrom = await CourseService.maxYearsToCreatePopulationFrom(JSON.parse(coursecodes))
-  if (Math.abs(to - from) > maxYearsToCreatePopulationFrom) {
+  if (Math.abs(to - from + 1) > maxYearsToCreatePopulationFrom) {
     return res.status(400).json({ error: `Max years to create population from is ${maxYearsToCreatePopulationFrom}` })
   }
   const semesters = ['FALL', 'SPRING']
-  let studentnumberlist
   const studentnumbers = await Student.findByCourseAndSemesters(JSON.parse(coursecodes), from, to)
-  const {
-    decodedToken: { userId },
-    roles
-  } = req
 
-  if (roles && roles.includes('admin')) {
-    studentnumberlist = studentnumbers
-  } else {
-    const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
-    const codes = unitsUserCanAccess.map(unit => unit.id)
-    studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
-  }
   try {
     const result = await Population.optimizedStatisticsOf(
       {
@@ -318,8 +307,38 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
         semesters,
         months: 10000
       },
-      studentnumberlist
+      studentnumbers
     )
+
+    let studentsUserCanAccess
+    if (roles && roles.includes('admin')) {
+      studentsUserCanAccess = new Set(studentnumbers)
+    } else {
+      const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(decodedToken.userId)
+      const codes = unitsUserCanAccess.map(unit => unit.id)
+      studentsUserCanAccess = new Set(await Student.filterStudentnumbersByAccessrights(studentnumbers, codes))
+    }
+
+    const randomHash = crypto.randomBytes(12).toString('hex')
+    const obfuscateStudent = ({ studyrights, studentNumber, courses, gender_code }) => ({
+      courses,
+      studyrights,
+      gender_code,
+      studentNumber: crypto
+        .createHash('md5')
+        .update(`${studentNumber}${randomHash}`)
+        .digest('hex'),
+      firstnames: 'Obfuscated',
+      lastname: 'Obfuscated',
+      name: 'Obfuscated',
+      email: 'Obfuscated',
+      started: null,
+      credits: 'Obfuscated',
+      tags: [],
+      obfuscated: true
+    })
+
+    result.students = result.students.map(s => (studentsUserCanAccess.has(s.studentNumber) ? s : obfuscateStudent(s)))
 
     if (result.error) {
       console.log(result.error)
