@@ -8,7 +8,17 @@ const router = FEATURES.ERROR_HANDLER ? r.wrapper : r.router
 
 router.get('/', async (req, res) => {
   const { searchTerm } = req.query
-  const result = await teachers.bySearchTerm(searchTerm)
+  if (!searchTerm) return res.status(400).json({ error: 'searchTerm missing' })
+
+  const trimmedSearchTerm = searchTerm.trim()
+  if (
+    !teachers.splitByEmptySpace(trimmedSearchTerm).find(t => t.length >= 4) ||
+    (Number(trimmedSearchTerm) && trimmedSearchTerm.length < 6)
+  ) {
+    return res.status(400).json({ error: 'invalid searchTerm' })
+  }
+
+  const result = await teachers.bySearchTerm(trimmedSearchTerm)
   res.json(result)
 })
 

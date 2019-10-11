@@ -10,7 +10,7 @@ import SortableTable from '../SortableTable'
 import Timeout from '../Timeout'
 import { makeFormatStudentRows } from '../../selectors/students'
 
-import { containsOnlyNumbers } from '../../common'
+import { containsOnlyNumbers, validateInputLength, splitByEmptySpace } from '../../common'
 
 const DEFAULT_STATE = {
   students: [],
@@ -65,13 +65,10 @@ class StudentSearch extends Component {
   }
 
   fetchStudentList = searchStr => {
-    const removeEmptySpaces = str => str.replace(/\s\s+/g, ' ')
-    const splitByEmptySpace = str => removeEmptySpaces(str).split(' ')
-
     if (
       !splitByEmptySpace(searchStr.trim())
         .slice(0, 2)
-        .find(t => t.length > 3) ||
+        .find(t => validateInputLength(t, 4)) ||
       (Number(searchStr) && searchStr.trim().length < 6)
     ) {
       return
