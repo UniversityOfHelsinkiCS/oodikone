@@ -331,3 +331,7 @@ export const useProgress = loading => {
     onProgress
   }
 }
+
+export const validateInputLength = (input, minLength) => input && input.trim().length >= minLength
+
+export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')

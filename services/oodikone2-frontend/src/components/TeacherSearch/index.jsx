@@ -4,6 +4,7 @@ import { func, arrayOf, object, string } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import './teacherSearch.css'
+import { validateInputLength, splitByEmptySpace } from '../../common/index'
 import Timeout from '../Timeout'
 import { findTeachers } from '../../redux/teachers'
 import SortableTable from '../SortableTable'
@@ -21,11 +22,15 @@ class TeacherSearch extends Component {
   }
 
   fetchTeachers = searchterm => {
-    if (searchterm.length <= 3 || (Number(searchterm) && searchterm.length < 6)) {
+    const trimmedSearchterm = searchterm.trim()
+    if (
+      !splitByEmptySpace(trimmedSearchterm).find(t => validateInputLength(t, 4)) ||
+      (Number(trimmedSearchterm) && trimmedSearchterm.length < 6)
+    ) {
       return
     }
     this.props.setTimeout('fetch', () => {}, 250)
-    this.props.findTeachers(searchterm).then(() => {
+    this.props.findTeachers(trimmedSearchterm).then(() => {
       this.setState({ displayResults: true })
       this.props.clearTimeout('fetch')
     })

@@ -278,5 +278,6 @@ module.exports = {
   bySearchTerm,
   teacherStats,
   yearlyStatistics,
-  getCredits
+  getCredits,
+  splitByEmptySpace
 }
