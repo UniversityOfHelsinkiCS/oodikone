@@ -4,13 +4,12 @@ import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { uniq } from 'lodash'
-import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
+import { shape, string, number, oneOfType, arrayOf } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
-import { getUserIsAdmin } from '../../../../../common'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
-const StudentTable = ({ stats, name, isAdmin, alternatives }) => {
+const StudentTable = ({ stats, name, alternatives }) => {
   const showPopulation = (yearcode, years) => {
     const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(alternatives)), years }
     const searchString = qs.stringify(queryObject)
@@ -46,17 +45,14 @@ const StudentTable = ({ stats, name, isAdmin, alternatives }) => {
             key: 'TIME',
             title: 'Time',
             getRowVal: s => s.code,
-            getRowContent: s =>
-              isAdmin ? (
-                <div>
-                  {s.name}
-                  <Item as={Link} to={showPopulation(s.code, s.name, s)}>
-                    <Icon name="level up alternate" />
-                  </Item>
-                </div>
-              ) : (
-                s.name
-              ),
+            getRowContent: s => (
+              <div>
+                {s.name}
+                <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+                  <Icon name="level up alternate" />
+                </Item>
+              </div>
+            ),
             headerProps: { rowSpan: 2, width: 3 }
           },
           {
@@ -131,8 +127,7 @@ const StudentTable = ({ stats, name, isAdmin, alternatives }) => {
 StudentTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  isAdmin: bool.isRequired,
   alternatives: arrayOf(string).isRequired
 }
 
-export default connect(({ auth: { token: { roles } } }) => ({ isAdmin: getUserIsAdmin(roles) }))(StudentTable)
+export default connect(null)(StudentTable)
