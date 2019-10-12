@@ -3,6 +3,8 @@ const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studytrack')
 const { calculateFacultyYearlyStats } = require('./services/faculties')
+const topteachers = require('./services/topteachers')
+
 const {
   setProductivity,
   setThroughput,
@@ -75,12 +77,24 @@ const refreshOverview = async () => {
   }
 }
 
+const refrestTeacherLeaderboard = async () => {
+  try {
+    const startyearcode = new Date().getFullYear() - 1950
+    const endyearcode = startyearcode + 1
+    console.log('Refreshing teacher leaderboard...')
+    await topteachers.findAndSaveTeachers(startyearcode, endyearcode)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 const startCron = () => {
   if (process.env.NODE_ENV === 'production') {
     schedule('0 6 * * *', async () => {
       await refreshFacultyYearlyStats()
       await refreshStudyrightAssociations()
       await refreshOverview()
+      await refrestTeacherLeaderboard()
     })
   }
 }
