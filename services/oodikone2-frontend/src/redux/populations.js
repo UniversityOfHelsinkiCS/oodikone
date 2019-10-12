@@ -9,36 +9,33 @@ const initialState = {
 }
 
 export const getPopulationStatistics = ({
-  endYear,
   semesters,
   studentStatuses,
   studyRights,
   months,
   uuid,
   tag,
-  startYear,
+  year,
   onProgress
 }) => {
   const route = !tag ? '/v3/populationstatistics/' : '/v3/populationstatisticsbytag'
   const prefix = 'GET_POPULATION_STATISTICS_'
   const query = {
-    endYear,
     semesters,
     studentStatuses,
     studyRights,
     uuid,
     months,
     tag,
-    startYear
+    year
   }
   const params = {
-    endYear,
     semesters,
     studentStatuses,
     months,
     studyRights,
     tag,
-    startYear
+    year
   }
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }

@@ -14,7 +14,7 @@ const PopulationStatisticsLink = ({ studyprogramme, year: yearLabel, children })
   const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
   const href =
     `/populations?months=${months}&semesters=FALL&semesters=` +
-    `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`
+    `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`
   return (
     <Link title={`Population statistics of class ${yearLabel}`} to={href}>
       {children}
