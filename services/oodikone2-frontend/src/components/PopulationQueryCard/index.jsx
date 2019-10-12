@@ -25,7 +25,7 @@ const PopulationQueryCard = ({
     history.push('/populations')
     removeSampleFn(uuid)
   }
-  const { uuid, startYear, endYear, semesters, months, studentStatuses, tag } = query
+  const { uuid, year, semesters, months, studentStatuses, tag } = query
   const tagname = tag ? tags.find(t => t.tag_id === tag).tagname : ''
   const { students } = population
   if (students.length > 0) {
@@ -44,9 +44,9 @@ const PopulationQueryCard = ({
             <Icon name="calendar" size="small" />
             {tag
               ? `${semesters.map(s => translate(`populationStatistics.${s}`))}/
-                ${startYear}-${endYear}, showing ${months} months.`
+                ${year}-${Number(year) + 1}, showing ${months} months.`
               : `${semesters.map(s => translate(`populationStatistics.${s}`))}/
-                ${startYear}-${Number(startYear) + 1}, showing ${months} months.`}
+                ${year}-${Number(year) + 1}, showing ${months} months.`}
           </div>
           {tag ? <div>{`Tagged with: ${tagname}`}</div> : null}
           <div>{`${translate('populationStatistics.sampleSize', { amount: students.length })} `}</div>
@@ -88,7 +88,7 @@ const PopulationQueryCard = ({
       <Card.Meta>
         <div className="dateItem">
           <Icon name="calendar" size="small" />
-          {`${semesters.map(s => translate(`populationStatistics.${s}`))}/${startYear}-${Number(startYear) + 1},
+          {`${semesters.map(s => translate(`populationStatistics.${s}`))}/${year}-${Number(year) + 1},
              showing ${months} months.`}
         </div>
         <div>{`${translate('populationStatistics.sampleSize', { amount: students.length })} `}</div>
@@ -113,7 +113,7 @@ PopulationQueryCard.propTypes = {
   translate: func.isRequired,
   population: shape({ students: arrayOf(object), extents: arrayOf(object) }).isRequired,
   query: shape({
-    startYear: oneOfType([string, number]),
+    year: oneOfType([string, number]),
     semester: string,
     studyRights: shape({ programme: string, degree: string, studyTrack: string }),
     uuid: string
