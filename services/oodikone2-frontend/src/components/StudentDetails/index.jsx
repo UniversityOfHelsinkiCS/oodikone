@@ -138,7 +138,7 @@ class StudentDetails extends Component {
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
     return (
       `/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${year}&endYear=${year}`
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`
     )
   }
 
