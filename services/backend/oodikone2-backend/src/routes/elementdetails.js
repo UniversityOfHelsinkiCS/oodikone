@@ -63,6 +63,11 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
     }
     if (!data) {
       try {
+        if (code.includes('MH') || code.includes('KH')) {
+          console.log('new')
+        } else {
+          console.log('old')
+        }
         const stats = await productivityStatsForStudytrack(code, programmeStatsSince)
         data = await setProductivity(stats)
       } catch (e) {
@@ -96,8 +101,13 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
   let ready = 0
   for (const code of codes) {
     try {
-      const data = await productivityStatsForStudytrack(code, programmeStatsSince)
-      await setProductivity(data)
+      if (code.includes('MH') || code.includes('KH')) {
+        const data = await productivityStatsForStudytrack(code, new Date('2017-07-31'))
+        await setProductivity(data)
+      } else {
+        const data = await productivityStatsForStudytrack(code, new Date('2000-07-31'))
+        await setProductivity(data)
+      }
     } catch (e) {
       try {
         await patchProductivity({
@@ -157,8 +167,13 @@ router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
   let ready = 0
   for (const code of codes) {
     try {
-      const data = await throughputStatsForStudytrack(code, programmeStatsSince.getFullYear())
-      await setThroughput(data)
+      if (code.includes('MH') || code.includes('KH')) {
+        const data = await throughputStatsForStudytrack(code, 2017)
+        await setThroughput(data)
+      } else {
+        const data = await throughputStatsForStudytrack(code, 2000)
+        await setThroughput(data)
+      }
     } catch (e) {
       try {
         await patchThroughput({ [code]: { status: 'RECALCULATION ERRORED' } })

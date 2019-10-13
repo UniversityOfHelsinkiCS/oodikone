@@ -37,10 +37,15 @@ const refreshStudyrightAssociations = async () => {
 const refreshOverview = async () => {
   try {
     console.log('Refreshing overview...')
-    const programmeStatsSince = new Date('2017-07-31')
     const codes = (await getAllProgrammes()).map(p => p.code)
     let ready = 0
     for (const code of codes) {
+      let programmeStatsSince = new Date('2017-07-31')
+      if (code.includes('MH') || code.includes('KH')) {
+        programmeStatsSince = new Date('2017-07-31')
+      } else {
+        programmeStatsSince = new Date('2000-07-31')
+      }
       try {
         await patchThroughput({ [code]: { status: 'RECALCULATING' } })
         const data = await throughputStatsForStudytrack(code, programmeStatsSince.getFullYear())
