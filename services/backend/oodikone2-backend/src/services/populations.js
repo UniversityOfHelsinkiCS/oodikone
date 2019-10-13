@@ -687,7 +687,10 @@ const bottlenecksOf = async (query, studentnumberlist) => {
           nondegreeStudents,
           tag
         ))
-      const allstudents = studentnumbers.reduce((numbers, num) => ({ ...numbers, [num]: true }), {})
+      const allstudents = studentnumbers.reduce((numbers, num) => {
+        numbers[num] = true
+        return numbers
+      }, {})
       const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
       return [allstudents, courses]
     } else {
