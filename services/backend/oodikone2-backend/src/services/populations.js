@@ -418,17 +418,17 @@ const studentnumbersWithAllStudyrightElements = async (
 }
 
 const parseQueryParams = query => {
-  const { semesters, studentStatuses, studyRights, months, endYear, startYear, tag } = query
+  const { semesters, studentStatuses, studyRights, months, year, tag } = query
   const startDate = semesters.includes('FALL')
-    ? `${startYear}-${semesterStart[semesters.find(s => s === 'FALL')]}`
-    : `${moment(startYear, 'YYYY')
+    ? `${year}-${semesterStart[semesters.find(s => s === 'FALL')]}`
+    : `${moment(year, 'YYYY')
         .add(1, 'years')
         .format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
   const endDate = semesters.includes('SPRING')
-    ? `${moment(endYear, 'YYYY')
+    ? `${moment(year, 'YYYY')
         .add(1, 'years')
         .format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}`
-    : `${endYear}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
+    : `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
   const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
   const cancelledStudents = studentStatuses && studentStatuses.includes('CANCELLED')
   const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
@@ -714,7 +714,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   const stats = {}
 
-  const startYear = parseInt(query.startYear, 10)
+  const startYear = parseInt(query.year, 10)
   const allstudentslength = Object.keys(allstudents).length
   courses.forEach(course => {
     let { disciplines, course_type } = course

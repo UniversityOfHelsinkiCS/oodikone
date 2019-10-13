@@ -10,7 +10,7 @@ import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import { getCourseSearchResults } from '../../../selectors/courses'
-import { useSearchHistory } from '../../../common'
+import { useSearchHistory, validateInputLength } from '../../../common'
 import { mergeCourses } from '../courseStatisticsUtils'
 import SearchHistory from '../../SearchHistory'
 
@@ -108,9 +108,8 @@ const SearchForm = props => {
   }
 
   const fetchCourses = () => {
-    const validateParam = (param, minLength) => param && param.trim().length >= minLength
-    const isValidName = validateParam(courseName, 5)
-    const isValidCode = validateParam(courseCode, 2)
+    const isValidName = validateInputLength(courseName, 5)
+    const isValidCode = validateInputLength(courseCode, 2)
 
     if (isValidName || isValidCode) {
       return props.findCoursesV2({ name: courseName, code: courseCode })

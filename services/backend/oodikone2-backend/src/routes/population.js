@@ -24,7 +24,7 @@ const filterPersonalTags = (population, userId) => {
 // POST instead of GET because of too long params and "sensitive" data
 router.post('/v2/populationstatistics/courses', async (req, res) => {
   try {
-    if (!req.body.startYear || !req.body.semesters || !req.body.studyRights) {
+    if (!req.body.year || !req.body.semesters || !req.body.studyRights) {
       res.status(400).json({ error: 'The body should have a year, semester and study rights defined' })
       return
     }
@@ -77,8 +77,7 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
 
     const result = await Population.bottlenecksOf(
       {
-        startYear: 1900,
-        endYear: 2200,
+        year: 1900,
         studyRights: [],
         semesters: ['FALL', 'SPRING'],
         months: 10000
@@ -120,8 +119,7 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
     }
     const result = await Population.bottlenecksOf(
       {
-        startYear: 1900,
-        endYear: 2200,
+        year: 1900,
         studyRights: [],
         semesters: ['FALL', 'SPRING'],
         months: 10000,
@@ -166,8 +164,7 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
 
     const result = await Population.bottlenecksOf(
       {
-        startYear: 1900,
-        endYear: 2200,
+        year: 1900,
         studyRights: [],
         semesters: ['FALL', 'SPRING'],
         months: 10000
@@ -187,10 +184,10 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
 })
 
 router.get('/v3/populationstatistics', async (req, res) => {
-  const { startYear, semesters, studyRights: studyRightsJSON } = req.query
+  const { year, semesters, studyRights: studyRightsJSON } = req.query
   const { decodedToken } = req
   try {
-    if (!startYear || !semesters || !studyRightsJSON) {
+    if (!year || !semesters || !studyRightsJSON) {
       res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
       return
     }
@@ -231,7 +228,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
 })
 
 router.get('/v3/populationstatisticsbytag', async (req, res) => {
-  const { tag, studyRights: studyRightsJSON, endYear, months, startYear } = req.query
+  const { tag, studyRights: studyRightsJSON, months, year } = req.query
   const { decodedToken } = req
 
   if (!tag) return res.status(400).json({ error: 'The query should have a tag defined' })
@@ -255,12 +252,11 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
   try {
     const studyRights = JSON.parse(studyRightsJSON)
     const newStartYear = await Population.getEarliestYear(studentnumberlist, studyRights)
-    const yearDifference = Number(startYear) - Number(newStartYear)
+    const yearDifference = Number(year) - Number(newStartYear)
     const newMonths = Number(months) + 12 * yearDifference
     const result = await Population.optimizedStatisticsOf(
       {
-        startYear: newStartYear,
-        endYear,
+        year: newStartYear,
         studyRights,
         semesters,
         months: newMonths,
@@ -301,8 +297,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   try {
     const result = await Population.optimizedStatisticsOf(
       {
-        startYear: 1900,
-        endYear: 2200,
+        year: 1900,
         studyRights: [],
         semesters,
         months: 10000
@@ -366,8 +361,7 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
     try {
       const result = await Population.optimizedStatisticsOf(
         {
-          startYear: 1900,
-          endYear: 2200,
+          year: 1900,
           studyRights: [],
           semesters: ['FALL', 'SPRING'],
           months: 10000
