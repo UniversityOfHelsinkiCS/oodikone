@@ -3,6 +3,8 @@ const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studytrack')
 const { calculateFacultyYearlyStats } = require('./services/faculties')
+const topteachers = require('./services/topteachers')
+
 const {
   setProductivity,
   setThroughput,
@@ -35,10 +37,15 @@ const refreshStudyrightAssociations = async () => {
 const refreshOverview = async () => {
   try {
     console.log('Refreshing overview...')
-    const programmeStatsSince = new Date('2017-07-31')
     const codes = (await getAllProgrammes()).map(p => p.code)
     let ready = 0
     for (const code of codes) {
+      let programmeStatsSince = new Date('2017-07-31')
+      if (code.includes('MH') || code.includes('KH')) {
+        programmeStatsSince = new Date('2017-07-31')
+      } else {
+        programmeStatsSince = new Date('2000-07-31')
+      }
       try {
         await patchThroughput({ [code]: { status: 'RECALCULATING' } })
         const data = await throughputStatsForStudytrack(code, programmeStatsSince.getFullYear())
@@ -75,12 +82,24 @@ const refreshOverview = async () => {
   }
 }
 
+const refrestTeacherLeaderboard = async () => {
+  try {
+    const startyearcode = new Date().getFullYear() - 1950
+    const endyearcode = startyearcode + 1
+    console.log('Refreshing teacher leaderboard...')
+    await topteachers.findAndSaveTeachers(startyearcode, endyearcode)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 const startCron = () => {
   if (process.env.NODE_ENV === 'production') {
     schedule('0 6 * * *', async () => {
       await refreshFacultyYearlyStats()
       await refreshStudyrightAssociations()
       await refreshOverview()
+      await refrestTeacherLeaderboard()
     })
   }
 }

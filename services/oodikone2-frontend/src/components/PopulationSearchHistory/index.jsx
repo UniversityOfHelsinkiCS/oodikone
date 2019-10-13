@@ -49,8 +49,7 @@ class PopulationSearchHistory extends Component {
       query: {
         ...query,
         months: nextProps.populations.query.months,
-        endYear: nextProps.populations.query.endYear,
-        startYear: nextProps.populations.query.startYear,
+        year: nextProps.populations.query.year,
         semesters: nextProps.populations.query.semesters,
         studentStatuses: nextProps.populations.query.studentStatuses || []
       }
@@ -62,10 +61,10 @@ class PopulationSearchHistory extends Component {
     return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
   }
 
-  getMonths = (startYear, end, term) => {
+  getMonths = (year, end, term) => {
     if (moment.isMoment(end)) {
       const lastDayOfMonth = moment(end).endOf('month')
-      const start = term === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`
+      const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
       return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
     }
     return -1
@@ -81,7 +80,7 @@ class PopulationSearchHistory extends Component {
         query: {
           ...query,
           semesters,
-          months: this.months(this.props.populations.query.startYear, semesters.includes('FALL') ? 'FALL' : 'SPRING')
+          months: this.months(this.props.populations.query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING')
         }
       })
     }
@@ -102,7 +101,7 @@ class PopulationSearchHistory extends Component {
 
   handleMonthsChange = value => {
     const { query } = this.state
-    const months = this.getMonths(query.startYear, value, query.semesters.includes('FALL') ? 'FALL' : 'SPRING')
+    const months = this.getMonths(query.year, value, query.semesters.includes('FALL') ? 'FALL' : 'SPRING')
     this.setState({
       query: {
         ...query,
@@ -111,8 +110,8 @@ class PopulationSearchHistory extends Component {
     })
   }
 
-  getMonthValue = (startYear, months) => {
-    const start = `${startYear}-08-01`
+  getMonthValue = (year, months) => {
+    const start = `${year}-08-01`
     return moment(start)
       .add(months - 1, 'months')
       .format('MMMM YYYY')
@@ -120,11 +119,10 @@ class PopulationSearchHistory extends Component {
 
   pushQueryToUrl = () => {
     const { studyRights, tag } = this.props.populations.query
-    const { studentStatuses, semesters, months, endYear, startYear } = this.state.query
+    const { studentStatuses, semesters, months, year } = this.state.query
     const queryObject = {
       tag,
-      endYear,
-      startYear,
+      year,
       months,
       studentStatuses,
       semesters,
@@ -135,7 +133,7 @@ class PopulationSearchHistory extends Component {
     this.props.history.push({ search: searchString })
   }
 
-  getMinSelection = (startYear, semester) => (semester === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`)
+  getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
 
   removePopulation = uuid => this.props.removePopulation(uuid)
 
@@ -154,11 +152,11 @@ class PopulationSearchHistory extends Component {
           <Datetime
             dateFormat="MMMM YYYY"
             closeOnSelect
-            defaultValue={this.getMonthValue(query.startYear, query.months)}
+            defaultValue={this.getMonthValue(query.year, query.months)}
             onChange={value => this.handleMonthsChange(value)}
             isValidDate={current =>
               current.isBefore(moment()) &&
-              current.isAfter(this.getMinSelection(query.startYear, query.semesters[1] || query.semesters[0]))
+              current.isAfter(this.getMinSelection(query.year, query.semesters[1] || query.semesters[0]))
             }
           />
         </Form.Field>
