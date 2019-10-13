@@ -1,17 +1,20 @@
-import React from 'react'
+import React, { useState } from 'react'
 import moment from 'moment'
-import { Table, Header, Grid, Label, Segment } from 'semantic-ui-react'
+import { Table, Header, Grid, Label, Segment, Dropdown } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { shape, number, arrayOf, bool, string, oneOfType } from 'prop-types'
 import { getProductivity } from '../../../redux/productivity'
 import './productivityTable.css'
 
 const ProductivityTable = ({ productivity, thesis, loading, error, showCredits }) => {
+  const [selectedYear, setYear] = useState('')
+
   if (error) return <h1>Oh no so error {error}</h1>
   let thesisTypes = []
   if (thesis) {
     thesisTypes = thesis.map(t => t.thesisType)
   }
+
   const headerList = [
     'Year',
     'Credits',
@@ -22,6 +25,21 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits }
     'Credits for non major students',
     'Hyväksiluettu (not included in Credits column)'
   ].filter(_ => _)
+
+  const years = productivity
+    ? productivity.data
+        .map(stats => ({ key: stats.year, text: stats.year, value: stats.year }))
+        .sort((year1, year2) => Number(year2.value) - Number(year1.value))
+    : []
+
+  const handleChange = (event, { value }) => {
+    event.preventDefault()
+    setYear(value)
+  }
+
+  if (selectedYear === '' && years.length > 5) {
+    setYear(years[5].value)
+  }
 
   const creditCell = content =>
     showCredits ? (
@@ -58,6 +76,8 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits }
           </Grid.Row>
         </Grid>
       </Header>
+      <div>Statistics from selected year onwards</div>
+      <Dropdown options={years} onChange={handleChange} selection value={selectedYear} />
       <Segment basic loading={loading} style={{ overflowX: 'auto' }}>
         <Table structured celled compact striped selectable className="fixed-header">
           <Table.Header>
@@ -70,6 +90,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits }
           <Table.Body>
             {productivity && productivity.data
               ? productivity.data
+                  .filter(stats => Number(stats.year) >= Number(selectedYear))
                   .sort((year1, year2) => year2.year - year1.year)
                   .map(year => (
                     <Table.Row key={year.year}>
