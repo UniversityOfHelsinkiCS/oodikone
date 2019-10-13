@@ -203,7 +203,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     include: [
       {
         model: Credit,
-        attributes: ['grade', 'credits', 'credittypecode', 'attainment_date', 'student_studentnumber', 'isStudyModule'],
+        attributes: ['grade', 'credits', 'credittypecode', 'attainment_date', 'isStudyModule'],
         separate: true,
         include: [
           {
@@ -254,16 +254,17 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
           {
             model: StudyrightElement,
             required: true,
-            attributes: ['id', 'startdate', 'enddate', 'studyrightid', 'code', 'studentnumber'],
+            attributes: ['id', 'startdate', 'enddate', 'studyrightid', 'code'],
             include: {
-              model: ElementDetails
+              model: ElementDetails,
+              attributes: ['code', 'name', 'type'],
             }
           }
         ]
       },
       {
         model: SemesterEnrollment,
-        attributes: ['enrollmenttype', 'studentnumber', 'semestercode', 'enrollment_date'],
+        attributes: ['enrollmenttype', 'semestercode', 'enrollment_date'],
         separate: true,
         include: {
           model: Semester,
