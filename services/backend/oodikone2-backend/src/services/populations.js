@@ -153,6 +153,34 @@ const dateMonthsFromNow = (date, months) =>
     .format('YYYY-MM-DD')
 
 const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright, tag) => {
+  const studentTags = await TagStudent.findAll({
+    attributes: ['tag_id', 'studentnumber'],
+    include: [
+      {
+        model: Tag,
+        attributes: ['tag_id', 'tagname', 'personal_user_id']
+      }
+    ],
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumbers
+      }
+    }
+  })
+
+  const { studentnumbersWithTag, studentNumberToTags } = studentTags.reduce(
+    (acc, t) => {
+      acc.studentNumberToTags[t.studentnumber] = acc.studentNumberToTags[t.studentnumber] || []
+      acc.studentNumberToTags[t.studentnumber].push(t)
+      if (tag && t.tag_id === tag.tag_id) {
+        acc.studentnumbersWithTag.push(t.studentnumber)
+      }
+      return acc
+    },
+    { studentnumbersWithTag: [], studentNumberToTags: {} }
+  )
+  if (tag) studentnumbers = studentnumbersWithTag
+
   const attainmentDateFrom = tag ? moment(startDate).year(tag.year) : startDate
   const creditsOfStudentOther = {
     attainment_date: {
@@ -257,7 +285,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             attributes: ['id', 'startdate', 'enddate', 'studyrightid', 'code'],
             include: {
               model: ElementDetails,
-              attributes: ['code', 'name', 'type'],
+              attributes: ['code', 'name', 'type']
             }
           }
         ]
@@ -285,32 +313,11 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     }
   })
 
-  const studentTags = await TagStudent.findAll({
-    attributes: ['tag_id', 'studentnumber'],
-    include: [
-      {
-        model: Tag,
-        attributes: ['tag_id', 'tagname', 'personal_user_id']
-      }
-    ],
-    where: {
-      studentnumber: {
-        [Op.in]: studentnumbers
-      }
-    }
-  })
-  const studentNumberToTags = studentTags.reduce((acc, t) => {
-    acc[t.studentnumber] = acc[t.studentnumber] || []
-    acc[t.studentnumber].push(t)
-    return acc
-  }, {})
-
   students.forEach(student => {
     student.tags = studentNumberToTags[student.studentnumber] || []
   })
 
-  if (tag) return students.filter(student => student.tags.some(t => t.tag_id === tag.tag_id))
-  return students
+  return { students }
 }
 
 const count = (column, count, distinct = false) => {
@@ -560,7 +567,8 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     endDate,
     exchangeStudents,
     cancelledStudents,
-    nondegreeStudents
+    nondegreeStudents,
+    tag
   } = parseQueryParams(formattedQueryParams)
 
   const studentnumbers = studentnumberlist
@@ -573,12 +581,12 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
         cancelledStudents,
         nondegreeStudents
       )
-  const students = await getStudentsIncludeCoursesBetween(
+  const { students } = await getStudentsIncludeCoursesBetween(
     studentnumbers,
     startDate,
     dateMonthsFromNow(startDate, months),
     studyRights,
-    formattedQueryParams.tag
+    tag
   )
 
   const formattedStudents = await formatStudentsForApi(students, startDate, endDate, formattedQueryParams)
