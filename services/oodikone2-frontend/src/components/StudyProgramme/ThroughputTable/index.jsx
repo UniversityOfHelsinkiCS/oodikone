@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useState, useEffect } from 'react'
 import moment from 'moment'
 import { Header, Table, Grid, Icon, Label, Segment, Dropdown } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, node } from 'prop-types'
@@ -29,24 +29,9 @@ PopulationStatisticsLink.propTypes = {
 }
 
 const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, userRoles }) => {
-  const [selectedYear, setYear] = useState('')
-  if (error) return <h1>Oh no so error {error}</h1>
-  const GRADUATED_FEATURE_TOGGLED_ON = userRoles.includes('dev')
-  const TRANSFERRED_FROM_FEATURE_TOGGLED_ON = userRoles.includes('admin')
-  const CANCELLED_FEATURE_TOGGLED_ON = userRoles.includes('admin')
+  const [selectedYear, setYear] = useState(null)
 
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
-  const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
-  const renderGenders = genders.length > 0
-
-  const calculateTotalNationalities = () =>
-    data.length > 0 ? Object.values(throughput.totals.nationalities).reduce((res, curr) => res + curr, 0) : 0
-
-  const renderRatioOfFinns = calculateTotalNationalities() > 0
-  let thesisTypes = []
-  if (thesis) {
-    thesisTypes = thesis.map(t => t.thesisType)
-  }
 
   const years = data
     ? data
@@ -58,8 +43,30 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
         .sort((year1, year2) => Number(year2.value) - Number(year1.value))
     : []
 
-  if (selectedYear === '' && years.length > 5) {
-    setYear(years[5].value)
+  useEffect(() => {
+    if (!selectedYear && years.length > 5) {
+      setYear(years[5].value)
+    } else if (!selectedYear && years.length > 1) {
+      setYear(years[years.length - 1].value)
+    }
+  }, [years])
+
+  if (error) return <h1>Oh no so error {error}</h1>
+
+  const GRADUATED_FEATURE_TOGGLED_ON = userRoles.includes('dev')
+  const TRANSFERRED_FROM_FEATURE_TOGGLED_ON = userRoles.includes('admin')
+  const CANCELLED_FEATURE_TOGGLED_ON = userRoles.includes('admin')
+
+  const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
+  const renderGenders = genders.length > 0
+
+  const calculateTotalNationalities = () =>
+    data.length > 0 ? Object.values(throughput.totals.nationalities).reduce((res, curr) => res + curr, 0) : 0
+
+  const renderRatioOfFinns = calculateTotalNationalities() > 0
+  let thesisTypes = []
+  if (thesis) {
+    thesisTypes = thesis.map(t => t.thesisType)
   }
 
   const handleChange = (event, { value }) => {
