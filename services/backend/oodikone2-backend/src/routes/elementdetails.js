@@ -63,11 +63,6 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
     }
     if (!data) {
       try {
-        if (code.includes('MH') || code.includes('KH')) {
-          console.log('new')
-        } else {
-          console.log('old')
-        }
         const stats = await productivityStatsForStudytrack(code, programmeStatsSince)
         data = await setProductivity(stats)
       } catch (e) {
