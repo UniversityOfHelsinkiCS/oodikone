@@ -36,7 +36,7 @@ const message1 = user => {
 }
 const message2 = email => {
   return {
-    to: email,
+    to: [email, 'grp-toska@helsinki.fi'],
     replyTo: 'Toska <grp-toska@helsinki.fi>',
     subject: 'Authorized in oodikone',
     text: "You've been authorized to use oodikone.",
@@ -55,7 +55,7 @@ const message2 = email => {
     <br />
     <p>Helsingin Yliopisto, TOSKA.</p>
     <p>grp-toska@helsinki.fi</p>
-    <p>Pietari Kalmin katu 5, Exactum B333</p>
+    <p>Pietari Kalmin katu 5, Exactum BK113</p>
     <img style="max-width: 13.5%;height: auto;" src="https://i.imgur.com/tnNDAJk.png" /> `
   }
 }
