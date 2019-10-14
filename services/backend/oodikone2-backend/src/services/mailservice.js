@@ -37,6 +37,7 @@ const message1 = user => {
 const message2 = email => {
   return {
     to: email,
+    replyTo: 'Toska <grp-toska@helsinki.fi>',
     subject: 'Authorized in oodikone',
     text: "You've been authorized to use oodikone.",
     html: `<p>You've been authorized to use <a href="https://oodikone.cs.helsinki.fi">oodikone</a> or 
