@@ -169,7 +169,7 @@ const withPopulationUsageTsa = bakeTsaHooks(props => {
       return
     }
 
-    TSA.sendEvent({ group: 'Populations Usage', name: 'study programme overview', label: studyProgrammeId })
+    TSA.sendEvent({ group: 'Programme Usage', name: 'study programme overview', label: studyProgrammeId })
   }, [studyProgrammeId])
 })
 

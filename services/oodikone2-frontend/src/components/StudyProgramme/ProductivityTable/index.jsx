@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 import { Table, Header, Grid, Label, Segment, Dropdown } from 'semantic-ui-react'
 import { connect } from 'react-redux'
@@ -7,7 +7,21 @@ import { getProductivity } from '../../../redux/productivity'
 import './productivityTable.css'
 
 const ProductivityTable = ({ productivity, thesis, loading, error, showCredits }) => {
-  const [selectedYear, setYear] = useState('')
+  const [selectedYear, setYear] = useState(null)
+
+  const years = productivity
+    ? productivity.data
+        .map(stats => ({ key: stats.year, text: stats.year, value: stats.year }))
+        .sort((year1, year2) => Number(year2.value) - Number(year1.value))
+    : []
+
+  useEffect(() => {
+    if (!selectedYear && years.length > 5) {
+      setYear(years[5].value)
+    } else if (!selectedYear && years.length > 1) {
+      setYear(years[years.length - 1].value)
+    }
+  }, [years])
 
   if (error) return <h1>Oh no so error {error}</h1>
   let thesisTypes = []
@@ -26,19 +40,9 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits }
     'Hyväksiluettu (not included in Credits column)'
   ].filter(_ => _)
 
-  const years = productivity
-    ? productivity.data
-        .map(stats => ({ key: stats.year, text: stats.year, value: stats.year }))
-        .sort((year1, year2) => Number(year2.value) - Number(year1.value))
-    : []
-
   const handleChange = (event, { value }) => {
     event.preventDefault()
     setYear(value)
-  }
-
-  if (selectedYear === '' && years.length > 5) {
-    setYear(years[5].value)
   }
 
   const creditCell = content =>
