@@ -12,7 +12,8 @@ const CustomPopulationProgrammeDist = ({
   selectedStudents,
   setPopulationFilterDispatch,
   removePopulationFilterDispatch,
-  filters
+  filters,
+  populationStatistics
 }) => {
   const [tableRows, setRows] = useState([])
 
@@ -22,15 +23,17 @@ const CustomPopulationProgrammeDist = ({
     filteredSamples.forEach(student => {
       const studyprogrammes = []
       student.studyrights.forEach(sr => {
-        const studyrightElements = sr.studyrightElements.filter(srE => srE.element_detail.type === 20)
-        if (studyrightElements.length > 0) {
-          const newestStudyrightElement = studyrightElements.sort(
+        const studyright_elements = sr.studyright_elements.filter(
+          srE => populationStatistics.elementdetails.data[srE.code].type === 20
+        )
+        if (studyright_elements.length > 0) {
+          const newestStudyrightElement = studyright_elements.sort(
             (a, b) => new Date(b.startdate) - new Date(a.startdate)
           )[0]
           studyprogrammes.push({
             name: sr.highlevelname,
             startdate: newestStudyrightElement.startdate,
-            code: newestStudyrightElement.element_detail.code
+            code: newestStudyrightElement.code
           })
         }
       })
@@ -65,7 +68,7 @@ const CustomPopulationProgrammeDist = ({
   const setFilter = row => {
     const splitRow = row[0].split(', ')
     filters.map(filter => removePopulationFilterDispatch(filter.id))
-    setPopulationFilterDispatch(programmeFilter({ programme: splitRow[1], programmeName: splitRow[0] }))
+    setPopulationFilterDispatch(programmeFilter({ programme: splitRow[1], programmeName: splitRow[0] }, populationStatistics.elementdetails.data))
   }
 
   const headers = ['Programmes', `Students (all=${selectedStudents.length})`, 'Percentage of population']
@@ -86,11 +89,15 @@ CustomPopulationProgrammeDist.propTypes = {
   selectedStudents: arrayOf(string).isRequired,
   setPopulationFilterDispatch: func.isRequired,
   removePopulationFilterDispatch: func.isRequired,
-  filters: arrayOf(shape({})).isRequired
+  filters: arrayOf(shape({})).isRequired,
+  populationStatistics: shape({}).isRequired
 }
 
-const mapStateToProps = ({ populationFilters }) => {
-  return { filters: populationFilters.filters.filter(f => f.type === 'ProgrammeFilter') }
+const mapStateToProps = ({ populationFilters, populations }) => {
+  return {
+    filters: populationFilters.filters.filter(f => f.type === 'ProgrammeFilter'),
+    populationStatistics: populations.data
+  }
 }
 
 export default connect(
