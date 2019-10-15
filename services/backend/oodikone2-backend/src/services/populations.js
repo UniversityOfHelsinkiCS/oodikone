@@ -171,6 +171,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     ? creditsOfStudentLaakis
     : creditsOfStudentOther
 
+  if (studentnumbers.length === 0) return { students: [], credits: [], extents: [], semesters: [], elementdetails: [], courses: [] }
   const [courses, students, credits, extents, semesters, elementdetails] = await Promise.all([
     Course.findAll({
       attributes: [sequelize.literal('DISTINCT ON("code") code'), 'name', 'coursetypecode'],
