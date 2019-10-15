@@ -1,5 +1,6 @@
+import * as Sentry from '@sentry/browser'
 import React from 'react'
-// import { callApi } from '../apiConnection'
+import { callApi } from '../apiConnection'
 
 // -- toska surveillance agency --
 // if we need moar stats, we should probably just replace all of this with
@@ -10,14 +11,13 @@ const sendEvent = ({ group, name, label, value }) => {
   // in GA & openwebanalytics, an event has a group and a name, and optionally
   // a label and/or a value
 
-  setImmediate(() => {
+  setImmediate(async () => {
     // use setImmediate so that we don't delay event handlers, e.g. if sendEvent is called from an onClick
     try {
       // TODO: if in the future there are more requests per second, buffer events into a buffer before sending
-      // callApi('/tsa', 'POST', { group, name, label, value })
-      console.log('TSA', { group, name, label, value })
+      await callApi('/tsa/event', 'post', { group, name, label, value })
     } catch (e) {
-      // just eat the error
+      Sentry.captureException(e)
     }
   })
 }
