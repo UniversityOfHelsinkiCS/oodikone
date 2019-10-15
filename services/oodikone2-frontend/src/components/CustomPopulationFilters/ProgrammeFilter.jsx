@@ -13,7 +13,8 @@ const ProgrammeFilter = ({
   allStudyrights,
   filter,
   language,
-  samples
+  samples,
+  elementDetails
 }) => {
   const [programme, setProgramme] = useState('')
   const [programmeName, setName] = useState('')
@@ -22,7 +23,7 @@ const ProgrammeFilter = ({
   useEffect(() => {
     const allProgrammes = {}
     samples.forEach(student => {
-      const programme = getNewestProgramme(student.studyrights)
+      const programme = getNewestProgramme(student.studyrights, elementDetails)
       if (programme) {
         if (allProgrammes[programme.code]) {
           allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
@@ -43,7 +44,7 @@ const ProgrammeFilter = ({
   }, [])
 
   const handleFilter = () => {
-    setPopulationFilterAction(programmeFilter({ programme, programmeName }))
+    setPopulationFilterAction(programmeFilter({ programme, programmeName }, elementDetails))
   }
   const handleChange = (e, { value }) => {
     setProgramme(value)
@@ -104,11 +105,13 @@ ProgrammeFilter.propTypes = {
   filter: shape({}).isRequired,
   allStudyrights: shape({}).isRequired,
   language: string.isRequired,
-  samples: arrayOf(shape({})).isRequired
+  samples: arrayOf(shape({})).isRequired,
+  elementDetails: shape({}).isRequired
 }
 
-const mapStateToProps = ({ settings }) => ({
-  language: settings.language
+const mapStateToProps = ({ settings, populations }) => ({
+  language: settings.language,
+  elementDetails: populations.data.elementDetails.data
 })
 
 export default connect(

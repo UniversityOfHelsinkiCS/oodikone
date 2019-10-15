@@ -74,7 +74,7 @@ export const studyrightTypes = { degree: '10', programme: '20', speciality: '30'
 
 export const getStudentTotalCredits = student => {
   const passedCourses = student.courses.filter(c => c.passed && !c.isStudyModuleCredit)
-  const uniqueCourses = uniqBy(passedCourses, 'course.code')
+  const uniqueCourses = uniqBy(passedCourses, 'course_code')
   return uniqueCourses.reduce((a, b) => a + b.credits, 0)
 }
 
@@ -87,7 +87,7 @@ export const getStudentGradeMean = student => {
 
 export const getStudentTotalCreditsFromMandatory = (student, mandatoryCourses) =>
   student.courses
-    .filter(c => c.passed && !c.isStudyModuleCredit && mandatoryCourses.find(cr => cr.code === c.course.code))
+    .filter(c => c.passed && !c.isStudyModuleCredit && mandatoryCourses.find(cr => cr.code === c.code))
     .reduce((a, b) => a + b.credits, 0)
 
 export const getTotalCreditsFromCourses = courses =>
@@ -209,25 +209,25 @@ export const useSearchHistory = (id, capacity = 5) => {
 export const flattenStudyrights = studyrights => {
   const studyrightcodes = []
   studyrights.forEach(sr => {
-    sr.studyrightElements.forEach(srE => {
+    sr.studyright_elements.forEach(srE => {
       studyrightcodes.push(srE.code)
     })
   })
   return studyrightcodes
 }
 
-export const getNewestProgramme = studyrights => {
+export const getNewestProgramme = (studyrights, elementDetails) => {
   const studyprogrammes = []
   studyrights.forEach(sr => {
-    const studyrightElements = sr.studyrightElements.filter(srE => srE.element_detail.type === 20)
-    if (studyrightElements.length > 0) {
-      const newestStudyrightElement = studyrightElements.sort(
+    const studyright_elements = sr.studyright_elements.filter(srE => elementDetails[srE.code].type === 20)
+    if (studyright_elements.length > 0) {
+      const newestStudyrightElement = studyright_elements.sort(
         (a, b) => new Date(b.startdate) - new Date(a.startdate)
       )[0]
       studyprogrammes.push({
         name: sr.highlevelname,
         startdate: newestStudyrightElement.startdate,
-        code: newestStudyrightElement.element_detail.code
+        code: newestStudyrightElement.code
       })
     }
   })

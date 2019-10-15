@@ -62,7 +62,7 @@ class PopulationStudents extends Component {
   }
 
   containsStudyTracks = () => {
-    const { language } = this.props
+    const { language, populationStatistics } = this.props
     const students = this.props.samples.reduce((obj, s) => {
       obj[s.studentNumber] = s
       return obj
@@ -72,10 +72,10 @@ class PopulationStudents extends Component {
     return allStudyrights
       .map(
         studyrights =>
-          this.studyrightCodes(studyrights, 'studyrightElements').reduce((acc, elemArr) => {
+          this.studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
             elemArr
-              .filter(el => el.element_detail.type === 30)
-              .forEach(el => acc.push(getTextIn(el.element_detail.name, language)))
+              .filter(el => populationStatistics.elementdetails.data[el.code].type === 30)
+              .forEach(el => acc.push(getTextIn(populationStatistics.elementdetails.data[el.code].name, language)))
             return acc
           }, []).length > 0
       )
@@ -86,8 +86,8 @@ class PopulationStudents extends Component {
     const { queryStudyrights } = this.props
     return studyrights
       .filter(sr => {
-        const { studyrightElements } = sr
-        return studyrightElements.filter(sre => queryStudyrights.includes(sre.code)).length >= queryStudyrights.length
+        const { studyright_elements } = sr
+        return studyright_elements.filter(sre => queryStudyrights.includes(sre.code)).length >= queryStudyrights.length
       })
       .map(a => a[value])
   }
@@ -115,7 +115,7 @@ class PopulationStudents extends Component {
     }
 
     const { admin, containsStudyTracks } = this.state
-    const { history } = this.props
+    const { history, populationStatistics } = this.props
     const students = this.props.samples.reduce((obj, s) => {
       obj[s.studentNumber] = s
       return obj
@@ -130,7 +130,7 @@ class PopulationStudents extends Component {
       copyToClipboard(clipboardString)
     }
 
-    const transferFrom = s => getTextIn(s.transferSource.name, this.props.language)
+    const transferFrom = s => getTextIn(populationStatistics.elementdetails.data[s.transferSource].name, this.props.language)
 
     const priorityText = studyRights => {
       const codes = this.studyrightCodes(studyRights, 'prioritycode')
@@ -148,7 +148,7 @@ class PopulationStudents extends Component {
     }
 
     const mainProgramme = studyrights => {
-      const programme = getNewestProgramme(studyrights)
+      const programme = getNewestProgramme(studyrights, populationStatistics.elementdetails.data)
       if (programme) {
         return programme.name
       }
@@ -158,19 +158,23 @@ class PopulationStudents extends Component {
     const studytrack = studyrights => {
       const { queryStudyrights } = this.props
       let startdate = '1900-01-01'
-      const res = this.studyrightCodes(studyrights, 'studyrightElements').reduce((acc, elemArr) => {
+      const res = this.studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
         elemArr
-          .filter(el => el.element_detail.type === 20)
+          .filter(el => populationStatistics.elementdetails.data[el.code].type === 20)
           .forEach(el => {
             if (queryStudyrights.includes(el.code)) {
               startdate = el.startdate // eslint-disable-line
             }
           })
         elemArr
-          .filter(el => el.element_detail.type === 30)
+          .filter(el => populationStatistics.elementdetails.data[el.code].type === 30)
           .forEach(el => {
             if (el.enddate > startdate) {
-              acc.push({ name: el.element_detail.name.fi, startdate: el.startdate, enddate: el.enddate })
+              acc.push({
+                name: populationStatistics.elementdetails.data[el.code].name.fi,
+                startdate: el.startdate,
+                enddate: el.enddate
+              })
             }
           })
         acc.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))
@@ -639,6 +643,12 @@ PopulationStudents.propTypes = {
   language: string.isRequired,
   history: shape({}).isRequired,
   queryStudyrights: arrayOf(string).isRequired,
+  populationStatistics: shape({
+    courses: arrayOf(shape({})),
+    extents: arrayOf(shape({})),
+    semesters: arrayOf(shape({})),
+    students: arrayOf(shape({}))
+  }).isRequired,
   mandatoryCourses: arrayOf(
     shape({
       name: shape({}).isRequired,
@@ -685,6 +695,7 @@ const mapStateToProps = state => {
     showList: settings.studentlistVisible,
     language: getActiveLanguage(localize).code,
     queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
+    populationStatistics: populations.data,
     mandatoryCourses: populationMandatoryCourses.data,
     mandatoryPassed,
     tags: tags.data,

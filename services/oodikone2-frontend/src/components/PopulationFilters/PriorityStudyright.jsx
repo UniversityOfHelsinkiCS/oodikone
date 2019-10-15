@@ -14,7 +14,7 @@ class PriorityStudyright extends Component {
     filter: shape({}).isRequired,
     removePopulationFilter: func.isRequired,
     setPopulationFilter: func.isRequired,
-    studyrights: shape({}).isRequired
+    populationStatistics: shape({}).isRequired
   }
 
   state = {
@@ -46,33 +46,33 @@ class PriorityStudyright extends Component {
     this.props.removePopulationFilter(this.props.filter.id)
   }
 
-  renderSetText = (filter, studyrights) => {
-    const { language } = this.props
+  renderSetText = filter => {
+    const { language, populationStatistics } = this.props
     const { prioritycode, degree, programme } = filter.params
     let returnText = 'Showing students that has '
     if (degree && programme) {
-      const degreeText = studyrights.degrees.find(sr => sr.code === degree)
-      const programmeText = studyrights.programmes.find(sr => sr.code === programme)
-      returnText = returnText.concat(`${degreeText ? getTextIn(degreeText.name, language) : ''} and
-        ${programmeText ? getTextIn(programmeText.name, language) : ''}`)
+      const degreeCode = populationStatistics.elementdetails.degrees.find(code => code === degree)
+      const programmeCode = populationStatistics.elementdetails.programmes.find(code => code === programme)
+      returnText = returnText.concat(`${degreeCode ? getTextIn(populationStatistics.elementdetails.data[degreeCode].name, language) : ''} and
+        ${programmeCode ? getTextIn(populationStatistics.elementdetails.data[programmeCode].name, language) : ''}`)
     } else if (degree && !programme) {
-      const degreeText = studyrights.degrees.find(sr => sr.code === degree)
-      returnText = returnText.concat(`${degreeText ? getTextIn(degreeText.name, language) : ''}`)
+      const degreeCode = populationStatistics.elementdetails.degrees.find(sr => sr.code === degree)
+      returnText = returnText.concat(`${degreeCode ? getTextIn(populationStatistics.elementdetails.data[degreeCode].name, language) : ''}`)
     } else if (!degree && programme) {
-      const programmeText = studyrights.programmes.find(sr => sr.code === programme)
-      returnText = returnText.concat(`${programmeText ? getTextIn(programmeText.name, language) : ''}`)
+      const programmeCode = populationStatistics.elementdetails.programmes.find(sr => sr.code === programme)
+      returnText = returnText.concat(`${programmeCode ? getTextIn(populationStatistics.elementdetails.data[programmeCode].name, language) : ''}`)
     }
     returnText = returnText.concat(` as ${this.priorityOptions.find(option => option.value === prioritycode).text} `)
     return returnText
   }
 
   render() {
-    const { filter, language, studyrights } = this.props
+    const { filter, language, populationStatistics } = this.props
 
-    let degreeOptions = studyrights.degrees.map(sr => ({ value: sr.code, text: getTextIn(sr.name, language) }))
+    let degreeOptions = populationStatistics.elementdetails.degrees.map(code => ({ value: code, text: getTextIn(populationStatistics.elementdetails.data[code].name, language) }))
     degreeOptions = [{ value: 'anyDegree', text: 'any degree' }, ...degreeOptions]
 
-    let programmeOptions = studyrights.programmes.map(sr => ({ value: sr.code, text: getTextIn(sr.name, language) }))
+    let programmeOptions = populationStatistics.elementdetails.programmes.map(code => ({ value: code, text: getTextIn(populationStatistics.elementdetails.data[code].name, language) }))
     programmeOptions = [{ value: 'anyProgramme', text: 'any programme' }, ...programmeOptions]
 
     if (filter.notSet) {
@@ -147,7 +147,7 @@ class PriorityStudyright extends Component {
 
     return (
       <Segment>
-        <label>{this.renderSetText(filter, studyrights)}</label>
+        <label>{this.renderSetText(filter)}</label>
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
@@ -158,7 +158,7 @@ class PriorityStudyright extends Component {
 
 const mapStateToProps = ({ localize, populations }) => ({
   language: getActiveLanguage(localize).code,
-  studyrights: populations.data.studyrights
+  populationStatistics: populations.data
 })
 
 export default connect(
