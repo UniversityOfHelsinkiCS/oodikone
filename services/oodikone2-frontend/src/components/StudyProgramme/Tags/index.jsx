@@ -57,9 +57,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
     const months = Math.ceil(moment.duration(moment().diff(`${tag.year}-08-01`)).asMonths())
     const href =
       `/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&startYear=${
-        tag.year
-      }&endYear=${new Date().getFullYear()}&tag=${tag.tag_id}`
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${tag.year}&tag=${tag.tag_id}`
     return href
   }
 

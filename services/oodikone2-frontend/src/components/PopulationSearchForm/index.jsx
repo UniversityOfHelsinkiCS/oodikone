@@ -42,13 +42,12 @@ const months = (year, term) => {
 }
 
 const initialQuery = () => ({
-  endYear: Datetime.moment('2017-01-01').year(),
-  startYear: Datetime.moment('2017-01-01').year(),
+  year: Datetime.moment('2017-01-01').year(),
   semesters: ['FALL', 'SPRING'],
   studentStatuses: [],
   studyRights: {},
   months: months('2017', 'FALL'),
-  tag: ''
+  tag: null
 })
 
 const PopulationSearchForm = props => {
@@ -85,16 +84,16 @@ const PopulationSearchForm = props => {
 
     const sameProgramme = query.studyRights.programme === previousQuery.studyRights.programme
     const sameMonths = query.months === previousQuery.months
-    const sameStartYear = query.startYear === previousQuery.startYear
+    const sameYear = query.Year === previousQuery.Year
     const sameSemesters = previousQuery.semesters
       ? isEqual(previousQuery.semesters, query.semesters)
       : !(query.semesters.length > 0)
     const sameStudentStatuses = previousQuery.studentStatuses
       ? isEqual(query.studentStatuses, previousQuery.studentStatuses)
       : !(query.studentStatuses.length > 0)
-    const sameTag = previousQuery.tag !== '' ? previousQuery.tag === query.tag : query.tag === ''
+    const sameTag = previousQuery.tag !== null ? previousQuery.tag === query.tag : query.tag === null
 
-    return sameProgramme && sameMonths && sameStartYear && sameSemesters && sameStudentStatuses && sameTag
+    return sameProgramme && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameTag
   }
 
   const formatQueryParamsToArrays = (query, params) => {
@@ -167,8 +166,7 @@ const PopulationSearchForm = props => {
           ...query,
           studentStatuses: [],
           semesters: ['FALL', 'SPRING'],
-          tag: '',
-          endYear: query.startYear
+          tag: null
         }
       })
     }
@@ -221,14 +219,14 @@ const PopulationSearchForm = props => {
   }
 
   const getSearchHistoryTextFromQuery = () => {
-    const { studyRights, semesters, months, startYear, endYear, studentStatuses, tag } = query
+    const { studyRights, semesters, months, year, studentStatuses, tag } = query
     const studyRightsText = `${studyProgrammes[studyRights.programme].name[language]} ${Object.values(studyRights)
       .filter(s => s)
       .join(', ')}`
-    const timeText = `${semesters.join(', ')}/${startYear}-${parseInt(endYear, 10) + 1}, ${months} months`
+    const timeText = `${semesters.join(', ')}/${year}-${parseInt(year, 10) + 1}, ${months} months`
     const studentStatusesText =
       studentStatuses.length > 0 ? `includes ${studentStatuses.map(s => s.toLowerCase()).join(', ')} students` : null
-    const tagText = tag === '' ? null : `Tag: ${tags.find(t => t.tag_id === tag).tagname}`
+    const tagText = !tag ? null : `Tag: ${tags.find(t => t.tag_id === tag).tagname}`
 
     return [studyRightsText, timeText, studentStatusesText, tagText].filter(t => t).join(' - ')
   }
@@ -283,9 +281,8 @@ const PopulationSearchForm = props => {
       momentYear,
       query: {
         ...query,
-        endYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
-        tag: '',
-        startYear: reformatDate(momentYear, YEAR_DATE_FORMAT),
+        tag: null,
+        year: reformatDate(momentYear, YEAR_DATE_FORMAT),
         months: months(
           reformatDate(momentYear, YEAR_DATE_FORMAT),
           query.semesters.includes('FALL') ? 'FALL' : 'SPRING'
@@ -299,24 +296,24 @@ const PopulationSearchForm = props => {
     })
   }
 
-  const getMonths = (startYear, end, term) => {
+  const getMonths = (year, end, term) => {
     if (moment.isMoment(end)) {
       const lastDayOfMonth = moment(end).endOf('month')
-      const start = term === 'FALL' ? `${startYear}-08-01` : `${startYear}-01-01`
+      const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
       return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
     }
     return -1
   }
 
   const addYear = () => {
-    const { startYear } = query
-    const nextYear = momentFromFormat(startYear, YEAR_DATE_FORMAT).add(1, 'year')
+    const { year } = query
+    const nextYear = momentFromFormat(year, YEAR_DATE_FORMAT).add(1, 'year')
     handleYearSelection(nextYear)
   }
 
   const subtractYear = () => {
-    const { startYear } = query
-    const previousYear = momentFromFormat(startYear, YEAR_DATE_FORMAT).subtract(1, 'year')
+    const { year } = query
+    const previousYear = momentFromFormat(year, YEAR_DATE_FORMAT).subtract(1, 'year')
     handleYearSelection(previousYear)
   }
 
@@ -370,8 +367,7 @@ const PopulationSearchForm = props => {
       setState({
         query: {
           ...query,
-          tag: '',
-          endYear: query.startYear,
+          tag: null,
           months: query.months
         }
       })
@@ -381,8 +377,7 @@ const PopulationSearchForm = props => {
         query: {
           ...query,
           tag: tag.tag_id,
-          startYear: tag.year,
-          endYear: reformatDate(moment(), YEAR_DATE_FORMAT),
+          year: tag.year,
           months
         }
       })
@@ -400,7 +395,7 @@ const PopulationSearchForm = props => {
     })
 
   const renderEnrollmentDateSelector = () => {
-    const { startYear } = query
+    const { year } = query
     return (
       <Form.Group key="year" className="enrollmentSelectorGroup">
         <Form.Field error={!validYearCheck(momentYear)} className="yearSelect">
@@ -417,8 +412,8 @@ const PopulationSearchForm = props => {
               </td>
             )}
             closeOnSelect
-            value={`${startYear}-${moment()
-              .year(startYear)
+            value={`${year}-${moment()
+              .year(year)
               .add(1, 'years')
               .format('YYYY')}`}
             isValidDate={validYearCheck}
