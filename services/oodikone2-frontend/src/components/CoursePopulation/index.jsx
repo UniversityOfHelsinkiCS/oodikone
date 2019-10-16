@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { shape, func, bool, arrayOf, string } from 'prop-types'
@@ -14,7 +14,7 @@ import CustomPopulationFilters from '../CustomPopulationFilters'
 import CoursePopulationGradeDist from '../CoursePopulationGradeDist'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
-import { useProgress } from '../../common'
+import { useProgress, getStudentToTargetCourseDateMap } from '../../common'
 
 const CoursePopulation = ({
   getCoursePopulationDispatch,
@@ -34,8 +34,11 @@ const CoursePopulation = ({
   const [codes, setCodes] = useState([])
   const [headerYears, setYears] = useState('')
   const [yearCodes, setYearCodes] = useState([])
-
   const { onProgress, progress } = useProgress(pending && !studentData.students)
+  const studentToTargetCourseDateMap = useMemo(
+    () => getStudentToTargetCourseDateMap(studentData.students ? studentData.students : [], codes),
+    [studentData.students, codes]
+  )
 
   useEffect(() => {
     const { coursecodes, from, to, years } = parseQueryFromUrl()
@@ -66,7 +69,12 @@ const CoursePopulation = ({
           <Header className="segmentTitle" size="medium" textAlign="center">
             {subHeader}
           </Header>
-          <CustomPopulationFilters samples={studentData.students} coursecodes={codes} yearRange={headerYears} />
+          <CustomPopulationFilters
+            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+            samples={studentData.students}
+            coursecodes={codes}
+            yearRange={headerYears}
+          />
           <Segment>
             <Header>Grade distribution</Header>
             <CoursePopulationGradeDist
@@ -78,9 +86,17 @@ const CoursePopulation = ({
           </Segment>
           <Segment>
             <Header>Programme distribution</Header>
-            <CustomPopulationProgrammeDist samples={studentData.students} selectedStudents={selectedStudents} />
+            <CustomPopulationProgrammeDist
+              studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+              samples={studentData.students}
+              selectedStudents={selectedStudents}
+            />
           </Segment>
-          <PopulationStudents samples={studentData.students} selectedStudents={selectedStudents} />
+          <PopulationStudents
+            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+            samples={studentData.students}
+            selectedStudents={selectedStudents}
+          />
         </Segment>
       ) : (
         <Segment className="contentSegment">
