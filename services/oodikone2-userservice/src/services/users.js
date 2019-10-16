@@ -198,7 +198,7 @@ const byUsernameMinified = async username => {
           attributes: ['programme_code']
         },
         attributes: ['faculty_code']
-      },
+      }
     ]
   })
   return userMinified
@@ -218,7 +218,7 @@ const byUsername = async username => {
 
 const createUser = async (username, fullname, email) => {
   return User.create({
-    username: username, 
+    username: username,
     full_name: fullname,
     email
   })
