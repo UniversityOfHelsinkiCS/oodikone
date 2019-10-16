@@ -1,6 +1,6 @@
 # oodikone
 
-[![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone.svg?branch=master)](https://travis-ci.org/UniversityOfHelsinkiCS/oodikone)
+[![CircleCI](https://circleci.com/gh/UniversityOfHelsinkiCS/oodikone/tree/master.svg?style=svg)](https://circleci.com/gh/UniversityOfHelsinkiCS/oodikone/tree/master)
 
 Simple CLI tool for setting up the development environment for Oodikone. The entire development environment runs inside of a Docker network that's defined in the docker-compose.yml file. The specifics of what this means for setting up the environment and accessing logs is discussed in a later section.
 
@@ -44,6 +44,7 @@ Run E2E tests in with `npm run cypress:run` or `npm run cypress:open` with visua
 ## Docker commands
 
 The development environment is entirely configured in the docker-compose.yml file located in this repository. The file defines the containers/environments for:
+
 - Frontend
 - Backend
 - Userservice
@@ -88,12 +89,12 @@ npm run docker:restart:backend  # just backend
 ```
 
 ### View the containers in the running environment
+
 ```
 docker-compose ps
 ```
 
 ### View logs
-
 
 ```
 npm run docker:logs          # all
@@ -101,9 +102,8 @@ npm run docker:logs          # all
 npm run docker:logs:backend  # just backend
 ```
 
-
-
 ### Attach a terminal shell to a container
+
 ```
 docker exec -it backend bash
 
@@ -111,6 +111,7 @@ docker exec -it <container> <command>
 ```
 
 ### Use `psql` or other database CLI tools
+
 ```
 docker exec -it -u postgres oodi_db psql -d tkt_oodi
 
@@ -124,6 +125,7 @@ docker exec -it -u <username> <container> psql -d <db name>
 This is how the setup script fetches the database dump from production servers. It will require you to have access to both melkki.cs.helsinki.fi as well as oodikone.cs.helsinki.fi. The command uses `scp` to transfer all backup files recursively from a known location on the production server by using the melkki server as a proxy, allowing you to get the dump even when you're not connected to the university network.
 
 #### Command
+
 ```
 scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* ./backups/
 
@@ -143,7 +145,7 @@ scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki
 >
 > If you use password authentication instead, try with:
 >
->  ```
+> ```
 > scp -o ProxyCommand="ssh -W %h:%p user1@server1" > user2@server2:/<remotePath> <localpath>
 > ```
 >
