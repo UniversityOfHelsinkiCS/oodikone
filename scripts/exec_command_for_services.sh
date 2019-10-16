@@ -15,9 +15,12 @@ services=(
   usageservice
 )
 
-b=4
 
-echo "Executing command $1 $([ -n "$2" ] && echo "with param(s) ${@:2} ")to services ${services[@]}"
+RED='\033[0;31m'
+Green='\033[0;32m'
+NC='\033[0m'
+
+echo -e "Executing command ${RED}$1${NC} $([ -n "$2" ] && echo "with param(s) ${RED}${@:2}${NC} ")to services ${Green}${services[@]}${NC}"
 
 for service in "${services[@]}";
   do docker-compose exec -T $service npm run "$1" --if-present -- "${@:2}"

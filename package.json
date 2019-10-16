@@ -14,7 +14,7 @@
     "lint": "npm run services -- lint",
     "lintfix": "npm run services -- lintfix",
     "test_services": "npm run services -- test",
-    "test": "set -e && npm run test_services && npm run cypress:run",
+    "test": "./scripts/test.sh",
     "docker": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml",
     "docker:cypress": "npm run docker -- -f ./docker/docker-compose.cypress.yml run --rm cypress",
     "docker:real": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml -f ./docker/docker-compose.dev.real.yml",
