@@ -334,7 +334,7 @@ export const courseCreditFilter = params => {
 }
 
 export const programmeFilter = params => {
-  const { programme, programmeName } = params
+  const { programme, programmeName, studentToTargetCourseDateMap = null } = params
   return {
     id: uuidv4(),
     type: 'ProgrammeFilter',
@@ -343,7 +343,11 @@ export const programmeFilter = params => {
       programmeName
     },
     filter: student => {
-      const studentStudyrightCode = getNewestProgramme(student.studyrights)
+      const studentStudyrightCode = getNewestProgramme(
+        student.studyrights,
+        student.studentNumber,
+        studentToTargetCourseDateMap
+      )
       return studentStudyrightCode.code === programme
     }
   }

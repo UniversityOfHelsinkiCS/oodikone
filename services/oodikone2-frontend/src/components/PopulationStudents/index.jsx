@@ -147,8 +147,8 @@ class PopulationStudents extends Component {
       return studentTags.join(', ')
     }
 
-    const mainProgramme = studyrights => {
-      const programme = getNewestProgramme(studyrights)
+    const mainProgramme = (studyrights, studentNumber) => {
+      const programme = getNewestProgramme(studyrights, studentNumber, this.props.studentToTargetCourseDateMap)
       if (programme) {
         return programme.name
       }
@@ -260,7 +260,7 @@ class PopulationStudents extends Component {
         {
           key: 'programme',
           title: 'studyprogramme',
-          getRowVal: s => mainProgramme(s.studyrights)
+          getRowVal: s => mainProgramme(s.studyrights, s.studentNumber)
         },
         {
           key: 'startyear',
@@ -630,6 +630,10 @@ class PopulationStudents extends Component {
   }
 }
 
+PopulationStudents.defaultProps = {
+  studentToTargetCourseDateMap: null
+}
+
 PopulationStudents.propTypes = {
   samples: arrayOf(object).isRequired,
   selectedStudents: arrayOf(string).isRequired,
@@ -649,7 +653,8 @@ PopulationStudents.propTypes = {
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   getTagsByStudytrack: func.isRequired,
   getStudentTagsStudyTrack: func.isRequired,
-  userRoles: arrayOf(string).isRequired
+  userRoles: arrayOf(string).isRequired,
+  studentToTargetCourseDateMap: shape({})
 }
 
 const mapStateToProps = state => {

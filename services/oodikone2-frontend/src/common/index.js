@@ -216,10 +216,27 @@ export const flattenStudyrights = studyrights => {
   return studyrightcodes
 }
 
-export const getNewestProgramme = studyrights => {
+export const getStudentToTargetCourseDateMap = (students, codes) => {
+  const codeSet = new Set(codes)
+  return students.reduce((acc, student) => {
+    const targetCourse = student.courses
+      .filter(c => codeSet.has(c.course.code))
+      .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+    acc[student.studentNumber] = targetCourse ? targetCourse.date : null
+    return acc
+  }, {})
+}
+
+export const getNewestProgramme = (studyrights, studentNumber = null, studentToTargetCourseDateMap = null) => {
   const studyprogrammes = []
   studyrights.forEach(sr => {
-    const studyrightElements = sr.studyrightElements.filter(srE => srE.element_detail.type === 20)
+    const studyrightElements = sr.studyrightElements.filter(
+      srE =>
+        srE.element_detail.type === 20 &&
+        (studentToTargetCourseDateMap && studentNumber
+          ? moment(studentToTargetCourseDateMap[studentNumber]).isBetween(moment(srE.startdate), moment(srE.enddate))
+          : true)
+    )
     if (studyrightElements.length > 0) {
       const newestStudyrightElement = studyrightElements.sort(
         (a, b) => new Date(b.startdate) - new Date(a.startdate)

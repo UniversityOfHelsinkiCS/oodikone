@@ -7,7 +7,15 @@ const getSemestersAndYears = async () => {
     (acc, semester) => {
       const { semestercode, name, yearcode, yearname, startdate, enddate } = semester
       acc.semesters[semestercode] = { semestercode, name, yearcode, startdate, enddate }
-      acc.years[yearcode] = { yearcode, yearname }
+      if (!acc.years[yearcode]) acc.years[yearcode] = { yearcode, yearname, startdate, enddate }
+      else {
+        acc.years[yearcode] = {
+          yearcode,
+          yearname,
+          startdate: Math.min(acc.years[yearcode].startdate, startdate),
+          enddate: Math.max(acc.years[yearcode].enddate, enddate)
+        }
+      }
       return acc
     },
     {

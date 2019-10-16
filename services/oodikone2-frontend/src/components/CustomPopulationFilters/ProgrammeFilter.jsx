@@ -13,7 +13,8 @@ const ProgrammeFilter = ({
   allStudyrights,
   filter,
   language,
-  samples
+  samples,
+  studentToTargetCourseDateMap
 }) => {
   const [programme, setProgramme] = useState('')
   const [programmeName, setName] = useState('')
@@ -22,7 +23,7 @@ const ProgrammeFilter = ({
   useEffect(() => {
     const allProgrammes = {}
     samples.forEach(student => {
-      const programme = getNewestProgramme(student.studyrights)
+      const programme = getNewestProgramme(student.studyrights, student.studentNumber, studentToTargetCourseDateMap)
       if (programme) {
         if (allProgrammes[programme.code]) {
           allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
@@ -98,13 +99,19 @@ const ProgrammeFilter = ({
     </Segment>
   )
 }
+
+ProgrammeFilter.defaultProps = {
+  studentToTargetCourseDateMap: null
+}
+
 ProgrammeFilter.propTypes = {
   setPopulationFilterAction: func.isRequired,
   removePopulationFilterAction: func.isRequired,
   filter: shape({}).isRequired,
   allStudyrights: shape({}).isRequired,
   language: string.isRequired,
-  samples: arrayOf(shape({})).isRequired
+  samples: arrayOf(shape({})).isRequired,
+  studentToTargetCourseDateMap: shape({})
 }
 
 const mapStateToProps = ({ settings }) => ({
