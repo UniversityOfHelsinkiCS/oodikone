@@ -98,6 +98,11 @@ services:
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
       UPDATER_URL: http://updater_scheduler:3678
+      # Set these in production:
+      # ANALYTICS_INFLUXDB_URL
+      # ANALYTICS_INFLUXDB_DB
+      # ANALYTICS_INFLUXDB_PASSWORD
+      # ANALYTICS_INFLUXDB_USER
     container_name: backend
     depends_on:
       - db

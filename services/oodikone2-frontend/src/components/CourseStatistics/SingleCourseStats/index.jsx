@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Segment, Header, Form, Grid, Button, Popup } from 'semantic-ui-react'
-import { shape, string, arrayOf, objectOf, oneOfType, number, func, bool } from 'prop-types'
+import { shape, string, arrayOf, objectOf, oneOfType, number, func } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { getActiveLanguage } from 'react-localize-redux'
@@ -15,7 +15,7 @@ import {
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import YearFilter from '../SearchForm/YearFilter'
-import { getTextIn, getUserIsAdmin } from '../../../common'
+import { getTextIn } from '../../../common'
 import { getSemesters } from '../../../redux/semesters'
 
 const countFilteredStudents = (stat, filter) =>
@@ -284,8 +284,6 @@ class SingleCourseStats extends Component {
   }
 
   renderShowPopulation(disabled = false) {
-    const { isAdmin } = this.props
-    if (!isAdmin) return null
     return <Button disabled={disabled} onClick={this.showPopulation} content="Show population" />
   }
 
@@ -407,16 +405,10 @@ SingleCourseStats.propTypes = {
     push: func
   }).isRequired,
   getMaxYearsToCreatePopulationFrom: func.isRequired,
-  maxYearsToCreatePopulationFrom: number.isRequired,
-  isAdmin: bool.isRequired
+  maxYearsToCreatePopulationFrom: number.isRequired
 }
 
 const mapStateToProps = state => {
-  const {
-    auth: {
-      token: { roles }
-    }
-  } = state
   const { semesters = [], years = [] } = state.semesters.data
   return {
     programmes: selectors.getAllStudyProgrammes(state),
@@ -435,8 +427,7 @@ const mapStateToProps = state => {
       }))
       .reverse(),
     activeLanguage: getActiveLanguage(state.localize).code,
-    maxYearsToCreatePopulationFrom: state.singleCourseStats.maxYearsToCreatePopulationFrom,
-    isAdmin: getUserIsAdmin(roles)
+    maxYearsToCreatePopulationFrom: state.singleCourseStats.maxYearsToCreatePopulationFrom
   }
 }
 
