@@ -21,7 +21,8 @@ class StudentDetails extends Component {
     super()
     this.state = {
       graphYearStart: null,
-      degreename: ''
+      degreename: '',
+      studyrightid: null
     }
   }
 
@@ -142,21 +143,28 @@ class StudentDetails extends Component {
     )
   }
 
-  handleStartDateChange = degree => {
-    const { degreename, graphYearStart } = this.state
-    const { name, startdate } = degree
+  handleStartDateChange = (elements, id) => {
+    const { degreename, graphYearStart, studyrightid } = this.state
 
-    if (name === degreename && graphYearStart === startdate) {
+    if (id === studyrightid) {
       this.setState({
         graphYearStart: null,
-        degreename: ''
+        degreename: '',
+        studyrightid: ''
       })
-    } else {
-      this.setState({
-        graphYearStart: degree.startdate,
-        degreename: degree.name
-      })
+      return
     }
+
+    const getTarget = () =>
+      elements.degree ||
+      sortBy(elements.programmes, 'startdate', ['desc'])[0] || { startdate: graphYearStart, name: degreename }
+
+    const { startdate, name } = getTarget()
+    this.setState({
+      graphYearStart: startdate,
+      degreename: name,
+      studyrightid: id
+    })
   }
 
   renderCreditsGraph = () => {
@@ -342,7 +350,7 @@ class StudentDetails extends Component {
 
   renderStudyRights = () => {
     const { student, language } = this.props
-    const { graphYearStart, degreename } = this.state
+    const { studyrightid } = this.state
     const studyRightHeaders = ['Degree', 'Programme', 'Study Track', 'Graduated']
     const studyRightRows = student.studyrights.map(studyright => {
       const degree = sortBy(studyright.studyrightElements, 'enddate').find(e => e.element_detail.type === 10)
@@ -407,17 +415,19 @@ class StudentDetails extends Component {
               if (c.elements.programmes.length > 0 || c.elements.degree) {
                 return (
                   <Table.Row
-                    active={graphYearStart === c.elements.degree.startdate && degreename === c.elements.degree.name}
+                    active={c.studyrightid === studyrightid}
                     key={c.studyrightid}
-                    onClick={() => this.handleStartDateChange(c.elements.degree)}
+                    onClick={() => this.handleStartDateChange(c.elements, c.studyrightid)}
                   >
                     <Table.Cell verticalAlign="middle">
-                      <p key={c.elements.degree.name}>
-                        {`${c.elements.degree.name} 
-                        (${reformatDate(c.elements.degree.startdate, 'DD.MM.YYYY')} - 
-                        ${reformatDate(c.elements.degree.enddate, 'DD.MM.YYYY')})`}
-                        <br />
-                      </p>
+                      {c.elements.degree && (
+                        <p key={c.elements.degree.name}>
+                          {`${c.elements.degree.name} 
+                          (${reformatDate(c.elements.degree.startdate, 'DD.MM.YYYY')} - 
+                          ${reformatDate(c.elements.degree.enddate, 'DD.MM.YYYY')})`}
+                          <br />
+                        </p>
+                      )}
                     </Table.Cell>
                     <Table.Cell>
                       {c.elements.programmes.filter(filterDuplicates).map(programme => (

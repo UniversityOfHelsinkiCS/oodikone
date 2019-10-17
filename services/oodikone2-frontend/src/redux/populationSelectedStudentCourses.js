@@ -8,7 +8,9 @@ export const getPopulationSelectedStudentCourses = ({
   uuid,
   selectedStudents,
   year,
-  tag
+  years,
+  tag,
+  selectedStudentsByYear
 }) => {
   const route = '/v2/populationstatistics/courses'
   const prefix = 'GET_POPULATION_SELECTEDSTUDENTS_COURSES_'
@@ -20,7 +22,9 @@ export const getPopulationSelectedStudentCourses = ({
     selectedStudents,
     months,
     year,
-    tag
+    years,
+    tag,
+    selectedStudentsByYear
   }
   const body = {
     semesters,
@@ -29,7 +33,9 @@ export const getPopulationSelectedStudentCourses = ({
     studyRights,
     selectedStudents,
     year,
-    tag
+    tag,
+    selectedStudentsByYear,
+    years
   }
   return callController(route, prefix, body, 'post', query)
 }

@@ -7,7 +7,9 @@ export const getPopulationCourses = ({
   months,
   uuid,
   selectedStudents,
+  selectedStudentsByYear,
   year,
+  years,
   tag
 }) => {
   const route = !tag ? '/v2/populationstatistics/courses' : '/v2/populationstatistics/coursesbytag'
@@ -20,14 +22,19 @@ export const getPopulationCourses = ({
     uuid,
     selectedStudents,
     year,
-    tag
+    years,
+    tag,
+    selectedStudentsByYear
   }
+
   const body = {
     semesters,
     months,
     studyRights,
     tag,
-    year
+    year,
+    selectedStudentsByYear,
+    years
   }
   return callController(route, prefix, body, 'post', query)
 }

@@ -45,7 +45,7 @@ const StudyProgramme = props => {
     panes.push(
       {
         menuItem: 'Overview',
-        render: () => <Overview studyprogramme={studyProgrammeId} />
+        render: () => <Overview studyprogramme={studyProgrammeId} history={props.history} />
       },
       {
         menuItem: 'Mandatory Courses',
