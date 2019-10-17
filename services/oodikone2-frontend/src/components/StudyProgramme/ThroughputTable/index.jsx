@@ -1,10 +1,10 @@
 import React, { Fragment, useState, useEffect } from 'react'
 import moment from 'moment'
-import { Header, Table, Grid, Icon, Label, Segment, Dropdown } from 'semantic-ui-react'
+import { Header, Table, Grid, Icon, Label, Segment, Dropdown, Button } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, node } from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { flatten, uniq } from 'lodash'
+import { flatten, uniq, range } from 'lodash'
 import { getUserRoles } from '../../../common'
 import InfoBox from '../../InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
@@ -28,9 +28,10 @@ PopulationStatisticsLink.propTypes = {
   children: node.isRequired
 }
 
-const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, userRoles }) => {
+const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, userRoles, history }) => {
   const [selectedYear, setYear] = useState(null)
-
+  const [lowerYear, setLower] = useState(null)
+  const [upperYear, setUpper] = useState(null)
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
 
   const years = data
@@ -72,6 +73,35 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
   const handleChange = (event, { value }) => {
     event.preventDefault()
     setYear(value)
+  }
+
+  const handleLowerBoundChange = (event, { value }) => {
+    event.preventDefault()
+    if (Number(lowerYear) > Number(upperYear)) {
+      setUpper(value)
+      setLower(value)
+    } else {
+      setLower(value)
+    }
+  }
+
+  const handleUpperBoundChange = (event, { value }) => {
+    event.preventDefault()
+    if (Number(upperYear) < Number(lowerYear)) {
+      setUpper(value)
+      setLower(value)
+    } else {
+      setUpper(value)
+    }
+  }
+
+  const pushQueryToUrl = () => {
+    const yearRange = range(Number(lowerYear), Number(upperYear) + 1)
+    const yearsString = yearRange.join('&years=')
+    history.push(
+      `/populations?months=200&semesters=FALL&semesters=` +
+        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${lowerYear}&years=${yearsString}`
+    )
   }
 
   const renderStudentsHeader = () => {
@@ -267,6 +297,15 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
           ) : null}
         </Table>
       </Segment>
+      {userRoles.includes('admin') ? (
+        <>
+          from:
+          <Dropdown selection options={years} onChange={handleLowerBoundChange} value={lowerYear} />
+          to:
+          <Dropdown selection options={years} onChange={handleUpperBoundChange} value={upperYear} />
+          <Button onClick={pushQueryToUrl}>fetch population</Button>
+        </>
+      ) : null}
     </React.Fragment>
   )
 }
@@ -297,7 +336,8 @@ ThroughputTable.propTypes = {
   studyprogramme: string.isRequired,
   loading: bool.isRequired,
   error: bool.isRequired,
-  userRoles: arrayOf(string).isRequired
+  userRoles: arrayOf(string).isRequired,
+  history: shape({}).isRequired
 }
 
 ThroughputTable.defaultProps = {
