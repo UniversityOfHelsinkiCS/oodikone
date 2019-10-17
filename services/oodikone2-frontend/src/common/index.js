@@ -5,7 +5,7 @@ import Datetime from 'react-datetime'
 import { uniqBy, filter, maxBy } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
 import qs from 'query-string'
-import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
+import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, SEARCH_HISTORY_VERSION } from '../constants'
 import toskaLogo from '../assets/toska.png'
 import irtomikko from '../assets/irtomikko.png'
 
@@ -181,6 +181,11 @@ export const useSearchHistory = (id, capacity = 5) => {
   }
 
   useEffect(() => {
+    if (localStorage.getItem('searchHistoryVersion') !== SEARCH_HISTORY_VERSION) {
+      saveSearchHistoryStore({})
+      localStorage.setItem('searchHistoryVersion', SEARCH_HISTORY_VERSION)
+    }
+
     setSearchHistory(getSearchHistoryStore()[id] || [])
     setDidMount(true)
   }, [])
@@ -193,12 +198,14 @@ export const useSearchHistory = (id, capacity = 5) => {
 
   const addItem = item => {
     const filteredSearchHistory = searchHistory.filter(sh => sh.text !== item.text)
-    setSearchHistory(filteredSearchHistory.concat({ ...item, timestamp: new Date() }).slice(-capacity))
+    setSearchHistory(
+      filteredSearchHistory.concat({ ...item, timestamp: new Date(), id: new Date().getTime() }).slice(-capacity)
+    )
   }
 
   const updateItem = item => {
     const updatedSearchHistory = [{ ...item, timestamp: new Date() }].concat(
-      searchHistory.filter(s => s.timestamp !== item.timestamp)
+      searchHistory.filter(s => s.id !== item.id)
     )
     setSearchHistory(updatedSearchHistory)
   }
