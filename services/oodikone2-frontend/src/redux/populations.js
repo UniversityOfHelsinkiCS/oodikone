@@ -78,6 +78,7 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'GET_POPULATION_STATISTICS_ATTEMPT':
       return {
+        ...state,
         pending: true,
         error: false,
         data: {},
@@ -86,6 +87,7 @@ const reducer = (state = initialState, action) => {
       }
     case 'GET_POPULATION_STATISTICS_FAILURE':
       return {
+        ...state,
         pending: false,
         error: true,
         data: action.response,
@@ -94,6 +96,7 @@ const reducer = (state = initialState, action) => {
       }
     case 'GET_POPULATION_STATISTICS_SUCCESS':
       return {
+        ...state,
         pending: false,
         error: false,
         data: action.response,
@@ -102,6 +105,7 @@ const reducer = (state = initialState, action) => {
       }
     case 'GET_STUDENTS_OF_COURSE_ATTEMPT':
       return {
+        ...state,
         pending: true,
         error: false,
         data: {},
@@ -109,6 +113,7 @@ const reducer = (state = initialState, action) => {
       }
     case 'GET_STUDENTS_OF_COURSE_FAILURE':
       return {
+        ...state,
         pending: false,
         error: true,
         data: action.response,
@@ -116,6 +121,7 @@ const reducer = (state = initialState, action) => {
       }
     case 'GET_STUDENTS_OF_COURSE_SUCCESS':
       return {
+        ...state,
         pending: false,
         error: false,
         data: action.response,
@@ -123,6 +129,7 @@ const reducer = (state = initialState, action) => {
       }
     case 'GET_CUSTOM_POP_ATTEMPT':
       return {
+        ...state,
         pending: true,
         error: false,
         data: {},
@@ -130,6 +137,7 @@ const reducer = (state = initialState, action) => {
       }
     case 'GET_CUSTOM_POP_FAILURE':
       return {
+        ...state,
         pending: false,
         error: true,
         data: action.response,
@@ -137,6 +145,7 @@ const reducer = (state = initialState, action) => {
       }
     case 'GET_CUSTOM_POP_SUCCESS':
       return {
+        ...state,
         pending: false,
         error: false,
         data: action.response,

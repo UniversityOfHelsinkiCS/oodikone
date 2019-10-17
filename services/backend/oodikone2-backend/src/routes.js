@@ -27,6 +27,7 @@ const feedback = require('./routes/feedback')
 const tags = require('./routes/tags')
 const updater = require('./routes/updater')
 const tsaAnalytics = require('./routes/tsaAnalytics')
+const customPopulationSearch = require('./routes/customPopulationSearch')
 
 module.exports = (app, url) => {
   app.use(shibbolethHeadersFix(['hyGroupCn', 'SHIB_LOGOUT_URL', 'eduPersonAffiliation', 'uid', 'displayName', 'mail']))
@@ -56,5 +57,6 @@ module.exports = (app, url) => {
   app.use(`${url}/mandatory-course-labels`, mandatoryCourseLabels)
   app.use(`${url}/oodi`, auth.roles(['dev']), oodi)
   app.use(`${url}/tsa`, tsaAnalytics)
+  app.use(`${url}/custom-population-search`, auth.roles(['dev', 'admin']), customPopulationSearch)
   app.use(url, auth.roles(['dev', 'admin']), task)
 }

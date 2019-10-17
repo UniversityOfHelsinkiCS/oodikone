@@ -4,21 +4,27 @@ import { sortBy } from 'lodash'
 import { Segment, Form, Header } from 'semantic-ui-react'
 import { arrayOf, date, func, shape, string, bool } from 'prop-types'
 
-const SearchHistory = ({ items, handleSearch, updateItem, disabled }) => {
+const SearchHistory = ({ items, handleSearch, updateItem, disabled, header }) => {
   const [selected, setSelected] = useState(null)
 
   const sortedItems = sortBy(items, i => -new Date(i.timestamp).getTime())
 
   const handleChange = (e, { value }) => {
+    if (!value) {
+      handleSearch(null)
+      setSelected(null)
+      return
+    }
     if (disabled) return
     setSelected(value)
-    handleSearch(sortedItems[value - 1].params)
-    updateItem(sortedItems[value - 1])
+    const target = sortedItems.find(i => i.id === value)
+    handleSearch(target.params)
+    updateItem(target)
   }
 
   return (
     <Segment>
-      <Header disabled={disabled} content="Previous searches" icon="clock outline" />
+      <Header disabled={disabled} content={header} icon="clock outline" />
       <Form.Dropdown
         disabled={disabled}
         placeholder="Select a previous search"
@@ -26,9 +32,9 @@ const SearchHistory = ({ items, handleSearch, updateItem, disabled }) => {
         search
         selection
         value={selected}
-        options={sortedItems.map(({ text, timestamp }, i) => ({
-          key: i + 1,
-          value: i + 1,
+        options={sortedItems.map(({ id, text, timestamp }) => ({
+          key: id,
+          value: id,
           text,
           description: moment(timestamp).format('DD.MM LT')
         }))}
@@ -44,7 +50,8 @@ const SearchHistory = ({ items, handleSearch, updateItem, disabled }) => {
 }
 
 SearchHistory.defaultProps = {
-  disabled: false
+  disabled: false,
+  header: 'Previous searches'
 }
 
 SearchHistory.propTypes = {
@@ -57,7 +64,8 @@ SearchHistory.propTypes = {
   ).isRequired,
   handleSearch: func.isRequired,
   updateItem: func.isRequired,
-  disabled: bool
+  disabled: bool,
+  header: string
 }
 
 export default SearchHistory

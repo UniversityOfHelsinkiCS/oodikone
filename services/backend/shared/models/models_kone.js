@@ -196,6 +196,23 @@ const ThesisCourse = sequelizeKone.define('thesis_courses', {
   }
 })
 
+const CustomPopulationSearch = sequelizeKone.define('custom_population_searches', {
+  id: {
+    primaryKey: true,
+    type: Sequelize.BIGINT,
+    autoIncrement: true
+  },
+  userId: {
+    type: Sequelize.BIGINT
+  },
+  name: {
+    type: Sequelize.STRING
+  },
+  students: {
+    type: Sequelize.ARRAY(Sequelize.STRING)
+  }
+})
+
 MandatoryCourse.belongsTo(MandatoryCourseLabels, {
   foreignKey: 'label',
   sourceKey: 'id'
@@ -230,5 +247,6 @@ module.exports = {
   ThesisTypeEnums,
   MandatoryCourseLabels,
   MigrationKone,
+  CustomPopulationSearch,
   sequelizeKone
 }
