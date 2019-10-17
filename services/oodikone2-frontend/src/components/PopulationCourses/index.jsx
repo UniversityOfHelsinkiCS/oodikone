@@ -19,7 +19,8 @@ const PopulationCourses = ({
   dispatchRefreshFilters,
   selectedStudents,
   translate,
-  getPopulationSelectedStudentCourses: gpc
+  getPopulationSelectedStudentCourses: gpc,
+  selectedStudentsByYear
 }) => {
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
@@ -29,7 +30,7 @@ const PopulationCourses = ({
   const { pending } = selectedPopulationCourses
   const reloadCourses = () => {
     dispatchRefreshFilters()
-    gpc({ ...selectedPopulationCourses.query, uuid: uuidv4(), selectedStudents })
+    gpc({ ...selectedPopulationCourses.query, uuid: uuidv4(), selectedStudents, selectedStudentsByYear })
   }
 
   useEffect(() => {
@@ -71,7 +72,8 @@ PopulationCourses.propTypes = {
   translate: func.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   getPopulationSelectedStudentCourses: func.isRequired,
-  dispatchRefreshFilters: func.isRequired
+  dispatchRefreshFilters: func.isRequired,
+  selectedStudentsByYear: shape({}).isRequired
 }
 
 const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses, localize, populationFilters }) => ({

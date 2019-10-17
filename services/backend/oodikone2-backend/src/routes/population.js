@@ -36,14 +36,38 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
     if (req.body.months == null) {
       req.body.months = 12
     }
-    const result = await Population.bottlenecksOf(req.body)
-
-    if (result.error) {
-      res.status(400).json(result)
-      return
+    if (req.body.years && req.body.years.length > 1) {
+      req.body.months = 2000
     }
+    if (req.body.years) {
+      const multicoursestatPromises = Promise.all(
+        req.body.years.map(year => {
+          if (req.body.selectedStudentsByYear) {
+            req.body.selectedStudents = req.body.selectedStudentsByYear[year]
+          }
+          const query = { ...req.body, year }
+          const coursestatistics = Population.bottlenecksOf(query)
+          return coursestatistics
+        })
+      )
+      const multicoursestats = await multicoursestatPromises
+      const result = Population.populationCourseStatsMerger(multicoursestats)
+      if (result.error) {
+        res.status(400).json(result)
+        return
+      }
 
-    res.json(result)
+      res.json(result)
+    } else {
+      const result = await Population.bottlenecksOf(req.body)
+
+      if (result.error) {
+        res.status(400).json(result)
+        return
+      }
+
+      res.json(result)
+    }
   } catch (e) {
     console.log(e)
     res.status(500).json({ error: e })
@@ -211,16 +235,39 @@ router.get('/v3/populationstatistics', async (req, res) => {
     if (req.query.months == null) {
       req.query.months = 12
     }
-    const result = await Population.optimizedStatisticsOf({ ...req.query, studyRights })
-
-    if (result.error) {
-      console.log(result.error)
-      res.status(400).end()
-      return
+    if (req.query.years && req.query.years.length > 1) {
+      req.query.months = 2000
     }
+    if (req.query.years) {
+      const multipopulationstudentPromises = Promise.all(
+        req.query.years.map(year => {
+          const populationStudents = Population.optimizedStatisticsOf({ ...req.query, studyRights, year })
+          return populationStudents
+        })
+      )
+      const multipopulationstudents = await multipopulationstudentPromises
 
-    console.log(`request completed ${new Date()}`)
-    res.json(filterPersonalTags(result, decodedToken.id))
+      const result = Population.populationStudentsMerger(multipopulationstudents)
+
+      if (result.error) {
+        console.log(result.error)
+        res.status(400).end()
+        return
+      }
+
+      console.log(`request completed ${new Date()}`)
+      res.json(filterPersonalTags(result, decodedToken.id))
+    } else {
+      const result = await Population.optimizedStatisticsOf({ ...req.query, studyRights })
+      if (result.error) {
+        console.log(result.error)
+        res.status(400).end()
+        return
+      }
+
+      console.log(`request completed ${new Date()}`)
+      res.json(filterPersonalTags(result, decodedToken.id))
+    }
   } catch (e) {
     console.log(e)
     res.status(500).json({ error: e })
