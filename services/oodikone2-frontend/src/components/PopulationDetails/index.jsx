@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { func, object, string, arrayOf, bool } from 'prop-types'
+import { func, object, string, arrayOf, bool, shape } from 'prop-types'
 import { Segment, Header, Message, Button, Icon, Tab } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { flattenDeep } from 'lodash'
@@ -24,7 +24,8 @@ class PopulationDetails extends Component {
     samples: arrayOf(object).isRequired,
     selectedStudents: arrayOf(string).isRequired,
     queryIsSet: bool.isRequired,
-    isLoading: bool.isRequired
+    isLoading: bool.isRequired,
+    selectedStudentsByYear: shape({}).isRequired
   }
 
   constructor() {
@@ -145,7 +146,11 @@ class PopulationDetails extends Component {
       <PopulationFilters ref={this.filters} samples={this.props.samples} />
       {this.renderCreditGainGraphs()}
       {this.renderCourseStatistics()}
-      <PopulationCourses ref={this.courses} selectedStudents={this.props.selectedStudents} />
+      <PopulationCourses
+        ref={this.courses}
+        selectedStudents={this.props.selectedStudents}
+        selectedStudentsByYear={this.props.selectedStudentsByYear}
+      />
       <PopulationStudents ref={this.students} />
     </div>
   )
@@ -186,7 +191,7 @@ class PopulationDetails extends Component {
 }
 
 const mapStateToProps = state => {
-  const { samples, selectedStudents, complemented } = selectors.makePopulationsToData(state)
+  const { samples, selectedStudents, complemented, selectedStudentsByYear } = selectors.makePopulationsToData(state)
 
   // REFACTOR YES, IF YOU SEE THIS COMMENT YOU ARE OBLIGATED TO FIX IT
   if (samples.length > 0) {
@@ -211,6 +216,7 @@ const mapStateToProps = state => {
   return {
     samples,
     selectedStudents,
+    selectedStudentsByYear,
     complemented,
     translate: getTranslate(state.localize),
     queryIsSet: !!state.populations.query,
