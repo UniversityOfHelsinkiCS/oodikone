@@ -24,7 +24,7 @@ const UsageStatistic = sequelize.define(
       type: Sequelize.STRING
     },
     URL: {
-      type: Sequelize.STRING
+      type: Sequelize.TEXT
     },
     status: {
       type: Sequelize.INTEGER
