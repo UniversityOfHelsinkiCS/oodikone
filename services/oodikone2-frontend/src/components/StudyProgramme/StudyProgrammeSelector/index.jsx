@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { arrayOf, func, string, bool, shape } from 'prop-types'
 import { Loader, Message, Header, Form } from 'semantic-ui-react'
 import { getDegreesAndProgrammes } from '../../../redux/populationDegreesAndProgrammes'
@@ -50,12 +51,12 @@ class StudyProgrammeSelector extends Component {
       {
         key: 'programmecode',
         title: 'code',
-        getRowVal: prog => prog.code
+        getRowVal: prog => <Link style={{ color: 'black' }} to={`/study-programme/${prog.code}`}>{prog.code}</Link>
       },
       {
         key: 'programmename',
         title: 'name',
-        getRowVal: prog => getTextIn(prog.name, language)
+        getRowVal: prog => <Link style={{ color: 'black' }} to={`/study-programme/${prog.code}`}>{getTextIn(prog.name, language)}</Link>
       }
     ]
     if (studyprogrammes == null) {
