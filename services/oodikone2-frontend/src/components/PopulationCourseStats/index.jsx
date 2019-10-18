@@ -441,13 +441,13 @@ class PopulationCourseStats extends Component {
           <Table.Cell content={passed + failed} />
           <Table.Cell content={passed} />
           <Table.Cell content={retryPassed} />
-          <Table.Cell content={`${percentage} %`} />
+          <Table.Cell content={`${percentage.toFixed(2)} %`} />
           <Table.Cell content={failed} />
           <Table.Cell content={failedMany} />
           <Table.Cell content={attempts} />
           <Table.Cell content={perStudent.toFixed(2)} />
-          <Table.Cell content={`${passedOfPopulation}  %`} />
-          <Table.Cell content={`${triedOfPopulation}  %`} />
+          <Table.Cell content={`${passedOfPopulation.toFixed(2)}  %`} />
+          <Table.Cell content={`${triedOfPopulation.toFixed(2)}  %`} />
         </Table.Row>
       )
     }
