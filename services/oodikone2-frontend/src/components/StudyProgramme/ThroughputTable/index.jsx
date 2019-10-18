@@ -22,9 +22,27 @@ const PopulationStatisticsLink = ({ studyprogramme, year: yearLabel, children })
   )
 }
 
+const TotalPopulationLink = ({ years, studyprogramme, children }) => {
+  const yearsString = years.map(year => year.value).join('&years=')
+  const href =
+    `/populations?months=200&semesters=FALL&semesters=` +
+    `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${years[0].value}&years=${yearsString}`
+  return (
+    <Link title="Population statistics of all years" to={href}>
+      {children}
+    </Link>
+  )
+}
+
 PopulationStatisticsLink.propTypes = {
   studyprogramme: string.isRequired,
   year: string.isRequired,
+  children: node.isRequired
+}
+
+TotalPopulationLink.propTypes = {
+  studyprogramme: string.isRequired,
+  years: arrayOf(shape({})).isRequired,
   children: node.isRequired
 }
 
@@ -77,7 +95,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
 
   const handleLowerBoundChange = (event, { value }) => {
     event.preventDefault()
-    if (Number(lowerYear) > Number(upperYear)) {
+    if (Number(value) > Number(upperYear)) {
       setUpper(value)
       setLower(value)
     } else {
@@ -87,7 +105,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
 
   const handleUpperBoundChange = (event, { value }) => {
     event.preventDefault()
-    if (Number(upperYear) < Number(lowerYear)) {
+    if (Number(value) < Number(lowerYear)) {
       setUpper(value)
       setLower(value)
     } else {
@@ -249,7 +267,14 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
           {throughput && throughput.totals ? (
             <Table.Footer>
               <Table.Row>
-                <Table.HeaderCell style={{ fontWeight: 'bold' }}>Total</Table.HeaderCell>
+                <Table.HeaderCell style={{ fontWeight: 'bold' }}>
+                  Total{' '}
+                  {userRoles.includes('admin') ? (
+                    <TotalPopulationLink studyprogramme={studyprogramme} years={years}>
+                      <Icon name="level up alternate" />
+                    </TotalPopulationLink>
+                  ) : null}
+                </Table.HeaderCell>
                 <Table.HeaderCell>{throughput.totals.students}</Table.HeaderCell>
                 {Object.keys(throughput.totals.genders).map(genderKey => (
                   <Table.HeaderCell key={`${genderKey}total`}>
