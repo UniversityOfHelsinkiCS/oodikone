@@ -222,7 +222,7 @@ const mapStateToProps = state => {
     translate: getTranslate(state.localize),
     queryIsSet: !!state.populations.query,
     isLoading: state.populations.pending === true,
-    query: state.populations.query
+    query: state.populations.query || {}
   }
 }
 
