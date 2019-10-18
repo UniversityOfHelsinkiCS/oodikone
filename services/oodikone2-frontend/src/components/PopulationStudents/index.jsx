@@ -122,6 +122,19 @@ class PopulationStudents extends Component {
       return obj
     }, {})
 
+    const studentToStudyrightStartMap = !['/coursepopulation', '/custompopulation'].includes(history.location.pathname)
+      ? this.props.selectedStudents.reduce((res, sn) => {
+          const targetStudyright = flatten(
+            students[sn].studyrights.reduce((acc, curr) => {
+              acc.push(curr.studyrightElements)
+              return acc
+            }, [])
+          ).filter(e => e.code === this.props.queryStudyrights[0])
+          res[sn] = targetStudyright[0] ? targetStudyright[0].startdate : null
+          return res
+        }, {})
+      : null
+
     const pushToHistoryFn = studentNumber => this.props.history.push(`/students/${studentNumber}`)
 
     const copyToClipboardAll = () => {
@@ -255,6 +268,15 @@ class PopulationStudents extends Component {
       title: 'tags',
       getRowVal: s => (!s.obfuscated ? tags(s.tags) : 'Obfuscated')
     })
+
+    if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
+      columns.push({
+        key: 'studystartdate',
+        title: 'start of studyright',
+        getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]).getTime(),
+        getRowContent: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD')
+      })
+    }
 
     if (['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
       columns.push(
