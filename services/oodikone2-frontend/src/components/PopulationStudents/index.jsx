@@ -321,11 +321,7 @@ class PopulationStudents extends Component {
       )
     }
 
-    const verticalTitle = title => (
-      <div className='verticalTitle'>
-        {title}
-      </div>
-    )
+    const verticalTitle = title => <div className="verticalTitle">{title}</div>
 
     const hasPassedMandatory = (studentNumber, code) =>
       this.props.mandatoryPassed[code] && this.props.mandatoryPassed[code].includes(studentNumber)
