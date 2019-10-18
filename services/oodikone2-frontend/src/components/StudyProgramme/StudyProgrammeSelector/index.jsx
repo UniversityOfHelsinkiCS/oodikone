@@ -51,12 +51,20 @@ class StudyProgrammeSelector extends Component {
       {
         key: 'programmecode',
         title: 'code',
-        getRowVal: prog => <Link style={{ color: 'black' }} to={`/study-programme/${prog.code}`}>{prog.code}</Link>
+        getRowVal: prog => (
+          <Link style={{ color: 'black' }} to={`/study-programme/${prog.code}`}>
+            {prog.code}
+          </Link>
+        )
       },
       {
         key: 'programmename',
         title: 'name',
-        getRowVal: prog => <Link style={{ color: 'black' }} to={`/study-programme/${prog.code}`}>{getTextIn(prog.name, language)}</Link>
+        getRowVal: prog => (
+          <Link style={{ color: 'black' }} to={`/study-programme/${prog.code}`}>
+            {getTextIn(prog.name, language)}
+          </Link>
+        )
       }
     ]
     if (studyprogrammes == null) {
