@@ -1,0 +1,12 @@
+/* https://stackoverflow.com/a/41396815 */
+.verticalTitle {
+  writing-mode: vertical-rl;
+  min-width: 32px;
+  max-height: 20vh;
+  overflow-y: hidden;
+  text-align: left;
+}
+
+.verticalTitle:hover {
+  overflow-y: auto;
+}
