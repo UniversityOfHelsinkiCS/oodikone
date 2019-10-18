@@ -41,8 +41,17 @@ const makePopulationsToData = createSelector(
       years.forEach(year => {
         selectedStudentsByYear[year] = intersection(...matchingStudents, selectedStudentsByYear[year])
       })
+      if (complemented) {
+        years.forEach(year => {
+          selectedStudentsByYear[year] = difference(
+            samples
+              .filter(student => new Date(student.studyrightStart).getFullYear() === year)
+              .map(student => student.studentNumber),
+            selectedStudentsByYear[year]
+          )
+        })
+      }
     }
-
     return { samples, selectedStudents, complemented, programme, selectedStudentsByYear }
   }
 )
