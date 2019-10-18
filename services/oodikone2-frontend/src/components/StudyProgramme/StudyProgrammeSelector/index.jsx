@@ -66,7 +66,8 @@ class StudyProgrammeSelector extends Component {
     const otherProgrammes = []
     const filteredStudyprogrammes = studyprogrammes.filter(
       programme =>
-        programme.code.toLowerCase().includes(filter) || programme.name[language].toLowerCase().includes(filter)
+        programme.code.toLowerCase().includes(filter.toLocaleLowerCase()) ||
+        programme.name[language].toLowerCase().includes(filter.toLocaleLowerCase())
     )
 
     filteredStudyprogrammes.forEach(programme => {
