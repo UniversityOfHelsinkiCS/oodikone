@@ -6,7 +6,7 @@ import { shape, number, arrayOf, bool, string, oneOfType } from 'prop-types'
 import { getProductivity } from '../../../redux/productivity'
 import './productivityTable.css'
 
-const ProductivityTable = ({ productivity, thesis, loading, error, showCredits }) => {
+const ProductivityTable = ({ productivity, thesis, loading, error, showCredits, newProgramme }) => {
   const [selectedYear, setYear] = useState(null)
 
   const years = productivity
@@ -16,7 +16,9 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits }
     : []
 
   useEffect(() => {
-    if (!selectedYear && years.length > 5) {
+    if (newProgramme && years.length > 1) {
+      setYear('2017')
+    } else if (!selectedYear && years.length > 5) {
       setYear(years[5].value)
     } else if (!selectedYear && years.length > 1) {
       setYear(years[years.length - 1].value)
@@ -143,7 +145,8 @@ ProductivityTable.propTypes = {
   ),
   loading: bool.isRequired,
   error: bool.isRequired,
-  showCredits: bool.isRequired
+  showCredits: bool.isRequired,
+  newProgramme: bool.isRequired
 }
 
 ProductivityTable.defaultProps = {
