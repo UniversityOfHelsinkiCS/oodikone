@@ -25,7 +25,8 @@ class PopulationDetails extends Component {
     selectedStudents: arrayOf(string).isRequired,
     queryIsSet: bool.isRequired,
     isLoading: bool.isRequired,
-    selectedStudentsByYear: shape({}).isRequired
+    selectedStudentsByYear: shape({}).isRequired,
+    query: shape({}).isRequired
   }
 
   constructor() {
@@ -145,7 +146,7 @@ class PopulationDetails extends Component {
     <div>
       <PopulationFilters ref={this.filters} samples={this.props.samples} />
       {this.renderCreditGainGraphs()}
-      {this.renderCourseStatistics()}
+      {!this.props.query.years ? this.renderCourseStatistics() : null}
       <PopulationCourses
         ref={this.courses}
         selectedStudents={this.props.selectedStudents}
@@ -220,7 +221,8 @@ const mapStateToProps = state => {
     complemented,
     translate: getTranslate(state.localize),
     queryIsSet: !!state.populations.query,
-    isLoading: state.populations.pending === true
+    isLoading: state.populations.pending === true,
+    query: state.populations.query || {}
   }
 }
 
