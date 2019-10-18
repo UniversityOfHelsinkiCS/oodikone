@@ -10,6 +10,7 @@ const StudyrightService = require('../services/studyrights')
 const UserService = require('../services/userService')
 const TagService = require('../services/tags')
 const CourseService = require('../services/courses')
+const StatMergeService = require('../services/statMerger')
 
 const filterPersonalTags = (population, userId) => {
   return {
@@ -51,7 +52,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
         })
       )
       const multicoursestats = await multicoursestatPromises
-      const result = Population.populationCourseStatsMerger(multicoursestats)
+      const result = StatMergeService.populationCourseStatsMerger(multicoursestats)
       if (result.error) {
         res.status(400).json(result)
         return
@@ -247,7 +248,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
       )
       const multipopulationstudents = await multipopulationstudentPromises
 
-      const result = Population.populationStudentsMerger(multipopulationstudents)
+      const result = StatMergeService.populationStudentsMerger(multipopulationstudents)
 
       if (result.error) {
         console.log(result.error)
