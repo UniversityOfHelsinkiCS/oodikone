@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react'
+import React, { Fragment, useState } from 'react'
 import moment from 'moment'
 import { Header, Table, Grid, Icon, Label, Segment, Dropdown, Button } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, node } from 'prop-types'
@@ -47,7 +47,6 @@ TotalPopulationLink.propTypes = {
 }
 
 const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, userRoles, history }) => {
-  const [selectedYear, setYear] = useState(null)
   const [lowerYear, setLower] = useState(null)
   const [upperYear, setUpper] = useState(null)
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
@@ -61,14 +60,6 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
         }))
         .sort((year1, year2) => Number(year2.value) - Number(year1.value))
     : []
-
-  useEffect(() => {
-    if (!selectedYear && years.length > 5) {
-      setYear(years[5].value)
-    } else if (!selectedYear && years.length > 1) {
-      setYear(years[years.length - 1].value)
-    }
-  }, [years])
 
   if (error) return <h1>Oh no so error {error}</h1>
 
@@ -86,11 +77,6 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
   let thesisTypes = []
   if (thesis) {
     thesisTypes = thesis.map(t => t.thesisType)
-  }
-
-  const handleChange = (event, { value }) => {
-    event.preventDefault()
-    setYear(value)
   }
 
   const handleLowerBoundChange = (event, { value }) => {
@@ -170,8 +156,6 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
           </Grid.Row>
         </Grid>
       </Header>
-      <div>Statistics from selected year onwards</div>
-      <Dropdown onChange={handleChange} options={years} value={selectedYear} selection />
       <Segment basic loading={loading} style={{ overflowX: 'auto' }}>
         <Table celled structured compact striped selectable className="fixed-header">
           <Table.Header>
@@ -225,7 +209,6 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
           </Table.Header>
           <Table.Body>
             {data
-              .filter(stats => Number(stats.year.substring(0, 4)) >= Number(selectedYear))
               .sort((year1, year2) => Number(year2.year.slice(0, 4)) - Number(year1.year.slice(0, 4)))
               .map(year => (
                 <Table.Row key={year.year}>
@@ -269,7 +252,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
               <Table.Row>
                 <Table.HeaderCell style={{ fontWeight: 'bold' }}>
                   Total{' '}
-                  {userRoles.includes('admin') ? (
+                  {userRoles.includes('admin') && years.length > 0 ? (
                     <TotalPopulationLink studyprogramme={studyprogramme} years={years}>
                       <Icon name="level up alternate" />
                     </TotalPopulationLink>
@@ -322,7 +305,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
           ) : null}
         </Table>
       </Segment>
-      {userRoles.includes('admin') ? (
+      {userRoles.includes('admin') && years.length > 0 ? (
         <>
           from:
           <Dropdown selection options={years} onChange={handleLowerBoundChange} value={lowerYear} />

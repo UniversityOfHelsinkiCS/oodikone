@@ -31,6 +31,7 @@ const Overview = props => {
         loading={productivity.pending}
         error={productivity.error}
         showCredits={isNewStudyprogramme(studyprogramme)}
+        newProgramme={isNewStudyprogramme(studyprogramme)}
       />
     </React.Fragment>
   )
