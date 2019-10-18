@@ -30,6 +30,7 @@ import CheckStudentList from '../CheckStudentList'
 import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
 import selector from '../../selectors/populationDetails'
+import './populationStudents.css'
 
 const popupTimeoutLength = 1000
 
@@ -320,20 +321,7 @@ class PopulationStudents extends Component {
       )
     }
 
-    const verticalTitle = title => (
-      // https://stackoverflow.com/a/41396815
-      <div
-        style={{
-          writingMode: 'vertical-rl',
-          minWidth: '32px',
-          maxHeight: '20vh',
-          overflowY: 'hidden',
-          textAlign: 'left'
-        }}
-      >
-        {title}
-      </div>
-    )
+    const verticalTitle = title => <div className="verticalTitle">{title}</div>
 
     const hasPassedMandatory = (studentNumber, code) =>
       this.props.mandatoryPassed[code] && this.props.mandatoryPassed[code].includes(studentNumber)
