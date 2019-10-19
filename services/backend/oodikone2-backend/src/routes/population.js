@@ -37,16 +37,16 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
     if (req.body.months == null) {
       req.body.months = 12
     }
-    if (req.body.years && req.body.years.length > 1) {
-      req.body.months = 2000
-    }
+
     if (req.body.years) {
+      const upperYearBound = new Date().getFullYear() + 1
       const multicoursestatPromises = Promise.all(
         req.body.years.map(year => {
           if (req.body.selectedStudentsByYear) {
             req.body.selectedStudents = req.body.selectedStudentsByYear[year]
           }
-          const query = { ...req.body, year }
+          const newMonths = (upperYearBound - Number(year)) * 12
+          const query = { ...req.body, year, months: newMonths }
           const coursestatistics = Population.bottlenecksOf(query)
           return coursestatistics
         })
@@ -236,13 +236,18 @@ router.get('/v3/populationstatistics', async (req, res) => {
     if (req.query.months == null) {
       req.query.months = 12
     }
-    if (req.query.years && req.query.years.length > 1) {
-      req.query.months = 2000
-    }
+
     if (req.query.years) {
+      const upperYearBound = new Date().getFullYear() + 1
       const multipopulationstudentPromises = Promise.all(
         req.query.years.map(year => {
-          const populationStudents = Population.optimizedStatisticsOf({ ...req.query, studyRights, year })
+          const newMonths = (upperYearBound - Number(year)) * 12
+          const populationStudents = Population.optimizedStatisticsOf({
+            ...req.query,
+            studyRights,
+            year,
+            months: newMonths
+          })
           return populationStudents
         })
       )
