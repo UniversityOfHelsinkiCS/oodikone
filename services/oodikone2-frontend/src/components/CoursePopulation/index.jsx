@@ -7,7 +7,7 @@ import qs from 'query-string'
 import { intersection, difference } from 'lodash'
 import { getCoursePopulation } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
-import { clearPopulationFilters } from '../../redux/populationFilters'
+import { getSemesters } from '../../redux/semesters'
 import PopulationStudents from '../PopulationStudents'
 
 import CustomPopulationFilters from '../CustomPopulationFilters'
@@ -19,12 +19,13 @@ import { useProgress, getStudentToTargetCourseDateMap } from '../../common'
 const CoursePopulation = ({
   getCoursePopulationDispatch,
   getSingleCourseStatsDispatch,
-  clearPopulationFiltersDispatch,
   studentData,
   pending,
   history,
   courseData,
-  selectedStudents
+  selectedStudents,
+  getSemestersDispatch,
+  semesters
 }) => {
   const parseQueryFromUrl = () => {
     const { location } = history
@@ -33,7 +34,9 @@ const CoursePopulation = ({
   }
   const [codes, setCodes] = useState([])
   const [headerYears, setYears] = useState('')
-  const [yearCodes, setYearCodes] = useState([])
+  const [dateFrom, setDateFrom] = useState(null)
+  const [dateTo, setDateTo] = useState(null)
+
   const { onProgress, progress } = useProgress(pending && !studentData.students)
   const studentToTargetCourseDateMap = useMemo(
     () => getStudentToTargetCourseDateMap(studentData.students ? studentData.students : [], codes),
@@ -41,23 +44,46 @@ const CoursePopulation = ({
   )
 
   useEffect(() => {
-    const { coursecodes, from, to, years } = parseQueryFromUrl()
-    const parsedCourseCodes = JSON.parse(coursecodes)
-    getCoursePopulationDispatch({ coursecodes, from, to, onProgress })
-    getSingleCourseStatsDispatch({
-      fromYear: from,
-      toYear: to,
-      courseCodes: parsedCourseCodes,
-      separate: false
-    })
-    setCodes(parsedCourseCodes)
-    setYearCodes([...Array(Number(to) + 1).keys()].slice(Number(from), Number(to) + 1))
-    setYears(years)
-    clearPopulationFiltersDispatch()
+    getSemestersDispatch()
   }, [])
+
+  const getFromToDates = (from, to, separate) => {
+    const targetProp = separate ? 'semestercode' : 'yearcode'
+    const data = separate ? semesters.semesters : semesters.years
+    const dataValues = Object.values(data)
+    const findDateByCode = code => dataValues.find(d => d[targetProp] === code)
+
+    return {
+      dateFrom: findDateByCode(Number(from)).startdate,
+      dateTo: findDateByCode(Number(to)).enddate
+    }
+  }
+
+  useEffect(() => {
+    if (semesters.years && semesters.semesters) {
+      const { coursecodes, from, to, years, separate } = parseQueryFromUrl()
+      const parsedCourseCodes = JSON.parse(coursecodes)
+      getCoursePopulationDispatch({ coursecodes, from, to, onProgress, separate })
+      getSingleCourseStatsDispatch({
+        fromYear: from,
+        toYear: to,
+        courseCodes: parsedCourseCodes,
+        separate
+      })
+      setCodes(parsedCourseCodes)
+      setYears(years)
+      getFromToDates(from, to, separate)
+
+      const { dateFrom, dateTo } = getFromToDates(from, to, separate ? JSON.parse(separate) : false)
+      setDateFrom(dateFrom)
+      setDateTo(dateTo)
+    }
+  }, [semesters])
 
   const header = courseData ? `${courseData.name} ${headerYears}` : null
   const subHeader = codes.join(', ')
+
+  if (!dateFrom || !dateTo) return null
 
   return (
     <div className="segmentContainer">
@@ -73,15 +99,17 @@ const CoursePopulation = ({
             studentToTargetCourseDateMap={studentToTargetCourseDateMap}
             samples={studentData.students}
             coursecodes={codes}
-            yearRange={headerYears}
+            from={dateFrom}
+            to={dateTo}
           />
           <Segment>
             <Header>Grade distribution</Header>
             <CoursePopulationGradeDist
-              yearcodes={yearCodes}
               selectedStudents={selectedStudents}
-              yearRange={headerYears}
+              from={dateFrom}
+              to={dateTo}
               samples={studentData.students}
+              codes={codes}
             />
           </Segment>
           <Segment>
@@ -110,15 +138,19 @@ const CoursePopulation = ({
 CoursePopulation.propTypes = {
   getCoursePopulationDispatch: func.isRequired,
   getSingleCourseStatsDispatch: func.isRequired,
-  clearPopulationFiltersDispatch: func.isRequired,
+  getSemestersDispatch: func.isRequired,
   pending: bool.isRequired,
   studentData: shape({}).isRequired,
   history: shape({}).isRequired,
   courseData: shape({}).isRequired,
-  selectedStudents: arrayOf(string).isRequired
+  selectedStudents: arrayOf(string).isRequired,
+  semesters: shape({
+    semesters: shape({}),
+    years: shape({})
+  }).isRequired
 }
 
-const mapStateToProps = ({ singleCourseStats, populationFilters, populations }) => {
+const mapStateToProps = ({ singleCourseStats, populationFilters, populations, semesters }) => {
   const samples = populations.data.students ? populations.data.students : []
   let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
   const { complemented } = populationFilters
@@ -140,7 +172,8 @@ const mapStateToProps = ({ singleCourseStats, populationFilters, populations }) 
     pending: populations.pending,
     query: populations.query,
     courseData: singleCourseStats.stats || {},
-    selectedStudents
+    selectedStudents,
+    semesters: semesters.data
   }
 }
 
@@ -150,7 +183,7 @@ export default withRouter(
     {
       getCoursePopulationDispatch: getCoursePopulation,
       getSingleCourseStatsDispatch: getSingleCourseStats,
-      clearPopulationFiltersDispatch: clearPopulationFilters
+      getSemestersDispatch: getSemesters
     }
   )(CoursePopulation)
 )

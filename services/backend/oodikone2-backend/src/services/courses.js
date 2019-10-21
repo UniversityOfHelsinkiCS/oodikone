@@ -644,7 +644,8 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses) => {
   const codes = await alternativeCodes(coursecode)
 
   if (unifyOpenUniCourses) {
-    const nonOpenUniCodes = codes.filter(c => !isOpenUniCourseCode(c))
+    const nonOpenUniCodes = _.uniq(codes.map(unifyOpenUniversity))
+
     const matchingOpenUniCourseCodes = nonOpenUniCodes.length
       ? await Course.findAll({
           where: {
@@ -660,7 +661,8 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses) => {
     codes.push(...matchingOpenUniCourseCodes)
   }
 
-  const [credits, course] = await Promise.all([creditsForCourses(codes), Course.findByPk(coursecode)])
+  const uniqueCodes = _.uniq(codes)
+  const [credits, course] = await Promise.all([creditsForCourses(uniqueCodes), Course.findByPk(coursecode)])
   const counter = new CourseYearlyStatsCounter()
   for (let credit of credits) {
     const {
@@ -694,7 +696,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses) => {
   return {
     ...statistics,
     coursecode,
-    alternatives: codes,
+    alternatives: uniqueCodes,
     name: course.name.fi
   }
 }

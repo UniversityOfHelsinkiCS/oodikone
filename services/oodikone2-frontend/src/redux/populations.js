@@ -43,10 +43,10 @@ export const getPopulationStatistics = ({
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }
 
-export const getCoursePopulation = ({ coursecodes, from, to, onProgress }) => {
+export const getCoursePopulation = ({ coursecodes, from, to, onProgress, separate }) => {
   const route = '/v3/populationstatisticsbycourse'
   const prefix = 'GET_STUDENTS_OF_COURSE_'
-  const params = { coursecodes, from, to }
+  const params = { coursecodes, from, to, separate }
   const query = { coursecodes, from, to, studyRights: { programme: 'KH555' } } // why is programme defined to some garbo?
 
   return callController(route, prefix, null, 'get', query, params, onProgress)

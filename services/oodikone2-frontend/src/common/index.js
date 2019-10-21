@@ -262,13 +262,13 @@ export const getNewestProgramme = (studyrights, studentNumber = null, studentToT
   return { name: 'No programme', startdate: '', code: '00000' }
 }
 
-export const getHighestGradeOfCourseBetweenRange = (courses, yearRange) => {
-  const lowerBound = `${yearRange.split('-')[0]}-08-01`
-  const upperBound = `20${yearRange.split('-')[1]}-07-31`
-
+export const getHighestGradeOfCourseBetweenRange = (courses, lowerBound, upperBound) => {
   const grades = []
   courses.forEach(course => {
-    if (lowerBound <= course.date && course.date <= upperBound) {
+    if (
+      new Date(lowerBound).getTime() <= new Date(course.date).getTime() &&
+      new Date(course.date).getTime() <= new Date(upperBound).getTime()
+    ) {
       if (course.grade === 'Hyv.') {
         grades.push({ grade: course.grade, value: 1 })
       } else if (!Number(course.grade)) {

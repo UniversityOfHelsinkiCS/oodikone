@@ -298,8 +298,9 @@ export const tagFilter = params => {
   }
 }
 
+// HERE
 export const gradeFilter = params => {
-  const { coursecodes, grade, coursename, yearRange } = params
+  const { coursecodes, grade, coursename, from, to } = params
   return {
     id: uuidv4(),
     type: 'GradeFilter',
@@ -310,7 +311,7 @@ export const gradeFilter = params => {
     },
     filter: student => {
       const courses = student.courses.filter(c => coursecodes.includes(c.course.code))
-      const highestGrade = getHighestGradeOfCourseBetweenRange(courses, yearRange)
+      const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
       return highestGrade && highestGrade.grade === grade
     }
   }
