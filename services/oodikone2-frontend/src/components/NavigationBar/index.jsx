@@ -30,7 +30,6 @@ const allNavigationItems = {
   faculty: { path: '/faculties', translateId: 'faculty', reqRights: ['faculties'] },
   usage: { path: '/usage', translateId: 'usage', reqRights: ['usage'] },
   sandbox: { path: '/sandbox', translateId: 'sandbox', reqRights: ['dev'] },
-  oodilearn: { path: '/oodilearn', translateId: 'oodilearn', reqRights: ['oodilearn'] },
   feedback: { path: '/feedback', translateId: 'feedback' }
 }
 
