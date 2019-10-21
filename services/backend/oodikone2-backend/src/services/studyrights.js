@@ -19,24 +19,6 @@ const byStudent = studentNumber => {
   })
 }
 
-const ofPopulations = conf => {
-  const studyrightRules = conf.units.map(sr => ({ [Op.eq]: sr.name }))
-
-  return Studyright.findAll({
-    where: {
-      highlevelname: {
-        [Op.or]: studyrightRules
-      },
-      prioritycode: {
-        [Op.or]: [1, 30]
-      },
-      studystartdate: {
-        [Op.between]: [conf.enrollmentDates.startDate, conf.enrollmentDates.endDate]
-      }
-    }
-  })
-}
-
 const studentNumbersWithAllStudyRightElements = async (codes, startedAfter, startedBefore) => {
   const studyrights = await StudyrightElement.findAll({
     attributes: ['studentnumber'],
@@ -388,7 +370,6 @@ const getUserAssociations = async userid => {
 module.exports = {
   byStudent,
   createStudyright,
-  ofPopulations,
   studentNumbersWithAllStudyRightElements,
   getAssociatedStudyrights,
   getAllStudyrightElementsAndAssociations,

@@ -129,7 +129,6 @@ const Studyright = sequelize.define(
     enddate: { type: Sequelize.DATE },
     givendate: { type: Sequelize.DATE },
     graduated: { type: Sequelize.INTEGER },
-    highlevelname: { type: Sequelize.STRING },
     prioritycode: { type: Sequelize.INTEGER },
     startdate: { type: Sequelize.DATE },
     studystartdate: { type: Sequelize.DATE },
