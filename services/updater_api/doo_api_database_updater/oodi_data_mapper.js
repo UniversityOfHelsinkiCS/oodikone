@@ -117,32 +117,6 @@ const getTeacherFromData = (teacher) => {
   }
 }
 
-const ELEMENT_ID = {
-  DEGREE_TITLE: 10,
-  DEGREE_STUDY_PROGRAM: 20,
-  DEGREE_MAJOR: 40,
-}
-
-const highlevelnameFromElements = elements => {
-  let subject
-  elements.forEach(element => {
-    const name = defaultNameFromTexts(element.name)
-    switch (element.element_id) {
-    case ELEMENT_ID.DEGREE_STUDY_PROGRAM:
-      subject = name
-      break
-    case ELEMENT_ID.DEGREE_MAJOR:
-      if (subject === undefined) {
-        subject = name
-      }
-      break
-    default:
-      break
-    }
-  })
-  return `${subject}`
-}
-
 const parseDate = (date, format = 'YYYY-MM-DD') => date && moment.utc(date, format).toDate()
 
 const getStudyRightFromData = (data, studentNumber) => {
@@ -155,7 +129,6 @@ const getStudyRightFromData = (data, studentNumber) => {
     givendate: parseDate(data.admission_date),
     graduated: Number(data.degree_date !== null),
     graduation_date: data.degree_date,
-    highlevelname: highlevelnameFromElements(data.elements),
     prioritycode: data.priority,
     startdate: parseDate(data.start_date),
     studystartdate: parseDate(data.study_start_date),

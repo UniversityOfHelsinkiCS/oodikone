@@ -301,7 +301,6 @@ describe('Updater works', () => {
         enddate,
         givendate,
         graduated,
-        highlevelname,
         prioritycode,
         startdate,
         studystartdate,
@@ -316,7 +315,6 @@ describe('Updater works', () => {
       expect(enddate.toISOString()).toBe(new Date('2010-04-12 00:00:00+00').toISOString())
       expect(givendate.toISOString()).toBe(new Date('2004-07-31 00:00:00+00').toISOString())
       expect(graduated).toBe(1)
-      expect(highlevelname).toBe('Teatteritiede')
       expect(prioritycode).toBe(30)
       expect(startdate.toISOString()).toBe(new Date('2004-07-31 00:00:00+00').toISOString())
       expect(studystartdate.toISOString()).toBe(new Date('2004-07-31 00:00:00+00').toISOString())
@@ -456,8 +454,7 @@ describe('Updater works', () => {
       const newStudyRight = {
         ...studyRights[0],
         studyright: {
-          ...studyRights[0].studyright,
-          highlevelname: 'Kaljatiede'
+          ...studyRights[0].studyright
         }
       }
       students[0].studyRights = [newStudyRight]
@@ -515,7 +512,6 @@ describe('Updater works', () => {
         }
       })
       expect(updatedStudyRights.length).toBe(1)
-      expect(updatedStudyRights[0].highlevelname).toBe('Kaljatiede')
       // theres really not a lot to test here since everything related to studyrights are just rewritten
     })
   })
