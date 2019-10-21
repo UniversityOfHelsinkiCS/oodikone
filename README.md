@@ -48,7 +48,6 @@ The development environment is entirely configured in the docker-compose.yml fil
 - Frontend
 - Backend
 - Userservice
-- Oodilearn
 - The databases used by the services
 - Adminer & other dev tools
 
