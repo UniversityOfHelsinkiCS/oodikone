@@ -58,11 +58,6 @@ restore_psql_from_backup () {
     docker exec $2 pg_restore -U postgres --no-owner -F c --dbname=$3 -j4 /asd.sqz
 }
 
-# oodilearn
-# restore_mongodb_from_backup () {
-#     docker exec -t mongo_db mongorestore -d oodilearn "/dump"
-# }
-
 ping_psql () {
     drop_psql $1 $2
     echo "Creating psql in container $1 with db name $2"
