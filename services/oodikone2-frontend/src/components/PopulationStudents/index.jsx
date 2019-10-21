@@ -166,7 +166,7 @@ class PopulationStudents extends Component {
       if (programme) {
         return programme.name
       }
-      return 'No programme'
+      return null
     }
 
     const studytrack = studyrights => {
@@ -283,7 +283,8 @@ class PopulationStudents extends Component {
         {
           key: 'programme',
           title: 'studyprogramme',
-          getRowVal: s => mainProgramme(s.studyrights, s.studentNumber)
+          getRowVal: s =>
+            getTextIn(mainProgramme(s.studyrights, s.studentNumber), this.props.language) || 'No programme'
         },
         {
           key: 'startyear',
