@@ -155,7 +155,6 @@ const formatStudent = ({
       : studyrights.map(
           ({
             studyrightid,
-            highlevelname,
             startdate,
             enddate,
             canceldate,
@@ -165,7 +164,6 @@ const formatStudent = ({
             studyright_elements
           }) => ({
             studyrightid,
-            highlevelname,
             extentcode,
             startdate,
             graduationDate: graduation_date,

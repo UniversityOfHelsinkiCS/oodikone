@@ -186,7 +186,6 @@ const generateStudyrights = async (students, organization, amount, date, priorit
       extentcode: numberFromTo(2, 99),
       givendate: daysAgo(365 * numberFromTo(1, 100)),
       graduated: null,
-      highlevelname: possibleStudyrightNames[numberFromTo(0, amount - 1)] || faker.company.catchPhrase(),
       prioritycode: prioritycode || numberFromTo(1, 30),
       startdate: date,
       studystartdate: date,
@@ -235,26 +234,6 @@ const generateTagStudents = (students, tags) => {
   return tag_students
 }
 
-const generateUnits = (amount, studyrights) => {
-  const units = []
-  if (!studyrights) {
-    const number = amount || numberFromTo(10, 100)
-    for (let i = 0; i < number; i++) {
-      units.push({
-        name: faker.company.catchPhrase(),
-        enabled: false
-      })
-    }
-  } else {
-    studyrights.forEach(studyright => {
-      if (!units.find(unit => unit.name === studyright.highlevelname)) {
-        units.push({ name: studyright.highlevelname, enabled: false })
-      }
-    })
-  }
-  return units
-}
-
 module.exports = {
   generateCourses,
   generateCourseInstances,
@@ -265,7 +244,6 @@ module.exports = {
   generateCourseTeachers,
   generateOrganizations,
   generateUsers,
-  generateUnits,
   generateTags,
   generateTagStudents
 }

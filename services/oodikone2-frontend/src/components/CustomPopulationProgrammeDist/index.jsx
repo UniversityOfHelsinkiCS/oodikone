@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Progress } from 'semantic-ui-react'
 import { func, arrayOf, string, shape } from 'prop-types'
+import { getActiveLanguage } from 'react-localize-redux'
 
 import SearchResultTable from '../SearchResultTable'
 import { programmeFilter } from '../../populationFilters'
 import { setPopulationFilter, removePopulationFilter } from '../../redux/populationFilters'
-import { getNewestProgramme } from '../../common'
+import { getNewestProgramme, getTextIn } from '../../common'
 
 const CustomPopulationProgrammeDist = ({
   samples,
@@ -14,7 +15,8 @@ const CustomPopulationProgrammeDist = ({
   setPopulationFilterDispatch,
   removePopulationFilterDispatch,
   filters,
-  studentToTargetCourseDateMap
+  studentToTargetCourseDateMap,
+  language
 }) => {
   const [tableRows, setRows] = useState([])
   useEffect(() => {
@@ -31,17 +33,17 @@ const CustomPopulationProgrammeDist = ({
         }
       } else {
         if (!allProgrammes['00000']) {
-          allProgrammes['00000'] = { programme: { name: 'No programme', code: '' }, students: [] }
+          allProgrammes['00000'] = { programme: { name: { en: 'No programme' } }, students: [] }
         }
         allProgrammes['00000'].students.push({ studentnumber: student.studentnumber })
       }
     })
-    const rows = Object.keys(allProgrammes).map(code => [
-      `${allProgrammes[code].programme.name}, ${code}`,
-      allProgrammes[code].students.length,
+    const rows = Object.entries(allProgrammes).map(([code, { programme, students }]) => [
+      `${getTextIn(programme.name, language)}, ${code}`,
+      students.length,
       <Progress
         style={{ margin: '0px' }}
-        percent={Math.round((allProgrammes[code].students.length / selectedStudents.length) * 100)}
+        percent={Math.round((students.length / selectedStudents.length) * 100)}
         progress
       />
     ])
@@ -80,11 +82,15 @@ CustomPopulationProgrammeDist.propTypes = {
   setPopulationFilterDispatch: func.isRequired,
   removePopulationFilterDispatch: func.isRequired,
   filters: arrayOf(shape({})).isRequired,
-  studentToTargetCourseDateMap: shape({})
+  studentToTargetCourseDateMap: shape({}),
+  language: string.isRequired
 }
 
-const mapStateToProps = ({ populationFilters }) => {
-  return { filters: populationFilters.filters.filter(f => f.type === 'ProgrammeFilter') }
+const mapStateToProps = ({ populationFilters, localize }) => {
+  return {
+    filters: populationFilters.filters.filter(f => f.type === 'ProgrammeFilter'),
+    language: getActiveLanguage(localize).code
+  }
 }
 
 export default connect(
