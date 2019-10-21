@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { func, shape, string, arrayOf } from 'prop-types'
 import { programmeFilter } from '../../populationFilters'
-import { textAndDescriptionSearch, getNewestProgramme } from '../../common'
+import { textAndDescriptionSearch, getNewestProgramme, getTextIn } from '../../common'
 
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -25,17 +25,15 @@ const ProgrammeFilter = ({
     samples.forEach(student => {
       const programme = getNewestProgramme(student.studyrights, student.studentNumber, studentToTargetCourseDateMap)
       if (programme) {
-        if (allProgrammes[programme.code]) {
-          allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
-        } else {
+        if (!allProgrammes[programme.code]) {
           allProgrammes[programme.code] = { programme, students: [] }
-          allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
         }
+        allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
       }
     })
     const optionsToSet = Object.keys(allProgrammes).map(code => ({
       key: code,
-      text: allProgrammes[code].programme.name,
+      text: getTextIn(allProgrammes[code].programme.name, language),
       value: code,
       description: code
     }))
