@@ -173,6 +173,7 @@ const PopulationSearchForm = props => {
     setDidMount(true)
     return () => {
       if (fetchPopulationPromises.current) fetchPopulationPromises.current.cancel()
+      props.clearPopulationFilters()
     }
   }, [location.search])
 
