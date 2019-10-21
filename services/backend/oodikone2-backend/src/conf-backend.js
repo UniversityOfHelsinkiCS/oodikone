@@ -18,7 +18,6 @@ const DB_SCHEMA = process.env.DB_SCHEMA || 'public'
 const DB_SCHEMA_KONE = process.env.DB_SCHEMA_KONE || 'public'
 const CERT_PATH = process.env.CERT_PATH // production/staging only
 const KEY_PATH = process.env.KEY_PATH // production/staging only
-const OODILEARN_URL = process.env.OODILEARN_URL
 const USERSERVICE_URL = process.env.USERSERVICE_URL
 const UPDATER_URL = process.env.UPDATER_URL
 const USAGESERVICE_URL = process.env.USAGESERVICE_URL
@@ -78,7 +77,6 @@ module.exports = {
   CERT_PATH,
   KEY_PATH,
   FEATURES,
-  OODILEARN_URL,
   USERSERVICE_URL: formatURL(USERSERVICE_URL),
   ACCESS_TOKEN_HEADER_KEY,
   PORT,

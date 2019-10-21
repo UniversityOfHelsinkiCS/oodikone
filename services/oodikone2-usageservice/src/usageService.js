@@ -16,7 +16,6 @@ const wildcarded = url => {
     url.includes('/students/') ||
     url.includes('/teachers/') ||
     url.includes('/users/') ||
-    url.includes('oodilearn/student') ||
     url.includes('courseGroups/')
   ) {
     return url.replace(/\d/g, '0')
@@ -38,18 +37,6 @@ const wildcarded = url => {
   ) {
     const aa = url.split('/')
     aa[aa.length - 2] = '00000'
-    return aa.join('/')
-  }
-
-  if (url.includes('oodilearn/courses/')) {
-    const aa = url.split('/')
-    aa[aa.length - 1] = '00000'
-    return aa.join('/')
-  }
-
-  if (url.includes('oodilearn/') && !url.includes('ping') && !url.includes('populations')) {
-    const aa = url.split('/')
-    aa[aa.length - 1] = '00000'
     return aa.join('/')
   }
 

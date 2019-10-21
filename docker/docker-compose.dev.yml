@@ -149,23 +149,7 @@ networks:
   # mongo_db:
   #   image: mongo
   #   volumes:
-  #     - ./backups/mongo/oodilearn:/dump
   #     - ./mongodata:/data/db
   #   ports:
   #     - "27017:27017"
   #   container_name: mongo_db
-
-  # oodilearn:
-  #   build:
-  #     context: services/oodilearn/server
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - ./services/oodilearn/data:/data
-  #     - ./services/oodilearn/server:/src
-  #     - ./services/oodilearn/models:/models
-  #   ports:
-  #     - "5000:5000"
-  #   environment:
-  #     - ENV=development
-  #     - MONGO_URI=mongodb://mongo_db:27017/oodilearn
-  #   container_name: oodilearn
