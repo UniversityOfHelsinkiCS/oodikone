@@ -37,7 +37,8 @@ const CustomPopulationFilters = ({
   setComplementFilterDispatch,
   allStudyrights,
   coursecodes,
-  yearRange
+  from,
+  to
 }) => {
   const [visible, setVisible] = useState(false)
 
@@ -79,7 +80,8 @@ const CustomPopulationFilters = ({
             samples,
             allStudyrights,
             coursecodes,
-            yearRange
+            from,
+            to
           })
         })}
         <Button onClick={() => setVisible(false)}>cancel</Button>
@@ -131,8 +133,9 @@ const CustomPopulationFilters = ({
 }
 
 CustomPopulationFilters.defaultProps = {
-  yearRange: '',
-  coursecodes: []
+  coursecodes: [],
+  from: '',
+  to: ''
 }
 
 CustomPopulationFilters.propTypes = {
@@ -143,7 +146,8 @@ CustomPopulationFilters.propTypes = {
   setComplementFilterDispatch: func.isRequired,
   coursecodes: arrayOf(string),
   allStudyrights: shape({}).isRequired,
-  yearRange: string
+  from: string,
+  to: string
 }
 
 const mapStateToProps = ({ populationFilters, populations }) => ({

@@ -1,7 +1,7 @@
 import React from 'react'
 import qs from 'query-string'
 import { Link } from 'react-router-dom'
-import { arrayOf, number, oneOfType, shape, string } from 'prop-types'
+import { arrayOf, number, oneOfType, shape, string, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { Header, Icon, Item } from 'semantic-ui-react'
 import { uniq } from 'lodash'
@@ -49,14 +49,20 @@ const getGradeColumns = isGradeSeries =>
       ]
     : THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s[k]))
 
-const GradesTable = ({ stats, name, alternatives }) => {
+const GradesTable = ({ stats, name, alternatives, separate }) => {
   const {
     cumulative: { grades }
   } = stats[0]
   const isGradeSeries = !isThesisGrades(grades)
 
   const showPopulation = (yearcode, years) => {
-    const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(alternatives)), years }
+    const queryObject = {
+      from: yearcode,
+      to: yearcode,
+      coursecodes: JSON.stringify(uniq(alternatives)),
+      years,
+      separate
+    }
     const searchString = qs.stringify(queryObject)
     return `/coursepopulation?${searchString}`
   }
@@ -94,9 +100,16 @@ const GradesTable = ({ stats, name, alternatives }) => {
     </div>
   )
 }
+
 GradesTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  alternatives: arrayOf(string).isRequired
+  alternatives: arrayOf(string).isRequired,
+  separate: bool
 }
+
+GradesTable.defaultProps = {
+  separate: false
+}
+
 export default connect(null)(GradesTable)

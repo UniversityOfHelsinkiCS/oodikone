@@ -15,9 +15,11 @@ const CoursePopulationCreditDist = ({
   selectedStudents,
   setPopulationFilterDispatch,
   removePopulationFilterDispatch,
-  yearRange,
   samples,
-  filters
+  filters,
+  codes,
+  from,
+  to
 }) => {
   const [courseGrades, setGrades] = useState([])
   useEffect(() => {
@@ -26,8 +28,8 @@ const CoursePopulationCreditDist = ({
 
       const grades = {}
       samples.forEach(student => {
-        const courses = student.courses.filter(c => singleCourseStats.alternatives.includes(c.course.code))
-        const highestGrade = getHighestGradeOfCourseBetweenRange(courses, yearRange)
+        const courses = student.courses.filter(c => codes.includes(c.course.code))
+        const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
         if (highestGrade) {
           if (!grades[highestGrade.grade]) {
             grades[highestGrade.grade] = []
@@ -48,9 +50,10 @@ const CoursePopulationCreditDist = ({
     setPopulationFilterDispatch(
       gradeFilter({
         grade: row[0],
-        coursecodes: singleCourseStats.alternatives,
+        coursecodes: codes,
         coursename: singleCourseStats.name,
-        yearRange
+        from,
+        to
       })
     )
   }
@@ -87,13 +90,15 @@ const CoursePopulationCreditDist = ({
 
 CoursePopulationCreditDist.propTypes = {
   singleCourseStats: shape({}).isRequired,
-  yearRange: string.isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   setPopulationFilterDispatch: func.isRequired,
   removePopulationFilterDispatch: func.isRequired,
   samples: arrayOf(shape({})).isRequired,
-  filters: arrayOf(shape({})).isRequired
+  filters: arrayOf(shape({})).isRequired,
+  codes: arrayOf(string).isRequired,
+  from: string.isRequired,
+  to: string.isRequired
 }
 
 const mapStateToProps = ({ singleCourseStats, populationFilters }) => ({

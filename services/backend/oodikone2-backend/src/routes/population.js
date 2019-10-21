@@ -333,23 +333,30 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
 })
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
-  const { coursecodes, from, to } = req.query
+  const { coursecodes, from, to, separate: sep } = req.query
   const { decodedToken, roles } = req
+  const separate = sep ? JSON.parse(sep) : false
 
   if (!coursecodes || !from || !to) {
     return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
   }
 
   const maxYearsToCreatePopulationFrom = await CourseService.maxYearsToCreatePopulationFrom(JSON.parse(coursecodes))
-  if (Math.abs(to - from + 1) > maxYearsToCreatePopulationFrom) {
+  const toFromDiff = Math.abs(to - from + 1)
+  // 2 semesters = 1 year
+  const requestedYearsToCreatePopulationFrom = Math.ceil(separate ? toFromDiff / 2 : toFromDiff)
+  if (requestedYearsToCreatePopulationFrom > maxYearsToCreatePopulationFrom) {
     return res.status(400).json({ error: `Max years to create population from is ${maxYearsToCreatePopulationFrom}` })
   }
+
   const semesters = ['FALL', 'SPRING']
-  const studentnumbers = await Student.findByCourseAndSemesters(JSON.parse(coursecodes), from, to)
+  const studentnumbers = await Student.findByCourseAndSemesters(JSON.parse(coursecodes), from, to, separate)
 
   try {
     const result = await Population.optimizedStatisticsOf(
       {
+        // Useless, because studentnumbers are already filtered above by from & to.
+        // We should probably refactor this to avoid more confusement.
         year: 1900,
         studyRights: [],
         semesters,
