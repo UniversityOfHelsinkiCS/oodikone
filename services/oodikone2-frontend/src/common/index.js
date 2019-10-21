@@ -249,7 +249,7 @@ export const getNewestProgramme = (studyrights, studentNumber = null, studentToT
         (a, b) => new Date(b.startdate) - new Date(a.startdate)
       )[0]
       studyprogrammes.push({
-        name: sr.highlevelname,
+        name: newestStudyrightElement.element_detail.name,
         startdate: newestStudyrightElement.startdate,
         code: newestStudyrightElement.element_detail.code
       })
@@ -259,7 +259,7 @@ export const getNewestProgramme = (studyrights, studentNumber = null, studentToT
   if (programme) {
     return programme
   }
-  return { name: 'No programme', startdate: '', code: '00000' }
+  return { name: { en: 'No programme' }, startdate: '', code: '00000' }
 }
 
 export const getHighestGradeOfCourseBetweenRange = (courses, lowerBound, upperBound) => {
