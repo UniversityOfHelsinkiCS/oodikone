@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
 import { Header, Segment, Grid, Message, Button } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { func, bool, oneOfType, shape, string } from 'prop-types'
+import { bool, oneOfType, shape, string } from 'prop-types'
 import './index.css'
-import { pingOodiLearn } from '../../redux/sandbox'
 import Postman from '../Postman'
 import UpdateTopTeachers from './UpdateTopTeachers'
 
@@ -38,7 +37,6 @@ class SandboxContainer extends Component {
                   />
                 </Segment>
                 <Segment basic loading={this.props.pending}>
-                  <Button primary fluid content="Ping OodiLearn" icon="student" onClick={this.props.pingOodiLearn} />
                   <Message error={this.props.error} content={this.props.error ? 'Error.' : this.props.data} />
                 </Segment>
                 <Segment basic>
@@ -57,7 +55,6 @@ class SandboxContainer extends Component {
 }
 
 SandboxContainer.propTypes = {
-  pingOodiLearn: func.isRequired,
   error: bool.isRequired,
   pending: bool.isRequired,
   data: oneOfType([string, shape({})])
@@ -73,7 +70,4 @@ const mapStateToProps = ({ sandbox }) => ({
   data: sandbox.data
 })
 
-export default connect(
-  mapStateToProps,
-  { pingOodiLearn }
-)(SandboxContainer)
+export default connect(mapStateToProps)(SandboxContainer)

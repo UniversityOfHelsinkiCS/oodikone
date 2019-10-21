@@ -32,16 +32,7 @@ import courseDisciplines from './coursedisciplines'
 import courseSearch from './coursesearch'
 import courseStats from './coursestats'
 import courseSummaryForm from './coursesSummaryForm'
-import sandbox from './sandbox'
 import ping from './ping'
-import oodilearnStudent from './oodilearnStudent'
-import oodilearnCourses from './oodilearnCourses'
-import oodilearnCourse from './oodilearnCourse'
-import oodilearnCluster from './oodilearnCluster'
-import oodilearnPopulations from './oodilearnPopulations'
-import oodilearnPopulation from './oodilearnPopulation'
-import oodilearnPopulationForm from './oodilearnPopulationForm'
-import oodilearnPopulationCourseSelect from './oodilearnPopulationCourseSelect'
 import thesisCourses from './thesisCourses'
 import accessGroups from './accessGroups'
 import feedback from './feedback'
@@ -87,16 +78,7 @@ export default combineReducers({
   courseSearch,
   courseStats,
   courseSummaryForm,
-  sandbox,
   ping,
-  oodilearnStudent,
-  oodilearnCourses,
-  oodilearnCourse,
-  oodilearnCluster,
-  oodilearnPopulations,
-  oodilearnPopulation,
-  oodilearnPopulationForm,
-  oodilearnPopulationCourseSelect,
   thesisCourses,
   accessGroups,
   elementdetails,

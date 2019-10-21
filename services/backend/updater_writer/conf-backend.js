@@ -15,7 +15,6 @@ const redis = process.env.REDIS
 const TOKEN_SECRET = process.env.TOKEN_SECRET
 const CERT_PATH = process.env.CERT_PATH // production/staging only
 const KEY_PATH = process.env.KEY_PATH // production/staging only
-const OODILEARN_URL = process.env.OODILEARN_URL
 const USERSERVICE_URL = process.env.USERSERVICE_URL
 const USAGESERVICE_URL = process.env.USAGESERVICE_URL
 const ANALYTICS_URL = process.env.ANALYTICS_URL
@@ -68,7 +67,6 @@ module.exports = {
   CERT_PATH,
   KEY_PATH,
   FEATURES,
-  OODILEARN_URL,
   USERSERVICE_URL: formatURL(USERSERVICE_URL),
   ACCESS_TOKEN_HEADER_KEY,
   PORT,
