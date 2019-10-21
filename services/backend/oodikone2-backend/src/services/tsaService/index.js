@@ -22,7 +22,7 @@ const influxHttp = axios.create({
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded'
   },
-  withCredentials: false,
+  withCredentials: true,
   auth: null
 })
 
@@ -34,9 +34,11 @@ const write = obj => {
   return influxHttp.post('/write', payload, {
     params: {
       db: ANALYTICS_INFLUXDB_DB,
-      u: ANALYTICS_INFLUXDB_USER,
-      p: ANALYTICS_INFLUXDB_PASSWORD,
       precision: 'ms' // date.getTime() timestamps
+    },
+    auth: {
+      username: ANALYTICS_INFLUXDB_USER,
+      password: ANALYTICS_INFLUXDB_PASSWORD
     }
   })
 }
