@@ -92,7 +92,6 @@ const formatStudentForPopulationStatistics = (
       : studyrights.map(
           ({
             studyrightid,
-            highlevelname,
             startdate,
             canceldate,
             extentcode,
@@ -102,7 +101,6 @@ const formatStudentForPopulationStatistics = (
             prioritycode
           }) => ({
             studyrightid,
-            highlevelname,
             extentcode,
             startdate,
             graduationDate: graduation_date,
@@ -235,15 +233,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       },
       {
         model: Studyright,
-        attributes: [
-          'studyrightid',
-          'startdate',
-          'highlevelname',
-          'extentcode',
-          'graduated',
-          'canceldate',
-          'prioritycode'
-        ],
+        attributes: ['studyrightid', 'startdate', 'extentcode', 'graduated', 'canceldate', 'prioritycode'],
         separate: true,
         include: [
           {
