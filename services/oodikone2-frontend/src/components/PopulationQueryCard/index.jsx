@@ -25,8 +25,10 @@ const PopulationQueryCard = ({
     history.push('/populations')
     removeSampleFn(uuid)
   }
-  const { uuid, year, semesters, months, studentStatuses, tag } = query
+  const { uuid, year, semesters, months, studentStatuses, tag, years } = query
   const tagname = tag ? tags.find(t => t.tag_id === tag).tagname : ''
+  const lowestYear = query.years ? Math.min(...query.years.map(year => Number(year))) : null
+  const highestYear = query.years ? Math.max(...query.years.map(year => Number(year))) : null
   const { students } = population
   if (students.length > 0) {
     return (
@@ -42,11 +44,11 @@ const PopulationQueryCard = ({
         <Card.Meta>
           <div className="dateItem">
             <Icon name="calendar" size="small" />
-            {tag
+            {!years
               ? `${semesters.map(s => translate(`populationStatistics.${s}`))}/
                 ${year}-${Number(year) + 1}, showing ${months} months.`
               : `${semesters.map(s => translate(`populationStatistics.${s}`))}/
-                ${year}-${Number(year) + 1}, showing ${months} months.`}
+                started during ${lowestYear}-${highestYear}`}
           </div>
           {tag ? <div>{`Tagged with: ${tagname}`}</div> : null}
           <div>{`${translate('populationStatistics.sampleSize', { amount: students.length })} `}</div>

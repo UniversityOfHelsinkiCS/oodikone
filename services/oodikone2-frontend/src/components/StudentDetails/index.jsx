@@ -5,7 +5,6 @@ import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Table, Icon, Label, Header, Loader, Item } from 'semantic-ui-react'
 import { isEmpty, sortBy, flattenDeep, cloneDeep } from 'lodash'
 import moment from 'moment'
-import qs from 'query-string'
 import { withRouter, Link } from 'react-router-dom'
 import { getStudent, removeStudentSelection, resetStudent } from '../../redux/students'
 import { getSemesters } from '../../redux/semesters'
@@ -126,14 +125,6 @@ class StudentDetails extends Component {
     )
   }
 
-  pushQueryToUrl = query => {
-    const { courseCodes, ...rest } = query
-    const queryObject = { ...rest, courseCodes: JSON.stringify(courseCodes) }
-    const searchString = qs.stringify(queryObject)
-    this.props.clearCourseStats()
-    return `/coursestatistics?${searchString}`
-  }
-
   showPopulationStatistics = (studyprogramme, date) => {
     const year = moment(date).isBefore(moment(`${date.slice(0, 4)}-08-01`)) ? date.slice(0, 4) - 1 : date.slice(0, 4)
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
@@ -208,6 +199,7 @@ class StudentDetails extends Component {
     ]
 
     const courseRowsByAcademicYear = {}
+
     student.courses.sort(byDateDesc).forEach(c => {
       const { date, grade, credits, course, isStudyModuleCredit, passed } = c
       let icon = null
@@ -218,7 +210,6 @@ class StudentDetails extends Component {
       } else {
         icon = <Icon name="circle outline" color="red" />
       }
-      const year = moment(new Date(date)).diff(new Date('1950-1-1'), 'years')
 
       if (!courseRowsByAcademicYear[`${new Date(date).getFullYear()}-${new Date(date).getFullYear() + 1}`]) {
         courseRowsByAcademicYear[`${new Date(date).getFullYear()}-${new Date(date).getFullYear() + 1}`] = []
@@ -242,15 +233,9 @@ class StudentDetails extends Component {
           credits,
           <Item
             as={Link}
-            to={this.pushQueryToUrl({
-              courseCodes: [course.code],
-              separate: false,
-              unifyOpenUniCourses: false,
-              fromYear: year - 1,
-              toYear: year + 1
-            })}
+            to={`/coursestatistics?courseCodes=["${course.code}"]&separate=false&unifyOpenUniCourses=false`}
           >
-            <Icon name="level up alternate" />
+            <Icon name="level up alternate" onClick={() => this.props.clearCourseStats()} />
           </Item>
         ])
       } else {
@@ -268,14 +253,9 @@ class StudentDetails extends Component {
           credits,
           <Item
             as={Link}
-            to={this.pushQueryToUrl({
-              courseCodes: [course.code],
-              separate: false,
-              fromYear: year - 1,
-              toYear: year + 1
-            })}
+            to={`/coursestatistics?courseCodes=["${course.code}"]&separate=false&unifyOpenUniCourses=false`}
           >
-            <Icon name="level up alternate" />
+            <Icon name="level up alternate" onClick={() => this.props.clearCourseStats()} />
           </Item>
         ])
       }
