@@ -119,7 +119,7 @@ const ResultTabs = props => {
 
   return (
     <div>
-      <Tab panes={getPanes()} onTabChange={handleTabChange} activeIndex={tab} />
+      <Tab id="CourseStatPanes" panes={getPanes()} onTabChange={handleTabChange} activeIndex={tab} />
     </div>
   )
 }
