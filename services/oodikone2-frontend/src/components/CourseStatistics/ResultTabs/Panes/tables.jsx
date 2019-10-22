@@ -21,15 +21,17 @@ const Tables = ({ primary, comparison, viewMode, alternatives }) => {
     }
   }
 
-  const getTables = series => {
+  const getTables = (series, isPrimary) => {
     const { name, stats } = series
 
-    return <Grid.Column>{getViewMode(name, stats)}</Grid.Column>
+    return (
+      <Grid.Column id={isPrimary ? 'PrimaryDataTable' : 'ComparisonDataTable'}>{getViewMode(name, stats)}</Grid.Column>
+    )
   }
   return (
     <Fragment>
-      {primary && getTables(primary)}
-      {comparison && getTables(comparison)}
+      {primary && getTables(primary, true)}
+      {comparison && getTables(comparison, false)}
     </Fragment>
   )
 }
