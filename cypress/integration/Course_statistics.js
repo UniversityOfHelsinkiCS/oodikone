@@ -1,3 +1,4 @@
+/// <reference types="Cypress" />
 
 describe('Course Statistics tests', () => {
   beforeEach(() => {
