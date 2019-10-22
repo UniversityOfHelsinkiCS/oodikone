@@ -8,7 +8,7 @@ const YearFilter = ({ years, fromYear, toYear, handleChange }) => (
       <Form.Dropdown
         label="From:"
         name="fromYear"
-        options={years}
+        options={toYear ? years.filter(({ value }) => value <= toYear) : years}
         selection
         inline
         placeholder="Select academic year"
@@ -20,7 +20,7 @@ const YearFilter = ({ years, fromYear, toYear, handleChange }) => (
       <Form.Dropdown
         label="To:"
         name="toYear"
-        options={years}
+        options={fromYear ? years.filter(({ value }) => value >= fromYear) : years}
         inline
         selection
         placeholder="Select academic year"
