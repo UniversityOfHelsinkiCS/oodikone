@@ -1,3 +1,4 @@
+/// <reference types="Cypress" />
 
 describe('Population Statistics tests', () => {
   beforeEach(() => {
@@ -191,7 +192,7 @@ describe('Population Statistics tests', () => {
     cy.contains("and at least").parentsUntil("form").contains("set filter").click()
 
     checkAmountOfStudents(0)
-  
+
     cy.get('.filter-segment').its('length')
       .then(originalLength => {
         cy.contains('.filter-segment', 'Laskennan mallit').should('exist')
