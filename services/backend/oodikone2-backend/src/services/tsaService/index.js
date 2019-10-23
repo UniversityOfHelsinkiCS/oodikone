@@ -48,17 +48,24 @@ const sendTsaEvent = (userId, { group, name, label, value }) => {
     return Promise.resolve()
   }
 
-  let fields = {}
-  if (label) fields.eventLabel = label
-  if (value) fields.eventValue = value
+  if (!value) {
+    throw new Error('Value is required')
+  }
 
   // note: influxdb line protocol supports multiple events per write
   // so if we need that in the future, it can be implemented instead of
   // looping
   return write({
     measurement: 'oodikone_tsa_event',
-    tags: { userId, eventGroup: group, eventName: name },
-    fields: fields,
+    tags: {
+      userId,
+      eventGroup: group,
+      eventName: name,
+      eventLabel: label
+    },
+    fields: {
+      eventValue: value
+    },
     timestamp: new Date()
   })
 }

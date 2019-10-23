@@ -140,7 +140,12 @@ const PopulationSearchForm = props => {
     const query = parseQueryFromUrl()
 
     if (query.studyRights && query.studyRights.programme) {
-      TSA.sendEvent({ group: 'Programme Usage', name: 'populations query', label: query.studyRights.programme })
+      TSA.sendEvent({
+        group: 'Programme Usage',
+        name: 'populations query',
+        label: query.studyRights.programme,
+        value: 1
+      })
     }
 
     if (!checkPreviousQuery(query, previousQuery)) {
