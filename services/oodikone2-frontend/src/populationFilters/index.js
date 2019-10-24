@@ -298,7 +298,6 @@ export const tagFilter = params => {
   }
 }
 
-// HERE
 export const gradeFilter = params => {
   const { coursecodes, grade, coursename, from, to } = params
   return {
