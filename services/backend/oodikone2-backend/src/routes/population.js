@@ -383,12 +383,12 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
         .createHash('md5')
         .update(`${studentNumber}${randomHash}`)
         .digest('hex'),
-      firstnames: 'Obfuscated',
-      lastname: 'Obfuscated',
-      name: 'Obfuscated',
-      email: 'Obfuscated',
+      firstnames: '',
+      lastname: '',
+      name: '',
+      email: '',
       started: null,
-      credits: 'Obfuscated',
+      credits: '',
       tags: [],
       obfuscated: true
     })

@@ -204,7 +204,11 @@ class PopulationStudents extends Component {
       {
         key: 'studentnumber',
         title: 'student number',
-        getRowVal: s => (!s.obfuscated ? s.studentNumber : 'Obfuscated'),
+        getRowVal: s => (
+          <span style={s.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
+            {!s.obfuscated ? s.studentNumber : 'hidden'}
+          </span>
+        ),
         headerProps: { colSpan: 2 }
       },
       {
@@ -266,7 +270,7 @@ class PopulationStudents extends Component {
     columns.push({
       key: 'tags',
       title: 'tags',
-      getRowVal: s => (!s.obfuscated ? tags(s.tags) : 'Obfuscated')
+      getRowVal: s => (!s.obfuscated ? tags(s.tags) : '')
     })
 
     if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
@@ -289,7 +293,7 @@ class PopulationStudents extends Component {
         {
           key: 'startyear',
           title: 'start year at university',
-          getRowVal: s => (!s.obfuscated ? reformatDate(s.started, 'YYYY') : 'Obfuscated')
+          getRowVal: s => (!s.obfuscated ? reformatDate(s.started, 'YYYY') : '')
         }
       )
     }
