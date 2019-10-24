@@ -18,7 +18,7 @@
   "dependencies": {
     "cron": "^1.7.1",
     "express": "^4.17.1",
-    "mongoose": "^5.6.6",
+    "mongoose": "^5.7.5",
     "node-nats-streaming": "^0.2.6",
     "nodemon": "^1.19.1",
     "winston": "^3.2.1",

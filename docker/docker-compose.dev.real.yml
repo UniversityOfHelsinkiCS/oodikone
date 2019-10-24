@@ -1,10 +1,15 @@
 version: '3.2'
 
 services:
+  nats:
+    volumes:
+      - datastore-real:/datastore
+
   backend:
     environment:
       DB_URL: postgres://postgres@db:5432/tkt_oodi_real
       DB_URL_KONE: postgres://postgres@db_kone:5432/db_kone_real
+
   userservice:
     environment:
       DB_URL: postgres://postgres@user_db:5432/user_db_real
@@ -16,3 +21,16 @@ services:
   updater_writer:
     environment:
       DB_URL: postgres://postgres@db:5432/tkt_oodi_real
+
+  redis:
+    volumes:
+      - redis-data-real:/data
+
+  scheduler_mongo:
+    volumes:
+      - mongodata-real:/data/db
+
+volumes:
+  datastore-real:
+  redis-data-real:
+  mongodata-real:
