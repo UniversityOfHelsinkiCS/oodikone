@@ -9,6 +9,13 @@ import { getUserRoles } from '../../../common'
 import InfoBox from '../../InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
 
+const getMonths = year => {
+  const end = moment()
+  const lastDayOfMonth = moment(end).endOf('month')
+  const start = `${year}-08-01`
+  return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
+}
+
 const PopulationStatisticsLink = ({ studyprogramme, year: yearLabel, children }) => {
   const year = Number(yearLabel.slice(0, 4))
   const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
@@ -24,9 +31,13 @@ const PopulationStatisticsLink = ({ studyprogramme, year: yearLabel, children })
 
 const TotalPopulationLink = ({ years, studyprogramme, children }) => {
   const yearsString = years.map(year => year.value).join('&years=')
+  const months = getMonths(Math.min(...years.map(year => Number(year.value))))
   const href =
-    `/populations?months=200&semesters=FALL&semesters=` +
-    `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${years[0].value}&years=${yearsString}`
+    years.length > 1
+      ? `/populations?months=${months}&semesters=FALL&semesters=` +
+        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${years[0].value}&years=${yearsString}`
+      : `/populations?months=${months}&semesters=FALL&semesters=` +
+        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${years[0].value}&years[]=${yearsString}`
   return (
     <Link title="Population statistics of all years" to={href}>
       {children}
@@ -55,7 +66,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
     ? data
         .map(stats => ({
           key: stats.year.substring(0, 4),
-          text: stats.year.substring(0, 4),
+          text: stats.year,
           value: stats.year.substring(0, 4)
         }))
         .sort((year1, year2) => Number(year2.value) - Number(year1.value))
@@ -101,11 +112,19 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
 
   const pushQueryToUrl = () => {
     const yearRange = range(Number(lowerYear), Number(upperYear) + 1)
+    const months = getMonths(Number(lowerYear))
     const yearsString = yearRange.join('&years=')
-    history.push(
-      `/populations?months=200&semesters=FALL&semesters=` +
-        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${lowerYear}&years=${yearsString}`
-    )
+    if (yearRange.length > 1) {
+      history.push(
+        `/populations?months=${months}&semesters=FALL&semesters=` +
+          `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${lowerYear}&years=${yearsString}`
+      )
+    } else {
+      history.push(
+        `/populations?months=${months}&semesters=FALL&semesters=` +
+          `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${lowerYear}&years[]=${yearsString}`
+      )
+    }
   }
 
   const renderStudentsHeader = () => {
@@ -307,11 +326,13 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
       </Segment>
       {userRoles.includes('admin') && years.length > 0 ? (
         <>
-          from:
+          Statistics from:
           <Dropdown selection options={years} onChange={handleLowerBoundChange} value={lowerYear} />
           to:
           <Dropdown selection options={years} onChange={handleUpperBoundChange} value={upperYear} />
-          <Button onClick={pushQueryToUrl}>fetch population</Button>
+          <Button disabled={!lowerYear || !upperYear} onClick={pushQueryToUrl}>
+            fetch combined population
+          </Button>
         </>
       ) : null}
     </React.Fragment>
