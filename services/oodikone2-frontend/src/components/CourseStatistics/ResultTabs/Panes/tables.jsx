@@ -1,21 +1,21 @@
 import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Grid } from 'semantic-ui-react'
-import { string, arrayOf } from 'prop-types'
+import { string, arrayOf, bool } from 'prop-types'
 import { dataSeriesType, viewModeNames, viewModeType } from './util'
 import CumulativeTable from './Tables/cumulative'
 import StudentTable from './Tables/student'
 import GradesTable from './Tables/grades'
 
-const Tables = ({ primary, comparison, viewMode, alternatives }) => {
+const Tables = ({ primary, comparison, viewMode, alternatives, separate }) => {
   const getViewMode = (name, stats) => {
     switch (viewMode) {
       case viewModeNames.CUMULATIVE:
-        return <CumulativeTable name={name} stats={stats} alternatives={alternatives} />
+        return <CumulativeTable separate={separate} name={name} stats={stats} alternatives={alternatives} />
       case viewModeNames.STUDENT:
-        return <StudentTable name={name} stats={stats} alternatives={alternatives} />
+        return <StudentTable separate={separate} name={name} stats={stats} alternatives={alternatives} />
       case viewModeNames.GRADES:
-        return <GradesTable name={name} stats={stats} alternatives={alternatives} />
+        return <GradesTable separate={separate} name={name} stats={stats} alternatives={alternatives} />
       default:
         return null
     }
@@ -40,11 +40,13 @@ Tables.propTypes = {
   primary: dataSeriesType.isRequired,
   comparison: dataSeriesType,
   viewMode: viewModeType.isRequired,
-  alternatives: arrayOf(string).isRequired
+  alternatives: arrayOf(string).isRequired,
+  separate: bool
 }
 
 Tables.defaultProps = {
-  comparison: null
+  comparison: null,
+  separate: false
 }
 
 const mapStateToProps = state => {

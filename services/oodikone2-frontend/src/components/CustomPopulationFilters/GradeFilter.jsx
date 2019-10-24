@@ -12,11 +12,12 @@ const GradeFilter = ({
   filter,
   setPopulationFilterAction,
   removePopulationFilterAction,
-  yearRange
+  from,
+  to
 }) => {
   const [grade, setGrade] = useState(0)
   const handleFilter = () => {
-    setPopulationFilterAction(gradeFilter({ grade, coursecodes, coursename: courseData.name, yearRange }))
+    setPopulationFilterAction(gradeFilter({ grade, coursecodes, coursename: courseData.name, from, to }))
   }
 
   const handleChange = (e, { value }) => {
@@ -75,17 +76,14 @@ const GradeFilter = ({
   )
 }
 
-GradeFilter.defaultProps = {
-  yearRange: ''
-}
-
 GradeFilter.propTypes = {
   setPopulationFilterAction: func.isRequired,
   removePopulationFilterAction: func.isRequired,
   filter: shape({}).isRequired,
   courseData: shape({}).isRequired,
   coursecodes: arrayOf(string).isRequired,
-  yearRange: string
+  from: string.isRequired,
+  to: string.isRequired
 }
 
 const mapStateToProps = ({ singleCourseStats }) => ({

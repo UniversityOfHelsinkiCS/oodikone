@@ -278,7 +278,7 @@ class SingleCourseStats extends Component {
     const years = `${yearCodes.find(s => s.value === from).text.split('-')[0]}-${
       yearCodes.find(s => s.value === to).text.split('-')[1]
     }`
-    const queryObject = { from, to, coursecodes: JSON.stringify(alternatives), years }
+    const queryObject = { from, to, coursecodes: JSON.stringify(alternatives), years, separate: false }
     const searchString = qs.stringify(queryObject)
     history.push(`/coursepopulation?${searchString}`)
   }
@@ -363,7 +363,7 @@ class SingleCourseStats extends Component {
             </Grid>
           </Form>
         </Segment>
-        <ResultTabs primary={statistics.primary} comparison={statistics.comparison} />
+        <ResultTabs separate={this.state.separate} primary={statistics.primary} comparison={statistics.comparison} />
       </div>
     )
   }

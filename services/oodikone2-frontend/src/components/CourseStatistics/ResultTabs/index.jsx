@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Tab, Grid, Radio, Menu } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
-import { shape } from 'prop-types'
+import { shape, bool } from 'prop-types'
 import { dataSeriesType, viewModeNames } from './Panes/util'
 import PassRate from './Panes/passRate'
 import Distribution from './Panes/distribution'
@@ -73,11 +73,11 @@ const ResultTabs = props => {
   }
 
   const getPanes = () => {
-    const { primary, comparison } = props
+    const { primary, comparison, separate } = props
     const paneMenuItems = [
       {
         menuItem: { key: 'Table', icon: 'table', content: 'Table' },
-        renderFn: () => <Tables comparison={comparison} primary={primary} viewMode={viewMode} />
+        renderFn: () => <Tables separate={separate} comparison={comparison} primary={primary} viewMode={viewMode} />
       },
       {
         menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
@@ -127,11 +127,13 @@ const ResultTabs = props => {
 ResultTabs.propTypes = {
   primary: dataSeriesType.isRequired,
   comparison: dataSeriesType,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  separate: bool
 }
 
 ResultTabs.defaultProps = {
-  comparison: undefined
+  comparison: undefined,
+  separate: false
 }
 
 export default withRouter(ResultTabs)
