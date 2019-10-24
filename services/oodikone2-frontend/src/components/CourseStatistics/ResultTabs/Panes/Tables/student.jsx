@@ -4,14 +4,20 @@ import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { uniq } from 'lodash'
-import { shape, string, number, oneOfType, arrayOf } from 'prop-types'
+import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
-const StudentTable = ({ stats, name, alternatives }) => {
+const StudentTable = ({ stats, name, alternatives, separate }) => {
   const showPopulation = (yearcode, years) => {
-    const queryObject = { from: yearcode, to: yearcode, coursecodes: JSON.stringify(uniq(alternatives)), years }
+    const queryObject = {
+      from: yearcode,
+      to: yearcode,
+      coursecodes: JSON.stringify(uniq(alternatives)),
+      years,
+      separate
+    }
     const searchString = qs.stringify(queryObject)
     return `/coursepopulation?${searchString}`
   }
@@ -127,7 +133,12 @@ const StudentTable = ({ stats, name, alternatives }) => {
 StudentTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
-  alternatives: arrayOf(string).isRequired
+  alternatives: arrayOf(string).isRequired,
+  separate: bool
+}
+
+StudentTable.defaultProps = {
+  separate: false
 }
 
 export default connect(null)(StudentTable)
