@@ -164,7 +164,10 @@ const updateStudent = async student => {
   let { studentInfo, studyAttainments, semesterEnrollments, studyRights } = student
 
   // sort data to avoid deadlocks
-  semesterEnrollments = uniqBy(sortBy(semesterEnrollments, 'studentnumber', 'semestercode'), 'id')
+  semesterEnrollments = uniqBy(
+    sortBy(semesterEnrollments, 'studentnumber', 'semestercode'),
+    sE => `${sE.semestercode}${sE.studentnumber}`
+  )
 
   const transaction = await sequelize.transaction()
   try {
@@ -174,7 +177,7 @@ const updateStudent = async student => {
 
     await SemesterEnrollment.bulkCreate(semesterEnrollments, {
       transaction,
-      updateOnDuplicate: ['enrollmenttype', 'studentnumber', 'semestercode', 'enrollment_date']
+      updateOnDuplicate: ['enrollmenttype', 'enrollment_date']
     })
 
     if (studyAttainments) await updateAttainments(studyAttainments, transaction)
