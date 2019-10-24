@@ -38,7 +38,7 @@ const TSA = {
  *      return
  *    }
  *
- *     TSA.sendEvent({ group: 'Student Usage', name: 'student data viewed', label: props.studentId })
+ *     TSA.sendEvent({ group: 'Student Usage', name: 'student data viewed', label: props.studentId, value: 1 })
  *   }, [props.studentId])
  * })
  * export default withStudentDataTsa(StudentData)

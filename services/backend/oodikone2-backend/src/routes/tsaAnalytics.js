@@ -5,8 +5,8 @@ const tsaService = require('../services/tsaService')
 router.post('/event', (req, res) => {
   const { group, name, label, value } = req.body
 
-  if (!group || !name) {
-    return res.status(400).json({ error: 'group and name are required' })
+  if (!group || !name || !value) {
+    return res.status(400).json({ error: 'group, name and value are required' })
   }
 
   // don't await here because frontend doesn't care if it succeeds
