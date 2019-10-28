@@ -227,6 +227,9 @@ class PopulationSearchHistory extends Component {
       return null
     }
     const studentNumberList = populations.data.students.map(s => s.studentNumber)
+
+    const { programme: programmeCode, degree: degreeCode, studyTrack: studyTrackCode } = populations.query.studyRights
+
     return (
       <React.Fragment>
         <Form.Group inline style={{ marginRight: '100px' }}>
@@ -239,10 +242,10 @@ class PopulationSearchHistory extends Component {
             queryId={0}
             unit={units.data.programmes[populations.query.studyRights.programme]} // Possibly deprecated
             units={[
-              ...Object.values(units.data.programmes),
-              ...Object.values(units.data.degrees),
-              ...Object.values(units.data.studyTracks)
-            ].filter(u => Object.values(populations.query.studyRights).includes(u.code))}
+              units.data.programmes[programmeCode],
+              units.data.degrees[degreeCode],
+              units.data.studyTracks[studyTrackCode]
+            ].filter(Boolean)}
             removeSampleFn={this.removePopulation}
             updateStudentsFn={() => this.props.updatePopulationStudents(studentNumberList)}
             updating={populations.updating}
