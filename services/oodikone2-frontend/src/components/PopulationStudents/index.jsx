@@ -126,7 +126,7 @@ class PopulationStudents extends Component {
       ? this.props.selectedStudents.reduce((res, sn) => {
           const targetStudyright = flatten(
             students[sn].studyrights.reduce((acc, curr) => {
-              acc.push(curr.studyrightElements)
+              acc.push(curr.studyright_elements)
               return acc
             }, [])
           ).filter(e => e.code === this.props.queryStudyrights[0])

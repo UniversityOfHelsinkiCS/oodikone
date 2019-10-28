@@ -38,7 +38,7 @@ const run1 = async () => {
     // eslint-disable-next-line no-constant-condition
     if (true || s1.studentNumber === '014612688') {
       const studyright = s1.studyrights.find(s =>
-        s.studyrightElements.map(d => d.element_detail.code).includes('KH50_001')
+        s.studyright_elements.map(d => d.element_detail.code).includes('KH50_001')
       )
 
       console.log(studyright.startdate, start.isAfter(moment(studyright.startdate)), s1.changedStudyright)
