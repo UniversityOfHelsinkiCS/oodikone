@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/browser'
-import React from 'react'
 import { callApi } from '../apiConnection'
 
 // -- toska surveillance agency --
@@ -24,35 +23,6 @@ const sendEvent = ({ group, name, label, value }) => {
 
 const TSA = {
   sendEvent
-}
-
-/**
- * Creates a TSA HOC from a render method. The runHooks render method is called
- * when the HOC renders, which can be used to run effect hooks that send TSA events.
- *
- * @example
- * ```
- * const withStudentDataTsa = bakeTsaHooks(props => {
- *   useEffect(() => {
- *    if (!props.studentId) {
- *      return
- *    }
- *
- *     TSA.sendEvent({ group: 'Student Usage', name: 'student data viewed', label: props.studentId, value: 1 })
- *   }, [props.studentId])
- * })
- * export default withStudentDataTsa(StudentData)
- * ```
- */
-export const bakeTsaHooks = runHooks => Component => {
-  const displayName = Component.displayName || Component.name || 'Component'
-
-  const WithTsaHooks = props => {
-    runHooks(props)
-    return <Component {...props} />
-  }
-  WithTsaHooks.displayName = `WithTsaHooks(${displayName})`
-  return WithTsaHooks
 }
 
 export default TSA

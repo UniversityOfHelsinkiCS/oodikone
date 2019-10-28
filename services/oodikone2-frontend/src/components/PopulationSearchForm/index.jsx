@@ -28,7 +28,6 @@ import {
   cancelablePromise,
   useSearchHistory
 } from '../../common'
-import TSA from '../../common/tsa'
 import { setLoading } from '../../redux/graphSpinner'
 import './populationSearchForm.css'
 import { dropdownType } from '../../constants/types'
@@ -139,15 +138,6 @@ const PopulationSearchForm = props => {
   const fetchPopulationFromUrlParams = () => {
     const previousQuery = queries
     const query = parseQueryFromUrl()
-
-    if (query.studyRights && query.studyRights.programme) {
-      TSA.sendEvent({
-        group: 'Programme Usage',
-        name: 'populations query',
-        label: query.studyRights.programme,
-        value: 1
-      })
-    }
 
     if (!checkPreviousQuery(query, previousQuery)) {
       setState({ query })

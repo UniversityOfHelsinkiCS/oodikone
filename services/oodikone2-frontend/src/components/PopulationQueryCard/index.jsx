@@ -30,15 +30,13 @@ const PopulationQueryCard = ({
   const lowestYear = query.years ? Math.min(...query.years.map(year => Number(year))) : null
   const highestYear = query.years ? Math.max(...query.years.map(year => Number(year))) : null
   const { students } = population
+  const header = units.map(u => getTextIn(u.name, language)).join(', ')
+
   if (students.length > 0) {
     return (
       <Card className="cardContainer">
         <Card.Header className="cardHeader">
-          <div>
-            {Object.values(units)
-              .map(u => getTextIn(u.name, language))
-              .join(', ')}
-          </div>
+          <div>{header}</div>
           <Icon name="remove" className="controlIcon" onClick={() => removePopulation(uuid)} />
         </Card.Header>
         <Card.Meta>
@@ -80,11 +78,7 @@ const PopulationQueryCard = ({
   return (
     <Card className="cardContainer">
       <Card.Header className="cardHeader">
-        <div>
-          {Object.values(units)
-            .map(u => getTextIn(u.name, language))
-            .join(', ')}
-        </div>
+        <div>{header}</div>
         <Icon name="remove" className="controlIcon" onClick={() => removeSampleFn(uuid)} />
       </Card.Header>
       <Card.Meta>
