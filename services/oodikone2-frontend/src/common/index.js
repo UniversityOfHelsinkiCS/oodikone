@@ -234,18 +234,18 @@ export const getStudentToTargetCourseDateMap = (students, codes) => {
   }, {})
 }
 
-export const getNewestProgramme = (studyrights, studentNumber = null, studentToTargetCourseDateMap = null, elementDetails) => {
+export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails) => {
   const studyprogrammes = []
   studyrights.forEach(sr => {
-    const studyright_elements = sr.studyright_elements.filter(
+    const studyrightElements = sr.studyright_elements.filter(
       srE =>
         elementDetails[srE.code].type === 20 &&
         (studentToTargetCourseDateMap && studentNumber
           ? moment(studentToTargetCourseDateMap[studentNumber]).isBetween(moment(srE.startdate), moment(srE.enddate))
           : true)
     )
-    if (studyright_elements.length > 0) {
-      const newestStudyrightElement = studyright_elements.sort(
+    if (studyrightElements.length > 0) {
+      const newestStudyrightElement = studyrightElements.sort(
         (a, b) => new Date(b.startdate) - new Date(a.startdate)
       )[0]
       studyprogrammes.push({

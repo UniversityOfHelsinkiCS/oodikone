@@ -24,7 +24,12 @@ const ProgrammeFilter = ({
   useEffect(() => {
     const allProgrammes = {}
     samples.forEach(student => {
-      const programme = getNewestProgramme(student.studyrights, student.studentNumber, studentToTargetCourseDateMap, elementDetails)
+      const programme = getNewestProgramme(
+        student.studyrights,
+        student.studentNumber,
+        studentToTargetCourseDateMap,
+        elementDetails
+      )
       if (programme) {
         if (!allProgrammes[programme.code]) {
           allProgrammes[programme.code] = { programme, students: [] }
