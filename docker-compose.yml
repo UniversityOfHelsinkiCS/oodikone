@@ -150,7 +150,7 @@ services:
       - nats
     environment:
       - NATS_URI=nats://nats:4222
-      - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
+      - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi/test
       - TOKEN=jotaindiibadaabaa
 
   updater_writer:
