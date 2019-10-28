@@ -216,7 +216,7 @@ describe('optimizedStatisticsOf tests', () => {
         courseinstances.some(
           instance =>
             instance.date.getTime() === courseinstanceFall.coursedate.getTime() &&
-            instance.course.code === courseinstanceFall.course_code
+            instance.course_code === courseinstanceFall.course_code
         )
       ).toBe(true)
     })
