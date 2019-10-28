@@ -69,13 +69,11 @@ const mergeCourses = (groups, courses, groupMeta, unifyOpenUniCourses = false) =
       }
     } else {
       const mergedCourse = mergedCourses[groupId]
-      mergedCourse.min_attainment_date = Math.min(
-        mergedCourse.min_attainment_date,
-        new Date(course.min_attainment_date)
+      mergedCourse.min_attainment_date = new Date(
+        Math.min(mergedCourse.min_attainment_date, new Date(course.min_attainment_date))
       )
-      mergedCourse.max_attainment_date = Math.max(
-        mergedCourse.max_attainment_date,
-        new Date(course.max_attainment_date)
+      mergedCourse.max_attainment_date = new Date(
+        Math.max(mergedCourse.max_attainment_date, new Date(course.max_attainment_date))
       )
       mergedCourse.alternatives.push({
         code: course.code,
