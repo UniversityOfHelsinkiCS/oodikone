@@ -91,9 +91,10 @@ const PopulationSearchForm = props => {
     const sameStudentStatuses = previousQuery.studentStatuses
       ? isEqual(query.studentStatuses, previousQuery.studentStatuses)
       : !(query.studentStatuses.length > 0)
-    const sameTag = previousQuery.tag !== null ? previousQuery.tag === query.tag : query.tag === null
+    const sameTag = previousQuery.tag ? previousQuery.tag === query.tag : !query.tag
+    const sameYears = previousQuery.years ? isEqual(previousQuery.years, query.years) : !query.years
 
-    return sameProgramme && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameTag
+    return sameProgramme && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameTag && sameYears
   }
 
   const formatQueryParamsToArrays = (query, params) => {

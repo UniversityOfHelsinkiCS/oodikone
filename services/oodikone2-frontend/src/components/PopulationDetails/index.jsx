@@ -151,6 +151,7 @@ class PopulationDetails extends Component {
         ref={this.courses}
         selectedStudents={this.props.selectedStudents}
         selectedStudentsByYear={this.props.selectedStudentsByYear}
+        query={this.props.query}
       />
       <PopulationStudents ref={this.students} />
     </div>
