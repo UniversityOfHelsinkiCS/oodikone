@@ -127,16 +127,16 @@ const formatStudyrightElements = (elements, associations) =>
   }))
 
 const getAllStudyrightElementsAndAssociations = async () => {
-  let studyrightElements = await redisClient.getAsync('studyrightElements')
-  if (!studyrightElements) {
+  let studyright_elements = await redisClient.getAsync('studyright_elements')
+  if (!studyright_elements) {
     const [associations, studyrightelements] = await Promise.all([getAssociatedStudyrights(), ElementDetails.findAll()])
     await redisClient.setAsync(
-      'studyrightElements',
+      'studyright_elements',
       JSON.stringify(formatStudyrightElements(studyrightelements, associations))
     )
-    studyrightElements = await redisClient.getAsync('studyrightElements')
+    studyright_elements = await redisClient.getAsync('studyright_elements')
   }
-  return JSON.parse(studyrightElements)
+  return JSON.parse(studyright_elements)
 }
 
 const getStudyrightElementsAndAssociationsForUser = async username => {
