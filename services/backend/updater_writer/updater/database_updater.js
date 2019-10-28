@@ -49,12 +49,13 @@ const updateAttainments = async (studyAttainments, transaction) => {
         'startdate',
         'enddate',
         'max_attainment_date',
-        'min_attainment_date'
+        'min_attainment_date',
+        'updatedAt'
       ]
     }),
     Provider.bulkCreate(providers, {
       transaction,
-      updateOnDuplicate: ['name']
+      updateOnDuplicate: ['name', 'updatedAt']
     }),
     Credit.bulkCreate(credits, {
       transaction,
@@ -69,12 +70,13 @@ const updateAttainments = async (studyAttainments, transaction) => {
         'attainment_date',
         'course_code',
         'semestercode',
-        'isStudyModule'
+        'isStudyModule',
+        'updatedAt'
       ]
     }),
     Teacher.bulkCreate(teachers, {
       transaction,
-      updateOnDuplicate: ['code', 'name']
+      updateOnDuplicate: ['code', 'name', 'updatedAt']
     })
   ])
 
@@ -118,7 +120,7 @@ const updateStudyRights = async (studyRights, transaction) => {
   await Promise.all([
     StudyrightExtent.bulkCreate(studyRightExtents, {
       transaction,
-      updateOnDuplicate: ['name']
+      updateOnDuplicate: ['name', 'updatedAt']
     }),
 
     Studyright.bulkCreate(studyrights, {
@@ -134,23 +136,24 @@ const updateStudyRights = async (studyRights, transaction) => {
         'studystartdate',
         'organization_code',
         'student_studentnumber',
-        'extentcode'
+        'extentcode',
+        'updatedAt'
       ]
     }),
 
     ElementDetails.bulkCreate(elementDetails, {
       transaction,
-      updateOnDuplicate: ['name', 'type']
+      updateOnDuplicate: ['name', 'type', 'updatedAt']
     }),
 
     StudyrightElement.bulkCreate(studyRightElements, {
       transaction,
-      updateOnDuplicate: ['startdate', 'enddate', 'studyrightid', 'code', 'studentnumber']
+      updateOnDuplicate: ['startdate', 'enddate', 'studyrightid', 'code', 'studentnumber', 'updatedAt']
     }),
 
     Transfers.bulkCreate(transfers, {
       transaction,
-      updateOnDuplicate: ['transferdate', 'studentnumber', 'studyrightid', 'sourcecode', 'targetcode']
+      updateOnDuplicate: ['transferdate', 'studentnumber', 'studyrightid', 'sourcecode', 'targetcode', 'updatedAt']
     })
   ])
 }
@@ -175,10 +178,11 @@ const updateStudent = async student => {
 
     await Student.upsert(studentInfo, { transaction })
 
-    await SemesterEnrollment.bulkCreate(semesterEnrollments, {
-      transaction,
-      updateOnDuplicate: ['enrollmenttype', 'enrollment_date']
-    })
+    // Change this to bulkCreate after https://github.com/sequelize/sequelize/issues/11569
+    // is merged and released
+    for (let i = 0; i < semesterEnrollments.length; i++) {
+      await SemesterEnrollment.upsert(semesterEnrollments[i], { transaction })
+    }
 
     if (studyAttainments) await updateAttainments(studyAttainments, transaction)
 
@@ -203,32 +207,33 @@ const updateMeta = async ({
   disciplines
 }) => {
   const transaction = await sequelize.transaction()
+  const updateOnDuplicate = ['name', 'updatedAt']
 
   try {
     await Promise.all([
       CourseType.bulkCreate(uniqBy(courseTypeCodes, 'coursetypecode'), {
         transaction,
-        updateOnDuplicate: ['name']
+        updateOnDuplicate
       }),
       Organisation.bulkCreate(uniqBy(faculties, 'code'), {
         transaction,
-        updateOnDuplicate: ['name']
+        updateOnDuplicate
       }),
       CourseRealisationType.bulkCreate(uniqBy(courseRealisationsTypes, 'realisationtypecode'), {
         transaction,
-        updateOnDuplicate: ['name']
+        updateOnDuplicate
       }),
       Semester.bulkCreate(uniqBy(semesters, 'semestercode'), {
         transaction,
-        updateOnDuplicate: ['name', 'startdate', 'enddate', 'yearcode', 'yearname']
+        updateOnDuplicate: ['name', 'startdate', 'enddate', 'yearcode', 'yearname', 'updateOnDuplicate']
       }),
       CreditType.bulkCreate(uniqBy(creditTypeCodes, 'credittypecode'), {
         transaction,
-        updateOnDuplicate: ['name']
+        updateOnDuplicate
       }),
       Discipline.bulkCreate(uniqBy(disciplines, 'discipline_id'), {
         transaction,
-        updateOnDuplicate: ['name']
+        updateOnDuplicate
       })
     ])
 
