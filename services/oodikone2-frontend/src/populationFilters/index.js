@@ -85,13 +85,11 @@ export const transferFilter = params => {
       target
     },
     filter: student =>
-      student.transfers
-        .map(
-          transfer =>
-            (source === 'anywhere' || transfer.source.code === source) &&
-            (target === 'anywhere' || transfer.target.code === target)
-        )
-        .some(b => b === true)
+      student.transfers.some(
+        transfer =>
+          (source === 'anywhere' || transfer.sourcecode === source) &&
+          (target === 'anywhere' || transfer.targetcode === target)
+      )
   }
 }
 
@@ -157,7 +155,7 @@ export const extentGraduated = params => {
         if (complemented === 'true' && graduated === 'either') {
           // jos koodi 7 eli exchange student
           const thisStudyright = student.studyrights.find(s =>
-            s.studyrightElements.map(e => e.code).includes(studyright)
+            s.studyright_elements.map(e => e.code).includes(studyright)
           )
 
           return !thisStudyright || thisStudyright.extentcode !== code
@@ -176,7 +174,7 @@ export const extentGraduated = params => {
           .map(sr => sr.extentcode)
           .includes(code)
       }
-      const foundStudyRight = student.studyrights.find(s => s.studyrightElements.map(e => e.code).includes(code))
+      const foundStudyRight = student.studyrights.find(s => s.studyright_elements.map(e => e.code).includes(code))
       const returnable = graduated !== 'grad' ? !!foundStudyRight : foundStudyRight && foundStudyRight.graduated
       return complemented === 'true' ? !returnable : returnable
     }
@@ -208,11 +206,11 @@ export const canceledStudyright = params => {
     filter: student => {
       if (cancel === 'true') {
         return student.studyrights
-          .filter(sr => sr.studyrightElements.some(e => Object.values(studyrights).includes(e.code)))
+          .filter(sr => sr.studyright_elements.some(e => Object.values(studyrights).includes(e.code)))
           .every(sr => sr.canceldate)
       }
       return !student.studyrights
-        .filter(sr => sr.studyrightElements.some(e => Object.values(studyrights).includes(e.code)))
+        .filter(sr => sr.studyright_elements.some(e => Object.values(studyrights).includes(e.code)))
         .every(sr => sr.canceldate)
     }
   }
@@ -244,7 +242,7 @@ export const priorityStudyright = params => {
     filter: student =>
       student.studyrights.some(sr => {
         if (sr.prioritycode === prioritycode) {
-          const elements = sr.studyrightElements.map(e => e.code)
+          const elements = sr.studyright_elements.map(e => e.code)
           let bools = []
           if (degree) {
             bools = bools.concat(elements.includes(degree) || degree === 'anyDegree')
@@ -309,7 +307,7 @@ export const gradeFilter = params => {
       coursename
     },
     filter: student => {
-      const courses = student.courses.filter(c => coursecodes.includes(c.course.code))
+      const courses = student.courses.filter(c => coursecodes.includes(c.course_code))
       const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
       return highestGrade && highestGrade.grade === grade
     }
@@ -333,7 +331,7 @@ export const courseCreditFilter = params => {
   }
 }
 
-export const programmeFilter = params => {
+export const programmeFilter = (params, elementDetails) => {
   const { programme, programmeName, studentToTargetCourseDateMap = null } = params
   return {
     id: uuidv4(),
@@ -346,7 +344,8 @@ export const programmeFilter = params => {
       const studentStudyrightCode = getNewestProgramme(
         student.studyrights,
         student.studentNumber,
-        studentToTargetCourseDateMap
+        studentToTargetCourseDateMap,
+        elementDetails
       )
       return studentStudyrightCode.code === programme
     }

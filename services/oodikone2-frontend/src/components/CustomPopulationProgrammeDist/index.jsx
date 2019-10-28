@@ -16,14 +16,20 @@ const CustomPopulationProgrammeDist = ({
   removePopulationFilterDispatch,
   filters,
   studentToTargetCourseDateMap,
-  language
+  language,
+  populationStatistics
 }) => {
   const [tableRows, setRows] = useState([])
   useEffect(() => {
     const allProgrammes = {}
     const filteredSamples = samples.filter(student => selectedStudents.includes(student.studentNumber))
     filteredSamples.forEach(student => {
-      const programme = getNewestProgramme(student.studyrights, student.studentNumber, studentToTargetCourseDateMap)
+      const programme = getNewestProgramme(
+        student.studyrights,
+        student.studentNumber,
+        studentToTargetCourseDateMap,
+        populationStatistics.elementdetails.data
+      )
       if (programme) {
         if (allProgrammes[programme.code]) {
           allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
@@ -55,7 +61,10 @@ const CustomPopulationProgrammeDist = ({
     const splitRow = row[0].split(', ')
     filters.map(filter => removePopulationFilterDispatch(filter.id))
     setPopulationFilterDispatch(
-      programmeFilter({ programme: splitRow[1], programmeName: splitRow[0], studentToTargetCourseDateMap })
+      programmeFilter(
+        { programme: splitRow[1], programmeName: splitRow[0], studentToTargetCourseDateMap },
+        populationStatistics.elementdetails.data
+      )
     )
   }
 
@@ -83,13 +92,15 @@ CustomPopulationProgrammeDist.propTypes = {
   removePopulationFilterDispatch: func.isRequired,
   filters: arrayOf(shape({})).isRequired,
   studentToTargetCourseDateMap: shape({}),
-  language: string.isRequired
+  language: string.isRequired,
+  populationStatistics: shape({}).isRequired
 }
 
-const mapStateToProps = ({ populationFilters, localize }) => {
+const mapStateToProps = ({ populationFilters, localize, populations }) => {
   return {
     filters: populationFilters.filters.filter(f => f.type === 'ProgrammeFilter'),
-    language: getActiveLanguage(localize).code
+    language: getActiveLanguage(localize).code,
+    populationStatistics: populations.data
   }
 }
 
