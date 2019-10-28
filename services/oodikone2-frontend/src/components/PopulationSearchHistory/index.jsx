@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, object, bool, arrayOf } from 'prop-types'
 import { getTranslate } from 'react-localize-redux'
@@ -6,14 +6,42 @@ import { Form, Button } from 'semantic-ui-react'
 import moment from 'moment'
 import qs from 'query-string'
 import Datetime from 'react-datetime'
+import { get as lodashGet } from 'lodash'
 
 import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation, updatePopulationStudents } from '../../redux/populations'
 import { clearPopulationFilters } from '../../redux/populationFilters'
+import TSA from '../../common/tsa'
 
 import './populationSearchHistory.css'
 import infotooltips from '../../common/InfoToolTips'
+import { getTextIn } from '../../common'
 import InfoBox from '../InfoBox'
+
+const PopulationsQueryTSA = ({ programmeCode, unitData }) => {
+  // hack: I wanna use useEffect because it's handy but PopulationSearchHistory is not a function component
+  // so here's a component that renders nothing that we can just plug in
+  useEffect(() => {
+    if (!programmeCode) {
+      return
+    }
+
+    const programmeNameData = lodashGet(unitData, ['programmes', programmeCode, 'name'])
+    const programme = programmeNameData && getTextIn(unitData.programmes[programmeCode].name, 'fi')
+
+    if (!programme) {
+      return
+    }
+
+    TSA.sendEvent({
+      group: 'Programme Usage',
+      name: 'populations query',
+      label: programme,
+      value: 1
+    })
+  }, [programmeCode])
+  return null
+}
 
 class PopulationSearchHistory extends Component {
   static propTypes = {
@@ -227,11 +255,11 @@ class PopulationSearchHistory extends Component {
       return null
     }
     const studentNumberList = populations.data.students.map(s => s.studentNumber)
-
     const { programme: programmeCode, degree: degreeCode, studyTrack: studyTrackCode } = populations.query.studyRights
 
     return (
       <React.Fragment>
+        <PopulationsQueryTSA programmeCode={programmeCode} unitData={units.data} />
         <Form.Group inline style={{ marginRight: '100px' }}>
           <InfoBox content={QueryCard} style={{ margin: 'auto' }} />
           <PopulationQueryCard
@@ -240,7 +268,7 @@ class PopulationSearchHistory extends Component {
             population={populations.data}
             query={populations.query}
             queryId={0}
-            unit={units.data.programmes[populations.query.studyRights.programme]} // Possibly deprecated
+            unit={units.data.programmes[programmeCode]} // Possibly deprecated
             units={[
               units.data.programmes[programmeCode],
               units.data.degrees[degreeCode],
