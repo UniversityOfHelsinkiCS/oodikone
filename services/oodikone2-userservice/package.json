@@ -29,7 +29,7 @@
     "moment": "^2.24.0",
     "nodemon": "^1.19.1",
     "pg": "^7.11.0",
-    "sequelize": "^5.10.2",
+    "sequelize": "^5.15.1",
     "umzug": "^2.2.0"
   },
   "devDependencies": {
