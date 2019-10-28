@@ -134,9 +134,8 @@ const scheduleDaily = async () => {
 
   console.log({ findStudentsRange, minstudentnumber, studentNumberMid, min, max })
 
-  const studentnumbers = []
   const activeStudents = [...await Schedule.find({ type: 'student', active: true }).sort({ updatedAt: 1 })]
-  studentnumbers.push(...activeStudents.map(t => t.task))
+  const studentnumbers = activeStudents.map(t => t.task)
   for (let i = min; i <= max; ++i) {
     studentnumbers.push(`0${i}${getStudentNumberChecksum(i)}`)
   }

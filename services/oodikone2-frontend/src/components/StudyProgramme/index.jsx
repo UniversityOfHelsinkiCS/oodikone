@@ -13,7 +13,7 @@ import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
 import { getTextIn, useTabs, getUserRoles, getUserIsAdmin } from '../../common'
-import TSA, { bakeTsaHooks } from '../../common/tsa'
+import TSA from '../../common/tsa'
 import Tags from './Tags'
 
 import { getThroughput } from '../../redux/throughput'
@@ -92,6 +92,20 @@ const StudyProgramme = props => {
   const { studyProgrammeId } = match.params
   const programmeName = programmes[studyProgrammeId] && getTextIn(programmes[studyProgrammeId].name, language)
   const panes = getPanes()
+
+  useEffect(() => {
+    if (!programmeName) {
+      return
+    }
+
+    TSA.sendEvent({
+      group: 'Programme Usage',
+      name: 'study programme overview',
+      label: programmeName,
+      value: 1
+    })
+  }, [programmeName])
+
   return (
     <div className="segmentContainer">
       <Header className="segmentTitle" size="large">
@@ -161,18 +175,6 @@ const mapStateToProps = ({
   }
 }
 
-const withPopulationUsageTsa = bakeTsaHooks(props => {
-  const studyProgrammeId = props.match && props.match.params && props.match.params.studyProgrammeId
-
-  useEffect(() => {
-    if (!studyProgrammeId) {
-      return
-    }
-
-    TSA.sendEvent({ group: 'Programme Usage', name: 'study programme overview', label: studyProgrammeId, value: 1 })
-  }, [studyProgrammeId])
-})
-
 export default connect(
   mapStateToProps,
   {
@@ -183,4 +185,4 @@ export default connect(
   {
     areStatePropsEqual: isEqual
   }
-)(withRouter(withPopulationUsageTsa(StudyProgramme)))
+)(withRouter(StudyProgramme))
