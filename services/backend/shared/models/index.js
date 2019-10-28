@@ -323,6 +323,12 @@ const SemesterEnrollment = sequelize.define(
     },
     enrollment_date: {
       type: Sequelize.DATE
+    },
+    semestercode: {
+      type: Sequelize.INTEGER
+    },
+    studentnumber: {
+      type: Sequelize.STRING
     }
   },
   {
