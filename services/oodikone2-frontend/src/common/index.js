@@ -74,7 +74,7 @@ export const studyrightTypes = { degree: '10', programme: '20', speciality: '30'
 
 export const getStudentTotalCredits = student => {
   const passedCourses = student.courses.filter(c => c.passed && !c.isStudyModuleCredit)
-  const uniqueCourses = uniqBy(passedCourses, 'course.code')
+  const uniqueCourses = uniqBy(passedCourses, 'course_code')
   return uniqueCourses.reduce((a, b) => a + b.credits, 0)
 }
 
@@ -87,7 +87,7 @@ export const getStudentGradeMean = student => {
 
 export const getStudentTotalCreditsFromMandatory = (student, mandatoryCourses) =>
   student.courses
-    .filter(c => c.passed && !c.isStudyModuleCredit && mandatoryCourses.find(cr => cr.code === c.course.code))
+    .filter(c => c.passed && !c.isStudyModuleCredit && mandatoryCourses.find(cr => cr.code === c.code))
     .reduce((a, b) => a + b.credits, 0)
 
 export const getTotalCreditsFromCourses = courses =>
@@ -216,7 +216,7 @@ export const useSearchHistory = (id, capacity = 5) => {
 export const flattenStudyrights = studyrights => {
   const studyrightcodes = []
   studyrights.forEach(sr => {
-    sr.studyrightElements.forEach(srE => {
+    sr.studyright_elements.forEach(srE => {
       studyrightcodes.push(srE.code)
     })
   })
@@ -234,12 +234,12 @@ export const getStudentToTargetCourseDateMap = (students, codes) => {
   }, {})
 }
 
-export const getNewestProgramme = (studyrights, studentNumber = null, studentToTargetCourseDateMap = null) => {
+export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails) => {
   const studyprogrammes = []
   studyrights.forEach(sr => {
-    const studyrightElements = sr.studyrightElements.filter(
+    const studyrightElements = sr.studyright_elements.filter(
       srE =>
-        srE.element_detail.type === 20 &&
+        elementDetails[srE.code].type === 20 &&
         (studentToTargetCourseDateMap && studentNumber
           ? moment(studentToTargetCourseDateMap[studentNumber]).isBetween(moment(srE.startdate), moment(srE.enddate))
           : true)
@@ -251,7 +251,7 @@ export const getNewestProgramme = (studyrights, studentNumber = null, studentToT
       studyprogrammes.push({
         name: newestStudyrightElement.element_detail.name,
         startdate: newestStudyrightElement.startdate,
-        code: newestStudyrightElement.element_detail.code
+        code: newestStudyrightElement.code
       })
     }
   })

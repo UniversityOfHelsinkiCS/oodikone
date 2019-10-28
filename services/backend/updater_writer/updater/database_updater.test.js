@@ -338,12 +338,12 @@ describe('Updater works', () => {
     })
 
     test('study right elements are written to database', async () => {
-      const studyrightElements = await StudyrightElement.findAll({
+      const studyright_elements = await StudyrightElement.findAll({
         order: ['startdate', 'enddate', 'studyrightid', 'code']
       })
-      const { id, startdate, enddate, createdAt, updatedAt, studyrightid, code, studentnumber } = studyrightElements[0]
+      const { id, startdate, enddate, createdAt, updatedAt, studyrightid, code, studentnumber } = studyright_elements[0]
 
-      expect(studyrightElements.length).toBe(21)
+      expect(studyright_elements.length).toBe(21)
       expect(id).toBe(11)
       expect(startdate.toISOString()).toBe(new Date('2003-07-31T21:00:00.000Z').toISOString())
       expect(enddate.toISOString()).toBe(new Date('2007-08-24T21:00:00.000Z').toISOString())
