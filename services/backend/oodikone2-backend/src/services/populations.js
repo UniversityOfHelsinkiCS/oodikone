@@ -62,12 +62,13 @@ const formatStudentForPopulationStatistics = (
   endDateMoment
 ) => {
   const toCourse = ({ grade, attainment_date, credits, course_code, credittypecode, isStudyModule }) => {
-    const attainment_date_normailized = attainment_date < startDate
-      ? startDateMoment
-          .clone()
-          .add(1, 'day')
-          .toISOString()
-      : attainment_date
+    const attainment_date_normailized =
+      attainment_date < startDate
+        ? startDateMoment
+            .clone()
+            .add(1, 'day')
+            .toISOString()
+        : attainment_date
 
     return {
       course_code,
@@ -171,7 +172,8 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     ? creditsOfStudentLaakis
     : creditsOfStudentOther
 
-  if (studentnumbers.length === 0) return { students: [], credits: [], extents: [], semesters: [], elementdetails: [], courses: [] }
+  if (studentnumbers.length === 0)
+    return { students: [], credits: [], extents: [], semesters: [], elementdetails: [], courses: [] }
   const [courses, students, credits, extents, semesters, elementdetails] = await Promise.all([
     Course.findAll({
       attributes: [sequelize.literal('DISTINCT ON("code") code'), 'name', 'coursetypecode'],
@@ -242,12 +244,23 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       }
     }),
     Credit.findAll({
-      attributes: ['grade', 'credits', 'credittypecode', 'attainment_date', 'isStudyModule', 'student_studentnumber', 'course_code'],
+      attributes: [
+        'grade',
+        'credits',
+        'credittypecode',
+        'attainment_date',
+        'isStudyModule',
+        'student_studentnumber',
+        'course_code'
+      ],
       where: creditsOfStudent,
       raw: true
     }),
     StudyrightExtent.findAll({
-      attributes: [sequelize.literal('DISTINCT ON("studyright_extent"."extentcode") "studyright_extent"."extentcode"'), 'name'],
+      attributes: [
+        sequelize.literal('DISTINCT ON("studyright_extent"."extentcode") "studyright_extent"."extentcode"'),
+        'name'
+      ],
       include: [
         {
           model: Studyright,
@@ -263,7 +276,12 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       raw: true
     }),
     Semester.findAll({
-      attributes: [sequelize.literal('DISTINCT ON("semester"."semestercode") "semester"."semestercode"'), 'name', 'startdate', 'enddate'],
+      attributes: [
+        sequelize.literal('DISTINCT ON("semester"."semestercode") "semester"."semestercode"'),
+        'name',
+        'startdate',
+        'enddate'
+      ],
       include: {
         model: SemesterEnrollment,
         attributes: [],
@@ -448,14 +466,11 @@ const formatStudentsForApi = async (
     },
     { programmes: [], degrees: [], data: {} }
   )
-  credits = credits.reduce(
-    (acc, e) => {
-      acc[e.student_studentnumber] = acc[e.student_studentnumber] || []
-      acc[e.student_studentnumber].push(e)
-      return acc
-    },
-    {}
-  )
+  credits = credits.reduce((acc, e) => {
+    acc[e.student_studentnumber] = acc[e.student_studentnumber] || []
+    acc[e.student_studentnumber].push(e)
+    return acc
+  }, {})
   const result = students.reduce(
     (stats, student) => {
       student.transfers.forEach(transfer => {

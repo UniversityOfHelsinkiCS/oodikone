@@ -24,7 +24,12 @@ const CustomPopulationProgrammeDist = ({
     const allProgrammes = {}
     const filteredSamples = samples.filter(student => selectedStudents.includes(student.studentNumber))
     filteredSamples.forEach(student => {
-      const programme = getNewestProgramme(student.studyrights, student.studentNumber, studentToTargetCourseDateMap, populationStatistics.elementdetails.data)
+      const programme = getNewestProgramme(
+        student.studyrights,
+        student.studentNumber,
+        studentToTargetCourseDateMap,
+        populationStatistics.elementdetails.data
+      )
       if (programme) {
         if (allProgrammes[programme.code]) {
           allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
@@ -56,7 +61,10 @@ const CustomPopulationProgrammeDist = ({
     const splitRow = row[0].split(', ')
     filters.map(filter => removePopulationFilterDispatch(filter.id))
     setPopulationFilterDispatch(
-      programmeFilter({ programme: splitRow[1], programmeName: splitRow[0], studentToTargetCourseDateMap }, populationStatistics.elementdetails.data)
+      programmeFilter(
+        { programme: splitRow[1], programmeName: splitRow[0], studentToTargetCourseDateMap },
+        populationStatistics.elementdetails.data
+      )
     )
   }
 

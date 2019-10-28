@@ -85,12 +85,11 @@ export const transferFilter = params => {
       target
     },
     filter: student =>
-      student.transfers
-        .some(
-          transfer =>
-            (source === 'anywhere' || transfer.sourcecode === source) &&
-            (target === 'anywhere' || transfer.targetcode === target)
-        )
+      student.transfers.some(
+        transfer =>
+          (source === 'anywhere' || transfer.sourcecode === source) &&
+          (target === 'anywhere' || transfer.targetcode === target)
+      )
   }
 }
 

@@ -87,8 +87,8 @@ class PopulationStudents extends Component {
     const { queryStudyrights } = this.props
     return studyrights
       .filter(sr => {
-        const { studyright_elements } = sr
-        return studyright_elements.filter(sre => queryStudyrights.includes(sre.code)).length >= queryStudyrights.length
+        const { studyright_elements: studyrightElements } = sr
+        return studyrightElements.filter(sre => queryStudyrights.includes(sre.code)).length >= queryStudyrights.length
       })
       .map(a => a[value])
   }
@@ -144,7 +144,8 @@ class PopulationStudents extends Component {
       copyToClipboard(clipboardString)
     }
 
-    const transferFrom = s => getTextIn(populationStatistics.elementdetails.data[s.transferSource].name, this.props.language)
+    const transferFrom = s =>
+      getTextIn(populationStatistics.elementdetails.data[s.transferSource].name, this.props.language)
 
     const priorityText = studyRights => {
       const codes = this.studyrightCodes(studyRights, 'prioritycode')
@@ -162,7 +163,12 @@ class PopulationStudents extends Component {
     }
 
     const mainProgramme = (studyrights, studentNumber) => {
-      const programme = getNewestProgramme(studyrights, studentNumber, this.props.studentToTargetCourseDateMap, populationStatistics.elementdetails.data)
+      const programme = getNewestProgramme(
+        studyrights,
+        studentNumber,
+        this.props.studentToTargetCourseDateMap,
+        populationStatistics.elementdetails.data
+      )
       if (programme) {
         return programme.name
       }

@@ -53,14 +53,20 @@ class PriorityStudyright extends Component {
     if (degree && programme) {
       const degreeCode = populationStatistics.elementdetails.degrees.find(code => code === degree)
       const programmeCode = populationStatistics.elementdetails.programmes.find(code => code === programme)
-      returnText = returnText.concat(`${degreeCode ? getTextIn(populationStatistics.elementdetails.data[degreeCode].name, language) : ''} and
+      returnText = returnText.concat(`${
+        degreeCode ? getTextIn(populationStatistics.elementdetails.data[degreeCode].name, language) : ''
+      } and
         ${programmeCode ? getTextIn(populationStatistics.elementdetails.data[programmeCode].name, language) : ''}`)
     } else if (degree && !programme) {
       const degreeCode = populationStatistics.elementdetails.degrees.find(sr => sr.code === degree)
-      returnText = returnText.concat(`${degreeCode ? getTextIn(populationStatistics.elementdetails.data[degreeCode].name, language) : ''}`)
+      returnText = returnText.concat(
+        `${degreeCode ? getTextIn(populationStatistics.elementdetails.data[degreeCode].name, language) : ''}`
+      )
     } else if (!degree && programme) {
       const programmeCode = populationStatistics.elementdetails.programmes.find(sr => sr.code === programme)
-      returnText = returnText.concat(`${programmeCode ? getTextIn(populationStatistics.elementdetails.data[programmeCode].name, language) : ''}`)
+      returnText = returnText.concat(
+        `${programmeCode ? getTextIn(populationStatistics.elementdetails.data[programmeCode].name, language) : ''}`
+      )
     }
     returnText = returnText.concat(` as ${this.priorityOptions.find(option => option.value === prioritycode).text} `)
     return returnText
@@ -69,10 +75,16 @@ class PriorityStudyright extends Component {
   render() {
     const { filter, language, populationStatistics } = this.props
 
-    let degreeOptions = populationStatistics.elementdetails.degrees.map(code => ({ value: code, text: getTextIn(populationStatistics.elementdetails.data[code].name, language) }))
+    let degreeOptions = populationStatistics.elementdetails.degrees.map(code => ({
+      value: code,
+      text: getTextIn(populationStatistics.elementdetails.data[code].name, language)
+    }))
     degreeOptions = [{ value: 'anyDegree', text: 'any degree' }, ...degreeOptions]
 
-    let programmeOptions = populationStatistics.elementdetails.programmes.map(code => ({ value: code, text: getTextIn(populationStatistics.elementdetails.data[code].name, language) }))
+    let programmeOptions = populationStatistics.elementdetails.programmes.map(code => ({
+      value: code,
+      text: getTextIn(populationStatistics.elementdetails.data[code].name, language)
+    }))
     programmeOptions = [{ value: 'anyProgramme', text: 'any programme' }, ...programmeOptions]
 
     if (filter.notSet) {
