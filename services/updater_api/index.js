@@ -3,7 +3,6 @@ const { getStudent, getMeta } = require('./doo_api_database_updater/updater_form
 const logger = require('./logger')
 const moment = require('moment')
 
-
 console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
 var opts = stan.subscriptionOptions()
 opts.setManualAckMode(true)
@@ -40,6 +39,7 @@ const fetchData = async (priority, msg) => {
           stan.publish('status', JSON.stringify({ task: task.task, status: 'NO_STUDENT', active: false, priority }), (err) => { if (err) console.log( 'STATUS PUBLISH FAILED', err) })
           return
         } else {
+          console.error('Task failed', task)
           throw e
         }
       }
@@ -56,7 +56,6 @@ const handleMessage = (priority) => async (msg) => {
 }
 
 stan.on('connect', async () => {
-
   const sub = stan.subscribe('UpdateApi', 'updater.workers', opts)
   const prioSub = stan.subscribe('PriorityApi', 'updater.workers.prio', opts)
 
