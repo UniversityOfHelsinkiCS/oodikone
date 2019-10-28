@@ -25,7 +25,7 @@ const {
 } = require('../models/index')
 const { updateAttainmentDates } = require('./update_attainment_dates')
 
-const getColumnsToUpdate = (arr) => arr[0] ? Object.keys(arr[0]) : []
+const getColumnsToUpdate = arr => (arr[0] ? Object.keys(arr[0]) : [])
 
 const updateAttainments = async (studyAttainments, transaction) => {
   // Sort data to avoid deadlocks. If there are duplicate primary keys in the same array, then bulkCreate won't work.
