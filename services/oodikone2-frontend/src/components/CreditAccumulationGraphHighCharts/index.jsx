@@ -122,7 +122,7 @@ class CreditAccumulationGraphHighCharts extends Component {
 
       let totalAbsenceMonths = 0
       const absencePoints = this.props.absences
-        .filter(a => a.startdate > started)
+        .filter(a => a.startdate >= started || (a.startdate <= started && a.enddate >= started))
         .reduce((res, { startdate, enddate }) => {
           const targetCreditsBeforeAbsence =
             (Math.ceil(this.getXAxisMonth(moment(startdate), started)) - totalAbsenceMonths) * (55 / 12)
