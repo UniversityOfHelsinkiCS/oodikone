@@ -2,8 +2,9 @@ import { callController } from '../apiConnection'
 
 const initialState = {
   customPopulationSearches: [],
-  latestCreatedcustomPopulationSearchId: null,
-  saving: false
+  latestCreatedCustomPopulationSearchId: null,
+  saving: false,
+  searchedCustomPopulationSearchId: null
 }
 
 export const getCustomPopulationSearches = () => {
@@ -25,6 +26,11 @@ export const updateCustomPopulationSearch = ({ id, studentnumberlist }) => {
   const body = { id, students: studentnumberlist }
   return callController(route, prefix, body, 'put')
 }
+
+export const selectCustomPopulationSearch = id => ({
+  type: 'SELECT_CUSTOM_POPULATION_SEARCH',
+  id
+})
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -49,7 +55,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         customPopulationSearches: state.customPopulationSearches.concat(action.response),
-        latestCreatedcustomPopulationSearchId: action.response.id,
+        latestCreatedCustomPopulationSearchId: action.response.id,
         saving: false
       }
     case 'UPDATE_CUSTOM_POPULATION_SEARCH_SUCCESS':
@@ -59,6 +65,11 @@ const reducer = (state = initialState, action) => {
           s.id === action.response.id ? action.response : s
         ),
         saving: false
+      }
+    case 'SELECT_CUSTOM_POPULATION_SEARCH':
+      return {
+        ...state,
+        searchedCustomPopulationSearchId: action.id
       }
     default:
       return state

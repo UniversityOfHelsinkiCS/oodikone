@@ -9,7 +9,8 @@ import { getCustomPopulation } from '../../redux/populations'
 import {
   getCustomPopulationSearches,
   saveCustomPopulationSearch,
-  updateCustomPopulationSearch
+  updateCustomPopulationSearch,
+  selectCustomPopulationSearch
 } from '../../redux/customPopulationSearch'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import { clearPopulationFilters } from '../../redux/populationFilters'
@@ -27,6 +28,7 @@ const CustomPopulation = ({
   getCustomPopulationSearchesDispatch,
   saveCustomPopulationSearchDispatch,
   updateCustomPopulationSearchDispatch,
+  selectCustomPopulationSearchDispatch,
   custompop,
   translate,
   isAdmin,
@@ -34,8 +36,9 @@ const CustomPopulation = ({
   clearPopulationFiltersDispatch,
   loading,
   customPopulationSearches,
-  latestCreatedcustomPopulationSearchId,
-  customPopulationSearchSaving
+  latestCreatedCustomPopulationSearchId,
+  customPopulationSearchSaving,
+  searchedCustomPopulationSearchId
 }) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
@@ -48,10 +51,10 @@ const CustomPopulation = ({
   }, [])
 
   useEffect(() => {
-    if (latestCreatedcustomPopulationSearchId) {
-      setSelectedSearchId(latestCreatedcustomPopulationSearchId)
+    if (latestCreatedCustomPopulationSearchId) {
+      setSelectedSearchId(latestCreatedCustomPopulationSearchId)
     }
-  }, [latestCreatedcustomPopulationSearchId])
+  }, [latestCreatedCustomPopulationSearchId])
 
   const handleNameChange = e => {
     setName(e.target.value)
@@ -98,6 +101,7 @@ const CustomPopulation = ({
     getCustomPopulationDispatch({ studentnumberlist: studentnumbers, onProgress })
     getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: studentnumbers })
     clearPopulationFiltersDispatch()
+    selectCustomPopulationSearchDispatch(selectedSearchId || null)
     handleClose()
   }
   const renderCustomPopulationSearch = () => (
@@ -156,6 +160,14 @@ const CustomPopulation = ({
 
   const renderCustomPopulation = () => (
     <div>
+      {custompop && (
+        <Header className="segmentTitle" size="large" textAlign="center">
+          Custom population
+          {searchedCustomPopulationSearchId
+            ? ` "${customPopulationSearches.find(({ id }) => id === searchedCustomPopulationSearchId).name}"`
+            : ''}
+        </Header>
+      )}
       <Segment>
         <CustomPopulationFilters samples={custompop} />
         <Segment>
@@ -195,7 +207,8 @@ const CustomPopulation = ({
 }
 
 CustomPopulation.defaultProps = {
-  latestCreatedcustomPopulationSearchId: null
+  latestCreatedCustomPopulationSearchId: null,
+  searchedCustomPopulationSearchId: null
 }
 
 CustomPopulation.propTypes = {
@@ -209,10 +222,12 @@ CustomPopulation.propTypes = {
   loading: bool.isRequired,
   customPopulationSearches: arrayOf(shape({})).isRequired,
   customPopulationSearchSaving: bool.isRequired,
-  latestCreatedcustomPopulationSearchId: string,
+  latestCreatedCustomPopulationSearchId: string,
+  searchedCustomPopulationSearchId: string,
   saveCustomPopulationSearchDispatch: func.isRequired,
   getCustomPopulationSearchesDispatch: func.isRequired,
-  updateCustomPopulationSearchDispatch: func.isRequired
+  updateCustomPopulationSearchDispatch: func.isRequired,
+  selectCustomPopulationSearchDispatch: func.isRequired
 }
 
 const mapStateToProps = ({
@@ -252,7 +267,8 @@ const mapStateToProps = ({
     selectedStudents,
     customPopulationSearches: customPopulationSearch.customPopulationSearches,
     customPopulationSearchSaving: customPopulationSearch.saving,
-    latestCreatedcustomPopulationSearchId: customPopulationSearch.latestCreatedcustomPopulationSearchId
+    latestCreatedCustomPopulationSearchId: customPopulationSearch.latestCreatedCustomPopulationSearchId,
+    searchedCustomPopulationSearchId: customPopulationSearch.searchedCustomPopulationSearchId
   }
 }
 
@@ -264,6 +280,7 @@ export default connect(
     clearPopulationFiltersDispatch: clearPopulationFilters,
     saveCustomPopulationSearchDispatch: saveCustomPopulationSearch,
     getCustomPopulationSearchesDispatch: getCustomPopulationSearches,
-    updateCustomPopulationSearchDispatch: updateCustomPopulationSearch
+    updateCustomPopulationSearchDispatch: updateCustomPopulationSearch,
+    selectCustomPopulationSearchDispatch: selectCustomPopulationSearch
   }
 )(CustomPopulation)
