@@ -25,6 +25,8 @@ const {
 } = require('../models/index')
 const { updateAttainmentDates } = require('./update_attainment_dates')
 
+const getColumnsToUpdate = (arr) => arr[0] ? Object.keys(arr[0]) : []
+
 const updateAttainments = async (studyAttainments, transaction) => {
   // Sort data to avoid deadlocks. If there are duplicate primary keys in the same array, then bulkCreate won't work.
   const courses = sortedUniqBy(sortBy(studyAttainments.map(e => e.course), 'code'), 'code')
@@ -41,42 +43,19 @@ const updateAttainments = async (studyAttainments, transaction) => {
   await Promise.all([
     Course.bulkCreate(courses, {
       transaction,
-      updateOnDuplicate: [
-        'name',
-        'latest_instance_date',
-        'is_study_module',
-        'coursetypecode',
-        'startdate',
-        'enddate',
-        'max_attainment_date',
-        'min_attainment_date',
-        'updatedAt'
-      ]
+      updateOnDuplicate: getColumnsToUpdate(courses)
     }),
     Provider.bulkCreate(providers, {
       transaction,
-      updateOnDuplicate: ['name', 'updatedAt']
+      updateOnDuplicate: getColumnsToUpdate(providers)
     }),
     Credit.bulkCreate(credits, {
       transaction,
-      updateOnDuplicate: [
-        'grade',
-        'student_studentnumber',
-        'credits',
-        'ordering',
-        'createddate',
-        'lastmodifieddate',
-        'credittypecode',
-        'attainment_date',
-        'course_code',
-        'semestercode',
-        'isStudyModule',
-        'updatedAt'
-      ]
+      updateOnDuplicate: getColumnsToUpdate(credits)
     }),
     Teacher.bulkCreate(teachers, {
       transaction,
-      updateOnDuplicate: ['code', 'name', 'updatedAt']
+      updateOnDuplicate: getColumnsToUpdate(teachers)
     })
   ])
 
@@ -120,40 +99,27 @@ const updateStudyRights = async (studyRights, transaction) => {
   await Promise.all([
     StudyrightExtent.bulkCreate(studyRightExtents, {
       transaction,
-      updateOnDuplicate: ['name', 'updatedAt']
+      updateOnDuplicate: getColumnsToUpdate(studyRightExtents)
     }),
 
     Studyright.bulkCreate(studyrights, {
       transaction,
-      updateOnDuplicate: [
-        'canceldate',
-        'cancelorganisation',
-        'enddate',
-        'givendate',
-        'graduated',
-        'prioritycode',
-        'startdate',
-        'studystartdate',
-        'organization_code',
-        'student_studentnumber',
-        'extentcode',
-        'updatedAt'
-      ]
+      updateOnDuplicate: getColumnsToUpdate(studyrights)
     }),
 
     ElementDetails.bulkCreate(elementDetails, {
       transaction,
-      updateOnDuplicate: ['name', 'type', 'updatedAt']
+      updateOnDuplicate: getColumnsToUpdate(elementDetails)
     }),
 
     StudyrightElement.bulkCreate(studyRightElements, {
       transaction,
-      updateOnDuplicate: ['startdate', 'enddate', 'studyrightid', 'code', 'studentnumber', 'updatedAt']
+      updateOnDuplicate: getColumnsToUpdate(studyRightElements)
     }),
 
     Transfers.bulkCreate(transfers, {
       transaction,
-      updateOnDuplicate: ['transferdate', 'studentnumber', 'studyrightid', 'sourcecode', 'targetcode', 'updatedAt']
+      updateOnDuplicate: getColumnsToUpdate(transfers)
     })
   ])
 }
@@ -207,33 +173,32 @@ const updateMeta = async ({
   disciplines
 }) => {
   const transaction = await sequelize.transaction()
-  const updateOnDuplicate = ['name', 'updatedAt']
 
   try {
     await Promise.all([
       CourseType.bulkCreate(uniqBy(courseTypeCodes, 'coursetypecode'), {
         transaction,
-        updateOnDuplicate
+        updateOnDuplicate: getColumnsToUpdate(courseTypeCodes)
       }),
       Organisation.bulkCreate(uniqBy(faculties, 'code'), {
         transaction,
-        updateOnDuplicate
+        updateOnDuplicate: getColumnsToUpdate(faculties)
       }),
       CourseRealisationType.bulkCreate(uniqBy(courseRealisationsTypes, 'realisationtypecode'), {
         transaction,
-        updateOnDuplicate
+        updateOnDuplicate: getColumnsToUpdate(courseRealisationsTypes)
       }),
       Semester.bulkCreate(uniqBy(semesters, 'semestercode'), {
         transaction,
-        updateOnDuplicate: ['name', 'startdate', 'enddate', 'yearcode', 'yearname', 'updateOnDuplicate']
+        updateOnDuplicate: getColumnsToUpdate(semesters)
       }),
       CreditType.bulkCreate(uniqBy(creditTypeCodes, 'credittypecode'), {
         transaction,
-        updateOnDuplicate
+        updateOnDuplicate: getColumnsToUpdate(creditTypeCodes)
       }),
       Discipline.bulkCreate(uniqBy(disciplines, 'discipline_id'), {
         transaction,
-        updateOnDuplicate
+        updateOnDuplicate: getColumnsToUpdate(disciplines)
       })
     ])
 
