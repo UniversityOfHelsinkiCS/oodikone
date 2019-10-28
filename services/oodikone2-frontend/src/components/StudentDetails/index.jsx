@@ -333,15 +333,15 @@ class StudentDetails extends Component {
     const { studyrightid } = this.state
     const studyRightHeaders = ['Degree', 'Programme', 'Study Track', 'Graduated']
     const studyRightRows = student.studyrights.map(studyright => {
-      const degree = sortBy(studyright.studyrightElements, 'enddate').find(e => e.element_detail.type === 10)
+      const degree = sortBy(studyright.studyright_elements, 'enddate').find(e => e.element_detail.type === 10)
       const formattedDegree = degree && {
         startdate: degree.startdate,
         enddate: degree.enddate,
         name: getTextIn(degree.element_detail.name, language),
-        graduateionDate: degree.graduationDate,
+        graduateionDate: degree.graduation_date,
         canceldate: degree.canceldate
       }
-      const programmes = sortBy(studyright.studyrightElements, 'enddate')
+      const programmes = sortBy(studyright.studyright_elements, 'enddate')
         .filter(e => e.element_detail.type === 20)
         .map(programme => ({
           code: programme.code,
@@ -349,7 +349,7 @@ class StudentDetails extends Component {
           enddate: programme.enddate,
           name: getTextIn(programme.element_detail.name, language)
         }))
-      const studytracks = sortBy(studyright.studyrightElements, 'enddate')
+      const studytracks = sortBy(studyright.studyright_elements, 'enddate')
         .filter(e => e.element_detail.type === 30)
         .map(studytrack => ({
           startdate: studytrack.startdate,
@@ -402,8 +402,8 @@ class StudentDetails extends Component {
                     <Table.Cell verticalAlign="middle">
                       {c.elements.degree && (
                         <p key={c.elements.degree.name}>
-                          {`${c.elements.degree.name} 
-                          (${reformatDate(c.elements.degree.startdate, 'DD.MM.YYYY')} - 
+                          {`${c.elements.degree.name}
+                          (${reformatDate(c.elements.degree.startdate, 'DD.MM.YYYY')} -
                           ${reformatDate(c.elements.degree.enddate, 'DD.MM.YYYY')})`}
                           <br />
                         </p>

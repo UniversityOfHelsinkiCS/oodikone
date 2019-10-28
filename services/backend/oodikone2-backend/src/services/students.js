@@ -153,30 +153,7 @@ const formatStudent = ({
     }
   }
 
-  studyrights =
-    studyrights === undefined
-      ? []
-      : studyrights.map(
-          ({
-            studyrightid,
-            startdate,
-            enddate,
-            canceldate,
-            extentcode,
-            graduated,
-            graduation_date,
-            studyright_elements
-          }) => ({
-            studyrightid,
-            extentcode,
-            startdate,
-            graduationDate: graduation_date,
-            studyrightElements: studyright_elements,
-            enddate,
-            canceldate,
-            graduated: Boolean(graduated)
-          })
-        )
+  studyrights = studyrights || []
   semester_enrollments = semester_enrollments || []
   const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({
     semestercode,

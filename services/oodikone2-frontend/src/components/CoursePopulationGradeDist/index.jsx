@@ -28,7 +28,7 @@ const CoursePopulationCreditDist = ({
 
       const grades = {}
       samples.forEach(student => {
-        const courses = student.courses.filter(c => codes.includes(c.course.code))
+        const courses = student.courses.filter(c => codes.includes(c.course_code))
         const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
         if (highestGrade) {
           if (!grades[highestGrade.grade]) {
