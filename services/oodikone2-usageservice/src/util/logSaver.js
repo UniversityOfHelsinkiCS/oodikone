@@ -11,7 +11,7 @@ module.exports = class LogSaverTransport extends Transport {
           username: payload.userId,
           name: payload.name,
           admin: payload.roles ? payload.roles.map(r => r.group_code).includes('admin') : false,
-          time: payload.iat,
+          time: payload.time,
           method: payload.method,
           URL: payload.url,
           status: payload.status,
