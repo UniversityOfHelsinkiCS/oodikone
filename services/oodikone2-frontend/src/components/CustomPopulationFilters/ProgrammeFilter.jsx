@@ -121,7 +121,7 @@ ProgrammeFilter.propTypes = {
 
 const mapStateToProps = ({ settings, populations }) => ({
   language: settings.language,
-  elementDetails: populations.data.elementDetails.data
+  elementDetails: populations.data.elementdetails.data
 })
 
 export default connect(

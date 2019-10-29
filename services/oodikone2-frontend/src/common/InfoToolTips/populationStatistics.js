@@ -5,15 +5,17 @@ export default {
   <br>
   <br>
   **Class of:** lukuvuosi, jolloin opiskelija on ilmoittautunut ensimmäisen kerran (läsnä- tai poissaolevaksi) ohjelmaan. Ilmoittautumisen opinto-oikeus voi olla ensi- tai toissijainen. <br>
-  **Statistics until:** tarkastelujakson päättymiskuukausi. <br>
-  **Study programme:** haluttu koulutusohjelma.`,
+  **Study programme:** haluttu koulutusohjelma.<br>
+  **Select tag (Optional):** itsetehty tai valmis tägi.<br>
+  **Study track (Optional):** opintosuunta.<br>
+  **Degree (optional):** tutkintotaso.`,
   Advanced: `**Semesters:**  Jos haluaa tarkastella vain syyslukukaudella tai kevätlukukaudella ilmoittautuneita, haluttu ajanjakso valitaan tästä.
 
   **Include:** Koulutusohjelmapopulaatiosta on oletusarvoisesti suodatettu pois vaihto-opiskelijat, tutkinnonsuoritusoikeudesta luopuneet ja erillisopinto-oikeudella opiskelevat. Näitä ryhmiä voi sisällyttää mukaan lisäämällä ruksin haluamaansa kohtaan.`,
   QueryCard: `Valitun koulutusohjelmavuosikurssin perustiedot.
   <br>
   <br>
-  **Sample size** luku sisältää läsnä- ja poissaolevaksi ilmoittautuneet opiskelijat, muttei "excludes"-ryhmiä, jotka voi määritellä koulutusohjelmaa valittaessa.
+  **Sample size** luku sisältää läsnä- ja poissaolevaksi ilmoittautuneet opiskelijat, muttei "excludes"-ryhmiä, jotka voi määritellä "advanced settings" -kohdasta.
   <br>
   **Fall** = 1.8. - 31.12. ilmoittautuneet ja **Spring** = 1.1. - 31.7. ilmoittautuneet.
   <br>
@@ -28,7 +30,7 @@ export default {
     josta voi lisätä haluamiaan suodattimia, jotka rajaavat valittua populaatiota.`,
     Filters: `Valitut suodattimet näkyvät tässä. Suodattimia voi poistaa klikkaamalla mustaa rastia.
     <br> <br>
-    **Show excluded students only**: Tällä liukukytkimellä voi valita filtteri-suodatuksien komplementin,
+    **Show excluded students only**: Tällä liukukytkimellä voi valita suodatuksien komplementin,
     eli liukukytkin päällä saa näkyviin poissuodatetut opiskelijat.
     <br> <br>
     **Clear all filters**: Poistaa kerralla valitut filtterit.
@@ -65,15 +67,17 @@ export default {
     <br> <br>
     Tämä taulukko sisältää kaikkien populaatioon liittyvien opiskelijoiden kaikki kurssisuoritukset.
     <br> <br>
+    Kurssin nimiää voi käyttää suodattimina, eli klikkaamalla haluamiansa nimiä saa vain näkyviin kyseisten kurssien opiskelijat. Nämä suodatimet löytyvät ”Filters” otsikon alta ja ne voi poistaa klikkaamalla mustaa rastia.
+    <br> <br>
+    Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta siirtyy ”course statistics” 
+    näkymään valitun kurssin osalta.
+    <br> <br>
     Taulukon tietoja voi suodattaa kohdassa ”limit to courses where student number at least” 
     kirjoittamalla haluamansa opiskelijalukumäärän kenttään sekä kohdassa ”code (filter here)” 
     kirjoittamalla haluamansa kurssikoodin alun kenttään ja näkyviin jää esimerkiksi vain 
     ”MAT”-alkuiset kurssit. Huom.! Nämä suodattimet ovat ”taulukon sisäisiä” suodattimia, 
     eivätkä siis ilmesty ”Filters” otsikon alle. Suodattimet saa pois tyhjentämällä kentän 
     kirjoittamistaan merkeistä ja painamalla ENTER.
-    <br> <br>
-    Klikkaamalla kurssin nimen vieressä olevaa mustaa nuolta siirtyy ”course statistics” 
-    näkymään valitun kurssin osalta.
     <br> <br>
     Taulukossa on kolme eri näkymää ”pass/fail”, ”grades” ja ”when passed”.
     <br> <br>
