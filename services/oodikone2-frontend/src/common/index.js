@@ -227,7 +227,7 @@ export const getStudentToTargetCourseDateMap = (students, codes) => {
   const codeSet = new Set(codes)
   return students.reduce((acc, student) => {
     const targetCourse = student.courses
-      .filter(c => codeSet.has(c.course.code))
+      .filter(c => codeSet.has(c.course_code))
       .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
     acc[student.studentNumber] = targetCourse ? targetCourse.date : null
     return acc
@@ -249,7 +249,7 @@ export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCo
         (a, b) => new Date(b.startdate) - new Date(a.startdate)
       )[0]
       studyprogrammes.push({
-        name: newestStudyrightElement.element_detail.name,
+        name: elementDetails[newestStudyrightElement.code].name,
         startdate: newestStudyrightElement.startdate,
         code: newestStudyrightElement.code
       })

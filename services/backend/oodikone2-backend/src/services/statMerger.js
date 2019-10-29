@@ -55,7 +55,7 @@ const populationCourseStatsMerger = multiyearstats => {
           if (!stats.coursestatistics[index].grades[grade]) {
             stats.coursestatistics[index].grades[grade] = c.grades[grade]
           } else {
-            stats.coursestatistics[index].grades[grade].count += c.grades[grade]
+            stats.coursestatistics[index].grades[grade].count += c.grades[grade].count
           }
         })
         Object.keys(c.students).forEach(key2 => {
@@ -79,9 +79,11 @@ const populationStudentsMerger = multiyearstudents => {
   samples.students = []
   samples.extents = []
   samples.semesters = []
-  samples.studyrights = {}
-  samples.studyrights.degrees = []
-  samples.studyrights.programmes = []
+  samples.courses = []
+  samples.elementdetails = {}
+  samples.elementdetails.data = {}
+  samples.elementdetails.degrees = []
+  samples.elementdetails.programmes = []
   samples.transfers = {}
   samples.transfers.targets = {}
   samples.transfers.sources = {}
@@ -90,8 +92,10 @@ const populationStudentsMerger = multiyearstudents => {
     samples.students = samples.students.concat(year.students)
     samples.extents = samples.extents.concat(year.extents)
     samples.semesters = samples.semesters.concat(year.semesters)
-    samples.studyrights.degrees = samples.studyrights.degrees.concat(year.studyrights.degrees)
-    samples.studyrights.programmes = samples.studyrights.programmes.concat(year.studyrights.programmes)
+    samples.courses = samples.courses.concat(year.courses)
+    samples.elementdetails.data = Object.assign(samples.elementdetails.data, year.elementdetails.data)
+    samples.elementdetails.degrees = samples.elementdetails.degrees.concat(year.elementdetails.degrees)
+    samples.elementdetails.programmes = samples.elementdetails.programmes.concat(year.elementdetails.programmes)
     samples.transfers.targets = { ...samples.transfers.targets, ...year.transfers.targets }
     samples.transfers.sources = { ...samples.transfers.sources, ...year.transfers.sources }
   })
