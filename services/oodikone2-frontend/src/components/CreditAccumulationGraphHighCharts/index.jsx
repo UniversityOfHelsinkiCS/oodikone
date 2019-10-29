@@ -241,7 +241,7 @@ class CreditAccumulationGraphHighCharts extends Component {
         if (course.passed && !course.isStudyModuleCredit) {
           credits += course.credits
         }
-        const defaultPointOptions = this.isSingleStudentGraph() ? { name: course.course.code } : {}
+        const defaultPointOptions = this.isSingleStudentGraph() ? { name: course.course_code } : {}
         return {
           ...defaultPointOptions,
           x: new Date(course.date).getTime(),
