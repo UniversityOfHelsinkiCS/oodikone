@@ -10,10 +10,12 @@ router.get('/ping', async (req, res) => {
   res.json({ data: 'pong' })
 })
 
+const S_TO_MS = 1000
+
 router.get('/log', async (req, res) => {
   try {
-    const from = req.query.from || 1
-    const to = req.query.to || Number((new Date().getTime() / 1000 + 60).toFixed(0))
+    const from = req.query.from || new Date(1 * S_TO_MS)
+    const to = req.query.to || new Date(new Date().getTime() + 60 * S_TO_MS)
     const results = await between(from, to)
     res.json(results)
   } catch (e) {

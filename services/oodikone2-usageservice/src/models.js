@@ -15,7 +15,7 @@ const UsageStatistic = sequelize.define(
       type: Sequelize.STRING
     },
     time: {
-      type: Sequelize.INTEGER
+      type: Sequelize.DATE
     },
     admin: {
       type: Sequelize.BOOLEAN
