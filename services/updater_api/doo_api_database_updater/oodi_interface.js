@@ -1,17 +1,17 @@
 require('dotenv').config()
 const axios = require('axios')
-const { setupCache } = require('axios-cache-adapter')
+const LRU = require('lru-cache')
 const https = require('https')
 const fs = require('fs')
+const logger = require('../logger')
 
 const { OODI_ADDR, KEY_PATH, CERT_PATH } = process.env
 const base_url = OODI_ADDR
 
-const cache = setupCache({
-  maxAge: 60 * 60 * 1000,
-  exclude: {
-    paths: ['/students/'],
-  },
+const requestCache = new LRU({
+  max: 10000,
+  length: () => 1,
+  maxAge: 60 * 60 * 1000
 })
 
 const agent = KEY_PATH && CERT_PATH ?
@@ -25,11 +25,17 @@ const agent = KEY_PATH && CERT_PATH ?
   })
 
 const instance = axios.create({
-  httpsAgent: agent,
-  adapter: cache.adapter
+  httpsAgent: agent
 })
 
-const getUrl = instance.get
+const getUrl = async (url) => {
+  const cacheHit = requestCache.get(url)
+  if (cacheHit) return [cacheHit, true]
+
+  const data = await instance.get(url)
+  if (!url.includes('/students/')) requestCache.set(url, data)
+  return [data, false]
+}
 
 const getOodiApi = async relative => {
   const route = base_url + relative
@@ -37,17 +43,20 @@ const getOodiApi = async relative => {
   return stuff
 }
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 const attemptGetFor = async (url, attempts = 5) => {
   for (let attempt = 1; attempt <= attempts; ++attempt) {
     try {
-      const response = await getUrl(url)
-      // logger.info('requested url', { url, success: response.status === 200, responsetype: response.request.fromCache ? 'FROM_CACHE' : 'FROM_OODI' })
+      const [response, fromCache] = await getUrl(url)
+      logger.info('oodi_cache_hit', { cache_hit: fromCache ? 'HIT' : 'MISS' })
       return response
     } catch (error) {
       if (attempt === attempts) {
         console.log('ATTEMPT GET FOR FAILURE')
         throw error
       }
+      await sleep(15000)
     }
   }
 }
