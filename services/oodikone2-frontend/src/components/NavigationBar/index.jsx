@@ -29,6 +29,7 @@ const allNavigationItems = {
   users: { path: '/users', translateId: 'users', reqRights: ['users'] },
   faculty: { path: '/faculties', translateId: 'faculty', reqRights: ['faculties'] },
   usage: { path: '/usage', translateId: 'usage', reqRights: ['usage'] },
+  updater: { path: '/updater', translateId: 'updater', reqRights: ['dev', 'admin'] },
   sandbox: { path: '/sandbox', translateId: 'sandbox', reqRights: ['dev'] },
   feedback: { path: '/feedback', translateId: 'feedback' }
 }
@@ -45,7 +46,7 @@ const NavigationBar = props => {
         }
       }
       const { reqRights } = allNavigationItems[key]
-      if (!reqRights || userRoles.some(r => reqRights.includes(r))) {
+      if (!reqRights || reqRights.every(r => userRoles.includes(r))) {
         visibleNavigationItems[key] = allNavigationItems[key]
       }
     })
