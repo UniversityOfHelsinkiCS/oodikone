@@ -24,6 +24,7 @@ const Overview = props => {
         error={throughput.error}
         studyprogramme={studyprogramme}
         history={history}
+        newProgramme={isNewStudyprogramme(studyprogramme)}
       />
       <ProductivityTable
         productivity={productivity.data[studyprogramme]}

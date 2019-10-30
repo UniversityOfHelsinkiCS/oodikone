@@ -1,11 +1,14 @@
 const router = require('express').Router()
 const UsageService = require('../services/usageService')
 
+const S_TO_MS = 1000
+
 router.get('/', async (req, res) => {
-  const from = req.query.from || 1
-  const to = req.query.to || Number((new Date().getTime() / 1000 + 60).toFixed(0))
-  const results = await UsageService.get(from, to)
-  res.json(results)
+  const from = req.query.from ? new Date(req.query.from) : new Date(1 * S_TO_MS)
+  const to = req.query.to ? new Date(req.query.to) : new Date(new Date().getTime() + 60 * S_TO_MS)
+  const resultStream = await UsageService.getStream(from, to)
+  res.contentType('json')
+  resultStream.pipe(res)
 })
 
 module.exports = router
