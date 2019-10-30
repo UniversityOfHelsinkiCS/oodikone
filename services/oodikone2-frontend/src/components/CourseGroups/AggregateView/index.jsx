@@ -31,7 +31,11 @@ class AggregateView extends Component {
           isLoading: false
         })
       })
-      .catch(() => {
+      .catch(e => {
+        if (e.message.toLowerCase() === 'network error') {
+          window.location.reload(true)
+          return
+        }
         this.setState({ courseGroups: [], isLoading: false })
       })
   }
@@ -45,7 +49,11 @@ class AggregateView extends Component {
           isLoading: false
         })
       })
-      .catch(() => {
+      .catch(e => {
+        if (e.message.toLowerCase() === 'network error') {
+          window.location.reload(true)
+          return
+        }
         this.setState({ courseGroups: [], isLoading: false })
       })
   }

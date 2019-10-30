@@ -11,9 +11,15 @@ class UsageStatistics extends Component {
   state = null
 
   componentWillMount() {
-    callApi('/usage').then(({ data }) => {
-      this.setState(data)
-    })
+    callApi('/usage')
+      .then(({ data }) => {
+        this.setState(data)
+      })
+      .catch(e => {
+        if (e.message.toLowerCase() === 'network error') {
+          window.location.reload(true)
+        }
+      })
   }
 
   renderStats() {

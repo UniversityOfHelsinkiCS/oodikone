@@ -1,15 +1,7 @@
-var stan = require('node-nats-streaming').connect('updaterNATS', process.env.HOSTNAME, process.env.NATS_URI)
+const { stan, opts } = require('./stan')
 const { getStudent, getMeta } = require('./doo_api_database_updater/updater_formatter')
 const logger = require('./logger')
 const moment = require('moment')
-
-console.log(`STARTING WITH ${process.env.HOSTNAME} as id`)
-var opts = stan.subscriptionOptions()
-opts.setManualAckMode(true)
-opts.setAckWait(10 * 60 * 1000)
-// opts.setDeliverAllAvailable()
-// opts.setDurableName('durable')
-opts.setMaxInFlight(1)
 
 const hasActiveEnrollment = (semesterEnrollments) => {
   if (semesterEnrollments) {
