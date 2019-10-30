@@ -255,4 +255,10 @@ describe('Population Statistics tests', () => {
       cy.root().get("button").contains("Delete for good").click({ force: true })
     })
   })
+  it('Population statistics wont crash course population', () => {
+    cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
+    cy.contains("See population").click()
+    cy.get(':nth-child(3) > .iconCell > p > .item > .level').click({ force: true })
+    cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click({ force: true })
+  })
 })
