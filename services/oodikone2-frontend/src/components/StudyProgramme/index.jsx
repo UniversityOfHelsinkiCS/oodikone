@@ -26,16 +26,28 @@ const StudyProgramme = props => {
   const refreshProductivity = () => {
     callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, {
       code: props.match.params.studyProgrammeId
-    }).then(() => {
-      props.getProductivityDispatch(props.match.params.studyProgrammeId)
     })
+      .then(() => {
+        props.getProductivityDispatch(props.match.params.studyProgrammeId)
+      })
+      .catch(e => {
+        if (e.message.toLowerCase() === 'network error') {
+          window.location.reload(true)
+        }
+      })
   }
   const refreshThroughput = () => {
     callApi('/v2/studyprogrammes/throughput/recalculate', 'get', null, {
       code: props.match.params.studyProgrammeId
-    }).then(() => {
-      props.getThroughputDispatch(props.match.params.studyProgrammeId)
     })
+      .then(() => {
+        props.getThroughputDispatch(props.match.params.studyProgrammeId)
+      })
+      .catch(e => {
+        if (e.message.toLowerCase() === 'network error') {
+          window.location.reload(true)
+        }
+      })
   }
 
   const getPanes = () => {

@@ -30,42 +30,54 @@ class CourseGroup extends Component {
   }
 
   async componentDidMount() {
-    const { groupId } = this.props
-    const [courseGroup, academicYears] = await Promise.all([
-      callApi(`${CG_API_BASE_PATH}/${groupId}`),
-      callApi(`${CG_API_BASE_PATH}/academic-years`)
-    ])
+    try {
+      const { groupId } = this.props
+      const [courseGroup, academicYears] = await Promise.all([
+        callApi(`${CG_API_BASE_PATH}/${groupId}`),
+        callApi(`${CG_API_BASE_PATH}/academic-years`)
+      ])
 
-    const { name, totalCredits, totalStudents, totalCourses, teachers, semester } = courseGroup.data
+      const { name, totalCredits, totalStudents, totalCourses, teachers, semester } = courseGroup.data
 
-    this.setState({
-      academicYears: academicYears.data,
-      semesterCode: semester,
-      name,
-      totalCredits,
-      totalStudents,
-      totalCourses,
-      teachers,
-      isLoading: false,
-      showOnlyActiveTeachers: false
-    })
+      this.setState({
+        academicYears: academicYears.data,
+        semesterCode: semester,
+        name,
+        totalCredits,
+        totalStudents,
+        totalCourses,
+        teachers,
+        isLoading: false,
+        showOnlyActiveTeachers: false
+      })
+    } catch (e) {
+      if (e.message.toLowerCase() === 'network error') {
+        window.location.reload(true)
+      }
+    }
   }
 
   handleSemesterCodeChange = (e, { value }) => {
     const { groupId } = this.props
 
     this.setState({ semesterCode: value, isLoading: true }, () =>
-      callApi(`${CG_API_BASE_PATH}/${groupId}/?semester=${value}`).then(({ data }) => {
-        const { totalCredits, totalStudents, totalCourses, teachers } = data
+      callApi(`${CG_API_BASE_PATH}/${groupId}/?semester=${value}`)
+        .then(({ data }) => {
+          const { totalCredits, totalStudents, totalCourses, teachers } = data
 
-        this.setState({
-          isLoading: false,
-          totalCredits,
-          totalStudents,
-          totalCourses,
-          teachers
+          this.setState({
+            isLoading: false,
+            totalCredits,
+            totalStudents,
+            totalCourses,
+            teachers
+          })
         })
-      })
+        .catch(e => {
+          if (e.message.toLowerCase() === 'network error') {
+            window.location.reload(true)
+          }
+        })
     )
   }
 
