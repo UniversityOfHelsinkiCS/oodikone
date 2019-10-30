@@ -73,15 +73,17 @@ class PopulationSearchHistory extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { query } = this.state
-    this.setState({
-      query: {
-        ...query,
-        months: nextProps.populations.query.months,
-        year: nextProps.populations.query.year,
-        semesters: nextProps.populations.query.semesters,
-        studentStatuses: nextProps.populations.query.studentStatuses || []
-      }
-    })
+    if (nextProps.populations.query) {
+      this.setState({
+        query: {
+          ...query,
+          months: nextProps.populations.query.months,
+          year: nextProps.populations.query.year,
+          semesters: nextProps.populations.query.semesters,
+          studentStatuses: nextProps.populations.query.studentStatuses || []
+        }
+      })
+    }
   }
 
   months = (year, term) => {

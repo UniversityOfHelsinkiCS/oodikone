@@ -84,6 +84,9 @@
     "sandbox": [
       "Sandbox"
     ],
+    "updater": [
+      "Updater"
+    ],
     "courseGroups": [
       "Course groups"
     ],
