@@ -79,7 +79,13 @@ class Index extends Component {
     }
 
     this.setState({ isLoading: true, courses: [] }, () =>
-      callApi(path).then(({ data: courses }) => this.setState({ isLoading: false, courses }))
+      callApi(path)
+        .then(({ data: courses }) => this.setState({ isLoading: false, courses }))
+        .catch(e => {
+          if (e.message.toLowerCase() === 'network error') {
+            window.location.reload(true)
+          }
+        })
     )
   }
 
