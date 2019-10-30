@@ -10,7 +10,7 @@ import Datetime from 'react-datetime'
 import { sortBy, isEqual } from 'lodash'
 import moment from 'moment'
 
-import { getPopulationStatistics } from '../../redux/populations'
+import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/populationSelectedStudentCourses'
 import { getPopulationFilters, setPopulationFilter, clearPopulationFilters } from '../../redux/populationFilters'
@@ -209,10 +209,14 @@ const PopulationSearchForm = props => {
   })
 
   const pushQueryToUrl = query => {
-    const { studyRights, ...rest } = query
-    const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
-    const searchString = qs.stringify(queryObject)
-    history.push({ search: searchString })
+    if (!checkPreviousQuery(query, props.queries)) props.clearPopulations()
+    // Just to be sure that the previous population's data has been cleared
+    setImmediate(() => {
+      const { studyRights, ...rest } = query
+      const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
+      const searchString = qs.stringify(queryObject)
+      history.push({ search: searchString })
+    })
   }
 
   const getSearchHistoryTextFromQuery = () => {
@@ -646,7 +650,8 @@ PopulationSearchForm.propTypes = {
   getTagsByStudytrackAction: func.isRequired,
   tags: oneOfType([arrayOf(shape({ tag_id: string, tagname: string })), object]).isRequired,
   onProgress: func.isRequired,
-  clearSelected: func.isRequired
+  clearSelected: func.isRequired,
+  clearPopulations: func.isRequired
 }
 
 const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, localize, tags }) => {
@@ -678,7 +683,8 @@ export default withRouter(
       setLoading,
       getSemesters,
       getTagsByStudytrackAction,
-      clearSelected
+      clearSelected,
+      clearPopulations
     }
   )(PopulationSearchForm)
 )
