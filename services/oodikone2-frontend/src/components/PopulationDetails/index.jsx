@@ -5,9 +5,7 @@ import { Segment, Header, Message, Button, Icon, Tab } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { flattenDeep } from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
-
 import selectors from '../../selectors/populationDetails'
-
 import { getTotalCreditsFromCourses } from '../../common'
 import PopulationFilters from '../PopulationFilters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
