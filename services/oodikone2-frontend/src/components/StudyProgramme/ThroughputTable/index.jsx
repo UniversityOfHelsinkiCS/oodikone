@@ -57,7 +57,7 @@ TotalPopulationLink.propTypes = {
   children: node.isRequired
 }
 
-const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, userRoles, history }) => {
+const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, userRoles, history, newProgramme }) => {
   const [lowerYear, setLower] = useState(null)
   const [upperYear, setUpper] = useState(null)
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
@@ -271,7 +271,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
               <Table.Row>
                 <Table.HeaderCell style={{ fontWeight: 'bold' }}>
                   Total{' '}
-                  {userRoles.includes('admin') && years.length > 0 ? (
+                  {newProgramme && years.length > 0 ? (
                     <TotalPopulationLink studyprogramme={studyprogramme} years={years}>
                       <Icon name="level up alternate" />
                     </TotalPopulationLink>
@@ -366,7 +366,8 @@ ThroughputTable.propTypes = {
   loading: bool.isRequired,
   error: bool.isRequired,
   userRoles: arrayOf(string).isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  newProgramme: bool.isRequired
 }
 
 ThroughputTable.defaultProps = {
