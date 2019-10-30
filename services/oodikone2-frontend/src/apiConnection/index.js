@@ -151,6 +151,12 @@ export const handleAuth = store => next => async action => {
       }
       store.dispatch({ type: 'LOGIN_SUCCESS', token })
     } catch (err) {
+      // handle stale Shibboleth session by reloading frontend
+      if (err.message.toLowerCase() === 'network error') {
+        window.location.reload(true)
+        return
+      }
+
       store.dispatch({ type: 'LOGIN_FAILURE' })
       handleError(err)
     }
@@ -159,6 +165,10 @@ export const handleAuth = store => next => async action => {
       await logout()
       store.dispatch({ type: 'LOGOUT_SUCCESSFUL' })
     } catch (err) {
+      if (err.message.toLowerCase() === 'network error') {
+        window.location.reload(true)
+        return
+      }
       store.dispatch({ type: 'LOGOUT_FAILURE' })
       handleError(err)
     }
