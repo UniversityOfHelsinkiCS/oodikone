@@ -93,21 +93,19 @@ export default {
     (huom. suodattimet vaikuttavat tähän listaan!). Taulukko näyttää oletusarvoisesti vain 
     opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
     <br> <br>
-    **General:**
-    <br> <br>
-    Klikkaamalla opiskelijanumeron vieressä olevaa mustaa nuolta, siirtyy "student statistic" näkymään.    ”student statistics” näkymään valitun opiskelijan osalta.
+    **GENERAL:**
+    Klikkaamalla opiskelijanumeron vieressä olevaa sinistä nuolta, siirtyy "student statistic" näkymään valitun opiskelijan osalta.
     <br> <br>
     **credits since start of studyright**  listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson / populaation ajalta.
     <br> <br>
     **all credits:** listaa opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, 
       eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
     <br> <br>    
-    **transferred froms:** opiskelijan vanha koulutusohjelma, josta opiskelija on siirtynyt uuteen.
+    **transferred from:** opiskelijan vanha koulutusohjelma, josta opiskelija on siirtynyt uuteen.
     <br> <br>
-    **studytracks:** koulutusohjelman suunta
+    **studytracks:** opintosuunta
     <br> <br>
-    **Mandatory courses:**
-    <br>
+    **MANDATORY COURSES:**
     Tällä välilehdellä näkyy, mitä pakollisiksi määriteltyjä kursseja opiskelija on suorittanut. 
     Kurssit voi määrittää kohdassa "Study program" > "Overview" > haluttu koulutusohjelma. 
     Scrollatessa kurssitaulukkoa alaspäin, kurssin nimen saa näkyviin viemällä kursorin halutun 
