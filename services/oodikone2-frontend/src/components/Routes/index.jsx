@@ -50,7 +50,8 @@ const routes = {
   sandbox: '/sandbox',
   feedback: '/feedback',
   coursepopulation: '/coursepopulation',
-  custompopulation: '/custompopulation'
+  custompopulation: '/custompopulation',
+  updater: '/updater'
 }
 
 const Routes = () => (
@@ -70,7 +71,7 @@ const Routes = () => (
       <Route exact path={routes.feedback} component={Feedback} />
       <Route exact path={routes.coursepopulation} component={CoursePopulation} />
       <Route exact path={routes.custompopulation} component={CustomPopulation} />
-      <Route exact path="/updater" component={Updater} />
+      <Route exact path={routes.updater} component={Updater} />
     </Switch>
   </Suspense>
 )
