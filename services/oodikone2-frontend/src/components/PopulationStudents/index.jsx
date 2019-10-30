@@ -594,6 +594,7 @@ class PopulationStudents extends Component {
           priority: priorityText(s.studyrights),
           extent: extentCodes(s.studyrights),
           studytrack: studytrack(s.studyrights).map(st => st.name)[0],
+          tags: tags(s.tags),
           'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
           'mandatory total passed': totalMandatoryPassed(s.studentNumber),
           ...sortedMandatory.reduce((acc, m) => {

@@ -77,17 +77,19 @@ class UsageStatistics extends Component {
     ]
 
     if (this.state.user) {
-      const entries = this.state.all.filter(e => e.username === this.state.user).sort((e1, e2) => e2.time - e1.time)
+      const entries = this.state.all
+        .filter(e => e.username === this.state.user)
+        .map(({ time, ...e }) => ({ ...e, time: new Date(time) }))
+        .sort((e1, e2) => e2.time.getTime() - e1.time.getTime())
 
       const usersName = entries[0].name
 
-      const toTime = stamp => {
+      const toTime = date => {
         const zeroed = v => (v < 10 ? `0${v}` : v)
 
-        const date = new Date(stamp * 1000)
-        return `${date.getFullYear()}${zeroed(date.getUTCMonth() + 1)}
-          ${zeroed(date.getDate())} ${zeroed(date.getHours())}:
-          ${zeroed(date.getMinutes())}:${zeroed(date.getSeconds())}`
+        return `${date.getFullYear()}-${zeroed(date.getUTCMonth() + 1)}-${zeroed(date.getDate())} ${zeroed(
+          date.getHours()
+        )}:${zeroed(date.getMinutes())}:${zeroed(date.getSeconds())}`
       }
 
       return (
