@@ -3,13 +3,13 @@ const axios = require('axios')
 const LRU = require('lru-cache')
 const https = require('https')
 const fs = require('fs')
-const logger = require('../logger')
+const { stan } = require('../stan')
 
 const { OODI_ADDR, KEY_PATH, CERT_PATH } = process.env
 const base_url = OODI_ADDR
 
 const requestCache = new LRU({
-  max: 10000,
+  max: 25000,
   length: () => 1,
   maxAge: 60 * 60 * 1000
 })
@@ -49,7 +49,7 @@ const attemptGetFor = async (url, attempts = 5) => {
   for (let attempt = 1; attempt <= attempts; ++attempt) {
     try {
       const [response, fromCache] = await getUrl(url)
-      logger.info('oodi_cache_hit', { cache_hit: fromCache ? 'HIT' : 'MISS' })
+      stan.publish('api_request', JSON.stringify({ fromCache }), (err) => { if (err) console.log('api_request publish failed', err) })
       return response
     } catch (error) {
       if (attempt === attempts) {
