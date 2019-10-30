@@ -1,8 +1,8 @@
 module.exports = {
-    up: async queryInterface => {
-      return queryInterface.sequelize.transaction(async transaction => {
-        await queryInterface.sequelize.query(
-            `
+  up: async queryInterface => {
+    return queryInterface.sequelize.transaction(async transaction => {
+      await queryInterface.sequelize.query(
+        `
 ALTER TABLE "usage_statistics"
 ADD COLUMN "fixed_time" TIMESTAMP WITH TIME ZONE;
 
@@ -16,10 +16,9 @@ USING "fixed_time";
 ALTER TABLE "usage_statistics"
 DROP COLUMN "fixed_time";
             `,
-          { transaction }
-        )
-      })
-    },
-    down: () => {}
-  }
-  
+        { transaction }
+      )
+    })
+  },
+  down: () => {}
+}

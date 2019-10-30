@@ -87,14 +87,19 @@ const getStudent = async (studentnumber) => {
     error.name = 'NO_STUDENT'
     throw error
   }
-  const studentInfo = await mapper.getStudentFromData(api.student, api.studyrights)
-  const [studyRights, studyAttainments, semesterEnrollments, courseEnrollments] = await Promise.all([
-    formatStudyrights(api, studentnumber),
-    formatStudyattainments(api, studentnumber),
-    formatSemesterEnrollments(api, studentnumber),
-    formatCourseEnrollments(api, studentnumber)
-  ])
-  return { studentInfo, studyRights, studyAttainments, semesterEnrollments, courseEnrollments }
+  try {
+    const studentInfo = await mapper.getStudentFromData(api.student, api.studyrights)
+    const [studyRights, studyAttainments, semesterEnrollments, courseEnrollments] = await Promise.all([
+      formatStudyrights(api, studentnumber),
+      formatStudyattainments(api, studentnumber),
+      formatSemesterEnrollments(api, studentnumber),
+      formatCourseEnrollments(api, studentnumber)
+    ])
+    return { studentInfo, studyRights, studyAttainments, semesterEnrollments, courseEnrollments }
+  } catch (e) {
+    console.error('getStudent failed', api)
+    throw e
+  }
 }
 
 const getMeta = async () => {

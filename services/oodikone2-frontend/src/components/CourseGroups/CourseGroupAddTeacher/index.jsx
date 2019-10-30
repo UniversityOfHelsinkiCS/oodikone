@@ -21,12 +21,18 @@ class CourseGroupAddTeacher extends Component {
   state = DEFAULT_STATE
 
   componentDidMount() {
-    callApi(`/course-groups/${this.props.groupId}`).then(res => {
-      this.setState({
-        courseGroup: res.data,
-        isLoading: false
+    callApi(`/course-groups/${this.props.groupId}`)
+      .then(res => {
+        this.setState({
+          courseGroup: res.data,
+          isLoading: false
+        })
       })
-    })
+      .catch(e => {
+        if (e.message.toLowerCase() === 'network error') {
+          window.location.reload(true)
+        }
+      })
   }
 
   resetComponent = () => {
@@ -91,14 +97,20 @@ class CourseGroupAddTeacher extends Component {
               link
               onClick={() => {
                 this.setState({ isLoading: true })
-                callApi(`/course-groups/${this.props.groupId}/remove/${t.id}`, 'post').then(() => {
-                  callApi(`/course-groups/${this.props.groupId}`).then(res => {
-                    this.setState({
-                      courseGroup: res.data,
-                      isLoading: false
+                callApi(`/course-groups/${this.props.groupId}/remove/${t.id}`, 'post')
+                  .then(() => {
+                    callApi(`/course-groups/${this.props.groupId}`).then(res => {
+                      this.setState({
+                        courseGroup: res.data,
+                        isLoading: false
+                      })
                     })
                   })
-                })
+                  .catch(e => {
+                    if (e.message.toLowerCase() === 'network error') {
+                      window.location.reload(true)
+                    }
+                  })
               }}
             />
           ),
@@ -133,14 +145,20 @@ class CourseGroupAddTeacher extends Component {
                         className: 'clickable',
                         onClick: () => {
                           this.setState({ isLoading: true })
-                          callApi(`/course-groups/${this.props.groupId}/add/${teacher.id}`, 'post').then(() => {
-                            callApi(`/course-groups/${this.props.groupId}`).then(res => {
-                              this.setState({
-                                courseGroup: res.data,
-                                isLoading: false
+                          callApi(`/course-groups/${this.props.groupId}/add/${teacher.id}`, 'post')
+                            .then(() => {
+                              callApi(`/course-groups/${this.props.groupId}`).then(res => {
+                                this.setState({
+                                  courseGroup: res.data,
+                                  isLoading: false
+                                })
                               })
                             })
-                          })
+                            .catch(e => {
+                              if (e.message.toLowerCase() === 'network error') {
+                                window.location.reload(true)
+                              }
+                            })
                         }
                       })}
                       tableProps={{ celled: false, sortable: false }}
