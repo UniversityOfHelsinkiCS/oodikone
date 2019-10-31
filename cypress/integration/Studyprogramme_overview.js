@@ -117,4 +117,67 @@ describe('Studyprogramme overview', () => {
     cy.get('i.level.up.alternate.icon').eq(0).click()
     cy.contains('Credit accumulation (for 29 students)')
   })
+  it('can create and delete tags for population', () => {
+    cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
+    cy.get('.attached > :nth-child(6)').click()
+    cy.get(':nth-child(1) > .field > .ui > input').type('tykittäjät')
+    cy.get('.form-control').type('2018')
+    cy.contains('Create new tag').click()
+    cy.contains('tykittäjät')
+    cy.contains('2018')
+    cy.get('tr > :nth-child(3) > .field > .ui').click()
+    cy.contains('Are you sure you want to delete tag')
+    cy.contains('Confirm').click()
+    cy.contains('tykittäjät').should('not.exist')
+  })
+  it('can create personal tags', () => {
+    cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
+    cy.get('.attached > :nth-child(6)').click()
+    cy.get(':nth-child(1) > .field > .ui > input').type('epätykittäjät')
+    cy.get('.form-control').type('2018')
+    cy.get('.ui > label').click()
+    cy.contains('Create new tag').click()
+    cy.get('.purple')
+    cy.contains('epätykittäjät')
+    cy.get('tr > :nth-child(3) > .field > .ui').click()
+    cy.contains('Are you sure you want to delete tag')
+    cy.contains('Confirm').click()
+    cy.contains('epätykittäjät').should('not.exist')
+
+  })
+  it('can add tags to students', () => {
+    cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
+    cy.get('.attached > :nth-child(6)').click()
+    cy.get(':nth-child(1) > .field > .ui > input').type('tykittäjät')
+    cy.get('.form-control').type('2018')
+    cy.contains('Create new tag').click()
+    cy.contains('tykittäjät')
+
+    cy.contains('Add tags to students').click()
+    cy.get('.form > .field > .dropdown').click().get('.ui > .search').type('tykittäjät').click()
+    
+    cy.get('.form > .field > .dropdown').contains('tykittäjät').click()
+
+    cy.get('textarea').type('014495339')
+    cy.get('.positive').click()
+
+    cy.contains('Student statistics').click()
+    cy.get('.prompt').type('014495339')
+    cy.contains('10').click()
+    cy.contains('tykittäjät')
+
+    cy.go('back')
+    cy.go('back')
+
+    cy.get('tr > :nth-child(3) > .field > .ui').click()
+    cy.contains('Are you sure you want to delete tag')
+    cy.contains('Confirm').click()
+    cy.contains('tykittäjät').should('not.exist')
+
+    cy.contains('Student statistics').click()
+    cy.get('.prompt').type('014495339')
+    cy.contains('10').click()
+    cy.contains('tykittäjät').should('not.exist')
+
+  })
 })
