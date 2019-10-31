@@ -268,10 +268,17 @@ export const gradeMeanFilter = params => {
     },
     filter: student => {
       const gradeMeanOfStudent = getStudentGradeMean(student)
-      if (comparator === 'less') {
-        return gradeMean > gradeMeanOfStudent
+
+      if (comparator === '≤') {
+        return gradeMeanOfStudent <= gradeMean
       }
-      return gradeMean <= gradeMeanOfStudent
+      if (comparator === '≥') {
+        return gradeMeanOfStudent >= gradeMean
+      }
+      if (comparator === '<') {
+        return gradeMeanOfStudent < gradeMean
+      }
+      return gradeMeanOfStudent > gradeMean
     }
   }
 }
