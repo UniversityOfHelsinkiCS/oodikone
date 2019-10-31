@@ -212,7 +212,7 @@ class PopulationFilters extends Component {
     this.setState({ presetFilters: this.state.presetFilters.filter(filter => filter.id !== id) })
 
   renderAddFilters(allStudyRights) {
-    const { extents, transfers, populationSelectedStudentCourses, populationCourses } = this.props
+    const { extents, transfers, populationSelectedStudentCourses, populationCourses, tags } = this.props
     const { Add } = infotooltips.PopulationStatistics.Filters
     const selectedPopulationCourses = populationSelectedStudentCourses.data
       ? populationSelectedStudentCourses
@@ -264,9 +264,10 @@ class PopulationFilters extends Component {
         </div>
         {unsetFilters.map(filterName => {
           //eslint-disable-line
-          if (componentFor[filterName]) {
+          if (componentFor[filterName] && !(filterName === 'TagFilter' && tags.length < 1)) {
             // THIS IS KINDA HACKED SOLUTION PLS FIX
             // this is awful, shame on who ever wrote this, pls fix
+            // when is this going to be fixed?
             return React.createElement(componentFor[filterName], {
               filter: { notSet: true },
               key: filterName,
@@ -275,7 +276,7 @@ class PopulationFilters extends Component {
               extents,
               allStudyRights
             })
-          } else {
+          } else if(!(filterName === 'TagFilter' && tags.length < 1)) {
             return React.createElement(Preset, {
               filter: {
                 ...this.state.presetFilters.find(f => f.id === filterName),
@@ -407,7 +408,8 @@ const mapStateToProps = ({
   graphSpinner,
   populations,
   populationSelectedStudentCourses,
-  populationCourses
+  populationCourses,
+  tags
 }) => ({
   populationSelectedStudentCourses,
   populationCourses,
@@ -420,7 +422,8 @@ const mapStateToProps = ({
   studyRights: populations.query.studyRights,
   allStudyRights: populations.data.studyrights,
   extents: populations.data.extents,
-  transfers: populations.data.transfers
+  transfers: populations.data.transfers,
+  tags: tags.data
 })
 
 export default connect(
