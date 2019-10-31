@@ -108,7 +108,6 @@ class CreditAccumulationGraphHighCharts extends Component {
         }
       }
     ]
-
     return renderToString(<CreditGraphTooltip payload={payload} active translate={translate} />)
   }
 
@@ -173,6 +172,7 @@ class CreditAccumulationGraphHighCharts extends Component {
           shared: false,
           split: false
         }
+
     const options = {
       plotOptions: {
         series: {
@@ -225,7 +225,6 @@ class CreditAccumulationGraphHighCharts extends Component {
         ...tooltipOptions
       }
     }
-
     this.setState({ options, updateGraph: false })
   }
 
@@ -241,7 +240,7 @@ class CreditAccumulationGraphHighCharts extends Component {
         if (course.passed && !course.isStudyModuleCredit) {
           credits += course.credits
         }
-        const defaultPointOptions = this.isSingleStudentGraph() ? { name: course.course_code } : {}
+        const defaultPointOptions = this.isSingleStudentGraph() ? { name: course.course.code } : {}
         return {
           ...defaultPointOptions,
           x: new Date(course.date).getTime(),
