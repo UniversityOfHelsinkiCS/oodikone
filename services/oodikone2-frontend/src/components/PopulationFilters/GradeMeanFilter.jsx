@@ -51,7 +51,12 @@ class GradeMeanFilter extends Component {
                 <Dropdown
                   placeholder="select comparator"
                   onChange={(e, data) => this.setState({ comparator: data.value })}
-                  options={[{ key: 1, text: 'less than', value: 'less' }, { key: 2, text: 'more than', value: 'more' }]}
+                  options={[
+                    { key: 1, text: '≤', value: '≤' },
+                    { key: 2, text: '≥', value: '≥' },
+                    { key: 3, text: '<', value: '<' },
+                    { key: 4, text: '>', value: '>' }
+                  ]}
                   selectOnBlur={false}
                   selectOnNavigation={false}
                 />
@@ -87,7 +92,7 @@ class GradeMeanFilter extends Component {
 
     return (
       <Segment>
-        Students that have grade mean {this.props.filter.params.comparator} than {this.props.filter.params.gradeMean}
+        Students that have grade mean {this.props.filter.params.comparator} {this.props.filter.params.gradeMean}
         <span style={{ float: 'right' }}>
           <Icon name="remove" onClick={this.clearFilter} />
         </span>
