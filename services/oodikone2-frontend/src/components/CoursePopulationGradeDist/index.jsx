@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Progress } from 'semantic-ui-react'
 import { intersection, orderBy } from 'lodash'
-import { shape, func, bool, arrayOf, string } from 'prop-types'
+import { shape, func, bool, arrayOf, string, number } from 'prop-types'
 
 import SearchResultTable from '../SearchResultTable'
 import { gradeFilter } from '../../populationFilters'
@@ -97,8 +97,8 @@ CoursePopulationCreditDist.propTypes = {
   samples: arrayOf(shape({})).isRequired,
   filters: arrayOf(shape({})).isRequired,
   codes: arrayOf(string).isRequired,
-  from: string.isRequired,
-  to: string.isRequired
+  from: number.isRequired,
+  to: number.isRequired
 }
 
 const mapStateToProps = ({ singleCourseStats, populationFilters }) => ({
