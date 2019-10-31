@@ -8,8 +8,8 @@ import { tagFilter } from '../../populationFilters'
 
 const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, filter, tags }) => {
   const [options, setOptions] = useState([])
-  const [selectedTag, setSelectedTag] = useState()
-  const [selectedComp, setSelectedComp] = useState()
+  const [selectedTag, setSelectedTag] = useState(null)
+  const [selectedComp, setSelectedComp] = useState(null)
 
   const createOptions = () => {
     const createdOptions = tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id }))
@@ -48,7 +48,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
             <Form.Field>
               <Dropdown
                 placeholder="select"
-                options={[{ key: 1, text: 'have', value: 'true' }, { key: 2, text: "don't have", value: 'false' }]}
+                options={[{ key: 1, text: 'have', value: 1 }, { key: 2, text: "don't have", value: 0 }]}
                 onChange={handleCompChange}
                 selectOnBlur={false}
                 selectOnNavigation={false}
@@ -67,7 +67,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
               />
             </Form.Field>
             <Form.Field>
-              <Button onClick={handleFilter} disabled={!selectedTag || !selectedComp}>
+              <Button onClick={handleFilter} disabled={!selectedTag || selectedComp === null}>
                 set filter
               </Button>
             </Form.Field>
