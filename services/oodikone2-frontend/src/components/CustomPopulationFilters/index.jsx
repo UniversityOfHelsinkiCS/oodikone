@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Header, Button, Form, Radio } from 'semantic-ui-react'
-import { func, arrayOf, bool, shape, string } from 'prop-types'
+import { func, arrayOf, bool, shape, string, number } from 'prop-types'
 import { union, uniq, difference } from 'lodash'
 
 import CreditsLessThan from '../PopulationFilters/CreditsLessThan'
@@ -134,8 +134,8 @@ const CustomPopulationFilters = ({
 
 CustomPopulationFilters.defaultProps = {
   coursecodes: [],
-  from: '',
-  to: ''
+  from: 0,
+  to: 0
 }
 
 CustomPopulationFilters.propTypes = {
@@ -146,8 +146,8 @@ CustomPopulationFilters.propTypes = {
   setComplementFilterDispatch: func.isRequired,
   coursecodes: arrayOf(string),
   allStudyrights: shape({}).isRequired,
-  from: string,
-  to: string
+  from: number,
+  to: number
 }
 
 const mapStateToProps = ({ populationFilters, populations }) => ({
