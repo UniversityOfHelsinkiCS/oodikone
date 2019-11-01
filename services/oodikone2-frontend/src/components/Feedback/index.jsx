@@ -5,11 +5,13 @@ import { Form, TextArea, Button, Modal } from 'semantic-ui-react'
 import PropTypes from 'prop-types'
 
 import { sendFeedbackAction } from '../../redux/feedback'
+import { useTitle } from '../../common'
 
 const Feedback = ({ sendFeedback, success, pending, error }) => {
   const [feedback, setFeedback] = useState('')
   const [showError, setError] = useState(false)
   const [show, setShow] = useState(false)
+  useTitle('Feedback')
 
   useEffect(() => {
     if (success) {
