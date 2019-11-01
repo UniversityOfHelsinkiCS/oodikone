@@ -5,7 +5,7 @@ import { getActiveLanguage } from 'react-localize-redux'
 import { Header, Segment, Form } from 'semantic-ui-react'
 import { uniq } from 'lodash'
 import { string, arrayOf, shape, func, bool } from 'prop-types'
-import { getTextIn } from '../../common'
+import { getTextIn, useTitle } from '../../common'
 import { getUserFaculties, getFacultiesYearlyStats, getFacultyProgrammes } from '../../redux/faculties'
 import YearFilter from '../CourseStatistics/SearchForm/YearFilter'
 import FacultySelector from './FacultySelector'
@@ -28,6 +28,7 @@ const Faculty = ({
   const [toYear, setToYear] = useState(-1)
   const [years, setYears] = useState([])
   const [initialized, setInitialized] = useState(false)
+  useTitle('Faculties')
 
   const facultyCodes = faculties.map(({ code }) => code)
   const selectedFacultyProgrammesStats = facultyYearlyStats.find(({ id }) => id === selectedFaculty)

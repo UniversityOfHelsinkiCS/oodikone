@@ -11,12 +11,13 @@ import InfoBox from '../InfoBox'
 import ProgressBar from '../ProgressBar'
 
 import infoTooltips from '../../common/InfoToolTips'
-import { useProgress } from '../../common'
+import { useProgress, useTitle } from '../../common'
 
 const PopulationStatistics = memo(props => {
   const { translate, populationFound, loading, location, history } = props
 
   const { onProgress, progress } = useProgress(loading)
+  useTitle('Population statistics')
 
   const renderPopulationSearch = () => {
     const { Main } = infoTooltips.PopulationStatistics

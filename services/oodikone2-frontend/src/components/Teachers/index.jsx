@@ -7,7 +7,7 @@ import TeacherSearchTab from '../TeacherSearchTab'
 import TeacherPage from '../TeacherPage'
 import TeacherStatistics from '../TeacherStatistics'
 import TeacherLeaderBoard from '../TeacherLeaderBoard'
-import { useTabs, getUserIsAdmin } from '../../common'
+import { useTabs, getUserIsAdmin, useTitle } from '../../common'
 
 const pane = (title, Content, icon) => ({
   menuItem: { key: title, content: title, icon },
@@ -43,14 +43,17 @@ const Teachers = ({
     params: { teacherid }
   },
   isAdmin
-}) => (
-  <div className="segmentContainer">
-    <Header className="segmentTitle" size="large" content="Teacher statistics" />
-    <Segment className="contentSegment">
-      {teacherid ? <TeacherPage teacherid={teacherid} /> : <TeachersTabs admin={isAdmin} />}
-    </Segment>
-  </div>
-)
+}) => {
+  useTitle('Teachers')
+  return (
+    <div className="segmentContainer">
+      <Header className="segmentTitle" size="large" content="Teacher statistics" />
+      <Segment className="contentSegment">
+        {teacherid ? <TeacherPage teacherid={teacherid} /> : <TeachersTabs admin={isAdmin} />}
+      </Segment>
+    </div>
+  )
+}
 
 Teachers.propTypes = {
   match: shape({

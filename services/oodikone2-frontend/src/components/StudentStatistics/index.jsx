@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { func, shape, string } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
@@ -9,28 +9,28 @@ import { findStudents, getStudent, selectStudent } from '../../redux/students'
 import StudentSearch from '../StudentSearch'
 import StudentDetails from '../StudentDetails'
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
+import { useTitle } from '../../common'
 
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
-// eslint-disable-next-line react/prefer-stateless-function
-class StudentStatistics extends Component {
-  render() {
-    const { translate, match } = this.props
-    const { studentNumber } = match.params
+const StudentStatistics = props => {
+  const { translate, match } = props
+  const { studentNumber } = match.params
 
-    return (
-      <div className="segmentContainer">
-        <Header className="segmentTitle" size="large">
-          {translate('studentStatistics.header')}
-        </Header>
-        <StudentNameVisibilityToggle />
-        <Segment className="contentSegment">
-          <StudentSearch translate={translate} studentNumber={studentNumber} />
-          <StudentDetails translate={translate} studentNumber={studentNumber} />
-        </Segment>
-      </div>
-    )
-  }
+  useTitle('Student statistics')
+
+  return (
+    <div className="segmentContainer">
+      <Header className="segmentTitle" size="large">
+        {translate('studentStatistics.header')}
+      </Header>
+      <StudentNameVisibilityToggle />
+      <Segment className="contentSegment">
+        <StudentSearch translate={translate} studentNumber={studentNumber} />
+        <StudentDetails translate={translate} studentNumber={studentNumber} />
+      </Segment>
+    </div>
+  )
 }
 
 StudentStatistics.propTypes = {

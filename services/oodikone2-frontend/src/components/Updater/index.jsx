@@ -2,12 +2,13 @@ import React, { useState, useRef, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Header, Segment, Form, Button, Table, TextArea } from 'semantic-ui-react'
 import { callApi } from '../../apiConnection'
-import { cancelablePromise } from '../../common'
+import { cancelablePromise, useTitle } from '../../common'
 
 const Updater = () => {
   const [amount, setAmount] = useState('')
   const [statuses, setStatuses] = useState(null)
   const [nums, setNums] = useState('')
+  useTitle('Updater')
 
   const updateOldestStudents = amount => amount !== 0 && callApi('/updater/update/oldest', 'post', { amount })
   const updateAllStudents = () => callApi('/updater/update/all', 'post')
