@@ -358,7 +358,7 @@ export const useProgress = loading => {
 
 export const useTitle = title => {
   useEffect(() => {
-    document.title = title ? `Oodikone - ${title}` : 'Oodikone'
+    document.title = title ? `${title} - Oodikone` : 'Oodikone'
   }, [title])
 }
 
