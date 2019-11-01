@@ -29,7 +29,15 @@ const PopulationStatisticsLink = ({ studyprogramme, year: yearLabel, children })
   )
 }
 
-const TotalPopulationLink = ({ years, studyprogramme, children }) => {
+const TotalPopulationLink = ({ confirm, years, studyprogramme, children }) => {
+  const confirmWrapper = e => {
+    if (confirm) {
+      const c = window.confirm(
+        `Are you sure you want to see a combined population of ${years.length} different populations?`
+      )
+      if (!c) e.preventDefault()
+    }
+  }
   const yearsString = years.map(year => year.value).join('&years=')
   const months = getMonths(Math.min(...years.map(year => Number(year.value))))
   const href =
@@ -39,7 +47,7 @@ const TotalPopulationLink = ({ years, studyprogramme, children }) => {
       : `/populations?months=${months}&semesters=FALL&semesters=` +
         `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${years[0].value}&years[]=${yearsString}`
   return (
-    <Link title="Population statistics of all years" to={href}>
+    <Link onClick={confirmWrapper} title="Population statistics of all years" to={href}>
       {children}
     </Link>
   )
@@ -51,10 +59,15 @@ PopulationStatisticsLink.propTypes = {
   children: node.isRequired
 }
 
+TotalPopulationLink.defaultProps = {
+  confirm: false
+}
+
 TotalPopulationLink.propTypes = {
   studyprogramme: string.isRequired,
   years: arrayOf(shape({})).isRequired,
-  children: node.isRequired
+  children: node.isRequired,
+  confirm: bool
 }
 
 const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, userRoles, history, newProgramme }) => {
@@ -272,7 +285,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                 <Table.HeaderCell style={{ fontWeight: 'bold' }}>
                   Total{' '}
                   {newProgramme && years.length > 0 ? (
-                    <TotalPopulationLink studyprogramme={studyprogramme} years={years}>
+                    <TotalPopulationLink confirm studyprogramme={studyprogramme} years={years}>
                       <Icon name="level up alternate" />
                     </TotalPopulationLink>
                   ) : null}
