@@ -30,9 +30,11 @@ const PopulationStatisticsLink = ({ studyprogramme, year: yearLabel, children })
 }
 
 const TotalPopulationLink = ({ confirm, years, studyprogramme, children }) => {
-  const confirmWrapper = (e) => {
+  const confirmWrapper = e => {
     if (confirm) {
-      const c = window.confirm(`Are you sure you want to see a combined population of ${years.length} different populations?`)
+      const c = window.confirm(
+        `Are you sure you want to see a combined population of ${years.length} different populations?`
+      )
       if (!c) e.preventDefault()
     }
   }
@@ -283,7 +285,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                 <Table.HeaderCell style={{ fontWeight: 'bold' }}>
                   Total{' '}
                   {newProgramme && years.length > 0 ? (
-                    <TotalPopulationLink confirm={true} studyprogramme={studyprogramme} years={years}>
+                    <TotalPopulationLink confirm studyprogramme={studyprogramme} years={years}>
                       <Icon name="level up alternate" />
                     </TotalPopulationLink>
                   ) : null}
