@@ -8,7 +8,7 @@ import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
 import SummaryTab from './SummaryTab'
 import ProgressBar from '../ProgressBar'
-import { useProgress } from '../../common'
+import { useProgress, useTitle } from '../../common'
 import { clearCourseStats } from '../../redux/coursestats'
 
 const MENU = {
@@ -24,6 +24,7 @@ const CourseStatistics = props => {
   const [selected, setSelected] = useState(undefined)
 
   const { onProgress, progress } = useProgress(loading)
+  useTitle('Course statistics')
 
   const switchToCourse = coursecode => {
     setActiveIndex(1)
