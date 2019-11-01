@@ -15,7 +15,7 @@ import CustomPopulationFilters from '../CustomPopulationFilters'
 import CoursePopulationGradeDist from '../CoursePopulationGradeDist'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
-import { useProgress, getStudentToTargetCourseDateMap } from '../../common'
+import { useProgress, getStudentToTargetCourseDateMap, useTitle } from '../../common'
 
 const CoursePopulation = ({
   getCoursePopulationDispatch,
@@ -38,6 +38,7 @@ const CoursePopulation = ({
   const [headerYears, setYears] = useState('')
   const [dateFrom, setDateFrom] = useState(null)
   const [dateTo, setDateTo] = useState(null)
+  useTitle('Course population')
 
   const { onProgress, progress } = useProgress(pending && !studentData.students)
   const studentToTargetCourseDateMap = useMemo(

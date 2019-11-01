@@ -21,6 +21,7 @@ class EnableUsers extends Component {
     if (this.props.elementdetails.length === 0) this.props.getElementDetails()
     if (this.props.units.length === 0) this.props.getUnits()
     if (this.props.users.length === 0) this.props.getUsers()
+    document.title = 'Users - Oodikone'
   }
 
   toggleEnabledOnly() {

@@ -10,6 +10,10 @@ import '../StudentInfoCard/studentInfoCard.css'
 class UsageStatistics extends Component {
   state = null
 
+  componentDidMount() {
+    document.title = 'Usage statistics - Oodikone'
+  }
+
   componentWillMount() {
     callApi('/usage')
       .then(({ data }) => {

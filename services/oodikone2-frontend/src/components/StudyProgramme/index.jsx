@@ -12,7 +12,7 @@ import Overview from './Overview'
 import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
-import { getTextIn, useTabs, getUserRoles, getUserIsAdmin } from '../../common'
+import { getTextIn, useTabs, getUserRoles, getUserIsAdmin, useTitle } from '../../common'
 import TSA from '../../common/tsa'
 import Tags from './Tags'
 
@@ -22,6 +22,7 @@ import { callApi } from '../../apiConnection'
 
 const StudyProgramme = props => {
   const [tab, setTab] = useTabs('p_tab', props.match.params.courseGroupId ? 2 : 0, props.history)
+  useTitle('Study programmes')
 
   const refreshProductivity = () => {
     callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, {

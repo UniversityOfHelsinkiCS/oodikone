@@ -1,5 +1,11 @@
 /// <reference types="Cypress" />
 
+const setPopStatsUntil = (until) => {
+  cy.contains("Advanced settings").siblings().get('.toggle').click()
+  cy.contains("Statistics until").siblings().get('.rdt').get('input').eq(1).click().clear().type(until)
+  cy.contains("Fetch population with new settings").click()
+}
+
 describe('Population Statistics tests', () => {
   beforeEach(() => {
     cy.server({
@@ -59,6 +65,9 @@ describe('Population Statistics tests', () => {
   it('Population statistics is usable on general level', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
+
+    setPopStatsUntil('September 2019')
+
     cy.get(".card").within(() => {
       cy.contains("Tietojenkäsittelytieteen maisteriohjelma")
       cy.contains("Sample size: 29 students")

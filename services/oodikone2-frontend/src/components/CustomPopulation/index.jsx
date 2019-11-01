@@ -4,7 +4,7 @@ import { Button, Modal, Form, TextArea, Segment, Header } from 'semantic-ui-reac
 import { getTranslate } from 'react-localize-redux'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
 import { intersection, difference } from 'lodash'
-import { getUserIsAdmin, useProgress } from '../../common'
+import { getUserIsAdmin, useProgress, useTitle } from '../../common'
 import { getCustomPopulation } from '../../redux/populations'
 import {
   getCustomPopulationSearches,
@@ -45,6 +45,7 @@ const CustomPopulation = ({
   const [name, setName] = useState('')
   const [selectedSearchId, setSelectedSearchId] = useState('')
   const { onProgress, progress } = useProgress(loading)
+  useTitle('Custom population')
 
   useEffect(() => {
     getCustomPopulationSearchesDispatch()

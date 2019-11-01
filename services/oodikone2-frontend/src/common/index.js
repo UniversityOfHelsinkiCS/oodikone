@@ -356,6 +356,12 @@ export const useProgress = loading => {
   }
 }
 
+export const useTitle = title => {
+  useEffect(() => {
+    document.title = title ? `${title} - Oodikone` : 'Oodikone'
+  }, [title])
+}
+
 export const validateInputLength = (input, minLength) => input && input.trim().length >= minLength
 
 export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
