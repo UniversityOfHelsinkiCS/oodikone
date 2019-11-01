@@ -11,7 +11,7 @@ class UsageStatistics extends Component {
   state = null
 
   componentDidMount() {
-    document.title = 'Oodikone - Usage statistics'
+    document.title = 'Usage statistics - Oodikone'
   }
 
   componentWillMount() {
