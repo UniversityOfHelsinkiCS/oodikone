@@ -196,6 +196,10 @@ const getCourseEnrollments = async studentnumber => {
   const url = `${base_url}/students/${studentnumber}/enrollments`
   try {
     const response = await attemptGetFor(url)
+    if (!response.data.data) {
+      console.log('COURSE ENROLLMENTS RESPONSE', response)
+      console.log('COURSE ENROLLMENTS RESPONSE DATA', response.data)
+    }
     return response.data.data
   } catch (e) {
     console.log('GET COURS EENREOLMETNS FAIELD')
