@@ -18,6 +18,7 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production'
 try {
   if (IS_PRODUCTION && BASE_PATH === '/') {
     Sentry.init({
+      environment: process.env.TAG,
       dsn: 'https://02d07bd40f404cc0965f38f06183d9fb@toska.cs.helsinki.fi/3',
       release: process.env.SENTRY_RELEASE_VERSION
     })
