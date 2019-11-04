@@ -1,7 +1,31 @@
+const axios = require('axios')
+const https = require('https')
+const fs = require('fs')
 const { wrapper, router } = require('./router').routerWithWrapper()
-const { getOodiApi } = require('../services/doo_api_database_updater/oodi_interface')
-const { OODI_SECRET, OODI_SECRET_HEADER_KEY } = require('../conf-backend')
+const { KEY_PATH, CERT_PATH, OODI_ADDR, OODI_SECRET, OODI_SECRET_HEADER_KEY } = require('../conf-backend')
 const logger = require('../util/logger')
+
+const agent =
+  KEY_PATH && CERT_PATH
+    ? new https.Agent({
+        cert: fs.readFileSync(CERT_PATH, 'utf8'),
+        key: fs.readFileSync(KEY_PATH, 'utf8')
+      })
+    : new https.Agent({
+        rejectUnauthorized: false
+      })
+
+const instance = axios.create({
+  httpsAgent: agent
+})
+
+const getUrl = instance.get
+
+const getOodiApi = async relative => {
+  const route = OODI_ADDR + relative
+  const stuff = await getUrl(route)
+  return stuff
+}
 
 const validOodApiRequest = request => {
   const secret = request.headers[OODI_SECRET_HEADER_KEY]
