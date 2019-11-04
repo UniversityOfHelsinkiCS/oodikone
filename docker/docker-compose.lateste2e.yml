@@ -16,6 +16,9 @@ services:
   backend:
     image: toska/oodikone2-backend:${TAG}
     build:
+      args:
+        TAG: ${TAG}
+    build:
       cache_from:
         - toska/oodikone2-backend:trunk
         - toska/oodikone2-backend:staging
@@ -31,6 +34,7 @@ services:
     build:
       args:
         BASE_PATH: /
+        TAG: ${TAG}
       cache_from:
         - toska/oodikone2-frontend:trunk
         - toska/oodikone2-frontend:staging
