@@ -3,7 +3,6 @@ const axios = require('axios')
 const LRU = require('lru-cache')
 const https = require('https')
 const fs = require('fs')
-const { stan } = require('../stan')
 
 const { OODI_ADDR, KEY_PATH, CERT_PATH } = process.env
 const base_url = OODI_ADDR
@@ -30,11 +29,11 @@ const instance = axios.create({
 
 const getUrl = async (url) => {
   const cacheHit = requestCache.get(url)
-  if (cacheHit) return [cacheHit, true]
+  if (cacheHit) return cacheHit
 
   const data = await instance.get(url)
   if (!url.includes('/students/')) requestCache.set(url, data)
-  return [data, false]
+  return data
 }
 
 const getOodiApi = async relative => {
@@ -48,8 +47,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 const attemptGetFor = async (url, attempts = 5) => {
   for (let attempt = 1; attempt <= attempts; ++attempt) {
     try {
-      const [response, fromCache] = await getUrl(url)
-      stan.publish('api_request', JSON.stringify({ fromCache }), (err) => { if (err) console.log('api_request publish failed', err) })
+      const response = await getUrl(url)
       return response
     } catch (error) {
       if (attempt === attempts) {

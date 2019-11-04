@@ -146,8 +146,6 @@ Environment variable _INCREMENT_ (currently not set) controls how many new stude
 
 At the moment script uses the local postgres (see .env) to save student numbers.
 
-Use _docker-compose run -d CONTAINER_NAME node src/services/doo_api_database_updater/student_list_updater.js /updater_files/all_student_numbers.txt_ to save student numbers in textfile. 
-
 ### Student info updater (database updater)
 
 To update your database run `docker-compose run -d CONTAINER_NAME npm run update_database` with optional args `file="<filename>"` and `index=<number>` with former telling the studentnumber filename to update and latter telling which row to start from.
