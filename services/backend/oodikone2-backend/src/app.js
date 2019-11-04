@@ -14,7 +14,7 @@ initializeDatabaseConnection()
 
     startCron()
 
-    Raven.config(process.env.SENTRY_ADDR, { captureUnhandledRejections: true }).install()
+    Raven.config(process.env.SENTRY_ADDR, { captureUnhandledRejections: true, environment: process.env.TAG }).install()
 
     app.use(cors({ credentials: true, origin: conf.frontend_addr }))
     app.use(bodyParser.json())
