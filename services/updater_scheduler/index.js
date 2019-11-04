@@ -11,8 +11,6 @@ const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start
 let updatedCount = 0
 let scheduledCount = 0
 let fetchedCount = 0
-let fromCacheCount = 0
-let notFromCacheCount = 0
 
 const updateTask = async ({ task, status, type, updatetime, active }) => {
   const doc = { task, status, type }
@@ -69,13 +67,6 @@ stan.on('connect', async () => {
     scheduledCount = 0
   })
 
-  schedule('*/15 * * * *', async () => {
-    // Every 15 min
-    logger.info('oodi_cache_hit', { hit: fromCacheCount, miss: notFromCacheCount })
-    fromCacheCount = 0
-    notFromCacheCount = 0
-  })
-
   const opts = stan.subscriptionOptions()
   opts.setManualAckMode(true)
   opts.setAckWait(5 * 60 * 1000)
@@ -84,7 +75,6 @@ stan.on('connect', async () => {
   opts.setMaxInFlight(20)
 
   const statusSub = stan.subscribe('status', opts)
-  const apiRequestSub = stan.subscribe('api_request', opts)
 
   const handleStatusMessage = async (msg) => {
     const data = JSON.parse(msg.getData())
@@ -112,19 +102,6 @@ stan.on('connect', async () => {
   statusSub.on('message', async (msg) => {
     try {
       await handleStatusMessage(msg)
-    } catch (err) {
-      console.log(err)
-      logger.info('failure', { service: 'SCHEDULER' })
-    }
-    msg.ack()
-  })
-
-  apiRequestSub.on('message', async (msg) => {
-    try {
-      const data = JSON.parse(msg.getData())
-      data.fromCache ?
-        fromCacheCount++ :
-        notFromCacheCount++
     } catch (err) {
       console.log(err)
       logger.info('failure', { service: 'SCHEDULER' })

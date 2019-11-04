@@ -1,14 +1,27 @@
 import React, { useMemo } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { string, arrayOf, shape, number, func } from 'prop-types'
-import { Segment, Icon, Header } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
+import { string, arrayOf, shape, number } from 'prop-types'
+import { Segment, Icon, Header, Item } from 'semantic-ui-react'
 import { getTextIn } from '../../../common'
 import { calculateStatsForProgramme, calculateTotalPassedCourses, calculateTotalFailedCourses } from '../facultyUtils'
 import SortableTable from '../../SortableTable'
 import FacultyStatsGraph from '../FacultyStatsGraph'
 
-const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, language, fromYear, toYear, history }) => {
+const ShowProgrammeOverView = ({ code }) => {
+  return (
+    <Item as={Link} title={`Overview of study programme ${code}`} to={`/study-programme/${code}`}>
+      <Icon name="level up alternate" />
+    </Item>
+  )
+}
+
+ShowProgrammeOverView.propTypes = {
+  code: string.isRequired
+}
+
+const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, language, fromYear, toYear }) => {
   const totalStats = useMemo(
     () =>
       Object.entries(selectedFacultyProgrammesStats).reduce((res, [code, stats]) => {
@@ -17,10 +30,6 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
       }, {}),
     [fromYear, toYear]
   )
-
-  const showProgrammeOverView = code => {
-    history.push(`/study-programme/${code}`)
-  }
 
   const getNameOfProgramme = code => {
     const foundProgramme = facultyProgrammes.find(p => p.code === code)
@@ -45,7 +54,7 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
       getRowVal: ({ code }) => (
         <div>
           {' '}
-          {getNameOfProgramme(code)} <Icon name="level up alternate" onClick={() => showProgrammeOverView(code)} />
+          {getNameOfProgramme(code)} <ShowProgrammeOverView code={code} />
         </div>
       )
     },
@@ -99,10 +108,7 @@ FacultyStats.propTypes = {
   selectedFacultyProgrammesStats: shape({}).isRequired,
   language: string.isRequired,
   fromYear: number.isRequired,
-  toYear: number.isRequired,
-  history: shape({
-    push: func.isRequired
-  }).isRequired
+  toYear: number.isRequired
 }
 
 const mapStateToProps = ({ faculties, localize }) => ({
