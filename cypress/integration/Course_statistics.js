@@ -372,7 +372,7 @@ describe('Course Statistics tests', () => {
         // [studentcount, label, code]
         [289, "All", "ALL"],
         [179, "Tietojenkäsittelytieteen kandiohjelma", "KH50_005"],
-        [147, "Excluded", "EXCLUDED"],
+        [122, "Excluded", "EXCLUDED"],
         [64, "Matemaattisten tieteiden kandiohjelma", "KH50_001"],
         [24, "Tietojenkäsittelytieteen koulutusohjelma", "520080"],
         [16, "Tietojenkäsittelytieteen maisteriohjelma", "MH50_009"],
