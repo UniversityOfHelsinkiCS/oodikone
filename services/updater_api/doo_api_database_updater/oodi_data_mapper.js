@@ -117,7 +117,7 @@ const getTeacherFromData = (teacher) => {
   }
 }
 
-const parseDate = (date, format = 'YYYY-MM-DD') => date && moment.utc(date, format).toDate()
+const parseDate = (date, format = 'YYYY-MM-DD HH:mm') => date && moment.utc(date, format).toDate()
 
 const getStudyRightFromData = (data, studentNumber) => {
   return {

@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-describe('Course Statistics tests', () => {
+describe('Course population tests', () => {
   beforeEach(() => {
     cy.server({
       onAnyRequest: function (route, proxy) {

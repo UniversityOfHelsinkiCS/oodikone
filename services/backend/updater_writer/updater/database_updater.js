@@ -1,3 +1,4 @@
+const { notIn } = require('sequelize').Op
 const { sequelize } = require('../database/connection')
 const { sortBy, flatMap, uniqBy, sortedUniqBy } = require('lodash')
 
@@ -78,7 +79,7 @@ const updateAttainments = async (studyAttainments, transaction) => {
   ])
 }
 
-const updateStudyRights = async (studyRights, transaction) => {
+const updateStudyRights = async (studyRights, studentnumber, transaction) => {
   // Sort data to avoid deadlocks. If there are duplicate primary keys in the same array, then bulkCreate won't work.
   const studyRightExtents = sortedUniqBy(sortBy(studyRights.map(e => e.studyRightExtent), 'extentcode'), 'extentcode')
   const studyrights = sortedUniqBy(sortBy(studyRights.map(e => e.studyright), 'studyrightid'), 'studyrightid')
@@ -94,6 +95,16 @@ const updateStudyRights = async (studyRights, transaction) => {
     'studyrightid',
     'sourcecode',
     'targetcode'
+  )
+
+  const studyrightids = studyrights.map(s => s.studyrightid)
+  await Studyright.destroy(
+    { where: { student_studentnumber: studentnumber, studyrightid: { [notIn]: studyrightids } } },
+    { transaction }
+  )
+  await StudyrightElement.destroy(
+    { where: { studentnumber, studyrightid: { [notIn]: studyrightids } } },
+    { transaction }
   )
 
   await Promise.all([
@@ -114,7 +125,7 @@ const updateStudyRights = async (studyRights, transaction) => {
 
     StudyrightElement.bulkCreate(studyRightElements, {
       transaction,
-      updateOnDuplicate: getColumnsToUpdate(studyRightElements)
+      ignoreDuplicates: true
     }),
 
     Transfers.bulkCreate(transfers, {
@@ -122,11 +133,6 @@ const updateStudyRights = async (studyRights, transaction) => {
       updateOnDuplicate: getColumnsToUpdate(transfers)
     })
   ])
-}
-
-const deleteStudentStudyrights = async (studentnumber, transaction) => {
-  await Studyright.destroy({ where: { student_studentnumber: studentnumber } }, { transaction })
-  await StudyrightElement.destroy({ where: { studentnumber } }, { transaction })
 }
 
 const updateStudent = async student => {
@@ -140,8 +146,6 @@ const updateStudent = async student => {
 
   const transaction = await sequelize.transaction()
   try {
-    await deleteStudentStudyrights(studentInfo.studentnumber, transaction) // this needs to be done because Oodi just deletes deprecated studyrights from students ( big yikes )
-
     await Student.upsert(studentInfo, { transaction })
 
     // Change this to bulkCreate after https://github.com/sequelize/sequelize/issues/11569
@@ -152,7 +156,7 @@ const updateStudent = async student => {
 
     if (studyAttainments) await updateAttainments(studyAttainments, transaction)
 
-    if (studyRights) await updateStudyRights(studyRights, transaction)
+    if (studyRights) await updateStudyRights(studyRights, studentInfo.studentnumber, transaction)
     await transaction.commit()
   } catch (err) {
     await transaction.rollback()
