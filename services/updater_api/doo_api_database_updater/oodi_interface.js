@@ -27,13 +27,13 @@ const instance = axios.create({
   httpsAgent: agent
 })
 
-const getUrl = async (url) => {
+const getUrl = async (url, fullRes = false) => {
   const cacheHit = requestCache.get(url)
   if (cacheHit) return cacheHit
 
-  const data = await instance.get(url)
-  if (!url.includes('/students/')) requestCache.set(url, data)
-  return data
+  const res = await instance.get(url)
+  if (!url.includes('/students/')) requestCache.set(url, fullRes ? res : res.data.data)
+  return fullRes ? res : res.data.data
 }
 
 const getOodiApi = async relative => {
@@ -44,11 +44,11 @@ const getOodiApi = async relative => {
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-const attemptGetFor = async (url, attempts = 5) => {
+const attemptGetFor = async (url, attempts = 5, fullRes = false) => {
   for (let attempt = 1; attempt <= attempts; ++attempt) {
     try {
-      const response = await getUrl(url)
-      return response
+      const data = await getUrl(url, fullRes)
+      return data
     } catch (error) {
       if (attempt === attempts) {
         console.log('ATTEMPT GET FOR FAILURE')
@@ -76,9 +76,7 @@ console.log(process.env.NODE_ENV)
 const getStudent = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/info`
   try {
-    const response = await attemptGetFor(url)
-    const data = response.data.data
-    return data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log('GET STUDENT FAILED')
     throw e
@@ -88,8 +86,7 @@ const getStudent = async studentNumber => {
 const getStudentStudyRights = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/studyrights`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log('GET STUDYRIGHT FAIELD')
     throw e
@@ -99,8 +96,7 @@ const getStudentStudyRights = async studentNumber => {
 const getFaculties = async () => {
   const url = `${base_url}/codes/faculties`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   }
   catch (e) {
     console.log(' GET FACULTIE S FAIELD')
@@ -111,8 +107,7 @@ const getFaculties = async () => {
 const getStudyAttainments = async studentNumber => {
   const url = `${base_url}/students/${studentNumber}/studyattainments`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log('GET STSDU ATTAINEMNT FIALE')
     throw e
@@ -122,8 +117,7 @@ const getStudyAttainments = async studentNumber => {
 const getTeacherInfo = async id => {
   const url = `${base_url}/teachers/${id}/info`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log(' GET TCHR FIAIELd')
     throw e
@@ -133,8 +127,7 @@ const getTeacherInfo = async id => {
 const getCourseTypeCodes = async () => {
   const url = `${base_url}/codes/learningopportunities/types`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log('CORUSE TTYPE CODE FAIEL')
     throw e
@@ -144,8 +137,7 @@ const getCourseTypeCodes = async () => {
 const getLearningOpportunity = async (id) => {
   const url = `${base_url}/learningopportunities/${id}`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log('GET LEARNIGN OEPPRITUNCITY FAIELD')
     throw e
@@ -154,15 +146,13 @@ const getLearningOpportunity = async (id) => {
 
 const getStudyattainmentStatusCodes = async () => {
   const url = `${base_url}/codes/studyattainments/statuses`
-  const response = await attemptGetFor(url)
-  return response.data.data
+  return await attemptGetFor(url)
 }
 
 const getCourseDisciplines = async () => {
   const url = `${base_url}/codes/learningopportunities/disciplines`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log(' GET COURS EDISCIIPLINES FIALED')
     throw e
@@ -171,8 +161,7 @@ const getCourseDisciplines = async () => {
 const getSemesters = async () => {
   const url = `${base_url}/codes/semesters`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log('GET SEMESTERS FAIELD')
     throw e
@@ -182,8 +171,7 @@ const getSemesters = async () => {
 const getSemesterEnrollments = async studentnumber => {
   const url = `${base_url}/students/${studentnumber}/semesterenrollments`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log('GEST EMESTER ENROLLMENTS FAIELD')
     throw e
@@ -193,12 +181,12 @@ const getSemesterEnrollments = async studentnumber => {
 const getCourseEnrollments = async studentnumber => {
   const url = `${base_url}/students/${studentnumber}/enrollments`
   try {
-    const response = await attemptGetFor(url)
-    if (!response.data.data) {
-      console.log('COURSE ENROLLMENTS RESPONSE', response)
-      console.log('COURSE ENROLLMENTS RESPONSE DATA', response.data)
+    const res = await attemptGetFor(url, 5, true)
+    if (!res.data.data) {
+      console.log('COURSE ENROLLMENTS RES', res)
+      console.log('COURSE ENROLLMENTS DATA', res.data)
     }
-    return response.data.data
+    return res.data.data
   } catch (e) {
     console.log('GET COURS EENREOLMETNS FAIELD')
     throw e
@@ -208,8 +196,7 @@ const getCourseEnrollments = async studentnumber => {
 const getCourseRealisationTypes = async () => {
   const url = `${base_url}/codes/courseunitrealisations/types`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log('GET COURSE REALSITASITON TYPES')
     throw e
@@ -219,8 +206,7 @@ const getCourseRealisationTypes = async () => {
 const courseUnitRealisationsSince = async sinceDate => {
   const url = `${base_url}/courseunitrealisations/changes/ids/${sinceDate}`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log('COURSEU UNTI REALISTIATION')
     throw e
@@ -230,8 +216,7 @@ const courseUnitRealisationsSince = async sinceDate => {
 const learningOpportunitiesSince = async (sinceDate = '0000-01-01') => {
   const url = `${base_url}/learningopportunities/changes/ids/${sinceDate}`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log('LRNG OPRRTN SINCE')
     throw e
@@ -241,8 +226,7 @@ const learningOpportunitiesSince = async (sinceDate = '0000-01-01') => {
 const getCourseUnitRealisation = async id => {
   const url = `${base_url}/courseunitrealisations/${id}`
   try {
-    const response = await attemptGetFor(url)
-    return response.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log('GET COURS EUNTI GREALSISTAITOn')
     throw e
