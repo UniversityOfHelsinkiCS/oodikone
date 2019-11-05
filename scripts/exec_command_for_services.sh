@@ -38,7 +38,7 @@ shift $(( OPTIND - 1 ))
 WHITELISTED_SERVICES=${@}
 
 if [ ! -z "$WHITELISTED_SERVICES" ]; then
-  services=$WHITELISTED_SERVICES
+  services=($WHITELISTED_SERVICES)
 else
   services=(
     backend
