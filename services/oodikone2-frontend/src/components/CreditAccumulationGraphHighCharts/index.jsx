@@ -92,12 +92,11 @@ class CreditAccumulationGraphHighCharts extends Component {
 
   createTooltip = point => {
     const { students, language, translate } = this.props
+    
     const targetCourse = this.sortCoursesByDate(students[0].courses).find(
-      c => point.key === c.course.code && point.x === new Date(c.date).getTime()
+      c => point.key === c.course_code && point.x === new Date(c.date).getTime()
     )
-
-    if (!targetCourse) return ''
-
+    if (!targetCourse.course) return ''
     const payload = [
       {
         name: students[0].studentNumber,
@@ -240,7 +239,7 @@ class CreditAccumulationGraphHighCharts extends Component {
         if (course.passed && !course.isStudyModuleCredit) {
           credits += course.credits
         }
-        const defaultPointOptions = this.isSingleStudentGraph() ? { name: course.course.code } : {}
+        const defaultPointOptions = this.isSingleStudentGraph() ? { name: course.course_code } : {}
         return {
           ...defaultPointOptions,
           x: new Date(course.date).getTime(),
