@@ -146,6 +146,7 @@ const formatStudent = ({
         coursetypecode: course.coursetypecode
       },
       date: attainment_date,
+      course_code: course.code,
       passed: Credit.passed({ credittypecode }),
       grade,
       credits,
