@@ -92,7 +92,7 @@ class CreditAccumulationGraphHighCharts extends Component {
 
   createTooltip = point => {
     const { students, language, translate } = this.props
-    
+
     const targetCourse = this.sortCoursesByDate(students[0].courses).find(
       c => point.key === c.course_code && point.x === new Date(c.date).getTime()
     )
