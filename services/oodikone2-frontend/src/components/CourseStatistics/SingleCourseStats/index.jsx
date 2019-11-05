@@ -4,7 +4,7 @@ import { shape, string, arrayOf, objectOf, oneOfType, number, func } from 'prop-
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { getActiveLanguage } from 'react-localize-redux'
-import { difference, min, max, flatten, pickBy } from 'lodash'
+import { difference, min, max, flatten, pickBy, uniq } from 'lodash'
 import qs from 'query-string'
 import ResultTabs from '../ResultTabs'
 import {
@@ -257,10 +257,11 @@ class SingleCourseStats extends Component {
       const excludedStudents = result
         .filter(({ key }) => excludedProgrammes.includes(key) && key !== 'ALL')
         .reduce((res, { students }) => [...res, ...flatten(Object.values(students))], [])
+      const uniqueExcludedStudents = uniq(excludedStudents)
       result.push({
         key: 'EXCLUDED',
-        size: excludedStudents.length,
-        students: excludedStudents,
+        size: uniqueExcludedStudents.length,
+        students: uniqueExcludedStudents,
         text: 'Excluded',
         value: 'EXCLUDED'
       })
