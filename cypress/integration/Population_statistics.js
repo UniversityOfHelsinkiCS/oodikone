@@ -264,10 +264,31 @@ describe('Population Statistics tests', () => {
       cy.root().get("button").contains("Delete for good").click({ force: true })
     })
   })
+
   it('Population statistics wont crash course population', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
     cy.get(':nth-child(3) > .iconCell > p > .item > .level').click({ force: true })
     cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click({ force: true })
+  })
+
+  it("Empty 'mandatory courses' tab has a link to the page where mandatory courses can be added", () => {
+    cy.contains("Select study programme").click().siblings().contains("Kielten kandiohjelma").click()
+    cy.contains("See population").click()
+    cy.contains("button", "show").click()
+    cy.contains("Mandatory courses").click()
+    cy.contains("No mandatory courses defined. You can define them here.").find("a").click()
+    cy.contains("Kielten kandiohjelma")
+    cy.contains("Add courses")
+  })
+
+  it("Empty 'tags' tab has a link to the page where tags can be created", () => {
+    cy.contains("Select study programme").click().siblings().contains("Kielten kandiohjelma").click()
+    cy.contains("See population").click()
+    cy.contains("button", "show").click()
+    cy.contains("Mandatory courses").siblings().contains("Tags").click()
+    cy.contains("No tags defined. You can define them here.").find("a").click()
+    cy.contains("Kielten kandiohjelma")
+    cy.contains("Create new tag")
   })
 })
