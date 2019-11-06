@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Button, Dropdown, List, Confirm } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
@@ -109,12 +108,10 @@ const mapStateToProps = ({ tagstudent }) => ({
   created: tagstudent.created
 })
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    {
-      createMultipleStudentTag: createMultipleStudentTagAction,
-      deleteMultipleStudentTag: deleteMultipleStudentTagAction
-    }
-  )(TagPopulation)
-)
+export default connect(
+  mapStateToProps,
+  {
+    createMultipleStudentTag: createMultipleStudentTagAction,
+    deleteMultipleStudentTag: deleteMultipleStudentTagAction
+  }
+)(TagPopulation)

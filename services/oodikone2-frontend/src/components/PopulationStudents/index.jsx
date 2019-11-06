@@ -527,27 +527,43 @@ class PopulationStudents extends Component {
           <Tab.Pane>
             <div style={{ display: 'flex' }}>
               <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
-                <SortableTable
-                  getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
-                  tableProps={{
-                    celled: true,
-                    compact: 'very',
-                    padded: false,
-                    collapsing: true,
-                    basic: true,
-                    striped: true,
-                    singleLine: true,
-                    textAlign: 'center'
-                  }}
-                  collapsingHeaders
-                  showNames={this.props.showNames}
-                  columns={mandatoryCourseColumns}
-                  data={mandatoryCourseData}
-                />
+                {this.props.mandatoryCourses.length > 0 && (
+                  <React.Fragment>
+                    <SortableTable
+                      getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
+                      tableProps={{
+                        celled: true,
+                        compact: 'very',
+                        padded: false,
+                        collapsing: true,
+                        basic: true,
+                        striped: true,
+                        singleLine: true,
+                        textAlign: 'center'
+                      }}
+                      collapsingHeaders
+                      showNames={this.props.showNames}
+                      columns={mandatoryCourseColumns}
+                      data={mandatoryCourseData}
+                    />
+                  </React.Fragment>
+                )}
               </div>
-              <div style={{ paddingLeft: '2em' }}>
+              <div
+                style={{
+                  paddingLeft: '10px',
+                  minHeight: '300px',
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
                 {this.props.mandatoryCourses.length === 0 && (
-                  <h1>Please define mandatory courses at study program overview panel!</h1>
+                  <h3>
+                    No mandatory courses defined. You can define them{' '}
+                    <Link to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=1`}>here</Link>.
+                  </h3>
                 )}
               </div>
             </div>
@@ -559,15 +575,36 @@ class PopulationStudents extends Component {
         render: () => (
           <Tab.Pane>
             <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
-              <TagPopulation
-                tags={this.props.tags}
-                selectedStudents={this.props.selectedStudents}
-                studytrack={this.props.queryStudyrights[0]}
-              />
-              <TagList
-                studytrack={this.props.queryStudyrights[0]}
-                selectedStudents={this.props.selectedStudents.map(sn => students[sn])}
-              />
+              <div
+                style={{
+                  paddingLeft: '10px',
+                  minHeight: '300px',
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                {this.props.tags.length === 0 && (
+                  <h3>
+                    No tags defined. You can define them{' '}
+                    <Link to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=5`}>here</Link>.
+                  </h3>
+                )}
+              </div>
+              {this.props.tags.length > 0 && (
+                <React.Fragment>
+                  <TagPopulation
+                    tags={this.props.tags}
+                    selectedStudents={this.props.selectedStudents}
+                    studytrack={this.props.queryStudyrights[0]}
+                  />
+                  <TagList
+                    studytrack={this.props.queryStudyrights[0]}
+                    selectedStudents={this.props.selectedStudents.map(sn => students[sn])}
+                  />
+                </React.Fragment>
+              )}
             </div>
           </Tab.Pane>
         )
