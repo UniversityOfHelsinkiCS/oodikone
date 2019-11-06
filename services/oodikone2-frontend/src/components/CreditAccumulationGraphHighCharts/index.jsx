@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import moment from 'moment'
-import { arrayOf, object, string, func, number, shape } from 'prop-types'
+import { arrayOf, bool, object, string, func, number, shape } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import Highcharts from 'highcharts/highstock'
 import { Button } from 'semantic-ui-react'
@@ -21,6 +21,8 @@ import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
 // https://www.highcharts.com/errors/26/
 boostcanvas(Highcharts)
 boost(Highcharts)
+
+const SINGLE_GRAPH_GOAL_SERIES_NAME = 'Goal'
 
 class CreditAccumulationGraphHighCharts extends Component {
   constructor(props) {
@@ -93,10 +95,15 @@ class CreditAccumulationGraphHighCharts extends Component {
   createTooltip = point => {
     const { students, language, translate } = this.props
 
+    if (point.series.name === SINGLE_GRAPH_GOAL_SERIES_NAME) {
+      return null
+    }
+
     const targetCourse = this.sortCoursesByDate(students[0].courses).find(
       c => point.key === c.course_code && point.x === new Date(c.date).getTime()
     )
-    if (!targetCourse.course) return ''
+
+    if (!targetCourse.course) return null
     const payload = [
       {
         name: students[0].studentNumber,
@@ -140,6 +147,7 @@ class CreditAccumulationGraphHighCharts extends Component {
 
       lastCredits = (lastMonth - totalAbsenceMonths) * (55 / 12)
       dataOfSelected.push({
+        name: SINGLE_GRAPH_GOAL_SERIES_NAME,
         data: [
           ...[[students.minDate, 0], ...absencePoints, [students.maxDate, lastCredits]].sort((a, b) => a[0] - b[0])
         ],
@@ -227,7 +235,7 @@ class CreditAccumulationGraphHighCharts extends Component {
     this.setState({ options, updateGraph: false })
   }
 
-  isSingleStudentGraph = () => this.props.students.length === 1
+  isSingleStudentGraph = () => !!this.props.singleStudent
 
   createStudentCreditLines = students =>
     students.map(student => {
@@ -302,10 +310,12 @@ class CreditAccumulationGraphHighCharts extends Component {
 }
 
 CreditAccumulationGraphHighCharts.defaultProps = {
-  absences: []
+  absences: [],
+  singleStudent: false
 }
 
 CreditAccumulationGraphHighCharts.propTypes = {
+  singleStudent: bool,
   students: arrayOf(object).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   setChartHeight: func.isRequired,
