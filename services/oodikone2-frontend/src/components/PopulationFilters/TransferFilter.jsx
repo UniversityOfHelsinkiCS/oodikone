@@ -76,7 +76,6 @@ class TransferFilter extends Component {
     }
     filteredTargets.push(ANYWHERE)
     filteredSources.push(ANYWHERE)
-    console.log(filteredSources, filteredTargets)
     if (filter.notSet) {
       return (
         <Segment>
