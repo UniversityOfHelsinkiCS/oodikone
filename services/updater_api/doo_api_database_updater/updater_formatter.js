@@ -66,7 +66,16 @@ const formatStudyattainments = async (api, studentnumber) => {
       ...studyAttainments, {
         credit: (credit.semestercode ? credit : { ...credit, semestercode: mapper.getSemesterCode(credit.attainment_date) }),
         creditTeachers: await createCreditTeachers(credit, teachers),
-        teachers: await Promise.all(teachers.map(async (t) => mapper.getTeacherFromData((await Oodi.getTeacherInfo(t.id))))),
+        teachers: (await Promise.all(teachers.map(async (t) => {
+          const teacher = await Oodi.getTeacherInfo(t.id)
+          // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/1547#issuecomment-550184131
+          // Sometimes Oodi returns a null teacher... We need to figure out why.
+          if (!teacher) {
+            console.log('TEACHER MISSING!', t.id)
+            return null
+          }
+          return mapper.getTeacherFromData(teacher)
+        }))).filter(t => t),
         course: {
           ...course, ...mapper.learningOpportunityDataToCourse(learningOpportunity),
           disciplines: mapper.learningOpportunityDataToCourseDisciplines(learningOpportunity),
