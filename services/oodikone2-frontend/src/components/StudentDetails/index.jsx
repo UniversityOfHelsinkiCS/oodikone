@@ -177,6 +177,7 @@ class StudentDetails extends Component {
 
     return (
       <CreditAccumulationGraphHighCharts
+        singleStudent
         students={sample}
         selectedStudents={[student.studentNumber]}
         title={translate('studentStatistics.chartTitle')}
