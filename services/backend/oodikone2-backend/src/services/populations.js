@@ -352,6 +352,9 @@ const studentnumbersWithAllStudyrightElements = async (
 ) => {
   // eslint-disable-line
 
+  // db startdate is formatted to utc so need to change it when querying
+  const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
+
   const filteredExtents = []
   let studyrightWhere = {
     extentcode: {
@@ -409,7 +412,7 @@ const studentnumbersWithAllStudyrightElements = async (
         },
         {
           ['$studyright_elements.startdate$']: {
-            [Op.between]: [startDate, endDate]
+            [Op.between]: [formattedStartDate, endDate]
           }
         }
       ],
@@ -562,11 +565,14 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     tag
   } = parseQueryParams(formattedQueryParams)
 
+  // db startdate is formatted to utc so need to change it when querying
+  const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
+
   const studentnumbers = studentnumberlist
     ? studentnumberlist
     : await studentnumbersWithAllStudyrightElements(
         studyRights,
-        startDate,
+        formattedStartDate,
         endDate,
         exchangeStudents,
         cancelledStudents,
