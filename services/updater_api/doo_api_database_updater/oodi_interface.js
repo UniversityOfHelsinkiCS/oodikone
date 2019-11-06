@@ -126,7 +126,7 @@ const getTeacherInfo = async id => {
   try {
     return await attemptGetFor(url)
   } catch (e) {
-    console.log('GET TCHR FIAIELd')
+    console.log('GET TCHR FIAIELd', id)
     throw e
   }
 }
@@ -146,7 +146,7 @@ const getLearningOpportunity = async (id) => {
   try {
     return await attemptGetFor(url)
   } catch (e) {
-    console.log('GET LEARNIGN OEPPRITUNCITY FAIELD')
+    console.log('GET LEARNIGN OEPPRITUNCITY FAIELD', id)
     throw e
   }
 }
@@ -230,7 +230,7 @@ const getCourseUnitRealisation = async id => {
   try {
     return await attemptGetFor(url)
   } catch (e) {
-    console.log('GET COURS EUNTI GREALSISTAITOn')
+    console.log('GET COURS EUNTI GREALSISTAITOn', id)
     throw e
   }
 }
