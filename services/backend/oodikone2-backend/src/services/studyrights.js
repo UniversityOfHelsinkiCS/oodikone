@@ -211,18 +211,15 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
   }
   const total = await Studyright.count()
   let offset = 0
-
-  // is this even needed ?
-
-  // const types = new Set([10, 20, 30]) // degree, programme, studytrack
-  // const isValid = ({ type }) => types.has(type)
-
+  const types = new Set([10, 20, 30]) // degree, programme, studytrack
+  const isValid = ({ type }) => types.has(type)
   const associations = { programmes: {}, degrees: {}, studyTracks: {} }
   while (offset <= total) {
     console.log(`${offset}/${total}`)
     const elementgroups = await associatedStudyrightElements(offset, chunksize)
     elementgroups.forEach(fullgroup => {
-      fullgroup.forEach(({ type, code, name, studyrightid, startdate, enddate }) => {
+      const group = fullgroup.filter(isValid)
+      group.forEach(({ type, code, name, studyrightid, startdate, enddate }) => {
         if (type === 10) {
           associations.degrees[code] = associations.degrees[code] || {
             type,
@@ -255,7 +252,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
           }
           const enrollmentStartYear = enrollmentStartYears[enrollment]
 
-          fullgroup
+          group
             .filter(e => e.studyrightid === studyrightid && e.code !== code)
             .forEach(e => {
               if (e.type == 10) {
@@ -328,7 +325,7 @@ const refreshAssociationsInRedis = async () => {
   await saveAssociationsToRedis(associations)
 }
 
-const getAssociations = async (doRefresh = true) => {
+const getAssociations = async (doRefresh = false) => {
   const studyrights = await getAssociationsFromRedis()
   if (!studyrights || doRefresh) {
     const associations = await calculateAssociationsFromDb()
