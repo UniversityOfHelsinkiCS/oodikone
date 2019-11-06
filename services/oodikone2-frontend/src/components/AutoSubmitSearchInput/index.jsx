@@ -24,10 +24,12 @@ const AutoSubmitSearchInput = ({
   const [input, setInput] = useState(value)
 
   const executeSearch = searchterm => {
-    setTimeout(TIMEOUTS.FETCH, () => {}, latency)
-    doSearch(searchterm).then(() => {
-      clearTimeout(TIMEOUTS.FETCH)
-    })
+    clearTimeout(TIMEOUTS.FETCH)
+    setTimeout(
+      TIMEOUTS.FETCH,
+      () => doSearch(searchterm),
+      latency
+    )
   }
 
   useEffect(() => {
