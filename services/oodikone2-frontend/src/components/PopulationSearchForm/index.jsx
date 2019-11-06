@@ -81,7 +81,6 @@ const PopulationSearchForm = props => {
   const checkPreviousQuery = (query, previousQuery) => {
     if (!previousQuery.studyRights) return false
 
-    const sameProgramme = query.studyRights.programme === previousQuery.studyRights.programme
     const sameMonths = query.months === previousQuery.months
     const sameYear = query.Year === previousQuery.Year
     const sameSemesters = previousQuery.semesters
@@ -92,8 +91,11 @@ const PopulationSearchForm = props => {
       : !(query.studentStatuses.length > 0)
     const sameTag = previousQuery.tag ? previousQuery.tag === query.tag : !query.tag
     const sameYears = previousQuery.years ? isEqual(previousQuery.years, query.years) : !query.years
+    const sameStudyrights = previousQuery.studyRights
+      ? isEqual(previousQuery.studyRights, query.studyRights)
+      : !query.studyRights
 
-    return sameProgramme && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameTag && sameYears
+    return sameStudyrights && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameTag && sameYears
   }
 
   const formatQueryParamsToArrays = (query, params) => {
