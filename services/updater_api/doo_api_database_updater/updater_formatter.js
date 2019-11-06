@@ -59,7 +59,16 @@ const formatStudyattainments = async (api, studentnumber) => {
   let studyAttainments = []
   for (let data of api.studyattainments) {
     const { credit, teachers, course } = parseAttainmentData(data, studentnumber)
-    const learningOpportunity = await Oodi.getLearningOpportunity(course.code)
+    let learningOpportunity
+    // For some learning opportunities oodi returns an SQL error.
+    // F.ex. /learningopportunities/590202B. Therefore, until the
+    // bug is fixed on Oodi's side, this is what we need to do.
+    try {
+      learningOpportunity = await Oodi.getLearningOpportunity(course.code)
+    } catch (e) {
+      if (e.message && e.message.includes('PreparedStatementCallback')) continue
+      throw e
+    }
     const { providers, courseproviders } = mapper.learningOpportunityDataToCourseProviders(learningOpportunity)
 
     studyAttainments = [
