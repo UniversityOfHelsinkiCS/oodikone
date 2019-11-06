@@ -42,7 +42,7 @@ class Postman extends Component {
   }
 
   dataToConsole = () => {
-    /* eslint-disable-next-line react/prop-types */
+    // eslint-disable-next-line no-console
     console.log(this.state.data)
   }
 

@@ -32,6 +32,7 @@ const PopulationStatisticsLink = ({ studyprogramme, year: yearLabel, children })
 const TotalPopulationLink = ({ confirm, years, studyprogramme, children }) => {
   const confirmWrapper = e => {
     if (confirm) {
+      // eslint-disable-next-line no-alert
       const c = window.confirm(
         `Are you sure you want to see a combined population of ${years.length} different populations?`
       )
