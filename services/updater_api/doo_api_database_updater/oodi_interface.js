@@ -27,13 +27,21 @@ const instance = axios.create({
   httpsAgent: agent
 })
 
-const getUrl = async (url, fullRes = false) => {
+const getUrl = async (url) => {
   const cacheHit = requestCache.get(url)
   if (cacheHit) return cacheHit
 
   const res = await instance.get(url)
-  if (!url.includes('/students/')) requestCache.set(url, fullRes ? res : res.data.data)
-  return fullRes ? res : res.data.data
+
+  // Sometimes oodi seems to randomly return a response with status 200
+  // that in reality contains an error. Check this out:
+  // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/1547#issuecomment-550167612
+  if (res.data.exception) {
+    throw new Error(res.data.exception.message)
+  }
+
+  if (!url.includes('/students/')) requestCache.set(url, res.data.data)
+  return res.data.data
 }
 
 const getOodiApi = async relative => {
@@ -44,17 +52,16 @@ const getOodiApi = async relative => {
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-const attemptGetFor = async (url, attempts = 5, fullRes = false) => {
+const attemptGetFor = async (url, attempts = 6) => {
   for (let attempt = 1; attempt <= attempts; ++attempt) {
     try {
-      const data = await getUrl(url, fullRes)
-      return data
+      return await getUrl(url)
     } catch (error) {
       if (attempt === attempts) {
         console.log('ATTEMPT GET FOR FAILURE')
         throw error
       }
-      await sleep(15000)
+      await sleep(attempt * 5000)
     }
   }
 }
@@ -119,7 +126,7 @@ const getTeacherInfo = async id => {
   try {
     return await attemptGetFor(url)
   } catch (e) {
-    console.log(' GET TCHR FIAIELd')
+    console.log('GET TCHR FIAIELd')
     throw e
   }
 }
@@ -181,12 +188,7 @@ const getSemesterEnrollments = async studentnumber => {
 const getCourseEnrollments = async studentnumber => {
   const url = `${base_url}/students/${studentnumber}/enrollments`
   try {
-    const res = await attemptGetFor(url, 5, true)
-    if (!res.data.data) {
-      console.log('COURSE ENROLLMENTS RES', res)
-      console.log('COURSE ENROLLMENTS DATA', res.data)
-    }
-    return res.data.data
+    return await attemptGetFor(url)
   } catch (e) {
     console.log('GET COURS EENREOLMETNS FAIELD')
     throw e
