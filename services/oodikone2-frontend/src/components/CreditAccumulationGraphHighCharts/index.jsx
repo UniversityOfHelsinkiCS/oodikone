@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import moment from 'moment'
-import { arrayOf, object, string, func, number, shape } from 'prop-types'
+import { arrayOf, bool, object, string, func, number, shape } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import Highcharts from 'highcharts/highstock'
 import { Button } from 'semantic-ui-react'
@@ -235,7 +235,7 @@ class CreditAccumulationGraphHighCharts extends Component {
     this.setState({ options, updateGraph: false })
   }
 
-  isSingleStudentGraph = () => this.props.students.length === 1
+  isSingleStudentGraph = () => !!this.props.singleStudent
 
   createStudentCreditLines = students =>
     students.map(student => {
@@ -310,10 +310,12 @@ class CreditAccumulationGraphHighCharts extends Component {
 }
 
 CreditAccumulationGraphHighCharts.defaultProps = {
-  absences: []
+  absences: [],
+  singleStudent: false
 }
 
 CreditAccumulationGraphHighCharts.propTypes = {
+  singleStudent: bool,
   students: arrayOf(object).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   setChartHeight: func.isRequired,
