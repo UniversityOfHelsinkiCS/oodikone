@@ -444,7 +444,9 @@ const parseQueryParams = query => {
     exchangeStudents,
     cancelledStudents,
     nondegreeStudents,
-    studyRights: Array.isArray(studyRights) ? studyRights : Object.values(studyRights),
+    // if someone passes something falsy like null as the studyright, remove it so it doesn't break
+    // the sequelize query
+    studyRights: (Array.isArray(studyRights) ? studyRights : Object.values(studyRights)).filter(Boolean),
     months,
     startDate,
     endDate,
