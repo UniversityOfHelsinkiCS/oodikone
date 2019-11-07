@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react'
 import moment from 'moment'
-import { Header, Table, Grid, Icon, Label, Segment, Dropdown, Button } from 'semantic-ui-react'
+import { Header, Table, Grid, Icon, Label, Segment, Dropdown, Button, Modal } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, node } from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -74,6 +74,8 @@ TotalPopulationLink.propTypes = {
 const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, userRoles, history, newProgramme }) => {
   const [lowerYear, setLower] = useState(null)
   const [upperYear, setUpper] = useState(null)
+  const [yearDifference, setDifference] = useState(null)
+
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
 
   const years = data
@@ -109,8 +111,14 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
     if (Number(value) > Number(upperYear)) {
       setUpper(value)
       setLower(value)
+      setDifference(1)
+    } else if (Number(upperYear) - Number(value) > 5) {
+      setUpper(String(Number(value) + 5))
+      setLower(value)
+      setDifference(6)
     } else {
       setLower(value)
+      setDifference(Number(upperYear) - Number(value) + 1)
     }
   }
 
@@ -119,15 +127,23 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
     if (Number(value) < Number(lowerYear)) {
       setUpper(value)
       setLower(value)
+      setDifference(1)
+    } else if (Number(value) - Number(lowerYear) > 5) {
+      setLower(String(Number(value) - 5))
+      setUpper(value)
+      setDifference(6)
     } else {
       setUpper(value)
+      setDifference(Number(value) - Number(lowerYear) + 1)
     }
   }
 
-  const pushQueryToUrl = () => {
+  const pushQueryToUrl = event => {
+    event.preventDefault()
     const yearRange = range(Number(lowerYear), Number(upperYear) + 1)
     const months = getMonths(Number(lowerYear))
     const yearsString = yearRange.join('&years=')
+
     if (yearRange.length > 1) {
       history.push(
         `/populations?months=${months}&semesters=FALL&semesters=` +
@@ -285,7 +301,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
               <Table.Row>
                 <Table.HeaderCell style={{ fontWeight: 'bold' }}>
                   Total{' '}
-                  {newProgramme && years.length > 0 ? (
+                  {newProgramme && years.length > 0 && years.length < 5 ? (
                     <TotalPopulationLink confirm studyprogramme={studyprogramme} years={years}>
                       <Icon name="level up alternate" />
                     </TotalPopulationLink>
@@ -338,15 +354,25 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
           ) : null}
         </Table>
       </Segment>
-      {userRoles.includes('admin') && years.length > 0 ? (
+      {years.length > 4 ? (
         <>
           Statistics from:
           <Dropdown selection options={years} onChange={handleLowerBoundChange} value={lowerYear} />
           to:
           <Dropdown selection options={years} onChange={handleUpperBoundChange} value={upperYear} />
-          <Button disabled={!lowerYear || !upperYear} onClick={pushQueryToUrl}>
-            fetch combined population
-          </Button>
+          <Modal
+            trigger={<Button disabled={!lowerYear || !upperYear}>Show combined population</Button>}
+            header={`Are you sure you want to see a combined population of ${yearDifference} different populations?`}
+            actions={[
+              'Cancel',
+              {
+                key: 'fetch',
+                content: 'Show population',
+                positive: true,
+                onClick: event => pushQueryToUrl(event)
+              }
+            ]}
+          />
         </>
       ) : null}
     </React.Fragment>
