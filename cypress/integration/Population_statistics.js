@@ -7,6 +7,7 @@ const setPopStatsUntil = (until, includeSettings = []) => {
   })
   cy.contains("Statistics until").siblings().get('.rdt').get('input').eq(1).click().clear().type(until)
   cy.contains("Fetch population with new settings").click()
+  cy.contains("Advanced settings")
 }
 
 describe('Population Statistics tests', () => {
@@ -265,13 +266,12 @@ describe('Population Statistics tests', () => {
     })
   })
 
-  it.only("Cancelled filter is shown only if cancelled students are included in the advanced settings", () => {
+  it("Cancelled filter is shown only if cancelled students are included in the advanced settings", () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
     setPopStatsUntil("September 2019", ["with cancelled"])
 
-    cy.contains("Add filters")
-    cy.contains('add').click()
+    cy.contains("Add filters").siblings().contains("button", "add").should('not.be.disabled').click({ force: true })
     cy.contains("Add filters").siblings().within(() => {
       cy.get(".form").should('have.length', 9)
     })
