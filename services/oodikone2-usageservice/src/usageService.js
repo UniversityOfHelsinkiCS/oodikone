@@ -1,7 +1,7 @@
 const groupBy = require('lodash/groupBy')
 const moment = require('moment')
 const Sequelize = require('sequelize')
-const { UsageStatistic, sequelize } = require('./models')
+const { UsageStatistic } = require('./models')
 const { Op } = Sequelize
 
 const wildcarded = url => {
