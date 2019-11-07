@@ -60,4 +60,11 @@ CourseTable.defaultProps = {
   emptyListText: 'No results.'
 }
 
-export default CourseTable
+function areEqual(prevProps, nextProps) {
+  if (prevProps.courses.length !== nextProps.courses.length) {
+    return false
+  }
+  return true
+}
+
+export default React.memo(CourseTable, areEqual)
