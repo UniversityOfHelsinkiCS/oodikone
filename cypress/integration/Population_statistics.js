@@ -115,6 +115,10 @@ describe('Population Statistics tests', () => {
     cy.contains("Student names hidden").click()
     cy.contains("Luoto").siblings().eq(2).click()
     cy.contains("Luoto").invoke('text').then((text) => expect(text).to.equal('Luoto Veli-Matti, 014824094'))
+
+    cy.go("back")
+    cy.get('.remove').click()
+    cy.contains('Previous searches')
   })
 
   it('Student list checking works as intended', () => {
