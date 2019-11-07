@@ -291,4 +291,31 @@ describe('Population Statistics tests', () => {
     cy.contains("Kielten kandiohjelma")
     cy.contains("Create new tag")
   })
+  
+  it("Advanced settings work", () => {
+    cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen kandiohjelma").click()
+    cy.contains("See population").click()
+    cy.get('.field > .ui > label').click()
+    cy.contains('Statistics until')
+    // only spring
+    cy.get(':nth-child(3) > :nth-child(2) > :nth-child(2) > .ui > label').click()
+    cy.get(':nth-child(3) > .button').click()
+
+    cy.contains('Credit accumulation (for 13 students)')
+
+    // only fall
+    cy.get(':nth-child(3) > :nth-child(2) > :nth-child(2) > .ui > label').click()
+    cy.get(':nth-child(2) > :nth-child(3) > .ui > label').click()
+    cy.get(':nth-child(3) > .button').click()
+
+    cy.contains('Credit accumulation (for 206 students)')
+
+    // spring + fall and include cancelled
+    cy.get(':nth-child(2) > :nth-child(3) > .ui > label').click()
+    cy.get(':nth-child(3) > :nth-child(3) > .ui > label').click()
+
+    cy.get(':nth-child(3) > .button').click()
+
+    cy.contains('Credit accumulation (for 228 students)')
+  })
 })
