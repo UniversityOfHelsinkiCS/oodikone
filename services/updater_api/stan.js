@@ -8,5 +8,6 @@ opts.setAckWait(10 * 60 * 1000)
 opts.setMaxInFlight(1)
 
 module.exports = {
-  stan, opts
+  stan,
+  opts
 }

@@ -4,7 +4,7 @@ const { sleep, getStudentNumberChecksum } = require('./util')
 const createTasks = async () => {
   console.log('Creating studentnumbers to DB...')
 
-  const writeStudents = async (studentsToAdd) => {
+  const writeStudents = async studentsToAdd => {
     const tasks = studentsToAdd.map(student => ({ task: student, status: 'CREATED', type: 'student', active: true }))
     const bulkOperation = Schedule.collection.initializeUnorderedBulkOp()
     for (const task of tasks) {
@@ -13,7 +13,7 @@ const createTasks = async () => {
     await bulkOperation.execute()
   }
 
-  const writeToDB = async (studentnumbers) => {
+  const writeToDB = async studentnumbers => {
     try {
       await writeStudents(studentnumbers)
     } catch (err) {
@@ -35,10 +35,10 @@ const createTasks = async () => {
   for (let i = minStudentNumber; i <= maxStudentNumber; ++i) {
     const studentNumber = '0' + i + getStudentNumberChecksum(i)
     studentnumbers.push(studentNumber)
-    if ((studentnumbers.length % mongoWriteBatchSize) === 0 || i === maxStudentNumber) {
+    if (studentnumbers.length % mongoWriteBatchSize === 0 || i === maxStudentNumber) {
       console.log('current studentnumber', i)
-      while (!await writeToDB(studentnumbers)) {
-        await sleep(1*60*1000)
+      while (!(await writeToDB(studentnumbers))) {
+        await sleep(1 * 60 * 1000)
       }
       studentnumbers = []
     }

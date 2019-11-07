@@ -1,10 +1,18 @@
 const Schedule = require('../models')
 
 const getOldestTasks = async () => {
-  const oldestTask = (await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 }).limit(1))[0]
-  const oldestActiveTask = (await Schedule.find({ type: 'student', active: true }).sort({ updatedAt: 1 }).limit(1))[0]
-  const oldestMetaTask = (await Schedule.find({ type: 'other', task: 'meta' }).sort({ updatedAt: 1 }).limit(1))[0]
-  const oldestAttainmentTask = (await Schedule.find({ type: 'other', task: 'attainment' }).sort({ updatedAt: 1 }).limit(1))[0]
+  const oldestTask = (await Schedule.find({ type: 'student' })
+    .sort({ updatedAt: 1 })
+    .limit(1))[0]
+  const oldestActiveTask = (await Schedule.find({ type: 'student', active: true })
+    .sort({ updatedAt: 1 })
+    .limit(1))[0]
+  const oldestMetaTask = (await Schedule.find({ type: 'other', task: 'meta' })
+    .sort({ updatedAt: 1 })
+    .limit(1))[0]
+  const oldestAttainmentTask = (await Schedule.find({ type: 'other', task: 'attainment' })
+    .sort({ updatedAt: 1 })
+    .limit(1))[0]
 
   return {
     oldestChangedStatus: {

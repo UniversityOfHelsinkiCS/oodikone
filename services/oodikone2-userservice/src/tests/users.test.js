@@ -1,10 +1,5 @@
 const { sequelize, forceSyncDatabase } = require('../database/connection')
-const {
-  User,
-  AccessGroup,
-  HyGroup,
-  UserElementDetails
-} = require('../models/index')
+const { User, AccessGroup, HyGroup, UserElementDetails } = require('../models/index')
 const userService = require('../services/users')
 const AccessService = require('../services/accessgroups')
 const { DB_SCHEMA } = require('../conf')
@@ -135,13 +130,7 @@ describe('user tests', () => {
   })
 
   test('login creates user if user does not exist', async () => {
-    const { token, isNew } = await userService.login(
-      'rtz',
-      'Artour Babaev',
-      [],
-      [],
-      'rtz@eg.com'
-    )
+    const { token, isNew } = await userService.login('rtz', 'Artour Babaev', [], [], 'rtz@eg.com')
     expect(token).toBeTruthy()
     expect(isNew).toBe(true)
     const users = await userService.findAll()
