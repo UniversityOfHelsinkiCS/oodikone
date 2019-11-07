@@ -212,7 +212,7 @@ class PopulationFilters extends Component {
     this.setState({ presetFilters: this.state.presetFilters.filter(filter => filter.id !== id) })
 
   renderAddFilters(allStudyRights) {
-    const { extents, transfers, populationSelectedStudentCourses, populationCourses, tags } = this.props
+    const { extents, transfers, populationSelectedStudentCourses, populationCourses, tags, exclude } = this.props
     const { Add } = infotooltips.PopulationStatistics.Filters
     const selectedPopulationCourses = populationSelectedStudentCourses.data
       ? populationSelectedStudentCourses
@@ -223,7 +223,7 @@ class PopulationFilters extends Component {
         .filter(f => !(Object.keys(advancedFilters).includes(f) && !this.state.advancedUser))
         .map(f => String(f)),
       this.state.presetFilters.map(f => f.id).filter(f => this.state.advancedUser)
-    )
+    ).filter(f => !exclude.includes(f))
 
     const setFilters = union(
       this.props.filters.map(f => f.type),
@@ -268,6 +268,7 @@ class PopulationFilters extends Component {
             // THIS IS KINDA HACKED SOLUTION PLS FIX
             // this is awful, shame on who ever wrote this, pls fix
             // when is this going to be fixed?
+            // when the time is right, probably
             return React.createElement(componentFor[filterName], {
               filter: { notSet: true },
               key: filterName,
