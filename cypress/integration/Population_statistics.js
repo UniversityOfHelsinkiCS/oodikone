@@ -1,7 +1,10 @@
 /// <reference types="Cypress" />
 
-const setPopStatsUntil = (until) => {
+const setPopStatsUntil = (until, includeSettings = []) => {
   cy.contains("Advanced settings").siblings().get('.toggle').click()
+  includeSettings.forEach(setting => {
+    cy.contains(setting).click()
+  })
   cy.contains("Statistics until").siblings().get('.rdt').get('input').eq(1).click().clear().type(until)
   cy.contains("Fetch population with new settings").click()
 }
@@ -65,7 +68,6 @@ describe('Population Statistics tests', () => {
   it('Population statistics is usable on general level', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
-
     setPopStatsUntil('September 2019')
 
     cy.get(".card").within(() => {
@@ -92,7 +94,7 @@ describe('Population Statistics tests', () => {
 
     cy.contains("add").click()
     cy.contains("Add filters").siblings().within(() => {
-      cy.get(".form").should('have.length', 9)
+      cy.get(".form").should('have.length', 8)
     })
 
     checkAmountOfStudents(29)
@@ -168,13 +170,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Spring 2018").click()
     cy.contains("Spring 2018").parentsUntil("form").contains("set filter").click()
     cy.contains("Students that were present").should('have.text', "Students that were present during Fall 2018, Spring 2018")
-    cy.get(':nth-child(7) > .form > .inline > :nth-child(2) > .ui > .default').click().siblings().contains('have not').click()
-
-    checkAmountOfStudents(11)
-
-    cy.contains("have/haven't").click().siblings().contains('haven\'t').click()
-    cy.contains('canceled this studyright').parentsUntil('form').contains('set filter').click()
-    cy.contains('Excluded students whose').should('have.text', 'Excluded students whose studyright is cancelled')
+    cy.get(':nth-child(6) > .form > .inline > :nth-child(2) > .ui > .default').click().siblings().contains('have not').click()
 
     checkAmountOfStudents(11)
 
@@ -263,6 +259,23 @@ describe('Population Statistics tests', () => {
       })
       cy.root().get("button").contains("Delete for good").click({ force: true })
     })
+  })
+
+  it("Cancelled filter is shown only if cancelled students are included in the advanced settings", () => {
+    cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
+    cy.contains("See population").click()
+    setPopStatsUntil("September 2019", ["Students with cancelled"])
+
+    cy.contains("add").click()
+    cy.contains("Add filters").siblings().within(() => {
+      cy.get(".form").should('have.length', 9)
+    })
+
+    checkAmountOfStudents(32)
+    cy.contains("have/haven't").click().siblings().contains("haven\'t").click()
+    cy.contains("canceled this studyright").parentsUntil("form").contains("set filter").click()
+    cy.contains("Excluded students whose").should("have.text", "Excluded students whose studyright is cancelled")
+    checkAmountOfStudents(29)
   })
 
   it('Population statistics wont crash course population', () => {
