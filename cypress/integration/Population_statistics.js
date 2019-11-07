@@ -1,7 +1,10 @@
 /// <reference types="Cypress" />
 
-const setPopStatsUntil = (until) => {
+const setPopStatsUntil = (until, includeSettings = []) => {
   cy.contains("Advanced settings").siblings().get('.toggle').click()
+  includeSettings.forEach(setting => {
+    cy.contains("Advanced settings").parent().siblings().contains(setting).click()
+  })
   cy.contains("Statistics until").siblings().get('.rdt').get('input').eq(1).click().clear().type(until)
   cy.contains("Fetch population with new settings").click()
 }
@@ -65,7 +68,6 @@ describe('Population Statistics tests', () => {
   it('Population statistics is usable on general level', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
-
     setPopStatsUntil('September 2019')
 
     cy.get(".card").within(() => {
@@ -92,7 +94,7 @@ describe('Population Statistics tests', () => {
 
     cy.contains("add").click()
     cy.contains("Add filters").siblings().within(() => {
-      cy.get(".form").should('have.length', 9)
+      cy.get(".form").should('have.length', 8)
     })
 
     checkAmountOfStudents(29)
@@ -115,6 +117,10 @@ describe('Population Statistics tests', () => {
     cy.contains("Student names hidden").click()
     cy.contains("Luoto").siblings().eq(2).click()
     cy.contains("Luoto").invoke('text').then((text) => expect(text).to.equal('Luoto Veli-Matti, 014824094'))
+
+    cy.go("back")
+    cy.contains("Tietojenkäsittelytieteen maisteriohjelma").siblings().get('.remove').click()
+    cy.contains('Previous searches')
   })
 
   it('Student list checking works as intended', () => {
@@ -168,13 +174,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Spring 2018").click()
     cy.contains("Spring 2018").parentsUntil("form").contains("set filter").click()
     cy.contains("Students that were present").should('have.text', "Students that were present during Fall 2018, Spring 2018")
-    cy.get(':nth-child(7) > .form > .inline > :nth-child(2) > .ui > .default').click().siblings().contains('have not').click()
-
-    checkAmountOfStudents(11)
-
-    cy.contains("have/haven't").click().siblings().contains('haven\'t').click()
-    cy.contains('canceled this studyright').parentsUntil('form').contains('set filter').click()
-    cy.contains('Excluded students whose').should('have.text', 'Excluded students whose studyright is cancelled')
+    cy.get(':nth-child(6) > .form > .inline > :nth-child(2) > .ui > .default').click().siblings().contains('have not').click()
 
     checkAmountOfStudents(11)
 
@@ -265,6 +265,23 @@ describe('Population Statistics tests', () => {
     })
   })
 
+  it("Cancelled filter is shown only if cancelled students are included in the advanced settings", () => {
+    cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
+    cy.contains("See population").click()
+    setPopStatsUntil("September 2019", ["with cancelled"])
+
+    cy.contains("Add filters").siblings().contains("button", "add").click({ force: true })
+    cy.contains("Add filters").siblings().within(() => {
+      cy.get(".form").should('have.length', 9)
+    })
+
+    checkAmountOfStudents(32)
+    cy.contains("have/haven't").click().siblings().contains("haven\'t").click()
+    cy.contains("canceled this studyright").parentsUntil("form").contains("set filter").click()
+    cy.contains("Excluded students whose").should("have.text", "Excluded students whose studyright is cancelled")
+    checkAmountOfStudents(29)
+  })
+
   it('Population statistics wont crash course population', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
@@ -290,5 +307,32 @@ describe('Population Statistics tests', () => {
     cy.contains("No tags defined. You can define them here.").find("a").click()
     cy.contains("Kielten kandiohjelma")
     cy.contains("Create new tag")
+  })
+  
+  it("Advanced settings work", () => {
+    cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen kandiohjelma").click()
+    cy.contains("See population").click()
+    cy.get('.field > .ui > label').click()
+    cy.contains('Statistics until')
+    // only spring
+    cy.get(':nth-child(3) > :nth-child(2) > :nth-child(2) > .ui > label').click()
+    cy.get(':nth-child(3) > .button').click()
+
+    cy.contains('Credit accumulation (for 13 students)')
+
+    // only fall
+    cy.get(':nth-child(3) > :nth-child(2) > :nth-child(2) > .ui > label').click()
+    cy.get(':nth-child(2) > :nth-child(3) > .ui > label').click()
+    cy.get(':nth-child(3) > .button').click()
+
+    cy.contains('Credit accumulation (for 206 students)')
+
+    // spring + fall and include cancelled
+    cy.get(':nth-child(2) > :nth-child(3) > .ui > label').click()
+    cy.get(':nth-child(3) > :nth-child(3) > .ui > label').click()
+
+    cy.get(':nth-child(3) > .button').click()
+
+    cy.contains('Credit accumulation (for 228 students)')
   })
 })
