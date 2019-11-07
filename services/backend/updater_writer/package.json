@@ -17,13 +17,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "babel-eslint": "^10.0.2",
     "dotenv": "^8.0.0",
-    "eslint": "^6.1.0",
     "jest": "^24.8.0",
     "lodash": "^4.17.15",
     "node-nats-streaming": "^0.2.6",
-    "nodemon": "^1.19.1",
     "pg": "^7.12.0",
     "sequelize": "^5.21.1",
     "umzug": "^2.2.0",
@@ -31,8 +28,11 @@
     "winston-log2gelf": "^2.0.4"
   },
   "devDependencies": {
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-prettier": "^3.1.0",
+    "nodemon": "^1.19.4",
     "prettier": "^1.18.2",
     "prettier-eslint": "^9.0.0"
   }
