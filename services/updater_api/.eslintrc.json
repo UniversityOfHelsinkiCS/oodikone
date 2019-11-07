@@ -5,24 +5,9 @@
         "jest": true
     },
     "parser": "babel-eslint",
-    "extends": "eslint:recommended",
+    "extends": ["eslint:recommended", "plugin:prettier/recommended", "prettier/babel"],
     "rules": {
-        "indent": [
-            "error",
-            2
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "never"
-        ],
-        "no-console": 0
+        "no-console": 0,
+        "prettier/prettier": "error"
     }
 }
