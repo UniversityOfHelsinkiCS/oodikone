@@ -3,7 +3,7 @@
 const setPopStatsUntil = (until, includeSettings = []) => {
   cy.contains("Advanced settings").siblings().get('.toggle').click()
   includeSettings.forEach(setting => {
-    cy.contains(setting).click()
+    cy.contains("Advanced settings").parent().siblings().contains(setting).click()
   })
   cy.contains("Statistics until").siblings().get('.rdt').get('input').eq(1).click().clear().type(until)
   cy.contains("Fetch population with new settings").click()
@@ -119,7 +119,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Luoto").invoke('text').then((text) => expect(text).to.equal('Luoto Veli-Matti, 014824094'))
 
     cy.go("back")
-    cy.get('.remove').click()
+    cy.contains("Tietojenkäsittelytieteen maisteriohjelma").siblings().get('.remove').click()
     cy.contains('Previous searches')
   })
 
@@ -268,7 +268,7 @@ describe('Population Statistics tests', () => {
   it("Cancelled filter is shown only if cancelled students are included in the advanced settings", () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
-    setPopStatsUntil("September 2019", ["Students with cancelled"])
+    setPopStatsUntil("September 2019", ["with cancelled"])
 
     cy.contains("button", "add").click()
     cy.contains("Add filters").siblings().within(() => {
