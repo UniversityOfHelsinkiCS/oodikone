@@ -270,7 +270,7 @@ describe('Population Statistics tests', () => {
     cy.contains("See population").click()
     setPopStatsUntil("September 2019", ["with cancelled"])
 
-    cy.contains("button", "add").click()
+    cy.contains("Add filters").siblings().contains("button", "add").click({ force: true })
     cy.contains("Add filters").siblings().within(() => {
       cy.get(".form").should('have.length', 9)
     })
