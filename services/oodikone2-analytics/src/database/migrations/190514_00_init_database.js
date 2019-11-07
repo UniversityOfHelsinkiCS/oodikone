@@ -8,7 +8,7 @@ module.exports = {
       data: Sequelize.JSONB,
       status: Sequelize.STRING,
       createdAt: Sequelize.DATE,
-      updatedAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE
     })
     await queryInterface.createTable('throughput', {
       id: {
@@ -18,7 +18,7 @@ module.exports = {
       data: Sequelize.JSONB,
       status: Sequelize.STRING,
       createdAt: Sequelize.DATE,
-      updatedAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE
     })
   },
   down: () => {
