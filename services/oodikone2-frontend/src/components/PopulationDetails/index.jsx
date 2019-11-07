@@ -140,9 +140,17 @@ class PopulationDetails extends Component {
     </div>
   )
 
+  getExcludedFilters = () => {
+    const excludedFilters = []
+    if (!this.props.query.studentStatuses.includes('CANCELLED')) {
+      excludedFilters.push('CanceledStudyright')
+    }
+    return excludedFilters
+  }
+
   renderPopulationDetailsContent = () => (
     <div>
-      <PopulationFilters ref={this.filters} samples={this.props.samples} />
+      <PopulationFilters ref={this.filters} samples={this.props.samples} exclude={this.getExcludedFilters()} />
       {this.renderCreditGainGraphs()}
       {!this.props.query.years ? this.renderCourseStatistics() : null}
       <PopulationCourses
