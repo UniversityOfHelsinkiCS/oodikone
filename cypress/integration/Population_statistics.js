@@ -269,7 +269,8 @@ describe('Population Statistics tests', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
     setPopStatsUntil("September 2019", ["with cancelled"])
-
+    
+    cy.wait(100)
     cy.contains("Add filters")
     cy.contains('add').click()
     cy.contains("Add filters").siblings().within(() => {
