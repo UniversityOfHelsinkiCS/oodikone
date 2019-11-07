@@ -42,11 +42,10 @@ if [ ! -z "$WHITELISTED_SERVICES" ]; then
 else
   services=(
     backend
+    frontend
     updater_writer
     updater_api
     updater_scheduler
-    userservice
-    frontend
     analytics
     userservice
     usageservice
@@ -61,5 +60,5 @@ echo -e "Executing command ${RED}$COMMAND${NC} $([ -n "$PARAMS" ] && echo "with 
 
 # Execute the given npm command in given services
 for service in "${services[@]}";
-  do docker-compose exec -T $service npm run "$COMMAND" --if-present -- "${PARAMS[@]}"
+  do docker exec -t $service npm run "$COMMAND" --if-present -- "${PARAMS[@]}"
 done

@@ -51,9 +51,7 @@ const createMissingGroups = async (group, service) => {
 }
 
 const updateGroups = async (user, affiliations, hyGroups) => {
-  let affiliationsToBeUpdated = (await user.getAffiliation()).map(
-    af => af.code
-  )
+  let affiliationsToBeUpdated = (await user.getAffiliation()).map(af => af.code)
   let affiliationsToAdd = []
   let affiliationsToDelete = []
 
@@ -67,12 +65,8 @@ const updateGroups = async (user, affiliations, hyGroups) => {
       affiliationsToDelete = affiliationsToDelete.concat(affilitation)
     }
   })
-  await user.addAffiliation(
-    await AffiliationService.byCodes(affiliationsToAdd)
-  )
-  await user.removeAffiliation(
-    await AffiliationService.byCodes(affiliationsToDelete)
-  )
+  await user.addAffiliation(await AffiliationService.byCodes(affiliationsToAdd))
+  await user.removeAffiliation(await AffiliationService.byCodes(affiliationsToDelete))
 
   let hyGroupsToBeUpdated = (await user.getHy_group()).map(hg => hg.code)
   let hyGroupsToAdd = []
@@ -164,9 +158,7 @@ const getUserData = user => {
   if (user == null) return null
   const newuser = user.get()
   newuser.elementdetails = getUserProgrammes(newuser)
-  newuser.is_enabled =
-    requiredGroup === null ||
-    newuser.hy_group.some(e => e.code === requiredGroup)
+  newuser.is_enabled = requiredGroup === null || newuser.hy_group.some(e => e.code === requiredGroup)
   newuser.hy_group = null
   return newuser
 }
@@ -277,10 +269,7 @@ const setFaculties = async (uid, faculties) => {
   await sequelize.transaction(async transaction => {
     await UserFaculties.destroy({ where: { userId: uid }, transaction })
     for (const faculty of faculties) {
-      await UserFaculties.create(
-        { userId: uid, faculty_code: faculty },
-        { transaction }
-      )
+      await UserFaculties.create({ userId: uid, faculty_code: faculty }, { transaction })
     }
   })
 }

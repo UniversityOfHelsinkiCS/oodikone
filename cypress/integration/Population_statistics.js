@@ -7,6 +7,7 @@ const setPopStatsUntil = (until, includeSettings = []) => {
   })
   cy.contains("Statistics until").siblings().get('.rdt').get('input').eq(1).click().clear().type(until)
   cy.contains("Fetch population with new settings").click()
+  cy.contains("Advanced settings")
 }
 
 describe('Population Statistics tests', () => {
@@ -269,10 +270,9 @@ describe('Population Statistics tests', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
     setPopStatsUntil("September 2019", ["with cancelled"])
-    
-    cy.wait(100)
-    cy.contains("Add filters")
-    cy.contains('add').click()
+
+    cy.contains("Add filters").parent().contains("button", "add").should('not.have.class', 'disabled')
+    cy.contains("Add filters").parent().contains("button", "add").click()
     cy.contains("Add filters").siblings().within(() => {
       cy.get(".form").should('have.length', 9)
     })
