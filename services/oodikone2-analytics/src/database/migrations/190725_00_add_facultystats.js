@@ -7,9 +7,8 @@ module.exports = {
       },
       data: Sequelize.JSONB,
       createdAt: Sequelize.DATE,
-      updatedAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE
     })
   },
-  down: () => {
-  }
+  down: () => {}
 }

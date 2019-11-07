@@ -13,21 +13,21 @@ const requestCache = new LRU({
   maxAge: 60 * 60 * 1000
 })
 
-const agent = KEY_PATH && CERT_PATH ?
-  new https.Agent({
-    cert: fs.readFileSync(process.env.CERT_PATH, 'utf8'),
-    key: fs.readFileSync(process.env.KEY_PATH, 'utf8'),
-  })
-  :
-  new https.Agent({
-    rejectUnauthorized: false
-  })
+const agent =
+  KEY_PATH && CERT_PATH
+    ? new https.Agent({
+        cert: fs.readFileSync(process.env.CERT_PATH, 'utf8'),
+        key: fs.readFileSync(process.env.KEY_PATH, 'utf8')
+      })
+    : new https.Agent({
+        rejectUnauthorized: false
+      })
 
 const instance = axios.create({
   httpsAgent: agent
 })
 
-const getUrl = async (url) => {
+const getUrl = async url => {
   const cacheHit = requestCache.get(url)
   if (cacheHit) return cacheHit
 
@@ -67,16 +67,14 @@ const attemptGetFor = async (url, attempts = 6) => {
 }
 
 if (process.env.NODE_ENV === 'development') {
-
   // axios.defaults.auth = {
   //   username: 'tktl',
   //   password: process.env.OODI_PW
   // }
-  instance.interceptors.request.use((config) => {
-    config.params = {token: process.env.TOKEN}
+  instance.interceptors.request.use(config => {
+    config.params = { token: process.env.TOKEN }
     return config
   })
-
 }
 console.log(process.env.NODE_ENV)
 
@@ -104,8 +102,7 @@ const getFaculties = async () => {
   const url = `${base_url}/codes/faculties`
   try {
     return await attemptGetFor(url)
-  }
-  catch (e) {
+  } catch (e) {
     console.log(' GET FACULTIE S FAIELD')
     throw e
   }
@@ -141,7 +138,7 @@ const getCourseTypeCodes = async () => {
   }
 }
 
-const getLearningOpportunity = async (id) => {
+const getLearningOpportunity = async id => {
   const url = `${base_url}/learningopportunities/${id}`
   try {
     return await attemptGetFor(url)

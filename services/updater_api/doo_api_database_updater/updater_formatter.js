@@ -29,15 +29,19 @@ const formatStudyrights = async (api, studentnumber) => {
     const studyright = mapper.getStudyRightFromData(studyrightData, studentnumber)
 
     const elementDetails = studyrightData.elements.map(element => mapper.elementDetailFromData(element))
-    const studyRightElements = studyrightData.elements.map(element => mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber))
+    const studyRightElements = studyrightData.elements.map(element =>
+      mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber)
+    )
 
     const transfers = mapper.getTransfersFromData(studyrightData, studentnumber)
     return { studyRightExtent, studyright, elementDetails, studyRightElements, transfers }
   })
 }
 
-const formatCourseEnrollments = async (apidata, studentnumber) => await Promise.all(apidata.courseEnrollments.map(enrollment => mapper.studentEnrollmentToModels(enrollment, studentnumber)))
-
+const formatCourseEnrollments = async (apidata, studentnumber) =>
+  await Promise.all(
+    apidata.courseEnrollments.map(enrollment => mapper.studentEnrollmentToModels(enrollment, studentnumber))
+  )
 
 const parseAttainmentData = (data, studentnumber) => {
   return {
@@ -72,21 +76,27 @@ const formatStudyattainments = async (api, studentnumber) => {
     const { providers, courseproviders } = mapper.learningOpportunityDataToCourseProviders(learningOpportunity)
 
     studyAttainments = [
-      ...studyAttainments, {
-        credit: (credit.semestercode ? credit : { ...credit, semestercode: mapper.getSemesterCode(credit.attainment_date) }),
+      ...studyAttainments,
+      {
+        credit: credit.semestercode
+          ? credit
+          : { ...credit, semestercode: mapper.getSemesterCode(credit.attainment_date) },
         creditTeachers: await createCreditTeachers(credit, teachers),
-        teachers: (await Promise.all(teachers.map(async (t) => {
-          const teacher = await Oodi.getTeacherInfo(t.id)
-          // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/1547#issuecomment-550184131
-          // Sometimes Oodi returns a null teacher... We need to figure out why.
-          if (!teacher) {
-            console.log('TEACHER MISSING!', t.id)
-            return null
-          }
-          return mapper.getTeacherFromData(teacher)
-        }))).filter(t => t),
+        teachers: (await Promise.all(
+          teachers.map(async t => {
+            const teacher = await Oodi.getTeacherInfo(t.id)
+            // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/1547#issuecomment-550184131
+            // Sometimes Oodi returns a null teacher... We need to figure out why.
+            if (!teacher) {
+              console.log('TEACHER MISSING!', t.id)
+              return null
+            }
+            return mapper.getTeacherFromData(teacher)
+          })
+        )).filter(t => t),
         course: {
-          ...course, ...mapper.learningOpportunityDataToCourse(learningOpportunity),
+          ...course,
+          ...mapper.learningOpportunityDataToCourse(learningOpportunity),
           disciplines: mapper.learningOpportunityDataToCourseDisciplines(learningOpportunity),
           providers,
           courseproviders
@@ -96,9 +106,12 @@ const formatStudyattainments = async (api, studentnumber) => {
   }
   return studyAttainments
 }
-const formatSemesterEnrollments = async (apidata, studentnumber) => await Promise.all(apidata.semesterEnrollments.map(apiEnrollment => mapper.semesterEnrollmentFromData(apiEnrollment, studentnumber)))
+const formatSemesterEnrollments = async (apidata, studentnumber) =>
+  await Promise.all(
+    apidata.semesterEnrollments.map(apiEnrollment => mapper.semesterEnrollmentFromData(apiEnrollment, studentnumber))
+  )
 
-const getStudent = async (studentnumber) => {
+const getStudent = async studentnumber => {
   const api = await getAllStudentInformationFromApi(studentnumber)
   if (api.student == null) {
     const error = new Error(`API returned ${api.student} for studentnumber ${studentnumber}.`)
@@ -121,7 +134,14 @@ const getStudent = async (studentnumber) => {
 }
 
 const getMeta = async () => {
-  const [faculties, courseRealisationsTypes, semesters, creditTypeCodes, courseTypeCodes, disciplines] = await Promise.all([
+  const [
+    faculties,
+    courseRealisationsTypes,
+    semesters,
+    creditTypeCodes,
+    courseTypeCodes,
+    disciplines
+  ] = await Promise.all([
     (await Oodi.getFaculties()).map(mapper.getOrganisationFromData),
     (await Oodi.getCourseRealisationTypes()).map(mapper.courseRealisationTypeFromData),
     (await Oodi.getSemesters()).map(mapper.semesterFromData),
@@ -132,9 +152,7 @@ const getMeta = async () => {
   return { faculties, courseRealisationsTypes, semesters, creditTypeCodes, courseTypeCodes, disciplines }
 }
 
-
-
-
 module.exports = {
-  getStudent, getMeta
+  getStudent,
+  getMeta
 }

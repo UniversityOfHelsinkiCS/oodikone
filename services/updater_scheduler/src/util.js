@@ -1,8 +1,7 @@
-
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 // Shuffle in place, returns same array
-const shuffleArray = (a) => {
+const shuffleArray = a => {
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
     const x = a[i]
@@ -12,7 +11,7 @@ const shuffleArray = (a) => {
   return a
 }
 
-const isValidStudentId = (id) => {
+const isValidStudentId = id => {
   if (/^0\d{8}$/.test(id)) {
     // is a 9 digit number
     const multipliers = [7, 1, 3, 7, 1, 3, 7]
@@ -35,7 +34,7 @@ const getStudentNumberChecksum = studentNumber => {
   for (let i = 0; i < studentNumberString.length; i++) {
     // go from end t start
     let currentNumber = studentNumberString[studentNumberString.length - (i + 1)]
-    checksum += currentNumber * (checksumNumbers[i % checksumNumbers.length])
+    checksum += currentNumber * checksumNumbers[i % checksumNumbers.length]
   }
 
   return (10 - (checksum % 10)) % 10
