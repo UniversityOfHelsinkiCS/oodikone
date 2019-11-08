@@ -43,8 +43,7 @@ export default {
     annetun määrän opintopisteitä pakollisista kursseista`,
     StartingThisSemester: `Suodattaa opiskelijat, jotka aloittivat opiskelun valittuna lukuvuonna tai sitä ennen`,
     EnrollmentStatus: 'Näyttää opiskelijat, jotka olivat läsnä- tai poissaolevana valittuina lukukausina',
-    CanceledStudyright: `Suodattaa opiskelijat, jotka ovat/eivät ole peruuttaneet virallisesti
-    opinto-oikeutensa`,
+    CanceledStudyright: `Suodattaa opiskelijat, jotka ovat/eivät ole ilmoittautuneet läsnä- tai poissaoleviksi`,
     DisciplineTypes: `Asettaa annetun tyyppisille annettujen tieteenalojen
     kursseille automaattisesti osallistumissuodattimet.
     Voit asettaa rajan osallistumismäärälle tuodaksesi esiin vain suositut kurssit`,
