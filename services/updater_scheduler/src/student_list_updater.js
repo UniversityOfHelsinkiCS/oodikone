@@ -1,7 +1,7 @@
 const Schedule = require('../models')
 const { sleep, getStudentNumberChecksum } = require('./util')
 
-const createTasks = async () => {
+const createTasks = async (fromStudents = []) => {
   console.log('Creating studentnumbers to DB...')
 
   const writeStudents = async studentsToAdd => {
@@ -28,19 +28,32 @@ const createTasks = async () => {
     return true
   }
 
-  const minStudentNumber = 1010000
-  const maxStudentNumber = 1530000
   const mongoWriteBatchSize = 1000
   let studentnumbers = []
-  for (let i = minStudentNumber; i <= maxStudentNumber; ++i) {
-    const studentNumber = '0' + i + getStudentNumberChecksum(i)
-    studentnumbers.push(studentNumber)
-    if (studentnumbers.length % mongoWriteBatchSize === 0 || i === maxStudentNumber) {
-      console.log('current studentnumber', i)
-      while (!(await writeToDB(studentnumbers))) {
-        await sleep(1 * 60 * 1000)
+  if (fromStudents.length) {
+    for (let i = 0; i < fromStudents.length; i++) {
+      studentnumbers.push(fromStudents[i])
+      if (studentnumbers.length % mongoWriteBatchSize === 0 || i === fromStudents.length - 1) {
+        while (!(await writeToDB(studentnumbers))) {
+          await sleep(60 * 1000)
+        }
+        console.log(`Created tasks from ${studentnumbers}`)
+        studentnumbers = []
       }
-      studentnumbers = []
+    }
+  } else {
+    const minStudentNumber = 1010000
+    const maxStudentNumber = 1530000
+    for (let i = minStudentNumber; i <= maxStudentNumber; ++i) {
+      const studentNumber = '0' + i + getStudentNumberChecksum(i)
+      studentnumbers.push(studentNumber)
+      if (studentnumbers.length % mongoWriteBatchSize === 0 || i === maxStudentNumber) {
+        console.log('current studentnumber', i)
+        while (!(await writeToDB(studentnumbers))) {
+          await sleep(60 * 1000)
+        }
+        studentnumbers = []
+      }
     }
   }
   console.log('Studentnumbers created to DB')
