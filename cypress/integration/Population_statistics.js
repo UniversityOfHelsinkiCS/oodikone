@@ -75,7 +75,7 @@ describe('Population Statistics tests', () => {
       cy.contains("Tietojenkäsittelytieteen maisteriohjelma")
       cy.contains("Sample size: 29 students")
       cy.contains("Excludes exchange students")
-      cy.contains("Excludes students with cancelled study right")
+      cy.contains("Excludes students who haven't enrolled present nor absent")
     })
 
     cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
@@ -266,10 +266,10 @@ describe('Population Statistics tests', () => {
     })
   })
 
-  it("Cancelled filter is shown only if cancelled students are included in the advanced settings", () => {
+  it("'Has enrolled' filter is shown only if non-enrolled students are included in the advanced settings", () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
-    setPopStatsUntil("September 2019", ["with cancelled"])
+    setPopStatsUntil("September 2019", ["present nor absent"])
 
     cy.contains("Add filters").parent().contains("button", "add").should('not.have.class', 'disabled')
     cy.contains("Add filters").parent().contains("button", "add").click()
@@ -278,9 +278,9 @@ describe('Population Statistics tests', () => {
     })
 
     checkAmountOfStudents(32)
-    cy.contains("have/haven't").click().siblings().contains("haven\'t").click()
-    cy.contains("canceled this studyright").parentsUntil("form").contains("set filter").click()
-    cy.contains("Excluded students whose").should("have.text", "Excluded students whose studyright is cancelled")
+    cy.contains("have/haven't").click().siblings().contains("have").click()
+    cy.contains("enrolled present (n)or absent").parentsUntil("form").contains("set filter").click()
+    cy.contains("Excluded students who").should("have.text", "Excluded students who haven't enrolled present nor absent")
     checkAmountOfStudents(29)
   })
 
