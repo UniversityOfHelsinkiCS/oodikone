@@ -411,7 +411,7 @@ class StudentDetails extends Component {
                       )}
                     </Table.Cell>
                     <Table.Cell>
-                      {c.elements.programmes.filter(filterDuplicates).map(programme => (
+                      {sortBy(c.elements.programmes.filter(filterDuplicates), 'startdate').map(programme => (
                         <p key={programme.name}>
                           {`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(
                             programme.enddate,
