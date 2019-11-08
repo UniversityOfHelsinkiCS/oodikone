@@ -365,3 +365,5 @@ export const useTitle = title => {
 export const validateInputLength = (input, minLength) => input && input.trim().length >= minLength
 
 export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
+
+export const isNewHYStudyProgramme = code => !!(code && code.match(/^[A-Z]*[0-9]*_[0-9]*$/))
