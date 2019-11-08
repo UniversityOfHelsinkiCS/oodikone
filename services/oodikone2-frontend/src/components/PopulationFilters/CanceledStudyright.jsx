@@ -75,10 +75,10 @@ class CanceledStudyright extends Component {
     return (
       <Segment>
         {filter.params.cancel === 'true' ? (
-          'Showing students who haven\'t enrolled present nor absent'
+          "Showing students who haven't enrolled present nor absent"
         ) : (
           <span>
-            <b>Excluded</b> students who haven't enrolled present nor absent
+            <b>Excluded</b> {"students who haven't enrolled present nor absent"}
           </span>
         )}
         <span style={{ float: 'right' }}>

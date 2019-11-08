@@ -54,7 +54,7 @@ const PopulationQueryCard = ({
           <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students</div>
           <div>
             {studentStatuses.includes('CANCELLED') ? 'Includes ' : 'Excludes '}
-            students who haven't enrolled present nor absent
+            {"students who haven't enrolled present nor absent"}
           </div>
           <div>
             {studentStatuses.includes('NONDEGREE') ? 'Includes ' : 'Excludes '}
