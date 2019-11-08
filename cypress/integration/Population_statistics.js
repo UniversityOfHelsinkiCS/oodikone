@@ -271,6 +271,7 @@ describe('Population Statistics tests', () => {
     cy.contains("See population").click()
     setPopStatsUntil("September 2019", ["present nor absent"])
 
+    cy.wait(100)
     cy.contains("Add filters").parent().contains("button", "add").should('not.have.class', 'disabled')
     cy.contains("Add filters").parent().contains("button", "add").click()
     cy.contains("Add filters").siblings().within(() => {
