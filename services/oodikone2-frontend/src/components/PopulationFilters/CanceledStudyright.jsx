@@ -19,7 +19,7 @@ class CanceledStudyright extends Component {
     cancel: 'true'
   }
 
-  options = [{ value: 'false', text: "haven't" }, { value: 'true', text: 'have' }]
+  options = [{ value: 'false', text: 'have' }, { value: 'true', text: "haven't" }]
 
   handleChange = (e, { value }) => {
     this.setState({ cancel: value })
@@ -47,7 +47,7 @@ class CanceledStudyright extends Component {
             <InfoBox content={infoTooltips.PopulationStatistics.Filters.CanceledStudyright} />
             <Form.Group inline>
               <Form.Field>
-                <label>Filter students that </label>
+                <label>Filter students who </label>
               </Form.Field>
               <Form.Field>
                 <Dropdown
@@ -61,7 +61,7 @@ class CanceledStudyright extends Component {
                 />
               </Form.Field>
               <Form.Field>
-                <label> canceled this studyright </label>
+                <label> enrolled present (n)or absent</label>
               </Form.Field>
               <Form.Field>
                 <Button onClick={this.handleCancel}>set filter</Button>
@@ -75,10 +75,10 @@ class CanceledStudyright extends Component {
     return (
       <Segment>
         {filter.params.cancel === 'true' ? (
-          'Showing students that have canceled this studyright'
+          "Showing students who haven't enrolled present nor absent"
         ) : (
           <span>
-            <b>Excluded</b> students whose studyright is cancelled
+            <b>Excluded</b> {"students who haven't enrolled present nor absent"}
           </span>
         )}
         <span style={{ float: 'right' }}>

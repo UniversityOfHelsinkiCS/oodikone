@@ -228,7 +228,7 @@ class PopulationSearchHistory extends Component {
           <Form.Checkbox
             className="populationStatisticsRadio"
             key="CANCELLED"
-            label="Students with cancelled study right"
+            label="Students who haven't enrolled present nor absent"
             value="CANCELLED"
             name="studentStatusGroup"
             checked={studentStatuses.includes('CANCELLED')}
