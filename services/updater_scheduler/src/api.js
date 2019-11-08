@@ -23,7 +23,8 @@ app.use(bodyParser.json())
 app.get('/ping', (req, res) => res.json({ message: 'pong ' }))
 
 app.post('/update', async (req, res) => {
-  scheduleStudentsByArray(req.body)
+  await createTasks(req.body)
+  await scheduleStudentsByArray(req.body)
   res.json({ message: 'scheduled' })
 })
 
