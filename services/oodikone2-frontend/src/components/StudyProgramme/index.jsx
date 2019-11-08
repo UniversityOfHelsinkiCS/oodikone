@@ -12,7 +12,7 @@ import Overview from './Overview'
 import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
-import { getTextIn, useTabs, getUserRoles, getUserIsAdmin, useTitle } from '../../common'
+import { getTextIn, useTabs, getUserRoles, getUserIsAdmin, useTitle, isNewHYStudyProgramme } from '../../common'
 import TSA from '../../common/tsa'
 import Tags from './Tags'
 
@@ -23,6 +23,7 @@ import { callApi } from '../../apiConnection'
 const StudyProgramme = props => {
   const [tab, setTab] = useTabs('p_tab', props.match.params.courseGroupId ? 2 : 0, props.history)
   useTitle('Study programmes')
+  const SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE = props.userRoles && props.userRoles.includes('dev')
 
   const refreshProductivity = () => {
     callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, {
@@ -80,6 +81,14 @@ const StudyProgramme = props => {
       menuItem: 'Tags',
       render: () => <Tags studyprogramme={studyProgrammeId} />
     })
+    if (SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE && !isNewHYStudyProgramme(studyProgrammeId)) {
+      panes.push({
+        menuItem: 'Present students',
+        render: () => (
+          <React.Fragment>{SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE && <b>Behind a feature toggle</b>}</React.Fragment>
+        )
+      })
+    }
     if (props.isAdmin) {
       panes.push({
         menuItem: 'Admin',
