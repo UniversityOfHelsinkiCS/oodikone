@@ -392,71 +392,77 @@ class StudentDetails extends Component {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {studyRightRows.map(c => {
-              if (c.elements.programmes.length > 0 || c.elements.degree) {
-                return (
-                  <Table.Row
-                    active={c.studyrightid === studyrightid}
-                    key={c.studyrightid}
-                    onClick={() => this.handleStartDateChange(c.elements, c.studyrightid)}
-                  >
-                    <Table.Cell verticalAlign="middle">
-                      {c.elements.degree && (
-                        <p key={c.elements.degree.name}>
-                          {`${c.elements.degree.name}
+            {sortBy(studyRightRows, 'studyrightid')
+              .reverse()
+              .map(c => {
+                if (c.elements.programmes.length > 0 || c.elements.degree) {
+                  return (
+                    <Table.Row
+                      active={c.studyrightid === studyrightid}
+                      key={c.studyrightid}
+                      onClick={() => this.handleStartDateChange(c.elements, c.studyrightid)}
+                    >
+                      <Table.Cell verticalAlign="middle">
+                        {c.elements.degree && (
+                          <p key={c.elements.degree.name}>
+                            {`${c.elements.degree.name}
                           (${reformatDate(c.elements.degree.startdate, 'DD.MM.YYYY')} -
                           ${reformatDate(c.elements.degree.enddate, 'DD.MM.YYYY')})`}
-                          <br />
-                        </p>
-                      )}
-                    </Table.Cell>
-                    <Table.Cell>
-                      {sortBy(c.elements.programmes.filter(filterDuplicates), 'startdate').map(programme => (
-                        <p key={programme.name}>
-                          {`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(
-                            programme.enddate,
-                            'DD.MM.YYYY'
-                          )})`}
-                          <Item as={Link} to={this.showPopulationStatistics(programme.code, programme.startdate)}>
-                            <Icon name="level up alternate" />
-                          </Item>{' '}
-                          <br />
-                        </p>
-                      ))}
-                    </Table.Cell>
-                    <Table.Cell>
-                      {c.elements.studytracks.filter(filterDuplicates).map(studytrack => (
-                        <p key={studytrack.name}>
-                          {`${studytrack.name} (${reformatDate(studytrack.startdate, 'DD.MM.YYYY')} - ${reformatDate(
-                            studytrack.enddate,
-                            'DD.MM.YYYY'
-                          )})`}
-                          <br />{' '}
-                        </p>
-                      ))}
-                    </Table.Cell>
-                    <Table.Cell>
+                            <br />
+                          </p>
+                        )}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {sortBy(c.elements.programmes.filter(filterDuplicates), 'startdate')
+                          .reverse()
+                          .map(programme => (
+                            <p key={`${programme.name}-${programme.startdate}`}>
+                              {`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(
+                                programme.enddate,
+                                'DD.MM.YYYY'
+                              )})`}
+                              <Item as={Link} to={this.showPopulationStatistics(programme.code, programme.startdate)}>
+                                <Icon name="level up alternate" />
+                              </Item>{' '}
+                              <br />
+                            </p>
+                          ))}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {sortBy(c.elements.studytracks.filter(filterDuplicates), 'startdate')
+                          .reverse()
+                          .map(studytrack => (
+                            <p key={studytrack.name}>
+                              {`${studytrack.name} (${reformatDate(
+                                studytrack.startdate,
+                                'DD.MM.YYYY'
+                              )} - ${reformatDate(studytrack.enddate, 'DD.MM.YYYY')})`}
+                              <br />{' '}
+                            </p>
+                          ))}
+                      </Table.Cell>
+                      <Table.Cell>
                       {c.canceldate ? ( // eslint-disable-line
-                        <div>
-                          <p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p>
-                        </div>
-                      ) : c.graduated ? (
-                        <div>
-                          <Icon name="check circle outline" color="green" />
-                          <p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p>
-                        </div>
-                      ) : (
-                        <div>
-                          <Icon name="circle outline" color="red" />
-                          <p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p>
-                        </div>
-                      )}
-                    </Table.Cell>
-                  </Table.Row>
-                )
-              }
-              return null
-            })}
+                          <div>
+                            <p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p>
+                          </div>
+                        ) : c.graduated ? (
+                          <div>
+                            <Icon name="check circle outline" color="green" />
+                            <p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p>
+                          </div>
+                        ) : (
+                          <div>
+                            <Icon name="circle outline" color="red" />
+                            <p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p>
+                          </div>
+                        )}
+                      </Table.Cell>
+                    </Table.Row>
+                  )
+                }
+                return null
+              })}
           </Table.Body>
         </Table>
       </Fragment>
