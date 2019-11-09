@@ -280,7 +280,7 @@ class StudentDetails extends Component {
     return (
       <Fragment>
         <Header content="Courses" />
-        <Segment style={{ maxHeight: '80vh', overflowY: 'auto', padding: 10 }}>{courseTables}</Segment>
+        {courseTables}
       </Fragment>
     )
   }
@@ -392,7 +392,7 @@ class StudentDetails extends Component {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {sortBy(studyRightRows, 'studyrightid')
+            {sortBy(studyRightRows, c => Number(c.studyrightid))
               .reverse()
               .map(c => {
                 if (c.elements.programmes.length > 0 || c.elements.degree) {
