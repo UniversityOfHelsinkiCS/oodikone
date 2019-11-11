@@ -1,5 +1,21 @@
 const sequelize = require('sequelize')
 const { Semester } = require('../models/index')
+const Op = sequelize.Op
+
+const getCurrentSemester = async () => {
+  const today = new Date()
+  const currentSemester = await Semester.findOne({
+    where: {
+      startdate: {
+        [Op.lte]: today
+      },
+      enddate: {
+        [Op.gte]: today
+      }
+    }
+  })
+  return currentSemester
+}
 
 const getSemestersAndYears = async () => {
   const semesters = await Semester.findAll({})
@@ -36,5 +52,6 @@ const getMaxYearcode = async () => {
 
 module.exports = {
   getSemestersAndYears,
-  getMaxYearcode
+  getMaxYearcode,
+  getCurrentSemester
 }
