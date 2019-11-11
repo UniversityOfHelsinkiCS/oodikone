@@ -4,13 +4,12 @@ import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { func, shape, string, arrayOf } from 'prop-types'
 import { programmeFilter } from '../../populationFilters'
 import { textAndDescriptionSearch, getNewestProgramme, getTextIn } from '../../common'
-
+import infoTooltips from '../../common/InfoToolTips'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
 const ProgrammeFilter = ({
   removePopulationFilterAction,
   setPopulationFilterAction,
-  allStudyrights,
   filter,
   language,
   samples,
@@ -20,6 +19,7 @@ const ProgrammeFilter = ({
   const [programme, setProgramme] = useState('')
   const [programmeName, setName] = useState('')
   const [options, setOptions] = useState([])
+  const [programmes, setProgrammes] = useState(null)
 
   useEffect(() => {
     const allProgrammes = {}
@@ -31,10 +31,17 @@ const ProgrammeFilter = ({
         elementDetails
       )
       if (programme) {
-        if (!allProgrammes[programme.code]) {
+        if (allProgrammes[programme.code]) {
+          allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
+        } else {
           allProgrammes[programme.code] = { programme, students: [] }
+          allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
         }
-        allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
+      } else {
+        if (!allProgrammes['00000']) {
+          allProgrammes['00000'] = { programme: { name: { en: 'No programme' } }, students: [] }
+        }
+        allProgrammes['00000'].students.push({ studentnumber: student.studentnumber })
       }
     })
     const optionsToSet = Object.keys(allProgrammes).map(code => ({
@@ -43,17 +50,19 @@ const ProgrammeFilter = ({
       value: code,
       description: code
     }))
-
+    setProgrammes(allProgrammes)
     setOptions(optionsToSet)
   }, [])
 
   const handleFilter = () => {
-    setPopulationFilterAction(programmeFilter({ programme, programmeName }, elementDetails))
+    setPopulationFilterAction(
+      programmeFilter({ programme, programmeName, studentToTargetCourseDateMap }, elementDetails)
+    )
   }
   const handleChange = (e, { value }) => {
     setProgramme(value)
-    const chosenProgrammeName = allStudyrights.programmes.find(sr => sr.code === value)
-    setName(chosenProgrammeName.name[language])
+    const chosenProgramme = programmes[value].programme
+    setName(chosenProgramme.name[language])
   }
   const clearFilter = () => {
     removePopulationFilterAction(filter.id)
@@ -65,7 +74,10 @@ const ProgrammeFilter = ({
     return (
       <Segment>
         <Form>
-          <Popup trigger={<Icon style={{ float: 'right' }} name="info" />} />
+          <Popup
+            content={infoTooltips.PopulationStatistics.Filters.TagFilter}
+            trigger={<Icon style={{ float: 'right' }} name="info" />}
+          />
           <Form.Group inline>
             <Form.Field>
               <label>Select students that are in programme </label>
@@ -112,7 +124,6 @@ ProgrammeFilter.propTypes = {
   setPopulationFilterAction: func.isRequired,
   removePopulationFilterAction: func.isRequired,
   filter: shape({}).isRequired,
-  allStudyrights: shape({}).isRequired,
   language: string.isRequired,
   samples: arrayOf(shape({})).isRequired,
   studentToTargetCourseDateMap: shape({}),

@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Input, Popup } from 'semantic-ui-react'
 import { func, shape, string, arrayOf } from 'prop-types'
 
+import infoTooltips from '../../common/InfoToolTips'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { courseCreditFilter } from '../../populationFilters'
 
@@ -29,7 +30,10 @@ const CourseCreditFilter = ({
     return (
       <Segment>
         <Form>
-          <Popup trigger={<Icon style={{ float: 'right' }} name="info" />} />
+          <Popup
+            content={infoTooltips.PopulationStatistics.Filters.TagFilter}
+            trigger={<Icon style={{ float: 'right' }} name="info" />}
+          />
           <Form.Group inline>
             <Form.Field>
               <label>Select students that have </label>

@@ -77,6 +77,6 @@ describe('Student Statistics tests', () => {
         cy.contains('014824094').click()
         cy.get('i.level.up.alternate.icon').eq(0).click()
         cy.contains('Population statistics')
-        cy.contains('Tietojenkäsittelytieteen koulutusohjelma')
+        cy.contains('Tietojenkäsittelytieteen maisteriohjelma')
     })
 })

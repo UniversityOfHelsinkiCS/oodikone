@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { func, shape, arrayOf } from 'prop-types'
 
+import infoTooltips from '../../common/InfoToolTips'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { tagFilter } from '../../populationFilters'
 
@@ -40,7 +41,10 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
     return (
       <Segment>
         <Form>
-          <Popup trigger={<Icon style={{ float: 'right' }} name="info" />} />
+          <Popup
+            content={infoTooltips.PopulationStatistics.Filters.TagFilter}
+            trigger={<Icon style={{ float: 'right' }} name="info" />}
+          />
           <Form.Group inline>
             <Form.Field>
               <label>Select students that </label>
