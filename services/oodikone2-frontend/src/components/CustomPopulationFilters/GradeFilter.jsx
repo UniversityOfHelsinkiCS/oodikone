@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
-import { func, shape, string, arrayOf } from 'prop-types'
+import { func, shape, string, arrayOf, number } from 'prop-types'
 
 import infoTooltips from '../../common/InfoToolTips'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
@@ -86,8 +86,8 @@ GradeFilter.propTypes = {
   filter: shape({}).isRequired,
   courseData: shape({}).isRequired,
   coursecodes: arrayOf(string).isRequired,
-  from: string.isRequired,
-  to: string.isRequired
+  from: number.isRequired,
+  to: number.isRequired
 }
 
 const mapStateToProps = ({ singleCourseStats }) => ({

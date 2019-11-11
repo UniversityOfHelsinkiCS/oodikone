@@ -38,7 +38,8 @@ const CustomPopulationFilters = ({
   allStudyrights,
   coursecodes,
   from,
-  to
+  to,
+  studentToTargetCourseDateMap
 }) => {
   const [visible, setVisible] = useState(false)
 
@@ -78,7 +79,7 @@ const CustomPopulationFilters = ({
             filter: { notSet: true },
             key: filterName,
             samples,
-            allStudyrights,
+            studentToTargetCourseDateMap,
             coursecodes,
             from,
             to
@@ -135,7 +136,8 @@ const CustomPopulationFilters = ({
 CustomPopulationFilters.defaultProps = {
   coursecodes: [],
   from: 0,
-  to: 0
+  to: 0,
+  studentToTargetCourseDateMap: null
 }
 
 CustomPopulationFilters.propTypes = {
@@ -146,6 +148,7 @@ CustomPopulationFilters.propTypes = {
   setComplementFilterDispatch: func.isRequired,
   coursecodes: arrayOf(string),
   allStudyrights: shape({}).isRequired,
+  studentToTargetCourseDateMap: shape({}),
   from: number,
   to: number
 }
