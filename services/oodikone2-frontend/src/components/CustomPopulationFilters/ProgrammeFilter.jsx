@@ -4,7 +4,7 @@ import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { func, shape, string, arrayOf } from 'prop-types'
 import { programmeFilter } from '../../populationFilters'
 import { textAndDescriptionSearch, getNewestProgramme, getTextIn } from '../../common'
-
+import infoTooltips from '../../common/InfoToolTips'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
 const ProgrammeFilter = ({
@@ -65,7 +65,10 @@ const ProgrammeFilter = ({
     return (
       <Segment>
         <Form>
-          <Popup trigger={<Icon style={{ float: 'right' }} name="info" />} />
+          <Popup
+            content={infoTooltips.PopulationStatistics.Filters.TagFilter}
+            trigger={<Icon style={{ float: 'right' }} name="info" />}
+          />
           <Form.Group inline>
             <Form.Field>
               <label>Select students that are in programme </label>

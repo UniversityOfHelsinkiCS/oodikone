@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Icon, Input, Button, Form } from 'semantic-ui-react'
+import { Segment, Icon, Input, Button, Form, Popup } from 'semantic-ui-react'
 import { func, shape } from 'prop-types'
 
+import infoTooltips from '../../common/InfoToolTips'
 import { creditsBeforeStudyright } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 
@@ -28,6 +29,10 @@ const CreditsBeforeStudyright = ({ filter, removePopulationFilterAction, setPopu
     return (
       <Segment>
         <Form>
+          <Popup
+            content={infoTooltips.PopulationStatistics.Filters.CreditsBeforeStudyright}
+            trigger={<Icon style={{ float: 'right' }} name="info" />}
+          />
           <Form.Group inline>
             <Form.Field>
               <label>Show only students with credits more than</label>
