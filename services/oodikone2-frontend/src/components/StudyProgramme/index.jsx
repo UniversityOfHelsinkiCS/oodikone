@@ -18,6 +18,7 @@ import Tags from './Tags'
 
 import { getThroughput } from '../../redux/throughput'
 import { getProductivity } from '../../redux/productivity'
+import { getPresentStudents } from '../../redux/presentStudents'
 import { callApi } from '../../apiConnection'
 
 const StudyProgramme = props => {
@@ -116,6 +117,12 @@ const StudyProgramme = props => {
   const panes = getPanes()
 
   useEffect(() => {
+    if (SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE && !isNewHYStudyProgramme(studyProgrammeId)) {
+      props.getPresentStudentsDispatch(studyProgrammeId)
+    }
+  }, [studyProgrammeId])
+
+  useEffect(() => {
     if (!programmeName) {
       return
     }
@@ -170,7 +177,8 @@ StudyProgramme.propTypes = {
   userRoles: arrayOf(string).isRequired,
   getProductivityDispatch: func.isRequired,
   getThroughputDispatch: func.isRequired,
-  isAdmin: bool.isRequired
+  isAdmin: bool.isRequired,
+  getPresentStudentsDispatch: func.isRequired
 }
 
 StudyProgramme.defaultProps = {
@@ -201,7 +209,8 @@ export default connect(
   mapStateToProps,
   {
     getThroughputDispatch: getThroughput,
-    getProductivityDispatch: getProductivity
+    getProductivityDispatch: getProductivity,
+    getPresentStudentsDispatch: getPresentStudents
   },
   null,
   {
