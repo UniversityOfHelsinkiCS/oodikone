@@ -2,6 +2,7 @@ const axios = require('axios')
 const { USERSERVICE_URL } = require('../conf-backend')
 const UnitService = require('./units')
 const elementDetailService = require('./elementdetails')
+const { filterStudentnumbersByAccessrights } = require('./students')
 const { userDataCache } = require('./cache')
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: process.env.USERSERVICE_SECRET } })
 
@@ -127,6 +128,18 @@ const getUserDataFor = async uid => {
   }
 }
 
+const getStudentsUserCanAccess = async (studentnumbers, roles, userId) => {
+  let studentsUserCanAccess
+  if (roles && roles.includes('admin')) {
+    studentsUserCanAccess = new Set(studentnumbers)
+  } else {
+    const unitsUserCanAccess = await getUnitsFromElementDetails(userId)
+    const codes = unitsUserCanAccess.map(unit => unit.id)
+    studentsUserCanAccess = new Set(await filterStudentnumbersByAccessrights(studentnumbers, codes))
+  }
+  return studentsUserCanAccess
+}
+
 module.exports = {
   ping,
   byUsername,
@@ -144,5 +157,6 @@ module.exports = {
   getUnitsFromElementDetails,
   getRolesFor,
   setFaculties,
-  getUserDataFor
+  getUserDataFor,
+  getStudentsUserCanAccess
 }
