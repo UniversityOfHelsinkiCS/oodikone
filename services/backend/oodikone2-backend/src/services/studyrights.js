@@ -66,7 +66,8 @@ const nonGraduatedStudentsOfElementDetail = async code => {
   // see if student is currently enrolled and format the result
   // to shape of { year1: [studentnumbers], ... }
   const result = {}
-  const studentnumbers = []
+  const studentnumbers = new Set()
+  const studentsToBeFiltered = new Set()
   await Promise.all(
     studyrights.map(
       ({ student_studentnumber, studyrightid }) =>
@@ -83,14 +84,16 @@ const nonGraduatedStudentsOfElementDetail = async code => {
           // If student is in new master's programme,
           // then don't include them in the result
           if (studentElementDetails.find(e => e.code.match(/^M[A-Z]*[0-9]*_[0-9]*$/))) {
+            studentsToBeFiltered.add(student_studentnumber)
             return res()
           }
 
+          if (studentnumbers.has(student_studentnumber)) return res()
           const year = moment(studentToDatesMap[student_studentnumber].startdate)
             .tz('Europe/Helsinki')
             .year()
           if (!result[year]) result[year] = []
-          studentnumbers.push(student_studentnumber)
+          studentnumbers.add(student_studentnumber)
           result[year].push({
             ...studentToDatesMap[student_studentnumber],
             studentNumber: student_studentnumber,
@@ -100,6 +103,11 @@ const nonGraduatedStudentsOfElementDetail = async code => {
         })
     )
   )
+
+  // Filter out some special cases
+  Object.keys(result).forEach(year => {
+    result[year] = result[year].filter(({ studentNumber }) => !studentsToBeFiltered.has(studentNumber))
+  })
 
   return [result, studentnumbers]
 }
