@@ -5,8 +5,7 @@ import ProductivityTable from '../ProductivityTable'
 import ThroughputTable from '../ThroughputTable'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
-
-const isNewStudyprogramme = programmeId => programmeId.includes('_')
+import { isNewHYStudyProgramme } from '../../../common'
 
 const Overview = props => {
   const { productivity, throughput, studyprogramme, dispatchGetProductivity, dispatchGetThroughput, history } = props
@@ -24,15 +23,15 @@ const Overview = props => {
         error={throughput.error}
         studyprogramme={studyprogramme}
         history={history}
-        newProgramme={isNewStudyprogramme(studyprogramme)}
+        newProgramme={isNewHYStudyProgramme(studyprogramme)}
       />
       <ProductivityTable
         productivity={productivity.data[studyprogramme]}
         thesis={throughput.data.thesis}
         loading={productivity.pending}
         error={productivity.error}
-        showCredits={isNewStudyprogramme(studyprogramme)}
-        newProgramme={isNewStudyprogramme(studyprogramme)}
+        showCredits={isNewHYStudyProgramme(studyprogramme)}
+        newProgramme={isNewHYStudyProgramme(studyprogramme)}
       />
     </React.Fragment>
   )

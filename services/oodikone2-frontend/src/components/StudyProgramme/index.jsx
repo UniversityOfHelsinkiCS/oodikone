@@ -11,6 +11,7 @@ import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
 import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
+import PresentStudents from './PresentStudents'
 import '../PopulationQueryCard/populationQueryCard.css'
 import { getTextIn, useTabs, getUserRoles, getUserIsAdmin, useTitle, isNewHYStudyProgramme } from '../../common'
 import TSA from '../../common/tsa'
@@ -85,9 +86,7 @@ const StudyProgramme = props => {
     if (SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE && !isNewHYStudyProgramme(studyProgrammeId)) {
       panes.push({
         menuItem: 'Present students',
-        render: () => (
-          <React.Fragment>{SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE && <b>Behind a feature toggle</b>}</React.Fragment>
-        )
+        render: () => <React.Fragment>{SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE && <PresentStudents />}</React.Fragment>
       })
     }
     if (props.isAdmin) {
