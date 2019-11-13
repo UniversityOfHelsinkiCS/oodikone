@@ -23,15 +23,15 @@ const PresentStudents = () => {
     entries.forEach(([year, students], i) => {
       studentAccumulator.push(students)
       if (
-        (currentClusterSize++ % Math.max(2, MERGE_TRESHOLD_AFTER_2000) === 0 && year >= 2000) ||
+        (++currentClusterSize % Math.max(2, MERGE_TRESHOLD_AFTER_2000) === 0 && year >= 2000) ||
         (year + 1 === nextDecade && year < 2000) ||
         i === entries.length - 1
       ) {
-        mergedData[`${minYear}-${year}`] = flatten([...studentAccumulator])
+        mergedData[minYear !== year ? `${minYear}-${year}` : `${year}`] = flatten([...studentAccumulator])
         studentAccumulator = []
         minYear = year + 1
         nextDecade = Math.ceil((minYear + 1) / 10) * 10
-        currentClusterSize = 1
+        currentClusterSize = 0
       }
     })
     return mergedData

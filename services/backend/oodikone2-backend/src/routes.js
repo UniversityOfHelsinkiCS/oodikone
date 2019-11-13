@@ -55,6 +55,6 @@ module.exports = (app, url) => {
   app.use(`${url}/mandatory-course-labels`, mandatoryCourseLabels)
   app.use(`${url}/oodi`, auth.roles(['dev']), oodi)
   app.use(`${url}/tsa`, tsaAnalytics)
-  app.use(`${url}/custom-population-search`, auth.roles(['dev', 'admin']), customPopulationSearch)
+  app.use(`${url}/custom-population-search`, customPopulationSearch)
   app.use(url, auth.roles(['dev', 'admin']), task)
 }
