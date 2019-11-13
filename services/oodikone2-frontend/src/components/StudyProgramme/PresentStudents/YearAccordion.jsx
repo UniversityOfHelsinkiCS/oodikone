@@ -5,6 +5,7 @@ import { Icon, Accordion, Button } from 'semantic-ui-react'
 import { differenceBy } from 'lodash'
 import { bool, func, number, arrayOf, shape, string } from 'prop-types'
 import { getCustomPopulation } from '../../../redux/populations'
+import { getCustomPopulationCoursesByStudentnumbers } from '../../../redux/populationCourses'
 
 const YearAccordion = ({ active, handleClick, index, years, students }) => {
   const history = useHistory()
@@ -13,8 +14,10 @@ const YearAccordion = ({ active, handleClick, index, years, students }) => {
   const nonEnrolledStudents = differenceBy(students, enrolledStudents, 'studentNumber')
 
   const handlePopulationClick = students => {
+    const studentnumberlist = Object.values(students).map(s => s.studentNumber)
     history.push('/custompopulation')
-    dispatch(getCustomPopulation({ studentnumberlist: Object.values(students).map(s => s.studentNumber) }))
+    dispatch(getCustomPopulation({ studentnumberlist }))
+    dispatch(getCustomPopulationCoursesByStudentnumbers({ studentnumberlist }))
   }
 
   const renderTotal = (title, students) => {

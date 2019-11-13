@@ -8,6 +8,10 @@ export const getPresentStudents = studyprogrammeId => {
   return callController(route, prefix, [], 'get')
 }
 
+export const clearPresentStudents = () => ({
+  type: `${prefix}_CLEAR`
+})
+
 const reducer = listreducer(prefix, null, false)
 
 export default reducer
