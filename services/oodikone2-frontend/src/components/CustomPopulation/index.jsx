@@ -4,7 +4,7 @@ import { Button, Modal, Form, TextArea, Segment, Header } from 'semantic-ui-reac
 import { getTranslate } from 'react-localize-redux'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
 import { intersection, difference } from 'lodash'
-import { getUserIsAdmin, useProgress, useTitle } from '../../common'
+import { useProgress, useTitle } from '../../common'
 import { getCustomPopulation } from '../../redux/populations'
 import {
   getCustomPopulationSearches,
@@ -31,7 +31,6 @@ const CustomPopulation = ({
   selectCustomPopulationSearchDispatch,
   custompop,
   translate,
-  isAdmin,
   selectedStudents,
   clearPopulationFiltersDispatch,
   loading,
@@ -191,8 +190,6 @@ const CustomPopulation = ({
     </div>
   )
 
-  if (!isAdmin) return <div>you are not an admin, go away</div>
-
   return (
     <div>
       {renderCustomPopulationSearch()}
@@ -218,7 +215,6 @@ CustomPopulation.propTypes = {
   getCustomPopulationDispatch: func.isRequired,
   getCustomPopulationCoursesByStudentnumbers: func.isRequired,
   clearPopulationFiltersDispatch: func.isRequired,
-  isAdmin: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   loading: bool.isRequired,
   customPopulationSearches: arrayOf(shape({})).isRequired,
@@ -231,16 +227,7 @@ CustomPopulation.propTypes = {
   selectCustomPopulationSearchDispatch: func.isRequired
 }
 
-const mapStateToProps = ({
-  populationFilters,
-  populations,
-  localize,
-  populationCourses,
-  auth: {
-    token: { roles }
-  },
-  customPopulationSearch
-}) => {
+const mapStateToProps = ({ populationFilters, populations, localize, populationCourses, customPopulationSearch }) => {
   const samples = populations.data.students ? populations.data.students : []
   let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
   const { complemented } = populationFilters
@@ -264,7 +251,6 @@ const mapStateToProps = ({
     custompop: populations.data.students || [],
     courses: populationCourses.data,
     pending: populationCourses.pending,
-    isAdmin: getUserIsAdmin(roles),
     selectedStudents,
     customPopulationSearches: customPopulationSearch.customPopulationSearches,
     customPopulationSearchSaving: customPopulationSearch.saving,

@@ -413,31 +413,32 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
   const { studentnumberlist } = req.body
   const { roles, decodedToken } = req
 
-  if (!(roles && roles.includes('admin'))) {
-    console.log('no rights')
-    res.status(400).end()
-    return
-  } else {
-    try {
-      const result = await Population.optimizedStatisticsOf(
-        {
-          year: 1900,
-          studyRights: [],
-          semesters: ['FALL', 'SPRING'],
-          months: 10000
-        },
-        studentnumberlist
-      )
-      if (result.error) {
-        console.log(result.error)
-        res.status(400).end()
-        return
-      }
-      res.status(200).json(filterPersonalTags(result, decodedToken.id))
-    } catch (err) {
-      console.log(err)
+  const studentsUserCanAccess = await UserService.getStudentsUserCanAccess(
+    studentnumberlist,
+    roles,
+    decodedToken.userId
+  )
+  const filteredStudentNumbers = studentnumberlist.filter(s => studentsUserCanAccess.has(s))
+
+  try {
+    const result = await Population.optimizedStatisticsOf(
+      {
+        year: 1900,
+        studyRights: [],
+        semesters: ['FALL', 'SPRING'],
+        months: 10000
+      },
+      filteredStudentNumbers
+    )
+    if (result.error) {
+      console.log(result.error)
       res.status(400).end()
+      return
     }
+    res.status(200).json(filterPersonalTags(result, decodedToken.id))
+  } catch (err) {
+    console.log(err)
+    res.status(400).end()
   }
 })
 

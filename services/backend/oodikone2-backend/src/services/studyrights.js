@@ -109,7 +109,7 @@ const nonGraduatedStudentsOfElementDetail = async code => {
     result[year] = result[year].filter(({ studentNumber }) => !studentsToBeFiltered.has(studentNumber))
   })
 
-  return [result, studentnumbers]
+  return [result, [...studentnumbers]]
 }
 
 const studentNumbersWithAllStudyRightElements = async (codes, startedAfter, startedBefore) => {
