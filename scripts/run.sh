@@ -28,36 +28,39 @@ options=(
     "Download latest real db"
     "Quit"
 )
-select opt in "${options[@]}"
-do
-    case $opt in
-        "e2e setup")
-            mopo
-            run_e2e_setup ./docker/docker-compose.lateste2e.yml staging
-            ;;
-        "Anon setup")
-            mopo
-            run_anon_full_setup
-            ;;
-        "Full setup")
-            mopo
-            run_full_setup
-            ;;
-        "Reset anon db")
-            reset_db
-            ;;
-        "Reset real db")
-            reset_real_db
-            ;;
-        "Download latest anon db")
-            get_anon_oodikone
-            ;;
-        "Download latest real db")
-            get_oodikone_server_backup
-            ;;
-        "Quit")
-            break
-            ;;
-        *) echo "invalid option $REPLY";;
-    esac
+
+while true; do
+    select opt in "${options[@]}"; do
+        case $opt in
+            "e2e setup")
+                mopo
+                run_e2e_setup ./docker/docker-compose.lateste2e.yml staging
+                ;;
+            "Anon setup")
+                mopo
+                run_anon_full_setup
+                ;;
+            "Full setup")
+                mopo
+                run_full_setup
+                ;;
+            "Reset anon db")
+                reset_db
+                ;;
+            "Reset real db")
+                reset_real_db
+                ;;
+            "Download latest anon db")
+                get_anon_oodikone
+                ;;
+            "Download latest real db")
+                get_oodikone_server_backup
+                ;;
+            "Quit")
+                break 2
+                ;;
+            *) echo "invalid option $REPLY";;
+        esac
+        break
+    done
 done
