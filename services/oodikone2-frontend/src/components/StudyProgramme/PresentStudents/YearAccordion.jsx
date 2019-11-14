@@ -1,7 +1,7 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
-import { Icon, Accordion, Button } from 'semantic-ui-react'
+import { Icon, Accordion, Button, Table } from 'semantic-ui-react'
 import { differenceBy } from 'lodash'
 import { bool, func, number, arrayOf, shape, string } from 'prop-types'
 import { getCustomPopulation } from '../../../redux/populations'
@@ -20,15 +20,20 @@ const YearAccordion = ({ active, handleClick, index, years, students }) => {
     dispatch(getCustomPopulationCoursesByStudentnumbers({ studentnumberlist }))
   }
 
-  const renderTotal = (title, students) => {
+  const renderRow = (title, students) => {
     const onClick = () => handlePopulationClick(students)
     return (
-      <div style={{ margin: '10px 0 10px 0' }}>
-        <b>{title}:</b> {students.length}
-        <Button style={{ marginLeft: '10px' }} size="tiny" onClick={onClick}>
-          Show custom population
-        </Button>
-      </div>
+      <Table.Row>
+        <Table.Cell>
+          <b>{title}</b>
+        </Table.Cell>
+        <Table.Cell>{students.length}</Table.Cell>
+        <Table.Cell>
+          <Button size="tiny" onClick={onClick}>
+            Show custom population
+          </Button>
+        </Table.Cell>
+      </Table.Row>
     )
   }
 
@@ -39,9 +44,16 @@ const YearAccordion = ({ active, handleClick, index, years, students }) => {
         {years} ({students.length})
       </Accordion.Title>
       <Accordion.Content active={active}>
-        {renderTotal('Total students', students)}
-        {renderTotal('Enrolled students', enrolledStudents)}
-        {renderTotal('Non-enrolled students', nonEnrolledStudents)}
+        <Table collapsing>
+          <Table.Header>
+            <Table.HeaderCell>Enrolled</Table.HeaderCell>
+            <Table.HeaderCell>Total</Table.HeaderCell>
+            <Table.HeaderCell></Table.HeaderCell>
+          </Table.Header>
+          {renderRow('Yes', enrolledStudents)}
+          {renderRow('No', nonEnrolledStudents)}
+          {renderRow('Any', students)}
+        </Table>
       </Accordion.Content>
     </Accordion>
   )
