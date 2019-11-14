@@ -49,6 +49,7 @@ const YearAccordion = ({ active, handleClick, index, years, students }) => {
             <Table.Row>
               <Table.HeaderCell>Enrolled</Table.HeaderCell>
               <Table.HeaderCell>Total</Table.HeaderCell>
+              <Table.HeaderCell />
             </Table.Row>
           </Table.Header>
           <Table.Body>
