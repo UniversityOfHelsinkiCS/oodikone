@@ -95,7 +95,6 @@ const nonGraduatedStudentsOfElementDetail = async code => {
           if (!result[year]) result[year] = []
           studentnumbers.add(student_studentnumber)
           result[year].push({
-            ...studentToDatesMap[student_studentnumber],
             studentNumber: student_studentnumber,
             enrolled
           })

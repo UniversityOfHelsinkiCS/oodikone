@@ -44,6 +44,8 @@ const oldToNew = code => {
 
 const validateParamLength = (param, minLength) => param && param.trim().length >= minLength
 
+const isNewHYStudyProgramme = code => !!(code && code.match(/^[A-Z]*[0-9]*_[0-9]*$/))
+
 module.exports = {
   arrayUnique,
   getStudentNumberChecksum,
@@ -51,5 +53,6 @@ module.exports = {
   plainify,
   isValidStudentId,
   oldToNew,
-  validateParamLength
+  validateParamLength,
+  isNewHYStudyProgramme
 }
