@@ -120,6 +120,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Luoto").invoke('text').then((text) => expect(text).to.equal('Luoto Veli-Matti, 014824094'))
 
     cy.go("back")
+    cy.contains("Advanced settings")
     cy.contains("Tietojenkäsittelytieteen maisteriohjelma").siblings().get('.remove').click()
     cy.contains('Previous searches')
   })

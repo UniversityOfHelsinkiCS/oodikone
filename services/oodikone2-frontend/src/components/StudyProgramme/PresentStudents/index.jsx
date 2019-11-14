@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react'
+import { Loader } from 'semantic-ui-react'
 import { useSelector } from 'react-redux'
 import { flatten } from 'lodash'
 import YearAccordion from './YearAccordion'
 
 const PresentStudents = () => {
-  const { data: presentStudents } = useSelector(state => state.presentStudents)
+  const { data: presentStudents, pending } = useSelector(state => state.presentStudents)
   const [activeYearAccordion, setActiveYearAccordion] = useState(-1)
 
   // Tries to merge data by years in the following manner:
@@ -63,25 +64,30 @@ const PresentStudents = () => {
     return mergedData
   }
 
-  const mergedData = useMemo(() => mergeDataByYears(), [presentStudents])
+  const mergedData = useMemo(() => Object.entries(mergeDataByYears()), [presentStudents])
   return (
     <div style={{ marginTop: '10px' }}>
       <h2 style={{ margin: '10px' }}>
         Behind a feature toggle (this page is only visible to admins and developers and is still under development)
       </h2>
-      {Object.entries(mergedData)
-        .slice()
-        .sort(([, { endYear: endYear1 }], [, { endYear: endYear2 }]) => endYear2 - endYear1)
-        .map(([years, { students }], i) => (
-          <YearAccordion
-            index={i}
-            active={activeYearAccordion === i}
-            handleClick={() => setActiveYearAccordion(i === activeYearAccordion ? -1 : i)}
-            key={`${years}-${students.length}`}
-            years={years}
-            students={students}
-          />
-        ))}
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Loader inline active={pending} />
+      </div>
+      {mergedData.length === 0 && !pending && <p>No present students</p>}
+      {mergedData.length > 0 &&
+        mergedData
+          .slice()
+          .sort(([, { endYear: endYear1 }], [, { endYear: endYear2 }]) => endYear2 - endYear1)
+          .map(([years, { students }], i) => (
+            <YearAccordion
+              index={i}
+              active={activeYearAccordion === i}
+              handleClick={() => setActiveYearAccordion(i === activeYearAccordion ? -1 : i)}
+              key={`${years}-${students.length}`}
+              years={years}
+              students={students}
+            />
+          ))}
     </div>
   )
 }
