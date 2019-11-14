@@ -46,13 +46,16 @@ const YearAccordion = ({ active, handleClick, index, years, students }) => {
       <Accordion.Content active={active}>
         <Table collapsing>
           <Table.Header>
-            <Table.HeaderCell>Enrolled</Table.HeaderCell>
-            <Table.HeaderCell>Total</Table.HeaderCell>
-            <Table.HeaderCell></Table.HeaderCell>
+            <Table.Row>
+              <Table.HeaderCell>Enrolled</Table.HeaderCell>
+              <Table.HeaderCell>Total</Table.HeaderCell>
+            </Table.Row>
           </Table.Header>
-          {renderRow('Yes', enrolledStudents)}
-          {renderRow('No', nonEnrolledStudents)}
-          {renderRow('Any', students)}
+          <Table.Body>
+            {renderRow('Yes', enrolledStudents)}
+            {renderRow('No', nonEnrolledStudents)}
+            {renderRow('Any', students)}
+          </Table.Body>
         </Table>
       </Accordion.Content>
     </Accordion>
