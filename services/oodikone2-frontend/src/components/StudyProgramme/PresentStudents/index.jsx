@@ -65,7 +65,7 @@ const PresentStudents = () => {
 
   const mergedData = useMemo(() => mergeDataByYears(), [presentStudents])
   return (
-    <div>
+    <div style={{ marginTop: '10px' }}>
       <h2 style={{ margin: '10px' }}>
         Behind a feature toggle (this page is only visible to admins and developers and is still under development)
       </h2>
