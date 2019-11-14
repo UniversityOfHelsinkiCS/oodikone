@@ -27,31 +27,34 @@ const PresentStudents = () => {
     let studentAccumulator
     let currentClusterSize
 
-    const resetVariablesBy = year => {
+    const resetVariablesTo = (year, csize = 1) => {
       studentAccumulator = []
       minYear = year
       maxYear = minYear
       nextDecade = getNextDecadeFrom(minYear)
-      currentClusterSize = 0
+      currentClusterSize = csize
     }
 
-    resetVariablesBy(entries[0] ? entries[0][0] : -1)
+    resetVariablesTo(entries[0] ? entries[0][0] : -1, 0)
 
     const mergeData = year => {
       mergedData[minYear !== maxYear ? `${minYear}-${maxYear}` : `${maxYear}`] = {
         endYear: year,
         students: flatten([...studentAccumulator])
       }
-      resetVariablesBy(year)
+      resetVariablesTo(year)
     }
 
     entries.forEach(([year, students], i) => {
       if (
-        (++currentClusterSize % Math.max(2, MERGE_TRESHOLD_AFTER_2000) === 0 && maxYear >= 2000) ||
-        (year >= nextDecade && maxYear <= 2000)
+        (currentClusterSize % Math.max(2, MERGE_TRESHOLD_AFTER_2000) === 0 &&
+          maxYear >= 2000 &&
+          currentClusterSize !== 0) ||
+        (year >= nextDecade && maxYear < 2000)
       ) {
         mergeData(year)
       } else {
+        currentClusterSize++
         maxYear = year
       }
       studentAccumulator.push(students)
