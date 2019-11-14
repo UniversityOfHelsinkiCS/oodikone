@@ -21,6 +21,7 @@ const Updater = () => {
   const rescheduleScheduled = () => callApi('/updater/reschedule/scheduled', 'post')
   const rescheduleFetched = () => callApi('/updater/reschedule/fetched', 'post')
   const updatePopulationStudents = () => callApi('/updatedatabase', 'post', nums.split('\n'))
+  const refreshStatistics = () => callApi('/updater/refresh_statistics', 'post')
 
   const statusRef = useRef()
   useEffect(() => {
@@ -67,6 +68,7 @@ const Updater = () => {
           <Form.Button onClick={updatePopulationStudents} content="Update students by student number" icon="refresh" />
         </Form.Group>
       </Form>
+      <Form.Button content="Refresh statistics" icon="refresh" onClick={() => refreshStatistics()} />
       <Header>Status:</Header>
       <Segment loading={!statuses} basic>
         <Table striped>
