@@ -1,7 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
-const { Productivity, Throughput, FacultyStats } = require('./src/models')
+const { Productivity, Throughput, FacultyStats, NonGraduatedStudents } = require('./src/models')
 const { initializeDatabaseConnection } = require('./src/database/connection')
 
 initializeDatabaseConnection()
@@ -80,6 +80,23 @@ initializeDatabaseConnection()
     app.patch('/facultystats', async (req, res) => {
       for (let [id, data] of Object.entries(req.body.data)) {
         await FacultyStats.upsert({ id, data })
+      }
+      res.status(200).end()
+    })
+
+    app.get('/nongraduatedstudents/:id', async (req, res) => {
+      const { id } = req.params
+      const result = await NonGraduatedStudents.findByPk(id)
+      if (!result) {
+        res.json(null)
+      } else {
+        res.json(result)
+      }
+    })
+
+    app.patch('/nongraduatedstudents', async (req, res) => {
+      for (let [id, data] of Object.entries(req.body.data)) {
+        await NonGraduatedStudents.upsert({ data, id })
       }
       res.status(200).end()
     })

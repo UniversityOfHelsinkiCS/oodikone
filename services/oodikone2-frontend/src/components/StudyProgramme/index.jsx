@@ -116,7 +116,7 @@ const StudyProgramme = props => {
   const panes = getPanes()
 
   useEffect(() => {
-    if (SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE && !isNewHYStudyProgramme(studyProgrammeId)) {
+    if (SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE && studyProgrammeId && !isNewHYStudyProgramme(studyProgrammeId)) {
       props.clearPresentStudentsDispatch()
       props.getPresentStudentsDispatch(studyProgrammeId)
     }

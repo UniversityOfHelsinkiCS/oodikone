@@ -1,16 +1,18 @@
 const { CronJob } = require('cron')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
-const { getAllProgrammes } = require('./services/studyrights')
+const { getAllProgrammes, nonGraduatedStudentsOfElementDetail } = require('./services/studyrights')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studytrack')
 const { calculateFacultyYearlyStats } = require('./services/faculties')
 const topteachers = require('./services/topteachers')
+const { isNewHYStudyProgramme } = require('./util')
 
 const {
   setProductivity,
   setThroughput,
   patchProductivity,
   patchThroughput,
-  patchFacultyYearlyStats
+  patchFacultyYearlyStats,
+  patchNonGraduatedStudents
 } = require('./services/analyticsService')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
@@ -82,12 +84,37 @@ const refreshOverview = async () => {
   }
 }
 
-const refrestTeacherLeaderboard = async () => {
+const refreshTeacherLeaderboard = async () => {
   try {
     const startyearcode = new Date().getFullYear() - 1950
     const endyearcode = startyearcode + 1
     console.log('Refreshing teacher leaderboard...')
     await topteachers.findAndSaveTeachers(startyearcode, endyearcode)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+const refreshNonGraduatedStudentsOfOldProgrammes = async () => {
+  try {
+    const oldProgrammeCodes = (await getAllProgrammes()).map(p => p.code).filter(c => !isNewHYStudyProgramme(c))
+    let i = 0
+    console.log('Refreshing non-graduated students of old programmes...')
+    await Promise.all(
+      oldProgrammeCodes.map(
+        c =>
+          new Promise(async res => {
+            try {
+              const [nonGraduatedStudents, studentnumbers] = await nonGraduatedStudentsOfElementDetail(c)
+              await patchNonGraduatedStudents({ [c]: { formattedData: nonGraduatedStudents, studentnumbers } })
+              console.log(`${++i}/${oldProgrammeCodes.length}`)
+            } catch (e) {
+              console.log(`Failed refreshing non-graduated students of programme ${c}!`)
+            }
+            res()
+          })
+      )
+    )
   } catch (e) {
     console.log(e)
   }
@@ -99,7 +126,8 @@ const startCron = () => {
       await refreshFacultyYearlyStats()
       await refreshStudyrightAssociations()
       await refreshOverview()
-      await refrestTeacherLeaderboard()
+      await refreshTeacherLeaderboard()
+      await refreshNonGraduatedStudentsOfOldProgrammes()
     })
   }
 }
