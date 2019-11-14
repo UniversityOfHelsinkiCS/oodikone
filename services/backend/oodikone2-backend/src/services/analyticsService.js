@@ -48,6 +48,16 @@ const getFacultyYearlyStats = async data => {
   return response.data
 }
 
+const patchNonGraduatedStudents = async data => {
+  const response = await client.patch('/nongraduatedstudents', { data })
+  return response.data
+}
+
+const getNonGraduatedStudents = async id => {
+  const response = await client.get(`/nongraduatedstudents/${id}`)
+  return response.data
+}
+
 module.exports = {
   ping,
   getProductivity,
@@ -57,5 +67,7 @@ module.exports = {
   setThroughput,
   patchThroughput,
   patchFacultyYearlyStats,
-  getFacultyYearlyStats
+  getFacultyYearlyStats,
+  patchNonGraduatedStudents,
+  getNonGraduatedStudents
 }
