@@ -120,18 +120,23 @@ const refreshNonGraduatedStudentsOfOldProgrammes = async () => {
   }
 }
 
+const refreshStatistics = async () => {
+  await refreshFacultyYearlyStats()
+  await refreshStudyrightAssociations()
+  await refreshOverview()
+  await refreshTeacherLeaderboard()
+  await refreshNonGraduatedStudentsOfOldProgrammes()
+}
+
 const startCron = () => {
   if (process.env.NODE_ENV === 'production') {
     schedule('0 6 * * *', async () => {
-      await refreshFacultyYearlyStats()
-      await refreshStudyrightAssociations()
-      await refreshOverview()
-      await refreshTeacherLeaderboard()
-      await refreshNonGraduatedStudentsOfOldProgrammes()
+      await refreshStatistics()
     })
   }
 }
 
 module.exports = {
-  startCron
+  startCron,
+  refreshStatistics
 }
