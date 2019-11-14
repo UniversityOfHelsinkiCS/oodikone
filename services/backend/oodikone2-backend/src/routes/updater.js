@@ -12,6 +12,7 @@ const {
   updateNoStudents,
   updateDaily
 } = require('../services/updaterService')
+const { refreshStatistics } = require('../events')
 
 router.post('/update/oldest', async (req, res) => {
   const { amount } = req.body
@@ -135,6 +136,16 @@ router.post('/update/daily', async (req, res) => {
     }
   } catch (err) {
     res.status(500).json(err)
+  }
+})
+
+router.post('/refresh_statistics', async (req, res) => {
+  try {
+    refreshStatistics()
+    res.status(200).json('Refreshing statistics')
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'error' })
   }
 })
 
