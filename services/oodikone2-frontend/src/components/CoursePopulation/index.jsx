@@ -16,6 +16,8 @@ import CoursePopulationGradeDist from '../CoursePopulationGradeDist'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
 import { useProgress, getStudentToTargetCourseDateMap, useTitle } from '../../common'
+import infotooltips from '../../common/InfoToolTips'
+import InfoBox from '../InfoBox'
 
 const CoursePopulation = ({
   getCoursePopulationDispatch,
@@ -117,7 +119,10 @@ const CoursePopulation = ({
             />
           </Segment>
           <Segment>
-            <Header>Programme distribution</Header>
+            <Header>
+              Programme distribution{' '}
+              <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
+            </Header>
             <CustomPopulationProgrammeDist
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
               samples={studentData.students}
