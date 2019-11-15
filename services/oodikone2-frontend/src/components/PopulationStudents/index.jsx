@@ -632,6 +632,7 @@ class PopulationStudents extends Component {
           extent: extentCodes(s.studyrights),
           studytrack: studytrack(s.studyrights).map(st => st.name)[0],
           tags: tags(s.tags),
+          'start year at university': reformatDate(s.started, 'YYYY'),
           'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
           'mandatory total passed': totalMandatoryPassed(s.studentNumber),
           ...sortedMandatory.reduce((acc, m) => {
