@@ -67,9 +67,6 @@ const PresentStudents = () => {
   const mergedData = useMemo(() => Object.entries(mergeDataByYears()), [presentStudents])
   return (
     <div style={{ marginTop: '10px' }}>
-      <h2 style={{ margin: '10px' }}>
-        Behind a feature toggle (this page is only visible to admins and developers and is still under development)
-      </h2>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Loader inline active={pending} />
       </div>
