@@ -128,5 +128,7 @@ export default {
     ja myös esim. nollasuorittajat. Huom.! nollasuorittajissa on mukana myös poissaolevaksi ilmoittautuneet, 
     ellei heitä ole erikseen suodattanut populaatiosta pois. Kategorioita voi myös itsessään käyttää suodattimina, 
     eli klikkaamalla haluamaansa kategoriaa saa näkyviin vain sen kategorian opiskelijat. 
-    Tämä suodatin löytyy ”Filters” otsikon alta ja sen voi poistaa klikkaamalla mustaa rastia.`
+    Tämä suodatin löytyy ”Filters” otsikon alta ja sen voi poistaa klikkaamalla mustaa rastia.`,
+  ProgrammeDistributionCustomPopulation: `Näyttää opiskelijan viimeisimmän koulutusohjelman`,
+  ProgrammeDistributionCoursePopulation: `Näyttää sen koulutusohjelman, jossa opiskelija oli suorittaessaan kurssin`
 }

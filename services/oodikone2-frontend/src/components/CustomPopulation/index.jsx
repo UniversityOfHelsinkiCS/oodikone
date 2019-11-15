@@ -5,6 +5,7 @@ import { getTranslate } from 'react-localize-redux'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
 import { intersection, difference } from 'lodash'
 import { useProgress, useTitle } from '../../common'
+import infotooltips from '../../common/InfoToolTips'
 import { getCustomPopulation } from '../../redux/populations'
 import {
   getCustomPopulationSearches,
@@ -21,6 +22,7 @@ import CustomPopulationFilters from '../CustomPopulationFilters'
 import CustomPopulationCourses from '../CustomPopulationCourses'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
+import InfoBox from '../InfoBox'
 
 const CustomPopulation = ({
   getCustomPopulationDispatch,
@@ -182,7 +184,10 @@ const CustomPopulation = ({
         </Segment>
       </Segment>
       <Segment>
-        <Header>Programme distribution</Header>
+        <Header>
+          Programme distribution{' '}
+          <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCustomPopulation} />
+        </Header>
         <CustomPopulationProgrammeDist samples={custompop} selectedStudents={selectedStudents} />
       </Segment>
       <CustomPopulationCourses selectedStudents={selectedStudents} />
