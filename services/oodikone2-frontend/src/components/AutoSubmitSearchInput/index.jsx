@@ -29,7 +29,7 @@ const AutoSubmitSearchInput = ({
   }
 
   useEffect(() => {
-    if (input && input.length >= minSearchLength) {
+    if ((input || input === '') && input.length >= minSearchLength) {
       executeSearch(input)
     }
   }, [input])
