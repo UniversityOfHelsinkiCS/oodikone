@@ -25,7 +25,6 @@ import { callApi } from '../../apiConnection'
 const StudyProgramme = props => {
   const [tab, setTab] = useTabs('p_tab', props.match.params.courseGroupId ? 2 : 0, props.history)
   useTitle('Study programmes')
-  const SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE = props.userRoles && props.userRoles.includes('dev')
 
   const refreshProductivity = () => {
     callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, {
@@ -83,10 +82,10 @@ const StudyProgramme = props => {
       menuItem: 'Tags',
       render: () => <Tags studyprogramme={studyProgrammeId} />
     })
-    if (SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE && !isNewHYStudyProgramme(studyProgrammeId)) {
+    if (!isNewHYStudyProgramme(studyProgrammeId)) {
       panes.push({
         menuItem: 'Present students',
-        render: () => <React.Fragment>{SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE && <PresentStudents />}</React.Fragment>
+        render: () => <PresentStudents />
       })
     }
     if (props.isAdmin) {
@@ -116,7 +115,7 @@ const StudyProgramme = props => {
   const panes = getPanes()
 
   useEffect(() => {
-    if (SHOW_PRESENT_STUDENTS_TAB_FEATURE_TOGGLE && studyProgrammeId && !isNewHYStudyProgramme(studyProgrammeId)) {
+    if (studyProgrammeId && !isNewHYStudyProgramme(studyProgrammeId)) {
       props.clearPresentStudentsDispatch()
       props.getPresentStudentsDispatch(studyProgrammeId)
     }
