@@ -332,7 +332,7 @@ export const courseCreditFilter = params => {
       coursename
     },
     filter: student => {
-      const course = student.courses.find(c => coursecodes.includes(c.course.code))
+      const course = student.courses.find(c => coursecodes.includes(c.course_code))
       return Number(course.credits) === Number(credits)
     }
   }
