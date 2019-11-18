@@ -36,7 +36,7 @@ const PopulationCourses = ({
       uuid: uuidv4(),
       selectedStudents,
       selectedStudentsByYear,
-      year:query.year,
+      year: query.year,
       years: query.years
     })
   }
