@@ -6,6 +6,65 @@ const openCustomPopupForm = () => {
     .click();
 };
 
+const fillName = () => {
+  const name = `TEST-${new Date().getTime()}`;
+  cy.contains("Insert name for this custom population if you wish to save it")
+    .siblings()
+    .get("input[placeholder=name]")
+    .type(name);
+  return name;
+};
+
+const save = () => {
+  cy.get("button")
+    .contains("Save")
+    .click();
+};
+
+const selectSavedPopulation = name => {
+  cy.contains("Saved populations")
+    .siblings()
+    .get("input[class=search]")
+    .click();
+  cy.contains("Saved populations")
+    .siblings()
+    .get("div[role=option]")
+    .contains(name)
+    .click();
+};
+
+const deleteAllSearches = () => {
+  cy.contains("Saved populations")
+    .siblings()
+    .get("input[class=search]")
+    .click();
+  cy.contains("Saved populations")
+    .parent()
+    .parent()
+    .parent()
+    .parent()
+    .get(".dropdown")
+    .then(d => {
+      const searchItems = d.find("div[role=option] > span[class=text]");
+      for (let i = 0; i < searchItems.length; i++) {
+        if (searchItems[i].textContent.includes("TEST-")) {
+          cy.contains("Saved populations")
+            .siblings()
+            .get("div[role=option] > span[class=text]")
+            .contains(searchItems[i].textContent)
+            .click();
+          cy.get("button")
+            .contains("Delete")
+            .click();
+          cy.contains("Saved populations")
+            .siblings()
+            .get("input[class=search]")
+            .click();
+        }
+      }
+    });
+};
+
 const fillForm = content => {
   cy.contains("Insert studentnumbers you wish to use for population here")
     .siblings()
@@ -77,48 +136,126 @@ describe("Custom population tests", () => {
     cy.get("button").contains("Custom population");
   });
 
-  it("Finds a proper population", () => {
-    const testStudentNumbers = ["010623419", "010942404", "010484975"];
-    searchFor(testStudentNumbers);
-    hasLanded();
-    containsAmountOfStudents(3);
-    containsSpecificStudents(testStudentNumbers);
+  after(() => {
+    cy.visit(`${Cypress.config().baseUrl}custompopulation`);
+    cy.url().should("include", "/custompopulation");
+    cy.get("button")
+      .contains("Custom population")
+      .click();
+    deleteAllSearches();
   });
 
-  it("Doesn't return non-existing students", () => {
-    const testStudentNumbers = ["010623419", "010942404", "123", "x", "-", " "];
-    searchFor(testStudentNumbers);
-    hasLanded();
-    containsAmountOfStudents(2);
-    containsSpecificStudents(["010623419", "010942404"]);
+  describe("Custom population searching", () => {
+    it("Finds a proper population", () => {
+      const testStudentNumbers = ["010623419", "010942404", "010484975"];
+      searchFor(testStudentNumbers);
+      hasLanded();
+      containsAmountOfStudents(3);
+      containsSpecificStudents(testStudentNumbers);
+    });
+
+    it("Doesn't return non-existing students", () => {
+      const testStudentNumbers = [
+        "010623419",
+        "010942404",
+        "123",
+        "x",
+        "-",
+        " "
+      ];
+      searchFor(testStudentNumbers);
+      hasLanded();
+      containsAmountOfStudents(2);
+      containsSpecificStudents(["010623419", "010942404"]);
+    });
+
+    it("Doesn't find empty custom population", () => {
+      const testStudentNumbers = ["1", "2", "3"];
+      searchFor(testStudentNumbers);
+      cy.contains("Add filters").should("not.exist");
+      cy.contains("Credit accumulation").should("not.exist");
+      cy.contains("Programme distribution").should("not.exist");
+      cy.contains("Courses of Population").should("not.exist");
+      cy.contains("Students").should("not.exist");
+      cy.get("button").contains("Custom population");
+    });
+
+    it("Doesn't return students to whom the user doesn't have rights to", () => {
+      const kasvatusStudents = ["010102273", "010112616", "010116531"];
+      const kapistelyStudents = ["010623419", "010942404", "010484975"];
+      loginAs("Normaalikäyttäjä");
+
+      searchFor(kasvatusStudents);
+      cy.contains("Add filters").should("not.exist");
+      cy.contains("Credit accumulation").should("not.exist");
+      cy.contains("Programme distribution").should("not.exist");
+      cy.contains("Courses of Population").should("not.exist");
+      cy.contains("Students").should("not.exist");
+
+      searchFor(kapistelyStudents.concat(kasvatusStudents));
+      hasLanded();
+      containsAmountOfStudents(3);
+      containsSpecificStudents(kapistelyStudents);
+    });
   });
 
-  it("Doesn't find empty custom population", () => {
-    const testStudentNumbers = ["1", "2", "3"];
-    searchFor(testStudentNumbers);
-    cy.contains("Add filters").should("not.exist");
-    cy.contains("Credit accumulation").should("not.exist");
-    cy.contains("Programme distribution").should("not.exist");
-    cy.contains("Courses of Population").should("not.exist");
-    cy.contains("Students").should("not.exist");
-    cy.get("button").contains("Custom population");
-  });
+  describe("Custom population search saving", () => {
+    it("Saves a custom population search", () => {
+      const testStudentNumbers = ["010623419", "010942404", "010484975"];
+      openCustomPopupForm();
+      const name = fillName();
+      fillForm(testStudentNumbers);
+      save();
 
-  it("Doesn't return students to whom the user doesn't have rights to", () => {
-    const kasvatusStudents = ["010102273", "010112616", "010116531"];
-    const kapistelyStudents = ["010623419", "010942404", "010484975"];
-    loginAs("Normaalikäyttäjä");
+      // Round 1
+      selectSavedPopulation(name);
+      search();
+      cy.contains(`Custom population "${name}"`);
+      containsAmountOfStudents(3);
+      containsSpecificStudents(testStudentNumbers);
 
-    searchFor(kasvatusStudents);
-    cy.contains("Add filters").should("not.exist");
-    cy.contains("Credit accumulation").should("not.exist");
-    cy.contains("Programme distribution").should("not.exist");
-    cy.contains("Courses of Population").should("not.exist");
-    cy.contains("Students").should("not.exist");
+      // Round 2
+      cy.visit(`${Cypress.config().baseUrl}custompopulation`);
+      cy.url().should("include", "/custompopulation");
+      cy.get("button")
+        .contains("Custom population")
+        .click();
+      selectSavedPopulation(name);
+      search();
+      cy.contains(`Custom population "${name}"`);
+      containsAmountOfStudents(3);
+      containsSpecificStudents(testStudentNumbers);
+    });
 
-    searchFor(kapistelyStudents.concat(kasvatusStudents));
-    hasLanded();
-    containsAmountOfStudents(3);
-    containsSpecificStudents(kapistelyStudents);
+    it("Updates a custom population search", () => {
+      const testStudentNumbers = ["010623419", "010942404", "010484975"];
+      openCustomPopupForm();
+      const name = fillName();
+      fillForm(testStudentNumbers);
+      save();
+
+      selectSavedPopulation(name);
+      search();
+      cy.contains(`Custom population "${name}"`);
+      containsAmountOfStudents(3);
+      containsSpecificStudents(testStudentNumbers);
+      cy.get("button")
+        .contains("Custom population")
+        .click();
+      selectSavedPopulation(name);
+      fillForm(["", "011284954"]);
+      save();
+
+      cy.visit(`${Cypress.config().baseUrl}custompopulation`);
+      cy.url().should("include", "/custompopulation");
+      cy.get("button")
+        .contains("Custom population")
+        .click();
+      selectSavedPopulation(name);
+      search();
+      cy.contains(`Custom population "${name}"`);
+      containsAmountOfStudents(4);
+      containsSpecificStudents(testStudentNumbers.concat("011284954"));
+    });
   });
 });
