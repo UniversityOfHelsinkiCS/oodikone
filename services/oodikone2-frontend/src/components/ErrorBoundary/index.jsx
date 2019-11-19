@@ -22,7 +22,7 @@ class ErrorBoundary extends Component {
   static getDerivedStateFromProps(props) {
     const { auth, actionHistory } = props
     Sentry.configureScope(scope => {
-      if (auth.token) scope.setUser({ username: auth.token.userId })
+      if (auth.token) scope.setUser({ username: auth.token.userId, mockedBy: auth.token.mockedBy })
       scope.setExtra('actionHistory', JSON.stringify(actionHistory))
     })
     return null

@@ -105,7 +105,12 @@ const handleError = err => {
   const { response } = err
   if (response && response.status) {
     if (!ERROR_STATUSES_NOT_TO_CAPTURE.includes(response.status)) {
-      Sentry.captureException(err)
+      Sentry.withScope(s => {
+        s.setExtra('config', err.config)
+        s.setExtra('request', err.request)
+        s.setExtra('response', err.response)
+        Sentry.captureException(err)
+      })
     }
   }
 }
