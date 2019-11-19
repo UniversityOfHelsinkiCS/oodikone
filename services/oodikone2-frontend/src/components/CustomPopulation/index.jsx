@@ -11,7 +11,8 @@ import {
   getCustomPopulationSearches,
   saveCustomPopulationSearch,
   updateCustomPopulationSearch,
-  selectCustomPopulationSearch
+  selectCustomPopulationSearch,
+  deleteCustomPopulationSearch
 } from '../../redux/customPopulationSearch'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import { clearPopulationFilters } from '../../redux/populationFilters'
@@ -31,6 +32,7 @@ const CustomPopulation = ({
   saveCustomPopulationSearchDispatch,
   updateCustomPopulationSearchDispatch,
   selectCustomPopulationSearchDispatch,
+  deleteCustomPopulationSearchDispatch,
   custompop,
   translate,
   selectedStudents,
@@ -79,6 +81,13 @@ const CustomPopulation = ({
       updateCustomPopulationSearchDispatch({ id: selectedSearchId, studentnumberlist })
     } else {
       saveCustomPopulationSearchDispatch({ name, studentnumberlist })
+    }
+  }
+
+  const onDelete = () => {
+    if (selectedSearchId) {
+      deleteCustomPopulationSearchDispatch({ id: selectedSearchId })
+      clearForm()
     }
   }
 
@@ -150,9 +159,8 @@ const CustomPopulation = ({
           onClick={onSave}
           content="Save"
         />
-        <Button negative onClick={handleClose}>
-          Cancel
-        </Button>
+        <Button disabled={!selectedSearchId} negative floated="left" icon="trash" onClick={onDelete} content="Delete" />
+        <Button onClick={handleClose}>Cancel</Button>
         <Button positive onClick={e => onClicker(e)}>
           Search population
         </Button>
@@ -229,7 +237,8 @@ CustomPopulation.propTypes = {
   saveCustomPopulationSearchDispatch: func.isRequired,
   getCustomPopulationSearchesDispatch: func.isRequired,
   updateCustomPopulationSearchDispatch: func.isRequired,
-  selectCustomPopulationSearchDispatch: func.isRequired
+  selectCustomPopulationSearchDispatch: func.isRequired,
+  deleteCustomPopulationSearchDispatch: func.isRequired
 }
 
 const mapStateToProps = ({ populationFilters, populations, localize, populationCourses, customPopulationSearch }) => {
@@ -273,6 +282,7 @@ export default connect(
     saveCustomPopulationSearchDispatch: saveCustomPopulationSearch,
     getCustomPopulationSearchesDispatch: getCustomPopulationSearches,
     updateCustomPopulationSearchDispatch: updateCustomPopulationSearch,
-    selectCustomPopulationSearchDispatch: selectCustomPopulationSearch
+    selectCustomPopulationSearchDispatch: selectCustomPopulationSearch,
+    deleteCustomPopulationSearchDispatch: deleteCustomPopulationSearch
   }
 )(CustomPopulation)
