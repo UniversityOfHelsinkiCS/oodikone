@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter, Link } from 'react-router-dom'
-import { Button, Radio, Icon, Header, Segment, Loader, Label } from 'semantic-ui-react'
+import { Button, Radio, Icon, Header, Segment, Loader, Label, Popup } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf, number } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
@@ -22,6 +22,10 @@ class EnableUsers extends Component {
     if (this.props.units.length === 0) this.props.getUnits()
     if (this.props.users.length === 0) this.props.getUsers()
     document.title = 'Users - Oodikone'
+  }
+
+  componentWillUnmount = () => {
+    clearTimeout(this.popupTimeout)
   }
 
   toggleEnabledOnly() {
@@ -143,12 +147,23 @@ class EnableUsers extends Component {
     )
   }
 
+  handlePopupOpen = () => {
+    this.setState({ popupOpen: true })
+    this.popupTimeout = setTimeout(() => {
+      this.setState({ popupOpen: false })
+    }, 1500)
+  }
+
+  handlePopupClose = () => {
+    this.popupTimeout = null
+  }
+
   render() {
     const { match, pending } = this.props
     const { enabledOnly } = this.state
     const { userid } = match.params
     return (
-      <div className="segmentContainer">
+      <div style={{ marginBottom: '10px' }} className="segmentContainer">
         <Header className="segmentTitle" size="large">
           Oodikone users
         </Header>
@@ -160,7 +175,14 @@ class EnableUsers extends Component {
         <Segment loading={pending} className="contentSegment">
           {!userid ? this.renderUserSearchList() : this.renderUserPage(userid)}
         </Segment>
-        <Icon link name="envelope" onClick={this.copyEmailsToClippoard} style={{ float: 'right' }} />
+        <Popup
+          trigger={<Icon link name="envelope" onClick={this.copyEmailsToClippoard} style={{ float: 'right' }} />}
+          content="Copied email(s)!"
+          on="click"
+          onOpen={this.handlePopupOpen}
+          onClose={this.handlePopupClose}
+          open={this.state.popupOpen}
+        />
       </div>
     )
   }
