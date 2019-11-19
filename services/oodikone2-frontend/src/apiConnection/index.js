@@ -101,7 +101,7 @@ export const callController = (route, prefix, data, method = 'get', query, param
   return { type: `${prefix}ATTEMPT`, requestSettings }
 }
 
-const handleError = err => {
+const handleError = (err, actionHistory = []) => {
   const { response } = err
   if (response && response.status) {
     if (!ERROR_STATUSES_NOT_TO_CAPTURE.includes(response.status)) {
@@ -109,6 +109,7 @@ const handleError = err => {
         s.setExtra('config', err.config)
         s.setExtra('request', err.request)
         s.setExtra('response', err.response)
+        s.setExtra('actionHistory', JSON.stringify(actionHistory))
         Sentry.captureException(err)
       })
     }
@@ -131,7 +132,7 @@ export const handleRequest = store => next => async action => {
       }
 
       store.dispatch({ type: `${prefix}FAILURE`, response: e, query })
-      handleError(e)
+      handleError(e, store.getState().actionHistory)
     }
   }
 }
@@ -163,7 +164,7 @@ export const handleAuth = store => next => async action => {
       }
 
       store.dispatch({ type: 'LOGIN_FAILURE' })
-      handleError(err)
+      handleError(err, store.getState().actionHistory)
     }
   } else if (type === 'LOGOUT_ATTEMPT') {
     try {
@@ -175,7 +176,7 @@ export const handleAuth = store => next => async action => {
         return
       }
       store.dispatch({ type: 'LOGOUT_FAILURE' })
-      handleError(err)
+      handleError(err, store.getState().actionHistory)
     }
   }
 }
