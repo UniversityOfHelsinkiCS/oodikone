@@ -29,8 +29,17 @@ const updateCustomPopulationSearch = async (userId, id, students) => {
   })
 }
 
+const deleteCustomPopulationSearch = async (userId, id) =>
+  CustomPopulationSearch.destroy({
+    where: {
+      id,
+      userId
+    }
+  })
+
 module.exports = {
   getCustomPopulationSearchesByUser,
   createCustomPopulationSearch,
-  updateCustomPopulationSearch
+  updateCustomPopulationSearch,
+  deleteCustomPopulationSearch
 }
