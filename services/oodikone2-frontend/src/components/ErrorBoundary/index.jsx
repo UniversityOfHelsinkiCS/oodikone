@@ -19,17 +19,21 @@ class ErrorBoundary extends Component {
     this.props.login()
   }
 
-  static getDerivedStateFromProps(props) {
-    const { auth, actionHistory } = props
-    Sentry.configureScope(scope => {
-      if (auth.token) scope.setUser({ username: auth.token.userId })
-      scope.setExtra('actionHistory', JSON.stringify(actionHistory))
-    })
-    return null
+  componentDidUpdate = prevProps => {
+    if (prevProps.auth.token !== this.props.auth.token) {
+      const { auth } = this.props
+      Sentry.configureScope(scope => {
+        if (auth.token) scope.setUser({ username: auth.token.userId, mockedBy: auth.token.mockedBy })
+      })
+    }
   }
 
   componentDidCatch = e => {
-    Sentry.captureException(e)
+    const { actionHistory } = this.props
+    Sentry.withScope(s => {
+      s.setExtra('actionHistory', JSON.stringify(actionHistory))
+      Sentry.captureException(e)
+    })
   }
 
   render() {
