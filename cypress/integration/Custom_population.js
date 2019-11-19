@@ -25,12 +25,9 @@ const selectSavedPopulation = name => {
   cy.contains("Saved populations")
     .siblings()
     .get("input[class=search]")
-    .click();
-  cy.contains("Saved populations")
-    .siblings()
-    .get("div[role=option]")
-    .contains(name)
-    .click();
+    .click()
+    .type(name)
+    .type("{enter}");
 };
 
 const deleteAllSearches = () => {
