@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { useEffect, useState, Fragment } from 'react'
 import { withRouter } from 'react-router-dom'
 import { func, string, arrayOf, object, bool, shape } from 'prop-types'
 import { connect } from 'react-redux'
@@ -12,59 +12,49 @@ import { makeFormatStudentRows } from '../../selectors/students'
 
 import { containsOnlyNumbers, validateInputLength, splitByEmptySpace } from '../../common'
 
-const DEFAULT_STATE = {
-  students: [],
-  isLoading: false,
-  showResults: false,
-  searchStr: ''
-}
+const StudentSearch = ({
+  getStudent,
+  clearTimeout: customClearTimeout,
+  setTimeout: customSetTimeout,
+  history,
+  students,
+  studentNumber,
+  findStudents,
+  translate,
+  showNames,
+  pending
+}) => {
+  const [loading, setLoading] = useState(false)
+  const [showResults, setShowResults] = useState(false)
+  const [searchStr, setSearchStr] = useState('')
 
-class StudentSearch extends Component {
-  state = DEFAULT_STATE
+  const resetComponent = () => {
+    setLoading(false)
+    setShowResults(false)
+    setSearchStr('')
+  }
 
-  componentDidMount() {
-    const { studentNumber } = this.props
-
+  useEffect(() => {
     if (studentNumber && containsOnlyNumbers(studentNumber)) {
-      this.setState({ isLoading: true })
-      this.props.getStudent(studentNumber).then(() => this.resetComponent())
+      setLoading(true)
+      getStudent(studentNumber).then(() => resetComponent())
     }
-  }
+  }, [])
 
-  resetComponent = () => {
-    this.setState(DEFAULT_STATE)
-  }
-
-  handleSearchChange = (e, { value }) => {
-    this.props.clearTimeout('search')
-    if (value.length > 0) {
-      this.setState({ searchStr: value })
-      this.props.setTimeout(
-        'search',
-        () => {
-          this.fetchStudentList(value)
-        },
-        250
-      )
-    } else {
-      this.resetComponent()
-    }
-  }
-
-  handleSearchSelect = student => {
+  const handleSearchSelect = student => {
     const { studentNumber } = student
-    this.props.history.push(`/students/${studentNumber}`, { selected: studentNumber })
-    const studentObject = this.props.students.find(person => person.studentNumber === studentNumber)
+    history.push(`/students/${studentNumber}`, { selected: studentNumber })
+    const studentObject = students.find(person => person.studentNumber === studentNumber)
     const fetched = studentObject ? studentObject.fetched : false
     if (!fetched) {
-      this.setState({ isLoading: true })
-      this.props.getStudent(studentNumber).then(() => this.resetComponent())
+      setLoading(true)
+      getStudent(studentNumber).then(() => resetComponent())
     } else {
-      this.resetComponent()
+      resetComponent()
     }
   }
 
-  fetchStudentList = searchStr => {
+  const fetchStudentList = searchStr => {
     if (
       !splitByEmptySpace(searchStr.trim())
         .slice(0, 2)
@@ -74,23 +64,37 @@ class StudentSearch extends Component {
       return
     }
 
-    this.props.setTimeout(
+    customSetTimeout(
       'fetch',
       () => {
-        this.setState({ isLoading: true })
+        setLoading(true)
       },
       250
     )
-    this.props.findStudents(searchStr.trim()).then(() => {
-      this.props.clearTimeout('fetch')
-      this.setState({ isLoading: false, showResults: true })
+    findStudents(searchStr.trim()).then(() => {
+      customClearTimeout('fetch')
+      setLoading(false)
+      setShowResults(true)
     })
   }
 
-  renderSearchResults = () => {
-    const { translate, students, showNames, pending } = this.props
-    const { showResults } = this.state
+  const handleSearchChange = (e, { value }) => {
+    customClearTimeout('search')
+    if (value.length > 0) {
+      setSearchStr(value)
+      customSetTimeout(
+        'search',
+        () => {
+          fetchStudentList(value)
+        },
+        250
+      )
+    } else {
+      resetComponent()
+    }
+  }
 
+  const renderSearchResults = () => {
     if (!showResults || pending) {
       // so that the loading spinner doesn't go on top of the search box
       return <div style={{ margin: 100 }} />
@@ -115,7 +119,7 @@ class StudentSearch extends Component {
         getRowKey={s => s.studentNumber}
         getRowProps={s => ({
           style: { cursor: 'pointer' },
-          onClick: () => this.handleSearchSelect(s)
+          onClick: () => handleSearchSelect(s)
         })}
         tableProps={{ celled: false }}
         columns={columns}
@@ -124,34 +128,28 @@ class StudentSearch extends Component {
     )
   }
 
-  render() {
-    const { translate, studentNumber } = this.props
-
-    if (studentNumber) {
-      return null
-    }
-
-    const { isLoading, searchStr } = this.state
-
-    return (
-      <Fragment>
-        <Container>
-          <Search
-            input={{ fluid: true }}
-            loading={isLoading}
-            onSearchChange={this.handleSearchChange}
-            showNoResults={false}
-            value={searchStr}
-            placeholder={translate('studentStatistics.searchPlaceholder')}
-          />
-        </Container>
-        <Segment basic>
-          <SegmentDimmer translate={translate} isLoading={isLoading} />
-          {this.renderSearchResults()}
-        </Segment>
-      </Fragment>
-    )
+  if (studentNumber) {
+    return null
   }
+
+  return (
+    <Fragment>
+      <Container>
+        <Search
+          input={{ fluid: true }}
+          loading={loading}
+          onSearchChange={handleSearchChange}
+          showNoResults={false}
+          value={searchStr}
+          placeholder={translate('studentStatistics.searchPlaceholder')}
+        />
+      </Container>
+      <Segment basic>
+        <SegmentDimmer translate={translate} isLoading={loading} />
+        {renderSearchResults()}
+      </Segment>
+    </Fragment>
+  )
 }
 StudentSearch.propTypes = {
   translate: func.isRequired,
