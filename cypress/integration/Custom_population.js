@@ -47,15 +47,12 @@ const deleteAllSearches = () => {
         if (searchItems[i].textContent.includes("TEST-")) {
           cy.contains("Saved populations")
             .siblings()
-            .get("div[role=option] > span[class=text]")
-            .contains(searchItems[i].textContent)
-            .click();
+            .get("input[class=search]")
+            .click()
+            .type(searchItems[i].textContent)
+            .type("{enter}");
           cy.get("button")
             .contains("Delete")
-            .click();
-          cy.contains("Saved populations")
-            .siblings()
-            .get("input[class=search]")
             .click();
         }
       }
