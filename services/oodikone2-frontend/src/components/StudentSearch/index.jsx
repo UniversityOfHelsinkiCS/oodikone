@@ -100,13 +100,13 @@ class StudentSearch extends Component {
     }
 
     const columns = [
-      { key: 'studentnumber', title: translate('common.studentNumber'), getRowVal: s => s.studentNumber },
+      { key: 'studentNumber', title: translate('common.studentNumber'), getRowVal: s => s.studentNumber },
       { key: 'started', title: translate('common.started'), getRowVal: s => s.started },
       { key: 'credits', title: translate('common.credits'), getRowVal: s => s.credits }
     ]
 
     if (showNames) {
-      columns.push({ key: 'lastnames', title: 'last names', getRowVal: s => s.lastname })
+      columns.push({ key: 'lastname', title: 'last names', getRowVal: s => s.lastname })
       columns.push({ key: 'firstnames', title: 'given names', getRowVal: s => s.firstnames })
     }
 
