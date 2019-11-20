@@ -26,10 +26,12 @@ const feedback = require('./routes/feedback')
 const tags = require('./routes/tags')
 const updater = require('./routes/updater')
 const tsaAnalytics = require('./routes/tsaAnalytics')
+const matomoInit = require('./routes/matomo-init')
 const customPopulationSearch = require('./routes/customPopulationSearch')
 
 module.exports = (app, url) => {
   app.use(shibbolethHeadersFix(['hyGroupCn', 'SHIB_LOGOUT_URL', 'eduPersonAffiliation', 'uid', 'displayName', 'mail']))
+  app.use(url, matomoInit)
   app.use(url, log)
   app.use(url, login)
   app.use(`${url}/superlogin`, superlogin)
