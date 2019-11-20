@@ -21,10 +21,16 @@ export const saveCustomPopulationSearch = ({ name, studentnumberlist }) => {
 }
 
 export const updateCustomPopulationSearch = ({ id, studentnumberlist }) => {
-  const route = '/custom-population-search'
+  const route = `/custom-population-search/${id}`
   const prefix = 'UPDATE_CUSTOM_POPULATION_SEARCH_'
-  const body = { id, students: studentnumberlist }
+  const body = { students: studentnumberlist }
   return callController(route, prefix, body, 'put')
+}
+
+export const deleteCustomPopulationSearch = ({ id }) => {
+  const route = `/custom-population-search/${id}`
+  const prefix = 'DELETE_CUSTOM_POPULATION_SEARCH_'
+  return callController(route, prefix, {}, 'delete')
 }
 
 export const selectCustomPopulationSearch = id => ({
@@ -70,6 +76,23 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         searchedCustomPopulationSearchId: action.id
+      }
+    case 'DELETE_CUSTOM_POPULATION_SEARCH_ATTEMPT':
+      return {
+        ...state,
+        deleting: true,
+        deleted: null
+      }
+    case 'DELETE_CUSTOM_POPULATION_SEARCH_FAILED':
+      return {
+        ...state,
+        deleting: false
+      }
+    case 'DELETE_CUSTOM_POPULATION_SEARCH_SUCCESS':
+      return {
+        ...state,
+        deleting: false,
+        customPopulationSearches: state.customPopulationSearches.filter(s => s.id !== action.response)
       }
     default:
       return state
