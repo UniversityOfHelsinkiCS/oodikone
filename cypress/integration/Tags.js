@@ -12,32 +12,30 @@ describe('Tag tests', () => {
         }
       }
     })
-    console.log(Cypress.config().baseUrl)
     cy.visit(Cypress.config().baseUrl)
     cy.reload()
     cy.contains("Study programme").click()
     cy.contains("Overview").click()
     cy.contains("Datatieteen maisteriohjelma").click()
     cy.get('.attached > :nth-child(6)').click()
-
-    cy.get(':nth-child(1) > .field > .ui > input').type('test tag')
-    cy.get('.form-control').type('2016')
-    cy.contains('Create new tag').click()
-    cy.contains('test tag')
-    cy.contains('2016')
-
-
   })
 
   it("Tagged population works", () => {
-    cy.contains('Add tags to students').click()
-    cy.get('.form > .field > .dropdown').click().get('.ui > .search').type('test tag').click()
+    const name = `tag-${new Date().getTime()}`
+    cy.get(':nth-child(1) > .field > .ui > input').type(name)
+    cy.get('.form-control').type('2016')
+    cy.contains('Create new tag').click()
+    cy.contains(name)
+    cy.contains('2016')
 
-    cy.get('.form > .field > .dropdown').contains('test tag').click()
+    cy.contains('Add tags to students').click()
+    cy.get('.form > .field > .dropdown').click().get('.ui > .search').type(name).click()
+
+    cy.get('.form > .field > .dropdown').contains(name).click()
 
     cy.get('textarea').type('014022579\n011122249')
     cy.get('.positive').click()
-    cy.get('.level').click()
+    cy.contains(name).find('.level').click()
 
     cy.contains('Credit accumulation (for 2 students)')
     cy.get(':nth-child(5) > .dividing > :nth-child(1)').click()
@@ -45,9 +43,11 @@ describe('Tag tests', () => {
     cy.contains('011122249')
 
     cy.go('back')
-    cy.get('tr > :nth-child(3) > .field > .ui').click()
-    cy.contains('Are you sure you want to delete tag')
-    cy.contains('Confirm').click()
-    cy.contains('test tag').should('not.exist')
+    cy.get('tr > :nth-child(3) > .field > .ui').each(_ => {
+      cy.get('tr > :nth-child(3) > .field > .ui').eq(0).click()
+      cy.contains('Are you sure you want to delete tag')
+      cy.contains('Confirm').click()
+    })
+    cy.contains(name).should('not.exist')
   })
 })

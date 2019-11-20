@@ -118,45 +118,56 @@ describe('Studyprogramme overview', () => {
     cy.contains('Credit accumulation (for 29 students)')
   })
   it('can create and delete tags for population', () => {
+    const name = `tag-${new Date().getTime()}`
     cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
     cy.get('.attached > :nth-child(6)').click()
-    cy.get(':nth-child(1) > .field > .ui > input').type('tykittäjät')
+    cy.get(':nth-child(1) > .field > .ui > input').type(name)
     cy.get('.form-control').type('2018')
     cy.contains('Create new tag').click()
-    cy.contains('tykittäjät')
+    cy.contains(name)
     cy.contains('2018')
-    cy.get('tr > :nth-child(3) > .field > .ui').click()
-    cy.contains('Are you sure you want to delete tag')
-    cy.contains('Confirm').click()
-    cy.contains('tykittäjät').should('not.exist')
+
+    cy.get('tr > :nth-child(3) > .field > .ui').each(_ => {
+      cy.get('tr > :nth-child(3) > .field > .ui').eq(0).click()
+      cy.contains('Are you sure you want to delete tag')
+      cy.contains('Confirm').click()
+    })
+
+    cy.contains(name).should('not.exist')
   })
   it('can create personal tags', () => {
+    const name = `tag-${new Date().getTime()}`
     cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
     cy.get('.attached > :nth-child(6)').click()
-    cy.get(':nth-child(1) > .field > .ui > input').type('epätykittäjät')
+    cy.get(':nth-child(1) > .field > .ui > input').type(name)
     cy.get('.form-control').type('2018')
     cy.get('.ui > label').click()
     cy.contains('Create new tag').click()
     cy.get('.purple')
-    cy.contains('epätykittäjät')
-    cy.get('tr > :nth-child(3) > .field > .ui').click()
-    cy.contains('Are you sure you want to delete tag')
-    cy.contains('Confirm').click()
-    cy.contains('epätykittäjät').should('not.exist')
+    cy.contains(name)
 
+    cy.get('tr > :nth-child(3) > .field > .ui').each(_ => {
+      cy.get('tr > :nth-child(3) > .field > .ui').eq(0).click()
+      cy.contains('Are you sure you want to delete tag')
+      cy.contains('Confirm').click()
+    })
+
+    cy.contains(name).should('not.exist')
   })
   it('can add tags to students', () => {
+    const name = `tag-${new Date().getTime()}`
+
     cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
     cy.get('.attached > :nth-child(6)').click()
-    cy.get(':nth-child(1) > .field > .ui > input').type('tykittäjät')
+    cy.get(':nth-child(1) > .field > .ui > input').type(name)
     cy.get('.form-control').type('2018')
     cy.contains('Create new tag').click()
-    cy.contains('tykittäjät')
+    cy.contains(name)
 
     cy.contains('Add tags to students').click()
-    cy.get('.form > .field > .dropdown').click().get('.ui > .search').type('tykittäjät').click()
+    cy.get('.form > .field > .dropdown').click().get('.ui > .search').type(name).click()
     
-    cy.get('.form > .field > .dropdown').contains('tykittäjät').click()
+    cy.get('.form > .field > .dropdown').contains(name).click()
 
     cy.get('textarea').type('014495339')
     cy.get('.positive').click()
@@ -164,7 +175,7 @@ describe('Studyprogramme overview', () => {
     cy.contains('Student statistics').click()
     cy.get('.prompt').type('014495339')
     cy.contains('10').click()
-    cy.contains('tykittäjät')
+    cy.contains(name)
 
     cy.go('back')
     cy.go('back')
@@ -172,12 +183,12 @@ describe('Studyprogramme overview', () => {
     cy.get('tr > :nth-child(3) > .field > .ui').click()
     cy.contains('Are you sure you want to delete tag')
     cy.contains('Confirm').click()
-    cy.contains('tykittäjät').should('not.exist')
+    cy.contains(name).should('not.exist')
 
     cy.contains('Student statistics').click()
     cy.get('.prompt').type('014495339')
     cy.contains('10').click()
-    cy.contains('tykittäjät').should('not.exist')
+    cy.contains(name).should('not.exist')
 
   })
 })
