@@ -5,7 +5,6 @@ import Datetime from 'react-datetime'
 import { uniqBy, filter, maxBy } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
 import qs from 'query-string'
-import TSA from './tsa'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, SEARCH_HISTORY_VERSION } from '../constants'
 import toskaLogo from '../assets/toska.png'
 import irtomikko from '../assets/irtomikko.png'
@@ -360,7 +359,6 @@ export const useProgress = loading => {
 export const useTitle = title => {
   useEffect(() => {
     document.title = title ? `${title} - Oodikone` : 'Oodikone'
-    TSA.Matomo.setDocumentTitle(document.title)
   }, [title])
 }
 
