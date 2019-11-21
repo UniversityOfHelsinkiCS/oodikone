@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { func, string, arrayOf, object, bool, shape } from 'prop-types'
 import { connect } from 'react-redux'
 import { Search, Segment, Container } from 'semantic-ui-react'
+import moment from 'moment'
 
 import { findStudents, getStudent } from '../../redux/students'
 import SegmentDimmer from '../SegmentDimmer'
@@ -80,8 +81,8 @@ const StudentSearch = ({
 
   const handleSearchChange = (e, { value }) => {
     customClearTimeout('search')
+    setSearchStr(value)
     if (value.length > 0) {
-      setSearchStr(value)
       customSetTimeout(
         'search',
         () => {
@@ -105,7 +106,12 @@ const StudentSearch = ({
 
     const columns = [
       { key: 'studentNumber', title: translate('common.studentNumber'), getRowVal: s => s.studentNumber },
-      { key: 'started', title: translate('common.started'), getRowVal: s => s.started },
+      {
+        key: 'started',
+        title: translate('common.started'),
+        getRowContent: s => s.started,
+        getRowVal: s => (s.started === 'Unavailable' ? -Infinity : moment(s.started, 'DD.MM.YYYY').unix())
+      },
       { key: 'credits', title: translate('common.credits'), getRowVal: s => s.credits }
     ]
 
@@ -123,7 +129,8 @@ const StudentSearch = ({
         })}
         tableProps={{ celled: false }}
         columns={columns}
-        data={students}
+        data={students.slice(0, 200)}
+        chunkifyBy="studentNumber"
       />
     )
   }
