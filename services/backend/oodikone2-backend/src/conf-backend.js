@@ -28,6 +28,8 @@ const ANALYTICS_INFLUXDB_URL = process.env.ANALYTICS_INFLUXDB_URL
 const ANALYTICS_INFLUXDB_USER = process.env.ANALYTICS_INFLUXDB_USER
 const ANALYTICS_INFLUXDB_PASSWORD = process.env.ANALYTICS_INFLUXDB_PASSWORD
 const ANALYTICS_INFLUXDB_DB = process.env.ANALYTICS_INFLUXDB_DB
+const MATOMO_SITE_ID = process.env.MATOMO_SITE_ID
+const MATOMO_URL = process.env.MATOMO_URL
 
 const FEATURES = {
   ERROR_HANDLER: false
@@ -36,6 +38,8 @@ const FEATURES = {
 const formatURL = url => {
   return !!url && !url.startsWith('http') ? `http://${url}` : url
 }
+
+const addSlashToEnd = url => (url.endsWith('/') ? url : url + '/')
 
 if (process.env.NODE_ENV === 'dev' && process.env.FEATURES) {
   const toggled = process.env.FEATURES.split(',')
@@ -90,5 +94,7 @@ module.exports = {
   ANALYTICS_INFLUXDB_URL: formatURL(ANALYTICS_INFLUXDB_URL),
   ANALYTICS_INFLUXDB_USER,
   ANALYTICS_INFLUXDB_PASSWORD,
-  ANALYTICS_INFLUXDB_DB
+  ANALYTICS_INFLUXDB_DB,
+  MATOMO_SITE_ID,
+  MATOMO_URL: MATOMO_URL && addSlashToEnd(MATOMO_URL)
 }
