@@ -126,7 +126,7 @@ describe('Studyprogramme overview', () => {
   })
   it('can create and delete tags for population', () => {
     const name = `tag-${new Date().getTime()}`
-    cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
+    cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
     cy.get('.attached > :nth-child(6)').click()
     cy.get(':nth-child(1) > .field > .ui > input').type(name)
     cy.get('.form-control').type('2018')
@@ -137,7 +137,7 @@ describe('Studyprogramme overview', () => {
   })
   it('can create personal tags', () => {
     const name = `tag-${new Date().getTime()}`
-    cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
+    cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
     cy.get('.attached > :nth-child(6)').click()
     cy.get(':nth-child(1) > .field > .ui > input').type(name)
     cy.get('.form-control').type('2018')
@@ -150,7 +150,7 @@ describe('Studyprogramme overview', () => {
   it('can add tags to students', () => {
     const name = `tag-${new Date().getTime()}`
 
-    cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
+    cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
     cy.get('.attached > :nth-child(6)').click()
     cy.get(':nth-child(1) > .field > .ui > input').type(name)
     cy.get('.form-control').type('2018')
@@ -162,11 +162,11 @@ describe('Studyprogramme overview', () => {
     
     cy.get('.form > .field > .dropdown').contains(name).click()
 
-    cy.get('textarea').type('014495339')
+    cy.get('textarea').type('010623419')
     cy.get('.positive').click()
 
     cy.contains('Student statistics').click()
-    cy.get('.prompt').type('014495339')
+    cy.get('.prompt').type('010623419')
     cy.contains('10').click()
     cy.contains(name)
 
@@ -176,7 +176,7 @@ describe('Studyprogramme overview', () => {
     deleteTag(name)
 
     cy.contains('Student statistics').click()
-    cy.get('.prompt').type('014495339')
+    cy.get('.prompt').type('010623419')
     cy.contains('10').click()
     cy.contains(name).should('not.exist')
   })

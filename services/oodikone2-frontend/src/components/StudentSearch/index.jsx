@@ -96,11 +96,11 @@ const StudentSearch = ({
   }
 
   const renderSearchResults = () => {
-    if (!showResults || (students.length === 0 && pending)) {
+    if (!showResults || pending) {
       // so that the loading spinner doesn't go on top of the search box
       return <div style={{ margin: 100 }} />
     }
-    if (students.length <= 0 && showResults && !pending) {
+    if (students.length <= 0) {
       return <div>{translate('common.noResults')}</div>
     }
 
@@ -130,6 +130,7 @@ const StudentSearch = ({
         tableProps={{ celled: false }}
         columns={columns}
         data={students.slice(0, 200)}
+        chunkifyBy="studentNumber"
       />
     )
   }

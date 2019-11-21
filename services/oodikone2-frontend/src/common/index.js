@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import moment from 'moment'
 import jwtDecode from 'jwt-decode'
 import Datetime from 'react-datetime'
-import { uniqBy, filter, maxBy } from 'lodash'
+import { uniqBy, filter, maxBy, chunk, isEqual } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
 import qs from 'query-string'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, SEARCH_HISTORY_VERSION } from '../constants'
@@ -367,3 +367,52 @@ export const validateInputLength = (input, minLength) => input && input.trim().l
 export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 
 export const isNewHYStudyProgramme = code => !!(code && code.match(/^[A-Z]*[0-9]*_[0-9]*$/))
+
+export const useChunk = (data, chunkifyBy) => {
+  const [chunkedData, setChunkedData] = useState([])
+  const chunkTrigger = useRef([])
+  const sleepTimeout = useRef(null)
+
+  const sleep = ms =>
+    new Promise(res => {
+      sleepTimeout.current = setTimeout(res, ms)
+    })
+
+  const chunkify = async () => {
+    const chunks = chunk(data, 50)
+    let res = []
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i]
+
+      // Gives time to the main event loop
+      await sleep(1) // eslint-disable-line
+      res = res.concat(...chunk)
+      setChunkedData(res)
+    }
+  }
+
+  useEffect(() => {
+    if (
+      chunkifyBy &&
+      !isEqual(
+        chunkTrigger.current,
+        data
+          .slice()
+          .sort()
+          .map(d => d[chunkifyBy])
+      )
+    ) {
+      chunkTrigger.current = data.map(d => d[chunkifyBy])
+    }
+  }, [data])
+
+  useEffect(() => {
+    if (chunkifyBy) {
+      chunkify()
+    }
+
+    return () => clearTimeout(sleepTimeout.current)
+  }, [chunkTrigger.current])
+
+  return chunkifyBy ? chunkedData : data
+}
