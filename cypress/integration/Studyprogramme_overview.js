@@ -1,7 +1,7 @@
 /// <reference types="Cypress" />
 
 const deleteTag = (name) => {
-  cy.contains(name).siblings().find('button').contains('Delete').click()
+  cy.contains(name).siblings().contains('Delete').click()
   cy.contains('Are you sure you want to delete tag')
   cy.contains('Confirm').click()
   cy.contains(name).should('not.exist')
