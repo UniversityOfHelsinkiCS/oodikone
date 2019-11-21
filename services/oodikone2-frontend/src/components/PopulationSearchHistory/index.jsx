@@ -33,7 +33,8 @@ const PopulationsQueryTSA = ({ programmeCode, unitData }) => {
       return
     }
 
-    TSA.sendEvent({
+    TSA.Matomo.sendEvent('Programme Usage', 'populations query', programme)
+    TSA.Influx.sendEvent({
       group: 'Programme Usage',
       name: 'populations query',
       label: programme,
