@@ -1,5 +1,12 @@
 /// <reference types="Cypress" />
 
+const deleteTag = (name) => {
+  cy.contains(name).siblings().find('button').contains('Delete').click()
+  cy.contains('Are you sure you want to delete tag')
+  cy.contains('Confirm').click()
+  cy.contains(name).should('not.exist')
+}
+
 describe('Studyprogramme overview', () => {
   beforeEach(() => {
     cy.server({
@@ -126,14 +133,7 @@ describe('Studyprogramme overview', () => {
     cy.contains('Create new tag').click()
     cy.contains(name)
     cy.contains('2018')
-
-    cy.get('tr > :nth-child(3) > .field > .ui').each(_ => {
-      cy.get('tr > :nth-child(3) > .field > .ui').eq(0).click()
-      cy.contains('Are you sure you want to delete tag')
-      cy.contains('Confirm').click()
-    })
-
-    cy.contains(name).should('not.exist')
+    deleteTag(name)
   })
   it('can create personal tags', () => {
     const name = `tag-${new Date().getTime()}`
@@ -145,14 +145,7 @@ describe('Studyprogramme overview', () => {
     cy.contains('Create new tag').click()
     cy.get('.purple')
     cy.contains(name)
-
-    cy.get('tr > :nth-child(3) > .field > .ui').each(_ => {
-      cy.get('tr > :nth-child(3) > .field > .ui').eq(0).click()
-      cy.contains('Are you sure you want to delete tag')
-      cy.contains('Confirm').click()
-    })
-
-    cy.contains(name).should('not.exist')
+    deleteTag(name)
   })
   it('can add tags to students', () => {
     const name = `tag-${new Date().getTime()}`
@@ -180,15 +173,11 @@ describe('Studyprogramme overview', () => {
     cy.go('back')
     cy.go('back')
 
-    cy.get('tr > :nth-child(3) > .field > .ui').click()
-    cy.contains('Are you sure you want to delete tag')
-    cy.contains('Confirm').click()
-    cy.contains(name).should('not.exist')
+    deleteTag(name)
 
     cy.contains('Student statistics').click()
     cy.get('.prompt').type('014495339')
     cy.contains('10').click()
     cy.contains(name).should('not.exist')
-
   })
 })

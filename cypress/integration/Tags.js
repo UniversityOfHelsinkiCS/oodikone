@@ -1,5 +1,12 @@
 /// <reference types="Cypress" />
 
+const deleteTag = (name) => {
+  cy.contains(name).siblings().find('button').contains('Delete').click()
+  cy.contains('Are you sure you want to delete tag')
+  cy.contains('Confirm').click()
+  cy.contains(name).should('not.exist')
+}
+
 describe('Tag tests', () => {
   beforeEach(() => {
     cy.server({
@@ -43,11 +50,6 @@ describe('Tag tests', () => {
     cy.contains('011122249')
 
     cy.go('back')
-    cy.get('tr > :nth-child(3) > .field > .ui').each(_ => {
-      cy.get('tr > :nth-child(3) > .field > .ui').eq(0).click()
-      cy.contains('Are you sure you want to delete tag')
-      cy.contains('Confirm').click()
-    })
-    cy.contains(name).should('not.exist')
+    deleteTag(name)
   })
 })
