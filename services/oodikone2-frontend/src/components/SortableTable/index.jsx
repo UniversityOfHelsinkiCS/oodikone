@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Table } from 'semantic-ui-react'
 import { shape, arrayOf, string, func, bool, element, oneOfType } from 'prop-types'
 import { sortBy } from 'lodash'
+import { useChunk } from '../../common'
 
 const DIRECTIONS = {
   ASC: 'ascending',
@@ -16,11 +17,13 @@ const SortableTable = ({
   tableProps,
   getRowProps,
   getRowKey,
-  collapsingHeaders
+  collapsingHeaders,
+  chunkifyBy
 }) => {
   const [direction, setDirection] = useState(defaultdescending ? DIRECTIONS.DESC : DIRECTIONS.ASC)
   const [selected, setSelected] = useState(defaultsortkey == null ? columns[0].key : defaultsortkey)
   const [collapsed, setCollapsed] = useState([])
+  const chunkedData = useChunk(data, chunkifyBy)
 
   const handleSort = column => () => {
     if (selected === column) {
@@ -42,10 +45,10 @@ const SortableTable = ({
   const sortedRows = () => {
     const column = columns.find(c => c.key === selected)
     if (!column) {
-      return data
+      return chunkedData
     }
     const { getRowVal } = column
-    const sorted = sortBy(data, [getRowVal])
+    const sorted = sortBy(chunkedData, [getRowVal])
     return direction === DIRECTIONS.ASC ? sorted : sorted.reverse()
   }
 
@@ -170,7 +173,8 @@ SortableTable.propTypes = {
   defaultdescending: bool,
   defaultsortkey: string,
   collapsingHeaders: bool,
-  showNames: bool
+  showNames: bool,
+  chunkifyBy: string
 }
 
 SortableTable.defaultProps = {
@@ -179,7 +183,8 @@ SortableTable.defaultProps = {
   defaultdescending: false,
   defaultsortkey: null,
   collapsingHeaders: false,
-  showNames: undefined
+  showNames: undefined,
+  chunkifyBy: undefined
 }
 
 export default SortableTable
