@@ -14,7 +14,7 @@ ARG BASE_PATH=/
 ENV BASE_PATH=$BASE_PATH
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
-ARG TAG=production
+ARG TAG=local
 ENV TAG=${TAG}
 RUN if [ "${NODE_ENV}" != "production" ]; then cp -r /usr/src/app/node_modules /usr/src/cache/node_modules; fi
 
