@@ -2,16 +2,28 @@ import React, { useState } from 'react'
 import { Table } from 'semantic-ui-react'
 import { shape, arrayOf, string, func, bool, element, oneOfType } from 'prop-types'
 import { sortBy } from 'lodash'
+import { useChunk } from '../../common'
 
 const DIRECTIONS = {
   ASC: 'ascending',
   DESC: 'descending'
 }
 
-const SortableTable = props => {
-  const [direction, setDirection] = useState(props.defaultdescending ? DIRECTIONS.DESC : DIRECTIONS.ASC)
-  const [selected, setSelected] = useState(props.defaultsortkey == null ? props.columns[0].key : props.defaultsortkey)
+const SortableTable = ({
+  defaultdescending,
+  defaultsortkey,
+  columns,
+  data,
+  tableProps,
+  getRowProps,
+  getRowKey,
+  collapsingHeaders,
+  chunkifyBy
+}) => {
+  const [direction, setDirection] = useState(defaultdescending ? DIRECTIONS.DESC : DIRECTIONS.ASC)
+  const [selected, setSelected] = useState(defaultsortkey == null ? columns[0].key : defaultsortkey)
   const [collapsed, setCollapsed] = useState([])
+  const chunkedData = useChunk(data, chunkifyBy)
 
   const handleSort = column => () => {
     if (selected === column) {
@@ -31,12 +43,12 @@ const SortableTable = props => {
   }
 
   const sortedRows = () => {
-    const column = props.columns.find(c => c.key === selected)
+    const column = columns.find(c => c.key === selected)
     if (!column) {
-      return props.data
+      return chunkedData
     }
     const { getRowVal } = column
-    const sorted = sortBy(props.data, [getRowVal])
+    const sorted = sortBy(chunkedData, [getRowVal])
     return direction === DIRECTIONS.ASC ? sorted : sorted.reverse()
   }
 
@@ -45,7 +57,6 @@ const SortableTable = props => {
     <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>{title}</div>
   )
 
-  const { tableProps, getRowProps, columns, getRowKey, collapsingHeaders } = props
   const columnsWithCollapsedHeaders = collapsingHeaders
     ? [
         ...columns.filter(
@@ -162,7 +173,8 @@ SortableTable.propTypes = {
   defaultdescending: bool,
   defaultsortkey: string,
   collapsingHeaders: bool,
-  showNames: bool
+  showNames: bool,
+  chunkifyBy: string
 }
 
 SortableTable.defaultProps = {
@@ -171,7 +183,8 @@ SortableTable.defaultProps = {
   defaultdescending: false,
   defaultsortkey: null,
   collapsingHeaders: false,
-  showNames: undefined
+  showNames: undefined,
+  chunkifyBy: undefined
 }
 
 export default SortableTable
