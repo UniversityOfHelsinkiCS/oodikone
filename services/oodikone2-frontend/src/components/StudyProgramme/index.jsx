@@ -126,7 +126,8 @@ const StudyProgramme = props => {
       return
     }
 
-    TSA.sendEvent({
+    TSA.Matomo.sendEvent('Programme Usage', 'study programme overview', programmeName)
+    TSA.Influx.sendEvent({
       group: 'Programme Usage',
       name: 'study programme overview',
       label: programmeName,
