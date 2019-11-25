@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Switch, Redirect } from 'react-router-dom'
 import { Loader } from 'semantic-ui-react'
 
 // From https://dev.to/goenning/how-to-retry-when-react-lazy-fails-mb5
@@ -72,6 +72,7 @@ const Routes = () => (
       <Route exact path={routes.coursepopulation} component={CoursePopulation} />
       <Route exact path={routes.custompopulation} component={CustomPopulation} />
       <Route exact path={routes.updater} component={Updater} />
+      <Redirect to="/" />
     </Switch>
   </Suspense>
 )
