@@ -6,6 +6,7 @@ import { func, shape, arrayOf } from 'prop-types'
 import infoTooltips from '../../common/InfoToolTips'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { tagFilter } from '../../populationFilters'
+import Track from './tracking'
 
 const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, filter, tags }) => {
   const [options, setOptions] = useState([])
@@ -23,6 +24,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
 
   const handleFilter = () => {
     setPopulationFilterAction(tagFilter({ tag: selectedTag, comp: selectedComp }))
+    Track.set(__filename)
   }
 
   const handleCompChange = (e, { value }) => {
@@ -35,6 +37,7 @@ const TagFilter = ({ setPopulationFilterAction, removePopulationFilterAction, fi
   }
   const clearFilter = () => {
     removePopulationFilterAction(filter.id)
+    Track.cleared(__filename)
   }
 
   if (filter.notSet) {

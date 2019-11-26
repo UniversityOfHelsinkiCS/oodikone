@@ -4,10 +4,12 @@ import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { shape, func, arrayOf, object, string } from 'prop-types'
 import { sortBy } from 'lodash'
+
 import infoTooltips from '../../common/InfoToolTips'
 import { extentGraduated } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { getTextIn } from '../../common'
+import Track from './tracking'
 
 class ExtentGraduated extends Component {
   static propTypes = {
@@ -38,10 +40,12 @@ class ExtentGraduated extends Component {
     this.props.setPopulationFilter(
       extentGraduated({ code, graduated, complemented, isExtent: typeof code === 'number' })
     )
+    Track.set(__filename)
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   renderSetText = (extents, filter, allStudyRights) => {

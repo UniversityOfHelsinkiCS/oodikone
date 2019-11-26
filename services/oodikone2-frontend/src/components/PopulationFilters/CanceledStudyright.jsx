@@ -6,6 +6,7 @@ import InfoBox from '../InfoBox'
 import infoTooltips from '../../common/InfoToolTips'
 import { canceledStudyright } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import Track from './tracking'
 
 class CanceledStudyright extends Component {
   static propTypes = {
@@ -32,10 +33,12 @@ class CanceledStudyright extends Component {
         cancel: this.state.cancel
       })
     )
+    Track.set(__filename)
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   render() {
