@@ -35,6 +35,7 @@ import {
 } from '../../redux/populationFilters'
 import { presetFilter, getFilterFunction } from '../../populationFilters'
 import { getTextIn, cancelablePromise } from '../../common'
+import Track from './tracking'
 
 const componentFor = {
   CreditsAtLeast,
@@ -151,7 +152,7 @@ class PopulationFilters extends Component {
     return filterToSave
   }
 
-  handleSavePopulationFilters = () => {
+  handleSaveFiltersModalSubmit = () => {
     const preset = {
       id: uuidv4(),
       name: this.state.presetName,
@@ -168,6 +169,9 @@ class PopulationFilters extends Component {
     this.updateFilterList([preset])
     this.props.clearPopulationFilters()
     this.props.setPopulationFilter(presetFilter(preset))
+
+    this.setState({ modalOpen: false })
+    Track.sendFilterEvent('Save Filters As Preset', this.state.presetName)
   }
 
   handlePresetName = value => {
@@ -193,10 +197,10 @@ class PopulationFilters extends Component {
       filters.map(f =>
         f.type === 'Preset'
           ? getFilterFunction(
-            f.type,
-            { ...f, filters: regenerateFilterFunctions(f.filters) },
-            selectedPopulationCourses.data
-          )
+              f.type,
+              { ...f, filters: regenerateFilterFunctions(f.filters) },
+              selectedPopulationCourses.data
+            )
           : getFilterFunction(f.type, f.params, selectedPopulationCourses.data)
       )
 
@@ -208,8 +212,52 @@ class PopulationFilters extends Component {
       this.setState({ presetFilters: this.state.presetFilters.concat(newFilters) })
     }
   }
+
   destroyFromAllFilters = id =>
     this.setState({ presetFilters: this.state.presetFilters.filter(filter => filter.id !== id) })
+
+  handleClearAllFiltersClicked = () => {
+    this.props.clearPopulationFilters()
+    Track.sendFilterEvent('All filters cleared', 'All filters cleared')
+  }
+
+  handleSetComplementFilterClicked = () => {
+    this.props.setComplementFilter()
+    Track.sendFilterEvent(
+      'Toggle Show excluded students only',
+      this.props.complemented ? 'All students' : 'Excluded only'
+    )
+  }
+
+  handleAdvancedFiltersChanged = () => {
+    this.setState({ advancedUser: !this.state.advancedUser })
+    Track.sendFilterEvent('Toggle Advanced filters', !this.state.advancedUser ? 'Show' : 'Hide')
+  }
+
+  handleAddFilterCancelClicked = () => {
+    this.setState({ visible: false })
+    Track.sendFilterEvent('Toggle Add Filters', 'Hide')
+  }
+
+  handleAddFiltersClicked = () => {
+    this.setState({ visible: true })
+    Track.sendFilterEvent('Toggle Add Filters', 'Show')
+  }
+
+  handleSaveFiltersClicked = () => {
+    this.setState({ modalOpen: true })
+    Track.sendFilterEvent('Save Filters As Preset Modal', 'Shown')
+  }
+
+  handleSaveFiltersModalClosed = () => {
+    this.setState({ modalOpen: false })
+    Track.sendFilterEvent('Save Filters As Preset Modal', 'Closed')
+  }
+
+  handleSaveFiltersModalCanceled = () => {
+    this.setState({ modalOpen: false })
+    Track.sendFilterEvent('Save Filters As Preset Modal', 'Canceled')
+  }
 
   renderAddFilters(allStudyRights) {
     const { extents, transfers, populationSelectedStudentCourses, populationCourses, tags, exclude } = this.props
@@ -242,7 +290,7 @@ class PopulationFilters extends Component {
             Add filters <InfoBox content={Add} />
           </Header>
           <Loader active={selectedPopulationCourses.pending} inline="centered" />
-          <Button onClick={() => this.setState({ visible: true })} disabled={selectedPopulationCourses.pending}>
+          <Button onClick={this.handleAddFiltersClicked} disabled={selectedPopulationCourses.pending}>
             add
           </Button>
         </Segment>
@@ -259,7 +307,7 @@ class PopulationFilters extends Component {
             toggle
             label="Advanced filters"
             checked={this.state.advancedUser}
-            onChange={() => this.setState({ advancedUser: !this.state.advancedUser })}
+            onChange={this.handleAdvancedFiltersChanged}
           />
         </div>
         {unsetFilters.map(filterName => {
@@ -277,7 +325,7 @@ class PopulationFilters extends Component {
               extents,
               allStudyRights
             })
-          } else if(!(filterName === 'TagFilter' && tags.length < 1)) {
+          } else if (!(filterName === 'TagFilter' && tags.length < 1)) {
             return React.createElement(Preset, {
               filter: {
                 ...this.state.presetFilters.find(f => f.id === filterName),
@@ -288,12 +336,12 @@ class PopulationFilters extends Component {
             })
           }
         })}
-        <Button onClick={() => this.setState({ visible: false })}>cancel</Button>
+        <Button onClick={this.handleAddFilterCancelClicked}>cancel</Button>
       </Segment>
     )
   }
 
-  renderSetFilters(handleSave, allStudyRights) {
+  renderSetFilters(allStudyRights) {
     const setFilters = this.props.filters.map(f => f.type)
     const { Filters } = infotooltips.PopulationStatistics.Filters
     if (setFilters.length === 0) {
@@ -328,17 +376,17 @@ class PopulationFilters extends Component {
               <label>Show excluded students only</label>
             </Form.Field>
             <Form.Field>
-              <Radio toggle checked={this.props.complemented} onClick={this.props.setComplementFilter} />
+              <Radio toggle checked={this.props.complemented} onClick={this.handleSetComplementFilterClicked} />
             </Form.Field>
           </Form.Group>
         </Form>
 
-        <Button onClick={this.props.clearPopulationFilters}>clear all filters</Button>
+        <Button onClick={this.handleClearAllFiltersClicked}>clear all filters</Button>
         {this.state.advancedUser ? (
           <Modal
-            trigger={<Button onClick={() => this.setState({ modalOpen: true })}>Save filters as preset</Button>}
+            trigger={<Button onClick={this.handleSaveFiltersClicked}>Save filters as preset</Button>}
             open={this.state.modalOpen}
-            onClose={() => this.setState({ modalOpen: false })}
+            onClose={this.handleSaveFiltersModalClosed}
             size="small"
           >
             <Header />
@@ -347,11 +395,7 @@ class PopulationFilters extends Component {
                 <Form.Field>
                   <h2> Save current filters as preset </h2>
                   <em> This filter is saved in this population for future use </em>
-                  <Input
-                    placeholder="Name..."
-                    maxLength={40}
-                    onChange={e => this.handlePresetName(e.target.value)}
-                  />
+                  <Input placeholder="Name..." maxLength={40} onChange={e => this.handlePresetName(e.target.value)} />
                 </Form.Field>
                 <Form.Field>
                   <em> explain what your filter is doing here </em>
@@ -364,16 +408,13 @@ class PopulationFilters extends Component {
               </Form>
             </Modal.Content>
             <Modal.Actions>
-              <Button negative onClick={() => this.setState({ modalOpen: false })}>
+              <Button negative onClick={this.handleSaveFiltersModalCanceled}>
                 Cancel
               </Button>
               <Button
                 disabled={this.state.presetName === ''}
                 color="green"
-                onClick={() => {
-                  handleSave()
-                  this.setState({ modalOpen: false })
-                }}
+                onClick={this.handleSaveFiltersModalSubmit}
                 inverted
               >
                 <Icon name="checkmark" /> Save
@@ -397,7 +438,7 @@ class PopulationFilters extends Component {
     return (
       <div>
         {this.renderAddFilters(allStudyRightOptions)}
-        {this.renderSetFilters(this.handleSavePopulationFilters, allStudyRightOptions)}
+        {this.renderSetFilters(allStudyRightOptions)}
       </div>
     )
   }

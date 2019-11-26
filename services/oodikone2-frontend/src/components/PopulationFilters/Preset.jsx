@@ -2,8 +2,10 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Icon, Form, Segment, Button, Confirm, Grid } from 'semantic-ui-react'
 import { shape, func } from 'prop-types'
+
 import { removePopulationFilter, setPopulationFilter, deletePopulationFilter } from '../../redux/populationFilters'
 import { presetFilter } from '../../populationFilters'
+import Track from './tracking'
 
 class Preset extends Component {
   static propTypes = {
@@ -19,9 +21,12 @@ class Preset extends Component {
   handleSetFilter = filter => {
     this.props.filter.notSet = false
     this.props.setPopulationFilter(presetFilter(filter))
+    Track.sendFilterEvent('Set preset filter', this.props.filter.name)
   }
 
   clearFilter = (destroy = false) => {
+    Track.sendFilterEvent('Cleared preset filter', this.props.filter.name)
+
     this.props.filter.notSet = true
     if (destroy) {
       this.props.destroy(this.props.filter.id)
@@ -78,6 +83,7 @@ class Preset extends Component {
                       this.clearFilter(true)
                       this.props.deletePopulationFilter({ id: filter.id })
                       this.setState({ open: false })
+                      Track.sendFilterEvent('Delete Preset Filter', filter.name)
                     }}
                     size="small"
                   />
