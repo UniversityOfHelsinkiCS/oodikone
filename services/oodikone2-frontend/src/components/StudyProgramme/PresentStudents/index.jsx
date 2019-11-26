@@ -61,6 +61,15 @@ const PresentStudents = () => {
       studentAccumulator.push(students)
       if (i === entries.length - 1) mergeData(year)
     })
+
+    if (entries.length > 0) {
+      mergedData.Total = {
+        endYear: -Infinity,
+        students: entries.reduce((acc, [, students]) => acc.concat(...students), []),
+        bold: true
+      }
+    }
+
     return mergedData
   }
 
@@ -75,8 +84,9 @@ const PresentStudents = () => {
         mergedData
           .slice()
           .sort(([, { endYear: endYear1 }], [, { endYear: endYear2 }]) => endYear2 - endYear1)
-          .map(([years, { students }], i) => (
+          .map(([years, { students, bold }], i) => (
             <YearAccordion
+              bold={bold}
               index={i}
               active={activeYearAccordion === i}
               handleClick={() => setActiveYearAccordion(i === activeYearAccordion ? -1 : i)}

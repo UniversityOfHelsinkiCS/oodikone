@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { node, shape, bool, func, arrayOf } from 'prop-types'
 import { Loader } from 'semantic-ui-react'
 import * as Sentry from '@sentry/browser'
+import TSA from '../../common/tsa'
 import { login as loginAction } from '../../redux/auth'
 import AccessDenied from '../AccessDenied'
 
@@ -20,11 +21,22 @@ class ErrorBoundary extends Component {
   }
 
   componentDidUpdate = prevProps => {
-    if (prevProps.auth.token !== this.props.auth.token) {
-      const { auth } = this.props
-      Sentry.configureScope(scope => {
-        if (auth.token) scope.setUser({ username: auth.token.userId, mockedBy: auth.token.mockedBy })
+    if (prevProps.auth.token === this.props.auth.token || !this.props.auth.token) {
+      return
+    }
+
+    const { userId, mockedBy } = this.props.auth.token
+
+    Sentry.configureScope(scope => {
+      scope.setUser({
+        username: userId,
+        mockedBy
       })
+    })
+    TSA.Matomo.setUserId(mockedBy || userId)
+
+    if (mockedBy) {
+      TSA.Matomo.sendEvent('Admin', 'Mocking user', userId)
     }
   }
 

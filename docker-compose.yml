@@ -102,6 +102,8 @@ services:
       # ANALYTICS_INFLUXDB_DB
       # ANALYTICS_INFLUXDB_PASSWORD
       # ANALYTICS_INFLUXDB_USER
+      # MATOMO_SITE_ID
+      # MATOMO_URL
     container_name: backend
     depends_on:
       - db
