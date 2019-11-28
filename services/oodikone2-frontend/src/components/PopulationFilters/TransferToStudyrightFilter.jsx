@@ -8,6 +8,7 @@ import infoTooltips from '../../common/InfoToolTips'
 import { transferTo } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { getTextIn } from '../../common'
+import Track from './tracking'
 
 class TransferToStudyrightFilter extends Component {
   static propTypes = {
@@ -26,6 +27,7 @@ class TransferToStudyrightFilter extends Component {
 
   handleRadio = () => {
     this.props.setPopulationFilter(transferTo({ negated: this.state.negated === 'true' }))
+    Track.set(__filename)
   }
 
   handleChange = (e, { value }) => {
@@ -34,6 +36,7 @@ class TransferToStudyrightFilter extends Component {
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   render() {

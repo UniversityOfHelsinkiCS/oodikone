@@ -56,11 +56,11 @@ describe('Course population tests', () => {
     cy.get(':nth-child(8) > .form > .inline > :nth-child(3) > .ui').click()
 
     cy.contains('Students (all=100)')
-    cy.get(':nth-child(4) > .segment > .selectable > tbody > :nth-child(2) > :nth-child(2)').click()
+    cy.get(':nth-child(5) > .segment > .selectable > tbody > :nth-child(2) > :nth-child(2)').click()
 
     cy.contains('Students (all=17)')
 
-    cy.get(':nth-child(5) > .segment > .selectable > tbody > :nth-child(3) > :nth-child(1)').click()
+    cy.get(':nth-child(6) > .segment > .selectable > tbody > :nth-child(3) > :nth-child(1)').click()
     cy.contains('Tietojenkäsittelytieteen kandiohjelma, KH50_005').should('not.exist')
     cy.contains('Students (all=1)')
   })

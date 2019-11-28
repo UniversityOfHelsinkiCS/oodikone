@@ -5,6 +5,7 @@ import { shape, func } from 'prop-types'
 
 import { matriculationFilter } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import Track from './tracking'
 
 class MatriculationFilter extends Component {
   static propTypes = {
@@ -23,10 +24,12 @@ class MatriculationFilter extends Component {
 
   handleMatr = () => {
     this.props.setPopulationFilter(matriculationFilter(this.state.matr))
+    Track.set(__filename)
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   render() {
