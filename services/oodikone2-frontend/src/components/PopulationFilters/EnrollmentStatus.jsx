@@ -8,6 +8,7 @@ import { range } from 'lodash'
 import infoTooltips from '../../common/InfoToolTips'
 import { enrollmentStatus } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import Track from './tracking'
 
 class EnrollmentStatus extends Component {
   static propTypes = {
@@ -60,10 +61,12 @@ class EnrollmentStatus extends Component {
         enrolled: this.state.enrolled
       })
     )
+    Track.set(__filename)
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   render() {

@@ -7,6 +7,7 @@ import { sortBy } from 'lodash'
 import infoTooltips from '../../common/InfoToolTips'
 import { courseParticipation } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import Track from './tracking'
 
 class DisciplineTypes extends Component {
   static propTypes = {
@@ -37,10 +38,12 @@ class DisciplineTypes extends Component {
     )
     courses.forEach(course => this.props.setPopulationFilter(courseParticipation({ field: 'all', course })))
     this.setState({ discipline: '', courseType: '' })
+    Track.set(__filename)
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   render() {

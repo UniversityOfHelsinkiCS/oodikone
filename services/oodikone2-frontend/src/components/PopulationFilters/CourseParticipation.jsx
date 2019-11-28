@@ -6,6 +6,7 @@ import { shape, func, string } from 'prop-types'
 
 import { removePopulationFilter, alterPopulationCourseFilter } from '../../redux/populationFilters'
 import { getTextIn } from '../../common'
+import Track from './tracking'
 
 class CourseParticipation extends Component {
   static propTypes = {
@@ -17,12 +18,14 @@ class CourseParticipation extends Component {
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   selectField = field => () => {
     const selectedField = this.props.filter.params.field
     if (field !== selectedField) {
       this.props.alterPopulationCourseFilter(this.props.filter.id, field)
+      Track.altered(__filename)
     }
   }
 

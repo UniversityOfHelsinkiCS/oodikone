@@ -3,10 +3,11 @@ import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { Radio, Icon, Form, Segment, Button } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
-import { getTextIn } from '../../common'
 
+import { getTextIn } from '../../common'
 import { sexFilter } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import Track from './tracking'
 
 class SexFilter extends Component {
   static propTypes = {
@@ -27,10 +28,12 @@ class SexFilter extends Component {
   handleSex = () => {
     this.props.setPopulationFilter(sexFilter({ gender: this.state.sex }))
     this.setState({ sex: '' })
+    Track.set(__filename)
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   render() {

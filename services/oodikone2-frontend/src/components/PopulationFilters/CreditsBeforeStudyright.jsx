@@ -6,6 +6,7 @@ import { func, shape } from 'prop-types'
 import infoTooltips from '../../common/InfoToolTips'
 import { creditsBeforeStudyright } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import Track from './tracking'
 
 const CreditsBeforeStudyright = ({ filter, removePopulationFilterAction, setPopulationFilterAction }) => {
   const [limit, setLimit] = useState('')
@@ -19,10 +20,12 @@ const CreditsBeforeStudyright = ({ filter, removePopulationFilterAction, setPopu
   const handleLimit = () => {
     setPopulationFilterAction(creditsBeforeStudyright({ credit: limit }))
     setLimit('')
+    Track.set(__filename)
   }
 
   const clearFilter = () => {
     removePopulationFilterAction(filter.id)
+    Track.cleared(__filename)
   }
 
   if (filter.notSet) {

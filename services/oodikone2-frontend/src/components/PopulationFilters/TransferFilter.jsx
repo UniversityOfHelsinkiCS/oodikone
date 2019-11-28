@@ -9,6 +9,7 @@ import infoTooltips from '../../common/InfoToolTips'
 import { getTextIn } from '../../common'
 import { transferFilter } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import Track from './tracking'
 
 const ANYWHERE = { code: 'anywhere', name: { en: 'Anywhere', fi: 'Anywhere', sv: 'Anywhere' } }
 
@@ -44,10 +45,12 @@ class TransferFilter extends Component {
         target: selectedTarget
       })
     )
+    Track.set(__filename)
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   renderFilterText = filter => {
