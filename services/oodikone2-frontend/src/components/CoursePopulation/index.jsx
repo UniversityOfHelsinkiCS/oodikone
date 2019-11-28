@@ -2,10 +2,10 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { shape, func, bool, arrayOf, string } from 'prop-types'
-import { Segment, Header } from 'semantic-ui-react'
+import { Segment, Header, Icon, Button } from 'semantic-ui-react'
 import qs from 'query-string'
 import { intersection, difference } from 'lodash'
-import { getCoursePopulation } from '../../redux/populations'
+import { getCoursePopulation, updatePopulationStudents } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import { clearPopulationFilters } from '../../redux/populationFilters'
 import { getSemesters } from '../../redux/semesters'
@@ -15,7 +15,7 @@ import CustomPopulationFilters from '../CustomPopulationFilters'
 import CoursePopulationGradeDist from '../CoursePopulationGradeDist'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
-import { useProgress, getStudentToTargetCourseDateMap, useTitle } from '../../common'
+import { useProgress, getStudentToTargetCourseDateMap, useTitle, getUserIsAdmin } from '../../common'
 import infotooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
 
@@ -29,7 +29,9 @@ const CoursePopulation = ({
   selectedStudents,
   getSemestersDispatch,
   clearPopulationFiltersDispatch,
-  semesters
+  semesters,
+  updatePopulationStudentsDispatch,
+  isAdmin
 }) => {
   const parseQueryFromUrl = () => {
     const { location } = history
@@ -101,6 +103,19 @@ const CoursePopulation = ({
           <Header className="segmentTitle" size="medium" textAlign="center">
             {subHeader}
           </Header>
+          {isAdmin ? (
+            <Header className="segmentTitle" size="medium" textAlign="center">
+              <Button
+                compact
+                size="medium"
+                labelPosition="left"
+                onClick={() => updatePopulationStudentsDispatch(selectedStudents.filter(number => number.length < 10))}
+              >
+                <Icon name="refresh" />
+                update population
+              </Button>
+            </Header>
+          ) : null}
           <CustomPopulationFilters
             studentToTargetCourseDateMap={studentToTargetCourseDateMap}
             samples={studentData.students}
@@ -149,7 +164,9 @@ CoursePopulation.propTypes = {
   getSingleCourseStatsDispatch: func.isRequired,
   getSemestersDispatch: func.isRequired,
   clearPopulationFiltersDispatch: func.isRequired,
+  updatePopulationStudentsDispatch: func.isRequired,
   pending: bool.isRequired,
+  isAdmin: bool.isRequired,
   studentData: shape({}).isRequired,
   history: shape({}).isRequired,
   courseData: shape({}).isRequired,
@@ -160,7 +177,15 @@ CoursePopulation.propTypes = {
   }).isRequired
 }
 
-const mapStateToProps = ({ singleCourseStats, populationFilters, populations, semesters }) => {
+const mapStateToProps = ({
+  singleCourseStats,
+  populationFilters,
+  populations,
+  semesters,
+  auth: {
+    token: { roles }
+  }
+}) => {
   const samples = populations.data.students ? populations.data.students : []
   let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
   const { complemented } = populationFilters
@@ -183,7 +208,8 @@ const mapStateToProps = ({ singleCourseStats, populationFilters, populations, se
     query: populations.query,
     courseData: singleCourseStats.stats || {},
     selectedStudents,
-    semesters: semesters.data
+    semesters: semesters.data,
+    isAdmin: getUserIsAdmin(roles)
   }
 }
 
@@ -194,7 +220,8 @@ export default withRouter(
       getCoursePopulationDispatch: getCoursePopulation,
       getSingleCourseStatsDispatch: getSingleCourseStats,
       getSemestersDispatch: getSemesters,
-      clearPopulationFiltersDispatch: clearPopulationFilters
+      clearPopulationFiltersDispatch: clearPopulationFilters,
+      updatePopulationStudentsDispatch: updatePopulationStudents
     }
   )(CoursePopulation)
 )
