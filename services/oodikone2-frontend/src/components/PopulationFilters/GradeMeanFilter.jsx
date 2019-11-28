@@ -6,6 +6,7 @@ import { shape, func } from 'prop-types'
 import infoTooltips from '../../common/InfoToolTips'
 import { gradeMeanFilter } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import Track from './tracking'
 
 class GradeMeanFilter extends Component {
   static propTypes = {
@@ -27,10 +28,12 @@ class GradeMeanFilter extends Component {
       })
     )
     this.setState({ gradeMean: 0, comparator: '' })
+    Track.set(__filename)
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   render() {

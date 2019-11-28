@@ -6,6 +6,7 @@ import { intersection } from 'lodash'
 
 import { courseParticipationNTimes } from '../../populationFilters'
 import { removePopulationFilter, alterPopulationCourseFilter, setPopulationFilter } from '../../redux/populationFilters'
+import Track from './tracking'
 
 class CourseParticipationNTimes extends Component {
   static propTypes = {
@@ -35,10 +36,12 @@ class CourseParticipationNTimes extends Component {
         courses: ['375063', '339101']
       })
     )
+    Track.set(__filename)
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   courseInPopulation = () => intersection(this.studyRights(), ['MH30_001', '320001']).length > 0
