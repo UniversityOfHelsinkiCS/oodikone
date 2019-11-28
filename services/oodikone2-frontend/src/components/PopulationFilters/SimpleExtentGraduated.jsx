@@ -3,10 +3,12 @@ import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { shape, func, string } from 'prop-types'
+
 import infoTooltips from '../../common/InfoToolTips'
 import { extentGraduated } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { getTextIn } from '../../common'
+import Track from './tracking'
 
 const SimpleExtentGraduated = props => {
   SimpleExtentGraduated.propTypes = {
@@ -27,10 +29,12 @@ const SimpleExtentGraduated = props => {
 
   const handleLimit = () => {
     props.setPopulationFilter(extentGraduated({ code: props.code, graduated: 'grad', complemented, simple: true }))
+    Track.set(__filename)
   }
 
   const clearFilter = () => {
     props.removePopulationFilter(props.filter.id)
+    Track.cleared(__filename)
   }
 
   const { filter, programme, language } = props

@@ -7,7 +7,7 @@ import { bool, func, number, arrayOf, shape, string } from 'prop-types'
 import { getCustomPopulation } from '../../../redux/populations'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../../redux/populationCourses'
 
-const YearAccordion = ({ active, handleClick, index, years, students }) => {
+const YearAccordion = ({ active, handleClick, index, years, students, bold }) => {
   const history = useHistory()
   const dispatch = useDispatch()
   const enrolledStudents = students.filter(s => s.enrolled)
@@ -39,7 +39,7 @@ const YearAccordion = ({ active, handleClick, index, years, students }) => {
 
   return (
     <Accordion fluid styled>
-      <Accordion.Title index={index} active={active} onClick={handleClick}>
+      <Accordion.Title style={{ color: `${bold ? 'black' : ''}` }} index={index} active={active} onClick={handleClick}>
         <Icon name="dropdown" />
         {years} ({students.length})
       </Accordion.Title>
@@ -63,12 +63,17 @@ const YearAccordion = ({ active, handleClick, index, years, students }) => {
   )
 }
 
+YearAccordion.defaultProps = {
+  bold: false
+}
+
 YearAccordion.propTypes = {
   active: bool.isRequired,
   handleClick: func.isRequired,
   index: number.isRequired,
   years: string.isRequired,
-  students: arrayOf(shape({})).isRequired
+  students: arrayOf(shape({})).isRequired,
+  bold: bool
 }
 
 export default YearAccordion

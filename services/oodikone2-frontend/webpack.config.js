@@ -101,6 +101,9 @@ module.exports = (env, args) => {
         }
       ],
       disableHostCheck: true
+    },
+    node: {
+      __filename: true
     }
   }
 }

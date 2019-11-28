@@ -6,6 +6,7 @@ import { shape, func } from 'prop-types'
 import infoTooltips from '../../common/InfoToolTips'
 import { startingThisSemester } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import Track from './tracking'
 
 const dropDownOptions = [
   {
@@ -36,10 +37,12 @@ class StartingThisSemester extends Component {
   handleRadio = () => {
     this.props.setPopulationFilter(startingThisSemester({ starting: this.state.starting }))
     this.setState({ starting: true })
+    Track.set(__filename)
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   render() {

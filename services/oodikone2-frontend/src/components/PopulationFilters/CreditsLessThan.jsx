@@ -7,6 +7,7 @@ import { shape, func } from 'prop-types'
 import infoTooltips from '../../common/InfoToolTips'
 import { creditsLessThan } from '../../populationFilters'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import Track from './tracking'
 
 class CreditsLessThan extends Component {
   static propTypes = {
@@ -28,10 +29,12 @@ class CreditsLessThan extends Component {
   handleLimit = () => {
     this.props.setPopulationFilter(creditsLessThan({ credit: this.state.limit }))
     this.setState({ limit: '' })
+    Track.set(__filename)
   }
 
   clearFilter = () => {
     this.props.removePopulationFilter(this.props.filter.id)
+    Track.cleared(__filename)
   }
 
   render() {
