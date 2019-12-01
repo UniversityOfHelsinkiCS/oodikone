@@ -259,7 +259,7 @@ export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCo
   if (programme) {
     return programme
   }
-  return { name: { en: 'No programme' }, startdate: '', code: '00000' }
+  return { name: { en: 'No programme', fi: 'Ei ohjelmaa' }, startdate: '', code: '00000' }
 }
 
 export const getHighestGradeOfCourseBetweenRange = (courses, lowerBound, upperBound) => {
