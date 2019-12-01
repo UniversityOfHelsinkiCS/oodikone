@@ -246,7 +246,7 @@ export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCo
     )
     if (studyrightElements.length > 0) {
       const newestStudyrightElement = studyrightElements.sort(
-        (a, b) => new Date(b.startdate) - new Date(a.startdate)
+        (a, b) => new Date(b.startdate) - new Date(a.startdate) + (new Date(b.enddate) - new Date(a.enddate))
       )[0]
       studyprogrammes.push({
         name: elementDetails[newestStudyrightElement.code].name,
