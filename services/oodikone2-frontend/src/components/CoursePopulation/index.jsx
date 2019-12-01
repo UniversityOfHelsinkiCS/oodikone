@@ -13,6 +13,7 @@ import PopulationStudents from '../PopulationStudents'
 
 import CustomPopulationFilters from '../CustomPopulationFilters'
 import CoursePopulationGradeDist from '../CoursePopulationGradeDist'
+import CoursePopulationProgrammeCredits from '../CoursePopulationProgrammeCredits'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
 import { useProgress, getStudentToTargetCourseDateMap, useTitle, getUserIsAdmin } from '../../common'
@@ -144,6 +145,14 @@ const CoursePopulation = ({
               selectedStudents={selectedStudents}
             />
           </Segment>
+          <CoursePopulationProgrammeCredits
+            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+            selectedStudents={selectedStudents}
+            samples={studentData.students}
+            codes={codes}
+            from={dateFrom}
+            to={dateTo}
+          />
           <PopulationStudents
             studentToTargetCourseDateMap={studentToTargetCourseDateMap}
             samples={studentData.students}
