@@ -24,7 +24,8 @@ class PopulationDetails extends Component {
     queryIsSet: bool.isRequired,
     isLoading: bool.isRequired,
     selectedStudentsByYear: shape({}).isRequired,
-    query: shape({}).isRequired
+    query: shape({}).isRequired,
+    tagstudent: arrayOf({}).isRequired
   }
 
   constructor() {
@@ -145,6 +146,10 @@ class PopulationDetails extends Component {
     if (!this.props.query.studentStatuses.includes('CANCELLED')) {
       excludedFilters.push('CanceledStudyright')
     }
+    if (this.props.tagstudent.length < 1) {
+      excludedFilters.push('TagFilter')
+    }
+
     return excludedFilters
   }
 
@@ -200,7 +205,6 @@ class PopulationDetails extends Component {
 
 const mapStateToProps = state => {
   const { samples, selectedStudents, complemented, selectedStudentsByYear } = selectors.makePopulationsToData(state)
-
   // REFACTOR YES, IF YOU SEE THIS COMMENT YOU ARE OBLIGATED TO FIX IT
   if (samples.length > 0) {
     const creditsAndDates = samples.map(s => {
@@ -229,7 +233,8 @@ const mapStateToProps = state => {
     translate: getTranslate(state.localize),
     queryIsSet: !!state.populations.query,
     isLoading: state.populations.pending === true,
-    query: state.populations.query || {}
+    query: state.populations.query || {},
+    tagstudent: state.tagstudent.data || []
   }
 }
 
