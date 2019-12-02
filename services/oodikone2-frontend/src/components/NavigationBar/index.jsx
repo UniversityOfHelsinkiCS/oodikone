@@ -28,7 +28,6 @@ const allNavigationItems = {
   teachers: { path: '/teachers', translateId: 'teachers', reqRights: ['teachers'] },
   users: { path: '/users', translateId: 'users', reqRights: ['users'] },
   faculty: { path: '/faculties', translateId: 'faculty', reqRights: ['faculties'] },
-  usage: { path: '/usage', translateId: 'usage', reqRights: ['usage'] },
   updater: { path: '/updater', translateId: 'updater', reqRights: ['dev', 'admin'] },
   sandbox: { path: '/sandbox', translateId: 'sandbox', reqRights: ['dev'] },
   feedback: { path: '/feedback', translateId: 'feedback' }
