@@ -44,17 +44,17 @@ const componentFor = {
   CreditsLessThanFromMandatory,
   StartingThisSemester,
   CourseParticipationNTimes,
-  DisciplineTypes,
   EnrollmentStatus,
   CourseParticipation,
   SexFilter,
-  ExtentGraduated,
-  TransferFilter,
-  CanceledStudyright,
-  PriorityStudyright,
   TransferToStudyrightFilter,
   SimpleExtentGraduated,
   TagFilter,
+  CanceledStudyright,
+  PriorityStudyright,
+  DisciplineTypes,
+  TransferFilter,
+  ExtentGraduated,
   CreditsBeforeStudyright
 }
 
@@ -197,10 +197,10 @@ class PopulationFilters extends Component {
       filters.map(f =>
         f.type === 'Preset'
           ? getFilterFunction(
-              f.type,
-              { ...f, filters: regenerateFilterFunctions(f.filters) },
-              selectedPopulationCourses.data
-            )
+            f.type,
+            { ...f, filters: regenerateFilterFunctions(f.filters) },
+            selectedPopulationCourses.data
+          )
           : getFilterFunction(f.type, f.params, selectedPopulationCourses.data)
       )
 
@@ -265,7 +265,6 @@ class PopulationFilters extends Component {
     const selectedPopulationCourses = populationSelectedStudentCourses.data
       ? populationSelectedStudentCourses
       : populationCourses
-
     const allFilters = union(
       Object.keys(componentFor)
         .filter(f => !(Object.keys(advancedFilters).includes(f) && !this.state.advancedUser))
@@ -312,11 +311,12 @@ class PopulationFilters extends Component {
         </div>
         {unsetFilters.map(filterName => {
           //eslint-disable-line
-          if (componentFor[filterName] && !(filterName === 'TagFilter' && tags.length < 1)) {
+          if (componentFor[filterName]) {
             // THIS IS KINDA HACKED SOLUTION PLS FIX
             // this is awful, shame on who ever wrote this, pls fix
             // when is this going to be fixed?
             // when the time is right, probably
+            // does this even need fixing though?
             return React.createElement(componentFor[filterName], {
               filter: { notSet: true },
               key: filterName,
@@ -336,6 +336,9 @@ class PopulationFilters extends Component {
             })
           }
         })}
+        {exclude.length > 0 ? (<Segment style={{textAlign:'center', backgroundColor: 'whitesmoke'}}>
+          Currently there are {exclude.length} hidden filter(s) ({exclude.map(ex => ex.replace(/([a-z0-9])([A-Z])/g, '$1 $2')).join(', ')}) since there are no students that could be filtered with them
+        </Segment>) : null}
         <Button onClick={this.handleAddFilterCancelClicked}>cancel</Button>
       </Segment>
     )
