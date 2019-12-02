@@ -33,7 +33,6 @@ const EnableUsers = React.lazy(() => retry(() => import('../EnableUsers')))
 const StudyProgramme = React.lazy(() => retry(() => import('../StudyProgramme')))
 const Teachers = React.lazy(() => retry(() => import('../Teachers')))
 const Sandbox = React.lazy(() => retry(() => import('../Sandbox')))
-const UsageStatistics = React.lazy(() => retry(() => import('../UsageStatistics')))
 const Feedback = React.lazy(() => retry(() => import('../Feedback')))
 const Faculty = React.lazy(() => retry(() => import('../Faculty')))
 const CoursePopulation = React.lazy(() => retry(() => import('../CoursePopulation')))
@@ -46,7 +45,6 @@ const routes = {
   teachers: '/teachers/:teacherid?',
   users: '/users/:userid?',
   faculty: '/faculties/:facultyid?',
-  usage: '/usage',
   sandbox: '/sandbox',
   feedback: '/feedback',
   coursepopulation: '/coursepopulation',
@@ -66,7 +64,6 @@ const Routes = () => (
       <Route exact path={routes.faculty} component={Faculty} />
       <Route exact path={routes.users} component={EnableUsers} />
       <Route exact path={routes.teachers} component={Teachers} />
-      <Route exact path={routes.usage} component={UsageStatistics} />
       <Route exact path={routes.sandbox} component={Sandbox} />
       <Route exact path={routes.feedback} component={Feedback} />
       <Route exact path={routes.coursepopulation} component={CoursePopulation} />
