@@ -20,7 +20,7 @@ const CoursePopulationProgrammeCredits = ({
   const [programmeCreditsStatistics, setStatistics] = useState({})
   const [totalCredits, setTotalCredits] = useState(0)
   useEffect(() => {
-    if (samples && selectedStudents) {
+    if (samples && selectedStudents && Object.keys(populationStatistics).length > 0) {
       const programmeCredits = {}
       let tempTotal = 0
       const filteredStudents = samples.filter(student => selectedStudents.includes(student.studentNumber))
@@ -45,8 +45,6 @@ const CoursePopulationProgrammeCredits = ({
           ) {
             if (course.grade === 'Hyv.') {
               coursesBetween.push({ grade: course.grade, value: 1, credits: course.credits })
-            } else if (!Number(course.grade)) {
-              coursesBetween.push({ grade: course.grade, value: 0, credits: course.credits })
             } else {
               coursesBetween.push({ grade: course.grade, value: Number(course.grade), credits: course.credits })
             }

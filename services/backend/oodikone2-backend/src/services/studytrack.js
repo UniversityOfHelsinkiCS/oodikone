@@ -406,7 +406,9 @@ const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, e
         [Op.between]: [startDate, endDate]
       },
       targetcode: studytrack
-    }
+    },
+    distinct: true,
+    col: 'studentnumber'
   })
 }
 

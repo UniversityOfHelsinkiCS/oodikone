@@ -19,14 +19,18 @@ import { clearPopulationFilters, setComplementFilter } from '../../redux/populat
 
 const componentFor = {
   GradeFilter,
-  CourseCreditFilter,
   ProgrammeFilter,
   CreditsAtLeast,
   CreditsLessThan,
   GradeMeanFilter,
   SexFilter,
   CourseParticipation,
-  CourseParticipationNTimes
+  CourseParticipationNTimes,
+  CourseCreditFilter
+}
+
+const advancedFilters = {
+  CourseCreditFilter
 }
 
 const CustomPopulationFilters = ({
@@ -39,9 +43,11 @@ const CustomPopulationFilters = ({
   coursecodes,
   from,
   to,
-  studentToTargetCourseDateMap
+  studentToTargetCourseDateMap,
+  coursePopulation
 }) => {
   const [visible, setVisible] = useState(false)
+  const [showAdvanced, setAdvanced] = useState(false)
 
   const renderAddFilters = () => {
     const { Add } = infotooltips.PopulationStatistics.Filters
@@ -50,7 +56,12 @@ const CustomPopulationFilters = ({
     const setFilters = union(filters.map(f => f.type), filters.filter(f => f.type === 'Preset').map(f => f.id))
 
     const unsetFilters = uniq(difference(allFilters, setFilters))
-    if (unsetFilters.length === 0) {
+
+    const filteredUnsetFilters = unsetFilters.filter(
+      filter => !Object.keys(advancedFilters).includes(filter) || showAdvanced
+    )
+
+    if (filteredUnsetFilters.length === 0) {
       return null
     }
     if (!visible) {
@@ -68,11 +79,13 @@ const CustomPopulationFilters = ({
         <Header>
           Add filters <InfoBox content={Add} />
         </Header>
-        {unsetFilters.map(filterName => {
-          if (
-            window.location.pathname === '/custompopulation' &&
-            ['GradeFilter', 'CourseCreditFilter'].includes(filterName)
-          ) {
+        {coursePopulation ? (
+          <div>
+            <Radio toggle label="Advanced filters" checked={showAdvanced} onChange={() => setAdvanced(!showAdvanced)} />
+          </div>
+        ) : null}
+        {filteredUnsetFilters.map(filterName => {
+          if (!coursePopulation && ['GradeFilter', 'CourseCreditFilter'].includes(filterName)) {
             return null
           }
           return React.createElement(componentFor[filterName], {
@@ -137,7 +150,8 @@ CustomPopulationFilters.defaultProps = {
   coursecodes: [],
   from: 0,
   to: 0,
-  studentToTargetCourseDateMap: null
+  studentToTargetCourseDateMap: null,
+  coursePopulation: false
 }
 
 CustomPopulationFilters.propTypes = {
@@ -150,7 +164,8 @@ CustomPopulationFilters.propTypes = {
   allStudyrights: shape({}).isRequired,
   studentToTargetCourseDateMap: shape({}),
   from: number,
-  to: number
+  to: number,
+  coursePopulation: bool
 }
 
 const mapStateToProps = ({ populationFilters, populations }) => ({
