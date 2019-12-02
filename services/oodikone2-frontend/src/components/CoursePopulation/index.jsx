@@ -94,76 +94,79 @@ const CoursePopulation = ({
 
   if (!dateFrom || !dateTo) return null
 
+  if (!studentData.students) {
+    return (
+      <Segment className="contentSegment">
+        <ProgressBar progress={progress} />
+      </Segment>
+    )
+  }
+
   return (
     <div className="segmentContainer">
-      {studentData.students ? (
-        <Segment className="contentSegment">
-          <Header className="segmentTitle" size="large" textAlign="center">
-            Population of course {header}
-          </Header>
+      <Segment className="contentSegment">
+        <Header className="segmentTitle" size="large" textAlign="center">
+          Population of course {header}
+        </Header>
+        <Header className="segmentTitle" size="medium" textAlign="center">
+          {subHeader}
+        </Header>
+        {isAdmin ? (
           <Header className="segmentTitle" size="medium" textAlign="center">
-            {subHeader}
+            <Button
+              compact
+              size="medium"
+              labelPosition="left"
+              onClick={() => updatePopulationStudentsDispatch(selectedStudents.filter(number => number.length < 10))}
+            >
+              <Icon name="refresh" />
+              update population
+            </Button>
           </Header>
-          {isAdmin ? (
-            <Header className="segmentTitle" size="medium" textAlign="center">
-              <Button
-                compact
-                size="medium"
-                labelPosition="left"
-                onClick={() => updatePopulationStudentsDispatch(selectedStudents.filter(number => number.length < 10))}
-              >
-                <Icon name="refresh" />
-                update population
-              </Button>
-            </Header>
-          ) : null}
-          <CustomPopulationFilters
-            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-            samples={studentData.students}
-            coursecodes={codes}
+        ) : null}
+        <CustomPopulationFilters
+          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+          samples={studentData.students}
+          coursecodes={codes}
+          from={dateFrom}
+          to={dateTo}
+          coursePopulation
+        />
+        <Segment>
+          <Header>Grade distribution</Header>
+          <CoursePopulationGradeDist
+            selectedStudents={selectedStudents}
             from={dateFrom}
             to={dateTo}
-          />
-          <Segment>
-            <Header>Grade distribution</Header>
-            <CoursePopulationGradeDist
-              selectedStudents={selectedStudents}
-              from={dateFrom}
-              to={dateTo}
-              samples={studentData.students}
-              codes={codes}
-            />
-          </Segment>
-          <Segment>
-            <Header>
-              Programme distribution{' '}
-              <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
-            </Header>
-            <CustomPopulationProgrammeDist
-              studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-              samples={studentData.students}
-              selectedStudents={selectedStudents}
-            />
-          </Segment>
-          <CoursePopulationProgrammeCredits
-            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-            selectedStudents={selectedStudents}
             samples={studentData.students}
             codes={codes}
-            from={dateFrom}
-            to={dateTo}
           />
-          <PopulationStudents
+        </Segment>
+        <Segment>
+          <Header>
+            Programme distribution{' '}
+            <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
+          </Header>
+          <CustomPopulationProgrammeDist
             studentToTargetCourseDateMap={studentToTargetCourseDateMap}
             samples={studentData.students}
             selectedStudents={selectedStudents}
           />
         </Segment>
-      ) : (
-        <Segment className="contentSegment">
-          <ProgressBar progress={progress} />
-        </Segment>
-      )}
+        <CoursePopulationProgrammeCredits
+          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+          selectedStudents={selectedStudents}
+          samples={studentData.students}
+          codes={codes}
+          from={dateFrom}
+          to={dateTo}
+        />
+        <PopulationStudents
+          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+          samples={studentData.students}
+          selectedStudents={selectedStudents}
+        />
+      </Segment>
     </div>
   )
 }
