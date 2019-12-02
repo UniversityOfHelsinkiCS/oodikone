@@ -465,7 +465,7 @@ const endedStudyright = async (studentnumbers, startDate, studytrack, endDate) =
 }
 
 const formatCreditsForProductivity = credits => {
-  return credits.map(formatCredit).reduce(function (acc, curr) {
+  return credits.map(formatCredit).reduce(function(acc, curr) {
     var key = curr['year']
     if (!acc[key]) {
       acc[key] = []
