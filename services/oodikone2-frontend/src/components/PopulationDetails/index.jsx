@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool, shape } from 'prop-types'
 import { Segment, Header, Message, Button, Icon, Tab } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
-import { flattenDeep } from 'lodash'
+import { flattenDeep, intersection } from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
 import selectors from '../../selectors/populationDetails'
 import { getTotalCreditsFromCourses } from '../../common'
@@ -146,7 +146,8 @@ class PopulationDetails extends Component {
     if (!this.props.query.studentStatuses.includes('CANCELLED')) {
       excludedFilters.push('CanceledStudyright')
     }
-    if (this.props.tagstudent.length < 1) {
+    const taggedStudentNumbers = this.props.tagstudent.map(tag => tag.studentnumber)
+    if (intersection(taggedStudentNumbers, this.props.selectedStudents) < 1) {
       excludedFilters.push('TagFilter')
     }
 
@@ -234,7 +235,7 @@ const mapStateToProps = state => {
     queryIsSet: !!state.populations.query,
     isLoading: state.populations.pending === true,
     query: state.populations.query || {},
-    tagstudent: state.tagstudent.data || []
+    tagstudent: state.tagstudent.data || {}
   }
 }
 
