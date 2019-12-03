@@ -280,11 +280,12 @@ const PopulationSearchForm = props => {
         }
       }
     }
+    const tag = tags.find(t => t.tag_id === query.tag)
     setState({
       momentYear,
       query: {
         ...query,
-        tag: null,
+        tag: query.tag && tag.year ? null : query.tag,
         year: reformatDate(momentYear, YEAR_DATE_FORMAT),
         months: months(
           reformatDate(momentYear, YEAR_DATE_FORMAT),
@@ -375,12 +376,14 @@ const PopulationSearchForm = props => {
         }
       })
     } else {
-      const months = getMonths(reformatDate(moment(`${tag.year}-01-01`), YEAR_DATE_FORMAT), moment(), 'FALL')
+      const months = tag.year
+        ? getMonths(reformatDate(moment(`${tag.year}-01-01`), YEAR_DATE_FORMAT), moment(), 'FALL')
+        : query.months
       setState({
         query: {
           ...query,
           tag: tag.tag_id,
-          year: tag.year,
+          year: tag.year || query.year,
           months
         }
       })

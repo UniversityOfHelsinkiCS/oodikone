@@ -34,6 +34,13 @@ const findTagsFromStudytrackById = async (studytrack, tag_ids) => {
 }
 
 const createNewTag = async tag => {
+  if (isNaN(tag.year)) {
+    const newTag = {
+      ...tag,
+      year: null
+    }
+    return Tag.create(newTag)
+  }
   return Tag.create(tag)
 }
 
