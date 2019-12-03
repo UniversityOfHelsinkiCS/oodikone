@@ -102,11 +102,18 @@ const createReport = async () => {
   console.log('SPLIT')
   otherStudents.forEach(s => console.log(`${new Date(s.birthdate).getFullYear()};${s.gender_fi}`))
   console.log('SPLIT')
+
+  const getFirstName = namestring => {
+    const names = namestring.split(' ')
+    const i = names.findIndex(n => n.substring(0, 1) === '*')
+    return i != -1 ? names[i].substring(1) : names[0]
+  }
+
   fmseiStudents.forEach(s =>
     console.log(
       `${s.studentnumber};${s.email || ''};${s.zipcode || ''};${s.city_fi || ''};${new Date(
         s.birthdate
-      ).getFullYear()};${s.country_fi || ''};${s.home_country_fi || ''};${s.gender_fi}`
+      ).getFullYear()};${s.country_fi || ''};${s.home_country_fi || ''};${s.gender_fi};${getFirstName(s.firstnames)}`
     )
   )
   console.log('SPLIT')
