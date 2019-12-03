@@ -422,7 +422,9 @@ const transferredFromStudyprogram = async (studentnumbers, startDate, studytrack
         [Op.between]: [startDate, endDate]
       },
       sourcecode: studytrack
-    }
+    },
+    distinct: true,
+    col: 'studentnumber'
   })
 }
 
@@ -544,7 +546,7 @@ const statsForClass = async (studentnumbers, startDate, studytrack, endDate) => 
     tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate),
     endedStudyright(studentnumbers, startDate, studytrack, endDate),
     nationalitiesFromClass(studentnumbers),
-    transferredFromStudyprogram(studentnumbers, startDate, studytrack, endDate),
+    transferredFromStudyprogram(studentnumbers, startDate, studytrack, new Date()),
     cancelledStudyright(studentnumbers, startDate, studytrack, endDate),
     startedStudyright(studentnumbers, startDate, studytrack, endDate)
   ])
