@@ -38,7 +38,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
     const newTag = {
       tagname: tagname.trim(),
       studytrack: studyprogramme,
-      year: reformatDate(year, YEAR_DATE_FORMAT),
+      year: year ? reformatDate(year, YEAR_DATE_FORMAT) : null,
       personal_user_id: personal ? userId : null
     }
     createTag(newTag)
@@ -122,7 +122,8 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
           header="Create tags for study programme"
           content="Here you can create tags for study programme. You can either create public tags or personal tags. 
           Tags can be used to combine students from other starting years. 'Associated start year' means what year you want to use as a start year for the students in that tag.
-          For example with this you can move student from earlier starting year to next year if the student was absent during first year."
+          For example with this you can move student from earlier starting year to next year if the student was absent during first year. However this is optional and you can 
+          create a new tag without selecting year."
         />
         <Segment>
           <Form.Group>
@@ -147,10 +148,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
               <label>Personal tag</label>
               <Form.Checkbox toggle checked={personal} onClick={() => setPersonal(!personal)} />
             </Form.Field>
-            <Button
-              disabled={!tagname.trim() || tags.some(t => t.tagname === tagname.trim()) || !year}
-              onClick={handleSubmit}
-            >
+            <Button disabled={!tagname.trim() || tags.some(t => t.tagname === tagname.trim())} onClick={handleSubmit}>
               {' '}
               Create new tag{' '}
             </Button>
