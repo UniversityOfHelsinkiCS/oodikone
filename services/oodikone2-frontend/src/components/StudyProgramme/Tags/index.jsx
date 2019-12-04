@@ -54,6 +54,14 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
   const deleteButton = tag => <Button onClick={() => setConfirm(tag)}>Delete</Button>
 
   const populationUrl = tag => {
+    if (!tag.year) {
+      const year = new Date().getFullYear()
+      const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
+      const href =
+        `/populations?months=${months}&semesters=FALL&semesters=` +
+        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}&tag=${tag.tag_id}`
+      return href
+    }
     const months = Math.ceil(moment.duration(moment().diff(`${tag.year}-08-01`)).asMonths())
     const href =
       `/populations?months=${months}&semesters=FALL&semesters=` +
