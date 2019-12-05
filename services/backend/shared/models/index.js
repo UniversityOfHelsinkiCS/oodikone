@@ -133,7 +133,8 @@ const Studyright = sequelize.define(
     startdate: { type: Sequelize.DATE },
     studystartdate: { type: Sequelize.DATE },
     organization_code: { type: Sequelize.STRING },
-    student_studentnumber: { type: Sequelize.STRING }
+    student_studentnumber: { type: Sequelize.STRING },
+    faculty_code: { type: Sequelize.STRING }
   },
   {
     tableName: 'studyright',
