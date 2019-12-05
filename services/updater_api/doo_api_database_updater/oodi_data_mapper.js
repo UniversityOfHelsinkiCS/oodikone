@@ -131,7 +131,8 @@ const getStudyRightFromData = (data, studentNumber) => {
     startdate: parseDate(data.start_date),
     studystartdate: parseDate(data.study_start_date),
     organization_code: data.organisation_code,
-    student_studentnumber: studentNumber
+    student_studentnumber: studentNumber,
+    faculty_code: data.faculty_code
   }
 }
 
