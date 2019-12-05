@@ -8,6 +8,7 @@ import { intersection, difference } from 'lodash'
 import { getCoursePopulation, updatePopulationStudents } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import { clearPopulationFilters } from '../../redux/populationFilters'
+import { getFaculties } from '../../redux/faculties'
 import { getSemesters } from '../../redux/semesters'
 import PopulationStudents from '../PopulationStudents'
 
@@ -32,6 +33,7 @@ const CoursePopulation = ({
   clearPopulationFiltersDispatch,
   semesters,
   updatePopulationStudentsDispatch,
+  getFacultiesDispatch,
   isAdmin
 }) => {
   const parseQueryFromUrl = () => {
@@ -82,6 +84,7 @@ const CoursePopulation = ({
       setCodes(parsedCourseCodes)
       setYears(years)
       getFromToDates(from, to, separate)
+      getFacultiesDispatch()
 
       const { dateFrom, dateTo } = getFromToDates(from, to, separate ? JSON.parse(separate) : false)
       setDateFrom(dateFrom)
@@ -186,7 +189,8 @@ CoursePopulation.propTypes = {
   semesters: shape({
     semesters: shape({}),
     years: shape({})
-  }).isRequired
+  }).isRequired,
+  getFacultiesDispatch: func.isRequired
 }
 
 const mapStateToProps = ({
@@ -233,7 +237,8 @@ export default withRouter(
       getSingleCourseStatsDispatch: getSingleCourseStats,
       getSemestersDispatch: getSemesters,
       clearPopulationFiltersDispatch: clearPopulationFilters,
-      updatePopulationStudentsDispatch: updatePopulationStudents
+      updatePopulationStudentsDispatch: updatePopulationStudents,
+      getFacultiesDispatch: getFaculties
     }
   )(CoursePopulation)
 )
