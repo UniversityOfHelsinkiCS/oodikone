@@ -165,7 +165,7 @@ CoursePopulationProgrammeCredits.propTypes = {
   studentToTargetCourseDateMap: shape({}),
   language: string.isRequired,
   populationStatistics: shape({}).isRequired,
-  faculties: arrayOf({}).isRequired
+  faculties: arrayOf(shape({})).isRequired
 }
 
 const mapStateToProps = ({ populations, localize, faculties }) => {
