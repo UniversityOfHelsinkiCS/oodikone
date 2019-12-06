@@ -64,7 +64,7 @@ const CustomPopulationProgrammeDist = ({
     filters.map(filter => removePopulationFilterDispatch(filter.id))
     setPopulationFilterDispatch(
       programmeFilter(
-        { programme: splitRow[1], programmeName: splitRow[0], studentToTargetCourseDateMap },
+        { programme: splitRow.slice(-1)[0], programmeName: splitRow[0], studentToTargetCourseDateMap },
         populationStatistics.elementdetails.data
       )
     )
