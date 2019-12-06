@@ -14,7 +14,7 @@ import PopulationStudents from '../PopulationStudents'
 
 import CustomPopulationFilters from '../CustomPopulationFilters'
 import CoursePopulationGradeDist from '../CoursePopulationGradeDist'
-import CoursePopulationProgrammeCredits from '../CoursePopulationProgrammeCredits'
+import CoursePopulationCreditGainTable from '../CoursePopulationCreditGainTable'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
 import { useProgress, getStudentToTargetCourseDateMap, useTitle, getUserIsAdmin } from '../../common'
@@ -33,8 +33,7 @@ const CoursePopulation = ({
   clearPopulationFiltersDispatch,
   semesters,
   updatePopulationStudentsDispatch,
-  getFacultiesDispatch,
-  isAdmin
+  getFacultiesDispatch
 }) => {
   const parseQueryFromUrl = () => {
     const { location } = history
@@ -114,19 +113,17 @@ const CoursePopulation = ({
         <Header className="segmentTitle" size="medium" textAlign="center">
           {subHeader}
         </Header>
-        {isAdmin ? (
-          <Header className="segmentTitle" size="medium" textAlign="center">
-            <Button
-              compact
-              size="medium"
-              labelPosition="left"
-              onClick={() => updatePopulationStudentsDispatch(selectedStudents.filter(number => number.length < 10))}
-            >
-              <Icon name="refresh" />
-              update population
-            </Button>
-          </Header>
-        ) : null}
+        <Header className="segmentTitle" size="medium" textAlign="center">
+          <Button
+            compact
+            size="medium"
+            labelPosition="left"
+            onClick={() => updatePopulationStudentsDispatch(selectedStudents.filter(number => number.length < 10))}
+          >
+            <Icon name="refresh" />
+            update population
+          </Button>
+        </Header>
         <CustomPopulationFilters
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}
           samples={studentData.students}
@@ -156,7 +153,7 @@ const CoursePopulation = ({
             selectedStudents={selectedStudents}
           />
         </Segment>
-        <CoursePopulationProgrammeCredits
+        <CoursePopulationCreditGainTable
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}
           selectedStudents={selectedStudents}
           samples={studentData.students}
@@ -181,7 +178,6 @@ CoursePopulation.propTypes = {
   clearPopulationFiltersDispatch: func.isRequired,
   updatePopulationStudentsDispatch: func.isRequired,
   pending: bool.isRequired,
-  isAdmin: bool.isRequired,
   studentData: shape({}).isRequired,
   history: shape({}).isRequired,
   courseData: shape({}).isRequired,
