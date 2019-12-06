@@ -237,6 +237,7 @@ export const getStudentToTargetCourseDateMap = (students, codes) => {
 export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails) => {
   const studyprogrammes = []
   studyrights.forEach(sr => {
+    const facultyCode = sr.faculty_code
     const studyrightElements = sr.studyright_elements.filter(
       srE =>
         elementDetails[srE.code].type === 20 &&
@@ -251,7 +252,8 @@ export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCo
       studyprogrammes.push({
         name: elementDetails[newestStudyrightElement.code].name,
         startdate: newestStudyrightElement.startdate,
-        code: newestStudyrightElement.code
+        code: newestStudyrightElement.code,
+        facultyCode
       })
     }
   })
