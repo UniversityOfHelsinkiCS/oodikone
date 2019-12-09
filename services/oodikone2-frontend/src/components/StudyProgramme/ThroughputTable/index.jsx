@@ -157,6 +157,15 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
     }
   }
 
+  const headerCellPopUp = (title, cell) => {
+    if (!userRoles.includes('admin')) return cell
+    return (
+      <Popup trigger={cell} wide="very" position="left center">
+        <Popup.Content>{infotooltips.PopulationOverview[title]}</Popup.Content>
+      </Popup>
+    )
+  }
+
   const renderStudentsHeader = () => {
     let colSpan = 1
     let rowSpan = 1
@@ -165,7 +174,8 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
     if (renderRatioOfFinns) colSpan += 1
     if (!renderGenders && !renderRatioOfFinns) rowSpan += 1
 
-    return (
+    return headerCellPopUp(
+      'Students',
       <Table.HeaderCell colSpan={colSpan} rowSpan={rowSpan}>
         Students
       </Table.HeaderCell>
@@ -178,37 +188,6 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
       <Table.Cell>
         {`${year.nationalities.Finland || 0} (${Math.floor((year.nationalities.Finland / total) * 100) || 0}%)`}
       </Table.Cell>
-    )
-  }
-
-  const headerPopUp = title => {
-    if (!userRoles.includes('admin')) return title
-    return (
-      <Popup trigger={<div>{title}</div>} wide="very" position="left center">
-        <Popup.Content>placeholder</Popup.Content>
-      </Popup>
-    )
-  }
-
-  const headerCellPopUp = title => {
-    if (!userRoles.includes('admin'))
-      return (
-        <Table.HeaderCell rowSpan="2" colSpan="1">
-          {title}
-        </Table.HeaderCell>
-      )
-    return (
-      <Popup
-        trigger={
-          <Table.HeaderCell rowSpan="2" colSpan="1">
-            {title}
-          </Table.HeaderCell>
-        }
-        wide="very"
-        position="left center"
-      >
-        <Popup.Content>placeholder</Popup.Content>
-      </Popup>
     )
   }
 
@@ -242,20 +221,32 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
             <Table.Row>
               <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
               {renderStudentsHeader()}
-              <Table.HeaderCell rowSpan="2" colSpan="1">
-                {headerPopUp('Started')}
-              </Table.HeaderCell>
-              {CANCELLED_FEATURE_TOGGLED_ON && headerCellPopUp('Cancelled')}
-
-              <Table.HeaderCell colSpan={GRADUATED_FEATURE_TOGGLED_ON ? '3' : '1'}>Graduated</Table.HeaderCell>
-
-              <Table.HeaderCell rowSpan="1" colSpan={TRANSFERRED_FROM_FEATURE_TOGGLED_ON ? '2' : '1'}>
-                {headerPopUp('Transferred')}
-              </Table.HeaderCell>
-              <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
-              {(thesisTypes.includes('BACHELOR') || thesisTypes.includes('MASTER')) && (
-                <Table.HeaderCell colSpan={thesisTypes.length}>Thesis</Table.HeaderCell>
+              {headerCellPopUp(
+                'Started',
+                <Table.HeaderCell rowSpan="2" colSpan="1">
+                  Started
+                </Table.HeaderCell>
               )}
+              {CANCELLED_FEATURE_TOGGLED_ON &&
+                headerCellPopUp(
+                  'Cancelled',
+                  <Table.HeaderCell rowSpan="2" colSpan="1">
+                    Cancelled
+                  </Table.HeaderCell>
+                )}
+              {headerCellPopUp(
+                'Graduated',
+                <Table.HeaderCell colSpan={GRADUATED_FEATURE_TOGGLED_ON ? '3' : '1'}>Graduated</Table.HeaderCell>
+              )}
+              {headerCellPopUp(
+                'Transferred',
+                <Table.HeaderCell rowSpan="1" colSpan={TRANSFERRED_FROM_FEATURE_TOGGLED_ON ? '2' : '1'}>
+                  Transferred
+                </Table.HeaderCell>
+              )}
+              {headerCellPopUp('Credits', <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>)}
+              {(thesisTypes.includes('BACHELOR') || thesisTypes.includes('MASTER')) &&
+                headerCellPopUp('Thesis', <Table.HeaderCell colSpan={thesisTypes.length}>Thesis</Table.HeaderCell>)}
             </Table.Row>
 
             <Table.Row>
