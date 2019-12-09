@@ -1,7 +1,7 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
-import { Icon, Accordion, Button, Table } from 'semantic-ui-react'
+import { Icon, Accordion, Button, Table, Modal } from 'semantic-ui-react'
 import { differenceBy } from 'lodash'
 import { bool, func, number, arrayOf, shape, string } from 'prop-types'
 import { getCustomPopulation } from '../../../redux/populations'
@@ -22,6 +22,32 @@ const YearAccordion = ({ active, handleClick, index, years, students, bold }) =>
 
   const renderRow = (title, students) => {
     const onClick = () => handlePopulationClick(students)
+
+    if (students.length > 500) {
+      return (
+        <Table.Row>
+          <Table.Cell>
+            <b>{title}</b>
+          </Table.Cell>
+          <Table.Cell>{students.length}</Table.Cell>
+          <Table.Cell>
+            <Modal
+              trigger={<Button>Show combined population</Button>}
+              header={`Are you sure you want to see a population of ${students.length} students?`}
+              actions={[
+                'Cancel',
+                {
+                  key: 'fetch',
+                  content: 'Show population',
+                  positive: true,
+                  onClick: () => onClick()
+                }
+              ]}
+            />
+          </Table.Cell>
+        </Table.Row>
+      )
+    }
     return (
       <Table.Row>
         <Table.Cell>
@@ -36,7 +62,6 @@ const YearAccordion = ({ active, handleClick, index, years, students, bold }) =>
       </Table.Row>
     )
   }
-
   return (
     <Accordion fluid styled>
       <Accordion.Title style={{ color: `${bold ? 'black' : ''}` }} index={index} active={active} onClick={handleClick}>
