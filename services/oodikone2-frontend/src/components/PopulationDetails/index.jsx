@@ -27,42 +27,33 @@ class PopulationDetails extends Component {
     tagstudent: arrayOf(shape({})).isRequired
   }
 
+  renderCreditsGainTab = () => {
+    const { samples, selectedStudents, translate } = this.props
+    return (
+      <Tab.Pane attached={false}>
+        <PopulationCreditGainTable
+          sample={samples.filter(s => selectedStudents.includes(s.studentNumber))}
+          translate={translate}
+        />
+      </Tab.Pane>
+    )
+  }
+
+  renderQuartersTab = () => {
+    const { samples, selectedStudents, translate } = this.props
+    return (
+      <Tab.Pane attached={false}>
+        <CourseQuarters
+          sample={samples.filter(s => selectedStudents.includes(s.studentNumber))}
+          translate={translate}
+        />
+      </Tab.Pane>
+    )
+  }
+
   renderCourseStatistics = () => {
     const { samples, translate } = this.props
     const { CreditStatistics } = infoTooltips.PopulationStatistics
-    let statistics = null
-
-    if (samples) {
-      statistics = (
-        <Tab
-          menu={{ pointing: true }}
-          panes={[
-            {
-              menuItem: 'Credits gained',
-              render: () => (
-                <Tab.Pane attached={false}>
-                  <PopulationCreditGainTable
-                    sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
-                    translate={translate}
-                  />
-                </Tab.Pane>
-              )
-            },
-            {
-              menuItem: 'Quarters',
-              render: () => (
-                <Tab.Pane attached={false}>
-                  <CourseQuarters
-                    sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
-                    translate={translate}
-                  />
-                </Tab.Pane>
-              )
-            }
-          ]}
-        />
-      )
-    }
 
     return (
       <Segment>
@@ -70,13 +61,28 @@ class PopulationDetails extends Component {
           {translate('populationStatistics.creditStatisticsHeader')}
           <InfoBox content={CreditStatistics} />
         </Header>
-        {statistics}
+
+        {samples && (
+          <Tab
+            menu={{ pointing: true }}
+            panes={[
+              {
+                menuItem: 'Credits gained',
+                render: this.renderCreditsGainTab
+              },
+              {
+                menuItem: 'Quarters',
+                render: this.renderQuartersTab
+              }
+            ]}
+          />
+        )}
       </Segment>
     )
   }
 
   renderCreditGainGraphs = () => {
-    const { samples, translate } = this.props
+    const { samples, translate, selectedStudents } = this.props
     const { CreditAccumulationGraph } = infoTooltips.PopulationStatistics
 
     const graphs = (
@@ -86,28 +92,30 @@ class PopulationDetails extends Component {
         translate={translate}
         label={samples.label}
         maxCredits={samples.maxCredits}
-        selectedStudents={this.props.selectedStudents}
+        selectedStudents={selectedStudents}
       />
     )
 
     return (
       <Segment>
         <Header size="medium" dividing>
-          {translate('populationStatistics.graphSegmentHeader')} (for {this.props.selectedStudents.length} students)
+          {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
           <InfoBox content={CreditAccumulationGraph} />
         </Header>
-        {samples.length > 0 ? graphs : null}
+        {samples.length > 0 && graphs}
       </Segment>
     )
   }
 
   getExcludedFilters = () => {
+    const { query, tagstudent, selectedStudents } = this.props
+
     const excludedFilters = []
-    if (!this.props.query.studentStatuses.includes('CANCELLED')) {
+    if (!query.studentStatuses.includes('CANCELLED')) {
       excludedFilters.push('CanceledStudyright')
     }
-    const taggedStudentNumbers = this.props.tagstudent.map(tag => tag.studentnumber)
-    if (intersection(taggedStudentNumbers, this.props.selectedStudents) < 1) {
+    const taggedStudentNumbers = tagstudent.map(tag => tag.studentnumber)
+    if (intersection(taggedStudentNumbers, selectedStudents) < 1) {
       excludedFilters.push('TagFilter')
     }
 
@@ -125,15 +133,16 @@ class PopulationDetails extends Component {
       return <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
     }
 
+    const { query, selectedStudents, selectedStudentsByYear } = this.props
     return (
       <div>
-        <PopulationFilters samples={this.props.samples} exclude={this.getExcludedFilters()} />
+        <PopulationFilters samples={samples} exclude={this.getExcludedFilters()} />
         {this.renderCreditGainGraphs()}
-        {!this.props.query.years ? this.renderCourseStatistics() : null}
+        {!query.years && this.renderCourseStatistics()}
         <PopulationCourses
-          selectedStudents={this.props.selectedStudents}
-          selectedStudentsByYear={this.props.selectedStudentsByYear}
-          query={this.props.query}
+          selectedStudents={selectedStudents}
+          selectedStudentsByYear={selectedStudentsByYear}
+          query={query}
         />
         <PopulationStudents />
       </div>
