@@ -176,7 +176,8 @@ const ElementDetails = sequelize.define(
       type: Sequelize.STRING
     },
     name: { type: Sequelize.JSONB },
-    type: { type: Sequelize.INTEGER }
+    type: { type: Sequelize.INTEGER },
+    faculty_code: { type: Sequelize.STRING }
   },
   {
     tableName: 'element_details'
@@ -474,6 +475,8 @@ const ErrorData = sequelize.define('error_data', {
     type: Sequelize.JSONB
   }
 })
+
+ElementDetails.hasOne(Organisation, { foreignKey: 'faculty_code', sourceKey: 'code' })
 
 Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
