@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+const Raven = require('raven')
 const router = require('express').Router()
 const Population = require('../services/populations')
 const Filters = require('../services/filters')
@@ -26,6 +27,11 @@ const filterPersonalTags = (population, userId) => {
 router.post('/v2/populationstatistics/courses', async (req, res) => {
   try {
     if (!req.body.year || !req.body.semesters || !req.body.studyRights) {
+      Raven.captureMessage(new Error('The body should have a year, semester and study rights defined'), {
+        extra: {
+          FINDME: true
+        }
+      })
       res.status(400).json({ error: 'The body should have a year, semester and study rights defined' })
       return
     }
@@ -63,6 +69,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
       const result = await Population.bottlenecksOf(req.body)
 
       if (result.error) {
+        Raven.captureException(new Error(result.error), { extra: { FINDME: true } })
         res.status(400).json(result)
         return
       }
@@ -71,6 +78,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
     }
   } catch (e) {
     console.log(e)
+    Raven.captureException(e, { extra: { FINDME: true } })
     res.status(500).json({ error: e })
   }
 })
