@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react'
 import moment from 'moment'
-import { Header, Table, Grid, Icon, Label, Segment, Dropdown, Button, Modal } from 'semantic-ui-react'
+import { Header, Table, Grid, Icon, Label, Segment, Dropdown, Button, Modal, Popup } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, node } from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -181,6 +181,37 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
     )
   }
 
+  const headerPopUp = title => {
+    if (!userRoles.includes('admin')) return title
+    return (
+      <Popup trigger={<div>{title}</div>} wide="very" position="left center">
+        <Popup.Content>placeholder</Popup.Content>
+      </Popup>
+    )
+  }
+
+  const headerCellPopUp = title => {
+    if (!userRoles.includes('admin'))
+      return (
+        <Table.HeaderCell rowSpan="2" colSpan="1">
+          {title}
+        </Table.HeaderCell>
+      )
+    return (
+      <Popup
+        trigger={
+          <Table.HeaderCell rowSpan="2" colSpan="1">
+            {title}
+          </Table.HeaderCell>
+        }
+        wide="very"
+        position="left center"
+      >
+        <Popup.Content>placeholder</Popup.Content>
+      </Popup>
+    )
+  }
+
   return (
     <React.Fragment>
       <Header>
@@ -212,18 +243,14 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
               <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
               {renderStudentsHeader()}
               <Table.HeaderCell rowSpan="2" colSpan="1">
-                Started
+                {headerPopUp('Started')}
               </Table.HeaderCell>
-              {CANCELLED_FEATURE_TOGGLED_ON && (
-                <Table.HeaderCell rowSpan="2" colSpan="1">
-                  Cancelled
-                </Table.HeaderCell>
-              )}
+              {CANCELLED_FEATURE_TOGGLED_ON && headerCellPopUp('Cancelled')}
 
               <Table.HeaderCell colSpan={GRADUATED_FEATURE_TOGGLED_ON ? '3' : '1'}>Graduated</Table.HeaderCell>
 
               <Table.HeaderCell rowSpan="1" colSpan={TRANSFERRED_FROM_FEATURE_TOGGLED_ON ? '2' : '1'}>
-                Transferred
+                {headerPopUp('Transferred')}
               </Table.HeaderCell>
               <Table.HeaderCell colSpan="5">Credits</Table.HeaderCell>
               {(thesisTypes.includes('BACHELOR') || thesisTypes.includes('MASTER')) && (
