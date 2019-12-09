@@ -25,7 +25,7 @@ class PopulationDetails extends Component {
     isLoading: bool.isRequired,
     selectedStudentsByYear: shape({}).isRequired,
     query: shape({}).isRequired,
-    tagstudent: arrayOf({}).isRequired
+    tagstudent: arrayOf(shape({})).isRequired
   }
 
   constructor() {

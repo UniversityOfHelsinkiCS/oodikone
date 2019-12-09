@@ -7,7 +7,7 @@ import { getActiveLanguage } from 'react-localize-redux'
 
 import { getNewestProgramme, getTextIn } from '../../common'
 
-const CoursePopulationProgrammeCredits = ({
+const CoursePopulationCreditGainTable = ({
   samples,
   selectedStudents,
   codes,
@@ -152,11 +152,11 @@ const CoursePopulationProgrammeCredits = ({
   )
 }
 
-CoursePopulationProgrammeCredits.defaultProps = {
+CoursePopulationCreditGainTable.defaultProps = {
   studentToTargetCourseDateMap: null
 }
 
-CoursePopulationProgrammeCredits.propTypes = {
+CoursePopulationCreditGainTable.propTypes = {
   selectedStudents: arrayOf(string).isRequired,
   samples: arrayOf(shape({})).isRequired,
   codes: arrayOf(string).isRequired,
@@ -165,7 +165,7 @@ CoursePopulationProgrammeCredits.propTypes = {
   studentToTargetCourseDateMap: shape({}),
   language: string.isRequired,
   populationStatistics: shape({}).isRequired,
-  faculties: arrayOf({}).isRequired
+  faculties: arrayOf(shape({})).isRequired
 }
 
 const mapStateToProps = ({ populations, localize, faculties }) => {
@@ -179,4 +179,4 @@ const mapStateToProps = ({ populations, localize, faculties }) => {
 export default connect(
   mapStateToProps,
   null
-)(CoursePopulationProgrammeCredits)
+)(CoursePopulationCreditGainTable)
