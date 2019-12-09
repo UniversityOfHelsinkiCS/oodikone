@@ -143,7 +143,7 @@ const elementDetailFromData = (element, faculty_code) => {
     code,
     name: names,
     type: element_id,
-    faculty_code: code === 20 ? faculty_code : null
+    faculty_code: element_id === 20 ? faculty_code : null
   }
 }
 
