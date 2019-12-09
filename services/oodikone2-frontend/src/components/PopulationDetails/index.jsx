@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool, shape } from 'prop-types'
-import { Segment, Header, Message, Button, Icon, Tab } from 'semantic-ui-react'
+import { Segment, Header, Message, Tab } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { flattenDeep, intersection } from 'lodash'
-import scrollToComponent from 'react-scroll-to-component'
 import selectors from '../../selectors/populationDetails'
 import { getTotalCreditsFromCourses } from '../../common'
 import PopulationFilters from '../PopulationFilters'
@@ -28,66 +27,64 @@ class PopulationDetails extends Component {
     tagstudent: arrayOf(shape({})).isRequired
   }
 
-  constructor() {
-    super()
-    this.chart = React.createRef()
-    this.courses = React.createRef()
-    this.students = React.createRef()
-    this.filters = React.createRef()
-    this.state = {
-      navigationVisible: false
-    }
+  renderCreditsGainTab = () => {
+    const { samples, selectedStudents, translate } = this.props
+    return (
+      <Tab.Pane attached={false}>
+        <PopulationCreditGainTable
+          sample={samples.filter(s => selectedStudents.includes(s.studentNumber))}
+          translate={translate}
+        />
+      </Tab.Pane>
+    )
+  }
+
+  renderQuartersTab = () => {
+    const { samples, selectedStudents, translate } = this.props
+    return (
+      <Tab.Pane attached={false}>
+        <CourseQuarters
+          sample={samples.filter(s => selectedStudents.includes(s.studentNumber))}
+          translate={translate}
+        />
+      </Tab.Pane>
+    )
   }
 
   renderCourseStatistics = () => {
     const { samples, translate } = this.props
     const { CreditStatistics } = infoTooltips.PopulationStatistics
-    let statistics = null
-    if (samples) {
-      statistics = (
-        <Tab
-          menu={{ pointing: true }}
-          panes={[
-            {
-              menuItem: 'Credits gained',
-              render: () => (
-                <Tab.Pane attached={false}>
-                  <PopulationCreditGainTable
-                    sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
-                    translate={translate}
-                  />
-                </Tab.Pane>
-              )
-            },
-            {
-              menuItem: 'Quarters',
-              render: () => (
-                <Tab.Pane attached={false}>
-                  <CourseQuarters
-                    sample={samples.filter(s => this.props.selectedStudents.includes(s.studentNumber))}
-                    translate={translate}
-                  />
-                </Tab.Pane>
-              )
-            }
-          ]}
-        />
-      )
-    }
+
     return (
       <Segment>
         <Header size="medium" dividing>
           {translate('populationStatistics.creditStatisticsHeader')}
           <InfoBox content={CreditStatistics} />
         </Header>
-        {statistics}
+
+        {samples && (
+          <Tab
+            menu={{ pointing: true }}
+            panes={[
+              {
+                menuItem: 'Credits gained',
+                render: this.renderCreditsGainTab
+              },
+              {
+                menuItem: 'Quarters',
+                render: this.renderQuartersTab
+              }
+            ]}
+          />
+        )}
       </Segment>
     )
   }
 
   renderCreditGainGraphs = () => {
-    const { samples, translate } = this.props
+    const { samples, translate, selectedStudents } = this.props
     const { CreditAccumulationGraph } = infoTooltips.PopulationStatistics
+
     const graphs = (
       <CreditAccumulationGraphHighCharts
         students={samples}
@@ -95,110 +92,59 @@ class PopulationDetails extends Component {
         translate={translate}
         label={samples.label}
         maxCredits={samples.maxCredits}
-        selectedStudents={this.props.selectedStudents}
-        ref={this.chart}
+        selectedStudents={selectedStudents}
       />
     )
+
     return (
       <Segment>
         <Header size="medium" dividing>
-          {translate('populationStatistics.graphSegmentHeader')} (for {this.props.selectedStudents.length} students)
+          {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
           <InfoBox content={CreditAccumulationGraph} />
         </Header>
-        {samples.length > 0 ? graphs : null}
+        {samples.length > 0 && graphs}
       </Segment>
     )
   }
 
-  renderNavigationPanel = () => (
-    <div>
-      <Segment className="navigationpanel" style={{ position: 'fixed', right: '2%', bottom: '2%' }}>
-        <Header size="medium" textAlign="center">
-          Navigation
-          <Button
-            className="navigationbuttonclose"
-            icon
-            basic
-            floated="right"
-            onClick={() => this.setState({ navigationVisible: false })}
-          >
-            <Icon name="chevron right" />
-          </Button>
-        </Header>
-        <Button.Group vertical>
-          <Button onClick={() => scrollToComponent(this.filters.current, { align: 'top', offset: -40 })}>
-            Go To Filters
-          </Button>
-          <Button onClick={() => scrollToComponent(this.chart.current, { align: 'middle' })}>Go To Chart</Button>
-          <Button onClick={() => scrollToComponent(this.courses.current, { align: 'top', offset: -40 })}>
-            Go To Course List
-          </Button>
-          <Button onClick={() => scrollToComponent(this.students.current, { align: 'top', offset: -40 })}>
-            Go To Student List
-          </Button>
-        </Button.Group>
-      </Segment>
-    </div>
-  )
-
   getExcludedFilters = () => {
+    const { query, tagstudent, selectedStudents } = this.props
+
     const excludedFilters = []
-    if (!this.props.query.studentStatuses.includes('CANCELLED')) {
+    if (!query.studentStatuses.includes('CANCELLED')) {
       excludedFilters.push('CanceledStudyright')
     }
-    const taggedStudentNumbers = this.props.tagstudent.map(tag => tag.studentnumber)
-    if (intersection(taggedStudentNumbers, this.props.selectedStudents) < 1) {
+    const taggedStudentNumbers = tagstudent.map(tag => tag.studentnumber)
+    if (intersection(taggedStudentNumbers, selectedStudents) < 1) {
       excludedFilters.push('TagFilter')
     }
 
     return excludedFilters
   }
 
-  renderPopulationDetailsContent = () => (
-    <div>
-      <PopulationFilters ref={this.filters} samples={this.props.samples} exclude={this.getExcludedFilters()} />
-      {this.renderCreditGainGraphs()}
-      {!this.props.query.years ? this.renderCourseStatistics() : null}
-      <PopulationCourses
-        ref={this.courses}
-        selectedStudents={this.props.selectedStudents}
-        selectedStudentsByYear={this.props.selectedStudentsByYear}
-        query={this.props.query}
-      />
-      <PopulationStudents ref={this.students} />
-    </div>
-  )
-
   render() {
     const { samples, translate, queryIsSet, isLoading } = this.props
+
     if (isLoading || !queryIsSet) {
       return null
     }
+
     if (samples.length === 0) {
       return <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
     }
-    if (this.state.navigationVisible) {
-      return (
-        <div>
-          {this.renderPopulationDetailsContent()}
-          {this.renderNavigationPanel()}
-        </div>
-      )
-    }
+
+    const { query, selectedStudents, selectedStudentsByYear } = this.props
     return (
       <div>
-        {this.renderPopulationDetailsContent()}
-        <div>
-          <Button
-            className="navigationbuttonopen"
-            icon
-            basic
-            onClick={() => this.setState({ navigationVisible: true })}
-            style={{ position: 'fixed', right: '0.5%', bottom: '0.5%' }}
-          >
-            <Icon name="bars" />
-          </Button>
-        </div>
+        <PopulationFilters samples={samples} exclude={this.getExcludedFilters()} />
+        {this.renderCreditGainGraphs()}
+        {!query.years && this.renderCourseStatistics()}
+        <PopulationCourses
+          selectedStudents={selectedStudents}
+          selectedStudentsByYear={selectedStudentsByYear}
+          query={query}
+        />
+        <PopulationStudents />
       </div>
     )
   }
