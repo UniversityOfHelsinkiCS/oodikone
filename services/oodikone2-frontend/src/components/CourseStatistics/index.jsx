@@ -6,6 +6,7 @@ import { bool, shape, func } from 'prop-types'
 import './courseStatistics.css'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
+import FacultyLevelStatistics from './FacultyLevelStatistics'
 import SummaryTab from './SummaryTab'
 import ProgressBar from '../ProgressBar'
 import { useProgress, useTitle } from '../../common'
@@ -14,7 +15,8 @@ import { clearCourseStats } from '../../redux/coursestats'
 const MENU = {
   SUM: 'Summary',
   COURSE: 'Course',
-  QUERY: 'New query'
+  QUERY: 'New query',
+  FACULTY: 'Faculty statistics'
 }
 
 const CourseStatistics = props => {
@@ -40,6 +42,10 @@ const CourseStatistics = props => {
       {
         menuItem: MENU.COURSE,
         render: () => <SingleCourseTab selected={selected} />
+      },
+      {
+        menuItem: MENU.FACULTY,
+        render: () => <FacultyLevelStatistics />
       },
       {
         menuItem: {
