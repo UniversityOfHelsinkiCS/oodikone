@@ -9,6 +9,7 @@ class CourseYearlyStatsCounter {
   constructor() {
     this.groups = {}
     this.programmes = {}
+    this.facultyStats = {}
     this.history = {
       passed: new Set(),
       failed: new Set(),
@@ -17,7 +18,21 @@ class CourseYearlyStatsCounter {
   }
 
   initProgramme(code, name) {
-    this.programmes[code] = { name, students: {} }
+    this.programmes[code] = { name, students: {}, passed: {}, credits: {} }
+  }
+
+  initFacultyYear(code) {
+    const year = `${1949 + Number(code)}-${1950 + Number(code)}`
+    this.facultyStats[code] = { year, allStudents: [], allPassed: [], faculties: {}, allCredits: 0 }
+  }
+
+  initFaculty(yearcode, faculty_code, organization) {
+    this.facultyStats[yearcode].faculties[faculty_code] = {
+      name: organization.name,
+      students: [],
+      passed: [],
+      credits: 0
+    }
   }
 
   initGroup(groupcode, name, coursecode, yearcode) {
@@ -44,17 +59,46 @@ class CourseYearlyStatsCounter {
     return { attempted, passed, failed }
   }
 
-  markStudyProgramme(code, name, studentnumber, yearcode) {
+  markStudyProgramme(code, name, studentnumber, yearcode, passed, credit, faculty_code, organization) {
     if (!this.programmes[code]) {
       this.initProgramme(code, name)
     }
+    if (!this.facultyStats[yearcode]) {
+      this.initFacultyYear(yearcode)
+    }
+
+    if (faculty_code && !this.facultyStats[yearcode].faculties[faculty_code]) {
+      this.initFaculty(yearcode, faculty_code, organization)
+    }
+
     this.programmes[code].students[yearcode] = this.programmes[code].students[yearcode] || []
     this.programmes[code].students[yearcode].push(studentnumber)
+
+    if (!this.programmes[code].passed[yearcode]) {
+      this.programmes[code].passed[yearcode] = []
+      this.programmes[code].credits[yearcode] = 0
+    }
+
+    if (faculty_code && !this.facultyStats[yearcode].allStudents.includes(studentnumber)) {
+      this.facultyStats[yearcode].allStudents.push(studentnumber)
+      this.facultyStats[yearcode].faculties[faculty_code].students.push(studentnumber)
+    }
+    if (passed && !this.programmes[code].passed[yearcode].includes(studentnumber)) {
+      this.programmes[code].passed[yearcode].push(studentnumber)
+      this.programmes[code].credits[yearcode] += credit
+    }
+
+    if (faculty_code && passed && !this.facultyStats[yearcode].allPassed.includes(studentnumber)) {
+      this.facultyStats[yearcode].allPassed.push(studentnumber)
+      this.facultyStats[yearcode].faculties[faculty_code].passed.push(studentnumber)
+      this.facultyStats[yearcode].faculties[faculty_code].credits += credit
+      this.facultyStats[yearcode].allCredits += credit
+    }
   }
 
-  markStudyProgrammes(studentnumber, programmes, yearcode) {
-    programmes.forEach(({ code, name }) => {
-      this.markStudyProgramme(code, name, studentnumber, yearcode)
+  markStudyProgrammes(studentnumber, programmes, yearcode, passed, credit) {
+    programmes.forEach(({ code, name, faculty_code, organization }) => {
+      this.markStudyProgramme(code, name, studentnumber, yearcode, passed, credit, faculty_code, organization)
     })
   }
 
@@ -135,7 +179,8 @@ class CourseYearlyStatsCounter {
   getFinalStatistics() {
     return {
       programmes: this.programmes,
-      statistics: this.formatGroupStatistics()
+      statistics: this.formatGroupStatistics(),
+      facultyStats: this.facultyStats
     }
   }
 }
