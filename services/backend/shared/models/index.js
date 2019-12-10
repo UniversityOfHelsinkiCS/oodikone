@@ -476,7 +476,10 @@ const ErrorData = sequelize.define('error_data', {
   }
 })
 
-ElementDetails.hasOne(Organisation, { foreignKey: 'faculty_code', sourceKey: 'code' })
+Organisation.hasMany(ElementDetails, { foreignKey: 'faculty_code', sourceKey:'code' })
+
+Organisation.hasMany(Studyright, { foreignKey: 'faculty_code', sourceKey:'code' })
+Studyright.belongsTo(Organisation, { foreignKey: 'faculty_code', sourceKey: 'code' })
 
 Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
