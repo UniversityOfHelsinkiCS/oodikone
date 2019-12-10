@@ -10,7 +10,8 @@ const {
   ElementDetails,
   StudyrightElement,
   Studyright,
-  Semester
+  Semester,
+  Organisation
 } = require('../models')
 const { sequelizeKone, CourseDuplicates } = require('../models/models_kone')
 const Op = Sequelize.Op
@@ -118,7 +119,7 @@ const creditsForCourses = codes =>
           include: [
             {
               model: ElementDetails,
-              attributes: ['name', 'type'],
+              attributes: ['name', 'type', 'faculty_code'],
               where: {
                 type: {
                   [Op.eq]: 20
@@ -127,11 +128,14 @@ const creditsForCourses = codes =>
             },
             {
               model: Studyright,
-              attributes: ['prioritycode'],
+              attributes: ['prioritycode', 'faculty_code'],
               where: {
                 prioritycode: {
                   [Op.eq]: 1
                 }
+              },
+              include: {
+                model: Organisation
               }
             }
           ]
@@ -616,14 +620,16 @@ const getGroupId = async code => {
   return duplicates ? duplicates.groupid : code
 }
 
-const formatStudyrightElement = ({ code, element_detail, startdate }) => ({
+const formatStudyrightElement = ({ code, element_detail, startdate, studyright }) => ({
   code,
   name: element_detail.name,
-  startdate
+  startdate,
+  faculty_code: studyright.faculty_code || null,
+  organization: studyright.organization || null
 })
 
 const parseCredit = credit => {
-  const { student, semester, grade, course_code } = credit
+  const { student, semester, grade, course_code, credits } = credit
   const { studentnumber, studyright_elements: elements } = student
   const { yearcode, yearname, semestercode, name: semestername } = semester
   return {
@@ -636,7 +642,8 @@ const parseCredit = credit => {
     grade,
     passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),
     studentnumber,
-    programmes: elements.map(formatStudyrightElement)
+    programmes: elements.map(formatStudyrightElement),
+    credits
   }
 }
 
@@ -674,7 +681,8 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses) => {
       yearcode,
       yearname,
       programmes,
-      coursecode
+      coursecode,
+      credits
     } = parseCredit(credit)
     const groupcode = separate ? semestercode : yearcode
     const groupname = separate ? semestername : yearname
@@ -685,10 +693,24 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses) => {
           en: 'Other',
           fi: 'Muu',
           sv: 'Andra'
+        },
+        faculty_code: 'OTHER',
+        organization: {
+          name: {
+            en: 'Other',
+            fi: 'Muu',
+            sv: 'Andra'
+          }
         }
       }
     ]
-    counter.markStudyProgrammes(studentnumber, programmes.length === 0 ? unknownProgramme : programmes, yearcode)
+    counter.markStudyProgrammes(
+      studentnumber,
+      programmes.length === 0 ? unknownProgramme : programmes,
+      yearcode,
+      passed,
+      credits
+    )
     counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode, yearcode)
     counter.markCreditToHistory(studentnumber, passed)
   }
