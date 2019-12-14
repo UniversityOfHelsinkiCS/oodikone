@@ -133,7 +133,10 @@ const CoursePopulation = ({
           coursePopulation
         />
         <Segment>
-          <Header>Grade distribution</Header>
+          <Header>
+            Grade distribution
+            <InfoBox content={infotooltips.PopulationStatistics.GradeDistributionCoursePopulation} />
+          </Header>
           <CoursePopulationGradeDist
             selectedStudents={selectedStudents}
             from={dateFrom}

@@ -130,5 +130,7 @@ export default {
     eli klikkaamalla haluamaansa kategoriaa saa näkyviin vain sen kategorian opiskelijat. 
     Tämä suodatin löytyy ”Filters” otsikon alta ja sen voi poistaa klikkaamalla mustaa rastia.`,
   ProgrammeDistributionCustomPopulation: `Näyttää opiskelijan viimeisimmän koulutusohjelman`,
-  ProgrammeDistributionCoursePopulation: `Näyttää sen koulutusohjelman, jossa opiskelija oli suorittaessaan kurssin`
+  ProgrammeDistributionCoursePopulation: `Näyttää sen koulutusohjelman, jossa opiskelija oli suorittaessaan kurssin`,
+  GradeDistributionCoursePopulation: `Näyttää korkeimman arvosanan, jonka opiskelija on saanut valitulla aikavälillä.`,
+  CreditDistributionCoursePopulation: `Näyttää tiedekunta-/ohjelmankohtaisen opintopistejakauman.`
 }

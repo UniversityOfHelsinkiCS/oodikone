@@ -5,6 +5,8 @@ import { Table, Segment, Header, Tab } from 'semantic-ui-react'
 import { maxBy } from 'lodash'
 import { getActiveLanguage } from 'react-localize-redux'
 
+import InfoBox from '../InfoBox'
+import infotooltips from '../../common/InfoToolTips'
 import { getNewestProgramme, getTextIn } from '../../common'
 
 const CreditGainTableRow = ({ statistics, code, language }) => {
@@ -149,7 +151,10 @@ const CoursePopulationCreditGainTable = ({
 
   return (
     <Segment>
-      <Header>Credit gains</Header>
+      <Header>
+        Credit gains
+        <InfoBox content={infotooltips.PopulationStatistics.CreditDistributionCoursePopulation} />
+      </Header>
       <Tab panes={panes} />
     </Segment>
   )
