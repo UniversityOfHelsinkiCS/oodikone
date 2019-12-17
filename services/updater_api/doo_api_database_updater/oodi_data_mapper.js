@@ -57,7 +57,6 @@ const getStudentFromData = (student, studyrights) => {
     firstnames: student.first_names,
     communicationlanguage: language.en || language.fi || language.sv,
     dateofuniversityenrollment: universityEnrollmentDateFromStudyRights(studyrights),
-    matriculationexamination: null,
     abbreviatedname: [student.last_name, student.first_names].join(' '),
     gender_code: student.gender_code,
     gender_fi: gender.fi,

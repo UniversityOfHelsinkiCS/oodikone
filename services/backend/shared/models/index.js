@@ -15,7 +15,6 @@ const Student = sequelize.define(
     communicationlanguage: { type: Sequelize.STRING },
     creditcount: { type: Sequelize.INTEGER },
     dateofuniversityenrollment: { type: Sequelize.DATE },
-    matriculationexamination: { type: Sequelize.STRING },
     email: { type: Sequelize.STRING },
     phone: { type: Sequelize.STRING },
     city_fi: { type: Sequelize.STRING },
