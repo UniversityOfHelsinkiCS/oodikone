@@ -33,17 +33,6 @@ export const sexFilter = params => {
     filter: student => student.gender_code === gender
   }
 }
-export const matriculationFilter = params => {
-  const { matriculationexamination } = params
-  return {
-    id: uuidv4(),
-    type: 'HasMatriculation',
-    params: {
-      matriculationexamination
-    },
-    filter: student => student.matriculationexamination === matriculationexamination
-  }
-}
 export const creditsAtLeast = params => {
   const { credit } = params
   return {
@@ -386,7 +375,6 @@ const typeList = {
   CreditsLessThanFromMandatory: creditsLessThanFromMandatory,
   CreditsLessThan: creditsLessThan,
   CreditsAtLeast: creditsAtLeast,
-  HasMatriculation: matriculationFilter,
   SexFilter: sexFilter,
   GradeMeanFilter: gradeMeanFilter,
   CourseParticipation: courseParticipation,
