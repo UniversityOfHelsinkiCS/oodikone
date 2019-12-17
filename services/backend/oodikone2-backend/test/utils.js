@@ -89,7 +89,6 @@ const generateStudents = async amount => {
       dateoflastcredit,
       dateofuniversityenrollment,
       gradestudent: `${numberFromTo(0, 1)}`,
-      matriculationexamination: `${numberFromTo(0, 1)}`,
       nationalities: ['fi', 'sv', 'en'][numberFromTo(0, 2)],
       semesterenrollmenttypecode: [null, '1.0', '2.0'][numberFromTo(0, 2)],
       sex: ['female', 'male'][numberFromTo(0, 1)],

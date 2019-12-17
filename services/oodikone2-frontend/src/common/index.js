@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import moment from 'moment'
 import jwtDecode from 'jwt-decode'
 import Datetime from 'react-datetime'
-import { uniqBy, filter, maxBy, chunk, isEqual } from 'lodash'
+import { filter, maxBy, chunk, isEqual } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
 import qs from 'query-string'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT, SEARCH_HISTORY_VERSION } from '../constants'
@@ -74,8 +74,7 @@ export const studyrightTypes = { degree: '10', programme: '20', speciality: '30'
 
 export const getStudentTotalCredits = student => {
   const passedCourses = student.courses.filter(c => c.passed && !c.isStudyModuleCredit)
-  const uniqueCourses = uniqBy(passedCourses, 'course_code')
-  return uniqueCourses.reduce((a, b) => a + b.credits, 0)
+  return passedCourses.reduce((a, b) => a + b.credits, 0)
 }
 
 export const getStudentGradeMean = student => {
