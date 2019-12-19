@@ -26,6 +26,7 @@ class SingleCourseTab extends Component {
   render() {
     const { selected, selectedStatistic } = this.getStats()
     const { courses } = this.props
+    if (!selectedStatistic) return null
     return (
       <div>
         <Segment>

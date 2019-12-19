@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Header, Segment, Tab } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -24,9 +24,15 @@ const CourseStatistics = props => {
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [selected, setSelected] = useState(undefined)
-
   const { onProgress, progress } = useProgress(loading)
   useTitle('Course statistics')
+
+  useEffect(() => {
+    if (statsIsEmpty) {
+      setSelected(undefined)
+      setActiveIndex(0)
+    }
+  }, [statsIsEmpty])
 
   const switchToCourse = coursecode => {
     setActiveIndex(1)
