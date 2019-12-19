@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Header, Segment, Tab } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { bool, shape, func } from 'prop-types'
+import { bool, shape, func, string } from 'prop-types'
 import './courseStatistics.css'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
@@ -20,13 +20,19 @@ const MENU = {
 }
 
 const CourseStatistics = props => {
-  const { singleCourseStats, clearCourseStats, history, statsIsEmpty, loading } = props
+  const { singleCourseStats, clearCourseStats, history, statsIsEmpty, loading, initCourseCode } = props
 
   const [activeIndex, setActiveIndex] = useState(0)
-  const [selected, setSelected] = useState(undefined)
-
+  const [selected, setSelected] = useState(initCourseCode)
   const { onProgress, progress } = useProgress(loading)
   useTitle('Course statistics')
+
+  useEffect(() => {
+    if (statsIsEmpty) {
+      setSelected(initCourseCode)
+      setActiveIndex(0)
+    }
+  }, [statsIsEmpty])
 
   const switchToCourse = coursecode => {
     setActiveIndex(1)
@@ -41,7 +47,7 @@ const CourseStatistics = props => {
       },
       {
         menuItem: MENU.COURSE,
-        render: () => <SingleCourseTab selected={selected} />
+        render: () => <SingleCourseTab selected={selected || initCourseCode} />
       },
       {
         menuItem: MENU.FACULTY,
@@ -98,7 +104,8 @@ CourseStatistics.propTypes = {
   singleCourseStats: bool.isRequired,
   history: shape({}).isRequired,
   clearCourseStats: func.isRequired,
-  loading: bool.isRequired
+  loading: bool.isRequired,
+  initCourseCode: string.isRequired
 }
 
 const mapStateToProps = ({ courseStats }) => {
@@ -108,7 +115,8 @@ const mapStateToProps = ({ courseStats }) => {
     error: courseStats.error,
     statsIsEmpty: courses.length === 0,
     singleCourseStats: courses.length === 1,
-    loading: courseStats.pending
+    loading: courseStats.pending,
+    initCourseCode: courses[0] || ''
   }
 }
 
