@@ -12,11 +12,7 @@ class SingleCourseTab extends Component {
 
   getStats = () => {
     const { stats } = this.props
-    const statistics = Object.values(stats)
-    let { selected } = this.state
-    if (!selected && statistics.length > 0) {
-      selected = statistics[0].coursecode
-    }
+    const { selected } = this.state
     return {
       selected,
       selectedStatistic: stats[selected]
@@ -26,6 +22,7 @@ class SingleCourseTab extends Component {
   render() {
     const { selected, selectedStatistic } = this.getStats()
     const { courses } = this.props
+    if (!selectedStatistic) return null
     return (
       <div>
         <Segment>
@@ -60,11 +57,7 @@ class SingleCourseTab extends Component {
 SingleCourseTab.propTypes = {
   stats: shape({}).isRequired,
   courses: arrayOf(shape({})).isRequired,
-  selected: oneOfType([number, string])
-}
-
-SingleCourseTab.defaultProps = {
-  selected: undefined
+  selected: oneOfType([number, string]).isRequired
 }
 
 const mapStateToProps = state => ({

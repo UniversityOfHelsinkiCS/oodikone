@@ -289,7 +289,7 @@ class SingleCourseStats extends Component {
   }
 
   render() {
-    const { programmes, maxYearsToCreatePopulationFrom } = this.props
+    const { programmes, maxYearsToCreatePopulationFrom, stats } = this.props
     const { primary, comparison, fromYear, toYear } = this.state
     const statistics = this.filteredProgrammeStatistics()
     const { filteredYears } = this.filteredYearsAndSemesters()
@@ -301,6 +301,8 @@ class SingleCourseStats extends Component {
         return { ...e, students: [...students], size: students.size }
       })
       .filter(e => e.size > 0)
+
+    if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
 
     return (
       <div>
