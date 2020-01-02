@@ -383,6 +383,10 @@ const Transfers = sequelize.define(
   {
     indexes: [
       {
+        fields: ['studyrightid', 'sourcecode', 'targetcode', 'transferdate', 'studentnumber'],
+        unique: true
+      },
+      {
         fields: ['studentnumber'],
         name: 'transfers_studentnumber'
       }
