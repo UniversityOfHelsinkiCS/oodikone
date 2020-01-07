@@ -34,6 +34,7 @@ const PopulationCourses = ({
     gpc({
       ...selectedPopulationCourses.query,
       uuid: uuidv4(),
+      studyRights: [query.studyRights.programme],
       selectedStudents,
       selectedStudentsByYear,
       year: query.year,

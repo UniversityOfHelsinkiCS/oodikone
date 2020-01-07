@@ -58,7 +58,9 @@ describe('Population Statistics tests', () => {
 
     cy.get("@enrollmentSelect").its(`${[0]}.value`).then((beforeVal) => {
       cy.get("@enrollmentSelect").click()
-      cy.get("table").contains("2014-2015").click()
+      // go back to 2010-2019
+      cy.get(".yearSelectInput .rdtPrev").click()
+      cy.get(".yearSelectInput table").contains("2014-2015").click()
       cy.get("@enrollmentSelect").should('not.have.value', beforeVal)
     })
 
