@@ -130,7 +130,7 @@ const updateStudyRights = async (studyRights, studentnumber, transaction) => {
 
     Transfers.bulkCreate(transfers, {
       transaction,
-      updateOnDuplicate: getColumnsToUpdate(transfers)
+      ignoreDuplicates: true
     })
   ])
 }
