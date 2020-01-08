@@ -67,6 +67,8 @@ const FacultyLevelStatistics = () => {
     language: getActiveLanguage(localize).code
   }))
   const yearcodes = uniq(flatten(Object.values(courseStats).map(c => Object.keys(c.facultyStats))))
+    .sort()
+    .reverse()
 
   const [selectedYear, setSelectedYear] = useState(yearcodes[0])
 
