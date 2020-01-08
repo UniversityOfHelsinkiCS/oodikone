@@ -5,13 +5,15 @@ import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
 import { sortBy } from 'lodash'
 import { func, arrayOf, shape, bool } from 'prop-types'
+
 import { clearCourses, findCoursesV2, toggleUnifyOpenUniCourses } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
+import { getCourseSearchResults } from '../../../selectors/courses'
+import { useSearchHistory } from '../../../common/hooks'
+import { validateInputLength } from '../../../common'
+import { mergeCourses } from '../courseStatisticsUtils'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
-import { getCourseSearchResults } from '../../../selectors/courses'
-import { useSearchHistory, validateInputLength } from '../../../common'
-import { mergeCourses } from '../courseStatisticsUtils'
 import SearchHistory from '../../SearchHistory'
 
 const INITIAL = {

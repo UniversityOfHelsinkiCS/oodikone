@@ -4,7 +4,7 @@ import { Button, Modal, Form, TextArea, Segment, Header } from 'semantic-ui-reac
 import { getTranslate } from 'react-localize-redux'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
 import { intersection, difference } from 'lodash'
-import { useProgress, useTitle } from '../../common'
+import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import { getCustomPopulation } from '../../redux/populations'
 import {

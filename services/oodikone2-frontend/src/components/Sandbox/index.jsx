@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Header, Segment, Grid, Message, Button } from 'semantic-ui-react'
 import './index.css'
-import { useTitle } from '../../common'
+import { useTitle } from '../../common/hooks'
 import Postman from '../Postman'
 import UpdateTopTeachers from './UpdateTopTeachers'
 
