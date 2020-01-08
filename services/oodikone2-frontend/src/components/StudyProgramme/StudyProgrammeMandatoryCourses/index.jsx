@@ -13,7 +13,7 @@ import {
 import MandatoryCourseTable from '../MandatoryCourseTable'
 import AddMandatoryCourses from '../AddMandatoryCourses'
 import MandatoryCourseLabels from '../MandatoryCourseLabels'
-import { useTabs } from '../../../common'
+import { useTabs } from '../../../common/hooks'
 
 const StudyProgrammeMandatoryCourses = props => {
   const {

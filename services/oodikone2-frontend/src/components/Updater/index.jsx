@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Header, Segment, Form, Button, Table, TextArea } from 'semantic-ui-react'
 import { callApi } from '../../apiConnection'
-import { cancelablePromise, useTitle } from '../../common'
+import { cancelablePromise } from '../../common'
+import { useTitle } from '../../common/hooks'
 
 const Updater = () => {
   const [amount, setAmount] = useState('')

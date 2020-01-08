@@ -9,7 +9,7 @@ import SingleCourseTab from './SingleCourseTab'
 import FacultyLevelStatistics from './FacultyLevelStatistics'
 import SummaryTab from './SummaryTab'
 import ProgressBar from '../ProgressBar'
-import { useProgress, useTitle } from '../../common'
+import { useProgress, useTitle } from '../../common/hooks'
 import { clearCourseStats } from '../../redux/coursestats'
 
 const MENU = {
