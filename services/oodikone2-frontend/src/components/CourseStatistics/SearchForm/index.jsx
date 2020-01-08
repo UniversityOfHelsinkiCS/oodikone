@@ -9,18 +9,41 @@ import { func, arrayOf, shape, bool } from 'prop-types'
 import { clearCourses, findCoursesV2, toggleUnifyOpenUniCourses } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import { getCourseSearchResults } from '../../../selectors/courses'
-import { useSearchHistory } from '../../../common/hooks'
+import { useSearchHistory, usePrevious } from '../../../common/hooks'
 import { validateInputLength } from '../../../common'
+import TSA from '../../../common/tsa'
 import { mergeCourses } from '../courseStatisticsUtils'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import SearchHistory from '../../SearchHistory'
+
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Course statistics search', action, name, value)
 
 const INITIAL = {
   courseName: '',
   courseCode: '',
   selectedCourses: {},
   separate: false
+}
+
+const useTSASearchResultsHook = (coursesLoading, courseName, courseCode, matchingCoursesLength) => {
+  const prevCoursesLoading = usePrevious(coursesLoading)
+
+  useEffect(() => {
+    const wasLoadingButFinished = prevCoursesLoading && !coursesLoading
+    if (!wasLoadingButFinished) {
+      // only send events after user has seen results
+      return
+    }
+
+    if (courseName && courseCode) {
+      sendAnalytics('Search with both name and code', `${courseName}, ${courseCode}`, matchingCoursesLength)
+    } else if (courseName) {
+      sendAnalytics('Search with name', courseName, matchingCoursesLength)
+    } else if (courseCode) {
+      sendAnalytics('Search with code', courseCode, matchingCoursesLength)
+    }
+  }, [coursesLoading, courseName, courseCode, matchingCoursesLength])
 }
 
 const SearchForm = props => {
@@ -30,6 +53,7 @@ const SearchForm = props => {
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
 
   const { courseName, courseCode, selectedCourses, separate } = state
+  const { coursesLoading, isLoading, matchingCourses, unifyOpenUniCourses } = props
 
   const parseQueryFromUrl = () => {
     const { location } = props
@@ -65,17 +89,21 @@ const SearchForm = props => {
     }
   }, [props.location.search])
 
+  useTSASearchResultsHook(coursesLoading, courseName, courseCode, matchingCourses.length)
+
   const onSelectCourse = course => {
     course.selected = !course.selected
     const isSelected = !!selectedCourses[course.code]
 
     if (isSelected) {
       const { [course.code]: omit, ...rest } = selectedCourses
+      sendAnalytics('Unselected course', course.name)
       setState({
         ...state,
         selectedCourses: rest
       })
     } else {
+      sendAnalytics('Selected course', course.name)
       setState({
         ...state,
         selectedCourses: {
@@ -92,6 +120,14 @@ const SearchForm = props => {
     const queryObject = { ...rest, courseCodes: JSON.stringify(courseCodes) }
     const searchString = qs.stringify(queryObject)
     history.push({ search: searchString })
+  }
+
+  const onSearchHistorySelected = historyItem => {
+    sendAnalytics(
+      'Select Previous Search',
+      historyItem && historyItem.courseCodes && historyItem.courseCodes.join && historyItem.courseCodes.join(',')
+    )
+    pushQueryToUrl(historyItem)
   }
 
   const onSubmitFormClick = () => {
@@ -122,17 +158,20 @@ const SearchForm = props => {
     return Promise.resolve()
   }
 
-  const onToggleCheckbox = (e, target) => {
-    const { name } = target
-    setState({ ...state, [name]: !state[name] })
+  const onToggleSeparateStatistics = () => {
+    const newValue = !state.separate
+    setState({ ...state, separate: newValue })
+    sendAnalytics('Toggle Separate stats for spring & fall', `${newValue}`)
   }
 
   const onToggleUnifyOpenUniCoursesCheckbox = () => {
+    const newValue = !unifyOpenUniCourses
+    sendAnalytics('Toggle Unify open university courses', `${newValue}`)
+
     setState({ ...state, selectedCourses: {} })
     props.toggleUnifyOpenUniCourses()
   }
 
-  const { isLoading, matchingCourses, unifyOpenUniCourses } = props
   const courses = matchingCourses.filter(c => !selectedCourses[c.code])
 
   const disabled = isLoading || Object.keys(selectedCourses).length === 0
@@ -191,7 +230,7 @@ const SearchForm = props => {
                 <Form.Checkbox
                   label="Separate statistics for Spring and Fall semesters"
                   name="separate"
-                  onChange={onToggleCheckbox}
+                  onChange={onToggleSeparateStatistics}
                   checked={separate}
                 />
                 <Form.Button
@@ -219,7 +258,7 @@ const SearchForm = props => {
       </Segment>
       <SearchHistory
         disabled={isLoading}
-        handleSearch={pushQueryToUrl}
+        handleSearch={onSearchHistorySelected}
         items={searchHistory}
         updateItem={updateItemInSearchHistory}
       />

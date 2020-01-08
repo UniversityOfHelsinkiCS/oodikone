@@ -3,6 +3,14 @@ import { chunk, isEqual } from 'lodash'
 import qs from 'query-string'
 import { SEARCH_HISTORY_VERSION } from '../constants'
 
+export const usePrevious = value => {
+  const ref = useRef()
+  useEffect(() => {
+    ref.current = value
+  })
+  return ref.current
+}
+
 export const useTabs = (id, initialTab, { location, replace }) => {
   const [tab, setTab] = useState(-1)
   const [didMount, setDidMount] = useState(false)
