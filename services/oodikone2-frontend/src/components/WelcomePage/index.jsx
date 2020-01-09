@@ -1,7 +1,8 @@
 import React from 'react'
 import { Container, Header, Image, Divider } from 'semantic-ui-react'
 import moment from 'moment'
-import { images, useTitle } from '../../common'
+import { images } from '../../common'
+import { useTitle } from '../../common/hooks'
 
 const WelcomePage = () => {
   useTitle()

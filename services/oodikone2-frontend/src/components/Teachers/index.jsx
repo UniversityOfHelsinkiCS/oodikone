@@ -7,7 +7,8 @@ import TeacherSearchTab from '../TeacherSearchTab'
 import TeacherPage from '../TeacherPage'
 import TeacherStatistics from '../TeacherStatistics'
 import TeacherLeaderBoard from '../TeacherLeaderBoard'
-import { useTabs, getUserIsAdmin, useTitle } from '../../common'
+import { getUserIsAdmin } from '../../common'
+import { useTabs, useTitle } from '../../common/hooks'
 
 const pane = (title, Content, icon) => ({
   menuItem: { key: title, content: title, icon },

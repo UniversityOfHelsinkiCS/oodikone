@@ -9,7 +9,7 @@ import { findStudents, getStudent, selectStudent } from '../../redux/students'
 import StudentSearch from '../StudentSearch'
 import StudentDetails from '../StudentDetails'
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
-import { useTitle } from '../../common'
+import { useTitle } from '../../common/hooks'
 
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
