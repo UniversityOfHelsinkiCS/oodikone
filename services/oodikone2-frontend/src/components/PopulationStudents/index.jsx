@@ -575,23 +575,23 @@ class PopulationStudents extends Component {
         render: () => (
           <Tab.Pane>
             <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
-              <div
-                style={{
-                  paddingLeft: '10px',
-                  minHeight: '300px',
-                  width: '100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}
-              >
-                {this.props.tags.length === 0 && (
+              {this.props.tags.length === 0 && (
+                <div
+                  style={{
+                    paddingLeft: '10px',
+                    minHeight: '300px',
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
+                >
                   <h3>
                     No tags defined. You can define them{' '}
                     <Link to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=5`}>here</Link>.
                   </h3>
-                )}
-              </div>
+                </div>
+              )}
               {this.props.tags.length > 0 && (
                 <React.Fragment>
                   <TagPopulation
