@@ -86,9 +86,14 @@ services:
     environment:
       REDIS: redis
       DB_URL: postgres://postgres@db:5432/tkt_oodi
+      # DB_MAX_CONNECTIONS: 90 # defaults to 5
       DB_URL_KONE: postgres://postgres@db_kone:5432/db_kone
+      # if NODE_ENV === 'test', these are used instead
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       TEST_DB_KONE: postgres://postgres@db_kone:5432/db_kone_test
+      # same but for NODE_ENV === 'anon'
+      # ANON_DB:
+      # ANON_DB_KONE:
       TOKEN_SECRET: IWannaBeTheVeryBest
       USERSERVICE_URL: http://userservice:4567
       USAGESERVICE_URL: http://usageservice:545
