@@ -172,10 +172,64 @@ class SingleCourseStats extends Component {
         }
         return { code, name, cumulative, students, coursecode }
       })
+    const totals = progStats.reduce(
+      (acc, curr) => {
+        const passed = acc.cumulative.categories.passed + curr.cumulative.categories.passed
+        const failed = acc.cumulative.categories.failed + curr.cumulative.categories.failed
+        const cgrades = acc.cumulative.grades
+
+        Object.keys(curr.cumulative.grades).forEach(grade => {
+          if (!cgrades[grade]) cgrades[grade] = 0
+          cgrades[grade] += curr.cumulative.grades[grade]
+        })
+        const { passedFirst, failedFirst } = curr.students.categories
+
+        const newPassedFirst = passedFirst
+          ? acc.students.categories.passedFirst + passedFirst
+          : acc.students.categories.passedFirst
+        const newFailedFirst = failedFirst
+          ? acc.students.categories.failedFirst + failedFirst
+          : acc.students.categories.failedFirst
+
+        const sgrades = acc.students.grades
+
+        Object.keys(curr.students.grades).forEach(grade => {
+          if (!sgrades[grade]) sgrades[grade] = 0
+          sgrades[grade] += curr.students.grades[grade]
+        })
+
+        return {
+          ...acc,
+          coursecode: curr.coursecode,
+          cumulative: { categories: { passed, failed }, grades: cgrades },
+          students: { categories: { passedFirst: newPassedFirst, failedFirst: newFailedFirst }, grades: sgrades }
+        }
+      },
+      {
+        code: 9999,
+        name: 'Total',
+        coursecode: '000',
+        cumulative: {
+          categories: {
+            passed: 0,
+            failed: 0
+          },
+          grades: {}
+        },
+        students: {
+          categories: {
+            passedFirst: 0,
+            failedFirst: 0
+          },
+          grades: {}
+        }
+      }
+    )
     return {
-      codes: progCodes,
+      codes: progCodes.concat,
       name,
-      stats: progStats
+      stats: progStats.concat(totals),
+      totals
     }
   }
 
@@ -231,7 +285,6 @@ class SingleCourseStats extends Component {
           comparisonProgrammes.length === 1 ? this.getProgrammeName(comparisonProgrammes[0]) : 'Comparison'
         )
       : undefined
-
     return {
       primary: pstats || undefined,
       comparison: cstats || undefined
@@ -301,7 +354,6 @@ class SingleCourseStats extends Component {
         return { ...e, students: [...students], size: students.size }
       })
       .filter(e => e.size > 0)
-
     if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
 
     return (
