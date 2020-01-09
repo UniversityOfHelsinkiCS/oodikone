@@ -11,6 +11,12 @@ if (isTest) {
   DB_URL = process.env.ANON_DB
   DB_URL_KONE = process.env.ANON_DB_KONE
 }
+
+let DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS, 10)
+if (isNaN(DB_MAX_CONNECTIONS)) {
+  DB_MAX_CONNECTIONS = 5 // sequelize's default
+}
+
 const frontend_addr = process.env.FRONT_URL
 const redis = process.env.REDIS
 const TOKEN_SECRET = process.env.TOKEN_SECRET
@@ -73,6 +79,7 @@ module.exports = {
   frontend_addr,
   DB_URL,
   DB_URL_KONE,
+  DB_MAX_CONNECTIONS,
   redis,
   TOKEN_SECRET,
   DB_SCHEMA,

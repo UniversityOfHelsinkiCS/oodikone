@@ -5,7 +5,11 @@ const conf = require('../conf-backend')
 const sequelize = new Sequelize(conf.DB_URL, {
   schema: conf.DB_SCHEMA,
   searchPath: conf.DB_SCHEMA,
-  logging: false
+  logging: false,
+  pool: {
+    min: 0,
+    max: conf.DB_MAX_CONNECTIONS
+  }
 })
 sequelize.query(`SET SESSION search_path to ${conf.DB_SCHEMA}`)
 
