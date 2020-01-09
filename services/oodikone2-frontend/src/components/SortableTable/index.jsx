@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Table } from 'semantic-ui-react'
 import { shape, arrayOf, string, func, bool, element, oneOfType } from 'prop-types'
 import { sortBy } from 'lodash'
-import { useChunk } from '../../common'
+import { useChunk } from '../../common/hooks'
 
 const DIRECTIONS = {
   ASC: 'ascending',
