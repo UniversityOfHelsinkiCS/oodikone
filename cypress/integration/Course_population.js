@@ -28,7 +28,7 @@ describe('Course population tests', () => {
     cy.contains("Käyttöjärjestelmät")
     cy.contains("TKT20003")
 
-    cy.get(':nth-child(2) > :nth-child(1) > div > .item > .level').click()
+    cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
     cy.contains('Population of course Käyttöjärjestelmät 2017-18')
     cy.contains('TKT20003, 582219, 582640, 582497')
     cy.contains('Students (all=39)')
@@ -47,7 +47,7 @@ describe('Course population tests', () => {
     cy.get(':nth-child(2) > .ten > :nth-child(1)').click()
     cy.contains("Fetch statistics").should('be.enabled').click()
 
-    cy.get(':nth-child(1) > :nth-child(1) > div > .item > .level').click()
+    cy.get(':nth-child(2) > :nth-child(1) > div > .item > .level').click()
     cy.contains('Population of course Tietokantojen perusteet 2017-18')
     cy.contains('add').click()
     

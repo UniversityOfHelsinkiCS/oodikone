@@ -32,14 +32,17 @@ const CumulativeTable = ({ stats, name, alternatives, separate }) => {
             key: 'TIME',
             title: 'Time',
             getRowVal: s => s.code,
-            getRowContent: s => (
-              <div>
-                {s.name}
-                <Item as={Link} to={showPopulation(s.code, s.name, s)}>
-                  <Icon name="level up alternate" />
-                </Item>
-              </div>
-            ),
+            getRowContent: s =>
+              s.code !== 9999 ? (
+                <div>
+                  {s.name}
+                  <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+                    <Icon name="level up alternate" />
+                  </Item>
+                </div>
+              ) : (
+                <div>{s.name}</div>
+              ),
             cellProps: { width: 4 }
           },
           { key: 'PASSED', title: 'Passed', getRowVal: s => s.cumulative.categories.passed, cellProps: { width: 4 } },
