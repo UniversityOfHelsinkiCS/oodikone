@@ -549,23 +549,23 @@ class PopulationStudents extends Component {
                   </React.Fragment>
                 )}
               </div>
-              <div
-                style={{
-                  paddingLeft: '10px',
-                  minHeight: '300px',
-                  width: '100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}
-              >
-                {this.props.mandatoryCourses.length === 0 && (
+              {this.props.mandatoryCourses.length === 0 && (
+                <div
+                  style={{
+                    paddingLeft: '10px',
+                    minHeight: '300px',
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
+                >
                   <h3>
                     No mandatory courses defined. You can define them{' '}
                     <Link to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=1`}>here</Link>.
                   </h3>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </Tab.Pane>
         )
