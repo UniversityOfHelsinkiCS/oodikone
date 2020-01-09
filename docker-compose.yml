@@ -86,6 +86,7 @@ services:
     environment:
       REDIS: redis
       DB_URL: postgres://postgres@db:5432/tkt_oodi
+      # DB_MAX_CONNECTIONS: 90 # defaults to 5
       DB_URL_KONE: postgres://postgres@db_kone:5432/db_kone
       # if NODE_ENV === 'test', these are used instead
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
