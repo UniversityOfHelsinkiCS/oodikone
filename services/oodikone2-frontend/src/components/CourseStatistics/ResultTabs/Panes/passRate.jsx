@@ -77,7 +77,7 @@ const getPassRateStudSeriesFromStats = stats => {
 const PassRate = ({ primary, comparison, viewMode, isRelative = false }) => {
   const isCumulativeMode = viewMode === viewModeNames.CUMULATIVE
 
-  const primaryStats = primary.stats
+  const primaryStats = primary.stats.filter(stat => stat.name !== 'Total')
   const statYears = primaryStats.map(year => year.name)
   const comparisonStats = comparison ? comparison.stats : []
   const passGraphSerieFn = isCumulativeMode ? getPassRateCumSeriesFromStats : getPassRateStudSeriesFromStats
