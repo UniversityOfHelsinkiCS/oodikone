@@ -29,7 +29,7 @@ const formatStudyrights = async (api, studentnumber) => {
     const studyright = mapper.getStudyRightFromData(studyrightData, studentnumber)
 
     const elementDetails = studyrightData.elements.map(element =>
-      mapper.elementDetailFromData(element, studyrightData.faculty_code)
+      mapper.elementDetailFromData(element)
     )
     const studyRightElements = studyrightData.elements.map(element =>
       mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber)
