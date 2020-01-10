@@ -119,7 +119,7 @@ const creditsForCourses = codes =>
           include: [
             {
               model: ElementDetails,
-              attributes: ['name', 'type', 'faculty_code'],
+              attributes: ['name', 'type'],
               where: {
                 type: {
                   [Op.eq]: 20
