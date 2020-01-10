@@ -135,7 +135,7 @@ const getStudyRightFromData = (data, studentNumber) => {
   }
 }
 
-const elementDetailFromData = (element) => {
+const elementDetailFromData = element => {
   const { code, name, element_id } = element
   const names = getTextsByLanguage(name)
   return {
