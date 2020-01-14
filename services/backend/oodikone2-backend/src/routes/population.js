@@ -65,7 +65,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
       const result = await Population.bottlenecksOf(req.body)
 
       if (result.error) {
-        Sentry.captureException(new Error(result.error), { extra: { FINDME: true } })
+        Sentry.captureException(new Error(result.error))
         res.status(400).json(result)
         return
       }
