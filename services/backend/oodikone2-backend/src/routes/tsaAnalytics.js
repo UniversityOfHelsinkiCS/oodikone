@@ -1,4 +1,4 @@
-const Raven = require('raven')
+const Sentry = require('@sentry/node')
 const router = require('express').Router()
 const tsaService = require('../services/tsaService')
 
@@ -11,14 +11,14 @@ router.post('/event', (req, res) => {
 
   // don't await here because frontend doesn't care if it succeeds
   tsaService.sendTsaEvent(req.decodedToken.userId, { group, name, label, value }).catch(e => {
-    let ravenOpts = { req }
-    // if error was caused by a 400, dig out the JSON response for Sentry
-    if (e && e.isAxiosError && e.response && e.response.data) {
-      ravenOpts.extra = {
-        errorData: e.response.data
+    Sentry.withScope(scope => {
+      // if error was caused by a 400, dig out the JSON response for Sentry
+      if (e.isAxiosError && e.response && e.response.data) {
+        scope.setExtra({ error: e.response.data })
       }
-    }
-    Raven.captureException(e, ravenOpts)
+
+      Sentry.captureException(e)
+    })
   })
 
   res.status(200).end()

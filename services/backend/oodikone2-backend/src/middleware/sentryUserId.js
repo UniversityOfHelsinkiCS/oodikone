@@ -1,11 +1,12 @@
-const Raven = require('raven')
+const Sentry = require('@sentry/node')
 
 const sentryUserIdMiddleware = (req, res, next) => {
-  if (req.decodedToken && req.decodedToken.userId) {
-    Raven.setContext({
-      user: { id: req.decodedToken.userId }
+  Sentry.getCurrentHub().configureScope(scope => {
+    scope.setUser({
+      username: req.decodedToken && req.decodedToken.userId
     })
-  }
+  })
+
   next()
 }
 
