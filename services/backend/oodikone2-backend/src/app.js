@@ -1,7 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
-const Raven = require('raven')
+const Sentry = require('@sentry/node')
 const conf = require('./conf-backend')
 const routes = require('./routes')
 const { startCron } = require('./events')
@@ -12,9 +12,13 @@ initializeDatabaseConnection()
   .then(() => {
     const app = express()
 
-    startCron()
+    Sentry.init({
+      dsn: process.env.SENTRY_ADDR,
+      environment: process.env.TAG
+    })
+    app.use(Sentry.Handlers.requestHandler())
 
-    Raven.config(process.env.SENTRY_ADDR, { captureUnhandledRejections: true, environment: process.env.TAG }).install()
+    startCron()
 
     app.use(cors({ credentials: true, origin: conf.frontend_addr }))
     app.use(bodyParser.json())
@@ -34,6 +38,8 @@ initializeDatabaseConnection()
       const results = { error: 'unknown endpoint' }
       res.status(404).json(results)
     })
+
+    app.use(Sentry.Handlers.errorHandler())
 
     const server = app.listen(PORT, () => console.log(`Backend listening on port ${PORT}!`))
     process.on('SIGTERM', () => {
