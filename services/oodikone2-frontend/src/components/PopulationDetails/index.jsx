@@ -15,6 +15,27 @@ import PopulationCourses from '../PopulationCourses'
 import PopulationCreditGainTable from '../PopulationCreditGainTable'
 import InfoBox from '../InfoBox'
 import infoTooltips from '../../common/InfoToolTips'
+import TSA from '../../common/tsa'
+
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
+
+const useTabChangeAnalytics = action => {
+  const previousTabIndex = React.useRef(0)
+
+  const handleTabChange = useCallback(
+    (e, data) => {
+      const { activeIndex, panes } = data
+
+      if (previousTabIndex.current !== activeIndex) {
+        sendAnalytics(action, panes[activeIndex].menuItem)
+        previousTabIndex.current = activeIndex
+      }
+    },
+    [action, previousTabIndex]
+  )
+
+  return { handleTabChange }
+}
 
 const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
   const { CreditStatistics } = infoTooltips.PopulationStatistics
@@ -41,6 +62,8 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
     )
   }, [samples, selectedStudents, translate])
 
+  const { handleTabChange } = useTabChangeAnalytics('Change Credit statistics tab')
+
   return (
     <Segment>
       <Header size="medium" dividing>
@@ -50,6 +73,7 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
 
       {samples && (
         <Tab
+          onTabChange={handleTabChange}
           menu={{ pointing: true }}
           panes={[
             {
