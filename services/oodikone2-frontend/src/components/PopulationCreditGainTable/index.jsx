@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { connect } from 'react-redux'
 import { func, arrayOf, object, number } from 'prop-types'
 import { Progress } from 'semantic-ui-react'
 import SearchResultTable from '../SearchResultTable'
 import { getStudentTotalCredits } from '../../common'
+import TSA from '../../common/tsa'
 
 import { creditsLessThan, creditsAtLeast } from '../../populationFilters'
 import { setPopulationFilter, removePopulationFilter } from '../../redux/populationFilters'
@@ -43,21 +44,32 @@ const filterStudents = (students, minCredits, maxCredits = Infinity) => {
   }
 }
 
-const PopulationCreditGainTable = props => {
-  const setCreditFilter = row => {
-    props.filters.map(filter => props.removePopulationFilter(filter.id))
-    const credits = row[0].split(/(\d+)/).map(count => Number(count))
-    if (credits[1]) {
-      props.setPopulationFilter(creditsAtLeast({ credit: credits[1] }))
-      if (credits[3]) {
-        props.setPopulationFilter(creditsLessThan({ credit: credits[3] }))
-      }
-    } else {
-      props.setPopulationFilter(creditsLessThan({ credit: 1 }))
-    }
-  }
+const PopulationCreditGainTable = ({
+  translate,
+  sample,
+  months,
+  filters,
+  setPopulationFilter,
+  removePopulationFilter
+}) => {
+  const handleCreditBracketRowClicked = useCallback(
+    (e, row) => {
+      // clear filters & set credit filter for selected range
+      filters.forEach(filter => removePopulationFilter(filter.id))
 
-  const { translate, sample, months } = props
+      const credits = row[0].split(/(\d+)/).map(count => Number(count))
+      if (credits[1]) {
+        setPopulationFilter(creditsAtLeast({ credit: credits[1] }))
+        if (credits[3]) {
+          setPopulationFilter(creditsLessThan({ credit: credits[3] }))
+        }
+      } else {
+        setPopulationFilter(creditsLessThan({ credit: 1 }))
+      }
+    },
+    [filters, removePopulationFilter, setPopulationFilter]
+  )
+
   const stats = getTotal(sample)
   const limits = expectedAmountOfCredits(months)
   const arr = limits.map(l => filterStudents(stats, ...l))
@@ -106,7 +118,7 @@ const PopulationCreditGainTable = props => {
       headers={headers}
       rows={rows}
       selectable
-      rowClickFn={(e, row) => setCreditFilter(row)}
+      rowClickFn={handleCreditBracketRowClicked}
       noResultText={translate('common.noResults')}
     />
   )
