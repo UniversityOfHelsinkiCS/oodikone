@@ -55,6 +55,7 @@ const PopulationCreditGainTable = ({
   const handleCreditBracketRowClicked = useCallback(
     (e, row) => {
       // clear filters & set credit filter for selected range
+      TSA.Matomo.sendEvent('Population statistics', '"Credits gained during" row selected', row[0])
       filters.forEach(filter => removePopulationFilter(filter.id))
 
       const credits = row[0].split(/(\d+)/).map(count => Number(count))
