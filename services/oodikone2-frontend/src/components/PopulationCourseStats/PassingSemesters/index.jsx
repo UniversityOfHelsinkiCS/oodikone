@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Table, Checkbox } from 'semantic-ui-react'
 import { arrayOf, shape, string, func } from 'prop-types'
 import CourseRow from './CourseRow'
+import TSA from '../../../common/tsa'
 
 export default class PassingSemesters extends Component {
   static propTypes = {
@@ -19,6 +20,11 @@ export default class PassingSemesters extends Component {
   }
 
   handleChange = () => {
+    TSA.Matomo.sendEvent(
+      'Population statistics',
+      'Courses of Population toggle cumulative when passed stats',
+      this.state.cumulativeStats ? 'false' : 'true'
+    )
     // eslint-disable-next-line react/no-access-state-in-setstate
     this.setState({ cumulativeStats: !this.state.cumulativeStats })
   }
