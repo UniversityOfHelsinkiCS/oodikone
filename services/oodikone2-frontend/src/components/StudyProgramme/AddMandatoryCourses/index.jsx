@@ -63,23 +63,23 @@ class AddMandatoryCourses extends Component {
           <Form loading={pending}>
             <Form.Group widths="equal" style={{ marginTop: '15px' }}>
               <Form.Field>
-                <label>Code:</label>
-                <AutoSubmitSearchInput
-                  doSearch={this.fetchCourses}
-                  placeholder="Search by entering a course code"
-                  value={coursecode}
-                  onChange={cc => this.setState({ coursecode: cc })}
-                  loading={pending}
-                  minSearchLength={0}
-                />
-              </Form.Field>
-              <Form.Field>
                 <label>Name:</label>
                 <AutoSubmitSearchInput
                   doSearch={this.fetchCourses}
                   placeholder="Search by entering a course name"
                   value={coursename}
                   onChange={cn => this.setState({ coursename: cn })}
+                  loading={pending}
+                  minSearchLength={0}
+                />
+              </Form.Field>
+              <Form.Field>
+                <label>Code:</label>
+                <AutoSubmitSearchInput
+                  doSearch={this.fetchCourses}
+                  placeholder="Search by entering a course code"
+                  value={coursecode}
+                  onChange={cc => this.setState({ coursecode: cc })}
                   loading={pending}
                   minSearchLength={0}
                 />
