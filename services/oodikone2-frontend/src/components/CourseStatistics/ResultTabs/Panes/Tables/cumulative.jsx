@@ -36,9 +36,11 @@ const CumulativeTable = ({ stats, name, alternatives, separate }) => {
               s.code !== 9999 ? (
                 <div>
                   {s.name}
-                  <Item as={Link} to={showPopulation(s.code, s.name, s)}>
-                    <Icon name="level up alternate" />
-                  </Item>
+                  {s.name !== 'Total' ? (
+                    <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+                      <Icon name="level up alternate" />
+                    </Item>
+                  ) : null}
                 </div>
               ) : (
                 <div>{s.name}</div>
