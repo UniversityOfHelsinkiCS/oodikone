@@ -80,17 +80,18 @@ const CoursePopulationCreditGainTable = ({
           programmeCredits[programme.code] = { name: programme.name, students: [], credits: 0 }
         }
 
-        if (!facultyCredits[programme.facultyCode]) {
-          const faculty = faculties.find(fac => fac.code === programme.facultyCode) || {
-            // in case there isn't a faculty associated with studyright
-            code: '0000',
-            name: { fi: 'No associated faculty' }
-          }
-          facultyCredits[programme.facultyCode] = { name: faculty.name, students: [], credits: 0 }
+        const faculty = faculties.find(fac => fac.code === programme.facultyCode) || {
+          // in case there isn't a faculty associated with studyright
+          code: '0000',
+          name: { fi: 'No associated faculty' }
+        }
+
+        if (!facultyCredits[faculty.code]) {
+          facultyCredits[faculty.code] = { name: faculty.name, students: [], credits: 0 }
         }
 
         programmeCredits[programme.code].students.push(student.studentNumber)
-        facultyCredits[programme.facultyCode].students.push(student.studentNumber)
+        facultyCredits[faculty.code].students.push(student.studentNumber)
         const coursesBetween = []
         courses.forEach(course => {
           if (
@@ -108,7 +109,7 @@ const CoursePopulationCreditGainTable = ({
         if (maxBy(coursesBetween, course => course.value)) {
           const maxCredits = maxBy(coursesBetween, course => course.value).credits
           programmeCredits[programme.code].credits += maxCredits
-          facultyCredits[programme.facultyCode].credits += maxCredits
+          facultyCredits[faculty.code].credits += maxCredits
           tempTotal += maxBy(coursesBetween, course => course.value).credits
         }
       })
