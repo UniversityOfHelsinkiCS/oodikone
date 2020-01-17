@@ -75,9 +75,11 @@ const GradesTable = ({ stats, name, alternatives, separate }) => {
       s => (
         <div>
           {s.name}
-          <Item as={Link} to={showPopulation(s.code, s.name, s)}>
-            <Icon name="level up alternate" />
-          </Item>
+          {s.name !== 'Total' ? (
+            <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+              <Icon name="level up alternate" />
+            </Item>
+          ) : null}
         </div>
       )
     ),

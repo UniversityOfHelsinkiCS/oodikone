@@ -54,9 +54,11 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
             getRowContent: s => (
               <div>
                 {s.name}
-                <Item as={Link} to={showPopulation(s.code, s.name, s)}>
-                  <Icon name="level up alternate" />
-                </Item>
+                {s.name !== 'Total' ? (
+                  <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+                    <Icon name="level up alternate" />
+                  </Item>
+                ) : null}
               </div>
             ),
             headerProps: { rowSpan: 2, width: 3 }
