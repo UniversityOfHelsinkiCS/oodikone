@@ -1,9 +1,10 @@
-import React, { Component } from 'react'
+import React, { Component, useCallback } from 'react'
 import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool, shape } from 'prop-types'
 import { Segment, Header, Message, Tab } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { flattenDeep, intersection } from 'lodash'
+
 import selectors from '../../selectors/populationDetails'
 import { getTotalCreditsFromCourses } from '../../common'
 import PopulationFilters from '../PopulationFilters'
@@ -14,6 +15,87 @@ import PopulationCourses from '../PopulationCourses'
 import PopulationCreditGainTable from '../PopulationCreditGainTable'
 import InfoBox from '../InfoBox'
 import infoTooltips from '../../common/InfoToolTips'
+import TSA from '../../common/tsa'
+
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
+
+const useTabChangeAnalytics = action => {
+  const previousTabIndex = React.useRef(0)
+
+  const handleTabChange = useCallback(
+    (e, data) => {
+      const { activeIndex, panes } = data
+
+      if (previousTabIndex.current !== activeIndex) {
+        sendAnalytics(action, panes[activeIndex].menuItem)
+        previousTabIndex.current = activeIndex
+      }
+    },
+    [action, previousTabIndex]
+  )
+
+  return { handleTabChange }
+}
+
+const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
+  const { CreditStatistics } = infoTooltips.PopulationStatistics
+
+  const renderCreditsGainTab = useCallback(() => {
+    return (
+      <Tab.Pane attached={false}>
+        <PopulationCreditGainTable
+          sample={samples.filter(s => selectedStudents.includes(s.studentNumber))}
+          translate={translate}
+        />
+      </Tab.Pane>
+    )
+  }, [samples, selectedStudents, translate])
+
+  const renderQuartersTab = useCallback(() => {
+    return (
+      <Tab.Pane attached={false}>
+        <CourseQuarters
+          sample={samples.filter(s => selectedStudents.includes(s.studentNumber))}
+          translate={translate}
+        />
+      </Tab.Pane>
+    )
+  }, [samples, selectedStudents, translate])
+
+  const { handleTabChange } = useTabChangeAnalytics('Change Credit statistics tab')
+
+  return (
+    <Segment>
+      <Header size="medium" dividing>
+        {translate('populationStatistics.creditStatisticsHeader')}
+        <InfoBox content={CreditStatistics} />
+      </Header>
+
+      {samples && (
+        <Tab
+          onTabChange={handleTabChange}
+          menu={{ pointing: true }}
+          panes={[
+            {
+              menuItem: 'Credits gained',
+              render: renderCreditsGainTab
+            },
+            {
+              menuItem: 'Quarters',
+              render: renderQuartersTab
+            }
+          ]}
+        />
+      )}
+    </Segment>
+  )
+}
+
+CourseStatisticsSegment.propTypes = {
+  samples: arrayOf(object).isRequired,
+  selectedStudents: arrayOf(string).isRequired,
+  translate: func.isRequired
+}
 
 class PopulationDetails extends Component {
   static propTypes = {
@@ -25,60 +107,6 @@ class PopulationDetails extends Component {
     selectedStudentsByYear: shape({}).isRequired,
     query: shape({}).isRequired,
     tagstudent: arrayOf(shape({})).isRequired
-  }
-
-  renderCreditsGainTab = () => {
-    const { samples, selectedStudents, translate } = this.props
-    return (
-      <Tab.Pane attached={false}>
-        <PopulationCreditGainTable
-          sample={samples.filter(s => selectedStudents.includes(s.studentNumber))}
-          translate={translate}
-        />
-      </Tab.Pane>
-    )
-  }
-
-  renderQuartersTab = () => {
-    const { samples, selectedStudents, translate } = this.props
-    return (
-      <Tab.Pane attached={false}>
-        <CourseQuarters
-          sample={samples.filter(s => selectedStudents.includes(s.studentNumber))}
-          translate={translate}
-        />
-      </Tab.Pane>
-    )
-  }
-
-  renderCourseStatistics = () => {
-    const { samples, translate } = this.props
-    const { CreditStatistics } = infoTooltips.PopulationStatistics
-
-    return (
-      <Segment>
-        <Header size="medium" dividing>
-          {translate('populationStatistics.creditStatisticsHeader')}
-          <InfoBox content={CreditStatistics} />
-        </Header>
-
-        {samples && (
-          <Tab
-            menu={{ pointing: true }}
-            panes={[
-              {
-                menuItem: 'Credits gained',
-                render: this.renderCreditsGainTab
-              },
-              {
-                menuItem: 'Quarters',
-                render: this.renderQuartersTab
-              }
-            ]}
-          />
-        )}
-      </Segment>
-    )
   }
 
   renderCreditGainGraphs = () => {
@@ -138,7 +166,9 @@ class PopulationDetails extends Component {
       <div>
         <PopulationFilters samples={samples} exclude={this.getExcludedFilters()} />
         {this.renderCreditGainGraphs()}
-        {!query.years && this.renderCourseStatistics()}
+        {!query.years && (
+          <CourseStatisticsSegment samples={samples} selectedStudents={selectedStudents} translate={translate} />
+        )}
         <PopulationCourses
           selectedStudents={selectedStudents}
           selectedStudentsByYear={selectedStudentsByYear}
