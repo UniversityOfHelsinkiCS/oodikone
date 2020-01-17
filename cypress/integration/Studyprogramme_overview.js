@@ -70,7 +70,7 @@ describe('Studyprogramme overview', () => {
     cy.contains('Mandatory Courses').click()
     cy.get('button').contains('Add Courses').click()
     cy.route('/api/v2/coursesmulti**').as('searchResponse')
-    cy.get('input').eq(1).type('Code Generation')
+    cy.get('input').eq(0).type('Code Generation')
     cy.wait('@searchResponse')
     cy.contains('Searched courses')
     cy.get('table').eq(0).contains('Code Generation').click()
