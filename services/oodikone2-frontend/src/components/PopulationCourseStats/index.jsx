@@ -14,6 +14,9 @@ import PassingSemesters from './PassingSemesters'
 
 import './populationCourseStats.css'
 import { getTextIn } from '../../common'
+import TSA from '../../common/tsa'
+
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
 
 export const tableColumnNames = {
   STUDENTS: 'students',
@@ -181,6 +184,11 @@ class PopulationCourseStats extends Component {
     } = e
     clearTimeout(this.timer)
     this.timer = setTimeout(() => {
+      sendAnalytics(
+        'Courses of Population student count filter change',
+        'Courses of Population student count filter change',
+        value
+      )
       this.setState({ studentAmountLimit: value }, () => this.handleCourseStatisticsCriteriaChange())
     }, 1000)
   }
@@ -210,8 +218,10 @@ class PopulationCourseStats extends Component {
       if (!this.isActiveCourse(courseStatistic.course)) {
         const params = { course: courseStatistic, field: 'all' }
         this.props.setPopulationFilter(courseParticipation(params))
+        sendAnalytics('Courses of Population course selected for filter', code)
       } else {
         this.props.removePopulationFilterOfCourse(courseStatistic.course)
+        sendAnalytics('Courses of Population course unselected for filter', code)
       }
     }
   }
@@ -479,7 +489,10 @@ class PopulationCourseStats extends Component {
               <Button
                 active={this.state.activeView === 'passingSemester'}
                 floated="right"
-                onClick={() => this.setActiveView('passingSemester')}
+                onClick={() => {
+                  this.setActiveView('passingSemester')
+                  sendAnalytics('Courses of Population view button clicked', 'when passed')
+                }}
               >
                 when passed
               </Button>
@@ -487,11 +500,21 @@ class PopulationCourseStats extends Component {
             <Button
               active={this.state.activeView === 'showGradeDistribution'}
               floated="right"
-              onClick={() => this.setActiveView('showGradeDistribution')}
+              onClick={() => {
+                this.setActiveView('showGradeDistribution')
+                sendAnalytics('Courses of Population view button clicked', 'grades')
+              }}
             >
               grades
             </Button>
-            <Button active={this.state.activeView === null} floated="right" onClick={() => this.setActiveView(null)}>
+            <Button
+              active={this.state.activeView === null}
+              floated="right"
+              onClick={() => {
+                this.setActiveView(null)
+                sendAnalytics('Courses of Population view button clicked', 'pass/fail')
+              }}
+            >
               pass/fail
             </Button>
           </Form.Field>
