@@ -15,6 +15,8 @@ import {
   getUserRoles,
   getNewestProgramme
 } from '../../common'
+import TSA from '../../common/tsa'
+import { useTabChangeAnalytics } from '../../common/hooks'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
@@ -32,7 +34,23 @@ import TagList from '../TagList'
 import selector from '../../selectors/populationDetails'
 import './populationStudents.css'
 
+const ANALYTICS_CATEGORY = 'Population students'
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
+
 const popupTimeoutLength = 1000
+
+const StudentTableTabs = ({ panes, filterPanes }) => {
+  // only its own component really because I needed to use hooks and didn't want to refactor
+  // this megamillion line component :) /Joona
+  const { handleTabChange } = useTabChangeAnalytics(ANALYTICS_CATEGORY, 'Change students table tab')
+
+  return <Tab onTabChange={handleTabChange} panes={filterPanes(panes)} />
+}
+
+StudentTableTabs.propTypes = {
+  panes: arrayOf(object).isRequired,
+  filterPanes: func.isRequired
+}
 
 class PopulationStudents extends Component {
   constructor(props) {
@@ -651,6 +669,7 @@ class PopulationStudents extends Component {
       }
       return panesToFilter
     }
+
     return (
       <Fragment>
         <Grid columns="two">
@@ -664,7 +683,7 @@ class PopulationStudents extends Component {
             </Button>
           </Grid.Column>
         </Grid>
-        <Tab panes={filteredPanes(panes)} />
+        <StudentTableTabs panes={panes} filterPanes={filteredPanes} />
       </Fragment>
     )
   }
@@ -681,7 +700,13 @@ class PopulationStudents extends Component {
         <Segment>
           <Header dividing>
             {`Students (${this.props.selectedStudents.length}) `}
-            <Button size="small" onClick={() => this.props.toggleStudentListVisibility()}>
+            <Button
+              size="small"
+              onClick={() => {
+                this.props.toggleStudentListVisibility()
+                sendAnalytics('Toggle Show students', this.props.showList ? 'hide' : 'show')
+              }}
+            >
               {toggleLabel}
             </Button>
             {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
