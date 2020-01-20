@@ -153,8 +153,6 @@ class PopulationStudents extends Component {
         }, {})
       : null
 
-    const pushToHistoryFn = studentNumber => this.props.history.push(`/students/${studentNumber}`)
-
     const copyToClipboardAll = () => {
       const studentsInfo = this.props.selectedStudents.map(number => students[number])
       const emails = studentsInfo.filter(s => s.email && !s.obfuscated).map(s => s.email)
@@ -430,7 +428,12 @@ class PopulationStudents extends Component {
       {
         key: 'icon',
         title: '',
-        getRowVal: s => !s.total && <Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />,
+        getRowVal: s =>
+          !s.total && (
+            <Item as={Link} to={`students/${s.studentNumber}`}>
+              <Icon name="level up alternate" />
+            </Item>
+          ),
         cellProps: { collapsing: true, className: 'iconCell' },
         child: true
       },
