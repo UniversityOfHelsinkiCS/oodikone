@@ -160,6 +160,7 @@ class PopulationStudents extends Component {
       const emails = studentsInfo.filter(s => s.email && !s.obfuscated).map(s => s.email)
       const clipboardString = emails.join('; ')
       copyToClipboard(clipboardString)
+      sendAnalytics('Copy all student emails to clipboard', 'Copy all student emails to clipboard')
     }
 
     const transferFrom = s =>
@@ -360,7 +361,15 @@ class PopulationStudents extends Component {
             s.email && !s.obfuscated ? (
               <Popup
                 trigger={
-                  <Icon link name="copy outline" onClick={() => copyToClipboard(s.email)} style={{ float: 'right' }} />
+                  <Icon
+                    link
+                    name="copy outline"
+                    onClick={() => {
+                      copyToClipboard(s.email)
+                      sendAnalytics("Copy student's email to clipboard", "Copy student's email to clipboard")
+                    }}
+                    style={{ float: 'right' }}
+                  />
                 }
                 content="Email copied!"
                 on="click"
