@@ -241,11 +241,17 @@ class PopulationStudents extends Component {
       {
         key: 'icon',
         getRowVal: s =>
-          !s.obfuscated ? (
-            <Item as={Link} to={`students/${s.studentNumber}`}>
+          !s.obfuscated && (
+            <Item
+              as={Link}
+              to={`students/${s.studentNumber}`}
+              onClick={() => {
+                sendAnalytics('Student details button clicked', 'General tab')
+              }}
+            >
               <Icon name="level up alternate" />
             </Item>
-          ) : null,
+          ),
         cellProps: { collapsing: true, className: 'iconCellNoPointer' }
       }
     )
@@ -430,7 +436,13 @@ class PopulationStudents extends Component {
         title: '',
         getRowVal: s =>
           !s.total && (
-            <Item as={Link} to={`students/${s.studentNumber}`}>
+            <Item
+              as={Link}
+              to={`students/${s.studentNumber}`}
+              onClick={() => {
+                sendAnalytics('Student details button clicked', 'Mandatory courses table')
+              }}
+            >
               <Icon name="level up alternate" />
             </Item>
           ),
