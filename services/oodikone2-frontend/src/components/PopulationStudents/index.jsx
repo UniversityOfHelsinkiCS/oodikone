@@ -244,7 +244,7 @@ class PopulationStudents extends Component {
           !s.obfuscated && (
             <Item
               as={Link}
-              to={`students/${s.studentNumber}`}
+              to={`/students/${s.studentNumber}`}
               onClick={() => {
                 sendAnalytics('Student details button clicked', 'General tab')
               }}
@@ -438,7 +438,7 @@ class PopulationStudents extends Component {
           !s.total && (
             <Item
               as={Link}
-              to={`students/${s.studentNumber}`}
+              to={`/students/${s.studentNumber}`}
               onClick={() => {
                 sendAnalytics('Student details button clicked', 'Mandatory courses table')
               }}
