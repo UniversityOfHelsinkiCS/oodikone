@@ -717,7 +717,14 @@ class PopulationStudents extends Component {
             <StudentNameVisibilityToggle />
           </Grid.Column>
           <Grid.Column textAlign="right">
-            <Button icon labelPosition="right" onClick={() => XLSX.writeFile(generateWorkbook(), 'students.xlsx')}>
+            <Button
+              icon
+              labelPosition="right"
+              onClick={() => {
+                XLSX.writeFile(generateWorkbook(), 'students.xlsx')
+                sendAnalytics('Download excel button clicked', 'Download excel button clicked')
+              }}
+            >
               Download
               <Icon name="file excel" />
             </Button>
