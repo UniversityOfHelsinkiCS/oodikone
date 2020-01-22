@@ -49,7 +49,6 @@ else
     analytics
     userservice
     usageservice
-    sis-updater
   )
 fi
 
