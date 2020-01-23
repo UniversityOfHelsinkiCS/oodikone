@@ -207,8 +207,9 @@ class PopulationCourseStats extends Component {
     )
   }
 
-  onGoToCourseStatisticsClick = () => {
+  onGoToCourseStatisticsClick = courseCode => {
     const { clearCourseStats: clearCourseStatsfn } = this.props
+    sendAnalytics('Courses of Population course stats button clicked', courseCode)
     clearCourseStatsfn()
   }
 
@@ -333,7 +334,7 @@ class PopulationCourseStats extends Component {
                   code
                 )}"]&separate=false&unifyOpenUniCourses=false`}
               >
-                <Icon name="level up alternate" onClick={() => this.onGoToCourseStatisticsClick()} />
+                <Icon name="level up alternate" onClick={() => this.onGoToCourseStatisticsClick(code)} />
               </Item>
             </p>
           </Table.Cell>
@@ -443,7 +444,7 @@ class PopulationCourseStats extends Component {
                   code
                 )}"]&separate=false&unifyOpenUniCourses=false`}
               >
-                <Icon name="level up alternate" onClick={() => this.onGoToCourseStatisticsClick()} />
+                <Icon name="level up alternate" onClick={() => this.onGoToCourseStatisticsClick(code)} />
               </Item>
             </p>
           </Table.Cell>

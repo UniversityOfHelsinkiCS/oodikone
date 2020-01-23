@@ -15,6 +15,8 @@ import {
   getUserRoles,
   getNewestProgramme
 } from '../../common'
+import TSA from '../../common/tsa'
+import { useTabChangeAnalytics } from '../../common/hooks'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
@@ -32,7 +34,23 @@ import TagList from '../TagList'
 import selector from '../../selectors/populationDetails'
 import './populationStudents.css'
 
+const ANALYTICS_CATEGORY = 'Population students'
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
+
 const popupTimeoutLength = 1000
+
+const StudentTableTabs = ({ panes, filterPanes }) => {
+  // only its own component really because I needed to use hooks and didn't want to refactor
+  // this megamillion line component :) /Joona
+  const { handleTabChange } = useTabChangeAnalytics(ANALYTICS_CATEGORY, 'Change students table tab')
+
+  return <Tab onTabChange={handleTabChange} panes={filterPanes(panes)} />
+}
+
+StudentTableTabs.propTypes = {
+  panes: arrayOf(object).isRequired,
+  filterPanes: func.isRequired
+}
 
 class PopulationStudents extends Component {
   constructor(props) {
@@ -135,13 +153,12 @@ class PopulationStudents extends Component {
         }, {})
       : null
 
-    const pushToHistoryFn = studentNumber => this.props.history.push(`/students/${studentNumber}`)
-
     const copyToClipboardAll = () => {
       const studentsInfo = this.props.selectedStudents.map(number => students[number])
       const emails = studentsInfo.filter(s => s.email && !s.obfuscated).map(s => s.email)
       const clipboardString = emails.join('; ')
       copyToClipboard(clipboardString)
+      sendAnalytics('Copy all student emails to clipboard', 'Copy all student emails to clipboard')
     }
 
     const transferFrom = s =>
@@ -224,11 +241,17 @@ class PopulationStudents extends Component {
       {
         key: 'icon',
         getRowVal: s =>
-          !s.obfuscated ? (
-            <Item as={Link} to={`students/${s.studentNumber}`}>
+          !s.obfuscated && (
+            <Item
+              as={Link}
+              to={`/students/${s.studentNumber}`}
+              onClick={() => {
+                sendAnalytics('Student details button clicked', 'General tab')
+              }}
+            >
               <Icon name="level up alternate" />
             </Item>
-          ) : null,
+          ),
         cellProps: { collapsing: true, className: 'iconCellNoPointer' }
       }
     )
@@ -342,7 +365,15 @@ class PopulationStudents extends Component {
             s.email && !s.obfuscated ? (
               <Popup
                 trigger={
-                  <Icon link name="copy outline" onClick={() => copyToClipboard(s.email)} style={{ float: 'right' }} />
+                  <Icon
+                    link
+                    name="copy outline"
+                    onClick={() => {
+                      copyToClipboard(s.email)
+                      sendAnalytics("Copy student's email to clipboard", "Copy student's email to clipboard")
+                    }}
+                    style={{ float: 'right' }}
+                  />
                 }
                 content="Email copied!"
                 on="click"
@@ -403,7 +434,18 @@ class PopulationStudents extends Component {
       {
         key: 'icon',
         title: '',
-        getRowVal: s => !s.total && <Icon name="level up alternate" onClick={() => pushToHistoryFn(s.studentNumber)} />,
+        getRowVal: s =>
+          !s.total && (
+            <Item
+              as={Link}
+              to={`/students/${s.studentNumber}`}
+              onClick={() => {
+                sendAnalytics('Student details button clicked', 'Mandatory courses table')
+              }}
+            >
+              <Icon name="level up alternate" />
+            </Item>
+          ),
         cellProps: { collapsing: true, className: 'iconCell' },
         child: true
       },
@@ -562,7 +604,15 @@ class PopulationStudents extends Component {
                 >
                   <h3>
                     No mandatory courses defined. You can define them{' '}
-                    <Link to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=1`}>here</Link>.
+                    <Link
+                      to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=1`}
+                      onClick={() => {
+                        sendAnalytics('No mandatory courses defined button clicked', 'Mandatory courses tab')
+                      }}
+                    >
+                      here
+                    </Link>
+                    .
                   </h3>
                 </div>
               )}
@@ -588,7 +638,15 @@ class PopulationStudents extends Component {
                 >
                   <h3>
                     No tags defined. You can define them{' '}
-                    <Link to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=5`}>here</Link>.
+                    <Link
+                      to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=5`}
+                      onClick={() => {
+                        sendAnalytics('No tags defined button clicked', 'Tags tab')
+                      }}
+                    >
+                      here
+                    </Link>
+                    .
                   </h3>
                 </div>
               )}
@@ -651,6 +709,7 @@ class PopulationStudents extends Component {
       }
       return panesToFilter
     }
+
     return (
       <Fragment>
         <Grid columns="two">
@@ -658,13 +717,20 @@ class PopulationStudents extends Component {
             <StudentNameVisibilityToggle />
           </Grid.Column>
           <Grid.Column textAlign="right">
-            <Button icon labelPosition="right" onClick={() => XLSX.writeFile(generateWorkbook(), 'students.xlsx')}>
+            <Button
+              icon
+              labelPosition="right"
+              onClick={() => {
+                XLSX.writeFile(generateWorkbook(), 'students.xlsx')
+                sendAnalytics('Download excel button clicked', 'Download excel button clicked')
+              }}
+            >
               Download
               <Icon name="file excel" />
             </Button>
           </Grid.Column>
         </Grid>
-        <Tab panes={filteredPanes(panes)} />
+        <StudentTableTabs panes={panes} filterPanes={filteredPanes} />
       </Fragment>
     )
   }
@@ -681,7 +747,13 @@ class PopulationStudents extends Component {
         <Segment>
           <Header dividing>
             {`Students (${this.props.selectedStudents.length}) `}
-            <Button size="small" onClick={() => this.props.toggleStudentListVisibility()}>
+            <Button
+              size="small"
+              onClick={() => {
+                this.props.toggleStudentListVisibility()
+                sendAnalytics('Toggle Show students', this.props.showList ? 'hide' : 'show')
+              }}
+            >
               {toggleLabel}
             </Button>
             {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
