@@ -3,11 +3,28 @@ const moment = require('moment')
 const eachLimit = require('async/eachLimit')
 const { USERSERVICE_URL, DB_MAX_CRON_CONNECTIONS } = require('../conf-backend')
 const { Credit, StudyrightElement } = require('../models')
+const { lruMemoize } = require('../util')
 
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: process.env.USERSERVICE_SECRET } })
 
 const calculateFacultyYearlyStats = async () => {
   const { data: facultyProgrammes } = await client.get('/faculty_programmes')
+
+  const getFilteredStudentCredits = lruMemoize(
+    studentNumber =>
+      Credit.findAll({
+        where: {
+          student_studentnumber: studentNumber,
+          credittypecode: [4, 10],
+          isStudyModule: false
+        }
+      }),
+    args => args[0],
+    {
+      max: 10000
+    }
+  )
+
   const res = {}
   const studentSets = {}
 
@@ -32,13 +49,7 @@ const calculateFacultyYearlyStats = async () => {
     })
 
     await eachLimit(facultyStudents, DB_MAX_CRON_CONNECTIONS, async student => {
-      const filteredStudentCredits = await Credit.findAll({
-        where: {
-          student_studentnumber: student.studentnumber,
-          credittypecode: [4, 10],
-          isStudyModule: false
-        }
-      })
+      const filteredStudentCredits = await getFilteredStudentCredits(student.studentnumber)
 
       filteredStudentCredits.forEach(c => {
         const attainmentYear = moment(c.attainment_date).year()
