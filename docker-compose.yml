@@ -207,6 +207,11 @@ services:
       - analytics_db
     container_name: analytics
 
+  sis-updater:
+    build:
+      context: services/sis-updater
+    container_name: sis-updater
+
 volumes:
   datastore:
   analytics_pgdata:
