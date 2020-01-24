@@ -109,7 +109,6 @@ const CustomPopulationFilters = ({
     if (setFilters.length === 0) {
       return null
     }
-
     return (
       <Segment>
         <Header>
@@ -121,7 +120,9 @@ const CustomPopulationFilters = ({
             key: filter.id,
             samples,
             allStudyrights,
-            coursecodes
+            coursecodes,
+            from,
+            to
           })
         )}
         <Form>
