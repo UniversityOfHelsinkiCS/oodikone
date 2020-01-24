@@ -254,9 +254,9 @@ const combineStatistics = (creditStats, studyrightStats, thesisStats, creditsFor
 
 const productivityStatsForStudytrack = async (studytrack, since) => {
   const providercode = mapToProviders([studytrack])[0]
-  const year = new Date(since).getFullYear()
+  const year = 1950
   const startDate = `${year}-${semesterStart['FALL']}`
-  const endDate = `${moment(since, 'YYYY')
+  const endDate = `${moment(new Date(), 'YYYY')
     .add(1, 'years')
     .format('YYYY')}-${semesterEnd['SPRING']}`
   const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
