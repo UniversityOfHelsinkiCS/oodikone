@@ -292,6 +292,12 @@ const associatedStudyrightElements = async (offset, limit) => {
   return groupings
 }
 
+const StudyRightType = {
+  DEGREE: 10,
+  PROGRAMME: 20,
+  STUDYTRACK: 30
+}
+
 const calculateAssociationsFromDb = async (chunksize = 100000) => {
   const getSemester = momentstartdate => {
     if (momentstartdate < moment(`${momentstartdate.utc().year()}-07-31 21:00:00+00`)) return 'SPRING'
@@ -303,7 +309,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
   }
   const total = await Studyright.count()
   let offset = 0
-  const types = new Set([10, 20, 30]) // degree, programme, studytrack
+  const types = new Set([StudyRightType.DEGREE, StudyRightType.PROGRAMME, StudyRightType.STUDYTRACK])
   const isValid = ({ type }) => types.has(type)
   const associations = { programmes: {}, degrees: {}, studyTracks: {} }
   while (offset <= total) {
@@ -312,7 +318,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
     elementgroups.forEach(fullgroup => {
       const group = fullgroup.filter(isValid)
       group.forEach(({ type, code, name, studyrightid, startdate, enddate }) => {
-        if (type === 10) {
+        if (type === StudyRightType.DEGREE) {
           associations.degrees[code] = associations.degrees[code] || {
             type,
             name,
@@ -320,7 +326,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
             programmes: {}
           }
         }
-        if (type === 30) {
+        if (type === StudyRightType.STUDYTRACK) {
           associations.studyTracks[code] = associations.studyTracks[code] || {
             type,
             name,
@@ -328,7 +334,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
             programmes: {}
           }
         }
-        if (type === 20) {
+        if (type === StudyRightType.PROGRAMME) {
           associations.programmes[code] = associations.programmes[code] || {
             type: type,
             name: name,
@@ -347,7 +353,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
           group
             .filter(e => e.studyrightid === studyrightid && e.code !== code)
             .forEach(e => {
-              if (e.type == 10) {
+              if (e.type == StudyRightType.DEGREE) {
                 enrollmentStartYear.degrees[e.code] = {
                   type: e.type,
                   name: e.name,
@@ -365,7 +371,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
                   code: code
                 }
               }
-              if (e.type == 30) {
+              if (e.type == StudyRightType.STUDYTRACK) {
                 const momentenddate = moment(enddate)
                 const estartdate = moment(e.startdate)
                 const eenddate = moment(e.enddate)
