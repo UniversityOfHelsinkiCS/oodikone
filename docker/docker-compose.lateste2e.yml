@@ -13,6 +13,10 @@ services:
     environment:
       - POSTGRES_MULTIPLE_DATABASES=analytics_db
 
+  db_sis:
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=db_sis
+
   backend:
     image: toska/oodikone2-backend:${TAG}
     build:

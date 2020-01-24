@@ -1,4 +1,4 @@
-version: '3.2'
+version: "3.2"
 
 services:
   nats:
@@ -66,6 +66,17 @@ services:
     container_name: db_kone
     environment:
       - POSTGRES_MULTIPLE_DATABASES=db_kone
+      - POSTGRES_USER=postgres
+
+  db_sis:
+    image: postgres:9.6.3
+    ports:
+      - "5426:5432"
+    volumes:
+      - pgdata_sis:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    container_name: db_sis
+    environment:
       - POSTGRES_USER=postgres
 
   redis:
@@ -143,7 +154,7 @@ services:
     ports:
       - 545:545
     environment:
-      PORT: '545'
+      PORT: "545"
       DB_URL: postgres://postgres@usage_db:5432/usage_db
       SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
     depends_on:
@@ -219,5 +230,6 @@ volumes:
   usage_pgdata:
   pgdata:
   pgdata_kone:
+  pgdata_sis:
   redis-data:
   mongodata:
