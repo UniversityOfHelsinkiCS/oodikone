@@ -221,6 +221,12 @@ services:
   sis-updater:
     build:
       context: services/sis-updater
+    environment:
+      SIS_DB_URL: postgres://postgres@db_sis:5432/db_sis
+      SIS_IMPORTER_HOST: importer-db
+      SIS_IMPORTER_USER: dev
+      SIS_IMPORTER_PASSWORD: dev
+      SIS_IMPORTER_DATABASE: importer-db
     container_name: sis-updater
 
 volumes:
