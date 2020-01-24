@@ -128,12 +128,6 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    environment:
-      SIS_DB_URL: postgres://postgres@db_sis:5432/db_sis
-      SIS_IMPORTER_HOST: importer-db
-      SIS_IMPORTER_USER: dev
-      SIS_IMPORTER_PASSWORD: dev
-      SIS_IMPORTER_DATABASE: importer-db
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     volumes:
       - ./services/sis-updater/:/usr/src/app
