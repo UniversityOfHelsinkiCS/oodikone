@@ -51,7 +51,7 @@ const isNewHYStudyProgramme = code => !!(code && code.match(/^[A-Z]*[0-9]*_[0-9]
  * @param {(...args: any[]) => Promise<any>} fn
  * @param {(...args: any[]) => string | number} keyPicker
  * @param {LRU.Options} cacheOpts
- * @returns {Promise<any>}
+ * @returns {(...args: any[]) => Promise<any>}
  */
 const lruMemoize = (fn, keyPicker, cacheOpts) => {
   const cache = new LRU(cacheOpts)
