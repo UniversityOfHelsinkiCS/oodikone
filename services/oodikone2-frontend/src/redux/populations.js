@@ -111,6 +111,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         pending: true,
         error: false,
+        query: null,
         data: {},
         updating: false
       }
@@ -135,6 +136,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         pending: true,
         error: false,
+        query: null,
         data: {},
         updating: false
       }
