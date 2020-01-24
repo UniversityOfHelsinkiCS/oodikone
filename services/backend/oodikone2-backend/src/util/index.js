@@ -1,3 +1,4 @@
+const LRU = require('lru-cache')
 const oldToNewMap = require('./oldToNew.json')
 
 const arrayUnique = (value, index, self) => {
@@ -46,6 +47,28 @@ const validateParamLength = (param, minLength) => param && param.trim().length >
 
 const isNewHYStudyProgramme = code => !!(code && code.match(/^[A-Z]*[0-9]*_[0-9]*$/))
 
+/**
+ * @param {(...args: any[]) => Promise<any>} fn
+ * @param {(...args: any[]) => string | number} keyPicker
+ * @param {LRU.Options} cacheOpts
+ * @returns {(...args: any[]) => Promise<any>}
+ */
+const lruMemoize = (fn, keyPicker, cacheOpts) => {
+  const cache = new LRU(cacheOpts)
+
+  return async (...args) => {
+    const key = keyPicker(args)
+    const cached = cache.get(key)
+    if (cached) {
+      return cached
+    }
+
+    const ret = await fn(...args)
+    cache.set(key, ret)
+    return ret
+  }
+}
+
 module.exports = {
   arrayUnique,
   getStudentNumberChecksum,
@@ -54,5 +77,6 @@ module.exports = {
   isValidStudentId,
   oldToNew,
   validateParamLength,
-  isNewHYStudyProgramme
+  isNewHYStudyProgramme,
+  lruMemoize
 }

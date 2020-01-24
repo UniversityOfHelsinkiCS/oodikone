@@ -16,6 +16,10 @@ let DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS, 10)
 if (isNaN(DB_MAX_CONNECTIONS)) {
   DB_MAX_CONNECTIONS = 5 // sequelize's default
 }
+let DB_MAX_CRON_CONNECTIONS = DB_MAX_CONNECTIONS - 5
+if (DB_MAX_CRON_CONNECTIONS < 1) {
+  DB_MAX_CRON_CONNECTIONS = 1
+}
 
 const frontend_addr = process.env.FRONT_URL
 const redis = process.env.REDIS
@@ -80,6 +84,7 @@ module.exports = {
   DB_URL,
   DB_URL_KONE,
   DB_MAX_CONNECTIONS,
+  DB_MAX_CRON_CONNECTIONS,
   redis,
   TOKEN_SECRET,
   DB_SCHEMA,

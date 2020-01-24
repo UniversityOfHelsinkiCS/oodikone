@@ -16,6 +16,11 @@ services:
       - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test,tkt_oodi_real
     restart: unless-stopped
 
+  db_sis:
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=db_sis
+    restart: unless-stopped
+
   backend:
     build:
       args:
@@ -123,11 +128,6 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    environment:
-      SIS_IMPORTER_HOST: importer-db
-      SIS_IMPORTER_USER: dev
-      SIS_IMPORTER_PASSWORD: dev
-      SIS_IMPORTER_DATABASE: importer-db
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     volumes:
       - ./services/sis-updater/:/usr/src/app
