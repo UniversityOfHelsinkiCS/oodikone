@@ -299,6 +299,7 @@ const StudyRightType = {
 }
 
 const calculateAssociationsFromDb = async (chunksize = 100000) => {
+  // bottlenecked by Studyright.findAll in associatedStudyrightElements()
   const getSemester = momentstartdate => {
     if (momentstartdate < moment(`${momentstartdate.utc().year()}-07-31 21:00:00+00`)) return 'SPRING'
     return 'FALL'
