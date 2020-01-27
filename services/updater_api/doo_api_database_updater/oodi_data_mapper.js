@@ -124,7 +124,7 @@ const getStudyRightFromData = (data, studentNumber) => {
     enddate: parseDate(data.end_date),
     extentcode: data.extent_code,
     givendate: parseDate(data.admission_date),
-    graduated: Number(data.degree_date !== null),
+    graduated: Number(!!data.degree_date),
     graduation_date: data.degree_date,
     prioritycode: data.priority,
     startdate: parseDate(data.start_date),
