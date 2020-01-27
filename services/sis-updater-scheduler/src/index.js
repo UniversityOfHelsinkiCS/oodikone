@@ -23,7 +23,7 @@ stan.on('error', () => {
   console.log('NATS connection failed')
 })
 
-stan.on('connect', async ({ clientID }) => {
+stan.on('connect', ({ clientID }) => {
   console.log(`Connected to NATS as ${clientID}`)
   knexConnection.connect()
 })
