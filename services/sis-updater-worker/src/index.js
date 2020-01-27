@@ -1,6 +1,11 @@
 const { stan, opts } = require('./utils/stan')
 const { dbConnections } = require('./db/connection')
-const { SIS_UPDATER_SCHEDULE_CHANNEL } = require('./config')
+const { update } = require('./updater')
+const { SIS_UPDATER_SCHEDULE_CHANNEL, NATS_GROUP } = require('./config')
+
+const msgParser = f => async msg => {
+  await f(JSON.parse(msg.getData()))
+}
 
 stan.on('error', () => {
   console.log('NATS connection failed')
@@ -17,9 +22,6 @@ dbConnections.on('error', () => {
 
 dbConnections.on('connect', () => {
   console.log('DB connections established')
-  const updaterChannel = stan.subscribe(SIS_UPDATER_SCHEDULE_CHANNEL, 'sis-updater-nats.workers', opts)
-  updaterChannel.on('message', msg => {
-    console.log(JSON.parse(msg.getData()))
-    msg.ack()
-  })
+  const updaterChannel = stan.subscribe(SIS_UPDATER_SCHEDULE_CHANNEL, NATS_GROUP, opts)
+  updaterChannel.on('message', msgParser(update))
 })

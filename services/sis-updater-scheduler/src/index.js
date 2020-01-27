@@ -4,7 +4,7 @@ const { stan } = require('./utils/stan')
 const { SIS_UPDATER_SCHEDULE_CHANNEL, CHUNK_SIZE } = require('./config')
 
 const createJobs = studentNumbers => {
-  stan.publish(SIS_UPDATER_SCHEDULE_CHANNEL, JSON.stringify({ studentNumbers }), err => {
+  stan.publish(SIS_UPDATER_SCHEDULE_CHANNEL, JSON.stringify(studentNumbers), err => {
     if (err) console.log('failed publishing', err)
   })
 }

@@ -1,4 +1,5 @@
 const natsStreaming = require('node-nats-streaming')
+const { NATS_GROUP } = require('../config')
 const { HOSTNAME, SIS_NATS_URI, SIS_NATS_TOKEN } = process.env
 
 const stan = natsStreaming.connect('sis-updater-nats', HOSTNAME, {
@@ -7,8 +8,8 @@ const stan = natsStreaming.connect('sis-updater-nats', HOSTNAME, {
 })
 
 const opts = stan.subscriptionOptions()
-opts.setManualAckMode(true)
-opts.setAckWait(60 * 1000 * 15)
+opts.setDeliverAllAvailable()
+opts.setDurableName(NATS_GROUP)
 opts.setMaxInFlight(1)
 
 module.exports = {
