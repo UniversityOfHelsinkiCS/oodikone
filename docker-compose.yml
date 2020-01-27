@@ -218,16 +218,24 @@ services:
       - analytics_db
     container_name: analytics
 
-  sis-updater:
+  sis-updater-nats:
+    image: nats-streaming:0.16.2
+    command: -cid sis-updater-nats -m 8222 -p 4222 --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 5000 -store file -dir datastore
+    container_name: sis-updater-nats
+    volumes:
+      - sis-updater-datastore:/datastore
+
+  sis-updater-scheduler:
     build:
-      context: services/sis-updater
+      context: services/sis-updater-scheduler
     environment:
-      SIS_DB_URL: postgres://postgres@db_sis:5432/db_sis
+      SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
+      SIS_NATS_TOKEN: dev
       SIS_IMPORTER_HOST: importer-db
       SIS_IMPORTER_USER: dev
       SIS_IMPORTER_PASSWORD: dev
       SIS_IMPORTER_DATABASE: importer-db
-    container_name: sis-updater
+    container_name: sis-updater-scheduler
 
 volumes:
   datastore:
@@ -239,3 +247,4 @@ volumes:
   pgdata_sis:
   redis-data:
   mongodata:
+  sis-updater-datastore:

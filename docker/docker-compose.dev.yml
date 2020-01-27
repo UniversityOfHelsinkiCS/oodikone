@@ -124,13 +124,13 @@ services:
     container_name: adminer
     restart: unless-stopped
 
-  sis-updater:
+  sis-updater-scheduler:
     build:
       args:
         NODE_ENV: 'development'
     command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
     volumes:
-      - ./services/sis-updater/:/usr/src/app
+      - ./services/sis-updater-scheduler/:/usr/src/app
     restart: unless-stopped
 
 networks:
