@@ -19,6 +19,10 @@ const scheduleAll = async () =>
     CHUNK_SIZE
   ).forEach(createJobs)
 
+stan.on('error', () => {
+  console.log('NATS connection failed')
+})
+
 stan.on('connect', async ({ clientID }) => {
   console.log(`Connected to NATS as ${clientID}`)
   knexConnection.connect()
