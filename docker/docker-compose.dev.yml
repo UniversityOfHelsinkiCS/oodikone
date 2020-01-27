@@ -133,6 +133,15 @@ services:
       - ./services/sis-updater-scheduler/:/usr/src/app
     restart: unless-stopped
 
+  sis-updater-worker:
+    build:
+      args:
+        NODE_ENV: 'development'
+    command: 'npm run dev'
+    volumes:
+      - ./services/sis-updater-worker/:/usr/src/app
+    restart: unless-stopped
+
 networks:
   default:
 
