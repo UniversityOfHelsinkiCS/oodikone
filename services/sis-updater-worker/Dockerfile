@@ -12,4 +12,4 @@ RUN npm ci
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-COPY . /usr/src/ap
+COPY . /usr/src/app
