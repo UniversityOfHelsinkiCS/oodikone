@@ -299,6 +299,7 @@ const StudyRightType = {
 }
 
 const calculateAssociationsFromDb = async (chunksize = 100000) => {
+  // bottlenecked by Studyright.findAll in associatedStudyrightElements()
   const getSemester = momentstartdate => {
     if (momentstartdate < moment(`${momentstartdate.utc().year()}-07-31 21:00:00+00`)) return 'SPRING'
     return 'FALL'
@@ -325,16 +326,14 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
             code,
             programmes: {}
           }
-        }
-        if (type === StudyRightType.STUDYTRACK) {
+        } else if (type === StudyRightType.STUDYTRACK) {
           associations.studyTracks[code] = associations.studyTracks[code] || {
             type,
             name,
             code,
             programmes: {}
           }
-        }
-        if (type === StudyRightType.PROGRAMME) {
+        } else if (type === StudyRightType.PROGRAMME) {
           associations.programmes[code] = associations.programmes[code] || {
             type: type,
             name: name,
@@ -370,8 +369,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
                   name: name,
                   code: code
                 }
-              }
-              if (e.type === StudyRightType.STUDYTRACK) {
+              } else if (e.type === StudyRightType.STUDYTRACK) {
                 const momentenddate = moment(enddate)
                 const estartdate = moment(e.startdate)
                 const eenddate = moment(e.enddate)
