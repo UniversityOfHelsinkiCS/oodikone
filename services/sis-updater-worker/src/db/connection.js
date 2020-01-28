@@ -13,7 +13,7 @@ class DbConnections extends EventEmitter {
     this.sequelize = new Sequelize({
       dialect: 'postgres',
       pool: {
-        max: 5,
+        max: 25,
         min: 0,
         acquire: 10000,
         idle: 300000000
@@ -44,7 +44,7 @@ class DbConnections extends EventEmitter {
           },
           pool: {
             min: 0,
-            max: 5
+            max: 25
           }
         })
         await this.knex.raw('select 1+1 as result')
