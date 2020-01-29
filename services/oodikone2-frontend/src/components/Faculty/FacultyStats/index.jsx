@@ -83,7 +83,7 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
     {
       key: 'students',
       title: 'Students',
-      getRowVal: ({ code }) => totalStats[code].totalStudents
+      getRowVal: ({ code }) => totalStats[code].totalStudents.length
     }
   ]
   /* eslint-enable react/prop-types */
