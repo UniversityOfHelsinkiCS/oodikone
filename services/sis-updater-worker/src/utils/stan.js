@@ -10,6 +10,8 @@ const stan = natsStreaming.connect('sis-updater-nats', HOSTNAME, {
 const opts = stan.subscriptionOptions()
 opts.setDeliverAllAvailable()
 opts.setDurableName(NATS_GROUP)
+opts.setManualAckMode(true)
+opts.setAckWait(60 * 1000 * 15)
 opts.setMaxInFlight(1)
 
 module.exports = {
