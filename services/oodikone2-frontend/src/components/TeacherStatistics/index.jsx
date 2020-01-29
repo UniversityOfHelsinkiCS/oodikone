@@ -31,7 +31,7 @@ class TeacherStatistics extends Component {
     this.setState({ semesterStart: value })
     if (semesterEnd <= value) {
       this.setState({
-        semesterEnd: value + 1
+        semesterEnd: value
       })
     }
   }
@@ -115,7 +115,7 @@ class TeacherStatistics extends Component {
                 label="End semester"
                 selection
                 search
-                options={filteredOptions.filter(semester => semester.value > semesterStart)}
+                options={filteredOptions.filter(semester => semester.value >= semesterStart)}
                 disabled={!semesterStart}
                 value={semesterEnd}
                 onChange={this.handleChange}
