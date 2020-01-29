@@ -17,7 +17,7 @@ const FacultyStatsGraph = ({ data }) => {
           y: Math.round(
             ['coursesPassed', 'coursesFailed'].includes(mode)
               ? (stats[mode] / (stats.coursesPassed + stats.coursesFailed)) * 100
-              : stats[mode]
+              : stats[mode].length || stats[mode]
           )
         }))
       })),
