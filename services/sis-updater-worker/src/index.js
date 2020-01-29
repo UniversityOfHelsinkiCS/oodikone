@@ -5,6 +5,7 @@ const { SIS_UPDATER_SCHEDULE_CHANNEL, NATS_GROUP } = require('./config')
 
 const msgParser = f => async msg => {
   await f(JSON.parse(msg.getData()))
+  msg.ack()
 }
 
 stan.on('error', () => {
