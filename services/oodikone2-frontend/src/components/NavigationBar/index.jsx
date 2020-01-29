@@ -9,13 +9,22 @@ import { logout as logoutAction } from '../../redux/auth'
 import LanguageChooser from '../LanguageChooser'
 import './navigationBar.css'
 
-const { USER_ADMINER_URL, ADMINER_URL, ANALYTICS_ADMINER_URL, USAGE_ADMINER_URL, KONE_ADMINER_URL } = process.env
+const {
+  USER_ADMINER_URL,
+  ADMINER_URL,
+  ANALYTICS_ADMINER_URL,
+  USAGE_ADMINER_URL,
+  KONE_ADMINER_URL,
+  SIS_ADMINER_URL
+} = process.env
+
 const adminerUrls = [
   { url: ADMINER_URL, text: 'Database' },
   { url: USER_ADMINER_URL, text: 'User database' },
   { url: ANALYTICS_ADMINER_URL, text: 'Analytics database' },
   { url: KONE_ADMINER_URL, text: 'Kone database' },
-  { url: USAGE_ADMINER_URL, text: 'Usage database' }
+  { url: USAGE_ADMINER_URL, text: 'Usage database' },
+  { url: SIS_ADMINER_URL, text: 'SIS database' }
 ]
 
 const allNavigationItems = {
