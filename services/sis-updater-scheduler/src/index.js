@@ -3,21 +3,31 @@ const { knexConnection } = require('./db/connection')
 const { stan } = require('./utils/stan')
 const { SIS_UPDATER_SCHEDULE_CHANNEL, CHUNK_SIZE } = require('./config')
 
-const createJobs = personIds => {
-  stan.publish(SIS_UPDATER_SCHEDULE_CHANNEL, JSON.stringify(personIds), err => {
+const createJobs = (entityIds, type) => {
+  stan.publish(SIS_UPDATER_SCHEDULE_CHANNEL, JSON.stringify({ entityIds, type }), err => {
     if (err) console.log('failed publishing', err)
   })
 }
 
-const scheduleAll = async () =>
+const scheduleSomeStudents = async (limit = 100) =>
   chunk(
-    await knexConnection.knex
+    await knexConnection
+      .knex('persons')
       .select('student_number', 'id')
-      .from('persons')
       .whereNotNull('student_number')
+      .limit(limit)
       .pluck('id'),
     CHUNK_SIZE
-  ).forEach(createJobs)
+  ).forEach(s => createJobs(s, 'students'))
+
+const scheduleSomeMeta = async (table, limit = 100) => {
+  chunk(
+    await knexConnection
+      .knex(table)
+      .limit(limit)
+      .pluck('id')
+  ).forEach(e => createJobs(e, table))
+}
 
 stan.on('error', () => {
   console.log('NATS connection failed')
@@ -34,5 +44,11 @@ knexConnection.on('error', e => {
 
 knexConnection.on('connect', async () => {
   console.log('Knex database connection established successfully')
-  await scheduleAll()
+  await scheduleSomeMeta('organisations')
+  await scheduleSomeMeta('modules')
+  await scheduleSomeMeta('educations')
+  await scheduleSomeMeta('assessment_items')
+  await scheduleSomeMeta('course_units')
+  await scheduleSomeMeta('course_unit_realisations')
+  await scheduleSomeStudents()
 })
