@@ -14,7 +14,7 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
       studentCredits: 0,
       coursesPassed: 0,
       coursesFailed: 0,
-      students: 0
+      students: []
     }
 
     const faculty = facultyYearlyStats.find(f => f.id === facultyCode)
@@ -25,7 +25,7 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
         res[year].studentCredits += stat.studentCredits
         res[year].coursesPassed += stat.coursesPassed
         res[year].coursesFailed += stat.coursesFailed
-        res[year].students += stat.students
+        res[year].students = [...new Set(res[year].students.concat(stat.studentArray))]
       })
     })
     return res
@@ -36,7 +36,7 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
       totalStudentCredits: 0,
       totalCoursesPassed: 0,
       totalCoursesFailed: 0,
-      totalStudents: 0
+      totalStudents: []
     }
     return Object.entries(calculateYearlyStatsForFaculty(facultyCode))
       .filter(([year]) => year >= fromYear && year <= toYear)
@@ -45,7 +45,7 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
           totalStudentCredits: res.totalStudentCredits + curr.studentCredits,
           totalCoursesPassed: res.totalCoursesPassed + curr.coursesPassed,
           totalCoursesFailed: res.totalCoursesFailed + curr.coursesFailed,
-          totalStudents: res.totalStudents + curr.students
+          totalStudents: [...new Set(res.totalStudents.concat(curr.students))]
         }),
         { ...initial }
       )
@@ -100,7 +100,7 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
     {
       key: 'students',
       title: 'Students',
-      getRowVal: ({ code }) => totalStats[code].totalStudents
+      getRowVal: ({ code }) => totalStats[code].totalStudents.length
     }
   ]
 

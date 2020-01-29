@@ -59,6 +59,7 @@ const calculateFacultyYearlyStats = async () => {
           facultyYearStats.coursesPassed = 0
           facultyYearStats.coursesFailed = 0
           facultyYearStats.students = 0
+          facultyYearStats.studentArray = []
           res[faculty_code][programme_code][attainmentYear] = facultyYearStats
           studentSets[faculty_code][programme_code][attainmentYear] = new Set()
         }
@@ -66,6 +67,7 @@ const calculateFacultyYearlyStats = async () => {
         const studentSet = studentSets[faculty_code][programme_code][attainmentYear]
         if (!studentSet.has(c.student_studentnumber)) {
           facultyYearStats.students++
+          facultyYearStats.studentArray.push(c.student_studentnumber)
           studentSet.add(c.student_studentnumber)
         }
         if (c.credittypecode === 4) {
