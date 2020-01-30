@@ -220,7 +220,7 @@ services:
 
   sis-updater-nats:
     image: nats-streaming:0.16.2
-    command: -cid sis-updater-nats -m 8222 -p 4222 --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 5000 -store file -dir datastore
+    command: -cid sis-updater-nats -m 8222 -p 4222 --max_age 24h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore
     container_name: sis-updater-nats
     volumes:
       - sis-updater-datastore:/datastore
@@ -241,6 +241,8 @@ services:
     build:
       context: services/sis-updater-worker
     environment:
+      REDIS_URI: //redis:6379
+      DB_URL: postgres://postgres@db_sis:5432/db_sis
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
       SIS_NATS_TOKEN: dev
       SIS_IMPORTER_HOST: importer-db
