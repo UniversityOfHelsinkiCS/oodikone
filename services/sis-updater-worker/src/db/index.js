@@ -14,7 +14,17 @@ const selectFromSnapshotsByIds = async (table, ids, col = 'id') =>
     .map(({ data }) => getLatestSnapshot(data))
     .filter(isActive)
 
+const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))
+
+const bulkCreate = async (model, entities, transaction = null, properties = ['id']) => {
+  await model.bulkCreate(entities, {
+    updateOnDuplicate: getColumnsToUpdate(model, properties),
+    transaction
+  })
+}
+
 module.exports = {
   selectFromByIds,
-  selectFromSnapshotsByIds
+  selectFromSnapshotsByIds,
+  bulkCreate
 }

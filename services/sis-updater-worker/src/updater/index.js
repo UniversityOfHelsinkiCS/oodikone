@@ -1,7 +1,8 @@
-const { selectFromByIds, selectFromSnapshotsByIds } = require('../db')
+const { Organization } = require('../db/models')
+const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
 
 const updateOrganisations = async organisations => {
-  console.log('organisations', organisations)
+  await bulkCreate(Organization, organisations)
 }
 
 const updateModules = async modules => {

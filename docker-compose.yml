@@ -241,6 +241,8 @@ services:
     build:
       context: services/sis-updater-worker
     environment:
+      REDIS_URI: //redis:6379
+      DB_URL: postgres://postgres@db_sis:5432/db_sis
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
       SIS_NATS_TOKEN: dev
       SIS_IMPORTER_HOST: importer-db
