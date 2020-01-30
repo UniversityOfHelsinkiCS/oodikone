@@ -1,5 +1,7 @@
-const { Organization } = require('../db/models')
+const { groupBy, flatten } = require('lodash')
+const { Organization, Course } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
+const { getMinMaxDate, getMinMax } = require('../utils')
 
 const updateOrganisations = async organisations => {
   await bulkCreate(Organization, organisations)
@@ -14,7 +16,44 @@ const updateEducations = async educations => {
 }
 
 const updateCourseUnits = async courseUnits => {
-  console.log('courseUnits', courseUnits)
+  const attainments = await selectFromByIds(
+    'attainments',
+    courseUnits.map(c => c.id),
+    'course_unit_id'
+  )
+  const courseIdToAttainments = groupBy(attainments, 'course_unit_id')
+  const groupIdToCourse = groupBy(courseUnits, 'group_id')
+
+  const courses = Object.entries(groupIdToCourse).map(([, courses]) => {
+    const { code, name, study_level: coursetypecode, id } = courses[0]
+    const { min: startdate, max: enddate } = getMinMaxDate(
+      courses,
+      c => c.validity_period.startDate,
+      c => c.validity_period.endDate
+    )
+
+    const attainments = flatten(courses.map(c => courseIdToAttainments[c.id])).filter(a => !!a)
+    const { min: min_attainment_date, max: max_attainment_date } = getMinMax(
+      attainments,
+      a => a.attainment_date,
+      a => a.attainment_date
+    )
+
+    return {
+      id,
+      name,
+      code,
+      coursetypecode,
+      minAttainmentDate: min_attainment_date,
+      maxAttainmentDate: max_attainment_date,
+      latestInstanceDate: max_attainment_date,
+      startdate,
+      enddate,
+      isStudyModule: false
+    }
+  })
+
+  await bulkCreate(Course, courses)
 }
 
 const updateAssessmentItems = async assessmentItems => {
@@ -68,9 +107,10 @@ const update = async ({ entityIds, type }) => {
     case 'organisations':
     case 'assessment_items':
       return await updateHandler(await selectFromSnapshotsByIds(type, entityIds))
+    case 'course_units':
+      return await updateHandler(await selectFromByIds(type, entityIds, 'group_id'))
     case 'modules':
     case 'educations':
-    case 'course_units':
     case 'course_unit_realisations':
       return await updateHandler(await selectFromByIds(type, entityIds))
   }
