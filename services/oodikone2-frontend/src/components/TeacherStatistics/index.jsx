@@ -84,7 +84,8 @@ class TeacherStatistics extends Component {
       const options =
         moment(new Date()).diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0
           ? Number(sem.text.replace(/[^0-9]/g, '')) <= new Date().getFullYear()
-          : Number(sem.text.replace(/[^0-9]/g, '')) < new Date().getFullYear()
+          : Number(sem.text.replace(/[^0-9]/g, '')) < new Date().getFullYear() ||
+            (Number(sem.text.replace(/[^0-9]/g, '')) === new Date().getFullYear() && sem.text.includes('Spring')) // so that current spring is included
       return options
     })
     return (
