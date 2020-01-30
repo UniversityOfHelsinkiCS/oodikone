@@ -236,6 +236,9 @@ services:
       SIS_IMPORTER_PASSWORD: dev
       SIS_IMPORTER_DATABASE: importer-db
     container_name: sis-updater-scheduler
+    depends_on:
+      - redis
+      - sis-updater-nats
 
   sis-updater-worker:
     build:
@@ -249,6 +252,9 @@ services:
       SIS_IMPORTER_USER: dev
       SIS_IMPORTER_PASSWORD: dev
       SIS_IMPORTER_DATABASE: importer-db
+    depends_on:
+      - redis
+      - sis-updater-nats
 
 volumes:
   datastore:
