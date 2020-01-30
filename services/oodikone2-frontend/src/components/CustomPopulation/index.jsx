@@ -188,6 +188,7 @@ const CustomPopulation = ({
             students={custompop}
             selectedStudents={selectedStudents}
             translate={translate}
+            render={false}
           />
         </Segment>
       </Segment>
