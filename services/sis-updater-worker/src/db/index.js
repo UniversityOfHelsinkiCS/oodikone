@@ -1,31 +1,30 @@
 const { dbConnections } = require('./connection')
+const { getLatestSnapshot, isActive } = require('../utils')
 
-const selectStudentsByIds = async ids => dbConnections.knex('persons').whereIn('id', ids)
+const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
 
-const selectStudyRightsByPersonIds = async personIds =>
-  dbConnections.knex
-    .select(dbConnections.knex.raw('array_agg(to_json(studyrights.*)) as studyright'))
-    .from('studyrights')
-    .whereIn('person_id', personIds)
-    .groupBy('id')
+const selectFromSnapshotsByIds = async (table, ids, col = 'id') =>
+  (
+    await dbConnections.knex
+      .select(dbConnections.knex.raw(`array_agg(to_json(${table}.*)) as data`))
+      .from(table)
+      .whereIn(col, ids)
+      .groupBy('id')
+  )
+    .map(({ data }) => getLatestSnapshot(data))
+    .filter(isActive)
 
-const selectAttainmentsByPersonIds = async personIds =>
-  dbConnections.knex('attainments').whereIn('person_id', personIds)
+const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))
 
-const selectTermRegistrationsByPersonIds = async personIds =>
-  dbConnections.knex('term_registrations').whereIn('student_id', personIds)
-
-const selectOrganisationsById = async ids =>
-  dbConnections.knex
-    .select(dbConnections.knex.raw('array_agg(to_json(organisations.*)) as organisation'))
-    .from('organisations')
-    .whereIn('id', ids)
-    .groupBy('id')
+const bulkCreate = async (model, entities, transaction = null, properties = ['id']) => {
+  await model.bulkCreate(entities, {
+    updateOnDuplicate: getColumnsToUpdate(model, properties),
+    transaction
+  })
+}
 
 module.exports = {
-  selectStudentsByIds,
-  selectStudyRightsByPersonIds,
-  selectAttainmentsByPersonIds,
-  selectTermRegistrationsByPersonIds,
-  selectOrganisationsById
+  selectFromByIds,
+  selectFromSnapshotsByIds,
+  bulkCreate
 }

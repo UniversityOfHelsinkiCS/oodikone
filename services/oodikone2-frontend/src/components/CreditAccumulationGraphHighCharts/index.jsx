@@ -58,17 +58,22 @@ class CreditAccumulationGraphHighCharts extends Component {
         const { students } = nextProps
         this.getMoreCreditLines(students, clear)
       } else if (changedStudentAmount || changedGraphSize) {
-        this.createGraphOptions(nextProps.students, nextProps.selectedStudents, nextProps.currentGraphSize)
+        this.createGraphOptions(
+          nextProps.students,
+          nextProps.selectedStudents,
+          nextProps.currentGraphSize,
+          nextProps.render
+        )
       }
     }
   }
 
   componentDidUpdate() {
     const { updateGraph } = this.state
-    const { students, selectedStudents, currentGraphSize } = this.props
+    const { students, selectedStudents, currentGraphSize, render } = this.props
 
     if (updateGraph) {
-      this.createGraphOptions(students, selectedStudents, currentGraphSize)
+      this.createGraphOptions(students, selectedStudents, currentGraphSize, render)
     }
   }
 
@@ -117,10 +122,10 @@ class CreditAccumulationGraphHighCharts extends Component {
     return renderToString(<CreditGraphTooltip payload={payload} active translate={translate} />)
   }
 
-  createGraphOptions = (students, selectedStudents, graphSize) => {
+  createGraphOptions = (students, selectedStudents, graphSize, render) => {
     const dataOfSelected = this.state.studentCreditLines.filter(line => selectedStudents.includes(line.name))
     let lastCredits = null
-    if (this.isSingleStudentGraph() && !['/custompopulation', '/coursepopulation'].includes(window.location.pathname)) {
+    if (this.isSingleStudentGraph() && render) {
       const started = moment(students.minDate)
       const lastDate = moment(students.maxDate)
       const lastMonth = Math.ceil(this.getXAxisMonth(lastDate, started))
@@ -311,7 +316,8 @@ class CreditAccumulationGraphHighCharts extends Component {
 
 CreditAccumulationGraphHighCharts.defaultProps = {
   absences: [],
-  singleStudent: false
+  singleStudent: false,
+  render: true
 }
 
 CreditAccumulationGraphHighCharts.propTypes = {
@@ -322,7 +328,8 @@ CreditAccumulationGraphHighCharts.propTypes = {
   currentGraphSize: number.isRequired,
   language: string.isRequired,
   translate: func.isRequired,
-  absences: arrayOf(shape({}))
+  absences: arrayOf(shape({})),
+  render: bool
 }
 
 const mapStateToProps = state => ({
