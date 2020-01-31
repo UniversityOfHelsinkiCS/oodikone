@@ -25,9 +25,20 @@ const scheduleSomeMeta = async (table, limit = 100) => {
     await knexConnection
       .knex(table)
       .limit(limit)
-      .pluck('id')
+      .pluck('id'),
+    CHUNK_SIZE
   ).forEach(e => createJobs(e, table))
 }
+
+const scheduleSomeCourseUnits = async (limit = 100) =>
+  chunk(
+    await knexConnection
+      .knex('course_units')
+      .distinct('group_id')
+      .pluck('group_id')
+      .limit(limit),
+    CHUNK_SIZE
+  ).forEach(e => createJobs(e, 'course_units'))
 
 stan.on('error', () => {
   console.log('NATS connection failed')
@@ -44,11 +55,15 @@ knexConnection.on('error', e => {
 
 knexConnection.on('connect', async () => {
   console.log('Knex database connection established successfully')
+
+  // IN DB
   await scheduleSomeMeta('organisations')
+  await scheduleSomeCourseUnits()
+
+  // POC
   await scheduleSomeMeta('modules')
   await scheduleSomeMeta('educations')
   await scheduleSomeMeta('assessment_items')
-  await scheduleSomeMeta('course_units')
   await scheduleSomeMeta('course_unit_realisations')
   await scheduleSomeStudents()
 })
