@@ -2,7 +2,7 @@ import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 import Highcharts from 'highcharts'
 import HighchartsSankey from 'highcharts/modules/sankey'
-import raw_data from './data'
+import rawData from './data'
 import ProtoC from './ProtoC'
 import ProtoD from './ProtoD'
 import './CoolDataScience.css'
@@ -70,9 +70,9 @@ const configs = [config1, config2]
 const CoolDataScience = () => {
   return (
     <div style={{ margin: '0 auto', maxWidth: '75vw' }}>
-      <ProtoD data={raw_data} />
+      <ProtoD data={rawData} />
       <hr />
-      <ProtoC rawData={raw_data} />
+      <ProtoC rawData={rawData} />
       <hr />
       {configs.map((c, i) => (
         <div key={i}>
