@@ -17,9 +17,8 @@ const CourseSearchForm = props => {
     const validateParam = (param, minLength) => param && param.length >= minLength
     const isValidName = validateParam(courseName, 5)
     const isValidCode = validateParam(courseCode, 2)
-
     if (isValidName || isValidCode) {
-      return props.findCoursesV2({ courseName, courseCode })
+      return props.findCoursesV2({ course: courseName, code: courseCode })
     }
     if (courseName.length === 0 && courseCode.length === 0) {
       props.clearCourses()
@@ -33,23 +32,23 @@ const CourseSearchForm = props => {
     <Form>
       <Form.Group widths="equal">
         <Form.Field>
-          <label>Code:</label>
-          <AutoSubmitSearchInput
-            doSearch={fetchCourses}
-            placeholder="Search by entering a course code"
-            value={courseCode}
-            onChange={cc => setCourseCode(cc)}
-            loading={pending}
-            minSearchLength={0}
-          />
-        </Form.Field>
-        <Form.Field>
           <label>Name:</label>
           <AutoSubmitSearchInput
             doSearch={fetchCourses}
             placeholder="Search by entering a course name"
             value={courseName}
             onChange={cn => setCourseName(cn)}
+            loading={pending}
+            minSearchLength={0}
+          />
+        </Form.Field>
+        <Form.Field>
+          <label>Code:</label>
+          <AutoSubmitSearchInput
+            doSearch={fetchCourses}
+            placeholder="Search by entering a course code"
+            value={courseCode}
+            onChange={cc => setCourseCode(cc)}
             loading={pending}
             minSearchLength={0}
           />
