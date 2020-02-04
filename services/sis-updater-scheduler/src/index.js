@@ -58,6 +58,7 @@ knexConnection.on('connect', async () => {
 
   // IN DB
   await scheduleSomeMeta('organisations')
+  await scheduleSomeMeta('study_levels')
   await scheduleSomeCourseUnits()
 
   // POC
