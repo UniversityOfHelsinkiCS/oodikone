@@ -1,5 +1,5 @@
 const { groupBy, flatten } = require('lodash')
-const { Organization, Course } = require('../db/models')
+const { Organization, Course, CourseType } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
 const { getMinMaxDate, getMinMax } = require('../utils')
 
@@ -89,6 +89,14 @@ const updateTermRegistrations = async termRegistrations => {
   console.log('termRegistrations', termRegistrations)
 }
 
+const updateCourseTypes = async studyLevels => {
+  const mapStudyLevelToCourseType = studyLevel => ({
+    coursetypecode: studyLevel.id,
+    name: studyLevel.name
+  })
+  await bulkCreate(CourseType, studyLevels.map(mapStudyLevelToCourseType))
+}
+
 const idToHandler = {
   students: updateStudents,
   organisations: updateOrganisations,
@@ -96,7 +104,8 @@ const idToHandler = {
   educations: updateEducations,
   assessment_items: updateAssessmentItems,
   course_units: updateCourseUnits,
-  course_unit_realisations: updateCourseUnitRealisations
+  course_unit_realisations: updateCourseUnitRealisations,
+  study_levels: updateCourseTypes
 }
 
 const update = async ({ entityIds, type }) => {
@@ -110,6 +119,7 @@ const update = async ({ entityIds, type }) => {
     case 'course_units':
       return await updateHandler(await selectFromByIds(type, entityIds, 'group_id'))
     case 'modules':
+    case 'study_levels':
     case 'educations':
     case 'course_unit_realisations':
       return await updateHandler(await selectFromByIds(type, entityIds))
