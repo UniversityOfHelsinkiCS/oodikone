@@ -1,6 +1,6 @@
 -- Tavoiteaika~: >=55
 -- +1 aika: >= 40
--- Jäte: < 40
+-- Ei-tavoiteajassa: < 40
 
 
 -- Studyrights of extent 1 (bachelors) under matlu (H50) who started 2017
