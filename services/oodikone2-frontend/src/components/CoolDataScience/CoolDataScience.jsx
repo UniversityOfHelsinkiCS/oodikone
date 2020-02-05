@@ -78,6 +78,7 @@ const CoolDataScience = () => {
       <ProtoC rawData={rawData} />
       <hr />
       {configs.map((c, i) => (
+        // eslint-disable-next-line react/no-array-index-key
         <div key={i}>
           <ReactHighcharts highcharts={Highcharts} config={c} />
           <hr />
@@ -86,20 +87,5 @@ const CoolDataScience = () => {
     </div>
   )
 }
-
-/* <Sankey
-      className="my-cool-data-science"
-      nodes={nodes}
-      links={linkMapper(links)}
-      width={800}
-      height={400}
-      onLinkMouseOver={handleLinkMouseOver}
-      onLinkMouseOut={handleLinkMouseOut}
-      onValueMouseOver={handleValueMouseOver}
-      onValueMouseOut={handleValueMouseOut}
-    >
-      {activeValue && makeValueHint(activeValue)}
-      {activeLink && makeLinkHint(activeLink)}
-    </Sankey> */
 
 export default CoolDataScience
