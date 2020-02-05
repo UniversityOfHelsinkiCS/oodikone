@@ -57,7 +57,8 @@ knexConnection.on('connect', async () => {
   console.log('Knex database connection established successfully')
 
   // IN DB
-  await scheduleSomeMeta('organisations')
+  await scheduleSomeMeta('organisations', 1000000)
+  await scheduleSomeMeta('study_levels')
   await scheduleSomeCourseUnits()
 
   // POC
