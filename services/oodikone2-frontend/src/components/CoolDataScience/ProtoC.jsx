@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState } from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'

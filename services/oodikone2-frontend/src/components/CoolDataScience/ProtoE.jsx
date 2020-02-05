@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react'
+/* eslint-disable */
+import React, { useState, useCallback } from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 import moment from 'moment'
