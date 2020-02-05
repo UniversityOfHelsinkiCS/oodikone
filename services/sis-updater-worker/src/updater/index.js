@@ -1,5 +1,5 @@
 const { groupBy, flatten } = require('lodash')
-const { Organization, Course, CourseType } = require('../db/models')
+const { Organization, Course, CourseType, CourseProvider } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
 const { getMinMaxDate, getMinMax } = require('../utils')
 
@@ -23,9 +23,19 @@ const updateCourseUnits = async courseUnits => {
   )
   const courseIdToAttainments = groupBy(attainments, 'course_unit_id')
   const groupIdToCourse = groupBy(courseUnits, 'group_id')
+  const courseProviders = []
 
   const courses = Object.entries(groupIdToCourse).map(([, courses]) => {
-    const { code, name, study_level: coursetypecode, id } = courses[0]
+    const { code, name, study_level: coursetypecode, id, organisations } = courses[0]
+    organisations
+      .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
+      .forEach(({ organisationId }) => {
+        courseProviders.push({
+          composite: `${code}-${organisationId}`,
+          coursecode: id,
+          organizationcode: organisationId
+        })
+      })
     const { min: startdate, max: enddate } = getMinMaxDate(
       courses,
       c => c.validity_period.startDate,
@@ -54,6 +64,7 @@ const updateCourseUnits = async courseUnits => {
   })
 
   await bulkCreate(Course, courses)
+  await bulkCreate(CourseProvider, courseProviders, null, ['composite'])
 }
 
 const updateAssessmentItems = async assessmentItems => {
