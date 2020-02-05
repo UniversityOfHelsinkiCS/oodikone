@@ -18,7 +18,7 @@ const CourseSearchForm = props => {
     const isValidName = validateParam(courseName, 5)
     const isValidCode = validateParam(courseCode, 2)
     if (isValidName || isValidCode) {
-      return props.findCoursesV2({ course: courseName, code: courseCode })
+      return props.findCoursesV2({ name: courseName, code: courseCode })
     }
     if (courseName.length === 0 && courseCode.length === 0) {
       props.clearCourses()
