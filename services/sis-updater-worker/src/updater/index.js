@@ -1,5 +1,13 @@
-const { groupBy, flatten, flattenDeep, sortBy, mapValues } = require('lodash')
-const { Organization, Course, CourseType, CourseProvider, Student, Semester } = require('../db/models')
+const { groupBy, flatten, flattenDeep, sortBy, mapValues, uniqBy } = require('lodash')
+const {
+  Organization,
+  Course,
+  CourseType,
+  CourseProvider,
+  Student,
+  Semester,
+  SemesterEnrollment
+} = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
 const { getMinMaxDate, getMinMax } = require('../utils')
 
@@ -83,11 +91,16 @@ const updateStudents = async personIds => {
     selectFromByIds('term_registrations', personIds, 'student_id')
   ])
 
+  const personIdToStudentNumber = students.reduce((res, curr) => {
+    res[curr.id] = curr.student_number
+    return res
+  }, {})
+
   const formattedStudents = students.map(student => {
     const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
 
-    const gender_urn_array = gender_urn.split(':')
-    const formattedGender = gender_urn_array[gender_urn_array.length - 1]
+    const gender_urn_array = gender_urn ? gender_urn.split(':') : null
+    const formattedGender = gender_urn_array ? gender_urn_array[gender_urn_array.length - 1] : null
 
     const gender_mankeli = gender => {
       if (gender === 'male') return 1
@@ -132,7 +145,10 @@ const updateStudents = async personIds => {
   console.log('students', students)
   await bulkCreate(Student, formattedStudents)
   await updateStudyRights(studyRights.map(({ studyright }) => studyright))
-  await Promise.all([updateAttainments(attainments), updateTermRegistrations(termRegistrations)])
+  await Promise.all([
+    updateAttainments(attainments),
+    updateTermRegistrations(termRegistrations, personIdToStudentNumber)
+  ])
 }
 
 const updateStudyRights = async studyRights => {
@@ -143,8 +159,64 @@ const updateAttainments = async attainments => {
   console.log('attainments', attainments)
 }
 
-const updateTermRegistrations = async termRegistrations => {
-  console.log('termRegistrations', termRegistrations)
+const updateTermRegistrations = async (termRegistrations, personIdToStudentNumber) => {
+  const semesters = await Semester.findAll()
+  const studyRightIds = termRegistrations.map(({ study_right_id }) => study_right_id)
+  const studyRights = await selectFromSnapshotsByIds('studyrights', studyRightIds)
+  const orgIds = studyRights.map(({ organisation_id }) => organisation_id)
+  const organisations = await selectFromSnapshotsByIds('organisations', orgIds)
+
+  const orgToStartYearToSemesters = semesters.reduce((res, curr) => {
+    if (!res[curr.org]) res[curr.org] = {}
+    if (!res[curr.org][curr.startYear]) res[curr.org][curr.startYear] = {}
+    res[curr.org][curr.startYear][curr.termIndex] = curr
+    return res
+  }, {})
+
+  const orgToUniOrgId = organisations.reduce((res, curr) => {
+    res[curr.id] = curr.university_org_id
+    return res
+  }, {})
+
+  const studyrightToUniOrgId = studyRights.reduce((res, curr) => {
+    res[curr.id] = orgToUniOrgId[curr.organisation_id]
+    return res
+  }, {})
+
+  const semesterEnrollments = uniqBy(
+    flatten(
+      termRegistrations.map(({ student_id, term_registrations, study_right_id }) => {
+        return term_registrations.map(
+          ({
+            studyTerm: { termIndex, studyYearStartYear },
+            registrationDate,
+            termRegistrationType,
+            statutoryAbsence
+          }) => {
+            const enrollmenttype = termRegistrationType === 'ATTENDING' ? 1 : 2
+            const studentnumber = personIdToStudentNumber[student_id]
+            const { semestercode } = orgToStartYearToSemesters[studyrightToUniOrgId[study_right_id]][
+              studyYearStartYear
+            ][termIndex]
+            const enrollment_date = registrationDate
+            const org = studyrightToUniOrgId[study_right_id]
+            return {
+              enrollmenttype,
+              studentnumber,
+              semestercode,
+              enrollment_date,
+              org,
+              semestercomposite: `${org}-${semestercode}`,
+              statutory_absence: statutoryAbsence
+            }
+          }
+        )
+      })
+    ),
+    sE => `${sE.studentnumber}${sE.semestercomposite}`
+  )
+
+  await bulkCreate(SemesterEnrollment, semesterEnrollments)
 }
 
 const updateCourseTypes = async studyLevels => {
@@ -160,9 +232,10 @@ const updateSemesters = async studyYears => {
     Object.entries(groupBy(studyYears, 'org')).map(([org, orgStudyYears]) => {
       let semestercode = 1
       return sortBy(orgStudyYears, 'start_year').map(orgStudyYear => {
-        return orgStudyYear.study_terms.map(studyTerm => {
+        return orgStudyYear.study_terms.map((studyTerm, i) => {
           const acualYear = new Date(studyTerm.valid.startDate).getFullYear()
           return {
+            composite: `${org}-${semestercode}`,
             name: mapValues(studyTerm.name, n => {
               return `${n} ${acualYear}`
             }),
@@ -171,7 +244,9 @@ const updateSemesters = async studyYears => {
             yearcode: Number(orgStudyYear.start_year) - 1949, // lul! :D
             yearname: orgStudyYear.name,
             semestercode: semestercode++,
-            org
+            org,
+            termIndex: i,
+            startYear: orgStudyYear.start_year
           }
         })
       })
