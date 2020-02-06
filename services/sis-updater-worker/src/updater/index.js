@@ -1,5 +1,5 @@
-const { groupBy, flatten, sortBy } = require('lodash')
-const { Organization, Course, CourseType, CourseProvider, Student } = require('../db/models')
+const { groupBy, flatten, flattenDeep, sortBy, mapValues } = require('lodash')
+const { Organization, Course, CourseType, CourseProvider, Student, Semester } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
 const { getMinMaxDate, getMinMax } = require('../utils')
 
@@ -155,6 +155,31 @@ const updateCourseTypes = async studyLevels => {
   await bulkCreate(CourseType, studyLevels.map(mapStudyLevelToCourseType))
 }
 
+const updateSemesters = async studyYears => {
+  const semesters = flattenDeep(
+    Object.entries(groupBy(studyYears, 'org')).map(([org, orgStudyYears]) => {
+      let semestercode = 1
+      return sortBy(orgStudyYears, 'start_year').map(orgStudyYear => {
+        return orgStudyYear.study_terms.map(studyTerm => {
+          const acualYear = new Date(studyTerm.valid.startDate).getFullYear()
+          return {
+            name: mapValues(studyTerm.name, n => {
+              return `${n} ${acualYear}`
+            }),
+            startdate: studyTerm.valid.startDate,
+            enddate: studyTerm.valid.endDate,
+            yearcode: Number(orgStudyYear.start_year) - 1949, // lul! :D
+            yearname: orgStudyYear.name,
+            semestercode: semestercode++,
+            org
+          }
+        })
+      })
+    })
+  )
+  await bulkCreate(Semester, semesters)
+}
+
 const idToHandler = {
   students: updateStudents,
   organisations: updateOrganisations,
@@ -163,7 +188,8 @@ const idToHandler = {
   assessment_items: updateAssessmentItems,
   course_units: updateCourseUnits,
   course_unit_realisations: updateCourseUnitRealisations,
-  study_levels: updateCourseTypes
+  study_levels: updateCourseTypes,
+  study_years: updateSemesters
 }
 
 const update = async ({ entityIds, type }) => {
@@ -176,6 +202,8 @@ const update = async ({ entityIds, type }) => {
       return await updateHandler(await selectFromSnapshotsByIds(type, entityIds))
     case 'course_units':
       return await updateHandler(await selectFromByIds(type, entityIds, 'group_id'))
+    case 'study_years':
+      return await updateHandler(await selectFromByIds(type, entityIds, 'org'))
     case 'modules':
     case 'study_levels':
     case 'educations':
