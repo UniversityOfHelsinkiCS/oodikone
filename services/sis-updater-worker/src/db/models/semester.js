@@ -5,9 +5,12 @@ class Semester extends Model {}
 
 Semester.init(
   {
-    semestercode: {
-      type: INTEGER,
+    composite: {
+      type: STRING,
       primaryKey: true
+    },
+    semestercode: {
+      type: INTEGER
     },
     name: {
       type: JSONB
@@ -19,15 +22,19 @@ Semester.init(
       type: DATE
     },
     yearcode: {
-      type: INTEGER,
-      primaryKey: true
+      type: INTEGER
     },
     org: {
-      type: STRING,
-      primaryKey: true
+      type: STRING
     },
     yearname: {
       type: STRING
+    },
+    termIndex: {
+      type: INTEGER
+    },
+    startYear: {
+      type: INTEGER
     },
     createdAt: {
       type: DATE

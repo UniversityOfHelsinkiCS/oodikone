@@ -3,9 +3,12 @@ const { STRING, DATE, JSONB, INTEGER } = require('sequelize')
 module.exports = {
   up: async queryInterface => {
     await queryInterface.createTable('semesters', {
-      semestercode: {
-        type: INTEGER,
+      composite: {
+        type: STRING,
         primaryKey: true
+      },
+      semestercode: {
+        type: INTEGER
       },
       name: {
         type: JSONB
@@ -17,12 +20,10 @@ module.exports = {
         type: DATE
       },
       yearcode: {
-        type: INTEGER,
-        primaryKey: true
+        type: INTEGER
       },
       org: {
-        type: STRING,
-        primaryKey: true
+        type: STRING
       },
       yearname: {
         type: STRING
