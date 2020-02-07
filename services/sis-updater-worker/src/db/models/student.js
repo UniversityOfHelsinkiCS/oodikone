@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, JSONB, INTEGER } = require('sequelize')
+const { Model, STRING, DATE, INTEGER } = require('sequelize')
 const { dbConnections } = require('../connection')
 
 class Student extends Model {}
