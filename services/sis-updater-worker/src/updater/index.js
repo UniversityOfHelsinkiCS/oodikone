@@ -6,7 +6,8 @@ const {
   CourseProvider,
   Student,
   Semester,
-  SemesterEnrollment
+  SemesterEnrollment,
+  Teacher
 } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
 const { getMinMaxDate, getMinMax } = require('../utils')
@@ -157,6 +158,25 @@ const updateStudyRights = async studyRights => {
 
 const updateAttainments = async attainments => {
   console.log('attainments', attainments)
+  const acceptorPersonIds = flatten(
+    attainments.map(attainment =>
+      attainment.acceptor_persons
+        .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by')
+        .map(p => p.personId)
+    )
+  ).filter(p => !!p)
+  await updateTeachers(acceptorPersonIds)
+}
+
+const updateTeachers = async personIds => {
+  const teachers = (await selectFromByIds('persons', personIds))
+    .filter(p => !!p.employee_number)
+    .map(p => ({
+      id: p.employee_number,
+      name: `${p.last_name} ${p.first_names}`
+    }))
+
+  await bulkCreate(Teacher, teachers)
 }
 
 const updateTermRegistrations = async (termRegistrations, personIdToStudentNumber) => {
