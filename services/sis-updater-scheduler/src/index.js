@@ -50,6 +50,8 @@ const scheduleSomeCourseUnits = async (limit = 100) =>
     CHUNK_SIZE
   ).forEach(e => createJobs(e, 'course_units'))
 
+const scheduleCreditTypeCodes = () => createJobs([4, 7, 9, 10], 'credit_types')
+
 stan.on('error', () => {
   console.log('NATS connection failed')
 })
@@ -71,6 +73,7 @@ knexConnection.on('connect', async () => {
   await scheduleSomeMeta('study_levels')
   await scheduleSomeCourseUnits()
   await scheduleSomeStudyYears()
+  await scheduleCreditTypeCodes()
 
   // POC
   await scheduleSomeMeta('modules')
