@@ -7,7 +7,8 @@ const {
   Student,
   Semester,
   SemesterEnrollment,
-  Teacher
+  Teacher,
+  CreditType
 } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
 const { getMinMaxDate, getMinMax } = require('../utils')
@@ -275,6 +276,31 @@ const updateSemesters = async studyYears => {
   await bulkCreate(Semester, semesters)
 }
 
+const updateCreditTypes = async creditTypes => {
+  await bulkCreate(CreditType, creditTypes)
+}
+
+const creditTypeIdToCreditType = {
+  4: {
+    credittypecode: 4,
+    name: { en: 'Completed', fi: 'Suoritettu', sv: 'Genomförd' }
+  },
+  7: {
+    credittypecode: 7,
+    name: { en: 'Improved (grade)', fi: 'Korotettu', sv: 'Höjd' }
+  },
+  9: {
+    credittypecode: 9,
+    name: { en: 'Transferred', fi: 'Hyväksiluettu', sv: 'Tillgodoräknad' }
+  },
+  10: {
+    credittypecode: 10,
+    name: { en: 'Failed', fi: 'Hylätty', sv: 'Underkänd' }
+  }
+}
+
+const creditTypeIdsToCreditTypes = ids => ids.map(id => creditTypeIdToCreditType[id])
+
 const idToHandler = {
   students: updateStudents,
   organisations: updateOrganisations,
@@ -284,7 +310,8 @@ const idToHandler = {
   course_units: updateCourseUnits,
   course_unit_realisations: updateCourseUnitRealisations,
   study_levels: updateCourseTypes,
-  study_years: updateSemesters
+  study_years: updateSemesters,
+  credit_types: updateCreditTypes
 }
 
 const update = async ({ entityIds, type }) => {
@@ -292,6 +319,8 @@ const update = async ({ entityIds, type }) => {
   switch (type) {
     case 'students':
       return await updateHandler(entityIds)
+    case 'credit_types':
+      return await updateHandler(creditTypeIdsToCreditTypes(entityIds))
     case 'organisations':
     case 'assessment_items':
       return await updateHandler(await selectFromSnapshotsByIds(type, entityIds))
