@@ -77,5 +77,5 @@ knexConnection.on('connect', async () => {
   await scheduleSomeMeta('educations')
   await scheduleSomeMeta('assessment_items')
   await scheduleSomeMeta('course_unit_realisations')
-  await scheduleSomeStudents(10000)
+  await scheduleSomeStudents()
 })
