@@ -96,6 +96,14 @@ const updateStudents = async personIds => {
     return res
   }, {})
 
+  const country_urns = students.map(student => student.country_urn).filter(country => country)
+  const citizenship_urns = flatten(students.map(student => student.citizenships)).filter(urn => urn)
+
+  const [countries, home_countries] = await Promise.all([
+    selectFromByIds('countries', country_urns),
+    selectFromByIds('countries', citizenship_urns)
+  ])
+
   const formattedStudents = students.map(student => {
     const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
 
@@ -110,13 +118,15 @@ const updateStudents = async personIds => {
 
     const gender_code = gender_mankeli(formattedGender)
 
+    const country = countries.find(country => country.id === student.country_urn) // country defined by primary address, not good solution most likely, fix in importer
+    const home_country = student.citizenships ? home_countries.find(country => country.id === student.citizenships[0]) : null // this is stupid logic PLS FIX WHEN REAL PROPER DATA
+
     const studyRightsOfStudent = studyRights.filter(SR => SR.person_id === id)
 
     const dateofuniversityenrollment =
       studyRightsOfStudent.length > 0 ? sortBy(studyRightsOfStudent.map(sr => sr.study_start_date))[0] : null
 
     const attainmentsOfStudent = attainments.filter(attainment => attainment.person_id === id) // current db doesn't have studentnumbers in attainment table so have to use person_id for now
-
     const creditcount = attainmentsOfStudent.reduce((acc, curr) => {
       if (curr.type === 'ModuleAttainment' || curr.state === 'FAILED' || curr.misregistration) return acc // bit hacky solution for now
       return acc + Number(curr.credits)
@@ -129,20 +139,19 @@ const updateStudents = async personIds => {
       email: primary_email,
       gender_code,
       national_student_number: oppija_id,
-      home_county_id: null, //wtf
+      home_county_id: null, //wtf this is probably trash, current db has only null in this column
       birthdate: date_of_birth,
       creditcount,
       dateofuniversityenrollment,
-      country_fi: null, // do we need these names in different languages?
-      country_sv: null, // --||--
-      country_en: null, // --||--
-      home_country_fi: null, // --||--
-      home_country_sv: null, // --||--
-      home_country_en: null // --||--
+      country_fi: country ? country.name.fi : null,
+      country_sv: country ? country.name.sv : null,
+      country_en: country ? country.name.en : null,
+      home_country_fi: home_country ? home_country.name.fi : null, 
+      home_country_sv: home_country ? home_country.name.sv : null, 
+      home_country_en: home_country ? home_country.name.en : null
     }
   })
 
-  console.log('students', students)
   await bulkCreate(Student, formattedStudents)
   await updateStudyRights(studyRights.map(({ studyright }) => studyright))
   await Promise.all([
