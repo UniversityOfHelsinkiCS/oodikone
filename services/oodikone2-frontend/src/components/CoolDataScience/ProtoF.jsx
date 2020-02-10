@@ -65,11 +65,11 @@ const ProtoF = () => {
 
     setDataLoading(true)
     callApi('/cool-data-science/3y-students', 'get', null, { startDate: selectedStartYear }).then(res => {
-      const sortedByName = res.data.sort((a, b) => a.org_name.localeCompare(b.org_name))
+      const sortedByName = res.data.sort((a, b) => a.orgName.localeCompare(b.orgName))
       if (!setNameToColorIndex) {
         setNameToColorIndex(
           sortedByName.reduce((acc, val, i) => {
-            acc[val.org_name] = i
+            acc[val.orgName] = i
             return acc
           }, {})
         )
@@ -78,13 +78,13 @@ const ProtoF = () => {
         for (let i = 0; i < sortedByName.length; i++) {
           const tdk = sortedByName[i]
 
-          if (typeof newMapper[tdk.org_name] === 'undefined') {
-            newMapper[tdk.org_name] = Object.keys(newMapper).length
+          if (typeof newMapper[tdk.orgName] === 'undefined') {
+            newMapper[tdk.orgName] = Object.keys(newMapper).length
           }
         }
         setNameToColorIndex(newMapper)
       }
-      setData(res.data.sort((a, b) => parseInt(a.target_students, 10) - parseInt(b.target_students, 10)))
+      setData(res.data.sort((a, b) => parseInt(a.targetStudents, 10) - parseInt(b.targetStudents, 10)))
       setDataLoading(false)
     })
   }, [selectedStartYear])
@@ -139,6 +139,7 @@ const ProtoF = () => {
                   size: '110%',
                   dataLabels: {
                     formatter() {
+                      // eslint-disable-next-line
                       return `${this.point.name.replace(' tiedekunta', '')}`
                     }
                   }
@@ -150,12 +151,12 @@ const ProtoF = () => {
                   zMin: 0,
                   name: '3V tavoite-ajassa',
                   innerSize: '40%',
-                  data: data.map(({ org_code, org_name, org_total_students, target_students }) => ({
-                    id: org_code,
-                    color: COLORS[nameToColorIndex[org_name]],
-                    name: org_name,
-                    z: parseInt(org_total_students, 10),
-                    y: parseInt(target_students, 10)
+                  data: data.map(({ orgCode, orgName, orgTotalStudents, targetStudents }) => ({
+                    id: orgCode,
+                    color: COLORS[nameToColorIndex[orgName]],
+                    name: orgName,
+                    z: parseInt(orgTotalStudents, 10),
+                    y: parseInt(targetStudents, 10)
                   }))
                 }
               ]
