@@ -20,15 +20,25 @@ const scheduleSomeStudents = async (limit = 100) =>
     CHUNK_SIZE
   ).forEach(s => createJobs(s, 'students'))
 
-const scheduleSomeMeta = async (table, limit = 100) => {
+const scheduleSomeMeta = async (table, limit = 100, pluck = 'id') => {
   chunk(
     await knexConnection
       .knex(table)
       .limit(limit)
-      .pluck('id'),
+      .pluck(pluck),
     CHUNK_SIZE
   ).forEach(e => createJobs(e, table))
 }
+
+const scheduleSomeStudyYears = async (limit = 100) =>
+  chunk(
+    await knexConnection
+      .knex('study_years')
+      .distinct('org')
+      .pluck('org')
+      .limit(limit),
+    CHUNK_SIZE
+  ).forEach(e => createJobs(e, 'study_years'))
 
 const scheduleSomeCourseUnits = async (limit = 100) =>
   chunk(
@@ -39,6 +49,8 @@ const scheduleSomeCourseUnits = async (limit = 100) =>
       .limit(limit),
     CHUNK_SIZE
   ).forEach(e => createJobs(e, 'course_units'))
+
+const scheduleCreditTypeCodes = () => createJobs([4, 7, 9, 10], 'credit_types')
 
 stan.on('error', () => {
   console.log('NATS connection failed')
@@ -60,6 +72,8 @@ knexConnection.on('connect', async () => {
   await scheduleSomeMeta('organisations', 1000000)
   await scheduleSomeMeta('study_levels')
   await scheduleSomeCourseUnits()
+  await scheduleSomeStudyYears()
+  await scheduleCreditTypeCodes()
 
   // POC
   await scheduleSomeMeta('modules')

@@ -38,6 +38,7 @@ const Faculty = React.lazy(() => retry(() => import('../Faculty')))
 const CoursePopulation = React.lazy(() => retry(() => import('../CoursePopulation')))
 const CustomPopulation = React.lazy(() => retry(() => import('../CustomPopulation')))
 const Updater = React.lazy(() => retry(() => import('../Updater')))
+const CoolDataScience = React.lazy(() => retry(() => import('../CoolDataScience/CoolDataScience')))
 
 const routes = {
   students: '/students/:studentNumber?',
@@ -49,7 +50,8 @@ const routes = {
   feedback: '/feedback',
   coursepopulation: '/coursepopulation',
   custompopulation: '/custompopulation',
-  updater: '/updater'
+  updater: '/updater',
+  cooldatascience: '/cool-data-science'
 }
 
 const Routes = () => (
@@ -69,6 +71,7 @@ const Routes = () => (
       <Route exact path={routes.coursepopulation} component={CoursePopulation} />
       <Route exact path={routes.custompopulation} component={CustomPopulation} />
       <Route exact path={routes.updater} component={Updater} />
+      <Route exact path={routes.cooldatascience} component={CoolDataScience} />
       <Redirect to="/" />
     </Switch>
   </Suspense>
