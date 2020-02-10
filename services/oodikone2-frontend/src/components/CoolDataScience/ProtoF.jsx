@@ -1,28 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { Dropdown, Loader, Dimmer, Segment } from 'semantic-ui-react'
+import { Dropdown, Loader, Dimmer, Segment, Form } from 'semantic-ui-react'
 import ReactHighcharts from 'react-highcharts'
 import Highcharts from 'highcharts'
 import HighchartsVariablePie from 'highcharts/modules/variable-pie'
+import HighchartsDrilldown from 'highcharts/modules/drilldown'
 import { callApi } from '../../apiConnection'
 
 HighchartsVariablePie(Highcharts)
+HighchartsDrilldown(Highcharts)
 
 const COLORS = [
-  /* '#1abc9c',
-    '#2ecc71',
-    '#3498db',
-    '#9b59b6',
-    '#34495e',
-    '#f1c40f',
-    '#e67e22',
-    '#e74c3c',
-    '#16a085',
-    '#27ae60',
-    '#2980b9',
-    '#8e44ad',
-    '#f39c12',
-    '#d35400',
-    '#c0392b' */
   '#636e72',
   '#a29bfe',
   '#ffeaa7',
@@ -44,9 +31,15 @@ const COLORS = [
   '#2d3436'
 ]
 
+const sortOpts = [
+  { key: 0, text: 'by 3y target count', value: 'target' },
+  { key: 1, text: 'by total count', value: 'total' }
+]
+
 const ProtoF = () => {
   const [startOptions, setStartOptions] = useState([])
   const [selectedStartYear, setSelectedStartYear] = useState(null)
+  const [selectedSort, setSelectedSort] = useState('target')
   const [data, setData] = useState(null)
   const [dataLoading, setDataLoading] = useState(false)
   const [nameToColorIndex, setNameToColorIndex] = useState({})
@@ -64,46 +57,72 @@ const ProtoF = () => {
     }
 
     setDataLoading(true)
-    callApi('/cool-data-science/3y-students', 'get', null, { startDate: selectedStartYear }).then(res => {
-      const sortedByName = res.data.sort((a, b) => a.orgName.localeCompare(b.orgName))
-      if (!setNameToColorIndex) {
-        setNameToColorIndex(
-          sortedByName.reduce((acc, val, i) => {
-            acc[val.orgName] = i
-            return acc
-          }, {})
-        )
-      } else {
-        const newMapper = { ...nameToColorIndex }
-        for (let i = 0; i < sortedByName.length; i++) {
-          const tdk = sortedByName[i]
+    callApi('/cool-data-science/3y-students', 'get', null, { sort: selectedSort, startDate: selectedStartYear }).then(
+      res => {
+        const sortedByName = [...res.data].sort((a, b) => a.name.localeCompare(b.name))
+        if (!setNameToColorIndex) {
+          setNameToColorIndex(
+            sortedByName.reduce((acc, val, i) => {
+              acc[val.name] = i
+              return acc
+            }, {})
+          )
+        } else {
+          const newMapper = { ...nameToColorIndex }
+          for (let i = 0; i < sortedByName.length; i++) {
+            const tdk = sortedByName[i]
 
-          if (typeof newMapper[tdk.orgName] === 'undefined') {
-            newMapper[tdk.orgName] = Object.keys(newMapper).length
+            if (typeof newMapper[tdk.name] === 'undefined') {
+              newMapper[tdk.name] = Object.keys(newMapper).length
+            }
           }
+          setNameToColorIndex(newMapper)
         }
-        setNameToColorIndex(newMapper)
+        setData(res.data)
+        setDataLoading(false)
       }
-      setData(res.data.sort((a, b) => parseInt(a.targetStudents, 10) - parseInt(b.targetStudents, 10)))
-      setDataLoading(false)
-    })
-  }, [selectedStartYear])
+    )
+  }, [selectedStartYear, selectedSort])
 
   const handleYearChanged = useCallback((e, { value }) => {
     setSelectedStartYear(value)
+  }, [])
+  const handleSortChanged = useCallback((e, { value }) => {
+    setSelectedSort(value)
+  }, [])
+  const handleSubmit = useCallback(e => {
+    e.preventDefault()
   }, [])
 
   return (
     <Segment>
       <h3>Proto F</h3>
       <h4>3v tahdissa</h4>
-      <Dropdown
-        onChange={handleYearChanged}
-        options={startOptions}
-        placholder="Choose year"
-        selection
-        value={selectedStartYear}
-      />
+      <Form onSubmit={handleSubmit}>
+        <Form.Group inline>
+          <Form.Field>
+            <label>Start year</label>
+            <Dropdown
+              onChange={handleYearChanged}
+              options={startOptions}
+              placholder="Choose year"
+              selection
+              value={selectedStartYear}
+            />
+          </Form.Field>
+
+          <Form.Field>
+            <label>Sort</label>
+            <Dropdown
+              onChange={handleSortChanged}
+              options={sortOpts}
+              placeholder="Choose sort"
+              selection
+              value={selectedSort}
+            />
+          </Form.Field>
+        </Form.Group>
+      </Form>
 
       <Segment padded>
         <Dimmer active={!data && dataLoading} />
@@ -129,7 +148,7 @@ const ProtoF = () => {
               },
               tooltip: {
                 pointFormat:
-                  '<span style="color:{point.color}">\u25CF</span><b> {series.name}</b>: <b>{point.y}</b> ({point.percentage:.1f}% HY:stä)<br/>Yhteensä aloittaneita: {point.z}<br/>'
+                  '<span style="color:{point.color}">\u25CF</span><b> {series.name}</b>: <b>{point.y}</b> ({point.percentage:.1f}% tavoiteajassa olevista)<br/>Yhteensä aloittaneita: {point.z}<br/>'
               },
               plotOptions: {
                 variablepie: {
@@ -145,21 +164,38 @@ const ProtoF = () => {
                   }
                 }
               },
+              colors: COLORS,
               series: [
                 {
                   minPointsize: 10,
                   zMin: 0,
                   name: '3V tavoite-ajassa',
-                  innerSize: '40%',
-                  data: data.map(({ orgCode, orgName, orgTotalStudents, targetStudents }) => ({
-                    id: orgCode,
-                    color: COLORS[nameToColorIndex[orgName]],
-                    name: orgName,
-                    z: parseInt(orgTotalStudents, 10),
-                    y: parseInt(targetStudents, 10)
+                  innerSize: '30%',
+                  data: data.map(({ code, name, totalStudents, targetStudents }) => ({
+                    drilldown: `drilldown-${code}`,
+                    color: COLORS[nameToColorIndex[name]],
+                    name,
+                    z: totalStudents,
+                    y: targetStudents
                   }))
                 }
-              ]
+              ],
+              drilldown: {
+                series: data.map(org => {
+                  return {
+                    id: `drilldown-${org.code}`,
+                    minPointSize: 10,
+                    zMin: 0,
+                    name: `3V tavoite-ajassa, ${org.name.replace(' tiedekunta', '')}`,
+                    innerSize: '60%',
+                    data: org.programmes.map(({ name, totalStudents, targetStudents }) => ({
+                      name,
+                      z: totalStudents,
+                      y: targetStudents
+                    }))
+                  }
+                })
+              }
             }}
           />
         )}
