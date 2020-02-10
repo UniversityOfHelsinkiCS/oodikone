@@ -60,8 +60,9 @@ const get3yStudents = _.memoize(async startDate => {
     }
   )
 
-  return await sequelize.query(
-    `
+  return await sequelize
+    .query(
+      `
     WITH all_students AS (
       SELECT
         org.code org_code,
@@ -120,14 +121,20 @@ const get3yStudents = _.memoize(async startDate => {
     GROUP BY 1, 2, 3
     ORDER BY 2;
     `,
-    {
-      type: sequelize.QueryTypes.SELECT,
-      replacements: {
-        startDate: startDate,
-        targetCredits: targetCreditsForStartDate(startDate)
+      {
+        type: sequelize.QueryTypes.SELECT,
+        replacements: {
+          startDate: startDate,
+          targetCredits: targetCreditsForStartDate(startDate)
+        }
       }
-    }
-  )
+    )
+    .map(({ org_code, org_name, org_total_students, target_students }) => ({
+      orgCode: org_code,
+      orgName: org_name,
+      orgTotalStudents: org_total_students,
+      targetStudents: target_students
+    }))
 })
 
 router.get('/3y-students', async (req, res) => {
