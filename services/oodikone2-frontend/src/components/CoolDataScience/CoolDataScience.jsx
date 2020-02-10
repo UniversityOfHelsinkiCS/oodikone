@@ -2,10 +2,12 @@ import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 import Highcharts from 'highcharts'
 import HighchartsSankey from 'highcharts/modules/sankey'
+
 import rawData from './data'
 import ProtoC from './ProtoC'
 import ProtoD from './ProtoD'
 import ProtoE from './ProtoE'
+import ProtoF from './ProtoF'
 import './CoolDataScience.css'
 
 HighchartsSankey(Highcharts)
@@ -71,6 +73,8 @@ const configs = [config1, config2]
 const CoolDataScience = () => {
   return (
     <div style={{ margin: '0 auto', maxWidth: '75vw' }}>
+      <ProtoF />
+      <hr />
       <ProtoE />
       <hr />
       <ProtoD data={rawData} />
