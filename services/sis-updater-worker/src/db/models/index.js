@@ -7,6 +7,8 @@ const Semester = require('./semester')
 const SemesterEnrollment = require('./semesterEnrollment')
 const Teacher = require('./teacher')
 const CreditType = require('./creditType')
+const Credit = require('./credit')
+const CreditTeacher = require('./creditTeacher')
 
 CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
 Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
@@ -20,6 +22,34 @@ Student.hasMany(SemesterEnrollment, { foreignKey: 'studentnumber', sourceKey: 's
 SemesterEnrollment.belongsTo(Semester, { foreignKey: 'semestercomposite', targetKey: 'composite' })
 Semester.hasMany(SemesterEnrollment, { foreignKey: 'semestercomposite', sourceKey: 'composite' })
 
+Credit.notUnnecessary = credit => {
+  return credit.credits > 0 && credit.credits <= 12
+}
+
+const CREDIT_TYPE_CODES = {
+  PASSED: 4,
+  FAILED: 10,
+  IMPROVED: 7,
+  APPROVED: 9
+}
+
+Credit.passed = ({ credittypecode }) =>
+  credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.APPROVED
+Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
+Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED
+
+Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
+Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
+
+Credit.belongsTo(Course, { foreignKey: 'course_code' })
+Course.hasMany(Credit, { foreignKey: 'course_code' })
+
+Credit.belongsTo(CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
+Credit.belongsToMany(Teacher, { through: CreditTeacher, foreignKey: 'credit_id' })
+Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id' })
+
+// Credit.belongsTo(Semester, { foreignKey: { name: 'semestercode', allowNull: false } })
+
 module.exports = {
   Organization,
   Course,
@@ -29,5 +59,7 @@ module.exports = {
   Semester,
   SemesterEnrollment,
   Teacher,
-  CreditType
+  CreditType,
+  Credit,
+  CreditTeacher
 }
