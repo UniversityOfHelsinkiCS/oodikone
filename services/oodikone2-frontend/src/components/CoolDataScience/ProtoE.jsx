@@ -164,8 +164,6 @@ const ProtoE = () => {
     }))
     .value()
 
-  console.log(statsTarget)
-
   const count3yAmount = useCallback(
     facultyName => {
       return statsTarget[statsTarget.length - 1].ebin.filter(r => r[1] === facultyName).reduce((a, b) => a + b[3], 0)
