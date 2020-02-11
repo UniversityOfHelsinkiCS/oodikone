@@ -20,7 +20,8 @@ class DbConnections extends EventEmitter {
         min: 0,
         acquire: 10000,
         idle: 300000000
-      }
+      },
+      logging: false
     })
   }
 
