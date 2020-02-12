@@ -9,6 +9,7 @@ const Teacher = require('./teacher')
 const CreditType = require('./creditType')
 const Credit = require('./credit')
 const CreditTeacher = require('./creditTeacher')
+const ElementDetail = require('./elementDetail')
 
 CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
 Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
@@ -61,5 +62,6 @@ module.exports = {
   Teacher,
   CreditType,
   Credit,
-  CreditTeacher
+  CreditTeacher,
+  ElementDetail
 }
