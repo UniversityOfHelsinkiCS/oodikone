@@ -10,7 +10,8 @@ const {
   Teacher,
   CreditType,
   Credit,
-  CreditTeacher
+  CreditTeacher,
+  ElementDetail
 } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
 const { getMinMaxDate, getMinMax } = require('../utils')
@@ -226,6 +227,25 @@ const updateStudents = async personIds => {
 }
 
 const updateStudyRights = async studyRights => {
+  const mapping = studyRights.reduce((acc, curr) => {
+    const { accepted_selection_path: { educationPhase1GroupId, educationPhase1ChildGroupId, educationPhase2GroupId, educationPhase2ChildGroupId } } = curr
+    
+    acc[20].add(educationPhase1GroupId)
+    acc[20].add(educationPhase2GroupId)
+    acc[30].add(educationPhase1ChildGroupId)
+    acc[30].add(educationPhase2ChildGroupId)
+
+    return acc
+  }, {20:new Set(), 30: new Set()})
+
+  const programmes = await selectFromByIds('modules', [...mapping[20]].filter(a => !!a), 'group_id')
+  const studytracks = await selectFromByIds('modules', [...mapping[30]].filter(a => !!a), 'group_id')
+
+  const formattedProgrammes = programmes.map(programme => ({ ...programme, type:20 }))
+  const formattedStudytracks = studytracks.map(studytrack => ({ ...studytrack, type:30 }))
+
+  await bulkCreate(ElementDetail, [...formattedProgrammes, ...formattedStudytracks], null, ['code'])
+  
   console.log('studyRights', studyRights)
 }
 
