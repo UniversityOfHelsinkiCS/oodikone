@@ -13,7 +13,8 @@ const {
   CreditTeacher,
   ElementDetail,
   StudyrightExtent,
-  Studyright
+  Studyright,
+  StudyrightElement
 } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, selectAllFrom } = require('../db')
 const { getMinMaxDate, getMinMax } = require('../utils')
@@ -144,6 +145,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     organisations
       .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
       .forEach(({ organisationId }) => {
+        console.log('fuuuuuuckj')
         courseProviders.push({
           composite: `${groupId}-${organisationId}`,
           coursecode: groupId,
@@ -306,6 +308,13 @@ const updateStudyRights = async studyRights => {
   const formattedProgrammes = programmes.map(programme => ({ ...programme, type: 20 }))
   const formattedStudytracks = studytracks.map(studytrack => ({ ...studytrack, type: 30 }))
 
+  const moduleGroupIdToCode = [...formattedProgrammes, ...formattedStudytracks].reduce((acc, curr) => {
+    acc[curr.group_id] = curr.code
+    return acc
+  }, {})
+
+  // console.log("m", moduleGroupIdToCode)
+
   await bulkCreate(
     ElementDetail,
     uniqBy([...formattedProgrammes, ...formattedStudytracks], e => e.code),
@@ -337,6 +346,8 @@ const updateStudyRights = async studyRights => {
     return acc
   }, {})
 
+  const studyrightElements = []
+
   const formattedStudyRights = studyRights.reduce((acc, studyright) => {
     const studyRightEducation = educationIdToEducation[studyright.education_id]
 
@@ -360,6 +371,25 @@ const updateStudyRights = async studyRights => {
         prioritycode: 1, // fix this pls
         studentStudentnumber: personToStudentNumber[studyright.person_id]
       }
+
+      studyrightElements.push({
+        studyrightid: studyRightBach.studyrightid,
+        id: `${studyRightBach.studyrightid}-1`,
+        startdate: studyRightBach.startdate,
+        enddate: studyRightBach.enddate,
+        code: moduleGroupIdToCode[studyright.accepted_selection_path.educationPhase1GroupId],
+        studentnumber: studyRightBach.studentStudentnumber
+      })
+
+      studyrightElements.push({
+        studyrightid: studyRightBach.studyrightid,
+        id: `${studyRightBach.studyrightid}-2`,
+        startdate: studyRightBach.startdate,
+        enddate: studyRightBach.enddate,
+        code: moduleGroupIdToCode[studyright.accepted_selection_path.educationPhase1ChildGroupId],
+        studentnumber: studyRightBach.studentStudentnumber
+      })
+
       const studyRightMast = {
         extentcode: 2,
         studyrightid: `${studyright.id}-2`,
@@ -378,6 +408,25 @@ const updateStudyRights = async studyRights => {
         prioritycode: 1,
         studentStudentnumber: personToStudentNumber[studyright.person_id]
       }
+
+      studyrightElements.push({
+        studyrightid: studyRightMast.studyrightid,
+        id: `${studyRightMast.studyrightid}-1`,
+        startdate: studyRightMast.startdate,
+        enddate: studyRightMast.enddate,
+        code: moduleGroupIdToCode[studyright.accepted_selection_path.educationPhase2GroupId],
+        studentnumber: studyRightMast.studentStudentnumber
+      })
+
+      studyrightElements.push({
+        studyrightid: studyRightMast.studyrightid,
+        id: `${studyRightMast.studyrightid}-2`,
+        startdate: studyRightMast.startdate,
+        enddate: studyRightMast.enddate,
+        code: moduleGroupIdToCode[studyright.accepted_selection_path.educationPhase2ChildGroupId],
+        studentnumber: studyRightMast.studentStudentnumber
+      })
+
       acc.push(studyRightMast, studyRightBach)
     } else {
       const currentEducationType = educationTypes[studyRightEducation.education_type]
@@ -399,12 +448,33 @@ const updateStudyRights = async studyRights => {
         studentStudentnumber: personToStudentNumber[studyright.person_id]
       }
       acc.push(studyRight)
+
+      studyrightElements.push({
+        studyrightid: studyRight.studyrightid,
+        id: `${studyRight.studyrightid}-1`,
+        startdate: studyRight.startdate,
+        enddate: studyRight.enddate,
+        code: moduleGroupIdToCode[studyright.accepted_selection_path.educationPhase1GroupId],
+        studentnumber: studyRight.studentStudentnumber
+      })
+
+      studyrightElements.push({
+        studyrightid: studyRight.studyrightid,
+        id: `${studyRight.studyrightid}-2`,
+        startdate: studyRight.startdate,
+        enddate: studyRight.enddate,
+        code: moduleGroupIdToCode[studyright.accepted_selection_path.educationPhase1ChildGroupId],
+        studentnumber: studyRight.studentStudentnumber
+      })
+
     }
     return acc
   }, [])
+
   await bulkCreate(Studyright, formattedStudyRights, null, ['studyrightid'])
+  await bulkCreate(StudyrightElement, studyrightElements.filter(s_element => !!s_element.code))
 }
-//
+
 const updateAttainments = async attainments => {
   if (!daysToSemesters) await initDaysToSemesters()
 
