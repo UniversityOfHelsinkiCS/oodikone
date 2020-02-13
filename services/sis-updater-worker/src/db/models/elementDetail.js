@@ -5,7 +5,7 @@ class ElementDetail extends Model {}
 
 ElementDetail.init(
   {
-    code: { type:STRING, primaryKey: true },
+    code: { type: STRING, primaryKey: true },
     name: { type: JSONB },
     type: { type: INTEGER },
     createdAt: {
