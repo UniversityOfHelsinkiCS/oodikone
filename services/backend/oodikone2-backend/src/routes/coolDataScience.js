@@ -162,7 +162,8 @@ const get3yStudentsWithDrilldown = _.memoize(async startDate => {
 
 const sorters = {
   target: (a, b) => a.targetStudents - b.targetStudents,
-  total: (a, b) => a.totalStudents - b.totalStudents
+  total: (a, b) => a.totalStudents - b.totalStudents,
+  targetRelative: (a, b) => a.targetStudents / a.totalStudents - b.targetStudents / b.totalStudents
 }
 
 router.get('/3y-students', async (req, res) => {
