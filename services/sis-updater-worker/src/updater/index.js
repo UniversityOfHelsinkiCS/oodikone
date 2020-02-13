@@ -12,9 +12,10 @@ const {
   Credit,
   CreditTeacher,
   ElementDetail,
-  StudyrightExtent
+  StudyrightExtent,
+  Studyright
 } = require('../db/models')
-const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
+const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, selectAllFrom } = require('../db')
 const { getMinMaxDate, getMinMax } = require('../utils')
 
 let daysToSemesters = null
@@ -270,7 +271,7 @@ const updateStudents = async personIds => {
 }
 
 const updateStudyRights = async studyRights => {
-  const mapping = studyRights.reduce(
+  const formattedElementDetails = studyRights.reduce(
     (acc, curr) => {
       const {
         accepted_selection_path: {
@@ -293,12 +294,12 @@ const updateStudyRights = async studyRights => {
 
   const programmes = await selectFromByIds(
     'modules',
-    [...mapping[20]].filter(a => !!a),
+    [...formattedElementDetails[20]].filter(a => !!a),
     'group_id'
   )
   const studytracks = await selectFromByIds(
     'modules',
-    [...mapping[30]].filter(a => !!a),
+    [...formattedElementDetails[30]].filter(a => !!a),
     'group_id'
   )
 
@@ -312,9 +313,98 @@ const updateStudyRights = async studyRights => {
     ['code']
   )
 
-  console.log('studyRights', studyRights)
-}
+  const educationIds = studyRights.map(sr => sr.education_id)
 
+  const personIds = studyRights.map(sr => sr.person_id)
+
+  const educationIdToEducation = (await selectFromByIds('educations', educationIds)).reduce((acc, curr) => {
+    acc[curr.id] = curr
+    return acc
+  }, {})
+
+  const educationTypes = (await selectAllFrom('education_types')).reduce((acc, curr) => {
+    acc[curr.id] = curr
+    return acc
+  }, {})
+
+  const organisationUrnToCode = (await Organization.findAll()).reduce((acc, curr) => {
+    acc[curr.id] = curr.code
+    return acc
+  }, {})
+
+  const personToStudentNumber = (await selectFromByIds('persons', personIds)).reduce((acc, curr) => {
+    acc[curr.id] = curr.student_number
+    return acc
+  }, {})
+
+  const formattedStudyRights = studyRights.reduce((acc, studyright) => {
+    const studyRightEducation = educationIdToEducation[studyright.education_id]
+
+    if (!studyRightEducation) return acc
+
+    if (
+      studyRightEducation.education_type === 'urn:code:education-type:degree-education:bachelors-and-masters-degree' // :D
+    ) {
+      const studyRightBach = {
+        extentcode: 1,
+        studyrightid: `${studyright.id}-1`,
+        facultyCode: organisationUrnToCode[studyright.organisation_id],
+        startdate: studyright.valid.startDate,
+        enddate: studyright.study_right_graduation
+          ? studyright.study_right_graduation.phase1GraduationDate
+          : studyright.valid.endDate,
+        givendate: studyright.grant_date,
+        canceldate: studyright.study_right_cancellation ? studyright.study_right_cancellation.cancellationDate : null,
+        graduated: studyright.study_right_graduation ? 1 : 0,
+        studystartdate: studyright.study_start_date,
+        prioritycode: 1, // fix this pls
+        studentStudentnumber: personToStudentNumber[studyright.person_id]
+      }
+      const studyRightMast = {
+        extentcode: 2,
+        studyrightid: `${studyright.id}-2`,
+        facultyCode: organisationUrnToCode[studyright.organisation_id],
+        startdate: studyright.valid.startDate,
+        enddate:
+          studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate
+            ? studyright.study_right_graduation.phase2GraduationDate
+            : studyright.valid.endDate,
+        givendate: studyright.grant_date,
+        canceldate: studyright.study_right_cancellation ? studyright.study_right_cancellation.cancellationDate : null,
+        graduated: studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate ? 1 : 0,
+        studystartdate: studyright.study_right_graduation
+          ? studyright.study_right_graduation.phase1GraduationDate
+          : null,
+        prioritycode: 1,
+        studentStudentnumber: personToStudentNumber[studyright.person_id]
+      }
+      acc.push(studyRightMast, studyRightBach)
+    } else {
+      const currentEducationType = educationTypes[studyRightEducation.education_type]
+      const studyRight = {
+        extentcode:
+          educationTypeToExtentcode[currentEducationType.id] ||
+          educationTypeToExtentcode[currentEducationType.parent_id], // hyi
+        studyrightid: studyright.id,
+        facultyCode: organisationUrnToCode[studyright.organisation_id],
+        startdate: studyright.valid.startDate,
+        enddate: studyright.study_right_graduation
+          ? studyright.study_right_graduation.phase1GraduationDate
+          : studyright.valid.endDate,
+        givendate: studyright.grant_date,
+        canceldate: studyright.study_right_cancellation ? studyright.study_right_cancellation.cancellationDate : null,
+        graduated: studyright.study_right_graduation ? 1 : 0,
+        studystartdate: studyright.study_start_date,
+        prioritycode: 1, // fix this pls
+        studentStudentnumber: personToStudentNumber[studyright.person_id]
+      }
+      acc.push(studyRight)
+    }
+    return acc
+  }, [])
+  await bulkCreate(Studyright, formattedStudyRights, null, ['studyrightid'])
+}
+//
 const updateAttainments = async attainments => {
   if (!daysToSemesters) await initDaysToSemesters()
 

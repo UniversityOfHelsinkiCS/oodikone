@@ -3,6 +3,8 @@ const { getLatestSnapshot, isActive } = require('../utils')
 
 const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
 
+const selectAllFrom = async table => dbConnections.knex(table)
+
 const selectFromSnapshotsByIds = async (table, ids, col = 'id') =>
   (
     await dbConnections.knex
@@ -26,5 +28,6 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
 module.exports = {
   selectFromByIds,
   selectFromSnapshotsByIds,
-  bulkCreate
+  bulkCreate,
+  selectAllFrom
 }
