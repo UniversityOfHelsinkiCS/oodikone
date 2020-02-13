@@ -11,7 +11,8 @@ const {
   CreditType,
   Credit,
   CreditTeacher,
-  ElementDetail
+  ElementDetail,
+  StudyrightExtent
 } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
 const { getMinMaxDate, getMinMax } = require('../utils')
@@ -65,6 +66,46 @@ const creditTypeIdToCreditType = {
 }
 
 const creditTypeIdsToCreditTypes = ids => ids.map(id => creditTypeIdToCreditType[id])
+
+/* 
+  MISSING EXTENTS:
+  - 5
+  - 8
+  - 10
+  - 11
+  - 12 (maybe 31)
+  - 15 (maybe 31)
+  - 17
+  - 20
+  - 21
+  - 32
+  - 33
+*/
+const educationTypeToExtentcode = {
+  'urn:code:education-type:degree-education:bachelors-degree': 1,
+  'urn:code:education-type:degree-education:masters-degree': 2,
+  'urn:code:education-type:degree-education:lic': 3,
+  'urn:code:education-type:degree-education:doctor': 4,
+  'urn:code:education-type:non-degree-education:updating-training': 6,
+  'urn:code:education-type:non-degree-education:exchange-studies': 7,
+  'urn:code:education-type:non-degree-education:open-university-studies': 9,
+  'urn:code:education-type:non-degree-education:separate-studies:separate-teacher-pedagogical-studies': 13,
+  'urn:code:education-type:non-degree-education:agreement-studies': 14,
+  'urn:code:education-type:non-degree-education:agreement-studies:bilateral-agreement-studies': null, // Parent is 14
+  'urn:code:education-type:non-degree-education:agreement-studies:joo-studies': null, // Parent is 14
+  'urn:code:education-type:non-degree-education:agreement-studies:studies-for-secondary-school-students': 16,
+  'urn:code:education-type:non-degree-education:separate-studies:specialisation-studies': 18,
+  'urn:code:education-type:non-degree-education:separate-studies:separate-special-education-teacher-pedagogical-studies': 22,
+  'urn:code:education-type:degree-education:specialisation-in-medicine-and-dentistry': 23,
+  'urn:code:education-type:non-degree-education:summer-winter-school': 31,
+  'urn:code:education-type:non-degree-education:exchange-studies-postgraduate': 34,
+  'urn:code:education-type:non-degree-education:separate-studies': 99,
+  'urn:code:education-type:non-degree-education:separate-studies:separate-subject-matter-studies': null, // Parent is 99
+  'urn:code:education-type:non-degree-education:separate-studies:alumni-studies': null, // Parent is 99
+  'urn:code:education-type:non-degree-education:separate-studies:separate-study-advisor-studies': null, // Parent is 99
+  'urn:code:education-type:non-degree-education:separate-studies:separate-personal-studies': null, // Parent is 99
+  'urn:code:education-type:non-degree-education:separate-studies:adult-educator-pedagogical-studies': null // Parent is 99
+}
 
 const updateOrganisations = async organisations => {
   await bulkCreate(Organization, organisations)
@@ -182,7 +223,9 @@ const updateStudents = async personIds => {
     const gender_code = gender_mankeli(formattedGender)
 
     const country = countries.find(country => country.id === student.country_urn) // country defined by primary address, not good solution most likely, fix in importer
-    const home_country = student.citizenships ? home_countries.find(country => country.id === student.citizenships[0]) : null // this is stupid logic PLS FIX WHEN REAL PROPER DATA
+    const home_country = student.citizenships
+      ? home_countries.find(country => country.id === student.citizenships[0])
+      : null // this is stupid logic PLS FIX WHEN REAL PROPER DATA
 
     const studyRightsOfStudent = studyRights.filter(SR => SR.person_id === id)
 
@@ -209,8 +252,8 @@ const updateStudents = async personIds => {
       country_fi: country ? country.name.fi : null,
       country_sv: country ? country.name.sv : null,
       country_en: country ? country.name.en : null,
-      home_country_fi: home_country ? home_country.name.fi : null, 
-      home_country_sv: home_country ? home_country.name.sv : null, 
+      home_country_fi: home_country ? home_country.name.fi : null,
+      home_country_sv: home_country ? home_country.name.sv : null,
       home_country_en: home_country ? home_country.name.en : null
     }
   })
@@ -227,29 +270,54 @@ const updateStudents = async personIds => {
 }
 
 const updateStudyRights = async studyRights => {
-  const mapping = studyRights.reduce((acc, curr) => {
-    const { accepted_selection_path: { educationPhase1GroupId, educationPhase1ChildGroupId, educationPhase2GroupId, educationPhase2ChildGroupId } } = curr
-    
-    acc[20].add(educationPhase1GroupId)
-    acc[20].add(educationPhase2GroupId)
-    acc[30].add(educationPhase1ChildGroupId)
-    acc[30].add(educationPhase2ChildGroupId)
+  const mapping = studyRights.reduce(
+    (acc, curr) => {
+      const {
+        accepted_selection_path: {
+          educationPhase1GroupId,
+          educationPhase1ChildGroupId,
+          educationPhase2GroupId,
+          educationPhase2ChildGroupId
+        }
+      } = curr
 
-    return acc
-  }, {20:new Set(), 30: new Set()})
+      acc[20].add(educationPhase1GroupId)
+      acc[20].add(educationPhase2GroupId)
+      acc[30].add(educationPhase1ChildGroupId)
+      acc[30].add(educationPhase2ChildGroupId)
 
-  const programmes = await selectFromByIds('modules', [...mapping[20]].filter(a => !!a), 'group_id')
-  const studytracks = await selectFromByIds('modules', [...mapping[30]].filter(a => !!a), 'group_id')
+      return acc
+    },
+    { 20: new Set(), 30: new Set() }
+  )
 
-  const formattedProgrammes = programmes.map(programme => ({ ...programme, type:20 }))
-  const formattedStudytracks = studytracks.map(studytrack => ({ ...studytrack, type:30 }))
+  const programmes = await selectFromByIds(
+    'modules',
+    [...mapping[20]].filter(a => !!a),
+    'group_id'
+  )
+  const studytracks = await selectFromByIds(
+    'modules',
+    [...mapping[30]].filter(a => !!a),
+    'group_id'
+  )
 
-  await bulkCreate(ElementDetail, [...formattedProgrammes, ...formattedStudytracks], null, ['code'])
-  
+  const formattedProgrammes = programmes.map(programme => ({ ...programme, type: 20 }))
+  const formattedStudytracks = studytracks.map(studytrack => ({ ...studytrack, type: 30 }))
+
+  await bulkCreate(
+    ElementDetail,
+    uniqBy([...formattedProgrammes, ...formattedStudytracks], e => e.code),
+    null,
+    ['code']
+  )
+
   console.log('studyRights', studyRights)
 }
 
 const updateAttainments = async attainments => {
+  if (!daysToSemesters) await initDaysToSemesters()
+
   const acceptorPersonIds = flatten(
     attainments.map(attainment =>
       attainment.acceptor_persons
@@ -467,6 +535,18 @@ const updateCreditTypes = async creditTypes => {
   console.log(`Updated ${creditTypes.length} credit types`)
 }
 
+const updateStudyrightExtents = async educationTypes => {
+  const studyrightExtents = educationTypes
+    .map(eT => ({
+      extentcode: educationTypeToExtentcode[eT.id],
+      name: eT.name
+    }))
+    .filter(eT => eT.extentcode)
+
+  await bulkCreate(StudyrightExtent, studyrightExtents, null, ['extentcode'])
+  console.log(`Updated ${educationTypes.length} studyright extents`)
+}
+
 const idToHandler = {
   students: updateStudents,
   organisations: updateOrganisations,
@@ -474,12 +554,11 @@ const idToHandler = {
   course_units: updateCourseUnits,
   study_levels: updateCourseTypes,
   study_years: updateSemesters,
-  credit_types: updateCreditTypes
+  credit_types: updateCreditTypes,
+  education_types: updateStudyrightExtents
 }
 
 const update = async ({ entityIds, type }) => {
-  if (!daysToSemesters) await initDaysToSemesters()
-
   const updateHandler = idToHandler[type]
   switch (type) {
     case 'students':
@@ -494,6 +573,7 @@ const update = async ({ entityIds, type }) => {
       return await updateHandler(await selectFromByIds(type, entityIds, 'org'))
     case 'study_modules':
       return await updateHandler(await selectFromByIds('modules', entityIds, 'group_id'))
+    case 'education_types':
     case 'study_levels':
       return await updateHandler(await selectFromByIds(type, entityIds))
   }

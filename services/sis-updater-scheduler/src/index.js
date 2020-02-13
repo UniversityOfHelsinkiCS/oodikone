@@ -82,11 +82,12 @@ knexConnection.on('connect', async () => {
   // META
   await scheduleSomeMeta('organisations', 1000000)
   await scheduleSomeMeta('study_levels', 1000000)
-  await scheduleSomeCourseUnits(1000000)
-  await scheduleSomeStudyModules(1000000)
+  await scheduleSomeMeta('education_types', 1000000)
+  await scheduleSomeCourseUnits(1000)
+  await scheduleSomeStudyModules(1000)
   await scheduleSomeStudyYears(1000000)
   await scheduleCreditTypeCodes()
 
   // META needs to be in DB before students (courses etc.)
-  await scheduleSomeStudents(500000)
+  await scheduleSomeStudents()
 })
