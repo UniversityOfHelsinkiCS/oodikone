@@ -54,80 +54,101 @@ const get3yStudentsWithDrilldown = _.memoize(async startDate => {
     RETURNS DOUBLE PRECISION AS $$
         SELECT (input - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
     $$ LANGUAGE SQL;
-  `,
+    
+    -- linear mapping from 0-180op -> 0-1 * targetCredits basically
+    CREATE OR REPLACE FUNCTION pg_temp.is_in_target(
+        currentDate TIMESTAMP WITH TIME ZONE,
+        studyStartDate TIMESTAMP WITH TIME ZONE,
+        targetDate TIMESTAMP WITH TIME ZONE,
+        studentCredits DOUBLE PRECISION,
+        targetCredits DOUBLE PRECISION)
+    RETURNS INTEGER AS $$
+        SELECT CASE WHEN studentCredits >= pg_temp.mapRange(
+            EXTRACT(EPOCH FROM currentDate),
+            EXTRACT(EPOCH FROM studyStartDate),
+            EXTRACT(EPOCH FROM targetDate),
+            0,
+            targetCredits
+        )
+            THEN 1
+            ELSE 0
+        END;
+    $$ LANGUAGE SQL;`,
     {
-      type: sequelize.QueryTypes.RAW
+      type: sequelize.QueryTypes.RAW,
+      multipleStatements: true
     }
   )
-
   return await sequelize.query(
     `
-    WITH all_students AS (
-        SELECT
-            org.code org_code,
-            org.name->>'fi' org_name,
-            element_details.name->>'fi' programme_name,
-            studyright.student_studentnumber studentnumber,
-            studyright.studystartdate studystartdate,
-            credits.credits_sum credits_sum
-        FROM
-            organization org
-            INNER JOIN studyright
-                ON studyright.faculty_code = org.code
-            LEFT JOIN studyright_elements
-                ON studyright.studyrightid = studyright_elements.studyrightid
-            LEFT JOIN element_details
-                ON element_details.code = studyright_elements.code
-            LEFT JOIN (
-                SELECT
-                    student_studentnumber,
-                    sum(credits) credits_sum
-                FROM credit
-                WHERE attainment_date >= :startDate
-                GROUP BY student_studentnumber
-            ) credits
-                ON credits.student_studentnumber = studyright.student_studentnumber
-            LEFT JOIN transfers
-                ON studyright.studyrightid = transfers.studyrightid
-        WHERE
-            studyright.extentcode = 1
-            AND element_details.type = 20
-            AND studyright.studystartdate = :startDate
-            AND transfers.studyrightid IS NULL
-    ),
-    org_stats AS (
-        SELECT
-            all_students.org_code org_code,
-            all_students.programme_name programme_name,
-            COUNT(DISTINCT all_students.studentnumber) total_students
-        FROM all_students
-        GROUP BY 1, 2
-    ),
-    target_students AS (
-        SELECT *
-        FROM all_students
-        WHERE
-            all_students.credits_sum IS NOT NULL
-                AND all_students.credits_sum >= pg_temp.mapRange(
-                    EXTRACT(EPOCH FROM now()),
-                    EXTRACT(EPOCH FROM all_students.studystartdate),
-                    EXTRACT(EPOCH FROM TIMESTAMP '2020-07-31'),
-                    0,
-                    1
-                ) * :targetCredits
-    )
     SELECT
-        target_students.org_code "orgCode",
-        target_students.org_name "orgName",
-        target_students.programme_name "programmeName",
-        org_stats.total_students "programmeTotalStudents",
-        COUNT(DISTINCT target_students.studentnumber) "targetStudents"
-    FROM target_students
-        LEFT JOIN org_stats
-            ON org_stats.org_code = target_students.org_code
-                AND org_stats.programme_name = target_students.programme_name
-    GROUP BY 1, 2, 3, 4
-    ORDER BY 2
+        ss.org_code "orgCode",
+        ss.org_name "orgName",
+        ss.programme_code "programmeCode",
+        ss.programme_name "programmeName",
+        COUNT(ss.studentnumber) "programmeTotalStudents",
+        SUM(
+            pg_temp.is_in_target(
+                CURRENT_TIMESTAMP,
+                ss.studystartdate,
+                TIMESTAMP '2020-07-31',
+                ss.credits,
+                :targetCredits
+            )
+        ) "targetStudents"
+    FROM (
+        SELECT
+            org_code,
+            org_name,
+            programme_code,
+            programme_name,
+            studystartdate,
+            studentnumber,
+            SUM(credits) credits
+        FROM (
+            SELECT
+                org.code org_code,
+                org.name->>'fi' org_name,
+                element_details.code programme_code,
+                element_details.name->>'fi' programme_name,
+                studyright.studystartdate studystartdate,
+                studyright.student_studentnumber studentnumber,
+                credit.credits credits
+            FROM
+                organization org
+                INNER JOIN studyright
+                    ON org.code = studyright.faculty_code
+                INNER JOIN (
+                    -- HACK: fix updater writing duplicates where enddate has changed
+                    SELECT DISTINCT ON (studyrightid, startdate, code, studentnumber)
+                        *
+                    FROM studyright_elements
+                ) s_elements
+                    ON studyright.studyrightid = s_elements.studyrightid
+                INNER JOIN element_details
+                    ON s_elements.code = element_details.code
+                LEFT JOIN transfers
+                    ON studyright.studyrightid = transfers.studyrightid
+                LEFT JOIN (
+                    SELECT
+                        student_studentnumber,
+                        attainment_date,
+                        credits
+                    FROM credit
+                    WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
+                        AND credit.attainment_date >= :startDate
+                ) credit
+                    ON credit.student_studentnumber = studyright.student_studentnumber
+            WHERE
+                studyright.extentcode = 1 -- Bachelor's
+                AND studyright.prioritycode IN (1, 30) -- Primary or Graduated
+                AND studyright.studystartdate = :startDate
+                AND element_details.type = 20 -- Programme's name
+                AND transfers.studyrightid IS NULL -- Not transferred within faculty
+        ) s
+        GROUP BY (1,2), (3,4), 5, 6
+    ) ss
+    GROUP BY (1, 2), (3, 4);
     `,
     {
       type: sequelize.QueryTypes.SELECT,
@@ -141,7 +162,8 @@ const get3yStudentsWithDrilldown = _.memoize(async startDate => {
 
 const sorters = {
   target: (a, b) => a.targetStudents - b.targetStudents,
-  total: (a, b) => a.totalStudents - b.totalStudents
+  total: (a, b) => a.totalStudents - b.totalStudents,
+  targetRelative: (a, b) => a.targetStudents / a.totalStudents - b.targetStudents / b.totalStudents
 }
 
 router.get('/3y-students', async (req, res) => {

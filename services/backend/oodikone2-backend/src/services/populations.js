@@ -512,7 +512,10 @@ const formatStudentsForApi = async (
 
   const transferredStudyright = s => {
     const transferred_from = s.transfers.find(
-      t => t.targetcode === studyRights.programme && moment(t.transferdate).isBetween(startDateMoment, endDateMoment)
+      t =>
+        t.targetcode === studyRights.programme &&
+        // add bit of flex for students that transferred just before the startdate
+        moment(t.transferdate).isBetween(startDateMoment.subtract(1, 'd'), endDateMoment.add(1, 'd'))
     )
     if (transferred_from) {
       s.transferredStudyright = true
