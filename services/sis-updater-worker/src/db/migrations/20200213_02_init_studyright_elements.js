@@ -14,7 +14,7 @@ module.exports = {
         type: DATE
       },
       studyrightid: {
-        type:STRING,
+        type: STRING,
         references: {
           model: 'studyright',
           key: 'studyrightid'
@@ -44,4 +44,3 @@ module.exports = {
   },
   down: async () => {}
 }
-
