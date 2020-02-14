@@ -428,44 +428,6 @@ const transferredFromStudyprogram = async (studentnumbers, startDate, studytrack
   })
 }
 
-const endedStudyright = async (studentnumbers, startDate, studytrack, endDate) => {
-  const enddate = new Date() < new Date(endDate) ? new Date() : new Date(endDate)
-  return Studyright.findAndCountAll({
-    include: {
-      include: {
-        model: ElementDetails,
-        where: {
-          type: {
-            [Op.eq]: 20
-          }
-        }
-      },
-      model: StudyrightElement,
-      required: true,
-      where: {
-        code: {
-          [Op.eq]: studytrack
-        },
-        enddate: {
-          [Op.gte]: new Date(startDate),
-          [Op.lt]: enddate
-        }
-      }
-    },
-    where: {
-      student_studentnumber: {
-        [Op.in]: studentnumbers
-      },
-      graduated: {
-        [Op.eq]: 0
-      },
-      extentcode: {
-        [Op.eq]: 5
-      }
-    }
-  })
-}
-
 const formatCreditsForProductivity = credits => {
   return credits.map(formatCredit).reduce(function(acc, curr) {
     var key = curr['year']
@@ -544,7 +506,6 @@ const statsForClass = async (studentnumbers, startDate, studytrack, endDate) => 
     thesesFromClass(studentnumbers, startDate, studytrack),
     gendersFromClass(studentnumbers),
     tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate),
-    endedStudyright(studentnumbers, startDate, studytrack, endDate),
     nationalitiesFromClass(studentnumbers),
     transferredFromStudyprogram(studentnumbers, startDate, studytrack, new Date()),
     cancelledStudyright(studentnumbers, startDate, studytrack, endDate),
@@ -620,7 +581,6 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
         theses,
         genders,
         transferredTo,
-        endedStudyright,
         nationalities,
         transferredFrom,
         cancelled,
@@ -659,7 +619,6 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       totals.thesisB = theses.BACHELOR ? totals.thesisB + theses.BACHELOR : totals.thesisB
       totals.students = totals.students + credits.length
       totals.graduated = totals.graduated + graduated.length
-      totals.ended = totals.ended + endedStudyright.count
       totals.medianGraduationTime = median(allGraduationTimes)
       totals.inTargetTime = totals.inTargetTime + inTargetTime
       totals.transferred = totals.transferred + transferredTo
@@ -678,7 +637,6 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
         genders,
         creditValues,
         transferred: transferredTo,
-        ended: endedStudyright.count,
         nationalities,
         transferredFrom,
         cancelled,

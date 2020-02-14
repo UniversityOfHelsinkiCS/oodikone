@@ -32,8 +32,9 @@ const COLORS = [
 ]
 
 const sortOpts = [
-  { key: 0, text: 'by 3y target count', value: 'target' },
-  { key: 1, text: 'by total count', value: 'total' }
+  { key: 0, text: 'by relative 3y target count', value: 'targetRelative' },
+  { key: 1, text: 'by 3y target count', value: 'target' },
+  { key: 2, text: 'by total count', value: 'total' }
 ]
 
 const ProtoF = () => {
@@ -148,7 +149,7 @@ const ProtoF = () => {
               },
               tooltip: {
                 pointFormat:
-                  '<span style="color:{point.color}">\u25CF</span><b> {series.name}</b>: <b>{point.y}</b> ({point.percentage:.1f}% tavoiteajassa olevista)<br/>Yhteensä aloittaneita: {point.z}<br/>'
+                  '<span style="color:{point.color}">\u25CF</span><b> {series.name}</b>: <b>{point.y}</b> tavoiteajassa olevista)<br/>Yhteensä aloittaneita: {point.z}<br/>'
               },
               plotOptions: {
                 variablepie: {
@@ -176,7 +177,7 @@ const ProtoF = () => {
                     color: COLORS[nameToColorIndex[name]],
                     name,
                     z: totalStudents,
-                    y: targetStudents
+                    y: targetStudents / totalStudents
                   }))
                 }
               ],
@@ -191,7 +192,7 @@ const ProtoF = () => {
                     data: org.programmes.map(({ name, totalStudents, targetStudents }) => ({
                       name,
                       z: totalStudents,
-                      y: targetStudents
+                      y: targetStudents / totalStudents
                     }))
                   }
                 })

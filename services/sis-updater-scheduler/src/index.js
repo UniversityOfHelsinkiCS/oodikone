@@ -40,6 +40,17 @@ const scheduleSomeStudyYears = async (limit = 100) =>
     CHUNK_SIZE
   ).forEach(e => createJobs(e, 'study_years'))
 
+const scheduleSomeStudyModules = async (limit = 100) =>
+  chunk(
+    await knexConnection
+      .knex('modules')
+      .where('type', 'StudyModule')
+      .distinct('group_id')
+      .pluck('group_id')
+      .limit(limit),
+    CHUNK_SIZE
+  ).forEach(e => createJobs(e, 'study_modules'))
+
 const scheduleSomeCourseUnits = async (limit = 100) =>
   chunk(
     await knexConnection
@@ -68,17 +79,15 @@ knexConnection.on('error', e => {
 knexConnection.on('connect', async () => {
   console.log('Knex database connection established successfully')
 
-  // IN DB
+  // META
   await scheduleSomeMeta('organisations', 1000000)
-  await scheduleSomeMeta('study_levels')
-  await scheduleSomeCourseUnits()
-  await scheduleSomeStudyYears()
+  await scheduleSomeMeta('study_levels', 1000000)
+  await scheduleSomeMeta('education_types', 1000000)
+  await scheduleSomeCourseUnits(1000)
+  await scheduleSomeStudyModules(1000)
+  await scheduleSomeStudyYears(1000000)
   await scheduleCreditTypeCodes()
 
-  // POC
-  await scheduleSomeMeta('modules')
-  await scheduleSomeMeta('educations')
-  await scheduleSomeMeta('assessment_items')
-  await scheduleSomeMeta('course_unit_realisations')
+  // META needs to be in DB before students (courses etc.)
   await scheduleSomeStudents()
 })
