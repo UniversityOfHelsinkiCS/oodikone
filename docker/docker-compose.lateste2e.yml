@@ -94,6 +94,23 @@ services:
         - toska/oodikone2-analytics:staging
         - toska/oodikone2-analytics:latest
 
+  sis-updater-scheduler:
+    image: toska/sis-updater-scheduler:${TAG}
+    build:
+      cache_from:
+        - toska/sis-updater-scheduler:trunk
+        - toska/sis-updater-scheduler:staging
+        - toska/sis-updater-scheduler:latest
+
+  sis-updater-worker:
+    image: toska/sis-updater-worker:${TAG}
+    build:
+      cache_from:
+        - toska/sis-updater-worker:trunk
+        - toska/sis-updater-worker:staging
+        - toska/sis-updater-worker:latest
+    container_name: oodikone_sis-updater-worker_1
+
   nginx:
     image: nginx:latest
     volumes:
