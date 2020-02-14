@@ -49,6 +49,8 @@ else
     analytics
     userservice
     usageservice
+    sis-updater-scheduler
+    oodikone_sis-updater-worker_1
   )
 fi
 
