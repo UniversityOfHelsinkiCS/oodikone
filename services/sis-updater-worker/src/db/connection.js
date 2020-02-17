@@ -9,7 +9,7 @@ const { DB_URL, SIS_IMPORTER_HOST, SIS_IMPORTER_USER, SIS_IMPORTER_PASSWORD, SIS
 class DbConnections extends EventEmitter {
   constructor() {
     super()
-    this.RETRY_ATTEMPTS = 5
+    this.RETRY_ATTEMPTS = 15
     this.knexConnection = false
     this.seqConnection = false
 

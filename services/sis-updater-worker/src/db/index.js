@@ -1,3 +1,5 @@
+const { chunk } = require('lodash')
+const { eachLimit } = require('async')
 const { dbConnections } = require('./connection')
 const { getLatestSnapshot, isActive } = require('../utils')
 
@@ -19,10 +21,20 @@ const selectFromSnapshotsByIds = async (table, ids, col = 'id') =>
 const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))
 
 const bulkCreate = async (model, entities, transaction = null, properties = ['id']) => {
-  await model.bulkCreate(entities, {
-    updateOnDuplicate: getColumnsToUpdate(model, properties),
-    transaction
-  })
+  try {
+    await model.bulkCreate(entities, {
+      updateOnDuplicate: getColumnsToUpdate(model, properties),
+      transaction
+    })
+  } catch (e) {
+    if (entities.length === 1) {
+      console.error(e)
+      return
+    }
+
+    const chunks = chunk(entities, Math.floor(entities.length / 2))
+    await eachLimit(chunks, 1, async c => await bulkCreate(model, c, transaction, properties))
+  }
 }
 
 module.exports = {

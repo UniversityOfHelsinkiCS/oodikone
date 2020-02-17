@@ -145,7 +145,6 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     organisations
       .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
       .forEach(({ organisationId }) => {
-        console.log('fuuuuuuckj')
         courseProviders.push({
           composite: `${groupId}-${organisationId}`,
           coursecode: groupId,
@@ -313,8 +312,6 @@ const updateStudyRights = async studyRights => {
     return acc
   }, {})
 
-  // console.log("m", moduleGroupIdToCode)
-
   await bulkCreate(
     ElementDetail,
     uniqBy([...formattedProgrammes, ...formattedStudytracks], e => e.code),
@@ -466,13 +463,15 @@ const updateStudyRights = async studyRights => {
         code: moduleGroupIdToCode[studyright.accepted_selection_path.educationPhase1ChildGroupId],
         studentnumber: studyRight.studentStudentnumber
       })
-
     }
     return acc
   }, [])
 
   await bulkCreate(Studyright, formattedStudyRights, null, ['studyrightid'])
-  await bulkCreate(StudyrightElement, studyrightElements.filter(s_element => !!s_element.code))
+  await bulkCreate(
+    StudyrightElement,
+    studyrightElements.filter(s_element => !!s_element.code)
+  )
 }
 
 const updateAttainments = async attainments => {

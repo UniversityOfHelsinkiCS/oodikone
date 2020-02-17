@@ -1,67 +1,79 @@
 const { chunk } = require('lodash')
+const { eachLimit } = require('async')
 const { knexConnection } = require('./db/connection')
+const { schedule: scheduleCron } = require('./utils/cron')
 const { stan } = require('./utils/stan')
-const { SIS_UPDATER_SCHEDULE_CHANNEL, CHUNK_SIZE } = require('./config')
+const { SIS_UPDATER_SCHEDULE_CHANNEL, CHUNK_SIZE, isDev } = require('./config')
 
-const createJobs = (entityIds, type) => {
-  stan.publish(SIS_UPDATER_SCHEDULE_CHANNEL, JSON.stringify({ entityIds, type }), err => {
-    if (err) console.log('failed publishing', err)
+const createJobs = async (entityIds, type) =>
+  new Promise((res, rej) => {
+    stan.publish(SIS_UPDATER_SCHEDULE_CHANNEL, JSON.stringify({ entityIds, type }), err => {
+      if (err) {
+        console.log('failed publishing', err)
+        rej()
+      }
+      res()
+    })
+  })
+
+const scheduleFromDb = async ({ table, distinct, pluck = 'id', whereNotNull, scheduleId, limit, where }) => {
+  const { knex } = knexConnection
+  const knexBuilder = knex(table)
+  if (distinct) knexBuilder.distinct(distinct)
+  if (pluck) knexBuilder.pluck(pluck)
+  if (whereNotNull) knexBuilder.whereNotNull(whereNotNull)
+  if (limit) knexBuilder.limit(limit)
+  if (where) knexBuilder.where(...where)
+  await eachLimit(chunk(await knexBuilder, CHUNK_SIZE), 10, async e => await createJobs(e, scheduleId || table))
+}
+
+const scheduleMeta = async () => {
+  await scheduleFromDb({
+    table: 'organisations'
+  })
+
+  await scheduleFromDb({
+    table: 'study_levels'
+  })
+
+  await scheduleFromDb({
+    table: 'education_types'
+  })
+
+  await scheduleFromDb({
+    table: 'study_years',
+    distinct: 'org',
+    pluck: 'org'
+  })
+
+  await createJobs([4, 7, 9, 10], 'credit_types')
+
+  await scheduleFromDb({
+    table: 'course_units',
+    distinct: 'group_id',
+    pluck: 'group_id',
+    limit: isDev ? 100 : null
+  })
+
+  await scheduleFromDb({
+    scheduleId: 'study_modules',
+    table: 'modules',
+    where: ['type', 'StudyModule'],
+    distinct: 'group_id',
+    pluck: 'group_id',
+    limit: isDev ? 100 : null
   })
 }
 
-const scheduleSomeStudents = async (limit = 100) =>
-  chunk(
-    await knexConnection
-      .knex('persons')
-      .select('student_number', 'id')
-      .whereNotNull('student_number')
-      .limit(limit)
-      .pluck('id'),
-    CHUNK_SIZE
-  ).forEach(s => createJobs(s, 'students'))
-
-const scheduleSomeMeta = async (table, limit = 100, pluck = 'id') => {
-  chunk(
-    await knexConnection
-      .knex(table)
-      .limit(limit)
-      .pluck(pluck),
-    CHUNK_SIZE
-  ).forEach(e => createJobs(e, table))
+const scheduleStudents = async () => {
+  await scheduleFromDb({
+    scheduleId: 'students',
+    table: 'persons',
+    whereNotNull: 'student_number',
+    pluck: 'id',
+    limit: isDev ? 100 : null
+  })
 }
-
-const scheduleSomeStudyYears = async (limit = 100) =>
-  chunk(
-    await knexConnection
-      .knex('study_years')
-      .distinct('org')
-      .pluck('org')
-      .limit(limit),
-    CHUNK_SIZE
-  ).forEach(e => createJobs(e, 'study_years'))
-
-const scheduleSomeStudyModules = async (limit = 100) =>
-  chunk(
-    await knexConnection
-      .knex('modules')
-      .where('type', 'StudyModule')
-      .distinct('group_id')
-      .pluck('group_id')
-      .limit(limit),
-    CHUNK_SIZE
-  ).forEach(e => createJobs(e, 'study_modules'))
-
-const scheduleSomeCourseUnits = async (limit = 100) =>
-  chunk(
-    await knexConnection
-      .knex('course_units')
-      .distinct('group_id')
-      .pluck('group_id')
-      .limit(limit),
-    CHUNK_SIZE
-  ).forEach(e => createJobs(e, 'course_units'))
-
-const scheduleCreditTypeCodes = () => createJobs([4, 7, 9, 10], 'credit_types')
 
 stan.on('error', () => {
   console.log('NATS connection failed')
@@ -78,16 +90,11 @@ knexConnection.on('error', e => {
 
 knexConnection.on('connect', async () => {
   console.log('Knex database connection established successfully')
+  if (isDev) {
+    await scheduleMeta()
+    await scheduleStudents()
+  }
 
-  // META
-  await scheduleSomeMeta('organisations', 1000000)
-  await scheduleSomeMeta('study_levels', 1000000)
-  await scheduleSomeMeta('education_types', 1000000)
-  await scheduleSomeCourseUnits(1000)
-  await scheduleSomeStudyModules(1000)
-  await scheduleSomeStudyYears(1000000)
-  await scheduleCreditTypeCodes()
-
-  // META needs to be in DB before students (courses etc.)
-  await scheduleSomeStudents()
+  scheduleCron('0 0 * * *', scheduleMeta)
+  scheduleCron('0 3 * * *', scheduleStudents)
 })
