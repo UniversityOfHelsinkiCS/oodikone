@@ -236,6 +236,9 @@ services:
       SIS_IMPORTER_USER: dev
       SIS_IMPORTER_PASSWORD: dev
       SIS_IMPORTER_DATABASE: importer-db
+      SECRET_TOKEN: dev
+    ports:
+      - "8082:8082"
     container_name: sis-updater-scheduler
     depends_on:
       - redis
