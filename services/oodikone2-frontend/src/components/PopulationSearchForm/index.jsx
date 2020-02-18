@@ -109,6 +109,7 @@ const PopulationSearchForm = props => {
     setState({ isLoading: true })
     props.setLoading()
     props.clearSelected()
+    props.clearPopulationFilters()
     fetchPopulationPromises.current = cancelablePromise(
       Promise.all([
         props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }),
@@ -118,10 +119,8 @@ const PopulationSearchForm = props => {
         props.getTagsByStudytrackAction(query.studyRights.programme)
       ])
     )
-
     const success = await fetchPopulationPromises.current.promise
     if (success) {
-      props.clearPopulationFilters()
       if (query.studyRights.programme === 'KH50_001') {
         props.setPopulationFilter(transferTo(false))
       }
