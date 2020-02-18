@@ -1,6 +1,7 @@
 /// <reference types="Cypress" />
 
 const deleteTag = (name) => {
+  cy.contains('Create tags for study programme')
   cy.contains(name).siblings().contains('Delete').click()
   cy.contains('Are you sure you want to delete tag')
   cy.contains('Confirm').click()

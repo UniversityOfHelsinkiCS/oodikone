@@ -24,9 +24,13 @@
   "dependencies": {
     "async": "^3.1.1",
     "cron": "^1.8.2",
+    "express": "^4.17.1",
+    "express-async-errors": "^3.1.1",
+    "i": "^0.3.6",
     "knex": "^0.20.8",
     "lodash": "^4.17.15",
     "node-nats-streaming": "^0.2.6",
+    "npm": "^6.13.7",
     "pg": "^7.17.1"
   }
 }
