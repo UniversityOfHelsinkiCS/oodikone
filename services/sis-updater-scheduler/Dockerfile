@@ -1,6 +1,7 @@
 FROM node:10.15-alpine
 
 WORKDIR /usr/src/app
+EXPOSE 8082
 CMD npm start
 
 COPY package.json /usr/src/app/package.json

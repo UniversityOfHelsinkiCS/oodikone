@@ -40,7 +40,7 @@ const sortOpts = [
 const ProtoF = () => {
   const [startOptions, setStartOptions] = useState([])
   const [selectedStartYear, setSelectedStartYear] = useState(null)
-  const [selectedSort, setSelectedSort] = useState('target')
+  const [selectedSort, setSelectedSort] = useState('targetRelative')
   const [data, setData] = useState(null)
   const [dataLoading, setDataLoading] = useState(false)
   const [nameToColorIndex, setNameToColorIndex] = useState({})
@@ -148,20 +148,24 @@ const ProtoF = () => {
                 verticalAlign: 'top'
               },
               tooltip: {
-                pointFormat:
-                  '<span style="color:{point.color}">\u25CF</span><b> {series.name}</b>: <b>{point.y}</b> tavoiteajassa olevista)<br/>Yhteensä aloittaneita: {point.z}<br/>'
+                pointFormatter() {
+                  /* eslint-disable react/no-this-in-sfc */
+                  return `<span style="color:${this.color}">\u25CF</span><b> ${this.series.name}</b>: <b>${(
+                    this.y * 100
+                  ).toFixed(2)}%</b> (${this.targetStudents}/${this.z})<br/>`
+                }
               },
               plotOptions: {
                 variablepie: {
-                  startAngle: -90,
-                  endAngle: 90,
+                  startAngle: -110,
+                  endAngle: 110,
                   center: ['50%', '75%'],
                   size: '110%',
                   dataLabels: {
                     formatter() {
-                      // eslint-disable-next-line
-                      return `${this.point.name.replace(' tiedekunta', '')}`
+                      return `<b>${this.point.name.replace(' tiedekunta', '')}</b>: ${(this.y * 100).toFixed(1)}%`
                     }
+                    /* eslint-enable react/no-this-in-sfc */
                   }
                 }
               },
@@ -177,7 +181,8 @@ const ProtoF = () => {
                     color: COLORS[nameToColorIndex[name]],
                     name,
                     z: totalStudents,
-                    y: targetStudents / totalStudents
+                    y: targetStudents / totalStudents,
+                    targetStudents
                   }))
                 }
               ],
@@ -192,7 +197,8 @@ const ProtoF = () => {
                     data: org.programmes.map(({ name, totalStudents, targetStudents }) => ({
                       name,
                       z: totalStudents,
-                      y: targetStudents / totalStudents
+                      y: targetStudents / totalStudents,
+                      targetStudents
                     }))
                   }
                 })
