@@ -243,6 +243,7 @@ const updateStudents = async personIds => {
     return {
       lastname: last_name,
       firstnames: first_names,
+      abbreviatedname: `${last_name} ${first_names}`.trim(),
       studentnumber: student_number,
       email: primary_email,
       gender_code,
