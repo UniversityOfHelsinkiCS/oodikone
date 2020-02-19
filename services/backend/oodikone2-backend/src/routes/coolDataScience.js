@@ -43,42 +43,6 @@ const targetCreditsForStartDate = startDate => {
 }
 
 const get3yStudentsWithDrilldown = _.memoize(async startDate => {
-  await sequelize.query(
-    `
-    CREATE OR REPLACE FUNCTION pg_temp.mapRange(
-        input DOUBLE PRECISION,
-        inMin DOUBLE PRECISION,
-        inMax DOUBLE PRECISION,
-        outMin DOUBLE PRECISION,
-        outMax DOUBLE PRECISION)
-    RETURNS DOUBLE PRECISION AS $$
-        SELECT (input - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
-    $$ LANGUAGE SQL;
-    
-    -- linear mapping from 0-180op -> 0-1 * targetCredits basically
-    CREATE OR REPLACE FUNCTION pg_temp.is_in_target(
-        currentDate TIMESTAMP WITH TIME ZONE,
-        studyStartDate TIMESTAMP WITH TIME ZONE,
-        targetDate TIMESTAMP WITH TIME ZONE,
-        studentCredits DOUBLE PRECISION,
-        targetCredits DOUBLE PRECISION)
-    RETURNS INTEGER AS $$
-        SELECT CASE WHEN studentCredits >= pg_temp.mapRange(
-            EXTRACT(EPOCH FROM currentDate),
-            EXTRACT(EPOCH FROM studyStartDate),
-            EXTRACT(EPOCH FROM targetDate),
-            0,
-            targetCredits
-        )
-            THEN 1
-            ELSE 0
-        END;
-    $$ LANGUAGE SQL;`,
-    {
-      type: sequelize.QueryTypes.RAW,
-      multipleStatements: true
-    }
-  )
   return await sequelize.query(
     `
     SELECT
@@ -88,7 +52,7 @@ const get3yStudentsWithDrilldown = _.memoize(async startDate => {
         ss.programme_name "programmeName",
         COUNT(ss.studentnumber) "programmeTotalStudents",
         SUM(
-            pg_temp.is_in_target(
+            public.is_in_target(
                 CURRENT_TIMESTAMP,
                 ss.studystartdate,
                 TIMESTAMP '2020-07-31',
