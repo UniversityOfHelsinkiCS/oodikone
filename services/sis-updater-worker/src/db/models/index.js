@@ -52,6 +52,24 @@ Credit.belongsTo(CreditType, { foreignKey: 'credittypecode', targetKey: 'creditt
 Credit.belongsToMany(Teacher, { through: CreditTeacher, foreignKey: 'credit_id' })
 Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id' })
 
+Organization.hasMany(Studyright, { foreignKey: 'facultyCode', sourceKey: 'code' })
+Studyright.belongsTo(Organization, { foreignKey: 'facultyCode', sourceKey: 'code' })
+
+Studyright.belongsTo(Student, { foreignKey: 'studentStudentnumber', targetKey: 'studentnumber' })
+Student.hasMany(Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
+
+StudyrightElement.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
+Studyright.hasMany(StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
+
+StudyrightElement.belongsTo(ElementDetail, { foreignKey: 'code', targetKey: 'code' })
+ElementDetail.hasMany(StudyrightElement, { foreignKey: 'code', sourceKey: 'code' })
+
+StudyrightElement.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+Student.hasMany(StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+
+StudyrightExtent.hasMany(Studyright, { foreignKey: 'extentcode', sourceKey: 'extentcode' })
+Studyright.belongsTo(StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'extentcode' })
+
 // Credit.belongsTo(Semester, { foreignKey: { name: 'semestercode', allowNull: false } })
 
 module.exports = {
