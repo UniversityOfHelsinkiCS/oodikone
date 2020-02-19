@@ -11,6 +11,7 @@ Student.init(
     },
     lastname: { type: STRING },
     firstnames: { type: STRING },
+    abbreviatedname: { type: STRING },
     birthdate: { type: DATE },
     creditcount: { type: INTEGER },
     dateofuniversityenrollment: { type: DATE },
