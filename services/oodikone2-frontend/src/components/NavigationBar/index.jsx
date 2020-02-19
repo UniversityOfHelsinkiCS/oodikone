@@ -1,10 +1,10 @@
 import React from 'react'
-import { Menu, Dropdown, Button } from 'semantic-ui-react'
+import { Menu, Dropdown, Button, Icon } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
 import { func, string, arrayOf } from 'prop-types'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
-import { getUserRoles, setMocking, setTestUser } from '../../common'
+import { getUserRoles, setMocking, setTestUser, setTestUserSIS, getTestUserSIS } from '../../common'
 import { logout as logoutAction } from '../../redux/auth'
 import LanguageChooser from '../LanguageChooser'
 import './navigationBar.css'
@@ -63,6 +63,12 @@ const NavigationBar = props => {
 
   const visibleNavigationItems = refreshNavigationRoutes()
 
+  const setFlagSIS = () => {
+    const flag = getTestUserSIS()
+    setTestUserSIS(!flag)
+    window.location.reload()
+  }
+
   const returnToSelf = () => {
     setMocking(null)
     window.location.reload()
@@ -99,7 +105,6 @@ const NavigationBar = props => {
         </Menu.Item>
       )
     )
-
   const testUsers = ['tktl', 'mluukkai']
   const renderUserMenu = () =>
     process.env.NODE_ENV === 'development' ? (
@@ -127,6 +132,7 @@ const NavigationBar = props => {
               }}
             />
           ))}
+          <Dropdown.Item icon="heartbeat" text="Destroy oodikone with SIS" onClick={setFlagSIS} />
           <Dropdown.Item icon="log out" text={t('navigationBar.logout')} onClick={logout} />
         </Dropdown.Menu>
       </Menu.Item>
@@ -148,6 +154,13 @@ const NavigationBar = props => {
     </Menu.Item>
   )
 
+  const renderSISWarning = () => (
+    <Menu.Item>
+      <Icon className="heartbeat" />
+      AT YOUR OWN RISK
+    </Menu.Item>
+  )
+
   return (
     <Menu stackable fluid className="navBar">
       {renderHome()}
@@ -155,6 +168,7 @@ const NavigationBar = props => {
       {renderUserMenu()}
       {renderLanguageChooser()}
       {mockedBy && renderStopMockingButton()}
+      {getTestUserSIS() && renderSISWarning()}
     </Menu>
   )
 }
