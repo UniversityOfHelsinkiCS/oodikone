@@ -30,7 +30,6 @@ module.exports = {
             END;
         $$ LANGUAGE SQL;`,
       {
-        type: sequelize.QueryTypes.RAW,
         multipleStatements: true
       }
     )
