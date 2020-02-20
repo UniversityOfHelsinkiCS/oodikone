@@ -7,9 +7,20 @@ const routes = require('./routes')
 const { startCron } = require('./events')
 const { PORT } = conf
 const { initializeDatabaseConnection } = require('./database/connection')
+const { dbConnections } = require('./databaseV2/connection')
 
 initializeDatabaseConnection()
   .then(() => {
+    dbConnections.connect()
+
+    dbConnections.on('connect', () => {
+      console.log('Connected to sis db successfully')
+    })
+
+    dbConnections.on('error', () => {
+      console.log('Failed connecting to sis db')
+    })
+
     const app = express()
 
     Sentry.init({
