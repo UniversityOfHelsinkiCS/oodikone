@@ -17,6 +17,22 @@ const Throughput = sequelize.define(
   }
 )
 
+const ThroughputV2 = sequelize.define(
+  'throughput_v2',
+  {
+    id: {
+      type: Sequelize.STRING,
+      primaryKey: true
+    },
+    data: Sequelize.JSONB,
+    status: Sequelize.STRING
+  },
+  {
+    timestamps: true,
+    tableName: 'throughput_v2'
+  }
+)
+
 const Productivity = sequelize.define(
   'productivity',
   {
@@ -30,6 +46,22 @@ const Productivity = sequelize.define(
   {
     timestamps: true,
     tableName: 'productivity'
+  }
+)
+
+const ProductivityV2 = sequelize.define(
+  'productivity_v2',
+  {
+    id: {
+      type: Sequelize.STRING,
+      primaryKey: true
+    },
+    data: Sequelize.JSONB,
+    status: Sequelize.STRING
+  },
+  {
+    timestamps: true,
+    tableName: 'productivity_v2'
   }
 )
 
@@ -65,7 +97,9 @@ const NonGraduatedStudents = sequelize.define(
 
 module.exports = {
   Throughput,
+  ThroughputV2,
   Productivity,
+  ProductivityV2,
   FacultyStats,
   NonGraduatedStudents
 }
