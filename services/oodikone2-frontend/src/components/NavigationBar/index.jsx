@@ -142,6 +142,15 @@ const NavigationBar = props => {
       </Menu.Item>
     )
 
+  const renderSISSwitch = isSis => (
+    <Menu.Item>
+      <Button className={isSis ? 'sis-danger-zone-button' : ''} onClick={setFlagSIS} basic={!isSis} color="red">
+        <Icon className="heartbeat" />
+        {isSis ? 'Stop SIS destruction' : 'Destroy oodikone with SIS'}
+      </Button>
+    </Menu.Item>
+  )
+
   const renderLanguageChooser = () => (
     <Menu.Item>
       <LanguageChooser />
@@ -156,10 +165,15 @@ const NavigationBar = props => {
 
   const renderSISWarning = () => (
     <Menu.Item>
-      <Icon className="heartbeat" />
+      <img
+        src="https://p7.hiclipart.com/preview/453/925/261/emergency-lighting-siren-emergency-vehicle-lighting-light.jpg"
+        className="sis-destruction-siren"
+        alt="SIS destruction active"
+      />
       AT YOUR OWN RISK
     </Menu.Item>
   )
+  const showSISSwitch = process.env.TAG === 'staging' || process.env.NODE_ENV === 'development'
 
   return (
     <Menu stackable fluid className="navBar">
@@ -167,6 +181,7 @@ const NavigationBar = props => {
       {renderNavigationRoutes()}
       {renderUserMenu()}
       {renderLanguageChooser()}
+      {showSISSwitch && renderSISSwitch(!!getTestUserSIS())}
       {mockedBy && renderStopMockingButton()}
       {getTestUserSIS() && renderSISWarning()}
     </Menu>
