@@ -23,6 +23,8 @@ const Updater = () => {
   const rescheduleFetched = () => callApi('/updater/reschedule/fetched', 'post')
   const updatePopulationStudents = () => callApi('/updatedatabase', 'post', nums.split('\n'))
   const refreshStatistics = () => callApi('/updater/refresh_statistics', 'post')
+  const updateSISMeta = () => callApi('/updater/update/v2/meta', 'get')
+  const updateSISStudents = () => callApi('/updater/update/v2/students', 'get')
 
   const statusRef = useRef()
   useEffect(() => {
@@ -70,6 +72,11 @@ const Updater = () => {
         </Form.Group>
       </Form>
       <Form.Button content="Refresh statistics" icon="refresh" onClick={() => refreshStatistics()} />
+      <Segment>
+        <Header>SIS STUFF WATCHOUT</Header>
+        <Button content="Update SIS Meta" onClick={() => updateSISMeta()} />
+        <Button content="Update SIS Students" onClick={() => updateSISStudents()} />
+      </Segment>
       <Header>Status:</Header>
       <Segment loading={!statuses} basic>
         <Table striped>

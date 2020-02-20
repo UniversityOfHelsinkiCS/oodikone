@@ -107,6 +107,7 @@ services:
       # ANON_DB:
       # ANON_DB_KONE:
       TOKEN_SECRET: IWannaBeTheVeryBest
+      SECRET_TOKEN: dev
       USERSERVICE_URL: http://userservice:4567
       USAGESERVICE_URL: http://usageservice:545
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
@@ -114,6 +115,7 @@ services:
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
       UPDATER_URL: http://updater_scheduler:3678
+      SIS_UPDATER_URL: http://sis-updater-scheduler:8082
       # Set these in production:
       # ANALYTICS_INFLUXDB_URL
       # ANALYTICS_INFLUXDB_DB

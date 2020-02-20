@@ -16,7 +16,6 @@ const auth = (req, res, next) => {
   if (req.query.token === SECRET_TOKEN) {
     return next()
   }
-
   res.locals.msg('Token missing or invalid', 403)
 }
 
