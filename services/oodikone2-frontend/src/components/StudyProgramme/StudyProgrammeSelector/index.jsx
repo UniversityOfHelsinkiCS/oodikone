@@ -10,7 +10,6 @@ import SortableTable from '../../SortableTable'
 class StudyProgrammeSelector extends Component {
   static propTypes = {
     getDegreesAndProgrammes: func.isRequired,
-    handleSelect: func.isRequired,
     studyprogrammes: arrayOf(shape({ name: shape({}), code: string })),
     selected: bool.isRequired,
     language: string.isRequired
@@ -52,19 +51,47 @@ class StudyProgrammeSelector extends Component {
         key: 'programmecode',
         title: 'code',
         getRowVal: prog => (
-          <Link style={{ color: 'black' }} to={`/study-programme/${prog.code}`}>
+          <Link
+            style={{
+              color: 'black',
+              display: 'inline-block',
+              width: '100%',
+              height: '100%',
+              padding: '.78571429em .78571429em'
+            }}
+            to={`/study-programme/${prog.code}`}
+          >
             {prog.code}
           </Link>
-        )
+        ),
+        cellProps: {
+          style: {
+            padding: '0'
+          }
+        }
       },
       {
         key: 'programmename',
         title: 'name',
         getRowVal: prog => (
-          <Link style={{ color: 'black' }} to={`/study-programme/${prog.code}`}>
+          <Link
+            style={{
+              color: 'black',
+              display: 'inline-block',
+              width: '100%',
+              height: '100%',
+              padding: '.78571429em .78571429em'
+            }}
+            to={`/study-programme/${prog.code}`}
+          >
             {getTextIn(prog.name, language)}
           </Link>
-        )
+        ),
+        cellProps: {
+          style: {
+            padding: '0'
+          }
+        }
       }
     ]
     if (studyprogrammes == null) {
@@ -99,44 +126,20 @@ class StudyProgrammeSelector extends Component {
         {bachelorProgrammes.length > 0 ? (
           <>
             <Header>Bachelor programmes</Header>
-            <SortableTable
-              columns={headers}
-              getRowKey={programme => programme.code}
-              getRowProps={programme => ({
-                onClick: () => this.props.handleSelect(programme.code),
-                style: { cursor: 'pointer' }
-              })}
-              data={bachelorProgrammes}
-            />
+            <SortableTable columns={headers} getRowKey={programme => programme.code} data={bachelorProgrammes} />
           </>
         ) : null}
         {masterProgrammes.length > 0 ? (
           <>
             <Header>Master programmes</Header>
-            <SortableTable
-              columns={headers}
-              getRowKey={programme => programme.code}
-              getRowProps={programme => ({
-                onClick: () => this.props.handleSelect(programme.code),
-                style: { cursor: 'pointer' }
-              })}
-              data={masterProgrammes}
-            />
+            <SortableTable columns={headers} getRowKey={programme => programme.code} data={masterProgrammes} />
           </>
         ) : null}
 
         {otherProgrammes.length > 0 ? (
           <>
             <Header>Doctoral programmes and old programmes</Header>
-            <SortableTable
-              columns={headers}
-              getRowKey={programme => programme.code}
-              getRowProps={programme => ({
-                onClick: () => this.props.handleSelect(programme.code),
-                style: { cursor: 'pointer' }
-              })}
-              data={otherProgrammes}
-            />
+            <SortableTable columns={headers} getRowKey={programme => programme.code} data={otherProgrammes} />
           </>
         ) : null}
       </>
