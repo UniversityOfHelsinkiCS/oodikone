@@ -1,9 +1,7 @@
 const router = require('express').Router()
-const Student = require('../services/students')
-const userService = require('../services/userService')
-const Unit = require('../services/units')
-const studentsV2 = require('../routesV2/students')
-const useSisRouter = require('../util/useSisRouter')
+const Student = require('../servicesV2/students')
+const userService = require('../servicesV2/userService')
+const Unit = require('../servicesV2/units')
 
 const filterStudentTags = (student, userId) => {
   return {
@@ -94,4 +92,6 @@ router.get('/students/:id', async (req, res) => {
   }
 })
 
-module.exports = useSisRouter(studentsV2, router)
+router.use('*', (req, res, next) => next())
+
+module.exports = router
