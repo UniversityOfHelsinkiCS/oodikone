@@ -1,8 +1,75 @@
 const express = require('express')
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
-const { Productivity, Throughput, FacultyStats, NonGraduatedStudents } = require('./src/models')
+const {
+  Productivity,
+  Throughput,
+  FacultyStats,
+  NonGraduatedStudents,
+  ProductivityV2,
+  ThroughputV2
+} = require('./src/models')
 const { initializeDatabaseConnection } = require('./src/database/connection')
+
+const v2Routes = app => {
+  const formatProductivity = stats => {
+    const { id, updatedAt: lastUpdated, data, status } = stats
+    return { [id]: { lastUpdated, data, status } }
+  }
+
+  const formatThroughput = stats => {
+    const { id, updatedAt: lastUpdated, data, status } = stats
+    return { [id]: { lastUpdated, data: data.years, status, totals: data.totals } }
+  }
+
+  app.get('/v2/productivity/:id', async (req, res) => {
+    const { id } = req.params
+    const result = await ProductivityV2.findByPk(id)
+    if (!result) {
+      res.json(null)
+    } else {
+      res.json(formatProductivity(result))
+    }
+  })
+
+  app.post('/v2/productivity', async (req, res) => {
+    const { data } = req.body
+    const [saved] = await ProductivityV2.upsert({ ...data, status: 'DONE' }, { returning: true })
+    const result = formatProductivity(saved)
+    res.json(result)
+  })
+
+  app.patch('/v2/productivity', async (req, res) => {
+    for (let [id, data] of Object.entries(req.body.data)) {
+      await ProductivityV2.upsert({ ...data, id })
+    }
+    res.status(200).end()
+  })
+
+  app.get('/v2/throughput/:id', async (req, res) => {
+    const { id } = req.params
+    const result = await ThroughputV2.findByPk(id)
+    if (!result) {
+      res.json(null)
+    } else {
+      res.json(formatThroughput(result))
+    }
+  })
+
+  app.post('/v2/throughput', async (req, res) => {
+    const { data } = req.body
+    const [saved] = await ThroughputV2.upsert({ ...data, status: 'DONE' }, { returning: true })
+    const result = formatThroughput(saved)
+    res.json(result)
+  })
+
+  app.patch('/v2/throughput', async (req, res) => {
+    for (let [id, data] of Object.entries(req.body.data)) {
+      await ThroughputV2.upsert({ ...data, id })
+    }
+    res.status(200).end()
+  })
+}
 
 initializeDatabaseConnection()
   .then(() => {
@@ -100,6 +167,8 @@ initializeDatabaseConnection()
       }
       res.status(200).end()
     })
+
+    v2Routes(app)
 
     const server = app.listen(port, () => console.log(`Analytics listening on port ${port}!`))
     process.on('SIGTERM', () => {
