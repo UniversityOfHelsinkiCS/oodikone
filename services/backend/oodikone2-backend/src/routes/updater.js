@@ -12,6 +12,9 @@ const {
   updateNoStudents,
   updateDaily
 } = require('../services/updaterService')
+
+const { updateSISMetadata, updateSISStudents } = require('../services/sisUpdaterService')
+
 const { refreshStatistics } = require('../events')
 
 router.post('/update/oldest', async (req, res) => {
@@ -145,6 +148,36 @@ router.post('/refresh_statistics', async (req, res) => {
     res.status(200).json('Refreshing statistics')
   } catch (err) {
     console.error(err)
+    res.status(500).json({ error: 'error' })
+  }
+})
+
+router.get('/update/v2/meta', async (req, res) => {
+  const { roles } = req
+  if (!roles.includes('dev')) return res.status(403).send('No rights, please stop')
+
+  try {
+    const response = await updateSISMetadata(req)
+    if (response) {
+      res.status(200).json('Update SIS meta scheduled')
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: 'error' })
+  }
+})
+
+router.get('/update/v2/students', async (req, res) => {
+  const { roles } = req
+  if (!roles.includes('dev')) return res.status(403).send('No rights, please stop')
+
+  try {
+    const response = await updateSISStudents(req)
+    if (response) {
+      res.status(200).json('Update SIS students scheduled')
+    }
+  } catch (err) {
+    console.log(err)
     res.status(500).json({ error: 'error' })
   }
 })
