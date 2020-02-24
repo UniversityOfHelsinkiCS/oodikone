@@ -70,7 +70,7 @@ Student.hasMany(StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'st
 StudyrightExtent.hasMany(Studyright, { foreignKey: 'extentcode', sourceKey: 'extentcode' })
 Studyright.belongsTo(StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'extentcode' })
 
-// Credit.belongsTo(Semester, { foreignKey: { name: 'semestercode', allowNull: false } })
+Credit.belongsTo(Semester, { foreignKey: { name: 'semester_composite', allowNull: false } })
 
 module.exports = {
   Organization,
