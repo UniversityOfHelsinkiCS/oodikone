@@ -21,7 +21,7 @@ const { getMinMaxDate, getMinMax } = require('../utils')
 
 let daysToSemesters = null
 
-const getSemesterByDate = async date => {
+const getSemesterByDate = date => {
   if (!daysToSemesters) throw new Error('daysToSemesters null!')
   return daysToSemesters[date.toDateString()]
 }
@@ -34,7 +34,10 @@ const initDaysToSemesters = async () => {
 
     for (let i = start; i < end; i += 1000 * 60 * 60 * 24) {
       const newDay = new Date(i)
-      res[newDay.toDateString()] = curr.semestercode
+      res[newDay.toDateString()] = {
+        semestercode: curr.semestercode,
+        composite: curr.composite
+      }
     }
     return res
   }, {})
@@ -563,7 +566,9 @@ const updateAttainments = async attainments => {
           creditTeachers.push({ composite: `${a.id}-${employeeNumber}`, credit_id: a.id, teacher_id: employeeNumber })
         })
 
-      const targetSemester = getSemesterByDate(new Date(a.attainment_date)).semestercode
+      const targetSemester = getSemesterByDate(new Date(a.attainment_date))
+
+      console.log('targetSemester', targetSemester)
 
       return {
         id: a.id,
@@ -575,7 +580,8 @@ const updateAttainments = async attainments => {
         attainment_date: a.attainment_date,
         course_code:
           a.type === 'CourseUnitAttainment' ? courseUnitIdToCourseGroupId[a.course_unit_id] : a.module_group_id,
-        semestercode: targetSemester,
+        semestercode: targetSemester.semestercode,
+        semester_composite: targetSemester.composite,
         isStudyModule: a.type === 'ModuleAttainment',
         org: attainmentUniOrg
       }
