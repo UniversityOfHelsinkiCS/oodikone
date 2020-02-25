@@ -124,18 +124,32 @@ const get3yStudentsWithDrilldown = _.memoize(async startDate => {
   )
 })
 
-const getUberData = _.memoize(async startDate => {
+const makeCheckpoints = startDate => {
+  const M_TO_MS = 2.628e6 * 1000
+  const FOUR_M_TO_MS = M_TO_MS * 4
+  const now = Date.now()
+  let checkpoints = []
+
+  for (let ts = startDate.getTime(); ts < now; ts += FOUR_M_TO_MS) {
+    checkpoints.push(new Date(ts))
+  }
+
+  if (checkpoints[checkpoints.length - 1].getTime() > now) {
+    // last checkpoint in the future
+    checkpoints[checkpoints.length - 1] = new Date()
+  } else if (now - checkpoints[checkpoints.length - 1].getTime() > M_TO_MS) {
+    // last checkpoint over a month in the past, push "now" in there
+    checkpoints.push(new Date())
+  }
+
+  return checkpoints
+}
+
+const getUberData = _.memoize(async startDateStr => {
+  const startDate = new Date(startDateStr)
   const creditsTarget = targetCreditsForStartDate(startDate)
-  const checkpoints = [
-    '2017-11-30T13:00:00.000Z',
-    '2018-04-01T05:00:00.000Z',
-    '2018-07-31T21:00:00.000Z',
-    '2018-11-30T13:00:00.000Z',
-    '2019-04-01T05:00:00.000Z',
-    '2019-07-31T21:00:00.000Z',
-    '2019-11-30T13:00:00.000Z',
-    new Date().toISOString()
-  ]
+  const checkpoints = makeCheckpoints(startDate)
+
   return sequelize.query(
     `
     SELECT
