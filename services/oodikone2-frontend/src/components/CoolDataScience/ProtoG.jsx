@@ -126,34 +126,41 @@ const ProtoG = () => {
                     highcharts={Highcharts}
                     config={Highcharts.merge(defaultConfig(), {
                       xAxis: {
-                        categories: snapshots.map(s => {
-                          const date = new Date(s.date)
-                          return `<b>${date.getFullYear()}</b>-${date.getMonth()}-${date.getDate()}`
-                        })
+                        type: 'datetime'
                       },
                       series: [
                         {
                           name: 'muut',
-                          data: snapshots.map(s => s.totalStudents - s.students3y - s.students4y),
+                          data: snapshots.map(s => ({
+                            y: s.totalStudents - s.students3y - s.students4y,
+                            x: new Date(s.date).getTime()
+                          })),
                           color: '#ff7979',
                           fillOpacity: 0.7
                         },
                         {
                           name: '4v tahdissa',
-                          data: snapshots.map(s => s.students4y),
+                          data: snapshots.map(s => ({
+                            y: s.students4y,
+                            x: new Date(s.date).getTime()
+                          })),
                           color: '#f9ca24',
                           fillOpacity: 0.7
                         },
                         {
                           name: '3v tahdissa',
-                          data: snapshots.map(s => s.students3y),
+                          data: snapshots.map(s => ({
+                            y: s.students3y,
+                            x: new Date(s.date).getTime()
+                          })),
                           color: '#6ab04c',
                           fillOpacity: 0.7
                         }
                       ],
                       tooltip: {
                         pointFormat:
-                          '<span style="color:{series.color}">●</span>	<span style="font-weight:bold;">{series.name}</span>: {point.percentage:.1f}% ({point.y})<br/>'
+                          '<span style="color:{series.color}">●</span>	<span style="font-weight:bold;">{series.name}</span>: {point.percentage:.1f}% ({point.y})<br/>',
+                        xDateFormat: '%Y-%m-%d'
                       },
                       plotOptions: {
                         area: {
