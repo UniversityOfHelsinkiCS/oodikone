@@ -9,6 +9,7 @@ import ProtoC from './ProtoC'
 import ProtoD from './ProtoD'
 import ProtoE from './ProtoE'
 import ProtoF from './ProtoF'
+import ProtoG from './ProtoG'
 import './CoolDataScience.css'
 
 HighchartsSankey(Highcharts)
@@ -89,6 +90,8 @@ const CoolDataScience = () => {
       >
         log test data
       </button>
+      <ProtoG />
+      <hr />
       <ProtoF />
       <hr />
       <ProtoE />
