@@ -114,7 +114,6 @@ const educationTypeToExtentcode = {
 
 const updateOrganisations = async organisations => {
   await bulkCreate(Organization, organisations)
-  console.log(`Updated ${organisations.length} organisations`)
 }
 
 const updateStudyModules = async studyModules => {
@@ -188,8 +187,6 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     null,
     ['composite']
   )
-
-  console.log(`Updated ${courses.length} courses`)
 }
 
 const updateStudents = async personIds => {
@@ -271,8 +268,6 @@ const updateStudents = async personIds => {
     updateAttainments(attainments),
     updateTermRegistrations(termRegistrations, personIdToStudentNumber)
   ])
-
-  console.log(`Updated ${personIds.length} students`)
 }
 
 const updateStudyRights = async studyRights => {
@@ -568,6 +563,8 @@ const updateAttainments = async attainments => {
 
       const targetSemester = getSemesterByDate(new Date(a.attainment_date))
 
+      if (!targetSemester) return null
+
       return {
         id: a.id,
         grade: gradeScaleIdToGradeIdsToGrades[grade_scale_id][grade_id],
@@ -584,6 +581,7 @@ const updateAttainments = async attainments => {
         org: attainmentUniOrg
       }
     })
+    .filter(c => !!c)
 
   await bulkCreate(Credit, credits)
   await bulkCreate(
@@ -592,8 +590,6 @@ const updateAttainments = async attainments => {
     null,
     ['composite']
   )
-
-  console.log(`Updated ${credits.length} credits`)
 }
 
 const updateTermRegistrations = async (termRegistrations, personIdToStudentNumber) => {
@@ -662,7 +658,6 @@ const updateCourseTypes = async studyLevels => {
     name: studyLevel.name
   })
   await bulkCreate(CourseType, studyLevels.map(mapStudyLevelToCourseType))
-  console.log(`Updated ${studyLevels.length} course types`)
 }
 
 const updateSemesters = async studyYears => {
@@ -691,12 +686,10 @@ const updateSemesters = async studyYears => {
     })
   )
   await bulkCreate(Semester, semesters)
-  console.log(`Updated ${semesters.length} semesters`)
 }
 
 const updateCreditTypes = async creditTypes => {
   await bulkCreate(CreditType, creditTypes)
-  console.log(`Updated ${creditTypes.length} credit types`)
 }
 
 const updateStudyrightExtents = async educationTypes => {
@@ -708,7 +701,6 @@ const updateStudyrightExtents = async educationTypes => {
     .filter(eT => eT.extentcode)
 
   await bulkCreate(StudyrightExtent, studyrightExtents, null, ['extentcode'])
-  console.log(`Updated ${educationTypes.length} studyright extents`)
 }
 
 const idToHandler = {
