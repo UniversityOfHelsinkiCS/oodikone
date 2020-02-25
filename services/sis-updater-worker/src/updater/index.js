@@ -568,8 +568,6 @@ const updateAttainments = async attainments => {
 
       const targetSemester = getSemesterByDate(new Date(a.attainment_date))
 
-      console.log('targetSemester', targetSemester)
-
       return {
         id: a.id,
         grade: gradeScaleIdToGradeIdsToGrades[grade_scale_id][grade_id],
