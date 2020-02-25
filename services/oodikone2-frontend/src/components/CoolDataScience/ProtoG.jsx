@@ -2,8 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
-import moment from 'moment'
-import { Table, Checkbox, Form, Dropdown } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Table, Form, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash'
 import { callApi } from '../../apiConnection'
 
@@ -28,9 +27,6 @@ const defaultConfig = () => ({
     enabled: false
   },
   xAxis: {
-    labels: {
-      enabled: false
-    },
     title: {
       text: null
     },
@@ -84,9 +80,22 @@ const defaultConfig = () => ({
 })
 
 const ProtoG = () => {
-  const [startDate, setStartDate] = useState('2017-07-31T21:00:00.000Z')
+  const [startOptions, setStartOptions] = useState([])
+  const [startDate, setStartDate] = useState(null)
   const [uberdata, setUberdata] = useState(null)
-  const [isLoading, setLoading] = useState(false)
+  const [isLoading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      setLoading(true)
+      const res = await callApi('/cool-data-science/start-years')
+      setLoading(false)
+      setStartOptions(res.data.map((date, i) => ({ key: i, text: new Date(date).getFullYear(), value: date })))
+      setStartDate(res.data[0])
+    }
+
+    load()
+  }, [])
 
   useEffect(() => {
     async function load() {
@@ -95,92 +104,130 @@ const ProtoG = () => {
       setUberdata(res.data)
       setLoading(false)
     }
-    load()
+
+    if (startDate) {
+      load()
+    }
   }, [startDate])
 
-  if (isLoading) {
-    return <div>loading...</div>
-  }
-
-  if (!isLoading && !uberdata) {
-    return <div>no data?</div>
-  }
+  const handleYearChanged = useCallback((e, { value }) => {
+    setStartDate(value)
+  }, [])
+  const preventDefault = useCallback(e => e.preventDefault(), [])
 
   return (
-    <div>
-      <Table compact striped>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Tiedekunta</Table.HeaderCell>
-            <Table.HeaderCell>3v tahdin kehitys</Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
+    <Segment>
+      <h3>Proto G</h3>
 
-        <Table.Body>
-          {Object.values(uberdata).map(({ name, code, snapshots, programmes }) => {
-            return (
-              <Table.Row key={code}>
-                <Table.Cell>{name}</Table.Cell>
-                <Table.Cell>
-                  <ReactHighcharts
-                    highcharts={Highcharts}
-                    config={Highcharts.merge(defaultConfig(), {
-                      xAxis: {
-                        type: 'datetime'
-                      },
-                      series: [
-                        {
-                          name: 'muut',
-                          data: snapshots.map(s => ({
-                            y: s.totalStudents - s.students3y - s.students4y,
-                            x: new Date(s.date).getTime()
-                          })),
-                          color: '#ff7979',
-                          fillOpacity: 0.7
-                        },
-                        {
-                          name: '4v tahdissa',
-                          data: snapshots.map(s => ({
-                            y: s.students4y,
-                            x: new Date(s.date).getTime()
-                          })),
-                          color: '#f9ca24',
-                          fillOpacity: 0.7
-                        },
-                        {
-                          name: '3v tahdissa',
-                          data: snapshots.map(s => ({
-                            y: s.students3y,
-                            x: new Date(s.date).getTime()
-                          })),
-                          color: '#6ab04c',
-                          fillOpacity: 0.7
-                        }
-                      ],
-                      tooltip: {
-                        pointFormat:
-                          '<span style="color:{series.color}">●</span>	<span style="font-weight:bold;">{series.name}</span>: {point.percentage:.1f}% ({point.y})<br/>',
-                        xDateFormat: '%Y-%m-%d'
-                      },
-                      plotOptions: {
-                        area: {
-                          stacking: 'percent',
-                          lineColor: '#ffffff',
-                          lineWidth: 1,
-                          marker: {
-                            lineWidth: 1
-                          }
-                        }
-                      }
-                    })}
-                  />
-                </Table.Cell>
+      <Form onSubmit={preventDefault}>
+        <Form.Group inline>
+          <Form.Field>
+            <label>Start year</label>
+            <Dropdown
+              onChange={handleYearChanged}
+              options={startOptions}
+              placholder="Choose year"
+              selection
+              value={startDate}
+            />
+          </Form.Field>
+        </Form.Group>
+      </Form>
+
+      <Segment placeholder={isLoading} vertical>
+        <Dimmer inverted active={isLoading} />
+        <Loader active={isLoading} />
+
+        {uberdata && (
+          <Table compact striped>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Tiedekunta</Table.HeaderCell>
+                <Table.HeaderCell>Tahdissa olevien kehitys</Table.HeaderCell>
               </Table.Row>
-            )
-          })}
-        </Table.Body>
-      </Table>
-    </div>
+            </Table.Header>
+
+            <Table.Body>
+              {Object.values(uberdata)
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map(({ name, code, snapshots, programmes }) => {
+                  const years = _.uniq(snapshots.map(s => new Date(s.date).getFullYear())).map(
+                    year => new Date(year, 1, 1)
+                  )
+
+                  return (
+                    <Table.Row key={code}>
+                      <Table.Cell>{name}</Table.Cell>
+                      <Table.Cell style={{ paddingBottom: '20px' }}>
+                        <ReactHighcharts
+                          highcharts={Highcharts}
+                          config={Highcharts.merge(defaultConfig(), {
+                            xAxis: {
+                              type: 'datetime',
+                              labels: {
+                                formatter: function() {
+                                  return new Date(this.value).getFullYear()
+                                }
+                              },
+                              tickPositions: years.map(date => date.getTime()),
+                              minorTickInterval: 1.051e10,
+                              minorTicks: true
+                            },
+                            series: [
+                              {
+                                name: 'muut',
+                                data: snapshots.map(s => ({
+                                  y: s.totalStudents - s.students3y - s.students4y,
+                                  x: new Date(s.date).getTime()
+                                })),
+                                color: '#ff7979',
+                                fillOpacity: 0.7
+                              },
+                              {
+                                name: '4v tahdissa',
+                                data: snapshots.map(s => ({
+                                  y: s.students4y,
+                                  x: new Date(s.date).getTime()
+                                })),
+                                color: '#f9ca24',
+                                fillOpacity: 0.7
+                              },
+                              {
+                                name: '3v tahdissa',
+                                data: snapshots.map(s => ({
+                                  y: s.students3y,
+                                  x: new Date(s.date).getTime()
+                                })),
+                                color: '#6ab04c',
+                                fillOpacity: 0.7
+                              }
+                            ],
+                            tooltip: {
+                              pointFormat:
+                                '<span style="color:{series.color}">●</span>	<span style="font-weight:bold;">{series.name}</span>: {point.percentage:.1f}% ({point.y})<br/>',
+                              xDateFormat: '%Y-%m-%d'
+                            },
+                            plotOptions: {
+                              area: {
+                                stacking: 'percent',
+                                lineColor: '#ffffff',
+                                lineWidth: 1,
+                                marker: {
+                                  lineWidth: 1
+                                }
+                              }
+                            }
+                          })}
+                        />
+                      </Table.Cell>
+                    </Table.Row>
+                  )
+                })}
+            </Table.Body>
+          </Table>
+        )}
+      </Segment>
+    </Segment>
   )
 }
 
