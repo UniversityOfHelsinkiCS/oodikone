@@ -153,7 +153,16 @@ const getUberData = _.memoize(async startDate => {
                 ss.credits,
                 $1
             )
-        ) "targetStudents"
+        ) "students3y",
+        SUM(
+          public.is_in_target(
+              cp,
+              ss.studystartdate,
+              TIMESTAMP '2021-07-31',
+              ss.credits,
+              $1
+          )
+      ) "students4y"
     FROM (
             SELECT
                 cp,
@@ -244,7 +253,8 @@ router.get(
           programmeCode: "KH10_001",
           programmeName: "Teologian ja uskonnontutkimuksen kandiohjelma",
           programmeTotalStudents: "120",
-          targetStudents: "9"
+          students3y: "9"
+          students4y: "10"
         },
         ...
       ]
@@ -260,7 +270,8 @@ router.get(
           {
             date: '2017-11-30T13:00:00.000Z',
             totalStudents: 340, // sum of programme total students at this checkpoint
-            targetStudents: 50 // ^^^ of programme target students
+            students3y: 43, // ^^^ of programme 3y target students
+            students4y: 55
           },
           ...
         ],
@@ -273,7 +284,8 @@ router.get(
               {
                 date: '2017-11-30T13:00:00.000Z',
                 totalStudents: 120,
-                targetStudents: 9
+                students3y: 9,
+                students4y: 10
               },
               ...
           },
@@ -288,18 +300,21 @@ router.get(
       .map(programmeRow => ({
         ...programmeRow,
         programmeTotalStudents: parseInt(programmeRow.programmeTotalStudents, 10),
-        targetStudents: parseInt(programmeRow.targetStudents, 10)
+        students3y: parseInt(programmeRow.students3y, 10),
+        // 4y group includes 3y group, make the 4y group exclusive
+        students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10)
       }))
       .groupBy(row => row.programmeCode)
       .map(programmeRows => ({
         ..._.pick(programmeRows[0], 'orgCode', 'orgName', 'programmeCode', 'programmeName'),
         snapshots: _(programmeRows)
-          .map(({ checkpoint: date, programmeTotalStudents: totalStudents, targetStudents }) => ({
+          .map(({ checkpoint: date, programmeTotalStudents: totalStudents, students3y, students4y }) => ({
             date,
             totalStudents,
-            targetStudents
+            students3y,
+            students4y
           }))
-          .sortBy(s => s.date)
+          .sort((a, b) => a.date - b.date)
           .value()
       }))
       // Then, group all programmes under the correct organization
@@ -315,9 +330,10 @@ router.get(
           .map(snapshots => ({
             date: snapshots[0].date,
             totalStudents: _.sumBy(snapshots, s => s.totalStudents),
-            targetStudents: _.sumBy(snapshots, s => s.targetStudents)
+            students3y: _.sumBy(snapshots, s => s.students3y),
+            students4y: _.sumBy(snapshots, s => s.students4y)
           }))
-          .sort(snapshot => snapshot.date)
+          .sort((a, b) => a.date - b.date)
           .value(),
         /**
          * type ProgrammeCode = string
