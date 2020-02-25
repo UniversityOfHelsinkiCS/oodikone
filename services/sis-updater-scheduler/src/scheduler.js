@@ -2,7 +2,16 @@ const { chunk } = require('lodash')
 const { eachLimit } = require('async')
 const { knexConnection } = require('./db/connection')
 const { stan } = require('./utils/stan')
-const { SIS_UPDATER_SCHEDULE_CHANNEL, CHUNK_SIZE, isDev } = require('./config')
+const { set: redisSet } = require('./utils/redis')
+const {
+  SIS_UPDATER_SCHEDULE_CHANNEL,
+  CHUNK_SIZE,
+  isDev,
+  REDIS_TOTAL_META_KEY,
+  REDIS_TOTAL_STUDENTS_KEY,
+  REDIS_TOTAL_META_DONE_KEY,
+  REDIS_TOTAL_STUDENTS_DONE_KEY
+} = require('./config')
 
 const createJobs = async (entityIds, type) =>
   new Promise((res, rej) => {
@@ -23,38 +32,43 @@ const scheduleFromDb = async ({ table, distinct, pluck = 'id', whereNotNull, sch
   if (whereNotNull) knexBuilder.whereNotNull(whereNotNull)
   if (limit) knexBuilder.limit(limit)
   if (where) knexBuilder.where(...where)
-  await eachLimit(chunk(await knexBuilder, CHUNK_SIZE), 10, async e => await createJobs(e, scheduleId || table))
+  const entities = await knexBuilder
+  await eachLimit(chunk(entities, CHUNK_SIZE), 10, async e => await createJobs(e, scheduleId || table))
+  return entities.length
 }
 
 const scheduleMeta = async () => {
-  await scheduleFromDb({
+  await redisSet(REDIS_TOTAL_META_DONE_KEY, 0)
+  await redisSet(REDIS_TOTAL_META_KEY, 'SCHEDULING...')
+  const totalOrganisations = await scheduleFromDb({
     table: 'organisations'
   })
 
-  await scheduleFromDb({
+  const totalStudyLevels = await scheduleFromDb({
     table: 'study_levels'
   })
 
-  await scheduleFromDb({
+  const totalEducationTypes = await scheduleFromDb({
     table: 'education_types'
   })
 
-  await scheduleFromDb({
+  const totalStudyYears = await scheduleFromDb({
     table: 'study_years',
     distinct: 'org',
     pluck: 'org'
   })
 
-  await createJobs([4, 7, 9, 10], 'credit_types')
+  const creditTypes = [4, 7, 9, 10]
+  await createJobs(creditTypes, 'credit_types')
 
-  await scheduleFromDb({
+  const totalCourseUnits = await scheduleFromDb({
     table: 'course_units',
     distinct: 'group_id',
     pluck: 'group_id',
     limit: isDev ? 100 : null
   })
 
-  await scheduleFromDb({
+  const totalStudyModules = await scheduleFromDb({
     scheduleId: 'study_modules',
     table: 'modules',
     where: ['type', 'StudyModule'],
@@ -62,16 +76,31 @@ const scheduleMeta = async () => {
     pluck: 'group_id',
     limit: isDev ? 100 : null
   })
+
+  const totalMeta =
+    totalOrganisations +
+    totalStudyLevels +
+    totalEducationTypes +
+    totalStudyYears +
+    creditTypes.length +
+    totalCourseUnits +
+    totalStudyModules
+
+  await redisSet(REDIS_TOTAL_META_KEY, totalMeta)
 }
 
 const scheduleStudents = async () => {
-  await scheduleFromDb({
+  await redisSet(REDIS_TOTAL_STUDENTS_DONE_KEY, 0)
+  await redisSet(REDIS_TOTAL_STUDENTS_KEY, 'SCHEDULING...')
+  const totalStudents = await scheduleFromDb({
     scheduleId: 'students',
     table: 'persons',
     whereNotNull: 'student_number',
     pluck: 'id',
-    limit: isDev ? 1000 : null
+    limit: isDev ? 10000 : null
   })
+
+  await redisSet(REDIS_TOTAL_STUDENTS_KEY, totalStudents)
 }
 
 module.exports = {

@@ -233,6 +233,7 @@ services:
     build:
       context: services/sis-updater-scheduler
     environment:
+      REDIS_URI: //redis:6379
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
       SIS_NATS_TOKEN: dev
       SIS_IMPORTER_HOST: importer-db
