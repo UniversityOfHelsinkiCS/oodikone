@@ -13,8 +13,7 @@ const {
   updateDaily
 } = require('../services/updaterService')
 const { updateSISMetadata, updateSISStudents } = require('../services/sisUpdaterService')
-const { refreshStatistics } = require('../events')
-const { refreshAssociationsInRedis: refreshAssociationsInRedisV2 } = require('../servicesV2/studyrights')
+const { refreshStatistics, refreshStatisticsV2 } = require('../events')
 
 router.post('/update/oldest', async (req, res) => {
   const { amount } = req.body
@@ -183,7 +182,7 @@ router.get('/update/v2/students', async (req, res) => {
 
 router.post('/refresh_statistic_v2', async (req, res) => {
   try {
-    refreshAssociationsInRedisV2()
+    refreshStatisticsV2()
     res.status(200).json('Refreshing sis statistics')
   } catch (err) {
     console.error(err)

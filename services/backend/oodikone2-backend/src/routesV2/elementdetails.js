@@ -1,43 +1,42 @@
 const router = require('express').Router()
-const { getStudentsUserCanAccess } = require('../services/userService')
+/* const { getStudentsUserCanAccess } = require('../services/userService')
 const { getAllDegreesAndProgrammes, getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
-const MandatoryCourses = require('../services/mandatoryCourses')
-const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('../services/studytrack')
-const { findProgrammeTheses, createThesisCourse, deleteThesisCourse } = require('../services/thesis')
+const MandatoryCourses = require('../services/mandatoryCourses') */
+const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('../servicesV2/studytrack')
+const { findProgrammeTheses /* , createThesisCourse, deleteThesisCourse */ } = require('../services/thesis')
+
 const {
   getProductivity,
   setProductivity,
   getThroughput,
-  setThroughput,
-  patchProductivity,
+  setThroughput
+  /* patchProductivity,
   patchThroughput,
   getNonGraduatedStudents,
-  ping
-} = require('../services/analyticsService')
-const elementDetailsV2 = require('../routesV2/elementdetails')
-const useSisRouter = require('../util/useSisRouter')
+  ping */
+} = require('../servicesV2/analyticsService')
 
 const programmeStatsSince = new Date('2017-07-31')
 
-router.get('/elementdetails/all', async (req, res) => {
+/* router.get('/elementdetails/all', async (req, res) => {
   try {
     const elementdetails = await getAllElementDetails()
     res.json(elementdetails)
   } catch (e) {
     res.status(500).json(e)
   }
-})
+}) */
 
-router.get('/studyprogrammes', async (req, res) => {
+/* router.get('/studyprogrammes', async (req, res) => {
   try {
     const studyrights = await getAllDegreesAndProgrammes()
     res.json(studyrights)
   } catch (err) {
     res.status(500).json(err)
   }
-})
+}) */
 
-router.get('/v2/studyprogrammes/:id/present_students', async (req, res) => {
+/* router.get('/v2/studyprogrammes/:id/present_students', async (req, res) => {
   try {
     const {
       roles,
@@ -63,25 +62,25 @@ router.get('/v2/studyprogrammes/:id/present_students', async (req, res) => {
     console.error('e', e)
     res.status(500).json({ error: 'error' })
   }
-})
+}) */
 
-router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {
+/* router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {
   if (req.params.id) {
     const codes = await MandatoryCourses.byStudyprogramme(req.params.id)
     res.json(codes)
   } else {
     res.status(422).end()
   }
-})
+}) */
 
-router.get('/v2/studyprogrammes/ping', async (req, res) => {
+/* router.get('/v2/studyprogrammes/ping', async (req, res) => {
   try {
     const result = await ping()
     res.json(result)
   } catch (e) {
     res.status(500).end()
   }
-})
+}) */
 
 router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
   const code = req.params.id
@@ -106,7 +105,7 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
   }
 })
 
-router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
+/* router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
   const code = req.query.code
 
   console.log('Productivity stats recalculation starting')
@@ -149,7 +148,7 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
     ready += 1
     console.log(`Productivity stats recalculation ${ready}/${codes.length} done`)
   }
-})
+}) */
 
 router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
   const code = req.params.id
@@ -176,7 +175,7 @@ router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
   }
 })
 
-router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
+/* router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
   const code = req.query.code
 
   console.log('Throughput stats recalculation starting')
@@ -213,9 +212,9 @@ router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
     ready += 1
     console.log(`Throughput stats recalculation ${ready}/${codes.length} done`)
   }
-})
+}) */
 
-router.get('/v2/studyprogrammes/:id/thesis', async (req, res) => {
+/* router.get('/v2/studyprogrammes/:id/thesis', async (req, res) => {
   const { id } = req.params
   if (id) {
     const thesis = await findProgrammeTheses(id)
@@ -223,9 +222,9 @@ router.get('/v2/studyprogrammes/:id/thesis', async (req, res) => {
   } else {
     res.status(422).end()
   }
-})
+}) */
 
-router.post('/v2/studyprogrammes/:id/thesis', async (req, res) => {
+/* router.post('/v2/studyprogrammes/:id/thesis', async (req, res) => {
   const { id } = req.params
   const { course, thesisType } = req.body
   if (id && course && thesisType) {
@@ -234,9 +233,9 @@ router.post('/v2/studyprogrammes/:id/thesis', async (req, res) => {
   } else {
     res.status(422).end()
   }
-})
+}) */
 
-router.delete('/v2/studyprogrammes/:id/thesis/:course', async (req, res) => {
+/* router.delete('/v2/studyprogrammes/:id/thesis/:course', async (req, res) => {
   const { id, course } = req.params
   if (id && course) {
     const deleted = await deleteThesisCourse(id, course)
@@ -244,6 +243,8 @@ router.delete('/v2/studyprogrammes/:id/thesis/:course', async (req, res) => {
   } else {
     res.status(422).end()
   }
-})
+}) */
 
-module.exports = useSisRouter(elementDetailsV2, router)
+router.use('*', (req, res, next) => next())
+
+module.exports = router

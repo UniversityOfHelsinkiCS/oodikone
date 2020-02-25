@@ -1,20 +1,18 @@
 const router = require('express').Router()
-const Course = require('../services/courses')
+const Course = require('../servicesV2/courses')
 const { validateParamLength } = require('../util')
-const logger = require('../util/logger')
-const coursesV2 = require('../routesV2/courses')
-const useSisRouter = require('../util/useSisRouter')
+// const logger = require('../util/logger')
 
-router.get('/courses', async (req, res) => {
+/* router.get('/courses', async (req, res) => {
   let results = []
   if (req.query.name) {
     results = await Course.bySearchTerm(req.query.name, req.query.language)
   }
 
   res.json(results)
-})
+}) */
 
-router.get('/coursesmulti', async (req, res) => {
+/* router.get('/coursesmulti', async (req, res) => {
   let results = []
   if (req.query.name || req.query.discipline || req.query.type) {
     results = await Course.bySearchTermTypeAndDiscipline(
@@ -25,7 +23,7 @@ router.get('/coursesmulti', async (req, res) => {
     ) // eslint-disable-line
   }
   res.json(results)
-})
+}) */
 
 router.get('/v2/coursesmulti', async (req, res) => {
   let results = { courses: [], groups: {}, groupMeta: {} }
@@ -39,17 +37,17 @@ router.get('/v2/coursesmulti', async (req, res) => {
   res.json(results)
 })
 
-router.get('/coursetypes', async (req, res) => {
+/* router.get('/coursetypes', async (req, res) => {
   const coursetypes = await Course.getAllCourseTypes()
   res.json(coursetypes)
-})
+}) */
 
-router.get('/coursedisciplines', async (req, res) => {
+/* router.get('/coursedisciplines', async (req, res) => {
   const courseDisciplines = await Course.getAllDisciplines()
   res.json(courseDisciplines)
-})
+}) */
 
-router.get('/v2/courseyearlystats', async (req, res) => {
+/* router.get('/v2/courseyearlystats', async (req, res) => {
   let results = []
   const { rights, roles } = req
   const admin = roles.includes('admin')
@@ -66,9 +64,9 @@ router.get('/v2/courseyearlystats', async (req, res) => {
     )
   }
   res.json(results)
-})
+}) */
 
-router.get('/v3/courseyearlystats', async (req, res) => {
+/* router.get('/v3/courseyearlystats', async (req, res) => {
   try {
     const { rights, roles } = req
     const admin = roles && roles.includes('admin')
@@ -94,26 +92,28 @@ router.get('/v3/courseyearlystats', async (req, res) => {
     console.log(e)
     res.status(500).send('Something went wrong with handling the request.')
   }
-})
+}) */
 
-router.get('/courses/duplicatecodes/:programme', async (req, res) => {
+/* router.get('/courses/duplicatecodes/:programme', async (req, res) => {
   // const { programme } = req.params
   const results = await Course.getMainCourseToCourseMap()
   return res.json(results)
-})
+}) */
 
-router.post('/courses/duplicatecodes/:code1/:code2', async (req, res) => {
+/* router.post('/courses/duplicatecodes/:code1/:code2', async (req, res) => {
   const { code1, code2 } = req.params
   await Course.setDuplicateCode(code1, code2)
   const results = await Course.getMainCourseToCourseMap()
   res.status(200).json(results)
-})
+}) */
 
-router.delete('/courses/duplicatecodes/:code', async (req, res) => {
+/* router.delete('/courses/duplicatecodes/:code', async (req, res) => {
   const { code } = req.params
   await Course.deleteDuplicateCode(code)
   const results = await Course.getMainCourseToCourseMap()
   res.status(200).json(results)
-})
+}) */
 
-module.exports = useSisRouter(coursesV2, router)
+router.use('*', (req, res, next) => next())
+
+module.exports = router

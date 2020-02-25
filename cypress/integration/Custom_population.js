@@ -127,12 +127,13 @@ describe("Custom population tests", () => {
     console.log(Cypress.config().baseUrl);
     cy.visit(`${Cypress.config().baseUrl}custompopulation`);
     cy.url().should("include", "/custompopulation");
-    cy.get("button").contains("Custom population");
+    cy.contains("Custom population");
   });
 
   after(() => {
     cy.visit(`${Cypress.config().baseUrl}custompopulation`);
     cy.url().should("include", "/custompopulation");
+    cy.contains("Custom population");
     cy.get("button")
       .contains("Custom population")
       .click();
@@ -211,6 +212,7 @@ describe("Custom population tests", () => {
       // Round 2
       cy.visit(`${Cypress.config().baseUrl}custompopulation`);
       cy.url().should("include", "/custompopulation");
+      cy.contains("Custom population");
       cy.get("button")
         .contains("Custom population")
         .click();
@@ -233,6 +235,7 @@ describe("Custom population tests", () => {
       cy.contains(`Custom population "${name}"`);
       containsAmountOfStudents(3);
       containsSpecificStudents(testStudentNumbers);
+      cy.contains("Custom population");
       cy.get("button")
         .contains("Custom population")
         .click();
@@ -242,6 +245,7 @@ describe("Custom population tests", () => {
 
       cy.visit(`${Cypress.config().baseUrl}custompopulation`);
       cy.url().should("include", "/custompopulation");
+      cy.contains("Custom population");
       cy.get("button")
         .contains("Custom population")
         .click();
