@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const { groupBy, flatten, flattenDeep, sortBy, mapValues, uniqBy } = require('lodash')
 const {
   Organization,
@@ -43,11 +44,11 @@ const initDaysToSemesters = async () => {
   }, {})
 }
 
-const getCreditTypeCodeFromAttainment = attainment => {
+const getCreditTypeCodeFromAttainment = (attainment, passed) => {
   const { primary, state } = attainment
+  if (!passed || state === 'FAILED') return 10
   if (!primary) return 7
   if (state === 'ATTAINED') return 4
-  if (state === 'FAILED') return 10
   return 9
 }
 
@@ -171,9 +172,9 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
       name,
       code,
       coursetypecode,
-      minAttainmentDate: min_attainment_date,
-      maxAttainmentDate: max_attainment_date,
-      latestInstanceDate: max_attainment_date,
+      min_attainment_date,
+      max_attainment_date,
+      latest_instance_date: max_attainment_date,
       startdate,
       enddate,
       isStudyModule: false
@@ -516,9 +517,14 @@ const updateAttainments = async attainments => {
       const {
         localId,
         numericCorrespondence,
+        passed,
         abbreviation: { fi }
       } = curr
-      if (!res[localId]) res[localId] = numericCorrespondence || fi
+      if (!res[localId])
+        res[localId] = {
+          value: numericCorrespondence || fi,
+          passed
+        }
       return res
     }, {})
     return res
@@ -533,6 +539,19 @@ const updateAttainments = async attainments => {
     res[curr.id] = curr.group_id
     return res
   }, {})
+
+  const courseGroupIdToCourseCode = (
+    await Course.findAll({
+      where: {
+        id: {
+          [Op.in]: Object.values(courseUnitIdToCourseGroupId)
+        }
+      }
+    })
+  ).reduce((res, curr) => {
+    res[curr.id] = curr.code
+    return res
+  })
 
   const organisations = await selectFromSnapshotsByIds(
     'organisations',
@@ -567,14 +586,21 @@ const updateAttainments = async attainments => {
 
       return {
         id: a.id,
-        grade: gradeScaleIdToGradeIdsToGrades[grade_scale_id][grade_id],
+        grade: gradeScaleIdToGradeIdsToGrades[grade_scale_id][grade_id].value,
         student_studentnumber: personIdToStudentNumber[a.person_id],
         credits: a.credits,
         createdate: a.registration_date,
-        credittypecode: getCreditTypeCodeFromAttainment(a),
+        credittypecode: getCreditTypeCodeFromAttainment(
+          a,
+          gradeScaleIdToGradeIdsToGrades[grade_scale_id][grade_id].passed
+        ),
         attainment_date: a.attainment_date,
-        course_code:
+        course_id:
           a.type === 'CourseUnitAttainment' ? courseUnitIdToCourseGroupId[a.course_unit_id] : a.module_group_id,
+        course_code:
+          a.type === 'CourseUnitAttainment'
+            ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[a.course_unit_id]]
+            : courseGroupIdToCourseCode[a.module_group_id],
         semestercode: targetSemester.semestercode,
         semester_composite: targetSemester.composite,
         isStudyModule: a.type === 'ModuleAttainment',

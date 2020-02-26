@@ -45,8 +45,8 @@ Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED
 Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
 
-Credit.belongsTo(Course, { foreignKey: 'course_code' })
-Course.hasMany(Credit, { foreignKey: 'course_code' })
+Credit.belongsTo(Course, { foreignKey: 'course_id' })
+Course.hasMany(Credit, { foreignKey: 'course_id' })
 
 Credit.belongsTo(CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
 Credit.belongsToMany(Teacher, { through: CreditTeacher, foreignKey: 'credit_id' })

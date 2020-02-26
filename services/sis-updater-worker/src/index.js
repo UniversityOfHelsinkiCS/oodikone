@@ -24,7 +24,11 @@ const msgParser = f => async msg => {
   } catch (e) {
     console.log('Updating failed', e)
   } finally {
-    msg.ack()
+    try {
+      msg.ack()
+    } catch (e) {
+      console.log('Failed acking message...')
+    }
   }
 }
 
