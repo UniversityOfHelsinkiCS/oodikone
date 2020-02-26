@@ -13,7 +13,7 @@ import moment from 'moment'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/populationSelectedStudentCourses'
-import { getPopulationFilters, setPopulationFilter, clearPopulationFilters } from '../../redux/populationFilters'
+import { getPopulationFilters, setPopulationFilter, resetPopulationFilters } from '../../redux/populationFilters'
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 import { getSemesters } from '../../redux/semesters'
 import { transferTo } from '../../populationFilters'
@@ -109,7 +109,7 @@ const PopulationSearchForm = props => {
     setState({ isLoading: true })
     props.setLoading()
     props.clearSelected()
-    props.clearPopulationFilters()
+    props.resetPopulationFilters()
     fetchPopulationPromises.current = cancelablePromise(
       Promise.all([
         props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }),
@@ -164,7 +164,7 @@ const PopulationSearchForm = props => {
     setDidMount(true)
     return () => {
       if (fetchPopulationPromises.current) fetchPopulationPromises.current.cancel()
-      props.clearPopulationFilters()
+      props.resetPopulationFilters()
     }
   }, [location.search])
 
@@ -634,7 +634,7 @@ PopulationSearchForm.propTypes = {
   getMandatoryCourses: func.isRequired,
   getPopulationFilters: func.isRequired,
   setPopulationFilter: func.isRequired,
-  clearPopulationFilters: func.isRequired,
+  resetPopulationFilters: func.isRequired,
   queries: shape({}).isRequired,
   studyProgrammes: shape({}), //eslint-disable-line
   degrees: arrayOf(dropdownType), //eslint-disable-line
@@ -676,7 +676,7 @@ export default withRouter(
       getPopulationFilters,
       getMandatoryCourses,
       setPopulationFilter,
-      clearPopulationFilters,
+      resetPopulationFilters,
       getDegreesAndProgrammes,
       setLoading,
       getSemesters,
