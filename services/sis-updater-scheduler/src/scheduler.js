@@ -97,7 +97,7 @@ const scheduleStudents = async () => {
     table: 'persons',
     whereNotNull: 'student_number',
     pluck: 'id',
-    limit: isDev ? 10000 : null
+    limit: isDev ? 100 : null
   })
 
   await redisSet(REDIS_TOTAL_STUDENTS_KEY, totalStudents)
