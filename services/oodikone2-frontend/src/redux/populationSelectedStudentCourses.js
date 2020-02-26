@@ -71,9 +71,7 @@ const reducer = (state = defaultState, action) => {
         query: action.query
       }
     case 'CLEAR_SELECTED':
-      return {
-        state: defaultState
-      }
+      return defaultState
     default:
       return state
   }
