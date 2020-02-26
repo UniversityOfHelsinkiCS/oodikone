@@ -3,12 +3,12 @@ import ReactHighcharts from 'react-highcharts'
 import Highcharts from 'highcharts'
 import HighchartsSankey from 'highcharts/modules/sankey'
 
-import { callApi } from '../../apiConnection'
 import rawData from './data'
 import ProtoC from './ProtoC'
 import ProtoD from './ProtoD'
 import ProtoE from './ProtoE'
 import ProtoF from './ProtoF'
+import ProtoG from './ProtoG'
 import './CoolDataScience.css'
 
 HighchartsSankey(Highcharts)
@@ -74,21 +74,8 @@ const configs = [config1, config2]
 const CoolDataScience = () => {
   return (
     <div style={{ margin: '0 auto', maxWidth: '75vw' }}>
-      <button
-        type="button"
-        onClick={e => {
-          e.preventDefault()
-
-          const start = new Date()
-          console.log('uber data-ing')
-          callApi('/cool-data-science/uber-data', 'get', null, { start_date: '2017-07-31T21:00:00.000Z' }).then(res => {
-            console.log(`took ${((new Date() - start) / 1000).toFixed(2)}s`)
-            console.log(res.data)
-          })
-        }}
-      >
-        log test data
-      </button>
+      <ProtoG />
+      <hr />
       <ProtoF />
       <hr />
       <ProtoE />

@@ -7,6 +7,10 @@ export const clearPopulationFilters = () => ({
   type: 'CLEAR_POPULATION_FILTERS'
 })
 
+export const resetPopulationFilters = () => ({
+  type: 'RESET_POPULATION_FILTERS'
+})
+
 export const setPopulationFilter = filter => ({
   type: 'ADD_POPULATION_FILTER',
   filter
@@ -107,6 +111,13 @@ const reducer = (state = initial, action) => {
         filters: [],
         refreshNeeded: true
       }
+
+    case 'RESET_POPULATION_FILTERS':
+      return {
+        ...state,
+        filters: []
+      }
+
     case 'ALTER_POPULATION_COURSE_FILTER': {
       const toAlter = state.filters.find(f => f.id === action.id)
       const { course } = toAlter.params

@@ -50,6 +50,14 @@ SearchResult.defaultProps = {
   courses: []
 }
 
-const mapStateToProps = state => ({ courses: getCourseSearchResults(state).courses })
-
+const mapStateToProps = state => {
+  const { thesisCourses } = state
+  const { data } = thesisCourses || null
+  const thesisCourseCodes = data.map(c => c.courseCode)
+  const searchResults = getCourseSearchResults(state).courses
+  const filteredResults = searchResults.filter(c => !thesisCourseCodes.includes(c.code))
+  return {
+    courses: filteredResults
+  }
+}
 export default connect(mapStateToProps)(SearchResult)
