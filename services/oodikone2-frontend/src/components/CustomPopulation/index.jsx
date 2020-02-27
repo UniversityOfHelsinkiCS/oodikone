@@ -34,6 +34,7 @@ const CustomPopulation = ({
   selectCustomPopulationSearchDispatch,
   deleteCustomPopulationSearchDispatch,
   custompop,
+  customPopulationFlag,
   translate,
   selectedStudents,
   clearPopulationFiltersDispatch,
@@ -207,7 +208,7 @@ const CustomPopulation = ({
   return (
     <div>
       {renderCustomPopulationSearch()}
-      {custompop.length > 0 ? (
+      {custompop.length > 0 && customPopulationFlag ? (
         renderCustomPopulation()
       ) : (
         <Segment className="contentSegment">
@@ -226,6 +227,7 @@ CustomPopulation.defaultProps = {
 CustomPopulation.propTypes = {
   translate: func.isRequired,
   custompop: arrayOf(shape({})).isRequired,
+  customPopulationFlag: bool.isRequired,
   getCustomPopulationDispatch: func.isRequired,
   getCustomPopulationCoursesByStudentnumbers: func.isRequired,
   clearPopulationFiltersDispatch: func.isRequired,
@@ -246,7 +248,7 @@ const mapStateToProps = ({ populationFilters, populations, localize, populationC
   const samples = populations.data.students ? populations.data.students : []
   let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
   const { complemented } = populationFilters
-
+  const { customPopulationFlag } = populations
   if (samples.length > 0 && populationFilters.filters.length > 0) {
     const studentsForFilter = f => {
       return samples.filter(f.filter).map(s => s.studentNumber)
@@ -267,6 +269,7 @@ const mapStateToProps = ({ populationFilters, populations, localize, populationC
     courses: populationCourses.data,
     pending: populationCourses.pending,
     selectedStudents,
+    customPopulationFlag,
     customPopulationSearches: customPopulationSearch.customPopulationSearches,
     customPopulationSearchSaving: customPopulationSearch.saving,
     latestCreatedCustomPopulationSearchId: customPopulationSearch.latestCreatedCustomPopulationSearchId,
