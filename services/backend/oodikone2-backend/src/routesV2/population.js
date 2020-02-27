@@ -8,9 +8,9 @@ const { updateStudents } = require('../services/updaterService')
 const Student = require('../services/students') */
 const StudyrightService = require('../servicesV2/studyrights')
 /* const UserService = require('../services/userService')
-const TagService = require('../services/tags')
-const CourseService = require('../services/courses')
-const StatMergeService = require('../services/statMerger') */
+const TagService = require('../services/tags') */
+const CourseService = require('../servicesV2/courses')
+//const StatMergeService = require('../services/statMerger')
 
 /* const filterPersonalTags = (population, userId) => {
   return {
@@ -525,15 +525,16 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   }
 }) */
 
-/* router.get('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
+router.get('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
   try {
     const { courseCodes } = req.query
     const maxYearsToCreatePopulationFrom = await CourseService.maxYearsToCreatePopulationFrom(JSON.parse(courseCodes))
     return res.json(maxYearsToCreatePopulationFrom)
   } catch (err) {
+    console.log('err', err)
     res.status(500).json(err)
   }
-}) */
+})
 
 router.use('*', (req, res, next) => next())
 
