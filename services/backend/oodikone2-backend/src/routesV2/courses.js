@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const Course = require('../servicesV2/courses')
 const { validateParamLength } = require('../util')
-// const logger = require('../util/logger')
+const logger = require('../util/logger')
 
 /* router.get('/courses', async (req, res) => {
   let results = []
@@ -66,7 +66,7 @@ router.get('/v2/coursesmulti', async (req, res) => {
   res.json(results)
 }) */
 
-/* router.get('/v3/courseyearlystats', async (req, res) => {
+router.get('/v3/courseyearlystats', async (req, res) => {
   try {
     const { rights, roles } = req
     const admin = roles && roles.includes('admin')
@@ -92,7 +92,7 @@ router.get('/v2/coursesmulti', async (req, res) => {
     console.log(e)
     res.status(500).send('Something went wrong with handling the request.')
   }
-}) */
+})
 
 /* router.get('/courses/duplicatecodes/:programme', async (req, res) => {
   // const { programme } = req.params
