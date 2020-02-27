@@ -5,7 +5,8 @@ const initialState = {
   error: false,
   data: {},
   query: undefined,
-  updating: false
+  updating: false,
+  customPopulationFlag: false
 }
 
 export const getPopulationStatistics = ({
@@ -86,7 +87,8 @@ const reducer = (state = initialState, action) => {
         error: false,
         data: {},
         query: action.requestSettings.query,
-        updating: false
+        updating: false,
+        customPopulationFlag: false
       }
     case 'GET_POPULATION_STATISTICS_FAILURE':
       return {
@@ -95,7 +97,8 @@ const reducer = (state = initialState, action) => {
         error: true,
         data: action.response,
         query: action.query,
-        updating: false
+        updating: false,
+        customPopulationFlag: false
       }
     case 'GET_POPULATION_STATISTICS_SUCCESS':
       return {
@@ -104,7 +107,8 @@ const reducer = (state = initialState, action) => {
         error: false,
         data: action.response,
         query: action.query,
-        updating: false
+        updating: false,
+        customPopulationFlag: false
       }
     case 'GET_STUDENTS_OF_COURSE_ATTEMPT':
       return {
@@ -113,7 +117,8 @@ const reducer = (state = initialState, action) => {
         error: false,
         query: null,
         data: {},
-        updating: false
+        updating: false,
+        customPopulationFlag: false
       }
     case 'GET_STUDENTS_OF_COURSE_FAILURE':
       return {
@@ -121,7 +126,8 @@ const reducer = (state = initialState, action) => {
         pending: false,
         error: true,
         data: action.response,
-        updating: false
+        updating: false,
+        customPopulationFlag: false
       }
     case 'GET_STUDENTS_OF_COURSE_SUCCESS':
       return {
@@ -129,7 +135,8 @@ const reducer = (state = initialState, action) => {
         pending: false,
         error: false,
         data: action.response,
-        updating: false
+        updating: false,
+        customPopulationFlag: false
       }
     case 'GET_CUSTOM_POP_ATTEMPT':
       return {
@@ -138,7 +145,8 @@ const reducer = (state = initialState, action) => {
         error: false,
         query: null,
         data: {},
-        updating: false
+        updating: false,
+        customPopulationFlag: true
       }
     case 'GET_CUSTOM_POP_FAILURE':
       return {
@@ -146,7 +154,8 @@ const reducer = (state = initialState, action) => {
         pending: false,
         error: true,
         data: action.response,
-        updating: false
+        updating: false,
+        customPopulationFlag: true
       }
     case 'GET_CUSTOM_POP_SUCCESS':
       return {
@@ -154,7 +163,8 @@ const reducer = (state = initialState, action) => {
         pending: false,
         error: false,
         data: action.response,
-        updating: false
+        updating: false,
+        customPopulationFlag: true
       }
     case 'UPDATE_POPULATION_STUDENTS_ATTEMPT':
       return {
