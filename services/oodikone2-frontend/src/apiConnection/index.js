@@ -30,7 +30,9 @@ const getDefaultConfig = () => {
     return { ...devOptions }
   }
   return {
-    headers: {}
+    headers: {
+      'X-sis': !!getTestUserSIS()
+    }
   }
 }
 
