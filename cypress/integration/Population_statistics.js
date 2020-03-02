@@ -97,7 +97,7 @@ describe('Population Statistics tests', () => {
 
     cy.contains("add").click()
     cy.contains("Add filters").siblings().within(() => {
-      cy.get(".form").should('have.length', 8)
+      cy.get(".form").should('have.length', 9)
     })
 
     checkAmountOfStudents(29)
@@ -278,7 +278,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Add filters").parent().contains("button", "add").should('not.have.class', 'disabled')
     cy.contains("Add filters").parent().contains("button", "add").click()
     cy.contains("Add filters").siblings().within(() => {
-      cy.get(".form").should('have.length', 9)
+      cy.get(".form").should('have.length', 10)
     })
 
     checkAmountOfStudents(32)
