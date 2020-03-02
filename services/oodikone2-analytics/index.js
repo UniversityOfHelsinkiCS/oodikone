@@ -7,7 +7,8 @@ const {
   FacultyStats,
   NonGraduatedStudents,
   ProductivityV2,
-  ThroughputV2
+  ThroughputV2,
+  NonGraduatedStudentsV2
 } = require('./src/models')
 const { initializeDatabaseConnection } = require('./src/database/connection')
 
@@ -68,6 +69,23 @@ const v2Routes = app => {
       await ThroughputV2.upsert({ ...data, id })
     }
     res.status(200).end()
+  })
+
+  app.patch('/v2/nongraduatedstudents', async (req, res) => {
+    for (let [id, data] of Object.entries(req.body.data)) {
+      await NonGraduatedStudentsV2.upsert({ data, id })
+    }
+    res.status(200).end()
+  })
+
+  app.get('/v2/nongraduatedstudents/:id', async (req, res) => {
+    const { id } = req.params
+    const result = await NonGraduatedStudentsV2.findByPk(id)
+    if (!result) {
+      res.json(null)
+    } else {
+      res.json(result)
+    }
   })
 }
 
