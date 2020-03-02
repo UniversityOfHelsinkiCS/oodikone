@@ -1,18 +1,18 @@
-/* const crypto = require('crypto')
-const Sentry = require('@sentry/node') */
+/* const crypto = require('crypto') */
+const Sentry = require('@sentry/node')
 const router = require('express').Router()
-/* const { isValidStudentId } = require('../util/index')
-const Population = require('../services/populations')
+/* const { isValidStudentId } = require('../util/index') */
+const Population = require('../servicesV2/populations')
 const Filters = require('../services/filters')
-const { updateStudents } = require('../services/updaterService')
-const Student = require('../services/students') */
+/* const { updateStudents } = require('../services/updaterService') */
+const Student = require('../servicesV2/students')
 const StudyrightService = require('../servicesV2/studyrights')
-/* const UserService = require('../services/userService')
-const TagService = require('../services/tags') */
+const UserService = require('../servicesV2/userService')
+/* const TagService = require('../services/tags') */
 const CourseService = require('../servicesV2/courses')
-//const StatMergeService = require('../services/statMerger')
+const StatMergeService = require('../services/statMerger')
 
-/* const filterPersonalTags = (population, userId) => {
+const filterPersonalTags = (population, userId) => {
   return {
     ...population,
     students: population.students.map(student => {
@@ -20,10 +20,10 @@ const CourseService = require('../servicesV2/courses')
       return student
     })
   }
-} */
+}
 
 // POST instead of GET because of too long params and "sensitive" data
-/* router.post('/v2/populationstatistics/courses', async (req, res) => {
+router.post('/v2/populationstatistics/courses', async (req, res) => {
   try {
     if (!req.body.year || !req.body.semesters || !req.body.studyRights) {
       Sentry.captureException(new Error('The body should have a year, semester and study rights defined'))
@@ -76,9 +76,9 @@ const CourseService = require('../servicesV2/courses')
     Sentry.captureException(e)
     res.status(500).json({ error: e })
   }
-}) */
+})
 
-/* router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => {
+router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => {
   try {
     const { from, to, coursecodes } = req.body
     if (!from || !to || !coursecodes) {
@@ -123,9 +123,9 @@ const CourseService = require('../servicesV2/courses')
     console.log(e)
     res.status(500).json({ error: e })
   }
-}) */
+})
 
-/* router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
+router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
   try {
     const { tag } = req.body
     if (!tag) {
@@ -168,9 +168,9 @@ const CourseService = require('../servicesV2/courses')
     console.log(e)
     res.status(500).json({ error: e })
   }
-}) */
+})
 
-/* router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, res) => {
+router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, res) => {
   try {
     if (!req.body.studentnumberlist) {
       res.status(400).json({ error: 'The body should have a studentnumberlist defined' })
@@ -209,9 +209,9 @@ const CourseService = require('../servicesV2/courses')
     console.log(err)
     res.status(500).json({ error: err })
   }
-}) */
+})
 
-/* router.get('/v3/populationstatistics', async (req, res) => {
+router.get('/v3/populationstatistics', async (req, res) => {
   const { year, semesters, studyRights: studyRightsJSON } = req.query
   const { decodedToken } = req
   try {
@@ -281,7 +281,7 @@ const CourseService = require('../servicesV2/courses')
     console.log(e)
     res.status(500).json({ error: e })
   }
-}) */
+})
 
 /* router.get('/v3/populationstatisticsbytag', async (req, res) => {
   const { tag, studyRights: studyRightsJSON, months, year } = req.query
@@ -445,7 +445,7 @@ const CourseService = require('../servicesV2/courses')
   }
 }) */
 
-/* router.get('/v2/populationstatistics/filters', async (req, res) => {
+router.get('/v2/populationstatistics/filters', async (req, res) => {
   let results = []
   let rights = req.query.studyRights
   if (!Array.isArray(rights)) {
@@ -459,9 +459,9 @@ const CourseService = require('../servicesV2/courses')
     console.log(err)
     res.status(400).end()
   }
-}) */
+})
 
-/* router.post('/v2/populationstatistics/filters', async (req, res) => {
+router.post('/v2/populationstatistics/filters', async (req, res) => {
   let results = []
   const filter = req.body
 
@@ -472,9 +472,9 @@ const CourseService = require('../servicesV2/courses')
     console.log(err)
     res.status(400).end()
   }
-}) */
+})
 
-/* router.delete('/v2/populationstatistics/filters', async (req, res) => {
+router.delete('/v2/populationstatistics/filters', async (req, res) => {
   let results = []
   const filter = req.body
   try {
@@ -483,7 +483,7 @@ const CourseService = require('../servicesV2/courses')
   } catch (err) {
     res.status(400).end()
   }
-}) */
+})
 
 /* router.post('/updatedatabase', async (req, res) => {
   const studentnumbers = req.body

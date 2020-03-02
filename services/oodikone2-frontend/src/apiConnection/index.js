@@ -10,7 +10,7 @@ const devOptions = {
     uid: getTestUser() || 'tktl',
     displayName: 'Development Kayttaja',
     'shib-session-id': 'mock-session',
-    sis: !!getTestUserSIS()
+    'X-sis': !!getTestUserSIS()
   }
 }
 
