@@ -1,5 +1,7 @@
 const Sequelize = require('sequelize')
-const { sequelize } = require('../database/connection')
+const {
+  dbConnections: { sequelize }
+} = require('../databaseV2/connection')
 const moment = require('moment')
 const {
   Student,
