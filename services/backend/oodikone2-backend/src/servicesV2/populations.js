@@ -196,10 +196,10 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'abbreviatedname',
         'email',
         'updatedAt',
-        'gender_code',
-        'gender_fi',
+        'gender_code'
+        /* 'gender_fi',
         'gender_sv',
-        'gender_en'
+        'gender_en' */
       ],
       include: [
         /* {
@@ -306,9 +306,10 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       raw: true
     }),
     sequelize.query(
+      //EXISTS (SELECT 1 FROM transfers WHERE studentnumber IN (:studentnumbers) AND (code = sourcecode OR code = targetcode)) OR
+
       `
 SELECT DISTINCT ON (code) code, name, type FROM element_details WHERE
-EXISTS (SELECT 1 FROM transfers WHERE studentnumber IN (:studentnumbers) AND (code = sourcecode OR code = targetcode)) OR
 EXISTS (SELECT 1 FROM studyright_elements WHERE studentnumber IN (:studentnumbers))`,
       {
         replacements: { studentnumbers },
@@ -484,14 +485,14 @@ const formatStudentsForApi = async (
   }, {})
   const result = students.reduce(
     (stats, student) => {
-      student.transfers.forEach(transfer => {
+      /* student.transfers.forEach(transfer => {
         const target = stats.transfers.targets[transfer.targetcode] || { sources: {} }
         const source = stats.transfers.sources[transfer.sourcecode] || { targets: {} }
         target.sources[transfer.sourcecode] = true
         source.targets[transfer.targetcode] = true
         stats.transfers.targets[transfer.targetcode] = target
         stats.transfers.sources[transfer.sourcecode] = source
-      })
+      }) */
 
       stats.students.push(
         formatStudentForPopulationStatistics(student, credits, startDate, endDate, startDateMoment, endDateMoment)
@@ -741,7 +742,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
   const startYear = parseInt(query.year, 10)
   const allstudentslength = Object.keys(allstudents).length
   courses.forEach(course => {
-    let { disciplines, course_type } = course
+    let { /* disciplines,  */ course_type } = course
     const maincourse = getMainCourse(course, codeToMainCourse)
     if (!stats[maincourse.code]) {
       stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
@@ -750,10 +751,10 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
     coursestats.addCourseType(course_type.coursetypecode, course_type.name)
     bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
-    disciplines.forEach(({ discipline_id, name }) => {
+    /* disciplines.forEach(({ discipline_id, name }) => {
       coursestats.addCourseDiscipline(discipline_id, name)
       bottlenecks.disciplines[discipline_id] = name
-    })
+    }) */
 
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)

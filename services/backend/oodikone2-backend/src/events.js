@@ -2,7 +2,10 @@ const { CronJob } = require('cron')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { refreshAssociationsInRedis: refreshAssociationsInRedisV2 } = require('./servicesV2/studyrights')
 const { getAllProgrammes, nonGraduatedStudentsOfElementDetail } = require('./services/studyrights')
-const { getAllProgrammes: getAllProgrammesV2 } = require('./servicesV2/studyrights')
+const {
+  getAllProgrammes: getAllProgrammesV2,
+  nonGraduatedStudentsOfElementDetail: nonGraduatedStudentsOfElementDetailV2
+} = require('./servicesV2/studyrights')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studytrack')
 
 const {
@@ -27,7 +30,8 @@ const {
   setProductivity: setProductivityV2,
   setThroughput: setThroughputV2,
   patchProductivity: patchProductivityV2,
-  patchThroughput: patchThroughputV2
+  patchThroughput: patchThroughputV2,
+  patchNonGraduatedStudents: patchNonGraduatedStudentsV2
 } = require('./servicesV2/analyticsService')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
@@ -198,6 +202,31 @@ const refreshNonGraduatedStudentsOfOldProgrammes = async () => {
   }
 }
 
+const refreshNonGraduatedStudentsOfOldProgrammesV2 = async () => {
+  try {
+    const oldProgrammeCodes = (await getAllProgrammesV2()).map(p => p.code).filter(c => !isNewHYStudyProgramme(c))
+    let i = 0
+    console.log('Refreshing non-graduated students of old programmes...')
+    await Promise.all(
+      oldProgrammeCodes.map(
+        c =>
+          new Promise(async res => {
+            try {
+              const [nonGraduatedStudents, studentnumbers] = await nonGraduatedStudentsOfElementDetailV2(c)
+              await patchNonGraduatedStudentsV2({ [c]: { formattedData: nonGraduatedStudents, studentnumbers } })
+              console.log(`${++i}/${oldProgrammeCodes.length}`)
+            } catch (e) {
+              console.log(`Failed refreshing non-graduated students of programme ${c}!`)
+            }
+            res()
+          })
+      )
+    )
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 const refreshStatistics = async () => {
   await refreshFacultyYearlyStats()
   await refreshStudyrightAssociations()
@@ -209,6 +238,7 @@ const refreshStatistics = async () => {
 const refreshStatisticsV2 = async () => {
   await refreshStudyrightAssociationsV2()
   await refreshOverviewV2()
+  await refreshNonGraduatedStudentsOfOldProgrammesV2()
 }
 
 const startCron = () => {

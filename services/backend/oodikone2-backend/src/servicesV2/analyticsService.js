@@ -49,12 +49,12 @@ const getFacultyYearlyStats = async data => {
 }
 
 const patchNonGraduatedStudents = async data => {
-  const response = await client.patch('/nongraduatedstudents', { data })
+  const response = await client.patch('/v2/nongraduatedstudents', { data })
   return response.data
 }
 
 const getNonGraduatedStudents = async id => {
-  const response = await client.get(`/nongraduatedstudents/${id}`)
+  const response = await client.get(`/v2/nongraduatedstudents/${id}`)
   return response.data
 }
 

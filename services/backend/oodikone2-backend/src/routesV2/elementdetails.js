@@ -1,7 +1,7 @@
 const router = require('express').Router()
-/* const { getStudentsUserCanAccess } = require('../services/userService')
-const { getAllDegreesAndProgrammes, getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
-const MandatoryCourses = require('../services/mandatoryCourses') */
+const { getStudentsUserCanAccess } = require('../servicesV2/userService')
+//const { getAllDegreesAndProgrammes, getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
+const MandatoryCourses = require('../servicesV2/mandatoryCourses')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('../servicesV2/studytrack')
 const { findProgrammeTheses /* , createThesisCourse, deleteThesisCourse */ } = require('../services/thesis')
 
@@ -9,11 +9,11 @@ const {
   getProductivity,
   setProductivity,
   getThroughput,
-  setThroughput
+  setThroughput,
   /* patchProductivity,
-  patchThroughput,
-  getNonGraduatedStudents,
-  ping */
+  patchThroughput, */
+  getNonGraduatedStudents
+  //ping
 } = require('../servicesV2/analyticsService')
 
 const programmeStatsSince = new Date('2017-07-31')
@@ -36,7 +36,7 @@ const programmeStatsSince = new Date('2017-07-31')
   }
 }) */
 
-/* router.get('/v2/studyprogrammes/:id/present_students', async (req, res) => {
+router.get('/v2/studyprogrammes/:id/present_students', async (req, res) => {
   try {
     const {
       roles,
@@ -62,16 +62,16 @@ const programmeStatsSince = new Date('2017-07-31')
     console.error('e', e)
     res.status(500).json({ error: 'error' })
   }
-}) */
+})
 
-/* router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {
+router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {
   if (req.params.id) {
     const codes = await MandatoryCourses.byStudyprogramme(req.params.id)
     res.json(codes)
   } else {
     res.status(422).end()
   }
-}) */
+})
 
 /* router.get('/v2/studyprogrammes/ping', async (req, res) => {
   try {

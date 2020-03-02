@@ -95,11 +95,27 @@ const NonGraduatedStudents = sequelize.define(
   }
 )
 
+const NonGraduatedStudentsV2 = sequelize.define(
+  'nongraduatedstudents_v2',
+  {
+    id: {
+      type: Sequelize.STRING,
+      primaryKey: true
+    },
+    data: Sequelize.JSONB
+  },
+  {
+    timestamps: true,
+    tableName: 'nongraduatedstudents_v2'
+  }
+)
+
 module.exports = {
   Throughput,
   ThroughputV2,
   Productivity,
   ProductivityV2,
   FacultyStats,
-  NonGraduatedStudents
+  NonGraduatedStudents,
+  NonGraduatedStudentsV2
 }
