@@ -4,7 +4,8 @@ import {
   getStudentTotalCreditsFromMandatory,
   getStudentGradeMean,
   getNewestProgramme,
-  getHighestGradeOfCourseBetweenRange
+  getHighestGradeOfCourseBetweenRange,
+  flattenStudyrights
 } from '../common'
 
 export const creditsLessThan = params => {
@@ -359,6 +360,22 @@ export const creditsBeforeStudyright = params => {
     filter: student => {
       const credits = getStudentTotalCredits(student)
       return student.credits - credits > credit
+    }
+  }
+}
+
+export const studytrackFilter = params => {
+  const { studytrack } = params
+  return {
+    id: uuidv4(),
+    type: 'StudytrackFilter',
+    params: {
+      text: studytrack.name,
+      code: studytrack.code
+    },
+    filter: student => {
+      const studyrights = flattenStudyrights(student.studyrights)
+      return studyrights.includes(studytrack.code)
     }
   }
 }
