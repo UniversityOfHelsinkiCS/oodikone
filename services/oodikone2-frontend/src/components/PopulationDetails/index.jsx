@@ -6,7 +6,7 @@ import { getTranslate } from 'react-localize-redux'
 import { flattenDeep, intersection } from 'lodash'
 
 import selectors from '../../selectors/populationDetails'
-import { getTotalCreditsFromCourses } from '../../common'
+import { getTotalCreditsFromCourses, flattenStudyrights } from '../../common'
 import { useTabChangeAnalytics } from '../../common/hooks'
 import PopulationFilters from '../PopulationFilters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
@@ -86,7 +86,8 @@ class PopulationDetails extends Component {
     isLoading: bool.isRequired,
     selectedStudentsByYear: shape({}).isRequired,
     query: shape({}).isRequired,
-    tagstudent: arrayOf(shape({})).isRequired
+    tagstudent: arrayOf(shape({})).isRequired,
+    studytracks: shape({}).isRequired
   }
 
   renderCreditGainGraphs = () => {
@@ -116,16 +117,20 @@ class PopulationDetails extends Component {
   }
 
   getExcludedFilters = () => {
-    const { query, tagstudent, selectedStudents } = this.props
+    const { query, tagstudent, selectedStudents, samples, studytracks } = this.props
+
+    const studyrights = samples.flatMap(student => flattenStudyrights(student.studyrights))
+    const studytracksInPopulation = intersection(Object.keys(studytracks), studyrights)
 
     const excludedFilters = []
-    if (!query.studentStatuses.includes('CANCELLED')) {
-      excludedFilters.push('CanceledStudyright')
-    }
+
+    if (!query.studentStatuses.includes('CANCELLED')) excludedFilters.push('CanceledStudyright')
+
     const taggedStudentNumbers = tagstudent.map(tag => tag.studentnumber)
-    if (intersection(taggedStudentNumbers, selectedStudents) < 1) {
-      excludedFilters.push('TagFilter')
-    }
+
+    if (intersection(taggedStudentNumbers, selectedStudents) < 1) excludedFilters.push('TagFilter')
+
+    if (studytracksInPopulation.length < 1) excludedFilters.push('StudytrackFilter')
 
     return excludedFilters
   }
@@ -191,7 +196,8 @@ const mapStateToProps = state => {
     queryIsSet: !!state.populations.query,
     isLoading: state.populations.pending === true,
     query: state.populations.query || {},
-    tagstudent: state.tagstudent.data || {}
+    tagstudent: state.tagstudent.data || {},
+    studytracks: state.populationDegreesAndProgrammes.data.studyTracks || {}
   }
 }
 

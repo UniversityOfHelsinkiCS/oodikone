@@ -40,6 +40,9 @@ Credit.init(
       type: DATE
     },
     course_code: {
+      type: STRING
+    },
+    course_id: {
       type: STRING,
       references: {
         model: 'course',

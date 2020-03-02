@@ -15,10 +15,10 @@ Course.init(
     name: {
       type: JSONB
     },
-    latestInstanceDate: {
+    latest_instance_date: {
       type: DATE
     },
-    isStudyModule: {
+    is_study_module: {
       type: BOOLEAN
     },
     coursetypecode: {
@@ -30,21 +30,23 @@ Course.init(
     enddate: {
       type: DATE
     },
-    maxAttainmentDate: {
+    max_attainment_date: {
       type: DATE
     },
-    minAttainmentDate: {
+    min_attainment_date: {
       type: DATE
     },
     createdAt: {
+      field: 'created_at',
       type: DATE
     },
     updatedAt: {
+      field: 'updated_at',
       type: DATE
     }
   },
   {
-    underscored: true,
+    underscored: false,
     sequelize: dbConnections.sequelize,
     modelName: 'course',
     tableName: 'course'

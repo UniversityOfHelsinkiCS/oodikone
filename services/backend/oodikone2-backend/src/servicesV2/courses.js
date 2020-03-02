@@ -1,18 +1,20 @@
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const {
-  sequelize,
   Student,
   Credit,
   Course,
   CourseType,
-  Discipline,
-  ElementDetails,
+  // Discipline,
+  ElementDetail,
   StudyrightElement,
   Studyright,
   Semester,
-  Organisation
+  Organization
 } = require('../modelsV2')
+const {
+  dbConnections: { sequelize }
+} = require('../databaseV2/connection')
 const { sequelizeKone, CourseDuplicates } = require('../models/models_kone')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../servicesV2/course_yearly_stats_counter')
@@ -51,7 +53,7 @@ const byName = (name, language) =>
     limit: 1
   })
 
-const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) => {
+/* const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) => {
   const includeDiscipline = discipline
     ? {
         include: {
@@ -103,11 +105,11 @@ const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) =
       ...whereType
     }
   })
-}
+} */
 
 const byCode = code => Course.findByPk(code)
 
-const creditsForCourses = codes =>
+const creditsForCourses = async codes =>
   Credit.findAll({
     include: [
       {
@@ -118,7 +120,7 @@ const creditsForCourses = codes =>
           attributes: ['code', 'startdate'],
           include: [
             {
-              model: ElementDetails,
+              model: ElementDetail,
               attributes: ['name', 'type'],
               where: {
                 type: {
@@ -135,7 +137,7 @@ const creditsForCourses = codes =>
                 }
               },
               include: {
-                model: Organisation
+                model: Organization
               }
             }
           ]
@@ -149,6 +151,9 @@ const creditsForCourses = codes =>
     where: {
       course_code: {
         [Op.in]: codes
+      },
+      student_studentnumber: {
+        [Op.ne]: null
       }
     },
     order: [['attainment_date', 'ASC']]
@@ -171,7 +176,7 @@ const bySearchTerm = async (term, language) => {
   }
 }
 
-const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) => {
+/* const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) => {
   const formatCourse = course => ({
     name: course.name[language],
     code: course.code,
@@ -201,7 +206,7 @@ const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) =
       error: e
     }
   }
-}
+} */
 
 const creditsOf = async codes => {
   const formatCredit = credit => {
@@ -604,7 +609,7 @@ const setDuplicateCode = async (code1, code2) => {
 }
 
 const getAllCourseTypes = () => CourseType.findAll()
-const getAllDisciplines = () => Discipline.findAll()
+// const getAllDisciplines = () => Discipline.findAll()
 
 const alternativeCodes = async code => {
   const alternatives = await getDuplicateCodes(code)
@@ -630,6 +635,9 @@ const formatStudyrightElement = ({ code, element_detail, startdate, studyright }
 
 const parseCredit = credit => {
   const { student, semester, grade, course_code, credits } = credit
+  if (!student) {
+    console.log('credit', credit.id)
+  }
   const { studentnumber, studyright_elements: elements } = student
   const { yearcode, yearname, semestercode, name: semestername } = semester
   return {
@@ -669,7 +677,14 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses) => {
   }
 
   const uniqueCodes = _.uniq(codes)
-  const [credits, course] = await Promise.all([creditsForCourses(uniqueCodes), Course.findByPk(coursecode)])
+  const [credits, course] = await Promise.all([
+    creditsForCourses(uniqueCodes),
+    Course.findOne({
+      where: {
+        code: coursecode
+      }
+    })
+  ])
   const counter = new CourseYearlyStatsCounter()
   for (let credit of credits) {
     const {
@@ -872,7 +887,7 @@ module.exports = {
   byCode,
   byName,
   bySearchTerm,
-  bySearchTermTypeAndDiscipline,
+  //bySearchTermTypeAndDiscipline,
   createCourse,
   yearlyStatsOf,
   findDuplicates,
@@ -881,7 +896,7 @@ module.exports = {
   getCodeToMainCourseMap,
   getMainCourseToCourseMap,
   getAllCourseTypes,
-  getAllDisciplines,
+  //getAllDisciplines,
   yearlyStatsOfNew,
   courseYearlyStats,
   byNameAndOrCodeLike,
