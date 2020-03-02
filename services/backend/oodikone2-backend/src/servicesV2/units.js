@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { ElementDetails, StudyrightElement } = require('../modelsV2')
+const { ElementDetail, StudyrightElement } = require('../modelsV2')
 const Op = Sequelize.Op
 
 const hasStudent = async (code, studentnumber) =>
@@ -18,7 +18,7 @@ const parseUnitFromElement = element => ({
 })
 
 const getUnitsFromElementDetails = async () => {
-  const elementdetails = await ElementDetails.findAll({
+  const elementdetails = await ElementDetail.findAll({
     where: {
       type: {
         [Op.or]: ['20']
@@ -29,7 +29,7 @@ const getUnitsFromElementDetails = async () => {
 }
 
 const getUnitFromElementDetail = async id => {
-  const element = await ElementDetails.findByPk(id)
+  const element = await ElementDetail.findByPk(id)
   return parseUnitFromElement(element)
 }
 

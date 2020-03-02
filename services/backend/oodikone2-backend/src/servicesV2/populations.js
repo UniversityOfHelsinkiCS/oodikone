@@ -7,11 +7,11 @@ const {
   Studyright,
   StudyrightExtent,
   ElementDetail,
-  Discipline,
+  //Discipline,
   CourseType,
   SemesterEnrollment,
   Semester,
-  Transfers,
+  //Transfers,
   StudyrightElement
 } = require('../modelsV2')
 const {
@@ -202,11 +202,11 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'gender_en'
       ],
       include: [
-        {
+        /* {
           model: Transfers,
           attributes: ['transferdate', 'sourcecode', 'targetcode'],
           separate: true
-        },
+        }, */
         {
           model: Studyright,
           attributes: [
@@ -629,10 +629,10 @@ const findCourses = async (studentnumbers, beforeDate) => {
           }
         }
       },
-      {
+      /* {
         attributes: ['discipline_id', 'name'],
         model: Discipline
-      },
+      }, */
       {
         attributes: ['coursetypecode', 'name'],
         model: CourseType,
