@@ -286,6 +286,7 @@ const filterStudentnumbersByAccessrights = async (studentnumbers, codes) => {
   return students.map(student => student.studentnumber)
 }
 
+/* HERE */
 const hasEnrolledForSemester = async (studentnumber, semestercode) => {
   const enrollment = await SemesterEnrollment.findOne({
     where: {

@@ -73,7 +73,7 @@ const nonGraduatedStudentsOfElementDetail = async code => {
   const studentsToBeFiltered = new Set()
   await Promise.all(
     studyrights.map(
-      ({ student_studentnumber, studyrightid }) =>
+      ({ studentStudentnumber: student_studentnumber, studyrightid }) =>
         new Promise(async res => {
           const [enrolled, studentElementDetails] = await Promise.all([
             await hasEnrolledForSemester(student_studentnumber, currentSemesterCode),
