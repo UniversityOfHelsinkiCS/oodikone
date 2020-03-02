@@ -222,7 +222,10 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             {
               model: StudyrightElement,
               required: true,
-              attributes: ['id', 'startdate', 'enddate', 'studyrightid', 'code']
+              attributes: ['id', 'startdate', 'enddate', 'studyrightid', 'code'],
+              include: {
+                model: ElementDetails
+              }
             }
           ]
         },
@@ -319,7 +322,6 @@ EXISTS (SELECT 1 FROM studyright_elements WHERE studentnumber IN (:studentnumber
   students.forEach(student => {
     student.tags = studentNumberToTags[student.studentnumber] || []
   })
-
   return { students, credits, extents, semesters, elementdetails, courses }
 }
 
@@ -491,7 +493,6 @@ const formatStudentsForApi = async (
         stats.transfers.targets[transfer.targetcode] = target
         stats.transfers.sources[transfer.sourcecode] = source
       })
-
       stats.students.push(
         formatStudentForPopulationStatistics(student, credits, startDate, endDate, startDateMoment, endDateMoment)
       )
