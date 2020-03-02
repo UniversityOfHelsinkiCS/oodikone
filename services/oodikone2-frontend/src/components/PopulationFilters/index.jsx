@@ -25,6 +25,7 @@ import TransferToStudyrightFilter from './TransferToStudyrightFilter'
 import CanceledStudyright from './CanceledStudyright'
 import PriorityStudyright from './PriorityStudyright'
 import CreditsBeforeStudyright from './CreditsBeforeStudyright'
+import StudytrackFilter from './StudytrackFilter'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import {
@@ -55,7 +56,8 @@ const componentFor = {
   DisciplineTypes,
   TransferFilter,
   ExtentGraduated,
-  CreditsBeforeStudyright
+  CreditsBeforeStudyright,
+  StudytrackFilter
 }
 
 const advancedFilters = {
