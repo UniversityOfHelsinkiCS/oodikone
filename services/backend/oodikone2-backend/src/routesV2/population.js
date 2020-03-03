@@ -411,7 +411,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   }
 })
 
-/* router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
+router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
   const { studentnumberlist } = req.body
   const { roles, decodedToken } = req
 
@@ -442,7 +442,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     console.log(err)
     res.status(400).end()
   }
-}) */
+})
 
 router.get('/v2/populationstatistics/filters', async (req, res) => {
   let results = []
