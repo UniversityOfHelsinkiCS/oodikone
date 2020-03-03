@@ -11,8 +11,8 @@ const ID = {
 }
 
 const categories = {
-  [ID.ALL]: category('All', 'TOP_TEACHERS_ALL'),
-  [ID.OPENUNI]: category('Open University', 'TOP_TEACHERS_OPEN_UNI')
+  [ID.ALL]: category('All', 'TOP_TEACHERS_ALL_V2'),
+  [ID.OPENUNI]: category('Open University', 'TOP_TEACHERS_OPEN_UNI_V2')
 }
 
 const deleteCategory = async categoryid => {
