@@ -5,8 +5,8 @@ const { isDev } = require('./config')
 const { startServer } = require('./server')
 const { scheduleMeta, scheduleStudents } = require('./scheduler')
 
-stan.on('error', () => {
-  console.log('NATS connection failed')
+stan.on('error', e => {
+  console.log('NATS connection failed', e)
 })
 
 stan.on('connect', ({ clientID }) => {
@@ -27,6 +27,6 @@ knexConnection.on('connect', async () => {
     await scheduleStudents()
   }
 
-  scheduleCron('0 0 * * *', scheduleMeta)
+  scheduleCron('0 2 * * *', scheduleMeta)
   scheduleCron('0 3 * * *', scheduleStudents)
 })
