@@ -1,15 +1,14 @@
-const teachers = require('../services/teachers')
-const topteachers = require('../services/topteachers')
-const r = require('./router').routerWithWrapper()
-const { FEATURES } = require('../conf-backend')
+const teachers = require('../servicesV2/teachers')
+const topteachers = require('../servicesV2/topteachers')
+const router = require('express').Router()
+// const { FEATURES } = require('../conf-backend') // this probably isn't needed and should be deprecated
 const { mapToProviders } = require('../util/utils')
-const teacherV2 = require('../routesV2/teachers')
-const useSisRouter = require('../util/useSisRouter')
 
-const router = FEATURES.ERROR_HANDLER ? r.wrapper : r.router
+// const router = FEATURES.ERROR_HANDLER ? r.wrapper : r.router
 
 router.get('/', async (req, res) => {
   const { searchTerm } = req.query
+  console.log('kskks')
   if (!searchTerm) return res.status(400).json({ error: 'searchTerm missing' })
 
   const trimmedSearchTerm = searchTerm.trim()
@@ -69,4 +68,4 @@ router.get('/:id', async (req, res) => {
   res.json(result)
 })
 
-module.exports = useSisRouter(teacherV2, r.router)
+module.exports = router
