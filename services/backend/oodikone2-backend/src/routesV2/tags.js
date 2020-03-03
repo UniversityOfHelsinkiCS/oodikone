@@ -196,4 +196,6 @@ router.delete('/studenttags/delete_many', async (req, res) => {
   }
 })
 
+router.use('*', (req, res, next) => next())
+
 module.exports = router
