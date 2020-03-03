@@ -8,7 +8,6 @@ const { mapToProviders } = require('../util/utils')
 
 router.get('/', async (req, res) => {
   const { searchTerm } = req.query
-  console.log('kskks')
   if (!searchTerm) return res.status(400).json({ error: 'searchTerm missing' })
 
   const trimmedSearchTerm = searchTerm.trim()
@@ -67,5 +66,7 @@ router.get('/:id', async (req, res) => {
   }
   res.json(result)
 })
+
+router.use('*', (req, res, next) => next())
 
 module.exports = router
