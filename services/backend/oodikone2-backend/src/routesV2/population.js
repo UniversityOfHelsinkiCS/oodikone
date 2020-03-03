@@ -8,7 +8,7 @@ const Filters = require('../services/filters')
 const Student = require('../servicesV2/students')
 const StudyrightService = require('../servicesV2/studyrights')
 const UserService = require('../servicesV2/userService')
-/* const TagService = require('../services/tags') */
+const TagService = require('../services/tags')
 const CourseService = require('../servicesV2/courses')
 const StatMergeService = require('../services/statMerger')
 
@@ -283,7 +283,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
   }
 })
 
-/* router.get('/v3/populationstatisticsbytag', async (req, res) => {
+router.get('/v3/populationstatisticsbytag', async (req, res) => {
   const { tag, studyRights: studyRightsJSON, months, year } = req.query
   const { decodedToken } = req
 
@@ -333,7 +333,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     console.log(e)
     res.status(500).json({ error: e })
   }
-}) */
+})
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecodes, from, to, separate: sep } = req.query

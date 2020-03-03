@@ -9,8 +9,8 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
   const [options, setOptions] = useState([])
   const [selectedValue, setSelected] = useState('')
   const [selectedTag, setSelectedTag] = useState(null)
-  const [confirmAdd, setConfirmAdd] = useState(null)
-  const [confirmDelete, setConfirmDelete] = useState(null)
+  const [confirmAdd, setConfirmAdd] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   useEffect(() => {
     const createdOptions = tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id }))
@@ -27,7 +27,7 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
   const handleDelete = () => {
     deleteMultipleStudentTag(selectedValue, selectedStudents, studytrack)
     setSelected('')
-    setConfirmDelete(null)
+    setConfirmDelete(false)
   }
 
   const handleAdd = () => {
@@ -41,13 +41,13 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
     })
     setSelected('')
     createMultipleStudentTag(tagList, studytrack)
-    setConfirmAdd(null)
+    setConfirmAdd(false)
   }
 
   const addConfirm = (
     <Confirm
-      open={confirmAdd === selectedTag && selectedTag}
-      onCancel={() => setConfirmAdd(null)}
+      open={confirmAdd && !!selectedTag}
+      onCancel={() => setConfirmAdd(false)}
       onConfirm={() => handleAdd()}
       content={`Are you sure you want to add tag "${selectedTag ? selectedTag.tagname : null}" to ${
         selectedStudents.length
@@ -59,8 +59,8 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
 
   const deleteConfirm = (
     <Confirm
-      open={confirmDelete === selectedTag && selectedTag}
-      onCancel={() => setConfirmDelete(null)}
+      open={confirmDelete && !!selectedTag}
+      onCancel={() => setConfirmDelete(false)}
       onConfirm={() => handleDelete()}
       content={`Are you sure you want to delete tag "${selectedTag ? selectedTag.tagname : null}" from ${
         selectedStudents.length
@@ -84,10 +84,10 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
           selectOnNavigation={false}
         />
       </List.Item>
-      <Button onClick={() => setConfirmAdd(selectedTag)} disabled={selectedValue === ''}>
+      <Button onClick={() => setConfirmAdd(true)} disabled={selectedValue === ''}>
         add tag to {selectedStudents.length} students
       </Button>
-      <Button onClick={() => setConfirmDelete(selectedTag)} disabled={selectedValue === ''}>
+      <Button onClick={() => setConfirmDelete(true)} disabled={selectedValue === ''}>
         delete tag from {selectedStudents.length} students
       </Button>
       {deleteConfirm}
