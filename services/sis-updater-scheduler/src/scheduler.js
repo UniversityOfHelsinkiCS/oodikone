@@ -7,6 +7,7 @@ const {
   SIS_UPDATER_SCHEDULE_CHANNEL,
   CHUNK_SIZE,
   isDev,
+  DEV_SCHEDULE_COUNT,
   REDIS_TOTAL_META_KEY,
   REDIS_TOTAL_STUDENTS_KEY,
   REDIS_TOTAL_META_DONE_KEY,
@@ -65,7 +66,7 @@ const scheduleMeta = async () => {
     table: 'course_units',
     distinct: 'group_id',
     pluck: 'group_id',
-    limit: isDev ? 100 : null
+    limit: isDev ? DEV_SCHEDULE_COUNT : null
   })
 
   const totalStudyModules = await scheduleFromDb({
@@ -74,7 +75,7 @@ const scheduleMeta = async () => {
     where: ['type', 'StudyModule'],
     distinct: 'group_id',
     pluck: 'group_id',
-    limit: isDev ? 100 : null
+    limit: isDev ? DEV_SCHEDULE_COUNT : null
   })
 
   const totalMeta =
@@ -97,7 +98,7 @@ const scheduleStudents = async () => {
     table: 'persons',
     whereNotNull: 'student_number',
     pluck: 'id',
-    limit: isDev ? 100 : null
+    limit: isDev ? DEV_SCHEDULE_COUNT : null
   })
 
   await redisSet(REDIS_TOTAL_STUDENTS_KEY, totalStudents)
