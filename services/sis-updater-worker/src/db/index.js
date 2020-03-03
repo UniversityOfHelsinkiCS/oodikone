@@ -5,7 +5,23 @@ const { getLatestSnapshot, isActive } = require('../utils')
 
 const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
 
+const selectFromByIdsOrderBy = async (table, ids, col = 'id', by, order) =>
+  dbConnections
+    .knex(table)
+    .whereIn(col, ids)
+    .orderBy(by, order)
+
 const selectAllFrom = async table => dbConnections.knex(table)
+
+const selectAllFromSnapshots = async table =>
+  (
+    await dbConnections.knex
+      .select(dbConnections.knex.raw(`array_agg(to_json(${table}.*)) as data`))
+      .from(table)
+      .groupBy('id')
+  )
+    .map(({ data }) => getLatestSnapshot(data))
+    .filter(isActive)
 
 const selectFromSnapshotsByIds = async (table, ids, col = 'id') =>
   (
@@ -39,7 +55,9 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
 
 module.exports = {
   selectFromByIds,
+  selectFromByIdsOrderBy,
   selectFromSnapshotsByIds,
   bulkCreate,
-  selectAllFrom
+  selectAllFrom,
+  selectAllFromSnapshots
 }
