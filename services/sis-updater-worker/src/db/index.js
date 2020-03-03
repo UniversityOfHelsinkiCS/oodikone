@@ -5,7 +5,7 @@ const { getLatestSnapshot, isActive } = require('../utils')
 
 const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
 
-const selectFromByIdsOrderBy = async (table, ids, col = 'id', by, order) =>
+const selectFromByIdsOrderBy = async (table, ids, col = 'id', by, order = 'asc') =>
   dbConnections
     .knex(table)
     .whereIn(col, ids)
