@@ -1,4 +1,4 @@
-/* const crypto = require('crypto') */
+const crypto = require('crypto')
 const Sentry = require('@sentry/node')
 const router = require('express').Router()
 /* const { isValidStudentId } = require('../util/index') */
@@ -8,7 +8,7 @@ const Filters = require('../services/filters')
 const Student = require('../servicesV2/students')
 const StudyrightService = require('../servicesV2/studyrights')
 const UserService = require('../servicesV2/userService')
-/* const TagService = require('../services/tags') */
+const TagService = require('../services/tags')
 const CourseService = require('../servicesV2/courses')
 const StatMergeService = require('../services/statMerger')
 
@@ -283,7 +283,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
   }
 })
 
-/* router.get('/v3/populationstatisticsbytag', async (req, res) => {
+router.get('/v3/populationstatisticsbytag', async (req, res) => {
   const { tag, studyRights: studyRightsJSON, months, year } = req.query
   const { decodedToken } = req
 
@@ -333,9 +333,9 @@ router.get('/v3/populationstatistics', async (req, res) => {
     console.log(e)
     res.status(500).json({ error: e })
   }
-}) */
+})
 
-/* router.get('/v3/populationstatisticsbycourse', async (req, res) => {
+router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecodes, from, to, separate: sep } = req.query
   const { decodedToken, roles } = req
   const separate = sep ? JSON.parse(sep) : false
@@ -354,7 +354,6 @@ router.get('/v3/populationstatistics', async (req, res) => {
 
   const semesters = ['FALL', 'SPRING']
   const studentnumbers = await Student.findByCourseAndSemesters(JSON.parse(coursecodes), from, to, separate)
-
   try {
     const result = await Population.optimizedStatisticsOf(
       {
@@ -410,9 +409,9 @@ router.get('/v3/populationstatistics', async (req, res) => {
     console.log(e)
     res.status(500).json({ error: e })
   }
-}) */
+})
 
-/* router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
+router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
   const { studentnumberlist } = req.body
   const { roles, decodedToken } = req
 
@@ -443,7 +442,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     console.log(err)
     res.status(400).end()
   }
-}) */
+})
 
 router.get('/v2/populationstatistics/filters', async (req, res) => {
   let results = []
