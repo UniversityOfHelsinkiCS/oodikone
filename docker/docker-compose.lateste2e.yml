@@ -96,6 +96,8 @@ services:
 
   sis-updater-scheduler:
     image: toska/sis-updater-scheduler:${TAG}
+    environment:
+      CI: 1
     build:
       cache_from:
         - toska/sis-updater-scheduler:trunk
@@ -104,6 +106,8 @@ services:
 
   sis-updater-worker:
     image: toska/sis-updater-worker:${TAG}
+    environment:
+      CI: 1
     build:
       cache_from:
         - toska/sis-updater-worker:trunk
