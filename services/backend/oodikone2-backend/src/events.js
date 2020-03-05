@@ -246,6 +246,12 @@ const startCron = () => {
     schedule('0 6 * * *', async () => {
       await refreshStatistics()
     })
+
+    if (process.env.TAG === 'staging') {
+      schedule('0 7 * * *', async () => {
+        await refreshStatisticsV2()
+      })
+    }
   }
 }
 

@@ -38,6 +38,7 @@ const msgParser = f => async msg => {
 
 stan.on('error', e => {
   console.log('NATS connection failed', e)
+  process.exit(1)
 })
 
 stan.on('connect', ({ clientID }) => {
@@ -47,6 +48,7 @@ stan.on('connect', ({ clientID }) => {
 
 dbConnections.on('error', () => {
   console.log('DB connections failed')
+  process.exit(1)
 })
 
 dbConnections.on('connect', async () => {

@@ -6,7 +6,8 @@ const stan = natsStreaming.connect('sis-updater-nats', HOSTNAME, {
   token: SIS_NATS_TOKEN,
   maxPubAcksInflight: Infinity,
   maxReconnectAttempts: -1,
-  waitOnFirstConnect: true
+  waitOnFirstConnect: true,
+  connectTimeout: 60 * 1000 * 5
 })
 
 module.exports = {
