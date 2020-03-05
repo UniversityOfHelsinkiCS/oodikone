@@ -7,7 +7,7 @@ const { scheduleMeta, scheduleStudents } = require('./scheduler')
 
 stan.on('error', e => {
   console.log('NATS connection failed', e)
-  process.exit(1)
+  process.exit(0)
 })
 
 stan.on('connect', ({ clientID }) => {
@@ -17,7 +17,7 @@ stan.on('connect', ({ clientID }) => {
 
 knexConnection.on('error', e => {
   console.log('Knex database connection failed', e)
-  process.exit(1)
+  process.exit(0)
 })
 
 knexConnection.on('connect', async () => {
