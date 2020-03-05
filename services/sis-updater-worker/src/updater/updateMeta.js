@@ -1,4 +1,4 @@
-const { sortBy, uniqBy, flattenDeep, groupBy, mapValues } = require('lodash')
+const { uniqBy, flattenDeep, groupBy } = require('lodash')
 const {
   Organization,
   Course,
@@ -9,8 +9,7 @@ const {
   StudyrightExtent
 } = require('../db/models')
 const { selectFromByIdsOrderBy, bulkCreate } = require('../db')
-const { getMinMaxDate } = require('../utils')
-const { educationTypeToExtentcode } = require('./shared')
+const { courseProviderMapper, courseMapper, mapCourseType, mapSemester, mapStudyrightExtent } = require('./mapper')
 
 const updateOrganisations = async organisations => {
   await bulkCreate(Organization, organisations)
@@ -44,55 +43,19 @@ const updateCourseUnits = async courseUnits => {
 
 const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
   const courseProviders = []
-  const courses = Object.entries(groupIdToCourse).map(([groupId, courses]) => {
-    const { code, name, study_level: coursetypecode, organisations } = courses[0]
-    organisations
-      .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
-      .forEach(({ organisationId }) => {
-        courseProviders.push({
-          composite: `${groupId}-${organisationId}`,
-          coursecode: groupId,
-          organizationcode: organisationId
-        })
-      })
-    const { min: startdate, max: enddate } = getMinMaxDate(
-      courses,
-      c => c.validity_period.startDate,
-      c => c.validity_period.endDate
+  const mapCourse = courseMapper(courseIdToAttainments)
+
+  const courses = Object.entries(groupIdToCourse).map(groupedCourse => {
+    const [groupId, courses] = groupedCourse
+    const { organisations } = courses[0]
+    const mapCourseProvider = courseProviderMapper(groupId)
+    courseProviders.push(
+      ...organisations
+        .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
+        .map(mapCourseProvider)
     )
 
-    const timify = t => new Date(t).getTime()
-
-    const { min_attainment_date, max_attainment_date } = courses.reduce(
-      (res, curr) => {
-        const courseAttainments = courseIdToAttainments[curr.id]
-        if (!courseAttainments || courseAttainments.length === 0) return res
-
-        let min_attainment_date = res.min_attainment_date
-        let max_attainment_date = res.max_attainment_date
-
-        if (!min_attainment_date || timify(min_attainment_date) > timify(courseAttainments[0].attainment_date))
-          min_attainment_date = courseAttainments[0].attainment_date
-        if (!max_attainment_date || timify(max_attainment_date) < timify(courseAttainments[curr.length - 1]))
-          max_attainment_date = courseAttainments[courseAttainments.length - 1].attainment_date
-
-        return { min_attainment_date, max_attainment_date }
-      },
-      { min_attainment_date: null, max_attainment_date: null }
-    )
-
-    return {
-      id: groupId,
-      name,
-      code,
-      coursetypecode,
-      min_attainment_date,
-      max_attainment_date,
-      latest_instance_date: max_attainment_date,
-      startdate,
-      enddate,
-      isStudyModule: false
-    }
+    return mapCourse(groupedCourse)
   })
 
   await bulkCreate(Course, courses)
@@ -105,38 +68,11 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
 }
 
 const updateCourseTypes = async studyLevels => {
-  const mapStudyLevelToCourseType = studyLevel => ({
-    coursetypecode: studyLevel.id,
-    name: studyLevel.name
-  })
-  await bulkCreate(CourseType, studyLevels.map(mapStudyLevelToCourseType))
+  await bulkCreate(CourseType, studyLevels.map(mapCourseType))
 }
 
 const updateSemesters = async studyYears => {
-  const semesters = flattenDeep(
-    Object.entries(groupBy(studyYears, 'org')).map(([org, orgStudyYears]) => {
-      let semestercode = 1
-      return sortBy(orgStudyYears, 'start_year').map(orgStudyYear => {
-        return orgStudyYear.study_terms.map((studyTerm, i) => {
-          const acualYear = new Date(studyTerm.valid.startDate).getFullYear()
-          return {
-            composite: `${org}-${semestercode}`,
-            name: mapValues(studyTerm.name, n => {
-              return `${n} ${acualYear}`
-            }),
-            startdate: studyTerm.valid.startDate,
-            enddate: studyTerm.valid.endDate,
-            yearcode: Number(orgStudyYear.start_year) - 1949, // lul! :D
-            yearname: orgStudyYear.name,
-            semestercode: semestercode++,
-            org,
-            termIndex: i,
-            startYear: orgStudyYear.start_year
-          }
-        })
-      })
-    })
-  )
+  const semesters = flattenDeep(Object.entries(groupBy(studyYears, 'org')).map(mapSemester))
   await bulkCreate(Semester, semesters)
 }
 
@@ -145,13 +81,7 @@ const updateCreditTypes = async creditTypes => {
 }
 
 const updateStudyrightExtents = async educationTypes => {
-  const studyrightExtents = educationTypes
-    .map(eT => ({
-      extentcode: educationTypeToExtentcode[eT.id],
-      name: eT.name
-    }))
-    .filter(eT => eT.extentcode)
-
+  const studyrightExtents = educationTypes.map(mapStudyrightExtent).filter(eT => eT.extentcode)
   await bulkCreate(StudyrightExtent, studyrightExtents, null, ['extentcode'])
 }
 

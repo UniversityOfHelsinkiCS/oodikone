@@ -9,6 +9,7 @@ let educationIdToEducation = null
 let gradeScaleIdToGradeIdsToGrades = null
 let orgToUniOrgId = null
 let orgToStartYearToSemesters = null
+let countries = null
 
 const areMapsInitialized = () => mapsInitialized
 
@@ -105,6 +106,15 @@ const initOrgToStartYearToSemesters = async () => {
 const getSemester = (uniOrgId, studyYearStartYear, termIndex) =>
   orgToStartYearToSemesters[uniOrgId][studyYearStartYear][termIndex]
 
+const initCountries = async () => {
+  countries = (await selectAllFrom('countries')).reduce((res, curr) => {
+    if (!res[curr.id]) res[curr.id] = curr
+    return res
+  })
+}
+
+const getCountry = countryId => countries[countryId]
+
 const getCreditTypeCodeFromAttainment = (attainment, passed) => {
   const { primary, state } = attainment
   if (!passed || state === 'FAILED') return 10
@@ -168,6 +178,7 @@ const init = async () => {
   await initGradeScaleIdToGradeIdsToGrades()
   await initOrgToUniOrgId()
   await initOrgToStartYearToSemesters()
+  await initCountries()
   mapsInitialized = true
 }
 
@@ -183,5 +194,6 @@ module.exports = {
   getGrade,
   getUniOrgId,
   getSemester,
+  getCountry,
   init
 }
