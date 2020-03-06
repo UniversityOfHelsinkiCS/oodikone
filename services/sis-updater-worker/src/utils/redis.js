@@ -27,10 +27,13 @@ const lock = promisify(redisLock(client))
 
 const get = async key => await redisPromisify(client.get, key)
 
+const set = async (key, val) => await redisPromisify(client.set, key, val)
+
 const incrby = async (key, val) => await redisPromisify(client.incrby, key, val)
 
 module.exports = {
   lock,
   get,
+  set,
   incrby
 }
