@@ -3,7 +3,7 @@ const { schedule: scheduleCron } = require('./utils/cron')
 const { stan } = require('./utils/stan')
 const { isDev } = require('./config')
 const { startServer } = require('./server')
-const { scheduleMeta, scheduleStudents } = require('./scheduler')
+const { scheduleMeta, scheduleStudents, scheduleHourly, scheduleWeekly } = require('./scheduler')
 
 stan.on('error', e => {
   console.log('NATS connection failed', e)
@@ -29,6 +29,13 @@ knexConnection.on('connect', async () => {
     await scheduleStudents()
   }
 
-  scheduleCron('0 2 * * *', scheduleMeta)
-  scheduleCron('0 3 * * *', scheduleStudents)
+  // Monday-Friday on every hour
+  scheduleCron('0 * * * 1-5', async () => {
+    await scheduleHourly()
+  })
+
+  // Saturday at 4 AM
+  scheduleCron('0 4 * * 6', async () => {
+    await scheduleWeekly()
+  })
 })
