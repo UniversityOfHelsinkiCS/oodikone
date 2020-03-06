@@ -20,21 +20,27 @@ StudyrightElement.init(
       references: {
         model: 'studyright',
         key: 'studyrightid'
-      }
+      },
+      onUpdate: 'cascade',
+      onDelete: 'cascade'
     },
     code: {
       type: STRING,
       references: {
         model: 'element_details',
         key: 'code'
-      }
+      },
+      onUpdate: 'cascade',
+      onDelete: 'cascade'
     },
     studentnumber: {
       type: STRING,
       references: {
         model: 'student',
         key: 'studentnumber'
-      }
+      },
+      onUpdate: 'cascade',
+      onDelete: 'cascade'
     },
     createdAt: {
       type: DATE
