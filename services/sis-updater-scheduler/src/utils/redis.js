@@ -23,6 +23,9 @@ const client = redis.createClient({
 
 const set = async (key, val) => await redisPromisify(client.set, key, val)
 
+const get = async key => await redisPromisify(client.get, key)
+
 module.exports = {
-  set
+  set,
+  get
 }
