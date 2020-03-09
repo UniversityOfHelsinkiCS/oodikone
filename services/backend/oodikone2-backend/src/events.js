@@ -15,6 +15,7 @@ const {
 
 const { calculateFacultyYearlyStats } = require('./services/faculties')
 const topteachers = require('./services/topteachers')
+const topteachersV2 = require('./servicesV2/topteachers')
 const { isNewHYStudyProgramme } = require('./util')
 
 const {
@@ -177,6 +178,17 @@ const refreshTeacherLeaderboard = async () => {
   }
 }
 
+const refreshTeacherLeaderboardV2 = async () => {
+  try {
+    const startyearcode = new Date().getFullYear() - 1950
+    const endyearcode = startyearcode + 1
+    console.log('Refreshing teacher leaderboard...')
+    await topteachersV2.findAndSaveTeachers(startyearcode, endyearcode)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 const refreshNonGraduatedStudentsOfOldProgrammes = async () => {
   try {
     const oldProgrammeCodes = (await getAllProgrammes()).map(p => p.code).filter(c => !isNewHYStudyProgramme(c))
@@ -239,6 +251,7 @@ const refreshStatisticsV2 = async () => {
   await refreshStudyrightAssociationsV2()
   await refreshOverviewV2()
   await refreshNonGraduatedStudentsOfOldProgrammesV2()
+  await refreshTeacherLeaderboardV2()
 }
 
 const startCron = () => {
