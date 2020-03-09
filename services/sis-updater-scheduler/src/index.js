@@ -29,8 +29,8 @@ knexConnection.on('connect', async () => {
     await scheduleStudents()
   }
 
-  // Monday-Friday on every hour
-  scheduleCron('0 * * * 1-5', async () => {
+  // Monday-Friday at every minute 30
+  scheduleCron('30 * * * 1-5', async () => {
     await scheduleHourly()
   })
 
