@@ -629,7 +629,7 @@ const formatStudyrightElement = ({ code, element_detail, startdate, studyright }
   code,
   name: element_detail.name,
   startdate,
-  faculty_code: studyright.faculty_code || null,
+  faculty_code: studyright.dataValues.faculty_code || null,
   organization: studyright.organization || null
 })
 

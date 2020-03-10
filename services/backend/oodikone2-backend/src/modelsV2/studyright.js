@@ -32,7 +32,11 @@ Studyright.init(
       type: STRING
     },
     facultyCode: {
-      type: STRING
+      type: STRING,
+      references: {
+        model: 'organization',
+        key: 'code'
+      }
     },
     prioritycode: {
       type: INTEGER
