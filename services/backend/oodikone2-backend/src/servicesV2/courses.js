@@ -380,7 +380,7 @@ const yearlyStatsOf = async (code, year, separate, language) => {
   )
 
   const allInstancesUntilYear = allInstances.filter(inst => moment(new Date(inst.date)).isBefore(year.end + '-08-01'))
-  const name = (await Course.findOne({ where: { code: { [Op.eq]: code } } })).dataValues.name[language]
+  const name = (await Course.findOne({ where: { code: { [Op.eq]: code } }, raw: true })).name[language]
   const start = Number(year.start)
   const end = Number(year.end)
   const resultStats = []
@@ -625,13 +625,16 @@ const getGroupId = async code => {
   return duplicates ? duplicates.groupid : code
 }
 
-const formatStudyrightElement = ({ code, element_detail, startdate, studyright }) => ({
-  code,
-  name: element_detail.name,
-  startdate,
-  faculty_code: studyright.dataValues.faculty_code || null,
-  organization: studyright.organization || null
-})
+const formatStudyrightElement = ({ code, element_detail, startdate, studyright: sr }) => {
+  const studyright = sr.get({ plain: true })
+  return {
+    code,
+    name: element_detail.name,
+    startdate,
+    faculty_code: studyright.faculty_code || null,
+    organization: studyright.organization || null
+  }
+}
 
 const parseCredit = credit => {
   const { student, semester, grade, course_code, credits } = credit
