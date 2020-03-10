@@ -2,25 +2,14 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { withRouter } from 'react-router-dom'
-import { func, arrayOf, object, shape, string, bool, oneOfType, number } from 'prop-types'
-import { Card, Icon, Button } from 'semantic-ui-react'
+import { func, arrayOf, object, shape, string, oneOfType, number } from 'prop-types'
+import { Card, Icon } from 'semantic-ui-react'
 import { minBy } from 'lodash'
 import './populationQueryCard.css'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
 import { reformatDate, getTextIn } from '../../common'
 
-const PopulationQueryCard = ({
-  translate,
-  population,
-  query,
-  removeSampleFn,
-  units,
-  updateStudentsFn,
-  updating,
-  language,
-  history,
-  tags
-}) => {
+const PopulationQueryCard = ({ translate, population, query, removeSampleFn, units, language, history, tags }) => {
   const removePopulation = uuid => {
     history.push('/populations')
     removeSampleFn(uuid)
@@ -60,17 +49,6 @@ const PopulationQueryCard = ({
             {studentStatuses.includes('NONDEGREE') ? 'Includes ' : 'Excludes '}
             students with non-degree study right
           </div>
-          {updating ? (
-            <Button disabled compact floated="left" size="medium" labelPosition="left" onClick={updateStudentsFn}>
-              <Icon loading name="refresh" />
-              update population
-            </Button>
-          ) : (
-            <Button compact floated="left" size="medium" labelPosition="left" onClick={updateStudentsFn}>
-              <Icon name="refresh" />
-              update population
-            </Button>
-          )}
         </Card.Meta>
       </Card>
     )
@@ -88,17 +66,6 @@ const PopulationQueryCard = ({
              showing ${months} months.`}
         </div>
         <div>{`${translate('populationStatistics.sampleSize', { amount: students.length })} `}</div>
-        {updating ? (
-          <Button disabled compact floated="left" size="medium" labelPosition="left" onClick={updateStudentsFn}>
-            <Icon loading name="refresh" />
-            update population
-          </Button>
-        ) : (
-          <Button compact floated="left" size="medium" labelPosition="left" onClick={updateStudentsFn}>
-            <Icon name="refresh" />
-            update population
-          </Button>
-        )}
       </Card.Meta>
     </Card>
   )
@@ -117,8 +84,6 @@ PopulationQueryCard.propTypes = {
   removeSampleFn: func.isRequired,
   units: arrayOf(object).isRequired,
   unit: object, // eslint-disable-line
-  updateStudentsFn: func.isRequired,
-  updating: bool.isRequired,
   history: shape({}).isRequired,
   tags: arrayOf(shape({})).isRequired
 }

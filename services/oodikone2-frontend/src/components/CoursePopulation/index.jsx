@@ -2,10 +2,10 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { shape, func, bool, arrayOf, string } from 'prop-types'
-import { Segment, Header, Icon, Button } from 'semantic-ui-react'
+import { Segment, Header } from 'semantic-ui-react'
 import qs from 'query-string'
 import { intersection, difference } from 'lodash'
-import { getCoursePopulation, updatePopulationStudents } from '../../redux/populations'
+import { getCoursePopulation } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import { clearPopulationFilters } from '../../redux/populationFilters'
 import { getFaculties } from '../../redux/faculties'
@@ -33,7 +33,6 @@ const CoursePopulation = ({
   getSemestersDispatch,
   clearPopulationFiltersDispatch,
   semesters,
-  updatePopulationStudentsDispatch,
   getFacultiesDispatch
 }) => {
   const parseQueryFromUrl = () => {
@@ -114,17 +113,6 @@ const CoursePopulation = ({
         <Header className="segmentTitle" size="medium" textAlign="center">
           {subHeader}
         </Header>
-        <Header className="segmentTitle" size="medium" textAlign="center">
-          <Button
-            compact
-            size="medium"
-            labelPosition="left"
-            onClick={() => updatePopulationStudentsDispatch(selectedStudents.filter(number => number.length < 10))}
-          >
-            <Icon name="refresh" />
-            update population
-          </Button>
-        </Header>
         <CustomPopulationFilters
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}
           samples={studentData.students}
@@ -180,7 +168,6 @@ CoursePopulation.propTypes = {
   getSingleCourseStatsDispatch: func.isRequired,
   getSemestersDispatch: func.isRequired,
   clearPopulationFiltersDispatch: func.isRequired,
-  updatePopulationStudentsDispatch: func.isRequired,
   pending: bool.isRequired,
   studentData: shape({}).isRequired,
   history: shape({}).isRequired,
@@ -237,7 +224,6 @@ export default withRouter(
       getSingleCourseStatsDispatch: getSingleCourseStats,
       getSemestersDispatch: getSemesters,
       clearPopulationFiltersDispatch: clearPopulationFilters,
-      updatePopulationStudentsDispatch: updatePopulationStudents,
       getFacultiesDispatch: getFaculties
     }
   )(CoursePopulation)
