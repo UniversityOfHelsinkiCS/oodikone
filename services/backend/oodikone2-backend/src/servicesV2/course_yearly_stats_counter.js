@@ -67,7 +67,12 @@ class CourseYearlyStatsCounter {
       this.initFacultyYear(yearcode)
     }
 
-    if (faculty_code && !this.facultyStats[yearcode].faculties[faculty_code]) {
+    if (
+      // disgusting
+      faculty_code &&
+      !this.facultyStats[yearcode].faculties[faculty_code] &&
+      !this.facultyStats[yearcode].allStudents.includes(studentnumber)
+    ) {
       this.initFaculty(yearcode, faculty_code, organization)
     }
 
