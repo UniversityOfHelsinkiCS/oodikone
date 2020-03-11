@@ -62,8 +62,6 @@ const defaultConfig = () => {
 }
 
 const makeConfig = (sortedOrgs, onOrgClicked) => {
-  console.log('MAKE CONFIG')
-
   const addPointClickHandler = serie => {
     serie.point = {
       events: {
@@ -228,8 +226,6 @@ const ProtoC = () => {
       const res = await callApi('/cool-data-science/proto-c-data')
       setData(res.data)
       setLoading(false)
-
-      console.log(res.data)
     }
 
     load()
