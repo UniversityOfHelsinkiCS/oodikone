@@ -215,7 +215,7 @@ const ProtoG = () => {
         <Loader active={isLoading} />
 
         {uberdata && (
-          <Table compact striped>
+          <Table compact striped className="proto-g-table">
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell></Table.HeaderCell>
@@ -236,7 +236,7 @@ const ProtoG = () => {
                       onClick={makeHandleExpando(code)}
                     >
                       <Table.Cell style={{ paddingRight: '0', paddingLeft: '0.7em' }}>
-                        <Icon name={isExpanded ? 'caret down' : 'caret right'} fitted color="grey" />
+                        <Icon name={isExpanded ? 'caret down' : 'caret right'} color="grey" />
                       </Table.Cell>
                       <Table.Cell>{name}</Table.Cell>
                       <Table.Cell style={{ paddingBottom: '20px' }}>
