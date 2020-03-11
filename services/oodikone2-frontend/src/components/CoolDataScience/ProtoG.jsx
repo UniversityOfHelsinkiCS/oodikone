@@ -81,7 +81,7 @@ const defaultConfig = () => ({
   }
 })
 
-const Chart = React.memo(({ years, snapshots }) => (
+const Chart = React.memo(({ tickDates, snapshots }) => (
   <ReactHighcharts
     highcharts={Highcharts}
     config={Highcharts.merge(defaultConfig(), {
@@ -89,10 +89,14 @@ const Chart = React.memo(({ years, snapshots }) => (
         type: 'datetime',
         labels: {
           formatter: function() {
-            return new Date(this.value).getFullYear()
+            const d = new Date(this.value)
+            return `${d.getDate()}.${d.getMonth()}.${d
+              .getFullYear()
+              .toString()
+              .substr(-2)}`
           }
         },
-        tickPositions: years.map(date => date.getTime()),
+        tickPositions: tickDates.map(date => date.getTime()),
         minorTickInterval: 1.051e10,
         minorTicks: true
       },
@@ -227,7 +231,7 @@ const ProtoG = () => {
             <Table.Body>
               {uberdata.map(({ name, code, snapshots, programmes }) => {
                 const isExpanded = !!expandedOrgs[code]
-                const years = getSnapshotsStartYears(snapshots)
+                const tickDates = getSnapshotsStartYears(snapshots)
 
                 return (
                   <React.Fragment key={code}>
@@ -240,7 +244,7 @@ const ProtoG = () => {
                       </Table.Cell>
                       <Table.Cell>{name}</Table.Cell>
                       <Table.Cell style={{ paddingBottom: '20px' }}>
-                        <Chart years={years} snapshots={snapshots} />
+                        <Chart tickDates={tickDates} snapshots={snapshots} />
                       </Table.Cell>
                     </Table.Row>
 
@@ -251,7 +255,7 @@ const ProtoG = () => {
                             <Table.Cell style={{ padding: '0' }} />
                             <Table.Cell>{programme.name}</Table.Cell>
                             <Table.Cell style={{ paddingBottom: '20px' }}>
-                              <Chart years={years} snapshots={programme.snapshots} />
+                              <Chart tickDates={tickDates} snapshots={programme.snapshots} />
                             </Table.Cell>
                           </Table.Row>
                         )
