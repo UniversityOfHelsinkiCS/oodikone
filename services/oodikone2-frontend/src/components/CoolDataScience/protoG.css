@@ -2,18 +2,26 @@
   cursor: pointer;
 }
 
-/* expanded accordion: shadow below */
-.proto-g-row--expanded {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+.proto-g-row > td:first-of-type {
+  border-left: 4px solid #dddde5;
 }
 
-/* next row of an expanded accordion: shadow above */
-.proto-g-row-child + .proto-g-row {
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.12), 0 -1px 2px rgba(0, 0, 0, 0.24);
+.proto-g-row-child {
+  font-size: 0.9em;
 }
 
-/* expanded accordion that's next of an expanded accordion: shadow above and below */
-.proto-g-row-child + .proto-g-row--expanded {
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.12), 0 -1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12),
-    0 1px 2px rgba(0, 0, 0, 0.24);
+.proto-g-row--expanded > td {
+  border-bottom: 1px solid #dddde5;
+}
+
+.proto-g-row--expanded > td:first-of-type {
+  border-left-color: #c4c4ca;
+}
+
+.proto-g-row--expanded > td:last-of-type {
+  border-right: 4px solid #c4c4ca;
+}
+
+.proto-g-table .proto-g-row-child + .proto-g-row > td {
+  border-top: 4px solid #f3f3f6;
 }
