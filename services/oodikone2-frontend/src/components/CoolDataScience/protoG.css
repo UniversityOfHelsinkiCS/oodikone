@@ -2,10 +2,6 @@
   cursor: pointer;
 }
 
-.proto-g-row > td:first-of-type {
-  border-left: 4px solid #dddde5;
-}
-
 .proto-g-row-child {
   font-size: 0.9em;
 }
@@ -20,6 +16,10 @@
 
 .proto-g-row--expanded > td:last-of-type {
   border-right: 4px solid #c4c4ca;
+}
+
+.proto-g-row > td:first-of-type {
+  border-left: 4px solid #dddde5;
 }
 
 .proto-g-table .proto-g-row-child + .proto-g-row > td {
