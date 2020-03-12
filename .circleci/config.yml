@@ -56,7 +56,7 @@ jobs:
       - run:
           name: lint
           command: |
-            if [ "${DEPLOY}"" != "true" ]; then
+            if [ "${DEPLOY}" != "true" ]; then
               npm run lint
             fi
       - run: npm run docker:ci -- pull --ignore-pull-failures
