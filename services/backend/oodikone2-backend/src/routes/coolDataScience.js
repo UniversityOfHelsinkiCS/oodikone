@@ -42,7 +42,104 @@ const targetCreditsForStartDate = startDate => {
   }
 }
 
-const get3yStudentsWithDrilldown = _.memoize(async startDate => {
+const getTargetStudentCounts = _.memoize(async () => {
+  return await sequelize.query(
+    `
+    SELECT
+        ss.org_code "orgCode",
+        ss.org_name "orgName",
+        ss.programme_code "programmeCode",
+        ss.programme_name "programmeName",
+        COUNT(ss.studentnumber) "programmeTotalStudents",
+        SUM(
+            public.is_in_target(
+                CURRENT_TIMESTAMP,
+                ss.studystartdate,
+                TIMESTAMP '2020-07-31',
+                ss.credits,
+                CASE
+                    WHEN ss.studystartdate = '2017-07-31 21:00:00+00' THEN 180
+                    WHEN ss.studystartdate = '2018-07-31 21:00:00+00' THEN 120
+                    WHEN ss.studystartdate = '2019-07-31 21:00:00+00' THEN 60
+                    ELSE 999999999
+                END
+            )
+        ) "students3y",
+        SUM(
+            public.is_in_target(
+                CURRENT_TIMESTAMP,
+                ss.studystartdate,
+                TIMESTAMP '2021-07-31',
+                ss.credits,
+                CASE
+                    WHEN ss.studystartdate = '2017-07-31 21:00:00+00' THEN 180
+                    WHEN ss.studystartdate = '2018-07-31 21:00:00+00' THEN 120
+                    WHEN ss.studystartdate = '2019-07-31 21:00:00+00' THEN 60
+                    ELSE 999999999
+                END
+            )
+        ) "students4y"
+    FROM (
+        SELECT
+            org_code,
+            org_name,
+            programme_code,
+            programme_name,
+            studystartdate,
+            studentnumber,
+            SUM(credits) credits
+        FROM (
+            SELECT
+                org.code org_code,
+                org.name->>'fi' org_name,
+                element_details.code programme_code,
+                element_details.name->>'fi' programme_name,
+                studyright.studystartdate studystartdate,
+                studyright.student_studentnumber studentnumber,
+                credit.credits credits
+            FROM
+                organization org
+                INNER JOIN studyright
+                    ON org.code = studyright.faculty_code
+                INNER JOIN (
+                    -- HACK: fix updater writing duplicates where enddate has changed
+                    SELECT DISTINCT ON (studyrightid, startdate, code, studentnumber)
+                        *
+                    FROM studyright_elements
+                ) s_elements
+                    ON studyright.studyrightid = s_elements.studyrightid
+                INNER JOIN element_details
+                    ON s_elements.code = element_details.code
+                LEFT JOIN transfers
+                    ON studyright.studyrightid = transfers.studyrightid
+                LEFT JOIN LATERAL (
+                    SELECT
+                        student_studentnumber,
+                        attainment_date,
+                        credits
+                    FROM credit
+                    WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
+                        AND credit.attainment_date >= studyright.studystartdate -- only include credits attained during studyright's time
+                ) credit
+                    ON credit.student_studentnumber = studyright.student_studentnumber
+            WHERE
+                studyright.extentcode = 1 -- Bachelor's
+                AND studyright.prioritycode IN (1, 30) -- Primary or Graduated
+                AND studyright.studystartdate IN ('2017-07-31 21:00:00+00', '2018-07-31 21:00:00+00', '2019-07-31 21:00:00+00')
+                AND element_details.type = 20 -- programme
+                AND transfers.studyrightid IS NULL -- Not transferred within faculty
+        ) s
+        GROUP BY (1,2), (3,4), 5, 6
+    ) ss
+    GROUP BY (1, 2), (3, 4);
+    `,
+    {
+      type: sequelize.QueryTypes.SELECT
+    }
+  )
+})
+
+const get3yStudentsWithDrilldownPerYear = _.memoize(async startDate => {
   return await sequelize.query(
     `
     SELECT
@@ -252,13 +349,8 @@ const sorters = {
 
 const withErr = handler => (req, res, next) => handler(req, res, next).catch(e => res.status(500).json({ error: e }))
 
-router.get(
-  '/uber-data',
-  withErr(async (req, res) => {
-    const data = await getUberData(req.query.start_date)
-
-    // mankel data from:
-    /* 
+// mankel data from:
+/* 
       [
         {
           checkpoint: "2017-11-30T13:00:00.000Z",
@@ -273,8 +365,8 @@ router.get(
         ...
       ]
     */
-    // into:
-    /*
+// into:
+/*
     {
       H10: {
         name: "Teologinen tiedekunta",
@@ -309,62 +401,112 @@ router.get(
       ...
     }
     */
-    const mankeld = _(data)
-      // First, gather programme snapshots grouped by programme
+const mankeliUberData = data =>
+  _(data)
+    // First, gather programme snapshots grouped by programme
+    .map(programmeRow => ({
+      ...programmeRow,
+      programmeTotalStudents: parseInt(programmeRow.programmeTotalStudents, 10),
+      students3y: parseInt(programmeRow.students3y, 10),
+      // 4y group includes 3y group, make the 4y group exclusive
+      students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10)
+    }))
+    .groupBy(row => row.programmeCode)
+    .map(programmeRows => ({
+      ..._.pick(programmeRows[0], 'orgCode', 'orgName', 'programmeCode', 'programmeName'),
+      snapshots: _(programmeRows)
+        .map(({ checkpoint: date, programmeTotalStudents: totalStudents, students3y, students4y }) => ({
+          date,
+          totalStudents,
+          students3y,
+          students4y
+        }))
+        .sort((a, b) => a.date - b.date)
+        .value()
+    }))
+    // Then, group all programmes under the correct organization
+    .groupBy(p => p.orgCode)
+    .map(programmeRows => ({
+      name: programmeRows[0].orgName,
+      code: programmeRows[0].orgCode,
+      // Calculate snapshots for this organization by summing
+      // the total & target values from each programme, grouped by the snapshot date
+      snapshots: _(programmeRows)
+        .flatMap(row => row.snapshots)
+        .groupBy(snapshot => snapshot.date)
+        .map(snapshots => ({
+          date: snapshots[0].date,
+          totalStudents: _.sumBy(snapshots, s => s.totalStudents),
+          students3y: _.sumBy(snapshots, s => s.students3y),
+          students4y: _.sumBy(snapshots, s => s.students4y)
+        }))
+        .sort((a, b) => a.date - b.date)
+        .value(),
+      /**
+       * type ProgrammeCode = string
+       * programmes: Map<ProgrammeCode, Programme>
+       */
+      programmes: _(programmeRows)
+        .map(({ programmeCode: code, programmeName: name, snapshots }) => ({
+          code,
+          name,
+          snapshots
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .value()
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .value()
+
+router.get(
+  '/uber-data',
+  withErr(async (req, res) => {
+    const data = await getUberData(req.query.start_date)
+    const mankeld = mankeliUberData(data)
+    res.json(mankeld)
+  })
+)
+
+router.get(
+  '/proto-c-data',
+  withErr(async (req, res) => {
+    const data = await getTargetStudentCounts()
+    const mankelid = _(data)
+      // seems to return the numerical columns as strings, parse them first
       .map(programmeRow => ({
         ...programmeRow,
         programmeTotalStudents: parseInt(programmeRow.programmeTotalStudents, 10),
         students3y: parseInt(programmeRow.students3y, 10),
-        // 4y group includes 3y group, make the 4y group exclusive
+        // 4y group includes 3y group, make 4y count exclusive:
         students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10)
       }))
-      .groupBy(row => row.programmeCode)
-      .map(programmeRows => ({
-        ..._.pick(programmeRows[0], 'orgCode', 'orgName', 'programmeCode', 'programmeName'),
-        snapshots: _(programmeRows)
-          .map(({ checkpoint: date, programmeTotalStudents: totalStudents, students3y, students4y }) => ({
-            date,
+      .groupBy(r => r.orgCode)
+      .mapValues(rows => ({
+        // all of these rows have the same orgCode and orgName, just pick it from the first
+        code: rows[0].orgCode,
+        name: rows[0].orgName,
+        totalStudents: _.sumBy(rows, row => row.programmeTotalStudents),
+        students3y: _.sumBy(rows, row => row.students3y),
+        students4y: _.sumBy(rows, row => row.students4y),
+        programmes: rows.map(
+          ({
+            programmeCode: code,
+            programmeName: name,
+            programmeTotalStudents: totalStudents,
+            students3y,
+            students4y
+          }) => ({
+            code,
+            name,
             totalStudents,
             students3y,
             students4y
-          }))
-          .sort((a, b) => a.date - b.date)
-          .value()
-      }))
-      // Then, group all programmes under the correct organization
-      .groupBy(p => p.orgCode)
-      .mapValues(programmeRows => ({
-        name: programmeRows[0].orgName,
-        code: programmeRows[0].orgCode,
-        // Calculate snapshots for this organization by summing
-        // the total & target values from each programme, grouped by the snapshot date
-        snapshots: _(programmeRows)
-          .flatMap(row => row.snapshots)
-          .groupBy(snapshot => snapshot.date)
-          .map(snapshots => ({
-            date: snapshots[0].date,
-            totalStudents: _.sumBy(snapshots, s => s.totalStudents),
-            students3y: _.sumBy(snapshots, s => s.students3y),
-            students4y: _.sumBy(snapshots, s => s.students4y)
-          }))
-          .sort((a, b) => a.date - b.date)
-          .value(),
-        /**
-         * type ProgrammeCode = string
-         * programmes: Map<ProgrammeCode, Programme>
-         */
-        programmes: _(programmeRows)
-          .map(({ programmeCode: code, programmeName: name, snapshots }) => ({
-            code,
-            name,
-            snapshots
-          }))
-          .keyBy(p => p.code)
-          .value()
+          })
+        )
       }))
       .value()
 
-    res.json(mankeld)
+    res.json(mankelid)
   })
 )
 
@@ -374,7 +516,7 @@ router.get(
     const { startDate, sort } = req.query
     const shouldSort = Object.keys(sorters).includes(sort)
 
-    const rawData = await get3yStudentsWithDrilldown(startDate)
+    const rawData = await get3yStudentsWithDrilldownPerYear(startDate)
     const byOrganization = rawData.reduce((acc, val) => {
       const programmeTotalStudents = parseInt(val.programmeTotalStudents, 10)
       const targetStudents = parseInt(val.targetStudents, 10)

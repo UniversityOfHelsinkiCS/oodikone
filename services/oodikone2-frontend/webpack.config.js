@@ -41,7 +41,11 @@ module.exports = (env, args) => {
         {
           // Load CSS files
           test: /\.css$/,
-          use: [MiniCssExtractPlugin.loader, 'css-loader']
+          use: [
+            // fix CSS HMR in dev
+            isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+            'css-loader'
+          ]
         },
         {
           // Load other files
