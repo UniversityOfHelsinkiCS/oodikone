@@ -4,7 +4,7 @@
   "description": "",
   "main": "./src/index.js",
   "scripts": {
-    "test": "npm run lint",
+    "test": "echo 'no tests specified'",
     "lint": "eslint .",
     "lintfix": "prettier --write **/*.{js,json} && eslint --fix .",
     "start": "node ./src/index.js",

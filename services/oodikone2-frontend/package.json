@@ -16,7 +16,7 @@
     "lintfix": "eslint --ext .jsx,.js --fix ./",
     "sentry-cli": "sentry-cli",
     "stats": "webpack --json --mode=production --profile --progress > stats.json",
-    "test": "npm run lint",
+    "test": "echo 'no tests specified'",
     "test_docker": "docker exec -t frontend /bin/bash -c 'npm test'",
     "notest": "echo",
     "storybook": "start-storybook -h 0.0.0.0 -p 7777 --ci",
