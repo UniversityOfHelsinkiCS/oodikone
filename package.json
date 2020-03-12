@@ -12,7 +12,7 @@
     "cypress:ci": "CYPRESS_baseUrl=http://nginx/ npm run docker:ci:cypress",
     "concurrently": "concurrently",
     "services": "./scripts/exec_command_for_services.sh",
-    "lint": "npm run services -- -c lint",
+    "lint": "./scripts/exec_parallel_npm_in_services.sh -c lint",
     "lintfix": "npm run services -- -c lintfix",
     "test_services": "npm run services -- -e -c test",
     "test": "./scripts/test.sh",
@@ -52,9 +52,9 @@
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
     "concurrently": "^5.1.0",
-    "cypress": "^3.8.3",
+    "cypress": "^4.1.0",
     "cypress-smokify": "0.0.3",
-    "husky": "^4.2.1"
+    "husky": "^4.2.3"
   },
   "dependencies": {}
 }

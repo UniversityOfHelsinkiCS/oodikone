@@ -21,7 +21,7 @@ export default {
   <br>
   **showing XX months**: Dataa näytetään ohjelman vuosikurssin alkamispäivästä lähtien haluttuun kuukauteen asti (oletusarvoisesti "tähän päivään").
   <br>
-  **Updated** kertoo milloin data on päivitetty ja **Update population** kohdasta datan voi päivittää käsin (päivitysoperaatio kestää noin 10 minuuttia, jonka jälkeen sivu on ladattava uudelleen).
+  **Updated** kertoo milloin data on päivitetty
   <br>
   Mustasta rastista voi sulkea valitun koulutusohjelmavuosikurssin.
   `,
