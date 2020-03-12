@@ -426,7 +426,7 @@ const mankeliUberData = data =>
     }))
     // Then, group all programmes under the correct organization
     .groupBy(p => p.orgCode)
-    .mapValues(programmeRows => ({
+    .map(programmeRows => ({
       name: programmeRows[0].orgName,
       code: programmeRows[0].orgCode,
       // Calculate snapshots for this organization by summing
@@ -452,9 +452,10 @@ const mankeliUberData = data =>
           name,
           snapshots
         }))
-        .keyBy(p => p.code)
+        .sort((a, b) => a.name.localeCompare(b.name))
         .value()
     }))
+    .sort((a, b) => a.name.localeCompare(b.name))
     .value()
 
 router.get(
