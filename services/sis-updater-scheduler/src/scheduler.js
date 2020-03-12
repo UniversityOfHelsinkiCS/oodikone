@@ -19,13 +19,16 @@ const {
 } = require('./config')
 
 const IMPORTER_TABLES = {
+  attainments: 'attainments',
   organisations: 'organisations',
   studyLevels: 'study_levels',
   educationTypes: 'education_types',
   studyYears: 'study_years',
   courseUnits: 'course_units',
   modules: 'modules',
-  persons: 'persons'
+  persons: 'persons',
+  studyrights: 'studyrights',
+  termRegistrations: 'term_registrations'
 }
 
 const createJobs = async (entityIds, type) =>
@@ -39,7 +42,16 @@ const createJobs = async (entityIds, type) =>
     })
   })
 
-const scheduleFromDb = async ({ table, distinct, pluck = 'id', whereNotNull, scheduleId, limit, where, clean }) => {
+const scheduleFromDb = async ({
+  table,
+  distinct,
+  pluck = 'id',
+  whereNotNull,
+  scheduleId,
+  limit,
+  where,
+  clean = true
+}) => {
   const { knex } = knexConnection
   const knexBuilder = knex(table)
   if (distinct) knexBuilder.distinct(distinct)
@@ -114,7 +126,7 @@ const scheduleMeta = async (clean = true) => {
   await redisSet(REDIS_TOTAL_META_KEY, totalMeta)
 }
 
-const scheduleStudents = async (clean = true) => {
+const scheduleStudents = async () => {
   await redisSet(REDIS_TOTAL_STUDENTS_DONE_KEY, 0)
   await redisSet(REDIS_TOTAL_STUDENTS_KEY, 'SCHEDULING...')
   const totalStudents = await scheduleFromDb({
@@ -122,14 +134,47 @@ const scheduleStudents = async (clean = true) => {
     table: IMPORTER_TABLES.persons,
     whereNotNull: 'student_number',
     pluck: 'id',
-    limit: isDev ? DEV_SCHEDULE_COUNT : null,
-    clean
+    limit: isDev ? DEV_SCHEDULE_COUNT : null
   })
 
   await redisSet(REDIS_TOTAL_STUDENTS_KEY, totalStudents)
 }
 
+const getHourlyPersonsToUpdate = async () => {
+  const { knex } = knexConnection
+  const lastHourlySchedule = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
+
+  const getUpdatedFrom = (table, pluck) => {
+    const builder = knex(table).pluck(pluck)
+    if (lastHourlySchedule) builder.where('updated_at', '>=', new Date(lastHourlySchedule))
+    if (isDev) builder.limit(DEV_SCHEDULE_COUNT)
+    return builder
+  }
+
+  const [
+    updatedPersons,
+    updatedAttainmentStudents,
+    updatedStudyrightStudents,
+    updatedTermRegistrationStudents
+  ] = await Promise.all([
+    getUpdatedFrom(IMPORTER_TABLES.persons, 'id').whereNotNull('student_number'),
+    getUpdatedFrom(IMPORTER_TABLES.attainments, 'person_id'),
+    getUpdatedFrom(IMPORTER_TABLES.studyrights, 'person_id'),
+    getUpdatedFrom(IMPORTER_TABLES.termRegistrations, 'student_id')
+  ])
+
+  return Array.from(
+    new Set([
+      ...updatedPersons,
+      ...updatedAttainmentStudents,
+      ...updatedStudyrightStudents,
+      ...updatedTermRegistrationStudents
+    ])
+  )
+}
+
 const scheduleHourly = async () => {
+  // If updater is currently running, then return
   const latestUpdaterHandledMessage = await redisGet(REDIS_LATEST_MESSAGE_RECEIVED)
   if (
     !isDev &&
@@ -139,8 +184,16 @@ const scheduleHourly = async () => {
     return
   }
 
+  // Update meta that have changed between now and the last update
   await scheduleMeta(false)
-  await scheduleStudents(false)
+
+  // Update persons whose attainments, studyrights etc. have changed
+  // between now and the last update
+  const personsToUpdate = await getHourlyPersonsToUpdate()
+  await redisSet(REDIS_TOTAL_STUDENTS_DONE_KEY, 0)
+  await redisSet(REDIS_TOTAL_STUDENTS_KEY, personsToUpdate.length)
+  await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students'))
+
   await redisSet(REDIS_LAST_HOURLY_SCHEDULE, new Date())
 }
 
