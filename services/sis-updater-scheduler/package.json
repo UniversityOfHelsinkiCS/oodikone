@@ -32,6 +32,8 @@
     "node-nats-streaming": "^0.2.6",
     "npm": "^6.13.7",
     "pg": "^7.17.1",
-    "redis": "^3.0.2"
+    "redis": "^3.0.2",
+    "winston": "^3.2.1",
+    "winston-log2gelf": "^2.1.0"
   }
 }

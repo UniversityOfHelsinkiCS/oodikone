@@ -241,6 +241,10 @@ services:
       SIS_IMPORTER_PASSWORD: dev
       SIS_IMPORTER_DATABASE: importer-db
       SECRET_TOKEN: dev
+      # LOG_HOST: host.docker.internal
+      # LOG_HOSTNAME: sis-updater-scheduler
+      # LOG_PORT: 9501
+    
     ports:
       - "8082:8082"
     container_name: sis-updater-scheduler
@@ -260,6 +264,9 @@ services:
       SIS_IMPORTER_USER: dev
       SIS_IMPORTER_PASSWORD: dev
       SIS_IMPORTER_DATABASE: importer-db
+      # LOG_HOST: host.docker.internal
+      # LOG_HOSTNAME: sis-updater-worker
+      # LOG_PORT: 9501
     depends_on:
       - redis
       - sis-updater-nats
