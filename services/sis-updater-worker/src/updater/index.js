@@ -30,6 +30,7 @@ const {
 } = require('./updateMeta')
 const { lock } = require('../utils/redis')
 const { PURGE_LOCK } = require('../config')
+const { logger } = require('../utils/logger')
 
 const idToHandler = {
   students: updateStudents,
@@ -83,7 +84,6 @@ const tableToModel = {
 
 const purge = async ({ table, before }) => {
   const unlock = await lock(PURGE_LOCK, 1000 * 60 * 60)
-  console.log(`PURGING ${table}...`)
   const deletedCount = await tableToModel[table].destroy({
     where: {
       updatedAt: {
@@ -94,7 +94,11 @@ const purge = async ({ table, before }) => {
     limit: 1000
   })
 
-  console.log(`DELETED ${deletedCount} ENTITIES FROM TABLE ${table}`)
+  logger.info({
+    message: 'Purge',
+    table,
+    count: deletedCount
+  })
   unlock()
 }
 

@@ -1,6 +1,7 @@
 const { chunk } = require('lodash')
 const { eachLimit } = require('async')
 const { dbConnections } = require('./connection')
+const { logger } = require('../utils/logger')
 const { getLatestSnapshot, isActive } = require('../utils')
 
 const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
@@ -44,7 +45,7 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
     })
   } catch (e) {
     if (entities.length === 1) {
-      console.error(e)
+      logger.error({ message: 'Updater error', meta: e.stack })
       return
     }
 
