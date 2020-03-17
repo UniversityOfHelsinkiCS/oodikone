@@ -61,7 +61,7 @@ echo ''
 
 if [[ -n "$PARAMS" ]]
 then
-    echo "$directories" | xargs -n 1 -P "$THREADS" -i{} bash -c "pushd '{}' > /dev/null ; set -o pipefail && npm run --if-present '$COMMAND' -- '${PARAMS[@]}' | sed -e \"s/^/\$(basename \$PWD): /;\" || exit 255 ; popd > /dev/null"
+    echo "$directories" | xargs -n 1 -P "$THREADS" -I{} bash -c "pushd '{}' > /dev/null ; set -o pipefail && npm run --if-present '$COMMAND' -- '${PARAMS[@]}' | sed -e \"s/^/\$(basename \$PWD): /;\" || exit 255 ; popd > /dev/null"
 else
-    echo "$directories" | xargs -n 1 -P "$THREADS" -i{} bash -c "pushd '{}' > /dev/null ; set -o pipefail && npm run --if-present '$COMMAND' | sed -e \"s/^/\$(basename \$PWD): /;\" || exit 255 ; popd > /dev/null"
+    echo "$directories" | xargs -n 1 -P "$THREADS" -I{} bash -c "pushd '{}' > /dev/null ; set -o pipefail && npm run --if-present '$COMMAND' | sed -e \"s/^/\$(basename \$PWD): /;\" || exit 255 ; popd > /dev/null"
 fi
