@@ -16,12 +16,14 @@ const getMonths = year => {
   return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
 }
 
-const PopulationStatisticsLink = ({ studyprogramme, year: yearLabel, children }) => {
+const PopulationStatisticsLink = ({ studytrack, studyprogramme, year: yearLabel, children }) => {
   const year = Number(yearLabel.slice(0, 4))
   const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
-  const href =
-    `/populations?months=${months}&semesters=FALL&semesters=` +
-    `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`
+  const href = studytrack
+    ? `/populations?months=${months}&semesters=FALL&semesters=` +
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%2C"studyTrack"%3A"${studytrack}"%7D&year=${year}`
+    : `/populations?months=${months}&semesters=FALL&semesters=` +
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`
   return (
     <Link title={`Population statistics of class ${yearLabel}`} to={href}>
       {children}
@@ -29,7 +31,7 @@ const PopulationStatisticsLink = ({ studyprogramme, year: yearLabel, children })
   )
 }
 
-const TotalPopulationLink = ({ confirm, years, studyprogramme, children }) => {
+const TotalPopulationLink = ({ confirm, years, studyprogramme, studytrack, children }) => {
   const confirmWrapper = e => {
     if (confirm) {
       // eslint-disable-next-line no-alert
@@ -41,12 +43,11 @@ const TotalPopulationLink = ({ confirm, years, studyprogramme, children }) => {
   }
   const yearsString = years.map(year => year.value).join('&years=')
   const months = getMonths(Math.min(...years.map(year => Number(year.value))))
-  const href =
-    years.length > 1
-      ? `/populations?months=${months}&semesters=FALL&semesters=` +
-        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${years[0].value}&years=${yearsString}`
-      : `/populations?months=${months}&semesters=FALL&semesters=` +
-        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${years[0].value}&years[]=${yearsString}`
+  const href = studytrack
+    ? `/populations?months=${months}&semesters=FALL&semesters=` +
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%2C"studyTrack"%3A"${studytrack}"%7D&year=${years[0].value}&years=${yearsString}`
+    : `/populations?months=${months}&semesters=FALL&semesters=` +
+      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${years[0].value}&years=${yearsString}`
   return (
     <Link onClick={confirmWrapper} title="Population statistics of all years" to={href}>
       {children}
@@ -55,6 +56,7 @@ const TotalPopulationLink = ({ confirm, years, studyprogramme, children }) => {
 }
 
 PopulationStatisticsLink.propTypes = {
+  studytrack: string.isRequired,
   studyprogramme: string.isRequired,
   year: string.isRequired,
   children: node.isRequired
@@ -68,10 +70,21 @@ TotalPopulationLink.propTypes = {
   studyprogramme: string.isRequired,
   years: arrayOf(shape({})).isRequired,
   children: node.isRequired,
-  confirm: bool
+  confirm: bool,
+  studytrack: string.isRequired
 }
 
-const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, userRoles, history, newProgramme }) => {
+const ThroughputTable = ({
+  throughput,
+  thesis,
+  loading,
+  error,
+  studyprogramme,
+  studytrack,
+  userRoles,
+  history,
+  newProgramme
+}) => {
   const [lowerYear, setLower] = useState(null)
   const [upperYear, setUpper] = useState(null)
   const [yearDifference, setDifference] = useState(null)
@@ -197,7 +210,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
         <Grid columns={2}>
           <Grid.Row>
             <Grid.Column>
-              Population progress
+              {studytrack ? `Population progress for selected studytrack` : 'Population progress'}
               {throughput && (
                 <Header.Subheader>
                   {`Last updated ${
@@ -281,7 +294,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                 <Table.Row key={year.year}>
                   <Table.Cell>
                     {year.year}
-                    <PopulationStatisticsLink studyprogramme={studyprogramme} year={year.year}>
+                    <PopulationStatisticsLink studytrack={studytrack} studyprogramme={studyprogramme} year={year.year}>
                       <Icon name="level up alternate" />
                     </PopulationStatisticsLink>
                   </Table.Cell>
@@ -320,7 +333,7 @@ const ThroughputTable = ({ throughput, thesis, loading, error, studyprogramme, u
                 <Table.HeaderCell style={{ fontWeight: 'bold' }}>
                   Total{' '}
                   {newProgramme && years.length > 0 && years.length < 5 ? (
-                    <TotalPopulationLink confirm studyprogramme={studyprogramme} years={years}>
+                    <TotalPopulationLink confirm studyprogramme={studyprogramme} studytrack={studytrack} years={years}>
                       <Icon name="level up alternate" />
                     </TotalPopulationLink>
                   ) : null}
@@ -421,6 +434,7 @@ ThroughputTable.propTypes = {
     })
   ),
   studyprogramme: string.isRequired,
+  studytrack: string,
   loading: bool.isRequired,
   error: bool.isRequired,
   userRoles: arrayOf(string).isRequired,
@@ -430,7 +444,8 @@ ThroughputTable.propTypes = {
 
 ThroughputTable.defaultProps = {
   throughput: null,
-  thesis: undefined
+  thesis: undefined,
+  studytrack: ''
 }
 
 const mapStateToProps = ({
