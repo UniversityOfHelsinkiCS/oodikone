@@ -605,7 +605,7 @@ class PopulationStudents extends Component {
                   <h3>
                     No mandatory courses defined. You can define them{' '}
                     <Link
-                      to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=1`}
+                      to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=2`}
                       onClick={() => {
                         sendAnalytics('No mandatory courses defined button clicked', 'Mandatory courses tab')
                       }}
@@ -639,7 +639,7 @@ class PopulationStudents extends Component {
                   <h3>
                     No tags defined. You can define them{' '}
                     <Link
-                      to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=5`}
+                      to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=6`}
                       onClick={() => {
                         sendAnalytics('No tags defined button clicked', 'Tags tab')
                       }}
