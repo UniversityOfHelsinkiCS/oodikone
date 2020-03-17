@@ -9,6 +9,7 @@ import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
 import CourseCodeMapper from '../CourseCodeMapper'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
+import StudyTrackOverview from './StudyTrackOverview'
 import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import PresentStudents from './PresentStudents'
@@ -90,15 +91,21 @@ const StudyProgramme = props => {
       })
     }
     if (props.isAdmin) {
-      panes.push({
-        menuItem: 'Admin',
-        render: () => (
-          <>
-            <Button onClick={() => refreshThroughput()}>recalculate throughput</Button>
-            <Button onClick={() => refreshProductivity()}>recalculate productivity</Button>
-          </>
-        )
-      })
+      panes.push(
+        {
+          menuItem: 'Admin',
+          render: () => (
+            <>
+              <Button onClick={() => refreshThroughput()}>recalculate throughput</Button>
+              <Button onClick={() => refreshProductivity()}>recalculate productivity</Button>
+            </>
+          )
+        },
+        {
+          menuItem: 'Studytrack overview',
+          render: () => <StudyTrackOverview studyprogramme={studyProgrammeId} history={props.history} />
+        }
+      )
     }
     return panes
   }
