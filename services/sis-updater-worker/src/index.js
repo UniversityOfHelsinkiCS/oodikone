@@ -2,6 +2,7 @@ const { stan, opts } = require('./utils/stan')
 const { dbConnections } = require('./db/connection')
 const { update, purge } = require('./updater')
 const { get: redisGet, incrby: redisIncrementBy, set: redisSet } = require('./utils/redis')
+const { logger } = require('./utils/logger')
 const {
   SIS_UPDATER_SCHEDULE_CHANNEL,
   SIS_PURGE_SCHEDULE_CHANNEL,
@@ -17,29 +18,37 @@ const handleMessage = messageHandler => async msg => {
   try {
     await messageHandler(JSON.parse(msg.getData()))
   } catch (e) {
-    console.log('Failed handling message', e)
+    logger.error({ message: 'Failed handling message', meta: e.stack })
   } finally {
     try {
       msg.ack()
       await redisSet(REDIS_LATEST_MESSAGE_RECEIVED, new Date())
     } catch (e) {
-      console.log('Failed acking message', e)
+      logger.error({ message: 'Failed acking message', meta: e.stack })
     }
   }
 }
 
-const logProgress = async updateMsg => {
+const logProgress = async (updateMsg, startTime) => {
   const totalScheduled = await redisGet(updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY)
   const totalDone = await redisIncrementBy(
     updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_DONE_KEY : REDIS_TOTAL_META_DONE_KEY,
     updateMsg.entityIds.length
   )
-  console.log(`UPDATED ${updateMsg.type === 'students' ? 'STUDENTS' : 'META'}: ${totalDone}/${totalScheduled}`)
+  logger.info({
+    message: 'Update',
+    type: updateMsg.type === 'students' ? 'STUDENTS' : 'META',
+    count: updateMsg.entityIds.length,
+    done: totalDone,
+    scheduled: totalScheduled,
+    timems: new Date() - startTime
+  })
 }
 
 const updateMsgHandler = async updateMsg => {
+  const startTime = new Date()
   await update(updateMsg)
-  await logProgress(updateMsg)
+  await logProgress(updateMsg, startTime)
 }
 
 const purgeMsgHandler = async purgeMsg => {
@@ -66,12 +75,12 @@ dbConnections.on('connect', async () => {
   const updaterChannel = stan.subscribe(SIS_UPDATER_SCHEDULE_CHANNEL, NATS_GROUP, opts)
   updaterChannel.on('message', handleMessage(updateMsgHandler))
   updaterChannel.on('error', e => {
-    console.log('NATS updater channel error', e)
+    logger.error({ message: 'Updater channel error', meta: e.stack })
   })
 
   const purgeChannel = stan.subscribe(SIS_PURGE_SCHEDULE_CHANNEL, NATS_GROUP, opts)
   purgeChannel.on('message', handleMessage(purgeMsgHandler))
   purgeChannel.on('error', e => {
-    console.log('NATS purge channel error', e)
+    logger.error({ message: 'Purge channel error', meta: e.stack })
   })
 })

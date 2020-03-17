@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { flatten, uniqBy } = require('lodash')
+const { flatten, uniqBy, sortBy, sortedUniqBy } = require('lodash')
 const {
   Course,
   Student,
@@ -158,9 +158,10 @@ const updateElementDetails = async studyRights => {
   const mappedProgrammes = programmes.map(programme => ({ ...programme, type: 20 }))
   const mappedStudytracks = studytracks.map(studytrack => ({ ...studytrack, type: 30 }))
 
+  // Sort to avoid deadlocks
   await bulkCreate(
     ElementDetail,
-    uniqBy([...mappedProgrammes, ...mappedStudytracks], e => e.code),
+    sortedUniqBy(sortBy([...mappedProgrammes, ...mappedStudytracks], ['code']), e => e.code),
     null,
     ['code']
   )
@@ -256,7 +257,9 @@ const updateTeachers = async attainments => {
       personIdToEmployeeNumber[p.id] = p.employee_number
       return mapTeacher(p)
     })
-  await bulkCreate(Teacher, teachers)
+
+  // Sort to avoid deadlocks
+  await bulkCreate(Teacher, sortBy(teachers, ['id']))
   return personIdToEmployeeNumber
 }
 
