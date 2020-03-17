@@ -3,7 +3,13 @@ const { schedule: scheduleCron } = require('./utils/cron')
 const { stan } = require('./utils/stan')
 const { isDev } = require('./config')
 const { startServer } = require('./server')
-const { scheduleMeta, scheduleStudents, scheduleHourly, scheduleWeekly, schedulePurge } = require('./scheduler')
+const {
+  scheduleMeta,
+  scheduleStudents,
+  scheduleHourly,
+  scheduleWeekly,
+  schedulePurge
+} = require('./scheduler')
 
 stan.on('error', e => {
   console.log('NATS connection failed', e)
