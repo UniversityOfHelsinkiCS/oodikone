@@ -5,14 +5,22 @@ import { Dropdown } from 'semantic-ui-react'
 import ThroughputTable from '../ThroughputTable'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
-import { isNewHYStudyProgramme } from '../../../common'
+import { isNewHYStudyProgramme, textAndDescriptionSearch } from '../../../common'
 
 const Overview = props => {
   const [selectedTrack, setTrack] = useState('')
   const [throughputData, setData] = useState(null)
   const [options, setOptions] = useState([])
 
-  const { throughput, studyprogramme, dispatchGetProductivity, dispatchGetThroughput, history, studytracks } = props
+  const {
+    language,
+    throughput,
+    studyprogramme,
+    dispatchGetProductivity,
+    dispatchGetThroughput,
+    history,
+    studytracks
+  } = props
 
   useEffect(() => {
     dispatchGetProductivity(studyprogramme)
@@ -28,7 +36,8 @@ const Overview = props => {
 
       const dropdownOptions = filteredStudytracks.map(st => ({
         key: st.code,
-        text: `${st.code}, ${st.name.fi}`,
+        text: st.name[language],
+        description: st.code,
         value: st.code
       }))
       setOptions(dropdownOptions)
@@ -37,14 +46,16 @@ const Overview = props => {
 
   useEffect(() => {
     if (throughput.data[studyprogramme] && selectedTrack) {
-      const selectedData = throughput.data[studyprogramme].data.map(deita => deita.studytrackdata[selectedTrack])
-      const newData = {
-        data: selectedData,
-        lastUpdated: throughput.data[studyprogramme].lastUpdated,
-        status: 'DONE',
-        totals: throughput.data[studyprogramme].stTotals[selectedTrack]
+      if (throughput.data[studyprogramme].data[0].studytrackdata) {
+        const selectedData = throughput.data[studyprogramme].data.map(data => data.studytrackdata[selectedTrack])
+        const newData = {
+          data: selectedData,
+          lastUpdated: throughput.data[studyprogramme].lastUpdated,
+          status: throughput.data[studyprogramme].status,
+          totals: throughput.data[studyprogramme].stTotals[selectedTrack]
+        }
+        setData(newData)
       }
-      setData(newData)
     }
   }, [selectedTrack])
 
@@ -56,7 +67,14 @@ const Overview = props => {
   const renderDropdown = () => (
     <>
       <h4>Studytrack</h4>
-      <Dropdown options={options} onChange={handleChange} selection placeholder="Select studytrack" />
+      <Dropdown
+        options={options}
+        onChange={handleChange}
+        selection
+        placeholder="Select studytrack"
+        search={textAndDescriptionSearch}
+        fluid
+      />
     </>
   )
 
@@ -91,6 +109,7 @@ Overview.propTypes = {
   dispatchGetThroughput: func.isRequired,
   history: shape({}).isRequired,
   studytracks: shape({}).isRequired,
+  language: string.isRequired,
   throughput: shape({
     error: bool,
     pending: bool,
@@ -98,9 +117,10 @@ Overview.propTypes = {
   }).isRequired // eslint-disable-line
 }
 
-const mapStateToProps = ({ studyProgrammeThroughput, populationDegreesAndProgrammes }) => ({
+const mapStateToProps = ({ studyProgrammeThroughput, populationDegreesAndProgrammes, settings }) => ({
   throughput: studyProgrammeThroughput,
-  studytracks: populationDegreesAndProgrammes.data.studyTracks || {}
+  studytracks: populationDegreesAndProgrammes.data.studyTracks || {},
+  language: settings.language
 })
 
 export default connect(
