@@ -20,7 +20,7 @@ const v2Routes = app => {
 
   const formatThroughput = stats => {
     const { id, updatedAt: lastUpdated, data, status } = stats
-    return { [id]: { lastUpdated, data: data.years, status, totals: data.totals } }
+    return { [id]: { lastUpdated, data: data.years, status, totals: data.totals, stTotals: data.stTotals } }
   }
 
   app.get('/v2/productivity/:id', async (req, res) => {
@@ -106,7 +106,7 @@ initializeDatabaseConnection()
 
     const formatThroughput = stats => {
       const { id, updatedAt: lastUpdated, data, status } = stats
-      return { [id]: { lastUpdated, data: data.years, status, totals: data.totals } }
+      return { [id]: { lastUpdated, data: data.years, status, totals: data.totals, stTotals: data.stTotals } }
     }
 
     app.get('/productivity/:id', async (req, res) => {
