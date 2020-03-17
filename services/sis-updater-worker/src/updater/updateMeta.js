@@ -50,7 +50,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     const { organisations } = courses[0]
     const mapCourseProvider = courseProviderMapper(groupId)
     courseProviders.push(
-      ...organisations
+      ...(organisations || [])
         .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
         .map(mapCourseProvider)
     )

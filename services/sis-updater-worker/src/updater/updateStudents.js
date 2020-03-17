@@ -207,7 +207,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
   ).reduce((res, curr) => {
     res[curr.id] = curr.code
     return res
-  })
+  }, {})
 
   const mapCredit = creditMapper(
     personIdToStudentNumber,
@@ -215,7 +215,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
     moduleGroupIdToModuleCode,
     courseGroupIdToCourseCode
   )
-  const properAttainmentTypes = new Set(['CourseUnitAttainment', 'ModuleAttainment'])
+  const properAttainmentTypes = new Set(['CourseUnitAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment'])
   const creditTeachers = []
 
   const credits = attainments

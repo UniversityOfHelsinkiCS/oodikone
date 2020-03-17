@@ -108,6 +108,9 @@ const mapTeacher = person => ({
   name: `${person.last_name} ${person.first_names}`.trim()
 })
 
+const moduleTypes = new Set(['ModuleAttainment', 'DegreeProgrammeAttainment'])
+const isModule = courseType => moduleTypes.has(courseType)
+
 const creditMapper = (
   personIdToStudentNumber,
   courseUnitIdToCourseGroupId,
@@ -141,14 +144,13 @@ const creditMapper = (
     createdate: registration_date,
     credittypecode: getCreditTypeCodeFromAttainment(attainment, getGrade(grade_scale_id, grade_id).passed),
     attainment_date: attainment_date,
-    course_id: type === 'CourseUnitAttainment' ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id,
-    course_code:
-      type === 'CourseUnitAttainment'
-        ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
-        : moduleGroupIdToModuleCode[module_group_id],
+    course_id: !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id,
+    course_code: !isModule(type)
+      ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
+      : moduleGroupIdToModuleCode[module_group_id],
     semestercode: targetSemester.semestercode,
     semester_composite: targetSemester.composite,
-    isStudyModule: type === 'ModuleAttainment',
+    isStudyModule: isModule(type),
     org: attainmentUniOrg
   }
 }
