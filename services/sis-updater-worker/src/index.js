@@ -29,7 +29,7 @@ const handleMessage = messageHandler => async msg => {
   }
 }
 
-const logProgress = async updateMsg => {
+const logProgress = async (updateMsg, startTime) => {
   const totalScheduled = await redisGet(updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY)
   const totalDone = await redisIncrementBy(
     updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_DONE_KEY : REDIS_TOTAL_META_DONE_KEY,
@@ -40,13 +40,15 @@ const logProgress = async updateMsg => {
     type: updateMsg.type === 'students' ? 'STUDENTS' : 'META',
     count: updateMsg.entityIds.length,
     done: totalDone,
-    scheduled: totalScheduled
+    scheduled: totalScheduled,
+    timems: new Date() - startTime
   })
 }
 
 const updateMsgHandler = async updateMsg => {
+  const startTime = new Date()
   await update(updateMsg)
-  await logProgress(updateMsg)
+  await logProgress(updateMsg, startTime)
 }
 
 const purgeMsgHandler = async purgeMsg => {
