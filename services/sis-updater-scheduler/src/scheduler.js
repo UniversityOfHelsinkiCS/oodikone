@@ -17,6 +17,7 @@ const {
   REDIS_LATEST_MESSAGE_RECEIVED,
   LATEST_MESSAGE_RECEIVED_THRESHOLD
 } = require('./config')
+const { logger } = require('./utils/logger')
 
 const IMPORTER_TABLES = {
   attainments: 'attainments',
@@ -34,10 +35,7 @@ const IMPORTER_TABLES = {
 const createJobs = async (entityIds, type) =>
   new Promise((res, rej) => {
     stan.publish(SIS_UPDATER_SCHEDULE_CHANNEL, JSON.stringify({ entityIds, type }), err => {
-      if (err) {
-        console.log('failed publishing', err)
-        rej()
-      }
+      if (err) return rej(err)
       res()
     })
   })
@@ -174,32 +172,40 @@ const getHourlyPersonsToUpdate = async () => {
 }
 
 const scheduleHourly = async () => {
-  // If updater is currently running, then return
-  const latestUpdaterHandledMessage = await redisGet(REDIS_LATEST_MESSAGE_RECEIVED)
-  if (
-    !isDev &&
-    latestUpdaterHandledMessage &&
-    new Date().getTime() - new Date(latestUpdaterHandledMessage).getTime() <= LATEST_MESSAGE_RECEIVED_THRESHOLD
-  ) {
-    return
+  try {
+    // If updater is currently running, then return
+    const latestUpdaterHandledMessage = await redisGet(REDIS_LATEST_MESSAGE_RECEIVED)
+    if (
+      !isDev &&
+      latestUpdaterHandledMessage &&
+      new Date().getTime() - new Date(latestUpdaterHandledMessage).getTime() <= LATEST_MESSAGE_RECEIVED_THRESHOLD
+    ) {
+      return
+    }
+
+    // Update meta that have changed between now and the last update
+    await scheduleMeta(false)
+
+    // Update persons whose attainments, studyrights etc. have changed
+    // between now and the last update
+    const personsToUpdate = await getHourlyPersonsToUpdate()
+    await redisSet(REDIS_TOTAL_STUDENTS_DONE_KEY, 0)
+    await redisSet(REDIS_TOTAL_STUDENTS_KEY, personsToUpdate.length)
+    await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students'))
+
+    await redisSet(REDIS_LAST_HOURLY_SCHEDULE, new Date())
+  } catch (e) {
+    logger.error({ message: 'Hourly scheduling failed', meta: e.stack })
   }
-
-  // Update meta that have changed between now and the last update
-  await scheduleMeta(false)
-
-  // Update persons whose attainments, studyrights etc. have changed
-  // between now and the last update
-  const personsToUpdate = await getHourlyPersonsToUpdate()
-  await redisSet(REDIS_TOTAL_STUDENTS_DONE_KEY, 0)
-  await redisSet(REDIS_TOTAL_STUDENTS_KEY, personsToUpdate.length)
-  await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students'))
-
-  await redisSet(REDIS_LAST_HOURLY_SCHEDULE, new Date())
 }
 
 const scheduleWeekly = async () => {
-  await scheduleMeta()
-  await scheduleStudents()
+  try {
+    await scheduleMeta()
+    await scheduleStudents()
+  } catch (e) {
+    logger.error({ message: 'Weekly scheduling failed', meta: e.stack })
+  }
 }
 
 const schedulePurge = async () => {
@@ -220,20 +226,24 @@ const schedulePurge = async () => {
     'studyright_extents',
     'teacher'
   ]
-  const lastHourlySchedule = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
-  each(
-    Object.values(TABLES_TO_PURGE),
-    async table =>
-      new Promise((res, rej) => {
-        stan.publish(SIS_PURGE_SCHEDULE_CHANNEL, JSON.stringify({ table, before: lastHourlySchedule }), err => {
-          if (err) {
-            console.log('failed publishing', err)
-            rej()
-          }
-          res()
+  try {
+    const lastHourlySchedule = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
+    each(
+      Object.values(TABLES_TO_PURGE),
+      async table =>
+        new Promise((res, rej) => {
+          stan.publish(SIS_PURGE_SCHEDULE_CHANNEL, JSON.stringify({ table, before: lastHourlySchedule }), err => {
+            if (err) {
+              console.log('failed publishing', err)
+              rej()
+            }
+            res()
+          })
         })
-      })
-  )
+    )
+  } catch (e) {
+    logger.error({ message: 'Purge scheduling failed', meta: e.stack })
+  }
 }
 
 module.exports = {
