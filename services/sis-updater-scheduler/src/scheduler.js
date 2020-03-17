@@ -47,7 +47,7 @@ const scheduleFromDb = async ({
   whereNotNull,
   scheduleId,
   limit,
-  where,
+  whereIn,
   clean = true
 }) => {
   const { knex } = knexConnection
@@ -56,7 +56,7 @@ const scheduleFromDb = async ({
   if (pluck) knexBuilder.pluck(pluck)
   if (whereNotNull) knexBuilder.whereNotNull(whereNotNull)
   if (limit) knexBuilder.limit(limit)
-  if (where) knexBuilder.where(...where)
+  if (whereIn) knexBuilder.whereIn(...whereIn)
   if (!clean) {
     const lastHourlySchedule = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
     if (lastHourlySchedule) knexBuilder.where('updated_at', '>=', new Date(lastHourlySchedule))
@@ -105,7 +105,7 @@ const scheduleMeta = async (clean = true) => {
   const totalStudyModules = await scheduleFromDb({
     scheduleId: 'study_modules',
     table: IMPORTER_TABLES.modules,
-    where: ['type', 'StudyModule'],
+    whereIn: ['type', ['StudyModule', 'DegreeProgramme']],
     distinct: 'group_id',
     pluck: 'group_id',
     limit: isDev ? DEV_SCHEDULE_COUNT : null,
@@ -169,6 +169,16 @@ const getHourlyPersonsToUpdate = async () => {
       ...updatedTermRegistrationStudents
     ])
   )
+}
+
+const scheduleByStudentNumbers = async studentNumbers => {
+  const { knex } = knexConnection
+  const personsToUpdate = await knex('persons')
+    .whereIn('student_number', studentNumbers)
+    .pluck('id')
+  await redisSet(REDIS_TOTAL_STUDENTS_DONE_KEY, 0)
+  await redisSet(REDIS_TOTAL_STUDENTS_KEY, personsToUpdate.length)
+  await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students'))
 }
 
 const scheduleHourly = async () => {
@@ -251,5 +261,6 @@ module.exports = {
   scheduleStudents,
   scheduleHourly,
   scheduleWeekly,
-  schedulePurge
+  schedulePurge,
+  scheduleByStudentNumbers
 }
