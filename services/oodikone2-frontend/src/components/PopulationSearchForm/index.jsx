@@ -102,7 +102,7 @@ const PopulationSearchForm = props => {
   }
 
   const fetchPopulation = async query => {
-    const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses'])
+    const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
     const queryCodes = Object.values(query.studyRights).filter(e => e != null)
     const uuid = uuidv4()
     const request = { ...formattedQueryParams, studyRights: queryCodes, uuid }

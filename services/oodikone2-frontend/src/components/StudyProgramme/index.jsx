@@ -9,6 +9,7 @@ import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
 import CourseCodeMapper from '../CourseCodeMapper'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
+import StudyTrackOverview from './StudyTrackOverview'
 import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import PresentStudents from './PresentStudents'
@@ -26,6 +27,8 @@ import { callApi } from '../../apiConnection'
 const StudyProgramme = props => {
   const [tab, setTab] = useTabs('p_tab', props.match.params.courseGroupId ? 2 : 0, props.history)
   useTitle('Study programmes')
+
+  useEffect(() => {}, [])
 
   const refreshProductivity = () => {
     callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, {
@@ -55,20 +58,33 @@ const StudyProgramme = props => {
   }
 
   const getPanes = () => {
-    const { match, rights, userRoles } = props
+    const { match, rights, userRoles, studytracks } = props
     const { studyProgrammeId, courseGroupId } = match.params
+    const filteredStudytracks = studytracks
+      ? Object.keys(studytracks).reduce((acc, curr) => {
+          if (Object.keys(studytracks[curr].programmes).includes(studyProgrammeId)) acc.push(studytracks[curr])
+          return acc
+        }, [])
+      : []
     const panes = []
+    panes.push({
+      menuItem: 'Overview',
+      render: () => <Overview studyprogramme={studyProgrammeId} history={props.history} />
+    })
+    if (filteredStudytracks.length > 0) {
+      panes.push({
+        menuItem: 'Studytrack overview',
+        render: () => <StudyTrackOverview studyprogramme={studyProgrammeId} history={props.history} />
+      })
+    }
     panes.push(
-      {
-        menuItem: 'Overview',
-        render: () => <Overview studyprogramme={studyProgrammeId} history={props.history} />
-      },
       {
         menuItem: 'Mandatory Courses',
         render: () => <StudyProgrammeMandatoryCourses studyProgramme={studyProgrammeId} />
       },
       { menuItem: 'Code Mapper', render: () => <CourseCodeMapper studyprogramme={studyProgrammeId} /> }
     )
+
     if ((userRoles.includes('coursegroups') && rights.includes(studyProgrammeId)) || userRoles.includes('admin')) {
       panes.push({
         menuItem: 'Course Groups',
@@ -180,7 +196,8 @@ StudyProgramme.propTypes = {
   getThroughputDispatch: func.isRequired,
   isAdmin: bool.isRequired,
   getPresentStudentsDispatch: func.isRequired,
-  clearPresentStudentsDispatch: func.isRequired
+  clearPresentStudentsDispatch: func.isRequired,
+  studytracks: shape({}).isRequired
 }
 
 StudyProgramme.defaultProps = {
@@ -198,12 +215,16 @@ const mapStateToProps = ({
   }
 }) => {
   const programmes = populationDegreesAndProgrammes.data ? populationDegreesAndProgrammes.data.programmes : {}
+  const studytracks = populationDegreesAndProgrammes.data.studyTracks
+    ? populationDegreesAndProgrammes.data.studyTracks
+    : {}
   return {
     programmes,
     language: getActiveLanguage(localize).code,
     rights,
     userRoles: getUserRoles(roles),
-    isAdmin: getUserIsAdmin(roles)
+    isAdmin: getUserIsAdmin(roles),
+    studytracks
   }
 }
 

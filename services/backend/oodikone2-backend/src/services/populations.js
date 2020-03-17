@@ -414,7 +414,7 @@ const studentnumbersWithAllStudyrightElements = async (
       [Op.or]: [
         {
           ['$studyright_elements->element_detail.type$']: {
-            [Op.ne]: 20
+            [Op.notIn]: [20, 30]
           }
         },
         {
