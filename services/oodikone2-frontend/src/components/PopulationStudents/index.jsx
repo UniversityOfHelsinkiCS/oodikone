@@ -129,7 +129,7 @@ class PopulationStudents extends Component {
   }
 
   renderStudentTable() {
-    if (!this.props.showList) {
+    if (!this.props.showList && !this.props.accordionView) {
       return null
     }
 
@@ -745,20 +745,22 @@ class PopulationStudents extends Component {
     return (
       <Ref innerRef={this.handleRef}>
         <Segment>
-          <Header dividing>
-            {`Students (${this.props.selectedStudents.length}) `}
-            <Button
-              size="small"
-              onClick={() => {
-                this.props.toggleStudentListVisibility()
-                sendAnalytics('Toggle Show students', this.props.showList ? 'hide' : 'show')
-              }}
-            >
-              {toggleLabel}
-            </Button>
-            {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
-            <InfoBox content={Students} />
-          </Header>
+          {!this.props.accordionView && (
+            <Header dividing>
+              {`Students (${this.props.selectedStudents.length}) `}
+              <Button
+                size="small"
+                onClick={() => {
+                  this.props.toggleStudentListVisibility()
+                  sendAnalytics('Toggle Show students', this.props.showList ? 'hide' : 'show')
+                }}
+              >
+                {toggleLabel}
+              </Button>
+              {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
+              <InfoBox content={Students} />
+            </Header>
+          )}
           {this.renderStudentTable()}
         </Segment>
       </Ref>
@@ -796,7 +798,8 @@ PopulationStudents.propTypes = {
   getTagsByStudytrack: func.isRequired,
   getStudentTagsStudyTrack: func.isRequired,
   userRoles: arrayOf(string).isRequired,
-  studentToTargetCourseDateMap: shape({})
+  studentToTargetCourseDateMap: shape({}),
+  accordionView: bool.isRequired
 }
 
 const mapStateToProps = state => {

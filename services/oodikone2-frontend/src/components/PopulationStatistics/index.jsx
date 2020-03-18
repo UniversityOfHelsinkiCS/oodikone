@@ -1,8 +1,8 @@
-import React, { memo } from 'react'
+import React, { memo, useState } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { func, bool, shape } from 'prop-types'
-import { Header, Segment, Divider } from 'semantic-ui-react'
+import { Header, Segment, Divider, Radio } from 'semantic-ui-react'
 
 import PopulationSearchForm from '../PopulationSearchForm'
 import PopulationSearchHistory from '../PopulationSearchHistory'
@@ -11,10 +11,12 @@ import InfoBox from '../InfoBox'
 import ProgressBar from '../ProgressBar'
 
 import infoTooltips from '../../common/InfoToolTips'
+import { getUserIsAdmin } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 
 const PopulationStatistics = memo(props => {
-  const { translate, populationFound, loading, location, history } = props
+  const { translate, populationFound, loading, location, history, isAdmin } = props
+  const [accordionView, setAccordion] = useState(false)
 
   const { onProgress, progress } = useProgress(loading)
   useTitle('Population statistics')
@@ -33,12 +35,16 @@ const PopulationStatistics = memo(props => {
         </Header>
         <PopulationSearchForm onProgress={onProgress} />
         <Divider />
-        {location.search !== '' ? <PopulationSearchHistory history={history} /> : null}
+        {location.search !== '' ? (
+          <>
+            {isAdmin ? <Radio id="accordion-toggle" toggle onChange={() => setAccordion(!accordionView)} /> : null}
+            <PopulationSearchHistory history={history} />
+          </>
+        ) : null}
         <ProgressBar fixed progress={progress} />
       </Segment>
     )
   }
-
   return (
     <div className="segmentContainer">
       <Header className="segmentTitle" size="large">
@@ -46,7 +52,7 @@ const PopulationStatistics = memo(props => {
       </Header>
       <Segment className="contentSegment">
         {renderPopulationSearch()}
-        {location.search !== '' ? <PopulationDetails /> : null}
+        {location.search !== '' ? <PopulationDetails accordionView={accordionView} /> : null}
       </Segment>
     </div>
   )
@@ -57,15 +63,23 @@ PopulationStatistics.propTypes = {
   populationFound: bool.isRequired,
   loading: bool.isRequired,
   location: shape({}).isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  isAdmin: bool.isRequired
 }
 
-const mapStateToProps = ({ localize, populations }) => ({
+const mapStateToProps = ({
+  localize,
+  populations,
+  auth: {
+    token: { roles }
+  }
+}) => ({
   translate: getTranslate(localize),
   currentLanguage: getActiveLanguage(localize).value,
   loading: populations.pending,
   populationFound: populations.data.students !== undefined,
-  query: populations.query ? populations.query : {}
+  query: populations.query ? populations.query : {},
+  isAdmin: getUserIsAdmin(roles)
 })
 
 export default connect(mapStateToProps)(PopulationStatistics)
