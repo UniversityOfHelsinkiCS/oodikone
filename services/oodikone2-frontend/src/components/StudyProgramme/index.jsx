@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { shape, string, arrayOf, func, bool } from 'prop-types'
 import { Header, Segment, Tab, Card, Icon, Button } from 'semantic-ui-react'
-import { isEqual } from 'lodash'
+import { isEqual, uniqBy } from 'lodash'
 import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
 import CourseCodeMapper from '../CourseCodeMapper'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
@@ -58,12 +58,12 @@ const StudyProgramme = props => {
   }
 
   const getPanes = () => {
-    const { match, rights, userRoles, studytracks } = props
+    const { match, rights, userRoles, programmes } = props
     const { studyProgrammeId, courseGroupId } = match.params
-    const filteredStudytracks = studytracks
-      ? Object.keys(studytracks).reduce((acc, curr) => {
-          if (Object.keys(studytracks[curr].programmes).includes(studyProgrammeId)) acc.push(studytracks[curr])
-          return acc
+    const filteredStudytracks = programmes[studyProgrammeId]
+      ? Object.values(programmes[studyProgrammeId].enrollmentStartYears).reduce((acc, curr) => {
+          acc.push(...Object.values(curr.studyTracks))
+          return uniqBy(acc, 'code')
         }, [])
       : []
     const panes = []
@@ -196,8 +196,7 @@ StudyProgramme.propTypes = {
   getThroughputDispatch: func.isRequired,
   isAdmin: bool.isRequired,
   getPresentStudentsDispatch: func.isRequired,
-  clearPresentStudentsDispatch: func.isRequired,
-  studytracks: shape({}).isRequired
+  clearPresentStudentsDispatch: func.isRequired
 }
 
 StudyProgramme.defaultProps = {
@@ -215,16 +214,13 @@ const mapStateToProps = ({
   }
 }) => {
   const programmes = populationDegreesAndProgrammes.data ? populationDegreesAndProgrammes.data.programmes : {}
-  const studytracks = populationDegreesAndProgrammes.data.studyTracks
-    ? populationDegreesAndProgrammes.data.studyTracks
-    : {}
+
   return {
     programmes,
     language: getActiveLanguage(localize).code,
     rights,
     userRoles: getUserRoles(roles),
-    isAdmin: getUserIsAdmin(roles),
-    studytracks
+    isAdmin: getUserIsAdmin(roles)
   }
 }
 
