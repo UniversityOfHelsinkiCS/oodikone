@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { string, func, shape, bool } from 'prop-types'
 import { connect } from 'react-redux'
+import { uniqBy } from 'lodash'
 import { Dropdown } from 'semantic-ui-react'
 import ThroughputTable from '../ThroughputTable'
 import { getProductivity } from '../../../redux/productivity'
@@ -19,7 +20,7 @@ const Overview = props => {
     dispatchGetProductivity,
     dispatchGetThroughput,
     history,
-    studytracks
+    studyprogrammes
   } = props
 
   useEffect(() => {
@@ -29,10 +30,13 @@ const Overview = props => {
 
   useEffect(() => {
     if (throughput.data[studyprogramme]) {
-      const filteredStudytracks = Object.keys(studytracks).reduce((acc, curr) => {
-        if (Object.keys(studytracks[curr].programmes).includes(studyprogramme)) acc.push(studytracks[curr])
-        return acc
-      }, [])
+      const filteredStudytracks = Object.values(studyprogrammes[studyprogramme].enrollmentStartYears).reduce(
+        (acc, curr) => {
+          acc.push(...Object.values(curr.studyTracks))
+          return uniqBy(acc, 'code')
+        },
+        []
+      )
 
       const dropdownOptions = filteredStudytracks.map(st => ({
         key: st.code,
@@ -42,12 +46,15 @@ const Overview = props => {
       }))
       setOptions(dropdownOptions)
     }
-  }, [throughput, studytracks])
+  }, [throughput, studyprogrammes])
 
   useEffect(() => {
     if (throughput.data[studyprogramme] && selectedTrack) {
       if (throughput.data[studyprogramme].data[0].studytrackdata) {
-        const selectedData = throughput.data[studyprogramme].data.map(data => data.studytrackdata[selectedTrack])
+        const selectedData = throughput.data[studyprogramme].data.reduce((acc, curr) => {
+          if (curr.studytrackdata[selectedTrack]) acc.push(curr.studytrackdata[selectedTrack])
+          return acc
+        }, [])
         const newData = {
           data: selectedData,
           lastUpdated: throughput.data[studyprogramme].lastUpdated,
@@ -108,7 +115,7 @@ Overview.propTypes = {
   dispatchGetProductivity: func.isRequired,
   dispatchGetThroughput: func.isRequired,
   history: shape({}).isRequired,
-  studytracks: shape({}).isRequired,
+  studyprogrammes: shape({}).isRequired,
   language: string.isRequired,
   throughput: shape({
     error: bool,
@@ -119,7 +126,7 @@ Overview.propTypes = {
 
 const mapStateToProps = ({ studyProgrammeThroughput, populationDegreesAndProgrammes, settings }) => ({
   throughput: studyProgrammeThroughput,
-  studytracks: populationDegreesAndProgrammes.data.studyTracks || {},
+  studyprogrammes: populationDegreesAndProgrammes.data.programmes || {},
   language: settings.language
 })
 
