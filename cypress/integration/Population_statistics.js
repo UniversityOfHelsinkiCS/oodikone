@@ -1,11 +1,11 @@
 /// <reference types="Cypress" />
 
 const setPopStatsUntil = (until, includeSettings = []) => {
-  cy.contains("Advanced settings").siblings().get('.toggle').click()
+  cy.contains("Advanced settings").siblings().get('[data-cy=advanced-toggle]').click()
   includeSettings.forEach(setting => {
     cy.contains("Advanced settings").parent().siblings().contains(setting).click()
   })
-  cy.contains("Statistics until").siblings().get('.rdt').get('input').eq(1).click().clear().type(until)
+  cy.contains("Statistics until").siblings().get('.rdt').get('input').eq(2).click().clear().type(until)
   cy.contains("Fetch population with new settings").click()
   cy.contains("Advanced settings")
 }

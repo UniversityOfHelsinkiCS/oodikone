@@ -21,7 +21,8 @@ const PopulationCourses = ({
   translate,
   getPopulationSelectedStudentCourses: gpc,
   selectedStudentsByYear,
-  query
+  query,
+  accordionView
 }) => {
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
@@ -51,16 +52,18 @@ const PopulationCourses = ({
   return (
     <React.Fragment>
       <Segment>
-        <Header size="medium" dividing>
-          <Popup
-            trigger={<Header.Content>{translate('populationCourses.header')}</Header.Content>}
-            content="Sort by clicking columns. Click course name to limit observed population to students who
+        {!accordionView && (
+          <Header size="medium" dividing>
+            <Popup
+              trigger={<Header.Content>{translate('populationCourses.header')}</Header.Content>}
+              content="Sort by clicking columns. Click course name to limit observed population to students who
             participated to the course."
-            wide
-            position="top left"
-          />
-          <InfoBox content={CoursesOf} />
-        </Header>
+              wide
+              position="top left"
+            />
+            <InfoBox content={CoursesOf} />
+          </Header>
+        )}
         <SegmentDimmer translate={translate} isLoading={pending} />
         <PopulationCourseStats
           key={selectedPopulationCourses.query.uuid}
@@ -87,7 +90,8 @@ PopulationCourses.propTypes = {
   getPopulationSelectedStudentCourses: func.isRequired,
   dispatchRefreshFilters: func.isRequired,
   selectedStudentsByYear: shape({}).isRequired,
-  query: shape({}).isRequired
+  query: shape({}).isRequired,
+  accordionView: bool.isRequired
 }
 
 const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses, localize, populationFilters }) => ({

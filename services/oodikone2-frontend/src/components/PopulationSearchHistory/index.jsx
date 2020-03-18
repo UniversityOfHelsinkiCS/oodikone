@@ -292,6 +292,7 @@ class PopulationSearchHistory extends Component {
           <Form.Field style={{ margin: 'auto' }}>
             <b>Advanced settings</b>
             <Form.Radio
+              data-cy="advanced-toggle"
               toggle
               checked={showAdvancedSettings}
               onClick={() => {
