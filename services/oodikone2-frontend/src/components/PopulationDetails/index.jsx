@@ -1,7 +1,7 @@
 import React, { Component, useCallback } from 'react'
 import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool, shape } from 'prop-types'
-import { Segment, Header, Message, Tab } from 'semantic-ui-react'
+import { Segment, Header, Message, Tab, Accordion } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { flattenDeep, intersection } from 'lodash'
 
@@ -17,7 +17,7 @@ import PopulationCreditGainTable from '../PopulationCreditGainTable'
 import InfoBox from '../InfoBox'
 import infoTooltips from '../../common/InfoToolTips'
 
-const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
+const CourseStatisticsSegment = ({ samples, selectedStudents, translate, accordionView }) => {
   const { CreditStatistics } = infoTooltips.PopulationStatistics
 
   const renderCreditsGainTab = useCallback(() => {
@@ -46,10 +46,12 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
 
   return (
     <Segment>
-      <Header size="medium" dividing>
-        {translate('populationStatistics.creditStatisticsHeader')}
-        <InfoBox content={CreditStatistics} />
-      </Header>
+      {!accordionView && (
+        <Header size="medium" dividing>
+          {translate('populationStatistics.creditStatisticsHeader')}
+          <InfoBox content={CreditStatistics} />
+        </Header>
+      )}
 
       {samples && (
         <Tab
@@ -74,7 +76,8 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
 CourseStatisticsSegment.propTypes = {
   samples: arrayOf(object).isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  translate: func.isRequired
+  translate: func.isRequired,
+  accordionView: bool.isRequired
 }
 
 class PopulationDetails extends Component {
@@ -87,11 +90,12 @@ class PopulationDetails extends Component {
     selectedStudentsByYear: shape({}).isRequired,
     query: shape({}).isRequired,
     tagstudent: arrayOf(shape({})).isRequired,
-    studytracks: shape({}).isRequired
+    studytracks: shape({}).isRequired,
+    accordionView: bool.isRequired
   }
 
   renderCreditGainGraphs = () => {
-    const { samples, translate, selectedStudents } = this.props
+    const { samples, translate, selectedStudents, accordionView } = this.props
     const { CreditAccumulationGraph } = infoTooltips.PopulationStatistics
 
     const graphs = (
@@ -107,10 +111,12 @@ class PopulationDetails extends Component {
 
     return (
       <Segment>
-        <Header size="medium" dividing>
-          {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
-          <InfoBox content={CreditAccumulationGraph} />
-        </Header>
+        {!accordionView && (
+          <Header size="medium" dividing>
+            {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
+            <InfoBox content={CreditAccumulationGraph} />
+          </Header>
+        )}
         {samples.length > 0 && graphs}
       </Segment>
     )
@@ -146,20 +152,74 @@ class PopulationDetails extends Component {
       return <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
     }
 
-    const { query, selectedStudents, selectedStudentsByYear } = this.props
+    const { query, selectedStudents, selectedStudentsByYear, accordionView } = this.props
+
+    const panels = [
+      {
+        key: 'credit graph',
+        title: `${translate('populationStatistics.graphSegmentHeader')} (for ${selectedStudents.length} students)`,
+        content: {
+          content: this.renderCreditGainGraphs()
+        }
+      },
+      {
+        key: 'credit stats',
+        title: 'Credit statistics',
+        content: {
+          content: !query.years && (
+            <CourseStatisticsSegment
+              accordionView={accordionView}
+              samples={samples}
+              selectedStudents={selectedStudents}
+              translate={translate}
+            />
+          )
+        }
+      },
+      {
+        key: 'cop',
+        title: 'Courses of population',
+        content: {
+          content: (
+            <PopulationCourses
+              selectedStudents={selectedStudents}
+              selectedStudentsByYear={selectedStudentsByYear}
+              query={query}
+              accordionView={accordionView}
+            />
+          )
+        }
+      },
+      {
+        key: 'students',
+        title: `Students (${selectedStudents.length})`,
+        content: {
+          content: <PopulationStudents accordionView={accordionView} />
+        }
+      }
+    ]
+
+    if (accordionView) return <Accordion styled fluid panels={panels} />
+
     return (
       <div>
         <PopulationFilters samples={samples} exclude={this.getExcludedFilters()} />
         {this.renderCreditGainGraphs()}
         {!query.years && (
-          <CourseStatisticsSegment samples={samples} selectedStudents={selectedStudents} translate={translate} />
+          <CourseStatisticsSegment
+            samples={samples}
+            selectedStudents={selectedStudents}
+            translate={translate}
+            accordionView={accordionView}
+          />
         )}
         <PopulationCourses
           selectedStudents={selectedStudents}
           selectedStudentsByYear={selectedStudentsByYear}
           query={query}
+          accordionView={accordionView}
         />
-        <PopulationStudents />
+        <PopulationStudents accordionView={accordionView} />
       </div>
     )
   }
