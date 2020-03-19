@@ -44,15 +44,37 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate, accordi
 
   const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Change Credit statistics tab')
 
-  return (
-    <Segment>
-      {!accordionView && (
-        <Header size="medium" dividing>
-          {translate('populationStatistics.creditStatisticsHeader')}
+  if (accordionView)
+    return (
+      <>
+        <Header>
           <InfoBox content={CreditStatistics} />
         </Header>
-      )}
+        {samples && (
+          <Tab
+            onTabChange={handleTabChange}
+            menu={{ pointing: true }}
+            panes={[
+              {
+                menuItem: 'Credits gained',
+                render: renderCreditsGainTab
+              },
+              {
+                menuItem: 'Quarters',
+                render: renderQuartersTab
+              }
+            ]}
+          />
+        )}
+      </>
+    )
 
+  return (
+    <Segment>
+      <Header size="medium" dividing>
+        {translate('populationStatistics.creditStatisticsHeader')}
+        <InfoBox content={CreditStatistics} />
+      </Header>
       {samples && (
         <Tab
           onTabChange={handleTabChange}
@@ -108,15 +130,22 @@ class PopulationDetails extends Component {
         selectedStudents={selectedStudents}
       />
     )
+    if (accordionView)
+      return (
+        <>
+          <Header>
+            <InfoBox content={CreditAccumulationGraph} />
+          </Header>
+          {samples.length > 0 && graphs}
+        </>
+      )
 
     return (
       <Segment>
-        {!accordionView && (
-          <Header size="medium" dividing>
-            {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
-            <InfoBox content={CreditAccumulationGraph} />
-          </Header>
-        )}
+        <Header size="medium" dividing>
+          {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
+          <InfoBox content={CreditAccumulationGraph} />
+        </Header>
         {samples.length > 0 && graphs}
       </Segment>
     )
@@ -156,14 +185,14 @@ class PopulationDetails extends Component {
 
     const panels = [
       {
-        key: 'credit graph',
+        key: 0,
         title: `${translate('populationStatistics.graphSegmentHeader')} (for ${selectedStudents.length} students)`,
         content: {
           content: this.renderCreditGainGraphs()
         }
       },
       {
-        key: 'credit stats',
+        key: 1,
         title: 'Credit statistics',
         content: {
           content: !query.years && (
@@ -177,7 +206,7 @@ class PopulationDetails extends Component {
         }
       },
       {
-        key: 'cop',
+        key: 2,
         title: 'Courses of population',
         content: {
           content: (
@@ -191,7 +220,7 @@ class PopulationDetails extends Component {
         }
       },
       {
-        key: 'students',
+        key: 3,
         title: `Students (${selectedStudents.length})`,
         content: {
           content: <PopulationStudents accordionView={accordionView} />
@@ -199,11 +228,17 @@ class PopulationDetails extends Component {
       }
     ]
 
-    if (accordionView) return <Accordion styled fluid panels={panels} />
+    if (accordionView)
+      return (
+        <>
+          {/* <PopulationFilters samples={samples} exclude={this.getExcludedFilters()} /> */}
+          <Accordion exclusive={false} styled fluid panels={panels} />
+        </>
+      )
 
     return (
       <div>
-        <PopulationFilters samples={samples} exclude={this.getExcludedFilters()} />
+        <PopulationFilters samples={samples} exclude={this.getExcludedFilters()} accordionView={false} />
         {this.renderCreditGainGraphs()}
         {!query.years && (
           <CourseStatisticsSegment

@@ -49,6 +49,23 @@ const PopulationCourses = ({
     }
   }, [refreshNeeded])
 
+  if (accordionView)
+    return (
+      <>
+        <Header>
+          <InfoBox content={CoursesOf} />
+        </Header>
+        <SegmentDimmer translate={translate} isLoading={pending} />
+        <PopulationCourseStats
+          key={selectedPopulationCourses.query.uuid}
+          courses={selectedPopulationCourses.data}
+          query={selectedPopulationCourses.query}
+          pending={pending}
+          selectedStudents={selectedStudents}
+        />
+      </>
+    )
+
   return (
     <React.Fragment>
       <Segment>
