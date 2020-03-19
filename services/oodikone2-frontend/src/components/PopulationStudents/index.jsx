@@ -742,6 +742,17 @@ class PopulationStudents extends Component {
     }
 
     const toggleLabel = this.props.showList ? 'hide' : 'show'
+
+    if (this.props.accordionView)
+      return (
+        <Ref innerRef={this.handleRef}>
+          <>
+            {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
+            <InfoBox content={Students} />
+            {this.renderStudentTable()}
+          </>
+        </Ref>
+      )
     return (
       <Ref innerRef={this.handleRef}>
         <Segment>
