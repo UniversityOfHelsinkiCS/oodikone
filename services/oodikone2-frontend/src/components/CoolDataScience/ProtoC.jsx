@@ -29,7 +29,8 @@ const defaultConfig = () => {
       backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
     },
     tooltip: {
-      shared: true
+      shared: true,
+      followPointer: true
     },
     yAxis: {
       allowDecimals: false,
