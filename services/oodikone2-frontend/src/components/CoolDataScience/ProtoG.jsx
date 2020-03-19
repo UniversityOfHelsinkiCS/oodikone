@@ -149,7 +149,7 @@ const Chart = React.memo(({ tickDates, snapshots }) => (
 ))
 
 const getSnapshotsStartYears = _.memoize(snapshots =>
-  _.uniq(snapshots.map(s => new Date(s.date).getFullYear())).map(year => new Date(year, 1, 1))
+  _.uniq(snapshots.map(s => new Date(s.date).getFullYear())).map(year => new Date(year, 8, 1))
 )
 
 const ProtoG = () => {
