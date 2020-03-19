@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
-import { Segment, Loader, Dimmer, Table, Form, Dropdown, Icon } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Table, Form, Dropdown, Icon, Checkbox } from 'semantic-ui-react'
 import _ from 'lodash'
 
 import { callApi } from '../../apiConnection'
@@ -158,6 +158,7 @@ const ProtoG = () => {
   const [uberdata, setUberdata] = useState(null)
   const [isLoading, setLoading] = useState(true)
   const [expandedOrgs, setExpandedOrgs] = useState({})
+  const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -174,7 +175,10 @@ const ProtoG = () => {
   useEffect(() => {
     async function load() {
       setLoading(true)
-      const res = await callApi('/cool-data-science/uber-data', 'get', null, { start_date: startDate })
+      const res = await callApi('/cool-data-science/uber-data', 'get', null, {
+        start_date: startDate,
+        include_old_attainments: includeOldAttainments.toString()
+      })
       setUberdata(res.data)
       setLoading(false)
     }
@@ -182,7 +186,11 @@ const ProtoG = () => {
     if (startDate) {
       load()
     }
-  }, [startDate])
+  }, [startDate, includeOldAttainments])
+
+  const handleOldAttainmentToggled = useCallback(() => {
+    setIncludeOldAttainments(previous => !previous)
+  }, [])
 
   const handleYearChanged = useCallback((e, { value }) => {
     setStartDate(value)
@@ -197,7 +205,15 @@ const ProtoG = () => {
 
   return (
     <Segment>
-      <h3>Proto G</h3>
+      <div style={{ display: 'flex' }}>
+        <h3>Proto G</h3>
+        <Checkbox
+          style={{ marginLeft: 'auto' }}
+          label="Include old attainments"
+          onChange={handleOldAttainmentToggled}
+          checked={includeOldAttainments}
+        />
+      </div>
 
       <Form onSubmit={preventDefault}>
         <Form.Group inline>
