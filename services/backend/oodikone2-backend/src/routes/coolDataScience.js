@@ -42,9 +42,10 @@ const targetCreditsForStartDate = startDate => {
   }
 }
 
-const getTargetStudentCounts = _.memoize(async () => {
-  return await sequelize.query(
-    `
+const getTargetStudentCounts = _.memoize(
+  async ({ includeOldAttainments }) => {
+    return await sequelize.query(
+      `
     SELECT
         ss.org_code "orgCode",
         ss.org_name "orgName",
@@ -119,7 +120,11 @@ const getTargetStudentCounts = _.memoize(async () => {
                         credits
                     FROM credit
                     WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
-                        AND credit.attainment_date >= studyright.studystartdate -- only include credits attained during studyright's time
+                        ${
+                          includeOldAttainments
+                            ? ''
+                            : "AND credit.attainment_date >= studyright.studystartdate -- only include credits attained during studyright's time"
+                        }
                 ) credit
                     ON credit.student_studentnumber = studyright.student_studentnumber
             WHERE
@@ -133,11 +138,13 @@ const getTargetStudentCounts = _.memoize(async () => {
     ) ss
     GROUP BY (1, 2), (3, 4);
     `,
-    {
-      type: sequelize.QueryTypes.SELECT
-    }
-  )
-})
+      {
+        type: sequelize.QueryTypes.SELECT
+      }
+    )
+  },
+  ({ includeOldAttainments }) => JSON.stringify(includeOldAttainments)
+)
 
 const get3yStudentsWithDrilldownPerYear = _.memoize(async startDate => {
   return await sequelize.query(
@@ -242,13 +249,13 @@ const makeCheckpoints = startDate => {
   return checkpoints
 }
 
-const getUberData = _.memoize(async startDateStr => {
-  const startDate = new Date(startDateStr)
-  const creditsTarget = targetCreditsForStartDate(startDate)
-  const checkpoints = makeCheckpoints(startDate)
+const getUberData = _.memoize(
+  async ({ startDate, includeOldAttainments }) => {
+    const creditsTarget = targetCreditsForStartDate(startDate)
+    const checkpoints = makeCheckpoints(startDate)
 
-  return sequelize.query(
-    `
+    return sequelize.query(
+      `
     SELECT
         cp "checkpoint",
         ss.org_code "orgCode",
@@ -319,7 +326,7 @@ const getUberData = _.memoize(async startDateStr => {
                             credits
                         FROM credit
                         WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
-                            AND credit.attainment_date >= $3::TIMESTAMP WITH TIME ZONE
+                            ${includeOldAttainments ? '' : 'AND credit.attainment_date >= $3::TIMESTAMP WITH TIME ZONE'}
                             AND credit.attainment_date <= checkpoints.checkpoint
                     ) credit
                         ON credit.student_studentnumber = studyright.student_studentnumber
@@ -334,12 +341,14 @@ const getUberData = _.memoize(async startDateStr => {
         ) ss
     GROUP BY 1, (2, 3), (4, 5);
     `,
-    {
-      type: sequelize.QueryTypes.SELECT,
-      bind: [creditsTarget, checkpoints, startDate]
-    }
-  )
-})
+      {
+        type: sequelize.QueryTypes.SELECT,
+        bind: [creditsTarget, checkpoints, startDate]
+      }
+    )
+  },
+  ({ startDate, includeOldAttainments }) => `${startDate.toISOString()}-${includeOldAttainments}`
+)
 
 const sorters = {
   target: (a, b) => a.targetStudents - b.targetStudents,
@@ -461,7 +470,10 @@ const mankeliUberData = data =>
 router.get(
   '/uber-data',
   withErr(async (req, res) => {
-    const data = await getUberData(req.query.start_date)
+    const data = await getUberData({
+      startDate: new Date(req.query.start_date),
+      includeOldAttainments: req.query.include_old_attainments === 'true'
+    })
     const mankeld = mankeliUberData(data)
     res.json(mankeld)
   })
@@ -470,7 +482,9 @@ router.get(
 router.get(
   '/proto-c-data',
   withErr(async (req, res) => {
-    const data = await getTargetStudentCounts()
+    const data = await getTargetStudentCounts({
+      includeOldAttainments: req.query.include_old_attainments === 'true'
+    })
     const mankelid = _(data)
       // seems to return the numerical columns as strings, parse them first
       .map(programmeRow => ({
