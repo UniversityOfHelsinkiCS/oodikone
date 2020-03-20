@@ -81,23 +81,23 @@ const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) 
   }
 }
 
-const mapStudyrightElements = (studyright, code, childCode) => {
+const mapStudyrightElements = (studyrightid, ordinal, startdate, enddate, studentnumber, code, childCode) => {
   const defaultProps = {
-    studyrightid: studyright.studyrightid,
-    startdate: studyright.startdate,
-    enddate: studyright.enddate,
-    studentnumber: studyright.studentStudentnumber
+    studyrightid,
+    startdate,
+    enddate,
+    studentnumber
   }
 
   return [
     {
       ...defaultProps,
-      id: `${studyright.studyrightid}-1`,
+      id: `${defaultProps.studyrightid}-${ordinal}-1`,
       code
     },
     {
       ...defaultProps,
-      id: `${studyright.studyrightid}-2`,
+      id: `${defaultProps.studyrightid}-${ordinal}-2`,
       code: childCode
     }
   ]
