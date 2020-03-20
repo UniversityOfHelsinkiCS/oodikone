@@ -186,7 +186,6 @@ const scheduleHourly = async () => {
     // If updater is currently running, then return
     const latestUpdaterHandledMessage = await redisGet(REDIS_LATEST_MESSAGE_RECEIVED)
     if (
-      !isDev &&
       latestUpdaterHandledMessage &&
       new Date().getTime() - new Date(latestUpdaterHandledMessage).getTime() <= LATEST_MESSAGE_RECEIVED_THRESHOLD
     ) {

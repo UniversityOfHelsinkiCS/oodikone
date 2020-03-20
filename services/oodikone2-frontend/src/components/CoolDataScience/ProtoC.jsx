@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
-import { Segment, Loader, Dimmer, Table, Form, Dropdown } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Checkbox } from 'semantic-ui-react'
 import _ from 'lodash'
 
 import { callApi } from '../../apiConnection'
@@ -29,7 +29,8 @@ const defaultConfig = () => {
       backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
     },
     tooltip: {
-      shared: true
+      shared: true,
+      followPointer: true
     },
     yAxis: {
       allowDecimals: false,
@@ -217,18 +218,28 @@ const ProtoC = () => {
   const [isLoading, setLoading] = useState(true)
   const [sorter, setSorter] = useState('3y tahti')
   const [sortDir, setSortDir] = useState(1)
-
   const [drilldownOrg, setDrilldownOrg] = useState(null)
+
+  const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
 
   useEffect(() => {
     const load = async () => {
       setLoading(true)
-      const res = await callApi('/cool-data-science/proto-c-data')
+      const res = await callApi(
+        '/cool-data-science/proto-c-data',
+        'get',
+        null,
+        includeOldAttainments ? { include_old_attainments: 'true' } : undefined
+      )
       setData(res.data)
       setLoading(false)
     }
 
     load()
+  }, [includeOldAttainments])
+
+  const handleOldAttainmentToggled = useCallback(() => {
+    setIncludeOldAttainments(previous => !previous)
   }, [])
 
   const handleOrgClicked = useCallback(org => {
@@ -241,7 +252,15 @@ const ProtoC = () => {
 
   return (
     <Segment>
-      <h3>Proto C</h3>
+      <div style={{ display: 'flex' }}>
+        <h3>Proto C</h3>
+        <Checkbox
+          style={{ marginLeft: 'auto' }}
+          label="Include old attainments"
+          onChange={handleOldAttainmentToggled}
+          checked={includeOldAttainments}
+        />
+      </div>
 
       <div>
         Sort:{' '}

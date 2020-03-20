@@ -8,6 +8,9 @@ const isActive = entity => {
   return entity.document_state === 'ACTIVE'
 }
 
+const isBaMa = education =>
+  education.education_type === 'urn:code:education-type:degree-education:bachelors-and-masters-degree'
+
 const getMinMaxDate = (arr, fMax, fMin) => {
   let maxVal = null
   let max = -Infinity
@@ -36,5 +39,6 @@ const getMinMaxDate = (arr, fMax, fMin) => {
 module.exports = {
   getLatestSnapshot,
   isActive,
-  getMinMaxDate
+  getMinMaxDate,
+  isBaMa
 }
