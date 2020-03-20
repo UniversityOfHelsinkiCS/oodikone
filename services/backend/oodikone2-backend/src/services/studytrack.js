@@ -525,9 +525,10 @@ const getYears = since => {
 
 const throughputStatsForStudytrack = async (studyprogramme, since) => {
   const associations = await getAssociations()
-  const studytracks = Object.keys(associations.studyTracks).filter(st =>
-    Object.keys(associations.studyTracks[st].programmes).includes(studyprogramme)
-  )
+  const studyprogrammeYears = associations.programmes[studyprogramme]
+    ? associations.programmes[studyprogramme].enrollmentStartYears
+    : {}
+
   const totals = {
     credits: {
       mte30: 0,
@@ -572,10 +573,10 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
       const endDate = `${moment(year, 'YYYY')
         .add(1, 'years')
         .format('YYYY')}-${semesterEnd['SPRING']}`
+      const studytracks = studyprogrammeYears[year] ? Object.keys(studyprogrammeYears[year].studyTracks) : []
       const studytrackdata = await studytracks.reduce(async (acc, curr) => {
         const previousData = await acc
         const studentnumbers = await studentnumbersWithAllStudyrightElements([curr], startDate, endDate, false, false)
-        if (curr === 'SH60_036') console.log(startDate, studentnumbers.length)
         const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(
           studyprogramme,
           startDate,
