@@ -5,6 +5,7 @@ import HighchartsSankey from 'highcharts/modules/sankey'
 
 import rawData from './data'
 import ProtoC from './ProtoC'
+import ProtoC2 from './ProtoC2'
 import ProtoD from './ProtoD'
 import ProtoE from './ProtoE'
 import ProtoF from './ProtoF'
@@ -83,6 +84,7 @@ const CoolDataScience = () => {
       <ProtoD data={rawData} />
       <hr />
       <ProtoC />
+      <ProtoC2 />
       <hr />
       {configs.map((c, i) => (
         // eslint-disable-next-line react/no-array-index-key
