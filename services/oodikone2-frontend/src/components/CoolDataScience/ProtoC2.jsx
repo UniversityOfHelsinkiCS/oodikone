@@ -45,7 +45,12 @@ const defaultConfig = () => {
       shadow: false
     },
     tooltip: {
-      shared: true
+      shared: true,
+      pointFormatter() {
+        return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${this.y}</b> (${(
+          this.z * 100
+        ).toFixed(1)}%)<br/>`
+      }
     },
     plotOptions: {
       column: {
@@ -81,7 +86,9 @@ const makeConfig = (organisations, sorter) => {
         custom: {
           orgCode: org.code
         },
-        y: org.totalStudents - org.students3y - org.students4y
+        y: org.totalStudents - org.students3y - org.students4y,
+        // pass % of total as z so we can display it in the tooltip
+        z: (org.totalStudents - org.students3y - org.students4y) / org.totalStudents
       }))
     },
     {
@@ -91,7 +98,8 @@ const makeConfig = (organisations, sorter) => {
         custom: {
           orgCode: org.code
         },
-        y: org.students4y
+        y: org.students4y,
+        z: org.students4y / org.totalStudents
       }))
     },
     {
@@ -101,7 +109,8 @@ const makeConfig = (organisations, sorter) => {
         custom: {
           orgCode: org.code
         },
-        y: org.students3y
+        y: org.students3y,
+        z: org.students3y / org.totalStudents
       }))
     }
   ]
@@ -130,17 +139,27 @@ const makeConfig = (organisations, sorter) => {
                   {
                     color: '#ff7979',
                     name: 'ei tahdissa',
-                    data: programmes.map(p => p.totalStudents - p.students3y - p.students4y)
+                    data: programmes.map(p => ({
+                      y: p.totalStudents - p.students3y - p.students4y,
+                      // pass % of total as z so we can display it in the tooltip
+                      z: (p.totalStudents - p.students3y - p.students4y) / p.totalStudents
+                    }))
                   },
                   {
                     color: '#f9ca24',
                     name: '4v tahdissa',
-                    data: programmes.map(p => p.students4y)
+                    data: programmes.map(p => ({
+                      y: p.students4y,
+                      z: p.students4y / p.totalStudents
+                    }))
                   },
                   {
                     color: '#6ab04c',
                     name: '3v tahdissa',
-                    data: programmes.map(p => p.students3y)
+                    data: programmes.map(p => ({
+                      y: p.students3y,
+                      z: p.students3y / p.totalStudents
+                    }))
                   }
                 ])
               } else {
