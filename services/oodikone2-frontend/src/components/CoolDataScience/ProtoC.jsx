@@ -30,12 +30,16 @@ const defaultConfig = () => {
     },
     tooltip: {
       shared: true,
-      followPointer: true
+      followPointer: true,
+      pointFormatter() {
+        const percentage = (this.z * 100).toFixed(1)
+        return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${percentage}%</b> (${this.y})<br/>`
+      }
     },
     yAxis: {
       allowDecimals: false,
       min: 0,
-      reversed: true
+      reversed: false
     },
     plotOptions: {
       area: {
@@ -81,13 +85,14 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
 
   const series = [
     {
-      color: '#6ab04c',
-      name: '3v tahdissa',
+      color: '#ff7979',
+      name: 'ei tahdissa',
       data: sortedOrgs.map(org => ({
         custom: {
           orgCode: org.code
         },
-        y: org.students3y
+        y: org.totalStudents - org.students3y - org.students4y,
+        z: (org.totalStudents - org.students3y - org.students4y) / org.totalStudents
       }))
     },
     {
@@ -97,17 +102,19 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
         custom: {
           orgCode: org.code
         },
-        y: org.students4y
+        y: org.students4y,
+        z: org.students4y / org.totalStudents
       }))
     },
     {
-      color: '#ff7979',
-      name: 'ei tahdissa',
+      color: '#6ab04c',
+      name: '3v tahdissa',
       data: sortedOrgs.map(org => ({
         custom: {
           orgCode: org.code
         },
-        y: org.totalStudents - org.students3y - org.students4y
+        y: org.students3y,
+        z: org.students3y / org.totalStudents
       }))
     }
   ].map(addPointClickHandler)
@@ -131,24 +138,28 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
 const makeDrilldownConfig = org => {
   const series = [
     {
-      color: '#6ab04c',
-      name: '3v tahdissa',
+      color: '#ff7979',
+      name: 'ei tahdissa',
       data: org.programmes.map(p => ({
-        y: p.students3y
+        y: p.totalStudents - p.students3y - p.students4y,
+        z: (p.totalStudents - p.students3y - p.students4y) / p.totalStudents
       }))
     },
+
     {
       color: '#f9ca24',
       name: '4v tahdissa',
       data: org.programmes.map(p => ({
-        y: p.students4y
+        y: p.students4y,
+        z: p.students4y / p.totalStudents
       }))
     },
     {
-      color: '#ff7979',
-      name: 'ei tahdissa',
+      color: '#6ab04c',
+      name: '3v tahdissa',
       data: org.programmes.map(p => ({
-        y: p.totalStudents - p.students3y - p.students4y
+        y: p.students3y,
+        z: p.students3y / p.totalStudents
       }))
     }
   ]
