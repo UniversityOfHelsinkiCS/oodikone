@@ -121,7 +121,7 @@ const getStudyRightFromData = (data, studentNumber) => {
     studyrightid: `${data.studyright_id}`,
     canceldate: data.cancel_date,
     cancelorganisation: data.organisation_code,
-    enddate: parseDate(data.end_date),
+    enddate: parseDate(data.degree_date) || parseDate(data.end_date),
     extentcode: data.extent_code,
     givendate: parseDate(data.admission_date),
     graduated: Number(!!data.degree_date),
@@ -145,14 +145,14 @@ const elementDetailFromData = element => {
   }
 }
 
-const studyrightElementFromData = (element, studyrightid, studentnumber) => {
+const studyrightElementFromData = (element, studyrightid, studentnumber, degree_date) => {
   const { start_date, end_date, code } = element
   return {
     code,
     studyrightid,
     studentnumber,
     startdate: start_date,
-    enddate: end_date
+    enddate: degree_date || end_date
   }
 }
 

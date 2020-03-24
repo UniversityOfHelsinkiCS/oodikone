@@ -30,7 +30,7 @@ const formatStudyrights = async (api, studentnumber) => {
 
     const elementDetails = studyrightData.elements.map(element => mapper.elementDetailFromData(element))
     const studyRightElements = studyrightData.elements.map(element =>
-      mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber)
+      mapper.studyrightElementFromData(element, studyright.studyrightid, studentnumber, studyrightData.degree_date)
     )
 
     const transfers = mapper.getTransfersFromData(studyrightData, studentnumber)
