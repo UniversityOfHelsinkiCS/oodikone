@@ -29,7 +29,8 @@ const IMPORTER_TABLES = {
   modules: 'modules',
   persons: 'persons',
   studyrights: 'studyrights',
-  termRegistrations: 'term_registrations'
+  termRegistrations: 'term_registrations',
+  studyRightPrimalities: 'study_right_primalities'
 }
 
 const createJobs = async (entityIds, type) =>
@@ -153,12 +154,14 @@ const getHourlyPersonsToUpdate = async () => {
     updatedPersons,
     updatedAttainmentStudents,
     updatedStudyrightStudents,
-    updatedTermRegistrationStudents
+    updatedTermRegistrationStudents,
+    updatedStudyRightPrimalitiesStudents
   ] = await Promise.all([
     getUpdatedFrom(IMPORTER_TABLES.persons, 'id').whereNotNull('student_number'),
     getUpdatedFrom(IMPORTER_TABLES.attainments, 'person_id'),
     getUpdatedFrom(IMPORTER_TABLES.studyrights, 'person_id'),
-    getUpdatedFrom(IMPORTER_TABLES.termRegistrations, 'student_id')
+    getUpdatedFrom(IMPORTER_TABLES.termRegistrations, 'student_id'),
+    getUpdatedFrom(IMPORTER_TABLES.studyRightPrimalities, 'student_id')
   ])
 
   return Array.from(
@@ -166,7 +169,8 @@ const getHourlyPersonsToUpdate = async () => {
       ...updatedPersons,
       ...updatedAttainmentStudents,
       ...updatedStudyrightStudents,
-      ...updatedTermRegistrationStudents
+      ...updatedTermRegistrationStudents,
+      ...updatedStudyRightPrimalitiesStudents
     ])
   )
 }
