@@ -15,7 +15,7 @@ const TEST_USERID = 'TEST_USERID'
 export const setTestUser = userid =>
   userid ? localStorage.setItem(TEST_USERID, userid) : localStorage.removeItem(TEST_USERID)
 export const getTestUser = () => localStorage.getItem(TEST_USERID)
-const SIS_DB_FLAG = 'SIS_DB_FLAG'
+export const SIS_DB_FLAG = 'SIS_DB_FLAG'
 export const setTestUserSIS = booleanFlag =>
   booleanFlag ? localStorage.setItem(SIS_DB_FLAG, booleanFlag) : localStorage.removeItem(SIS_DB_FLAG)
 export const getTestUserSIS = () => localStorage.getItem(SIS_DB_FLAG)
