@@ -131,7 +131,7 @@ const Chart = React.memo(({ tickDates, snapshots }) => (
       ],
       tooltip: {
         pointFormat:
-          '<span style="color:{series.color}">●</span>	<span style="font-weight:bold;">{series.name}</span>: {point.percentage:.1f}% ({point.y})<br/>',
+          '<span style="color:{series.color}">●</span>	<span>{series.name}</span>: <b>{point.percentage:.1f}%</b> ({point.y})<br/>',
         xDateFormat: '%Y-%m-%d'
       },
       plotOptions: {
