@@ -34,11 +34,12 @@ const { isBaMa } = require('../utils')
 const updateStudents = async personIds => {
   if (!areMapsInitialized()) await initMaps()
 
-  const [students, studyRightSnapshots, attainments, termRegistrations] = await Promise.all([
+  const [students, studyRightSnapshots, attainments, termRegistrations, studyRightPrimalities] = await Promise.all([
     selectFromByIds('persons', personIds),
     selectFromByIds('studyrights', personIds, 'person_id'),
     selectFromByIds('attainments', personIds, 'person_id'),
-    selectFromByIds('term_registrations', personIds, 'student_id')
+    selectFromByIds('term_registrations', personIds, 'student_id'),
+    selectFromByIds('study_right_primalities', personIds, 'student_id')
   ])
 
   const groupedStudyRightSnapshots = Object.entries(
@@ -65,12 +66,18 @@ const updateStudents = async personIds => {
     return res
   }, {})
 
+  const personIdToStudyRightIdToPrimality = studyRightPrimalities.reduce((res, curr) => {
+    if (!res[curr.student_id]) res[curr.student_id] = {}
+    res[curr.student_id][curr.study_right_id] = curr
+    return res
+  }, {})
+
   const mappedStudents = students.map(studentMapper(attainments, studyRightSnapshots))
   await bulkCreate(Student, mappedStudents)
 
   const [moduleGroupIdToCode] = await Promise.all([
     updateElementDetails(flatten(Object.values(groupedStudyRightSnapshots))),
-    updateStudyRights(latestStudyRights, personIdToStudentNumber)
+    updateStudyRights(latestStudyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality)
   ])
 
   await Promise.all([
@@ -81,17 +88,27 @@ const updateStudents = async personIds => {
   ])
 }
 
-const updateStudyRights = async (studyRights, personIdToStudentNumber) => {
+const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
   const formattedStudyRights = studyRights.reduce((acc, studyright) => {
     const studyRightEducation = getEducation(studyright.education_id)
+    const primality = get(personIdToStudyRightIdToPrimality, `${studyright.person_id}.${studyright.id}`)
+    const primalityEndDate = get(primality, 'end_date')
+    const isPrimality = primality && !primalityEndDate
     if (!studyRightEducation) return acc
 
     if (isBaMa(studyRightEducation)) {
       const studyRightBach = mapStudyright(studyright, {
         extentcode: 1,
-        studyrightid: `${studyright.id}-1`
+        studyrightid: `${studyright.id}-1`,
+        prioritycode: get(studyright, 'study_right_graduation.phase1GraduationDate')
+          ? 30
+          : studyright.state === 'RESCINDED'
+          ? 5
+          : isPrimality
+          ? 1
+          : 2
       })
 
       const studyRightMast = mapStudyright(studyright, {
@@ -104,14 +121,24 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber) => {
         graduated: studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate ? 1 : 0,
         studystartdate: studyright.study_right_graduation
           ? studyright.study_right_graduation.phase1GraduationDate
-          : null
+          : null,
+        prioritycode: get(studyright, 'studyright.study_right_graduation.phase2GraduationDate')
+          ? 30
+          : studyright.state === 'RESCINDED'
+          ? 5
+          : isPrimality
+          ? get(studyright, 'study_right_graduation.phase1GraduationDate')
+            ? 1
+            : 6
+          : 2
       })
 
       acc.push(studyRightMast, studyRightBach)
     } else {
       const educationType = getEducationType(studyRightEducation.education_type)
       const mappedStudyright = mapStudyright(studyright, {
-        extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id]
+        extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
+        prioritycode: studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2
       })
       acc.push(mappedStudyright)
     }

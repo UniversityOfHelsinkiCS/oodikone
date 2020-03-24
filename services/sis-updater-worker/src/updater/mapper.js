@@ -65,7 +65,7 @@ const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) 
     givendate: studyright.grant_date,
     canceldate: studyright.study_right_cancellation ? studyright.study_right_cancellation.cancellationDate : null,
     studentStudentnumber: personIdToStudentNumber[studyright.person_id],
-    prioritycode: 1,
+    prioritycode: 2,
     educationType: 99
   }
 
