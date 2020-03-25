@@ -15,7 +15,10 @@ const defaultConfig = () => {
       text: 'oodikone | TOSKA'
     },
     title: {
-      text: 'Tavoiteaikaerittely, 2017-2019 aloittaneet'
+      text: '',
+      style: {
+        display: 'none'
+      }
     },
 
     yAxis: {
@@ -180,8 +183,8 @@ const makeConfig = (organisations, sorter, type = 'column') => {
 const countNotInTarget = org => org.totalStudents - org.students4y - org.students3y
 const sorters = {
   nimi: (a, b) => a.name.localeCompare(b.name),
-  '4y tahti': (a, b) => a.students4y - b.students4y,
-  '3y tahti': (a, b) => a.students3y - b.students3y,
+  '4v tahti': (a, b) => a.students4y - b.students4y,
+  '3v tahti': (a, b) => a.students3y - b.students3y,
   'ei tahdissa': (a, b) => countNotInTarget(a) - countNotInTarget(b)
 }
 
@@ -218,7 +221,7 @@ OrgChart.propTypes = {
 const ProtoC = () => {
   const [data, setData] = useState(null)
   const [isLoading, setLoading] = useState(true)
-  const [sorter, setSorter] = useState('3y tahti')
+  const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
 
   const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
@@ -252,7 +255,7 @@ const ProtoC = () => {
   return (
     <Segment>
       <div style={{ display: 'flex' }}>
-        <h3>Proto C.2</h3>
+        <h3>Prototyyppi: Tavoiteaikaerittely, 2017-2019 aloittaneet</h3>
         <Checkbox
           style={{ marginLeft: 'auto' }}
           label="Include old attainments"
@@ -279,8 +282,6 @@ const ProtoC = () => {
         <Loader active={isLoading} />
         {!isLoading && data && (
           <>
-            <OrgChart orgs={sortedOrgs} sorter={currentSorter} />
-            <hr />
             <OrgChart orgs={sortedOrgs} sorter={currentSorter} isSideways />
           </>
         )}
