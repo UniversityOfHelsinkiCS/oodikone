@@ -186,8 +186,8 @@ const makeDrilldownConfig = org => {
 const countNotInTarget = org => org.totalStudents - org.students4y - org.students3y
 const sorters = {
   nimi: (a, b) => a.name.localeCompare(b.name),
-  '4y tahti': (a, b) => a.students4y / a.totalStudents - b.students4y / b.totalStudents,
-  '3y tahti': (a, b) => a.students3y / a.totalStudents - b.students3y / b.totalStudents,
+  '4v tahti': (a, b) => a.students4y / a.totalStudents - b.students4y / b.totalStudents,
+  '3v tahti': (a, b) => a.students3y / a.totalStudents - b.students3y / b.totalStudents,
   'ei tahdissa': (a, b) => countNotInTarget(a) / a.totalStudents - countNotInTarget(b) / b.totalStudents
 }
 
@@ -230,7 +230,7 @@ const ProgrammeDrilldown = ({ org, defaultSorter, defaultSortDir }) => {
 const ProtoC = () => {
   const [data, setData] = useState(null)
   const [isLoading, setLoading] = useState(true)
-  const [sorter, setSorter] = useState('3y tahti')
+  const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
   const [drilldownOrg, setDrilldownOrg] = useState(null)
 
