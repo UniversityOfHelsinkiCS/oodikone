@@ -1,7 +1,7 @@
 import moment from 'moment'
 import jwtDecode from 'jwt-decode'
 import Datetime from 'react-datetime'
-import { filter, maxBy } from 'lodash'
+import { filter, maxBy, sortBy } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
 import toskaLogo from '../assets/toska.png'
@@ -137,12 +137,18 @@ export const cancelablePromise = promise => {
   }
 }
 
-export const flattenStudyrights = studyrights => {
+export const flattenStudyrights = (studyrights, programme) => {
   const studyrightcodes = []
   studyrights.forEach(sr => {
-    sr.studyright_elements.forEach(srE => {
-      studyrightcodes.push(srE.code)
-    })
+    if (sr.studyright_elements.map(srE => srE.code).includes(programme)) {
+      const programmeStartdate = sr.studyright_elements.find(srE => srE.code === programme).startdate
+      const currentStudytracks = sr.studyright_elements.reduce((acc, curr) => {
+        if (curr.element_detail.type === 30 && !(curr.startdate < programmeStartdate)) acc.push(curr)
+        return acc
+      }, [])
+
+      if (currentStudytracks.length > 0) studyrightcodes.push(sortBy(currentStudytracks, 'startdate').reverse()[0].code)
+    }
   })
   return studyrightcodes
 }
