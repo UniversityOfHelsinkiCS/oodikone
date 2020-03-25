@@ -15,7 +15,10 @@ const defaultConfig = () => {
       text: 'oodikone | TOSKA'
     },
     title: {
-      text: 'Tavoiteaikaerittely, 2017-2019 aloittaneet'
+      text: '',
+      style: {
+        display: 'none'
+      }
     },
 
     yAxis: {
@@ -252,7 +255,7 @@ const ProtoC = () => {
   return (
     <Segment>
       <div style={{ display: 'flex' }}>
-        <h3>Proto C.2</h3>
+        <h3>Prototyyppi: Tavoiteaikaerittely, 2017-2019 aloittaneet</h3>
         <Checkbox
           style={{ marginLeft: 'auto' }}
           label="Include old attainments"

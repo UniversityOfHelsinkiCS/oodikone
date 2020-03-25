@@ -121,7 +121,10 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
 
   return Highcharts.merge(defaultConfig(), {
     title: {
-      text: '2017-2019 aloittaneet uudet kandiopiskelijat'
+      text: '',
+      style: {
+        display: 'none'
+      }
     },
     xAxis: {
       categories: sortedOrgs.map(org => org.name)
@@ -264,7 +267,7 @@ const ProtoC = () => {
   return (
     <Segment>
       <div style={{ display: 'flex' }}>
-        <h3>Proto C</h3>
+        <h3>Prototyyppi: Suhteellinen tavoiteaikaerittely, 2017-2019 aloittaneet</h3>
         <Checkbox
           style={{ marginLeft: 'auto' }}
           label="Include old attainments"
