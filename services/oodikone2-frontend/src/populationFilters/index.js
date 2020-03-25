@@ -1,4 +1,5 @@
 import uuidv4 from 'uuid/v4'
+import { intersection } from 'lodash'
 import {
   getStudentTotalCredits,
   getStudentTotalCreditsFromMandatory,
@@ -365,17 +366,17 @@ export const creditsBeforeStudyright = params => {
 }
 
 export const studytrackFilter = params => {
-  const { studytrack } = params
+  const { studytracks, programme } = params
   return {
     id: uuidv4(),
     type: 'StudytrackFilter',
     params: {
-      text: studytrack.name,
-      code: studytrack.code
+      text: studytracks.names,
+      code: studytracks.codes
     },
     filter: student => {
-      const studyrights = flattenStudyrights(student.studyrights)
-      return studyrights.includes(studytrack.code)
+      const studyrights = flattenStudyrights(student.studyrights, programme)
+      return intersection(studyrights, studytracks.codes).length > 0
     }
   }
 }

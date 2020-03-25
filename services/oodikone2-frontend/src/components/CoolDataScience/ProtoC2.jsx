@@ -53,7 +53,7 @@ const defaultConfig = () => {
       }
     },
     plotOptions: {
-      column: {
+      series: {
         stacking: 'normal',
         dataLabels: {
           enabled: true
@@ -77,7 +77,7 @@ const changeSeries = (chart, categories, series) => {
   chart.hideLoading()
 }
 
-const makeConfig = (organisations, sorter) => {
+const makeConfig = (organisations, sorter, type = 'column') => {
   const orgSeries = [
     {
       color: '#ff7979',
@@ -118,12 +118,15 @@ const makeConfig = (organisations, sorter) => {
   const orgCategories = organisations.map(org => org.name)
 
   return Highcharts.merge(defaultConfig(), {
+    chart: {
+      type
+    },
     xAxis: {
       categories: orgCategories
     },
     series: orgSeries,
     plotOptions: {
-      column: {
+      series: {
         cursor: 'pointer',
         point: {
           events: {
@@ -182,9 +185,13 @@ const sorters = {
   'ei tahdissa': (a, b) => countNotInTarget(a) - countNotInTarget(b)
 }
 
-const OrgChart = React.memo(({ orgs, sorter }) => {
-  return <ReactHighcharts highcharts={Highcharts} config={makeConfig(orgs, sorter)} />
+const OrgChart = React.memo(({ orgs, sorter, isSideways }) => {
+  return <ReactHighcharts highcharts={Highcharts} config={makeConfig(orgs, sorter, isSideways ? 'bar' : 'column')} />
 })
+
+OrgChart.defaultProps = {
+  isSideways: false
+}
 
 OrgChart.propTypes = {
   orgs: PropTypes.arrayOf(
@@ -204,7 +211,8 @@ OrgChart.propTypes = {
       ).isRequired
     })
   ).isRequired,
-  sorter: PropTypes.func.isRequired
+  sorter: PropTypes.func.isRequired,
+  isSideways: PropTypes.bool
 }
 
 const ProtoC = () => {
@@ -272,6 +280,8 @@ const ProtoC = () => {
         {!isLoading && data && (
           <>
             <OrgChart orgs={sortedOrgs} sorter={currentSorter} />
+            <hr />
+            <OrgChart orgs={sortedOrgs} sorter={currentSorter} isSideways />
           </>
         )}
       </Segment>

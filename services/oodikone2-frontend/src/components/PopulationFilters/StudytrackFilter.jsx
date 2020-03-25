@@ -7,17 +7,25 @@ import { uniqBy } from 'lodash'
 import infoTooltips from '../../common/InfoToolTips'
 import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
 import { studytrackFilter } from '../../populationFilters'
+import { flattenStudyrights } from '../../common'
 import Track from './tracking'
 
-const StudytrackFilter = ({ setPopulationFilterAction, removePopulationFilterAction, filter, samples }) => {
+const StudytrackFilter = ({
+  setPopulationFilterAction,
+  removePopulationFilterAction,
+  filter,
+  samples,
+  studyRights
+}) => {
   const [options, setOptions] = useState([])
-  const [selectedStudytrack, setSelectedStudytrack] = useState(null)
-
+  const [selectedStudytracks, setSelectedStudytracks] = useState(null)
   const createOptions = () => {
     const studytracks = samples.reduce((acc, curr) => {
+      const newestStudytracks = flattenStudyrights(curr.studyrights, studyRights.programme)
       const studentsStudyrightElements = curr.studyrights.flatMap(studyright => studyright.studyright_elements)
       const studentsStudytracks = studentsStudyrightElements.filter(
-        studyrightElement => studyrightElement.element_detail.type === 30
+        studyrightElement =>
+          studyrightElement.element_detail.type === 30 && newestStudytracks.includes(studyrightElement.code)
       )
       if (studentsStudytracks.length > 0) acc.push(...studentsStudytracks)
       return acc
@@ -36,13 +44,13 @@ const StudytrackFilter = ({ setPopulationFilterAction, removePopulationFilterAct
   }, [])
 
   const handleFilter = () => {
-    setPopulationFilterAction(studytrackFilter({ studytrack: selectedStudytrack }))
+    setPopulationFilterAction(studytrackFilter({ studytracks: selectedStudytracks, programme: studyRights.programme }))
     Track.set(__filename)
   }
 
   const handleChange = (e, { value }) => {
-    const selection = options.find(option => option.key === value)
-    setSelectedStudytrack({ code: value, name: selection.text })
+    const selections = options.filter(option => value.includes(option.key))
+    setSelectedStudytracks({ codes: value, names: selections.map(selection => selection.text) })
   }
   const clearFilter = () => {
     removePopulationFilterAction(filter.id)
@@ -68,13 +76,14 @@ const StudytrackFilter = ({ setPopulationFilterAction, removePopulationFilterAct
                 onChange={handleChange}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                multiple
               />
             </Form.Field>
             <Form.Field>
               <label> studytrack </label>
             </Form.Field>
             <Form.Field>
-              <Button onClick={handleFilter} disabled={!selectedStudytrack}>
+              <Button onClick={handleFilter} disabled={!selectedStudytracks}>
                 set filter
               </Button>
             </Form.Field>
@@ -85,7 +94,7 @@ const StudytrackFilter = ({ setPopulationFilterAction, removePopulationFilterAct
   }
   return (
     <Segment>
-      Students that are in studytrack {filter.params.text}
+      Students that are in studytrack(s) {filter.params.text.join(', ')}
       <span style={{ float: 'right' }}>
         <Icon name="remove" onClick={clearFilter} />
       </span>
@@ -97,7 +106,8 @@ StudytrackFilter.propTypes = {
   samples: arrayOf(object).isRequired,
   setPopulationFilterAction: func.isRequired,
   removePopulationFilterAction: func.isRequired,
-  filter: shape({}).isRequired
+  filter: shape({}).isRequired,
+  studyRights: shape({}).isRequired
 }
 
 export default connect(

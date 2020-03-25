@@ -270,7 +270,8 @@ class PopulationFilters extends Component {
       populationCourses,
       tags,
       exclude,
-      accordionView
+      accordionView,
+      studyRights
     } = this.props
     const { Add } = infotooltips.PopulationStatistics.Filters
     const selectedPopulationCourses = populationSelectedStudentCourses.data
@@ -318,7 +319,6 @@ class PopulationFilters extends Component {
         </Segment>
       )
     }
-
     if (accordionView)
       return (
         <>
@@ -347,7 +347,8 @@ class PopulationFilters extends Component {
                 samples: this.props.samples,
                 transfers,
                 extents,
-                allStudyRights
+                allStudyRights,
+                studyRights
               })
             } else if (!(filterName === 'TagFilter' && tags.length < 1)) {
               return React.createElement(Preset, {
@@ -397,7 +398,8 @@ class PopulationFilters extends Component {
               samples: this.props.samples,
               transfers,
               extents,
-              allStudyRights
+              allStudyRights,
+              studyRights
             })
           } else if (!(filterName === 'TagFilter' && tags.length < 1)) {
             return React.createElement(Preset, {
@@ -443,7 +445,8 @@ class PopulationFilters extends Component {
                 samples: this.props.samples,
                 transfers: this.props.transfers,
                 extents: this.props.extents,
-                allStudyRights
+                allStudyRights,
+                studyRights: this.props.studyRights
               })
             }
             return React.createElement(Preset, {
@@ -520,7 +523,8 @@ class PopulationFilters extends Component {
               samples: this.props.samples,
               transfers: this.props.transfers,
               extents: this.props.extents,
-              allStudyRights
+              allStudyRights,
+              studyRights: this.props.studyRights
             })
           }
           return React.createElement(Preset, {
