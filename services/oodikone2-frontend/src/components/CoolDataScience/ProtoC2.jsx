@@ -282,8 +282,6 @@ const ProtoC = () => {
         <Loader active={isLoading} />
         {!isLoading && data && (
           <>
-            <OrgChart orgs={sortedOrgs} sorter={currentSorter} />
-            <hr />
             <OrgChart orgs={sortedOrgs} sorter={currentSorter} isSideways />
           </>
         )}
