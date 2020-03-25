@@ -576,7 +576,13 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
       const studytracks = studyprogrammeYears[year] ? Object.keys(studyprogrammeYears[year].studyTracks) : []
       const studytrackdata = await studytracks.reduce(async (acc, curr) => {
         const previousData = await acc
-        const studentnumbers = await studentnumbersWithAllStudyrightElements([curr], startDate, endDate, false, false)
+        const studentnumbers = await studentnumbersWithAllStudyrightElements(
+          [studyprogramme, curr],
+          startDate,
+          endDate,
+          false,
+          false
+        )
         const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(
           studyprogramme,
           startDate,
