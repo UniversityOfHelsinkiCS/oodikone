@@ -69,7 +69,7 @@ const StudytrackFilter = ({
             <Form.Field>
               <label>Select students that are in </label>
             </Form.Field>
-            <Form.Field>
+            <Form.Field style={{ width: '500px' }}>
               <Dropdown
                 placeholder="select studytrack"
                 options={options}
@@ -77,10 +77,13 @@ const StudytrackFilter = ({
                 selectOnBlur={false}
                 selectOnNavigation={false}
                 multiple
+                fluid
+                selection
+                search
               />
             </Form.Field>
             <Form.Field>
-              <label> studytrack </label>
+              <label> studytrack(s) </label>
             </Form.Field>
             <Form.Field>
               <Button onClick={handleFilter} disabled={!selectedStudytracks}>
