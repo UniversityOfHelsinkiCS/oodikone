@@ -134,13 +134,13 @@ class PopulationStudents extends Component {
     }
 
     const { admin, containsStudyTracks } = this.state
-    const { history, populationStatistics } = this.props
+    const { populationStatistics, customPopulation, coursePopulation } = this.props
     const students = this.props.samples.reduce((obj, s) => {
       obj[s.studentNumber] = s
       return obj
     }, {})
 
-    const studentToStudyrightStartMap = !['/coursepopulation', '/custompopulation'].includes(history.location.pathname)
+    const studentToStudyrightStartMap = !(customPopulation || coursePopulation)
       ? this.props.selectedStudents.reduce((res, sn) => {
           const targetStudyright = flatten(
             students[sn].studyrights.reduce((acc, curr) => {
@@ -255,7 +255,7 @@ class PopulationStudents extends Component {
         cellProps: { collapsing: true, className: 'iconCellNoPointer' }
       }
     )
-    if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
+    if (!(coursePopulation || customPopulation)) {
       columns.push({
         key: 'credits since start',
         title: 'credits since start of studyright',
@@ -271,14 +271,14 @@ class PopulationStudents extends Component {
       getRowVal: s => s.credits
     })
 
-    if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
+    if (!(coursePopulation || customPopulation)) {
       columns.push({
         key: 'transferred from',
         title: 'transferred from',
         getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '')
       })
     }
-    if (containsStudyTracks && !['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
+    if (containsStudyTracks && !(coursePopulation || customPopulation)) {
       columns.push({
         key: 'studytrack',
         title: 'studytrack',
@@ -286,7 +286,7 @@ class PopulationStudents extends Component {
       })
     }
 
-    if (admin && !['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
+    if (admin && !(coursePopulation || customPopulation)) {
       columns.push(
         {
           key: 'priority',
@@ -306,7 +306,7 @@ class PopulationStudents extends Component {
       getRowVal: s => (!s.obfuscated ? tags(s.tags) : '')
     })
 
-    if (!['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
+    if (!(coursePopulation || customPopulation)) {
       columns.push({
         key: 'studystartdate',
         title: 'start of studyright',
@@ -315,7 +315,7 @@ class PopulationStudents extends Component {
       })
     }
 
-    if (['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
+    if (coursePopulation || customPopulation) {
       columns.push(
         {
           key: 'programme',
@@ -704,7 +704,7 @@ class PopulationStudents extends Component {
       return workbook
     }
     const filteredPanes = panesToFilter => {
-      if (['/coursepopulation', '/custompopulation'].includes(history.location.pathname)) {
+      if (coursePopulation || customPopulation) {
         return panesToFilter.slice(0, 1)
       }
       return panesToFilter
@@ -780,7 +780,9 @@ class PopulationStudents extends Component {
 }
 
 PopulationStudents.defaultProps = {
-  studentToTargetCourseDateMap: null
+  studentToTargetCourseDateMap: null,
+  customPopulation: false,
+  coursePopulation: false
 }
 
 PopulationStudents.propTypes = {
@@ -790,7 +792,6 @@ PopulationStudents.propTypes = {
   showNames: bool.isRequired,
   showList: bool.isRequired,
   language: string.isRequired,
-  history: shape({}).isRequired,
   queryStudyrights: arrayOf(string).isRequired,
   populationStatistics: shape({
     courses: arrayOf(shape({})),
@@ -810,7 +811,9 @@ PopulationStudents.propTypes = {
   getStudentTagsStudyTrack: func.isRequired,
   userRoles: arrayOf(string).isRequired,
   studentToTargetCourseDateMap: shape({}),
-  accordionView: bool.isRequired
+  accordionView: bool.isRequired,
+  coursePopulation: bool,
+  customPopulation: bool
 }
 
 const mapStateToProps = state => {
