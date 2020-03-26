@@ -157,6 +157,7 @@ const CoursePopulation = ({
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}
           samples={studentData.students}
           selectedStudents={selectedStudents}
+          coursePopulation
         />
       </Segment>
     </div>
