@@ -201,7 +201,7 @@ const CustomPopulation = ({
         <CustomPopulationProgrammeDist samples={custompop} selectedStudents={selectedStudents} />
       </Segment>
       <CustomPopulationCourses selectedStudents={selectedStudents} />
-      <PopulationStudents samples={custompop} selectedStudents={selectedStudents} />
+      <PopulationStudents samples={custompop} selectedStudents={selectedStudents} customPopulation />
     </div>
   )
 
