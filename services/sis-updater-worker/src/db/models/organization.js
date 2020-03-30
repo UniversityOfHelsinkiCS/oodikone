@@ -10,7 +10,11 @@ Organization.init(
       primaryKey: true
     },
     code: {
-      type: STRING
+      type: STRING,
+      references: {
+        table: 'organization',
+        field: 'code'
+      }
     },
     name: {
       type: JSONB
