@@ -1,5 +1,6 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
+const { sortBy } = require('lodash')
 
 const {
   Student,
@@ -414,7 +415,7 @@ const studentnumbersWithAllStudyrightElements = async (
       [Op.or]: [
         {
           ['$studyright_elements->element_detail.type$']: {
-            [Op.notIn]: [20, 30]
+            [Op.ne]: 20
           }
         },
         {
@@ -429,7 +430,37 @@ const studentnumbersWithAllStudyrightElements = async (
     having: count('studyright_elements.code', studyRights.length, true),
     raw: true
   })
-  return [...new Set(students.map(s => s.student_studentnumber))]
+  const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
+
+  // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
+  const allStudytracksForStudents = await StudyrightElement.findAll({
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumbers
+      }
+    },
+    include: {
+      model: ElementDetails,
+      where: {
+        type: {
+          [Op.eq]: 30
+        }
+      }
+    },
+    raw: true
+  })
+
+  const formattedStudytracks = studentnumbers.reduce((acc, curr) => {
+    acc[curr] = allStudytracksForStudents.filter(srE => srE.studentnumber === curr)
+    return acc
+  }, {})
+
+  const filteredStudentnumbers = studentnumbers.filter(studentnumber => {
+    const newestStudytrack = sortBy(formattedStudytracks[studentnumber], 'startdate').reverse()[0]
+    if (!newestStudytrack) return false
+    return studyRights.includes(newestStudytrack.code)
+  })
+  return filteredStudentnumbers.length > 0 ? filteredStudentnumbers : studentnumbers
 }
 
 const parseQueryParams = query => {

@@ -206,7 +206,7 @@ const ProtoG = () => {
   return (
     <Segment>
       <div style={{ display: 'flex' }}>
-        <h3>Proto G</h3>
+        <h3>Prototyyppi: Suhteellisen tavoiteaikaerittelyn kehitys</h3>
         <Checkbox
           style={{ marginLeft: 'auto' }}
           label="Include old attainments"
@@ -218,7 +218,7 @@ const ProtoG = () => {
       <Form onSubmit={preventDefault}>
         <Form.Group inline>
           <Form.Field>
-            <label>Start year</label>
+            <label>Aloitusvuosi</label>
             <Dropdown
               onChange={handleYearChanged}
               options={startOptions}

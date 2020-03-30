@@ -27,13 +27,8 @@ class StudentDetails extends Component {
 
   componentDidMount() {
     this.props.getSemesters()
-    this.unlistenHistory = this.props.history.listen((location, action) => {
-      if (
-        action === 'POP' ||
-        location.pathname === '/students' ||
-        location.pathname !== '/students' ||
-        this.props.error
-      ) {
+    this.unlistenHistory = this.props.history.listen(action => {
+      if (action === 'POP' || this.props.error) {
         this.props.resetStudent()
         this.props.removeStudentSelection()
       }
@@ -442,7 +437,7 @@ class StudentDetails extends Component {
                           ))}
                       </Table.Cell>
                       <Table.Cell>
-                      {c.canceldate ? ( // eslint-disable-line
+                        {c.canceldate ? ( // eslint-disable-line
                           <div>
                             <p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p>
                           </div>
