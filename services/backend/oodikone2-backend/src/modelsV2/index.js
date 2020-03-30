@@ -13,6 +13,7 @@ const ElementDetail = require('./elementDetail')
 const StudyrightExtent = require('./studyrightExtent')
 const Studyright = require('./studyright')
 const StudyrightElement = require('./studyrightElement')
+const Transfer = require('./transfer')
 
 CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
 Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
@@ -53,7 +54,7 @@ Credit.belongsToMany(Teacher, { through: CreditTeacher, foreignKey: 'credit_id' 
 Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id' })
 
 Organization.hasMany(Studyright, { foreignKey: 'facultyCode', sourceKey: 'code' })
-Studyright.belongsTo(Organization, { foreignKey: 'facultyCode', targetKey: 'code' })
+Studyright.belongsTo(Organization, { foreignKey: 'facultyCode', sourceKey: 'code' })
 
 Studyright.belongsTo(Student, { foreignKey: 'studentStudentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
@@ -72,6 +73,15 @@ Studyright.belongsTo(StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'e
 
 Credit.belongsTo(Semester, { foreignKey: { name: 'semester_composite', allowNull: false } })
 
+Transfer.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+Student.hasMany(Transfer, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+
+Transfer.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
+Studyright.hasMany(Transfer, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
+
+Transfer.belongsTo(ElementDetail, { as: 'source', foreignKey: 'sourcecode' })
+Transfer.belongsTo(ElementDetail, { as: 'target', foreignKey: 'targetcode' })
+
 module.exports = {
   Organization,
   Course,
@@ -87,5 +97,6 @@ module.exports = {
   ElementDetail,
   StudyrightExtent,
   Studyright,
-  StudyrightElement
+  StudyrightElement,
+  Transfer
 }

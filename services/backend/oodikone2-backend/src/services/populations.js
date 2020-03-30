@@ -109,6 +109,7 @@ const dateMonthsFromNow = (date, months) =>
     .add(months, 'months')
     .format('YYYY-MM-DD')
 
+ */
 const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright, tag) => {
   const studentTags = await TagStudent.findAll({
     attributes: ['tag_id', 'studentnumber'],
