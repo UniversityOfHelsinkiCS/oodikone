@@ -29,11 +29,20 @@ const get = async key => await redisPromisify(client.get, key)
 
 const set = async (key, val) => await redisPromisify(client.set, key, val)
 
+const getObject = async key => JSON.parse(await redisPromisify(client.get, key))
+
+const setObject = async (key, val) => await redisPromisify(client.set, key, JSON.stringify(val))
+
 const incrby = async (key, val) => await redisPromisify(client.incrby, key, val)
+
+const expire = async (key, val) => await redisPromisify(client.expire, key, val)
 
 module.exports = {
   lock,
   get,
   set,
-  incrby
+  incrby,
+  expire,
+  getObject,
+  setObject
 }
