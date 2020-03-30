@@ -51,6 +51,15 @@ Credit.init(
       onUpdate: 'cascade',
       onDelete: 'cascade'
     },
+    semester_composite: {
+      type: STRING,
+      references: {
+        model: 'semesters',
+        key: 'composite'
+      },
+      onUpdate: 'cascade',
+      onDelete: 'cascade'
+    },
     semestercode: {
       type: INTEGER
     },

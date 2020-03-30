@@ -29,20 +29,28 @@ Studyright.init(
     },
     // irtisanomisperuste
     studentStudentnumber: {
-      type: STRING
-    },
-    facultyCode: {
       type: STRING,
       references: {
-        model: 'organization',
-        key: 'code'
-      }
+        model: 'student',
+        key: 'studentnumber'
+      },
+      onUpdate: 'cascade',
+      onDelete: 'cascade'
+    },
+    facultyCode: {
+      type: STRING
     },
     prioritycode: {
       type: INTEGER
     },
     extentcode: {
-      type: INTEGER
+      type: INTEGER,
+      references: {
+        model: 'studyright_extents',
+        key: 'extentcode'
+      },
+      onUpdate: 'cascade',
+      onDelete: 'cascade'
     },
     createdAt: {
       type: DATE

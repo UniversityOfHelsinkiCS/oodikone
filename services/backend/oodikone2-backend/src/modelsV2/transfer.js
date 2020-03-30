@@ -1,30 +1,15 @@
 const { Model, STRING, DATE } = require('sequelize')
 const { dbConnections } = require('../databaseV2/connection')
 
-class StudyrightElement extends Model {}
+class Transfer extends Model {}
 
-StudyrightElement.init(
+Transfer.init(
   {
     id: {
       type: STRING,
       primaryKey: true
     },
-    startdate: {
-      type: DATE
-    },
-    enddate: {
-      type: DATE
-    },
-    studyrightid: {
-      type: STRING,
-      references: {
-        model: 'studyright',
-        key: 'studyrightid'
-      },
-      onUpdate: 'cascade',
-      onDelete: 'cascade'
-    },
-    code: {
+    sourcecode: {
       type: STRING,
       references: {
         model: 'element_details',
@@ -33,11 +18,32 @@ StudyrightElement.init(
       onUpdate: 'cascade',
       onDelete: 'cascade'
     },
+    targetcode: {
+      type: STRING,
+      references: {
+        model: 'element_details',
+        key: 'code'
+      },
+      onUpdate: 'cascade',
+      onDelete: 'cascade'
+    },
+    transferdate: {
+      type: DATE
+    },
     studentnumber: {
       type: STRING,
       references: {
         model: 'student',
         key: 'studentnumber'
+      },
+      onUpdate: 'cascade',
+      onDelete: 'cascade'
+    },
+    studyrightid: {
+      type: STRING,
+      references: {
+        model: 'studyright',
+        key: 'studyrightid'
       },
       onUpdate: 'cascade',
       onDelete: 'cascade'
@@ -50,11 +56,11 @@ StudyrightElement.init(
     }
   },
   {
-    underscored: false,
+    underscored: true,
     sequelize: dbConnections.sequelize,
-    modelName: 'studyright_element',
-    tableName: 'studyright_elements'
+    modelName: 'transfer',
+    tableName: 'transfers'
   }
 )
 
-module.exports = StudyrightElement
+module.exports = Transfer
