@@ -1,119 +1,185 @@
+const { each } = require('async')
 const { Semester, Organization } = require('../db/models')
 const { selectAllFrom, selectAllFromSnapshots } = require('../db')
+const { getObject: redisGet, setObject: redisSet, lock: redisLock, expire: redisExpire } = require('../utils/redis')
 
-let mapsInitialized = false
-let daysToSemesters = null
-let educationTypes = null
-let organisationIdToCode = null
-let educationIdToEducation = null
-let gradeScaleIdToGradeIdsToGrades = null
-let orgToUniOrgId = null
-let orgToStartYearToSemesters = null
-let countries = null
+const TIME_LIMIT_BETWEEN_RELOADS = 1000 * 60 * 30
+const REDIS_INITIALIZED = 'INITIALIZED'
+const SHARED_LOCK = 'SHARED_LOCK'
 
-const areMapsInitialized = () => mapsInitialized
+let loadedAt = null
+
+const localMapToRedisKey = {
+  daysToSemesters: 'DAYS_TO_SEMESTERS',
+  educationTypes: 'EDUCATION_TYPES',
+  organisationIdToCode: 'ORGANISATION_ID_TO_CODE',
+  educationIdToEducation: 'EDUCATION_ID_TO_EDUCATION',
+  gradeScaleIdToGradeIdsToGrades: 'GRADE_SCALE_ID_TO_GRADE_SCALE_IDS_TO_GRADES',
+  orgToUniOrgId: 'ORG_TO_UNI_ORG_ID',
+  orgToStartYearToSemesters: 'ORG_TO_START_YEAR_TO_SEMESTERS',
+  countries: 'COUNTRIES'
+}
+
+const localMaps = {
+  daysToSemesters: null,
+  educationTypes: null,
+  organisationIdToCode: null,
+  educationIdToEducation: null,
+  gradeScaleIdToGradeIdsToGrades: null,
+  orgToUniOrgId: null,
+  orgToStartYearToSemesters: null,
+  countries: null
+}
+
+const loadMapsIfNeeded = async () => {
+  const now = new Date().getTime()
+  if (!loadedAt || now - loadedAt > TIME_LIMIT_BETWEEN_RELOADS) {
+    const unlock = await redisLock(SHARED_LOCK, 1000 * 60 * 3)
+    const isInitialized = await redisGet(REDIS_INITIALIZED)
+    if (!isInitialized) {
+      await calculateMapsToRedis()
+      await redisSet(REDIS_INITIALIZED, true)
+      await redisExpire(REDIS_INITIALIZED, 1800)
+    }
+    unlock()
+    await loadMapsFromRedis()
+    loadedAt = now
+  }
+}
+
+const calculateMapsToRedis = async () =>
+  Promise.all([
+    initDaysToSemesters(),
+    initEducationTypes(),
+    initOrganisationIdToCode(),
+    initEducationIdToEducation(),
+    initGradeScaleIdToGradeIdsToGrades(),
+    initOrgToUniOrgId(),
+    initOrgToStartYearToSemesters(),
+    initCountries()
+  ])
+
+const loadMapsFromRedis = async () =>
+  each(Object.entries(localMapToRedisKey), async ([localMap, redisKey]) => {
+    localMaps[localMap] = await redisGet(redisKey)
+  })
 
 const initDaysToSemesters = async () => {
   const semesters = await Semester.findAll()
-  daysToSemesters = semesters.reduce((res, curr) => {
-    const start = new Date(curr.startdate).getTime()
-    const end = new Date(curr.enddate).getTime() - 1
+  await redisSet(
+    localMapToRedisKey.daysToSemesters,
+    semesters.reduce((res, curr) => {
+      const start = new Date(curr.startdate).getTime()
+      const end = new Date(curr.enddate).getTime() - 1
 
-    for (let i = start; i < end; i += 1000 * 60 * 60 * 24) {
-      const newDay = new Date(i)
-      res[newDay.toDateString()] = {
-        semestercode: curr.semestercode,
-        composite: curr.composite
-      }
-    }
-    return res
-  }, {})
-}
-
-const getSemesterByDate = date => {
-  if (!daysToSemesters) throw new Error('daysToSemesters null!')
-  return daysToSemesters[date.toDateString()]
-}
-
-const initEducationTypes = async () => {
-  educationTypes = (await selectAllFrom('education_types')).reduce((acc, curr) => {
-    acc[curr.id] = curr
-    return acc
-  }, {})
-}
-
-const getEducationType = id => educationTypes[id]
-
-const initOrganisationIdToCode = async () => {
-  organisationIdToCode = (await Organization.findAll()).reduce((acc, curr) => {
-    acc[curr.id] = curr.code
-    return acc
-  }, {})
-}
-
-const getOrganisationCode = id => organisationIdToCode[id]
-
-const initEducationIdToEducation = async () => {
-  educationIdToEducation = (await selectAllFrom('educations')).reduce((acc, curr) => {
-    acc[curr.id] = curr
-    return acc
-  }, {})
-}
-
-const getEducation = id => educationIdToEducation[id]
-
-const initGradeScaleIdToGradeIdsToGrades = async () => {
-  gradeScaleIdToGradeIdsToGrades = (await selectAllFrom('grade_scales')).reduce((res, curr) => {
-    res[curr.id] = curr.grades.reduce((res, curr) => {
-      const {
-        localId,
-        numericCorrespondence,
-        passed,
-        abbreviation: { fi }
-      } = curr
-      if (!res[localId])
-        res[localId] = {
-          value: numericCorrespondence || fi,
-          passed
+      for (let i = start; i < end; i += 1000 * 60 * 60 * 24) {
+        const newDay = new Date(i)
+        res[newDay.toDateString()] = {
+          semestercode: curr.semestercode,
+          composite: curr.composite
         }
+      }
       return res
     }, {})
-    return res
-  }, {})
+  )
 }
 
-const getGrade = (scaleId, gradeId) => gradeScaleIdToGradeIdsToGrades[scaleId][gradeId]
+const getSemesterByDate = date => localMaps.daysToSemesters[date.toDateString()]
+
+const initEducationTypes = async () =>
+  redisSet(
+    localMapToRedisKey.educationTypes,
+    (await selectAllFrom('education_types')).reduce((acc, curr) => {
+      acc[curr.id] = curr
+      return acc
+    }, {})
+  )
+
+const getEducationType = id => localMaps.educationTypes[id]
+
+const initOrganisationIdToCode = async () =>
+  redisSet(
+    localMapToRedisKey.organisationIdToCode,
+    (await Organization.findAll()).reduce((acc, curr) => {
+      acc[curr.id] = curr.code
+      return acc
+    }, {})
+  )
+
+const getOrganisationCode = id => localMaps.organisationIdToCode[id]
+
+const initEducationIdToEducation = async () =>
+  redisSet(
+    localMapToRedisKey.educationIdToEducation,
+    (await selectAllFrom('educations')).reduce((acc, curr) => {
+      acc[curr.id] = curr
+      return acc
+    }, {})
+  )
+
+const getEducation = id => localMaps.educationIdToEducation[id]
+
+const initGradeScaleIdToGradeIdsToGrades = async () =>
+  redisSet(
+    localMapToRedisKey.gradeScaleIdToGradeIdsToGrades,
+    (await selectAllFrom('grade_scales')).reduce((res, curr) => {
+      res[curr.id] = curr.grades.reduce((res, curr) => {
+        const {
+          localId,
+          numericCorrespondence,
+          passed,
+          abbreviation: { fi }
+        } = curr
+        if (!res[localId])
+          res[localId] = {
+            value: numericCorrespondence || fi,
+            passed
+          }
+        return res
+      }, {})
+      return res
+    }, {})
+  )
+
+const getGrade = (scaleId, gradeId) => localMaps.gradeScaleIdToGradeIdsToGrades[scaleId][gradeId]
 
 const initOrgToUniOrgId = async () => {
   const organisations = await selectAllFromSnapshots('organisations')
-  orgToUniOrgId = organisations.reduce((res, curr) => {
-    res[curr.id] = curr.university_org_id
-    return res
-  }, {})
+  await redisSet(
+    localMapToRedisKey.orgToUniOrgId,
+    organisations.reduce((res, curr) => {
+      res[curr.id] = curr.university_org_id
+      return res
+    }, {})
+  )
 }
 
-const getUniOrgId = orgId => orgToUniOrgId[orgId]
+const getUniOrgId = orgId => localMaps.orgToUniOrgId[orgId]
 
-const initOrgToStartYearToSemesters = async () => {
-  orgToStartYearToSemesters = (await Semester.findAll()).reduce((res, curr) => {
-    if (!res[curr.org]) res[curr.org] = {}
-    if (!res[curr.org][curr.startYear]) res[curr.org][curr.startYear] = {}
-    res[curr.org][curr.startYear][curr.termIndex] = curr
-    return res
-  }, {})
-}
+const initOrgToStartYearToSemesters = async () =>
+  redisSet(
+    localMapToRedisKey.orgToStartYearToSemesters,
+    (await Semester.findAll()).reduce((res, curr) => {
+      if (!res[curr.org]) res[curr.org] = {}
+      if (!res[curr.org][curr.startYear]) res[curr.org][curr.startYear] = {}
+      res[curr.org][curr.startYear][curr.termIndex] = curr
+      return res
+    }, {})
+  )
 
 const getSemester = (uniOrgId, studyYearStartYear, termIndex) =>
-  orgToStartYearToSemesters[uniOrgId][studyYearStartYear][termIndex]
+  localMaps.orgToStartYearToSemesters[uniOrgId][studyYearStartYear][termIndex]
 
-const initCountries = async () => {
-  countries = (await selectAllFrom('countries')).reduce((res, curr) => {
-    if (!res[curr.id]) res[curr.id] = curr
-    return res
-  })
-}
+const initCountries = async () =>
+  redisSet(
+    localMapToRedisKey.countries,
+    (await selectAllFrom('countries')).reduce((res, curr) => {
+      if (!res[curr.id]) res[curr.id] = curr
+      return res
+    })
+  )
 
-const getCountry = countryId => countries[countryId]
+const getCountry = countryId => localMaps.countries[countryId]
 
 const getCreditTypeCodeFromAttainment = (attainment, passed) => {
   const { primary, state } = attainment
@@ -170,20 +236,7 @@ const creditTypeIdToCreditType = {
 
 const creditTypeIdsToCreditTypes = ids => ids.map(id => creditTypeIdToCreditType[id])
 
-const init = async () => {
-  await initDaysToSemesters()
-  await initEducationTypes()
-  await initOrganisationIdToCode()
-  await initEducationIdToEducation()
-  await initGradeScaleIdToGradeIdsToGrades()
-  await initOrgToUniOrgId()
-  await initOrgToStartYearToSemesters()
-  await initCountries()
-  mapsInitialized = true
-}
-
 module.exports = {
-  areMapsInitialized,
   getSemesterByDate,
   getCreditTypeCodeFromAttainment,
   educationTypeToExtentcode,
@@ -195,5 +248,5 @@ module.exports = {
   getUniOrgId,
   getSemester,
   getCountry,
-  init
+  loadMapsIfNeeded
 }

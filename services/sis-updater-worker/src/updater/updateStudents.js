@@ -13,14 +13,7 @@ const {
   Transfer
 } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
-const {
-  init: initMaps,
-  areMapsInitialized,
-  educationTypeToExtentcode,
-  getEducationType,
-  getEducation,
-  getUniOrgId
-} = require('./shared')
+const { educationTypeToExtentcode, getEducationType, getEducation, getUniOrgId, loadMapsIfNeeded } = require('./shared')
 const {
   studentMapper,
   studyrightMapper,
@@ -32,7 +25,7 @@ const {
 const { isBaMa } = require('../utils')
 
 const updateStudents = async personIds => {
-  if (!areMapsInitialized()) await initMaps()
+  await loadMapsIfNeeded()
 
   const [students, studyRightSnapshots, attainments, termRegistrations, studyRightPrimalities] = await Promise.all([
     selectFromByIds('persons', personIds),
