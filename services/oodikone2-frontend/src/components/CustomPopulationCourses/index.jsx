@@ -41,7 +41,13 @@ const CustomPopulationCourses = ({
         />
       </Header>
       <SegmentDimmer translate={translate} isLoading={pending} />
-      <PopulationCourseStats courses={courses} query={query} pending={pending} selectedStudents={selectedStudents} />
+      <PopulationCourseStats
+        courses={courses}
+        query={query}
+        pending={pending}
+        selectedStudents={selectedStudents}
+        customPopulation
+      />
     </Segment>
   )
 }

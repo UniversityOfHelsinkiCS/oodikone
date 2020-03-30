@@ -29,8 +29,9 @@ const PopulationStatistics = memo(props => {
   useEffect(() => {
     if (props.queryIsSet) {
       const { query, tagstudent, selectedStudents, samples, studytracks } = props
-
-      const studyrights = samples.flatMap(student => flattenStudyrights(student.studyrights))
+      const studyrights = samples.flatMap(student =>
+        flattenStudyrights(student.studyrights, query.studyRights.programme)
+      )
       const studytracksInPopulation = intersection(Object.keys(studytracks), studyrights)
 
       const excludedFilters = []

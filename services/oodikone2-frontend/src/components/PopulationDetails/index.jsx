@@ -154,7 +154,7 @@ class PopulationDetails extends Component {
   getExcludedFilters = () => {
     const { query, tagstudent, selectedStudents, samples, studytracks } = this.props
 
-    const studyrights = samples.flatMap(student => flattenStudyrights(student.studyrights))
+    const studyrights = samples.flatMap(student => flattenStudyrights(student.studyrights, query.studyRights.programme))
     const studytracksInPopulation = intersection(Object.keys(studytracks), studyrights)
 
     const excludedFilters = []

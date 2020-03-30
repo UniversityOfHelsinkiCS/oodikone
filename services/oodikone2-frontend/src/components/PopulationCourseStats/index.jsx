@@ -95,12 +95,18 @@ class PopulationCourseStats extends Component {
     }).isRequired,
     selectedCourses: arrayOf(object).isRequired,
     removePopulationFilterOfCourse: func.isRequired,
-    history: shape({}).isRequired,
+    coursePopulation: bool,
+    customPopulation: bool,
     clearCourseStats: func.isRequired,
     language: string.isRequired,
     pending: bool.isRequired,
     selectedStudents: arrayOf(string).isRequired,
     years: shape({}) // eslint-disable-line
+  }
+
+  static defaultProps = {
+    coursePopulation: false,
+    customPopulation: false
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -472,7 +478,7 @@ class PopulationCourseStats extends Component {
   }
 
   render() {
-    const { courses, translate, pending, history } = this.props
+    const { courses, translate, pending, coursePopulation, customPopulation } = this.props
     const { studentAmountLimit } = this.state
     if (!courses) {
       return null
@@ -486,7 +492,7 @@ class PopulationCourseStats extends Component {
           <Form.Field inline>
             <label>{translate('populationCourses.limit')}</label>
             <Input defaultValue={studentAmountLimit} onChange={this.onStudentAmountLimitChange} />
-            {['/coursepopulation', '/custompopulation'].includes(history.location.pathname) ? null : (
+            {coursePopulation || customPopulation ? null : (
               <Button
                 active={this.state.activeView === 'passingSemester'}
                 floated="right"
