@@ -223,7 +223,10 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             {
               model: StudyrightElement,
               required: true,
-              attributes: ['id', 'startdate', 'enddate', 'studyrightid', 'code']
+              attributes: ['id', 'startdate', 'enddate', 'studyrightid', 'code'],
+              include: {
+                model: ElementDetail
+              }
             }
           ]
         },
