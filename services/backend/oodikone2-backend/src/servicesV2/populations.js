@@ -1,5 +1,7 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
+const { sortBy } = require('lodash')
+
 const {
   Student,
   Credit,
@@ -11,7 +13,7 @@ const {
   CourseType,
   SemesterEnrollment,
   Semester,
-  //Transfers,
+  Transfer,
   StudyrightElement
 } = require('../modelsV2')
 const {
@@ -202,11 +204,11 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'gender_en' */
       ],
       include: [
-        /* {
-          model: Transfers,
+        {
+          model: Transfer,
           attributes: ['transferdate', 'sourcecode', 'targetcode'],
           separate: true
-        }, */
+        },
         {
           model: Studyright,
           attributes: [
@@ -309,10 +311,9 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       raw: true
     }),
     sequelize.query(
-      //EXISTS (SELECT 1 FROM transfers WHERE studentnumber IN (:studentnumbers) AND (code = sourcecode OR code = targetcode)) OR
-
       `
 SELECT DISTINCT ON (code) code, name, type FROM element_details WHERE
+EXISTS (SELECT 1 FROM transfers WHERE studentnumber IN (:studentnumbers) AND (code = sourcecode OR code = targetcode)) OR
 EXISTS (SELECT 1 FROM studyright_elements WHERE studentnumber IN (:studentnumbers))`,
       {
         replacements: { studentnumbers },
@@ -432,7 +433,38 @@ const studentnumbersWithAllStudyrightElements = async (
     having: count('studyright_elements.code', studyRights.length, true),
     raw: true
   })
-  return [...new Set(students.map(s => s.student_studentnumber))]
+
+  const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
+
+  // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
+  const allStudytracksForStudents = await StudyrightElement.findAll({
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumbers
+      }
+    },
+    include: {
+      model: ElementDetail,
+      where: {
+        type: {
+          [Op.eq]: 30
+        }
+      }
+    },
+    raw: true
+  })
+
+  const formattedStudytracks = studentnumbers.reduce((acc, curr) => {
+    acc[curr] = allStudytracksForStudents.filter(srE => srE.studentnumber === curr)
+    return acc
+  }, {})
+
+  const filteredStudentnumbers = studentnumbers.filter(studentnumber => {
+    const newestStudytrack = sortBy(formattedStudytracks[studentnumber], 'startdate').reverse()[0]
+    if (!newestStudytrack) return false
+    return studyRights.includes(newestStudytrack.code)
+  })
+  return filteredStudentnumbers.length > 0 ? filteredStudentnumbers : studentnumbers
 }
 
 const parseQueryParams = query => {
@@ -488,14 +520,14 @@ const formatStudentsForApi = async (
   }, {})
   const result = students.reduce(
     (stats, student) => {
-      /* student.transfers.forEach(transfer => {
+      student.transfers.forEach(transfer => {
         const target = stats.transfers.targets[transfer.targetcode] || { sources: {} }
         const source = stats.transfers.sources[transfer.sourcecode] || { targets: {} }
         target.sources[transfer.sourcecode] = true
         source.targets[transfer.targetcode] = true
         stats.transfers.targets[transfer.targetcode] = target
         stats.transfers.sources[transfer.sourcecode] = source
-      }) */
+      })
 
       stats.students.push(
         formatStudentForPopulationStatistics(student, credits, startDate, endDate, startDateMoment, endDateMoment)

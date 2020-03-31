@@ -501,7 +501,6 @@ const startedStudyright = async (studentnumbers, startDate, studytrack, endDate)
 }
 
 const statsForClass = async (studentnumbers, startDate, studyprogramme, endDate) => {
-  // console.log('studytrack', studytrack)
   return Promise.all([
     creditsAfter(studentnumbers, startDate),
     graduationsFromClass(studentnumbers, studyprogramme),
