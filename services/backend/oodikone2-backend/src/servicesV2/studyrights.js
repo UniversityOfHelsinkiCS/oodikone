@@ -344,7 +344,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
             enrollmentStartYears: {}
           }
           const momentstartdate = moment(startdate)
-          const enrollment = getEnrollmentStartYear(momentstartdate)
+          const enrollment = momentstartdate.isValid() ? getEnrollmentStartYear(momentstartdate) : null
           const enrollmentStartYears = associations.programmes[code].enrollmentStartYears
           enrollmentStartYears[enrollment] = enrollmentStartYears[enrollment] || {
             degrees: {},

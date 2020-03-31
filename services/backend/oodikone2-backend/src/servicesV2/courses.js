@@ -638,9 +638,6 @@ const formatStudyrightElement = ({ code, element_detail, startdate, studyright: 
 
 const parseCredit = credit => {
   const { student, semester, grade, course_code, credits } = credit
-  if (!student) {
-    console.log('credit', credit.id)
-  }
   const { studentnumber, studyright_elements: elements } = student
   const { yearcode, yearname, semestercode, name: semestername } = semester
   return {

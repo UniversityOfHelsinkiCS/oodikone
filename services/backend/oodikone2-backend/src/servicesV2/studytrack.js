@@ -9,9 +9,10 @@ const {
   Organization,
   Studyright,
   StudyrightElement,
-  ElementDetail
-  /* Transfers */
+  ElementDetail,
+  Transfer
 } = require('../modelsV2')
+const { getAssociations } = require('./studyrights')
 const { ThesisCourse, ThesisTypeEnums } = require('../models/models_kone')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { semesterStart, semesterEnd } = require('../util/semester')
@@ -402,10 +403,8 @@ const nationalitiesFromClass = async studentnumbers => {
   }, {})
 }
 
-// TODO: RECONSIDER
-const tranferredToStudyprogram = async (/* studentnumbers, startDate, studytrack, endDate */) => {
-  return 0
-  /* return Transfers.count({
+const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, endDate) => {
+  return Transfer.count({
     where: {
       studentnumber: {
         [Op.in]: studentnumbers
@@ -417,13 +416,11 @@ const tranferredToStudyprogram = async (/* studentnumbers, startDate, studytrack
     },
     distinct: true,
     col: 'studentnumber'
-  }) */
+  })
 }
 
-// TODO: RECONSIDER
-const transferredFromStudyprogram = async (/* studentnumbers, startDate, studytrack, endDate */) => {
-  return 0
-  /* return Transfers.count({
+const transferredFromStudyprogram = async (studentnumbers, startDate, studytrack, endDate) => {
+  return Transfer.count({
     where: {
       studentnumber: {
         [Op.in]: studentnumbers
@@ -435,7 +432,7 @@ const transferredFromStudyprogram = async (/* studentnumbers, startDate, studytr
     },
     distinct: true,
     col: 'studentnumber'
-  }) */
+  })
 }
 
 const formatCreditsForProductivity = credits => {
@@ -509,17 +506,17 @@ const startedStudyright = async (studentnumbers, startDate, studytrack, endDate)
   })
 }
 
-const statsForClass = async (studentnumbers, startDate, studytrack, endDate) => {
+const statsForClass = async (studentnumbers, startDate, studyprogramme, endDate) => {
   return Promise.all([
     creditsAfter(studentnumbers, startDate),
-    graduationsFromClass(studentnumbers, studytrack),
-    thesesFromClass(studentnumbers, startDate, studytrack),
+    graduationsFromClass(studentnumbers, studyprogramme),
+    thesesFromClass(studentnumbers, startDate, studyprogramme),
     gendersFromClass(studentnumbers),
-    tranferredToStudyprogram(studentnumbers, startDate, studytrack, endDate),
+    tranferredToStudyprogram(studentnumbers, startDate, studyprogramme, endDate),
     nationalitiesFromClass(studentnumbers),
-    transferredFromStudyprogram(studentnumbers, startDate, studytrack, new Date()),
-    cancelledStudyright(studentnumbers, startDate, studytrack, endDate),
-    startedStudyright(studentnumbers, startDate, studytrack, endDate)
+    transferredFromStudyprogram(studentnumbers, startDate, studyprogramme, new Date()),
+    cancelledStudyright(studentnumbers, startDate, studyprogramme, endDate),
+    startedStudyright(studentnumbers, startDate, studyprogramme, endDate)
   ])
 }
 
@@ -531,7 +528,12 @@ const getYears = since => {
   return years
 }
 
-const throughputStatsForStudytrack = async (studytrack, since) => {
+const throughputStatsForStudytrack = async (studyprogramme, since) => {
+  const associations = await getAssociations()
+  const studyprogrammeYears = associations.programmes[studyprogramme]
+    ? associations.programmes[studyprogramme].enrollmentStartYears
+    : {}
+
   const totals = {
     credits: {
       mte30: 0,
@@ -552,9 +554,12 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
     cancelled: 0,
     started: 0
   }
+
+  const stTotals = {}
+
   const years = getYears(since)
   // studyprogramme starts with K if bachelors and M if masters
-  const graduationTimeLimit = studytrack[0] === 'K' ? 36 : 24
+  const graduationTimeLimit = studyprogramme[0] === 'K' ? 36 : 24
   const median = values => {
     if (values.length === 0) return 0
 
@@ -573,15 +578,125 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
       const endDate = `${moment(year, 'YYYY')
         .add(1, 'years')
         .format('YYYY')}-${semesterEnd['SPRING']}`
+      const studytracks = studyprogrammeYears[year] ? Object.keys(studyprogrammeYears[year].studyTracks) : []
+      const studytrackdata = await studytracks.reduce(async (acc, curr) => {
+        const previousData = await acc
+        const studentnumbers = await studentnumbersWithAllStudyrightElements(
+          [studyprogramme, curr],
+          startDate,
+          endDate,
+          false,
+          false
+        )
+        const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(
+          studyprogramme,
+          startDate,
+          studentnumbers
+        )
+        const [
+          credits,
+          graduated,
+          theses,
+          genders,
+          transferredTo,
+          nationalities,
+          transferredFrom,
+          cancelled,
+          started
+        ] = await statsForClass(studentnumbers, startDate, studyprogramme, endDate)
+        delete genders[null]
+        const creditValues = credits.reduce(
+          (acc, curr) => {
+            acc.mte30 = curr >= 30 ? acc.mte30 + 1 : acc.mte30
+            acc.mte60 = curr >= 60 ? acc.mte60 + 1 : acc.mte60
+            acc.mte90 = curr >= 90 ? acc.mte90 + 1 : acc.mte90
+            acc.mte120 = curr >= 120 ? acc.mte120 + 1 : acc.mte120
+            acc.mte150 = curr >= 150 ? acc.mte150 + 1 : acc.mte150
+            return acc
+          },
+          { mte30: 0, mte60: 0, mte90: 0, mte120: 0, mte150: 0 }
+        )
+
+        if (!stTotals[curr]) {
+          stTotals[curr] = {
+            credits: {
+              mte30: 0,
+              mte60: 0,
+              mte90: 0,
+              mte120: 0,
+              mte150: 0
+            },
+            genders: {},
+            thesisM: 0,
+            thesisB: 0,
+            students: 0,
+            graduated: 0,
+            inTargetTime: 0,
+            transferred: 0,
+            nationalities: {},
+            transferredFrom: 0,
+            cancelled: 0,
+            started: 0
+          }
+        }
+
+        Object.keys(stTotals[curr].credits).forEach(key => {
+          stTotals[curr].credits[key] += creditValues[key]
+        })
+        Object.keys(genders).forEach(genderKey => {
+          stTotals[curr].genders[genderKey] = stTotals[curr].genders[genderKey]
+            ? stTotals[curr].genders[genderKey] + Number(genders[genderKey])
+            : Number(genders[genderKey])
+        })
+        Object.keys(nationalities).forEach(nationality => {
+          if (!stTotals[curr].nationalities[nationality]) stTotals[curr].nationalities[nationality] = 0
+          stTotals[curr].nationalities[nationality] += nationalities[nationality]
+        })
+        const graduationTimes = graduated.map(g => moment(g.enddate).diff(g.studystartdate, 'months'))
+        const inTargetTime = graduationTimes.filter(time => time <= graduationTimeLimit).length
+        allGraduationTimes = [...allGraduationTimes, ...graduationTimes]
+
+        stTotals[curr].thesisM = theses.MASTER ? stTotals[curr].thesisM + theses.MASTER : stTotals[curr].thesisM
+        stTotals[curr].thesisB = theses.BACHELOR ? stTotals[curr].thesisB + theses.BACHELOR : stTotals[curr].thesisB
+        stTotals[curr].students = stTotals[curr].students + credits.length
+        stTotals[curr].graduated = stTotals[curr].graduated + graduated.length
+        stTotals[curr].medianGraduationTime = median(allGraduationTimes)
+        stTotals[curr].inTargetTime = stTotals[curr].inTargetTime + inTargetTime
+        stTotals[curr].transferred = stTotals[curr].transferred + transferredTo
+        stTotals[curr].transferredFrom += transferredFrom
+        stTotals[curr].cancelled += cancelled
+        stTotals[curr].started += started
+        return {
+          ...previousData,
+          [curr]: {
+            year: `${year}-${year + 1}`,
+            credits: credits.map(cr => (cr === null ? 0 : cr)),
+            creditsForStudyprogramme: creditsForStudyprogramme,
+            graduated: graduated.length,
+            medianGraduationTime: median(graduationTimes),
+            inTargetTime,
+            thesisM: theses.MASTER || 0,
+            thesisB: theses.BACHELOR || 0,
+            genders,
+            creditValues,
+            transferred: transferredTo,
+            nationalities,
+            transferredFrom,
+            cancelled,
+            started
+          }
+        }
+      }, {})
+
       const studentnumbers = await studentnumbersWithAllStudyrightElements(
-        [studytrack],
+        [studyprogramme],
         startDate,
         endDate,
         false,
         false
       )
       const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(
-        studytrack,
+        studyprogramme,
         startDate,
         studentnumbers
       )
@@ -595,7 +710,7 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
         transferredFrom,
         cancelled,
         started
-      ] = await statsForClass(studentnumbers, startDate, studytrack, endDate)
+      ] = await statsForClass(studentnumbers, startDate, studyprogramme, endDate)
       // theres so much shit in the data that transefferFrom doesnt rly mean anything
       delete genders[null]
       const creditValues = credits.reduce(
@@ -650,11 +765,12 @@ const throughputStatsForStudytrack = async (studytrack, since) => {
         nationalities,
         transferredFrom,
         cancelled,
-        started
+        started,
+        studytrackdata
       }
     })
   )
-  return { id: studytrack, status: null, data: { years: arr, totals } }
+  return { id: studyprogramme, status: null, data: { years: arr, totals, stTotals } }
 }
 
 module.exports = {
