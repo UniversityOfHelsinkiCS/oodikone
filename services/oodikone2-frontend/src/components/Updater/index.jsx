@@ -31,7 +31,7 @@ const Updater = () => {
   useEffect(() => {
     statusRef.current = cancelablePromise(
       (async () => {
-        if (process.env.NODE_ENV !== 'staging') {
+        if (process.env.TAG !== 'staging') {
           const result = await callApi('/updater/status', 'get')
           setStatuses(result.data)
         }
