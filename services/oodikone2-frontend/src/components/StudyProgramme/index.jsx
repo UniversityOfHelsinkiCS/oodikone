@@ -74,7 +74,9 @@ const StudyProgramme = props => {
     if (filteredStudytracks.length > 0) {
       panes.push({
         menuItem: 'Studytrack overview',
-        render: () => <StudyTrackOverview studyprogramme={studyProgrammeId} history={props.history} />
+        render: () => (
+          <StudyTrackOverview studyprogramme={studyProgrammeId} history={props.history} admin={props.isAdmin} />
+        )
       })
     }
     panes.push(
