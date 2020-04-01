@@ -4,6 +4,7 @@ import { func, object, string, arrayOf, bool, shape } from 'prop-types'
 import { Segment, Header, Message, Tab, Accordion } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { flattenDeep, intersection } from 'lodash'
+import scrollToComponent from 'react-scroll-to-component'
 
 import selectors from '../../selectors/populationDetails'
 import { getTotalCreditsFromCourses, flattenStudyrights } from '../../common'
@@ -116,6 +117,36 @@ class PopulationDetails extends Component {
     accordionView: bool.isRequired
   }
 
+  constructor() {
+    super()
+    this.creditGraphRef = React.createRef()
+    this.creditGainRef = React.createRef()
+    this.courseTableRef = React.createRef()
+    this.studentTableRef = React.createRef()
+  }
+
+  state = {
+    activeIndex: []
+  }
+
+  handleClick = index => {
+    this.setState(prevState => {
+      const indexes = [...prevState.activeIndex].sort()
+      if (indexes.includes(index)) {
+        indexes.splice(indexes.findIndex(ind => ind === index), 1)
+      } else {
+        indexes.push(index)
+        const refs = [this.creditGraphRef, this.creditGainRef, this.courseTableRef, this.studentTableRef]
+        // oh god no, another haxy solution
+        setTimeout(() => {
+          scrollToComponent(refs[index].current, { align: 'bottom' })
+        }, 1)
+      }
+
+      return { activeIndex: indexes }
+    })
+  }
+
   renderCreditGainGraphs = () => {
     const { samples, translate, selectedStudents, accordionView } = this.props
     const { CreditAccumulationGraph } = infoTooltips.PopulationStatistics
@@ -181,49 +212,62 @@ class PopulationDetails extends Component {
       return <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
     }
 
-    const { query, selectedStudents, selectedStudentsByYear, accordionView } = this.props
+    const { query, selectedStudents, selectedStudentsByYear } = this.props
+    const accordionView = true
 
     const panels = [
       {
         key: 0,
         title: `${translate('populationStatistics.graphSegmentHeader')} (for ${selectedStudents.length} students)`,
+        onTitleClick: () => this.handleClick(0),
         content: {
-          content: this.renderCreditGainGraphs()
+          content: <div ref={this.creditGraphRef}>{this.renderCreditGainGraphs()}</div>
         }
       },
       {
         key: 1,
         title: 'Credit statistics',
+        onTitleClick: () => this.handleClick(1),
         content: {
           content: !query.years && (
-            <CourseStatisticsSegment
-              accordionView={accordionView}
-              samples={samples}
-              selectedStudents={selectedStudents}
-              translate={translate}
-            />
+            <div ref={this.creditGainRef}>
+              <CourseStatisticsSegment
+                accordionView={accordionView}
+                samples={samples}
+                selectedStudents={selectedStudents}
+                translate={translate}
+              />
+            </div>
           )
         }
       },
       {
         key: 2,
         title: 'Courses of population',
+        onTitleClick: () => this.handleClick(2),
         content: {
           content: (
-            <PopulationCourses
-              selectedStudents={selectedStudents}
-              selectedStudentsByYear={selectedStudentsByYear}
-              query={query}
-              accordionView={accordionView}
-            />
+            <div ref={this.courseTableRef}>
+              <PopulationCourses
+                selectedStudents={selectedStudents}
+                selectedStudentsByYear={selectedStudentsByYear}
+                query={query}
+                accordionView={accordionView}
+              />
+            </div>
           )
         }
       },
       {
         key: 3,
         title: `Students (${selectedStudents.length})`,
+        onTitleClick: () => this.handleClick(3),
         content: {
-          content: <PopulationStudents accordionView={accordionView} />
+          content: (
+            <div ref={this.studentTableRef}>
+              <PopulationStudents accordionView={accordionView} />
+            </div>
+          )
         }
       }
     ]
@@ -231,8 +275,7 @@ class PopulationDetails extends Component {
     if (accordionView)
       return (
         <>
-          {/* <PopulationFilters samples={samples} exclude={this.getExcludedFilters()} /> */}
-          <Accordion exclusive={false} styled fluid panels={panels} />
+          <Accordion activeIndex={this.state.activeIndex} exclusive={false} styled fluid panels={panels} />
         </>
       )
 
