@@ -129,6 +129,14 @@ class PopulationDetails extends Component {
     activeIndex: []
   }
 
+  componentDidUpdate = (prevProps, prevState) => {
+    if (prevState.activeIndex.length < this.state.activeIndex.length) {
+      const foundIndex = this.state.activeIndex.find(index => !prevState.activeIndex.includes(index))
+      const refs = [this.creditGraphRef, this.creditGainRef, this.courseTableRef, this.studentTableRef]
+      scrollToComponent(refs[foundIndex].current, { align: 'bottom' })
+    }
+  }
+
   handleClick = index => {
     this.setState(prevState => {
       const indexes = [...prevState.activeIndex].sort()
@@ -136,11 +144,6 @@ class PopulationDetails extends Component {
         indexes.splice(indexes.findIndex(ind => ind === index), 1)
       } else {
         indexes.push(index)
-        const refs = [this.creditGraphRef, this.creditGainRef, this.courseTableRef, this.studentTableRef]
-        // oh god no, another haxy solution
-        setTimeout(() => {
-          scrollToComponent(refs[index].current, { align: 'bottom' })
-        }, 1)
       }
 
       return { activeIndex: indexes }
@@ -212,8 +215,7 @@ class PopulationDetails extends Component {
       return <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
     }
 
-    const { query, selectedStudents, selectedStudentsByYear } = this.props
-    const accordionView = true
+    const { query, selectedStudents, selectedStudentsByYear, accordionView } = this.props
 
     const panels = [
       {
