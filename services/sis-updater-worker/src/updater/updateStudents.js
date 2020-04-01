@@ -41,7 +41,7 @@ const updateStudents = async personIds => {
       'id'
     )
   ).reduce((res, [id, snapshots]) => {
-    const orderedSnapshots = orderBy(snapshots, s => Number(s.modification_ordinal), 'desc')
+    const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'desc')
     res[id] = orderedSnapshots.filter((currentSnapshot, i) => {
       if (i === 0) return true
       return !isEqual(currentSnapshot.accepted_selection_path, orderedSnapshots[i - 1].accepted_selection_path)
@@ -199,18 +199,16 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
       if (!mainStudyRightEducation) return res
 
       const snapshotStudyRightElements = []
-      const orderedSnapshots = orderBy(snapshots, s => s.modification_ordinal, 'asc')
-      orderedSnapshots.forEach((snapshot, i) => {
+      const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
+      orderedSnapshots.forEach(snapshot => {
         const ordinal = snapshot.modification_ordinal
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
 
-        const startDate = i === 0 ? snapshot.valid.startDate : snapshot.snapshot_date_time
+        const startDate = snapshot.valid.startDate
         const endDate =
           snapshot.study_right_graduation && snapshot.study_right_graduation.phase1GraduationDate
             ? snapshot.study_right_graduation.phase1GraduationDate
-            : i === orderedSnapshots.length - 1
-            ? snapshot.valid.endDate
-            : orderedSnapshots[i + 1].snapshot_date_time
+            : snapshot.valid.endDate
 
         if (isBaMa(mainStudyRightEducation)) {
           const [baProgramme, baStudytrack] = mapStudyrightElements(
@@ -226,16 +224,10 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           const [maProgramme, maStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-2`,
             ordinal,
-            snapshot.study_right_graduation
-              ? i === 0
-                ? snapshot.study_right_graduation.phase1GraduationDate
-                : snapshot.snapshot_date_time
-              : null,
-            i === orderedSnapshots.length - 1
-              ? snapshot.study_right_graduation && snapshot.study_right_graduation.phase2GraduationDate
-                ? snapshot.study_right_graduation.phase2GraduationDate
-                : snapshot.valid.endDate
-              : orderedSnapshots[i + 1].snapshot_date_time,
+            snapshot.study_right_graduation ? snapshot.study_right_graduation.phase1GraduationDate : null,
+            snapshot.study_right_graduation && snapshot.study_right_graduation.phase2GraduationDate
+              ? snapshot.study_right_graduation.phase2GraduationDate
+              : snapshot.valid.endDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2ChildGroupId]
@@ -266,71 +258,59 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
 }
 
 const updateTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
-  const getTransfersAndElementsFrom = (orderedSnapshots, studyrightid, educationId) => {
-    return orderedSnapshots.reduce(
-      (curr, snapshot, i) => {
-        if (i === 0) return curr
+  const getTransfersFrom = (orderedSnapshots, studyrightid, educationId) => {
+    return orderedSnapshots.reduce((curr, snapshot, i) => {
+      if (i === 0) return curr
 
-        const studyRightEducation = getEducation(educationId)
-        if (!studyRightEducation) return curr
+      const studyRightEducation = getEducation(educationId)
+      if (!studyRightEducation) return curr
 
-        const usePhase2 =
-          isBaMa(studyRightEducation) && !!get(orderedSnapshots[i - 1], 'study_right_graduation.phase1GraduationDate')
+      const usePhase2 =
+        isBaMa(studyRightEducation) && !!get(orderedSnapshots[i - 1], 'study_right_graduation.phase1GraduationDate')
 
-        if (usePhase2 && !get(orderedSnapshots[i - 1], 'accepted_selection_path.educationPhase2GroupId')) return curr
+      if (usePhase2 && !get(orderedSnapshots[i - 1], 'accepted_selection_path.educationPhase2GroupId')) return curr
 
-        const [transfers, elements] = curr
+      const mappedId = isBaMa(studyRightEducation)
+        ? usePhase2 && !!get(snapshot, 'accepted_selection_path.educationPhase2GroupId')
+          ? `${studyrightid}-2`
+          : `${studyrightid}-1`
+        : studyrightid
 
-        const mappedId = isBaMa(studyRightEducation)
-          ? usePhase2 && !!get(snapshot, 'accepted_selection_path.educationPhase2GroupId')
-            ? `${studyrightid}-2`
-            : `${studyrightid}-1`
-          : studyrightid
-
-        const sourcecode =
-          moduleGroupIdToCode[
-            orderedSnapshots[i - 1].accepted_selection_path[
-              usePhase2 ? 'educationPhase2GroupId' : 'educationPhase1GroupId'
-            ]
+      const sourcecode =
+        moduleGroupIdToCode[
+          orderedSnapshots[i - 1].accepted_selection_path[
+            usePhase2 ? 'educationPhase2GroupId' : 'educationPhase1GroupId'
           ]
+        ]
 
-        const targetcode =
-          moduleGroupIdToCode[
-            snapshot.accepted_selection_path[
-              usePhase2 && has(snapshot, 'accepted_selection_path.educationPhase2GroupId')
-                ? 'educationPhase2GroupId'
-                : 'educationPhase1GroupId'
-            ]
+      const targetcode =
+        moduleGroupIdToCode[
+          snapshot.accepted_selection_path[
+            usePhase2 && has(snapshot, 'accepted_selection_path.educationPhase2GroupId')
+              ? 'educationPhase2GroupId'
+              : 'educationPhase1GroupId'
           ]
+        ]
 
-        if (!sourcecode || !targetcode) return curr
+      if (!sourcecode || !targetcode) return curr
 
-        transfers.push({
-          id: `${mappedId}-${snapshot.modification_ordinal}-${sourcecode}-${targetcode}`,
-          sourcecode,
-          targetcode,
-          transferdate: new Date(snapshot.snapshot_date_time),
-          studentnumber: personIdToStudentNumber[snapshot.person_id],
-          studyrightid: mappedId
-        })
+      curr.push({
+        id: `${mappedId}-${snapshot.modification_ordinal}-${sourcecode}-${targetcode}`,
+        sourcecode,
+        targetcode,
+        transferdate: new Date(snapshot.snapshot_date_time),
+        studentnumber: personIdToStudentNumber[snapshot.person_id],
+        studyrightid: mappedId
+      })
 
-        return [transfers, elements]
-      },
-      [[], []]
-    )
+      return curr
+    }, [])
   }
 
   const transfers = []
-  const elements = []
   Object.values(groupedStudyRightSnapshots).forEach(snapshots => {
-    const orderedSnapshots = orderBy(snapshots, s => s.modification_ordinal, 'asc')
-    const [studyRightTransfers, studyRightElements] = getTransfersAndElementsFrom(
-      orderedSnapshots,
-      snapshots[0].id,
-      snapshots[0].education_id
-    )
-    transfers.push(...studyRightTransfers)
-    elements.push(...studyRightElements)
+    const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
+    transfers.push(...getTransfersFrom(orderedSnapshots, snapshots[0].id, snapshots[0].education_id))
   })
 
   await bulkCreate(Transfer, transfers)
