@@ -195,6 +195,7 @@ const scheduleHourly = async () => {
     ) {
       return
     }
+    await redisSet(REDIS_LAST_HOURLY_SCHEDULE, new Date())
 
     // Update meta that have changed between now and the last update
     await scheduleMeta(false)
@@ -205,13 +206,12 @@ const scheduleHourly = async () => {
     await redisSet(REDIS_TOTAL_STUDENTS_DONE_KEY, 0)
     await redisSet(REDIS_TOTAL_STUDENTS_KEY, personsToUpdate.length)
     await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students'))
-
-    await redisSet(REDIS_LAST_HOURLY_SCHEDULE, new Date())
   } catch (e) {
     logger.error({ message: 'Hourly scheduling failed', meta: e.stack })
   }
 }
 
+/* TODO: Set date to redis */
 const scheduleWeekly = async () => {
   try {
     await scheduleMeta()
@@ -222,6 +222,7 @@ const scheduleWeekly = async () => {
 }
 
 const schedulePurge = async () => {
+  /* TODO: Check that weekly has been scheduled (1 week?) and that updater isn't running */
   const TABLES_TO_PURGE = [
     'course',
     'course_providers',
