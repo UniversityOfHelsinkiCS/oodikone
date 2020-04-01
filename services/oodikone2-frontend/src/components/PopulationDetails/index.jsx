@@ -1,9 +1,11 @@
 import React, { Component, useCallback } from 'react'
 import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool, shape } from 'prop-types'
-import { Segment, Header, Message, Tab, Accordion } from 'semantic-ui-react'
+import { Segment, Header, Message, Tab, Accordion, Popup } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { flattenDeep, intersection } from 'lodash'
+import scrollToComponent from 'react-scroll-to-component'
+import ReactMarkdown from 'react-markdown'
 
 import selectors from '../../selectors/populationDetails'
 import { getTotalCreditsFromCourses, flattenStudyrights } from '../../common'
@@ -116,6 +118,39 @@ class PopulationDetails extends Component {
     accordionView: bool.isRequired
   }
 
+  constructor() {
+    super()
+    this.creditGraphRef = React.createRef()
+    this.creditGainRef = React.createRef()
+    this.courseTableRef = React.createRef()
+    this.studentTableRef = React.createRef()
+  }
+
+  state = {
+    activeIndex: []
+  }
+
+  componentDidUpdate = (prevProps, prevState) => {
+    if (prevState.activeIndex.length < this.state.activeIndex.length) {
+      const foundIndex = this.state.activeIndex.find(index => !prevState.activeIndex.includes(index))
+      const refs = [this.creditGraphRef, this.creditGainRef, this.courseTableRef, this.studentTableRef]
+      scrollToComponent(refs[foundIndex].current, { align: 'bottom' })
+    }
+  }
+
+  handleClick = index => {
+    this.setState(prevState => {
+      const indexes = [...prevState.activeIndex].sort()
+      if (indexes.includes(index)) {
+        indexes.splice(indexes.findIndex(ind => ind === index), 1)
+      } else {
+        indexes.push(index)
+      }
+
+      return { activeIndex: indexes }
+    })
+  }
+
   renderCreditGainGraphs = () => {
     const { samples, translate, selectedStudents, accordionView } = this.props
     const { CreditAccumulationGraph } = infoTooltips.PopulationStatistics
@@ -182,48 +217,159 @@ class PopulationDetails extends Component {
     }
 
     const { query, selectedStudents, selectedStudentsByYear, accordionView } = this.props
+    const { Students, CreditStatistics, CoursesOf, CreditAccumulationGraph } = infoTooltips.PopulationStatistics
 
     const panels = [
       {
         key: 0,
-        title: `${translate('populationStatistics.graphSegmentHeader')} (for ${selectedStudents.length} students)`,
+        title: {
+          content: (
+            <>
+              {this.state.activeIndex.includes(0) ? (
+                <>
+                  {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
+                </>
+              ) : (
+                <Popup
+                  trigger={
+                    <span style={{ paddingRight: '70vw', paddingTop: '1vh', paddingBottom: '1vh' }}>
+                      {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
+                    </span>
+                  }
+                  position="top center"
+                  offset="0, 50px"
+                  wide="very"
+                >
+                  <Popup.Content>
+                    {' '}
+                    <ReactMarkdown source={CreditAccumulationGraph} escapeHtml={false} />
+                  </Popup.Content>
+                </Popup>
+              )}
+            </>
+          )
+        },
+        onTitleClick: () => this.handleClick(0),
         content: {
-          content: this.renderCreditGainGraphs()
+          content: <div ref={this.creditGraphRef}>{this.renderCreditGainGraphs()}</div>
         }
       },
       {
         key: 1,
-        title: 'Credit statistics',
+        title: {
+          content: (
+            <>
+              {this.state.activeIndex.includes(1) ? (
+                <>Credit statistics</>
+              ) : (
+                <Popup
+                  trigger={
+                    <span style={{ paddingRight: '70vw', paddingTop: '1vh', paddingBottom: '1vh' }}>
+                      Credit statistics
+                    </span>
+                  }
+                  position="top center"
+                  offset="0, 50px"
+                  wide="very"
+                >
+                  <Popup.Content>
+                    {' '}
+                    <ReactMarkdown source={CreditStatistics} escapeHtml={false} />
+                  </Popup.Content>
+                </Popup>
+              )}
+            </>
+          )
+        },
+        onTitleClick: () => this.handleClick(1),
         content: {
           content: !query.years && (
-            <CourseStatisticsSegment
-              accordionView={accordionView}
-              samples={samples}
-              selectedStudents={selectedStudents}
-              translate={translate}
-            />
+            <div ref={this.creditGainRef}>
+              <CourseStatisticsSegment
+                accordionView={accordionView}
+                samples={samples}
+                selectedStudents={selectedStudents}
+                translate={translate}
+              />
+            </div>
           )
         }
       },
       {
         key: 2,
-        title: 'Courses of population',
+        title: {
+          content: (
+            <>
+              {this.state.activeIndex.includes(2) ? (
+                <>Courses of population</>
+              ) : (
+                <Popup
+                  trigger={
+                    <span style={{ paddingRight: '70vw', paddingTop: '1vh', paddingBottom: '1vh' }}>
+                      Courses of population
+                    </span>
+                  }
+                  position="top center"
+                  offset="0, 50px"
+                  wide="very"
+                >
+                  <Popup.Content>
+                    {' '}
+                    <ReactMarkdown source={CoursesOf} escapeHtml={false} />
+                  </Popup.Content>
+                </Popup>
+              )}
+            </>
+          )
+        },
+        onTitleClick: () => this.handleClick(2),
         content: {
           content: (
-            <PopulationCourses
-              selectedStudents={selectedStudents}
-              selectedStudentsByYear={selectedStudentsByYear}
-              query={query}
-              accordionView={accordionView}
-            />
+            <div ref={this.courseTableRef}>
+              <PopulationCourses
+                selectedStudents={selectedStudents}
+                selectedStudentsByYear={selectedStudentsByYear}
+                query={query}
+                accordionView={accordionView}
+              />
+            </div>
           )
         }
       },
       {
         key: 3,
-        title: `Students (${selectedStudents.length})`,
+        title: {
+          content: (
+            <>
+              {this.state.activeIndex.includes(3) ? (
+                <>Students ({selectedStudents.length})</>
+              ) : (
+                <Popup
+                  trigger={
+                    <span style={{ paddingRight: '70vw', paddingTop: '1vh', paddingBottom: '1vh' }}>
+                      Students ({selectedStudents.length})
+                    </span>
+                  }
+                  position="top center"
+                  offset="0, 50px"
+                  wide="very"
+                >
+                  <Popup.Content>
+                    {' '}
+                    <ReactMarkdown source={Students} escapeHtml={false} />
+                  </Popup.Content>
+                </Popup>
+              )}
+            </>
+          )
+        },
+        onTitleClick: () => this.handleClick(3),
         content: {
-          content: <PopulationStudents accordionView={accordionView} />
+          content: (
+            <div ref={this.studentTableRef}>
+              <PopulationStudents accordionView={accordionView} />
+            </div>
+          )
         }
       }
     ]
@@ -231,8 +377,7 @@ class PopulationDetails extends Component {
     if (accordionView)
       return (
         <>
-          {/* <PopulationFilters samples={samples} exclude={this.getExcludedFilters()} /> */}
-          <Accordion exclusive={false} styled fluid panels={panels} />
+          <Accordion activeIndex={this.state.activeIndex} exclusive={false} styled fluid panels={panels} />
         </>
       )
 
