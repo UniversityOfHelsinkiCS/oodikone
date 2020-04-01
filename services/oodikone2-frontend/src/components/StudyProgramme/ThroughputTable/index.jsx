@@ -83,7 +83,8 @@ const ThroughputTable = ({
   studytrack,
   userRoles,
   history,
-  newProgramme
+  newProgramme,
+  isStudytrackView
 }) => {
   const [lowerYear, setLower] = useState(null)
   const [upperYear, setUpper] = useState(null)
@@ -91,15 +92,16 @@ const ThroughputTable = ({
 
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
 
-  const years = data
-    ? data
-        .map(stats => ({
-          key: stats.year.substring(0, 4),
-          text: stats.year,
-          value: stats.year.substring(0, 4)
-        }))
-        .sort((year1, year2) => Number(year2.value) - Number(year1.value))
-    : []
+  const years =
+    data && !isStudytrackView
+      ? data
+          .map(stats => ({
+            key: stats.year.substring(0, 4),
+            text: stats.year,
+            value: stats.year.substring(0, 4)
+          }))
+          .sort((year1, year2) => Number(year2.value) - Number(year1.value))
+      : []
 
   if (error) return <h1>Oh no so error {error}</h1>
 
@@ -203,7 +205,6 @@ const ThroughputTable = ({
       </Table.Cell>
     )
   }
-
   return (
     <React.Fragment>
       <Header>
@@ -294,9 +295,15 @@ const ThroughputTable = ({
                 <Table.Row key={year.year}>
                   <Table.Cell>
                     {year.year}
-                    <PopulationStatisticsLink studytrack={studytrack} studyprogramme={studyprogramme} year={year.year}>
-                      <Icon name="level up alternate" />
-                    </PopulationStatisticsLink>
+                    {!isStudytrackView && (
+                      <PopulationStatisticsLink
+                        studytrack={studytrack}
+                        studyprogramme={studyprogramme}
+                        year={year.year}
+                      >
+                        <Icon name="level up alternate" />
+                      </PopulationStatisticsLink>
+                    )}
                   </Table.Cell>
                   <Table.Cell>{year.credits.length}</Table.Cell>
                   {genders.map(gender => (
@@ -332,7 +339,7 @@ const ThroughputTable = ({
               <Table.Row>
                 <Table.HeaderCell style={{ fontWeight: 'bold' }}>
                   Total{' '}
-                  {newProgramme && years.length > 0 && years.length < 5 ? (
+                  {newProgramme && !isStudytrackView && years.length > 0 && years.length < 5 ? (
                     <TotalPopulationLink confirm studyprogramme={studyprogramme} studytrack={studytrack} years={years}>
                       <Icon name="level up alternate" />
                     </TotalPopulationLink>
@@ -439,13 +446,15 @@ ThroughputTable.propTypes = {
   error: bool.isRequired,
   userRoles: arrayOf(string).isRequired,
   history: shape({}).isRequired,
-  newProgramme: bool.isRequired
+  newProgramme: bool.isRequired,
+  isStudytrackView: bool
 }
 
 ThroughputTable.defaultProps = {
   throughput: null,
   thesis: undefined,
-  studytrack: ''
+  studytrack: '',
+  isStudytrackView: false
 }
 
 const mapStateToProps = ({
