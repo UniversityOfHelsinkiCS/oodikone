@@ -89,9 +89,7 @@ const purge = async ({ table, before }) => {
       updatedAt: {
         [Op.lt]: new Date(before)
       }
-    },
-    // We trust that Oodi won't delete more than 1000 entities from a table in a week...
-    limit: 1000
+    }
   })
 
   logger.info({
