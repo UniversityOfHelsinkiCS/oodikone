@@ -31,8 +31,10 @@ const Updater = () => {
   useEffect(() => {
     statusRef.current = cancelablePromise(
       (async () => {
-        const result = await callApi('/updater/status', 'get')
-        setStatuses(result.data)
+        if (process.env.TAG !== 'staging') {
+          const result = await callApi('/updater/status', 'get')
+          setStatuses(result.data)
+        }
       })()
     )
     return () => {
