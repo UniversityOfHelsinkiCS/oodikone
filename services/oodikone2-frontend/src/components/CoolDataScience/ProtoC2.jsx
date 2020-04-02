@@ -83,15 +83,24 @@ const changeSeries = (chart, categories, series) => {
 const makeConfig = (organisations, sorter, type = 'column') => {
   const orgSeries = [
     {
+      color: '#7f8c8d',
+      name: 'tällä hetkellä peruutettu',
+      data: organisations.map(org => ({
+        y: org.currentlyCancelled,
+        // pass % of total as z so we can display it in the tooltip
+        z: org.currentlyCancelled / org.totalStudents
+      }))
+    },
+    {
       color: '#ff7979',
       name: 'ei tahdissa',
       data: organisations.map(org => ({
         custom: {
           orgCode: org.code
         },
-        y: org.totalStudents - org.students3y - org.students4y,
+        y: org.totalStudents - org.students3y - org.students4y - org.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
-        z: (org.totalStudents - org.students3y - org.students4y) / org.totalStudents
+        z: (org.totalStudents - org.students3y - org.students4y - org.currentlyCancelled) / org.totalStudents
       }))
     },
     {
@@ -143,12 +152,21 @@ const makeConfig = (organisations, sorter, type = 'column') => {
                 const programmes = [...org.programmes].sort(sorter)
                 changeSeries(chart, programmes.map(p => p.name), [
                   {
+                    color: '#7f8c8d',
+                    name: 'tällä hetkellä peruutettu',
+                    data: programmes.map(p => ({
+                      y: p.currentlyCancelled,
+                      // pass % of total as z so we can display it in the tooltip
+                      z: p.currentlyCancelled / p.totalStudents
+                    }))
+                  },
+                  {
                     color: '#ff7979',
                     name: 'ei tahdissa',
                     data: programmes.map(p => ({
-                      y: p.totalStudents - p.students3y - p.students4y,
+                      y: p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled,
                       // pass % of total as z so we can display it in the tooltip
-                      z: (p.totalStudents - p.students3y - p.students4y) / p.totalStudents
+                      z: (p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled) / p.totalStudents
                     }))
                   },
                   {
@@ -180,12 +198,13 @@ const makeConfig = (organisations, sorter, type = 'column') => {
   })
 }
 
-const countNotInTarget = org => org.totalStudents - org.students4y - org.students3y
+const countNotInTarget = org => org.totalStudents - org.students4y - org.students3y - org.currentlyCancelled
 const sorters = {
   nimi: (a, b) => a.name.localeCompare(b.name),
   '4v tahti': (a, b) => a.students4y - b.students4y,
   '3v tahti': (a, b) => a.students3y - b.students3y,
-  'ei tahdissa': (a, b) => countNotInTarget(a) - countNotInTarget(b)
+  'ei tahdissa': (a, b) => countNotInTarget(a) - countNotInTarget(b),
+  peruutettu: (a, b) => a.currentlyCancelled - b.currentlyCancelled
 }
 
 const OrgChart = React.memo(({ orgs, sorter, isSideways }) => {
@@ -204,12 +223,14 @@ OrgChart.propTypes = {
       students3y: PropTypes.number,
       students4y: PropTypes.number,
       totalStudents: PropTypes.number,
+      currentlyCancelled: PropTypes.number,
       programmes: PropTypes.arrayOf(
         PropTypes.shape({
           name: PropTypes.string,
           students3y: PropTypes.number,
           students4y: PropTypes.number,
-          totalStudents: PropTypes.number
+          totalStudents: PropTypes.number,
+          currentlyCancelled: PropTypes.number
         })
       ).isRequired
     })
@@ -225,25 +246,28 @@ const ProtoC = () => {
   const [sortDir, setSortDir] = useState(1)
 
   const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
+  const [excludeNonEnrolled, setExcludeNonEnrolled] = useState(false)
 
   useEffect(() => {
     const load = async () => {
       setLoading(true)
-      const res = await callApi(
-        '/cool-data-science/proto-c-data',
-        'get',
-        null,
-        includeOldAttainments ? { include_old_attainments: 'true' } : undefined
-      )
+      const res = await callApi('/cool-data-science/proto-c-data', 'get', null, {
+        include_old_attainments: includeOldAttainments.toString(),
+        exclude_non_enrolled: excludeNonEnrolled.toString()
+      })
       setData(res.data)
       setLoading(false)
     }
 
     load()
-  }, [includeOldAttainments])
+  }, [includeOldAttainments, excludeNonEnrolled])
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
+  }, [])
+
+  const handleExcludeNonEnrolledToggled = useCallback(() => {
+    setExcludeNonEnrolled(previous => !previous)
   }, [])
 
   const currentSorter = useCallback((a, b) => sorters[sorter](a, b) * sortDir, [sorter, sortDir])
@@ -256,6 +280,12 @@ const ProtoC = () => {
     <Segment>
       <div style={{ display: 'flex' }}>
         <h3>Prototyyppi: Tavoiteaikaerittely, 2017-2019 aloittaneet</h3>
+        <Checkbox
+          style={{ marginLeft: 'auto' }}
+          label="Include only at least once enrolled students"
+          onChange={handleExcludeNonEnrolledToggled}
+          checked={excludeNonEnrolled}
+        />
         <Checkbox
           style={{ marginLeft: 'auto' }}
           label="Include old attainments"
