@@ -233,7 +233,7 @@ const ThroughputTable = ({
         <Table celled structured compact striped selectable className="fixed-header">
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell rowSpan="2">Year</Table.HeaderCell>
+              <Table.HeaderCell rowSpan="2">{isStudytrackView ? 'Studytrack' : 'Year'}</Table.HeaderCell>
               {renderStudentsHeader()}
               {headerCellPopUp(
                 'Started',
