@@ -49,7 +49,6 @@ const PopulationStatistics = memo(props => {
 
   const renderPopulationSearch = () => {
     const { Main } = infoTooltips.PopulationStatistics
-    console.log(!'')
     const title =
       populationFound && history.location.search
         ? translate('populationStatistics.foundTitle')
