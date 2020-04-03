@@ -43,7 +43,7 @@ const targetCreditsForStartDate = startDate => {
 }
 
 const getTargetStudentCounts = _.memoize(
-  async ({ includeOldAttainments }) => {
+  async ({ includeOldAttainments, excludeNonEnrolled }) => {
     return await sequelize.query(
       `
     SELECT
@@ -59,6 +59,10 @@ const getTargetStudentCounts = _.memoize(
                 TIMESTAMP '2020-07-31',
                 ss.credits,
                 CASE
+                    -- HAX: instead of trying to guess which category the student is in if 
+                    --      the studyright is currently cancelled, just make the target HUGE
+                    --      so we can subtract these from the non-goal students
+                    WHEN ss.currently_cancelled = 1 THEN 999999999
                     WHEN ss.studystartdate = '2017-07-31 21:00:00+00' THEN 180
                     WHEN ss.studystartdate = '2018-07-31 21:00:00+00' THEN 120
                     WHEN ss.studystartdate = '2019-07-31 21:00:00+00' THEN 60
@@ -73,13 +77,18 @@ const getTargetStudentCounts = _.memoize(
                 TIMESTAMP '2021-07-31',
                 ss.credits,
                 CASE
+                    -- HAX: instead of trying to guess which category the student is in if 
+                    --      the studyright is currently cancelled, just make the target HUGE
+                    --      so we can subtract these from the non-goal students
+                    WHEN ss.currently_cancelled = 1 THEN 999999999
                     WHEN ss.studystartdate = '2017-07-31 21:00:00+00' THEN 180
                     WHEN ss.studystartdate = '2018-07-31 21:00:00+00' THEN 120
                     WHEN ss.studystartdate = '2019-07-31 21:00:00+00' THEN 60
                     ELSE 999999999
                 END
             )
-        ) "students4y"
+        ) "students4y",
+        SUM(ss.currently_cancelled) "currentlyCancelled"
     FROM (
         SELECT
             org_code,
@@ -88,7 +97,11 @@ const getTargetStudentCounts = _.memoize(
             programme_name,
             studystartdate,
             studentnumber,
-            SUM(credits) credits
+            SUM(credits) credits,
+            CASE
+                WHEN SUM(currently_cancelled) > 0 THEN 1
+                ELSE 0
+            END currently_cancelled
         FROM (
             SELECT
                 org.code org_code,
@@ -97,11 +110,43 @@ const getTargetStudentCounts = _.memoize(
                 element_details.name->>'fi' programme_name,
                 studyright.studystartdate studystartdate,
                 studyright.student_studentnumber studentnumber,
-                credit.credits credits
+                credit.credits credits,
+                CASE
+                    WHEN studyright.canceldate IS NOT NULL AND studyright.graduated != 1 THEN 1
+                    ELSE 0
+                END currently_cancelled
             FROM
                 organization org
+                ${
+                  excludeNonEnrolled
+                    ? `
+                -- only pick studyrights during which the student has enrolled at least once, whether it's
+                -- a present or non-present enrollment
+                INNER JOIN (
+                  SELECT DISTINCT -- remove duplicate join rows from se with DISTINCT
+                      studyright.*
+                  FROM
+                      studyright
+                      INNER JOIN (
+                          SELECT
+                              studentnumber,
+                              startdate
+                          FROM
+                              semester_enrollments
+                              INNER JOIN semesters
+                                  ON semester_enrollments.semestercode = semesters.semestercode
+                      ) se
+                          ON se.studentnumber = studyright.student_studentnumber
+                  WHERE
+                      se.startdate IS NOT NULL
+                      AND se.startdate >= studyright.studystartdate
+                ) studyright
+                    ON org.code = studyright.faculty_code`
+                    : `
                 INNER JOIN studyright
-                    ON org.code = studyright.faculty_code
+                      ON org.code = studyright.faculty_code`
+                }
+                
                 INNER JOIN (
                     -- HACK: fix updater writing duplicates where enddate has changed
                     SELECT DISTINCT ON (studyrightid, startdate, code, studentnumber)
@@ -143,7 +188,7 @@ const getTargetStudentCounts = _.memoize(
       }
     )
   },
-  ({ includeOldAttainments }) => JSON.stringify(includeOldAttainments)
+  args => JSON.stringify(args)
 )
 
 const get3yStudentsWithDrilldownPerYear = _.memoize(async startDate => {
@@ -483,7 +528,8 @@ router.get(
   '/proto-c-data',
   withErr(async (req, res) => {
     const data = await getTargetStudentCounts({
-      includeOldAttainments: req.query.include_old_attainments === 'true'
+      includeOldAttainments: req.query.include_old_attainments === 'true',
+      excludeNonEnrolled: req.query.exclude_non_enrolled === 'true'
     })
     const mankelid = _(data)
       // seems to return the numerical columns as strings, parse them first
@@ -492,7 +538,8 @@ router.get(
         programmeTotalStudents: parseInt(programmeRow.programmeTotalStudents, 10),
         students3y: parseInt(programmeRow.students3y, 10),
         // 4y group includes 3y group, make 4y count exclusive:
-        students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10)
+        students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10),
+        currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10)
       }))
       .groupBy(r => r.orgCode)
       .mapValues(rows => ({
@@ -502,19 +549,22 @@ router.get(
         totalStudents: _.sumBy(rows, row => row.programmeTotalStudents),
         students3y: _.sumBy(rows, row => row.students3y),
         students4y: _.sumBy(rows, row => row.students4y),
+        currentlyCancelled: _.sumBy(rows, row => row.currentlyCancelled),
         programmes: rows.map(
           ({
             programmeCode: code,
             programmeName: name,
             programmeTotalStudents: totalStudents,
             students3y,
-            students4y
+            students4y,
+            currentlyCancelled
           }) => ({
             code,
             name,
             totalStudents,
             students3y,
-            students4y
+            students4y,
+            currentlyCancelled
           })
         )
       }))
