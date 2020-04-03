@@ -85,14 +85,23 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
 
   const series = [
     {
+      color: '#7f8c8d',
+      name: 'tällä hetkellä peruutettu',
+      data: sortedOrgs.map(org => ({
+        y: org.currentlyCancelled,
+        // pass % of total as z so we can display it in the tooltip
+        z: org.currentlyCancelled / org.totalStudents
+      }))
+    },
+    {
       color: '#ff7979',
       name: 'ei tahdissa',
       data: sortedOrgs.map(org => ({
         custom: {
           orgCode: org.code
         },
-        y: org.totalStudents - org.students3y - org.students4y,
-        z: (org.totalStudents - org.students3y - org.students4y) / org.totalStudents
+        y: org.totalStudents - org.students3y - org.students4y - org.currentlyCancelled,
+        z: (org.totalStudents - org.students3y - org.students4y - org.currentlyCancelled) / org.totalStudents
       }))
     },
     {
@@ -141,11 +150,20 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
 const makeDrilldownConfig = org => {
   const series = [
     {
+      color: '#7f8c8d',
+      name: 'tällä hetkellä peruutettu',
+      data: orgprogrammes.map(p => ({
+        y: p.currentlyCancelled,
+        // pass % of total as z so we can display it in the tooltip
+        z: p.currentlyCancelled / p.totalStudents
+      }))
+    },
+    {
       color: '#ff7979',
       name: 'ei tahdissa',
       data: org.programmes.map(p => ({
-        y: p.totalStudents - p.students3y - p.students4y,
-        z: (p.totalStudents - p.students3y - p.students4y) / p.totalStudents
+        y: p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled,
+        z: (p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled) / p.totalStudents
       }))
     },
 
@@ -183,12 +201,13 @@ const makeDrilldownConfig = org => {
   })
 }
 
-const countNotInTarget = org => org.totalStudents - org.students4y - org.students3y
+const countNotInTarget = org => org.totalStudents - org.students4y - org.students3y - org.currentlyCancelled
 const sorters = {
   nimi: (a, b) => a.name.localeCompare(b.name),
   '4v tahti': (a, b) => a.students4y / a.totalStudents - b.students4y / b.totalStudents,
   '3v tahti': (a, b) => a.students3y / a.totalStudents - b.students3y / b.totalStudents,
-  'ei tahdissa': (a, b) => countNotInTarget(a) / a.totalStudents - countNotInTarget(b) / b.totalStudents
+  'ei tahdissa': (a, b) => countNotInTarget(a) / a.totalStudents - countNotInTarget(b) / b.totalStudents,
+  peruutettu: (a, b) => a.currentlyCancelled / a.totalStudents - b.currentlyCancelled / b.totalStudents
 }
 
 const OrgChart = React.memo(({ orgs, onOrgClicked }) => {
@@ -235,25 +254,28 @@ const ProtoC = () => {
   const [drilldownOrg, setDrilldownOrg] = useState(null)
 
   const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
+  const [excludeNonEnrolled, setExcludeNonEnrolled] = useState(false)
 
   useEffect(() => {
     const load = async () => {
       setLoading(true)
-      const res = await callApi(
-        '/cool-data-science/proto-c-data',
-        'get',
-        null,
-        includeOldAttainments ? { include_old_attainments: 'true' } : undefined
-      )
+      const res = await callApi('/cool-data-science/proto-c-data', 'get', null, {
+        include_old_attainments: includeOldAttainments.toString(),
+        exclude_non_enrolled: excludeNonEnrolled.toString()
+      })
       setData(res.data)
       setLoading(false)
     }
 
     load()
-  }, [includeOldAttainments])
+  }, [includeOldAttainments, excludeNonEnrolled])
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
+  }, [])
+
+  const handleExcludeNonEnrolledToggled = useCallback(() => {
+    setExcludeNonEnrolled(previous => !previous)
   }, [])
 
   const handleOrgClicked = useCallback(org => {
@@ -268,6 +290,12 @@ const ProtoC = () => {
     <Segment>
       <div style={{ display: 'flex' }}>
         <h3>Prototyyppi: Suhteellinen tavoiteaikaerittely, 2017-2019 aloittaneet</h3>
+        <Checkbox
+          style={{ marginLeft: 'auto' }}
+          label="Include only at least once enrolled students"
+          onChange={handleExcludeNonEnrolledToggled}
+          checked={excludeNonEnrolled}
+        />
         <Checkbox
           style={{ marginLeft: 'auto' }}
           label="Include old attainments"
