@@ -152,7 +152,7 @@ const makeDrilldownConfig = org => {
     {
       color: '#7f8c8d',
       name: 'tällä hetkellä peruutettu',
-      data: orgprogrammes.map(p => ({
+      data: org.programmes.map(p => ({
         y: p.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
         z: p.currentlyCancelled / p.totalStudents
