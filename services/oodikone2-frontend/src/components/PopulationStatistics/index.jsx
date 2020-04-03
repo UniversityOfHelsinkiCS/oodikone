@@ -49,14 +49,16 @@ const PopulationStatistics = memo(props => {
 
   const renderPopulationSearch = () => {
     const { Main } = infoTooltips.PopulationStatistics
-    const title = populationFound
-      ? translate('populationStatistics.foundTitle')
-      : translate('populationStatistics.searchTitle')
+    console.log(!'')
+    const title =
+      populationFound && history.location.search
+        ? translate('populationStatistics.foundTitle')
+        : translate('populationStatistics.searchTitle')
     return (
       <Segment>
         <Header size="medium">
           {title}
-          {!populationFound && <InfoBox content={Main} />}
+          {(!populationFound || !history.location.search) && <InfoBox content={Main} />}
         </Header>
         <PopulationSearchForm onProgress={onProgress} />
         <Divider />
