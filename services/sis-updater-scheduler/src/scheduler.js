@@ -15,7 +15,8 @@ const {
   REDIS_TOTAL_STUDENTS_DONE_KEY,
   REDIS_LAST_HOURLY_SCHEDULE,
   REDIS_LATEST_MESSAGE_RECEIVED,
-  LATEST_MESSAGE_RECEIVED_THRESHOLD
+  LATEST_MESSAGE_RECEIVED_THRESHOLD,
+  REDIS_LAST_WEEKLY_SCHEDULE
 } = require('./config')
 const { logger } = require('./utils/logger')
 
@@ -185,18 +186,27 @@ const scheduleByStudentNumbers = async studentNumbers => {
   await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students'))
 }
 
+const isUpdaterActive = async () => {
+  const latestUpdaterHandledMessage = await redisGet(REDIS_LATEST_MESSAGE_RECEIVED)
+  return (
+    latestUpdaterHandledMessage &&
+    new Date().getTime() - new Date(latestUpdaterHandledMessage).getTime() <= LATEST_MESSAGE_RECEIVED_THRESHOLD
+  )
+}
+
+const hasWeeklyBeenScheduled = async () => {
+  const lastWeeklySchedule = await redisGet(REDIS_LAST_WEEKLY_SCHEDULE)
+  const lastHourlySchedule = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
+
+  return (
+    lastWeeklySchedule &&
+    lastHourlySchedule &&
+    new Date(lastWeeklySchedule).getTime() > new Date(lastHourlySchedule).getTime()
+  )
+}
+
 const scheduleHourly = async () => {
   try {
-    // If updater is currently running, then return
-    const latestUpdaterHandledMessage = await redisGet(REDIS_LATEST_MESSAGE_RECEIVED)
-    if (
-      latestUpdaterHandledMessage &&
-      new Date().getTime() - new Date(latestUpdaterHandledMessage).getTime() <= LATEST_MESSAGE_RECEIVED_THRESHOLD
-    ) {
-      return
-    }
-    await redisSet(REDIS_LAST_HOURLY_SCHEDULE, new Date())
-
     // Update meta that have changed between now and the last update
     await scheduleMeta(false)
 
@@ -211,7 +221,6 @@ const scheduleHourly = async () => {
   }
 }
 
-/* TODO: Set date to redis */
 const scheduleWeekly = async () => {
   try {
     await scheduleMeta()
@@ -222,7 +231,6 @@ const scheduleWeekly = async () => {
 }
 
 const schedulePurge = async () => {
-  /* TODO: Check that weekly has been scheduled (1 week?) and that updater isn't running */
   const TABLES_TO_PURGE = [
     'course',
     'course_providers',
@@ -266,5 +274,7 @@ module.exports = {
   scheduleHourly,
   scheduleWeekly,
   schedulePurge,
-  scheduleByStudentNumbers
+  scheduleByStudentNumbers,
+  isUpdaterActive,
+  hasWeeklyBeenScheduled
 }
