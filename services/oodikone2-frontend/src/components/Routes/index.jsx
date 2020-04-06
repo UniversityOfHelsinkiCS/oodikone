@@ -71,7 +71,7 @@ const Routes = () => (
       <Route exact path={routes.coursepopulation} component={CoursePopulation} />
       <Route exact path={routes.custompopulation} component={CustomPopulation} />
       <Route exact path={routes.updater} component={Updater} />
-      <Route exact path={routes.cooldatascience} component={CoolDataScience} />
+      <Route path={routes.cooldatascience} component={CoolDataScience} />
       <Redirect to="/" />
     </Switch>
   </Suspense>
