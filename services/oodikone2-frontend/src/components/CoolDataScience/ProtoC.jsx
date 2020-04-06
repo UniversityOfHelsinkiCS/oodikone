@@ -71,7 +71,7 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
     serie.point = {
       events: {
         click: e => {
-          const clickedOrg = sortedOrgs.find(org => org.code === e.point.custom.orgCode)
+          const clickedOrg = sortedOrgs.find(org => e.point && e.point.custom && org.code === e.point.custom.orgCode)
           if (clickedOrg) {
             // use setImmediate so the click handler can finish
             // before datamangels begins so that the browser is responsive
