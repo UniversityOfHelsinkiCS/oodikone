@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { string, func, shape, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { uniqBy } from 'lodash'
-import { Dropdown, Button, Tab } from 'semantic-ui-react'
+import { Dropdown, Tab, Message } from 'semantic-ui-react'
 import ThroughputTable from '../ThroughputTable'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
@@ -14,7 +14,6 @@ const Overview = props => {
   const [throughputData, setData] = useState(null)
   const [studytrackOptions, setStudytrackOptions] = useState([])
   const [yearOptions, setYearOptions] = useState([])
-  const [showTabView, setShow] = useState(false)
 
   const {
     language,
@@ -23,8 +22,7 @@ const Overview = props => {
     dispatchGetProductivity,
     dispatchGetThroughput,
     history,
-    studyprogrammes,
-    admin
+    studyprogrammes
   } = props
 
   useEffect(() => {
@@ -32,6 +30,7 @@ const Overview = props => {
     dispatchGetThroughput(studyprogramme)
   }, [])
 
+  // set dropdown options
   useEffect(() => {
     if (throughput.data[studyprogramme]) {
       const years = Object.keys(studyprogrammes[studyprogramme].enrollmentStartYears)
@@ -57,6 +56,7 @@ const Overview = props => {
     }
   }, [throughput, studyprogrammes])
 
+  // mankel throughput data after selecting studytrack
   useEffect(() => {
     if (throughput.data[studyprogramme] && selectedTrack) {
       if (throughput.data[studyprogramme].data[0].studytrackdata) {
@@ -75,6 +75,7 @@ const Overview = props => {
     }
   }, [selectedTrack])
 
+  // mankel throughput data after selecting a year
   useEffect(() => {
     if (throughput.data[studyprogramme] && selectedYear) {
       if (throughput.data[studyprogramme].data[0].studytrackdata) {
@@ -91,6 +92,7 @@ const Overview = props => {
           const newStudyTrackObject = {
             ...selectedYearData.studytrackdata[curr],
             // oh pls no, pls fix asap
+            // need to fix logic in throughputtable component so that we can name this better
             year: `${studytrack.name[language]}, ${curr}`
           }
           acc.push(newStudyTrackObject)
@@ -125,74 +127,34 @@ const Overview = props => {
     setYear(value)
   }
 
-  const renderStudytrackDropdown = () => (
-    <>
-      {admin && (
-        <Button content={showTabView ? 'show no tab view' : ' show tab view'} onClick={() => setShow(!showTabView)} />
-      )}
-      <h4>Studytrack</h4>
-      <Dropdown
-        options={studytrackOptions}
-        onChange={handleStudytrackChange}
-        selection
-        placeholder="Select studytrack"
-        search={textAndDescriptionSearch}
-        fluid
-      />
-    </>
-  )
-
-  const renderYearDropdown = () => (
-    <>
-      <Button content={showTabView ? 'show no tab view' : 'show tab view'} onClick={() => setShow(!showTabView)} />
-      <h4>Year</h4>
-      <Dropdown
-        options={yearOptions}
-        onChange={handleYearChange}
-        selection
-        placeholder="Select studytrack"
-        search={textAndDescriptionSearch}
-        fluid
-      />
-    </>
-  )
-
-  const renderStudytrackTable = () => {
-    if (!throughputData)
-      return (
-        <>
-          {renderStudytrackDropdown()}
-          <h2>No studytrack selected</h2>
-        </>
-      )
+  const renderDropdown = year => {
     return (
-      <React.Fragment>
-        {renderStudytrackDropdown()}
-        <ThroughputTable
-          throughput={throughputData}
-          thesis={throughput.data.thesis}
-          loading={throughput.pending}
-          error={throughput.error}
-          studyprogramme={studyprogramme}
-          studytrack={selectedTrack}
-          history={history}
-          newProgramme={isNewHYStudyProgramme(studyprogramme)}
+      <>
+        <h4>{year ? 'Year' : 'Studytrack'} selection</h4>
+        <Dropdown
+          options={year ? yearOptions : studytrackOptions}
+          onChange={year ? handleYearChange : handleStudytrackChange}
+          selection
+          placeholder={`Select ${year ? 'year' : ' studytrack'}`}
+          search={textAndDescriptionSearch}
+          fluid
         />
-      </React.Fragment>
+      </>
     )
   }
 
-  const renderYearTable = () => {
-    if (!throughputData)
+  const renderTable = year => {
+    if (!throughputData) {
       return (
         <>
-          {renderYearDropdown()}
-          <h2>No year selected</h2>
+          {renderDropdown(year)}
+          <h2>No {year ? 'year' : 'studytrack'} selected</h2>
         </>
       )
+    }
     return (
       <React.Fragment>
-        {renderYearDropdown()}
+        {renderDropdown(year)}
         <ThroughputTable
           throughput={throughputData}
           thesis={throughput.data.thesis}
@@ -202,7 +164,7 @@ const Overview = props => {
           studytrack={selectedTrack}
           history={history}
           newProgramme={isNewHYStudyProgramme(studyprogramme)}
-          isStudytrackView
+          isStudytrackView={year}
         />
       </React.Fragment>
     )
@@ -216,41 +178,23 @@ const Overview = props => {
 
   const panes = [
     {
-      menuItem: 'Studytrack specific',
-      render: () => renderStudytrackTable()
+      menuItem: 'Year specific',
+      render: () => renderTable(true)
     },
     {
-      menuItem: 'Year specific',
-      render: () => renderYearTable()
+      menuItem: 'Studytrack specific',
+      render: () => renderTable(false)
     }
   ]
 
-  if (showTabView && admin) {
-    return <Tab panes={panes} onTabChange={() => handleTabChange()} />
-  }
-
-  if (!throughputData)
-    return (
-      <>
-        {renderStudytrackDropdown()}
-        <h2>No studytrack selected</h2>
-      </>
-    )
-
   return (
-    <React.Fragment>
-      {renderStudytrackDropdown()}
-      <ThroughputTable
-        throughput={throughputData}
-        thesis={throughput.data.thesis}
-        loading={throughput.pending}
-        error={throughput.error}
-        studyprogramme={studyprogramme}
-        studytrack={selectedTrack}
-        history={history}
-        newProgramme={isNewHYStudyProgramme(studyprogramme)}
+    <>
+      <Message
+        content="Here you can see statistics on studytrack level. In year specific tab you can compare statistics for all studytracks within selected year. 
+                  In studytrack specific tab you can compare different years from one selected studytrack."
       />
-    </React.Fragment>
+      <Tab panes={panes} onTabChange={() => handleTabChange()} />
+    </>
   )
 }
 
@@ -265,8 +209,7 @@ Overview.propTypes = {
     error: bool,
     pending: bool,
     data: shape({})
-  }).isRequired, // eslint-disable-line
-  admin: bool.isRequired
+  }).isRequired // eslint-disable-line
 }
 
 const mapStateToProps = ({ studyProgrammeThroughput, populationDegreesAndProgrammes, settings }) => ({
