@@ -60,15 +60,23 @@ export default {
     CreditsBeforeStudyright: `Suodattaa pois opiskelijat joilla vähemmän opintopisteitä ennen kyseisessä ohjelmassa aloittamista`,
     StudytrackFilter: `Palauttaa opiskelijat joilla on valittu kyseinen suuntautumisvaihtoehto`
   },
-  CreditAccumulationGraph: `Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina. Kun
+  CreditAccumulationGraph: {
+    AccordionTitle: ` **Credit accumulation graph**
+    Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina.`,
+    Infobox: `Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina. Kun
     hiiren vie kuvaajien päälle, saa näkyviin jokaista kuvaajaa vastaavan opiskelijanumeron. Opiskelijanumeron
     yhteydessä olevaa ympyrää klikkaamalla siirtyy ”student statistics” puolelle ja näkee valitun opiskelijan
     opintotiedot.
     <br>
     X-akselin skaalaa voi säätää harmaista painikkeista ”1m”, ”3m”, ”6m”, ”YTD”, ”1y” ja ”ALL” tai kuvaajan alla
     olevan sinisen näkymän harmaita ”kahvoja” siirtämällä. Y-akselin skaalaa voi säätää harmaista painikkeista
-    ”small” ”medium” ja "large”`,
-  CoursesOf: `Courses of population
+    ”small” ”medium” ja "large”`
+  },
+  CoursesOf: {
+    AccordionTitle: `**Courses of population**
+    <br> <br>
+    Tämä taulukko sisältää kaikkien populaatioon liittyvien opiskelijoiden kaikki kurssisuoritukset.`,
+    Infobox: `Courses of population
     <br> <br>
     Tämä taulukko sisältää kaikkien populaatioon liittyvien opiskelijoiden kaikki kurssisuoritukset.
     <br> <br>
@@ -93,8 +101,12 @@ export default {
     **grades** arvosanajakauma
     <br> <br>
     **when passed** kurssisuorituksen ajankohdan. Huom.! ”passed” sarakkeen kokonaissumma ei välttämättä 
-    täsmää puolivuosi-lukumäärien summan kanssa, johtuen tuplakirjauksista Oodissa.`,
-  Students: `**Students:** harmaata "show" painiketta klikkaamalla saa listan kaikista populaation opiskelijoista
+    täsmää puolivuosi-lukumäärien summan kanssa, johtuen tuplakirjauksista Oodissa.`
+  },
+  Students: {
+    AccordionTitle: `**Students:** Taulukko näyttää oletusarvoisesti vain 
+    opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.`,
+    Infobox: `**Students:** harmaata "show" painiketta klikkaamalla saa listan kaikista populaation opiskelijoista
     (huom. suodattimet vaikuttavat tähän listaan!). Taulukko näyttää oletusarvoisesti vain 
     opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
     <br> <br>
@@ -122,14 +134,18 @@ export default {
     <br> <br>
     **Download**:  klikkaamalla tätä harmaata kuvaketta, saa ladattua .xlsx tiedoston, 
     joka sisältää kaikki "General" ja "Mandatory Courses" välilehtien tiedot.
-    `,
-  CreditStatistics: `Opintopistekertymä-kategoria skaalautuvat valitun tarkastelujakson mukaan. 
+    `
+  },
+  CreditStatistics: {
+    AccordionTitle: `**Credit Statistics** Opintopistekertymä-kategoria skaalautuvat valitun tarkastelujakson mukaan. `,
+    Infobox: `Opintopistekertymä-kategoria skaalautuvat valitun tarkastelujakson mukaan. 
     Jos tarkastelujaksoksi valitsee 12 kuukautta, ylin kategoria on 55 opintopistettä tai yli, 
     eli opiskelija etenee tavoiteajassa. Taulukosta näkee silmäyksellä tavoiteajassa etenevät (ylin kategoria) 
     ja myös esim. nollasuorittajat. Huom.! nollasuorittajissa on mukana myös poissaolevaksi ilmoittautuneet, 
     ellei heitä ole erikseen suodattanut populaatiosta pois. Kategorioita voi myös itsessään käyttää suodattimina, 
     eli klikkaamalla haluamaansa kategoriaa saa näkyviin vain sen kategorian opiskelijat. 
-    Tämä suodatin löytyy ”Filters” otsikon alta ja sen voi poistaa klikkaamalla mustaa rastia.`,
+    Tämä suodatin löytyy ”Filters” otsikon alta ja sen voi poistaa klikkaamalla mustaa rastia.`
+  },
   ProgrammeDistributionCustomPopulation: `Näyttää opiskelijan viimeisimmän koulutusohjelman`,
   ProgrammeDistributionCoursePopulation: `Näyttää sen koulutusohjelman, jossa opiskelija oli suorittaessaan kurssin`,
   GradeDistributionCoursePopulation: `Näyttää korkeimman arvosanan, jonka opiskelija on saanut valitulla aikavälillä.`,

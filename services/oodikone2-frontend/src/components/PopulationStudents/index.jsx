@@ -748,7 +748,7 @@ class PopulationStudents extends Component {
         <Ref innerRef={this.handleRef}>
           <>
             {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
-            <InfoBox content={Students} />
+            <InfoBox content={Students.Infobox} />
             {this.renderStudentTable()}
           </>
         </Ref>
@@ -769,7 +769,7 @@ class PopulationStudents extends Component {
                 {toggleLabel}
               </Button>
               {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
-              <InfoBox content={Students} />
+              <InfoBox content={Students.Infobox} />
             </Header>
           )}
           {this.renderStudentTable()}
