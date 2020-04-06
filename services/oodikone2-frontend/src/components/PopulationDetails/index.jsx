@@ -50,7 +50,7 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate, accordi
     return (
       <>
         <Header>
-          <InfoBox content={CreditStatistics} />
+          <InfoBox content={CreditStatistics.Infobox} />
         </Header>
         {samples && (
           <Tab
@@ -75,7 +75,7 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate, accordi
     <Segment>
       <Header size="medium" dividing>
         {translate('populationStatistics.creditStatisticsHeader')}
-        <InfoBox content={CreditStatistics} />
+        <InfoBox content={CreditStatistics.Infobox} />
       </Header>
       {samples && (
         <Tab
@@ -169,7 +169,7 @@ class PopulationDetails extends Component {
       return (
         <>
           <Header>
-            <InfoBox content={CreditAccumulationGraph} />
+            <InfoBox content={CreditAccumulationGraph.Infobox} />
           </Header>
           {samples.length > 0 && graphs}
         </>
@@ -179,7 +179,7 @@ class PopulationDetails extends Component {
       <Segment>
         <Header size="medium" dividing>
           {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
-          <InfoBox content={CreditAccumulationGraph} />
+          <InfoBox content={CreditAccumulationGraph.Infobox} />
         </Header>
         {samples.length > 0 && graphs}
       </Segment>
@@ -242,7 +242,7 @@ class PopulationDetails extends Component {
                 >
                   <Popup.Content>
                     {' '}
-                    <ReactMarkdown source={CreditAccumulationGraph} escapeHtml={false} />
+                    <ReactMarkdown source={CreditAccumulationGraph.AccordionTitle} escapeHtml={false} />
                   </Popup.Content>
                 </Popup>
               )}
@@ -274,7 +274,7 @@ class PopulationDetails extends Component {
                 >
                   <Popup.Content>
                     {' '}
-                    <ReactMarkdown source={CreditStatistics} escapeHtml={false} />
+                    <ReactMarkdown source={CreditStatistics.AccordionTitle} escapeHtml={false} />
                   </Popup.Content>
                 </Popup>
               )}
@@ -286,7 +286,7 @@ class PopulationDetails extends Component {
           content: !query.years && (
             <div ref={this.creditGainRef}>
               <CourseStatisticsSegment
-                accordionView={accordionView}
+                accordionView={accordionView.AccordionTitle}
                 samples={samples}
                 selectedStudents={selectedStudents}
                 translate={translate}
@@ -315,7 +315,7 @@ class PopulationDetails extends Component {
                 >
                   <Popup.Content>
                     {' '}
-                    <ReactMarkdown source={CoursesOf} escapeHtml={false} />
+                    <ReactMarkdown source={CoursesOf.AccordionTitle} escapeHtml={false} />
                   </Popup.Content>
                 </Popup>
               )}
@@ -356,7 +356,7 @@ class PopulationDetails extends Component {
                 >
                   <Popup.Content>
                     {' '}
-                    <ReactMarkdown source={Students} escapeHtml={false} />
+                    <ReactMarkdown source={Students.AccordionTitle} escapeHtml={false} />
                   </Popup.Content>
                 </Popup>
               )}

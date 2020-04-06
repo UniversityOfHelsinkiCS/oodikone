@@ -53,7 +53,7 @@ const PopulationCourses = ({
     return (
       <>
         <Header>
-          <InfoBox content={CoursesOf} />
+          <InfoBox content={CoursesOf.Infobox} />
         </Header>
         <SegmentDimmer translate={translate} isLoading={pending} />
         <PopulationCourseStats
@@ -78,7 +78,7 @@ const PopulationCourses = ({
               wide
               position="top left"
             />
-            <InfoBox content={CoursesOf} />
+            <InfoBox content={CoursesOf.Infobox} />
           </Header>
         )}
         <SegmentDimmer translate={translate} isLoading={pending} />
