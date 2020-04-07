@@ -398,7 +398,7 @@ class PopulationCourseStats extends Component {
     const getTableHeader = () => (
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell colSpan="3" content={translate('populationCourses.course')} />
+          <Table.HeaderCell colSpan="4" content={translate('populationCourses.course')} />
           {getSortableHeaderCell(translate('populationCourses.students'), tableColumnNames.STUDENTS, 2)}
           <Table.HeaderCell colSpan="3" content={translate('populationCourses.passed')} />
           <Table.HeaderCell colSpan="2" content={translate('populationCourses.failed')} />
@@ -406,7 +406,7 @@ class PopulationCourseStats extends Component {
           <Table.HeaderCell colSpan="2" content={translate('populationCourses.percentageOfPopulation')} />
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell colSpan="2" content={translate('populationCourses.name')} />
+          <Table.HeaderCell colSpan="3" content={translate('populationCourses.name')} />
           {this.renderCodeFilterInputHeaderCell()}
           {getSortableHeaderCell(translate('populationCourses.number'), tableColumnNames.PASSED)}
           {getSortableHeaderCell(translate('populationCourses.passedAfterRetry'), tableColumnNames.RETRY_PASSED)}
@@ -435,14 +435,30 @@ class PopulationCourseStats extends Component {
         passedOfPopulation,
         triedOfPopulation
       } = stats
+      const isActive = this.isActiveCourse(course)
       return (
-        <Table.Row key={code} active={this.isActiveCourse(course)}>
-          <Table.Cell
-            onClick={() => this.onCourseNameCellClick(code)}
-            content={getTextIn(name, language)}
-            className="clickableCell"
+        <Table.Row key={code} active={isActive}>
+          <Popup
+            trigger={
+              <Table.Cell className="filterCell clickableCell">
+                <Icon onClick={() => this.onCourseNameCellClick(code)} name={isActive ? 'remove' : 'filter'} />
+              </Table.Cell>
+            }
+            content={
+              isActive ? (
+                <span>
+                  Poista rajaus kurssin <b>{getTextIn(name, language).toLowerCase()}</b> perusteella
+                </span>
+              ) : (
+                <span>
+                  Rajaa opiskelijat kurssin <b>{getTextIn(name, language).toLowerCase()}</b> perusteella
+                </span>
+              )
+            }
+            position="top right"
           />
-          <Table.Cell className="iconCell">
+          <Table.Cell content={getTextIn(name, language)} className="nameCell" />
+          <Table.Cell className="iconCell clickableCell">
             <p>
               <Item
                 as={Link}
