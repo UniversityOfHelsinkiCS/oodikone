@@ -12,9 +12,13 @@
   border-left: 0 !important;
 }
 
+.nameCell,
 .iconCell {
   border-left: 0 !important;
-  cursor: pointer;
+}
+
+.filterCell {
+  border-right: 0 !important;
 }
 
 .clickableCell {
