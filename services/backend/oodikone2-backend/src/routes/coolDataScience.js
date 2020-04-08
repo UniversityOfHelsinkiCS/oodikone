@@ -1,6 +1,14 @@
+const axios = require('axios')
 const router = require('express').Router()
 const _ = require('lodash')
+const { ElementDetails, Organisation } = require('../models')
 const { sequelize } = require('../database/connection')
+const { mapToProviders } = require('../util/utils')
+const { USERSERVICE_URL } = require('../conf-backend')
+const userServiceClient = axios.create({
+  baseURL: USERSERVICE_URL,
+  headers: { secret: process.env.USERSERVICE_SECRET }
+})
 
 const STUDYRIGHT_START_DATE = '2017-07-31 21:00:00+00'
 
@@ -401,7 +409,11 @@ const sorters = {
   targetRelative: (a, b) => a.targetStudents / a.totalStudents - b.targetStudents / b.totalStudents
 }
 
-const withErr = handler => (req, res, next) => handler(req, res, next).catch(e => res.status(500).json({ error: e }))
+const withErr = handler => (req, res, next) =>
+  handler(req, res, next).catch(e => {
+    console.log('error', e)
+    res.status(500).json({ error: e })
+  })
 
 // mankel data from:
 /* 
@@ -512,6 +524,27 @@ const mankeliUberData = data =>
     .sort((a, b) => a.name.localeCompare(b.name))
     .value()
 
+const getTotalCreditsOfProvidersBetween = async (a, b, sumAlias) => {
+  return sequelize.query(
+    `
+    SELECT SUM(cr.credits) AS ` +
+    sumAlias + // hax
+      `, cp.providercode FROM credit cr
+      INNER JOIN course co ON cr.course_code = co.code
+      INNER JOIN course_providers cp ON cp.coursecode = co.code
+    WHERE
+      cr.attainment_date BETWEEN :a AND :b
+      AND cr."isStudyModule" = false
+      AND cr.credittypecode IN (4, 9)
+    GROUP BY cp.providercode;
+  `,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: { a, b }
+    }
+  )
+}
+
 router.get(
   '/uber-data',
   withErr(async (req, res) => {
@@ -604,6 +637,89 @@ router.get(
     res.json(
       shouldSort ? data.map(d => ({ ...d, programmes: d.programmes.sort(sorters[sort]) })).sort(sorters[sort]) : data
     )
+  })
+)
+
+router.get(
+  '/status',
+  withErr(async (req, res) => {
+    const Y_TO_MS = 31556952000
+    const { startdate: currentAcademicYearStartTimestamp } = (await sequelize.query(
+      `
+      SELECT startdate FROM SEMESTERS s WHERE yearcode = (SELECT yearcode FROM SEMESTERS WHERE startdate < NOW() ORDER BY startdate DESC LIMIT 1) ORDER BY startdate LIMIT 1;
+      `,
+      {
+        type: sequelize.QueryTypes.SELECT
+      }
+    ))[0]
+
+    const currentAcademicYearStartDate = new Date(currentAcademicYearStartTimestamp)
+    const now = new Date()
+    const [
+      currentYearsCredits,
+      prevYearsCredits,
+      elementDetails,
+      faculties,
+      { data: facultyProgrammes }
+    ] = await Promise.all([
+      getTotalCreditsOfProvidersBetween(currentAcademicYearStartDate, now, 'current'),
+      getTotalCreditsOfProvidersBetween(
+        new Date(currentAcademicYearStartDate.getTime() - Y_TO_MS),
+        new Date(now - Y_TO_MS),
+        'previous'
+      ),
+      ElementDetails.findAll(),
+      Organisation.findAll(),
+      userServiceClient.get('/faculty_programmes')
+    ])
+
+    const facultyCodeToFaculty = faculties.reduce((res, curr) => {
+      res[curr.code] = curr
+      return res
+    }, {})
+
+    const programmeToFaculty = facultyProgrammes.reduce((res, curr) => {
+      res[curr.programme_code] = curr.faculty_code
+      return res
+    }, {})
+
+    const providerToProgramme = elementDetails.reduce((res, curr) => {
+      const p = mapToProviders([curr.code])[0]
+      res[p] = {
+        code: curr.code,
+        name: curr.name
+      }
+      return res
+    }, {})
+
+    const groupedByProvider = _.groupBy([...currentYearsCredits, ...prevYearsCredits], 'providercode')
+
+    const programmesToTotals = Object.keys(groupedByProvider).reduce((res, provider) => {
+      const programme = providerToProgramme[provider]
+      if (programme && programme.code) {
+        res[programme.code] = {
+          totals: Object.assign(...groupedByProvider[provider]),
+          name: programme.name
+        }
+      }
+      return res
+    }, {})
+
+    const result = Object.entries(programmesToTotals).reduce((res, [programme, programmeStats]) => {
+      const facultyCode = programmeToFaculty[programme]
+      if (!facultyCode) return res
+      if (!res[facultyCode]) {
+        res[facultyCode] = { totals: { current: 0, previous: 0 } }
+        res[facultyCode]['programmes'] = {}
+        res[facultyCode].name = facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null
+      }
+      res[facultyCode]['programmes'][programme] = programmeStats
+      res[facultyCode].totals.current += programmeStats.totals.current
+      res[facultyCode].totals.previous += programmeStats.totals.previous
+      return res
+    }, {})
+
+    res.json(result)
   })
 )
 
