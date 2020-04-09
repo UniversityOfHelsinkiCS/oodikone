@@ -61,40 +61,36 @@ const getTargetStudentCounts = _.memoize(
         ss.programme_name "programmeName",
         COUNT(ss.studentnumber) "programmeTotalStudents",
         SUM(
-            public.is_in_target(
-                CURRENT_TIMESTAMP,
-                ss.studystartdate,
-                TIMESTAMP '2020-07-31',
-                ss.credits,
-                CASE
-                    -- HAX: instead of trying to guess which category the student is in if 
-                    --      the studyright is currently cancelled, just make the target HUGE
-                    --      so we can subtract these from the non-goal students
-                    WHEN ss.currently_cancelled = 1 THEN 999999999
-                    WHEN ss.studystartdate = '2017-07-31 21:00:00+00' THEN 180
-                    WHEN ss.studystartdate = '2018-07-31 21:00:00+00' THEN 120
-                    WHEN ss.studystartdate = '2019-07-31 21:00:00+00' THEN 60
-                    ELSE 999999999
-                END
-            )
+             public.is_in_target(
+                 CURRENT_TIMESTAMP,
+                 ss.studystartdate,
+                 public.next_date_occurrence(ss.studystartdate), -- e.g if studystartdate = 2017-07-31 and it's now 2020-02-02, this returns 2020-07-31. However, if it's now 2020-11-01 (we've passed the date already), it returns 2021-07-31.
+                 ss.credits,
+                 CASE
+                     -- HAX: instead of trying to guess which category the student is in if
+                     --      the studyright is currently cancelled, just make the target HUGE
+                     --      so we can subtract these from the non-goal students
+                     WHEN ss.currently_cancelled = 1 THEN 999999999
+                     -- credit target: 60 credits per year since starting
+                     ELSE 60 * ceil(EXTRACT(EPOCH FROM (now() - ss.studystartdate) / 365) / 86400)
+                 END
+             )
         ) "students3y",
         SUM(
-            public.is_in_target(
-                CURRENT_TIMESTAMP,
-                ss.studystartdate,
-                TIMESTAMP '2021-07-31',
-                ss.credits,
-                CASE
-                    -- HAX: instead of trying to guess which category the student is in if 
-                    --      the studyright is currently cancelled, just make the target HUGE
-                    --      so we can subtract these from the non-goal students
-                    WHEN ss.currently_cancelled = 1 THEN 999999999
-                    WHEN ss.studystartdate = '2017-07-31 21:00:00+00' THEN 180
-                    WHEN ss.studystartdate = '2018-07-31 21:00:00+00' THEN 120
-                    WHEN ss.studystartdate = '2019-07-31 21:00:00+00' THEN 60
-                    ELSE 999999999
-                END
-            )
+             public.is_in_target(
+                 CURRENT_TIMESTAMP,
+                 ss.studystartdate,
+                 public.next_date_occurrence(ss.studystartdate),
+                 ss.credits,
+                 CASE
+                     -- HAX: instead of trying to guess which category the student is in if
+                     --      the studyright is currently cancelled, just make the target HUGE
+                     --      so we can subtract these from the non-goal students
+                     WHEN ss.currently_cancelled = 1 THEN 999999999
+                     -- credit target: 45 credits per year since starting
+                     ELSE 45 * ceil(EXTRACT(EPOCH FROM (now() - ss.studystartdate) / 365) / 86400)
+                 END
+             )
         ) "students4y",
         SUM(ss.currently_cancelled) "currentlyCancelled"
     FROM (
@@ -173,6 +169,7 @@ const getTargetStudentCounts = _.memoize(
                         credits
                     FROM credit
                     WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
+                        AND credit."isStudyModule" = false
                         ${
                           includeOldAttainments
                             ? ''
@@ -212,7 +209,7 @@ const get3yStudentsWithDrilldownPerYear = _.memoize(async startDate => {
             public.is_in_target(
                 CURRENT_TIMESTAMP,
                 ss.studystartdate,
-                TIMESTAMP '2020-07-31',
+                next_date_occurrence(ss.studystartdate),
                 ss.credits,
                 :targetCredits
             )
@@ -257,6 +254,7 @@ const get3yStudentsWithDrilldownPerYear = _.memoize(async startDate => {
                         credits
                     FROM credit
                     WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
+                        AND credit."isStudyModule" = false
                         AND credit.attainment_date >= :startDate
                 ) credit
                     ON credit.student_studentnumber = studyright.student_studentnumber
@@ -281,13 +279,27 @@ const get3yStudentsWithDrilldownPerYear = _.memoize(async startDate => {
   )
 })
 
+const isSameDateIgnoringYear = (a, b) =>
+  a.getUTCMonth() === b.getUTCMonth() &&
+  a.getUTCDate() === b.getUTCDate() &&
+  a.getUTCHours() === b.getUTCHours() &&
+  a.getUTCMinutes() === b.getUTCMinutes() &&
+  a.getUTCSeconds() === b.getUTCSeconds() &&
+  a.getUTCMilliseconds() === b.getUTCMilliseconds()
+
 const makeCheckpoints = startDate => {
   const M_TO_MS = 2.628e6 * 1000
   const FOUR_M_TO_MS = M_TO_MS * 4
+  const CHECKPOINT_INTERVAL = FOUR_M_TO_MS
+
   const now = Date.now()
   let checkpoints = []
 
-  for (let ts = startDate.getTime(); ts < now; ts += FOUR_M_TO_MS) {
+  // add start date as first checkpoint but add 1ms since just having the same date
+  // would set the credit target to 0
+  checkpoints.push(new Date(startDate.getTime() + 1))
+
+  for (let ts = startDate.getTime() + CHECKPOINT_INTERVAL; ts < now; ts += CHECKPOINT_INTERVAL) {
     checkpoints.push(new Date(ts))
   }
 
@@ -299,104 +311,115 @@ const makeCheckpoints = startDate => {
     checkpoints.push(new Date())
   }
 
+  // go through all checkpoints excluding first and adjust the ones that are exactly one
+  // year from start date
+  // do this here in the end so we don't need to copypaste isSameDateIgnoringYear
+  // in three places
+  for (let i = 1; i < checkpoints.length; i++) {
+    if (isSameDateIgnoringYear(startDate, checkpoints[i])) {
+      // exactly one year from start date -> set checkpoint to 1ms before so we don't explode in SQL
+      checkpoints[i] = new Date(checkpoints[i].getTime() - 1)
+    }
+  }
+
   return checkpoints
 }
 
 const getUberData = _.memoize(
   async ({ startDate, includeOldAttainments }) => {
-    const creditsTarget = targetCreditsForStartDate(startDate)
     const checkpoints = makeCheckpoints(startDate)
 
     return sequelize.query(
       `
-    SELECT
-        cp "checkpoint",
-        ss.org_code "orgCode",
-        ss.org_name "orgName",
-        ss.programme_code "programmeCode",
-        ss.programme_name "programmeName",
-        COUNT(ss.studentnumber) "programmeTotalStudents",
-        SUM(
-            public.is_in_target(
-                cp,
-                ss.studystartdate,
-                TIMESTAMP '2020-07-31',
-                ss.credits,
-                $1
-            )
-        ) "students3y",
-        SUM(
-          public.is_in_target(
+      SELECT
+          cp "checkpoint",
+          ss.org_code "orgCode",
+          ss.org_name "orgName",
+          ss.programme_code "programmeCode",
+          ss.programme_name "programmeName",
+          COUNT(ss.studentnumber) "programmeTotalStudents",
+          SUM(
+              public.is_in_target(
+                  cp,
+                  ss.studystartdate,
+                  public.next_date_occurrence(ss.studystartdate, cp),
+                  ss.credits,
+                  60 * ceil(EXTRACT(EPOCH FROM (cp - ss.studystartdate) / 365) / 86400)
+              )
+          ) "students3y",
+          SUM(
+              public.is_in_target(
+                  cp,
+                  ss.studystartdate,
+                  public.next_date_occurrence(ss.studystartdate, cp),
+                  ss.credits,
+                  45 * ceil(EXTRACT(EPOCH FROM (cp - ss.studystartdate) / 365) / 86400)
+              )
+          ) "students4y"
+      FROM (
+          SELECT
               cp,
-              ss.studystartdate,
-              TIMESTAMP '2021-07-31',
-              ss.credits,
-              $1
-          )
-      ) "students4y"
-    FROM (
-            SELECT
-                cp,
-                org_code,
-                org_name,
-                programme_code,
-                programme_name,
-                studystartdate,
-                studentnumber,
-                SUM(credits) credits
-            FROM (
-                SELECT
-                    checkpoints.checkpoint cp,
-                    org.code org_code,
-                    org.name->>'fi' org_name,
-                    element_details.code programme_code,
-                    element_details.name->>'fi' programme_name,
-                    studyright.studystartdate studystartdate,
-                    studyright.student_studentnumber studentnumber,
-                    credit.credits credits
-                FROM
-                    organization org
-                    INNER JOIN studyright
-                        ON org.code = studyright.faculty_code
-                    INNER JOIN (
-                        -- HACK: fix updater writing duplicates where enddate has changed
-                        SELECT DISTINCT ON (studyrightid, startdate, code, studentnumber)
-                            *
-                        FROM studyright_elements
-                    ) s_elements
-                        ON studyright.studyrightid = s_elements.studyrightid
-                    INNER JOIN element_details
-                        ON s_elements.code = element_details.code
-                    LEFT JOIN transfers
-                        ON studyright.studyrightid = transfers.studyrightid
-                    INNER JOIN unnest($2::TIMESTAMP WITH TIME ZONE[])
-                        AS checkpoints(checkpoint)
-                        ON true
-                    LEFT JOIN LATERAL (
-                        SELECT
-                            student_studentnumber,
-                            attainment_date,
-                            credits
-                        FROM credit
-                        WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
-                            ${includeOldAttainments ? '' : 'AND credit.attainment_date >= $3::TIMESTAMP WITH TIME ZONE'}
-                            AND credit.attainment_date <= checkpoints.checkpoint
-                    ) credit
-                        ON credit.student_studentnumber = studyright.student_studentnumber
-                WHERE
-                    studyright.extentcode = 1 -- Bachelor's
-                    AND studyright.prioritycode IN (1, 30) -- Primary or Graduated
-                    AND studyright.studystartdate = $3::TIMESTAMP WITH TIME ZONE
-                    AND element_details.type = 20 -- Programme's name
-                    AND transfers.studyrightid IS NULL -- Not transferred within faculty
-            ) s
-            GROUP BY 1, (2,3), (4,5), 6, 7
-        ) ss
-    GROUP BY 1, (2, 3), (4, 5);
-    `,
+              org_code,
+              org_name,
+              programme_code,
+              programme_name,
+              studystartdate,
+              studentnumber,
+              SUM(credits) credits
+          FROM (
+              SELECT
+                  checkpoints.checkpoint cp,
+                  org.code org_code,
+                  org.name->>'fi' org_name,
+                  element_details.code programme_code,
+                  element_details.name->>'fi' programme_name,
+                  studyright.studystartdate studystartdate,
+                  studyright.student_studentnumber studentnumber,
+                  credit.credits credits
+              FROM
+                  organization org
+                  INNER JOIN studyright
+                      ON org.code = studyright.faculty_code
+                  INNER JOIN (
+                      -- HACK: fix updater writing duplicates where enddate has changed
+                      SELECT DISTINCT ON (studyrightid, startdate, code, studentnumber)
+                          *
+                      FROM studyright_elements
+                  ) s_elements
+                      ON studyright.studyrightid = s_elements.studyrightid
+                  INNER JOIN element_details
+                      ON s_elements.code = element_details.code
+                  LEFT JOIN transfers
+                      ON studyright.studyrightid = transfers.studyrightid
+                  INNER JOIN unnest($1::TIMESTAMP WITH TIME ZONE[])
+                      AS checkpoints(checkpoint)
+                      ON true
+                  LEFT JOIN LATERAL (
+                      SELECT
+                          student_studentnumber,
+                          attainment_date,
+                          credits
+                      FROM credit
+                      WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
+                          AND credit."isStudyModule" = false
+                          ${includeOldAttainments ? '' : 'AND credit.attainment_date >= $2::TIMESTAMP WITH TIME ZONE'}
+                          AND credit.attainment_date <= checkpoints.checkpoint
+                  ) credit
+                      ON credit.student_studentnumber = studyright.student_studentnumber
+              WHERE
+                  studyright.extentcode = 1 -- Bachelor's
+                  AND studyright.prioritycode IN (1, 30) -- Primary or Graduated
+                  AND studyright.studystartdate = $2::TIMESTAMP WITH TIME ZONE
+                  AND element_details.type = 20 -- Programme's name
+                  AND transfers.studyrightid IS NULL -- Not transferred within faculty
+          ) s
+          GROUP BY 1, (2,3), (4,5), 6, 7
+      ) ss
+      GROUP BY 1, (2, 3), (4, 5);
+      `,
       {
         type: sequelize.QueryTypes.SELECT,
-        bind: [creditsTarget, checkpoints, startDate]
+        bind: [checkpoints, startDate]
       }
     )
   },
@@ -411,8 +434,8 @@ const sorters = {
 
 const withErr = handler => (req, res, next) =>
   handler(req, res, next).catch(e => {
-    console.log('error', e)
-    res.status(500).json({ error: e })
+    console.error(e)
+    res.status(500).json({ error: { message: e.message, stack: e.stack } })
   })
 
 // mankel data from:
