@@ -104,7 +104,7 @@ StatusContainer.propTypes = {
 }
 
 const Status = () => {
-  const [showYearlyValues, setShowYearlyValues] = useState(true)
+  const [showYearlyValues, setShowYearlyValues] = useState(false)
   const [selected, setSelected] = useState(null)
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(null)
