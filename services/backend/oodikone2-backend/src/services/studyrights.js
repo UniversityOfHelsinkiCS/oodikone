@@ -338,7 +338,8 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
             type: type,
             name: name,
             code: code,
-            enrollmentStartYears: {}
+            enrollmentStartYears: {},
+            studytracks: []
           }
           const momentstartdate = moment(startdate)
           const enrollment = getEnrollmentStartYear(momentstartdate)
@@ -385,6 +386,8 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
                     name: e.name,
                     code: e.code
                   }
+                  if (!associations.programmes[code].studytracks.includes(e.code))
+                    associations.programmes[code].studytracks.push(e.code)
                 }
                 associations.studyTracks[e.code] = associations.studyTracks[e.code] || {
                   type: e.type,
