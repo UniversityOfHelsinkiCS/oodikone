@@ -393,6 +393,7 @@ const getUberData = _.memoize(
                           credits
                       FROM credit
                       WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
+                          AND credit."isStudyModule" = false
                           ${includeOldAttainments ? '' : 'AND credit.attainment_date >= $2::TIMESTAMP WITH TIME ZONE'}
                           AND credit.attainment_date <= checkpoints.checkpoint
                   ) credit
