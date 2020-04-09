@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
-import { Segment, Loader, Dimmer, Checkbox } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Checkbox, Button, Message } from 'semantic-ui-react'
 
 import { callApi } from '../../apiConnection'
+import InfoToolTips from '../../common/InfoToolTips'
 
 const defaultConfig = () => {
   return {
@@ -276,37 +277,60 @@ const ProtoC = () => {
     return Object.values(data || {}).sort(currentSorter)
   }, [data, currentSorter])
 
+  const { CoolDataScience } = InfoToolTips
+
+  const sorterNames = Object.keys(sorters)
+    .map(sorterName => sorterName)
+    .sort((a, b) => {
+      if (a === 'nimi') return false
+      return a > b
+    })
+
   return (
     <Segment>
-      <div style={{ display: 'flex' }}>
-        <h3>Prototyyppi: Tavoiteaikaerittely, 2017-2019 aloittaneet</h3>
-        <Checkbox
-          style={{ marginLeft: 'auto' }}
-          label="Include only at least once enrolled students"
-          onChange={handleExcludeNonEnrolledToggled}
-          checked={excludeNonEnrolled}
-        />
-        <Checkbox
-          style={{ marginLeft: 'auto' }}
-          label="Include old attainments"
-          onChange={handleOldAttainmentToggled}
-          checked={includeOldAttainments}
-        />
+      <div align="center">
+        <h2>Prototyyppi: Tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
       </div>
 
-      <div>
-        Sort:{' '}
-        {Object.keys(sorters).map(sorterName => (
-          <button type="button" key={sorterName} disabled={sorter === sorterName} onClick={() => setSorter(sorterName)}>
-            {sorterName}
-          </button>
-        ))}
+      <div align="center" style={{ marginTop: '10px' }}>
+        <Button.Group>
+          <Button style={{ cursor: 'default' }} active color="black">
+            Sort by:
+          </Button>
+          {sorterNames.map(sorterName => (
+            <Button
+              basic
+              color="grey"
+              key={sorterName}
+              disabled={sorter === sorterName}
+              onClick={() => setSorter(sorterName)}
+              style={{ borderRadius: '1px' }}
+            >
+              {sorterName}
+            </Button>
+          ))}
+        </Button.Group>
+        <Button.Group style={{ marginLeft: '5px' }}>
+          <Button
+            basic
+            color="grey"
+            style={{ borderRadius: '1px' }}
+            onClick={() => setSortDir(1)}
+            disabled={sortDir === 1}
+          >
+            desc
+          </Button>
+          <Button
+            basic
+            color="grey"
+            style={{ borderRadius: '1px' }}
+            onClick={() => setSortDir(-1)}
+            disabled={sortDir === -1}
+          >
+            asc
+          </Button>
+        </Button.Group>
       </div>
-      <div>
-        Order: <input type="button" value="↓" onClick={() => setSortDir(1)} disabled={sortDir === 1} />
-        <input type="button" value="↑" onClick={() => setSortDir(-1)} disabled={sortDir === -1} />
-      </div>
-
       <Segment placeholder={isLoading} vertical>
         <Dimmer inverted active={isLoading} />
         <Loader active={isLoading} />
@@ -315,6 +339,20 @@ const ProtoC = () => {
             <OrgChart orgs={sortedOrgs} sorter={currentSorter} isSideways />
           </>
         )}
+        <div align="center">
+          <Checkbox
+            label="Include only at least once enrolled students"
+            onChange={handleExcludeNonEnrolledToggled}
+            checked={excludeNonEnrolled}
+          />
+          <Checkbox
+            style={{ marginLeft: '10px' }}
+            label="Include old attainments"
+            onChange={handleOldAttainmentToggled}
+            checked={includeOldAttainments}
+          />
+        </div>
+        <Message content={CoolDataScience.protoC2} />
       </Segment>
     </Segment>
   )
