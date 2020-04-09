@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 import { Segment, Loader, Dimmer, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
 import { getTextIn } from '../../common'
-
 import { callApi } from '../../apiConnection'
+import './status.css'
 
 const mapValueToRange = (x, min1, max1, min2, max2) => {
   if (x < min1) return min2
@@ -30,6 +30,7 @@ const StatusContainer = ({ title, current, previous, clickable, handleClick, min
 
   return (
     <Segment
+      className="status-card"
       onClick={clickable ? handleClick : null}
       style={{
         display: 'flex',
@@ -44,7 +45,7 @@ const StatusContainer = ({ title, current, previous, clickable, handleClick, min
       compact
     >
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <h2 style={{ all: 'unset', fontWeight: 'bold' }}>{title}</h2>
+        <span className="status-title">{title}</span>
         <div style={{ margin: '10px 0' }}>
           <Icon
             style={{
