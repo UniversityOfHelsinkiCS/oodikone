@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
-import { Segment, Loader, Dimmer, Checkbox, Button, Message } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Checkbox, Button, Message, Radio } from 'semantic-ui-react'
 
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
@@ -245,6 +245,7 @@ const ProtoC = () => {
   const [isLoading, setLoading] = useState(true)
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
+  const [showAlt, setAlt] = useState(false)
 
   const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
   const [excludeNonEnrolled, setExcludeNonEnrolled] = useState(false)
@@ -279,6 +280,11 @@ const ProtoC = () => {
 
   const { CoolDataScience } = InfoToolTips
 
+  const handleClick = sorterName => {
+    if (sorterName === sorter) setSortDir(-1 * sortDir)
+    setSorter(sorterName)
+  }
+
   const sorterNames = Object.keys(sorters)
     .map(sorterName => sorterName)
     .sort((a, b) => {
@@ -291,46 +297,68 @@ const ProtoC = () => {
       <div align="center">
         <h2>Prototyyppi: Tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
       </div>
-
-      <div align="center" style={{ marginTop: '10px' }}>
-        <Button.Group>
-          <Button style={{ cursor: 'default' }} active color="black">
-            Sort by:
-          </Button>
-          {sorterNames.map(sorterName => (
-            <Button
-              basic
-              color="grey"
-              key={sorterName}
-              disabled={sorter === sorterName}
-              onClick={() => setSorter(sorterName)}
-              style={{ borderRadius: '1px' }}
-            >
-              {sorterName}
-            </Button>
-          ))}
-        </Button.Group>
-        <Button.Group style={{ marginLeft: '5px' }}>
-          <Button
-            basic
-            color="grey"
-            style={{ borderRadius: '1px' }}
-            onClick={() => setSortDir(1)}
-            disabled={sortDir === 1}
-          >
-            desc
-          </Button>
-          <Button
-            basic
-            color="grey"
-            style={{ borderRadius: '1px' }}
-            onClick={() => setSortDir(-1)}
-            disabled={sortDir === -1}
-          >
-            asc
-          </Button>
-        </Button.Group>
+      <div align="center">
+        <Radio toggle onChange={() => setAlt(!showAlt)} />
       </div>
+      {showAlt ? (
+        <div align="center" style={{ marginTop: '10px' }}>
+          <Button.Group>
+            <Button style={{ cursor: 'default' }} active color="black">
+              Sort by:
+            </Button>
+            {sorterNames.map(sorterName => (
+              <Button
+                basic={sorter !== sorterName}
+                color={sorter === sorterName ? 'blue' : 'black'}
+                key={sorterName}
+                active={sorter === sorterName}
+                onClick={() => handleClick(sorterName)}
+                style={{ borderRadius: '1px' }}
+                icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
+                content={sorterName}
+              />
+            ))}
+          </Button.Group>
+        </div>
+      ) : (
+        <div align="center" style={{ marginTop: '10px' }}>
+          <Button.Group>
+            <Button style={{ cursor: 'default' }} active color="black">
+              Sort by:
+            </Button>
+            {sorterNames.map(sorterName => (
+              <Button
+                basic={sorter !== sorterName}
+                color={sorter === sorterName ? 'blue' : 'black'}
+                key={sorterName}
+                active={sorter === sorterName}
+                onClick={() => setSorter(sorterName)}
+                style={{ borderRadius: '1px' }}
+              >
+                {sorterName}
+              </Button>
+            ))}
+          </Button.Group>
+          <Button.Group style={{ marginLeft: '5px' }}>
+            <Button
+              icon="sort content ascending"
+              basic={sortDir !== 1}
+              color={sortDir === 1 ? 'blue' : 'black'}
+              style={{ borderRadius: '1px' }}
+              onClick={() => setSortDir(1)}
+              active={sortDir === 1}
+            />
+            <Button
+              icon="sort content descending"
+              basic={sortDir !== -1}
+              color={sortDir === -1 ? 'blue' : 'black'}
+              style={{ borderRadius: '1px' }}
+              onClick={() => setSortDir(-1)}
+              active={sortDir === -1}
+            />
+          </Button.Group>
+        </div>
+      )}
       <Segment placeholder={isLoading} vertical>
         <Dimmer inverted active={isLoading} />
         <Loader active={isLoading} />

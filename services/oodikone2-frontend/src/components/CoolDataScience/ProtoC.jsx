@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
-import { Segment, Loader, Dimmer, Checkbox, Button, Message, Divider } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Checkbox, Button, Message, Divider, Radio } from 'semantic-ui-react'
 import _ from 'lodash'
 
 import { callApi } from '../../apiConnection'
@@ -219,13 +219,18 @@ const ProgrammeChart = React.memo(({ org }) => {
   return <ReactHighcharts highcharts={Highcharts} config={makeDrilldownConfig(org)} />
 })
 
-const ProgrammeDrilldown = ({ org, defaultSorter, defaultSortDir }) => {
+const ProgrammeDrilldown = ({ org, defaultSorter, defaultSortDir, showAlt }) => {
   const [sorter, setSorter] = useState(defaultSorter)
   const [sortDir, setSortDir] = useState(defaultSortDir)
 
   const orgSortedProgrammes = useMemo(() => {
     return { ...org, programmes: [...org.programmes].sort((a, b) => sorters[sorter](a, b) * sortDir) }
   }, [org, sorter, sortDir])
+
+  const handleClick = sorterName => {
+    if (sorterName === sorter) setSortDir(-1 * sortDir)
+    setSorter(sorterName)
+  }
 
   const sorterNames = Object.keys(sorters)
     .map(sorterName => sorterName)
@@ -237,45 +242,65 @@ const ProgrammeDrilldown = ({ org, defaultSorter, defaultSortDir }) => {
   return (
     <>
       <Divider />
-      <div align="center" style={{ marginTop: '10px' }}>
-        <Button.Group>
-          <Button style={{ cursor: 'default' }} active color="black">
-            Sort by:
-          </Button>
-          {sorterNames.map(sorterName => (
-            <Button
-              basic
-              color="grey"
-              key={sorterName}
-              disabled={sorter === sorterName}
-              onClick={() => setSorter(sorterName)}
-              style={{ borderRadius: '1px' }}
-            >
-              {sorterName}
+      {showAlt ? (
+        <div align="center" style={{ marginTop: '10px' }}>
+          <Button.Group>
+            <Button style={{ cursor: 'default' }} active color="black">
+              Sort by:
             </Button>
-          ))}
-        </Button.Group>
-        <Button.Group style={{ marginLeft: '5px' }}>
-          <Button
-            basic
-            color="grey"
-            style={{ borderRadius: '1px' }}
-            onClick={() => setSortDir(1)}
-            disabled={sortDir === 1}
-          >
-            desc
-          </Button>
-          <Button
-            basic
-            color="grey"
-            style={{ borderRadius: '1px' }}
-            onClick={() => setSortDir(-1)}
-            disabled={sortDir === -1}
-          >
-            asc
-          </Button>
-        </Button.Group>
-      </div>
+            {sorterNames.map(sorterName => (
+              <Button
+                basic={sorter !== sorterName}
+                color={sorter === sorterName ? 'blue' : 'black'}
+                key={sorterName}
+                active={sorter === sorterName}
+                onClick={() => handleClick(sorterName)}
+                style={{ borderRadius: '1px' }}
+                icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
+                content={sorterName}
+              />
+            ))}
+          </Button.Group>
+        </div>
+      ) : (
+        <div align="center" style={{ marginTop: '10px' }}>
+          <Button.Group>
+            <Button style={{ cursor: 'default' }} active color="black">
+              Sort by:
+            </Button>
+            {sorterNames.map(sorterName => (
+              <Button
+                basic={sorter !== sorterName}
+                color={sorter === sorterName ? 'blue' : 'black'}
+                key={sorterName}
+                active={sorter === sorterName}
+                onClick={() => setSorter(sorterName)}
+                style={{ borderRadius: '1px' }}
+              >
+                {sorterName}
+              </Button>
+            ))}
+          </Button.Group>
+          <Button.Group style={{ marginLeft: '5px' }}>
+            <Button
+              icon="sort content ascending"
+              basic={sortDir !== 1}
+              color={sortDir === 1 ? 'blue' : 'black'}
+              style={{ borderRadius: '1px' }}
+              onClick={() => setSortDir(1)}
+              active={sortDir === 1}
+            />
+            <Button
+              icon="sort content descending"
+              basic={sortDir !== -1}
+              color={sortDir === -1 ? 'blue' : 'black'}
+              style={{ borderRadius: '1px' }}
+              onClick={() => setSortDir(-1)}
+              active={sortDir === -1}
+            />
+          </Button.Group>
+        </div>
+      )}
       <ProgrammeChart org={orgSortedProgrammes} />
     </>
   )
@@ -287,6 +312,7 @@ const ProtoC = () => {
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
   const [drilldownOrg, setDrilldownOrg] = useState(null)
+  const [showAlt, setAlt] = useState(false)
 
   const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
   const [excludeNonEnrolled, setExcludeNonEnrolled] = useState(false)
@@ -321,6 +347,11 @@ const ProtoC = () => {
     return Object.values(data || {}).sort((a, b) => sorters[sorter](a, b) * sortDir)
   }, [data, sorter, sortDir])
 
+  const handleClick = sorterName => {
+    if (sorterName === sorter) setSortDir(-1 * sortDir)
+    setSorter(sorterName)
+  }
+
   const { CoolDataScience } = InfoToolTips
 
   const sorterNames = Object.keys(sorters)
@@ -334,46 +365,68 @@ const ProtoC = () => {
       <div align="center">
         <h2>Prototyyppi: Suhteellinen tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
       </div>
-
-      <div align="center" style={{ marginTop: '10px' }}>
-        <Button.Group>
-          <Button style={{ cursor: 'default' }} active color="black">
-            Sort by:
-          </Button>
-          {sorterNames.map(sorterName => (
-            <Button
-              basic
-              color="grey"
-              key={sorterName}
-              disabled={sorter === sorterName}
-              onClick={() => setSorter(sorterName)}
-              style={{ borderRadius: '1px' }}
-            >
-              {sorterName}
-            </Button>
-          ))}
-        </Button.Group>
-        <Button.Group style={{ marginLeft: '5px' }}>
-          <Button
-            basic
-            color="grey"
-            style={{ borderRadius: '1px' }}
-            onClick={() => setSortDir(1)}
-            disabled={sortDir === 1}
-          >
-            desc
-          </Button>
-          <Button
-            basic
-            color="grey"
-            style={{ borderRadius: '1px' }}
-            onClick={() => setSortDir(-1)}
-            disabled={sortDir === -1}
-          >
-            asc
-          </Button>
-        </Button.Group>
+      <div align="center">
+        <Radio toggle onChange={() => setAlt(!showAlt)} />
       </div>
+      {showAlt ? (
+        <div align="center" style={{ marginTop: '10px' }}>
+          <Button.Group>
+            <Button style={{ cursor: 'default' }} active color="black">
+              Sort by:
+            </Button>
+            {sorterNames.map(sorterName => (
+              <Button
+                basic={sorter !== sorterName}
+                color={sorter === sorterName ? 'blue' : 'black'}
+                key={sorterName}
+                active={sorter === sorterName}
+                onClick={() => handleClick(sorterName)}
+                style={{ borderRadius: '1px' }}
+                icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
+                content={sorterName}
+              />
+            ))}
+          </Button.Group>
+        </div>
+      ) : (
+        <div align="center" style={{ marginTop: '10px' }}>
+          <Button.Group>
+            <Button style={{ cursor: 'default' }} active color="black">
+              Sort by:
+            </Button>
+            {sorterNames.map(sorterName => (
+              <Button
+                basic={sorter !== sorterName}
+                color={sorter === sorterName ? 'blue' : 'black'}
+                key={sorterName}
+                active={sorter === sorterName}
+                onClick={() => setSorter(sorterName)}
+                style={{ borderRadius: '1px' }}
+              >
+                {sorterName}
+              </Button>
+            ))}
+          </Button.Group>
+          <Button.Group style={{ marginLeft: '5px' }}>
+            <Button
+              icon="sort content ascending"
+              basic={sortDir !== 1}
+              color={sortDir === 1 ? 'blue' : 'black'}
+              style={{ borderRadius: '1px' }}
+              onClick={() => setSortDir(1)}
+              active={sortDir === 1}
+            />
+            <Button
+              icon="sort content descending"
+              basic={sortDir !== -1}
+              color={sortDir === -1 ? 'blue' : 'black'}
+              style={{ borderRadius: '1px' }}
+              onClick={() => setSortDir(-1)}
+              active={sortDir === -1}
+            />
+          </Button.Group>
+        </div>
+      )}
 
       <Segment placeholder={isLoading} vertical>
         <Dimmer inverted active={isLoading} />
@@ -394,7 +447,7 @@ const ProtoC = () => {
         </div>
         <Message content={CoolDataScience.protoC} />
         {!isLoading && data && drilldownOrg && (
-          <ProgrammeDrilldown org={drilldownOrg} defaultSorter={sorter} defaultSortDir={sortDir} />
+          <ProgrammeDrilldown org={drilldownOrg} defaultSorter={sorter} defaultSortDir={sortDir} showAlt={showAlt} />
         )}
       </Segment>
     </Segment>
