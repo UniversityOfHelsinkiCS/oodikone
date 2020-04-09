@@ -161,6 +161,7 @@ const getTargetStudentCounts = _.memoize(
                         credits
                     FROM credit
                     WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
+                        AND credit."isStudyModule" = false
                         ${
                           includeOldAttainments
                             ? ''
@@ -245,6 +246,7 @@ const get3yStudentsWithDrilldownPerYear = _.memoize(async startDate => {
                         credits
                     FROM credit
                     WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
+                        AND credit."isStudyModule" = false
                         AND credit.attainment_date >= :startDate
                 ) credit
                     ON credit.student_studentnumber = studyright.student_studentnumber
@@ -367,6 +369,7 @@ const getUberData = _.memoize(
                             credits
                         FROM credit
                         WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
+                            AND credit."isStudyModule" = false
                             ${includeOldAttainments ? '' : 'AND credit.attainment_date >= $3::TIMESTAMP WITH TIME ZONE'}
                             AND credit.attainment_date <= checkpoints.checkpoint
                     ) credit
