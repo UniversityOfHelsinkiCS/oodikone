@@ -545,6 +545,86 @@ const getTotalCreditsOfProvidersBetween = async (a, b, sumAlias) => {
   )
 }
 
+const getStatusStatistics = _.memoize(async () => {
+  const Y_TO_MS = 31556952000
+  const { startdate: currentAcademicYearStartTimestamp } = (await sequelize.query(
+    `
+      SELECT startdate FROM SEMESTERS s WHERE yearcode = (SELECT yearcode FROM SEMESTERS WHERE startdate < NOW() ORDER BY startdate DESC LIMIT 1) ORDER BY startdate LIMIT 1;
+      `,
+    {
+      type: sequelize.QueryTypes.SELECT
+    }
+  ))[0]
+
+  const currentAcademicYearStartDate = new Date(currentAcademicYearStartTimestamp)
+  const now = new Date()
+  const [
+    currentYearsCredits,
+    prevYearsCredits,
+    elementDetails,
+    faculties,
+    { data: facultyProgrammes }
+  ] = await Promise.all([
+    getTotalCreditsOfProvidersBetween(currentAcademicYearStartDate, now, 'current'),
+    getTotalCreditsOfProvidersBetween(
+      new Date(currentAcademicYearStartDate.getTime() - Y_TO_MS),
+      new Date(now - Y_TO_MS),
+      'previous'
+    ),
+    ElementDetails.findAll(),
+    Organisation.findAll(),
+    userServiceClient.get('/faculty_programmes')
+  ])
+
+  const facultyCodeToFaculty = faculties.reduce((res, curr) => {
+    res[curr.code] = curr
+    return res
+  }, {})
+
+  const programmeToFaculty = facultyProgrammes.reduce((res, curr) => {
+    res[curr.programme_code] = curr.faculty_code
+    return res
+  }, {})
+
+  const providerToProgramme = elementDetails.reduce((res, curr) => {
+    const p = mapToProviders([curr.code])[0]
+    res[p] = {
+      code: curr.code,
+      name: curr.name
+    }
+    return res
+  }, {})
+
+  const groupedByProvider = _.groupBy([...currentYearsCredits, ...prevYearsCredits], 'providercode')
+
+  const programmesToTotals = Object.keys(groupedByProvider).reduce((res, provider) => {
+    const programme = providerToProgramme[provider]
+    if (programme && programme.code) {
+      res[programme.code] = {
+        totals: Object.assign(...groupedByProvider[provider]),
+        name: programme.name
+      }
+    }
+    return res
+  }, {})
+
+  const result = Object.entries(programmesToTotals).reduce((res, [programme, programmeStats]) => {
+    const facultyCode = programmeToFaculty[programme]
+    if (!facultyCode) return res
+    if (!res[facultyCode]) {
+      res[facultyCode] = { totals: { current: 0, previous: 0 } }
+      res[facultyCode]['programmes'] = {}
+      res[facultyCode].name = facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null
+    }
+    res[facultyCode]['programmes'][programme] = programmeStats
+    res[facultyCode].totals.current += programmeStats.totals.current
+    res[facultyCode].totals.previous += programmeStats.totals.previous
+    return res
+  }, {})
+
+  return result
+})
+
 router.get(
   '/uber-data',
   withErr(async (req, res) => {
@@ -643,83 +723,10 @@ router.get(
 router.get(
   '/status',
   withErr(async (req, res) => {
-    const Y_TO_MS = 31556952000
-    const { startdate: currentAcademicYearStartTimestamp } = (await sequelize.query(
-      `
-      SELECT startdate FROM SEMESTERS s WHERE yearcode = (SELECT yearcode FROM SEMESTERS WHERE startdate < NOW() ORDER BY startdate DESC LIMIT 1) ORDER BY startdate LIMIT 1;
-      `,
-      {
-        type: sequelize.QueryTypes.SELECT
-      }
-    ))[0]
-
-    const currentAcademicYearStartDate = new Date(currentAcademicYearStartTimestamp)
-    const now = new Date()
-    const [
-      currentYearsCredits,
-      prevYearsCredits,
-      elementDetails,
-      faculties,
-      { data: facultyProgrammes }
-    ] = await Promise.all([
-      getTotalCreditsOfProvidersBetween(currentAcademicYearStartDate, now, 'current'),
-      getTotalCreditsOfProvidersBetween(
-        new Date(currentAcademicYearStartDate.getTime() - Y_TO_MS),
-        new Date(now - Y_TO_MS),
-        'previous'
-      ),
-      ElementDetails.findAll(),
-      Organisation.findAll(),
-      userServiceClient.get('/faculty_programmes')
-    ])
-
-    const facultyCodeToFaculty = faculties.reduce((res, curr) => {
-      res[curr.code] = curr
-      return res
-    }, {})
-
-    const programmeToFaculty = facultyProgrammes.reduce((res, curr) => {
-      res[curr.programme_code] = curr.faculty_code
-      return res
-    }, {})
-
-    const providerToProgramme = elementDetails.reduce((res, curr) => {
-      const p = mapToProviders([curr.code])[0]
-      res[p] = {
-        code: curr.code,
-        name: curr.name
-      }
-      return res
-    }, {})
-
-    const groupedByProvider = _.groupBy([...currentYearsCredits, ...prevYearsCredits], 'providercode')
-
-    const programmesToTotals = Object.keys(groupedByProvider).reduce((res, provider) => {
-      const programme = providerToProgramme[provider]
-      if (programme && programme.code) {
-        res[programme.code] = {
-          totals: Object.assign(...groupedByProvider[provider]),
-          name: programme.name
-        }
-      }
-      return res
-    }, {})
-
-    const result = Object.entries(programmesToTotals).reduce((res, [programme, programmeStats]) => {
-      const facultyCode = programmeToFaculty[programme]
-      if (!facultyCode) return res
-      if (!res[facultyCode]) {
-        res[facultyCode] = { totals: { current: 0, previous: 0 } }
-        res[facultyCode]['programmes'] = {}
-        res[facultyCode].name = facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null
-      }
-      res[facultyCode]['programmes'][programme] = programmeStats
-      res[facultyCode].totals.current += programmeStats.totals.current
-      res[facultyCode].totals.previous += programmeStats.totals.previous
-      return res
-    }, {})
-
-    res.json(result)
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
+    const status = await getStatusStatistics(startOfToday.getTime()) // Memoizing by day
+    res.json(status)
   })
 )
 
