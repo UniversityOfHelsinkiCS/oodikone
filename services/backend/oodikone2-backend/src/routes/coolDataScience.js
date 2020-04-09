@@ -400,7 +400,11 @@ const sorters = {
   targetRelative: (a, b) => a.targetStudents / a.totalStudents - b.targetStudents / b.totalStudents
 }
 
-const withErr = handler => (req, res, next) => handler(req, res, next).catch(e => res.status(500).json({ error: e }))
+const withErr = handler => (req, res, next) =>
+  handler(req, res, next).catch(e => {
+    console.error(e)
+    res.status(500).json({ error: { message: e.message, stack: e.stack } })
+  })
 
 // mankel data from:
 /* 
