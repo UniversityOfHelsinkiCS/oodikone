@@ -53,40 +53,36 @@ const getTargetStudentCounts = _.memoize(
         ss.programme_name "programmeName",
         COUNT(ss.studentnumber) "programmeTotalStudents",
         SUM(
-            public.is_in_target(
-                CURRENT_TIMESTAMP,
-                ss.studystartdate,
-                TIMESTAMP '2020-07-31',
-                ss.credits,
-                CASE
-                    -- HAX: instead of trying to guess which category the student is in if 
-                    --      the studyright is currently cancelled, just make the target HUGE
-                    --      so we can subtract these from the non-goal students
-                    WHEN ss.currently_cancelled = 1 THEN 999999999
-                    WHEN ss.studystartdate = '2017-07-31 21:00:00+00' THEN 180
-                    WHEN ss.studystartdate = '2018-07-31 21:00:00+00' THEN 120
-                    WHEN ss.studystartdate = '2019-07-31 21:00:00+00' THEN 60
-                    ELSE 999999999
-                END
-            )
+             public.is_in_target(
+                 CURRENT_TIMESTAMP,
+                 ss.studystartdate,
+                 public.next_date_occurrence(ss.studystartdate) - INTERVAL '1 day', -- e.g if studystartdate = 2017-07-31 and it's now 2020-02-02, this returns 2020-07-31. However, if it's now 2020-11-01 (we've passed the date already), it returns 2021-07-31.
+                 ss.credits,
+                 CASE
+                     -- HAX: instead of trying to guess which category the student is in if
+                     --      the studyright is currently cancelled, just make the target HUGE
+                     --      so we can subtract these from the non-goal students
+                     WHEN ss.currently_cancelled = 1 THEN 999999999
+                     -- credit target: 60 credits per year since starting
+                     ELSE 60 * ceil(EXTRACT(EPOCH FROM (now() - ss.studystartdate) / 365) / 86400)
+                 END
+             )
         ) "students3y",
         SUM(
-            public.is_in_target(
-                CURRENT_TIMESTAMP,
-                ss.studystartdate,
-                TIMESTAMP '2021-07-31',
-                ss.credits,
-                CASE
-                    -- HAX: instead of trying to guess which category the student is in if 
-                    --      the studyright is currently cancelled, just make the target HUGE
-                    --      so we can subtract these from the non-goal students
-                    WHEN ss.currently_cancelled = 1 THEN 999999999
-                    WHEN ss.studystartdate = '2017-07-31 21:00:00+00' THEN 180
-                    WHEN ss.studystartdate = '2018-07-31 21:00:00+00' THEN 120
-                    WHEN ss.studystartdate = '2019-07-31 21:00:00+00' THEN 60
-                    ELSE 999999999
-                END
-            )
+             public.is_in_target(
+                 CURRENT_TIMESTAMP,
+                 ss.studystartdate,
+                 public.next_date_occurrence(ss.studystartdate) - INTERVAL '1 day',
+                 ss.credits,
+                 CASE
+                     -- HAX: instead of trying to guess which category the student is in if
+                     --      the studyright is currently cancelled, just make the target HUGE
+                     --      so we can subtract these from the non-goal students
+                     WHEN ss.currently_cancelled = 1 THEN 999999999
+                     -- credit target: 45 credits per year since starting
+                     ELSE 45 * ceil(EXTRACT(EPOCH FROM (now() - ss.studystartdate) / 365) / 86400)
+                 END
+             )
         ) "students4y",
         SUM(ss.currently_cancelled) "currentlyCancelled"
     FROM (
@@ -204,7 +200,7 @@ const get3yStudentsWithDrilldownPerYear = _.memoize(async startDate => {
             public.is_in_target(
                 CURRENT_TIMESTAMP,
                 ss.studystartdate,
-                TIMESTAMP '2020-07-31',
+                next_date_occurrence(ss.studystartdate) - INTERVAL '1 day',
                 ss.credits,
                 :targetCredits
             )
