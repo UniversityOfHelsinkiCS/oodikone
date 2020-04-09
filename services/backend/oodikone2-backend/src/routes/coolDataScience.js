@@ -547,7 +547,7 @@ const mankeliUberData = data =>
     .sort((a, b) => a.name.localeCompare(b.name))
     .value()
 
-const getTotalCreditsOfProvidersBetween = async (a, b, sumAlias) => {
+const getTotalCreditsOfProvidersBetween = async (a, b, sumAlias = 'sum') => {
   return sequelize.query(
     `
     SELECT SUM(cr.credits) AS ` +
@@ -581,23 +581,30 @@ const getStatusStatistics = _.memoize(async () => {
 
   const currentAcademicYearStartDate = new Date(currentAcademicYearStartTimestamp)
   const now = new Date()
-  const [
-    currentYearsCredits,
-    prevYearsCredits,
-    elementDetails,
-    faculties,
-    { data: facultyProgrammes }
-  ] = await Promise.all([
-    getTotalCreditsOfProvidersBetween(currentAcademicYearStartDate, now, 'current'),
-    getTotalCreditsOfProvidersBetween(
-      new Date(currentAcademicYearStartDate.getTime() - Y_TO_MS),
-      new Date(now - Y_TO_MS),
-      'previous'
-    ),
+  const diff = currentAcademicYearStartDate.getFullYear() - 2017
+  const yearlyCreditsPromises = [...new Array(diff + 1)].map((_, i) => {
+    return new Promise(async (res, rej) => {
+      try {
+        const data = await getTotalCreditsOfProvidersBetween(
+          new Date(currentAcademicYearStartDate.getTime() - i * Y_TO_MS),
+          new Date(now.getTime() - i * Y_TO_MS)
+        )
+        res(data.map(d => ({ ...d, providercode: d.providercode, [2019 - i]: d, type: 'yearly' })))
+      } catch (e) {
+        rej(e)
+      }
+    })
+  })
+
+  const [yearlyCredits, elementDetails, faculties, { data: facultyProgrammes }] = await Promise.all([
+    Promise.all(yearlyCreditsPromises),
     ElementDetails.findAll(),
     Organisation.findAll(),
     userServiceClient.get('/faculty_programmes')
   ])
+
+  const currentYearsCredits = yearlyCredits[0].map(c => ({ current: c.sum, providercode: c.providercode }))
+  const prevYearsCredits = yearlyCredits[1].map(c => ({ previous: c.sum, providercode: c.providercode }))
 
   const facultyCodeToFaculty = faculties.reduce((res, curr) => {
     res[curr.code] = curr
@@ -618,13 +625,22 @@ const getStatusStatistics = _.memoize(async () => {
     return res
   }, {})
 
-  const groupedByProvider = _.groupBy([...currentYearsCredits, ...prevYearsCredits], 'providercode')
+  const groupedByProvider = _.groupBy(
+    [
+      ...currentYearsCredits.map(c => ({ ...c, type: 'active' })),
+      ...prevYearsCredits.map(c => ({ ...c, type: 'active' })),
+      ..._.flatten(yearlyCredits)
+    ],
+    'providercode'
+  )
 
   const programmesToTotals = Object.keys(groupedByProvider).reduce((res, provider) => {
     const programme = providerToProgramme[provider]
+    const groupedByType = _.groupBy(groupedByProvider[provider], 'type')
     if (programme && programme.code) {
       res[programme.code] = {
-        totals: Object.assign(...groupedByProvider[provider]),
+        totals: _.omit(Object.assign(...groupedByType['active'])),
+        yearly: _.omit(Object.assign(...groupedByType['yearly']), ['type', 'providercode', 'sum']),
         name: programme.name
       }
     }
@@ -635,13 +651,17 @@ const getStatusStatistics = _.memoize(async () => {
     const facultyCode = programmeToFaculty[programme]
     if (!facultyCode) return res
     if (!res[facultyCode]) {
-      res[facultyCode] = { totals: { current: 0, previous: 0 } }
+      res[facultyCode] = { totals: { current: 0, previous: 0 }, yearly: {} }
       res[facultyCode]['programmes'] = {}
       res[facultyCode].name = facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null
     }
     res[facultyCode]['programmes'][programme] = programmeStats
     res[facultyCode].totals.current += programmeStats.totals.current
     res[facultyCode].totals.previous += programmeStats.totals.previous
+    Object.entries(programmeStats.yearly).forEach(([year, total]) => {
+      if (!res[facultyCode].yearly[year]) res[facultyCode].yearly[year] = { sum: 0 }
+      res[facultyCode].yearly[year].sum += total.sum
+    })
     return res
   }, {})
 
