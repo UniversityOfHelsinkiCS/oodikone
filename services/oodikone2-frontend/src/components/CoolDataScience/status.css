@@ -1,0 +1,11 @@
+.status-card {
+  transition: all 0.1s linear;
+}
+
+.status-card:hover .status-title {
+  font-weight: bold;
+}
+
+.status-card:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
