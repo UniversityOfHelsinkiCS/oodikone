@@ -6,9 +6,11 @@ import { Switch, Route, Link, useRouteMatch } from 'react-router-dom'
 import ProtoC from './ProtoC'
 import ProtoC2 from './ProtoC2'
 import ProtoG from './ProtoG'
+import Status from './Status'
 import relativeGraphImg from '../../assets/graph-relative.png'
 import absoluteGraphImg from '../../assets/graph-absolute.png'
 import timelineGraphImg from '../../assets/graph-timeline.png'
+import statusImg from '../../assets/status.png'
 
 import './CoolDataScience.css'
 
@@ -53,6 +55,7 @@ const CoolDataScience = () => {
           <NavTile to={`${baseURI}/relative`} title="Compare relative trends" imageSrc={relativeGraphImg} />
           <NavTile to={`${baseURI}/absolute`} title="Compare numerical trends" imageSrc={absoluteGraphImg} />
           <NavTile to={`${baseURI}/timeline`} title="Compare trends over time" imageSrc={timelineGraphImg} />
+          <NavTile to={`${baseURI}/status`} title="See current status" imageSrc={statusImg} />
         </NavTiles>
       </div>
       <div style={{ margin: '0 auto', marginBottom: '300px', maxWidth: '75vw' }}>
@@ -60,6 +63,7 @@ const CoolDataScience = () => {
           <Route exact path={`${baseURI}/relative`} component={ProtoC} />
           <Route exact path={`${baseURI}/absolute`} component={ProtoC2} />
           <Route exact path={`${baseURI}/timeline`} component={ProtoG} />
+          <Route exact path={`${baseURI}/status`} component={Status} />
         </Switch>
       </div>
 
