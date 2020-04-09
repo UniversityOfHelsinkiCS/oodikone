@@ -56,7 +56,7 @@ const getTargetStudentCounts = _.memoize(
              public.is_in_target(
                  CURRENT_TIMESTAMP,
                  ss.studystartdate,
-                 public.next_date_occurrence(ss.studystartdate) - INTERVAL '1 day', -- e.g if studystartdate = 2017-07-31 and it's now 2020-02-02, this returns 2020-07-31. However, if it's now 2020-11-01 (we've passed the date already), it returns 2021-07-31.
+                 public.next_date_occurrence(ss.studystartdate), -- e.g if studystartdate = 2017-07-31 and it's now 2020-02-02, this returns 2020-07-31. However, if it's now 2020-11-01 (we've passed the date already), it returns 2021-07-31.
                  ss.credits,
                  CASE
                      -- HAX: instead of trying to guess which category the student is in if
@@ -72,7 +72,7 @@ const getTargetStudentCounts = _.memoize(
              public.is_in_target(
                  CURRENT_TIMESTAMP,
                  ss.studystartdate,
-                 public.next_date_occurrence(ss.studystartdate) - INTERVAL '1 day',
+                 public.next_date_occurrence(ss.studystartdate),
                  ss.credits,
                  CASE
                      -- HAX: instead of trying to guess which category the student is in if
@@ -201,7 +201,7 @@ const get3yStudentsWithDrilldownPerYear = _.memoize(async startDate => {
             public.is_in_target(
                 CURRENT_TIMESTAMP,
                 ss.studystartdate,
-                next_date_occurrence(ss.studystartdate) - INTERVAL '1 day',
+                next_date_occurrence(ss.studystartdate),
                 ss.credits,
                 :targetCredits
             )
