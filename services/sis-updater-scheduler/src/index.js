@@ -42,14 +42,14 @@ knexConnection.on('connect', async () => {
   scheduleCron('30 * * * 1-5', async () => {
     // If updater is currently running, then return
     if (await isUpdaterActive()) return
-    await redisSet(REDIS_LAST_HOURLY_SCHEDULE, new Date())
     await scheduleHourly()
+    await redisSet(REDIS_LAST_HOURLY_SCHEDULE, new Date())
   })
 
   // Saturday at 4 AM
   scheduleCron('0 4 * * 6', async () => {
-    await redisSet(REDIS_LAST_WEEKLY_SCHEDULE, new Date())
     await scheduleWeekly()
+    await redisSet(REDIS_LAST_WEEKLY_SCHEDULE, new Date())
   })
 
   // Sunday at 4 AM
