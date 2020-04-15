@@ -6,6 +6,11 @@ import { getTextIn } from '../../common'
 import { callApi } from '../../apiConnection'
 import './status.css'
 
+const getP = (a, b) => {
+  if (a === 0 || b === 0) return 1
+  return a / b
+}
+
 const mapValueToRange = (x, min1, max1, min2, max2) => {
   if (x < min1) return min2
   if (x > max1) return max2
@@ -24,7 +29,7 @@ const StatusContainer = ({
   yearlyValues
 }) => {
   const diff = Math.round(current - previous)
-  const p = current / previous
+  const p = getP(current, previous)
   const change = Math.round((p - 1) * 1000) / 10
 
   const getColor = v => {
@@ -74,8 +79,8 @@ const StatusContainer = ({
       </div>
       {showYearlyValues && (
         <div style={{ marginTop: '10px', textAlign: 'start' }}>
-          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(([year, { sum }], i) => {
-            const yearChange = Math.round((current / sum - 1) * 1000) / 10
+          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(([year, sum], i) => {
+            const yearChange = Math.round((getP(current, sum) - 1) * 1000) / 10
             return (
               <div style={{ margin: '5px 0' }} key={year}>
                 <span>
@@ -105,9 +110,9 @@ StatusContainer.propTypes = {
 
 const Status = () => {
   const [showYearlyValues, setShowYearlyValues] = useState(false)
-  const [selected, setSelected] = useState(null)
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(null)
+  const [drillStack, setDrillStack] = useState([])
 
   useEffect(() => {
     const load = async () => {
@@ -124,6 +129,16 @@ const Status = () => {
     setShowYearlyValues(!showYearlyValues)
   }
 
+  const pushToDrillStack = values => {
+    const updatedDrillStack = [...drillStack].concat(values)
+    setDrillStack(updatedDrillStack)
+  }
+
+  const popFromDrillStack = () => {
+    const updatedDrillStack = _.dropRight([...drillStack], 1)
+    setDrillStack(updatedDrillStack)
+  }
+
   if (!data || loading)
     return (
       <Segment style={{ padding: '40px' }} textAlign="center">
@@ -132,12 +147,18 @@ const Status = () => {
       </Segment>
     )
 
+  const orderedAbsDiffs = _.orderBy(
+    Object.values(_.last(drillStack) || data).map(({ current, previous }) => {
+      return Math.abs(Math.floor((getP(current, previous) - 1) * 1000) / 10)
+    })
+  )
+  const medianDiff = orderedAbsDiffs[Math.round((orderedAbsDiffs.length - 1) / 2)]
   return (
     <div>
       <div style={{ marginBottom: '20px' }}>
-        {selected && (
+        {drillStack.length > 0 && (
           <Icon
-            onClick={() => setSelected(null)}
+            onClick={popFromDrillStack}
             style={{ fontSize: '40px', cursor: 'pointer', marginRight: '20px' }}
             name="arrow left"
           />
@@ -152,27 +173,21 @@ const Status = () => {
           gridGap: '20px'
         }}
       >
-        {_.orderBy(
-          Object.entries(selected || data),
-          ([
-            ,
-            {
-              totals: { current, previous }
-            }
-          ]) => current / previous,
-          ['desc']
-        ).map(([code, stats]) => {
+        {_.orderBy(Object.entries(_.last(drillStack) || data), ([, { current, previous }]) => getP(current, previous), [
+          'desc'
+        ]).map(([code, stats]) => {
+          const handleClick = () => pushToDrillStack(stats.drill)
           return (
             <StatusContainer
-              clickable={!selected}
-              handleClick={() => setSelected(data[code].programmes)}
+              clickable={!!stats.drill}
+              handleClick={handleClick}
               key={code}
               title={getTextIn(stats.name)}
-              current={stats.totals.current}
-              previous={stats.totals.previous}
+              current={stats.current}
+              previous={stats.previous}
               showYearlyValues={showYearlyValues}
-              min1={selected ? -18 : -7}
-              max1={selected ? 18 : 7}
+              min1={-medianDiff * 2}
+              max1={medianDiff * 2}
               yearlyValues={stats.yearly}
             />
           )
