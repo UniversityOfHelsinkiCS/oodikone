@@ -547,20 +547,31 @@ const mankeliUberData = data =>
     .sort((a, b) => a.name.localeCompare(b.name))
     .value()
 
-const getTotalCreditsOfProvidersBetween = async (a, b, sumAlias = 'sum') => {
+const getCurrentStudyYearStartDate = async () =>
+  new Date(
+    (await sequelize.query(
+      `
+    SELECT startdate FROM SEMESTERS s WHERE yearcode = (SELECT yearcode FROM SEMESTERS WHERE startdate < NOW() ORDER BY startdate DESC LIMIT 1) ORDER BY startdate LIMIT 1;
+    `,
+      {
+        type: sequelize.QueryTypes.SELECT
+      }
+    ))[0].startdate
+  )
+
+const getTotalCreditsOfCoursesBetween = async (a, b) => {
   return sequelize.query(
     `
-    SELECT SUM(cr.credits) AS ` +
-    sumAlias + // hax
-      `, cp.providercode FROM credit cr
+    SELECT SUM(cr.credits), cp.providercode, co.code, co.name FROM credit cr
       INNER JOIN course co ON cr.course_code = co.code
       INNER JOIN course_providers cp ON cp.coursecode = co.code
     WHERE
       cr.attainment_date BETWEEN :a AND :b
       AND cr."isStudyModule" = false
       AND cr.credittypecode IN (4, 9)
-    GROUP BY cp.providercode;
-  `,
+    GROUP BY co.code, cp.providercode
+    -- HAVING SUM(cr.credits) > 0
+    `,
     {
       type: sequelize.QueryTypes.SELECT,
       replacements: { a, b }
@@ -568,33 +579,35 @@ const getTotalCreditsOfProvidersBetween = async (a, b, sumAlias = 'sum') => {
   )
 }
 
+const mergele = (a, b) => {
+  if (!a) return b
+  if (!b) return a
+  return a + b
+}
+
 const getStatusStatistics = _.memoize(async () => {
   const Y_TO_MS = 31556952000
-  const { startdate: currentAcademicYearStartTimestamp } = (await sequelize.query(
-    `
-      SELECT startdate FROM SEMESTERS s WHERE yearcode = (SELECT yearcode FROM SEMESTERS WHERE startdate < NOW() ORDER BY startdate DESC LIMIT 1) ORDER BY startdate LIMIT 1;
-      `,
-    {
-      type: sequelize.QueryTypes.SELECT
-    }
-  ))[0]
-
-  const currentAcademicYearStartDate = new Date(currentAcademicYearStartTimestamp)
   const now = new Date()
-  const diff = currentAcademicYearStartDate.getFullYear() - 2017
-  const yearlyCreditsPromises = [...new Array(diff + 1)].map((_, i) => {
-    return new Promise(async (res, rej) => {
-      try {
-        const data = await getTotalCreditsOfProvidersBetween(
-          new Date(currentAcademicYearStartDate.getTime() - i * Y_TO_MS),
-          new Date(now.getTime() - i * Y_TO_MS)
+  const currentAcademicYearStartDate = await getCurrentStudyYearStartDate()
+  const currentAcademicYearStartYear = currentAcademicYearStartDate.getFullYear()
+
+  const yearRange = _.range(2017, currentAcademicYearStartYear + 1)
+  const yearlyCreditsPromises = yearRange.map(
+    year =>
+      new Promise(async res => {
+        const diff = currentAcademicYearStartYear - year
+        const creditsByCourse = await getTotalCreditsOfCoursesBetween(
+          new Date(currentAcademicYearStartDate.getTime() - diff * Y_TO_MS),
+          new Date(now.getTime() - diff * Y_TO_MS)
         )
-        res(data.map(d => ({ ...d, providercode: d.providercode, [2019 - i]: d, type: 'yearly' })))
-      } catch (e) {
-        rej(e)
-      }
-    })
-  })
+        res(
+          creditsByCourse.map(c => {
+            c['year'] = year
+            return c
+          })
+        )
+      })
+  )
 
   const [yearlyCredits, elementDetails, faculties, { data: facultyProgrammes }] = await Promise.all([
     Promise.all(yearlyCreditsPromises),
@@ -602,9 +615,6 @@ const getStatusStatistics = _.memoize(async () => {
     Organisation.findAll(),
     userServiceClient.get('/faculty_programmes')
   ])
-
-  const currentYearsCredits = yearlyCredits[0].map(c => ({ current: c.sum, providercode: c.providercode }))
-  const prevYearsCredits = yearlyCredits[1].map(c => ({ previous: c.sum, providercode: c.providercode }))
 
   const facultyCodeToFaculty = faculties.reduce((res, curr) => {
     res[curr.code] = curr
@@ -617,7 +627,7 @@ const getStatusStatistics = _.memoize(async () => {
   }, {})
 
   const providerToProgramme = elementDetails.reduce((res, curr) => {
-    const p = mapToProviders([curr.code])[0]
+    const [p] = mapToProviders([curr.code])
     res[p] = {
       code: curr.code,
       name: curr.name
@@ -625,47 +635,62 @@ const getStatusStatistics = _.memoize(async () => {
     return res
   }, {})
 
-  const groupedByProvider = _.groupBy(
-    [
-      ...currentYearsCredits.map(c => ({ ...c, type: 'active' })),
-      ...prevYearsCredits.map(c => ({ ...c, type: 'active' })),
-      ..._.flatten(yearlyCredits)
-    ],
-    'providercode'
+  const coursesGroupedByProvider = Object.entries(_.groupBy([..._.flatten(yearlyCredits)], 'providercode')).reduce(
+    (acc, [providerCode, courseCredits]) => {
+      acc[providerCode] = Object.entries(_.groupBy(courseCredits, 'code')).reduce(
+        (acc, [courseCode, yearlyInstances]) => {
+          acc[courseCode] = { yearly: {}, name: yearlyInstances[0].name }
+          yearlyInstances.forEach(instance => {
+            acc[courseCode]['yearly'][instance.year] = instance.sum
+          })
+          acc[courseCode]['current'] = acc[courseCode]['yearly'][currentAcademicYearStartYear] || 0
+          acc[courseCode]['previous'] = acc[courseCode]['yearly'][currentAcademicYearStartYear - 1] || 0
+          return acc
+        },
+        {}
+      )
+      return acc
+    },
+    {}
   )
 
-  const programmesToTotals = Object.keys(groupedByProvider).reduce((res, provider) => {
-    const programme = providerToProgramme[provider]
-    const groupedByType = _.groupBy(groupedByProvider[provider], 'type')
+  const groupedByProgramme = Object.entries(coursesGroupedByProvider).reduce((acc, [providerCode, courses]) => {
+    const programme = providerToProgramme[providerCode]
+    const courseValues = Object.values(courses)
+    const yearlyValues = courseValues.map(c => c.yearly)
+
     if (programme && programme.code) {
-      res[programme.code] = {
-        totals: _.omit(Object.assign(...groupedByType['active'])),
-        yearly: _.omit(Object.assign(...groupedByType['yearly']), ['type', 'providercode', 'sum']),
-        name: programme.name
+      acc[programme.code] = {
+        name: programme.name,
+        drill: courses,
+        yearly: _.mergeWith({}, ...yearlyValues, mergele),
+        current: _.sumBy(courseValues, 'current'),
+        previous: _.sumBy(courseValues, 'previous')
       }
     }
-    return res
+    return acc
   }, {})
 
-  const result = Object.entries(programmesToTotals).reduce((res, [programme, programmeStats]) => {
-    const facultyCode = programmeToFaculty[programme]
-    if (!facultyCode) return res
-    if (!res[facultyCode]) {
-      res[facultyCode] = { totals: { current: 0, previous: 0 }, yearly: {} }
-      res[facultyCode]['programmes'] = {}
-      res[facultyCode].name = facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null
+  const groupedByFaculty = Object.entries(groupedByProgramme).reduce((acc, [programmeCode, programmeStats]) => {
+    const facultyCode = programmeToFaculty[programmeCode]
+    if (!facultyCode) return acc
+    if (!acc[facultyCode]) {
+      acc[facultyCode] = {
+        drill: {},
+        name: facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null,
+        yearly: {},
+        current: 0,
+        previous: 0
+      }
     }
-    res[facultyCode]['programmes'][programme] = programmeStats
-    res[facultyCode].totals.current += programmeStats.totals.current
-    res[facultyCode].totals.previous += programmeStats.totals.previous
-    Object.entries(programmeStats.yearly).forEach(([year, total]) => {
-      if (!res[facultyCode].yearly[year]) res[facultyCode].yearly[year] = { sum: 0 }
-      res[facultyCode].yearly[year].sum += total.sum
-    })
-    return res
+    acc[facultyCode]['drill'][programmeCode] = programmeStats
+    acc[facultyCode]['yearly'] = _.mergeWith(acc[facultyCode]['yearly'], programmeStats.yearly, mergele)
+    acc[facultyCode]['current'] += programmeStats.current
+    acc[facultyCode]['previous'] += programmeStats.previous
+    return acc
   }, {})
 
-  return result
+  return groupedByFaculty
 })
 
 router.get(
