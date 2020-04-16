@@ -33,6 +33,7 @@ async function moduleResolver(rule, n) {
   if (mod.type == 'StudyModule') {
     const result = await moduleRuleResolver(mod, n)
     return {
+      id: mod.id,
       name: mod.name.fi,
       studyLevel: mod.studyLevel,
       targetCredits: mod.targetCredits,
@@ -45,6 +46,7 @@ async function moduleResolver(rule, n) {
   if (mod.type == 'GroupingModule') {
     const result = await moduleRuleResolver(mod, n)
     return {
+      id: mod.id,
       name: mod.name.fi,
       type: mod.type,
       result,
@@ -53,6 +55,7 @@ async function moduleResolver(rule, n) {
   }
 
   return {
+    id: mod.id,
     name: mod.name.fi,
     type: mod.type,
     result: 'unhandled module type: ' + mod.type
@@ -81,6 +84,7 @@ async function courseResolver(rule) {
     .first()
 
   return {
+    id: course.id,
     name: course.name ? course.name.fi : '',
     code: course.code
   }
@@ -89,15 +93,14 @@ async function courseResolver(rule) {
 async function resolver(rule, n) {
   const lid = rule.localId
 
-  if (seen.includes(lid)) {
-    return {
-      type: rule.type,
-      lid,
-      groupId: rule.moduleGroupId,
-      message: 'Circular reference to rule'
-    }
-  }
-
+  // if (seen.includes(lid)) {
+  //   return {
+  //     type: rule.type,
+  //     lid,
+  //     groupId: rule.moduleGroupId,
+  //     message: 'Circular reference to rule'
+  //   }
+  // }
   seen.push(lid)
 
   if (n > 24) {
