@@ -87,13 +87,14 @@ const StatusContainer = ({
       </div>
       {showYearlyValues && (
         <div style={{ marginTop: '10px', textAlign: 'start' }}>
-          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(([year, sum], i) => {
-            const yearChange = Math.round((getP(current, sum) - 1) * 1000) / 10
+          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(([year, sum]) => {
             return (
               <div style={{ margin: '5px 0' }} key={year}>
                 <span>
-                  <b>{year}:</b> {Math.round(sum)}{' '}
-                  {i !== 0 && <span style={{ color: getColor(yearChange) }}>({plussify(yearChange)}%)</span>}
+                  <b>
+                    {year}-{`${Number(year) + 1}`.slice(-2)}:
+                  </b>{' '}
+                  {Math.round(sum)}
                 </span>
               </div>
             )
@@ -171,7 +172,7 @@ const Status = () => {
             name="arrow left"
           />
         )}
-        <Checkbox label="Show yearly" onChange={handleShowYearlyValuesToggled} checked={showYearlyValues} />
+        <Checkbox label="Show previous years" onChange={handleShowYearlyValuesToggled} checked={showYearlyValues} />
       </div>
       <div
         style={{
