@@ -59,7 +59,15 @@ const StatusContainer = ({
       textAlign="center"
       compact
     >
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          overflowWrap: 'break-word'
+        }}
+      >
         <span className="status-title">{title}</span>
         <div style={{ margin: '10px 0' }}>
           <Icon
