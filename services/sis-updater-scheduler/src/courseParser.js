@@ -36,7 +36,7 @@ async function moduleResolver(rule, n) {
 
   if (mod.type == 'StudyModule') {
     const result = await moduleRuleResolver(mod, n)
-    const moduleCourses = { module: { id: mod.group_id, code: mod.code }, courses: result }
+    const moduleCourses = { module: { id: mod.group_id, code: mod.code, name: mod.name.fi }, courses: result }
     return moduleCourses
   }
 
