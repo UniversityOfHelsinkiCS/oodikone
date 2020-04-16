@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
-import { Segment, Loader, Dimmer, Checkbox, Button, Message, Radio } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Checkbox, Button, Message } from 'semantic-ui-react'
 
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
