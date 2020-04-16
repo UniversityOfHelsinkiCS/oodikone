@@ -621,8 +621,9 @@ const getStatusStatistics = _.memoize(async () => {
     return res
   }, {})
 
-  const programmeToFaculty = facultyProgrammes.reduce((res, curr) => {
-    res[curr.programme_code] = curr.faculty_code
+  const programmeToFaculties = facultyProgrammes.reduce((res, curr) => {
+    if (!res[curr.programme_code]) res[curr.programme_code] = []
+    res[curr.programme_code].push(curr.faculty_code)
     return res
   }, {})
 
@@ -672,21 +673,24 @@ const getStatusStatistics = _.memoize(async () => {
   }, {})
 
   const groupedByFaculty = Object.entries(groupedByProgramme).reduce((acc, [programmeCode, programmeStats]) => {
-    const facultyCode = programmeToFaculty[programmeCode]
-    if (!facultyCode) return acc
-    if (!acc[facultyCode]) {
-      acc[facultyCode] = {
-        drill: {},
-        name: facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null,
-        yearly: {},
-        current: 0,
-        previous: 0
+    const facultyCodes = programmeToFaculties[programmeCode]
+    if (!facultyCodes) return acc
+    facultyCodes.forEach(facultyCode => {
+      if (!facultyCode) return
+      if (!acc[facultyCode]) {
+        acc[facultyCode] = {
+          drill: {},
+          name: facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null,
+          yearly: {},
+          current: 0,
+          previous: 0
+        }
       }
-    }
-    acc[facultyCode]['drill'][programmeCode] = programmeStats
-    acc[facultyCode]['yearly'] = _.mergeWith(acc[facultyCode]['yearly'], programmeStats.yearly, mergele)
-    acc[facultyCode]['current'] += programmeStats.current
-    acc[facultyCode]['previous'] += programmeStats.previous
+      acc[facultyCode]['drill'][programmeCode] = programmeStats
+      acc[facultyCode]['yearly'] = _.mergeWith(acc[facultyCode]['yearly'], programmeStats.yearly, mergele)
+      acc[facultyCode]['current'] += programmeStats.current
+      acc[facultyCode]['previous'] += programmeStats.previous
+    })
     return acc
   }, {})
 
