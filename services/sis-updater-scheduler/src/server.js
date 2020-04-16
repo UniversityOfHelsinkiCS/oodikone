@@ -2,6 +2,7 @@ const express = require('express')
 require('express-async-errors')
 const { scheduleMeta, scheduleStudents } = require('./scheduler')
 const { getStructure } = require('./explorer')
+const { getCourses } = require('./courseParser')
 const { SECRET_TOKEN } = require('./config')
 
 const bakeMessage = res => (message = '', status = 200) => {
@@ -46,6 +47,16 @@ app.get('/v1/structure/:code', async (req, res) => {
     const studyModule = await getStructure(req.params.code)
     res.json(studyModule)
   } catch (e) {
+    res.json({ error: e })
+  }
+})
+
+app.get('/v1/courses/:code', async (req, res) => {
+  try {
+    const studyModule = await getCourses(req.params.code)
+    res.json(studyModule)
+  } catch (e) {
+    console.log(e)
     res.json({ error: e })
   }
 })
