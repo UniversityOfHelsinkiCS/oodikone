@@ -2,13 +2,29 @@ const { knexConnection } = require('./db/connection')
 
 let seen = []
 
+function flatten(arr) {
+  const result = []
+  for (let elem of arr) {
+    if (!Array.isArray(elem)) {
+      result.push(elem)
+      continue
+    }
+
+    for (let subelem of elem) {
+      result.push(subelem)
+    }
+  }
+
+  return result
+}
+
 async function moduleRuleResolver(mod, n) {
   if (mod.rule.rules) {
     return compositeResolver(mod.rule, n + 1)
   }
 
   const result = await resolver(mod.rule, n + 1)
-  return [result]
+  return flatten(result)
 }
 
 async function moduleResolver(rule, n) {
@@ -22,13 +38,16 @@ async function moduleResolver(rule, n) {
 
   if (mod.type == 'StudyModule') {
     const result = await moduleRuleResolver(mod, n)
-    const moduleCourses = { module: { id: mod.id, code: mod.code }, courses: result }
+    const moduleCourses = { module: { id: mod.group_id, code: mod.code }, courses: result }
     return moduleCourses
   }
 
   if (mod.type == 'GroupingModule') {
-    const result = await moduleRuleResolver(mod, n)
-    return result
+    if (mod.rule.rules) {
+      return Promise.all(mod.rule.rules.map(r => resolver(r, n + 1)))
+    }
+
+    return resolver(mod.rule, n + 1)
   }
 
   return {
@@ -39,7 +58,8 @@ async function moduleResolver(rule, n) {
 }
 
 async function compositeResolver(rule, n) {
-  return Promise.all(rule.rules.map(r => resolver(r, n + 1)))
+  const result = await Promise.all(rule.rules.map(r => resolver(r, n + 1)))
+  return flatten(result)
 }
 
 async function courseResolver(rule) {
@@ -51,22 +71,14 @@ async function courseResolver(rule) {
     .first()
 
   return {
-    name: course.name ? course.name.fi : '',
-    code: course.code
+    id: course.group_id,
+    code: course.code,
+    name: course.name ? course.name.fi : ''
   }
 }
 
 async function resolver(rule, n) {
   const lid = rule.localId
-
-  if (seen.includes(lid)) {
-    return {
-      type: rule.type,
-      lid,
-      groupId: rule.moduleGroupId,
-      message: 'Circular reference to rule'
-    }
-  }
 
   seen.push(lid)
 
@@ -105,7 +117,14 @@ const getCourses = async code => {
   const id = result.groupId
   const name = result.name.fi
 
-  const data = await resolver(result.rule.rule.rules[0], 1) // works well with TKT
+  // find the acual studies
+  let mod = result.rule.rule.rules[0]
+
+  while (mod.type != 'ModuleRule') {
+    mod = mod.rules[0]
+  }
+
+  const data = await resolver(mod, 1) // works well with TKT
 
   return {
     id,
