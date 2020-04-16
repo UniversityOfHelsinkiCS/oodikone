@@ -219,88 +219,16 @@ const ProgrammeChart = React.memo(({ org }) => {
   return <ReactHighcharts highcharts={Highcharts} config={makeDrilldownConfig(org)} />
 })
 
-const ProgrammeDrilldown = ({ org, defaultSorter, defaultSortDir, showAlt }) => {
-  const [sorter, setSorter] = useState(defaultSorter)
-  const [sortDir, setSortDir] = useState(defaultSortDir)
+const ProgrammeDrilldown = ({ org, sorter, sortDir }) => {
+
 
   const orgSortedProgrammes = useMemo(() => {
     return { ...org, programmes: [...org.programmes].sort((a, b) => sorters[sorter](a, b) * sortDir) }
   }, [org, sorter, sortDir])
 
-  const handleClick = sorterName => {
-    if (sorterName === sorter) setSortDir(-1 * sortDir)
-    setSorter(sorterName)
-  }
-
-  const sorterNames = Object.keys(sorters)
-    .map(sorterName => sorterName)
-    .sort((a, b) => {
-      if (a === 'nimi') return false
-      return a > b
-    })
-
   return (
     <>
       <Divider />
-      {showAlt ? (
-        <div align="center" style={{ marginTop: '10px' }}>
-          <Button.Group>
-            <Button style={{ cursor: 'default' }} active color="black">
-              Sort by:
-            </Button>
-            {sorterNames.map(sorterName => (
-              <Button
-                basic={sorter !== sorterName}
-                color={sorter === sorterName ? 'blue' : 'black'}
-                key={sorterName}
-                active={sorter === sorterName}
-                onClick={() => handleClick(sorterName)}
-                style={{ borderRadius: '1px' }}
-                icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
-                content={sorterName}
-              />
-            ))}
-          </Button.Group>
-        </div>
-      ) : (
-        <div align="center" style={{ marginTop: '10px' }}>
-          <Button.Group>
-            <Button style={{ cursor: 'default' }} active color="black">
-              Sort by:
-            </Button>
-            {sorterNames.map(sorterName => (
-              <Button
-                basic={sorter !== sorterName}
-                color={sorter === sorterName ? 'blue' : 'black'}
-                key={sorterName}
-                active={sorter === sorterName}
-                onClick={() => setSorter(sorterName)}
-                style={{ borderRadius: '1px' }}
-              >
-                {sorterName}
-              </Button>
-            ))}
-          </Button.Group>
-          <Button.Group style={{ marginLeft: '5px' }}>
-            <Button
-              icon="sort content ascending"
-              basic={sortDir !== 1}
-              color={sortDir === 1 ? 'blue' : 'black'}
-              style={{ borderRadius: '1px' }}
-              onClick={() => setSortDir(1)}
-              active={sortDir === 1}
-            />
-            <Button
-              icon="sort content descending"
-              basic={sortDir !== -1}
-              color={sortDir === -1 ? 'blue' : 'black'}
-              style={{ borderRadius: '1px' }}
-              onClick={() => setSortDir(-1)}
-              active={sortDir === -1}
-            />
-          </Button.Group>
-        </div>
-      )}
       <ProgrammeChart org={orgSortedProgrammes} />
     </>
   )
@@ -312,7 +240,6 @@ const ProtoC = () => {
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
   const [drilldownOrg, setDrilldownOrg] = useState(null)
-  const [showAlt, setAlt] = useState(false)
 
   const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
   const [excludeNonEnrolled, setExcludeNonEnrolled] = useState(false)
@@ -365,73 +292,32 @@ const ProtoC = () => {
       <div align="center">
         <h2>Prototyyppi: Suhteellinen tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
       </div>
-      <div align="center">
-        <Radio toggle onChange={() => setAlt(!showAlt)} />
+      <div align="center" style={{ marginTop: '10px' }}>
+        <Button.Group>
+          <Button style={{ cursor: 'default' }} active color="black">
+            Sort by:
+          </Button>
+          {sorterNames.map(sorterName => (
+            <Button
+              basic={sorter !== sorterName}
+              color={sorter === sorterName ? 'blue' : 'black'}
+              key={sorterName}
+              active={sorter === sorterName}
+              onClick={() => handleClick(sorterName)}
+              style={{ borderRadius: '1px' }}
+              icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
+              content={sorterName}
+            />
+          ))}
+        </Button.Group>
       </div>
-      {showAlt ? (
-        <div align="center" style={{ marginTop: '10px' }}>
-          <Button.Group>
-            <Button style={{ cursor: 'default' }} active color="black">
-              Sort by:
-            </Button>
-            {sorterNames.map(sorterName => (
-              <Button
-                basic={sorter !== sorterName}
-                color={sorter === sorterName ? 'blue' : 'black'}
-                key={sorterName}
-                active={sorter === sorterName}
-                onClick={() => handleClick(sorterName)}
-                style={{ borderRadius: '1px' }}
-                icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
-                content={sorterName}
-              />
-            ))}
-          </Button.Group>
-        </div>
-      ) : (
-        <div align="center" style={{ marginTop: '10px' }}>
-          <Button.Group>
-            <Button style={{ cursor: 'default' }} active color="black">
-              Sort by:
-            </Button>
-            {sorterNames.map(sorterName => (
-              <Button
-                basic={sorter !== sorterName}
-                color={sorter === sorterName ? 'blue' : 'black'}
-                key={sorterName}
-                active={sorter === sorterName}
-                onClick={() => setSorter(sorterName)}
-                style={{ borderRadius: '1px' }}
-              >
-                {sorterName}
-              </Button>
-            ))}
-          </Button.Group>
-          <Button.Group style={{ marginLeft: '5px' }}>
-            <Button
-              icon="sort content ascending"
-              basic={sortDir !== 1}
-              color={sortDir === 1 ? 'blue' : 'black'}
-              style={{ borderRadius: '1px' }}
-              onClick={() => setSortDir(1)}
-              active={sortDir === 1}
-            />
-            <Button
-              icon="sort content descending"
-              basic={sortDir !== -1}
-              color={sortDir === -1 ? 'blue' : 'black'}
-              style={{ borderRadius: '1px' }}
-              onClick={() => setSortDir(-1)}
-              active={sortDir === -1}
-            />
-          </Button.Group>
-        </div>
-      )}
-
       <Segment placeholder={isLoading} vertical>
         <Dimmer inverted active={isLoading} />
         <Loader active={isLoading} />
         {!isLoading && data && <OrgChart orgs={sortedOrgs} onOrgClicked={handleOrgClicked} />}
+        {!isLoading && data && drilldownOrg && (
+          <ProgrammeDrilldown org={drilldownOrg} sorter={sorter} sortDir={sortDir} />
+        )}
         <div align="center">
           <Checkbox
             label="Include only at least once enrolled students"
@@ -446,9 +332,6 @@ const ProtoC = () => {
           />
         </div>
         <Message content={CoolDataScience.protoC} />
-        {!isLoading && data && drilldownOrg && (
-          <ProgrammeDrilldown org={drilldownOrg} defaultSorter={sorter} defaultSortDir={sortDir} showAlt={showAlt} />
-        )}
       </Segment>
     </Segment>
   )
