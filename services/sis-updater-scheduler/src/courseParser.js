@@ -1,20 +1,5 @@
+const { flatten } = require('lodash')
 const { knexConnection } = require('./db/connection')
-
-function flatten(arr) {
-  const result = []
-  for (let elem of arr) {
-    if (!Array.isArray(elem)) {
-      result.push(elem)
-      continue
-    }
-
-    for (let subelem of elem) {
-      result.push(subelem)
-    }
-  }
-
-  return result
-}
 
 async function moduleRuleResolver(mod, n) {
   if (mod.rule.rules) {
@@ -104,7 +89,7 @@ const getCourses = async code => {
     .where({ code: code })
     .first()
 
-  const id = result.groupId
+  const id = result.group_id
   const name = result.name.fi
 
   const data = await resolver(result.rule, 1)
