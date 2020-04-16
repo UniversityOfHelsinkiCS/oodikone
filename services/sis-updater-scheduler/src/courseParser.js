@@ -1,7 +1,5 @@
 const { knexConnection } = require('./db/connection')
 
-let seen = []
-
 function flatten(arr) {
   const result = []
   for (let elem of arr) {
@@ -43,11 +41,7 @@ async function moduleResolver(rule, n) {
   }
 
   if (mod.type == 'GroupingModule') {
-    if (mod.rule.rules) {
-      return Promise.all(mod.rule.rules.map(r => resolver(r, n + 1)))
-    }
-
-    return resolver(mod.rule, n + 1)
+    return moduleRuleResolver(mod, n)
   }
 
   return {
@@ -78,10 +72,6 @@ async function courseResolver(rule) {
 }
 
 async function resolver(rule, n) {
-  const lid = rule.localId
-
-  seen.push(lid)
-
   if (n > 24) {
     return 'Max depth reached'
   } else if (!n) {
@@ -117,19 +107,23 @@ const getCourses = async code => {
   const id = result.groupId
   const name = result.name.fi
 
-  // find the acual studies
-  let mod = result.rule.rule.rules[0]
+  const data = await resolver(result.rule, 1)
 
-  while (mod.type != 'ModuleRule') {
-    mod = mod.rules[0]
-  }
+  const appeared = new Set()
 
-  const data = await resolver(mod, 1) // works well with TKT
+  const filtered = data.filter(d => {
+    if (!d.module) return false
+    if (appeared.has(d.module.id)) {
+      return false
+    }
+    appeared.add(d.module.id)
+    return true
+  })
 
   return {
     id,
     name,
-    modules: data
+    modules: filtered
   }
 }
 
