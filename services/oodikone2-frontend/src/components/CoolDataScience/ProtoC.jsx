@@ -2,8 +2,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
-import { Segment, Loader, Dimmer, Checkbox, Button, Message, Divider, Radio } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Checkbox, Button, Message, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
+import ReactMarkdown from 'react-markdown'
 
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
@@ -25,9 +26,7 @@ const defaultConfig = () => {
       }
     },
     legend: {
-      layout: 'horizontal',
-      borderWidth: 1,
-      backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
+      enabled: false
     },
     tooltip: {
       shared: true,
@@ -77,6 +76,7 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
             // use setImmediate so the click handler can finish
             // before datamangels begins so that the browser is responsive
             setImmediate(() => onOrgClicked(clickedOrg))
+            e.point.update()
           }
         }
       }
@@ -135,6 +135,22 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
       style: {
         display: 'none'
       }
+    },
+    responsive: {
+      rules: [
+        {
+          condition: {
+            callback: function() {
+              console.log(series)
+            }
+          },
+          chartOptions: {
+            legend: {
+              enabled: false
+            }
+          }
+        }
+      ]
     },
     xAxis: {
       categories: sortedOrgs.map(org => org.name)
@@ -311,6 +327,15 @@ const ProtoC = () => {
         {!isLoading && data && drilldownOrg && (
           <ProgrammeDrilldown org={drilldownOrg} sorter={sorter} sortDir={sortDir} />
         )}
+        <div align="center" style={{ margin: '10px' }}>
+          <span style={{ border: '1px solid black', padding: '4px' }}>
+            <Icon style={{ marginLeft: '10px', color: '#6ab04c' }} name="circle" size="small" /> 3v tahdissa
+            <Icon style={{ marginLeft: '10px', color: '#f9ca24' }} name="circle" size="small" /> 4v tahdissa
+            <Icon style={{ marginLeft: '10px', color: '#ff7979' }} name="circle" size="small" /> ei tahdissa
+            <Icon style={{ marginLeft: '10px', color: '#7f8c8d' }} name="circle" size="small" /> tällä hetkellä
+            peruutettu
+          </span>
+        </div>
         <div align="center">
           <Checkbox
             label="Include only at least once enrolled students"
@@ -325,7 +350,9 @@ const ProtoC = () => {
           />
         </div>
       </Segment>
-      <Message content={CoolDataScience.protoC} />
+      <Message>
+        <ReactMarkdown source={CoolDataScience.protoC} escapeHtml={false} />
+      </Message>
     </Segment>
   )
 }
