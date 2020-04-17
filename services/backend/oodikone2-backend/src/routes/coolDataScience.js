@@ -559,10 +559,12 @@ const getCurrentStudyYearStartDate = async () =>
     ))[0].startdate
   )
 
-const getTotalCreditsOfCoursesBetween = async (a, b) => {
+const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum') => {
   return sequelize.query(
     `
-    SELECT SUM(cr.credits), cp.providercode, co.code, co.name FROM credit cr
+    SELECT SUM(cr.credits) AS ` +
+    alias + // HAX, alias doesn't come from user so no sql injection
+      `, cp.providercode, co.code, co.name FROM credit cr
       INNER JOIN course co ON cr.course_code = co.code
       INNER JOIN course_providers cp ON cp.coursecode = co.code
     WHERE
@@ -579,27 +581,25 @@ const getTotalCreditsOfCoursesBetween = async (a, b) => {
   )
 }
 
-const mergele = (a, b) => {
+const sumMerge = (a, b) => {
   if (!a) return b
   if (!b) return a
   return a + b
 }
 
-const getStatusStatistics = _.memoize(async () => {
-  const Y_TO_MS = 31556952000
-  const now = new Date()
-  const currentAcademicYearStartDate = await getCurrentStudyYearStartDate()
-  const currentAcademicYearStartYear = currentAcademicYearStartDate.getFullYear()
+const mergele = (a, b) => {
+  if (!a) return _.clone(b)
+  if (!b) return _.clone(a)
+  return _.mergeWith(a, b, sumMerge)
+}
 
-  const yearRange = _.range(2017, currentAcademicYearStartYear + 1)
-  const yearlyCreditsPromises = yearRange.map(
+const makeYearlyCreditsPromises = (now, currentYear, years, getRange, alias = 'sum') => {
+  return years.map(
     year =>
       new Promise(async res => {
-        const diff = currentAcademicYearStartYear - year
-        const creditsByCourse = await getTotalCreditsOfCoursesBetween(
-          new Date(currentAcademicYearStartDate.getTime() - diff * Y_TO_MS),
-          new Date(now.getTime() - diff * Y_TO_MS)
-        )
+        const diff = currentYear - year
+        const { from, to } = getRange(diff)
+        const creditsByCourse = await getTotalCreditsOfCoursesBetween(from, to, alias)
         res(
           creditsByCourse.map(c => {
             c['year'] = year
@@ -608,9 +608,47 @@ const getStatusStatistics = _.memoize(async () => {
         )
       })
   )
+}
 
-  const [yearlyCredits, elementDetails, faculties, { data: facultyProgrammes }] = await Promise.all([
-    Promise.all(yearlyCreditsPromises),
+const getStatusStatistics = _.memoize(async () => {
+  const Y_TO_MS = 31556952000
+  const now = new Date().getTime()
+  const currentAcademicYearStartDate = await getCurrentStudyYearStartDate()
+  const currentAcademicYearStartYear = currentAcademicYearStartDate.getFullYear()
+  const currentAcademicYearStartTime = currentAcademicYearStartDate.getTime()
+
+  const yearRange = _.range(2017, currentAcademicYearStartYear + 1)
+  const yearlyAccCreditsPromises = makeYearlyCreditsPromises(
+    now,
+    currentAcademicYearStartYear,
+    yearRange,
+    diff => ({
+      from: new Date(currentAcademicYearStartTime - diff * Y_TO_MS),
+      to: new Date(now - diff * Y_TO_MS)
+    }),
+    'acc'
+  )
+
+  const yearlyTotalCreditsPromises = makeYearlyCreditsPromises(
+    now,
+    currentAcademicYearStartYear,
+    yearRange.slice(0, -1),
+    diff => ({
+      from: new Date(currentAcademicYearStartTime - diff * Y_TO_MS),
+      to: new Date(currentAcademicYearStartTime - (diff - 1) * Y_TO_MS)
+    }),
+    'total'
+  )
+
+  const [
+    yearlyAccCredits,
+    yearlyTotalCredits,
+    elementDetails,
+    faculties,
+    { data: facultyProgrammes }
+  ] = await Promise.all([
+    Promise.all(yearlyAccCreditsPromises),
+    Promise.all(yearlyTotalCreditsPromises),
     ElementDetails.findAll(),
     Organisation.findAll(),
     userServiceClient.get('/faculty_programmes')
@@ -636,24 +674,28 @@ const getStatusStatistics = _.memoize(async () => {
     return res
   }, {})
 
-  const coursesGroupedByProvider = Object.entries(_.groupBy([..._.flatten(yearlyCredits)], 'providercode')).reduce(
-    (acc, [providerCode, courseCredits]) => {
-      acc[providerCode] = Object.entries(_.groupBy(courseCredits, 'code')).reduce(
-        (acc, [courseCode, yearlyInstances]) => {
-          acc[courseCode] = { yearly: {}, name: yearlyInstances[0].name }
-          yearlyInstances.forEach(instance => {
-            acc[courseCode]['yearly'][instance.year] = instance.sum
-          })
-          acc[courseCode]['current'] = acc[courseCode]['yearly'][currentAcademicYearStartYear] || 0
-          acc[courseCode]['previous'] = acc[courseCode]['yearly'][currentAcademicYearStartYear - 1] || 0
-          return acc
-        },
-        {}
-      )
-      return acc
-    },
-    {}
-  )
+  const coursesGroupedByProvider = Object.entries(
+    _.groupBy([..._.flatten(yearlyAccCredits), ..._.flatten(yearlyTotalCredits)], 'providercode')
+  ).reduce((acc, [providerCode, courseCredits]) => {
+    acc[providerCode] = Object.entries(_.groupBy(courseCredits, 'code')).reduce(
+      (acc, [courseCode, yearlyInstances]) => {
+        acc[courseCode] = { yearly: {}, name: yearlyInstances[0].name }
+        yearlyInstances.forEach(instance => {
+          if (!acc[courseCode]['yearly'][instance.year]) acc[courseCode]['yearly'][instance.year] = {}
+          if (instance.acc !== undefined) {
+            acc[courseCode]['yearly'][instance.year]['acc'] = instance.acc
+          } else {
+            acc[courseCode]['yearly'][instance.year]['total'] = instance.total
+          }
+        })
+        acc[courseCode]['current'] = _.get(acc, [courseCode, 'yearly', currentAcademicYearStartYear, 'acc']) || 0
+        acc[courseCode]['previous'] = _.get(acc, [courseCode, 'yearly', currentAcademicYearStartYear - 1, 'acc']) || 0
+        return acc
+      },
+      {}
+    )
+    return acc
+  }, {})
 
   const groupedByProgramme = Object.entries(coursesGroupedByProvider).reduce((acc, [providerCode, courses]) => {
     const programme = providerToProgramme[providerCode]
