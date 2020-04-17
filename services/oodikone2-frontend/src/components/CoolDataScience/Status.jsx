@@ -39,8 +39,8 @@ const StatusContainer = ({
   }
 
   const plussify = x => {
-    if (x > 0) return `+${x}`
-    return x
+    if (x > 0) return `+${x.toLocaleString('fi')}`
+    return x.toLocaleString('fi')
   }
 
   return (
@@ -50,8 +50,8 @@ const StatusContainer = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        maxWidth: '220px',
-        minWidth: '220px',
+        maxWidth: '240px',
+        minWidth: '240px',
         cursor: clickable ? 'pointer' : 'default',
         flex: 1,
         margin: 0
@@ -87,14 +87,21 @@ const StatusContainer = ({
       </div>
       {showYearlyValues && (
         <div style={{ marginTop: '10px', textAlign: 'start' }}>
-          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(([year, sum]) => {
+          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(([year, { acc, total }]) => {
             return (
-              <div style={{ margin: '5px 0' }} key={year}>
+              <div style={{ margin: '5px 0' }} key={`${title}-${year}`}>
                 <span>
                   <b>
                     {year}-{`${Number(year) + 1}`.slice(-2)}:
                   </b>{' '}
-                  {Math.round(sum)}
+                  {acc ? Math.round(acc).toLocaleString('fi') : 0}
+                  {!!total && (
+                    <span>
+                      {' '}
+                      <span style={{ fontSize: '1.4em', verticalAlign: 'bottom' }}>/</span>{' '}
+                      {Math.round(total).toLocaleString('fi')}
+                    </span>
+                  )}
                 </span>
               </div>
             )
@@ -177,7 +184,7 @@ const Status = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, 220px)',
+          gridTemplateColumns: 'repeat(auto-fill, 240px)',
           gridTemplateRows: 'repeat(auto-fill) 20px',
           gridGap: '20px'
         }}
@@ -188,9 +195,9 @@ const Status = () => {
           const handleClick = () => pushToDrillStack(stats.drill)
           return (
             <StatusContainer
+              key={code}
               clickable={!!stats.drill}
               handleClick={handleClick}
-              key={code}
               title={getTextIn(stats.name)}
               current={stats.current}
               previous={stats.previous}
