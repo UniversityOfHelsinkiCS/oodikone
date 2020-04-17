@@ -11,7 +11,7 @@ if (process.env.LOG_PORT && process.env.LOG_HOST) {
       hostname: process.env.LOG_HOSTNAME || 'oodikone-usageservice',
       host: process.env.LOG_HOST,
       port: process.env.LOG_PORT,
-      protocol: 'http',
+      protocol: process.env.LOG_PROTOCOL || 'http',
       environment: process.env.NODE_ENV
     })
   )
