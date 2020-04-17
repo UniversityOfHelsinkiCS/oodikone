@@ -1,11 +1,24 @@
 const { flatten } = require('lodash')
 const { knexConnection } = require('./db/connection')
 
-async function moduleRuleResolver(mod, n) {
-  if (mod.rule.rules) {
-    return compositeResolver(mod.rule, n + 1)
+async function creditResolver(rule, n) {
+  const data = await resolver(rule.rule, n + 1)
+  if (rule.credits.min === 45) {
+    console.log(rule, data)
+  }
+  if (rule.credits.min < 100 && rule.credits.min > 0) {
+    return [
+      {
+        credits: rule.credits.min,
+        modules: data
+      }
+    ]
   }
 
+  return data
+}
+
+async function moduleRuleResolver(mod, n) {
   const result = await resolver(mod.rule, n + 1)
   return flatten(result)
 }
@@ -20,7 +33,9 @@ async function moduleResolver(rule, n) {
     .first()
 
   if (mod.type == 'StudyModule') {
-    const result = await moduleRuleResolver(mod, n)
+    const result = await resolver(mod.rule, n)
+    if (mod.code === 'MAT230') console.log(mod.rule, result)
+    if (mod.code.slice(0, 3) === 'KK-') return null
     const moduleCourses = { module: { id: mod.group_id, code: mod.code, name: mod.name.fi }, courses: result }
     return moduleCourses
   }
@@ -38,7 +53,7 @@ async function moduleResolver(rule, n) {
 
 async function compositeResolver(rule, n) {
   const result = await Promise.all(rule.rules.map(r => resolver(r, n + 1)))
-  return flatten(result)
+  return flatten(result.filter(Boolean))
 }
 
 async function courseResolver(rule) {
@@ -57,14 +72,8 @@ async function courseResolver(rule) {
 }
 
 async function resolver(rule, n) {
-  if (n > 24) {
-    return 'Max depth reached'
-  } else if (!n) {
-    return '***'
-  }
-
   if (rule.type == 'CreditsRule') {
-    return resolver(rule.rule, n + 1)
+    return creditResolver(rule, n + 1)
   }
   if (rule.type == 'CompositeRule') {
     return compositeResolver(rule, n)
@@ -74,6 +83,15 @@ async function resolver(rule, n) {
   }
   if (rule.type == 'CourseUnitRule') {
     return courseResolver(rule)
+  }
+
+  if (rule.type == 'AnyCourseUnitRule') {
+    return { id: rule.localId, name: 'Any course' }
+  }
+
+  if (rule.type == 'AnyModuleRule') {
+    console.log(rule)
+    return { id: rule.localId, name: 'Any module' }
   }
 
   return {
