@@ -4,6 +4,7 @@ import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 import { Segment, Loader, Dimmer, Checkbox, Button, Message, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
+import ReactMarkdown from 'react-markdown'
 
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
@@ -25,7 +26,7 @@ const defaultConfig = () => {
       }
     },
     legend: {
-      enabled: false,
+      enabled: false
     },
     tooltip: {
       shared: true,
@@ -349,7 +350,9 @@ const ProtoC = () => {
           />
         </div>
       </Segment>
-      <Message content={CoolDataScience.protoC} />
+      <Message>
+        <ReactMarkdown source={CoolDataScience.protoC} escapeHtml={false} />
+      </Message>
     </Segment>
   )
 }
