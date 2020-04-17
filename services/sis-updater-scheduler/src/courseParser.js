@@ -3,9 +3,6 @@ const { knexConnection } = require('./db/connection')
 
 async function creditResolver(rule, n) {
   const data = await resolver(rule.rule, n + 1)
-  if (rule.credits.min === 45) {
-    console.log(rule, data)
-  }
   if (rule.credits.min < 100 && rule.credits.min > 0) {
     return [
       {
@@ -34,7 +31,6 @@ async function moduleResolver(rule, n) {
 
   if (mod.type == 'StudyModule') {
     const result = await resolver(mod.rule, n)
-    if (mod.code === 'MAT230') console.log(mod.rule, result)
     if (mod.code.slice(0, 3) === 'KK-') return null
     const moduleCourses = { module: { id: mod.group_id, code: mod.code, name: mod.name.fi }, courses: result }
     return moduleCourses
@@ -90,7 +86,6 @@ async function resolver(rule, n) {
   }
 
   if (rule.type == 'AnyModuleRule') {
-    console.log(rule)
     return { id: rule.localId, name: 'Any module' }
   }
 
