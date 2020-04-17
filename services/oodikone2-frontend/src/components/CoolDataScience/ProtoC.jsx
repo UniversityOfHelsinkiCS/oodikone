@@ -220,18 +220,11 @@ const ProgrammeChart = React.memo(({ org }) => {
 })
 
 const ProgrammeDrilldown = ({ org, sorter, sortDir }) => {
-
-
   const orgSortedProgrammes = useMemo(() => {
     return { ...org, programmes: [...org.programmes].sort((a, b) => sorters[sorter](a, b) * sortDir) }
   }, [org, sorter, sortDir])
 
-  return (
-    <>
-      <Divider />
-      <ProgrammeChart org={orgSortedProgrammes} />
-    </>
-  )
+  return <ProgrammeChart org={orgSortedProgrammes} />
 }
 
 const ProtoC = () => {
@@ -331,8 +324,8 @@ const ProtoC = () => {
             checked={includeOldAttainments}
           />
         </div>
-        <Message content={CoolDataScience.protoC} />
       </Segment>
+      <Message content={CoolDataScience.protoC} />
     </Segment>
   )
 }
