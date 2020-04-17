@@ -1,5 +1,21 @@
-const { flatten } = require('lodash')
 const { knexConnection } = require('./db/connection')
+
+function customFlatten(arr) {
+  const result = []
+
+  for (let elem of arr) {
+    if (!Array.isArray(elem) || (!elem[0].module && elem[0].code)) {
+      result.push(elem)
+      continue
+    }
+
+    for (let subelem of elem) {
+      result.push(subelem)
+    }
+  }
+
+  return result
+}
 
 async function creditResolver(rule, n) {
   const data = await resolver(rule.rule, n + 1)
@@ -17,7 +33,7 @@ async function creditResolver(rule, n) {
 
 async function moduleRuleResolver(mod, n) {
   const result = await resolver(mod.rule, n + 1)
-  return flatten(result)
+  return customFlatten(result)
 }
 
 async function moduleResolver(rule, n) {
@@ -49,7 +65,7 @@ async function moduleResolver(rule, n) {
 
 async function compositeResolver(rule, n) {
   const result = await Promise.all(rule.rules.map(r => resolver(r, n + 1)))
-  return flatten(result.filter(Boolean))
+  return customFlatten(result.filter(Boolean))
 }
 
 async function courseResolver(rule) {
