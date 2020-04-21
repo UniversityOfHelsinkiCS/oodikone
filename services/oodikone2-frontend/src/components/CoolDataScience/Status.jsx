@@ -158,12 +158,12 @@ const Status = () => {
 
   const renderSettings = () => {
     return (
-      <Accordion>
+      <Accordion style={{ padding: 0, flex: 1 }}>
         <Accordion.Title active={showSettings} onClick={() => setShowSettings(!showSettings)}>
           <Icon name="setting" />
           Asetukset
         </Accordion.Title>
-        <Accordion.Content style={{ padding: 0 }} active={showSettings}>
+        <Accordion.Content style={{ padding: 0, marginTop: '10px' }} active={showSettings}>
           <Segment>
             <div
               style={{
@@ -208,16 +208,11 @@ const Status = () => {
   const medianDiff = orderedAbsDiffs[Math.round((orderedAbsDiffs.length - 1) / 2)]
   return (
     <div>
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ display: 'flex', marginBottom: '20px', marginRight: '40px' }}>
         {drillStack.length > 0 && (
-          <Icon
-            onClick={popFromDrillStack}
-            style={{ fontSize: '40px', cursor: 'pointer', marginRight: '20px' }}
-            name="arrow left"
-          />
+          <Icon onClick={popFromDrillStack} style={{ fontSize: '40px', cursor: 'pointer' }} name="arrow left" />
         )}
         {renderSettings()}
-        {/* <Checkbox label="Show previous years" onChange={handleShowYearlyValuesToggled} checked={showYearlyValues} /> */}
       </div>
       <div
         style={{
