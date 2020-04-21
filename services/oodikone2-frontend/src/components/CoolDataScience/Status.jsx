@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Segment, Loader, Dimmer, Icon, Checkbox } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Icon, Accordion, Checkbox } from 'semantic-ui-react'
 import _ from 'lodash'
 import { getTextIn } from '../../common'
 import { callApi } from '../../apiConnection'
@@ -129,6 +129,7 @@ const Status = () => {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(null)
   const [drillStack, setDrillStack] = useState([])
+  const [showSettings, setShowSettings] = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -155,6 +156,42 @@ const Status = () => {
     setDrillStack(updatedDrillStack)
   }
 
+  const renderSettings = () => {
+    return (
+      <Accordion>
+        <Accordion.Title active={showSettings} onClick={() => setShowSettings(!showSettings)}>
+          <Icon name="setting" />
+          Asetukset
+        </Accordion.Title>
+        <Accordion.Content style={{ padding: 0 }} active={showSettings}>
+          <Segment>
+            <div
+              style={{
+                width: '10px',
+                height: '10px',
+                background: 'red',
+                transform: 'rotateY(0deg) rotate(45deg)',
+                position: 'absolute',
+                top: '-6px',
+                left: '35px',
+                border: '1px solid #dededf',
+                borderRight: 'none',
+                borderBottom: 'none',
+                backgroundColor: 'white'
+              }}
+            />
+            <Checkbox
+              style={{ fontSize: '14px', fontWeight: 'normal' }}
+              label="Näytä edelliset vuodet"
+              onChange={handleShowYearlyValuesToggled}
+              checked={showYearlyValues}
+            />
+          </Segment>
+        </Accordion.Content>
+      </Accordion>
+    )
+  }
+
   if (!data || loading)
     return (
       <Segment style={{ padding: '40px' }} textAlign="center">
@@ -179,7 +216,8 @@ const Status = () => {
             name="arrow left"
           />
         )}
-        <Checkbox label="Show previous years" onChange={handleShowYearlyValuesToggled} checked={showYearlyValues} />
+        {renderSettings()}
+        {/* <Checkbox label="Show previous years" onChange={handleShowYearlyValuesToggled} checked={showYearlyValues} /> */}
       </div>
       <div
         style={{
