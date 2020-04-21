@@ -121,6 +121,7 @@ async function resolver(rule, n) {
     const data = await compositeResolver(rule, n)
     return {
       type: rule.type,
+      allMandatory: rule.allMandatory,
       data,
       rule: includeRules ? rule : null
     }
