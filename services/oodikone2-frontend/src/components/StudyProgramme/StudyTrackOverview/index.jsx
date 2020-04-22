@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { string, func, shape, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { uniqBy } from 'lodash'
-import { Dropdown, Tab, Message } from 'semantic-ui-react'
+import { Dropdown, Tab, Message, Button } from 'semantic-ui-react'
 import ThroughputTable from '../ThroughputTable'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
@@ -14,6 +14,7 @@ const Overview = props => {
   const [throughputData, setData] = useState(null)
   const [studytrackOptions, setStudytrackOptions] = useState([])
   const [yearOptions, setYearOptions] = useState([])
+  const [activeIndex, setIndex] = useState(0)
 
   const {
     language,
@@ -33,16 +34,17 @@ const Overview = props => {
   // set dropdown options
   useEffect(() => {
     if (throughput.data[studyprogramme]) {
-      const years = Object.keys(studyprogrammes[studyprogramme].enrollmentStartYears)
+      const years = throughput.data[studyprogramme].data.map(data => data.year)
       const filteredStudytracks = years.reduce((acc, curr) => {
-        acc.push(...Object.values(studyprogrammes[studyprogramme].enrollmentStartYears[curr].studyTracks))
+        if (studyprogrammes[studyprogramme].enrollmentStartYears[curr.slice(0, 4)])
+          acc.push(...Object.values(studyprogrammes[studyprogramme].enrollmentStartYears[curr.slice(0, 4)].studyTracks))
         return uniqBy(acc, 'code')
       }, [])
 
       const yearDropdownOptions = years.map(year => ({
-        key: `${year}-${Number(year) + 1}`,
-        text: `${year}-${Number(year) + 1}`,
-        value: `${year}-${Number(year) + 1}`
+        key: year,
+        text: year,
+        value: year
       }))
 
       const dropdownOptions = filteredStudytracks.map(st => ({
@@ -51,6 +53,9 @@ const Overview = props => {
         description: st.code,
         value: st.code
       }))
+      if (yearDropdownOptions.length > 0) {
+        setYear(yearDropdownOptions[0].value)
+      }
       setYearOptions(yearDropdownOptions)
       setStudytrackOptions(dropdownOptions)
     }
@@ -73,7 +78,7 @@ const Overview = props => {
         setData(newData)
       }
     }
-  }, [selectedTrack])
+  }, [selectedTrack, activeIndex])
 
   // mankel throughput data after selecting a year
   useEffect(() => {
@@ -115,7 +120,7 @@ const Overview = props => {
         setData(newData)
       }
     }
-  }, [selectedYear])
+  }, [selectedYear, activeIndex])
 
   const handleStudytrackChange = (event, { value }) => {
     event.preventDefault()
@@ -127,13 +132,33 @@ const Overview = props => {
     setYear(value)
   }
 
-  const renderDropdown = year => {
+  const renderSelection = year => {
+    if (year && yearOptions.length < 10)
+      return (
+        <>
+          <h3>Year selection</h3>
+          <Button.Group>
+            {yearOptions.map(option => (
+              <Button
+                key={option.key}
+                content={option.text}
+                style={{ borderRadius: '1px' }}
+                onClick={e => handleYearChange(e, option)}
+                active={option.value === selectedYear}
+                color={option.value === selectedYear ? 'blue' : 'black'}
+                basic={option.value !== selectedYear}
+              />
+            ))}
+          </Button.Group>
+        </>
+      )
     return (
       <>
-        <h4>{year ? 'Year' : 'Studytrack'} selection</h4>
+        <h3>{year ? 'Year' : 'Studytrack'} selection</h3>
         <Dropdown
           options={year ? yearOptions : studytrackOptions}
           onChange={year ? handleYearChange : handleStudytrackChange}
+          defaultValue={year ? yearOptions[0].value : studytrackOptions[0].value}
           selection
           placeholder={`Select ${year ? 'year' : ' studytrack'}`}
           search={textAndDescriptionSearch}
@@ -147,14 +172,14 @@ const Overview = props => {
     if (!throughputData) {
       return (
         <>
-          {renderDropdown(year)}
+          {renderSelection(year)}
           <h2>No {year ? 'year' : 'studytrack'} selected</h2>
         </>
       )
     }
     return (
       <React.Fragment>
-        {renderDropdown(year)}
+        {renderSelection(year)}
         <ThroughputTable
           throughput={throughputData}
           thesis={throughput.data.thesis}
@@ -169,11 +194,16 @@ const Overview = props => {
       </React.Fragment>
     )
   }
-
-  const handleTabChange = () => {
-    setYear('')
-    setTrack('')
+  const handleTabChange = (event, { activeIndex }) => {
     setData(null)
+    if (activeIndex === 1) {
+      setTrack(studytrackOptions[0].value)
+      setYear('')
+    } else {
+      setYear(yearOptions[0].value)
+      setTrack('')
+    }
+    setIndex(activeIndex)
   }
 
   const panes = [
@@ -186,14 +216,13 @@ const Overview = props => {
       render: () => renderTable(false)
     }
   ]
-
   return (
     <>
       <Message
         content="Here you can see statistics on studytrack level. In year specific tab you can compare statistics for all studytracks within selected year. 
                   In studytrack specific tab you can compare different years from one selected studytrack."
       />
-      <Tab panes={panes} onTabChange={() => handleTabChange()} />
+      <Tab panes={panes} activeIndex={activeIndex} onTabChange={handleTabChange} />
     </>
   )
 }
