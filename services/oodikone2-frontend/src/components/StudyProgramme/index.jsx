@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect } from 'react'
-import { withRouter, Link } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { shape, string, arrayOf, func, bool } from 'prop-types'
-import { Header, Segment, Tab, Card, Icon, Button } from 'semantic-ui-react'
+import { Header, Segment, Tab, Button } from 'semantic-ui-react'
 import { isEqual, uniqBy } from 'lodash'
 import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
 import CourseCodeMapper from '../CourseCodeMapper'
@@ -154,29 +154,26 @@ const StudyProgramme = props => {
     })
   }, [programmeName])
 
+  if (!studyProgrammeId)
+    return (
+      <div className="segmentContainer">
+        <Header className="segmentTitle" size="large">
+          Study Programme
+        </Header>
+        <Segment className="contentSegment">
+          <StudyProgrammeSelector handleSelect={handleSelect} selected={studyProgrammeId !== undefined} />
+        </Segment>
+      </div>
+    )
+
   return (
     <div className="segmentContainer">
-      <Header className="segmentTitle" size="large">
-        Study Programme
-      </Header>
       <Segment className="contentSegment">
-        <StudyProgrammeSelector handleSelect={handleSelect} selected={studyProgrammeId !== undefined} />
-        {studyProgrammeId ? (
-          <React.Fragment>
-            <Card fluid className="cardContainer">
-              <Card.Content>
-                <Card.Header className="cardHeader">
-                  {programmeName}
-                  <Link to="/study-programme" className="controlIconLink">
-                    <Icon name="remove" className="controlIcon" />
-                  </Link>
-                </Card.Header>
-                <Card.Meta content={studyProgrammeId} />
-              </Card.Content>
-            </Card>
-            <Tab panes={panes} activeIndex={tab} onTabChange={setTab} />
-          </React.Fragment>
-        ) : null}
+        <div align="center" style={{ padding: '30px' }}>
+          <Header textAlign="center">{programmeName}</Header>
+          <span>{studyProgrammeId}</span>
+        </div>
+        <Tab panes={panes} activeIndex={tab} onTabChange={setTab} />
       </Segment>
     </div>
   )

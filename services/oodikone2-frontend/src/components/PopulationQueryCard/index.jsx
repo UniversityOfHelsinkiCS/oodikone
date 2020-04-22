@@ -8,25 +8,24 @@ import { minBy } from 'lodash'
 import './populationQueryCard.css'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
 import { reformatDate, getTextIn } from '../../common'
+import InfoBox from '../InfoBox'
+import infotooltips from '../../common/InfoToolTips'
 
-const PopulationQueryCard = ({ translate, population, query, removeSampleFn, units, language, history, tags }) => {
-  const removePopulation = uuid => {
-    history.push('/populations')
-    removeSampleFn(uuid)
-  }
+const PopulationQueryCard = ({ translate, population, query, removeSampleFn, units, language, tags }) => {
   const { uuid, year, semesters, months, studentStatuses, tag, years } = query
   const tagname = tag ? tags.find(t => t.tag_id === tag).tagname : ''
   const lowestYear = query.years ? Math.min(...query.years.map(year => Number(year))) : null
   const highestYear = query.years ? Math.max(...query.years.map(year => Number(year))) : null
   const { students } = population
   const header = units.map(u => getTextIn(u.name, language)).join(', ')
+  const { QueryCard } = infotooltips.PopulationStatistics
 
   if (students.length > 0) {
     return (
       <Card className="cardContainer">
         <Card.Header className="cardHeader">
           <div>{header}</div>
-          <Icon name="remove" className="controlIcon" onClick={() => removePopulation(uuid)} />
+          <InfoBox content={QueryCard} style={{ margin: 'auto' }} />
         </Card.Header>
         <Card.Meta>
           <div className="dateItem">
@@ -84,7 +83,6 @@ PopulationQueryCard.propTypes = {
   removeSampleFn: func.isRequired,
   units: arrayOf(object).isRequired,
   unit: object, // eslint-disable-line
-  history: shape({}).isRequired,
   tags: arrayOf(shape({})).isRequired
 }
 
