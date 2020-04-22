@@ -51,7 +51,7 @@ const PopulationCourses = ({
 
   if (accordionView)
     return (
-      <>
+      <Segment basic>
         <Header>
           <InfoBox content={CoursesOf.Infobox} />
         </Header>
@@ -63,7 +63,7 @@ const PopulationCourses = ({
           pending={pending}
           selectedStudents={selectedStudents}
         />
-      </>
+      </Segment>
     )
 
   return (
