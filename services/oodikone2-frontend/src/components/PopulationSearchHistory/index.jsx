@@ -253,18 +253,16 @@ class PopulationSearchHistory extends Component {
   renderQueryCards = () => {
     const { populations, translate, units, tags } = this.props
     const { showAdvancedSettings } = this.state
-    const { QueryCard, Advanced } = infotooltips.PopulationStatistics
+    const { Advanced } = infotooltips.PopulationStatistics
     if (!units.data.programmes || !populations.query || !populations.data.students) {
       return null
     }
     const studentNumberList = populations.data.students.map(s => s.studentNumber)
     const { programme: programmeCode, degree: degreeCode, studyTrack: studyTrackCode } = populations.query.studyRights
-
     return (
       <React.Fragment>
         <PopulationsQueryTSA programmeCode={programmeCode} unitData={units.data} />
         <Form.Group inline style={{ marginRight: '100px' }}>
-          <InfoBox content={QueryCard} style={{ margin: 'auto' }} />
           <PopulationQueryCard
             key={`population-${populations.query.uuid}`}
             translate={translate}
@@ -284,13 +282,11 @@ class PopulationSearchHistory extends Component {
           />
         </Form.Group>
         <Form.Group>
-          {showAdvancedSettings ? (
-            <Form.Group>
-              <InfoBox content={Advanced} />
-            </Form.Group>
-          ) : null}
           <Form.Field style={{ margin: 'auto' }}>
-            <b>Advanced settings</b>
+            <b>
+              Advanced settings
+              {showAdvancedSettings ? <InfoBox content={Advanced} /> : null}
+            </b>
             <Form.Radio
               data-cy="advanced-toggle"
               toggle

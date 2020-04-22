@@ -70,7 +70,6 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate, accordi
         )}
       </>
     )
-
   return (
     <Segment>
       <Header size="medium" dividing>
@@ -286,7 +285,7 @@ class PopulationDetails extends Component {
           content: !query.years && (
             <div ref={this.creditGainRef}>
               <CourseStatisticsSegment
-                accordionView={accordionView.AccordionTitle}
+                accordionView={accordionView}
                 samples={samples}
                 selectedStudents={selectedStudents}
                 translate={translate}
