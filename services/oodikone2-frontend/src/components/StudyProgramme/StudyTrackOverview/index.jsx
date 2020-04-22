@@ -169,11 +169,11 @@ const Overview = props => {
   }
 
   const renderTable = year => {
-    if (!throughputData) {
+    if (!throughputData || throughputData.data.length < 1) {
       return (
         <>
           {renderSelection(year)}
-          <h2>No {year ? 'year' : 'studytrack'} selected</h2>
+          <h2>No {year ? 'year' : 'studytrack'} selected or no data available for selection</h2>
         </>
       )
     }
