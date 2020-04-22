@@ -66,7 +66,10 @@ const PopulationStatistics = memo(props => {
             {isAdmin ? <Radio id="accordion-toggle" toggle onChange={() => setAccordion(!accordionView)} /> : null}
             <PopulationSearchHistory history={history} />
             {!props.isLoading && props.queryIsSet && accordionView && (
-              <PopulationFilters samples={props.samples} exclude={excluded} accordionView={accordionView} />
+              <>
+                <Divider />
+                <PopulationFilters samples={props.samples} exclude={excluded} accordionView={accordionView} />
+              </>
             )}
           </>
         ) : null}
