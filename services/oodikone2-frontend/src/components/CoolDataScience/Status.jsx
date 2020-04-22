@@ -159,9 +159,11 @@ const Status = () => {
   const renderSettings = () => {
     return (
       <Accordion style={{ padding: 0, flex: 1 }}>
-        <Accordion.Title active={showSettings} onClick={() => setShowSettings(!showSettings)}>
-          <Icon name="setting" />
-          Asetukset
+        <Accordion.Title style={{ padding: 0, cursor: 'default' }} active={showSettings}>
+          <span style={{ cursor: 'pointer' }} onClick={() => setShowSettings(!showSettings)}>
+            <Icon name="setting" />
+            <span>Asetukset</span>
+          </span>
         </Accordion.Title>
         <Accordion.Content style={{ padding: 0, marginTop: '10px' }} active={showSettings}>
           <Segment>
