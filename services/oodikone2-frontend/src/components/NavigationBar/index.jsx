@@ -36,6 +36,7 @@ const allNavigationItems = {
   courseStatistics: { path: '/coursestatistics', translateId: 'courseStatistics' },
   teachers: { path: '/teachers', translateId: 'teachers', reqRights: ['teachers'] },
   users: { path: '/users', translateId: 'users', reqRights: ['users'] },
+  trends: { path: '/trends', translateId: 'trends', reqRights: ['dev'] },
   faculty: { path: '/faculties', translateId: 'faculty', reqRights: ['faculties'] },
   updater: { path: '/updater', translateId: 'updater', reqRights: ['dev', 'admin'] },
   sandbox: { path: '/sandbox', translateId: 'sandbox', reqRights: ['dev'] },

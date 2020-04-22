@@ -15,6 +15,7 @@ services:
     environment:
       - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test,tkt_oodi_real
     restart: unless-stopped
+    shm_size: '2gb'
 
   db_sis:
     command:
