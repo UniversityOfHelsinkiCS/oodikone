@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, arrayOf, string, bool } from 'prop-types'
-import { Segment, Header, Popup } from 'semantic-ui-react'
+import { Segment, Header } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 
@@ -51,7 +51,7 @@ const PopulationCourses = ({
 
   if (accordionView)
     return (
-      <>
+      <Segment basic>
         <Header>
           <InfoBox content={CoursesOf.Infobox} />
         </Header>
@@ -63,7 +63,7 @@ const PopulationCourses = ({
           pending={pending}
           selectedStudents={selectedStudents}
         />
-      </>
+      </Segment>
     )
 
   return (
@@ -71,13 +71,7 @@ const PopulationCourses = ({
       <Segment>
         {!accordionView && (
           <Header size="medium" dividing>
-            <Popup
-              trigger={<Header.Content>{translate('populationCourses.header')}</Header.Content>}
-              content="Sort by clicking columns. Click course name to limit observed population to students who
-            participated to the course."
-              wide
-              position="top left"
-            />
+            {translate('populationCourses.header')}
             <InfoBox content={CoursesOf.Infobox} />
           </Header>
         )}

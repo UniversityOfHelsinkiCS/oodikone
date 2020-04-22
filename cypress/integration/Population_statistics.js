@@ -80,7 +80,7 @@ describe('Population Statistics tests', () => {
       cy.contains("Excludes students who haven't enrolled present nor absent")
     })
 
-    cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
+    cy.contains("Courses of Population").parent().within(() => {
       cy.get("tr").its('length').should('be.gte', 10)
       cy.route('/api/v3/courseyearlystats**').as('coursePage')
       cy.contains("Laskennan mallit")
@@ -91,7 +91,7 @@ describe('Population Statistics tests', () => {
     cy.contains("TKT20005")
     cy.go("back")
 
-    cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
+    cy.contains("Courses of Population").parent().within(() => {
       cy.contains("Ohjelmoinnin perusteet").siblings().eq(3).should("have.text", "15")
     })
 
@@ -112,7 +112,7 @@ describe('Population Statistics tests', () => {
       checkAmountOfStudents(filteredStudents)
     })
 
-    cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
+    cy.contains("Courses of Population").parent().within(() => {
       cy.contains("Ohjelmoinnin perusteet").siblings().eq(3).should("have.text", "1")
     })
 
@@ -123,8 +123,6 @@ describe('Population Statistics tests', () => {
 
     cy.go("back")
     cy.contains("Advanced settings")
-    cy.contains("Tietojenkäsittelytieteen maisteriohjelma").siblings().get('.remove').click()
-    cy.contains('Previous searches')
   })
 
   it('Student list checking works as intended', () => {
@@ -321,23 +319,22 @@ describe('Population Statistics tests', () => {
     cy.get('.field > .ui > label').click()
     cy.contains('Statistics until')
     // only spring
-    cy.get(':nth-child(3) > :nth-child(2) > :nth-child(2) > .ui > label').click()
-    cy.get(':nth-child(3) > .button').click()
+    cy.contains('Semesters').siblings().contains('Fall').click()
+    cy.contains('Fetch population').click()
 
     cy.contains('Credit accumulation (for 13 students)')
 
     // only fall
-    cy.get(':nth-child(3) > :nth-child(2) > :nth-child(2) > .ui > label').click()
-    cy.get(':nth-child(2) > :nth-child(3) > .ui > label').click()
-    cy.get(':nth-child(3) > .button').click()
+    cy.contains('Semesters').siblings().contains('Fall').click()
+    cy.contains('Semesters').siblings().contains('Spring').click()
+    cy.contains('Fetch population').click()
 
     cy.contains('Credit accumulation (for 206 students)')
 
     // spring + fall and include cancelled
-    cy.get(':nth-child(2) > :nth-child(3) > .ui > label').click()
-    cy.get(':nth-child(3) > :nth-child(3) > .ui > label').click()
-
-    cy.get(':nth-child(3) > .button').click()
+    cy.contains('Semesters').siblings().contains('Spring').click()
+    cy.contains('Include').siblings().contains('present nor absent').click()
+    cy.contains('Fetch population').click()
 
     cy.contains('Credit accumulation (for 228 students)')
   })

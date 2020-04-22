@@ -250,6 +250,11 @@ const schedulePurge = async () => {
   ]
   try {
     const lastHourlySchedule = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
+    console.log('PURGE_REDIS_LAST_HOURLY', lastHourlySchedule)
+
+    if (!lastHourlySchedule || Number.isNaN(new Date(lastHourlySchedule).getTime())) {
+      throw new Error('Invalid date from hourly schedule')
+    }
     each(
       Object.values(TABLES_TO_PURGE),
       async table =>
